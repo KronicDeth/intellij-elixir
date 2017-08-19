@@ -1,0 +1,2918 @@
+<html>
+<body>
+<h1>v6.1.1</h1>
+<ul>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>
+        When <a href="https://github.com/KronicDeth/intellij-elixir/pull/754">#754</a> made
+        <code>intellij-erlang</code> a soft-dependency, it broke the debugger's icons that referenced
+        <code>ErlangIcons</code>, but it turns out all the icon constants were aliases to
+        <code>AllIcons.Debugger</code> constants, so by using the <code>AllIcons.Debugger</code> icons directly,
+        the dependency on <code>ErlangIcons</code> can be removed without the need to copy the image files into
+        <code>intellij-elixir</code>.
+      </li>
+      <li>
+        When <code>do ... end</code> template is inserted, it did not have a previous child whose attributes to
+        use, so it used the default, which left the cursor unindented. To get the cursor indented by default,
+        when the <code>ElementType</code> is <code>DO</code>, apply the <code>stabChildrenIndent</code> rules:
+        indent normal and determine whether to indent relative to direct parent using code style setting.
+      </li>
+      <li>Include <code>VirtualFile</code> path in Beam read errors</li>
+    </ul>
+  </li>
+</ul>
+<h1>v6.1.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>
+        Since the process of requiring resource files is the same, <code>org.elixir_lang.ElixirModules</code> has
+        static methods for copying resources out to a temporary directory and adding the
+        <code>-r &lt;temporary_path&gt;</code> for one or more resource files to a new or existing ParametersList.
+        These are now shared for the Mix ExUnit and Debugger code paths.
+      </li>
+      <li>Format class
+        <ul>
+          <li><code>ElixirXDebugProcess</code></li>
+          <li><code>MixExUnitRunningState</code></li>
+          <li><code>MIxRunningState</code></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>
+        The compiled <code>.beam</code> files were removed in
+        <a href="https://github.com/KronicDeth/intellij-elixir/commit/58e7d4aafa6ad44279d15dd92f40c35e00d7357e">
+          <tt>58e7d4a</tt>
+        </a>, which was before v5.1.0, but not all users had problems with using the debugger.
+        <a href="https://github.com/KronicDeth/intellij-elixir/issues/739">#739</a>
+        <a href="https://github.com/KronicDeth/intellij-elixir/issues/739#issuecomment-322032123">persisted</a>
+        (as reported by <a href="https://github.com/erikreedstrom" class="user-mention">@erikreedstrom</a>) when
+        6.0.0 was released; I retried reproducing on a clean VM and I got it. I'm not sure why it worked for some
+        people in prior releases since the <code>.beam</code> don't exist that were being copied, but now the
+        debugger uses the same system of copying <code>.ex</code> files and requiring them with <code>-r</code>
+        instead of copying <code>.beam</code> and using <code>-pa</code> to add the <code>ebin</code> directory.
+        Fix was verified local under macOS and in Windows VM that reproduced
+        <a href="https://github.com/KronicDeth/intellij-elixir/issues/739">#739</a>.
+      </li>
+    </ul>
+  </li>
+</ul>
+<h1>v6.0.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>Code Formatter
+        <ul>
+          <li><code>do</code> block lines are indented</li>
+          <li><code>do</code> blocks <code>end</code> as the last argument of a no parentheses call unindents to the
+            start of the call
+          </li>
+          <li>If one clause of a multi-clause anonymous function wraps, all clauses wrap.</li>
+          <li>Indent after <code>else</code></li>
+          <li>Indent map and struct keys</li>
+          <li>All keys wrap if any key wraps</li>
+          <li>No spaces around...
+            <ul>
+              <li><code>.</code></li>
+            </ul>
+          </li>
+          <li>Spaces around...
+            <ul>
+              <li><code>and</code></li>
+              <li><code>in</code></li>
+              <li><code>or</code></li>
+              <li><code>when</code></li>
+            </ul>
+          </li>
+          <li>Configure spaces around...
+            <ul>
+              <li><code>=</code></li>
+              <li><code>&lt;-</code> and <code>\\</code></li>
+              <li><code>!=</code>, <code>==</code>, <code>=~</code>, <code>!==</code>, and <code>===</code></li>
+              <li><code>&lt;</code>, <code>&lt;=</code>, <code>&gt;=</code>, and <code>&gt;</code></li>
+              <li><code>+</code> and <code>-</code></li>
+              <li><code>*</code> and <code>/</code></li>
+              <li>Unary <code>+</code>, <code>-</code>, <code>!</code>, <code>^</code>, and <code>~~~</code></li>
+              <li><code>-&gt;</code></li>
+              <li><code>::</code></li>
+              <li><code>|</code></li>
+              <li><code>||</code> and <code>|||</code></li>
+              <li><code>&amp;&amp;</code> and <code>&amp;&amp;&amp;</code></li>
+              <li><code>&lt;~</code>, <code>|&gt;</code>, <code>~&gt;</code>, <code>&lt;&lt;&lt;</code>,
+                <code>&lt;&lt;~</code>, <code>&lt;|&gt;</code>, <code>&lt;~&gt;</code>, <code>&gt;&gt;&gt;</code>, and
+                <code>~&gt;&gt;</code></li>
+              <li><code>..</code></li>
+              <li><code>^^^</code></li>
+              <li><code>++</code>, <code>--</code>, <code>..</code>, <code>&lt;&gt;</code></li>
+              <li><code>=&gt;</code></li>
+            </ul>
+          </li>
+          <li>Configure spaces before...
+            <ul>
+              <li><code>,</code></li>
+            </ul>
+          </li>
+          <li>No space after...
+            <ul>
+              <li><code>@</code></li>
+            </ul>
+          </li>
+          <li>Spaces after...
+            <ul>
+              <li><code>not</code></li>
+              <li><code>fn</code></li>
+              <li><code>after</code></li>
+              <li><code>catch</code></li>
+              <li><code>rescue</code></li>
+              <li><code>key:</code></li>
+            </ul>
+          </li>
+          <li>Configure space after...
+            <ul>
+              <li><code>&amp;</code></li>
+              <li><code>,</code></li>
+            </ul>
+          </li>
+          <li>Configure spaces within...
+            <ul>
+              <li><code>{ }</code></li>
+              <li><code>&lt;&lt; &gt;&gt;</code></li>
+              <li><code>[ ]</code></li>
+              <li><code>( )</code></li>
+            </ul>
+          </li>
+          <li>No space around <code>/</code> in <code>&amp;NAME/ARITY</code> and <code>&amp;QUALIFIER.NAME/ARITY</code>
+          </li>
+          <li><code>when</code> wraps when its right operand wraps, so that guards start with <code>when</code> on a
+            newline when they are too long.
+          </li>
+          <li>Align <code>|&gt;</code> at start of indented line for pipelines</li>
+          <li>Align <code>end</code> with start of call instead of start of line for <code>do</code> blocks in pipelines
+          </li>
+          <li>Indent list elements when wrapped</li>
+          <li>Indent tuple elements when wrapped</li>
+          <li>Align type definition to right of <code>::</code></li>
+          <li>Align guard to right of <code>when</code> when guards span multiple lines</li>
+          <li>Align two operator (<code>++</code>, <code>--</code>, <code>..</code>, <code>&lt;&gt;</code>) operands, so
+            that <code>&lt;&gt;</code> binaries are multiple lines align their starts instead of using continuation
+            indent and being indented relative to first operand.
+          </li>
+          <li>Align pipe <code>|</code> operands, so that alternates in types and specs are aligned instead of
+            continuation indented relative to the first operand.
+          </li>
+          <li>Comments in <code>spec</code> (that is above operands to <code>|</code> align with the operands</li>
+          <li>Remove newlines from pipelines, so that all pipelines start with an initial value or call and each <code>|&gt;</code>
+            is the start of a successive line.
+          </li>
+          <li>Key exclusivity: if an association operation or keyword key is already on a line, the container value
+            automatically has it's elements wrapped if there is nested associations or keyword pairs, so that two levels
+            of keys are not on the same line.
+          </li>
+          <li>Indent bit string (<code>&lt;&lt; &gt;&gt;</code>) elements when wrapped</li>
+        </ul>
+      </li>
+      <li>Update IntelliJ IDEA version to latest in each MINOR version:
+        <ul>
+          <li><code>2017.1.1</code> -&gt; <code>2017.1.5</code></li>
+          <li><code>2016.3.5</code> -&gt; <code>2016.3.7</code></li>
+        </ul>
+      </li>
+      <li>Update Elixir version <code>1.4.2</code> -&gt; <code>1.4.5</code></li>
+      <li><code>TeamCityExUnitFormatting.put_event</code></li>
+      <li>Always match on <code>%__MODULE__{}</code> for state in clauses to prevent state update errors</li>
+      <li>Match on <code>:suite_finished</code> and <code>:suite_started</code> events, so that only events added to the
+        interface will be unknown and <code>IO.warn</code> can be used tell anyone spotting the new event to file an
+        issue.
+      </li>
+      <li>Instead of pinning position (<code>1</code> for lines or <code>3</code> for heredocs), <code>pin</code> <code>*_PROMOTER</code>
+        token, so it's more obvious the pattern is that the promoter is pinned.
+      </li>
+      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/659">#659</a>.</li>
+      <li>Search for Elixir SDKs in <code>/nix/store</code> on Mac if homebrew path does not exist</li>
+      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/672">#672</a></li>
+      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/674">#674</a></li>
+      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/683">#683</a></li>
+      <li>Store expected decompilation in files to shrink <code>DecompilerTest</code> length</li>
+      <li>Update to <code>org.jetbrains.intellij</code> <code>0.2.15</code></li>
+      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/687">#687</a></li>
+      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/692">#692</a></li>
+      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/694">#694</a></li>
+      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/699">#699</a></li>
+      <li>Use <code>Elixir.LDAPEx.ELDAPv3.beam</code> as regression test for <a
+          href="https://github.com/KronicDeth/intellij-elixir/issues/703">#703</a>.
+      </li>
+      <li>Use <code>THashSet</code> instead of the more specific <code>SmartHashSet</code> because <code>THashSet</code>
+        allows <code>null</code> keys, which are expected for the <code>canonicalNameSet</code>.
+      </li>
+      <li>Show <code>quote</code>s in list in macros in Structure View</li>
+      <li>
+        References will be cached until the file containing the PSI element changes, so that results from
+        <code>Callable#multiResolve</code>, <code>CallDefinitionClause#multiResolve</code>,
+        <code>Module#multiResolve</code>, and <code>ModuleAttribute#multiResolve</code>, which are all the extant
+        references, can be cached and invalidated correctly.
+      </li>
+      <li>Use <code>ParameterLists</code> to support Path Variables in program parameters.</li>
+      <li>Adjust SDK home path when <code>bin</code>, <code>lib,</code> or <code>src</code> to parent directory.</li>
+      <li>Format <code>ElixirSdkType</code>.</li>
+      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/354">#354</a></li>
+      <li>Include specific message for each decompilation error reason.</li>
+      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/772"
+                                 class="issue-link js-issue-link" data-id="248110529"
+                                 data-error-text="Failed to load issue title"
+                                 data-permission-text="Issue title is private"
+                                 title="Decompilation not working with OTP 20 using AtU8 chunk for ASCII atoms">#772</a>
+      </li>
+      <li><code>AtU8</code> UTF8 atoms chunk decompilation to support OTP 20 compiled <code>.beam</code> files.</li>
+      <li>
+        Regression test for Elixir 1.5.0 announcement to ensure that unicode from <code>AtU8</code> chunk can be read
+        from beam file produced by following Elixir code:
+        <pre><code>
+defmodule AtU8Test do
+  def こんにちは世界 do
+    :こんにちは世界
+
+     saudação = "Bom dia!"
+
+    saudação
+  end
+end
+</code></pre>
+      </li>
+      <li>Guard against read/write mismatch in stubs</li>
+      <li>
+        Always install <code>IdeaVIM</code> in the gradle sandbox because it got annoying having to reinstall it
+        when the sandbox reset.
+      </li>
+      <li>Merge both homebrew and nix store on Mac</li>
+      <li>Merge default and nix store on Linux</li>
+      <li>Format <code>MixRunningStateUtil</code> and fix warnings.</li>
+    </ul>
+  </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>Treat <code>::</code> the same as <code>:</code> in <code>key:</code> after <code>when</code> in type
+        specifications as it's a realistic error.
+      </li>
+      <li>Change <code>.</code> to <code>#</code> when referring to constants in javadocs</li>
+      <li>Remove <code>@param</code> without descriptions</li>
+      <li>Remove explicit type from generics when the type can be inferred.</li>
+      <li>Check if <code>atNonNumericOperation</code> reference is non-<code>null</code> before resolving</li>
+      <li>Swap empty branches to inverted conditions for final <code>else</code>.</li>
+      <li>Check if <code>Type</code> <code>leftOperand</code> is <code>null</code> before using it.</li>
+      <li>Remove empty <code>highlightTypesAndTypeParameterUsages(When...)</code></li>
+      <li>Remove unused <code>highlightTypesAndSpecificationTypeParameterDeclarations</code></li>
+      <li>Flip <code>equals</code> to eliminate need for <code>null</code> check</li>
+      <li>Remove redundant type arguments (<code>&lt;...&gt;</code>)</li>
+      <li>Change <code>Collections.EMPTY_SET</code> to <code>Collections.emptySet()</code> to prevent uncheck cast
+        warnings.
+      </li>
+      <li>Inline constant argument for errors.</li>
+      <li>Check if <code>when</code> <code>rightOperand</code> is non-<code>null</code> before scanning it for parameter
+        names.
+      </li>
+      <li>Fix typos</li>
+      <li>When compilation error is detected during <code>mix test</code>, it will be turned into a test failure.
+        <ul>
+          <li>Compilation errors are any stacktraces to <code>stderr</code> that end in <code>(elixir)
+            lib/kernel/parallel_require.ex:</code>.
+          </li>
+          <li>The test failure for the compilation will be attributed to either <code>mix test</code> or the inferred
+            module name of test file.
+            <ul>
+              <li>If the first line of the stacktrace contains <code>test/.*_test.exs:\d+: \(module\)</code>
+                <ul>
+                  <li>The file and line from that line will be used as the location of failure</li>
+                  <li>The <code>test/</code> and <code>.exs</code> will be stripped from the file and it will be
+                    camelized to produce the derived test module name of the failure
+                  </li>
+                </ul>
+              </li>
+              <li>Otherwise, <code>mix test</code> is used</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>Rearrange doc test names to emphasize the function being tested: <code>"test doc at MODULE.FUNCTION/ARITY
+        (COUNT)"</code> becomes <code>"MODULE.FUNCTION/ARITY doc (COUNT)"</code>
+        <ul>
+          <li>If <code>MODULE</code> is the same as the test case without the <code>Test</code> suffix, then <code>MODULE.</code>
+            is stripped too and the test name becomes only <code>FUNCTION/ARITY doc (COUNT)</code></li>
+        </ul>
+      </li>
+      <li>Fix parallel test cases nesting under each other due to asynchronous reporting from formatter. <code>##teamCity</code>
+        <code>testSuiteStarted</code> messages automatically nest, so switched to using <code>nodeId</code> and <code>parentNodeId</code>
+        system, so that nesting is explicit. This will allow multiple parallel tests to show up in GUI too.
+      </li>
+      <li><code>Elixir.</code> prefix is stripped from test case names.</li>
+      <li>Handle Elixir versions with non-numeric parts</li>
+      <li>Use a separate formatter, one GenEvent-based and one GenServer-based, depending on whether the SDK is &gt;=
+        1.4.0 as that's when GenEvent was deprecated and GenServer was preferred.
+      </li>
+      <li>Merge <code>Callable</code> and <code>Kernel</code> annotators</li>
+      <li>Use <code>PsiElementVisitor</code> instead of <code>PsiRecursiveElementVisitor</code>, so that macros in
+        <code>defmodule</code> block don't get double annotated.
+      </li>
+      <li>Instead of erasing and then applying multiple <code>TextAttributeKey</code>, erase as before, but then merge
+        the <code>TextAttributeKey</code>'s <code>TextAttributes</code> and apply as single <code>setEnforcedTextAttributes</code>.
+        For some reason, this fixes the inconsistency of whether <code>PREDEFINED_CALL</code> or <code>MACRO_CALL</code>
+        is applied first.
+      </li>
+      <li>In case of multiple <code>resolved</code>s, make those that need <code>PREDEFINED_CALL</code> to win.</li>
+      <li><code>TeamCityExUnitFormatting.new</code> should return struct only because none of the formatters
+        expects an <code>:ok</code> tuple.
+      </li>
+      <li>Fix order of <code>TeamCityExUnitFormatting.put_Event</code> catchall parameters.</li>
+      <li><code>FileReferenceFilter</code>
+        <ul>
+          <li>Add <code>.exs</code> to pattern for stacktrace linking.</li>
+          <li>Highlight only stacktrace path and line umber instead of entire line</li>
+          <li>Better path match in stacktraces
+            <ul>
+              <li>Only accept VirtualFile if it has a suffix matching the stacktrace's path instead of accepting the
+                first index file with a matching basename.
+              </li>
+              <li>Allow multiple VirtualFiles to be linked if it turns out there is a true file path collision between
+                two OTP apps in the Project or Libraries.
+              </li>
+            </ul>
+          </li>
+          <li>Format and fix warnings</li>
+        </ul>
+      </li>
+      <li>Pin promoter for all quotes, including the previously missing <code>stringLine</code> and
+        <code>charListLine</code>.
+      </li>
+      <li>Only insert closing quote if previous token was an opening quote.</li>
+      <li>On <code>unquote</code>, include argument in name of call definition clause</li>
+      <li>Look outside tuple containing <code>quote</code> for <code>enclosingMacroCall</code>, which allows going to <a
+          href="https://github.com/phoenixframework/phoenix/blob/v1.2.4/lib/phoenix/template.ex#L380-L392">Phoenix.Template.compile's
+        quote's defp</a></li>
+      <li>Treat <code>Module.create</code> as `Modular</li>
+      <li><code>Or</code> interface to unify <code>Matched</code> and <code>Unmatched</code> <code>Or</code>s.</li>
+      <li>Look at both side of <code>Or</code> operation for nested child calls for Structure view.</li>
+      <li>Make <code>unquote(ARG1)</code> name for <code>getName</code> and indexing</li>
+      <li><code>ElementDescription</code> for <code>ElixirVariable</code></li>
+      <li>Mark <code>UnqualifiedParenthesesCall</code>s as <code>call</code> instead of <code>variable</code>.</li>
+      <li><code>mix local.hex --force</code> before <code>mix deps.get</code> during project import to prevent prompt
+        for hex update when local hex is earlier than that required by <code>mix</code>.
+      </li>
+      <li>Fix warnings and format <code>MixProjectRootStep</code></li>
+      <li>Mark <code>ElixirDecimalFloat</code> as error in types.
+        <ul>
+          <li>If in a Range: "Floats aren't allowed in Ranges"</li>
+          <li>Otherwise: "Float literals are not allowed in types. Use float() instead".</li>
+        </ul>
+      </li>
+      <li>Ignore <code>jps-*/out</code> directories.</li>
+      <li>Look at parent for <code>isParameter</code> for <code>AtUnqualifiedBracketOperation</code>.</li>
+      <li>Treat <code>AtUnqualifiedBracketOperation</code> the same as <code>UnqualifiedBracketOperation</code> for
+        <code>isVariable</code>.
+      </li>
+      <li>Include path in error messages from <code>buildFileStub</code></li>
+      <li>Erlang allows <code>do</code> as a function name, but it's a keyword in Elixir, so wrap it as <code>unquote(:do)</code>.
+        The <code>SpecialForm</code> decompiler already did this <code>unquote(...)</code> wrapping, but <code>do</code>
+        is a keyword and not a special form, so rename the decompiler to <code>Unquoted</code>.
+      </li>
+      <li>
+        <p>Move {3} inside <code>|</code> for <code>SIGIL</code> <code>PROMOTER</code> and <code>TERMINATOR</code>:</p>
+        <blockquote>
+<pre><code>SIGIL_HEREDOC_PROMOTER = ({SIGIL_DOUBLE_QUOTES_PROMOTER}|&gt;
+{SIGIL_SINGLE_QUOTES_PROMOTER}){3}
+SIGIL_HEREDOC_TERMINATOR = ({SIGIL_DOUBLE_QUOTES_TERMINATOR}|&gt;
+{SIGIL_SINGLE_QUOTES_TERMINATOR}){3}
+</code></pre>
+          <p>-- <a
+              href="https://github.com/KronicDeth/intellij-elixir/blob/v5.1.0/src/org/elixir_lang/Elixir.flex?utf8=%E2%9C%93#L524-L525">https://github.com/KronicDeth/intellij-elixir/blob/v5.1.0/src/org/elixir_lang/Elixir.flex?utf8=%E2%9C%93#L524-L525</a>
+          </p>
+        </blockquote>
+        <p>The <code>|</code> is inside group that is then <code>{3}</code>'d, so it allows either <code>'</code> or
+          <code>"</code> in groups of three. This is only applies to the sigils. It's correct for normal string and
+          charlist heredocs:</p>
+        <blockquote>
+<pre><code>CHAR_LIST_HEREDOC_PROMOTER = {CHAR_LIST_PROMOTER}{3}
+CHAR_LIST_HEREDOC_TERMINATOR = {CHAR_LIST_TERMINATOR}{3}
+
+STRING_HEREDOC_PROMOTER = {STRING_PROMOTER}{3}
+STRING_HEREDOC_TERMINATOR = {STRING_TERMINATOR}{3}
+
+QUOTE_HEREDOC_PROMOTER = {CHAR_LIST_HEREDOC_PROMOTER} | {STRING_HEREDOC_PROMOTER}
+QUOTE_HEREDOC_TERMINATOR = {CHAR_LIST_HEREDOC_TERMINATOR} | {STRING_HEREDOC_TERMINATOR}
+</code></pre>
+          <p>-- <a
+              href="https://github.com/KronicDeth/intellij-elixir/blob/v5.1.0/src/org/elixir_lang/Elixir.flex?utf8=%E2%9C%93#L441-L448">https://github.com/KronicDeth/intellij-elixir/blob/v5.1.0/src/org/elixir_lang/Elixir.flex?utf8=%E2%9C%93#L441-L448</a>
+          </p>
+        </blockquote>
+      </li>
+      <li>Unquote function names that start with an uppercase codepoint, so that they aren't parsed as Aliases. These
+        function names occur in the CORBA modules in OTP.
+      </li>
+      <li>Using intellij.plugins will prevent packaging intellij-erlang as a runtime dependency, which leads to
+        duplicate templates.
+      </li>
+      <li>Don't use the <code>JPS</code> <code>type</code> for <code>jps-*</code> projects because their deps become
+        incompatible with other projects.
+      </li>
+      <li>Add missing <code>break</code>s to <code>case</code> statement in <code>processDeclarations(Match, ...)</code>
+        that caused the logic of whether to check left, right, or both operand based on the whether the treeWalkUp came
+        from always fell through to the <code>RIGHT</code> case, so it was only, always checking the right operand of
+        the match and never the left operand.
+      </li>
+      <li>Skip <code>processDeclarationsInPreviousSibling</code> when <code>lastParent</code> is <code>ElixirFile</code>
+      </li>
+      <li>Remove background color from sigils because it stands out really badly in the Default theme where it's black
+        on white and while it doesn't in Darcula, it's unnecessary there because it's so close to the editor background
+        color in Darcula.
+      </li>
+      <li>Treat <code>Alias</code> as miscapitalized type parameter.</li>
+      <li>Ignore call definition clauses after <code>when</code> in type specifications as it is a common occurrence
+        when typing a specification above a pre-existing call definition clause.
+      </li>
+      <li>Look above <code>List</code> for enclosing modular macro.</li>
+      <li>Look above <code>ElixirNoParenthesesManyStrictNoParenthesesExpression</code> for enclosing modular macro.</li>
+      <li>Remove background color from Sigil Color Scheme Design to match changes in <a
+          href="https://github.com/KronicDeth/intellij-elixir/pull/757">#757</a>.
+      </li>
+      <li>Check if program parameters is blank before splitting into mix args.</li>
+      <li>Use <code>ParametersList</code> to properly parse quote program parameters.</li>
+      <li>Move <code>Quoter</code> into <code>test</code> directory, so it and its dependency on <code>JUnit</code> is
+        only used for test compilation and runtime and not the shipped runtime.
+      </li>
+      <li>Fix <code>Quoter</code> warnings and format.</li>
+      <li>
+        Show expected SDK home path structure when invalid.
+        <a href="https://user-images.githubusercontent.com/298259/29006393-5ce71dfe-7ab4-11e7-88c9-732856f6259d.png"
+           target="_blank">
+          <img src="https://user-images.githubusercontent.com/298259/29006393-5ce71dfe-7ab4-11e7-88c9-732856f6259d.png"
+               alt="screen shot 2017-08-06 at 2 28 36 pm" style="max-width:100%;" />
+        </a>
+      </li>
+      <li>Suppress invalid warnings in <code>ElixirSdkType</code>.</li>
+      <li>Always check if resolution result is right operand of match.</li>
+      <li>
+        <code>CallDefinitionClause</code> <code>InsertHandler</code> always assumed there was a character after
+        the insert location, but when inserting at the very end of the file, there isn't, which caused an
+        <code>IndexOutOfBoundsException</code>. Only check if the following character is not a space,
+        <code>(</code>, or <code>[</code> when the document is longer than the tail offset to prevent the
+        <code>IndexOutOfBoundsException</code>. If the insertion is at the end of the file, then the
+        <code>()</code> will always be inserted.
+      </li>
+      <li><code>Decompilated</code> -&gt; <code>Decompilation</code></li>
+      <li>
+        The lower-level <code>Data(Output|IntputStream</code> <code>(write|read)Int</code> don't work correctly
+        with sizes, so use the JetBrains <code>(write|read)VarInt</code> ones instead.
+      </li>
+      <li>
+        Delegate <code>ChildAttributes</code> to previous child when available:
+        <code>Block.getChildAttributes</code> is used when Enter is pressed to determine the indentation and
+        alignment. Using the default implementation, newlines in stabs look overly indented, but there is a
+        constant, <code>DELEGATE_TO_PREV_CHILD</code> that can be used to just use the last child's indent as long
+        as there is one, which appears to work well for stabs (do block bodies, etc).
+      </li>
+      <li>
+        Increase suspect <code>nameSetSize</code> from <code>4</code> to <code>10</code> because a
+        <code>Poison.Encoder</code> has an <code>impl</code> module for 4 types, and so has 4 canonical names.
+      </li>
+      <li>
+        Only read-ahead if guard length is non-zero; otherwise, only warn the nameSetSize may be suspect and don't
+        read-ahead as this can mess up OK namesets.
+      </li>
+      <li>Override <code>Kernel.SpecialFroms</code> arity intervals
+        <ul>
+          <li><code>alias</code> overridden from <code>2</code> to <code>1-2</code> to support without <code>:as</code>
+            option.
+          </li>
+          <li><code>import</code> overridden from <code>2</code> to <code>1-2</code> to support without
+            <code>:except</code> or <code>:only</code> options.
+          </li>
+          <li><code>quote</code> overridden from <code>2</code> to <code>1-2</code> to support block without options.
+          </li>
+          <li><code>require</code> overridden from <code>2</code> to <code>1-2</code> to support without
+            <code>:as</code> option.
+          </li>
+          <li><code>super</code> overridden from <code>1</code> to <code>0-</code> to support calling any super method.
+          </li>
+        </ul>
+      </li>
+      <li>
+        <code>elixir.bat</code> in at least Elixir 1.5.1, will not properly parse a mix path with spaces in it on
+        Windows even when the path has outer quotes (see
+        <a href="https://github.com/elixir-lang/elixir/issues/6455">elixir-lang/elixir#6455</a>). It is not
+        possible to use inner quotes, as you can do in cmd.exe, using the JetBrains and Java libraries that
+        auto-matically quote, so instead bypass the bad quoting in <code>elixir.bat</code> by doing what
+        <code>elixir.bat</code> does: call <code>erl.exe</code> with all the SDK ebin paths added with
+        <code>-pa</code>, then <code>-noshell -s elixir start_cli</code> to run Elixir and<code>-extra</code> to
+        run requires (<code>-r</code>), mix and its tasks.
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Incompatible Changes</p>
+    <ul>
+      <li>Drop <code>14.1.X</code> support because it does not have support for nodeId test output, so it's not possible
+        to handle the ExUnit test output in a safe manner while still allowing concurrent output for asynchronous tests.
+      </li>
+    </ul>
+  </li>
+</ul>
+<h1>v5.1.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>Graphical debugger with line breakpoints</li>
+      <li>Add Debugger to README</li>
+    </ul>
+  </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>
+        Replace <code>assert scope.isEquivalentTo(lastParent.getParent())</code> with an <code>if</code> and log
+        what <code>lastParent</code> was when condition is <code>false</code>, so root cause can be traced.
+      </li>
+    </ul>
+  </li>
+</ul>
+<h1>v5.0.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>
+        <p>
+          Decompile <code>.beam</code> files
+        </p>
+        <ul>
+          <li>Structure view for decompiled <code>.beam</code> files</li>
+          <li>Index modules, functions, and macros exported by <code>.beam</code> files</li>
+          <li>
+            <p>Go To Symbol for Modules defined in <code>.beam</code> files (both SDK and deps)</p>
+            <ul>
+              <li>Erlang using atoms (like <code>:idna</code>)</li>
+              <li>Elixir using Alias (like <code>Enum</code>)</li>
+            </ul>
+          </li>
+          <li>
+            <p>Completion for Modules defined in <code>.beam</code> files (both SDK and deps)</p>
+            <ul>
+              <li>Elixir using Alias (like <code>Enum</code>)</li>
+            </ul>
+          </li>
+          <li>Completion for functions and macros exported by <code>.beam</code> files</li>
+          <li>Syntax highlighting</li>
+        </ul>
+      </li>
+      <li>
+        Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/pull/575">#575</a>
+      </li>
+      <li>
+        <p>Macros appear before functions in decomplied <code>.beam</code> files</p>
+        <ul>
+          <li>Header for macro and function sections</li>
+        </ul>
+      </li>
+      <li>
+        Update <code>ELIXIR_VERSION</code> for <code>1.2.*</code> from <code>1.2.3</code> to <code>1.2.6</code>
+      </li>
+      <li>Add <code>ELIXIR_VERSION</code> <code>1.3.4</code></li>
+      <li>Add <code>ELIXIR_VERSION</code> <code>1.4.0</code></li>
+      <li>Update <code>IDEA</code> for <code>2016.*</code> to <code>2016.3.1</code></li>
+      <li>
+        Show <code>OtpErlangBitStr</code> (and therefore <code>OtpErlangBinary</code> contents when tests fail
+      </li>
+      <li>
+        Quote binaries as <code>to_charlist</code> instead of <code>to_char_list</code> for Elixir
+        <code>&lt;= 1.3</code>. Depends on Elixir version of project SDK.
+      </li>
+      <li>
+        Use <code>elixir</code> instead of <code>java</code> VM, so now Erlang and Elixir don't need to be built
+        on travis-ci, but <code>ant</code> and the <code>jdk</code> need to be installed, but unlike Erlang and
+        Elixir, there are tarballs for that, so this way is faster than the old method without depending on
+        Travis-CI cache.
+      </li>
+      <li>
+        If <code>multiResolve</code> causes a <code>StackOverflow</code> for
+        <code>org.elixir_lang.annotator.Callable.visitCall</code>, then <code>catch</code> it and use
+        <code>errorreport</code> logger to log the element.
+      </li>
+      <li>Include file path in <code>errorreport</code> excerpt</li>
+      <li>Log element for <code>StackOverflow</code> related to <code>import</code>s</li>
+      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/605">#605</a>.</li>
+      <li>
+        Log <code>LookupElement#getObject</code> when <code>LookupElement#getPsiElement</code> is
+        <code>null</code> to track down how it was <code>null</code> in
+        <a href="https://github.com/KronicDeth/intellij-elixir/issues/563">#563</a>.
+      </li>
+      <li>
+        Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/559">#559</a>
+      </li>
+      <li>
+        <p>Switch to Gradle for builds.</p>
+        <ul>
+          <li>
+            <code>./gradlew runIde</code> (or the <code>runIde (VERSION)</code> Run Configurations) will run IDEA
+            in a sandbox with the development version of the plugin.
+          </li>
+          <li>
+            <code>./gradlew test</code> (or the <code>test (VERSION)</code> Run Configurations) will run the main
+            plugin and jps-builder tests.
+          </li>
+          <li>
+            The plugin can now be published with <code>./gradlew publishPlugin</code>, <b>BUT</b> you'll need to
+            fill in <code>publish*</code> properties in <code>gradle.properties</code>. This will
+            <i>eventually</i> allow for automated "nightlies" from successful Travis-CI builds on
+            <code>master</code>.
+          </li>
+        </ul>
+      </li>
+      <li>
+        The <code>Callable</code> annotator is meant for variables, parameters, and macro and function calls and
+        declarations. The <code>ModuleAttribute</code> annotator handles module attribute declaration and usage,
+        so we can save reference resolution time by skipping module attributes in <code>Callable</code>.
+      </li>
+      <li>Allow module attribute folding to be configured.</li>
+      <li>
+        Allow call definition heads to resolves to themselves for consistency with Aliases of
+        <code>defmodule</code>.
+      </li>
+      <li>
+        Generalize <code>Callable.callDefinitionClauseDefiner(Call)</code>: in addition to the current
+        <code>CallDefinitionClause</code>, make it work for <code>Implementation</code>, <code>Module</code>,
+        and <code>Protocol</code>.
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>
+        Fix copy-paste errors in <code>MatchOperatorInsteadOfTypeOperator</code>
+      </li>
+      <li>
+        Subtract 1 from arity in <code>.beam</code> file when decompiling to <code>defmacro</code> calls because
+        the Erlang function for Elixir macros has one addition argument: the first argument is the
+        <code>Caller</code> of the macro.
+      </li>
+      <li>
+        If the name of the decompiled macro/function is an infix operator, then decompile the head as a binary
+        operation instead of a normal prefix name as infix operators aren't valid prefix names and led to parsing
+        errors, which was the root cause of <a href="https://github.com/KronicDeth/intellij-elixir/pull/575">#575</a>.
+      </li>
+      <li>Fix IntelliJ warnings in <code>BeamFileImpl</code></li>
+      <li>Remove unused <code>VirtualFile</code> argument to <code>BeamFileImpl#buildFileStub</code>.</li>
+      <li>
+        Add <code>++</code>, <code>=~</code>, and <code>in</code> to <code>INFIX_OPERATOR_SET</code>.
+      </li>
+      <li>
+        Only render infix operators if arity is <code>2</code>.
+      </li>
+      <li>
+        Prefix operator decompilation: <code>+</code> and <code>-</code> are both binary and unary operators.
+        When a unary operator they need to be wrapped in parentheses, so that the call definition clause is parsed
+        correctly.
+      </li>
+      <li>Ignore <code>JFLex</code> jar</li>
+      <li>Don't check for <code>elixir-lang/elixr</code> files remove in <code>1.3</code></li>
+      <li>
+        Allow <code>nil</code> as a keyword key. <code>nil</code> was being lexed as a potential keyword key, but
+        <code>NIL</code> was missing from the token list in the keywordKey grammar rule.
+      </li>
+      <li>
+        Some SpecialForms don't work as literals as they would be interpreted as metaprogramming, so their name
+        needs to be wrapped as an atom to <code>unquote</code>.
+      </li>
+      <li>Check children of <code>MultipleAliases</code> for variable declarations.</li>
+      <li>Treat any variable declared in a <code>MultipleAliases</code> as invalid.</li>
+      <li>
+        Skip <code>import Kernel</code> in <code>kernel.ex</code> to prevent stack overflow due to recursive
+        <code>import</code>
+      </li>
+      <li>
+        Strip all outer parentheses for left type operand, so that <code>(+value)</code> can be see as
+        <code>+</code> operator type spec.
+      </li>
+      <li>
+        Use advice from <code>IndexNotReadyException</code> documentation and check
+        <code>DumbService.isDumb(Project)</code> before calling <code>StubIndex.getElements</code> in
+        <code>Module</code> and <code>module.MultiResolve.indexNameElements</code>.
+      </li>
+      <li>
+        Don't <code>assert</code> that <code>LookupElement#getPsiElement</code> is not <code>null</code> in
+        <code>CallDefinitionCluase.renderElement</code>
+      </li>
+      <li>Update to <code>ant</code> <code>1.10.1</code> because <code>1.10.0</code> is no longer hosted.</li>
+      <li>
+        Yeah, it sounds weird, but an <code>ElixirVariable</code> isn't necessarily a variable if it doesn't occur in a
+        declaration context. It could just be a no-parentheses function call in the wrong spot, so check the
+        parent <code>PsiElement</code> to determine if <code>ElixirVariable</code> is a variable.
+      </li>
+      <li>
+        Highlight parameterized type head (<code>maybe(t)</code> in <code>@type maybe(t)</code>) the same as a
+        full type definition (<code>maybe(t)</code> in <code>@type maybe(t) :: t | nil</code>)
+      </li>
+      <li>
+        Only show Mix ExUnit Run in context when the module, or when the module is not a available, the project
+        SDK is Elixir. If there is no SDK configured, show "Mix ExUnit Run" in the menu.
+      </li>
+      <li>Mark <code>do:</code> as atom in demo text</li>
+      <li>
+        Annotations can only be applied to the single, active file, which belongs to the <code>referrer</code>
+        <code>Callable</code>. The <code>resolved</code> may be outside the file if it is a cross-file function
+        or macro usage, in which case it's <code>TextRange</code> should not be highlighted because it is
+        referring to offsets in a different file.
+      </li>
+      <li>
+        <code>Variable</code> scope for <code>QualifiedMultipleAliases</code>, which occurs when qualified call
+        occurs over a line with assignment to a tuple, such as
+        <pre><code>
+Qualifier.
+{:ok, value} = call()</code></pre>
+      </li>
+      <li>
+        Remove call definition clauses (function or macro) completion for bare words as it had a detrimental
+        impact on typing feedback (the editor still took input, but it wasn't rendered until the completion
+        returned OR <code>ESC</code> was hit to cancel the completion, which became excessive once the index of
+        call definition clauses was expanded by the decompilation of the Elixir standard library
+        <code>.beam</code>s, so disable it. If bare-words completion is restored. It will either (1) need to
+        not use the <code>Reference#getVariants()</code> API because it generates too many objects that need to
+        be thrown away or (2) need to only complete call definition clauses that are provably in-scope from
+        imports or other macros.
+      </li>
+      <li>
+        Both intellij-erlang and intellij-community are Apache 2.0 licensed and its the default license for Elixir
+        projects, so seems like a good choice for <code>LICENSE.md</code>
+      </li>
+      <li>Add <code>CODE_OF_CONDUCT.md</code></li>
+      <li>
+        The run configurations I put together in
+        <a href="https://github.com/KronicDeth/intellij-elixir/pull/504">#504</a>
+        didn't allow for the debugger to work properly: neither pause nor breakpoints had any effect, so
+        regenerate them from the Gradle pane.
+      </li>
+      <li>
+        Check parent of <code>when</code> operation in case it's a guarded function head in
+        <code>org.elixir_lang.annonator.Parameter.putParameterized(Parameter, PsiElement)</code>
+      </li>
+      <li>
+        Instead of highlighting call definition clauses when they are referred to, which only works if it is in
+        the same file, highlight all function and macro declarations when the <code>def*</code> call is
+        encountered.
+      </li>
+      <li>
+        Only increment arity for right pipe operand instead of all operands, so that left operands resolve to
+        correct arity or as variable/parameter.
+      </li>
+      <li>
+        Override <code>ModuleImpl#getProject()</code> to prevent <code>StackOverflowError</code>. Without
+        overriding <code>#getProject()</code>, <code>IdentifierHighlighterPass</code> gets stuck in a loop
+        between <code>getManager</code> and <code>getProject</code> on the target (the <code>ModuleImpl</code>)
+        when clicking on the space between <code>def</code>s or <code>defmacro</code>s in the decompiled
+        <code>.beam</code> files.
+      </li>
+      <li>Fix source formatting</li>
+      <li>Skip looking for variables unless 0-arity AND no arguments</li>
+      <li>
+        Highlight unresolved macros as macro calls. Anything with a do keyword or a do block will be treated like
+        a macro call even if it can't be resolved. No resolved is either no resolve results or an empty list
+      </li>
+      <li>Implicit imports at top of file in addition to top of Module.</li>
+      <li>
+        <code>CallDefinitionClause</code> completion provider is unexpectedly invoked both when <code>.</code> is
+        typed, but continues to be invoked after a letter is typed after the <code>.</code>; however, once the
+        letter is typed, the letter becomes the default prefix instead, so the prefix should only be reset to
+        <code>""</code> when it ends in <code>.</code>.
+      </li>
+      <li>
+        Disable <code>Callable#getVariants</code> unless <code>Unqualified</code> to prevents local functions and
+        macros being shown as completions for qualified names.
+      </li>
+      <li>
+        <p>
+          Among many other tweaks, the String color is now green, so that Atom and String are no longer close to
+          one another, which was the original issue in
+          <a href="https://github.com/KronicDeth/intellij-elixir/issues/569">#569</a>
+        </p>
+        <img width="760" alt="screen shot 2017-04-09 at 9 44 06 pm"
+             src="https://cloud.githubusercontent.com/assets/298259/24844071/b1c9b51a-1d6d-11e7-8647-46a5075b12d9.png"/>
+        <ul>
+          <li><code>Alias</code> now has <code>underscored</code> effect</li>
+          <li><code>Brackets</code> are now greenish instead of brownish</li>
+          <li><code>Callbacks</code> are now a lighter blue and has <code>underscored</code> effect</li>
+          <li><code>CharList</code> is little lighter</li>
+          <li><code>CharToken</code> is dark yellow now instead of dark purple</li>
+          <li><code>Dot</code> is now purple instead of dark red</li>
+          <li><code>Expression Substitution Mark</code> is a little lighter</li>
+          <li><code>Interpolation</code> is now lime green</li>
+          <li><code>Kernel Macros</code> are a burnt orange</li>
+          <li><code>Map</code> is now a dark blue instead of a dark yellow</li>
+          <li><code>Operation Sign</code> is a little lighter</li>
+          <li><code>Parameters</code> are a little darker</li>
+          <li><code>Parentheses</code> are redder</li>
+          <li><code>Predefined</code> is orange instead of blue</li>
+          <li><code>Specification</code> is now red instead of purple</li>
+          <li><code>Struct</code> is now purple instead of yellow</li>
+          <li><code>Type</code> is now green instead of dark purple</li>
+          <li><code>Variable</code> is more tealish</li>
+        </ul>
+      </li>
+      <li>Fix indentation to fix sub-lists in <code>CONTRIBUTING.md</code></li>
+      <li>Fix pluralization in <code>CONTRIBUTING.md</code></li>
+      <li>Check if resolve results are <code>null</code> for <code>For.resolveResultList</code></li>
+      <li>Check if <code>Protocol.resolveResultList</code> is <code>null</code></li>
+      <li>
+        Check <code>match</code> <code>Call</code> is an <code>UnqualifiedNoArgumentCall</code>, in addition to
+        being 0 resolved final arity, before checking if the name matches.
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Incompatible Changes</p>
+    <ul>
+      <li>
+        Move <code>^^^</code> to its own three-operator precedence level to match <code>1.2</code>. This does
+        mean the parsing will be wrong for Elixir <code>1.1</code>, but is simpler than maintaining two grammars
+        for those that are still using Elixir <code>1.1</code>.
+      </li>
+      <li>
+        The <code>ant</code> build files have been removed. To build the build plugin (for Install From Disk),
+        use the <code>./gradlew buildPlugin</code>.
+      </li>
+      <li>Allow module attribute folding to be configured.</li>
+    </ul>
+  </li>
+</ul>
+<h1>v4.7.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>
+        Use the <code>CommonProgramParametersPanel</code> to get the working directory and environment variables
+        the same way the JUnit form does. Replace the custom "Command" input with the "Program arguments" input
+        built into the <code>CommonProgramParametersPanel</code>. <code>CommonProgramParametersPanel</code>
+        expects to store the "Program Arguments" in a "ProgramParameters" field, so old run configurations will
+        lose their "Command" option value and it will be migrated to the new "ProgramParameters".
+      </li>
+      <li>
+        <p>Create / Run Mix ExUnit Run Configurations</p>
+        <ul>
+          <li>Run Configuration from Directory</li>
+          <li>Run Configuration from File</li>
+          <li>Run Configuration from LIne</li>
+        </ul>
+      </li>
+      <li>
+        <p>Run Configurations support Common Program Parameters</p>
+        <ul>
+          <li>Program Arguments</li>
+          <li>Working directory</li>
+          <li>Environment variables</li>
+        </ul>
+      </li>
+      <li>
+        <code>enclosingMacroCall</code> returns enclosing macro call when parent is <code>ElixirDoBlock</code>, so
+        that <code>end</code> element goes to the macro call.
+      </li>
+      <li>
+        <code>Navigate > Test</code> will go to the Module that has the same canonical name as the current
+        <code>defimpl</code>, <code>defmodule</code>, <code>defprotocol</code> , or <code>quote</code> with a
+        <code>Test</code> suffix added
+      </li>
+      <li>
+        <code>Navigate &gt; Test Subject</code> will go to the <code>defimpl</code>, <code>defmodule</code>,
+        <code>defprotocol</code>, or <code>quote</code> that has the same canonical name as the current Module
+        with the <code>Test</code> suffix removed.
+      </li>
+      <li>
+        Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/500">#500</a>.
+      </li>
+      <li>
+        Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/517">#517</a>.
+      </li>
+      <li>
+        Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/521">#521</a>.
+      </li>
+      <li>Regression test for #525</li>
+      <li>
+        If <code>:</code> is used instead of <code>::</code> for a type specification, mark it as an error with
+        a Quick Fix to convert <code>:</code> to <code> ::</code>.
+      </li>
+      <li>Highlight <code>=</code> operands the same as <code>::</code> operands in type specifications.</li>
+      <li>
+        If <code>=</code> is used instead of <code>::</code> in a type specification, mark it as an error with a
+        Quick Fix to convert <code>=</code> to <code>::</code>.
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>Fix typo: <code>myRunInModuleChekcBox</code> => <code>myRunInModuleCheckBox</code></li>
+      <li>
+        Don't log error when name length exceeds presentable text length because it appears to be common for
+        normal users and not a development environment artifact.
+      </li>
+      <li>
+        Check parent of <code>ElixirMultipleAliases</code> for <code>isVariable</code> because
+        <code>ElixirMultipleAliases</code> can be hit in <code>isVariable</code> when <code>MyAlias.</code> is
+        added on a line above a pre-existing tuple, such as when typing a new qualified call.
+      </li>
+      <li>Add space between variable and match in lookup element presentation</li>
+      <li>
+        Check <code>VirtualFile</code> is not null before creating attachment because <code>PsiFile</code> can
+        lack a <code>VirtualFile</code> if the <code>PsiFile</code> only exists in memory.
+      </li>
+      <li>
+        Convert <code>CallDefinitionClause(Call)</code> to <code>CallDefinitionClause.fromCall(Call)</code>, so
+        that <code>null</code> can be returned when <code>CallDefinitionClause.enclosingModular(Call)</code>
+        returns <code>null</code>.
+      </li>
+      <li>
+        Use <code>functionName</code> instead of <code>getName</code> when multiresolving unqualified functions
+        because <code>getName</code> will return the Alias when called on <code>defmodule</code>.
+      </li>
+      <li>
+        <code>maybeQualifiedCallToModular</code> returned <code>null</code> BOTH (1) if the call was unqualified
+        OR (2) if the call was qualified, but its modular could not be resolved, so qualified calls to
+        <code>.beam</code>-only modules, like <code>File.read!</code> returned <code>null</code> because
+        <code>File</code> could not be resolved to a modular. Remove <code>maybeqQualifiedToModular</code> and
+        call <code>qualifiedToModular</code> when <code>myElement</code> is qualified. If the modular is
+        <code>null</code>, then return an empty <code>ResolveResult[]</code> instead of looking for unqualified
+        matches.
+      </li>
+      <li>
+        Pass <code>maxScope</code> to <code>Module</code> reference. <code>maxScope</code> is generally the
+        containing file for the element, but when using <code>Module</code> to resolve <code>import</code>s, it is
+        the <code>import</code> call's parent element, so that the resolve doesn't ricochet between the
+        <code>defmodule</code> and its child, the <code>import</code> call until <code>StackOverflowError</code>.
+      </li>
+      <li>
+        A variable cannot be declared in update arguments, so return <code>LocalSearchScope.EMPTY</code>, the same
+        as interpolation.
+      </li>
+      <li>
+        <code>ElixirSystemUtil.getProcessOutput</code> already allowed for an empty, invalid
+        <code>ProcessOutput</code> when the <code>workDir</code> wasn't a directory, so allow it to also be
+        <code>null</code> and return the empty <code>ProcessOutput</code>.
+      </li>
+      <li>
+        If a single keyword pair is used for a type spec, treat <code>:</code> as a type for <code>::</code>
+      </li>
+      <li>
+        Limit variable use scope for variables "declared" in module attributes to the module attribute because the
+        variable can't be declared there and it is really a variable usage without declaration.
+      </li>
+    </ul>
+  </li>
+</ul>
+<h1>v4.6.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>
+        Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/453">#453</a>
+      </li>
+      <li>
+        Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/446">#446</a>
+      </li>
+      <li>
+        Show element class in all error reports
+      </li>
+      <li>
+        Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/465">#465</a>
+      </li>
+      <li>
+        Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/458">#458</a>
+      </li>
+      <li>
+        Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/443">#443</a>
+      </li>
+      <li>
+        Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/462">#462</a>
+      </li>
+      <li>
+        Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/468">#468</a>
+      </li>
+      <li>
+        Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/469">#469</a>
+      </li>
+      <li>
+        Highlight Strings and String Heredocs as errors in types.
+      </li>
+      <li>
+        Regression tests for <a href="https://github.com/KronicDeth/intellij-elixir/issues/470">#470</a>
+      </li>
+      <li>
+        Add <code>Qualified#qualifier</code> by extracting it from <code>CallDefinitionClause</code>
+        <code>CompletionProvider</code>.
+      </li>
+      <li>
+        Add <code>Modular</code> class with <code>#forEachCallDefinitionClauseNameIdentifier</code> to enumerate
+        all the identifiers that could be linked to in a modular.
+      </li>
+      <li>
+        Add <code>ElixirPsiImplUtil#maybeQualifiedCallToModular</code> by extracting
+        <code>resolveFully</code> from <code>CallDefinitionClause</code> <code>CompletionProvider</code>
+      </li>
+      <li>
+        Add regression tests for <a href="https://github.com/KronicDeth/intellij-elixir/issues/463">#463</a>.
+      </li>
+      <li>
+        Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/471">#471</a>
+      </li>
+      <li>
+        Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/pull/472">#472</a>
+      </li>
+      <li>
+        Extract <code>Arrow</code> interface for <code>*ArrowOperation</code>s.
+      </li>
+      <li>
+        Regression tests for <a href="https://github.com/KronicDeth/intellij-elixir/issues/480">#480</a>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>
+        Return <code>emptySet</code> when <code>lookupElementByPsiElement</code> is <code>null</code>.
+      </li>
+      <li>
+        Don't do a naked <code>assert</code> that there are 2 children because this can fail during error recovery
+        on the operand, instead use the <code>prefix.Normalized.operand()</code> through
+        <code>prefix.operand()</code>.
+
+        <strong>WARNING: This changes the <code>@NotNull</code> array so that its sole element changes from
+          <code>@NotNull</code> to <code>@Nullable</code>. It may trigger new bugs.</strong>
+      </li>
+      <li>
+        Use shipped <code>GeneratedParserUtilBase.DUMMY_BLOCK</code> because the <code>DUMMY_BLOCK</code>
+        <strong>MUST</strong> match the <code>GeneratedParserUtilBase</code> to detect dummy blocks inserted for
+        error handling.
+      </li>
+      <li>
+        Skip over <code>ElixirNoParenthesesStrict</code> for <code>isVariable</code>
+      </li>
+      <li>
+        Allow newlines before <code>do</code> in <code>doBlock</code>
+      </li>
+      <li>
+        Don't match <code>do</code> or <code>fn</code> to <code>end</code> when used as a keyword key.
+      </li>
+      <li>
+        Check if <code>iterator.atEnd()</code> before calling <code>iterator.getTokenType()</code> to avoid
+        <code>IndexOutOfBounds</code> exception
+      </li>
+      <li>
+        Don't add current call definition clause being written to completion
+      </li>
+      <li>
+        <code>When#leftOperand</code> will return <code>null</code> (because it's normalized) if there are
+        left-hand error elements, but when stripping guards we want best-effort to match human expectations, so
+        don't use normalized <code>null</code>, but use left, non-error element if it is unique.
+      </li>
+      <li>
+        Highlight types in <code>QualifiedNoParenthesesCall</code>
+      </li>
+      <li>
+        Still not obvious why <code>name</code> for a <code>CallDefinitionClause</code> lookup renderer can be
+        longer than <code>presentableText</code>, so still log an error, but with <code>Logger.error</code>, so we
+        get <code>name</code>, <code>presentableText</code>, and the original <code>element</code>.
+      </li>
+      <li>
+        Skip <code>Arguments</code> elements in <code>previousParentExpresion</code> to eliminate an unnecessary
+        level of processing declarations since calls will enter their arguments.
+      </li>
+      <li>
+        Only put new <code>ENTRANCE</code> in <code>ResolveState</code> in
+        <code>variable.MultiResolve.resolveResultList</code>, so that caller can override the default value.
+      </li>
+      <li>
+        Set <code>ENTRANCE</code> to <code>matchAncestor</code> instead of previous expression to eliminate the
+        looping that occurred when a variable was unbound (or a function) because the check for <code>with</code>
+        (and <code>for</code>) was expecting the <code>ENTRANCE</code> to be the previous child expression instead
+        of the <code>with</code> clause as a whole (or the <code>Arguments</code> element as had been the case
+        before
+        <a href="https://github.com/KronicDeth/intellij-elixir/commit/6fcc19bd1748004756da2c8a541fa8b94ede1f71">
+          6fcc19b
+        </a>.
+      </li>
+      <li>
+        Resolves functions qualified by Aliases that are either direct Module references or one-step aliases.
+      </li>
+      <li>
+        Remove <code>Call#resolvedFunctionName</code> because <code>import</code> can't rename functions.
+      </li>
+      <li>
+        Don't type-highlight <code>BracketOperation</code>s as they occur when putting maps or structs in front of
+        lists.
+      </li>
+      <li>
+        Treat <code>Enum.each</code> the same as <code>Enum.map</code> around <code>def</code>
+      </li>
+      <li>
+        Increase <code>resolvedFinalArity</code> by <code>1</code> for piping.
+      </li>
+      <li>
+        <p>Go To Declaration resolves through <code>import</code></p>
+        <ul>
+          <li>
+            <p>for <code>import MyModule</code></p>
+            <ul>
+              <li>the <code>import</code> statement</li>
+              <li>the call definition clause in the imported Module.</li>
+            </ul>
+          </li>
+          <li>
+            <p>for <code>import MyModule, only: [name: arity]</code></p>
+            <ul>
+              <li>the <code>import</code> statement</li>
+              <li>the call definition clause in the imported Module.</li>
+            </ul>
+          </li>
+          <li>
+            <p>
+              for <code>import MyModule, except: [name: arity]</code> <em>if</em> reference is <em>not</em>
+              <code>name/arity</code>.
+            </p>
+            <ul>
+              <li>the <code>import</code> statement</li>
+              <li>the call definition clause in the imported Module</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+<h1>v4.5.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>
+        Go To Declaration for functions and macros (only those defined in parseable-Elixir source. References
+        to Erlang functions or only those available in <code>.beam</code> file, such as the standard library will
+        not resolve.)
+      </li>
+      <li>
+        <p>
+          Completion for functions and macros (only those defined in parseable-Elixir source. Erlang functions
+          and Elixir function only in compiled <code>.beam</code> file, such as the standard library will not
+          complete.)
+        </p>
+        <ul>
+          <li>
+            Completion uses the same presentation as Structure View, so the you can tell whether the name is a
+            function/macro, whether it is public/private, and the Module where it is defined.
+          </li>
+          <li>
+            Completed functions/macro insert <code>()</code> after the name in preparation for Elixir 1.4 where it
+            is an error to have bare function calls. It also makes it more obvious that you inserted a function
+            and not a variable.
+          </li>
+          <li>
+            Completion works for all functions when a bare identifier is used. For a qualified identifier, only
+            functions/macros under than Module are shown.
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+<h1>v4.4.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>
+        Regression test using <code>typespec_test.exs</code> that triggered
+        <a href="https://github.com/KronicDeth/intellij-elixir/issues/413">#413</a>
+      </li>
+      <li>
+        Regression test that checks the correct <code>import</code> is used for
+        <code>GeneratedParserUtilBase</code> in <code>ElixirParser</code>
+      </li>
+      <li>
+        <p>
+          <a href="https://www.youtube.com/watch?v=aOiJHZuudzg">Completion of multiple aliases inside curly braces</a>
+        </p>
+        <ul>
+          <li>
+            Override <code>ElixirMultipleAliases#processDeclarations</code>, so that <code>treeWalkUp</code> can
+            stop at <code>ElixirMultipleAliases</code> when determining how to do Alias completion. If a multiple
+            alias is encountered, then de-prefixed names should be returned.
+          </li>
+        </ul>
+      </li>
+      <li>
+        Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/429">#429</a>
+      </li>
+      <li>
+        Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/422">#422</a>
+      </li>
+      <li>
+        Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/438">#438</a>
+      </li>
+      <li>
+        Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/431">#431</a>
+      </li>
+      <li>
+        Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/436">#436</a>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>
+        Return empty <code>Set</code> instead of <code>null</code> from <code>canonicalNameSet</code>
+      </li>
+      <li>
+        Highlight types in <code>ElixirMapUpdateArguments</code> even though they are an
+        <a href="https://github.com/elixir-lang/elixir/blob/dadf98fbff2966f24bf5b0313822a90b90f7016a/lib/elixir/test/elixir/kernel/typespec_test.exs#L314-L320">
+          invalid typespec example from elixir-lang/elixir tests
+        </a>
+      </li>
+      <li>
+        Check if <code>rightOperand</code> is <code>null</code> when highlighting types for <code>Type</code>,
+        which can occur when typing <code>:</code> for an atom after the <code>::</code> for a <code>Type</code>.
+      </li>
+      <li>
+        Use <code>GeneratedParserUtilBase</code> synced to GrammarKit version as was done originally in
+        <a href="https://github.com/KronicDeth/intellij-elixir/pull/406">#406</a>
+      </li>
+      <li>
+        Check parent of <code>BracketArguments</code> for <code>isParameter</code> and <code>isVariable</code>.
+      </li>
+      <li>
+        Instead of asserting that a <code>QualifiableAlias</code> has 3 children, which may not be true on error
+        recovery, use the <code>Normalized</code> static methods that are used elsewhere to handle error recovery
+        around Infix operations as the <code>.</code> in <code>QualifiableAlias</code>es is a pseudo-Infix.
+      </li>
+      <li>
+        Add missing <code>@Nullable</code> to <code>@NotNull</code> change when parser wasn't regenerated when
+        <code>canonicalNameSet</code> was changed to <code>@NotNull</code> in the interface.
+      </li>
+      <li>
+        Search above block items and block lists for calls to check use scope
+      </li>
+      <li>
+        Check parent <code>isVariable</code> for <code>ElixirNoParenthesesManyStrictNoParenthesesExpression</code>
+      </li>
+      <li>
+        Highlight <code>@type</code> without <code>::</code>
+      </li>
+      <li>
+        <code>ElixirNoParenthesesManyStrictNoParenthesesExpression</code> indicates an ambiguous no parentheses
+        nesting, but the highlighting should not error and do a best effort instead.
+      </li>
+      <li>
+        <code>isParameter(Call)</code> called <code>isParameter</code> on its parent if it wasn't a call
+        definition clause, delegation or macro, but <code>isParameter(PsiElement)</code> immediately calls
+        <code>getParent()</code> and does all the <code>instanceof</code> tests on the parent. So, instead of
+        <code>isParameter(Call)</code> calling <code>isParameter(PsiElement)</code> on its parent, it should just
+        call it on itself, this way the check for <code>ElixirInterpolation</code> will not be skipped and there's
+        no need to handle <code>ElixirInterpolatedString</code>.
+      </li>
+    </ul>
+  </li>
+</ul>
+<h1>v4.3.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>
+        <p>
+          Resolve aliased modules to their <code>alias</code> call, from the alias call, you can Go To Declaration
+          for the module itself.
+        </p>
+        <ul>
+          <li>
+            <p>Code structure</p>
+            <ul>
+              <li>
+                Module resolution uses the OpenAPI convention of <code>treeWalkUp</code> now instead of custom
+                code.
+              </li>
+              <li>Resolvable names has been extracted to its own class</li>
+            </ul>
+          </li>
+          <li>
+            <p>Resolution use cases</p>
+            <ul>
+              <li><code>Suffix</code> resolves to <code>alias Prefix.Suffix</code></li>
+              <li><code>Suffix.Nested</code> resolves to <code>alias Prefix.Suffix</code></li>
+              <li><code>As</code> resolves to <code>alias Prefix.Suffix, as: As</code></li>
+              <li><code>NestedSuffix</code> resolves to <code>alias __MODULE__.NestedSuffix</code></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>
+        <p>Completion for module aliases</p>
+        <ul>
+          <li>From in-file aliases</li>
+          <li><code>__MODULE__</code></li>
+          <li>In project modules (using index already used for Go To Declaration)</li>
+        </ul>
+      </li>
+      <li>
+        In addition to <code>StubBased#canonicalName</code>, there now also <code>StubBased#canonicalNames</code>,
+        for when a call defines multiple canonical names, as is the case for
+        <code>defimpl &lt;PROTOCOL&gt;, for: [&lt;TYPE&gt;, ...]</code>.
+      </li>
+      <li>
+        When a aliased name is added to the module list for completion, it's unaliased name is searched for in the
+        <code>AllName</code> index, if any nested modules are found for the unaliased name, then those nested
+        names are aliased and also shown for completion.
+      </li>
+      <li>
+        <code>resolvableName</code> allows nested modules under multiple aliases to be completed
+      </li>
+      <li>
+        By user request, the folding will be off-by-default now, but can be re-enabled, like the old behavior by
+        checking the checkbox in Preferences &gt; Editor &gt; General &gt; Code Folding &gt;
+        Elixir Module directive (<code>alias</code>, <code>import</code>, <code>require</code> or
+        <code>use</code>) groups.
+      </li>
+      <li>
+        Resolve <code>as:</code> aliased name to both <code>alias</code> and <code>defmodule</code>
+      </li>
+      <li>
+        Complete modules nested under <code>as:</code> aliased name.
+      </li>
+      <li>
+        <p>Completion and reference tests for aliases:</p>
+        <ul>
+          <li><code>alias Prefix.Suffix</code>.</li>
+          <li><code>alias Prefix.Suffix, as: As</code></li>
+          <li><code>alias Prefix.{MultipleAliasA, MultipleAliasB}</code></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>
+        <p>
+          <code>defimpl &lt;PROTOCOL&gt;, for: [&lt;TYPE&gt;, ...]</code> generates multiple canonical names,
+          which are stored in the stub index.
+        </p>
+        <ul>
+          <li>
+            When retrieved from the <code>AllName</code> index, the <code>defimpl</code>'s Implementation will
+            render as if only the <code>defimpl &lt;PROTOCOL&gt;, for: &lt;TYPE&gt;</code> was used for the
+            <code>&lt;TYPE&gt;</code> matching the lookup name in the Goto Symbol dialog. For example, if you
+            search for <code>Tuple</code>, <code>JSX.Encoder.Tuple</code> will match for
+            <a href="https://github.com/talentdeficit/exjsx/blob/master/lib/jsx.ex#L152-L155">
+              <code>defimpl JSX.Encoder, for: for: [Tuple, PID, Port, Reference, Function, Any]</code>
+            </a>.
+          </li>
+        </ul>
+      </li>
+      <li>
+        Look outside <code>Enum.map</code> for enclosing macro call because <code>Ecto</code> defines the clauses
+        of <code>__schema__(:type, ...)</code> using <code>Enum.map</code>, but <code>enclosingMacroCall</code>
+        only knew to jump over enclosing macros like <code>for</code>, so a special case was added for anonymous
+        function given to <code>Enum.map</code>.
+      </li>
+      <li>
+        Fix if-else-ordering bug where <code>Call</code> appeared before operations (which are usually
+        <code>Call</code>s) like <code>Match</code>.
+      </li>
+      <li>
+        In <code>@type unquote({name, nil, []}) :: foo</code>, <code>name</code> will be highlighted as a type
+        parameter even though it is not strictly the name that will appear as a type parameter.
+      </li>
+      <li>
+        Resolve alias nested under aliased modules to both the <code>alias</code> and <code>defmodule</code>, as
+        resolving to only the <code>alias</code> loses the nested name, so it wasn't possible to jump to the
+        nested name's <code>defmodule</code>.
+      </li>
+      <li>
+        Resolve aliased name to both the <code>alias</code> and the <code>defmodule</code>, so you can skip
+        jumping to the <code>alias</code> before jumping to the <code>defmodule</code>.
+      </li>
+      <li>
+        The generated <code>ElixirParser</code> uses the <code>GeneratedParserUtilBase</code> from <code>com.intellij.lang.parser</code>,
+        but since
+        that version is a synced copy, it is a snapshot of <code>GeneratedParserUtilBase</code> from the version of
+        GrammarKit that was current when the IDE was released. To ensure the generated parser works on all the
+        IDEs, copy <code>GeneratedParserUtilBase</code> from <code>org.intellij.grammar.parser</code> into
+        <code>org.elixir_lang.grammar.parser</code> and then use that version in <code>ElixirParser</code>. This ensures
+        neither the
+        IDE's version nor the version in any installed GrammarKit plugin is used.
+      </li>
+      <li>
+        Check that index name maps to an actual project element before returning it for completion as the names
+        from <code>StubIndex.getInstance.getAllKeys(...)</code> is a superset of actual keys in the actual project
+        <a href="https://intellij-support.jetbrains.com/hc/en-us/community/posts/207930789-StubIndex-persisting-between-test-runs-leading-to-incorrect-completions">
+          according to Peter Gromov of JetBrains
+        </a>
+      </li>
+      <li>
+        Don't index <code>canonicalName</code> if it matches the literal name, as the duplicate name leads to
+        duplicate entries in the completion lookup.
+      </li>
+      <li>
+        <code>canonicalNameCollection</code> was renamed to <code>canonicalNameSet</code> (with type changing from
+        <code>Collection&lt;String&gt;</code> to <code>Set&lt;String&gt;</code> to match) to emphasize that the
+        canonical names should be unique, but <code>canonicalNameSet</code> itself should still include duplicates
+        of name for those places where only canonical names are used.
+      </li>
+      <li>
+        Use <code>resolvableName</code> for the <code>unaliasedName</code> for <code>MultipleAliases</code>
+        Aliases, so that they complete correctly for nested modules.
+      </li>
+      <li>
+        Completion for nested modules will no longer complete with string suffixes (i.e. <code>SSHView</code>) and
+        only complete nested Aliases (i.e. <code>SSH.Key</code>).
+      </li>
+    </ul>
+  </li>
+</ul>
+<h1>v4.2.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>
+        <p>
+          <code>BraceMatcher</code>
+        </p>
+        <ul>
+          <li>
+            <p>Matches the following pairs:</p>
+            <ul>
+              <li><code>do</code> to <code>end</code></li>
+              <li><code>fn</code> to <code>end</code></li>
+              <li><code>"""</code> to <code>"""</code></li>
+              <li><code>'''</code> to <code>'''</code></li>
+              <li><code>&lt;&lt;</code> to <code>&gt;&gt;</code></li>
+              <li><code>&lt;</code> to <code>&gt;</code></li>
+              <li><code>[</code> to <code>]</code></li>
+              <li><code>{</code> to <code>}</code></li>
+              <li><code>(</code> to <code>)</code></li>
+            </ul>
+          </li>
+          <li>
+            <p>Completes the following pairs:</p>
+            <ul>
+              <li><code>[</code> with <code>]</code></li>
+              <li><code>{</code> with <code>}</code></li>
+              <li><code>(</code> with <code>)</code></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>
+        <p>
+          <code>QuoteHandler</code> completes standard quotes (that start with <code>"</code> or <code>'</code>)
+        </p>
+        <ul>
+          <li><code>'</code> with <code>'</code></li>
+          <li><code>"</code> with <code>"</code></li>
+          <li><code>'''</code> with <code>'''</code></li>
+          <li><code>"""</code> with <code>"""</code></li>
+        </ul>
+      </li>
+      <li>
+        <p>
+          <code>TypedHandler</code> completes the non-standard quotes and braces
+        </p>
+        <ul>
+          <li><code>do</code> with <code> end</code></li>
+          <li><code>fn</code> with <code> end</code></li>
+          <li><code>&lt;&lt;</code> with <code>&gt;&gt;</code></li>
+          <li><code>&lt;</code> with <code>&gt;</code> (for promoters)</li>
+          <li><code>/</code> with <code>/</code> (for promoters)</li>
+          <li><code>|</code> with <code>|</code> (for promoters)</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>Check parent for <code>isVariable(ElixirMapUpdateArguments)</code></li>
+      <li>
+        IntelliJ 15.0.4 is no longer available from JetBrains, so if the cache is not available, the builds don't
+        work, so use 15.0.6, which is available in 15.0.4's place as the test version for 15.X.
+      </li>
+      <li>
+        IntelliJ 2016.2 is no longer available from JetBrains, so if the cache is not available, the builds don't
+        work, so use 2016.2, which is available in 2016.1's places at the test version for 2016.X.
+      </li>
+      <li>
+        <code>enclosingMacroCall</code> could climb out the stab after a <code>do</code>, but not the
+        <code>else</code> in an <code>if</code>, which is used for defined functions conditionally in
+        <a href="https://github.com/phoenixframework/phoenix/blob/v1.2.0/lib/phoenix/endpoint.ex#L542-L548">
+          <code>Phoenix.Endpoint.server/0</code>
+        </a>
+      </li>
+      <li>
+        A lot of ppl use the doc template after already typing <code>@</code>, but the doc template starts with
+        <code>@</code>, so it ends up inserting <code>@@doc ...</code>. The <code>@doc</code> template is the same
+        code, but since the name starts with <code>@</code>, it doesn't insert a second <code>@</code>.
+        Unfortunately, the template search code doesn't prompt when just typing <code>@</code>, so you end up
+        having to type <code>@doc</code> before only one template is selected. The <code>@doc</code> template
+        will show in the lookup as soon as <code>@d</code> is typed, but you have to select it from the list then
+        before tabbing to accept.
+      </li>
+      <li>
+        Look at end of <code>do</code> instead of start for <code>end</code> completion to stop ignoring the
+        <code>:</code> in <code>do: </code>, when <code>caret - 3</code> would land on the <code>o</code>, now all
+        tests are meant to land on the <code>o</code>, so <code>do: </code> won't complete with <code>end</code>
+        incorrectly anymore.
+      </li>
+      <li>
+        Ignore <code>ElixirVariable</code> in <code>highlightTypesAndTypeParameterUsages</code>
+      </li>
+    </ul>
+  </li>
+</ul>
+<h1>v4.1.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>Allow <code>do end</code> blocks to fold to <code>do: ...</code></li>
+      <li>Allow <code>-></code> operator and the right operand to fold to <code>-> ...</code></li>
+      <li>
+        Allow <code>@doc</code>, <code>@moduledoc</code> and <code>@typedoc</code> value to fold to
+        <code>"..."</code>.
+      </li>
+      <li>
+        Fold runs of adjacent <code>alias</code>, <code>import</code>, <code>require</code>, or <code>use</code>
+        to be followed to a single <code>alias</code>, <code>import</code>, <code>require</code>, or
+        <code>use</code> followed by <code>...</code>.
+      </li>
+      <li>
+        Show a function separator
+        (Preferences &gt; Editor &gt; General &gt; Appearance &gt; Show method separators) above the group of
+        <code>@doc</code>, <code>@spec</code> and <code>def</code>, <code>defp</code>, <code>defmacro</code>, and
+        <code>defmacrop</code> (call definition clauses) of the same name and arity range. Arity range will be
+        used if one of the call definition clauses uses default arguments.
+      </li>
+      <li><code>@for</code> folds to the resolved module name in <code>defimpl</code></li>
+      <li><code>@protocol</code> folds to the protocol name in <code>defimpl</code></li>
+      <li>Share code between <code>mix</code> and <code>elixir</code> version parsing.</li>
+      <li>
+        If no known modular (Module, Implementation, Protocol, Quote, or Use) matches the call, then use Unknown,
+        which accepts any macro with a <code>do</code> block or keyword. This allows Go To Symbol to no error in
+        projects using Dogma as <code>defrule</code> is now treated as Unknown instead of causing an error that
+        the enclosing modular could not be found.
+      </li>
+      <li>
+        Regenerate <code>gen</code> folder using Grammar Kit 1.4.1 and fix some bugs (including
+        <a href="https://github.com/JetBrains/Grammar-Kit/issues/126">JetBrains/Grammar-Kit#126</a>) manually.
+      </li>
+      <li>
+        Have both <code>QualifiedBracketOperation</code> and <code>UnqualifiedBracketOperation</code> extend
+        <code>BracketOperation</code>, so that <code>BracketOperation</code> can be used to match both when the
+        qualification does not matter.
+      </li>
+      <li>Regenerate parser with GrammarKit 1.4.2</li>
+      <li>
+        <code>ElixirSdkRelease</code> is now <code>Comparable</code>, so version checks can be done for tests to
+        restrict them to Elixir 1.2+ for multiple alias support.
+      </li>
+      <li>Resolve Multiple Aliases with unqualified Alias in tuples.</li>
+      <li>
+        <p>
+          <code>canonicalName</code> borrows from the idea of <code>PsiReference#canonicalText</code>: an element
+          can have both a Name (from <code>getName</code>), which is the literal name in the code, which can be
+          renamed, and a Canonical Name, which is the name to refer to the element without need for imports or
+          aliases. For this change, <code>defimpl</code>, <code>defmodule</code>, and <code>defprotocol</code>
+          will show their full module Alias for their Canonical Name.
+        </p>
+        <p>
+          This change addresses the use case of Go To Declaration that should resolved to a nested
+          <code>defmodule</code>.
+        </p>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>
+        Check if <code>parameter</code> is <code>null</code> before <code>Variable#execute</code> call in
+        <code>Variable#execute(PsiElement[], ResolveState)</code>.
+      </li>
+      <li>
+        Fix <code>isVariable</code> and <code>variableUseScope</code> for <code>var!(name)[...]</code>
+      </li>
+      <li>
+        <code>@for</code> is no longer marked as unresolved in <code>defimpl</code> and instead resolve to the
+        either the <code>&lt;name&gt;</code> in <code>for: &lt;name&gt;</code> or the module name for the
+        enclosing module when <code>for: </code> is not given.
+      </li>
+      <li>
+        <code>@protocol</code> is no longer marked as unresolved in <code>defimpl</code> and instead resolve to
+        the <code>&lt;name&gt;</code> in <code>defimpl &lt;name&gt;</code>.
+      </li>
+      <li>
+        Instead of <code>assert checkRight || checkLeft</code> in <code>Match#processDeclaraions</code>, do the
+        normal code if <code>checkRight || checkLeft</code> and log an error report otherwise, so that the exact
+        code that trigger this error can be reported and the method fixed to handle that form of
+        <code>Match</code> later.
+      </li>
+      <li>
+        Check all lines of output for mix version as Elixir 1.3.0 changed the format of
+        <code>mix --version</code>, so that it includes the Erlang header
+        (<code>Erlang/OTP ... [erts-...] [source] [64-bit] [smp:..:..] [async-threads:..] [hipe] [kernel-poll:false]
+        [dtrace]</code>)
+        on the first line and <code>Mix &lt;version&gt;</code> on the 3rd line. Previously the parsing expected
+        <code>Mix &lt;version&gt;</code> to be the first line.
+      </li>
+      <li>
+        If no known modular (Module, Implementation, Protocol, Quote, or Use) matches the call, then use Unknown,
+        which accepts any macro with a <code>do</code> block or keyword. This allows Go To Symbol to no error in
+        projects using Dogma as <code>defrule</code> is now treated as Unknown instead of causing an error that
+        the enclosing modular could not be found.
+      </li>
+      <li><code>BracketOperations</code> are neither parameters nor variables.</li>
+      <li>
+        <p>Fix stacktrace linking picking wrong file with same basename</p>
+        <ul>
+          <li>
+            Strip spaces from front of file path in <code>mix</code> output, which allows file looks to work
+            correctly.
+          </li>
+          <li>
+            Ensure file reference highlight doesn't include the leading and trailing characters by fix off-by-one
+            errors.
+          </li>
+        </ul>
+      </li>
+      <li>
+        Determine whether to check left, right, or both by doing isAncestor checks for all operands, not just the
+        normalized operand. The normalized operand is still used for <code>PsiScopeProcessor#execute</code> since
+        <code>#execute</code> is not expected to handle error elements.
+      </li>
+      <li>
+        Add <code>A.{B, C}</code> to grammar with quoting to check consistence with Elixir 1.2. Ports
+        <a href="https://github.com/elixir-lang/elixir/pull/3666">elixir-lang/elixir#3666</a>.
+      </li>
+      <li>
+        Use <code>fullyQualifiedName</code> instead of <code>getName</code> for <code>resolvableName</code>
+        because <code>fullyQualifiedName</code> is needed so that qualified aliases inside of the
+        <code>{ }</code> of a multiple alias will not have a name as <code>getName</code> is <code>null</code> for
+        those qualified aliases because the name from <code>getName</code> has to be a literal name that can be
+        renamed and qualified names can't be renamed.
+      </li>
+      <li>
+        The <code>Module</code> icon got the same icon as <code>Unknown</code> when creating <code>Unknown</code>
+        somehow, I assume due to find-replace.
+      </li>
+    </ul>
+  </li>
+</ul>
+<h1>v4.0.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>
+        <p>Resolve and highlight parameter references</p>
+        <ul>
+          <li>Resolve call definition clause (<code>def(macro)?p?</code>) parameters to themselves</li>
+          <li>Resolve call definition parameter with default to itself</li>
+          <li>Add Parameter ot Color Settings Page</li>
+          <li>Parameters in any macro with do block or keyword pair</li>
+        </ul>
+      </li>
+      <li>
+        <p>Resolve and highlight variable references</p>
+        <ul>
+          <li>Properly identifier variable declared in <code>for</code> comprehension as variable</li>
+          <li>Add Variable to Color Settings Page</li>
+          <li>Highlight bind quoted keyword key as Variable</li>
+          <li>
+            Resolve references to earlier <code>&amp;&amp;</code> operands, which handles code that matches a variable and
+            only uses the variable on success like
+            <a href="https://github.com/elixir-lang/elixir/blob/ccf6d14e3ec2eb96090222dad6f395b5b9ab72ac/lib/elixir/lib/system.ex#L268">
+              <code>((cwd = cwd()) &amp;&amp; write_tmp_dir(cwd))</code>
+            </a>
+          </li>
+          <li>Resolve variables from <code>destructure</code></li>
+        </ul>
+      </li>
+      <li>
+        <p>Detect bitstring segment options and don't treat them as variables.</p>
+        <ul>
+          <li>
+            Highlight bitstring segment type options as Type, the same highlight as used for <code>@type</code>
+            names.
+          </li>
+          <li>Don't generate (unresolved) references for bitstring segment options</li>
+        </ul>
+      </li>
+      <li>
+        <p>
+          Resolve <code>_</code> to only itself, no matter how many are used to reflect that it is non-binding,
+          while <code>_&lt;name&gt;</code> will resolve to <code>_&lt;name&gt;</code> as it does bind.
+        </p>
+        <ul>
+          <li>Add Ignored Variable to Color Settings Page</li>
+        </ul>
+      </li>
+      <li>
+        Reimplement module attribute renaming so that variable renaming can be implemented using a different
+        validator for renaming (since module attribute names include the <code>@</code>). Non-inplace renaming
+        should also be supported, but inplace is preferred. (There's a setting to turn off in-place renaming in
+        JetBrains IDEs.)
+      </li>
+      <li>
+        <p>
+          <code>operation.infix.Normalized</code>
+        </p>
+        <ul>
+          <li>
+            Normalizes leftOperand, operator, and rightOperand for an Infix operation that may have errors (in
+            either operand). If there is an error in the operand then its normalized value is <code>null</code>.
+          </li>
+        </ul>
+      </li>
+      <li>
+        <p>Keyword key type descriptions</p>
+        <ul>
+          <li>Default to <code>"keyword key"</code>.</li>
+          <li>Detect <code>bind_quoted:</code> usage and call those <code>"quote bound variable"</code>.</li>
+        </ul>
+      </li>
+      <li>
+        <p>
+          Add interfaces to unify matching of <code>Matched</code> and <code>Unmatched</code> form of operations
+          when the code cares about the operator
+        </p>
+        <ul>
+          <li><code>And</code></li>
+          <li><code>UnaryNonNumericOperation</code></li>
+        </ul>
+      </li>
+      <li>
+        <p>
+          Add <code>processDeclarations</code> to support variable and parameter resolution using
+          <code>PsiTreeUtil.treeWalkUp</code> and <code>PsiScopeProcessors</code>
+        </p>
+        <ul>
+          <li><code>ElixirStabBody</code></li>
+          <li>StabOperations</li>
+        </ul>
+      </li>
+      <li>Treat variables and parameters as <code>NamedElements</code>, so they can be Rename Refactored.</li>
+      <li>
+        Move reused Module and Function names to <code>org.elixir_lang.psi.name.{Module,Function}</code>
+        constants.
+      </li>
+      <li>Parameter and Variable completion</li>
+      <li>
+        Highlight keyword keys (<code>key:</code> in <code>key: value</code>) that aren't quotes
+        (<code>"key": value</code> or <code>'key': value</code>) as Atom.
+      </li>
+      <li>
+        <p>Show annotator applied highlights in the Preferences > Editor > Colors &amp; Fonts > Elixir.</p>
+        <ul>
+          <li>Errors</li>
+          <li><code>Alias</code></li>
+          <li>
+            <p><code>Braces and Operators</code></p>
+            <ul>
+              <li><code>Bit</code> (<code>&lt;&lt;</code> and <code>&gt;&gt;</code>)</li>
+              <li><code>Braces</code> (<code>{</code> and <code>}</code>)</li>
+              <li><code>Brackets</code> (<code>[</code> and <code>]</code>)</li>
+              <li><code>Char Tokens</code> (<code>?</code>)</li>
+              <li><code>Comma</code> (<code>,</code>)</li>
+              <li><code>Dot</code> (<code>.</code>)</li>
+              <li><code>Interpolation</code> (<code>#{</code> and <code>}</code>)</li>
+              <li>
+                <p><code>Maps and Structs</code></p>
+                <ul>
+                  <li><code>Maps</code> (<code>%{</code> and <code>}</code>)</li>
+                  <li>
+                    <code>Structs</code> (<code>%{</code> and <code>}</code> when used for struct. The Alias is
+                    still highlighted using <code>Alias</code>)
+                  </li>
+                </ul>
+              </li>
+              <li><code>Operation Sign</code></li>
+              <li><code>Parentheses</code> (<code>(</code> and <code>)</code>)</li>
+              <li><code>Semicolon</code> (<code>;</code>)</li>
+            </ul>
+          </li>
+          <li>
+            <p><code>Calls</code></p>
+            <ul>
+              <li>
+                <code>Function</code> (currently only combined with <code>Predefined</code> to highlight
+                <code>Kernel</code> functions. Will be used later for all function calls once function references
+                are implemented.)
+              </li>
+              <li>
+                <code>Macro</code> (curently only combined with <code>Predefined</code> to highlight
+                <code>Kernel</code> and <code>Kernel.SpecialForms</code> macros. Will be used later for all macro
+                calls once macro references are implemented.)
+              </li>
+              <li>
+                <code>Predefined</code> (Combined with <code>Function</code> to highlight <code>Kernel</code>
+                functions. Combined with <code>Macro</code> to highlight <code>Kernel</code> and
+                <code>Kernel.SpecialForms</code> macros.)
+              </li>
+            </ul>
+          </li>
+          <li><code>Escape Sequence</code></li>
+          <li>
+            <p><code>Module Attributes</code></p>
+            <ul>
+              <li>
+                <p><code>Documentation</code> (Previously <code>Documentation Module Attributes</code>)</p>
+                <ul>
+                  <li><code>Text</code> (Previously <code>Documentation Text</code>)</li>
+                </ul>
+              </li>
+              <li>
+                <p><code>Types</code></p>
+                <ul>
+                  <li>
+                    <code>Callback</code> (<code>my_callback</code> in <code>@callback my_callback() :: :ok</code>
+                    or <code>my_macro_callback</code> in <code>@macrocallback my_macro_callback</code>)
+                  </li>
+                  <li>
+                    <code>Specification</code> (<code>my_function</code> in
+                    <code>@spec my_function() :: :ok</code>)
+                  </li>
+                  <li>
+                    <p><code>Type</code></p>
+                    <ul>
+                      <li><code>typ</code> and <code>integer</code> in <code>@type typ :: integer</code></li>
+                      <li>
+                        <code>parameterized</code> in
+                        <code>@type parameterized(type_parameter) :: type_parameter</code>
+                      </li>
+                      <li><code>typtyp</code> in <code>@opaque typtyp :: 1..10</code></li>
+                      <li>
+                        <code>typ</code> and <code>typtyp</code> in
+                        <code>@callback func(typ, typtyp) :: :ok | :fail</code>
+                      </li>
+                      <li>
+                        <code>binary</code> and <code>utf8</code> in
+                        <code>&lt;&lt; "hello" :: binary, c :: utf8, x = 4 * 2 &gt;&gt; = "hello™1"</code>
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <code>Type Parameters</code> (<code>type_parameter</code> in
+                <code>@type parameterized(type_parameter) :: type_parameter</code>)
+              </li>
+            </ul>
+          </li>
+          <li>
+            <p><code>Numbers</code></p>
+            <ul>
+              <li><code>Binary, Decimal, Hexadecimal, and Octal Digits</code> (Previously at top-level.)</li>
+              <li><code>Decimal Exponent, Mark and Separator</code> (Previously at top-level)</li>
+              <li>
+                <code>Invalid Binary, Decimal, Hexadecimal, and Octal Digits</code> (Previously at top-level.)
+              </li>
+              <li><code>Non-Decimal Base Prefix</code> (Previously at top-level.)</li>
+              <li><code>Obsolete Non-Decimal Base Prefix</code></li>
+            </ul>
+          </li>
+          <li>
+            <p><code>Variables</code></p>
+            <ul>
+              <li><code>Ignored</code></li>
+              <li><code>Parameter</code></li>
+              <li><code>Variable</code></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>
+        <p>Recover in expression until close of subexpression</p>
+        <ul>
+          <li><code>\n</code></li>
+          <li><code>\r\n</code></li>
+          <li><code>>></code></li>
+          <li><code>]</code></li>
+          <li><code>}</code></li>
+          <li><code>)</code></li>
+          <li><code>;</code></li>
+          <li><code>-></code></li>
+          <li><code>end</code></li>
+          <li><code>after</code></li>
+          <li><code>catch</code></li>
+          <li><code>else</code></li>
+          <li><code>rescue</code></li>
+        </ul>
+      </li>
+      <li>
+        Update Preferences &gt; Editor &gt; Colors &amp; Fonts &gt; Elixir example text's bitstring syntax to Elixir post-1.0.0
+        (Use <code>-</code> to separate segment options instead of a list.)
+      </li>
+      <li>
+        Use same algorithm for <code>ElixirStabBody</code> and <code>ElixirFile</code> because they are sequences
+        of expressions.
+      </li>
+      <li>
+        Highlight atom keywords (<code>false</code>, <code>nil</code>, and <code>true</code>) as merge of
+        <code>Atom</code> and <code>Keyword</code> text attributes. If both only use foreground color,
+        <code>Keyword</code> wins.
+      </li>
+      <li>Annotate <code>QualifiableAlias</code> as <code>Alias</code>.</li>
+      <li>Highlight keyword list and map keywords (<code>&lt;key&gt;:</code>) as <code>Atom</code>.</li>
+      <li>Add <code>with</code> to highlighted special forms</li>
+      <li>
+        Default text attributes for "Darcula" and "Default" themes: almost every Text Attribute Key has a unique
+        hue for the Foreground color.
+      </li>
+      <li>
+        Explain how to add <code>additionalTextAttributes</code> to <code>plugin.xml</code> in
+        <code>CONTRIBUTING.md</code>
+      </li>
+      <li>
+        Group Textual Text Attribute Keys Together: Next "Textual" group is created and "Character List",
+        "Escape Sequence", "Sigil", and "String" are moved under the group.
+      </li>
+      <li>
+        Describe relations between different text attributes in <code>COLOR_SCHEMA_DESIGN.xml</code>, so they can
+        be applied to different base schemes, such as applying the current Darcula additonalTextAttributes to
+        Default.
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>
+        Don't generate module attribute references for control attributes: Module attributes that control
+        compilation or are predefined by the standard library: <code>@behaviour</code>, <code>@callback</code>,
+        <code>@macrocallback</code>, <code>@doc</code>, <code>@moduledoc</code>, <code>@typedoc</code>,
+        <code>@spec</code>, <code>@opaque</code>, <code>@type</code>, and <code>@typep</code>, should not have
+        references because their uses are unrelated.
+      </li>
+      <li>
+        Drop requirement that there are 2 children and only require there be 1 and assume that is the Operator.
+      </li>
+      <li>
+        Don't count @(...) as a module attribute usage: Module attribute declarations are defined as
+        <code>defmacro @(...)</code> in Kernel and that <code>@</code> should count as a function name, not a
+        prefix for a module attribute name.
+      </li>
+      <li>Allow <code>null</code> Module for Scratch File use scope</li>
+      <li>Default to <code>"call"</code> for Call type</li>
+      <li>Fix typo that had <code>*Two</code> operations using <code>Type</code> interface</li>
+      <li>Don't process <code>AccessExpression</code> declarations</li>
+      <li>
+        Highlight <code>foo</code> in <code>@spec foo</code> as a type, which occurs while typing a new
+        <code>@spec</code> before <code>::</code> can be typed.
+      </li>
+      <li>
+        Check if <code>leftOperand</code> is <code>null</code> even when <code>checkLeft</code> is
+        <code>true</code> because <code>checkLeft</code> can be <code>true</code> and <code>leftOperand</code> is
+        <code>null</code> when the <code>lastParent</code> is the operand or operation as a whole, but there is an
+        error in the unnormalized <code>leftOperand</code> leading to the normalized <code>leftOperand</code>
+        being <code>null</code>.
+      </li>
+      <li>
+        Check if reference is <code>null</code> before checking if it resolves to <code>null</code> when replacing
+        module attribute usages with their value because <code>AtNonNumericOperation</code>s can have a
+        <code>null</code> reference when they are non-referencing, like <code>@spec</code>.
+      </li>
+      <li>Leave normal highlighting for char tokens when highlighting types</li>
+      <li>Stab operation parameter Use Scope is the stab operation.</li>
+      <li>
+        Skip over <code>PsiLeafElement</code> when looking for variables because the <code>PsiLeafElement</code>
+        is an error.
+      </li>
+      <li>
+        In a script file where the parent of a <code>Match</code> is a <code>PsiFile</code>, the
+        <code>Match</code> Use Scope is the rest of the file.
+      </li>
+      <li>Add <code>=</code> to <code>Operator Signs</code></li>
+      <li>
+        Skip <code>NoParenthesesKeywords</code> when highlighting types, which occurs when the <code>::</code> has
+        no proper right operand and the following one-liner function clause with <code>do:</code> is parsed as the
+        right operand.
+      </li>
+      <li>Skip <code>DUMMY_BLOCK</code> when looking for Variable, which prevents walking through errors.</li>
+      <li>
+        Use <code>Normalized</code> pattern for <code>Prefix</code>, so that the operand is <code>null</code> when
+        only the operator matches or the operand has errors.
+      </li>
+      <li>
+        Work-around Phoenix .ex templates that contain EEX: if <code>&lt;%=</code> from EEX is detected, don't throw
+        error when <code>Modular</code> can't be found.
+      </li>
+      <li>Fix capitalization error in example text</li>
+      <li>
+        <p>
+          In IntelliJ 14.1, all of <code>openapi.jar</code> targets Java 1.6 (with <code>MAJOR.MINOR</code>
+          <code>50.0</code>), but in IntelliJ 2016.1, some of <code>openapi.jar</code> targets only Java 1.8
+          (with <code>MAJOR.MINOR</code> <code>52.0</code>), since <code>jps-builders</code> require parts of
+          <code>openapi.jar</code> and must target Java 1.6 even for IntelliJ 2016.1, the <code>52.0</code>
+          <code>.class</code>es needed to be ported into <code>org.elixir_lang.jps.builder</code>, so that the
+          <code>52.0</code> version in <code>openapi.jar</code> wouldn't be attempted to be loaded.
+        </p>
+        <p>
+          This ended up being 5 classes:
+        <ul>
+          <li><code>ExecutionException</code></li>
+          <li><code>GeneralCommandLine</code></li>
+          <li><code>ParametersList</code></li>
+          <li><code>ParamsGroup</code></li>
+          <li><code>ProcessNotCreatedException</code></li>
+        </ul>
+        Only <code>GeneralCommandLine</code> was used directly, all others are dependencies of it.
+        </p>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Incompatible Changes</p>
+    <ul>
+      <li>
+        <p>
+          Preferences &gt; Editor &gt; Colors &amp; Fonts &gt; Elixir restructured to group together related highlights
+          and to match grouping used for Colors &amp; Fonts &gt; Language Defaults and Colors &amp; Fonts &gt; Java.
+        </p>
+        <ul>
+          <li>
+            <code>Documentation Module Attributes</code> renamed to
+            <code>Module Attributes</code> > <code>Documentation</code>
+          </li>
+          <li>
+            <code>Documentation Text</code> renamed to <code>Module Attributes > Documentation > Text</code>
+          </li>
+          <li>
+            <code>Expression Substitution Mark</code> renamed to
+            <code>Braces and Operators > Interpolation</code>.
+          </li>
+          <li>
+            <code>Binary, Decimal, Hexadecimal, and Octal Digits</code> was renamed to
+            <code>Numbers > Digits > Valid</code>
+          </li>
+          <li>
+            <code>Decimal Exponent, Mark and Separator</code> was renamed to
+            <code>Number > Digits > Invalid</code>
+          </li>
+          <li>
+            <code>Numbers > Non-Decimal Base Prefix</code> renamed to
+            <code>Numbers > Base Prefix > Non-Decimal</code>
+          </li>
+          <li>
+            <code>Numbers > Obsolete Non-Decimal Base</code> renamed to
+            <code>Numbers > Base Prefix > Obsolete > Non-Decimal</code>
+          </li>
+        </ul>
+      </li>
+      <li>"Character List", "Escape Sequence", "Sigil", and "String" are moved under the new "Textual" group.</li>
+    </ul>
+  </li>
+</ul>
+<h1>v3.0.1</h1>
+<ul>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>
+        Use the error reporter logger instead of plain <code>assert</code> in <code>Prefix#operator</code>.
+        <strong>
+          NOTE: This does not address error recovery recovery since I don't have a regression test case.
+        </strong>
+      </li>
+      <li>
+        All function name elements act as <code>PsiNameIdentifier</code>s now even if they don't resolve, but that
+        means they all need to support <code>FindUsagesProvider#getType</code>, which they don't, so use a
+        placeholder of "unknown call type" for any <code>Call</code> that can't be matched and "unknown element"
+        for anything else.
+      </li>
+      <li>
+        Enumerate all Kernel Functions, Macros, and Special Forms in the Syntax Highlighting section of the
+        README, so that users searching for which category controls highlighting a given call can find it.
+      </li>
+    </ul>
+  </li>
+</ul>
+<h1>v3.0.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>
+        <p>Go To Symbol (&#8997;&#8984;O)</p>
+        <ul>
+          <li>
+            Call definition clauses (<code>def</code>, <code>defp</code>, <code>defmacro</code>, and
+            <code>defmacrop</code>)
+          </li>
+          <li>Callbacks (<code>@callback</code> and <code>@macrocallback</code>)</li>
+          <li>Call definition specifications (<code>@spec</code>)</li>
+          <li>
+            Call definition heads (<code>foo(bar)</code>) for delegation
+            (<code>defdelegate foo(bar), to: BAZ</code>)
+          </li>
+          <li>Implementations (<code>defimpl</code>)</li>
+          <li>Protocols (<code>defprotocol</code>)</li>
+        </ul>
+      </li>
+      <li>
+        Go To Declaration for Aliases now uses the same <code>isModular</code> checks as the stubbing for the index uses
+        for
+        Go To Symbol.
+      </li>
+      <li>Build against 14.0, 14.1, 15.0, and 2016.1 on travis-ci to ensure continued compatibility.</li>
+      <li>
+        Error reporting for type highlighter gives the Class, Excerpt and Full Text when an unknown element type
+        is encountered as the Excerpt alone is not enough sometimes.
+      </li>
+      <li>
+        Custom error handling that will open an issue against https://github.com/KronicDeth/intellij-elixir with
+        the exception messsage and stacktrace filled in.
+      </li>
+      <li>
+        Changed <code>NotImplementedExceptions</code> and (some) <code>assert</code>s to logging custom error
+        message that include the <code>PsiElement</code> text and the containing file as an attachment. The files
+        make the URL too big for the error handler to put the file contents in when opening the browser with the
+        error handler, so the issue body instead explains how to get the attachment text out of IntelliJ's
+        "IDE Fatal Errors"
+      </li>
+      <li>Update to Grammar Kit 1.3.0</li>
+    </ul>
+  </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>Fix Elixir Mix Run configuration not persisting past restart</li>
+      <li>
+        Allow <code>Infix#operator</code> to work on operations with errors, which eliminates the
+        <code>AssertionError</code> reported when typing infix operation and they are incomplete.
+      </li>
+      <li>
+        Add Keywords to the Preferences &gt; Editor &gt; Colors &amp; Fonts &gt; Elixir settings page, so it can be
+        customized for just Elixir instead of having to change Preferences &gt; Editor &gt; Colors &amp; Fonts &gt;
+        General &gt; Keyword.
+      </li>
+      <li>
+        <p>Use <code>TextAttributesKey</code>s that aren't deprecated in 2016.1 and work back to 14.1</p>
+        <p>
+          All of <code>CodeInsightColors</code> is deprecated, so all constants from there had to be replaced.
+          Unfortunately, the recommended replacements don't have the same color as the original, so I used
+          different <code>DefaultLanguageHighlighterColors</code> constants for some.
+        </p>
+        <p>
+          "Module Attribute" is now based on <code>DefaultLanguageHighlighterColors.CONSTANT</code> (which is
+          purplish in Darcula) instead of the recommended <code>METADATA</code>, which is yellow. Although module
+          attributes don't have to be constant since they can be set to accumulate, often they are used as
+          constants and not really as metadata, since they are just data then. All the <code>metadata</code> uses
+          of module attributes have a separate color.
+        </p>
+        <p>
+          "Specification" is now based on <code>DefaultLanguageHighlighterColors.FUNCTION_DECLARATION</code>,
+          which maintains the golden color that <code>CodeInsightColors.METHOD_DECLARATION_ATTRIBUTES</code> had.
+        </p>
+        <p>
+          "Type" is now based on <code>DefaultLanguageHighlighterColors.METADATA</code>, which is bright yellow
+          unlike <code>CodeInsightColors.ANNOTATION_ATTRIBUTE_NAME_ATTRIBUTES</code>, which was a bright white.
+        </p>
+        <p>
+          "Type Parameter" is now based on <code>DefaultLanguageHighlighterColors.PARAMETER</code>, which
+          unfortunately has no attributes associated with it, but the constant name was too good a fit not to use,
+          so if you want the old color, you'll need to customize it yourself.
+        </p>
+      </li>
+      <li>
+        <p>Restore compatibility with the IntelliJ IDEA 14.0 release line</p>
+        <ul>
+          <li>
+            By using reflection to call <code>FileTemplateManager#getInstance</code> if
+            <code>FileTemplateManager#getDefaultInstance</code> is not available
+          </li>
+          <li>
+            By calling <code>FileChooserDescriptorFactory#createSingleLocalFileDescriptor</code> (which works in
+            14.0 through 2016.1) instead of <code>FileChooserDescriptorFactory#createSingleFileDescriptor</code>
+            (which only works in 14.1 through 2016.1)
+          </li>
+        </ul>
+      </li>
+      <li>
+        Instead of showing the regular expression pattern, which may be confusing to new developers, explain in
+        English the expected pattern. I also included the description, which explains how nesting is mapped to
+        directories, of the action since it doesn't actually show up in the dialog otherwise.
+      </li>
+      <li>
+        Check if a file exists before allowing Elixir Module to be created. If it exists, show an error with the
+        conflicting path.
+      </li>
+      <li>
+        Fix (one cause) of <code>AssertionError</code> in <code>GoToSymbolContributor</code> when the
+        <code>Modular</code> (<code>defimpl</code>, <code>demodule</code>, <code>defprotocol</code>, and
+        <code>quote</code>) could not be resolved due a <code>def</code> being surrounded by a <code>for</code>
+        comprehension, which is common in Elixir libraries as was the case for <code>Postgrex</code>: any
+        enclosing <code>for</code> comprehension(s) will now be ignored and the next enclosing macro will be
+        checked to see if it is a <code>Modular</code>.
+      </li>
+      <li>
+        While typing before <code>:</code> in keyword pairs after the <code>when</code>, such as in
+        <code>@spec foo(id) :: id when id</code> before finishing typing
+        <code>@spec foo(id) :: id when id: String.t</code>, the keyword key will be properly highlighted as a
+        Type Parameter.
+      </li>
+      <li>
+        Properly handle the <code>Infix#rightOperand</code> being <code>null</code> due to the Pratt Parser
+        matching up through the operator and then ignoring the mismatched right operand, which leads to the
+        <code>Infix</code> having only 2 elements: the left operand and the operator.
+      </li>
+      <li>
+        <code>@doc</code> and other module attributes appearing as the right operand of <code>@type name ::</code>
+        will be ignored as it is common when adding a new type above pre-existing, documented functions.
+      </li>
+      <li>
+        Only error in <code>Infix#leftOperand</code> if there are not 2-3 children for <code>Infix</code> instead
+        of a strict 3.
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Incompatible Changes</p>
+    <ul>
+      <li>
+        Drop support for IntelliJ 14.0 because the parser generated by Grammar Kit 1.3.0 is not compatible with
+        the OpenAPI libraries shipped in IntelliJ 14.0. Still compatible with 14.1 through 2016.1.
+      </li>
+    </ul>
+  </li>
+</ul>
+<h1>v2.2.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>Code Commenter</li>
+      <li>
+        <p>Structure View</p>
+        <ul>
+          <li>
+            <p>Controls</p>
+            <ul>
+              <li>Scroll to Source and Scroll From Source</li>
+              <li>
+                <p>Sorting</p>
+                <ul>
+                  <li>Runtime (functions) vs Compile (macros)</li>
+                  <li>
+                    Visibility (public [<code>def</code>, <code>macro</code>, etc] vs private
+                    [<code>defp</code>, <code>macrop</code> and <code>@typep</code>]
+                  </li>
+                  <li>Alphabetical</li>
+                </ul>
+              </li>
+              <li>
+                Show Used - injects structure from <code>use Alias</code> call's <code>__using__</code>'s
+                <code>quote</code> into the call site Structure
+              </li>
+            </ul>
+          </li>
+          <li>
+            <p>Elements</p>
+            <ul>
+              <li>Callbacks (<code>@callback</code>) show their name/arity and then a nest spec</li>
+              <li>CallDefinition groups together CallDefinitionClause of the same name/arity</li>
+              <li>
+                CallDefinitionClause (<code>def</code>, <code>defp</code>, <code>macro</code>, and
+                <code>macrop</code>) shows the head of each definition under the CallDefinition.
+              </li>
+              <li>
+                CallDefinitionSpecification (<code>@spec</code>) show the type specification for a CallDefinition
+              </li>
+              <li>
+                CallReference <code>name: arity</code> shows the name/arity for a <code>defoverridable</code>.
+              </li>
+              <li>
+                Delegation shows all the <code>:append_first</code> and <code>:to</code> options with the implied
+                Function Delegation nested underneath
+              </li>
+              <li>
+                Exception (<code>defexception</code>) show the implicit struct and nest any callback functions,
+                such as <code>exception/1</code> or <code>message/1</code>.
+              </li>
+              <li>
+                Overridable <code>defoverridable</code> tracks overridable functions and is used to mark
+                CallDefinitions are overrides.
+              </li>
+              <li>
+                Quote <code>quote do end</code> models quote blocks so they can be injected <code>use Alias</code>
+                sites.
+              </li>
+              <li>Use <code>use Alias</code> show <code>use</code> calls.</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>Live Templates</li>
+      <li>
+        Added clarification to "Import Project from External Model" that <code>mix.bat</code> should be used
+        instead of <code>mix</code>
+      </li>
+      <li>
+        Get the Elixir version directly from <code>System.build_info[:version]</code> instead of processing the
+        formatted output of <code>elixir --version</code> as the build info version is more stable
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>
+        Elixir version parsing handles both pre and build numbers if present by using the same regular expression
+        as Elixir itself uses for the <code>Version</code> module
+      </li>
+      <li>Better error handing in Structure View</li>
+    </ul>
+  </li>
+</ul>
+<h1>v2.1.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li><code>\u</code> in strings and char lists for unicode mapping</li>
+      <li>Test against Elixir 1.1.1 and 1.2.0</li>
+      <li>
+        More flexible <code>elixir --version</code> parsing: works with <code>elixir</code> 1.2.0 and earlier
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>Update IntelliJ to 14.1.6 to fix 403 errors in Travis-CI build</li>
+    </ul>
+  </li>
+</ul>
+<h1>v2.0.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>
+        <p>Highlighters for</p>
+        <ul>
+          <li>Kernel Functions</li>
+          <li>Kernel Macros</li>
+          <li>Kernel.SpecialForms Macros</li>
+        </ul>
+      </li>
+      <li>Test against Elixir v1.1.1</li>
+      <li>
+        Highlight <code>after</code>, <code>catch</code>, <code>do</code>, <code>else</code>, <code>end,
+      </code>fn<code>, and </code>rescue` as keywords.
+      </li>
+      <li>
+        <p>Annotate Module Attributes</p>
+        <ul>
+          <li>
+            Documentation module attributes (<code>@doc</code>, <code>@moduledoc</code>, and
+            <code>@typedoc</code>) are annotated as "Documentation Module Attributes" while all other module
+            attributes are annotated as "Module Attributes".
+          </li>
+          <li>
+            The string or heredoc argument to a documentation module attribute (<code>@doc</code>,
+            <code>@moduledoc</code>, and <code>@typedoc</code>) is annotated as "Documentation Text"
+          </li>
+          <li>
+            Function names passed to <code>@callback</code>, <code>@macrocallback</code> or
+            <code>@spec</code> are annotated as "Specification".
+          </li>
+          <li>
+            Variables/calls in the parameters and return of <code>@callback</code>, <code>@macrocallback</code>,
+            <code>@spec</code> are annotated as "Type".
+          </li>
+          <li>
+            Parameters of <code>@opaque</code>, <code>@type</code>, <code>@typep</code> names are annotated as
+            "Type Parameter"
+          </li>
+          <li>
+            Keyword keys from the <code>when</code> clause of <code>@callback</code>, <code>@macrocallback</code>
+            or <code>@spec</code> definitions and their usage are annotated as "Type Parameters"
+          </li>
+          <li>
+            <code>@doc false</code>, <code>@moduledoc false</code>, and <code>@typedoc false</code> will annotate
+            the <code>false</code> with a weak warning: "Will make documented invisible to the documentation
+            extraction tools like ExDoc.".
+          </li>
+        </ul>
+      </li>
+      <li>
+        <p>Module Attribute resolution and refactoring</p>
+        <ul>
+          <li>Go To Definition for module attributes.</li>
+          <li>Module attribute completion</li>
+          <li>
+            Module attributes that can't be resolved will have "Unresolved module attribute" error annotation
+            (i.e. red squiggly underline).
+          </li>
+          <li>Find Usages of module attributes from their declarations.</li>
+          <li>
+            Rename module attributes inline (editing the name in the declaration will change the name at the usage
+            site at the same time without a dialog).
+          </li>
+          <li>
+            The module attribute value (from the declaration site) will be folded into the usage site. It can be
+            reverted to the literal <code>@module_name</code> text by clicking the + to unfold.
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>Change "edition" to "addition" in README.</li>
+      <li>
+        Sped up reparsing when [ENTER] is hit in the middle of comment by removing the custom error handling
+        element, adjacentExpression, and going with the default error handling provided by JetBrains' OpenAPI.
+      </li>
+      <li>
+        Fix <code>mix</code> version detection on Windows.
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Incompatible Changes</p>
+    <ul>
+      <li>
+        Removed "Add Newline" Quick Fix as it depended on <code>adjacentExpression</code> elements, which have now
+        been removed to speed up error handling when comments become code.
+      </li>
+      <li>
+        Removed "Add Semicolon" Quick Fix as it depended on <code>adjacentExpression</code> elements, which have
+        now been removed to speed up error handling when comments become code.
+      </li>
+    </ul>
+  </li>
+</ul>
+<h1>v1.2.1</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>
+        Keywords not at the end of no parentheses calls will be properly marked as errors.
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>
+        Fix <code>IllegalStateException</code> for file delete and rename by giving <code>ElixirFile</code>s
+        descriptive names for safe-refactoring displaying file usage.
+      </li>
+      <li>
+        README states explicitly that the plugin works with *both* IntelliJ Community and Ultimate.
+      </li>
+      <li>
+        README states that the plugin is free.
+      </li>
+      <li>
+        Prevent match error when typing <code>~</code> to start a sigil that is followed later by a
+        <code>\n</code> by matching <code>EOL</code> in the <code>NAMED_SIGIL</code> state as a
+        <code>BAD_CHARACTER</code>.
+      </li>
+      <li>
+        Keywords at the end of a no parentheses call that is surrounded by parentheses will not be marked as an
+        error when that parenthetical group appears in the middle of an outer call.
+      </li>
+    </ul>
+  </li>
+</ul>
+<h1>v1.2.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>
+        If (1) you have intellij-erlang installed and (2) you have an atom in Erlang that starts with
+        <code>Elixir.</code>, such as <code>'Elixir.Test'</code>, then intellij-elixir will annotate whether it
+        can resolve the name to a <code>defmodule</code> call in Elixir files.
+      </li>
+      <li>
+        Default SDK path for Linux and Windows.
+      </li>
+      <li>
+        Go To Declaration (<code>Cmd+Click</code>, <code>Cmd+B</code>, <code>Navigate > Declaration</code>) from
+        Alias to <code>defmodule</code> where Alias is declared.
+      </li>
+      <li>
+        Index <code>defmodule</code>s for fast Go To Declaration in
+        <a href="https://github.com/elixir-lang/elixir">
+          <code>elixir-lang/elixir</code>
+        </a>
+        and other large projects.
+      </li>
+      <li>
+        Find Usage for Alias in <code>defmodule</code>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>Fi links to screenshots in README</li>
+    </ul>
+  </li>
+</ul>
+<h1>v1.1.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>
+        <p>
+          <code>Build</code>
+        </p>
+        <ul>
+          <li><code>Compile</code> an individual file</li>
+          <li><code>Make Project</code> to build the entire project</li>
+        </ul>
+      </li>
+      <li>
+        <p>
+          <code>New</code>
+        </p>
+        <ul>
+          <li>
+            <p>
+              <code>Elixir File</code> has new templates
+            </p>
+            <ul>
+              <li>
+                <code>Empty module</code>
+              </li>
+              <li>
+                <code>Elixir Application</code>
+              </li>
+              <li>
+                <code>Elixir Supervisor</code>
+              </li>
+              <li>
+                <code>Elixir GenServer</code>
+              </li>
+              <li>
+                <code>Elixir GenEvent</code>
+              </li>
+            </ul>
+          </li>
+          <li>
+            <code>Project > Elixir</code> creates a new Elixir project with an empty <code>lib</code> directory
+            marked as source directory.
+          </li>
+          <li>
+            <p>
+              <code>Project from Existing Sources... </code>
+            </p>
+            <ul>
+              <li>
+                <code>Create project from existing sources</code> sets up the project with SDK using a
+                pre-existing directory.
+              </li>
+              <li>
+                <p>
+                  <code>Import project from external model > Mix</code>
+                </p>
+                <ul>
+                  <li>Fetches the the dependencies with the local version of <code>mix</code></li>
+                  <li>Marks <code>lib</code> directory as source</li>
+                  <li>Marks <code>test</code> directory as test sources</li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><code>Run > Elixir Mix</code> to setup Run Configurations to run <code>mix</code> tasks.</li>
+    </ul>
+  </li>
+</ul>
+<h1>v1.0.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>Update ant build on travis-ci.org to use IDEA 14.1.4 (from 14.0.2)</li>
+      <li>Parser is verified to quote the same as native Elixir</li>
+    </ul>
+  </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>Fix parsing of unary vs binary +/- with leading and trailing spaces and newlines</li>
+      <li>Allow EOL between list arguments and <code>]</code></li>
+      <li>
+        Relative identifiers after <code>.</code> that start with <code>and</code>, <code>or</code>, and
+        <code>not</code> will be lexed as a single identifier instead of <code>and</code>, <code>or</code>, or
+        <code>not</code> followed by another identifier.
+      </li>
+      <li><code>end</code> is allowed as a relative identifier after <code>.</code></li>
+      <li>Fix <code>(...)</code> as part of matched expression in no parentheses stab signature</li>
+      <li>Allow multiple newlines to mark the end of an expression, but only one <code>;</code></li>
+      <li>
+        Allow operators in function references (<code>&lt;op&gt;/&lt;arity&gt;</code>) for function captures
+        (<code>&amp;&lt;op&gt;/&lt;arity&gt;</code>)
+      </li>
+      <li><code>unquote_splicing</code> is properly wrapped in <code>__block__</code> when in stab bodies</li>
+      <li>Check for matching terminator in heredocs when determining white space type at beginning of line</li>
+      <li>Allow &lt;space&gt;+&lt;EOL&gt; to count as addition</li>
+      <li>Unary expressions inside parentheses are no longer marked <code>ambiguous_op: nil</code></li>
+      <li>
+        Differentiate between <code>Qualifier.'relative'()</code> vs <code>Qualifier.'relative' ()</code> and
+        <code>Qualifier."relative"()</code> vs <code>Qualifier."relative" ()</code>
+      </li>
+      <li>Fix link to Elixir website in README</li>
+      <li>All tokens have human-readable names and/or expected characters for better error messages</li>
+    </ul>
+    <p>Incompatible Changes</p>
+    <ul>
+      <li>
+        New Elixir File has moved to the last item in the New File menu to preserve <code>CTRL+N ENTER</code>
+        keyboard shortcut for <code>New &gt; File</code>
+      </li>
+    </ul>
+  </li>
+</ul>
+<h1>0.3.5</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li><code>do</code> blocks (<code>do end</code>)</li>
+      <li>Unmatched expressions (operations involving <code>do</code> block calls and normal matched expressions)</li>
+    </ul>
+  </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>Lex full atom instead of just identifier-like operator prefix (<code>:in&lt;nospace&gt;dex</code> before vs
+        <code>:index</code> after)
+      </li>
+      <li><code>!</code> and <code>not</code> are properly wrapped in <code>__block__</code>s when in stab bodies</li>
+    </ul>
+  </li>
+</ul>
+<h1>v0.3.4</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>Bracket at expression (<code>@foo[key]</code>)</li>
+      <li>Anonymous functions (<code>fn end</code>), stab clauses (<code>-&gt;</code>), and parentheticals (<code>1 +
+        2</code>)
+      </li>
+      <li>Maps (<code>%{}</code>) and structs (<code>%User{}</code>)</li>
+      <li>Tuples (<code>{}</code>)</li>
+      <li>Bit Strings (<code>&lt;&lt;&gt;&gt;</code>)</li>
+    </ul>
+  </li>
+</ul>
+<h1>v0.3.3</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>
+        <p>Remote function calls (<code>Alias.function</code>, <code>:atom.function</code>, etc) and local function
+          calls (<code>function</code>) with...</p>
+        <ul>
+          <li>
+            <p>No Parentheses with...</p>
+            <ul>
+              <li>No Arguments (<code>Alias.function</code>)</li>
+              <li>Keywords (<code>Alias.function key: value</code>)</li>
+              <li>
+                Nested No Parentheses Call (<code>Alias.function Inner.function positional, key: value</code>)
+              </li>
+              <li>Positional and Keyword arguments (<code>Alias.function positional, key: value</code>)</li>
+              <li>Matched Expression (<code>Alias.function 1 + 2</code>)</li>
+            </ul>
+          </li>
+          <li>
+            <p>Parentheses with...</p>
+            <ul>
+              <li>No arguments (<code>Alias.function()</code>)</li>
+              <li>No Parentheses Call (<code>Alias.function(Inner.function positional, key: value</code>)</li>
+              <li>Keywords (<code>Alias.function(key: value)</code>)</li>
+              <li>Positional and Keyword arguments (<code>Alias.function(positional, key: value)</code>)</li>
+              <li>Trailing parentheses for quoting (<code>def unquote(variable)(positional)</code>)</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>Bracket expressions (<code>foo[key]</code>)</li>
+    </ul>
+  </li>
+</ul>
+<h1>v0.3.2</h1>
+<ul>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>
+        Fix
+        <code>
+          NoSuchElementException
+        </code>
+        when no suggested SDK home paths are available. Thanks to
+        <a href="https://github.com/zyuyou">
+          zyuyou
+        </a>
+        for
+        <a href="https://github.com/KronicDeth/intellij-elixir/issues/120">
+          reporting
+        </a>
+      </li>
+    </ul>
+  </li>
+</ul>
+<h1>v0.3.1</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>
+        File &gt; New &gt; Project From Existing Sources can be used in IntelliJ to setup the excludes, sources, tests,
+        SDK and libraries for an Elixir project that has already been created with <code>mix new</code>.
+      </li>
+      <li>
+        Operators can be qualified function names.
+      </li>
+      <li>
+        Anonymous function calls (<code>.(...)</code>)
+      </li>
+      <li>
+        Inspection that marks errors when keywords aren't at end of list.
+      </li>
+    </ul>
+  </li>
+</ul>
+<h1>v0.3.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>
+        <code>\x</code> is marked an error in CharLists, CharList Heredocs, Strings, and String Heredocs, but not
+        in any sigils.
+      </li>
+      <li>
+        New Elixir File will automatically underscore the camel case module name when creating the file name and
+        will convert qualifying aliases before the last <code>.</code> to directories.
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Incompatible Changes</p>
+    <ul>
+      <li>
+        New Elixir File validates that the name is a valid Alias, so each <code>.</code> separated part must start with
+        a
+        capital letter. Previous New Elixir File validated that the name was a valid path, and so forced the name
+        to be lowercase.
+      </li>
+    </ul>
+  </li>
+</ul>
+<h1>v0.2.1</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>
+        No parentheses function calls can occur as the right operand in binary infix operations or the sole
+        operand of unary prefix operation.
+      </li>
+      <li>
+        Function calls with neither parentheses nor <code>do</code> blocks that have at least 2 arguments: a
+        positional argument and keyword arguments or 2 or more positional argument(s) followed by optional keyword
+        arguments.
+      </li>
+      <li>Inspection that marks errors for ambiguous commas</li>
+      <li>Inspection that marks errors for ambiguous parentheses</li>
+      <li>Quick Fix for the ambiguous parentheses to remove the space between the function name and the opening
+        parentheses.
+      </li>
+      <li>Inspection that marks errors for missing end-of-expressions (<code>;</code> and newlines) between expressions.
+      </li>
+      <li>Quick Fix to insert <code>;</code> for missing end-of-expression.</li>
+      <li>Quick Fix to insert newline for missing end-of-expression.</li>
+    </ul>
+  </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>Right hand-side of dot_alias and dot_identifier was translated incorrectly. Only Aliases and Identifiers are
+        allowed now.
+      </li>
+    </ul>
+  </li>
+</ul>
+<h1>v0.2.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>
+        <p>New attributes for parts of numbers on Color Settings Page</p>
+        <ul>
+          <li>Binary, Decimal, Hexadecimal, and Octal Digits</li>
+          <li>Decimal Exponent, Mark, and Separator</li>
+          <li>
+            <p>Invalid Binary, Decimal, Hexadecimal, and Octal Digits</p>
+            <ul>
+              <li>2-9, A-Z, and a-z will be parsed as invalid binary digits</li>
+              <li>8-9, A-Z, and a-z will be parsed as invalid octal digits</li>
+              <li>G-Z and g-z will be parsed as invalid hexadecimal digits</li>
+            </ul>
+          </li>
+          <li>
+            <p>Non-Decimal Base Prefix</p>
+            <ul>
+              <li>Any letter other than b, o, or x, in either case, will be recognized as an invalid whole number base
+              </li>
+            </ul>
+          </li>
+          <li>Obsolete Non-Decimal Base Prefix (<code>B</code> for binary and <code>X</code> for hexadecimal)</li>
+        </ul>
+      </li>
+      <li>Any digit, 0-9, A-Z, or a-z will be parsed as invalid for invalid whole number based numbers</li>
+      <li>Recovery for non-decimal whole numbers if the prefix is given, but no digits are given</li>
+    </ul>
+  </li>
+  <li>
+    <p>Incompatible Changes</p>
+    <ul>
+      <li>Recovery for non-decimal whole numbers if the prefix is given, but no digits are given</li>
+    </ul>
+  </li>
+</ul>
+<h1>v0.1.4</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>All valid escape sequences (<code>\&lt;character&gt;</code>, <code>\x&lt;hexadecimal&gt;</code>, <code>\x{&lt;hexadecimal&gt;}</code>,)
+        are recognized.
+      </li>
+      <li>Support for creation of Elixir modules</li>
+      <li>Use pygments' elixir_example.ex supplied by Alexei Sholik for Color Settings Page.</li>
+      <li><code>?</code> before any character or valid escape sequence will be recognized as a character token.</li>
+      <li><code>;</code> is recognized as EOL. <code>\r\n</code> and <code>\n</code> style EOL can be escaped with
+        <code>\</code> and will be treated as whitespace.
+      </li>
+      <li>Operator arity, associativity, and precedence</li>
+      <li>Decimal integers and floats</li>
+      <li>Identifiers (variable, function, and macro names)</li>
+      <li><code>...</code> identifier</li>
+      <li>Aliases (module names)</li>
+      <li>Keyword Identifiers</li>
+      <li>Empty Parentheses</li>
+      <li>In Operator</li>
+      <li>Dot Operator</li>
+      <li>Keyword Lists</li>
+      <li>Matched Expressions</li>
+      <li>Regular Keywords (<code>end</code>, <code>false</code>, <code>fn</code>, <code>nil</code>, and
+        <code>true</code>)
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>Sigil terminator escapes are recognized, so that sigils are no longer prematurely terminated.</li>
+      <li>Comments do not consume EOL, so trailing comments don't cause error parsing expression on following line.</li>
+      <li>Sigil modifiers now work on groups in addition to heredocs.</li>
+      <li><code>;</code> is separate from <code>EOL</code> and either or both can separate expressions, but only <code>EOL</code>
+        can separate operators and operands for operations
+      </li>
+    </ul>
+  </li>
+</ul>
+</body>
+</html>

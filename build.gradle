@@ -50,6 +50,17 @@ allprojects {
     version ideaVersion
     downloadSources Boolean.valueOf(sources)
     updateSinceUntilBuild = false
+
+  }
+
+  patchPluginXml {
+    def stripTag = { text, tag -> text.replace("<${tag}>", "").replace("</${tag}>", "") }
+    def bodyInnerHTML = { path ->
+      stripTag(stripTag(file(path).text, "html"), "body")
+    }
+
+    changeNotes bodyInnerHTML("resources/META-INF/changelog.html")
+    pluginDescription bodyInnerHTML("resources/META-INF/description.html")
   }
 
   publishPlugin {
