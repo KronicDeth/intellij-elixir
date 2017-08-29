@@ -5,7 +5,7 @@ import com.intellij.ide.util.projectWizard.ProjectJdkForModuleStep;
 import com.intellij.ide.util.projectWizard.WizardContext;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.projectImport.ProjectImportProvider;
-import org.elixir_lang.sdk.ElixirSdkType;
+import org.elixir_lang.sdk.elixir.Type;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,7 +22,7 @@ public class MixProjectImportProvider extends ProjectImportProvider {
     return new ModuleWizardStep[]{
         new MixProjectRootStep(context),
         new SelectImportedOtpAppsStep(context),
-        new ProjectJdkForModuleStep(context, ElixirSdkType.getInstance())
+        new ProjectJdkForModuleStep(context, Type.getInstance())
     };
   }
 

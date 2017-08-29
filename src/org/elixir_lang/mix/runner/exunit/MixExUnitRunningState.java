@@ -21,7 +21,7 @@ import org.elixir_lang.jps.builder.ParametersList;
 import org.elixir_lang.mix.runner.MixRunningState;
 import org.elixir_lang.mix.runner.MixTestConsoleProperties;
 import org.elixir_lang.mix.settings.MixSettings;
-import org.elixir_lang.sdk.ElixirSdkType;
+import org.elixir_lang.sdk.elixir.Type;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -53,7 +53,7 @@ final class MixExUnitRunningState extends MixRunningState {
 
     @NotNull
     private static ParametersList elixirParametersList(@Nullable Sdk sdk, boolean useCustomMixTask) throws IOException {
-        return ElixirModules.parametersList(ElixirSdkType.getRelease(sdk), useCustomMixTask);
+        return ElixirModules.parametersList(Type.getRelease(sdk), useCustomMixTask);
     }
 
     /**

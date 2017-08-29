@@ -1,6 +1,6 @@
 package org.elixir_lang.parser_definition;
 
-import org.elixir_lang.sdk.ElixirSdkRelease;
+import org.elixir_lang.sdk.elixir.Release;
 
 import static org.elixir_lang.test.ElixirVersion.elixirSdkRelease;
 
@@ -41,7 +41,7 @@ public class CharTokenParsingTestCase extends ParsingTestCase {
      */
 
     public void testOpenHexadecimalEscapeSequence() {
-        if (elixirSdkRelease().compareTo(ElixirSdkRelease.V_1_3) < 0) {
+        if (elixirSdkRelease().compareTo(Release.V_1_3) < 0) {
             assertParsedAndQuotedCorrectly();
         } else {
             assertParsedAndQuotedAroundError();
@@ -49,7 +49,7 @@ public class CharTokenParsingTestCase extends ParsingTestCase {
     }
 
     public void testEnclosedHexadecimalEscapeSequence() {
-        if (elixirSdkRelease().compareTo(ElixirSdkRelease.V_1_3) < 0) {
+        if (elixirSdkRelease().compareTo(Release.V_1_3) < 0) {
             assertParsedAndQuotedCorrectly();
         } else {
             assertParsedAndQuotedAroundError();

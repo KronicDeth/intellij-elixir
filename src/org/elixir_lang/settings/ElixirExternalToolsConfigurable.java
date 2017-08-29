@@ -11,9 +11,9 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.TitledSeparator;
 import org.elixir_lang.mix.settings.MixConfigurationForm;
 import org.elixir_lang.mix.settings.MixSettings;
-import org.elixir_lang.sdk.ElixirSdkForSmallIdes;
-import org.elixir_lang.sdk.ElixirSdkType;
-import org.elixir_lang.sdk.ElixirSystemUtil;
+import org.elixir_lang.sdk.elixir.ForSmallIdes;
+import org.elixir_lang.sdk.elixir.Type;
+import org.elixir_lang.sdk.ProcessOutput;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -56,7 +56,7 @@ public class ElixirExternalToolsConfigurable implements SearchableConfigurable, 
       }
     }
 
-    if(!ElixirSystemUtil.isSmallIde()){
+    if(!ProcessOutput.isSmallIde()){
       mySdkPathLabel.setVisible(false);
       mySdkPathSelector.setVisible(false);
       mySdkTitledSeparator.setVisible(false);
@@ -101,15 +101,15 @@ public class ElixirExternalToolsConfigurable implements SearchableConfigurable, 
     myMixSettings.setMixPath(myMixConfigurationForm.getPath());
     myMixSettings.setSupportsFormatterOption(myMixConfigurationForm.getSupportsFormatterOption());
 
-    if(ElixirSystemUtil.isSmallIde()){
-      ElixirSdkForSmallIdes.setUpOrUpdateSdk(myProject, mySdkPathSelector.getText());
+    if(ProcessOutput.isSmallIde()){
+      ForSmallIdes.setUpOrUpdateSdk(myProject, mySdkPathSelector.getText());
     }
   }
 
   @Override
   public boolean isModified() {
     return !myMixSettings.getMixPath().equals(myMixConfigurationForm.getPath())
-        || !StringUtil.notNullize(ElixirSdkType.getSdkPath(myProject)).equals(mySdkPathSelector.getText());
+        || !StringUtil.notNullize(Type.getSdkPath(myProject)).equals(mySdkPathSelector.getText());
 
   }
 
@@ -121,6 +121,6 @@ public class ElixirExternalToolsConfigurable implements SearchableConfigurable, 
   public void reset() {
     myMixConfigurationForm.setPath(myMixSettings.getMixPath());
 
-    mySdkPathSelector.setText(StringUtil.notNullize(ElixirSdkType.getSdkPath(myProject)));
+    mySdkPathSelector.setText(StringUtil.notNullize(Type.getSdkPath(myProject)));
   }
 }

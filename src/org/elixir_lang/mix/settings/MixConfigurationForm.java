@@ -1,7 +1,6 @@
 package org.elixir_lang.mix.settings;
 
 import com.intellij.execution.ExecutionException;
-import com.intellij.execution.process.ProcessOutput;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.diagnostic.Logger;
@@ -18,8 +17,8 @@ import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.download.DownloadableFileDescription;
 import com.intellij.util.download.DownloadableFileService;
 import com.intellij.util.download.FileDownloader;
-import org.elixir_lang.sdk.ElixirSdkRelease;
-import org.elixir_lang.sdk.ElixirSystemUtil;
+import org.elixir_lang.sdk.ProcessOutput;
+import org.elixir_lang.sdk.elixir.Release;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,7 +28,7 @@ import java.awt.*;
 import java.io.File;
 import java.util.List;
 
-import static org.elixir_lang.sdk.ElixirSystemUtil.transformStdoutLine;
+import static org.elixir_lang.sdk.ProcessOutput.transformStdoutLine;
 
 /**
  * Created by zyuyou on 2015/5/26.
@@ -122,12 +121,12 @@ public class MixConfigurationForm {
     File exeFile = mix.getAbsoluteFile();
     String exePath = exeFile.getPath();
     String workDir = exeFile.getParent();
-    ProcessOutput output = null;
+    com.intellij.execution.process.ProcessOutput output = null;
     boolean valid = false;
 
     for (String[] arguments : MIX_ARGUMENTS_ARRAY) {
       try {
-        output = ElixirSystemUtil.getProcessOutput(3000, workDir, exePath, arguments);
+        output = ProcessOutput.getProcessOutput(3000, workDir, exePath, arguments);
       } catch (ExecutionException executionException) {
         LOGGER.warn(executionException);
       }
@@ -141,10 +140,10 @@ public class MixConfigurationForm {
 
           // Support for the --formatter option may be added in a 1.3.x release, but I'm being conservative for now
           // and assuming it won't be released until 1.4
-          ElixirSdkRelease elixirSdkRelease = ElixirSdkRelease.fromString(versionString);
+          Release elixirSdkRelease = Release.fromString(versionString);
 
           if (elixirSdkRelease != null) {
-            supportsFormatterOptionCheckBox.setSelected(elixirSdkRelease.compareTo(ElixirSdkRelease.V_1_4) >= 0);
+            supportsFormatterOptionCheckBox.setSelected(elixirSdkRelease.compareTo(Release.V_1_4) >= 0);
           }
 
           valid = true;

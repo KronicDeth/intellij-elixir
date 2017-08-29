@@ -6,12 +6,10 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
 import org.elixir_lang.module.ElixirModuleType;
-import org.elixir_lang.sdk.ElixirSystemUtil;
+import org.elixir_lang.sdk.ProcessOutput;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /**
  * Created by zyuyou on 15/7/8.
@@ -26,15 +24,12 @@ public final class MixRunConfigurationEditorForm extends SettingsEditor<MixRunCo
   private CommonProgramParametersPanel commonProgramParametersPanel;
 
   public MixRunConfigurationEditorForm(){
-    myRunInModuleCheckBox.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        myModulesComboBox.setEnabled(myRunInModuleCheckBox.isSelected());
-      }
-    });
+    myRunInModuleCheckBox.addActionListener(e -> myModulesComboBox.setEnabled(myRunInModuleCheckBox.isSelected()));
 
-    myModulesComboBox.setVisible(!ElixirSystemUtil.isSmallIde());
-    myRunInModuleCheckBox.setVisible(!ElixirSystemUtil.isSmallIde());
+    boolean richIde = !ProcessOutput.isSmallIde();
+
+    myModulesComboBox.setVisible(richIde);
+    myRunInModuleCheckBox.setVisible(richIde);
   }
 
   @Override
@@ -45,7 +40,7 @@ public final class MixRunConfigurationEditorForm extends SettingsEditor<MixRunCo
   public void reset(@NotNull MixRunConfigurationBase configuration) {
       mySkipDependenciesCheckBox.setSelected(configuration.isSkipDependencies());
       Module module = null;
-      if(!ElixirSystemUtil.isSmallIde()){
+      if(!ProcessOutput.isSmallIde()){
         myModulesComboBox.fillModules(configuration.getProject(), ElixirModuleType.getInstance());
         module = configuration.getConfigurationModule().getModule();
       }

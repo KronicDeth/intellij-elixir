@@ -10,7 +10,7 @@ import com.intellij.ide.util.projectWizard.importSources.ProjectFromSourcesBuild
 import com.intellij.ide.util.projectWizard.importSources.ProjectStructureDetector;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.util.containers.ContainerUtil;
-import org.elixir_lang.sdk.ElixirSdkType;
+import org.elixir_lang.sdk.elixir.Type;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -65,7 +65,7 @@ public class ElixirProjectStructureDetector extends ProjectStructureDetector {
 
   @Override
   public List<ModuleWizardStep> createWizardSteps(ProjectFromSourcesBuilder builder, ProjectDescriptor projectDescriptor, Icon stepIcon) {
-    ProjectJdkForModuleStep projectJdkForModuleStep = new ProjectJdkForModuleStep(builder.getContext(), ElixirSdkType.getInstance());
+    ProjectJdkForModuleStep projectJdkForModuleStep = new ProjectJdkForModuleStep(builder.getContext(), Type.getInstance());
     return Collections.<ModuleWizardStep>singletonList(projectJdkForModuleStep);
   }
 

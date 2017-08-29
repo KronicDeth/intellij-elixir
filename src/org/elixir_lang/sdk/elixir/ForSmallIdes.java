@@ -1,4 +1,4 @@
-package org.elixir_lang.sdk;
+package org.elixir_lang.sdk.elixir;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
@@ -17,10 +17,10 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Created by zyuyou on 15/7/16.
  */
-public abstract class ElixirSdkForSmallIdes {
+public abstract class ForSmallIdes {
   private static final String LIBRARY_NAME = "Elixir SDK";
 
-  public ElixirSdkForSmallIdes() {
+  public ForSmallIdes() {
   }
 
   public static void setUpOrUpdateSdk(@NotNull final Project project, @NotNull final String path){

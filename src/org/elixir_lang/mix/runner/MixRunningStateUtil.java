@@ -9,21 +9,22 @@ import com.intellij.notification.Notifications;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.projectRoots.Sdk;
+import com.intellij.openapi.projectRoots.SdkTypeId;
 import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.roots.OrderRootType;
+import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.ObjectUtils;
 import org.elixir_lang.jps.builder.ParametersList;
 import org.elixir_lang.jps.model.JpsElixirSdkType;
+import org.elixir_lang.jps.model.JpsErlangSdkType;
 import org.elixir_lang.mix.settings.MixSettings;
-import org.elixir_lang.sdk.ElixirSdkType;
+import org.elixir_lang.sdk.elixir.Type;
 import org.elixir_lang.utils.ElixirExternalToolsNotificationListener;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.File;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
 
@@ -34,19 +35,9 @@ public class MixRunningStateUtil {
     private static final Logger LOGGER = Logger.getInstance(MixRunningStateUtil.class);
     private static final String SKIP_DEPENDENCIES_PARAMETER = "--no-deps-check";
 
-    private static void addEbinPaths(@NotNull GeneralCommandLine commandLine, @NotNull String sdkPath) {
-        try (DirectoryStream<Path> libStream = Files.newDirectoryStream(Paths.get(sdkPath, "lib"))) {
-            libStream.forEach(
-                    path -> {
-                        try (DirectoryStream<Path> pathStream = Files.newDirectoryStream(path, "*")) {
-                            pathStream.forEach(ebinPath -> commandLine.addParameters("-pa", ebinPath.toString()));
-                        } catch (IOException ioException) {
-                            LOGGER.error(ioException);
-                        }
-                    }
-            );
-        } catch (IOException ioException) {
-            LOGGER.error(ioException);
+    private static void prependCodePaths(@NotNull GeneralCommandLine commandLine, @NotNull Sdk sdk) {
+        for (VirtualFile virtualFile : sdk.getRootProvider().getFiles(OrderRootType.CLASSES)) {
+            commandLine.addParameters("-pa", virtualFile.getCanonicalPath());
         }
     }
 
@@ -149,22 +140,52 @@ public class MixRunningStateUtil {
     private static void setElixir(@NotNull GeneralCommandLine commandLine,
                                   @NotNull Project project,
                                   @NotNull ParametersList parametersList) {
-        String sdkPath = ElixirSdkType.getSdkPath(project);
-        String elixirPath = elixirPath(sdkPath);
+        Sdk sdk = ProjectRootManager.getInstance(project).getProjectSdk();
 
-    /* replace elixir.bat with direct call to erl.exe, to work around quoting problem
-       See https://github.com/KronicDeth/intellij-elixir/issues/603 */
-        if (elixirPath.endsWith(".bat") && sdkPath != null) {
-            // See https://github.com/elixir-lang/elixir/blob/v1.5.1/bin/elixir.bat#L111
-            commandLine.setExePath("erl.exe");
-            // See https://github.com/elixir-lang/elixir/blob/v1.5.1/bin/elixir.bat#L96-L102
-            addEbinPaths(commandLine, sdkPath);
-            // See https://github.com/elixir-lang/elixir/blob/v1.5.1/bin/elixir.bat#L106
-            commandLine.addParameters("-noshell", "-s", "elixir", "start_cli");
-            // See https://github.com/elixir-lang/elixir/blob/v1.5.1/bin/elixir.bat#L111
-            commandLine.addParameter("-extra");
+        if (sdk != null) {
+            SdkTypeId sdkType = sdk.getSdkType();
+
+            if (sdkType == Type.getInstance()) {
+                org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData sdkAdditionalData =
+                        (org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData) sdk.getSdkAdditionalData();
+
+                if (sdkAdditionalData != null) {
+                    Sdk erlangSdk = sdkAdditionalData.getErlangSdk();
+
+                    if (erlangSdk != null) {
+                        String erlangHomePath = erlangSdk.getHomePath();
+
+                        if (erlangHomePath != null) {
+                            File erlFile = JpsErlangSdkType.getByteCodeInterpreterExecutable(erlangHomePath);
+
+                            if (erlFile.exists() && erlFile.canExecute()) {
+                                // See https://github.com/elixir-lang/elixir/blob/v1.5.1/bin/elixir.bat#L111
+                                commandLine.setExePath(erlFile.getAbsolutePath());
+                                // See https://github.com/elixir-lang/elixir/blob/v1.5.1/bin/elixir.bat#L96-L102
+                                prependCodePaths(commandLine, sdk);
+                                // See https://github.com/elixir-lang/elixir/blob/v1.5.1/bin/elixir.bat#L106
+                                commandLine.addParameters("-noshell", "-s", "elixir", "start_cli");
+                                // See https://github.com/elixir-lang/elixir/blob/v1.5.1/bin/elixir.bat#L111
+                                commandLine.addParameter("-extra");
+                            }
+                        }
+                    } else {
+                        String erl = JpsErlangSdkType.getExecutableFileName("erl");
+
+                        // See https://github.com/elixir-lang/elixir/blob/v1.5.1/bin/elixir.bat#L111
+                        commandLine.setExePath(erl);
+                        // See https://github.com/elixir-lang/elixir/blob/v1.5.1/bin/elixir.bat#L96-L102
+                        prependCodePaths(commandLine, sdk);
+                        // See https://github.com/elixir-lang/elixir/blob/v1.5.1/bin/elixir.bat#L106
+                        commandLine.addParameters("-noshell", "-s", "elixir", "start_cli");
+                        // See https://github.com/elixir-lang/elixir/blob/v1.5.1/bin/elixir.bat#L111
+                        commandLine.addParameter("-extra");
+                    }
+                }
+            }
         } else {
-            commandLine.setExePath(elixirPath);
+            String elixir = JpsElixirSdkType.getExecutableFileName("elixir");
+            commandLine.setExePath(elixir);
         }
 
         commandLine.addParameters(parametersList.getList());

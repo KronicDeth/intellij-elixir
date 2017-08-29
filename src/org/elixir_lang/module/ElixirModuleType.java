@@ -7,7 +7,7 @@ import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.module.ModuleTypeManager;
 import com.intellij.openapi.roots.ui.configuration.ModulesProvider;
 import org.elixir_lang.icons.ElixirIcons;
-import org.elixir_lang.sdk.ElixirSdkType;
+import org.elixir_lang.sdk.elixir.Type;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -60,7 +60,7 @@ public class ElixirModuleType extends ModuleType<ElixirModuleBuilder>{
                                               @NotNull final ElixirModuleBuilder moduleBuilder,
                                               @NotNull ModulesProvider modulesProvider) {
     return new ModuleWizardStep[]{
-        new ProjectJdkForModuleStep(wizardContext, ElixirSdkType.getInstance()){
+        new ProjectJdkForModuleStep(wizardContext, Type.getInstance()){
           public void updateDataModel(){
             super.updateDataModel();
             moduleBuilder.setModuleJdk(getJdk());

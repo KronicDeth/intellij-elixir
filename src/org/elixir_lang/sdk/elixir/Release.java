@@ -1,4 +1,4 @@
-package org.elixir_lang.sdk;
+package org.elixir_lang.sdk.elixir;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -7,16 +7,16 @@ import org.jetbrains.annotations.Nullable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public final class ElixirSdkRelease implements Comparable<ElixirSdkRelease> {
+public final class Release implements Comparable<Release> {
   /*
    * CONSTANTS
    */
 
-  public static final ElixirSdkRelease V_1_0_4 = new ElixirSdkRelease("1", "0", "4", null, null);
-  public static final ElixirSdkRelease V_1_2 = new ElixirSdkRelease("1", "2", null, null, null);
-  public static final ElixirSdkRelease V_1_3 = new ElixirSdkRelease("1", "3", null, null, null);
-  public static final ElixirSdkRelease V_1_4 = new ElixirSdkRelease("1", "4", null, null, null);
-  public static final ElixirSdkRelease LATEST = V_1_4;
+  public static final Release V_1_0_4 = new Release("1", "0", "4", null, null);
+  public static final Release V_1_2 = new Release("1", "2", null, null, null);
+  public static final Release V_1_3 = new Release("1", "3", null, null, null);
+  public static final Release V_1_4 = new Release("1", "4", null, null, null);
+  public static final Release LATEST = V_1_4;
 
   private static final Pattern VERSION_PATTERN = Pattern.compile(
           // @version_regex from Version in elixir itself
@@ -34,9 +34,9 @@ public final class ElixirSdkRelease implements Comparable<ElixirSdkRelease> {
    */
 
   @Nullable
-  public static ElixirSdkRelease fromString(@Nullable String versionString){
+  public static Release fromString(@Nullable String versionString){
     Matcher m = versionString != null ? VERSION_PATTERN.matcher(versionString) : null;
-    return m != null && m.matches() ? new ElixirSdkRelease(m.group(1), m.group(2), m.group(3), m.group(4), m.group(5)) : null;
+    return m != null && m.matches() ? new Release(m.group(1), m.group(2), m.group(3), m.group(4), m.group(5)) : null;
   }
 
   /*
@@ -119,11 +119,11 @@ public final class ElixirSdkRelease implements Comparable<ElixirSdkRelease> {
    * Constructors
    */
 
-  public ElixirSdkRelease(@NotNull String major,
-                          @Nullable String minor,
-                          @Nullable String patch,
-                          @Nullable String pre,
-                          @Nullable String build) {
+  public Release(@NotNull String major,
+                 @Nullable String minor,
+                 @Nullable String patch,
+                 @Nullable String pre,
+                 @Nullable String build) {
     this.major = major;
     this.minor = minor;
     this.patch = patch;
@@ -140,7 +140,7 @@ public final class ElixirSdkRelease implements Comparable<ElixirSdkRelease> {
    */
 
   @Override
-  public int compareTo(@NotNull ElixirSdkRelease other) {
+  public int compareTo(@NotNull Release other) {
     int comparison = compareMaybeFormattedDecimals(major, other.major);
 
     if (comparison == 0) {

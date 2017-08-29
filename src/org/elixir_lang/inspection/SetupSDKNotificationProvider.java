@@ -21,9 +21,9 @@ import com.intellij.ui.EditorNotificationPanel;
 import com.intellij.ui.EditorNotifications;
 import org.elixir_lang.ElixirFileType;
 import org.elixir_lang.ElixirLanguage;
-import org.elixir_lang.sdk.ElixirSdkRelease;
-import org.elixir_lang.sdk.ElixirSdkType;
-import org.elixir_lang.sdk.ElixirSystemUtil;
+import org.elixir_lang.sdk.ProcessOutput;
+import org.elixir_lang.sdk.elixir.Release;
+import org.elixir_lang.sdk.elixir.Type;
 import org.elixir_lang.settings.ElixirExternalToolsConfigurable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -62,7 +62,7 @@ public class SetupSDKNotificationProvider extends EditorNotifications.Provider<E
     PsiFile psiFile = PsiManager.getInstance(myProject).findFile(file);
     if(psiFile == null || psiFile.getLanguage() != ElixirLanguage.INSTANCE) return null;
 
-    ElixirSdkRelease sdkRelease = ElixirSdkType.getRelease(psiFile);
+    Release sdkRelease = Type.getRelease(psiFile);
     if(sdkRelease != null) return null;
 
     return createPanel(myProject, psiFile);
@@ -78,7 +78,7 @@ public class SetupSDKNotificationProvider extends EditorNotifications.Provider<E
     panel.createActionLabel(ProjectBundle.message("project.sdk.setup"), new Runnable() {
       @Override
       public void run() {
-        if(ElixirSystemUtil.isSmallIde()){
+        if(ProcessOutput.isSmallIde()){
           ShowSettingsUtil.getInstance().showSettingsDialog(project, ElixirExternalToolsConfigurable.ELIXIR_RELATED_TOOLS);
           return;
         }

@@ -32,7 +32,7 @@ import org.elixir_lang.configuration.ElixirCompilerSettings;
 import org.elixir_lang.icons.ElixirIcons;
 import org.elixir_lang.mix.settings.MixSettings;
 import org.elixir_lang.module.ElixirModuleType;
-import org.elixir_lang.sdk.ElixirSdkType;
+import org.elixir_lang.sdk.elixir.Type;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -71,7 +71,7 @@ public class MixProjectImportBuilder extends ProjectImportBuilder<ImportedOtpApp
 
   @Override
   public boolean isSuitableSdkType(SdkTypeId sdkType) {
-    return sdkType == ElixirSdkType.getInstance();
+    return sdkType == Type.getInstance();
   }
 
   @Override
@@ -292,17 +292,16 @@ public class MixProjectImportBuilder extends ProjectImportBuilder<ImportedOtpApp
   private static Sdk fixProjectSdk(@NotNull Project project){
     final ProjectRootManagerEx projectRootMgr = ProjectRootManagerEx.getInstanceEx(project);
     Sdk selectedSdk = projectRootMgr.getProjectSdk();
-    if(selectedSdk == null || selectedSdk.getSdkType() != ElixirSdkType.getInstance()){
-      final Sdk moreSuitableSdk = ProjectJdkTable.getInstance().findMostRecentSdkOfType(ElixirSdkType.getInstance());
-      ApplicationManager.getApplication().runWriteAction(new Runnable() {
-        @Override
-        public void run() {
-          projectRootMgr.setProjectSdk(moreSuitableSdk);
-        }
-      });
-      return moreSuitableSdk;
+    Sdk fixedProjectSdk;
+
+    if (selectedSdk == null || selectedSdk.getSdkType() != Type.getInstance()){
+      fixedProjectSdk = ProjectJdkTable.getInstance().findMostRecentSdkOfType(Type.getInstance());
+      ApplicationManager.getApplication().runWriteAction(() -> projectRootMgr.setProjectSdk(fixedProjectSdk));
+    } else {
+      fixedProjectSdk = selectedSdk;
     }
-    return selectedSdk;
+
+    return fixedProjectSdk;
   }
 
   private static void addSourceDirToContent(@NotNull ContentEntry content,

@@ -24,7 +24,7 @@ import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.ElixirParserDefinition;
 import org.elixir_lang.intellij_elixir.Quoter;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
-import org.elixir_lang.sdk.ElixirSdkType;
+import org.elixir_lang.sdk.elixir.Type;
 import org.jetbrains.annotations.NotNull;
 import org.picocontainer.MutablePicoContainer;
 
@@ -249,13 +249,13 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
     }
 
     @NotNull
-    protected ElixirSdkType registerElixirSdkType() {
+    protected Type registerElixirSdkType() {
         registerExtensionPoint(
                 com.intellij.openapi.projectRoots.SdkType.EP_NAME,
                 com.intellij.openapi.projectRoots.SdkType.class
         );
-        registerExtension(com.intellij.openapi.projectRoots.SdkType.EP_NAME, new ElixirSdkType());
-        ElixirSdkType elixirSdkType = ElixirSdkType.getInstance();
+        registerExtension(com.intellij.openapi.projectRoots.SdkType.EP_NAME, new Type());
+        Type elixirSdkType = Type.getInstance();
 
         assertNotNull(elixirSdkType);
 
@@ -297,9 +297,9 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
                 com.intellij.openapi.projectRoots.SdkType.EP_NAME,
                 com.intellij.openapi.projectRoots.SdkType.class
         );
-        registerExtension(com.intellij.openapi.projectRoots.SdkType.EP_NAME, new ElixirSdkType());
+        registerExtension(com.intellij.openapi.projectRoots.SdkType.EP_NAME, new Type());
 
-        Sdk sdk = ElixirSdkType.createMockSdk(sdkHome, elixirSdkRelease());
+        Sdk sdk = Type.createMockSdk(sdkHome, elixirSdkRelease());
         projectJdkTable.addJdk(sdk);
 
         ExtensionsArea area = Extensions.getArea(myProject);
