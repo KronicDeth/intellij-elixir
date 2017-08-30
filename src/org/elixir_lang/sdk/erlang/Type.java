@@ -106,6 +106,34 @@ public class Type extends SdkType {
         return release;
     }
 
+    /**
+     * Map of home paths to versions in descending version order so that newer versions are favored.
+     *
+     * @return Map
+     */
+    public static Map<Version, String> homePathByVersion() {
+        Map<Version, String> homePathByVersion = HomePath.homePathByVersion();
+
+        if (SystemInfo.isMac) {
+            mergeHomebrew(homePathByVersion, "erlang", VERSION_PATH_TO_HOME_PATH);
+            mergeNixStore(homePathByVersion, NIX_PATTERN, VERSION_PATH_TO_HOME_PATH);
+        } else {
+            String sdkPath;
+
+            if (SystemInfo.isWindows) {
+                sdkPath = WINDOWS_DEFAULT_HOME_PATH;
+
+                homePathByVersion.put(UNKNOWN_VERSION, sdkPath);
+            } else if (SystemInfo.isLinux) {
+                homePathByVersion.put(UNKNOWN_VERSION, LINUX_DEFAULT_HOME_PATH);
+
+                mergeNixStore(homePathByVersion, NIX_PATTERN, VERSION_PATH_TO_HOME_PATH);
+            }
+        }
+
+        return homePathByVersion;
+    }
+
     @Override
     public boolean isRootTypeApplicable(@NotNull OrderRootType type) {
         return type == OrderRootType.CLASSES ||
@@ -145,34 +173,6 @@ public class Type extends SdkType {
     @Override
     public Collection<String> suggestHomePaths() {
         return homePathByVersion().values();
-    }
-
-    /**
-     * Map of home paths to versions in descending version order so that newer versions are favored.
-     *
-     * @return Map
-     */
-    private Map<Version, String> homePathByVersion() {
-        Map<Version, String> homePathByVersion = HomePath.homePathByVersion();
-
-        if (SystemInfo.isMac) {
-            mergeHomebrew(homePathByVersion, "erlang", VERSION_PATH_TO_HOME_PATH);
-            mergeNixStore(homePathByVersion, NIX_PATTERN, VERSION_PATH_TO_HOME_PATH);
-        } else {
-            String sdkPath;
-
-            if (SystemInfo.isWindows) {
-                sdkPath = WINDOWS_DEFAULT_HOME_PATH;
-
-                homePathByVersion.put(UNKNOWN_VERSION, sdkPath);
-            } else if (SystemInfo.isLinux) {
-                homePathByVersion.put(UNKNOWN_VERSION, LINUX_DEFAULT_HOME_PATH);
-
-                mergeNixStore(homePathByVersion, NIX_PATTERN, VERSION_PATH_TO_HOME_PATH);
-            }
-        }
-
-        return homePathByVersion;
     }
 
     @Override

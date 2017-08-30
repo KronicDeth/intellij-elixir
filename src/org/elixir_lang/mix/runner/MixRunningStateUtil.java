@@ -27,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.elixir_lang.sdk.elixir.Type.putDefaultErlangSdk;
 
 /**
  * https://github.com/ignatov/intellij-erlang/blob/master/src/org/intellij/erlang/rebar/runner/RebarRunningStateUtil.java
@@ -151,6 +152,10 @@ public class MixRunningStateUtil {
 
                 if (sdkAdditionalData != null) {
                     Sdk erlangSdk = sdkAdditionalData.getErlangSdk();
+
+                    if (erlangSdk == null) {
+                        erlangSdk = putDefaultErlangSdk(sdk);
+                    }
 
                     if (erlangSdk != null) {
                         String erlangHomePath = erlangSdk.getHomePath();

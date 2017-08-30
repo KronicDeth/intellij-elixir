@@ -9,6 +9,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectBundle;
 import com.intellij.openapi.projectRoots.*;
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl;
+import com.intellij.openapi.projectRoots.impl.UnknownSdkType;
 import com.intellij.openapi.roots.JavadocOrderRootType;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.ProjectFileIndex;
@@ -144,6 +145,87 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
     @NotNull
     private static String getDefaultSdkName(@NotNull String sdkHome, @Nullable Release release) {
         return release != null ? release.toString() : "Unknown Elixir version at " + sdkHome;
+    }
+
+    @Nullable
+    private static String defaultErlangSdkHomePath() {
+        SdkType erlangSdkForElixirSdkType = SdkType.findInstance(org.elixir_lang.sdk.erlang.Type.class);
+        // Will suggest newest version, unlike `intellij-erlang`
+        return erlangSdkForElixirSdkType.suggestHomePath();
+    }
+
+    @Nullable
+    private static Sdk createDefaultErlangSdk(@NotNull ProjectJdkTable projectJdkTable,
+                                              @NotNull SdkType erlangSdkType,
+                                              @NotNull String homePath) {
+        String sdkName = erlangSdkType.suggestSdkName("Default " + erlangSdkType.getName(), homePath);
+        ProjectJdkImpl projectJdkImpl = new ProjectJdkImpl(sdkName, erlangSdkType);
+        projectJdkImpl.setHomePath(homePath);
+        erlangSdkType.setupSdkPaths(projectJdkImpl);
+        final Sdk erlangSdk;
+
+        if (projectJdkImpl.getVersionString() != null) {
+            ApplicationManager.getApplication().runWriteAction(() -> projectJdkTable.addJdk(projectJdkImpl));
+
+            erlangSdk = projectJdkImpl;
+        } else {
+            erlangSdk = null;
+        }
+
+        return erlangSdk;
+    }
+
+    @Nullable
+    private static Sdk createDefaultErlangSdk(@NotNull ProjectJdkTable projectJdkTable,
+                                              @NotNull SdkType erlangSdkType) {
+        String homePath = defaultErlangSdkHomePath();
+        final Sdk erlangSdk;
+
+        if (homePath != null) {
+            erlangSdk = createDefaultErlangSdk(projectJdkTable, erlangSdkType, homePath);
+        } else {
+            erlangSdk = null;
+        }
+
+        return erlangSdk;
+    }
+
+    @Nullable
+    private static Sdk defaultErlangSdk() {
+        ProjectJdkTable projectJdkTable = ProjectJdkTable.getInstance();
+        SdkType erlangSdkType = (SdkType) projectJdkTable.getSdkTypeByName("Erlang SDK");
+
+        if (erlangSdkType instanceof UnknownSdkType) {
+            erlangSdkType = SdkType.findInstance(org.elixir_lang.sdk.erlang.Type.class);
+        }
+
+        Sdk mostRecentErlangSdk = projectJdkTable.findMostRecentSdkOfType(erlangSdkType);
+        @Nullable Sdk defaultErlangSdk;
+
+        if (mostRecentErlangSdk == null) {
+            defaultErlangSdk = createDefaultErlangSdk(projectJdkTable, erlangSdkType);
+        } else {
+            defaultErlangSdk = mostRecentErlangSdk;
+        }
+
+        return defaultErlangSdk;
+    }
+
+    @Nullable
+    public static Sdk putDefaultErlangSdk(@NotNull Sdk elixirSdk) {
+        assert elixirSdk.getSdkType() == Type.getInstance();
+
+        @Nullable Sdk defaultErlangSdk = defaultErlangSdk();
+
+        if (defaultErlangSdk != null) {
+            SdkModificator sdkModificator = elixirSdk.getSdkModificator();
+            org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData sdkAdditionalData =
+                    new org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData(defaultErlangSdk, elixirSdk);
+            sdkModificator.setSdkAdditionalData(sdkAdditionalData);
+            ApplicationManager.getApplication().runWriteAction(sdkModificator::commitChanges);
+        }
+
+        return defaultErlangSdk;
     }
 
     @NotNull
