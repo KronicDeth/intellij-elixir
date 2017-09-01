@@ -1,5 +1,7 @@
 defmodule Mix.Tasks.IntellijElixir.DebugTask do
   @moduledoc false
+  
+  @regex_lowcase ~r/^[a-z]/
 
   use Mix.Task
 
@@ -70,7 +72,16 @@ defmodule Mix.Tasks.IntellijElixir.DebugTask do
     blacklist = System.get_env("INTELLIJ_ELIXIR_DEBUG_BLACKLIST") || ""
     blacklist
       |> String.split(",")
-      |> Enum.map(&(String.to_atom(&1)))
+      |> Enum.map(&(atom_fix(&1)))
+  end
+
+  defp atom_fix(str) do
+    case Regex.match?(@regex_lowcase, str) do
+      true -> str
+      false ->
+        if String.starts_with?(str, "Elixir."), do: str, else: "Elixir." <> str
+    end
+    |> String.to_atom()
   end
 
   defp get_task(["-" <> _ | _]) do
