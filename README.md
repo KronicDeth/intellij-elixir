@@ -1401,6 +1401,9 @@ After you have configured a [run configuration](#run-configuration) for your pro
 | -----------------------------------|------------| --------------------------------|
 | INTELLIJ\_ELIXIR\_DEBUG\_BLACKLIST | iconv,some | Excluding modules from debugger |
 
+*Notice: If you trying blacklist atom of some Elixir module like `Bcrypt.Base`, check twice for `Elixir.` prefix.  
+This rule applies only to module atoms.*
+
 #### Breakpoints
 
 When a breakpoint is set, the editor displays a breakpoint icon in the gutter area to the left of the affected source code. A breakpoint icon denotes status of a breakpoint, and provides useful information about its type, location, and action.
