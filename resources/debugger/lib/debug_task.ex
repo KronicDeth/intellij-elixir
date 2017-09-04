@@ -79,13 +79,18 @@ defmodule Mix.Tasks.IntellijElixir.DebugTask do
     case Regex.match?(@regex_lowcase, str) do
       true -> str
       false ->
-        with new_str = str, 
-             "Elixir." <> new_str = str,
-             ":" <> new_str = str, 
-        do: new_str
+        with {:ok, new_str} <- detect_module(str) do
+          new_str
+        else
+          str -> str
+        end
     end
     |> String.to_atom()
   end
+  
+  defp detect_module("Elixir." <> str), do: {:ok, str}
+  defp detect_module(":" <> str), do: {:ok, str}
+  defp detect_module(str), do: str
 
   defp get_task(["-" <> _ | _]) do
     Mix.shell.error "** (Mix) Cannot implicitly pass flags to default Mix task, " <>
