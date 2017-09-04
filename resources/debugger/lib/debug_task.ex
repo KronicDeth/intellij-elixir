@@ -77,7 +77,8 @@ defmodule Mix.Tasks.IntellijElixir.DebugTask do
 
   defp atom_fix(str) do
     case Regex.match?(@regex_lowcase, str) do
-      true -> str
+      true -> 
+        with new_str = str, ":" <> new_str = str, do: new_str
       false ->
         if String.starts_with?(str, "Elixir."), do: str, else: "Elixir." <> str
     end
