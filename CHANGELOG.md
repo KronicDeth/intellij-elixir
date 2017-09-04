@@ -113,6 +113,11 @@
 
 # Changelog
 
+## v6.1.2.
+
+### Bug Fixes
+* [#816](https://github.com/KronicDeth/intellij-elixir/pull/816) - Add notice for debug blacklist that it uses atoms, not Aliases, so you need to qualifier module aliases with `Elixir.` - [@merqlove](https://github.com/merqlove)
+
 ## v6.1.1
 
 ### Bug Fixes
