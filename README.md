@@ -1401,7 +1401,7 @@ After you have configured a [run configuration](#run-configuration) for your pro
 | -----------------------------------|------------| --------------------------------|
 | INTELLIJ\_ELIXIR\_DEBUG\_BLACKLIST | iconv,some | Excluding modules from debugger |
 
-*Notice: If you trying blacklist atom of some Elixir module like `Bcrypt.Base`, check twice for `Elixir.` prefix.  
+*Notice: If you want non `Elixir.` module in blacklist, write it with: `:`.  
 This rule applies only to module atoms.*
 
 #### Breakpoints

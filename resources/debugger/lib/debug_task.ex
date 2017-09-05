@@ -1,5 +1,7 @@
 defmodule Mix.Tasks.IntellijElixir.DebugTask do
   @moduledoc false
+  
+  @regex_lowcase ~r/^[a-z]/
 
   use Mix.Task
 
@@ -70,8 +72,25 @@ defmodule Mix.Tasks.IntellijElixir.DebugTask do
     blacklist = System.get_env("INTELLIJ_ELIXIR_DEBUG_BLACKLIST") || ""
     blacklist
       |> String.split(",")
-      |> Enum.map(&(String.to_atom(&1)))
+      |> Enum.map(&(atom_fix(&1)))
   end
+
+  defp atom_fix(str) do
+    case Regex.match?(@regex_lowcase, str) do
+      true -> str
+      false ->
+        with {:ok, new_str} <- detect_module(str) do
+          new_str
+        else
+          str -> str
+        end
+    end
+    |> String.to_atom()
+  end
+  
+  defp detect_module("Elixir." <> str), do: {:ok, str}
+  defp detect_module(":" <> str), do: {:ok, str}
+  defp detect_module(str), do: str
 
   defp get_task(["-" <> _ | _]) do
     Mix.shell.error "** (Mix) Cannot implicitly pass flags to default Mix task, " <>
