@@ -10,15 +10,13 @@ import com.intellij.openapi.project.ProjectBundle;
 import com.intellij.openapi.projectRoots.*;
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl;
 import com.intellij.openapi.projectRoots.impl.UnknownSdkType;
-import com.intellij.openapi.roots.JavadocOrderRootType;
-import com.intellij.openapi.roots.ModuleRootManager;
-import com.intellij.openapi.roots.ProjectFileIndex;
-import com.intellij.openapi.roots.ProjectRootManager;
+import com.intellij.openapi.roots.*;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.Version;
 import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.psi.PsiElement;
@@ -38,6 +36,7 @@ import org.jetbrains.annotations.TestOnly;
 import javax.swing.*;
 import java.io.File;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -107,19 +106,45 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
         addDocumentationPath(sdkModificator, releaseVersion, appName);
     }
 
-    private static void addDocumentationPaths(@NotNull SdkModificator sdkModificator) {
+    public static void addDocumentationPaths(@NotNull SdkModificator sdkModificator) {
         String releaseVersion = releaseVersion(sdkModificator);
 
         eachEbinPath(
                 sdkModificator.getHomePath(),
-                ebin -> addDocumentationPath(sdkModificator, releaseVersion, ebin)
+                ebinPath -> addDocumentationPath(sdkModificator, releaseVersion, ebinPath)
         );
+    }
+
+    public static void addSourcePaths(@NotNull SdkModificator sdkModificator) {
+        eachEbinPath(
+                sdkModificator.getHomePath(),
+                ebinPath -> addSourcePath(sdkModificator, ebinPath)
+        );
+    }
+
+    private static void addSourcePath(@NotNull SdkModificator sdkModificator, @NotNull File libFile) {
+        VirtualFile sourcePath = VfsUtil.findFileByIoFile(libFile, true);
+
+        if (sourcePath != null) {
+            sdkModificator.addRoot(sourcePath, OrderRootType.SOURCES);
+        }
+    }
+
+    private static void addSourcePath(@NotNull SdkModificator sdkModificator, @NotNull Path ebinPath) {
+        Path parentPath = ebinPath.getParent();
+        Path libPath = Paths.get(parentPath.toString(), "lib");
+        File libFile = libPath.toFile();
+
+        if (libFile.exists()) {
+            addSourcePath(sdkModificator, libFile);
+        }
     }
 
     private static void configureSdkPaths(@NotNull Sdk sdk) {
         SdkModificator sdkModificator = sdk.getSdkModificator();
         addCodePaths(sdkModificator);
         addDocumentationPaths(sdkModificator);
+        addSourcePaths(sdkModificator);
 
         sdkModificator.commitChanges();
     }

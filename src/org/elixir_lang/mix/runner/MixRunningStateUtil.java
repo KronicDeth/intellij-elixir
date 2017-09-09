@@ -6,15 +6,17 @@ import com.intellij.execution.process.OSProcessHandler;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.Sdk;
+import com.intellij.openapi.projectRoots.SdkModificator;
 import com.intellij.openapi.projectRoots.SdkTypeId;
+import com.intellij.openapi.roots.JavadocOrderRootType;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.util.ObjectUtils;
 import org.elixir_lang.jps.builder.ParametersList;
 import org.elixir_lang.jps.model.JpsElixirSdkType;
@@ -25,6 +27,7 @@ import org.elixir_lang.utils.ElixirExternalToolsNotificationListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.nio.file.Paths;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.elixir_lang.sdk.elixir.Type.putDefaultErlangSdk;
@@ -33,13 +36,104 @@ import static org.elixir_lang.sdk.elixir.Type.putDefaultErlangSdk;
  * https://github.com/ignatov/intellij-erlang/blob/master/src/org/intellij/erlang/rebar/runner/RebarRunningStateUtil.java
  */
 public class MixRunningStateUtil {
-    private static final Logger LOGGER = Logger.getInstance(MixRunningStateUtil.class);
     private static final String SKIP_DEPENDENCIES_PARAMETER = "--no-deps-check";
 
     private static void prependCodePaths(@NotNull GeneralCommandLine commandLine, @NotNull Sdk sdk) {
-        for (VirtualFile virtualFile : sdk.getRootProvider().getFiles(OrderRootType.CLASSES)) {
-            commandLine.addParameters("-pa", virtualFile.getCanonicalPath());
+        VirtualFile[] virtualFiles = updatedCodePaths(sdk);
+
+        for (VirtualFile codePath : virtualFiles) {
+            commandLine.addParameters("-pa", codePath.getCanonicalPath());
         }
+    }
+
+    /**
+     * Ensures code path are ebin directories that can be passed to `-pa`.
+     * <p>
+     * Updates all Roots in SDK as it assumes that if the Class Paths are out-of-date then the Source and Documentation
+     * Paths are likely out-of-date too.
+     */
+    @NotNull
+    private static VirtualFile[] updatedCodePaths(@NotNull Sdk sdk) {
+        updateRoots(sdk);
+
+        return sdk.getRootProvider().getFiles(OrderRootType.CLASSES);
+    }
+
+    @NotNull
+    private static String oldClassPathPath(@NotNull String homePath) {
+        return Paths.get(homePath, "lib").toString();
+    }
+
+    @NotNull
+    private static String oldSourcePathPath(@NotNull String homePath) {
+        return Paths.get(homePath, "lib").toString();
+    }
+
+    private static boolean updateClassPaths(@NotNull SdkModificator sdkModificator, @NotNull String homePath) {
+        final String oldClassPathPath = oldClassPathPath(homePath);
+        boolean modified = false;
+
+        for (VirtualFile classPath : sdkModificator.getRoots(OrderRootType.CLASSES)) {
+            String classPathPath = classPath.getPath();
+
+            if (classPathPath.equals(oldClassPathPath)) {
+                sdkModificator.removeRoot(classPath, OrderRootType.CLASSES);
+                org.elixir_lang.sdk.Type.addCodePaths(sdkModificator);
+                modified = true;
+            }
+        }
+
+        return modified;
+    }
+
+    private static void updateRoots(@NotNull Sdk sdk) {
+        String homePath = sdk.getHomePath();
+
+        if (homePath != null) {
+            final SdkModificator sdkModificator = sdk.getSdkModificator();
+            boolean modified = updateClassPaths(sdkModificator, homePath);
+            modified = updateDocumentationPaths(sdkModificator) || modified;
+            modified = updateSourcePaths(sdkModificator, homePath) || modified;
+
+            if (modified) {
+                sdkModificator.commitChanges();
+            }
+        }
+    }
+
+    private static boolean updateSourcePaths(SdkModificator sdkModificator, String homePath) {
+        final String oldSourcePathPath = oldSourcePathPath(homePath);
+        boolean modified = false;
+
+        for (VirtualFile classPath : sdkModificator.getRoots(OrderRootType.SOURCES)) {
+            String classPathPath = classPath.getPath();
+
+            if (classPathPath.equals(oldSourcePathPath)) {
+                sdkModificator.removeRoot(classPath, OrderRootType.SOURCES);
+                org.elixir_lang.sdk.elixir.Type.addSourcePaths(sdkModificator);
+                modified = true;
+            }
+        }
+
+        return modified;
+    }
+
+    private static boolean updateDocumentationPaths(@NotNull SdkModificator sdkModificator) {
+        OrderRootType documentationRootType = JavadocOrderRootType.getInstance();
+        final String elixirLangDotOrgDocsUrl = "http://elixir-lang.org/docs/stable/elixir/";
+        boolean modified = false;
+
+        for (VirtualFile documentationPath : sdkModificator.getRoots(documentationRootType)) {
+            if (documentationPath.getUrl().equals(elixirLangDotOrgDocsUrl)) {
+                VirtualFile elixirLangDotOrgDocsUrlVirtualFile =
+                        VirtualFileManager.getInstance().findFileByUrl(elixirLangDotOrgDocsUrl);
+                sdkModificator.removeRoot(elixirLangDotOrgDocsUrlVirtualFile, documentationRootType);
+                org.elixir_lang.sdk.elixir.Type.addDocumentationPaths(sdkModificator);
+                modified = true;
+            }
+        }
+
+        return modified;
     }
 
     @NotNull
@@ -70,12 +164,6 @@ public class MixRunningStateUtil {
         commandLine.addParameters(mixParametersList.getList());
 
         return addNewSkipDependencies(commandLine, configuration);
-    }
-
-    @NotNull
-    private static String elixirPath(String sdkPath) {
-        return sdkPath != null ? JpsElixirSdkType.getScriptInterpreterExecutable(sdkPath).getAbsolutePath() :
-                JpsElixirSdkType.getExecutableFileName(JpsElixirSdkType.SCRIPT_INTERPRETER);
     }
 
     @NotNull
@@ -125,12 +213,11 @@ public class MixRunningStateUtil {
             if (isEmpty || notCorrect) {
                 Notifications.Bus.notify(
                         new Notification(
-                                "Mix run configuration",  // groudDisplayId
-                                "Mix settings",           // title
+                                "Mix run configuration",
+                                "Mix settings",
                                 "Mix executable path is " + (isEmpty ? "empty" : "not specified correctly") + "<br><a href='configure'>Configure</a></br>",
-                                // content
-                                NotificationType.ERROR,   // errorType
-                                new ElixirExternalToolsNotificationListener(project)  // listener
+                                NotificationType.ERROR,
+                                new ElixirExternalToolsNotificationListener(project)
                         )
                 );
             }
