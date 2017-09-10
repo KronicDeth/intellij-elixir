@@ -218,6 +218,7 @@ public class Type extends SdkType {
     @Override
     public void saveAdditionalData(@NotNull com.intellij.openapi.projectRoots.SdkAdditionalData additionalData,
                                    @NotNull Element additional) {
+        // Intentionally left blank
     }
 
     @Nullable

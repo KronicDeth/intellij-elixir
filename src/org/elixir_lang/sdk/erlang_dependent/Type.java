@@ -71,6 +71,6 @@ public abstract class Type extends DependentSdkType {
 
     @Override
     public void saveAdditionalData(@NotNull SdkAdditionalData additionalData, @NotNull Element additional) {
+        // intentionally left blank
     }
-
 }
