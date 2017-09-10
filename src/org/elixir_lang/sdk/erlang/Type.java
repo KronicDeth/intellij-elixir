@@ -41,7 +41,7 @@ public class Type extends SdkType {
                     "erlang:system_info(version)" +
                     "]),erlang:halt().";
     private static final String WINDOWS_DEFAULT_HOME_PATH = "C:\\Program Files\\erl9.0";
-    private static final Pattern NIX_PATTERN = HomePath.nixPattern("erlang");
+    private static final Pattern NIX_PATTERN = nixPattern("erlang");
     private static final String LINUX_DEFAULT_HOME_PATH = HomePath.LINUX_DEFAULT_HOME_PATH + "/erlang";
     private static final Function<File, File> VERSION_PATH_TO_HOME_PATH =
             versionPath -> new File(versionPath, "lib/erlang");

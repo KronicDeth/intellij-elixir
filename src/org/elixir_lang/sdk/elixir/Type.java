@@ -48,7 +48,7 @@ import static org.elixir_lang.sdk.Type.addCodePaths;
 public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
     private static final String LINUX_DEFAULT_HOME_PATH = HomePath.LINUX_DEFAULT_HOME_PATH + "/elixir";
     private static final Logger LOG = Logger.getInstance(Type.class);
-    private static final Pattern NIX_PATTERN = HomePath.nixPattern("elixir");
+    private static final Pattern NIX_PATTERN = nixPattern("elixir");
     private static final Set<String> SDK_HOME_CHILD_BASE_NAME_SET = new THashSet<>(Arrays.asList("bin", "lib", "src"));
     private static final String WINDOWS_32BIT_DEFAULT_HOME_PATH = "C:\\Program Files\\Elixir";
     private static final String WINDOWS_64BIT_DEFAULT_HOME_PATH = "C:\\Program Files (x86)\\Elixir";

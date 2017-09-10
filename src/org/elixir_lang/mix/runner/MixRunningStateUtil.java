@@ -30,6 +30,8 @@ import java.io.File;
 import java.nio.file.Paths;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.elixir_lang.sdk.elixir.Type.addDocumentationPaths;
+import static org.elixir_lang.sdk.elixir.Type.addSourcePaths;
 import static org.elixir_lang.sdk.elixir.Type.putDefaultErlangSdk;
 
 /**
@@ -110,7 +112,7 @@ public class MixRunningStateUtil {
 
             if (classPathPath.equals(oldSourcePathPath)) {
                 sdkModificator.removeRoot(classPath, OrderRootType.SOURCES);
-                org.elixir_lang.sdk.elixir.Type.addSourcePaths(sdkModificator);
+                addSourcePaths(sdkModificator);
                 modified = true;
             }
         }
@@ -128,7 +130,7 @@ public class MixRunningStateUtil {
                 VirtualFile elixirLangDotOrgDocsUrlVirtualFile =
                         VirtualFileManager.getInstance().findFileByUrl(elixirLangDotOrgDocsUrl);
                 sdkModificator.removeRoot(elixirLangDotOrgDocsUrlVirtualFile, documentationRootType);
-                org.elixir_lang.sdk.elixir.Type.addDocumentationPaths(sdkModificator);
+                addDocumentationPaths(sdkModificator);
                 modified = true;
             }
         }
