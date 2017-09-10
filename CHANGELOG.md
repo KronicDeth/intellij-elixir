@@ -113,10 +113,30 @@
 
 # Changelog
 
-## v6.1.2.
+## v6.2.0
+
+### Enhancements
+* [#817](https://github.com/KronicDeth/intellij-elixir/pull/817) - * Add note to README that atom module names should be prefixed with `:` - [@merqlove](https://github.com/merglove)
+* [#827](https://github.com/KronicDeth/intellij-elixir/pull/827) - [@KronicDeth](https://github.com/KronicDeth)
+  * Elixir SDK will now have an Internal Erlang SDK, which can be supplied one of two ways:
+    1. If `intellij-erlang` is installed: its Erlang SDK can be used
+    2. Otherwise: the Erlang SDK for Elixir SDK from this plugin can be used
+
+    Either Internal Erlang SDK's home path is used to locate the `erl` (or `erl.exe` on Windows) executable and it is used to run Elixir; bypassing the `elixir` (or `elixir.bat` on Windows) script.  Instead, as was done in #789, the ebin directories for the Elixir SDK are passed as `-pa` options to `erl`.
+
+    The Elixir SDK's configuration becomes more important: the classpath entries are now the list of `ebin` directories to pass to `erl` using `-pa` instead of scanning for ebins in the homepath, so additional code paths can be added to the Classpaths configuration and they will be used when running `mix` and `mix test`.  The classpaths will be initialized to the ebin directories under the home path.
+
+    * To support migrating from earlier version of the plugin, an SDK will be updated when it is used for Mix ExUnit Run Configurations
+      * The default Internal Erlang SDK will be set, which uses the latest version of Erlang that can be found on the system.  When `intellij-erlang` is installed, `intellij-elixir`'s Erlang version suggestion is still used because `intellij-elixir` favors the latest version while `intellij-erlang` favors the first found, which is usually the oldest version.
+      * Update roots (class path, source paths, documentation paths):
+        * Class path of `HOMEPATH/lib` is replaced with `HOMEPATH/lib/APP/ebin`.
+        * Source path of `HOMEPATH/lib` is replaced with `HOMEPATH/lib/APP/lib` IF it exists (so only for source SDKs)
+        * Documentation of `http://elixir-lang.org/docs/stable/elixir/` will be replaced with `https://hexdoc.pm/APP/VERSION` for every `APP` in `HOMEPATH/lib`.
+
 
 ### Bug Fixes
 * [#816](https://github.com/KronicDeth/intellij-elixir/pull/816) - Add notice for debug blacklist that it uses atoms, not Aliases, so you need to qualifier module aliases with `Elixir.` - [@merqlove](https://github.com/merqlove)
+* [#817](https://github.com/KronicDeth/intellij-elixir/pull/817) - Support atoms (prefixed with `:`) and`Elixir.` and plain Aliases for debugger blacklist. - [@merqlove](https://github.com/merglove)
 
 ## v6.1.1
 

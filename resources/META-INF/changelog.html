@@ -1,7 +1,36 @@
 <html>
 <body>
-<h1>v6.1.2</h1>
+<h1>v6.2.0</h1>
 <ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>Add note to README that atom module names should be prefixed with <code>:</code></li>
+      <li>
+        <p>Elixir SDK will now have an Internal Erlang SDK, which can be supplied one of two ways:</p>
+        <ol>
+          <li>If <code>intellij-erlang</code> is installed: its Erlang SDK can be used</li>
+          <li>Otherwise: the Erlang SDK for Elixir SDK from this plugin can be used</li>
+        </ol>
+        <p>Either Internal Erlang SDK's home path is used to locate the <code>erl</code> (or <code>erl.exe</code> on Windows) executable and it is used to run Elixir; bypassing the <code>elixir</code> (or <code>elixir.bat</code> on Windows) script.  Instead, as was done in <a href="https://github.com/KronicDeth/intellij-elixir/pull/789" class="issue-link js-issue-link" data-url="https://github.com/KronicDeth/intellij-elixir/issues/789" data-id="249841680" data-error-text="Failed to load issue title" data-permission-text="Issue title is private">#789</a>, the ebin directories for the Elixir SDK are passed as <code>-pa</code> options to <code>erl</code>.</p>
+        <p>The Elixir SDK's configuration becomes more important: the classpath entries are now the list of <code>ebin</code> directories to pass to <code>erl</code> using <code>-pa</code> instead of scanning for ebins in the homepath, so additional code paths can be added to the Classpaths configuration and they will be used when running <code>mix</code> and <code>mix test</code>.  The classpaths will be initialized to the ebin directories under the home path.</p>
+        <ul>
+          <li>To support migrating from earlier version of the plugin, an SDK will be updated when it is used for Mix ExUnit Run Configurations
+            <ul>
+              <li>The default Internal Erlang SDK will be set, which uses the latest version of Erlang that can be found on the system.  When <code>intellij-erlang</code> is installed, <code>intellij-elixir</code>'s Erlang version suggestion is still used because <code>intellij-elixir</code> favors the latest version while <code>intellij-erlang</code> favors the first found, which is usually the oldest version.</li>
+              <li>Update roots (class path, source paths, documentation paths):
+                <ul>
+                  <li>Class path of <code>HOMEPATH/lib</code> is replaced with <code>HOMEPATH/lib/APP/ebin</code>.</li>
+                  <li>Source path of <code>HOMEPATH/lib</code> is replaced with <code>HOMEPATH/lib/APP/lib</code> IF it exists (so only for source SDKs)</li>
+                  <li>Documentation of <code>http://elixir-lang.org/docs/stable/elixir/</code> will be replaced with <code>https://hexdoc.pm/APP/VERSION</code> for every <code>APP</code> in <code>HOMEPATH/lib</code>.</li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
   <li>
     <p>Bug Fixes</p>
     <ul>
@@ -9,6 +38,7 @@
         Add notice for debug blacklist that it uses atoms, not Aliases, so you need to qualifier module aliases with
         <code>Elixir.</code>.
       </li>
+      <li>Support atoms (prefixed with <code>:</code>) and<code>Elixir.</code> and plain Aliases for debugger blacklist.</li>
     </ul>
   </li>
 </ul>
