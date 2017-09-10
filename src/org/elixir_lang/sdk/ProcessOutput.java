@@ -3,7 +3,6 @@ package org.elixir_lang.sdk;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.process.CapturingProcessHandler;
-import com.intellij.execution.process.ProcessOutput;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.util.Function;
 import com.intellij.util.PlatformUtils;
@@ -18,16 +17,16 @@ import java.util.List;
  * Created by zyuyou on 2015/5/27.
  *
  */
-public class ElixirSystemUtil {
+public class ProcessOutput {
   /*
    * CONSTANTS
    */
 
-  public static final Logger LOGGER = Logger.getInstance(ElixirSystemUtil.class);
+  private static final Logger LOGGER = Logger.getInstance(ProcessOutput.class);
   public static final int STANDARD_TIMEOUT = 10 * 1000;
 
   @Nullable
-  public static <T> T transformStdoutLine(@NotNull ProcessOutput output, @NotNull Function<String, T> lineTransformer) {
+  public static <T> T transformStdoutLine(@NotNull com.intellij.execution.process.ProcessOutput output, @NotNull Function<String, T> lineTransformer) {
     List<String> lines;
 
     if (output.getExitCode() != 0 || output.isTimeout() || output.isCancelled()) {
@@ -58,7 +57,7 @@ public class ElixirSystemUtil {
     T transformed = null;
 
     try {
-      ProcessOutput output = getProcessOutput(timeout, workDir, exePath, arguments);
+      com.intellij.execution.process.ProcessOutput output = getProcessOutput(timeout, workDir, exePath, arguments);
 
       transformed = transformStdoutLine(output, lineTransformer);
     } catch (ExecutionException executionException) {
@@ -69,12 +68,12 @@ public class ElixirSystemUtil {
   }
 
   @NotNull
-  public static ProcessOutput getProcessOutput(int timeout,
-                                               @Nullable String workDir,
-                                               @NotNull String exePath,
-                                               @NotNull String... arguments) throws ExecutionException{
+  public static com.intellij.execution.process.ProcessOutput getProcessOutput(int timeout,
+                                                                              @Nullable String workDir,
+                                                                              @NotNull String exePath,
+                                                                              @NotNull String... arguments) throws ExecutionException{
     if(workDir == null || !new File(workDir).isDirectory() || !new File(exePath).canExecute()){
-      return new ProcessOutput();
+      return new com.intellij.execution.process.ProcessOutput();
     }
 
     GeneralCommandLine cmd = new GeneralCommandLine();
@@ -86,12 +85,12 @@ public class ElixirSystemUtil {
   }
 
   @NotNull
-  public static ProcessOutput execute(@NotNull GeneralCommandLine cmd) throws ExecutionException {
+  public static com.intellij.execution.process.ProcessOutput execute(@NotNull GeneralCommandLine cmd) throws ExecutionException {
     return execute(cmd, STANDARD_TIMEOUT);
   }
 
   @NotNull
-  public static ProcessOutput execute(@NotNull GeneralCommandLine cmd, int timeout) throws ExecutionException {
+  public static com.intellij.execution.process.ProcessOutput execute(@NotNull GeneralCommandLine cmd, int timeout) throws ExecutionException {
     CapturingProcessHandler processHandler = new CapturingProcessHandler(cmd.createProcess());
     return timeout < 0 ? processHandler.runProcess() : processHandler.runProcess(timeout);
   }

@@ -10,7 +10,7 @@ import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.Pair;
 import org.elixir_lang.icons.ElixirIcons;
-import org.elixir_lang.sdk.ElixirSdkType;
+import org.elixir_lang.sdk.elixir.Type;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,7 +35,7 @@ public class ElixirModuleBuilder extends JavaModuleBuilder implements ModuleBuil
 
   @Override
   public boolean isSuitableSdkType(SdkTypeId sdkType) {
-    return sdkType == ElixirSdkType.getInstance();
+    return sdkType == Type.getInstance();
   }
 
   @Override

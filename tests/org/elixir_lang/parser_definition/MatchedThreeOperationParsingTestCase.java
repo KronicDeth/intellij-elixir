@@ -1,6 +1,6 @@
 package org.elixir_lang.parser_definition;
 
-import org.elixir_lang.sdk.ElixirSdkRelease;
+import org.elixir_lang.sdk.elixir.Release;
 
 import static org.elixir_lang.test.ElixirVersion.elixirSdkRelease;
 
@@ -23,7 +23,7 @@ public class MatchedThreeOperationParsingTestCase extends ParsingTestCase {
     }
 
     public void testMatchedInOperation() {
-        if (!isTravis() && elixirSdkRelease().compareTo(ElixirSdkRelease.V_1_2) > 0) {
+        if (!isTravis() && elixirSdkRelease().compareTo(Release.V_1_2) > 0) {
             assertParsedAndQuotedCorrectly();
         }
     }

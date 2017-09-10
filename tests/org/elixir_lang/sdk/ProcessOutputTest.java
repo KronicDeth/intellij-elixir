@@ -3,7 +3,7 @@ package org.elixir_lang.sdk;
 import com.intellij.execution.ExecutionException;
 import junit.framework.TestCase;
 
-public class ElixirSystemUtilTest extends TestCase {
+public class ProcessOutputTest extends TestCase {
     /*
      * Tests
      */
@@ -11,7 +11,7 @@ public class ElixirSystemUtilTest extends TestCase {
     public void testIssue521() throws ExecutionException {
         assertEquals(
                 -1,
-                ElixirSystemUtil
+                ProcessOutput
                         .getProcessOutput(
                                 1,
                                 null,

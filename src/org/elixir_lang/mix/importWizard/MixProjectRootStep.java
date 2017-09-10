@@ -23,7 +23,7 @@ import com.intellij.projectImport.ProjectImportBuilder;
 import com.intellij.projectImport.ProjectImportWizardStep;
 import org.elixir_lang.jps.model.JpsElixirSdkType;
 import org.elixir_lang.mix.settings.MixConfigurationForm;
-import org.elixir_lang.sdk.ElixirSdkType;
+import org.elixir_lang.sdk.elixir.Type;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -113,7 +113,7 @@ public class MixProjectRootStep extends ProjectImportWizardStep {
         String sdkPath;
 
         if (project != null) {
-            sdkPath = ElixirSdkType.getSdkPath(project);
+            sdkPath = Type.getSdkPath(project);
         } else {
             sdkPath = null;
         }

@@ -16,7 +16,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import org.elixir_lang.psi.ElixirFile;
-import org.elixir_lang.sdk.ElixirSdkType;
+import org.elixir_lang.sdk.elixir.Type;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -72,7 +72,7 @@ public class MixExUnitRunConfigurationProducer extends RunConfigurationProducer<
         sdkTypeId = sdk.getSdkType();
       }
 
-      if ((sdkTypeId == null || sdkTypeId.equals(ElixirSdkType.getInstance())) &&
+      if ((sdkTypeId == null || sdkTypeId.equals(Type.getInstance())) &&
               ProjectRootsUtil.isInTestSource(psiDirectory.getVirtualFile(),  psiDirectory.getProject())) {
         String basePath = psiElement.getProject().getBasePath();
         String workingDirectory = workingDirectory(psiElement, basePath);

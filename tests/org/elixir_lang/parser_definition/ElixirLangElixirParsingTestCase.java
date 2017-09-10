@@ -4,7 +4,7 @@ import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.io.FileUtilRt;
 import com.intellij.openapi.vfs.CharsetToolkit;
 import org.elixir_lang.intellij_elixir.Quoter;
-import org.elixir_lang.sdk.ElixirSdkRelease;
+import org.elixir_lang.sdk.elixir.Release;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -354,10 +354,10 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     }
 
     public void testParallelCompilerBat() {
-        if (elixirSdkRelease().compareTo(ElixirSdkRelease.V_1_3) < 0) {
+        if (elixirSdkRelease().compareTo(Release.V_1_3) < 0) {
             assertParsed("lib/elixir/test/elixir/fixtures/parallel_compiler/bat.ex", Parse.ERROR);
         } else {
-            assertTrue(elixirSdkRelease().compareTo(ElixirSdkRelease.V_1_3) >= 0);
+            assertTrue(elixirSdkRelease().compareTo(Release.V_1_3) >= 0);
         }
     }
 
@@ -538,10 +538,10 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     }
 
     public void testMixArchive() {
-        if (elixirSdkRelease().compareTo(ElixirSdkRelease.V_1_3) < 0) {
+        if (elixirSdkRelease().compareTo(Release.V_1_3) < 0) {
             assertParsed("lib/mix/lib/mix/archive.ex", Parse.CORRECT);
         } else {
-            assertTrue(elixirSdkRelease().compareTo(ElixirSdkRelease.V_1_3) >= 0);
+            assertTrue(elixirSdkRelease().compareTo(Release.V_1_3) >= 0);
         }
     }
 
@@ -718,10 +718,10 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     }
 
     public void testMixTasksDepsCheck() {
-        if (elixirSdkRelease().compareTo(ElixirSdkRelease.V_1_3) < 0) {
+        if (elixirSdkRelease().compareTo(Release.V_1_3) < 0) {
             assertParsed("lib/mix/lib/mix/tasks/deps.check.ex", Parse.CORRECT);
         } else {
-            assertTrue(elixirSdkRelease().compareTo(ElixirSdkRelease.V_1_3) >= 0);
+            assertTrue(elixirSdkRelease().compareTo(Release.V_1_3) >= 0);
         }
     }
 
@@ -841,10 +841,10 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     }
 
     public void testNoMixfileLibC() {
-        if (elixirSdkRelease().compareTo(ElixirSdkRelease.V_1_3) < 0) {
+        if (elixirSdkRelease().compareTo(Release.V_1_3) < 0) {
             assertParsed("lib/mix/test/fixtures/no_mixfile/lib/c.ex", Parse.CORRECT);
         } else {
-            assertTrue(elixirSdkRelease().compareTo(ElixirSdkRelease.V_1_3) >= 0);
+            assertTrue(elixirSdkRelease().compareTo(Release.V_1_3) >= 0);
         }
     }
 

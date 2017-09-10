@@ -1,7 +1,7 @@
 package org.elixir_lang.exunit;
 
 import org.elixir_lang.jps.builder.ParametersList;
-import org.elixir_lang.sdk.ElixirSdkRelease;
+import org.elixir_lang.sdk.elixir.Release;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,11 +26,11 @@ public class ElixirModules {
     }
 
     private static void addFormatterPath(@NotNull List<String> relativeSourcePathList,
-                                         @Nullable ElixirSdkRelease elixirSdkRelease) {
+                                         @Nullable Release elixirSdkRelease) {
 
         String versionDirectory = "1.4.0";
 
-        if (elixirSdkRelease != null && elixirSdkRelease.compareTo(ElixirSdkRelease.V_1_4) < 0) {
+        if (elixirSdkRelease != null && elixirSdkRelease.compareTo(Release.V_1_4) < 0) {
             versionDirectory = "1.1.0";
         }
 
@@ -40,17 +40,17 @@ public class ElixirModules {
     }
 
     @NotNull
-    private static List<File> copy(@Nullable ElixirSdkRelease elixirSdkRelease, boolean useCustomMixTask) throws IOException {
+    private static List<File> copy(@Nullable Release elixirSdkRelease, boolean useCustomMixTask) throws IOException {
         return org.elixir_lang.ElixirModules.copy(BASE_PATH, relativeSourcePathList(elixirSdkRelease, useCustomMixTask));
     }
 
     @NotNull
-    public static ParametersList parametersList(@Nullable ElixirSdkRelease elixirSdkRelease, boolean useCustomMixTask) throws IOException {
+    public static ParametersList parametersList(@Nullable Release elixirSdkRelease,
+                                                boolean useCustomMixTask) throws IOException {
         return org.elixir_lang.ElixirModules.parametersList(copy(elixirSdkRelease, useCustomMixTask));
     }
 
-    private static List<String> relativeSourcePathList(@Nullable ElixirSdkRelease elixirSdkRelease,
-                                                       boolean useCustomMixTask) {
+    private static List<String> relativeSourcePathList(@Nullable Release elixirSdkRelease, boolean useCustomMixTask) {
         List<String> relativeSourcePathList = new ArrayList<>();
         relativeSourcePathList.add(FORMATTING_FILE_NAME);
 

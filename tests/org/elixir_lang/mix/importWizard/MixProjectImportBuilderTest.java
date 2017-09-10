@@ -15,8 +15,8 @@ import com.intellij.openapi.roots.impl.ModuleRootManagerImpl;
 import com.intellij.openapi.util.JDOMUtil;
 import com.intellij.openapi.util.io.FileUtil;
 import org.elixir_lang.configuration.ElixirCompilerSettings;
-import org.elixir_lang.sdk.ElixirSdkRelease;
-import org.elixir_lang.sdk.ElixirSdkType;
+import org.elixir_lang.sdk.elixir.Release;
+import org.elixir_lang.sdk.elixir.Type;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
@@ -50,7 +50,7 @@ public class MixProjectImportBuilderTest extends ProjectWizardTestCase{
   }
 
   private static void createMockSdk(){
-    final Sdk mockSdk = ElixirSdkType.createMockSdk(MOCK_SDK_DIR, ElixirSdkRelease.V_1_0_4);
+    final Sdk mockSdk = Type.createMockSdk(MOCK_SDK_DIR, Release.V_1_0_4);
     ApplicationManager.getApplication().runWriteAction(() -> ProjectJdkTable.getInstance().addJdk(mockSdk));
   }
 

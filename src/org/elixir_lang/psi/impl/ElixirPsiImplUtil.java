@@ -45,7 +45,7 @@ import org.elixir_lang.psi.qualification.Qualified;
 import org.elixir_lang.psi.qualification.Unqualified;
 import org.elixir_lang.psi.stub.call.Stub;
 import org.elixir_lang.reference.Callable;
-import org.elixir_lang.sdk.ElixirSdkRelease;
+import org.elixir_lang.sdk.elixir.Release;
 import org.elixir_lang.structure_view.element.CallDefinitionClause;
 import org.elixir_lang.structure_view.element.CallDefinitionSpecification;
 import org.elixir_lang.structure_view.element.Callback;
@@ -70,7 +70,7 @@ import static org.elixir_lang.psi.call.name.Module.*;
 import static org.elixir_lang.psi.stub.type.call.Stub.isModular;
 import static org.elixir_lang.reference.Callable.*;
 import static org.elixir_lang.reference.ModuleAttribute.isNonReferencing;
-import static org.elixir_lang.sdk.ElixirSdkType.getNonNullRelease;
+import static org.elixir_lang.sdk.elixir.Type.getNonNullRelease;
 import static org.elixir_lang.structure_view.element.CallDefinitionClause.enclosingModularMacroCall;
 import static org.elixir_lang.structure_view.element.modular.Implementation.forNameCollection;
 
@@ -4880,10 +4880,10 @@ if (quoted == null) {
     @Contract(pure = true)
     @NotNull
     private static String quoteBinaryFunctionIdentifier(@NotNull final InterpolatedCharList interpolatedCharList) {
-        ElixirSdkRelease release = getNonNullRelease(interpolatedCharList);
+        Release release = getNonNullRelease(interpolatedCharList);
         String functionIdentifier = "to_charlist";
 
-        if (release.compareTo(ElixirSdkRelease.V_1_3) < 0) {
+        if (release.compareTo(Release.V_1_3) < 0) {
             functionIdentifier = "to_char_list";
         }
 
@@ -5732,10 +5732,10 @@ if (quoted == null) {
         }
 
         Body body = line.getBody();
-        ElixirSdkRelease release = getNonNullRelease(line);
+        Release release = getNonNullRelease(line);
         ASTNode[] childNodes = childNodes(body);
 
-        if (release.compareTo(ElixirSdkRelease.V_1_3) < 0 &&
+        if (release.compareTo(Release.V_1_3) < 0 &&
                 childNodes.length >= 1 &&
                 childNodes[childNodes.length - 1].getElementType().equals(ElixirTypes.ESCAPED_EOL)) {
             heredocDescendantNodes.addAll(Arrays.asList(childNodes).subList(0, childNodes.length - 1));
@@ -5835,9 +5835,9 @@ if (quoted == null) {
                                               @NotNull @SuppressWarnings("unused") ASTNode child) {
         List<Integer> codePointList = ensureCodePointList(maybeCodePointList);
 
-        ElixirSdkRelease release = getNonNullRelease(parent);
+        Release release = getNonNullRelease(parent);
 
-        if (release.compareTo(ElixirSdkRelease.V_1_3) >= 0) {
+        if (release.compareTo(Release.V_1_3) >= 0) {
             if (parent instanceof LiteralSigilHeredoc) {
                 codePointList = addStringCodePoints(codePointList, "\\");
             } else if (parent instanceof LiteralSigilLine) {

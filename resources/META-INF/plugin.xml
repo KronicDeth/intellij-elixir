@@ -18,7 +18,8 @@
     <errorHandler implementation="org.elixir_lang.errorreport.Submitter"/>
 
     <!-- Elixir Module Structure -->
-    <sdkType implementation="org.elixir_lang.sdk.ElixirSdkType"/>
+    <sdkType implementation="org.elixir_lang.sdk.elixir.Type"/>
+    <sdkType implementation="org.elixir_lang.sdk.erlang.Type"/>
 
     <moduleConfigurationEditorProvider implementation="org.elixir_lang.module.DefaultModuleEditorsProvider" order="first"/>
 

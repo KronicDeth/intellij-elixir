@@ -1,4 +1,4 @@
-package org.elixir_lang.sdk;
+package org.elixir_lang.sdk.elixir;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
@@ -9,19 +9,25 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectBundle;
 import com.intellij.openapi.projectRoots.*;
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl;
+import com.intellij.openapi.projectRoots.impl.UnknownSdkType;
 import com.intellij.openapi.roots.*;
+import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.Version;
+import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.psi.PsiElement;
+import com.intellij.util.Function;
 import gnu.trove.THashSet;
 import org.apache.commons.io.FilenameUtils;
 import org.elixir_lang.icons.ElixirIcons;
 import org.elixir_lang.jps.model.JpsElixirModelSerializerExtension;
 import org.elixir_lang.jps.model.JpsElixirSdkType;
+import org.elixir_lang.sdk.HomePath;
+import org.elixir_lang.sdk.ProcessOutput;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,48 +35,123 @@ import org.jetbrains.annotations.TestOnly;
 
 import javax.swing.*;
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.elixir_lang.sdk.ElixirSystemUtil.STANDARD_TIMEOUT;
-import static org.elixir_lang.sdk.ElixirSystemUtil.transformStdoutLine;
+import static org.elixir_lang.sdk.HomePath.*;
+import static org.elixir_lang.sdk.ProcessOutput.STANDARD_TIMEOUT;
+import static org.elixir_lang.sdk.ProcessOutput.transformStdoutLine;
+import static org.elixir_lang.sdk.Type.addCodePaths;
 
-public class ElixirSdkType extends SdkType {
-    public static final Version UNKNOWN_VERSION = new Version(0, 0, 0);
-    private static final File HOMEBREW_ROOT = new File("/usr/local/Cellar/elixir");
-    private static final String LINUX_DEFAULT_HOME_PATH = "/usr/local/lib/elixir";
-    private static final Logger LOG = Logger.getInstance(ElixirSdkType.class);
-    private static final Pattern NIX_PATTERN = Pattern.compile(".+-elixir-(\\d+)\\.(\\d+)\\.(\\d+)");
-    private static final File NIX_STORE = new File("/nix/store/");
+public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
+    private static final String LINUX_DEFAULT_HOME_PATH = HomePath.LINUX_DEFAULT_HOME_PATH + "/elixir";
+    private static final Logger LOG = Logger.getInstance(Type.class);
+    private static final Pattern NIX_PATTERN = nixPattern("elixir");
     private static final Set<String> SDK_HOME_CHILD_BASE_NAME_SET = new THashSet<>(Arrays.asList("bin", "lib", "src"));
     private static final String WINDOWS_32BIT_DEFAULT_HOME_PATH = "C:\\Program Files\\Elixir";
     private static final String WINDOWS_64BIT_DEFAULT_HOME_PATH = "C:\\Program Files (x86)\\Elixir";
-    private final Map<String, ElixirSdkRelease> mySdkHomeToReleaseCache =
+    private static final Function<File, File> ID = file -> file;
+    private final Map<String, Release> mySdkHomeToReleaseCache =
             ApplicationManager.getApplication().isUnitTestMode() ? new HashMap<>() : new WeakHashMap<>();
 
-    public ElixirSdkType() {
+    public Type() {
         super(JpsElixirModelSerializerExtension.ELIXIR_SDK_TYPE_ID);
+    }
+
+    @Nullable
+    private static String releaseVersion(@NotNull SdkModificator sdkModificator) {
+        String versionString = sdkModificator.getVersionString();
+        final String releaseVersion;
+
+        if (versionString != null) {
+            Release release = Release.fromString(versionString);
+
+            if (release != null) {
+                releaseVersion = release.version();
+            } else {
+                releaseVersion = null;
+            }
+        } else {
+            releaseVersion = null;
+        }
+
+        return releaseVersion;
+    }
+
+    private static void addDocumentationPath(@NotNull SdkModificator sdkModificator,
+                                             @Nullable String releaseVersion,
+                                             @NotNull String appName) {
+        StringBuilder hexdocUrlBuilder =
+                new StringBuilder("https://hexdoc.pm/").append(appName);
+
+        if (releaseVersion != null) {
+            hexdocUrlBuilder.append('/').append(releaseVersion);
+        }
+
+        VirtualFile hexdocUrlVirtualFile =
+                VirtualFileManager.getInstance().findFileByUrl(hexdocUrlBuilder.toString());
+
+        if (hexdocUrlVirtualFile != null) {
+            sdkModificator.addRoot(hexdocUrlVirtualFile, JavadocOrderRootType.getInstance());
+        }
+    }
+
+    private static void addDocumentationPath(@NotNull SdkModificator sdkModificator,
+                                             @Nullable String releaseVersion,
+                                             @NotNull Path ebinPath) {
+        String appName = ebinPath.getParent().getFileName().toString();
+
+        addDocumentationPath(sdkModificator, releaseVersion, appName);
+    }
+
+    public static void addDocumentationPaths(@NotNull SdkModificator sdkModificator) {
+        String releaseVersion = releaseVersion(sdkModificator);
+
+        eachEbinPath(
+                sdkModificator.getHomePath(),
+                ebinPath -> addDocumentationPath(sdkModificator, releaseVersion, ebinPath)
+        );
+    }
+
+    public static void addSourcePaths(@NotNull SdkModificator sdkModificator) {
+        eachEbinPath(
+                sdkModificator.getHomePath(),
+                ebinPath -> addSourcePath(sdkModificator, ebinPath)
+        );
+    }
+
+    private static void addSourcePath(@NotNull SdkModificator sdkModificator, @NotNull File libFile) {
+        VirtualFile sourcePath = VfsUtil.findFileByIoFile(libFile, true);
+
+        if (sourcePath != null) {
+            sdkModificator.addRoot(sourcePath, OrderRootType.SOURCES);
+        }
+    }
+
+    private static void addSourcePath(@NotNull SdkModificator sdkModificator, @NotNull Path ebinPath) {
+        Path parentPath = ebinPath.getParent();
+        Path libPath = Paths.get(parentPath.toString(), "lib");
+        File libFile = libPath.toFile();
+
+        if (libFile.exists()) {
+            addSourcePath(sdkModificator, libFile);
+        }
     }
 
     private static void configureSdkPaths(@NotNull Sdk sdk) {
         SdkModificator sdkModificator = sdk.getSdkModificator();
-        setupLocalSdkPaths(sdkModificator);
-        String externalDocUrl = getDefaultDocumentationUrl(getRelease(sdk));
-        if (externalDocUrl != null) {
-            VirtualFile fileByUrl = VirtualFileManager.getInstance().findFileByUrl(externalDocUrl);
-
-            if (fileByUrl != null) {
-                sdkModificator.addRoot(fileByUrl, JavadocOrderRootType.getInstance());
-            }
-        }
+        addCodePaths(sdkModificator);
+        addDocumentationPaths(sdkModificator);
+        addSourcePaths(sdkModificator);
 
         sdkModificator.commitChanges();
     }
 
     @TestOnly
     @NotNull
-    public static Sdk createMockSdk(@NotNull String sdkHome, @NotNull ElixirSdkRelease version) {
+    public static Sdk createMockSdk(@NotNull String sdkHome, @NotNull Release version) {
         getInstance().mySdkHomeToReleaseCache.put(getVersionCacheKey(sdkHome), version);  // we'll not try to detect sdk version in tests environment
         Sdk sdk = new ProjectJdkImpl(getDefaultSdkName(sdkHome, version), getInstance());
         SdkModificator sdkModificator = sdk.getSdkModificator();
@@ -82,37 +163,118 @@ public class ElixirSdkType extends SdkType {
     }
 
     @Nullable
-    private static String getDefaultDocumentationUrl(@Nullable ElixirSdkRelease version) {
+    private static String getDefaultDocumentationUrl(@Nullable Release version) {
         return version == null ? null : "http://elixir-lang.org/docs/stable/elixir/";
     }
 
     @NotNull
-    private static String getDefaultSdkName(@NotNull String sdkHome, @Nullable ElixirSdkRelease release) {
+    private static String getDefaultSdkName(@NotNull String sdkHome, @Nullable Release release) {
         return release != null ? release.toString() : "Unknown Elixir version at " + sdkHome;
     }
 
-    @NotNull
-    public static ElixirSdkType getInstance() {
-        return SdkType.findInstance(ElixirSdkType.class);
+    @Nullable
+    private static String defaultErlangSdkHomePath() {
+        SdkType erlangSdkForElixirSdkType = SdkType.findInstance(org.elixir_lang.sdk.erlang.Type.class);
+        // Will suggest newest version, unlike `intellij-erlang`
+        return erlangSdkForElixirSdkType.suggestHomePath();
+    }
+
+    @Nullable
+    private static Sdk createDefaultErlangSdk(@NotNull ProjectJdkTable projectJdkTable,
+                                              @NotNull SdkType erlangSdkType,
+                                              @NotNull String homePath) {
+        String sdkName = erlangSdkType.suggestSdkName("Default " + erlangSdkType.getName(), homePath);
+        ProjectJdkImpl projectJdkImpl = new ProjectJdkImpl(sdkName, erlangSdkType);
+        projectJdkImpl.setHomePath(homePath);
+        erlangSdkType.setupSdkPaths(projectJdkImpl);
+        final Sdk erlangSdk;
+
+        if (projectJdkImpl.getVersionString() != null) {
+            ApplicationManager.getApplication().runWriteAction(() -> projectJdkTable.addJdk(projectJdkImpl));
+
+            erlangSdk = projectJdkImpl;
+        } else {
+            erlangSdk = null;
+        }
+
+        return erlangSdk;
+    }
+
+    @Nullable
+    private static Sdk createDefaultErlangSdk(@NotNull ProjectJdkTable projectJdkTable,
+                                              @NotNull SdkType erlangSdkType) {
+        String homePath = defaultErlangSdkHomePath();
+        final Sdk erlangSdk;
+
+        if (homePath != null) {
+            erlangSdk = createDefaultErlangSdk(projectJdkTable, erlangSdkType, homePath);
+        } else {
+            erlangSdk = null;
+        }
+
+        return erlangSdk;
+    }
+
+    @Nullable
+    private static Sdk defaultErlangSdk() {
+        ProjectJdkTable projectJdkTable = ProjectJdkTable.getInstance();
+        SdkType erlangSdkType = (SdkType) projectJdkTable.getSdkTypeByName("Erlang SDK");
+
+        if (erlangSdkType instanceof UnknownSdkType) {
+            erlangSdkType = SdkType.findInstance(org.elixir_lang.sdk.erlang.Type.class);
+        }
+
+        Sdk mostRecentErlangSdk = projectJdkTable.findMostRecentSdkOfType(erlangSdkType);
+        @Nullable Sdk defaultErlangSdk;
+
+        if (mostRecentErlangSdk == null) {
+            defaultErlangSdk = createDefaultErlangSdk(projectJdkTable, erlangSdkType);
+        } else {
+            defaultErlangSdk = mostRecentErlangSdk;
+        }
+
+        return defaultErlangSdk;
+    }
+
+    @Nullable
+    public static Sdk putDefaultErlangSdk(@NotNull Sdk elixirSdk) {
+        assert elixirSdk.getSdkType() == Type.getInstance();
+
+        @Nullable Sdk defaultErlangSdk = defaultErlangSdk();
+
+        if (defaultErlangSdk != null) {
+            SdkModificator sdkModificator = elixirSdk.getSdkModificator();
+            org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData sdkAdditionalData =
+                    new org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData(defaultErlangSdk, elixirSdk);
+            sdkModificator.setSdkAdditionalData(sdkAdditionalData);
+            ApplicationManager.getApplication().runWriteAction(sdkModificator::commitChanges);
+        }
+
+        return defaultErlangSdk;
     }
 
     @NotNull
-    public static ElixirSdkRelease getNonNullRelease(@NotNull PsiElement element) {
-        ElixirSdkRelease nonNullRelease = getRelease(element);
+    public static Type getInstance() {
+        return SdkType.findInstance(Type.class);
+    }
+
+    @NotNull
+    public static Release getNonNullRelease(@NotNull PsiElement element) {
+        Release nonNullRelease = getRelease(element);
 
         if (nonNullRelease == null) {
-            nonNullRelease = ElixirSdkRelease.LATEST;
+            nonNullRelease = Release.LATEST;
         }
 
         return nonNullRelease;
     }
 
     @Nullable
-    public static ElixirSdkRelease getRelease(@NotNull PsiElement element) {
-        ElixirSdkRelease release = null;
+    public static Release getRelease(@NotNull PsiElement element) {
+        Release release = null;
         Project project = element.getProject();
 
-        if (ElixirSystemUtil.isSmallIde()) {
+        if (ProcessOutput.isSmallIde()) {
             release = getReleaseForSmallIde(project);
         } else {
       /* ModuleUtilCore.findModuleForPsiElement can fail with NullPointerException if the
@@ -143,10 +305,10 @@ public class ElixirSdkType extends SdkType {
     }
 
     @Nullable
-    private static ElixirSdkRelease getRelease(@NotNull Project project) {
-        ElixirSdkRelease release;
+    private static Release getRelease(@NotNull Project project) {
+        Release release;
 
-        if (ElixirSystemUtil.isSmallIde()) {
+        if (ProcessOutput.isSmallIde()) {
             release = getReleaseForSmallIde(project);
         } else {
             ProjectRootManager projectRootManager = ProjectRootManager.getInstance(project);
@@ -162,16 +324,16 @@ public class ElixirSdkType extends SdkType {
     }
 
     @Nullable
-    public static ElixirSdkRelease getRelease(@Nullable Sdk sdk) {
+    public static Release getRelease(@Nullable Sdk sdk) {
         if (sdk != null && sdk.getSdkType() == getInstance()) {
-            ElixirSdkRelease fromVersionString = ElixirSdkRelease.fromString(sdk.getVersionString());
+            Release fromVersionString = Release.fromString(sdk.getVersionString());
             return fromVersionString != null ? fromVersionString : getInstance().detectSdkVersion(StringUtil.notNullize(sdk.getHomePath()));
         }
         return null;
     }
 
     @Nullable
-    private static ElixirSdkRelease getReleaseForSmallIde(@NotNull Project project) {
+    private static Release getReleaseForSmallIde(@NotNull Project project) {
         String sdkPath = getSdkPath(project);
         return StringUtil.isEmpty(sdkPath) ? null : getInstance().detectSdkVersion(sdkPath);
     }
@@ -179,8 +341,8 @@ public class ElixirSdkType extends SdkType {
     @Nullable
     public static String getSdkPath(@NotNull final Project project) {
         // todo small ide
-        if (ElixirSystemUtil.isSmallIde()) {
-            return ElixirSdkForSmallIdes.getSdkHome(project);
+        if (ProcessOutput.isSmallIde()) {
+            return ForSmallIdes.getSdkHome(project);
         }
 
         Sdk sdk = ProjectRootManager.getInstance(project).getProjectSdk();
@@ -193,83 +355,8 @@ public class ElixirSdkType extends SdkType {
     }
 
     @Nullable
-    private static String getVersionString(@Nullable ElixirSdkRelease version) {
+    private static String getVersionString(@Nullable Release version) {
         return version != null ? version.toString() : null;
-    }
-
-    private static boolean isStandardLibraryDir(@NotNull File dir) {
-        return dir.isDirectory();
-    }
-
-    private static void mergeHomebrew(Map<Version, String> homePathByVersion) {
-        if (HOMEBREW_ROOT.isDirectory()) {
-            File[] files = HOMEBREW_ROOT.listFiles();
-            if (files != null) {
-                for (File child : files) {
-                    if (child.isDirectory()) {
-                        String versionString = child.getName();
-                        Version version = Version.parseVersion(versionString);
-                        homePathByVersion.put(version, child.getAbsolutePath());
-                    }
-                }
-            }
-        }
-    }
-
-    private static void mergeNixStore(Map<Version, String> homePathByVersion) {
-        if (NIX_STORE.isDirectory()) {
-            //noinspection ResultOfMethodCallIgnored
-            NIX_STORE.listFiles(
-                    (dir, name) -> {
-                        Matcher matcher = NIX_PATTERN.matcher(name);
-                        boolean accept = false;
-
-                        if (matcher.matches()) {
-                            int major = Integer.parseInt(matcher.group(1));
-                            int minor = Integer.parseInt(matcher.group(2));
-                            int bugfix = Integer.parseInt(matcher.group(3));
-
-                            Version version = new Version(major, minor, bugfix);
-
-                            homePathByVersion.put(version, new File(dir, name).getAbsolutePath());
-                            accept = true;
-                        }
-                        return accept;
-                    }
-            );
-        }
-    }
-
-    private static void setupLocalSdkPaths(@NotNull SdkModificator sdkModificator) {
-        String sdkHome = sdkModificator.getHomePath();
-
-        {
-            File stdLibDir = new File(new File(sdkHome), "lib");
-            if (tryToProcessAsStandardLibraryDir(sdkModificator, stdLibDir)) {
-                return;
-            }
-        }
-
-        assert !ApplicationManager.getApplication().isUnitTestMode() : "Failed to setup a mock SDK";
-
-        File stdLibDir = new File("/usr/lib/erlang");
-        tryToProcessAsStandardLibraryDir(sdkModificator, stdLibDir);
-    }
-
-    /**
-     * set the sdk libs
-     * todo: differentiating `Elixir.*.beam` files and `*.ex` files.
-     */
-    private static boolean tryToProcessAsStandardLibraryDir(@NotNull SdkModificator sdkModificator, @NotNull File stdLibDir) {
-        if (!isStandardLibraryDir(stdLibDir)) {
-            return false;
-        }
-        VirtualFile dir = LocalFileSystem.getInstance().findFileByIoFile(stdLibDir);
-        if (dir != null) {
-            sdkModificator.addRoot(dir, OrderRootType.SOURCES);
-            sdkModificator.addRoot(dir, OrderRootType.CLASSES);
-        }
-        return true;
     }
 
     /**
@@ -298,14 +385,8 @@ public class ElixirSdkType extends SdkType {
     }
 
     @Nullable
-    @Override
-    public AdditionalDataConfigurable createAdditionalDataConfigurable(@NotNull SdkModel sdkModel, @NotNull SdkModificator sdkModificator) {
-        return null;
-    }
-
-    @Nullable
-    private ElixirSdkRelease detectSdkVersion(@NotNull String sdkHome) {
-        ElixirSdkRelease cachedRelease = mySdkHomeToReleaseCache.get(getVersionCacheKey(sdkHome));
+    private Release detectSdkVersion(@NotNull String sdkHome) {
+        Release cachedRelease = mySdkHomeToReleaseCache.get(getVersionCacheKey(sdkHome));
         if (cachedRelease != null) {
             return cachedRelease;
         }
@@ -317,13 +398,13 @@ public class ElixirSdkType extends SdkType {
             return null;
         }
 
-        ElixirSdkRelease release = transformStdoutLine(
-                ElixirSdkRelease::fromString,
+        Release release = transformStdoutLine(
+                Release::fromString,
                 STANDARD_TIMEOUT,
                 sdkHome,
                 elixir.getAbsolutePath(),
                 "-e",
-                "IO.puts System.build_info[:version]"
+                "System.version() |> IO.puts()"
         );
 
         if (release != null) {
@@ -393,8 +474,8 @@ public class ElixirSdkType extends SdkType {
         );
 
         if (SystemInfo.isMac) {
-            mergeHomebrew(homePathByVersion);
-            mergeNixStore(homePathByVersion);
+            mergeHomebrew(homePathByVersion, "elixir", ID);
+            mergeNixStore(homePathByVersion, NIX_PATTERN, ID);
         } else {
             String sdkPath;
 
@@ -409,7 +490,7 @@ public class ElixirSdkType extends SdkType {
             } else if (SystemInfo.isLinux) {
                 homePathByVersion.put(UNKNOWN_VERSION, LINUX_DEFAULT_HOME_PATH);
 
-                mergeNixStore(homePathByVersion);
+                mergeNixStore(homePathByVersion, NIX_PATTERN, ID);
             }
         }
 
@@ -461,10 +542,6 @@ public class ElixirSdkType extends SdkType {
     }
 
     @Override
-    public void saveAdditionalData(@NotNull SdkAdditionalData additionalData, @NotNull Element additional) {
-    }
-
-    @Override
     public void setupSdkPaths(@NotNull Sdk sdk) {
         configureSdkPaths(sdk);
     }
@@ -504,5 +581,36 @@ public class ElixirSdkType extends SdkType {
                 throw invalidSdkHomeException(virtualFile);
             }
         }
+    }
+
+    @Nullable
+    @Override
+    public com.intellij.openapi.projectRoots.AdditionalDataConfigurable createAdditionalDataConfigurable(
+            @NotNull SdkModel sdkModel,
+            @NotNull SdkModificator sdkModificator
+    ) {
+        return new org.elixir_lang.sdk.erlang_dependent.AdditionalDataConfigurable(sdkModel);
+    }
+
+    public void saveAdditionalData(@NotNull SdkAdditionalData additionalData, @NotNull Element additional) {
+        if (additionalData instanceof org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData) {
+            try {
+                ((org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData) additionalData).writeExternal(additional);
+            } catch (WriteExternalException e) {
+                LOG.error(e);
+            }
+        }
+    }
+
+    public SdkAdditionalData loadAdditionalData(@NotNull Sdk elixirSdk, Element additional) {
+        org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData sdkAdditionalData = new org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData(elixirSdk);
+
+        try {
+            sdkAdditionalData.readExternal(additional);
+        } catch (InvalidDataException e) {
+            LOG.error(e);
+        }
+
+        return sdkAdditionalData;
     }
 }
