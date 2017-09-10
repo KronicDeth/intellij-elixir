@@ -20,9 +20,6 @@ import org.jetbrains.annotations.Nullable;
 public abstract class ForSmallIdes {
   private static final String LIBRARY_NAME = "Elixir SDK";
 
-  public ForSmallIdes() {
-  }
-
   public static void setUpOrUpdateSdk(@NotNull final Project project, @NotNull final String path){
     ApplicationManager.getApplication().runWriteAction(new Runnable() {
       @Override
