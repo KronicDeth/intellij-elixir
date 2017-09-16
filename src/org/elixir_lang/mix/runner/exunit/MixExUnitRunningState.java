@@ -8,6 +8,7 @@ import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.runners.ProgramRunner;
+import com.intellij.execution.testframework.autotest.ToggleAutoTestAction;
 import com.intellij.execution.testframework.TestConsoleProperties;
 import com.intellij.execution.testframework.sm.SMTestRunnerConnectionUtil;
 import com.intellij.execution.ui.ConsoleView;
@@ -163,6 +164,9 @@ final class MixExUnitRunningState extends MixRunningState {
         TestConsoleProperties properties = new MixTestConsoleProperties(myConfiguration, TEST_FRAMEWORK_NAME, executor);
         ConsoleView console = createAndAttachConsole(TEST_FRAMEWORK_NAME, processHandler, properties);
         ElixirConsoleUtil.attachFilters(myConfiguration.getProject(), console);
-        return new DefaultExecutionResult(console, processHandler, createActions(console, processHandler));
+
+        DefaultExecutionResult executionResult = new DefaultExecutionResult(console, processHandler, createActions(console, processHandler));
+        executionResult.setRestartActions(new ToggleAutoTestAction());
+        return executionResult;
     }
 }
