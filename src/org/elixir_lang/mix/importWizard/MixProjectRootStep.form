@@ -35,7 +35,7 @@
         </constraints>
         <properties>
           <selected value="true"/>
-          <text value="&amp;Fetch dependencies with mix(requires valid mix path)"/>
+          <text value="&amp;Fetch dependencies with mix (requires valid mix path)"/>
         </properties>
       </component>
       <nested-form id="13435" form-file="org/elixir_lang/mix/settings/MixConfigurationForm.form" binding="myMixConfigurationForm">
