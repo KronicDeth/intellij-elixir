@@ -589,7 +589,7 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
             @NotNull SdkModel sdkModel,
             @NotNull SdkModificator sdkModificator
     ) {
-        return new org.elixir_lang.sdk.erlang_dependent.AdditionalDataConfigurable(sdkModel);
+        return new org.elixir_lang.sdk.erlang_dependent.AdditionalDataConfigurable(sdkModel, sdkModificator);
     }
 
     public void saveAdditionalData(@NotNull SdkAdditionalData additionalData, @NotNull Element additional) {

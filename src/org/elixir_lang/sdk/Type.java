@@ -6,24 +6,31 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 
+import java.nio.file.Path;
+import java.util.function.Consumer;
+
 import static org.elixir_lang.sdk.HomePath.eachEbinPath;
 
 public class Type {
     private Type() {
     }
 
+    public static void ebinPathChainVirtualFile(@NotNull Path ebinPath, Consumer<VirtualFile> virtualFileConsumer) {
+        VirtualFile virtualFile = LocalFileSystem
+                .getInstance()
+                .findFileByIoFile(ebinPath.toFile());
+
+        if (virtualFile != null) {
+            virtualFileConsumer.accept(virtualFile);
+        }
+    }
+
     public static void addCodePaths(@NotNull SdkModificator sdkModificator) {
         eachEbinPath(
                 sdkModificator.getHomePath(),
-                ebin -> {
-                    VirtualFile virtualFile = LocalFileSystem
-                            .getInstance()
-                            .findFileByIoFile(ebin.toFile());
-
-                    if (virtualFile != null) {
-                        sdkModificator.addRoot(virtualFile, OrderRootType.CLASSES);
-                    }
-                }
+                ebin -> ebinPathChainVirtualFile(
+                        ebin, virtualFile -> sdkModificator.addRoot(virtualFile, OrderRootType.CLASSES)
+                )
         );
     }
 }
