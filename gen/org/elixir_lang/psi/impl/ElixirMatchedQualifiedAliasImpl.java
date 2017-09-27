@@ -3,10 +3,7 @@ package org.elixir_lang.psi.impl;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiElementVisitor;
-import com.intellij.psi.PsiReference;
-import com.intellij.psi.ResolveState;
+import com.intellij.psi.*;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.*;
@@ -64,6 +61,11 @@ public class ElixirMatchedQualifiedAliasImpl extends ElixirMatchedExpressionImpl
   @Nullable
   public PsiReference getReference() {
     return ElixirPsiImplUtil.getReference(this);
+  }
+
+  @Nullable
+  public PsiPolyVariantReference getReference(PsiElement maxScope) {
+    return ElixirPsiImplUtil.getReference(this, maxScope);
   }
 
   public boolean isModuleName() {

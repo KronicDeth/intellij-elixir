@@ -3231,6 +3231,19 @@ public class ElixirPsiImplUtil {
     }
 
     @Nullable
+    public static PsiReference getReference(@NotNull ElixirAtom atom) {
+        return CachedValuesManager.getCachedValue(
+                atom,
+                () -> CachedValueProvider.Result.create(computeReference(atom), atom)
+        );
+    }
+
+    @NotNull
+    private static PsiReference computeReference(@NotNull ElixirAtom atom) {
+        return new org.elixir_lang.reference.Atom(atom);
+    }
+
+    @Nullable
     public static PsiReference getReference(@NotNull QualifiableAlias qualifiableAlias) {
         return getReference(qualifiableAlias, qualifiableAlias.getContainingFile());
     }
