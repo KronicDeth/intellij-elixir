@@ -137,6 +137,7 @@
 ### Bug Fixes
 * [#816](https://github.com/KronicDeth/intellij-elixir/pull/816) - Add notice for debug blacklist that it uses atoms, not Aliases, so you need to qualifier module aliases with `Elixir.` - [@merqlove](https://github.com/merqlove)
 * [#817](https://github.com/KronicDeth/intellij-elixir/pull/817) - Support atoms (prefixed with `:`) and`Elixir.` and plain Aliases for debugger blacklist. - [@merqlove](https://github.com/merglove)
+* [#832](https://github.com/KronicDeth/intellij-elixir/pull/832) - Add space to import window text - [@kentongray](https://github.com/kentongray)
 
 ## v6.1.1
 
