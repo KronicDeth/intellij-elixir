@@ -271,7 +271,7 @@ public class Import {
         Call modular = null;
 
         if (finalArguments != null && finalArguments.length >= 1) {
-            modular = maybeAliasToModular(finalArguments[0], importCall.getParent());
+            modular = maybeModularNameToModular(finalArguments[0], importCall.getParent());
         }
 
         return modular;

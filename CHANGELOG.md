@@ -132,11 +132,18 @@
         * Class path of `HOMEPATH/lib` is replaced with `HOMEPATH/lib/APP/ebin`.
         * Source path of `HOMEPATH/lib` is replaced with `HOMEPATH/lib/APP/lib` IF it exists (so only for source SDKs)
         * Documentation of `http://elixir-lang.org/docs/stable/elixir/` will be replaced with `https://hexdoc.pm/APP/VERSION` for every `APP` in `HOMEPATH/lib`.
-
+* [#839](https://github.com/KronicDeth/intellij-elixir/pull/839) - [@KronicDeth](https://github.com/KronicDeth)
+  * All `ebin` paths in the Internal Erlang SDK will be copied to the Elixir SDK, so that they are indexed, which makes the Internal Erlang SDK modules show up in Symbol search.
+  * Erlang SDK modules can be completed and then functions in those modules can be completed after typing `.`.
+    * Atoms have References.
+      * Indexed atoms (from decompiled Erlang `.beams` from the Internal Erlang SDK) will be used for completing atoms as soon the atom is parseable: either after the first letter `:` or inside the quotes when making a quoted atom.
+      * Atoms will resolve to modules if the atom is a module name.  If the atom is quoted and contains interpolation, it will treat each interpolation as `.*` and look for regex matches to this derived potential atom name.
+  * Completions for functions after `.` will now work at the end of file.  Previously, completions only worked in the middle of a file, where the `.` could parse the next work an existing call, now if that parse doesn't work and the only thing after is a new line, it will still complete.
 
 ### Bug Fixes
 * [#816](https://github.com/KronicDeth/intellij-elixir/pull/816) - Add notice for debug blacklist that it uses atoms, not Aliases, so you need to qualifier module aliases with `Elixir.` - [@merqlove](https://github.com/merqlove)
 * [#817](https://github.com/KronicDeth/intellij-elixir/pull/817) - Support atoms (prefixed with `:`) and`Elixir.` and plain Aliases for debugger blacklist. - [@merqlove](https://github.com/merglove)
+* [#832](https://github.com/KronicDeth/intellij-elixir/pull/832) - Add space to import window text - [@kentongray](https://github.com/kentongray)
 
 ## v6.1.1
 

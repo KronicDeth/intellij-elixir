@@ -26,6 +26,7 @@ import java.util.List;
 import static com.intellij.psi.util.PsiTreeUtil.treeWalkUp;
 import static org.elixir_lang.Module.concat;
 import static org.elixir_lang.Module.split;
+import static org.elixir_lang.Reference.indexedNameCollection;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE;
 
 public class Variants extends Module {
@@ -230,9 +231,7 @@ public class Variants extends Module {
         if (unaliasedName != null) {
             Project project = match.getProject();
 
-            Collection<String> indexedNameCollection = StubIndex
-                    .getInstance()
-                    .getAllKeys(AllName.KEY, project);
+            Collection<String> indexedNameCollection = indexedNameCollection(project);
             List<String> unaliasedNestedNames = ContainerUtil.findAll(
                     indexedNameCollection,
                     new org.elixir_lang.Module.IsNestedUnder(unaliasedName)

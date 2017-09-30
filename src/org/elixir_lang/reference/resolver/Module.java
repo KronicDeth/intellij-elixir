@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.elixir_lang.reference.Module.forEachNavigationElement;
+import static org.elixir_lang.Reference.forEachNavigationElement;
 import static org.elixir_lang.reference.module.ResolvableName.resolvableName;
 
 public class Module implements ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Module> {

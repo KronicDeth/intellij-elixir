@@ -5,6 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.PsiReference;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.ElixirAtom;
 import org.elixir_lang.psi.ElixirCharListLine;
@@ -38,6 +39,11 @@ public class ElixirAtomImpl extends ASTWrapperPsiElement implements ElixirAtom {
   @Nullable
   public ElixirStringLine getStringLine() {
     return PsiTreeUtil.getChildOfType(this, ElixirStringLine.class);
+  }
+
+  @Nullable
+  public PsiReference getReference() {
+    return ElixirPsiImplUtil.getReference(this);
   }
 
   @NotNull

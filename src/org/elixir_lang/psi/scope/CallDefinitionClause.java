@@ -129,7 +129,7 @@ public abstract class CallDefinitionClause implements PsiScopeProcessor {
     private boolean implicitImports(@NotNull PsiElement element, @NotNull ResolveState state) {
         Project project = element.getProject();
 
-        boolean keepProcessing = org.elixir_lang.reference.Module.forEachNavigationElement(
+        boolean keepProcessing = org.elixir_lang.Reference.forEachNavigationElement(
                 project,
                 KERNEL,
                 new Function<PsiElement, Boolean>() {
@@ -159,7 +159,7 @@ public abstract class CallDefinitionClause implements PsiScopeProcessor {
         // the implicit `import Kernel.SpecialForms`
         if (keepProcessing) {
             ResolveState modularCanonicalNameState = state.put(MODULAR_CANONICAL_NAME, KERNEL_SPECIAL_FORMS);
-            keepProcessing = org.elixir_lang.reference.Module.forEachNavigationElement(
+            keepProcessing = org.elixir_lang.Reference.forEachNavigationElement(
                     project,
                     KERNEL_SPECIAL_FORMS,
                     new Function<PsiElement, Boolean>() {
