@@ -29,6 +29,35 @@
           </li>
         </ul>
       </li>
+      <li>
+        All <code>ebin</code> paths in the Internal Erlang SDK will be copied to the Elixir SDK, so that they are
+        indexed, which makes the Internal Erlang SDK modules show up in Symbol search.
+      </li>
+      <li>
+        Erlang SDK modules can be completed and then functions in those modules can be completed after typing
+        <code>.</code>.
+        <ul>
+          <li>Atoms have References.
+            <ul>
+              <li>
+                Indexed atoms (from decompiled Erlang <code>.beams</code> from the Internal Erlang SDK) will be used for
+                completing atoms as soon the atom is parseable: either after the first letter <code>:</code> or inside
+                the quotes when making a quoted atom.
+              </li>
+              <li>
+                Atoms will resolve to modules if the atom is a module name.  If the atom is quoted and contains
+                interpolation, it will treat each interpolation as <code>.*</code> and look for regex matches to this
+                derived potential atom name.
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>
+        Completions for functions after <code>.</code> will now work at the end of file.  Previously, completions only
+        worked in the middle of a file, where the <code>.</code> could parse the next work an existing call, now if that
+        parse doesn't work and the only thing after is a new line, it will still complete.
+      </li>
     </ul>
   </li>
   <li>
