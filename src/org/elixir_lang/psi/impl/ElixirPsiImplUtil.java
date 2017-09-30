@@ -5650,7 +5650,7 @@ if (quoted == null) {
      * Private static methods
      */
 
-    private static ASTNode[] childNodes(PsiElement parentElement) {
+    public static ASTNode[] childNodes(PsiElement parentElement) {
         ASTNode parentNode = parentElement.getNode();
         return parentNode.getChildren(null);
     }
@@ -5801,7 +5801,7 @@ if (quoted == null) {
     }
 
     @NotNull
-    private static List<Integer> addChildTextCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode child) {
+    public static List<Integer> addChildTextCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode child) {
         return addStringCodePoints(codePointList, child.getText());
     }
 

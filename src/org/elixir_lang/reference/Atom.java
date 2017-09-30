@@ -6,6 +6,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiPolyVariantReference;
 import com.intellij.psi.PsiReferenceBase;
 import com.intellij.psi.ResolveResult;
+import com.intellij.psi.impl.source.resolve.ResolveCache;
 import org.elixir_lang.psi.ElixirAtom;
 import org.elixir_lang.psi.scope.atom.Variants;
 import org.jetbrains.annotations.NotNull;
@@ -37,7 +38,9 @@ public class Atom extends PsiReferenceBase<ElixirAtom> implements PsiPolyVariant
     @NotNull
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
-        return new ResolveResult[0];
+        return ResolveCache
+                .getInstance(this.myElement.getProject())
+                .resolveWithCaching(this, org.elixir_lang.reference.resolver.Atom.INSTANCE, false, incompleteCode);
     }
 
     @Nullable
