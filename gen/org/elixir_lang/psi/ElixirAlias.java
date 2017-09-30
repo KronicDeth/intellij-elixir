@@ -3,6 +3,7 @@ package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiPolyVariantReference;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
@@ -22,6 +23,9 @@ public interface ElixirAlias extends NamedElement, QualifiableAlias, Quotable {
 
   @Nullable
   PsiReference getReference();
+
+  @Nullable
+  PsiPolyVariantReference getReference(PsiElement maxScope);
 
   boolean isModuleName();
 

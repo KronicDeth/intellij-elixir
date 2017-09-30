@@ -8,22 +8,21 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
 import org.apache.commons.lang.math.IntRange;
+import org.elixir_lang.psi.ElixirEndOfExpression;
+import org.elixir_lang.psi.ElixirTypes;
 import org.elixir_lang.psi.call.Call;
-import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.macroChildCalls;
+import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.maybeModularNameToModular;
 import static org.elixir_lang.structure_view.element.CallDefinitionClause.nameArityRange;
 
 public class CallDefinitionClause extends CompletionProvider<CompletionParameters> {
-    /*
-     * Private Instance Methods
-     */
-
     @NotNull
     private static Iterable<LookupElement> callDefinitionClauseLookupElements(@NotNull Call scope) {
         Call[] childCalls = macroChildCalls(scope);
@@ -61,39 +60,57 @@ public class CallDefinitionClause extends CompletionProvider<CompletionParameter
         return lookupElementList;
     }
 
-    /*
-     * Protected Instance Methods
-     */
-
-    @Override
-    protected void addCompletions(@NotNull CompletionParameters parameters,
-                                  ProcessingContext context,
-                                  @NotNull CompletionResultSet resultSet) {
+    @Nullable
+    private static PsiElement maybeModularName(@NotNull CompletionParameters parameters) {
         PsiElement originalPosition = parameters.getOriginalPosition();
-        PsiElement originalParent;
+        PsiElement maybeModularName = null;
 
         if (originalPosition != null) {
-            originalParent = originalPosition.getParent();
+            PsiElement originalParent = originalPosition.getParent();
 
             if (originalParent != null) {
                 PsiElement grandParent = originalParent.getParent();
 
                 if (grandParent instanceof org.elixir_lang.psi.qualification.Qualified) {
-                    org.elixir_lang.psi.qualification.Qualified qualifiedGrandParent = (org.elixir_lang.psi.qualification.Qualified) grandParent;
-                    PsiElement qualifier = qualifiedGrandParent.qualifier();
+                    org.elixir_lang.psi.qualification.Qualified qualifiedGrandParent =
+                            (org.elixir_lang.psi.qualification.Qualified) grandParent;
+                    maybeModularName = qualifiedGrandParent.qualifier();
+                } else if (originalParent instanceof ElixirEndOfExpression) {
+                    final int originalParentOffset = originalParent.getTextOffset();
 
-                    Call modular = ElixirPsiImplUtil.maybeAliasToModular(qualifier, qualifier.getContainingFile());
+                    if (originalParentOffset > 0) {
+                        final PsiElement previousElement =
+                                parameters.getOriginalFile().findElementAt(originalParentOffset - 1);
 
-                    if (modular != null) {
-                        if (resultSet.getPrefixMatcher().getPrefix().endsWith(".")) {
-                            resultSet = resultSet.withPrefixMatcher("");
+                        if (previousElement != null &&
+                                previousElement.getNode().getElementType() == ElixirTypes.DOT_OPERATOR) {
+                            maybeModularName = previousElement.getPrevSibling();
                         }
-
-                        resultSet.addAllElements(
-                                callDefinitionClauseLookupElements(modular)
-                        );
                     }
                 }
+            }
+        }
+
+        return maybeModularName;
+    }
+
+    @Override
+    protected void addCompletions(@NotNull CompletionParameters parameters,
+                                  ProcessingContext context,
+                                  @NotNull CompletionResultSet resultSet) {
+        PsiElement maybeModularName = maybeModularName(parameters);
+
+        if (maybeModularName != null) {
+            Call modular = maybeModularNameToModular(maybeModularName, maybeModularName.getContainingFile());
+
+            if (modular != null) {
+                if (resultSet.getPrefixMatcher().getPrefix().endsWith(".")) {
+                    resultSet = resultSet.withPrefixMatcher("");
+                }
+
+                resultSet.addAllElements(
+                        callDefinitionClauseLookupElements(modular)
+                );
             }
         }
     }

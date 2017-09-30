@@ -2772,7 +2772,10 @@ atom ::= COLON (ATOM_FRAGMENT | quote)
              "com.intellij.psi.NavigatablePsiElement"
              "org.elixir_lang.psi.Quotable"
            ]
-           methods = [quote]
+           methods = [
+             getReference
+             quote
+           ]
          }
 
 private infixComma ::= COMMA EOL*

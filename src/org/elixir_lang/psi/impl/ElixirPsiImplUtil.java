@@ -3231,6 +3231,19 @@ public class ElixirPsiImplUtil {
     }
 
     @Nullable
+    public static PsiReference getReference(@NotNull ElixirAtom atom) {
+        return CachedValuesManager.getCachedValue(
+                atom,
+                () -> CachedValueProvider.Result.create(computeReference(atom), atom)
+        );
+    }
+
+    @NotNull
+    private static PsiReference computeReference(@NotNull ElixirAtom atom) {
+        return new org.elixir_lang.reference.Atom(atom);
+    }
+
+    @Nullable
     public static PsiReference getReference(@NotNull QualifiableAlias qualifiableAlias) {
         return getReference(qualifiableAlias, qualifiableAlias.getContainingFile());
     }
@@ -5637,7 +5650,7 @@ if (quoted == null) {
      * Private static methods
      */
 
-    private static ASTNode[] childNodes(PsiElement parentElement) {
+    public static ASTNode[] childNodes(PsiElement parentElement) {
         ASTNode parentNode = parentElement.getNode();
         return parentNode.getChildren(null);
     }
@@ -5718,7 +5731,7 @@ if (quoted == null) {
     @Contract(pure = true)
     @Nullable
     public static Call qualifiedToModular(@NotNull final org.elixir_lang.psi.call.qualification.Qualified qualified) {
-        return maybeAliasToModular(qualified.qualifier(), qualified.getContainingFile());
+        return maybeModularNameToModular(qualified.qualifier(), qualified.getContainingFile());
     }
 
     @NotNull
@@ -5788,7 +5801,7 @@ if (quoted == null) {
     }
 
     @NotNull
-    private static List<Integer> addChildTextCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode child) {
+    public static List<Integer> addChildTextCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode child) {
         return addStringCodePoints(codePointList, child.getText());
     }
 
@@ -5877,13 +5890,28 @@ if (quoted == null) {
      */
     @Contract(pure = true)
     @Nullable
-    public static Call maybeAliasToModular(@NotNull final PsiElement maybeAlias, @NotNull PsiElement maxScope) {
-        PsiElement maybeQualifiableAlias = stripAccessExpression(maybeAlias);
+    public static Call maybeModularNameToModular(@NotNull final PsiElement maybeModularName, @NotNull PsiElement maxScope) {
+        PsiElement strippedMaybeModuleName = stripAccessExpression(maybeModularName);
 
         Call modular = null;
 
-        if (maybeQualifiableAlias instanceof QualifiableAlias) {
-            QualifiableAlias qualifiableAlias = (QualifiableAlias) maybeQualifiableAlias;
+        if (strippedMaybeModuleName instanceof ElixirAtom) {
+            ElixirAtom atom = (ElixirAtom) strippedMaybeModuleName;
+            PsiReference reference = atom.getReference();
+
+            if (reference != null) {
+                final PsiElement resolved = reference.resolve();
+
+                if (resolved != null && resolved instanceof Call) {
+                    Call call = (Call) resolved;
+
+                    if (isModular(call)) {
+                        modular = call;
+                    }
+                }
+            }
+        } else if (strippedMaybeModuleName instanceof QualifiableAlias) {
+            QualifiableAlias qualifiableAlias = (QualifiableAlias) strippedMaybeModuleName;
 
             if (!recursiveKernelImport(qualifiableAlias, maxScope)) {
                 /* need to construct reference directly as qualified aliases don't return a reference except for the
