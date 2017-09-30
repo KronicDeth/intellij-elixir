@@ -139,6 +139,7 @@
       * Indexed atoms (from decompiled Erlang `.beams` from the Internal Erlang SDK) will be used for completing atoms as soon the atom is parseable: either after the first letter `:` or inside the quotes when making a quoted atom.
       * Atoms will resolve to modules if the atom is a module name.  If the atom is quoted and contains interpolation, it will treat each interpolation as `.*` and look for regex matches to this derived potential atom name.
   * Completions for functions after `.` will now work at the end of file.  Previously, completions only worked in the middle of a file, where the `.` could parse the next work an existing call, now if that parse doesn't work and the only thing after is a new line, it will still complete.
+* [#830](https://github.com/KronicDeth/intellij-elixir/pull/830) - Auto test for mix test case runner will automatically run tests after a change is detected in the project files, which normally happens on save, which happens when losing focus on a changed editor tab by default. - [@nivanson](https://github.com/nivanson)
 
 ### Bug Fixes
 * [#816](https://github.com/KronicDeth/intellij-elixir/pull/816) - Add notice for debug blacklist that it uses atoms, not Aliases, so you need to qualifier module aliases with `Elixir.` - [@merqlove](https://github.com/merqlove)
