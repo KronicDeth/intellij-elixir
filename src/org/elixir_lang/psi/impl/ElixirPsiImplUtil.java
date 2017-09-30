@@ -5731,7 +5731,7 @@ if (quoted == null) {
     @Contract(pure = true)
     @Nullable
     public static Call qualifiedToModular(@NotNull final org.elixir_lang.psi.call.qualification.Qualified qualified) {
-        return maybeAliasToModular(qualified.qualifier(), qualified.getContainingFile());
+        return maybeModularNameToModular(qualified.qualifier(), qualified.getContainingFile());
     }
 
     @NotNull
@@ -5890,13 +5890,28 @@ if (quoted == null) {
      */
     @Contract(pure = true)
     @Nullable
-    public static Call maybeAliasToModular(@NotNull final PsiElement maybeAlias, @NotNull PsiElement maxScope) {
-        PsiElement maybeQualifiableAlias = stripAccessExpression(maybeAlias);
+    public static Call maybeModularNameToModular(@NotNull final PsiElement maybeModularName, @NotNull PsiElement maxScope) {
+        PsiElement strippedMaybeModuleName = stripAccessExpression(maybeModularName);
 
         Call modular = null;
 
-        if (maybeQualifiableAlias instanceof QualifiableAlias) {
-            QualifiableAlias qualifiableAlias = (QualifiableAlias) maybeQualifiableAlias;
+        if (strippedMaybeModuleName instanceof ElixirAtom) {
+            ElixirAtom atom = (ElixirAtom) strippedMaybeModuleName;
+            PsiReference reference = atom.getReference();
+
+            if (reference != null) {
+                final PsiElement resolved = reference.resolve();
+
+                if (resolved != null && resolved instanceof Call) {
+                    Call call = (Call) resolved;
+
+                    if (isModular(call)) {
+                        modular = call;
+                    }
+                }
+            }
+        } else if (strippedMaybeModuleName instanceof QualifiableAlias) {
+            QualifiableAlias qualifiableAlias = (QualifiableAlias) strippedMaybeModuleName;
 
             if (!recursiveKernelImport(qualifiableAlias, maxScope)) {
                 /* need to construct reference directly as qualified aliases don't return a reference except for the
