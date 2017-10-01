@@ -2787,6 +2787,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   //                DIVISION_OPERATOR |
   //                DUAL_OPERATOR |
   //                ELSE |
+  //                END |
   //                IDENTIFIER_TOKEN |
   //                IN_MATCH_OPERATOR |
   //                IN_OPERATOR |
@@ -2828,6 +2829,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, DIVISION_OPERATOR);
     if (!r) r = consumeToken(b, DUAL_OPERATOR);
     if (!r) r = consumeToken(b, ELSE);
+    if (!r) r = consumeToken(b, END);
     if (!r) r = consumeToken(b, IDENTIFIER_TOKEN);
     if (!r) r = consumeToken(b, IN_MATCH_OPERATOR);
     if (!r) r = consumeToken(b, IN_OPERATOR);
