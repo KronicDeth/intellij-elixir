@@ -30,10 +30,10 @@ import org.elixir_lang.beam.Beam;
 import org.elixir_lang.beam.MacroNameArity;
 import org.elixir_lang.beam.chunk.Atoms;
 import org.elixir_lang.beam.chunk.Exports;
+import org.elixir_lang.beam.psi.impl.CallDefinitionStubImpl;
 import org.elixir_lang.beam.psi.impl.ModuleElementImpl;
 import org.elixir_lang.beam.psi.impl.ModuleImpl;
 import org.elixir_lang.beam.psi.impl.ModuleStubImpl;
-import org.elixir_lang.beam.psi.impl.CallDefinitionStubImpl;
 import org.elixir_lang.beam.psi.stubs.CallDefinitionStub;
 import org.elixir_lang.beam.psi.stubs.ModuleStub;
 import org.elixir_lang.psi.ElixirFile;
@@ -46,6 +46,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.SortedSet;
 
 import static com.intellij.reference.SoftReference.dereference;
@@ -81,48 +82,42 @@ public class BeamFileImpl extends ModuleElementImpl implements ModuleOwner, PsiC
         this.isForDecompiling = isForDecompiling;
     }
 
-    public static PsiFileStub<?> buildFileStub(@NotNull byte[] bytes, @NotNull String path) {
-        ElixirFileStubImpl stub = new ElixirFileStubImpl();
-
-        Beam beam = null;
+    public static Optional<Stub> buildFileStub(@NotNull byte[] bytes, @NotNull String path) {
+        Optional<Beam> beamOptional;
 
         try {
-            beam = Beam.from(bytes, path);
+            beamOptional = Beam.from(bytes, path);
         } catch (IOException e) {
             LOGGER.error("IOException during BeamFileImpl.buildFileStub(bytes, " + path + ")",  e);
+            beamOptional = Optional.empty();
         } catch (OtpErlangDecodeException e) {
             LOGGER.error("OtpErlangDecodeException during BeamFileImpl.buildFileStub(bytes, " + path + ")", e);
+            beamOptional = Optional.empty();
         }
 
-        ModuleStub moduleStub = buildModuleStub(stub, beam);
-
-        if (moduleStub == null) {
-            stub = null;
-        }
-
-        return stub;
+        return beamOptional.flatMap(BeamFileImpl::buildModuleStub).map(StubElement::getParentStub);
     }
 
-    @Nullable
-    private static ModuleStub buildModuleStub(PsiFileStub<ElixirFile> parentStub, Beam beam) {
-        ModuleStub moduleStub = null;
+    private static Optional<ModuleStub> buildModuleStub(@NotNull Beam beam) {
+        Optional<ModuleStub> moduleStubOptional = Optional.empty();
 
-        if (beam != null) {
-            Atoms atoms = beam.atoms();
+        Atoms atoms = beam.atoms();
 
-            if (atoms != null) {
-                String moduleName = atoms.moduleName();
+        if (atoms != null) {
+            String moduleName = atoms.moduleName();
 
-                if (moduleName != null) {
-                    String name = defmoduleArgument(moduleName);
-                    moduleStub = new ModuleStubImpl(parentStub, name);
+            if (moduleName != null) {
+                String name = defmoduleArgument(moduleName);
+                ElixirFileStubImpl parentStub = new ElixirFileStubImpl();
+                ModuleStub moduleStub = new ModuleStubImpl(parentStub, name);
 
-                    buildCallDefinitions(moduleStub, beam, atoms);
-                }
+                buildCallDefinitions(moduleStub, beam, atoms);
+
+                moduleStubOptional = Optional.of(moduleStub);
             }
         }
 
-        return moduleStub;
+        return moduleStubOptional;
     }
 
     private static void buildCallDefinitions(@NotNull ModuleStub parentStub, @NotNull Beam beam, @NotNull Atoms atoms) {

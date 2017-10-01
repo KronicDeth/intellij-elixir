@@ -1,9 +1,9 @@
 # Source code recreated from a .beam file by IntelliJ Elixir
-defmodule AtU8Test do
+defmodule :certifi_cacerts do
 
   # Functions
 
-  def __info__(p0) do
+  def ders() do
     # body not decompiled
   end
 
@@ -12,10 +12,6 @@ defmodule AtU8Test do
   end
 
   def module_info(p0) do
-    # body not decompiled
-  end
-
-  def こんにちは世界() do
     # body not decompiled
   end
 end
