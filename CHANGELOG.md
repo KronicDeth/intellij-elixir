@@ -140,11 +140,13 @@
       * Atoms will resolve to modules if the atom is a module name.  If the atom is quoted and contains interpolation, it will treat each interpolation as `.*` and look for regex matches to this derived potential atom name.
   * Completions for functions after `.` will now work at the end of file.  Previously, completions only worked in the middle of a file, where the `.` could parse the next work an existing call, now if that parse doesn't work and the only thing after is a new line, it will still complete.
 * [#830](https://github.com/KronicDeth/intellij-elixir/pull/830) - Auto test for mix test case runner will automatically run tests after a change is detected in the project files, which normally happens on save, which happens when losing focus on a changed editor tab by default. - [@nivanson](https://github.com/nivanson)
+* [#840](https://github.com/KronicDeth/intellij-elixir/pull/840) - Regression test for [#821](https://github.com/KronicDeth/intellij-elixir/issues/821) - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#816](https://github.com/KronicDeth/intellij-elixir/pull/816) - Add notice for debug blacklist that it uses atoms, not Aliases, so you need to qualifier module aliases with `Elixir.` - [@merqlove](https://github.com/merqlove)
 * [#817](https://github.com/KronicDeth/intellij-elixir/pull/817) - Support atoms (prefixed with `:`) and`Elixir.` and plain Aliases for debugger blacklist. - [@merqlove](https://github.com/merglove)
 * [#832](https://github.com/KronicDeth/intellij-elixir/pull/832) - Add space to import window text - [@kentongray](https://github.com/kentongray)
+* [#840](https://github.com/KronicDeth/intellij-elixir/pull/840) - Add `END` to allowed `keywordKey` tokens - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v6.1.1
 
