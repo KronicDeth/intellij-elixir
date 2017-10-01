@@ -2848,6 +2848,7 @@ keywordKey ::= AFTER |
                DIVISION_OPERATOR |
                DUAL_OPERATOR |
                ELSE |
+               END |
                IDENTIFIER_TOKEN |
                IN_MATCH_OPERATOR |
                IN_OPERATOR |
