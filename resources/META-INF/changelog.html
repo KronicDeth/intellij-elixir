@@ -63,6 +63,7 @@
         which normally happens on save, which happens when losing focus on a changed editor tab by default.
       </li>
       <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/821">#821</a></li>
+      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/803">#803</a></li>
     </ul>
   </li>
   <li>
@@ -75,6 +76,18 @@
       <li>Support atoms (prefixed with <code>:</code>) and<code>Elixir.</code> and plain Aliases for debugger blacklist.</li>
       <li>Add space to import window text</li>
       <li>Add <code>END</code> to allowed <code>keywordKey</code> tokens</li>
+      <li>
+        Only use "Macros" as first header in decompiled <code>.beam</code> files if <code>macro</code> is
+        <code>defmacro</code>.  "Macros" header was being printed when there was only functions because the check when
+        there was no <code>lastMacroNameArity</code> didn't care what the current <code>macroNameArity.macro</code> was.
+      </li>
+      <li>
+        When an <code>.erl</code> file has <code>-compile([compressed])</code>, it will be compiled normally, and then
+        gzipped, so that the <code>.beam</code> will not contain the BEAM magic number <code>FOR1</code>, but instead
+        the gzip magic number <code>0x1f</code> <code>0x8b</code>.  So, to properly handle normal and compressed, the
+        decompiler needs to look-ahead 2-bytes and check the gzip magic number.  If the gzip magic number is detected,
+        the InputStream will be passed through <code>GZIPInputStream</code> before the the normal decoding process.
+      </li>
     </ul>
   </li>
 </ul>
