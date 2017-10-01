@@ -87,7 +87,11 @@ public class Decompiler implements BinaryFileDecompiler {
 
         for (MacroNameArity macroNameArity : macroNameAritySortedSet) {
             if (lastMacroNameArity == null) {
-                appendHeader(decompiled, "Macros");
+                if (macroNameArity.macro.equals(DEFMACRO)) {
+                    appendHeader(decompiled, "Macros");
+                } else if (macroNameArity.macro.equals(DEF)) {
+                    appendHeader(decompiled, "Functions");
+                }
             } else if (lastMacroNameArity.macro.equals(DEFMACRO) && macroNameArity.macro.equals(DEF)) {
                 appendHeader(decompiled, "Functions");
             }

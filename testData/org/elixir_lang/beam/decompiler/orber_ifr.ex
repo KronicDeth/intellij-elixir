@@ -1,7 +1,7 @@
 # Source code recreated from a .beam file by IntelliJ Elixir
 defmodule :orber_ifr do
 
-  # Macros
+  # Functions
 
   def unquote(:AliasDef__get_absolute_name)(p0) do
     # body not decompiled

@@ -1,7 +1,7 @@
 # Source code recreated from a .beam file by IntelliJ Elixir
 defmodule AtU8Test do
 
-  # Macros
+  # Functions
 
   def __info__(p0) do
     # body not decompiled

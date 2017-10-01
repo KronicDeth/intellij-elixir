@@ -1,7 +1,7 @@
 # Source code recreated from a .beam file by IntelliJ Elixir
 defmodule :rebar3_hex_config do
 
-  # Macros
+  # Functions
 
   def api_url() do
     # body not decompiled
