@@ -14,11 +14,10 @@ import org.jetbrains.annotations.Nullable;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.zip.GZIPInputStream;
 
 import static org.elixir_lang.beam.chunk.Chunk.TypeID.*;
 import static org.elixir_lang.beam.chunk.Chunk.length;
@@ -28,6 +27,10 @@ import static org.elixir_lang.beam.chunk.Chunk.typeID;
  * See http://beam-wisdoms.clau.se/en/latest/indepth-beam-file.html
  */
 public class Beam {
+
+    private static final int GZIP_FIRST_UNSIGNED_BYTE = 0x1f;
+    private static final int GZIP_SECOND_UNSIGNED_BYTE = 0x8b;
+
     private static final String HEADER = "FOR1";
 
     /*
@@ -121,35 +124,58 @@ public class Beam {
         return new Beam(chunkList);
     }
 
-    @Nullable
-    public static Beam from(@NotNull byte[] content, @NotNull String path)
+    @NotNull
+    public static Optional<Beam> from(@NotNull byte[] content, @NotNull String path)
             throws IOException, OtpErlangDecodeException {
-        return from(new DataInputStream(new ByteArrayInputStream(content)), path);
+        return decompressedInputStream(new ByteArrayInputStream(content))
+                .map(DataInputStream::new)
+                .flatMap(dataInputStream -> Optional.ofNullable(Beam.from(dataInputStream, path)));
     }
 
-    @Nullable
-    public static Beam from(@NotNull FileContent fileContent) throws IOException, OtpErlangDecodeException {
+    @NotNull
+    public static Optional<Beam> from(@NotNull FileContent fileContent) throws IOException, OtpErlangDecodeException {
         return from(fileContent.getContent(), fileContent.getFile().getPath());
     }
 
-    @Nullable
-    public static Beam from(@NotNull VirtualFile virtualFile) {
-        Beam beam = null;
-
-        DataInputStream dataInputStream;
+    private static Optional<InputStream> virtualFileToInputStream(@NotNull VirtualFile virtualFile) {
+        Optional<InputStream> inputStreamOptional;
 
         try {
-            dataInputStream = new DataInputStream(virtualFile.getInputStream());
-        } catch (IOException ioException) {
-            dataInputStream = null;
+            inputStreamOptional = Optional.of(virtualFile.getInputStream());
+        } catch (IOException e) {
+            inputStreamOptional = Optional.empty();
         }
 
-        if (dataInputStream != null) {
-            String path = virtualFile.getPath();
-            beam = Beam.from(dataInputStream, path);
+        return inputStreamOptional;
+    }
+
+    private static Optional<InputStream> decompressedInputStream(@NotNull InputStream inputStream) {
+        assert inputStream.markSupported();
+
+        inputStream.mark(2);
+        Optional<InputStream> decompressedInputStreamOptional;
+
+        try {
+            if (inputStream.read() == GZIP_FIRST_UNSIGNED_BYTE && inputStream.read() == GZIP_SECOND_UNSIGNED_BYTE) {
+                inputStream.reset();
+                decompressedInputStreamOptional = Optional.of(new GZIPInputStream(inputStream));
+            } else {
+                inputStream.reset();
+                decompressedInputStreamOptional = Optional.of(inputStream);
+            }
+        } catch (IOException e) {
+            decompressedInputStreamOptional = Optional.empty();
         }
 
-        return beam;
+        return decompressedInputStreamOptional;
+    }
+
+    @NotNull
+    public static Optional<Beam> from(@NotNull VirtualFile virtualFile) {
+        return virtualFileToInputStream(virtualFile)
+                .flatMap(Beam::decompressedInputStream)
+                .map(DataInputStream::new)
+                .flatMap(dataInputStream -> Optional.ofNullable(Beam.from(dataInputStream, virtualFile.getPath())));
     }
 
     public static boolean is(@NotNull VirtualFile virtualFile) {

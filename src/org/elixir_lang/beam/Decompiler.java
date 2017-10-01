@@ -12,12 +12,8 @@ import org.elixir_lang.beam.decompiler.InfixOperator;
 import org.elixir_lang.beam.decompiler.PrefixOperator;
 import org.elixir_lang.beam.decompiler.Unquoted;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.SortedSet;
+import java.util.*;
 
 import static org.elixir_lang.beam.chunk.Chunk.TypeID.ATOM;
 import static org.elixir_lang.psi.call.name.Function.DEF;
@@ -36,10 +32,13 @@ public class Decompiler implements BinaryFileDecompiler {
     }
 
     @NotNull
-    private static CharSequence decompiled(@Nullable Beam beam) {
+    private static CharSequence decompiled(
+            @SuppressWarnings("OptionalUsedAsFieldOrParameterType") @NotNull Optional<Beam> beamOptional
+    ) {
         StringBuilder decompiled = new StringBuilder("# Decompilation Error: ");
 
-        if (beam != null) {
+        if (beamOptional.isPresent()) {
+            Beam beam = beamOptional.get();
             Atoms atoms = beam.atoms();
 
             if (atoms != null) {
@@ -163,8 +162,6 @@ public class Decompiler implements BinaryFileDecompiler {
     @NotNull
     @Override
     public CharSequence decompile(@NotNull VirtualFile virtualFile) {
-        Beam beam = Beam.from(virtualFile);
-
-        return decompiled(beam);
+        return decompiled(Beam.from(virtualFile));
     }
 }
