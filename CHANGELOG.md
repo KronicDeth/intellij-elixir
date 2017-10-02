@@ -142,6 +142,7 @@
 * [#830](https://github.com/KronicDeth/intellij-elixir/pull/830) - Auto test for mix test case runner will automatically run tests after a change is detected in the project files, which normally happens on save, which happens when losing focus on a changed editor tab by default. - [@nivanson](https://github.com/nivanson)
 * [#840](https://github.com/KronicDeth/intellij-elixir/pull/840) - Regression test for [#821](https://github.com/KronicDeth/intellij-elixir/issues/821) - [@KronicDeth](https://github.com/KronicDeth)
 * [#841](https://github.com/KronicDeth/intellij-elixir/pull/841) - Regression test for [#803](https://github.com/KronicDeth/intellij-elixir/issues/803) - [@KronicDeth](https://github.com/KronicDeth)
+* [#842](https://github.com/KronicDeth/intellij-elixir/pull/842) - Regression test for [#833](https://github.com/KronicDeth/intellij-elixir/issues/833) - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#816](https://github.com/KronicDeth/intellij-elixir/pull/816) - Add notice for debug blacklist that it uses atoms, not Aliases, so you need to qualifier module aliases with `Elixir.` - [@merqlove](https://github.com/merqlove)
@@ -151,6 +152,7 @@
 * [#841](https://github.com/KronicDeth/intellij-elixir/pull/841) - [@KronicDeth](https://github.com/KronicDeth)
   * Only use "Macros" as first header in decompiled `.beam` files if `macro` is `defmacro`.  "Macros" header was being printed when there was only functions because the check when there was no `lastMacroNameArity` didn't care what the current `macroNameArity.macro` was.
   * When an `.erl` file has `-compile([compressed])`, it will be compiled normally, and then gzipped, so that the `.beam` will not contain the BEAM magic number `FOR1`, but instead the gzip magic number `0x1f` `0x8b`.  So, to properly handle normal and compressed, the decompiler needs to look-ahead 2-bytes and check the gzip magic number.  If the gzip magic number is detected, the InputStream will be passed through `GZIPInputStream` before the the normal decoding process.
+* [#842](https://github.com/KronicDeth/intellij-elixir/pull/842) - When decompiling function and macro names from Erlang module, its possible for the name to contain `#` and they would be interpreted as comments.  Accepting those names in `Unquoted` wouldn't escape the `#` from being treated as a comment, so in addition to `unquote`ing the name, surround it in double quotes. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v6.1.1
 
