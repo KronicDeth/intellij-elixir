@@ -129,6 +129,10 @@ public class DecompilerTest extends LightCodeInsightTestCase {
         assertDecompiled("certifi_cacerts");
     }
 
+    public void testIssue833() throws IOException, OtpErlangDecodeException {
+        assertDecompiled("docgen_xmerl_xml_cb");
+    }
+
     public void testElixir_1_5_0() throws IOException, OtpErlangDecodeException {
         assertDecompiled("OTP20/Elixir.AtU8Test");
     }

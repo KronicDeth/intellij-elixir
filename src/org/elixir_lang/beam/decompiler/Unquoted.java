@@ -1,6 +1,7 @@
 package org.elixir_lang.beam.decompiler;
 
 import gnu.trove.THashSet;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
@@ -44,6 +45,11 @@ public class Unquoted extends MacroNameArity {
         return Character.isUpperCase(name.codePointAt(0));
     }
 
+    @Contract(pure = true)
+    private static boolean wouldParseAsComment(@NotNull String name) {
+        return name.contains("#");
+    }
+
     /*
      * Instance Methods
      */
@@ -58,7 +64,7 @@ public class Unquoted extends MacroNameArity {
     public boolean accept(@NotNull org.elixir_lang.beam.MacroNameArity macroNameArity) {
         String name = macroNameArity.name;
 
-        return wouldParseAsAlias(name) || isSpecialForm(name);
+        return wouldParseAsAlias(name) || wouldParseAsComment(name) || isSpecialForm(name);
     }
 
 
@@ -73,9 +79,22 @@ public class Unquoted extends MacroNameArity {
                 .append("  ")
                 .append(macroNameArity.macro)
                 .append(" unquote(:")
-                .append(macroNameArity.name)
+                .append(macroNameToAtomName(macroNameArity.name))
                 .append(")");
         appendParameters(decompiled, macroNameArity);
         appendBody(decompiled);
+    }
+
+    @NotNull
+    private StringBuilder macroNameToAtomName(@NotNull String macroName) {
+        StringBuilder atomName = new StringBuilder();
+
+        if (wouldParseAsComment(macroName)) {
+            atomName.append('"').append(macroName).append('"');
+        } else {
+            atomName.append(macroName);
+        }
+
+        return atomName;
     }
 }
