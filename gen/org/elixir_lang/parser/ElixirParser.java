@@ -1051,7 +1051,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   // AT_OPERATOR EOL*
   public static boolean atPrefixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "atPrefixOperator")) return false;
-    if (!nextTokenIs(b, AT_OPERATOR)) return false;
+    if (!nextTokenIs(b, "<@>", AT_OPERATOR)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, AT_PREFIX_OPERATOR, "<@>");
     r = consumeToken(b, AT_OPERATOR);
@@ -1369,7 +1369,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   // CAPTURE_OPERATOR EOL*
   public static boolean capturePrefixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "capturePrefixOperator")) return false;
-    if (!nextTokenIs(b, CAPTURE_OPERATOR)) return false;
+    if (!nextTokenIs(b, "<&>", CAPTURE_OPERATOR)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, CAPTURE_PREFIX_OPERATOR, "<&>");
     r = consumeToken(b, CAPTURE_OPERATOR);
@@ -3552,7 +3552,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   // STRUCT_OPERATOR EOL*
   public static boolean mapPrefixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "mapPrefixOperator")) return false;
-    if (!nextTokenIs(b, STRUCT_OPERATOR)) return false;
+    if (!nextTokenIs(b, "<%>", STRUCT_OPERATOR)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, MAP_PREFIX_OPERATOR, "<%>");
     r = consumeToken(b, STRUCT_OPERATOR);

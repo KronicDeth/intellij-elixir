@@ -418,7 +418,7 @@
     SIGIL_FRAGMENT = "Sigil Fragment"
     SIGIL_HEREDOC_PROMOTER = "Sigil Heredoc Promoter (\"\"\", ''')"
     SIGIL_HEREDOC_TERMINATOR = "Sigil Heredoc Terminator (\"\"\", ''')"
-    SIGIL_MODIFIER = "a-z"
+    SIGIL_MODIFIER = "Sigil Modifier (A-Z, a-z)"
     SIGIL_PROMOTER = "Sigil Promoter ({, [, <, \", /, (, |, ')"
     SIGIL_TERMINATOR = "Sigil Terminator ({, [, <, \", /, (, |, ')"
     SIGNIFICANT_WHITE_SPACE = "<significant-space>";

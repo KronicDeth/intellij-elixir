@@ -36,7 +36,7 @@ public abstract class Test extends TokenTest {
         return Arrays.asList(new Object[][]{
                         { " ", TokenType.WHITE_SPACE, ElixirFlexLexer.YYINITIAL },
                         { ";", ElixirTypes.SEMICOLON, ElixirFlexLexer.YYINITIAL },
-                        { "A", ElixirTypes.ALIAS_TOKEN, ElixirFlexLexer.KEYWORD_PAIR_MAYBE },
+                        { "A", ElixirTypes.SIGIL_MODIFIER, ElixirFlexLexer.SIGIL_MODIFIERS },
                         { "\n", ElixirTypes.EOL, ElixirFlexLexer.YYINITIAL },
                         { "\r\n", ElixirTypes.EOL, ElixirFlexLexer.YYINITIAL },
                         { "a", ElixirTypes.SIGIL_MODIFIER, ElixirFlexLexer.SIGIL_MODIFIERS }

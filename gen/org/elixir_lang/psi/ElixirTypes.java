@@ -318,7 +318,7 @@ public interface ElixirTypes {
   IElementType SIGIL_FRAGMENT = new ElixirTokenType("Sigil Fragment");
   IElementType SIGIL_HEREDOC_PROMOTER = new ElixirTokenType("Sigil Heredoc Promoter (\"\"\", ''')");
   IElementType SIGIL_HEREDOC_TERMINATOR = new ElixirTokenType("Sigil Heredoc Terminator (\"\"\", ''')");
-  IElementType SIGIL_MODIFIER = new ElixirTokenType("a-z");
+  IElementType SIGIL_MODIFIER = new ElixirTokenType("Sigil Modifier (A-Z, a-z)");
   IElementType SIGIL_PROMOTER = new ElixirTokenType("Sigil Promoter ({, [, <, \", /, (, |, ')");
   IElementType SIGIL_TERMINATOR = new ElixirTokenType("Sigil Terminator ({, [, <, \", /, (, |, ')");
   IElementType SIGNIFICANT_WHITE_SPACE = new ElixirTokenType("<significant-space>");
