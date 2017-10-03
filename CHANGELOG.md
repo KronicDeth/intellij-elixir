@@ -143,6 +143,7 @@
 * [#840](https://github.com/KronicDeth/intellij-elixir/pull/840) - Regression test for [#821](https://github.com/KronicDeth/intellij-elixir/issues/821) - [@KronicDeth](https://github.com/KronicDeth)
 * [#841](https://github.com/KronicDeth/intellij-elixir/pull/841) - Regression test for [#803](https://github.com/KronicDeth/intellij-elixir/issues/803) - [@KronicDeth](https://github.com/KronicDeth)
 * [#842](https://github.com/KronicDeth/intellij-elixir/pull/842) - Regression test for [#833](https://github.com/KronicDeth/intellij-elixir/issues/833) - [@KronicDeth](https://github.com/KronicDeth)
+* [#843](https://github.com/KronicDeth/intellij-elixir/pull/843) - Port [elixir-lang/elixir#2774](https://github.com/elixir-lang/elixir/pull/2774): Allow `A-Z` as sigil modifiers in addition to `a-z` to support `U` ungreedy modifier that replaced `r` ungreedy modifier for regexes. - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#816](https://github.com/KronicDeth/intellij-elixir/pull/816) - Add notice for debug blacklist that it uses atoms, not Aliases, so you need to qualifier module aliases with `Elixir.` - [@merqlove](https://github.com/merqlove)
