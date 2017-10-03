@@ -481,7 +481,7 @@ TRUE = "true"
  */
 
 TILDE = "~"
-SIGIL_MODIFIER = [a-z]
+SIGIL_MODIFIER = [A-Za-z]
 SIGIL_NAME = [A-Za-z]
 
 /*
