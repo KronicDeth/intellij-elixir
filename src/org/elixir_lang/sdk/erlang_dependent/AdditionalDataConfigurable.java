@@ -5,27 +5,21 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.projectRoots.SdkModel;
 import com.intellij.openapi.projectRoots.SdkModificator;
-import com.intellij.openapi.projectRoots.SdkType;
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl;
-import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.util.Comparing;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.ListCellRendererWrapper;
-import com.intellij.util.ArrayUtil;
 import com.intellij.util.ui.JBUI;
 import org.elixir_lang.sdk.elixir.Type;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ItemEvent;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
 
-import static org.elixir_lang.sdk.HomePath.eachEbinPath;
-import static org.elixir_lang.sdk.Type.ebinPathChainVirtualFile;
+import static org.elixir_lang.sdk.elixir.Type.addNewCodePathsFromInternErlangSdk;
+import static org.elixir_lang.sdk.elixir.Type.removeCodePathsFromInternalErlangSdk;
 import static org.elixir_lang.sdk.erlang_dependent.Type.staticIsValidDependency;
 
 public class AdditionalDataConfigurable implements com.intellij.openapi.projectRoots.AdditionalDataConfigurable {
@@ -133,34 +127,13 @@ public class AdditionalDataConfigurable implements com.intellij.openapi.projectR
         internalErlangSdksComboBox.addItemListener(itemEvent -> {
             if (!freeze) {
                 final int stateChange = itemEvent.getStateChange();
-
-                if (stateChange == ItemEvent.SELECTED) {
-                    modified = true;
-                }
-
                 final Sdk internalErlangSdk = (Sdk) itemEvent.getItem();
-                final SdkType internalSdkType = (SdkType) internalErlangSdk.getSdkType();
-                final SdkType elixirSdkType = (SdkType) elixirSdk.getSdkType();
 
-                for (OrderRootType type : OrderRootType.getAllTypes()) {
-                    if (internalSdkType.isRootTypeApplicable(type) && elixirSdkType.isRootTypeApplicable(type)) {
-                        final VirtualFile[] internalRoots = internalErlangSdk.getSdkModificator().getRoots(type);
-                        final VirtualFile[] configuredRoots = sdkModificator.getRoots(type);
-
-                        for (VirtualFile internalRoot : internalRoots) {
-
-                            for (VirtualFile expandedInternalRoot : expandInternalRoot(internalRoot, type)) {
-                                if (stateChange == ItemEvent.DESELECTED) {
-                                    // Remove roots copied from old Erlang SDK
-                                    sdkModificator.removeRoot(expandedInternalRoot, type);
-                                } else if (ArrayUtil.find(configuredRoots, expandedInternalRoot) == -1) {
-                                    /* Copy roots from new Erlang SDK, so that completion works for Erlang SDK beams.
-                                       See #829. */
-                                    sdkModificator.addRoot(expandedInternalRoot, type);
-                                }
-                            }
-                        }
-                    }
+                if (stateChange == ItemEvent.DESELECTED) {
+                    removeCodePathsFromInternalErlangSdk(elixirSdk, internalErlangSdk, sdkModificator);
+                } else if (stateChange == ItemEvent.SELECTED) {
+                    addNewCodePathsFromInternErlangSdk(elixirSdk, internalErlangSdk, sdkModificator);
+                    modified = true;
                 }
             }
         });
@@ -168,30 +141,6 @@ public class AdditionalDataConfigurable implements com.intellij.openapi.projectR
         modified = true;
 
         return wholePanel;
-    }
-
-    @NotNull
-    private Iterable<VirtualFile> expandInternalRoot(@NotNull VirtualFile internalRoot, OrderRootType type) {
-        java.util.List<VirtualFile> expandedInternalRootList;
-
-        if (type == OrderRootType.CLASSES) {
-            final String path = internalRoot.getPath();
-
-            /* Erlang SDK from intellij-erlang uses lib/erlang/lib as class path, but intellij-elixir needs the ebin
-               directories under lib/erlang/lib/APP-VERSION/ebin that works as a code path used by `-pa` argument to
-               `erl.exe` */
-            if (path.endsWith("lib/erlang/lib")) {
-                expandedInternalRootList = new ArrayList<>();
-                String parentPath = Paths.get(path).getParent().toString();
-                eachEbinPath(parentPath, ebinPath -> ebinPathChainVirtualFile(ebinPath, expandedInternalRootList::add));
-            } else {
-                expandedInternalRootList = Collections.singletonList(internalRoot);
-            }
-        } else {
-            expandedInternalRootList = Collections.singletonList(internalRoot);
-        }
-
-        return expandedInternalRootList;
     }
 
     private void internalErlangSdkUpdate(final Sdk sdk) {
@@ -209,15 +158,22 @@ public class AdditionalDataConfigurable implements com.intellij.openapi.projectR
     }
 
     public void apply() throws ConfigurationException {
+        writeInternalErlangSdk((Sdk) internalErlangSdksComboBox.getSelectedItem());
+        modified = false;
+    }
+
+    private void writeInternalErlangSdk(@Nullable Sdk erlangSdk) {
+        writeInternalErlangSdk(elixirSdk.getSdkModificator(), erlangSdk);
+    }
+
+    private void writeInternalErlangSdk(@NotNull SdkModificator sdkModificator, @Nullable Sdk erlangSdk) {
         SdkAdditionalData sdkAdditionData = new SdkAdditionalData(
-                (Sdk) internalErlangSdksComboBox.getSelectedItem(),
+                erlangSdk,
                 elixirSdk
         );
-        final SdkModificator modificator = elixirSdk.getSdkModificator();
-        modificator.setSdkAdditionalData(sdkAdditionData);
-        ApplicationManager.getApplication().runWriteAction(() -> modificator.commitChanges());
+        sdkModificator.setSdkAdditionalData(sdkAdditionData);
+        ApplicationManager.getApplication().runWriteAction(sdkModificator::commitChanges);
         ((ProjectJdkImpl) elixirSdk).resetVersionString();
-        modified = false;
     }
 
     public void reset() {
