@@ -20,7 +20,6 @@ import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.psi.PsiElement;
-import com.intellij.util.Function;
 import gnu.trove.THashSet;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.ArrayUtils;
@@ -40,6 +39,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import static org.elixir_lang.sdk.HomePath.*;
@@ -55,7 +55,6 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
     private static final Set<String> SDK_HOME_CHILD_BASE_NAME_SET = new THashSet<>(Arrays.asList("bin", "lib", "src"));
     private static final String WINDOWS_32BIT_DEFAULT_HOME_PATH = "C:\\Program Files\\Elixir";
     private static final String WINDOWS_64BIT_DEFAULT_HOME_PATH = "C:\\Program Files (x86)\\Elixir";
-    private static final Function<File, File> ID = file -> file;
     private final Map<String, Release> mySdkHomeToReleaseCache =
             ApplicationManager.getApplication().isUnitTestMode() ? new HashMap<>() : new WeakHashMap<>();
 
@@ -566,8 +565,8 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
         );
 
         if (SystemInfo.isMac) {
-            mergeHomebrew(homePathByVersion, "elixir", ID);
-            mergeNixStore(homePathByVersion, NIX_PATTERN, ID);
+            mergeHomebrew(homePathByVersion, "elixir", java.util.function.Function.identity());
+            mergeNixStore(homePathByVersion, NIX_PATTERN, Function.identity());
         } else {
             String sdkPath;
 
@@ -582,7 +581,7 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
             } else if (SystemInfo.isLinux) {
                 homePathByVersion.put(UNKNOWN_VERSION, LINUX_DEFAULT_HOME_PATH);
 
-                mergeNixStore(homePathByVersion, NIX_PATTERN, ID);
+                mergeNixStore(homePathByVersion, NIX_PATTERN, Function.identity());
             }
         }
 

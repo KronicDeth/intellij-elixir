@@ -11,7 +11,6 @@ import com.intellij.openapi.roots.JavadocOrderRootType;
 import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.Version;
-import com.intellij.util.Function;
 import com.intellij.util.containers.WeakHashMap;
 import org.elixir_lang.jps.model.JpsErlangSdkType;
 import org.elixir_lang.sdk.HomePath;
@@ -22,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.*;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import static org.elixir_lang.sdk.HomePath.*;
@@ -123,6 +123,7 @@ public class Type extends SdkType {
             } else if (SystemInfo.isLinux) {
                 putIfDirectory(homePathByVersion, UNKNOWN_VERSION, LINUX_DEFAULT_HOME_PATH);
 
+                mergeTravisCIKerl(homePathByVersion, Function.identity());
                 mergeNixStore(homePathByVersion, NIX_PATTERN, VERSION_PATH_TO_HOME_PATH);
             }
         }
