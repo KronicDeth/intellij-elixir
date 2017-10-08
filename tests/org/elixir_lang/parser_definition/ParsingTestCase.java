@@ -298,6 +298,7 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
                 com.intellij.openapi.projectRoots.SdkType.class
         );
         registerExtension(com.intellij.openapi.projectRoots.SdkType.EP_NAME, new Type());
+        registerExtension(com.intellij.openapi.projectRoots.SdkType.EP_NAME, new org.elixir_lang.sdk.erlang.Type());
 
         Sdk sdk = Type.createMockSdk(sdkHome, elixirSdkRelease());
         projectJdkTable.addJdk(sdk);
