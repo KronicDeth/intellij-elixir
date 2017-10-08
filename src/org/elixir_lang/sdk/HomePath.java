@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -30,11 +31,11 @@ public class HomePath {
     public static void eachEbinPath(@NotNull String homePath, @NotNull Consumer<Path> ebinPathConsumer) {
         Path lib = Paths.get(homePath, "lib");
 
-        try {
-            Files.newDirectoryStream(lib).forEach(
+        try (DirectoryStream<Path> libDirectoryStream = Files.newDirectoryStream(lib)) {
+            libDirectoryStream.forEach(
                     app -> {
-                        try {
-                            Files.newDirectoryStream(app, "ebin").forEach(ebinPathConsumer);
+                        try (DirectoryStream<Path> ebinDirectoryStream = Files.newDirectoryStream(app, "ebin")) {
+                            ebinDirectoryStream.forEach(ebinPathConsumer);
                         } catch (IOException ioException) {
                             LOGGER.error(ioException);
                         }
