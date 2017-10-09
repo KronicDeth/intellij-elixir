@@ -20,14 +20,15 @@ import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.psi.PsiElement;
-import com.intellij.util.Function;
 import gnu.trove.THashSet;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.elixir_lang.icons.ElixirIcons;
 import org.elixir_lang.jps.model.JpsElixirModelSerializerExtension;
 import org.elixir_lang.jps.model.JpsElixirSdkType;
 import org.elixir_lang.sdk.HomePath;
 import org.elixir_lang.sdk.ProcessOutput;
+import org.elixir_lang.sdk.erlang_dependent.SdkModificatorRootTypeConsumer;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -38,12 +39,14 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import static org.elixir_lang.sdk.HomePath.*;
 import static org.elixir_lang.sdk.ProcessOutput.STANDARD_TIMEOUT;
 import static org.elixir_lang.sdk.ProcessOutput.transformStdoutLine;
 import static org.elixir_lang.sdk.Type.addCodePaths;
+import static org.elixir_lang.sdk.Type.ebinPathChainVirtualFile;
 
 public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
     private static final String LINUX_DEFAULT_HOME_PATH = HomePath.LINUX_DEFAULT_HOME_PATH + "/elixir";
@@ -52,7 +55,6 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
     private static final Set<String> SDK_HOME_CHILD_BASE_NAME_SET = new THashSet<>(Arrays.asList("bin", "lib", "src"));
     private static final String WINDOWS_32BIT_DEFAULT_HOME_PATH = "C:\\Program Files\\Elixir";
     private static final String WINDOWS_64BIT_DEFAULT_HOME_PATH = "C:\\Program Files (x86)\\Elixir";
-    private static final Function<File, File> ID = file -> file;
     private final Map<String, Release> mySdkHomeToReleaseCache =
             ApplicationManager.getApplication().isUnitTestMode() ? new HashMap<>() : new WeakHashMap<>();
 
@@ -145,8 +147,97 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
         addCodePaths(sdkModificator);
         addDocumentationPaths(sdkModificator);
         addSourcePaths(sdkModificator);
+        configureInternalErlangSdk(sdk, sdkModificator);
 
         sdkModificator.commitChanges();
+    }
+
+    private static void configureInternalErlangSdk(@NotNull Sdk elixirSdk, @NotNull SdkModificator elixirSdkModificator) {
+        final Sdk erlangSdk = defaultErlangSdk();
+        SdkAdditionalData sdkAdditionData =
+                new org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData(erlangSdk, elixirSdk);
+        elixirSdkModificator.setSdkAdditionalData(sdkAdditionData);
+
+        if (erlangSdk != null) {
+            addNewCodePathsFromInternErlangSdk(elixirSdk, erlangSdk, elixirSdkModificator);
+        }
+    }
+
+    public static void addNewCodePathsFromInternErlangSdk(@NotNull Sdk elixirSdk,
+                                                          @NotNull Sdk internalErlangSdk,
+                                                          @NotNull SdkModificator elixirSdkModificator) {
+        codePathsFromInternalErlangSdk(
+                elixirSdk,
+                internalErlangSdk,
+                elixirSdkModificator,
+                (sdkModificator, configuredRoots, expandedInternalRoot, type) -> {
+                    if (!ArrayUtils.contains(configuredRoots, expandedInternalRoot)) {
+                        sdkModificator.addRoot(expandedInternalRoot, type);
+                    }
+                }
+        );
+    }
+
+    public static void removeCodePathsFromInternalErlangSdk(@NotNull Sdk elixirSdk,
+                                                          @NotNull Sdk internalErlangSdk,
+                                                          @NotNull SdkModificator elixirSdkModificator) {
+        codePathsFromInternalErlangSdk(
+                elixirSdk,
+                internalErlangSdk,
+                elixirSdkModificator,
+                (sdkModificator, configuredRoots, expandedInternalRoot, type) -> {
+                    sdkModificator.removeRoot(expandedInternalRoot, type);
+                }
+        );
+    }
+
+    private static void codePathsFromInternalErlangSdk(
+            @NotNull Sdk elixirSdk,
+            @NotNull Sdk internalErlangSdk,
+            @NotNull SdkModificator elixirSdkModificator,
+            @NotNull SdkModificatorRootTypeConsumer sdkModificatorRootTypeConsumer
+    ) {
+        final SdkType internalSdkType = (SdkType) internalErlangSdk.getSdkType();
+        final SdkType elixirSdkType = (SdkType) elixirSdk.getSdkType();
+
+        for (OrderRootType type : OrderRootType.getAllTypes()) {
+            if (internalSdkType.isRootTypeApplicable(type) && elixirSdkType.isRootTypeApplicable(type)) {
+                final VirtualFile[] internalRoots = internalErlangSdk.getSdkModificator().getRoots(type);
+                final VirtualFile[] configuredRoots = elixirSdkModificator.getRoots(type);
+
+                for (VirtualFile internalRoot : internalRoots) {
+                    for (VirtualFile expandedInternalRoot : expandInternalErlangSdkRoot(internalRoot, type)) {
+                        sdkModificatorRootTypeConsumer
+                                .consume(elixirSdkModificator, configuredRoots, expandedInternalRoot, type);
+                    }
+                }
+            }
+        }
+    }
+
+    @NotNull
+    private static Iterable<VirtualFile> expandInternalErlangSdkRoot(@NotNull VirtualFile internalRoot,
+                                                                     @NotNull OrderRootType type) {
+        java.util.List<VirtualFile> expandedInternalRootList;
+
+        if (type == OrderRootType.CLASSES) {
+            final String path = internalRoot.getPath();
+
+            /* Erlang SDK from intellij-erlang uses lib/erlang/lib as class path, but intellij-elixir needs the ebin
+               directories under lib/erlang/lib/APP-VERSION/ebin that works as a code path used by `-pa` argument to
+               `erl.exe` */
+            if (path.endsWith("lib/erlang/lib")) {
+                expandedInternalRootList = new ArrayList<>();
+                String parentPath = Paths.get(path).getParent().toString();
+                eachEbinPath(parentPath, ebinPath -> ebinPathChainVirtualFile(ebinPath, expandedInternalRootList::add));
+            } else {
+                expandedInternalRootList = Collections.singletonList(internalRoot);
+            }
+        } else {
+            expandedInternalRootList = Collections.singletonList(internalRoot);
+        }
+
+        return expandedInternalRootList;
     }
 
     @TestOnly
@@ -474,8 +565,8 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
         );
 
         if (SystemInfo.isMac) {
-            mergeHomebrew(homePathByVersion, "elixir", ID);
-            mergeNixStore(homePathByVersion, NIX_PATTERN, ID);
+            mergeHomebrew(homePathByVersion, "elixir", java.util.function.Function.identity());
+            mergeNixStore(homePathByVersion, NIX_PATTERN, Function.identity());
         } else {
             String sdkPath;
 
@@ -490,7 +581,7 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
             } else if (SystemInfo.isLinux) {
                 homePathByVersion.put(UNKNOWN_VERSION, LINUX_DEFAULT_HOME_PATH);
 
-                mergeNixStore(homePathByVersion, NIX_PATTERN, ID);
+                mergeNixStore(homePathByVersion, NIX_PATTERN, Function.identity());
             }
         }
 

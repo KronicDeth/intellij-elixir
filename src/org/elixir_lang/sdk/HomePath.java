@@ -2,18 +2,19 @@ package org.elixir_lang.sdk;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.Version;
-import com.intellij.util.Function;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,11 +31,11 @@ public class HomePath {
     public static void eachEbinPath(@NotNull String homePath, @NotNull Consumer<Path> ebinPathConsumer) {
         Path lib = Paths.get(homePath, "lib");
 
-        try {
-            Files.newDirectoryStream(lib).forEach(
+        try (DirectoryStream<Path> libDirectoryStream = Files.newDirectoryStream(lib)) {
+            libDirectoryStream.forEach(
                     app -> {
-                        try {
-                            Files.newDirectoryStream(app, "ebin").forEach(ebinPathConsumer);
+                        try (DirectoryStream<Path> ebinDirectoryStream = Files.newDirectoryStream(app, "ebin")) {
+                            ebinDirectoryStream.forEach(ebinPathConsumer);
                         } catch (IOException ioException) {
                             LOGGER.error(ioException);
                         }
@@ -53,8 +54,15 @@ public class HomePath {
     public static void mergeHomebrew(@NotNull Map<Version, String> homePathByVersion,
                                      @NotNull String name,
                                      @NotNull Function<File, File> versionPathToHomePath) {
-        if (HOMEBREW_ROOT.isDirectory()) {
-            File nameDirectory = new File(HOMEBREW_ROOT, name);
+        mergeNameSubdirectories(homePathByVersion, HOMEBREW_ROOT, name, versionPathToHomePath);
+    }
+
+    private static void mergeNameSubdirectories(@NotNull Map<Version, String> homePathByVersion,
+                                                @NotNull File parent,
+                                                @NotNull String name,
+                                                @NotNull Function<File, File> versionPathToHomePath) {
+        if (parent.isDirectory()) {
+            File nameDirectory = new File(parent, name);
 
             if (nameDirectory.isDirectory()) {
                 File[] files = nameDirectory.listFiles();
@@ -64,7 +72,7 @@ public class HomePath {
                         if (child.isDirectory()) {
                             String versionString = child.getName();
                             Version version = Version.parseVersion(versionString);
-                            File homePath = versionPathToHomePath.fun(child);
+                            File homePath = versionPathToHomePath.apply(child);
                             homePathByVersion.put(version, homePath.getAbsolutePath());
                         }
                     }
@@ -89,7 +97,7 @@ public class HomePath {
                             int bugfix = Integer.parseInt(matcher.group(3));
 
                             Version version = new Version(major, minor, bugfix);
-                            File homePath = versionPathToHomePath.fun(new File(dir, name));
+                            File homePath = versionPathToHomePath.apply(new File(dir, name));
 
                             homePathByVersion.put(version, homePath.getAbsolutePath());
                             accept = true;
@@ -97,6 +105,15 @@ public class HomePath {
                         return accept;
                     }
             );
+        }
+    }
+
+    public static void mergeTravisCIKerl(@NotNull Map<Version, String> homePathByVersion,
+                                         @NotNull Function<File, File> versionPathToHomePath) {
+        final String userHome = System.getProperty("user.home");
+
+        if (userHome != null) {
+            mergeNameSubdirectories(homePathByVersion, new File(userHome), "otp", versionPathToHomePath);
         }
     }
 

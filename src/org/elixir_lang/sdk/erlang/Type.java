@@ -11,7 +11,6 @@ import com.intellij.openapi.roots.JavadocOrderRootType;
 import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.Version;
-import com.intellij.util.Function;
 import com.intellij.util.containers.WeakHashMap;
 import org.elixir_lang.jps.model.JpsErlangSdkType;
 import org.elixir_lang.sdk.HomePath;
@@ -22,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.*;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import static org.elixir_lang.sdk.HomePath.*;
@@ -118,20 +118,27 @@ public class Type extends SdkType {
             mergeHomebrew(homePathByVersion, "erlang", VERSION_PATH_TO_HOME_PATH);
             mergeNixStore(homePathByVersion, NIX_PATTERN, VERSION_PATH_TO_HOME_PATH);
         } else {
-            String sdkPath;
-
             if (SystemInfo.isWindows) {
-                sdkPath = WINDOWS_DEFAULT_HOME_PATH;
-
-                homePathByVersion.put(UNKNOWN_VERSION, sdkPath);
+                putIfDirectory(homePathByVersion, UNKNOWN_VERSION, WINDOWS_DEFAULT_HOME_PATH);
             } else if (SystemInfo.isLinux) {
-                homePathByVersion.put(UNKNOWN_VERSION, LINUX_DEFAULT_HOME_PATH);
+                putIfDirectory(homePathByVersion, UNKNOWN_VERSION, LINUX_DEFAULT_HOME_PATH);
 
+                mergeTravisCIKerl(homePathByVersion, Function.identity());
                 mergeNixStore(homePathByVersion, NIX_PATTERN, VERSION_PATH_TO_HOME_PATH);
             }
         }
 
         return homePathByVersion;
+    }
+
+    private static void putIfDirectory(@NotNull Map<Version, String> homePathByVersion,
+                                       @NotNull Version version,
+                                       @NotNull String homePath) {
+        File homeFile = new File(homePath);
+
+        if (homeFile.isDirectory()) {
+            homePathByVersion.put(version, homePath);
+        }
     }
 
     @Override
