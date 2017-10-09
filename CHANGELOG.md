@@ -154,6 +154,12 @@
   * Only use "Macros" as first header in decompiled `.beam` files if `macro` is `defmacro`.  "Macros" header was being printed when there was only functions because the check when there was no `lastMacroNameArity` didn't care what the current `macroNameArity.macro` was.
   * When an `.erl` file has `-compile([compressed])`, it will be compiled normally, and then gzipped, so that the `.beam` will not contain the BEAM magic number `FOR1`, but instead the gzip magic number `0x1f` `0x8b`.  So, to properly handle normal and compressed, the decompiler needs to look-ahead 2-bytes and check the gzip magic number.  If the gzip magic number is detected, the InputStream will be passed through `GZIPInputStream` before the the normal decoding process.
 * [#842](https://github.com/KronicDeth/intellij-elixir/pull/842) - When decompiling function and macro names from Erlang module, its possible for the name to contain `#` and they would be interpreted as comments.  Accepting those names in `Unquoted` wouldn't escape the `#` from being treated as a comment, so in addition to `unquote`ing the name, surround it in double quotes. - [@KronicDeth](https://github.com/KronicDeth)
+* [#848](https://github.com/KronicDeth/intellij-elixir/pull/848) - [@KronicDeth](https://github.com/KronicDeth)
+  * `AdditionalDataConfigurable` only copied the the Internal Erlang SDK Code Paths when the selection in the `ComboBox` was changed, which meant if the there was only one Erlang SDK or the user never changed the selection, the Code Paths were never copied.  To get the Code Paths copied when the Elixir SDK is first created and `setupSdkPaths` interface method is called
+    1. All paths are set directly on the Elixir SDK as before
+    2. The default Erlang SDK, which should be the one that was last created, is configured in `SdkAdditionalaData`
+    3. The Code paths from the Erlang SDK are copied to the Elixir SDK
+        1. If the the Erlang SDK is from intellij-elixir and does not have `ebin` directories for its Class Paths, then the Class Paths is expanded to Code Paths.
 
 ## v6.1.1
 

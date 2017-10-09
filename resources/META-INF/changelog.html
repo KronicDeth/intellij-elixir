@@ -100,6 +100,27 @@
         wouldn't escape the <code>#</code> from being treated as a comment, so in addition to <code>unquote</code>ing
         the name, surround it in double quotes.
       </li>
+      <li>
+        <code>AdditionalDataConfigurable</code> only copied the the Internal Erlang SDK Code Paths when the selection in
+        the <code>ComboBox</code> was changed, which meant if the there was only one Erlang SDK or the user never
+        changed the selection, the Code Paths were never copied.  To get the Code Paths copied when the Elixir SDK is
+        first created and <code>setupSdkPaths</code> interface method is called
+        <ol>
+          <li>All paths are set directly on the Elixir SDK as before</li>
+          <li>
+            The default Erlang SDK, which should be the one that was last created, is configured in
+            <code>SdkAdditionalaData</code>
+          </li>
+          <li>The Code paths from the Erlang SDK are copied to the Elixir SDK
+            <ol>
+              <li>
+                If the the Erlang SDK is from intellij-elixir and does not have <code>ebin</code> directories for its
+                Class Paths, then the Class Paths is expanded to Code Paths.
+              </li>
+            </ol>
+          </li>
+        </ol>
+      </li>
     </ul>
   </li>
 </ul>
