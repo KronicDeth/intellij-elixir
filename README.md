@@ -90,6 +90,8 @@
       - [Module Attributes](#module-attributes)
       - [Parameters and Variables](#parameters-and-variables)
     - [Decompilation](#decompilation)
+      - [Decompression](#decompression)
+      - [Special handling of call definition names](#special-handling-of-call-definition-names)
     - [Go To Declaration](#go-to-declaration)
       - [Alias](#alias)
       - [Function or Macro](#function-or-macro)
@@ -137,7 +139,7 @@
   - [Screenshots](#screenshots)
   - [Error reporting](#error-reporting)
   - [Donations](#donations)
-    - [Public Donors](#public-donors)
+    - [Donors](#donors)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -1401,7 +1403,7 @@ After you have configured a [run configuration](#run-configuration) for your pro
 | -----------------------------------|------------| --------------------------------|
 | INTELLIJ\_ELIXIR\_DEBUG\_BLACKLIST | iconv,some | Excluding modules from debugger |
 
-*Notice: If you want non `Elixir.` module in blacklist, write it with: `:`.  
+*Notice: If you want non `Elixir.` module in blacklist, write it with: `:`.
 This rule applies only to module atoms.*
 
 #### Breakpoints
@@ -2106,7 +2108,297 @@ Parameter and variable usages can be completed whenever typing an identifier.  T
 
 ### Decompilation
 
-`.beam` files, such as those in the Elixir SDK and in your project's `build` directory will be decompiled to equivalent `def` and `defmacro` calls.  The bodies will not be decompiled, only the call definition head and placeholder parameters.  These decompiled call definition heads are enough to allow Go To Declaration, the Structure pane, and Completion to work with the decompiled `.beam` files.
+`.beam` files, such as those in the Elixir SDK, the Elixir SDK's Internal Erlang SDK, and in your project's `build` directory will be decompiled to equivalent `def` and `defmacro` calls.  The bodies will not be decompiled, only the call definition head and placeholder parameters.  These decompiled call definition heads are enough to allow Go To Declaration, the Structure pane, and Completion to work with the decompiled `.beam` files.
+
+`.beam` files are not detected purely by their file extension: the BEAM file format starts with a magic number, `FOR1`, that is checked for before decompiling.
+
+#### Decompression
+
+If the `.beam` module was compiled with the `compressed` compiler directive, which in Erlang looks like
+
+```erlang
+-compile([compressed])
+```
+
+and in Elixir looks like
+
+```elixir
+@compile [:compressed]
+```
+
+then the outer file format is [GZip](https://en.wikipedia.org/wiki/Gzip) (which is detected by checking for the gzip magic number, `1f 8b`, at the start of the file) and the `.beam` will be (stream) decompressed before the `.beam` header is checked and the chunks decoded.
+
+#### Special handling of call definition names
+
+Functions and macros can have names that aren't valid identifier names, so the decompiler has special handlers to detect these invalid identifiers and escape them to make decompiled code that is parsable as valid Elixir.
+
+<table cellspacing="0" cellpadding="0">
+  <thead>
+  <tr>
+    <td>Handler</td>
+    <td>Name/Arity</td>
+    <td>Decompiled</td>
+    <td>Reason</td>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+    <td rowspan="42">Infix Operator</td>
+    <td><code>!=/2</code></td>
+    <td><code>left != right</code></td>
+    <td rowspan="42">Infix operators are defined in infix position</td>
+  </tr>
+  <tr>
+    <td><code>!==/2</code></td>
+    <td><code>left !== right</code></td>
+  </tr>
+  <tr>
+    <td><code>&amp;&amp;/2</code></td>
+    <td><code>left &amp;&amp; right</code></td>
+  </tr>
+  <tr>
+    <td><code>&amp;&amp;&amp;/2</code></td>
+    <td><code>left &amp;&amp;&amp; right</code></td>
+  </tr>
+  <tr>
+    <td><code>*/2</code></td>
+    <td><code>left * right</code></td>
+  </tr>
+  <tr>
+    <td><code>=+/2</code></td>
+    <td><code>left + right</code></td>
+  </tr>
+  <tr>
+    <td><code>=++/2</code></td>
+    <td><code>left ++ right</code></td>
+  </tr>
+  <tr>
+    <td><code>-/2</code></td>
+    <td><code>left - right</code></td>
+  </tr>
+  <tr>
+    <td><code>--/2</code></td>
+    <td><code>left -- right</code></td>
+  </tr>
+  <tr>
+    <td><code>-&gt;/2</code></td>
+    <td><code>left -&gt; right</code></td>
+  </tr>
+  <tr>
+    <td><code>../2</code></td>
+    <td><code>left .. right</code></td>
+  </tr>
+  <tr>
+    <td><code>//2</code></td>
+    <td><code>left / right</code></td>
+  </tr>
+  <tr>
+    <td><code>::/2</code></td>
+    <td><code>left :: right</code></td>
+  </tr>
+  <tr>
+    <td><code>&lt;/2</code></td>
+    <td><code>left &lt; right</code></td>
+  </tr>
+  <tr>
+    <td><code>&lt;-/2</code></td>
+    <td><code>left &lt;- right</code></td>
+  </tr>
+  <tr>
+    <td><code>&lt;&lt;&lt;/2</code></td>
+    <td><code>left &lt;&lt;&lt; right</code></td>
+  </tr>
+  <tr>
+    <td><code>&lt;&lt;~/2</code></td>
+    <td><code>left &lt;&lt;~ right</code></td>
+  </tr>
+  <tr>
+    <td><code>&lt;=/2</code></td>
+    <td><code>left &lt;= right</code></td>
+  </tr>
+  <tr>
+    <td><code>&lt;&gt;/2</code></td>
+    <td><code>left &lt;&gt; right</code></td>
+  </tr>
+  <tr>
+    <td><code>&lt;|&gt;/2</code></td>
+    <td><code>left &lt;|&gt; right</code></td>
+  </tr>
+  <tr>
+    <td><code>&lt;~/2</code></td>
+    <td><code>left &lt;~ right</code></td>
+  </tr>
+  <tr>
+    <td><code>&lt;~&gt;/2</code></td>
+    <td><code>left &lt;~&gt; right</code></td>
+  </tr>
+  <tr>
+    <td><code>=/2</code></td>
+    <td><code>left = right</code></td>
+  </tr>
+  <tr>
+    <td><code>==/2</code></td>
+    <td><code>left == right</code></td>
+  </tr>
+  <tr>
+    <td><code>===/2</code></td>
+    <td><code>left === right</code></td>
+  </tr>
+  <tr>
+    <td><code>=&gt;/2</code></td>
+    <td><code>left =&gt; right</code></td>
+  </tr>
+  <tr>
+    <td><code>=~/2</code></td>
+    <td><code>left =~ right</code></td>
+  </tr>
+  <tr>
+    <td><code>&gt;/2</code></td>
+    <td><code>left &gt; right</code></td>
+  </tr>
+  <tr>
+    <td><code>&gt;=/2</code></td>
+    <td><code>left &gt;= right</code></td>
+  </tr>
+  <tr>
+    <td><code>&gt;&gt;&gt;/2</code></td>
+    <td><code>left &gt;&gt;&gt; right</code></td>
+  </tr>
+  <tr>
+    <td><code>\\/2</code></td>
+    <td><code>left \\\\ right</code></td>
+  </tr>
+  <tr>
+    <td><code>^/2</code></td>
+    <td><code>left ^ right</code></td>
+  </tr>
+  <tr>
+    <td><code>^^^/2</code></td>
+    <td><code>left ^^^ right</code></td>
+  </tr>
+  <tr>
+    <td><code>and/2</code></td>
+    <td><code>left and right</code></td>
+  </tr>
+  <tr>
+    <td><code>in/2</code></td>
+    <td><code>left in right</code></td>
+  </tr>
+  <tr>
+    <td><code>or/2</code></td>
+    <td><code>left or right</code></td>
+  </tr>
+  <tr>
+    <td><code>|&gt;/2</code></td>
+    <td><code>left |&gt; right</code></td>
+  </tr>
+  <tr>
+    <td><code>||/2</code></td>
+    <td><code>left || right</code></td>
+  </tr>
+  <tr>
+    <td><code>|||/2</code></td>
+    <td><code>left ||| right</code></td>
+  </tr>
+  <tr>
+    <td><code>~=/2</code></td>
+    <td><code>left ~= right</code></td>
+  </tr>
+  <tr>
+    <td><code>~&gt;/2</code></td>
+    <td><code>left ~&gt; right</code></td>
+  </tr>
+  <tr>
+    <td><code>~&gt;&gt;/2</code></td>
+    <td><code>left ~&gt;&gt; right</code></td>
+  </tr>
+  <tr>
+    <td rowspan="2">Prefix Operator</td>
+    <td><code>+/1</code></td>
+    <td><code>(+value)</code></td>
+    <td rowspan="2">To prevent precedence errors, unary prefix operators, which also have binary
+      infix operators of the same name need to be defined inside parentheses
+    </td>
+  </tr>
+  <tr>
+    <td><code>-/1</code></td>
+    <td><code>(-value)</code></td>
+  </tr>
+  <tr>
+    <td rowspan="12">Unquoted</td>
+    <td><code>%/2</code></td>
+    <td><code>unquote(:%)(p0, p1)</code></td>
+    <td rowspan="5">Special forms need to defined as atom passed to unquote, as special forms are
+      handled before macros defining the calls are applied
+    </td>
+  </tr>
+  <tr>
+    <td><code>%{}/1</code></td>
+    <td><code>unquote(:%{})(p0)</code></td>
+  </tr>
+  <tr>
+    <td><code>&amp;/1</code></td>
+    <td><code>unquote(:&amp;)(p0)</code></td>
+  </tr>
+  <tr>
+    <td><code>./2</code></td>
+    <td><code>unquote(:.)(p0, p1)</code></td>
+  </tr>
+  <tr>
+    <td><code>&lt;&lt;&gt;&gt;/1</code></td>
+    <td><code>unquote(:&lt;&lt;&gt;&gt;)(p0)</code></td>
+  </tr>
+  <tr>
+    <td><code>do/n</code></td>
+    <td><code>unquote(:do)(p0, ...)</code></td>
+    <td>Keywords need to be escaped</td>
+  </tr>
+  <tr>
+    <td><code>fn/1</code></td>
+    <td><code>unquote(:fn)(p0)</code></td>
+    <td rowspan="4">Special forms need to defined as atom passed to unquote, as special forms are
+      handled before macros defining the calls are applied
+    </td>
+  </tr>
+  <tr>
+    <td><code>unquote/1</code></td>
+    <td><code>unquote(:unquote)(p0)</code></td>
+  </tr>
+  <tr>
+    <td><code>unquote_splicing/1</code></td>
+    <td><code>unquote(:unquote_splicing)(p0)</code></td>
+  </tr>
+  <tr>
+    <td><code>{}/n</code></td>
+    <td><code>unquote(:{})(p0, ...)</code></td>
+  </tr>
+  <tr>
+    <td><code>Capitalized/n</code></td>
+    <td><code>unquote(:Capitalized)(p0, ...)</code></td>
+    <td>Part of the Corba libraries in OTP have functions starting with a capital letter, which
+      would be parsed as an Alias in Elixir if not unquoted.
+    </td>
+  </tr>
+  <tr>
+    <td><code>#text#/1</code></td>
+    <td><code>unquote(:"#text#")(p0)</code></td>
+    <td>
+      <div>Part of the XML libraries in OTP have functions
+        that start with or contain `#`, which would parse as a comment in Elixir if not unquoted in a double quoted
+        atom.
+      </div>
+    </td>
+  </tr>
+  <tr>
+    <td>Default</td>
+    <td><code>name/n</code></td>
+    <td><code>name(p0, ...)</code></td>
+    <td>If no specialized handler is required, functions and macros are defined normally with pN
+      for each parameter in the Nth position
+    </td>
+  </tr>
+  </tbody>
+</table>
 
 ### Go To Declaration
 
