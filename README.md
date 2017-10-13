@@ -118,6 +118,8 @@
       - [Rename](#rename)
         - [Module Attribute](#module-attribute-2)
         - [Parameters and Variables](#parameters-and-variables-3)
+    - [SDK](#sdk)
+      - [Default SDK](#default-sdk)
     - [Structure](#structure)
       - [Viewing Structure](#viewing-structure)
       - [Buttons](#buttons)
@@ -2718,6 +2720,60 @@ in a `defmodule`, is used, including in strings and comments.
         3. Select "Rename..." from the Refactoring submenu
     2. `Shift+F6`
 3. Edit the name inline and have the declaration and usages update.
+
+### SDK
+
+Because Elixir is built on top of Erlang, Elixir command line commands don't have OS native binaries, instead the OS native binaries from Erlang are used.  In order to reliably find the Erlang OS native binaries, like `erl` and `erl.exe`, the path to BOTH the Erlang SDK and the Elixir SDK must be configured.  This allows you to install Erlang and Elixir with completely different package managers too: you can install Erlang with `kerl` and Elixir with `kiex` and you don't have to worry about IntelliJ not seeing the environment variables set by `kerl` when launching IntelliJ from an application launchers instead of a terminal.
+
+Since JetBrains' OpenAPI only supports one SDK per Project or Module, to support Elixir and Erlang SDK at the same time, the Elixir SDK keeps track of an Internal Erlang SDK.  When setting up your first Elixir SDK, you will be prompted to create an Erlang SDK (if you have the [`intellij-erlang`](https://github.com/ignatov/intellij-erlang) plugin [installed](https://plugins.jetbrains.com/plugin/7083-erlang)) or and Erlang for Elixir SDK (if you don't have `intellij-erlang` installed and you need to use the minimal Erlang for Elixir SDK supplied by this plugin).
+
+With the Elixir SDK setup with an Internal Erlang SDK, you can see the Elixir SDK name and the home path, but unlike other SDKs, there's a dropdown for changing the Internal Erlang SDK.
+
+![Internal Erlang SDK](/screenshots/features/sdk/default/Internal%20Erlang%20SDK.png?raw=true "Internal Erlang SDK")
+
+You'll notice there is a mix of two different parent paths in Class Paths:
+
+1. Those from the Elixir SDK Home Directory, which are the `lib/APP/ebin` for the `APP`s that ships with Elixir: `eex`, `elixir`, `ex_unit`, `iex`, `logger`, and `mix`.
+
+   ![Elixir SDK Home Directory Class Paths.png](/screenshots/features/sdk/Elixir%20SDK%20Home%20Directory%20Class%20Paths.png?raw=true "Elixir SDK Home Directory Class Paths")
+
+2. Those from the Internal Erlang SDK Home Directory, which are the `lib/APP-VERSION/ebin` for the `APP`s that ship with OTP.
+
+   ![Erlang SDK Home Directory Class Paths.png](/screenshots/features/sdk/Erlang%20SDK%20Home%20Directory%20Class%20Paths.png?raw=true "Erlang SDK Home Directory Class Paths")
+
+The Class Paths are combined from the two SDKs because OpenAPI doesn't allow to dynamically delegate to the Internal Erlang SDK when checking for Class Paths to scan for completion and running.  If you change the Internal Erlang SDK in the dropdown, the Class Paths will be updated to remove the old Internal Erlang SDK Class Paths and add the new Internal Erlang SDK Class Paths.
+
+These Class Paths are not just for code completion and search anymore, all paths listed as passed with `-pa` flag to `erl` or `erl.exe` when running `mix`, so that you can mix different versions of OTP applications shipped with different version of OTP, so you can take advantage of the independently updatable OTP apps in the release notes for OTP.
+![Code Paths.png](/screenshots/features/sdk/Code%20Paths.png?raw=true "Code Paths")
+
+#### Default SDK
+
+1. The default SDK for new projects can we set from the Configure menu on Welcome Screen
+2. Hover over "Project Defaults" to see its submenu
+
+   ![Project Defaults](/screenshots/features/sdk/default/Project%20Defaults.png?raw=true "Configure > Project Defaults on the Welcome Screen")
+3. Select "Project Structure" from the submenu
+
+   ![Project Structure](/screenshots/features/sdk/default/Project%20Structure.png?raw=true "Configure > Project Defaults > Project Structure on the Welcome Screen")
+4. IntelliJ will start out with no default SDK.  To make the default SDK, an Elixir SDK, Click New
+
+   ![No SDK](/screenshots/features/sdk/default/No%20SDK.png?raw=true "No default SDK")
+5. Select "Elixir SDK"
+
+   ![Elixir SDK](/screenshots/features/sdk/default/Elixir%20SDK.png?raw=true "New > Elixir SDK")
+6. You'll get "Cannot Create SDK" message because there are no Erlang SDKs for the Elixir SDK to use as an Internal Erlang SDK.  Click OK to create the Erlang SDK first.
+
+   ![Cannot Create SDK](/screenshots/features/sdk/default/Cannot%20Create%20SDK.png?raw=true "Cannot Create SDK")
+7. You'll be actually prompted to Select Home Directory for the Erlang SDK
+   * If you have the [`intellij-erlang`](https://github.com/ignatov/intellij-erlang) plugin [installed](https://plugins.jetbrains.com/plugin/7083-erlang), you'll create an Erlang SDK from it.
+
+     ![Erlang SDK](/screenshots/features/sdk/default/Erlang%20SDK.png?raw=true "Erlang SDK")
+
+     **NOTE: Erlang SDK's default Home Directory favors the _oldest_ version of Erlang installed.  You probably want the newest version.  To manually select the Home Directory, it is the directory that contains the `bin`, `erts-VERSION`, and `lib` subdirectories.  For Homebrew, the path looks like `/usr/local/Cellar/erlang/VERSION/lib/erlang`.  It is important to select the `lib/erlang` directory and not the `VERSION` directory for `intellij-erlang` to accept it as a Home Directory.**
+   * If you don't have `intellij-erlang` installed, then you'll create and Erlang for Elixir SDK, which is supplied by this plugin.
+8. With an Erlang SDK available to use as the Internal Erlang SDK, you'll be prompted for the Home Directory for the Elixir SDK.
+
+   ![Elixir SDK Home Directory](/screenshots/features/sdk/default/Elixir%20SDK%20Home%20Directory.png?raw=true "Elixir SDK Home Directory")
 
 ### Structure
 
