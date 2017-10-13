@@ -90,6 +90,8 @@
       - [Module Attributes](#module-attributes)
       - [Parameters and Variables](#parameters-and-variables)
     - [Decompilation](#decompilation)
+      - [Decompression](#decompression)
+      - [Special handling of call definition names](#special-handling-of-call-definition-names)
     - [Go To Declaration](#go-to-declaration)
       - [Alias](#alias)
       - [Function or Macro](#function-or-macro)
@@ -116,6 +118,8 @@
       - [Rename](#rename)
         - [Module Attribute](#module-attribute-2)
         - [Parameters and Variables](#parameters-and-variables-3)
+    - [SDK](#sdk)
+      - [Default SDK](#default-sdk)
     - [Structure](#structure)
       - [Viewing Structure](#viewing-structure)
       - [Buttons](#buttons)
@@ -137,7 +141,7 @@
   - [Screenshots](#screenshots)
   - [Error reporting](#error-reporting)
   - [Donations](#donations)
-    - [Public Donors](#public-donors)
+    - [Donors](#donors)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -1401,7 +1405,7 @@ After you have configured a [run configuration](#run-configuration) for your pro
 | -----------------------------------|------------| --------------------------------|
 | INTELLIJ\_ELIXIR\_DEBUG\_BLACKLIST | iconv,some | Excluding modules from debugger |
 
-*Notice: If you want non `Elixir.` module in blacklist, write it with: `:`.  
+*Notice: If you want non `Elixir.` module in blacklist, write it with: `:`.
 This rule applies only to module atoms.*
 
 #### Breakpoints
@@ -2106,7 +2110,297 @@ Parameter and variable usages can be completed whenever typing an identifier.  T
 
 ### Decompilation
 
-`.beam` files, such as those in the Elixir SDK and in your project's `build` directory will be decompiled to equivalent `def` and `defmacro` calls.  The bodies will not be decompiled, only the call definition head and placeholder parameters.  These decompiled call definition heads are enough to allow Go To Declaration, the Structure pane, and Completion to work with the decompiled `.beam` files.
+`.beam` files, such as those in the Elixir SDK, the Elixir SDK's Internal Erlang SDK, and in your project's `build` directory will be decompiled to equivalent `def` and `defmacro` calls.  The bodies will not be decompiled, only the call definition head and placeholder parameters.  These decompiled call definition heads are enough to allow Go To Declaration, the Structure pane, and Completion to work with the decompiled `.beam` files.
+
+`.beam` files are not detected purely by their file extension: the BEAM file format starts with a magic number, `FOR1`, that is checked for before decompiling.
+
+#### Decompression
+
+If the `.beam` module was compiled with the `compressed` compiler directive, which in Erlang looks like
+
+```erlang
+-compile([compressed])
+```
+
+and in Elixir looks like
+
+```elixir
+@compile [:compressed]
+```
+
+then the outer file format is [GZip](https://en.wikipedia.org/wiki/Gzip) (which is detected by checking for the gzip magic number, `1f 8b`, at the start of the file) and the `.beam` will be (stream) decompressed before the `.beam` header is checked and the chunks decoded.
+
+#### Special handling of call definition names
+
+Functions and macros can have names that aren't valid identifier names, so the decompiler has special handlers to detect these invalid identifiers and escape them to make decompiled code that is parsable as valid Elixir.
+
+<table cellspacing="0" cellpadding="0">
+  <thead>
+  <tr>
+    <td>Handler</td>
+    <td>Name/Arity</td>
+    <td>Decompiled</td>
+    <td>Reason</td>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+    <td rowspan="42">Infix Operator</td>
+    <td><code>!=/2</code></td>
+    <td><code>left != right</code></td>
+    <td rowspan="42">Infix operators are defined in infix position</td>
+  </tr>
+  <tr>
+    <td><code>!==/2</code></td>
+    <td><code>left !== right</code></td>
+  </tr>
+  <tr>
+    <td><code>&amp;&amp;/2</code></td>
+    <td><code>left &amp;&amp; right</code></td>
+  </tr>
+  <tr>
+    <td><code>&amp;&amp;&amp;/2</code></td>
+    <td><code>left &amp;&amp;&amp; right</code></td>
+  </tr>
+  <tr>
+    <td><code>*/2</code></td>
+    <td><code>left * right</code></td>
+  </tr>
+  <tr>
+    <td><code>=+/2</code></td>
+    <td><code>left + right</code></td>
+  </tr>
+  <tr>
+    <td><code>=++/2</code></td>
+    <td><code>left ++ right</code></td>
+  </tr>
+  <tr>
+    <td><code>-/2</code></td>
+    <td><code>left - right</code></td>
+  </tr>
+  <tr>
+    <td><code>--/2</code></td>
+    <td><code>left -- right</code></td>
+  </tr>
+  <tr>
+    <td><code>-&gt;/2</code></td>
+    <td><code>left -&gt; right</code></td>
+  </tr>
+  <tr>
+    <td><code>../2</code></td>
+    <td><code>left .. right</code></td>
+  </tr>
+  <tr>
+    <td><code>//2</code></td>
+    <td><code>left / right</code></td>
+  </tr>
+  <tr>
+    <td><code>::/2</code></td>
+    <td><code>left :: right</code></td>
+  </tr>
+  <tr>
+    <td><code>&lt;/2</code></td>
+    <td><code>left &lt; right</code></td>
+  </tr>
+  <tr>
+    <td><code>&lt;-/2</code></td>
+    <td><code>left &lt;- right</code></td>
+  </tr>
+  <tr>
+    <td><code>&lt;&lt;&lt;/2</code></td>
+    <td><code>left &lt;&lt;&lt; right</code></td>
+  </tr>
+  <tr>
+    <td><code>&lt;&lt;~/2</code></td>
+    <td><code>left &lt;&lt;~ right</code></td>
+  </tr>
+  <tr>
+    <td><code>&lt;=/2</code></td>
+    <td><code>left &lt;= right</code></td>
+  </tr>
+  <tr>
+    <td><code>&lt;&gt;/2</code></td>
+    <td><code>left &lt;&gt; right</code></td>
+  </tr>
+  <tr>
+    <td><code>&lt;|&gt;/2</code></td>
+    <td><code>left &lt;|&gt; right</code></td>
+  </tr>
+  <tr>
+    <td><code>&lt;~/2</code></td>
+    <td><code>left &lt;~ right</code></td>
+  </tr>
+  <tr>
+    <td><code>&lt;~&gt;/2</code></td>
+    <td><code>left &lt;~&gt; right</code></td>
+  </tr>
+  <tr>
+    <td><code>=/2</code></td>
+    <td><code>left = right</code></td>
+  </tr>
+  <tr>
+    <td><code>==/2</code></td>
+    <td><code>left == right</code></td>
+  </tr>
+  <tr>
+    <td><code>===/2</code></td>
+    <td><code>left === right</code></td>
+  </tr>
+  <tr>
+    <td><code>=&gt;/2</code></td>
+    <td><code>left =&gt; right</code></td>
+  </tr>
+  <tr>
+    <td><code>=~/2</code></td>
+    <td><code>left =~ right</code></td>
+  </tr>
+  <tr>
+    <td><code>&gt;/2</code></td>
+    <td><code>left &gt; right</code></td>
+  </tr>
+  <tr>
+    <td><code>&gt;=/2</code></td>
+    <td><code>left &gt;= right</code></td>
+  </tr>
+  <tr>
+    <td><code>&gt;&gt;&gt;/2</code></td>
+    <td><code>left &gt;&gt;&gt; right</code></td>
+  </tr>
+  <tr>
+    <td><code>\\/2</code></td>
+    <td><code>left \\\\ right</code></td>
+  </tr>
+  <tr>
+    <td><code>^/2</code></td>
+    <td><code>left ^ right</code></td>
+  </tr>
+  <tr>
+    <td><code>^^^/2</code></td>
+    <td><code>left ^^^ right</code></td>
+  </tr>
+  <tr>
+    <td><code>and/2</code></td>
+    <td><code>left and right</code></td>
+  </tr>
+  <tr>
+    <td><code>in/2</code></td>
+    <td><code>left in right</code></td>
+  </tr>
+  <tr>
+    <td><code>or/2</code></td>
+    <td><code>left or right</code></td>
+  </tr>
+  <tr>
+    <td><code>|&gt;/2</code></td>
+    <td><code>left |&gt; right</code></td>
+  </tr>
+  <tr>
+    <td><code>||/2</code></td>
+    <td><code>left || right</code></td>
+  </tr>
+  <tr>
+    <td><code>|||/2</code></td>
+    <td><code>left ||| right</code></td>
+  </tr>
+  <tr>
+    <td><code>~=/2</code></td>
+    <td><code>left ~= right</code></td>
+  </tr>
+  <tr>
+    <td><code>~&gt;/2</code></td>
+    <td><code>left ~&gt; right</code></td>
+  </tr>
+  <tr>
+    <td><code>~&gt;&gt;/2</code></td>
+    <td><code>left ~&gt;&gt; right</code></td>
+  </tr>
+  <tr>
+    <td rowspan="2">Prefix Operator</td>
+    <td><code>+/1</code></td>
+    <td><code>(+value)</code></td>
+    <td rowspan="2">To prevent precedence errors, unary prefix operators, which also have binary
+      infix operators of the same name need to be defined inside parentheses
+    </td>
+  </tr>
+  <tr>
+    <td><code>-/1</code></td>
+    <td><code>(-value)</code></td>
+  </tr>
+  <tr>
+    <td rowspan="12">Unquoted</td>
+    <td><code>%/2</code></td>
+    <td><code>unquote(:%)(p0, p1)</code></td>
+    <td rowspan="5">Special forms need to defined as atom passed to unquote, as special forms are
+      handled before macros defining the calls are applied
+    </td>
+  </tr>
+  <tr>
+    <td><code>%{}/1</code></td>
+    <td><code>unquote(:%{})(p0)</code></td>
+  </tr>
+  <tr>
+    <td><code>&amp;/1</code></td>
+    <td><code>unquote(:&amp;)(p0)</code></td>
+  </tr>
+  <tr>
+    <td><code>./2</code></td>
+    <td><code>unquote(:.)(p0, p1)</code></td>
+  </tr>
+  <tr>
+    <td><code>&lt;&lt;&gt;&gt;/1</code></td>
+    <td><code>unquote(:&lt;&lt;&gt;&gt;)(p0)</code></td>
+  </tr>
+  <tr>
+    <td><code>do/n</code></td>
+    <td><code>unquote(:do)(p0, ...)</code></td>
+    <td>Keywords need to be escaped</td>
+  </tr>
+  <tr>
+    <td><code>fn/1</code></td>
+    <td><code>unquote(:fn)(p0)</code></td>
+    <td rowspan="4">Special forms need to defined as atom passed to unquote, as special forms are
+      handled before macros defining the calls are applied
+    </td>
+  </tr>
+  <tr>
+    <td><code>unquote/1</code></td>
+    <td><code>unquote(:unquote)(p0)</code></td>
+  </tr>
+  <tr>
+    <td><code>unquote_splicing/1</code></td>
+    <td><code>unquote(:unquote_splicing)(p0)</code></td>
+  </tr>
+  <tr>
+    <td><code>{}/n</code></td>
+    <td><code>unquote(:{})(p0, ...)</code></td>
+  </tr>
+  <tr>
+    <td><code>Capitalized/n</code></td>
+    <td><code>unquote(:Capitalized)(p0, ...)</code></td>
+    <td>Part of the Corba libraries in OTP have functions starting with a capital letter, which
+      would be parsed as an Alias in Elixir if not unquoted.
+    </td>
+  </tr>
+  <tr>
+    <td><code>#text#/1</code></td>
+    <td><code>unquote(:"#text#")(p0)</code></td>
+    <td>
+      <div>Part of the XML libraries in OTP have functions
+        that start with or contain `#`, which would parse as a comment in Elixir if not unquoted in a double quoted
+        atom.
+      </div>
+    </td>
+  </tr>
+  <tr>
+    <td>Default</td>
+    <td><code>name/n</code></td>
+    <td><code>name(p0, ...)</code></td>
+    <td>If no specialized handler is required, functions and macros are defined normally with pN
+      for each parameter in the Nth position
+    </td>
+  </tr>
+  </tbody>
+</table>
 
 ### Go To Declaration
 
@@ -2426,6 +2720,60 @@ in a `defmodule`, is used, including in strings and comments.
         3. Select "Rename..." from the Refactoring submenu
     2. `Shift+F6`
 3. Edit the name inline and have the declaration and usages update.
+
+### SDK
+
+Because Elixir is built on top of Erlang, Elixir command line commands don't have OS native binaries, instead the OS native binaries from Erlang are used.  In order to reliably find the Erlang OS native binaries, like `erl` and `erl.exe`, the path to BOTH the Erlang SDK and the Elixir SDK must be configured.  This allows you to install Erlang and Elixir with completely different package managers too: you can install Erlang with `kerl` and Elixir with `kiex` and you don't have to worry about IntelliJ not seeing the environment variables set by `kerl` when launching IntelliJ from an application launchers instead of a terminal.
+
+Since JetBrains' OpenAPI only supports one SDK per Project or Module, to support Elixir and Erlang SDK at the same time, the Elixir SDK keeps track of an Internal Erlang SDK.  When setting up your first Elixir SDK, you will be prompted to create an Erlang SDK (if you have the [`intellij-erlang`](https://github.com/ignatov/intellij-erlang) plugin [installed](https://plugins.jetbrains.com/plugin/7083-erlang)) or and Erlang for Elixir SDK (if you don't have `intellij-erlang` installed and you need to use the minimal Erlang for Elixir SDK supplied by this plugin).
+
+With the Elixir SDK setup with an Internal Erlang SDK, you can see the Elixir SDK name and the home path, but unlike other SDKs, there's a dropdown for changing the Internal Erlang SDK.
+
+![Internal Erlang SDK](/screenshots/features/sdk/default/Internal%20Erlang%20SDK.png?raw=true "Internal Erlang SDK")
+
+You'll notice there is a mix of two different parent paths in Class Paths:
+
+1. Those from the Elixir SDK Home Directory, which are the `lib/APP/ebin` for the `APP`s that ships with Elixir: `eex`, `elixir`, `ex_unit`, `iex`, `logger`, and `mix`.
+
+   ![Elixir SDK Home Directory Class Paths.png](/screenshots/features/sdk/Elixir%20SDK%20Home%20Directory%20Class%20Paths.png?raw=true "Elixir SDK Home Directory Class Paths")
+
+2. Those from the Internal Erlang SDK Home Directory, which are the `lib/APP-VERSION/ebin` for the `APP`s that ship with OTP.
+
+   ![Erlang SDK Home Directory Class Paths.png](/screenshots/features/sdk/Erlang%20SDK%20Home%20Directory%20Class%20Paths.png?raw=true "Erlang SDK Home Directory Class Paths")
+
+The Class Paths are combined from the two SDKs because OpenAPI doesn't allow to dynamically delegate to the Internal Erlang SDK when checking for Class Paths to scan for completion and running.  If you change the Internal Erlang SDK in the dropdown, the Class Paths will be updated to remove the old Internal Erlang SDK Class Paths and add the new Internal Erlang SDK Class Paths.
+
+These Class Paths are not just for code completion and search anymore, all paths listed as passed with `-pa` flag to `erl` or `erl.exe` when running `mix`, so that you can mix different versions of OTP applications shipped with different version of OTP, so you can take advantage of the independently updatable OTP apps in the release notes for OTP.
+![Code Paths.png](/screenshots/features/sdk/Code%20Paths.png?raw=true "Code Paths")
+
+#### Default SDK
+
+1. The default SDK for new projects can we set from the Configure menu on Welcome Screen
+2. Hover over "Project Defaults" to see its submenu
+
+   ![Project Defaults](/screenshots/features/sdk/default/Project%20Defaults.png?raw=true "Configure > Project Defaults on the Welcome Screen")
+3. Select "Project Structure" from the submenu
+
+   ![Project Structure](/screenshots/features/sdk/default/Project%20Structure.png?raw=true "Configure > Project Defaults > Project Structure on the Welcome Screen")
+4. IntelliJ will start out with no default SDK.  To make the default SDK, an Elixir SDK, Click New
+
+   ![No SDK](/screenshots/features/sdk/default/No%20SDK.png?raw=true "No default SDK")
+5. Select "Elixir SDK"
+
+   ![Elixir SDK](/screenshots/features/sdk/default/Elixir%20SDK.png?raw=true "New > Elixir SDK")
+6. You'll get "Cannot Create SDK" message because there are no Erlang SDKs for the Elixir SDK to use as an Internal Erlang SDK.  Click OK to create the Erlang SDK first.
+
+   ![Cannot Create SDK](/screenshots/features/sdk/default/Cannot%20Create%20SDK.png?raw=true "Cannot Create SDK")
+7. You'll be actually prompted to Select Home Directory for the Erlang SDK
+   * If you have the [`intellij-erlang`](https://github.com/ignatov/intellij-erlang) plugin [installed](https://plugins.jetbrains.com/plugin/7083-erlang), you'll create an Erlang SDK from it.
+
+     ![Erlang SDK](/screenshots/features/sdk/default/Erlang%20SDK.png?raw=true "Erlang SDK")
+
+     **NOTE: Erlang SDK's default Home Directory favors the _oldest_ version of Erlang installed.  You probably want the newest version.  To manually select the Home Directory, it is the directory that contains the `bin`, `erts-VERSION`, and `lib` subdirectories.  For Homebrew, the path looks like `/usr/local/Cellar/erlang/VERSION/lib/erlang`.  It is important to select the `lib/erlang` directory and not the `VERSION` directory for `intellij-erlang` to accept it as a Home Directory.**
+   * If you don't have `intellij-erlang` installed, then you'll create and Erlang for Elixir SDK, which is supplied by this plugin.
+8. With an Erlang SDK available to use as the Internal Erlang SDK, you'll be prompted for the Home Directory for the Elixir SDK.
+
+   ![Elixir SDK Home Directory](/screenshots/features/sdk/default/Elixir%20SDK%20Home%20Directory.png?raw=true "Elixir SDK Home Directory")
 
 ### Structure
 
