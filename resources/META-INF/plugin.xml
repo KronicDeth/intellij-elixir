@@ -61,6 +61,7 @@
     <annotator implementationClass="org.elixir_lang.annotator.EscapeSequence" language="Elixir"/>
     <annotator implementationClass="org.elixir_lang.annotator.Map" language="Elixir"/>
     <annotator implementationClass="org.elixir_lang.annotator.ModuleAttribute" language="Elixir"/>
+    <externalAnnotator implementationClass="org.elixir_lang.annotator.Credo" language="Elixir"/>
 
     <!-- <code>.beam</code> -->
     <filetype.decompiler filetype="BEAM" implementationClass="org.elixir_lang.beam.Decompiler"/>
