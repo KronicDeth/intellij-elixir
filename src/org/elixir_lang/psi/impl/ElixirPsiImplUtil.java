@@ -28,7 +28,7 @@ import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.Macro;
-import org.elixir_lang.annonator.Parameter;
+import org.elixir_lang.annotator.Parameter;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.call.MaybeExported;

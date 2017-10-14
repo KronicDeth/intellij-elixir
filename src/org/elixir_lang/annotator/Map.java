@@ -1,5 +1,6 @@
-package org.elixir_lang.annonator;
+package org.elixir_lang.annotator;
 
+import com.intellij.lang.ASTNode;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
@@ -9,15 +10,19 @@ import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiRecursiveElementVisitor;
-import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import org.elixir_lang.ElixirSyntaxHighlighter;
-import org.elixir_lang.psi.ElixirKeywordKey;
+import org.elixir_lang.psi.ElixirMapArguments;
+import org.elixir_lang.psi.ElixirMapOperation;
+import org.elixir_lang.psi.ElixirStructOperation;
 import org.jetbrains.annotations.NotNull;
 
+import static org.elixir_lang.ElixirSyntaxHighlighter.BRACES_TOKEN_SET;
+
+
 /**
- * Annotates {@link org.elixir_lang.psi.EscapeSequence} as {@link ElixirSyntaxHighlighter#VALID_ESCAPE_SEQUENCE}
+ * Annotates maps and structs
  */
-public class EscapeSequence implements Annotator, DumbAware {
+public class Map implements Annotator, DumbAware {
     /*
      * Public Instance Methods
      */
@@ -41,8 +46,10 @@ public class EscapeSequence implements Annotator, DumbAware {
 
                    @Override
                    public void visitElement(PsiElement element) {
-                       if (element instanceof org.elixir_lang.psi.EscapeSequence) {
-                         visitEscapeSequence((org.elixir_lang.psi.EscapeSequence) element);
+                       if (element instanceof ElixirMapOperation) {
+                         visitMapOperation((ElixirMapOperation) element);
+                       } else if (element instanceof ElixirStructOperation) {
+                           visitStructOperation((ElixirStructOperation) element);
                        }
                    }
 
@@ -50,13 +57,16 @@ public class EscapeSequence implements Annotator, DumbAware {
                     * Private Instance Methods
                     */
 
-                   private void visitEscapeSequence(org.elixir_lang.psi.EscapeSequence escapeSequence) {
-                       PsiElement parent = escapeSequence.getParent();
+                   private void visitMapOperation(ElixirMapOperation mapOperation) {
+                       highlight(mapOperation.getMapPrefixOperator(), holder, ElixirSyntaxHighlighter.MAP);
+                       highlight(mapOperation.getMapArguments(), holder, ElixirSyntaxHighlighter.MAP);
+                   }
 
-                       // parent can highlight itself
-                       if (!(parent instanceof org.elixir_lang.psi.EscapeSequence)) {
-                           highlight(escapeSequence, holder, ElixirSyntaxHighlighter.VALID_ESCAPE_SEQUENCE);
-                       }
+                   private void visitStructOperation(ElixirStructOperation structOperation) {
+                       highlight(structOperation.getMapPrefixOperator(), holder, ElixirSyntaxHighlighter.STRUCT);
+                       /* DO NOT highlight mapExpression.  It will be highlighted as either an alias or module
+                          attribute, which are more specific and useful. */
+                       highlight(structOperation.getMapArguments(), holder, ElixirSyntaxHighlighter.STRUCT);
                    }
                }
        );
@@ -65,6 +75,16 @@ public class EscapeSequence implements Annotator, DumbAware {
     /*
      * Private Instance Methods
      */
+
+    private void highlight(@NotNull final ElixirMapArguments mapArguments,
+                           @NotNull AnnotationHolder annotationHolder,
+                           @NotNull final TextAttributesKey textAttributesKey) {
+        ASTNode[] braces = mapArguments.getNode().getChildren(BRACES_TOKEN_SET);
+
+        for (ASTNode brace : braces) {
+            highlight(brace.getTextRange(), annotationHolder, textAttributesKey);
+        }
+    }
 
     private void highlight(@NotNull final PsiElement element,
                            @NotNull AnnotationHolder annotationHolder,

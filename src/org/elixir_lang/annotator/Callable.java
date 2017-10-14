@@ -1,4 +1,4 @@
-package org.elixir_lang.annonator;
+package org.elixir_lang.annotator;
 
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;

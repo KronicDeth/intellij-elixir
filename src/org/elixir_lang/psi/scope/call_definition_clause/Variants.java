@@ -7,7 +7,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.util.PsiTreeUtil;
 import gnu.trove.THashMap;
-import org.elixir_lang.annonator.Parameter;
+import org.elixir_lang.annotator.Parameter;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.call.Named;
 import org.elixir_lang.psi.scope.CallDefinitionClause;

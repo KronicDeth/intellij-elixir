@@ -55,12 +55,12 @@
     <additionalTextAttributes file="colorSchemes/ElixirDarcula.xml" scheme="Darcula"/>
     <additionalTextAttributes file="colorSchemes/ElixirDefault.xml" scheme="Default"/>
 
-    <annotator implementationClass="org.elixir_lang.annonator.Alias" language="Elixir"/>
-    <annotator implementationClass="org.elixir_lang.annonator.Atom" language="Elixir"/>
-    <annotator implementationClass="org.elixir_lang.annonator.Callable" language="Elixir"/>
-    <annotator implementationClass="org.elixir_lang.annonator.EscapeSequence" language="Elixir"/>
-    <annotator implementationClass="org.elixir_lang.annonator.Map" language="Elixir"/>
-    <annotator implementationClass="org.elixir_lang.annonator.ModuleAttribute" language="Elixir"/>
+    <annotator implementationClass="org.elixir_lang.annotator.Alias" language="Elixir"/>
+    <annotator implementationClass="org.elixir_lang.annotator.Atom" language="Elixir"/>
+    <annotator implementationClass="org.elixir_lang.annotator.Callable" language="Elixir"/>
+    <annotator implementationClass="org.elixir_lang.annotator.EscapeSequence" language="Elixir"/>
+    <annotator implementationClass="org.elixir_lang.annotator.Map" language="Elixir"/>
+    <annotator implementationClass="org.elixir_lang.annotator.ModuleAttribute" language="Elixir"/>
 
     <!-- <code>.beam</code> -->
     <filetype.decompiler filetype="BEAM" implementationClass="org.elixir_lang.beam.Decompiler"/>

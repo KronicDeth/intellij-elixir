@@ -6,7 +6,7 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.ui.JBColor;
 import org.elixir_lang.ElixirSyntaxHighlighter;
-import org.elixir_lang.annonator.Parameter;
+import org.elixir_lang.annotator.Parameter;
 import org.elixir_lang.icons.ElixirIcons;
 import org.elixir_lang.psi.operation.InMatch;
 import org.elixir_lang.psi.operation.Match;

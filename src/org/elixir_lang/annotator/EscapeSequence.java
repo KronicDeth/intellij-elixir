@@ -1,4 +1,4 @@
-package org.elixir_lang.annonator;
+package org.elixir_lang.annotator;
 
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
@@ -15,9 +15,9 @@ import org.elixir_lang.psi.ElixirKeywordKey;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Annotates things that act like Atom as Atom
+ * Annotates {@link org.elixir_lang.psi.EscapeSequence} as {@link ElixirSyntaxHighlighter#VALID_ESCAPE_SEQUENCE}
  */
-public class Atom implements Annotator, DumbAware {
+public class EscapeSequence implements Annotator, DumbAware {
     /*
      * Public Instance Methods
      */
@@ -41,8 +41,8 @@ public class Atom implements Annotator, DumbAware {
 
                    @Override
                    public void visitElement(PsiElement element) {
-                       if (element instanceof ElixirKeywordKey) {
-                         visitKeywordKey((ElixirKeywordKey) element);
+                       if (element instanceof org.elixir_lang.psi.EscapeSequence) {
+                         visitEscapeSequence((org.elixir_lang.psi.EscapeSequence) element);
                        }
                    }
 
@@ -50,18 +50,12 @@ public class Atom implements Annotator, DumbAware {
                     * Private Instance Methods
                     */
 
-                   private void visitKeywordKey(ElixirKeywordKey keywordKey) {
-                       PsiElement child = keywordKey.getFirstChild();
+                   private void visitEscapeSequence(org.elixir_lang.psi.EscapeSequence escapeSequence) {
+                       PsiElement parent = escapeSequence.getParent();
 
-                       // a normal, non-quoted keyword key
-                       if (child instanceof LeafPsiElement) {
-                           TextRange keywordKeyTextRange = keywordKey.getTextRange();
-                           // highlight the `:` as part of the pseudo-atom
-                           TextRange atomTextRange = new TextRange(
-                                   keywordKeyTextRange.getStartOffset(),
-                                   keywordKeyTextRange.getEndOffset() + 1
-                           );
-                           highlight(atomTextRange, holder, ElixirSyntaxHighlighter.ATOM);
+                       // parent can highlight itself
+                       if (!(parent instanceof org.elixir_lang.psi.EscapeSequence)) {
+                           highlight(escapeSequence, holder, ElixirSyntaxHighlighter.VALID_ESCAPE_SEQUENCE);
                        }
                    }
                }
@@ -71,6 +65,12 @@ public class Atom implements Annotator, DumbAware {
     /*
      * Private Instance Methods
      */
+
+    private void highlight(@NotNull final PsiElement element,
+                           @NotNull AnnotationHolder annotationHolder,
+                           @NotNull final TextAttributesKey textAttributesKey) {
+        highlight(element.getTextRange(), annotationHolder, textAttributesKey);
+    }
 
     /**
      * Highlights `textRange` with the given `textAttributesKey`.
