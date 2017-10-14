@@ -152,15 +152,18 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
         sdkModificator.commitChanges();
     }
 
-    private static void configureInternalErlangSdk(@NotNull Sdk elixirSdk, @NotNull SdkModificator elixirSdkModificator) {
+    private static Sdk configureInternalErlangSdk(@NotNull Sdk elixirSdk, @NotNull SdkModificator elixirSdkModificator) {
         final Sdk erlangSdk = defaultErlangSdk();
-        SdkAdditionalData sdkAdditionData =
-                new org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData(erlangSdk, elixirSdk);
-        elixirSdkModificator.setSdkAdditionalData(sdkAdditionData);
 
         if (erlangSdk != null) {
+            SdkAdditionalData sdkAdditionData =
+                    new org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData(erlangSdk, elixirSdk);
+            elixirSdkModificator.setSdkAdditionalData(sdkAdditionData);
+
             addNewCodePathsFromInternErlangSdk(elixirSdk, erlangSdk, elixirSdkModificator);
         }
+
+        return erlangSdk;
     }
 
     public static void addNewCodePathsFromInternErlangSdk(@NotNull Sdk elixirSdk,
@@ -331,15 +334,9 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
     public static Sdk putDefaultErlangSdk(@NotNull Sdk elixirSdk) {
         assert elixirSdk.getSdkType() == Type.getInstance();
 
-        @Nullable Sdk defaultErlangSdk = defaultErlangSdk();
-
-        if (defaultErlangSdk != null) {
-            SdkModificator sdkModificator = elixirSdk.getSdkModificator();
-            org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData sdkAdditionalData =
-                    new org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData(defaultErlangSdk, elixirSdk);
-            sdkModificator.setSdkAdditionalData(sdkAdditionalData);
-            ApplicationManager.getApplication().runWriteAction(sdkModificator::commitChanges);
-        }
+        SdkModificator sdkModificator = elixirSdk.getSdkModificator();
+        Sdk defaultErlangSdk = configureInternalErlangSdk(elixirSdk, sdkModificator);
+        ApplicationManager.getApplication().runWriteAction(sdkModificator::commitChanges);
 
         return defaultErlangSdk;
     }
