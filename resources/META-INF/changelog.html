@@ -121,6 +121,11 @@
           </li>
         </ol>
       </li>
+      <li>
+        The Code Paths from the Internal Erlang SDK were not being copied from the default Erlang SDK to the Elixir SDK
+        when the default Erlang SDK was set during `mix test` runs, which meant that the Elixir SDK would not upgrade
+        correctly from 6.1.1 to 6.2.0 without the user deleting the Elixir SDK and recreating it.
+      </li>
     </ul>
   </li>
 </ul>

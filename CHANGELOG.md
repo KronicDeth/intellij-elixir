@@ -163,6 +163,7 @@
     2. The default Erlang SDK, which should be the one that was last created, is configured in `SdkAdditionalaData`
     3. The Code paths from the Erlang SDK are copied to the Elixir SDK
         1. If the the Erlang SDK is from intellij-elixir and does not have `ebin` directories for its Class Paths, then the Class Paths is expanded to Code Paths.
+* [#851](https://github.com/KronicDeth/intellij-elixir/pull/851) - The Code Paths from the Internal Erlang SDK were not being copied from the default Erlang SDK to the Elixir SDK when the default Erlang SDK was set during `mix test` runs, which meant that the Elixir SDK would not upgrade correctly from 6.1.1 to 6.2.0 without the user deleting the Elixir SDK and recreating it. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v6.1.1
 
