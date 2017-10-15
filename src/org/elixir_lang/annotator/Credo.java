@@ -38,7 +38,7 @@ public class Credo extends ExternalAnnotator<PsiFile, List<Credo.Issue>> {
     private static final Pattern LINE_PATTERN = Pattern.compile("(?<path>.+?):(?<line>\\d+):(?:(?<column>\\d+):)? (?<tag>[CFRSW]): (?<message>.+)");
     private static final Pattern EXPLANATION_LINE_PATTERN = Pattern.compile("┃ +(?<content>.*)");
     private static final Pattern EXPLAINABLE_PATTERN = Pattern.compile("(?<explainable>(?<path>.+\\.exs?):(?<lineNumber>\\d+)(:?:(?<columnNumber>\\d+))?)");
-
+    private static final Pattern HEADER_PATTERN = Pattern.compile("__ (?<header>.+)");
 
     @NotNull
     private static List<Issue> lineListToIssueList(@NotNull List<String> lineList, @NotNull Project project) {
@@ -163,7 +163,14 @@ public class Credo extends ExternalAnnotator<PsiFile, List<Credo.Issue>> {
                         "</a>" +
                         escapeHtml(content.substring(after));
             } else {
-                toolTipLine = escapeHtml(content);
+                Matcher headerMatcher = HEADER_PATTERN.matcher(content);
+
+                if (headerMatcher.find()) {
+                    String header = headerMatcher.group("header");
+                    toolTipLine = "<h2>" + escapeHtml(header) + "</h2>";
+                } else {
+                    toolTipLine = escapeHtml(content);
+                }
             }
         } else {
             toolTipLine = escapeHtml(explanationLine);
