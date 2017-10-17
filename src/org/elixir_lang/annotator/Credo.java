@@ -10,12 +10,12 @@ import com.intellij.lang.annotation.ExternalAnnotator;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import gnu.trove.THashMap;
-import jdk.nashorn.internal.runtime.regexp.joni.constants.OPCode;
 import org.elixir_lang.jps.builder.ParametersList;
 import org.elixir_lang.mix.runner.MixRunningStateUtil;
 import org.jetbrains.annotations.Contract;
@@ -29,6 +29,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
 import static org.elixir_lang.mix.runner.MixRunningStateUtil.workingDirectory;
@@ -36,9 +37,12 @@ import static org.elixir_lang.mix.runner.MixRunningStateUtil.workingDirectory;
 // See https://github.com/antlr/jetbrains-plugin-sample/blob/7c400e02f89477dbe179123a2d43f839b4df05d7/src/java/org/antlr/jetbrains/sample/SampleExternalAnnotator.java
 public class Credo extends ExternalAnnotator<PsiFile, List<Credo.Issue>> {
     private static final Pattern LINE_PATTERN = Pattern.compile("(?<path>.+?):(?<line>\\d+):(?:(?<column>\\d+):)? (?<tag>[CFRSW]): (?<message>.+)");
-    private static final Pattern EXPLANATION_LINE_PATTERN = Pattern.compile("┃ +(?<content>.*)");
-    private static final Pattern EXPLAINABLE_PATTERN = Pattern.compile("(?<explainable>(?<path>.+\\.exs?):(?<lineNumber>\\d+)(:?:(?<columnNumber>\\d+))?)");
-    private static final Pattern HEADER_PATTERN = Pattern.compile("__ (?<header>.+)");
+    private static final Pattern EXPLANATION_LINE_PATTERN = Pattern.compile("┃ (?<content>.*)");
+    private static final Pattern EXPLAINABLE_PATTERN = Pattern.compile("\\s*(?<explainable>(?<path>.+\\.exs?):(?<lineNumber>\\d+)(:?:(?<columnNumber>\\d+))?)");
+    private static final Pattern HEADER_PATTERN = Pattern.compile("^\\s*__ (?<header>.+)");
+    private static final String CODE_IN_QUESTION_HEADER = "CODE IN QUESTION";
+    private static final String CONFIGURATION_OPTIONS = "CONFIGURATION OPTIONS";
+    private static final String WHY_IT_MATTERS_HEADER = "WHY IT MATTERS";
 
     @NotNull
     private static List<Issue> lineListToIssueList(@NotNull List<String> lineList, @NotNull Project project) {
@@ -143,43 +147,6 @@ public class Credo extends ExternalAnnotator<PsiFile, List<Credo.Issue>> {
     }
 
     @NotNull
-    private static String explanationLineToToolTipLine(@NotNull String explanationLine,
-                                                       @NotNull String workingDirectory) {
-        String toolTipLine;
-
-        Matcher explanationLineMatcher = EXPLANATION_LINE_PATTERN.matcher(explanationLine);
-
-        if (explanationLineMatcher.matches()) {
-            String content = explanationLineMatcher.group("content");
-            Matcher explainableMatcher = EXPLAINABLE_PATTERN.matcher(content);
-
-            if (explainableMatcher.find()) {
-                String explainable = explainableMatcher.group("explainable");
-                int before = explainableMatcher.start("explainable");
-                int after = explainableMatcher.end("explainable");
-                toolTipLine = escapeHtml(content.substring(0, before)) +
-                        "<a href=\"" + navigationHref(workingDirectory, explainableMatcher) + "\">" +
-                        explainable +
-                        "</a>" +
-                        escapeHtml(content.substring(after));
-            } else {
-                Matcher headerMatcher = HEADER_PATTERN.matcher(content);
-
-                if (headerMatcher.find()) {
-                    String header = headerMatcher.group("header");
-                    toolTipLine = "<h2>" + escapeHtml(header) + "</h2>";
-                } else {
-                    toolTipLine = escapeHtml(content);
-                }
-            }
-        } else {
-            toolTipLine = escapeHtml(explanationLine);
-        }
-
-        return toolTipLine;
-    }
-
-    @NotNull
     private static String navigationHref(@NotNull String workingDirectory, @NotNull Matcher matcher) {
         String relativePath = matcher.group("path");
         String path = Paths.get(workingDirectory, relativePath).toString();
@@ -214,6 +181,36 @@ public class Credo extends ExternalAnnotator<PsiFile, List<Credo.Issue>> {
         }
 
         return offset;
+    }
+
+    @NotNull
+    private static String stripEdge(@NotNull String explanationLine) {
+        Matcher matcher = EXPLANATION_LINE_PATTERN.matcher(explanationLine);
+
+        assert matcher.matches();
+
+        return matcher.group("content");
+    }
+
+    @NotNull
+    private static String preludeContentLineToHTMLLine(@NotNull String contentLine, @NotNull String workingDirectory) {
+        Matcher explainableMatcher = EXPLAINABLE_PATTERN.matcher(contentLine);
+        String htmlLine;
+
+        if (explainableMatcher.find()) {
+            String explainable = explainableMatcher.group("explainable");
+            int before = explainableMatcher.start("explainable");
+            int after = explainableMatcher.end("explainable");
+            htmlLine = escapeHtml(contentLine.substring(0, before)) +
+                    "<a href=\"" + navigationHref(workingDirectory, explainableMatcher) + "\">" +
+                    explainable +
+                    "</a>" +
+                    escapeHtml(contentLine.substring(after));
+        } else {
+            htmlLine = escapeHtml(contentLine);
+        }
+
+        return htmlLine + "<br/>";
     }
 
     @Nullable
@@ -283,9 +280,138 @@ public class Credo extends ExternalAnnotator<PsiFile, List<Credo.Issue>> {
     @Contract(pure = true)
     @NotNull
     private String explanationToToolTip(@NotNull Stream<String> explanation, @NotNull String workingDirectory) {
-        return explanation
-                .map(explanationLine -> explanationLineToToolTipLine(explanationLine, workingDirectory))
-                .collect(Collectors.joining("\n", "<pre>\n", "\n</pre>"));
+        List<String> headers = new ArrayList<>();
+        Map<String, List<String>> contentsByHeader = new HashMap<>();
+        Ref<String> headerRef = Ref.create();
+        headers.add(headerRef.get());
+
+        explanation.map(Credo::stripEdge).forEachOrdered(content -> {
+            Matcher headerMatcher = HEADER_PATTERN.matcher(content);
+
+            if (headerMatcher.matches()) {
+                String header = headerMatcher.group("header");
+                headers.add(header);
+                headerRef.set(header);
+            } else {
+                contentsByHeader.computeIfAbsent(headerRef.get(), k -> new ArrayList<>()).add(content);
+            }
+        });
+
+        return headers
+                .stream()
+                .flatMap(header -> sectionToHTML(header, contentsByHeader.get(header), workingDirectory))
+                .collect(Collectors.joining("\n"));
+    }
+
+    private Stream<String> sectionToHTML(@Nullable String header,
+                                         @NotNull List<String> contentLineList,
+                                         @NotNull String workingDirectory) {
+        Stream<String> headerHTMLLineStream = headerHTMLLineStream(header);
+        Stream<String> contentHTMLLineStream;
+
+        if (header == null) {
+            contentHTMLLineStream = preludeContentLineListToHTMLLineStream(contentLineList, workingDirectory);
+        } else if (header.equals(CODE_IN_QUESTION_HEADER)) {
+            contentHTMLLineStream = codeInQuestionContentLineListToHTMLLineStream(contentLineList);
+        } else if (header.equals(CONFIGURATION_OPTIONS) || header.equals(WHY_IT_MATTERS_HEADER)) {
+            contentHTMLLineStream = contentLineList.stream().map(contentLine -> {
+                String unindentedLine;
+
+                if (contentLine.isEmpty()) {
+                    unindentedLine = contentLine;
+                } else {
+                    assert contentLine.startsWith("     ");
+
+                    unindentedLine = contentLine.substring(5);
+                }
+
+                return unindentedLine;
+            }).map(unindentedLine -> escapeHtml(unindentedLine) + "<br/>");
+        } else {
+            contentHTMLLineStream = Stream.empty();
+        }
+
+        return Stream.concat(headerHTMLLineStream, contentHTMLLineStream);
+    }
+
+    @NotNull
+    private Stream<String> codeInQuestionContentLineListToHTMLLineStream(List<String> contentLineList) {
+        Stream<String> unindentedLines = contentLineList.stream().map(indentedLine -> {
+            String unindentedLine;
+
+            if (indentedLine.length() == 0) {
+                unindentedLine = indentedLine;
+            } else {
+                assert indentedLine.startsWith("   ");
+
+                unindentedLine = indentedLine.substring(3);
+            }
+
+            return unindentedLine;
+        });
+
+        return Stream.concat(
+                Stream.of("<pre><code>"),
+                Stream.concat(unindentedLines, Stream.of("</code></pre>"))
+        );
+    }
+
+    private static <T, R> Stream<R> withIndex(Stream<T> stream, FunctionWithIndex<T, R> function) {
+        assert !stream.isParallel();
+
+        final Iterator<T> iterator = stream.iterator();
+        final Iterator<R> returnIterator = new Iterator<R>() {
+            private int index = 0;
+
+            @Override
+            public boolean hasNext() {
+                return iterator.hasNext();
+            }
+
+            @Override
+            public R next() {
+                return function.apply(iterator.next(), index++);
+            }
+        };
+        return iteratorToFiniteStream(returnIterator);
+    }
+
+    private static <T> Stream<T> iteratorToFiniteStream(Iterator<T> iterator) {
+        final Iterable<T> iterable = () -> iterator;
+        return StreamSupport.stream(iterable.spliterator(), false);
+    }
+
+    private Stream<String> preludeContentLineListToHTMLLineStream(@NotNull List<String> contentLineList,
+                                                                  @NotNull String workingDirectory) {
+        return withIndex(contentLineList.stream(), (contentLine, index) -> {
+            String unindentedLine;
+
+            if (index <= 1) {
+                assert contentLine.startsWith("  ");
+
+                unindentedLine = contentLine.substring(2);
+            } else if (contentLine.length() == 0) {
+                unindentedLine = contentLine;
+            } else {
+                assert contentLine.startsWith("     ");
+
+                unindentedLine = contentLine.substring(5);
+            }
+
+            return unindentedLine;
+        }).map(contentLine -> preludeContentLineToHTMLLine(contentLine, workingDirectory));
+    }
+
+    private Stream<String> headerHTMLLineStream(@Nullable String header) {
+        Stream<String> htmlLineStream;
+
+        if (header != null) {
+            htmlLineStream = Stream.of("<h2>" + escapeHtml(header) + "</h2>");
+        } else {
+            htmlLineStream = Stream.empty();
+        }
+
+        return htmlLineStream;
     }
 
     @Override
@@ -332,7 +458,7 @@ public class Credo extends ExternalAnnotator<PsiFile, List<Credo.Issue>> {
                                 .execAndGetOutput(generalCommandLine)
                                 .getStdoutLines(true)
                                 .stream()
-                                .skip(4)
+                                .skip(3)
                                 .filter(line -> !line.isEmpty())
                 );
             } catch (ExecutionException executionException) {
