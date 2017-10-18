@@ -116,6 +116,18 @@
 
 # Changelog
 
+## v6.3.0
+
+### Enhancements
+* [#854](https://github.com/KronicDeth/intellij-elixir/pull/854) - [@KronicDeth](https://github.com/KronicDeth)
+  * `credo` external annotator
+    * Once modifications have settled on a file and all internal annotators have run, `mix credo` will be run on any modified file.
+      * Each check failure reported by `mix credo` will be turned into a warning annotation (yellow highlight) of the line or line and column credo identified.
+      * If you hover over the annotation (either in the source or on right gutter), the `mix credo PATH:LINE(:COLUMN)` explanation will be shown.  Links in the tooltip are clickable and allow you to jump to the specific line or line and column of the failure.
+
+### Bug Fixes
+* [#854](https://github.com/KronicDeth/intellij-elixir/pull/854) - Rename package with typo `org.elixir_lang.annonator` -> `org.elixir_lang.annotator`. - [@KronicDeth](https://github.com/KronicDeth)
+
 ## v6.2.0
 
 ### Enhancements

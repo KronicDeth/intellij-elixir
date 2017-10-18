@@ -1,5 +1,29 @@
 <html>
 <body>
+<h1>v6.3.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li><code>credo</code> external annotator
+        <ul>
+          <li>Once modifications have settled on a file and all internal annotators have run, <code>mix credo</code> will be run on any modified file.
+            <ul>
+              <li>Each check failure reported by <code>mix credo</code> will be turned into a warning annotation (yellow highlight) of the line or line and column credo identified.</li>
+              <li>If you hover over the annotation (either in the source or on right gutter), the <code>mix credo PATH:LINE(:COLUMN)</code> explanation will be shown.  Links in the tooltip are clickable and allow you to jump to the specific line or line and column of the failure.</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>Rename package with typo <code>org.elixir_lang.annonator</code> -&gt; <code>org.elixir_lang.annotator</code>.</li>
+    </ul>
+  </li>
+</ul>
 <h1>v6.2.0</h1>
 <ul>
   <li>
