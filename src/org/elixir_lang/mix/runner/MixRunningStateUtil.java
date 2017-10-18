@@ -25,6 +25,7 @@ import org.elixir_lang.mix.settings.MixSettings;
 import org.elixir_lang.sdk.elixir.Type;
 import org.elixir_lang.utils.ElixirExternalToolsNotificationListener;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.nio.file.Paths;
@@ -158,14 +159,24 @@ public class MixRunningStateUtil {
                                                  @NotNull ParametersList mixParametersList) {
         GeneralCommandLine commandLine = getBaseMixCommandLine(configuration);
         Project project = configuration.getProject();
-        setElixir(commandLine, project, elixirParametersList);
-
-        String mixPath = mixPath(project);
-        commandLine.addParameter(mixPath);
-
-        commandLine.addParameters(mixParametersList.getList());
+        commandLine(commandLine, project, elixirParametersList, mixParametersList);
 
         return addNewSkipDependencies(commandLine, configuration);
+    }
+
+    @NotNull
+    public static GeneralCommandLine commandLine(@NotNull GeneralCommandLine baseMixCommandLine,
+                                                 @NotNull Project project,
+                                                 @NotNull ParametersList elixirParametersList,
+                                                 @NotNull ParametersList mixParametersList) {
+        setElixir(baseMixCommandLine, project, elixirParametersList);
+
+        String mixPath = mixPath(project);
+        baseMixCommandLine.addParameter(mixPath);
+
+        baseMixCommandLine.addParameters(mixParametersList.getList());
+
+        return baseMixCommandLine;
     }
 
     @NotNull
@@ -176,22 +187,37 @@ public class MixRunningStateUtil {
     }
 
     @NotNull
-    private static String getWorkingDirectory(@NotNull MixRunConfigurationBase configuration) {
+    public static String workingDirectory(@NotNull Project project) {
+        return ObjectUtils.assertNotNull(project.getBasePath());
+    }
+
+    @Nullable
+    private static String workingDirectory(@NotNull Module module) {
+        VirtualFile[] contentRoots = ModuleRootManager.getInstance(module).getContentRoots();
+        String workingDirectory;
+
+        if (contentRoots.length >= 1) {
+            workingDirectory = contentRoots[0].getPath();
+        } else {
+            workingDirectory = null;
+        }
+
+        return workingDirectory;
+    }
+
+    @NotNull
+    private static String workingDirectory(@NotNull MixRunConfigurationBase configuration) {
         String workingDirectory = configuration.getWorkingDirectory();
 
         if (isBlank(workingDirectory)) {
             Module module = configuration.getConfigurationModule().getModule();
 
             if (module != null) {
-                VirtualFile[] contentRoots = ModuleRootManager.getInstance(module).getContentRoots();
-
-                if (contentRoots.length >= 1) {
-                    workingDirectory = contentRoots[0].getPath();
-                }
+                workingDirectory = workingDirectory(module);
             }
 
             if (isBlank(workingDirectory)) {
-                workingDirectory = ObjectUtils.assertNotNull(configuration.getProject().getBasePath());
+                workingDirectory = workingDirectory(configuration.getProject());
             }
         }
 
@@ -294,6 +320,6 @@ public class MixRunningStateUtil {
     @NotNull
     private static GeneralCommandLine withWorkDirectory(@NotNull GeneralCommandLine commandLine,
                                                         @NotNull MixRunConfigurationBase configuration) {
-        return commandLine.withWorkDirectory(getWorkingDirectory(configuration));
+        return commandLine.withWorkDirectory(workingDirectory(configuration));
     }
 }

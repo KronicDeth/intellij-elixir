@@ -14,7 +14,7 @@ import com.intellij.usageView.UsageViewShortNameLocation;
 import com.intellij.usageView.UsageViewTypeLocation;
 import com.intellij.util.IncorrectOperationException;
 import com.intellij.util.ProcessingContext;
-import org.elixir_lang.annonator.Parameter;
+import org.elixir_lang.annotator.Parameter;
 import org.elixir_lang.errorreport.Logger;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;

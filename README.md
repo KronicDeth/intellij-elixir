@@ -1036,6 +1036,22 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
   </tbody>
 </table>
 
+### External Annotators
+
+In addition to the built-in syntax highlighting and annotations above, various `mix` tasks will be run to gather annotations from Elixir status analysis tools.
+
+#### Credo
+
+If [`credo`](https://github.com/rrrene/credo) is not installed as a project dependency, nothing will happen, but if it is installed, `mix credo PATH` will be called on any files after updates have quieted.  Any `credo` check failures will show up as warning annotations
+
+![Warning Annotations](/screenshots/features/external_annotators/credo/Warning%20Annotations.png?raw=true "Warning Annotations")
+
+Individual check failures will show the explanation (from `mix credo PATH:LINE(:COLUMN)`) if you hover over the annotation
+
+![Explanation](/screenshots/features/external_annotators/credo/Explanation.png?raw=true "Credo Check Failure Explanation")
+
+You can hover over the explanation and click the embedded links to jump to the line (and column) where the failure occurred.
+
 ### Grammar parsing
 
 Built on top of highlighted tokens above, the parser understands the following parts of Elixir grammar as valid or

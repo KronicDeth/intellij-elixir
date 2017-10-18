@@ -5,7 +5,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.usageView.UsageViewLongNameLocation;
 import com.intellij.usageView.UsageViewShortNameLocation;
 import com.intellij.usageView.UsageViewTypeLocation;
-import org.elixir_lang.annonator.Parameter;
+import org.elixir_lang.annotator.Parameter;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.reference.Callable;
 import org.elixir_lang.structure_view.element.*;
