@@ -180,6 +180,36 @@ Once you have your IDE of choice installed, you can [install this plugin](#insta
 
 ## Features
 
+| Feature                                     | [Rich](#ides) | [Small](#ides)  |
+|---------------------------------------------|---------------|-----------------|
+| Project                                     | Yes           | No              |
+| Project Structure                           | Automatic     | Manual          |
+| Project Settings                            | Yes           | No              |
+| Module Settings                             | Yes           | No              |
+| New Elixir File                             | Yes           | Yes             |
+| Syntax Highlighting and Semantic Annotation | Yes           | Yes             |
+| Grammar Parsing                             | Yes           | Yes             |
+| Inspections                                 | Yes           | Yes             |
+| Quick Fixes                                 | Yes           | Yes             |
+| Code Folding                                | Yes           | Yes             |
+| Commenter                                   | Yes           | Yes             |
+| Debugger                                    | Yes           | Yes             |
+| Delimiters                                  | Yes           | Yes             |
+| Building/Compiling                          | Yes           | No              |
+| Live Templates                              | Yes           | Yes             |
+| Run Configurations                          | Yes           | Yes             |
+| Completion                                  | Yes           | Yes             |
+| Decompilation                               | Yes           | Yes             |
+| Go To Declaration                           | Yes           | Yes             |
+| Formatting                                  | Yes           | Yes             |
+| Go To Symbol                                | Yes           | Yes             |
+| Go To Test                                  | Yes           | Yes             |
+| Go To Test Subject                          | Yes           | Yes             |
+| Find Usage                                  | Yes           | Yes             |
+| Refactor                                    | Yes           | Yes             |
+| SDK                                         | Yes           | No              |
+| Structure                                   | Yes           | Yes             |
+
 ### Project
 **NOTE: This feature only works in [rich IDEs](#ides) as it depends on an extension point unavailable in [small IDEs](#ides).**
 
