@@ -3,12 +3,13 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Elixir plugin](#elixir-plugin)
+  - [IDEs](#ides)
   - [Features](#features)
     - [Project](#project)
-      - [New](#new)
       - [From Existing Sources](#from-existing-sources)
-        - [Create project from existing sources](#create-project-from-existing-sources)
         - [Import project from external model](#import-project-from-external-model)
+        - [Create project from existing sources](#create-project-from-existing-sources)
+      - [New](#new)
     - [Project Structure](#project-structure)
     - [Project Settings](#project-settings)
     - [Module Settings](#module-settings)
@@ -22,6 +23,8 @@
       - [Elixir GenServer](#elixir-genserver)
       - [Elixir GenEvent](#elixir-genevent)
     - [Syntax Highlighting and Semantic Annotation](#syntax-highlighting-and-semantic-annotation)
+    - [External Annotators](#external-annotators)
+      - [Credo](#credo)
     - [Grammar parsing](#grammar-parsing)
     - [Inspections](#inspections)
       - [Ambiguous nested calls](#ambiguous-nested-calls)
@@ -120,6 +123,10 @@
         - [Parameters and Variables](#parameters-and-variables-3)
     - [SDK](#sdk)
       - [Default SDK](#default-sdk)
+    - [Elixir External Tools](#elixir-external-tools)
+      - [Rich IDEs](#rich-ides)
+      - [Small IDEs](#small-ides)
+        - [Elixir SDK Path](#elixir-sdk-path)
     - [Structure](#structure)
       - [Viewing Structure](#viewing-structure)
       - [Buttons](#buttons)
@@ -149,87 +156,73 @@
 
 [![Build Status](https://travis-ci.org/KronicDeth/intellij-elixir.svg?branch=master)](https://travis-ci.org/KronicDeth/intellij-elixir)
 
-This is a plugin that adds support for [Elixir](http://elixir-lang.org/) to JetBrains IntelliJ IDEA platform IDEs
-([DataGrip](http://www.jetbrains.com/datagrip/), [AppCode](http://www.jetbrains.com/objc/),
-[IntelliJ IDEA](http://www.jetbrains.com/idea/), [PHPStorm](http://www.jetbrains.com/phpstorm/),
-[PyCharm](http://www.jetbrains.com/pycharm/), [Rubymine](http://www.jetbrains.com/ruby/),
-[WebStorm](http://www.jetbrains.com/webstorm/)).
+This is a plugin that adds support for [Elixir](http://elixir-lang.org/) to JetBrains IDEs.
 
-It works with the free,
-[open source](https://github.com/JetBrains/intellij-community) Community edition of IntelliJ IDEA in addition to the
-paid JetBrains IDEs like Ultimate edition of IntelliJ.  No feature is locked to a the paid version of the IDEs, but
-the plugin works best in IntelliJ because only IntelliJ supports projects with different languages than the default
-(Java for IntelliJ, Ruby for Rubymine, etc).
+The plugin works both in the rich IDEs that allow alternative language SDK selection and small IDEs that are language specific.  The rich IDEs work best for IntelliJ Elixir because only in the rich IDEs can have an Elixir SDK set as the Project SDK.  In all small IDEs, the native language SDK is always there, which makes anything that uses the SDK, such as running `elixir`, `erl`, or `mix` more complicated both internally and externally in the configuration you have to setup.
 
-The plugin itself is free.  Once you have your IDE of choice installed, you can [install this plugin](#installation)
+## IDEs
+
+*The plugin is free to use in all JetBrains IDEs.  The Cost column in the below table is what JetBrains charges for the IDE itself.  IntelliJ Elixir is maintained by [@KronicDeth](https://github.com/KronicDeth) who does not get any of the subscription money.  If you want to support the plugin itself, make a [donation](#donations).*
+
+| IDE                                                                                                      | Rich/Small | Languages   | Cost                                                                      | Trial                                                                                | License              | Source                                                                                                          |
+|----------------------------------------------------------------------------------------------------------|------------|-------------|---------------------------------------------------------------------------|--------------------------------------------------------------------------------------|----------------------|-----------------------------------------------------------------------------------------------------------------|
+| [IntelliJ IDEA Community Edition](https://www.jetbrains.com/idea/download/download-thanks.html?code=IIC) | Rich       | Java        | Free                                                                      | N/A                                                                                  | Apache 2.0           | [JetBrains/intellij-community](https://github.com/JetBrains/intellij-community)                                 |
+| [IntelliJ IDEA Ultimate Edition](https://www.jetbrains.com/idea/download/download-thanks.html)           | Rich       | Java        | [Subscription](https://www.jetbrains.com/idea/buy/#edition=discounts)     | 30-days                                                                              | Commercial           | N/A                                                                                                             |
+| [AppCode](https://www.jetbrains.com/objc/download/download-thanks.html)                                  | Small      | Objective-C | [Subscription](https://www.jetbrains.com/objc/buy/#edition=discounts)     | 30-days                                                                              | Commercial           | N/A                                                                                                             |
+| [CLion](https://www.jetbrains.com/clion/download/download-thanks.html)                                   | Small      | C/C++       | [Subscription](https://www.jetbrains.com/clion/buy/#edition=discounts)    | 30-days                                                                              | Commercial           | N/A                                                                                                             |
+| [DataGrip](https://www.jetbrains.com/datagrip/download/download-thanks.html)                             | Small      | SQL         | [Subscription](https://www.jetbrains.com/datagrip/buy/#edition=discounts) | 30-days                                                                              | Commercial           | N/A                                                                                                             |
+| [Gogland](https://www.jetbrains.com/go/download/download-thanks.html?type=eap)                           | Small      | Go          | Free                                                                      | N/A                                                                                  | Early Access Preview | N/A                                                                                                             |
+| [PHPStorm](https://www.jetbrains.com/phpstorm/download/download-thanks.html)                             | Small      | PHP         | [Subscription](https://www.jetbrains.com/phpstorm/buy/#edition=discounts) | 30-days                                                                              | Commercial           | N/A                                                                                                             |
+| [PyCharm Community Edition](https://www.jetbrains.com/pycharm/download/download-thanks.html?code=PCC)    | Small      | Python      | Free                                                                      | N/A                                                                                  | Apache 2.0           | [JetBrains/intellij-community subdirectory](https://github.com/JetBrains/intellij-community/tree/master/python) |
+| [PyCharm Professional Edition](https://www.jetbrains.com/pycharm/download/download-thanks.html)          | Small      | Python      | [Subscription](https://www.jetbrains.com/pycharm/buy/#edition=discounts)  | N/A                                                                                  | Commercial           | N/A                                                                                                             |
+| [Rider](https://www.jetbrains.com/rider/download/download-thanks.html)                                   | Small      | .NET        | [Subcription](https://www.jetbrains.com/rider/buy/#edition=discounts)     | N/A                                                                                  | Commercial           | N/A                                                                                                             |
+| [RubyMine](https://www.jetbrains.com/ruby/download/download-thanks.html)                                 | Small      | Ruby        | [Subscription](https://www.jetbrains.com/ruby/buy/#edition=discounts)     | 30-days ([90-day for whole team](https://www.jetbrains.com/ruby/buy/#edition=trial)) | Commercial           | N/A                                                                                                             |
+| [WebStorm](https://www.jetbrains.com/webstorm/download/download-thanks.html)                             | Small      | JavaScript  | [Subscription](https://www.jetbrains.com/webstorm/buy/#edition=discounts) | 30-days                                                                              | Commercial           | N/A                                                                                                             |
+
+
+Once you have your IDE of choice installed, you can [install this plugin](#installation)
 
 ## Features
 
+| Feature                                     | [Rich](#ides) | [Small](#ides) | Alternative                                                                           |
+|---------------------------------------------|---------------|----------------|---------------------------------------------------------------------------------------|
+| Project                                     | Yes           | No             | 1. Open directory<br/>2. [Elixir SDK Path in External Elixir Tools](#elixir-sdk-path) |
+| Project Structure                           | Automatic     | Manual         |                                                                                       |
+| Project Settings                            | Yes           | No             |                                                                                       |
+| Module Settings                             | Yes           | No             |                                                                                       |
+| New Elixir File                             | Yes           | Yes            |                                                                                       |
+| Syntax Highlighting and Semantic Annotation | Yes           | Yes            |                                                                                       |
+| Grammar Parsing                             | Yes           | Yes            |                                                                                       |
+| Inspections                                 | Yes           | Yes            |                                                                                       |
+| Quick Fixes                                 | Yes           | Yes            |                                                                                       |
+| Code Folding                                | Yes           | Yes            |                                                                                       |
+| Commenter                                   | Yes           | Yes            |                                                                                       |
+| Debugger                                    | Yes           | Yes            |                                                                                       |
+| Delimiters                                  | Yes           | Yes            |                                                                                       |
+| Building/Compiling                          | Yes           | No             | Build/compile as part `mix` run configurations only                                   |
+| Live Templates                              | Yes           | Yes            |                                                                                       |
+| Run Configurations                          | Yes           | Yes            |                                                                                       |
+| Completion                                  | Yes           | Yes            |                                                                                       |
+| Decompilation                               | Yes           | Yes            |                                                                                       |
+| Go To Declaration                           | Yes           | Yes            |                                                                                       |
+| Formatting                                  | Yes           | Yes            |                                                                                       |
+| Go To Symbol                                | Yes           | Yes            |                                                                                       |
+| Go To Test                                  | Yes           | Yes            |                                                                                       |
+| Go To Test Subject                          | Yes           | Yes            |                                                                                       |
+| Find Usage                                  | Yes           | Yes            |                                                                                       |
+| Refactor                                    | Yes           | Yes            |                                                                                       |
+| SDK                                         | Yes           | No             | [Elixir SDK Path in External Elixir Tools](#elixir-sdk-path)                          |
+| Structure                                   | Yes           | Yes            |                                                                                       |
+
 ### Project
-**NOTE: This feature only works in IntelliJ IDEA as it depends on an extension point unavailable in language-specific
-  IDEs, like Rubymine.**
+<b>
+NOTE: This feature only works in Rich IDEs as it depends on an extension point unavailable in Small IDEs.  To setup a project in a Small IDE
 
-#### New
-
-If you want to create a basic (non-`mix`) Elixir project with a `lib` directory, perform the following steps.
-
-1. File > New > Project
-   ![File > New > Project](/screenshots/features/project/New.png?raw=true "New Project")
-2. Select Elixir from the project type menu on the left
-3. Click Next
-   ![File > New > Project > Elixir](/screenshots/features/project/new/Elixir.png?raw=true "New Elixir Project")
-4. Select a Project SDK directory by clicking Configure.
-   ![Project SDK](/screenshots/features/project/SDK.png?raw=true "Project SDK")
-4. Select a Project SDK directory by clicking Configure.
-5. The plugin will automatically find the newest version of Elixir installed.
-   * macOS / OSX
-     * Homebrew (`/usr/local/Cellar/elixir`)
-     * Nix (`/nix/store`)
-   * Linux
-     * `/usr/local/lib/elixir`
-     * Nix and NixOS (`/nix/store`)
-   * Windows
-     * 32-bit (`C:\Program Files\Elixir`)
-     * 64-bit (`C:\Program Files (x86)\Elixir`)
-     * (**NOTE: SDK detection only works for
-   [Open an issue](https://github.com/KronicDeth/intellij-elixir/issues) with information about Elixir install locations on your operating system and package manager to have SDK detection added for it.
-6. If the automatic detection doesn't find your Elixir SDK or you want to use an older version, manually select select the directory above the `bin` directory containing `elixir`, `elixirc`, `iex`, and `mix`.  If the `bin`, `lib,` or `src` directory is incorrectly selected, it will be corrected to the parent directory.
-7. Click Next after you select SDK name from the Project SDK list.
-8. Change the `Project name` to the name your want for the project
-   ![File > New > Project > Settings](/screenshots/features/project/new/Settings.png?raw=true "New Elixir Project Settings")
-9. (Optionally) change the `Project location` if the directory does not match what you want
-10. (Optionally) expand `More Settings` to change the `Module name`, `Content root`, `Module file location`, and/or `Project format`.  The defaults derived from the `Project name` and `Project location` should work for most projects.
-11. Click Finish
-12. Choose whether to open in a New Window or in This Window.
-    ![File > New > Project > Window](/screenshots/features/project/new/Settings.png?raw=true "Open Project in New Window or This Window")
+1. Open Directory of the project
+2. [Setup the Elixir SDK Path in External Elixir Tools](#elixir-sdk-path)
+</b>
 
 #### From Existing Sources
-
-##### Create project from existing sources
-If you've already created a (non-`mix`) project, you can load it as an Elixir project into the plugin.
-
-1. File > New > Project From Existing Sources...
-2. Select the root directory of your project.
-3. Leave the default selection, "Create project from existing sources"
-4. Click Next
-5. Project name will be filled with the basename of the root directory.  Customize it if you like.
-6. Project location will be the root directory.
-7. Click Next.
-8. If you previously opened the directory in IntelliJ or another JetBrains IDE, you'll be prompted to overwrite the
-   .idea directory.  Click Yes.
-9. You'll be prompted with a list of detected Elixir project roots to add to the project.  Each root contains a
-   `mix.exs`.  Uncheck any project roots that you don't want added.
-10. Click Next.
-10. Select a Project SDK directory by clicking Configure.
-11. The plugin will automatically find the newest version of Elixir installed. (**NOTE: SDK detection only works for
-    Linux, homebrew installs on OSX, and Windows.  [Open an issue](https://github.com/KronicDeth/intellij-elixir/issues)
-    with information about Elixir install locations on your operating system and package manager to have SDK detection
-    added for it.**)
-12. If the automatic detection doesn't find your Elixir SDK or you want to use an older version, manually select select
-    the directory above the `bin` directory containing `elixir`, `elixirc`, `iex`, and `mix`.
-13. Click Next after you select SDK name from the Project SDK list.
-14. Click Finish on the framework page.  (*No framework detection is implemented yet for Elixir.*)
-15. Choose whether to open in a New Window or in This Window.
 
 ##### Import project from external model
 If you've already created a `mix` project, you can load it as an Elixir project into the plugin.
@@ -259,6 +252,65 @@ If you've already created a `mix` project, you can load it as an Elixir project 
     the directory above the `bin` directory containing `elixir`, `elixirc`, `iex`, and `mix`. (On Windows it is the
     directory containing `elixir.bat`, `elixirc.bat`, `iex.bat`, and `mix.bat`.)
 17. Click Finish after you select SDK name from the Project SDK list.
+
+##### Create project from existing sources
+If you've already created a (non-`mix`) project, you can load it as an Elixir project into the plugin.
+
+1. File > New > Project From Existing Sources...
+2. Select the root directory of your project.
+3. Leave the default selection, "Create project from existing sources"
+4. Click Next
+5. Project name will be filled with the basename of the root directory.  Customize it if you like.
+6. Project location will be the root directory.
+7. Click Next.
+8. If you previously opened the directory in IntelliJ or another JetBrains IDE, you'll be prompted to overwrite the
+   .idea directory.  Click Yes.
+9. You'll be prompted with a list of detected Elixir project roots to add to the project.  Each root contains a
+   `mix.exs`.  Uncheck any project roots that you don't want added.
+10. Click Next.
+10. Select a Project SDK directory by clicking Configure.
+11. The plugin will automatically find the newest version of Elixir installed. (**NOTE: SDK detection only works for
+    Linux, homebrew installs on OSX, and Windows.  [Open an issue](https://github.com/KronicDeth/intellij-elixir/issues)
+    with information about Elixir install locations on your operating system and package manager to have SDK detection
+    added for it.**)
+12. If the automatic detection doesn't find your Elixir SDK or you want to use an older version, manually select select
+    the directory above the `bin` directory containing `elixir`, `elixirc`, `iex`, and `mix`.
+13. Click Next after you select SDK name from the Project SDK list.
+14. Click Finish on the framework page.  (*No framework detection is implemented yet for Elixir.*)
+15. Choose whether to open in a New Window or in This Window.
+
+#### New
+
+If you want to create a basic (non-`mix`) Elixir project with a `lib` directory, perform the following steps.
+
+1. File > New > Project
+   ![File > New > Project](/screenshots/features/project/New.png?raw=true "New Project")
+2. Select Elixir from the project type menu on the left
+3. Click Next
+   ![File > New > Project > Elixir](/screenshots/features/project/new/Elixir.png?raw=true "New Elixir Project")
+4. Select a Project SDK directory by clicking Configure.
+   ![Project SDK](/screenshots/features/project/SDK.png?raw=true "Project SDK")
+4. Select a Project SDK directory by clicking Configure.
+5. The plugin will automatically find the newest version of Elixir installed.
+   * macOS / OSX
+     * Homebrew (`/usr/local/Cellar/elixir`)
+     * Nix (`/nix/store`)
+   * Linux
+     * `/usr/local/lib/elixir`
+     * Nix and NixOS (`/nix/store`)
+   * Windows
+     * 32-bit (`C:\Program Files\Elixir`)
+     * 64-bit (`C:\Program Files (x86)\Elixir`)
+     * (**NOTE: SDK detection only works for [Open an issue](https://github.com/KronicDeth/intellij-elixir/issues) with information about Elixir install locations on your operating system and package manager to have SDK detection added for it.**)
+6. If the automatic detection doesn't find your Elixir SDK or you want to use an older version, manually select select the directory above the `bin` directory containing `elixir`, `elixirc`, `iex`, and `mix`.  If the `bin`, `lib,` or `src` directory is incorrectly selected, it will be corrected to the parent directory.
+7. Click Next after you select SDK name from the Project SDK list.
+8. Change the `Project name` to the name your want for the project
+   ![File > New > Project > Settings](/screenshots/features/project/new/Settings.png?raw=true "New Elixir Project Settings")
+9. (Optionally) change the `Project location` if the directory does not match what you want
+10. (Optionally) expand `More Settings` to change the `Module name`, `Content root`, `Module file location`, and/or `Project format`.  The defaults derived from the `Project name` and `Project location` should work for most projects.
+11. Click Finish
+12. Choose whether to open in a New Window or in This Window.
+    ![File > New > Project > Window](/screenshots/features/project/new/Settings.png?raw=true "Open Project in New Window or This Window")
 
 ### Project Structure
 
@@ -2739,6 +2791,8 @@ in a `defmodule`, is used, including in strings and comments.
 
 ### SDK
 
+**NOTE: These instructions only apply to Rich IDEs, for a Small IDE use [Elixir SDK Path](#elixir-sdk-path)**
+
 Because Elixir is built on top of Erlang, Elixir command line commands don't have OS native binaries, instead the OS native binaries from Erlang are used.  In order to reliably find the Erlang OS native binaries, like `erl` and `erl.exe`, the path to BOTH the Erlang SDK and the Elixir SDK must be configured.  This allows you to install Erlang and Elixir with completely different package managers too: you can install Erlang with `kerl` and Elixir with `kiex` and you don't have to worry about IntelliJ not seeing the environment variables set by `kerl` when launching IntelliJ from an application launchers instead of a terminal.
 
 Since JetBrains' OpenAPI only supports one SDK per Project or Module, to support Elixir and Erlang SDK at the same time, the Elixir SDK keeps track of an Internal Erlang SDK.  When setting up your first Elixir SDK, you will be prompted to create an Erlang SDK (if you have the [`intellij-erlang`](https://github.com/ignatov/intellij-erlang) plugin [installed](https://plugins.jetbrains.com/plugin/7083-erlang)) or and Erlang for Elixir SDK (if you don't have `intellij-erlang` installed and you need to use the minimal Erlang for Elixir SDK supplied by this plugin).
@@ -2790,6 +2844,40 @@ These Class Paths are not just for code completion and search anymore, all paths
 8. With an Erlang SDK available to use as the Internal Erlang SDK, you'll be prompted for the Home Directory for the Elixir SDK.
 
    ![Elixir SDK Home Directory](/screenshots/features/sdk/default/Elixir%20SDK%20Home%20Directory.png?raw=true "Elixir SDK Home Directory")
+
+### Elixir External Tools
+
+#### [Rich IDEs](#ides)
+
+![Elixir External Tools in Rich IDEs](/screenshots/features/external_elixir_tools/Rich%20IDE.png?raw=true "Elixir External Tools in Rich IDEs")
+
+In a [Rich IDE](#ides), like IntelliJ IDEA, only the path to `mix` is configured as an external tool.  This `mix` path is only used when creating new projects, so when opening a pre-existing project with [Import project from external model](#import-project-from-external-model), this doesn't even need to be set.
+
+#### [Small IDEs](#ides)
+
+![Elixir External Tools in Small IDEs](/screenshots/features/external_elixir_tools/Small%20IDE.png?raw=true "Elixir External Tools in Small IDEs")
+
+##### Elixir SDK Path
+
+**NOTE: To setup the SDK in a Rich IDE use [Import project from external model](#import-project-from-external-model) or [SDK](#sdk)**
+
+In a [Small IDE](#ides), like Rubymine, the Project SDK is always a Ruby SDK, so to support a pseudo-Elixir-SDK in a Small IDE, the Elixir SDK Path can be set.
+
+1. Open Preferences > Other Settings > Elixir External Tools
+2. Set the Elixir SDK Path
+  * Paste the path to an Elixir SDK
+  * Click the `...` to select the directory
+
+  The pattern for the Elixir SDK Path varies based on the OS and package manager you used to install Elixir
+
+  | OS              | Package Manager  | Elixir SDK Path                    |
+  |-----------------|------------------|------------------------------------|
+  | OSX/macOS       | Homebrew         | `/usr/local/Cellar/elixir/VERSION` |
+  | OSX/macOS/Linux | Nix              | `/nix/store/HASH-elixir-VERSION`   |
+  | Windows 32-bit  | Erlang Solutions | `C:\Program Files\Elixir`          |
+  | Windows 64-bit  | Erlang Solutions | `C:\Program Files (x86)\Elixir`    |
+  | Linux           | Default          | `/usr/local/lib/elixir`            |
+
 
 ### Structure
 
