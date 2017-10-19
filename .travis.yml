@@ -24,14 +24,6 @@ matrix:
       env: IDEA_VERSION="2017.2.5"
       jdk: oraclejdk8
       otp_release: 19.3
-    - elixir: 1.2.6
-      env: IDEA_VERSION="2017.2.5"
-      jdk: oraclejdk8
-      otp_release: 18.3
-    - elixir: 1.1.1
-      env: IDEA_VERSION="2017.2.5"
-      jdk: oraclejdk8
-      otp_release: 18.3
 
     - elixir: 1.4.5
       env: IDEA_VERSION="2017.1.5"
@@ -41,14 +33,6 @@ matrix:
       env: IDEA_VERSION="2017.1.5"
       jdk: oraclejdk8
       otp_release: 19.3
-    - elixir: 1.2.6
-      env: IDEA_VERSION="2017.1.5"
-      jdk: oraclejdk8
-      otp_release: 18.3
-    - elixir: 1.1.1
-      env: IDEA_VERSION="2017.1.5"
-      jdk: oraclejdk8
-      otp_release: 18.3
 
     - elixir: 1.4.5
       env: IDEA_VERSION="2016.3.7"
@@ -58,14 +42,6 @@ matrix:
       env: IDEA_VERSION="2016.3.7"
       jdk: oraclejdk8
       otp_release: 19.3
-    - elixir: 1.2.6
-      env: IDEA_VERSION="2016.3.7"
-      jdk: oraclejdk8
-      otp_release: 18.3
-    - elixir: 1.1.1
-      env: IDEA_VERSION="2016.3.7"
-      jdk: oraclejdk8
-      otp_release: 18.3
 
     - elixir: 1.4.5
       env: IDEA_VERSION="2016.2.5"
@@ -75,14 +51,6 @@ matrix:
       env: IDEA_VERSION="2016.2.5"
       jdk: oraclejdk8
       otp_release: 19.3
-    - elixir: 1.2.6
-      env: IDEA_VERSION="2016.2.5"
-      jdk: oraclejdk8
-      otp_release: 18.3
-    - elixir: 1.1.1
-      env: IDEA_VERSION="2016.2.5"
-      jdk: oraclejdk8
-      otp_release: 18.3
 before_install:
 - mix local.hex --force
 - "export ELIXIR_VERSION=${TRAVIS_ELIXIR_VERSION}"
