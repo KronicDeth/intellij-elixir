@@ -7,20 +7,37 @@
     <ul>
       <li><code>credo</code> external annotator
         <ul>
-          <li>Once modifications have settled on a file and all internal annotators have run, <code>mix credo</code> will be run on any modified file.
+          <li>
+            Once modifications have settled on a file and all internal annotators have run, <code>mix credo</code> will
+            be run on any modified file.
             <ul>
-              <li>Each check failure reported by <code>mix credo</code> will be turned into a warning annotation (yellow highlight) of the line or line and column credo identified.</li>
-              <li>If you hover over the annotation (either in the source or on right gutter), the <code>mix credo PATH:LINE(:COLUMN)</code> explanation will be shown.  Links in the tooltip are clickable and allow you to jump to the specific line or line and column of the failure.</li>
+              <li>
+                Each check failure reported by <code>mix credo</code> will be turned into a warning annotation (yellow
+                highlight) of the line or line and column credo identified.
+              </li>
+              <li>
+                If you hover over the annotation (either in the source or on right gutter), the
+                <code>mix credo PATH:LINE(:COLUMN)</code> explanation will be shown.  Links in the tooltip are clickable
+                and allow you to jump to the specific line or line and column of the failure.
+              </li>
             </ul>
           </li>
         </ul>
       </li>
+      <li>Explain Rich vs Small IDEs more</li>
+      <li>
+        Add feature support table for Rich vs Small IDEs with links to alternatives for Rich IDEs features not in Small
+        IDEs.
+      </li>
+      <li>Reorder Project subsections based on usage.</li>
     </ul>
   </li>
   <li>
     <p>Bug Fixes</p>
     <ul>
-      <li>Rename package with typo <code>org.elixir_lang.annonator</code> -&gt; <code>org.elixir_lang.annotator</code>.</li>
+      <li>
+        Rename package with typo <code>org.elixir_lang.annonator</code> -&gt; <code>org.elixir_lang.annotator</code>.
+      </li>
     </ul>
     <ul>
       <li>Change error to say mix, elixir, or erlang path is not set instead of just mix path.</li>
@@ -31,6 +48,12 @@
         this gap, if the SDK is not Elixir and a Small IDE is detected, then the SDK Home from Preferences &gt; Other
         Settings &gt; Elixir External Tools &gt; Elixir SDK &gt; Path will be used to get the absolute path to the
         <code>elixir</code> (or <code>elixir.bat</code> executable and set it in the <code>GeneralCommandLine</code>.
+      </li>
+      <li>Add missing <code>**</code> for bold.</li>
+      <li>Document alternative setup in Small IDEs</li>
+      <li>
+        Put Import from external model first in Project subsections, so that people are more likely to import as a mix
+        project correctly.
       </li>
     </ul>
   </li>

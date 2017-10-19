@@ -124,12 +124,20 @@
     * Once modifications have settled on a file and all internal annotators have run, `mix credo` will be run on any modified file.
       * Each check failure reported by `mix credo` will be turned into a warning annotation (yellow highlight) of the line or line and column credo identified.
       * If you hover over the annotation (either in the source or on right gutter), the `mix credo PATH:LINE(:COLUMN)` explanation will be shown.  Links in the tooltip are clickable and allow you to jump to the specific line or line and column of the failure.
+* [#856](https://github.com/KronicDeth/intellij-elixir/pull/856) - [@KronicDeth](https://github.com/KronicDeth)
+  * Explain Rich vs Small IDEs more
+  * Add feature support table for Rich vs Small IDEs with links to alternatives for Rich IDEs features not in Small IDEs.
+  * Reorder Project subsections based on usage.
 
 ### Bug Fixes
 * [#854](https://github.com/KronicDeth/intellij-elixir/pull/854) - Rename package with typo `org.elixir_lang.annonator` -> `org.elixir_lang.annotator`. - [@KronicDeth](https://github.com/KronicDeth)
 * [#855](https://github.com/KronicDeth/intellij-elixir/pull/855) - [@KronicDeth](https://github.com/KronicDeth)
   * Change error to say mix, elixir, or erlang path is not set instead of just mix path.
   * Rewrite of `MixRunningStateUtil#setElixir` to support calling `erl` directly in IntelliJ IDEA added a check that sdk type was the Elixir SDK Type, but there was no `else` clauses to handle that there IS an SDK, but its NOT Elixir, which is the common case on all Small IDEs (like Rubymine).  To fill this gap, if the SDK is not Elixir and a Small IDE is detected, then the SDK Home from Preferences > Other Settings > Elixir External Tools > Elixir SDK > Path will be used to get the absolute path to the `elixir` (or `elixir.bat` executable and set it in the `GeneralCommandLine`.
+* [#856](https://github.com/KronicDeth/intellij-elixir/pull/856) - [@KronicDeth](https://github.com/KronicDeth)
+  * Add missing `**` for bold.
+  * Document alternative setup in Small IDEs
+  * Put Import from external model first in Project subsections, so that people are more likely to import as a mix project correctly.
 
 ## v6.2.0
 
