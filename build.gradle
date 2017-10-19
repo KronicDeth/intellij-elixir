@@ -29,7 +29,9 @@ allprojects {
   intellij {
     def intellij_erlang_version
 
-    if (ideaVersion.startsWith("2017.1.")) {
+    if (ideaVersion.startsWith("2017.2")) {
+      intellij_erlang_version = "0.9.958"
+    } else if (ideaVersion.startsWith("2017.1.")) {
       intellij_erlang_version = "0.9.939"
     } else if (ideaVersion.startsWith("2016.3.")) {
       intellij_erlang_version = "0.9.912"
