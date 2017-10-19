@@ -243,7 +243,9 @@ public class MixRunningStateUtil {
                         new Notification(
                                 "Mix run configuration",
                                 "Mix settings",
-                                "Mix executable path is " + (isEmpty ? "empty" : "not specified correctly") + "<br><a href='configure'>Configure</a></br>",
+                                "Mix executable path, elixir executable path, or erl executable path is " +
+                                        (isEmpty ? "empty" : "not specified correctly") +
+                                        "<br><a href='configure'>Configure</a></br>",
                                 NotificationType.ERROR,
                                 new ElixirExternalToolsNotificationListener(project)
                         )
