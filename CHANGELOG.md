@@ -127,6 +127,9 @@
 
 ### Bug Fixes
 * [#854](https://github.com/KronicDeth/intellij-elixir/pull/854) - Rename package with typo `org.elixir_lang.annonator` -> `org.elixir_lang.annotator`. - [@KronicDeth](https://github.com/KronicDeth)
+* [#855](https://github.com/KronicDeth/intellij-elixir/pull/855) - [@KronicDeth](https://github.com/KronicDeth)
+  * Change error to say mix, elixir, or erlang path is not set instead of just mix path.
+  * Rewrite of `MixRunningStateUtil#setElixir` to support calling `erl` directly in IntelliJ IDEA added a check that sdk type was the Elixir SDK Type, but there was no `else` clauses to handle that there IS an SDK, but its NOT Elixir, which is the common case on all Small IDEs (like Rubymine).  To fill this gap, if the SDK is not Elixir and a Small IDE is detected, then the SDK Home from Preferences > Other Settings > Elixir External Tools > Elixir SDK > Path will be used to get the absolute path to the `elixir` (or `elixir.bat` executable and set it in the `GeneralCommandLine`.
 
 ## v6.2.0
 
