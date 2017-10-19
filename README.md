@@ -6,10 +6,10 @@
   - [IDEs](#ides)
   - [Features](#features)
     - [Project](#project)
-      - [New](#new)
       - [From Existing Sources](#from-existing-sources)
-        - [Create project from existing sources](#create-project-from-existing-sources)
         - [Import project from external model](#import-project-from-external-model)
+        - [Create project from existing sources](#create-project-from-existing-sources)
+      - [New](#new)
     - [Project Structure](#project-structure)
     - [Project Settings](#project-settings)
     - [Module Settings](#module-settings)
@@ -222,6 +222,63 @@ NOTE: This feature only works in Rich IDEs as it depends on an extension point u
 2. [Setup the Elixir SDK Path in External Elixir Tools](#elixir-sdk-path)
 </b>
 
+#### From Existing Sources
+
+##### Import project from external model
+If you've already created a `mix` project, you can load it as an Elixir project into the plugin.
+
+1. File > New > Project From Existing Sources...
+2. Select the root directory of your project.
+3. Select "Import project from external model"
+4. Select Mix
+   ![File > New Project > From Existing Sources > Import project from external model > Mix](/screenshots/features/project/from_existing_sources/import_project_from_external_model/Mix.png?raw=true "Import Mix Project")
+5. Click Next
+6. The "Mix project root" will be filled in with the selected directory.
+7. (Optional) Uncheck "Fetch dependencies with mix" if you don't want to run `mix deps.get` when importing the project
+   * If "Fetch dependencies with mix" is checked both `mix hex.local --force` and `mix deps.get` will be run.
+8. Ensure the correct "Mix Path" is detected.  On Windows, the `mix.bat`, such as
+   `C:\Program Files (x86)\Elixir\bin\mix.bat` should be used instead of the `mix` file without the extension.
+9. Ensure the "Mix Version" is as expected.  The number in parentheses should match the Elixir version.
+10. Click Next
+11. All directories with `mix.exs` files will be selected as "Mix projects to import".  To import just the main project and not its dependencies, click Unselect All.
+12. Check the box next to the project root to use only its `mix.exs`.  (It will likely be the first checkbox at the top.)
+13. Click Next
+14. Select a Project SDK directory by clicking Configure.
+15. The plugin will automatically find the newest version of Elixir installed. (**NOTE: SDK detection only works for
+    Linux, homebrew installs on OSX, and Windows.  [Open an issue](https://github.com/KronicDeth/intellij-elixir/issues)
+    with information about Elixir install locations on your operating system and package manager to have SDK detection
+    added for it.**)
+16. If the automatic detection doesn't find your Elixir SDK or you want to use an older version, manually select select
+    the directory above the `bin` directory containing `elixir`, `elixirc`, `iex`, and `mix`. (On Windows it is the
+    directory containing `elixir.bat`, `elixirc.bat`, `iex.bat`, and `mix.bat`.)
+17. Click Finish after you select SDK name from the Project SDK list.
+
+##### Create project from existing sources
+If you've already created a (non-`mix`) project, you can load it as an Elixir project into the plugin.
+
+1. File > New > Project From Existing Sources...
+2. Select the root directory of your project.
+3. Leave the default selection, "Create project from existing sources"
+4. Click Next
+5. Project name will be filled with the basename of the root directory.  Customize it if you like.
+6. Project location will be the root directory.
+7. Click Next.
+8. If you previously opened the directory in IntelliJ or another JetBrains IDE, you'll be prompted to overwrite the
+   .idea directory.  Click Yes.
+9. You'll be prompted with a list of detected Elixir project roots to add to the project.  Each root contains a
+   `mix.exs`.  Uncheck any project roots that you don't want added.
+10. Click Next.
+10. Select a Project SDK directory by clicking Configure.
+11. The plugin will automatically find the newest version of Elixir installed. (**NOTE: SDK detection only works for
+    Linux, homebrew installs on OSX, and Windows.  [Open an issue](https://github.com/KronicDeth/intellij-elixir/issues)
+    with information about Elixir install locations on your operating system and package manager to have SDK detection
+    added for it.**)
+12. If the automatic detection doesn't find your Elixir SDK or you want to use an older version, manually select select
+    the directory above the `bin` directory containing `elixir`, `elixirc`, `iex`, and `mix`.
+13. Click Next after you select SDK name from the Project SDK list.
+14. Click Finish on the framework page.  (*No framework detection is implemented yet for Elixir.*)
+15. Choose whether to open in a New Window or in This Window.
+
 #### New
 
 If you want to create a basic (non-`mix`) Elixir project with a `lib` directory, perform the following steps.
@@ -255,63 +312,6 @@ If you want to create a basic (non-`mix`) Elixir project with a `lib` directory,
 11. Click Finish
 12. Choose whether to open in a New Window or in This Window.
     ![File > New > Project > Window](/screenshots/features/project/new/Settings.png?raw=true "Open Project in New Window or This Window")
-
-#### From Existing Sources
-
-##### Create project from existing sources
-If you've already created a (non-`mix`) project, you can load it as an Elixir project into the plugin.
-
-1. File > New > Project From Existing Sources...
-2. Select the root directory of your project.
-3. Leave the default selection, "Create project from existing sources"
-4. Click Next
-5. Project name will be filled with the basename of the root directory.  Customize it if you like.
-6. Project location will be the root directory.
-7. Click Next.
-8. If you previously opened the directory in IntelliJ or another JetBrains IDE, you'll be prompted to overwrite the
-   .idea directory.  Click Yes.
-9. You'll be prompted with a list of detected Elixir project roots to add to the project.  Each root contains a
-   `mix.exs`.  Uncheck any project roots that you don't want added.
-10. Click Next.
-10. Select a Project SDK directory by clicking Configure.
-11. The plugin will automatically find the newest version of Elixir installed. (**NOTE: SDK detection only works for
-    Linux, homebrew installs on OSX, and Windows.  [Open an issue](https://github.com/KronicDeth/intellij-elixir/issues)
-    with information about Elixir install locations on your operating system and package manager to have SDK detection
-    added for it.**)
-12. If the automatic detection doesn't find your Elixir SDK or you want to use an older version, manually select select
-    the directory above the `bin` directory containing `elixir`, `elixirc`, `iex`, and `mix`.
-13. Click Next after you select SDK name from the Project SDK list.
-14. Click Finish on the framework page.  (*No framework detection is implemented yet for Elixir.*)
-15. Choose whether to open in a New Window or in This Window.
-
-##### Import project from external model
-If you've already created a `mix` project, you can load it as an Elixir project into the plugin.
-
-1. File > New > Project From Existing Sources...
-2. Select the root directory of your project.
-3. Select "Import project from external model"
-4. Select Mix
-   ![File > New Project > From Existing Sources > Import project from external model > Mix](/screenshots/features/project/from_existing_sources/import_project_from_external_model/Mix.png?raw=true "Import Mix Project")
-5. Click Next
-6. The "Mix project root" will be filled in with the selected directory.
-7. (Optional) Uncheck "Fetch dependencies with mix" if you don't want to run `mix deps.get` when importing the project
-   * If "Fetch dependencies with mix" is checked both `mix hex.local --force` and `mix deps.get` will be run.
-8. Ensure the correct "Mix Path" is detected.  On Windows, the `mix.bat`, such as
-   `C:\Program Files (x86)\Elixir\bin\mix.bat` should be used instead of the `mix` file without the extension.
-9. Ensure the "Mix Version" is as expected.  The number in parentheses should match the Elixir version.
-10. Click Next
-11. All directories with `mix.exs` files will be selected as "Mix projects to import".  To import just the main project and not its dependencies, click Unselect All.
-12. Check the box next to the project root to use only its `mix.exs`.  (It will likely be the first checkbox at the top.)
-13. Click Next
-14. Select a Project SDK directory by clicking Configure.
-15. The plugin will automatically find the newest version of Elixir installed. (**NOTE: SDK detection only works for
-    Linux, homebrew installs on OSX, and Windows.  [Open an issue](https://github.com/KronicDeth/intellij-elixir/issues)
-    with information about Elixir install locations on your operating system and package manager to have SDK detection
-    added for it.**)
-16. If the automatic detection doesn't find your Elixir SDK or you want to use an older version, manually select select
-    the directory above the `bin` directory containing `elixir`, `elixirc`, `iex`, and `mix`. (On Windows it is the
-    directory containing `elixir.bat`, `elixirc.bat`, `iex.bat`, and `mix.bat`.)
-17. Click Finish after you select SDK name from the Project SDK list.
 
 ### Project Structure
 
