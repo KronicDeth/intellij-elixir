@@ -3,6 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Elixir plugin](#elixir-plugin)
+  - [IDEs](#ides)
   - [Features](#features)
     - [Project](#project)
       - [New](#new)
@@ -22,6 +23,8 @@
       - [Elixir GenServer](#elixir-genserver)
       - [Elixir GenEvent](#elixir-genevent)
     - [Syntax Highlighting and Semantic Annotation](#syntax-highlighting-and-semantic-annotation)
+    - [External Annotators](#external-annotators)
+      - [Credo](#credo)
     - [Grammar parsing](#grammar-parsing)
     - [Inspections](#inspections)
       - [Ambiguous nested calls](#ambiguous-nested-calls)
@@ -149,25 +152,36 @@
 
 [![Build Status](https://travis-ci.org/KronicDeth/intellij-elixir.svg?branch=master)](https://travis-ci.org/KronicDeth/intellij-elixir)
 
-This is a plugin that adds support for [Elixir](http://elixir-lang.org/) to JetBrains IntelliJ IDEA platform IDEs
-([DataGrip](http://www.jetbrains.com/datagrip/), [AppCode](http://www.jetbrains.com/objc/),
-[IntelliJ IDEA](http://www.jetbrains.com/idea/), [PHPStorm](http://www.jetbrains.com/phpstorm/),
-[PyCharm](http://www.jetbrains.com/pycharm/), [Rubymine](http://www.jetbrains.com/ruby/),
-[WebStorm](http://www.jetbrains.com/webstorm/)).
+This is a plugin that adds support for [Elixir](http://elixir-lang.org/) to JetBrains IDEs.
 
-It works with the free,
-[open source](https://github.com/JetBrains/intellij-community) Community edition of IntelliJ IDEA in addition to the
-paid JetBrains IDEs like Ultimate edition of IntelliJ.  No feature is locked to a the paid version of the IDEs, but
-the plugin works best in IntelliJ because only IntelliJ supports projects with different languages than the default
-(Java for IntelliJ, Ruby for Rubymine, etc).
+The plugin works both in the rich IDEs that allow alternative language SDK selection and small IDEs that are language specific.  The rich IDEs work best for IntelliJ Elixir because only in the rich IDEs can have an Elixir SDK set as the Project SDK.  In all small IDEs, the native language SDK is always there, which makes anything that uses the SDK, such as running `elixir`, `erl`, or `mix` more complicated both internally and externally in the configuration you have to setup.
 
-The plugin itself is free.  Once you have your IDE of choice installed, you can [install this plugin](#installation)
+## IDEs
+
+*The plugin is free to use in all JetBrains IDEs.  The Cost column in the below table is what JetBrains charges for the IDE itself.  IntelliJ Elixir is maintained by [@KronicDeth](https://github.com/KronicDeth) who does not get any of the subscription money.  If you want to support the plugin itself, make a [donation](#donations).*
+
+| IDE                                                                                                      | Rich/Small | Languages   | Cost                                                                      | Trial                                                                                | License              | Source                                                                                                          |
+|----------------------------------------------------------------------------------------------------------|------------|-------------|---------------------------------------------------------------------------|--------------------------------------------------------------------------------------|----------------------|-----------------------------------------------------------------------------------------------------------------|
+| [IntelliJ IDEA Community Edition](https://www.jetbrains.com/idea/download/download-thanks.html?code=IIC) | Rich       | Java        | Free                                                                      | N/A                                                                                  | Apache 2.0           | [JetBrains/intellij-community](https://github.com/JetBrains/intellij-community)                                 |
+| [IntelliJ IDEA Ultimate Edition](https://www.jetbrains.com/idea/download/download-thanks.html)           | Rich       | Java        | [Subscription](https://www.jetbrains.com/idea/buy/#edition=discounts)     | 30-days                                                                              | Commercial           | N/A                                                                                                             |
+| [AppCode](https://www.jetbrains.com/objc/download/download-thanks.html)                                  | Small      | Objective-C | [Subscription](https://www.jetbrains.com/objc/buy/#edition=discounts)     | 30-days                                                                              | Commercial           | N/A                                                                                                             |
+| [CLion](https://www.jetbrains.com/clion/download/download-thanks.html)                                   | Small      | C/C++       | [Subscription](https://www.jetbrains.com/clion/buy/#edition=discounts)    | 30-days                                                                              | Commercial           | N/A                                                                                                             |
+| [DataGrip](https://www.jetbrains.com/datagrip/download/download-thanks.html)                             | Small      | SQL         | [Subscription](https://www.jetbrains.com/datagrip/buy/#edition=discounts) | 30-days                                                                              | Commercial           | N/A                                                                                                             |
+| [Gogland](https://www.jetbrains.com/go/download/download-thanks.html?type=eap)                           | Small      | Go          | Free                                                                      | N/A                                                                                  | Early Access Preview | N/A                                                                                                             |
+| [PHPStorm](https://www.jetbrains.com/phpstorm/download/download-thanks.html)                             | Small      | PHP         | [Subscription](https://www.jetbrains.com/phpstorm/buy/#edition=discounts) | 30-days                                                                              | Commercial           | N/A                                                                                                             |
+| [PyCharm Community Edition](https://www.jetbrains.com/pycharm/download/download-thanks.html?code=PCC)    | Small      | Python      | Free                                                                      | N/A                                                                                  | Apache 2.0           | [JetBrains/intellij-community subdirectory](https://github.com/JetBrains/intellij-community/tree/master/python) |
+| [PyCharm Professional Edition](https://www.jetbrains.com/pycharm/download/download-thanks.html)          | Small      | Python      | [Subscription](https://www.jetbrains.com/pycharm/buy/#edition=discounts)  | N/A                                                                                  | Commercial           | N/A                                                                                                             |
+| [Rider](https://www.jetbrains.com/rider/download/download-thanks.html)                                   | Small      | .NET        | [Subcription](https://www.jetbrains.com/rider/buy/#edition=discounts)     | N/A                                                                                  | Commercial           | N/A                                                                                                             |
+| [RubyMine](https://www.jetbrains.com/ruby/download/download-thanks.html)                                 | Small      | Ruby        | [Subscription](https://www.jetbrains.com/ruby/buy/#edition=discounts)     | 30-days ([90-day for whole team](https://www.jetbrains.com/ruby/buy/#edition=trial)) | Commercial           | N/A                                                                                                             |
+| [WebStorm](https://www.jetbrains.com/webstorm/download/download-thanks.html)                             | Small      | JavaScript  | [Subscription](https://www.jetbrains.com/webstorm/buy/#edition=discounts) | 30-days                                                                              | Commercial           | N/A                                                                                                             |
+
+
+Once you have your IDE of choice installed, you can [install this plugin](#installation)
 
 ## Features
 
 ### Project
-**NOTE: This feature only works in IntelliJ IDEA as it depends on an extension point unavailable in language-specific
-  IDEs, like Rubymine.**
+**NOTE: This feature only works in [rich IDEs](#ides) as it depends on an extension point unavailable in [small IDEs](#ides).**
 
 #### New
 
