@@ -22,6 +22,7 @@ import org.elixir_lang.jps.builder.ParametersList;
 import org.elixir_lang.jps.model.JpsElixirSdkType;
 import org.elixir_lang.jps.model.JpsErlangSdkType;
 import org.elixir_lang.mix.settings.MixSettings;
+import org.elixir_lang.sdk.elixir.ForSmallIdes;
 import org.elixir_lang.sdk.elixir.Type;
 import org.elixir_lang.utils.ElixirExternalToolsNotificationListener;
 import org.jetbrains.annotations.NotNull;
@@ -31,6 +32,7 @@ import java.io.File;
 import java.nio.file.Paths;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.elixir_lang.sdk.ProcessOutput.isSmallIde;
 import static org.elixir_lang.sdk.elixir.Type.addDocumentationPaths;
 import static org.elixir_lang.sdk.elixir.Type.addSourcePaths;
 import static org.elixir_lang.sdk.elixir.Type.putDefaultErlangSdk;
@@ -243,7 +245,9 @@ public class MixRunningStateUtil {
                         new Notification(
                                 "Mix run configuration",
                                 "Mix settings",
-                                "Mix executable path is " + (isEmpty ? "empty" : "not specified correctly") + "<br><a href='configure'>Configure</a></br>",
+                                "Mix executable path, elixir executable path, or erl executable path is " +
+                                        (isEmpty ? "empty" : "not specified correctly") +
+                                        "<br><a href='configure'>Configure</a></br>",
                                 NotificationType.ERROR,
                                 new ElixirExternalToolsNotificationListener(project)
                         )
@@ -302,6 +306,17 @@ public class MixRunningStateUtil {
                         commandLine.addParameter("-extra");
                     }
                 }
+            } else if (isSmallIde()) {
+                String sdkHome = ForSmallIdes.getSdkHome(project);
+                String elixir;
+
+                if (sdkHome != null) {
+                    elixir = JpsElixirSdkType.getScriptInterpreterExecutable(sdkHome).toString();
+                } else {
+                    elixir = JpsElixirSdkType.getExecutableFileName("elixir");
+                }
+
+                commandLine.setExePath(elixir);
             }
         } else {
             String elixir = JpsElixirSdkType.getExecutableFileName("elixir");
