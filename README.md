@@ -123,6 +123,10 @@
         - [Parameters and Variables](#parameters-and-variables-3)
     - [SDK](#sdk)
       - [Default SDK](#default-sdk)
+    - [Elixir External Tools](#elixir-external-tools)
+      - [Rich IDEs](#rich-ides)
+      - [Small IDEs](#small-ides)
+        - [Elixir SDK Path](#elixir-sdk-path)
     - [Structure](#structure)
       - [Viewing Structure](#viewing-structure)
       - [Buttons](#buttons)
@@ -180,38 +184,43 @@ Once you have your IDE of choice installed, you can [install this plugin](#insta
 
 ## Features
 
-| Feature                                     | [Rich](#ides) | [Small](#ides)  |
-|---------------------------------------------|---------------|-----------------|
-| Project                                     | Yes           | No              |
-| Project Structure                           | Automatic     | Manual          |
-| Project Settings                            | Yes           | No              |
-| Module Settings                             | Yes           | No              |
-| New Elixir File                             | Yes           | Yes             |
-| Syntax Highlighting and Semantic Annotation | Yes           | Yes             |
-| Grammar Parsing                             | Yes           | Yes             |
-| Inspections                                 | Yes           | Yes             |
-| Quick Fixes                                 | Yes           | Yes             |
-| Code Folding                                | Yes           | Yes             |
-| Commenter                                   | Yes           | Yes             |
-| Debugger                                    | Yes           | Yes             |
-| Delimiters                                  | Yes           | Yes             |
-| Building/Compiling                          | Yes           | No              |
-| Live Templates                              | Yes           | Yes             |
-| Run Configurations                          | Yes           | Yes             |
-| Completion                                  | Yes           | Yes             |
-| Decompilation                               | Yes           | Yes             |
-| Go To Declaration                           | Yes           | Yes             |
-| Formatting                                  | Yes           | Yes             |
-| Go To Symbol                                | Yes           | Yes             |
-| Go To Test                                  | Yes           | Yes             |
-| Go To Test Subject                          | Yes           | Yes             |
-| Find Usage                                  | Yes           | Yes             |
-| Refactor                                    | Yes           | Yes             |
-| SDK                                         | Yes           | No              |
-| Structure                                   | Yes           | Yes             |
+| Feature                                     | [Rich](#ides) | [Small](#ides) | Alternative                                                                           |
+|---------------------------------------------|---------------|----------------|---------------------------------------------------------------------------------------|
+| Project                                     | Yes           | No             | 1. Open directory<br/>2. [Elixir SDK Path in External Elixir Tools](#elixir-sdk-path) |
+| Project Structure                           | Automatic     | Manual         |                                                                                       |
+| Project Settings                            | Yes           | No             |                                                                                       |
+| Module Settings                             | Yes           | No             |                                                                                       |
+| New Elixir File                             | Yes           | Yes            |                                                                                       |
+| Syntax Highlighting and Semantic Annotation | Yes           | Yes            |                                                                                       |
+| Grammar Parsing                             | Yes           | Yes            |                                                                                       |
+| Inspections                                 | Yes           | Yes            |                                                                                       |
+| Quick Fixes                                 | Yes           | Yes            |                                                                                       |
+| Code Folding                                | Yes           | Yes            |                                                                                       |
+| Commenter                                   | Yes           | Yes            |                                                                                       |
+| Debugger                                    | Yes           | Yes            |                                                                                       |
+| Delimiters                                  | Yes           | Yes            |                                                                                       |
+| Building/Compiling                          | Yes           | No             | Build/compile as part `mix` run configurations only                                   |
+| Live Templates                              | Yes           | Yes            |                                                                                       |
+| Run Configurations                          | Yes           | Yes            |                                                                                       |
+| Completion                                  | Yes           | Yes            |                                                                                       |
+| Decompilation                               | Yes           | Yes            |                                                                                       |
+| Go To Declaration                           | Yes           | Yes            |                                                                                       |
+| Formatting                                  | Yes           | Yes            |                                                                                       |
+| Go To Symbol                                | Yes           | Yes            |                                                                                       |
+| Go To Test                                  | Yes           | Yes            |                                                                                       |
+| Go To Test Subject                          | Yes           | Yes            |                                                                                       |
+| Find Usage                                  | Yes           | Yes            |                                                                                       |
+| Refactor                                    | Yes           | Yes            |                                                                                       |
+| SDK                                         | Yes           | No             | [Elixir SDK Path in External Elixir Tools](#elixir-sdk-path)                          |
+| Structure                                   | Yes           | Yes            |                                                                                       |
 
 ### Project
-**NOTE: This feature only works in [rich IDEs](#ides) as it depends on an extension point unavailable in [small IDEs](#ides).**
+<b>
+NOTE: This feature only works in Rich IDEs as it depends on an extension point unavailable in Small IDEs.  To setup a project in a Small IDE
+
+1. Open Directory of the project
+2. [Setup the Elixir SDK Path in External Elixir Tools](#elixir-sdk-path)
+</b>
 
 #### New
 
@@ -2783,6 +2792,8 @@ in a `defmodule`, is used, including in strings and comments.
 
 ### SDK
 
+**NOTE: These instructions only apply to Rich IDEs, for a Small IDE use [Elixir SDK Path](#elixir-sdk-path)**
+
 Because Elixir is built on top of Erlang, Elixir command line commands don't have OS native binaries, instead the OS native binaries from Erlang are used.  In order to reliably find the Erlang OS native binaries, like `erl` and `erl.exe`, the path to BOTH the Erlang SDK and the Elixir SDK must be configured.  This allows you to install Erlang and Elixir with completely different package managers too: you can install Erlang with `kerl` and Elixir with `kiex` and you don't have to worry about IntelliJ not seeing the environment variables set by `kerl` when launching IntelliJ from an application launchers instead of a terminal.
 
 Since JetBrains' OpenAPI only supports one SDK per Project or Module, to support Elixir and Erlang SDK at the same time, the Elixir SDK keeps track of an Internal Erlang SDK.  When setting up your first Elixir SDK, you will be prompted to create an Erlang SDK (if you have the [`intellij-erlang`](https://github.com/ignatov/intellij-erlang) plugin [installed](https://plugins.jetbrains.com/plugin/7083-erlang)) or and Erlang for Elixir SDK (if you don't have `intellij-erlang` installed and you need to use the minimal Erlang for Elixir SDK supplied by this plugin).
@@ -2834,6 +2845,40 @@ These Class Paths are not just for code completion and search anymore, all paths
 8. With an Erlang SDK available to use as the Internal Erlang SDK, you'll be prompted for the Home Directory for the Elixir SDK.
 
    ![Elixir SDK Home Directory](/screenshots/features/sdk/default/Elixir%20SDK%20Home%20Directory.png?raw=true "Elixir SDK Home Directory")
+
+### Elixir External Tools
+
+#### [Rich IDEs](#ides)
+
+![Elixir External Tools in Rich IDEs](/screenshots/features/external_elixir_tools/Rich%20IDE.png?raw=true "Elixir External Tools in Rich IDEs")
+
+In a [Rich IDE](#ides), like IntelliJ IDEA, only the path to `mix` is configured as an external tool.  This `mix` path is only used when creating new projects, so when opening a pre-existing project with [Import project from external model](#import-project-from-external-model), this doesn't even need to be set.
+
+#### [Small IDEs](#ides)
+
+![Elixir External Tools in Small IDEs](/screenshots/features/external_elixir_tools/Small%20IDE.png?raw=true "Elixir External Tools in Small IDEs")
+
+##### Elixir SDK Path
+
+**NOTE: To setup the SDK in a Rich IDE use [Import project from external model](#import-project-from-external-model) or [SDK](#sdk)**
+
+In a [Small IDE](#ides), like Rubymine, the Project SDK is always a Ruby SDK, so to support a pseudo-Elixir-SDK in a Small IDE, the Elixir SDK Path can be set.
+
+1. Open Preferences > Other Settings > Elixir External Tools
+2. Set the Elixir SDK Path
+  * Paste the path to an Elixir SDK
+  * Click the `...` to select the directory
+
+  The pattern for the Elixir SDK Path varies based on the OS and package manager you used to install Elixir
+
+  | OS              | Package Manager  | Elixir SDK Path                    |
+  |-----------------|------------------|------------------------------------|
+  | OSX/macOS       | Homebrew         | `/usr/local/Cellar/elixir/VERSION` |
+  | OSX/macOS/Linux | Nix              | `/nix/store/HASH-elixir-VERSION`   |
+  | Windows 32-bit  | Erlang Solutions | `C:\Program Files\Elixir`          |
+  | Windows 64-bit  | Erlang Solutions | `C:\Program Files (x86)\Elixir`    |
+  | Linux           | Default          | `/usr/local/lib/elixir`            |
+
 
 ### Structure
 
