@@ -133,6 +133,10 @@ public class DecompilerTest extends LightCodeInsightTestCase {
         assertDecompiled("docgen_xmerl_xml_cb");
     }
 
+    public void testIssue860() throws IOException, OtpErlangDecodeException {
+        assertDecompiled("OTP-PUB-KEY");
+    }
+
     public void testElixir_1_5_0() throws IOException, OtpErlangDecodeException {
         assertDecompiled("OTP20/Elixir.AtU8Test");
     }
