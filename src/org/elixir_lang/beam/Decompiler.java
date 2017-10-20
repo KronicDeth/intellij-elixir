@@ -132,7 +132,7 @@ public class Decompiler implements BinaryFileDecompiler {
         com.intellij.openapi.diagnostic.Logger logger = com.intellij.openapi.diagnostic.Logger.getInstance(
                 Decompiler.class
         );
-        String fullUserMessage = "No decompiler for MacroNameArity (" + macroNameArity +")";
+        String fullUserMessage = "No decompiler for MacroNameArity (" + macroNameArity + ")";
         logger.error(
                 LogMessageEx.createEvent(
                         fullUserMessage,
@@ -154,9 +154,22 @@ public class Decompiler implements BinaryFileDecompiler {
         if (moduleName.startsWith(ELIXIR_PREFIX)) {
             defmoduleArgument = moduleName.substring(ELIXIR_PREFIX.length());
         } else {
-            defmoduleArgument = ":" + moduleName;
+            defmoduleArgument = ":" + moduleNameToAtomName(moduleName);
         }
         return defmoduleArgument;
+    }
+
+    @NotNull
+    private static String moduleNameToAtomName(@NotNull String moduleName) {
+        String atom;
+
+        if (moduleName.contains("-")) {
+            atom = "\"" + moduleName + "\"";
+        } else {
+            atom = moduleName;
+        }
+
+        return atom;
     }
 
     @NotNull
