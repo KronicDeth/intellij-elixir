@@ -1,6 +1,7 @@
 package org.elixir_lang.beam.decompiler;
 
 import gnu.trove.THashSet;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,17 +38,18 @@ public class Unquoted extends MacroNameArity {
     /**
      * @param name {@link org.elixir_lang.beam.MacroNameArity#name}
      */
+    @Contract(pure = true)
     private static boolean isSpecialForm(@NotNull String name) {
         return SPECIAL_FORM_NAME_SET.contains(name);
     }
 
-    private static boolean wouldParseAsAlias(@NotNull String name) {
-        return Character.isUpperCase(name.codePointAt(0));
+    @Contract(pure = true)
+    private static boolean mustQuoteAtom(@NotNull String name) {
+        return StringUtils.containsAny(name, "#-");
     }
 
-    @Contract(pure = true)
-    private static boolean wouldParseAsComment(@NotNull String name) {
-        return name.contains("#");
+    private static boolean wouldParseAsAlias(@NotNull String name) {
+        return Character.isUpperCase(name.codePointAt(0));
     }
 
     /*
@@ -64,9 +66,8 @@ public class Unquoted extends MacroNameArity {
     public boolean accept(@NotNull org.elixir_lang.beam.MacroNameArity macroNameArity) {
         String name = macroNameArity.name;
 
-        return wouldParseAsAlias(name) || wouldParseAsComment(name) || isSpecialForm(name);
+        return wouldParseAsAlias(name) || mustQuoteAtom(name) || isSpecialForm(name);
     }
-
 
     /**
      * Append the decompiled source for {@code macroNameArity} to {@code decompiled}.
@@ -89,7 +90,7 @@ public class Unquoted extends MacroNameArity {
     private StringBuilder macroNameToAtomName(@NotNull String macroName) {
         StringBuilder atomName = new StringBuilder();
 
-        if (wouldParseAsComment(macroName)) {
+        if (mustQuoteAtom(macroName)) {
             atomName.append('"').append(macroName).append('"');
         } else {
             atomName.append(macroName);
