@@ -3945,7 +3945,9 @@ I'd like to thank those who have donated to help support this project.
 * Robin Hillard ([@robinhillard](https://github.com/robinhillard)) of [rocketboots.com](http://www.rocketboots.com)
 * Ryan Scheel ([@Havvy](https://github.com/Havvy))
 * Tynes Consulting
-* William De Melo Gueiros ([williamgueiros](https://github.com/williamgueiros))
+* William De Melo Gueiros ([@williamgueiros](https://github.com/williamgueiros))
 * Yicheng Dong
 * [TreasureData](https://www.treasuredata.com/)
-
+* Denis Andrejew [@seeekr](https://github.com/seeekr)
+* Vanja Radovanović [@elvanja](https://github.com/elvanja)
+* Bartłomiej Kuczyński [@Koziolek](https://github.com/Koziolek)
