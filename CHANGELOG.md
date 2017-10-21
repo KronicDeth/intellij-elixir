@@ -126,6 +126,7 @@
 ### Enhancements
 * [#861](https://github.com/KronicDeth/intellij-elixir/pull/861) - Regression test for [#860](https://github.com/KronicDeth/intellij-elixir/issues/860) - [@KronicDeth](https://github.com/KronicDeth)
 * [#862](https://github.com/KronicDeth/intellij-elixir/pull/862) - Regression test for [#859](https://github.com/KronicDeth/intellij-elixir/issues/859) - [@KronicDeth](https://github.com/KronicDeth)
+* [#863](https://github.com/KronicDeth/intellij-elixir/pull/863) - Convert ANSI escape codes to colored output in `mix` Run and Debug output - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#861](https://github.com/KronicDeth/intellij-elixir/pull/861) - [@KronicDeth](https://github.com/KronicDeth).
