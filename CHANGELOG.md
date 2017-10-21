@@ -124,12 +124,14 @@
 ## v6.4.0
 
 ### Enhancements
-* [#861](https://github.com/KronicDeth/intellij-elixir/pull/861) - Regression test for [#860](https://github.com/KronicDeth/intellij-elixir/issues/860) - [@KronicDeth](https://github.com/KronicDeth).
+* [#861](https://github.com/KronicDeth/intellij-elixir/pull/861) - Regression test for [#860](https://github.com/KronicDeth/intellij-elixir/issues/860) - [@KronicDeth](https://github.com/KronicDeth)
+* [#862](https://github.com/KronicDeth/intellij-elixir/pull/862) - Regression test for [#859](https://github.com/KronicDeth/intellij-elixir/issues/859) - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#861](https://github.com/KronicDeth/intellij-elixir/pull/861) - [@KronicDeth](https://github.com/KronicDeth).
   * Quote `-` in addition to `#` in `Unquoted` `MacroNameArity` decompiler.
   * Quote `-` in decompiled module names.
+* [#862](https://github.com/KronicDeth/intellij-elixir/pull/862) - Wrap call definitions with name `nil` as `unquote(:nil)` in the decompiler. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v6.3.0
 
