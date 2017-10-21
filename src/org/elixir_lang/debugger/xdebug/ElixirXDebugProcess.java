@@ -23,6 +23,7 @@ import com.intellij.execution.ExecutionException;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.configurations.RunConfiguration;
+import com.intellij.execution.process.ColoredProcessHandler;
 import com.intellij.execution.process.OSProcessHandler;
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.execution.runners.ExecutionEnvironment;
@@ -319,7 +320,7 @@ class ElixirXDebugProcess extends XDebugProcess implements ElixirDebuggerEventLi
         LOG.debug(commandLine.getCommandLineString());
 
         Process process = commandLine.createProcess();
-        elixirProcessHandler = new OSProcessHandler(process, commandLine.getCommandLineString());
+        elixirProcessHandler = new ColoredProcessHandler(process, commandLine.getCommandLineString());
 
         LOG.debug("Debugger process started.");
         return elixirProcessHandler;
