@@ -2,6 +2,7 @@ package org.elixir_lang.mix.runner;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
+import com.intellij.execution.process.ColoredProcessHandler;
 import com.intellij.execution.process.OSProcessHandler;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
@@ -235,7 +236,7 @@ public class MixRunningStateUtil {
     @NotNull
     static OSProcessHandler runMix(Project project, GeneralCommandLine commandLine) throws ExecutionException {
         try {
-            return new OSProcessHandler(commandLine.createProcess(), commandLine.getCommandLineString());
+            return new ColoredProcessHandler(commandLine.createProcess(), commandLine.getCommandLineString());
         } catch (ExecutionException e) {
             String message = e.getMessage();
             boolean isEmpty = "Executable is not specified".equals(message);
