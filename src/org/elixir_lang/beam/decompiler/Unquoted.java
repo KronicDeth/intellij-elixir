@@ -26,6 +26,7 @@ public class Unquoted extends MacroNameArity {
         SPECIAL_FORM_NAME_SET.add("<<>>");
         SPECIAL_FORM_NAME_SET.add("do");
         SPECIAL_FORM_NAME_SET.add("fn");
+        SPECIAL_FORM_NAME_SET.add("nil");
         SPECIAL_FORM_NAME_SET.add("unquote");
         SPECIAL_FORM_NAME_SET.add("unquote_splicing");
         SPECIAL_FORM_NAME_SET.add("{}");
