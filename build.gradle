@@ -4,8 +4,20 @@ plugins {
 }
 
 ext {
-  quoterPath = "${rootDir}/cache/intellij_elixir-0.1.1"
-  quoterExe = "${quoterPath}/rel/intellij_elixir/bin/intellij_elixir"
+  if (elixirVersion.startsWith("1.5")) {
+    quoterVersion = "1.0.0"
+  } else {
+    quoterVersion = "0.1.1"
+  }
+
+  quoterPath = "${rootDir}/cache/intellij_elixir-${quoterVersion}"
+
+  if (elixirVersion.startsWith("1.5")) {
+    quoterExe = "${quoterPath}/_build/dev/rel/intellij_elixir/bin/intellij_elixir"
+  } else {
+    quoterExe = "${quoterPath}/rel/intellij_elixir/bin/intellij_elixir"
+  }
+
   elixirPath = "${rootDir}/cache/elixir-${elixirVersion}"
 }
 
