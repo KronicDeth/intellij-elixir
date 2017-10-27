@@ -42,6 +42,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
+import static com.intellij.openapi.application.ModalityState.NON_MODAL;
 import static org.elixir_lang.sdk.HomePath.*;
 import static org.elixir_lang.sdk.ProcessOutput.STANDARD_TIMEOUT;
 import static org.elixir_lang.sdk.ProcessOutput.transformStdoutLine;
@@ -284,7 +285,12 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
         final Sdk erlangSdk;
 
         if (projectJdkImpl.getVersionString() != null) {
-            ApplicationManager.getApplication().runWriteAction(() -> projectJdkTable.addJdk(projectJdkImpl));
+            ApplicationManager.getApplication().invokeAndWait(
+                    () -> ApplicationManager.getApplication().runWriteAction(() ->
+                            projectJdkTable.addJdk(projectJdkImpl)
+                    ),
+                    NON_MODAL
+            );
 
             erlangSdk = projectJdkImpl;
         } else {
@@ -336,7 +342,10 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
 
         SdkModificator sdkModificator = elixirSdk.getSdkModificator();
         Sdk defaultErlangSdk = configureInternalErlangSdk(elixirSdk, sdkModificator);
-        ApplicationManager.getApplication().runWriteAction(sdkModificator::commitChanges);
+        ApplicationManager.getApplication().invokeAndWait(
+                () -> ApplicationManager.getApplication().runWriteAction(sdkModificator::commitChanges),
+                NON_MODAL
+        );
 
         return defaultErlangSdk;
     }
