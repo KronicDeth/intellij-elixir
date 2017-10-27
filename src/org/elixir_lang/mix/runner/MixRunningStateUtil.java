@@ -7,6 +7,7 @@ import com.intellij.execution.process.OSProcessHandler;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.Sdk;
@@ -32,6 +33,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.nio.file.Paths;
 
+import static com.intellij.openapi.application.ModalityState.NON_MODAL;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.elixir_lang.sdk.ProcessOutput.isSmallIde;
 import static org.elixir_lang.sdk.elixir.Type.addDocumentationPaths;
@@ -102,7 +104,10 @@ public class MixRunningStateUtil {
             modified = updateSourcePaths(sdkModificator, homePath) || modified;
 
             if (modified) {
-                sdkModificator.commitChanges();
+                ApplicationManager.getApplication().invokeAndWait(
+                        () -> ApplicationManager.getApplication().runWriteAction(sdkModificator::commitChanges),
+                        NON_MODAL
+                );
             }
         }
     }
