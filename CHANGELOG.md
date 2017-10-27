@@ -133,6 +133,7 @@
   * Quote `-` in addition to `#` in `Unquoted` `MacroNameArity` decompiler.
   * Quote `-` in decompiled module names.
 * [#862](https://github.com/KronicDeth/intellij-elixir/pull/862) - Wrap call definitions with name `nil` as `unquote(:nil)` in the decompiler. - [@KronicDeth](https://github.com/KronicDeth)
+* [#884](https://github.com/KronicDeth/intellij-elixir/pull/884) - `Application#runWriteAction` MUST be run from EventDispatch thread.  This is true when run from a Run Configuration runner, but when the Credo annotator runs `runWriteAction`, it's not in an EventDispatch thread, so followed [IntelliJ Platform SDK DevGuide - General Threading Rules](https://www.jetbrains.org/intellij/sdk/docs/basics/architectural_overview/general_threading_rules.html) and wrapped the `runWriteAction` in `Application#invokeAndWait`. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v6.3.0
 

@@ -19,6 +19,14 @@
       </li>
       <li>Quote <code>-</code> in decompiled module names.</li>
       <li>Wrap call definitions with name <code>nil</code> as <code>unquote(:nil)</code> in the decompiler.</li>
+      <li>
+        <code>Application#runWriteAction</code> MUST be run from EventDispatch thread.  This is true when run from a Run
+        Configuration runner, but when the Credo annotator runs <code>runWriteAction</code>, it's not in an
+        EventDispatch thread, so followed
+        <a href="https://www.jetbrains.org/intellij/sdk/docs/basics/architectural_overview/general_threading_rules.html">
+          IntelliJ Platform SDK DevGuide - General Threading Rules
+        </a> and wrapped the <code>runWriteAction</code> in <code>Application#invokeAndWait</code>.
+      </li>
     </ul>
   </li>
 </ul>
