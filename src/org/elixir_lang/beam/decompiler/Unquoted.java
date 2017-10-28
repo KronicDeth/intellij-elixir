@@ -1,11 +1,12 @@
 package org.elixir_lang.beam.decompiler;
 
-import gnu.trove.THashSet;
-import org.apache.commons.lang.StringUtils;
-import org.jetbrains.annotations.Contract;
+import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Set;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.elixir_lang.beam.decompiler.Default.appendParameters;
 
@@ -14,43 +15,39 @@ public class Unquoted extends MacroNameArity {
      * CONSTANTS
      */
 
-    private static final Set<String> SPECIAL_FORM_NAME_SET;
     public static final MacroNameArity INSTANCE = new Unquoted();
+    private static final Predicate<String> NOT_IDENTIFIER_OR_PREFIX_OPERATOR_PREDICATE;
+    private static final Predicate<String> BARE_ATOM_PREDICATE;
 
     static {
-        SPECIAL_FORM_NAME_SET = new THashSet<String>();
-        SPECIAL_FORM_NAME_SET.add("%");
-        SPECIAL_FORM_NAME_SET.add("%{}");
-        SPECIAL_FORM_NAME_SET.add("&");
-        SPECIAL_FORM_NAME_SET.add(".");
-        SPECIAL_FORM_NAME_SET.add("<<>>");
-        SPECIAL_FORM_NAME_SET.add("do");
-        SPECIAL_FORM_NAME_SET.add("fn");
-        SPECIAL_FORM_NAME_SET.add("nil");
-        SPECIAL_FORM_NAME_SET.add("unquote");
-        SPECIAL_FORM_NAME_SET.add("unquote_splicing");
-        SPECIAL_FORM_NAME_SET.add("{}");
-    }
+        String specialForm = Stream.of(
+                        "%",
+                        "%{}",
+                        "&",
+                        ".",
+                        "<<>>",
+                        "do",
+                        "fn",
+                        "nil",
+                        "unquote",
+                        "unquote_splicing",
+                        "{}"
+                ).map(Pattern::quote).collect(Collectors.joining("|"));
 
-    /*
-     * Static Methods
-     */
-
-    /**
-     * @param name {@link org.elixir_lang.beam.MacroNameArity#name}
-     */
-    @Contract(pure = true)
-    private static boolean isSpecialForm(@NotNull String name) {
-        return SPECIAL_FORM_NAME_SET.contains(name);
-    }
-
-    @Contract(pure = true)
-    private static boolean mustQuoteAtom(@NotNull String name) {
-        return StringUtils.containsAny(name, "#-");
-    }
-
-    private static boolean wouldParseAsAlias(@NotNull String name) {
-        return Character.isUpperCase(name.codePointAt(0));
+        // See Elixir.flex IDENTIFIER_TOKEN_TAIL
+        @Language("RegExp")
+        String identifierTokenTail = "[0-9a-zA-Z_]*[?!]?";
+        // See Elixir.flex ALIAS
+        @Language("RegExp")
+        String alias = "[A-Z]" + identifierTokenTail;
+        BARE_ATOM_PREDICATE = Pattern
+                .compile("^(" + specialForm + "|" + alias + ")$")
+                .asPredicate();
+        String prefixOperators = "[@!]|~~~";
+        // See Elixir.flex IDENTIFIER_TOKEN
+        NOT_IDENTIFIER_OR_PREFIX_OPERATOR_PREDICATE = Pattern.compile(
+                "^(" + "[a-z_]" + identifierTokenTail + "|" + prefixOperators + ")$"
+        ).asPredicate().negate();
     }
 
     /*
@@ -65,9 +62,7 @@ public class Unquoted extends MacroNameArity {
      */
     @Override
     public boolean accept(@NotNull org.elixir_lang.beam.MacroNameArity macroNameArity) {
-        String name = macroNameArity.name;
-
-        return wouldParseAsAlias(name) || mustQuoteAtom(name) || isSpecialForm(name);
+        return BARE_ATOM_PREDICATE.or(NOT_IDENTIFIER_OR_PREFIX_OPERATOR_PREDICATE).test(macroNameArity.name);
     }
 
     /**
@@ -91,10 +86,10 @@ public class Unquoted extends MacroNameArity {
     private StringBuilder macroNameToAtomName(@NotNull String macroName) {
         StringBuilder atomName = new StringBuilder();
 
-        if (mustQuoteAtom(macroName)) {
-            atomName.append('"').append(macroName).append('"');
-        } else {
+        if (BARE_ATOM_PREDICATE.test(macroName)) {
             atomName.append(macroName);
+        } else {
+            atomName.append('"').append(macroName).append('"');
         }
 
         return atomName;
