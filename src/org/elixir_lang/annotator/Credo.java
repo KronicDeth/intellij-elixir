@@ -47,6 +47,8 @@ public class Credo extends ExternalAnnotator<PsiFile, List<Credo.Issue>> {
     private static final String CODE_IN_QUESTION_HEADER = "CODE IN QUESTION";
     private static final String CONFIGURATION_OPTIONS = "CONFIGURATION OPTIONS";
     private static final String WHY_IT_MATTERS_HEADER = "WHY IT MATTERS";
+    public static final Logger LOGGER = Logger.getInstance(Credo.class);
+    public static final String INDENT = "     ";
 
     @NotNull
     private static List<Issue> lineListToIssueList(@NotNull List<String> lineList, @NotNull Project project) {
@@ -195,9 +197,8 @@ public class Credo extends ExternalAnnotator<PsiFile, List<Credo.Issue>> {
         if (matcher.matches()) {
             stripped = matcher.group("content");
         } else {
-            Logger logger = Logger.getInstance(Credo.class);
             final String title = "Edge could not be stripped from explanation line";
-            logger.error(LogMessageEx.createEvent(
+            LOGGER.error(LogMessageEx.createEvent(
                     title + "\n" +
                             "\n" +
                             "`" +explanationLine + "`\n" ,
@@ -341,10 +342,22 @@ public class Credo extends ExternalAnnotator<PsiFile, List<Credo.Issue>> {
 
                 if (contentLine.isEmpty()) {
                     unindentedLine = contentLine;
+                } else if (contentLine.startsWith(INDENT)) {
+                    unindentedLine = contentLine.substring(INDENT.length());
                 } else {
-                    assert contentLine.startsWith("     ");
+                    final String title = header + " content line was neither blank nor starting with " +
+                            INDENT.length() + " spaces";
+                    LOGGER.error(LogMessageEx.createEvent(
+                            title + "\n" +
+                                    "\n" +
+                                    "`" + contentLine + "`\n",
+                            Joiner.on("\n").join(new Throwable().getStackTrace()),
+                            title,
+                            null,
+                            (Attachment) null
+                    ));
 
-                    unindentedLine = contentLine.substring(5);
+                    unindentedLine = contentLine;
                 }
 
                 return unindentedLine;
