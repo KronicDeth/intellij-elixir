@@ -1,5 +1,7 @@
 package org.elixir_lang.annotator;
 
+import com.google.common.base.Joiner;
+import com.intellij.diagnostic.LogMessageEx;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.process.ProcessOutput;
@@ -7,6 +9,8 @@ import com.intellij.execution.util.ExecUtil;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.ExternalAnnotator;
+import com.intellij.openapi.diagnostic.Attachment;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
@@ -43,6 +47,8 @@ public class Credo extends ExternalAnnotator<PsiFile, List<Credo.Issue>> {
     private static final String CODE_IN_QUESTION_HEADER = "CODE IN QUESTION";
     private static final String CONFIGURATION_OPTIONS = "CONFIGURATION OPTIONS";
     private static final String WHY_IT_MATTERS_HEADER = "WHY IT MATTERS";
+    public static final Logger LOGGER = Logger.getInstance(Credo.class);
+    public static final String INDENT = "     ";
 
     @NotNull
     private static List<Issue> lineListToIssueList(@NotNull List<String> lineList, @NotNull Project project) {
@@ -186,10 +192,27 @@ public class Credo extends ExternalAnnotator<PsiFile, List<Credo.Issue>> {
     @NotNull
     private static String stripEdge(@NotNull String explanationLine) {
         Matcher matcher = EXPLANATION_LINE_PATTERN.matcher(explanationLine);
+        String stripped;
 
-        assert matcher.matches();
+        if (matcher.matches()) {
+            stripped = matcher.group("content");
+        } else {
+            final String title = "Edge could not be stripped from explanation line";
+            LOGGER.error(LogMessageEx.createEvent(
+                    title + "\n" +
+                            "\n" +
+                            "`" +explanationLine + "`\n" ,
+                    Joiner.on("\n").join(new Throwable().getStackTrace()),
+                    title,
+                    null,
+                    (Attachment) null
+                    )
+            );
 
-        return matcher.group("content");
+            stripped = explanationLine;
+        }
+
+        return stripped;
     }
 
     @NotNull
@@ -319,10 +342,22 @@ public class Credo extends ExternalAnnotator<PsiFile, List<Credo.Issue>> {
 
                 if (contentLine.isEmpty()) {
                     unindentedLine = contentLine;
+                } else if (contentLine.startsWith(INDENT)) {
+                    unindentedLine = contentLine.substring(INDENT.length());
                 } else {
-                    assert contentLine.startsWith("     ");
+                    final String title = header + " content line was neither blank nor starting with " +
+                            INDENT.length() + " spaces";
+                    LOGGER.error(LogMessageEx.createEvent(
+                            title + "\n" +
+                                    "\n" +
+                                    "`" + contentLine + "`\n",
+                            Joiner.on("\n").join(new Throwable().getStackTrace()),
+                            title,
+                            null,
+                            (Attachment) null
+                    ));
 
-                    unindentedLine = contentLine.substring(5);
+                    unindentedLine = contentLine;
                 }
 
                 return unindentedLine;
