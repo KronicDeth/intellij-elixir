@@ -8,6 +8,7 @@
       <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/860">#860</a>.</li>
       <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/859">#859</a>.</li>
       <li>Convert ANSI escape codes to colored output in <code>mix</code> Run and Debug output</li>
+      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/883">#883</a>.</li>
     </ul>
   </li>
   <li>
@@ -30,6 +31,14 @@
       <li>
         Wrap <code>sdkModificator::commitChanges</code> in <code>invokeAndWait</code> <code>runWriteAction</code> in
         <code>MixRunningStateUtil#updateRoots</code>.
+      </li>
+      <li>
+        <p>Generalize what needs to be double quoted for <code>Unquoted</code> decompiler</p>
+        <ul>
+          <li>Aliases and special forms are bare atoms</li>
+          <li>Anything that is NEITHER an identifier NOR a prefix operator is a double quoted atom.</li>
+        </ul>
+        <p>Normal identifiers and prefix operators then fall through to the <code>Default</code> decompiler.</p>
       </li>
     </ul>
   </li>

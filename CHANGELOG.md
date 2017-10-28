@@ -127,6 +127,7 @@
 * [#861](https://github.com/KronicDeth/intellij-elixir/pull/861) - Regression test for [#860](https://github.com/KronicDeth/intellij-elixir/issues/860) - [@KronicDeth](https://github.com/KronicDeth)
 * [#862](https://github.com/KronicDeth/intellij-elixir/pull/862) - Regression test for [#859](https://github.com/KronicDeth/intellij-elixir/issues/859) - [@KronicDeth](https://github.com/KronicDeth)
 * [#863](https://github.com/KronicDeth/intellij-elixir/pull/863) - Convert ANSI escape codes to colored output in `mix` Run and Debug output - [@KronicDeth](https://github.com/KronicDeth)
+* [#886](https://github.com/KronicDeth/intellij-elixir/pull/886) - Regression test for [#883](https://github.com/KronicDeth/intellij-elixir/issues/883) - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#861](https://github.com/KronicDeth/intellij-elixir/pull/861) - [@KronicDeth](https://github.com/KronicDeth).
@@ -135,6 +136,12 @@
 * [#862](https://github.com/KronicDeth/intellij-elixir/pull/862) - Wrap call definitions with name `nil` as `unquote(:nil)` in the decompiler. - [@KronicDeth](https://github.com/KronicDeth)
 * [#884](https://github.com/KronicDeth/intellij-elixir/pull/884) - `Application#runWriteAction` MUST be run from EventDispatch thread.  This is true when run from a Run Configuration runner, but when the Credo annotator runs `runWriteAction`, it's not in an EventDispatch thread, so followed [IntelliJ Platform SDK DevGuide - General Threading Rules](https://www.jetbrains.org/intellij/sdk/docs/basics/architectural_overview/general_threading_rules.html) and wrapped the `runWriteAction` in `Application#invokeAndWait`. - [@KronicDeth](https://github.com/KronicDeth)
 * [#885](https://github.com/KronicDeth/intellij-elixir/pull/885) - Wrap `sdkModificator::commitChanges` in `invokeAndWait` `runWriteAction` in `MixRunningStateUtil#updateRoots`. - [@KronicDeth](https://github.com/KronicDeth)
+* [#886](https://github.com/KronicDeth/intellij-elixir/pull/886) - [@KronicDeth](https://github.com/KronicDeth)
+  * Generalize what needs to be double quoted for `Unquoted` decompiler
+    * Aliases and special forms are bare atoms
+    * Anything that is NEITHER an identifier NOR a prefix operator is a double quoted atom.
+
+    Normal identifiers and prefix operators then fall through to the `Default` decompiler.
 
 ## v6.3.0
 
