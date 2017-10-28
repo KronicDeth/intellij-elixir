@@ -141,6 +141,10 @@ public class DecompilerTest extends LightCodeInsightTestCase {
         assertDecompiled("OTP-PUB-KEY");
     }
 
+    public void testIssue883() throws IOException, OtpErlangDecodeException {
+        assertDecompiled("fprof");
+    }
+
     public void testElixir_1_5_0() throws IOException, OtpErlangDecodeException {
         assertDecompiled("OTP20/Elixir.AtU8Test");
     }

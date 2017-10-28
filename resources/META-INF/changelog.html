@@ -27,6 +27,10 @@
           IntelliJ Platform SDK DevGuide - General Threading Rules
         </a> and wrapped the <code>runWriteAction</code> in <code>Application#invokeAndWait</code>.
       </li>
+      <li>
+        Wrap <code>sdkModificator::commitChanges</code> in <code>invokeAndWait</code> <code>runWriteAction</code> in
+        <code>MixRunningStateUtil#updateRoots</code>.
+      </li>
     </ul>
   </li>
 </ul>
