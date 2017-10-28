@@ -1,5 +1,7 @@
 package org.elixir_lang.annotator;
 
+import com.google.common.base.Joiner;
+import com.intellij.diagnostic.LogMessageEx;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.process.ProcessOutput;
@@ -7,6 +9,8 @@ import com.intellij.execution.util.ExecUtil;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.ExternalAnnotator;
+import com.intellij.openapi.diagnostic.Attachment;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
@@ -186,10 +190,28 @@ public class Credo extends ExternalAnnotator<PsiFile, List<Credo.Issue>> {
     @NotNull
     private static String stripEdge(@NotNull String explanationLine) {
         Matcher matcher = EXPLANATION_LINE_PATTERN.matcher(explanationLine);
+        String stripped;
 
-        assert matcher.matches();
+        if (matcher.matches()) {
+            stripped = matcher.group("content");
+        } else {
+            Logger logger = Logger.getInstance(Credo.class);
+            final String title = "Edge could not be stripped from explanation line";
+            logger.error(LogMessageEx.createEvent(
+                    title + "\n" +
+                            "\n" +
+                            "`" +explanationLine + "`\n" ,
+                    Joiner.on("\n").join(new Throwable().getStackTrace()),
+                    title,
+                    null,
+                    (Attachment) null
+                    )
+            );
 
-        return matcher.group("content");
+            stripped = explanationLine;
+        }
+
+        return stripped;
     }
 
     @NotNull
