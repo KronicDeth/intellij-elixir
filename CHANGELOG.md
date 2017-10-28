@@ -128,6 +128,7 @@
 * [#862](https://github.com/KronicDeth/intellij-elixir/pull/862) - Regression test for [#859](https://github.com/KronicDeth/intellij-elixir/issues/859) - [@KronicDeth](https://github.com/KronicDeth)
 * [#863](https://github.com/KronicDeth/intellij-elixir/pull/863) - Convert ANSI escape codes to colored output in `mix` Run and Debug output - [@KronicDeth](https://github.com/KronicDeth)
 * [#886](https://github.com/KronicDeth/intellij-elixir/pull/886) - Regression test for [#883](https://github.com/KronicDeth/intellij-elixir/issues/883) - [@KronicDeth](https://github.com/KronicDeth)
+* [#887](https://github.com/KronicDeth/intellij-elixir/pull/887) - Regression test for [#878](https://github.com/KronicDeth/intellij-elixir/issues/878) - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#861](https://github.com/KronicDeth/intellij-elixir/pull/861) - [@KronicDeth](https://github.com/KronicDeth).
@@ -142,6 +143,7 @@
     * Anything that is NEITHER an identifier NOR a prefix operator is a double quoted atom.
 
     Normal identifiers and prefix operators then fall through to the `Default` decompiler.
+* [#887](https://github.com/KronicDeth/intellij-elixir/pull/887) - Add `end` to `Unquoted` decompiler bare atoms. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v6.3.0
 
