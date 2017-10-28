@@ -20,19 +20,26 @@ public class Unquoted extends MacroNameArity {
     private static final Predicate<String> BARE_ATOM_PREDICATE;
 
     static {
-        String specialForm = Stream.of(
-                        "%",
-                        "%{}",
-                        "&",
-                        ".",
-                        "<<>>",
-                        "do",
-                        "fn",
-                        "nil",
-                        "unquote",
-                        "unquote_splicing",
-                        "{}"
-                ).map(Pattern::quote).collect(Collectors.joining("|"));
+        Stream<String> keywordStream = Stream.of(
+                "do",
+                "end",
+                "nil"
+        );
+        Stream<String> specialFormStream = Stream.of(
+                "%",
+                "%{}",
+                "&",
+                ".",
+                "<<>>",
+                "fn",
+                "unquote",
+                "unquote_splicing",
+                "{}"
+        );
+        String fixed = Stream
+                .concat(keywordStream, specialFormStream)
+                .map(Pattern::quote)
+                .collect(Collectors.joining("|"));
 
         // See Elixir.flex IDENTIFIER_TOKEN_TAIL
         @Language("RegExp")
@@ -41,7 +48,7 @@ public class Unquoted extends MacroNameArity {
         @Language("RegExp")
         String alias = "[A-Z]" + identifierTokenTail;
         BARE_ATOM_PREDICATE = Pattern
-                .compile("^(" + specialForm + "|" + alias + ")$")
+                .compile("^(" + fixed + "|" + alias + ")$")
                 .asPredicate();
         String prefixOperators = "[@!]|~~~";
         // See Elixir.flex IDENTIFIER_TOKEN
