@@ -144,6 +144,7 @@
 
     Normal identifiers and prefix operators then fall through to the `Default` decompiler.
 * [#887](https://github.com/KronicDeth/intellij-elixir/pull/887) - Add `end` to `Unquoted` decompiler bare atoms. - [@KronicDeth](https://github.com/KronicDeth)
+* [#888](https://github.com/KronicDeth/intellij-elixir/pull/888) - Replace `assert`s in `Credo` external annotator with extended log messages that record the unexpected line. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v6.3.0
 
