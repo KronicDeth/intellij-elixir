@@ -16,7 +16,6 @@ Alias.|| unqualified positional, key: value
 Alias.| unqualified positional, key: value
 Alias.<= unqualified positional, key: value
 Alias.-> unqualified positional, key: value
-Alias.% unqualified positional, key: value
 Alias.<> unqualified positional, key: value
 Alias.^ unqualified positional, key: value
 Alias.not unqualified positional, key: value

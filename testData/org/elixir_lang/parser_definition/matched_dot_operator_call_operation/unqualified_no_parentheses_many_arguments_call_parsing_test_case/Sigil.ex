@@ -16,7 +16,6 @@
 ~x{}i.| unqualified positional, key: value
 ~x{}i.<= unqualified positional, key: value
 ~x{}i.-> unqualified positional, key: value
-~x{}i.% unqualified positional, key: value
 ~x{}i.<> unqualified positional, key: value
 ~x{}i.^ unqualified positional, key: value
 ~x{}i.not unqualified positional, key: value

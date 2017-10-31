@@ -16,7 +16,6 @@ Alias.|| positional
 Alias.| positional
 Alias.<= positional
 Alias.-> positional
-Alias.% positional
 Alias.<> positional
 Alias.^ positional
 Alias.not positional

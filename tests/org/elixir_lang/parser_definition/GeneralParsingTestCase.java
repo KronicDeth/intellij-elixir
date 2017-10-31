@@ -49,7 +49,7 @@ public class GeneralParsingTestCase extends ParsingTestCase {
     }
 
     public void testPygment() {
-        assertParsedWithErrors();
+        assertParsedWithErrors(false);
     }
 
     /* The pygment example text contains intentional errors to ensure that pygment can handle errors, but to check
@@ -57,7 +57,7 @@ public class GeneralParsingTestCase extends ParsingTestCase {
     public void testPygmentWithoutErrors() throws Exception {
         registerProjectFileIndex();
 
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testRealistic() {

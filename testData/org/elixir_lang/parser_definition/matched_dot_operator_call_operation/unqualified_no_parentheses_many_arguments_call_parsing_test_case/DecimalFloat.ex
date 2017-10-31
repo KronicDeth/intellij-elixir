@@ -16,7 +16,6 @@
 1.2e-3.| unqualified positional, key: value
 1.2e-3.<= unqualified positional, key: value
 1.2e-3.-> unqualified positional, key: value
-1.2e-3.% unqualified positional, key: value
 1.2e-3.<> unqualified positional, key: value
 1.2e-3.^ unqualified positional, key: value
 1.2e-3.not unqualified positional, key: value

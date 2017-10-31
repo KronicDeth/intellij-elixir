@@ -8,13 +8,13 @@ public class MatchedExpressionParsingTestCase extends ParsingTestCase {
     public void testAtNonNumericOperation() throws Exception {
         registerProjectFileIndex();
 
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testVariable() throws Exception {
         registerProjectFileIndex();
 
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     /*
@@ -22,7 +22,7 @@ public class MatchedExpressionParsingTestCase extends ParsingTestCase {
      */
 
     public void testAtNumericOperation() {
-        assertParsedWithErrors();
+        assertParsedWithErrors(false);
     }
 
     public void testCaptureNumericOperation() {
@@ -30,7 +30,7 @@ public class MatchedExpressionParsingTestCase extends ParsingTestCase {
     }
 
     public void testUnaryNumericOperation() {
-        assertParsedWithErrors();
+        assertParsedWithErrors(false);
     }
 
     public void testEmptyBlock() {

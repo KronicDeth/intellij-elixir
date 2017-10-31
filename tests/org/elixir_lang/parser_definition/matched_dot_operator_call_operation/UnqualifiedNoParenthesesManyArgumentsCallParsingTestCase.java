@@ -6,7 +6,7 @@ public class UnqualifiedNoParenthesesManyArgumentsCallParsingTestCase extends Pa
      */
 
     public void testAtNonNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testVariable() {
@@ -18,7 +18,7 @@ public class UnqualifiedNoParenthesesManyArgumentsCallParsingTestCase extends Pa
      */
 
     public void testAtNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testCaptureNumericOperation() {
@@ -26,7 +26,7 @@ public class UnqualifiedNoParenthesesManyArgumentsCallParsingTestCase extends Pa
     }
 
     public void testUnaryNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testEmptyBlock() {

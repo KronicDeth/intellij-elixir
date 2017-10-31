@@ -16,7 +16,6 @@
 ?c.| key1: value1, key2: value2
 ?c.<= key1: value1, key2: value2
 ?c.-> key1: value1, key2: value2
-?c.% key1: value1, key2: value2
 ?c.<> key1: value1, key2: value2
 ?c.^ key1: value1, key2: value2
 ?c.not key1: value1, key2: value2

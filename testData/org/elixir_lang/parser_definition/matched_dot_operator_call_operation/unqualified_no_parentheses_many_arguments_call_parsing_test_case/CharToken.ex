@@ -16,7 +16,6 @@
 ?c.| unqualified positional, key: value
 ?c.<= unqualified positional, key: value
 ?c.-> unqualified positional, key: value
-?c.% unqualified positional, key: value
 ?c.<> unqualified positional, key: value
 ?c.^ unqualified positional, key: value
 ?c.not unqualified positional, key: value

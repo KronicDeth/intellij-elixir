@@ -16,7 +16,6 @@
 9876543210.| Qualifier.qualified positional, key: value
 9876543210.<= Qualifier.qualified positional, key: value
 9876543210.-> Qualifier.qualified positional, key: value
-9876543210.% Qualifier.qualified positional, key: value
 9876543210.<> Qualifier.qualified positional, key: value
 9876543210.^ Qualifier.qualified positional, key: value
 9876543210.not Qualifier.qualified positional, key: value

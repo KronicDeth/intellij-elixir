@@ -1,8 +1,12 @@
 package org.elixir_lang.structure_view.element;
 
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.psi.PsiElement;
 import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase;
 import org.elixir_lang.psi.call.Call;
+
+import java.lang.Exception;
 
 public class CallDefinitionHeadTest extends LightPlatformCodeInsightFixtureTestCase {
     /*
@@ -58,5 +62,18 @@ public class CallDefinitionHeadTest extends LightPlatformCodeInsightFixtureTestC
                 "create(state = %__MODULE__{ecto_schema_module: ecto_schema_module, view: view}, params)",
                 CallDefinitionHead.stripGuard(head).getText()
         );
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+
+        if (myFixture != null) {
+            Project project = getProject();
+
+            if (project != null && !project.isDisposed()) {
+                Disposer.dispose(project);
+            }
+        }
     }
 }

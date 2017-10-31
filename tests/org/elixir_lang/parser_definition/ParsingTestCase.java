@@ -52,7 +52,11 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
     }
 
     protected void assertParsedAndQuotedAroundError() {
-        doTest(true);
+        assertParsedAndQuotedAroundError(true);
+    }
+
+    protected void assertParsedAndQuotedAroundError(boolean checkResult) {
+        doTest(checkResult);
         assertQuotedAroundError();
     }
 
@@ -62,7 +66,11 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
     }
 
     protected void assertParsedAndQuotedCorrectly() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly(true);
+    }
+
+    protected void assertParsedAndQuotedCorrectly(boolean checkResult) {
+        doTest(checkResult);
         assertWithoutLocalError();
         assertQuotedCorrectly();
     }
@@ -75,7 +83,11 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
     }
 
     protected void assertParsedWithErrors() {
-        doTest(true);
+        assertParsedWithErrors(true);
+    }
+
+    protected void assertParsedWithErrors(boolean checkResult) {
+        doTest(checkResult);
 
         assertWithLocalError();
         Quoter.assertError(myFile);

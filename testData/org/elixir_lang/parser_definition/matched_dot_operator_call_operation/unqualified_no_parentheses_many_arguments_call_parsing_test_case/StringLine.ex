@@ -16,7 +16,6 @@
 "String".| unqualified positional, key: value
 "String".<= unqualified positional, key: value
 "String".-> unqualified positional, key: value
-"String".% unqualified positional, key: value
 "String".<> unqualified positional, key: value
 "String".^ unqualified positional, key: value
 "String".not unqualified positional, key: value

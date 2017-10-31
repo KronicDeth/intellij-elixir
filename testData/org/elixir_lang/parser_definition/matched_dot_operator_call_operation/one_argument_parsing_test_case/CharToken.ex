@@ -15,7 +15,6 @@
 ?c.| positional
 ?c.<= positional
 ?c.-> positional
-?c.% positional
 ?c.<> positional
 ?c.^ positional
 ?c.not positional

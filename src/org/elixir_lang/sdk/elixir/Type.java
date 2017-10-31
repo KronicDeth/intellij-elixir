@@ -23,6 +23,7 @@ import com.intellij.psi.PsiElement;
 import gnu.trove.THashSet;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.ArrayUtils;
+import org.eclipse.jdt.internal.compiler.parser.RecoveredElement;
 import org.elixir_lang.icons.ElixirIcons;
 import org.elixir_lang.jps.model.JpsElixirModelSerializerExtension;
 import org.elixir_lang.jps.model.JpsElixirSdkType;
@@ -402,7 +403,7 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
     }
 
     @Nullable
-    private static Release getRelease(@NotNull Project project) {
+    public static Release getRelease(@NotNull Project project) {
         Release release;
 
         if (ProcessOutput.isSmallIde()) {

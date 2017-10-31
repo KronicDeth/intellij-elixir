@@ -32,9 +32,9 @@ public class ModelBuilder implements FormattingModelBuilder {
     private static final boolean DUMP_FORMATTING_AST = false;
     private static final TokenSet MULTIPLICATIVE_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.DIVISION_OPERATOR, ElixirTypes.MULTIPLICATION_OPERATOR);
     private static final TokenSet UNARY_OPERATION_TOKEN_SET = TokenSet.create(
-            ElixirTypes.MATCHED_UNARY_NON_NUMERIC_OPERATION,
+            ElixirTypes.MATCHED_UNARY_OPERATION,
             ElixirTypes.UNARY_NUMERIC_OPERATION,
-            ElixirTypes.UNMATCHED_UNARY_NON_NUMERIC_OPERATION
+            ElixirTypes.UNMATCHED_UNARY_OPERATION
     );
 
     @NotNull

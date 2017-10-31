@@ -72,10 +72,6 @@ public class AtBracketOperationParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testStructOperator() {
-        assertParsedAndQuotedCorrectly();
-    }
-
     public void testThreeOperator() {
         assertParsedAndQuotedCorrectly();
     }

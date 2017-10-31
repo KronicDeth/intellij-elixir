@@ -471,6 +471,16 @@ public class ElixirVisitor extends PsiElementVisitor {
     // visitAtNonNumericOperation(o);
   }
 
+  public void visitMatchedAtNumericBracketOperation(@NotNull ElixirMatchedAtNumericBracketOperation o) {
+    visitMatchedExpression(o);
+    // visitAtNumericBracketOperation(o);
+  }
+
+  public void visitMatchedAtOperation(@NotNull ElixirMatchedAtOperation o) {
+    visitMatchedExpression(o);
+    // visitAtNonNumericOperation(o);
+  }
+
   public void visitMatchedAtUnqualifiedBracketOperation(@NotNull ElixirMatchedAtUnqualifiedBracketOperation o) {
     visitMatchedExpression(o);
     // visitAtUnqualifiedBracketOperation(o);
@@ -608,6 +618,11 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitMatchedUnaryNonNumericOperation(@NotNull ElixirMatchedUnaryNonNumericOperation o) {
+    visitMatchedExpression(o);
+    // visitUnaryNonNumericOperation(o);
+  }
+
+  public void visitMatchedUnaryOperation(@NotNull ElixirMatchedUnaryOperation o) {
     visitMatchedExpression(o);
     // visitUnaryNonNumericOperation(o);
   }
@@ -834,6 +849,16 @@ public class ElixirVisitor extends PsiElementVisitor {
     // visitAtNonNumericOperation(o);
   }
 
+  public void visitUnmatchedAtNumericBracketOperation(@NotNull ElixirUnmatchedAtNumericBracketOperation o) {
+    visitUnmatchedExpression(o);
+    // visitAtNumericBracketOperation(o);
+  }
+
+  public void visitUnmatchedAtOperation(@NotNull ElixirUnmatchedAtOperation o) {
+    visitUnmatchedExpression(o);
+    // visitAtNonNumericOperation(o);
+  }
+
   public void visitUnmatchedAtUnqualifiedBracketOperation(@NotNull ElixirUnmatchedAtUnqualifiedBracketOperation o) {
     visitUnmatchedExpression(o);
     // visitAtUnqualifiedBracketOperation(o);
@@ -961,6 +986,11 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitUnmatchedUnaryNonNumericOperation(@NotNull ElixirUnmatchedUnaryNonNumericOperation o) {
+    visitUnmatchedExpression(o);
+    // visitUnaryNonNumericOperation(o);
+  }
+
+  public void visitUnmatchedUnaryOperation(@NotNull ElixirUnmatchedUnaryOperation o) {
     visitUnmatchedExpression(o);
     // visitUnaryNonNumericOperation(o);
   }

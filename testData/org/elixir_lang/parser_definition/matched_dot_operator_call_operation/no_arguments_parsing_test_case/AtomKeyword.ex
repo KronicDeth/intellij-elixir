@@ -16,7 +16,6 @@ nil.||
 nil.|
 nil.<=
 nil.->
-nil.%
 nil.<>
 nil.^
 nil.not

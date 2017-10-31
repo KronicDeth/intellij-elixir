@@ -73,10 +73,6 @@ Heredoc
 """
 String
 Heredoc
-""".% Qualifier.qualified positional, key: value
-"""
-String
-Heredoc
 """.<> Qualifier.qualified positional, key: value
 """
 String

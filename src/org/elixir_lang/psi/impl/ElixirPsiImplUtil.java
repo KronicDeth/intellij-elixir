@@ -4061,6 +4061,36 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject quote(@NotNull final AtNumericBracketOperation atUnqualifiedBracketOperation) {
+        Quotable operator = atUnqualifiedBracketOperation.getAtPrefixOperator();
+        OtpErlangObject quotedOperator = operator.quote();
+
+        PsiElement[] children = atUnqualifiedBracketOperation.getChildren();
+
+        assert children.length == 3;
+
+        Quotable numeric = (Quotable) children[1];
+
+        OtpErlangObject quotedOperand = numeric.quote();
+
+        OtpErlangList metadata = metadata(atUnqualifiedBracketOperation);
+
+        OtpErlangTuple quotedContainer = quotedFunctionCall(quotedOperator, metadata, quotedOperand);
+
+        Quotable bracketArguments = atUnqualifiedBracketOperation.getBracketArguments();
+        OtpErlangObject quotedBracketArguments = bracketArguments.quote();
+
+        return quotedFunctionCall(
+                "Elixir.Access",
+                "get",
+                metadata(bracketArguments),
+                quotedContainer,
+                quotedBracketArguments
+        );
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quote(@NotNull final AtUnqualifiedBracketOperation atUnqualifiedBracketOperation) {
         Quotable operator = atUnqualifiedBracketOperation.getAtPrefixOperator();
         OtpErlangObject quotedOperator = operator.quote();

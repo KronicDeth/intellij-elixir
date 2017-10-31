@@ -16,7 +16,6 @@
 "String".|
 "String".<=
 "String".->
-"String".%
 "String".<>
 "String".^
 "String".not

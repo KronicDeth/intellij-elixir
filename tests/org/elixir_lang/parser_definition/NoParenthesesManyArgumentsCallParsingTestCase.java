@@ -37,7 +37,7 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
     }
 
     public void testKeywordValueAtNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testKeywordValueAtom() {
@@ -87,7 +87,7 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
     }
 
     public void testKeywordValueMatchedAtNonNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testKeywordValueMatchedMultiplicationOperation() {
@@ -99,7 +99,7 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
     }
 
     public void testKeywordValueMatchedUnaryNonNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testKeywordValueNoParenthesesNoArgumentsUnqualifiedCallOrVariable() {
@@ -121,7 +121,7 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
     }
 
     public void testKeywordValueUnaryNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testNoParenthesesExpressionKeywordValue() {
@@ -133,7 +133,7 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
     }
 
     public void testPositionalAtNonNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testPositionalAtom() {
@@ -231,11 +231,11 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
     }
 
     public void testPositionalUnaryNonNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testPositionalNumericAtOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testPositionalNumericCaptureOperation() {
@@ -243,7 +243,7 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
     }
 
     public void testPositionalNumericUnaryOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testPositionalQualifiedAlias() {

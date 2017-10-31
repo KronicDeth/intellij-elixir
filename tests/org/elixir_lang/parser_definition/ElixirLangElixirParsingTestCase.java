@@ -892,6 +892,7 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
             String nameWithoutExtension = FileUtilRt.getNameWithoutExtension(absoluteFile.toString());
             myFile = createPsiFile(nameWithoutExtension, text);
             ensureParsed(myFile);
+            checkResult("lib/elixir/lib/base", myFile);
             toParseTreeText(myFile, skipSpaces(), includeRanges());
         } catch (IOException ioException) {
             throw new RuntimeException(ioException);

@@ -80,7 +80,7 @@ public class MatchedQualifiedMultipleAliasesParsingTestCase extends ParsingTestC
     }
 
     public void testMatchedUnaryNonNumericOperation() {
-        assertParsedAndQuotedCorrectlyInOneThree();
+        assertParsedAndQuotedCorrectlyInOneThree(false);
     }
 
     public void testMatchedDotCallOperation() {
@@ -96,7 +96,7 @@ public class MatchedQualifiedMultipleAliasesParsingTestCase extends ParsingTestC
     }
 
     public void testMatchedAtNonNumericOperation() {
-        assertParsedAndQuotedCorrectlyInOneThree();
+        assertParsedAndQuotedCorrectlyInOneThree(false);
     }
 
     public void testMatchedUnqualifiedCallOperation() {
@@ -112,7 +112,7 @@ public class MatchedQualifiedMultipleAliasesParsingTestCase extends ParsingTestC
      */
 
     public void testAtNumericOperation() {
-        assertParsedAndQuotedCorrectlyInOneThree();
+        assertParsedAndQuotedCorrectlyInOneThree(false);
     }
 
     public void testCaptureNumericOperation() {
@@ -120,7 +120,7 @@ public class MatchedQualifiedMultipleAliasesParsingTestCase extends ParsingTestC
     }
 
     public void testUnaryNumericOperation() {
-        assertParsedAndQuotedCorrectlyInOneThree();
+        assertParsedAndQuotedCorrectlyInOneThree(false);
     }
 
     public void testEmptyBlock() {
@@ -205,10 +205,14 @@ public class MatchedQualifiedMultipleAliasesParsingTestCase extends ParsingTestC
     }
 
     private void assertParsedAndQuotedCorrectlyInOneThree() {
+        assertParsedAndQuotedCorrectlyInOneThree(true);
+    }
+
+    private void assertParsedAndQuotedCorrectlyInOneThree(boolean checkResult) {
         if (elixirSdkRelease().compareTo(Release.V_1_2) >= 0) {
-            assertParsedAndQuotedCorrectly();
+            assertParsedAndQuotedCorrectly(checkResult);
         } else {
-            assertParsedAndQuotedAroundError();
+            assertParsedAndQuotedAroundError(checkResult);
         }
     }
 

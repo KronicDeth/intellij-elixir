@@ -16,7 +16,6 @@
 ~x{}i.| Qualifier.qualified positional, key: value
 ~x{}i.<= Qualifier.qualified positional, key: value
 ~x{}i.-> Qualifier.qualified positional, key: value
-~x{}i.% Qualifier.qualified positional, key: value
 ~x{}i.<> Qualifier.qualified positional, key: value
 ~x{}i.^ Qualifier.qualified positional, key: value
 ~x{}i.not Qualifier.qualified positional, key: value

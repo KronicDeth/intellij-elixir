@@ -16,7 +16,6 @@ variable.|| Qualifier.qualified positional, key: value
 variable.| Qualifier.qualified positional, key: value
 variable.<= Qualifier.qualified positional, key: value
 variable.-> Qualifier.qualified positional, key: value
-variable.% Qualifier.qualified positional, key: value
 variable.<> Qualifier.qualified positional, key: value
 variable.^ Qualifier.qualified positional, key: value
 variable.not Qualifier.qualified positional, key: value

@@ -41,7 +41,7 @@ public class MatchedRelationalOperationParsingTestCase extends ParsingTestCase {
     }
 
     public void testUnaryNonNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testMatchedDotOperation() {
@@ -49,7 +49,7 @@ public class MatchedRelationalOperationParsingTestCase extends ParsingTestCase {
     }
 
     public void testAtNonNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testMatchedCallOperation() {
@@ -65,7 +65,7 @@ public class MatchedRelationalOperationParsingTestCase extends ParsingTestCase {
      */
 
     public void testAtNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testCaptureNumericOperation() {
@@ -73,7 +73,7 @@ public class MatchedRelationalOperationParsingTestCase extends ParsingTestCase {
     }
 
     public void testUnaryNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testEmptyBlock() {

@@ -16,7 +16,6 @@
 "String".| positional
 "String".<= positional
 "String".-> positional
-"String".% positional
 "String".<> positional
 "String".^ positional
 "String".not positional

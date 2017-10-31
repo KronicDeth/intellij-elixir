@@ -16,7 +16,6 @@
 9876543210.| positional
 9876543210.<= positional
 9876543210.-> positional
-9876543210.% positional
 9876543210.<> positional
 9876543210.^ positional
 9876543210.not positional

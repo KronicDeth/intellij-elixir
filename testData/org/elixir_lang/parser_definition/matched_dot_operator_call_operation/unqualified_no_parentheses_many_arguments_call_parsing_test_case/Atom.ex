@@ -16,7 +16,6 @@
 :atom.| unqualified positional, key: value
 :atom.<= unqualified positional, key: value
 :atom.-> unqualified positional, key: value
-:atom.% unqualified positional, key: value
 :atom.<> unqualified positional, key: value
 :atom.^ unqualified positional, key: value
 :atom.not unqualified positional, key: value

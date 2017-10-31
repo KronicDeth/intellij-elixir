@@ -18,7 +18,7 @@ public class MapOperationParsingTestCase extends ParsingTestCase {
     }
 
     public void testEmptyStruct() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testInterpolation() {
@@ -34,7 +34,7 @@ public class MapOperationParsingTestCase extends ParsingTestCase {
     }
 
     public void testMapExpression() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testMapUpdateArgumentsWithTrailingComma() {
@@ -50,15 +50,15 @@ public class MapOperationParsingTestCase extends ParsingTestCase {
     }
 
     public void testMatchedPipeMapExpression() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testMatchedPipeMapExpressionWIthTrailingComma() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testMatchedPipeMatchedAssociationMatched() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testMaxDotCallStruct() {

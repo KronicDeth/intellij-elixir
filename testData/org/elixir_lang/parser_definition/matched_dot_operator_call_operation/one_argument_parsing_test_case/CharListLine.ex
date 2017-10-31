@@ -16,7 +16,6 @@
 'CharList'.| positional
 'CharList'.<= positional
 'CharList'.-> positional
-'CharList'.% positional
 'CharList'.<> positional
 'CharList'.^ positional
 'CharList'.not positional

@@ -16,7 +16,6 @@
 0b10.| Qualifier.qualified positional, key: value
 0b10.<= Qualifier.qualified positional, key: value
 0b10.-> Qualifier.qualified positional, key: value
-0b10.% Qualifier.qualified positional, key: value
 0b10.<> Qualifier.qualified positional, key: value
 0b10.^ Qualifier.qualified positional, key: value
 0b10.not Qualifier.qualified positional, key: value

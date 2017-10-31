@@ -73,10 +73,6 @@ Heredoc
 '''
 CharList
 Heredoc
-'''.% positional
-'''
-CharList
-Heredoc
 '''.<> positional
 '''
 CharList

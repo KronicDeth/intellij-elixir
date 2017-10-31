@@ -16,7 +16,6 @@
 (;).| positional
 (;).<= positional
 (;).-> positional
-(;).% positional
 (;).<> positional
 (;).^ positional
 (;).not positional

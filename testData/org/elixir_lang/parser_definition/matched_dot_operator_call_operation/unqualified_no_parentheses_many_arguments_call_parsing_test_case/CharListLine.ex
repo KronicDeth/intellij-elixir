@@ -16,7 +16,6 @@
 'CharList'.| unqualified positional, key: value
 'CharList'.<= unqualified positional, key: value
 'CharList'.-> unqualified positional, key: value
-'CharList'.% unqualified positional, key: value
 'CharList'.<> unqualified positional, key: value
 'CharList'.^ unqualified positional, key: value
 'CharList'.not unqualified positional, key: value

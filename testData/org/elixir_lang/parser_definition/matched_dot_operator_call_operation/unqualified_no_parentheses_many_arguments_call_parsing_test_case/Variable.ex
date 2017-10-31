@@ -16,7 +16,6 @@ variable.|| unqualified positional, key: value
 variable.| unqualified positional, key: value
 variable.<= unqualified positional, key: value
 variable.-> unqualified positional, key: value
-variable.% unqualified positional, key: value
 variable.<> unqualified positional, key: value
 variable.^ unqualified positional, key: value
 variable.not unqualified positional, key: value

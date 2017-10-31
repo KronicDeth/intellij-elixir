@@ -1185,7 +1185,9 @@ public class ModuleAttribute implements Annotator, DumbAware {
                         /* happens when :: is typed in `@spec` above function clause that uses `do:` */
                         psiElement instanceof ElixirNoParenthesesKeywords ||
                         psiElement instanceof ElixirUnaryNumericOperation ||
+                        psiElement instanceof ElixirMatchedUnaryOperation ||
                         psiElement instanceof ElixirVariable ||
+                        psiElement instanceof ElixirUnmatchedUnaryOperation ||
                         psiElement instanceof When
         )) {
             cannotHighlightTypes(psiElement);

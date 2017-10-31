@@ -18,7 +18,7 @@ public class NoParenthesesManyArgumentsStrictParsingTestCase extends ParsingTest
      */
 
     public void testAtNumericOperation() {
-        assertParsedWithErrors();
+        assertParsedWithErrors(false);
     }
 
     public void testCaptureNumericOperation() {
@@ -26,7 +26,7 @@ public class NoParenthesesManyArgumentsStrictParsingTestCase extends ParsingTest
     }
 
     public void testUnaryNumericOperation() {
-        assertParsedWithErrors();
+        assertParsedWithErrors(false);
     }
 
     public void testEmptyBlock() {

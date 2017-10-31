@@ -16,7 +16,6 @@
 ~x{}i.| positional
 ~x{}i.<= positional
 ~x{}i.-> positional
-~x{}i.% positional
 ~x{}i.<> positional
 ~x{}i.^ positional
 ~x{}i.not positional
