@@ -116,6 +116,7 @@ public class ElixirPsiImplUtil {
     public static final TokenSet IN_MATCH_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.IN_MATCH_OPERATOR);
     public static final TokenSet IN_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.IN_OPERATOR);
     public static final TokenSet MATCH_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.MATCH_OPERATOR);
+    public static final TokenSet NOT_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.NOT_OPERATOR);
     public static final TokenSet MULTIPLICATIVE_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.DIVISION_OPERATOR, ElixirTypes.MULTIPLICATION_OPERATOR);
     public static final TokenSet OR_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.OR_SYMBOL_OPERATOR, ElixirTypes.OR_WORD_OPERATOR);
     public static final TokenSet PIPE_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.PIPE_OPERATOR);
@@ -1217,6 +1218,12 @@ public class ElixirPsiImplUtil {
         return org.elixir_lang.psi.operation.infix.Normalized.leftOperand(infix);
     }
 
+    @Contract(pure = true)
+    @Nullable
+    public static Quotable leftOperand(@NotNull NotIn notIn) {
+        return org.elixir_lang.psi.operation.not_in.Normalized.leftOperand(notIn);
+    }
+
     /* Returns the 0-indexed line number for the element */
     public static int lineNumber(ASTNode node) {
         return document(node.getPsi()).getLineNumber(node.getStartOffset());
@@ -1356,6 +1363,13 @@ public class ElixirPsiImplUtil {
     @Nullable
     public static String moduleName(@NotNull @SuppressWarnings("unused") final DotCall dotCall) {
         // Always null because anonymous
+        return null;
+    }
+
+    @Contract(pure = true, value = "_ -> null")
+    @Nullable
+    public static String moduleName(@NotNull @SuppressWarnings("unused") final NotIn notIn) {
+        // Always null because it's unqualified.
         return null;
     }
 
@@ -1513,6 +1527,12 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirNotInfixOperator notInfixOperator) {
+        return NOT_OPERATOR_TOKEN_SET;
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirOrInfixOperator orInfixOperator) {
         return OR_OPERATOR_TOKEN_SET;
     }
@@ -1622,6 +1642,18 @@ public class ElixirPsiImplUtil {
         return null;
     }
 
+    @Contract(pure = true)
+    @NotNull
+    public static PsiElement[] primaryArguments(@NotNull final NotIn notIn) {
+        PsiElement[] children = notIn.getChildren();
+        Quotable leftOperand = org.elixir_lang.psi.operation.not_in.Normalized.leftOperand(children);
+        Quotable rightOperand = org.elixir_lang.psi.operation.not_in.Normalized.rightOperand(children);
+
+        return new PsiElement[]{
+                leftOperand,
+                rightOperand
+        };
+    }
 
     @Contract(pure = true)
     @NotNull
@@ -1950,6 +1982,41 @@ public class ElixirPsiImplUtil {
                 metadata(operator),
                 quotedLeftOperand,
                 quotedRightOperand
+        );
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final NotIn notIn) {
+        Quotable leftOperand = notIn.leftOperand();
+        OtpErlangObject quotedLeftOperand = leftOperand.quote();
+
+        Operator notOperator = notIn.getNotInfixOperator();
+        OtpErlangObject quotedNotOperator = notOperator.quote();
+
+        Operator inOperator = notIn.getInInfixOperator();
+        OtpErlangObject quotedInOperator = inOperator.quote();
+
+        PsiElement rightOperand = notIn.rightOperand();
+        OtpErlangObject quotedRightOperand;
+
+        if (rightOperand != null) {
+            Quotable quotableRightOperand = (Quotable) rightOperand;
+            quotedRightOperand = quotableRightOperand.quote();
+        } else {
+            // this is not valid Elixir quoting, but something needs to be there for quoting to work
+            quotedRightOperand = NIL;
+        }
+
+        return quotedFunctionCall(
+                quotedNotOperator,
+                metadata(notOperator),
+                quotedFunctionCall(
+                        quotedInOperator,
+                        metadata(inOperator),
+                        quotedLeftOperand,
+                        quotedRightOperand
+                )
         );
     }
 
@@ -2591,6 +2658,12 @@ public class ElixirPsiImplUtil {
         return null;
     }
 
+    @Contract(pure = true, value = "_ -> null")
+    @Nullable
+    public static PsiElement functionNameElement(@NotNull final NotIn notIn) {
+        return null;
+    }
+
     @Contract(pure = true)
     @NotNull
     public static PsiElement functionNameElement(@NotNull final Operation operation) {
@@ -2707,6 +2780,12 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true, value = "_ -> null")
     @Nullable
     public static ElixirDoBlock getDoBlock(@NotNull @SuppressWarnings("unused") final ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall) {
+        return null;
+    }
+
+    @Contract(pure = true, value = "_ -> null")
+    @Nullable
+    public static ElixirDoBlock getDoBlock(@NotNull @SuppressWarnings("unused") final NotIn notIn) {
         return null;
     }
 
@@ -5351,6 +5430,12 @@ if (quoted == null) {
 
     @Contract(pure = true)
     @NotNull
+    public static String resolvedModuleName(@NotNull final NotIn notIn) {
+        return KERNEL;
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static String resolvedModuleName(@NotNull final Prefix prefix) {
         /* TODO handle resolving module name from imports.  Assume KERNEL for now. */
         return KERNEL;
@@ -5496,6 +5581,12 @@ if (quoted == null) {
 
     @Contract(pure = true)
     @Nullable
+    public static Quotable rightOperand(@NotNull NotIn notIn) {
+        return org.elixir_lang.psi.operation.not_in.Normalized.rightOperand(notIn);
+    }
+
+    @Contract(pure = true)
+    @Nullable
     public static PsiElement[] secondaryArguments(@NotNull final DotCall dotCall) {
         List<ElixirParenthesesArguments> parenthesesArgumentsList = dotCall.getParenthesesArgumentsList();
         PsiElement[] arguments;
@@ -5519,6 +5610,12 @@ if (quoted == null) {
     @Contract(pure = true, value = "_ -> null")
     @Nullable
     public static PsiElement[] secondaryArguments(@NotNull @SuppressWarnings("unused") final None none) {
+        return null;
+    }
+
+    @Contract(pure = true)
+    @Nullable
+    public static PsiElement[] secondaryArguments(@NotNull @SuppressWarnings("unused") final NotIn notIn) {
         return null;
     }
 

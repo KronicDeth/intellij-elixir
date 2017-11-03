@@ -81,6 +81,38 @@
   ]
   // methods set by infix operations below
 
+  // `not in` operations that works as calls
+  implements("(un)?matchedNotInOperation")=[
+    "org.elixir_lang.psi.call.Call"
+    "org.elixir_lang.psi.operation.NotIn"
+  ]
+  methods("(un)?matchedNotInOperation")=[
+    functionName
+    functionNameElement
+    getDoBlock
+    getName
+    getNameIdentifier
+    hasDoBlockOrKeyword
+    isCalling
+    isCallingMacro
+    leftOperand
+    moduleName
+    operator
+    primaryArguments
+    primaryArity
+    processDeclarations
+    quote
+    resolvedFinalArity
+    resolvedFinalArityRange
+    resolvedModuleName
+    resolvedPrimaryArity
+    resolvedSecondaryArity
+    rightOperand
+    secondaryArguments
+    secondaryArity
+    setName
+  ]
+
   /* infix operations that work as name identifier owner calls - specifically support getNameIdentifier so they can
      return their operator, so it is easy to use a different operator when making customer operators like in Bitwise or
      the free arrow operators */
@@ -1111,6 +1143,7 @@ matchedExpression ::= matchedCaptureNonNumericOperation |
                       matchedRelationalOperation |
                       matchedArrowOperation |
                       matchedInOperation |
+                      matchedNotInOperation |
                       matchedThreeOperation |
                       matchedTwoOperation |
                       matchedAdditionOperation |
@@ -1364,6 +1397,17 @@ inInfixOperator ::= EOL* IN_OPERATOR EOL*
 // methods defined by "infix operations" section above
 matchedInOperation ::= matchedExpression inInfixOperator matchedExpression
 
+notInfixOperator ::= EOL* NOT_OPERATOR EOL*
+                     {
+                       implements = "org.elixir_lang.psi.Operator"
+                         methods = [
+                         operatorTokenSet
+                         quote
+                       ]
+                       name = "not"
+                     }
+matchedNotInOperation ::= matchedExpression <<ifVersion "GE" "1.5.0">> notInfixOperator inInfixOperator matchedExpression
+
 /*
  * Three Operation - left-associative
  *
@@ -1444,7 +1488,7 @@ multiplicationInfixOperator ::= EOL* (DIVISION_OPERATOR | MULTIPLICATION_OPERATO
 // implements and methods defined by "infix operations" section above
 matchedMultiplicationOperation ::= matchedExpression multiplicationInfixOperator matchedExpression
 
-unaryPrefixOperator ::= (SIGNIFICANT_WHITE_SPACE? DUAL_OPERATOR | NOT_OPERATOR | UNARY_OPERATOR) EOL*
+unaryPrefixOperator ::= (SIGNIFICANT_WHITE_SPACE? DUAL_OPERATOR | UNARY_OPERATOR) EOL* | NOT_OPERATOR EOL* !inInfixOperator
                         {
                           implements = "org.elixir_lang.psi.Operator"
                           methods = [
@@ -2350,6 +2394,8 @@ unmatchedArrowOperation ::= unmatchedExpression arrowInfixOperator unmatchedExpr
 // methods defined by "infix operations" section above
 unmatchedInOperation ::= unmatchedExpression inInfixOperator unmatchedExpression
 
+unmatchedNotInOperation ::= unmatchedExpression <<ifVersion "GE" "1.5.0">> notInfixOperator inInfixOperator unmatchedExpression
+
 /*
  * Three Operation - left-associative
  *
@@ -2697,6 +2743,7 @@ unmatchedExpression ::= unmatchedCaptureNonNumericOperation |
                         unmatchedRelationalOperation |
                         unmatchedArrowOperation |
                         unmatchedInOperation |
+                        unmatchedNotInOperation |
                         unmatchedThreeOperation |
                         unmatchedTwoOperation |
                         unmatchedAdditionOperation |

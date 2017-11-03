@@ -543,6 +543,12 @@ public class ElixirVisitor extends PsiElementVisitor {
     // visitInfix(o);
   }
 
+  public void visitMatchedNotInOperation(@NotNull ElixirMatchedNotInOperation o) {
+    visitMatchedExpression(o);
+    // visitCall(o);
+    // visitNotIn(o);
+  }
+
   public void visitMatchedOrOperation(@NotNull ElixirMatchedOrOperation o) {
     visitMatchedExpression(o);
     // visitNamed(o);
@@ -689,6 +695,10 @@ public class ElixirVisitor extends PsiElementVisitor {
   public void visitNoParenthesesStrict(@NotNull ElixirNoParenthesesStrict o) {
     visitArguments(o);
     // visitQuotableArguments(o);
+  }
+
+  public void visitNotInfixOperator(@NotNull ElixirNotInfixOperator o) {
+    visitOperator(o);
   }
 
   public void visitOctalDigits(@NotNull ElixirOctalDigits o) {
@@ -917,6 +927,12 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitUnmatchedExpression(o);
     // visitNamed(o);
     // visitInfix(o);
+  }
+
+  public void visitUnmatchedNotInOperation(@NotNull ElixirUnmatchedNotInOperation o) {
+    visitUnmatchedExpression(o);
+    // visitCall(o);
+    // visitNotIn(o);
   }
 
   public void visitUnmatchedOrOperation(@NotNull ElixirUnmatchedOrOperation o) {
