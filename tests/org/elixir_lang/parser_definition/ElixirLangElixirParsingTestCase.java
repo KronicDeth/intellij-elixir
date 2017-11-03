@@ -829,7 +829,11 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     }
 
     public void testEscripttestLibEscripttest() {
-        assertParsed("lib/mix/test/fixtures/escripttest/lib/escripttest.ex", Parse.CORRECT);
+        if (elixirSdkRelease().compareTo(Release.V_1_5) < 0) {
+            assertParsed("lib/mix/test/fixtures/escripttest/lib/escripttest.ex", Parse.CORRECT);
+        } else {
+            assertTrue(elixirSdkRelease().compareTo(Release.V_1_5) >= 0);
+        }
     }
 
     public void testNoMixfileLibA() {
