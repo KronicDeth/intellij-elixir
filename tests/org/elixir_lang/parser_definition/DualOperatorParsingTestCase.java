@@ -50,6 +50,38 @@ public class DualOperatorParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testIdentifierCommaOperatorIdentifier() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testIdentifierCommaOperatorSpaceIdentifier() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testIdentifierCommaSpaceDualSpaceIdentifier() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testIdentifierCommaSpaceOperatorIdentifier() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testIdentifierEOLOperatorSpaceIdentifier() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testIdentifierEOLOperatorIdentifier() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testIdentifierOperatorSpaceIdentifier() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testEnum() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     @Override
     protected String getTestDataPath() {
         return super.getTestDataPath() + "/dual_operator_parsing_test_case";

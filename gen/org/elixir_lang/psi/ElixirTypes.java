@@ -267,7 +267,7 @@ public interface ElixirTypes {
   IElementType DIVISION_OPERATOR = new ElixirTokenType("/");
   IElementType DO = new ElixirTokenType("do");
   IElementType DOT_OPERATOR = new ElixirTokenType(".");
-  IElementType DUAL_OPERATOR = new ElixirTokenType("+, -");
+  IElementType DUAL_OPERATOR = new ElixirTokenType("Dual Operator (+, -)");
   IElementType ELSE = new ElixirTokenType("else");
   IElementType END = new ElixirTokenType("end");
   IElementType EOL = new ElixirTokenType("\\\\n, \\\\r\\\\n");
@@ -331,6 +331,7 @@ public interface ElixirTypes {
   IElementType SIGIL_PROMOTER = new ElixirTokenType("Sigil Promoter ({, [, <, \", /, (, |, ')");
   IElementType SIGIL_TERMINATOR = new ElixirTokenType("Sigil Terminator ({, [, <, \", /, (, |, ')");
   IElementType SIGNIFICANT_WHITE_SPACE = new ElixirTokenType("<significant-space>");
+  IElementType SIGN_OPERATOR = new ElixirTokenType("Sign Operator (+, -)");
   IElementType STAB_OPERATOR = new ElixirTokenType("->");
   IElementType STRING_FRAGMENT = new ElixirTokenType("String Fragment");
   IElementType STRING_HEREDOC_PROMOTER = new ElixirTokenType("String Heredoc Promoter (\"\"\")");

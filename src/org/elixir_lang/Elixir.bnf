@@ -390,7 +390,7 @@
     DIVISION_OPERATOR = "/"
     DO = "do"
     DOT_OPERATOR = "."
-    DUAL_OPERATOR = "+, -"
+    DUAL_OPERATOR = "Dual Operator (+, -)"
     ELSE = "else"
     EOL = "\\n, \\r\\n"
     END = "end"
@@ -457,6 +457,7 @@
     SIGIL_PROMOTER = "Sigil Promoter ({, [, <, \", /, (, |, ')"
     SIGIL_TERMINATOR = "Sigil Terminator ({, [, <, \", /, (, |, ')"
     SIGNIFICANT_WHITE_SPACE = "<significant-space>";
+    SIGN_OPERATOR = "Sign Operator (+, -)"
     STAB_OPERATOR = "->"
     STRING_FRAGMENT = "String Fragment"
     STRING_HEREDOC_PROMOTER = "String Heredoc Promoter (\"\"\")"
@@ -1457,7 +1458,7 @@ matchedTwoOperation ::= matchedExpression twoInfixOperator matchedExpression
    See https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L605-L613
    for rules for SIGNIFICANT_WHITE_SPACE */
 additionInfixOperator ::= (SIGNIFICANT_WHITE_SPACE DUAL_OPERATOR (SIGNIFICANT_WHITE_SPACE | &EOL) |
-                           DUAL_OPERATOR) EOL*
+                           DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE?) EOL*
                           {
                             implements = "org.elixir_lang.psi.Operator"
                             methods = [
@@ -1488,7 +1489,8 @@ multiplicationInfixOperator ::= EOL* (DIVISION_OPERATOR | MULTIPLICATION_OPERATO
 // implements and methods defined by "infix operations" section above
 matchedMultiplicationOperation ::= matchedExpression multiplicationInfixOperator matchedExpression
 
-unaryPrefixOperator ::= (SIGNIFICANT_WHITE_SPACE? DUAL_OPERATOR | UNARY_OPERATOR) EOL* | NOT_OPERATOR EOL* !inInfixOperator
+unaryPrefixOperator ::= (SIGNIFICANT_WHITE_SPACE? DUAL_OPERATOR | SIGN_OPERATOR | UNARY_OPERATOR) EOL* |
+                        NOT_OPERATOR EOL* !inInfixOperator
                         {
                           implements = "org.elixir_lang.psi.Operator"
                           methods = [
@@ -2970,6 +2972,7 @@ keywordKey ::= AFTER |
                RANGE_OPERATOR |
                RESCUE |
                RELATIONAL_OPERATOR |
+               SIGN_OPERATOR |
                STAB_OPERATOR |
                STRUCT_OPERATOR |
                THREE_OPERATOR |

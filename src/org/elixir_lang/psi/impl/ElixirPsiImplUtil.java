@@ -126,7 +126,9 @@ public class ElixirPsiImplUtil {
     public static final TokenSet THREE_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.THREE_OPERATOR);
     public static final TokenSet TWO_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.RANGE_OPERATOR, ElixirTypes.TWO_OPERATOR);
     public static final TokenSet TYPE_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.TYPE_OPERATOR);
-    public static final TokenSet UNARY_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.DUAL_OPERATOR, ElixirTypes.NOT_OPERATOR, ElixirTypes.UNARY_OPERATOR);
+    public static final TokenSet UNARY_OPERATOR_TOKEN_SET = TokenSet.create(
+            ElixirTypes.DUAL_OPERATOR, ElixirTypes.NOT_OPERATOR, ElixirTypes.SIGN_OPERATOR, ElixirTypes.UNARY_OPERATOR
+    );
     private static final OtpErlangAtom WHEN = new OtpErlangAtom("when");
     public static final OtpErlangAtom UNQUOTE_SPLICING = new OtpErlangAtom("unquote_splicing");
     public static final OtpErlangAtom[] ATOM_KEYWORDS = new OtpErlangAtom[]{

@@ -578,6 +578,9 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 %state KEYWORD_PAIR_MAYBE
 %state NAMED_SIGIL
 %state OCTAL_WHOLE_NUMBER
+%state SIGN_OPERATION
+%state SIGN_OPERATION_KEYWORD_PAIR_MAYBE
+%state SIGN_OPERATION_MAYBE
 %state REFERENCE_OPERATION
 %state SIGIL
 %state SIGIL_MODIFIERS
@@ -628,7 +631,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                                return ElixirTypes.DO; }
   {ELSE}                                     { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.ELSE; }
-  {EOL}                                      { return ElixirTypes.EOL; }
+  {EOL}                                      { pushAndBegin(SIGN_OPERATION_MAYBE);
+                                               return ElixirTypes.EOL; }
   {END}                                      { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.END; }
   // see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L605-L613
@@ -646,7 +650,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   // Must be after {TYPE_OPERATOR}, so that 1 ':' is consumed after 2
   {COLON}                                    { pushAndBegin(ATOM_START);
                                                return ElixirTypes.COLON; }
-  {COMMA}                                    { return ElixirTypes.COMMA; }
+  {COMMA}                                    { pushAndBegin(SIGN_OPERATION_MAYBE);
+                                               return ElixirTypes.COMMA; }
   {COMMENT}                                  { return ElixirTypes.COMMENT; }
   /* Must be after {BIT_STRING_OPERATOR} as {BIT_STRING_OPERATOR} combines {OPENING_BIT} {CLOSING_BIT}; must be after
      {ARROW_OPERATOR} because {ARROW_OPERATOR} includes "<<<", which is a longer match than {OPENING_BIT}'s "<<"; and
@@ -1238,6 +1243,32 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {SIGIL_MODIFIER} { return ElixirTypes.SIGIL_MODIFIER; }
   {EOL}|.          { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                      handleInState(stackFrame.getLastLexicalState()); }
+}
+
+<SIGN_OPERATION> {
+  {ESCAPED_EOL}|{WHITE_SPACE}+ { return TokenType.WHITE_SPACE; }
+  {EOL}|.                      { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                                 handleInState(stackFrame.getLastLexicalState()); }
+}
+
+<SIGN_OPERATION_KEYWORD_PAIR_MAYBE> {
+  {COLON} / {SPACE}         { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                              yybegin(stackFrame.getLastLexicalState());
+                              return ElixirTypes.KEYWORD_PAIR_COLON; }
+  {EOL}|.                   { handleInState(SIGN_OPERATION); }
+}
+
+<SIGN_OPERATION_MAYBE> {
+  // Must be before any single operator's match
+  {REFERENCABLE_OPERATOR} / {REFERENCE_INFIX_OPERATOR} { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                                                         handleInState(stackFrame.getLastLexicalState()); }
+  {ESCAPED_EOL}|{WHITE_SPACE}+ { return TokenType.WHITE_SPACE; }
+  {DUAL_OPERATOR}              { yybegin(SIGN_OPERATION_KEYWORD_PAIR_MAYBE);
+                                 return ElixirTypes.SIGN_OPERATOR; }
+  /* STAB_OPERATOR needs to be included explicitly because `-` in `DUAL_OPERATOR` is a prefix of `->` (`STAB_OPERATOR`)
+     and `.` would only match one character and be a shorter match otherwise. */
+  {EOL}|{STAB_OPERATOR}|.      { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                                 handleInState(stackFrame.getLastLexicalState()); }
 }
 
 <UNICODE_ESCAPE_SEQUENCE> {

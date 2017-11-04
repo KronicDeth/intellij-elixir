@@ -57,7 +57,7 @@ public class GeneralParsingTestCase extends ParsingTestCase {
     public void testPygmentWithoutErrors() throws Exception {
         registerProjectFileIndex();
 
-        assertParsedAndQuotedCorrectly(false);
+        assertParsedAndQuotedCorrectly(true);
     }
 
     public void testRealistic() {

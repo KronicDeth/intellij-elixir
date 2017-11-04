@@ -37,8 +37,8 @@ public abstract class Test extends TokenTest {
                         { " ", TokenType.WHITE_SPACE, ElixirFlexLexer.YYINITIAL },
                         { ";", ElixirTypes.SEMICOLON, ElixirFlexLexer.YYINITIAL },
                         { "A", ElixirTypes.SIGIL_MODIFIER, ElixirFlexLexer.SIGIL_MODIFIERS },
-                        { "\n", ElixirTypes.EOL, ElixirFlexLexer.YYINITIAL },
-                        { "\r\n", ElixirTypes.EOL, ElixirFlexLexer.YYINITIAL },
+                        { "\n", ElixirTypes.EOL, ElixirFlexLexer.SIGN_OPERATION_MAYBE },
+                        { "\r\n", ElixirTypes.EOL, ElixirFlexLexer.SIGN_OPERATION_MAYBE },
                         { "a", ElixirTypes.SIGIL_MODIFIER, ElixirFlexLexer.SIGIL_MODIFIERS }
                 }
         );
