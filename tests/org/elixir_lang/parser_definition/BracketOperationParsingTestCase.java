@@ -81,10 +81,10 @@ public class BracketOperationParsingTestCase extends ParsingTestCase {
     }
 
     public void testStructOperator() {
-        if (elixirSdkRelease().compareTo(Release.V_1_5) < 0) {
-            assertParsedAndQuotedCorrectly();
+        if (elixirSdkRelease().compareTo(Release.V_1_4) < 0) {
+            assertParsedAndQuotedCorrectly(false);
         } else {
-            assertTrue(elixirSdkRelease().compareTo(Release.V_1_5) >= 0);
+            assertTrue(elixirSdkRelease().compareTo(Release.V_1_4) >= 0);
         }
     }
 
@@ -138,7 +138,7 @@ public class BracketOperationParsingTestCase extends ParsingTestCase {
 
     public void testUnaryNumericOperation() {
         if (elixirSdkRelease().compareTo(Release.V_1_5) < 0) {
-            assertParsedAndQuotedCorrectly();
+            assertParsedAndQuotedCorrectly(false);
         } else {
             assertTrue(elixirSdkRelease().compareTo(Release.V_1_5) >= 0);
         }
