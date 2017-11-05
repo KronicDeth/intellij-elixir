@@ -7,7 +7,7 @@ Any changes to the README are delayed until the last PR before release because i
 ## Build Release
 
 1. Update `version` in `gradle.properties` to the release version used in `resources/META-INF/plugin.xml`.
-2. Update `ideaVersion` in `gradle.properties` to the earliest version being supported.  This will be the earliest `IDEA_VERSION` listed in the `.travis.yml` build matrix.
+2. Update `ideaVersion` in `gradle.properties` to the earliest version being supported (`15.0.6`).
 3. Run the `buildPlugin` gradle task.
 
 ## Smoke Test Built Release
@@ -54,13 +54,22 @@ To create release notes for the new tag
 
 ## Announce on Elixir Forums
 
-1. Open [https://elixirforum.com/](https://elixirforum.com/)
-2. Click "+ New Topic"
-3. Put "IntelliJ Elixir VERSION" as the title
-4. Select "Code Editors" as the Topic
+1. Open [IntelliJ Elixir - Elixir plugin for JetBrain's IntelliJ Platform](https://elixirforum.com/t/intellij-elixir-elixir-plugin-for-jetbrains-intellij-platform/1697)
+2. Click "+ Reply" at the bottom of the thread
+3. Put version as title of post
+   ```
+   # Version VERSION
+   ```
+4. Add Donate link
+   ```
+   [Donate](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=Kronic%2eDeth%40gmail%2ecom&lc=US&item_name=Elixir%20plugin%20for%20IntelliJ%20IDEA&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted)
+   ```
 5. Paste Release Notes from Github in message body
-6. Add installation instructions from bottom of README
-7. Click "+ Create Topic"
+6. Add Installation Instructions link
+   ```
+   [Installation Instructions](https://github.com/KronicDeth/intellij-elixir/blob/VERSION/README.md#installation)
+   ```
+7. Click "Reply" to post reply
 
 ## Announce on Twitter
 
@@ -80,5 +89,9 @@ To create release notes for the new tag
 2. Click Sign in and Post
 3. Put "IntelliJ Elixir VERSION" for the title
 4. Put in brief bullet-points of enhancements and bug fixes
-5. Click "Post this"
-6. Click "Retweet this!"
+5. Add Installation Instructions link
+   ```
+   [Installation Instructions](https://github.com/KronicDeth/intellij-elixir/blob/VERSION/README.md#installation)
+   ```
+6. Click "Post this"
+7. Click "Retweet this!"
