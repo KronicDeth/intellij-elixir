@@ -61,15 +61,4 @@ public class CallDefinitionHeadTest extends LightPlatformCodeInsightFixtureTestC
                 CallDefinitionHead.stripGuard(head).getText()
         );
     }
-
-    @Override
-    protected void tearDown() {
-        if (myFixture != null) {
-            Project project = getProject();
-
-            if (project != null && !project.isDisposed()) {
-                Disposer.dispose(project);
-            }
-        }
-    }
 }
