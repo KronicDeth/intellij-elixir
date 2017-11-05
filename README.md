@@ -3948,6 +3948,11 @@ I'd like to thank those who have donated to help support this project.
 * William De Melo Gueiros ([@williamgueiros](https://github.com/williamgueiros))
 * Yicheng Dong
 * [TreasureData](https://www.treasuredata.com/)
-* Denis Andrejew [@seeekr](https://github.com/seeekr)
-* Vanja Radovanović [@elvanja](https://github.com/elvanja)
-* Bartłomiej Kuczyński [@Koziolek](https://github.com/Koziolek)
+* Denis Andrejew ([@seeekr](https://github.com/seeekr))
+* Vanja Radovanović ([@elvanja](https://github.com/elvanja))
+* Bartłomiej Kuczyński ([@Koziolek](https://github.com/Koziolek))
+* Szymon Jeż ([@szymon-jez](https://github.com/szymon-jez))
+* Klemen Sever ([@achedeuzot](https://github.com/achedeuzot))
+* Christian Nelson ([@christiannelson](https://github.com/christiannelson))
+* César Salazar Hernández ([@cesarslzr](https://github.com/cesarslzr))
+* Milan Köpke
