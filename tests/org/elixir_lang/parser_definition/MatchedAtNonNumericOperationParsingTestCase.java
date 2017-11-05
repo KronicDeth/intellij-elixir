@@ -13,15 +13,15 @@ public class MatchedAtNonNumericOperationParsingTestCase extends ParsingTestCase
     }
 
     public void testAtNoParenthesesManyArgumentsCall() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testCaptureNoParenthesesManyArgumentsCall() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testUnaryNoParenthesesManyArgumentsCall() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     /*
@@ -29,15 +29,15 @@ public class MatchedAtNonNumericOperationParsingTestCase extends ParsingTestCase
      */
 
     public void testCaptureLeftOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testUnaryLeftOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testAtLeftOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     /*
@@ -45,7 +45,7 @@ public class MatchedAtNonNumericOperationParsingTestCase extends ParsingTestCase
      */
 
     public void testVariable() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     /*
@@ -53,39 +53,39 @@ public class MatchedAtNonNumericOperationParsingTestCase extends ParsingTestCase
      */
 
     public void testAtNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testCaptureNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testUnaryNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testEmptyBlock() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testList() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testSigil() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testAtomKeyword() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testAtom() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testAlias() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     /*
@@ -93,27 +93,27 @@ public class MatchedAtNonNumericOperationParsingTestCase extends ParsingTestCase
      */
 
     public void testCharToken() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testBinaryWholeNumber() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testDecimalFloat() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testDecimalWholeNumber() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testOctalWholeNumber() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testUnknownBaseWholeNumber() {
-        assertParsedAndQuotedAroundError();
+        assertParsedAndQuotedAroundError(false);
     }
 
     /*
@@ -121,13 +121,11 @@ public class MatchedAtNonNumericOperationParsingTestCase extends ParsingTestCase
      */
 
     public void testStringLine() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
-    public void testStringHeredoc() throws Exception {
-        registerProjectFileIndex();
-
-        assertParsedAndQuotedCorrectly();
+    public void testStringHeredoc() {
+        assertParsedAndQuotedCorrectly(false);
     }
 
     /*
@@ -135,13 +133,11 @@ public class MatchedAtNonNumericOperationParsingTestCase extends ParsingTestCase
      */
 
     public void testCharListLine() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
-    public void testCharListHeredoc() throws Exception {
-        registerProjectFileIndex();
-
-        assertParsedAndQuotedCorrectly();
+    public void testCharListHeredoc() {
+        assertParsedAndQuotedCorrectly(false);
     }
 
 

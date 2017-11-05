@@ -16,7 +16,6 @@ Alias.|| Qualifier.qualified positional, key: value
 Alias.| Qualifier.qualified positional, key: value
 Alias.<= Qualifier.qualified positional, key: value
 Alias.-> Qualifier.qualified positional, key: value
-Alias.% Qualifier.qualified positional, key: value
 Alias.<> Qualifier.qualified positional, key: value
 Alias.^ Qualifier.qualified positional, key: value
 Alias.not Qualifier.qualified positional, key: value

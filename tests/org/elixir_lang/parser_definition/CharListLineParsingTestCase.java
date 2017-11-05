@@ -18,17 +18,11 @@ public class CharListLineParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedAroundExit();
     }
 
-    public void testEscapeSequences() throws Exception {
-        registerProjectFileIndex();
-
+    public void testEscapeSequences() {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testInterpolation()
-            throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException,
-            IllegalAccessException {
-        setProjectSdkFromEbinDirectory();
-
+    public void testInterpolation() {
         assertParsedAndQuotedCorrectly();
     }
 

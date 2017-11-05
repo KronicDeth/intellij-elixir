@@ -5,16 +5,12 @@ public class MatchedExpressionParsingTestCase extends ParsingTestCase {
      * matchedCallOperation
      */
 
-    public void testAtNonNumericOperation() throws Exception {
-        registerProjectFileIndex();
-
-        assertParsedAndQuotedCorrectly();
+    public void testAtNonNumericOperation() {
+        assertParsedAndQuotedCorrectly(false);
     }
 
-    public void testVariable() throws Exception {
-        registerProjectFileIndex();
-
-        assertParsedAndQuotedCorrectly();
+    public void testVariable() {
+        assertParsedAndQuotedCorrectly(false);
     }
 
     /*
@@ -22,35 +18,35 @@ public class MatchedExpressionParsingTestCase extends ParsingTestCase {
      */
 
     public void testAtNumericOperation() {
-        assertParsedWithErrors();
+        assertParsedWithErrors(false);
     }
 
     public void testCaptureNumericOperation() {
-        assertParsedWithErrors();
+        assertParsedWithErrors(false);
     }
 
     public void testUnaryNumericOperation() {
-        assertParsedWithErrors();
+        assertParsedWithErrors(false);
     }
 
     public void testEmptyBlock() {
-        assertParsedWithErrors();
+        assertParsedWithErrors(false);
     }
 
     public void testList() {
-        assertParsedWithErrors();
+        assertParsedWithErrors(false);
     }
 
     public void testSigil() {
-        assertParsedWithErrors();
+        assertParsedWithErrors(false);
     }
 
     public void testAtomKeyword() {
-        assertParsedWithErrors();
+        assertParsedWithErrors(false);
     }
 
     public void testAtom() {
-        assertParsedWithErrors();
+        assertParsedWithErrors(false);
     }
 
     /*
@@ -58,51 +54,51 @@ public class MatchedExpressionParsingTestCase extends ParsingTestCase {
      */
 
     public void testCharToken() {
-        assertParsedWithErrors();
+        assertParsedWithErrors(false);
     }
 
     public void testBinaryWholeNumber() {
-        assertParsedWithErrors();
+        assertParsedWithErrors(false);
     }
 
     public void testHexadecimalWholeNumber() {
-        assertParsedWithErrors();
+        assertParsedWithErrors(false);
     }
 
     public void testOctalWholeNumber() {
-        assertParsedWithErrors();
+        assertParsedWithErrors(false);
     }
 
     public void testUnknownBaseWholeNumber() {
-        assertParsedWithErrors();
+        assertParsedWithErrors(false);
     }
 
     public void testDecimalFloat() {
-        assertParsedWithErrors();
+        assertParsedWithErrors(false);
     }
 
     public void testDecimalFloatDecimalFloat() {
-        assertParsedWithErrors();
+        assertParsedWithErrors(false);
     }
 
     public void testDecimalWholeNumber() {
-        assertParsedWithErrors();
+        assertParsedWithErrors(false);
     }
 
     public void testStringLine() {
-        assertParsedWithErrors();
+        assertParsedWithErrors(false);
     }
 
     public void testStringHeredoc() {
-        assertParsedWithErrors();
+        assertParsedWithErrors(false);
     }
 
     public void testCharListLine() {
-        assertParsedWithErrors();
+        assertParsedWithErrors(false);
     }
 
     public void testCharListHeredoc() {
-        assertParsedWithErrors();
+        assertParsedWithErrors(false);
     }
 
     @Override

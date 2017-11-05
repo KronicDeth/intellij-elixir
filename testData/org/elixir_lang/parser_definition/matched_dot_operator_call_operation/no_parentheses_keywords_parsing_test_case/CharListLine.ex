@@ -16,7 +16,6 @@
 'CharList'.| key1: value1, key2: value2
 'CharList'.<= key1: value1, key2: value2
 'CharList'.-> key1: value1, key2: value2
-'CharList'.% key1: value1, key2: value2
 'CharList'.<> key1: value1, key2: value2
 'CharList'.^ key1: value1, key2: value2
 'CharList'.not key1: value1, key2: value2

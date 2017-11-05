@@ -1,6 +1,8 @@
 package org.elixir_lang.reference.module.multiple_alias;
 
 import com.intellij.codeInsight.completion.CompletionType;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiPolyVariantReference;
@@ -70,5 +72,19 @@ public class NestedTest extends LightCodeInsightFixtureTestCase {
     @Override
     protected String getTestDataPath() {
         return "testData/org/elixir_lang/reference/module/multiple_alias/nested";
+    }
+
+
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+
+        if (myFixture != null) {
+            Project project = getProject();
+
+            if (project != null && !project.isDisposed()) {
+                Disposer.dispose(project);
+            }
+        }
     }
 }

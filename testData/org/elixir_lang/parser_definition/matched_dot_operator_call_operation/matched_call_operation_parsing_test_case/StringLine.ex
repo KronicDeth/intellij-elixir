@@ -16,7 +16,6 @@
 "String".| Qualifier.qualified positional, key: value
 "String".<= Qualifier.qualified positional, key: value
 "String".-> Qualifier.qualified positional, key: value
-"String".% Qualifier.qualified positional, key: value
 "String".<> Qualifier.qualified positional, key: value
 "String".^ Qualifier.qualified positional, key: value
 "String".not Qualifier.qualified positional, key: value

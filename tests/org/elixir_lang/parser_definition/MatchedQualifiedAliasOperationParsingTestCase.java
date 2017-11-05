@@ -78,7 +78,7 @@ public class MatchedQualifiedAliasOperationParsingTestCase extends ParsingTestCa
     }
 
     public void testMatchedUnaryNonNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testMatchedDotCallOperation() {
@@ -94,7 +94,7 @@ public class MatchedQualifiedAliasOperationParsingTestCase extends ParsingTestCa
     }
 
     public void testMatchedAtNonNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testMatchedUnqualifiedCallOperation() {
@@ -110,7 +110,7 @@ public class MatchedQualifiedAliasOperationParsingTestCase extends ParsingTestCa
      */
 
     public void testAtNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testCaptureNumericOperation() {
@@ -118,7 +118,7 @@ public class MatchedQualifiedAliasOperationParsingTestCase extends ParsingTestCa
     }
 
     public void testUnaryNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testEmptyBlock() {
@@ -177,9 +177,7 @@ public class MatchedQualifiedAliasOperationParsingTestCase extends ParsingTestCa
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testStringHeredoc() throws Exception {
-        registerProjectFileIndex();
-
+    public void testStringHeredoc() {
         assertParsedAndQuotedCorrectly();
     }
 
@@ -187,9 +185,7 @@ public class MatchedQualifiedAliasOperationParsingTestCase extends ParsingTestCa
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testCharListHeredoc() throws Exception {
-        registerProjectFileIndex();
-
+    public void testCharListHeredoc() {
         assertParsedAndQuotedCorrectly();
     }
 

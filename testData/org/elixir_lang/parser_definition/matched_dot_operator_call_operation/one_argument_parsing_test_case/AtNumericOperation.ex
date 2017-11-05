@@ -16,7 +16,6 @@
 @1.| positional
 @1.<= positional
 @1.-> positional
-@1.% positional
 @1.<> positional
 @1.^ positional
 @1.not positional

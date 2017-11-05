@@ -16,7 +16,6 @@ variable.|| positional
 variable.| positional
 variable.<= positional
 variable.-> positional
-variable.% positional
 variable.<> positional
 variable.^ positional
 variable.not positional

@@ -53,7 +53,7 @@ public class MatchedOrOperationParsingTestCase extends ParsingTestCase {
     }
 
     public void testUnaryNonNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testMatchedDotOperation() {
@@ -61,7 +61,7 @@ public class MatchedOrOperationParsingTestCase extends ParsingTestCase {
     }
 
     public void testAtNonNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testMatchedCallOperation() {
@@ -77,7 +77,7 @@ public class MatchedOrOperationParsingTestCase extends ParsingTestCase {
      */
 
     public void testAtNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testCaptureNumericOperation() {
@@ -85,7 +85,7 @@ public class MatchedOrOperationParsingTestCase extends ParsingTestCase {
     }
 
     public void testUnaryNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testEmptyBlock() {
@@ -109,7 +109,7 @@ public class MatchedOrOperationParsingTestCase extends ParsingTestCase {
     }
 
     public void testAlias() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     /*
@@ -160,9 +160,7 @@ public class MatchedOrOperationParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testStringHeredoc() throws Exception {
-        registerProjectFileIndex();
-
+    public void testStringHeredoc() {
         assertParsedAndQuotedCorrectly();
     }
 
@@ -174,9 +172,7 @@ public class MatchedOrOperationParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testCharListHeredoc() throws Exception {
-        registerProjectFileIndex();
-
+    public void testCharListHeredoc() {
         assertParsedAndQuotedCorrectly();
     }
 

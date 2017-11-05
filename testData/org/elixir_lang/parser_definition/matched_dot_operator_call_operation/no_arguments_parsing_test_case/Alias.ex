@@ -16,7 +16,6 @@ Alias.||
 Alias.|
 Alias.<=
 Alias.->
-Alias.%
 Alias.<>
 Alias.^
 Alias.not

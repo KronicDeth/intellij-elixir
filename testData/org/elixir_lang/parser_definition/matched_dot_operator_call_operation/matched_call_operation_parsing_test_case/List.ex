@@ -16,7 +16,6 @@
 [].| Qualifier.qualified positional, key: value
 [].<= Qualifier.qualified positional, key: value
 [].-> Qualifier.qualified positional, key: value
-[].% Qualifier.qualified positional, key: value
 [].<> Qualifier.qualified positional, key: value
 [].^ Qualifier.qualified positional, key: value
 [].not Qualifier.qualified positional, key: value

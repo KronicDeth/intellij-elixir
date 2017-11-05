@@ -16,7 +16,6 @@
 'CharList'.|
 'CharList'.<=
 'CharList'.->
-'CharList'.%
 'CharList'.<>
 'CharList'.^
 'CharList'.not

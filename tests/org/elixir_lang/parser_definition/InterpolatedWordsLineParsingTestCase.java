@@ -29,8 +29,6 @@ public class InterpolatedWordsLineParsingTestCase extends ParsingTestCase {
     }
 
     public void testEscapeSequences() throws Exception {
-        registerProjectFileIndex();
-
         assertParsedAndQuotedCorrectly();
     }
 

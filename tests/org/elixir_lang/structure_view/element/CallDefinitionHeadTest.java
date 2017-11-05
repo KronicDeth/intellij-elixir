@@ -1,5 +1,7 @@
 package org.elixir_lang.structure_view.element;
 
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.psi.PsiElement;
 import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase;
 import org.elixir_lang.psi.call.Call;

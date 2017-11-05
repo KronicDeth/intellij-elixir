@@ -8,9 +8,7 @@ public class StringLineParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testEscapeSequences() throws Exception {
-        registerProjectFileIndex();
-
+    public void testEscapeSequences() {
         assertParsedAndQuotedCorrectly();
     }
 

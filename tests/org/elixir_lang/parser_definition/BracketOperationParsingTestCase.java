@@ -1,5 +1,9 @@
 package org.elixir_lang.parser_definition;
 
+import org.elixir_lang.sdk.elixir.Release;
+
+import static org.elixir_lang.test.ElixirVersion.elixirSdkRelease;
+
 /**
  * Created by luke.imhoff on 9/17/14.
  */
@@ -77,7 +81,11 @@ public class BracketOperationParsingTestCase extends ParsingTestCase {
     }
 
     public void testStructOperator() {
-        assertParsedAndQuotedCorrectly();
+        if (elixirSdkRelease().compareTo(Release.V_1_4) < 0) {
+            assertParsedAndQuotedCorrectly(false);
+        } else {
+            assertTrue(elixirSdkRelease().compareTo(Release.V_1_4) >= 0);
+        }
     }
 
     public void testTwoOperator() {
@@ -121,7 +129,7 @@ public class BracketOperationParsingTestCase extends ParsingTestCase {
      */
 
     public void testAtNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testCaptureNumericOperation() {
@@ -129,7 +137,11 @@ public class BracketOperationParsingTestCase extends ParsingTestCase {
     }
 
     public void testUnaryNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        if (elixirSdkRelease().compareTo(Release.V_1_5) < 0) {
+            assertParsedAndQuotedCorrectly(false);
+        } else {
+            assertTrue(elixirSdkRelease().compareTo(Release.V_1_5) >= 0);
+        }
     }
 
     public void testEmptyBlock() {
@@ -189,8 +201,6 @@ public class BracketOperationParsingTestCase extends ParsingTestCase {
     }
 
     public void testStringHeredoc() throws Exception {
-        registerProjectFileIndex();
-
         assertParsedAndQuotedCorrectly();
     }
 
@@ -199,8 +209,6 @@ public class BracketOperationParsingTestCase extends ParsingTestCase {
     }
 
     public void testCharListHeredoc() throws Exception {
-        registerProjectFileIndex();
-
         assertParsedAndQuotedCorrectly();
     }
 

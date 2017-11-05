@@ -16,7 +16,6 @@
 0b10.| unqualified positional, key: value
 0b10.<= unqualified positional, key: value
 0b10.-> unqualified positional, key: value
-0b10.% unqualified positional, key: value
 0b10.<> unqualified positional, key: value
 0b10.^ unqualified positional, key: value
 0b10.not unqualified positional, key: value

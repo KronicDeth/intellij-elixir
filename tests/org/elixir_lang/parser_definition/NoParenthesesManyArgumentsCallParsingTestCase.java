@@ -5,7 +5,7 @@ package org.elixir_lang.parser_definition;
  */
 public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCase {
     public void testFunctionEOLPositional() {
-        assertParsedWithErrors();
+        assertParsedWithErrors(false);
     }
 
     public void testOneKeyword() {
@@ -37,7 +37,7 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
     }
 
     public void testKeywordValueAtNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testKeywordValueAtom() {
@@ -52,9 +52,7 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testKeywordValueCharListHeredoc() throws Exception {
-        registerProjectFileIndex();
-
+    public void testKeywordValueCharListHeredoc() {
         assertParsedAndQuotedCorrectly();
     }
 
@@ -87,7 +85,7 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
     }
 
     public void testKeywordValueMatchedAtNonNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testKeywordValueMatchedMultiplicationOperation() {
@@ -99,7 +97,7 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
     }
 
     public void testKeywordValueMatchedUnaryNonNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testKeywordValueNoParenthesesNoArgumentsUnqualifiedCallOrVariable() {
@@ -110,9 +108,7 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testKeywordValueStringHeredoc() throws Exception {
-        registerProjectFileIndex();
-
+    public void testKeywordValueStringHeredoc() {
         assertParsedAndQuotedCorrectly();
     }
 
@@ -121,7 +117,7 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
     }
 
     public void testKeywordValueUnaryNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testNoParenthesesExpressionKeywordValue() {
@@ -133,7 +129,7 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
     }
 
     public void testPositionalAtNonNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testPositionalAtom() {
@@ -144,9 +140,7 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testPositionalCharListHeredoc() throws Exception {
-        registerProjectFileIndex();
-
+    public void testPositionalCharListHeredoc() {
         assertParsedAndQuotedCorrectly();
     }
 
@@ -231,11 +225,11 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
     }
 
     public void testPositionalUnaryNonNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testPositionalNumericAtOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testPositionalNumericCaptureOperation() {
@@ -243,7 +237,7 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
     }
 
     public void testPositionalNumericUnaryOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testPositionalQualifiedAlias() {
@@ -262,9 +256,7 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testPositionalStringHeredoc() throws Exception {
-        registerProjectFileIndex();
-
+    public void testPositionalStringHeredoc() {
         assertParsedAndQuotedCorrectly();
     }
 

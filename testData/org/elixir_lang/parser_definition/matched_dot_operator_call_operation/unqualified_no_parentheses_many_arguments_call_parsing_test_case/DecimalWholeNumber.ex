@@ -16,7 +16,6 @@
 9876543210.| unqualified positional, key: value
 9876543210.<= unqualified positional, key: value
 9876543210.-> unqualified positional, key: value
-9876543210.% unqualified positional, key: value
 9876543210.<> unqualified positional, key: value
 9876543210.^ unqualified positional, key: value
 9876543210.not unqualified positional, key: value

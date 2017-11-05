@@ -402,7 +402,7 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
     }
 
     @Nullable
-    private static Release getRelease(@NotNull Project project) {
+    public static Release getRelease(@NotNull Project project) {
         Release release;
 
         if (ProcessOutput.isSmallIde()) {

@@ -16,7 +16,6 @@
 :atom.|
 :atom.<=
 :atom.->
-:atom.%
 :atom.<>
 :atom.^
 :atom.not

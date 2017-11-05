@@ -1,30 +1,24 @@
 package org.elixir_lang.parser_definition;
 
 public class UnmatchedExpressionParsingTestCase extends ParsingTestCase {
-    public void testAtDotCallBlock() throws Exception{
-        registerProjectFileIndex();
-
-        assertParsedAndQuotedCorrectly();
+    public void testAtDotCallBlock() {
+        assertParsedAndQuotedCorrectly(false);
     }
 
-    public void testAtQualifiedNoArgumentsCallBlock() throws Exception {
-        registerProjectFileIndex();
-
-        assertParsedAndQuotedCorrectly();
+    public void testAtQualifiedNoArgumentsCallBlock() {
+        assertParsedAndQuotedCorrectly(false);
     }
 
-    public void testAtQualifiedNoParenthesesCallBlock() throws Exception {
-        registerProjectFileIndex();
-
-        assertParsedAndQuotedCorrectly();
+    public void testAtQualifiedNoParenthesesCallBlock() {
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testAtQualifiedParenthesesCallBlock() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testAtUnqualifiedNoArgumentsBlock() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testAtUnqualifiedNoParenthesesCallBlock() {
@@ -32,7 +26,7 @@ public class UnmatchedExpressionParsingTestCase extends ParsingTestCase {
     }
 
     public void testAtUnqualifiedParenthesesCallBlock() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testBlockIdentifierKeywordKeys() {
@@ -43,22 +37,16 @@ public class UnmatchedExpressionParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testCaptureDotCallBlock() throws Exception {
-        registerProjectFileIndex();
-
-        assertParsedAndQuotedCorrectly();
+    public void testCaptureDotCallBlock() {
+        assertParsedAndQuotedCorrectly(false);
     }
 
-    public void testCaptureQualifiedNoArgumentsCallBlock() throws Exception {
-        registerProjectFileIndex();
-
-        assertParsedAndQuotedCorrectly();
+    public void testCaptureQualifiedNoArgumentsCallBlock() {
+        assertParsedAndQuotedCorrectly(false);
     }
 
-    public void testCaptureQualifiedNoParenthesesCallBlock() throws Exception {
-        registerProjectFileIndex();
-
-        assertParsedAndQuotedCorrectly();
+    public void testCaptureQualifiedNoParenthesesCallBlock() {
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testCaptureQualifiedParenthesesCallBlock() {
@@ -77,90 +65,72 @@ public class UnmatchedExpressionParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testDotCallBlock() throws Exception {
-        registerProjectFileIndex();
-
-        assertParsedAndQuotedCorrectly();
+    public void testDotCallBlock() {
+        assertParsedAndQuotedCorrectly(false);
     }
 
-    public void testExclamationPointDotCallBlock() throws Exception {
-        registerProjectFileIndex();
-
-        assertParsedAndQuotedCorrectly();
+    public void testExclamationPointDotCallBlock() {
+        assertParsedAndQuotedCorrectly(false);
     }
 
-    public void testExclamationPointQualifiedNoArgumentsCallBlock() throws Exception {
-        registerProjectFileIndex();
-
-        assertParsedAndQuotedCorrectly();
+    public void testExclamationPointQualifiedNoArgumentsCallBlock() {
+        assertParsedAndQuotedCorrectly(false);
     }
 
-    public void testExclamationPointQualifiedNoParenthesesCallBlock() throws Exception {
-        registerProjectFileIndex();
-
-        assertParsedAndQuotedCorrectly();
+    public void testExclamationPointQualifiedNoParenthesesCallBlock() {
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testExclamationPointQualifiedParenthesesCallBlock() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testExclamationPointUnqualifiedNoArgumentsBlock() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testExclamationPointUnqualifiedNoParenthesesCallBlock() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testExclamationPointUnqualifiedParenthesesCallBlock() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testInternalError() {
         assertParsedWithErrors();
     }
 
-    public void testNotDotCallBlock() throws Exception {
-        registerProjectFileIndex();
-
-        assertParsedAndQuotedCorrectly();
+    public void testNotDotCallBlock() {
+        assertParsedAndQuotedCorrectly(false);
     }
 
-    public void testNotQualifiedNoArgumentsCallBlock() throws Exception {
-        registerProjectFileIndex();
-
-        assertParsedAndQuotedCorrectly();
+    public void testNotQualifiedNoArgumentsCallBlock() {
+        assertParsedAndQuotedCorrectly(false);
     }
 
-    public void testNotQualifiedNoParenthesesCallBlock() throws Exception {
-        registerProjectFileIndex();
-
-        assertParsedAndQuotedCorrectly();
+    public void testNotQualifiedNoParenthesesCallBlock() {
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testNotUnqualifiedNoArgumentsBlock() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testNotUnqualifiedNoParenthesesCallBlock() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testNotUnqualifiedParenthesesCallBlock() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
-    public void testQualifiedNoArgumentsCallBlock() throws Exception {
-        registerProjectFileIndex();
-
-        assertParsedAndQuotedCorrectly();
+    public void testQualifiedNoArgumentsCallBlock() {
+        assertParsedAndQuotedCorrectly(false);
     }
 
-    public void testQualifiedNoParenthesesCallBlock() throws Exception {
-        registerProjectFileIndex();
-
-        assertParsedAndQuotedCorrectly();
+    public void testQualifiedNoParenthesesCallBlock() {
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testQualifiedParenthesesCallBlock() {
@@ -168,7 +138,7 @@ public class UnmatchedExpressionParsingTestCase extends ParsingTestCase {
     }
 
     public void testUnaryStabBody() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testUnqualifiedNoArgumentsAfterBlock() {
@@ -176,7 +146,7 @@ public class UnmatchedExpressionParsingTestCase extends ParsingTestCase {
     }
 
     public void testUnqualifiedNoArgumentsAfterStabBlock() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testUnqualifiedNoArgumentsBlock() {
@@ -188,7 +158,7 @@ public class UnmatchedExpressionParsingTestCase extends ParsingTestCase {
     }
 
     public void testUnqualifiedNoArgumentsCatchStabBlock() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testUnqualifiedNoArgumentsElseBlock() {
@@ -196,7 +166,7 @@ public class UnmatchedExpressionParsingTestCase extends ParsingTestCase {
     }
 
     public void testUnqualifiedNoArgumentsElseStabBlock() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testUnqualifiedNoArgumentsRepeatBlock() {
@@ -208,27 +178,27 @@ public class UnmatchedExpressionParsingTestCase extends ParsingTestCase {
     }
 
     public void testUnqualifiedNoArgumentsRescueStabBlock() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testUnqualifiedNoArgumentsStabAfterStabBlock() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testUnqualifiedNoArgumentsStabCatchStabBlock() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testUnqualifiedNoArgumentsStabElseStabBlock() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testUnqualifiedNoArgumentsStabRescueStabBlock() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testUnqualifiedNoArgumentsStabBlock() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testUnqualifiedNoParenthesesCallBlock() {

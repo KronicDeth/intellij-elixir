@@ -8,27 +8,19 @@ public class CharListHeredocParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedAroundError();
     }
 
-    public void testEmptyHexadecimalEscapeSequence() throws Exception {
-        registerProjectFileIndex();
-
+    public void testEmptyHexadecimalEscapeSequence() {
         assertParsedAndQuotedAroundExit();
     }
 
-    public void testEmptyUnicodeEscapeSequence() throws Exception {
-        registerProjectFileIndex();
-
+    public void testEmptyUnicodeEscapeSequence() {
         assertParsedAndQuotedAroundExit();
     }
 
-    public void testEscapeSequences() throws Exception {
-        registerProjectFileIndex();
-
+    public void testEscapeSequences() {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testInterpolation() throws Exception {
-        setProjectSdkFromEbinDirectory();
-
+    public void testInterpolation() {
         assertParsedAndQuotedCorrectly();
     }
 
@@ -36,9 +28,7 @@ public class CharListHeredocParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testWhitespaceEndPrefix() throws Exception {
-        registerProjectFileIndex();
-
+    public void testWhitespaceEndPrefix() {
         assertParsedAndQuotedAroundError();
     }
 

@@ -16,7 +16,6 @@
 'CharList'.| Qualifier.qualified positional, key: value
 'CharList'.<= Qualifier.qualified positional, key: value
 'CharList'.-> Qualifier.qualified positional, key: value
-'CharList'.% Qualifier.qualified positional, key: value
 'CharList'.<> Qualifier.qualified positional, key: value
 'CharList'.^ Qualifier.qualified positional, key: value
 'CharList'.not Qualifier.qualified positional, key: value

@@ -1,6 +1,8 @@
 package org.elixir_lang.reference.callable;
 
 import com.intellij.navigation.ItemPresentation;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.psi.*;
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
 import org.elixir_lang.psi.ElixirIdentifier;
@@ -235,5 +237,19 @@ public class IntramoduleTest extends LightCodeInsightFixtureTestCase {
     @Override
     protected String getTestDataPath() {
         return "testData/org/elixir_lang/reference/callable/intramodule";
+    }
+
+
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+
+        if (myFixture != null) {
+            Project project = getProject();
+
+            if (project != null && !project.isDisposed()) {
+                Disposer.dispose(project);
+            }
+        }
     }
 }

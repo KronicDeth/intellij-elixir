@@ -1,5 +1,8 @@
 {
   parserClass="org.elixir_lang.parser.ElixirParser"
+  parserImports=[
+    "static org.elixir_lang.parser.ExternalRules.*"
+  ]
 
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
   // direct children of matchedExpression
@@ -77,6 +80,38 @@
     "org.elixir_lang.psi.operation.In"
   ]
   // methods set by infix operations below
+
+  // `not in` operations that works as calls
+  implements("(un)?matchedNotInOperation")=[
+    "org.elixir_lang.psi.call.Call"
+    "org.elixir_lang.psi.operation.NotIn"
+  ]
+  methods("(un)?matchedNotInOperation")=[
+    functionName
+    functionNameElement
+    getDoBlock
+    getName
+    getNameIdentifier
+    hasDoBlockOrKeyword
+    isCalling
+    isCallingMacro
+    leftOperand
+    moduleName
+    operator
+    primaryArguments
+    primaryArity
+    processDeclarations
+    quote
+    resolvedFinalArity
+    resolvedFinalArityRange
+    resolvedModuleName
+    resolvedPrimaryArity
+    resolvedSecondaryArity
+    rightOperand
+    secondaryArguments
+    secondaryArity
+    setName
+  ]
 
   /* infix operations that work as name identifier owner calls - specifically support getNameIdentifier so they can
      return their operator, so it is easy to use a different operator when making customer operators like in Bitwise or
@@ -182,11 +217,11 @@
    *
    * Have names (their operators), but aren't stubbed because they don't define structures.
    */
-  implements(        "((at|capture|unary)Numeric|(un)?matched(Capture)NonNumeric)Operation")=[
+  implements(        "((at|capture|unary)Numeric|(un)?matchedCaptureNonNumeric)Operation")=[
     "org.elixir_lang.psi.call.Named"
     "org.elixir_lang.psi.operation.Prefix"
   ]
-  methods(           "((at|capture|unary)Numeric|(un)?matched(Capture|Unary)NonNumeric)Operation")=[
+  methods(           "((at|capture|unary)Numeric|(un)?matched((Capture|Unary)NonNumeric|Unary))Operation")=[
     functionName
     functionNameElement
     getDoBlock
@@ -212,10 +247,10 @@
   ]
 
   // atNonNumeric operations
-  implements("(un)?matchedAtNonNumericOperation")=[
+  implements("(un)?matchedAt(NonNumeric)?Operation")=[
     "org.elixir_lang.psi.AtNonNumericOperation"
   ]
-  methods("(un)?matchedAtNonNumericOperation")=[
+  methods("(un)?matchedAt(NonNumeric)?Operation")=[
     getReference
     moduleAttributeName
     operand
@@ -224,7 +259,7 @@
   ]
 
   // unaryNonNumeric operations
-  implements("(un)?matchedUnaryNonNumericOperation")=[
+  implements("(un)?matchedUnary(NonNumeric)?Operation")=[
     "org.elixir_lang.psi.UnaryNonNumericOperation"
   ]
   // method set by prefix operations above
@@ -355,7 +390,7 @@
     DIVISION_OPERATOR = "/"
     DO = "do"
     DOT_OPERATOR = "."
-    DUAL_OPERATOR = "+, -"
+    DUAL_OPERATOR = "Dual Operator (+, -)"
     ELSE = "else"
     EOL = "\\n, \\r\\n"
     END = "end"
@@ -422,6 +457,7 @@
     SIGIL_PROMOTER = "Sigil Promoter ({, [, <, \", /, (, |, ')"
     SIGIL_TERMINATOR = "Sigil Terminator ({, [, <, \", /, (, |, ')"
     SIGNIFICANT_WHITE_SPACE = "<significant-space>";
+    SIGN_OPERATOR = "Sign Operator (+, -)"
     STAB_OPERATOR = "->"
     STRING_FRAGMENT = "String Fragment"
     STRING_HEREDOC_PROMOTER = "String Heredoc Promoter (\"\"\")"
@@ -1108,16 +1144,19 @@ matchedExpression ::= matchedCaptureNonNumericOperation |
                       matchedRelationalOperation |
                       matchedArrowOperation |
                       matchedInOperation |
+                      matchedNotInOperation |
                       matchedThreeOperation |
                       matchedTwoOperation |
                       matchedAdditionOperation |
                       matchedMultiplicationOperation |
                       matchedUnaryNonNumericOperation |
+                      matchedUnaryOperation |
                       matchedDotCall |
                       // NoParentheses before matchedBracketOperation because brackets only make sense after parentheses.
                       matchedQualifiedNoParenthesesCall |
                       matchedAtUnqualifiedNoParenthesesCall |
                       matchedUnqualifiedNoParenthesesCall |
+                      matchedAtNumericBracketOperation |
                       matchedBracketOperation |
                       matchedQualifiedAlias |
                       matchedQualifiedMultipleAliases |
@@ -1126,6 +1165,7 @@ matchedExpression ::= matchedCaptureNonNumericOperation |
                       matchedQualifiedNoArgumentsCall |
                       matchedAtUnqualifiedBracketOperation |
                       matchedAtNonNumericOperation | // after matchedQualified because @ binds only before `.`
+                      matchedAtOperation | // after matchedQualified because @ binds only before `.`
                       matchedUnqualifiedParenthesesCall |
                       matchedUnqualifiedBracketOperation |
                       matchedUnqualifiedNoArgumentsCall |
@@ -1358,6 +1398,17 @@ inInfixOperator ::= EOL* IN_OPERATOR EOL*
 // methods defined by "infix operations" section above
 matchedInOperation ::= matchedExpression inInfixOperator matchedExpression
 
+notInfixOperator ::= EOL* NOT_OPERATOR EOL*
+                     {
+                       implements = "org.elixir_lang.psi.Operator"
+                         methods = [
+                         operatorTokenSet
+                         quote
+                       ]
+                       name = "not"
+                     }
+matchedNotInOperation ::= matchedExpression <<ifVersion "GE" "1.5.0">> notInfixOperator inInfixOperator matchedExpression
+
 /*
  * Three Operation - left-associative
  *
@@ -1407,7 +1458,7 @@ matchedTwoOperation ::= matchedExpression twoInfixOperator matchedExpression
    See https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L605-L613
    for rules for SIGNIFICANT_WHITE_SPACE */
 additionInfixOperator ::= (SIGNIFICANT_WHITE_SPACE DUAL_OPERATOR (SIGNIFICANT_WHITE_SPACE | &EOL) |
-                           DUAL_OPERATOR) EOL*
+                           DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE?) EOL*
                           {
                             implements = "org.elixir_lang.psi.Operator"
                             methods = [
@@ -1438,14 +1489,8 @@ multiplicationInfixOperator ::= EOL* (DIVISION_OPERATOR | MULTIPLICATION_OPERATO
 // implements and methods defined by "infix operations" section above
 matchedMultiplicationOperation ::= matchedExpression multiplicationInfixOperator matchedExpression
 
-/*
- * Unary Non-Numeric Operation - non-associative
- *
- * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L67
- *
- */
-
-unaryPrefixOperator ::= (SIGNIFICANT_WHITE_SPACE? DUAL_OPERATOR | NOT_OPERATOR | UNARY_OPERATOR) EOL*
+unaryPrefixOperator ::= (SIGNIFICANT_WHITE_SPACE? DUAL_OPERATOR | SIGN_OPERATOR | UNARY_OPERATOR) EOL* |
+                        NOT_OPERATOR EOL* !inInfixOperator
                         {
                           implements = "org.elixir_lang.psi.Operator"
                           methods = [
@@ -1454,7 +1499,21 @@ unaryPrefixOperator ::= (SIGNIFICANT_WHITE_SPACE? DUAL_OPERATOR | NOT_OPERATOR |
                           ]
                           name = "+, -, !, ^, not, ~~~"
                         }
-matchedUnaryNonNumericOperation ::= unaryPrefixOperator !numeric matchedExpression
+
+/*
+ * Unary Non-Numeric Operation - non-associative (Elixir < 1.5.0)
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L67
+ *
+ */
+
+matchedUnaryNonNumericOperation ::= <<ifVersion "LT" "1.5.0">> unaryPrefixOperator !numeric matchedExpression
+
+/*
+ * Unary Operation - non-associative (Elixir >= 1.5.0)
+ */
+
+matchedUnaryOperation ::= <<ifVersion "GE" "1.5.0" >> unaryPrefixOperator matchedExpression
 
 /*
  * Dot Operations
@@ -1789,6 +1848,15 @@ matchedAtUnqualifiedBracketOperation ::= atPrefixOperator IDENTIFIER_TOKEN CALL 
                                          { implements = "org.elixir_lang.psi.AtUnqualifiedBracketOperation" methods = [quote] }
 
 /*
+ * At Numeric Bracket Operation (Elixir >= 1.5.0)
+ *
+ * Needed so that At consumes numeric, but brackets consume both of them.
+ */
+
+matchedAtNumericBracketOperation ::= <<ifVersion "GE" "1.5.0">> atPrefixOperator numeric bracketArguments
+                                     { implements = "org.elixir_lang.psi.AtNumericBracketOperation" methods = [quote] }
+
+/*
  * Unqualified Parentheses Call
  *
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L229-L230
@@ -1804,14 +1872,6 @@ matchedUnqualifiedParenthesesCall ::= identifier matchedParenthesesArguments
                                         stubClass = "org.elixir_lang.psi.stub.MatchedUnqualifiedParenthesesCall"
                                       }
 
-/*
- * At Non-Numeric Operation - non-associative
- *
- * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L70
- * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L567-L572
- * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L574-L578
- */
-
 atPrefixOperator ::= AT_OPERATOR EOL*
                      {
                        implements = "org.elixir_lang.psi.Operator"
@@ -1821,7 +1881,22 @@ atPrefixOperator ::= AT_OPERATOR EOL*
                        ]
                        name = "@"
                      }
-matchedAtNonNumericOperation ::= atPrefixOperator !numeric matchedExpression
+
+/*
+ * At Non-Numeric Operation - non-associative (Elixir < 1.5.0)
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L70
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L567-L572
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L574-L578
+ */
+
+matchedAtNonNumericOperation ::= <<ifVersion "LT" "1.5.0">> atPrefixOperator !numeric matchedExpression
+
+/*
+ * At Operation - non-associative (Elixir >= 1.5.0)
+ */
+
+matchedAtOperation ::= <<ifVersion "GE" "1.5.0">> atPrefixOperator matchedExpression
 
 /*
  * Unqualified Bracket Operation
@@ -1859,9 +1934,9 @@ matchedAccessExpression ::= accessExpression
  *
  */
 
-atNumericOperation ::= atPrefixOperator numeric
+atNumericOperation ::= <<ifVersion "LT" "1.5">> atPrefixOperator numeric
 captureNumericOperation ::= capturePrefixOperator numeric
-unaryNumericOperation ::= unaryPrefixOperator numeric
+unaryNumericOperation ::= <<ifVersion "LT" "1.5">> unaryPrefixOperator numeric
 
 /*
  *
@@ -1924,7 +1999,9 @@ private maxExpression ::= /* matchedBracketOperation because it is first rule af
                              because all those rules are ATOM or PREFIX so they won't also match lower rules */
                           (
                            matchedAtUnqualifiedBracketOperation |
+                           matchedAtNumericBracketOperation |
                            matchedAtNonNumericOperation |
+                           matchedAtOperation |
                            matchedUnqualifiedParenthesesCall |
                            matchedUnqualifiedBracketOperation |
                            variable |
@@ -2319,6 +2396,8 @@ unmatchedArrowOperation ::= unmatchedExpression arrowInfixOperator unmatchedExpr
 // methods defined by "infix operations" section above
 unmatchedInOperation ::= unmatchedExpression inInfixOperator unmatchedExpression
 
+unmatchedNotInOperation ::= unmatchedExpression <<ifVersion "GE" "1.5.0">> notInfixOperator inInfixOperator unmatchedExpression
+
 /*
  * Three Operation - left-associative
  *
@@ -2358,13 +2437,19 @@ unmatchedAdditionOperation ::= unmatchedExpression additionInfixOperator unmatch
 unmatchedMultiplicationOperation ::= unmatchedExpression multiplicationInfixOperator unmatchedExpression
 
 /*
- * Unary Non-Numeric Operation - non-associative
+ * Unary Non-Numeric Operation - non-associative (Elixir < 1.5.0)
  *
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L67
  *
  */
 
-unmatchedUnaryNonNumericOperation ::= unaryPrefixOperator !numeric unmatchedExpression
+unmatchedUnaryNonNumericOperation ::= <<ifVersion "LT" "1.5.0">> unaryPrefixOperator !numeric unmatchedExpression
+
+/*
+ * Unary Operation - non-associative (Elixir >= 1.5.0)
+ */
+
+unmatchedUnaryOperation ::= <<ifVersion "GE" "1.5.0">> unaryPrefixOperator unmatchedExpression
 
 /*
  * Dot Operations
@@ -2543,6 +2628,16 @@ unmatchedAtUnqualifiedBracketOperation ::= atPrefixOperator IDENTIFIER_TOKEN CAL
                                            { implements = "org.elixir_lang.psi.AtUnqualifiedBracketOperation" methods = [quote] }
 
 /*
+ * At Numeric Operation (Elixir >= 1.5.0)
+ *
+ * Needed so that At consumes numeric, but brackets consume both of them.
+ */
+
+unmatchedAtNumericBracketOperation ::= <<ifVersion "GE" "1.5.0">> atPrefixOperator numeric bracketArguments
+                                       { implements = "org.elixir_lang.psi.AtNumericBracketOperation" methods = [quote] }
+
+
+/*
  * Unqualified Parentheses Call
  *
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L229-L230
@@ -2556,14 +2651,24 @@ unmatchedUnqualifiedParenthesesCall ::= identifier matchedParenthesesArguments d
                                         }
 
 /*
- * At Non-Numeric Operation - non-associative
+ * At Non-Numeric Operation - non-associative (Elixir < 1.5.0)
  *
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L70
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L567-L572
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L574-L578
  */
 
-unmatchedAtNonNumericOperation ::= atPrefixOperator !numeric unmatchedExpression
+unmatchedAtNonNumericOperation ::= <<ifVersion "LT" "1.5.0">> atPrefixOperator !numeric unmatchedExpression
+
+/*
+ * At Operation - non-associative (Elixir >= 1.5.0)
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L70
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L567-L572
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L574-L578
+ */
+
+unmatchedAtOperation ::= <<ifVersion "GE" "1.5.0">> atPrefixOperator unmatchedExpression
 
 /*
  * Unqualified Bracket Operation
@@ -2640,16 +2745,19 @@ unmatchedExpression ::= unmatchedCaptureNonNumericOperation |
                         unmatchedRelationalOperation |
                         unmatchedArrowOperation |
                         unmatchedInOperation |
+                        unmatchedNotInOperation |
                         unmatchedThreeOperation |
                         unmatchedTwoOperation |
                         unmatchedAdditionOperation |
                         unmatchedMultiplicationOperation |
                         unmatchedUnaryNonNumericOperation |
+                        unmatchedUnaryOperation |
                         unmatchedDotCall |
                         // NoParentheses before unmatchedBracketOperation because brackets only make sense after parentheses.
                         unmatchedQualifiedNoParenthesesCall |
                         unmatchedAtUnqualifiedNoParenthesesCall |
                         unmatchedUnqualifiedNoParenthesesCall |
+                        unmatchedAtNumericBracketOperation |
                         unmatchedBracketOperation |
                         unmatchedQualifiedAlias |
                         unmatchedQualifiedMultipleAliases |
@@ -2658,6 +2766,7 @@ unmatchedExpression ::= unmatchedCaptureNonNumericOperation |
                         unmatchedQualifiedNoArgumentsCall |
                         unmatchedAtUnqualifiedBracketOperation |
                         unmatchedAtNonNumericOperation | // after unmatchedQualified because @ binds only before `.`
+                        unmatchedAtOperation | // after unmatchedQualified because @ binds only before `.`
                         unmatchedUnqualifiedParenthesesCall |
                         unmatchedUnqualifiedBracketOperation |
                         unmatchedUnqualifiedNoArgumentsCall |
@@ -2863,6 +2972,7 @@ keywordKey ::= AFTER |
                RANGE_OPERATOR |
                RESCUE |
                RELATIONAL_OPERATOR |
+               SIGN_OPERATOR |
                STAB_OPERATOR |
                STRUCT_OPERATOR |
                THREE_OPERATOR |

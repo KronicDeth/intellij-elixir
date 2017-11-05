@@ -10,23 +10,23 @@ public class BitStringParsingTestCase extends ParsingTestCase {
     }
 
     public void testOne() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testOneWithTrailingComma() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testTwo() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testTwoWithKeywords() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testThree() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testWhenKeyword() {
@@ -36,12 +36,5 @@ public class BitStringParsingTestCase extends ParsingTestCase {
     @Override
     protected String getTestDataPath() {
         return super.getTestDataPath() + "/bit_string_parsing_test_case";
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-
-        registerProjectFileIndex();
     }
 }

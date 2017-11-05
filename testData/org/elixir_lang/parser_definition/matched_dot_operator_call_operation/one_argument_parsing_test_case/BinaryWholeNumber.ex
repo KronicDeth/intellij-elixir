@@ -16,7 +16,6 @@
 0b10.| positional
 0b10.<= positional
 0b10.-> positional
-0b10.% positional
 0b10.<> positional
 0b10.^ positional
 0b10.not positional

@@ -12,7 +12,7 @@ public class NoParenthesesNoArgumentsCallParsingTestCase extends ParsingTestCase
      */
 
     public void testAtOperationDotIdentifier() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     /*
@@ -24,11 +24,11 @@ public class NoParenthesesNoArgumentsCallParsingTestCase extends ParsingTestCase
     }
 
     public void testUnaryLeftOperationDotIdentifier() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testAtLeftOperationDotIdentifier() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     /*
@@ -44,7 +44,7 @@ public class NoParenthesesNoArgumentsCallParsingTestCase extends ParsingTestCase
      */
 
     public void testAtNumericOperationDotIdentifier() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     /* underscore is a special case of identifier because _ is also a decimal separator, so this checks that _ as an
@@ -58,7 +58,7 @@ public class NoParenthesesNoArgumentsCallParsingTestCase extends ParsingTestCase
     }
 
     public void testUnaryNumericOperationDotIdentifier() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testEmptyBlockDotIdentifier() {
@@ -121,9 +121,7 @@ public class NoParenthesesNoArgumentsCallParsingTestCase extends ParsingTestCase
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testStringHeredocDotIdentifier() throws Exception {
-        registerProjectFileIndex();
-
+    public void testStringHeredocDotIdentifier() {
         assertParsedAndQuotedCorrectly();
     }
 
@@ -135,9 +133,7 @@ public class NoParenthesesNoArgumentsCallParsingTestCase extends ParsingTestCase
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testCharListHeredocDotIdentifier() throws Exception {
-        registerProjectFileIndex();
-
+    public void testCharListHeredocDotIdentifier() {
         assertParsedAndQuotedCorrectly();
     }
 

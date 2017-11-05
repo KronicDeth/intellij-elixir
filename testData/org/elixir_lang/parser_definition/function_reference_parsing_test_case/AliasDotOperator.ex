@@ -42,7 +42,6 @@ One.>=/2
 One.</2
 One.>/2
 One.->/2
-One.%/1
 One.++/2
 One.--/2
 One.<>/2

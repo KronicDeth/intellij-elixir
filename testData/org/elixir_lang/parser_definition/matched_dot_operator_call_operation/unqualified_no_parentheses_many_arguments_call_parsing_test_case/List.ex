@@ -16,7 +16,6 @@
 [].| unqualified positional, key: value
 [].<= unqualified positional, key: value
 [].-> unqualified positional, key: value
-[].% unqualified positional, key: value
 [].<> unqualified positional, key: value
 [].^ unqualified positional, key: value
 [].not unqualified positional, key: value

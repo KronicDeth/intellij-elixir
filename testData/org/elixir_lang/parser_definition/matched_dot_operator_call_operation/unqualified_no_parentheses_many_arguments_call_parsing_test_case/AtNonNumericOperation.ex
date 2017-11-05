@@ -16,8 +16,6 @@
 @non_numeric.| unqualified positional, key: value
 @non_numeric.<= unqualified positional, key: value
 @non_numeric.-> unqualified positional, key: value
-@non_numeric.% unqualified positional, key: value
-@non_numeric.% unqualified positional, key: value
 @non_numeric.<> unqualified positional, key: value
 @non_numeric.^ unqualified positional, key: value
 @non_numeric.not unqualified positional, key: value

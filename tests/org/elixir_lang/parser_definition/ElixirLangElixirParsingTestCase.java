@@ -550,7 +550,11 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     }
 
     public void testMixCompilersElixir() {
-        assertParsed("lib/mix/lib/mix/compilers/elixir.ex", Parse.CORRECT);
+        if (elixirSdkRelease().compareTo(Release.V_1_5) >= 0) {
+            assertParsed("lib/mix/lib/mix/compilers/elixir.ex", Parse.CORRECT);
+        } else {
+            assertTrue(elixirSdkRelease().compareTo(Release.V_1_5) < 0);
+        }
     }
 
     public void testMixCompilersErlang() {
@@ -829,7 +833,11 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     }
 
     public void testEscripttestLibEscripttest() {
-        assertParsed("lib/mix/test/fixtures/escripttest/lib/escripttest.ex", Parse.CORRECT);
+        if (elixirSdkRelease().compareTo(Release.V_1_5) < 0) {
+            assertParsed("lib/mix/test/fixtures/escripttest/lib/escripttest.ex", Parse.CORRECT);
+        } else {
+            assertTrue(elixirSdkRelease().compareTo(Release.V_1_5) >= 0);
+        }
     }
 
     public void testNoMixfileLibA() {
@@ -864,13 +872,6 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     @NotNull
     protected String getTestDataPath() {
         return System.getenv("ELIXIR_LANG_ELIXIR_PATH");
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-
-        setProjectSdkFromEbinDirectory();
     }
 
     /*

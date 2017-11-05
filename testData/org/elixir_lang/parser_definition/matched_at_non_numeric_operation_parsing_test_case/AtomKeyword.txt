@@ -1,7 +1,0 @@
-Elixir File(0,4)
-  ElixirUnmatchedAtNonNumericOperationImpl(UNMATCHED_AT_NON_NUMERIC_OPERATION)(0,4)
-    ElixirAtPrefixOperatorImpl(AT_PREFIX_OPERATOR)(0,1)
-      PsiElement(@)('@')(0,1)
-    ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(1,4)
-      ElixirAtomKeywordImpl(ATOM_KEYWORD)(1,4)
-        PsiElement(nil)('nil')(1,4)

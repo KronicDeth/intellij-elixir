@@ -3,7 +3,6 @@
 %one.two{}
 %@1.two{}
 %&1.two{}
-%^1.two{}
 %fn -> end.two{}
 %(->).two{}
 %?1.two{}

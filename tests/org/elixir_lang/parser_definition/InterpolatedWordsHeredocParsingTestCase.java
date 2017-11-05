@@ -36,11 +36,4 @@ public class InterpolatedWordsHeredocParsingTestCase extends ParsingTestCase {
     protected String getTestDataPath() {
         return super.getTestDataPath() + "/interpolated_words_heredoc_parsing_test_case";
     }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-
-        registerProjectFileIndex();
-    }
 }

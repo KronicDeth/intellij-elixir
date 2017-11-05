@@ -16,7 +16,6 @@
 0xFEDCBAfedcba9876543210.| positional
 0xFEDCBAfedcba9876543210.<= positional
 0xFEDCBAfedcba9876543210.-> positional
-0xFEDCBAfedcba9876543210.% positional
 0xFEDCBAfedcba9876543210.<> positional
 0xFEDCBAfedcba9876543210.^ positional
 0xFEDCBAfedcba9876543210.not positional

@@ -5,11 +5,11 @@ package org.elixir_lang.parser_definition;
  */
 public class NoParenthesesOneArgumentCallParsingTestCase extends ParsingTestCase {
     public void testUnqualifiedSpaceOpeningParenthesisDualVariableClosingParentheses() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testUnqualifiedSpaceOpeningParenthesisDualVariableClosingParenthesesDoBlock() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     @Override

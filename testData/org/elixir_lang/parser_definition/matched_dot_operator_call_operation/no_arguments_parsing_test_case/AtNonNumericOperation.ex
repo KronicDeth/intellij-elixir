@@ -16,7 +16,6 @@
 @non_numeric.|
 @non_numeric.<=
 @non_numeric.->
-@non_numeric.%
 @non_numeric.<>
 @non_numeric.^
 @non_numeric.not
