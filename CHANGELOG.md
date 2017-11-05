@@ -139,7 +139,10 @@
        * Drop `18.3`
   * Support `not in` grammar added by elixir-lang/elixir#5620 shipped with Elixir 1.5.
   * Don't treat numeric operands to `@` and unary operators as separate operations from non-numeric operands to port elixir-lang/elixir@9747e58db773c716c01c210642ec1d91475e0c83 that shipped with Elixir 1.5.0.  This only kicks in if the Elixir SDK is version >= 1.5.0 or not set.  With an earlier SDK, you'll get the earlier behavior.
+
+### Bug Fixes
 * [#898](https://github.com/KronicDeth/intellij-elixir/pull/898) - Make binary infix vs unary prefix `+`/`-` handling more robust to support `one(two, - three)` used in Elixir 1.5 `enum.ex`. - [@KronicDeth](https://github.com/KronicDeth)
+* [#901](https://github.com/KronicDeth/intellij-elixir/pull/901) - Call `withCharSet(Charsets.UTF_8)` on all `GeneralCommandLines` to prevent encoding errors on Windows. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v6.4.0
 

@@ -55,6 +55,10 @@
         Make binary infix vs unary prefix <code>+</code>/<code>-</code> handling more robust to support
         <code>one(two, - three)</code> used in Elixir 1.5 <code>enum.ex</code>.
       </li>
+      <li>
+        Call <code>withCharSet(Charsets.UTF_8)</code> on all <code>GeneralCommandLines</code> to prevent encoding errors
+        on Windows.
+      </li>
     </ul>
   </li>
 </ul>
