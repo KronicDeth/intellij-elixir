@@ -6,8 +6,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase;
 import org.elixir_lang.psi.call.Call;
 
-import java.lang.Exception;
-
 public class CallDefinitionHeadTest extends LightPlatformCodeInsightFixtureTestCase {
     /*
      * Tests
@@ -65,9 +63,7 @@ public class CallDefinitionHeadTest extends LightPlatformCodeInsightFixtureTestC
     }
 
     @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-
+    protected void tearDown() {
         if (myFixture != null) {
             Project project = getProject();
 

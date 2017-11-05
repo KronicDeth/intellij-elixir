@@ -164,9 +164,7 @@ public class MatchedMatchOperationParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testStringHeredoc() throws Exception {
-        registerProjectFileIndex();
-
+    public void testStringHeredoc() {
         assertParsedAndQuotedCorrectly();
     }
 
@@ -178,9 +176,7 @@ public class MatchedMatchOperationParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testCharListHeredoc() throws Exception {
-        registerProjectFileIndex();
-
+    public void testCharListHeredoc() {
         assertParsedAndQuotedCorrectly();
     }
 

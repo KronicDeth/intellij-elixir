@@ -5,7 +5,7 @@ package org.elixir_lang.parser_definition;
  */
 public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCase {
     public void testFunctionEOLPositional() {
-        assertParsedWithErrors();
+        assertParsedWithErrors(false);
     }
 
     public void testOneKeyword() {
@@ -52,9 +52,7 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testKeywordValueCharListHeredoc() throws Exception {
-        registerProjectFileIndex();
-
+    public void testKeywordValueCharListHeredoc() {
         assertParsedAndQuotedCorrectly();
     }
 
@@ -110,9 +108,7 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testKeywordValueStringHeredoc() throws Exception {
-        registerProjectFileIndex();
-
+    public void testKeywordValueStringHeredoc() {
         assertParsedAndQuotedCorrectly();
     }
 
@@ -144,9 +140,7 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testPositionalCharListHeredoc() throws Exception {
-        registerProjectFileIndex();
-
+    public void testPositionalCharListHeredoc() {
         assertParsedAndQuotedCorrectly();
     }
 
@@ -262,9 +256,7 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testPositionalStringHeredoc() throws Exception {
-        registerProjectFileIndex();
-
+    public void testPositionalStringHeredoc() {
         assertParsedAndQuotedCorrectly();
     }
 

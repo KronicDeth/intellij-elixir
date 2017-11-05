@@ -179,9 +179,7 @@ public class MatchedQualifiedMultipleAliasesParsingTestCase extends ParsingTestC
         assertParsedAndQuotedCorrectlyInOneThree();
     }
 
-    public void testStringHeredoc() throws Exception {
-        registerProjectFileIndex();
-
+    public void testStringHeredoc() {
         assertParsedAndQuotedCorrectlyInOneThree();
     }
 
@@ -189,9 +187,7 @@ public class MatchedQualifiedMultipleAliasesParsingTestCase extends ParsingTestC
         assertParsedAndQuotedCorrectlyInOneThree();
     }
 
-    public void testCharListHeredoc() throws Exception {
-        registerProjectFileIndex();
-
+    public void testCharListHeredoc() {
         assertParsedAndQuotedCorrectlyInOneThree();
     }
 

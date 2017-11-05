@@ -874,13 +874,6 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         return System.getenv("ELIXIR_LANG_ELIXIR_PATH");
     }
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-
-        setProjectSdkFromEbinDirectory();
-    }
-
     /*
      * Private Instance Methods
      */

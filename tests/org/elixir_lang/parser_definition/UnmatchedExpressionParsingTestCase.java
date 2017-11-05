@@ -1,21 +1,15 @@
 package org.elixir_lang.parser_definition;
 
 public class UnmatchedExpressionParsingTestCase extends ParsingTestCase {
-    public void testAtDotCallBlock() throws Exception{
-        registerProjectFileIndex();
-
+    public void testAtDotCallBlock() {
         assertParsedAndQuotedCorrectly(false);
     }
 
-    public void testAtQualifiedNoArgumentsCallBlock() throws Exception {
-        registerProjectFileIndex();
-
+    public void testAtQualifiedNoArgumentsCallBlock() {
         assertParsedAndQuotedCorrectly(false);
     }
 
-    public void testAtQualifiedNoParenthesesCallBlock() throws Exception {
-        registerProjectFileIndex();
-
+    public void testAtQualifiedNoParenthesesCallBlock() {
         assertParsedAndQuotedCorrectly(false);
     }
 
@@ -43,21 +37,15 @@ public class UnmatchedExpressionParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testCaptureDotCallBlock() throws Exception {
-        registerProjectFileIndex();
-
-        assertParsedAndQuotedCorrectly();
-    }
-
-    public void testCaptureQualifiedNoArgumentsCallBlock() throws Exception {
-        registerProjectFileIndex();
-
+    public void testCaptureDotCallBlock() {
         assertParsedAndQuotedCorrectly(false);
     }
 
-    public void testCaptureQualifiedNoParenthesesCallBlock() throws Exception {
-        registerProjectFileIndex();
+    public void testCaptureQualifiedNoArgumentsCallBlock() {
+        assertParsedAndQuotedCorrectly(false);
+    }
 
+    public void testCaptureQualifiedNoParenthesesCallBlock() {
         assertParsedAndQuotedCorrectly(false);
     }
 
@@ -77,27 +65,19 @@ public class UnmatchedExpressionParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testDotCallBlock() throws Exception {
-        registerProjectFileIndex();
-
+    public void testDotCallBlock() {
         assertParsedAndQuotedCorrectly(false);
     }
 
-    public void testExclamationPointDotCallBlock() throws Exception {
-        registerProjectFileIndex();
-
+    public void testExclamationPointDotCallBlock() {
         assertParsedAndQuotedCorrectly(false);
     }
 
-    public void testExclamationPointQualifiedNoArgumentsCallBlock() throws Exception {
-        registerProjectFileIndex();
-
+    public void testExclamationPointQualifiedNoArgumentsCallBlock() {
         assertParsedAndQuotedCorrectly(false);
     }
 
-    public void testExclamationPointQualifiedNoParenthesesCallBlock() throws Exception {
-        registerProjectFileIndex();
-
+    public void testExclamationPointQualifiedNoParenthesesCallBlock() {
         assertParsedAndQuotedCorrectly(false);
     }
 
@@ -121,21 +101,15 @@ public class UnmatchedExpressionParsingTestCase extends ParsingTestCase {
         assertParsedWithErrors();
     }
 
-    public void testNotDotCallBlock() throws Exception {
-        registerProjectFileIndex();
-
+    public void testNotDotCallBlock() {
         assertParsedAndQuotedCorrectly(false);
     }
 
-    public void testNotQualifiedNoArgumentsCallBlock() throws Exception {
-        registerProjectFileIndex();
-
+    public void testNotQualifiedNoArgumentsCallBlock() {
         assertParsedAndQuotedCorrectly(false);
     }
 
-    public void testNotQualifiedNoParenthesesCallBlock() throws Exception {
-        registerProjectFileIndex();
-
+    public void testNotQualifiedNoParenthesesCallBlock() {
         assertParsedAndQuotedCorrectly(false);
     }
 
@@ -151,15 +125,11 @@ public class UnmatchedExpressionParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly(false);
     }
 
-    public void testQualifiedNoArgumentsCallBlock() throws Exception {
-        registerProjectFileIndex();
-
+    public void testQualifiedNoArgumentsCallBlock() {
         assertParsedAndQuotedCorrectly(false);
     }
 
-    public void testQualifiedNoParenthesesCallBlock() throws Exception {
-        registerProjectFileIndex();
-
+    public void testQualifiedNoParenthesesCallBlock() {
         assertParsedAndQuotedCorrectly(false);
     }
 

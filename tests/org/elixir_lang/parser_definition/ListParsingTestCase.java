@@ -65,8 +65,6 @@ public class ListParsingTestCase extends ParsingTestCase {
     }
 
     public void testKeywordValue() throws Exception {
-        registerProjectFileIndex();
-
         assertParsedAndQuotedAroundError(false);
     }
 

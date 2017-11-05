@@ -8,27 +8,19 @@ public class LiteralStringSigilHeredocParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedAroundError();
     }
 
-    public void testEmptyHexadecimalEscapeSequence() throws Exception {
-        registerProjectFileIndex();
-
+    public void testEmptyHexadecimalEscapeSequence() {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testEmptyUnicodeEscapeSequence() throws Exception {
-        registerProjectFileIndex();
-
+    public void testEmptyUnicodeEscapeSequence() {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testEscapeSequences() throws Exception {
-        setProjectSdkFromEbinDirectory();
-
+    public void testEscapeSequences() {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testInterpolation() throws Exception {
-        registerProjectFileIndex();
-
+    public void testInterpolation() {
         assertParsedAndQuotedCorrectly();
     }
 
@@ -40,15 +32,11 @@ public class LiteralStringSigilHeredocParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testWhitespaceEndPrefix() throws Exception {
-        registerProjectFileIndex();
-
+    public void testWhitespaceEndPrefix() {
         assertParsedAndQuotedAroundError();
     }
 
-    public void testEmbeddedStringHeredoc() throws Exception {
-        registerProjectFileIndex();
-
+    public void testEmbeddedStringHeredoc() {
         assertParsedAndQuotedCorrectly();
     }
 

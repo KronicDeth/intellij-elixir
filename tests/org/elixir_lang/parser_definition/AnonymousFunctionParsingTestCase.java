@@ -14,8 +14,6 @@ public class AnonymousFunctionParsingTestCase extends ParsingTestCase {
     }
 
     public void testFnExpressionEnd() throws Exception {
-        registerProjectFileIndex();
-
         assertParsedAndQuotedAroundError(false);
     }
 
@@ -24,14 +22,10 @@ public class AnonymousFunctionParsingTestCase extends ParsingTestCase {
     }
 
     public void testFnKeywordsInParenthesesWhenExpressionStabEnd() throws Exception {
-        registerProjectFileIndex();
-
         assertParsedAndQuotedCorrectly(false);
     }
 
     public void testFnMatchedExpressionStabEnd() throws Exception {
-        registerProjectFileIndex();
-
         assertParsedAndQuotedCorrectly(false);
     }
 
@@ -60,8 +54,6 @@ public class AnonymousFunctionParsingTestCase extends ParsingTestCase {
     }
 
     public void testFnPositionalsAndKeywordsInParenthesesWhenExpressionStabEnd() throws Exception {
-        registerProjectFileIndex();
-
         assertParsedAndQuotedCorrectly(false);
     }
 
@@ -74,8 +66,6 @@ public class AnonymousFunctionParsingTestCase extends ParsingTestCase {
     }
 
     public void testFnStabExpressionEnd() throws Exception {
-        registerProjectFileIndex();
-
         assertParsedAndQuotedCorrectly(false);
     }
 

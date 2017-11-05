@@ -30,11 +30,7 @@ public class LiteralCharListSigilLineParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testEscapeSequences()
-            throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException,
-            IllegalAccessException {
-        setProjectSdkFromEbinDirectory();
-
+    public void testEscapeSequences() {
         assertParsedAndQuotedCorrectly();
     }
 

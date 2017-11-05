@@ -121,9 +121,7 @@ public class NoParenthesesNoArgumentsCallParsingTestCase extends ParsingTestCase
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testStringHeredocDotIdentifier() throws Exception {
-        registerProjectFileIndex();
-
+    public void testStringHeredocDotIdentifier() {
         assertParsedAndQuotedCorrectly();
     }
 
@@ -135,9 +133,7 @@ public class NoParenthesesNoArgumentsCallParsingTestCase extends ParsingTestCase
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testCharListHeredocDotIdentifier() throws Exception {
-        registerProjectFileIndex();
-
+    public void testCharListHeredocDotIdentifier() {
         assertParsedAndQuotedCorrectly();
     }
 

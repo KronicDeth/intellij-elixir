@@ -32,14 +32,14 @@ public class DualOperatorParsingTestCase extends ParsingTestCase {
     }
 
     public void testIdentifierSpaceOperatorIdentifier() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     /**
      * see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L610
      */
     public void testIdentifierSpaceOperatorOperatorOperand() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testIdentifierSpaceOperatorSpaceCommentEOLIdentifier() {
@@ -51,27 +51,27 @@ public class DualOperatorParsingTestCase extends ParsingTestCase {
     }
 
     public void testIdentifierCommaOperatorIdentifier() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testIdentifierCommaOperatorSpaceIdentifier() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testIdentifierCommaSpaceDualSpaceIdentifier() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testIdentifierCommaSpaceOperatorIdentifier() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testIdentifierEOLOperatorSpaceIdentifier() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testIdentifierEOLOperatorIdentifier() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testIdentifierOperatorSpaceIdentifier() {
@@ -79,7 +79,7 @@ public class DualOperatorParsingTestCase extends ParsingTestCase {
     }
 
     public void testEnum() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     @Override

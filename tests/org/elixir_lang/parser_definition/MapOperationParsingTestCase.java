@@ -2,7 +2,7 @@ package org.elixir_lang.parser_definition;
 
 public class MapOperationParsingTestCase extends ParsingTestCase {
     public void testAssociationOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testAssociationOperations() {
@@ -62,19 +62,19 @@ public class MapOperationParsingTestCase extends ParsingTestCase {
     }
 
     public void testMaxDotCallStruct() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testMaxQualifiedAliasStruct() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testMaxQualifiedNoArgumentsCallStruct() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testMaxQualifiedParenthesesCallStruct() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testPercentNewLineOpeningCurlyBraceNewlineClosingCurlyBrace() {
@@ -104,12 +104,5 @@ public class MapOperationParsingTestCase extends ParsingTestCase {
     @Override
     protected String getTestDataPath() {
         return super.getTestDataPath() + "/map_operation_parsing_test_case";
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-
-        registerProjectFileIndex();
     }
 }

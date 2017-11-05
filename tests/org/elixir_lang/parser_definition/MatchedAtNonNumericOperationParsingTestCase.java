@@ -124,9 +124,7 @@ public class MatchedAtNonNumericOperationParsingTestCase extends ParsingTestCase
         assertParsedAndQuotedCorrectly(false);
     }
 
-    public void testStringHeredoc() throws Exception {
-        registerProjectFileIndex();
-
+    public void testStringHeredoc() {
         assertParsedAndQuotedCorrectly(false);
     }
 
@@ -138,9 +136,7 @@ public class MatchedAtNonNumericOperationParsingTestCase extends ParsingTestCase
         assertParsedAndQuotedCorrectly(false);
     }
 
-    public void testCharListHeredoc() throws Exception {
-        registerProjectFileIndex();
-
+    public void testCharListHeredoc() {
         assertParsedAndQuotedCorrectly(false);
     }
 

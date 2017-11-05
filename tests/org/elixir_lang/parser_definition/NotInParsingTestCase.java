@@ -23,11 +23,4 @@ public class NotInParsingTestCase extends ParsingTestCase {
     protected String getTestDataPath() {
         return super.getTestDataPath() + "/not_in_parsing_test_case";
     }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-
-        registerProjectFileIndex();
-    }
 }

@@ -150,6 +150,13 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
     }
 
     @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+
+        setProjectSdkFromEbinDirectory();
+    }
+
+    @Override
     protected String getTestDataPath() {
         return "testData/org/elixir_lang/parser_definition";
     }

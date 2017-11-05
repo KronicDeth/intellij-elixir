@@ -20,9 +20,7 @@ public class InterpolatedCharListSigilLineParsingTestCase extends ParsingTestCas
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testEscapeSequences() throws Exception {
-        registerProjectFileIndex();
-
+    public void testEscapeSequences() {
         assertParsedAndQuotedCorrectly();
     }
 

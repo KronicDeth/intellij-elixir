@@ -201,8 +201,6 @@ public class BracketOperationParsingTestCase extends ParsingTestCase {
     }
 
     public void testStringHeredoc() throws Exception {
-        registerProjectFileIndex();
-
         assertParsedAndQuotedCorrectly();
     }
 
@@ -211,8 +209,6 @@ public class BracketOperationParsingTestCase extends ParsingTestCase {
     }
 
     public void testCharListHeredoc() throws Exception {
-        registerProjectFileIndex();
-
         assertParsedAndQuotedCorrectly();
     }
 

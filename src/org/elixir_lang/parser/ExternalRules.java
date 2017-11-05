@@ -1,7 +1,7 @@
 package org.elixir_lang.parser;
 
 import com.intellij.lang.PsiBuilder;
-import org.elixir_lang.grammar.parser.GeneratedParserUtilBase;
+import com.intellij.mock.MockProjectEx;
 import com.intellij.openapi.project.Project;
 import org.elixir_lang.sdk.elixir.Release;
 import org.elixir_lang.sdk.elixir.Type;
@@ -14,6 +14,10 @@ public class ExternalRules {
                              @SuppressWarnings("SameParameterValue") @NotNull String releaseString) {
         Project project = psiBuilder.getProject();
         Release release = Type.getRelease(project);
+
+        assert !(release == null && project instanceof MockProjectEx) :
+                "Release MUST be set during testing of ifVersion rules:\n" +
+                        "Call `setProjectSdkFromEbinDirectory();` to setup the Release.";
 
         Release limit = Release.fromString(releaseString);
 

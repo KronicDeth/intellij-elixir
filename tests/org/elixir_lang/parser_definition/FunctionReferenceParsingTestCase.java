@@ -41,11 +41,4 @@ public class FunctionReferenceParsingTestCase extends ParsingTestCase {
     protected String getTestDataPath() {
         return super.getTestDataPath() + "/function_reference_parsing_test_case";
     }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-
-        setProjectSdkFromEbinDirectory();
-    }
 }

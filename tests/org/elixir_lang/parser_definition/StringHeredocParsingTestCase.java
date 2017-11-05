@@ -8,15 +8,11 @@ public class StringHeredocParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedAroundError();
     }
 
-    public void testEscapeSequences() throws Exception {
-        registerProjectFileIndex();
-
+    public void testEscapeSequences() {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testInterpolation() throws Exception {
-        registerProjectFileIndex();
-
+    public void testInterpolation() {
         assertParsedAndQuotedCorrectly();
     }
 
@@ -24,9 +20,7 @@ public class StringHeredocParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testWhitespaceEndPrefix() throws Exception {
-        registerProjectFileIndex();
-
+    public void testWhitespaceEndPrefix() {
         assertParsedAndQuotedAroundError();
     }
 
