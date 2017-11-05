@@ -1,5 +1,63 @@
 <html>
 <body>
+<h1>v6.5.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>Update Build Matrix
+        <ul>
+          <li>
+            Only include IDEA versions within the last year.  Prior versions are supported, but not tested.  It is up to
+            users stuck on older versions to report incompatibilities and then I'm specifically fix those bugs.
+            <ul>
+              <li>Add <code>2017.2</code></li>
+              <li>Drop <code>2016.1.4</code></li>
+            </ul>
+          </li>
+          <li>
+            Only include Elixir versions within the last year.  Prior versions are supported, but not tested.  It is up
+            to users stuck on older versions to report incompatibilities and then I'm specifically fix those bugs.
+            <ul>
+              <li>Add <code>1.5.2</code></li>
+              <li>Drop <code>1.3.4</code></li>
+            </ul>
+          </li>
+          <li>
+            Only include OTP versions within the last year.  Prior versions are supported, but not tested.  It is up to
+            users stuck on older versions to report incompatibilities and then I'm specifically fix those bugs.
+            <ul>
+              <li>Add <code>20.1</code></li>
+              <li>Drop <code>18.3</code></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>
+        Support <code>not in</code> grammar added by
+        <a href="https://github.com/elixir-lang/elixir/pull/5620">elixir-lang/elixir#5620</a> shipped with Elixir 1.5.
+      </li>
+      <li>
+        Don't treat numeric operands to <code>@</code> and unary operators as separate operations from non-numeric
+        operands to port
+        <a href="https://github.com/elixir-lang/elixir/commit/9747e58db773c716c01c210642ec1d91475e0c83">
+          elixir-lang/elixir@<tt>9747e58</tt>
+        </a>
+        that shipped with Elixir 1.5.0.  This only kicks in if the Elixir SDK is version &gt;= 1.5.0 or not set.  With
+        an earlier SDK, you'll get the earlier behavior.
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>
+        Make binary infix vs unary prefix <code>+</code>/<code>-</code> handling more robust to support
+        <code>one(two, - three)</code> used in Elixir 1.5 <code>enum.ex</code>.
+      </li>
+    </ul>
+  </li>
+</ul>
 <h1>v6.4.0</h1>
 <ul>
   <li>
