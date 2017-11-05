@@ -1,5 +1,6 @@
 package org.elixir_lang.mix.importWizard;
 
+import com.google.common.base.Charsets;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.Platform;
 import com.intellij.execution.configurations.GeneralCommandLine;
@@ -83,10 +84,10 @@ public class MixProjectRootStep extends ProjectImportWizardStep {
         GeneralCommandLine generalCommandLine = null;
 
         if (SystemInfo.isWindows) {
-            generalCommandLine = new GeneralCommandLine("where");
+            generalCommandLine = new GeneralCommandLine("where").withCharset(Charsets.UTF_8);
             generalCommandLine.addParameter("mix.bat");
         } else if (SystemInfo.isMac || SystemInfo.isLinux || SystemInfo.isUnix) {
-            generalCommandLine = new GeneralCommandLine("which");
+            generalCommandLine = new GeneralCommandLine("which").withCharset(Charsets.UTF_8);
             generalCommandLine.addParameter("mix");
         }
 
@@ -146,7 +147,7 @@ public class MixProjectRootStep extends ProjectImportWizardStep {
                     public void run(@NotNull final ProgressIndicator indicator) {
                         indicator.setIndeterminate(true);
 
-                        GeneralCommandLine commandLine = new GeneralCommandLine();
+                        GeneralCommandLine commandLine = new GeneralCommandLine().withCharset(Charsets.UTF_8);
                         commandLine.withWorkDirectory(workingDirectory);
                         commandLine.setExePath(elixirPath);
                         commandLine.addParameter(mixPath);

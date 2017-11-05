@@ -1,5 +1,6 @@
 package org.elixir_lang.mix.runner;
 
+import com.google.common.base.Charsets;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.process.ColoredProcessHandler;
@@ -189,7 +190,8 @@ public class MixRunningStateUtil {
 
     @NotNull
     private static GeneralCommandLine getBaseMixCommandLine(@NotNull MixRunConfigurationBase configuration) {
-        GeneralCommandLine commandLine = withEnvironment(new GeneralCommandLine(), configuration);
+        GeneralCommandLine commandLine =
+                withEnvironment(new GeneralCommandLine().withCharset(Charsets.UTF_8), configuration);
 
         return withWorkDirectory(commandLine, configuration);
     }

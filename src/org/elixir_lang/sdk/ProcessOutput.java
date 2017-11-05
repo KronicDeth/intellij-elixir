@@ -1,5 +1,6 @@
 package org.elixir_lang.sdk;
 
+import com.google.common.base.Charsets;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.process.CapturingProcessHandler;
@@ -76,7 +77,7 @@ public class ProcessOutput {
       return new com.intellij.execution.process.ProcessOutput();
     }
 
-    GeneralCommandLine cmd = new GeneralCommandLine();
+    GeneralCommandLine cmd = new GeneralCommandLine().withCharset(Charsets.UTF_8);
     cmd.withWorkDirectory(workDir);
     cmd.setExePath(exePath);
     cmd.addParameters(arguments);

@@ -1,5 +1,6 @@
 package org.elixir_lang.annotator;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.intellij.diagnostic.LogMessageEx;
 import com.intellij.execution.ExecutionException;
@@ -140,7 +141,7 @@ public class Credo extends ExternalAnnotator<PsiFile, List<Credo.Issue>> {
 
     @NotNull
     private static GeneralCommandLine generalCommandLine(@NotNull Project project, @NotNull ParametersList mixParametersList) {
-        GeneralCommandLine workingDirectoryGeneralCommandLine = new GeneralCommandLine();
+        GeneralCommandLine workingDirectoryGeneralCommandLine = new GeneralCommandLine().withCharset(Charsets.UTF_8);
 
         String workingDirectory = workingDirectory(project);
         workingDirectoryGeneralCommandLine.withWorkDirectory(workingDirectory);

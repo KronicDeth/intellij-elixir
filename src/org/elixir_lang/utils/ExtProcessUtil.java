@@ -16,6 +16,7 @@
 
 package org.elixir_lang.utils;
 
+import com.google.common.base.Charsets;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.openapi.util.text.StringUtil;
@@ -34,7 +35,7 @@ public final class ExtProcessUtil {
   @NotNull
   public static ExtProcessOutput execAndGetFirstLine(long timeout, @NotNull String... command) {
     try {
-      final Process cmdRunner = new GeneralCommandLine(command).createProcess();
+      final Process cmdRunner = new GeneralCommandLine(command).withCharset(Charsets.UTF_8).createProcess();
       ExecutorService singleTreadExecutor = Executors.newSingleThreadExecutor();
       try {
         Future<ExtProcessOutput> cmdRunnerFuture = singleTreadExecutor.submit(new Callable<ExtProcessOutput>() {
