@@ -1,7 +1,6 @@
 package org.elixir_lang.parser;
 
 import com.intellij.lang.PsiBuilder;
-import com.intellij.mock.MockProjectEx;
 import com.intellij.openapi.project.Project;
 import org.elixir_lang.sdk.elixir.Release;
 import org.elixir_lang.sdk.elixir.Type;
@@ -15,7 +14,11 @@ public class ExternalRules {
         Project project = psiBuilder.getProject();
         Release release = Type.getRelease(project);
 
-        assert !(release == null && project instanceof MockProjectEx) :
+
+        assert !(release == null &&
+                /* `project instanceof MockProjectEx`, but in a way that safe for IDEs that don't ship with
+                   `MockProjectEx` */
+                project.getClass().getCanonicalName().equals("com.intellij.mock.MockProjectEx")) :
                 "Release MUST be set during testing of ifVersion rules:\n" +
                         "Call `setProjectSdkFromEbinDirectory();` to setup the Release.";
 
