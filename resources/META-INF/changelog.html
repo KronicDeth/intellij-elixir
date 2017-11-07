@@ -1,5 +1,17 @@
 <html>
 <body>
+<h1>v6.5.1</h1>
+<ul>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>
+        Don't do <code>project instanceOf MockProjectEx</code> because not all IDEs, such as Rider, ship with
+        <code>MockProjectEx</code>; instead, do a <code>Class#getCanonicalName()</code> check.
+      </li>
+    </ul>
+  </li>
+</ul>
 <h1>v6.5.0</h1>
 <ul>
   <li>
