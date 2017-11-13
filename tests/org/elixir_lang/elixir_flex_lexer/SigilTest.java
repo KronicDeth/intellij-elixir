@@ -29,12 +29,12 @@ public class SigilTest extends TokenTest {
      */
 
     @Override
-    protected void reset(CharSequence charSequence) throws IOException {
+    protected void start(CharSequence charSequence) {
         // start to trigger SIGIL state
         CharSequence fullCharSequence = "~" + charSequence;
-        super.reset(fullCharSequence);
+        super.start(fullCharSequence);
         // consume '~'
-        flexLexer.advance();
+        lexer.advance();
     }
 
     @Parameterized.Parameters(

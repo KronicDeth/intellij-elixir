@@ -4,6 +4,7 @@ import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import org.elixir_lang.ElixirFlexLexer;
 import org.elixir_lang.psi.ElixirTypes;
+import org.jetbrains.annotations.NotNull;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -28,14 +29,14 @@ public class UnknownBaseIntegerTest extends TokenTest {
      */
 
     @Override
-    protected void reset(CharSequence charSequence) throws IOException {
+    protected void start(@NotNull CharSequence charSequence) {
         // start to trigger UNKNOWN_BASE_WHOLE_NUMBER state
         CharSequence fullCharSequence = "0z" + charSequence;
-        super.reset(fullCharSequence);
+        super.start(fullCharSequence);
         // consume '0'
-        flexLexer.advance();
+        lexer.advance();
         // consume 'z'
-        flexLexer.advance();
+        lexer.advance();
     }
 
     @Parameterized.Parameters(

@@ -2,6 +2,7 @@ package org.elixir_lang.elixir_flex_lexer.group.valid_escape_sequence;
 
 import org.elixir_lang.ElixirFlexLexer;
 import org.elixir_lang.psi.ElixirTypes;
+import org.jetbrains.annotations.NotNull;
 import org.junit.experimental.theories.DataPoints;
 import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
@@ -44,24 +45,31 @@ public class CharacterTest extends org.elixir_lang.elixir_flex_lexer.Test {
         return charSequences;
     }
 
-    protected void reset(CharSequence charSequence) throws IOException {
+    @Override
+    protected void start(@NotNull CharSequence charSequence) {
         // start of "\"" + promoter to trigger GROUP state
         CharSequence fullCharSequence = "\"" + charSequence;
-        super.reset(fullCharSequence);
+        super.start(fullCharSequence);
         // consume "
-        flexLexer.advance();
+        lexer.advance();
     }
 
     @Theory
-    public void validCharacterCode(CharSequence charSequence) throws IOException {
-        reset(charSequence);
+    public void validCharacterCode(@NotNull CharSequence charSequence) throws IOException {
+        start(charSequence);
 
-        assertEquals(ElixirTypes.ESCAPE, flexLexer.advance());
-        assertEquals(ElixirFlexLexer.ESCAPE_SEQUENCE, flexLexer.yystate());
+        lexer.advance();
 
-        assertEquals(ElixirTypes.ESCAPED_CHARACTER_TOKEN, flexLexer.advance());
-        assertEquals(ElixirFlexLexer.GROUP, flexLexer.yystate());
+        assertEquals(ElixirTypes.ESCAPE, lexer.getTokenType());
+        assertEquals(ElixirFlexLexer.ESCAPE_SEQUENCE, lexer.getState());
 
-        assertTrue("Failure: expected all of \"" + charSequence + "\" to be consumed", flexLexer.advance() == null);
+        lexer.advance();
+
+        assertEquals(ElixirTypes.ESCAPED_CHARACTER_TOKEN, lexer.getTokenType());
+        assertEquals(ElixirFlexLexer.GROUP, lexer.getState());
+
+        lexer.advance();
+
+        assertTrue("Failure: expected all of \"" + charSequence + "\" to be consumed", lexer.getTokenType() == null);
     };
 }

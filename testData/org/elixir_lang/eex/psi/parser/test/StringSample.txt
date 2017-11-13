@@ -1,0 +1,5 @@
+Embedded Elixir File(0,12)
+  EExEqualsTagImpl(EQUALS_TAG)(0,12)
+    PsiElement(<%=)('<%=')(0,3)
+    PsiElement(Elixir)(' a + b ')(3,10)
+    PsiElement(%>)('%>')(10,12)

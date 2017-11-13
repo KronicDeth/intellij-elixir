@@ -47,17 +47,18 @@ public abstract class Test extends TokenTest {
     protected abstract char promoter();
     protected abstract char terminator();
 
-    protected void reset(CharSequence charSequence) throws IOException {
+    @Override
+    protected void start(CharSequence charSequence) {
         // start to trigger SIGIL_MODIFIERS after GROUP
         CharSequence fullCharSequence = "~r" + promoter() + terminator() + charSequence;
-        super.reset(fullCharSequence);
+        super.start(fullCharSequence);
         // consume ~
-        flexLexer.advance();
+        lexer.advance();
         // consume r
-        flexLexer.advance();
+        lexer.advance();
         // consume promoter
-        flexLexer.advance();
+        lexer.advance();
         // consume terminator
-        flexLexer.advance();
+        lexer.advance();
     }
 }

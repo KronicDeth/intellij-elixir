@@ -24,6 +24,14 @@
 
     <editorNotificationProvider implementation="org.elixir_lang.inspection.SetupSDKNotificationProvider"/>
 
+    <!-- EEX -->
+    <!--<braceMatcher filetype="EEx" implementationClass="org.elixir_lang.eex.BraceMatcher"/>-->
+    <fileType.fileViewProviderFactory filetype="EEx" implementationClass="org.elixir_lang.eex.file.view_provider.Factory"/>
+    <fileTypeFactory implementation="org.elixir_lang.eex.file.type.Factory"/>
+    <lang.fileViewProviderFactory language="EEx" implementationClass="org.elixir_lang.eex.file.view_provider.Factory"/>
+    <lang.parserDefinition language="EEx" implementationClass="org.elixir_lang.eex.ParserDefinition"/>
+    <!--<lang.psiStructureViewFactory language="EEx" implementationClass="org.elixir_lang.eex.PsiStructureViewFactory"/>-->
+
     <!-- Mix related extensions -->
     <projectConfigurable instance="org.elixir_lang.settings.ElixirExternalToolsConfigurable" />
     <projectService serviceImplementation="org.elixir_lang.mix.settings.MixSettings" />

@@ -3,6 +3,7 @@ package org.elixir_lang.elixir_flex_lexer;
 import org.elixir_lang.ElixirFlexLexer;
 import org.elixir_lang.TokenTypeState;
 import org.elixir_lang.psi.ElixirTypes;
+import org.jetbrains.annotations.NotNull;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -574,16 +575,20 @@ public class DotRelativeIdentifierParenthesesCallTest extends Test {
 
     @org.junit.Test
     public void identifierCall() throws IOException {
-        reset(identifierCharSequence);
+        start(identifierCharSequence);
 
         int lastState = ElixirFlexLexer.DOT_OPERATION;
 
-        assertEquals(ElixirTypes.DOT_OPERATOR, flexLexer.advance());
-        assertEquals(lastState, flexLexer.yystate());
+        lexer.advance();
+
+        assertEquals(ElixirTypes.DOT_OPERATOR, lexer.getTokenType());
+        assertEquals(lastState, lexer.getState());
 
         for (TokenTypeState tokenTypeState: tokenTypeStates) {
-            assertEquals(tokenTypeState.tokenType, flexLexer.advance());
-            assertEquals(tokenTypeState.state, flexLexer.yystate());
+            lexer.advance();
+
+            assertEquals(tokenTypeState.tokenType, lexer.getTokenType());
+            assertEquals(tokenTypeState.state, lexer.getState());
             lastState = tokenTypeState.state;
         }
 
@@ -591,11 +596,11 @@ public class DotRelativeIdentifierParenthesesCallTest extends Test {
     }
 
     @Override
-    protected void reset(CharSequence charSequence) throws IOException {
+    protected void start(@NotNull CharSequence charSequence) {
         // append "." to trigger DOT_OPERATION
         // charSequence for relative identifier
         // append "(" to trigger CALL_OR_KEYWORD_PAIR_MAYBE
         CharSequence fullCharSequence = "." + charSequence + "(";
-        super.reset(fullCharSequence);
+        super.start(fullCharSequence);
     }
 }

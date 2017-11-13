@@ -1,6 +1,7 @@
 package org.elixir_lang.parser_definition;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.lang.ParserDefinition;
 import com.intellij.mock.MockLocalFileSystem;
 import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.extensions.ExtensionsArea;
@@ -43,7 +44,11 @@ import static org.elixir_lang.test.ElixirVersion.elixirSdkRelease;
 @org.junit.Ignore("abstract")
 public abstract class ParsingTestCase extends com.intellij.testFramework.ParsingTestCase {
     public ParsingTestCase() {
-        super("", "ex", new ElixirParserDefinition());
+        this("ex", new ElixirParserDefinition());
+    }
+
+    protected ParsingTestCase(String extension, ParserDefinition parserDefinition) {
+        super("", extension, parserDefinition);
     }
 
     @NotNull

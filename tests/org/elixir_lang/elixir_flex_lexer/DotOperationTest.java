@@ -2,6 +2,7 @@ package org.elixir_lang.elixir_flex_lexer;
 
 import org.elixir_lang.ElixirFlexLexer;
 import org.elixir_lang.psi.ElixirTypes;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
@@ -17,12 +18,12 @@ public class DotOperationTest extends Test {
      */
 
     @Override
-    protected void reset(CharSequence charSequence) throws IOException {
+    protected void start(@NotNull CharSequence charSequence) {
         // start to trigger ATOM_BODY state
         CharSequence fullCharSequence = "." + charSequence;
-        super.reset(fullCharSequence);
+        super.start(fullCharSequence);
         // consume '.'
-        flexLexer.advance();
+        lexer.advance();
     }
 
 
@@ -33,51 +34,75 @@ public class DotOperationTest extends Test {
     @org.junit.Test
     public void andOperatorParentheses() throws IOException {
         CharSequence charSequence = "&&(";
-        reset(charSequence);
+        start(charSequence);
 
-        assertEquals(ElixirTypes.AND_SYMBOL_OPERATOR, flexLexer.advance());
-        assertEquals(ElixirFlexLexer.CALL_MAYBE, flexLexer.yystate());
+        lexer.advance();
 
-        assertEquals(ElixirTypes.CALL, flexLexer.advance());
-        assertEquals(initialState(), flexLexer.yystate());
+        assertEquals(ElixirTypes.AND_SYMBOL_OPERATOR, lexer.getTokenType());
+        assertEquals(ElixirFlexLexer.CALL_MAYBE, lexer.getState());
 
-        assertEquals(ElixirTypes.OPENING_PARENTHESIS, flexLexer.advance());
-        assertEquals(initialState(), flexLexer.yystate());
+        lexer.advance();
 
-        assertTrue("Failure: expected all of \"" + charSequence + "\" to be consumed", flexLexer.advance() == null);
+        assertEquals(ElixirTypes.CALL, lexer.getTokenType());
+        assertEquals(initialState(), lexer.getState());
+
+        lexer.advance();
+
+        assertEquals(ElixirTypes.OPENING_PARENTHESIS, lexer.getTokenType());
+        assertEquals(initialState(), lexer.getState());
+
+        lexer.advance();
+
+        assertTrue("Failure: expected all of \"" + charSequence + "\" to be consumed", lexer.getTokenType() == null);
     }
 
     @org.junit.Test
     public void andOperatorParenthesis() throws IOException {
         CharSequence charSequence = "&&(";
-        reset(charSequence);
+        start(charSequence);
 
-        assertEquals(ElixirTypes.AND_SYMBOL_OPERATOR, flexLexer.advance());
-        assertEquals(ElixirFlexLexer.CALL_MAYBE, flexLexer.yystate());
+        lexer.advance();
 
-        assertEquals(ElixirTypes.CALL, flexLexer.advance());
-        assertEquals(initialState(), flexLexer.yystate());
+        assertEquals(ElixirTypes.AND_SYMBOL_OPERATOR, lexer.getTokenType());
+        assertEquals(ElixirFlexLexer.CALL_MAYBE, lexer.getState());
 
-        assertEquals(ElixirTypes.OPENING_PARENTHESIS, flexLexer.advance());
-        assertEquals(initialState(), flexLexer.yystate());
+        lexer.advance();
 
-        assertTrue("Failure: expected all of \"" + charSequence + "\" to be consumed", flexLexer.advance() == null);
+        assertEquals(ElixirTypes.CALL, lexer.getTokenType());
+        assertEquals(initialState(), lexer.getState());
+
+        lexer.advance();
+
+        assertEquals(ElixirTypes.OPENING_PARENTHESIS, lexer.getTokenType());
+        assertEquals(initialState(), lexer.getState());
+
+        lexer.advance();
+
+        assertTrue("Failure: expected all of \"" + charSequence + "\" to be consumed", lexer.getTokenType() == null);
     }
 
     @org.junit.Test
     public void andOperatorBracket() throws IOException {
         CharSequence charSequence = "&&[";
-        reset(charSequence);
+        start(charSequence);
 
-        assertEquals(ElixirTypes.AND_SYMBOL_OPERATOR, flexLexer.advance());
-        assertEquals(ElixirFlexLexer.CALL_MAYBE, flexLexer.yystate());
+        lexer.advance();
 
-        assertEquals(ElixirTypes.CALL, flexLexer.advance());
-        assertEquals(initialState(), flexLexer.yystate());
+        assertEquals(ElixirTypes.AND_SYMBOL_OPERATOR, lexer.getTokenType());
+        assertEquals(ElixirFlexLexer.CALL_MAYBE, lexer.getState());
 
-        assertEquals(ElixirTypes.OPENING_BRACKET, flexLexer.advance());
-        assertEquals(initialState(), flexLexer.yystate());
+        lexer.advance();
 
-        assertTrue("Failure: expected all of \"" + charSequence + "\" to be consumed", flexLexer.advance() == null);
+        assertEquals(ElixirTypes.CALL, lexer.getTokenType());
+        assertEquals(initialState(), lexer.getState());
+
+        lexer.advance();
+
+        assertEquals(ElixirTypes.OPENING_BRACKET, lexer.getTokenType());
+        assertEquals(initialState(), lexer.getState());
+
+        lexer.advance();
+
+        assertTrue("Failure: expected all of \"" + charSequence + "\" to be consumed", lexer.getTokenType() == null);
     }
 }

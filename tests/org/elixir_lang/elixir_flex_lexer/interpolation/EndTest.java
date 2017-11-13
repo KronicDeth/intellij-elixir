@@ -25,11 +25,11 @@ public class EndTest extends TokenTest {
     @Test
     @Override
     public void token() throws IOException {
-        int lastLexicalState = ElixirFlexLexer.GROUP;
-        reset("}", lastLexicalState);
-        flexLexer.pushAndBegin(initialState());
+        start("\"#{}\"");
 
-        assertEquals(ElixirTypes.INTERPOLATION_END, flexLexer.advance());
-        assertEquals(lastLexicalState, flexLexer.yystate());
+        lexer.advance();
+
+        assertEquals(ElixirTypes.INTERPOLATION_END, lexer.getTokenType());
+        assertEquals(ElixirFlexLexer.GROUP, lexer.getState());
     }
 }

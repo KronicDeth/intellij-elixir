@@ -2,6 +2,7 @@ package org.elixir_lang.elixir_flex_lexer.group.valid_escape_sequence;
 
 import org.elixir_lang.ElixirFlexLexer;
 import org.elixir_lang.psi.ElixirTypes;
+import org.jetbrains.annotations.NotNull;
 import org.junit.experimental.theories.DataPoints;
 import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
@@ -93,33 +94,46 @@ public class BracedCharacterCodeTest extends org.elixir_lang.elixir_flex_lexer.T
         return charSequences.toArray(new CharSequence[charSequences.size()]);
     };
 
-    protected void reset(CharSequence charSequence) throws IOException {
+    @NotNull
+    protected void start(@NotNull CharSequence charSequence) {
         // start of "\"" + promoter to trigger GROUP state
         CharSequence fullCharSequence = "\"" + charSequence;
-        super.reset(fullCharSequence);
+        super.start(fullCharSequence);
         // consume "
-        flexLexer.advance();
+        lexer.advance();
     }
 
     @Theory
-    public void validCharacterCode(CharSequence charSequence) throws IOException {
-        reset(charSequence);
+    public void validCharacterCode(@NotNull CharSequence charSequence) {
+        start(charSequence);
 
-        assertEquals(ElixirTypes.ESCAPE, flexLexer.advance());
-        assertEquals(ElixirFlexLexer.ESCAPE_SEQUENCE, flexLexer.yystate());
+        lexer.advance();
 
-        assertEquals(ElixirTypes.HEXADECIMAL_WHOLE_NUMBER_BASE, flexLexer.advance());
-        assertEquals(ElixirFlexLexer.HEXADECIMAL_ESCAPE_SEQUENCE, flexLexer.yystate());
+        assertEquals(ElixirTypes.ESCAPE, lexer.getTokenType());
+        assertEquals(ElixirFlexLexer.ESCAPE_SEQUENCE, lexer.getState());
 
-        assertEquals(ElixirTypes.OPENING_CURLY, flexLexer.advance());
-        assertEquals(ElixirFlexLexer.EXTENDED_HEXADECIMAL_ESCAPE_SEQUENCE, flexLexer.yystate());
+        lexer.advance();
 
-        assertEquals(ElixirTypes.VALID_HEXADECIMAL_DIGITS, flexLexer.advance());
-        assertEquals(ElixirFlexLexer.EXTENDED_HEXADECIMAL_ESCAPE_SEQUENCE, flexLexer.yystate());
+        assertEquals(ElixirTypes.HEXADECIMAL_WHOLE_NUMBER_BASE, lexer.getTokenType());
+        assertEquals(ElixirFlexLexer.HEXADECIMAL_ESCAPE_SEQUENCE, lexer.getState());
 
-        assertEquals(ElixirTypes.CLOSING_CURLY, flexLexer.advance());
-        assertEquals(ElixirFlexLexer.GROUP, flexLexer.yystate());
+        lexer.advance();
 
-        assertTrue("Failure: expected all of \"" + charSequence + "\" to be consumed", flexLexer.advance() == null);
+        assertEquals(ElixirTypes.OPENING_CURLY, lexer.getTokenType());
+        assertEquals(ElixirFlexLexer.EXTENDED_HEXADECIMAL_ESCAPE_SEQUENCE, lexer.getState());
+
+        lexer.advance();
+
+        assertEquals(ElixirTypes.VALID_HEXADECIMAL_DIGITS, lexer.getTokenType());
+        assertEquals(ElixirFlexLexer.EXTENDED_HEXADECIMAL_ESCAPE_SEQUENCE, lexer.getState());
+
+        lexer.advance();
+
+        assertEquals(ElixirTypes.CLOSING_CURLY, lexer.getTokenType());
+        assertEquals(ElixirFlexLexer.GROUP, lexer.getState());
+
+        lexer.advance();
+
+        assertTrue("Failure: expected all of \"" + charSequence + "\" to be consumed", lexer.getTokenType() == null);
     };
 }

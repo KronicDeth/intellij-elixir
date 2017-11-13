@@ -5,6 +5,7 @@ import com.intellij.psi.tree.IElementType;
 import org.elixir_lang.ElixirFlexLexer;
 import org.elixir_lang.elixir_flex_lexer.TokenTest;
 import org.elixir_lang.psi.ElixirTypes;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;
 import org.junit.runners.Parameterized;
 
@@ -46,19 +47,20 @@ public abstract class Test extends TokenTest {
 
     protected abstract CharSequence quotes();
 
-    protected void reset(CharSequence charSequence) throws IOException {
+    @Override
+    protected void start(@NotNull CharSequence charSequence) {
         // start to trigger SIGIL_MODIFIERS after GROUP
         CharSequence fullCharSequence = "~r" + quotes() + "\n" + quotes() + charSequence;
-        super.reset(fullCharSequence);
+        super.start(fullCharSequence);
         // consume ~
-        flexLexer.advance();
+        lexer.advance();
         // consume r
-        flexLexer.advance();
+        lexer.advance();
         // consume quotes
-        flexLexer.advance();
+        lexer.advance();
         // consume '\n'
-        flexLexer.advance();
+        lexer.advance();
         // consume quotes
-        flexLexer.advance();
+        lexer.advance();
     }
 }

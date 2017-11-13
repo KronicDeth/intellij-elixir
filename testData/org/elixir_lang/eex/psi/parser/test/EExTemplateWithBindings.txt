@@ -1,0 +1,6 @@
+Embedded Elixir File(0,14)
+  PsiElement(DATA)('foo ')(0,4)
+  EExEqualsTagImpl(EQUALS_TAG)(4,14)
+    PsiElement(<%=)('<%=')(4,7)
+    PsiElement(Elixir)(' bar ')(7,12)
+    PsiElement(%>)('%>')(12,14)

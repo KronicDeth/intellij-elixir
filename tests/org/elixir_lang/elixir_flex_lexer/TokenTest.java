@@ -50,15 +50,18 @@ public abstract class TokenTest extends Test {
 
     @org.junit.Test
     public void token() throws IOException {
-        reset(charSequence);
+        start(charSequence);
 
-        assertEquals(tokenType, flexLexer.advance());
-        assertEquals(lexicalState, flexLexer.yystate());
+        lexer.advance();
+        assertEquals(tokenType, lexer.getTokenType());
+        assertEquals(lexicalState, lexer.getState());
+
+        lexer.advance();
 
         if (consumeAll) {
-            assertTrue("Failure: expected all of \"" + charSequence + "\" to be consumed", flexLexer.advance() == null);
+            assertTrue("Failure: expected all of \"" + charSequence + "\" to be consumed", lexer.getTokenType() == null);
         } else {
-            assertTrue("Failure: expected all of \"" + charSequence + "\" not to be consumed", flexLexer.advance() != null);
+            assertTrue("Failure: expected all of \"" + charSequence + "\" not to be consumed", lexer.getTokenType() != null);
         }
     }
 }

@@ -3,6 +3,7 @@ package org.elixir_lang.elixir_flex_lexer.group;
 import com.intellij.psi.tree.IElementType;
 import org.elixir_lang.ElixirFlexLexer;
 import org.elixir_lang.psi.ElixirTypes;
+import org.jetbrains.annotations.NotNull;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -28,11 +29,11 @@ public class InterpolationTest extends org.elixir_lang.elixir_flex_lexer.group.T
      */
 
     @Override
-    protected void reset(CharSequence charSequence) throws IOException {
+    protected void start(@NotNull CharSequence charSequence) {
         // start of quote to trigger GROUP state with isInterpolating being true
         CharSequence fullCharSequence = "\"" + charSequence;
         // consumes '"'
-        super.reset(fullCharSequence);
+        super.start(fullCharSequence);
     }
 
     @Parameterized.Parameters(

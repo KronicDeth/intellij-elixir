@@ -1,0 +1,36 @@
+{
+  // CANNOT be called `Parser` because `
+  parserClass="org.elixir_lang.eex.Parser"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="EEx"
+  psiImplClassSuffix="Impl"
+  psiPackage="org.elixir_lang.eex.psi"
+  psiImplPackage="org.elixir_lang.eex.psi.impl"
+
+  elementTypeHolderClass="org.elixir_lang.eex.psi.Types"
+  elementTypeClass="org.elixir_lang.eex.psi.ElementType"
+  tokenTypeClass="org.elixir_lang.eex.psi.TokenType"
+
+  tokens = [
+    CLOSING = "%>"
+    COMMENT = "Comment"
+    Data = "Data"
+    ELIXIR = "Elixir"
+    OPENING = "<%"
+    OPENING_COMMENT = "<%#"
+    OPENING_EQUALS = "<%="
+    OPENING_QUOTATION = "<%%"
+    QUOTATION = "Quotation"
+  ]
+}
+
+private eexFile ::= DATA? (tags DATA?)?
+private tags ::= tag (DATA? tag)*
+private tag ::= normalTag | commentTag | equalsTag | quotationTag
+
+commentTag ::= OPENING_COMMENT COMMENT? CLOSING
+equalsTag ::= OPENING_EQUALS ELIXIR? CLOSING
+quotationTag ::= OPENING_QUOTATION QUOTATION? CLOSING
+normalTag ::= OPENING ELIXIR? CLOSING
