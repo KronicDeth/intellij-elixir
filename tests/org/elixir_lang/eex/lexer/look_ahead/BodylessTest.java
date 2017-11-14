@@ -1,44 +1,51 @@
 package org.elixir_lang.eex.lexer.look_ahead;
 
 import com.intellij.psi.tree.IElementType;
+import org.apache.commons.lang.ArrayUtils;
 import org.elixir_lang.eex.lexer.Flex;
 import org.elixir_lang.eex.psi.Types;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 @RunWith(Parameterized.class)
 public class BodylessTest extends Test {
-    private static final Collection<Object[]> PARAMETERS = Arrays.asList(
-            new Object[][]{
-                    {"<%#", Types.OPENING_COMMENT, Flex.COMMENT},
-                    {"<%%", Types.OPENING_QUOTATION, Flex.QUOTATION},
-                    {"<%=", Types.OPENING_EQUALS, Flex.ELIXIR}
-            }
-    );
+    private static final Lex[][] PREFIXES = new Lex[][]{
+            {new Lex("<%#", Types.OPENING_COMMENT, Flex.COMMENT)},
+            {new Lex("<%%", Types.OPENING_QUOTATION, Flex.QUOTATION)},
+            {new Lex("<%", Types.OPENING, Flex.MARKER_MAYBE), new Lex("/", Types.FORWARD_SLASH_MARKER, Flex.ELIXIR)},
+            {new Lex("<%", Types.OPENING, Flex.MARKER_MAYBE), new Lex("=", Types.EQUALS_MARKER, Flex.ELIXIR)},
+            {new Lex("<%", Types.OPENING, Flex.MARKER_MAYBE), new Lex("|", Types.PIPE_MARKER, Flex.ELIXIR)}
+    };
+    private static final Lex[] SUFFIX = new Lex[]{
+            new Lex("%>", Types.CLOSING, Flex.YYINITIAL)
+    };
 
-    private final CharSequence charSequence;
-    private final IElementType tokenType;
-    private final int bodyState;
-
-    @Parameterized.Parameters(
-            name = "\"{0}\" parses as {1} and advances to state {2}"
-    )
-    public static Collection<Object[]> parameters() {
-        return PARAMETERS;
+    public BodylessTest(@NotNull Sequence sequence) {
+        super(sequence);
     }
 
-    public BodylessTest(@NotNull CharSequence charSequence, @NotNull IElementType tokenType, int bodyState) {
-        this.charSequence = charSequence;
-        this.tokenType = tokenType;
-        this.bodyState = bodyState;
+    @Contract(pure = true)
+    @NotNull
+    @Parameterized.Parameters(name = "#{index} {0}")
+    public static Iterable<Object> parameters() {
+        return Arrays.stream(PREFIXES).<Object>map(prefix -> {
+            Lex[] lexes = new Lex[prefix.length + SUFFIX.length];
+            System.arraycopy(prefix, 0, lexes, 0, prefix.length);
+            System.arraycopy(SUFFIX, 0, lexes, prefix.length, SUFFIX.length);
+
+            return new Sequence(lexes);
+        })::iterator;
     }
 
     @Override
@@ -47,19 +54,7 @@ public class BodylessTest extends Test {
     }
 
     @org.junit.Test
-    public void bodyless() throws IOException {
-        start(charSequence);
-
-        assertEquals(tokenType, lexer.getTokenType());
-
-        lexer.advance();
-
-        assertEquals(Types.CLOSING, lexer.getTokenType());
-        assertEquals(bodyState, lexer.getState());
-
-        lexer.advance();
-
-        assertNull(lexer.getTokenType());
-        assertEquals(Flex.YYINITIAL, lexer.getState());
+    public void bodyless() {
+        assertSequence();
     }
 }

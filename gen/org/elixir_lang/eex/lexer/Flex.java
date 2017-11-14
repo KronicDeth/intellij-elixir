@@ -24,6 +24,7 @@ public class Flex implements com.intellij.lexer.FlexLexer {
   public static final int COMMENT = 2;
   public static final int ELIXIR = 4;
   public static final int QUOTATION = 6;
+  public static final int MARKER_MAYBE = 8;
 
   /**
    * ZZ_LEXSTATE[l] is the state in the DFA for the lexical state l
@@ -32,7 +33,7 @@ public class Flex implements com.intellij.lexer.FlexLexer {
    * l is of the form l = 2*k, k a non negative integer
    */
   private static final int ZZ_LEXSTATE[] = { 
-     0,  0,  1,  1,  2,  2,  3, 3
+     0,  0,  1,  1,  2,  2,  3,  3,  4, 4
   };
 
   /** 
@@ -54,7 +55,7 @@ public class Flex implements com.intellij.lexer.FlexLexer {
 
   /* The ZZ_CMAP_A table has 256 entries */
   static final char ZZ_CMAP_A[] = zzUnpackCMap(
-    "\43\0\1\4\1\0\1\2\26\0\1\1\1\5\1\3\301\0");
+    "\43\0\1\4\1\0\1\2\11\0\1\6\14\0\1\1\1\5\1\3\75\0\1\7\203\0");
 
   /** 
    * Translates DFA states to action switch labels.
@@ -62,11 +63,11 @@ public class Flex implements com.intellij.lexer.FlexLexer {
   private static final int [] ZZ_ACTION = zzUnpackAction();
 
   private static final String ZZ_ACTION_PACKED_0 =
-    "\4\0\2\1\2\2\2\3\2\4\1\5\1\6\1\7"+
-    "\1\10\1\11";
+    "\5\0\2\1\2\2\2\3\2\4\1\5\1\6\1\7"+
+    "\1\10\1\11\1\12\1\13\1\14";
 
   private static int [] zzUnpackAction() {
-    int [] result = new int[17];
+    int [] result = new int[21];
     int offset = 0;
     offset = zzUnpackAction(ZZ_ACTION_PACKED_0, offset, result);
     return result;
@@ -91,12 +92,12 @@ public class Flex implements com.intellij.lexer.FlexLexer {
   private static final int [] ZZ_ROWMAP = zzUnpackRowMap();
 
   private static final String ZZ_ROWMAP_PACKED_0 =
-    "\0\0\0\6\0\14\0\22\0\30\0\36\0\30\0\44"+
-    "\0\30\0\44\0\30\0\44\0\52\0\30\0\30\0\30"+
-    "\0\30";
+    "\0\0\0\10\0\20\0\30\0\40\0\50\0\60\0\50"+
+    "\0\70\0\50\0\70\0\50\0\70\0\50\0\50\0\50"+
+    "\0\50\0\100\0\50\0\50\0\50";
 
   private static int [] zzUnpackRowMap() {
-    int [] result = new int[17];
+    int [] result = new int[21];
     int offset = 0;
     offset = zzUnpackRowMap(ZZ_ROWMAP_PACKED_0, offset, result);
     return result;
@@ -119,12 +120,13 @@ public class Flex implements com.intellij.lexer.FlexLexer {
   private static final int [] ZZ_TRANS = zzUnpackTrans();
 
   private static final String ZZ_TRANS_PACKED_0 =
-    "\1\5\1\6\4\5\2\7\1\10\3\7\2\11\1\12"+
-    "\3\11\2\13\1\14\3\13\10\0\1\15\6\0\1\16"+
-    "\4\0\1\17\1\0\1\20\1\21";
+    "\1\6\1\7\6\6\2\10\1\11\5\10\2\12\1\13"+
+    "\5\12\2\14\1\15\5\14\5\16\1\17\1\20\1\21"+
+    "\12\0\1\22\10\0\1\23\6\0\1\24\1\0\1\25"+
+    "\3\0";
 
   private static int [] zzUnpackTrans() {
-    int [] result = new int[48];
+    int [] result = new int[72];
     int offset = 0;
     offset = zzUnpackTrans(ZZ_TRANS_PACKED_0, offset, result);
     return result;
@@ -162,11 +164,11 @@ public class Flex implements com.intellij.lexer.FlexLexer {
   private static final int [] ZZ_ATTRIBUTE = zzUnpackAttribute();
 
   private static final String ZZ_ATTRIBUTE_PACKED_0 =
-    "\4\0\1\11\1\1\1\11\1\1\1\11\1\1\1\11"+
-    "\2\1\4\11";
+    "\5\0\1\11\1\1\1\11\1\1\1\11\1\1\1\11"+
+    "\1\1\4\11\1\1\3\11";
 
   private static int [] zzUnpackAttribute() {
-    int [] result = new int[17];
+    int [] result = new int[21];
     int offset = 0;
     offset = zzUnpackAttribute(ZZ_ATTRIBUTE_PACKED_0, offset, result);
     return result;
@@ -220,6 +222,12 @@ public class Flex implements com.intellij.lexer.FlexLexer {
 
   /** denotes if the user-EOF-code has already been executed */
   private boolean zzEOFDone;
+
+  /* user code: */
+  private void handleInState(int nextLexicalState) {
+    yypushback(yylength());
+    yybegin(nextLexicalState);
+  }
 
 
   /**
@@ -482,44 +490,58 @@ public class Flex implements com.intellij.lexer.FlexLexer {
           case 1: 
             { return Types.DATA;
             }
-          case 10: break;
+          case 13: break;
           case 2: 
             { return Types.COMMENT;
             }
-          case 11: break;
+          case 14: break;
           case 3: 
             { return Types.ELIXIR;
             }
-          case 12: break;
+          case 15: break;
           case 4: 
             { return Types.QUOTATION;
             }
-          case 13: break;
+          case 16: break;
           case 5: 
+            { handleInState(ELIXIR);
+            }
+          case 17: break;
+          case 6: 
             { yybegin(ELIXIR);
+                            return Types.EQUALS_MARKER;
+            }
+          case 18: break;
+          case 7: 
+            { yybegin(ELIXIR);
+                            return Types.FORWARD_SLASH_MARKER;
+            }
+          case 19: break;
+          case 8: 
+            { yybegin(ELIXIR);
+                            return Types.PIPE_MARKER;
+            }
+          case 20: break;
+          case 9: 
+            { yybegin(MARKER_MAYBE);
                         return Types.OPENING;
             }
-          case 14: break;
-          case 6: 
+          case 21: break;
+          case 10: 
             { yybegin(YYINITIAL);
                return Types.CLOSING;
             }
-          case 15: break;
-          case 7: 
+          case 22: break;
+          case 11: 
             { yybegin(QUOTATION);
                         return Types.OPENING_QUOTATION;
             }
-          case 16: break;
-          case 8: 
+          case 23: break;
+          case 12: 
             { yybegin(COMMENT);
                         return Types.OPENING_COMMENT;
             }
-          case 17: break;
-          case 9: 
-            { yybegin(ELIXIR);
-                        return Types.OPENING_EQUALS;
-            }
-          case 18: break;
+          case 24: break;
           default:
             zzScanError(ZZ_NO_MATCH);
           }

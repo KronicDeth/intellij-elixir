@@ -16,21 +16,23 @@
   tokens = [
     CLOSING = "%>"
     COMMENT = "Comment"
-    Data = "Data"
+    DATA = "Data"
+    EQUALS_MARKER = "="
     ELIXIR = "Elixir"
+    FORWARD_SLASH_MARKER = "/"
     OPENING = "<%"
     OPENING_COMMENT = "<%#"
-    OPENING_EQUALS = "<%="
     OPENING_QUOTATION = "<%%"
+    PIPE_MARKER = "|"
     QUOTATION = "Quotation"
   ]
 }
 
 private eexFile ::= DATA? (tags DATA?)?
 private tags ::= tag (DATA? tag)*
-private tag ::= normalTag | commentTag | equalsTag | quotationTag
+private tag ::= elixirTag | commentTag | quotationTag
 
 commentTag ::= OPENING_COMMENT COMMENT? CLOSING
-equalsTag ::= OPENING_EQUALS ELIXIR? CLOSING
+elixirTag ::= OPENING marker? ELIXIR? CLOSING
+marker ::= EQUALS_MARKER | FORWARD_SLASH_MARKER | PIPE_MARKER
 quotationTag ::= OPENING_QUOTATION QUOTATION? CLOSING
-normalTag ::= OPENING ELIXIR? CLOSING

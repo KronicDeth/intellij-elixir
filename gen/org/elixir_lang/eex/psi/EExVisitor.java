@@ -11,11 +11,11 @@ public class EExVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitEqualsTag(@NotNull EExEqualsTag o) {
+  public void visitElixirTag(@NotNull EExElixirTag o) {
     visitPsiElement(o);
   }
 
-  public void visitNormalTag(@NotNull EExNormalTag o) {
+  public void visitMarker(@NotNull EExMarker o) {
     visitPsiElement(o);
   }
 

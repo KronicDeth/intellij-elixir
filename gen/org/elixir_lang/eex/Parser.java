@@ -26,11 +26,11 @@ public class Parser implements PsiParser, LightPsiParser {
     if (t == COMMENT_TAG) {
       r = commentTag(b, 0);
     }
-    else if (t == EQUALS_TAG) {
-      r = equalsTag(b, 0);
+    else if (t == ELIXIR_TAG) {
+      r = elixirTag(b, 0);
     }
-    else if (t == NORMAL_TAG) {
-      r = normalTag(b, 0);
+    else if (t == MARKER) {
+      r = marker(b, 0);
     }
     else if (t == QUOTATION_TAG) {
       r = quotationTag(b, 0);
@@ -111,45 +111,45 @@ public class Parser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // OPENING_EQUALS ELIXIR? CLOSING
-  public static boolean equalsTag(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "equalsTag")) return false;
-    if (!nextTokenIs(b, OPENING_EQUALS)) return false;
+  // OPENING marker? ELIXIR? CLOSING
+  public static boolean elixirTag(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "elixirTag")) return false;
+    if (!nextTokenIs(b, OPENING)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, OPENING_EQUALS);
-    r = r && equalsTag_1(b, l + 1);
+    r = consumeToken(b, OPENING);
+    r = r && elixirTag_1(b, l + 1);
+    r = r && elixirTag_2(b, l + 1);
     r = r && consumeToken(b, CLOSING);
-    exit_section_(b, m, EQUALS_TAG, r);
+    exit_section_(b, m, ELIXIR_TAG, r);
     return r;
   }
 
+  // marker?
+  private static boolean elixirTag_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "elixirTag_1")) return false;
+    marker(b, l + 1);
+    return true;
+  }
+
   // ELIXIR?
-  private static boolean equalsTag_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "equalsTag_1")) return false;
+  private static boolean elixirTag_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "elixirTag_2")) return false;
     consumeToken(b, ELIXIR);
     return true;
   }
 
   /* ********************************************************** */
-  // OPENING ELIXIR? CLOSING
-  public static boolean normalTag(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "normalTag")) return false;
-    if (!nextTokenIs(b, OPENING)) return false;
+  // EQUALS_MARKER | FORWARD_SLASH_MARKER | PIPE_MARKER
+  public static boolean marker(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "marker")) return false;
     boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, OPENING);
-    r = r && normalTag_1(b, l + 1);
-    r = r && consumeToken(b, CLOSING);
-    exit_section_(b, m, NORMAL_TAG, r);
+    Marker m = enter_section_(b, l, _NONE_, MARKER, "<marker>");
+    r = consumeToken(b, EQUALS_MARKER);
+    if (!r) r = consumeToken(b, FORWARD_SLASH_MARKER);
+    if (!r) r = consumeToken(b, PIPE_MARKER);
+    exit_section_(b, l, m, r, false, null);
     return r;
-  }
-
-  // ELIXIR?
-  private static boolean normalTag_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "normalTag_1")) return false;
-    consumeToken(b, ELIXIR);
-    return true;
   }
 
   /* ********************************************************** */
@@ -174,14 +174,13 @@ public class Parser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // normalTag | commentTag | equalsTag | quotationTag
+  // elixirTag | commentTag | quotationTag
   static boolean tag(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "tag")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = normalTag(b, l + 1);
+    r = elixirTag(b, l + 1);
     if (!r) r = commentTag(b, l + 1);
-    if (!r) r = equalsTag(b, l + 1);
     if (!r) r = quotationTag(b, l + 1);
     exit_section_(b, m, null, r);
     return r;

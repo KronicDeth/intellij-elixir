@@ -11,19 +11,25 @@ import static org.elixir_lang.eex.psi.Types.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.eex.psi.*;
 
-public class EExNormalTagImpl extends ASTWrapperPsiElement implements EExNormalTag {
+public class EExElixirTagImpl extends ASTWrapperPsiElement implements EExElixirTag {
 
-  public EExNormalTagImpl(ASTNode node) {
+  public EExElixirTagImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull EExVisitor visitor) {
-    visitor.visitNormalTag(this);
+    visitor.visitElixirTag(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof EExVisitor) accept((EExVisitor)visitor);
     else super.accept(visitor);
+  }
+
+  @Override
+  @Nullable
+  public EExMarker getMarker() {
+    return findChildByClass(EExMarker.class);
   }
 
 }

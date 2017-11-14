@@ -11,14 +11,14 @@ import static org.elixir_lang.eex.psi.Types.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.eex.psi.*;
 
-public class EExEqualsTagImpl extends ASTWrapperPsiElement implements EExEqualsTag {
+public class EExMarkerImpl extends ASTWrapperPsiElement implements EExMarker {
 
-  public EExEqualsTagImpl(ASTNode node) {
+  public EExMarkerImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull EExVisitor visitor) {
-    visitor.visitEqualsTag(this);
+    visitor.visitMarker(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

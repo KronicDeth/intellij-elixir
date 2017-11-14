@@ -9,18 +9,20 @@ import org.elixir_lang.eex.psi.impl.*;
 public interface Types {
 
   IElementType COMMENT_TAG = new ElementType("COMMENT_TAG");
-  IElementType EQUALS_TAG = new ElementType("EQUALS_TAG");
-  IElementType NORMAL_TAG = new ElementType("NORMAL_TAG");
+  IElementType ELIXIR_TAG = new ElementType("ELIXIR_TAG");
+  IElementType MARKER = new ElementType("MARKER");
   IElementType QUOTATION_TAG = new ElementType("QUOTATION_TAG");
 
   IElementType CLOSING = new TokenType("%>");
   IElementType COMMENT = new TokenType("Comment");
-  IElementType DATA = new TokenType("DATA");
+  IElementType DATA = new TokenType("Data");
   IElementType ELIXIR = new TokenType("Elixir");
+  IElementType EQUALS_MARKER = new TokenType("=");
+  IElementType FORWARD_SLASH_MARKER = new TokenType("/");
   IElementType OPENING = new TokenType("<%");
   IElementType OPENING_COMMENT = new TokenType("<%#");
-  IElementType OPENING_EQUALS = new TokenType("<%=");
   IElementType OPENING_QUOTATION = new TokenType("<%%");
+  IElementType PIPE_MARKER = new TokenType("|");
   IElementType QUOTATION = new TokenType("Quotation");
 
   class Factory {
@@ -29,11 +31,11 @@ public interface Types {
        if (type == COMMENT_TAG) {
         return new EExCommentTagImpl(node);
       }
-      else if (type == EQUALS_TAG) {
-        return new EExEqualsTagImpl(node);
+      else if (type == ELIXIR_TAG) {
+        return new EExElixirTagImpl(node);
       }
-      else if (type == NORMAL_TAG) {
-        return new EExNormalTagImpl(node);
+      else if (type == MARKER) {
+        return new EExMarkerImpl(node);
       }
       else if (type == QUOTATION_TAG) {
         return new EExQuotationTagImpl(node);
