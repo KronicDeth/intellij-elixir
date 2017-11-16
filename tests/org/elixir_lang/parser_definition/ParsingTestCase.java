@@ -47,8 +47,8 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
         this("ex", new ElixirParserDefinition());
     }
 
-    protected ParsingTestCase(String extension, ParserDefinition parserDefinition) {
-        super("", extension, parserDefinition);
+    protected ParsingTestCase(String extension, ParserDefinition... parserDefinitions) {
+        super("", extension, parserDefinitions);
     }
 
     @NotNull
