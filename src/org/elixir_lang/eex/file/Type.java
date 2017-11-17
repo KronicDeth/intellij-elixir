@@ -35,9 +35,8 @@ public class Type extends LanguageFileType implements TemplateLanguageFileType {
     }
 
     private static Set<FileType> templateDataFileTypeSet(@NotNull VirtualFile virtualFile) {
-        String name = virtualFile.getName();
-        VirtualFile parent = virtualFile.getParent();
-        int nameLength = name.length();
+        String path = virtualFile.getPath();
+        int pathLength = path.length();
         FileTypeManager fileTypeManager = FileTypeManager.getInstance();
 
         return fileTypeManager
@@ -47,10 +46,9 @@ public class Type extends LanguageFileType implements TemplateLanguageFileType {
                 .map(ExtensionFileNameMatcher.class::cast)
                 .map(ExtensionFileNameMatcher::getExtension)
                 .map(extension -> '.' + extension)
-                .filter(name::endsWith)
-                .map(dotExtension -> name.substring(0, nameLength - dotExtension.length()))
-                .map(dataName -> new FakeVirtualFile(parent, dataName))
-                .map(VirtualFile::getFileType)
+                .filter(path::endsWith)
+                .map(dotExtension -> path.substring(0, pathLength - dotExtension.length()))
+                .map(fileTypeManager::getFileTypeByFileName)
                 .collect(Collectors.toSet());
     }
 
