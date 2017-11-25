@@ -9,6 +9,7 @@ import com.intellij.lang.html.HTMLParserDefinition;
 import com.intellij.lexer.EmbeddedTokenTypesProvider;
 import com.intellij.openapi.fileTypes.*;
 import com.intellij.openapi.fileTypes.impl.FileTypeManagerImpl;
+import com.intellij.openapi.vfs.newvfs.FileAttribute;
 import com.intellij.psi.LanguageFileViewProviders;
 import com.intellij.psi.templateLanguages.TemplateDataLanguageMappings;
 import com.intellij.psi.templateLanguages.TemplateDataLanguagePatterns;
@@ -21,9 +22,13 @@ import org.elixir_lang.eex.file.Type;
 import org.elixir_lang.eex.file.view_provider.Factory;
 import org.elixir_lang.parser_definition.ParsingTestCase;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.junit.BeforeClass;
 import org.picocontainer.MutablePicoContainer;
 
+import java.lang.reflect.Field;
 import java.util.Collections;
+import java.util.Set;
 
 public class Test extends ParsingTestCase {
     public Test() {
@@ -78,6 +83,7 @@ public class Test extends ParsingTestCase {
 
         registerExtensionPoint(EmbeddedTokenTypesProvider.EXTENSION_POINT_NAME, EmbeddedTokenTypesProvider.class);
 
+        unregisterAutoDetectionCacheAttribute();
         FileTypeManagerImpl fileTypeManager =
                 new FileTypeManagerImpl(messageBus, new MockSchemeManagerFactory(), new AppPropertiesComponentImpl());
 
@@ -89,5 +95,16 @@ public class Test extends ParsingTestCase {
 
     private static void registerFileType(@NotNull FileTypeManager fileTypeManager, FileType fileType) {
         fileTypeManager.registerFileType(fileType, Collections.singletonList(new ExtensionFileNameMatcher(fileType.getDefaultExtension())));
+    }
+
+    private static void unregisterAutoDetectionCacheAttribute() {
+        try {
+            Field ourRegisteredIdsField = FileAttribute.class.getDeclaredField("ourRegisteredIds");
+            ourRegisteredIdsField.setAccessible(true);
+            Set<String> ourRegisteredIds = (Set<String>) ourRegisteredIdsField.get(null);
+            ourRegisteredIds.clear();
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            // Don't care
+        }
     }
 }
