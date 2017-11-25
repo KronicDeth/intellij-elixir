@@ -11,12 +11,13 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.impl.source.PsiFileImpl;
 import com.intellij.psi.templateLanguages.ConfigurableTemplateLanguageFileViewProvider;
-import com.intellij.psi.templateLanguages.TemplateDataElementType;
 import com.intellij.psi.templateLanguages.TemplateDataLanguageMappings;
+import com.intellij.psi.tree.IElementType;
 import com.intellij.util.containers.ContainerUtil;
 import gnu.trove.THashSet;
 import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.eex.Language;
+import org.elixir_lang.eex.element_type.EmbeddedElixir;
 import org.elixir_lang.eex.element_type.TemplateData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,13 +27,11 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 
 import static org.elixir_lang.eex.file.Type.onlyTemplateDataFileType;
-import static org.elixir_lang.eex.psi.Types.DATA;
-import static org.elixir_lang.eex.psi.Types.ELIXIR;
 
 // See https://github.com/JetBrains/intellij-plugins/blob/500f42337a87f463e0340f43e2411266fcfa9c5f/handlebars/src/com/dmarcotte/handlebars/file/HbFileViewProvider.java
 public class ViewProvider extends MultiplePsiFilesPerDocumentFileViewProvider
         implements ConfigurableTemplateLanguageFileViewProvider {
-    private static final ConcurrentMap<String, TemplateDataElementType> TEMPLATE_DATA_ELEMENT_TYPE_BY_LANGUAGE_ID =
+    private static final ConcurrentMap<String, IElementType> ELEMENT_TYPE_BY_LANGUAGE_ID =
             ContainerUtil.newConcurrentMap();
     @NotNull
     private final com.intellij.lang.Language baseLanguage;
@@ -56,10 +55,20 @@ public class ViewProvider extends MultiplePsiFilesPerDocumentFileViewProvider
         this(psiManager, virtualFile, physical, baseLanguage, templateDataLanguage(psiManager, virtualFile));
     }
 
-    private static TemplateDataElementType templateDataElementType(com.intellij.lang.Language language) {
-        return TEMPLATE_DATA_ELEMENT_TYPE_BY_LANGUAGE_ID.computeIfAbsent(
+    private static IElementType elementType(com.intellij.lang.Language language) {
+        return ELEMENT_TYPE_BY_LANGUAGE_ID.computeIfAbsent(
                 language.getID(),
-                languageID -> new TemplateData("EEX_TEMPLATE_DATA", language)
+                languageID -> {
+                    IElementType elementType;
+
+                    if (language == ElixirLanguage.INSTANCE) {
+                        elementType = new EmbeddedElixir();
+                    } else {
+                        elementType = new TemplateData(language);
+                    }
+
+                    return elementType;
+                }
         );
     }
 
@@ -104,7 +113,7 @@ public class ViewProvider extends MultiplePsiFilesPerDocumentFileViewProvider
             psiFileImpl = (PsiFileImpl) parserDefinition.createFile(this);
         } else {
             psiFileImpl = (PsiFileImpl) parserDefinition.createFile(this);
-            psiFileImpl.setContentElementType(templateDataElementType(language));
+            psiFileImpl.setContentElementType(elementType(language));
         }
 
         return psiFileImpl;

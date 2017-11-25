@@ -9,7 +9,7 @@ import com.intellij.lang.PsiParser;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 
-import static org.elixir_lang.grammar.parser.GeneratedParserUtilBase.*;
+import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
 import static org.elixir_lang.parser.ExternalRules.ifVersion;
 import static org.elixir_lang.psi.ElixirTypes.*;
 
@@ -135,6 +135,12 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     }
     else if (t == DOT_INFIX_OPERATOR) {
       r = dotInfixOperator(b, 0);
+    }
+    else if (t == EEX) {
+      r = eex(b, 0);
+    }
+    else if (t == EEX_EQUALS_TAG) {
+      r = eexEqualsTag(b, 0);
     }
     else if (t == EMPTY_PARENTHESES) {
       r = emptyParentheses(b, 0);
@@ -537,6 +543,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   //                      literalSigilLine |
   //                      literalStringSigilLine |
   //                      literalWordsLine |
+  //                      eex |
   //                      atomKeyword |
   //                      atom |
   //                      alias
@@ -578,6 +585,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     if (!r) r = literalSigilLine(b, l + 1);
     if (!r) r = literalStringSigilLine(b, l + 1);
     if (!r) r = literalWordsLine(b, l + 1);
+    if (!r) r = eex(b, l + 1);
     if (!r) r = atomKeyword(b, l + 1);
     if (!r) r = atom(b, l + 1);
     if (!r) r = alias(b, l + 1);
@@ -1880,6 +1888,75 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // EEX_DATA? (eexEqualsTag EEX_DATA?)+
+  public static boolean eex(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "eex")) return false;
+    if (!nextTokenIs(b, "<eex>", EEX_DATA, EEX_OPENING)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, EEX, "<eex>");
+    r = eex_0(b, l + 1);
+    r = r && eex_1(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // EEX_DATA?
+  private static boolean eex_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "eex_0")) return false;
+    consumeToken(b, EEX_DATA);
+    return true;
+  }
+
+  // (eexEqualsTag EEX_DATA?)+
+  private static boolean eex_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "eex_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = eex_1_0(b, l + 1);
+    int c = current_position_(b);
+    while (r) {
+      if (!eex_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "eex_1", c)) break;
+      c = current_position_(b);
+    }
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // eexEqualsTag EEX_DATA?
+  private static boolean eex_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "eex_1_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = eexEqualsTag(b, l + 1);
+    r = r && eex_1_0_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // EEX_DATA?
+  private static boolean eex_1_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "eex_1_0_1")) return false;
+    consumeToken(b, EEX_DATA);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // EEX_OPENING EEX_EQUALS_MARKER elixirFile EEX_CLOSING
+  public static boolean eexEqualsTag(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "eexEqualsTag")) return false;
+    if (!nextTokenIs(b, EEX_OPENING)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, EEX_EQUALS_TAG, null);
+    r = consumeTokens(b, 1, EEX_OPENING, EEX_EQUALS_MARKER);
+    p = r; // pin = 1
+    r = r && report_error_(b, elixirFile(b, l + 1));
+    r = p && consumeToken(b, EEX_CLOSING) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  /* ********************************************************** */
   // endOfExpression? (expressionList endOfExpression?)?
   static boolean elixirFile(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "elixirFile")) return false;
@@ -2067,7 +2144,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // !(EOL | CLOSING_BIT | CLOSING_BRACKET | CLOSING_CURLY | CLOSING_PARENTHESIS | INTERPOLATION_END | SEMICOLON | STAB_OPERATOR | END | blockIdentifier)
+  // !(EOL | CLOSING_BIT | CLOSING_BRACKET | CLOSING_CURLY | CLOSING_PARENTHESIS | INTERPOLATION_END | SEMICOLON | STAB_OPERATOR | END | blockIdentifier | EEX_CLOSING)
   static boolean expressionRecoverWhile(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "expressionRecoverWhile")) return false;
     boolean r;
@@ -2077,7 +2154,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // EOL | CLOSING_BIT | CLOSING_BRACKET | CLOSING_CURLY | CLOSING_PARENTHESIS | INTERPOLATION_END | SEMICOLON | STAB_OPERATOR | END | blockIdentifier
+  // EOL | CLOSING_BIT | CLOSING_BRACKET | CLOSING_CURLY | CLOSING_PARENTHESIS | INTERPOLATION_END | SEMICOLON | STAB_OPERATOR | END | blockIdentifier | EEX_CLOSING
   private static boolean expressionRecoverWhile_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "expressionRecoverWhile_0")) return false;
     boolean r;
@@ -2092,6 +2169,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, STAB_OPERATOR);
     if (!r) r = consumeToken(b, END);
     if (!r) r = blockIdentifier(b, l + 1);
+    if (!r) r = consumeToken(b, EEX_CLOSING);
     exit_section_(b, m, null, r);
     return r;
   }

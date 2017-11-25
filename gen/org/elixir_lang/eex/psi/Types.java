@@ -1,10 +1,13 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.eex.psi;
 
-import com.intellij.psi.tree.IElementType;
-import com.intellij.psi.PsiElement;
 import com.intellij.lang.ASTNode;
-import org.elixir_lang.eex.psi.impl.*;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.tree.IElementType;
+import org.elixir_lang.eex.psi.impl.EExCommentTagImpl;
+import org.elixir_lang.eex.psi.impl.EExElixirTagImpl;
+import org.elixir_lang.eex.psi.impl.EExMarkerImpl;
+import org.elixir_lang.eex.psi.impl.EExQuotationTagImpl;
 
 public interface Types {
 

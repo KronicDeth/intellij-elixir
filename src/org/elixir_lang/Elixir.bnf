@@ -391,6 +391,16 @@
     DO = "do"
     DOT_OPERATOR = "."
     DUAL_OPERATOR = "Dual Operator (+, -)"
+    EEX_CLOSING = "%>"
+    EEX_COMMENT = "EEx Comment"
+    EEX_DATA = "EEx Data"
+    EEX_EQUALS_MARKER = "EEx Equals Marker (=)"
+    EEX_FORWARD_SLASH_MARKER = "EEx Forward Slash Marker (/)"
+    EEX_OPENING = "<%"
+    EEX_OPENING_COMMENT = "<%#"
+    EEX_OPENING_QUOTATION = "<%%"
+    EEX_PIPE_MARKER = "EEx Pipe Marker (|)"
+    EEX_QUOTATION = "EEx Quotation"
     ELSE = "else"
     EOL = "\\n, \\r\\n"
     END = "end"
@@ -526,7 +536,7 @@ private expression ::= emptyParentheses |
 // CLOSING_* because they are endings to subexpressions
 // STAB_OPERATOR because it ends when clause for no parentheses stab guard clauses
 // blockIdentifier for one-liner blockItems where there isn't a newline between block expressions and following blockIdentifier.
-private expressionRecoverWhile ::= !(EOL | CLOSING_BIT | CLOSING_BRACKET | CLOSING_CURLY | CLOSING_PARENTHESIS | INTERPOLATION_END | SEMICOLON | STAB_OPERATOR | END | blockIdentifier)
+private expressionRecoverWhile ::= !(EOL | CLOSING_BIT | CLOSING_BRACKET | CLOSING_CURLY | CLOSING_PARENTHESIS | INTERPOLATION_END | SEMICOLON | STAB_OPERATOR | END | blockIdentifier | EEX_CLOSING)
 
 private expressionList ::= expression (endOfExpression expression)*
 
@@ -2230,6 +2240,7 @@ accessExpression ::= atNumericOperation |
                      literalSigilLine |
                      literalStringSigilLine |
                      literalWordsLine |
+                     eex |
                      atomKeyword |
                      atom |
                      alias
@@ -2243,6 +2254,12 @@ accessExpression ::= atNumericOperation |
                          quote
                        ]
                      }
+
+// See eexFile in EEx.bnf
+eex ::= EEX_DATA? (eexEqualsTag EEX_DATA?)+
+
+eexEqualsTag ::= EEX_OPENING EEX_EQUALS_MARKER elixirFile EEX_CLOSING
+                 { pin = 1 }
 
 // keywords that map to atoms
 atomKeyword ::= FALSE | NIL | TRUE

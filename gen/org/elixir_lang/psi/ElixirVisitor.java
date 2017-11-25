@@ -169,6 +169,14 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitOperator(o);
   }
 
+  public void visitEex(@NotNull ElixirEex o) {
+    visitPsiElement(o);
+  }
+
+  public void visitEexEqualsTag(@NotNull ElixirEexEqualsTag o) {
+    visitPsiElement(o);
+  }
+
   public void visitEmptyParentheses(@NotNull ElixirEmptyParentheses o) {
     visitQuotable(o);
   }
