@@ -35,7 +35,7 @@ public class TemplateData extends MergingLexerAdapterBase {
                 while (true) {
                     IElementType originalTokenType = originalLexer.getTokenType();
 
-                    if (originalTokenType != DATA) {
+                    if (originalTokenType != null && originalTokenType != DATA) {
                         originalLexer.advance();
                     } else {
                         break;
