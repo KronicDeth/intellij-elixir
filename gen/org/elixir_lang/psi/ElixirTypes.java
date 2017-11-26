@@ -272,14 +272,14 @@ public interface ElixirTypes {
   IElementType DUAL_OPERATOR = new ElixirTokenType("Dual Operator (+, -)");
   IElementType EEX_CLOSING = new ElixirTokenType("%>");
   IElementType EEX_COMMENT = new ElixirTokenType("EEx Comment");
+  IElementType EEX_COMMENT_MARKER = new ElixirTokenType("EEx Comment Marker (#)");
   IElementType EEX_DATA = new ElixirTokenType("EEx Data");
   IElementType EEX_EQUALS_MARKER = new ElixirTokenType("EEx Equals Marker (=)");
   IElementType EEX_FORWARD_SLASH_MARKER = new ElixirTokenType("EEx Forward Slash Marker (/)");
   IElementType EEX_OPENING = new ElixirTokenType("<%");
-  IElementType EEX_OPENING_COMMENT = new ElixirTokenType("<%#");
-  IElementType EEX_OPENING_QUOTATION = new ElixirTokenType("<%%");
   IElementType EEX_PIPE_MARKER = new ElixirTokenType("EEx Pipe Marker (|)");
   IElementType EEX_QUOTATION = new ElixirTokenType("EEx Quotation");
+  IElementType EEX_QUOTATION_MARKER = new ElixirTokenType("EEx Quotation Marker (%)");
   IElementType ELSE = new ElixirTokenType("else");
   IElementType END = new ElixirTokenType("end");
   IElementType EOL = new ElixirTokenType("\\\\n, \\\\r\\\\n");

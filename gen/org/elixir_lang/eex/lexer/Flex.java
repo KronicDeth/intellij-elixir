@@ -94,7 +94,7 @@ public class Flex implements com.intellij.lexer.FlexLexer {
   private static final String ZZ_ROWMAP_PACKED_0 =
     "\0\0\0\10\0\20\0\30\0\40\0\50\0\60\0\50"+
     "\0\70\0\50\0\70\0\50\0\70\0\50\0\50\0\50"+
-    "\0\50\0\100\0\50\0\50\0\50";
+    "\0\50\0\50\0\50\0\50\0\50";
 
   private static int [] zzUnpackRowMap() {
     int [] result = new int[21];
@@ -121,12 +121,11 @@ public class Flex implements com.intellij.lexer.FlexLexer {
 
   private static final String ZZ_TRANS_PACKED_0 =
     "\1\6\1\7\6\6\2\10\1\11\5\10\2\12\1\13"+
-    "\5\12\2\14\1\15\5\14\5\16\1\17\1\20\1\21"+
-    "\12\0\1\22\10\0\1\23\6\0\1\24\1\0\1\25"+
-    "\3\0";
+    "\5\12\2\14\1\15\5\14\2\16\1\17\1\16\1\20"+
+    "\1\21\1\22\1\23\12\0\1\24\10\0\1\25\4\0";
 
   private static int [] zzUnpackTrans() {
-    int [] result = new int[72];
+    int [] result = new int[64];
     int offset = 0;
     offset = zzUnpackTrans(ZZ_TRANS_PACKED_0, offset, result);
     return result;
@@ -165,7 +164,7 @@ public class Flex implements com.intellij.lexer.FlexLexer {
 
   private static final String ZZ_ATTRIBUTE_PACKED_0 =
     "\5\0\1\11\1\1\1\11\1\1\1\11\1\1\1\11"+
-    "\1\1\4\11\1\1\3\11";
+    "\1\1\10\11";
 
   private static int [] zzUnpackAttribute() {
     int [] result = new int[21];
@@ -508,38 +507,38 @@ public class Flex implements com.intellij.lexer.FlexLexer {
             }
           case 17: break;
           case 6: 
-            { yybegin(ELIXIR);
-                            return Types.EQUALS_MARKER;
+            { yybegin(QUOTATION);
+                            return Types.QUOTATION_MARKER;
             }
           case 18: break;
           case 7: 
-            { yybegin(ELIXIR);
-                            return Types.FORWARD_SLASH_MARKER;
+            { yybegin(COMMENT);
+                            return Types.COMMENT_MARKER;
             }
           case 19: break;
           case 8: 
             { yybegin(ELIXIR);
-                            return Types.PIPE_MARKER;
+                            return Types.EQUALS_MARKER;
             }
           case 20: break;
           case 9: 
-            { yybegin(MARKER_MAYBE);
-                        return Types.OPENING;
+            { yybegin(ELIXIR);
+                            return Types.FORWARD_SLASH_MARKER;
             }
           case 21: break;
           case 10: 
-            { yybegin(YYINITIAL);
-               return Types.CLOSING;
+            { yybegin(ELIXIR);
+                            return Types.PIPE_MARKER;
             }
           case 22: break;
           case 11: 
-            { yybegin(QUOTATION);
-                        return Types.OPENING_QUOTATION;
+            { yybegin(MARKER_MAYBE);
+                        return Types.OPENING;
             }
           case 23: break;
           case 12: 
-            { yybegin(COMMENT);
-                        return Types.OPENING_COMMENT;
+            { yybegin(YYINITIAL);
+               return Types.CLOSING;
             }
           case 24: break;
           default:

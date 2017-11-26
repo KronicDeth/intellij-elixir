@@ -8,16 +8,20 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
+import java.util.stream.Stream;
 
 @RunWith(Parameterized.class)
 public class WhiteSpaceBodyTest extends Test {
-    private static final Lex[][] PREFIXES = new Lex[][]{
-            {new Lex("<%", Types.OPENING, Flex.MARKER_MAYBE), new Lex(" ", Types.ELIXIR, Flex.ELIXIR)},
-            {new Lex("<%#", Types.OPENING_COMMENT, Flex.COMMENT), new Lex(" ", Types.COMMENT, Flex.COMMENT)},
-            {new Lex("<%%", Types.OPENING_QUOTATION, Flex.QUOTATION), new Lex(" ", Types.QUOTATION, Flex.QUOTATION)},
-            {new Lex("<%", Types.OPENING, Flex.MARKER_MAYBE), new Lex("/", Types.FORWARD_SLASH_MARKER, Flex.ELIXIR), new Lex(" ", Types.ELIXIR, Flex.ELIXIR)},
-            {new Lex("<%", Types.OPENING, Flex.MARKER_MAYBE), new Lex("=", Types.EQUALS_MARKER, Flex.ELIXIR), new Lex(" ", Types.ELIXIR, Flex.ELIXIR)},
-            {new Lex("<%", Types.OPENING, Flex.MARKER_MAYBE), new Lex("|", Types.PIPE_MARKER, Flex.ELIXIR), new Lex(" ", Types.ELIXIR, Flex.ELIXIR)}
+    private static final Lex[] PREFIX = new Lex[]{
+            new Lex("<%", Types.OPENING, Flex.MARKER_MAYBE)
+    };
+    private static final Lex[][] INFIXES = new Lex[][]{
+            {new Lex(" ", Types.ELIXIR, Flex.ELIXIR)},
+            {new Lex("#", Types.COMMENT_MARKER, Flex.COMMENT), new Lex(" ", Types.COMMENT, Flex.COMMENT)},
+            {new Lex("%", Types.QUOTATION_MARKER, Flex.QUOTATION), new Lex(" ", Types.QUOTATION, Flex.QUOTATION)},
+            {new Lex("/", Types.FORWARD_SLASH_MARKER, Flex.ELIXIR), new Lex(" ", Types.ELIXIR, Flex.ELIXIR)},
+            {new Lex("=", Types.EQUALS_MARKER, Flex.ELIXIR), new Lex(" ", Types.ELIXIR, Flex.ELIXIR)},
+            {new Lex("|", Types.PIPE_MARKER, Flex.ELIXIR), new Lex(" ", Types.ELIXIR, Flex.ELIXIR)}
     };
     private static final Lex[] SUFFIX = new Lex[]{
             new Lex("%>", Types.CLOSING, Flex.YYINITIAL)
@@ -31,10 +35,8 @@ public class WhiteSpaceBodyTest extends Test {
     @NotNull
     @Parameterized.Parameters(name = "#{index} {0}")
     public static Iterable<Object> parameters() {
-        return Arrays.stream(PREFIXES).<Object>map(prefix -> {
-            Lex[] lexes = new Lex[prefix.length + SUFFIX.length];
-            System.arraycopy(prefix, 0, lexes, 0, prefix.length);
-            System.arraycopy(SUFFIX, 0, lexes, prefix.length, SUFFIX.length);
+        return Arrays.stream(INFIXES).<Object>map(infix -> {
+            Lex[] lexes = Stream.of(PREFIX, infix, SUFFIX).flatMap(Stream::of).toArray(Lex[]::new);
 
             return new Sequence(lexes);
         })::iterator;

@@ -25,13 +25,12 @@ import org.elixir_lang.eex.psi.Types;
 OPENING = "<%"
 CLOSING = "%>"
 
-OPENING_COMMENT = "<%#"
-OPENING_QUOTATION = "<%%"
-
+COMMENT_MARKER = "#"
 EQUALS_MARKER = "="
 // See https://github.com/elixir-lang/elixir/pull/6281
 FORWARD_SLASH_MARKER = "/"
 PIPE_MARKER = "|"
+QUOTATION_MARKER = "%"
 
 ANY = [^]
 
@@ -45,20 +44,20 @@ ANY = [^]
 <YYINITIAL> {
   {OPENING}           { yybegin(MARKER_MAYBE);
                         return Types.OPENING; }
-  {OPENING_COMMENT}   { yybegin(COMMENT);
-                        return Types.OPENING_COMMENT; }
-  {OPENING_QUOTATION} { yybegin(QUOTATION);
-                        return Types.OPENING_QUOTATION; }
   {ANY}               { return Types.DATA; }
 }
 
 <MARKER_MAYBE> {
+  {COMMENT_MARKER}        { yybegin(COMMENT);
+                            return Types.COMMENT_MARKER; }
   {EQUALS_MARKER}         { yybegin(ELIXIR);
                             return Types.EQUALS_MARKER; }
   {FORWARD_SLASH_MARKER}  { yybegin(ELIXIR);
                             return Types.FORWARD_SLASH_MARKER; }
   {PIPE_MARKER}           { yybegin(ELIXIR);
                             return Types.PIPE_MARKER; }
+  {QUOTATION_MARKER}      { yybegin(QUOTATION);
+                            return Types.QUOTATION_MARKER; }
   {ANY}                   { handleInState(ELIXIR); }
 }
 

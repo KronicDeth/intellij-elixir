@@ -7,19 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class EExVisitor extends PsiElementVisitor {
 
-  public void visitCommentTag(@NotNull EExCommentTag o) {
-    visitPsiElement(o);
-  }
-
-  public void visitElixirTag(@NotNull EExElixirTag o) {
-    visitPsiElement(o);
-  }
-
-  public void visitMarker(@NotNull EExMarker o) {
-    visitPsiElement(o);
-  }
-
-  public void visitQuotationTag(@NotNull EExQuotationTag o) {
+  public void visitTag(@NotNull EExTag o) {
     visitPsiElement(o);
   }
 

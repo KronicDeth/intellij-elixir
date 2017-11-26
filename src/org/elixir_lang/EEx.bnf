@@ -16,23 +16,26 @@
   tokens = [
     CLOSING = "%>"
     COMMENT = "Comment"
+    COMMENT_MARKER = "#"
     DATA = "Data"
     EQUALS_MARKER = "="
     ELIXIR = "Elixir"
     FORWARD_SLASH_MARKER = "/"
     OPENING = "<%"
-    OPENING_COMMENT = "<%#"
-    OPENING_QUOTATION = "<%%"
     PIPE_MARKER = "|"
     QUOTATION = "Quotation"
+    QUOTATION_MARKER = "%"
   ]
 }
 
 private eexFile ::= DATA? (tags DATA?)?
 private tags ::= tag (DATA? tag)*
-private tag ::= elixirTag | commentTag | quotationTag
+tag ::= OPENING (commentBody | quotationBody | elixirBody) CLOSING
+        { pin = 1 }
 
-commentTag ::= OPENING_COMMENT COMMENT? CLOSING
-elixirTag ::= OPENING marker? ELIXIR? CLOSING
-marker ::= EQUALS_MARKER | FORWARD_SLASH_MARKER | PIPE_MARKER
-quotationTag ::= OPENING_QUOTATION QUOTATION? CLOSING
+private commentBody ::= COMMENT_MARKER COMMENT?
+                        { pin = 1 }
+private elixirBody ::=  elixirMarker? ELIXIR?
+private elixirMarker ::= EQUALS_MARKER | FORWARD_SLASH_MARKER | PIPE_MARKER
+private quotationBody ::= QUOTATION_MARKER QUOTATION?
+                          { pin = 1 }

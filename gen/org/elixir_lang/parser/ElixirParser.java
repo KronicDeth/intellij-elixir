@@ -9,7 +9,7 @@ import com.intellij.lang.PsiParser;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 
-import static org.elixir_lang.grammar.parser.GeneratedParserUtilBase.*;
+import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
 import static org.elixir_lang.parser.ExternalRules.ifVersion;
 import static org.elixir_lang.psi.ElixirTypes.*;
 
@@ -1977,7 +1977,81 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // EEX_OPENING EEX_EQUALS_MARKER? elixirFile EEX_CLOSING
+  // EEX_COMMENT_MARKER EEX_COMMENT?
+  static boolean eexCommentBody(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "eexCommentBody")) return false;
+    if (!nextTokenIs(b, EEX_COMMENT_MARKER)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_);
+    r = consumeToken(b, EEX_COMMENT_MARKER);
+    p = r; // pin = 1
+    r = r && eexCommentBody_1(b, l + 1);
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  // EEX_COMMENT?
+  private static boolean eexCommentBody_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "eexCommentBody_1")) return false;
+    consumeToken(b, EEX_COMMENT);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // eexElixirMarker? elixirFile
+  static boolean eexElixirBody(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "eexElixirBody")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = eexElixirBody_0(b, l + 1);
+    r = r && elixirFile(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // eexElixirMarker?
+  private static boolean eexElixirBody_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "eexElixirBody_0")) return false;
+    eexElixirMarker(b, l + 1);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // EEX_EQUALS_MARKER | EEX_FORWARD_SLASH_MARKER | EEX_PIPE_MARKER
+  static boolean eexElixirMarker(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "eexElixirMarker")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, EEX_EQUALS_MARKER);
+    if (!r) r = consumeToken(b, EEX_FORWARD_SLASH_MARKER);
+    if (!r) r = consumeToken(b, EEX_PIPE_MARKER);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // EEX_QUOTATION EEX_QUOTATION?
+  static boolean eexQuotationBody(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "eexQuotationBody")) return false;
+    if (!nextTokenIs(b, EEX_QUOTATION_MARKER)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_);
+    r = consumeToken(b, EEX_QUOTATION_MARKER);
+    p = r; // pin = 1
+    r = r && eexQuotationBody_1(b, l + 1);
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  // EEX_QUOTATION?
+  private static boolean eexQuotationBody_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "eexQuotationBody_1")) return false;
+    consumeToken(b, EEX_QUOTATION);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // EEX_OPENING (eexCommentBody | eexQuotationBody | eexElixirBody) EEX_CLOSING
   public static boolean eexTag(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "eexTag")) return false;
     if (!nextTokenIs(b, EEX_OPENING)) return false;
@@ -1986,17 +2060,21 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     r = consumeToken(b, EEX_OPENING);
     p = r; // pin = 1
     r = r && report_error_(b, eexTag_1(b, l + 1));
-    r = p && report_error_(b, elixirFile(b, l + 1)) && r;
     r = p && consumeToken(b, EEX_CLOSING) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
   }
 
-  // EEX_EQUALS_MARKER?
+  // eexCommentBody | eexQuotationBody | eexElixirBody
   private static boolean eexTag_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "eexTag_1")) return false;
-    consumeToken(b, EEX_EQUALS_MARKER);
-    return true;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = eexCommentBody(b, l + 1);
+    if (!r) r = eexQuotationBody(b, l + 1);
+    if (!r) r = eexElixirBody(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   /* ********************************************************** */

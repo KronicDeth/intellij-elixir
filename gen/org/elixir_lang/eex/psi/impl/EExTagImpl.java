@@ -4,18 +4,18 @@ package org.elixir_lang.eex.psi.impl;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
-import org.elixir_lang.eex.psi.EExQuotationTag;
+import org.elixir_lang.eex.psi.EExTag;
 import org.elixir_lang.eex.psi.EExVisitor;
 import org.jetbrains.annotations.NotNull;
 
-public class EExQuotationTagImpl extends ASTWrapperPsiElement implements EExQuotationTag {
+public class EExTagImpl extends ASTWrapperPsiElement implements EExTag {
 
-  public EExQuotationTagImpl(ASTNode node) {
+  public EExTagImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull EExVisitor visitor) {
-    visitor.visitQuotationTag(this);
+    visitor.visitTag(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

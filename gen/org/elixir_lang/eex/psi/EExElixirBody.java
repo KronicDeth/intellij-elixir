@@ -4,9 +4,9 @@ package org.elixir_lang.eex.psi;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.Nullable;
 
-public interface EExElixirTag extends PsiElement {
+public interface EExElixirBody extends PsiElement {
 
   @Nullable
-  EExMarker getMarker();
+  EExElixirMarker getElixirMarker();
 
 }

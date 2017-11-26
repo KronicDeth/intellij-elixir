@@ -3,6 +3,6 @@ package org.elixir_lang.eex.psi;
 
 import com.intellij.psi.PsiElement;
 
-public interface EExQuotationTag extends PsiElement {
+public interface EExElixirMarker extends PsiElement {
 
 }

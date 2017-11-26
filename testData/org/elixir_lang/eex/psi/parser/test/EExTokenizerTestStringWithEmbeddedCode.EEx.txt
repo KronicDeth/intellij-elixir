@@ -1,6 +1,6 @@
 Embedded Elixir File(0,13)
   PsiElement(Data)('foo ')(0,4)
-  EExElixirTagImpl(ELIXIR_TAG)(4,13)
+  EExTagImpl(TAG)(4,13)
     PsiElement(<%)('<%')(4,6)
     PsiElement(Elixir)(' bar ')(6,11)
     PsiElement(%>)('%>')(11,13)
