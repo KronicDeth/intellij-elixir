@@ -2736,15 +2736,20 @@ blockList ::= blockItem+
               { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
 
 // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L272-L275
-doBlock ::= EOL* DO endOfExpression?
-            stab? endOfExpression? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L273
-            blockList? endOfExpression? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L274
-            END
+doBlock ::= EOL* DO endOfExpression? (doBlockElixirTail | doBlockEExTail)
             {
               implements = "org.elixir_lang.psi.QuotableArguments"
               methods = [quoteArguments]
               pin = DO
             }
+
+private doBlockElixirTail ::= stab? endOfExpression? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L273
+                              blockList? endOfExpression? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L274
+                              END
+
+private doBlockEExTail ::= EEX_CLOSING
+                           EEX_DATA
+                           EEX_OPENING END
 
 // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L143-L148
 unmatchedExpression ::= unmatchedCaptureNonNumericOperation |

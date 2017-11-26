@@ -9,7 +9,7 @@ import com.intellij.lang.PsiParser;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 
-import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
+import static org.elixir_lang.grammar.parser.GeneratedParserUtilBase.*;
 import static org.elixir_lang.parser.ExternalRules.ifVersion;
 import static org.elixir_lang.psi.ElixirTypes.*;
 
@@ -1780,10 +1780,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // EOL* DO endOfExpression?
-  //             stab? endOfExpression? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L273
-  //             blockList? endOfExpression? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L274
-  //             END
+  // EOL* DO endOfExpression? (doBlockElixirTail | doBlockEExTail)
   public static boolean doBlock(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "doBlock")) return false;
     if (!nextTokenIs(b, "<do block>", DO, EOL)) return false;
@@ -1793,11 +1790,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     r = r && consumeToken(b, DO);
     p = r; // pin = DO
     r = r && report_error_(b, doBlock_2(b, l + 1));
-    r = p && report_error_(b, doBlock_3(b, l + 1)) && r;
-    r = p && report_error_(b, doBlock_4(b, l + 1)) && r;
-    r = p && report_error_(b, doBlock_5(b, l + 1)) && r;
-    r = p && report_error_(b, doBlock_6(b, l + 1)) && r;
-    r = p && consumeToken(b, END) && r;
+    r = p && doBlock_3(b, l + 1) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
   }
@@ -1821,30 +1814,72 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // stab?
+  // doBlockElixirTail | doBlockEExTail
   private static boolean doBlock_3(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "doBlock_3")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = doBlockElixirTail(b, l + 1);
+    if (!r) r = doBlockEExTail(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // EEX_CLOSING
+  //                            EEX_DATA
+  //                            EEX_OPENING END
+  static boolean doBlockEExTail(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "doBlockEExTail")) return false;
+    if (!nextTokenIs(b, EEX_CLOSING)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, EEX_CLOSING, EEX_DATA, EEX_OPENING, END);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // stab? endOfExpression? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L273
+  //                               blockList? endOfExpression? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L274
+  //                               END
+  static boolean doBlockElixirTail(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "doBlockElixirTail")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = doBlockElixirTail_0(b, l + 1);
+    r = r && doBlockElixirTail_1(b, l + 1);
+    r = r && doBlockElixirTail_2(b, l + 1);
+    r = r && doBlockElixirTail_3(b, l + 1);
+    r = r && consumeToken(b, END);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // stab?
+  private static boolean doBlockElixirTail_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "doBlockElixirTail_0")) return false;
     stab(b, l + 1);
     return true;
   }
 
   // endOfExpression?
-  private static boolean doBlock_4(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "doBlock_4")) return false;
+  private static boolean doBlockElixirTail_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "doBlockElixirTail_1")) return false;
     endOfExpression(b, l + 1);
     return true;
   }
 
   // blockList?
-  private static boolean doBlock_5(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "doBlock_5")) return false;
+  private static boolean doBlockElixirTail_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "doBlockElixirTail_2")) return false;
     blockList(b, l + 1);
     return true;
   }
 
   // endOfExpression?
-  private static boolean doBlock_6(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "doBlock_6")) return false;
+  private static boolean doBlockElixirTail_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "doBlockElixirTail_3")) return false;
     endOfExpression(b, l + 1);
     return true;
   }
