@@ -1,0 +1,6 @@
+Elixir File(0,15)
+  PsiErrorElement:'foo ' unexpected(0,4)
+    PsiElement(EEx Data)('foo ')(0,4)
+  PsiElement(<%%)('<%%')(4,7)
+  PsiElement(EEx Quotation)(' true ')(7,13)
+  PsiElement(%>)('%>')(13,15)

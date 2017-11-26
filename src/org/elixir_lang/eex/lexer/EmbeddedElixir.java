@@ -37,6 +37,7 @@ public class EmbeddedElixir extends LexerBase {
         EEX_TOKEN_TYPE_TO_ELIXIR_TOKEN_TYPE.put(FORWARD_SLASH_MARKER, EEX_FORWARD_SLASH_MARKER);
         EEX_TOKEN_TYPE_TO_ELIXIR_TOKEN_TYPE.put(OPENING, EEX_OPENING);
         EEX_TOKEN_TYPE_TO_ELIXIR_TOKEN_TYPE.put(OPENING_COMMENT, EEX_OPENING_COMMENT);
+        EEX_TOKEN_TYPE_TO_ELIXIR_TOKEN_TYPE.put(OPENING_QUOTATION, EEX_OPENING_QUOTATION);
         EEX_TOKEN_TYPE_TO_ELIXIR_TOKEN_TYPE.put(PIPE_MARKER, EEX_PIPE_MARKER);
         EEX_TOKEN_TYPE_TO_ELIXIR_TOKEN_TYPE.put(QUOTATION, EEX_QUOTATION);
         EEX_TOKEN_TYPE_TO_ELIXIR_TOKEN_TYPE.put(WHITE_SPACE, WHITE_SPACE);
@@ -149,9 +150,11 @@ public class EmbeddedElixir extends LexerBase {
         IElementType tokenType = lexer().getTokenType();
 
         if (tokenType != null && tokenType.getLanguage() != ElixirLanguage.INSTANCE) {
-            tokenType = EEX_TOKEN_TYPE_TO_ELIXIR_TOKEN_TYPE.get(tokenType);
+            IElementType elixirTokenType = EEX_TOKEN_TYPE_TO_ELIXIR_TOKEN_TYPE.get(tokenType);
 
-            assert tokenType != null : "EEx TokenType " + tokenType + " is not mapped to an Elixir TokenType";
+            assert elixirTokenType != null : "EEx TokenType " + tokenType + " is not mapped to an Elixir TokenType";
+
+            tokenType = elixirTokenType;
         }
 
         return tokenType;
