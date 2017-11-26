@@ -88,6 +88,14 @@ public class Test extends ParsingTestCase {
         doTest(true);
     }
 
+    public void testEExTokenizerTestQuotationWithInterpolation1() {
+        doTest(true);
+    }
+
+    public void testEExTokenizerTestQuotationWithInterpolation2() {
+        doTest(true);
+    }
+
     @Override
     protected String getTestDataPath() {
         return "testData/org/elixir_lang/eex/psi/parser/test";

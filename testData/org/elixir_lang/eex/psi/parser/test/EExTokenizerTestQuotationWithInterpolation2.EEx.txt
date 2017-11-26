@@ -1,0 +1,7 @@
+Embedded Elixir File(0,21)
+  EExTagImpl(TAG)(0,16)
+    PsiElement(<%)('<%')(0,2)
+    PsiElement(%)('%')(2,3)
+    PsiElement(Quotation)('% a <%%= b ')(3,14)
+    PsiElement(%>)('%>')(14,16)
+  PsiElement(Data)(' c %>')(16,21)
