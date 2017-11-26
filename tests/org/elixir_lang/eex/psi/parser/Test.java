@@ -35,6 +35,21 @@ public class Test extends ParsingTestCase {
         super("eex", new ParserDefinition(), new ElixirParserDefinition(), new HTMLParserDefinition(), new PlainTextParserDefinition());
     }
 
+    private static void registerFileType(@NotNull FileTypeManager fileTypeManager, FileType fileType) {
+        fileTypeManager.registerFileType(fileType, Collections.singletonList(new ExtensionFileNameMatcher(fileType.getDefaultExtension())));
+    }
+
+    private static void unregisterAutoDetectionCacheAttribute() {
+        try {
+            Field ourRegisteredIdsField = FileAttribute.class.getDeclaredField("ourRegisteredIds");
+            ourRegisteredIdsField.setAccessible(true);
+            Set<String> ourRegisteredIds = (Set<String>) ourRegisteredIdsField.get(null);
+            ourRegisteredIds.clear();
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            // Don't care
+        }
+    }
+
     public void testPhoenixTemplatesLayoutApp() {
         this.myFileExt = "html.eex";
 
@@ -50,6 +65,10 @@ public class Test extends ParsingTestCase {
     }
 
     public void testStringSample() {
+        doTest(true);
+    }
+
+    public void testEExTokenizerTestStringWithEmbeddedCode() {
         doTest(true);
     }
 
@@ -91,20 +110,5 @@ public class Test extends ParsingTestCase {
         registerFileType(fileTypeManager, Type.INSTANCE);
 
         registerComponentInstance(picoContainer, FileTypeManager.class, fileTypeManager);
-    }
-
-    private static void registerFileType(@NotNull FileTypeManager fileTypeManager, FileType fileType) {
-        fileTypeManager.registerFileType(fileType, Collections.singletonList(new ExtensionFileNameMatcher(fileType.getDefaultExtension())));
-    }
-
-    private static void unregisterAutoDetectionCacheAttribute() {
-        try {
-            Field ourRegisteredIdsField = FileAttribute.class.getDeclaredField("ourRegisteredIds");
-            ourRegisteredIdsField.setAccessible(true);
-            Set<String> ourRegisteredIds = (Set<String>) ourRegisteredIdsField.get(null);
-            ourRegisteredIds.clear();
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            // Don't care
-        }
     }
 }
