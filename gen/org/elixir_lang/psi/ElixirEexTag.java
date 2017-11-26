@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public interface ElixirEexEqualsTag extends PsiElement {
+public interface ElixirEexTag extends PsiElement {
 
   @NotNull
   List<ElixirEmptyParentheses> getEmptyParenthesesList();

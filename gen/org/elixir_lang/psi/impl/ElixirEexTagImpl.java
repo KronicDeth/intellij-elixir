@@ -10,14 +10,14 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class ElixirEexEqualsTagImpl extends ASTWrapperPsiElement implements ElixirEexEqualsTag {
+public class ElixirEexTagImpl extends ASTWrapperPsiElement implements ElixirEexTag {
 
-  public ElixirEexEqualsTagImpl(ASTNode node) {
+  public ElixirEexTagImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull ElixirVisitor visitor) {
-    visitor.visitEexEqualsTag(this);
+    visitor.visitEexTag(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

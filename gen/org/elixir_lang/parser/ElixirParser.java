@@ -139,8 +139,8 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     else if (t == EEX) {
       r = eex(b, 0);
     }
-    else if (t == EEX_EQUALS_TAG) {
-      r = eexEqualsTag(b, 0);
+    else if (t == EEX_TAG) {
+      r = eexTag(b, 0);
     }
     else if (t == EMPTY_PARENTHESES) {
       r = emptyParentheses(b, 0);
@@ -1923,7 +1923,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // EEX_DATA? (eexEqualsTag EEX_DATA?)+
+  // EEX_DATA? (eexTag EEX_DATA?)+
   public static boolean eex(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "eex")) return false;
     if (!nextTokenIs(b, "<eex>", EEX_DATA, EEX_OPENING)) return false;
@@ -1942,7 +1942,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // (eexEqualsTag EEX_DATA?)+
+  // (eexTag EEX_DATA?)+
   private static boolean eex_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "eex_1")) return false;
     boolean r;
@@ -1958,12 +1958,12 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // eexEqualsTag EEX_DATA?
+  // eexTag EEX_DATA?
   private static boolean eex_1_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "eex_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = eexEqualsTag(b, l + 1);
+    r = eexTag(b, l + 1);
     r = r && eex_1_0_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -1977,18 +1977,26 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // EEX_OPENING EEX_EQUALS_MARKER elixirFile EEX_CLOSING
-  public static boolean eexEqualsTag(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "eexEqualsTag")) return false;
+  // EEX_OPENING EEX_EQUALS_MARKER? elixirFile EEX_CLOSING
+  public static boolean eexTag(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "eexTag")) return false;
     if (!nextTokenIs(b, EEX_OPENING)) return false;
     boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, EEX_EQUALS_TAG, null);
-    r = consumeTokens(b, 1, EEX_OPENING, EEX_EQUALS_MARKER);
+    Marker m = enter_section_(b, l, _NONE_, EEX_TAG, null);
+    r = consumeToken(b, EEX_OPENING);
     p = r; // pin = 1
-    r = r && report_error_(b, elixirFile(b, l + 1));
+    r = r && report_error_(b, eexTag_1(b, l + 1));
+    r = p && report_error_(b, elixirFile(b, l + 1)) && r;
     r = p && consumeToken(b, EEX_CLOSING) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
+  }
+
+  // EEX_EQUALS_MARKER?
+  private static boolean eexTag_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "eexTag_1")) return false;
+    consumeToken(b, EEX_EQUALS_MARKER);
+    return true;
   }
 
   /* ********************************************************** */

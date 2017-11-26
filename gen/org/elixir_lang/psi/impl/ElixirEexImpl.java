@@ -6,7 +6,7 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.ElixirEex;
-import org.elixir_lang.psi.ElixirEexEqualsTag;
+import org.elixir_lang.psi.ElixirEexTag;
 import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,8 +29,8 @@ public class ElixirEexImpl extends ASTWrapperPsiElement implements ElixirEex {
 
   @Override
   @NotNull
-  public List<ElixirEexEqualsTag> getEexEqualsTagList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEexEqualsTag.class);
+  public List<ElixirEexTag> getEexTagList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEexTag.class);
   }
 
 }

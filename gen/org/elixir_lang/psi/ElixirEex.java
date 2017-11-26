@@ -9,6 +9,6 @@ import java.util.List;
 public interface ElixirEex extends PsiElement {
 
   @NotNull
-  List<ElixirEexEqualsTag> getEexEqualsTagList();
+  List<ElixirEexTag> getEexTagList();
 
 }

@@ -2256,10 +2256,10 @@ accessExpression ::= atNumericOperation |
                      }
 
 // See eexFile in EEx.bnf
-eex ::= EEX_DATA? (eexEqualsTag EEX_DATA?)+
+eex ::= EEX_DATA? (eexTag EEX_DATA?)+
 
-eexEqualsTag ::= EEX_OPENING EEX_EQUALS_MARKER elixirFile EEX_CLOSING
-                 { pin = 1 }
+eexTag ::= EEX_OPENING EEX_EQUALS_MARKER? elixirFile EEX_CLOSING
+           { pin = 1 }
 
 // keywords that map to atoms
 atomKeyword ::= FALSE | NIL | TRUE

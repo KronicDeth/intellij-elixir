@@ -173,7 +173,7 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitEexEqualsTag(@NotNull ElixirEexEqualsTag o) {
+  public void visitEexTag(@NotNull ElixirEexTag o) {
     visitPsiElement(o);
   }
 
