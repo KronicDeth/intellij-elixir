@@ -1,0 +1,7 @@
+Embedded Elixir File(0,15)
+  PsiElement(Data)('foo ')(0,4)
+  EExTagImpl(TAG)(4,15)
+    PsiElement(<%)('<%')(4,6)
+    PsiElement(#)('#')(6,7)
+    PsiComment(Comment)(' true ')(7,13)
+    PsiElement(%>)('%>')(13,15)
