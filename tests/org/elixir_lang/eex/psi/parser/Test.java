@@ -100,6 +100,10 @@ public class Test extends ParsingTestCase {
         doTest(true);
     }
 
+    public void testEExTokenizerTestCommentsWithDoEnd() {
+        doTest(true);
+    }
+
     @Override
     protected String getTestDataPath() {
         return "testData/org/elixir_lang/eex/psi/parser/test";

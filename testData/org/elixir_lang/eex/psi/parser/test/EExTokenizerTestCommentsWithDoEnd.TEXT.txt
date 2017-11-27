@@ -1,0 +1,5 @@
+PsiFile(plain text):EExTokenizerTestCommentsWithDoEnd.eex(0,31)
+  PsiElement(PLAIN_TEXT)('foo ')(0,4)
+  PsiElement(EEx)('<%# true do %>')(4,18)
+  PsiElement(PLAIN_TEXT)('bar')(18,21)
+  PsiElement(EEx)('<%# end %>')(21,31)
