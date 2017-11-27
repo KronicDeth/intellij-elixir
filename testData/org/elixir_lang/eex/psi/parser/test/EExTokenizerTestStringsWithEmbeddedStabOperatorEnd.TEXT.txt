@@ -1,0 +1,7 @@
+PsiFile(plain text):EExTokenizerTestStringsWithEmbeddedStabOperatorEnd.eex(0,59)
+  PsiElement(PLAIN_TEXT)('foo ')(0,4)
+  PsiElement(EEx)('<% cond do %><% false -> %>')(4,31)
+  PsiElement(PLAIN_TEXT)('bar')(31,34)
+  PsiElement(EEx)('<% true -> %>')(34,47)
+  PsiElement(PLAIN_TEXT)('baz')(47,50)
+  PsiElement(EEx)('<% end %>')(50,59)
