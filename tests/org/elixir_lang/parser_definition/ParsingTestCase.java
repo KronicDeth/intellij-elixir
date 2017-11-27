@@ -1,6 +1,7 @@
 package org.elixir_lang.parser_definition;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.lang.Language;
 import com.intellij.lang.ParserDefinition;
 import com.intellij.mock.MockLocalFileSystem;
 import com.intellij.openapi.extensions.Extensions;
@@ -98,10 +99,10 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
         Quoter.assertError(myFile);
     }
 
-    protected void assertWithLocalError() {
+    private List<PsiElement> localErrors(@NotNull Language language) {
         final FileViewProvider fileViewProvider = myFile.getViewProvider();
-        PsiFile root = fileViewProvider.getPsi(ElixirLanguage.INSTANCE);
-        final List<PsiElement> errorElementList = new LinkedList<PsiElement>();
+        PsiFile root = fileViewProvider.getPsi(language);
+        final List<PsiElement> errorElementList = new LinkedList<>();
 
         root.accept(
                 new PsiRecursiveElementWalkingVisitor() {
@@ -116,7 +117,27 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
                 }
         );
 
+        return errorElementList;
+    }
+
+    protected void assertWithLocalError() {
+        assertWithLocalError(ElixirLanguage.INSTANCE);
+    }
+
+    protected void assertWithLocalError(@NotNull Language language) {
+        List<PsiElement> errorElementList = localErrors(language);
+
         assertTrue("No PsiErrorElements found in parsed file PSI", !errorElementList.isEmpty());
+    }
+
+    protected void assertWithoutLocalError() {
+        assertWithoutLocalError(ElixirLanguage.INSTANCE);
+    }
+
+    protected void assertWithoutLocalError(@NotNull Language language) {
+        List<PsiElement> errorElementList = localErrors(language);
+
+        assertTrue("PsiErrorElements found in parsed file PSI", errorElementList.isEmpty());
     }
 
     protected void assertQuotedAroundError() {
@@ -131,27 +152,6 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
 
     protected void assertQuotedCorrectly() {
         Quoter.assertQuotedCorrectly(myFile);
-    }
-
-    protected void assertWithoutLocalError() {
-        final FileViewProvider fileViewProvider = myFile.getViewProvider();
-        PsiFile root = fileViewProvider.getPsi(ElixirLanguage.INSTANCE);
-        final List<PsiElement> errorElementList = new LinkedList<PsiElement>();
-
-        root.accept(
-                new PsiRecursiveElementWalkingVisitor() {
-                    @Override
-                    public void visitElement(PsiElement element) {
-                        if (element instanceof PsiErrorElement) {
-                            errorElementList.add(element);
-                        }
-
-                        super.visitElement(element);
-                    }
-                }
-        );
-
-        assertTrue("PsiErrorElements found in parsed file PSI", errorElementList.isEmpty());
     }
 
     @Override

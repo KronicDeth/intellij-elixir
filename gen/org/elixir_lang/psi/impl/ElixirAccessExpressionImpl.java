@@ -105,12 +105,6 @@ public class ElixirAccessExpressionImpl extends ASTWrapperPsiElement implements 
 
   @Override
   @Nullable
-  public ElixirEex getEex() {
-    return PsiTreeUtil.getChildOfType(this, ElixirEex.class);
-  }
-
-  @Override
-  @Nullable
   public ElixirHexadecimalWholeNumber getHexadecimalWholeNumber() {
     return PsiTreeUtil.getChildOfType(this, ElixirHexadecimalWholeNumber.class);
   }

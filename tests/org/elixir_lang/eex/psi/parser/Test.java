@@ -10,11 +10,12 @@ import com.intellij.lexer.EmbeddedTokenTypesProvider;
 import com.intellij.openapi.fileTypes.*;
 import com.intellij.openapi.fileTypes.impl.FileTypeManagerImpl;
 import com.intellij.openapi.vfs.newvfs.FileAttribute;
-import com.intellij.psi.LanguageFileViewProviders;
+import com.intellij.psi.*;
 import com.intellij.psi.templateLanguages.TemplateDataLanguageMappings;
 import com.intellij.psi.templateLanguages.TemplateDataLanguagePatterns;
 import com.intellij.testFramework.MockSchemeManagerFactory;
 import com.intellij.util.messages.MessageBus;
+import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.ElixirParserDefinition;
 import org.elixir_lang.eex.Language;
 import org.elixir_lang.eex.ParserDefinition;
@@ -28,6 +29,8 @@ import org.picocontainer.MutablePicoContainer;
 
 import java.lang.reflect.Field;
 import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 public class Test extends ParsingTestCase {
@@ -53,63 +56,63 @@ public class Test extends ParsingTestCase {
     public void testPhoenixTemplatesLayoutApp() {
         this.myFileExt = "html.eex";
 
-        doTest(true);
+        doTest();
     }
 
     public void testEExTemplate() {
-        doTest(true);
+        doTest();
     }
 
     public void testEExTemplateWithBindings() {
-        doTest(true);
+        doTest();
     }
 
     public void testStringSample() {
-        doTest(true);
+        doTest();
     }
 
     public void testEExTokenizerTestStringWithEmbeddedCode() {
-        doTest(true);
+        doTest();
     }
 
     public void testEExTokenizerTestStringsWithMoreThanOneLine() {
-        doTest(true);
+        doTest();
     }
 
     public void testEExTokenizerTestStringsWithMoreThanOneLineAndExpressionWithMoreThanOneLine(){
-        doTest(true);
+        doTest();
     }
 
     public void testEExTokenizerTestQuotation() {
-        doTest(true);
+        doTest();
     }
 
     public void testEExTokenizerTestQuotationWithDoEnd() {
-        doTest(true);
+        doTest();
     }
 
     public void testEExTokenizerTestQuotationWithInterpolation1() {
-        doTest(true);
+        doTest();
     }
 
     public void testEExTokenizerTestQuotationWithInterpolation2() {
-        doTest(true);
+        doTest();
     }
 
     public void testEExTokenizerTestComments() {
-        doTest(true);
+        doTest();
     }
 
     public void testEExTokenizerTestCommentsWithDoEnd() {
-        doTest(true);
+        doTest();
     }
 
     public void testEExTokenizerTestStringsWithEmbeddedDoEnd() {
-        doTest(true);
+        doTest();
     }
 
     public void testEExTokenizerTestStringsWithEmbeddedStabOperatorEnd() {
-        doTest(true);
+        doTest();
     }
 
     @Override
@@ -124,6 +127,12 @@ public class Test extends ParsingTestCase {
         registerApplicationService(TemplateDataLanguagePatterns.class, new TemplateDataLanguagePatterns());
         myProject.registerService(TemplateDataLanguageMappings.class, new TemplateDataLanguageMappings(myProject));
         LanguageFileViewProviders.INSTANCE.addExplicitExtension(Language.INSTANCE, new Factory());
+    }
+
+    private void doTest() {
+        doTest(true);
+
+        assertWithoutLocalError();
     }
 
     @Override
