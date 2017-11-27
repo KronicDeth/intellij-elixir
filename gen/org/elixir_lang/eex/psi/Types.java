@@ -16,11 +16,10 @@ public interface Types {
   IElementType DATA = new TokenType("Data");
   IElementType ELIXIR = new TokenType("Elixir");
   IElementType EQUALS_MARKER = new TokenType("=");
+  IElementType ESCAPED_OPENING = new TokenType("<%%");
   IElementType FORWARD_SLASH_MARKER = new TokenType("/");
   IElementType OPENING = new TokenType("<%");
   IElementType PIPE_MARKER = new TokenType("|");
-  IElementType QUOTATION = new TokenType("Quotation");
-  IElementType QUOTATION_MARKER = new TokenType("%");
 
   class Factory {
     public static PsiElement createElement(ASTNode node) {

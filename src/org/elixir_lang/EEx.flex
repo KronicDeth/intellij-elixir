@@ -30,40 +30,38 @@ EQUALS_MARKER = "="
 // See https://github.com/elixir-lang/elixir/pull/6281
 FORWARD_SLASH_MARKER = "/"
 PIPE_MARKER = "|"
-QUOTATION_MARKER = "%"
+ESCAPED_OPENING = "<%%"
 
 ANY = [^]
 
 %state COMMENT
 %state ELIXIR
-%state QUOTATION
 %state MARKER_MAYBE
 
 %%
 
 <YYINITIAL> {
-  {OPENING}           { yybegin(MARKER_MAYBE);
-                        return Types.OPENING; }
-  {ANY}               { return Types.DATA; }
+  {ESCAPED_OPENING} { return Types.ESCAPED_OPENING; }
+  {OPENING}         { yybegin(MARKER_MAYBE);
+                      return Types.OPENING; }
+  {ANY}             { return Types.DATA; }
 }
 
 <MARKER_MAYBE> {
-  {COMMENT_MARKER}        { yybegin(COMMENT);
-                            return Types.COMMENT_MARKER; }
-  {EQUALS_MARKER}         { yybegin(ELIXIR);
-                            return Types.EQUALS_MARKER; }
-  {FORWARD_SLASH_MARKER}  { yybegin(ELIXIR);
-                            return Types.FORWARD_SLASH_MARKER; }
-  {PIPE_MARKER}           { yybegin(ELIXIR);
-                            return Types.PIPE_MARKER; }
-  {QUOTATION_MARKER}      { yybegin(QUOTATION);
-                            return Types.QUOTATION_MARKER; }
-  {ANY}                   { handleInState(ELIXIR); }
+  {COMMENT_MARKER}       { yybegin(COMMENT);
+                           return Types.COMMENT_MARKER; }
+  {EQUALS_MARKER}        { yybegin(ELIXIR);
+                           return Types.EQUALS_MARKER; }
+  {FORWARD_SLASH_MARKER} { yybegin(ELIXIR);
+                           return Types.FORWARD_SLASH_MARKER; }
+  {PIPE_MARKER}          { yybegin(ELIXIR);
+                           return Types.PIPE_MARKER; }
+  {ANY}                  { handleInState(ELIXIR); }
 }
 
-<COMMENT, ELIXIR, QUOTATION> {
-  {CLOSING}  { yybegin(YYINITIAL);
-               return Types.CLOSING; }
+<COMMENT, ELIXIR> {
+  {CLOSING} { yybegin(YYINITIAL);
+              return Types.CLOSING; }
 }
 
 <COMMENT> {
@@ -72,8 +70,4 @@ ANY = [^]
 
 <ELIXIR> {
   {ANY} { return Types.ELIXIR; }
-}
-
-<QUOTATION> {
-  {ANY} { return Types.QUOTATION; }
 }

@@ -17,19 +17,13 @@ import java.util.stream.Stream;
  */
 @RunWith(Parameterized.class)
 public class MinimalBodyTest extends Test {
-    private static final Lex[] PREFIX = new Lex[]{
-            new Lex("<%", Types.OPENING, Flex.MARKER_MAYBE)
-    };
-    private static final Lex[][] INFIXES = new Lex[][]{
-            {new Lex("body", Types.ELIXIR, Flex.ELIXIR)},
-            {new Lex("#", Types.COMMENT_MARKER, Flex.COMMENT), new Lex("body", Types.COMMENT, Flex.COMMENT)},
-            {new Lex("%", Types.QUOTATION_MARKER, Flex.QUOTATION), new Lex("body", Types.QUOTATION, Flex.QUOTATION)},
-            {new Lex("/", Types.FORWARD_SLASH_MARKER, Flex.ELIXIR), new Lex("body", Types.ELIXIR, Flex.ELIXIR)},
-            {new Lex("=", Types.EQUALS_MARKER, Flex.ELIXIR), new Lex("body", Types.ELIXIR, Flex.ELIXIR)},
-            {new Lex("|", Types.PIPE_MARKER, Flex.ELIXIR), new Lex("body", Types.ELIXIR, Flex.ELIXIR)}
-    };
-    private static final Lex[] SUFFIX = new Lex[]{
-            new Lex("%>", Types.CLOSING, Flex.YYINITIAL)
+    private static final Lex[][] TAGS = new Lex[][]{
+            {new Lex("<%", Types.OPENING, Flex.MARKER_MAYBE), new Lex("body", Types.ELIXIR, Flex.ELIXIR), new Lex("%>", Types.CLOSING, Flex.YYINITIAL)},
+            {new Lex("<%", Types.OPENING, Flex.MARKER_MAYBE), new Lex("#", Types.COMMENT_MARKER, Flex.COMMENT), new Lex("body", Types.COMMENT, Flex.COMMENT), new Lex("%>", Types.CLOSING, Flex.YYINITIAL)},
+            {new Lex("<%%", Types.ESCAPED_OPENING, Flex.YYINITIAL), new Lex("body%>", Types.DATA, Flex.YYINITIAL)},
+            {new Lex("<%", Types.OPENING, Flex.MARKER_MAYBE), new Lex("/", Types.FORWARD_SLASH_MARKER, Flex.ELIXIR), new Lex("body", Types.ELIXIR, Flex.ELIXIR), new Lex("%>", Types.CLOSING, Flex.YYINITIAL)},
+            {new Lex("<%", Types.OPENING, Flex.MARKER_MAYBE), new Lex("=", Types.EQUALS_MARKER, Flex.ELIXIR), new Lex("body", Types.ELIXIR, Flex.ELIXIR), new Lex("%>", Types.CLOSING, Flex.YYINITIAL)},
+            {new Lex("<%", Types.OPENING, Flex.MARKER_MAYBE), new Lex("|", Types.PIPE_MARKER, Flex.ELIXIR), new Lex("body", Types.ELIXIR, Flex.ELIXIR), new Lex("%>", Types.CLOSING, Flex.YYINITIAL)}
     };
 
     @Contract(pure = true)
@@ -38,10 +32,10 @@ public class MinimalBodyTest extends Test {
     public static Iterable<Object> parameters() {
         Collection<Object> parameters = new ArrayList<>();
 
-        for (Lex[] firstInfix : INFIXES) {
-            for (Lex[] secondInfix : INFIXES) {
+        for (Lex[] firstTag : TAGS) {
+            for (Lex[] secondTag : TAGS) {
                 Lex[] lexes = Stream
-                        .of(PREFIX, firstInfix, SUFFIX, PREFIX, secondInfix, SUFFIX)
+                        .of(firstTag, secondTag)
                         .flatMap(Stream::of)
                         .toArray(Lex[]::new);
 

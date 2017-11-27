@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ParserDefinition implements com.intellij.lang.ParserDefinition {
     private static final TokenSet COMMENT_TOKENS = TokenSet.create(Types.COMMENT);
-    private static final TokenSet STRING_LITERAL_ELEMENTS = TokenSet.create(Types.QUOTATION);
+    private static final TokenSet STRING_LITERAL_ELEMENTS = TokenSet.EMPTY;
     private static final TokenSet WHITESPACE_TOKENS = TokenSet.EMPTY;
 
     @NotNull

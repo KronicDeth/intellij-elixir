@@ -102,7 +102,7 @@ public class Test extends org.elixir_lang.flex_lexer.Test<LookAhead> {
             Lex lex = lexes[i];
 
             // text and tokenType before advancing to state because lexer is look-ahead
-            assertEquals("Text #" + i, lex.text, lexer.getTokenText());
+            assertEquals("Text #" + i + " expected (\"" + lex.text + "\") differs from actual (\"" + lexer.getTokenText() +  "\")", lex.text, lexer.getTokenText());
             assertEquals("TokenType " + i, lex.tokenType, lexer.getTokenType());
 
             lexer.advance();

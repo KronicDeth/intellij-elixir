@@ -58,47 +58,28 @@ public class Parser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // DATA? (tags DATA?)?
+  // (DATA | ESCAPED_OPENING | tag)*
   static boolean eexFile(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "eexFile")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = eexFile_0(b, l + 1);
-    r = r && eexFile_1(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
+    int c = current_position_(b);
+    while (true) {
+      if (!eexFile_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "eexFile", c)) break;
+      c = current_position_(b);
+    }
+    return true;
   }
 
-  // DATA?
+  // DATA | ESCAPED_OPENING | tag
   private static boolean eexFile_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "eexFile_0")) return false;
-    consumeToken(b, DATA);
-    return true;
-  }
-
-  // (tags DATA?)?
-  private static boolean eexFile_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "eexFile_1")) return false;
-    eexFile_1_0(b, l + 1);
-    return true;
-  }
-
-  // tags DATA?
-  private static boolean eexFile_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "eexFile_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = tags(b, l + 1);
-    r = r && eexFile_1_0_1(b, l + 1);
+    r = consumeToken(b, DATA);
+    if (!r) r = consumeToken(b, ESCAPED_OPENING);
+    if (!r) r = tag(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
-  }
-
-  // DATA?
-  private static boolean eexFile_1_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "eexFile_1_0_1")) return false;
-    consumeToken(b, DATA);
-    return true;
   }
 
   /* ********************************************************** */
@@ -141,28 +122,7 @@ public class Parser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // QUOTATION_MARKER QUOTATION?
-  static boolean quotationBody(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "quotationBody")) return false;
-    if (!nextTokenIs(b, QUOTATION_MARKER)) return false;
-    boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_);
-    r = consumeToken(b, QUOTATION_MARKER);
-    p = r; // pin = 1
-    r = r && quotationBody_1(b, l + 1);
-    exit_section_(b, l, m, r, p, null);
-    return r || p;
-  }
-
-  // QUOTATION?
-  private static boolean quotationBody_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "quotationBody_1")) return false;
-    consumeToken(b, QUOTATION);
-    return true;
-  }
-
-  /* ********************************************************** */
-  // OPENING (commentBody | quotationBody | elixirBody) CLOSING
+  // OPENING (commentBody | elixirBody) CLOSING
   public static boolean tag(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "tag")) return false;
     if (!nextTokenIs(b, OPENING)) return false;
@@ -176,59 +136,15 @@ public class Parser implements PsiParser, LightPsiParser {
     return r || p;
   }
 
-  // commentBody | quotationBody | elixirBody
+  // commentBody | elixirBody
   private static boolean tag_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "tag_1")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = commentBody(b, l + 1);
-    if (!r) r = quotationBody(b, l + 1);
     if (!r) r = elixirBody(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
-  }
-
-  /* ********************************************************** */
-  // tag (DATA? tag)*
-  static boolean tags(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "tags")) return false;
-    if (!nextTokenIs(b, OPENING)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = tag(b, l + 1);
-    r = r && tags_1(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // (DATA? tag)*
-  private static boolean tags_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "tags_1")) return false;
-    int c = current_position_(b);
-    while (true) {
-      if (!tags_1_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "tags_1", c)) break;
-      c = current_position_(b);
-    }
-    return true;
-  }
-
-  // DATA? tag
-  private static boolean tags_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "tags_1_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = tags_1_0_0(b, l + 1);
-    r = r && tag(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // DATA?
-  private static boolean tags_1_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "tags_1_0_0")) return false;
-    consumeToken(b, DATA);
-    return true;
   }
 
 }

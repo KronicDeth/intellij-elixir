@@ -20,22 +20,18 @@
     DATA = "Data"
     EQUALS_MARKER = "="
     ELIXIR = "Elixir"
+    ESCAPED_OPENING = "<%%"
     FORWARD_SLASH_MARKER = "/"
     OPENING = "<%"
     PIPE_MARKER = "|"
-    QUOTATION = "Quotation"
-    QUOTATION_MARKER = "%"
   ]
 }
 
-private eexFile ::= DATA? (tags DATA?)?
-private tags ::= tag (DATA? tag)*
-tag ::= OPENING (commentBody | quotationBody | elixirBody) CLOSING
+private eexFile ::= (DATA | ESCAPED_OPENING | tag)*
+tag ::= OPENING (commentBody | elixirBody) CLOSING
         { pin = 1 }
 
 private commentBody ::= COMMENT_MARKER COMMENT?
                         { pin = 1 }
 private elixirBody ::=  elixirMarker? ELIXIR?
 private elixirMarker ::= EQUALS_MARKER | FORWARD_SLASH_MARKER | PIPE_MARKER
-private quotationBody ::= QUOTATION_MARKER QUOTATION?
-                          { pin = 1 }

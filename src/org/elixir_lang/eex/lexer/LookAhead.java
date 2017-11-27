@@ -8,8 +8,7 @@ public class LookAhead extends com.intellij.lexer.LookAheadLexer {
     public static final TokenSet MERGABLE_TOKEN_SET = TokenSet.create(
             Types.COMMENT,
             Types.DATA,
-            Types.ELIXIR,
-            Types.QUOTATION
+            Types.ELIXIR
     );
 
     public LookAhead() {

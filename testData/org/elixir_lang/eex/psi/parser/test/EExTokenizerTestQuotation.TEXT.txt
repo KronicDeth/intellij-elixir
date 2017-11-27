@@ -1,3 +1,4 @@
 PsiFile(plain text):EExTokenizerTestQuotation.eex(0,15)
   PsiElement(PLAIN_TEXT)('foo ')(0,4)
-  PsiElement(EEx)('<%% true %>')(4,15)
+  PsiElement(EEx)('<%%')(4,7)
+  PsiElement(PLAIN_TEXT)(' true %>')(7,15)
