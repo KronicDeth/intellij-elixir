@@ -2259,8 +2259,8 @@ accessExpression ::= atNumericOperation |
 // See eexFile in EEx.bnf
 eex ::= (EEX_DATA | EEX_ESCAPED_OPENING | eexTag)+
 
+// CANNOT be `{ pin = 1 }` because an `EEX_OPENING` is also used in `doBlock`
 eexTag ::= EEX_OPENING (eexCommentBody | eexElixirBody) EEX_CLOSING
-           { pin = 1 }
 
 private eexCommentBody ::= EEX_COMMENT_MARKER EEX_COMMENT?
                            { pin = 1 }
@@ -2741,16 +2741,30 @@ blockItem ::= blockIdentifier endOfExpression? // @see https://github.com/elixir
 blockList ::= blockItem+
               { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
 
+private eexStabOperationPrefix ::= EEX_OPENING stabOperationPrefix EEX_CLOSING
+eexStabBody ::= eex
+eexStabOperation ::= eexStabOperationPrefix eexStabBody?
+eexStab ::= eexStabOperation (eexStabOperation)* |
+            eexStabBody
+
+private doBlockEExBody ::= EEX_CLOSING
+                           eexStab? endOfExpression? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L273
+                           blockList? endOfExpression? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L274
+                           EEX_OPENING
+private doBlockElixirBody ::= stab? endOfExpression? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L273
+                              blockList? endOfExpression? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L274
+private doBlockBody ::= doBlockEExBody | doBlockElixirBody
+
 // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L272-L275
 doBlock ::= EOL* DO endOfExpression?
-            stab? endOfExpression? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L273
-            blockList? endOfExpression? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L274
+            doBlockBody
             END
             {
               implements = "org.elixir_lang.psi.QuotableArguments"
               methods = [quoteArguments]
               pin = DO
             }
+
 
 // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L143-L148
 unmatchedExpression ::= unmatchedCaptureNonNumericOperation |

@@ -47,6 +47,9 @@ public interface ElixirTypes {
   IElementType DOT_INFIX_OPERATOR = new ElixirElementType("DOT_INFIX_OPERATOR");
   IElementType DO_BLOCK = new ElixirElementType("DO_BLOCK");
   IElementType EEX = new ElixirElementType("EEX");
+  IElementType EEX_STAB = new ElixirElementType("EEX_STAB");
+  IElementType EEX_STAB_BODY = new ElixirElementType("EEX_STAB_BODY");
+  IElementType EEX_STAB_OPERATION = new ElixirElementType("EEX_STAB_OPERATION");
   IElementType EEX_TAG = new ElixirElementType("EEX_TAG");
   IElementType EMPTY_PARENTHESES = new ElixirElementType("EMPTY_PARENTHESES");
   IElementType ENCLOSED_HEXADECIMAL_ESCAPE_SEQUENCE = new ElixirElementType("ENCLOSED_HEXADECIMAL_ESCAPE_SEQUENCE");
@@ -490,6 +493,15 @@ public interface ElixirTypes {
       }
       else if (type == EEX) {
         return new ElixirEexImpl(node);
+      }
+      else if (type == EEX_STAB) {
+        return new ElixirEexStabImpl(node);
+      }
+      else if (type == EEX_STAB_BODY) {
+        return new ElixirEexStabBodyImpl(node);
+      }
+      else if (type == EEX_STAB_OPERATION) {
+        return new ElixirEexStabOperationImpl(node);
       }
       else if (type == EEX_TAG) {
         return new ElixirEexTagImpl(node);

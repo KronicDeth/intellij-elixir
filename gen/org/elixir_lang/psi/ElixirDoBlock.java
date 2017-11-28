@@ -12,6 +12,9 @@ public interface ElixirDoBlock extends QuotableArguments {
   @Nullable
   ElixirBlockList getBlockList();
 
+  @Nullable
+  ElixirEexStab getEexStab();
+
   @NotNull
   List<ElixirEndOfExpression> getEndOfExpressionList();
 
