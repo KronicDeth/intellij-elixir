@@ -173,6 +173,18 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitEexBlockIdentifier(@NotNull ElixirEexBlockIdentifier o) {
+    visitPsiElement(o);
+  }
+
+  public void visitEexBlockItem(@NotNull ElixirEexBlockItem o) {
+    visitPsiElement(o);
+  }
+
+  public void visitEexBlockList(@NotNull ElixirEexBlockList o) {
+    visitPsiElement(o);
+  }
+
   public void visitEexStab(@NotNull ElixirEexStab o) {
     visitPsiElement(o);
   }

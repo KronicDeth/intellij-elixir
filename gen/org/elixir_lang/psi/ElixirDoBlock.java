@@ -13,6 +13,9 @@ public interface ElixirDoBlock extends QuotableArguments {
   ElixirBlockList getBlockList();
 
   @Nullable
+  ElixirEexBlockList getEexBlockList();
+
+  @Nullable
   ElixirEexStab getEexStab();
 
   @NotNull

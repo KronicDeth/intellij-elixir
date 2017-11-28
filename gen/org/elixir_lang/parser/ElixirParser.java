@@ -9,7 +9,7 @@ import com.intellij.lang.PsiParser;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 
-import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
+import static org.elixir_lang.grammar.parser.GeneratedParserUtilBase.*;
 import static org.elixir_lang.parser.ExternalRules.ifVersion;
 import static org.elixir_lang.psi.ElixirTypes.*;
 
@@ -138,6 +138,15 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     }
     else if (t == EEX) {
       r = eex(b, 0);
+    }
+    else if (t == EEX_BLOCK_IDENTIFIER) {
+      r = eexBlockIdentifier(b, 0);
+    }
+    else if (t == EEX_BLOCK_ITEM) {
+      r = eexBlockItem(b, 0);
+    }
+    else if (t == EEX_BLOCK_LIST) {
+      r = eexBlockList(b, 0);
     }
     else if (t == EEX_STAB) {
       r = eexStab(b, 0);
@@ -1839,7 +1848,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   /* ********************************************************** */
   // EEX_CLOSING
   //                            eexStab? endOfExpression? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L273
-  //                            blockList? endOfExpression? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L274
+  //                            eexBlockList? endOfExpression? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L274
   //                            EEX_OPENING
   static boolean doBlockEExBody(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "doBlockEExBody")) return false;
@@ -1870,10 +1879,10 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // blockList?
+  // eexBlockList?
   private static boolean doBlockEExBody_3(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "doBlockEExBody_3")) return false;
-    blockList(b, l + 1);
+    eexBlockList(b, l + 1);
     return true;
   }
 
@@ -1991,6 +2000,52 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, EEX_ESCAPED_OPENING);
     if (!r) r = eexTag(b, l + 1);
     exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // EEX_OPENING blockIdentifier EEX_CLOSING
+  public static boolean eexBlockIdentifier(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "eexBlockIdentifier")) return false;
+    if (!nextTokenIs(b, EEX_OPENING)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, EEX_OPENING);
+    r = r && blockIdentifier(b, l + 1);
+    r = r && consumeToken(b, EEX_CLOSING);
+    exit_section_(b, m, EEX_BLOCK_IDENTIFIER, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // eexBlockIdentifier
+  //                  eexStab
+  public static boolean eexBlockItem(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "eexBlockItem")) return false;
+    if (!nextTokenIs(b, EEX_OPENING)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = eexBlockIdentifier(b, l + 1);
+    r = r && eexStab(b, l + 1);
+    exit_section_(b, m, EEX_BLOCK_ITEM, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // eexBlockItem+
+  public static boolean eexBlockList(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "eexBlockList")) return false;
+    if (!nextTokenIs(b, EEX_OPENING)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = eexBlockItem(b, l + 1);
+    int c = current_position_(b);
+    while (r) {
+      if (!eexBlockItem(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "eexBlockList", c)) break;
+      c = current_position_(b);
+    }
+    exit_section_(b, m, EEX_BLOCK_LIST, r);
     return r;
   }
 

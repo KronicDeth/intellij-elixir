@@ -2742,14 +2742,19 @@ blockList ::= blockItem+
               { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
 
 private eexStabOperationPrefix ::= EEX_OPENING stabOperationPrefix EEX_CLOSING
+eexBlockIdentifier ::= EEX_OPENING blockIdentifier EEX_CLOSING
 eexStabBody ::= eex
 eexStabOperation ::= eexStabOperationPrefix eexStabBody?
 eexStab ::= eexStabOperation (eexStabOperation)* |
             eexStabBody
 
+eexBlockItem ::= eexBlockIdentifier
+                 eexStab
+eexBlockList ::= eexBlockItem+
+
 private doBlockEExBody ::= EEX_CLOSING
                            eexStab? endOfExpression? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L273
-                           blockList? endOfExpression? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L274
+                           eexBlockList? endOfExpression? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L274
                            EEX_OPENING
 private doBlockElixirBody ::= stab? endOfExpression? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L273
                               blockList? endOfExpression? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L274
