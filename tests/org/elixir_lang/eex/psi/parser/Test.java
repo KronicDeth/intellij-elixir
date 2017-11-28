@@ -135,6 +135,16 @@ public class Test extends ParsingTestCase {
         doTest();
     }
 
+    public void testEExTokenizerTestRaiseSyntaxErrorWhenThereIsStartMarkAndNoEndMark1() {
+        doTest(true);
+        assertWithLocalError();
+    }
+
+    public void testEExTokenizerTestRaiseSyntaxErrorWhenThereIsStartMarkAndNoEndMark2() {
+        doTest(true);
+        assertWithLocalError();
+    }
+
     @Override
     protected String getTestDataPath() {
         return "testData/org/elixir_lang/eex/psi/parser/test";
