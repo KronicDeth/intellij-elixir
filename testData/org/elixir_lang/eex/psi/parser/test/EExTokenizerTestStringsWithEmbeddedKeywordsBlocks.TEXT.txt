@@ -1,0 +1,7 @@
+PsiFile(plain text):EExTokenizerTestStringsWithEmbeddedKeywordsBlocks.eex(0,45)
+  PsiElement(PLAIN_TEXT)('foo ')(0,4)
+  PsiElement(EEx)('<% if true do %>')(4,20)
+  PsiElement(PLAIN_TEXT)('bar')(20,23)
+  PsiElement(EEx)('<% else %>')(23,33)
+  PsiElement(PLAIN_TEXT)('baz')(33,36)
+  PsiElement(EEx)('<% end %>')(36,45)

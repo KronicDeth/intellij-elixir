@@ -115,6 +115,10 @@ public class Test extends ParsingTestCase {
         doTest();
     }
 
+    public void testEExTokenizerTestStringsWithEmbeddedKeywordsBlocks() {
+        doTest();
+    }
+
     @Override
     protected String getTestDataPath() {
         return "testData/org/elixir_lang/eex/psi/parser/test";
