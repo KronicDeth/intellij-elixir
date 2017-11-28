@@ -1,0 +1,4 @@
+PsiFile(plain text):EExTokenizerTestTrimModeWithCRLF.eex(0,18)
+  PsiElement(PLAIN_TEXT)('0\n  ')(0,4)
+  PsiElement(EEx)('<%= 12 %>')(4,13)
+  PsiElement(PLAIN_TEXT)('  \n34')(13,18)
