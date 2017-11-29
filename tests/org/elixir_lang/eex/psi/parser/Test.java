@@ -54,19 +54,31 @@ public class Test extends ParsingTestCase {
     }
 
     public void testPhoenixTemplatesLayoutApp() {
-        if (!isTravis()) {
-            this.myFileExt = "html.eex";
-
-            doTest();
-        }
+        doHTMLTest();
     }
 
     public void testPhoenixTemplatesPageIndex() {
-        if (!isTravis()) {
-            this.myFileExt = "html.eex";
+        doHTMLTest();
+    }
 
-            doTest();
-        }
+    public void testPhoenixTemplatesUserEdit() {
+        doHTMLTest();
+    }
+
+    public void testPhoenixTemplatesUserForm() {
+        doHTMLTest();
+    }
+
+    public void testPhoenixTemplatesUserIndex() {
+        doHTMLTest();
+    }
+
+    public void testPhoenixTemplatesUserNew() {
+        doHTMLTest();
+    }
+
+    public void testPhoenixTemplatesUserShow() {
+        doHTMLTest();
     }
 
     public void testEExTemplate() {
@@ -173,6 +185,14 @@ public class Test extends ParsingTestCase {
         doTest(true);
 
         assertWithoutLocalError();
+    }
+
+    private void doHTMLTest() {
+        if (!isTravis()) {
+            this.myFileExt = "html.eex";
+
+            doTest();
+        }
     }
 
     @Override

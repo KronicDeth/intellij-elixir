@@ -6,22 +6,22 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
-import org.elixir_lang.psi.ElixirAnonymousFunction;
 import org.elixir_lang.psi.ElixirEndOfExpression;
+import org.elixir_lang.psi.ElixirStabOperation;
 import org.elixir_lang.psi.ElixirStabOperations;
 import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class ElixirAnonymousFunctionImpl extends ASTWrapperPsiElement implements ElixirAnonymousFunction {
+public class ElixirStabOperationsImpl extends ASTWrapperPsiElement implements ElixirStabOperations {
 
-  public ElixirAnonymousFunctionImpl(ASTNode node) {
+  public ElixirStabOperationsImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull ElixirVisitor visitor) {
-    visitor.visitAnonymousFunction(this);
+    visitor.visitStabOperations(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -37,8 +37,8 @@ public class ElixirAnonymousFunctionImpl extends ASTWrapperPsiElement implements
 
   @Override
   @NotNull
-  public ElixirStabOperations getStabOperations() {
-    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirStabOperations.class));
+  public List<ElixirStabOperation> getStabOperationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirStabOperation.class);
   }
 
   @NotNull

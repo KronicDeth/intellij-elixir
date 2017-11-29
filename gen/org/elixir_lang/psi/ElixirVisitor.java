@@ -810,6 +810,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitQuotable(o);
   }
 
+  public void visitStabOperations(@NotNull ElixirStabOperations o) {
+    visitQuotable(o);
+  }
+
   public void visitStabParenthesesSignature(@NotNull ElixirStabParenthesesSignature o) {
     visitQuotable(o);
     // visitWhen(o);

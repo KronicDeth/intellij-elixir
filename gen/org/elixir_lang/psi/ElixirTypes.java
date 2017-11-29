@@ -184,6 +184,7 @@ public interface ElixirTypes {
   IElementType STAB_INFIX_OPERATOR = new ElixirElementType("STAB_INFIX_OPERATOR");
   IElementType STAB_NO_PARENTHESES_SIGNATURE = new ElixirElementType("STAB_NO_PARENTHESES_SIGNATURE");
   IElementType STAB_OPERATION = new ElixirElementType("STAB_OPERATION");
+  IElementType STAB_OPERATIONS = new ElixirElementType("STAB_OPERATIONS");
   IElementType STAB_PARENTHESES_SIGNATURE = new ElixirElementType("STAB_PARENTHESES_SIGNATURE");
   IElementType STRING_HEREDOC = new ElixirElementType("STRING_HEREDOC");
   IElementType STRING_HEREDOC_LINE = new ElixirElementType("STRING_HEREDOC_LINE");
@@ -904,6 +905,9 @@ public interface ElixirTypes {
       }
       else if (type == STAB_OPERATION) {
         return new ElixirStabOperationImpl(node);
+      }
+      else if (type == STAB_OPERATIONS) {
+        return new ElixirStabOperationsImpl(node);
       }
       else if (type == STAB_PARENTHESES_SIGNATURE) {
         return new ElixirStabParenthesesSignatureImpl(node);

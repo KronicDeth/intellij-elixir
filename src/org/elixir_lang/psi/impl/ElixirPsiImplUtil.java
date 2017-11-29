@@ -2130,8 +2130,8 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirAnonymousFunction anonymousFunction) {
-        Quotable stab = anonymousFunction.getStab();
-        OtpErlangObject quotedStab = stab.quote();
+        Quotable stabOperations = anonymousFunction.getStabOperations();
+        OtpErlangObject quotedStab = stabOperations.quote();
 
         OtpErlangList metadata = metadata(anonymousFunction);
 
@@ -3708,8 +3708,25 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject quote(ElixirStabOperations stabOperations) {
+        List<ElixirStabOperation> stabOperationList = stabOperations.getStabOperationList();
+        Deque<OtpErlangObject> quotedChildren = new ArrayDeque<>();
+
+        for (ElixirStabOperation stabOperation : stabOperationList) {
+            quotedChildren.add(stabOperation.quote());
+        }
+
+        int size = quotedChildren.size();
+
+        OtpErlangObject[] quotedArray = new OtpErlangObject[size];
+        quotedArray = quotedChildren.toArray(quotedArray);
+
+        return new OtpErlangList(quotedArray);
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quote(ElixirStab stab) {
-        Deque<OtpErlangObject> quotedChildren = new ArrayDeque<OtpErlangObject>();
 
         ElixirStabBody stabBody = stab.getStabBody();
         OtpErlangObject quoted;
@@ -3718,17 +3735,9 @@ public class ElixirPsiImplUtil {
             // TODO port quote(ElixirStabExpression)'s unary handling
             quoted = stabBody.quote();
         } else {
-            List<ElixirStabOperation> stabOperationList = stab.getStabOperationList();
+            ElixirStabOperations stabOperations = stab.getStabOperations();
+            quoted = stabOperations.quote();
 
-            for (ElixirStabOperation stabOperation : stabOperationList) {
-                quotedChildren.add(stabOperation.quote());
-            }
-
-            int size = quotedChildren.size();
-
-            OtpErlangObject[] quotedArray = new OtpErlangObject[size];
-            quotedArray = quotedChildren.toArray(quotedArray);
-            quoted = new OtpErlangList(quotedArray);
         }
 
         return quoted;

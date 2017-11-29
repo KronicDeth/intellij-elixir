@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
+import static com.intellij.psi.TokenType.BAD_CHARACTER;
 import static com.intellij.psi.TokenType.WHITE_SPACE;
 import static org.elixir_lang.eex.psi.Types.*;
 import static org.elixir_lang.eex.psi.Types.COMMENT;
@@ -30,6 +31,7 @@ public class EmbeddedElixir extends LexerBase {
     final Lexer elixirLexer;
 
     static {
+        EEX_TOKEN_TYPE_TO_ELIXIR_TOKEN_TYPE.put(BAD_CHARACTER, BAD_CHARACTER);
         EEX_TOKEN_TYPE_TO_ELIXIR_TOKEN_TYPE.put(CLOSING, EEX_CLOSING);
         EEX_TOKEN_TYPE_TO_ELIXIR_TOKEN_TYPE.put(COMMENT, EEX_COMMENT);
         EEX_TOKEN_TYPE_TO_ELIXIR_TOKEN_TYPE.put(COMMENT_MARKER, EEX_COMMENT_MARKER);

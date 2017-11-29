@@ -2143,7 +2143,8 @@ stabInfixOperator ::= EOL* STAB_OPERATOR EOL*
 private stabOperationPrefix ::= stabParenthesesSignature stabInfixOperator |
                                 stabNoParenthesesSignature stabInfixOperator |
                                 stabInfixOperator
-private stabBodyExpression ::= !stabOperationPrefix expression
+private stabBodyExpression ::= EEX_CLOSING eex EEX_OPENING |
+                               !stabOperationPrefix expression
 stabBody ::= stabBodyExpression (endOfExpression stabBodyExpression)*
              {
                implements = "org.elixir_lang.psi.Quotable"
@@ -2165,14 +2166,17 @@ stabOperation ::= stabOperationPrefix stabBody?
                     ]
                   }
 
+stabOperations ::= stabOperation (endOfExpression stabOperation)*
+                   { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L268-L269
-stab ::= stabOperation (endOfExpression stabOperation)* |
-         stabBody
+stab ::= stabOperations | stabBody
          { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L205
 anonymousFunction ::= FN endOfExpression?
-                      stab endOfExpression?
+                      // -> is required, so use stabOperations directly and not stab as would be used used in `doBlock`
+                      stabOperations endOfExpression?
                       END
                       {
                         implements = [
