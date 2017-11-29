@@ -22,8 +22,6 @@ public abstract class Test<L extends Lexer> {
 
     protected abstract L lexer();
 
-    protected abstract int initialState();
-
     protected void start(@NotNull CharSequence charSequence) {
         lexer.start(charSequence);
     }

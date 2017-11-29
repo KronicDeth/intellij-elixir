@@ -92,9 +92,10 @@ public class SigilPromoterTest extends Test {
         start(identifierCharSequence);
 
         for (TokenTypeState tokenTypeState: tokenTypeStates) {
+            assertEquals(tokenTypeState.tokenType, lexer.getTokenType());
+
             lexer.advance();
 
-            assertEquals(tokenTypeState.tokenType, lexer.getTokenType());
             assertEquals(tokenTypeState.state, lexer.getState());
         }
 

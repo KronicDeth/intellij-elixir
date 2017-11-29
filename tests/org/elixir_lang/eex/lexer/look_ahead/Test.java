@@ -16,19 +16,19 @@ import static org.junit.Assert.assertEquals;
 public class Test extends org.elixir_lang.flex_lexer.Test<LookAhead> {
     public static class Lex {
         @NotNull
-        public final CharSequence text;
+        final CharSequence text;
         @NotNull
         public final IElementType tokenType;
         public final int state;
 
-        public Lex(@NotNull CharSequence text, @NotNull IElementType tokenType, int state) {
+        Lex(@NotNull CharSequence text, @NotNull IElementType tokenType, int state) {
             this.text = text;
             this.tokenType = tokenType;
             this.state = state;
         }
 
         @NotNull
-        public CharSequence text() {
+        CharSequence text() {
             return text;
         }
 
@@ -40,15 +40,15 @@ public class Test extends org.elixir_lang.flex_lexer.Test<LookAhead> {
 
     public static class Sequence {
         @NotNull
-        public final Lex[] lexes;
+        final Lex[] lexes;
         @NotNull
-        public final CharSequence text;
+        final CharSequence text;
 
         private static String text(@NotNull Lex... lexes) {
             return Arrays.stream(lexes).map(Lex::text).collect(Collectors.joining());
         }
 
-        public Sequence(@NotNull Lex... lexes) {
+        Sequence(@NotNull Lex... lexes) {
             this.lexes = lexes;
             this.text = text(lexes);
         }
@@ -58,12 +58,6 @@ public class Test extends org.elixir_lang.flex_lexer.Test<LookAhead> {
                     Arrays.stream(lexes).map(Lex::toString).collect(Collectors.joining("; "));
         }
     }
-
-    /*
-     * Constants
-     */
-
-    public static final int INITIAL_STATE = Flex.YYINITIAL;
 
     /*
      * Fields
@@ -83,11 +77,6 @@ public class Test extends org.elixir_lang.flex_lexer.Test<LookAhead> {
     /*
      * Methods
      */
-
-    @Override
-    protected int initialState() {
-        return INITIAL_STATE;
-    }
 
     @Override
     protected LookAhead lexer() {

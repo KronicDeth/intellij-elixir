@@ -52,9 +52,7 @@ public abstract class TokenTest extends Test {
     public void token() throws IOException {
         start(charSequence);
 
-        lexer.advance();
         assertEquals(tokenType, lexer.getTokenType());
-        assertEquals(lexicalState, lexer.getState());
 
         lexer.advance();
 
@@ -63,5 +61,7 @@ public abstract class TokenTest extends Test {
         } else {
             assertTrue("Failure: expected all of \"" + charSequence + "\" not to be consumed", lexer.getTokenType() != null);
         }
+
+        assertEquals(lexicalState, lexer.getState());
     }
 }

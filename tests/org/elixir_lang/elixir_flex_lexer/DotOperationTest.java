@@ -36,20 +36,21 @@ public class DotOperationTest extends Test {
         CharSequence charSequence = "&&(";
         start(charSequence);
 
-        lexer.advance();
-
         assertEquals(ElixirTypes.AND_SYMBOL_OPERATOR, lexer.getTokenType());
+
+        lexer.advance();
+
         assertEquals(ElixirFlexLexer.CALL_MAYBE, lexer.getState());
-
-        lexer.advance();
-
         assertEquals(ElixirTypes.CALL, lexer.getTokenType());
-        assertEquals(initialState(), lexer.getState());
 
         lexer.advance();
 
+        assertEquals(ElixirFlexLexer.YYINITIAL, lexer.getState());
         assertEquals(ElixirTypes.OPENING_PARENTHESIS, lexer.getTokenType());
-        assertEquals(initialState(), lexer.getState());
+
+        lexer.advance();
+
+        assertEquals(ElixirFlexLexer.YYINITIAL, lexer.getState());
 
         lexer.advance();
 
@@ -61,20 +62,21 @@ public class DotOperationTest extends Test {
         CharSequence charSequence = "&&(";
         start(charSequence);
 
-        lexer.advance();
-
         assertEquals(ElixirTypes.AND_SYMBOL_OPERATOR, lexer.getTokenType());
+
+        lexer.advance();
+
         assertEquals(ElixirFlexLexer.CALL_MAYBE, lexer.getState());
-
-        lexer.advance();
-
         assertEquals(ElixirTypes.CALL, lexer.getTokenType());
-        assertEquals(initialState(), lexer.getState());
 
         lexer.advance();
 
+        assertEquals(ElixirFlexLexer.YYINITIAL, lexer.getState());
         assertEquals(ElixirTypes.OPENING_PARENTHESIS, lexer.getTokenType());
-        assertEquals(initialState(), lexer.getState());
+
+        lexer.advance();
+
+        assertEquals(ElixirFlexLexer.YYINITIAL, lexer.getState());
 
         lexer.advance();
 
@@ -86,20 +88,21 @@ public class DotOperationTest extends Test {
         CharSequence charSequence = "&&[";
         start(charSequence);
 
-        lexer.advance();
-
         assertEquals(ElixirTypes.AND_SYMBOL_OPERATOR, lexer.getTokenType());
+
+        lexer.advance();
+
         assertEquals(ElixirFlexLexer.CALL_MAYBE, lexer.getState());
-
-        lexer.advance();
-
         assertEquals(ElixirTypes.CALL, lexer.getTokenType());
-        assertEquals(initialState(), lexer.getState());
 
         lexer.advance();
 
+        assertEquals(ElixirFlexLexer.YYINITIAL, lexer.getState());
         assertEquals(ElixirTypes.OPENING_BRACKET, lexer.getTokenType());
-        assertEquals(initialState(), lexer.getState());
+
+        lexer.advance();
+
+        assertEquals(ElixirFlexLexer.YYINITIAL, lexer.getState());
 
         lexer.advance();
 

@@ -58,14 +58,15 @@ public class CharacterTest extends org.elixir_lang.elixir_flex_lexer.Test {
     public void validCharacterCode(@NotNull CharSequence charSequence) throws IOException {
         start(charSequence);
 
-        lexer.advance();
-
         assertEquals(ElixirTypes.ESCAPE, lexer.getTokenType());
-        assertEquals(ElixirFlexLexer.ESCAPE_SEQUENCE, lexer.getState());
 
         lexer.advance();
 
+        assertEquals(ElixirFlexLexer.ESCAPE_SEQUENCE, lexer.getState());
         assertEquals(ElixirTypes.ESCAPED_CHARACTER_TOKEN, lexer.getTokenType());
+
+        lexer.advance();
+
         assertEquals(ElixirFlexLexer.GROUP, lexer.getState());
 
         lexer.advance();

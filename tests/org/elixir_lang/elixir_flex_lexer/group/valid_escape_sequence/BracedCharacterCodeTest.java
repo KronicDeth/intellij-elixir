@@ -107,29 +107,30 @@ public class BracedCharacterCodeTest extends org.elixir_lang.elixir_flex_lexer.T
     public void validCharacterCode(@NotNull CharSequence charSequence) {
         start(charSequence);
 
-        lexer.advance();
-
         assertEquals(ElixirTypes.ESCAPE, lexer.getTokenType());
+
+        lexer.advance();
+
         assertEquals(ElixirFlexLexer.ESCAPE_SEQUENCE, lexer.getState());
-
-        lexer.advance();
-
         assertEquals(ElixirTypes.HEXADECIMAL_WHOLE_NUMBER_BASE, lexer.getTokenType());
+
+        lexer.advance();
+
         assertEquals(ElixirFlexLexer.HEXADECIMAL_ESCAPE_SEQUENCE, lexer.getState());
-
-        lexer.advance();
-
         assertEquals(ElixirTypes.OPENING_CURLY, lexer.getTokenType());
-        assertEquals(ElixirFlexLexer.EXTENDED_HEXADECIMAL_ESCAPE_SEQUENCE, lexer.getState());
 
         lexer.advance();
 
+        assertEquals(ElixirFlexLexer.EXTENDED_HEXADECIMAL_ESCAPE_SEQUENCE, lexer.getState());
         assertEquals(ElixirTypes.VALID_HEXADECIMAL_DIGITS, lexer.getTokenType());
-        assertEquals(ElixirFlexLexer.EXTENDED_HEXADECIMAL_ESCAPE_SEQUENCE, lexer.getState());
 
         lexer.advance();
 
+        assertEquals(ElixirFlexLexer.EXTENDED_HEXADECIMAL_ESCAPE_SEQUENCE, lexer.getState());
         assertEquals(ElixirTypes.CLOSING_CURLY, lexer.getTokenType());
+
+        lexer.advance();
+
         assertEquals(ElixirFlexLexer.GROUP, lexer.getState());
 
         lexer.advance();

@@ -1,5 +1,6 @@
 package org.elixir_lang.elixir_flex_lexer.atom_start;
 
+import org.elixir_lang.ElixirFlexLexer;
 import org.elixir_lang.psi.ElixirTypes;
 import org.jetbrains.annotations.NotNull;
 import org.junit.experimental.theories.DataPoints;
@@ -87,10 +88,11 @@ public class WholeTest extends org.elixir_lang.elixir_flex_lexer.Test {
     public void operatorIsWholeAtom(CharSequence charSequence) {
         start(charSequence);
 
+        assertEquals(ElixirTypes.ATOM_FRAGMENT, lexer.getTokenType());
+
         lexer.advance();
 
-        assertEquals(ElixirTypes.ATOM_FRAGMENT, lexer.getTokenType());
-        assertEquals(initialState(), lexer.getState());
+        assertEquals(ElixirFlexLexer.YYINITIAL, lexer.getState());
 
         lexer.advance();
 
