@@ -1,0 +1,8 @@
+Embedded Elixir File(0,972)
+  PsiElement(Data)('<div class="jumbotron">\n  <h2>')(0,30)
+  EExTagImpl(TAG)(30,83)
+    PsiElement(<%)('<%')(30,32)
+    PsiElement(=)('=')(32,33)
+    PsiElement(Elixir)(' gettext "Welcome to %{name}!", name: "Phoenix" ')(33,81)
+    PsiElement(%>)('%>')(81,83)
+  PsiElement(Data)('</h2>\n  <p class="lead">A productive web framework that<br />does not compromise speed and maintainability.</p>\n</div>\n\n<div class="row marketing">\n  <div class="col-lg-6">\n    <h4>Resources</h4>\n    <ul>\n      <li>\n        <a href="http://phoenixframework.org/docs/overview">Guides</a>\n      </li>\n      <li>\n        <a href="https://hexdocs.pm/phoenix">Docs</a>\n      </li>\n      <li>\n        <a href="https://github.com/phoenixframework/phoenix">Source</a>\n      </li>\n    </ul>\n  </div>\n\n  <div class="col-lg-6">\n    <h4>Help</h4>\n    <ul>\n      <li>\n        <a href="http://groups.google.com/group/phoenix-talk">Mailing list</a>\n      </li>\n      <li>\n        <a href="http://webchat.freenode.net/?channels=elixir-lang">#elixir-lang on freenode IRC</a>\n      </li>\n      <li>\n        <a href="https://twitter.com/elixirphoenix">@elixirphoenix</a>\n      </li>\n    </ul>\n  </div>\n</div>')(83,972)

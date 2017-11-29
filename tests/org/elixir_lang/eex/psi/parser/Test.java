@@ -61,6 +61,14 @@ public class Test extends ParsingTestCase {
         }
     }
 
+    public void testPhoenixTemplatesPageIndex() {
+        if (!isTravis()) {
+            this.myFileExt = "html.eex";
+
+            doTest();
+        }
+    }
+
     public void testEExTemplate() {
         doTest();
     }
