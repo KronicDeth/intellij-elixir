@@ -2495,13 +2495,15 @@ unmatchedUnaryOperation ::= <<ifVersion "GE" "1.5.0">> unaryPrefixOperator unmat
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L574-L578
  */
 
+private doBlockMaybe ::= doBlock?
+
 /*
  * Dot (Anonymous function) Call Operation
  *
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L403
  */
 
-unmatchedDotCall ::= unmatchedExpression dotInfixOperator parenthesesArguments parenthesesArguments? doBlock?
+unmatchedDotCall ::= unmatchedExpression dotInfixOperator parenthesesArguments parenthesesArguments? doBlockMaybe
                      {
                        implements = "org.elixir_lang.psi.DotCall<org.elixir_lang.psi.stub.UnmatchedDotCall>"
                        mixin = "org.elixir_lang.psi.impl.NamedStubbedPsiElementBase<org.elixir_lang.psi.stub.UnmatchedDotCall>"
@@ -2514,7 +2516,7 @@ unmatchedDotCall ::= unmatchedExpression dotInfixOperator parenthesesArguments p
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L191-L194
  */
 
-unmatchedQualifiedNoParenthesesCall ::= unmatchedExpression dotInfixOperator relativeIdentifier noParenthesesOneArgument doBlock?
+unmatchedQualifiedNoParenthesesCall ::= unmatchedExpression dotInfixOperator relativeIdentifier noParenthesesOneArgument doBlockMaybe
                                         {
                                           implements = [
                                             "org.elixir_lang.psi.QualifiedNoParenthesesCall<org.elixir_lang.psi.stub.UnmatchedQualifiedNoParenthesesCall>"
@@ -2533,7 +2535,7 @@ unmatchedQualifiedNoParenthesesCall ::= unmatchedExpression dotInfixOperator rel
 
 atIdentifier ::= atPrefixOperator IDENTIFIER_TOKEN
                  { methods = [getReference] }
-unmatchedAtUnqualifiedNoParenthesesCall ::= atIdentifier noParenthesesOneArgument doBlock?
+unmatchedAtUnqualifiedNoParenthesesCall ::= atIdentifier noParenthesesOneArgument doBlockMaybe
                                             {
                                               implements = "org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall<org.elixir_lang.psi.stub.UnmatchedAtUnqualifiedNoParenthesesCall>"
                                               mixin = "org.elixir_lang.psi.impl.NamedStubbedPsiElementBase<org.elixir_lang.psi.stub.UnmatchedAtUnqualifiedNoParenthesesCall>"
@@ -2546,7 +2548,7 @@ unmatchedAtUnqualifiedNoParenthesesCall ::= atIdentifier noParenthesesOneArgumen
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L191-L194
  */
 
-unmatchedUnqualifiedNoParenthesesCall ::= identifier noParenthesesOneArgument doBlock?
+unmatchedUnqualifiedNoParenthesesCall ::= identifier noParenthesesOneArgument doBlockMaybe
                                           {
                                             implements = "org.elixir_lang.psi.UnqualifiedNoParenthesesCall<org.elixir_lang.psi.stub.UnmatchedUnqualifiedNoParenthesesCall>"
                                             methods = [
@@ -2634,7 +2636,7 @@ unmatchedQualifiedBracketOperation ::= unmatchedExpression dotInfixOperator rela
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L229-L230
  */
 
-unmatchedQualifiedParenthesesCall ::= unmatchedExpression dotInfixOperator relativeIdentifier matchedParenthesesArguments doBlock?
+unmatchedQualifiedParenthesesCall ::= unmatchedExpression dotInfixOperator relativeIdentifier matchedParenthesesArguments doBlockMaybe
                                       {
                                         implements = "org.elixir_lang.psi.QualifiedParenthesesCall<org.elixir_lang.psi.stub.UnmatchedQualifiedParenthesesCall>"
                                         mixin = "org.elixir_lang.psi.impl.NamedStubbedPsiElementBase<org.elixir_lang.psi.stub.UnmatchedQualifiedParenthesesCall>"
@@ -2645,7 +2647,7 @@ unmatchedQualifiedParenthesesCall ::= unmatchedExpression dotInfixOperator relat
  * Qualified Call with No Arguments - neither parenthes nor no parentheses
  */
 
-unmatchedQualifiedNoArgumentsCall ::= unmatchedExpression dotInfixOperator relativeIdentifier !CALL doBlock?
+unmatchedQualifiedNoArgumentsCall ::= unmatchedExpression dotInfixOperator relativeIdentifier !CALL doBlockMaybe
                                       {
                                         implements = [
                                           "org.elixir_lang.psi.QualifiedNoArgumentsCall<org.elixir_lang.psi.stub.UnmatchedQualifiedNoArgumentsCall>"
@@ -2679,7 +2681,7 @@ unmatchedAtNumericBracketOperation ::= <<ifVersion "GE" "1.5.0">> atPrefixOperat
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L229-L230
  */
 
-unmatchedUnqualifiedParenthesesCall ::= identifier matchedParenthesesArguments doBlock?
+unmatchedUnqualifiedParenthesesCall ::= identifier matchedParenthesesArguments doBlockMaybe
                                         {
                                           implements = "org.elixir_lang.psi.UnqualifiedParenthesesCall<org.elixir_lang.psi.stub.UnmatchedUnqualifiedParenthesesCall>"
                                           mixin = "org.elixir_lang.psi.impl.NamedStubbedPsiElementBase<org.elixir_lang.psi.stub.UnmatchedUnqualifiedParenthesesCall>"
@@ -2720,7 +2722,7 @@ unmatchedUnqualifiedBracketOperation ::= identifier CALL bracketArguments
  * Unqualified No Arguments Call
  */
 
-unmatchedUnqualifiedNoArgumentsCall ::= identifier notKeywordPairColon doBlock?
+unmatchedUnqualifiedNoArgumentsCall ::= identifier notKeywordPairColon doBlockMaybe
                                         {
                                           implements = "org.elixir_lang.psi.UnqualifiedNoArgumentsCall<org.elixir_lang.psi.stub.UnmatchedUnqualifiedNoArgumentsCall>"
                                           mixin = "org.elixir_lang.psi.impl.NamedStubbedPsiElementBase<org.elixir_lang.psi.stub.UnmatchedUnqualifiedNoArgumentsCall>"
