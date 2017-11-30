@@ -1770,7 +1770,7 @@ matchedUnqualifiedNoParenthesesCall ::= identifier noParenthesesOneArgument
 bracketArguments ::= OPENING_BRACKET eolStar
                      (
                       keywords |
-                      containerExpression infixComma?
+                      containerExpression infixCommaMaybe
                      )
                      CLOSING_BRACKET
                      { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
@@ -2050,7 +2050,7 @@ private associationsExpression ::= containerAssociationOperation | // @see https
                                    mapExpression // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L506
 associationsBase ::= associationsExpression (infixComma associationsExpression)*
                      { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
-associations ::= associationsBase infixComma?
+associations ::= associationsBase infixCommaMaybe
                  { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 /*
@@ -2949,6 +2949,7 @@ atom ::= COLON (ATOM_FRAGMENT | quote)
          }
 
 private infixComma ::= COMMA eolStar
+private infixCommaMaybe ::= infixComma?
 
 charToken ::= CHAR_TOKENIZER (CHAR_LIST_FRAGMENT | quoteEscapeSequence)
               { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }

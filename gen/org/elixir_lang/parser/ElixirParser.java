@@ -1,16 +1,17 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.parser;
 
+import com.intellij.lang.ASTNode;
+import com.intellij.lang.LightPsiParser;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiBuilder.Marker;
-import static org.elixir_lang.psi.ElixirTypes.*;
-import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
-import com.intellij.psi.tree.IElementType;
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.tree.TokenSet;
 import com.intellij.lang.PsiParser;
-import com.intellij.lang.LightPsiParser;
-import static org.elixir_lang.parser.ExternalRules.*;
+import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.TokenSet;
+
+import static org.elixir_lang.grammar.parser.GeneratedParserUtilBase.*;
+import static org.elixir_lang.parser.ExternalRules.ifVersion;
+import static org.elixir_lang.psi.ElixirTypes.*;
 
 @SuppressWarnings({"SimplifiableIfStatement", "UnusedAssignment"})
 public class ElixirParser implements PsiParser, LightPsiParser {
@@ -858,22 +859,15 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // associationsBase infixComma?
+  // associationsBase infixCommaMaybe
   public static boolean associations(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "associations")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, ASSOCIATIONS, "<associations>");
     r = associationsBase(b, l + 1);
-    r = r && associations_1(b, l + 1);
+    r = r && infixCommaMaybe(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
-  }
-
-  // infixComma?
-  private static boolean associations_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "associations_1")) return false;
-    infixComma(b, l + 1);
-    return true;
   }
 
   /* ********************************************************** */
@@ -1160,7 +1154,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   // OPENING_BRACKET eolStar
   //                      (
   //                       keywords |
-  //                       containerExpression infixComma?
+  //                       containerExpression infixCommaMaybe
   //                      )
   //                      CLOSING_BRACKET
   public static boolean bracketArguments(PsiBuilder b, int l) {
@@ -1177,7 +1171,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   // keywords |
-  //                       containerExpression infixComma?
+  //                       containerExpression infixCommaMaybe
   private static boolean bracketArguments_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "bracketArguments_2")) return false;
     boolean r;
@@ -1188,22 +1182,15 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // containerExpression infixComma?
+  // containerExpression infixCommaMaybe
   private static boolean bracketArguments_2_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "bracketArguments_2_1")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = containerExpression(b, l + 1);
-    r = r && bracketArguments_2_1_1(b, l + 1);
+    r = r && infixCommaMaybe(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
-  }
-
-  // infixComma?
-  private static boolean bracketArguments_2_1_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "bracketArguments_2_1_1")) return false;
-    infixComma(b, l + 1);
-    return true;
   }
 
   /* ********************************************************** */
@@ -2320,6 +2307,14 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     r = r && eolStar(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
+  }
+
+  /* ********************************************************** */
+  // infixComma?
+  static boolean infixCommaMaybe(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "infixCommaMaybe")) return false;
+    infixComma(b, l + 1);
+    return true;
   }
 
   /* ********************************************************** */
