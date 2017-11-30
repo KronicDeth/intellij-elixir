@@ -518,7 +518,8 @@ private elixirFile ::= endOfExpressionMaybe (expressionList endOfExpressionMaybe
  *
  */
 
-private infixSemicolon ::= EOL* SEMICOLON EOL*
+private eolStar ::= EOL*
+private infixSemicolon ::= eolStar SEMICOLON eolStar
 // Must have at least one EOL or SEMICOLON, but at most one SEMICOLON
 endOfExpression ::= infixSemicolon | EOL+ { implements = "org.elixir_lang.psi.Unquoted" }
 private endOfExpressionMaybe ::= endOfExpression?
@@ -1191,7 +1192,7 @@ matchedExpression ::= matchedCaptureNonNumericOperation |
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L50
  */
 
-capturePrefixOperator ::= CAPTURE_OPERATOR EOL*
+capturePrefixOperator ::= CAPTURE_OPERATOR eolStar
                           {
                             implements = "org.elixir_lang.psi.Operator"
                             methods = [
@@ -1208,7 +1209,7 @@ matchedCaptureNonNumericOperation ::= capturePrefixOperator !numeric matchedExpr
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L51
  */
 
-inMatchInfixOperator ::= EOL* IN_MATCH_OPERATOR EOL*
+inMatchInfixOperator ::= eolStar IN_MATCH_OPERATOR eolStar
                     {
                       implements = "org.elixir_lang.psi.Operator"
                       methods = [
@@ -1226,7 +1227,7 @@ matchedInMatchOperation ::= matchedExpression inMatchInfixOperator matchedExpres
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L52
  */
 
-whenInfixOperator ::= EOL* WHEN_OPERATOR EOL*
+whenInfixOperator ::= eolStar WHEN_OPERATOR eolStar
                       {
                         implements = "org.elixir_lang.psi.Operator"
                         methods = [
@@ -1253,7 +1254,7 @@ matchedWhenOperation ::= matchedExpression whenInfixOperator matchedExpression
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L53
  */
 
-typeInfixOperator ::= EOL* TYPE_OPERATOR EOL*
+typeInfixOperator ::= eolStar TYPE_OPERATOR eolStar
                       {
                         implements = "org.elixir_lang.psi.Operator"
                         methods = [
@@ -1272,7 +1273,7 @@ matchedTypeOperation ::= matchedExpression typeInfixOperator matchedExpression
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L54
  */
 
-pipeInfixOperator ::= EOL* PIPE_OPERATOR EOL*
+pipeInfixOperator ::= eolStar PIPE_OPERATOR eolStar
                       {
                         implements = "org.elixir_lang.psi.Operator"
                         methods = [
@@ -1291,7 +1292,7 @@ matchedPipeOperation ::= matchedExpression pipeInfixOperator matchedExpression
  * @see see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L56
  */
 
-matchInfixOperator ::= EOL* MATCH_OPERATOR EOL*
+matchInfixOperator ::= eolStar MATCH_OPERATOR eolStar
                        {
                          implements = "org.elixir_lang.psi.Operator"
                          methods = [
@@ -1310,7 +1311,7 @@ matchedMatchOperation ::= matchedExpression matchInfixOperator matchedExpression
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L57
  */
 
-orInfixOperator ::= EOL* (OR_SYMBOL_OPERATOR | OR_WORD_OPERATOR) EOL*
+orInfixOperator ::= eolStar (OR_SYMBOL_OPERATOR | OR_WORD_OPERATOR) eolStar
                     {
                       implements = "org.elixir_lang.psi.Operator"
                       methods = [
@@ -1327,7 +1328,7 @@ matchedOrOperation ::= matchedExpression orInfixOperator matchedExpression
  *
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L58
  */
-andInfixOperator ::= EOL* (AND_SYMBOL_OPERATOR | AND_WORD_OPERATOR) EOL*
+andInfixOperator ::= eolStar (AND_SYMBOL_OPERATOR | AND_WORD_OPERATOR) eolStar
                      {
                        implements = "org.elixir_lang.psi.Operator"
                        methods = [
@@ -1345,7 +1346,7 @@ matchedAndOperation ::= matchedExpression andInfixOperator matchedExpression
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L59
  */
 
-comparisonInfixOperator ::= EOL* COMPARISON_OPERATOR EOL*
+comparisonInfixOperator ::= eolStar COMPARISON_OPERATOR eolStar
                             {
                               implements = "org.elixir_lang.psi.Operator"
                               methods = [
@@ -1363,7 +1364,7 @@ matchedComparisonOperation ::= matchedExpression comparisonInfixOperator matched
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L60
  */
 
-relationalInfixOperator ::= EOL* RELATIONAL_OPERATOR EOL*
+relationalInfixOperator ::= eolStar RELATIONAL_OPERATOR eolStar
                             {
                               implements = "org.elixir_lang.psi.Operator"
                               methods = [
@@ -1381,7 +1382,7 @@ matchedRelationalOperation ::= matchedExpression relationalInfixOperator matched
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L61
  */
 
-arrowInfixOperator ::= EOL* ARROW_OPERATOR EOL*
+arrowInfixOperator ::= eolStar ARROW_OPERATOR eolStar
                        {
                          implements = "org.elixir_lang.psi.Operator"
                          methods = [
@@ -1399,7 +1400,7 @@ matchedArrowOperation ::= matchedExpression arrowInfixOperator matchedExpression
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L62
  */
 
-inInfixOperator ::= EOL* IN_OPERATOR EOL*
+inInfixOperator ::= eolStar IN_OPERATOR eolStar
                     {
                       implements = "org.elixir_lang.psi.Operator"
                       methods = [
@@ -1412,7 +1413,7 @@ inInfixOperator ::= EOL* IN_OPERATOR EOL*
 // methods defined by "infix operations" section above
 matchedInOperation ::= matchedExpression inInfixOperator matchedExpression
 
-notInfixOperator ::= EOL* NOT_OPERATOR EOL*
+notInfixOperator ::= eolStar NOT_OPERATOR eolStar
                      {
                        implements = "org.elixir_lang.psi.Operator"
                          methods = [
@@ -1428,7 +1429,7 @@ matchedNotInOperation ::= matchedExpression <<ifVersion "GE" "1.5.0">> notInfixO
  *
  * @see https://github.com/elixir-lang/elixir/blob/3487d00ddb5e90c7cf0e65d03717903b9b27eafd/lib/elixir/src/elixir_parser.yrl#L67
  */
-threeInfixOperator ::= EOL* THREE_OPERATOR EOL*
+threeInfixOperator ::= eolStar THREE_OPERATOR eolStar
                        {
                          implements = "org.elixir_lang.psi.Operator"
                          methods = [
@@ -1446,7 +1447,7 @@ matchedThreeOperation ::= matchedExpression threeInfixOperator matchedExpression
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L63
  */
 
-twoInfixOperator ::= EOL* (RANGE_OPERATOR | TWO_OPERATOR) EOL*
+twoInfixOperator ::= eolStar (RANGE_OPERATOR | TWO_OPERATOR) eolStar
                      {
                        implements = "org.elixir_lang.psi.Operator"
                        methods = [
@@ -1472,7 +1473,7 @@ matchedTwoOperation ::= matchedExpression twoInfixOperator matchedExpression
    See https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L605-L613
    for rules for SIGNIFICANT_WHITE_SPACE */
 additionInfixOperator ::= (SIGNIFICANT_WHITE_SPACE DUAL_OPERATOR (SIGNIFICANT_WHITE_SPACE | &EOL) |
-                           DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE?) EOL*
+                           DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE?) eolStar
                           {
                             implements = "org.elixir_lang.psi.Operator"
                             methods = [
@@ -1491,7 +1492,7 @@ matchedAdditionOperation ::= matchedExpression additionInfixOperator matchedExpr
  *
  */
 
-multiplicationInfixOperator ::= EOL* (DIVISION_OPERATOR | MULTIPLICATION_OPERATOR) EOL*
+multiplicationInfixOperator ::= eolStar (DIVISION_OPERATOR | MULTIPLICATION_OPERATOR) eolStar
                                 {
                                   implements = "org.elixir_lang.psi.Operator"
                                   methods = [
@@ -1503,8 +1504,8 @@ multiplicationInfixOperator ::= EOL* (DIVISION_OPERATOR | MULTIPLICATION_OPERATO
 // implements and methods defined by "infix operations" section above
 matchedMultiplicationOperation ::= matchedExpression multiplicationInfixOperator matchedExpression
 
-unaryPrefixOperator ::= (SIGNIFICANT_WHITE_SPACE? DUAL_OPERATOR | SIGN_OPERATOR | UNARY_OPERATOR) EOL* |
-                        NOT_OPERATOR EOL* !inInfixOperator
+unaryPrefixOperator ::= (SIGNIFICANT_WHITE_SPACE? DUAL_OPERATOR | SIGN_OPERATOR | UNARY_OPERATOR) eolStar |
+                        NOT_OPERATOR eolStar !inInfixOperator
                         {
                           implements = "org.elixir_lang.psi.Operator"
                           methods = [
@@ -1538,7 +1539,7 @@ matchedUnaryOperation ::= <<ifVersion "GE" "1.5.0" >> unaryPrefixOperator matche
  */
 
 // left-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L69)
-dotInfixOperator ::= EOL* DOT_OPERATOR EOL*
+dotInfixOperator ::= eolStar DOT_OPERATOR eolStar
                      {
                        implements = "org.elixir_lang.psi.Operator"
                        name = "."
@@ -1593,11 +1594,11 @@ relativeIdentifier ::= IDENTIFIER_TOKEN |
 private parenthesesPositionalArguments ::= containerArgumentsBase
 
 // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L484-L488
-parenthesesArguments ::= OPENING_PARENTHESIS EOL*
+parenthesesArguments ::= OPENING_PARENTHESIS eolStar
                          (
                           unqualifiedNoParenthesesManyArgumentsCall | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L485
                           keywords | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L486
-                          parenthesesPositionalArguments (infixComma keywords)?)? EOL* // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L487-L488
+                          parenthesesPositionalArguments (infixComma keywords)?)? eolStar // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L487-L488
                          CLOSING_PARENTHESIS
                          {
                            implements = [
@@ -1761,7 +1762,7 @@ matchedUnqualifiedNoParenthesesCall ::= identifier noParenthesesOneArgument
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L238
  */
 
-bracketArguments ::= OPENING_BRACKET EOL*
+bracketArguments ::= OPENING_BRACKET eolStar
                      (
                       keywords |
                       containerExpression infixComma?
@@ -1804,8 +1805,8 @@ matchedQualifiedAlias ::= matchedExpression dotInfixOperator alias
 matchedQualifiedMultipleAliases ::= matchedExpression dotInfixOperator multipleAliases
 
 // same rules as tuple, but quoting is different, so separate rule.
-multipleAliases ::= OPENING_CURLY EOL*
-                    containerArguments? EOL*
+multipleAliases ::= OPENING_CURLY eolStar
+                    containerArguments? eolStar
                     CLOSING_CURLY
                     {
                       implements = "org.elixir_lang.psi.Quotable"
@@ -1886,7 +1887,7 @@ matchedUnqualifiedParenthesesCall ::= identifier matchedParenthesesArguments
                                         stubClass = "org.elixir_lang.psi.stub.MatchedUnqualifiedParenthesesCall"
                                       }
 
-atPrefixOperator ::= AT_OPERATOR EOL*
+atPrefixOperator ::= AT_OPERATOR eolStar
                      {
                        implements = "org.elixir_lang.psi.Operator"
                        methods = [
@@ -1965,7 +1966,7 @@ unaryNumericOperation ::= <<ifVersion "LT" "1.5">> unaryPrefixOperator numeric
  *
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L521-L522
  */
-mapPrefixOperator ::= STRUCT_OPERATOR EOL*
+mapPrefixOperator ::= STRUCT_OPERATOR eolStar
                       {
                         implements = "org.elixir_lang.psi.Operator"
                         methods = [
@@ -1975,7 +1976,7 @@ mapPrefixOperator ::= STRUCT_OPERATOR EOL*
                         name = "%"
                       }
 
-private associationInfixOperator ::= EOL* ASSOCIATION_OPERATOR EOL*
+private associationInfixOperator ::= eolStar ASSOCIATION_OPERATOR eolStar
 
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L505
 containerAssociationOperation ::= containerExpression associationInfixOperator containerExpression
@@ -2070,12 +2071,12 @@ mapConstructionArguments ::= mapTailArguments
                                ]
                              }
 
-mapArguments ::= OPENING_CURLY EOL*
+mapArguments ::= OPENING_CURLY eolStar
                  (
                   // Must be before mapConstructionArguments, so that PIPE_OPERATOR is used for updates and not matchedExpression.
                   mapUpdateArguments |
                   mapConstructionArguments
-                 )? EOL*
+                 )? eolStar
                  CLOSING_CURLY
                  { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
@@ -2083,7 +2084,7 @@ mapArguments ::= OPENING_CURLY EOL*
 mapOperation ::= mapPrefixOperator mapArguments
                  { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
-structOperation ::= mapPrefixOperator mapExpression EOL* mapArguments
+structOperation ::= mapPrefixOperator mapExpression eolStar mapArguments
                     { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 private map ::= mapOperation |
@@ -2123,7 +2124,7 @@ stabParenthesesSignature ::= parenthesesArguments (whenInfixOperator expression)
                                ]
                              }
 
-stabInfixOperator ::= EOL* STAB_OPERATOR EOL*
+stabInfixOperator ::= eolStar STAB_OPERATOR eolStar
                       {
                         implements = "org.elixir_lang.psi.Operator"
                         methods = [
@@ -2192,17 +2193,17 @@ anonymousFunction ::= FN endOfExpressionMaybe
                       }
 
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L206-L210
-parentheticalStab ::= OPENING_PARENTHESIS EOL*
+parentheticalStab ::= OPENING_PARENTHESIS eolStar
                       (infixSemicolon? stab infixSemicolon? | infixSemicolon)
-                      EOL* CLOSING_PARENTHESIS
+                      eolStar CLOSING_PARENTHESIS
                       { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 /*
  * Tuple
  */
 
-tuple ::= OPENING_CURLY EOL*
-          containerArguments? EOL*
+tuple ::= OPENING_CURLY eolStar
+          containerArguments? eolStar
           CLOSING_CURLY
           { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
@@ -2210,8 +2211,8 @@ tuple ::= OPENING_CURLY EOL*
  * Bit String
  */
 
-bitString ::= OPENING_BIT EOL*
-              containerArguments? EOL*
+bitString ::= OPENING_BIT eolStar
+              containerArguments? eolStar
               CLOSING_BIT
               { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
@@ -2772,7 +2773,7 @@ private doBlockElixirBody ::= stab? endOfExpressionMaybe // @see https://github.
 private doBlockBody ::= doBlockEExBody | doBlockElixirBody
 
 // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L272-L275
-doBlock ::= EOL* DO endOfExpressionMaybe
+doBlock ::= eolStar DO endOfExpressionMaybe
             doBlockBody
             END
             {
@@ -2940,7 +2941,7 @@ atom ::= COLON (ATOM_FRAGMENT | quote)
            ]
          }
 
-private infixComma ::= COMMA EOL*
+private infixComma ::= COMMA eolStar
 
 charToken ::= CHAR_TOKENIZER (CHAR_LIST_FRAGMENT | quoteEscapeSequence)
               { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
@@ -3047,7 +3048,7 @@ keywordKey ::= AFTER |
                  ]
                }
 // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L499
-private keywordKeyColonEOL ::= keywordKey KEYWORD_PAIR_COLON EOL*
+private keywordKeyColonEOL ::= keywordKey KEYWORD_PAIR_COLON eolStar
 
 /* @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L499 */
 keywordPair ::=  keywordKeyColonEOL containerExpression
@@ -3081,7 +3082,7 @@ sigilHexadecimalEscapeSequence ::= hexadecimalEscapePrefix (openHexadecimalEscap
                                      methods = [codePoint]
                                    }
 
-emptyParentheses ::= OPENING_PARENTHESIS EOL* CLOSING_PARENTHESIS
+emptyParentheses ::= OPENING_PARENTHESIS eolStar CLOSING_PARENTHESIS
                      { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 interpolation ::= INTERPOLATION_START elixirFile INTERPOLATION_END
                   { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
@@ -3098,8 +3099,8 @@ private containerArguments ::= containerArgumentsBase (infixComma keywords | inf
 private listArguments ::= keywords |
                           containerArguments
 
-list ::= OPENING_BRACKET EOL*
-         listArguments? EOL*
+list ::= OPENING_BRACKET eolStar
+         listArguments? eolStar
          CLOSING_BRACKET
          { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
