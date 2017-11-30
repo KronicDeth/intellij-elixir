@@ -4210,7 +4210,25 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // BASE_WHOLE_NUMBER_PREFIX OCTAL_WHOLE_NUMBER_BASE octalDigits+
+  // octalDigits+
+  static boolean octalDigitsSome(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "octalDigitsSome")) return false;
+    if (!nextTokenIs(b, "", INVALID_OCTAL_DIGITS, VALID_OCTAL_DIGITS)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = octalDigits(b, l + 1);
+    int c = current_position_(b);
+    while (r) {
+      if (!octalDigits(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "octalDigitsSome", c)) break;
+      c = current_position_(b);
+    }
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // BASE_WHOLE_NUMBER_PREFIX OCTAL_WHOLE_NUMBER_BASE octalDigitsSome
   public static boolean octalWholeNumber(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "octalWholeNumber")) return false;
     if (!nextTokenIs(b, BASE_WHOLE_NUMBER_PREFIX)) return false;
@@ -4218,25 +4236,9 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, l, _NONE_, OCTAL_WHOLE_NUMBER, null);
     r = consumeTokens(b, 2, BASE_WHOLE_NUMBER_PREFIX, OCTAL_WHOLE_NUMBER_BASE);
     p = r; // pin = 2
-    r = r && octalWholeNumber_2(b, l + 1);
+    r = r && octalDigitsSome(b, l + 1);
     exit_section_(b, l, m, r, p, null);
     return r || p;
-  }
-
-  // octalDigits+
-  private static boolean octalWholeNumber_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "octalWholeNumber_2")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = octalDigits(b, l + 1);
-    int c = current_position_(b);
-    while (r) {
-      if (!octalDigits(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "octalWholeNumber_2", c)) break;
-      c = current_position_(b);
-    }
-    exit_section_(b, m, null, r);
-    return r;
   }
 
   /* ********************************************************** */

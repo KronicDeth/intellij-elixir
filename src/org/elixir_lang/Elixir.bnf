@@ -2900,7 +2900,8 @@ hexadecimalWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX (HEXADECIMAL_WHOLE_NUMBER_BA
 
 octalDigits ::= INVALID_OCTAL_DIGITS | VALID_OCTAL_DIGITS
                 { implements = "org.elixir_lang.psi.Digits" methods = [base inBase quote validElementType] }
-octalWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX OCTAL_WHOLE_NUMBER_BASE octalDigits+
+private octalDigitsSome ::= octalDigits+
+octalWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX OCTAL_WHOLE_NUMBER_BASE octalDigitsSome
                      {
                        implements = "org.elixir_lang.psi.WholeNumber"
                        methods = [
