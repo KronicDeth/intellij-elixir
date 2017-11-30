@@ -540,9 +540,9 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   //                      map |
   //                      tuple |
   //                      bitString |
-  //                      stringLine !KEYWORD_PAIR_COLON |
+  //                      stringLine notKeywordPairColon |
   //                      stringHeredoc |
-  //                      charListLine !KEYWORD_PAIR_COLON |
+  //                      charListLine notKeywordPairColon |
   //                      charListHeredoc |
   //                      interpolatedCharListSigilLine |
   //                      interpolatedCharListSigilHeredoc |
@@ -612,45 +612,25 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // stringLine !KEYWORD_PAIR_COLON
+  // stringLine notKeywordPairColon
   private static boolean accessExpression_10(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "accessExpression_10")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = stringLine(b, l + 1);
-    r = r && accessExpression_10_1(b, l + 1);
+    r = r && notKeywordPairColon(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
-  // !KEYWORD_PAIR_COLON
-  private static boolean accessExpression_10_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "accessExpression_10_1")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NOT_);
-    r = !consumeToken(b, KEYWORD_PAIR_COLON);
-    exit_section_(b, l, m, r, false, null);
-    return r;
-  }
-
-  // charListLine !KEYWORD_PAIR_COLON
+  // charListLine notKeywordPairColon
   private static boolean accessExpression_12(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "accessExpression_12")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = charListLine(b, l + 1);
-    r = r && accessExpression_12_1(b, l + 1);
+    r = r && notKeywordPairColon(b, l + 1);
     exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // !KEYWORD_PAIR_COLON
-  private static boolean accessExpression_12_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "accessExpression_12_1")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NOT_);
-    r = !consumeToken(b, KEYWORD_PAIR_COLON);
-    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
@@ -802,25 +782,15 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // ALIAS_TOKEN !KEYWORD_PAIR_COLON
+  // ALIAS_TOKEN notKeywordPairColon
   public static boolean alias(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "alias")) return false;
     if (!nextTokenIs(b, ALIAS_TOKEN)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, ALIAS_TOKEN);
-    r = r && alias_1(b, l + 1);
+    r = r && notKeywordPairColon(b, l + 1);
     exit_section_(b, m, ALIAS, r);
-    return r;
-  }
-
-  // !KEYWORD_PAIR_COLON
-  private static boolean alias_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "alias_1")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NOT_);
-    r = !consumeToken(b, KEYWORD_PAIR_COLON);
-    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
@@ -4192,6 +4162,17 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // !KEYWORD_PAIR_COLON
+  static boolean notKeywordPairColon(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "notKeywordPairColon")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NOT_);
+    r = !consumeToken(b, KEYWORD_PAIR_COLON);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
   // charToken |
   //                     binaryWholeNumber |
   //                     // decimalFloat starts with decimalWholeNumber, so decimalFloat needs to be first
@@ -5257,7 +5238,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // identifier !KEYWORD_PAIR_COLON
+  // identifier notKeywordPairColon
   //                                               noParenthesesManyArgumentsStrict
   public static boolean unqualifiedNoParenthesesManyArgumentsCall(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unqualifiedNoParenthesesManyArgumentsCall")) return false;
@@ -5265,42 +5246,22 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     boolean r;
     Marker m = enter_section_(b);
     r = identifier(b, l + 1);
-    r = r && unqualifiedNoParenthesesManyArgumentsCall_1(b, l + 1);
+    r = r && notKeywordPairColon(b, l + 1);
     r = r && noParenthesesManyArgumentsStrict(b, l + 1);
     exit_section_(b, m, UNQUALIFIED_NO_PARENTHESES_MANY_ARGUMENTS_CALL, r);
     return r;
   }
 
-  // !KEYWORD_PAIR_COLON
-  private static boolean unqualifiedNoParenthesesManyArgumentsCall_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "unqualifiedNoParenthesesManyArgumentsCall_1")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NOT_);
-    r = !consumeToken(b, KEYWORD_PAIR_COLON);
-    exit_section_(b, l, m, r, false, null);
-    return r;
-  }
-
   /* ********************************************************** */
-  // IDENTIFIER_TOKEN !KEYWORD_PAIR_COLON
+  // IDENTIFIER_TOKEN notKeywordPairColon
   public static boolean variable(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "variable")) return false;
     if (!nextTokenIs(b, IDENTIFIER_TOKEN)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, IDENTIFIER_TOKEN);
-    r = r && variable_1(b, l + 1);
+    r = r && notKeywordPairColon(b, l + 1);
     exit_section_(b, m, VARIABLE, r);
-    return r;
-  }
-
-  // !KEYWORD_PAIR_COLON
-  private static boolean variable_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "variable_1")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NOT_);
-    r = !consumeToken(b, KEYWORD_PAIR_COLON);
-    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
@@ -5837,25 +5798,15 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // identifier !KEYWORD_PAIR_COLON
+  // identifier notKeywordPairColon
   public static boolean matchedUnqualifiedNoArgumentsCall(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedUnqualifiedNoArgumentsCall")) return false;
     if (!nextTokenIsSmart(b, IDENTIFIER_TOKEN)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = identifier(b, l + 1);
-    r = r && matchedUnqualifiedNoArgumentsCall_1(b, l + 1);
+    r = r && notKeywordPairColon(b, l + 1);
     exit_section_(b, m, MATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL, r);
-    return r;
-  }
-
-  // !KEYWORD_PAIR_COLON
-  private static boolean matchedUnqualifiedNoArgumentsCall_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedUnqualifiedNoArgumentsCall_1")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NOT_);
-    r = !consumeTokenSmart(b, KEYWORD_PAIR_COLON);
-    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
@@ -6444,26 +6395,16 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // identifier !KEYWORD_PAIR_COLON doBlock?
+  // identifier notKeywordPairColon doBlock?
   public static boolean unmatchedUnqualifiedNoArgumentsCall(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unmatchedUnqualifiedNoArgumentsCall")) return false;
     if (!nextTokenIsSmart(b, IDENTIFIER_TOKEN)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = identifier(b, l + 1);
-    r = r && unmatchedUnqualifiedNoArgumentsCall_1(b, l + 1);
+    r = r && notKeywordPairColon(b, l + 1);
     r = r && unmatchedUnqualifiedNoArgumentsCall_2(b, l + 1);
     exit_section_(b, m, UNMATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL, r);
-    return r;
-  }
-
-  // !KEYWORD_PAIR_COLON
-  private static boolean unmatchedUnqualifiedNoArgumentsCall_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "unmatchedUnqualifiedNoArgumentsCall_1")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NOT_);
-    r = !consumeTokenSmart(b, KEYWORD_PAIR_COLON);
-    exit_section_(b, l, m, r, false, null);
     return r;
   }
 

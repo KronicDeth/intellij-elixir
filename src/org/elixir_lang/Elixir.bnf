@@ -617,8 +617,9 @@ identifier ::= IDENTIFIER_TOKEN
                  ]
                }
 
+private notKeywordPairColon ::= !KEYWORD_PAIR_COLON
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L124-L125
-unqualifiedNoParenthesesManyArgumentsCall ::= identifier !KEYWORD_PAIR_COLON
+unqualifiedNoParenthesesManyArgumentsCall ::= identifier notKeywordPairColon
                                               noParenthesesManyArgumentsStrict
                                               {
                                                 implements = [
@@ -659,7 +660,7 @@ noParenthesesKeywordPair ::= keywordKeyColonEOL noParenthesesExpression
  * 0 Arguments
  */
 
-variable ::= IDENTIFIER_TOKEN !KEYWORD_PAIR_COLON
+variable ::= IDENTIFIER_TOKEN notKeywordPairColon
              {
                implements = [
                  "org.elixir_lang.psi.NamedElement"
@@ -1928,7 +1929,7 @@ matchedUnqualifiedBracketOperation ::= identifier CALL bracketArguments
  * Unqualified No Arguments Call
  */
 
-matchedUnqualifiedNoArgumentsCall ::= identifier !KEYWORD_PAIR_COLON
+matchedUnqualifiedNoArgumentsCall ::= identifier notKeywordPairColon
                                       {
                                         implements = [
                                           "org.elixir_lang.psi.MatchedCall"
@@ -2226,9 +2227,9 @@ accessExpression ::= atNumericOperation |
                      map |
                      tuple |
                      bitString |
-                     stringLine !KEYWORD_PAIR_COLON |
+                     stringLine notKeywordPairColon |
                      stringHeredoc |
-                     charListLine !KEYWORD_PAIR_COLON |
+                     charListLine notKeywordPairColon |
                      charListHeredoc |
                      interpolatedCharListSigilLine |
                      interpolatedCharListSigilHeredoc |
@@ -2283,7 +2284,7 @@ private eexElixirBody ::= eexFunctionalElixirBody | eexProceduralElixirBody
 atomKeyword ::= FALSE | NIL | TRUE
                 { implements = "org.elixir_lang.psi.Quotable" methods = [quote] name = "false, nil, true" }
 
-alias ::= ALIAS_TOKEN !KEYWORD_PAIR_COLON
+alias ::= ALIAS_TOKEN notKeywordPairColon
           {
             implements = [
               "org.elixir_lang.psi.NamedElement"
@@ -2719,7 +2720,7 @@ unmatchedUnqualifiedBracketOperation ::= identifier CALL bracketArguments
  * Unqualified No Arguments Call
  */
 
-unmatchedUnqualifiedNoArgumentsCall ::= identifier !KEYWORD_PAIR_COLON doBlock?
+unmatchedUnqualifiedNoArgumentsCall ::= identifier notKeywordPairColon doBlock?
                                         {
                                           implements = "org.elixir_lang.psi.UnqualifiedNoArgumentsCall<org.elixir_lang.psi.stub.UnmatchedUnqualifiedNoArgumentsCall>"
                                           mixin = "org.elixir_lang.psi.impl.NamedStubbedPsiElementBase<org.elixir_lang.psi.stub.UnmatchedUnqualifiedNoArgumentsCall>"
