@@ -1,0 +1,7 @@
+PsiFile(plain text):DoEExClosingWhiteSpaceEExOpening.eex(0,96)
+  PsiElement(PLAIN_TEXT)('foo ')(0,4)
+  PsiElement(EEx)('<% cond do %>\n      <% false -> %>')(4,38)
+  PsiElement(PLAIN_TEXT)('\n        bar\n      ')(38,57)
+  PsiElement(EEx)('<% true -> %>')(57,70)
+  PsiElement(PLAIN_TEXT)('\n        baz\n    ')(70,87)
+  PsiElement(EEx)('<% end %>')(87,96)

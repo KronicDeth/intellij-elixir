@@ -2,6 +2,7 @@
 
 package org.elixir_lang.eex.lexer;
 
+import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import org.elixir_lang.eex.psi.Types;
 
@@ -21,9 +22,10 @@ public class Flex implements com.intellij.lexer.FlexLexer {
 
   /** lexical states */
   public static final int YYINITIAL = 0;
-  public static final int COMMENT = 2;
-  public static final int ELIXIR = 4;
-  public static final int MARKER_MAYBE = 6;
+  public static final int WHITESPACE_MAYBE = 2;
+  public static final int COMMENT = 4;
+  public static final int ELIXIR = 6;
+  public static final int MARKER_MAYBE = 8;
 
   /**
    * ZZ_LEXSTATE[l] is the state in the DFA for the lexical state l
@@ -32,7 +34,7 @@ public class Flex implements com.intellij.lexer.FlexLexer {
    * l is of the form l = 2*k, k a non negative integer
    */
   private static final int ZZ_LEXSTATE[] = {
-     0,  0,  1,  1,  2,  2,  3, 3
+     0,  0,  1,  1,  2,  2,  3,  3,  4, 4
   };
 
   /**
@@ -54,7 +56,8 @@ public class Flex implements com.intellij.lexer.FlexLexer {
 
   /* The ZZ_CMAP_A table has 256 entries */
   static final char ZZ_CMAP_A[] = zzUnpackCMap(
-    "\43\0\1\4\1\0\1\2\11\0\1\6\14\0\1\1\1\5\1\3\75\0\1\7\203\0");
+    "\11\0\2\11\1\0\2\11\22\0\1\10\2\0\1\4\1\0\1\2\11\0\1\6\14\0\1\1\1\5\1\3\75"+
+    "\0\1\7\203\0");
 
   /**
    * Translates DFA states to action switch labels.
@@ -62,11 +65,11 @@ public class Flex implements com.intellij.lexer.FlexLexer {
   private static final int [] ZZ_ACTION = zzUnpackAction();
 
   private static final String ZZ_ACTION_PACKED_0 =
-    "\4\0\2\1\2\2\2\3\1\4\1\5\1\6\1\7"+
-    "\1\10\1\11\1\12\1\13";
+    "\5\0\2\1\2\2\2\3\2\4\1\5\1\6\1\7"+
+    "\1\10\1\11\1\12\2\0\1\13\1\14\1\0\1\15";
 
   private static int [] zzUnpackAction() {
-    int [] result = new int[18];
+    int [] result = new int[25];
     int offset = 0;
     offset = zzUnpackAction(ZZ_ACTION_PACKED_0, offset, result);
     return result;
@@ -91,12 +94,13 @@ public class Flex implements com.intellij.lexer.FlexLexer {
   private static final int [] ZZ_ROWMAP = zzUnpackRowMap();
 
   private static final String ZZ_ROWMAP_PACKED_0 =
-    "\0\0\0\10\0\20\0\30\0\40\0\50\0\40\0\60"+
-    "\0\40\0\60\0\40\0\40\0\40\0\40\0\40\0\70"+
-    "\0\40\0\40";
+    "\0\0\0\12\0\24\0\36\0\50\0\62\0\74\0\62"+
+    "\0\106\0\62\0\120\0\62\0\120\0\62\0\62\0\62"+
+    "\0\62\0\62\0\132\0\144\0\106\0\62\0\62\0\156"+
+    "\0\62";
 
   private static int [] zzUnpackRowMap() {
-    int [] result = new int[18];
+    int [] result = new int[25];
     int offset = 0;
     offset = zzUnpackRowMap(ZZ_ROWMAP_PACKED_0, offset, result);
     return result;
@@ -119,12 +123,13 @@ public class Flex implements com.intellij.lexer.FlexLexer {
   private static final int [] ZZ_TRANS = zzUnpackTrans();
 
   private static final String ZZ_TRANS_PACKED_0 =
-    "\1\5\1\6\6\5\2\7\1\10\5\7\2\11\1\12"+
-    "\5\11\4\13\1\14\1\15\1\16\1\17\12\0\1\20"+
-    "\10\0\1\21\6\0\1\22\5\0";
+    "\1\6\1\7\10\6\10\10\2\11\2\12\1\13\7\12"+
+    "\2\14\1\15\7\14\4\16\1\17\1\20\1\21\1\22"+
+    "\2\16\14\0\1\23\10\0\1\24\6\0\2\25\3\0"+
+    "\1\26\10\0\1\27\11\0\1\30\17\0\1\31\1\0";
 
   private static int [] zzUnpackTrans() {
-    int [] result = new int[64];
+    int [] result = new int[120];
     int offset = 0;
     offset = zzUnpackTrans(ZZ_TRANS_PACKED_0, offset, result);
     return result;
@@ -162,11 +167,11 @@ public class Flex implements com.intellij.lexer.FlexLexer {
   private static final int [] ZZ_ATTRIBUTE = zzUnpackAttribute();
 
   private static final String ZZ_ATTRIBUTE_PACKED_0 =
-    "\4\0\1\11\1\1\1\11\1\1\1\11\1\1\5\11"+
-    "\1\1\2\11";
+    "\5\0\1\11\1\1\1\11\1\1\1\11\1\1\1\11"+
+    "\1\1\5\11\1\1\2\0\2\11\1\0\1\11";
 
   private static int [] zzUnpackAttribute() {
-    int [] result = new int[18];
+    int [] result = new int[25];
     int offset = 0;
     offset = zzUnpackAttribute(ZZ_ATTRIBUTE_PACKED_0, offset, result);
     return result;
@@ -488,54 +493,66 @@ public class Flex implements com.intellij.lexer.FlexLexer {
           case 1:
             { return Types.DATA;
             }
-          case 12: break;
+          case 14: break;
           case 2:
+            { handleInState(YYINITIAL);
+            }
+          case 15: break;
+          case 3:
             { return Types.COMMENT;
             }
-          case 13: break;
-          case 3:
+          case 16: break;
+          case 4:
             { return Types.ELIXIR;
             }
-          case 14: break;
-          case 4:
+          case 17: break;
+          case 5:
             { handleInState(ELIXIR);
                            return Types.EMPTY_MARKER;
             }
-          case 15: break;
-          case 5:
+          case 18: break;
+          case 6:
             { yybegin(COMMENT);
                            return Types.COMMENT_MARKER;
             }
-          case 16: break;
-          case 6:
+          case 19: break;
+          case 7:
             { yybegin(ELIXIR);
                            return Types.EQUALS_MARKER;
             }
-          case 17: break;
-          case 7:
+          case 20: break;
+          case 8:
             { yybegin(ELIXIR);
                            return Types.FORWARD_SLASH_MARKER;
             }
-          case 18: break;
-          case 8:
+          case 21: break;
+          case 9:
             { yybegin(ELIXIR);
                            return Types.PIPE_MARKER;
             }
-          case 19: break;
-          case 9:
+          case 22: break;
+          case 10:
             { yybegin(MARKER_MAYBE);
                       return Types.OPENING;
             }
-          case 20: break;
-          case 10:
-            { yybegin(YYINITIAL);
+          case 23: break;
+          case 11:
+            { yybegin(WHITESPACE_MAYBE);
               return Types.CLOSING;
             }
-          case 21: break;
-          case 11:
+          case 24: break;
+          case 12:
             { return Types.ESCAPED_OPENING;
             }
-          case 22: break;
+          case 25: break;
+          case 13:
+            // lookahead expression with fixed lookahead length
+            zzMarkedPos = Character.offsetByCodePoints
+                (zzBufferL/*, zzStartRead, zzEndRead - zzStartRead*/, zzMarkedPos, -3);
+            { yybegin(YYINITIAL);
+                                         return TokenType.WHITE_SPACE;
+            }
+          case 26: break;
           default:
             zzScanError(ZZ_NO_MATCH);
           }

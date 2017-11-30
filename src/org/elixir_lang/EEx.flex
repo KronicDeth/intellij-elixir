@@ -1,5 +1,6 @@
 package org.elixir_lang.eex.lexer;
 
+import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import org.elixir_lang.eex.psi.Types;
 
@@ -31,9 +32,12 @@ EQUALS_MARKER = "="
 FORWARD_SLASH_MARKER = "/"
 PIPE_MARKER = "|"
 ESCAPED_OPENING = "<%%"
+PROCEDURAL_OPENING = {OPENING} " "
 
+WHITE_SPACE = [\ \t\f\r\n]+
 ANY = [^]
 
+%state WHITESPACE_MAYBE
 %state COMMENT
 %state ELIXIR
 %state MARKER_MAYBE
@@ -57,11 +61,11 @@ ANY = [^]
   {PIPE_MARKER}          { yybegin(ELIXIR);
                            return Types.PIPE_MARKER; }
   {ANY}                  { handleInState(ELIXIR);
-                           return Types.NO_MARKER; }
+                           return Types.EMPTY_MARKER; }
 }
 
 <COMMENT, ELIXIR> {
-  {CLOSING} { yybegin(YYINITIAL);
+  {CLOSING} { yybegin(WHITESPACE_MAYBE);
               return Types.CLOSING; }
 }
 
@@ -72,3 +76,11 @@ ANY = [^]
 <ELIXIR> {
   {ANY} { return Types.ELIXIR; }
 }
+
+<WHITESPACE_MAYBE> {
+  // Only completely whitespace before a procedural tag counts as whitespace
+  {WHITE_SPACE} / {PROCEDURAL_OPENING} { yybegin(YYINITIAL);
+                                         return TokenType.WHITE_SPACE; }
+  {ANY}                                { handleInState(YYINITIAL); }
+}
+
