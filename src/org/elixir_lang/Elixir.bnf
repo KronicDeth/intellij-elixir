@@ -1194,6 +1194,7 @@ matchedExpression ::= matchedCaptureNonNumericOperation |
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L50
  */
 
+private nonNumeric ::= !numeric
 capturePrefixOperator ::= CAPTURE_OPERATOR eolStar
                           {
                             implements = "org.elixir_lang.psi.Operator"
@@ -1203,7 +1204,7 @@ capturePrefixOperator ::= CAPTURE_OPERATOR eolStar
                             ]
                             name = "&"
                           }
-matchedCaptureNonNumericOperation ::= capturePrefixOperator !numeric matchedExpression
+matchedCaptureNonNumericOperation ::= capturePrefixOperator nonNumeric matchedExpression
 
 /*
  * In Match Operation - left-associative
@@ -1526,7 +1527,7 @@ unaryPrefixOperator ::= (significantWhiteSpaceMaybe DUAL_OPERATOR | SIGN_OPERATO
  *
  */
 
-matchedUnaryNonNumericOperation ::= <<ifVersion "LT" "1.5.0">> unaryPrefixOperator !numeric matchedExpression
+matchedUnaryNonNumericOperation ::= <<ifVersion "LT" "1.5.0">> unaryPrefixOperator nonNumeric matchedExpression
 
 /*
  * Unary Operation - non-associative (Elixir >= 1.5.0)
@@ -1909,7 +1910,7 @@ atPrefixOperator ::= AT_OPERATOR eolStar
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L574-L578
  */
 
-matchedAtNonNumericOperation ::= <<ifVersion "LT" "1.5.0">> atPrefixOperator !numeric matchedExpression
+matchedAtNonNumericOperation ::= <<ifVersion "LT" "1.5.0">> atPrefixOperator nonNumeric matchedExpression
 
 /*
  * At Operation - non-associative (Elixir >= 1.5.0)
@@ -2320,7 +2321,7 @@ alias ::= ALIAS_TOKEN notKeywordPairColon
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L50
  */
 
-unmatchedCaptureNonNumericOperation ::= capturePrefixOperator !numeric unmatchedExpression
+unmatchedCaptureNonNumericOperation ::= capturePrefixOperator nonNumeric unmatchedExpression
 
 /*
  * In Match Operation - left-associative
@@ -2482,7 +2483,7 @@ unmatchedMultiplicationOperation ::= unmatchedExpression multiplicationInfixOper
  *
  */
 
-unmatchedUnaryNonNumericOperation ::= <<ifVersion "LT" "1.5.0">> unaryPrefixOperator !numeric unmatchedExpression
+unmatchedUnaryNonNumericOperation ::= <<ifVersion "LT" "1.5.0">> unaryPrefixOperator nonNumeric unmatchedExpression
 
 /*
  * Unary Operation - non-associative (Elixir >= 1.5.0)
@@ -2699,7 +2700,7 @@ unmatchedUnqualifiedParenthesesCall ::= identifier matchedParenthesesArguments d
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L574-L578
  */
 
-unmatchedAtNonNumericOperation ::= <<ifVersion "LT" "1.5.0">> atPrefixOperator !numeric unmatchedExpression
+unmatchedAtNonNumericOperation ::= <<ifVersion "LT" "1.5.0">> atPrefixOperator nonNumeric unmatchedExpression
 
 /*
  * At Operation - non-associative (Elixir >= 1.5.0)

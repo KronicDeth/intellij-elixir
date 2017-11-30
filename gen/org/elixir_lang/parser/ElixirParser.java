@@ -4142,6 +4142,17 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // !numeric
+  static boolean nonNumeric(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "nonNumeric")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NOT_);
+    r = !numeric(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
   // eolStar NOT_OPERATOR eolStar
   public static boolean notInfixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "notInfixOperator")) return false;
@@ -5457,24 +5468,14 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r || p;
   }
 
-  // capturePrefixOperator !numeric
+  // capturePrefixOperator nonNumeric
   private static boolean matchedCaptureNonNumericOperation_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedCaptureNonNumericOperation_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = capturePrefixOperator(b, l + 1);
-    r = r && matchedCaptureNonNumericOperation_0_1(b, l + 1);
+    r = r && nonNumeric(b, l + 1);
     exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // !numeric
-  private static boolean matchedCaptureNonNumericOperation_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedCaptureNonNumericOperation_0_1")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NOT_);
-    r = !numeric(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
@@ -5512,25 +5513,15 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r || p;
   }
 
-  // <<ifVersion "LT" "1.5.0">> unaryPrefixOperator !numeric
+  // <<ifVersion "LT" "1.5.0">> unaryPrefixOperator nonNumeric
   private static boolean matchedUnaryNonNumericOperation_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedUnaryNonNumericOperation_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = ifVersion(b, l + 1, "LT", "1.5.0");
     r = r && unaryPrefixOperator(b, l + 1);
-    r = r && matchedUnaryNonNumericOperation_0_2(b, l + 1);
+    r = r && nonNumeric(b, l + 1);
     exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // !numeric
-  private static boolean matchedUnaryNonNumericOperation_0_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedUnaryNonNumericOperation_0_2")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NOT_);
-    r = !numeric(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
@@ -5717,25 +5708,15 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r || p;
   }
 
-  // <<ifVersion "LT" "1.5.0">> atPrefixOperator !numeric
+  // <<ifVersion "LT" "1.5.0">> atPrefixOperator nonNumeric
   private static boolean matchedAtNonNumericOperation_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedAtNonNumericOperation_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = ifVersion(b, l + 1, "LT", "1.5.0");
     r = r && atPrefixOperator(b, l + 1);
-    r = r && matchedAtNonNumericOperation_0_2(b, l + 1);
+    r = r && nonNumeric(b, l + 1);
     exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // !numeric
-  private static boolean matchedAtNonNumericOperation_0_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedAtNonNumericOperation_0_2")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NOT_);
-    r = !numeric(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
@@ -5998,24 +5979,14 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r || p;
   }
 
-  // capturePrefixOperator !numeric
+  // capturePrefixOperator nonNumeric
   private static boolean unmatchedCaptureNonNumericOperation_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unmatchedCaptureNonNumericOperation_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = capturePrefixOperator(b, l + 1);
-    r = r && unmatchedCaptureNonNumericOperation_0_1(b, l + 1);
+    r = r && nonNumeric(b, l + 1);
     exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // !numeric
-  private static boolean unmatchedCaptureNonNumericOperation_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "unmatchedCaptureNonNumericOperation_0_1")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NOT_);
-    r = !numeric(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
@@ -6053,25 +6024,15 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r || p;
   }
 
-  // <<ifVersion "LT" "1.5.0">> unaryPrefixOperator !numeric
+  // <<ifVersion "LT" "1.5.0">> unaryPrefixOperator nonNumeric
   private static boolean unmatchedUnaryNonNumericOperation_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unmatchedUnaryNonNumericOperation_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = ifVersion(b, l + 1, "LT", "1.5.0");
     r = r && unaryPrefixOperator(b, l + 1);
-    r = r && unmatchedUnaryNonNumericOperation_0_2(b, l + 1);
+    r = r && nonNumeric(b, l + 1);
     exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // !numeric
-  private static boolean unmatchedUnaryNonNumericOperation_0_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "unmatchedUnaryNonNumericOperation_0_2")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NOT_);
-    r = !numeric(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
@@ -6264,25 +6225,15 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r || p;
   }
 
-  // <<ifVersion "LT" "1.5.0">> atPrefixOperator !numeric
+  // <<ifVersion "LT" "1.5.0">> atPrefixOperator nonNumeric
   private static boolean unmatchedAtNonNumericOperation_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unmatchedAtNonNumericOperation_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = ifVersion(b, l + 1, "LT", "1.5.0");
     r = r && atPrefixOperator(b, l + 1);
-    r = r && unmatchedAtNonNumericOperation_0_2(b, l + 1);
+    r = r && nonNumeric(b, l + 1);
     exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // !numeric
-  private static boolean unmatchedAtNonNumericOperation_0_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "unmatchedAtNonNumericOperation_0_2")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NOT_);
-    r = !numeric(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
