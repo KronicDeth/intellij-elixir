@@ -2154,19 +2154,9 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // !(EOL | CLOSING_BIT | CLOSING_BRACKET | CLOSING_CURLY | CLOSING_PARENTHESIS | INTERPOLATION_END | SEMICOLON | STAB_OPERATOR | END | blockIdentifier | EEX_CLOSING)
-  static boolean expressionRecoverWhile(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "expressionRecoverWhile")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NOT_);
-    r = !expressionRecoverWhile_0(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
-    return r;
-  }
-
   // EOL | CLOSING_BIT | CLOSING_BRACKET | CLOSING_CURLY | CLOSING_PARENTHESIS | INTERPOLATION_END | SEMICOLON | STAB_OPERATOR | END | blockIdentifier | EEX_CLOSING
-  private static boolean expressionRecoverWhile_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "expressionRecoverWhile_0")) return false;
+  static boolean expressionRecoverUntil(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "expressionRecoverUntil")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, EOL);
@@ -2181,6 +2171,17 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     if (!r) r = blockIdentifier(b, l + 1);
     if (!r) r = consumeToken(b, EEX_CLOSING);
     exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // !expressionRecoverUntil
+  static boolean expressionRecoverWhile(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "expressionRecoverWhile")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NOT_);
+    r = !expressionRecoverUntil(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 

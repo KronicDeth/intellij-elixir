@@ -541,7 +541,8 @@ private expression ::= emptyParentheses |
 // CLOSING_* because they are endings to subexpressions
 // STAB_OPERATOR because it ends when clause for no parentheses stab guard clauses
 // blockIdentifier for one-liner blockItems where there isn't a newline between block expressions and following blockIdentifier.
-private expressionRecoverWhile ::= !(EOL | CLOSING_BIT | CLOSING_BRACKET | CLOSING_CURLY | CLOSING_PARENTHESIS | INTERPOLATION_END | SEMICOLON | STAB_OPERATOR | END | blockIdentifier | EEX_CLOSING)
+private expressionRecoverUntil ::= EOL | CLOSING_BIT | CLOSING_BRACKET | CLOSING_CURLY | CLOSING_PARENTHESIS | INTERPOLATION_END | SEMICOLON | STAB_OPERATOR | END | blockIdentifier | EEX_CLOSING
+private expressionRecoverWhile ::= !expressionRecoverUntil
 
 private expressionList ::= expression (endOfExpression expression)*
 
