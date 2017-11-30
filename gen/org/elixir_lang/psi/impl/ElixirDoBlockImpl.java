@@ -34,18 +34,6 @@ public class ElixirDoBlockImpl extends ASTWrapperPsiElement implements ElixirDoB
   }
 
   @Override
-  @Nullable
-  public ElixirEexBlockList getEexBlockList() {
-    return PsiTreeUtil.getChildOfType(this, ElixirEexBlockList.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirEexStab getEexStab() {
-    return PsiTreeUtil.getChildOfType(this, ElixirEexStab.class);
-  }
-
-  @Override
   @NotNull
   public List<ElixirEndOfExpression> getEndOfExpressionList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEndOfExpression.class);

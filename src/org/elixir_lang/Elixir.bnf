@@ -2154,6 +2154,7 @@ private stabOperationPrefix ::= stabParenthesesSignature stabInfixOperator |
 private stabBodyExpression ::= EEX_CLOSING eex EEX_OPENING |
                                !stabOperationPrefix expression
 private stabBodyExpressionSeparator ::= EEX_EMPTY_MARKER | endOfExpression
+private stabBodyExpressionSeparatorMaybe ::= stabBodyExpressionSeparator?
 stabBody ::= stabBodyExpression (stabBodyExpressionSeparator stabBodyExpression)*
              {
                implements = "org.elixir_lang.psi.Quotable"
@@ -2185,7 +2186,7 @@ stab ::= stabOperations | stabBody
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L205
 anonymousFunction ::= FN endOfExpressionMaybe
                       // -> is required, so use stabOperations directly and not stab as would be used used in `doBlock`
-                      stabOperations stabBodyExpressionSeparator?
+                      stabOperations stabBodyExpressionSeparatorMaybe
                       END
                       {
                         implements = [
@@ -2759,29 +2760,13 @@ blockItem ::= blockIdentifier endOfExpressionMaybe // @see https://github.com/el
 // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L316-L317
 blockList ::= blockItem+
               { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
-
-private eexStabOperationPrefix ::= EEX_OPENING EEX_EMPTY_MARKER stabOperationPrefix EEX_CLOSING
-eexBlockIdentifier ::= EEX_OPENING EEX_EMPTY_MARKER blockIdentifier EEX_CLOSING
-eexStabBody ::= eex
-eexStabOperation ::= eexStabOperationPrefix eexStabBody?
-eexStab ::= eexStabOperation (eexStabOperation)* |
-            eexStabBody
-
-eexBlockItem ::= eexBlockIdentifier
-                 eexStab
-eexBlockList ::= eexBlockItem+
-
-private doBlockEExBody ::= EEX_CLOSING
-                           eexStab? endOfExpressionMaybe // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L273
-                           eexBlockList? endOfExpressionMaybe // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L274
-                           EEX_OPENING EEX_EMPTY_MARKER
-private doBlockElixirBody ::= stab? endOfExpressionMaybe // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L273
-                              blockList? endOfExpressionMaybe // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L274
-private doBlockBody ::= doBlockEExBody | doBlockElixirBody
-
+private eexWhitespace ::= EEX_CLOSING EEX_OPENING EEX_EMPTY_MARKER
+private doStabSeparator ::= endOfExpression | eexWhitespace
+private doStabSeparatorMaybe ::= doStabSeparator?
 // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L272-L275
-doBlock ::= eolStar DO endOfExpressionMaybe
-            doBlockBody
+doBlock ::= eolStar DO doStabSeparatorMaybe
+            stab? stabBodyExpressionSeparatorMaybe // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L273
+            blockList? stabBodyExpressionSeparatorMaybe // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L274
             END
             {
               implements = "org.elixir_lang.psi.QuotableArguments"
