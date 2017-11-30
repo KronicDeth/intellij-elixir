@@ -395,6 +395,7 @@
     EEX_COMMENT = "EEx Comment"
     EEX_COMMENT_MARKER = "EEx Comment Marker (#)"
     EEX_DATA = "EEx Data"
+    EEX_EMPTY_MARKER = "EEx Empty Marker"
     EEX_EQUALS_MARKER = "EEx Equals Marker (=)"
     EEX_ESCAPED_OPENING = "<%%"
     EEX_FORWARD_SLASH_MARKER = "EEx Forward Slash Marker (/)"
@@ -2145,7 +2146,8 @@ private stabOperationPrefix ::= stabParenthesesSignature stabInfixOperator |
                                 stabInfixOperator
 private stabBodyExpression ::= EEX_CLOSING eex EEX_OPENING |
                                !stabOperationPrefix expression
-stabBody ::= stabBodyExpression (endOfExpression stabBodyExpression)*
+private stabBodyExpressionSeparator ::= EEX_EMPTY_MARKER | endOfExpression
+stabBody ::= stabBodyExpression (stabBodyExpressionSeparator stabBodyExpression)*
              {
                implements = "org.elixir_lang.psi.Quotable"
                methods = [
@@ -2166,7 +2168,7 @@ stabOperation ::= stabOperationPrefix stabBody?
                     ]
                   }
 
-stabOperations ::= stabOperation (endOfExpression stabOperation)*
+stabOperations ::= stabOperation (stabBodyExpressionSeparator stabOperation)*
                    { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L268-L269
@@ -2176,7 +2178,7 @@ stab ::= stabOperations | stabBody
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L205
 anonymousFunction ::= FN endOfExpression?
                       // -> is required, so use stabOperations directly and not stab as would be used used in `doBlock`
-                      stabOperations endOfExpression?
+                      stabOperations stabBodyExpressionSeparator?
                       END
                       {
                         implements = [
@@ -2268,8 +2270,12 @@ eexTag ::= EEX_OPENING (eexCommentBody | eexElixirBody) EEX_CLOSING
 
 private eexCommentBody ::= EEX_COMMENT_MARKER EEX_COMMENT?
                            { pin = 1 }
-private eexElixirBody ::= eexElixirMarker? elixirFile
-private eexElixirMarker ::= EEX_EQUALS_MARKER | EEX_FORWARD_SLASH_MARKER | EEX_PIPE_MARKER
+private eexFunctionalMarker ::= EEX_EQUALS_MARKER | EEX_FORWARD_SLASH_MARKER | EEX_PIPE_MARKER
+private eexFunctionalElixirBody ::= eexFunctionalMarker elixirFile
+                                    { pin = 1 }
+// DO NOT { pin = 1 ] because EEX_EMPTY_MARKER can occur before `END` and `blockItem`
+private eexProceduralElixirBody ::= EEX_EMPTY_MARKER elixirFile
+private eexElixirBody ::= eexFunctionalElixirBody | eexProceduralElixirBody
 
 // keywords that map to atoms
 atomKeyword ::= FALSE | NIL | TRUE
@@ -2745,8 +2751,8 @@ blockItem ::= blockIdentifier endOfExpression? // @see https://github.com/elixir
 blockList ::= blockItem+
               { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
 
-private eexStabOperationPrefix ::= EEX_OPENING stabOperationPrefix EEX_CLOSING
-eexBlockIdentifier ::= EEX_OPENING blockIdentifier EEX_CLOSING
+private eexStabOperationPrefix ::= EEX_OPENING EEX_EMPTY_MARKER stabOperationPrefix EEX_CLOSING
+eexBlockIdentifier ::= EEX_OPENING EEX_EMPTY_MARKER blockIdentifier EEX_CLOSING
 eexStabBody ::= eex
 eexStabOperation ::= eexStabOperationPrefix eexStabBody?
 eexStab ::= eexStabOperation (eexStabOperation)* |
@@ -2759,7 +2765,7 @@ eexBlockList ::= eexBlockItem+
 private doBlockEExBody ::= EEX_CLOSING
                            eexStab? endOfExpression? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L273
                            eexBlockList? endOfExpression? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L274
-                           EEX_OPENING
+                           EEX_OPENING EEX_EMPTY_MARKER
 private doBlockElixirBody ::= stab? endOfExpression? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L273
                               blockList? endOfExpression? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L274
 private doBlockBody ::= doBlockEExBody | doBlockElixirBody

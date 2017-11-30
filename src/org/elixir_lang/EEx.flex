@@ -56,7 +56,8 @@ ANY = [^]
                            return Types.FORWARD_SLASH_MARKER; }
   {PIPE_MARKER}          { yybegin(ELIXIR);
                            return Types.PIPE_MARKER; }
-  {ANY}                  { handleInState(ELIXIR); }
+  {ANY}                  { handleInState(ELIXIR);
+                           return Types.NO_MARKER; }
 }
 
 <COMMENT, ELIXIR> {

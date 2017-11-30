@@ -167,6 +167,44 @@ public class Test extends ParsingTestCase {
         assertWithLocalError();
     }
 
+    public void testFnEExClosing() {
+        doTest(true);
+        assertWithLocalError();
+    }
+
+    public void testFn1Clause() {
+        doTest();
+    }
+
+    public void testFn1ClauseCall() {
+        doTest();
+    }
+
+    public void testFn2ClauseCall() {
+        doTest();
+    }
+
+    public void testFnEExElixirEExStabBody() {
+        doTest();
+    }
+
+    public void testFnEExElixirStabBody() {
+        doTest();
+    }
+
+    public void testFnElixirEExElixirStabBody() {
+        doTest();
+    }
+
+    public void testFnElixirEExStabBody() {
+        doTest();
+    }
+
+    public void testFnUnexpectedEnd() {
+        doTest(true);
+        assertWithLocalError();
+    }
+
     @Override
     protected String getTestDataPath() {
         return "testData/org/elixir_lang/eex/psi/parser/test";

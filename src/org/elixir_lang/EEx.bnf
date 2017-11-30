@@ -18,6 +18,7 @@
     COMMENT = "Comment"
     COMMENT_MARKER = "#"
     DATA = "Data"
+    EMPTY_MARKER = "Empty Marker"
     EQUALS_MARKER = "="
     ELIXIR = "Elixir"
     ESCAPED_OPENING = "<%%"
@@ -34,4 +35,4 @@ tag ::= OPENING (commentBody | elixirBody) CLOSING
 private commentBody ::= COMMENT_MARKER COMMENT?
                         { pin = 1 }
 private elixirBody ::=  elixirMarker? ELIXIR?
-private elixirMarker ::= EQUALS_MARKER | FORWARD_SLASH_MARKER | PIPE_MARKER
+private elixirMarker ::= EMPTY_MARKER | EQUALS_MARKER | FORWARD_SLASH_MARKER | PIPE_MARKER

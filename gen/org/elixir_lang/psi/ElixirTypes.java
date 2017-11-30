@@ -281,6 +281,7 @@ public interface ElixirTypes {
   IElementType EEX_COMMENT = new ElixirTokenType("EEx Comment");
   IElementType EEX_COMMENT_MARKER = new ElixirTokenType("EEx Comment Marker (#)");
   IElementType EEX_DATA = new ElixirTokenType("EEx Data");
+  IElementType EEX_EMPTY_MARKER = new ElixirTokenType("EEx Empty Marker");
   IElementType EEX_EQUALS_MARKER = new ElixirTokenType("EEx Equals Marker (=)");
   IElementType EEX_ESCAPED_OPENING = new ElixirTokenType("<%%");
   IElementType EEX_FORWARD_SLASH_MARKER = new ElixirTokenType("EEx Forward Slash Marker (/)");

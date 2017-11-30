@@ -499,6 +499,7 @@ public class Flex implements com.intellij.lexer.FlexLexer {
           case 14: break;
           case 4:
             { handleInState(ELIXIR);
+                           return Types.EMPTY_MARKER;
             }
           case 15: break;
           case 5:

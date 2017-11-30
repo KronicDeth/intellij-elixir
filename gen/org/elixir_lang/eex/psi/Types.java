@@ -15,6 +15,7 @@ public interface Types {
   IElementType COMMENT_MARKER = new TokenType("#");
   IElementType DATA = new TokenType("Data");
   IElementType ELIXIR = new TokenType("Elixir");
+  IElementType EMPTY_MARKER = new TokenType("Empty Marker");
   IElementType EQUALS_MARKER = new TokenType("=");
   IElementType ESCAPED_OPENING = new TokenType("<%%");
   IElementType FORWARD_SLASH_MARKER = new TokenType("/");

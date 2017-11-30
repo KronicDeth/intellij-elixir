@@ -887,7 +887,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   /* ********************************************************** */
   // FN endOfExpression?
   //                       // -> is required, so use stabOperations directly and not stab as would be used used in `doBlock`
-  //                       stabOperations endOfExpression?
+  //                       stabOperations stabBodyExpressionSeparator?
   //                       END
   public static boolean anonymousFunction(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "anonymousFunction")) return false;
@@ -910,10 +910,10 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // endOfExpression?
+  // stabBodyExpressionSeparator?
   private static boolean anonymousFunction_3(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "anonymousFunction_3")) return false;
-    endOfExpression(b, l + 1);
+    stabBodyExpressionSeparator(b, l + 1);
     return true;
   }
 
@@ -1853,7 +1853,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   // EEX_CLOSING
   //                            eexStab? endOfExpression? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L273
   //                            eexBlockList? endOfExpression? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L274
-  //                            EEX_OPENING
+  //                            EEX_OPENING EEX_EMPTY_MARKER
   static boolean doBlockEExBody(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "doBlockEExBody")) return false;
     if (!nextTokenIs(b, EEX_CLOSING)) return false;
@@ -1864,7 +1864,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     r = r && doBlockEExBody_2(b, l + 1);
     r = r && doBlockEExBody_3(b, l + 1);
     r = r && doBlockEExBody_4(b, l + 1);
-    r = r && consumeToken(b, EEX_OPENING);
+    r = r && consumeTokens(b, 0, EEX_OPENING, EEX_EMPTY_MARKER);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -2008,13 +2008,13 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // EEX_OPENING blockIdentifier EEX_CLOSING
+  // EEX_OPENING EEX_EMPTY_MARKER blockIdentifier EEX_CLOSING
   public static boolean eexBlockIdentifier(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "eexBlockIdentifier")) return false;
     if (!nextTokenIs(b, EEX_OPENING)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, EEX_OPENING);
+    r = consumeTokens(b, 0, EEX_OPENING, EEX_EMPTY_MARKER);
     r = r && blockIdentifier(b, l + 1);
     r = r && consumeToken(b, EEX_CLOSING);
     exit_section_(b, m, EEX_BLOCK_IDENTIFIER, r);
@@ -2075,28 +2075,34 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // eexElixirMarker? elixirFile
+  // eexFunctionalElixirBody | eexProceduralElixirBody
   static boolean eexElixirBody(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "eexElixirBody")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = eexElixirBody_0(b, l + 1);
-    r = r && elixirFile(b, l + 1);
+    r = eexFunctionalElixirBody(b, l + 1);
+    if (!r) r = eexProceduralElixirBody(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
-  // eexElixirMarker?
-  private static boolean eexElixirBody_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "eexElixirBody_0")) return false;
-    eexElixirMarker(b, l + 1);
-    return true;
+  /* ********************************************************** */
+  // eexFunctionalMarker elixirFile
+  static boolean eexFunctionalElixirBody(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "eexFunctionalElixirBody")) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_);
+    r = eexFunctionalMarker(b, l + 1);
+    p = r; // pin = 1
+    r = r && elixirFile(b, l + 1);
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
   }
 
   /* ********************************************************** */
   // EEX_EQUALS_MARKER | EEX_FORWARD_SLASH_MARKER | EEX_PIPE_MARKER
-  static boolean eexElixirMarker(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "eexElixirMarker")) return false;
+  static boolean eexFunctionalMarker(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "eexFunctionalMarker")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, EEX_EQUALS_MARKER);
@@ -2114,6 +2120,19 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b);
     r = eex(b, l + 1);
     if (!r) r = elixirFile(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // EEX_EMPTY_MARKER elixirFile
+  static boolean eexProceduralElixirBody(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "eexProceduralElixirBody")) return false;
+    if (!nextTokenIs(b, EEX_EMPTY_MARKER)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, EEX_EMPTY_MARKER);
+    r = r && elixirFile(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -2196,13 +2215,13 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // EEX_OPENING stabOperationPrefix EEX_CLOSING
+  // EEX_OPENING EEX_EMPTY_MARKER stabOperationPrefix EEX_CLOSING
   static boolean eexStabOperationPrefix(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "eexStabOperationPrefix")) return false;
     if (!nextTokenIs(b, EEX_OPENING)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, EEX_OPENING);
+    r = consumeTokens(b, 0, EEX_OPENING, EEX_EMPTY_MARKER);
     r = r && stabOperationPrefix(b, l + 1);
     r = r && consumeToken(b, EEX_CLOSING);
     exit_section_(b, m, null, r);
@@ -5354,7 +5373,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // stabBodyExpression (endOfExpression stabBodyExpression)*
+  // stabBodyExpression (stabBodyExpressionSeparator stabBodyExpression)*
   public static boolean stabBody(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "stabBody")) return false;
     boolean r;
@@ -5365,7 +5384,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // (endOfExpression stabBodyExpression)*
+  // (stabBodyExpressionSeparator stabBodyExpression)*
   private static boolean stabBody_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "stabBody_1")) return false;
     int c = current_position_(b);
@@ -5377,12 +5396,12 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // endOfExpression stabBodyExpression
+  // stabBodyExpressionSeparator stabBodyExpression
   private static boolean stabBody_1_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "stabBody_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = endOfExpression(b, l + 1);
+    r = stabBodyExpressionSeparator(b, l + 1);
     r = r && stabBodyExpression(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -5431,6 +5450,18 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, l, _NOT_);
     r = !stabOperationPrefix(b, l + 1);
     exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // EEX_EMPTY_MARKER | endOfExpression
+  static boolean stabBodyExpressionSeparator(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "stabBodyExpressionSeparator")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, EEX_EMPTY_MARKER);
+    if (!r) r = endOfExpression(b, l + 1);
+    exit_section_(b, m, null, r);
     return r;
   }
 
@@ -5540,7 +5571,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // stabOperation (endOfExpression stabOperation)*
+  // stabOperation (stabBodyExpressionSeparator stabOperation)*
   public static boolean stabOperations(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "stabOperations")) return false;
     boolean r;
@@ -5551,7 +5582,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // (endOfExpression stabOperation)*
+  // (stabBodyExpressionSeparator stabOperation)*
   private static boolean stabOperations_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "stabOperations_1")) return false;
     int c = current_position_(b);
@@ -5563,12 +5594,12 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // endOfExpression stabOperation
+  // stabBodyExpressionSeparator stabOperation
   private static boolean stabOperations_1_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "stabOperations_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = endOfExpression(b, l + 1);
+    r = stabBodyExpressionSeparator(b, l + 1);
     r = r && stabOperation(b, l + 1);
     exit_section_(b, m, null, r);
     return r;

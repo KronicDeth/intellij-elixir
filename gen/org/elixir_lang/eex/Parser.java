@@ -109,12 +109,13 @@ public class Parser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // EQUALS_MARKER | FORWARD_SLASH_MARKER | PIPE_MARKER
+  // EMPTY_MARKER | EQUALS_MARKER | FORWARD_SLASH_MARKER | PIPE_MARKER
   static boolean elixirMarker(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "elixirMarker")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, EQUALS_MARKER);
+    r = consumeToken(b, EMPTY_MARKER);
+    if (!r) r = consumeToken(b, EQUALS_MARKER);
     if (!r) r = consumeToken(b, FORWARD_SLASH_MARKER);
     if (!r) r = consumeToken(b, PIPE_MARKER);
     exit_section_(b, m, null, r);
