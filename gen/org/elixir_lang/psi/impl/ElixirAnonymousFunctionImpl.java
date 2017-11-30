@@ -8,7 +8,7 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.ElixirAnonymousFunction;
 import org.elixir_lang.psi.ElixirEndOfExpression;
-import org.elixir_lang.psi.ElixirStabOperations;
+import org.elixir_lang.psi.ElixirStab;
 import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,8 +37,8 @@ public class ElixirAnonymousFunctionImpl extends ASTWrapperPsiElement implements
 
   @Override
   @NotNull
-  public ElixirStabOperations getStabOperations() {
-    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirStabOperations.class));
+  public ElixirStab getStab() {
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirStab.class));
   }
 
   @NotNull

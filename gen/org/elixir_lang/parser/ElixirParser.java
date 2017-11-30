@@ -424,9 +424,6 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     else if (t == STAB_OPERATION) {
       r = stabOperation(b, 0);
     }
-    else if (t == STAB_OPERATIONS) {
-      r = stabOperations(b, 0);
-    }
     else if (t == STAB_PARENTHESES_SIGNATURE) {
       r = stabParenthesesSignature(b, 0);
     }
@@ -789,7 +786,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   /* ********************************************************** */
   // FN endOfExpressionMaybe
   //                       // -> is required, so use stabOperations directly and not stab as would be used used in `doBlock`
-  //                       stabOperations stabBodyExpressionSeparatorMaybe
+  //                       stab stabBodyExpressionSeparatorMaybe
   //                       END
   public static boolean anonymousFunction(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "anonymousFunction")) return false;
@@ -798,7 +795,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b);
     r = consumeToken(b, FN);
     r = r && endOfExpressionMaybe(b, l + 1);
-    r = r && stabOperations(b, l + 1);
+    r = r && stab(b, l + 1);
     r = r && stabBodyExpressionSeparatorMaybe(b, l + 1);
     r = r && consumeToken(b, END);
     exit_section_(b, m, ANONYMOUS_FUNCTION, r);
@@ -4716,13 +4713,13 @@ public class ElixirParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // stabOperation (stabBodyExpressionSeparator stabOperation)*
-  public static boolean stabOperations(PsiBuilder b, int l) {
+  static boolean stabOperations(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "stabOperations")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, STAB_OPERATIONS, "<stab operations>");
+    Marker m = enter_section_(b);
     r = stabOperation(b, l + 1);
     r = r && stabOperations_1(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
+    exit_section_(b, m, null, r);
     return r;
   }
 

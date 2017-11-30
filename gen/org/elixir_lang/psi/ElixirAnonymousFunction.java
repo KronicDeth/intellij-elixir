@@ -13,7 +13,7 @@ public interface ElixirAnonymousFunction extends NavigatablePsiElement, Quotable
   List<ElixirEndOfExpression> getEndOfExpressionList();
 
   @NotNull
-  ElixirStabOperations getStabOperations();
+  ElixirStab getStab();
 
   @NotNull
   OtpErlangObject quote();
