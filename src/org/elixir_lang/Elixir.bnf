@@ -1469,13 +1469,15 @@ matchedTwoOperation ::= matchedExpression twoInfixOperator matchedExpression
  *
  */
 
+private significantWhiteSpaceMaybe ::= SIGNIFICANT_WHITE_SPACE?
+
 /* Unlike other binary operation, additionOperations cannot begin with EOLs: if there are EOLs, then the +/- is
    interpreted as unaryOperation.
 
    See https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L605-L613
    for rules for SIGNIFICANT_WHITE_SPACE */
 additionInfixOperator ::= (SIGNIFICANT_WHITE_SPACE DUAL_OPERATOR (SIGNIFICANT_WHITE_SPACE | &EOL) |
-                           DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE?) eolStar
+                           DUAL_OPERATOR significantWhiteSpaceMaybe) eolStar
                           {
                             implements = "org.elixir_lang.psi.Operator"
                             methods = [
@@ -1506,7 +1508,7 @@ multiplicationInfixOperator ::= eolStar (DIVISION_OPERATOR | MULTIPLICATION_OPER
 // implements and methods defined by "infix operations" section above
 matchedMultiplicationOperation ::= matchedExpression multiplicationInfixOperator matchedExpression
 
-unaryPrefixOperator ::= (SIGNIFICANT_WHITE_SPACE? DUAL_OPERATOR | SIGN_OPERATOR | UNARY_OPERATOR) eolStar |
+unaryPrefixOperator ::= (significantWhiteSpaceMaybe DUAL_OPERATOR | SIGN_OPERATOR | UNARY_OPERATOR) eolStar |
                         NOT_OPERATOR eolStar !inInfixOperator
                         {
                           implements = "org.elixir_lang.psi.Operator"
@@ -1566,7 +1568,7 @@ relativeIdentifier ::= IDENTIFIER_TOKEN |
                        COMPARISON_OPERATOR |
                        DO |
                        DIVISION_OPERATOR |
-                       DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE? |
+                       DUAL_OPERATOR significantWhiteSpaceMaybe |
                        ELSE |
                        END |
                        IN_MATCH_OPERATOR |
@@ -1647,7 +1649,7 @@ noParenthesesOneArgument ::= noParenthesesKeywords | // @see https://github.com/
 
 /* @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L418
   @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L609-L610 */
-private additionTail ::= SIGNIFICANT_WHITE_SPACE? DUAL_OPERATOR (
+private additionTail ::= significantWhiteSpaceMaybe DUAL_OPERATOR (
                            // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L610
                            "/" | ">" | DUAL_OPERATOR | STRUCT_OPERATOR |
                            // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L609

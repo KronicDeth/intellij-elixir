@@ -1,17 +1,16 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.parser;
 
-import com.intellij.lang.ASTNode;
-import com.intellij.lang.LightPsiParser;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiBuilder.Marker;
-import com.intellij.lang.PsiParser;
-import com.intellij.psi.tree.IElementType;
-import com.intellij.psi.tree.TokenSet;
-
-import static org.elixir_lang.grammar.parser.GeneratedParserUtilBase.*;
-import static org.elixir_lang.parser.ExternalRules.ifVersion;
 import static org.elixir_lang.psi.ElixirTypes.*;
+import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
+import com.intellij.psi.tree.IElementType;
+import com.intellij.lang.ASTNode;
+import com.intellij.psi.tree.TokenSet;
+import com.intellij.lang.PsiParser;
+import com.intellij.lang.LightPsiParser;
+import static org.elixir_lang.parser.ExternalRules.*;
 
 @SuppressWarnings({"SimplifiableIfStatement", "UnusedAssignment"})
 public class ElixirParser implements PsiParser, LightPsiParser {
@@ -636,7 +635,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // (SIGNIFICANT_WHITE_SPACE DUAL_OPERATOR (SIGNIFICANT_WHITE_SPACE | &EOL) |
-  //                            DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE?) eolStar
+  //                            DUAL_OPERATOR significantWhiteSpaceMaybe) eolStar
   public static boolean additionInfixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "additionInfixOperator")) return false;
     if (!nextTokenIs(b, "<+, ->", DUAL_OPERATOR, SIGNIFICANT_WHITE_SPACE)) return false;
@@ -649,7 +648,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   // SIGNIFICANT_WHITE_SPACE DUAL_OPERATOR (SIGNIFICANT_WHITE_SPACE | &EOL) |
-  //                            DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE?
+  //                            DUAL_OPERATOR significantWhiteSpaceMaybe
   private static boolean additionInfixOperator_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "additionInfixOperator_0")) return false;
     boolean r;
@@ -692,26 +691,19 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE?
+  // DUAL_OPERATOR significantWhiteSpaceMaybe
   private static boolean additionInfixOperator_0_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "additionInfixOperator_0_1")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, DUAL_OPERATOR);
-    r = r && additionInfixOperator_0_1_1(b, l + 1);
+    r = r && significantWhiteSpaceMaybe(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
-  // SIGNIFICANT_WHITE_SPACE?
-  private static boolean additionInfixOperator_0_1_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "additionInfixOperator_0_1_1")) return false;
-    consumeToken(b, SIGNIFICANT_WHITE_SPACE);
-    return true;
-  }
-
   /* ********************************************************** */
-  // SIGNIFICANT_WHITE_SPACE? DUAL_OPERATOR (
+  // significantWhiteSpaceMaybe DUAL_OPERATOR (
   //                            // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L610
   //                            "/" | ">" | DUAL_OPERATOR | STRUCT_OPERATOR |
   //                            // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L609
@@ -732,7 +724,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // SIGNIFICANT_WHITE_SPACE? DUAL_OPERATOR (
+  // significantWhiteSpaceMaybe DUAL_OPERATOR (
   //                            // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L610
   //                            "/" | ">" | DUAL_OPERATOR | STRUCT_OPERATOR |
   //                            // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L609
@@ -744,18 +736,11 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "additionTail_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = additionTail_0_0(b, l + 1);
+    r = significantWhiteSpaceMaybe(b, l + 1);
     r = r && consumeToken(b, DUAL_OPERATOR);
     r = r && additionTail_0_2(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
-  }
-
-  // SIGNIFICANT_WHITE_SPACE?
-  private static boolean additionTail_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "additionTail_0_0")) return false;
-    consumeToken(b, SIGNIFICANT_WHITE_SPACE);
-    return true;
   }
 
   // "/" | ">" | DUAL_OPERATOR | STRUCT_OPERATOR |
@@ -4571,7 +4556,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   //                        COMPARISON_OPERATOR |
   //                        DO |
   //                        DIVISION_OPERATOR |
-  //                        DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE? |
+  //                        DUAL_OPERATOR significantWhiteSpaceMaybe |
   //                        ELSE |
   //                        END |
   //                        IN_MATCH_OPERATOR |
@@ -4636,22 +4621,15 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE?
+  // DUAL_OPERATOR significantWhiteSpaceMaybe
   private static boolean relativeIdentifier_11(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "relativeIdentifier_11")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, DUAL_OPERATOR);
-    r = r && relativeIdentifier_11_1(b, l + 1);
+    r = r && significantWhiteSpaceMaybe(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
-  }
-
-  // SIGNIFICANT_WHITE_SPACE?
-  private static boolean relativeIdentifier_11_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "relativeIdentifier_11_1")) return false;
-    consumeToken(b, SIGNIFICANT_WHITE_SPACE);
-    return true;
   }
 
   /* ********************************************************** */
@@ -4710,6 +4688,14 @@ public class ElixirParser implements PsiParser, LightPsiParser {
       c = current_position_(b);
     }
     exit_section_(b, l, m, true, false, null);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // SIGNIFICANT_WHITE_SPACE?
+  static boolean significantWhiteSpaceMaybe(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "significantWhiteSpaceMaybe")) return false;
+    consumeToken(b, SIGNIFICANT_WHITE_SPACE);
     return true;
   }
 
@@ -5129,7 +5115,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // (SIGNIFICANT_WHITE_SPACE? DUAL_OPERATOR | SIGN_OPERATOR | UNARY_OPERATOR) eolStar |
+  // (significantWhiteSpaceMaybe DUAL_OPERATOR | SIGN_OPERATOR | UNARY_OPERATOR) eolStar |
   //                         NOT_OPERATOR eolStar !inInfixOperator
   public static boolean unaryPrefixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unaryPrefixOperator")) return false;
@@ -5141,7 +5127,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // (SIGNIFICANT_WHITE_SPACE? DUAL_OPERATOR | SIGN_OPERATOR | UNARY_OPERATOR) eolStar
+  // (significantWhiteSpaceMaybe DUAL_OPERATOR | SIGN_OPERATOR | UNARY_OPERATOR) eolStar
   private static boolean unaryPrefixOperator_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unaryPrefixOperator_0")) return false;
     boolean r;
@@ -5152,7 +5138,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // SIGNIFICANT_WHITE_SPACE? DUAL_OPERATOR | SIGN_OPERATOR | UNARY_OPERATOR
+  // significantWhiteSpaceMaybe DUAL_OPERATOR | SIGN_OPERATOR | UNARY_OPERATOR
   private static boolean unaryPrefixOperator_0_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unaryPrefixOperator_0_0")) return false;
     boolean r;
@@ -5164,22 +5150,15 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // SIGNIFICANT_WHITE_SPACE? DUAL_OPERATOR
+  // significantWhiteSpaceMaybe DUAL_OPERATOR
   private static boolean unaryPrefixOperator_0_0_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unaryPrefixOperator_0_0_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = unaryPrefixOperator_0_0_0_0(b, l + 1);
+    r = significantWhiteSpaceMaybe(b, l + 1);
     r = r && consumeToken(b, DUAL_OPERATOR);
     exit_section_(b, m, null, r);
     return r;
-  }
-
-  // SIGNIFICANT_WHITE_SPACE?
-  private static boolean unaryPrefixOperator_0_0_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "unaryPrefixOperator_0_0_0_0")) return false;
-    consumeToken(b, SIGNIFICANT_WHITE_SPACE);
-    return true;
   }
 
   // NOT_OPERATOR eolStar !inInfixOperator
