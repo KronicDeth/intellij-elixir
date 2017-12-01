@@ -19,6 +19,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class HomePath {
+    private static final String HEAD_PREFIX = "HEAD-";
     public static final String LINUX_DEFAULT_HOME_PATH = "/usr/local/lib";
     public static final Version UNKNOWN_VERSION = new Version(0, 0, 0);
     private static final File HOMEBREW_ROOT = new File("/usr/local/Cellar");
@@ -71,7 +72,7 @@ public class HomePath {
                     for (File child : files) {
                         if (child.isDirectory()) {
                             String versionString = child.getName();
-                            Version version = Version.parseVersion(versionString);
+                            @NotNull Version version = parseVersion(versionString);
                             File homePath = versionPathToHomePath.apply(child);
                             homePathByVersion.put(version, homePath.getAbsolutePath());
                         }
@@ -79,6 +80,23 @@ public class HomePath {
                 }
             }
         }
+    }
+
+    @NotNull
+    private static Version parseVersion(@NotNull String versionString) {
+        Version version = Version.parseVersion(versionString);
+
+        if (version == null) {
+            if (versionString.startsWith(HEAD_PREFIX)) {
+                String sha1 = versionString.substring(HEAD_PREFIX.length());
+
+                version = new Version(0, 0, Integer.parseInt(sha1, 16));
+            } else {
+                version = UNKNOWN_VERSION;
+            }
+        }
+
+        return version;
     }
 
     public static void mergeNixStore(@NotNull Map<Version, String> homePathByVersion,
