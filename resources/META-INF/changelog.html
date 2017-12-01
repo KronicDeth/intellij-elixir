@@ -34,18 +34,21 @@
         </ul>
       </li>
       <li>
-        <p>Bug Fixes</p>
-        <ul>
-          <li>
-            <code>mix hex.local --force</code> -> <code>mix local.hex --force</code> in <code>README</code>.
-          </li>
-          <li>
-            Parse <code>HEAD-&lt;SHA1&gt;</code> as <code>0.0.&lt;SHA1&gt;</code> for sorting versions from homebrew
-            homepath.  It will almost always be last unless there is an unknown version, which uses <code>0.0.0</code>.
-          </li>
-          <li>Ensure any unparsable version sorts as <code>0.0.0</code> (<code>UKNOWN_VERSION</code>).</li>
-        </ul>
+        Decompile <code>LocT</code> chunk for private macros and functions and the derived names of anonymous functions.
       </li>
+    </ul>
+  </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>
+        <code>mix hex.local --force</code> -> <code>mix local.hex --force</code> in <code>README</code>.
+      </li>
+      <li>
+        Parse <code>HEAD-&lt;SHA1&gt;</code> as <code>0.0.&lt;SHA1&gt;</code> for sorting versions from homebrew
+        homepath.  It will almost always be last unless there is an unknown version, which uses <code>0.0.0</code>.
+      </li>
+      <li>Ensure any unparsable version sorts as <code>0.0.0</code> (<code>UKNOWN_VERSION</code>).</li>
     </ul>
   </li>
 </ul>

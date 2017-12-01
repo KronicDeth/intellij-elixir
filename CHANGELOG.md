@@ -140,6 +140,7 @@
       * Any file with `.eex` as the final extension will be treated as EEx.  To determine the Template Data Language, the `.eex` extension will be stripped and any remaining extension will be looked up to get the File Type and its associated Language.  For example, `*.txt.eex` will be EEx with Plain Text (`.txt`) as the Data Template Language.  Likewise, `*.html.eex` will be EEx with HTML as the Data Template Language.  There's no need to register `*.txt.eex` or `*.html.eex` or any other `*.DATA_TEMPLATE_LANGUAGE_EXTENSION.eex` pattern explicitly: the nested extension will be looked up using the normal extension setup.
   * Update Build Matrix
     * IDEA `2016.2` is dropped because it's over a year old.  It is still supported, but not actively tested.
+* [#931](https://github.com/KronicDeth/intellij-elixir/pull/931) - Decompile `LocT` chunk for private macros and functions and the derived names of anonymous functions. - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#910](https://github.com/KronicDeth/intellij-elixir/pull/910) - `mix hex.local --force` -> `mix local.hex --force` in `README` - [@bryanhuntesl-lowpriv](https://github.com/bryanhuntesl-lowpriv)
