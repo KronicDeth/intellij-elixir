@@ -143,6 +143,9 @@
 
 ### Bug Fixes
 * [#910](https://github.com/KronicDeth/intellij-elixir/pull/910) - `mix hex.local --force` -> `mix local.hex --force` in `README` - [@bryanhuntesl-lowpriv](https://github.com/bryanhuntesl-lowpriv)
+* [#930](https://github.com/KronicDeth/intellij-elixir/pull/930) - [@KronicDeth](https://github.com/KronicDeth)
+  * Parse `HEAD-<SHA1>` as `0.0.<SHA1>` for sorting versions from homebrew homepath.  It will almost always be last unless there is an unknown version, which uses `0.0.0`.
+  * Ensure any unparsable version sorts as `0.0.0` (`UKNOWN_VERSION`).
 
 ## v6.5.1
 
