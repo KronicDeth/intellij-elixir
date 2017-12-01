@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * Created by luke.imhoff on 10/23/14.
  */
@@ -47,17 +49,26 @@ public abstract class Test extends TokenTest {
     protected abstract char promoter();
     protected abstract char terminator();
 
-    protected void reset(CharSequence charSequence) throws IOException {
+    @Override
+    protected void start(CharSequence charSequence) {
         // start to trigger SIGIL_MODIFIERS after GROUP
         CharSequence fullCharSequence = "~r" + promoter() + terminator() + charSequence;
-        super.reset(fullCharSequence);
+        super.start(fullCharSequence);
+
         // consume ~
-        flexLexer.advance();
+        assertEquals("~", lexer.getTokenText());
+        lexer.advance();
+
         // consume r
-        flexLexer.advance();
+        assertEquals("r", lexer.getTokenText());
+        lexer.advance();
+
         // consume promoter
-        flexLexer.advance();
+        assertEquals(String.valueOf(promoter()), lexer.getTokenText());
+        lexer.advance();
+
         // consume terminator
-        flexLexer.advance();
+        assertEquals(String.valueOf(terminator()), lexer.getTokenText());
+        lexer.advance();
     }
 }

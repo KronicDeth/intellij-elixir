@@ -1,0 +1,8 @@
+Embedded Elixir File(0,18)
+  PsiElement(Data)('0\n  ')(0,4)
+  EExTagImpl(TAG)(4,13)
+    PsiElement(<%)('<%')(4,6)
+    PsiElement(=)('=')(6,7)
+    PsiElement(Elixir)(' 12 ')(7,11)
+    PsiElement(%>)('%>')(11,13)
+  PsiElement(Data)('  \n34')(13,18)

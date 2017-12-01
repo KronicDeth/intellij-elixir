@@ -1,0 +1,4 @@
+PsiFile(plain text):FnUnexpectedEnd.eex(0,33)
+  PsiElement(EEx)('<% f = fn 1 -> %>')(0,17)
+  PsiElement(PLAIN_TEXT)('b')(17,18)
+  PsiElement(EEx)('<% end\nf.() %>')(18,33)

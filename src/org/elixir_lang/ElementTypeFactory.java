@@ -14,11 +14,16 @@ public class ElementTypeFactory {
 
     @NotNull
     public static IElementType factory(@NotNull String name) {
+        return factory("org.elixir_lang.psi.stub.type", name);
+    }
+
+    @NotNull
+    public static IElementType factory(@NotNull String packageName, @NotNull String name) {
         String relativeClassName = CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, name);
         Class<?> clazz = null;
 
         try {
-            clazz = Class.forName("org.elixir_lang.psi.stub.type." + relativeClassName);
+            clazz = Class.forName(packageName + "." + relativeClassName);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }

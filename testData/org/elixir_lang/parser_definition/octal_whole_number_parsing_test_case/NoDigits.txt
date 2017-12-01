@@ -6,7 +6,7 @@ Elixir File(0,84)
     ElixirOctalWholeNumberImpl(OCTAL_WHOLE_NUMBER)(34,36)
       PsiElement(0)('0')(34,35)
       PsiElement(o)('o')(35,36)
-      PsiErrorElement:<octal digits> expected, got '
+      PsiErrorElement:'0-7', A-Z, a-z or 8-9 expected, got '
 '(36,36)
         <empty list>
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(36,70)
@@ -18,7 +18,7 @@ Elixir File(0,84)
     ElixirOctalWholeNumberImpl(OCTAL_WHOLE_NUMBER)(70,72)
       PsiElement(0)('0')(70,71)
       PsiElement(o)('o')(71,72)
-      PsiErrorElement:<octal digits> expected, got ';'(72,72)
+      PsiErrorElement:'0-7', A-Z, a-z or 8-9 expected, got ';'(72,72)
         <empty list>
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(72,73)
     PsiElement(;)(';')(72,73)

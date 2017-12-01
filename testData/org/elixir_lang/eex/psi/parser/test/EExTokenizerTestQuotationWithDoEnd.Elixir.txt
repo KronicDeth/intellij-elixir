@@ -1,0 +1,7 @@
+Elixir File(0,31)
+  ElixirEexImpl(EEX)(0,31)
+    PsiElement(EEx Data)('foo ')(0,4)
+    PsiElement(<%%)('<%%')(4,7)
+    PsiElement(EEx Data)(' true do %>bar')(7,21)
+    PsiElement(<%%)('<%%')(21,24)
+    PsiElement(EEx Data)(' end %>')(24,31)

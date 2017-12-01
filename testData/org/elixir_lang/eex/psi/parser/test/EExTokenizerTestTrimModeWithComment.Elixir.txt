@@ -1,0 +1,8 @@
+Elixir File(0,20)
+  ElixirEexImpl(EEX)(0,20)
+    ElixirEexTagImpl(EEX_TAG)(0,14)
+      PsiElement(<%)('<%')(0,2)
+      PsiElement(EEx Comment Marker (#))('#')(2,3)
+      PsiElement(EEx Comment)(' comment ')(3,12)
+      PsiElement(%>)('%>')(12,14)
+    PsiElement(EEx Data)('  \n123')(14,20)

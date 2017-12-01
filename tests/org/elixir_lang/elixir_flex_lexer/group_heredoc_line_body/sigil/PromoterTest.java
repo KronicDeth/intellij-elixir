@@ -38,18 +38,19 @@ public abstract class PromoterTest extends TokenTest {
         );
     }
 
-    protected void reset(CharSequence charSequence) throws IOException {
+    @Override
+    protected void start(CharSequence charSequence) {
         // start to trigger GROUP state
         CharSequence fullCharSequence = "~" + sigilName() + "'''\n" + charSequence;
-        super.reset(fullCharSequence);
+        super.start(fullCharSequence);
         // consume '~'
-        flexLexer.advance();
+        lexer.advance();
         // consume sigilName
-        flexLexer.advance();
+        lexer.advance();
         // consume "'''"
-        flexLexer.advance();
+        lexer.advance();
         // consume '\n'
-        flexLexer.advance();
+        lexer.advance();
     }
 
     protected abstract char sigilName();

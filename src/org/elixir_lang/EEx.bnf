@@ -1,0 +1,38 @@
+{
+  // CANNOT be called `Parser` because `
+  parserClass="org.elixir_lang.eex.Parser"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="EEx"
+  psiImplClassSuffix="Impl"
+  psiPackage="org.elixir_lang.eex.psi"
+  psiImplPackage="org.elixir_lang.eex.psi.impl"
+
+  elementTypeHolderClass="org.elixir_lang.eex.psi.Types"
+  elementTypeClass="org.elixir_lang.eex.psi.ElementType"
+  tokenTypeClass="org.elixir_lang.eex.psi.TokenType"
+
+  tokens = [
+    CLOSING = "%>"
+    COMMENT = "Comment"
+    COMMENT_MARKER = "#"
+    DATA = "Data"
+    EMPTY_MARKER = "Empty Marker"
+    EQUALS_MARKER = "="
+    ELIXIR = "Elixir"
+    ESCAPED_OPENING = "<%%"
+    FORWARD_SLASH_MARKER = "/"
+    OPENING = "<%"
+    PIPE_MARKER = "|"
+  ]
+}
+
+private eexFile ::= (DATA | ESCAPED_OPENING | tag)*
+tag ::= OPENING (commentBody | elixirBody) CLOSING
+        { pin = 1 }
+
+private commentBody ::= COMMENT_MARKER COMMENT?
+                        { pin = 1 }
+private elixirBody ::=  elixirMarker? ELIXIR?
+private elixirMarker ::= EMPTY_MARKER | EQUALS_MARKER | FORWARD_SLASH_MARKER | PIPE_MARKER

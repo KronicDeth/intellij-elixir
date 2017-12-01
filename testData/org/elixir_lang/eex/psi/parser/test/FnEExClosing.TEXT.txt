@@ -1,0 +1,4 @@
+PsiFile(plain text):FnEExClosing.eex(0,28)
+  PsiElement(EEx)('<% fn %><% a -> %>')(0,18)
+  PsiElement(PLAIN_TEXT)('b')(18,19)
+  PsiElement(EEx)('<% end %>')(19,28)

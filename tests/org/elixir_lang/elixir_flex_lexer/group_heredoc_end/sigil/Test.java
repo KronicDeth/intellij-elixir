@@ -24,15 +24,15 @@ public abstract class Test extends TokenTest {
      */
 
     @Override
-    protected void reset(CharSequence charSequence) throws IOException {
+    protected void start(CharSequence charSequence) {
         CharSequence fullCharSequence = sigilName() + promoter() + '\n' + charSequence;
-        super.reset(fullCharSequence);
+        super.start(fullCharSequence);
         // consume sigilName
-        flexLexer.advance();
+        lexer.advance();
         // consume promoter
-        flexLexer.advance();
+        lexer.advance();
         // consume '\n'
-        flexLexer.advance();
+        lexer.advance();
     }
 
     protected abstract String promoter();

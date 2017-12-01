@@ -1,0 +1,6 @@
+PsiFile(plain text):FnElixirEExElixirStabBody.eex(0,56)
+  PsiElement(EEx)('<% f = fn 1 -> 1; %>')(0,20)
+  PsiElement(PLAIN_TEXT)('b')(20,21)
+  PsiElement(EEx)('<% 3; 4 -> %>')(21,34)
+  PsiElement(PLAIN_TEXT)('c')(34,35)
+  PsiElement(EEx)('<% end %><%= f.(1) %>')(35,56)

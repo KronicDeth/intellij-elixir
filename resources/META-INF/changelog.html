@@ -1,5 +1,41 @@
 <html>
 <body>
+<h1>v6.6.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>EEx support
+        <ul>
+          <li>Lexer for EEx format</li>
+          <li>Parser for EEx format</li>
+          <li>EEx as a Template Language
+            <ul>
+              <li>
+                Any file with <code>.eex</code> as the final extension will be treated as EEx.  To determine the
+                Template Data Language, the <code>.eex</code> extension will be stripped and any remaining extension
+                will be looked up to get the File Type and its associated Language.  For example, <code>*.txt.eex</code>
+                will be EEx with Plain Text (<code>.txt</code>) as the Data Template Language.  Likewise,
+                <code>*.html.eex</code> will be EEx with HTML as the Data Template Language.  There's no need to
+                register <code>*.txt.eex</code> or <code>*.html.eex</code> or any other
+                <code>*.DATA_TEMPLATE_LANGUAGE_EXTENSION.eex</code> pattern explicitly: the nested extension will be
+                looked up using the normal extension setup.
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>Update Build Matrix
+        <ul>
+          <li>
+            IDEA <code>2016.2</code> is dropped because it's over a year old.  It is still supported, but not actively
+            tested.
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
 <h1>v6.5.1</h1>
 <ul>
   <li>

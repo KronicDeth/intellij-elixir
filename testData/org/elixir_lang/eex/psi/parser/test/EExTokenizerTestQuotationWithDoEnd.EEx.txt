@@ -1,0 +1,6 @@
+Embedded Elixir File(0,31)
+  PsiElement(Data)('foo ')(0,4)
+  PsiElement(<%%)('<%%')(4,7)
+  PsiElement(Data)(' true do %>bar')(7,21)
+  PsiElement(<%%)('<%%')(21,24)
+  PsiElement(Data)(' end %>')(24,31)

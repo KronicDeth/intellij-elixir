@@ -1,0 +1,5 @@
+PsiFile(plain text):EExTokenizerTestQuotationWithInterpolation2.eex(0,21)
+  PsiElement(EEx)('<%%')(0,3)
+  PsiElement(PLAIN_TEXT)('% a ')(3,7)
+  PsiElement(EEx)('<%%')(7,10)
+  PsiElement(PLAIN_TEXT)('= b %> c %>')(10,21)

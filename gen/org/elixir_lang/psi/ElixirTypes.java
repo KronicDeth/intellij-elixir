@@ -46,6 +46,8 @@ public interface ElixirTypes {
   IElementType DECIMAL_WHOLE_NUMBER = new ElixirElementType("DECIMAL_WHOLE_NUMBER");
   IElementType DOT_INFIX_OPERATOR = new ElixirElementType("DOT_INFIX_OPERATOR");
   IElementType DO_BLOCK = new ElixirElementType("DO_BLOCK");
+  IElementType EEX = new ElixirElementType("EEX");
+  IElementType EEX_TAG = new ElixirElementType("EEX_TAG");
   IElementType EMPTY_PARENTHESES = new ElixirElementType("EMPTY_PARENTHESES");
   IElementType ENCLOSED_HEXADECIMAL_ESCAPE_SEQUENCE = new ElixirElementType("ENCLOSED_HEXADECIMAL_ESCAPE_SEQUENCE");
   IElementType END_OF_EXPRESSION = new ElixirElementType("END_OF_EXPRESSION");
@@ -268,6 +270,16 @@ public interface ElixirTypes {
   IElementType DO = new ElixirTokenType("do");
   IElementType DOT_OPERATOR = new ElixirTokenType(".");
   IElementType DUAL_OPERATOR = new ElixirTokenType("Dual Operator (+, -)");
+  IElementType EEX_CLOSING = new ElixirTokenType("%>");
+  IElementType EEX_COMMENT = new ElixirTokenType("EEx Comment");
+  IElementType EEX_COMMENT_MARKER = new ElixirTokenType("EEx Comment Marker (#)");
+  IElementType EEX_DATA = new ElixirTokenType("EEx Data");
+  IElementType EEX_EMPTY_MARKER = new ElixirTokenType("EEx Empty Marker");
+  IElementType EEX_EQUALS_MARKER = new ElixirTokenType("EEx Equals Marker (=)");
+  IElementType EEX_ESCAPED_OPENING = new ElixirTokenType("<%%");
+  IElementType EEX_FORWARD_SLASH_MARKER = new ElixirTokenType("EEx Forward Slash Marker (/)");
+  IElementType EEX_OPENING = new ElixirTokenType("<%");
+  IElementType EEX_PIPE_MARKER = new ElixirTokenType("EEx Pipe Marker (|)");
   IElementType ELSE = new ElixirTokenType("else");
   IElementType END = new ElixirTokenType("end");
   IElementType EOL = new ElixirTokenType("\\\\n, \\\\r\\\\n");
@@ -476,6 +488,12 @@ public interface ElixirTypes {
       }
       else if (type == DO_BLOCK) {
         return new ElixirDoBlockImpl(node);
+      }
+      else if (type == EEX) {
+        return new ElixirEexImpl(node);
+      }
+      else if (type == EEX_TAG) {
+        return new ElixirEexTagImpl(node);
       }
       else if (type == EMPTY_PARENTHESES) {
         return new ElixirEmptyParenthesesImpl(node);

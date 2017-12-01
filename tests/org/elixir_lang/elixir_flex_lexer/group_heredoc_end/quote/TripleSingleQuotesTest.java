@@ -39,8 +39,8 @@ public class TripleSingleQuotesTest extends Test {
     public static Collection<Object[]> generateData() {
         return Arrays.asList(
                 new Object[][]{
-                        {"'''", TERMINATOR_TYPE, INITIAL_STATE, true },
-                        {"\"\"\"", FRAGMENT_TYPE, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY, false }
+                        {"'''", TERMINATOR_TYPE, ElixirFlexLexer.YYINITIAL, true },
+                        {"\"\"\"", FRAGMENT_TYPE, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY, true }
                 }
         );
     }

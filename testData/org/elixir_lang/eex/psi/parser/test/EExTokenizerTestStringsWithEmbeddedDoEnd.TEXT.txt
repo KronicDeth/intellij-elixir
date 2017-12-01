@@ -1,0 +1,5 @@
+PsiFile(plain text):EExTokenizerTestStringsWithEmbeddedDoEnd.eex(0,32)
+  PsiElement(PLAIN_TEXT)('foo ')(0,4)
+  PsiElement(EEx)('<% if true do %>')(4,20)
+  PsiElement(PLAIN_TEXT)('bar')(20,23)
+  PsiElement(EEx)('<% end %>')(23,32)

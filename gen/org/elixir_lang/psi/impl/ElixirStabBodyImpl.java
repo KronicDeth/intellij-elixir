@@ -31,6 +31,12 @@ public class ElixirStabBodyImpl extends ASTWrapperPsiElement implements ElixirSt
 
   @Override
   @NotNull
+  public List<ElixirEex> getEexList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEex.class);
+  }
+
+  @Override
+  @NotNull
   public List<ElixirEmptyParentheses> getEmptyParenthesesList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEmptyParentheses.class);
   }

@@ -3,6 +3,7 @@ package org.elixir_lang.elixir_flex_lexer.group.quote;
 import com.intellij.psi.tree.IElementType;
 import org.elixir_lang.ElixirFlexLexer;
 import org.elixir_lang.psi.ElixirTypes;
+import org.jetbrains.annotations.NotNull;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -49,9 +50,9 @@ public class SingleQuoteTest extends Test {
     }
 
     @Override
-    protected void reset(CharSequence charSequence) throws IOException {
+    protected void start(@NotNull CharSequence charSequence) {
         // start of single quote to trigger GROUP state with terminator being single quote
         CharSequence fullCharSequence = "'" + charSequence;
-        super.reset(fullCharSequence);
+        super.start(fullCharSequence);
     }
 }

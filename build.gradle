@@ -59,7 +59,8 @@ allprojects {
 
     plugins = ["org.jetbrains.erlang:${intellij_erlang_version}",
                // always have IdeaVIM installed in sandbox
-               "IdeaVIM:0.48"]
+               "IdeaVIM:0.48",
+               "PsiViewer:3.28.93"]
     pluginName 'intellij-elixir'
     version ideaVersion
     downloadSources Boolean.valueOf(sources)

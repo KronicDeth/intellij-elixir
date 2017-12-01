@@ -4,12 +4,15 @@ import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import org.elixir_lang.ElixirFlexLexer;
 import org.elixir_lang.psi.ElixirTypes;
+import org.jetbrains.annotations.NotNull;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by luke.imhoff on 11/28/14.
@@ -28,12 +31,12 @@ public class DecimalIntegerTest extends TokenTest {
      */
 
     @Override
-    protected void reset(CharSequence charSequence) throws IOException {
+    protected void start(@NotNull CharSequence charSequence) {
         // start to trigger DECIMAL_WHOLE_NUMBER state
         CharSequence fullCharSequence = "1" + charSequence;
-        super.reset(fullCharSequence);
+        super.start(fullCharSequence);
         // consume '0'
-        flexLexer.advance();
+        lexer.advance();
     }
 
     @Parameterized.Parameters(
@@ -41,16 +44,16 @@ public class DecimalIntegerTest extends TokenTest {
     )
     public static Collection<Object[]> generateData() {
         return Arrays.asList(new Object[][]{
-                { " ", TokenType.WHITE_SPACE, INITIAL_STATE, true },
+                { " ", TokenType.WHITE_SPACE, ElixirFlexLexer.YYINITIAL, true },
                 { "!", ElixirTypes.UNARY_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
-                { "#", ElixirTypes.COMMENT, INITIAL_STATE, true },
-                { "$", TokenType.BAD_CHARACTER, INITIAL_STATE, true },
+                { "#", ElixirTypes.COMMENT, ElixirFlexLexer.YYINITIAL, true },
+                { "$", TokenType.BAD_CHARACTER, ElixirFlexLexer.YYINITIAL, true },
                 { "%", ElixirTypes.STRUCT_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
                 { "&", ElixirTypes.CAPTURE_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
                 { "'", ElixirTypes.CHAR_LIST_PROMOTER, ElixirFlexLexer.GROUP, true },
                 { "'''", ElixirTypes.CHAR_LIST_HEREDOC_PROMOTER, ElixirFlexLexer.GROUP_HEREDOC_START, true },
-                { "(", ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE, true },
-                { ")", ElixirTypes.CLOSING_PARENTHESIS, INITIAL_STATE, true },
+                { "(", ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL, true },
+                { ")", ElixirTypes.CLOSING_PARENTHESIS, ElixirFlexLexer.YYINITIAL, true },
                 { "*", ElixirTypes.MULTIPLICATION_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
                 { "+", ElixirTypes.DUAL_OPERATOR, ElixirFlexLexer.DUAL_OPERATION, true },
                 { ",", ElixirTypes.COMMA, ElixirFlexLexer.SIGN_OPERATION_MAYBE, true },
@@ -69,7 +72,7 @@ public class DecimalIntegerTest extends TokenTest {
                 { "8", null, ElixirFlexLexer.DECIMAL_WHOLE_NUMBER, true },
                 { "9", null, ElixirFlexLexer.DECIMAL_WHOLE_NUMBER, true },
                 { ":", ElixirTypes.COLON, ElixirFlexLexer.ATOM_START, true },
-                { ";", ElixirTypes.SEMICOLON, INITIAL_STATE, true },
+                { ";", ElixirTypes.SEMICOLON, ElixirFlexLexer.YYINITIAL, true },
                 { "<", ElixirTypes.RELATIONAL_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
                 { "=", ElixirTypes.MATCH_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
                 { ">", ElixirTypes.RELATIONAL_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
@@ -101,15 +104,15 @@ public class DecimalIntegerTest extends TokenTest {
                 { "X", ElixirTypes.INVALID_DECIMAL_DIGITS, ElixirFlexLexer.DECIMAL_WHOLE_NUMBER, true },
                 { "Y", ElixirTypes.INVALID_DECIMAL_DIGITS, ElixirFlexLexer.DECIMAL_WHOLE_NUMBER, true },
                 { "Z", ElixirTypes.INVALID_DECIMAL_DIGITS, ElixirFlexLexer.DECIMAL_WHOLE_NUMBER, true },
-                { "[", ElixirTypes.OPENING_BRACKET, INITIAL_STATE, true },
+                { "[", ElixirTypes.OPENING_BRACKET, ElixirFlexLexer.YYINITIAL, true },
                 { "\"", ElixirTypes.STRING_PROMOTER, ElixirFlexLexer.GROUP, true },
                 { "\"\"\"", ElixirTypes.STRING_HEREDOC_PROMOTER, ElixirFlexLexer.GROUP_HEREDOC_START, true },
                 { "\n", ElixirTypes.EOL, ElixirFlexLexer.SIGN_OPERATION_MAYBE, true },
                 { "\r\n", ElixirTypes.EOL, ElixirFlexLexer.SIGN_OPERATION_MAYBE, true },
-                { "]", ElixirTypes.CLOSING_BRACKET, INITIAL_STATE, true },
+                { "]", ElixirTypes.CLOSING_BRACKET, ElixirFlexLexer.YYINITIAL, true },
                 { "^", ElixirTypes.UNARY_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
                 { "_", ElixirTypes.DECIMAL_SEPARATOR, ElixirFlexLexer.DECIMAL_WHOLE_NUMBER, true },
-                { "`", TokenType.BAD_CHARACTER, INITIAL_STATE, true },
+                { "`", TokenType.BAD_CHARACTER, ElixirFlexLexer.YYINITIAL, true },
                 { "a", ElixirTypes.INVALID_DECIMAL_DIGITS, ElixirFlexLexer.DECIMAL_WHOLE_NUMBER, true },
                 { "b", ElixirTypes.INVALID_DECIMAL_DIGITS, ElixirFlexLexer.DECIMAL_WHOLE_NUMBER, true },
                 { "c", ElixirTypes.INVALID_DECIMAL_DIGITS, ElixirFlexLexer.DECIMAL_WHOLE_NUMBER, true },
@@ -136,9 +139,9 @@ public class DecimalIntegerTest extends TokenTest {
                 { "x", ElixirTypes.INVALID_DECIMAL_DIGITS, ElixirFlexLexer.DECIMAL_WHOLE_NUMBER, true },
                 { "y", ElixirTypes.INVALID_DECIMAL_DIGITS, ElixirFlexLexer.DECIMAL_WHOLE_NUMBER, true },
                 { "z", ElixirTypes.INVALID_DECIMAL_DIGITS, ElixirFlexLexer.DECIMAL_WHOLE_NUMBER, true },
-                { "{", ElixirTypes.OPENING_CURLY, INITIAL_STATE, true },
+                { "{", ElixirTypes.OPENING_CURLY, ElixirFlexLexer.YYINITIAL, true },
                 { "|", ElixirTypes.PIPE_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
-                { "}", ElixirTypes.CLOSING_CURLY, INITIAL_STATE, true },
+                { "}", ElixirTypes.CLOSING_CURLY, ElixirFlexLexer.YYINITIAL, true },
                 { "~", ElixirTypes.TILDE, ElixirFlexLexer.SIGIL, true }
         });
     }

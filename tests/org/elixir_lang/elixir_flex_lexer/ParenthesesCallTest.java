@@ -3,6 +3,7 @@ package org.elixir_lang.elixir_flex_lexer;
 import org.elixir_lang.ElixirFlexLexer;
 import org.elixir_lang.TokenTypeState;
 import org.elixir_lang.psi.ElixirTypes;
+import org.jetbrains.annotations.NotNull;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -47,469 +48,469 @@ public class ParenthesesCallTest extends Test {
                                 "&&",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.AND_SYMBOL_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "&&&",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.AND_SYMBOL_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "<<<",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.ARROW_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "<<~",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.ARROW_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "<|>",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.ARROW_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "<~>",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.ARROW_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 ">>>",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.ARROW_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "~>>",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.ARROW_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "<~",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.ARROW_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "|>",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.ARROW_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "~>",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.ARROW_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "=>",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.ASSOCIATION_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "identifier",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_OR_KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.CALL, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.CALL, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "@",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.AT_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "<<>>",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.OPENING_BIT, INITIAL_STATE),
-                                        new TokenTypeState(ElixirTypes.CLOSING_BIT, INITIAL_STATE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_BIT, ElixirFlexLexer.YYINITIAL),
+                                        new TokenTypeState(ElixirTypes.CLOSING_BIT, ElixirFlexLexer.YYINITIAL),
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "&",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.CAPTURE_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "after",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.AFTER, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "afterwards",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_OR_KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.CALL, INITIAL_STATE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.CALL, ElixirFlexLexer.YYINITIAL),
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "and",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.AND_WORD_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "androids",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_OR_KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.CALL, INITIAL_STATE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.CALL, ElixirFlexLexer.YYINITIAL),
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "catch",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.CATCH, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "catchall",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_OR_KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.CALL, INITIAL_STATE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.CALL, ElixirFlexLexer.YYINITIAL),
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "do",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.DO, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "done",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_OR_KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.CALL, INITIAL_STATE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.CALL, ElixirFlexLexer.YYINITIAL),
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "else",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.ELSE, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "elsewhere",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_OR_KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.CALL, INITIAL_STATE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.CALL, ElixirFlexLexer.YYINITIAL),
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "end",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.END, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "ending",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_OR_KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.CALL, INITIAL_STATE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.CALL, ElixirFlexLexer.YYINITIAL),
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "in",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.IN_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "inner",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_OR_KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.CALL, INITIAL_STATE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.CALL, ElixirFlexLexer.YYINITIAL),
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "not",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.NOT_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "notifiers",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_OR_KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.CALL, INITIAL_STATE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.CALL, ElixirFlexLexer.YYINITIAL),
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "or",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.OR_WORD_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "order",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_OR_KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.CALL, INITIAL_STATE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.CALL, ElixirFlexLexer.YYINITIAL),
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "rescue",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.RESCUE, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "rescuer",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_OR_KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.CALL, INITIAL_STATE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.CALL, ElixirFlexLexer.YYINITIAL),
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "!==",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.COMPARISON_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "===",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.COMPARISON_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "!=",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.COMPARISON_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "+",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.DUAL_OPERATOR, ElixirFlexLexer.DUAL_OPERATION),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "-",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.DUAL_OPERATOR, ElixirFlexLexer.DUAL_OPERATION),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "^^^",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.THREE_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "||",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.OR_SYMBOL_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "|||",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.OR_SYMBOL_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "~~~",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.UNARY_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "!",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.UNARY_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "^",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.UNARY_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "<-",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.IN_MATCH_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "\\\\",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.IN_MATCH_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "%{}",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.STRUCT_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_CURLY, INITIAL_STATE),
-                                        new TokenTypeState(ElixirTypes.CLOSING_CURLY, INITIAL_STATE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_CURLY, ElixirFlexLexer.YYINITIAL),
+                                        new TokenTypeState(ElixirTypes.CLOSING_CURLY, ElixirFlexLexer.YYINITIAL),
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "=",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.MATCH_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "*",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.MULTIPLICATION_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "/",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.DIVISION_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "|",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.PIPE_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "<=",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.RELATIONAL_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 ">=",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.RELATIONAL_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "<",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.RELATIONAL_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 ">",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.RELATIONAL_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "->",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.STAB_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "%",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.STRUCT_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "{}",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.OPENING_CURLY, INITIAL_STATE),
-                                        new TokenTypeState(ElixirTypes.CLOSING_CURLY, INITIAL_STATE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_CURLY, ElixirFlexLexer.YYINITIAL),
+                                        new TokenTypeState(ElixirTypes.CLOSING_CURLY, ElixirFlexLexer.YYINITIAL),
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "++",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.TWO_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "--",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.TWO_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "..",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.RANGE_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
                         {
                                 "<>",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.TWO_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL)
                                 )
                         }
                 }
@@ -521,24 +522,28 @@ public class ParenthesesCallTest extends Test {
      */
 
     @org.junit.Test
-    public void identifierCall() throws IOException {
-        reset(identifierCharSequence);
+    public void identifierCall() {
+        start(identifierCharSequence);
 
         int lastState = -1;
 
         for (TokenTypeState tokenTypeState: tokenTypeStates) {
-            assertEquals(tokenTypeState.tokenType, flexLexer.advance());
-            assertEquals(tokenTypeState.state, flexLexer.yystate());
+            assertEquals(tokenTypeState.tokenType, lexer.getTokenType());
+
+            lexer.advance();
+
+            assertEquals(tokenTypeState.state, lexer.getState());
+
             lastState = tokenTypeState.state;
         }
 
-        assertEquals(lastState, INITIAL_STATE);
+        assertEquals(lastState, ElixirFlexLexer.YYINITIAL);
     }
 
     @Override
-    protected void reset(CharSequence charSequence) throws IOException {
+    protected void start(@NotNull CharSequence charSequence) {
         // append "(" to trigger CALL_OR_KEYWORD_PAIR_MAYBE
         CharSequence fullCharSequence = charSequence + "(";
-        super.reset(fullCharSequence);
+        super.start(fullCharSequence);
     }
 }
