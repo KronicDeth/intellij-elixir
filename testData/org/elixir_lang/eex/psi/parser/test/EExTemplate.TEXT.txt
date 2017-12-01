@@ -1,0 +1,5 @@
+PsiFile(plain text):EExTemplate.eex(0,34)
+  PsiElement(PLAIN_TEXT)('foo ')(0,4)
+  PsiElement(EEx)('<%= if true do %>')(4,21)
+  PsiElement(PLAIN_TEXT)('bar.')(21,25)
+  PsiElement(EEx)('<% end %>')(25,34)

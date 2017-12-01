@@ -4,6 +4,7 @@ import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import org.elixir_lang.ElixirFlexLexer;
 import org.elixir_lang.psi.ElixirTypes;
+import org.jetbrains.annotations.NotNull;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -29,12 +30,12 @@ public class GroupHeredocStartTest extends TokenTest {
      */
 
     @Override
-    protected void reset(CharSequence charSequence) throws IOException {
+    protected void start(@NotNull CharSequence charSequence) {
         // start to trigger GROUP_HEREDOC_START state
         CharSequence fullCharSequence = "'''" + charSequence;
-        super.reset(fullCharSequence);
+        super.start(fullCharSequence);
         // consume "'''"
-        flexLexer.advance();
+        lexer.advance();
     }
 
     @Parameterized.Parameters(

@@ -17,19 +17,24 @@ public class EndTest extends TokenTest {
      * Methods
      */
 
-    @Override
-    protected int initialState() {
-        return ElixirFlexLexer.INTERPOLATION;
-    }
-
     @Test
     @Override
     public void token() throws IOException {
-        int lastLexicalState = ElixirFlexLexer.GROUP;
-        reset("}", lastLexicalState);
-        flexLexer.pushAndBegin(initialState());
+        start("\"#{}\"");
 
-        assertEquals(ElixirTypes.INTERPOLATION_END, flexLexer.advance());
-        assertEquals(lastLexicalState, flexLexer.yystate());
+        lexer.advance();
+
+        assertEquals(ElixirTypes.INTERPOLATION_START, lexer.getTokenType());
+        assertEquals(ElixirFlexLexer.GROUP, lexer.getState());
+
+        lexer.advance();
+
+        assertEquals(ElixirTypes.INTERPOLATION_END, lexer.getTokenType());
+        assertEquals(ElixirFlexLexer.INTERPOLATION, lexer.getState());
+
+        lexer.advance();
+
+        assertEquals(ElixirTypes.STRING_TERMINATOR, lexer.getTokenType());
+        assertEquals(ElixirFlexLexer.GROUP, lexer.getState());
     }
 }

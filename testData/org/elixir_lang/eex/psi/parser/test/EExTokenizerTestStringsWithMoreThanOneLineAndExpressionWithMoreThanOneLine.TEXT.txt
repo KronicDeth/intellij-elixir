@@ -1,0 +1,3 @@
+PsiFile(plain text):EExTokenizerTestStringsWithMoreThanOneLineAndExpressionWithMoreThanOneLine.eex(0,28)
+  PsiElement(PLAIN_TEXT)('foo ')(0,4)
+  PsiElement(EEx)('<%= bar\nbaz %>\n<% foo %>')(4,28)

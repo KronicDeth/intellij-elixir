@@ -1,0 +1,3 @@
+PsiFile(plain text):StringSample.eex(0,12)
+  PsiElement(EEx)('<%= a + b %>')(0,12)
+  PsiElement(PLAIN_TEXT)('')(12,12)

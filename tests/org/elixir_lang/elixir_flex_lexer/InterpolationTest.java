@@ -16,12 +16,6 @@ import java.util.Collection;
 @RunWith(Parameterized.class)
 public class InterpolationTest extends TokenTest {
     /*
-     * Constants
-     */
-
-    private static final int INITIAL_STATE = ElixirFlexLexer.INTERPOLATION;
-
-    /*
      * Constructors
      */
 
@@ -33,21 +27,16 @@ public class InterpolationTest extends TokenTest {
      * Methods
      */
 
-    @Override
-    protected int initialState() {
-        return INITIAL_STATE;
-    }
-
     @Parameterized.Parameters(
             name = "\"{0}\" parses as {1} token and advances to state {2}"
     )
     public static Collection<Object[]> generateData() {
         return Arrays.asList(new Object[][]{
-                        { " ", TokenType.WHITE_SPACE, INITIAL_STATE, true },
+                        { " ", TokenType.WHITE_SPACE, ElixirFlexLexer.YYINITIAL, true },
                         { "!", ElixirTypes.UNARY_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true},
                         { "!=", ElixirTypes.COMPARISON_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
                         { "!==", ElixirTypes.COMPARISON_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
-                        { "#", ElixirTypes.COMMENT, INITIAL_STATE, true },
+                        { "#", ElixirTypes.COMMENT, ElixirFlexLexer.YYINITIAL, true },
                         { "%", ElixirTypes.STRUCT_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
                         { "%{}", ElixirTypes.STRUCT_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, false },
                         { "&", ElixirTypes.CAPTURE_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
@@ -55,8 +44,8 @@ public class InterpolationTest extends TokenTest {
                         { "&&&", ElixirTypes.AND_SYMBOL_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true},
                         { "'", ElixirTypes.CHAR_LIST_PROMOTER, ElixirFlexLexer.GROUP, true },
                         { "'''", ElixirTypes.CHAR_LIST_HEREDOC_PROMOTER, ElixirFlexLexer.GROUP_HEREDOC_START, true },
-                        { "(", ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE, true },
-                        { ")", ElixirTypes.CLOSING_PARENTHESIS, INITIAL_STATE, true },
+                        { "(", ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL, true },
+                        { ")", ElixirTypes.CLOSING_PARENTHESIS, ElixirFlexLexer.YYINITIAL, true },
                         { "+", ElixirTypes.DUAL_OPERATOR, ElixirFlexLexer.DUAL_OPERATION, true},
                         { "++", ElixirTypes.TWO_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true},
                         { ",", ElixirTypes.COMMA, ElixirFlexLexer.SIGN_OPERATION_MAYBE, true },
@@ -80,19 +69,19 @@ public class InterpolationTest extends TokenTest {
                         { "1234567890", ElixirTypes.VALID_DECIMAL_DIGITS, ElixirFlexLexer.DECIMAL_WHOLE_NUMBER, true },
                         { "1_", ElixirTypes.VALID_DECIMAL_DIGITS, ElixirFlexLexer.DECIMAL_WHOLE_NUMBER, false},
                         { "1_2_3_4_5_6_7_8_9_0", ElixirTypes.VALID_DECIMAL_DIGITS, ElixirFlexLexer.DECIMAL_WHOLE_NUMBER, false },
-                        { ": ", ElixirTypes.COLON, INITIAL_STATE, false },
+                        { ": ", ElixirTypes.COLON, ElixirFlexLexer.YYINITIAL, false },
                         { ":", ElixirTypes.COLON, ElixirFlexLexer.ATOM_START, true },
-                        { "::", ElixirTypes.TYPE_OPERATOR, INITIAL_STATE, true },
-                        { ":\n", ElixirTypes.COLON, INITIAL_STATE, false },
-                        { ":\r\n", ElixirTypes.COLON, INITIAL_STATE, false },
-                        { ":\t", ElixirTypes.COLON, INITIAL_STATE, false },
-                        { "]", ElixirTypes.CLOSING_BRACKET, INITIAL_STATE, true },
-                        { ";", ElixirTypes.SEMICOLON, INITIAL_STATE, true },
+                        { "::", ElixirTypes.TYPE_OPERATOR, ElixirFlexLexer.YYINITIAL, true },
+                        { ":\n", ElixirTypes.COLON, ElixirFlexLexer.YYINITIAL, false },
+                        { ":\r\n", ElixirTypes.COLON, ElixirFlexLexer.YYINITIAL, false },
+                        { ":\t", ElixirTypes.COLON, ElixirFlexLexer.YYINITIAL, false },
+                        { "]", ElixirTypes.CLOSING_BRACKET, ElixirFlexLexer.YYINITIAL, true },
+                        { ";", ElixirTypes.SEMICOLON, ElixirFlexLexer.YYINITIAL, true },
                         { "<", ElixirTypes.RELATIONAL_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
                         { "<-", ElixirTypes.IN_MATCH_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
-                        { "<<", ElixirTypes.OPENING_BIT, INITIAL_STATE, true },
+                        { "<<", ElixirTypes.OPENING_BIT, ElixirFlexLexer.YYINITIAL, true },
                         { "<<<", ElixirTypes.ARROW_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
-                        { "<<>>", ElixirTypes.OPENING_BIT, INITIAL_STATE, false },
+                        { "<<>>", ElixirTypes.OPENING_BIT, ElixirFlexLexer.YYINITIAL, false },
                         { "<<~", ElixirTypes.ARROW_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
                         { "<=", ElixirTypes.RELATIONAL_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
                         { "<>", ElixirTypes.TWO_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true},
@@ -106,22 +95,22 @@ public class InterpolationTest extends TokenTest {
                         { "=~", ElixirTypes.COMPARISON_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
                         { ">", ElixirTypes.RELATIONAL_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
                         { ">=", ElixirTypes.RELATIONAL_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
-                        { ">>", ElixirTypes.CLOSING_BIT, INITIAL_STATE, true },
+                        { ">>", ElixirTypes.CLOSING_BIT, ElixirFlexLexer.YYINITIAL, true },
                         { ">>>", ElixirTypes.ARROW_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
                         { "?", ElixirTypes.CHAR_TOKENIZER, ElixirFlexLexer.CHAR_TOKENIZATION, true },
                         { "@", ElixirTypes.AT_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
                         { "Enum", ElixirTypes.ALIAS_TOKEN, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
-                        { "[", ElixirTypes.OPENING_BRACKET, INITIAL_STATE, true },
+                        { "[", ElixirTypes.OPENING_BRACKET, ElixirFlexLexer.YYINITIAL, true },
                         { "\"", ElixirTypes.STRING_PROMOTER, ElixirFlexLexer.GROUP, true },
                         { "\"\"\"", ElixirTypes.STRING_HEREDOC_PROMOTER, ElixirFlexLexer.GROUP_HEREDOC_START, true },
-                        { "\\;", TokenType.BAD_CHARACTER, INITIAL_STATE, false },
+                        { "\\;", TokenType.BAD_CHARACTER, ElixirFlexLexer.YYINITIAL, false },
                         { "\\\\", ElixirTypes.IN_MATCH_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
-                        { "\\\n", TokenType.WHITE_SPACE, INITIAL_STATE, true },
-                        { "\\\r\n", TokenType.WHITE_SPACE, INITIAL_STATE, true },
-                        { "\f", TokenType.WHITE_SPACE, INITIAL_STATE, true },
+                        { "\\\n", TokenType.WHITE_SPACE, ElixirFlexLexer.YYINITIAL, true },
+                        { "\\\r\n", TokenType.WHITE_SPACE, ElixirFlexLexer.YYINITIAL, true },
+                        { "\f", TokenType.WHITE_SPACE, ElixirFlexLexer.YYINITIAL, true },
                         { "\n", ElixirTypes.EOL, ElixirFlexLexer.SIGN_OPERATION_MAYBE, true },
                         { "\r\n", ElixirTypes.EOL, ElixirFlexLexer.SIGN_OPERATION_MAYBE, true },
-                        { "\t", TokenType.WHITE_SPACE, INITIAL_STATE, true },
+                        { "\t", TokenType.WHITE_SPACE, ElixirFlexLexer.YYINITIAL, true },
                         { "^", ElixirTypes.UNARY_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true},
                         { "_identifier", ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_OR_KEYWORD_PAIR_MAYBE, true },
                         { "after", ElixirTypes.AFTER, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },

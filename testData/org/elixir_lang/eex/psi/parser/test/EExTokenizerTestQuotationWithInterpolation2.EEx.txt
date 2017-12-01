@@ -1,0 +1,5 @@
+Embedded Elixir File(0,21)
+  PsiElement(<%%)('<%%')(0,3)
+  PsiElement(Data)('% a ')(3,7)
+  PsiElement(<%%)('<%%')(7,10)
+  PsiElement(Data)('= b %> c %>')(10,21)

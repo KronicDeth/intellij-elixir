@@ -1,0 +1,3 @@
+PsiFile(plain text):EExTokenizerTestTrimModeWithComment.eex(0,20)
+  PsiElement(EEx)('<%# comment %>')(0,14)
+  PsiElement(PLAIN_TEXT)('  \n123')(14,20)

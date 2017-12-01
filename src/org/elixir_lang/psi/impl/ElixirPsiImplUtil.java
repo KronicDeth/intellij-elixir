@@ -2130,8 +2130,8 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirAnonymousFunction anonymousFunction) {
-        Quotable stab = anonymousFunction.getStab();
-        OtpErlangObject quotedStab = stab.quote();
+        Quotable stabOperations = anonymousFunction.getStab();
+        OtpErlangObject quotedStab = stabOperations.quote();
 
         OtpErlangList metadata = metadata(anonymousFunction);
 
@@ -3729,6 +3729,7 @@ public class ElixirPsiImplUtil {
             OtpErlangObject[] quotedArray = new OtpErlangObject[size];
             quotedArray = quotedChildren.toArray(quotedArray);
             quoted = new OtpErlangList(quotedArray);
+
         }
 
         return quoted;

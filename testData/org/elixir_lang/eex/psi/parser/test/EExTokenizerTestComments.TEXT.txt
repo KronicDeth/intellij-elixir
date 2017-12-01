@@ -1,0 +1,3 @@
+PsiFile(plain text):EExTokenizerTestComments.eex(0,15)
+  PsiElement(PLAIN_TEXT)('foo ')(0,4)
+  PsiElement(EEx)('<%# true %>')(4,15)

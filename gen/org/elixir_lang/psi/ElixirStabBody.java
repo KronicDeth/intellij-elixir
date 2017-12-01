@@ -12,6 +12,9 @@ import java.util.List;
 public interface ElixirStabBody extends Quotable {
 
   @NotNull
+  List<ElixirEex> getEexList();
+
+  @NotNull
   List<ElixirEmptyParentheses> getEmptyParenthesesList();
 
   @NotNull

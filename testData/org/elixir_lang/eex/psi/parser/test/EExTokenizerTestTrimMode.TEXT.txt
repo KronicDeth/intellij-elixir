@@ -1,0 +1,6 @@
+PsiFile(plain text):EExTokenizerTestTrimMode.eex(0,54)
+  PsiElement(EEx)('<%= if true do %>')(0,17)
+  PsiElement(PLAIN_TEXT)('\n TRUE\n  ')(17,26)
+  PsiElement(EEx)('<% else %>')(26,36)
+  PsiElement(PLAIN_TEXT)('\nFALSE\n  ')(36,45)
+  PsiElement(EEx)('<% end %>')(45,54)

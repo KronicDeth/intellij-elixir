@@ -25,7 +25,7 @@ Elixir File(0,39)
         PsiWhiteSpace('  ')(20,22)
         PsiComment(#)('# error')(22,29)
         PsiElement(\\n, \\r\\n)('\n')(29,30)
-      PsiErrorElement:';', <block identifier>, <end of expression>, '\\n, \\r\\n' or end expected, got '{'(30,30)
+      PsiErrorElement:';', <block identifier>, <end of expression>, EEx Empty Marker, '\\n, \\r\\n' or end expected, got '{'(30,30)
         <empty list>
   PsiWhiteSpace('  ')(30,32)
   PsiElement({)('{')(32,33)

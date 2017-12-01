@@ -40,8 +40,8 @@ public class TripleDoubleQuotesTest extends Test {
     public static Collection<Object[]> generateData() {
         return Arrays.asList(
                 new Object[][]{
-                        {"'''", FRAGMENT_TYPE, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY, false},
-                        {"\"\"\"", TERMINATOR_TYPE, INITIAL_STATE, true}
+                        {"'''", FRAGMENT_TYPE, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY, true},
+                        {"\"\"\"", TERMINATOR_TYPE, ElixirFlexLexer.YYINITIAL, true}
                 }
         );
     }

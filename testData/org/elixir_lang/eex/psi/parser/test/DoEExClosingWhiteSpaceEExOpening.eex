@@ -1,0 +1,6 @@
+foo <% cond do %>
+      <% false -> %>
+        bar
+      <% true -> %>
+        baz
+    <% end %>

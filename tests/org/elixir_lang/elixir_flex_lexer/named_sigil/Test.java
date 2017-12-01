@@ -3,6 +3,7 @@ package org.elixir_lang.elixir_flex_lexer.named_sigil;
 import com.intellij.psi.tree.IElementType;
 import org.elixir_lang.ElixirFlexLexer;
 import org.elixir_lang.elixir_flex_lexer.TokenTest;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;
 
 import java.io.IOException;
@@ -29,14 +30,14 @@ public abstract class Test extends TokenTest {
     protected abstract Sigil instanceSigil();
 
     @Override
-    protected void reset(CharSequence charSequence) throws IOException {
+    protected void start(@NotNull CharSequence charSequence) {
         // start to trigger NAMED_SIGIL state
         CharSequence fullCharSequence = "~" + instanceSigil().name() + charSequence;
-        super.reset(fullCharSequence);
+        super.start(fullCharSequence);
         // consume '~'
-        flexLexer.advance();
+        lexer.advance();
         // consume sigil name
-        flexLexer.advance();
+        lexer.advance();
     }
 
     public static Collection<Object[]> generateData(Sigil sigil) {

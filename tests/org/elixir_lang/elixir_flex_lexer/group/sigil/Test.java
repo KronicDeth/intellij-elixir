@@ -3,6 +3,7 @@ package org.elixir_lang.elixir_flex_lexer.group.sigil;
 import com.intellij.psi.tree.IElementType;
 import org.elixir_lang.ElixirFlexLexer;
 import org.elixir_lang.psi.ElixirTypes;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;
 
 import java.io.IOException;
@@ -40,15 +41,16 @@ public abstract class Test extends org.elixir_lang.elixir_flex_lexer.group.Test 
      * Methods
      */
 
-    protected void reset(CharSequence charSequence) throws IOException {
+    @Override
+    protected void start(@NotNull CharSequence charSequence) {
         // start of "~x" + promoter to trigger GROUP state
         CharSequence fullCharSequence = "~x" + promoter() + charSequence;
         // consume ~
-        super.reset(fullCharSequence);
+        super.start(fullCharSequence);
         // consume x
-        flexLexer.advance();
+        lexer.advance();
         // consume promoter
-        flexLexer.advance();
+        lexer.advance();
     }
 
     protected abstract char promoter();
