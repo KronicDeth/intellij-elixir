@@ -4162,4 +4162,4454 @@ defmodule :"OTP-PUB-KEY" do
   def versionOne() do
     # body not decompiled
   end
+
+  # Private Functions
+
+  defp unquote(:"-dec_ACClearAttrs_attrs/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_AttrSpec/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_AttributeCertificateInfo_attributes/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_Attribute_values/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_AuthorityInfoAccessSyntax/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_BuiltInDomainDefinedAttributes/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_CRLDistributionPoints/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_CRLSequence/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_CertificatePolicies/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_CertificateRevocationLists/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_Certificates/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_CertificationRequestInfo_attributes/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_CertificationRequestInfo_attributes_AttributePKCS-10_values/3-lc$^0/1-0-")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_Clearance_securityCategories/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_DigestAlgorithmIdentifiers_daSequence/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_DigestAlgorithmIdentifiers_daSet/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_ExtKeyUsageSyntax/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_ExtendedCertificatesAndCertificates/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_ExtensionAttributes/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_Extensions/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_GeneralNames/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_GeneralSubtrees/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_IetfAttrSyntax_values/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_NoticeReference_noticeNumbers/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_OTPExtensionAttributes/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_OTPExtensions/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_OrganizationalUnitNames/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_OtherPrimeInfos/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_PDSParameter/2-fun-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_PDSParameter/2-lc$^1/1-0-")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_PDSParameter/2-lc$^2/1-1-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_PersonalName/2-fun-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_PersonalName/2-lc$^1/1-0-")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_PersonalName/2-lc$^2/1-1-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_PolicyInformation_policyQualifiers/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_PolicyMappings/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_PresentationAddress_nAddresses/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_ProxyInfo/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_RDNSequence/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_RecipientInfos_riSequence/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_RecipientInfos_riSet/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_RelativeDistinguishedName/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_SignerInfoAuthenticatedAttributes_aaSequence/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_SignerInfoAuthenticatedAttributes_aaSequence_AttributePKCS-7_values/3-lc$^0/1-0-")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_SignerInfoAuthenticatedAttributes_aaSet/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_SignerInfoAuthenticatedAttributes_aaSet_AttributePKCS-7_values/3-lc$^0/1-0-")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_SignerInfo_unauthenticatedAttributes_uaSequence/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_SignerInfo_unauthenticatedAttributes_uaSequence_AttributePKCS-7_values/3-lc$^0/1-0-")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_SignerInfo_unauthenticatedAttributes_uaSet/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_SignerInfo_unauthenticatedAttributes_uaSet_AttributePKCS-7_values/3-lc$^0/1-0-")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_SignerInfos_siSequence/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_SignerInfos_siSet/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_SubjectDirectoryAttributes/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_SubjectInfoAccessSyntax/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_TBSCertList_revokedCertificates/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_Targets/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_TeletexDomainDefinedAttributes/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_TeletexOrganizationalUnitNames/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_TeletexPersonalName/2-fun-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_TeletexPersonalName/2-lc$^1/1-0-")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_TeletexPersonalName/2-lc$^2/1-1-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_UnformattedPostalAddress/2-fun-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_UnformattedPostalAddress/2-lc$^1/1-0-")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_UnformattedPostalAddress/2-lc$^2/1-1-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dec_UnformattedPostalAddress_printable-address/2-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-dynamicsort_SETOF/1-fun-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-e_object_identifier/1-fun-0-")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_Authenticated/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_Authenticated/1-fun-1-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_Authenticated/1-fun-2-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_Authenticated/1-fun-3-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_Authenticated/1-fun-4-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_Authenticated/1-fun-5-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_Authenticated/1-fun-6-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_Authenticated/1-fun-7-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_Authenticated/1-fun-8-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_Authenticated/1-fun-9-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_CRIAttributes/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_ContentEncryptionAlgorithms/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_Contents/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_Contents/1-fun-1-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_Contents/1-fun-2-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_Contents/1-fun-3-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_Contents/1-fun-4-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_Contents/1-fun-5-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_Contents/1-fun-6-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_DigestAlgorithms/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_DigestEncryptionAlgorithms/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_KeyEncryptionAlgorithms/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_PKInfoAlgorithms/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SignatureAlgorithms/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedAttributeTypeAndValues/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedAttributeTypeAndValues/1-fun-1-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedAttributeTypeAndValues/1-fun-10-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedAttributeTypeAndValues/1-fun-11-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedAttributeTypeAndValues/1-fun-12-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedAttributeTypeAndValues/1-fun-13-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedAttributeTypeAndValues/1-fun-14-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedAttributeTypeAndValues/1-fun-15-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedAttributeTypeAndValues/1-fun-16-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedAttributeTypeAndValues/1-fun-17-")(p0, p1, p2, p3) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedAttributeTypeAndValues/1-fun-2-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedAttributeTypeAndValues/1-fun-3-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedAttributeTypeAndValues/1-fun-4-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedAttributeTypeAndValues/1-fun-5-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedAttributeTypeAndValues/1-fun-6-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedAttributeTypeAndValues/1-fun-7-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedAttributeTypeAndValues/1-fun-8-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedAttributeTypeAndValues/1-fun-9-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedCharacteristicTwos/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedCharacteristicTwos/1-fun-1-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedCharacteristicTwos/1-fun-2-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedCharacteristicTwos/1-fun-3-")(p0, p1, p2, p3) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-1-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-10-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-11-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-12-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-13-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-14-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-15-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-16-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-17-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-18-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-19-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-2-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-20-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-21-")(p0, p1, p2, p3) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-3-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-4-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-5-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-6-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-7-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-8-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-9-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensions/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensions/1-fun-1-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensions/1-fun-10-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensions/1-fun-11-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensions/1-fun-12-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensions/1-fun-13-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensions/1-fun-14-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensions/1-fun-15-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensions/1-fun-16-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensions/1-fun-17-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensions/1-fun-18-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensions/1-fun-19-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensions/1-fun-2-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensions/1-fun-20-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensions/1-fun-21-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensions/1-fun-22-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensions/1-fun-23-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensions/1-fun-24-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensions/1-fun-25-")(p0, p1, p2, p3) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensions/1-fun-3-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensions/1-fun-4-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensions/1-fun-5-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensions/1-fun-6-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensions/1-fun-7-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensions/1-fun-8-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedExtensions/1-fun-9-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedFieldIds/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedFieldIds/1-fun-1-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedFieldIds/1-fun-2-")(p0, p1, p2, p3) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedPublicKeyAlgorithms/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedPublicKeyAlgorithms/1-fun-1-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedPublicKeyAlgorithms/1-fun-2-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedPublicKeyAlgorithms/1-fun-3-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedPublicKeyAlgorithms/1-fun-4-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedPublicKeyAlgorithms/1-fun-5-")(p0, p1, p2, p3) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedSignatureAlgorithms/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedSignatureAlgorithms/1-fun-1-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedSignatureAlgorithms/1-fun-10-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedSignatureAlgorithms/1-fun-11-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedSignatureAlgorithms/1-fun-12-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedSignatureAlgorithms/1-fun-13-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedSignatureAlgorithms/1-fun-14-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedSignatureAlgorithms/1-fun-15-")(p0, p1, p2, p3) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedSignatureAlgorithms/1-fun-2-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedSignatureAlgorithms/1-fun-3-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedSignatureAlgorithms/1-fun-4-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedSignatureAlgorithms/1-fun-5-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedSignatureAlgorithms/1-fun-6-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedSignatureAlgorithms/1-fun-7-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedSignatureAlgorithms/1-fun-8-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_SupportedSignatureAlgorithms/1-fun-9-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_Unauthenticated/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_Unauthenticated/1-fun-1-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_Unauthenticated/1-fun-2-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_Unauthenticated/1-fun-3-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_internal_object_set_argument_1/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_internal_object_set_argument_10/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_internal_object_set_argument_11/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_internal_object_set_argument_12/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_internal_object_set_argument_13/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_internal_object_set_argument_2/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_internal_object_set_argument_3/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_internal_object_set_argument_4/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_internal_object_set_argument_4/1-fun-1-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_internal_object_set_argument_4/1-fun-2-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_internal_object_set_argument_4/1-fun-3-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_internal_object_set_argument_4/1-fun-4-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_internal_object_set_argument_4/1-fun-5-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_internal_object_set_argument_4/1-fun-6-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_internal_object_set_argument_4/1-fun-7-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_internal_object_set_argument_4/1-fun-8-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_internal_object_set_argument_4/1-fun-9-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_internal_object_set_argument_5/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_internal_object_set_argument_5/1-fun-1-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_internal_object_set_argument_5/1-fun-2-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_internal_object_set_argument_5/1-fun-3-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_internal_object_set_argument_5/1-fun-4-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_internal_object_set_argument_5/1-fun-5-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_internal_object_set_argument_5/1-fun-6-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_internal_object_set_argument_5/1-fun-7-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_internal_object_set_argument_5/1-fun-8-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_internal_object_set_argument_5/1-fun-9-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_internal_object_set_argument_6/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_internal_object_set_argument_7/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_internal_object_set_argument_7/1-fun-1-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_internal_object_set_argument_7/1-fun-2-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_internal_object_set_argument_7/1-fun-3-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_internal_object_set_argument_8/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_internal_object_set_argument_8/1-fun-1-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_internal_object_set_argument_8/1-fun-2-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_internal_object_set_argument_8/1-fun-3-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getdec_internal_object_set_argument_9/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_Authenticated/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_Authenticated/1-fun-1-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_Authenticated/1-fun-2-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_Authenticated/1-fun-3-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_Authenticated/1-fun-4-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_Authenticated/1-fun-5-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_Authenticated/1-fun-6-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_Authenticated/1-fun-7-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_Authenticated/1-fun-8-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_Authenticated/1-fun-9-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_CRIAttributes/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_ContentEncryptionAlgorithms/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_Contents/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_Contents/1-fun-1-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_Contents/1-fun-2-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_Contents/1-fun-3-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_Contents/1-fun-4-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_Contents/1-fun-5-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_Contents/1-fun-6-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_DigestAlgorithms/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_DigestEncryptionAlgorithms/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_KeyEncryptionAlgorithms/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_PKInfoAlgorithms/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SignatureAlgorithms/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedAttributeTypeAndValues/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedAttributeTypeAndValues/1-fun-1-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedAttributeTypeAndValues/1-fun-10-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedAttributeTypeAndValues/1-fun-11-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedAttributeTypeAndValues/1-fun-12-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedAttributeTypeAndValues/1-fun-13-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedAttributeTypeAndValues/1-fun-14-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedAttributeTypeAndValues/1-fun-15-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedAttributeTypeAndValues/1-fun-16-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedAttributeTypeAndValues/1-fun-17-")(p0, p1, p2, p3) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedAttributeTypeAndValues/1-fun-2-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedAttributeTypeAndValues/1-fun-3-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedAttributeTypeAndValues/1-fun-4-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedAttributeTypeAndValues/1-fun-5-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedAttributeTypeAndValues/1-fun-6-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedAttributeTypeAndValues/1-fun-7-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedAttributeTypeAndValues/1-fun-8-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedAttributeTypeAndValues/1-fun-9-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedCharacteristicTwos/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedCharacteristicTwos/1-fun-1-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedCharacteristicTwos/1-fun-2-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedCharacteristicTwos/1-fun-3-")(p0, p1, p2, p3) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-1-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-10-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-11-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-12-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-13-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-14-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-15-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-16-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-17-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-18-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-19-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-2-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-20-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-21-")(p0, p1, p2, p3) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-3-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-4-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-5-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-6-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-7-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-8-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-9-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensions/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensions/1-fun-1-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensions/1-fun-10-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensions/1-fun-11-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensions/1-fun-12-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensions/1-fun-13-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensions/1-fun-14-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensions/1-fun-15-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensions/1-fun-16-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensions/1-fun-17-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensions/1-fun-18-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensions/1-fun-19-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensions/1-fun-2-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensions/1-fun-20-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensions/1-fun-21-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensions/1-fun-22-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensions/1-fun-23-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensions/1-fun-24-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensions/1-fun-25-")(p0, p1, p2, p3) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensions/1-fun-3-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensions/1-fun-4-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensions/1-fun-5-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensions/1-fun-6-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensions/1-fun-7-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensions/1-fun-8-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedExtensions/1-fun-9-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedFieldIds/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedFieldIds/1-fun-1-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedFieldIds/1-fun-2-")(p0, p1, p2, p3) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedPublicKeyAlgorithms/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedPublicKeyAlgorithms/1-fun-1-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedPublicKeyAlgorithms/1-fun-2-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedPublicKeyAlgorithms/1-fun-3-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedPublicKeyAlgorithms/1-fun-4-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedPublicKeyAlgorithms/1-fun-5-")(p0, p1, p2, p3) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedSignatureAlgorithms/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedSignatureAlgorithms/1-fun-1-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedSignatureAlgorithms/1-fun-10-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedSignatureAlgorithms/1-fun-11-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedSignatureAlgorithms/1-fun-12-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedSignatureAlgorithms/1-fun-13-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedSignatureAlgorithms/1-fun-14-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedSignatureAlgorithms/1-fun-15-")(p0, p1, p2, p3) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedSignatureAlgorithms/1-fun-2-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedSignatureAlgorithms/1-fun-3-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedSignatureAlgorithms/1-fun-4-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedSignatureAlgorithms/1-fun-5-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedSignatureAlgorithms/1-fun-6-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedSignatureAlgorithms/1-fun-7-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedSignatureAlgorithms/1-fun-8-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_SupportedSignatureAlgorithms/1-fun-9-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_Unauthenticated/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_Unauthenticated/1-fun-1-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_Unauthenticated/1-fun-2-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_Unauthenticated/1-fun-3-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_internal_object_set_argument_1/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_internal_object_set_argument_10/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_internal_object_set_argument_11/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_internal_object_set_argument_12/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_internal_object_set_argument_13/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_internal_object_set_argument_2/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_internal_object_set_argument_3/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_internal_object_set_argument_4/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_internal_object_set_argument_4/1-fun-1-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_internal_object_set_argument_4/1-fun-2-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_internal_object_set_argument_4/1-fun-3-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_internal_object_set_argument_4/1-fun-4-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_internal_object_set_argument_4/1-fun-5-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_internal_object_set_argument_4/1-fun-6-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_internal_object_set_argument_4/1-fun-7-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_internal_object_set_argument_4/1-fun-8-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_internal_object_set_argument_4/1-fun-9-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_internal_object_set_argument_5/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_internal_object_set_argument_5/1-fun-1-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_internal_object_set_argument_5/1-fun-2-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_internal_object_set_argument_5/1-fun-3-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_internal_object_set_argument_5/1-fun-4-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_internal_object_set_argument_5/1-fun-5-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_internal_object_set_argument_5/1-fun-6-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_internal_object_set_argument_5/1-fun-7-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_internal_object_set_argument_5/1-fun-8-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_internal_object_set_argument_5/1-fun-9-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_internal_object_set_argument_6/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_internal_object_set_argument_7/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_internal_object_set_argument_7/1-fun-1-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_internal_object_set_argument_7/1-fun-2-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_internal_object_set_argument_7/1-fun-3-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_internal_object_set_argument_8/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_internal_object_set_argument_8/1-fun-1-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_internal_object_set_argument_8/1-fun-2-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_internal_object_set_argument_8/1-fun-3-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-getenc_internal_object_set_argument_9/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp ber_decode_nif(p0) do
+    # body not decompiled
+  end
+
+  defp ber_encode(p0) do
+    # body not decompiled
+  end
+
+  defp check_int(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp check_named_bitstring(p0, p1, p2, p3) do
+    # body not decompiled
+  end
+
+  defp collect_parts(p0) do
+    # body not decompiled
+  end
+
+  defp collect_parts(p0, p1) do
+    # body not decompiled
+  end
+
+  defp collect_parts_bit(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"dec-inc-Certificate")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"dec-inc-Certificate")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"dec-inc-CertificateList")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"dec-inc-CertificateList")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp dec_AAControls(p0) do
+    # body not decompiled
+  end
+
+  defp dec_ACClearAttrs(p0) do
+    # body not decompiled
+  end
+
+  defp dec_ACClearAttrs_attrs(p0, p1) do
+    # body not decompiled
+  end
+
+  defp dec_AccessDescription(p0) do
+    # body not decompiled
+  end
+
+  defp dec_AdministrationDomainName(p0) do
+    # body not decompiled
+  end
+
+  defp dec_Algorithm(p0) do
+    # body not decompiled
+  end
+
+  defp dec_AlgorithmIdentifier(p0) do
+    # body not decompiled
+  end
+
+  defp dec_AlgorithmNull(p0) do
+    # body not decompiled
+  end
+
+  defp dec_AnotherName(p0) do
+    # body not decompiled
+  end
+
+  defp dec_Any(p0) do
+    # body not decompiled
+  end
+
+  defp dec_AttCertIssuer(p0) do
+    # body not decompiled
+  end
+
+  defp dec_AttCertValidityPeriod(p0) do
+    # body not decompiled
+  end
+
+  defp dec_AttCertVersion(p0) do
+    # body not decompiled
+  end
+
+  defp dec_AttrSpec(p0) do
+    # body not decompiled
+  end
+
+  defp dec_Attribute(p0) do
+    # body not decompiled
+  end
+
+  defp dec_AttributeCertificate(p0) do
+    # body not decompiled
+  end
+
+  defp dec_AttributeCertificateInfo(p0) do
+    # body not decompiled
+  end
+
+  defp dec_AttributeCertificateInfo_attributes(p0, p1) do
+    # body not decompiled
+  end
+
+  defp dec_AttributeType(p0) do
+    # body not decompiled
+  end
+
+  defp dec_AttributeTypeAndValue(p0) do
+    # body not decompiled
+  end
+
+  defp dec_AttributeValue(p0) do
+    # body not decompiled
+  end
+
+  defp dec_Attribute_values(p0, p1) do
+    # body not decompiled
+  end
+
+  defp dec_AuthorityInfoAccessSyntax(p0) do
+    # body not decompiled
+  end
+
+  defp dec_AuthorityKeyIdentifier(p0) do
+    # body not decompiled
+  end
+
+  defp dec_BaseCRLNumber(p0) do
+    # body not decompiled
+  end
+
+  defp dec_BaseDistance(p0) do
+    # body not decompiled
+  end
+
+  defp dec_BasicConstraints(p0) do
+    # body not decompiled
+  end
+
+  defp dec_Boolean(p0) do
+    # body not decompiled
+  end
+
+  defp dec_BuiltInDomainDefinedAttribute(p0) do
+    # body not decompiled
+  end
+
+  defp dec_BuiltInDomainDefinedAttributes(p0) do
+    # body not decompiled
+  end
+
+  defp dec_BuiltInStandardAttributes(p0) do
+    # body not decompiled
+  end
+
+  defp dec_CPSuri(p0) do
+    # body not decompiled
+  end
+
+  defp dec_CRLDistributionPoints(p0) do
+    # body not decompiled
+  end
+
+  defp dec_CRLNumber(p0) do
+    # body not decompiled
+  end
+
+  defp dec_CRLReason(p0) do
+    # body not decompiled
+  end
+
+  defp dec_CRLSequence(p0) do
+    # body not decompiled
+  end
+
+  defp dec_CertPolicyId(p0) do
+    # body not decompiled
+  end
+
+  defp dec_Certificate(p0) do
+    # body not decompiled
+  end
+
+  defp dec_CertificateIssuer(p0) do
+    # body not decompiled
+  end
+
+  defp dec_CertificateList(p0) do
+    # body not decompiled
+  end
+
+  defp dec_CertificatePolicies(p0) do
+    # body not decompiled
+  end
+
+  defp dec_CertificateRevocationLists(p0) do
+    # body not decompiled
+  end
+
+  defp dec_CertificateSerialNumber(p0) do
+    # body not decompiled
+  end
+
+  defp dec_Certificates(p0) do
+    # body not decompiled
+  end
+
+  defp dec_CertificationRequest(p0) do
+    # body not decompiled
+  end
+
+  defp dec_CertificationRequestInfo(p0) do
+    # body not decompiled
+  end
+
+  defp dec_CertificationRequestInfo_attributes(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"dec_CertificationRequestInfo_attributes_AttributePKCS-10")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"dec_CertificationRequestInfo_attributes_AttributePKCS-10_values")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp dec_CertificationRequestInfo_subjectPKInfo(p0, p1) do
+    # body not decompiled
+  end
+
+  defp dec_CertificationRequestInfo_subjectPKInfo_algorithm(p0, p1) do
+    # body not decompiled
+  end
+
+  defp dec_CertificationRequest_signatureAlgorithm(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"dec_Characteristic-two")(p0) do
+    # body not decompiled
+  end
+
+  defp dec_ClassList(p0) do
+    # body not decompiled
+  end
+
+  defp dec_Clearance(p0) do
+    # body not decompiled
+  end
+
+  defp dec_Clearance_securityCategories(p0, p1) do
+    # body not decompiled
+  end
+
+  defp dec_CommonName(p0) do
+    # body not decompiled
+  end
+
+  defp dec_ContentEncryptionAlgorithmIdentifier(p0) do
+    # body not decompiled
+  end
+
+  defp dec_ContentInfo(p0) do
+    # body not decompiled
+  end
+
+  defp dec_ContentType(p0) do
+    # body not decompiled
+  end
+
+  defp dec_CountryName(p0) do
+    # body not decompiled
+  end
+
+  defp dec_Curve(p0) do
+    # body not decompiled
+  end
+
+  defp dec_DHParameter(p0) do
+    # body not decompiled
+  end
+
+  defp dec_DHPublicKey(p0) do
+    # body not decompiled
+  end
+
+  defp dec_DSAParams(p0) do
+    # body not decompiled
+  end
+
+  defp dec_DSAPrivateKey(p0) do
+    # body not decompiled
+  end
+
+  defp dec_DSAPublicKey(p0) do
+    # body not decompiled
+  end
+
+  defp dec_Data(p0) do
+    # body not decompiled
+  end
+
+  defp dec_Digest(p0) do
+    # body not decompiled
+  end
+
+  defp dec_DigestAlgorithmIdentifier(p0) do
+    # body not decompiled
+  end
+
+  defp dec_DigestAlgorithmIdentifiers(p0) do
+    # body not decompiled
+  end
+
+  defp dec_DigestAlgorithmIdentifiers_daSequence(p0, p1) do
+    # body not decompiled
+  end
+
+  defp dec_DigestAlgorithmIdentifiers_daSet(p0, p1) do
+    # body not decompiled
+  end
+
+  defp dec_DigestEncryptionAlgorithmIdentifier(p0) do
+    # body not decompiled
+  end
+
+  defp dec_DigestInfoNull(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"dec_DigestInfoPKCS-1")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"dec_DigestInfoPKCS-7")(p0) do
+    # body not decompiled
+  end
+
+  defp dec_DigestedData(p0) do
+    # body not decompiled
+  end
+
+  defp dec_DirectoryString(p0) do
+    # body not decompiled
+  end
+
+  defp dec_DisplayText(p0) do
+    # body not decompiled
+  end
+
+  defp dec_DistinguishedName(p0) do
+    # body not decompiled
+  end
+
+  defp dec_DistributionPoint(p0) do
+    # body not decompiled
+  end
+
+  defp dec_DistributionPointName(p0) do
+    # body not decompiled
+  end
+
+  defp dec_DomainComponent(p0) do
+    # body not decompiled
+  end
+
+  defp dec_DomainParameters(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"dec_Dss-Parms")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"dec_Dss-Sig-Value")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"dec_ECDSA-Sig-Value")(p0) do
+    # body not decompiled
+  end
+
+  defp dec_ECPVer(p0) do
+    # body not decompiled
+  end
+
+  defp dec_ECParameters(p0) do
+    # body not decompiled
+  end
+
+  defp dec_ECPoint(p0) do
+    # body not decompiled
+  end
+
+  defp dec_ECPrivateKey(p0) do
+    # body not decompiled
+  end
+
+  defp dec_EDIPartyName(p0) do
+    # body not decompiled
+  end
+
+  defp dec_EcpkParameters(p0) do
+    # body not decompiled
+  end
+
+  defp dec_EmailAddress(p0) do
+    # body not decompiled
+  end
+
+  defp dec_EncryptedContent(p0) do
+    # body not decompiled
+  end
+
+  defp dec_EncryptedContentInfo(p0) do
+    # body not decompiled
+  end
+
+  defp dec_EncryptedData(p0) do
+    # body not decompiled
+  end
+
+  defp dec_EncryptedDigest(p0) do
+    # body not decompiled
+  end
+
+  defp dec_EncryptedKey(p0) do
+    # body not decompiled
+  end
+
+  defp dec_EnvelopedData(p0) do
+    # body not decompiled
+  end
+
+  defp dec_ExtKeyUsageSyntax(p0) do
+    # body not decompiled
+  end
+
+  defp dec_ExtendedCertificate(p0) do
+    # body not decompiled
+  end
+
+  defp dec_ExtendedCertificateOrCertificate(p0) do
+    # body not decompiled
+  end
+
+  defp dec_ExtendedCertificatesAndCertificates(p0) do
+    # body not decompiled
+  end
+
+  defp dec_ExtendedNetworkAddress(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"dec_ExtendedNetworkAddress_e163-4-address")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp dec_Extension(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"dec_Extension-Any")(p0) do
+    # body not decompiled
+  end
+
+  defp dec_ExtensionAttribute(p0) do
+    # body not decompiled
+  end
+
+  defp dec_ExtensionAttributes(p0) do
+    # body not decompiled
+  end
+
+  defp dec_ExtensionORAddressComponents(p0) do
+    # body not decompiled
+  end
+
+  defp dec_ExtensionPhysicalDeliveryAddressComponents(p0) do
+    # body not decompiled
+  end
+
+  defp dec_ExtensionRequest(p0) do
+    # body not decompiled
+  end
+
+  defp dec_Extensions(p0) do
+    # body not decompiled
+  end
+
+  defp dec_FieldElement(p0) do
+    # body not decompiled
+  end
+
+  defp dec_FieldID(p0) do
+    # body not decompiled
+  end
+
+  defp dec_FreshestCRL(p0) do
+    # body not decompiled
+  end
+
+  defp dec_GeneralName(p0) do
+    # body not decompiled
+  end
+
+  defp dec_GeneralNames(p0) do
+    # body not decompiled
+  end
+
+  defp dec_GeneralSubtree(p0) do
+    # body not decompiled
+  end
+
+  defp dec_GeneralSubtrees(p0) do
+    # body not decompiled
+  end
+
+  defp dec_HoldInstructionCode(p0) do
+    # body not decompiled
+  end
+
+  defp dec_Holder(p0) do
+    # body not decompiled
+  end
+
+  defp dec_IetfAttrSyntax(p0) do
+    # body not decompiled
+  end
+
+  defp dec_IetfAttrSyntax_values(p0, p1) do
+    # body not decompiled
+  end
+
+  defp dec_IetfAttrSyntax_values_SEQOF(p0, p1) do
+    # body not decompiled
+  end
+
+  defp dec_InhibitAnyPolicy(p0) do
+    # body not decompiled
+  end
+
+  defp dec_InvalidityDate(p0) do
+    # body not decompiled
+  end
+
+  defp dec_IssuerAltName(p0) do
+    # body not decompiled
+  end
+
+  defp dec_IssuerAndSerialNumber(p0) do
+    # body not decompiled
+  end
+
+  defp dec_IssuerSerial(p0) do
+    # body not decompiled
+  end
+
+  defp dec_IssuingDistributionPoint(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"dec_KEA-Parms-Id")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"dec_KEA-PublicKey")(p0) do
+    # body not decompiled
+  end
+
+  defp dec_KeyEncryptionAlgorithmIdentifier(p0) do
+    # body not decompiled
+  end
+
+  defp dec_KeyIdentifier(p0) do
+    # body not decompiled
+  end
+
+  defp dec_KeyPurposeId(p0) do
+    # body not decompiled
+  end
+
+  defp dec_KeyUsage(p0) do
+    # body not decompiled
+  end
+
+  defp dec_LocalPostalAttributes(p0) do
+    # body not decompiled
+  end
+
+  defp dec_MessageDigest(p0) do
+    # body not decompiled
+  end
+
+  defp dec_Name(p0) do
+    # body not decompiled
+  end
+
+  defp dec_NameConstraints(p0) do
+    # body not decompiled
+  end
+
+  defp dec_NetworkAddress(p0) do
+    # body not decompiled
+  end
+
+  defp dec_NoticeReference(p0) do
+    # body not decompiled
+  end
+
+  defp dec_NoticeReference_noticeNumbers(p0, p1) do
+    # body not decompiled
+  end
+
+  defp dec_NumericUserIdentifier(p0) do
+    # body not decompiled
+  end
+
+  defp dec_ORAddress(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"dec_OTP-X520countryname")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"dec_OTP-emailAddress")(p0) do
+    # body not decompiled
+  end
+
+  defp dec_OTPAttributeTypeAndValue(p0) do
+    # body not decompiled
+  end
+
+  defp dec_OTPCertificate(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"dec_OTPCharacteristic-two")(p0) do
+    # body not decompiled
+  end
+
+  defp dec_OTPExtension(p0) do
+    # body not decompiled
+  end
+
+  defp dec_OTPExtensionAttribute(p0) do
+    # body not decompiled
+  end
+
+  defp dec_OTPExtensionAttributes(p0) do
+    # body not decompiled
+  end
+
+  defp dec_OTPExtensions(p0) do
+    # body not decompiled
+  end
+
+  defp dec_OTPFieldID(p0) do
+    # body not decompiled
+  end
+
+  defp dec_OTPOLDSubjectPublicKeyInfo(p0) do
+    # body not decompiled
+  end
+
+  defp dec_OTPOLDSubjectPublicKeyInfo_algorithm(p0, p1) do
+    # body not decompiled
+  end
+
+  defp dec_OTPSubjectPublicKeyInfo(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"dec_OTPSubjectPublicKeyInfo-Any")(p0) do
+    # body not decompiled
+  end
+
+  defp dec_OTPTBSCertificate(p0) do
+    # body not decompiled
+  end
+
+  defp dec_ObjId(p0) do
+    # body not decompiled
+  end
+
+  defp dec_ObjectDigestInfo(p0) do
+    # body not decompiled
+  end
+
+  defp dec_OrganizationName(p0) do
+    # body not decompiled
+  end
+
+  defp dec_OrganizationalUnitName(p0) do
+    # body not decompiled
+  end
+
+  defp dec_OrganizationalUnitNames(p0) do
+    # body not decompiled
+  end
+
+  defp dec_OtherPrimeInfo(p0) do
+    # body not decompiled
+  end
+
+  defp dec_OtherPrimeInfos(p0) do
+    # body not decompiled
+  end
+
+  defp dec_PDSName(p0) do
+    # body not decompiled
+  end
+
+  defp dec_PDSParameter(p0) do
+    # body not decompiled
+  end
+
+  defp dec_Pentanomial(p0) do
+    # body not decompiled
+  end
+
+  defp dec_PersonalName(p0) do
+    # body not decompiled
+  end
+
+  defp dec_PhysicalDeliveryCountryName(p0) do
+    # body not decompiled
+  end
+
+  defp dec_PhysicalDeliveryOfficeName(p0) do
+    # body not decompiled
+  end
+
+  defp dec_PhysicalDeliveryOfficeNumber(p0) do
+    # body not decompiled
+  end
+
+  defp dec_PhysicalDeliveryOrganizationName(p0) do
+    # body not decompiled
+  end
+
+  defp dec_PhysicalDeliveryPersonalName(p0) do
+    # body not decompiled
+  end
+
+  defp dec_PolicyConstraints(p0) do
+    # body not decompiled
+  end
+
+  defp dec_PolicyInformation(p0) do
+    # body not decompiled
+  end
+
+  defp dec_PolicyInformation_policyQualifiers(p0, p1) do
+    # body not decompiled
+  end
+
+  defp dec_PolicyMappings(p0) do
+    # body not decompiled
+  end
+
+  defp dec_PolicyMappings_SEQOF(p0, p1) do
+    # body not decompiled
+  end
+
+  defp dec_PolicyQualifierId(p0) do
+    # body not decompiled
+  end
+
+  defp dec_PolicyQualifierInfo(p0) do
+    # body not decompiled
+  end
+
+  defp dec_PostOfficeBoxAddress(p0) do
+    # body not decompiled
+  end
+
+  defp dec_PostalCode(p0) do
+    # body not decompiled
+  end
+
+  defp dec_PosteRestanteAddress(p0) do
+    # body not decompiled
+  end
+
+  defp dec_PresentationAddress(p0) do
+    # body not decompiled
+  end
+
+  defp dec_PresentationAddress_nAddresses(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"dec_Prime-p")(p0) do
+    # body not decompiled
+  end
+
+  defp dec_PrivateDomainName(p0) do
+    # body not decompiled
+  end
+
+  defp dec_PrivateKeyUsagePeriod(p0) do
+    # body not decompiled
+  end
+
+  defp dec_ProxyInfo(p0) do
+    # body not decompiled
+  end
+
+  defp dec_PublicKeyAlgorithm(p0) do
+    # body not decompiled
+  end
+
+  defp dec_RDNSequence(p0) do
+    # body not decompiled
+  end
+
+  defp dec_RSAPrivateKey(p0) do
+    # body not decompiled
+  end
+
+  defp dec_RSAPublicKey(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"dec_RSASSA-PSS-params")(p0) do
+    # body not decompiled
+  end
+
+  defp dec_ReasonFlags(p0) do
+    # body not decompiled
+  end
+
+  defp dec_RecipientInfo(p0) do
+    # body not decompiled
+  end
+
+  defp dec_RecipientInfos(p0) do
+    # body not decompiled
+  end
+
+  defp dec_RecipientInfos_riSequence(p0, p1) do
+    # body not decompiled
+  end
+
+  defp dec_RecipientInfos_riSet(p0, p1) do
+    # body not decompiled
+  end
+
+  defp dec_RelativeDistinguishedName(p0) do
+    # body not decompiled
+  end
+
+  defp dec_RoleSyntax(p0) do
+    # body not decompiled
+  end
+
+  defp dec_SecurityCategory(p0) do
+    # body not decompiled
+  end
+
+  defp dec_SignatureAlgorithm(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"dec_SignatureAlgorithm-Any")(p0) do
+    # body not decompiled
+  end
+
+  defp dec_SignedAndEnvelopedData(p0) do
+    # body not decompiled
+  end
+
+  defp dec_SignedAndEnvelopedData_certificates(p0, p1) do
+    # body not decompiled
+  end
+
+  defp dec_SignedAndEnvelopedData_crls(p0, p1) do
+    # body not decompiled
+  end
+
+  defp dec_SignedData(p0) do
+    # body not decompiled
+  end
+
+  defp dec_SignedData_certificates(p0, p1) do
+    # body not decompiled
+  end
+
+  defp dec_SignedData_crls(p0, p1) do
+    # body not decompiled
+  end
+
+  defp dec_SignerInfo(p0) do
+    # body not decompiled
+  end
+
+  defp dec_SignerInfoAuthenticatedAttributes(p0) do
+    # body not decompiled
+  end
+
+  defp dec_SignerInfoAuthenticatedAttributes_aaSequence(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"dec_SignerInfoAuthenticatedAttributes_aaSequence_AttributePKCS-7")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"dec_SignerInfoAuthenticatedAttributes_aaSequence_AttributePKCS-7_values")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp dec_SignerInfoAuthenticatedAttributes_aaSet(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"dec_SignerInfoAuthenticatedAttributes_aaSet_AttributePKCS-7")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"dec_SignerInfoAuthenticatedAttributes_aaSet_AttributePKCS-7_values")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp dec_SignerInfo_unauthenticatedAttributes(p0, p1) do
+    # body not decompiled
+  end
+
+  defp dec_SignerInfo_unauthenticatedAttributes_uaSequence(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"dec_SignerInfo_unauthenticatedAttributes_uaSequence_AttributePKCS-7")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"dec_SignerInfo_unauthenticatedAttributes_uaSequence_AttributePKCS-7_values")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp dec_SignerInfo_unauthenticatedAttributes_uaSet(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"dec_SignerInfo_unauthenticatedAttributes_uaSet_AttributePKCS-7")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"dec_SignerInfo_unauthenticatedAttributes_uaSet_AttributePKCS-7_values")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp dec_SignerInfos(p0) do
+    # body not decompiled
+  end
+
+  defp dec_SignerInfos_siSequence(p0, p1) do
+    # body not decompiled
+  end
+
+  defp dec_SignerInfos_siSet(p0, p1) do
+    # body not decompiled
+  end
+
+  defp dec_SigningTime(p0) do
+    # body not decompiled
+  end
+
+  defp dec_SkipCerts(p0) do
+    # body not decompiled
+  end
+
+  defp dec_StreetAddress(p0) do
+    # body not decompiled
+  end
+
+  defp dec_SubjectAltName(p0) do
+    # body not decompiled
+  end
+
+  defp dec_SubjectDirectoryAttributes(p0) do
+    # body not decompiled
+  end
+
+  defp dec_SubjectInfoAccessSyntax(p0) do
+    # body not decompiled
+  end
+
+  defp dec_SubjectKeyIdentifier(p0) do
+    # body not decompiled
+  end
+
+  defp dec_SubjectPublicKeyInfo(p0) do
+    # body not decompiled
+  end
+
+  defp dec_SvceAuthInfo(p0) do
+    # body not decompiled
+  end
+
+  defp dec_TBSCertList(p0) do
+    # body not decompiled
+  end
+
+  defp dec_TBSCertList_revokedCertificates(p0, p1) do
+    # body not decompiled
+  end
+
+  defp dec_TBSCertList_revokedCertificates_SEQOF(p0, p1) do
+    # body not decompiled
+  end
+
+  defp dec_TBSCertificate(p0) do
+    # body not decompiled
+  end
+
+  defp dec_Target(p0) do
+    # body not decompiled
+  end
+
+  defp dec_TargetCert(p0) do
+    # body not decompiled
+  end
+
+  defp dec_Targets(p0) do
+    # body not decompiled
+  end
+
+  defp dec_TeletexCommonName(p0) do
+    # body not decompiled
+  end
+
+  defp dec_TeletexDomainDefinedAttribute(p0) do
+    # body not decompiled
+  end
+
+  defp dec_TeletexDomainDefinedAttributes(p0) do
+    # body not decompiled
+  end
+
+  defp dec_TeletexOrganizationName(p0) do
+    # body not decompiled
+  end
+
+  defp dec_TeletexOrganizationalUnitName(p0) do
+    # body not decompiled
+  end
+
+  defp dec_TeletexOrganizationalUnitNames(p0) do
+    # body not decompiled
+  end
+
+  defp dec_TeletexPersonalName(p0) do
+    # body not decompiled
+  end
+
+  defp dec_TerminalIdentifier(p0) do
+    # body not decompiled
+  end
+
+  defp dec_TerminalType(p0) do
+    # body not decompiled
+  end
+
+  defp dec_Time(p0) do
+    # body not decompiled
+  end
+
+  defp dec_TrailerField(p0) do
+    # body not decompiled
+  end
+
+  defp dec_Trinomial(p0) do
+    # body not decompiled
+  end
+
+  defp dec_UnformattedPostalAddress(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"dec_UnformattedPostalAddress_printable-address")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp dec_UniqueIdentifier(p0) do
+    # body not decompiled
+  end
+
+  defp dec_UniquePostalName(p0) do
+    # body not decompiled
+  end
+
+  defp dec_UserNotice(p0) do
+    # body not decompiled
+  end
+
+  defp dec_V2Form(p0) do
+    # body not decompiled
+  end
+
+  defp dec_ValidationParms(p0) do
+    # body not decompiled
+  end
+
+  defp dec_Validity(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"dec_VersionPKCS-1")(p0) do
+    # body not decompiled
+  end
+
+  defp dec_VersionPKIX1Explicit88(p0) do
+    # body not decompiled
+  end
+
+  defp dec_X121Address(p0) do
+    # body not decompiled
+  end
+
+  defp dec_X520CommonName(p0) do
+    # body not decompiled
+  end
+
+  defp dec_X520LocalityName(p0) do
+    # body not decompiled
+  end
+
+  defp dec_X520OrganizationName(p0) do
+    # body not decompiled
+  end
+
+  defp dec_X520OrganizationalUnitName(p0) do
+    # body not decompiled
+  end
+
+  defp dec_X520Pseudonym(p0) do
+    # body not decompiled
+  end
+
+  defp dec_X520SerialNumber(p0) do
+    # body not decompiled
+  end
+
+  defp dec_X520StateOrProvinceName(p0) do
+    # body not decompiled
+  end
+
+  defp dec_X520Title(p0) do
+    # body not decompiled
+  end
+
+  defp dec_X520countryName(p0) do
+    # body not decompiled
+  end
+
+  defp dec_X520dnQualifier(p0) do
+    # body not decompiled
+  end
+
+  defp dec_X520name(p0) do
+    # body not decompiled
+  end
+
+  defp dec_subidentifiers(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp decode_BMP_string(p0, p1) do
+    # body not decompiled
+  end
+
+  defp decode_UTF8_string(p0, p1) do
+    # body not decompiled
+  end
+
+  defp decode_bitstring2(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp decode_bitstring_NNL(p0, p1) do
+    # body not decompiled
+  end
+
+  defp decode_bitstring_NNL(p0, p1, p2, p3) do
+    # body not decompiled
+  end
+
+  defp decode_boolean(p0, p1) do
+    # body not decompiled
+  end
+
+  defp decode_constr_indef_incomplete(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp decode_constructed(p0) do
+    # body not decompiled
+  end
+
+  defp decode_constructed_incomplete(p0, p1) do
+    # body not decompiled
+  end
+
+  defp decode_constructed_indefinite(p0, p1) do
+    # body not decompiled
+  end
+
+  defp decode_disp(p0, p1) do
+    # body not decompiled
+  end
+
+  defp decode_inc_disp(p0, p1) do
+    # body not decompiled
+  end
+
+  defp decode_incomplete2(p0, p1, p2, p3, p4) do
+    # body not decompiled
+  end
+
+  defp decode_incomplete_bin(p0) do
+    # body not decompiled
+  end
+
+  defp decode_integer(p0, p1) do
+    # body not decompiled
+  end
+
+  defp decode_length(p0) do
+    # body not decompiled
+  end
+
+  defp decode_named_bit_string(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp decode_native_bit_string(p0, p1) do
+    # body not decompiled
+  end
+
+  defp decode_null(p0, p1) do
+    # body not decompiled
+  end
+
+  defp decode_object_identifier(p0, p1) do
+    # body not decompiled
+  end
+
+  defp decode_octet_string(p0, p1) do
+    # body not decompiled
+  end
+
+  defp decode_open_type(p0, p1) do
+    # body not decompiled
+  end
+
+  defp decode_open_type_as_binary(p0, p1) do
+    # body not decompiled
+  end
+
+  defp decode_partial_inc_disp(p0, p1) do
+    # body not decompiled
+  end
+
+  defp decode_partial_incomplete(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp decode_parts_incomplete(p0) do
+    # body not decompiled
+  end
+
+  defp decode_primitive(p0) do
+    # body not decompiled
+  end
+
+  defp decode_primitive_incomplete(p0, p1) do
+    # body not decompiled
+  end
+
+  defp decode_restricted_string(p0, p1) do
+    # body not decompiled
+  end
+
+  defp decode_tag(p0, p1) do
+    # body not decompiled
+  end
+
+  defp decode_tag_and_length(p0) do
+    # body not decompiled
+  end
+
+  defp decode_universal_string(p0, p1) do
+    # body not decompiled
+  end
+
+  defp do_encode_named_bit_string(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp dynamicsort_SETOF(p0) do
+    # body not decompiled
+  end
+
+  defp e_object_identifier(p0) do
+    # body not decompiled
+  end
+
+  defp enc_AAControls(p0) do
+    # body not decompiled
+  end
+
+  defp enc_ACClearAttrs(p0) do
+    # body not decompiled
+  end
+
+  defp enc_ACClearAttrs_attrs(p0, p1) do
+    # body not decompiled
+  end
+
+  defp enc_ACClearAttrs_attrs_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_AccessDescription(p0) do
+    # body not decompiled
+  end
+
+  defp enc_AdministrationDomainName(p0) do
+    # body not decompiled
+  end
+
+  defp enc_Algorithm(p0) do
+    # body not decompiled
+  end
+
+  defp enc_AlgorithmIdentifier(p0) do
+    # body not decompiled
+  end
+
+  defp enc_AlgorithmNull(p0) do
+    # body not decompiled
+  end
+
+  defp enc_AnotherName(p0) do
+    # body not decompiled
+  end
+
+  defp enc_Any(p0) do
+    # body not decompiled
+  end
+
+  defp enc_AttCertIssuer(p0) do
+    # body not decompiled
+  end
+
+  defp enc_AttCertValidityPeriod(p0) do
+    # body not decompiled
+  end
+
+  defp enc_AttCertVersion(p0) do
+    # body not decompiled
+  end
+
+  defp enc_AttrSpec(p0) do
+    # body not decompiled
+  end
+
+  defp enc_AttrSpec_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_Attribute(p0) do
+    # body not decompiled
+  end
+
+  defp enc_AttributeCertificate(p0) do
+    # body not decompiled
+  end
+
+  defp enc_AttributeCertificateInfo(p0) do
+    # body not decompiled
+  end
+
+  defp enc_AttributeCertificateInfo_attributes(p0, p1) do
+    # body not decompiled
+  end
+
+  defp enc_AttributeCertificateInfo_attributes_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_AttributeType(p0) do
+    # body not decompiled
+  end
+
+  defp enc_AttributeTypeAndValue(p0) do
+    # body not decompiled
+  end
+
+  defp enc_AttributeValue(p0) do
+    # body not decompiled
+  end
+
+  defp enc_Attribute_values(p0, p1) do
+    # body not decompiled
+  end
+
+  defp enc_Attribute_values_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_AuthorityInfoAccessSyntax(p0) do
+    # body not decompiled
+  end
+
+  defp enc_AuthorityInfoAccessSyntax_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_AuthorityKeyIdentifier(p0) do
+    # body not decompiled
+  end
+
+  defp enc_BaseCRLNumber(p0) do
+    # body not decompiled
+  end
+
+  defp enc_BaseDistance(p0) do
+    # body not decompiled
+  end
+
+  defp enc_BasicConstraints(p0) do
+    # body not decompiled
+  end
+
+  defp enc_Boolean(p0) do
+    # body not decompiled
+  end
+
+  defp enc_BuiltInDomainDefinedAttribute(p0) do
+    # body not decompiled
+  end
+
+  defp enc_BuiltInDomainDefinedAttributes(p0) do
+    # body not decompiled
+  end
+
+  defp enc_BuiltInDomainDefinedAttributes_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_BuiltInStandardAttributes(p0) do
+    # body not decompiled
+  end
+
+  defp enc_CPSuri(p0) do
+    # body not decompiled
+  end
+
+  defp enc_CRLDistributionPoints(p0) do
+    # body not decompiled
+  end
+
+  defp enc_CRLDistributionPoints_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_CRLNumber(p0) do
+    # body not decompiled
+  end
+
+  defp enc_CRLReason(p0) do
+    # body not decompiled
+  end
+
+  defp enc_CRLSequence(p0) do
+    # body not decompiled
+  end
+
+  defp enc_CRLSequence_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_CertPolicyId(p0) do
+    # body not decompiled
+  end
+
+  defp enc_Certificate(p0) do
+    # body not decompiled
+  end
+
+  defp enc_CertificateIssuer(p0) do
+    # body not decompiled
+  end
+
+  defp enc_CertificateList(p0) do
+    # body not decompiled
+  end
+
+  defp enc_CertificatePolicies(p0) do
+    # body not decompiled
+  end
+
+  defp enc_CertificatePolicies_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_CertificateRevocationLists(p0) do
+    # body not decompiled
+  end
+
+  defp enc_CertificateRevocationLists_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_CertificateSerialNumber(p0) do
+    # body not decompiled
+  end
+
+  defp enc_Certificates(p0) do
+    # body not decompiled
+  end
+
+  defp enc_Certificates_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_CertificationRequest(p0) do
+    # body not decompiled
+  end
+
+  defp enc_CertificationRequestInfo(p0) do
+    # body not decompiled
+  end
+
+  defp enc_CertificationRequestInfo_attributes(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"enc_CertificationRequestInfo_attributes_AttributePKCS-10")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"enc_CertificationRequestInfo_attributes_AttributePKCS-10_values")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"enc_CertificationRequestInfo_attributes_AttributePKCS-10_values_components")(p0, p1, p2, p3) do
+    # body not decompiled
+  end
+
+  defp enc_CertificationRequestInfo_attributes_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_CertificationRequestInfo_subjectPKInfo(p0, p1) do
+    # body not decompiled
+  end
+
+  defp enc_CertificationRequestInfo_subjectPKInfo_algorithm(p0, p1) do
+    # body not decompiled
+  end
+
+  defp enc_CertificationRequest_signatureAlgorithm(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"enc_Characteristic-two")(p0) do
+    # body not decompiled
+  end
+
+  defp enc_ClassList(p0) do
+    # body not decompiled
+  end
+
+  defp enc_Clearance(p0) do
+    # body not decompiled
+  end
+
+  defp enc_Clearance_securityCategories(p0, p1) do
+    # body not decompiled
+  end
+
+  defp enc_Clearance_securityCategories_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_CommonName(p0) do
+    # body not decompiled
+  end
+
+  defp enc_ContentEncryptionAlgorithmIdentifier(p0) do
+    # body not decompiled
+  end
+
+  defp enc_ContentInfo(p0) do
+    # body not decompiled
+  end
+
+  defp enc_ContentType(p0) do
+    # body not decompiled
+  end
+
+  defp enc_CountryName(p0) do
+    # body not decompiled
+  end
+
+  defp enc_Curve(p0) do
+    # body not decompiled
+  end
+
+  defp enc_DHParameter(p0) do
+    # body not decompiled
+  end
+
+  defp enc_DHPublicKey(p0) do
+    # body not decompiled
+  end
+
+  defp enc_DSAParams(p0) do
+    # body not decompiled
+  end
+
+  defp enc_DSAPrivateKey(p0) do
+    # body not decompiled
+  end
+
+  defp enc_DSAPublicKey(p0) do
+    # body not decompiled
+  end
+
+  defp enc_Data(p0) do
+    # body not decompiled
+  end
+
+  defp enc_Digest(p0) do
+    # body not decompiled
+  end
+
+  defp enc_DigestAlgorithmIdentifier(p0) do
+    # body not decompiled
+  end
+
+  defp enc_DigestAlgorithmIdentifiers(p0) do
+    # body not decompiled
+  end
+
+  defp enc_DigestAlgorithmIdentifiers_daSequence(p0, p1) do
+    # body not decompiled
+  end
+
+  defp enc_DigestAlgorithmIdentifiers_daSequence_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_DigestAlgorithmIdentifiers_daSet(p0, p1) do
+    # body not decompiled
+  end
+
+  defp enc_DigestAlgorithmIdentifiers_daSet_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_DigestEncryptionAlgorithmIdentifier(p0) do
+    # body not decompiled
+  end
+
+  defp enc_DigestInfoNull(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"enc_DigestInfoPKCS-1")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"enc_DigestInfoPKCS-7")(p0) do
+    # body not decompiled
+  end
+
+  defp enc_DigestedData(p0) do
+    # body not decompiled
+  end
+
+  defp enc_DirectoryString(p0) do
+    # body not decompiled
+  end
+
+  defp enc_DisplayText(p0) do
+    # body not decompiled
+  end
+
+  defp enc_DistinguishedName(p0) do
+    # body not decompiled
+  end
+
+  defp enc_DistributionPoint(p0) do
+    # body not decompiled
+  end
+
+  defp enc_DistributionPointName(p0) do
+    # body not decompiled
+  end
+
+  defp enc_DomainComponent(p0) do
+    # body not decompiled
+  end
+
+  defp enc_DomainParameters(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"enc_Dss-Parms")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"enc_Dss-Sig-Value")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"enc_ECDSA-Sig-Value")(p0) do
+    # body not decompiled
+  end
+
+  defp enc_ECPVer(p0) do
+    # body not decompiled
+  end
+
+  defp enc_ECParameters(p0) do
+    # body not decompiled
+  end
+
+  defp enc_ECPoint(p0) do
+    # body not decompiled
+  end
+
+  defp enc_ECPrivateKey(p0) do
+    # body not decompiled
+  end
+
+  defp enc_EDIPartyName(p0) do
+    # body not decompiled
+  end
+
+  defp enc_EcpkParameters(p0) do
+    # body not decompiled
+  end
+
+  defp enc_EmailAddress(p0) do
+    # body not decompiled
+  end
+
+  defp enc_EncryptedContent(p0) do
+    # body not decompiled
+  end
+
+  defp enc_EncryptedContentInfo(p0) do
+    # body not decompiled
+  end
+
+  defp enc_EncryptedData(p0) do
+    # body not decompiled
+  end
+
+  defp enc_EncryptedDigest(p0) do
+    # body not decompiled
+  end
+
+  defp enc_EncryptedKey(p0) do
+    # body not decompiled
+  end
+
+  defp enc_EnvelopedData(p0) do
+    # body not decompiled
+  end
+
+  defp enc_ExtKeyUsageSyntax(p0) do
+    # body not decompiled
+  end
+
+  defp enc_ExtKeyUsageSyntax_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_ExtendedCertificate(p0) do
+    # body not decompiled
+  end
+
+  defp enc_ExtendedCertificateOrCertificate(p0) do
+    # body not decompiled
+  end
+
+  defp enc_ExtendedCertificatesAndCertificates(p0) do
+    # body not decompiled
+  end
+
+  defp enc_ExtendedCertificatesAndCertificates_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_ExtendedNetworkAddress(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"enc_ExtendedNetworkAddress_e163-4-address")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp enc_Extension(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"enc_Extension-Any")(p0) do
+    # body not decompiled
+  end
+
+  defp enc_ExtensionAttribute(p0) do
+    # body not decompiled
+  end
+
+  defp enc_ExtensionAttributes(p0) do
+    # body not decompiled
+  end
+
+  defp enc_ExtensionAttributes_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_ExtensionORAddressComponents(p0) do
+    # body not decompiled
+  end
+
+  defp enc_ExtensionPhysicalDeliveryAddressComponents(p0) do
+    # body not decompiled
+  end
+
+  defp enc_ExtensionRequest(p0) do
+    # body not decompiled
+  end
+
+  defp enc_Extensions(p0) do
+    # body not decompiled
+  end
+
+  defp enc_Extensions_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_FieldElement(p0) do
+    # body not decompiled
+  end
+
+  defp enc_FieldID(p0) do
+    # body not decompiled
+  end
+
+  defp enc_FreshestCRL(p0) do
+    # body not decompiled
+  end
+
+  defp enc_GeneralName(p0) do
+    # body not decompiled
+  end
+
+  defp enc_GeneralNames(p0) do
+    # body not decompiled
+  end
+
+  defp enc_GeneralNames_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_GeneralSubtree(p0) do
+    # body not decompiled
+  end
+
+  defp enc_GeneralSubtrees(p0) do
+    # body not decompiled
+  end
+
+  defp enc_GeneralSubtrees_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_HoldInstructionCode(p0) do
+    # body not decompiled
+  end
+
+  defp enc_Holder(p0) do
+    # body not decompiled
+  end
+
+  defp enc_IetfAttrSyntax(p0) do
+    # body not decompiled
+  end
+
+  defp enc_IetfAttrSyntax_values(p0, p1) do
+    # body not decompiled
+  end
+
+  defp enc_IetfAttrSyntax_values_SEQOF(p0, p1) do
+    # body not decompiled
+  end
+
+  defp enc_IetfAttrSyntax_values_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_InhibitAnyPolicy(p0) do
+    # body not decompiled
+  end
+
+  defp enc_InvalidityDate(p0) do
+    # body not decompiled
+  end
+
+  defp enc_IssuerAltName(p0) do
+    # body not decompiled
+  end
+
+  defp enc_IssuerAndSerialNumber(p0) do
+    # body not decompiled
+  end
+
+  defp enc_IssuerSerial(p0) do
+    # body not decompiled
+  end
+
+  defp enc_IssuingDistributionPoint(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"enc_KEA-Parms-Id")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"enc_KEA-PublicKey")(p0) do
+    # body not decompiled
+  end
+
+  defp enc_KeyEncryptionAlgorithmIdentifier(p0) do
+    # body not decompiled
+  end
+
+  defp enc_KeyIdentifier(p0) do
+    # body not decompiled
+  end
+
+  defp enc_KeyPurposeId(p0) do
+    # body not decompiled
+  end
+
+  defp enc_KeyUsage(p0) do
+    # body not decompiled
+  end
+
+  defp enc_LocalPostalAttributes(p0) do
+    # body not decompiled
+  end
+
+  defp enc_MessageDigest(p0) do
+    # body not decompiled
+  end
+
+  defp enc_Name(p0) do
+    # body not decompiled
+  end
+
+  defp enc_NameConstraints(p0) do
+    # body not decompiled
+  end
+
+  defp enc_NetworkAddress(p0) do
+    # body not decompiled
+  end
+
+  defp enc_NoticeReference(p0) do
+    # body not decompiled
+  end
+
+  defp enc_NoticeReference_noticeNumbers(p0, p1) do
+    # body not decompiled
+  end
+
+  defp enc_NoticeReference_noticeNumbers_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_NumericUserIdentifier(p0) do
+    # body not decompiled
+  end
+
+  defp enc_ORAddress(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"enc_OTP-X520countryname")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"enc_OTP-emailAddress")(p0) do
+    # body not decompiled
+  end
+
+  defp enc_OTPAttributeTypeAndValue(p0) do
+    # body not decompiled
+  end
+
+  defp enc_OTPCertificate(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"enc_OTPCharacteristic-two")(p0) do
+    # body not decompiled
+  end
+
+  defp enc_OTPExtension(p0) do
+    # body not decompiled
+  end
+
+  defp enc_OTPExtensionAttribute(p0) do
+    # body not decompiled
+  end
+
+  defp enc_OTPExtensionAttributes(p0) do
+    # body not decompiled
+  end
+
+  defp enc_OTPExtensionAttributes_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_OTPExtensions(p0) do
+    # body not decompiled
+  end
+
+  defp enc_OTPExtensions_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_OTPFieldID(p0) do
+    # body not decompiled
+  end
+
+  defp enc_OTPOLDSubjectPublicKeyInfo(p0) do
+    # body not decompiled
+  end
+
+  defp enc_OTPOLDSubjectPublicKeyInfo_algorithm(p0, p1) do
+    # body not decompiled
+  end
+
+  defp enc_OTPSubjectPublicKeyInfo(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"enc_OTPSubjectPublicKeyInfo-Any")(p0) do
+    # body not decompiled
+  end
+
+  defp enc_OTPTBSCertificate(p0) do
+    # body not decompiled
+  end
+
+  defp enc_ObjId(p0) do
+    # body not decompiled
+  end
+
+  defp enc_ObjectDigestInfo(p0) do
+    # body not decompiled
+  end
+
+  defp enc_OrganizationName(p0) do
+    # body not decompiled
+  end
+
+  defp enc_OrganizationalUnitName(p0) do
+    # body not decompiled
+  end
+
+  defp enc_OrganizationalUnitNames(p0) do
+    # body not decompiled
+  end
+
+  defp enc_OrganizationalUnitNames_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_OtherPrimeInfo(p0) do
+    # body not decompiled
+  end
+
+  defp enc_OtherPrimeInfos(p0) do
+    # body not decompiled
+  end
+
+  defp enc_OtherPrimeInfos_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_PDSName(p0) do
+    # body not decompiled
+  end
+
+  defp enc_PDSParameter(p0) do
+    # body not decompiled
+  end
+
+  defp enc_Pentanomial(p0) do
+    # body not decompiled
+  end
+
+  defp enc_PersonalName(p0) do
+    # body not decompiled
+  end
+
+  defp enc_PhysicalDeliveryCountryName(p0) do
+    # body not decompiled
+  end
+
+  defp enc_PhysicalDeliveryOfficeName(p0) do
+    # body not decompiled
+  end
+
+  defp enc_PhysicalDeliveryOfficeNumber(p0) do
+    # body not decompiled
+  end
+
+  defp enc_PhysicalDeliveryOrganizationName(p0) do
+    # body not decompiled
+  end
+
+  defp enc_PhysicalDeliveryPersonalName(p0) do
+    # body not decompiled
+  end
+
+  defp enc_PolicyConstraints(p0) do
+    # body not decompiled
+  end
+
+  defp enc_PolicyInformation(p0) do
+    # body not decompiled
+  end
+
+  defp enc_PolicyInformation_policyQualifiers(p0, p1) do
+    # body not decompiled
+  end
+
+  defp enc_PolicyInformation_policyQualifiers_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_PolicyMappings(p0) do
+    # body not decompiled
+  end
+
+  defp enc_PolicyMappings_SEQOF(p0, p1) do
+    # body not decompiled
+  end
+
+  defp enc_PolicyMappings_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_PolicyQualifierId(p0) do
+    # body not decompiled
+  end
+
+  defp enc_PolicyQualifierInfo(p0) do
+    # body not decompiled
+  end
+
+  defp enc_PostOfficeBoxAddress(p0) do
+    # body not decompiled
+  end
+
+  defp enc_PostalCode(p0) do
+    # body not decompiled
+  end
+
+  defp enc_PosteRestanteAddress(p0) do
+    # body not decompiled
+  end
+
+  defp enc_PresentationAddress(p0) do
+    # body not decompiled
+  end
+
+  defp enc_PresentationAddress_nAddresses(p0, p1) do
+    # body not decompiled
+  end
+
+  defp enc_PresentationAddress_nAddresses_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"enc_Prime-p")(p0) do
+    # body not decompiled
+  end
+
+  defp enc_PrivateDomainName(p0) do
+    # body not decompiled
+  end
+
+  defp enc_PrivateKeyUsagePeriod(p0) do
+    # body not decompiled
+  end
+
+  defp enc_ProxyInfo(p0) do
+    # body not decompiled
+  end
+
+  defp enc_ProxyInfo_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_PublicKeyAlgorithm(p0) do
+    # body not decompiled
+  end
+
+  defp enc_RDNSequence(p0) do
+    # body not decompiled
+  end
+
+  defp enc_RDNSequence_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_RSAPrivateKey(p0) do
+    # body not decompiled
+  end
+
+  defp enc_RSAPublicKey(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"enc_RSASSA-PSS-params")(p0) do
+    # body not decompiled
+  end
+
+  defp enc_ReasonFlags(p0) do
+    # body not decompiled
+  end
+
+  defp enc_RecipientInfo(p0) do
+    # body not decompiled
+  end
+
+  defp enc_RecipientInfos(p0) do
+    # body not decompiled
+  end
+
+  defp enc_RecipientInfos_riSequence(p0, p1) do
+    # body not decompiled
+  end
+
+  defp enc_RecipientInfos_riSequence_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_RecipientInfos_riSet(p0, p1) do
+    # body not decompiled
+  end
+
+  defp enc_RecipientInfos_riSet_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_RelativeDistinguishedName(p0) do
+    # body not decompiled
+  end
+
+  defp enc_RelativeDistinguishedName_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_RoleSyntax(p0) do
+    # body not decompiled
+  end
+
+  defp enc_SecurityCategory(p0) do
+    # body not decompiled
+  end
+
+  defp enc_SignatureAlgorithm(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"enc_SignatureAlgorithm-Any")(p0) do
+    # body not decompiled
+  end
+
+  defp enc_SignedAndEnvelopedData(p0) do
+    # body not decompiled
+  end
+
+  defp enc_SignedAndEnvelopedData_certificates(p0, p1) do
+    # body not decompiled
+  end
+
+  defp enc_SignedAndEnvelopedData_crls(p0, p1) do
+    # body not decompiled
+  end
+
+  defp enc_SignedData(p0) do
+    # body not decompiled
+  end
+
+  defp enc_SignedData_certificates(p0, p1) do
+    # body not decompiled
+  end
+
+  defp enc_SignedData_crls(p0, p1) do
+    # body not decompiled
+  end
+
+  defp enc_SignerInfo(p0) do
+    # body not decompiled
+  end
+
+  defp enc_SignerInfoAuthenticatedAttributes(p0) do
+    # body not decompiled
+  end
+
+  defp enc_SignerInfoAuthenticatedAttributes_aaSequence(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"enc_SignerInfoAuthenticatedAttributes_aaSequence_AttributePKCS-7")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"enc_SignerInfoAuthenticatedAttributes_aaSequence_AttributePKCS-7_values")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"enc_SignerInfoAuthenticatedAttributes_aaSequence_AttributePKCS-7_values_components")(p0, p1, p2, p3) do
+    # body not decompiled
+  end
+
+  defp enc_SignerInfoAuthenticatedAttributes_aaSequence_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_SignerInfoAuthenticatedAttributes_aaSet(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"enc_SignerInfoAuthenticatedAttributes_aaSet_AttributePKCS-7")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"enc_SignerInfoAuthenticatedAttributes_aaSet_AttributePKCS-7_values")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"enc_SignerInfoAuthenticatedAttributes_aaSet_AttributePKCS-7_values_components")(p0, p1, p2, p3) do
+    # body not decompiled
+  end
+
+  defp enc_SignerInfoAuthenticatedAttributes_aaSet_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_SignerInfo_unauthenticatedAttributes(p0, p1) do
+    # body not decompiled
+  end
+
+  defp enc_SignerInfo_unauthenticatedAttributes_uaSequence(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"enc_SignerInfo_unauthenticatedAttributes_uaSequence_AttributePKCS-7")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"enc_SignerInfo_unauthenticatedAttributes_uaSequence_AttributePKCS-7_values")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"enc_SignerInfo_unauthenticatedAttributes_uaSequence_AttributePKCS-7_values_components")(p0, p1, p2, p3) do
+    # body not decompiled
+  end
+
+  defp enc_SignerInfo_unauthenticatedAttributes_uaSequence_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_SignerInfo_unauthenticatedAttributes_uaSet(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"enc_SignerInfo_unauthenticatedAttributes_uaSet_AttributePKCS-7")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"enc_SignerInfo_unauthenticatedAttributes_uaSet_AttributePKCS-7_values")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"enc_SignerInfo_unauthenticatedAttributes_uaSet_AttributePKCS-7_values_components")(p0, p1, p2, p3) do
+    # body not decompiled
+  end
+
+  defp enc_SignerInfo_unauthenticatedAttributes_uaSet_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_SignerInfos(p0) do
+    # body not decompiled
+  end
+
+  defp enc_SignerInfos_siSequence(p0, p1) do
+    # body not decompiled
+  end
+
+  defp enc_SignerInfos_siSequence_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_SignerInfos_siSet(p0, p1) do
+    # body not decompiled
+  end
+
+  defp enc_SignerInfos_siSet_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_SigningTime(p0) do
+    # body not decompiled
+  end
+
+  defp enc_SkipCerts(p0) do
+    # body not decompiled
+  end
+
+  defp enc_StreetAddress(p0) do
+    # body not decompiled
+  end
+
+  defp enc_SubjectAltName(p0) do
+    # body not decompiled
+  end
+
+  defp enc_SubjectDirectoryAttributes(p0) do
+    # body not decompiled
+  end
+
+  defp enc_SubjectDirectoryAttributes_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_SubjectInfoAccessSyntax(p0) do
+    # body not decompiled
+  end
+
+  defp enc_SubjectInfoAccessSyntax_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_SubjectKeyIdentifier(p0) do
+    # body not decompiled
+  end
+
+  defp enc_SubjectPublicKeyInfo(p0) do
+    # body not decompiled
+  end
+
+  defp enc_SvceAuthInfo(p0) do
+    # body not decompiled
+  end
+
+  defp enc_TBSCertList(p0) do
+    # body not decompiled
+  end
+
+  defp enc_TBSCertList_revokedCertificates(p0, p1) do
+    # body not decompiled
+  end
+
+  defp enc_TBSCertList_revokedCertificates_SEQOF(p0, p1) do
+    # body not decompiled
+  end
+
+  defp enc_TBSCertList_revokedCertificates_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_TBSCertificate(p0) do
+    # body not decompiled
+  end
+
+  defp enc_Target(p0) do
+    # body not decompiled
+  end
+
+  defp enc_TargetCert(p0) do
+    # body not decompiled
+  end
+
+  defp enc_Targets(p0) do
+    # body not decompiled
+  end
+
+  defp enc_Targets_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_TeletexCommonName(p0) do
+    # body not decompiled
+  end
+
+  defp enc_TeletexDomainDefinedAttribute(p0) do
+    # body not decompiled
+  end
+
+  defp enc_TeletexDomainDefinedAttributes(p0) do
+    # body not decompiled
+  end
+
+  defp enc_TeletexDomainDefinedAttributes_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_TeletexOrganizationName(p0) do
+    # body not decompiled
+  end
+
+  defp enc_TeletexOrganizationalUnitName(p0) do
+    # body not decompiled
+  end
+
+  defp enc_TeletexOrganizationalUnitNames(p0) do
+    # body not decompiled
+  end
+
+  defp enc_TeletexOrganizationalUnitNames_components(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_TeletexPersonalName(p0) do
+    # body not decompiled
+  end
+
+  defp enc_TerminalIdentifier(p0) do
+    # body not decompiled
+  end
+
+  defp enc_TerminalType(p0) do
+    # body not decompiled
+  end
+
+  defp enc_Time(p0) do
+    # body not decompiled
+  end
+
+  defp enc_TrailerField(p0) do
+    # body not decompiled
+  end
+
+  defp enc_Trinomial(p0) do
+    # body not decompiled
+  end
+
+  defp enc_UnformattedPostalAddress(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"enc_UnformattedPostalAddress_printable-address")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"enc_UnformattedPostalAddress_printable-address_components")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp enc_UniqueIdentifier(p0) do
+    # body not decompiled
+  end
+
+  defp enc_UniquePostalName(p0) do
+    # body not decompiled
+  end
+
+  defp enc_UserNotice(p0) do
+    # body not decompiled
+  end
+
+  defp enc_V2Form(p0) do
+    # body not decompiled
+  end
+
+  defp enc_ValidationParms(p0) do
+    # body not decompiled
+  end
+
+  defp enc_Validity(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"enc_VersionPKCS-1")(p0) do
+    # body not decompiled
+  end
+
+  defp enc_VersionPKIX1Explicit88(p0) do
+    # body not decompiled
+  end
+
+  defp enc_X121Address(p0) do
+    # body not decompiled
+  end
+
+  defp enc_X520CommonName(p0) do
+    # body not decompiled
+  end
+
+  defp enc_X520LocalityName(p0) do
+    # body not decompiled
+  end
+
+  defp enc_X520OrganizationName(p0) do
+    # body not decompiled
+  end
+
+  defp enc_X520OrganizationalUnitName(p0) do
+    # body not decompiled
+  end
+
+  defp enc_X520Pseudonym(p0) do
+    # body not decompiled
+  end
+
+  defp enc_X520SerialNumber(p0) do
+    # body not decompiled
+  end
+
+  defp enc_X520StateOrProvinceName(p0) do
+    # body not decompiled
+  end
+
+  defp enc_X520Title(p0) do
+    # body not decompiled
+  end
+
+  defp enc_X520countryName(p0) do
+    # body not decompiled
+  end
+
+  defp enc_X520dnQualifier(p0) do
+    # body not decompiled
+  end
+
+  defp enc_X520name(p0) do
+    # body not decompiled
+  end
+
+  defp enc_obj_id_tail(p0, p1) do
+    # body not decompiled
+  end
+
+  defp encode_BMP_string(p0, p1) do
+    # body not decompiled
+  end
+
+  defp encode_UTF8_string(p0, p1) do
+    # body not decompiled
+  end
+
+  defp encode_bitstring(p0) do
+    # body not decompiled
+  end
+
+  defp encode_bitstring(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp encode_boolean(p0, p1) do
+    # body not decompiled
+  end
+
+  defp encode_disp(p0, p1) do
+    # body not decompiled
+  end
+
+  defp encode_integer(p0) do
+    # body not decompiled
+  end
+
+  defp encode_integer(p0, p1) do
+    # body not decompiled
+  end
+
+  defp encode_integer(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp encode_integer_neg(p0, p1) do
+    # body not decompiled
+  end
+
+  defp encode_integer_pos(p0, p1) do
+    # body not decompiled
+  end
+
+  defp encode_length(p0) do
+    # body not decompiled
+  end
+
+  defp encode_named_bit_string(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp encode_null(p0, p1) do
+    # body not decompiled
+  end
+
+  defp encode_object_identifier(p0, p1) do
+    # body not decompiled
+  end
+
+  defp encode_open_type(p0, p1) do
+    # body not decompiled
+  end
+
+  defp encode_restricted_string(p0, p1) do
+    # body not decompiled
+  end
+
+  defp encode_tags(p0, p1) do
+    # body not decompiled
+  end
+
+  defp encode_tags(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp encode_universal_string(p0, p1) do
+    # body not decompiled
+  end
+
+  defp encode_unnamed_bit_string(p0, p1) do
+    # body not decompiled
+  end
+
+  defp get_all_bitposes(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp incomplete_choice_alt(p0, p1) do
+    # body not decompiled
+  end
+
+  defp is_default_1(p0) do
+    # body not decompiled
+  end
+
+  defp is_default_10(p0) do
+    # body not decompiled
+  end
+
+  defp is_default_11(p0) do
+    # body not decompiled
+  end
+
+  defp is_default_2(p0) do
+    # body not decompiled
+  end
+
+  defp is_default_3(p0) do
+    # body not decompiled
+  end
+
+  defp is_default_4(p0) do
+    # body not decompiled
+  end
+
+  defp is_default_5(p0) do
+    # body not decompiled
+  end
+
+  defp is_default_6(p0) do
+    # body not decompiled
+  end
+
+  defp is_default_7(p0) do
+    # body not decompiled
+  end
+
+  defp is_default_8(p0) do
+    # body not decompiled
+  end
+
+  defp is_default_9(p0) do
+    # body not decompiled
+  end
+
+  defp make_and_set_list(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp match_and_collect(p0, p1) do
+    # body not decompiled
+  end
+
+  defp match_tags(p0, p1) do
+    # body not decompiled
+  end
+
+  defp minimum_octets(p0) do
+    # body not decompiled
+  end
+
+  defp minimum_octets(p0, p1) do
+    # body not decompiled
+  end
+
+  defp mk_BMP_list(p0) do
+    # body not decompiled
+  end
+
+  defp mk_BMP_list(p0, p1) do
+    # body not decompiled
+  end
+
+  defp mk_BMP_string(p0) do
+    # body not decompiled
+  end
+
+  defp mk_BMP_string(p0, p1) do
+    # body not decompiled
+  end
+
+  defp mk_object_val(p0) do
+    # body not decompiled
+  end
+
+  defp mk_object_val(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp mk_uni_list(p0) do
+    # body not decompiled
+  end
+
+  defp mk_uni_list(p0, p1) do
+    # body not decompiled
+  end
+
+  defp mk_universal_string(p0) do
+    # body not decompiled
+  end
+
+  defp mk_universal_string(p0, p1) do
+    # body not decompiled
+  end
+
+  defp number2name(p0, p1) do
+    # body not decompiled
+  end
+
+  defp skip_indefinite_value(p0) do
+    # body not decompiled
+  end
+
+  defp skip_length_and_value(p0) do
+    # body not decompiled
+  end
+
+  defp skip_long_tag(p0) do
+    # body not decompiled
+  end
+
+  defp skip_tag(p0) do
+    # body not decompiled
+  end
+
+  defp tlv_format(p0) do
+    # body not decompiled
+  end
+
+  defp unused_bitlist(p0, p1, p2) do
+    # body not decompiled
+  end
 end

@@ -2,6 +2,7 @@ package org.elixir_lang.structure_view.element;
 
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
+import org.elixir_lang.Visibility;
 import org.elixir_lang.navigation.item_presentation.Parent;
 import org.elixir_lang.psi.QuotableKeywordPair;
 import org.elixir_lang.structure_view.element.modular.Modular;

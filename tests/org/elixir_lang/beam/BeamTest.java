@@ -4,17 +4,18 @@ import com.ericsson.otp.erlang.OtpErlangDecodeException;
 import com.intellij.openapi.util.Condition;
 import com.intellij.util.containers.ContainerUtil;
 import org.elixir_lang.beam.chunk.Atoms;
-import org.elixir_lang.beam.chunk.Exports;
+import org.elixir_lang.beam.chunk.CallDefinitions;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.Stream;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.elixir_lang.psi.call.name.Function.DEF;
+import static org.elixir_lang.psi.call.name.Function.DEFP;
+import static org.junit.Assert.*;
 
 public class BeamTest {
     @NotNull
@@ -33,32 +34,25 @@ public class BeamTest {
 
         assertEquals("Elixir.Kernel", atoms.moduleName());
 
-        Exports exports = beam.exports();
+        long callDefinitionCount = beam.callDefinitionsStream().mapToInt(CallDefinitions::size).sum();
 
-        assertNotNull(exports);
+        assertTrue("There are no callDefinitions", callDefinitionCount > 0);
 
-        int exportCount = exports.size();
+        SortedSet<MacroNameArity> macroNameAritySortedSet =
+                CallDefinitions.macroNameAritySortedSet(beam.callDefinitionsStream(), atoms);
 
-        assertTrue("There are no exports", exportCount > 0);
+        assertEquals("There are nameless callDefinitions", callDefinitionCount, macroNameAritySortedSet.size());
 
-        SortedSet<MacroNameArity> macroNameAritySortedSet = exports.macroNameAritySortedSet(atoms);
-
-        assertEquals("There are nameless exports", exportCount, macroNameAritySortedSet.size());
-
-        List<MacroNameArity> nodes = ContainerUtil.filter(
-                macroNameAritySortedSet,
-                new Condition<MacroNameArity>() {
-                    @Override
-                    public boolean value(MacroNameArity macroNameArity) {
-                        return "node".equals(macroNameArity.name);
-                    }
-                }
+        Stream<MacroNameArity> macroNameArityStream = macroNameAritySortedSet.stream().filter(
+                macroNameArity -> "node".equals(macroNameArity.name)
         );
 
-        assertEquals(nodes.size(), 2);
+        MacroNameArity[] macroNameArities = macroNameArityStream.toArray(MacroNameArity[]::new);
 
-        assertEquals(0, (int) nodes.get(0).arity);
-        assertEquals(1, (int) nodes.get(1).arity);
+        assertEquals(2, macroNameArities.length);
+
+        assertEquals(0, (int) macroNameArities[0].arity);
+        assertEquals(1, (int) macroNameArities[1].arity);
     }
 
     @Test
@@ -73,31 +67,31 @@ public class BeamTest {
 
         assertEquals("elixir_interpolation", atoms.moduleName());
 
-        Exports exports = beam.exports();
+        long callDefinitionCount = beam.callDefinitionsStream().mapToInt(CallDefinitions::size).sum();
 
-        assertNotNull(exports);
+        assertTrue("There are no callDefinitions", callDefinitionCount > 0);
 
-        int exportCount = exports.size();
+        SortedSet<MacroNameArity> macroNameAritySortedSet =
+                CallDefinitions.macroNameAritySortedSet(beam.callDefinitionsStream(), atoms);
 
-        assertTrue("There are no exports", exportCount > 0);
-
-        SortedSet<MacroNameArity> macroNameAritySortedSet = exports.macroNameAritySortedSet(atoms);
-
-        assertEquals("There are nameless exports", exportCount, macroNameAritySortedSet.size());
+        assertEquals("There are nameless callDefinitions", callDefinitionCount, macroNameAritySortedSet.size());
 
         List<MacroNameArity> extracts = ContainerUtil.filter(
                 macroNameAritySortedSet,
-                new Condition<MacroNameArity>() {
-                    @Override
-                    public boolean value(MacroNameArity macroNameArity) {
-                        return "extract".equals(macroNameArity.name);
-                    }
-                }
+                macroNameArity -> "extract".equals(macroNameArity.name)
         );
 
-        assertEquals(1, extracts.size());
+        assertEquals(2, extracts.size());
 
-        assertEquals(6, (int) extracts.get(0).arity);
+        MacroNameArity firstExtract = extracts.get(0);
+
+        assertEquals(DEF, firstExtract.macro);
+        assertEquals(6, (int) firstExtract.arity);
+
+        MacroNameArity secondExtract = extracts.get(1);
+
+        assertEquals(DEFP, secondExtract.macro);
+        assertEquals(8, (int) secondExtract.arity);
     }
 
     private Beam beam(@NotNull String baseName) throws IOException, OtpErlangDecodeException {

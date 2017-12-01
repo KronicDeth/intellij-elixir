@@ -6,6 +6,7 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiErrorElement;
 import org.apache.commons.lang.math.IntRange;
+import org.elixir_lang.Visibility;
 import org.elixir_lang.navigation.item_presentation.NameArity;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;

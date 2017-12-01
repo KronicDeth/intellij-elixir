@@ -7,7 +7,8 @@ import org.jetbrains.annotations.NotNull;
 
 public class AllName extends StringStubIndexExtension<NamedElement> {
     public static final StubIndexKey<String, NamedElement> KEY = StubIndexKey.createIndexKey("elixir.all.name");
-    public static final int VERSION = 3;
+    // 4 - adds defp and defmacrop to decompiled beam files
+    public static final int VERSION = 4;
 
     @Override
     public int getVersion() {

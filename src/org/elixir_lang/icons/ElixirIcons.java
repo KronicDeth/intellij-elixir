@@ -6,7 +6,6 @@ import com.intellij.ui.LayeredIcon;
 import com.intellij.ui.RowIcon;
 import com.intellij.util.PlatformIcons;
 import org.elixir_lang.structure_view.element.Timed;
-import org.elixir_lang.structure_view.element.Visible;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -58,7 +57,7 @@ public interface ElixirIcons {
         public static final Icon PUBLIC = PlatformIcons.PUBLIC_ICON;
 
         @NotNull
-        public static Icon from(@Nullable Visible.Visibility visibility) {
+        public static Icon from(@Nullable org.elixir_lang.Visibility visibility) {
             Icon icon = null;
 
 

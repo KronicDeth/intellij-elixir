@@ -3,7 +3,7 @@ defmodule Absinthe.Schema.Notation.Writer do
     info = build_info(env)
 
     errors        = Macro.escape info.errors
-    exports       = Macro.escape info.exports
+    exports       = Macro.escape info.callDefinitions
     type_map      = Macro.escape info.type_map
     implementors  = Macro.escape info.implementors
     directive_map = Macro.escape info.directive_map

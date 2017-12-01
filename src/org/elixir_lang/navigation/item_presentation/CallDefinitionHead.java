@@ -3,8 +3,8 @@ package org.elixir_lang.navigation.item_presentation;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.ui.RowIcon;
+import org.elixir_lang.Visibility;
 import org.elixir_lang.icons.ElixirIcons;
-import org.elixir_lang.structure_view.element.Visible;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,7 +20,7 @@ public class CallDefinitionHead implements ItemPresentation {
     @NotNull
     private final NameArity callDefinition;
     @NotNull
-    private final Visible.Visibility visibility;
+    private final Visibility visibility;
 
 
     /*
@@ -33,7 +33,7 @@ public class CallDefinitionHead implements ItemPresentation {
      * @param psiElement a call definition head
      */
     public CallDefinitionHead(@NotNull NameArity callDefinition,
-                              @NotNull Visible.Visibility visibility,
+                              @NotNull Visibility visibility,
                               @NotNull PsiElement psiElement) {
         this.psiElement = psiElement;
         this.callDefinition = callDefinition;

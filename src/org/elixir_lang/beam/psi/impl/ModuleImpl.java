@@ -73,54 +73,39 @@ public class ModuleImpl<T extends StubElement> extends ModuleElementImpl impleme
     public void setMirror(@NotNull TreeElement element) throws InvalidMirrorException {
         setMirrorCheckingType(element, null);
 
-        setMirrors(exports(), exports(element));
+        setMirrors(callDefinitions(), callDefinitions(element));
     }
 
     @Contract(pure = true)
     @NotNull
-    public static MaybeExported[] exports(@NotNull TreeElement mirror) {
+    private static MaybeExported[] callDefinitions(@NotNull TreeElement mirror) {
         PsiElement mirrorPsi = mirror.getPsi();
-        MaybeExported[] exports;
+        MaybeExported[] callDefinitions;
 
         if (mirrorPsi instanceof Call) {
             Call mirrorCall = (Call) mirrorPsi;
-            final List<MaybeExported> exportedList = new ArrayList<MaybeExported>();
+            final List<MaybeExported> callDefinitionList = new ArrayList<>();
 
-            Modular.callDefinitionClauseCallWhile(mirrorCall, new Function<Call, Boolean>() {
-                        @Override
-                        public Boolean fun(Call call) {
-                            if (call instanceof MaybeExported) {
-                                MaybeExported maybeExportedCall = (MaybeExported) call;
+            Modular.callDefinitionClauseCallWhile(mirrorCall, call -> {
+                if (call instanceof MaybeExported) {
+                    MaybeExported maybeExportedCall = (MaybeExported) call;
 
-                                if (maybeExportedCall.isExported()) {
-                                    exportedList.add(maybeExportedCall);
-                                }
-                            }
+                    callDefinitionList.add(maybeExportedCall);
+                }
 
-                            return true;
-                        }
-                    }
-            );
+                return true;
+            });
 
-            exports = exportedList.toArray(new MaybeExported[exportedList.size()]);
+            callDefinitions = callDefinitionList.toArray(new MaybeExported[callDefinitionList.size()]);
         } else {
-            exports = new MaybeExported[0];
+            callDefinitions = new MaybeExported[0];
         }
 
-        return exports;
+        return callDefinitions;
     }
 
-    private MaybeExported[] exports() {
-        return (MaybeExported[]) getStub().getChildrenByType(
-                CALL_DEFINITION,
-                new ArrayFactory() {
-                    @NotNull
-                    @Override
-                    public MaybeExported[] create(int count) {
-                        return new CallDefinitionImpl[count];
-                    }
-                }
-        );
+    private MaybeExported[] callDefinitions() {
+        return (MaybeExported[]) getStub().getChildrenByType(CALL_DEFINITION, CallDefinitionImpl[]::new);
     }
 
     /**

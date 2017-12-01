@@ -1118,4 +1118,606 @@ defmodule :erl_syntax do
   def warning_marker_info(p0) do
     # body not decompiled
   end
+
+  # Private Functions
+
+  defp unquote(:"-abstract/1-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-abstract/1-lc$^1/1-1-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-concrete/1-fun-2-")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-concrete/1-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-concrete/1-lc$^1/1-1-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-fold_binary_field_types/1-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-fold_function_names/1-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-fold_record_fields/1-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-fold_variable_names/1-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-is_literal/1-fun-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-is_literal/1-fun-1-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-is_literal/1-fun-2-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-meta_1/1-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-meta_subtrees/1-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-meta_subtrees/1-lc$^1/1-1-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-normalize_list_1/2-fun-0-")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-revert/1-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-revert/1-lc$^1/1-1-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-revert_case_expr/1-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-revert_clause_disjunction/1-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-revert_cond_expr/1-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-revert_fun_expr/1-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-revert_function/1-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-revert_if_expr/1-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-revert_list/1-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-revert_named_fun_expr/1-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-revert_receive_expr/1-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-revert_try_expr/1-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-revert_try_expr/1-lc$^1/1-1-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-unfold_binary_field_types/2-lc$^0/1-0-")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-unfold_function_names/2-fun-0-")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-unfold_function_names/2-lc$^1/1-0-")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-unfold_record_fields/1-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-unfold_try_clauses/1-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-unfold_variable_names/2-lc$^0/1-0-")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp abstract_list(p0) do
+    # body not decompiled
+  end
+
+  defp abstract_tail(p0, p1) do
+    # body not decompiled
+  end
+
+  defp add_postcomments_1(p0, p1) do
+    # body not decompiled
+  end
+
+  defp add_precomments_1(p0, p1) do
+    # body not decompiled
+  end
+
+  defp concrete_list(p0) do
+    # body not decompiled
+  end
+
+  defp conjunction_list(p0) do
+    # body not decompiled
+  end
+
+  defp cons_prefix(p0) do
+    # body not decompiled
+  end
+
+  defp cons_suffix(p0) do
+    # body not decompiled
+  end
+
+  defp flatten_form_list_1(p0, p1) do
+    # body not decompiled
+  end
+
+  defp fold_binary_field_type(p0) do
+    # body not decompiled
+  end
+
+  defp fold_binary_field_types(p0) do
+    # body not decompiled
+  end
+
+  defp fold_function_name(p0) do
+    # body not decompiled
+  end
+
+  defp fold_function_names(p0) do
+    # body not decompiled
+  end
+
+  defp fold_record_field(p0) do
+    # body not decompiled
+  end
+
+  defp fold_record_field_1(p0) do
+    # body not decompiled
+  end
+
+  defp fold_record_fields(p0) do
+    # body not decompiled
+  end
+
+  defp fold_try_clause(p0) do
+    # body not decompiled
+  end
+
+  defp fold_variable_names(p0) do
+    # body not decompiled
+  end
+
+  defp get_com(p0) do
+    # body not decompiled
+  end
+
+  defp get_postcomments_1(p0) do
+    # body not decompiled
+  end
+
+  defp get_precomments_1(p0) do
+    # body not decompiled
+  end
+
+  defp is_literal_binary_field(p0) do
+    # body not decompiled
+  end
+
+  defp is_literal_map_field(p0) do
+    # body not decompiled
+  end
+
+  defp is_printable(p0) do
+    # body not decompiled
+  end
+
+  defp list_elements(p0, p1) do
+    # body not decompiled
+  end
+
+  defp list_length(p0, p1) do
+    # body not decompiled
+  end
+
+  defp make_float(p0) do
+    # body not decompiled
+  end
+
+  defp meta_0(p0) do
+    # body not decompiled
+  end
+
+  defp meta_1(p0) do
+    # body not decompiled
+  end
+
+  defp meta_call(p0, p1) do
+    # body not decompiled
+  end
+
+  defp meta_list(p0) do
+    # body not decompiled
+  end
+
+  defp meta_postcomment(p0) do
+    # body not decompiled
+  end
+
+  defp meta_precomment(p0) do
+    # body not decompiled
+  end
+
+  defp meta_subtrees(p0) do
+    # body not decompiled
+  end
+
+  defp normalize_list_1(p0, p1) do
+    # body not decompiled
+  end
+
+  defp revert_annotated_type(p0) do
+    # body not decompiled
+  end
+
+  defp revert_application(p0) do
+    # body not decompiled
+  end
+
+  defp revert_atom(p0) do
+    # body not decompiled
+  end
+
+  defp revert_attribute(p0) do
+    # body not decompiled
+  end
+
+  defp revert_attribute_1(p0, p1, p2, p3) do
+    # body not decompiled
+  end
+
+  defp revert_binary(p0) do
+    # body not decompiled
+  end
+
+  defp revert_binary_comp(p0) do
+    # body not decompiled
+  end
+
+  defp revert_binary_field(p0) do
+    # body not decompiled
+  end
+
+  defp revert_binary_generator(p0) do
+    # body not decompiled
+  end
+
+  defp revert_bitstring_type(p0) do
+    # body not decompiled
+  end
+
+  defp revert_block_expr(p0) do
+    # body not decompiled
+  end
+
+  defp revert_case_expr(p0) do
+    # body not decompiled
+  end
+
+  defp revert_catch_expr(p0) do
+    # body not decompiled
+  end
+
+  defp revert_char(p0) do
+    # body not decompiled
+  end
+
+  defp revert_clause(p0) do
+    # body not decompiled
+  end
+
+  defp revert_clause_disjunction(p0) do
+    # body not decompiled
+  end
+
+  defp revert_cond_expr(p0) do
+    # body not decompiled
+  end
+
+  defp revert_constrained_function_type(p0) do
+    # body not decompiled
+  end
+
+  defp revert_constraint(p0) do
+    # body not decompiled
+  end
+
+  defp revert_eof_marker(p0) do
+    # body not decompiled
+  end
+
+  defp revert_error_marker(p0) do
+    # body not decompiled
+  end
+
+  defp revert_float(p0) do
+    # body not decompiled
+  end
+
+  defp revert_forms_1(p0) do
+    # body not decompiled
+  end
+
+  defp revert_fun_expr(p0) do
+    # body not decompiled
+  end
+
+  defp revert_fun_type(p0) do
+    # body not decompiled
+  end
+
+  defp revert_function(p0) do
+    # body not decompiled
+  end
+
+  defp revert_function_type(p0) do
+    # body not decompiled
+  end
+
+  defp revert_generator(p0) do
+    # body not decompiled
+  end
+
+  defp revert_if_expr(p0) do
+    # body not decompiled
+  end
+
+  defp revert_implicit_fun(p0) do
+    # body not decompiled
+  end
+
+  defp revert_infix_expr(p0) do
+    # body not decompiled
+  end
+
+  defp revert_integer(p0) do
+    # body not decompiled
+  end
+
+  defp revert_integer_range_type(p0) do
+    # body not decompiled
+  end
+
+  defp revert_list(p0) do
+    # body not decompiled
+  end
+
+  defp revert_list_comp(p0) do
+    # body not decompiled
+  end
+
+  defp revert_map_expr(p0) do
+    # body not decompiled
+  end
+
+  defp revert_map_field_assoc(p0) do
+    # body not decompiled
+  end
+
+  defp revert_map_field_exact(p0) do
+    # body not decompiled
+  end
+
+  defp revert_map_type(p0) do
+    # body not decompiled
+  end
+
+  defp revert_map_type_assoc(p0) do
+    # body not decompiled
+  end
+
+  defp revert_map_type_exact(p0) do
+    # body not decompiled
+  end
+
+  defp revert_match_expr(p0) do
+    # body not decompiled
+  end
+
+  defp revert_module_name(p0) do
+    # body not decompiled
+  end
+
+  defp revert_module_qualifier(p0) do
+    # body not decompiled
+  end
+
+  defp revert_named_fun_expr(p0) do
+    # body not decompiled
+  end
+
+  defp revert_nil(p0) do
+    # body not decompiled
+  end
+
+  defp revert_parentheses(p0) do
+    # body not decompiled
+  end
+
+  defp revert_prefix_expr(p0) do
+    # body not decompiled
+  end
+
+  defp revert_receive_expr(p0) do
+    # body not decompiled
+  end
+
+  defp revert_record_access(p0) do
+    # body not decompiled
+  end
+
+  defp revert_record_expr(p0) do
+    # body not decompiled
+  end
+
+  defp revert_record_index_expr(p0) do
+    # body not decompiled
+  end
+
+  defp revert_record_type(p0) do
+    # body not decompiled
+  end
+
+  defp revert_record_type_field(p0) do
+    # body not decompiled
+  end
+
+  defp revert_root(p0) do
+    # body not decompiled
+  end
+
+  defp revert_string(p0) do
+    # body not decompiled
+  end
+
+  defp revert_try_clause(p0) do
+    # body not decompiled
+  end
+
+  defp revert_try_expr(p0) do
+    # body not decompiled
+  end
+
+  defp revert_tuple(p0) do
+    # body not decompiled
+  end
+
+  defp revert_tuple_type(p0) do
+    # body not decompiled
+  end
+
+  defp revert_type_application(p0) do
+    # body not decompiled
+  end
+
+  defp revert_type_union(p0) do
+    # body not decompiled
+  end
+
+  defp revert_underscore(p0) do
+    # body not decompiled
+  end
+
+  defp revert_user_type_application(p0) do
+    # body not decompiled
+  end
+
+  defp revert_variable(p0) do
+    # body not decompiled
+  end
+
+  defp revert_warning_marker(p0) do
+    # body not decompiled
+  end
+
+  defp set_com(p0, p1) do
+    # body not decompiled
+  end
+
+  defp set_postcomments_1(p0, p1) do
+    # body not decompiled
+  end
+
+  defp set_precomments_1(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unfold_binary_field_type(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unfold_binary_field_types(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unfold_function_names(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unfold_record_field(p0) do
+    # body not decompiled
+  end
+
+  defp unfold_record_field_1(p0) do
+    # body not decompiled
+  end
+
+  defp unfold_record_fields(p0) do
+    # body not decompiled
+  end
+
+  defp unfold_try_clause(p0) do
+    # body not decompiled
+  end
+
+  defp unfold_try_clauses(p0) do
+    # body not decompiled
+  end
+
+  defp unfold_variable_names(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unwrap(p0) do
+    # body not decompiled
+  end
+
+  defp wrap(p0) do
+    # body not decompiled
+  end
 end

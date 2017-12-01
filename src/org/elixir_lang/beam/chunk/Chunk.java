@@ -109,7 +109,8 @@ public class Chunk {
     public enum TypeID {
         ATOM("Atom"),
         ATU8("AtU8"),
-        EXPT("ExpT");
+        EXPT("ExpT"),
+        LOCT("LocT");
 
         private final String typeID;
 

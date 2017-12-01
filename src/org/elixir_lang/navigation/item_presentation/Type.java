@@ -3,10 +3,10 @@ package org.elixir_lang.navigation.item_presentation;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.ui.RowIcon;
+import org.elixir_lang.Visibility;
 import org.elixir_lang.icons.ElixirIcons;
 import org.elixir_lang.psi.ElixirMatchedWhenOperation;
 import org.elixir_lang.psi.call.Call;
-import org.elixir_lang.structure_view.element.Visible;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,7 +23,7 @@ public class Type implements ItemPresentation {
     @Nullable
     private final Call type;
     @NotNull
-    private final Visible.Visibility visibility;
+    private final Visibility visibility;
 
     /*
      * Static Methods
@@ -63,7 +63,7 @@ public class Type implements ItemPresentation {
      * Constructors
      */
 
-    public Type(@Nullable String location, @Nullable Call type, boolean opaque, @NotNull Visible.Visibility visibility) {
+    public Type(@Nullable String location, @Nullable Call type, boolean opaque, @NotNull Visibility visibility) {
         this.location = location;
         this.opaque = opaque;
         this.type = type;

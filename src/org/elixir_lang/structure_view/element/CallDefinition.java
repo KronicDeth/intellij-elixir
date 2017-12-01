@@ -9,6 +9,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.math.IntRange;
 import com.intellij.psi.PsiElement;
+import org.elixir_lang.Visibility;
 import org.elixir_lang.navigation.item_presentation.NameArity;
 import org.elixir_lang.navigation.item_presentation.Parent;
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall;

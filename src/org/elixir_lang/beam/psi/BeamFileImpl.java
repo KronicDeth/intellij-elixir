@@ -29,7 +29,7 @@ import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.beam.Beam;
 import org.elixir_lang.beam.MacroNameArity;
 import org.elixir_lang.beam.chunk.Atoms;
-import org.elixir_lang.beam.chunk.Exports;
+import org.elixir_lang.beam.chunk.CallDefinitions;
 import org.elixir_lang.beam.psi.impl.CallDefinitionStubImpl;
 import org.elixir_lang.beam.psi.impl.ModuleElementImpl;
 import org.elixir_lang.beam.psi.impl.ModuleImpl;
@@ -51,6 +51,7 @@ import java.util.SortedSet;
 
 import static com.intellij.reference.SoftReference.dereference;
 import static org.elixir_lang.beam.Decompiler.defmoduleArgument;
+import static org.elixir_lang.beam.chunk.CallDefinitions.macroNameAritySortedSet;
 import static org.elixir_lang.beam.psi.stubs.ModuleStubElementTypes.MODULE;
 
 
@@ -121,15 +122,7 @@ public class BeamFileImpl extends ModuleElementImpl implements ModuleOwner, PsiC
     }
 
     private static void buildCallDefinitions(@NotNull ModuleStub parentStub, @NotNull Beam beam, @NotNull Atoms atoms) {
-        Exports exports = beam.exports();
-
-        if (exports != null) {
-            SortedSet<MacroNameArity> macroNameAritySortedSet = exports.macroNameAritySortedSet(atoms);
-
-            for (MacroNameArity macroNameArity : macroNameAritySortedSet) {
-                buildCallDefinition(parentStub, macroNameArity);
-            }
-        }
+        macroNameAritySortedSet(beam, atoms).forEach(macroNameArity -> buildCallDefinition(parentStub, macroNameArity));
     }
 
     @NotNull

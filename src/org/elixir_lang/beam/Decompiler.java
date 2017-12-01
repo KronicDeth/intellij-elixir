@@ -6,7 +6,7 @@ import com.intellij.openapi.diagnostic.Attachment;
 import com.intellij.openapi.fileTypes.BinaryFileDecompiler;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.elixir_lang.beam.chunk.Atoms;
-import org.elixir_lang.beam.chunk.Exports;
+import org.elixir_lang.beam.chunk.CallDefinitions;
 import org.elixir_lang.beam.decompiler.Default;
 import org.elixir_lang.beam.decompiler.InfixOperator;
 import org.elixir_lang.beam.decompiler.PrefixOperator;
@@ -16,11 +16,19 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
 import static org.elixir_lang.beam.chunk.Chunk.TypeID.ATOM;
-import static org.elixir_lang.psi.call.name.Function.DEF;
-import static org.elixir_lang.psi.call.name.Function.DEFMACRO;
+import static org.elixir_lang.psi.call.name.Function.*;
 import static org.elixir_lang.psi.call.name.Module.ELIXIR_PREFIX;
 
 public class Decompiler implements BinaryFileDecompiler {
+    private static final Map<String, String> HEADER_NAME_BY_MACRO = new HashMap<>();
+
+    static {
+        HEADER_NAME_BY_MACRO.put(DEFMACRO, "Macros");
+        HEADER_NAME_BY_MACRO.put(DEFMACROP, "Private Macros");
+        HEADER_NAME_BY_MACRO.put(DEF, "Functions");
+        HEADER_NAME_BY_MACRO.put(DEFP, "Private Functions");
+    }
+
     private static final List<org.elixir_lang.beam.decompiler.MacroNameArity> MACRO_NAME_ARITY_DECOMPILER_LIST =
             new ArrayList<org.elixir_lang.beam.decompiler.MacroNameArity>();
 
@@ -54,7 +62,7 @@ public class Decompiler implements BinaryFileDecompiler {
                             .append(defmoduleArgument)
                             .append(" do\n");
 
-                    appendExports(decompiled, beam, atoms);
+                    appendCallDefinitions(decompiled, beam, atoms);
 
                     decompiled.append("end\n");
                 } else {
@@ -70,29 +78,29 @@ public class Decompiler implements BinaryFileDecompiler {
         return decompiled;
     }
 
-    private static void appendExports(@NotNull StringBuilder decompiled, @NotNull Beam beam, @NotNull Atoms atoms) {
-        Exports exports = beam.exports();
-
-        if (exports != null) {
-            appendExports(decompiled, exports, atoms);
-        }
+    private static void appendCallDefinitions(@NotNull StringBuilder decompiled,
+                                              @NotNull Beam beam,
+                                              @NotNull Atoms atoms) {
+        SortedSet<MacroNameArity> macroNameAritySortedSet = CallDefinitions.macroNameAritySortedSet(beam, atoms);
+        appendCallDefinitions(decompiled, macroNameAritySortedSet);
     }
 
-    private static void appendExports(@NotNull StringBuilder decompiled,
-                                      @NotNull Exports exports,
-                                      @NotNull Atoms atoms) {
-        SortedSet<MacroNameArity> macroNameAritySortedSet = exports.macroNameAritySortedSet(atoms);
+    @NotNull
+    private static String macroToHeaderName(@NotNull String macro) {
+        return HEADER_NAME_BY_MACRO.get(macro);
+    }
+
+    private static void appendCallDefinitions(@NotNull StringBuilder decompiled,
+                                              @NotNull SortedSet<MacroNameArity> macroNameAritySortedSet) {
         MacroNameArity lastMacroNameArity = null;
 
         for (MacroNameArity macroNameArity : macroNameAritySortedSet) {
+            String macro = macroNameArity.macro;
+
             if (lastMacroNameArity == null) {
-                if (macroNameArity.macro.equals(DEFMACRO)) {
-                    appendHeader(decompiled, "Macros");
-                } else if (macroNameArity.macro.equals(DEF)) {
-                    appendHeader(decompiled, "Functions");
-                }
-            } else if (lastMacroNameArity.macro.equals(DEFMACRO) && macroNameArity.macro.equals(DEF)) {
-                appendHeader(decompiled, "Functions");
+                appendHeader(decompiled, macroToHeaderName(macro));
+            } else if (!lastMacroNameArity.macro.equals(macro)) {
+                appendHeader(decompiled, macroToHeaderName(macro));
             }
 
             decompiled.append("\n");

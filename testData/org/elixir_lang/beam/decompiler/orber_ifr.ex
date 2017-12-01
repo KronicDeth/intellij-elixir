@@ -1634,4 +1634,46 @@ defmodule :orber_ifr do
   def set_version(p0, p1) do
     # body not decompiled
   end
+
+  # Private Functions
+
+  defp unquote(:"-add_it/5-fun-0-")(p0, p1, p2, p3) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-add_items/3-fun-0-")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-destroy/1-fun-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-destroy/1-fun-1-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-remove/2-fun-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-remove/2-fun-1-")(p0) do
+    # body not decompiled
+  end
+
+  defp add_it(p0, p1, p2, p3, p4) do
+    # body not decompiled
+  end
+
+  defp add_items_helper(p0, p1) do
+    # body not decompiled
+  end
+
+  defp lookup_id_helper(p0, p1) do
+    # body not decompiled
+  end
+
+  defp obj2mod(p0) do
+    # body not decompiled
+  end
 end

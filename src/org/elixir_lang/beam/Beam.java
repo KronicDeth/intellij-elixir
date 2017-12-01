@@ -6,8 +6,8 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.indexing.FileContent;
 import gnu.trove.THashMap;
 import org.elixir_lang.beam.chunk.Atoms;
+import org.elixir_lang.beam.chunk.CallDefinitions;
 import org.elixir_lang.beam.chunk.Chunk;
-import org.elixir_lang.beam.chunk.Exports;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.*;
+import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
 
 import static org.elixir_lang.beam.chunk.Chunk.TypeID.*;
@@ -27,6 +28,7 @@ import static org.elixir_lang.beam.chunk.Chunk.typeID;
  * See http://beam-wisdoms.clau.se/en/latest/indepth-beam-file.html
  */
 public class Beam {
+    private static final List<Chunk.TypeID> CALL_DEFINITION_TYPE_IDS = Arrays.asList(EXPT, LOCT);
 
     private static final int GZIP_FIRST_UNSIGNED_BYTE = 0x1f;
     private static final int GZIP_SECOND_UNSIGNED_BYTE = 0x8b;
@@ -215,16 +217,25 @@ public class Beam {
         return chunk(typeID.toString());
     }
 
-    @Nullable
-    public Exports exports() {
-        Exports exports = null;
+    @NotNull
+    private Optional<CallDefinitions> callDefinitions(@NotNull Chunk.TypeID typeID) {
+        Optional<CallDefinitions> callDefinitions;
 
-        Chunk chunk = chunk(EXPT);
+        Chunk chunk = chunk(typeID);
 
         if (chunk != null) {
-            exports = Exports.from(chunk);
+            callDefinitions = Optional.ofNullable(CallDefinitions.from(chunk, typeID));
+        } else {
+            callDefinitions = Optional.empty();
         }
 
-        return exports;
+        return callDefinitions;
+    }
+
+    @NotNull
+    public Stream<CallDefinitions> callDefinitionsStream() {
+        return CALL_DEFINITION_TYPE_IDS
+                .stream()
+                .flatMap(typeID -> callDefinitions(typeID).map(Stream::of).orElseGet(Stream::empty));
     }
 }

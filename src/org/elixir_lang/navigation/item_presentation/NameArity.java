@@ -1,9 +1,9 @@
 package org.elixir_lang.navigation.item_presentation;
 
 import com.intellij.navigation.ItemPresentation;
+import org.elixir_lang.Visibility;
 import org.elixir_lang.name_arity.PresentationData;
 import org.elixir_lang.structure_view.element.Timed;
-import org.elixir_lang.structure_view.element.Visible;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,7 +32,7 @@ public class NameArity implements ItemPresentation {
     @NotNull
     private final Timed.Time time;
     @Nullable
-    private final Visible.Visibility visibility;
+    private final Visibility visibility;
 
     /**
      *
@@ -45,7 +45,7 @@ public class NameArity implements ItemPresentation {
     public NameArity(@Nullable String location,
                      boolean callback,
                      @NotNull Timed.Time time,
-                     @Nullable Visible.Visibility visibility,
+                     @Nullable Visibility visibility,
                      boolean overridable,
                      boolean override,
                      @NotNull String name,
