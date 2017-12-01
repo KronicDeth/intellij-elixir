@@ -4,8 +4,6 @@ import com.intellij.icons.AllIcons;
 import com.intellij.ide.util.treeView.smartTree.ActionPresentation;
 import com.intellij.ide.util.treeView.smartTree.ActionPresentationData;
 import com.intellij.ide.util.treeView.smartTree.Sorter;
-import org.apache.commons.lang.NotImplementedException;
-import org.elixir_lang.structure_view.element.Timed;
 import org.elixir_lang.structure_view.element.Visible;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -41,8 +39,8 @@ public class Visibility implements Sorter {
             @Override
             public int compare(Object o1, Object o2) {
                 int comparison = 2;
-                Visible.Visibility visibility1 = null;
-                Visible.Visibility visibility2 = null;
+                org.elixir_lang.Visibility visibility1 = null;
+                org.elixir_lang.Visibility visibility2 = null;
 
                 if (o1 instanceof Visible) {
                     Visible visible1 = (Visible) o1;
@@ -56,15 +54,15 @@ public class Visibility implements Sorter {
 
                 if (visibility1 == visibility2) {
                     comparison = 0;
-                } else if (visibility1 == Visible.Visibility.PUBLIC) {
+                } else if (visibility1 == org.elixir_lang.Visibility.PUBLIC) {
                     comparison = -1;
                 } else if (visibility1 == null) {
-                    if (visibility2 == Visible.Visibility.PUBLIC) {
+                    if (visibility2 == org.elixir_lang.Visibility.PUBLIC) {
                         comparison = 1;
-                    } else if (visibility2 == Visible.Visibility.PRIVATE) {
+                    } else if (visibility2 == org.elixir_lang.Visibility.PRIVATE) {
                         comparison = -1;
                     }
-                } else if (visibility1 == Visible.Visibility.PRIVATE) {
+                } else if (visibility1 == org.elixir_lang.Visibility.PRIVATE) {
                     comparison = 1;
                 }
 

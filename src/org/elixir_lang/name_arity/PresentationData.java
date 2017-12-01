@@ -1,9 +1,9 @@
 package org.elixir_lang.name_arity;
 
 import com.intellij.ui.RowIcon;
+import org.elixir_lang.Visibility;
 import org.elixir_lang.icons.ElixirIcons;
 import org.elixir_lang.structure_view.element.Timed;
-import org.elixir_lang.structure_view.element.Visible;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,7 +15,7 @@ public class PresentationData {
                             final boolean overridable,
                             final boolean override,
                             @NotNull final Timed.Time time,
-                            @Nullable final Visible.Visibility visibility) {
+                            @Nullable final Visibility visibility) {
         int layers = 3;
 
         if (callback) {

@@ -7,6 +7,7 @@ import com.intellij.psi.ElementDescriptionLocation;
 import com.intellij.psi.PsiElement;
 import com.intellij.usageView.UsageViewTypeLocation;
 import org.apache.commons.lang.math.IntRange;
+import org.elixir_lang.Visibility;
 import org.elixir_lang.errorreport.Logger;
 import org.elixir_lang.navigation.item_presentation.NameArity;
 import org.elixir_lang.psi.call.Call;
@@ -261,13 +262,13 @@ public class CallDefinitionClause extends Element<Call> implements Presentable, 
      * for {@code defp} and {@code defmacrop}; {@code null} only if {@code call} is unrecognized
      */
     @Nullable
-    public static Visible.Visibility visibility(Call call) {
-        Visible.Visibility callVisibility = null;
+    public static Visibility visibility(Call call) {
+        Visibility callVisibility = null;
 
         if (isPublicFunction(call) || isPublicMacro(call)) {
-            callVisibility = Visible.Visibility.PUBLIC;
+            callVisibility = Visibility.PUBLIC;
         } else if (isPrivateFunction(call) || isPrivateMacro(call)) {
-            callVisibility = Visible.Visibility.PRIVATE;
+            callVisibility = Visibility.PRIVATE;
         }
 
         return callVisibility;

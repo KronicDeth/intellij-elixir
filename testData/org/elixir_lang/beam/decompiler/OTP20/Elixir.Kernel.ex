@@ -568,4 +568,238 @@ defmodule Kernel do
   def update_in(p0, p1, p2) do
     # body not decompiled
   end
+
+  # Private Functions
+
+  defp unquote(:"-MACRO-binding/2-fun-0-")(p0, p1, p2, p3) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-MACRO-in/3-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-MACRO-in/3-fun-1-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-MACRO-sigil_r/3-fun-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-MACRO-sigil_r/3-fun-1-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-MACRO-use/3-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-MACRO-|>/3-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-do_pop_in/2-fun-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-do_pop_in/2-fun-1-")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-do_pop_in/2-fun-2-")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-expand_aliases/2-fun-0-")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-get_and_update_in/3-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-get_and_update_in/3-fun-1-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-get_in/2-fun-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-get_in/2-fun-1-")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-in_list/3-fun-0-")(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-put_in/3-fun-0-")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-struct!/2-fun-0-")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-struct/2-fun-0-")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp unquote(:"-update_in/3-fun-0-")(p0, p1) do
+    # body not decompiled
+  end
+
+  defp alias_meta(p0) do
+    # body not decompiled
+  end
+
+  defp assert_module_scope(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp assert_no_function_scope(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp bootstrapped?(p0) do
+    # body not decompiled
+  end
+
+  defp build_if(p0, p1) do
+    # body not decompiled
+  end
+
+  defp build_unless(p0, p1) do
+    # body not decompiled
+  end
+
+  defp comp(p0, p1) do
+    # body not decompiled
+  end
+
+  defp decreasing_compare(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp define(p0, p1, p2, p3) do
+    # body not decompiled
+  end
+
+  defp do_at(p0, p1, p2, p3, p4) do
+    # body not decompiled
+  end
+
+  defp do_pop_in(p0, p1) do
+    # body not decompiled
+  end
+
+  defp env_stacktrace(p0) do
+    # body not decompiled
+  end
+
+  defp expand_aliases(p0, p1) do
+    # body not decompiled
+  end
+
+  defp expand_module(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp extract_concatenations(p0) do
+    # body not decompiled
+  end
+
+  defp in_list(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp in_range(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp in_range_literal(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp in_var(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp increasing_compare(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp module_nesting(p0, p1) do
+    # body not decompiled
+  end
+
+  defp module_nesting(p0, p1, p2, p3) do
+    # body not decompiled
+  end
+
+  defp module_vars(p0, p1) do
+    # body not decompiled
+  end
+
+  defp nest_get_and_update_in(p0, p1) do
+    # body not decompiled
+  end
+
+  defp nest_get_and_update_in(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp nest_pop_in(p0, p1) do
+    # body not decompiled
+  end
+
+  defp nest_pop_in(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp nest_update_in(p0, p1) do
+    # body not decompiled
+  end
+
+  defp nest_update_in(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp optimize_boolean(p0) do
+    # body not decompiled
+  end
+
+  defp proper_start?(p0) do
+    # body not decompiled
+  end
+
+  defp split_module(p0) do
+    # body not decompiled
+  end
+
+  defp split_words(p0, p1) do
+    # body not decompiled
+  end
+
+  defp struct(p0, p1, p2) do
+    # body not decompiled
+  end
+
+  defp typespec(p0) do
+    # body not decompiled
+  end
+
+  defp unnest(p0, p1, p2, p3) do
+    # body not decompiled
+  end
+
+  defp wrap_binding(p0, p1) do
+    # body not decompiled
+  end
+
+  defp wrap_concatenation(p0) do
+    # body not decompiled
+  end
 end

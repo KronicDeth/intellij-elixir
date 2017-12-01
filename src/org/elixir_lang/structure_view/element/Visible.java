@@ -1,15 +1,12 @@
 package org.elixir_lang.structure_view.element;
 
+import org.elixir_lang.Visibility;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * The visibility (public or private) or the {@link CallDefinition} or {@link CallDefinitionClause}
  */
 public interface Visible {
-    enum Visibility {
-        PUBLIC,
-        PRIVATE
-    }
 
     /**
      * The visibility of the element.

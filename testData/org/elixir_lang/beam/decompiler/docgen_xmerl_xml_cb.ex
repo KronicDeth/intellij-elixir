@@ -26,4 +26,18 @@ defmodule :docgen_xmerl_xml_cb do
   def module_info(p0) do
     # body not decompiled
   end
+
+  # Private Functions
+
+  defp unquote(:"-#root#/4-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp convert_tag(p0, p1) do
+    # body not decompiled
+  end
+
+  defp is_url(p0) do
+    # body not decompiled
+  end
 end

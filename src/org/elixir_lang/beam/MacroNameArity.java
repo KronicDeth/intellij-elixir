@@ -1,11 +1,18 @@
 package org.elixir_lang.beam;
 
+import gnu.trove.THashMap;
+import org.elixir_lang.Visibility;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static org.elixir_lang.psi.call.name.Function.DEF;
-import static org.elixir_lang.psi.call.name.Function.DEFMACRO;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import static org.elixir_lang.Visibility.PRIVATE;
+import static org.elixir_lang.Visibility.PUBLIC;
+import static org.elixir_lang.psi.call.name.Function.*;
 
 /**
  * The macro ({@code def} or {@code defmacro}), name of the call definition and arity to define an export
@@ -15,7 +22,24 @@ public class MacroNameArity implements Comparable<MacroNameArity> {
      * CONSTANTS
      */
 
+    private static final Map<Visibility, String> FUNCTION_MACRO_BY_VISIBILITY = new THashMap<>();
     private static final String MACRO_EXPORT_PREFIX = "MACRO-";
+    private static final Map<Visibility, String> MACRO_MACRO_BY_VISIBILITY = new THashMap<>();
+    private static final List<String> MACRO_ORDER = Arrays.asList(DEFMACRO, DEFMACROP, DEF, DEFP);
+    private static final Map<String, Integer> ORDER_BY_MACRO = new THashMap<>();
+
+    static {
+        FUNCTION_MACRO_BY_VISIBILITY.put(PUBLIC, DEF);
+        FUNCTION_MACRO_BY_VISIBILITY.put(PRIVATE, DEFP);
+
+        MACRO_MACRO_BY_VISIBILITY.put(PUBLIC, DEFMACRO);
+        MACRO_MACRO_BY_VISIBILITY.put(PRIVATE, DEFMACROP);
+
+        int i = 0;
+        for (String macro : MACRO_ORDER) {
+            ORDER_BY_MACRO.put(macro, i++);
+        }
+    }
 
     /*
      * Fields
@@ -46,13 +70,13 @@ public class MacroNameArity implements Comparable<MacroNameArity> {
      * Constructors
      */
 
-    public MacroNameArity(@NotNull String exportName, int exportArity) {
+    public MacroNameArity(@NotNull Visibility visibility, @NotNull String exportName, int exportArity) {
         if (exportName.startsWith(MACRO_EXPORT_PREFIX)) {
-            macro = DEFMACRO;
+            macro = MACRO_MACRO_BY_VISIBILITY.get(visibility);
             name = exportName.substring(MACRO_EXPORT_PREFIX.length());
             arity = exportArity - 1;
         } else {
-            macro = DEF;
+            macro = FUNCTION_MACRO_BY_VISIBILITY.get(visibility);
             name = exportName;
             arity = exportArity;
         }
@@ -84,29 +108,7 @@ public class MacroNameArity implements Comparable<MacroNameArity> {
 
     @Contract(pure = true)
     private int compareMacroTo(@NotNull String otherMacro) {
-        int comparison;
-
-        if (macro.equals(DEFMACRO)) {
-            if (otherMacro.equals(DEFMACRO)) {
-                comparison = 0;
-            } else if (otherMacro.equals(DEF)) {
-                comparison = - 1;
-            } else {
-                throw new IllegalArgumentException("otherMacro must be \"" + DEFMACRO + "\" or \"" + DEF + "\"");
-            }
-        } else if (macro.equals(DEF)) {
-            if (otherMacro.equals(DEFMACRO)) {
-                comparison = 1;
-            } else if (otherMacro.equals(DEF)) {
-                comparison = 0;
-            } else {
-                throw new IllegalArgumentException("otherMacro must be \"" + DEFMACRO + "\" or \"" + DEF + "\"");
-            }
-        } else {
-            throw new IllegalArgumentException("macro must be \"" + DEFMACRO + "\" or \"" + DEF + "\"");
-        }
-
-        return comparison;
+        return ORDER_BY_MACRO.get(macro).compareTo(ORDER_BY_MACRO.get(otherMacro));
     }
 
     @Contract(pure = true)

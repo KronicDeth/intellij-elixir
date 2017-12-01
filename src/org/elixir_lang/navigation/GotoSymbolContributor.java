@@ -10,6 +10,7 @@ import com.intellij.psi.stubs.StubIndex;
 import com.intellij.util.ArrayUtil;
 import com.intellij.util.containers.ContainerUtil;
 import org.apache.commons.lang.math.IntRange;
+import org.elixir_lang.Visibility;
 import org.elixir_lang.errorreport.Logger;
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall;
 import org.elixir_lang.psi.NamedElement;
@@ -199,7 +200,7 @@ public class GotoSymbolContributor implements ChooseByNameContributor {
                     }
 
                     // Delegation is always public as import should be used for private
-                    Visible.Visibility visibility = Visible.Visibility.PUBLIC;
+                    Visibility visibility = Visibility.PUBLIC;
 
                     //noinspection ConstantConditions
                     CallDefinitionHead callDefinitionHead = new CallDefinitionHead(callDefinition, visibility, call);

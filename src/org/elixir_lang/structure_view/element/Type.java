@@ -5,6 +5,7 @@ import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.ElementDescriptionLocation;
 import com.intellij.psi.PsiElement;
 import com.intellij.usageView.UsageViewTypeLocation;
+import org.elixir_lang.Visibility;
 import org.elixir_lang.navigation.item_presentation.Parent;
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall;
 import org.elixir_lang.psi.call.Call;
@@ -22,7 +23,7 @@ public class Type extends Element<AtUnqualifiedNoParenthesesCall> implements Vis
     @NotNull
     private final Modular modular;
     @NotNull
-    private final Visible.Visibility visibility;
+    private final Visibility visibility;
 
     /*
      * Static Methods

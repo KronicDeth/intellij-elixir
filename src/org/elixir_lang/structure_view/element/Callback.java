@@ -7,6 +7,7 @@ import com.intellij.psi.ElementDescriptionLocation;
 import com.intellij.psi.PsiElement;
 import com.intellij.usageView.UsageViewTypeLocation;
 import org.apache.commons.lang.math.IntRange;
+import org.elixir_lang.Visibility;
 import org.elixir_lang.navigation.item_presentation.NameArity;
 import org.elixir_lang.navigation.item_presentation.Parent;
 import org.elixir_lang.psi.*;
@@ -202,7 +203,7 @@ public class Callback extends Element<AtUnqualifiedNoParenthesesCall> implements
 
         // pseudo-named-arguments
         boolean callback = true;
-        Visible.Visibility visibility = Visible.Visibility.PUBLIC;
+        Visibility visibility = Visibility.PUBLIC;
         boolean overridable = false;
         boolean override = false;
 

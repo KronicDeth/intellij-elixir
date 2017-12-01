@@ -62,4 +62,18 @@ defmodule :rebar3_hex_config do
   def write(p0) do
     # body not decompiled
   end
+
+  # Private Functions
+
+  defp unquote(:"-encode_config/1-lc$^0/1-0-")(p0) do
+    # body not decompiled
+  end
+
+  defp encode_config(p0) do
+    # body not decompiled
+  end
+
+  defp maybe_update(p0, p1) do
+    # body not decompiled
+  end
 end
