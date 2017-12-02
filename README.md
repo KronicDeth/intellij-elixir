@@ -71,6 +71,8 @@
     - [Delimiters](#delimiters)
       - [Auto-inserting](#auto-inserting)
       - [Matching](#matching)
+    - [Embedded Elixir (EEx) Templates](#embedded-elixir-eex-templates)
+      - [Advanced configuration](#advanced-configuration)
     - [Building/Compiling](#buildingcompiling)
       - [Settings](#settings)
       - [Individual File](#individual-file)
@@ -94,6 +96,8 @@
       - [Parameters and Variables](#parameters-and-variables)
     - [Decompilation](#decompilation)
       - [Decompression](#decompression)
+      - [Call definition macros](#call-definition-macros)
+        - [`defp` with `/` in name](#defp-with--in-name)
       - [Special handling of call definition names](#special-handling-of-call-definition-names)
     - [Go To Declaration](#go-to-declaration)
       - [Alias](#alias)
@@ -139,7 +143,6 @@
           - [Time](#time)
           - [Visibility](#visibility)
         - [Call to Element](#call-to-element)
-  - [Viewing Embedded Elixir Templates](#viewing-embedded-elixir-templates)
   - [Installation](#installation)
     - [Inside IDE using JetBrains repository](#inside-ide-using-jetbrains-repository)
     - [Inside IDE using Github releases](#inside-ide-using-github-releases)
@@ -199,6 +202,7 @@ Once you have your IDE of choice installed, you can [install this plugin](#insta
 | Commenter                                   | Yes           | Yes            |                                                                                       |
 | Debugger                                    | Yes           | Yes            |                                                                                       |
 | Delimiters                                  | Yes           | Yes            |                                                                                       |
+| Embedded Elixir (EEx) Templates             | Yes           | Yes            |                                                                                       |
 | Building/Compiling                          | Yes           | No             | Build/compile as part `mix` run configurations only                                   |
 | Live Templates                              | Yes           | Yes            |                                                                                       |
 | Run Configurations                          | Yes           | Yes            |                                                                                       |
@@ -1681,6 +1685,22 @@ All delimiters that are auto-inserted are also matched for highlighting
 | `/`   | `/`   |
 | `|`   | `|`   |
 
+### Embedded Elixir (EEx) Templates
+
+Any file with `.eex` as the final extension will be treated as Embedded Elixir ([EEx](https://hexdocs.pm/eex)) templates.  To determine the Template Data Language, the `.eex` extension will be stripped and any remaining extension will be looked up to get the File Type and its associated Language. For example, `*.txt.eex` will be EEx with Plain Text (`.txt`) as the Data Template Language. Likewise, `*.html.eex` will be EEx with HTML as the Data Template Language. There's no need to register `*.txt.eex` or `*.html.eex` or any other `*.DATA_TEMPLATE_LANGUAGE_EXTENSION.eex` pattern explicitly: the nested extension will be looked up using the normal extension setup.
+
+![Form Template](/screenshots/features/eex_templates/Form%20Template.png?raw=true "`lib/*_web/templates/user/form.html.eex` from `mix phx.gen.html Accounts User users name:string age:integer`")
+
+![Parameter Usage in Form Template](/screenshots/features/eex_templates/Parameter%20Usage%20in%20Form%20Template.png?raw=true "`f` parameter to `fn` passed to `form_for` is highlighted in pink, the parameter highlight color")
+
+#### Advanced configuration
+
+If you need more file-by-file configuration of the Template Data Language than can be achieved with a file extension/pattern, IntelliJ IDEA (Community or Ultimate Edition) has support for setting the Template Data Language on a specific path.
+
+1. Preferences > Languages and Frameworks > Template Data Languages
+
+See [JetBrains Documentation](https://www.jetbrains.com/help/idea/template-data-languages.html) for more details.
+
 ### Building/Compiling
 
 #### Settings
@@ -2197,6 +2217,43 @@ and in Elixir looks like
 ```
 
 then the outer file format is [GZip](https://en.wikipedia.org/wiki/Gzip) (which is detected by checking for the gzip magic number, `1f 8b`, at the start of the file) and the `.beam` will be (stream) decompressed before the `.beam` header is checked and the chunks decoded.
+
+#### Call definition macros
+
+It turns out that in the `.beam` binary format there are no macros.  This makes sense since the BEAM format was made for Erlang, which does not have macros, and only has functions.  Elixir marks its macros in the compiled `.beam` by prefixing them with `MACRO-`.
+
+There are 2 chunks in the BEAM format for function references: `ExpT`, which is for exports (because in Erlang module they are from `-export`), which are the public functions and macros; and `LocT`, which is for locals (anything not exported in Erlang), which are private functions and macros.
+
+| BEAM Chunk | Atom Prefix | Macro       |
+|------------|-------------|-------------|
+| `ExpT`     | `MACRO-`    | `defmacro`  |
+| `ExpT`     | N/A         | `def`       |
+| `LocT`     | `MACRO-`    | `defmacrop` |
+| `LocT`     | N/A         | `defp`      |
+
+##### `defp` with `/` in name
+
+Much like there are no macros in BEAM, there are no anonymous functions either.  Any anonymous function (using `fn` in Elixir or `fun` in Erlang) ends up being a named function in the `LocT` chunk.  Anonymous functions names start with `-`, then the parent function's name, a `/` and a unique number for that scope.
+
+As an example, `Kernel` has
+
+```elixir
+defp unquote(:"-MACRO-binding/2-fun-0-")(p0, p1, p2, p3) do
+  # body not decompiled
+end
+```
+
+which is generated from the `for` in
+
+```elixir
+ defmacro binding(context \\ nil) do
+    in_match? = Macro.Env.in_match?(__CALLER__)
+    for {v, c} <- __CALLER__.vars, c == context do
+      {v, wrap_binding(in_match?, {v, [generated: true], c})}
+    end
+  end
+```
+> -- [Kernel.binding/1](https://github.com/elixir-lang/elixir/blob/v1.5.2/lib/elixir/lib/kernel.ex#L2560-L2565)
 
 #### Special handling of call definition names
 
@@ -3834,40 +3891,6 @@ The Visibility icons indicated whether the element is usable outside its definin
     </tr>
   </tbody>
 </table>
-
-## Viewing Embedded Elixir Templates
-
-There is currently no direct support for Embedded Elixir (`*.eex`) templates.
-
-However, because the Elixir syntax is so similar to Ruby, you can use
-the Ruby language support for RHTML/ERB to get some syntax highlighting support
-in `*.eex` views.
-
-Note that this involves disabling some of the support for Ruby, but
-if you don't write Ruby, or if you write it in a different IDE (e.g. RubyMine),
-it won't matter.
-
-Here's the steps in Preferences (for OSX, other platforms may differ):
-
-* Install the [standard Jetbrains Ruby plugin](https://confluence.jetbrains.com/display/RUBYDEV/RubyMine+and+IntelliJ+IDEA+Ruby+Plugin)
-* Editor -> File Types -> RHTML: Add "`*.eex`" as type
-* Editor -> Inspections -> Ruby -> Unresolved Ruby Reference: Uncheck
-* Editor -> Inspections -> Ruby -> Double Quoted String: Uncheck
-
-Some non-Ruby syntax (e.g. `->` or `do`) will still show as an
-error, and of course none of the native Elixir support works, but most
-things will highlight reasonably well.  Unfortunately it's not
-possible to disable all error highlighting, but you can
-[vote for this issue](https://youtrack.jetbrains.com/issue/IDEA-173521)
-to try and get that fixed (click the "thumbs up" next to "Voters").
-
-You *can* disable the errors on a per-file basis, though, with the
-following steps:
-
-* Open the `*.eex` file which is showing a Ruby syntax error inspection
-* From the menu pick `Analyze -> Configure Current File Analysis`
-* Move the "ruby" Highlighting Level slider to "None"
-
 
 ## Installation
 
