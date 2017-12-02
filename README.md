@@ -71,7 +71,7 @@
     - [Delimiters](#delimiters)
       - [Auto-inserting](#auto-inserting)
       - [Matching](#matching)
-    - [EEx Templates](#eex-templates)
+    - [Embedded Elixir (EEx) Templates](#embedded-elixir-eex-templates)
       - [Advanced configuration](#advanced-configuration)
     - [Building/Compiling](#buildingcompiling)
       - [Settings](#settings)
@@ -143,7 +143,6 @@
           - [Time](#time)
           - [Visibility](#visibility)
         - [Call to Element](#call-to-element)
-  - [Viewing Embedded Elixir Templates](#viewing-embedded-elixir-templates)
   - [Installation](#installation)
     - [Inside IDE using JetBrains repository](#inside-ide-using-jetbrains-repository)
     - [Inside IDE using Github releases](#inside-ide-using-github-releases)
@@ -203,7 +202,7 @@ Once you have your IDE of choice installed, you can [install this plugin](#insta
 | Commenter                                   | Yes           | Yes            |                                                                                       |
 | Debugger                                    | Yes           | Yes            |                                                                                       |
 | Delimiters                                  | Yes           | Yes            |                                                                                       |
-| EEx Templates                               | Yes           | Yes            |                                                                                       |
+| Embedded Elixir (EEx) Templates             | Yes           | Yes            |                                                                                       |
 | Building/Compiling                          | Yes           | No             | Build/compile as part `mix` run configurations only                                   |
 | Live Templates                              | Yes           | Yes            |                                                                                       |
 | Run Configurations                          | Yes           | Yes            |                                                                                       |
@@ -1686,9 +1685,9 @@ All delimiters that are auto-inserted are also matched for highlighting
 | `/`   | `/`   |
 | `|`   | `|`   |
 
-### EEx Templates
+### Embedded Elixir (EEx) Templates
 
-Any file with `.eex` as the final extension will be treated as [EEx](https://hexdocs.pm/eex).  To determine the Template Data Language, the `.eex` extension will be stripped and any remaining extension will be looked up to get the File Type and its associated Language. For example, `*.txt.eex` will be EEx with Plain Text (`.txt`) as the Data Template Language. Likewise, `*.html.eex` will be EEx with HTML as the Data Template Language. There's no need to register `*.txt.eex` or `*.html.eex` or any other `*.DATA_TEMPLATE_LANGUAGE_EXTENSION.eex` pattern explicitly: the nested extension will be looked up using the normal extension setup.
+Any file with `.eex` as the final extension will be treated as Embedded Elixir ([EEx](https://hexdocs.pm/eex)) templates.  To determine the Template Data Language, the `.eex` extension will be stripped and any remaining extension will be looked up to get the File Type and its associated Language. For example, `*.txt.eex` will be EEx with Plain Text (`.txt`) as the Data Template Language. Likewise, `*.html.eex` will be EEx with HTML as the Data Template Language. There's no need to register `*.txt.eex` or `*.html.eex` or any other `*.DATA_TEMPLATE_LANGUAGE_EXTENSION.eex` pattern explicitly: the nested extension will be looked up using the normal extension setup.
 
 ![Form Template](/screenshots/features/eex_templates/Form%20Template.png?raw=true "`lib/*_web/templates/user/form.html.eex` from `mix phx.gen.html Accounts User users name:string age:integer`")
 
@@ -3892,40 +3891,6 @@ The Visibility icons indicated whether the element is usable outside its definin
     </tr>
   </tbody>
 </table>
-
-## Viewing Embedded Elixir Templates
-
-There is currently no direct support for Embedded Elixir (`*.eex`) templates.
-
-However, because the Elixir syntax is so similar to Ruby, you can use
-the Ruby language support for RHTML/ERB to get some syntax highlighting support
-in `*.eex` views.
-
-Note that this involves disabling some of the support for Ruby, but
-if you don't write Ruby, or if you write it in a different IDE (e.g. RubyMine),
-it won't matter.
-
-Here's the steps in Preferences (for OSX, other platforms may differ):
-
-* Install the [standard Jetbrains Ruby plugin](https://confluence.jetbrains.com/display/RUBYDEV/RubyMine+and+IntelliJ+IDEA+Ruby+Plugin)
-* Editor -> File Types -> RHTML: Add "`*.eex`" as type
-* Editor -> Inspections -> Ruby -> Unresolved Ruby Reference: Uncheck
-* Editor -> Inspections -> Ruby -> Double Quoted String: Uncheck
-
-Some non-Ruby syntax (e.g. `->` or `do`) will still show as an
-error, and of course none of the native Elixir support works, but most
-things will highlight reasonably well.  Unfortunately it's not
-possible to disable all error highlighting, but you can
-[vote for this issue](https://youtrack.jetbrains.com/issue/IDEA-173521)
-to try and get that fixed (click the "thumbs up" next to "Voters").
-
-You *can* disable the errors on a per-file basis, though, with the
-following steps:
-
-* Open the `*.eex` file which is showing a Ruby syntax error inspection
-* From the menu pick `Analyze -> Configure Current File Analysis`
-* Move the "ruby" Highlighting Level slider to "None"
-
 
 ## Installation
 
