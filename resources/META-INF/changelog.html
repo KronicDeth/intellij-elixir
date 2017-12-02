@@ -49,6 +49,12 @@
         homepath.  It will almost always be last unless there is an unknown version, which uses <code>0.0.0</code>.
       </li>
       <li>Ensure any unparsable version sorts as <code>0.0.0</code> (<code>UKNOWN_VERSION</code>).</li>
+      <li>Look at parent of <code>eexTag</code> to resolve <code>fn</code> parameters</li>
+      <li>
+        Ensure functions <code>fn</code> in <code>eex</code> tags don't error by looking at <code>eex</code> element
+        parent.
+      </li>
+      <li>Search above <code>eexTag</code> and <code>eex</code> to determine if variable.</li>
     </ul>
   </li>
 </ul>

@@ -147,6 +147,10 @@
 * [#930](https://github.com/KronicDeth/intellij-elixir/pull/930) - [@KronicDeth](https://github.com/KronicDeth)
   * Parse `HEAD-<SHA1>` as `0.0.<SHA1>` for sorting versions from homebrew homepath.  It will almost always be last unless there is an unknown version, which uses `0.0.0`.
   * Ensure any unparsable version sorts as `0.0.0` (`UKNOWN_VERSION`).
+* [#932](https://github.com/KronicDeth/intellij-elixir/pull/932) - [@KronicDeth](https://github.com/KronicDeth)
+  * Look at parent of `eexTag` to resolve `fn` parameters
+  * Ensure functions `fn` in `eex` tags don't error by looking at `eex` element parent.
+  * Search above `eexTag` and `eex` to determine if variable.
 
 ## v6.5.1
 
