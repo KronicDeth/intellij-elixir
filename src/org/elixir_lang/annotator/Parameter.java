@@ -139,6 +139,7 @@ public class Parameter {
                 parent instanceof ElixirAccessExpression ||
                 parent instanceof ElixirAssociations ||
                 parent instanceof ElixirAssociationsBase ||
+                parent instanceof ElixirEexTag ||
                 parent instanceof ElixirBitString ||
                 parent instanceof ElixirBracketArguments ||
                 parent instanceof ElixirContainerAssociationOperation ||
