@@ -280,6 +280,8 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
                 ancestor instanceof ElixirBracketArguments ||
                 ancestor instanceof ElixirContainerAssociationOperation ||
                 ancestor instanceof ElixirDoBlock ||
+                ancestor instanceof ElixirEex ||
+                ancestor instanceof ElixirEexTag ||
                 ancestor instanceof ElixirKeywordPair ||
                 ancestor instanceof ElixirKeywords ||
                 ancestor instanceof ElixirList ||

@@ -59,7 +59,7 @@ before_install:
 - java -version
 install:
 - ./gradlew compileTestJava
-script: ./gradlew test
+script: travis_wait ./gradlew test
 before_cache:
 - rm -fr cache/intellij_elixir-0.1.1/rel/intellij_elixir/log
 - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
