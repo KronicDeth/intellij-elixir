@@ -71,6 +71,8 @@
     - [Delimiters](#delimiters)
       - [Auto-inserting](#auto-inserting)
       - [Matching](#matching)
+    - [EEx Templates](#eex-templates)
+      - [Advanced configuration](#advanced-configuration)
     - [Building/Compiling](#buildingcompiling)
       - [Settings](#settings)
       - [Individual File](#individual-file)
@@ -94,6 +96,8 @@
       - [Parameters and Variables](#parameters-and-variables)
     - [Decompilation](#decompilation)
       - [Decompression](#decompression)
+      - [Call definition macros](#call-definition-macros)
+        - [`defp` with `/` in name](#defp-with--in-name)
       - [Special handling of call definition names](#special-handling-of-call-definition-names)
     - [Go To Declaration](#go-to-declaration)
       - [Alias](#alias)
@@ -199,6 +203,7 @@ Once you have your IDE of choice installed, you can [install this plugin](#insta
 | Commenter                                   | Yes           | Yes            |                                                                                       |
 | Debugger                                    | Yes           | Yes            |                                                                                       |
 | Delimiters                                  | Yes           | Yes            |                                                                                       |
+| EEx Templates                               | Yes           | Yes            |                                                                                       |
 | Building/Compiling                          | Yes           | No             | Build/compile as part `mix` run configurations only                                   |
 | Live Templates                              | Yes           | Yes            |                                                                                       |
 | Run Configurations                          | Yes           | Yes            |                                                                                       |
@@ -1680,6 +1685,22 @@ All delimiters that are auto-inserted are also matched for highlighting
 | `<`   | `>`   |
 | `/`   | `/`   |
 | `|`   | `|`   |
+
+### EEx Templates
+
+Any file with `.eex` as the final extension will be treated as [EEx](https://hexdocs.pm/eex).  To determine the Template Data Language, the `.eex` extension will be stripped and any remaining extension will be looked up to get the File Type and its associated Language. For example, `*.txt.eex` will be EEx with Plain Text (`.txt`) as the Data Template Language. Likewise, `*.html.eex` will be EEx with HTML as the Data Template Language. There's no need to register `*.txt.eex` or `*.html.eex` or any other `*.DATA_TEMPLATE_LANGUAGE_EXTENSION.eex` pattern explicitly: the nested extension will be looked up using the normal extension setup.
+
+![Form Template](/screenshots/features/eex_templates/Form%20Template.png?raw=true "`lib/*_web/templates/user/form.html.eex` from `mix phx.gen.html Accounts User users name:string age:integer`")
+
+![Parameter Usage in Form Template](/screenshots/features/eex_templates/Parameter%20Usage%20in%20Form%20Template.png?raw=true "`f` parameter to `fn` passed to `form_for` is highlighted in pink, the parameter highlight color")
+
+#### Advanced configuration
+
+If you need more file-by-file configuration of the Template Data Language than can be achieved with a file extension/pattern, IntelliJ IDEA (Community or Ultimate Edition) has support for setting the Template Data Language on a specific path.
+
+1. Preferences > Languages and Frameworks > Template Data Languages
+
+See [JetBrains Documentation](https://www.jetbrains.com/help/idea/template-data-languages.html) for more details.
 
 ### Building/Compiling
 
