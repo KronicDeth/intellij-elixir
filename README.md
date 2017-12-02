@@ -2198,6 +2198,43 @@ and in Elixir looks like
 
 then the outer file format is [GZip](https://en.wikipedia.org/wiki/Gzip) (which is detected by checking for the gzip magic number, `1f 8b`, at the start of the file) and the `.beam` will be (stream) decompressed before the `.beam` header is checked and the chunks decoded.
 
+#### Call definition macros
+
+It turns out that in the `.beam` binary format there are no macros.  This makes sense since the BEAM format was made for Erlang, which does not have macros, and only has functions.  Elixir marks its macros in the compiled `.beam` by prefixing them with `MACRO-`.
+
+There are 2 chunks in the BEAM format for function references: `ExpT`, which is for exports (because in Erlang module they are from `-export`), which are the public functions and macros; and `LocT`, which is for locals (anything not exported in Erlang), which are private functions and macros.
+
+| BEAM Chunk | Atom Prefix | Macro       |
+|------------|-------------|-------------|
+| `ExpT`     | `MACRO-`    | `defmacro`  |
+| `ExpT`     | N/A         | `def`       |
+| `LocT`     | `MACRO-`    | `defmacrop` |
+| `LocT`     | N/A         | `defp`      |
+
+##### `defp` with `/` in name
+
+Much like there are no macros in BEAM, there are no anonymous functions either.  Any anonymous function (using `fn` in Elixir or `fun` in Erlang) ends up being a named function in the `LocT` chunk.  Anonymous functions names start with `-`, then the parent function's name, a `/` and a unique number for that scope.
+
+As an example, `Kernel` has
+
+```elixir
+defp unquote(:"-MACRO-binding/2-fun-0-")(p0, p1, p2, p3) do
+  # body not decompiled
+end
+```
+
+which is generated from the `for` in
+
+```elixir
+ defmacro binding(context \\ nil) do
+    in_match? = Macro.Env.in_match?(__CALLER__)
+    for {v, c} <- __CALLER__.vars, c == context do
+      {v, wrap_binding(in_match?, {v, [generated: true], c})}
+    end
+  end
+```
+> -- [Kernel.binding/1](https://github.com/elixir-lang/elixir/blob/v1.5.2/lib/elixir/lib/kernel.ex#L2560-L2565)
+
 #### Special handling of call definition names
 
 Functions and macros can have names that aren't valid identifier names, so the decompiler has special handlers to detect these invalid identifiers and escape them to make decompiled code that is parsable as valid Elixir.
