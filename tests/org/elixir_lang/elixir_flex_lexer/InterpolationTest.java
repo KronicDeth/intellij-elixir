@@ -128,7 +128,7 @@ public class InterpolationTest extends TokenTest {
                         { "ending", ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_OR_KEYWORD_PAIR_MAYBE, true },
                         { "false", ElixirTypes.FALSE, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
                         { "falsehood", ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_OR_KEYWORD_PAIR_MAYBE, true },
-                        { "fn", ElixirTypes.FN, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
+                        { "fn", ElixirTypes.FN, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE, true },
                         { "fnctn", ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_OR_KEYWORD_PAIR_MAYBE, true },
                         { "identifier!", ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_OR_KEYWORD_PAIR_MAYBE, true },
                         { "identifier", ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_OR_KEYWORD_PAIR_MAYBE, true },

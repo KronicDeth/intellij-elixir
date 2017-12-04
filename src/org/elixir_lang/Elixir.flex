@@ -334,6 +334,7 @@ HORIZONTAL_SPACE = [ \t]
 VERTICAL_SPACE = [\n\r]
 SPACE = {HORIZONTAL_SPACE} | {VERTICAL_SPACE}
 WHITE_SPACE=[\ \t\f]
+MULTILINE_WHITE_SPACE = ({EOL} | {WHITE_SPACE})+
 // see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L609-L610
 SPACE_SENSITIVE={DUAL_OPERATOR}[^(\[<{%+-/>:]
 
@@ -578,6 +579,7 @@ ANY = [^]
 %state HEXADECIMAL_WHOLE_NUMBER
 %state INTERPOLATION
 %state KEYWORD_PAIR_MAYBE
+%state KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE
 %state NAMED_SIGIL
 %state OCTAL_WHOLE_NUMBER
 %state SIGN_OPERATION
@@ -671,7 +673,7 @@ ANY = [^]
                                                return ElixirTypes.DUAL_OPERATOR; }
   {FALSE}                                    { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.FALSE; }
-  {FN}                                       { pushAndBegin(KEYWORD_PAIR_MAYBE);
+  {FN}                                       { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.FN; }
   {OPENING_BRACKET}                          { return ElixirTypes.OPENING_BRACKET; }
   /* Must be before {OPENING_CURLY} so entire "{}" is matched instead of just "{"
@@ -1201,7 +1203,13 @@ ANY = [^]
                                 return ElixirTypes.INTERPOLATION_END; }
 }
 
-<KEYWORD_PAIR_MAYBE> {
+<KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE> {
+  {MULTILINE_WHITE_SPACE} { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                            yybegin(stackFrame.getLastLexicalState());
+                            return TokenType.WHITE_SPACE; }
+}
+
+<KEYWORD_PAIR_MAYBE, KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE> {
   {COLON} / {SPACE} { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                       yybegin(stackFrame.getLastLexicalState());
                       return ElixirTypes.KEYWORD_PAIR_COLON; }
