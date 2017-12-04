@@ -643,6 +643,7 @@ ANY = [^]
   // see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L605-L613
   {ESCAPED_EOL}|{WHITE_SPACE}+ / {SPACE_SENSITIVE} { return ElixirTypes.SIGNIFICANT_WHITE_SPACE; }
   {ESCAPED_EOL}|{WHITE_SPACE}+                     { return TokenType.WHITE_SPACE; }
+  {MULTILINE_WHITE_SPACE} / {COMMENT}              { return TokenType.WHITE_SPACE; }
   {CHAR_TOKENIZER}                                      { pushAndBegin(CHAR_TOKENIZATION);
                                                           return ElixirTypes.CHAR_TOKENIZER; }
   /* So that that atom of comparison operator consumes all 3 ':' instead of {TYPE_OPERATOR} consuming '::'
