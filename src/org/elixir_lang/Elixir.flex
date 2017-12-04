@@ -547,6 +547,8 @@ SIGIL_HEREDOC_TERMINATOR = {SIGIL_DOUBLE_QUOTES_HEREDOC_TERMINATOR}|{SIGIL_SINGL
 GROUP_TERMINATOR = {QUOTE_TERMINATOR}|{SIGIL_TERMINATOR}
 GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 
+ANY = [^]
+
 /*
  *  States - Ordered lexigraphically
  */
@@ -773,7 +775,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {OPERATOR}       { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                      yybegin(stackFrame.getLastLexicalState());
                      return ElixirTypes.ATOM_FRAGMENT; }
-  {EOL}|.          { return TokenType.BAD_CHARACTER; }
+  {ANY}            { return TokenType.BAD_CHARACTER; }
 }
 
 <BASE_WHOLE_NUMBER_BASE> {
@@ -795,7 +797,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 <BINARY_WHOLE_NUMBER> {
   {INVALID_BINARY_DIGITS} { return ElixirTypes.INVALID_BINARY_DIGITS; }
   {VALID_BINARY_DIGITS}   { return ElixirTypes.VALID_BINARY_DIGITS; }
-  {EOL}|.                 { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+  {ANY}                   { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                             handleInState(stackFrame.getLastLexicalState()); }
 }
 
@@ -807,18 +809,18 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 }
 
 <CALL_MAYBE> {
-  {EOL}|.                                 { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                                            handleInState(stackFrame.getLastLexicalState()); }
+  {ANY} { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+          handleInState(stackFrame.getLastLexicalState()); }
 }
 
 <CALL_OR_KEYWORD_PAIR_MAYBE> {
-  {EOL}|.                                 { handleInState(KEYWORD_PAIR_MAYBE); }
+  {ANY} { handleInState(KEYWORD_PAIR_MAYBE); }
 }
 
 <CHAR_TOKENIZATION> {
   {ESCAPE} { yybegin(ESCAPE_SEQUENCE);
              return ElixirTypes.ESCAPE; }
-  {EOL}|.  { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+  {ANY}    { org.elixir_lang.lexer.StackFrame stackFrame = pop();
              yybegin(stackFrame.getLastLexicalState());
              return ElixirTypes.CHAR_LIST_FRAGMENT; }
 }
@@ -826,7 +828,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 <DECIMAL_EXPONENT_SIGN> {
   {DUAL_OPERATOR} { yybegin(DECIMAL_EXPONENT);
                     return ElixirTypes.DUAL_OPERATOR; }
-  {EOL}|.         { handleInState(DECIMAL_EXPONENT); }
+  {ANY}           { handleInState(DECIMAL_EXPONENT); }
 }
 
 <DECIMAL_FRACTION> {
@@ -857,7 +859,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {DECIMAL_SEPARATOR}      { return ElixirTypes.DECIMAL_SEPARATOR; }
   {INVALID_DECIMAL_DIGITS} { return ElixirTypes.INVALID_DECIMAL_DIGITS; }
   {VALID_DECIMAL_DIGITS}   { return ElixirTypes.VALID_DECIMAL_DIGITS; }
-  {EOL}|.                  { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+  {ANY}                    { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                              handleInState(stackFrame.getLastLexicalState()); }
 }
 
@@ -970,7 +972,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {WHITE_SPACE}+ { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                    yybegin(stackFrame.getLastLexicalState());
                    return ElixirTypes.SIGNIFICANT_WHITE_SPACE; }
-  {EOL}|.        { handleInState(KEYWORD_PAIR_MAYBE); }
+  {ANY}          { handleInState(KEYWORD_PAIR_MAYBE); }
 }
 
 <ESCAPE_IN_LITERAL_GROUP> {
@@ -1069,7 +1071,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                  return fragmentType();
                                }
                              }
-  {EOL}|.                    { return fragmentType(); }
+  {ANY}                      { return fragmentType(); }
 }
 
 <GROUP_HEREDOC_END> {
@@ -1128,26 +1130,26 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 }
 
 <GROUP_HEREDOC_LINE_START> {
-  {WHITE_SPACE}+{GROUP_HEREDOC_TERMINATOR}    {
-                                                String groupHeredocTerminator = yytext().toString().trim();
+  {WHITE_SPACE}+{GROUP_HEREDOC_TERMINATOR} {
+                                             String groupHeredocTerminator = yytext().toString().trim();
 
-                                                // manual lookahead pushes terminator back
-                                                yypushback(3);
+                                             // manual lookahead pushes terminator back
+                                             yypushback(3);
 
-                                                if (isTerminator(groupHeredocTerminator)) {
-                                                  yybegin(GROUP_HEREDOC_END);
-                                                  return ElixirTypes.HEREDOC_PREFIX_WHITE_SPACE;
-                                                } else {
-                                                  yybegin(GROUP_HEREDOC_LINE_BODY);
-                                                  return ElixirTypes.HEREDOC_LINE_WHITE_SPACE_TOKEN;
-                                                }
-                                              }
-  {WHITE_SPACE}+                              {
-                                                yybegin(GROUP_HEREDOC_LINE_BODY);
-                                                return ElixirTypes.HEREDOC_LINE_WHITE_SPACE_TOKEN;
-                                              }
-  {GROUP_HEREDOC_TERMINATOR}                  { handleInState(GROUP_HEREDOC_END); }
-  {EOL}|.                                     { handleInState(GROUP_HEREDOC_LINE_BODY); }
+                                             if (isTerminator(groupHeredocTerminator)) {
+                                               yybegin(GROUP_HEREDOC_END);
+                                               return ElixirTypes.HEREDOC_PREFIX_WHITE_SPACE;
+                                             } else {
+                                               yybegin(GROUP_HEREDOC_LINE_BODY);
+                                               return ElixirTypes.HEREDOC_LINE_WHITE_SPACE_TOKEN;
+                                             }
+                                           }
+  {WHITE_SPACE}+                           {
+                                             yybegin(GROUP_HEREDOC_LINE_BODY);
+                                             return ElixirTypes.HEREDOC_LINE_WHITE_SPACE_TOKEN;
+                                           }
+  {GROUP_HEREDOC_TERMINATOR}               { handleInState(GROUP_HEREDOC_END); }
+  {ANY}                                    { handleInState(GROUP_HEREDOC_LINE_BODY); }
 }
 
 <GROUP_HEREDOC_START> {
@@ -1179,14 +1181,14 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {HEXADECIMAL_DIGIT}{1,2} { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                              yybegin(stackFrame.getLastLexicalState());
                              return ElixirTypes.VALID_HEXADECIMAL_DIGITS; }
-  {EOL}|.                  { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+  {ANY}                    { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                              handleInState(stackFrame.getLastLexicalState()); }
 }
 
 <HEXADECIMAL_WHOLE_NUMBER> {
   {INVALID_HEXADECIMAL_DIGITS} { return ElixirTypes.INVALID_HEXADECIMAL_DIGITS; }
   {VALID_HEXADECIMAL_DIGITS}   { return ElixirTypes.VALID_HEXADECIMAL_DIGITS; }
-  {EOL}|.                      { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+  {ANY}                        { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                                  handleInState(stackFrame.getLastLexicalState()); }
 }
 
@@ -1200,11 +1202,11 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 }
 
 <KEYWORD_PAIR_MAYBE> {
-  {COLON} / {SPACE}         { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                              yybegin(stackFrame.getLastLexicalState());
-                              return ElixirTypes.KEYWORD_PAIR_COLON; }
-  {EOL}|.                   { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                              handleInState(stackFrame.getLastLexicalState()); }
+  {COLON} / {SPACE} { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                      yybegin(stackFrame.getLastLexicalState());
+                      return ElixirTypes.KEYWORD_PAIR_COLON; }
+  {ANY}             { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                      handleInState(stackFrame.getLastLexicalState()); }
 }
 
 <NAMED_SIGIL> {
@@ -1220,7 +1222,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 <OCTAL_WHOLE_NUMBER> {
   {INVALID_OCTAL_DIGITS} { return ElixirTypes.INVALID_OCTAL_DIGITS; }
   {VALID_OCTAL_DIGITS}   { return ElixirTypes.VALID_OCTAL_DIGITS; }
-  {EOL}|.                { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+  {ANY}                  { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                            handleInState(stackFrame.getLastLexicalState()); }
 }
 
@@ -1241,21 +1243,21 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 
 <SIGIL_MODIFIERS> {
   {SIGIL_MODIFIER} { return ElixirTypes.SIGIL_MODIFIER; }
-  {EOL}|.          { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+  {ANY}            { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                      handleInState(stackFrame.getLastLexicalState()); }
 }
 
 <SIGN_OPERATION> {
   {ESCAPED_EOL}|{WHITE_SPACE}+ { return TokenType.WHITE_SPACE; }
-  {EOL}|.                      { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+  {ANY}                        { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                                  handleInState(stackFrame.getLastLexicalState()); }
 }
 
 <SIGN_OPERATION_KEYWORD_PAIR_MAYBE> {
-  {COLON} / {SPACE}         { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                              yybegin(stackFrame.getLastLexicalState());
-                              return ElixirTypes.KEYWORD_PAIR_COLON; }
-  {EOL}|.                   { handleInState(SIGN_OPERATION); }
+  {COLON} / {SPACE} { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                      yybegin(stackFrame.getLastLexicalState());
+                      return ElixirTypes.KEYWORD_PAIR_COLON; }
+  {ANY}             { handleInState(SIGN_OPERATION); }
 }
 
 <SIGN_OPERATION_MAYBE> {
@@ -1277,13 +1279,13 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {HEXADECIMAL_DIGIT}{1,4} { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                              yybegin(stackFrame.getLastLexicalState());
                              return ElixirTypes.VALID_HEXADECIMAL_DIGITS; }
-  {EOL}|.                  { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+  {ANY}                    { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                              handleInState(stackFrame.getLastLexicalState()); }
 }
 
 <UNKNOWN_BASE_WHOLE_NUMBER> {
   {INVALID_UNKNOWN_BASE_DIGITS} { return ElixirTypes.INVALID_UNKNOWN_BASE_DIGITS; }
-  {EOL}|.                       { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+  {ANY}                         { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                                   handleInState(stackFrame.getLastLexicalState()); }
 }
 
