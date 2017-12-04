@@ -62,7 +62,7 @@ public class YYInitialTest extends TokenTest {
                         { ",", ElixirTypes.COMMA, ElixirFlexLexer.SIGN_OPERATION_MAYBE, true },
                         { "-", ElixirTypes.DUAL_OPERATOR, ElixirFlexLexer.DUAL_OPERATION, true},
                         { "--", ElixirTypes.TWO_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true},
-                        { "->", ElixirTypes.STAB_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
+                        { "->", ElixirTypes.STAB_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE, true },
                         { ".", ElixirTypes.DOT_OPERATOR, ElixirFlexLexer.DOT_OPERATION, true },
                         { "..", ElixirTypes.RANGE_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true},
                         { "...", ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_OR_KEYWORD_PAIR_MAYBE, true },

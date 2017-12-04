@@ -733,7 +733,7 @@ ANY = [^]
   {RELATIONAL_OPERATOR}                      { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.RELATIONAL_OPERATOR; }
   {SEMICOLON}                                { return ElixirTypes.SEMICOLON; }
-  {STAB_OPERATOR}                            { pushAndBegin(KEYWORD_PAIR_MAYBE);
+  {STAB_OPERATOR}                            { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.STAB_OPERATOR; }
   {STRUCT_OPERATOR}                          { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.STRUCT_OPERATOR; }
