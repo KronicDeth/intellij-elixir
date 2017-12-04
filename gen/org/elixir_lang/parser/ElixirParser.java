@@ -3657,6 +3657,26 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // stabInfixOperator stabBody?
+  public static boolean noArgumentStabOperation(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "noArgumentStabOperation")) return false;
+    if (!nextTokenIs(b, "<no argument stab operation>", EOL, STAB_OPERATOR)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, STAB_OPERATION, "<no argument stab operation>");
+    r = stabInfixOperator(b, l + 1);
+    r = r && noArgumentStabOperation_1(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // stabBody?
+  private static boolean noArgumentStabOperation_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "noArgumentStabOperation_1")) return false;
+    stabBody(b, l + 1);
+    return true;
+  }
+
+  /* ********************************************************** */
   // noParenthesesOneArgument |
   //                            noParenthesesManyArguments
   public static boolean noParenthesesArguments(PsiBuilder b, int l) {
@@ -4676,15 +4696,13 @@ public class ElixirParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // stabParenthesesSignature stabInfixOperator |
-  //                                 stabNoParenthesesSignature stabInfixOperator |
-  //                                 stabInfixOperator
+  //                                 stabNoParenthesesSignature stabInfixOperator
   static boolean stabOperationPrefix(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "stabOperationPrefix")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = stabOperationPrefix_0(b, l + 1);
     if (!r) r = stabOperationPrefix_1(b, l + 1);
-    if (!r) r = stabInfixOperator(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -4712,32 +4730,44 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // stabOperation (stabBodyExpressionSeparator stabOperation)*
+  // noArgumentStabOperation |
+  //                            stabOperation (stabBodyExpressionSeparator stabOperation)*
   static boolean stabOperations(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "stabOperations")) return false;
     boolean r;
     Marker m = enter_section_(b);
+    r = noArgumentStabOperation(b, l + 1);
+    if (!r) r = stabOperations_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // stabOperation (stabBodyExpressionSeparator stabOperation)*
+  private static boolean stabOperations_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "stabOperations_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
     r = stabOperation(b, l + 1);
-    r = r && stabOperations_1(b, l + 1);
+    r = r && stabOperations_1_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // (stabBodyExpressionSeparator stabOperation)*
-  private static boolean stabOperations_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "stabOperations_1")) return false;
+  private static boolean stabOperations_1_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "stabOperations_1_1")) return false;
     int c = current_position_(b);
     while (true) {
-      if (!stabOperations_1_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "stabOperations_1", c)) break;
+      if (!stabOperations_1_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "stabOperations_1_1", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
   // stabBodyExpressionSeparator stabOperation
-  private static boolean stabOperations_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "stabOperations_1_0")) return false;
+  private static boolean stabOperations_1_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "stabOperations_1_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = stabBodyExpressionSeparator(b, l + 1);
