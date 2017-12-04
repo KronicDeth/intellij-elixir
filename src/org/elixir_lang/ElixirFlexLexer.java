@@ -2094,7 +2094,7 @@ public class ElixirFlexLexer implements FlexLexer {
             }
           case 336: break;
           case 161: 
-            { pushAndBegin(KEYWORD_PAIR_MAYBE);
+            { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.ELSE;
             }
           case 337: break;
@@ -2134,7 +2134,7 @@ public class ElixirFlexLexer implements FlexLexer {
             }
           case 342: break;
           case 167: 
-            { pushAndBegin(KEYWORD_PAIR_MAYBE);
+            { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.AFTER;
             }
           case 343: break;
@@ -2153,7 +2153,7 @@ public class ElixirFlexLexer implements FlexLexer {
             }
           case 345: break;
           case 170: 
-            { pushAndBegin(KEYWORD_PAIR_MAYBE);
+            { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.CATCH;
             }
           case 346: break;
@@ -2182,7 +2182,7 @@ public class ElixirFlexLexer implements FlexLexer {
             }
           case 350: break;
           case 175: 
-            { pushAndBegin(KEYWORD_PAIR_MAYBE);
+            { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.RESCUE;
             }
           case 351: break;
