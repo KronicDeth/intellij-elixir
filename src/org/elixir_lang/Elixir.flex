@@ -580,6 +580,7 @@ ANY = [^]
 %state INTERPOLATION
 %state KEYWORD_PAIR_MAYBE
 %state KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE
+%state MULTILINE_WHITE_SPACE_MAYBE
 %state NAMED_SIGIL
 %state OCTAL_WHOLE_NUMBER
 %state SIGN_OPERATION
@@ -1203,15 +1204,14 @@ ANY = [^]
                                 return ElixirTypes.INTERPOLATION_END; }
 }
 
-<KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE> {
+<KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE, MULTILINE_WHITE_SPACE_MAYBE> {
   {MULTILINE_WHITE_SPACE} { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                             yybegin(stackFrame.getLastLexicalState());
                             return TokenType.WHITE_SPACE; }
 }
 
 <KEYWORD_PAIR_MAYBE, KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE> {
-  {COLON} / {SPACE} { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                      yybegin(stackFrame.getLastLexicalState());
+  {COLON} / {SPACE} { yybegin(MULTILINE_WHITE_SPACE_MAYBE);
                       return ElixirTypes.KEYWORD_PAIR_COLON; }
   {ANY}             { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                       handleInState(stackFrame.getLastLexicalState()); }
