@@ -6,6 +6,8 @@ import com.intellij.util.containers.ContainerUtil;
 import org.elixir_lang.beam.chunk.Atoms;
 import org.elixir_lang.beam.chunk.CallDefinitions;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -18,8 +20,7 @@ import static org.elixir_lang.psi.call.name.Function.DEFP;
 import static org.junit.Assert.*;
 
 public class BeamTest {
-    @NotNull
-    @SuppressWarnings("NullableProblems")
+    @Nullable
     private String ebinDirectory;
 
     @Test
@@ -112,5 +113,10 @@ public class BeamTest {
         assertNotNull("ELIXIR_EBIN_DIRECTORY is not set", ebinDirectory);
 
         this.ebinDirectory = ebinDirectory;
+    }
+
+    @After
+    public void cleanEbinDirectory() {
+        this.ebinDirectory = null;
     }
 }

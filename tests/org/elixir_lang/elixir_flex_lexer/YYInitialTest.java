@@ -130,7 +130,7 @@ public class YYInitialTest extends TokenTest {
                         { "catch", ElixirTypes.CATCH, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
                         { "catchall", ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_OR_KEYWORD_PAIR_MAYBE, true },
                         { "defmodule", ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_OR_KEYWORD_PAIR_MAYBE, true },
-                        { "do", ElixirTypes.DO, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
+                        { "do", ElixirTypes.DO, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE, true },
                         { "done", ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_OR_KEYWORD_PAIR_MAYBE, true },
                         { "else", ElixirTypes.ELSE, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
                         { "elsewhere", ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_OR_KEYWORD_PAIR_MAYBE, true },

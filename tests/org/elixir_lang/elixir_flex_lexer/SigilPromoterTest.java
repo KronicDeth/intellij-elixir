@@ -55,8 +55,8 @@ public class SigilPromoterTest extends Test {
                                         new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL),
                                         new TokenTypeState(ElixirTypes.CLOSING_PARENTHESIS, ElixirFlexLexer.YYINITIAL),
                                         new TokenTypeState(TokenType.WHITE_SPACE, ElixirFlexLexer.YYINITIAL),
-                                        new TokenTypeState(ElixirTypes.DO, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.EOL, ElixirFlexLexer.SIGN_OPERATION_MAYBE),
+                                        new TokenTypeState(ElixirTypes.DO, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
+                                        new TokenTypeState(TokenType.WHITE_SPACE, ElixirFlexLexer.YYINITIAL),
                                         new TokenTypeState(ElixirTypes.END, ElixirFlexLexer.KEYWORD_PAIR_MAYBE)
                                 )
                         },

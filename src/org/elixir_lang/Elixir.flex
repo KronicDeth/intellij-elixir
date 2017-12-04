@@ -631,7 +631,7 @@ ANY = [^]
   {CLOSING_BIT}                              { return ElixirTypes.CLOSING_BIT; }
   {CLOSING_BRACKET}                          { return ElixirTypes.CLOSING_BRACKET; }
   {CLOSING_PARENTHESIS}                      { return ElixirTypes.CLOSING_PARENTHESIS; }
-  {DO}                                       { pushAndBegin(KEYWORD_PAIR_MAYBE);
+  {DO}                                       { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.DO; }
   {ELSE}                                     { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.ELSE; }
