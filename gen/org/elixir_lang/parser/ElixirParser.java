@@ -1936,7 +1936,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // EOL | CLOSING_BIT | CLOSING_BRACKET | CLOSING_CURLY | CLOSING_PARENTHESIS | INTERPOLATION_END | SEMICOLON | STAB_OPERATOR | END | blockIdentifier | EEX_CLOSING
+  // EOL | CLOSING_BIT | CLOSING_BRACKET | CLOSING_CURLY | CLOSING_PARENTHESIS | COMMA | INTERPOLATION_END | SEMICOLON | STAB_OPERATOR | END | blockIdentifier | EEX_CLOSING
   static boolean expressionRecoverUntil(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "expressionRecoverUntil")) return false;
     boolean r;
@@ -1946,6 +1946,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, CLOSING_BRACKET);
     if (!r) r = consumeToken(b, CLOSING_CURLY);
     if (!r) r = consumeToken(b, CLOSING_PARENTHESIS);
+    if (!r) r = consumeToken(b, COMMA);
     if (!r) r = consumeToken(b, INTERPOLATION_END);
     if (!r) r = consumeToken(b, SEMICOLON);
     if (!r) r = consumeToken(b, STAB_OPERATOR);
