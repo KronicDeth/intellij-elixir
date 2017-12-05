@@ -22,12 +22,9 @@ Elixir File(0,167)
             ElixirIdentifierImpl(IDENTIFIER)(94,113)
               PsiElement(identifier)('first_keyword_value')(94,113)
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(113,114)
-    PsiErrorElement:<end of expression> expected, got '
-'(113,113)
-      <empty list>
     PsiElement(\\n, \\r\\n)('\n')(113,114)
   PsiWhiteSpace('           ')(114,125)
-  PsiErrorElement:';', '\\n or \\r\\n' expected, got ','(125,126)
+  PsiErrorElement:'(', ';', <unmatched expression>, '\\n, \\r\\n' or identifier expected, got ','(125,126)
     PsiElement(,)(',')(125,126)
   PsiWhiteSpace(' ')(126,127)
   PsiElement(identifier)('second_keyword_key')(127,145)

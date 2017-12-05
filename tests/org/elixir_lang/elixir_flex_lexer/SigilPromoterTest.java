@@ -52,11 +52,11 @@ public class SigilPromoterTest extends Test {
                                         new TokenTypeState(TokenType.WHITE_SPACE, ElixirFlexLexer.YYINITIAL),
                                         new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_OR_KEYWORD_PAIR_MAYBE),
                                         new TokenTypeState(TokenType.WHITE_SPACE, ElixirFlexLexer.YYINITIAL),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL),
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.CLOSING_PARENTHESIS, ElixirFlexLexer.YYINITIAL),
                                         new TokenTypeState(TokenType.WHITE_SPACE, ElixirFlexLexer.YYINITIAL),
-                                        new TokenTypeState(ElixirTypes.DO, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.EOL, ElixirFlexLexer.SIGN_OPERATION_MAYBE),
+                                        new TokenTypeState(ElixirTypes.DO, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
+                                        new TokenTypeState(TokenType.WHITE_SPACE, ElixirFlexLexer.YYINITIAL),
                                         new TokenTypeState(ElixirTypes.END, ElixirFlexLexer.KEYWORD_PAIR_MAYBE)
                                 )
                         },
@@ -67,7 +67,7 @@ public class SigilPromoterTest extends Test {
                                         new TokenTypeState(TokenType.WHITE_SPACE, ElixirFlexLexer.YYINITIAL),
                                         new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_OR_KEYWORD_PAIR_MAYBE),
                                         new TokenTypeState(TokenType.WHITE_SPACE, ElixirFlexLexer.YYINITIAL),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.YYINITIAL),
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.TILDE, ElixirFlexLexer.SIGIL),
                                         new TokenTypeState(TokenType.BAD_CHARACTER, ElixirFlexLexer.SIGIL), // )
                                         new TokenTypeState(TokenType.BAD_CHARACTER, ElixirFlexLexer.SIGIL), // space

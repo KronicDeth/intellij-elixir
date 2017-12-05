@@ -19,7 +19,6 @@ public class IntramoduleTest extends LightCodeInsightFixtureTestCase {
         PsiElement ambiguous = myFixture
                 .getFile()
                 .findElementAt(myFixture.getCaretOffset())
-                .getParent()
                 .getPrevSibling();
 
         assertInstanceOf(ambiguous.getFirstChild(), ElixirIdentifier.class);
@@ -43,7 +42,6 @@ public class IntramoduleTest extends LightCodeInsightFixtureTestCase {
         PsiElement ambiguous = myFixture
                 .getFile()
                 .findElementAt(myFixture.getCaretOffset())
-                .getParent()
                 .getPrevSibling();
 
         assertInstanceOf(ambiguous.getFirstChild(), ElixirIdentifier.class);
@@ -67,7 +65,6 @@ public class IntramoduleTest extends LightCodeInsightFixtureTestCase {
         PsiElement ambiguous = myFixture
                 .getFile()
                 .findElementAt(myFixture.getCaretOffset())
-                .getParent()
                 .getPrevSibling();
 
         assertInstanceOf(ambiguous.getFirstChild(), ElixirIdentifier.class);
