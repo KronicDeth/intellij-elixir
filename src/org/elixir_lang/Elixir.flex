@@ -334,7 +334,8 @@ HORIZONTAL_SPACE = [ \t]
 VERTICAL_SPACE = [\n\r]
 SPACE = {HORIZONTAL_SPACE} | {VERTICAL_SPACE}
 WHITE_SPACE=[\ \t\f]
-MULTILINE_WHITE_SPACE = ({EOL} | {WHITE_SPACE})+
+MULTILINE_WHITE_SPACE = ({ESCAPED_EOL} | {EOL} | {WHITE_SPACE})+
+LAST_EOL = {MULTILINE_WHITE_SPACE}? {EOL} ({ESCAPED_EOL} | {WHITE_SPACE})*
 // see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L609-L610
 SPACE_SENSITIVE={DUAL_OPERATOR}[^(\[<{%+-/>:]
 
@@ -580,6 +581,7 @@ ANY = [^]
 %state INTERPOLATION
 %state KEYWORD_PAIR_MAYBE
 %state KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE
+%state LAST_EOL
 %state MULTILINE_WHITE_SPACE_MAYBE
 %state NAMED_SIGIL
 %state OCTAL_WHOLE_NUMBER
@@ -644,6 +646,23 @@ ANY = [^]
   {ESCAPED_EOL}|{WHITE_SPACE}+ / {SPACE_SENSITIVE} { return ElixirTypes.SIGNIFICANT_WHITE_SPACE; }
   {ESCAPED_EOL}|{WHITE_SPACE}+                     { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {COMMENT}              { return TokenType.WHITE_SPACE; }
+  {MULTILINE_WHITE_SPACE} / {END}                  { return TokenType.WHITE_SPACE; }
+  {LAST_EOL} / {IDENTIFIER_TOKEN}                  { CharSequence text = yytext();
+                                                     int length = text.length();
+
+                                                     for (int i = length - 1; i >= 0; i--) {
+                                                       if (text.charAt(i) == '\n') {
+                                                         if (i == 0 || text.charAt(i - 1) != '\\') {
+                                                           yypushback(length - i);
+                                                           break;
+                                                         }
+                                                       }
+                                                     }
+
+                                                     pushAndBegin(LAST_EOL);
+
+                                                     return TokenType.WHITE_SPACE;
+                                                   }
   {CHAR_TOKENIZER}                                      { pushAndBegin(CHAR_TOKENIZATION);
                                                           return ElixirTypes.CHAR_TOKENIZER; }
   /* So that that atom of comparison operator consumes all 3 ':' instead of {TYPE_OPERATOR} consuming '::'
@@ -1216,6 +1235,12 @@ ANY = [^]
                       return ElixirTypes.KEYWORD_PAIR_COLON; }
   {ANY}             { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                       handleInState(stackFrame.getLastLexicalState()); }
+}
+
+<LAST_EOL> {
+  {EOL} { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+          yybegin(stackFrame.getLastLexicalState());
+          return ElixirTypes.EOL; }
 }
 
 <NAMED_SIGIL> {

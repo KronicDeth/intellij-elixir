@@ -1,17 +1,10 @@
 package org.elixir_lang.reference.callable;
 
-import com.intellij.codeInsight.completion.CompletionType;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiPolyVariantReference;
-import com.intellij.psi.ResolveResult;
 import com.intellij.psi.search.LocalSearchScope;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
-import org.elixir_lang.psi.ElixirAlias;
 import org.elixir_lang.psi.call.Call;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class Issue429Test extends LightCodeInsightFixtureTestCase {
     /*
@@ -23,8 +16,9 @@ public class Issue429Test extends LightCodeInsightFixtureTestCase {
         PsiElement callable = myFixture
                 .getFile()
                 .findElementAt(myFixture.getCaretOffset())
-                .getParent()
                 .getPrevSibling()
+                .getLastChild()
+                .getLastChild()
                 .getLastChild()
                 .getLastChild()
                 .getLastChild();
