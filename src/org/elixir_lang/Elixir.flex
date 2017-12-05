@@ -707,7 +707,8 @@ ANY = [^]
   {OPENING_CURLY}                            { // use stack to match up nested OPENING_CURLY and CLOSING_CURLY
                                                pushAndBegin(YYINITIAL);
                                                return ElixirTypes.OPENING_CURLY; }
-  {OPENING_PARENTHESIS}                      { return ElixirTypes.OPENING_PARENTHESIS; }
+  {OPENING_PARENTHESIS}                      { pushAndBegin(MULTILINE_WHITE_SPACE_MAYBE);
+                                               return ElixirTypes.OPENING_PARENTHESIS; }
   // Must be before {IDENTIFIER_TOKEN} as "in" would be parsed as an identifier since it's a lowercase alphanumeric.
   {IN_OPERATOR}                              { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.IN_OPERATOR; }
@@ -1233,8 +1234,11 @@ ANY = [^]
 <KEYWORD_PAIR_MAYBE, KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE> {
   {COLON} / {SPACE} { yybegin(MULTILINE_WHITE_SPACE_MAYBE);
                       return ElixirTypes.KEYWORD_PAIR_COLON; }
-  {ANY}             { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                      handleInState(stackFrame.getLastLexicalState()); }
+}
+
+<KEYWORD_PAIR_MAYBE, KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE, MULTILINE_WHITE_SPACE_MAYBE> {
+  {ANY} { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+          handleInState(stackFrame.getLastLexicalState()); }
 }
 
 <LAST_EOL> {

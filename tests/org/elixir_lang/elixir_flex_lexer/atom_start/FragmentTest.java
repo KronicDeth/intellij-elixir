@@ -40,7 +40,7 @@ public class FragmentTest extends TokenTest {
     }
 
     @Parameterized.Parameters(
-            name = "\"{0}\" parses as {1} token and advances to state {2}"
+            name = "{index} \"{0}\" parses as {1} token and advances to state {2}"
     )
     public static Collection<Object[]> generateData() {
         return Arrays.asList(new Object[][] {

@@ -50,7 +50,7 @@ public class DotOperationTest extends Test {
 
         lexer.advance();
 
-        assertEquals(ElixirFlexLexer.YYINITIAL, lexer.getState());
+        assertEquals(ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE, lexer.getState());
 
         lexer.advance();
 
@@ -76,7 +76,7 @@ public class DotOperationTest extends Test {
 
         lexer.advance();
 
-        assertEquals(ElixirFlexLexer.YYINITIAL, lexer.getState());
+        assertEquals(ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE, lexer.getState());
 
         lexer.advance();
 

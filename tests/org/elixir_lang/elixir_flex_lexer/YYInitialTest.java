@@ -10,6 +10,8 @@ import org.junit.runners.Parameterized;
 import java.util.Arrays;
 import java.util.Collection;
 
+import static org.elixir_lang.ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE;
+
 /**
  * Created by luke.imhoff on 9/1/14.
  */
@@ -55,7 +57,7 @@ public class YYInitialTest extends TokenTest {
                         { "&&&", ElixirTypes.AND_SYMBOL_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true},
                         { "'", ElixirTypes.CHAR_LIST_PROMOTER, ElixirFlexLexer.GROUP, true },
                         { "'''", ElixirTypes.CHAR_LIST_HEREDOC_PROMOTER, ElixirFlexLexer.GROUP_HEREDOC_START, true },
-                        { "(", ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE, true },
+                        { "(", ElixirTypes.OPENING_PARENTHESIS, MULTILINE_WHITE_SPACE_MAYBE, true },
                         { ")", ElixirTypes.CLOSING_PARENTHESIS, INITIAL_STATE, true },
                         { "+", ElixirTypes.DUAL_OPERATOR, ElixirFlexLexer.DUAL_OPERATION, true},
                         { "++", ElixirTypes.TWO_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true},
