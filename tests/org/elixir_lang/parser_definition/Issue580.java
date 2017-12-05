@@ -33,6 +33,10 @@ public class Issue580 extends ParsingTestCase {
       assertParsedAndQuotedCorrectly();
    }
 
+   public void testFnStructNoParenthesesManyArguments() {
+      assertParsedAndQuotedCorrectly();
+   }
+
    @Override
    protected String getTestDataPath() {
       return super.getTestDataPath() + "/issue_580";

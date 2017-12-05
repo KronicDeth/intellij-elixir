@@ -2151,7 +2151,7 @@ stabInfixOperator ::= eolStar STAB_OPERATOR eolStar
 private stabOperationPrefix ::= stabParenthesesSignature stabInfixOperator |
                                 stabNoParenthesesSignature stabInfixOperator
 private stabBodyExpression ::= EEX_CLOSING eex EEX_OPENING |
-                               !stabOperationPrefix expression
+                               expression !(infixComma | stabInfixOperator)
 private stabBodyExpressionSeparator ::= EEX_EMPTY_MARKER | endOfExpression
 private stabBodyExpressionSeparatorMaybe ::= stabBodyExpressionSeparator?
 stabBody ::= stabBodyExpression (stabBodyExpressionSeparator stabBodyExpression)*
