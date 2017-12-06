@@ -621,9 +621,9 @@ ANY = [^]
   // Must be before any single operator's match
   {REFERENCABLE_OPERATOR} / {REFERENCE_INFIX_OPERATOR} { pushAndBegin(REFERENCE_OPERATION);
                                                          return ElixirTypes.IDENTIFIER_TOKEN; }
-  {AND_SYMBOL_OPERATOR}                      { pushAndBegin(KEYWORD_PAIR_MAYBE);
+  {AND_SYMBOL_OPERATOR}                      { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.AND_SYMBOL_OPERATOR; }
-  {AND_WORD_OPERATOR}                        { pushAndBegin(KEYWORD_PAIR_MAYBE);
+  {AND_WORD_OPERATOR}                        { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.AND_WORD_OPERATOR; }
   {ARROW_OPERATOR}                           { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.ARROW_OPERATOR; }
@@ -661,6 +661,8 @@ ANY = [^]
   // see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L605-L613
   {ESCAPED_EOL}|{WHITE_SPACE}+ / {SPACE_SENSITIVE} { return ElixirTypes.SIGNIFICANT_WHITE_SPACE; }
   {ESCAPED_EOL}|{WHITE_SPACE}+                     { return TokenType.WHITE_SPACE; }
+  {MULTILINE_WHITE_SPACE} / {AND_SYMBOL_OPERATOR}  { return TokenType.WHITE_SPACE; }
+  {MULTILINE_WHITE_SPACE} / {AND_WORD_OPERATOR}    { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {COMMENT}              { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {COMPARISON_OPERATOR}  { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {END}                  { return TokenType.WHITE_SPACE; }

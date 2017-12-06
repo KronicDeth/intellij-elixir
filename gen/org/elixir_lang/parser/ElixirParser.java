@@ -760,26 +760,15 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // eolStar (AND_SYMBOL_OPERATOR | AND_WORD_OPERATOR) eolStar
+  // AND_SYMBOL_OPERATOR | AND_WORD_OPERATOR
   public static boolean andInfixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "andInfixOperator")) return false;
+    if (!nextTokenIs(b, "<&&, &&&, and>", AND_SYMBOL_OPERATOR, AND_WORD_OPERATOR)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, AND_INFIX_OPERATOR, "<&&, &&&, and>");
-    r = eolStar(b, l + 1);
-    r = r && andInfixOperator_1(b, l + 1);
-    r = r && eolStar(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
-    return r;
-  }
-
-  // AND_SYMBOL_OPERATOR | AND_WORD_OPERATOR
-  private static boolean andInfixOperator_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "andInfixOperator_1")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
     r = consumeToken(b, AND_SYMBOL_OPERATOR);
     if (!r) r = consumeToken(b, AND_WORD_OPERATOR);
-    exit_section_(b, m, null, r);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
