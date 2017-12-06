@@ -2646,25 +2646,24 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // keywordKey KEYWORD_PAIR_COLON eolStar
-  static boolean keywordKeyColonEOL(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "keywordKeyColonEOL")) return false;
+  // keywordKey KEYWORD_PAIR_COLON
+  static boolean keywordKeyColon(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "keywordKeyColon")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = keywordKey(b, l + 1);
     r = r && consumeToken(b, KEYWORD_PAIR_COLON);
-    r = r && eolStar(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   /* ********************************************************** */
-  // keywordKeyColonEOL containerExpression
+  // keywordKeyColon containerExpression
   public static boolean keywordPair(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "keywordPair")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, KEYWORD_PAIR, "<keyword pair>");
-    r = keywordKeyColonEOL(b, l + 1);
+    r = keywordKeyColon(b, l + 1);
     r = r && containerExpression(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
@@ -3674,12 +3673,12 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // keywordKeyColonEOL noParenthesesExpression
+  // keywordKeyColon noParenthesesExpression
   public static boolean noParenthesesKeywordPair(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "noParenthesesKeywordPair")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, NO_PARENTHESES_KEYWORD_PAIR, "<no parentheses keyword pair>");
-    r = keywordKeyColonEOL(b, l + 1);
+    r = keywordKeyColon(b, l + 1);
     r = r && noParenthesesExpression(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
