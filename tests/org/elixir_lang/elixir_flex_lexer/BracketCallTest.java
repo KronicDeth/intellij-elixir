@@ -146,7 +146,7 @@ public class BracketCallTest extends Test {
                         {
                                 "&",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.CAPTURE_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
+                                        new TokenTypeState(ElixirTypes.CAPTURE_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.OPENING_BRACKET, ElixirFlexLexer.YYINITIAL)
                                 )
                         },

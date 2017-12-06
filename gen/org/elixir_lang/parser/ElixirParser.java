@@ -1179,14 +1179,13 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // CAPTURE_OPERATOR eolStar
+  // CAPTURE_OPERATOR
   public static boolean capturePrefixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "capturePrefixOperator")) return false;
     if (!nextTokenIs(b, "<&>", CAPTURE_OPERATOR)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, CAPTURE_PREFIX_OPERATOR, "<&>");
     r = consumeToken(b, CAPTURE_OPERATOR);
-    r = r && eolStar(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }

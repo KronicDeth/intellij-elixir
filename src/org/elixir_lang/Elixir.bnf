@@ -1194,7 +1194,7 @@ matchedExpression ::= matchedCaptureNonNumericOperation |
  */
 
 private nonNumeric ::= !numeric
-capturePrefixOperator ::= CAPTURE_OPERATOR eolStar
+capturePrefixOperator ::= CAPTURE_OPERATOR
                           {
                             implements = "org.elixir_lang.psi.Operator"
                             methods = [
