@@ -1211,15 +1211,15 @@ matchedCaptureNonNumericOperation ::= capturePrefixOperator nonNumeric matchedEx
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L51
  */
 
-inMatchInfixOperator ::= eolStar IN_MATCH_OPERATOR eolStar
-                    {
-                      implements = "org.elixir_lang.psi.Operator"
-                      methods = [
-                        operatorTokenSet
-                        quote
-                      ]
-                      name = "<-, \\\\"
-                    }
+inMatchInfixOperator ::= IN_MATCH_OPERATOR
+                         {
+                           implements = "org.elixir_lang.psi.Operator"
+                           methods = [
+                                         operatorTokenSet
+                                         quote
+                                         ]
+                           name = "<-, \\\\"
+                         }
 // implements and methods defined by "infix operations" section above
 matchedInMatchOperation ::= matchedExpression inMatchInfixOperator matchedExpression
 

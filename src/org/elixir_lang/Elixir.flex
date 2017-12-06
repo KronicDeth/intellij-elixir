@@ -41,6 +41,22 @@ import org.elixir_lang.psi.ElixirTypes;
     yybegin(nextLexicalState);
   }
 
+  private void handleLastEOL() {
+    CharSequence text = yytext();
+    int length = text.length();
+
+    for (int i = length - 1; i >= 0; i--) {
+      if (text.charAt(i) == '\n') {
+        if (i == 0 || text.charAt(i - 1) != '\\') {
+          yypushback(length - i);
+          break;
+        }
+      }
+    }
+
+    pushAndBegin(LAST_EOL);
+  }
+
   private boolean isTerminator(CharSequence terminator) {
     return stack.terminator().equals(terminator.toString());
   }
@@ -647,23 +663,12 @@ ANY = [^]
   {ESCAPED_EOL}|{WHITE_SPACE}+                     { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {COMMENT}              { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {END}                  { return TokenType.WHITE_SPACE; }
+  {LAST_EOL} / {IN_MATCH_OPERATOR}{REFERENCE_INFIX_OPERATOR} { handleLastEOL();
+                                                               return TokenType.WHITE_SPACE; }
+  {MULTILINE_WHITE_SPACE} / {IN_MATCH_OPERATOR}    { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {SEMICOLON}            { return TokenType.WHITE_SPACE; }
-  {LAST_EOL} / {IDENTIFIER_TOKEN}                  { CharSequence text = yytext();
-                                                     int length = text.length();
-
-                                                     for (int i = length - 1; i >= 0; i--) {
-                                                       if (text.charAt(i) == '\n') {
-                                                         if (i == 0 || text.charAt(i - 1) != '\\') {
-                                                           yypushback(length - i);
-                                                           break;
-                                                         }
-                                                       }
-                                                     }
-
-                                                     pushAndBegin(LAST_EOL);
-
-                                                     return TokenType.WHITE_SPACE;
-                                                   }
+  {LAST_EOL} / {IDENTIFIER_TOKEN}                  { handleLastEOL();
+                                                     return TokenType.WHITE_SPACE; }
   {CHAR_TOKENIZER}                                      { pushAndBegin(CHAR_TOKENIZATION);
                                                           return ElixirTypes.CHAR_TOKENIZER; }
   /* So that that atom of comparison operator consumes all 3 ':' instead of {TYPE_OPERATOR} consuming '::'
@@ -736,7 +741,7 @@ ANY = [^]
                                                return ElixirTypes.WHEN_OPERATOR; }
   {IDENTIFIER_TOKEN}                               { pushAndBegin(CALL_OR_KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.IDENTIFIER_TOKEN; }
-  {IN_MATCH_OPERATOR}                        { pushAndBegin(KEYWORD_PAIR_MAYBE);
+  {IN_MATCH_OPERATOR}                        { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.IN_MATCH_OPERATOR; }
   /* For map rule, STRUCT_OPERATOR EOL* OPENING_CURLY will be lexed.  This is just for when the operator needs to be one
      token for keywords key */

@@ -2091,15 +2091,13 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // eolStar IN_MATCH_OPERATOR eolStar
+  // IN_MATCH_OPERATOR
   public static boolean inMatchInfixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "inMatchInfixOperator")) return false;
-    if (!nextTokenIs(b, "<<-, \\\\>", EOL, IN_MATCH_OPERATOR)) return false;
+    if (!nextTokenIs(b, "<<-, \\\\>", IN_MATCH_OPERATOR)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, IN_MATCH_INFIX_OPERATOR, "<<-, \\\\>");
-    r = eolStar(b, l + 1);
-    r = r && consumeToken(b, IN_MATCH_OPERATOR);
-    r = r && eolStar(b, l + 1);
+    r = consumeToken(b, IN_MATCH_OPERATOR);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
