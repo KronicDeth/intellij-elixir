@@ -1273,15 +1273,13 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // eolStar COMPARISON_OPERATOR eolStar
+  // COMPARISON_OPERATOR
   public static boolean comparisonInfixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "comparisonInfixOperator")) return false;
-    if (!nextTokenIs(b, "<!=, ==, =~, !==, ===>", COMPARISON_OPERATOR, EOL)) return false;
+    if (!nextTokenIs(b, "<!=, ==, =~, !==, ===>", COMPARISON_OPERATOR)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, COMPARISON_INFIX_OPERATOR, "<!=, ==, =~, !==, ===>");
-    r = eolStar(b, l + 1);
-    r = r && consumeToken(b, COMPARISON_OPERATOR);
-    r = r && eolStar(b, l + 1);
+    r = consumeToken(b, COMPARISON_OPERATOR);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
