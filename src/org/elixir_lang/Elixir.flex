@@ -667,7 +667,11 @@ ANY = [^]
                                                                return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {IN_MATCH_OPERATOR}    { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {SEMICOLON}            { return TokenType.WHITE_SPACE; }
+  {MULTILINE_WHITE_SPACE} / {TYPE_OPERATOR}        { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {WHEN_OPERATOR}        { return TokenType.WHITE_SPACE; }
+  // Needs to be explicit, so that an atom of the type operator is longer
+  {LAST_EOL} / ":::"                               { handleLastEOL();
+                                                     return TokenType.WHITE_SPACE; }
   {LAST_EOL} / {IDENTIFIER_TOKEN}                  { handleLastEOL();
                                                      return TokenType.WHITE_SPACE; }
   {CHAR_TOKENIZER}                                      { pushAndBegin(CHAR_TOKENIZATION);
@@ -678,7 +682,8 @@ ANY = [^]
                                                return ElixirTypes.COLON; }
   {COLON} / {SPACE}                          { return ElixirTypes.COLON; }
   // Must be after `{COLON} / {TYPE_OPERATOR}`, so that 3 ':' are consumed before 1.
-  {TYPE_OPERATOR}                            { return ElixirTypes.TYPE_OPERATOR; }
+  {TYPE_OPERATOR}                            { pushAndBegin(MULTILINE_WHITE_SPACE_MAYBE);
+                                               return ElixirTypes.TYPE_OPERATOR; }
   // Must be after {TYPE_OPERATOR}, so that 1 ':' is consumed after 2
   {COLON}                                    { pushAndBegin(ATOM_START);
                                                return ElixirTypes.COLON; }

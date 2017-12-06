@@ -71,7 +71,7 @@ public class InterpolationTest extends TokenTest {
                         { "1_2_3_4_5_6_7_8_9_0", ElixirTypes.VALID_DECIMAL_DIGITS, ElixirFlexLexer.DECIMAL_WHOLE_NUMBER, false },
                         { ": ", ElixirTypes.COLON, ElixirFlexLexer.YYINITIAL, false },
                         { ":", ElixirTypes.COLON, ElixirFlexLexer.ATOM_START, true },
-                        { "::", ElixirTypes.TYPE_OPERATOR, ElixirFlexLexer.YYINITIAL, true },
+                        { "::", ElixirTypes.TYPE_OPERATOR, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE, true },
                         { ":\n", ElixirTypes.COLON, ElixirFlexLexer.YYINITIAL, false },
                         { ":\r\n", ElixirTypes.COLON, ElixirFlexLexer.YYINITIAL, false },
                         { ":\t", ElixirTypes.COLON, ElixirFlexLexer.YYINITIAL, false },

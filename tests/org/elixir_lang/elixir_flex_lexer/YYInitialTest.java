@@ -84,7 +84,7 @@ public class YYInitialTest extends TokenTest {
                         { "1_2_3_4_5_6_7_8_9_0", ElixirTypes.VALID_DECIMAL_DIGITS, ElixirFlexLexer.DECIMAL_WHOLE_NUMBER, false },
                         { ": ", ElixirTypes.COLON, INITIAL_STATE, false },
                         { ":", ElixirTypes.COLON, ElixirFlexLexer.ATOM_START, true },
-                        { "::", ElixirTypes.TYPE_OPERATOR, INITIAL_STATE, true },
+                        { "::", ElixirTypes.TYPE_OPERATOR, MULTILINE_WHITE_SPACE_MAYBE, true },
                         { ":\n", ElixirTypes.COLON, INITIAL_STATE, false },
                         { ":\r\n", ElixirTypes.COLON, INITIAL_STATE, false },
                         { ":\t", ElixirTypes.COLON, INITIAL_STATE, false },
