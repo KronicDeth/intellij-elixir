@@ -3343,15 +3343,13 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // eolStar MATCH_OPERATOR eolStar
+  // MATCH_OPERATOR
   public static boolean matchInfixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchInfixOperator")) return false;
-    if (!nextTokenIs(b, "<=>", EOL, MATCH_OPERATOR)) return false;
+    if (!nextTokenIs(b, "<=>", MATCH_OPERATOR)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, MATCH_INFIX_OPERATOR, "<=>");
-    r = eolStar(b, l + 1);
-    r = r && consumeToken(b, MATCH_OPERATOR);
-    r = r && eolStar(b, l + 1);
+    r = consumeToken(b, MATCH_OPERATOR);
     exit_section_(b, l, m, r, false, null);
     return r;
   }

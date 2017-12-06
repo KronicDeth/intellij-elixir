@@ -1294,7 +1294,7 @@ matchedPipeOperation ::= matchedExpression pipeInfixOperator matchedExpression
  * @see see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L56
  */
 
-matchInfixOperator ::= eolStar MATCH_OPERATOR eolStar
+matchInfixOperator ::= MATCH_OPERATOR
                        {
                          implements = "org.elixir_lang.psi.Operator"
                          methods = [

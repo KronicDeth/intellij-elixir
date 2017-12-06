@@ -667,6 +667,7 @@ ANY = [^]
   {LAST_EOL} / {REFERENCABLE_OPERATOR}{REFERENCE_INFIX_OPERATOR} { handleLastEOL();
                                                                    return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {IN_MATCH_OPERATOR}    { return TokenType.WHITE_SPACE; }
+  {MULTILINE_WHITE_SPACE} / {MATCH_OPERATOR}       { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {PIPE_OPERATOR}        { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {SEMICOLON}            { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {TYPE_OPERATOR}        { return TokenType.WHITE_SPACE; }
@@ -758,7 +759,7 @@ ANY = [^]
   {MAP_OPERATOR} / {COLON}{SPACE}            { // Definitely a Keyword pair, but KEYWORD_PAIR_MAYBE state will still work.
                                                pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.MAP_OPERATOR; }
-  {MATCH_OPERATOR}                           { pushAndBegin(KEYWORD_PAIR_MAYBE);
+  {MATCH_OPERATOR}                           { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.MATCH_OPERATOR; }
   {MULTIPLICATION_OPERATOR}                  { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.MULTIPLICATION_OPERATOR; }

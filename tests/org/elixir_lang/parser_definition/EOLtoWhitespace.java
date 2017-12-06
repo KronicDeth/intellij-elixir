@@ -13,6 +13,10 @@ public class EOLtoWhitespace extends ParsingTestCase {
       assertParsedAndQuotedCorrectly();
    }
 
+   public void testMatch() {
+      assertParsedAndQuotedCorrectly();
+   }
+
    public void testOpeningParentheses() {
       assertParsedAndQuotedCorrectly();
    }
