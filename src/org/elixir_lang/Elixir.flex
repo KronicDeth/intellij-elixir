@@ -1226,9 +1226,11 @@ ANY = [^]
 }
 
 <KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE, MULTILINE_WHITE_SPACE_MAYBE> {
-  {MULTILINE_WHITE_SPACE} { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                            yybegin(stackFrame.getLastLexicalState());
-                            return TokenType.WHITE_SPACE; }
+  {COMMENT}                           { return ElixirTypes.COMMENT; }
+  {MULTILINE_WHITE_SPACE} / {COMMENT} { return TokenType.WHITE_SPACE; }
+  {MULTILINE_WHITE_SPACE}             { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                                        yybegin(stackFrame.getLastLexicalState());
+                                        return TokenType.WHITE_SPACE; }
 }
 
 <KEYWORD_PAIR_MAYBE, KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE> {

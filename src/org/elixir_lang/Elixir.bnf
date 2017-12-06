@@ -1599,7 +1599,7 @@ relativeIdentifier ::= IDENTIFIER_TOKEN |
 private parenthesesPositionalArguments ::= containerArgumentsBase
 
 // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L484-L488
-parenthesesArguments ::= OPENING_PARENTHESIS eolStar
+parenthesesArguments ::= OPENING_PARENTHESIS
                          (
                           unqualifiedNoParenthesesManyArgumentsCall | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L485
                           keywords | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L486
@@ -2200,7 +2200,7 @@ anonymousFunction ::= FN endOfExpressionMaybe
                       }
 
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L206-L210
-parentheticalStab ::= OPENING_PARENTHESIS eolStar
+parentheticalStab ::= OPENING_PARENTHESIS
                       (infixSemicolon? stab infixSemicolon? | infixSemicolon)
                       eolStar CLOSING_PARENTHESIS
                       { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
@@ -3077,7 +3077,7 @@ sigilHexadecimalEscapeSequence ::= hexadecimalEscapePrefix (openHexadecimalEscap
                                      methods = [codePoint]
                                    }
 
-emptyParentheses ::= OPENING_PARENTHESIS eolStar CLOSING_PARENTHESIS
+emptyParentheses ::= OPENING_PARENTHESIS CLOSING_PARENTHESIS
                      { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 interpolation ::= INTERPOLATION_START elixirFile INTERPOLATION_END
                   { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }

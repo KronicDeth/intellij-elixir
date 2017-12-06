@@ -1784,15 +1784,13 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // OPENING_PARENTHESIS eolStar CLOSING_PARENTHESIS
+  // OPENING_PARENTHESIS CLOSING_PARENTHESIS
   public static boolean emptyParentheses(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "emptyParentheses")) return false;
     if (!nextTokenIs(b, OPENING_PARENTHESIS)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, OPENING_PARENTHESIS);
-    r = r && eolStar(b, l + 1);
-    r = r && consumeToken(b, CLOSING_PARENTHESIS);
+    r = consumeTokens(b, 0, OPENING_PARENTHESIS, CLOSING_PARENTHESIS);
     exit_section_(b, m, EMPTY_PARENTHESES, r);
     return r;
   }
@@ -4109,7 +4107,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // OPENING_PARENTHESIS eolStar
+  // OPENING_PARENTHESIS
   //                          (
   //                           unqualifiedNoParenthesesManyArgumentsCall | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L485
   //                           keywords | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L486
@@ -4121,8 +4119,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, OPENING_PARENTHESIS);
-    r = r && eolStar(b, l + 1);
-    r = r && parenthesesArguments_2(b, l + 1);
+    r = r && parenthesesArguments_1(b, l + 1);
     r = r && eolStar(b, l + 1);
     r = r && consumeToken(b, CLOSING_PARENTHESIS);
     exit_section_(b, m, PARENTHESES_ARGUMENTS, r);
@@ -4133,47 +4130,47 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   //                           unqualifiedNoParenthesesManyArgumentsCall | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L485
   //                           keywords | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L486
   //                           parenthesesPositionalArguments (infixComma keywords)?)?
-  private static boolean parenthesesArguments_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "parenthesesArguments_2")) return false;
-    parenthesesArguments_2_0(b, l + 1);
+  private static boolean parenthesesArguments_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "parenthesesArguments_1")) return false;
+    parenthesesArguments_1_0(b, l + 1);
     return true;
   }
 
   // unqualifiedNoParenthesesManyArgumentsCall | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L485
   //                           keywords | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L486
   //                           parenthesesPositionalArguments (infixComma keywords)?
-  private static boolean parenthesesArguments_2_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "parenthesesArguments_2_0")) return false;
+  private static boolean parenthesesArguments_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "parenthesesArguments_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = unqualifiedNoParenthesesManyArgumentsCall(b, l + 1);
     if (!r) r = keywords(b, l + 1);
-    if (!r) r = parenthesesArguments_2_0_2(b, l + 1);
+    if (!r) r = parenthesesArguments_1_0_2(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // parenthesesPositionalArguments (infixComma keywords)?
-  private static boolean parenthesesArguments_2_0_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "parenthesesArguments_2_0_2")) return false;
+  private static boolean parenthesesArguments_1_0_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "parenthesesArguments_1_0_2")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = parenthesesPositionalArguments(b, l + 1);
-    r = r && parenthesesArguments_2_0_2_1(b, l + 1);
+    r = r && parenthesesArguments_1_0_2_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // (infixComma keywords)?
-  private static boolean parenthesesArguments_2_0_2_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "parenthesesArguments_2_0_2_1")) return false;
-    parenthesesArguments_2_0_2_1_0(b, l + 1);
+  private static boolean parenthesesArguments_1_0_2_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "parenthesesArguments_1_0_2_1")) return false;
+    parenthesesArguments_1_0_2_1_0(b, l + 1);
     return true;
   }
 
   // infixComma keywords
-  private static boolean parenthesesArguments_2_0_2_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "parenthesesArguments_2_0_2_1_0")) return false;
+  private static boolean parenthesesArguments_1_0_2_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "parenthesesArguments_1_0_2_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = infixComma(b, l + 1);
@@ -4189,7 +4186,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // OPENING_PARENTHESIS eolStar
+  // OPENING_PARENTHESIS
   //                       (infixSemicolon? stab infixSemicolon? | infixSemicolon)
   //                       eolStar CLOSING_PARENTHESIS
   public static boolean parentheticalStab(PsiBuilder b, int l) {
@@ -4198,8 +4195,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, OPENING_PARENTHESIS);
-    r = r && eolStar(b, l + 1);
-    r = r && parentheticalStab_2(b, l + 1);
+    r = r && parentheticalStab_1(b, l + 1);
     r = r && eolStar(b, l + 1);
     r = r && consumeToken(b, CLOSING_PARENTHESIS);
     exit_section_(b, m, PARENTHETICAL_STAB, r);
@@ -4207,38 +4203,38 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   // infixSemicolon? stab infixSemicolon? | infixSemicolon
-  private static boolean parentheticalStab_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "parentheticalStab_2")) return false;
+  private static boolean parentheticalStab_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "parentheticalStab_1")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = parentheticalStab_2_0(b, l + 1);
+    r = parentheticalStab_1_0(b, l + 1);
     if (!r) r = infixSemicolon(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // infixSemicolon? stab infixSemicolon?
-  private static boolean parentheticalStab_2_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "parentheticalStab_2_0")) return false;
+  private static boolean parentheticalStab_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "parentheticalStab_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = parentheticalStab_2_0_0(b, l + 1);
+    r = parentheticalStab_1_0_0(b, l + 1);
     r = r && stab(b, l + 1);
-    r = r && parentheticalStab_2_0_2(b, l + 1);
+    r = r && parentheticalStab_1_0_2(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // infixSemicolon?
-  private static boolean parentheticalStab_2_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "parentheticalStab_2_0_0")) return false;
+  private static boolean parentheticalStab_1_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "parentheticalStab_1_0_0")) return false;
     infixSemicolon(b, l + 1);
     return true;
   }
 
   // infixSemicolon?
-  private static boolean parentheticalStab_2_0_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "parentheticalStab_2_0_2")) return false;
+  private static boolean parentheticalStab_1_0_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "parentheticalStab_1_0_2")) return false;
     infixSemicolon(b, l + 1);
     return true;
   }
