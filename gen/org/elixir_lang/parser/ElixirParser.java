@@ -4066,26 +4066,15 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // eolStar (OR_SYMBOL_OPERATOR | OR_WORD_OPERATOR) eolStar
+  // OR_SYMBOL_OPERATOR | OR_WORD_OPERATOR
   public static boolean orInfixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "orInfixOperator")) return false;
+    if (!nextTokenIs(b, "<||, |||, or>", OR_SYMBOL_OPERATOR, OR_WORD_OPERATOR)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, OR_INFIX_OPERATOR, "<||, |||, or>");
-    r = eolStar(b, l + 1);
-    r = r && orInfixOperator_1(b, l + 1);
-    r = r && eolStar(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
-    return r;
-  }
-
-  // OR_SYMBOL_OPERATOR | OR_WORD_OPERATOR
-  private static boolean orInfixOperator_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "orInfixOperator_1")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
     r = consumeToken(b, OR_SYMBOL_OPERATOR);
     if (!r) r = consumeToken(b, OR_WORD_OPERATOR);
-    exit_section_(b, m, null, r);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 

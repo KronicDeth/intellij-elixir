@@ -1313,7 +1313,7 @@ matchedMatchOperation ::= matchedExpression matchInfixOperator matchedExpression
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L57
  */
 
-orInfixOperator ::= eolStar (OR_SYMBOL_OPERATOR | OR_WORD_OPERATOR) eolStar
+orInfixOperator ::= OR_SYMBOL_OPERATOR | OR_WORD_OPERATOR
                     {
                       implements = "org.elixir_lang.psi.Operator"
                       methods = [

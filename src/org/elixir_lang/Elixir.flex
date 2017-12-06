@@ -663,12 +663,14 @@ ANY = [^]
   {ESCAPED_EOL}|{WHITE_SPACE}+                     { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {COMMENT}              { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {END}                  { return TokenType.WHITE_SPACE; }
-  {LAST_EOL} / {IN_MATCH_OPERATOR}{REFERENCE_INFIX_OPERATOR} { handleLastEOL();
-                                                               return TokenType.WHITE_SPACE; }
+  {LAST_EOL} / {REFERENCABLE_OPERATOR}{REFERENCE_INFIX_OPERATOR} { handleLastEOL();
+                                                                   return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {IN_MATCH_OPERATOR}    { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {SEMICOLON}            { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {TYPE_OPERATOR}        { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {WHEN_OPERATOR}        { return TokenType.WHITE_SPACE; }
+  {MULTILINE_WHITE_SPACE} / {OR_SYMBOL_OPERATOR}   { return TokenType.WHITE_SPACE; }
+  {MULTILINE_WHITE_SPACE} / {OR_WORD_OPERATOR}     { return TokenType.WHITE_SPACE; }
   // Needs to be explicit, so that an atom of the type operator is longer
   {LAST_EOL} / ":::"                               { handleLastEOL();
                                                      return TokenType.WHITE_SPACE; }
@@ -731,7 +733,7 @@ ANY = [^]
   {NOT_OPERATOR}                             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.NOT_OPERATOR; }
   // Must be before {IDENTIFIER_TOKEN} as "or" would be parsed as an identifier since it's a lowercase alphanumeric.
-  {OR_WORD_OPERATOR}                         { pushAndBegin(KEYWORD_PAIR_MAYBE);
+  {OR_WORD_OPERATOR}                         { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.OR_WORD_OPERATOR; }
   // Must be before {IDENTIFIER_TOKEN} as "rescue" would be parsed as an identifier since it's a lowercase alphanumeric.
   {RESCUE}                                   { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
@@ -758,7 +760,7 @@ ANY = [^]
                                                return ElixirTypes.MATCH_OPERATOR; }
   {MULTIPLICATION_OPERATOR}                  { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.MULTIPLICATION_OPERATOR; }
-  {OR_SYMBOL_OPERATOR}                       { pushAndBegin(KEYWORD_PAIR_MAYBE);
+  {OR_SYMBOL_OPERATOR}                       { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.OR_SYMBOL_OPERATOR; }
   {PIPE_OPERATOR}                            { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.PIPE_OPERATOR; }
