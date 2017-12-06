@@ -1766,7 +1766,7 @@ matchedUnqualifiedNoParenthesesCall ::= identifier noParenthesesOneArgument
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L238
  */
 
-bracketArguments ::= OPENING_BRACKET eolStar
+bracketArguments ::= OPENING_BRACKET
                      (
                       keywords |
                       containerExpression infixCommaMaybe
@@ -3094,7 +3094,7 @@ private containerArguments ::= containerArgumentsBase (infixComma keywords | inf
 private listArguments ::= keywords |
                           containerArguments
 
-list ::= OPENING_BRACKET eolStar
+list ::= OPENING_BRACKET
          listArguments?
          CLOSING_BRACKET
          { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }

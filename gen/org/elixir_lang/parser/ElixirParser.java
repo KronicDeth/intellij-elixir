@@ -1112,7 +1112,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // OPENING_BRACKET eolStar
+  // OPENING_BRACKET
   //                      (
   //                       keywords |
   //                       containerExpression infixCommaMaybe
@@ -1124,8 +1124,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, OPENING_BRACKET);
-    r = r && eolStar(b, l + 1);
-    r = r && bracketArguments_2(b, l + 1);
+    r = r && bracketArguments_1(b, l + 1);
     r = r && consumeToken(b, CLOSING_BRACKET);
     exit_section_(b, m, BRACKET_ARGUMENTS, r);
     return r;
@@ -1133,19 +1132,19 @@ public class ElixirParser implements PsiParser, LightPsiParser {
 
   // keywords |
   //                       containerExpression infixCommaMaybe
-  private static boolean bracketArguments_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "bracketArguments_2")) return false;
+  private static boolean bracketArguments_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "bracketArguments_1")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = keywords(b, l + 1);
-    if (!r) r = bracketArguments_2_1(b, l + 1);
+    if (!r) r = bracketArguments_1_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // containerExpression infixCommaMaybe
-  private static boolean bracketArguments_2_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "bracketArguments_2_1")) return false;
+  private static boolean bracketArguments_1_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "bracketArguments_1_1")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = containerExpression(b, l + 1);
@@ -2715,7 +2714,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // OPENING_BRACKET eolStar
+  // OPENING_BRACKET
   //          listArguments?
   //          CLOSING_BRACKET
   public static boolean list(PsiBuilder b, int l) {
@@ -2724,16 +2723,15 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, OPENING_BRACKET);
-    r = r && eolStar(b, l + 1);
-    r = r && list_2(b, l + 1);
+    r = r && list_1(b, l + 1);
     r = r && consumeToken(b, CLOSING_BRACKET);
     exit_section_(b, m, LIST, r);
     return r;
   }
 
   // listArguments?
-  private static boolean list_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "list_2")) return false;
+  private static boolean list_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "list_1")) return false;
     listArguments(b, l + 1);
     return true;
   }

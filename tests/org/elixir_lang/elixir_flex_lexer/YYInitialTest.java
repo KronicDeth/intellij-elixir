@@ -111,7 +111,7 @@ public class YYInitialTest extends TokenTest {
                         { ">>>", ElixirTypes.ARROW_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
                         { "@", ElixirTypes.AT_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
                         { "Enum", ElixirTypes.ALIAS_TOKEN, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
-                        { "[", ElixirTypes.OPENING_BRACKET, INITIAL_STATE, true },
+                        { "[", ElixirTypes.OPENING_BRACKET, MULTILINE_WHITE_SPACE_MAYBE, true },
                         { "\"", ElixirTypes.STRING_PROMOTER, ElixirFlexLexer.GROUP, true },
                         { "\"\"\"",ElixirTypes.STRING_HEREDOC_PROMOTER,ElixirFlexLexer.GROUP_HEREDOC_START, true },
                         { "\\;", TokenType.BAD_CHARACTER, INITIAL_STATE, false },

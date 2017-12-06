@@ -103,7 +103,7 @@ public class UnknownBaseIntegerTest extends TokenTest {
                 { "X", ElixirTypes.INVALID_UNKNOWN_BASE_DIGITS, ElixirFlexLexer.UNKNOWN_BASE_WHOLE_NUMBER },
                 { "Y", ElixirTypes.INVALID_UNKNOWN_BASE_DIGITS, ElixirFlexLexer.UNKNOWN_BASE_WHOLE_NUMBER },
                 { "Z", ElixirTypes.INVALID_UNKNOWN_BASE_DIGITS, ElixirFlexLexer.UNKNOWN_BASE_WHOLE_NUMBER },
-                { "[", ElixirTypes.OPENING_BRACKET, ElixirFlexLexer.YYINITIAL },
+                { "[", ElixirTypes.OPENING_BRACKET, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE },
                 { "\"", ElixirTypes.STRING_PROMOTER, ElixirFlexLexer.GROUP },
                 { "\"\"\"", ElixirTypes.STRING_HEREDOC_PROMOTER, ElixirFlexLexer.GROUP_HEREDOC_START },
                 { "\n", ElixirTypes.EOL, ElixirFlexLexer.SIGN_OPERATION_MAYBE },

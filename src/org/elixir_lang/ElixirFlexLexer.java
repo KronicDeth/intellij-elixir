@@ -1434,7 +1434,8 @@ public class ElixirFlexLexer implements FlexLexer {
             }
           case 215: break;
           case 28: 
-            { return ElixirTypes.OPENING_BRACKET;
+            { pushAndBegin(MULTILINE_WHITE_SPACE_MAYBE);
+                                               return ElixirTypes.OPENING_BRACKET;
             }
           case 216: break;
           case 29: 

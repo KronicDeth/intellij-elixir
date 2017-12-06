@@ -716,7 +716,8 @@ ANY = [^]
                                                return ElixirTypes.FALSE; }
   {FN}                                       { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.FN; }
-  {OPENING_BRACKET}                          { return ElixirTypes.OPENING_BRACKET; }
+  {OPENING_BRACKET}                          { pushAndBegin(MULTILINE_WHITE_SPACE_MAYBE);
+                                               return ElixirTypes.OPENING_BRACKET; }
   /* Must be before {OPENING_CURLY} so entire "{}" is matched instead of just "{"
 
      For tuple rule, OPENING_CURLY will be lexed.  This is just for when the operator needs to be one token for

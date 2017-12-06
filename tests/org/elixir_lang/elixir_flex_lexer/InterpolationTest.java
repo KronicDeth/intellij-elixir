@@ -100,7 +100,7 @@ public class InterpolationTest extends TokenTest {
                         { "?", ElixirTypes.CHAR_TOKENIZER, ElixirFlexLexer.CHAR_TOKENIZATION, true },
                         { "@", ElixirTypes.AT_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
                         { "Enum", ElixirTypes.ALIAS_TOKEN, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
-                        { "[", ElixirTypes.OPENING_BRACKET, ElixirFlexLexer.YYINITIAL, true },
+                        { "[", ElixirTypes.OPENING_BRACKET, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE, true },
                         { "\"", ElixirTypes.STRING_PROMOTER, ElixirFlexLexer.GROUP, true },
                         { "\"\"\"", ElixirTypes.STRING_HEREDOC_PROMOTER, ElixirFlexLexer.GROUP_HEREDOC_START, true },
                         { "\\;", TokenType.BAD_CHARACTER, ElixirFlexLexer.YYINITIAL, false },
