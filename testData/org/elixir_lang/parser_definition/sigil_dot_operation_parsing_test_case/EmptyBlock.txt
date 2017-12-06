@@ -15,5 +15,5 @@ Elixir File(0,8)
     <empty list>
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(6,7)
     PsiElement(;)(';')(6,7)
-  PsiErrorElement:'(', <unmatched expression>, '\\n, \\r\\n' or identifier expected, got ')'(7,8)
+  PsiErrorElement:'(', <unmatched expression> or identifier expected, got ')'(7,8)
     PsiElement())(')')(7,8)

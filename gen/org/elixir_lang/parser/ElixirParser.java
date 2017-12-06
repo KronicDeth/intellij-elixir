@@ -1809,13 +1809,13 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // infixSemicolon | EOL+
+  // SEMICOLON | EOL+
   public static boolean endOfExpression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "endOfExpression")) return false;
     if (!nextTokenIs(b, "<end of expression>", EOL, SEMICOLON)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, END_OF_EXPRESSION, "<end of expression>");
-    r = infixSemicolon(b, l + 1);
+    r = consumeToken(b, SEMICOLON);
     if (!r) r = endOfExpression_1(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
@@ -2124,20 +2124,6 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "infixCommaMaybe")) return false;
     infixComma(b, l + 1);
     return true;
-  }
-
-  /* ********************************************************** */
-  // eolStar SEMICOLON eolStar
-  static boolean infixSemicolon(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "infixSemicolon")) return false;
-    if (!nextTokenIs(b, "", EOL, SEMICOLON)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = eolStar(b, l + 1);
-    r = r && consumeToken(b, SEMICOLON);
-    r = r && eolStar(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
   }
 
   /* ********************************************************** */
@@ -4187,7 +4173,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // OPENING_PARENTHESIS
-  //                       (infixSemicolon? stab infixSemicolon? | infixSemicolon)
+  //                       (semicolonMaybe stab semicolonMaybe | SEMICOLON)
   //                       eolStar CLOSING_PARENTHESIS
   public static boolean parentheticalStab(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "parentheticalStab")) return false;
@@ -4202,41 +4188,27 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // infixSemicolon? stab infixSemicolon? | infixSemicolon
+  // semicolonMaybe stab semicolonMaybe | SEMICOLON
   private static boolean parentheticalStab_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "parentheticalStab_1")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = parentheticalStab_1_0(b, l + 1);
-    if (!r) r = infixSemicolon(b, l + 1);
+    if (!r) r = consumeToken(b, SEMICOLON);
     exit_section_(b, m, null, r);
     return r;
   }
 
-  // infixSemicolon? stab infixSemicolon?
+  // semicolonMaybe stab semicolonMaybe
   private static boolean parentheticalStab_1_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "parentheticalStab_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = parentheticalStab_1_0_0(b, l + 1);
+    r = semicolonMaybe(b, l + 1);
     r = r && stab(b, l + 1);
-    r = r && parentheticalStab_1_0_2(b, l + 1);
+    r = r && semicolonMaybe(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
-  }
-
-  // infixSemicolon?
-  private static boolean parentheticalStab_1_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "parentheticalStab_1_0_0")) return false;
-    infixSemicolon(b, l + 1);
-    return true;
-  }
-
-  // infixSemicolon?
-  private static boolean parentheticalStab_1_0_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "parentheticalStab_1_0_2")) return false;
-    infixSemicolon(b, l + 1);
-    return true;
   }
 
   /* ********************************************************** */
@@ -4465,6 +4437,14 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     r = r && significantWhiteSpaceMaybe(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
+  }
+
+  /* ********************************************************** */
+  // SEMICOLON?
+  static boolean semicolonMaybe(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "semicolonMaybe")) return false;
+    consumeToken(b, SEMICOLON);
+    return true;
   }
 
   /* ********************************************************** */

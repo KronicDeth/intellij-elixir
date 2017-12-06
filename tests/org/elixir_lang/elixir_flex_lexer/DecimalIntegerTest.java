@@ -72,7 +72,7 @@ public class DecimalIntegerTest extends TokenTest {
                 { "8", null, ElixirFlexLexer.DECIMAL_WHOLE_NUMBER, true },
                 { "9", null, ElixirFlexLexer.DECIMAL_WHOLE_NUMBER, true },
                 { ":", ElixirTypes.COLON, ElixirFlexLexer.ATOM_START, true },
-                { ";", ElixirTypes.SEMICOLON, ElixirFlexLexer.YYINITIAL, true },
+                { ";", ElixirTypes.SEMICOLON, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE, true },
                 { "<", ElixirTypes.RELATIONAL_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
                 { "=", ElixirTypes.MATCH_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
                 { ">", ElixirTypes.RELATIONAL_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },

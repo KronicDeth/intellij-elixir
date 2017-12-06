@@ -11,7 +11,7 @@ Elixir File(0,143)
 '(6,6)
       <empty list>
     PsiElement(\\n, \\r\\n)('\n')(6,7)
-  PsiErrorElement:';', '\\n or \\r\\n' expected, got '   '(7,10)
+  PsiErrorElement:'\\n, \\r\\n' expected, got '   '(7,10)
     PsiElement(Whitespace at beginning of line of heredoc)('   ')(7,10)
   PsiElement(DUMMY_BLOCK)(10,28)
     PsiElement(String Fragment)('Two')(10,13)

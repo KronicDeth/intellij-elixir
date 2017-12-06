@@ -647,6 +647,7 @@ ANY = [^]
   {ESCAPED_EOL}|{WHITE_SPACE}+                     { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {COMMENT}              { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {END}                  { return TokenType.WHITE_SPACE; }
+  {MULTILINE_WHITE_SPACE} / {SEMICOLON}            { return TokenType.WHITE_SPACE; }
   {LAST_EOL} / {IDENTIFIER_TOKEN}                  { CharSequence text = yytext();
                                                      int length = text.length();
 
@@ -754,7 +755,8 @@ ANY = [^]
                                                return ElixirTypes.RANGE_OPERATOR; }
   {RELATIONAL_OPERATOR}                      { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.RELATIONAL_OPERATOR; }
-  {SEMICOLON}                                { return ElixirTypes.SEMICOLON; }
+  {SEMICOLON}                                { pushAndBegin(MULTILINE_WHITE_SPACE_MAYBE);
+                                               return ElixirTypes.SEMICOLON; }
   {STAB_OPERATOR}                            { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.STAB_OPERATOR; }
   {STRUCT_OPERATOR}                          { pushAndBegin(KEYWORD_PAIR_MAYBE);

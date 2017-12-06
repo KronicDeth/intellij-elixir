@@ -76,7 +76,7 @@ public class InterpolationTest extends TokenTest {
                         { ":\r\n", ElixirTypes.COLON, ElixirFlexLexer.YYINITIAL, false },
                         { ":\t", ElixirTypes.COLON, ElixirFlexLexer.YYINITIAL, false },
                         { "]", ElixirTypes.CLOSING_BRACKET, ElixirFlexLexer.YYINITIAL, true },
-                        { ";", ElixirTypes.SEMICOLON, ElixirFlexLexer.YYINITIAL, true },
+                        { ";", ElixirTypes.SEMICOLON, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE, true },
                         { "<", ElixirTypes.RELATIONAL_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
                         { "<-", ElixirTypes.IN_MATCH_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
                         { "<<", ElixirTypes.OPENING_BIT, ElixirFlexLexer.YYINITIAL, true },
