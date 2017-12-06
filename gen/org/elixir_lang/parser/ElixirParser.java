@@ -2716,7 +2716,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // OPENING_BRACKET eolStar
-  //          listArguments? eolStar
+  //          listArguments?
   //          CLOSING_BRACKET
   public static boolean list(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "list")) return false;
@@ -2726,7 +2726,6 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     r = consumeToken(b, OPENING_BRACKET);
     r = r && eolStar(b, l + 1);
     r = r && list_2(b, l + 1);
-    r = r && eolStar(b, l + 1);
     r = r && consumeToken(b, CLOSING_BRACKET);
     exit_section_(b, m, LIST, r);
     return r;

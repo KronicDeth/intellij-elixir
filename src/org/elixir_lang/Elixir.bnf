@@ -3095,7 +3095,7 @@ private listArguments ::= keywords |
                           containerArguments
 
 list ::= OPENING_BRACKET eolStar
-         listArguments? eolStar
+         listArguments?
          CLOSING_BRACKET
          { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
