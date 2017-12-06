@@ -17,6 +17,10 @@ public class EOLtoWhitespace extends ParsingTestCase {
       assertParsedAndQuotedCorrectly();
    }
 
+   public void testPipe() {
+      assertParsedAndQuotedCorrectly();
+   }
+
    public void testSemicolon() {
       assertParsedAndQuotedCorrectly();
    }

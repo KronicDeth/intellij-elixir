@@ -666,6 +666,7 @@ ANY = [^]
   {LAST_EOL} / {REFERENCABLE_OPERATOR}{REFERENCE_INFIX_OPERATOR} { handleLastEOL();
                                                                    return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {IN_MATCH_OPERATOR}    { return TokenType.WHITE_SPACE; }
+  {MULTILINE_WHITE_SPACE} / {PIPE_OPERATOR}        { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {SEMICOLON}            { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {TYPE_OPERATOR}        { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {WHEN_OPERATOR}        { return TokenType.WHITE_SPACE; }
@@ -762,7 +763,7 @@ ANY = [^]
                                                return ElixirTypes.MULTIPLICATION_OPERATOR; }
   {OR_SYMBOL_OPERATOR}                       { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.OR_SYMBOL_OPERATOR; }
-  {PIPE_OPERATOR}                            { pushAndBegin(KEYWORD_PAIR_MAYBE);
+  {PIPE_OPERATOR}                            { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.PIPE_OPERATOR; }
   {RANGE_OPERATOR}                           { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.RANGE_OPERATOR; }

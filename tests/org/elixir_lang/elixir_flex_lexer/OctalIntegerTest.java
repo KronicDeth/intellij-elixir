@@ -139,7 +139,7 @@ public class OctalIntegerTest extends TokenTest {
                 { "y", ElixirTypes.INVALID_OCTAL_DIGITS, ElixirFlexLexer.OCTAL_WHOLE_NUMBER },
                 { "z", ElixirTypes.INVALID_OCTAL_DIGITS, ElixirFlexLexer.OCTAL_WHOLE_NUMBER },
                 { "{", ElixirTypes.OPENING_CURLY, ElixirFlexLexer.YYINITIAL },
-                { "|", ElixirTypes.PIPE_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE },
+                { "|", ElixirTypes.PIPE_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE },
                 { "}", ElixirTypes.CLOSING_CURLY, ElixirFlexLexer.YYINITIAL },
                 { "~", ElixirTypes.TILDE, ElixirFlexLexer.SIGIL }
         });

@@ -4198,15 +4198,13 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // eolStar PIPE_OPERATOR eolStar
+  // PIPE_OPERATOR
   public static boolean pipeInfixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "pipeInfixOperator")) return false;
-    if (!nextTokenIs(b, "<|>", EOL, PIPE_OPERATOR)) return false;
+    if (!nextTokenIs(b, "<|>", PIPE_OPERATOR)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, PIPE_INFIX_OPERATOR, "<|>");
-    r = eolStar(b, l + 1);
-    r = r && consumeToken(b, PIPE_OPERATOR);
-    r = r && eolStar(b, l + 1);
+    r = consumeToken(b, PIPE_OPERATOR);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
