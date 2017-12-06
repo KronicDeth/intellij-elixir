@@ -667,6 +667,7 @@ ANY = [^]
                                                                return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {IN_MATCH_OPERATOR}    { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {SEMICOLON}            { return TokenType.WHITE_SPACE; }
+  {MULTILINE_WHITE_SPACE} / {WHEN_OPERATOR}        { return TokenType.WHITE_SPACE; }
   {LAST_EOL} / {IDENTIFIER_TOKEN}                  { handleLastEOL();
                                                      return TokenType.WHITE_SPACE; }
   {CHAR_TOKENIZER}                                      { pushAndBegin(CHAR_TOKENIZATION);
@@ -737,7 +738,7 @@ ANY = [^]
   {THREE_OPERATOR}                           { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.THREE_OPERATOR; }
   // Must be before {IDENTIFIER_TOKEN} as "when" would be parsed as an identifier since it's a lowercase alphanumeric.
-  {WHEN_OPERATOR}                            { pushAndBegin(KEYWORD_PAIR_MAYBE);
+  {WHEN_OPERATOR}                            { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.WHEN_OPERATOR; }
   {IDENTIFIER_TOKEN}                               { pushAndBegin(CALL_OR_KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.IDENTIFIER_TOKEN; }

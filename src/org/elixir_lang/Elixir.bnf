@@ -1229,7 +1229,7 @@ matchedInMatchOperation ::= matchedExpression inMatchInfixOperator matchedExpres
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L52
  */
 
-whenInfixOperator ::= eolStar WHEN_OPERATOR eolStar
+whenInfixOperator ::= WHEN_OPERATOR
                       {
                         implements = "org.elixir_lang.psi.Operator"
                         methods = [

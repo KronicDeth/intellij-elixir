@@ -5095,15 +5095,13 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // eolStar WHEN_OPERATOR eolStar
+  // WHEN_OPERATOR
   public static boolean whenInfixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "whenInfixOperator")) return false;
-    if (!nextTokenIs(b, "<when>", EOL, WHEN_OPERATOR)) return false;
+    if (!nextTokenIs(b, "<when>", WHEN_OPERATOR)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, WHEN_INFIX_OPERATOR, "<when>");
-    r = eolStar(b, l + 1);
-    r = r && consumeToken(b, WHEN_OPERATOR);
-    r = r && eolStar(b, l + 1);
+    r = consumeToken(b, WHEN_OPERATOR);
     exit_section_(b, l, m, r, false, null);
     return r;
   }

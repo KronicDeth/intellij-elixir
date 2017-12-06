@@ -17,6 +17,10 @@ public class EOLtoWhitespace extends ParsingTestCase {
       assertParsedAndQuotedCorrectly();
    }
 
+   public void testWhen() {
+      assertParsedAndQuotedCorrectly();
+   }
+
    @Override
    protected String getTestDataPath() {
       return super.getTestDataPath() + "/eol_to_whitespace";
