@@ -3196,7 +3196,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   //                   // Must be before mapConstructionArguments, so that PIPE_OPERATOR is used for updates and not matchedExpression.
   //                   mapUpdateArguments |
   //                   mapConstructionArguments
-  //                  )? eolStar
+  //                  )?
   //                  CLOSING_CURLY
   public static boolean mapArguments(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "mapArguments")) return false;
@@ -3205,7 +3205,6 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b);
     r = consumeToken(b, OPENING_CURLY);
     r = r && mapArguments_1(b, l + 1);
-    r = r && eolStar(b, l + 1);
     r = r && consumeToken(b, CLOSING_CURLY);
     exit_section_(b, m, MAP_ARGUMENTS, r);
     return r;
@@ -3569,7 +3568,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // OPENING_CURLY
-  //                     containerArgumentsMaybe eolStar
+  //                     containerArgumentsMaybe
   //                     CLOSING_CURLY
   public static boolean multipleAliases(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "multipleAliases")) return false;
@@ -3578,7 +3577,6 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b);
     r = consumeToken(b, OPENING_CURLY);
     r = r && containerArgumentsMaybe(b, l + 1);
-    r = r && eolStar(b, l + 1);
     r = r && consumeToken(b, CLOSING_CURLY);
     exit_section_(b, m, MULTIPLE_ALIASES, r);
     return r;
@@ -4838,7 +4836,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // OPENING_CURLY
-  //           containerArgumentsMaybe eolStar
+  //           containerArgumentsMaybe
   //           CLOSING_CURLY
   public static boolean tuple(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "tuple")) return false;
@@ -4847,7 +4845,6 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b);
     r = consumeToken(b, OPENING_CURLY);
     r = r && containerArgumentsMaybe(b, l + 1);
-    r = r && eolStar(b, l + 1);
     r = r && consumeToken(b, CLOSING_CURLY);
     exit_section_(b, m, TUPLE, r);
     return r;
