@@ -2050,15 +2050,13 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // eolStar IN_OPERATOR eolStar
+  // IN_OPERATOR
   public static boolean inInfixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "inInfixOperator")) return false;
-    if (!nextTokenIs(b, "<in>", EOL, IN_OPERATOR)) return false;
+    if (!nextTokenIs(b, "<in>", IN_OPERATOR)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, IN_INFIX_OPERATOR, "<in>");
-    r = eolStar(b, l + 1);
-    r = r && consumeToken(b, IN_OPERATOR);
-    r = r && eolStar(b, l + 1);
+    r = consumeToken(b, IN_OPERATOR);
     exit_section_(b, l, m, r, false, null);
     return r;
   }

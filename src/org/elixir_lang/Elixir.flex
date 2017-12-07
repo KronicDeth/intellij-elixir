@@ -676,6 +676,7 @@ ANY = [^]
   {LAST_EOL} / {REFERENCABLE_OPERATOR}{REFERENCE_INFIX_OPERATOR} { handleLastEOL();
                                                                    return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {IN_MATCH_OPERATOR}    { return TokenType.WHITE_SPACE; }
+  {MULTILINE_WHITE_SPACE} / {IN_OPERATOR}          { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {MATCH_OPERATOR}       { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {PIPE_OPERATOR}        { return TokenType.WHITE_SPACE; }
   {LAST_EOL}              / {OPENING_BIT}          { handleLastEOL();
@@ -745,7 +746,7 @@ ANY = [^]
   {OPENING_PARENTHESIS}                      { pushAndBegin(MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.OPENING_PARENTHESIS; }
   // Must be before {IDENTIFIER_TOKEN} as "in" would be parsed as an identifier since it's a lowercase alphanumeric.
-  {IN_OPERATOR}                              { pushAndBegin(KEYWORD_PAIR_MAYBE);
+  {IN_OPERATOR}                              { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.IN_OPERATOR; }
   // Must be before {IDENTIFIER_TOKEN} as "nil" would be parsed as an identifier since it's a lowercase alphanumeric.
   {NIL}                                      { pushAndBegin(KEYWORD_PAIR_MAYBE);
