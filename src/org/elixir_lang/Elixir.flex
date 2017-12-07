@@ -676,6 +676,9 @@ ANY = [^]
   {MULTILINE_WHITE_SPACE} / {IN_MATCH_OPERATOR}    { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {MATCH_OPERATOR}       { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {PIPE_OPERATOR}        { return TokenType.WHITE_SPACE; }
+  {LAST_EOL}              / {OPENING_BIT}          { handleLastEOL();
+                                                     return TokenType.WHITE_SPACE; }
+  {MULTILINE_WHITE_SPACE} / {RELATIONAL_OPERATOR}  { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {SEMICOLON}            { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {STAB_OPERATOR}        { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {TYPE_OPERATOR}        { return TokenType.WHITE_SPACE; }
@@ -780,7 +783,7 @@ ANY = [^]
                                                return ElixirTypes.PIPE_OPERATOR; }
   {RANGE_OPERATOR}                           { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.RANGE_OPERATOR; }
-  {RELATIONAL_OPERATOR}                      { pushAndBegin(KEYWORD_PAIR_MAYBE);
+  {RELATIONAL_OPERATOR}                      { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.RELATIONAL_OPERATOR; }
   {SEMICOLON}                                { pushAndBegin(MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.SEMICOLON; }

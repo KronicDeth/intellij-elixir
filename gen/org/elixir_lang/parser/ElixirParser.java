@@ -4284,15 +4284,13 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // eolStar RELATIONAL_OPERATOR eolStar
+  // RELATIONAL_OPERATOR
   public static boolean relationalInfixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "relationalInfixOperator")) return false;
-    if (!nextTokenIs(b, "<<, >, <=, >=>", EOL, RELATIONAL_OPERATOR)) return false;
+    if (!nextTokenIs(b, "<<, >, <=, >=>", RELATIONAL_OPERATOR)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, RELATIONAL_INFIX_OPERATOR, "<<, >, <=, >=>");
-    r = eolStar(b, l + 1);
-    r = r && consumeToken(b, RELATIONAL_OPERATOR);
-    r = r && eolStar(b, l + 1);
+    r = consumeToken(b, RELATIONAL_OPERATOR);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
