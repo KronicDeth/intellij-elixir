@@ -2765,7 +2765,7 @@ private eexWhitespace ::= EEX_CLOSING EEX_OPENING EEX_EMPTY_MARKER
 private doStabSeparator ::= endOfExpression | eexWhitespace
 private doStabSeparatorMaybe ::= doStabSeparator?
 // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L272-L275
-doBlock ::= eolStar DO doStabSeparatorMaybe
+doBlock ::= DO doStabSeparatorMaybe
             stab? stabBodyExpressionSeparatorMaybe // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L273
             blockList? stabBodyExpressionSeparatorMaybe // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L274
             END

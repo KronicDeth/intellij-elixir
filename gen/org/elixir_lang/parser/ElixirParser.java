@@ -1510,22 +1510,21 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // eolStar DO doStabSeparatorMaybe
+  // DO doStabSeparatorMaybe
   //             stab? stabBodyExpressionSeparatorMaybe // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L273
   //             blockList? stabBodyExpressionSeparatorMaybe // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L274
   //             END
   public static boolean doBlock(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "doBlock")) return false;
-    if (!nextTokenIs(b, "<do block>", DO, EOL)) return false;
+    if (!nextTokenIs(b, DO)) return false;
     boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, DO_BLOCK, "<do block>");
-    r = eolStar(b, l + 1);
-    r = r && consumeToken(b, DO);
+    Marker m = enter_section_(b, l, _NONE_, DO_BLOCK, null);
+    r = consumeToken(b, DO);
     p = r; // pin = DO
     r = r && report_error_(b, doStabSeparatorMaybe(b, l + 1));
-    r = p && report_error_(b, doBlock_3(b, l + 1)) && r;
+    r = p && report_error_(b, doBlock_2(b, l + 1)) && r;
     r = p && report_error_(b, stabBodyExpressionSeparatorMaybe(b, l + 1)) && r;
-    r = p && report_error_(b, doBlock_5(b, l + 1)) && r;
+    r = p && report_error_(b, doBlock_4(b, l + 1)) && r;
     r = p && report_error_(b, stabBodyExpressionSeparatorMaybe(b, l + 1)) && r;
     r = p && consumeToken(b, END) && r;
     exit_section_(b, l, m, r, p, null);
@@ -1533,15 +1532,15 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   // stab?
-  private static boolean doBlock_3(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "doBlock_3")) return false;
+  private static boolean doBlock_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "doBlock_2")) return false;
     stab(b, l + 1);
     return true;
   }
 
   // blockList?
-  private static boolean doBlock_5(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "doBlock_5")) return false;
+  private static boolean doBlock_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "doBlock_4")) return false;
     blockList(b, l + 1);
     return true;
   }

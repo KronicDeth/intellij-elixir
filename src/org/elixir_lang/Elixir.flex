@@ -666,6 +666,7 @@ ANY = [^]
   {MULTILINE_WHITE_SPACE} / {COMMENT}              { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {CLOSING_BRACKET}      { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {COMPARISON_OPERATOR}  { return TokenType.WHITE_SPACE; }
+  {MULTILINE_WHITE_SPACE} / {DO}                   { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {END}                  { return TokenType.WHITE_SPACE; }
   {LAST_EOL} / {REFERENCABLE_OPERATOR}{REFERENCE_INFIX_OPERATOR} { handleLastEOL();
                                                                    return TokenType.WHITE_SPACE; }
