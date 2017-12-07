@@ -160,7 +160,7 @@ public class YYInitialTest extends TokenTest {
                         { "truest", ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_OR_KEYWORD_PAIR_MAYBE, true },
                         { "when", ElixirTypes.WHEN_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE, true },
                         { "whenever", ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_OR_KEYWORD_PAIR_MAYBE, true },
-                        { "{}", ElixirTypes.OPENING_CURLY, INITIAL_STATE, false },
+                        { "{}", ElixirTypes.OPENING_CURLY, MULTILINE_WHITE_SPACE_MAYBE, false },
                         { "|", ElixirTypes.PIPE_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE, true },
                         { "|>", ElixirTypes.ARROW_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
                         { "||", ElixirTypes.OR_SYMBOL_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE, true },

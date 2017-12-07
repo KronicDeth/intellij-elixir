@@ -138,7 +138,7 @@ public class HexadecimalIntegerTest extends TokenTest {
                 { "x", ElixirTypes.INVALID_HEXADECIMAL_DIGITS, ElixirFlexLexer.HEXADECIMAL_WHOLE_NUMBER },
                 { "y", ElixirTypes.INVALID_HEXADECIMAL_DIGITS, ElixirFlexLexer.HEXADECIMAL_WHOLE_NUMBER },
                 { "z", ElixirTypes.INVALID_HEXADECIMAL_DIGITS, ElixirFlexLexer.HEXADECIMAL_WHOLE_NUMBER },
-                { "{", ElixirTypes.OPENING_CURLY, ElixirFlexLexer.YYINITIAL },
+                { "{", ElixirTypes.OPENING_CURLY, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE },
                 { "|", ElixirTypes.PIPE_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE },
                 { "}", ElixirTypes.CLOSING_CURLY, ElixirFlexLexer.YYINITIAL },
                 { "~", ElixirTypes.TILDE, ElixirFlexLexer.SIGIL }

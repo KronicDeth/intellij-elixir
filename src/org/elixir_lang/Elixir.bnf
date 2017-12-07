@@ -1809,7 +1809,7 @@ matchedQualifiedAlias ::= matchedExpression dotInfixOperator alias
 matchedQualifiedMultipleAliases ::= matchedExpression dotInfixOperator multipleAliases
 
 // same rules as tuple, but quoting is different, so separate rule.
-multipleAliases ::= OPENING_CURLY eolStar
+multipleAliases ::= OPENING_CURLY
                     containerArgumentsMaybe eolStar
                     CLOSING_CURLY
                     {
@@ -2075,7 +2075,7 @@ mapConstructionArguments ::= mapTailArguments
                                ]
                              }
 
-mapArguments ::= OPENING_CURLY eolStar
+mapArguments ::= OPENING_CURLY
                  (
                   // Must be before mapConstructionArguments, so that PIPE_OPERATOR is used for updates and not matchedExpression.
                   mapUpdateArguments |
@@ -2209,7 +2209,7 @@ parentheticalStab ::= OPENING_PARENTHESIS
  * Tuple
  */
 
-tuple ::= OPENING_CURLY eolStar
+tuple ::= OPENING_CURLY
           containerArgumentsMaybe eolStar
           CLOSING_CURLY
           { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }

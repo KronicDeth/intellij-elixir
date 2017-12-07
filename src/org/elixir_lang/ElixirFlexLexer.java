@@ -1308,6 +1308,7 @@ public class ElixirFlexLexer implements FlexLexer {
           case 2: 
             { // use stack to match up nested OPENING_CURLY and CLOSING_CURLY
                                                pushAndBegin(YYINITIAL);
+                                               pushAndBegin(MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.OPENING_CURLY;
             }
           case 190: break;

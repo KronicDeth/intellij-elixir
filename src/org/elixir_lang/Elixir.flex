@@ -730,6 +730,7 @@ ANY = [^]
                                                return ElixirTypes.TUPLE_OPERATOR; }
   {OPENING_CURLY}                            { // use stack to match up nested OPENING_CURLY and CLOSING_CURLY
                                                pushAndBegin(YYINITIAL);
+                                               pushAndBegin(MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.OPENING_CURLY; }
   {OPENING_PARENTHESIS}                      { pushAndBegin(MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.OPENING_PARENTHESIS; }
