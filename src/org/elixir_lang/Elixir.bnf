@@ -1415,7 +1415,7 @@ inInfixOperator ::= IN_OPERATOR
 // methods defined by "infix operations" section above
 matchedInOperation ::= matchedExpression inInfixOperator matchedExpression
 
-notInfixOperator ::= eolStar NOT_OPERATOR eolStar
+notInfixOperator ::= NOT_OPERATOR
                      {
                        implements = "org.elixir_lang.psi.Operator"
                          methods = [
@@ -1509,7 +1509,7 @@ multiplicationInfixOperator ::= eolStar (DIVISION_OPERATOR | MULTIPLICATION_OPER
 matchedMultiplicationOperation ::= matchedExpression multiplicationInfixOperator matchedExpression
 
 unaryPrefixOperator ::= (significantWhiteSpaceMaybe DUAL_OPERATOR | SIGN_OPERATOR | UNARY_OPERATOR) eolStar |
-                        NOT_OPERATOR eolStar !inInfixOperator
+                        NOT_OPERATOR !IN_OPERATOR
                         {
                           implements = "org.elixir_lang.psi.Operator"
                           methods = [

@@ -3914,15 +3914,13 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // eolStar NOT_OPERATOR eolStar
+  // NOT_OPERATOR
   public static boolean notInfixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "notInfixOperator")) return false;
-    if (!nextTokenIs(b, "<not>", EOL, NOT_OPERATOR)) return false;
+    if (!nextTokenIs(b, "<not>", NOT_OPERATOR)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, NOT_INFIX_OPERATOR, "<not>");
-    r = eolStar(b, l + 1);
-    r = r && consumeToken(b, NOT_OPERATOR);
-    r = r && eolStar(b, l + 1);
+    r = consumeToken(b, NOT_OPERATOR);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
@@ -4869,7 +4867,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // (significantWhiteSpaceMaybe DUAL_OPERATOR | SIGN_OPERATOR | UNARY_OPERATOR) eolStar |
-  //                         NOT_OPERATOR eolStar !inInfixOperator
+  //                         NOT_OPERATOR !IN_OPERATOR
   public static boolean unaryPrefixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unaryPrefixOperator")) return false;
     boolean r;
@@ -4914,24 +4912,23 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // NOT_OPERATOR eolStar !inInfixOperator
+  // NOT_OPERATOR !IN_OPERATOR
   private static boolean unaryPrefixOperator_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unaryPrefixOperator_1")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, NOT_OPERATOR);
-    r = r && eolStar(b, l + 1);
-    r = r && unaryPrefixOperator_1_2(b, l + 1);
+    r = r && unaryPrefixOperator_1_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
-  // !inInfixOperator
-  private static boolean unaryPrefixOperator_1_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "unaryPrefixOperator_1_2")) return false;
+  // !IN_OPERATOR
+  private static boolean unaryPrefixOperator_1_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "unaryPrefixOperator_1_1")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NOT_);
-    r = !inInfixOperator(b, l + 1);
+    r = !consumeToken(b, IN_OPERATOR);
     exit_section_(b, l, m, r, false, null);
     return r;
   }

@@ -1,0 +1,8 @@
+Elixir File(0,8)
+  ElixirUnmatchedUnaryOperationImpl(UNMATCHED_UNARY_OPERATION)(0,8)
+    ElixirUnaryPrefixOperatorImpl(UNARY_PREFIX_OPERATOR)(0,3)
+      PsiElement(not)('not')(0,3)
+    PsiWhiteSpace('\n\n')(3,5)
+    UNMATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL(5,8)
+      ElixirIdentifierImpl(IDENTIFIER)(5,8)
+        PsiElement(identifier)('one')(5,8)

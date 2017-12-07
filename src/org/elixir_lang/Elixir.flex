@@ -752,7 +752,7 @@ ANY = [^]
   {NIL}                                      { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.NIL; }
   // Must be before {IDENTIFIER_TOKEN} as "not" would be parsed as an identifier since it's a lowercase alphanumeric.
-  {NOT_OPERATOR}                             { pushAndBegin(KEYWORD_PAIR_MAYBE);
+  {NOT_OPERATOR}                             { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.NOT_OPERATOR; }
   // Must be before {IDENTIFIER_TOKEN} as "or" would be parsed as an identifier since it's a lowercase alphanumeric.
   {OR_WORD_OPERATOR}                         { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
