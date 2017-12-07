@@ -90,6 +90,11 @@ public class EOLtoWhitespace extends ParsingTestCase {
       assertParsedAndQuotedCorrectly();
    }
 
+   public void testTwo() {
+      doTest(true);
+      assertWithoutLocalError();
+   }
+
    public void testWhen() {
       assertParsedAndQuotedCorrectly();
    }

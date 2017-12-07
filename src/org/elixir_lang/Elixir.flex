@@ -679,9 +679,11 @@ ANY = [^]
   {MULTILINE_WHITE_SPACE} / {PIPE_OPERATOR}        { return TokenType.WHITE_SPACE; }
   {LAST_EOL}              / {OPENING_BIT}          { handleLastEOL();
                                                      return TokenType.WHITE_SPACE; }
+  {MULTILINE_WHITE_SPACE} / {RANGE_OPERATOR}       { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {RELATIONAL_OPERATOR}  { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {SEMICOLON}            { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {STAB_OPERATOR}        { return TokenType.WHITE_SPACE; }
+  {MULTILINE_WHITE_SPACE} / {TWO_OPERATOR}         { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {TYPE_OPERATOR}        { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {WHEN_OPERATOR}        { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {OR_SYMBOL_OPERATOR}   { return TokenType.WHITE_SPACE; }
@@ -782,7 +784,7 @@ ANY = [^]
                                                return ElixirTypes.OR_SYMBOL_OPERATOR; }
   {PIPE_OPERATOR}                            { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.PIPE_OPERATOR; }
-  {RANGE_OPERATOR}                           { pushAndBegin(KEYWORD_PAIR_MAYBE);
+  {RANGE_OPERATOR}                           { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.RANGE_OPERATOR; }
   {RELATIONAL_OPERATOR}                      { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.RELATIONAL_OPERATOR; }
@@ -794,7 +796,7 @@ ANY = [^]
                                                return ElixirTypes.STRUCT_OPERATOR; }
   {TILDE}                                    { pushAndBegin(SIGIL);
                                                return ElixirTypes.TILDE; }
-  {TWO_OPERATOR}                             { pushAndBegin(KEYWORD_PAIR_MAYBE);
+  {TWO_OPERATOR}                             { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.TWO_OPERATOR; }
   {UNARY_OPERATOR}                           { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.UNARY_OPERATOR; }
