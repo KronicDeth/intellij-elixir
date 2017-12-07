@@ -1025,7 +1025,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // OPENING_BIT eolStar
-  //               containerArguments? eolStar
+  //               containerArguments?
   //               CLOSING_BIT
   public static boolean bitString(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "bitString")) return false;
@@ -1035,7 +1035,6 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     r = consumeToken(b, OPENING_BIT);
     r = r && eolStar(b, l + 1);
     r = r && bitString_2(b, l + 1);
-    r = r && eolStar(b, l + 1);
     r = r && consumeToken(b, CLOSING_BIT);
     exit_section_(b, m, BIT_STRING, r);
     return r;

@@ -2219,7 +2219,7 @@ tuple ::= OPENING_CURLY eolStar
  */
 
 bitString ::= OPENING_BIT eolStar
-              containerArguments? eolStar
+              containerArguments?
               CLOSING_BIT
               { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
