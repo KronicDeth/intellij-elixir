@@ -919,14 +919,13 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // AT_OPERATOR eolStar
+  // AT_OPERATOR
   public static boolean atPrefixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "atPrefixOperator")) return false;
     if (!nextTokenIs(b, "<@>", AT_OPERATOR)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, AT_PREFIX_OPERATOR, "<@>");
     r = consumeToken(b, AT_OPERATOR);
-    r = r && eolStar(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }

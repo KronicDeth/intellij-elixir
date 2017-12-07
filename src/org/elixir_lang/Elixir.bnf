@@ -1891,7 +1891,7 @@ matchedUnqualifiedParenthesesCall ::= identifier matchedParenthesesArguments
                                         stubClass = "org.elixir_lang.psi.stub.MatchedUnqualifiedParenthesesCall"
                                       }
 
-atPrefixOperator ::= AT_OPERATOR eolStar
+atPrefixOperator ::= AT_OPERATOR
                      {
                        implements = "org.elixir_lang.psi.Operator"
                        methods = [

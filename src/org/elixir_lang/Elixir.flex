@@ -631,7 +631,7 @@ ANY = [^]
                                                return ElixirTypes.ASSOCIATION_OPERATOR; }
   {ALIAS}                                    { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.ALIAS_TOKEN; }
-  {AT_OPERATOR}                              { pushAndBegin(KEYWORD_PAIR_MAYBE);
+  {AT_OPERATOR}                              { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.AT_OPERATOR; }
   {BASE_WHOLE_NUMBER_PREFIX} / {BASE_WHOLE_NUMBER_BASE} { pushAndBegin(BASE_WHOLE_NUMBER_BASE);
                                                           return ElixirTypes.BASE_WHOLE_NUMBER_PREFIX; }

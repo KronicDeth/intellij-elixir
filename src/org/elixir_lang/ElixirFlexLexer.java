@@ -1396,7 +1396,7 @@ public class ElixirFlexLexer implements FlexLexer {
             // fall through
           case 202: break;
           case 15: 
-            { pushAndBegin(KEYWORD_PAIR_MAYBE);
+            { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.AT_OPERATOR;
             } 
             // fall through
