@@ -792,15 +792,13 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // eolStar ARROW_OPERATOR eolStar
+  // ARROW_OPERATOR
   public static boolean arrowInfixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "arrowInfixOperator")) return false;
-    if (!nextTokenIs(b, "<<~, |>, ~>, <<<, <<~, <|>, <~>, >>>, ~>>>", ARROW_OPERATOR, EOL)) return false;
+    if (!nextTokenIs(b, "<<~, |>, ~>, <<<, <<~, <|>, <~>, >>>, ~>>>", ARROW_OPERATOR)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, ARROW_INFIX_OPERATOR, "<<~, |>, ~>, <<<, <<~, <|>, <~>, >>>, ~>>>");
-    r = eolStar(b, l + 1);
-    r = r && consumeToken(b, ARROW_OPERATOR);
-    r = r && eolStar(b, l + 1);
+    r = consumeToken(b, ARROW_OPERATOR);
     exit_section_(b, l, m, r, false, null);
     return r;
   }

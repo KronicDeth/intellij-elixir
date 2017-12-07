@@ -625,7 +625,7 @@ ANY = [^]
                                                return ElixirTypes.AND_SYMBOL_OPERATOR; }
   {AND_WORD_OPERATOR}                        { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.AND_WORD_OPERATOR; }
-  {ARROW_OPERATOR}                           { pushAndBegin(KEYWORD_PAIR_MAYBE);
+  {ARROW_OPERATOR}                           { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.ARROW_OPERATOR; }
   {ASSOCIATION_OPERATOR}                     { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.ASSOCIATION_OPERATOR; }
@@ -663,6 +663,7 @@ ANY = [^]
   {ESCAPED_EOL}|{WHITE_SPACE}+                     { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {AND_SYMBOL_OPERATOR}  { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {AND_WORD_OPERATOR}    { return TokenType.WHITE_SPACE; }
+  {MULTILINE_WHITE_SPACE} / {ARROW_OPERATOR}       { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {ASSOCIATION_OPERATOR} { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {COMMENT}              { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {CLOSING_BIT}          { return TokenType.WHITE_SPACE; }

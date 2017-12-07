@@ -1384,7 +1384,7 @@ matchedRelationalOperation ::= matchedExpression relationalInfixOperator matched
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L61
  */
 
-arrowInfixOperator ::= eolStar ARROW_OPERATOR eolStar
+arrowInfixOperator ::= ARROW_OPERATOR
                        {
                          implements = "org.elixir_lang.psi.Operator"
                          methods = [
