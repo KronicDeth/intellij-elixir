@@ -3271,14 +3271,13 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // STRUCT_OPERATOR eolStar
+  // STRUCT_OPERATOR
   public static boolean mapPrefixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "mapPrefixOperator")) return false;
     if (!nextTokenIs(b, "<%>", STRUCT_OPERATOR)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, MAP_PREFIX_OPERATOR, "<%>");
     r = consumeToken(b, STRUCT_OPERATOR);
-    r = r && eolStar(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
@@ -4802,7 +4801,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // mapPrefixOperator mapExpression eolStar mapArguments
+  // mapPrefixOperator mapExpression mapArguments
   public static boolean structOperation(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "structOperation")) return false;
     if (!nextTokenIs(b, STRUCT_OPERATOR)) return false;
@@ -4810,7 +4809,6 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b);
     r = mapPrefixOperator(b, l + 1);
     r = r && mapExpression(b, l + 1);
-    r = r && eolStar(b, l + 1);
     r = r && mapArguments(b, l + 1);
     exit_section_(b, m, STRUCT_OPERATION, r);
     return r;

@@ -1970,7 +1970,7 @@ unaryNumericOperation ::= <<ifVersion "LT" "1.5">> unaryPrefixOperator numeric
  *
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L521-L522
  */
-mapPrefixOperator ::= STRUCT_OPERATOR eolStar
+mapPrefixOperator ::= STRUCT_OPERATOR
                       {
                         implements = "org.elixir_lang.psi.Operator"
                         methods = [
@@ -2088,7 +2088,7 @@ mapArguments ::= OPENING_CURLY
 mapOperation ::= mapPrefixOperator mapArguments
                  { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
-structOperation ::= mapPrefixOperator mapExpression eolStar mapArguments
+structOperation ::= mapPrefixOperator mapExpression mapArguments
                     { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 private map ::= mapOperation |
