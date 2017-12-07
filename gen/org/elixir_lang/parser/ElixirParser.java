@@ -3610,12 +3610,12 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   // stabInfixOperator stabBody?
   public static boolean noArgumentStabOperation(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "noArgumentStabOperation")) return false;
-    if (!nextTokenIs(b, "<no argument stab operation>", EOL, STAB_OPERATOR)) return false;
+    if (!nextTokenIs(b, STAB_OPERATOR)) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, STAB_OPERATION, "<no argument stab operation>");
+    Marker m = enter_section_(b);
     r = stabInfixOperator(b, l + 1);
     r = r && noArgumentStabOperation_1(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
+    exit_section_(b, m, STAB_OPERATION, r);
     return r;
   }
 
@@ -4589,15 +4589,13 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // eolStar STAB_OPERATOR eolStar
+  // STAB_OPERATOR
   public static boolean stabInfixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "stabInfixOperator")) return false;
-    if (!nextTokenIs(b, "<->>", EOL, STAB_OPERATOR)) return false;
+    if (!nextTokenIs(b, "<->>", STAB_OPERATOR)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, STAB_INFIX_OPERATOR, "<->>");
-    r = eolStar(b, l + 1);
-    r = r && consumeToken(b, STAB_OPERATOR);
-    r = r && eolStar(b, l + 1);
+    r = consumeToken(b, STAB_OPERATOR);
     exit_section_(b, l, m, r, false, null);
     return r;
   }

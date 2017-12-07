@@ -2128,7 +2128,7 @@ stabParenthesesSignature ::= parenthesesArguments (whenInfixOperator expression)
                                ]
                              }
 
-stabInfixOperator ::= eolStar STAB_OPERATOR eolStar
+stabInfixOperator ::= STAB_OPERATOR
                       {
                         implements = "org.elixir_lang.psi.Operator"
                         methods = [
