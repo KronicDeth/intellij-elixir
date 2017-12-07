@@ -704,7 +704,8 @@ ANY = [^]
      {ARROW_OPERATOR} because {ARROW_OPERATOR} includes "<<<", which is a longer match than {OPENING_BIT}'s "<<"; and
      must be before {COMPARISON_OPERATOR} as {COMPARISON_OPERATOR} includes "<" which would match the begining of
      {OPENING_BIT}. */
-  {OPENING_BIT}                              { return ElixirTypes.OPENING_BIT; }
+  {OPENING_BIT}                              { pushAndBegin(MULTILINE_WHITE_SPACE_MAYBE);
+                                               return ElixirTypes.OPENING_BIT; }
   {COMPARISON_OPERATOR}                      { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.COMPARISON_OPERATOR; }
   {DIVISION_OPERATOR}                        { pushAndBegin(KEYWORD_PAIR_MAYBE);

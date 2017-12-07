@@ -145,7 +145,7 @@ public class ParenthesesCallTest extends Test {
                         {
                                 "<<>>",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.OPENING_BIT, ElixirFlexLexer.YYINITIAL),
+                                        new TokenTypeState(ElixirTypes.OPENING_BIT, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.CLOSING_BIT, ElixirFlexLexer.YYINITIAL),
                                         new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE)
                                 )

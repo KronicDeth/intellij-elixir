@@ -1810,7 +1810,7 @@ matchedQualifiedMultipleAliases ::= matchedExpression dotInfixOperator multipleA
 
 // same rules as tuple, but quoting is different, so separate rule.
 multipleAliases ::= OPENING_CURLY eolStar
-                    containerArguments? eolStar
+                    containerArgumentsMaybe eolStar
                     CLOSING_CURLY
                     {
                       implements = "org.elixir_lang.psi.Quotable"
@@ -2210,7 +2210,7 @@ parentheticalStab ::= OPENING_PARENTHESIS
  */
 
 tuple ::= OPENING_CURLY eolStar
-          containerArguments? eolStar
+          containerArgumentsMaybe eolStar
           CLOSING_CURLY
           { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
@@ -2218,8 +2218,8 @@ tuple ::= OPENING_CURLY eolStar
  * Bit String
  */
 
-bitString ::= OPENING_BIT eolStar
-              containerArguments?
+bitString ::= OPENING_BIT
+              containerArgumentsMaybe
               CLOSING_BIT
               { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
@@ -3090,6 +3090,7 @@ interpolation ::= INTERPOLATION_START elixirFile INTERPOLATION_END
 
 private containerArgumentsBase ::= containerExpression (infixComma containerExpression)*
 private containerArguments ::= containerArgumentsBase (infixComma keywords | infixComma)?
+private containerArgumentsMaybe ::= containerArguments?
 
 private listArguments ::= keywords |
                           containerArguments

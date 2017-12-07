@@ -1024,8 +1024,8 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // OPENING_BIT eolStar
-  //               containerArguments?
+  // OPENING_BIT
+  //               containerArgumentsMaybe
   //               CLOSING_BIT
   public static boolean bitString(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "bitString")) return false;
@@ -1033,18 +1033,10 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, OPENING_BIT);
-    r = r && eolStar(b, l + 1);
-    r = r && bitString_2(b, l + 1);
+    r = r && containerArgumentsMaybe(b, l + 1);
     r = r && consumeToken(b, CLOSING_BIT);
     exit_section_(b, m, BIT_STRING, r);
     return r;
-  }
-
-  // containerArguments?
-  private static boolean bitString_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "bitString_2")) return false;
-    containerArguments(b, l + 1);
-    return true;
   }
 
   /* ********************************************************** */
@@ -1345,6 +1337,14 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     r = r && containerExpression(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
+  }
+
+  /* ********************************************************** */
+  // containerArguments?
+  static boolean containerArgumentsMaybe(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "containerArgumentsMaybe")) return false;
+    containerArguments(b, l + 1);
+    return true;
   }
 
   /* ********************************************************** */
@@ -3570,7 +3570,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // OPENING_CURLY eolStar
-  //                     containerArguments? eolStar
+  //                     containerArgumentsMaybe eolStar
   //                     CLOSING_CURLY
   public static boolean multipleAliases(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "multipleAliases")) return false;
@@ -3579,18 +3579,11 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b);
     r = consumeToken(b, OPENING_CURLY);
     r = r && eolStar(b, l + 1);
-    r = r && multipleAliases_2(b, l + 1);
+    r = r && containerArgumentsMaybe(b, l + 1);
     r = r && eolStar(b, l + 1);
     r = r && consumeToken(b, CLOSING_CURLY);
     exit_section_(b, m, MULTIPLE_ALIASES, r);
     return r;
-  }
-
-  // containerArguments?
-  private static boolean multipleAliases_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "multipleAliases_2")) return false;
-    containerArguments(b, l + 1);
-    return true;
   }
 
   /* ********************************************************** */
@@ -4847,7 +4840,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // OPENING_CURLY eolStar
-  //           containerArguments? eolStar
+  //           containerArgumentsMaybe eolStar
   //           CLOSING_CURLY
   public static boolean tuple(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "tuple")) return false;
@@ -4856,18 +4849,11 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b);
     r = consumeToken(b, OPENING_CURLY);
     r = r && eolStar(b, l + 1);
-    r = r && tuple_2(b, l + 1);
+    r = r && containerArgumentsMaybe(b, l + 1);
     r = r && eolStar(b, l + 1);
     r = r && consumeToken(b, CLOSING_CURLY);
     exit_section_(b, m, TUPLE, r);
     return r;
-  }
-
-  // containerArguments?
-  private static boolean tuple_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "tuple_2")) return false;
-    containerArguments(b, l + 1);
-    return true;
   }
 
   /* ********************************************************** */
