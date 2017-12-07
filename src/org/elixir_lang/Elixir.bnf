@@ -1431,7 +1431,7 @@ matchedNotInOperation ::= matchedExpression <<ifVersion "GE" "1.5.0">> notInfixO
  *
  * @see https://github.com/elixir-lang/elixir/blob/3487d00ddb5e90c7cf0e65d03717903b9b27eafd/lib/elixir/src/elixir_parser.yrl#L67
  */
-threeInfixOperator ::= eolStar THREE_OPERATOR eolStar
+threeInfixOperator ::= THREE_OPERATOR
                        {
                          implements = "org.elixir_lang.psi.Operator"
                          methods = [

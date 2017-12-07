@@ -4798,15 +4798,13 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // eolStar THREE_OPERATOR eolStar
+  // THREE_OPERATOR
   public static boolean threeInfixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "threeInfixOperator")) return false;
-    if (!nextTokenIs(b, "<^^^>", EOL, THREE_OPERATOR)) return false;
+    if (!nextTokenIs(b, "<^^^>", THREE_OPERATOR)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, THREE_INFIX_OPERATOR, "<^^^>");
-    r = eolStar(b, l + 1);
-    r = r && consumeToken(b, THREE_OPERATOR);
-    r = r && eolStar(b, l + 1);
+    r = consumeToken(b, THREE_OPERATOR);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
