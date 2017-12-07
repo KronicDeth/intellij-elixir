@@ -4051,7 +4051,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   //                          (
   //                           unqualifiedNoParenthesesManyArgumentsCall | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L485
   //                           keywords | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L486
-  //                           parenthesesPositionalArguments (infixComma keywords)?)? eolStar // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L487-L488
+  //                           parenthesesPositionalArguments (infixComma keywords)?)? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L487-L488
   //                          CLOSING_PARENTHESIS
   public static boolean parenthesesArguments(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "parenthesesArguments")) return false;
@@ -4060,7 +4060,6 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b);
     r = consumeToken(b, OPENING_PARENTHESIS);
     r = r && parenthesesArguments_1(b, l + 1);
-    r = r && eolStar(b, l + 1);
     r = r && consumeToken(b, CLOSING_PARENTHESIS);
     exit_section_(b, m, PARENTHESES_ARGUMENTS, r);
     return r;
@@ -4128,7 +4127,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   /* ********************************************************** */
   // OPENING_PARENTHESIS
   //                       (semicolonMaybe stab semicolonMaybe | SEMICOLON)
-  //                       eolStar CLOSING_PARENTHESIS
+  //                       CLOSING_PARENTHESIS
   public static boolean parentheticalStab(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "parentheticalStab")) return false;
     if (!nextTokenIs(b, OPENING_PARENTHESIS)) return false;
@@ -4136,7 +4135,6 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b);
     r = consumeToken(b, OPENING_PARENTHESIS);
     r = r && parentheticalStab_1(b, l + 1);
-    r = r && eolStar(b, l + 1);
     r = r && consumeToken(b, CLOSING_PARENTHESIS);
     exit_section_(b, m, PARENTHETICAL_STAB, r);
     return r;

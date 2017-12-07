@@ -1602,7 +1602,7 @@ parenthesesArguments ::= OPENING_PARENTHESIS
                          (
                           unqualifiedNoParenthesesManyArgumentsCall | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L485
                           keywords | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L486
-                          parenthesesPositionalArguments (infixComma keywords)?)? eolStar // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L487-L488
+                          parenthesesPositionalArguments (infixComma keywords)?)? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L487-L488
                          CLOSING_PARENTHESIS
                          {
                            implements = [
@@ -2202,7 +2202,7 @@ private semicolonMaybe ::= SEMICOLON?
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L206-L210
 parentheticalStab ::= OPENING_PARENTHESIS
                       (semicolonMaybe stab semicolonMaybe | SEMICOLON)
-                      eolStar CLOSING_PARENTHESIS
+                      CLOSING_PARENTHESIS
                       { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 /*
