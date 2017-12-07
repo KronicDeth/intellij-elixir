@@ -1980,7 +1980,7 @@ mapPrefixOperator ::= STRUCT_OPERATOR
                         name = "%"
                       }
 
-private associationInfixOperator ::= eolStar ASSOCIATION_OPERATOR eolStar
+private associationInfixOperator ::= ASSOCIATION_OPERATOR
 
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L505
 containerAssociationOperation ::= containerExpression associationInfixOperator containerExpression

@@ -806,17 +806,9 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // eolStar ASSOCIATION_OPERATOR eolStar
+  // ASSOCIATION_OPERATOR
   static boolean associationInfixOperator(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "associationInfixOperator")) return false;
-    if (!nextTokenIs(b, "", ASSOCIATION_OPERATOR, EOL)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = eolStar(b, l + 1);
-    r = r && consumeToken(b, ASSOCIATION_OPERATOR);
-    r = r && eolStar(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
+    return consumeToken(b, ASSOCIATION_OPERATOR);
   }
 
   /* ********************************************************** */

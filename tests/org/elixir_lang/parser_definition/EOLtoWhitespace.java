@@ -5,6 +5,10 @@ public class EOLtoWhitespace extends ParsingTestCase {
       assertParsedAndQuotedCorrectly();
    }
 
+   public void testAssociation() {
+      assertParsedAndQuotedCorrectly();
+   }
+
    public void testAt() {
       doTest(true);
       assertWithoutLocalError();
