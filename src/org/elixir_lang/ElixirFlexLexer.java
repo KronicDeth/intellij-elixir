@@ -1068,6 +1068,11 @@ public class ElixirFlexLexer implements FlexLexer {
     return stack.sigilNameType();
   }
 
+  private void popAndBegin() {
+    org.elixir_lang.lexer.StackFrame stackFrame = pop();
+    yybegin(stackFrame.getLastLexicalState());
+  }
+
   // public for testing
   public void pushAndBegin(int lexicalState) {
     stack.push(yystate());
@@ -1352,8 +1357,7 @@ public class ElixirFlexLexer implements FlexLexer {
           case 3: 
             { // protect from too many "}"
                     if (!stack.empty()) {
-                      org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                      yybegin(stackFrame.getLastLexicalState());
+                      popAndBegin();
                     }
 
                     return ElixirTypes.CLOSING_CURLY;
@@ -1523,8 +1527,7 @@ public class ElixirFlexLexer implements FlexLexer {
             // fall through
           case 208: break;
           case 31: 
-            { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                     yybegin(stackFrame.getLastLexicalState());
+            { popAndBegin();
                      return ElixirTypes.ATOM_FRAGMENT;
             } 
             // fall through
@@ -1533,8 +1536,7 @@ public class ElixirFlexLexer implements FlexLexer {
             { /* At the end of the quote, return the state (YYINITIAL or INTERPOLATION) before ATOM_START as
                         anything after the closing quote should be handle by the state prior to ATOM_START.  Without
                         this, EOL and WHITESPACE won't be handled correctly */
-                     org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                     yybegin(stackFrame.getLastLexicalState());
+                     popAndBegin();
                      startQuote(yytext());
                      return promoterType();
             } 
@@ -1606,8 +1608,7 @@ public class ElixirFlexLexer implements FlexLexer {
             // fall through
           case 221: break;
           case 44: 
-            { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-             yybegin(stackFrame.getLastLexicalState());
+            { popAndBegin();
              return ElixirTypes.CHAR_LIST_FRAGMENT;
             } 
             // fall through
@@ -1734,8 +1735,7 @@ public class ElixirFlexLexer implements FlexLexer {
             // fall through
           case 242: break;
           case 65: 
-            { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                   yybegin(stackFrame.getLastLexicalState());
+            { popAndBegin();
                    return ElixirTypes.SIGNIFICANT_WHITE_SPACE;
             } 
             // fall through
@@ -1753,8 +1753,7 @@ public class ElixirFlexLexer implements FlexLexer {
             // fall through
           case 245: break;
           case 68: 
-            { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                                    yybegin(stackFrame.getLastLexicalState());
+            { popAndBegin();
                                     return ElixirTypes.ESCAPED_CHARACTER_TOKEN;
             } 
             // fall through
@@ -1766,8 +1765,7 @@ public class ElixirFlexLexer implements FlexLexer {
             // fall through
           case 247: break;
           case 70: 
-            { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                                    yybegin(stackFrame.getLastLexicalState());
+            { popAndBegin();
                                     return ElixirTypes.EOL;
             } 
             // fall through
@@ -1779,8 +1777,7 @@ public class ElixirFlexLexer implements FlexLexer {
             // fall through
           case 249: break;
           case 72: 
-            { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                             yybegin(stackFrame.getLastLexicalState());
+            { popAndBegin();
                              return ElixirTypes.CLOSING_CURLY;
             } 
             // fall through
@@ -1871,8 +1868,7 @@ public class ElixirFlexLexer implements FlexLexer {
             // fall through
           case 261: break;
           case 84: 
-            { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                             yybegin(stackFrame.getLastLexicalState());
+            { popAndBegin();
                              return ElixirTypes.VALID_HEXADECIMAL_DIGITS;
             } 
             // fall through
@@ -1883,22 +1879,19 @@ public class ElixirFlexLexer implements FlexLexer {
             // fall through
           case 263: break;
           case 86: 
-            { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                                yybegin(stackFrame.getLastLexicalState());
+            { popAndBegin();
                                 return ElixirTypes.INTERPOLATION_END;
             } 
             // fall through
           case 264: break;
           case 87: 
-            { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                                        yybegin(stackFrame.getLastLexicalState());
+            { popAndBegin();
                                         return TokenType.WHITE_SPACE;
             } 
             // fall through
           case 265: break;
           case 88: 
-            { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-          yybegin(stackFrame.getLastLexicalState());
+            { popAndBegin();
           return ElixirTypes.EOL;
             } 
             // fall through
@@ -1938,8 +1931,7 @@ public class ElixirFlexLexer implements FlexLexer {
             // fall through
           case 272: break;
           case 95: 
-            { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                                 yybegin(stackFrame.getLastLexicalState());
+            { popAndBegin();
                                  return ElixirTypes.DIVISION_OPERATOR;
             } 
             // fall through
@@ -2346,8 +2338,7 @@ public class ElixirFlexLexer implements FlexLexer {
             // lookahead expression with fixed base length
             zzMarkedPos = Character.offsetByCodePoints
                 (zzBufferL/*, zzStartRead, zzEndRead - zzStartRead*/, zzStartRead, 1);
-            { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                      yybegin(stackFrame.getLastLexicalState());
+            { popAndBegin();
                       return ElixirTypes.KEYWORD_PAIR_COLON;
             } 
             // fall through
@@ -2502,7 +2493,7 @@ public class ElixirFlexLexer implements FlexLexer {
           case 332: break;
           case 155: 
             { /* Does NOT return to CALL_MAYBE because heredocs aren't valid
-                                                         relative identifiers.  This clauses is only here to prevent a
+                                                         relative identifiers.  This clause is only here to prevent a
                                                          prefix match on {QUOTE_PROMOTER}. */
                                                       org.elixir_lang.lexer.StackFrame stackFrame = pop();
                                                       handleInState(stackFrame.getLastLexicalState());

@@ -109,6 +109,11 @@ import org.elixir_lang.psi.ElixirTypes;
     return stack.sigilNameType();
   }
 
+  private void popAndBegin() {
+    org.elixir_lang.lexer.StackFrame stackFrame = pop();
+    yybegin(stackFrame.getLastLexicalState());
+  }
+
   // public for testing
   public void pushAndBegin(int lexicalState) {
     stack.push(yystate());
@@ -828,18 +833,15 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
 
 /// Must be after {QUOTE_PROMOTER} for <ATOM_START> so that
 <ATOM_START> {
-  {ATOM}           { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                     yybegin(stackFrame.getLastLexicalState());
+  {ATOM}           { popAndBegin();
                      return ElixirTypes.ATOM_FRAGMENT; }
   {QUOTE_PROMOTER} { /* At the end of the quote, return the state (YYINITIAL or INTERPOLATION) before ATOM_START as
                         anything after the closing quote should be handle by the state prior to ATOM_START.  Without
                         this, EOL and WHITESPACE won't be handled correctly */
-                     org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                     yybegin(stackFrame.getLastLexicalState());
+                     popAndBegin();
                      startQuote(yytext());
                      return promoterType(); }
-  {OPERATOR}       { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                     yybegin(stackFrame.getLastLexicalState());
+  {OPERATOR}       { popAndBegin();
                      return ElixirTypes.ATOM_FRAGMENT; }
   {ANY}            { return TokenType.BAD_CHARACTER; }
 }
@@ -879,8 +881,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
 <CHAR_TOKENIZATION> {
   {ESCAPE} { yybegin(ESCAPE_SEQUENCE);
              return ElixirTypes.ESCAPE; }
-  {ANY}    { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-             yybegin(stackFrame.getLastLexicalState());
+  {ANY}    { popAndBegin();
              return ElixirTypes.CHAR_LIST_FRAGMENT; }
 }
 
@@ -1002,7 +1003,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
 
   /* Must be before {QUOTE_PROMOTER} as {QUOTE_PROMOTER} is a prefix of {QUOTE_HEREDOC_PROMOTER} */
   {QUOTE_HEREDOC_PROMOTER}                          { /* Does NOT return to CALL_MAYBE because heredocs aren't valid
-                                                         relative identifiers.  This clauses is only here to prevent a
+                                                         relative identifiers.  This clause is only here to prevent a
                                                          prefix match on {QUOTE_PROMOTER}. */
                                                       org.elixir_lang.lexer.StackFrame stackFrame = pop();
                                                       handleInState(stackFrame.getLastLexicalState()); }
@@ -1019,8 +1020,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
 }
 
 <DUAL_OPERATION> {
-  {WHITE_SPACE}+ { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                   yybegin(stackFrame.getLastLexicalState());
+  {WHITE_SPACE}+ { popAndBegin();
                    return ElixirTypes.SIGNIFICANT_WHITE_SPACE; }
   {ANY}          { handleInState(KEYWORD_PAIR_MAYBE); }
 }
@@ -1037,21 +1037,18 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
 }
 
 <ESCAPE_SEQUENCE> {
-  {EOL}                           { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                                    yybegin(stackFrame.getLastLexicalState());
+  {EOL}                           { popAndBegin();
                                     return ElixirTypes.EOL; }
   {HEXADECIMAL_WHOLE_NUMBER_BASE} { yybegin(HEXADECIMAL_ESCAPE_SEQUENCE);
                                     return ElixirTypes.HEXADECIMAL_WHOLE_NUMBER_BASE; }
   {UNICODE_ESCAPE_CHARACTER}      { yybegin(UNICODE_ESCAPE_SEQUENCE);
                                     return ElixirTypes.UNICODE_ESCAPE_CHARACTER; }
-  .                               { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                                    yybegin(stackFrame.getLastLexicalState());
+  .                               { popAndBegin();
                                     return ElixirTypes.ESCAPED_CHARACTER_TOKEN; }
 }
 
 <EXTENDED_HEXADECIMAL_ESCAPE_SEQUENCE> {
-  {CLOSING_CURLY}          { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                             yybegin(stackFrame.getLastLexicalState());
+  {CLOSING_CURLY}          { popAndBegin();
                              return ElixirTypes.CLOSING_CURLY; }
   {HEXADECIMAL_DIGIT}{1,6} { return ElixirTypes.VALID_HEXADECIMAL_DIGITS; }
   .                        { return TokenType.BAD_CHARACTER; }
@@ -1228,8 +1225,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
 <HEXADECIMAL_ESCAPE_SEQUENCE> {
   {OPENING_CURLY}          { yybegin(EXTENDED_HEXADECIMAL_ESCAPE_SEQUENCE);
                              return ElixirTypes.OPENING_CURLY; }
-  {HEXADECIMAL_DIGIT}{1,2} { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                             yybegin(stackFrame.getLastLexicalState());
+  {HEXADECIMAL_DIGIT}{1,2} { popAndBegin();
                              return ElixirTypes.VALID_HEXADECIMAL_DIGITS; }
 }
 
@@ -1242,16 +1238,14 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
    @note must be after <YYINITIAL, INTERPOLATION> so that BAD_CHARACTER doesn't match a single ' ' instead of
      {WHITE_SPACE}+. */
 <INTERPOLATION> {
-  {INTERPOLATION_END}         { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                                yybegin(stackFrame.getLastLexicalState());
+  {INTERPOLATION_END}         { popAndBegin();
                                 return ElixirTypes.INTERPOLATION_END; }
 }
 
 <KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE, MULTILINE_WHITE_SPACE_MAYBE> {
   {COMMENT}                           { return ElixirTypes.COMMENT; }
   {MULTILINE_WHITE_SPACE} / {COMMENT} { return TokenType.WHITE_SPACE; }
-  {MULTILINE_WHITE_SPACE}             { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                                        yybegin(stackFrame.getLastLexicalState());
+  {MULTILINE_WHITE_SPACE}             { popAndBegin();
                                         return TokenType.WHITE_SPACE; }
 }
 
@@ -1261,8 +1255,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
 }
 
 <LAST_EOL> {
-  {EOL} { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-          yybegin(stackFrame.getLastLexicalState());
+  {EOL} { popAndBegin();
           return ElixirTypes.EOL; }
 }
 
@@ -1284,8 +1277,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
 <REFERENCE_OPERATION> {
   {ESCAPED_EOL}|{WHITE_SPACE}+ { return TokenType.WHITE_SPACE; }
   {EOL}                        { return ElixirTypes.EOL; }
-  {DIVISION_OPERATOR}          { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                                 yybegin(stackFrame.getLastLexicalState());
+  {DIVISION_OPERATOR}          { popAndBegin();
                                  return ElixirTypes.DIVISION_OPERATOR; }
 }
 
@@ -1305,8 +1297,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
 }
 
 <SIGN_OPERATION_KEYWORD_PAIR_MAYBE> {
-  {COLON} / {SPACE} { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                      yybegin(stackFrame.getLastLexicalState());
+  {COLON} / {SPACE} { popAndBegin();
                       return ElixirTypes.KEYWORD_PAIR_COLON; }
   {ANY}             { handleInState(SIGN_OPERATION); }
 }
@@ -1327,8 +1318,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
 <UNICODE_ESCAPE_SEQUENCE> {
   {OPENING_CURLY}          { yybegin(EXTENDED_HEXADECIMAL_ESCAPE_SEQUENCE);
                              return ElixirTypes.OPENING_CURLY; }
-  {HEXADECIMAL_DIGIT}{1,4} { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                             yybegin(stackFrame.getLastLexicalState());
+  {HEXADECIMAL_DIGIT}{1,4} { popAndBegin();
                              return ElixirTypes.VALID_HEXADECIMAL_DIGITS; }
 }
 
@@ -1340,8 +1330,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
 <YYINITIAL> {
   {CLOSING_CURLY} { // protect from too many "}"
                     if (!stack.empty()) {
-                      org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                      yybegin(stackFrame.getLastLexicalState());
+                      popAndBegin();
                     }
 
                     return ElixirTypes.CLOSING_CURLY; }
