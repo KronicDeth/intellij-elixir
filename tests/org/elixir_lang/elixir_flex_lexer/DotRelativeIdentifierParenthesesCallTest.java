@@ -138,7 +138,7 @@ public class DotRelativeIdentifierParenthesesCallTest extends Test {
                                 "=>",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.MATCH_OPERATOR, ElixirFlexLexer.CALL_MAYBE),
-                                        new TokenTypeState(ElixirTypes.RELATIONAL_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
+                                        new TokenTypeState(ElixirTypes.RELATIONAL_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE)
                                 )
                         },
@@ -162,8 +162,8 @@ public class DotRelativeIdentifierParenthesesCallTest extends Test {
                                 "<<>>",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.RELATIONAL_OPERATOR, ElixirFlexLexer.CALL_MAYBE),
-                                        new TokenTypeState(ElixirTypes.TWO_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
-                                        new TokenTypeState(ElixirTypes.RELATIONAL_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
+                                        new TokenTypeState(ElixirTypes.TWO_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
+                                        new TokenTypeState(ElixirTypes.RELATIONAL_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE)
                                 )
                         },
@@ -445,7 +445,7 @@ public class DotRelativeIdentifierParenthesesCallTest extends Test {
                                 "%{}",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.STRUCT_OPERATOR, ElixirFlexLexer.CALL_MAYBE),
-                                        new TokenTypeState(ElixirTypes.OPENING_CURLY, ElixirFlexLexer.YYINITIAL),
+                                        new TokenTypeState(ElixirTypes.OPENING_CURLY, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.CLOSING_CURLY, ElixirFlexLexer.YYINITIAL),
                                         new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE)
                                 )
@@ -535,7 +535,7 @@ public class DotRelativeIdentifierParenthesesCallTest extends Test {
                                    valid relative identifier */
                                 "{}",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.OPENING_CURLY, ElixirFlexLexer.YYINITIAL),
+                                        new TokenTypeState(ElixirTypes.OPENING_CURLY, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.CLOSING_CURLY, ElixirFlexLexer.YYINITIAL),
                                         new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE)
                                 )
@@ -574,16 +574,14 @@ public class DotRelativeIdentifierParenthesesCallTest extends Test {
      */
 
     @org.junit.Test
-    public void identifierCall() throws IOException {
+    public void identifierCall() {
         start(identifierCharSequence);
-
-        int lastState = ElixirFlexLexer.DOT_OPERATION;
 
         assertEquals(ElixirTypes.DOT_OPERATOR, lexer.getTokenType());
 
         lexer.advance();
 
-        assertEquals(lastState, lexer.getState());
+        assertEquals(ElixirFlexLexer.DOT_OPERATION, lexer.getState());
 
         for (TokenTypeState tokenTypeState: tokenTypeStates) {
             assertEquals(tokenTypeState.tokenType, lexer.getTokenType());
@@ -591,8 +589,6 @@ public class DotRelativeIdentifierParenthesesCallTest extends Test {
             lexer.advance();
 
             assertEquals(tokenTypeState.state, lexer.getState());
-
-            lastState = tokenTypeState.state;
         }
     }
 

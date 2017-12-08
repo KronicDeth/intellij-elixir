@@ -77,10 +77,6 @@ public class MapOperationParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly(false);
     }
 
-    public void testPercentNewLineOpeningCurlyBraceNewlineClosingCurlyBrace() {
-        assertParsedAndQuotedAroundError();
-    }
-
     public void testQualifiedNoParenthesesCallAssociation() {
         assertParsedAndQuotedAroundError();
     }

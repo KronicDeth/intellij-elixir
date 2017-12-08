@@ -66,7 +66,15 @@ public class ElixirParserDefinition implements ParserDefinition {
     }
 
     public SpaceRequirements spaceExistanceTypeBetweenTokens(ASTNode left, ASTNode right) {
-        return SpaceRequirements.MAY;
+        SpaceRequirements spaceRequirements;
+
+        if (left.getElementType() == ElixirTypes.KEYWORD_PAIR_COLON) {
+            spaceRequirements = SpaceRequirements.MUST;
+        } else {
+            spaceRequirements = SpaceRequirements.MAY;
+        }
+
+        return spaceRequirements;
     }
 
     @NotNull

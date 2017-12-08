@@ -10,14 +10,14 @@ Elixir File(0,22)
       ElixirSigilModifiersImpl(SIGIL_MODIFIERS)(4,4)
         <empty list>
   PsiElement(.)('.')(4,5)
-  PsiErrorElement:'(', <relative identifier>, Alias, '\\n, \\r\\n' or '{' expected, got '''''(5,8)
+  PsiErrorElement:'(', <relative identifier>, Alias or '{' expected, got '''''(5,8)
     PsiElement(Char List Heredoc Promoter ('''))(''''')(5,8)
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(8,9)
     PsiErrorElement:<end of expression> expected, got '
 '(8,8)
       <empty list>
     PsiElement(\\n, \\r\\n)('\n')(8,9)
-  PsiErrorElement:';', '\\n or \\r\\n' expected, got '   '(9,12)
+  PsiErrorElement:'\\n, \\r\\n' expected, got '   '(9,12)
     PsiElement(Whitespace at beginning of line of heredoc)('   ')(9,12)
   PsiElement(Char List Fragment)('Two')(12,15)
   PsiElement(\\n, \\r\\n)('\n')(15,16)

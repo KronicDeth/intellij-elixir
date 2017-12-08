@@ -6,6 +6,7 @@ import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiWhiteSpace;
 import com.intellij.util.ProcessingContext;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.ElixirEndOfExpression;
@@ -75,16 +76,17 @@ public class CallDefinitionClause extends CompletionProvider<CompletionParameter
                     org.elixir_lang.psi.qualification.Qualified qualifiedGrandParent =
                             (org.elixir_lang.psi.qualification.Qualified) grandParent;
                     maybeModularName = qualifiedGrandParent.qualifier();
-                } else if (originalParent instanceof ElixirEndOfExpression) {
-                    final int originalParentOffset = originalParent.getTextOffset();
+                } else if (originalPosition instanceof PsiWhiteSpace) {
+                    final int originalPositionOffset = originalPosition.getTextOffset();
 
-                    if (originalParentOffset > 0) {
+                    if (originalPositionOffset > 0) {
                         final PsiElement previousElement =
-                                parameters.getOriginalFile().findElementAt(originalParentOffset - 1);
+                                parameters.getOriginalFile().findElementAt(originalPositionOffset - 1);
 
                         if (previousElement != null &&
                                 previousElement.getNode().getElementType() == ElixirTypes.DOT_OPERATOR) {
-                            maybeModularName = previousElement.getPrevSibling();
+                            PsiElement previousElementParent = previousElement.getParent();
+                            maybeModularName = previousElementParent.getPrevSibling();
                         }
                     }
                 }

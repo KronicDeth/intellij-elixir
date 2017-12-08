@@ -41,6 +41,8 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
     @Override
     public void tearDown() throws Exception {
         restoreStyleSettings();
+        // prevent project leak
+        temporaryCodeStyleSettings = null;
         super.tearDown();
     }
 
