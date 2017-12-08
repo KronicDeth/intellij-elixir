@@ -863,8 +863,6 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
 <BINARY_WHOLE_NUMBER> {
   {INVALID_BINARY_DIGITS} { return ElixirTypes.INVALID_BINARY_DIGITS; }
   {VALID_BINARY_DIGITS}   { return ElixirTypes.VALID_BINARY_DIGITS; }
-  {ANY}                   { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                            handleInState(stackFrame.getLastLexicalState()); }
 }
 
 <CALL_MAYBE, CALL_OR_KEYWORD_PAIR_MAYBE> {
@@ -872,11 +870,6 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                                             handleInState(stackFrame.getLastLexicalState());
                                             // zero-width token
                                             return ElixirTypes.CALL; }
-}
-
-<CALL_MAYBE> {
-  {ANY} { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-          handleInState(stackFrame.getLastLexicalState()); }
 }
 
 <CALL_OR_KEYWORD_PAIR_MAYBE> {
@@ -925,8 +918,6 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
   {DECIMAL_SEPARATOR}      { return ElixirTypes.DECIMAL_SEPARATOR; }
   {INVALID_DECIMAL_DIGITS} { return ElixirTypes.INVALID_DECIMAL_DIGITS; }
   {VALID_DECIMAL_DIGITS}   { return ElixirTypes.VALID_DECIMAL_DIGITS; }
-  {ANY}                    { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                             handleInState(stackFrame.getLastLexicalState()); }
 }
 
 <DOT_OPERATION> {
@@ -1240,15 +1231,11 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
   {HEXADECIMAL_DIGIT}{1,2} { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                              yybegin(stackFrame.getLastLexicalState());
                              return ElixirTypes.VALID_HEXADECIMAL_DIGITS; }
-  {ANY}                    { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                             handleInState(stackFrame.getLastLexicalState()); }
 }
 
 <HEXADECIMAL_WHOLE_NUMBER> {
   {INVALID_HEXADECIMAL_DIGITS} { return ElixirTypes.INVALID_HEXADECIMAL_DIGITS; }
   {VALID_HEXADECIMAL_DIGITS}   { return ElixirTypes.VALID_HEXADECIMAL_DIGITS; }
-  {ANY}                        { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                                 handleInState(stackFrame.getLastLexicalState()); }
 }
 
 /* Only rules for <INTERPOLATON>, but not <YYINITIAL> go here.
@@ -1273,11 +1260,6 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                       return ElixirTypes.KEYWORD_PAIR_COLON; }
 }
 
-<KEYWORD_PAIR_MAYBE, KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE, MULTILINE_WHITE_SPACE_MAYBE> {
-  {ANY} { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-          handleInState(stackFrame.getLastLexicalState()); }
-}
-
 <LAST_EOL> {
   {EOL} { org.elixir_lang.lexer.StackFrame stackFrame = pop();
           yybegin(stackFrame.getLastLexicalState());
@@ -1297,8 +1279,6 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
 <OCTAL_WHOLE_NUMBER> {
   {INVALID_OCTAL_DIGITS} { return ElixirTypes.INVALID_OCTAL_DIGITS; }
   {VALID_OCTAL_DIGITS}   { return ElixirTypes.VALID_OCTAL_DIGITS; }
-  {ANY}                  { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                           handleInState(stackFrame.getLastLexicalState()); }
 }
 
 <REFERENCE_OPERATION> {
@@ -1318,14 +1298,10 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
 
 <SIGIL_MODIFIERS> {
   {SIGIL_MODIFIER} { return ElixirTypes.SIGIL_MODIFIER; }
-  {ANY}            { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                     handleInState(stackFrame.getLastLexicalState()); }
 }
 
 <SIGN_OPERATION> {
   {ESCAPED_EOL}|{WHITE_SPACE}+ { return TokenType.WHITE_SPACE; }
-  {ANY}                        { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                                 handleInState(stackFrame.getLastLexicalState()); }
 }
 
 <SIGN_OPERATION_KEYWORD_PAIR_MAYBE> {
@@ -1354,14 +1330,10 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
   {HEXADECIMAL_DIGIT}{1,4} { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                              yybegin(stackFrame.getLastLexicalState());
                              return ElixirTypes.VALID_HEXADECIMAL_DIGITS; }
-  {ANY}                    { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                             handleInState(stackFrame.getLastLexicalState()); }
 }
 
 <UNKNOWN_BASE_WHOLE_NUMBER> {
   {INVALID_UNKNOWN_BASE_DIGITS} { return ElixirTypes.INVALID_UNKNOWN_BASE_DIGITS; }
-  {ANY}                         { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                                  handleInState(stackFrame.getLastLexicalState()); }
 }
 
 /* Only rules for <YYINITIAL>, but not <INTERPOLATION> go here. */
@@ -1375,7 +1347,21 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                     return ElixirTypes.CLOSING_CURLY; }
 }
 
+<BINARY_WHOLE_NUMBER,
+ CALL_MAYBE,
+ DECIMAL_EXPONENT, DECIMAL_FRACTION, DECIMAL_WHOLE_NUMBER,
+ HEXADECIMAL_ESCAPE_SEQUENCE, HEXADECIMAL_WHOLE_NUMBER,
+ KEYWORD_PAIR_MAYBE, KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE, MULTILINE_WHITE_SPACE_MAYBE,
+ OCTAL_WHOLE_NUMBER,
+ SIGIL_MODIFIERS,
+ SIGN_OPERATION,
+ UNICODE_ESCAPE_SEQUENCE,
+ UNKNOWN_BASE_WHOLE_NUMBER> {
+  {ANY} { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+          handleInState(stackFrame.getLastLexicalState()); }
+}
+
 // MUST go last so that . mapping to BAD_CHARACTER is the rule of last resort for the listed states
-<ATOM_START, GROUP_HEREDOC_START, INTERPOLATION, NAMED_SIGIL, SIGIL, YYINITIAL> {
+<GROUP_HEREDOC_START, INTERPOLATION, NAMED_SIGIL, SIGIL, YYINITIAL> {
   . { return TokenType.BAD_CHARACTER; }
 }
