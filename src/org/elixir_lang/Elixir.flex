@@ -36,6 +36,11 @@ import org.elixir_lang.psi.ElixirTypes;
     return stack.fragmentType();
   }
 
+  private void handleInLastState() {
+    org.elixir_lang.lexer.StackFrame stackFrame = pop();
+    handleInState(stackFrame.getLastLexicalState());
+  }
+
   private void handleInState(int nextLexicalState) {
     yypushback(yylength());
     yybegin(nextLexicalState);
@@ -868,8 +873,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
 }
 
 <CALL_MAYBE, CALL_OR_KEYWORD_PAIR_MAYBE> {
-  {OPENING_BRACKET}|{OPENING_PARENTHESIS} { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                                            handleInState(stackFrame.getLastLexicalState());
+  {OPENING_BRACKET}|{OPENING_PARENTHESIS} { handleInLastState();
                                             // zero-width token
                                             return ElixirTypes.CALL; }
 }
@@ -1005,8 +1009,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
   {QUOTE_HEREDOC_PROMOTER}                          { /* Does NOT return to CALL_MAYBE because heredocs aren't valid
                                                          relative identifiers.  This clause is only here to prevent a
                                                          prefix match on {QUOTE_PROMOTER}. */
-                                                      org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                                                      handleInState(stackFrame.getLastLexicalState()); }
+                                                      handleInLastState(); }
   {QUOTE_PROMOTER}                                  { /* return to CALL_MAYBE so that OPENING_BRACKET or
                                                          OPENING_PARENTHESES after quote can be parsed
                                                          with CALL so parser doesn't think call is no parentheses with
@@ -1015,8 +1018,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                                                       startQuote(yytext());
                                                       return promoterType(); }
 
-  .                                                 { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                                                      handleInState(stackFrame.getLastLexicalState()); }
+  .                                                 { handleInLastState(); }
 }
 
 <DUAL_OPERATION> {
@@ -1304,15 +1306,13 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
 
 <SIGN_OPERATION_MAYBE> {
   // Must be before any single operator's match
-  {REFERENCABLE_OPERATOR} / {REFERENCE_INFIX_OPERATOR} { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                                                         handleInState(stackFrame.getLastLexicalState()); }
+  {REFERENCABLE_OPERATOR} / {REFERENCE_INFIX_OPERATOR} { handleInLastState(); }
   {ESCAPED_EOL}|{WHITE_SPACE}+ { return TokenType.WHITE_SPACE; }
   {DUAL_OPERATOR}              { yybegin(SIGN_OPERATION_KEYWORD_PAIR_MAYBE);
                                  return ElixirTypes.SIGN_OPERATOR; }
   /* STAB_OPERATOR needs to be included explicitly because `-` in `DUAL_OPERATOR` is a prefix of `->` (`STAB_OPERATOR`)
      and `.` would only match one character and be a shorter match otherwise. */
-  {EOL}|{STAB_OPERATOR}|.      { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                                 handleInState(stackFrame.getLastLexicalState()); }
+  {EOL}|{STAB_OPERATOR}|.      { handleInLastState(); }
 }
 
 <UNICODE_ESCAPE_SEQUENCE> {
@@ -1346,8 +1346,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
  SIGN_OPERATION,
  UNICODE_ESCAPE_SEQUENCE,
  UNKNOWN_BASE_WHOLE_NUMBER> {
-  {ANY} { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-          handleInState(stackFrame.getLastLexicalState()); }
+  {ANY} { handleInLastState(); }
 }
 
 // MUST go last so that . mapping to BAD_CHARACTER is the rule of last resort for the listed states
