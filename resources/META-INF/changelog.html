@@ -1,5 +1,29 @@
 <html>
 <body>
+<h1>v6.8.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>
+        Eliminate the majority of the <code>eolStar</code> parser rules around operators where they do not matter
+        leaving only the <code>eolStar</code> after <code>COMMA</code> and the the ones that help differentiate unary
+        and binary <code>+</code>/<code>-</code>.  This simplifies the parser and under certain conditions should
+        prevent reparsing when only <code>WHITE_SPACE</code> changes in size.
+        <ul>
+          <li>
+            Look-ahead in the lexer, where it's cheaper than the parser to see if the next token does not care if
+            there's an <code>EOL</code> or normal <code>WHITE_SPACE</code>.
+          </li>
+          <li>
+            After operators that don't care if they are followed by <code>EOL</code>, try to match all following
+            <code>WHITE_SPACE</code>, <code>ESCAPED_EOL</code> and <code>EOL</code>.
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
 <h1>v6.7.0</h1>
 <ul>
   <li>
@@ -960,314 +984,6 @@ QUOTE_HEREDOC_TERMINATOR = {CHAR_LIST_HEREDOC_TERMINATOR} | {STRING_HEREDOC_TERM
         Replace <code>assert scope.isEquivalentTo(lastParent.getParent())</code> with an <code>if</code> and log
         what <code>lastParent</code> was when condition is <code>false</code>, so root cause can be traced.
       </li>
-    </ul>
-  </li>
-</ul>
-<h1>v5.0.0</h1>
-<ul>
-  <li>
-    <p>Enhancements</p>
-    <ul>
-      <li>
-        <p>
-          Decompile <code>.beam</code> files
-        </p>
-        <ul>
-          <li>Structure view for decompiled <code>.beam</code> files</li>
-          <li>Index modules, functions, and macros exported by <code>.beam</code> files</li>
-          <li>
-            <p>Go To Symbol for Modules defined in <code>.beam</code> files (both SDK and deps)</p>
-            <ul>
-              <li>Erlang using atoms (like <code>:idna</code>)</li>
-              <li>Elixir using Alias (like <code>Enum</code>)</li>
-            </ul>
-          </li>
-          <li>
-            <p>Completion for Modules defined in <code>.beam</code> files (both SDK and deps)</p>
-            <ul>
-              <li>Elixir using Alias (like <code>Enum</code>)</li>
-            </ul>
-          </li>
-          <li>Completion for functions and macros exported by <code>.beam</code> files</li>
-          <li>Syntax highlighting</li>
-        </ul>
-      </li>
-      <li>
-        Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/pull/575">#575</a>
-      </li>
-      <li>
-        <p>Macros appear before functions in decomplied <code>.beam</code> files</p>
-        <ul>
-          <li>Header for macro and function sections</li>
-        </ul>
-      </li>
-      <li>
-        Update <code>ELIXIR_VERSION</code> for <code>1.2.*</code> from <code>1.2.3</code> to <code>1.2.6</code>
-      </li>
-      <li>Add <code>ELIXIR_VERSION</code> <code>1.3.4</code></li>
-      <li>Add <code>ELIXIR_VERSION</code> <code>1.4.0</code></li>
-      <li>Update <code>IDEA</code> for <code>2016.*</code> to <code>2016.3.1</code></li>
-      <li>
-        Show <code>OtpErlangBitStr</code> (and therefore <code>OtpErlangBinary</code> contents when tests fail
-      </li>
-      <li>
-        Quote binaries as <code>to_charlist</code> instead of <code>to_char_list</code> for Elixir
-        <code>&lt;= 1.3</code>. Depends on Elixir version of project SDK.
-      </li>
-      <li>
-        Use <code>elixir</code> instead of <code>java</code> VM, so now Erlang and Elixir don't need to be built
-        on travis-ci, but <code>ant</code> and the <code>jdk</code> need to be installed, but unlike Erlang and
-        Elixir, there are tarballs for that, so this way is faster than the old method without depending on
-        Travis-CI cache.
-      </li>
-      <li>
-        If <code>multiResolve</code> causes a <code>StackOverflow</code> for
-        <code>org.elixir_lang.annotator.Callable.visitCall</code>, then <code>catch</code> it and use
-        <code>errorreport</code> logger to log the element.
-      </li>
-      <li>Include file path in <code>errorreport</code> excerpt</li>
-      <li>Log element for <code>StackOverflow</code> related to <code>import</code>s</li>
-      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/605">#605</a>.</li>
-      <li>
-        Log <code>LookupElement#getObject</code> when <code>LookupElement#getPsiElement</code> is
-        <code>null</code> to track down how it was <code>null</code> in
-        <a href="https://github.com/KronicDeth/intellij-elixir/issues/563">#563</a>.
-      </li>
-      <li>
-        Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/559">#559</a>
-      </li>
-      <li>
-        <p>Switch to Gradle for builds.</p>
-        <ul>
-          <li>
-            <code>./gradlew runIde</code> (or the <code>runIde (VERSION)</code> Run Configurations) will run IDEA
-            in a sandbox with the development version of the plugin.
-          </li>
-          <li>
-            <code>./gradlew test</code> (or the <code>test (VERSION)</code> Run Configurations) will run the main
-            plugin and jps-builder tests.
-          </li>
-          <li>
-            The plugin can now be published with <code>./gradlew publishPlugin</code>, <b>BUT</b> you'll need to
-            fill in <code>publish*</code> properties in <code>gradle.properties</code>. This will
-            <i>eventually</i> allow for automated "nightlies" from successful Travis-CI builds on
-            <code>master</code>.
-          </li>
-        </ul>
-      </li>
-      <li>
-        The <code>Callable</code> annotator is meant for variables, parameters, and macro and function calls and
-        declarations. The <code>ModuleAttribute</code> annotator handles module attribute declaration and usage,
-        so we can save reference resolution time by skipping module attributes in <code>Callable</code>.
-      </li>
-      <li>Allow module attribute folding to be configured.</li>
-      <li>
-        Allow call definition heads to resolves to themselves for consistency with Aliases of
-        <code>defmodule</code>.
-      </li>
-      <li>
-        Generalize <code>Callable.callDefinitionClauseDefiner(Call)</code>: in addition to the current
-        <code>CallDefinitionClause</code>, make it work for <code>Implementation</code>, <code>Module</code>,
-        and <code>Protocol</code>.
-      </li>
-    </ul>
-  </li>
-  <li>
-    <p>Bug Fixes</p>
-    <ul>
-      <li>
-        Fix copy-paste errors in <code>MatchOperatorInsteadOfTypeOperator</code>
-      </li>
-      <li>
-        Subtract 1 from arity in <code>.beam</code> file when decompiling to <code>defmacro</code> calls because
-        the Erlang function for Elixir macros has one addition argument: the first argument is the
-        <code>Caller</code> of the macro.
-      </li>
-      <li>
-        If the name of the decompiled macro/function is an infix operator, then decompile the head as a binary
-        operation instead of a normal prefix name as infix operators aren't valid prefix names and led to parsing
-        errors, which was the root cause of <a href="https://github.com/KronicDeth/intellij-elixir/pull/575">#575</a>.
-      </li>
-      <li>Fix IntelliJ warnings in <code>BeamFileImpl</code></li>
-      <li>Remove unused <code>VirtualFile</code> argument to <code>BeamFileImpl#buildFileStub</code>.</li>
-      <li>
-        Add <code>++</code>, <code>=~</code>, and <code>in</code> to <code>INFIX_OPERATOR_SET</code>.
-      </li>
-      <li>
-        Only render infix operators if arity is <code>2</code>.
-      </li>
-      <li>
-        Prefix operator decompilation: <code>+</code> and <code>-</code> are both binary and unary operators.
-        When a unary operator they need to be wrapped in parentheses, so that the call definition clause is parsed
-        correctly.
-      </li>
-      <li>Ignore <code>JFLex</code> jar</li>
-      <li>Don't check for <code>elixir-lang/elixr</code> files remove in <code>1.3</code></li>
-      <li>
-        Allow <code>nil</code> as a keyword key. <code>nil</code> was being lexed as a potential keyword key, but
-        <code>NIL</code> was missing from the token list in the keywordKey grammar rule.
-      </li>
-      <li>
-        Some SpecialForms don't work as literals as they would be interpreted as metaprogramming, so their name
-        needs to be wrapped as an atom to <code>unquote</code>.
-      </li>
-      <li>Check children of <code>MultipleAliases</code> for variable declarations.</li>
-      <li>Treat any variable declared in a <code>MultipleAliases</code> as invalid.</li>
-      <li>
-        Skip <code>import Kernel</code> in <code>kernel.ex</code> to prevent stack overflow due to recursive
-        <code>import</code>
-      </li>
-      <li>
-        Strip all outer parentheses for left type operand, so that <code>(+value)</code> can be see as
-        <code>+</code> operator type spec.
-      </li>
-      <li>
-        Use advice from <code>IndexNotReadyException</code> documentation and check
-        <code>DumbService.isDumb(Project)</code> before calling <code>StubIndex.getElements</code> in
-        <code>Module</code> and <code>module.MultiResolve.indexNameElements</code>.
-      </li>
-      <li>
-        Don't <code>assert</code> that <code>LookupElement#getPsiElement</code> is not <code>null</code> in
-        <code>CallDefinitionCluase.renderElement</code>
-      </li>
-      <li>Update to <code>ant</code> <code>1.10.1</code> because <code>1.10.0</code> is no longer hosted.</li>
-      <li>
-        Yeah, it sounds weird, but an <code>ElixirVariable</code> isn't necessarily a variable if it doesn't occur in a
-        declaration context. It could just be a no-parentheses function call in the wrong spot, so check the
-        parent <code>PsiElement</code> to determine if <code>ElixirVariable</code> is a variable.
-      </li>
-      <li>
-        Highlight parameterized type head (<code>maybe(t)</code> in <code>@type maybe(t)</code>) the same as a
-        full type definition (<code>maybe(t)</code> in <code>@type maybe(t) :: t | nil</code>)
-      </li>
-      <li>
-        Only show Mix ExUnit Run in context when the module, or when the module is not a available, the project
-        SDK is Elixir. If there is no SDK configured, show "Mix ExUnit Run" in the menu.
-      </li>
-      <li>Mark <code>do:</code> as atom in demo text</li>
-      <li>
-        Annotations can only be applied to the single, active file, which belongs to the <code>referrer</code>
-        <code>Callable</code>. The <code>resolved</code> may be outside the file if it is a cross-file function
-        or macro usage, in which case it's <code>TextRange</code> should not be highlighted because it is
-        referring to offsets in a different file.
-      </li>
-      <li>
-        <code>Variable</code> scope for <code>QualifiedMultipleAliases</code>, which occurs when qualified call
-        occurs over a line with assignment to a tuple, such as
-        <pre><code>
-Qualifier.
-{:ok, value} = call()</code></pre>
-      </li>
-      <li>
-        Remove call definition clauses (function or macro) completion for bare words as it had a detrimental
-        impact on typing feedback (the editor still took input, but it wasn't rendered until the completion
-        returned OR <code>ESC</code> was hit to cancel the completion, which became excessive once the index of
-        call definition clauses was expanded by the decompilation of the Elixir standard library
-        <code>.beam</code>s, so disable it. If bare-words completion is restored. It will either (1) need to
-        not use the <code>Reference#getVariants()</code> API because it generates too many objects that need to
-        be thrown away or (2) need to only complete call definition clauses that are provably in-scope from
-        imports or other macros.
-      </li>
-      <li>
-        Both intellij-erlang and intellij-community are Apache 2.0 licensed and its the default license for Elixir
-        projects, so seems like a good choice for <code>LICENSE.md</code>
-      </li>
-      <li>Add <code>CODE_OF_CONDUCT.md</code></li>
-      <li>
-        The run configurations I put together in
-        <a href="https://github.com/KronicDeth/intellij-elixir/pull/504">#504</a>
-        didn't allow for the debugger to work properly: neither pause nor breakpoints had any effect, so
-        regenerate them from the Gradle pane.
-      </li>
-      <li>
-        Check parent of <code>when</code> operation in case it's a guarded function head in
-        <code>org.elixir_lang.annonator.Parameter.putParameterized(Parameter, PsiElement)</code>
-      </li>
-      <li>
-        Instead of highlighting call definition clauses when they are referred to, which only works if it is in
-        the same file, highlight all function and macro declarations when the <code>def*</code> call is
-        encountered.
-      </li>
-      <li>
-        Only increment arity for right pipe operand instead of all operands, so that left operands resolve to
-        correct arity or as variable/parameter.
-      </li>
-      <li>
-        Override <code>ModuleImpl#getProject()</code> to prevent <code>StackOverflowError</code>. Without
-        overriding <code>#getProject()</code>, <code>IdentifierHighlighterPass</code> gets stuck in a loop
-        between <code>getManager</code> and <code>getProject</code> on the target (the <code>ModuleImpl</code>)
-        when clicking on the space between <code>def</code>s or <code>defmacro</code>s in the decompiled
-        <code>.beam</code> files.
-      </li>
-      <li>Fix source formatting</li>
-      <li>Skip looking for variables unless 0-arity AND no arguments</li>
-      <li>
-        Highlight unresolved macros as macro calls. Anything with a do keyword or a do block will be treated like
-        a macro call even if it can't be resolved. No resolved is either no resolve results or an empty list
-      </li>
-      <li>Implicit imports at top of file in addition to top of Module.</li>
-      <li>
-        <code>CallDefinitionClause</code> completion provider is unexpectedly invoked both when <code>.</code> is
-        typed, but continues to be invoked after a letter is typed after the <code>.</code>; however, once the
-        letter is typed, the letter becomes the default prefix instead, so the prefix should only be reset to
-        <code>""</code> when it ends in <code>.</code>.
-      </li>
-      <li>
-        Disable <code>Callable#getVariants</code> unless <code>Unqualified</code> to prevents local functions and
-        macros being shown as completions for qualified names.
-      </li>
-      <li>
-        <p>
-          Among many other tweaks, the String color is now green, so that Atom and String are no longer close to
-          one another, which was the original issue in
-          <a href="https://github.com/KronicDeth/intellij-elixir/issues/569">#569</a>
-        </p>
-        <img width="760" alt="screen shot 2017-04-09 at 9 44 06 pm"
-             src="https://cloud.githubusercontent.com/assets/298259/24844071/b1c9b51a-1d6d-11e7-8647-46a5075b12d9.png"/>
-        <ul>
-          <li><code>Alias</code> now has <code>underscored</code> effect</li>
-          <li><code>Brackets</code> are now greenish instead of brownish</li>
-          <li><code>Callbacks</code> are now a lighter blue and has <code>underscored</code> effect</li>
-          <li><code>CharList</code> is little lighter</li>
-          <li><code>CharToken</code> is dark yellow now instead of dark purple</li>
-          <li><code>Dot</code> is now purple instead of dark red</li>
-          <li><code>Expression Substitution Mark</code> is a little lighter</li>
-          <li><code>Interpolation</code> is now lime green</li>
-          <li><code>Kernel Macros</code> are a burnt orange</li>
-          <li><code>Map</code> is now a dark blue instead of a dark yellow</li>
-          <li><code>Operation Sign</code> is a little lighter</li>
-          <li><code>Parameters</code> are a little darker</li>
-          <li><code>Parentheses</code> are redder</li>
-          <li><code>Predefined</code> is orange instead of blue</li>
-          <li><code>Specification</code> is now red instead of purple</li>
-          <li><code>Struct</code> is now purple instead of yellow</li>
-          <li><code>Type</code> is now green instead of dark purple</li>
-          <li><code>Variable</code> is more tealish</li>
-        </ul>
-      </li>
-      <li>Fix indentation to fix sub-lists in <code>CONTRIBUTING.md</code></li>
-      <li>Fix pluralization in <code>CONTRIBUTING.md</code></li>
-      <li>Check if resolve results are <code>null</code> for <code>For.resolveResultList</code></li>
-      <li>Check if <code>Protocol.resolveResultList</code> is <code>null</code></li>
-      <li>
-        Check <code>match</code> <code>Call</code> is an <code>UnqualifiedNoArgumentCall</code>, in addition to
-        being 0 resolved final arity, before checking if the name matches.
-      </li>
-    </ul>
-  </li>
-  <li>
-    <p>Incompatible Changes</p>
-    <ul>
-      <li>
-        Move <code>^^^</code> to its own three-operator precedence level to match <code>1.2</code>. This does
-        mean the parsing will be wrong for Elixir <code>1.1</code>, but is simpler than maintaining two grammars
-        for those that are still using Elixir <code>1.1</code>.
-      </li>
-      <li>
-        The <code>ant</code> build files have been removed. To build the build plugin (for Install From Disk),
-        use the <code>./gradlew buildPlugin</code>.
-      </li>
-      <li>Allow module attribute folding to be configured.</li>
     </ul>
   </li>
 </ul>
