@@ -1496,7 +1496,7 @@ matchedAdditionOperation ::= matchedExpression additionInfixOperator matchedExpr
  *
  */
 
-multiplicationInfixOperator ::= eolStar (DIVISION_OPERATOR | MULTIPLICATION_OPERATOR) eolStar
+multiplicationInfixOperator ::= DIVISION_OPERATOR | MULTIPLICATION_OPERATOR
                                 {
                                   implements = "org.elixir_lang.psi.Operator"
                                   methods = [

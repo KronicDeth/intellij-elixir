@@ -3569,26 +3569,15 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // eolStar (DIVISION_OPERATOR | MULTIPLICATION_OPERATOR) eolStar
+  // DIVISION_OPERATOR | MULTIPLICATION_OPERATOR
   public static boolean multiplicationInfixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "multiplicationInfixOperator")) return false;
+    if (!nextTokenIs(b, "<*, />", DIVISION_OPERATOR, MULTIPLICATION_OPERATOR)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, MULTIPLICATION_INFIX_OPERATOR, "<*, />");
-    r = eolStar(b, l + 1);
-    r = r && multiplicationInfixOperator_1(b, l + 1);
-    r = r && eolStar(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
-    return r;
-  }
-
-  // DIVISION_OPERATOR | MULTIPLICATION_OPERATOR
-  private static boolean multiplicationInfixOperator_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "multiplicationInfixOperator_1")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
     r = consumeToken(b, DIVISION_OPERATOR);
     if (!r) r = consumeToken(b, MULTIPLICATION_OPERATOR);
-    exit_section_(b, m, null, r);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
