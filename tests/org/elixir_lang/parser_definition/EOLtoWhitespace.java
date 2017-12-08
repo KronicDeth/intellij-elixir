@@ -14,7 +14,7 @@ public class EOLtoWhitespace extends ParsingTestCase {
    }
 
    public void testAt() {
-      doTest(true);
+      doTest(false);
       assertWithoutLocalError();
    }
 
@@ -64,7 +64,8 @@ public class EOLtoWhitespace extends ParsingTestCase {
    }
 
    public void testNot() {
-      assertParsedAndQuotedCorrectly();
+      doTest(false);
+      assertWithoutLocalError();
    }
 
    public void testOpeningBit() {
