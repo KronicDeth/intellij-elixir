@@ -566,6 +566,35 @@ GROUP_TERMINATOR = {QUOTE_TERMINATOR}|{SIGIL_TERMINATOR}
 GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 
 ANY = [^]
+EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
+                  {AND_WORD_OPERATOR} |
+                  {ARROW_OPERATOR} |
+                  {ASSOCIATION_OPERATOR} |
+                  {COMMENT} |
+                  {CLOSING_BIT} |
+                  {CLOSING_BRACKET} |
+                  {CLOSING_CURLY}  |
+                  {CLOSING_PARENTHESIS} |
+                  {COMPARISON_OPERATOR} |
+                  {DIVISION_OPERATOR} |
+                  {DO} |
+                  {DOT_OPERATOR} |
+                  {END} |
+                  {IN_MATCH_OPERATOR} |
+                  {IN_OPERATOR} |
+                  {MATCH_OPERATOR} |
+                  {MULTIPLICATION_OPERATOR} |
+                  {PIPE_OPERATOR} |
+                  {RANGE_OPERATOR} |
+                  {RELATIONAL_OPERATOR} |
+                  {SEMICOLON} |
+                  {STAB_OPERATOR} |
+                  {THREE_OPERATOR} |
+                  {TWO_OPERATOR} |
+                  {TYPE_OPERATOR} |
+                  {WHEN_OPERATOR} |
+                  {OR_SYMBOL_OPERATOR} |
+                  {OR_WORD_OPERATOR}
 
 /*
  *  States - Ordered lexigraphically
@@ -661,39 +690,11 @@ ANY = [^]
   // see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L605-L613
   {ESCAPED_EOL}|{WHITE_SPACE}+ / {SPACE_SENSITIVE} { return ElixirTypes.SIGNIFICANT_WHITE_SPACE; }
   {ESCAPED_EOL}|{WHITE_SPACE}+                     { return TokenType.WHITE_SPACE; }
-  {MULTILINE_WHITE_SPACE} / {AND_SYMBOL_OPERATOR}  { return TokenType.WHITE_SPACE; }
-  {MULTILINE_WHITE_SPACE} / {AND_WORD_OPERATOR}    { return TokenType.WHITE_SPACE; }
-  {MULTILINE_WHITE_SPACE} / {ARROW_OPERATOR}       { return TokenType.WHITE_SPACE; }
-  {MULTILINE_WHITE_SPACE} / {ASSOCIATION_OPERATOR} { return TokenType.WHITE_SPACE; }
-  {MULTILINE_WHITE_SPACE} / {COMMENT}              { return TokenType.WHITE_SPACE; }
-  {MULTILINE_WHITE_SPACE} / {CLOSING_BIT}          { return TokenType.WHITE_SPACE; }
-  {MULTILINE_WHITE_SPACE} / {CLOSING_BRACKET}      { return TokenType.WHITE_SPACE; }
-  {MULTILINE_WHITE_SPACE} / {CLOSING_CURLY}        { return TokenType.WHITE_SPACE; }
-  {MULTILINE_WHITE_SPACE} / {CLOSING_PARENTHESIS}  { return TokenType.WHITE_SPACE; }
-  {MULTILINE_WHITE_SPACE} / {COMPARISON_OPERATOR}  { return TokenType.WHITE_SPACE; }
-  {MULTILINE_WHITE_SPACE} / {DIVISION_OPERATOR}    { return TokenType.WHITE_SPACE; }
-  {MULTILINE_WHITE_SPACE} / {DO}                   { return TokenType.WHITE_SPACE; }
-  {MULTILINE_WHITE_SPACE} / {DOT_OPERATOR}         { return TokenType.WHITE_SPACE; }
-  {MULTILINE_WHITE_SPACE} / {END}                  { return TokenType.WHITE_SPACE; }
+  {MULTILINE_WHITE_SPACE} / {EOL_INSENSITIVE}      { return TokenType.WHITE_SPACE; }
   {LAST_EOL} / {REFERENCABLE_OPERATOR}{REFERENCE_INFIX_OPERATOR} { handleLastEOL();
                                                                    return TokenType.WHITE_SPACE; }
-  {MULTILINE_WHITE_SPACE} / {IN_MATCH_OPERATOR}    { return TokenType.WHITE_SPACE; }
-  {MULTILINE_WHITE_SPACE} / {IN_OPERATOR}          { return TokenType.WHITE_SPACE; }
-  {MULTILINE_WHITE_SPACE} / {MATCH_OPERATOR}       { return TokenType.WHITE_SPACE; }
-  {MULTILINE_WHITE_SPACE} / {MULTIPLICATION_OPERATOR} { return TokenType.WHITE_SPACE; }
-  {MULTILINE_WHITE_SPACE} / {PIPE_OPERATOR}        { return TokenType.WHITE_SPACE; }
   {LAST_EOL}              / {OPENING_BIT}          { handleLastEOL();
                                                      return TokenType.WHITE_SPACE; }
-  {MULTILINE_WHITE_SPACE} / {RANGE_OPERATOR}       { return TokenType.WHITE_SPACE; }
-  {MULTILINE_WHITE_SPACE} / {RELATIONAL_OPERATOR}  { return TokenType.WHITE_SPACE; }
-  {MULTILINE_WHITE_SPACE} / {SEMICOLON}            { return TokenType.WHITE_SPACE; }
-  {MULTILINE_WHITE_SPACE} / {STAB_OPERATOR}        { return TokenType.WHITE_SPACE; }
-  {MULTILINE_WHITE_SPACE} / {THREE_OPERATOR}       { return TokenType.WHITE_SPACE; }
-  {MULTILINE_WHITE_SPACE} / {TWO_OPERATOR}         { return TokenType.WHITE_SPACE; }
-  {MULTILINE_WHITE_SPACE} / {TYPE_OPERATOR}        { return TokenType.WHITE_SPACE; }
-  {MULTILINE_WHITE_SPACE} / {WHEN_OPERATOR}        { return TokenType.WHITE_SPACE; }
-  {MULTILINE_WHITE_SPACE} / {OR_SYMBOL_OPERATOR}   { return TokenType.WHITE_SPACE; }
-  {MULTILINE_WHITE_SPACE} / {OR_WORD_OPERATOR}     { return TokenType.WHITE_SPACE; }
   // Needs to be explicit, so that an atom of the type operator is longer
   {LAST_EOL} / ":::"                               { handleLastEOL();
                                                      return TokenType.WHITE_SPACE; }
