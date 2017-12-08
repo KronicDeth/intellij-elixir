@@ -673,6 +673,7 @@ ANY = [^]
   {MULTILINE_WHITE_SPACE} / {COMPARISON_OPERATOR}  { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {DIVISION_OPERATOR}    { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {DO}                   { return TokenType.WHITE_SPACE; }
+  {MULTILINE_WHITE_SPACE} / {DOT_OPERATOR}         { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {END}                  { return TokenType.WHITE_SPACE; }
   {LAST_EOL} / {REFERENCABLE_OPERATOR}{REFERENCE_INFIX_OPERATOR} { handleLastEOL();
                                                                    return TokenType.WHITE_SPACE; }
@@ -998,14 +999,7 @@ ANY = [^]
   {IDENTIFIER_TOKEN}                                { yybegin(CALL_OR_KEYWORD_PAIR_MAYBE);
                                                       return ElixirTypes.IDENTIFIER_TOKEN; }
 
-  /*
-   * Emulates strip_space in elixir_tokenizer.erl
-   */
-
-  // see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L605-L613
-  {ESCAPED_EOL}|{WHITE_SPACE}+ / {SPACE_SENSITIVE}  { return ElixirTypes.SIGNIFICANT_WHITE_SPACE; }
-  {ESCAPED_EOL}|{WHITE_SPACE}+                      { return TokenType.WHITE_SPACE; }
-  {EOL}                                             { return ElixirTypes.EOL; }
+  {MULTILINE_WHITE_SPACE}                           { return TokenType.WHITE_SPACE; }
 
   /* Be better than strip_space and handle_dot and ignore comments so that IDENTIFIER_TOKEN and operators are parsed the
      same after dots.

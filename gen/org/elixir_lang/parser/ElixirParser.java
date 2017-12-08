@@ -1562,15 +1562,13 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // eolStar DOT_OPERATOR eolStar
+  // DOT_OPERATOR
   public static boolean dotInfixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "dotInfixOperator")) return false;
-    if (!nextTokenIs(b, "<.>", DOT_OPERATOR, EOL)) return false;
+    if (!nextTokenIs(b, "<.>", DOT_OPERATOR)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, DOT_INFIX_OPERATOR, "<.>");
-    r = eolStar(b, l + 1);
-    r = r && consumeToken(b, DOT_OPERATOR);
-    r = r && eolStar(b, l + 1);
+    r = consumeToken(b, DOT_OPERATOR);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
@@ -3346,9 +3344,9 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   // dotInfixOperator parenthesesArguments parenthesesArguments?
   public static boolean maxDotCall(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "maxDotCall")) return false;
-    if (!nextTokenIs(b, "<max dot call>", DOT_OPERATOR, EOL)) return false;
+    if (!nextTokenIs(b, DOT_OPERATOR)) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _LEFT_, MATCHED_DOT_CALL, "<max dot call>");
+    Marker m = enter_section_(b, l, _LEFT_, MATCHED_DOT_CALL, null);
     r = dotInfixOperator(b, l + 1);
     r = r && parenthesesArguments(b, l + 1);
     r = r && maxDotCall_2(b, l + 1);
@@ -3505,9 +3503,9 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   // dotInfixOperator alias
   public static boolean maxQualifiedAlias(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "maxQualifiedAlias")) return false;
-    if (!nextTokenIs(b, "<max qualified alias>", DOT_OPERATOR, EOL)) return false;
+    if (!nextTokenIs(b, DOT_OPERATOR)) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _LEFT_, MATCHED_QUALIFIED_ALIAS, "<max qualified alias>");
+    Marker m = enter_section_(b, l, _LEFT_, MATCHED_QUALIFIED_ALIAS, null);
     r = dotInfixOperator(b, l + 1);
     r = r && alias(b, l + 1);
     exit_section_(b, l, m, r, false, null);
@@ -3518,9 +3516,9 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   // dotInfixOperator relativeIdentifier !CALL
   public static boolean maxQualifiedNoArgumentsCall(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "maxQualifiedNoArgumentsCall")) return false;
-    if (!nextTokenIs(b, "<max qualified no arguments call>", DOT_OPERATOR, EOL)) return false;
+    if (!nextTokenIs(b, DOT_OPERATOR)) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _LEFT_, MATCHED_QUALIFIED_NO_ARGUMENTS_CALL, "<max qualified no arguments call>");
+    Marker m = enter_section_(b, l, _LEFT_, MATCHED_QUALIFIED_NO_ARGUMENTS_CALL, null);
     r = dotInfixOperator(b, l + 1);
     r = r && relativeIdentifier(b, l + 1);
     r = r && maxQualifiedNoArgumentsCall_2(b, l + 1);
@@ -3542,9 +3540,9 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   // dotInfixOperator relativeIdentifier matchedParenthesesArguments
   public static boolean maxQualifiedParenthesesCall(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "maxQualifiedParenthesesCall")) return false;
-    if (!nextTokenIs(b, "<max qualified parentheses call>", DOT_OPERATOR, EOL)) return false;
+    if (!nextTokenIs(b, DOT_OPERATOR)) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _LEFT_, MATCHED_QUALIFIED_PARENTHESES_CALL, "<max qualified parentheses call>");
+    Marker m = enter_section_(b, l, _LEFT_, MATCHED_QUALIFIED_PARENTHESES_CALL, null);
     r = dotInfixOperator(b, l + 1);
     r = r && relativeIdentifier(b, l + 1);
     r = r && matchedParenthesesArguments(b, l + 1);
