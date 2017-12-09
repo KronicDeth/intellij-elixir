@@ -3953,29 +3953,30 @@ If you'd like to use a different donation mechanism (such as Patreon), please op
 
 I'd like to thank those who have donated to help support this project.
 
-* Adrian Philipp ([@adri](https://github.com/adri))
-* Artem Hordynskyi
-* Bjorgvin Reynisson
-* Garrett Hart ([@https://github.com/thirdshift](https://github.com/thirdshift))
-* Gerard de Brieder ([@smeevil](https://github.com/smeevil)) of [govannon.nl](http://govannon.nl)
-* Jeremy Jackson ([@jejacks0n](https://github.com/jejacks0n))
 * Josh Taylor ([@joshuataylor](https://github.com/joshuataylor))
-* Maximilian Buschner
-* Nguyen Le
-* Percy Grunwald ([@pgrunwald](https://github.com/pgrunwald))
-* Purelogic Apps
-* Raúl Vázquez González ([@rvazquezglez](https://github.com/rvazquezglez))
-* Robin Hillard ([@robinhillard](https://github.com/robinhillard)) of [rocketboots.com](http://www.rocketboots.com)
-* Ryan Scheel ([@Havvy](https://github.com/Havvy))
+* Brandon Menc ([@brandonmenc](https://github.com/brandonmenc))
+* Gerard de Brieder ([@smeevil](https://github.com/smeevil)) of [govannon.nl](http://govannon.nl)
+* Jake Becker ([@JakeBecker](https://github.com/JakeBecker))
 * Tynes Consulting
-* William De Melo Gueiros ([@williamgueiros](https://github.com/williamgueiros))
-* Yicheng Dong
-* [TreasureData](https://www.treasuredata.com/)
-* Denis Andrejew ([@seeekr](https://github.com/seeekr))
-* Vanja Radovanović ([@elvanja](https://github.com/elvanja))
-* Bartłomiej Kuczyński ([@Koziolek](https://github.com/Koziolek))
-* Szymon Jeż ([@szymon-jez](https://github.com/szymon-jez))
-* Klemen Sever ([@achedeuzot](https://github.com/achedeuzot))
 * Christian Nelson ([@christiannelson](https://github.com/christiannelson))
+* Robin Hillard ([@robinhillard](https://github.com/robinhillard)) of [rocketboots.com](http://www.rocketboots.com)
+* Klemen Sever ([@achedeuzot](https://github.com/achedeuzot))
+* Bjorgvin Reynisson
+* Vanja Radovanović ([@elvanja](https://github.com/elvanja))
+* Garrett Hart ([@https://github.com/thirdshift](https://github.com/thirdshift))
+* Jeremy Jackson ([@jejacks0n](https://github.com/jejacks0n))
+* Raúl Vázquez González ([@rvazquezglez](https://github.com/rvazquezglez))
+* Ryan Scheel ([@Havvy](https://github.com/Havvy))
+* Szymon Jeż ([@szymon-jez](https://github.com/szymon-jez))
+* Yicheng Dong
+* Purelogic Apps
+* Adrian Philipp ([@adri](https://github.com/adri))
 * César Salazar Hernández ([@cesarslzr](https://github.com/cesarslzr))
 * Milan Köpke
+* Percy Grunwald ([@pgrunwald](https://github.com/pgrunwald))
+* William De Melo Gueiros ([@williamgueiros](https://github.com/williamgueiros))
+* Denis Andrejew ([@seeekr](https://github.com/seeekr))
+* Artem Hordynskyi
+* Maximilian Buschner
+* Bartłomiej Kuczyński ([@Koziolek](https://github.com/Koziolek))
+* Nguyen Le
