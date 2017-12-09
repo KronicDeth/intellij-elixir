@@ -3949,6 +3949,12 @@ If you would like to make a donation you can use Paypal:
 
 If you'd like to use a different donation mechanism (such as Patreon), please open an issue.
 
+### Work Time
+
+As part of the [DockYard](https://dockyard.com/)'s commitment to open source libraries and tools, it allows employees on DockYard Days (most Fridays) to work on those libraries and tools during normal work hours. As part of my ([@KronicDeth](https://github.com/KronicDeth)'s) DockYard Days, I've been able to spend the concentrated time I needed to get [EEx support](https://github.com/KronicDeth/intellij-elixir/pull/923) and [performance improvements](https://github.com/KronicDeth/intellij-elixir/pull/943) into IntelliJ Elixir that benefits both DockYard's usage of the tool on client projects, but also the community of users as a whole.  The more rapid cadence of releases would not have been possible without DockYard Days.
+
+If you're a developer of open source libraries or tools for the [Ember](https://www.emberjs.com/) or [Elixir](https://elixir-lang.org/) communities that can benefit DockYard and its client and would like to get the opportunity to help DockYard and its client with your open source and have your own DockYard Days, [let them know](https://dockyard.com/contact/join-us)
+
 ### Donors
 
 I'd like to thank those who have donated to help support this project.
