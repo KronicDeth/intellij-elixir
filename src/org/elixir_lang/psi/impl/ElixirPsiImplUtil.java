@@ -5006,13 +5006,8 @@ if (quoted == null) {
     @NotNull
     private static String quoteBinaryFunctionIdentifier(@NotNull final InterpolatedCharList interpolatedCharList) {
         Release release = getNonNullRelease(interpolatedCharList);
-        String functionIdentifier = "to_charlist";
 
-        if (release.compareTo(Release.V_1_3) < 0) {
-            functionIdentifier = "to_char_list";
-        }
-
-        return functionIdentifier;
+        return release.level().quoteBinaryFunctionIdentifier;
     }
 
     @Contract(pure = true)
