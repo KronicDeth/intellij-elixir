@@ -97,11 +97,6 @@ public class ProcessOutput {
   }
 
   public static boolean isSmallIde(){
-    return PlatformUtils.isRubyMine()
-        || PlatformUtils.isPyCharm()
-        || PlatformUtils.isPhpStorm()
-        || PlatformUtils.isWebStorm()
-        || PlatformUtils.isAppCode()
-        || PlatformUtils.isCLion();
+    return !PlatformUtils.isIntelliJ();
   }
 }

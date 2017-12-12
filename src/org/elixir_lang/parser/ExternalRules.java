@@ -2,53 +2,40 @@ package org.elixir_lang.parser;
 
 import com.intellij.lang.PsiBuilder;
 import com.intellij.openapi.project.Project;
-import org.elixir_lang.sdk.elixir.Release;
-import org.elixir_lang.sdk.elixir.Type;
+import com.intellij.openapi.vfs.VirtualFile;
+import org.elixir_lang.Level;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.function.BiFunction;
+
+import static org.elixir_lang.file.LevelPropertyPusher.VIRTUAL_FILE;
+import static org.elixir_lang.file.LevelPropertyPusher.level;
 
 public class ExternalRules {
     static boolean ifVersion(@NotNull PsiBuilder psiBuilder,
-                             @SuppressWarnings("unused") int level,
-                             @NotNull String operatorString,
-                             @SuppressWarnings("SameParameterValue") @NotNull String releaseString) {
+                             @SuppressWarnings("unused") int depth,
+                             @NotNull Operator operator,
+                             @SuppressWarnings("SameParameterValue") @NotNull Level targetLevel) {
         Project project = psiBuilder.getProject();
-        Release release = Type.getRelease(project);
+        VirtualFile virtualFile = psiBuilder.getUserData(VIRTUAL_FILE);
+        Level virtualFileLevel = level(project, virtualFile);
 
-
-        assert !(release == null &&
-                /* `project instanceof MockProjectEx`, but in a way that safe for IDEs that don't ship with
-                   `MockProjectEx` */
-                project.getClass().getCanonicalName().equals("com.intellij.mock.MockProjectEx")) :
-                "Release MUST be set during testing of ifVersion rules:\n" +
-                        "Call `setProjectSdkFromEbinDirectory();` to setup the Release.";
-
-        Release limit = Release.fromString(releaseString);
-
-        assert limit != null;
-
-        boolean keepParsing;
-
-        switch (Operator.valueOf(operatorString)) {
-            case LT:
-                // assume UNKNOWN release is GE limit and so rule DOES NOT run
-                keepParsing = release != null && release.compareTo(limit) < 0;
-
-                break;
-            case GE:
-                // assume UNKNOWN release is GE limit and so rule DOES run
-                keepParsing = release == null || release.compareTo(limit) >= 0;
-
-                break;
-            default:
-                keepParsing = true;
-
-                break;
-        }
-
-        return keepParsing;
+        return operator.keepParsing(virtualFileLevel, targetLevel);
     }
 
     public enum Operator {
-        LT, GE
+        LT((virtualFileLevel, targetLevel) -> virtualFileLevel.compareTo(targetLevel) < 0),
+        GE((virtualFileLevel, targetLevel) -> virtualFileLevel.compareTo(targetLevel) >= 0);
+
+        @NotNull
+        private final BiFunction<Level, Level, Boolean> operation;
+
+        Operator(@NotNull BiFunction<Level, Level, Boolean> operation) {
+            this.operation = operation;
+        }
+
+        public boolean keepParsing(@NotNull Level virtualFileLevel, @NotNull Level targetLevel) {
+            return operation.apply(virtualFileLevel, targetLevel);
+        }
     }
 }

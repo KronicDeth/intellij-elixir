@@ -4,14 +4,15 @@ import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.io.FileUtilRt;
 import com.intellij.openapi.vfs.CharsetToolkit;
 import org.elixir_lang.intellij_elixir.Quoter;
-import org.elixir_lang.sdk.elixir.Release;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
-import static org.elixir_lang.test.ElixirVersion.elixirSdkRelease;
+import static org.elixir_lang.Level.V_1_3;
+import static org.elixir_lang.Level.V_1_5;
+import static org.elixir_lang.test.ElixirVersion.elixirSdkLevel;
 
 public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     private enum Parse {
@@ -354,10 +355,13 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     }
 
     public void testParallelCompilerBat() {
-        if (elixirSdkRelease().compareTo(Release.V_1_3) < 0) {
+        boolean beforeV_1_3 = elixirSdkLevel().compareTo(V_1_3) < 0;
+
+        if (beforeV_1_3) {
             assertParsed("lib/elixir/test/elixir/fixtures/parallel_compiler/bat.ex", Parse.ERROR);
         } else {
-            assertTrue(elixirSdkRelease().compareTo(Release.V_1_3) >= 0);
+            //noinspection ConstantConditions
+            assertTrue(!beforeV_1_3);
         }
     }
 
@@ -538,10 +542,13 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     }
 
     public void testMixArchive() {
-        if (elixirSdkRelease().compareTo(Release.V_1_3) < 0) {
+        boolean beforeV_1_3 = elixirSdkLevel().compareTo(V_1_3) < 0;
+
+        if (beforeV_1_3) {
             assertParsed("lib/mix/lib/mix/archive.ex", Parse.CORRECT);
         } else {
-            assertTrue(elixirSdkRelease().compareTo(Release.V_1_3) >= 0);
+            //noinspection ConstantConditions
+            assertTrue(!beforeV_1_3);
         }
     }
 
@@ -550,10 +557,12 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     }
 
     public void testMixCompilersElixir() {
-        if (elixirSdkRelease().compareTo(Release.V_1_5) >= 0) {
+        boolean atLeastV_1_5 = elixirSdkLevel().compareTo(V_1_5) >= 0;
+
+        if (atLeastV_1_5) {
             assertParsed("lib/mix/lib/mix/compilers/elixir.ex", Parse.CORRECT);
         } else {
-            assertTrue(elixirSdkRelease().compareTo(Release.V_1_5) < 0);
+            assertTrue(!atLeastV_1_5);
         }
     }
 
@@ -722,10 +731,12 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     }
 
     public void testMixTasksDepsCheck() {
-        if (elixirSdkRelease().compareTo(Release.V_1_3) < 0) {
+        boolean beforeV_1_3 = elixirSdkLevel().compareTo(V_1_3) < 0;
+
+        if (beforeV_1_3) {
             assertParsed("lib/mix/lib/mix/tasks/deps.check.ex", Parse.CORRECT);
         } else {
-            assertTrue(elixirSdkRelease().compareTo(Release.V_1_3) >= 0);
+            assertTrue(!beforeV_1_3);
         }
     }
 
@@ -833,10 +844,13 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     }
 
     public void testEscripttestLibEscripttest() {
-        if (elixirSdkRelease().compareTo(Release.V_1_5) < 0) {
+        boolean beforeV_1_5 = elixirSdkLevel().compareTo(V_1_5) < 0;
+
+        if (beforeV_1_5) {
             assertParsed("lib/mix/test/fixtures/escripttest/lib/escripttest.ex", Parse.CORRECT);
         } else {
-            assertTrue(elixirSdkRelease().compareTo(Release.V_1_5) >= 0);
+            //noinspection ConstantConditions
+            assertTrue(!beforeV_1_5);
         }
     }
 
@@ -849,10 +863,12 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     }
 
     public void testNoMixfileLibC() {
-        if (elixirSdkRelease().compareTo(Release.V_1_3) < 0) {
+        boolean beforeV_1_3 = elixirSdkLevel().compareTo(V_1_3) < 0;
+
+        if (beforeV_1_3) {
             assertParsed("lib/mix/test/fixtures/no_mixfile/lib/c.ex", Parse.CORRECT);
         } else {
-            assertTrue(elixirSdkRelease().compareTo(Release.V_1_3) >= 0);
+            assertTrue(!beforeV_1_3);
         }
     }
 

@@ -1,8 +1,7 @@
 package org.elixir_lang.parser_definition;
 
-import org.elixir_lang.sdk.elixir.Release;
-
-import static org.elixir_lang.test.ElixirVersion.elixirSdkRelease;
+import static org.elixir_lang.Level.V_1_3;
+import static org.elixir_lang.test.ElixirVersion.elixirSdkLevel;
 
 /**
  * Created by luke.imhoff on 9/17/14.
@@ -41,7 +40,7 @@ public class CharTokenParsingTestCase extends ParsingTestCase {
      */
 
     public void testOpenHexadecimalEscapeSequence() {
-        if (elixirSdkRelease().compareTo(Release.V_1_3) < 0) {
+        if (elixirSdkLevel().supportsOpenHexadecimalEscapeSequence) {
             assertParsedAndQuotedCorrectly();
         } else {
             assertParsedAndQuotedAroundError();
@@ -49,7 +48,7 @@ public class CharTokenParsingTestCase extends ParsingTestCase {
     }
 
     public void testEnclosedHexadecimalEscapeSequence() {
-        if (elixirSdkRelease().compareTo(Release.V_1_3) < 0) {
+        if (elixirSdkLevel().compareTo(V_1_3) < 0) {
             assertParsedAndQuotedCorrectly();
         } else {
             assertParsedAndQuotedAroundError();

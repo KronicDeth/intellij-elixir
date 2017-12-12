@@ -2,7 +2,8 @@ package org.elixir_lang.parser_definition;
 
 import org.elixir_lang.sdk.elixir.Release;
 
-import static org.elixir_lang.test.ElixirVersion.elixirSdkRelease;
+import static org.elixir_lang.Level.V_1_2;
+import static org.elixir_lang.test.ElixirVersion.elixirSdkLevel;
 
 /**
  * Created by luke.imhoff on 9/17/14.
@@ -23,7 +24,7 @@ public class MatchedThreeOperationParsingTestCase extends ParsingTestCase {
     }
 
     public void testMatchedInOperation() {
-        if (!isTravis() && elixirSdkRelease().compareTo(Release.V_1_2) > 0) {
+        if (!isTravis() && elixirSdkLevel().compareTo(V_1_2) > 0) {
             assertParsedAndQuotedCorrectly();
         }
     }

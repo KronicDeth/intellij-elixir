@@ -28,6 +28,7 @@ import java.awt.*;
 import java.io.File;
 import java.util.List;
 
+import static org.elixir_lang.Level.V_1_4;
 import static org.elixir_lang.sdk.ProcessOutput.transformStdoutLine;
 
 /**
@@ -143,7 +144,7 @@ public class MixConfigurationForm {
           Release elixirSdkRelease = Release.fromString(versionString);
 
           if (elixirSdkRelease != null) {
-            supportsFormatterOptionCheckBox.setSelected(elixirSdkRelease.compareTo(Release.V_1_4) >= 0);
+            supportsFormatterOptionCheckBox.setSelected(elixirSdkRelease.level().supportsMixTestFormatterFlag);
           }
 
           valid = true;

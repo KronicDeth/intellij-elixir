@@ -1,5 +1,6 @@
 package org.elixir_lang.sdk.elixir;
 
+import org.elixir_lang.Level;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -13,12 +14,7 @@ public final class Release implements Comparable<Release> {
    */
 
   public static final Release V_1_0_4 = new Release("1", "0", "4", null, null);
-  public static final Release V_1_2 = new Release("1", "2", null, null, null);
-  public static final Release V_1_3 = new Release("1", "3", null, null, null);
-  public static final Release V_1_4 = new Release("1", "4", null, null, null);
-  public static final Release V_1_5 = new Release("1", "5", null, null, null);
-  public static final Release V_1_5_2 = new Release("1", "5", "2", null, null);
-  public static final Release LATEST = V_1_5_2;
+  public static final Release LATEST = new Release("1", "6", "0", "dev", null);
 
   private static final Pattern VERSION_PATTERN = Pattern.compile(
           // @version_regex from Version in elixir itself
@@ -109,13 +105,15 @@ public final class Release implements Comparable<Release> {
   @Nullable
   private final String build;
   @NotNull
-  private final String major;
+  public final String major;
   @Nullable
-  private final String minor;
+  public final String minor;
   @Nullable
   private final String patch;
   @Nullable
   private final String pre;
+  @NotNull
+  private final Level level;
 
   /*
    * Constructors
@@ -126,6 +124,15 @@ public final class Release implements Comparable<Release> {
                  @Nullable String patch,
                  @Nullable String pre,
                  @Nullable String build) {
+    this(major, minor, patch, pre, build, null);
+  }
+
+  public Release(@NotNull String major,
+                 @Nullable String minor,
+                 @Nullable String patch,
+                 @Nullable String pre,
+                 @Nullable String build,
+                 @Nullable Level level) {
     this.major = major;
     this.minor = minor;
     this.patch = patch;
@@ -134,6 +141,12 @@ public final class Release implements Comparable<Release> {
 
     if (minor == null && patch != null) {
       throw new IllegalArgumentException("patch MUST be null if minor is null");
+    }
+
+    if (level != null) {
+      this.level = level;
+    } else {
+      this.level = Level.fromRelease(this);
     }
   }
 
@@ -158,6 +171,12 @@ public final class Release implements Comparable<Release> {
     }
 
     return comparison;
+  }
+
+  @Contract(pure = true)
+  @NotNull
+  public Level level() {
+    return level;
   }
 
   @Override

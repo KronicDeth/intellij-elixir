@@ -1,8 +1,9 @@
 package org.elixir_lang.parser_definition;
 
-import org.elixir_lang.sdk.elixir.Release;
 
-import static org.elixir_lang.test.ElixirVersion.elixirSdkRelease;
+import static org.elixir_lang.Level.V_1_4;
+import static org.elixir_lang.Level.V_1_5;
+import static org.elixir_lang.test.ElixirVersion.elixirSdkLevel;
 
 /**
  * Created by luke.imhoff on 9/17/14.
@@ -81,10 +82,13 @@ public class BracketOperationParsingTestCase extends ParsingTestCase {
     }
 
     public void testStructOperator() {
-        if (elixirSdkRelease().compareTo(Release.V_1_4) < 0) {
+        int compareToV_1_4 = elixirSdkLevel().compareTo(V_1_4);
+
+        if (compareToV_1_4 < 0) {
             assertParsedAndQuotedCorrectly(false);
         } else {
-            assertTrue(elixirSdkRelease().compareTo(Release.V_1_4) >= 0);
+            //noinspection ConstantConditions
+            assertTrue(compareToV_1_4 >= 0);
         }
     }
 
@@ -137,10 +141,13 @@ public class BracketOperationParsingTestCase extends ParsingTestCase {
     }
 
     public void testUnaryNumericOperation() {
-        if (elixirSdkRelease().compareTo(Release.V_1_5) < 0) {
+        int compareToV_1_5 = elixirSdkLevel().compareTo(V_1_5);
+
+        if (compareToV_1_5 < 0) {
             assertParsedAndQuotedCorrectly(false);
         } else {
-            assertTrue(elixirSdkRelease().compareTo(Release.V_1_5) >= 0);
+            //noinspection ConstantConditions
+            assertTrue(compareToV_1_5 >= 0);
         }
     }
 

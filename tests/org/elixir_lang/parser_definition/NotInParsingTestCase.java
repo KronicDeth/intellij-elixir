@@ -1,16 +1,19 @@
 package org.elixir_lang.parser_definition;
 
-import org.elixir_lang.sdk.elixir.Release;
 import org.jetbrains.annotations.NotNull;
 
-import static org.elixir_lang.test.ElixirVersion.elixirSdkRelease;
+import static org.elixir_lang.Level.V_1_5;
+import static org.elixir_lang.test.ElixirVersion.elixirSdkLevel;
 
 public class NotInParsingTestCase extends ParsingTestCase {
     public void testIssue844() {
-        if (elixirSdkRelease().compareTo(Release.V_1_5) >= 0) {
+        boolean atLeastV_1_5 = elixirSdkLevel().compareTo(V_1_5) >= 0;
+
+        if (atLeastV_1_5) {
             assertParsedAndQuotedCorrectly();
         } else {
-            assertTrue(elixirSdkRelease().compareTo(Release.V_1_5) < 0);
+            //noinspection ConstantConditions
+            assertTrue(!atLeastV_1_5);
         }
     }
 

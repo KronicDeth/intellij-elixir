@@ -10,6 +10,9 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 
 import static org.elixir_lang.grammar.parser.GeneratedParserUtilBase.*;
+import static org.elixir_lang.Level.V_1_5;
+import static org.elixir_lang.parser.ExternalRules.Operator.GE;
+import static org.elixir_lang.parser.ExternalRules.Operator.LT;
 import static org.elixir_lang.parser.ExternalRules.ifVersion;
 import static org.elixir_lang.psi.ElixirTypes.*;
 
@@ -896,12 +899,12 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // <<ifVersion "LT" "1.5">> atPrefixOperator numeric
+  // <<ifVersion 'LT' 'V_1_5'>> atPrefixOperator numeric
   public static boolean atNumericOperation(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "atNumericOperation")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, AT_NUMERIC_OPERATION, "<at numeric operation>");
-    r = ifVersion(b, l + 1, "LT", "1.5");
+    r = ifVersion(b, l + 1, LT, V_1_5);
     r = r && atPrefixOperator(b, l + 1);
     r = r && numeric(b, l + 1);
     exit_section_(b, l, m, r, false, null);
@@ -4838,12 +4841,12 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // <<ifVersion "LT" "1.5">> unaryPrefixOperator numeric
+  // <<ifVersion 'LT' 'V_1_5'>> unaryPrefixOperator numeric
   public static boolean unaryNumericOperation(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unaryNumericOperation")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, UNARY_NUMERIC_OPERATION, "<unary numeric operation>");
-    r = ifVersion(b, l + 1, "LT", "1.5");
+    r = ifVersion(b, l + 1, LT, V_1_5);
     r = r && unaryPrefixOperator(b, l + 1);
     r = r && numeric(b, l + 1);
     exit_section_(b, l, m, r, false, null);
@@ -5212,12 +5215,12 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // <<ifVersion "GE" "1.5.0">> notInfixOperator inInfixOperator
+  // <<ifVersion 'GE' 'V_1_5'>> notInfixOperator inInfixOperator
   private static boolean matchedNotInOperation_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedNotInOperation_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = ifVersion(b, l + 1, "GE", "1.5.0");
+    r = ifVersion(b, l + 1, GE, V_1_5);
     r = r && notInfixOperator(b, l + 1);
     r = r && inInfixOperator(b, l + 1);
     exit_section_(b, m, null, r);
@@ -5235,12 +5238,12 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r || p;
   }
 
-  // <<ifVersion "LT" "1.5.0">> unaryPrefixOperator nonNumeric
+  // <<ifVersion 'LT' 'V_1_5'>> unaryPrefixOperator nonNumeric
   private static boolean matchedUnaryNonNumericOperation_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedUnaryNonNumericOperation_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = ifVersion(b, l + 1, "LT", "1.5.0");
+    r = ifVersion(b, l + 1, LT, V_1_5);
     r = r && unaryPrefixOperator(b, l + 1);
     r = r && nonNumeric(b, l + 1);
     exit_section_(b, m, null, r);
@@ -5258,12 +5261,12 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r || p;
   }
 
-  // <<ifVersion "GE" "1.5.0" >> unaryPrefixOperator
+  // <<ifVersion 'GE' 'V_1_5'>> unaryPrefixOperator
   private static boolean matchedUnaryOperation_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedUnaryOperation_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = ifVersion(b, l + 1, "GE", "1.5.0");
+    r = ifVersion(b, l + 1, GE, V_1_5);
     r = r && unaryPrefixOperator(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -5324,12 +5327,12 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // <<ifVersion "GE" "1.5.0">> atPrefixOperator numeric bracketArguments
+  // <<ifVersion 'GE' 'V_1_5'>> atPrefixOperator numeric bracketArguments
   public static boolean matchedAtNumericBracketOperation(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedAtNumericBracketOperation")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, MATCHED_AT_NUMERIC_BRACKET_OPERATION, "<matched at numeric bracket operation>");
-    r = ifVersion(b, l + 1, "GE", "1.5.0");
+    r = ifVersion(b, l + 1, GE, V_1_5);
     r = r && atPrefixOperator(b, l + 1);
     r = r && numeric(b, l + 1);
     r = r && bracketArguments(b, l + 1);
@@ -5430,12 +5433,12 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r || p;
   }
 
-  // <<ifVersion "LT" "1.5.0">> atPrefixOperator nonNumeric
+  // <<ifVersion 'LT' 'V_1_5'>> atPrefixOperator nonNumeric
   private static boolean matchedAtNonNumericOperation_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedAtNonNumericOperation_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = ifVersion(b, l + 1, "LT", "1.5.0");
+    r = ifVersion(b, l + 1, LT, V_1_5);
     r = r && atPrefixOperator(b, l + 1);
     r = r && nonNumeric(b, l + 1);
     exit_section_(b, m, null, r);
@@ -5453,12 +5456,12 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r || p;
   }
 
-  // <<ifVersion "GE" "1.5.0">> atPrefixOperator
+  // <<ifVersion 'GE' 'V_1_5'>> atPrefixOperator
   private static boolean matchedAtOperation_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedAtOperation_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = ifVersion(b, l + 1, "GE", "1.5.0");
+    r = ifVersion(b, l + 1, GE, V_1_5);
     r = r && atPrefixOperator(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -5723,12 +5726,12 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // <<ifVersion "GE" "1.5.0">> notInfixOperator inInfixOperator
+  // <<ifVersion 'GE' 'V_1_5'>> notInfixOperator inInfixOperator
   private static boolean unmatchedNotInOperation_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unmatchedNotInOperation_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = ifVersion(b, l + 1, "GE", "1.5.0");
+    r = ifVersion(b, l + 1, GE, V_1_5);
     r = r && notInfixOperator(b, l + 1);
     r = r && inInfixOperator(b, l + 1);
     exit_section_(b, m, null, r);
@@ -5746,12 +5749,12 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r || p;
   }
 
-  // <<ifVersion "LT" "1.5.0">> unaryPrefixOperator nonNumeric
+  // <<ifVersion 'LT' 'V_1_5'>> unaryPrefixOperator nonNumeric
   private static boolean unmatchedUnaryNonNumericOperation_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unmatchedUnaryNonNumericOperation_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = ifVersion(b, l + 1, "LT", "1.5.0");
+    r = ifVersion(b, l + 1, LT, V_1_5);
     r = r && unaryPrefixOperator(b, l + 1);
     r = r && nonNumeric(b, l + 1);
     exit_section_(b, m, null, r);
@@ -5769,12 +5772,12 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r || p;
   }
 
-  // <<ifVersion "GE" "1.5.0">> unaryPrefixOperator
+  // <<ifVersion 'GE' 'V_1_5'>> unaryPrefixOperator
   private static boolean unmatchedUnaryOperation_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unmatchedUnaryOperation_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = ifVersion(b, l + 1, "GE", "1.5.0");
+    r = ifVersion(b, l + 1, GE, V_1_5);
     r = r && unaryPrefixOperator(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -5839,12 +5842,12 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // <<ifVersion "GE" "1.5.0">> atPrefixOperator numeric bracketArguments
+  // <<ifVersion 'GE' 'V_1_5'>> atPrefixOperator numeric bracketArguments
   public static boolean unmatchedAtNumericBracketOperation(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unmatchedAtNumericBracketOperation")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, UNMATCHED_AT_NUMERIC_BRACKET_OPERATION, "<unmatched at numeric bracket operation>");
-    r = ifVersion(b, l + 1, "GE", "1.5.0");
+    r = ifVersion(b, l + 1, GE, V_1_5);
     r = r && atPrefixOperator(b, l + 1);
     r = r && numeric(b, l + 1);
     r = r && bracketArguments(b, l + 1);
@@ -5947,12 +5950,12 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r || p;
   }
 
-  // <<ifVersion "LT" "1.5.0">> atPrefixOperator nonNumeric
+  // <<ifVersion 'LT' 'V_1_5'>> atPrefixOperator nonNumeric
   private static boolean unmatchedAtNonNumericOperation_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unmatchedAtNonNumericOperation_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = ifVersion(b, l + 1, "LT", "1.5.0");
+    r = ifVersion(b, l + 1, LT, V_1_5);
     r = r && atPrefixOperator(b, l + 1);
     r = r && nonNumeric(b, l + 1);
     exit_section_(b, m, null, r);
@@ -5970,12 +5973,12 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r || p;
   }
 
-  // <<ifVersion "GE" "1.5.0">> atPrefixOperator
+  // <<ifVersion 'GE' 'V_1_5'>> atPrefixOperator
   private static boolean unmatchedAtOperation_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unmatchedAtOperation_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = ifVersion(b, l + 1, "GE", "1.5.0");
+    r = ifVersion(b, l + 1, GE, V_1_5);
     r = r && atPrefixOperator(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
