@@ -14,10 +14,7 @@ import com.intellij.openapi.project.DumbModeTask;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.Sdk;
-import com.intellij.openapi.roots.ModuleRootEvent;
-import com.intellij.openapi.roots.ModuleRootListener;
-import com.intellij.openapi.roots.ModuleRootManager;
-import com.intellij.openapi.roots.OrderRootType;
+import com.intellij.openapi.roots.*;
 import com.intellij.openapi.roots.impl.FilePropertyPusher;
 import com.intellij.openapi.roots.impl.PushedFilePropertiesUpdater;
 import com.intellij.openapi.roots.impl.PushedFilePropertiesUpdaterImpl;
@@ -139,10 +136,10 @@ public class LevelPropertyPusher implements FilePropertyPusher<Level> {
             Level maxLevel = null;
 
             for (Module module : moduleManager.getModules()) {
-                final Sdk sdk = ModuleRootManager.getInstance(module).getSdk();
+                final Sdk moduleSdk = ModuleRootManager.getInstance(module).getSdk();
 
-                if (sdk != null) {
-                    final Level sdkLevel = level(sdk);
+                if (moduleSdk != null) {
+                    final Level sdkLevel = level(moduleSdk);
 
                     if (maxLevel == null || maxLevel.ordinal() < sdkLevel.ordinal()) {
                         maxLevel = sdkLevel;
@@ -152,6 +149,9 @@ public class LevelPropertyPusher implements FilePropertyPusher<Level> {
 
             if (maxLevel != null) {
                 projectLevel = maxLevel;
+            } else {
+                Sdk projectSdk = ProjectRootManager.getInstance(project).getProjectSdk();
+                projectLevel = level(projectSdk);
             }
         }
 
