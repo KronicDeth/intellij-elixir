@@ -11,12 +11,12 @@ import java.util.Map;
 import java.util.Optional;
 
 public enum Level {
-    V_1_1(1, 1, false, "to_char_list", false),
-    V_1_2(1, 2, true, "to_char_list", false),
-    V_1_3(1, 3, true, "to_charlist", false),
-    V_1_4(1, 4, true, "to_charlist", true),
-    V_1_5(1, 5, true, "to_charlist", true),
-    V_1_6(1, 6, true, "to_charlist", true);
+    V_1_1(1, 1, true, false, "to_char_list", false),
+    V_1_2(1, 2, true, true, "to_char_list", false),
+    V_1_3(1, 3, false, true, "to_charlist", false),
+    V_1_4(1, 4, false, true, "to_charlist", true),
+    V_1_5(1, 5, false, true, "to_charlist", true),
+    V_1_6(1, 6, false, true, "to_charlist", true);
 
     public static final Key<Level> KEY = new Key<>("elixir.level");
 
@@ -45,16 +45,19 @@ public enum Level {
 
     private final int major;
     private final int minor;
+    public final boolean supportsOpenHexadecimalEscapeSequence;
     public final boolean supportsMultipleAliases;
     public final String quoteBinaryFunctionIdentifier;
     public final boolean supportsMixTestFormatterFlag;
 
     Level(int major, int minor,
+          boolean supportsOpenHexadecimalEscapeSequence,
           boolean supportsMultipleAliases,
           @NotNull String quoteBinaryFunctionIdentifier,
           boolean supportsMixTestFormatterFlag) {
         this.major = major;
         this.minor = minor;
+        this.supportsOpenHexadecimalEscapeSequence = supportsOpenHexadecimalEscapeSequence;
         this.supportsMultipleAliases = supportsMultipleAliases;
         this.quoteBinaryFunctionIdentifier = quoteBinaryFunctionIdentifier;
         this.supportsMixTestFormatterFlag = supportsMixTestFormatterFlag;

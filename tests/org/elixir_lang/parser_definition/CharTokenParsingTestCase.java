@@ -41,7 +41,7 @@ public class CharTokenParsingTestCase extends ParsingTestCase {
      */
 
     public void testOpenHexadecimalEscapeSequence() {
-        if (elixirSdkRelease().compareTo(Release.V_1_3) < 0) {
+        if (elixirSdkRelease().level().supportsOpenHexadecimalEscapeSequence) {
             assertParsedAndQuotedCorrectly();
         } else {
             assertParsedAndQuotedAroundError();
