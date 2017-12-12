@@ -1,7 +1,9 @@
 {
   parserClass="org.elixir_lang.parser.ElixirParser"
   parserImports=[
+    "static org.elixir_lang.Level.*"
     "static org.elixir_lang.parser.ExternalRules.*"
+    "static org.elixir_lang.parser.ExternalRules.Operator.*"
   ]
 
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
@@ -1424,7 +1426,7 @@ notInfixOperator ::= NOT_OPERATOR
                        ]
                        name = "not"
                      }
-matchedNotInOperation ::= matchedExpression <<ifVersion "GE" "1.5.0">> notInfixOperator inInfixOperator matchedExpression
+matchedNotInOperation ::= matchedExpression <<ifVersion 'GE' 'V_1_5'>> notInfixOperator inInfixOperator matchedExpression
 
 /*
  * Three Operation - left-associative
@@ -1526,13 +1528,13 @@ unaryPrefixOperator ::= (significantWhiteSpaceMaybe DUAL_OPERATOR | SIGN_OPERATO
  *
  */
 
-matchedUnaryNonNumericOperation ::= <<ifVersion "LT" "1.5.0">> unaryPrefixOperator nonNumeric matchedExpression
+matchedUnaryNonNumericOperation ::= <<ifVersion 'LT' 'V_1_5'>> unaryPrefixOperator nonNumeric matchedExpression
 
 /*
  * Unary Operation - non-associative (Elixir >= 1.5.0)
  */
 
-matchedUnaryOperation ::= <<ifVersion "GE" "1.5.0" >> unaryPrefixOperator matchedExpression
+matchedUnaryOperation ::= <<ifVersion 'GE' 'V_1_5'>> unaryPrefixOperator matchedExpression
 
 /*
  * Dot Operations
@@ -1872,7 +1874,7 @@ matchedAtUnqualifiedBracketOperation ::= atPrefixOperator IDENTIFIER_TOKEN CALL 
  * Needed so that At consumes numeric, but brackets consume both of them.
  */
 
-matchedAtNumericBracketOperation ::= <<ifVersion "GE" "1.5.0">> atPrefixOperator numeric bracketArguments
+matchedAtNumericBracketOperation ::= <<ifVersion 'GE' 'V_1_5'>> atPrefixOperator numeric bracketArguments
                                      { implements = "org.elixir_lang.psi.AtNumericBracketOperation" methods = [quote] }
 
 /*
@@ -1909,13 +1911,13 @@ atPrefixOperator ::= AT_OPERATOR
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L574-L578
  */
 
-matchedAtNonNumericOperation ::= <<ifVersion "LT" "1.5.0">> atPrefixOperator nonNumeric matchedExpression
+matchedAtNonNumericOperation ::= <<ifVersion 'LT' 'V_1_5'>> atPrefixOperator nonNumeric matchedExpression
 
 /*
  * At Operation - non-associative (Elixir >= 1.5.0)
  */
 
-matchedAtOperation ::= <<ifVersion "GE" "1.5.0">> atPrefixOperator matchedExpression
+matchedAtOperation ::= <<ifVersion 'GE' 'V_1_5'>> atPrefixOperator matchedExpression
 
 /*
  * Unqualified Bracket Operation
@@ -1953,9 +1955,9 @@ matchedAccessExpression ::= accessExpression
  *
  */
 
-atNumericOperation ::= <<ifVersion "LT" "1.5">> atPrefixOperator numeric
+atNumericOperation ::= <<ifVersion 'LT' 'V_1_5'>> atPrefixOperator numeric
 captureNumericOperation ::= capturePrefixOperator numeric
-unaryNumericOperation ::= <<ifVersion "LT" "1.5">> unaryPrefixOperator numeric
+unaryNumericOperation ::= <<ifVersion 'LT' 'V_1_5'>> unaryPrefixOperator numeric
 
 /*
  *
@@ -2438,7 +2440,7 @@ unmatchedArrowOperation ::= unmatchedExpression arrowInfixOperator unmatchedExpr
 // methods defined by "infix operations" section above
 unmatchedInOperation ::= unmatchedExpression inInfixOperator unmatchedExpression
 
-unmatchedNotInOperation ::= unmatchedExpression <<ifVersion "GE" "1.5.0">> notInfixOperator inInfixOperator unmatchedExpression
+unmatchedNotInOperation ::= unmatchedExpression <<ifVersion 'GE' 'V_1_5'>> notInfixOperator inInfixOperator unmatchedExpression
 
 /*
  * Three Operation - left-associative
@@ -2485,13 +2487,13 @@ unmatchedMultiplicationOperation ::= unmatchedExpression multiplicationInfixOper
  *
  */
 
-unmatchedUnaryNonNumericOperation ::= <<ifVersion "LT" "1.5.0">> unaryPrefixOperator nonNumeric unmatchedExpression
+unmatchedUnaryNonNumericOperation ::= <<ifVersion 'LT' 'V_1_5'>> unaryPrefixOperator nonNumeric unmatchedExpression
 
 /*
  * Unary Operation - non-associative (Elixir >= 1.5.0)
  */
 
-unmatchedUnaryOperation ::= <<ifVersion "GE" "1.5.0">> unaryPrefixOperator unmatchedExpression
+unmatchedUnaryOperation ::= <<ifVersion 'GE' 'V_1_5'>> unaryPrefixOperator unmatchedExpression
 
 /*
  * Dot Operations
@@ -2677,7 +2679,7 @@ unmatchedAtUnqualifiedBracketOperation ::= atPrefixOperator IDENTIFIER_TOKEN CAL
  * Needed so that At consumes numeric, but brackets consume both of them.
  */
 
-unmatchedAtNumericBracketOperation ::= <<ifVersion "GE" "1.5.0">> atPrefixOperator numeric bracketArguments
+unmatchedAtNumericBracketOperation ::= <<ifVersion 'GE' 'V_1_5'>> atPrefixOperator numeric bracketArguments
                                        { implements = "org.elixir_lang.psi.AtNumericBracketOperation" methods = [quote] }
 
 
@@ -2702,7 +2704,7 @@ unmatchedUnqualifiedParenthesesCall ::= identifier matchedParenthesesArguments d
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L574-L578
  */
 
-unmatchedAtNonNumericOperation ::= <<ifVersion "LT" "1.5.0">> atPrefixOperator nonNumeric unmatchedExpression
+unmatchedAtNonNumericOperation ::= <<ifVersion 'LT' 'V_1_5'>> atPrefixOperator nonNumeric unmatchedExpression
 
 /*
  * At Operation - non-associative (Elixir >= 1.5.0)
@@ -2712,7 +2714,7 @@ unmatchedAtNonNumericOperation ::= <<ifVersion "LT" "1.5.0">> atPrefixOperator n
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L574-L578
  */
 
-unmatchedAtOperation ::= <<ifVersion "GE" "1.5.0">> atPrefixOperator unmatchedExpression
+unmatchedAtOperation ::= <<ifVersion 'GE' 'V_1_5'>> atPrefixOperator unmatchedExpression
 
 /*
  * Unqualified Bracket Operation

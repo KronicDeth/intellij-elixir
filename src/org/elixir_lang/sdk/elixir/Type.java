@@ -430,7 +430,7 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
     }
 
     @Nullable
-    private static Release getReleaseForSmallIde(@NotNull Project project) {
+    public static Release getReleaseForSmallIde(@NotNull Project project) {
         String sdkPath = getSdkPath(project);
         return StringUtil.isEmpty(sdkPath) ? null : getInstance().detectSdkVersion(sdkPath);
     }

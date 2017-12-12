@@ -1,5 +1,8 @@
 package org.elixir_lang.psi.stub.type;
 
+import com.intellij.lang.*;
+import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.StubBuilder;
 import com.intellij.psi.stubs.DefaultStubBuilder;
@@ -10,8 +13,11 @@ import com.intellij.psi.tree.IStubFileElementType;
 import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.psi.ElixirFile;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+
+import static org.elixir_lang.file.LevelPropertyPusher.VIRTUAL_FILE;
 
 public class File extends IStubFileElementType<org.elixir_lang.psi.stub.File> {
     public static final int VERSION = 3;
@@ -53,5 +59,17 @@ public class File extends IStubFileElementType<org.elixir_lang.psi.stub.File> {
     @Override
     public String getExternalId() {
         return "elixir.FILE";
+    }
+
+    @Nullable
+    @Override
+    protected ASTNode doParseContents(@NotNull ASTNode chameleon, @NotNull PsiElement psi) {
+        Project project = psi.getProject();
+        Language languageForParser = getLanguageForParser(psi);
+        PsiBuilder builder = PsiBuilderFactory.getInstance().createBuilder(project, chameleon, null, languageForParser, chameleon.getChars());
+        PsiParser parser = LanguageParserDefinitions.INSTANCE.forLanguage(languageForParser).createParser(project);
+        builder.putUserData(VIRTUAL_FILE, psi.getContainingFile().getVirtualFile());
+        ASTNode node = parser.parse(this, builder);
+        return node.getFirstChildNode();
     }
 }

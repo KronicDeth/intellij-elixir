@@ -6,6 +6,8 @@ import com.intellij.psi.*;
 import com.intellij.psi.tree.IFileElementType;
 import org.elixir_lang.ElixirLanguage;
 
+import static org.elixir_lang.file.LevelPropertyPusher.VIRTUAL_FILE;
+
 /**
  * Both Elixir and enough of the EEx tags and {@link org.elixir_lang.eex.psi.Types#DATA}, so that Elixir parses
  * correctly, such as separating {@link org.elixir_lang.eex.psi.Types#ELIXIR} inside {@code <%= %>} tags, so that the
@@ -33,6 +35,7 @@ public class EmbeddedElixir extends IFileElementType {
                 chameleon.getChars()
         );
         PsiParser parser = LanguageParserDefinitions.INSTANCE.forLanguage(languageForParser).createParser(project);
+        builder.putUserData(VIRTUAL_FILE, psi.getContainingFile().getVirtualFile());
         ASTNode node = parser.parse(this, builder);
         return node.getFirstChildNode();
     }
