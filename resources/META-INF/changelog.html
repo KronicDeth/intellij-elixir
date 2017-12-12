@@ -23,6 +23,17 @@
       </li>
     </ul>
   </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>
+        When the SDK changes, record what <code>Release</code> of Elixir is used indirectly, using a <code>Level</code>
+        <code>enum</code> that only cares about the major and minor version. Changing the <code>Level</code>, will mark
+        the open files and .beam files as invalidated, so that if the SDK is changed, the stubs and code
+        <code>Level</code> will agree, so there isn't a stub incompatibility with the PSI.
+      </li>
+    </ul>
+  </li>
 </ul>
 <h1>v6.7.0</h1>
 <ul>
