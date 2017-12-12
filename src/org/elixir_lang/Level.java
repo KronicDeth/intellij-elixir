@@ -43,7 +43,7 @@ public enum Level {
 
     private final int major;
     private final int minor;
-    private final boolean supportsMixTestFormatterFlag;
+    public final boolean supportsMixTestFormatterFlag;
 
     Level(int major, int minor, boolean supportsMixTestFormatterFlag) {
         this.major = major;
