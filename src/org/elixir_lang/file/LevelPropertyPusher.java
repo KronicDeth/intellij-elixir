@@ -160,7 +160,7 @@ public class LevelPropertyPusher implements FilePropertyPusher<Level> {
 
     @NotNull
     @Contract(pure = true)
-    private static Level level(@NotNull Sdk sdk) {
+    public static Level level(@Nullable Sdk sdk) {
         Release release = Type.getRelease(sdk);
         Level level;
 

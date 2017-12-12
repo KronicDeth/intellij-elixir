@@ -8,8 +8,8 @@ import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.runners.ProgramRunner;
-import com.intellij.execution.testframework.autotest.ToggleAutoTestAction;
 import com.intellij.execution.testframework.TestConsoleProperties;
+import com.intellij.execution.testframework.autotest.ToggleAutoTestAction;
 import com.intellij.execution.testframework.sm.SMTestRunnerConnectionUtil;
 import com.intellij.execution.ui.ConsoleView;
 import com.intellij.openapi.diagnostic.Logger;
@@ -22,13 +22,14 @@ import org.elixir_lang.jps.builder.ParametersList;
 import org.elixir_lang.mix.runner.MixRunningState;
 import org.elixir_lang.mix.runner.MixTestConsoleProperties;
 import org.elixir_lang.mix.settings.MixSettings;
-import org.elixir_lang.sdk.elixir.Type;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
+import static org.elixir_lang.file.LevelPropertyPusher.level;
 
 final class MixExUnitRunningState extends MixRunningState {
     private static final Logger LOGGER = com.intellij.openapi.diagnostic.Logger.getInstance(MixExUnitRunningState.class);
@@ -54,7 +55,7 @@ final class MixExUnitRunningState extends MixRunningState {
 
     @NotNull
     private static ParametersList elixirParametersList(@Nullable Sdk sdk, boolean useCustomMixTask) throws IOException {
-        return ElixirModules.parametersList(Type.getRelease(sdk), useCustomMixTask);
+        return ElixirModules.parametersList(level(sdk), useCustomMixTask);
     }
 
     /**

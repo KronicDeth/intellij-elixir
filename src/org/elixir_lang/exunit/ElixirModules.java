@@ -1,14 +1,15 @@
 package org.elixir_lang.exunit;
 
+import org.elixir_lang.Level;
 import org.elixir_lang.jps.builder.ParametersList;
-import org.elixir_lang.sdk.elixir.Release;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.elixir_lang.Level.V_1_4;
 
 public class ElixirModules {
     private static final String BASE_PATH = "exunit";
@@ -26,11 +27,10 @@ public class ElixirModules {
     }
 
     private static void addFormatterPath(@NotNull List<String> relativeSourcePathList,
-                                         @Nullable Release elixirSdkRelease) {
-
+                                         @NotNull Level level) {
         String versionDirectory = "1.4.0";
 
-        if (elixirSdkRelease != null && elixirSdkRelease.compareTo(Release.V_1_4) < 0) {
+        if (level.compareTo(V_1_4) < 0) {
             versionDirectory = "1.1.0";
         }
 
@@ -40,21 +40,20 @@ public class ElixirModules {
     }
 
     @NotNull
-    private static List<File> copy(@Nullable Release elixirSdkRelease, boolean useCustomMixTask) throws IOException {
-        return org.elixir_lang.ElixirModules.copy(BASE_PATH, relativeSourcePathList(elixirSdkRelease, useCustomMixTask));
+    private static List<File> copy(@NotNull Level level, boolean useCustomMixTask) throws IOException {
+        return org.elixir_lang.ElixirModules.copy(BASE_PATH, relativeSourcePathList(level, useCustomMixTask));
     }
 
     @NotNull
-    public static ParametersList parametersList(@Nullable Release elixirSdkRelease,
-                                                boolean useCustomMixTask) throws IOException {
-        return org.elixir_lang.ElixirModules.parametersList(copy(elixirSdkRelease, useCustomMixTask));
+    public static ParametersList parametersList(@NotNull Level level, boolean useCustomMixTask) throws IOException {
+        return org.elixir_lang.ElixirModules.parametersList(copy(level, useCustomMixTask));
     }
 
-    private static List<String> relativeSourcePathList(@Nullable Release elixirSdkRelease, boolean useCustomMixTask) {
+    private static List<String> relativeSourcePathList(@NotNull Level level, boolean useCustomMixTask) {
         List<String> relativeSourcePathList = new ArrayList<>();
         relativeSourcePathList.add(FORMATTING_FILE_NAME);
 
-        addFormatterPath(relativeSourcePathList, elixirSdkRelease);
+        addFormatterPath(relativeSourcePathList, level);
         addCustomMixTask(relativeSourcePathList, useCustomMixTask);
 
         return relativeSourcePathList;

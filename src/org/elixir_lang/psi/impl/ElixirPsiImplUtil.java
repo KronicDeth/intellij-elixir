@@ -27,6 +27,7 @@ import com.intellij.util.containers.SmartHashSet;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.ElixirLanguage;
+import org.elixir_lang.Level;
 import org.elixir_lang.Macro;
 import org.elixir_lang.annotator.Parameter;
 import org.elixir_lang.psi.*;
@@ -64,6 +65,7 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import static org.elixir_lang.Level.V_1_3;
 import static org.elixir_lang.errorreport.Logger.error;
 import static org.elixir_lang.psi.call.name.Function.*;
 import static org.elixir_lang.psi.call.name.Module.*;
@@ -5870,10 +5872,10 @@ if (quoted == null) {
         }
 
         Body body = line.getBody();
-        Release release = getNonNullRelease(line);
+        Level level = getNonNullRelease(line).level();
         ASTNode[] childNodes = childNodes(body);
 
-        if (release.compareTo(Release.V_1_3) < 0 &&
+        if (level.compareTo(V_1_3) < 0 &&
                 childNodes.length >= 1 &&
                 childNodes[childNodes.length - 1].getElementType().equals(ElixirTypes.ESCAPED_EOL)) {
             heredocDescendantNodes.addAll(Arrays.asList(childNodes).subList(0, childNodes.length - 1));
@@ -5973,9 +5975,9 @@ if (quoted == null) {
                                               @NotNull @SuppressWarnings("unused") ASTNode child) {
         List<Integer> codePointList = ensureCodePointList(maybeCodePointList);
 
-        Release release = getNonNullRelease(parent);
+        Level level = getNonNullRelease(parent).level();
 
-        if (release.compareTo(Release.V_1_3) >= 0) {
+        if (level.compareTo(V_1_3) >= 0) {
             if (parent instanceof LiteralSigilHeredoc) {
                 codePointList = addStringCodePoints(codePointList, "\\");
             } else if (parent instanceof LiteralSigilLine) {

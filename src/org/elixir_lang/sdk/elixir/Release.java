@@ -14,12 +14,7 @@ public final class Release implements Comparable<Release> {
    */
 
   public static final Release V_1_0_4 = new Release("1", "0", "4", null, null);
-  public static final Release V_1_2 = new Release("1", "2", null, null, null);
-  public static final Release V_1_3 = new Release("1", "3", null, null, null);
-  public static final Release V_1_4 = new Release("1", "4", null, null, null);
-  public static final Release V_1_5 = new Release("1", "5", null, null, null);
-  public static final Release V_1_5_2 = new Release("1", "5", "2", null, null);
-  public static final Release LATEST = V_1_5_2;
+  public static final Release LATEST = new Release("1", "6", "0", "dev", null);
 
   private static final Pattern VERSION_PATTERN = Pattern.compile(
           // @version_regex from Version in elixir itself
