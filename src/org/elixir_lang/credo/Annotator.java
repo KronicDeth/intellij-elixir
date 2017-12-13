@@ -330,7 +330,14 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
 
         return headers
                 .stream()
-                .flatMap(header -> sectionToHTML(header, contentsByHeader.get(header), workingDirectory))
+                .flatMap(
+                        header ->
+                                sectionToHTML(
+                                        header,
+                                        contentsByHeader.getOrDefault(header, Collections.emptyList()),
+                                        workingDirectory
+                                )
+                )
                 .collect(Collectors.joining("\n"));
     }
 
