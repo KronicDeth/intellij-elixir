@@ -302,6 +302,12 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
         }
     }
 
+    @NotNull
+    @Override
+    public String getPairedBatchInspectionShortName() {
+        return Inspection.SHORT_NAME;
+    }
+
     @Contract(pure = true)
     @NotNull
     private String explanationToToolTip(@NotNull Stream<String> explanation, @NotNull String workingDirectory) {

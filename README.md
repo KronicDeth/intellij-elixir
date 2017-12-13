@@ -1092,22 +1092,6 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
   </tbody>
 </table>
 
-### External Annotators
-
-In addition to the built-in syntax highlighting and annotations above, various `mix` tasks will be run to gather annotations from Elixir status analysis tools.
-
-#### Credo
-
-If [`credo`](https://github.com/rrrene/credo) is not installed as a project dependency, nothing will happen, but if it is installed, `mix credo PATH` will be called on any files after updates have quieted.  Any `credo` check failures will show up as warning annotations
-
-![Warning Annotations](/screenshots/features/external_annotators/credo/Warning%20Annotations.png?raw=true "Warning Annotations")
-
-Individual check failures will show the explanation (from `mix credo PATH:LINE(:COLUMN)`) if you hover over the annotation
-
-![Explanation](/screenshots/features/external_annotators/credo/Explanation.png?raw=true "Credo Check Failure Explanation")
-
-You can hover over the explanation and click the embedded links to jump to the line (and column) where the failure occurred.
-
 ### Grammar parsing
 
 Built on top of highlighted tokens above, the parser understands the following parts of Elixir grammar as valid or
@@ -1433,6 +1417,63 @@ Using the menus
 2. Comment (or Uncomment) with one of the following:
   a. Code > Comment with Line Comment
   b. On OSX the key binding is normally `Cmd+/`.
+
+### Credo
+
+#### External Annotator
+
+If [`credo`](https://github.com/rrrene/credo) is not installed as a project dependency, nothing will happen, but if it is installed, `mix credo PATH` will be called on any files after updates have quieted.  Any `credo` check failures will show up as warning annotations
+
+![Warning Annotations](/screenshots/features/credo/external_annotator/Warning%20Annotations.png?raw=true "Warning Annotations")
+
+Individual check failures will show the explanation (from `mix credo PATH:LINE(:COLUMN)`) if you hover over the annotation
+
+![Explanation](/screenshots/features/credo/external_annotator/Explanation.png?raw=true "Credo Check Failure Explanation")
+
+You can hover over the explanation and click the embedded links to jump to the line (and column) where the failure occurred.
+
+#### Inspection
+
+If running `mix credo` as an external annotator puts too much load on your CPU (as can be the case for large projects), you can disable it from running.
+
+1. Preferences > Editor > Inspections > Elixir > Credo
+2. Uncheck the box.
+
+##### Batch Mode
+
+If you'd like to run the `mix credo` external annotator when it is disabled, you can run it using the inspection name.
+
+1. Analyze > Run Inspection By Name... (⌥⇧⌘I)
+2. Type "Credo"
+3. Select "Credo" from the shortened list
+4. Hit Enter.
+
+You'll be presented with a "Run 'Credo'" dialog
+
+![Run 'Credo'](/screenshots/features/inspection/batch_mode/Run%20Credo%20Custom%20Scope%20Project%20Production%20Files.png?raw=true)
+
+1. Change the "Inspection scope" from "Whole project", which would include the `deps` to "Custom scope"
+2. Select "Project Production Files" from the "Custom scope" dropdown
+3. Click "OK"
+
+The Inspections Result Tool Pane will open and show results as each file is processed.
+
+1. Click the ▶ to expand the Credo section to show all warnings
+
+   ![Individual Entry](/screenshots/features/inspection/batch_mode/Individual%20Entry.png?raw=true)
+2. Click an entry for the details of an individual warning with a code highlighting.
+
+   ![Code Highlighting](/screenshots/features/inspection/batch_mode/Code%20Highlighting.png?raw=true)
+
+   The view will show the parts of the file that aren't annotated as collapsed with the discontinuous line number indicating the jumps.
+
+   If you click on + collapse markers, you can expand the collapsed sections to see the full context
+
+   ![Expansion](/screenshots/features/inspection/batch_mode/Expansion.png?raw=true)
+
+   Or you can hover over the collapsed section to see a tooltip preview of the expansion
+
+   ![Expansion Preview](/screenshots/features/inspection/batch_mode/Expansion%20Preview.png?raw=true)
 
 ### Debugger
 
