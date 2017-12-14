@@ -42,6 +42,8 @@ import static org.elixir_lang.mix.runner.MixRunningStateUtil.workingDirectory;
 
 // See https://github.com/antlr/jetbrains-plugin-sample/blob/7c400e02f89477dbe179123a2d43f839b4df05d7/src/java/org/antlr/jetbrains/sample/SampleExternalAnnotator.java
 public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>> {
+    public static final Logger LOGGER = Logger.getInstance(Annotator.class);
+    public static final String INDENT = "     ";
     private static final Pattern LINE_PATTERN = Pattern.compile("(?<path>.+?):(?<line>\\d+):(?:(?<column>\\d+):)? (?<tag>[CFRSW]): (?<message>.+)");
     private static final Pattern EXPLANATION_LINE_PATTERN = Pattern.compile("┃ (?<content>.*)");
     private static final Pattern EXPLAINABLE_PATTERN = Pattern.compile("\\s*(?<explainable>(?<path>.+\\.exs?):(?<lineNumber>\\d+)(:?:(?<columnNumber>\\d+))?)");
@@ -49,18 +51,28 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
     private static final String CODE_IN_QUESTION_HEADER = "CODE IN QUESTION";
     private static final String CONFIGURATION_OPTIONS = "CONFIGURATION OPTIONS";
     private static final String WHY_IT_MATTERS_HEADER = "WHY IT MATTERS";
-    public static final Logger LOGGER = Logger.getInstance(Annotator.class);
-    public static final String INDENT = "     ";
+
+    @NotNull
+    static List<Issue> lineListToIssueList(@NotNull List<String> lineList) {
+        return lineListToIssueList(lineList, false, null);
+    }
 
     @NotNull
     private static List<Issue> lineListToIssueList(@NotNull List<String> lineList, @NotNull Project project) {
+        return lineListToIssueList(lineList, true, project);
+    }
+
+    @NotNull
+    private static List<Issue> lineListToIssueList(@NotNull List<String> lineList,
+                                                   boolean includeExplanation,
+                                                   @Nullable Project project) {
         List<Issue> issueList;
 
         if (!lineList.isEmpty()) {
             issueList = new ArrayList<>();
 
             for (String line : lineList) {
-                Issue issue = lineToIssue(line, project);
+                Issue issue = lineToIssue(line, includeExplanation, project);
 
                 if (issue != null) {
                     issueList.add(issue);
@@ -74,7 +86,7 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
     }
 
     @Nullable
-    private static Issue lineToIssue(@NotNull String line, @NotNull Project project) {
+    private static Issue lineToIssue(@NotNull String line, boolean includeExplanation, @Nullable Project project) {
         Matcher matcher = LINE_PATTERN.matcher(line);
         Issue issue;
 
@@ -93,7 +105,12 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
             String message = matcher.group("message");
 
             issue = new Issue(matcher.group("path"), lineNumber - 1, column, check, message);
-            issue.putExplanation(project);
+
+            if (includeExplanation) {
+                assert project != null : "Project must not be null to include explanation";
+
+                issue.putExplanation(project);
+            }
         } else {
             issue = null;
         }
@@ -238,6 +255,31 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
         return htmlLine + "<br/>";
     }
 
+    private static <T, R> Stream<R> withIndex(Stream<T> stream, FunctionWithIndex<T, R> function) {
+        assert !stream.isParallel();
+
+        final Iterator<T> iterator = stream.iterator();
+        final Iterator<R> returnIterator = new Iterator<R>() {
+            private int index = 0;
+
+            @Override
+            public boolean hasNext() {
+                return iterator.hasNext();
+            }
+
+            @Override
+            public R next() {
+                return function.apply(iterator.next(), index++);
+            }
+        };
+        return iteratorToFiniteStream(returnIterator);
+    }
+
+    private static <T> Stream<T> iteratorToFiniteStream(Iterator<T> iterator) {
+        final Iterable<T> iterable = () -> iterator;
+        return StreamSupport.stream(iterable.spliterator(), false);
+    }
+
     @Nullable
     @Override
     public List<Issue> doAnnotate(PsiFile file) {
@@ -294,6 +336,8 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
                     }
 
                     Annotation annotation = holder.createWarningAnnotation(new TextRange(start, end), issue.message);
+                    annotation.setAfterEndOfLine(end == start);
+
                     issue.explanation.ifPresent(
                             explanation -> annotation.setTooltip(explanationToToolTip(explanation, workingDirectory))
                     );
@@ -404,31 +448,6 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
                 Stream.of("<pre><code>"),
                 Stream.concat(unindentedLines, Stream.of("</code></pre>"))
         );
-    }
-
-    private static <T, R> Stream<R> withIndex(Stream<T> stream, FunctionWithIndex<T, R> function) {
-        assert !stream.isParallel();
-
-        final Iterator<T> iterator = stream.iterator();
-        final Iterator<R> returnIterator = new Iterator<R>() {
-            private int index = 0;
-
-            @Override
-            public boolean hasNext() {
-                return iterator.hasNext();
-            }
-
-            @Override
-            public R next() {
-                return function.apply(iterator.next(), index++);
-            }
-        };
-        return iteratorToFiniteStream(returnIterator);
-    }
-
-    private static <T> Stream<T> iteratorToFiniteStream(Iterator<T> iterator) {
-        final Iterable<T> iterable = () -> iterator;
-        return StreamSupport.stream(iterable.spliterator(), false);
     }
 
     private Stream<String> preludeContentLineListToHTMLLineStream(@NotNull List<String> contentLineList,
