@@ -23,8 +23,6 @@
       - [Elixir GenServer](#elixir-genserver)
       - [Elixir GenEvent](#elixir-genevent)
     - [Syntax Highlighting and Semantic Annotation](#syntax-highlighting-and-semantic-annotation)
-    - [External Annotators](#external-annotators)
-      - [Credo](#credo)
     - [Grammar parsing](#grammar-parsing)
     - [Inspections](#inspections)
       - [Ambiguous nested calls](#ambiguous-nested-calls)
@@ -45,6 +43,11 @@
         - [Expanding](#expanding)
       - [Regions](#regions)
     - [Commenter](#commenter)
+    - [Credo](#credo)
+      - [Annotator](#annotator)
+      - [Inspection](#inspection)
+        - [Batch Mode](#batch-mode)
+      - [Configuration](#configuration)
     - [Debugger](#debugger)
       - [Steps](#steps)
       - [Basics](#basics)
@@ -151,6 +154,7 @@
   - [Screenshots](#screenshots)
   - [Error reporting](#error-reporting)
   - [Donations](#donations)
+    - [Work Time](#work-time)
     - [Donors](#donors)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -1420,7 +1424,7 @@ Using the menus
 
 ### Credo
 
-#### External Annotator
+#### Annotator
 
 If [`credo`](https://github.com/rrrene/credo) is not installed as a project dependency, nothing will happen, but if it is installed, `mix credo PATH` will be called on any files after updates have quieted.  Any `credo` check failures will show up as warning annotations
 
@@ -1433,11 +1437,6 @@ Individual check failures will show the explanation (from `mix credo PATH:LINE(:
 You can hover over the explanation and click the embedded links to jump to the line (and column) where the failure occurred.
 
 #### Inspection
-
-If running `mix credo` as an external annotator puts too much load on your CPU (as can be the case for large projects), you can disable it from running.
-
-1. Preferences > Editor > Inspections > Elixir > Credo
-2. Uncheck the box.
 
 ##### Batch Mode
 
@@ -1474,6 +1473,204 @@ The Inspections Result Tool Pane will open and show results as each file is proc
    Or you can hover over the collapsed section to see a tooltip preview of the expansion
 
    ![Expansion Preview](/screenshots/features/inspection/batch_mode/Expansion%20Preview.png?raw=true)
+
+#### Configuration
+
+<table>
+  <thead>
+    <tr>
+      <th>
+        Preferences > Editor > Inspections
+      </th>
+      <th>
+        Preferences > Editor > Inspections > Credo
+      </th>
+      <th colspan="5">
+        Editor
+      </th>
+      <th colspan="5">
+        Inspections
+      </th>
+    </tr>
+    <tr>
+      <th rowspan="2">
+        Elixir > Credo
+      </th>
+      <th rowspan="2">
+        Include Explanation
+      </th>
+      <th rowspan="2">
+        Highlight
+      </th>
+      <th rowspan="2">
+        Message
+      </th>
+      <th rowspan="2">
+        Explanation in tooltip
+      </th>
+      <th colspan="2">
+        <code>mix credo</code> Runs
+      </th>
+      <th rowspan="2">
+        Highlight
+      </th>
+      <th rowspan="2">
+        Message
+      </th>
+      <th>
+        <code>mix credo</code> Runs
+      </th>
+      <th colspan="2">
+        Action
+      </th>
+    </tr>
+    <tr>
+      <th>
+        Per File
+      </th>
+      <th>
+        Per Issue
+      </th>
+      <th>
+        Working Directory
+      </th>
+      <th>
+        Inspect Code
+      </th>
+      <th>
+        Run Inspection By Name
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        ☑
+      </td>
+      <td>
+        ☑
+      </td>
+      <td>
+        Yes
+      </td>
+      <td>
+        Yes
+      </td>
+      <td>
+        Yes
+      </td>
+      <td>
+        1
+      </td>
+      <td>
+        1
+      </td>
+      <td>
+        Yes
+      </td>
+      <td>
+        Yes
+      </td>
+      <td>
+        1
+      </td>
+      <td>
+        Yes
+      </td>
+      <td>
+        Yes
+      </td>
+    </tr>
+    <tr>
+      <td>
+        ☑
+      </td>
+      <td>
+        ☐
+      </td>
+      <td>
+        Yes
+      </td>
+      <td>
+        Yes
+      </td>
+      <td>
+        No
+      </td>
+      <td>
+        1
+      </td>
+      <td>
+        0
+      </td>
+      <td>
+        Yes
+      </td>
+      <td>
+        Yes
+      </td>
+      <td>
+        1
+      </td>
+      <td>
+        Yes
+      </td>
+      <td>
+        Yes
+      </td>
+    </tr>
+    <tr>
+      <td>
+        ☐
+      </td>
+      <td>
+        ⁿ/ₐ
+      </td>
+      <td>
+        No
+      </td>
+      <td>
+        No
+      </td>
+      <td>
+        No
+      </td>
+      <td>
+        0
+      </td>
+      <td>
+        0
+      </td>
+      <td>
+        Yes
+      </td>
+      <td>
+        Yes
+      </td>
+      <td>
+        1
+      </td>
+      <td>
+        No
+      </td>
+      <td>
+        Yes
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+If you want to limit the performance impact of the credo annotator because `mix credo` spikes your CPU, you can limit the number of `mix credo` runs to 1 per open file by disabling the Explanation tooltip
+
+1. Preferences > Editor > Inspections > Credo
+2. Uncheck "Include Explanation"
+
+If you don't want the annotator to run at all on open editors, then you can disable the paired inspection
+
+1. Preferences > Editor > Inspections
+2. Uncheck Elixir > Credo
+
+Once the annotator is disabled, you can still run the inspection in [batch mode](#batch-mode)
 
 ### Debugger
 

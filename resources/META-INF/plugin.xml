@@ -75,6 +75,9 @@
     <globalInspection cleanupTool="true" displayName="Credo" enabledByDefault="true" groupName="Elixir"
                       implementationClass="org.elixir_lang.credo.Inspection" language="Elixir" level="WARNING"
                       shortName="Credo"/>
+    // groupId/parentId "Errors" is Editor > Inspections
+    <projectConfigurable instance="org.elixir_lang.credo.Configurable" groupId="Errors" parentId="Errors"/>
+    <projectService serviceImplementation="org.elixir_lang.credo.Service"/>
 
     <!-- <code>.beam</code> -->
     <filetype.decompiler filetype="BEAM" implementationClass="org.elixir_lang.beam.Decompiler"/>

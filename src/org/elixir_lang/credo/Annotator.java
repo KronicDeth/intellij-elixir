@@ -59,7 +59,7 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
 
     @NotNull
     private static List<Issue> lineListToIssueList(@NotNull List<String> lineList, @NotNull Project project) {
-        return lineListToIssueList(lineList, true, project);
+        return lineListToIssueList(lineList, Service.getInstance(project).includeExplanation(), project);
     }
 
     @NotNull
