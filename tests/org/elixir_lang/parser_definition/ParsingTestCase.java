@@ -3,6 +3,7 @@ package org.elixir_lang.parser_definition;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.Language;
 import com.intellij.lang.ParserDefinition;
+import com.intellij.mock.MockApplicationEx;
 import com.intellij.mock.MockLocalFileSystem;
 import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.extensions.ExtensionsArea;
@@ -19,7 +20,9 @@ import com.intellij.openapi.roots.*;
 import com.intellij.openapi.roots.impl.*;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.vfs.VirtualFileSystem;
+import com.intellij.openapi.vfs.impl.CoreVirtualFilePointerManager;
 import com.intellij.openapi.vfs.impl.VirtualFileManagerImpl;
+import com.intellij.openapi.vfs.pointers.VirtualFilePointerManager;
 import com.intellij.psi.*;
 import com.intellij.util.messages.MessageBus;
 import org.elixir_lang.ElixirLanguage;
@@ -303,8 +306,9 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
 
         registerExtensionPoint(OrderRootType.EP_NAME, OrderRootType.class);
         registerExtension(OrderRootType.EP_NAME, new JavadocOrderRootType());
+        MockApplicationEx application = getApplication();
 
-        getApplication().addComponent(
+        application.addComponent(
                 VirtualFileManager.class,
                 new VirtualFileManagerImpl(
                         new VirtualFileSystem[]{
@@ -313,6 +317,7 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
                         messageBus
                 )
         );
+        application.addComponent(VirtualFilePointerManager.class, new CoreVirtualFilePointerManager());
 
         ProjectJdkTable projectJdkTable = new ProjectJdkTableImpl();
         registerApplicationService(ProjectJdkTable.class, projectJdkTable);
