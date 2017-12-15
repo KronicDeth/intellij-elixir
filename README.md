@@ -4216,6 +4216,7 @@ I'd like to thank those who have donated to help support this project.
 * Purelogic Apps
 * Adrian Philipp ([@adri](https://github.com/adri))
 * César Salazar Hernández ([@cesarslzr](https://github.com/cesarslzr))
+* Dimitrios Fragkos
 * Milan Köpke
 * Percy Grunwald ([@pgrunwald](https://github.com/pgrunwald))
 * William De Melo Gueiros ([@williamgueiros](https://github.com/williamgueiros))
