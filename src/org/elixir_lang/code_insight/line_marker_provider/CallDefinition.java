@@ -11,8 +11,10 @@ import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.openapi.editor.markup.SeparatorPlacement;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.*;
+import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall;
+import org.elixir_lang.psi.ElixirTypes;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.structure_view.element.CallDefinitionClause;
 import org.jetbrains.annotations.NotNull;
@@ -80,11 +82,28 @@ public class CallDefinition implements LineMarkerProvider {
      */
 
     @NotNull
-    private LineMarkerInfo callDefinitionSeparator(@NotNull Call call) {
+    private LineMarkerInfo callDefinitionSeparator(
+            @NotNull AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall
+    ) {
+        LeafPsiElement leafPsiElement = (LeafPsiElement) atUnqualifiedNoParenthesesCall
+                        .getAtIdentifier()
+                        .getNode()
+                        .findChildByType(ElixirTypes.IDENTIFIER_TOKEN);
+
+        assert leafPsiElement != null :
+                "AtUnqualifiedNoParenthesesCall (" +
+                        atUnqualifiedNoParenthesesCall.getText() +
+                        ") does not have an Identifier token";
+
+        return callDefinitionSeparator(leafPsiElement);
+    }
+
+    @NotNull
+    private LineMarkerInfo callDefinitionSeparator(@NotNull PsiElement psiElement) {
         LineMarkerInfo lineMarkerInfo;
-        lineMarkerInfo = new LineMarkerInfo<Call>(
-                call,
-                call.getTextRange(),
+        lineMarkerInfo = new LineMarkerInfo<>(
+                psiElement,
+                psiElement.getTextRange(),
                 null,
                 Pass.UPDATE_ALL,
                 null,
