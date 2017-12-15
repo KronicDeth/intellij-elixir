@@ -2,20 +2,16 @@ package org.elixir_lang.mix.importWizard;
 
 import com.intellij.compiler.CompilerWorkspaceConfiguration;
 import com.intellij.ide.projectWizard.ProjectWizardTestCase;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.PathMacros;
 import com.intellij.openapi.components.PathMacroManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.projectRoots.ProjectJdkTable;
-import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.impl.ModuleRootManagerImpl;
 import com.intellij.openapi.util.JDOMUtil;
 import com.intellij.openapi.util.io.FileUtil;
 import org.elixir_lang.configuration.ElixirCompilerSettings;
-import org.elixir_lang.sdk.elixir.Release;
 import org.elixir_lang.sdk.elixir.Type;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -32,7 +28,6 @@ public class MixProjectImportBuilderTest extends ProjectWizardTestCase{
   private static final String MODULE_DIR = "MODULE_DIR";
   private static final String TEST_DATA = "testData/org/elixir_lang/";
   private static final String TEST_DATA_IMPORT = TEST_DATA + "mix/import/";
-  private static final String MOCK_SDK_DIR = TEST_DATA + "mockSdk-1.0.4/";
 
   public void testFromRootMixExsFile() throws Exception{ doTest(); }
 
@@ -44,14 +39,9 @@ public class MixProjectImportBuilderTest extends ProjectWizardTestCase{
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    createMockSdk();
+    createSdk("Elixir", Type.getInstance());
     File currentTestRoot = new File(TEST_DATA_IMPORT, getTestName(true));
     FileUtil.copyDir(currentTestRoot, new File(getProject().getBaseDir().getPath()));
-  }
-
-  private static void createMockSdk(){
-    final Sdk mockSdk = Type.createMockSdk(MOCK_SDK_DIR, Release.V_1_0_4);
-    ApplicationManager.getApplication().runWriteAction(() -> ProjectJdkTable.getInstance().addJdk(mockSdk));
   }
 
   private void doTest() throws Exception{
