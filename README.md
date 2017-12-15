@@ -23,8 +23,6 @@
       - [Elixir GenServer](#elixir-genserver)
       - [Elixir GenEvent](#elixir-genevent)
     - [Syntax Highlighting and Semantic Annotation](#syntax-highlighting-and-semantic-annotation)
-    - [External Annotators](#external-annotators)
-      - [Credo](#credo)
     - [Grammar parsing](#grammar-parsing)
     - [Inspections](#inspections)
       - [Ambiguous nested calls](#ambiguous-nested-calls)
@@ -45,6 +43,11 @@
         - [Expanding](#expanding)
       - [Regions](#regions)
     - [Commenter](#commenter)
+    - [Credo](#credo)
+      - [Annotator](#annotator)
+      - [Inspection](#inspection)
+        - [Batch Mode](#batch-mode)
+      - [Configuration](#configuration)
     - [Debugger](#debugger)
       - [Steps](#steps)
       - [Basics](#basics)
@@ -151,6 +154,7 @@
   - [Screenshots](#screenshots)
   - [Error reporting](#error-reporting)
   - [Donations](#donations)
+    - [Work Time](#work-time)
     - [Donors](#donors)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -1092,22 +1096,6 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
   </tbody>
 </table>
 
-### External Annotators
-
-In addition to the built-in syntax highlighting and annotations above, various `mix` tasks will be run to gather annotations from Elixir status analysis tools.
-
-#### Credo
-
-If [`credo`](https://github.com/rrrene/credo) is not installed as a project dependency, nothing will happen, but if it is installed, `mix credo PATH` will be called on any files after updates have quieted.  Any `credo` check failures will show up as warning annotations
-
-![Warning Annotations](/screenshots/features/external_annotators/credo/Warning%20Annotations.png?raw=true "Warning Annotations")
-
-Individual check failures will show the explanation (from `mix credo PATH:LINE(:COLUMN)`) if you hover over the annotation
-
-![Explanation](/screenshots/features/external_annotators/credo/Explanation.png?raw=true "Credo Check Failure Explanation")
-
-You can hover over the explanation and click the embedded links to jump to the line (and column) where the failure occurred.
-
 ### Grammar parsing
 
 Built on top of highlighted tokens above, the parser understands the following parts of Elixir grammar as valid or
@@ -1433,6 +1421,256 @@ Using the menus
 2. Comment (or Uncomment) with one of the following:
   a. Code > Comment with Line Comment
   b. On OSX the key binding is normally `Cmd+/`.
+
+### Credo
+
+#### Annotator
+
+If [`credo`](https://github.com/rrrene/credo) is not installed as a project dependency, nothing will happen, but if it is installed, `mix credo PATH` will be called on any files after updates have quieted.  Any `credo` check failures will show up as warning annotations
+
+![Warning Annotations](/screenshots/features/credo/external_annotator/Warning%20Annotations.png?raw=true "Warning Annotations")
+
+Individual check failures will show the explanation (from `mix credo PATH:LINE(:COLUMN)`) if you hover over the annotation
+
+![Explanation](/screenshots/features/credo/external_annotator/Explanation.png?raw=true "Credo Check Failure Explanation")
+
+You can hover over the explanation and click the embedded links to jump to the line (and column) where the failure occurred.
+
+#### Inspection
+
+##### Batch Mode
+
+If you'd like to run the `mix credo` external annotator when it is disabled, you can run it using the inspection name.
+
+1. Analyze > Run Inspection By Name... (⌥⇧⌘I)
+2. Type "Credo"
+3. Select "Credo" from the shortened list
+4. Hit Enter.
+
+You'll be presented with a "Run 'Credo'" dialog
+
+![Run 'Credo'](/screenshots/features/inspection/batch_mode/Run%20Credo%20Custom%20Scope%20Project%20Production%20Files.png?raw=true)
+
+1. Change the "Inspection scope" from "Whole project", which would include the `deps` to "Custom scope"
+2. Select "Project Production Files" from the "Custom scope" dropdown
+3. Click "OK"
+
+The Inspections Result Tool Pane will open and show results as each file is processed.
+
+1. Click the ▶ to expand the Credo section to show all warnings
+
+   ![Individual Entry](/screenshots/features/inspection/batch_mode/Individual%20Entry.png?raw=true)
+2. Click an entry for the details of an individual warning with a code highlighting.
+
+   ![Code Highlighting](/screenshots/features/inspection/batch_mode/Code%20Highlighting.png?raw=true)
+
+   The view will show the parts of the file that aren't annotated as collapsed with the discontinuous line number indicating the jumps.
+
+   If you click on + collapse markers, you can expand the collapsed sections to see the full context
+
+   ![Expansion](/screenshots/features/inspection/batch_mode/Expansion.png?raw=true)
+
+   Or you can hover over the collapsed section to see a tooltip preview of the expansion
+
+   ![Expansion Preview](/screenshots/features/inspection/batch_mode/Expansion%20Preview.png?raw=true)
+
+#### Configuration
+
+<table>
+  <thead>
+    <tr>
+      <th>
+        Preferences > Editor > Inspections
+      </th>
+      <th>
+        Preferences > Editor > Inspections > Credo
+      </th>
+      <th colspan="5">
+        Editor
+      </th>
+      <th colspan="5">
+        Inspections
+      </th>
+    </tr>
+    <tr>
+      <th rowspan="2">
+        Elixir > Credo
+      </th>
+      <th rowspan="2">
+        Include Explanation
+      </th>
+      <th rowspan="2">
+        Highlight
+      </th>
+      <th rowspan="2">
+        Message
+      </th>
+      <th rowspan="2">
+        Explanation in tooltip
+      </th>
+      <th colspan="2">
+        <code>mix credo</code> Runs
+      </th>
+      <th rowspan="2">
+        Highlight
+      </th>
+      <th rowspan="2">
+        Message
+      </th>
+      <th>
+        <code>mix credo</code> Runs
+      </th>
+      <th colspan="2">
+        Action
+      </th>
+    </tr>
+    <tr>
+      <th>
+        Per File
+      </th>
+      <th>
+        Per Issue
+      </th>
+      <th>
+        Working Directory
+      </th>
+      <th>
+        Inspect Code
+      </th>
+      <th>
+        Run Inspection By Name
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        ☑
+      </td>
+      <td>
+        ☑
+      </td>
+      <td>
+        Yes
+      </td>
+      <td>
+        Yes
+      </td>
+      <td>
+        Yes
+      </td>
+      <td>
+        1
+      </td>
+      <td>
+        1
+      </td>
+      <td>
+        Yes
+      </td>
+      <td>
+        Yes
+      </td>
+      <td>
+        1
+      </td>
+      <td>
+        Yes
+      </td>
+      <td>
+        Yes
+      </td>
+    </tr>
+    <tr>
+      <td>
+        ☑
+      </td>
+      <td>
+        ☐
+      </td>
+      <td>
+        Yes
+      </td>
+      <td>
+        Yes
+      </td>
+      <td>
+        No
+      </td>
+      <td>
+        1
+      </td>
+      <td>
+        0
+      </td>
+      <td>
+        Yes
+      </td>
+      <td>
+        Yes
+      </td>
+      <td>
+        1
+      </td>
+      <td>
+        Yes
+      </td>
+      <td>
+        Yes
+      </td>
+    </tr>
+    <tr>
+      <td>
+        ☐
+      </td>
+      <td>
+        ⁿ/ₐ
+      </td>
+      <td>
+        No
+      </td>
+      <td>
+        No
+      </td>
+      <td>
+        No
+      </td>
+      <td>
+        0
+      </td>
+      <td>
+        0
+      </td>
+      <td>
+        Yes
+      </td>
+      <td>
+        Yes
+      </td>
+      <td>
+        1
+      </td>
+      <td>
+        No
+      </td>
+      <td>
+        Yes
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+If you want to limit the performance impact of the credo annotator because `mix credo` spikes your CPU, you can limit the number of `mix credo` runs to 1 per open file by disabling the Explanation tooltip
+
+1. Preferences > Editor > Inspections > Credo
+2. Uncheck "Include Explanation"
+
+If you don't want the annotator to run at all on open editors, then you can disable the paired inspection
+
+1. Preferences > Editor > Inspections
+2. Uncheck Elixir > Credo
+
+Once the annotator is disabled, you can still run the inspection in [batch mode](#batch-mode)
 
 ### Debugger
 

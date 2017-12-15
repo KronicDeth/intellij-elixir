@@ -69,7 +69,15 @@
     <annotator implementationClass="org.elixir_lang.annotator.EscapeSequence" language="Elixir"/>
     <annotator implementationClass="org.elixir_lang.annotator.Map" language="Elixir"/>
     <annotator implementationClass="org.elixir_lang.annotator.ModuleAttribute" language="Elixir"/>
-    <externalAnnotator implementationClass="org.elixir_lang.annotator.Credo" language="Elixir"/>
+
+    <!-- credo -->
+    <externalAnnotator implementationClass="org.elixir_lang.credo.Annotator" language="Elixir"/>
+    <globalInspection cleanupTool="true" displayName="Credo" enabledByDefault="true" groupName="Elixir"
+                      implementationClass="org.elixir_lang.credo.Inspection" language="Elixir" level="WARNING"
+                      shortName="Credo"/>
+    // groupId/parentId "Errors" is Editor > Inspections
+    <projectConfigurable instance="org.elixir_lang.credo.Configurable" groupId="Errors" parentId="Errors"/>
+    <projectService serviceImplementation="org.elixir_lang.credo.Service"/>
 
     <!-- <code>.beam</code> -->
     <filetype.decompiler filetype="BEAM" implementationClass="org.elixir_lang.beam.Decompiler"/>
