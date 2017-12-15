@@ -23,6 +23,12 @@ public class Configurable implements SearchableConfigurable {
         return ID;
     }
 
+    // MUST be defined in 2016.3.7
+    @Nullable
+    public String getHelpTopic() {
+        return null;
+    }
+
     @Nullable
     @Override
     public JComponent createComponent() {

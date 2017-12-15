@@ -347,7 +347,6 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
     }
 
     @NotNull
-    @Override
     public String getPairedBatchInspectionShortName() {
         return Inspection.SHORT_NAME;
     }

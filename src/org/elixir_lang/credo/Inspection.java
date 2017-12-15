@@ -164,19 +164,19 @@ public class Inspection extends GlobalInspectionTool {
     }
 
     @NotNull
-    private static ExternalAnnotator<PsiFile, List<Annotator.Issue>> externalAnnotator() {
+    private static Annotator annotator() {
         List<ExternalAnnotator> externalAnnotatorList = ExternalLanguageAnnotators.INSTANCE.allForLanguage(ElixirLanguage.INSTANCE);
-        ExternalAnnotator<PsiFile, List<Annotator.Issue>> externalAnnotator = null;
+        Annotator annotator = null;
 
         for (ExternalAnnotator element : externalAnnotatorList) {
-            if (element.getPairedBatchInspectionShortName().equals(SHORT_NAME)) {
-                externalAnnotator = element;
+            if (element instanceof Annotator) {
+                annotator = (Annotator) element;
                 break;
             }
         }
 
         //noinspection ConstantConditions
-        return externalAnnotator;
+        return annotator;
     }
 
     // See ExternalAnnotatorInspectionVisitor#toLocalQuickFixes
@@ -394,7 +394,7 @@ public class Inspection extends GlobalInspectionTool {
         LocalFileSystem localFileSystem = LocalFileSystem.getInstance();
         PsiManager psiManager = PsiManager.getInstance(globalContext.getProject());
         RefManager refManager = globalContext.getRefManager();
-        ExternalAnnotator<PsiFile, List<Annotator.Issue>> externalAnnotator = externalAnnotator();
+        ExternalAnnotator<PsiFile, List<Annotator.Issue>> externalAnnotator = annotator();
 
         for (Map.Entry<String, List<Annotator.Issue>> entry : issueListByFullPath.entrySet()) {
             addProblemElement(
