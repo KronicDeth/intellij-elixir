@@ -270,7 +270,6 @@ public class BeamFileImpl extends ModuleElementImpl implements ModuleOwner, PsiC
     }
 
     @Nullable
-    @Override
     public ASTNode findTreeForStub(StubTree stubTree, StubElement<?> stubElement) {
         return null;
     }
