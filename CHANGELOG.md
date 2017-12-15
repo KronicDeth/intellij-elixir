@@ -142,9 +142,34 @@
   * Eliminate the majority of the `eolStar` parser rules around operators where they do not matter leaving only the `eolStar` after `COMMA` and the the ones that help differentiate unary and binary `+`/`-`.  This simplifies the parser and under certain conditions should prevent reparsing when only `WHITE_SPACE` changes in size.
     * Look-ahead in the lexer, where it's cheaper than the parser to see if the next token does not care if there's an `EOL` or normal `WHITE_SPACE`.
     * After operators that don't care if they are followed by `EOL`, try to match all following `WHITE_SPACE`, `ESCAPED_EOL` and `EOL`.
+* [#950](https://github.com/KronicDeth/intellij-elixir/pull/950) - [@KronicDeth](https://github.com/KronicDeth)
+  * If you want to limit the performance impact of the credo annotator because `mix credo` spikes your CPU, you can limit the number of `mix credo` runs to 1 per open file by disabling the Explanation tooltip
+
+    1. Preferences > Editor > Inspections > Credo
+    2. Uncheck "Include Explanation"
+
+    If you don't want the annotator to run at all on open editors, then you can disable the paired
+    inspection
+
+    1. Preferences > Editor > Inspections
+    2. Uncheck Elixir > Credo
+
+    If you've unchecked the inspection, it disables both the annotation and the pair inspection when Analyze > Inspect Code... is run.  You can still run the Credo inspection by name.
+
+    1. Analyze > Run Inspection By Name... (⌥⇧⌘I)
+    2. Type "Credo"
+    3. Select "Credo" from the shortened list
+    4. Hit Enter.
+
+    You'll be presented with a "Run 'Credo'" dialog
+
+    1. Change the "Inspection scope" from "Whole project", which would include the `deps` to "Custom scope"
+    2. Select "Project Production Files" from the "Custom scope" dropdown
+    3. Click "OK"
 
 ### Bug Fixes
 * [#947](https://github.com/KronicDeth/intellij-elixir/pull/947) - When the SDK changes, record what `Release` of Elixir is used indirectly, using a `Level` `enum` that only cares about the major and minor version. Changing the `Level`, will mark the open files and .beam files as invalidated, so that if the SDK is changed, the stubs and code `Level` will agree, so there isn't a stub incompatibility with the PSI. - [@KronicDeth](https://github.com/KronicDeth)
+* [#950](https://github.com/KronicDeth/intellij-elixir/pull/950) - Allow credo section to be empty when processing credo explanations - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v6.7.0
 
