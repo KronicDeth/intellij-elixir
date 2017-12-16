@@ -1449,7 +1449,7 @@ If you'd like to run the `mix credo` external annotator when it is disabled, you
 
 You'll be presented with a "Run 'Credo'" dialog
 
-![Run 'Credo'](/screenshots/features/inspection/batch_mode/Run%20Credo%20Custom%20Scope%20Project%20Production%20Files.png?raw=true)
+![Run 'Credo'](/screenshots/features/credo/inspection/batch_mode/Run%20Credo%20Custom%20Scope%20Project%20Production%20Files.png?raw=true)
 
 1. Change the "Inspection scope" from "Whole project", which would include the `deps` to "Custom scope"
 2. Select "Project Production Files" from the "Custom scope" dropdown
@@ -1459,20 +1459,20 @@ The Inspections Result Tool Pane will open and show results as each file is proc
 
 1. Click the ▶ to expand the Credo section to show all warnings
 
-   ![Individual Entry](/screenshots/features/inspection/batch_mode/Individual%20Entry.png?raw=true)
+   ![Individual Entry](/screenshots/features/credo/inspection/batch_mode/Individual%20Entry.png?raw=true)
 2. Click an entry for the details of an individual warning with a code highlighting.
 
-   ![Code Highlighting](/screenshots/features/inspection/batch_mode/Code%20Highlighting.png?raw=true)
+   ![Code Highlighting](/screenshots/features/credo/inspection/batch_mode/Code%20Highlighting.png?raw=true)
 
    The view will show the parts of the file that aren't annotated as collapsed with the discontinuous line number indicating the jumps.
 
    If you click on + collapse markers, you can expand the collapsed sections to see the full context
 
-   ![Expansion](/screenshots/features/inspection/batch_mode/Expansion.png?raw=true)
+   ![Expansion](/screenshots/features/credo/inspection/batch_mode/Expansion.png?raw=true)
 
    Or you can hover over the collapsed section to see a tooltip preview of the expansion
 
-   ![Expansion Preview](/screenshots/features/inspection/batch_mode/Expansion%20Preview.png?raw=true)
+   ![Expansion Preview](/screenshots/features/credo/inspection/batch_mode/Expansion%20Preview.png?raw=true)
 
 #### Configuration
 
