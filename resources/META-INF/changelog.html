@@ -1,6 +1,6 @@
 <html>
 <body>
-<h1>v6.8.0</h1>
+<h1>v7.0.0</h1>
 <ul>
   <li>
     <p>Enhancements</p>
@@ -47,6 +47,12 @@
           <li>Click "OK"</li>
         </ol>
       </li>
+      <li>Setup <code>VirtualFilePointerManager</code> during <code>ParsingTestCase</code></li>
+      <li>
+        Put <code>LineMarkerInfo</code> on leaf elements for Method (Call Definition) Separators for a performance
+        improvement.
+      </li>
+      <li>Add IntelliJ IDEA 2017.3 to the build matrix</li>
     </ul>
   </li>
   <li>
@@ -59,6 +65,14 @@
         <code>Level</code> will agree, so there isn't a stub incompatibility with the PSI.
       </li>
       <li>Allow credo section to be empty when processing credo explanations</li>
+      <li>Prevent negative indent as it is not supported in IntelliJ IDEA 2017.3</li>
+      <li>Cleanup SDKs from MixProjectImportBuilderTest</li>
+    </ul>
+  </li>
+  <li>
+    <p>Incompatible Changes</p>
+    <ul>
+      <li>Drop support for IntelliJ IDEA before 2016.3</li>
     </ul>
   </li>
 </ul>

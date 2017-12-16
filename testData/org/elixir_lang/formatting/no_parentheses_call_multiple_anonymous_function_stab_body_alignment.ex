@@ -17,11 +17,6 @@ one fn two -> two end, fn three ->
   three
 end
 
-one fn two ->
-      two
-    end,
-    three
-
 one fn
       ^two ->
         :three

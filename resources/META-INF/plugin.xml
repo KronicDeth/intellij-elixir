@@ -5,7 +5,7 @@
 
   <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
   <!-- 141 == IntelliJ IDEA 14.1, which is the oldest version compatible with GrammarKit 1.3.0 -->
-  <idea-version since-build="141"/>
+  <idea-version since-build="163.15529.5"/>
 
   <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
        on how to target different products -->

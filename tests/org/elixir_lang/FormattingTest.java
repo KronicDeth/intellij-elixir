@@ -185,6 +185,10 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         assertFormatted("bit_string_only_indent_nested_keywords.ex");
     }
 
+    public void testNoParenthesesCallAnonymousFunctionCallAlignment() {
+        assertFormatted("no_parentheses_call_anonymous_function_call_alignment.ex");
+    }
+
     public void testNoParenthesesCallDoNotWrapUnlessKeywordsMultiline() {
         myFixture.configureByFile("no_parentheses_call_do_not_wrap_unless_keywords_multiline_before.ex");
 

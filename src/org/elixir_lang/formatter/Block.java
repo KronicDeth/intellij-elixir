@@ -2030,12 +2030,14 @@ public class Block extends AbstractBlock implements BlockEx {
                                                    start of `fn` */
                                                 int stabParentStartOffset = stabParent.getStartOffset();
                                                 int directParentStartOffset = stabOperation.getStartOffset();
+                                                int spaces = normalIndentSize(stabParent) -
+                                                        (directParentStartOffset - stabParentStartOffset);
 
-                                                childrenIndent = Indent.getSpaceIndent(
-                                                        normalIndentSize(stabParent) -
-                                                                (directParentStartOffset - stabParentStartOffset),
-                                                        true
-                                                );
+                                                if (spaces < 0) {
+                                                    spaces = 0;
+                                                }
+
+                                                childrenIndent = Indent.getSpaceIndent(spaces, true);
                                             }
                                         } else {
                                             childrenIndent = null;

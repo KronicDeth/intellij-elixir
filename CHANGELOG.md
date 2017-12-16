@@ -135,7 +135,7 @@
 
 # Changelog
 
-## v6.8.0
+## v7.0.0
 
 ### Enhancements
 * [#944](https://github.com/KronicDeth/intellij-elixir/pull/944) - [@KronicDeth](https://github.com/KronicDeth)
@@ -166,10 +166,20 @@
     1. Change the "Inspection scope" from "Whole project", which would include the `deps` to "Custom scope"
     2. Select "Project Production Files" from the "Custom scope" dropdown
     3. Click "OK"
+* [#951](https://github.com/KronicDeth/intellij-elixir/pull/951) - [@KronicDeth](https://github.com/KronicDeth)
+  * Setup `VirtualFilePointerManager` during `ParsingTestCase`
+  * Put `LineMarkerInfo` on leaf elements for Method (Call Definition) Separators for a performance improvement.
+  * Add IntelliJ IDEA 2017.3 to the build matrix
 
 ### Bug Fixes
 * [#947](https://github.com/KronicDeth/intellij-elixir/pull/947) - When the SDK changes, record what `Release` of Elixir is used indirectly, using a `Level` `enum` that only cares about the major and minor version. Changing the `Level`, will mark the open files and .beam files as invalidated, so that if the SDK is changed, the stubs and code `Level` will agree, so there isn't a stub incompatibility with the PSI. - [@KronicDeth](https://github.com/KronicDeth)
 * [#950](https://github.com/KronicDeth/intellij-elixir/pull/950) - Allow credo section to be empty when processing credo explanations - [@KronicDeth](https://github.com/KronicDeth)
+* [#951](https://github.com/KronicDeth/intellij-elixir/pull/951) - [@KronicDeth](https://github.com/KronicDeth)
+  * Prevent negative indent, not supported in 2017.3
+  * Cleanup SDKs from MixProjectImportBuilderTest
+
+## Incompatible Changes
+* [#951](https://github.com/KronicDeth/intellij-elixir/pull/951) - Drop support for IntelliJ IDEA before 2016.3 - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v6.7.0
 

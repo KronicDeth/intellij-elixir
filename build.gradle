@@ -41,18 +41,14 @@ allprojects {
   intellij {
     def intellij_erlang_version
 
-    if (ideaVersion.startsWith("2017.2")) {
+    if (ideaVersion.startsWith("2017.3")) {
+      intellij_erlang_version = "0.10.966"
+    } else if (ideaVersion.startsWith("2017.2")) {
       intellij_erlang_version = "0.9.958"
     } else if (ideaVersion.startsWith("2017.1.")) {
       intellij_erlang_version = "0.9.939"
     } else if (ideaVersion.startsWith("2016.3.")) {
       intellij_erlang_version = "0.9.912"
-    } else if (ideaVersion.startsWith("2016.2.")) {
-      intellij_erlang_version = "0.8.913"
-    } else if (ideaVersion.startsWith("2016.1.")) {
-      intellij_erlang_version = "0.7.876"
-    } else if (ideaVersion.startsWith("15.0.")) {
-      intellij_erlang_version = "0.6.873"
     } else {
       throw new IllegalArgumentException("ideaVersion is not a recognized MAJOR.MINOR for IntelliJ Erlang compatibility")
     }
