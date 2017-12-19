@@ -1,5 +1,6 @@
 plugins {
   id 'org.jetbrains.intellij' version "0.2.15"
+  id "org.jetbrains.kotlin.jvm" version "1.2.0"
   id 'de.undercouch.download' version "3.1.2"
 }
 
@@ -78,6 +79,17 @@ allprojects {
     username publishUsername
     password publishPassword
     channels publishChannels
+  }
+
+  apply plugin: "kotlin"
+
+  //noinspection GroovyAssignabilityCheck,GrUnresolvedAccess
+  tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+    //noinspection GrUnresolvedAccess
+    kotlinOptions {
+      apiVersion = "1.0"
+      jvmTarget = "1.8"
+    }
   }
 
   def compilationPackages = ['org/intellij/elixir/build/**', 'org/intellij/elixir/jps/**']
