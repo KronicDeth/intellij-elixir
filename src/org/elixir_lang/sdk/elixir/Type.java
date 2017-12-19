@@ -97,8 +97,24 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
                 VirtualFileManager.getInstance().findFileByUrl(hexdocUrlBuilder.toString());
 
         if (hexdocUrlVirtualFile != null) {
-            sdkModificator.addRoot(hexdocUrlVirtualFile, JavadocOrderRootType.getInstance());
+            OrderRootType documentationRootType = documentationRootType();
+
+            if (documentationRootType != null) {
+                sdkModificator.addRoot(hexdocUrlVirtualFile, documentationRootType);
+            }
         }
+    }
+
+    private static OrderRootType documentationRootType() {
+        OrderRootType rootType;
+
+        try {
+            rootType = JavadocOrderRootType.getInstance();
+        } catch (AssertionError assertionError) {
+            rootType = null;
+        }
+
+        return rootType;
     }
 
     private static void addDocumentationPath(@NotNull SdkModificator sdkModificator,
