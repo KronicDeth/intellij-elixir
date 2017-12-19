@@ -16,7 +16,7 @@ import javax.swing.*;
  * Created by zyuyou on 2015/5/26.
  */
 public class ElixirModuleType extends ModuleType<ElixirModuleBuilder>{
-  private static final String MODULE_TYPE_ID = "ELIXIR_MODULE";
+  public static final String MODULE_TYPE_ID = "ELIXIR_MODULE";
 
   public ElixirModuleType() {
     super(MODULE_TYPE_ID);
