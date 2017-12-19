@@ -331,14 +331,20 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
         return erlangSdk;
     }
 
-    @Nullable
-    private static Sdk defaultErlangSdk() {
-        ProjectJdkTable projectJdkTable = ProjectJdkTable.getInstance();
+    public static SdkType erlangSdkType(@NotNull ProjectJdkTable projectJdkTable) {
         SdkType erlangSdkType = (SdkType) projectJdkTable.getSdkTypeByName("Erlang SDK");
 
         if (erlangSdkType instanceof UnknownSdkType) {
             erlangSdkType = SdkType.findInstance(org.elixir_lang.sdk.erlang.Type.class);
         }
+
+        return erlangSdkType;
+    }
+
+    @Nullable
+    private static Sdk defaultErlangSdk() {
+        ProjectJdkTable projectJdkTable = ProjectJdkTable.getInstance();
+        SdkType erlangSdkType = erlangSdkType(projectJdkTable);
 
         Sdk mostRecentErlangSdk = projectJdkTable.findMostRecentSdkOfType(erlangSdkType);
         @Nullable Sdk defaultErlangSdk;
