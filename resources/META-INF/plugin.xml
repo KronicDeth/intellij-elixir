@@ -49,10 +49,15 @@
     <filePropertyPusher implementation="org.elixir_lang.file.LevelPropertyPusher"/>
 
     <!-- Facet -->
-    <applicationConfigurable id="language.elixir.sdks" instance="org.elixir_lang.facet.sdks.Configurable" parentId="language.elixir"/>
+    <applicationConfigurable id="language.elixir.sdks"
+                             instance="org.elixir_lang.facet.sdks.Configurable"
+                             parentId="language.elixir"/>
     <applicationService serviceImplementation="org.elixir_lang.facet.SdksService"
                         serviceInterface="org.elixir_lang.facet.SdksService"/>
-    <projectConfigurable id="language.elixir" instance="org.elixir_lang.facet.configurable.Project" parentId="language"/>
+    <projectConfigurable id="language.elixir"
+                         instance="org.elixir_lang.facet.configurable.Project"
+                         parentId="language"/>
+    <project.converterProvider implementation="org.elixir_lang.facet.conversion.Provider"/>
 
     <facetType implementation="org.elixir_lang.facet.Type"/>
     <framework.detector implementation="org.elixir_lang.FrameworkDetector"/>

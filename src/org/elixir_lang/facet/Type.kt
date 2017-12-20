@@ -37,6 +37,6 @@ class Type : FacetType<Facet, Configuration>(Facet.ID, ID, "Elixir") {
     }
 
     companion object {
-        private val ID = "Elixir"
+        internal val ID = "Elixir"
     }
 }

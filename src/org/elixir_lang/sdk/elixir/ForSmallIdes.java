@@ -18,7 +18,8 @@ import org.jetbrains.annotations.Nullable;
  * Created by zyuyou on 15/7/16.
  */
 public abstract class ForSmallIdes {
-  private static final String LIBRARY_NAME = "Elixir SDK";
+  @Deprecated
+  public static final String LIBRARY_NAME = "Elixir SDK";
 
   public static void setUpOrUpdateSdk(@NotNull final Project project, @NotNull final String path){
     ApplicationManager.getApplication().runWriteAction(new Runnable() {

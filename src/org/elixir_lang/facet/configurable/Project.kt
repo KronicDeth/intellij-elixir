@@ -40,7 +40,11 @@ class Project(project: Project) : ModuleAwareProjectConfigurable<Configurable>(p
     }
 
     private fun addFacet(facetManager: FacetManager, sdk: Sdk?) {
-        val facet = facetManager.addFacet(FacetType.findInstance(Type::class.java), "Elixir facet", null)
+        val facet = facetManager.addFacet(FacetType.findInstance(Type::class.java), FACET_NAME, null)
         setFacetSdk(facet, sdk)
+    }
+
+    companion object {
+        const val FACET_NAME = "Elixir facet"
     }
 }
