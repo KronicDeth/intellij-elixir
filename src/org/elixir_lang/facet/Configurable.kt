@@ -50,6 +50,6 @@ abstract class Configurable(val module: Module) : UnnamedConfigurable {
     }
 
     override fun reset() {
-        sdkComboBox.selectedItem = initSdk()
+        sdkComboBox.selectedItem = projectSdksModel.findSdk(initSdk()?.name)
     }
 }
