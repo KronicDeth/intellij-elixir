@@ -13,6 +13,7 @@ import org.elixir_lang.facet.Type
 
 class Project(project: Project) : ModuleAwareProjectConfigurable<Configurable>(project, "Elixir", null) {
     override fun isSuitableForModule(module: Module): Boolean {
+        @Suppress("DEPRECATION")
         return !module.getOptionValue(Module.ELEMENT_TYPE).equals("ELIXIR_MODULE")
     }
 
