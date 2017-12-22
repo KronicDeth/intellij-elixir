@@ -338,9 +338,13 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
                     Annotation annotation = holder.createWarningAnnotation(new TextRange(start, end), issue.message);
                     annotation.setAfterEndOfLine(end == start);
 
-                    issue.explanation.ifPresent(
-                            explanation -> annotation.setTooltip(explanationToToolTip(explanation, workingDirectory))
-                    );
+                    issue.explanation.ifPresent(explanation -> {
+                        String toolTip = explanationToToolTip(explanation, workingDirectory);
+
+                        if (!toolTip.isEmpty()) {
+                            annotation.setTooltip(toolTip);
+                        }
+                    });
                 }
             }
         }
