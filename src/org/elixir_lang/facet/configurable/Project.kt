@@ -37,7 +37,15 @@ class Project(project: Project) : ModuleAwareProjectConfigurable<Configurable>(p
     }
 
     private fun setFacetSdk(facet: Facet, sdk: Sdk?) {
-        facet.configuration.sdk = sdk
+        facet.apply {
+            configuration.sdk = sdk
+
+            module.apply {
+                if (!isDisposed) {
+                    messageBus.syncPublisher(FacetManager.FACETS_TOPIC).facetConfigurationChanged(facet)
+                }
+            }
+        }
     }
 
     private fun addFacet(facetManager: FacetManager, sdk: Sdk?) {
