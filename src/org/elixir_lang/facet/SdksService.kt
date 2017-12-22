@@ -8,7 +8,7 @@ class SdksService {
     private var model: ProjectSdksModel? = null
 
     companion object {
-        fun getInstance(): SdksService = ServiceManager.getService(SdksService::class.java)
+        fun getInstance(): SdksService? = ServiceManager.getService(SdksService::class.java)
     }
 
     fun elixirSdkList() = getModel().sdks.filter { it.sdkType is Type }

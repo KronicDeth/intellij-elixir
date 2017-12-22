@@ -18,7 +18,7 @@ import javax.swing.JPanel
 
 class Configurable: SearchableConfigurable, com.intellij.openapi.options.Configurable.NoScroll {
     private val modifiedSdkModificatorSet: MutableSet<SdkModificator> = HashSet()
-    internal val sdksService by lazy { SdksService.getInstance() }
+    internal val sdksService by lazy { SdksService.getInstance()!! }
     private val projectSdksModel by lazy { sdksService.getModel() }
     private lateinit var rootSplitter: Splitter
     private val sdkModificatorBySdk: MutableMap<Sdk, SdkModificator> = object : FactoryMap<Sdk, SdkModificator>(){

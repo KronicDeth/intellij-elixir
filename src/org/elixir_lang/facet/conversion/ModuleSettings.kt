@@ -25,7 +25,7 @@ class ModuleSettings(private val conversionContext: ConversionContext) : Convers
             if (classRoots.size == 1) {
                 classRoots.forEach { classRoot ->
                     if (moduleSettings.getFacetElement(org.elixir_lang.facet.Type.ID) == null) {
-                        val projectSdksModel = SdksService.getInstance().getModel()
+                        val projectSdksModel = SdksService.getInstance()!!.getModel()
                         projectSdksModel.addSdk(Type.getInstance(), classRoot.path, { sdk ->
                             moduleSettings.addFacetElement(
                                     org.elixir_lang.facet.Type.ID,
