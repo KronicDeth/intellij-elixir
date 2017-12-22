@@ -22,7 +22,6 @@ import com.ericsson.otp.erlang.OtpErlangPid;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.configurations.GeneralCommandLine;
-import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.process.ColoredProcessHandler;
 import com.intellij.execution.process.OSProcessHandler;
 import com.intellij.execution.process.ProcessHandler;
@@ -288,10 +287,10 @@ class ElixirXDebugProcess extends XDebugProcess implements ElixirDebuggerEventLi
         LOG.debug("Preparing to run debug target.");
 
         RunnerAndConfigurationSettings runnerAndConfigurationSettings = myExecutionEnvironment.getRunnerAndConfigurationSettings();
-        RunConfiguration runConfiguration = null;
+        MixRunConfigurationBase runConfiguration = null;
 
         if (runnerAndConfigurationSettings != null) {
-            runConfiguration = runnerAndConfigurationSettings.getConfiguration();
+            runConfiguration = (MixRunConfigurationBase) runnerAndConfigurationSettings.getConfiguration();
         }
 
         ParametersList elixirParametersList = myRunningState.elixirParametersList(runConfiguration);

@@ -33,8 +33,6 @@
     <!--<lang.psiStructureViewFactory language="EEx" implementationClass="org.elixir_lang.eex.PsiStructureViewFactory"/>-->
 
     <!-- Mix related extensions -->
-    <projectConfigurable instance="org.elixir_lang.settings.ElixirExternalToolsConfigurable" />
-    <projectService serviceImplementation="org.elixir_lang.mix.settings.MixSettings" />
     <programRunner implementation="org.elixir_lang.mix.runner.MixRunner" />
     <configurationType implementation="org.elixir_lang.mix.runner.MixRunConfigurationType" />
 

@@ -3,6 +3,7 @@ package org.elixir_lang.mix.runner;
 import com.google.common.base.Charsets;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
+import com.intellij.execution.configurations.RunConfigurationModule;
 import com.intellij.execution.process.ColoredProcessHandler;
 import com.intellij.execution.process.OSProcessHandler;
 import com.intellij.notification.Notification;
@@ -10,24 +11,21 @@ import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.projectRoots.SdkModificator;
-import com.intellij.openapi.projectRoots.SdkTypeId;
-import com.intellij.openapi.roots.JavadocOrderRootType;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.OrderRootType;
-import com.intellij.openapi.roots.ProjectRootManager;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.util.ObjectUtils;
 import org.elixir_lang.jps.builder.ParametersList;
 import org.elixir_lang.jps.model.JpsElixirSdkType;
 import org.elixir_lang.jps.model.JpsErlangSdkType;
-import org.elixir_lang.mix.settings.MixSettings;
-import org.elixir_lang.sdk.elixir.ForSmallIdes;
-import org.elixir_lang.sdk.elixir.Type;
-import org.elixir_lang.utils.ElixirExternalToolsNotificationListener;
+import org.elixir_lang.utils.SetupElixirSDKNotificationListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,10 +34,7 @@ import java.nio.file.Paths;
 
 import static com.intellij.openapi.application.ModalityState.NON_MODAL;
 import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.elixir_lang.sdk.ProcessOutput.isSmallIde;
-import static org.elixir_lang.sdk.elixir.Type.addDocumentationPaths;
-import static org.elixir_lang.sdk.elixir.Type.addSourcePaths;
-import static org.elixir_lang.sdk.elixir.Type.putDefaultErlangSdk;
+import static org.elixir_lang.sdk.elixir.Type.*;
 
 /**
  * https://github.com/ignatov/intellij-erlang/blob/master/src/org/intellij/erlang/rebar/runner/RebarRunningStateUtil.java
@@ -131,17 +126,20 @@ public class MixRunningStateUtil {
     }
 
     private static boolean updateDocumentationPaths(@NotNull SdkModificator sdkModificator) {
-        OrderRootType documentationRootType = JavadocOrderRootType.getInstance();
-        final String elixirLangDotOrgDocsUrl = "http://elixir-lang.org/docs/stable/elixir/";
+        OrderRootType documentationRootType = documentationRootType();
         boolean modified = false;
 
-        for (VirtualFile documentationPath : sdkModificator.getRoots(documentationRootType)) {
-            if (documentationPath.getUrl().equals(elixirLangDotOrgDocsUrl)) {
-                VirtualFile elixirLangDotOrgDocsUrlVirtualFile =
-                        VirtualFileManager.getInstance().findFileByUrl(elixirLangDotOrgDocsUrl);
-                sdkModificator.removeRoot(elixirLangDotOrgDocsUrlVirtualFile, documentationRootType);
-                addDocumentationPaths(sdkModificator);
-                modified = true;
+        if (documentationRootType != null) {
+            final String elixirLangDotOrgDocsUrl = "http://elixir-lang.org/docs/stable/elixir/";
+
+            for (VirtualFile documentationPath : sdkModificator.getRoots(documentationRootType)) {
+                if (documentationPath.getUrl().equals(elixirLangDotOrgDocsUrl)) {
+                    VirtualFile elixirLangDotOrgDocsUrlVirtualFile =
+                            VirtualFileManager.getInstance().findFileByUrl(elixirLangDotOrgDocsUrl);
+                    sdkModificator.removeRoot(elixirLangDotOrgDocsUrlVirtualFile, documentationRootType);
+                    addDocumentationPaths(sdkModificator);
+                    modified = true;
+                }
             }
         }
 
@@ -167,20 +165,45 @@ public class MixRunningStateUtil {
                                                  @NotNull ParametersList elixirParametersList,
                                                  @NotNull ParametersList mixParametersList) {
         GeneralCommandLine commandLine = getBaseMixCommandLine(configuration);
-        Project project = configuration.getProject();
-        commandLine(commandLine, project, elixirParametersList, mixParametersList);
+        RunConfigurationModule runConfigurationModule = configuration.getConfigurationModule();
+        Module module = runConfigurationModule.getModule();
+
+        if (module == null) {
+            File workingDirectory = commandLine.getWorkDirectory();
+            VirtualFile virtualFile = VfsUtil.findFileByIoFile(workingDirectory, true);
+
+            assert virtualFile != null :
+                    "Working directory (" + workingDirectory + ") could not be mapped to a VirtualFile";
+
+            module = ModuleUtilCore.findModuleForFile(virtualFile, configuration.getProject());
+
+            assert module != null :
+                    "Working directory (" + workingDirectory + ") VirtualFile could not be mapped to a Module";
+        }
+
+        commandLine(commandLine, module, elixirParametersList, mixParametersList);
 
         return addNewSkipDependencies(commandLine, configuration);
     }
 
     @NotNull
     public static GeneralCommandLine commandLine(@NotNull GeneralCommandLine baseMixCommandLine,
-                                                 @NotNull Project project,
+                                                 @NotNull Module module,
                                                  @NotNull ParametersList elixirParametersList,
                                                  @NotNull ParametersList mixParametersList) {
-        setElixir(baseMixCommandLine, project, elixirParametersList);
+        Sdk sdk = mostSpecificSdk(module);
 
-        String mixPath = mixPath(project);
+        return commandLine(baseMixCommandLine, sdk, elixirParametersList, mixParametersList);
+    }
+
+    @NotNull
+    public static GeneralCommandLine commandLine(@NotNull GeneralCommandLine baseMixCommandLine,
+                                                 @Nullable Sdk sdk,
+                                                 @NotNull ParametersList elixirParametersList,
+                                                 @NotNull ParametersList mixParametersList) {
+        setElixir(baseMixCommandLine, sdk, elixirParametersList);
+
+        String mixPath = mixPath(sdk);
         baseMixCommandLine.addParameter(mixPath);
 
         baseMixCommandLine.addParameters(mixParametersList.getList());
@@ -196,13 +219,31 @@ public class MixRunningStateUtil {
         return withWorkDirectory(commandLine, configuration);
     }
 
+    @Nullable
+    public static Module module(@NotNull MixRunConfigurationBase mixRunConfigurationBase) {
+        Module module = mixRunConfigurationBase.getConfigurationModule().getModule();
+
+        if (module == null) {
+            String workingDirectory = workingDirectory(mixRunConfigurationBase);
+
+            VirtualFile virtualFile = LocalFileSystem.getInstance().findFileByPath(workingDirectory);
+
+            if (virtualFile != null) {
+                Project project = mixRunConfigurationBase.getProject();
+                module = ModuleUtilCore.findModuleForFile(virtualFile, project);
+            }
+        }
+
+        return module;
+    }
+
     @NotNull
     public static String workingDirectory(@NotNull Project project) {
         return ObjectUtils.assertNotNull(project.getBasePath());
     }
 
     @Nullable
-    private static String workingDirectory(@NotNull Module module) {
+    public static String workingDirectory(@NotNull Module module) {
         VirtualFile[] contentRoots = ModuleRootManager.getInstance(module).getContentRoots();
         String workingDirectory;
 
@@ -216,7 +257,7 @@ public class MixRunningStateUtil {
     }
 
     @NotNull
-    private static String workingDirectory(@NotNull MixRunConfigurationBase configuration) {
+    public static String workingDirectory(@NotNull MixRunConfigurationBase configuration) {
         String workingDirectory = configuration.getWorkingDirectory();
 
         if (isBlank(workingDirectory)) {
@@ -234,10 +275,22 @@ public class MixRunningStateUtil {
         return workingDirectory;
     }
 
-    @NotNull
-    private static String mixPath(@NotNull Project project) {
-        MixSettings mixSettings = MixSettings.getInstance(project);
-        return mixSettings.getMixPath();
+    private static String mixPath(@Nullable Sdk sdk) {
+        String mixPath;
+
+        if (sdk != null) {
+            String homePath = sdk.getHomePath();
+
+            if (homePath != null) {
+                mixPath = JpsElixirSdkType.getMixExecutable(homePath).getPath();
+            } else {
+                mixPath = JpsElixirSdkType.getExecutableFileName("mix");
+            }
+        } else {
+            mixPath = JpsElixirSdkType.getExecutableFileName("mix");
+        }
+
+        return mixPath;
     }
 
     @NotNull
@@ -257,7 +310,7 @@ public class MixRunningStateUtil {
                                         (isEmpty ? "empty" : "not specified correctly") +
                                         "<br><a href='configure'>Configure</a></br>",
                                 NotificationType.ERROR,
-                                new ElixirExternalToolsNotificationListener(project)
+                                new SetupElixirSDKNotificationListener(project, commandLine.getWorkDirectory())
                         )
                 );
             }
@@ -266,65 +319,48 @@ public class MixRunningStateUtil {
     }
 
     private static void setElixir(@NotNull GeneralCommandLine commandLine,
-                                  @NotNull Project project,
+                                  @Nullable Sdk sdk,
                                   @NotNull ParametersList parametersList) {
-        Sdk sdk = ProjectRootManager.getInstance(project).getProjectSdk();
-
         if (sdk != null) {
-            SdkTypeId sdkType = sdk.getSdkType();
+            org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData sdkAdditionalData =
+                    (org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData) sdk.getSdkAdditionalData();
 
-            if (sdkType == Type.getInstance()) {
-                org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData sdkAdditionalData =
-                        (org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData) sdk.getSdkAdditionalData();
+            if (sdkAdditionalData != null) {
+                Sdk erlangSdk = sdkAdditionalData.getErlangSdk();
 
-                if (sdkAdditionalData != null) {
-                    Sdk erlangSdk = sdkAdditionalData.getErlangSdk();
+                if (erlangSdk == null) {
+                    erlangSdk = putDefaultErlangSdk(sdk);
+                }
 
-                    if (erlangSdk == null) {
-                        erlangSdk = putDefaultErlangSdk(sdk);
-                    }
+                if (erlangSdk != null) {
+                    String erlangHomePath = erlangSdk.getHomePath();
 
-                    if (erlangSdk != null) {
-                        String erlangHomePath = erlangSdk.getHomePath();
+                    if (erlangHomePath != null) {
+                        File erlFile = JpsErlangSdkType.getByteCodeInterpreterExecutable(erlangHomePath);
 
-                        if (erlangHomePath != null) {
-                            File erlFile = JpsErlangSdkType.getByteCodeInterpreterExecutable(erlangHomePath);
-
-                            if (erlFile.exists() && erlFile.canExecute()) {
-                                // See https://github.com/elixir-lang/elixir/blob/v1.5.1/bin/elixir.bat#L111
-                                commandLine.setExePath(erlFile.getAbsolutePath());
-                                // See https://github.com/elixir-lang/elixir/blob/v1.5.1/bin/elixir.bat#L96-L102
-                                prependCodePaths(commandLine, sdk);
-                                // See https://github.com/elixir-lang/elixir/blob/v1.5.1/bin/elixir.bat#L106
-                                commandLine.addParameters("-noshell", "-s", "elixir", "start_cli");
-                                // See https://github.com/elixir-lang/elixir/blob/v1.5.1/bin/elixir.bat#L111
-                                commandLine.addParameter("-extra");
-                            }
+                        if (erlFile.exists() && erlFile.canExecute()) {
+                            // See https://github.com/elixir-lang/elixir/blob/v1.5.1/bin/elixir.bat#L111
+                            commandLine.setExePath(erlFile.getAbsolutePath());
+                            // See https://github.com/elixir-lang/elixir/blob/v1.5.1/bin/elixir.bat#L96-L102
+                            prependCodePaths(commandLine, sdk);
+                            // See https://github.com/elixir-lang/elixir/blob/v1.5.1/bin/elixir.bat#L106
+                            commandLine.addParameters("-noshell", "-s", "elixir", "start_cli");
+                            // See https://github.com/elixir-lang/elixir/blob/v1.5.1/bin/elixir.bat#L111
+                            commandLine.addParameter("-extra");
                         }
-                    } else {
-                        String erl = JpsErlangSdkType.getExecutableFileName("erl");
-
-                        // See https://github.com/elixir-lang/elixir/blob/v1.5.1/bin/elixir.bat#L111
-                        commandLine.setExePath(erl);
-                        // See https://github.com/elixir-lang/elixir/blob/v1.5.1/bin/elixir.bat#L96-L102
-                        prependCodePaths(commandLine, sdk);
-                        // See https://github.com/elixir-lang/elixir/blob/v1.5.1/bin/elixir.bat#L106
-                        commandLine.addParameters("-noshell", "-s", "elixir", "start_cli");
-                        // See https://github.com/elixir-lang/elixir/blob/v1.5.1/bin/elixir.bat#L111
-                        commandLine.addParameter("-extra");
                     }
-                }
-            } else if (isSmallIde()) {
-                String sdkHome = ForSmallIdes.getSdkHome(project);
-                String elixir;
-
-                if (sdkHome != null) {
-                    elixir = JpsElixirSdkType.getScriptInterpreterExecutable(sdkHome).toString();
                 } else {
-                    elixir = JpsElixirSdkType.getExecutableFileName("elixir");
-                }
+                    String erl = JpsErlangSdkType.getExecutableFileName("erl");
 
-                commandLine.setExePath(elixir);
+                    // See https://github.com/elixir-lang/elixir/blob/v1.5.1/bin/elixir.bat#L111
+                    commandLine.setExePath(erl);
+                    // See https://github.com/elixir-lang/elixir/blob/v1.5.1/bin/elixir.bat#L96-L102
+                    prependCodePaths(commandLine, sdk);
+                    // See https://github.com/elixir-lang/elixir/blob/v1.5.1/bin/elixir.bat#L106
+                    commandLine.addParameters("-noshell", "-s", "elixir", "start_cli");
+                    // See https://github.com/elixir-lang/elixir/blob/v1.5.1/bin/elixir.bat#L111
+                    commandLine.addParameter("-extra");
+                }
             }
         } else {
             String elixir = JpsElixirSdkType.getExecutableFileName("elixir");
