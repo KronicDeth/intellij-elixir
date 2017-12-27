@@ -49,6 +49,7 @@ import static com.intellij.openapi.application.ModalityState.NON_MODAL;
 import static org.elixir_lang.mix.runner.MixRunningStateUtil.module;
 import static org.elixir_lang.sdk.HomePath.*;
 import static org.elixir_lang.sdk.ProcessOutput.STANDARD_TIMEOUT;
+import static org.elixir_lang.sdk.ProcessOutput.isSmallIde;
 import static org.elixir_lang.sdk.ProcessOutput.transformStdoutLine;
 import static org.elixir_lang.sdk.Type.addCodePaths;
 import static org.elixir_lang.sdk.Type.ebinPathChainVirtualFile;
@@ -337,10 +338,18 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
     }
 
     public static SdkType erlangSdkType(@NotNull ProjectJdkTable projectJdkTable) {
-        SdkType erlangSdkType = (SdkType) projectJdkTable.getSdkTypeByName("Erlang SDK");
+        SdkType erlangSdkType;
 
-        if (erlangSdkType instanceof UnknownSdkType) {
+        if (isSmallIde()) {
+            /* intellij-erlang's "Erlang SDK" does not work in small IDEs because it uses JavadocRoot for documentation,
+               which isn't available in Small IDEs. */
             erlangSdkType = SdkType.findInstance(org.elixir_lang.sdk.erlang.Type.class);
+        } else {
+            erlangSdkType = (SdkType) projectJdkTable.getSdkTypeByName("Erlang SDK");
+
+            if (erlangSdkType instanceof UnknownSdkType) {
+                erlangSdkType = SdkType.findInstance(org.elixir_lang.sdk.erlang.Type.class);
+            }
         }
 
         return erlangSdkType;
