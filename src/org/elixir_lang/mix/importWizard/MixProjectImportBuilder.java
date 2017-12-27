@@ -330,21 +330,15 @@ public class MixProjectImportBuilder extends ProjectImportBuilder<ImportedOtpApp
   @Nullable
   private static ImportedOtpApp createImportedOtpApp(@NotNull VirtualFile appRoot){
     VirtualFile appMixFile = appRoot.findChild("mix.exs");
-    if(appMixFile == null){
-      return null;
-    }
-    return new ImportedOtpApp(appRoot, appMixFile);
-  }
+    ImportedOtpApp importedOtpApp;
 
-  @Nullable
-  private static VirtualFile findFileByExtension(@NotNull VirtualFile dir, @NotNull String extension){
-    for(VirtualFile file : dir.getChildren()){
-      String fileName = file.getName();
-      if(!file.isDirectory() && fileName.endsWith(extension)){
-        return file;
-      }
+    if(appMixFile == null){
+      importedOtpApp = null;
+    } else {
+      importedOtpApp = new ImportedOtpApp(appRoot, appMixFile);;
     }
-    return null; //To change body of created methods use File | settings | File Templates.
+
+    return importedOtpApp;
   }
 
   private static void deleteIdeaModuleFiles(@NotNull final List<ImportedOtpApp> importedOtpApps) throws IOException{
