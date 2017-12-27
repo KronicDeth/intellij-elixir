@@ -23,7 +23,6 @@ import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.projectImport.ProjectImportBuilder;
 import com.intellij.projectImport.ProjectImportWizardStep;
 import org.elixir_lang.jps.builder.ParametersList;
 import org.elixir_lang.jps.model.JpsElixirSdkType;
@@ -33,8 +32,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-
-import static org.elixir_lang.sdk.elixir.Type.mostSpecificSdk;
 
 /**
  * https://github.com/ignatov/intellij-erlang/blob/master/src/org/intellij/erlang/rebar/importWizard/RebarProjectRootStep.java
@@ -63,10 +60,9 @@ public class MixProjectRootStep extends ProjectImportWizardStep {
         myGetDepsCheckbox.setVisible(ourEnabled);
     }
 
-    private static void fetchDependencies(@Nullable final Project project,
-                                          @NotNull final GeneralCommandLine workingDirectoryGeneralCommandLine,
-                                          @Nullable final Sdk sdk) {
-        mixTask(project, workingDirectoryGeneralCommandLine, sdk, "Fetching dependencies", "deps.get");
+    private static void fetchDependencies(@NotNull final GeneralCommandLine workingDirectoryGeneralCommandLine,
+                                          @NotNull final Sdk sdk) {
+        mixTask(workingDirectoryGeneralCommandLine, sdk, "Fetching dependencies", "deps.get");
     }
 
     /**
@@ -100,13 +96,12 @@ public class MixProjectRootStep extends ProjectImportWizardStep {
         return elixirPath;
     }
 
-    private static void mixTask(@Nullable final Project project,
-                                @NotNull final GeneralCommandLine workingDirectoryGeneralCommandLine,
+    private static void mixTask(@NotNull final GeneralCommandLine workingDirectoryGeneralCommandLine,
                                 @Nullable final Sdk sdk,
                                 @NotNull final String title,
                                 @NotNull final String... parameters) {
         ProgressManager.getInstance().run(
-                new Task.Modal(project, title, true) {
+                new Task.Modal(null, title, true) {
                     @Override
                     public void run(@NotNull final ProgressIndicator indicator) {
                         indicator.setIndeterminate(true);
@@ -147,10 +142,9 @@ public class MixProjectRootStep extends ProjectImportWizardStep {
         );
     }
 
-    private static void updateHex(@Nullable final Project project,
-                                  @NotNull final GeneralCommandLine workingDirectoryGeneralCommandLine,
-                                  @Nullable final Sdk sdk) {
-        mixTask(project, workingDirectoryGeneralCommandLine, sdk, "Updating hex", "local.hex", "--force");
+    private static void updateHex(@NotNull final GeneralCommandLine workingDirectoryGeneralCommandLine,
+                                  @NotNull final Sdk sdk) {
+        mixTask(workingDirectoryGeneralCommandLine, sdk, "Updating hex", "local.hex", "--force");
     }
 
     @Override
@@ -191,7 +185,6 @@ public class MixProjectRootStep extends ProjectImportWizardStep {
         }
 
         if (myGetDepsCheckbox.isSelected() && !ApplicationManager.getApplication().isUnitTestMode()) {
-            final Project project = ProjectImportBuilder.getCurrentProject();
             String workingDirectory = projectRoot.getCanonicalPath();
 
             assert workingDirectory != null;
@@ -200,12 +193,10 @@ public class MixProjectRootStep extends ProjectImportWizardStep {
                     new GeneralCommandLine().withCharset(Charsets.UTF_8);
             workingDirectoryGeneralCommandLine.withWorkDirectory(workingDirectory);
 
-            assert project != null : "Cannot find SDK for non-existent Project";
+            Sdk sdk = getWizardContext().getProjectJdk();
 
-            Sdk sdk = mostSpecificSdk(project);
-
-            updateHex(project, workingDirectoryGeneralCommandLine, sdk);
-            fetchDependencies(project, workingDirectoryGeneralCommandLine, sdk);
+            updateHex(workingDirectoryGeneralCommandLine, sdk);
+            fetchDependencies(workingDirectoryGeneralCommandLine, sdk);
         }
 
         MixProjectImportBuilder builder = getBuilder();
