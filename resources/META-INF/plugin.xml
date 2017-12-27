@@ -47,9 +47,12 @@
     <filePropertyPusher implementation="org.elixir_lang.file.LevelPropertyPusher"/>
 
     <!-- Facet -->
-    <applicationConfigurable id="language.elixir.sdks"
+    <applicationConfigurable id="language.elixir.sdks.elixir"
                              parentId="language.elixir"
-                             provider="org.elixir_lang.facet.sdks.Provider"/>
+                             provider="org.elixir_lang.facet.sdks.elixir.Provider"/>
+    <applicationConfigurable id="language.elixir.sdks.erlang"
+                             parentId="language.elixir"
+                             provider="org.elixir_lang.facet.sdks.erlang.Provider"/>
     <applicationService serviceImplementation="org.elixir_lang.facet.SdksService"
                         serviceInterface="org.elixir_lang.facet.SdksService"/>
     <projectConfigurable id="language.elixir"

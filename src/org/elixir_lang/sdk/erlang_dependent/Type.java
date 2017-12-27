@@ -9,6 +9,8 @@ import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static org.elixir_lang.sdk.elixir.Type.erlangSdkType;
+
 /**
  * An SDK that depends on an Erlang SDK, either
  * * org.intellij.erlang.sdk.ErlangSdkType when intellij-erlang IS installed
@@ -36,21 +38,12 @@ public abstract class Type extends DependentSdkType {
 
     @Override
     public String getUnsatisfiedDependencyMessage() {
-        return "You need to configure an Erlang SDK (from intellij-erlang) or " +
-                "Erlang SDK for Elixir SDK (from intellij-elixir) first";
+        return "You need to configure an " + getDependencyType().getName();
     }
 
     @Override
     protected SdkType getDependencyType() {
-        Class<? extends SdkType> sdkTypeClass;
-
-        try {
-            sdkTypeClass = (Class<? extends SdkType>) Class.forName(ERLANG_SDK_TYPE_CANONICAL_NAME);
-        } catch (ClassNotFoundException e) {
-            sdkTypeClass = org.elixir_lang.sdk.erlang.Type.class;
-        }
-
-        return SdkType.findInstance(sdkTypeClass);
+        return erlangSdkType(ProjectJdkTable.getInstance());
     }
 
     @Nullable

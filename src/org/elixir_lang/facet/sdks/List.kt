@@ -13,6 +13,8 @@ class List(private val configurable: Configurable): JBList<ProjectJdkImpl>() {
     }
 
     fun refresh() {
-        model = CollectionListModel<ProjectJdkImpl>(configurable.sdksService.elixirSdkList())
+        model = CollectionListModel<ProjectJdkImpl>(
+                configurable.sdksService.projectJdkImplList(configurable.sdkType().javaClass)
+        )
     }
 }

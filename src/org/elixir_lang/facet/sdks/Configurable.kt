@@ -4,6 +4,7 @@ import com.intellij.openapi.options.SearchableConfigurable
 import com.intellij.openapi.options.ex.ConfigurableCardPanel
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.SdkModel
+import com.intellij.openapi.projectRoots.SdkType
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
 import com.intellij.openapi.projectRoots.impl.SdkConfigurationUtil
 import com.intellij.openapi.ui.Splitter
@@ -15,11 +16,10 @@ import com.intellij.ui.navigation.Place
 import com.intellij.util.ui.JBUI
 import org.elixir_lang.facet.SdksService
 import org.elixir_lang.facet.sdk.Editor
-import org.elixir_lang.sdk.elixir.Type
 import javax.swing.JComponent
 import javax.swing.JPanel
 
-class Configurable: SearchableConfigurable, com.intellij.openapi.options.Configurable.NoScroll {
+abstract class Configurable: SearchableConfigurable, com.intellij.openapi.options.Configurable.NoScroll {
     internal val sdksService by lazy { SdksService.getInstance()!! }
     private val projectSdksModel by lazy { sdksService.getModel() }
     private lateinit var rootSplitter: Splitter
@@ -77,10 +77,6 @@ class Configurable: SearchableConfigurable, com.intellij.openapi.options.Configu
         return rootSplitter
     }
 
-    override fun getDisplayName(): String = "SDKs"
-    override fun getHelpTopic(): String? = null
-    override fun getId(): String = "language.elixir.sdks"
-
     override fun isModified(): Boolean =
             projectSdksModel.isModified || editorByProjectJdkImpl.any { entry -> entry.value.isModified }
 
@@ -88,9 +84,11 @@ class Configurable: SearchableConfigurable, com.intellij.openapi.options.Configu
         sdkList.refresh()
     }
 
+    abstract fun sdkType(): SdkType
+
     private fun addCreatedSdk(sdk: Sdk?) {
         sdk?.let {
-            if (it.sdkType == Type.getInstance()) {
+            if (it.sdkType == sdkType()) {
                 sdkList.apply {
                     refresh()
                     setSelectedValue(sdk, true)
@@ -104,8 +102,7 @@ class Configurable: SearchableConfigurable, com.intellij.openapi.options.Configu
             override fun beforeSdkRemove(sdk: Sdk) {
             }
 
-            override fun sdkAdded(sdk: Sdk) {
-            }
+            override fun sdkAdded(sdk: Sdk) = sdkList.refresh()
 
             override fun sdkChanged(sdk: Sdk?, previousName: String?) = sdkList.refresh()
 
@@ -121,7 +118,7 @@ class Configurable: SearchableConfigurable, com.intellij.openapi.options.Configu
     }
 
     private fun addSdk() {
-        projectSdksModel.doAdd(sdkListPanel, Type.getInstance(), { sdk -> addCreatedSdk(sdk)  })
+        projectSdksModel.doAdd(sdkListPanel, sdkType(), { sdk -> addCreatedSdk(sdk)  })
     }
 
     private fun removeSdk() {

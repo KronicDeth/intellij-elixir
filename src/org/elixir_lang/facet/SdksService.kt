@@ -3,7 +3,6 @@ package org.elixir_lang.facet
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
 import com.intellij.openapi.roots.ui.configuration.projectRoot.ProjectSdksModel
-import org.elixir_lang.sdk.elixir.Type
 
 class SdksService {
     private var model: ProjectSdksModel? = null
@@ -12,7 +11,8 @@ class SdksService {
         fun getInstance(): SdksService? = ServiceManager.getService(SdksService::class.java)
     }
 
-    fun elixirSdkList() = getModel().sdks.filter { it.sdkType is Type }.map { it as ProjectJdkImpl }
+    fun <T> projectJdkImplList(clazz: Class<T>) =
+            getModel().sdks.filter { clazz.isInstance(it.sdkType) }.map { it as ProjectJdkImpl }
 
     fun getModel(): ProjectSdksModel {
         val model = this.model?: ProjectSdksModel().apply { reset(null) }
