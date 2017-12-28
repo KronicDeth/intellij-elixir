@@ -77,6 +77,8 @@ abstract class Configurable: SearchableConfigurable, com.intellij.openapi.option
         return rootSplitter
     }
 
+    override fun getHelpTopic(): String? = null
+
     override fun isModified(): Boolean =
             projectSdksModel.isModified || editorByProjectJdkImpl.any { entry -> entry.value.isModified }
 

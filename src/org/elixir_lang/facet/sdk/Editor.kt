@@ -269,14 +269,7 @@ class Editor(private val sdkModel: SdkModel, private val history: History, priva
             }
 
             if (component != null) {
-                if (configurable.tabName != null) {
-                    (0 until tabbedPane.tabCount)
-                            .filter { configurable.tabName == tabbedPane.getTitleAt(it) }
-                            .forEach { tabbedPane.removeTabAt(it) }
-                    tabbedPane.addTab(configurable.tabName, component)
-                } else {
-                    additionalDataPanel.add(component, BorderLayout.CENTER)
-                }
+                additionalDataPanel.add(component, BorderLayout.CENTER)
             }
         }
     }
