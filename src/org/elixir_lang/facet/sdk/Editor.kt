@@ -178,7 +178,7 @@ class Editor(private val sdkModel: SdkModel, private val history: History, priva
         homeComponent.apply {
             setText(absolutePath)
             textField.foreground =
-                    if (absolutePath != null && !absolutePath.isEmpty() && sdk.sdkType.isLocalSdk(sdk)) {
+                    if (absolutePath != null && !absolutePath.isEmpty()) {
                         val homeDir = File(absolutePath)
                         val homeMustBeDirectory = (sdk.sdkType as SdkType).homeChooserDescriptor.isChooseFolders
 
