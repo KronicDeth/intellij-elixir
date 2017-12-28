@@ -5,6 +5,7 @@ import com.intellij.openapi.projectRoots.SdkAdditionalData;
 import com.intellij.openapi.projectRoots.impl.DependentSdkType;
 import com.intellij.openapi.roots.JavadocOrderRootType;
 import com.intellij.openapi.roots.OrderRootType;
+import org.elixir_lang.sdk.ProcessOutput;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,9 +27,16 @@ public abstract class Type extends DependentSdkType {
 
     public static boolean staticIsValidDependency(Sdk sdk) {
         String sdkTypeCanonicalName = sdk.getSdkType().getClass().getCanonicalName();
+        boolean isValidDependency;
 
-        return sdkTypeCanonicalName.equals(ERLANG_SDK_TYPE_CANONICAL_NAME) ||
-                sdkTypeCanonicalName.equals(ERLANG_SDK_FOR_ELIXIR_SDK_TYPE_CANONICAL_NAME);
+        if (ProcessOutput.isSmallIde()) {
+            isValidDependency = sdkTypeCanonicalName.equals(ERLANG_SDK_FOR_ELIXIR_SDK_TYPE_CANONICAL_NAME);
+        } else {
+            isValidDependency = sdkTypeCanonicalName.equals(ERLANG_SDK_TYPE_CANONICAL_NAME) ||
+                    sdkTypeCanonicalName.equals(ERLANG_SDK_FOR_ELIXIR_SDK_TYPE_CANONICAL_NAME);
+        }
+
+        return isValidDependency;
     }
 
     @Override
