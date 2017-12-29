@@ -3192,7 +3192,7 @@ If you want to change the Internal Erlang SDK, you'll need to create a new Erlan
 
 1. Open Preferences > Languages & Frameworks > Elixir > Internal SDKs
 
-   ![Internal Erlang SDK](/screenshots/features/sdk/small_ides/Interal%20Erlang%20SDK.png?raw=true "Internal Erlang SDK")
+   ![Internal Erlang SDK](/screenshots/features/sdk/small_ides/Intenral%20Erlang%20SDK.png?raw=true "Internal Erlang SDK")
 2. Follow the same steps as above to create an SDK
 
 ### Structure
