@@ -9,7 +9,6 @@ import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.projectRoots.SdkTypeId;
-import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.util.text.StringUtil;
@@ -21,6 +20,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+
+import static org.elixir_lang.sdk.elixir.Type.mostSpecificSdk;
 
 public class MixExUnitRunConfigurationProducer extends RunConfigurationProducer<MixExUnitRunConfiguration> {
   /*
@@ -59,8 +60,7 @@ public class MixExUnitRunConfigurationProducer extends RunConfigurationProducer<
       Sdk sdk;
 
       if (module != null) {
-        ModuleRootManager moduleRootManager = ModuleRootManager.getInstance(module);
-        sdk = moduleRootManager.getSdk();
+        sdk = mostSpecificSdk(module);
       } else {
         ProjectRootManager projectRootManager = ProjectRootManager.getInstance(psiDirectory.getProject());
         sdk = projectRootManager.getProjectSdk();
