@@ -1,5 +1,47 @@
 <html>
 <body>
+<h1>v7.1.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>Start using Kotlin for new development.</li>
+      <li>Elixir Facet in Small IDEs
+        <ul>
+          <li>
+            Preferences &gt; Languages &amp; Frameworks &gt; Elixir can set the Elixir Facet SDK for the Project Module
+            used in Small IDEs as a per-project settings.
+          </li>
+          <li>
+            Preferences &gt; Languages &amp; Frameworks &gt; Elixir&gt; SDKs can add, delete, and configure Elixir SDKs
+            as per-application settings.
+          </li>
+          <li>
+            Preferences &gt; Languages * Frameworks &gt; Elixir &gt; Internal SDKs can add, delete, and configure Erlang
+            SDK for Elixir SDKs as per-application settings.
+          </li>
+        </ul>
+      </li>
+      <li>
+        Configure SDK before running <code>mix</code> when importing mix projects, so that the <code>mix</code> path
+        does not need to be configured separately from the SDK path.
+        <ul>
+          <li>The <code>mix</code> path no longer needs to be setup independently from the Elixir SDK.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>
+        Protect access to <code>JavadocOrderRootType.getInstance()</code> so that it doesn't cause an error in Small
+        IDEs where its Extension Point is not defined.
+      </li>
+      <li>If the explanation tooltip is empty, fallback to the message for the credo annotator instead.</li>
+    </ul>
+  </li>
+</ul>
 <h1>v7.0.0</h1>
 <ul>
   <li>
