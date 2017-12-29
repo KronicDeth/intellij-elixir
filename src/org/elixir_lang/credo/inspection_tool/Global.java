@@ -1,4 +1,4 @@
-package org.elixir_lang.credo;
+package org.elixir_lang.credo.inspection_tool;
 
 import com.google.common.base.Charsets;
 import com.intellij.analysis.AnalysisScope;
@@ -29,6 +29,7 @@ import com.intellij.util.containers.ContainerUtil;
 import gnu.trove.THashMap;
 import gnu.trove.THashSet;
 import org.elixir_lang.ElixirLanguage;
+import org.elixir_lang.credo.Annotator;
 import org.elixir_lang.jps.builder.ParametersList;
 import org.elixir_lang.mix.runner.MixRunningStateUtil;
 import org.jetbrains.annotations.NotNull;
@@ -37,9 +38,7 @@ import org.jetbrains.annotations.Nullable;
 import java.nio.file.Paths;
 import java.util.*;
 
-import static org.elixir_lang.credo.Annotator.lineListToIssueList;
-
-public class Inspection extends GlobalInspectionTool {
+public class Global extends GlobalInspectionTool {
     public static final String SHORT_NAME = "Credo";
 
     private static void put(@NotNull Map<String, Set<String>> pathSetByWorkingDirectory,
@@ -88,7 +87,7 @@ public class Inspection extends GlobalInspectionTool {
                     generalCommandLine(workingDirectory, module, pathSet)
             );
 
-            issueList = lineListToIssueList(processOutput.getStdoutLines());
+            issueList = Annotator.lineListToIssueList(processOutput.getStdoutLines());
         } catch (ExecutionException executionException) {
             issueList = Collections.emptyList();
         }
@@ -349,7 +348,7 @@ public class Inspection extends GlobalInspectionTool {
         globalContext.getRefManager().iterate(new RefVisitor() {
             @Override
             public void visitElement(@NotNull RefEntity refEntity) {
-                if (globalContext.shouldCheck(refEntity, Inspection.this)) {
+                if (globalContext.shouldCheck(refEntity, Global.this)) {
                     if (refEntity instanceof RefModule) {
                         RefModule refModule = (RefModule) refEntity;
 
@@ -440,5 +439,11 @@ public class Inspection extends GlobalInspectionTool {
     @Override
     public boolean worksInBatchModeOnly() {
         return true;
+    }
+
+    @NotNull
+    @Override
+    public LocalInspectionTool getSharedLocalInspectionTool() {
+        return super.getSharedLocalInspectionTool();
     }
 }
