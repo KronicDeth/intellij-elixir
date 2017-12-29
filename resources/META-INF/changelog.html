@@ -39,6 +39,10 @@
         IDEs where its Extension Point is not defined.
       </li>
       <li>If the explanation tooltip is empty, fallback to the message for the credo annotator instead.</li>
+      <li>
+        Check if <code>SdkAdditionalData</code> is <code>null</code> before getting <code>ErlangSDK</code> as it can be
+        <code>null</code> in certain scenarios in Rubymine.
+      </li>
     </ul>
   </li>
 </ul>

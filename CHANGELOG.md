@@ -155,6 +155,7 @@
 * [#955](https://github.com/KronicDeth/intellij-elixir/pull/955) - [@KronicDeth](https://github.com/KronicDeth)
   * Protect access to `JavadocOrderRootType.getInstance()` so that it doesn't cause an error in Small IDEs where its Extension Point is not defined.
   * If the explanation tooltip is empty, fallback to the message for the credo annotator instead.
+* [#956](https://github.com/KronicDeth/intellij-elixir/pull/956) - Check if `SdkAdditionalData` is `null` before getting `ErlangSDK` as it can be `null` in certain scenarios in Rubymine. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v7.0.0
 
