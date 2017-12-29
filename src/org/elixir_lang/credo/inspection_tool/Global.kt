@@ -361,8 +361,8 @@ class Global : GlobalInspectionTool() {
         }
     }
 
+    override fun getSharedLocalInspectionTool(): LocalInspectionTool = Local()
     override fun isGraphNeeded(): Boolean = true
-
     override fun worksInBatchModeOnly(): Boolean = true
 
     companion object {
