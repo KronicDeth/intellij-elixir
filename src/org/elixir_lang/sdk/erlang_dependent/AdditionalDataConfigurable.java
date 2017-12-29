@@ -143,10 +143,17 @@ public class AdditionalDataConfigurable implements com.intellij.openapi.projectR
         return wholePanel;
     }
 
-    private void internalErlangSdkUpdate(final Sdk sdk) {
-        final Sdk erlangSdk = ((SdkAdditionalData) sdk.getSdkAdditionalData()).getErlangSdk();
+    private void internalErlangSdkUpdate(@NotNull final Sdk sdk) {
+        SdkAdditionalData sdkAdditionalData = (SdkAdditionalData) sdk.getSdkAdditionalData();
+        Sdk erlangSdk;
 
-        if (internalErlangSdksComboBoxModel.getIndexOf(erlangSdk) == -1) {
+        if (sdkAdditionalData != null) {
+            erlangSdk = sdkAdditionalData.getErlangSdk();
+        } else {
+            erlangSdk = null;
+        }
+
+        if (erlangSdk == null || internalErlangSdksComboBoxModel.getIndexOf(erlangSdk) == -1) {
             internalErlangSdksComboBoxModel.addElement(erlangSdk);
         } else {
             internalErlangSdksComboBoxModel.setSelectedItem(erlangSdk);
