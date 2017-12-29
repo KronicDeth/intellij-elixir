@@ -361,7 +361,7 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
 
     @NotNull
     public String getPairedBatchInspectionShortName() {
-        return Global.SHORT_NAME;
+        return Global.Companion.getSHORT_NAME();
     }
 
     @Contract(pure = true)
