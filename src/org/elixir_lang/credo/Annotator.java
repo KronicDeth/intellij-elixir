@@ -23,6 +23,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import gnu.trove.THashMap;
 import org.elixir_lang.annotator.FunctionWithIndex;
+import org.elixir_lang.credo.inspection_tool.Global;
 import org.elixir_lang.jps.builder.ParametersList;
 import org.elixir_lang.mix.runner.MixRunningStateUtil;
 import org.jetbrains.annotations.Contract;
@@ -53,7 +54,7 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
     private static final String WHY_IT_MATTERS_HEADER = "WHY IT MATTERS";
 
     @NotNull
-    static List<Issue> lineListToIssueList(@NotNull List<String> lineList) {
+    public static List<Issue> lineListToIssueList(@NotNull List<String> lineList) {
         return lineListToIssueList(lineList, false, null);
     }
 
@@ -360,7 +361,7 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
 
     @NotNull
     public String getPairedBatchInspectionShortName() {
-        return Inspection.SHORT_NAME;
+        return Global.Companion.getSHORT_NAME();
     }
 
     @Contract(pure = true)
@@ -503,7 +504,7 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
     public static class Issue {
         public final int line;
         @NotNull
-        final String path;
+        public final String path;
         @NotNull
         final Check check;
         @Nullable
