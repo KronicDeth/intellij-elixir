@@ -67,6 +67,7 @@ import java.util.stream.Stream;
 
 import static org.elixir_lang.Level.V_1_3;
 import static org.elixir_lang.errorreport.Logger.error;
+import static org.elixir_lang.mix.importWizard.ImportedOtpAppKt.computeReadAction;
 import static org.elixir_lang.psi.call.name.Function.*;
 import static org.elixir_lang.psi.call.name.Module.*;
 import static org.elixir_lang.psi.stub.type.call.Stub.isModular;
@@ -905,8 +906,9 @@ public class ElixirPsiImplUtil {
      * @param keywordKeyText the text of the keyword value.
      * @return the {@code PsiElement} associated with {@code keywordKeyText}.
      */
-    public static PsiElement keywordValue(QuotableKeywordList keywordList, String keywordKeyText) {
-        PsiElement keywordValue = null;
+    @Nullable
+    public static Quotable keywordValue(QuotableKeywordList keywordList, String keywordKeyText) {
+        Quotable keywordValue = null;
 
         for (QuotableKeywordPair quotableKeywordPair : keywordList.quotableKeywordPairList()) {
             if (hasKeywordKey(quotableKeywordPair, keywordKeyText)) {
@@ -1240,9 +1242,16 @@ public class ElixirPsiImplUtil {
         );
     }
 
-    @Nullable
+    @NotNull
     public static Call[] macroChildCalls(Call macro) {
-        Call[] childCalls = null;
+        List<Call> childCallList = macroChildCallList(macro);
+
+        return childCallList.toArray(new Call[childCallList.size()]);
+    }
+
+    @NotNull
+    public static List<Call> macroChildCallList(@NotNull Call macro) {
+        List<Call> childCallList = null;
         ElixirDoBlock doBlock = macro.getDoBlock();
 
         if (doBlock != null) {
@@ -1255,9 +1264,7 @@ public class ElixirPsiImplUtil {
                     PsiElement stabChild = stabChildren[0];
 
                     if (stabChild instanceof ElixirStabBody) {
-                        List<Call> childCallList = macroChildCallList(stabChild);
-
-                        childCalls = childCallList.toArray(new Call[childCallList.size()]);
+                        childCallList = macroChildCallList(stabChild);
                     }
                 }
             }
@@ -1280,15 +1287,17 @@ public class ElixirPsiImplUtil {
 
                     if (keywordValue instanceof Call) {
                         Call childCall = (Call) keywordValue;
-                        childCalls = new Call[]{
-                                childCall
-                        };
+                        childCallList = Collections.singletonList(childCall);
                     }
                 }
             }
         }
 
-        return childCalls;
+        if (childCallList == null) {
+            childCallList = Collections.emptyList();
+        }
+
+        return childCallList;
     }
 
     @NotNull
@@ -2633,7 +2642,7 @@ public class ElixirPsiImplUtil {
         PsiElement element = call.functionNameElement();
 
         if (element != null) {
-            functionName = element.getText();
+            functionName = computeReadAction(element::getText);
         }
 
         return functionName;
@@ -3403,7 +3412,7 @@ public class ElixirPsiImplUtil {
         Quotable keywordKey = quotableKeywordPair.getKeywordKey();
         boolean has = false;
 
-        if (keywordKey.getText().equals(keywordKeyText)) {
+        if (computeReadAction(keywordKey::getText).equals(keywordKeyText)) {
             has = true;
         } else {
             OtpErlangObject quotedKeywordKey = keywordKey.quote();
@@ -3992,7 +4001,7 @@ public class ElixirPsiImplUtil {
             if (stringLine != null) {
                 quoted = stringLine.quoteAsAtom();
             } else {
-                quoted = new OtpErlangAtom(keywordKey.getText());
+                quoted = new OtpErlangAtom(computeReadAction(keywordKey::getText));
             }
         }
 
@@ -5529,7 +5538,7 @@ if (quoted == null) {
                 }
             }
 
-            PsiElement parent = call.getParent();
+            PsiElement parent = computeReadAction(call::getParent);
 
             if (isPipe(parent)) {
                 Arrow parentPipeOperation = (Arrow) parent;

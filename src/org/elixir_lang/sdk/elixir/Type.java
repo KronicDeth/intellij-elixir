@@ -1,5 +1,6 @@
 package org.elixir_lang.sdk.elixir;
 
+import com.intellij.facet.FacetManager;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
@@ -23,13 +24,15 @@ import com.intellij.psi.PsiElement;
 import gnu.trove.THashSet;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.ArrayUtils;
+import org.elixir_lang.Facet;
 import org.elixir_lang.icons.ElixirIcons;
 import org.elixir_lang.jps.model.JpsElixirModelSerializerExtension;
 import org.elixir_lang.jps.model.JpsElixirSdkType;
+import org.elixir_lang.mix.runner.MixRunConfigurationBase;
 import org.elixir_lang.sdk.HomePath;
-import org.elixir_lang.sdk.ProcessOutput;
 import org.elixir_lang.sdk.erlang_dependent.SdkModificatorRootTypeConsumer;
 import org.jdom.Element;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.TestOnly;
@@ -43,8 +46,10 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import static com.intellij.openapi.application.ModalityState.NON_MODAL;
+import static org.elixir_lang.mix.runner.MixRunningStateUtil.module;
 import static org.elixir_lang.sdk.HomePath.*;
 import static org.elixir_lang.sdk.ProcessOutput.STANDARD_TIMEOUT;
+import static org.elixir_lang.sdk.ProcessOutput.isSmallIde;
 import static org.elixir_lang.sdk.ProcessOutput.transformStdoutLine;
 import static org.elixir_lang.sdk.Type.addCodePaths;
 import static org.elixir_lang.sdk.Type.ebinPathChainVirtualFile;
@@ -97,8 +102,25 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
                 VirtualFileManager.getInstance().findFileByUrl(hexdocUrlBuilder.toString());
 
         if (hexdocUrlVirtualFile != null) {
-            sdkModificator.addRoot(hexdocUrlVirtualFile, JavadocOrderRootType.getInstance());
+            OrderRootType documentationRootType = documentationRootType();
+
+            if (documentationRootType != null) {
+                sdkModificator.addRoot(hexdocUrlVirtualFile, documentationRootType);
+            }
         }
+    }
+
+    @Nullable
+    public static OrderRootType documentationRootType() {
+        OrderRootType rootType;
+
+        try {
+            rootType = JavadocOrderRootType.getInstance();
+        } catch (AssertionError assertionError) {
+            rootType = null;
+        }
+
+        return rootType;
     }
 
     private static void addDocumentationPath(@NotNull SdkModificator sdkModificator,
@@ -315,14 +337,28 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
         return erlangSdk;
     }
 
+    public static SdkType erlangSdkType(@NotNull ProjectJdkTable projectJdkTable) {
+        SdkType erlangSdkType;
+
+        if (isSmallIde()) {
+            /* intellij-erlang's "Erlang SDK" does not work in small IDEs because it uses JavadocRoot for documentation,
+               which isn't available in Small IDEs. */
+            erlangSdkType = SdkType.findInstance(org.elixir_lang.sdk.erlang.Type.class);
+        } else {
+            erlangSdkType = (SdkType) projectJdkTable.getSdkTypeByName("Erlang SDK");
+
+            if (erlangSdkType instanceof UnknownSdkType) {
+                erlangSdkType = SdkType.findInstance(org.elixir_lang.sdk.erlang.Type.class);
+            }
+        }
+
+        return erlangSdkType;
+    }
+
     @Nullable
     private static Sdk defaultErlangSdk() {
         ProjectJdkTable projectJdkTable = ProjectJdkTable.getInstance();
-        SdkType erlangSdkType = (SdkType) projectJdkTable.getSdkTypeByName("Erlang SDK");
-
-        if (erlangSdkType instanceof UnknownSdkType) {
-            erlangSdkType = SdkType.findInstance(org.elixir_lang.sdk.erlang.Type.class);
-        }
+        SdkType erlangSdkType = erlangSdkType(projectJdkTable);
 
         Sdk mostRecentErlangSdk = projectJdkTable.findMostRecentSdkOfType(erlangSdkType);
         @Nullable Sdk defaultErlangSdk;
@@ -368,58 +404,10 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
 
     @Nullable
     public static Release getRelease(@NotNull PsiElement element) {
-        Release release = null;
-        Project project = element.getProject();
-
-        if (ProcessOutput.isSmallIde()) {
-            release = getReleaseForSmallIde(project);
-        } else {
-      /* ModuleUtilCore.findModuleForPsiElement can fail with NullPointerException if the
-         ProjectFileIndex.SERVICE.getInstance(Project) returns {@code null}, so check that the ProjectFileIndex is
-         available first */
-            if (ProjectFileIndex.SERVICE.getInstance(project) != null) {
-                Module module = ModuleUtilCore.findModuleForPsiElement(element);
-
-                if (module != null) {
-                    @Nullable ModuleRootManager moduleRootManager = ModuleRootManager.getInstance(module);
-
-                    if (moduleRootManager != null) {
-                        Sdk sdk = moduleRootManager.getSdk();
-
-                        if (sdk != null) {
-                            release = getRelease(sdk);
-                        }
-                    }
-                }
-            }
-
-            if (release == null) {
-                release = getRelease(project);
-            }
-        }
-
-        return release;
+        return getRelease(mostSpecificSdk(element));
     }
 
-    @Nullable
-    public static Release getRelease(@NotNull Project project) {
-        Release release;
-
-        if (ProcessOutput.isSmallIde()) {
-            release = getReleaseForSmallIde(project);
-        } else {
-            ProjectRootManager projectRootManager = ProjectRootManager.getInstance(project);
-
-            if (projectRootManager != null) {
-                release = getRelease(projectRootManager.getProjectSdk());
-            } else {
-                release = null;
-            }
-        }
-
-        return release;
-    }
-
+    @Contract("null -> null")
     @Nullable
     public static Release getRelease(@Nullable Sdk sdk) {
         if (sdk != null && sdk.getSdkType() == getInstance()) {
@@ -430,18 +418,7 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
     }
 
     @Nullable
-    public static Release getReleaseForSmallIde(@NotNull Project project) {
-        String sdkPath = getSdkPath(project);
-        return StringUtil.isEmpty(sdkPath) ? null : getInstance().detectSdkVersion(sdkPath);
-    }
-
-    @Nullable
     public static String getSdkPath(@NotNull final Project project) {
-        // todo small ide
-        if (ProcessOutput.isSmallIde()) {
-            return ForSmallIdes.getSdkHome(project);
-        }
-
         Sdk sdk = ProjectRootManager.getInstance(project).getProjectSdk();
         return sdk != null && sdk.getSdkType() == getInstance() ? sdk.getHomePath() : null;
     }
@@ -709,5 +686,96 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
         }
 
         return sdkAdditionalData;
+    }
+
+    @Nullable
+    private static Sdk facetSdk(@NotNull Facet facet) {
+        return facet.getConfiguration().getSdk();
+    }
+
+    @Nullable
+    private static Sdk moduleSdk(@NotNull Module module) {
+        return sdk(ModuleRootManager.getInstance(module).getSdk());
+    }
+
+    @Nullable
+    private static Sdk projectSdk(@NotNull Project project) {
+        return sdk(ProjectRootManager.getInstance(project).getProjectSdk());
+    }
+
+    @Nullable
+    private static Sdk sdk(@Nullable Sdk sdk) {
+        Sdk elixirSdk;
+
+        if (sdk != null && sdk.getSdkType() == Type.getInstance()) {
+            elixirSdk = sdk;
+        } else {
+            elixirSdk = null;
+        }
+
+        return elixirSdk;
+    }
+
+    @Nullable
+    public static Sdk mostSpecificSdk(@NotNull MixRunConfigurationBase mixRunConfigurationBase) {
+        Module module = module(mixRunConfigurationBase);
+        Sdk sdk;
+
+        if (module != null) {
+            sdk = mostSpecificSdk(module);
+        } else {
+            Project project = mixRunConfigurationBase.getProject();
+            sdk = mostSpecificSdk(project);
+        }
+
+        return sdk;
+    }
+
+    @Nullable
+    public static Sdk mostSpecificSdk(@NotNull Module module) {
+        Facet elixirFacet = FacetManager.getInstance(module).getFacetByType(Facet.ID);
+        Sdk elixirSdk = null;
+
+        if (elixirFacet != null) {
+            elixirSdk = facetSdk(elixirFacet);
+        }
+
+        if (elixirSdk == null) {
+            elixirSdk = moduleSdk(module);
+        }
+
+        if (elixirSdk == null) {
+            elixirSdk = mostSpecificSdk(module.getProject());
+        }
+
+        return elixirSdk;
+    }
+
+    @Nullable
+    public static Sdk mostSpecificSdk(@NotNull PsiElement psiElement) {
+        Project project = psiElement.getProject();
+        Sdk elixirSdk;
+
+        /* ModuleUtilCore.findModuleForPsiElement can fail with NullPointerException if the
+           ProjectFileIndex.SERVICE.getInstance(Project) returns {@code null}, so check that the ProjectFileIndex is
+           available first */
+        if (ProjectFileIndex.SERVICE.getInstance(project) != null) {
+            Module module = ModuleUtilCore.findModuleForPsiElement(psiElement);
+
+            if (module != null) {
+                elixirSdk = mostSpecificSdk(module);
+            } else {
+                elixirSdk = mostSpecificSdk(project);
+            }
+        } else {
+            elixirSdk = mostSpecificSdk(project);
+        }
+
+        return elixirSdk;
+    }
+
+    @Nullable
+    public static Sdk mostSpecificSdk(@NotNull Project project) {
+        return projectSdk(project);
     }
 }

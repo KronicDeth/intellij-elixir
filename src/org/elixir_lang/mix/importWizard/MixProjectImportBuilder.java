@@ -30,7 +30,6 @@ import com.intellij.util.Function;
 import com.intellij.util.containers.ContainerUtil;
 import org.elixir_lang.configuration.ElixirCompilerSettings;
 import org.elixir_lang.icons.ElixirIcons;
-import org.elixir_lang.mix.settings.MixSettings;
 import org.elixir_lang.module.ElixirModuleType;
 import org.elixir_lang.sdk.elixir.Type;
 import org.jetbrains.annotations.NotNull;
@@ -48,13 +47,11 @@ import java.util.*;
 public class MixProjectImportBuilder extends ProjectImportBuilder<ImportedOtpApp> {
   private static final Logger LOG = Logger.getInstance(MixProjectImportBuilder.class);
 
-  private boolean myOpenProjectSettingsAfter = false;
   @Nullable
   private VirtualFile myProjectRoot = null;
   @NotNull
   private List<ImportedOtpApp> myFoundOtpApps = Collections.emptyList();
   @NotNull private List<ImportedOtpApp> mySelectedOtpApps = Collections.emptyList();
-  @NotNull private String myMixPath = "";
   private boolean myIsImportingProject;
 
 
@@ -93,13 +90,11 @@ public class MixProjectImportBuilder extends ProjectImportBuilder<ImportedOtpApp
 
   @Override
   public void setOpenProjectSettingsAfter(boolean openProjectSettingsAfter) {
-    myOpenProjectSettingsAfter = openProjectSettingsAfter;
   }
 
   @Override
   public void cleanup() {
-    myOpenProjectSettingsAfter = false;
-    myProjectRoot = null;
+      myProjectRoot = null;
     myFoundOtpApps = Collections.emptyList();
     mySelectedOtpApps = Collections.emptyList();
   }
@@ -208,7 +203,6 @@ public class MixProjectImportBuilder extends ProjectImportBuilder<ImportedOtpApp
       }
     });
 
-    MixSettings.getInstance(project).setMixPath(myMixPath);
     if(myIsImportingProject){
       ElixirCompilerSettings.getInstance(project).setUseMixCompilerEnabled(true);
     }
@@ -270,10 +264,6 @@ public class MixProjectImportBuilder extends ProjectImportBuilder<ImportedOtpApp
     return !myFoundOtpApps.isEmpty();
   }
 
-  public void setMixPath(@NotNull String mixPath){
-    myMixPath = mixPath;
-  }
-
   public void setIsImportingProject(boolean isImportingProject){
     myIsImportingProject = isImportingProject;
   }
@@ -314,13 +304,6 @@ public class MixProjectImportBuilder extends ProjectImportBuilder<ImportedOtpApp
     }
   }
 
-  private static void excludeDirFromContent(ContentEntry content, VirtualFile root, String excludeDir){
-    VirtualFile excludeDirFile = root.findChild(excludeDir);
-    if(excludeDirFile != null){
-      content.addExcludeFolder(excludeDirFile);
-    }
-  }
-
   @NotNull
   private List<VirtualFile> findMixExs(@NotNull final VirtualFile root, @NotNull final ProgressIndicator indicator){
     // synchronous and recursive
@@ -347,21 +330,15 @@ public class MixProjectImportBuilder extends ProjectImportBuilder<ImportedOtpApp
   @Nullable
   private static ImportedOtpApp createImportedOtpApp(@NotNull VirtualFile appRoot){
     VirtualFile appMixFile = appRoot.findChild("mix.exs");
-    if(appMixFile == null){
-      return null;
-    }
-    return new ImportedOtpApp(appRoot, appMixFile);
-  }
+    ImportedOtpApp importedOtpApp;
 
-  @Nullable
-  private static VirtualFile findFileByExtension(@NotNull VirtualFile dir, @NotNull String extension){
-    for(VirtualFile file : dir.getChildren()){
-      String fileName = file.getName();
-      if(!file.isDirectory() && fileName.endsWith(extension)){
-        return file;
-      }
+    if(appMixFile == null){
+      importedOtpApp = null;
+    } else {
+      importedOtpApp = new ImportedOtpApp(appRoot, appMixFile);;
     }
-    return null; //To change body of created methods use File | settings | File Templates.
+
+    return importedOtpApp;
   }
 
   private static void deleteIdeaModuleFiles(@NotNull final List<ImportedOtpApp> importedOtpApps) throws IOException{

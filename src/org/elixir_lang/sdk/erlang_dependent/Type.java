@@ -5,9 +5,12 @@ import com.intellij.openapi.projectRoots.SdkAdditionalData;
 import com.intellij.openapi.projectRoots.impl.DependentSdkType;
 import com.intellij.openapi.roots.JavadocOrderRootType;
 import com.intellij.openapi.roots.OrderRootType;
+import org.elixir_lang.sdk.ProcessOutput;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import static org.elixir_lang.sdk.elixir.Type.erlangSdkType;
 
 /**
  * An SDK that depends on an Erlang SDK, either
@@ -24,9 +27,16 @@ public abstract class Type extends DependentSdkType {
 
     public static boolean staticIsValidDependency(Sdk sdk) {
         String sdkTypeCanonicalName = sdk.getSdkType().getClass().getCanonicalName();
+        boolean isValidDependency;
 
-        return sdkTypeCanonicalName.equals(ERLANG_SDK_TYPE_CANONICAL_NAME) ||
-                sdkTypeCanonicalName.equals(ERLANG_SDK_FOR_ELIXIR_SDK_TYPE_CANONICAL_NAME);
+        if (ProcessOutput.isSmallIde()) {
+            isValidDependency = sdkTypeCanonicalName.equals(ERLANG_SDK_FOR_ELIXIR_SDK_TYPE_CANONICAL_NAME);
+        } else {
+            isValidDependency = sdkTypeCanonicalName.equals(ERLANG_SDK_TYPE_CANONICAL_NAME) ||
+                    sdkTypeCanonicalName.equals(ERLANG_SDK_FOR_ELIXIR_SDK_TYPE_CANONICAL_NAME);
+        }
+
+        return isValidDependency;
     }
 
     @Override
@@ -36,21 +46,12 @@ public abstract class Type extends DependentSdkType {
 
     @Override
     public String getUnsatisfiedDependencyMessage() {
-        return "You need to configure an Erlang SDK (from intellij-erlang) or " +
-                "Erlang SDK for Elixir SDK (from intellij-elixir) first";
+        return "You need to configure an " + getDependencyType().getName();
     }
 
     @Override
     protected SdkType getDependencyType() {
-        Class<? extends SdkType> sdkTypeClass;
-
-        try {
-            sdkTypeClass = (Class<? extends SdkType>) Class.forName(ERLANG_SDK_TYPE_CANONICAL_NAME);
-        } catch (ClassNotFoundException e) {
-            sdkTypeClass = org.elixir_lang.sdk.erlang.Type.class;
-        }
-
-        return SdkType.findInstance(sdkTypeClass);
+        return erlangSdkType(ProjectJdkTable.getInstance());
     }
 
     @Nullable

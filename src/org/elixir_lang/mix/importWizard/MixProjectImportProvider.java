@@ -20,9 +20,9 @@ public class MixProjectImportProvider extends ProjectImportProvider {
   @Override
   public ModuleWizardStep[] createSteps(@NotNull WizardContext context){
     return new ModuleWizardStep[]{
+        new ProjectJdkForModuleStep(context, Type.getInstance()),
         new MixProjectRootStep(context),
-        new SelectImportedOtpAppsStep(context),
-        new ProjectJdkForModuleStep(context, Type.getInstance())
+        new SelectImportedOtpAppsStep(context)
     };
   }
 

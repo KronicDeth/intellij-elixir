@@ -20,8 +20,8 @@ public class ElixirModules {
     private ElixirModules() {
     }
 
-    private static void addCustomMixTask(@NotNull List<String> relativeSourcePathList, boolean useCustomMixTask) {
-        if (useCustomMixTask) {
+    private static void addCustomMixTask(@NotNull List<String> relativeSourcePathList, @NotNull Level level) {
+        if (level.compareTo(Level.V_1_4) < 0) {
             relativeSourcePathList.add(MIX_TASK_FILE_NAME);
         }
     }
@@ -40,21 +40,21 @@ public class ElixirModules {
     }
 
     @NotNull
-    private static List<File> copy(@NotNull Level level, boolean useCustomMixTask) throws IOException {
-        return org.elixir_lang.ElixirModules.copy(BASE_PATH, relativeSourcePathList(level, useCustomMixTask));
+    private static List<File> copy(@NotNull Level level) throws IOException {
+        return org.elixir_lang.ElixirModules.copy(BASE_PATH, relativeSourcePathList(level));
     }
 
     @NotNull
-    public static ParametersList parametersList(@NotNull Level level, boolean useCustomMixTask) throws IOException {
-        return org.elixir_lang.ElixirModules.parametersList(copy(level, useCustomMixTask));
+    public static ParametersList parametersList(@NotNull Level level) throws IOException {
+        return org.elixir_lang.ElixirModules.parametersList(copy(level));
     }
 
-    private static List<String> relativeSourcePathList(@NotNull Level level, boolean useCustomMixTask) {
+    private static List<String> relativeSourcePathList(@NotNull Level level) {
         List<String> relativeSourcePathList = new ArrayList<>();
         relativeSourcePathList.add(FORMATTING_FILE_NAME);
 
         addFormatterPath(relativeSourcePathList, level);
-        addCustomMixTask(relativeSourcePathList, useCustomMixTask);
+        addCustomMixTask(relativeSourcePathList, level);
 
         return relativeSourcePathList;
     }

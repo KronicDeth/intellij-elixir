@@ -67,24 +67,25 @@ public class Inspection extends GlobalInspectionTool {
 
     @NotNull
     private static GeneralCommandLine generalCommandLine(@NotNull GeneralCommandLine workingDirectoryGeneralCommandLine,
-                                                         @NotNull Project project,
+                                                         @NotNull Module module,
                                                          @NotNull ParametersList mixParametersList) {
         return MixRunningStateUtil.commandLine(
                 workingDirectoryGeneralCommandLine,
-                project,
+                module,
                 new ParametersList(),
                 mixParametersList
         );
     }
 
-    private static List<Annotator.Issue> runInspection(@NotNull Project project,
+    @NotNull
+    private static List<Annotator.Issue> runInspection(@NotNull Module module,
                                                        @NotNull String workingDirectory,
                                                        @NotNull Set<String> pathSet) {
         List<Annotator.Issue> issueList;
 
         try {
             ProcessOutput processOutput = ExecUtil.execAndGetOutput(
-                    generalCommandLine(workingDirectory, project, pathSet)
+                    generalCommandLine(workingDirectory, module, pathSet)
             );
 
             issueList = lineListToIssueList(processOutput.getStdoutLines());
@@ -96,24 +97,46 @@ public class Inspection extends GlobalInspectionTool {
     }
 
     @NotNull
+    private static List<Annotator.Issue> runInspection(@NotNull Project project,
+                                                       @NotNull String workingDirectory,
+                                                       @NotNull Set<String> pathSet) {
+        VirtualFile virtualFile = LocalFileSystem.getInstance().findFileByPath(workingDirectory);
+        List<Annotator.Issue> issueList;
+
+        if (virtualFile != null) {
+            Module module = ModuleUtilCore.findModuleForFile(virtualFile, project);
+
+            if (module != null) {
+                issueList = runInspection(module, workingDirectory, pathSet);
+            } else {
+                issueList = Collections.emptyList();
+            }
+        } else {
+            issueList = Collections.emptyList();
+        }
+
+        return issueList;
+    }
+
+    @NotNull
     private static GeneralCommandLine generalCommandLine(@NotNull String workingDirectory,
-                                                         @NotNull Project project,
+                                                         @NotNull Module module,
                                                          @NotNull ParametersList mixParametersList) {
         GeneralCommandLine workingDirectoryGeneralCommandLine = new GeneralCommandLine().withCharset(Charsets.UTF_8);
         workingDirectoryGeneralCommandLine.withWorkDirectory(workingDirectory);
 
         return generalCommandLine(
                 workingDirectoryGeneralCommandLine,
-                project,
+                module,
                 mixParametersList
         );
     }
 
     @NotNull
     private static GeneralCommandLine generalCommandLine(@NotNull String workingDirectory,
-                                                         @NotNull Project project,
+                                                         @NotNull Module module,
                                                          @NotNull Set<String> pathSet) {
-        return generalCommandLine(workingDirectory, project, mixParameterList(pathSet));
+        return generalCommandLine(workingDirectory, module, mixParameterList(pathSet));
     }
 
     @NotNull

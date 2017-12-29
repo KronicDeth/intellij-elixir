@@ -14,7 +14,8 @@ import com.intellij.openapi.diagnostic.Attachment;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
-import com.intellij.openapi.project.Project;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.LocalFileSystem;
@@ -30,7 +31,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -58,21 +58,21 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
     }
 
     @NotNull
-    private static List<Issue> lineListToIssueList(@NotNull List<String> lineList, @NotNull Project project) {
-        return lineListToIssueList(lineList, Service.getInstance(project).includeExplanation(), project);
+    private static List<Issue> lineListToIssueList(@NotNull List<String> lineList, @NotNull Module module) {
+        return lineListToIssueList(lineList, Service.getInstance(module.getProject()).includeExplanation(), module);
     }
 
     @NotNull
     private static List<Issue> lineListToIssueList(@NotNull List<String> lineList,
                                                    boolean includeExplanation,
-                                                   @Nullable Project project) {
+                                                   @Nullable Module module) {
         List<Issue> issueList;
 
         if (!lineList.isEmpty()) {
             issueList = new ArrayList<>();
 
             for (String line : lineList) {
-                Issue issue = lineToIssue(line, includeExplanation, project);
+                Issue issue = lineToIssue(line, includeExplanation, module);
 
                 if (issue != null) {
                     issueList.add(issue);
@@ -86,7 +86,7 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
     }
 
     @Nullable
-    private static Issue lineToIssue(@NotNull String line, boolean includeExplanation, @Nullable Project project) {
+    private static Issue lineToIssue(@NotNull String line, boolean includeExplanation, @Nullable Module module) {
         Matcher matcher = LINE_PATTERN.matcher(line);
         Issue issue;
 
@@ -107,11 +107,11 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
             issue = new Issue(matcher.group("path"), lineNumber - 1, column, check, message);
 
             if (includeExplanation) {
-                assert project != null : "Project must not be null to include explanation";
+                assert module != null : "Module must not be null to include explanation";
 
-                issue.putExplanation(project);
+                issue.putExplanation(module);
             }
-        } else {
+                } else {
             issue = null;
         }
 
@@ -120,11 +120,11 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
 
     @NotNull
     private static GeneralCommandLine generalCommandLine(@NotNull GeneralCommandLine workingDirectoryGeneralCommandLine,
-                                                  @NotNull Project project,
-                                                  @NotNull ParametersList mixParametersList) {
+                                                         @NotNull Module module,
+                                                         @NotNull ParametersList mixParametersList) {
         return MixRunningStateUtil.commandLine(
                 workingDirectoryGeneralCommandLine,
-                project,
+                module,
                 new ParametersList(),
                 mixParametersList
         );
@@ -158,15 +158,16 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
     }
 
     @NotNull
-    private static GeneralCommandLine generalCommandLine(@NotNull Project project, @NotNull ParametersList mixParametersList) {
+    private static GeneralCommandLine generalCommandLine(@NotNull Module module,
+                                                         @NotNull ParametersList mixParametersList) {
         GeneralCommandLine workingDirectoryGeneralCommandLine = new GeneralCommandLine().withCharset(Charsets.UTF_8);
 
-        String workingDirectory = workingDirectory(project);
+        String workingDirectory = workingDirectory(module);
         workingDirectoryGeneralCommandLine.withWorkDirectory(workingDirectory);
 
         return generalCommandLine(
                 workingDirectoryGeneralCommandLine,
-                project,
+                module,
                 mixParametersList
         );
     }
@@ -287,8 +288,11 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
 
         try {
             ProcessOutput processOutput = ExecUtil.execAndGetOutput(generalCommandLine(file));
+            Module module = ModuleUtilCore.findModuleForPsiElement(file);
 
-            issueList = lineListToIssueList(processOutput.getStdoutLines(), file.getProject());
+            assert module != null : "Could not find Module for PsiFile (" + file + ")";
+
+            issueList = lineListToIssueList(processOutput.getStdoutLines(), module);
         } catch (ExecutionException executionException) {
             issueList = Collections.emptyList();
         }
@@ -308,8 +312,12 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
 
     @NotNull
     private GeneralCommandLine generalCommandLine(@NotNull PsiFile file) {
+        Module module = ModuleUtilCore.findModuleForPsiElement(file);
+
+        assert module != null : "Module is null for PsiFile (" + file + ")";
+
         return generalCommandLine(
-                file.getProject(),
+                module,
                 mixParametersList(file)
         );
     }
@@ -338,9 +346,13 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
                     Annotation annotation = holder.createWarningAnnotation(new TextRange(start, end), issue.message);
                     annotation.setAfterEndOfLine(end == start);
 
-                    issue.explanation.ifPresent(
-                            explanation -> annotation.setTooltip(explanationToToolTip(explanation, workingDirectory))
-                    );
+                    issue.explanation.ifPresent(explanation -> {
+                        String toolTip = explanationToToolTip(explanation, workingDirectory);
+
+                        if (!toolTip.isEmpty()) {
+                            annotation.setTooltip(toolTip);
+                        }
+                    });
                 }
             }
         }
@@ -515,9 +527,9 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
         }
 
         @NotNull
-        private Optional<Stream<String>> explanation(@NotNull Project project) {
+        private Optional<Stream<String>> explanation(@NotNull Module module) {
             ParametersList mixParametersList = mixParametersList(this);
-            GeneralCommandLine generalCommandLine = generalCommandLine(project, mixParametersList);
+            GeneralCommandLine generalCommandLine = generalCommandLine(module, mixParametersList);
             Optional<Stream<String>> explanation;
 
             try {
@@ -536,8 +548,8 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
             return explanation;
         }
 
-        void putExplanation(@NotNull Project project) {
-            this.explanation = explanation(project);
+        void putExplanation(@NotNull Module module) {
+            this.explanation = explanation(module);
         }
 
         public enum Check {
