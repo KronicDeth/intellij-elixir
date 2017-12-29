@@ -150,6 +150,7 @@
     * Preferences > Languages * Frameworks > Elixir > Internal SDKs can add, delete, and configure Erlang SDK for Elixir SDKs as per-application settings.
   * Configure SDK before running `mix` when importing mix projects, so that the `mix` path does not need to be configured separately from the SDK path.
     * The `mix` path no longer needs to be setup independently from the Elixir SDK.
+* [#957](https://github.com/KronicDeth/intellij-elixir/pull/957) - Add Local shared `credo` inspection, so the the `credo` inspection works for Code > Code Cleanup. - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#955](https://github.com/KronicDeth/intellij-elixir/pull/955) - [@KronicDeth](https://github.com/KronicDeth)
