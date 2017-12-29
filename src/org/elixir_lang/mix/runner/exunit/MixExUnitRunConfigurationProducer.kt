@@ -47,21 +47,11 @@ private fun configurationName(file: PsiFileSystemItem,
         }
 
 private fun isConfigurationFromContextImpl(configuration: MixExUnitRunConfiguration, psiElement: PsiElement): Boolean {
-    val containingFile = psiElement.containingFile
-    containingFile?.virtualFile ?: return false
+    val contextConfiguration = MixExUnitRunConfiguration(configuration.name, configuration.project)
 
-    val lineNumber = lineNumber(psiElement)
-    val workingDirectory = configuration.workingDirectory
-
-    return configuration.name ==
-            configurationName(
-                    containingFile,
-                    lineNumber,
-                    workingDirectory,
-                    psiElement.project.basePath
-            )
-            && configuration.programParameters ==
-            programParameters(containingFile, lineNumber, workingDirectory)
+    return setupConfigurationFromContextImpl(contextConfiguration, psiElement) &&
+            contextConfiguration.programParameters == configuration.programParameters &&
+            contextConfiguration.workingDirectory == configuration.workingDirectory
 }
 
 private fun lineNumber(psiElement: PsiElement): Int {
