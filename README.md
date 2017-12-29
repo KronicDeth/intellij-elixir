@@ -129,11 +129,12 @@
         - [Module Attribute](#module-attribute-2)
         - [Parameters and Variables](#parameters-and-variables-3)
     - [SDK](#sdk)
-      - [Default SDK](#default-sdk)
-    - [Elixir External Tools](#elixir-external-tools)
       - [Rich IDEs](#rich-ides)
+        - [Default SDK](#default-sdk)
       - [Small IDEs](#small-ides)
-        - [Elixir SDK Path](#elixir-sdk-path)
+        - [Elixir Facet SDK](#elixir-facet-sdk)
+        - [Elixir SDKs](#elixir-sdks)
+        - [Internal Erlang SDK](#internal-erlang-sdk)
     - [Structure](#structure)
       - [Viewing Structure](#viewing-structure)
       - [Buttons](#buttons)
@@ -193,7 +194,7 @@ Once you have your IDE of choice installed, you can [install this plugin](#insta
 
 | Feature                                     | [Rich](#ides) | [Small](#ides) | Alternative                                                                           |
 |---------------------------------------------|---------------|----------------|---------------------------------------------------------------------------------------|
-| Project                                     | Yes           | No             | 1. Open directory<br/>2. [Elixir SDK Path in External Elixir Tools](#elixir-sdk-path) |
+| Project                                     | Yes           | No             | 1. Open directory<br/>2. [Setup the SDK](#small-ides)                                |
 | Project Structure                           | Automatic     | Manual         |                                                                                       |
 | Project Settings                            | Yes           | No             |                                                                                       |
 | Module Settings                             | Yes           | No             |                                                                                       |
@@ -219,7 +220,7 @@ Once you have your IDE of choice installed, you can [install this plugin](#insta
 | Go To Test Subject                          | Yes           | Yes            |                                                                                       |
 | Find Usage                                  | Yes           | Yes            |                                                                                       |
 | Refactor                                    | Yes           | Yes            |                                                                                       |
-| SDK                                         | Yes           | No             | [Elixir SDK Path in External Elixir Tools](#elixir-sdk-path)                          |
+| SDK                                         | Yes           | Yes            |                                                                                       |
 | Structure                                   | Yes           | Yes            |                                                                                       |
 
 ### Project
@@ -227,7 +228,7 @@ Once you have your IDE of choice installed, you can [install this plugin](#insta
 NOTE: This feature only works in Rich IDEs as it depends on an extension point unavailable in Small IDEs.  To setup a project in a Small IDE
 
 1. Open Directory of the project
-2. [Setup the Elixir SDK Path in External Elixir Tools](#elixir-sdk-path)
+2. [Setup the SDK](#small-ides)
 </b>
 
 #### From Existing Sources
@@ -3086,11 +3087,13 @@ in a `defmodule`, is used, including in strings and comments.
 
 ### SDK
 
-**NOTE: These instructions only apply to Rich IDEs, for a Small IDE use [Elixir SDK Path](#elixir-sdk-path)**
-
 Because Elixir is built on top of Erlang, Elixir command line commands don't have OS native binaries, instead the OS native binaries from Erlang are used.  In order to reliably find the Erlang OS native binaries, like `erl` and `erl.exe`, the path to BOTH the Erlang SDK and the Elixir SDK must be configured.  This allows you to install Erlang and Elixir with completely different package managers too: you can install Erlang with `kerl` and Elixir with `kiex` and you don't have to worry about IntelliJ not seeing the environment variables set by `kerl` when launching IntelliJ from an application launchers instead of a terminal.
 
 Since JetBrains' OpenAPI only supports one SDK per Project or Module, to support Elixir and Erlang SDK at the same time, the Elixir SDK keeps track of an Internal Erlang SDK.  When setting up your first Elixir SDK, you will be prompted to create an Erlang SDK (if you have the [`intellij-erlang`](https://github.com/ignatov/intellij-erlang) plugin [installed](https://plugins.jetbrains.com/plugin/7083-erlang)) or and Erlang for Elixir SDK (if you don't have `intellij-erlang` installed and you need to use the minimal Erlang for Elixir SDK supplied by this plugin).
+
+#### Rich IDEs
+
+Rich IDEs can use the Project Structure system to configure Elixir and Erlang SDKs and select the Project/Module SDK.
 
 With the Elixir SDK setup with an Internal Erlang SDK, you can see the Elixir SDK name and the home path, but unlike other SDKs, there's a dropdown for changing the Internal Erlang SDK.
 
@@ -3111,7 +3114,7 @@ The Class Paths are combined from the two SDKs because OpenAPI doesn't allow to 
 These Class Paths are not just for code completion and search anymore, all paths listed as passed with `-pa` flag to `erl` or `erl.exe` when running `mix`, so that you can mix different versions of OTP applications shipped with different version of OTP, so you can take advantage of the independently updatable OTP apps in the release notes for OTP.
 ![Code Paths.png](/screenshots/features/sdk/Code%20Paths.png?raw=true "Code Paths")
 
-#### Default SDK
+##### Default SDK
 
 1. The default SDK for new projects can we set from the Configure menu on Welcome Screen
 2. Hover over "Project Defaults" to see its submenu
@@ -3140,39 +3143,60 @@ These Class Paths are not just for code completion and search anymore, all paths
 
    ![Elixir SDK Home Directory](/screenshots/features/sdk/default/Elixir%20SDK%20Home%20Directory.png?raw=true "Elixir SDK Home Directory")
 
-### Elixir External Tools
+#### Small IDEs
 
-#### [Rich IDEs](#ides)
+Because Small IDEs like Rubymine do not have Project Structure, the Elixir SDK, Erlang SDK, and selected SDK must be configured in Preferences.
 
-![Elixir External Tools in Rich IDEs](/screenshots/features/external_elixir_tools/Rich%20IDE.png?raw=true "Elixir External Tools in Rich IDEs")
+##### Elixir Facet SDK
 
-In a [Rich IDE](#ides), like IntelliJ IDEA, only the path to `mix` is configured as an external tool.  This `mix` path is only used when creating new projects, so when opening a pre-existing project with [Import project from external model](#import-project-from-external-model), this doesn't even need to be set.
+Facets are a feature of JetBrains OpenAPI that allow additional languages and frameworks to be added to a Module.  In Small IDEs, each Project has only one Module and its SDK **MUST** match the Small IDE's language, such as a Ruby SDK in Rubymine, so to allow an Elixir SDK to be selected, an Elixir Facet is added to the Module in Small IDEs.
 
-#### [Small IDEs](#ides)
+To configure the Elixir Facet SDK
 
-![Elixir External Tools in Small IDEs](/screenshots/features/external_elixir_tools/Small%20IDE.png?raw=true "Elixir External Tools in Small IDEs")
+1. Open Preferences > Languages & Frameworks > Elixir
+2. Select a previously created Elixir SDK from the SDK combo box.
+  * If there is no Elixir SDK, you can [create one](#elixir-sdks) first.
+3. Click Apply to save the Preferences changes or OK to save and close.
 
-##### Elixir SDK Path
+##### Elixir SDKs
 
-**NOTE: To setup the SDK in a Rich IDE use [Import project from external model](#import-project-from-external-model) or [SDK](#sdk)**
+In Small IDEs, Elixir SDKs are tracked as Application Preferences, so any Elixir SDK you create in one project will be usable in another and you won't have to create the SDK in each project, just [select it](#elixir-facet-sdk).
 
-In a [Small IDE](#ides), like Rubymine, the Project SDK is always a Ruby SDK, so to support a pseudo-Elixir-SDK in a Small IDE, the Elixir SDK Path can be set.
+1. Open Preferences > Languages & Frameworks > Elixir > SDKs
+2. Click `+` to add a new Elixir SDK
 
-1. Open Preferences > Other Settings > Elixir External Tools
-2. Set the Elixir SDK Path
-  * Paste the path to an Elixir SDK
-  * Click the `...` to select the directory
+   ![Add SDK](/screenshots/features/sdk/small_ides/Add%20SDK.png?raw=true "Add SDK")
+3. If you don't already have an Erlang SDK for Elixir SDK setup, you'll need to create one first.
 
-  The pattern for the Elixir SDK Path varies based on the OS and package manager you used to install Elixir
+   ![Cannot Create SDK](/screenshots/features/sdk/small_ides/Cannot%20Create%20SDK.png?raw=true "Cannot Create SDK")
+4. You'll be prompted with the default path for the most recent version of Erlang installed.
 
-  | OS              | Package Manager  | Elixir SDK Path                    |
-  |-----------------|------------------|------------------------------------|
-  | OSX/macOS       | Homebrew         | `/usr/local/Cellar/elixir/VERSION` |
-  | OSX/macOS/Linux | Nix              | `/nix/store/HASH-elixir-VERSION`   |
-  | Windows 32-bit  | Erlang Solutions | `C:\Program Files\Elixir`          |
-  | Windows 64-bit  | Erlang Solutions | `C:\Program Files (x86)\Elixir`    |
-  | Linux           | Default          | `/usr/local/lib/elixir`            |
+   ![Select Home Directory for Erlang SDK for Elixir SDK](/screenshots/features/sdk/small_ides/Select%20Home%20Directory%20for%20Erlang%20SDK%20for%20Elixir%20SDK.png?raw=true "Select Home Directory for Erlang SDK for Elixir SDK")
 
+   You can change directory to a select a different version.  The home directory for "Erlang SDK for Elixir SDK" for Homebrew is **NOT** `/usr/local/Cellar/erlang/VERSION`, but `/usr/local/Cellar/erlang/VERSION/lib/erlang` due to where the OTP app `ebin` directories are located.
+5. Click OK to create the Erlang SDK for Elixir SDK.
+6. With at least one Erlang SDK for Elixir SDK setup, you'll be prompted with the default path for the most recent version of Elixir installed.
+
+   ![Select Home Directory for Elixir SDK](/screenshots/features/sdk/small_ides/Select%20Home%20Directory%20for%20Elixir%20SDK.png?raw=true "Select Home Directory for Elixir SDK")
+7. Click OK to create the Elixir SDK.
+8. Click Apply to save the Preferences changes or OK to save and close.
+
+You can further customize the Elixir SDK by selecting its name from the left list.
+
+![SDK](/screenshots/features/sdk/small_ides/SDK.png?raw=true "SDK")
+
+* Change Home Path
+* Change Internal Erlang SDK
+* Change `ebin` directories on the Classpath tab
+
+##### Internal Erlang SDK
+
+If you want to change the Internal Erlang SDK, you'll need to create a new Erlang SDK for Elixir SDK.
+
+1. Open Preferences > Languages & Frameworks > Elixir > Internal SDKs
+
+   ![Internal Erlang SDK](/screenshots/features/sdk/small_ides/Interal%20Erlang%20SDK.png?raw=true "Internal Erlang SDK")
+2. Follow the same steps as above to create an SDK
 
 ### Structure
 
