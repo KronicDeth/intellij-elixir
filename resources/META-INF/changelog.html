@@ -30,6 +30,22 @@
         </ul>
       </li>
       <li>Add Local shared <code>credo</code> inspection, so the the <code>credo</code> inspection works for Code &gt; Code Cleanup.</li>
+      <li>
+        <p>Show Mix ExUnit in context menu in Elixir Facets, so that</p>
+        <ul>
+          <li>Run 'Mix ExUnit ...'</li>
+          <li>Debug 'Mix ExUnit ...'</li>
+          <li>"Create "Mix ExUnit ...'"</li>
+        </ul>
+        <p>
+          appear in Rubymine when you right-click the <code>test</code> directory and it is Marked as a Test Sources
+          Root.  It will appear green in Rubymine if already marked.  To mark it, do the following:
+        </p>
+        <ol>
+          <li>Right-Click <code>test</code> directory</li>
+          <li>Select "Mark Directory as &gt; Test Sources Root"</li>
+        </ol>
+      </li>
     </ul>
   </li>
   <li>
@@ -43,6 +59,12 @@
       <li>
         Check if <code>SdkAdditionalData</code> is <code>null</code> before getting <code>ErlangSDK</code> as it can be
         <code>null</code> in certain scenarios in Rubymine.
+      </li>
+      <li>
+        Fix <code>isConfigurationFromContext</code>, so that it works on Mix ExUnit Run Configurations generated from
+        directories.  Check if the <code>programParameters</code> and <code>workingDirectory</code> match by just<br>
+        generating another configuration from the context as this ensures the logic matches and includes support for
+        <code>PsiDirectory</code>.
       </li>
     </ul>
   </li>

@@ -151,12 +151,25 @@
   * Configure SDK before running `mix` when importing mix projects, so that the `mix` path does not need to be configured separately from the SDK path.
     * The `mix` path no longer needs to be setup independently from the Elixir SDK.
 * [#957](https://github.com/KronicDeth/intellij-elixir/pull/957) - Add Local shared `credo` inspection, so the the `credo` inspection works for Code > Code Cleanup. - [@KronicDeth](https://github.com/KronicDeth)
+* [#958](https://github.com/KronicDeth/intellij-elixir/pull/958) - [@KronicDeth](https://github.com/KronicDeth)
+  * Show Mix ExUnit in context menu in Elixir Facets, so that
+      * Run 'Mix ExUnit ...'
+      * Debug 'Mix ExUnit ...'
+      * "Create "Mix ExUnit ...'"
+
+    appear in Rubymine when you right-click the `test` directory and it is Marked as a Test Sources Root.  It will appear green in Rubymine if already marked.  To mark it, do the following:
+
+    1. Right-Click `test` directory
+    2. Select "Mark Directory as > Test Sources Root"
 
 ### Bug Fixes
 * [#955](https://github.com/KronicDeth/intellij-elixir/pull/955) - [@KronicDeth](https://github.com/KronicDeth)
   * Protect access to `JavadocOrderRootType.getInstance()` so that it doesn't cause an error in Small IDEs where its Extension Point is not defined.
   * If the explanation tooltip is empty, fallback to the message for the credo annotator instead.
 * [#956](https://github.com/KronicDeth/intellij-elixir/pull/956) - Check if `SdkAdditionalData` is `null` before getting `ErlangSDK` as it can be `null` in certain scenarios in Rubymine. - [@KronicDeth](https://github.com/KronicDeth)
+* [#958](https://github.com/KronicDeth/intellij-elixir/pull/958) - [@KronicDeth](https://github.com/KronicDeth)
+  Fix `isConfigurationFromContext`, so that it works on Mix ExUnit Run Configurations generated from directories.  Check if the `programParameters` and `workingDirectory` match by just
+  generating another configuration from the context as this ensures the logic matches and includes support for `PsiDirectory`.
 
 ## v7.0.0
 
