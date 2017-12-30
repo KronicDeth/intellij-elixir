@@ -62,8 +62,6 @@ allprojects {
     version ideaVersion
     downloadSources Boolean.valueOf(sources)
     updateSinceUntilBuild = false
-
-    alternativeIdePath = "/Users/luke.imhoff/Library/Application Support/JetBrains/Toolbox/apps/RubyMine/ch-0/173.3727.132/RubyMine.app/"
   }
 
   patchPluginXml {
