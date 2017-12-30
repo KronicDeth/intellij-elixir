@@ -19,6 +19,7 @@
     <!-- Elixir Module Structure -->
     <sdkType implementation="org.elixir_lang.sdk.elixir.Type"/>
     <sdkType implementation="org.elixir_lang.sdk.erlang.Type"/>
+    <project.converterProvider implementation="org.elixir_lang.sdk.elixir.conversion.Provider"/>
 
     <moduleConfigurationEditorProvider implementation="org.elixir_lang.module.DefaultModuleEditorsProvider" order="first"/>
 

@@ -175,7 +175,8 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
         sdkModificator.commitChanges();
     }
 
-    private static Sdk configureInternalErlangSdk(@NotNull Sdk elixirSdk, @NotNull SdkModificator elixirSdkModificator) {
+    @Nullable
+    public static Sdk configureInternalErlangSdk(@NotNull Sdk elixirSdk, @NotNull SdkModificator elixirSdkModificator) {
         final Sdk erlangSdk = defaultErlangSdk();
 
         if (erlangSdk != null) {
@@ -356,7 +357,7 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
     }
 
     @Nullable
-    private static Sdk defaultErlangSdk() {
+    public static Sdk defaultErlangSdk() {
         ProjectJdkTable projectJdkTable = ProjectJdkTable.getInstance();
         SdkType erlangSdkType = erlangSdkType(projectJdkTable);
 
@@ -372,19 +373,6 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
         return defaultErlangSdk;
     }
 
-    @Nullable
-    public static Sdk putDefaultErlangSdk(@NotNull Sdk elixirSdk) {
-        assert elixirSdk.getSdkType() == Type.getInstance();
-
-        SdkModificator sdkModificator = elixirSdk.getSdkModificator();
-        Sdk defaultErlangSdk = configureInternalErlangSdk(elixirSdk, sdkModificator);
-        ApplicationManager.getApplication().invokeAndWait(
-                () -> ApplicationManager.getApplication().runWriteAction(sdkModificator::commitChanges),
-                NON_MODAL
-        );
-
-        return defaultErlangSdk;
-    }
 
     @NotNull
     public static Type getInstance() {
