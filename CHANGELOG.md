@@ -149,6 +149,7 @@
 
 ### Bug Fixes
 * [#963](https://github.com/KronicDeth/intellij-elixir/pull/963) - Avoid problems with read and write locks when updating Elixir SDK on-demand by instead updating them when any project is open using a project converter. - [@KronicDeth](https://github.com/KronicDeth)
+* [#964](https://github.com/KronicDeth/intellij-elixir/pull/964) - [JetBrains/intellij-community@9adbba0](https://github.com/JetBrains/intellij-community/commit/9adbba0b6fe279bcc65ad96ab7332d7bf5b59a83) added `@NotNull` to `OrderRootType.getOrderRootType`, which `JavaDocRootType.getInstance` calls, which means any Small IDE using `intellij-community` since 4 months ago, including the newest CLion cannot have `JavadocOrderRootType.getInstance` safely called. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v7.1.0
 

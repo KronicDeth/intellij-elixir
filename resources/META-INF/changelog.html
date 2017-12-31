@@ -15,6 +15,14 @@
         Avoid problems with read and write locks when updating Elixir SDK on-demand by instead updating them when any
         project is open using a project converter.
       </li>
+      <li>
+        <a href="https://github.com/JetBrains/intellij-community/commit/9adbba0b6fe279bcc65ad96ab7332d7bf5b59a83">
+          JetBrains/intellij-community@<tt>9adbba0</tt>
+        </a> added <code>@NotNull</code> to <code>OrderRootType.getOrderRootType</code>, which
+        <code>JavaDocRootType.getInstance</code> calls, which means any Small IDE using <code>intellij-community</code>
+        since 4 months ago, including the newest CLion cannot have <code>JavadocOrderRootType.getInstance</code> safely
+        called.
+      </li>
     </ul>
   </li>
 </ul>
