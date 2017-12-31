@@ -39,12 +39,10 @@ abstract class Configurable: SearchableConfigurable, com.intellij.openapi.option
     })
 
     override fun apply() {
-        projectSdksModel.apply()
         editorByProjectJdkImpl.forEach { _, editor ->
-            // TODO figure out why a single apply does not work
-            editor.apply()
             editor.apply()
         }
+        projectSdksModel.apply()
     }
 
     override fun createComponent(): JComponent? {
