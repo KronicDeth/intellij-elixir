@@ -114,10 +114,10 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
     public static OrderRootType documentationRootType() {
         OrderRootType rootType;
 
-        try {
-            rootType = JavadocOrderRootType.getInstance();
-        } catch (AssertionError assertionError) {
+        if (isSmallIde()) {
             rootType = null;
+        } else {
+            rootType = JavadocOrderRootType.getInstance();
         }
 
         return rootType;
