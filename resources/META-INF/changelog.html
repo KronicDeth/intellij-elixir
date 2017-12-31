@@ -23,6 +23,11 @@
         since 4 months ago, including the newest CLion cannot have <code>JavadocOrderRootType.getInstance</code> safely
         called.
       </li>
+      <li>
+        Path changes were not being written back to disk because the <code>projectSdksModel.apply()</code> was being
+        called before the <code>editor.apply()</code>, which would have copied to the <code>editor'</code>s path changes
+        to the <code>projectSdksModel</code>.
+      </li>
     </ul>
   </li>
 </ul>
