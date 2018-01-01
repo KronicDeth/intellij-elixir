@@ -1,15 +1,15 @@
-package org.elixir_lang.beam.chunk.atoms
+package org.elixir_lang.beam.chunk
 
 import com.intellij.ui.table.JBTable
-import org.elixir_lang.beam.chunk.Atoms
 import javax.swing.JTable
 import javax.swing.table.TableCellRenderer
 import javax.swing.table.TableColumn
 import javax.swing.table.TableColumnModel
+import javax.swing.table.TableModel
 
 const val DEFAULT_MIN_COLUMN_WIDTH = 15
 
-class Table(atoms: Atoms?): JBTable(Model(atoms)) {
+class Table(model: TableModel): JBTable(model) {
     init {
         autoResizeMode = JTable.AUTO_RESIZE_OFF
         packColumns()

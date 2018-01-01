@@ -7,28 +7,34 @@ import com.intellij.openapi.fileEditor.FileEditorState
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.UserDataHolderBase
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.JBTabbedPane
-import org.elixir_lang.beam.chunk.Atoms
 import org.elixir_lang.beam.chunk.Chunk
-import org.elixir_lang.beam.chunk.atoms.ScrollPane
+import org.elixir_lang.beam.chunk.Table
 import java.beans.PropertyChangeListener
-import java.nio.charset.Charset
 import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.JTabbedPane
+import javax.swing.table.TableModel
 
-private fun addTab(tabbedPane: JBTabbedPane, chunk: Chunk) {
+private fun addTab(tabbedPane: JBTabbedPane, cache: Cache, chunk: Chunk) {
     val typeID = chunk.typeID
-    val component: JComponent = when (typeID) {
-        Chunk.TypeID.ATOM.toString() ->
-            ScrollPane(Atoms.from(chunk, Chunk.TypeID.ATOM, Charset.forName("LATIN1")))
-        Chunk.TypeID.ATU8.toString() ->
-            ScrollPane(Atoms.from(chunk, Chunk.TypeID.ATU8, Charset.forName("UTF-8")))
+    val tableModel: TableModel? = when (typeID) {
+        Chunk.TypeID.ATOM.toString(), Chunk.TypeID.ATU8.toString() ->
+            org.elixir_lang.beam.chunk.atoms.Model(cache.atoms)
+        Chunk.TypeID.IMPT.toString() ->
+            org.elixir_lang.beam.chunk.imports.Model(cache.imports)
         else ->
-            JPanel()
+            null
     }
 
-    tabbedPane.addTab(typeID, component)
+    val scrollable: JComponent = if (tableModel != null) {
+        Table(tableModel)
+    } else {
+        JPanel()
+    }
+
+    tabbedPane.addTab(typeID, JBScrollPane(scrollable))
 }
 
 class FileEditor(private val virtualFile: VirtualFile): UserDataHolderBase(), FileEditor {
@@ -44,8 +50,10 @@ class FileEditor(private val virtualFile: VirtualFile): UserDataHolderBase(), Fi
         rootTabbedPane = JBTabbedPane(JTabbedPane.LEFT, JTabbedPane.SCROLL_TAB_LAYOUT)
 
         Beam.from(virtualFile).orElse(null)?.let { beam ->
-            beam.chunkCollection().forEach { chunk ->
-                addTab(rootTabbedPane, chunk)
+            val cache = Cache(beam)
+
+            cache.chunkCollection().forEach { chunk ->
+                addTab(rootTabbedPane, cache, chunk)
             }
         }
 

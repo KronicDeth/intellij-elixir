@@ -8,6 +8,7 @@ import gnu.trove.THashMap;
 import org.elixir_lang.beam.chunk.Atoms;
 import org.elixir_lang.beam.chunk.CallDefinitions;
 import org.elixir_lang.beam.chunk.Chunk;
+import org.elixir_lang.beam.chunk.Imports;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -241,5 +242,19 @@ public class Beam {
         return CALL_DEFINITION_TYPE_IDS
                 .stream()
                 .flatMap(typeID -> callDefinitions(typeID).map(Stream::of).orElseGet(Stream::empty));
+    }
+
+    @Nullable
+    public Imports imports(@Nullable Atoms atoms) {
+        Chunk chunk = chunk(IMPT);
+        Imports imports;
+
+        if (chunk != null) {
+            imports = Imports.Companion.from(chunk, atoms);
+        } else {
+            imports = null;
+        }
+
+        return imports;
     }
 }

@@ -93,7 +93,7 @@ public class Chunk {
     @NotNull
     @Contract(pure = true)
     @SuppressWarnings("PMD.DefaultPackage")
-    static Pair<Long, Integer> unsignedInt(@NotNull byte[] bytes, int offset) {
+    public static Pair<Long, Integer> unsignedInt(@NotNull byte[] bytes, int offset) {
         assert bytes.length >= offset + 4;
 
         long unsignedInt = 0;
@@ -110,6 +110,7 @@ public class Chunk {
         ATOM("Atom"),
         ATU8("AtU8"),
         EXPT("ExpT"),
+        IMPT("ImpT"),
         LOCT("LocT");
 
         private final String typeID;
