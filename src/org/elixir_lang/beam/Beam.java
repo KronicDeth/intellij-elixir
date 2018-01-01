@@ -217,6 +217,10 @@ public class Beam {
         return chunk(typeID.toString());
     }
 
+    public Collection<Chunk> chunkCollection() {
+        return chunkByTypeID.values();
+    }
+
     @NotNull
     private Optional<CallDefinitions> callDefinitions(@NotNull Chunk.TypeID typeID) {
         Optional<CallDefinitions> callDefinitions;

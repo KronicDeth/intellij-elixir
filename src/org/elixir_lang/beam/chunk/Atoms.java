@@ -1,6 +1,7 @@
 package org.elixir_lang.beam.chunk;
 
 import com.intellij.openapi.util.Pair;
+import org.elixir_lang.beam.chunk.atoms.Atom;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,9 +19,9 @@ public class Atoms {
      */
 
     @NotNull
-    private final List<String> atomList;
+    private final List<Atom> atomList;
 
-    private Atoms(@NotNull List<String> atomList) {
+    private Atoms(@NotNull List<Atom> atomList) {
         this.atomList = Collections.unmodifiableList(atomList);
     }
 
@@ -38,16 +39,16 @@ public class Atoms {
             long atomCount = atomCountByteCount.first;
             offset += atomCountByteCount.second;
 
-            List<String> atomList = new ArrayList<>();
+            List<Atom> atomList = new ArrayList<>();
 
             for (long i = 0; i < atomCount; i++) {
                 Pair<Integer, Integer> atomLengthByteCount = unsignedByte(chunk.data[offset]);
                 int atomLength = atomLengthByteCount.first;
                 offset += atomLengthByteCount.second;
 
-                String entry = new String(chunk.data, offset, atomLength, charset);
+                String string = new String(chunk.data, offset, atomLength, charset);
                 offset += atomLength;
-                atomList.add(entry);
+                atomList.add(new Atom((int) i, atomLength, string));
             }
 
             atoms = new Atoms(atomList);
@@ -60,13 +61,17 @@ public class Atoms {
      * Instance Methods
      */
 
+    public int size() {
+        return atomList.size();
+    }
+
     /**
      * @param index 1-based index.  1 is reserved for {#link moduleName}
      * @return atom if it exists
      */
     @Nullable
-    public String get(int index) {
-        String atom = null;
+    public Atom get(int index) {
+        Atom atom = null;
 
         if (index >= 1) {
             // index is 1-based, so subtract 1 to get 0-based
@@ -81,7 +86,7 @@ public class Atoms {
         String moduleName = null;
 
         if (atomList.size() > 0) {
-            moduleName = atomList.get(0);
+            moduleName = atomList.get(0).getString();
         }
 
         return moduleName;
