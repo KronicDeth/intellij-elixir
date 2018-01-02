@@ -53,7 +53,7 @@ class FileEditor(private val virtualFile: VirtualFile): UserDataHolderBase(), Fi
     override fun getComponent(): JComponent {
         rootTabbedPane = JBTabbedPane(JTabbedPane.LEFT, JTabbedPane.SCROLL_TAB_LAYOUT)
 
-        Beam.from(virtualFile).orElse(null)?.let { beam ->
+        Beam.from(virtualFile)?.let { beam ->
             val cache = Cache(beam)
 
             cache.chunkCollection().forEach { chunk ->

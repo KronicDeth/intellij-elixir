@@ -10,11 +10,7 @@ import org.elixir_lang.beam.chunk.call_definitions.CallDefinition;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.stream.Stream;
+import java.util.*;
 
 import static org.elixir_lang.beam.chunk.Chunk.unsignedInt;
 
@@ -81,14 +77,14 @@ public class CallDefinitions {
 
     @NotNull
     public static SortedSet<MacroNameArity> macroNameAritySortedSet(@NotNull Beam beam, @Nullable Atoms atoms) {
-        return macroNameAritySortedSet(beam.callDefinitionsStream(atoms));
+        return macroNameAritySortedSet(beam.callDefinitionsList(atoms));
     }
 
     @NotNull
     public static SortedSet<MacroNameArity> macroNameAritySortedSet(
-            @NotNull Stream<CallDefinitions> callDefinitionsStream
+            @NotNull List<CallDefinitions> callDefinitionsList
     ) {
-        return callDefinitionsStream
+        return callDefinitionsList.stream()
                 .map(CallDefinitions::macroNameAritySortedSet)
                 .collect(TreeSet::new, TreeSet::addAll, TreeSet::addAll);
     }
