@@ -1,16 +1,15 @@
 package org.elixir_lang.beam
 
 import com.ericsson.otp.erlang.OtpErlangDecodeException
+import com.ericsson.otp.erlang.OtpErlangObject
+import com.ericsson.otp.erlang.OtpInputStream
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.indexing.FileContent
-import org.elixir_lang.beam.chunk.Atoms
-import org.elixir_lang.beam.chunk.CallDefinitions
-import org.elixir_lang.beam.chunk.Chunk
+import org.elixir_lang.beam.chunk.*
 import org.elixir_lang.beam.chunk.Chunk.TypeID.*
 import org.elixir_lang.beam.chunk.Chunk.length
 import org.elixir_lang.beam.chunk.Chunk.typeID
-import org.elixir_lang.beam.chunk.Imports
 import java.io.ByteArrayInputStream
 import java.io.DataInputStream
 import java.io.IOException
@@ -24,6 +23,34 @@ private val callDefinitionTypeIDs = arrayOf(EXPT, LOCT)
 private const val GZIP_FIRST_UNSIGNED_BYTE = 0x1f
 private const val GZIP_SECOND_UNSIGNED_BYTE = 0x8b
 private const val HEADER = "FOR1"
+
+fun binaryToTerm(byteArray: ByteArray, offset: Int): OtpErlangObject =
+   OtpInputStream(byteArray, offset, byteArray.size, 0).read_any()
+
+private fun decompressedInputStream(inputStream: InputStream): InputStream? {
+    assert(inputStream.markSupported())
+
+    inputStream.mark(2)
+
+    return try {
+        if (inputStream.read() == GZIP_FIRST_UNSIGNED_BYTE && inputStream.read() == GZIP_SECOND_UNSIGNED_BYTE) {
+            inputStream.reset()
+            GZIPInputStream(inputStream)
+        } else {
+            inputStream.reset()
+            inputStream
+        }
+    } catch (e: IOException) {
+        null
+    }
+}
+
+private fun virtualFileToInputStream(virtualFile: VirtualFile): InputStream? =
+        try {
+            virtualFile.inputStream
+        } catch (e: IOException) {
+            null
+        }
 
 /**
  * See http://beam-wisdoms.clau.se/en/latest/indepth-beam-file.html
@@ -49,6 +76,8 @@ class Beam private constructor(chunkCollection: Collection<Chunk>) {
             callDefinitions(typeID, atoms)
         }
 
+    fun compileInfo(): Keyword? = chunk(CINF)?.let(::from)
+
     fun exports(atoms: Atoms?): CallDefinitions? = callDefinitions(EXPT, atoms)
 
     fun imports(atoms: Atoms?): Imports? =
@@ -59,7 +88,6 @@ class Beam private constructor(chunkCollection: Collection<Chunk>) {
     fun locals(atoms: Atoms?): CallDefinitions? = callDefinitions(LOCT, atoms)
 
     companion object {
-
         private val LOGGER = Logger.getInstance(Beam::class.java)
 
         fun from(dataInputStream: DataInputStream, path: String): Beam? {
@@ -134,31 +162,6 @@ class Beam private constructor(chunkCollection: Collection<Chunk>) {
 
         @Throws(IOException::class, OtpErlangDecodeException::class)
         fun from(fileContent: FileContent): Beam? = from(fileContent.content, fileContent.file.path)
-
-        private fun virtualFileToInputStream(virtualFile: VirtualFile): InputStream? =
-                try {
-                    virtualFile.inputStream
-                } catch (e: IOException) {
-                    null
-                }
-
-        private fun decompressedInputStream(inputStream: InputStream): InputStream? {
-            assert(inputStream.markSupported())
-
-            inputStream.mark(2)
-
-            return try {
-                if (inputStream.read() == GZIP_FIRST_UNSIGNED_BYTE && inputStream.read() == GZIP_SECOND_UNSIGNED_BYTE) {
-                    inputStream.reset()
-                    GZIPInputStream(inputStream)
-                } else {
-                    inputStream.reset()
-                    inputStream
-                }
-            } catch (e: IOException) {
-                null
-            }
-        }
 
         fun from(virtualFile: VirtualFile): Beam? =
                 virtualFileToInputStream(virtualFile)

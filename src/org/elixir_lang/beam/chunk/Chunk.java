@@ -109,6 +109,7 @@ public class Chunk {
     public enum TypeID {
         ATOM("Atom"),
         ATU8("AtU8"),
+        CINF("CInf"),
         EXPT("ExpT"),
         IMPT("ImpT"),
         LOCT("LocT");
