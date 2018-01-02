@@ -35,7 +35,7 @@ public class CallDefinitions {
      */
 
     @NotNull
-    private Collection<CallDefinition> callDefinitionCollection;
+    public Collection<CallDefinition> callDefinitionCollection;
     @NotNull
     private final Chunk.TypeID typeID;
 
@@ -53,7 +53,7 @@ public class CallDefinitions {
      */
 
     @Nullable
-    public static CallDefinitions from(@NotNull Chunk chunk, @NotNull Chunk.TypeID typeID) {
+    public static CallDefinitions from(@NotNull Chunk chunk, @NotNull Chunk.TypeID typeID, @Nullable Atoms atoms) {
         CallDefinitions callDefinitions = null;
 
         if (chunk.typeID.equals(typeID.toString()) && chunk.data.length >= 4) {
@@ -66,19 +66,11 @@ public class CallDefinitions {
             offset += exportCountByteCount.second;
 
             for (long i = 0; i < exportCount; i++) {
-                Pair<Long, Integer> atomIndexByteCount = unsignedInt(chunk.data, offset);
-                long atomIndex = atomIndexByteCount.first;
-                offset += atomIndexByteCount.second;
+                kotlin.Pair<CallDefinition, Integer> callDefinitionByteCount =
+                        CallDefinition.Companion.from(chunk, offset, atoms);
 
-                Pair<Long, Integer> arityByteCount = unsignedInt(chunk.data, offset);
-                long arity = arityByteCount.first;
-                offset += arityByteCount.second;
-
-                // label is currently unused, but it must be consumed to read the next export at the correct offset
-                Pair<Long, Integer> labelByteCount = unsignedInt(chunk.data, offset);
-                offset += labelByteCount.second;
-
-                callDefinitionCollection.add(new CallDefinition(atomIndex, arity));
+                callDefinitionCollection.add(callDefinitionByteCount.getFirst());
+                offset += callDefinitionByteCount.getSecond();
             }
 
             callDefinitions = new CallDefinitions(typeID, callDefinitionCollection);
@@ -88,17 +80,16 @@ public class CallDefinitions {
     }
 
     @NotNull
-    public static SortedSet<MacroNameArity> macroNameAritySortedSet(@NotNull Beam beam, @NotNull Atoms atoms) {
-        return macroNameAritySortedSet(beam.callDefinitionsStream(), atoms);
+    public static SortedSet<MacroNameArity> macroNameAritySortedSet(@NotNull Beam beam, @Nullable Atoms atoms) {
+        return macroNameAritySortedSet(beam.callDefinitionsStream(atoms));
     }
 
     @NotNull
     public static SortedSet<MacroNameArity> macroNameAritySortedSet(
-            @NotNull Stream<CallDefinitions> callDefinitionsStream,
-            @NotNull Atoms atoms
+            @NotNull Stream<CallDefinitions> callDefinitionsStream
     ) {
         return callDefinitionsStream
-                .map(callDefinitions -> callDefinitions.macroNameAritySortedSet(atoms))
+                .map(CallDefinitions::macroNameAritySortedSet)
                 .collect(TreeSet::new, TreeSet::addAll, TreeSet::addAll);
     }
 
@@ -108,19 +99,18 @@ public class CallDefinitions {
      * 2. {@link MacroNameArity#name} is sorted alphabetically
      * 3. {@link MacroNameArity#arity} is sorted ascending
      *
-     * @param atoms used to look up the names of the {@link CallDefinition}s in {@link #callDefinitionCollection}.
      * @return The sorted set will be the same size as {@link #callDefinitionCollection} unless
-     *   {@link CallDefinition#name(Atoms)} returns {@code null} for some {@link CallDefinition}s.
+     *   {@link CallDefinition#getName()} returns {@code null} for some {@link CallDefinition}s.
      */
     @NotNull
-    public SortedSet<MacroNameArity> macroNameAritySortedSet(@NotNull Atoms atoms) {
+    public SortedSet<MacroNameArity> macroNameAritySortedSet() {
         SortedSet<MacroNameArity> macroNameAritySortedSet = new TreeSet<MacroNameArity>();
 
         for (CallDefinition callDefinition : callDefinitionCollection) {
-            String exportName = callDefinition.name(atoms);
+            String exportName = callDefinition.getName();
 
             if (exportName != null) {
-                MacroNameArity macroNameArity = new MacroNameArity(visibility(), exportName, (int) callDefinition.arity());
+                MacroNameArity macroNameArity = new MacroNameArity(visibility(), exportName, (int) callDefinition.getArity());
                 macroNameAritySortedSet.add(macroNameArity);
             }
         }

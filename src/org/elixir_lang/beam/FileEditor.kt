@@ -22,8 +22,12 @@ private fun addTab(tabbedPane: JBTabbedPane, cache: Cache, chunk: Chunk) {
     val tableModel: TableModel? = when (typeID) {
         Chunk.TypeID.ATOM.toString(), Chunk.TypeID.ATU8.toString() ->
             org.elixir_lang.beam.chunk.atoms.Model(cache.atoms)
+        Chunk.TypeID.EXPT.toString() ->
+            org.elixir_lang.beam.chunk.call_definitions.Model(cache.exports)
         Chunk.TypeID.IMPT.toString() ->
             org.elixir_lang.beam.chunk.imports.Model(cache.imports)
+        Chunk.TypeID.LOCT.toString() ->
+            org.elixir_lang.beam.chunk.call_definitions.Model(cache.locals)
         else ->
             null
     }

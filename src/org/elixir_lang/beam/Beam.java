@@ -223,13 +223,13 @@ public class Beam {
     }
 
     @NotNull
-    private Optional<CallDefinitions> callDefinitions(@NotNull Chunk.TypeID typeID) {
+    private Optional<CallDefinitions> callDefinitions(@NotNull Chunk.TypeID typeID, @Nullable Atoms atoms) {
         Optional<CallDefinitions> callDefinitions;
 
         Chunk chunk = chunk(typeID);
 
         if (chunk != null) {
-            callDefinitions = Optional.ofNullable(CallDefinitions.from(chunk, typeID));
+            callDefinitions = Optional.ofNullable(CallDefinitions.from(chunk, typeID, atoms));
         } else {
             callDefinitions = Optional.empty();
         }
@@ -238,10 +238,15 @@ public class Beam {
     }
 
     @NotNull
-    public Stream<CallDefinitions> callDefinitionsStream() {
+    public Stream<CallDefinitions> callDefinitionsStream(@Nullable Atoms atoms) {
         return CALL_DEFINITION_TYPE_IDS
                 .stream()
-                .flatMap(typeID -> callDefinitions(typeID).map(Stream::of).orElseGet(Stream::empty));
+                .flatMap(typeID -> callDefinitions(typeID, atoms).map(Stream::of).orElseGet(Stream::empty));
+    }
+
+    @Nullable
+    public CallDefinitions exports(@Nullable Atoms atoms) {
+        return callDefinitions(EXPT, atoms).orElse(null);
     }
 
     @Nullable
@@ -256,5 +261,10 @@ public class Beam {
         }
 
         return imports;
+    }
+
+    @Nullable
+    public CallDefinitions locals(@Nullable Atoms atoms) {
+        return callDefinitions(LOCT, atoms).orElse(null);
     }
 }
