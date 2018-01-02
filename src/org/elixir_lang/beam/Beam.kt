@@ -62,6 +62,7 @@ class Beam private constructor(chunkCollection: Collection<Chunk>) {
             chunk(ATOM)?.let { Atoms.from(it, ATOM, Charset.forName("LATIN1")) } ?:
                     chunk(ATU8)?.let { Atoms.from(it, ATU8, Charset.forName("UTF-8")) }
 
+    fun attributes(): Keyword? = chunk(ATTR)?.let(::from)
     private fun chunk(typeID: String): Chunk? = chunkByTypeID[typeID]
     private fun chunk(typeID: Chunk.TypeID): Chunk? = chunk(typeID.toString())
     fun chunkCollection(): Collection<Chunk> = chunkByTypeID.values

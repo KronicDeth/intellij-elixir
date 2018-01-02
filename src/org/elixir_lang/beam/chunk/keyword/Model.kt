@@ -1,4 +1,4 @@
-package org.elixir_lang.beam.chunk.compile_info
+package org.elixir_lang.beam.chunk.keyword
 
 import org.elixir_lang.beam.chunk.Keyword
 import javax.swing.table.AbstractTableModel
