@@ -78,8 +78,7 @@ public class Chunk {
 
     @NotNull
     @Contract(pure = true)
-    @SuppressWarnings("PMD.DefaultPackage")
-    static Pair<Integer, Integer> unsignedByte(byte signedByte) {
+    public static Pair<Integer, Integer> unsignedByte(byte signedByte) {
         return pair(signedByte & 0xFF, 1);
     }
 
@@ -92,7 +91,6 @@ public class Chunk {
 
     @NotNull
     @Contract(pure = true)
-    @SuppressWarnings("PMD.DefaultPackage")
     public static Pair<Long, Integer> unsignedInt(@NotNull byte[] bytes, int offset) {
         assert bytes.length >= offset + 4;
 
@@ -111,6 +109,7 @@ public class Chunk {
         ATTR("Attr"),
         ATU8("AtU8"),
         CINF("CInf"),
+        CODE("Code"),
         EXPT("ExpT"),
         IMPT("ImpT"),
         LOCT("LocT");
