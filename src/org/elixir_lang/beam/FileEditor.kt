@@ -34,6 +34,8 @@ private fun addTab(tabbedPane: JBTabbedPane, cache: Cache, chunk: Chunk) {
             org.elixir_lang.beam.chunk.imports.Model(cache.imports)
         Chunk.TypeID.LOCT.toString() ->
             org.elixir_lang.beam.chunk.call_definitions.Model(cache.locals)
+        Chunk.TypeID.STRT.toString() ->
+            org.elixir_lang.beam.chunk.strings.Model(cache.strings)
         else ->
             null
     }

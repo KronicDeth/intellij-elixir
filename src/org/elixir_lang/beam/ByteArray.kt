@@ -1,4 +1,4 @@
-package org.elixir_lang.beam.term
+package org.elixir_lang.beam
 
 class ByteSubarray(private val byteArray: ByteArray, private val start: Int, val size: Int) {
     fun toUnsignedInt(): Long = shiftIn(0, 0)

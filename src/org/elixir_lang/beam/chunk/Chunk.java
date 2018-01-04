@@ -112,7 +112,8 @@ public class Chunk {
         CODE("Code"),
         EXPT("ExpT"),
         IMPT("ImpT"),
-        LOCT("LocT");
+        LOCT("LocT"),
+        STRT("StrT");
 
         private final String typeID;
 

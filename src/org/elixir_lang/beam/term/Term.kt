@@ -2,6 +2,7 @@ package org.elixir_lang.beam.term
 
 import com.intellij.openapi.util.component1
 import com.intellij.openapi.util.component2
+import org.elixir_lang.beam.ByteSubarray
 import org.elixir_lang.beam.chunk.Chunk.unsignedByte
 
 typealias UnsignedByte = Int

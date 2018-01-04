@@ -88,6 +88,7 @@ class Beam private constructor(chunkCollection: Collection<Chunk>) {
         }
 
     fun locals(atoms: Atoms?): CallDefinitions? = callDefinitions(LOCT, atoms)
+    fun strings(): Strings? = chunk(STRT)?.let { Strings.from(it) }
 
     companion object {
         private val LOGGER = Logger.getInstance(Beam::class.java)
