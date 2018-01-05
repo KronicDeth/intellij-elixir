@@ -1,12 +1,15 @@
 package org.elixir_lang.beam.chunk.keyword
 
+import com.ericsson.otp.erlang.OtpErlangAtom
+import com.ericsson.otp.erlang.OtpErlangObject
 import org.elixir_lang.beam.chunk.Keyword
 import javax.swing.table.AbstractTableModel
 
 class Model(private val keyword: Keyword?): AbstractTableModel() {
     override fun getColumnClass(columnIndex: Int): Class<*> =
             when (columnIndex) {
-                0, 1 -> String::class.java
+                0 -> OtpErlangAtom::class.java
+                1 -> OtpErlangObject::class.java
                 else -> throw IllegalArgumentException("Column $columnIndex out of bounds")
             }
 
