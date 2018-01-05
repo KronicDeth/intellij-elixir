@@ -1,5 +1,6 @@
 package org.elixir_lang.beam.chunk
 
+import com.ericsson.otp.erlang.OtpErlangObject
 import com.intellij.ui.table.JBTable
 import javax.swing.JTable
 import javax.swing.table.TableCellRenderer
@@ -12,6 +13,7 @@ const val DEFAULT_MIN_COLUMN_WIDTH = 15
 class Table(model: TableModel): JBTable(model) {
     init {
         autoResizeMode = JTable.AUTO_RESIZE_OFF
+        setDefaultRenderer(OtpErlangObject::class.java, OtpErlangObjectTableCellRenderer())
         packColumns()
         invalidate()
     }

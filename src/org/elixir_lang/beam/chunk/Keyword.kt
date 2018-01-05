@@ -44,7 +44,7 @@ fun keyword(): Keyword = mutableListOf()
  */
 fun from(chunk: Chunk): Keyword? {
     // Reverse `CompileBinary = term_to_binary([{version,?COMPILER_VSN}|Compile]),`
-    val compileTerm = binaryToTerm(chunk.data, offset = 0)
+    val (compileTerm, _) = binaryToTerm(chunk.data, offset = 0)
 
     return from(compileTerm)
 }

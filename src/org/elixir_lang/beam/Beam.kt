@@ -10,6 +10,7 @@ import org.elixir_lang.beam.chunk.*
 import org.elixir_lang.beam.chunk.Chunk.TypeID.*
 import org.elixir_lang.beam.chunk.Chunk.length
 import org.elixir_lang.beam.chunk.Chunk.typeID
+import org.elixir_lang.beam.term.ByteCount
 import java.io.ByteArrayInputStream
 import java.io.DataInputStream
 import java.io.IOException
@@ -24,8 +25,12 @@ private const val GZIP_FIRST_UNSIGNED_BYTE = 0x1f
 private const val GZIP_SECOND_UNSIGNED_BYTE = 0x8b
 private const val HEADER = "FOR1"
 
-fun binaryToTerm(byteArray: ByteArray, offset: Int): OtpErlangObject =
-   OtpInputStream(byteArray, offset, byteArray.size, 0).read_any()
+fun binaryToTerm(byteArray: ByteArray, offset: Int): Pair<OtpErlangObject, ByteCount> {
+    val stream = OtpInputStream(byteArray, offset, byteArray.size, 0)
+    val term = stream.read_any()
+
+    return Pair(term, stream.pos - offset)
+}
 
 private fun decompressedInputStream(inputStream: InputStream): InputStream? {
     assert(inputStream.markSupported())
@@ -88,6 +93,7 @@ class Beam private constructor(chunkCollection: Collection<Chunk>) {
             Imports.from(it, atoms)
         }
 
+    fun literals(): Literals? = chunk(LITT)?.let { Literals.from(it) }
     fun locals(atoms: Atoms?): CallDefinitions? = callDefinitions(LOCT, atoms)
     fun strings(): Strings? = chunk(STRT)?.let { Strings.from(it) }
 
