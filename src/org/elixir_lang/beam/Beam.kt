@@ -84,6 +84,7 @@ class Beam private constructor(chunkCollection: Collection<Chunk>) {
 
     fun code(): Code? = chunk(CODE)?.let { Code.from(it) }
     fun compileInfo(): Keyword? = chunk(CINF)?.let(::from)
+    fun debugInfo(): DebugInfo? = chunk(DBGI)?.let { DebugInfo.from(it) }
 
     fun exports(atoms: Atoms?): CallDefinitions? = callDefinitions(EXPT, atoms)
     fun functions(atoms: Atoms?): Functions? = chunk(FUNT)?.let { Functions.from(it, atoms) }

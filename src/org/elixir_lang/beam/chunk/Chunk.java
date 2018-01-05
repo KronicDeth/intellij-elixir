@@ -110,6 +110,7 @@ public class Chunk {
         ATU8("AtU8"),
         CINF("CInf"),
         CODE("Code"),
+        DBGI("Dbgi"),
         EXPT("ExpT"),
         FUNT("FunT"),
         IMPT("ImpT"),
