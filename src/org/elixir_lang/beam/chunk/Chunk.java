@@ -111,6 +111,7 @@ public class Chunk {
         CINF("CInf"),
         CODE("Code"),
         EXPT("ExpT"),
+        FUNT("FunT"),
         IMPT("ImpT"),
         LOCT("LocT"),
         STRT("StrT");
