@@ -148,6 +148,18 @@
 
 ### Bug Fixes
 * [#980](https://github.com/KronicDeth/intellij-elixir/pull/980) - Use `documentionRootType` to indirectly get the documentation `OrderRootType` in the Erlang SDK Type, so that it works in Small IDEs that have more than `CLASSES` and `SOURCES` root types installed. - [@KronicDeth](https://github.com/KronicDeth)
+* [#981](https://github.com/KronicDeth/intellij-elixir/pull/981) - [@KronicDeth](https://github.com/KronicDeth)
+  * The [`credo`](https://github.com/rrrene/credo) annotator is disabled by default as numerous users find running `mix credo` in the background has a negative impact on their system performance.  If you like to try enabling the annotation, you can turn it on using the configuration.
+
+    1. Preferences > Editor > Inspections > Elixir
+    2. Check "Credo"
+    3. Click OK to save and close Preferences
+
+    If you notice a degradation the in the responsiveness of the editor, it is recommended you disable the annotator again.
+
+    1. Preferences > Editor > Inspections > Elixir
+    2. Uncheck "Credo"
+    3. Click OK to save and close Preferences
 
 ## v7.2.0
 

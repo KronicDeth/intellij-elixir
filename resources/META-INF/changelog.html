@@ -10,6 +10,27 @@
         Erlang SDK Type, so that it works in Small IDEs that have more than <code>CLASSES</code> and
         <code>SOURCES</code> root types installed.
       </li>
+      <li>
+        <p>
+          The <a href="https://github.com/rrrene/credo"><code>credo</code></a> annotator is disabled by default as
+          numerous users find running <code>mix credo</code> in the background has a negative impact on their system
+          performance.  If you like to try enabling the annotation, you can turn it on using the configuration.
+        </p>
+        <ol>
+          <li>Preferences &gt; Editor &gt; Inspections &gt; Elixir</li>
+          <li>Check "Credo"</li>
+          <li>Click OK to save and close Preferences</li>
+        </ol>
+        <p>
+          If you notice a degradation the in the responsiveness of the editor, it is recommended you disable
+          the annotator again.
+        </p>
+        <ol>
+          <li>Preferences &gt; Editor &gt; Inspections &gt; Elixir</li>
+          <li>Uncheck "Credo"</li>
+          <li>Click OK to save and close Preferences</li>
+        </ol>
+      </li>
     </ul>
   </li>
 </ul>
