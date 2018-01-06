@@ -7,7 +7,6 @@ import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.projectRoots.SdkModel;
 import com.intellij.openapi.projectRoots.SdkModificator;
 import com.intellij.openapi.projectRoots.SdkType;
-import com.intellij.openapi.roots.JavadocOrderRootType;
 import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.Version;
@@ -26,6 +25,7 @@ import java.util.regex.Pattern;
 
 import static org.elixir_lang.sdk.HomePath.*;
 import static org.elixir_lang.sdk.Type.addCodePaths;
+import static org.elixir_lang.sdk.Type.documentationRootType;
 
 /**
  * An Erlang SdkType for use when `intellij-erlang` is not installed
@@ -145,7 +145,7 @@ public class Type extends SdkType {
     public boolean isRootTypeApplicable(@NotNull OrderRootType type) {
         return type == OrderRootType.CLASSES ||
                 type == OrderRootType.SOURCES ||
-                type == JavadocOrderRootType.getInstance();
+                type == documentationRootType();
     }
 
     @Override

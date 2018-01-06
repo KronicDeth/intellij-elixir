@@ -52,6 +52,7 @@ import static org.elixir_lang.sdk.ProcessOutput.STANDARD_TIMEOUT;
 import static org.elixir_lang.sdk.ProcessOutput.isSmallIde;
 import static org.elixir_lang.sdk.ProcessOutput.transformStdoutLine;
 import static org.elixir_lang.sdk.Type.addCodePaths;
+import static org.elixir_lang.sdk.Type.documentationRootType;
 import static org.elixir_lang.sdk.Type.ebinPathChainVirtualFile;
 
 public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
@@ -108,19 +109,6 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
                 sdkModificator.addRoot(hexdocUrlVirtualFile, documentationRootType);
             }
         }
-    }
-
-    @Nullable
-    public static OrderRootType documentationRootType() {
-        OrderRootType rootType;
-
-        if (isSmallIde()) {
-            rootType = null;
-        } else {
-            rootType = JavadocOrderRootType.getInstance();
-        }
-
-        return rootType;
     }
 
     private static void addDocumentationPath(@NotNull SdkModificator sdkModificator,
