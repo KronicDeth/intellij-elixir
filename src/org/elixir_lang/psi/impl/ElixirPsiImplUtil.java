@@ -1403,7 +1403,7 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static String moduleName(@NotNull final Qualified qualified) {
         // TODO handle more complex qualifiers besides Aliases
-        return qualified.getFirstChild().getText();
+        return computeReadAction(qualified.getFirstChild()::getText);
     }
 
     private static GlobalSearchScope moduleWithDependentsScope(PsiElement element) {
