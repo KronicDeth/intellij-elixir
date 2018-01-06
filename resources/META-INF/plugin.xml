@@ -88,7 +88,7 @@
 
     <!-- credo -->
     <externalAnnotator implementationClass="org.elixir_lang.credo.Annotator" language="Elixir"/>
-    <globalInspection cleanupTool="true" displayName="Credo" enabledByDefault="true" groupName="Elixir"
+    <globalInspection cleanupTool="true" displayName="Credo" enabledByDefault="false" groupName="Elixir"
                       implementationClass="org.elixir_lang.credo.inspection_tool.Global" language="Elixir" level="WARNING"
                       shortName="Credo"/>
     // groupId/parentId "Errors" is Editor > Inspections
