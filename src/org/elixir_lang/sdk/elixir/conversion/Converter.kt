@@ -8,6 +8,7 @@ import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.SdkModificator
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.vfs.VirtualFileManager
+import org.elixir_lang.sdk.Type.documentationRootType
 import org.elixir_lang.sdk.elixir.Type
 import org.elixir_lang.sdk.elixir.Type.*
 import org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData
