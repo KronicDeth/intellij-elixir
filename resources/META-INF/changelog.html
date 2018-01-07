@@ -37,6 +37,11 @@
         Scratch Files have a <code>Project</code>, but not a <code>Module</code>, so change flow to use
         <code>Project</code> when <code>Module</code> is <code>null</code> in credo annotator.
       </li>
+      <li>
+        Don't add <code>.bat</code> to <code>mix</code> on Windows. <code>mix</code> is never run as an executable.  It
+        is either run as a script to <code>elixir.bat</code> OR as an argument to <code>erl.exe</code> when
+        <code>erl.exe</code> is running <code>elixir</code>.
+      </li>
     </ul>
   </li>
 </ul>

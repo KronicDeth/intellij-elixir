@@ -162,7 +162,8 @@
     3. Click OK to save and close Preferences
 * [#982](https://github.com/KronicDeth/intellij-elixir/pull/982) - Protect from `PsiFile` being `null` in `Local` credo inspector - [@KronicDeth](https://github.com/KronicDeth)
 * [#983](https://github.com/KronicDeth/intellij-elixir/pull/983) - Run `Qualified#moduleName` `getText` in Read Action. - [@KronicDeth](https://github.com/KronicDeth)
-* [#985](https://github.com/KronicDeth/intellij-elixir/pull/985) -  Scratch Files have a `Project`, but not a `Module`, so change flow to use `Project` when `Module` is `null` in credo annotator. - [@KronicDeth](https://github.com/KronicDeth)
+* [#985](https://github.com/KronicDeth/intellij-elixir/pull/985) - Scratch Files have a `Project`, but not a `Module`, so change flow to use `Project` when `Module` is `null` in credo annotator. - [@KronicDeth](https://github.com/KronicDeth)
+* [#986](https://github.com/KronicDeth/intellij-elixir/pull/986) - Don't add `.bat` to `mix` on Windows. `mix` is never run as an executable.  It is either run as a script to `elixir.bat` OR as an argument to `erl.exe` when `erl.exe` is running `elixir`. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v7.2.0
 
