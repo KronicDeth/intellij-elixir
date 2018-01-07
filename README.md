@@ -4245,6 +4245,7 @@ I'd like to thank those who have donated to help support this project.
 * Bjorgvin Reynisson
 * Vanja Radovanović ([@elvanja](https://github.com/elvanja))
 * Garrett Hart ([@https://github.com/thirdshift](https://github.com/thirdshift))
+* Mateusz Jadczak
 * Jeremy Jackson ([@jejacks0n](https://github.com/jejacks0n))
 * Raúl Vázquez González ([@rvazquezglez](https://github.com/rvazquezglez))
 * Ryan Scheel ([@Havvy](https://github.com/Havvy))
@@ -4252,6 +4253,7 @@ I'd like to thank those who have donated to help support this project.
 * Yicheng Dong
 * Purelogic Apps
 * Adrian Philipp ([@adri](https://github.com/adri))
+* Angelika Tyborska ([@angelikatyborska](https://github.com/angelikatyborska))
 * César Salazar Hernández ([@cesarslzr](https://github.com/cesarslzr))
 * Dimitrios Fragkos
 * Milan Köpke
