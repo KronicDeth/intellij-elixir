@@ -29,6 +29,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.elixir_lang.jps.model.JpsElixirSdkType.ELIXIR_TOOL_MIX;
 import static org.elixir_lang.sdk.elixir.Type.mostSpecificSdk;
 
 /**
@@ -179,12 +180,12 @@ public class MixRunningStateUtil {
             String homePath = sdk.getHomePath();
 
             if (homePath != null) {
-                mixPath = JpsElixirSdkType.getMixExecutable(homePath).getPath();
+                mixPath = JpsElixirSdkType.getMixScript(homePath).getPath();
             } else {
-                mixPath = JpsElixirSdkType.getExecutableFileName("mix");
+                mixPath = ELIXIR_TOOL_MIX;
             }
         } else {
-            mixPath = JpsElixirSdkType.getExecutableFileName("mix");
+            mixPath = ELIXIR_TOOL_MIX;
         }
 
         return mixPath;
