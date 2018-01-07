@@ -33,6 +33,10 @@
       </li>
       <li>Protect from <code>PsiFile</code> being <code>null</code> in <code>Local</code> credo inspector</li>
       <li>Run <code>Qualified#moduleName</code> <code>getText</code> in Read Action.</li>
+      <li>
+        Scratch Files have a <code>Project</code>, but not a <code>Module</code>, so change flow to use
+        <code>Project</code> when <code>Module</code> is <code>null</code> in credo annotator.
+      </li>
     </ul>
   </li>
 </ul>

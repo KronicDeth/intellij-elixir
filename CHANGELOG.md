@@ -162,6 +162,7 @@
     3. Click OK to save and close Preferences
 * [#982](https://github.com/KronicDeth/intellij-elixir/pull/982) - Protect from `PsiFile` being `null` in `Local` credo inspector - [@KronicDeth](https://github.com/KronicDeth)
 * [#983](https://github.com/KronicDeth/intellij-elixir/pull/983) - Run `Qualified#moduleName` `getText` in Read Action. - [@KronicDeth](https://github.com/KronicDeth)
+* [#985](https://github.com/KronicDeth/intellij-elixir/pull/985) -  Scratch Files have a `Project`, but not a `Module`, so change flow to use `Project` when `Module` is `null` in credo annotator. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v7.2.0
 
