@@ -31,8 +31,8 @@ public class JpsElixirSdkType extends JpsSdkType<JpsDummyElement> implements Jps
   }
 
   @NotNull
-  public static File getMixExecutable(@NotNull String sdkHome){
-    return getSdkExecutable(sdkHome, ELIXIR_TOOL_MIX);
+  public static File getMixScript(@NotNull String sdkHome) {
+    return getSdkScript(sdkHome, ELIXIR_TOOL_MIX);
   }
 
   @NotNull
@@ -43,6 +43,11 @@ public class JpsElixirSdkType extends JpsSdkType<JpsDummyElement> implements Jps
   @NotNull
   private static File getSdkExecutable(@NotNull String sdkHome, @NotNull String command){
     return new File(new File(sdkHome, "bin").getAbsolutePath(), getExecutableFileName(command));
+  }
+
+  @NotNull
+  private static File getSdkScript(@NotNull String sdkHome, @NotNull String command) {
+    return new File(new File(sdkHome, "bin").getAbsolutePath(), command);
   }
 
   @NotNull

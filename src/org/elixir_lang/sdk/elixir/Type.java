@@ -585,10 +585,10 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
         File elixir = JpsElixirSdkType.getScriptInterpreterExecutable(path);
         File elixirc = JpsElixirSdkType.getByteCodeCompilerExecutable(path);
         File iex = JpsElixirSdkType.getIExExecutable(path);
-        File mix = JpsElixirSdkType.getMixExecutable(path);
+        File mix = JpsElixirSdkType.getMixScript(path);
 
-        // Determine whether everything is executable
-        return elixir.canExecute() && elixirc.canExecute() && iex.canExecute() && mix.canExecute();
+        // Determine whether everything is can run
+        return elixir.canExecute() && elixirc.canExecute() && iex.canExecute() && mix.canRead();
     }
 
     @Override
