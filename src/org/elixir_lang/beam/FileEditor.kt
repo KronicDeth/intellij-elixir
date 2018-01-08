@@ -11,6 +11,7 @@ import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.JBTabbedPane
 import org.elixir_lang.beam.chunk.Chunk
 import org.elixir_lang.beam.chunk.Table
+import org.elixir_lang.beam.chunk.debug_info.term.model
 import java.beans.PropertyChangeListener
 import javax.swing.JComponent
 import javax.swing.JPanel
@@ -29,7 +30,7 @@ private fun addTab(tabbedPane: JBTabbedPane, cache: Cache, chunk: Chunk) {
         Chunk.TypeID.CODE.toString() ->
             org.elixir_lang.beam.chunk.code.Model(cache.code)
         Chunk.TypeID.DBGI.toString() ->
-            org.elixir_lang.beam.chunk.debug_info.Model(cache.debugInfo)
+            model(cache.debugInfo)
         Chunk.TypeID.EXPT.toString() ->
             org.elixir_lang.beam.chunk.call_definitions.Model(cache.exports)
         Chunk.TypeID.FUNT.toString() ->
