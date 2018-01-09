@@ -2,21 +2,24 @@ package org.elixir_lang.beam.chunk.debug_info.term
 
 import com.ericsson.otp.erlang.OtpErlangObject
 import org.elixir_lang.beam.chunk.DebugInfo
+import org.elixir_lang.beam.chunk.Table
 import org.elixir_lang.beam.chunk.debug_info.Term
 import org.elixir_lang.beam.chunk.debug_info.v1.ElixirErl
+import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.Component
+import javax.swing.JComponent
+import javax.swing.JPanel
 import javax.swing.table.AbstractTableModel
-import javax.swing.table.TableModel
 
-fun model(debugInfo: DebugInfo?): TableModel? =
+fun component(debugInfo: DebugInfo?): JComponent =
     when (debugInfo) {
         is org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.V1 ->
-            org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.Model(debugInfo)
+            Component(debugInfo)
         is ElixirErl ->
-            org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.Model(debugInfo)
+            Table(org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.Model(debugInfo))
         is org.elixir_lang.beam.chunk.debug_info.V1 ->
-            org.elixir_lang.beam.chunk.debug_info.v1.Model(debugInfo)
-        is Term -> Model(debugInfo)
-        else -> null
+            Table(org.elixir_lang.beam.chunk.debug_info.v1.Model(debugInfo))
+        is Term -> Table(Model(debugInfo))
+        else -> JPanel()
     }
 
 class Model(private val term: Term?): AbstractTableModel() {

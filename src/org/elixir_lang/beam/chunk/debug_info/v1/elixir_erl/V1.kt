@@ -1,13 +1,14 @@
 package org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl
 
-import com.ericsson.otp.erlang.OtpErlangList
-import com.ericsson.otp.erlang.OtpErlangMap
-import com.ericsson.otp.erlang.OtpErlangObject
-import com.ericsson.otp.erlang.OtpErlangTuple
+import com.ericsson.otp.erlang.*
 import org.elixir_lang.beam.chunk.DebugInfo
+import org.elixir_lang.beam.chunk.Keyword
 import org.elixir_lang.beam.chunk.debug_info.logger
 import org.elixir_lang.beam.chunk.debug_info.v1.ElixirErl
+import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.Definitions
+import org.elixir_lang.beam.chunk.from
 import org.elixir_lang.beam.chunk.inspect
+import org.elixir_lang.debugger.ElixirXValuePresentation.toUtf8String
 
 fun v1(metadata: OtpErlangObject, elixirErl: ElixirErl): DebugInfo =
     when (metadata) {
@@ -49,6 +50,20 @@ private fun v1(metadata: OtpErlangTuple, elixirErl: ElixirErl): DebugInfo {
 
 
 class V1(val elixirErl: ElixirErl, val metadata: OtpErlangTuple): DebugInfo {
-    val map: OtpErlangMap? by lazy { metadata.elementAt(1) as? OtpErlangMap }
+    val map by lazy { metadata.elementAt(1) as? OtpErlangMap }
+    val attributes by lazy { keyword("attributes") }
+    val compileOpts by lazy { keyword("compile_opts") }
+    val definitions by lazy { Definitions.from(get("definitions")) }
+    val file by lazy { (get("file") as? OtpErlangBinary)?.let(::toUtf8String) }
+    val line by lazy { (get("line") as? OtpErlangLong)?.intValue() }
+    val module by lazy { get("module") as? OtpErlangAtom }
+    val unreachable by lazy { get("unreachable") as OtpErlangList? }
     val specs: OtpErlangList? by lazy { metadata.elementAt(2) as? OtpErlangList }
+
+    private fun get(key: String): OtpErlangObject? = map?.get(OtpErlangAtom(key))
+
+    private fun keyword(key: String): Keyword? =
+        get(key)?.let { attributes ->
+            (attributes as? OtpErlangList)?.let(::from)
+        }
 }

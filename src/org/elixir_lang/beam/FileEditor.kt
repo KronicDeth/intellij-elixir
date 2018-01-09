@@ -11,46 +11,39 @@ import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.JBTabbedPane
 import org.elixir_lang.beam.chunk.Chunk
 import org.elixir_lang.beam.chunk.Table
-import org.elixir_lang.beam.chunk.debug_info.term.model
+import org.elixir_lang.beam.chunk.debug_info.term.component
 import java.beans.PropertyChangeListener
 import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.JTabbedPane
-import javax.swing.table.TableModel
 
 private fun addTab(tabbedPane: JBTabbedPane, cache: Cache, chunk: Chunk) {
     val typeID = chunk.typeID
-    val tableModel: TableModel? = when (typeID) {
+    val scrollable: JComponent = when (typeID) {
         Chunk.TypeID.ATOM.toString(), Chunk.TypeID.ATU8.toString() ->
-            org.elixir_lang.beam.chunk.atoms.Model(cache.atoms)
+            Table(org.elixir_lang.beam.chunk.atoms.Model(cache.atoms))
         Chunk.TypeID.ATTR.toString() ->
-            org.elixir_lang.beam.chunk.keyword.Model(cache.attributes)
+            Table(org.elixir_lang.beam.chunk.keyword.Model(cache.attributes))
         Chunk.TypeID.CINF.toString() ->
-            org.elixir_lang.beam.chunk.keyword.Model(cache.compileInfo)
+            Table(org.elixir_lang.beam.chunk.keyword.Model(cache.compileInfo))
         Chunk.TypeID.CODE.toString() ->
-            org.elixir_lang.beam.chunk.code.Model(cache.code)
+            Table(org.elixir_lang.beam.chunk.code.Model(cache.code))
         Chunk.TypeID.DBGI.toString() ->
-            model(cache.debugInfo)
+            component(cache.debugInfo)
         Chunk.TypeID.EXPT.toString() ->
-            org.elixir_lang.beam.chunk.call_definitions.Model(cache.exports)
+            Table(org.elixir_lang.beam.chunk.call_definitions.Model(cache.exports))
         Chunk.TypeID.FUNT.toString() ->
-            org.elixir_lang.beam.chunk.functions.Model(cache.functions)
+            Table(org.elixir_lang.beam.chunk.functions.Model(cache.functions))
         Chunk.TypeID.IMPT.toString() ->
-            org.elixir_lang.beam.chunk.imports.Model(cache.imports)
+            Table(org.elixir_lang.beam.chunk.imports.Model(cache.imports))
         Chunk.TypeID.LOCT.toString() ->
-            org.elixir_lang.beam.chunk.call_definitions.Model(cache.locals)
+            Table(org.elixir_lang.beam.chunk.call_definitions.Model(cache.locals))
         Chunk.TypeID.LITT.toString() ->
-            org.elixir_lang.beam.chunk.literals.Model(cache.literals)
+            Table(org.elixir_lang.beam.chunk.literals.Model(cache.literals))
         Chunk.TypeID.STRT.toString() ->
-            org.elixir_lang.beam.chunk.strings.Model(cache.strings)
+            Table(org.elixir_lang.beam.chunk.strings.Model(cache.strings))
         else ->
-            null
-    }
-
-    val scrollable: JComponent = if (tableModel != null) {
-        Table(tableModel)
-    } else {
-        JPanel()
+            JPanel()
     }
 
     tabbedPane.addTab(typeID, JBScrollPane(scrollable))
