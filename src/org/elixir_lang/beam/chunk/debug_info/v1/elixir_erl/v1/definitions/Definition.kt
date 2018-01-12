@@ -1,21 +1,20 @@
 package org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.definitions
 
-import com.ericsson.otp.erlang.OtpErlangAtom
-import com.ericsson.otp.erlang.OtpErlangLong
-import com.ericsson.otp.erlang.OtpErlangObject
-import com.ericsson.otp.erlang.OtpErlangTuple
+import com.ericsson.otp.erlang.*
 import org.elixir_lang.beam.chunk.Keyword
 import org.elixir_lang.beam.chunk.debug_info.logger
+import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.definitions.definition.Clause
 import org.elixir_lang.beam.chunk.inspect
 
 class Definition(
         nameArity: OtpErlangObject,
         macro: OtpErlangObject,
         metadata: OtpErlangObject,
-        val quoted: OtpErlangObject
+        clauses: OtpErlangObject
 ) {
     private val nameArityTuple: OtpErlangTuple? = nameArityTuple(nameArity)
 
+    val clauses: List<Clause>? by lazy { clauses(clauses) }
     val macro: String? = macro(macro)
     val metdata: Keyword? = org.elixir_lang.beam.chunk.from(metadata)
 
@@ -44,10 +43,30 @@ class Definition(
                              ```elixir
                              ${inspect(term)}
                              ```
-                             """)
+                             """.trimIndent())
 
                 null
             }
+
+        private fun clauses(list: OtpErlangList, definition: Definition): List<Clause> =
+                list.mapNotNull { Clause.from(it, definition) }
+
+        private fun clauses(term: OtpErlangObject): List<Clause>? =
+                if (term is OtpErlangList) {
+                    clauses(term)
+                } else {
+                    logger.error("""
+                                 Clauses it not a list
+
+                                 ## clauses
+
+                                 ```elixir
+                                 ${inspect(term)}
+                                 ```
+                                 """.trimIndent())
+
+                    null
+                }
 
         private fun from(term: OtpErlangTuple): Definition? {
             val arity = term.arity()
@@ -62,7 +81,7 @@ class Definition(
                              ```elixir
                              ${inspect(term)}
                              ```
-                             """)
+                             """.trimIndent())
 
                 null
             }
@@ -80,7 +99,7 @@ class Definition(
                                  ```elixir
                                  ${inspect(macroObject)}
                                  ```
-                                 """)
+                                 """.trimIndent())
 
                     null
                 }
@@ -97,7 +116,7 @@ class Definition(
                              ```elixir
                              ${inspect(nameObject)}
                              ```
-                             """)
+                             """.trimIndent())
 
                 null
             }
@@ -116,7 +135,7 @@ class Definition(
                              ```elixir
                              ${inspect(arityObject)}
                              ```
-                             """)
+                             """.trimIndent())
 
                 null
             }
@@ -136,7 +155,7 @@ class Definition(
                              ```elixir
                              ${inspect(nameObject)}
                              ```
-                             """)
+                             """.trimIndent())
 
                 null
             }
@@ -154,7 +173,7 @@ class Definition(
                                  ```elixir
                                  ${inspect(nameArity)}
                                  ```
-                                 """)
+                                 """.trimIndent())
 
                     null
                 }
@@ -173,7 +192,7 @@ class Definition(
                              ```elixir
                              ${inspect(nameArity)}
                              ```
-                             """)
+                             """.trimIndent())
 
                 null
             }
@@ -182,7 +201,7 @@ class Definition(
     }
 }
 
-private operator fun OtpErlangTuple.component1(): OtpErlangObject = this.elementAt(0)
-private operator fun OtpErlangTuple.component2(): OtpErlangObject = this.elementAt(1)
-private operator fun OtpErlangTuple.component3(): OtpErlangObject = this.elementAt(2)
+operator fun OtpErlangTuple.component1(): OtpErlangObject = this.elementAt(0)
+operator fun OtpErlangTuple.component2(): OtpErlangObject = this.elementAt(1)
+operator fun OtpErlangTuple.component3(): OtpErlangObject = this.elementAt(2)
 private operator fun OtpErlangTuple.component4(): OtpErlangObject = this.elementAt(3)

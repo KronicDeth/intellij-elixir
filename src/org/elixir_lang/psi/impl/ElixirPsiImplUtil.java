@@ -412,7 +412,7 @@ public class ElixirPsiImplUtil {
             builtBlock = quotedChild;
 
             // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L588
-            if (Macro.isLocalCall(quotedChild)) {
+            if (Macro.INSTANCE.isLocalCall(quotedChild)) {
                 OtpErlangTuple childTuple = (OtpErlangTuple) quotedChild;
                 OtpErlangObject quotedIdentifier = childTuple.elementAt(0);
 
@@ -4315,7 +4315,7 @@ public class ElixirPsiImplUtil {
 
         // @see https://github.com/elixir-lang/elixir/blob/6c288be7300509ff7b809002a3563c6a02dc13fa/lib/elixir/src/elixir_parser.yrl#L596-L597
         // @see https://github.com/elixir-lang/elixir/blob/6c288be7300509ff7b809002a3563c6a02dc13fa/lib/elixir/src/elixir_parser.yrl#L583
-        if (Macro.isExpression(quotedLeftOperand)) {
+        if (Macro.INSTANCE.isExpression(quotedLeftOperand)) {
             OtpErlangTuple leftExpression = (OtpErlangTuple) quotedLeftOperand;
             OtpErlangObject leftOperator = leftExpression.elementAt(0);
 
@@ -4381,7 +4381,7 @@ if (quoted == null) {
         /*
          * Use line from last alias, but drop `counter: 0`
          */
-        OtpErlangList aliasMetadata = Macro.metadata(quotedAlias);
+        OtpErlangList aliasMetadata = Macro.INSTANCE.metadata(quotedAlias);
         OtpErlangTuple lineTuple = (OtpErlangTuple) org.elixir_lang.List.keyfind(
                 aliasMetadata,
                 new OtpErlangAtom("line"),
@@ -4393,14 +4393,14 @@ if (quoted == null) {
                 }
         );
 
-        OtpErlangList lastAliasList = Macro.callArguments(quotedAlias);
+        OtpErlangList lastAliasList = Macro.INSTANCE.callArguments(quotedAlias);
         OtpErlangObject[] mergedArguments;
         int i = 0;
 
         /* if both aliases, then the counter: 0 needs to be removed from the metadata data and the arguments for
            each __aliases__ need to be combined */
-        if (Macro.isAliases(quotedMatchedExpression)) {
-            OtpErlangList firstAliasList = Macro.callArguments((OtpErlangTuple) quotedMatchedExpression);
+        if (Macro.INSTANCE.isAliases(quotedMatchedExpression)) {
+            OtpErlangList firstAliasList = Macro.INSTANCE.callArguments((OtpErlangTuple) quotedMatchedExpression);
             mergedArguments = new OtpErlangObject[firstAliasList.arity() + lastAliasList.arity()];
 
             for (OtpErlangObject firstAliasElement : firstAliasList) {
@@ -4471,7 +4471,7 @@ if (quoted == null) {
                 quotedRelativeIdentifier
         );
 
-        OtpErlangList callMetadata = Macro.metadata((OtpErlangTuple) quotedIdentifier);
+        OtpErlangList callMetadata = Macro.INSTANCE.metadata((OtpErlangTuple) quotedIdentifier);
 
         OtpErlangObject quotedContainer = quotedFunctionCall(
                 quotedIdentifier,
@@ -4610,13 +4610,13 @@ if (quoted == null) {
         if (quotedArguments.length == 1) {
             OtpErlangObject quotedArgument = quotedArguments[0];
 
-            if (Macro.isExpression(quotedArgument)) {
+            if (Macro.INSTANCE.isExpression(quotedArgument)) {
                 OtpErlangTuple expression = (OtpErlangTuple) quotedArgument;
 
                 OtpErlangObject receiver = expression.elementAt(0);
 
                 if (receiver.equals(MINUS) || receiver.equals(PLUS)) {
-                    OtpErlangList dualCallArguments = Macro.callArguments(expression);
+                    OtpErlangList dualCallArguments = Macro.INSTANCE.callArguments(expression);
 
                     // [Arg]
                     if (dualCallArguments.arity() == 1) {
@@ -4819,12 +4819,12 @@ if (quoted == null) {
     public static OtpErlangObject anchoredQuotedFunctionCall(PsiElement anchor, OtpErlangObject quotedIdentifier, OtpErlangObject... quotedArguments) {
         OtpErlangList metadata;
 
-        if (Macro.isExpression(quotedIdentifier)) {
+        if (Macro.INSTANCE.isExpression(quotedIdentifier)) {
             OtpErlangTuple expression = (OtpErlangTuple) quotedIdentifier;
             /* Grab metadata from quotedIdentifier so line of quotedFunctionCall is line of identifier or `.` in
                identifier, which can differ from the line of quotable call when there are newlines on either side of
                `.`. */
-            metadata = Macro.metadata(expression);
+            metadata = Macro.INSTANCE.metadata(expression);
         } else {
             metadata = metadata(anchor);
         }
@@ -6224,7 +6224,7 @@ if (quoted == null) {
         OtpErlangObject[] unwrapped = quotedArguments;
 
         // { _, _, _}
-        if (Macro.isExpression(last)) {
+        if (Macro.INSTANCE.isExpression(last)) {
             OtpErlangTuple expression = (OtpErlangTuple) last;
             OtpErlangObject receiver = expression.elementAt(0);
 
@@ -6250,7 +6250,7 @@ if (quoted == null) {
 
                         unwrapped[0] = quotedFunctionCall(
                                 receiver,
-                                Macro.metadata(expression),
+                                Macro.INSTANCE.metadata(expression),
                                 unwrappedArguments
                         );
                     }
