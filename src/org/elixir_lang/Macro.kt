@@ -423,11 +423,11 @@ object Macro {
             }
 
     private fun isKeywordBlock(tuple: OtpErlangTuple): Boolean =
-            tuple.arity() == 2 && (tuple.elementAt(1) as? OtpErlangAtom)?.atomValue() in keywordBlockKeywords
+            tuple.arity() == 2 && (tuple.elementAt(0) as? OtpErlangAtom)?.atomValue() in keywordBlockKeywords
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex?utf8=%E2%9C%93#L750-L754
     private fun isKeywordBlocks(list: OtpErlangList): Boolean =
-        if (list.arity() > 1) {
+        if (list.arity() > 0) {
             (list.elementAt(0) as? OtpErlangTuple)?.let { firstTuple ->
                 if (firstTuple.arity() == 2 && firstTuple.elementAt(0) == OtpErlangAtom("do")) {
                     list.all { isKeywordBlock(it) }
