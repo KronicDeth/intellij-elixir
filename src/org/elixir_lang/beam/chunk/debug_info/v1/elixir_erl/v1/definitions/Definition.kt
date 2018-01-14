@@ -14,7 +14,7 @@ class Definition(
 ) {
     private val nameArityTuple: OtpErlangTuple? = nameArityTuple(nameArity)
 
-    val clauses: List<Clause>? by lazy { clauses(clauses) }
+    val clauses: List<Clause>? by lazy { clauses(clauses, this) }
     val macro: String? = macro(macro)
     val metdata: Keyword? = org.elixir_lang.beam.chunk.from(metadata)
 
@@ -51,9 +51,9 @@ class Definition(
         private fun clauses(list: OtpErlangList, definition: Definition): List<Clause> =
                 list.mapNotNull { Clause.from(it, definition) }
 
-        private fun clauses(term: OtpErlangObject): List<Clause>? =
+        private fun clauses(term: OtpErlangObject, definition: Definition): List<Clause>? =
                 if (term is OtpErlangList) {
-                    clauses(term)
+                    clauses(term, definition)
                 } else {
                     logger.error("""
                                  Clauses it not a list
@@ -76,7 +76,7 @@ class Definition(
                 Definition(nameArity, macro, metadata, quoted)
             } else {
                 logger.error("""
-                             Definition tuple arity (${arity}) is not 4
+                             Definition tuple arity ($arity) is not 4
 
                              ```elixir
                              ${inspect(term)}

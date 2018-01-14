@@ -1,5 +1,6 @@
 package org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1
 
+import com.intellij.ui.components.JBScrollPane
 import org.elixir_lang.beam.chunk.Table
 import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.V1
 import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.definitions.Tree
@@ -12,8 +13,8 @@ import org.elixir_lang.beam.chunk.keyword.Model as KeywordModel
  */
 class MultipleTabbedPane(debugInfo: V1): JTabbedPane(JTabbedPane.TOP, JTabbedPane.WRAP_TAB_LAYOUT) {
     init {
-        addTab("Attributes", Table(KeywordModel(debugInfo.attributes)))
-        addTab("Compile Options", Table(KeywordModel(debugInfo.compileOpts)))
-        addTab("Definitions", Tree(DefinitionsModel(debugInfo)))
+        addTab("Attributes", JBScrollPane(Table(KeywordModel(debugInfo.attributes))))
+        addTab("Compile Options", JBScrollPane(Table(KeywordModel(debugInfo.compileOpts))))
+        addTab("Definitions", JBScrollPane(Tree(DefinitionsModel(debugInfo))))
     }
 }
