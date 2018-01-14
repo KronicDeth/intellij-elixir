@@ -1,6 +1,7 @@
 package org.elixir_lang.beam.chunk.debug_info.term
 
 import com.ericsson.otp.erlang.OtpErlangObject
+import com.intellij.openapi.project.Project
 import org.elixir_lang.beam.chunk.DebugInfo
 import org.elixir_lang.beam.chunk.Table
 import org.elixir_lang.beam.chunk.debug_info.Term
@@ -10,10 +11,10 @@ import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.table.AbstractTableModel
 
-fun component(debugInfo: DebugInfo?): JComponent =
+fun component(debugInfo: DebugInfo?, project: Project): JComponent =
     when (debugInfo) {
         is org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.V1 ->
-            Component(debugInfo)
+            Component(debugInfo, project)
         is ElixirErl ->
             Table(org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.Model(debugInfo))
         is org.elixir_lang.beam.chunk.debug_info.V1 ->

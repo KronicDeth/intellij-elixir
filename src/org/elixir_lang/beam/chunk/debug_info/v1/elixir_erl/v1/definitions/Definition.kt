@@ -3,10 +3,12 @@ package org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.definitions
 import com.ericsson.otp.erlang.*
 import org.elixir_lang.beam.chunk.Keyword
 import org.elixir_lang.beam.chunk.debug_info.logger
+import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.V1
 import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.definitions.definition.Clause
 import org.elixir_lang.beam.chunk.inspect
 
 class Definition(
+        val debugInfo: V1,
         nameArity: OtpErlangObject,
         macro: OtpErlangObject,
         metadata: OtpErlangObject,
@@ -31,9 +33,9 @@ class Definition(
     }
 
     companion object {
-        fun from(term: OtpErlangObject): Definition? =
+        fun from(term: OtpErlangObject, debugInfo: V1): Definition? =
             if (term is OtpErlangTuple) {
-                from(term)
+                from(term, debugInfo)
             } else {
                 logger.error("""
                              Definition is not a tuple
@@ -68,12 +70,12 @@ class Definition(
                     null
                 }
 
-        private fun from(term: OtpErlangTuple): Definition? {
+        private fun from(term: OtpErlangTuple, debugInfo: V1): Definition? {
             val arity = term.arity()
 
             return if (arity == 4) {
                 val (nameArity, macro, metadata, quoted) = term
-                Definition(nameArity, macro, metadata, quoted)
+                Definition(debugInfo, nameArity, macro, metadata, quoted)
             } else {
                 logger.error("""
                              Definition tuple arity ($arity) is not 4

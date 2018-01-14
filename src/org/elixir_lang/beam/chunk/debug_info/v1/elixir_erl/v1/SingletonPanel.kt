@@ -1,7 +1,6 @@
 package org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1
 
 import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.V1
-import org.elixir_lang.beam.chunk.inspect
 import java.awt.GridBagConstraints
 import java.awt.GridBagConstraints.HORIZONTAL
 import java.awt.GridBagConstraints.LINE_START
@@ -64,7 +63,7 @@ class SingletonPanel(debugInfo: V1): JPanel(GridBagLayout()) {
                 }
         )
 
-        val moduleTextField = JTextField(debugInfo.module?.let { inspect(it) }).apply {
+        val moduleTextField = JTextField(debugInfo.inspectedModule).apply {
             isEditable = false
         }
         val moduleLabel = JLabel("Module:").apply {

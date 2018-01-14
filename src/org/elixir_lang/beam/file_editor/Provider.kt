@@ -20,7 +20,7 @@ class Provider: com.intellij.openapi.fileEditor.FileEditorProvider {
                     }
 
     override fun createEditor(project: Project, file: VirtualFile): FileEditor {
-        return FileEditor(file)
+        return FileEditor(file, project)
     }
 
     override fun getPolicy(): FileEditorPolicy = FileEditorPolicy.PLACE_AFTER_DEFAULT_EDITOR

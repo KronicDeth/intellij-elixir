@@ -4,6 +4,7 @@ import com.intellij.codeHighlighting.BackgroundEditorHighlighter
 import com.intellij.openapi.fileEditor.FileEditor
 import com.intellij.openapi.fileEditor.FileEditorLocation
 import com.intellij.openapi.fileEditor.FileEditorState
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.UserDataHolderBase
 import com.intellij.openapi.vfs.VirtualFile
@@ -17,39 +18,10 @@ import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.JTabbedPane
 
-private fun addTab(tabbedPane: JBTabbedPane, cache: Cache, chunk: Chunk) {
-    val typeID = chunk.typeID
-    val scrollable: JComponent = when (typeID) {
-        Chunk.TypeID.ATOM.toString(), Chunk.TypeID.ATU8.toString() ->
-            Table(org.elixir_lang.beam.chunk.atoms.Model(cache.atoms))
-        Chunk.TypeID.ATTR.toString() ->
-            Table(org.elixir_lang.beam.chunk.keyword.Model(cache.attributes))
-        Chunk.TypeID.CINF.toString() ->
-            Table(org.elixir_lang.beam.chunk.keyword.Model(cache.compileInfo))
-        Chunk.TypeID.CODE.toString() ->
-            Table(org.elixir_lang.beam.chunk.code.Model(cache.code))
-        Chunk.TypeID.DBGI.toString() ->
-            component(cache.debugInfo)
-        Chunk.TypeID.EXPT.toString() ->
-            Table(org.elixir_lang.beam.chunk.call_definitions.Model(cache.exports))
-        Chunk.TypeID.FUNT.toString() ->
-            Table(org.elixir_lang.beam.chunk.functions.Model(cache.functions))
-        Chunk.TypeID.IMPT.toString() ->
-            Table(org.elixir_lang.beam.chunk.imports.Model(cache.imports))
-        Chunk.TypeID.LOCT.toString() ->
-            Table(org.elixir_lang.beam.chunk.call_definitions.Model(cache.locals))
-        Chunk.TypeID.LITT.toString() ->
-            Table(org.elixir_lang.beam.chunk.literals.Model(cache.literals))
-        Chunk.TypeID.STRT.toString() ->
-            Table(org.elixir_lang.beam.chunk.strings.Model(cache.strings))
-        else ->
-            JPanel()
-    }
-
-    tabbedPane.addTab(typeID, JBScrollPane(scrollable))
-}
-
-class FileEditor(private val virtualFile: VirtualFile): UserDataHolderBase(), FileEditor {
+class FileEditor(
+        private val virtualFile: VirtualFile,
+        private val project: Project
+): UserDataHolderBase(), FileEditor {
     private var isActive: Boolean = false
 
     // GUI
@@ -95,4 +67,36 @@ class FileEditor(private val virtualFile: VirtualFile): UserDataHolderBase(), Fi
     }
 
     override fun setState(state: FileEditorState) {}
+
+    private fun addTab(tabbedPane: JBTabbedPane, cache: Cache, chunk: Chunk) {
+        val typeID = chunk.typeID
+        val scrollable: JComponent = when (typeID) {
+            Chunk.TypeID.ATOM.toString(), Chunk.TypeID.ATU8.toString() ->
+                Table(org.elixir_lang.beam.chunk.atoms.Model(cache.atoms))
+            Chunk.TypeID.ATTR.toString() ->
+                Table(org.elixir_lang.beam.chunk.keyword.Model(cache.attributes))
+            Chunk.TypeID.CINF.toString() ->
+                Table(org.elixir_lang.beam.chunk.keyword.Model(cache.compileInfo))
+            Chunk.TypeID.CODE.toString() ->
+                Table(org.elixir_lang.beam.chunk.code.Model(cache.code))
+            Chunk.TypeID.DBGI.toString() ->
+                component(cache.debugInfo, project)
+            Chunk.TypeID.EXPT.toString() ->
+                Table(org.elixir_lang.beam.chunk.call_definitions.Model(cache.exports))
+            Chunk.TypeID.FUNT.toString() ->
+                Table(org.elixir_lang.beam.chunk.functions.Model(cache.functions))
+            Chunk.TypeID.IMPT.toString() ->
+                Table(org.elixir_lang.beam.chunk.imports.Model(cache.imports))
+            Chunk.TypeID.LOCT.toString() ->
+                Table(org.elixir_lang.beam.chunk.call_definitions.Model(cache.locals))
+            Chunk.TypeID.LITT.toString() ->
+                Table(org.elixir_lang.beam.chunk.literals.Model(cache.literals))
+            Chunk.TypeID.STRT.toString() ->
+                Table(org.elixir_lang.beam.chunk.strings.Model(cache.strings))
+            else ->
+                JPanel()
+        }
+
+        tabbedPane.addTab(typeID, JBScrollPane(scrollable))
+    }
 }

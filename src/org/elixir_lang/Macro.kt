@@ -905,9 +905,8 @@ object Macro {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    private fun adjustNewLines(blockToString: Any, s: String): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    fun adjustNewLines(textWithNewLines: String, newLineReplacement: String): String =
+        Regex(Regex.escape("\n")).replace(textWithNewLines, Regex.escapeReplacement(newLineReplacement))
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex#L873-L882
     private fun callToString(call: OtpErlangObject): String =

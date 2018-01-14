@@ -53,10 +53,11 @@ class V1(val elixirErl: ElixirErl, val metadata: OtpErlangTuple): DebugInfo {
     val map by lazy { metadata.elementAt(1) as? OtpErlangMap }
     val attributes by lazy { keyword("attributes") }
     val compileOpts by lazy { keyword("compile_opts") }
-    val definitions by lazy { Definitions.from(get("definitions")) }
+    val definitions by lazy { Definitions.from(get("definitions"), this) }
     val file by lazy { (get("file") as? OtpErlangBinary)?.let(::toUtf8String) }
     val line by lazy { (get("line") as? OtpErlangLong)?.intValue() }
     val module by lazy { get("module") as? OtpErlangAtom }
+    val inspectedModule by lazy { module?.let { inspect(it) }  }
     val unreachable by lazy { get("unreachable") as OtpErlangList? }
     val specs: OtpErlangList? by lazy { metadata.elementAt(2) as? OtpErlangList }
 
