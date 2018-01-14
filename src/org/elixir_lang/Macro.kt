@@ -231,7 +231,7 @@ object Macro {
             (macro as? OtpErlangList)?.let { list ->
                 if (list.arity() > 0) {
                     ifTagged3TupleTo(list.elementAt(0), "->") {
-                        "(${arrowToString(list)})"
+                        "(${arrowToString(list, true)})"
                     }
                 } else {
                     null
@@ -588,7 +588,7 @@ object Macro {
                                     val arrowElementArgumentsTuple = arrowElementArguments.elementAt(1)
 
                                     if (arrowElementArgumentsTuple !is OtpErlangTuple || arrowElementArgumentsTuple.elementAt(0) != OtpErlangAtom("__block__")) {
-                                        "fn ${arrowToString(arrow)} end"
+                                        "fn ${arrowToString(arrow, false)} end"
                                     } else {
                                         null
                                     }
@@ -719,7 +719,7 @@ object Macro {
                     if (arguments.arity() == 2) {
                         val (left, right) = arguments
 
-                        val rightString = if (right != OtpErlangList() && isKeyword(right)) {
+                        val rightString = if (right != OtpErlangList() && Keyword.isKeyword(right)) {
                             keywordListToString(right as OtpErlangList)
                         } else {
                             operandToString(right, "when", Identifier.Associativity.RIGHT)
@@ -853,9 +853,35 @@ object Macro {
     private fun wrapInParenthesis(expression: OtpErlangObject): String =
             "(${toString(expression)})"
 
-    private fun arrowToString(last: OtpErlangList): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex?utf8=%E2%9C%93#L983-L988
+    private fun arrowToString(pairs: OtpErlangList, emptyParentheses: Boolean): String =
+        pairs.joinToString("; ") { pair ->
+            val (operator, _, arguments)  = pair as OtpErlangTuple
+
+            assert(operator is OtpErlangAtom && operator.atomValue() == "->")
+
+            val argumentList = arguments as OtpErlangList
+
+            assert(argumentList.arity() == 2)
+
+            val (left, right) = argumentList
+
+            val leftString = commaJoinOrEmptyParentheses(left as OtpErlangList, emptyParentheses)
+
+            leftString + "-> " + toString(right)
+        }
+
+    // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex?utf8=%E2%9C%93#L990-L995
+    private fun commaJoinOrEmptyParentheses(left: OtpErlangList, emptyParentheses: Boolean): String =
+        if (left.arity() == 0) {
+            if (emptyParentheses) {
+                "() "
+            } else {
+                ""
+            }
+        } else {
+            left.joinToString(", ") { toString(it) }
+        }
 
     private fun bitPartToString(part: OtpErlangObject?): String {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
@@ -1002,10 +1028,6 @@ object Macro {
             is OtpErlangAtom -> term.atomValue()
             else -> null
         }
-
-    private fun isKeyword(term: OtpErlangObject): Boolean {
-        TODO("not implemented")
-    }
 
     val NIL = OtpErlangAtom("nil")
 

@@ -16,4 +16,27 @@ object Keyword {
         }?.let { element ->
             (element as OtpErlangTuple).elementAt(1)
         }
+
+    tailrec fun isKeyword(term: OtpErlangObject): Boolean =
+            if (term is OtpErlangList) {
+                if (term.arity() == 0) {
+                    true
+                } else {
+                    val head = term.head
+
+                    if (head is OtpErlangTuple && head.arity() == 2) {
+                        val key = head.elementAt(0)
+
+                        if (key is OtpErlangAtom) {
+                            isKeyword(term.tail)
+                        } else {
+                            false
+                        }
+                    } else {
+                        false
+                    }
+                }
+            } else {
+                false
+            }
 }
