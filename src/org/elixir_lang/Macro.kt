@@ -240,7 +240,7 @@ object Macro {
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex#L558-L576
     private fun ifBitContainerToString(macro: OtpErlangObject): String? =
-            ifTagged3TupleTo(macro, "<<>") { tuple ->
+            ifTagged3TupleTo(macro, "<<>>") { tuple ->
                 if (isInterpolated(tuple)) {
                     interpolate(tuple)
                 } else {
@@ -936,9 +936,49 @@ object Macro {
             left.joinToString(", ", "", " ") { toString(it) }
         }
 
-    private fun bitPartToString(part: OtpErlangObject?): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex?utf8=%E2%9C%93#L724-L733
+    private fun bitPartToString(bitPart: OtpErlangObject): String =
+            // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex?utf8=%E2%9C%93#L724-L729
+            ifTagged3TupleTo(bitPart, "::") { tuple ->
+                (tuple.elementAt(2) as? OtpErlangList)?.let { arguments ->
+                    if (arguments.arity() == 2) {
+                        val (left, right) = arguments
+
+                        operandToString(left, "::", Identifier.Associativity.LEFT) + "::" + bitModsToString(right, "::", Identifier.Associativity.RIGHT)
+                    } else {
+                        null
+                    }
+                }
+            } ?:
+                    toString(bitPart)
+
+    // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex?utf8=%E2%9C%93#L735-L745
+    private fun bitModsToString(other: OtpErlangObject, parentOperator: String, side: Identifier.Associativity): String =
+            // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex?utf8=%E2%9C%93#L735-L741
+            ifTupleTo(other, 3) { tuple ->
+                (tuple.elementAt(0) as? OtpErlangAtom)?.let { operator ->
+                    val operatorAtomValue = operator.atomValue()
+
+                    when (operatorAtomValue) {
+                        "*", "-" -> {
+                            (tuple.elementAt(2) as? OtpErlangList)?.let { arguments ->
+                                if (arguments.arity() == 2) {
+                                    val (left, right) = arguments
+
+                                    bitModsToString(left, operatorAtomValue, Identifier.Associativity.LEFT) +
+                                            operatorAtomValue +
+                                            bitModsToString(right, operatorAtomValue, Identifier.Associativity.RIGHT)
+                                } else {
+                                    null
+                                }
+                            }
+                        }
+                        else -> null
+                    }
+                }
+            } ?:
+                    // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex?utf8=%E2%9C%93#L743-L745
+                    operandToString(other, parentOperator, side)
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex#L937-L946
     private fun mapToString(list: OtpErlangList): String =
@@ -980,9 +1020,44 @@ object Macro {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    private fun isInterpolated(macro: OtpErlangTuple): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex?utf8=%E2%9C%93#L756-L767
+    private fun isInterpolated(macro: OtpErlangObject): Boolean =
+        ifTagged3TupleTo(macro, "<<>>>") { tuple ->
+            (tuple.elementAt(2) as? OtpErlangList)?.let { arguments ->
+                if (arguments.arity() > 0) {
+                    arguments.all { isInterpolatedPart(it) }
+                } else {
+                    false
+                }
+            }
+        } ?: false
+
+    // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex?utf8=%E2%9C%93#L759-L761
+    private fun isInterpolatedPart(part: OtpErlangObject): Boolean =
+            // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex?utf8=%E2%9C%93#L759
+            ifTagged3TupleTo(part, "::") { tuple ->
+                (tuple.elementAt(2) as? OtpErlangList)?.let { typeArguments ->
+                    if (typeArguments.arity() == 2) {
+                        ifCallConvertArgumentsTo(
+                                typeArguments.elementAt(0),
+                                "Elixir.Kernel",
+                                "to_string"
+                        ) { toStringArguments ->
+                            if (toStringArguments.arity() == 1) {
+                                ifTagged3TupleTo(toStringArguments.elementAt(1), "binary") {
+                                    true
+                                }
+                            } else {
+                                false
+                            }
+                        }
+                    } else {
+                        false
+                    }
+                }
+            } ?:
+                    // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex?utf8=%E2%9C%93#L760-L761
+                    part is OtpErlangBinary
 
     fun adjustNewLines(textWithNewLines: String, newLineReplacement: String): String =
         Regex(Regex.escape("\n")).replace(textWithNewLines, Regex.escapeReplacement(newLineReplacement))
