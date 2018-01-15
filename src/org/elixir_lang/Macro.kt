@@ -260,7 +260,7 @@ object Macro {
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex#L553-L556
     private fun ifBlockToString(macro: OtpErlangObject): String? =
-            ifTagged3TupleTo(macro, "__block___") { tuple ->
+            ifTagged3TupleTo(macro, "__block__") { tuple ->
                 val adjusted = adjustNewLines(blockToString(tuple), "\n  ")
 
                 "(\n  $adjusted\n)"
@@ -511,17 +511,28 @@ object Macro {
             (tuple.elementAt(0) as? OtpErlangAtom)?.let { operator ->
                 (tuple.elementAt(2) as? OtpErlangList)?.let { arguments ->
                     if (arguments.arity() == 2 && Identifier.binaryOperator(operator) != null) {
-                        val (left, right) = arguments
                         val operatorAtomValue = operator.atomValue()
-                        val operatorString = if (operatorAtomValue == "..") {
-                            operatorAtomValue
-                        } else {
-                            " $operatorAtomValue "
-                        }
+                        val (left, right) = arguments
 
-                        operandToString(left, operatorAtomValue, Identifier.Associativity.LEFT) +
-                                operatorString +
-                                operandToString(right, operatorAtomValue, Identifier.Associativity.RIGHT)
+                        if (operatorAtomValue == "==" && right is OtpErlangAtom && right.atomValue() == "nil") {
+                           toString(
+                                   OtpErlangTuple(arrayOf(
+                                           OtpErlangAtom("is_nil"),
+                                           OtpErlangList(),
+                                           OtpErlangList(left)
+                                   ))
+                           )
+                        } else {
+                            val operatorString = if (operatorAtomValue == "..") {
+                                operatorAtomValue
+                            } else {
+                                " $operatorAtomValue "
+                            }
+
+                            operandToString(left, operatorAtomValue, Identifier.Associativity.LEFT) +
+                                    operatorString +
+                                    operandToString(right, operatorAtomValue, Identifier.Associativity.RIGHT)
+                        }
                     } else {
                         null
                     }
@@ -697,7 +708,7 @@ object Macro {
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex#L548-L551
     private fun ifSingleExpressionBlockToString(macro: OtpErlangObject): String? =
-            ifTagged3TupleTo(macro, "__block___") { tuple ->
+            ifTagged3TupleTo(macro, "__block__") { tuple ->
                 val arguments = tuple.elementAt(2)
 
                 if (arguments is OtpErlangList && arguments.arity() == 1) {
@@ -929,7 +940,7 @@ object Macro {
                     if (arguments.arity() == 2) {
                         val (updateMap, updateArguments) = arguments
 
-                        "${toString(updateMap)} | ${toString(updateArguments)}"
+                        "${toString(updateMap)} | ${mapToString(updateArguments as OtpErlangList)}"
                     } else {
                         null
                     }
