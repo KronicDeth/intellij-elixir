@@ -416,9 +416,36 @@ object Macro {
                     ifUnaryCallToString(tuple) ?:
                             ifBinaryCallToString(tuple) ?:
                             ifSigilCallToString(tuple) ?:
+                            ifDeinlineToString(tuple) ?:
                             otherCallToString(tuple)
                 }
             }
+
+    private fun ifDeinlineToString(term: OtpErlangTuple): String? =
+        ifCallConvertArgumentsTo(term, "maps", "is_key") { arguments ->
+            if (arguments.arity() == 2) {
+                toString(
+                        OtpErlangTuple(arrayOf(
+                                OtpErlangTuple(arrayOf(
+                                        OtpErlangAtom("."),
+                                        OtpErlangList(),
+                                        OtpErlangList(arrayOf(
+                                                OtpErlangAtom("Elixir.Map"),
+                                                OtpErlangAtom("has_key?")
+                                        ))
+                                )),
+                                OtpErlangList(),
+                                // Order or arguments is swapped in Elixir compared to Erlang
+                                OtpErlangList(arrayOf(
+                                        arguments.elementAt(1),
+                                        arguments.elementAt(0)
+                                ))
+                        ))
+                )
+            } else {
+                null
+            }
+        }
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex?utf8=%E2%9C%93#L681-L687
     private fun otherCallToString(tuple: OtpErlangTuple): String? {
@@ -447,8 +474,9 @@ object Macro {
             }
         }.joinToString("", " ") + "end"
 
-    private fun callToStringWithArguments(target: OtpErlangObject, arguments: OtpErlangList): String =
-        "${callToString(target)}(${argumentsToString(arguments)})"
+    private fun callToStringWithArguments(target: OtpErlangObject, arguments: OtpErlangList): String {
+        return "${callToString(target)}(${argumentsToString(arguments)})"
+    }
 
     private fun isKeywordBlock(term: OtpErlangObject): Boolean =
             when (term) {
