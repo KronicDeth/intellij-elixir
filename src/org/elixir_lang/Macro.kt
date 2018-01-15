@@ -445,7 +445,7 @@ object Macro {
             Keyword.get(keywordBlocks, keywordBlockKeyword)?.let { keywordBlock ->
                 keywordBlockToString(keywordBlockKeyword, keywordBlock)
             }
-        }.joinToString() + "end"
+        }.joinToString("", " ") + "end"
 
     private fun callToStringWithArguments(target: OtpErlangObject, arguments: OtpErlangList): String =
         "${callToString(target)}(${argumentsToString(arguments)})"
