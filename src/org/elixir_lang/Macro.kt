@@ -756,7 +756,7 @@ object Macro {
                         val rightString = if (right != OtpErlangList() && Keyword.isKeyword(right)) {
                             keywordListToString(right as OtpErlangList)
                         } else {
-                            operandToString(right, "when", Identifier.Associativity.RIGHT)
+                            operandToString(rewriteGuard(right), "when", Identifier.Associativity.RIGHT)
                         }
 
                         "${operandToString(left, "when", Identifier.Associativity.LEFT)} when $rightString"
@@ -967,6 +967,120 @@ object Macro {
 
     fun adjustNewLines(textWithNewLines: String, newLineReplacement: String): String =
         Regex(Regex.escape("\n")).replace(textWithNewLines, Regex.escapeReplacement(newLineReplacement))
+
+    private inline fun <T> ifCallConvertArgumentsTo(
+            term: OtpErlangObject,
+            module: String,
+            name: String,
+            crossinline argumentsTo: (OtpErlangList) -> T?
+    ): T? =
+            ifTupleTo(term, 3) { tuple ->
+                ifTagged3TupleTo(tuple.elementAt(0), ".") { function ->
+                    (function.elementAt(2) as? OtpErlangList)?.let { functionArguments ->
+                        if (functionArguments.arity() == 2 &&
+                                functionArguments.elementAt(0) == OtpErlangAtom(module) &&
+                                functionArguments.elementAt(1) == OtpErlangAtom(name)) {
+                            (tuple.elementAt(2) as? OtpErlangList)?.let { arguments ->
+                                argumentsTo(arguments)
+                            }
+                        } else {
+                            null
+                        }
+                    }
+                }
+            }
+
+    private inline fun <T> ifElementCallConvertArgumentsTo(
+            term: OtpErlangObject,
+            crossinline argumentsTo: (OtpErlangObject, OtpErlangObject) -> T?
+    ): T? =
+        ifCallConvertArgumentsTo(term, "erlang", "element") { arguments ->
+            if (arguments.arity() == 2) {
+                argumentsTo(arguments.elementAt(0), arguments.elementAt(1))
+            } else {
+                null
+            }
+        }
+
+    // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/exception.ex#L302-L316
+    fun rewriteGuard(guard: OtpErlangObject): OtpErlangObject =
+            Macro.prewalk(guard) { macro ->
+                // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/exception.ex#L304-L308
+                ifElementCallConvertArgumentsTo(macro) { first, second ->
+                    // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/exception.ex#L307-L308
+                    if (first is OtpErlangLong) {
+                        OtpErlangTuple(arrayOf(
+                                OtpErlangAtom("elem"),
+                                OtpErlangList(),
+                                OtpErlangList(arrayOf(
+                                        second,
+                                        OtpErlangLong(first.longValue() - 1)
+                                ))
+                        ))
+                    } else {
+                        // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/exception.ex#L304-L305
+                        ifCallConvertArgumentsTo(first, "erlang", "+") { plusArguments ->
+                            if (plusArguments.arity() == 2 && plusArguments.elementAt(1) == OtpErlangLong(1)) {
+                                OtpErlangTuple(arrayOf(
+                                        OtpErlangAtom("elem"),
+                                        OtpErlangList(),
+                                        OtpErlangList(arrayOf(
+                                                second,
+                                                plusArguments.elementAt(0)
+                                        ))
+                                ))
+                            } else {
+                                null
+                            }
+                        }
+                    }
+                } ?:
+                        // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/exception.ex#L310-L311
+                        Macro.ifTagged3TupleTo(macro, ".") { tuple ->
+                            (tuple.elementAt(2) as? OtpErlangList)?.let { arguments ->
+                                if (arguments.arity() == 2 && arguments.elementAt(0) == OtpErlangAtom("erlang")) {
+                                    rewriteGuardCall(arguments.elementAt(1))
+                                } else {
+                                    null
+                                }
+                            }
+                        } ?:
+                        macro
+            }
+
+    // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/exception.ex#L318-L329
+    private fun rewriteGuardCall(operator: OtpErlangAtom): OtpErlangObject =
+            when (operator.atomValue()) {
+                "orelse" -> OtpErlangAtom("or")
+                "andalso" -> OtpErlangAtom("and")
+                "=<" -> OtpErlangAtom("<=")
+                "/=" -> OtpErlangAtom("!=")
+                "=:=" -> OtpErlangAtom("===")
+                "=/=" -> OtpErlangAtom("!==")
+                "band", "bor", "bnot", "bsl", "bsr", "bxor" ->
+                    OtpErlangTuple(arrayOf(
+                            OtpErlangAtom("."),
+                            OtpErlangList(),
+                            OtpErlangList(arrayOf(
+                                    OtpErlangAtom("Elixir.Bitwise"), operator
+                            ))
+                    ))
+                "xor", "element", "size" ->
+                    OtpErlangTuple(arrayOf(
+                            OtpErlangAtom("."),
+                            OtpErlangList(),
+                            OtpErlangList(arrayOf(
+                                    OtpErlangAtom("erlang"), operator
+                            ))
+                    ))
+                else -> operator
+            }
+
+    fun rewriteGuardCall(guardCall: OtpErlangObject): OtpErlangObject =
+            when (guardCall) {
+                is OtpErlangAtom -> rewriteGuardCall(guardCall)
+                else -> guardCall
+            }
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex#L873-L882
     private fun callToString(call: OtpErlangObject): String =
