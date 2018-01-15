@@ -27,7 +27,7 @@ object Identifier {
 
     private val aliasRegex = Regex("Elixir(.[A-Z][a-zA-Z0-9_]*)+")
     // Not Unicode Identifier, based on Elixir.flex IDENTIFIER_TOKEN
-    private val identifierRegex = Regex("[a-z_][a-zA-Z0-9]*[?!]?")
+    private val identifierRegex = Regex("[a-z_][a-zA-Z0-9_]*[?!]?")
     private val notCallableAtomValues = arrayOf("%", "%{}", "{}", "<<>>", "...", "..", ".", "->")
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/code/identifier.ex#L23-L53
