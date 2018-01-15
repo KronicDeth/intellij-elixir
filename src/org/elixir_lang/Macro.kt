@@ -266,9 +266,43 @@ object Macro {
                 "(\n  $adjusted\n)"
             }
 
-    private fun blockToString(tuple: Any): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex?utf8=%E2%9C%93#L924-L935
+    private fun blockToString(term: OtpErlangObject): String =
+        ifArrowListBlockToString(term) ?:
+                ifBlockBlockToString(term) ?:
+                // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex?utf8=%E2%9C%93#L935
+                toString(term)
+
+    // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex?utf8=%E2%9C%93#L924-L929
+    private fun ifArrowListBlockToString(block: OtpErlangObject): String? =
+        (block as? OtpErlangList)?.let { list ->
+            if (list.arity() > 0) {
+                ifTagged3TupleTo(list.elementAt(0), "->") {
+                    list.joinToString("\n") { element ->
+                        val (function, _, arguments) = element as OtpErlangTuple
+
+                        assert(function is OtpErlangAtom && function.atomValue() == "->")
+
+                        val argumentList = arguments as OtpErlangList
+
+                        assert(argumentList.arity() == 2)
+
+                        val (left, right) = argumentList
+                        val leftString = commaJoinOrEmptyParentheses(left as OtpErlangList, false)
+
+                        "$leftString ->\n  ${adjustNewLines(blockToString(right), "\n  ")}"
+                    }
+                }
+            } else {
+                null
+            }
+        }
+
+    // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex?utf8=%E2%9C%93#L931-L933
+    private fun ifBlockBlockToString(term: OtpErlangObject): String? =
+            ifTagged3TupleTo(term, "__block__") { tuple ->
+                (tuple.elementAt(2) as OtpErlangList).joinToString("\n") { toString(it) }
+            }
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex#L645-L651
     private fun ifCaptureModuleNameArityToString(macro: OtpErlangObject): String? =
