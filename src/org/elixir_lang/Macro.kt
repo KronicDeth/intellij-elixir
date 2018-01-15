@@ -422,30 +422,9 @@ object Macro {
             }
 
     private fun ifDeinlineToString(term: OtpErlangTuple): String? =
-        ifCallConvertArgumentsTo(term, "maps", "is_key") { arguments ->
-            if (arguments.arity() == 2) {
-                toString(
-                        OtpErlangTuple(arrayOf(
-                                OtpErlangTuple(arrayOf(
-                                        OtpErlangAtom("."),
-                                        OtpErlangList(),
-                                        OtpErlangList(arrayOf(
-                                                OtpErlangAtom("Elixir.Map"),
-                                                OtpErlangAtom("has_key?")
-                                        ))
-                                )),
-                                OtpErlangList(),
-                                // Order or arguments is swapped in Elixir compared to Erlang
-                                OtpErlangList(arrayOf(
-                                        arguments.elementAt(1),
-                                        arguments.elementAt(0)
-                                ))
-                        ))
-                )
-            } else {
-                null
-            }
-        }
+            ifErlangElementRewriteTo(term) { toString(it) } ?:
+                    ifErlangRewriteTo(term) { toString(it) } ?:
+                    ifMapsIsKeyRewriteTo(term) { toString(it) }
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex?utf8=%E2%9C%93#L681-L687
     private fun otherCallToString(tuple: OtpErlangTuple): String? {
@@ -1029,7 +1008,7 @@ object Macro {
                 }
             }
 
-    private inline fun <T> ifElementCallConvertArgumentsTo(
+    private inline fun <T> ifErlangElementCallConvertArgumentsTo(
             term: OtpErlangObject,
             crossinline argumentsTo: (OtpErlangObject, OtpErlangObject) -> T?
     ): T? =
@@ -1041,49 +1020,85 @@ object Macro {
             }
         }
 
+    // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/exception.ex#L304-L308
+    private fun <T> ifErlangElementRewriteTo(macro: OtpErlangObject, transformer: (OtpErlangObject) -> T): T? =
+            ifErlangElementCallConvertArgumentsTo(macro) { first, second ->
+                // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/exception.ex#L307-L308
+                if (first is OtpErlangLong) {
+                    transformer(
+                            OtpErlangTuple(arrayOf(
+                                    OtpErlangAtom("elem"),
+                                    OtpErlangList(),
+                                    OtpErlangList(arrayOf(
+                                            second,
+                                            OtpErlangLong(first.longValue() - 1)
+                                    ))
+                            ))
+                    )
+                } else {
+                    // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/exception.ex#L304-L305
+                    ifCallConvertArgumentsTo(first, "erlang", "+") { plusArguments ->
+                        if (plusArguments.arity() == 2 && plusArguments.elementAt(1) == OtpErlangLong(1)) {
+                            transformer(
+                                    OtpErlangTuple(arrayOf(
+                                            OtpErlangAtom("elem"),
+                                            OtpErlangList(),
+                                            OtpErlangList(arrayOf(
+                                                    second,
+                                                    plusArguments.elementAt(0)
+                                            ))
+                                    ))
+                            )
+                        } else {
+                            null
+                        }
+                    }
+                }
+            }
+
+    private fun <T> ifMapsIsKeyRewriteTo(term: OtpErlangObject, transformer: (OtpErlangTuple) -> T): T? =
+        ifCallConvertArgumentsTo(term, "maps", "is_key") { arguments ->
+            if (arguments.arity() == 2) {
+                transformer(
+                        OtpErlangTuple(arrayOf(
+                                OtpErlangTuple(arrayOf(
+                                        OtpErlangAtom("."),
+                                        OtpErlangList(),
+                                        OtpErlangList(arrayOf(
+                                                OtpErlangAtom("Elixir.Map"),
+                                                OtpErlangAtom("has_key?")
+                                        ))
+                                )),
+                                OtpErlangList(),
+                                // Order or arguments is swapped in Elixir compared to Erlang
+                                OtpErlangList(arrayOf(
+                                        arguments.elementAt(1),
+                                        arguments.elementAt(0)
+                                ))
+                        ))
+                )
+            } else {
+                null
+            }
+        }
+
+    // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/exception.ex#L310-L311
+    private fun <T> ifErlangRewriteTo(term: OtpErlangObject, transformer: (OtpErlangObject) -> T): T? =
+            Macro.ifTagged3TupleTo(term, ".") { tuple ->
+                (tuple.elementAt(2) as? OtpErlangList)?.let { arguments ->
+                    if (arguments.arity() == 2 && arguments.elementAt(0) == OtpErlangAtom("erlang")) {
+                        transformer(rewriteGuardCall(arguments.elementAt(1)))
+                    } else {
+                        null
+                    }
+                }
+            }
+
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/exception.ex#L302-L316
     fun rewriteGuard(guard: OtpErlangObject): OtpErlangObject =
             Macro.prewalk(guard) { macro ->
-                // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/exception.ex#L304-L308
-                ifElementCallConvertArgumentsTo(macro) { first, second ->
-                    // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/exception.ex#L307-L308
-                    if (first is OtpErlangLong) {
-                        OtpErlangTuple(arrayOf(
-                                OtpErlangAtom("elem"),
-                                OtpErlangList(),
-                                OtpErlangList(arrayOf(
-                                        second,
-                                        OtpErlangLong(first.longValue() - 1)
-                                ))
-                        ))
-                    } else {
-                        // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/exception.ex#L304-L305
-                        ifCallConvertArgumentsTo(first, "erlang", "+") { plusArguments ->
-                            if (plusArguments.arity() == 2 && plusArguments.elementAt(1) == OtpErlangLong(1)) {
-                                OtpErlangTuple(arrayOf(
-                                        OtpErlangAtom("elem"),
-                                        OtpErlangList(),
-                                        OtpErlangList(arrayOf(
-                                                second,
-                                                plusArguments.elementAt(0)
-                                        ))
-                                ))
-                            } else {
-                                null
-                            }
-                        }
-                    }
-                } ?:
-                        // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/exception.ex#L310-L311
-                        Macro.ifTagged3TupleTo(macro, ".") { tuple ->
-                            (tuple.elementAt(2) as? OtpErlangList)?.let { arguments ->
-                                if (arguments.arity() == 2 && arguments.elementAt(0) == OtpErlangAtom("erlang")) {
-                                    rewriteGuardCall(arguments.elementAt(1))
-                                } else {
-                                    null
-                                }
-                            }
-                        } ?:
+                ifErlangElementRewriteTo(macro) { it } ?:
+                        ifErlangRewriteTo(macro) { it } ?:
                         macro
             }
 
