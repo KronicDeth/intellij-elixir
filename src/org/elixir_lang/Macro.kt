@@ -424,7 +424,8 @@ object Macro {
     private fun ifDeinlineToString(term: OtpErlangTuple): String? =
             ifErlangElementRewriteTo(term) { toString(it) } ?:
                     ifErlangRewriteTo(term) { toString(it) } ?:
-                    ifMapsIsKeyRewriteTo(term) { toString(it) }
+                    ifMapsIsKeyRewriteTo(term) { toString(it) } ?:
+                    ifMapsMergeRewriteTo(term) { toString(it) }
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex?utf8=%E2%9C%93#L681-L687
     private fun otherCallToString(tuple: OtpErlangTuple): String? {
@@ -1021,7 +1022,8 @@ object Macro {
         }
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/exception.ex#L304-L308
-    private fun <T> ifErlangElementRewriteTo(macro: OtpErlangObject, transformer: (OtpErlangObject) -> T): T? =
+    private inline fun <T> ifErlangElementRewriteTo(macro: OtpErlangObject,
+                                                    crossinline transformer: (OtpErlangObject) -> T): T? =
             ifErlangElementCallConvertArgumentsTo(macro) { first, second ->
                 // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/exception.ex#L307-L308
                 if (first is OtpErlangLong) {
@@ -1056,7 +1058,8 @@ object Macro {
                 }
             }
 
-    private fun <T> ifMapsIsKeyRewriteTo(term: OtpErlangObject, transformer: (OtpErlangTuple) -> T): T? =
+    private inline fun <T> ifMapsIsKeyRewriteTo(term: OtpErlangObject,
+                                                crossinline transformer: (OtpErlangTuple) -> T): T? =
         ifCallConvertArgumentsTo(term, "maps", "is_key") { arguments ->
             if (arguments.arity() == 2) {
                 transformer(
@@ -1082,8 +1085,35 @@ object Macro {
             }
         }
 
+    private inline fun <T> ifMapsMergeRewriteTo(term: OtpErlangObject,
+                                                crossinline transformer: (OtpErlangTuple) -> T): T? =
+        ifCallConvertArgumentsTo(term, "maps", "merge") { arguments ->
+            if (arguments.arity() == 2) {
+                transformer(
+                        OtpErlangTuple(arrayOf(
+                                OtpErlangTuple(arrayOf(
+                                        OtpErlangAtom("."),
+                                        OtpErlangList(),
+                                        OtpErlangList(arrayOf(
+                                                OtpErlangAtom("Elixir.Map"),
+                                                OtpErlangAtom("merge")
+                                        ))
+                                )),
+                                OtpErlangList(),
+                                OtpErlangList(arrayOf(
+                                        arguments.elementAt(0),
+                                        arguments.elementAt(1)
+                                ))
+                        ))
+                )
+            } else {
+                null
+            }
+        }
+
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/exception.ex#L310-L311
-    private fun <T> ifErlangRewriteTo(term: OtpErlangObject, transformer: (OtpErlangObject) -> T): T? =
+    private inline fun <T> ifErlangRewriteTo(term: OtpErlangObject,
+                                             crossinline transformer: (OtpErlangObject) -> T): T? =
             Macro.ifTagged3TupleTo(term, ".") { tuple ->
                 (tuple.elementAt(2) as? OtpErlangList)?.let { arguments ->
                     if (arguments.arity() == 2 && arguments.elementAt(0) == OtpErlangAtom("erlang")) {
