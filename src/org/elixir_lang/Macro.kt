@@ -290,7 +290,7 @@ object Macro {
                         val (left, right) = argumentList
                         val leftString = commaJoinOrEmptyParentheses(left as OtpErlangList, false)
 
-                        "$leftString ->\n  ${adjustNewLines(blockToString(right), "\n  ")}"
+                        "$leftString->\n  ${adjustNewLines(blockToString(right), "\n  ")}"
                     }
                 }
             } else {
@@ -914,7 +914,7 @@ object Macro {
                 ""
             }
         } else {
-            left.joinToString(", ") { toString(it) }
+            left.joinToString(", ", "", " ") { toString(it) }
         }
 
     private fun bitPartToString(part: OtpErlangObject?): String {
