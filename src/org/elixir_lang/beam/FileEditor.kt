@@ -31,7 +31,7 @@ class FileEditor(
 
     override fun getBackgroundHighlighter(): BackgroundEditorHighlighter? = null
     override fun getComponent(): JComponent {
-        rootTabbedPane = JBTabbedPane(JTabbedPane.LEFT, JTabbedPane.SCROLL_TAB_LAYOUT)
+        rootTabbedPane = JBTabbedPane(JTabbedPane.TOP, JTabbedPane.SCROLL_TAB_LAYOUT)
 
         Beam.from(virtualFile)?.let { beam ->
             val cache = Cache(beam)
