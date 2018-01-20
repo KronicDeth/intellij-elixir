@@ -5,7 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject
 import com.intellij.openapi.diagnostic.Logger
 import org.elixir_lang.beam.term.inspect
 
-class Docs(private val docList: List<Doc>) {
+class Docs(val docList: List<Doc>) {
     operator fun get(index: Int): Doc = docList[index]
     operator fun get(doc: Doc): Int = docList.indexOf(doc)
     fun size(): Int = docList.size

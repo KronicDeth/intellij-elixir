@@ -10,6 +10,6 @@ class Splitter(elixirDocumentation: ElixirDocumentation, project: Project, modul
         val tree = Tree(moduleName, Model(elixirDocumentation))
 
         firstComponent = JBScrollPane(tree)
-        secondComponent = Panel(tree, project)
+        secondComponent = Panel(tree, project, moduleName)
     }
 }

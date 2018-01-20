@@ -5,7 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject
 import com.intellij.openapi.diagnostic.Logger
 import org.elixir_lang.beam.term.inspect
 
-class TypeDocs(private val typeDocList: List<TypeDoc>) {
+class TypeDocs(val typeDocList: List<TypeDoc>) {
     operator fun get(index: Int): TypeDoc = typeDocList[index]
     operator fun get(typeDoc: TypeDoc): Int = typeDocList.indexOf(typeDoc)
     fun size(): Int = typeDocList.size

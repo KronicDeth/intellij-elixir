@@ -5,7 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject
 import com.intellij.openapi.diagnostic.Logger
 import org.elixir_lang.beam.term.inspect
 
-class CallbackDocs(private val callbackDocList: List<CallbackDoc>) {
+class CallbackDocs(val callbackDocList: List<CallbackDoc>) {
     operator fun get(callbackDoc: CallbackDoc): Int = callbackDocList.indexOf(callbackDoc)
     operator fun get(index: Int): CallbackDoc = callbackDocList[index]
     fun size(): Int = callbackDocList.size
