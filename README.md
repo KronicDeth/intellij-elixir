@@ -4244,7 +4244,7 @@ I'd like to thank those who have donated to help support this project.
 * Klemen Sever ([@achedeuzot](https://github.com/achedeuzot))
 * Bjorgvin Reynisson
 * Vanja Radovanović ([@elvanja](https://github.com/elvanja))
-* Garrett Hart ([@https://github.com/thirdshift](https://github.com/thirdshift))
+* Garrett Hart ([@thirdshift](https://github.com/thirdshift))
 * Mateusz Jadczak
 * Jeremy Jackson ([@jejacks0n](https://github.com/jejacks0n))
 * Raúl Vázquez González ([@rvazquezglez](https://github.com/rvazquezglez))
