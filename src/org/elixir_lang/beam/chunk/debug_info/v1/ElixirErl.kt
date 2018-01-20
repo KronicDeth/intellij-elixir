@@ -7,7 +7,7 @@ import org.elixir_lang.beam.chunk.DebugInfo
 import org.elixir_lang.beam.chunk.debug_info.V1
 import org.elixir_lang.beam.chunk.debug_info.logger
 import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1
-import org.elixir_lang.beam.chunk.inspect
+import org.elixir_lang.beam.term.inspect
 
 fun elixirErl(v1: V1): DebugInfo {
     val metadata = v1.metadata

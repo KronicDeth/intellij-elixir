@@ -5,7 +5,7 @@ import org.elixir_lang.beam.chunk.Keyword
 import org.elixir_lang.beam.chunk.debug_info.logger
 import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.V1
 import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.definitions.definition.Clause
-import org.elixir_lang.beam.chunk.inspect
+import org.elixir_lang.beam.term.inspect
 
 class Definition(
         val debugInfo: V1,

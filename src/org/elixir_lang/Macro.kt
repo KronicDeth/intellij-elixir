@@ -5,7 +5,7 @@ import com.intellij.openapi.diagnostic.Logger
 import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.definitions.component1
 import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.definitions.component2
 import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.definitions.component3
-import org.elixir_lang.beam.chunk.inspect
+import org.elixir_lang.beam.term.inspect
 import org.elixir_lang.code.Identifier
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil
 

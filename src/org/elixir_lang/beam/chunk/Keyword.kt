@@ -82,5 +82,5 @@ fun from(term: OtpErlangObject): Keyword? =
             else -> null
         }
 
-private operator fun OtpErlangTuple.component1(): OtpErlangObject = this.elementAt(0)
-private operator fun OtpErlangTuple.component2(): OtpErlangObject = this.elementAt(1)
+operator fun OtpErlangTuple.component1(): OtpErlangObject = this.elementAt(0)
+operator fun OtpErlangTuple.component2(): OtpErlangObject = this.elementAt(1)

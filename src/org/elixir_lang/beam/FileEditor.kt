@@ -12,7 +12,6 @@ import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.JBTabbedPane
 import org.elixir_lang.beam.chunk.Chunk
 import org.elixir_lang.beam.chunk.Table
-import org.elixir_lang.beam.chunk.debug_info.term.component
 import java.beans.PropertyChangeListener
 import javax.swing.JComponent
 import javax.swing.JPanel
@@ -80,7 +79,13 @@ class FileEditor(
             Chunk.TypeID.CODE.toString() ->
                 Table(org.elixir_lang.beam.chunk.code.Model(cache.code))
             Chunk.TypeID.DBGI.toString() ->
-                component(cache.debugInfo, project)
+                org.elixir_lang.beam.chunk.debug_info.term.component(cache.debugInfo, project)
+            Chunk.TypeID.EXDC.toString() ->
+                org.elixir_lang.beam.chunk.elixir_documentation.component(
+                        cache.elixirDocumentation,
+                        project,
+                        cache.atoms?.moduleName()
+                )
             Chunk.TypeID.EXPT.toString() ->
                 Table(org.elixir_lang.beam.chunk.call_definitions.Model(cache.exports))
             Chunk.TypeID.FUNT.toString() ->

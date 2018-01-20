@@ -111,6 +111,7 @@ public class Chunk {
         CINF("CInf"),
         CODE("Code"),
         DBGI("Dbgi"),
+        EXDC("ExDc"),
         EXPT("ExpT"),
         FUNT("FunT"),
         IMPT("ImpT"),

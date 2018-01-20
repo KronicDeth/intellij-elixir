@@ -1,14 +1,8 @@
 package org.elixir_lang.beam.chunk
 
 import com.ericsson.otp.erlang.OtpErlangObject
-import org.elixir_lang.debugger.ElixirXValuePresentation
+import org.elixir_lang.beam.term.inspect
 import javax.swing.table.DefaultTableCellRenderer
-
-fun inspect(term: OtpErlangObject): String =
-    XValueRenderer().let { renderer ->
-        ElixirXValuePresentation(term).renderValue(renderer)
-        renderer.getText()
-    }
 
 class OtpErlangObjectTableCellRenderer: DefaultTableCellRenderer() {
     override fun setValue(value: Any?) {

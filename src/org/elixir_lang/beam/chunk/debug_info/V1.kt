@@ -5,7 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
 import org.elixir_lang.beam.chunk.DebugInfo
 import org.elixir_lang.beam.chunk.debug_info.v1.elixirErl
-import org.elixir_lang.beam.chunk.inspect
+import org.elixir_lang.beam.term.inspect
 
 fun v1(term: Term): DebugInfo {
     val tuple = term.tuple!!

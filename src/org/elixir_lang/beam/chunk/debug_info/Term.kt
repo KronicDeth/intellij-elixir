@@ -7,7 +7,7 @@ import com.intellij.openapi.diagnostic.Logger
 import org.elixir_lang.beam.binaryToTerm
 import org.elixir_lang.beam.chunk.Chunk
 import org.elixir_lang.beam.chunk.DebugInfo
-import org.elixir_lang.beam.chunk.inspect
+import org.elixir_lang.beam.term.inspect
 
 val logger = Logger.getInstance(Term::class.java)
 
