@@ -10,7 +10,7 @@ import javax.swing.table.TableModel
 
 const val DEFAULT_MIN_COLUMN_WIDTH = 15
 
-class Table(model: TableModel): JBTable(model) {
+open class Table(model: TableModel): JBTable(model) {
     init {
         autoResizeMode = JTable.AUTO_RESIZE_OFF
         setDefaultRenderer(OtpErlangObject::class.java, OtpErlangObjectTableCellRenderer())

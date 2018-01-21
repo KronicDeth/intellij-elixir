@@ -16,7 +16,11 @@ import static com.intellij.openapi.util.Pair.pair;
  */
 public class Chunk {
     private static final int ALIGNMENT = 4;
+    private static final int BYTE_BIT_COUNT = 8;
     private static final Logger LOGGER = Logger.getInstance(Chunk.class);
+    private static final int UNSIGNED_INT_BYTE_COUNT = 4;
+    private static final int UNSIGNED_SHORT_BYTE_COUNT = 2;
+
     @NotNull
     public final String typeID;
     @NotNull
@@ -92,16 +96,30 @@ public class Chunk {
     @NotNull
     @Contract(pure = true)
     public static Pair<Long, Integer> unsignedInt(@NotNull byte[] bytes, int offset) {
-        assert bytes.length >= offset + 4;
+
+        assert bytes.length >= offset + UNSIGNED_INT_BYTE_COUNT;
 
         long unsignedInt = 0;
 
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < UNSIGNED_INT_BYTE_COUNT; i++) {
             int unsignedByte = unsignedByte(bytes[offset + i]).first;
-            unsignedInt += unsignedByte << 8 * (4 - 1 - i);
+            unsignedInt += unsignedByte << BYTE_BIT_COUNT * (UNSIGNED_INT_BYTE_COUNT - 1 - i);
         }
 
-        return pair(unsignedInt, 4);
+        return pair(unsignedInt, UNSIGNED_INT_BYTE_COUNT);
+    }
+
+    public static Pair<Integer, Integer> unsignedShort(@NotNull byte[] bytes, int offset) {
+        assert bytes.length >= offset + UNSIGNED_SHORT_BYTE_COUNT;
+
+        int unsignedShort = 0;
+
+        for (int i = 0; i < UNSIGNED_SHORT_BYTE_COUNT; i++) {
+            int unsignedByte = unsignedByte(bytes[offset + i]).first;
+            unsignedShort += unsignedByte << BYTE_BIT_COUNT * (UNSIGNED_SHORT_BYTE_COUNT - 1 - i);
+        }
+
+        return pair(unsignedShort, UNSIGNED_SHORT_BYTE_COUNT);
     }
 
     public enum TypeID {
@@ -115,6 +133,7 @@ public class Chunk {
         EXPT("ExpT"),
         FUNT("FunT"),
         IMPT("ImpT"),
+        LINE("Line"),
         LITT("LitT"),
         LOCT("LocT"),
         STRT("StrT");

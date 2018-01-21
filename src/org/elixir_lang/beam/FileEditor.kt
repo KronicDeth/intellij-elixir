@@ -12,6 +12,7 @@ import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.JBTabbedPane
 import org.elixir_lang.beam.chunk.Chunk
 import org.elixir_lang.beam.chunk.Table
+import org.elixir_lang.beam.chunk.lines.TabbedPane
 import java.beans.PropertyChangeListener
 import javax.swing.JComponent
 import javax.swing.JPanel
@@ -92,10 +93,12 @@ class FileEditor(
                 Table(org.elixir_lang.beam.chunk.functions.Model(cache.functions))
             Chunk.TypeID.IMPT.toString() ->
                 Table(org.elixir_lang.beam.chunk.imports.Model(cache.imports))
-            Chunk.TypeID.LOCT.toString() ->
-                Table(org.elixir_lang.beam.chunk.call_definitions.Model(cache.locals))
+            Chunk.TypeID.LINE.toString() ->
+                TabbedPane(cache.lines!!)
             Chunk.TypeID.LITT.toString() ->
                 Table(org.elixir_lang.beam.chunk.literals.Model(cache.literals))
+            Chunk.TypeID.LOCT.toString() ->
+                Table(org.elixir_lang.beam.chunk.call_definitions.Model(cache.locals))
             Chunk.TypeID.STRT.toString() ->
                 Table(org.elixir_lang.beam.chunk.strings.Model(cache.strings))
             else ->

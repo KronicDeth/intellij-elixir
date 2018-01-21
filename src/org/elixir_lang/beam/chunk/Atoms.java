@@ -19,10 +19,13 @@ public class Atoms {
      */
 
     @NotNull
+    public final Charset charset;
+    @NotNull
     private final List<Atom> atomList;
 
-    private Atoms(@NotNull List<Atom> atomList) {
+    private Atoms(@NotNull List<Atom> atomList, @NotNull Charset charset) {
         this.atomList = Collections.unmodifiableList(atomList);
+        this.charset = charset;
     }
 
     /*
@@ -51,7 +54,7 @@ public class Atoms {
                 atomList.add(new Atom((int) i, atomLength, string));
             }
 
-            atoms = new Atoms(atomList);
+            atoms = new Atoms(atomList, charset);
         }
 
         return atoms;
