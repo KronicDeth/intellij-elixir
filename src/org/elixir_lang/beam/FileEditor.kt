@@ -70,15 +70,15 @@ class FileEditor(
 
     private fun addTab(tabbedPane: JBTabbedPane, cache: Cache, chunk: Chunk) {
         val typeID = chunk.typeID
-        val scrollable: JComponent = when (typeID) {
+        val component: JComponent = when (typeID) {
             Chunk.TypeID.ATOM.toString(), Chunk.TypeID.ATU8.toString() ->
-                Table(org.elixir_lang.beam.chunk.atoms.Model(cache.atoms))
+                JBScrollPane(Table(org.elixir_lang.beam.chunk.atoms.Model(cache.atoms)))
             Chunk.TypeID.ATTR.toString() ->
-                Table(org.elixir_lang.beam.chunk.keyword.Model(cache.attributes))
+                JBScrollPane(Table(org.elixir_lang.beam.chunk.keyword.Model(cache.attributes)))
             Chunk.TypeID.CINF.toString() ->
-                Table(org.elixir_lang.beam.chunk.keyword.Model(cache.compileInfo))
+                JBScrollPane(Table(org.elixir_lang.beam.chunk.keyword.Model(cache.compileInfo)))
             Chunk.TypeID.CODE.toString() ->
-                Table(org.elixir_lang.beam.chunk.code.Model(cache.code))
+                org.elixir_lang.beam.chunk.code.component(cache.code, project)
             Chunk.TypeID.DBGI.toString() ->
                 org.elixir_lang.beam.chunk.debug_info.term.component(cache.debugInfo, project)
             Chunk.TypeID.EXDC.toString() ->
@@ -88,23 +88,23 @@ class FileEditor(
                         cache.atoms?.moduleName()
                 )
             Chunk.TypeID.EXPT.toString() ->
-                Table(org.elixir_lang.beam.chunk.call_definitions.Model(cache.exports))
+                JBScrollPane(Table(org.elixir_lang.beam.chunk.call_definitions.Model(cache.exports)))
             Chunk.TypeID.FUNT.toString() ->
-                Table(org.elixir_lang.beam.chunk.functions.Model(cache.functions))
+                JBScrollPane(Table(org.elixir_lang.beam.chunk.functions.Model(cache.functions)))
             Chunk.TypeID.IMPT.toString() ->
-                Table(org.elixir_lang.beam.chunk.imports.Model(cache.imports))
+                JBScrollPane(Table(org.elixir_lang.beam.chunk.imports.Model(cache.imports)))
             Chunk.TypeID.LINE.toString() ->
                 TabbedPane(cache.lines!!)
             Chunk.TypeID.LITT.toString() ->
-                Table(org.elixir_lang.beam.chunk.literals.Model(cache.literals))
+                JBScrollPane(Table(org.elixir_lang.beam.chunk.literals.Model(cache.literals)))
             Chunk.TypeID.LOCT.toString() ->
-                Table(org.elixir_lang.beam.chunk.call_definitions.Model(cache.locals))
+                JBScrollPane(Table(org.elixir_lang.beam.chunk.call_definitions.Model(cache.locals)))
             Chunk.TypeID.STRT.toString() ->
-                Table(org.elixir_lang.beam.chunk.strings.Model(cache.strings))
+                JBScrollPane(Table(org.elixir_lang.beam.chunk.strings.Model(cache.strings)))
             else ->
-                JPanel()
+                JBScrollPane(JPanel())
         }
 
-        tabbedPane.addTab(typeID, JBScrollPane(scrollable))
+        tabbedPane.addTab(typeID, component)
     }
 }

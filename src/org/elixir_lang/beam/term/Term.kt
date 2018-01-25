@@ -139,7 +139,7 @@ fun value(fullTag: UnsignedByte, data: ByteArray, offset: Int): Pair<Any, ByteCo
                 val (lowByte, lowByteCount) = unsignedByte(data[internalOffset])
                 internalOffset += lowByteCount
 
-                bits7to5.and(lowByte)
+                bits7to5.shl(8).or(lowByte)
             }
             bits7to5 == 0b111 -> {
                 val (byteCount, byteCountByteCount) = unsignedByte(data[internalOffset])

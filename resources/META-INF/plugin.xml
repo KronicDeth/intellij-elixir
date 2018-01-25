@@ -105,6 +105,10 @@
     <stubElementTypeHolder class="org.elixir_lang.beam.psi.stubs.ModuleStubElementTypes"/>
     <syntaxHighlighter key="BEAM" factoryClass="org.elixir_lang.ElixirSyntaxHighlighterFactory"/>
 
+    <!-- `.beam.asm` -->
+    <fileTypeFactory implementation="org.elixir_lang.beam.assembly.file.type.Factory"/>
+    <lang.parserDefinition language="BEAM.ASSEMBLY" implementationClass="org.elixir_lang.beam.assembly.ParserDefinition"/>
+
     <completion.contributor implementationClass="org.elixir_lang.code_insight.completion.contributor.CallDefinitionClause" language="Elixir"/>
 
     <codeInsight.lineMarkerProvider implementationClass="org.elixir_lang.code_insight.line_marker_provider.CallDefinition" language="Elixir"/>

@@ -8,7 +8,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.FileViewProvider;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.TokenSet;
 import org.elixir_lang.parser.ElixirParser;
@@ -28,17 +27,11 @@ public class ElixirParserDefinition implements ParserDefinition {
             ElixirTypes.STRING_FRAGMENT,
             ElixirTypes.WORDS_FRAGMENT
     );
-    public static final TokenSet WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE);
 
     @NotNull
     @Override
     public Lexer createLexer(Project project) {
         return new ElixirLexer();
-    }
-
-    @NotNull
-    public TokenSet getWhitespaceTokens() {
-        return WHITE_SPACES;
     }
 
     @NotNull

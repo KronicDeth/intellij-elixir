@@ -44,7 +44,7 @@ public class Atoms {
 
             List<Atom> atomList = new ArrayList<>();
 
-            for (long i = 0; i < atomCount; i++) {
+            for (long i = 1; i <= atomCount; i++) {
                 Pair<Integer, Integer> atomLengthByteCount = unsignedByte(chunk.data[offset]);
                 int atomLength = atomLengthByteCount.first;
                 offset += atomLengthByteCount.second;

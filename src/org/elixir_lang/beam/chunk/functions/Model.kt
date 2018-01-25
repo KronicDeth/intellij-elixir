@@ -6,8 +6,8 @@ import javax.swing.table.AbstractTableModel
 class Model(val functions: Functions?): AbstractTableModel() {
     override fun getColumnClass(columnIndex: Int): Class<*> =
             when (columnIndex) {
-                0, 2, 3, 4, 5, 6 -> Long::class.java
-                1 -> String::class.java
+                0, 1, 3, 4, 5, 6 -> Long::class.java
+                2 -> String::class.java
                 else -> throw IllegalArgumentException("Column $columnIndex out of bounds")
             }
 
@@ -15,11 +15,11 @@ class Model(val functions: Functions?): AbstractTableModel() {
 
     override fun getColumnName(column: Int): String =
             when (column) {
-                0 -> "Atom"
-                1 -> "Name"
-                2 -> "Arity"
-                3 -> "Code Offset"
-                4 -> "Index"
+                0 -> "Index"
+                1 -> "Atom"
+                2 -> "Name"
+                3 -> "Arity"
+                4 -> "Code Offset"
                 5 -> "Free Variable Count"
                 6 -> "O Unique"
                 else -> throw IllegalArgumentException("Column $column out of bounds")
@@ -35,11 +35,11 @@ class Model(val functions: Functions?): AbstractTableModel() {
         val function = functions!![rowIndex]
 
         return when (columnIndex) {
-            0 -> function.atomIndex
-            1 -> function.name
-            2 -> function.arity
-            3 -> function.codeOffset
-            4 -> function.index
+            0 -> function.index
+            1 -> function.atomIndex
+            2 -> function.name
+            3 -> function.arity
+            4 -> function.codeOffset
             5 -> function.freeVariableCount
             6 -> function.oUnique
             else -> throw IllegalArgumentException("Column $columnIndex out of bounds")

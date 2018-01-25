@@ -2,6 +2,7 @@ package org.elixir_lang.beam.chunk.debug_info.term
 
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.intellij.openapi.project.Project
+import com.intellij.ui.components.JBScrollPane
 import org.elixir_lang.beam.chunk.DebugInfo
 import org.elixir_lang.beam.chunk.Table
 import org.elixir_lang.beam.chunk.debug_info.Term
@@ -16,9 +17,9 @@ fun component(debugInfo: DebugInfo?, project: Project): JComponent =
         is org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.V1 ->
             Component(debugInfo, project)
         is ElixirErl ->
-            Table(org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.Model(debugInfo))
+            JBScrollPane(Table(org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.Model(debugInfo)))
         is org.elixir_lang.beam.chunk.debug_info.V1 ->
-            Table(org.elixir_lang.beam.chunk.debug_info.v1.Model(debugInfo))
+            JBScrollPane(Table(org.elixir_lang.beam.chunk.debug_info.v1.Model(debugInfo)))
         is Term -> Table(Model(debugInfo))
         else -> JPanel()
     }

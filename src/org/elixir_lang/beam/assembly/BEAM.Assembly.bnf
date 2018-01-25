@@ -1,0 +1,30 @@
+{
+  parserClass="org.elixir_lang.beam.assembly.Parser"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiImplClassSuffix="Impl"
+  psiPackage="org.elixir_lang.beam.assembly.psi"
+  psiImplPackage="org.elixir_lang.beam.assembly.psi.impl"
+
+  elementTypeHolderClass="org.elixir_lang.beam.assembly.psi.Types"
+  elementTypeClass="org.elixir_lang.beam.assembly.psi.ElementType"
+  tokenTypeClass="org.elixir_lang.beam.assembly.psi.TokenType"
+}
+
+beamAssemblyFile ::= operation*
+
+operation ::= NAME OPENING_PARENTHESIS operands? CLOSING_PARENTHESIS
+              { pin = 2 }
+operands ::= keywordList | termList
+
+term ::= INTEGER | typedTerm
+
+private typedTerm ::= NAME OPENING_PARENTHESIS values? CLOSING_PARENTHESIS
+                      { pin = 2 }
+
+values ::= keywordList | termList
+
+private keywordList ::= keyword (COMMA keyword)*
+private keyword ::= NAME COLON term
+private termList ::= term (COMMA term)*

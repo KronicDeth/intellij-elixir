@@ -7,6 +7,28 @@ import org.elixir_lang.beam.chunk.Chunk.unsignedInt
 import org.elixir_lang.beam.chunk.code.Operation
 
 class Code(private val operationList: List<Operation>) {
+    fun assembly(): String =
+        operationList.joinToString("\n") { operation ->
+            val operationAssembly = operation.assembly()
+            val function = operation.code.function
+
+            val indent = when (function) {
+                "label" -> ""
+                "line" -> "  "
+                "func_info" -> "    "
+                else -> "      "
+            }
+            val suffix = when (function) {
+                "badmatch", "call_ext_last", "call_ext_only", "call_last", "return" -> "\n"
+                else -> ""
+            }
+
+            "$indent$operationAssembly$suffix"
+        }
+
+    operator fun get(index: Int): Operation = operationList[index]
+    fun size(): Int = operationList.size
+
     companion object {
         private val LOGGER = Logger.getInstance(Code::class.java)
 
@@ -57,7 +79,4 @@ class Code(private val operationList: List<Operation>) {
             return Code(operationList)
         }
     }
-
-    operator fun get(index: Int): Operation = operationList[index]
-    fun size(): Int = operationList.size
 }
