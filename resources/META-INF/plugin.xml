@@ -107,7 +107,8 @@
 
     <!-- `.beam.asm` -->
     <fileTypeFactory implementation="org.elixir_lang.beam.assembly.file.type.Factory"/>
-    <lang.parserDefinition language="BEAM.ASSEMBLY" implementationClass="org.elixir_lang.beam.assembly.ParserDefinition"/>
+    <lang.parserDefinition implementationClass="org.elixir_lang.beam.assembly.ParserDefinition" language="BEAM.ASSEMBLY"/>
+    <lang.syntaxHighlighterFactory implementationClass="org.elixir_lang.beam.assembly.syntax_highlighter.Factory" language="BEAM.ASSEMBLY"/>
 
     <completion.contributor implementationClass="org.elixir_lang.code_insight.completion.contributor.CallDefinitionClause" language="Elixir"/>
 
