@@ -29,6 +29,20 @@ data class Operation(val code: Code, val termList: List<Term>) {
                     null
                 }
             }
+            "call_ext", "call_ext_only" -> {
+                if (options.inline.imports) {
+                    val index = 1
+                    val valueAssembly = code.arguments[index].assembly(
+                            termList[index],
+                            cache,
+                            options.copy(showArgumentNames = false)
+                    )
+
+                    "$function($valueAssembly)"
+                } else {
+                    null
+                }
+            }
             "deallocate" -> {
                 val (wordsOfStack) = termList
 
