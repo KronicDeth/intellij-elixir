@@ -23,11 +23,17 @@ public class Parser implements PsiParser, LightPsiParser {
     boolean r;
     b = adapt_builder_(t, b, this, null);
     Marker m = enter_section_(b, 0, _COLLAPSE_, null);
-    if (t == OPERANDS) {
+    if (t == FUNCTION_REFERENCE) {
+      r = functionReference(b, 0);
+    }
+    else if (t == OPERANDS) {
       r = operands(b, 0);
     }
     else if (t == OPERATION) {
       r = operation(b, 0);
+    }
+    else if (t == QUALIFIER) {
+      r = qualifier(b, 0);
     }
     else if (t == TERM) {
       r = term(b, 0);
@@ -56,6 +62,20 @@ public class Parser implements PsiParser, LightPsiParser {
       c = current_position_(b);
     }
     return true;
+  }
+
+  /* ********************************************************** */
+  // REFERENCE_OPERATOR qualifier DOT_OPERATOR NAME NAME_ARITY_SEPARATOR INTEGER
+  public static boolean functionReference(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "functionReference")) return false;
+    if (!nextTokenIs(b, REFERENCE_OPERATOR)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, REFERENCE_OPERATOR);
+    r = r && qualifier(b, l + 1);
+    r = r && consumeTokens(b, 0, DOT_OPERATOR, NAME, NAME_ARITY_SEPARATOR, INTEGER);
+    exit_section_(b, m, FUNCTION_REFERENCE, r);
+    return r;
   }
 
   /* ********************************************************** */
@@ -142,7 +162,20 @@ public class Parser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // ATOM | INTEGER | QUALIFIED_ALIAS | typedTerm
+  // ATOM | QUALIFIED_ALIAS
+  public static boolean qualifier(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "qualifier")) return false;
+    if (!nextTokenIs(b, "<qualifier>", ATOM, QUALIFIED_ALIAS)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, QUALIFIER, "<qualifier>");
+    r = consumeToken(b, ATOM);
+    if (!r) r = consumeToken(b, QUALIFIED_ALIAS);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // ATOM | INTEGER | QUALIFIED_ALIAS | functionReference | typedTerm
   public static boolean term(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "term")) return false;
     boolean r;
@@ -150,6 +183,7 @@ public class Parser implements PsiParser, LightPsiParser {
     r = consumeToken(b, ATOM);
     if (!r) r = consumeToken(b, INTEGER);
     if (!r) r = consumeToken(b, QUALIFIED_ALIAS);
+    if (!r) r = functionReference(b, l + 1);
     if (!r) r = typedTerm(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;

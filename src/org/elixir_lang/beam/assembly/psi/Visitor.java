@@ -7,11 +7,19 @@ import com.intellij.psi.PsiElement;
 
 public class Visitor extends PsiElementVisitor {
 
+  public void visitFunctionReference(@NotNull FunctionReference o) {
+    visitPsiElement(o);
+  }
+
   public void visitOperands(@NotNull Operands o) {
     visitPsiElement(o);
   }
 
   public void visitOperation(@NotNull Operation o) {
+    visitPsiElement(o);
+  }
+
+  public void visitQualifier(@NotNull Qualifier o) {
     visitPsiElement(o);
   }
 

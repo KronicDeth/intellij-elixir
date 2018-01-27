@@ -5,12 +5,6 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface Term extends PsiElement {
-
-  @Nullable
-  FunctionReference getFunctionReference();
-
-  @Nullable
-  Values getValues();
+public interface Qualifier extends PsiElement {
 
 }

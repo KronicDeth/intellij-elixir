@@ -52,8 +52,9 @@ class FlexLexer implements com.intellij.lexer.FlexLexer {
 
   /* The ZZ_CMAP_A table has 320 entries */
   static final char ZZ_CMAP_A[] = zzUnpackCMap(
-    "\12\0\4\1\22\0\1\1\1\2\1\7\5\0\1\15\1\11\2\0\1\13\1\0\1\5\1\0\1\14\11\3\1"+
-    "\12\4\0\1\2\1\0\32\6\1\0\1\10\2\0\1\4\1\0\32\4\12\0\1\1\242\0\2\1\26\0");
+    "\12\0\4\1\22\0\1\1\1\2\1\7\3\0\1\17\1\0\1\16\1\11\2\0\1\13\1\0\1\5\1\15\1"+
+    "\14\11\3\1\12\4\0\1\2\1\0\32\6\1\0\1\10\2\0\1\4\1\0\32\4\12\0\1\1\242\0\2"+
+    "\1\26\0");
 
   /** 
    * Translates DFA states to action switch labels.
@@ -61,12 +62,12 @@ class FlexLexer implements com.intellij.lexer.FlexLexer {
   private static final int [] ZZ_ACTION = zzUnpackAction();
 
   private static final String ZZ_ACTION_PACKED_0 =
-    "\1\0\1\1\1\2\1\3\1\4\1\1\1\5\1\6"+
-    "\1\7\1\10\1\3\1\11\1\4\2\0\1\12\2\0"+
-    "\1\12\3\0\1\12";
+    "\1\0\1\1\1\2\1\3\1\4\1\5\1\6\1\7"+
+    "\1\10\1\11\1\3\1\12\1\13\1\14\1\4\2\0"+
+    "\1\15\2\0\1\15\3\0\1\15";
 
   private static int [] zzUnpackAction() {
-    int [] result = new int[23];
+    int [] result = new int[25];
     int offset = 0;
     offset = zzUnpackAction(ZZ_ACTION_PACKED_0, offset, result);
     return result;
@@ -91,12 +92,13 @@ class FlexLexer implements com.intellij.lexer.FlexLexer {
   private static final int [] ZZ_ROWMAP = zzUnpackRowMap();
 
   private static final String ZZ_ROWMAP_PACKED_0 =
-    "\0\0\0\16\0\34\0\52\0\70\0\106\0\124\0\16"+
-    "\0\142\0\16\0\16\0\16\0\16\0\160\0\176\0\214"+
-    "\0\232\0\250\0\16\0\266\0\304\0\322\0\304";
+    "\0\0\0\20\0\40\0\60\0\100\0\120\0\140\0\20"+
+    "\0\160\0\20\0\20\0\20\0\20\0\20\0\20\0\200"+
+    "\0\220\0\240\0\260\0\300\0\20\0\320\0\340\0\360"+
+    "\0\340";
 
   private static int [] zzUnpackRowMap() {
-    int [] result = new int[23];
+    int [] result = new int[25];
     int offset = 0;
     offset = zzUnpackRowMap(ZZ_ROWMAP_PACKED_0, offset, result);
     return result;
@@ -120,17 +122,17 @@ class FlexLexer implements com.intellij.lexer.FlexLexer {
 
   private static final String ZZ_TRANS_PACKED_0 =
     "\1\2\1\3\1\2\1\4\1\5\1\6\1\7\2\2"+
-    "\1\10\1\11\1\12\1\13\1\14\17\0\1\3\17\0"+
-    "\1\4\10\0\1\4\3\0\1\15\2\5\1\0\1\5"+
-    "\5\0\1\5\6\0\1\16\13\0\2\7\1\17\1\7"+
-    "\5\0\1\7\5\0\1\20\1\21\1\0\1\22\13\0"+
-    "\1\15\16\0\1\7\11\0\1\23\2\20\1\0\1\20"+
-    "\5\0\1\20\6\0\1\24\10\0\7\25\1\0\1\26"+
-    "\5\25\5\0\1\23\10\0\7\25\1\23\1\26\14\25"+
-    "\1\27\1\26\5\25";
+    "\1\10\1\11\1\12\1\13\1\14\1\15\1\16\21\0"+
+    "\1\3\21\0\1\4\10\0\1\4\5\0\1\17\2\5"+
+    "\1\0\1\5\5\0\1\5\10\0\1\20\15\0\2\7"+
+    "\1\21\1\7\5\0\1\7\7\0\1\22\1\23\1\0"+
+    "\1\24\15\0\1\17\20\0\1\7\13\0\1\25\2\22"+
+    "\1\0\1\22\5\0\1\22\10\0\1\26\12\0\7\27"+
+    "\1\0\1\30\7\27\5\0\1\25\12\0\7\27\1\25"+
+    "\1\30\16\27\1\31\1\30\7\27";
 
   private static int [] zzUnpackTrans() {
-    int [] result = new int[224];
+    int [] result = new int[256];
     int offset = 0;
     offset = zzUnpackTrans(ZZ_TRANS_PACKED_0, offset, result);
     return result;
@@ -168,11 +170,11 @@ class FlexLexer implements com.intellij.lexer.FlexLexer {
   private static final int [] ZZ_ATTRIBUTE = zzUnpackAttribute();
 
   private static final String ZZ_ATTRIBUTE_PACKED_0 =
-    "\1\0\1\11\5\1\1\11\1\1\4\11\2\0\1\1"+
+    "\1\0\1\11\5\1\1\11\1\1\6\11\2\0\1\1"+
     "\2\0\1\11\3\0\1\1";
 
   private static int [] zzUnpackAttribute() {
-    int [] result = new int[23];
+    int [] result = new int[25];
     int offset = 0;
     offset = zzUnpackAttribute(ZZ_ATTRIBUTE_PACKED_0, offset, result);
     return result;
@@ -489,52 +491,67 @@ class FlexLexer implements com.intellij.lexer.FlexLexer {
             { return TokenType.BAD_CHARACTER;
             } 
             // fall through
-          case 11: break;
+          case 14: break;
           case 2: 
             { return TokenType.WHITE_SPACE;
             } 
             // fall through
-          case 12: break;
+          case 15: break;
           case 3: 
             { return Types.INTEGER;
             } 
             // fall through
-          case 13: break;
+          case 16: break;
           case 4: 
             { return Types.NAME;
             } 
             // fall through
-          case 14: break;
-          case 5: 
-            { return Types.QUALIFIED_ALIAS;
-            } 
-            // fall through
-          case 15: break;
-          case 6: 
-            { return Types.CLOSING_PARENTHESIS;
-            } 
-            // fall through
-          case 16: break;
-          case 7: 
-            { return Types.COLON;
-            } 
-            // fall through
           case 17: break;
-          case 8: 
-            { return Types.COMMA;
+          case 5: 
+            { return Types.DOT_OPERATOR;
             } 
             // fall through
           case 18: break;
-          case 9: 
-            { return Types.OPENING_PARENTHESIS;
+          case 6: 
+            { return Types.QUALIFIED_ALIAS;
             } 
             // fall through
           case 19: break;
-          case 10: 
-            { return Types.ATOM;
+          case 7: 
+            { return Types.CLOSING_PARENTHESIS;
             } 
             // fall through
           case 20: break;
+          case 8: 
+            { return Types.COLON;
+            } 
+            // fall through
+          case 21: break;
+          case 9: 
+            { return Types.COMMA;
+            } 
+            // fall through
+          case 22: break;
+          case 10: 
+            { return Types.NAME_ARITY_SEPARATOR;
+            } 
+            // fall through
+          case 23: break;
+          case 11: 
+            { return Types.OPENING_PARENTHESIS;
+            } 
+            // fall through
+          case 24: break;
+          case 12: 
+            { return Types.REFERENCE_OPERATOR;
+            } 
+            // fall through
+          case 25: break;
+          case 13: 
+            { return Types.ATOM;
+            } 
+            // fall through
+          case 26: break;
           default:
             zzScanError(ZZ_NO_MATCH);
           }

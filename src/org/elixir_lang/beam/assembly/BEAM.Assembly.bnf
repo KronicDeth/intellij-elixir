@@ -18,7 +18,10 @@ operation ::= NAME OPENING_PARENTHESIS operands? CLOSING_PARENTHESIS
               { pin = 2 }
 operands ::= keywordList | termList
 
-term ::= ATOM | INTEGER | QUALIFIED_ALIAS | typedTerm
+term ::= ATOM | INTEGER | QUALIFIED_ALIAS | functionReference | typedTerm
+
+functionReference ::= REFERENCE_OPERATOR qualifier DOT_OPERATOR NAME NAME_ARITY_SEPARATOR INTEGER
+qualifier ::= ATOM | QUALIFIED_ALIAS
 
 private typedTerm ::= NAME OPENING_PARENTHESIS values? CLOSING_PARENTHESIS
                       { pin = 2 }

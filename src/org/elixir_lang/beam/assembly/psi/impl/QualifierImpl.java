@@ -11,31 +11,19 @@ import static org.elixir_lang.beam.assembly.psi.Types.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.beam.assembly.psi.*;
 
-public class TermImpl extends ASTWrapperPsiElement implements Term {
+public class QualifierImpl extends ASTWrapperPsiElement implements Qualifier {
 
-  public TermImpl(ASTNode node) {
+  public QualifierImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull Visitor visitor) {
-    visitor.visitTerm(this);
+    visitor.visitQualifier(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof Visitor) accept((Visitor)visitor);
     else super.accept(visitor);
-  }
-
-  @Override
-  @Nullable
-  public FunctionReference getFunctionReference() {
-    return findChildByClass(FunctionReference.class);
-  }
-
-  @Override
-  @Nullable
-  public Values getValues() {
-    return findChildByClass(Values.class);
   }
 
 }

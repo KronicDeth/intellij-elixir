@@ -11,14 +11,14 @@ import static org.elixir_lang.beam.assembly.psi.Types.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.beam.assembly.psi.*;
 
-public class TermImpl extends ASTWrapperPsiElement implements Term {
+public class FunctionReferenceImpl extends ASTWrapperPsiElement implements FunctionReference {
 
-  public TermImpl(ASTNode node) {
+  public FunctionReferenceImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull Visitor visitor) {
-    visitor.visitTerm(this);
+    visitor.visitFunctionReference(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -27,15 +27,9 @@ public class TermImpl extends ASTWrapperPsiElement implements Term {
   }
 
   @Override
-  @Nullable
-  public FunctionReference getFunctionReference() {
-    return findChildByClass(FunctionReference.class);
-  }
-
-  @Override
-  @Nullable
-  public Values getValues() {
-    return findChildByClass(Values.class);
+  @NotNull
+  public Qualifier getQualifier() {
+    return findNotNullChildByClass(Qualifier.class);
   }
 
 }
