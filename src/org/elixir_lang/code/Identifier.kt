@@ -60,29 +60,29 @@ object Identifier {
             else -> null
         }
 
-    fun classify(atom: OtpErlangAtom): Classification {
-        val atomValue = atom.atomValue()
+    fun classify(atom: OtpErlangAtom): Classification = classify(atom.atomValue())
 
-        return when {
-            atomValue in notCallableAtomValues ->
-                Classification.NOT_CALLABLE
-            (unaryOperator(atomValue) ?: binaryOperator(atomValue)) != null ->
+    fun classify(atomValue: String): Classification =
+            when {
+                atomValue in notCallableAtomValues ->
+                    Classification.NOT_CALLABLE
+                (unaryOperator(atomValue) ?: binaryOperator(atomValue)) != null ->
                     Classification.CALLABLE_OPERATOR
-            isValidAlias(atomValue) ->
+                isValidAlias(atomValue) ->
                     Classification.ALIAS
-            isIdentifier(atomValue) ->
-                Classification.CALLABLE_LOCAL
-            "@" !in atomValue ->
-                Classification.NOT_CALLABLE
-            else ->
-                Classification.OTHER
-        }
-    }
+                isIdentifier(atomValue) ->
+                    Classification.CALLABLE_LOCAL
+                "@" !in atomValue ->
+                    Classification.NOT_CALLABLE
+                else ->
+                    Classification.OTHER
+            }
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/code/identifier.ex#L168-L188
-    fun inspectAsFunction(atom: OtpErlangAtom): String {
-        val string = atom.atomValue()
-        val classification = classify(atom)
+    fun inspectAsFunction(atom: OtpErlangAtom): String = inspectAsFunction(atom.atomValue())
+
+    fun inspectAsFunction(string: String): String {
+        val classification = classify(string)
 
         return if (classification in arrayOf(Classification.CALLABLE_LOCAL, Classification.CALLABLE_OPERATOR)) {
             string

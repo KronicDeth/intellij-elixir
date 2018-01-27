@@ -7,6 +7,7 @@ import org.elixir_lang.beam.chunk.Code.Options.Inline
 import org.elixir_lang.beam.term.*
 import org.elixir_lang.beam.term.Float
 import org.elixir_lang.beam.term.List
+import org.elixir_lang.code.Identifier.inspectAsFunction
 import org.elixir_lang.utils.ElixirModulesUtil
 
 data class Argument(val name: String, val supportedOptions: Code.Options = Code.Options()) {
@@ -39,7 +40,7 @@ data class Argument(val name: String, val supportedOptions: Code.Options = Code.
                     supportedOptions.inline.atoms && configuredOptions.inline.atoms -> {
                         cache.atoms?.get(index)?.string?.let { string ->
                             ElixirModulesUtil.erlangModuleNameToElixir(string)
-                        } ?:  "invalid_atom_index($index)"
+                        } ?: "invalid_atom_index($index)"
                     }
                     else -> "atom($index)"
                 }
@@ -79,7 +80,7 @@ data class Argument(val name: String, val supportedOptions: Code.Options = Code.
                     supportedOptions.inline.functions && configuredOptions.inline.functions -> {
                         cache.functions?.get(index)?.let { function ->
                             function.name?.let { name ->
-                                ElixirModulesUtil.erlangModuleNameToElixir(name)
+                                ":${inspectAsFunction(name)}"
                             } ?: "invalid_function_atom_index(${function.atomIndex})"
                         } ?: "invalid_function_index($index)"
                     }
