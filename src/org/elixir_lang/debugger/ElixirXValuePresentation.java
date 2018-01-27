@@ -96,7 +96,7 @@ public class ElixirXValuePresentation extends XValuePresentation {
   }
 
   private static void renderAtom(OtpErlangAtom atom, XValueTextRenderer renderer) {
-    renderer.renderKeywordValue(ElixirModulesUtil.erlangModuleNameToElixir(atom.atomValue()));
+    renderer.renderKeywordValue(ElixirModulesUtil.INSTANCE.erlangModuleNameToElixir(atom.atomValue()));
   }
 
   private static void renderTuple(OtpErlangTuple tuple, XValueTextRenderer renderer) {
@@ -187,7 +187,7 @@ public class ElixirXValuePresentation extends XValuePresentation {
   private static String structType(OtpErlangMap map) {
     OtpErlangObject structValue = map.get(new OtpErlangAtom("__struct__"));
     if (structValue instanceof OtpErlangAtom) {
-      return ElixirModulesUtil.erlangModuleNameToElixir(((OtpErlangAtom) structValue).atomValue());
+      return ElixirModulesUtil.INSTANCE.erlangModuleNameToElixir(((OtpErlangAtom) structValue).atomValue());
     } else {
       return null;
     }
