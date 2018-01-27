@@ -20,8 +20,9 @@ operands ::= keywordList | termList
 
 term ::= ATOM | INTEGER | QUALIFIED_ALIAS | functionReference | typedTerm
 
-functionReference ::= REFERENCE_OPERATOR qualifier DOT_OPERATOR NAME NAME_ARITY_SEPARATOR INTEGER
+functionReference ::= REFERENCE_OPERATOR qualifier DOT_OPERATOR relative NAME_ARITY_SEPARATOR INTEGER
 qualifier ::= ATOM | QUALIFIED_ALIAS
+relative ::= NAME | SYMBOLIC_OPERATOR
 
 private typedTerm ::= NAME OPENING_PARENTHESIS values? CLOSING_PARENTHESIS
                       { pin = 2 }

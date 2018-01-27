@@ -39,6 +39,53 @@ DOT_OPERATOR="."
 INTEGER=0|[1-9][0-9]*
 NAME_ARITY_SEPARATOR="/"
 OPENING_PARENTHESIS="("
+
+THREE_SYMBOL_OPERATOR = "!==" |
+                        "&&&" |
+                        "<<<" |
+                        "<<~" |
+                        "<|>" |
+                        "<~>" |
+                        "===" |
+                        ">>>" |
+                        "^^^" |
+                        "|||" |
+                        "~>>" |
+                        "~~~"
+
+TWO_SYMBOL_OPERATOR = "!=" |
+                      "&&" |
+                      "++" |
+                      "--" |
+                      ".." |
+                      "::" |
+                      "<-" |
+                      "<=" |
+                      "<=" |
+                      "<>" |
+                      "<~" |
+                      "==" |
+                      "=~" |
+                      ">=" |
+                      "|>" |
+                      "||" |
+                      "~>"
+
+ONE_SYMBOL_OPERATOR = "!" |
+                      "*" |
+                      "+" |
+                      "-" |
+                      "-" |
+                      "<" |
+                      "=" |
+                      ">" |
+                      "@" |
+                      "^" |
+                      "|"
+
+SYMBOLIC_OPERATOR = {THREE_SYMBOL_OPERATOR} | {TWO_SYMBOL_OPERATOR} | {ONE_SYMBOL_OPERATOR}
+
+
 QUALIFIED_ALIAS={ALIAS}(\.{ALIAS})*
 REFERENCE_OPERATOR="&"
 
@@ -56,6 +103,7 @@ REFERENCE_OPERATOR="&"
   {NAME_ARITY_SEPARATOR} { return Types.NAME_ARITY_SEPARATOR; }
   {OPENING_PARENTHESIS}  { return Types.OPENING_PARENTHESIS; }
   {REFERENCE_OPERATOR}   { return Types.REFERENCE_OPERATOR; }
+  {SYMBOLIC_OPERATOR}    { return Types.SYMBOLIC_OPERATOR; }
   {WHITE_SPACE}          { return TokenType.WHITE_SPACE; }
 }
 

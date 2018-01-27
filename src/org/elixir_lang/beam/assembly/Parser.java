@@ -35,6 +35,9 @@ public class Parser implements PsiParser, LightPsiParser {
     else if (t == QUALIFIER) {
       r = qualifier(b, 0);
     }
+    else if (t == RELATIVE) {
+      r = relative(b, 0);
+    }
     else if (t == TERM) {
       r = term(b, 0);
     }
@@ -65,7 +68,7 @@ public class Parser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // REFERENCE_OPERATOR qualifier DOT_OPERATOR NAME NAME_ARITY_SEPARATOR INTEGER
+  // REFERENCE_OPERATOR qualifier DOT_OPERATOR relative NAME_ARITY_SEPARATOR INTEGER
   public static boolean functionReference(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "functionReference")) return false;
     if (!nextTokenIs(b, REFERENCE_OPERATOR)) return false;
@@ -73,7 +76,9 @@ public class Parser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b);
     r = consumeToken(b, REFERENCE_OPERATOR);
     r = r && qualifier(b, l + 1);
-    r = r && consumeTokens(b, 0, DOT_OPERATOR, NAME, NAME_ARITY_SEPARATOR, INTEGER);
+    r = r && consumeToken(b, DOT_OPERATOR);
+    r = r && relative(b, l + 1);
+    r = r && consumeTokens(b, 0, NAME_ARITY_SEPARATOR, INTEGER);
     exit_section_(b, m, FUNCTION_REFERENCE, r);
     return r;
   }
@@ -170,6 +175,19 @@ public class Parser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, l, _NONE_, QUALIFIER, "<qualifier>");
     r = consumeToken(b, ATOM);
     if (!r) r = consumeToken(b, QUALIFIED_ALIAS);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // NAME | SYMBOLIC_OPERATOR
+  public static boolean relative(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "relative")) return false;
+    if (!nextTokenIs(b, "<relative>", NAME, SYMBOLIC_OPERATOR)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, RELATIVE, "<relative>");
+    r = consumeToken(b, NAME);
+    if (!r) r = consumeToken(b, SYMBOLIC_OPERATOR);
     exit_section_(b, l, m, r, false, null);
     return r;
   }

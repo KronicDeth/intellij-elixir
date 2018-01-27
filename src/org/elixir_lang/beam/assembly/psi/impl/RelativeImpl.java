@@ -11,31 +11,19 @@ import static org.elixir_lang.beam.assembly.psi.Types.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.beam.assembly.psi.*;
 
-public class FunctionReferenceImpl extends ASTWrapperPsiElement implements FunctionReference {
+public class RelativeImpl extends ASTWrapperPsiElement implements Relative {
 
-  public FunctionReferenceImpl(ASTNode node) {
+  public RelativeImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull Visitor visitor) {
-    visitor.visitFunctionReference(this);
+    visitor.visitRelative(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof Visitor) accept((Visitor)visitor);
     else super.accept(visitor);
-  }
-
-  @Override
-  @NotNull
-  public Qualifier getQualifier() {
-    return findNotNullChildByClass(Qualifier.class);
-  }
-
-  @Override
-  @NotNull
-  public Relative getRelative() {
-    return findNotNullChildByClass(Relative.class);
   }
 
 }

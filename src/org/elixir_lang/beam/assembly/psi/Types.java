@@ -12,6 +12,7 @@ public interface Types {
   IElementType OPERANDS = new ElementType("OPERANDS");
   IElementType OPERATION = new ElementType("OPERATION");
   IElementType QUALIFIER = new ElementType("QUALIFIER");
+  IElementType RELATIVE = new ElementType("RELATIVE");
   IElementType TERM = new ElementType("TERM");
   IElementType VALUES = new ElementType("VALUES");
 
@@ -26,6 +27,7 @@ public interface Types {
   IElementType OPENING_PARENTHESIS = new TokenType("OPENING_PARENTHESIS");
   IElementType QUALIFIED_ALIAS = new TokenType("QUALIFIED_ALIAS");
   IElementType REFERENCE_OPERATOR = new TokenType("REFERENCE_OPERATOR");
+  IElementType SYMBOLIC_OPERATOR = new TokenType("SYMBOLIC_OPERATOR");
 
   class Factory {
     public static PsiElement createElement(ASTNode node) {
@@ -41,6 +43,9 @@ public interface Types {
       }
       else if (type == QUALIFIER) {
         return new QualifierImpl(node);
+      }
+      else if (type == RELATIVE) {
+        return new RelativeImpl(node);
       }
       else if (type == TERM) {
         return new TermImpl(node);

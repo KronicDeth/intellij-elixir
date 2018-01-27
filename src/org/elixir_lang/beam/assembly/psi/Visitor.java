@@ -23,6 +23,10 @@ public class Visitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitRelative(@NotNull Relative o) {
+    visitPsiElement(o);
+  }
+
   public void visitTerm(@NotNull Term o) {
     visitPsiElement(o);
   }

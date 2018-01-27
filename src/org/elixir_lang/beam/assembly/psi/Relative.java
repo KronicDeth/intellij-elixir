@@ -5,12 +5,6 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface FunctionReference extends PsiElement {
-
-  @NotNull
-  Qualifier getQualifier();
-
-  @NotNull
-  Relative getRelative();
+public interface Relative extends PsiElement {
 
 }
