@@ -228,7 +228,7 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             DefaultLanguageHighlighterColors.NUMBER
     );
 
-    private static final TextAttributesKey[] ALIAS_KEYS = new TextAttributesKey[]{ALIAS};
+    public static final TextAttributesKey[] ALIAS_KEYS = new TextAttributesKey[]{ALIAS};
     private static final TextAttributesKey[] ATOM_KEYS = new TextAttributesKey[]{ATOM};
     private static final TextAttributesKey[] ATOM_KEYWORD_KEYS = new TextAttributesKey[]{ATOM, KEYWORD};
     private static final TextAttributesKey[] BAD_CHAR_KEYS = new TextAttributesKey[]{BAD_CHARACTER};

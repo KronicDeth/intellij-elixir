@@ -16,6 +16,7 @@ class SyntaxHighlighter: SyntaxHighlighterBase() {
                 CLOSING_PARENTHESIS, OPENING_PARENTHESIS -> PARENTHESES_KEYS
                 INTEGER -> DECIMAL_KEYS
                 NAME -> KEYWORD_KEYS
+                QUALIFIED_ALIAS -> ALIAS_KEYS
                 else -> EMPTY_KEYS
             }
 }

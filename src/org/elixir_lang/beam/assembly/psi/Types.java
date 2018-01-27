@@ -19,6 +19,7 @@ public interface Types {
   IElementType INTEGER = new TokenType("INTEGER");
   IElementType NAME = new TokenType("NAME");
   IElementType OPENING_PARENTHESIS = new TokenType("OPENING_PARENTHESIS");
+  IElementType QUALIFIED_ALIAS = new TokenType("QUALIFIED_ALIAS");
 
   class Factory {
     public static PsiElement createElement(ASTNode node) {
