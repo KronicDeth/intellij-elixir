@@ -9,89 +9,89 @@ typealias UnsignedByte = Int
 typealias ByteCount = Int
 
 fun unsignedIntToInt(unsignedInt: Long): Int =
-    if (unsignedInt > Int.MAX_VALUE) {
-        throw IllegalArgumentException("Unsigned int ($unsignedInt) exceeds max int (${Int.MAX_VALUE})")
-    } else {
-        unsignedInt.toInt()
-    }
+        if (unsignedInt > Int.MAX_VALUE) {
+            throw IllegalArgumentException("Unsigned int ($unsignedInt) exceeds max int (${Int.MAX_VALUE})")
+        } else {
+            unsignedInt.toInt()
+        }
 
 /**
  * BEAM file uses a special encoding to store simple terms in BEAM file in a space-efficient way. It is different from
  * memory term layout, used by BEAM VM.
  */
 sealed class Term {
-   companion object {
-       fun from(data: ByteArray, offset: Int, literalFloat: Boolean): Pair<Term, ByteCount> {
-           var internalOffset = offset
+    companion object {
+        fun from(data: ByteArray, offset: Int, literalFloat: Boolean): Pair<Term, ByteCount> {
+            var internalOffset = offset
 
-           val (fullTag, fullTagByteCount) = unsignedByte(data[offset])
-           internalOffset += fullTagByteCount
+            val (fullTag, fullTagByteCount) = unsignedByte(data[offset])
+            internalOffset += fullTagByteCount
 
-           val tag = fullTag.and(0b111)
+            val tag = fullTag.and(0b111)
 
-           // http://beam-wisdoms.clau.se/en/latest/indepth-beam-file.html#beam-term-format
-           val (term, termByteCount) = when (tag) {
-               0b000 ->
-                   indexed(fullTag, data, internalOffset, ::Literal)
-               0b001 ->
-                   Integer.from(fullTag, data, internalOffset)
-               0b010 ->
-                   indexed(fullTag, data, internalOffset, ::Atom)
-               0b011 ->
-                   indexed(fullTag, data, internalOffset, ::XRegister)
-               0b100 ->
-                   indexed(fullTag, data, internalOffset, ::YRegister)
-               0b101 ->
-                   indexed(fullTag, data, internalOffset, ::Label)
-               0b110 ->
-                   Character.from(fullTag, data, internalOffset)
-               0b111 -> {
-                   val extendedTag = fullTag.ushr(3).and(0b1_1111)
+            // http://beam-wisdoms.clau.se/en/latest/indepth-beam-file.html#beam-term-format
+            val (term, termByteCount) = when (tag) {
+                0b000 ->
+                    indexed(fullTag, data, internalOffset, ::Literal)
+                0b001 ->
+                    Integer.from(fullTag, data, internalOffset)
+                0b010 ->
+                    indexed(fullTag, data, internalOffset, ::Atom)
+                0b011 ->
+                    indexed(fullTag, data, internalOffset, ::XRegister)
+                0b100 ->
+                    indexed(fullTag, data, internalOffset, ::YRegister)
+                0b101 ->
+                    indexed(fullTag, data, internalOffset, ::Label)
+                0b110 ->
+                    Character.from(fullTag, data, internalOffset)
+                0b111 -> {
+                    val extendedTag = fullTag.ushr(3).and(0b1_1111)
 
-                   /* In OTP 20 the Floats are encoded as literals, and every other extended code is shifted, i.e. List
-                      becomes 1 (0b10111), Float register becomes 2 (0b100111), alloc list becomes 3 (0b110111) and
-                      literal becomes 4 (0b1000111). */
-                   if (literalFloat) {
-                       when (extendedTag) {
-                           0b0010 ->
-                               List.from(data, internalOffset, literalFloat)
-                           0b0100 ->
-                               FloatingPointRegister.from(data, internalOffset, literalFloat)
-                           0b0110 ->
-                               AllocationList.from(data, internalOffset, literalFloat)
-                           0b1000 ->
-                               ExtendedLiteral.from(data, internalOffset, literalFloat)
-                           else ->
-                               throw IllegalArgumentException(
-                                       "Extended tag ($extendedTag) is not properly shifted and masked"
-                               )
-                       }
-                   } else {
-                       when (extendedTag) {
-                           0b0010 ->
-                               Float.from(data, internalOffset)
-                           0b0100 ->
-                               List.from(data, internalOffset, literalFloat)
-                           0b0110 ->
-                               FloatingPointRegister.from(data, internalOffset, literalFloat)
-                           0b1000 ->
-                               AllocationList.from(data, internalOffset, literalFloat)
-                           0b1010 ->
-                               ExtendedLiteral.from(data, internalOffset, literalFloat)
-                           else ->
-                               throw IllegalArgumentException(
-                                       "Extended tag ($extendedTag) is not properly shifted and masked"
-                               )
-                       }
-                   }
-               }
-               else -> throw IllegalArgumentException("tag ($tag) is not properly shifted and masked")
-           }
-           internalOffset += termByteCount
+                    /* In OTP 20 the Floats are encoded as literals, and every other extended code is shifted, i.e. List
+                       becomes 1 (0b10111), Float register becomes 2 (0b100111), alloc list becomes 3 (0b110111) and
+                       literal becomes 4 (0b1000111). */
+                    if (literalFloat) {
+                        when (extendedTag) {
+                            0b0010 ->
+                                List.from(data, internalOffset, literalFloat)
+                            0b0100 ->
+                                FloatingPointRegister.from(data, internalOffset, literalFloat)
+                            0b0110 ->
+                                AllocationList.from(data, internalOffset, literalFloat)
+                            0b1000 ->
+                                ExtendedLiteral.from(data, internalOffset, literalFloat)
+                            else ->
+                                throw IllegalArgumentException(
+                                        "Extended tag ($extendedTag) is not properly shifted and masked"
+                                )
+                        }
+                    } else {
+                        when (extendedTag) {
+                            0b0010 ->
+                                Float.from(data, internalOffset)
+                            0b0100 ->
+                                List.from(data, internalOffset, literalFloat)
+                            0b0110 ->
+                                FloatingPointRegister.from(data, internalOffset, literalFloat)
+                            0b1000 ->
+                                AllocationList.from(data, internalOffset, literalFloat)
+                            0b1010 ->
+                                ExtendedLiteral.from(data, internalOffset, literalFloat)
+                            else ->
+                                throw IllegalArgumentException(
+                                        "Extended tag ($extendedTag) is not properly shifted and masked"
+                                )
+                        }
+                    }
+                }
+                else -> throw IllegalArgumentException("tag ($tag) is not properly shifted and masked")
+            }
+            internalOffset += termByteCount
 
-           return Pair(term, internalOffset - offset)
-       }
-   }
+            return Pair(term, internalOffset - offset)
+        }
+    }
 }
 
 typealias Index = Int
@@ -164,13 +164,9 @@ fun value(fullTag: UnsignedByte, data: ByteArray, offset: Int): Pair<Any, ByteCo
     }
 }
 
-class Literal(val index: Index): Term() {
-    override fun toString(): String = "literal($index)"
-}
+class Literal(val index: Index) : Term()
 
-class Integer(val long: Long): Term() {
-    override fun toString(): String = "integer($long)"
-
+class Integer(val long: Long) : Term() {
     companion object {
         fun from(fullTag: UnsignedByte, data: ByteArray, offset: Int): Pair<Integer, ByteCount> {
             val (value, byteCount) = value(fullTag, data, offset)
@@ -186,25 +182,12 @@ class Integer(val long: Long): Term() {
     }
 }
 
-class Atom(val index: Index): Term() {
-    override fun toString(): String = "atom($index)"
-}
+class Atom(val index: Index) : Term()
+class Label(val index: Index) : Term()
+class XRegister(val index: Index) : Term()
+class YRegister(val index: Index) : Term()
 
-class XRegister(val index: Index): Term() {
-    override fun toString(): String = "x($index)"
-}
-
-class YRegister(val index: Index): Term() {
-    override fun toString(): String = "y($index)"
-}
-
-class Label(val index: Index): Term() {
-    override fun toString(): String = "label($index)"
-}
-
-class Character(val codePoint: Int): Term() {
-    override fun toString(): String = "character(codePoint: $codePoint)"
-
+class Character(val codePoint: Int) : Term() {
     companion object {
         fun codePoint(byteSubarray: ByteSubarray): Int = unsignedIntToInt(byteSubarray.toUnsignedInt())
 
@@ -221,7 +204,7 @@ class Character(val codePoint: Int): Term() {
     }
 }
 
-class Float: Term() {
+class Float : Term() {
     companion object {
         fun from(data: ByteArray, offset: Int): Pair<Float, ByteCount> {
             return Pair(Float(), 0)
@@ -244,9 +227,7 @@ private fun size(data: ByteArray, offset: Int, literalFloat: Boolean): Pair<Int,
     return Pair(size, internalOffset - offset)
 }
 
-class List(val elements: kotlin.collections.List<Term>): Term() {
-    override fun toString(): String = "list(${elements.joinToString(", ")})"
-
+class List(val elements: kotlin.collections.List<Term>) : Term() {
     companion object {
         fun from(data: ByteArray, offset: Int, literalFloat: Boolean): Pair<List, ByteCount> {
             var internalOffset = offset
@@ -268,9 +249,7 @@ class List(val elements: kotlin.collections.List<Term>): Term() {
     }
 }
 
-class FloatingPointRegister(val index: Index): Term() {
-    override fun toString(): String = "fp($index)"
-
+class FloatingPointRegister(val index: Index) : Term() {
     companion object {
         fun from(data: ByteArray, offset: Int, literalFloat: Boolean): Pair<FloatingPointRegister, ByteCount> {
             var internalOffset = offset
@@ -289,10 +268,7 @@ class FloatingPointRegister(val index: Index): Term() {
     }
 }
 
-class AllocationList(val allocationList: kotlin.collections.List<Allocation>): Term() {
-    override fun toString(): String =
-        "allocation_list(size: ${allocationList.size}, elements: [${allocationList.joinToString(", ")}])"
-
+class AllocationList(val allocationList: kotlin.collections.List<Allocation>) : Term() {
     data class Allocation(val type: Type, val value: Int) {
         override fun toString(): String =
                 when (type) {
@@ -325,10 +301,9 @@ class AllocationList(val allocationList: kotlin.collections.List<Allocation>): T
                 val type = when (typeTerm) {
                     is Literal ->
                         // https://github.com/erlang/otp/blob/OTP-20.2.2/lib/compiler/src/beam_disasm.erl#L568-L572
-                        typeByNumber[typeTerm.index] ?:
-                                throw IllegalArgumentException(
-                                        "typeTerm Literal index (${typeTerm.index}) is not a recognized Type number"
-                                )
+                        typeByNumber[typeTerm.index] ?: throw IllegalArgumentException(
+                                "typeTerm Literal index (${typeTerm.index}) is not a recognized Type number"
+                        )
                     else -> throw IllegalArgumentException(
                             "Expecting typeTerm (${typeTerm.javaClass} $typeTerm) to be a Literal"
                     )

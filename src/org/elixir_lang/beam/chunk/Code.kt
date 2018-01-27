@@ -3,13 +3,25 @@ package org.elixir_lang.beam.chunk
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.util.component1
 import com.intellij.openapi.util.component2
+import org.elixir_lang.beam.Cache
 import org.elixir_lang.beam.chunk.Chunk.unsignedInt
 import org.elixir_lang.beam.chunk.code.Operation
 
 class Code(private val operationList: List<Operation>) {
-    fun assembly(): String =
+    data class Options(val inline: Inline = Inline(), val showArgumentNames: Boolean = true) {
+        data class Inline(
+                val atoms: Boolean = false,
+                val functions: Boolean = false,
+                val imports: Boolean = false,
+                val integers: Boolean = true,
+                val labels: Boolean = true,
+                val literals: Boolean = false
+        )
+    }
+
+    fun assembly(cache: Cache, options: Options): String =
         operationList.joinToString("\n") { operation ->
-            val operationAssembly = operation.assembly()
+            val operationAssembly = operation.assembly(cache, options)
             val function = operation.code.function
 
             val indent = when (function) {

@@ -1,21 +1,24 @@
 package org.elixir_lang.beam.chunk.code
 
+import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.project.Project
-import com.intellij.psi.PsiDocumentManager
-import com.intellij.psi.PsiFileFactory
-import org.elixir_lang.beam.assembly.Language
+import com.intellij.util.ui.components.BorderLayoutPanel
+import org.elixir_lang.beam.Cache
+import org.elixir_lang.beam.assembly.Controls
 import org.elixir_lang.beam.assembly.file.Type
-import org.elixir_lang.beam.chunk.Code
 import javax.swing.JComponent
 
-private const val DEFAULT_TEXT = "# Could not disassemble Code Chunk"
 
-fun component(code: Code?, project: Project): JComponent {
-    val text = code?.assembly() ?: DEFAULT_TEXT
-    val psiFile = PsiFileFactory.getInstance(project).createFileFromText(Language, text)
-    val document = PsiDocumentManager.getInstance(project).getDocument(psiFile)!!
-    val editor = EditorFactory.getInstance().createEditor(document, project, Type, true)
+fun component(cache: Cache, project: Project): JComponent {
+    val controls = Controls(cache, project)
+    val document = controls.document
+    val editorComponent = editorComponent(document, project)
 
-    return editor.component
+    return BorderLayoutPanel().addToTop(controls).addToCenter(editorComponent)
 }
+
+// Private functions
+
+private fun editorComponent(document: Document, project: Project): JComponent =
+    EditorFactory.getInstance().createEditor(document, project, Type, true).component

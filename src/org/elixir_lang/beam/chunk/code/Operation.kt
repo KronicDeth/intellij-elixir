@@ -2,8 +2,8 @@ package org.elixir_lang.beam.chunk.code
 
 import com.intellij.openapi.util.component1
 import com.intellij.openapi.util.component2
+import org.elixir_lang.beam.Cache
 import org.elixir_lang.beam.chunk.Chunk.unsignedByte
-import org.elixir_lang.beam.chunk.code.operation.Argument
 import org.elixir_lang.beam.chunk.code.operation.Code
 import org.elixir_lang.beam.chunk.code.operation.codeByNumber
 import org.elixir_lang.beam.term.Label
@@ -14,25 +14,7 @@ import org.elixir_lang.beam.term.Term
  * https://github.com/erlang/otp/blob/OTP-20.2.2/lib/compiler/src/genop.tab
  */
 data class Operation(val code: Code, val termList: List<Term>) {
-    private fun argumentsAs(termToString: (Term, Argument) -> String): String {
-        val argumentNameToType = code.argumentNameToType
-
-        val argumentList = if (argumentNameToType != null && argumentNameToType.size == termList.size) {
-            termList.mapIndexed { index, term ->
-                val (argumentName, type) = argumentNameToType[index]
-
-                "$argumentName: ${termToString(term, type)}"
-            }
-        } else {
-            termList
-        }
-
-        return argumentList.joinToString(", ")
-    }
-
-    private fun argumentsAsAssembly(): String = argumentsAs { term, type -> termToType(term, type) }
-    fun argumentsAsTerms(): String = argumentsAs { term, _ -> term.toString() }
-    fun assembly(): String {
+    fun assembly(cache: Cache, options: org.elixir_lang.beam.chunk.Code.Options): String {
         val function = code.function
 
         return when (function) {
@@ -44,7 +26,7 @@ data class Operation(val code: Code, val termList: List<Term>) {
                     // https://github.com/elixir-lang/elixir/issues/7258
                     "save_cp()"
                 } else {
-                    "$function(${argumentsAsAssembly()})"
+                    null
                 }
             }
             "deallocate" -> {
@@ -54,13 +36,24 @@ data class Operation(val code: Code, val termList: List<Term>) {
                     // https://github.com/elixir-lang/elixir/issues/7258
                     "restore_cp()"
                 } else {
-                    "$function(${argumentsAsAssembly()})"
+                    null
                 }
             }
-            "label", "line" -> "$function(${(termList[0] as Literal).index})"
-            else -> "$function(${argumentsAsAssembly()})"
-        }
+            "label", "line" ->
+                if (options.inline.integers) {
+                    "$function(${(termList[0] as Literal).index})"
+                } else {
+                    // literals of label and line aren't literal references, so don't inline them using inlineLiterals
+                    "$function(${argumentsAssembly(cache, options.copy(inline = options.inline.copy(literals = false)))})"
+                }
+            else -> null
+        } ?: "$function(${argumentsAssembly(cache, options)})"
     }
+
+    private fun argumentsAssembly(cache: Cache, options: org.elixir_lang.beam.chunk.Code.Options): String =
+            code.arguments.zip(termList).joinToString(", ") { (argument, term) ->
+                argument.assembly(term, cache, options)
+            }
 
     private fun termToInteger(term: Term): String =
             when (term) {
@@ -71,14 +64,6 @@ data class Operation(val code: Code, val termList: List<Term>) {
                 else ->
                     term.toString()
             }
-
-    private fun termToType(term: Term, type: Argument): String =
-        when (type) {
-            Argument.INTEGER -> termToInteger(term)
-            Argument.TERM -> term.toString()
-        }
-
-    override fun toString(): String = "${code.function}(${argumentsAsTerms()})"
 
     companion object {
         fun from(data: ByteArray, offset: Int, literalFloat: Boolean): Pair<Operation, Int> {
@@ -92,7 +77,7 @@ data class Operation(val code: Code, val termList: List<Term>) {
             return if (code != null) {
                 val termList = mutableListOf<Term>()
 
-                repeat(code.arity) {
+                repeat(code.arguments.size) {
                     val (term, byteCount) = Term.from(data, internalOffset, literalFloat)
                     termList.add(term)
                     internalOffset += byteCount
