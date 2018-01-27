@@ -62,10 +62,11 @@ class FlexLexer implements com.intellij.lexer.FlexLexer {
 
   private static final String ZZ_ACTION_PACKED_0 =
     "\1\0\1\1\1\2\1\3\1\4\1\1\1\5\1\6"+
-    "\1\7\1\10\1\3\1\11\1\4\2\0";
+    "\1\7\1\10\1\3\1\11\1\4\2\0\1\12\1\0"+
+    "\1\12\1\0";
 
   private static int [] zzUnpackAction() {
-    int [] result = new int[15];
+    int [] result = new int[19];
     int offset = 0;
     offset = zzUnpackAction(ZZ_ACTION_PACKED_0, offset, result);
     return result;
@@ -91,10 +92,11 @@ class FlexLexer implements com.intellij.lexer.FlexLexer {
 
   private static final String ZZ_ROWMAP_PACKED_0 =
     "\0\0\0\14\0\30\0\44\0\60\0\74\0\110\0\14"+
-    "\0\14\0\14\0\14\0\14\0\14\0\124\0\140";
+    "\0\124\0\14\0\14\0\14\0\14\0\140\0\154\0\170"+
+    "\0\204\0\14\0\220";
 
   private static int [] zzUnpackRowMap() {
-    int [] result = new int[15];
+    int [] result = new int[19];
     int offset = 0;
     offset = zzUnpackRowMap(ZZ_ROWMAP_PACKED_0, offset, result);
     return result;
@@ -121,10 +123,12 @@ class FlexLexer implements com.intellij.lexer.FlexLexer {
     "\1\11\1\12\1\13\1\14\15\0\1\3\15\0\1\4"+
     "\6\0\1\4\3\0\1\15\2\5\1\0\1\5\3\0"+
     "\1\5\6\0\1\16\11\0\2\7\1\17\1\7\3\0"+
-    "\1\7\6\0\1\15\14\0\1\7\5\0";
+    "\1\7\5\0\1\20\1\21\13\0\1\15\14\0\1\7"+
+    "\7\0\1\22\2\20\1\0\1\20\3\0\1\20\6\0"+
+    "\1\23\13\0\1\22\6\0";
 
   private static int [] zzUnpackTrans() {
-    int [] result = new int[108];
+    int [] result = new int[156];
     int offset = 0;
     offset = zzUnpackTrans(ZZ_TRANS_PACKED_0, offset, result);
     return result;
@@ -162,10 +166,11 @@ class FlexLexer implements com.intellij.lexer.FlexLexer {
   private static final int [] ZZ_ATTRIBUTE = zzUnpackAttribute();
 
   private static final String ZZ_ATTRIBUTE_PACKED_0 =
-    "\1\0\1\11\5\1\6\11\2\0";
+    "\1\0\1\11\5\1\1\11\1\1\4\11\2\0\1\1"+
+    "\1\0\1\11\1\0";
 
   private static int [] zzUnpackAttribute() {
-    int [] result = new int[15];
+    int [] result = new int[19];
     int offset = 0;
     offset = zzUnpackAttribute(ZZ_ATTRIBUTE_PACKED_0, offset, result);
     return result;
@@ -482,47 +487,52 @@ class FlexLexer implements com.intellij.lexer.FlexLexer {
             { return TokenType.BAD_CHARACTER;
             } 
             // fall through
-          case 10: break;
+          case 11: break;
           case 2: 
             { return TokenType.WHITE_SPACE;
             } 
             // fall through
-          case 11: break;
+          case 12: break;
           case 3: 
             { return Types.INTEGER;
             } 
             // fall through
-          case 12: break;
+          case 13: break;
           case 4: 
             { return Types.NAME;
             } 
             // fall through
-          case 13: break;
+          case 14: break;
           case 5: 
             { return Types.QUALIFIED_ALIAS;
             } 
             // fall through
-          case 14: break;
+          case 15: break;
           case 6: 
             { return Types.CLOSING_PARENTHESIS;
             } 
             // fall through
-          case 15: break;
+          case 16: break;
           case 7: 
             { return Types.COLON;
             } 
             // fall through
-          case 16: break;
+          case 17: break;
           case 8: 
             { return Types.COMMA;
             } 
             // fall through
-          case 17: break;
+          case 18: break;
           case 9: 
             { return Types.OPENING_PARENTHESIS;
             } 
             // fall through
-          case 18: break;
+          case 19: break;
+          case 10: 
+            { return Types.ATOM;
+            } 
+            // fall through
+          case 20: break;
           default:
             zzScanError(ZZ_NO_MATCH);
           }
