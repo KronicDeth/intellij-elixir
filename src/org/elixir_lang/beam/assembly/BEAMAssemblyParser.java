@@ -184,7 +184,7 @@ public class BEAMAssemblyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // MAP_OPERATOR OPENING_CURLY keywordList CLOSING_CURLY
+  // MAP_OPERATOR OPENING_CURLY keywordList? CLOSING_CURLY
   public static boolean map(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "map")) return false;
     if (!nextTokenIs(b, MAP_OPERATOR)) return false;
@@ -192,10 +192,17 @@ public class BEAMAssemblyParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, l, _NONE_, MAP, null);
     r = consumeTokens(b, 2, MAP_OPERATOR, OPENING_CURLY);
     p = r; // pin = 2
-    r = r && report_error_(b, keywordList(b, l + 1));
+    r = r && report_error_(b, map_2(b, l + 1));
     r = p && consumeToken(b, CLOSING_CURLY) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
+  }
+
+  // keywordList?
+  private static boolean map_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "map_2")) return false;
+    keywordList(b, l + 1);
+    return true;
   }
 
   /* ********************************************************** */
@@ -275,7 +282,7 @@ public class BEAMAssemblyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // MAP_OPERATOR QUALIFIED_ALIAS OPENING_CURLY keywordList CLOSING_CURLY
+  // MAP_OPERATOR QUALIFIED_ALIAS OPENING_CURLY keywordList? CLOSING_CURLY
   public static boolean struct(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "struct")) return false;
     if (!nextTokenIs(b, MAP_OPERATOR)) return false;
@@ -283,10 +290,17 @@ public class BEAMAssemblyParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, l, _NONE_, STRUCT, null);
     r = consumeTokens(b, 3, MAP_OPERATOR, QUALIFIED_ALIAS, OPENING_CURLY);
     p = r; // pin = 3
-    r = r && report_error_(b, keywordList(b, l + 1));
+    r = r && report_error_(b, struct_3(b, l + 1));
     r = p && consumeToken(b, CLOSING_CURLY) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
+  }
+
+  // keywordList?
+  private static boolean struct_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "struct_3")) return false;
+    keywordList(b, l + 1);
+    return true;
   }
 
   /* ********************************************************** */
