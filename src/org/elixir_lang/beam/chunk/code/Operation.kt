@@ -5,8 +5,8 @@ import com.intellij.openapi.util.component2
 import org.elixir_lang.beam.Cache
 import org.elixir_lang.beam.chunk.Chunk.unsignedByte
 import org.elixir_lang.beam.chunk.code.operation.Code
+import org.elixir_lang.beam.chunk.code.operation.code.Argument
 import org.elixir_lang.beam.chunk.code.operation.codeByNumber
-import org.elixir_lang.beam.term.Label
 import org.elixir_lang.beam.term.Literal
 import org.elixir_lang.beam.term.Term
 
@@ -43,6 +43,19 @@ data class Operation(val code: Code, val termList: List<Term>) {
                     null
                 }
             }
+            "call_ext_last" -> {
+                if (options.inline.imports) {
+                    val argumentsAssembly = argumentsAssembly(
+                            code.arguments.zip(termList).drop(1),
+                            cache,
+                            options
+                    )
+
+                    "$function($argumentsAssembly)"
+                } else {
+                    null
+                }
+            }
             "deallocate" -> {
                 val (wordsOfStack) = termList
 
@@ -65,19 +78,17 @@ data class Operation(val code: Code, val termList: List<Term>) {
     }
 
     private fun argumentsAssembly(cache: Cache, options: org.elixir_lang.beam.chunk.Code.Options): String =
-            code.arguments.zip(termList).joinToString(", ") { (argument, term) ->
+            argumentsAssembly(code.arguments.zip(termList), cache, options)
+
+    private fun argumentsAssembly(
+            argumentTermPairList: List<Pair<Argument, Term>>,
+            cache: Cache,
+            options: org.elixir_lang.beam.chunk.Code.Options
+    ): String =
+            argumentTermPairList.joinToString(", ") { (argument, term) ->
                 argument.assembly(term, cache, options)
             }
 
-    private fun termToInteger(term: Term): String =
-            when (term) {
-                is Label ->
-                    term.index.toString()
-                is Literal ->
-                    term.index.toString()
-                else ->
-                    term.toString()
-            }
 
     companion object {
         fun from(data: ByteArray, offset: Int, literalFloat: Boolean): Pair<Operation, Int> {

@@ -72,7 +72,7 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
             "call_ext_last",
             arrayOf(
                     ARITY,
-                    Argument("destination", Options()),
+                    Argument("destination", Options(Inline(imports = true, integers = true, literals = false))),
                     DEALLOCATE_WORDS_OF_STACK
             )
     ),
