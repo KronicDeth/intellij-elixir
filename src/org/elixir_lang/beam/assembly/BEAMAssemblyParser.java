@@ -12,7 +12,7 @@ import com.intellij.lang.PsiParser;
 import com.intellij.lang.LightPsiParser;
 
 @SuppressWarnings({"SimplifiableIfStatement", "UnusedAssignment"})
-public class Parser implements PsiParser, LightPsiParser {
+public class BEAMAssemblyParser implements PsiParser, LightPsiParser {
 
   public ASTNode parse(IElementType t, PsiBuilder b) {
     parseLight(t, b);
@@ -29,6 +29,9 @@ public class Parser implements PsiParser, LightPsiParser {
     else if (t == LIST) {
       r = list(b, 0);
     }
+    else if (t == MAP) {
+      r = map(b, 0);
+    }
     else if (t == OPERANDS) {
       r = operands(b, 0);
     }
@@ -40,6 +43,9 @@ public class Parser implements PsiParser, LightPsiParser {
     }
     else if (t == RELATIVE) {
       r = relative(b, 0);
+    }
+    else if (t == STRUCT) {
+      r = struct(b, 0);
     }
     else if (t == TERM) {
       r = term(b, 0);
@@ -93,13 +99,13 @@ public class Parser implements PsiParser, LightPsiParser {
   // KEY term
   static boolean keyword(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "keyword")) return false;
-    if (!nextTokenIs(b, KEY)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_);
     r = consumeToken(b, KEY);
+    p = r; // pin = 1
     r = r && term(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
+    exit_section_(b, l, m, r, p, keywordRecoverWhile_parser_);
+    return r || p;
   }
 
   /* ********************************************************** */
@@ -139,6 +145,31 @@ public class Parser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // COMMA | CLOSING_BRACKET | CLOSING_CURLY | CLOSING_PARENTHESIS
+  static boolean keywordRecoverUntil(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "keywordRecoverUntil")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, COMMA);
+    if (!r) r = consumeToken(b, CLOSING_BRACKET);
+    if (!r) r = consumeToken(b, CLOSING_CURLY);
+    if (!r) r = consumeToken(b, CLOSING_PARENTHESIS);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // !keywordRecoverUntil
+  static boolean keywordRecoverWhile(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "keywordRecoverWhile")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NOT_);
+    r = !keywordRecoverUntil(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
   // OPENING_BRACKET termList CLOSING_BRACKET
   public static boolean list(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "list")) return false;
@@ -150,6 +181,21 @@ public class Parser implements PsiParser, LightPsiParser {
     r = r && consumeToken(b, CLOSING_BRACKET);
     exit_section_(b, m, LIST, r);
     return r;
+  }
+
+  /* ********************************************************** */
+  // MAP_OPERATOR OPENING_CURLY keywordList CLOSING_CURLY
+  public static boolean map(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "map")) return false;
+    if (!nextTokenIs(b, MAP_OPERATOR)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, MAP, null);
+    r = consumeTokens(b, 2, MAP_OPERATOR, OPENING_CURLY);
+    p = r; // pin = 2
+    r = r && report_error_(b, keywordList(b, l + 1));
+    r = p && consumeToken(b, CLOSING_CURLY) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
   }
 
   /* ********************************************************** */
@@ -168,14 +214,13 @@ public class Parser implements PsiParser, LightPsiParser {
   // NAME OPENING_PARENTHESIS operands? CLOSING_PARENTHESIS
   public static boolean operation(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "operation")) return false;
-    if (!nextTokenIs(b, NAME)) return false;
     boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, OPERATION, null);
+    Marker m = enter_section_(b, l, _NONE_, OPERATION, "<operation>");
     r = consumeTokens(b, 2, NAME, OPENING_PARENTHESIS);
     p = r; // pin = 2
     r = r && report_error_(b, operation_2(b, l + 1));
     r = p && consumeToken(b, CLOSING_PARENTHESIS) && r;
-    exit_section_(b, l, m, r, p, null);
+    exit_section_(b, l, m, r, p, operationRecoverWhile_parser_);
     return r || p;
   }
 
@@ -184,6 +229,23 @@ public class Parser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "operation_2")) return false;
     operands(b, l + 1);
     return true;
+  }
+
+  /* ********************************************************** */
+  // NAME
+  static boolean operationRecoverUntil(PsiBuilder b, int l) {
+    return consumeToken(b, NAME);
+  }
+
+  /* ********************************************************** */
+  // !operationRecoverUntil
+  static boolean operationRecoverWhile(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "operationRecoverWhile")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NOT_);
+    r = !operationRecoverUntil(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
   }
 
   /* ********************************************************** */
@@ -213,7 +275,22 @@ public class Parser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // ATOM | ATOM_KEYWORD | INTEGER | QUALIFIED_ALIAS | functionReference | list | tuple | typedTerm
+  // MAP_OPERATOR QUALIFIED_ALIAS OPENING_CURLY keywordList CLOSING_CURLY
+  public static boolean struct(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "struct")) return false;
+    if (!nextTokenIs(b, MAP_OPERATOR)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, STRUCT, null);
+    r = consumeTokens(b, 3, MAP_OPERATOR, QUALIFIED_ALIAS, OPENING_CURLY);
+    p = r; // pin = 3
+    r = r && report_error_(b, keywordList(b, l + 1));
+    r = p && consumeToken(b, CLOSING_CURLY) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  /* ********************************************************** */
+  // ATOM | ATOM_KEYWORD | INTEGER | QUALIFIED_ALIAS | functionReference | list | map | tuple | struct | typedTerm
   public static boolean term(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "term")) return false;
     boolean r;
@@ -224,7 +301,9 @@ public class Parser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, QUALIFIED_ALIAS);
     if (!r) r = functionReference(b, l + 1);
     if (!r) r = list(b, l + 1);
+    if (!r) r = map(b, l + 1);
     if (!r) r = tuple(b, l + 1);
+    if (!r) r = struct(b, l + 1);
     if (!r) r = typedTerm(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
@@ -313,4 +392,14 @@ public class Parser implements PsiParser, LightPsiParser {
     return r;
   }
 
+  final static Parser keywordRecoverWhile_parser_ = new Parser() {
+    public boolean parse(PsiBuilder b, int l) {
+      return keywordRecoverWhile(b, l + 1);
+    }
+  };
+  final static Parser operationRecoverWhile_parser_ = new Parser() {
+    public boolean parse(PsiBuilder b, int l) {
+      return operationRecoverWhile(b, l + 1);
+    }
+  };
 }

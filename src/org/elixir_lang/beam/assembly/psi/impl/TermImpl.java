@@ -39,6 +39,18 @@ public class TermImpl extends ASTWrapperPsiElement implements Term {
 
   @Override
   @Nullable
+  public Map getMap() {
+    return findChildByClass(Map.class);
+  }
+
+  @Override
+  @Nullable
+  public Struct getStruct() {
+    return findChildByClass(Struct.class);
+  }
+
+  @Override
+  @Nullable
   public Tuple getTuple() {
     return findChildByClass(Tuple.class);
   }

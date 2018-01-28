@@ -15,6 +15,10 @@ public class Visitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitMap(@NotNull Map o) {
+    visitPsiElement(o);
+  }
+
   public void visitOperands(@NotNull Operands o) {
     visitPsiElement(o);
   }
@@ -28,6 +32,10 @@ public class Visitor extends PsiElementVisitor {
   }
 
   public void visitRelative(@NotNull Relative o) {
+    visitPsiElement(o);
+  }
+
+  public void visitStruct(@NotNull Struct o) {
     visitPsiElement(o);
   }
 

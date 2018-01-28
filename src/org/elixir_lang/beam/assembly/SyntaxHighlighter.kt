@@ -20,7 +20,7 @@ class SyntaxHighlighter: SyntaxHighlighterBase() {
                 CLOSING_PARENTHESIS, OPENING_PARENTHESIS -> ElixirSyntaxHighlighter.PARENTHESES_KEYS
                 INTEGER -> ElixirSyntaxHighlighter.DECIMAL_KEYS
                 NAME -> ElixirSyntaxHighlighter.KEYWORD_KEYS
-                REFERENCE_OPERATOR, DOT_OPERATOR, NAME_ARITY_SEPARATOR, SYMBOLIC_OPERATOR ->
+                DOT_OPERATOR, MAP_OPERATOR, NAME_ARITY_SEPARATOR, REFERENCE_OPERATOR, SYMBOLIC_OPERATOR ->
                     ElixirSyntaxHighlighter.OPERATION_SIGN_KEYS
                 QUALIFIED_ALIAS -> ElixirSyntaxHighlighter.ALIAS_KEYS
                 else -> ElixirSyntaxHighlighter.EMPTY_KEYS

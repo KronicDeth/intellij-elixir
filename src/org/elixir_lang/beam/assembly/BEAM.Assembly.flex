@@ -41,6 +41,7 @@ COMMA=","
 DOT_OPERATOR="."
 INTEGER=0|[1-9][0-9]*
 KEY={IDENTIFIER_TOKEN}{COLON}
+MAP_OPERATOR="%"
 NAME_ARITY_SEPARATOR="/"
 OPENING_BRACKET="["
 OPENING_CURLY="{"
@@ -109,6 +110,7 @@ REFERENCE_OPERATOR="&"
   {INTEGER}              { return Types.INTEGER; }
   {IDENTIFIER_TOKEN}     { return Types.NAME; }
   {KEY}                  { return Types.KEY; }
+  {MAP_OPERATOR}         { return Types.MAP_OPERATOR; }
   {NAME_ARITY_SEPARATOR} { return Types.NAME_ARITY_SEPARATOR; }
   {OPENING_BRACKET}      { return Types.OPENING_BRACKET; }
   {OPENING_CURLY}        { return Types.OPENING_CURLY; }
