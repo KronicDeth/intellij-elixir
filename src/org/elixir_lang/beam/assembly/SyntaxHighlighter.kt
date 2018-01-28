@@ -13,7 +13,7 @@ class SyntaxHighlighter: SyntaxHighlighterBase() {
 
     override fun getTokenHighlights(tokenType: IElementType): Array<TextAttributesKey> =
             when (tokenType) {
-                ATOM -> ElixirSyntaxHighlighter.ATOM_KEYS
+                ATOM, KEY -> ElixirSyntaxHighlighter.ATOM_KEYS
                 ATOM_KEYWORD -> ElixirSyntaxHighlighter.ATOM_KEYWORD_KEYS
                 CLOSING_PARENTHESIS, OPENING_PARENTHESIS -> ElixirSyntaxHighlighter.PARENTHESES_KEYS
                 INTEGER -> ElixirSyntaxHighlighter.DECIMAL_KEYS

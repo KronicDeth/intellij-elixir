@@ -90,13 +90,13 @@ public class Parser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // NAME COLON term
+  // KEY term
   static boolean keyword(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "keyword")) return false;
-    if (!nextTokenIs(b, NAME)) return false;
+    if (!nextTokenIs(b, KEY)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, NAME, COLON);
+    r = consumeToken(b, KEY);
     r = r && term(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -106,7 +106,7 @@ public class Parser implements PsiParser, LightPsiParser {
   // keyword (COMMA keyword)*
   static boolean keywordList(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "keywordList")) return false;
-    if (!nextTokenIs(b, NAME)) return false;
+    if (!nextTokenIs(b, KEY)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = keyword(b, l + 1);

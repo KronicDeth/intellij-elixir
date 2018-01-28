@@ -32,5 +32,5 @@ private typedTerm ::= NAME OPENING_PARENTHESIS values? CLOSING_PARENTHESIS
 values ::= keywordList | termList
 
 private keywordList ::= keyword (COMMA keyword)*
-private keyword ::= NAME COLON term
+private keyword ::= KEY term
 private termList ::= term (COMMA term)*

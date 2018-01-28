@@ -23,10 +23,10 @@ public interface Types {
   IElementType CLOSING_BRACKET = new TokenType("CLOSING_BRACKET");
   IElementType CLOSING_CURLY = new TokenType("CLOSING_CURLY");
   IElementType CLOSING_PARENTHESIS = new TokenType("CLOSING_PARENTHESIS");
-  IElementType COLON = new TokenType("COLON");
   IElementType COMMA = new TokenType("COMMA");
   IElementType DOT_OPERATOR = new TokenType("DOT_OPERATOR");
   IElementType INTEGER = new TokenType("INTEGER");
+  IElementType KEY = new TokenType("KEY");
   IElementType NAME = new TokenType("NAME");
   IElementType NAME_ARITY_SEPARATOR = new TokenType("NAME_ARITY_SEPARATOR");
   IElementType OPENING_BRACKET = new TokenType("OPENING_BRACKET");
