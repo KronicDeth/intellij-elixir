@@ -122,9 +122,7 @@ data class Argument(val name: String, val supportedOptions: Code.Options = Code.
     }
 }
 
-
 val ARITY = Argument("arity", Options(Inline(integers = true, literals = false)))
-val ARITY_LABEL_LIST = Argument("arity_label_list", Options(Inline(atoms = true, integers = true, labels = false)))
 val DESTINATION_REGISTER = Argument("destination_register")
 val DEALLOCATE_WORDS_OF_STACK = Argument("deallocate_words_of_stack", Options(Inline(integers = true)))
 val FAIL_LABEL = Argument("fail_label", Options(Inline(labels = true)))

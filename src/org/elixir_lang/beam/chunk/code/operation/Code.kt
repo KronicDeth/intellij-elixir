@@ -311,12 +311,28 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
     // @spec select_val Arg FailLabel Destinations
     // @doc Jump to the destination label corresponding to Arg
     //      in the Destinations list, if no arity matches, jump to FailLabel.
-    SELECT_VAL(59, "select_val", arrayOf(ARITY, FAIL_LABEL, ARITY_LABEL_LIST)),
+    SELECT_VAL(
+            59,
+            "select_val",
+            arrayOf(
+                    Argument("argument", Options(Inline(atoms = true))),
+                    FAIL_LABEL,
+                    Argument("value_to_label", Options(Inline(atoms = true, integers = true, labels = false)))
+            )
+    ),
 
     // @spec select_tuple_arity Tuple FailLabel Destinations
     // @doc Check the arity of the tuple Tuple and jump to the corresponding
     //      destination label, if no arity matches, jump to FailLabel.
-    SELECT_TUPLE_ARITY(60, "select_tuple_arity", arrayOf(TUPLE, FAIL_LABEL, ARITY_LABEL_LIST)),
+    SELECT_TUPLE_ARITY(
+            60,
+            "select_tuple_arity",
+            arrayOf(
+                    TUPLE,
+                    FAIL_LABEL,
+                    Argument("arity_to_label", Options(Inline(atoms = true, integers = true, labels = false)))
+            )
+    ),
 
     // @spec jump Label
     // @doc Jump to Label.
