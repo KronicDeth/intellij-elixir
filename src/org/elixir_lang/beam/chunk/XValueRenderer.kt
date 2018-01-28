@@ -16,7 +16,14 @@ class XValueRenderer: XValueTextRendererBase() {
     }
 
     override fun renderStringValue(value: String, additionalSpecialCharsToHighlight: String?, maxLength: Int) {
-        stringBuilder.append('"').append(value).append('"')
+        stringBuilder
+                .append('"')
+                .append(
+                        value
+                                .replace("\\", "\\\\")
+                                .replace("\"", "\\\"")
+                )
+                .append('"')
     }
 
     override fun renderComment(comment: String) {
