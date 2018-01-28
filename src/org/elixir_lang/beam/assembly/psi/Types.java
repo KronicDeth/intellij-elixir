@@ -17,6 +17,7 @@ public interface Types {
   IElementType VALUES = new ElementType("VALUES");
 
   IElementType ATOM = new TokenType("ATOM");
+  IElementType ATOM_KEYWORD = new TokenType("ATOM_KEYWORD");
   IElementType CLOSING_PARENTHESIS = new TokenType("CLOSING_PARENTHESIS");
   IElementType COLON = new TokenType("COLON");
   IElementType COMMA = new TokenType("COMMA");

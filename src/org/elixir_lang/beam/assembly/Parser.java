@@ -180,25 +180,26 @@ public class Parser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // NAME | SYMBOLIC_OPERATOR
+  // ATOM_KEYWORD | NAME | SYMBOLIC_OPERATOR
   public static boolean relative(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "relative")) return false;
-    if (!nextTokenIs(b, "<relative>", NAME, SYMBOLIC_OPERATOR)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, RELATIVE, "<relative>");
-    r = consumeToken(b, NAME);
+    r = consumeToken(b, ATOM_KEYWORD);
+    if (!r) r = consumeToken(b, NAME);
     if (!r) r = consumeToken(b, SYMBOLIC_OPERATOR);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
   /* ********************************************************** */
-  // ATOM | INTEGER | QUALIFIED_ALIAS | functionReference | typedTerm
+  // ATOM | ATOM_KEYWORD | INTEGER | QUALIFIED_ALIAS | functionReference | typedTerm
   public static boolean term(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "term")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, TERM, "<term>");
     r = consumeToken(b, ATOM);
+    if (!r) r = consumeToken(b, ATOM_KEYWORD);
     if (!r) r = consumeToken(b, INTEGER);
     if (!r) r = consumeToken(b, QUALIFIED_ALIAS);
     if (!r) r = functionReference(b, l + 1);

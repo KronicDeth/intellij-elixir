@@ -38,9 +38,13 @@ data class Argument(val name: String, val supportedOptions: Code.Options = Code.
                 when {
                     supportedOptions.inline.integers && configuredOptions.inline.integers -> index.toString()
                     supportedOptions.inline.atoms && configuredOptions.inline.atoms -> {
-                        cache.atoms?.get(index)?.string?.let { string ->
-                            ElixirModulesUtil.erlangModuleNameToElixir(string)
-                        } ?: "invalid_atom_index($index)"
+                        if (index == 0) {
+                            "nil"
+                        } else {
+                            cache.atoms?.get(index)?.string?.let { string ->
+                                ElixirModulesUtil.erlangModuleNameToElixir(string)
+                            } ?: "invalid_atom_index($index)"
+                        }
                     }
                     else -> "atom($index)"
                 }

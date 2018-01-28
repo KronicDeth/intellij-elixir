@@ -230,7 +230,7 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
 
     public static final TextAttributesKey[] ALIAS_KEYS = new TextAttributesKey[]{ALIAS};
     public static final TextAttributesKey[] ATOM_KEYS = new TextAttributesKey[]{ATOM};
-    private static final TextAttributesKey[] ATOM_KEYWORD_KEYS = new TextAttributesKey[]{ATOM, KEYWORD};
+    public static final TextAttributesKey[] ATOM_KEYWORD_KEYS = new TextAttributesKey[]{ATOM, KEYWORD};
     private static final TextAttributesKey[] BAD_CHAR_KEYS = new TextAttributesKey[]{BAD_CHARACTER};
     private static final TextAttributesKey[] BIT_KEYS = new TextAttributesKey[]{BIT};
     private static final TextAttributesKey[] BRACES_KEYS = new TextAttributesKey[]{BRACES};
