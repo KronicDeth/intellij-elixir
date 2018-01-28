@@ -312,13 +312,14 @@ public class BEAMAssemblyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // ATOM | ATOM_KEYWORD | INTEGER | QUALIFIED_ALIAS | STRING | functionReference | list | map | tuple | struct | typedTerm
+  // ATOM | ATOM_KEYWORD | CHARLIST | INTEGER | QUALIFIED_ALIAS | STRING | functionReference | list | map | tuple | struct | typedTerm
   public static boolean term(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "term")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, TERM, "<term>");
     r = consumeToken(b, ATOM);
     if (!r) r = consumeToken(b, ATOM_KEYWORD);
+    if (!r) r = consumeToken(b, CHARLIST);
     if (!r) r = consumeToken(b, INTEGER);
     if (!r) r = consumeToken(b, QUALIFIED_ALIAS);
     if (!r) r = consumeToken(b, STRING);

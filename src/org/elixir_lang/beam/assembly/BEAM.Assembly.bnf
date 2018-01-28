@@ -22,7 +22,7 @@ private operationRecoverUntil ::= NAME
 
 operands ::= keywordList | termList
 
-term ::= ATOM | ATOM_KEYWORD | INTEGER | QUALIFIED_ALIAS | STRING | functionReference | list | map | tuple | struct | typedTerm
+term ::= ATOM | ATOM_KEYWORD | CHARLIST | INTEGER | QUALIFIED_ALIAS | STRING | functionReference | list | map | tuple | struct | typedTerm
 
 functionReference ::= REFERENCE_OPERATOR qualifier DOT_OPERATOR relative NAME_ARITY_SEPARATOR INTEGER
 qualifier ::= ATOM | QUALIFIED_ALIAS

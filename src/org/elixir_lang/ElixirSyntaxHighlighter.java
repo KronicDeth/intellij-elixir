@@ -235,7 +235,7 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     private static final TextAttributesKey[] BIT_KEYS = new TextAttributesKey[]{BIT};
     public static final TextAttributesKey[] BRACES_KEYS = new TextAttributesKey[]{BRACES};
     public static final TextAttributesKey[] BRACKETS_KEYS = new TextAttributesKey[]{BRACKETS};
-    private static final TextAttributesKey[] CHAR_LIST_KEYS = new TextAttributesKey[]{CHAR_LIST};
+    public static final TextAttributesKey[] CHAR_LIST_KEYS = new TextAttributesKey[]{CHAR_LIST};
     private static final TextAttributesKey[] CHAR_TOKEN_KEYS = new TextAttributesKey[]{CHAR_TOKEN_TOKEN};
     private static final TextAttributesKey[] COMMA_KEYS = new TextAttributesKey[]{COMMA};
     private static final TextAttributesKey[] COMMENT_KEYS = new TextAttributesKey[]{COMMENT};

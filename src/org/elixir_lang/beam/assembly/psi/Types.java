@@ -22,6 +22,7 @@ public interface Types {
 
   IElementType ATOM = new TokenType("ATOM");
   IElementType ATOM_KEYWORD = new TokenType("ATOM_KEYWORD");
+  IElementType CHARLIST = new TokenType("CHARLIST");
   IElementType CLOSING_BRACKET = new TokenType("CLOSING_BRACKET");
   IElementType CLOSING_CURLY = new TokenType("CLOSING_CURLY");
   IElementType CLOSING_PARENTHESIS = new TokenType("CLOSING_PARENTHESIS");
