@@ -1,7 +1,6 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.beam.assembly.psi.impl;
 
-import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
@@ -30,6 +29,12 @@ public class TermImpl extends ASTWrapperPsiElement implements Term {
   @Nullable
   public FunctionReference getFunctionReference() {
     return findChildByClass(FunctionReference.class);
+  }
+
+  @Override
+  @Nullable
+  public List getList() {
+    return findChildByClass(List.class);
   }
 
   @Override

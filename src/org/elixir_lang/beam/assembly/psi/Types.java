@@ -9,6 +9,7 @@ import org.elixir_lang.beam.assembly.psi.impl.*;
 public interface Types {
 
   IElementType FUNCTION_REFERENCE = new ElementType("FUNCTION_REFERENCE");
+  IElementType LIST = new ElementType("LIST");
   IElementType OPERANDS = new ElementType("OPERANDS");
   IElementType OPERATION = new ElementType("OPERATION");
   IElementType QUALIFIER = new ElementType("QUALIFIER");
@@ -18,6 +19,7 @@ public interface Types {
 
   IElementType ATOM = new TokenType("ATOM");
   IElementType ATOM_KEYWORD = new TokenType("ATOM_KEYWORD");
+  IElementType CLOSING_BRACKET = new TokenType("CLOSING_BRACKET");
   IElementType CLOSING_PARENTHESIS = new TokenType("CLOSING_PARENTHESIS");
   IElementType COLON = new TokenType("COLON");
   IElementType COMMA = new TokenType("COMMA");
@@ -25,6 +27,7 @@ public interface Types {
   IElementType INTEGER = new TokenType("INTEGER");
   IElementType NAME = new TokenType("NAME");
   IElementType NAME_ARITY_SEPARATOR = new TokenType("NAME_ARITY_SEPARATOR");
+  IElementType OPENING_BRACKET = new TokenType("OPENING_BRACKET");
   IElementType OPENING_PARENTHESIS = new TokenType("OPENING_PARENTHESIS");
   IElementType QUALIFIED_ALIAS = new TokenType("QUALIFIED_ALIAS");
   IElementType REFERENCE_OPERATOR = new TokenType("REFERENCE_OPERATOR");
@@ -35,6 +38,9 @@ public interface Types {
       IElementType type = node.getElementType();
        if (type == FUNCTION_REFERENCE) {
         return new FunctionReferenceImpl(node);
+      }
+      else if (type == LIST) {
+        return new ListImpl(node);
       }
       else if (type == OPERANDS) {
         return new OperandsImpl(node);

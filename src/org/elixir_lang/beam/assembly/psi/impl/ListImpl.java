@@ -10,19 +10,25 @@ import static org.elixir_lang.beam.assembly.psi.Types.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.beam.assembly.psi.*;
 
-public class QualifierImpl extends ASTWrapperPsiElement implements Qualifier {
+public class ListImpl extends ASTWrapperPsiElement implements List {
 
-  public QualifierImpl(ASTNode node) {
+  public ListImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull Visitor visitor) {
-    visitor.visitQualifier(this);
+    visitor.visitList(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof Visitor) accept((Visitor)visitor);
     else super.accept(visitor);
+  }
+
+  @Override
+  @NotNull
+  public java.util.List<Term> getTermList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, Term.class);
   }
 
 }

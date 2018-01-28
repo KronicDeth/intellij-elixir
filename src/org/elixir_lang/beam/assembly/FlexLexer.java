@@ -52,10 +52,10 @@ class FlexLexer implements com.intellij.lexer.FlexLexer {
 
   /* The ZZ_CMAP_A table has 320 entries */
   static final char ZZ_CMAP_A[] = zzUnpackCMap(
-    "\12\0\4\1\22\0\1\1\1\31\1\7\3\0\1\33\1\0\1\30\1\23\1\43\1\41\1\25\1\42\1\5"+
-    "\1\27\1\26\11\3\1\24\1\0\1\34\1\32\1\37\1\2\1\43\32\6\1\0\1\10\1\0\1\40\1"+
-    "\4\1\0\1\12\3\4\1\15\1\11\2\4\1\17\2\4\1\13\1\4\1\16\3\4\1\21\1\14\1\20\1"+
-    "\22\5\4\1\0\1\36\1\0\1\35\6\0\1\1\242\0\2\1\26\0");
+    "\12\0\4\1\22\0\1\1\1\33\1\7\3\0\1\35\1\0\1\32\1\24\1\45\1\43\1\26\1\44\1\5"+
+    "\1\30\1\27\11\3\1\25\1\0\1\36\1\34\1\41\1\2\1\45\32\6\1\31\1\10\1\23\1\42"+
+    "\1\4\1\0\1\12\3\4\1\15\1\11\2\4\1\17\2\4\1\13\1\4\1\16\3\4\1\21\1\14\1\20"+
+    "\1\22\5\4\1\0\1\40\1\0\1\37\6\0\1\1\242\0\2\1\26\0");
 
   /** 
    * Translates DFA states to action switch labels.
@@ -64,13 +64,13 @@ class FlexLexer implements com.intellij.lexer.FlexLexer {
 
   private static final String ZZ_ACTION_PACKED_0 =
     "\1\0\1\1\1\2\1\3\1\4\1\5\1\6\3\4"+
-    "\1\7\1\10\1\11\1\3\1\12\1\13\2\14\1\15"+
-    "\1\14\1\1\6\14\1\4\1\14\1\0\3\4\1\16"+
-    "\2\0\2\14\1\0\1\14\2\0\1\14\1\0\1\4"+
-    "\1\17\1\4\1\16\3\0\1\16";
+    "\1\7\1\10\1\11\1\12\1\3\1\13\1\14\1\15"+
+    "\2\16\1\17\1\16\1\1\6\16\1\4\1\16\1\0"+
+    "\3\4\1\20\2\0\2\16\1\0\1\16\2\0\1\16"+
+    "\1\0\1\4\1\21\1\4\1\20\3\0\1\20";
 
   private static int [] zzUnpackAction() {
-    int [] result = new int[52];
+    int [] result = new int[54];
     int offset = 0;
     offset = zzUnpackAction(ZZ_ACTION_PACKED_0, offset, result);
     return result;
@@ -95,16 +95,16 @@ class FlexLexer implements com.intellij.lexer.FlexLexer {
   private static final int [] ZZ_ROWMAP = zzUnpackRowMap();
 
   private static final String ZZ_ROWMAP_PACKED_0 =
-    "\0\0\0\44\0\110\0\154\0\220\0\264\0\330\0\374"+
-    "\0\u0120\0\u0144\0\44\0\u0168\0\44\0\44\0\44\0\44"+
-    "\0\u018c\0\u01b0\0\u01d4\0\u01f8\0\u021c\0\u0240\0\u0264\0\u0288"+
-    "\0\u02ac\0\u02d0\0\44\0\44\0\u02f4\0\u0318\0\u033c\0\u0360"+
-    "\0\u0384\0\u03a8\0\u03cc\0\u03f0\0\u0414\0\u0438\0\u045c\0\u0480"+
-    "\0\u0480\0\u04a4\0\u04c8\0\u04ec\0\u0510\0\220\0\u0534\0\44"+
-    "\0\u0558\0\u057c\0\u05a0\0\u057c";
+    "\0\0\0\46\0\114\0\162\0\230\0\276\0\344\0\u010a"+
+    "\0\u0130\0\u0156\0\46\0\46\0\u017c\0\46\0\46\0\46"+
+    "\0\46\0\46\0\u01a2\0\u01c8\0\u01ee\0\u0214\0\u023a\0\u0260"+
+    "\0\u0286\0\u02ac\0\u02d2\0\u02f8\0\46\0\46\0\u031e\0\u0344"+
+    "\0\u036a\0\u0390\0\u03b6\0\u03dc\0\u0402\0\u0428\0\u044e\0\u0474"+
+    "\0\u049a\0\u04c0\0\u04c0\0\u04e6\0\u050c\0\u0532\0\u0558\0\230"+
+    "\0\u057e\0\46\0\u05a4\0\u05ca\0\u05f0\0\u05ca";
 
   private static int [] zzUnpackRowMap() {
-    int [] result = new int[52];
+    int [] result = new int[54];
     int offset = 0;
     offset = zzUnpackRowMap(ZZ_ROWMAP_PACKED_0, offset, result);
     return result;
@@ -130,38 +130,38 @@ class FlexLexer implements com.intellij.lexer.FlexLexer {
     "\1\2\1\3\1\2\1\4\1\5\1\6\1\7\2\2"+
     "\1\10\4\5\1\11\1\5\1\12\2\5\1\13\1\14"+
     "\1\15\1\16\1\17\1\20\1\21\1\22\1\23\1\24"+
-    "\1\25\1\26\1\27\1\30\1\31\1\32\1\33\45\0"+
-    "\1\3\45\0\1\4\22\0\1\4\17\0\1\34\2\5"+
-    "\1\0\1\5\2\0\12\5\3\0\1\5\2\0\1\34"+
-    "\17\0\1\35\41\0\2\7\1\36\1\7\2\0\12\7"+
-    "\3\0\1\7\17\0\1\34\2\5\1\0\1\5\2\0"+
-    "\1\5\1\37\10\5\3\0\1\5\2\0\1\34\14\0"+
-    "\1\34\2\5\1\0\1\5\2\0\6\5\1\40\3\5"+
-    "\3\0\1\5\2\0\1\34\14\0\1\34\2\5\1\0"+
-    "\1\5\2\0\10\5\1\41\1\5\3\0\1\5\2\0"+
-    "\1\34\16\0\1\42\1\43\1\0\1\44\1\0\12\42"+
-    "\1\0\1\33\51\0\1\45\43\0\1\45\2\0\1\33"+
-    "\41\0\1\46\42\0\1\33\1\0\1\47\1\50\1\51"+
-    "\1\33\2\0\1\33\36\0\1\52\1\0\1\50\42\0"+
-    "\1\53\1\33\36\0\1\33\4\0\1\51\44\0\1\54"+
-    "\44\0\1\33\44\0\1\33\6\0\1\34\44\0\1\7"+
-    "\37\0\1\34\2\5\1\0\1\5\2\0\2\5\1\55"+
-    "\7\5\3\0\1\5\2\0\1\34\14\0\1\34\2\5"+
-    "\1\0\1\5\2\0\2\5\1\56\7\5\3\0\1\5"+
-    "\2\0\1\34\14\0\1\34\2\5\1\0\1\5\2\0"+
-    "\11\5\1\57\3\0\1\5\2\0\1\34\14\0\1\60"+
-    "\2\42\1\0\1\42\2\0\12\42\3\0\1\42\2\0"+
-    "\1\60\17\0\1\61\36\0\7\62\1\0\1\63\33\62"+
-    "\32\0\1\33\44\0\1\33\44\0\2\33\45\0\1\33"+
-    "\41\0\1\33\44\0\1\33\45\0\1\33\5\0\1\34"+
-    "\2\5\1\0\1\5\2\0\3\5\1\57\6\5\3\0"+
-    "\1\5\2\0\1\34\14\0\1\34\2\5\1\0\1\5"+
-    "\2\0\4\5\1\56\5\5\3\0\1\5\2\0\1\34"+
-    "\17\0\1\60\36\0\7\62\1\60\1\63\42\62\1\64"+
-    "\1\63\33\62";
+    "\1\25\1\26\1\27\1\30\1\31\1\32\1\33\1\34"+
+    "\1\35\47\0\1\3\47\0\1\4\23\0\1\4\20\0"+
+    "\1\36\2\5\1\0\1\5\2\0\12\5\4\0\1\5"+
+    "\3\0\1\36\17\0\1\37\43\0\2\7\1\40\1\7"+
+    "\2\0\12\7\4\0\1\7\20\0\1\36\2\5\1\0"+
+    "\1\5\2\0\1\5\1\41\10\5\4\0\1\5\3\0"+
+    "\1\36\14\0\1\36\2\5\1\0\1\5\2\0\6\5"+
+    "\1\42\3\5\4\0\1\5\3\0\1\36\14\0\1\36"+
+    "\2\5\1\0\1\5\2\0\10\5\1\43\1\5\4\0"+
+    "\1\5\3\0\1\36\16\0\1\44\1\45\1\0\1\46"+
+    "\1\0\12\44\2\0\1\35\54\0\1\47\45\0\1\47"+
+    "\2\0\1\35\43\0\1\50\44\0\1\35\1\0\1\51"+
+    "\1\52\1\53\1\35\2\0\1\35\40\0\1\54\1\0"+
+    "\1\52\44\0\1\55\1\35\40\0\1\35\4\0\1\53"+
+    "\46\0\1\56\46\0\1\35\46\0\1\35\6\0\1\36"+
+    "\46\0\1\7\41\0\1\36\2\5\1\0\1\5\2\0"+
+    "\2\5\1\57\7\5\4\0\1\5\3\0\1\36\14\0"+
+    "\1\36\2\5\1\0\1\5\2\0\2\5\1\60\7\5"+
+    "\4\0\1\5\3\0\1\36\14\0\1\36\2\5\1\0"+
+    "\1\5\2\0\11\5\1\61\4\0\1\5\3\0\1\36"+
+    "\14\0\1\62\2\44\1\0\1\44\2\0\12\44\4\0"+
+    "\1\44\3\0\1\62\17\0\1\63\40\0\7\64\1\0"+
+    "\1\65\35\64\34\0\1\35\46\0\1\35\46\0\2\35"+
+    "\47\0\1\35\43\0\1\35\46\0\1\35\47\0\1\35"+
+    "\5\0\1\36\2\5\1\0\1\5\2\0\3\5\1\61"+
+    "\6\5\4\0\1\5\3\0\1\36\14\0\1\36\2\5"+
+    "\1\0\1\5\2\0\4\5\1\60\5\5\4\0\1\5"+
+    "\3\0\1\36\17\0\1\62\40\0\7\64\1\62\1\65"+
+    "\44\64\1\66\1\65\35\64";
 
   private static int [] zzUnpackTrans() {
-    int [] result = new int[1476];
+    int [] result = new int[1558];
     int offset = 0;
     offset = zzUnpackTrans(ZZ_TRANS_PACKED_0, offset, result);
     return result;
@@ -199,12 +199,12 @@ class FlexLexer implements com.intellij.lexer.FlexLexer {
   private static final int [] ZZ_ATTRIBUTE = zzUnpackAttribute();
 
   private static final String ZZ_ATTRIBUTE_PACKED_0 =
-    "\1\0\1\11\10\1\1\11\1\1\4\11\12\1\2\11"+
+    "\1\0\1\11\10\1\2\11\1\1\5\11\12\1\2\11"+
     "\1\1\1\0\4\1\2\0\2\1\1\0\1\1\2\0"+
     "\1\1\1\0\3\1\1\11\3\0\1\1";
 
   private static int [] zzUnpackAttribute() {
-    int [] result = new int[52];
+    int [] result = new int[54];
     int offset = 0;
     offset = zzUnpackAttribute(ZZ_ATTRIBUTE_PACKED_0, offset, result);
     return result;
@@ -521,77 +521,87 @@ class FlexLexer implements com.intellij.lexer.FlexLexer {
             { return TokenType.BAD_CHARACTER;
             } 
             // fall through
-          case 16: break;
+          case 18: break;
           case 2: 
             { return TokenType.WHITE_SPACE;
             } 
             // fall through
-          case 17: break;
+          case 19: break;
           case 3: 
             { return Types.INTEGER;
             } 
             // fall through
-          case 18: break;
+          case 20: break;
           case 4: 
             { return Types.NAME;
             } 
             // fall through
-          case 19: break;
+          case 21: break;
           case 5: 
             { return Types.DOT_OPERATOR;
             } 
             // fall through
-          case 20: break;
+          case 22: break;
           case 6: 
             { return Types.QUALIFIED_ALIAS;
             } 
             // fall through
-          case 21: break;
-          case 7: 
-            { return Types.CLOSING_PARENTHESIS;
-            } 
-            // fall through
-          case 22: break;
-          case 8: 
-            { return Types.COLON;
-            } 
-            // fall through
           case 23: break;
-          case 9: 
-            { return Types.COMMA;
+          case 7: 
+            { return Types.CLOSING_BRACKET;
             } 
             // fall through
           case 24: break;
-          case 10: 
-            { return Types.NAME_ARITY_SEPARATOR;
+          case 8: 
+            { return Types.CLOSING_PARENTHESIS;
             } 
             // fall through
           case 25: break;
-          case 11: 
-            { return Types.OPENING_PARENTHESIS;
+          case 9: 
+            { return Types.COLON;
             } 
             // fall through
           case 26: break;
-          case 12: 
-            { return Types.SYMBOLIC_OPERATOR;
+          case 10: 
+            { return Types.COMMA;
             } 
             // fall through
           case 27: break;
-          case 13: 
-            { return Types.REFERENCE_OPERATOR;
+          case 11: 
+            { return Types.NAME_ARITY_SEPARATOR;
             } 
             // fall through
           case 28: break;
-          case 14: 
-            { return Types.ATOM;
+          case 12: 
+            { return Types.OPENING_BRACKET;
             } 
             // fall through
           case 29: break;
-          case 15: 
-            { return Types.ATOM_KEYWORD;
+          case 13: 
+            { return Types.OPENING_PARENTHESIS;
             } 
             // fall through
           case 30: break;
+          case 14: 
+            { return Types.SYMBOLIC_OPERATOR;
+            } 
+            // fall through
+          case 31: break;
+          case 15: 
+            { return Types.REFERENCE_OPERATOR;
+            } 
+            // fall through
+          case 32: break;
+          case 16: 
+            { return Types.ATOM;
+            } 
+            // fall through
+          case 33: break;
+          case 17: 
+            { return Types.ATOM_KEYWORD;
+            } 
+            // fall through
+          case 34: break;
           default:
             zzScanError(ZZ_NO_MATCH);
           }

@@ -26,6 +26,9 @@ public class Parser implements PsiParser, LightPsiParser {
     if (t == FUNCTION_REFERENCE) {
       r = functionReference(b, 0);
     }
+    else if (t == LIST) {
+      r = list(b, 0);
+    }
     else if (t == OPERANDS) {
       r = operands(b, 0);
     }
@@ -133,6 +136,20 @@ public class Parser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // OPENING_BRACKET termList CLOSING_BRACKET
+  public static boolean list(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "list")) return false;
+    if (!nextTokenIs(b, OPENING_BRACKET)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, OPENING_BRACKET);
+    r = r && termList(b, l + 1);
+    r = r && consumeToken(b, CLOSING_BRACKET);
+    exit_section_(b, m, LIST, r);
+    return r;
+  }
+
+  /* ********************************************************** */
   // keywordList | termList
   public static boolean operands(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "operands")) return false;
@@ -193,7 +210,7 @@ public class Parser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // ATOM | ATOM_KEYWORD | INTEGER | QUALIFIED_ALIAS | functionReference | typedTerm
+  // ATOM | ATOM_KEYWORD | INTEGER | QUALIFIED_ALIAS | functionReference | list | typedTerm
   public static boolean term(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "term")) return false;
     boolean r;
@@ -203,6 +220,7 @@ public class Parser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, INTEGER);
     if (!r) r = consumeToken(b, QUALIFIED_ALIAS);
     if (!r) r = functionReference(b, l + 1);
+    if (!r) r = list(b, l + 1);
     if (!r) r = typedTerm(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;

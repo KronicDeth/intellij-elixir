@@ -4,6 +4,9 @@ package org.elixir_lang.beam.assembly.psi;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface Relative extends PsiElement {
+public interface List extends PsiElement {
+
+  @NotNull
+  java.util.List<Term> getTermList();
 
 }
