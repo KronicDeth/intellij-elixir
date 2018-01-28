@@ -15,6 +15,7 @@ class SyntaxHighlighter: SyntaxHighlighterBase() {
             when (tokenType) {
                 ATOM, KEY -> ElixirSyntaxHighlighter.ATOM_KEYS
                 ATOM_KEYWORD -> ElixirSyntaxHighlighter.ATOM_KEYWORD_KEYS
+                CLOSING_BRACKET, OPENING_BRACKET -> ElixirSyntaxHighlighter.BRACKETS_KEYS
                 CLOSING_PARENTHESIS, OPENING_PARENTHESIS -> ElixirSyntaxHighlighter.PARENTHESES_KEYS
                 INTEGER -> ElixirSyntaxHighlighter.DECIMAL_KEYS
                 NAME -> ElixirSyntaxHighlighter.KEYWORD_KEYS
