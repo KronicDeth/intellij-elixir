@@ -132,7 +132,7 @@ fun value(fullTag: UnsignedByte, data: ByteArray, offset: Int): Pair<Any, ByteCo
         Pair(value, internalOffset - offset)
     } else {
         val bit4 = fullTag.ushr(4).and(0b1)
-        val bits7to5 = fullTag.and(0b1110_0000).shl(3)
+        val bits7to5 = fullTag.and(0b1110_0000).shr(5)
 
         val value: Any = when {
             bit4 == 0 -> {
