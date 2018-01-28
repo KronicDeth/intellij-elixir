@@ -10,14 +10,14 @@ import static org.elixir_lang.beam.assembly.psi.Types.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.beam.assembly.psi.*;
 
-public class TermImpl extends ASTWrapperPsiElement implements Term {
+public class TupleImpl extends ASTWrapperPsiElement implements Tuple {
 
-  public TermImpl(ASTNode node) {
+  public TupleImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull Visitor visitor) {
-    visitor.visitTerm(this);
+    visitor.visitTuple(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -26,27 +26,9 @@ public class TermImpl extends ASTWrapperPsiElement implements Term {
   }
 
   @Override
-  @Nullable
-  public FunctionReference getFunctionReference() {
-    return findChildByClass(FunctionReference.class);
-  }
-
-  @Override
-  @Nullable
-  public List getList() {
-    return findChildByClass(List.class);
-  }
-
-  @Override
-  @Nullable
-  public Tuple getTuple() {
-    return findChildByClass(Tuple.class);
-  }
-
-  @Override
-  @Nullable
-  public Values getValues() {
-    return findChildByClass(Values.class);
+  @NotNull
+  public java.util.List<Term> getTermList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, Term.class);
   }
 
 }

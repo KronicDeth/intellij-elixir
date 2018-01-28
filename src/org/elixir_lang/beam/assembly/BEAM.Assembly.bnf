@@ -18,13 +18,14 @@ operation ::= NAME OPENING_PARENTHESIS operands? CLOSING_PARENTHESIS
               { pin = 2 }
 operands ::= keywordList | termList
 
-term ::= ATOM | ATOM_KEYWORD | INTEGER | QUALIFIED_ALIAS | functionReference | list | typedTerm
+term ::= ATOM | ATOM_KEYWORD | INTEGER | QUALIFIED_ALIAS | functionReference | list | tuple | typedTerm
 
 functionReference ::= REFERENCE_OPERATOR qualifier DOT_OPERATOR relative NAME_ARITY_SEPARATOR INTEGER
 qualifier ::= ATOM | QUALIFIED_ALIAS
 relative ::= ATOM_KEYWORD | NAME | SYMBOLIC_OPERATOR
 
 list ::= OPENING_BRACKET termList CLOSING_BRACKET
+tuple ::= OPENING_CURLY termList CLOSING_CURLY
 private typedTerm ::= NAME OPENING_PARENTHESIS values? CLOSING_PARENTHESIS
                       { pin = 2 }
 

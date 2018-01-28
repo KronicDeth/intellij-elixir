@@ -44,6 +44,9 @@ public class Parser implements PsiParser, LightPsiParser {
     else if (t == TERM) {
       r = term(b, 0);
     }
+    else if (t == TUPLE) {
+      r = tuple(b, 0);
+    }
     else if (t == VALUES) {
       r = values(b, 0);
     }
@@ -210,7 +213,7 @@ public class Parser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // ATOM | ATOM_KEYWORD | INTEGER | QUALIFIED_ALIAS | functionReference | list | typedTerm
+  // ATOM | ATOM_KEYWORD | INTEGER | QUALIFIED_ALIAS | functionReference | list | tuple | typedTerm
   public static boolean term(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "term")) return false;
     boolean r;
@@ -221,6 +224,7 @@ public class Parser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, QUALIFIED_ALIAS);
     if (!r) r = functionReference(b, l + 1);
     if (!r) r = list(b, l + 1);
+    if (!r) r = tuple(b, l + 1);
     if (!r) r = typedTerm(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
@@ -258,6 +262,20 @@ public class Parser implements PsiParser, LightPsiParser {
     r = consumeToken(b, COMMA);
     r = r && term(b, l + 1);
     exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // OPENING_CURLY termList CLOSING_CURLY
+  public static boolean tuple(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "tuple")) return false;
+    if (!nextTokenIs(b, OPENING_CURLY)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, OPENING_CURLY);
+    r = r && termList(b, l + 1);
+    r = r && consumeToken(b, CLOSING_CURLY);
+    exit_section_(b, m, TUPLE, r);
     return r;
   }
 

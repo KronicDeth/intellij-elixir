@@ -35,6 +35,10 @@ public class Visitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitTuple(@NotNull Tuple o) {
+    visitPsiElement(o);
+  }
+
   public void visitValues(@NotNull Values o) {
     visitPsiElement(o);
   }

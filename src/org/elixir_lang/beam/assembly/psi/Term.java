@@ -13,6 +13,9 @@ public interface Term extends PsiElement {
   List getList();
 
   @Nullable
+  Tuple getTuple();
+
+  @Nullable
   Values getValues();
 
 }

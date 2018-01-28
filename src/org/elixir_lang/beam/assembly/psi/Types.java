@@ -15,11 +15,13 @@ public interface Types {
   IElementType QUALIFIER = new ElementType("QUALIFIER");
   IElementType RELATIVE = new ElementType("RELATIVE");
   IElementType TERM = new ElementType("TERM");
+  IElementType TUPLE = new ElementType("TUPLE");
   IElementType VALUES = new ElementType("VALUES");
 
   IElementType ATOM = new TokenType("ATOM");
   IElementType ATOM_KEYWORD = new TokenType("ATOM_KEYWORD");
   IElementType CLOSING_BRACKET = new TokenType("CLOSING_BRACKET");
+  IElementType CLOSING_CURLY = new TokenType("CLOSING_CURLY");
   IElementType CLOSING_PARENTHESIS = new TokenType("CLOSING_PARENTHESIS");
   IElementType COLON = new TokenType("COLON");
   IElementType COMMA = new TokenType("COMMA");
@@ -28,6 +30,7 @@ public interface Types {
   IElementType NAME = new TokenType("NAME");
   IElementType NAME_ARITY_SEPARATOR = new TokenType("NAME_ARITY_SEPARATOR");
   IElementType OPENING_BRACKET = new TokenType("OPENING_BRACKET");
+  IElementType OPENING_CURLY = new TokenType("OPENING_CURLY");
   IElementType OPENING_PARENTHESIS = new TokenType("OPENING_PARENTHESIS");
   IElementType QUALIFIED_ALIAS = new TokenType("QUALIFIED_ALIAS");
   IElementType REFERENCE_OPERATOR = new TokenType("REFERENCE_OPERATOR");
@@ -56,6 +59,9 @@ public interface Types {
       }
       else if (type == TERM) {
         return new TermImpl(node);
+      }
+      else if (type == TUPLE) {
+        return new TupleImpl(node);
       }
       else if (type == VALUES) {
         return new ValuesImpl(node);
