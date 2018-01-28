@@ -1,15 +1,15 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.beam.assembly;
 
-import com.intellij.lang.ASTNode;
-import com.intellij.lang.LightPsiParser;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiBuilder.Marker;
-import com.intellij.lang.PsiParser;
-import com.intellij.psi.tree.IElementType;
-
-import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
 import static org.elixir_lang.beam.assembly.psi.Types.*;
+import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
+import com.intellij.psi.tree.IElementType;
+import com.intellij.lang.ASTNode;
+import com.intellij.psi.tree.TokenSet;
+import com.intellij.lang.PsiParser;
+import com.intellij.lang.LightPsiParser;
 
 @SuppressWarnings({"SimplifiableIfStatement", "UnusedAssignment"})
 public class BEAMAssemblyParser implements PsiParser, LightPsiParser {
@@ -276,13 +276,14 @@ public class BEAMAssemblyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // ATOM_KEYWORD | NAME | SYMBOLIC_OPERATOR
+  // ATOM_KEYWORD | NAME | STRING | SYMBOLIC_OPERATOR
   public static boolean relative(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "relative")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, RELATIVE, "<relative>");
     r = consumeToken(b, ATOM_KEYWORD);
     if (!r) r = consumeToken(b, NAME);
+    if (!r) r = consumeToken(b, STRING);
     if (!r) r = consumeToken(b, SYMBOLIC_OPERATOR);
     exit_section_(b, l, m, r, false, null);
     return r;

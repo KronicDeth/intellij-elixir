@@ -95,7 +95,7 @@ data class Argument(val name: String, val supportedOptions: Code.Options = Code.
 
                             when {
                                 moduleName != null && functionName != null ->
-                                    "&${ElixirModulesUtil.erlangModuleNameToElixir(moduleName)}.$functionName/${import.arity}"
+                                    "&${ElixirModulesUtil.erlangModuleNameToElixir(moduleName)}.${inspectAsFunction(functionName)}/${import.arity}"
                                 moduleName != null && functionName == null ->
                                     "invalid_import_function_name_atom_index(${import.functionAtomIndex}, moduleName: $moduleName)"
                                 moduleName == null && functionName != null ->
