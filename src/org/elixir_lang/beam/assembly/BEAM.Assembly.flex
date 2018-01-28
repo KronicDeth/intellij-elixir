@@ -29,12 +29,12 @@ ALIAS={ALIAS_HEAD} {IDENTIFIER_TOKEN_MIDDLE}*
 SINGLE_QUOTE="'"
 ESCAPED_SINGLE_QUOTE="\'"
 NOT_SINGLE_QUOTE=[^']
-CHARLIST = {SINGLE_QUOTE} ({ESCAPED_SINGLE_QUOTE} | {NOT_SINGLE_QUOTE})+ {SINGLE_QUOTE}
+CHARLIST = {SINGLE_QUOTE} ({ESCAPED_SINGLE_QUOTE} | {NOT_SINGLE_QUOTE})* {SINGLE_QUOTE}
 
 DOUBLE_QUOTE="\""
 ESCAPED_DOUBLE_QUOTE="\\\""
 NOT_DOUBLE_QUOTE=[^\"]
-STRING={DOUBLE_QUOTE} ({ESCAPED_DOUBLE_QUOTE} | {NOT_DOUBLE_QUOTE})+ {DOUBLE_QUOTE}
+STRING={DOUBLE_QUOTE} ({ESCAPED_DOUBLE_QUOTE} | {NOT_DOUBLE_QUOTE})* {DOUBLE_QUOTE}
 
 COLON=":"
 ATOM={COLON} ({IDENTIFIER_TOKEN} | {SYMBOLIC_OPERATOR} | {STRING})
@@ -85,6 +85,7 @@ TWO_SYMBOL_OPERATOR = "!=" |
                       "~>"
 
 ONE_SYMBOL_OPERATOR = "!" |
+                      "&" |
                       "*" |
                       "+" |
                       "-" |
@@ -116,7 +117,7 @@ REFERENCE_OPERATOR="&"
   {COMMA}                { return Types.COMMA; }
   {INTEGER}              { return Types.INTEGER; }
   {IDENTIFIER_TOKEN}     { return Types.NAME; }
-  {KEY}                  { return Types.KEY; }
+  {KEY} / {WHITE_SPACE}  { return Types.KEY; }
   {MAP_OPERATOR}         { return Types.MAP_OPERATOR; }
   {NAME_ARITY_SEPARATOR} { return Types.NAME_ARITY_SEPARATOR; }
   {OPENING_BRACKET}      { return Types.OPENING_BRACKET; }
