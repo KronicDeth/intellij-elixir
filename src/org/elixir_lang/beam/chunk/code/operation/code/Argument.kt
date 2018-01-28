@@ -3,6 +3,7 @@ package org.elixir_lang.beam.chunk.code.operation.code
 import org.elixir_lang.beam.Cache
 import org.elixir_lang.beam.chunk.Code
 import org.elixir_lang.beam.chunk.Code.Options
+import org.elixir_lang.beam.chunk.Code.Options.Companion.UNAMBIGUOUS
 import org.elixir_lang.beam.chunk.Code.Options.Inline
 import org.elixir_lang.beam.term.*
 import org.elixir_lang.beam.term.Float
@@ -40,7 +41,7 @@ data class Argument(val name: String, val supportedOptions: Code.Options = Code.
                         if (index == 0) {
                             "nil"
                         } else {
-                            cache.atoms?.get(index)?.string?.let { string ->
+                            cache.atoms?.getOrNull(index)?.string?.let { string ->
                                 ElixirModulesUtil.erlangModuleNameToElixir(string)
                             } ?: "invalid_atom_index($index)"
                         }
@@ -82,14 +83,14 @@ data class Argument(val name: String, val supportedOptions: Code.Options = Code.
 
                 when {
                     supportedOptions.inline.functions && configuredOptions.inline.functions -> {
-                        cache.functions?.get(index)?.let { function ->
+                        cache.functions?.getOrNull(index)?.let { function ->
                             function.name?.let { name ->
                                 ":${inspectAsFunction(name)}"
                             } ?: "invalid_function_atom_index(${function.atomIndex})"
                         } ?: "invalid_function_index($index)"
                     }
                     supportedOptions.inline.imports && configuredOptions.inline.imports -> {
-                        cache.imports?.get(index)?.let { import ->
+                        cache.imports?.getOrNull(index)?.let { import ->
                             val moduleName = import.moduleName
                             val functionName = import.functionName
 
@@ -106,7 +107,7 @@ data class Argument(val name: String, val supportedOptions: Code.Options = Code.
                         } ?: "invalid_import_index($index)"
                     }
                     supportedOptions.inline.literals && configuredOptions.inline.literals -> {
-                        cache.literals?.get(index)?.let { literal ->
+                        cache.literals?.getOrNull(index)?.let { literal ->
                             inspect(literal)
                         } ?: "invalid_literal_index($index)"
                     }
@@ -137,12 +138,19 @@ val UNIT = Argument("unit", Options(Inline(atoms = false, integers = true)))
 val WORDS_OF_HEAP = Argument("words_of_heap", Options(Inline(integers = true, literals = false)))
 val WORDS_OF_STACK = Argument("words_of_stack", Options(Inline(integers = true, literals = false)))
 
-fun arguments(count: Int): Array<Argument> = (1..count).map { Argument("argument$it") }.toTypedArray()
+fun arguments(count: Int): Array<Argument> = (1..count).map {
+    Argument("argument$it", UNAMBIGUOUS)
+}.toTypedArray()
 
-val COMPARISON = arrayOf(FAIL_LABEL, Argument("left"), Argument("right"))
+val COMPARISON = arrayOf(
+        FAIL_LABEL,
+        Argument("left", UNAMBIGUOUS),
+        Argument("right", UNAMBIGUOUS)
+)
 val FIVE = arguments(5)
 val FOUR = arguments(4)
-val ONE = arrayOf(Argument("argument"))
+val ONE = arrayOf(Argument( "argument", UNAMBIGUOUS)
+)
 val SEVEN = arguments(7)
 val SIX = arguments(6)
 val TWO = arguments(2)

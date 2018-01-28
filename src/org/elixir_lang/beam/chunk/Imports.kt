@@ -6,8 +6,9 @@ import org.elixir_lang.beam.chunk.Chunk.unsignedInt
 import org.elixir_lang.beam.chunk.imports.Import
 
 class Imports(private val importList: List<Import>) {
+    operator fun get(index: Int): Import = importList[index]
+    fun getOrNull(index: Int): Import? = importList.getOrNull(index)
     fun size() = importList.size
-    operator fun get(index: Int): Import? = importList[index]
 
     companion object {
         fun from(chunk: Chunk, atoms: Atoms?): Imports? =

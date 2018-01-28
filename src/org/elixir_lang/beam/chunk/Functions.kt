@@ -7,6 +7,7 @@ import org.elixir_lang.beam.chunk.functions.Function
 
 class Functions(private val functionList: List<Function>) {
     operator fun get(index: Int): Function = functionList[index]
+    fun getOrNull(index: Int): Function? = functionList.getOrNull(index)
     fun size(): Int = functionList.size
 
     companion object {

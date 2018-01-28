@@ -11,6 +11,7 @@ import java.util.zip.Inflater
 
 class Literals(private val termList: List<OtpErlangObject>) {
     operator fun get(index: Int): OtpErlangObject = termList[index]
+    fun getOrNull(index: Int): OtpErlangObject? = termList.getOrNull(index)
     fun size(): Int = termList.size
 
     companion object {
@@ -61,4 +62,5 @@ class Literals(private val termList: List<OtpErlangObject>) {
             return Literals(termList)
         }
     }
+
 }

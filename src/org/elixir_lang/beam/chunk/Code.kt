@@ -10,13 +10,21 @@ import org.elixir_lang.beam.chunk.code.Operation
 class Code(private val operationList: List<Operation>) {
     data class Options(val inline: Inline = Inline(), val showArgumentNames: Boolean = true) {
         data class Inline(
-                val atoms: Boolean = false,
+                val atoms: Boolean = true,
                 val functions: Boolean = false,
                 val imports: Boolean = false,
                 val integers: Boolean = true,
                 val labels: Boolean = true,
-                val literals: Boolean = false
-        )
+                val literals: Boolean = true
+        ) {
+            companion object {
+                val UNAMBIGUOUS = Inline(atoms = true, functions = false, imports = false, integers = true, literals = true)
+            }
+        }
+
+        companion object {
+            val UNAMBIGUOUS = Options(Inline.Companion.UNAMBIGUOUS)
+        }
     }
 
     fun assembly(cache: Cache, options: Options): String =

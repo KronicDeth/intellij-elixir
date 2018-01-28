@@ -29,7 +29,7 @@ class Model(private val atoms: Atoms?) : AbstractTableModel() {
         }
 
         // atomIndexes are 1-based while rowIndex is 0-based
-        val atom = atoms!![rowIndex + 1]!!
+        val atom = atoms!![rowIndex + 1]
 
         return when (columnIndex) {
             0 -> atom.index

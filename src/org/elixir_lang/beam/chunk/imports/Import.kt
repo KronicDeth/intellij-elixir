@@ -5,13 +5,14 @@ import com.intellij.openapi.util.component2
 import org.elixir_lang.beam.chunk.Atoms
 import org.elixir_lang.beam.chunk.Chunk
 import org.elixir_lang.beam.chunk.Chunk.unsignedInt
+import org.elixir_lang.beam.term.unsignedIntToInt
 
 data class Import(val moduleAtomIndex: Long, val functionAtomIndex: Long, val arity: Long, private val atoms: Atoms?) {
     val functionName: String?
-        get() = atoms?.get(functionAtomIndex.toInt())?.string
+        get() = atoms?.getOrNull(unsignedIntToInt(functionAtomIndex))?.string
 
     val moduleName: String?
-        get() = atoms?.get(moduleAtomIndex.toInt())?.string
+        get() = atoms?.getOrNull(unsignedIntToInt(moduleAtomIndex))?.string
 
     companion object {
         fun from(chunk: Chunk, offset: Int, atoms: Atoms?): Pair<Import, Int> {

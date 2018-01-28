@@ -5,10 +5,11 @@ import com.intellij.openapi.util.component2
 import org.elixir_lang.beam.chunk.Atoms
 import org.elixir_lang.beam.chunk.Chunk
 import org.elixir_lang.beam.chunk.Chunk.unsignedInt
+import org.elixir_lang.beam.term.unsignedIntToInt
 
 // atomIndex is 1-based
 class CallDefinition(val atomIndex: Long, val arity: Long, val label: Long, atoms: Atoms?): Comparable<CallDefinition> {
-    val name: String? = atoms?.get(atomIndex.toInt())?.string
+    val name: String? = atoms?.getOrNull(unsignedIntToInt(atomIndex))?.string
 
     override fun compareTo(other: CallDefinition): Int {
         val nameAtomIndexComparison = if (name != null && other.name != null) {

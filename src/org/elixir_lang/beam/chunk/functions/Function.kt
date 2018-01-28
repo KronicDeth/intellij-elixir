@@ -22,7 +22,7 @@ class Function(
             val (atomIndex, atomIndexByteCount) = unsignedInt(data, internalOffset)
             internalOffset += atomIndexByteCount
 
-            val name = atoms?.get(atomIndex.toInt())?.string
+            val name = atoms?.getOrNull(atomIndex.toInt())?.string
 
             val (arity, arityByteCount) = unsignedInt(data, internalOffset)
             internalOffset += arityByteCount
