@@ -1,5 +1,6 @@
 package org.elixir_lang.beam.assembly
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiDocumentManager
@@ -125,6 +126,8 @@ class Controls(val cache: Cache, val project: Project): JBScrollPane() {
     private fun computeDocumentText() = cache.code?.assembly(cache, assemblyOptions) ?: DEFAULT_TEXT
 
     private fun setDocumentText() {
-        document.setText(computeDocumentText())
+        ApplicationManager.getApplication().runWriteAction {
+            document.setText(computeDocumentText())
+        }
     }
 }
