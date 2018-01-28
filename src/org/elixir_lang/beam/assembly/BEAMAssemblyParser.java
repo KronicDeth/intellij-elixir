@@ -1,15 +1,15 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.beam.assembly;
 
+import com.intellij.lang.ASTNode;
+import com.intellij.lang.LightPsiParser;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiBuilder.Marker;
-import static org.elixir_lang.beam.assembly.psi.Types.*;
-import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
-import com.intellij.psi.tree.IElementType;
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.tree.TokenSet;
 import com.intellij.lang.PsiParser;
-import com.intellij.lang.LightPsiParser;
+import com.intellij.psi.tree.IElementType;
+
+import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
+import static org.elixir_lang.beam.assembly.psi.Types.*;
 
 @SuppressWarnings({"SimplifiableIfStatement", "UnusedAssignment"})
 public class BEAMAssemblyParser implements PsiParser, LightPsiParser {
@@ -170,17 +170,24 @@ public class BEAMAssemblyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // OPENING_BRACKET termList CLOSING_BRACKET
+  // OPENING_BRACKET termList? CLOSING_BRACKET
   public static boolean list(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "list")) return false;
     if (!nextTokenIs(b, OPENING_BRACKET)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, OPENING_BRACKET);
-    r = r && termList(b, l + 1);
+    r = r && list_1(b, l + 1);
     r = r && consumeToken(b, CLOSING_BRACKET);
     exit_section_(b, m, LIST, r);
     return r;
+  }
+
+  // termList?
+  private static boolean list_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "list_1")) return false;
+    termList(b, l + 1);
+    return true;
   }
 
   /* ********************************************************** */
