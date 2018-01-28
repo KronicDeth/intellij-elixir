@@ -18,10 +18,11 @@ class SyntaxHighlighter: SyntaxHighlighterBase() {
                 CLOSING_BRACKET, OPENING_BRACKET -> ElixirSyntaxHighlighter.BRACKETS_KEYS
                 CLOSING_CURLY, OPENING_CURLY -> ElixirSyntaxHighlighter.BRACES_KEYS
                 CLOSING_PARENTHESIS, OPENING_PARENTHESIS -> ElixirSyntaxHighlighter.PARENTHESES_KEYS
-                INTEGER -> ElixirSyntaxHighlighter.DECIMAL_KEYS
-                NAME -> ElixirSyntaxHighlighter.KEYWORD_KEYS
                 DOT_OPERATOR, MAP_OPERATOR, NAME_ARITY_SEPARATOR, REFERENCE_OPERATOR, SYMBOLIC_OPERATOR ->
                     ElixirSyntaxHighlighter.OPERATION_SIGN_KEYS
+                INTEGER -> ElixirSyntaxHighlighter.DECIMAL_KEYS
+                NAME -> ElixirSyntaxHighlighter.KEYWORD_KEYS
+                STRING -> ElixirSyntaxHighlighter.STRING_KEYS
                 QUALIFIED_ALIAS -> ElixirSyntaxHighlighter.ALIAS_KEYS
                 else -> ElixirSyntaxHighlighter.EMPTY_KEYS
             }

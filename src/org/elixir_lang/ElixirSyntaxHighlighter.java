@@ -251,7 +251,7 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     public static final TextAttributesKey[] PARENTHESES_KEYS = new TextAttributesKey[]{PARENTHESES};
     private static final TextAttributesKey[] SEMICOLON_KEYS = new TextAttributesKey[]{SEMICOLON};
     private static final TextAttributesKey[] SIGIL_KEYS = new TextAttributesKey[]{SIGIL};
-    private static final TextAttributesKey[] STRING_KEYS = new TextAttributesKey[]{STRING};
+    public static final TextAttributesKey[] STRING_KEYS = new TextAttributesKey[]{STRING};
     private static final TextAttributesKey[] VALID_DIGITS_KEYS = new TextAttributesKey[]{VALID_DIGIT};
     private static final TextAttributesKey[] WHOLE_NUMBER_BASE_KEYS = new TextAttributesKey[]{WHOLE_NUMBER_BASE};
 

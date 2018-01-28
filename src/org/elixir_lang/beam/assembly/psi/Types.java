@@ -37,6 +37,7 @@ public interface Types {
   IElementType OPENING_PARENTHESIS = new TokenType("OPENING_PARENTHESIS");
   IElementType QUALIFIED_ALIAS = new TokenType("QUALIFIED_ALIAS");
   IElementType REFERENCE_OPERATOR = new TokenType("REFERENCE_OPERATOR");
+  IElementType STRING = new TokenType("STRING");
   IElementType SYMBOLIC_OPERATOR = new TokenType("SYMBOLIC_OPERATOR");
 
   class Factory {
