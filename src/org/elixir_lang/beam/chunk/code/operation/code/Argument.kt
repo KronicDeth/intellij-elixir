@@ -129,7 +129,7 @@ val IMPORT_INDEX = Argument("import_index", Options(Inline(imports = true, integ
 val LABEL_ARGUMENT = Argument("label", Options(Inline(labels = true)))
 val LIVE_X_REGISTER_COUNT = Argument("live_x_register_count", Options(Inline(integers = true, literals = false)))
 val SIZE = Argument("size")
-val SOURCE = Argument("source")
+val SOURCE = Argument("source", Options(Inline(atoms = true, integers = false)))
 val TUPLE = Argument("tuple")
 val UNIT = Argument("unit", Options(Inline(atoms = false, integers = true)))
 val WORDS_OF_HEAP = Argument("words_of_heap", Options(Inline(integers = true, literals = false)))
