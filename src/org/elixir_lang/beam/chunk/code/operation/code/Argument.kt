@@ -36,7 +36,6 @@ data class Argument(val name: String, val supportedOptions: Code.Options = Code.
                 val index = term.index
 
                 when {
-                    supportedOptions.inline.integers && configuredOptions.inline.integers -> index.toString()
                     supportedOptions.inline.atoms && configuredOptions.inline.atoms -> {
                         if (index == 0) {
                             "nil"
@@ -46,6 +45,7 @@ data class Argument(val name: String, val supportedOptions: Code.Options = Code.
                             } ?: "invalid_atom_index($index)"
                         }
                     }
+                    supportedOptions.inline.integers && configuredOptions.inline.integers -> index.toString()
                     else -> "atom($index)"
                 }
             }
