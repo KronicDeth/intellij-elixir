@@ -34,26 +34,97 @@ class Code(private val operationList: List<Operation>) {
     }
 
     fun assembly(cache: Cache, options: Options): String =
-        operationList.joinToString("\n") { operation ->
+        indentOperationList().joinToString("\n") { (indent, operation) ->
             val operationAssembly = operation.assembly(cache, options)
-            val function = operation.code.function
 
-            val indent = when (function) {
-                "label" -> ""
-                "line" -> "  "
-                "func_info" -> "    "
-                else -> "      "
-            }
-            val suffix = when (function) {
-                "badmatch", "call_ext_last", "call_ext_only", "call_last", "return" -> "\n"
-                else -> ""
+            val suffix = when (operation.code) {
+                org.elixir_lang.beam.chunk.code.operation.Code.BADMATCH,
+                org.elixir_lang.beam.chunk.code.operation.Code.CALL_EXT_LAST,
+                org.elixir_lang.beam.chunk.code.operation.Code.CALL_EXT_ONLY,
+                org.elixir_lang.beam.chunk.code.operation.Code.CALL_LAST,
+                org.elixir_lang.beam.chunk.code.operation.Code.RETURN ->
+                    "\n"
+                else ->
+                    ""
             }
 
-            "$indent$operationAssembly$suffix"
+            "${" ".repeat(indent)}$operationAssembly$suffix"
         }
 
     operator fun get(index: Int): Operation = operationList[index]
     fun size(): Int = operationList.size
+
+    private fun functionHeadBodyPairList(): List<Pair<List<Operation>, List<Operation>>> {
+        val headerIndexLengthPairs = headerIndexLengthPairs()
+
+        return headerIndexLengthPairs.mapIndexed { index, (headerIndex, headerLength) ->
+            val bodyIndex = headerIndex + headerLength
+            val nextHeaderIndex = headerIndexLengthPairs.getOrNull(index + 1)?.first ?: operationList.size
+
+            val functionHead = operationList.subList(headerIndex, bodyIndex)
+            val functionBody = operationList.subList(bodyIndex, nextHeaderIndex)
+
+            Pair(functionHead, functionBody)
+        }
+    }
+
+    private fun headerIndexLengthPairs(): List<Pair<Int, Int>> {
+        val headerIndexLengthPairs = operationList
+                .mapIndexedNotNull { index, operation ->
+                    if (operation.code == org.elixir_lang.beam.chunk.code.operation.Code.FUNC_INFO) {
+                        index
+                    } else {
+                        null
+                    }
+                }.map { funcInfoIndex ->
+                    val lineIndex = funcInfoIndex - 1
+                    val hasLine = operationList.getOrNull(lineIndex)?.code == org.elixir_lang.beam.chunk.code.operation.Code.LINE
+
+                    if (hasLine) {
+                        val labelIndex = lineIndex - 1
+                        val hasLabel = operationList.getOrNull(labelIndex)?.code == org.elixir_lang.beam.chunk.code.operation.Code.LABEL
+
+                        if (hasLabel) {
+                            Pair(labelIndex, 3)
+                        } else {
+                            Pair(lineIndex, 2)
+                        }
+                    } else {
+                        Pair(funcInfoIndex, 1)
+                    }
+                }
+
+        val firstHeaderIndex = headerIndexLengthPairs.firstOrNull()?.first ?: 0
+
+        return if (firstHeaderIndex > 0) {
+            headerIndexLengthPairs.toMutableList().apply {
+                add(0, Pair(0, 0))
+            }
+        } else {
+            headerIndexLengthPairs
+        }
+    }
+
+    private fun indentOperationList() =
+            functionHeadBodyPairList().flatMap { (functionHead, functionBody) ->
+                val indentOperationList = mutableListOf<Pair<Int, Operation>>()
+
+                functionHead.forEach {
+                    indentOperationList.add(Pair(0, it))
+                }
+
+                functionBody.forEach {
+                    val indent = when (it.code) {
+                        org.elixir_lang.beam.chunk.code.operation.Code.LABEL -> 2
+                        org.elixir_lang.beam.chunk.code.operation.Code.LINE -> 4
+                        else -> 6
+                    }
+
+                    indentOperationList.add(Pair(indent, it))
+                }
+
+                indentOperationList
+            }
 
     companion object {
         private val LOGGER = Logger.getInstance(Code::class.java)
