@@ -386,7 +386,15 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
     // Building terms.
     //
     PUT_STRING(68, "-put_string", THREE),
-    PUT_LIST(69, "put_list", THREE),
+    PUT_LIST(
+            69,
+            "put_list",
+            arrayOf(
+                    Argument("head", Options(Inline(literals = true))),
+                    Argument("tail", Options(Inline(literals = true))),
+                    DESTINATION_REGISTER
+            )
+    ),
     PUT_TUPLE(
             70,
             "put_tuple",
