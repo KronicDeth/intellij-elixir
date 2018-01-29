@@ -1,6 +1,7 @@
 package org.elixir_lang.beam.chunk.code.operation
 
 import org.elixir_lang.beam.chunk.Code.Options
+import org.elixir_lang.beam.chunk.Code.Options.Companion.UNAMBIGUOUS
 import org.elixir_lang.beam.chunk.Code.Options.Inline
 import org.elixir_lang.beam.chunk.code.operation.code.*
 
@@ -545,7 +546,13 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
     GC_BIF1(
             124,
             "gc_bif1",
-            arrayOf(FAIL_LABEL, LIVE_X_REGISTER_COUNT, IMPORT, *ONE, DESTINATION_REGISTER)
+            arrayOf(
+                    FAIL_LABEL,
+                    LIVE_X_REGISTER_COUNT,
+                    IMPORT,
+                    Argument( "argument", UNAMBIGUOUS),
+                    DESTINATION_REGISTER
+            )
     ),
 
     // @spec gc_bif2 Lbl Live Bif Arg1 Arg2 Reg
