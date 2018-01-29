@@ -60,7 +60,7 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
     // @spec call_ext Arity Destination
     // @doc Call the function of arity Arity pointed to by Destination.
     //      Save the next instruction as the return address in the CP register.
-    CALL_EXT(7, "call_ext", arrayOf(ARITY, IMPORT_INDEX)),
+    CALL_EXT(7, "call_ext", arrayOf(ARITY, IMPORT)),
 
     // @spec call_ext_last Arity Destination Deallocate
     // @doc Deallocate and do a tail call to function of arity Arity
@@ -79,7 +79,7 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
 
     // @spec bif0 Bif Reg
     // @doc Call the bif Bif and store the result in Reg.
-    BIF0(9, "bif0", arrayOf(IMPORT_INDEX, DESTINATION_REGISTER)),
+    BIF0(9, "bif0", arrayOf(IMPORT, DESTINATION_REGISTER)),
 
     // @spec bif1 Lbl Bif Arg Reg
     // @doc Call the bif Bif with the argument Arg, and store the result in Reg.
@@ -87,7 +87,7 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
     BIF1(
             10,
             "bif1",
-            arrayOf(FAIL_LABEL, IMPORT_INDEX, Argument("argument"), DESTINATION_REGISTER)
+            arrayOf(FAIL_LABEL, IMPORT, Argument("argument"), DESTINATION_REGISTER)
     ),
 
     // @spec bif2 Lbl Bif Arg1 Arg2 Reg
@@ -99,7 +99,7 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
             "bif2",
             arrayOf(
                     FAIL_LABEL,
-                    IMPORT_INDEX,
+                    IMPORT,
                     *TWO,
                     DESTINATION_REGISTER
             )
@@ -426,7 +426,7 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
     // @spec call_ext_only Arity ImportIndex
     //      Do a tail recursive call to the function at ImportIndex.
     //      Do not update the CP register.
-    CALL_EXT_ONLY(78, "call_ext_only", arrayOf(ARITY, IMPORT_INDEX)),
+    CALL_EXT_ONLY(78, "call_ext_only", arrayOf(ARITY, IMPORT)),
 
     //
     // Binary matching (R7).
@@ -481,7 +481,7 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
             "make_fun2",
             arrayOf(
                     Argument(
-                            "function_index",
+                            "function",
                             Options(Inline(functions = true, integers = true, literals = false))
                     )
             )
@@ -545,7 +545,7 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
     GC_BIF1(
             124,
             "gc_bif1",
-            arrayOf(FAIL_LABEL, LIVE_X_REGISTER_COUNT, IMPORT_INDEX, *ONE, DESTINATION_REGISTER)
+            arrayOf(FAIL_LABEL, LIVE_X_REGISTER_COUNT, IMPORT, *ONE, DESTINATION_REGISTER)
     ),
 
     // @spec gc_bif2 Lbl Live Bif Arg1 Arg2 Reg
@@ -557,7 +557,7 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
     GC_BIF2(
             125,
             "gc_bif2",
-            arrayOf(FAIL_LABEL, LIVE_X_REGISTER_COUNT, IMPORT_INDEX, *TWO, DESTINATION_REGISTER)
+            arrayOf(FAIL_LABEL, LIVE_X_REGISTER_COUNT, IMPORT, *TWO, DESTINATION_REGISTER)
     ),
 
     // Experimental new bit_level bifs introduced in R11B.
@@ -640,7 +640,7 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
     GC_BIF3(
             152,
             "gc_bif3",
-            arrayOf(LABEL_ARGUMENT, LIVE_X_REGISTER_COUNT, IMPORT_INDEX, *THREE, DESTINATION_REGISTER)
+            arrayOf(LABEL_ARGUMENT, LIVE_X_REGISTER_COUNT, IMPORT, *THREE, DESTINATION_REGISTER)
     ),
 
     // R15A
