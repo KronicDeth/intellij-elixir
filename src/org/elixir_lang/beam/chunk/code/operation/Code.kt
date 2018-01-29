@@ -452,8 +452,8 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
             92,
             "bs_put_string",
             arrayOf(
-                    Argument("length", Options(Inline(integers = true))),
-                    Argument("pool_offset", Options(Inline(integers = true)))
+                    Argument("length", Options(Inline(integers = true, literals = false))),
+                    Argument("pool_offset", Options(Inline(integers = true, literals = false)))
             )
     ),
 

@@ -15,10 +15,16 @@ class Code(private val operationList: List<Operation>) {
                 val imports: Boolean = false,
                 val integers: Boolean = true,
                 val labels: Boolean = true,
-                val literals: Boolean = true
+                val literals: Boolean = false
         ) {
             companion object {
-                val UNAMBIGUOUS = Inline(atoms = true, functions = false, imports = false, integers = true, literals = true)
+                val UNAMBIGUOUS = Inline(
+                        atoms = true,
+                        functions = false,
+                        imports = false,
+                        integers = true,
+                        literals = false
+                )
             }
         }
 
