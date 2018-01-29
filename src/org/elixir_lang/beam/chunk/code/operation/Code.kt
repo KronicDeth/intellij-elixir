@@ -80,7 +80,7 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
 
     // @spec bif0 Bif Reg
     // @doc Call the bif Bif and store the result in Reg.
-    BIF0(9, "bif0", arrayOf(IMPORT, DESTINATION_REGISTER)),
+    BIF0(9, "bif0", arrayOf(IMPORT, DESTINATION)),
 
     // @spec bif1 Lbl Bif Arg Reg
     // @doc Call the bif Bif with the argument Arg, and store the result in Reg.
@@ -88,7 +88,7 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
     BIF1(
             10,
             "bif1",
-            arrayOf(FAIL_LABEL, IMPORT, Argument("argument"), DESTINATION_REGISTER)
+            arrayOf(FAIL_LABEL, IMPORT, Argument("argument"), DESTINATION)
     ),
 
     // @spec bif2 Lbl Bif Arg1 Arg2 Reg
@@ -102,7 +102,7 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
                     FAIL_LABEL,
                     IMPORT,
                     *TWO,
-                    DESTINATION_REGISTER
+                    DESTINATION
             )
     ),
 
@@ -352,7 +352,7 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
     // @spec move Source Destination
     // @doc Move the source Source (a literal or a register) to
     //      the destination register Destination.
-    MOVE(64, "move", arrayOf(SOURCE, DESTINATION_REGISTER)),
+    MOVE(64, "move", arrayOf(SOURCE, DESTINATION)),
 
     // @spec get_list  Source Head Tail
     // @doc  Get the head and tail (or car and cdr) parts of a list
@@ -370,7 +370,7 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
     GET_TUPLE_ELEMENT(
             66,
             "get_tuple_element",
-            arrayOf(SOURCE, Argument("element_number"), DESTINATION_REGISTER)
+            arrayOf(SOURCE, Argument("element_number"), DESTINATION)
     ),
 
     // @spec set_tuple_element NewElement Tuple Position
@@ -392,7 +392,7 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
             arrayOf(
                     Argument("head", Options(Inline(literals = true))),
                     Argument("tail", Options(Inline(literals = true))),
-                    DESTINATION_REGISTER
+                    DESTINATION
             )
     ),
     PUT_TUPLE(
@@ -400,7 +400,7 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
             "put_tuple",
             arrayOf(
                     Argument("size", Options(Inline(integers = true, literals = false))),
-                    DESTINATION_REGISTER
+                    DESTINATION
             )
     ),
     PUT(71, "put", ONE),
@@ -507,7 +507,7 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
     BS_INIT2(
             109,
             "bs_init2",
-            arrayOf(FAIL_LABEL, SIZE, WORDS_OF_STACK, LIVE_X_REGISTER_COUNT, FLAGS, DESTINATION_REGISTER)
+            arrayOf(FAIL_LABEL, SIZE, WORDS_OF_STACK, LIVE_X_REGISTER_COUNT, FLAGS, DESTINATION)
     ),
     BS_BITS_TO_BYTES(110, "-bs_bits_to_bytes", THREE),
     BS_ADD(
@@ -559,7 +559,7 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
                     LIVE_X_REGISTER_COUNT,
                     IMPORT,
                     Argument( "argument", UNAMBIGUOUS),
-                    DESTINATION_REGISTER
+                    DESTINATION
             )
     ),
 
@@ -572,7 +572,7 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
     GC_BIF2(
             125,
             "gc_bif2",
-            arrayOf(FAIL_LABEL, LIVE_X_REGISTER_COUNT, IMPORT, *TWO, DESTINATION_REGISTER)
+            arrayOf(FAIL_LABEL, LIVE_X_REGISTER_COUNT, IMPORT, *TWO, DESTINATION)
     ),
 
     // Experimental new bit_level bifs introduced in R11B.
@@ -655,7 +655,7 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
     GC_BIF3(
             152,
             "gc_bif3",
-            arrayOf(LABEL_ARGUMENT, LIVE_X_REGISTER_COUNT, IMPORT, *THREE, DESTINATION_REGISTER)
+            arrayOf(LABEL_ARGUMENT, LIVE_X_REGISTER_COUNT, IMPORT, *THREE, DESTINATION)
     ),
 
     // R15A
@@ -679,7 +679,7 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
             arrayOf(
                     FAIL_LABEL,
                     SOURCE,
-                    DESTINATION_REGISTER,
+                    DESTINATION,
                     LIVE_X_REGISTER_COUNT,
                     Argument("field_from_source", Options(Inline(atoms = true, integers = false)))
             )
