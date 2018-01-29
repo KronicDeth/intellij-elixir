@@ -107,6 +107,19 @@ class Controls(val cache: Cache, val project: Project): JBScrollPane() {
         }
         scrollable.add(inlineLiteralsCheckBox)
 
+        val inlineLocalCallsCheckBox = JBCheckBox("Inline Local Calls", assemblyOptions.inline.localCalls)
+        inlineLocalCallsCheckBox.addItemListener { itemEvent ->
+            when (itemEvent.stateChange) {
+                DESELECTED ->
+                    assemblyOptions = assemblyOptions.copy(inline = assemblyOptions.inline.copy(localCalls = false))
+                SELECTED ->
+                    assemblyOptions = assemblyOptions.copy(inline = assemblyOptions.inline.copy(localCalls = true))
+            }
+
+            setDocumentText()
+        }
+        scrollable.add(inlineLocalCallsCheckBox)
+
         val showArgumentNamesCheckBox = JBCheckBox("Show Argument Names", assemblyOptions.showArgumentNames)
         showArgumentNamesCheckBox.addItemListener { itemEvent ->
             when (itemEvent.stateChange) {

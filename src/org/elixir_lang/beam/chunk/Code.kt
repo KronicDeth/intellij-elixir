@@ -6,6 +6,7 @@ import com.intellij.openapi.util.component2
 import org.elixir_lang.beam.Cache
 import org.elixir_lang.beam.chunk.Chunk.unsignedInt
 import org.elixir_lang.beam.chunk.code.Operation
+import org.elixir_lang.beam.term.Literal
 
 class Code(private val operationList: List<Operation>) {
     data class Options(val inline: Inline = Inline(), val showArgumentNames: Boolean = true) {
@@ -15,7 +16,8 @@ class Code(private val operationList: List<Operation>) {
                 val imports: Boolean = false,
                 val integers: Boolean = true,
                 val labels: Boolean = true,
-                val literals: Boolean = false
+                val literals: Boolean = false,
+                val localCalls: Boolean = true
         ) {
             companion object {
                 val UNAMBIGUOUS = Inline(
@@ -23,7 +25,8 @@ class Code(private val operationList: List<Operation>) {
                         functions = false,
                         imports = false,
                         integers = true,
-                        literals = false
+                        literals = false,
+                        localCalls = true
                 )
             }
         }
@@ -32,6 +35,20 @@ class Code(private val operationList: List<Operation>) {
             val UNAMBIGUOUS = Options(Inline.Companion.UNAMBIGUOUS)
         }
     }
+
+    private val labelIndexToOperationIndex by lazy {
+        operationList
+                .withIndex()
+                .filter { indexedOperation ->
+                    indexedOperation.value.code == org.elixir_lang.beam.chunk.code.operation.Code.LABEL
+                }.associate { indexedOperation ->
+                    val labelIndex = (indexedOperation.value.termList[0] as Literal).index
+                    val operationIndex = indexedOperation.index
+
+                    Pair(labelIndex, operationIndex)
+                }
+    }
+    private val labelIndexToFuncInfoIndex by lazy { mutableMapOf<Int, Int?>() }
 
     fun assembly(cache: Cache, options: Options): String =
         indentOperationList().joinToString("\n") { (indent, operation) ->
@@ -53,6 +70,21 @@ class Code(private val operationList: List<Operation>) {
         }
 
     operator fun get(index: Int): Operation = operationList[index]
+
+    fun labelIndexToFuncInfoIndex(labelIndex: Int): Int? =
+        labelIndexToFuncInfoIndex.computeIfAbsent(labelIndex) { key ->
+            labelIndexToOperationIndex[key]?.let { operationIndex ->
+                val funcInfoIndex = operationIndex - 1
+
+                if (operationList.getOrNull(funcInfoIndex)?.code ==
+                        org.elixir_lang.beam.chunk.code.operation.Code.FUNC_INFO) {
+                    funcInfoIndex
+                } else {
+                    null
+                }
+            }
+        }
+
     fun size(): Int = operationList.size
 
     private fun functionHeadBodyPairList(): List<Pair<List<Operation>, List<Operation>>> {

@@ -156,3 +156,6 @@ val SIX = arguments(6)
 val TWO = arguments(2)
 val THREE = arguments(3)
 val UNARY = arrayOf(FAIL_LABEL, Argument("argument", UNAMBIGUOUS))
+
+fun reference(module: String, function: String, arity: Long) =
+        "&${ElixirModulesUtil.erlangModuleNameToElixir(module)}.${inspectAsFunction(function)}/$arity"
