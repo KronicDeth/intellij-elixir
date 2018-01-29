@@ -41,6 +41,7 @@ class Code(private val operationList: List<Operation>) {
                 org.elixir_lang.beam.chunk.code.operation.Code.BADMATCH,
                 org.elixir_lang.beam.chunk.code.operation.Code.CALL_EXT_LAST,
                 org.elixir_lang.beam.chunk.code.operation.Code.CALL_EXT_ONLY,
+                org.elixir_lang.beam.chunk.code.operation.Code.CALL_ONLY,
                 org.elixir_lang.beam.chunk.code.operation.Code.CALL_LAST,
                 org.elixir_lang.beam.chunk.code.operation.Code.RETURN ->
                     "\n"
