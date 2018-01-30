@@ -17,7 +17,8 @@ class Code(private val operationList: List<Operation>) {
                 val integers: Boolean = true,
                 val labels: Boolean = true,
                 val literals: Boolean = false,
-                val localCalls: Boolean = true
+                val localCalls: Boolean = true,
+                val strings: Boolean = true
         ) {
             companion object {
                 val UNAMBIGUOUS = Inline(
@@ -26,7 +27,8 @@ class Code(private val operationList: List<Operation>) {
                         imports = false,
                         integers = true,
                         literals = false,
-                        localCalls = true
+                        localCalls = true,
+                        strings = true
                 )
             }
         }

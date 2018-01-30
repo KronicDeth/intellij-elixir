@@ -25,7 +25,8 @@ class Controls(val cache: Cache, val project: Project): JBScrollPane() {
                     integers = true,
                     labels = true,
                     literals = true,
-                    localCalls = true
+                    localCalls = true,
+                    strings = true
             ),
             showArgumentNames = true
     )
@@ -130,6 +131,20 @@ class Controls(val cache: Cache, val project: Project): JBScrollPane() {
             setDocumentText()
         }
         scrollable.add(inlineLocalCallsCheckBox)
+
+        val inlineStringsCheckBox = JBCheckBox("Inline Strings", assemblyOptions.inline.strings)
+        inlineStringsCheckBox.addItemListener { itemEvent ->
+            when (itemEvent.stateChange) {
+                DESELECTED ->
+                    assemblyOptions = assemblyOptions.copy(inline = assemblyOptions.inline.copy(strings = false))
+                SELECTED ->
+                    assemblyOptions = assemblyOptions.copy(inline = assemblyOptions.inline.copy(strings = true))
+            }
+
+            setDocumentText()
+        }
+        scrollable.add(inlineStringsCheckBox)
+
 
         val showArgumentNamesCheckBox = JBCheckBox("Show Argument Names", assemblyOptions.showArgumentNames)
         showArgumentNamesCheckBox.addItemListener { itemEvent ->

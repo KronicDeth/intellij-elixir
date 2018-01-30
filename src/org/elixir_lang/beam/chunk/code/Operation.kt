@@ -31,7 +31,28 @@ data class Operation(val code: Code, val termList: List<Term>) {
                     null
                 }
             }
-            Code.CALL_EXT, Code.CALL_EXT_ONLY -> {
+            Code.BS_PUT_STRING ->
+                if (options.inline.strings) {
+                    cache.strings?.pool?.let { pool ->
+                        (termList[0] as? Literal)?.index?.let { length ->
+                            (termList[1] as? Literal)?.index?.let { start ->
+                                val end = start + length
+                                val poolLength = pool.length
+
+                                if (start < poolLength && end < poolLength) {
+                                    val string = pool.substring(start, end).replace("'", "\'")
+
+                                    "${code.function}('$string')"
+                                } else {
+                                    null
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    null
+                }
+            Code.CALL_EXT, Code.CALL_EXT_ONLY ->
                 if (options.inline.imports) {
                     val index = 1
                     val valueAssembly = code.arguments[index].assembly(
@@ -44,8 +65,7 @@ data class Operation(val code: Code, val termList: List<Term>) {
                 } else {
                     null
                 }
-            }
-            Code.CALL_EXT_LAST -> {
+            Code.CALL_EXT_LAST ->
                 if (options.inline.imports) {
                     val argumentsAssembly = argumentsAssembly(
                             code.arguments.zip(termList).drop(1),
@@ -57,8 +77,7 @@ data class Operation(val code: Code, val termList: List<Term>) {
                 } else {
                     null
                 }
-            }
-            Code.CALL_ONLY -> {
+            Code.CALL_ONLY ->
                 if (options.inline.localCalls) {
                     labelReference(termList[1], cache)?.let { labelReference ->
                         "${code.function}($labelReference)"
@@ -66,7 +85,6 @@ data class Operation(val code: Code, val termList: List<Term>) {
                 } else {
                     null
                 }
-            }
             Code.DEALLOCATE -> {
                 val (wordsOfStack) = termList
 
