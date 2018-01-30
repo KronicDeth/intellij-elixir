@@ -17,7 +17,18 @@ import javax.swing.JPanel
 private const val DEFAULT_TEXT = "# Could not disassemble Code Chunk"
 
 class Controls(val cache: Cache, val project: Project): JBScrollPane() {
-    private var assemblyOptions: Code.Options = Code.Options()
+    private var assemblyOptions: Code.Options = Code.Options(
+            inline = Code.Options.Inline(
+                    atoms = true,
+                    functions = true,
+                    imports = true,
+                    integers = true,
+                    labels = true,
+                    literals = true,
+                    localCalls = true
+            ),
+            showArgumentNames = true
+    )
     val document: Document
 
     init {
