@@ -391,8 +391,8 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
             69,
             "put_list",
             arrayOf(
-                    Argument("head", Options(Inline(literals = true))),
-                    Argument("tail", Options(Inline(literals = true))),
+                    Argument("head", Options(Inline(integers = false, literals = true))),
+                    Argument("tail", Options(Inline(integers = false, literals = true))),
                     DESTINATION
             )
     ),
