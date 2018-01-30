@@ -27,6 +27,12 @@ public class TermImpl extends ASTWrapperPsiElement implements Term {
 
   @Override
   @Nullable
+  public BitString getBitString() {
+    return findChildByClass(BitString.class);
+  }
+
+  @Override
+  @Nullable
   public FunctionReference getFunctionReference() {
     return findChildByClass(FunctionReference.class);
   }

@@ -23,7 +23,10 @@ public class BEAMAssemblyParser implements PsiParser, LightPsiParser {
     boolean r;
     b = adapt_builder_(t, b, this, null);
     Marker m = enter_section_(b, 0, _COLLAPSE_, null);
-    if (t == FUNCTION_REFERENCE) {
+    if (t == BIT_STRING) {
+      r = bitString(b, 0);
+    }
+    else if (t == FUNCTION_REFERENCE) {
       r = functionReference(b, 0);
     }
     else if (t == LIST) {
@@ -76,6 +79,27 @@ public class BEAMAssemblyParser implements PsiParser, LightPsiParser {
       if (!empty_element_parsed_guard_(b, "beamAssemblyFile", c)) break;
       c = current_position_(b);
     }
+    return true;
+  }
+
+  /* ********************************************************** */
+  // OPENING_BIT termList? CLOSING_BIT
+  public static boolean bitString(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "bitString")) return false;
+    if (!nextTokenIs(b, OPENING_BIT)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, OPENING_BIT);
+    r = r && bitString_1(b, l + 1);
+    r = r && consumeToken(b, CLOSING_BIT);
+    exit_section_(b, m, BIT_STRING, r);
+    return r;
+  }
+
+  // termList?
+  private static boolean bitString_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "bitString_1")) return false;
+    termList(b, l + 1);
     return true;
   }
 
@@ -312,7 +336,8 @@ public class BEAMAssemblyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // ATOM | ATOM_KEYWORD | CHARLIST | INTEGER | QUALIFIED_ALIAS | STRING | functionReference | list | map | tuple | struct | typedTerm
+  // ATOM | ATOM_KEYWORD | CHARLIST | INTEGER | QUALIFIED_ALIAS | STRING | 
+  //          bitString | functionReference | list | map | tuple | struct | typedTerm
   public static boolean term(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "term")) return false;
     boolean r;
@@ -323,6 +348,7 @@ public class BEAMAssemblyParser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, INTEGER);
     if (!r) r = consumeToken(b, QUALIFIED_ALIAS);
     if (!r) r = consumeToken(b, STRING);
+    if (!r) r = bitString(b, l + 1);
     if (!r) r = functionReference(b, l + 1);
     if (!r) r = list(b, l + 1);
     if (!r) r = map(b, l + 1);

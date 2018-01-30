@@ -8,6 +8,7 @@ import org.elixir_lang.beam.assembly.psi.impl.*;
 
 public interface Types {
 
+  IElementType BIT_STRING = new ElementType("BIT_STRING");
   IElementType FUNCTION_REFERENCE = new ElementType("FUNCTION_REFERENCE");
   IElementType LIST = new ElementType("LIST");
   IElementType MAP = new ElementType("MAP");
@@ -23,6 +24,7 @@ public interface Types {
   IElementType ATOM = new TokenType("ATOM");
   IElementType ATOM_KEYWORD = new TokenType("ATOM_KEYWORD");
   IElementType CHARLIST = new TokenType("CHARLIST");
+  IElementType CLOSING_BIT = new TokenType("CLOSING_BIT");
   IElementType CLOSING_BRACKET = new TokenType("CLOSING_BRACKET");
   IElementType CLOSING_CURLY = new TokenType("CLOSING_CURLY");
   IElementType CLOSING_PARENTHESIS = new TokenType("CLOSING_PARENTHESIS");
@@ -33,6 +35,7 @@ public interface Types {
   IElementType MAP_OPERATOR = new TokenType("MAP_OPERATOR");
   IElementType NAME = new TokenType("NAME");
   IElementType NAME_ARITY_SEPARATOR = new TokenType("NAME_ARITY_SEPARATOR");
+  IElementType OPENING_BIT = new TokenType("OPENING_BIT");
   IElementType OPENING_BRACKET = new TokenType("OPENING_BRACKET");
   IElementType OPENING_CURLY = new TokenType("OPENING_CURLY");
   IElementType OPENING_PARENTHESIS = new TokenType("OPENING_PARENTHESIS");
@@ -44,7 +47,10 @@ public interface Types {
   class Factory {
     public static PsiElement createElement(ASTNode node) {
       IElementType type = node.getElementType();
-       if (type == FUNCTION_REFERENCE) {
+       if (type == BIT_STRING) {
+        return new BitStringImpl(node);
+      }
+      else if (type == FUNCTION_REFERENCE) {
         return new FunctionReferenceImpl(node);
       }
       else if (type == LIST) {

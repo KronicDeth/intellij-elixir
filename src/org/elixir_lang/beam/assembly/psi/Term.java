@@ -7,6 +7,9 @@ import com.intellij.psi.PsiElement;
 public interface Term extends PsiElement {
 
   @Nullable
+  BitString getBitString();
+
+  @Nullable
   FunctionReference getFunctionReference();
 
   @Nullable

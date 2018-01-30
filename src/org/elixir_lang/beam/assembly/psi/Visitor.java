@@ -7,6 +7,10 @@ import com.intellij.psi.PsiElement;
 
 public class Visitor extends PsiElementVisitor {
 
+  public void visitBitString(@NotNull BitString o) {
+    visitPsiElement(o);
+  }
+
   public void visitFunctionReference(@NotNull FunctionReference o) {
     visitPsiElement(o);
   }
