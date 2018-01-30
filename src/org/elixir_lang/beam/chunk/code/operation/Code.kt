@@ -101,7 +101,8 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
             arrayOf(
                     FAIL_LABEL,
                     IMPORT,
-                    *TWO,
+                    Argument("argument1", Options(Inline(atoms = true, literals = true))),
+                    Argument("argument2", Options(Inline(atoms = true, literals = true))),
                     DESTINATION
             )
     ),
@@ -572,7 +573,14 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
     GC_BIF2(
             125,
             "gc_bif2",
-            arrayOf(FAIL_LABEL, LIVE_X_REGISTER_COUNT, IMPORT, *TWO, DESTINATION)
+            arrayOf(
+                    FAIL_LABEL,
+                    LIVE_X_REGISTER_COUNT,
+                    IMPORT,
+                    Argument("argument1", Options(Inline(atoms = true, literals = true))),
+                    Argument("argument2", Options(Inline(atoms = true, literals = true))),
+                    DESTINATION
+            )
     ),
 
     // Experimental new bit_level bifs introduced in R11B.
