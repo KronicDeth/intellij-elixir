@@ -541,7 +541,7 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
     BS_GET_FLOAT2(118, "bs_get_float2", SEVEN),
     BS_GET_BINARY2(119, "bs_get_binary2", SEVEN),
     BS_SKIP_BITS2(120, "bs_skip_bits2", FIVE),
-    BS_TEST_TAIL2(121, "bs_test_tail2", THREE),
+    BS_TEST_TAIL2(121, "bs_test_tail2", arrayOf(FAIL_LABEL, *TWO)),
     BS_SAVE2(122, "bs_save2", TWO),
     BS_RESTORE2(123, "bs_restore2", TWO),
 
@@ -599,7 +599,7 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
     // R12B
     BS_CONTEXT_TO_BINARY(130, "bs_context_to_binary", ONE),
     BS_TEST_UNIT(131, "bs_test_unit", THREE),
-    BS_MATCH_STRING(132, "bs_match_string", FOUR),
+    BS_MATCH_STRING(132, "bs_match_string", arrayOf(FAIL_LABEL, *THREE)),
     BS_INIT_WRITABLE(133, "bs_init_writable"),
     BS_APPEND(134, "bs_append", arguments(8)),
     BS_PRIVATE_APPEND(135, "bs_private_append", SIX),
