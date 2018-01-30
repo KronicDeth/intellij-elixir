@@ -536,7 +536,11 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
 
     // New bit syntax matching in R11B.
 
-    BS_START_MATCH2(116, "bs_start_match2", arrayOf(FAIL_LABEL, *FOUR)),
+    BS_START_MATCH2(
+            116,
+            "bs_start_match2",
+            arrayOf(FAIL_LABEL, SOURCE, LIVE_X_REGISTER_COUNT, Argument("max"), DESTINATION)
+    ),
     BS_GET_INTEGER2(
             117,
             "bs_get_integer2",
