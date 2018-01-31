@@ -607,7 +607,11 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
     // R12B
     BS_CONTEXT_TO_BINARY(130, "bs_context_to_binary", ONE),
     BS_TEST_UNIT(131, "bs_test_unit", THREE),
-    BS_MATCH_STRING(132, "bs_match_string", arrayOf(FAIL_LABEL, *THREE)),
+    BS_MATCH_STRING(
+            132,
+            "bs_match_string",
+            arrayOf(FAIL_LABEL, MATCH_STATE, Argument("bit_length"), Argument("byte_offset"))
+    ),
     BS_INIT_WRITABLE(133, "bs_init_writable"),
     BS_APPEND(134, "bs_append", arguments(8)),
     BS_PRIVATE_APPEND(135, "bs_private_append", SIX),
