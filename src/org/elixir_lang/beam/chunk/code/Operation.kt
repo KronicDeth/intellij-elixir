@@ -13,6 +13,9 @@ import org.elixir_lang.beam.term.Label
 import org.elixir_lang.beam.term.Literal
 import org.elixir_lang.beam.term.Term
 
+
+const val BITS_PER_BYTE = 8
+
 /**
  * https://github.com/erlang/otp/blob/OTP-20.2.2/lib/compiler/src/genop.tab
  */
@@ -31,6 +34,34 @@ data class Operation(val code: Code, val termList: List<Term>) {
                     null
                 }
             }
+            Code.BS_MATCH_STRING ->
+                if (options.inline.strings) {
+                    cache.strings?.pool?.let { pool ->
+                        (termList[2] as? Literal)?.index?.let { bit_length ->
+                            (termList[3] as? Literal)?.index?.let { start ->
+                                val length = (bit_length + BITS_PER_BYTE - 1) / BITS_PER_BYTE
+                                val end = start + length
+                                val poolLength = pool.length
+
+                                if (start <= poolLength && end <= poolLength) {
+                                    val string = pool.substring(start, end).replace("'", "\'")
+
+                                    val argumentsAssembly = argumentsAssembly(
+                                            code.arguments.zip(termList).take(2),
+                                            cache,
+                                            options
+                                    )
+
+                                    "${code.function}($argumentsAssembly, string: '$string')"
+                                } else {
+                                    null
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    null
+                }
             Code.BS_PUT_STRING ->
                 if (options.inline.strings) {
                     cache.strings?.pool?.let { pool ->
@@ -39,7 +70,7 @@ data class Operation(val code: Code, val termList: List<Term>) {
                                 val end = start + length
                                 val poolLength = pool.length
 
-                                if (start < poolLength && end < poolLength) {
+                                if (start <= poolLength && end <= poolLength) {
                                     val string = pool.substring(start, end).replace("'", "\'")
 
                                     "${code.function}('$string')"
