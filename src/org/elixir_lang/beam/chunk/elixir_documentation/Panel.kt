@@ -5,7 +5,7 @@ import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFileFactory
-import com.intellij.util.containers.ContainerUtil
+import com.intellij.util.containers.WeakValueHashMap
 import org.elixir_lang.ElixirFileType
 import org.elixir_lang.ElixirLanguage
 import org.elixir_lang.beam.chunk.ElixirDocumentation
@@ -21,13 +21,24 @@ class Panel(private val elixirDocumentationTree: Tree, project: Project, private
     private val psiFile = PsiFileFactory.getInstance(project).createFileFromText(ElixirLanguage.INSTANCE, DEFAULT_TEXT)
     private val document = PsiDocumentManager.getInstance(project).getDocument(psiFile)!!
     private val editor = EditorFactory.getInstance().createEditor(document, project, ElixirFileType.INSTANCE, true)
-    private val callbackDocByCallbackDoc = ContainerUtil.createWeakValueMap<CallbackDoc, String>()
+
+    /* Have to use deprecated direct call to `WeakValueHashMap<K, V> instead of
+       `ContainerUtil.createWeakValueMap<K, V>()` because `ContainerUtil.createWeakValueMap<K, V>()` only exists in
+       IntelliJ Elixir >= 2017.3 */
+
+    @Suppress("DEPRECATION")
+    private val callbackDocByCallbackDoc = WeakValueHashMap<CallbackDoc, String>()
     private var callbackDocs = WeakReference<String>(null)
-    private val docByDoc = ContainerUtil.createWeakMap<Doc, String>()
+
+    @Suppress("DEPRECATION")
+    private val docByDoc = WeakValueHashMap<Doc, String>()
     private var docs = WeakReference<String>(null)
     private var elixirDocumentation = WeakReference<String>(null)
     private var moduleDoc = WeakReference<String>(null)
-    private val typeDocByTypeDoc = ContainerUtil.createWeakValueMap<TypeDoc, String>()
+
+    @Suppress("DEPRECATION")
+    private val typeDocByTypeDoc = WeakValueHashMap<TypeDoc, String>()
+
     private var typeDocs = WeakReference<String>(null)
 
     init {

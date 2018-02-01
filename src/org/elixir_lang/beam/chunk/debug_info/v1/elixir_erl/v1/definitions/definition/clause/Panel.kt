@@ -5,7 +5,7 @@ import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFileFactory
-import com.intellij.util.containers.ContainerUtil
+import com.intellij.util.containers.WeakValueHashMap
 import org.elixir_lang.ElixirFileType
 import org.elixir_lang.ElixirLanguage
 import org.elixir_lang.Macro
@@ -26,10 +26,22 @@ class Panel(private val definitionsTree: Tree, project: Project): JPanel(GridLay
     private val psiFile = PsiFileFactory.getInstance(project).createFileFromText(ElixirLanguage.INSTANCE, DEFAULT_TEXT)
     private val document = PsiDocumentManager.getInstance(project).getDocument(psiFile)!!
     private val editor = EditorFactory.getInstance().createEditor(document, project, ElixirFileType.INSTANCE, true)
-    private val clauseHeadByClause = ContainerUtil.createWeakValueMap<Clause, String>()
-    private val clauseHeadModuleByClause = ContainerUtil.createWeakValueMap<Clause, String>()
-    private val definitionByDefinition = ContainerUtil.createWeakValueMap<Definition, String>()
-    private val definitionModuleByClause = ContainerUtil.createWeakValueMap<Definition, String>()
+
+    /* Have to use deprecated direct call to `WeakValueHashMap<K, V> instead of
+       `ContainerUtil.createWeakValueMap<K, V>()` because `ContainerUtil.createWeakValueMap<K, V>()` only exists in
+       IntelliJ Elixir >= 2017.3 */
+
+    @Suppress("DEPRECATION")
+    private val clauseHeadByClause = WeakValueHashMap<Clause, String>()
+
+    @Suppress("DEPRECATION")
+    private val clauseHeadModuleByClause = WeakValueHashMap<Clause, String>()
+
+    @Suppress("DEPRECATION")
+    private val definitionByDefinition = WeakValueHashMap<Definition, String>()
+
+    @Suppress("DEPRECATION")
+    private val definitionModuleByClause = WeakValueHashMap<Definition, String>()
     private var module: WeakReference<String> = WeakReference<String>(null)
 
     init {
