@@ -57,6 +57,7 @@ class Code(private val operationList: List<Operation>) {
             val operationAssembly = operation.assembly(cache, options)
 
             val suffix = when (operation.code) {
+                org.elixir_lang.beam.chunk.code.operation.Code.APPLY_LAST,
                 org.elixir_lang.beam.chunk.code.operation.Code.BADMATCH,
                 org.elixir_lang.beam.chunk.code.operation.Code.CALL_EXT_LAST,
                 org.elixir_lang.beam.chunk.code.operation.Code.CALL_EXT_ONLY,

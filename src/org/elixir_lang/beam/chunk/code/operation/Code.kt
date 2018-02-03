@@ -523,7 +523,7 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
             )
     ),
     APPLY(112, "apply", ONE),
-    APPLY_LAST(113, "apply_last", TWO),
+    APPLY_LAST(113, "apply_last", arrayOf(ARITY, DESTINATION)),
     // @spec is_boolean Lbl Arg1
     // @doc Test the type of Arg1 and jump to Lbl if it is not a Boolean.
     IS_BOOLEAN(114, "is_boolean", UNARY),
