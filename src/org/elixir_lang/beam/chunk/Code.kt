@@ -65,6 +65,7 @@ class Code(private val operationList: List<Operation>) {
                 org.elixir_lang.beam.chunk.code.operation.Code.CALL_EXT_ONLY,
                 org.elixir_lang.beam.chunk.code.operation.Code.CALL_ONLY,
                 org.elixir_lang.beam.chunk.code.operation.Code.CALL_LAST,
+                org.elixir_lang.beam.chunk.code.operation.Code.JUMP,
                 org.elixir_lang.beam.chunk.code.operation.Code.RETURN ->
                     "\n"
                 else ->
