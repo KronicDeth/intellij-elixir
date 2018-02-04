@@ -29,6 +29,9 @@ public class BEAMAssemblyParser implements PsiParser, LightPsiParser {
     else if (t == FUNCTION_REFERENCE) {
       r = functionReference(b, 0);
     }
+    else if (t == LAST_TAIL) {
+      r = lastTail(b, 0);
+    }
     else if (t == LIST) {
       r = list(b, 0);
     }
@@ -194,7 +197,20 @@ public class BEAMAssemblyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // OPENING_BRACKET termList? CLOSING_BRACKET
+  // PIPE_OPERATOR term
+  public static boolean lastTail(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "lastTail")) return false;
+    if (!nextTokenIs(b, PIPE_OPERATOR)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, PIPE_OPERATOR);
+    r = r && term(b, l + 1);
+    exit_section_(b, m, LAST_TAIL, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // OPENING_BRACKET (termList lastTail?)? CLOSING_BRACKET
   public static boolean list(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "list")) return false;
     if (!nextTokenIs(b, OPENING_BRACKET)) return false;
@@ -207,10 +223,28 @@ public class BEAMAssemblyParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // termList?
+  // (termList lastTail?)?
   private static boolean list_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "list_1")) return false;
-    termList(b, l + 1);
+    list_1_0(b, l + 1);
+    return true;
+  }
+
+  // termList lastTail?
+  private static boolean list_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "list_1_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = termList(b, l + 1);
+    r = r && list_1_0_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // lastTail?
+  private static boolean list_1_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "list_1_0_1")) return false;
+    lastTail(b, l + 1);
     return true;
   }
 
@@ -336,7 +370,7 @@ public class BEAMAssemblyParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // ATOM | ATOM_KEYWORD | CHARLIST | INTEGER | QUALIFIED_ALIAS | STRING | 
+  // ATOM | ATOM_KEYWORD | CHARLIST | INTEGER | QUALIFIED_ALIAS | STRING |
   //          bitString | functionReference | list | map | tuple | struct | typedTerm
   public static boolean term(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "term")) return false;

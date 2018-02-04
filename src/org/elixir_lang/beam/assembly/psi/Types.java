@@ -10,6 +10,7 @@ public interface Types {
 
   IElementType BIT_STRING = new ElementType("BIT_STRING");
   IElementType FUNCTION_REFERENCE = new ElementType("FUNCTION_REFERENCE");
+  IElementType LAST_TAIL = new ElementType("LAST_TAIL");
   IElementType LIST = new ElementType("LIST");
   IElementType MAP = new ElementType("MAP");
   IElementType OPERANDS = new ElementType("OPERANDS");
@@ -39,6 +40,7 @@ public interface Types {
   IElementType OPENING_BRACKET = new TokenType("OPENING_BRACKET");
   IElementType OPENING_CURLY = new TokenType("OPENING_CURLY");
   IElementType OPENING_PARENTHESIS = new TokenType("OPENING_PARENTHESIS");
+  IElementType PIPE_OPERATOR = new TokenType("PIPE_OPERATOR");
   IElementType QUALIFIED_ALIAS = new TokenType("QUALIFIED_ALIAS");
   IElementType REFERENCE_OPERATOR = new TokenType("REFERENCE_OPERATOR");
   IElementType STRING = new TokenType("STRING");
@@ -52,6 +54,9 @@ public interface Types {
       }
       else if (type == FUNCTION_REFERENCE) {
         return new FunctionReferenceImpl(node);
+      }
+      else if (type == LAST_TAIL) {
+        return new LastTailImpl(node);
       }
       else if (type == LIST) {
         return new ListImpl(node);

@@ -30,7 +30,10 @@ qualifier ::= ATOM | QUALIFIED_ALIAS
 relative ::= ATOM_KEYWORD | NAME | STRING | SYMBOLIC_OPERATOR
 
 bitString ::= OPENING_BIT termList? CLOSING_BIT
-list ::= OPENING_BRACKET termList? CLOSING_BRACKET
+
+list ::= OPENING_BRACKET (termList lastTail?)? CLOSING_BRACKET
+lastTail ::= PIPE_OPERATOR term
+
 map ::= MAP_OPERATOR OPENING_CURLY keywordList? CLOSING_CURLY
         { pin = 2 }
 struct ::= MAP_OPERATOR QUALIFIED_ALIAS OPENING_CURLY keywordList? CLOSING_CURLY

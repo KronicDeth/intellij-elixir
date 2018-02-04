@@ -55,6 +55,7 @@ OPENING_BIT = "<<"
 OPENING_BRACKET="["
 OPENING_CURLY="{"
 OPENING_PARENTHESIS="("
+PIPE_OPERATOR="|"
 
 THREE_SYMBOL_OPERATOR = "!==" |
                         "&&&" |
@@ -128,6 +129,7 @@ REFERENCE_OPERATOR="&"
   {OPENING_BRACKET}      { return Types.OPENING_BRACKET; }
   {OPENING_CURLY}        { return Types.OPENING_CURLY; }
   {OPENING_PARENTHESIS}  { return Types.OPENING_PARENTHESIS; }
+  {PIPE_OPERATOR}        { return Types.PIPE_OPERATOR; }
   {REFERENCE_OPERATOR}   { return Types.REFERENCE_OPERATOR; }
   {STRING}               { return Types.STRING; }
   {SYMBOLIC_OPERATOR}    { return Types.SYMBOLIC_OPERATOR; }

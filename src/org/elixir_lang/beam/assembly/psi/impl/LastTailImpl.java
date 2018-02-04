@@ -10,14 +10,14 @@ import static org.elixir_lang.beam.assembly.psi.Types.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.beam.assembly.psi.*;
 
-public class ListImpl extends ASTWrapperPsiElement implements List {
+public class LastTailImpl extends ASTWrapperPsiElement implements LastTail {
 
-  public ListImpl(ASTNode node) {
+  public LastTailImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull Visitor visitor) {
-    visitor.visitList(this);
+    visitor.visitLastTail(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -26,15 +26,9 @@ public class ListImpl extends ASTWrapperPsiElement implements List {
   }
 
   @Override
-  @Nullable
-  public LastTail getLastTail() {
-    return findChildByClass(LastTail.class);
-  }
-
-  @Override
   @NotNull
-  public java.util.List<Term> getTermList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, Term.class);
+  public Term getTerm() {
+    return findNotNullChildByClass(Term.class);
   }
 
 }

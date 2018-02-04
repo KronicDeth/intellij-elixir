@@ -15,6 +15,10 @@ public class Visitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitLastTail(@NotNull LastTail o) {
+    visitPsiElement(o);
+  }
+
   public void visitList(@NotNull List o) {
     visitPsiElement(o);
   }
