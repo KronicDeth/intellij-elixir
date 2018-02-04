@@ -2677,6 +2677,11 @@ By default as many references to other chunks and references to other parts of `
       <td><code>label(n)</code></td>
     </tr>
     <tr>
+      <td>Inline Lines</td>
+      <td><code>line(literal(n))</code> looks up index `n` in the "Line Reference" table in the `Lines` chunk.  The Line Reference contains a file name index and line.  The file name index is looked up in the "File Name" table in the `Lines` chunk.  The line from the Line Reference and the File name from the "File Name" table are inlined as `line(file_name: file_name, line: line)`.</td>
+      <td><code>line</code> operations are left as is</td>
+    </tr>
+    <tr>
       <td>Inline Literals</td>
       <td><code>literal(n)</code> looks up index <code>n</code> in <code>LitT</code> chunk and inlines its `inspect`ed version if the argument supports "Inline Literals"</td>
       <td><code>literal(n)</code></td>

@@ -106,6 +106,19 @@ class Controls(val cache: Cache, val project: Project): JBScrollPane() {
         }
         scrollable.add(inlineLabelsCheckBox)
 
+        val inlineLinesCheckBox = JBCheckBox("Inline Lines", assemblyOptions.inline.lines)
+        inlineLinesCheckBox.addItemListener { itemEvent ->
+            when (itemEvent.stateChange) {
+                DESELECTED ->
+                    assemblyOptions = assemblyOptions.copy(inline = assemblyOptions.inline.copy(lines = false))
+                SELECTED ->
+                    assemblyOptions = assemblyOptions.copy(inline = assemblyOptions.inline.copy(lines = true))
+            }
+
+            setDocumentText()
+        }
+        scrollable.add(inlineLinesCheckBox)
+
         val inlineLiteralsCheckBox = JBCheckBox("Inline Literals", assemblyOptions.inline.literals)
         inlineLiteralsCheckBox.addItemListener { itemEvent ->
             when (itemEvent.stateChange) {

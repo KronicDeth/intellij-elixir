@@ -16,6 +16,7 @@ class Code(private val operationList: List<Operation>) {
                 val imports: Boolean = false,
                 val integers: Boolean = true,
                 val labels: Boolean = true,
+                val lines: Boolean = true,
                 val literals: Boolean = false,
                 val localCalls: Boolean = true,
                 val strings: Boolean = true
@@ -26,6 +27,7 @@ class Code(private val operationList: List<Operation>) {
                         functions = false,
                         imports = false,
                         integers = true,
+                        lines = true,
                         literals = false,
                         localCalls = true,
                         strings = true

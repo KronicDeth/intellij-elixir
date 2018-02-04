@@ -126,14 +126,37 @@ data class Operation(val code: Code, val termList: List<Term>) {
                     null
                 }
             }
-            Code.LABEL, Code.LINE -> {
+            Code.LABEL -> {
                 val function = code.function
 
                 if (options.inline.integers) {
                     "$function(${(termList[0] as Literal).index})"
                 } else {
-                    // literals of label and line aren't literal references, so don't inline them using inlineLiterals
+                    // literal of label isn't literal references, so don't inline them using inlineLiterals
                     "$function(${argumentsAssembly(cache, options.copy(inline = options.inline.copy(literals = false)))})"
+                }
+            }
+            Code.LINE -> {
+                val function = code.function
+
+                when {
+                    options.inline.lines -> {
+                        cache.lines?.let { lines ->
+                            (termList[0] as? Literal)?.index?.let { index ->
+                                lines.lineReferenceList.getOrNull(index)?.let { lineReference ->
+                                    lines.fileNameList.getOrNull(lineReference.fileNameIndex)?.let { fileName ->
+                                        val line = lineReference.line
+
+                                        "$function(file_name: \"$fileName\", line: $line)"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    options.inline.integers -> "$function(${(termList[0] as Literal).index})"
+                    else ->
+                        // literal of line isn't literal references, so don't inline them using inlineLiterals
+                        "$function(${argumentsAssembly(cache, options.copy(inline = options.inline.copy(literals = false)))})"
                 }
             }
             else -> null
