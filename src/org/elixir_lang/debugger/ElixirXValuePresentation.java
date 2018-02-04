@@ -124,6 +124,15 @@ public class ElixirXValuePresentation extends XValuePresentation {
       renderObject(list.elementAt(i), renderer);
     }
 
+    // Improper lists have a lastTail
+    OtpErlangObject lastTail = list.getLastTail();
+
+    if (lastTail != null) {
+      // Improper lists need to render the head tail joiner, `|`, explicitly
+      renderer.renderSpecialSymbol(" | ");
+      renderObject(lastTail, renderer);
+    }
+
     renderer.renderSpecialSymbol("]");
   }
 
