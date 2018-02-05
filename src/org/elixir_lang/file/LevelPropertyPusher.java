@@ -26,7 +26,7 @@ import com.intellij.openapi.vfs.newvfs.FileAttribute;
 import com.intellij.util.FileContentUtil;
 import com.intellij.util.io.DataInputOutputUtil;
 import com.intellij.util.messages.MessageBus;
-import one.util.streamex.StreamEx;
+import gnu.trove.THashSet;
 import org.elixir_lang.Level;
 import org.elixir_lang.module.ElixirModuleType;
 import org.elixir_lang.sdk.elixir.Release;
@@ -39,7 +39,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.elixir_lang.Level.KEY;
 import static org.elixir_lang.Level.MAXIMUM;
@@ -160,10 +159,10 @@ public class LevelPropertyPusher implements FilePropertyPusher<Level> {
 
     @Override
     public void initExtra(@NotNull Project project, @NotNull MessageBus bus, @NotNull Engine languageLevelUpdater) {
-        Map<Module, Sdk> sdkByModule1 = sdkByModule(project);
-        Set<Sdk> sdkSet = StreamEx.ofValues(sdkByModule1).nonNull().collect(Collectors.toCollection(LinkedHashSet::new));
+        Map<Module, Sdk> sdkByModule = sdkByModule(project);
+        Set<Sdk> sdkSet = sdkByModuleToSdkSet(sdkByModule);
 
-        this.sdkByModule.putAll(sdkByModule1);
+        this.sdkByModule.putAll(sdkByModule);
         deleteLevel(project);
         updateSdkLevels(project, sdkSet);
         putLevel(project);
@@ -287,15 +286,19 @@ public class LevelPropertyPusher implements FilePropertyPusher<Level> {
     @Override
     public void afterRootsChanged(@NotNull Project project) {
         Map<Module, Sdk> sdkByModule = sdkByModule(project);
-        Set<Sdk> sdkSet = StreamEx.ofValues(sdkByModule).nonNull().collect(Collectors.toCollection(LinkedHashSet::new));
+        Set<Sdk> sdkSet = sdkByModuleToSdkSet(sdkByModule);
+        boolean needToReparseOpenFiles = false;
 
-        final boolean needToReparseOpenFiles = StreamEx.of(sdkByModule.entrySet()).anyMatch((entry -> {
-            final Module module = entry.getKey();
-            final Sdk newSdk = entry.getValue();
-            final Sdk oldSdk = this.sdkByModule.get(module);
+        for (Map.Entry<Module, Sdk> entry: sdkByModule.entrySet()) {
+            Module module = entry.getKey();
+            Sdk newSdk = entry.getValue();
+            Sdk oldSdk = this.sdkByModule.get(module);
 
-            return this.sdkByModule.containsKey(module) && (newSdk != null || oldSdk != null) && newSdk != oldSdk;
-        }));
+            if (this.sdkByModule.containsKey(module) && (newSdk != null || oldSdk != null) && newSdk != oldSdk) {
+                needToReparseOpenFiles = true;
+                break;
+            }
+        }
 
         this.sdkByModule.putAll(sdkByModule);
         deleteLevel(project);
@@ -314,6 +317,18 @@ public class LevelPropertyPusher implements FilePropertyPusher<Level> {
 
             FileContentUtil.reparseFiles(project, Collections.emptyList(), true);
         });
+    }
+
+    private Set<Sdk> sdkByModuleToSdkSet(@NotNull Map<Module, Sdk> sdkByModule) {
+        Set<Sdk> sdkSet = new THashSet<>();
+
+        for (@Nullable Sdk sdk : sdkByModule.values()) {
+            if (sdk != null) {
+                sdkSet.add(sdk);
+            }
+        }
+
+        return sdkSet;
     }
 
     private final class UpdateRootTask implements Runnable {
