@@ -228,30 +228,30 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             DefaultLanguageHighlighterColors.NUMBER
     );
 
-    private static final TextAttributesKey[] ALIAS_KEYS = new TextAttributesKey[]{ALIAS};
-    private static final TextAttributesKey[] ATOM_KEYS = new TextAttributesKey[]{ATOM};
-    private static final TextAttributesKey[] ATOM_KEYWORD_KEYS = new TextAttributesKey[]{ATOM, KEYWORD};
+    public static final TextAttributesKey[] ALIAS_KEYS = new TextAttributesKey[]{ALIAS};
+    public static final TextAttributesKey[] ATOM_KEYS = new TextAttributesKey[]{ATOM};
+    public static final TextAttributesKey[] ATOM_KEYWORD_KEYS = new TextAttributesKey[]{ATOM, KEYWORD};
     private static final TextAttributesKey[] BAD_CHAR_KEYS = new TextAttributesKey[]{BAD_CHARACTER};
-    private static final TextAttributesKey[] BIT_KEYS = new TextAttributesKey[]{BIT};
-    private static final TextAttributesKey[] BRACES_KEYS = new TextAttributesKey[]{BRACES};
-    private static final TextAttributesKey[] BRACKETS_KEYS = new TextAttributesKey[]{BRACKETS};
-    private static final TextAttributesKey[] CHAR_LIST_KEYS = new TextAttributesKey[]{CHAR_LIST};
+    public static final TextAttributesKey[] BIT_KEYS = new TextAttributesKey[]{BIT};
+    public static final TextAttributesKey[] BRACES_KEYS = new TextAttributesKey[]{BRACES};
+    public static final TextAttributesKey[] BRACKETS_KEYS = new TextAttributesKey[]{BRACKETS};
+    public static final TextAttributesKey[] CHAR_LIST_KEYS = new TextAttributesKey[]{CHAR_LIST};
     private static final TextAttributesKey[] CHAR_TOKEN_KEYS = new TextAttributesKey[]{CHAR_TOKEN_TOKEN};
     private static final TextAttributesKey[] COMMA_KEYS = new TextAttributesKey[]{COMMA};
     private static final TextAttributesKey[] COMMENT_KEYS = new TextAttributesKey[]{COMMENT};
-    private static final TextAttributesKey[] DECIMAL_KEYS = new TextAttributesKey[]{DECIMAL};
+    public static final TextAttributesKey[] DECIMAL_KEYS = new TextAttributesKey[]{DECIMAL};
     private static final TextAttributesKey[] DOT_KEYS = new TextAttributesKey[]{DOT};
-    private static final TextAttributesKey[] EMPTY_KEYS = new TextAttributesKey[0];
+    public static final TextAttributesKey[] EMPTY_KEYS = new TextAttributesKey[0];
     private static final TextAttributesKey[] EXPRESSION_SUBSTITUTION_MARK_KEYS = new TextAttributesKey[]{EXPRESSION_SUBSTITUTION_MARK};
     private static final TextAttributesKey[] IDENTIFIER_KEYS = new TextAttributesKey[]{IDENTIFIER};
     private static final TextAttributesKey[] INVALID_DIGITS_KEYS = new TextAttributesKey[]{INVALID_DIGIT};
-    private static final TextAttributesKey[] KEYWORD_KEYS = new TextAttributesKey[]{KEYWORD};
+    public static final TextAttributesKey[] KEYWORD_KEYS = new TextAttributesKey[]{KEYWORD};
     private static final TextAttributesKey[] OBSOLETE_WHOLE_NUMBER_BASE_KEYS = new TextAttributesKey[]{OBSOLETE_WHOLE_NUMBER_BASE};
-    private static final TextAttributesKey[] OPERATION_SIGN_KEYS = new TextAttributesKey[]{OPERATION_SIGN};
-    private static final TextAttributesKey[] PARENTHESES_KEYS = new TextAttributesKey[]{PARENTHESES};
+    public static final TextAttributesKey[] OPERATION_SIGN_KEYS = new TextAttributesKey[]{OPERATION_SIGN};
+    public static final TextAttributesKey[] PARENTHESES_KEYS = new TextAttributesKey[]{PARENTHESES};
     private static final TextAttributesKey[] SEMICOLON_KEYS = new TextAttributesKey[]{SEMICOLON};
     private static final TextAttributesKey[] SIGIL_KEYS = new TextAttributesKey[]{SIGIL};
-    private static final TextAttributesKey[] STRING_KEYS = new TextAttributesKey[]{STRING};
+    public static final TextAttributesKey[] STRING_KEYS = new TextAttributesKey[]{STRING};
     private static final TextAttributesKey[] VALID_DIGITS_KEYS = new TextAttributesKey[]{VALID_DIGIT};
     private static final TextAttributesKey[] WHOLE_NUMBER_BASE_KEYS = new TextAttributesKey[]{WHOLE_NUMBER_BASE};
 

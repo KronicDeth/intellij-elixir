@@ -54,7 +54,7 @@ class ElixirStackFrame extends XStackFrame {
 
   @Override
   public void customizePresentation(@NotNull ColoredTextContainer component) {
-    String title = ElixirModulesUtil.erlangModuleNameToElixir(myTraceElement.getModule()) +
+    String title = ElixirModulesUtil.INSTANCE.erlangModuleNameToElixir(myTraceElement.getModule()) +
       "." + myTraceElement.getFunction() + "/" + myTraceElement.getFunctionArgs().arity();
     if (myTraceElement.getLine() > 1) title += ", line " + myTraceElement.getLine();
     component.append(title, SimpleTextAttributes.REGULAR_ATTRIBUTES);

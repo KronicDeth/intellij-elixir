@@ -4,7 +4,6 @@ import gnu.trove.THashMap;
 import org.elixir_lang.Visibility;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.List;

@@ -1,0 +1,55 @@
+{
+  parserClass="org.elixir_lang.beam.assembly.BEAMAssemblyParser"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiImplClassSuffix="Impl"
+  psiPackage="org.elixir_lang.beam.assembly.psi"
+  psiImplPackage="org.elixir_lang.beam.assembly.psi.impl"
+
+  elementTypeHolderClass="org.elixir_lang.beam.assembly.psi.Types"
+  elementTypeClass="org.elixir_lang.beam.assembly.psi.ElementType"
+  tokenTypeClass="org.elixir_lang.beam.assembly.psi.TokenType"
+}
+
+beamAssemblyFile ::= operation*
+
+operation ::= NAME OPENING_PARENTHESIS operands? CLOSING_PARENTHESIS
+              { pin = 2
+                recoverWhile = operationRecoverWhile }
+private operationRecoverWhile ::= !operationRecoverUntil
+private operationRecoverUntil ::= NAME
+
+operands ::= keywordList | termList
+
+term ::= ATOM | ATOM_KEYWORD | CHARLIST | INTEGER | QUALIFIED_ALIAS | STRING |
+         bitString | functionReference | list | map | tuple | struct | typedTerm
+
+functionReference ::= REFERENCE_OPERATOR qualifier DOT_OPERATOR relative NAME_ARITY_SEPARATOR INTEGER
+qualifier ::= ATOM | QUALIFIED_ALIAS
+relative ::= ATOM_KEYWORD | NAME | STRING | SYMBOLIC_OPERATOR
+
+bitString ::= OPENING_BIT termList? CLOSING_BIT
+
+list ::= OPENING_BRACKET (termList lastTail?)? CLOSING_BRACKET
+lastTail ::= PIPE_OPERATOR term
+
+map ::= MAP_OPERATOR OPENING_CURLY keywordList? CLOSING_CURLY
+        { pin = 2 }
+struct ::= MAP_OPERATOR QUALIFIED_ALIAS OPENING_CURLY keywordList? CLOSING_CURLY
+           { pin = 3 }
+tuple ::= OPENING_CURLY termList CLOSING_CURLY
+private typedTerm ::= NAME OPENING_PARENTHESIS values? CLOSING_PARENTHESIS
+                      { pin = 2 }
+
+values ::= keywordList | termList
+
+private keywordList ::= keyword (COMMA keyword)*
+
+private keyword ::= KEY term
+                    { pin = 1
+                      recoverWhile = keywordRecoverWhile }
+private keywordRecoverWhile ::= !keywordRecoverUntil
+private keywordRecoverUntil ::= COMMA | CLOSING_BRACKET | CLOSING_CURLY | CLOSING_PARENTHESIS
+
+private termList ::= term (COMMA term)*
