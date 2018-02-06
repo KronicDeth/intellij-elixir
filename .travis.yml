@@ -20,11 +20,11 @@ matrix:
     - elixir: 1.6.1
       env: IDEA_VERSION="2017.3.2"
       jdk: oraclejdk8
-      otp_release: 20.1
+      otp_release: 20.2.2
     - elixir: 1.5.3
       env: IDEA_VERSION="2017.3.2"
       jdk: oraclejdk8
-      otp_release: 20.1
+      otp_release: 20.2.2
     - elixir: 1.4.5
       env: IDEA_VERSION="2017.3.2"
       jdk: oraclejdk8
@@ -33,11 +33,11 @@ matrix:
     - elixir: 1.6.1
       env: IDEA_VERSION="2017.2.5"
       jdk: oraclejdk8
-      otp_release: 20.1
+      otp_release: 20.2.2
     - elixir: 1.5.3
       env: IDEA_VERSION="2017.2.5"
       jdk: oraclejdk8
-      otp_release: 20.1
+      otp_release: 20.2.2
     - elixir: 1.4.5
       env: IDEA_VERSION="2017.2.5"
       jdk: oraclejdk8
@@ -46,11 +46,11 @@ matrix:
     - elixir: 1.6.1
       env: IDEA_VERSION="2017.1.5"
       jdk: oraclejdk8
-      otp_release: 20.1
+      otp_release: 20.2.2
     - elixir: 1.5.3
       env: IDEA_VERSION="2017.1.5"
       jdk: oraclejdk8
-      otp_release: 20.1
+      otp_release: 20.2.2
     - elixir: 1.4.5
       env: IDEA_VERSION="2017.1.5"
       jdk: oraclejdk8
@@ -59,11 +59,11 @@ matrix:
     - elixir: 1.6.1
       env: IDEA_VERSION="2016.3.7"
       jdk: oraclejdk8
-      otp_release: 20.1
+      otp_release: 20.2.2
     - elixir: 1.5.3
       env: IDEA_VERSION="2016.3.7"
       jdk: oraclejdk8
-      otp_release: 20.1
+      otp_release: 20.2.2
     - elixir: 1.4.5
       env: IDEA_VERSION="2016.3.7"
       jdk: oraclejdk8
