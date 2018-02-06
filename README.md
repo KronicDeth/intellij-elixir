@@ -4805,6 +4805,7 @@ I'd like to thank those who have donated to help support this project.
 * Ryan Scheel ([@Havvy](https://github.com/Havvy))
 * Szymon Jeż ([@szymon-jez](https://github.com/szymon-jez))
 * Yicheng Dong
+* Ilja Neumann ([@IljaN](https://github.com/IljaN))
 * Purelogic Apps
 * Adrian Philipp ([@adri](https://github.com/adri))
 * Angelika Tyborska ([@angelikatyborska](https://github.com/angelikatyborska))
