@@ -30,14 +30,18 @@ defmodule TeamCityExUnitFormatting do
     }
   end
 
-  def put_event(state = %__MODULE__{}, {:case_finished, test_case = %ExUnit.TestCase{}}) do
-    put_formatted :test_suite_finished, attributes(test_case)
+  # ExUnit.TestCase is deprecated in 1.6.0 and replaced by ExUnit.TestModule.  ExUnit.TestCase will be removed in 2.0.0.
+  def put_event(state = %__MODULE__{}, {:case_finished, %ExUnit.TestCase{}}), do: state
+  def put_event(state = %__MODULE__{}, {:case_started, %ExUnit.TestCase{}}), do: state
+
+  def put_event(state = %__MODULE__{}, {:module_finished, test_module = %ExUnit.TestModule{}}) do
+    put_formatted :test_suite_finished, attributes(test_module)
 
     state
   end
 
-  def put_event(state = %__MODULE__{}, {:case_started, test_case = %ExUnit.TestCase{}}) do
-    put_formatted :test_suite_started, attributes(test_case)
+  def put_event(state = %__MODULE__{}, {:module_started, test_module = %ExUnit.TestModule{}}) do
+    put_formatted :test_suite_started, attributes(test_module)
 
     state
   end
@@ -194,11 +198,11 @@ defmodule TeamCityExUnitFormatting do
 
   ## Private Functions
 
-  defp attributes(test_or_test_case) do
+  defp attributes(test_or_test_module) do
     [
-      nodeId: nodeId(test_or_test_case),
-      name: name(test_or_test_case),
-      parentNodeId: parentNodeId(test_or_test_case)
+      nodeId: nodeId(test_or_test_module),
+      name: name(test_or_test_module),
+      parentNodeId: parentNodeId(test_or_test_module)
     ]
   end
 
@@ -234,8 +238,8 @@ defmodule TeamCityExUnitFormatting do
     "#{Atom.to_string k}='#{escape_output v}'"
   end
 
-  defp format_case_name(case_name) do
-    case_name
+  defp format_module_name(module_name) do
+    module_name
     |> to_string()
     |> String.replace(~r/\bElixir\./, "")
   end
@@ -247,27 +251,27 @@ defmodule TeamCityExUnitFormatting do
     )
     name(test, named_captures)
   end
-  defp name(%ExUnit.TestCase{name: name}), do: format_case_name(name)
+  defp name(%ExUnit.TestModule{name: name}), do: format_module_name(name)
 
   defp name(%ExUnit.Test{name: name}, nil), do: to_string(name)
   defp name(
-         %ExUnit.Test{case: case_name},
+         %ExUnit.Test{module: module_name},
          %{"arity" => arity, "count" => count, "function" => function, "module" => module}
        ) do
     name = "#{function}/#{arity} doc (#{count})"
 
-    if module <> "Test" == format_case_name(case_name) do
+    if module <> "Test" == format_module_name(module_name) do
       name
     else
       "#{module}.#{name}"
     end
   end
 
-  defp nodeId(%ExUnit.Test{case: case_name, name: name}), do: "#{case_name}.#{name}"
-  defp nodeId(%ExUnit.TestCase{name: name}), do: name
+  defp nodeId(%ExUnit.Test{module: module_name, name: name}), do: "#{module_name}.#{name}"
+  defp nodeId(%ExUnit.TestModule{name: name}), do: name
 
-  defp parentNodeId(%ExUnit.Test{case: case_name}), do: case_name
-  defp parentNodeId(%ExUnit.TestCase{}), do: @root_parent_node_id
+  defp parentNodeId(%ExUnit.Test{module: module_name}), do: module_name
+  defp parentNodeId(%ExUnit.TestModule{}), do: @root_parent_node_id
 
   # DO NOT use `flowId` as an attribute.  IDEA ignores flowId and so it can't be used to interleave async test output
   defp put_formatted(type, attributes) do

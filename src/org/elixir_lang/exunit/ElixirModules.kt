@@ -2,6 +2,7 @@ package org.elixir_lang.exunit
 
 import org.elixir_lang.Level
 import org.elixir_lang.Level.V_1_4
+import org.elixir_lang.Level.V_1_6
 import org.elixir_lang.jps.builder.ParametersList
 import java.io.File
 import java.io.IOException
@@ -19,13 +20,15 @@ object ElixirModules {
         }
     }
 
-    private fun addFormatterPath(relativeSourcePathList: MutableList<String>,
+    private fun addVersionedPaths(relativeSourcePathList: MutableList<String>,
                                  level: Level) {
         val versionDirectory : String = when {
             level < V_1_4 -> "1.1.0"
-            else -> "1.4.0"
+            level < V_1_6 -> "1.4.0"
+            else -> "1.6.0"
         }
 
+        relativeSourcePathList.add("$versionDirectory/$FORMATTING_FILE_NAME")
         relativeSourcePathList.add("$versionDirectory/$FORMATTER_FILE_NAME")
     }
 
@@ -38,9 +41,8 @@ object ElixirModules {
 
     private fun relativeSourcePathList(level: Level): List<String> {
         val relativeSourcePathList = ArrayList<String>()
-        relativeSourcePathList.add(FORMATTING_FILE_NAME)
 
-        addFormatterPath(relativeSourcePathList, level)
+        addVersionedPaths(relativeSourcePathList, level)
         addCustomMixTask(relativeSourcePathList, level)
 
         return relativeSourcePathList
