@@ -1,7 +1,6 @@
 package org.elixir_lang.beam;
 
 import com.ericsson.otp.erlang.OtpErlangDecodeException;
-import com.intellij.openapi.util.Condition;
 import com.intellij.util.containers.ContainerUtil;
 import org.elixir_lang.beam.chunk.Atoms;
 import org.elixir_lang.beam.chunk.CallDefinitions;
@@ -11,8 +10,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.List;
+import java.util.SortedSet;
 import java.util.stream.Stream;
 
 import static org.elixir_lang.psi.call.name.Function.DEF;
@@ -35,12 +38,11 @@ public class BeamTest {
 
         assertEquals("Elixir.Kernel", atoms.moduleName());
 
-        long callDefinitionCount = beam.callDefinitionsStream().mapToInt(CallDefinitions::size).sum();
+        long callDefinitionCount = beam.callDefinitionsList(atoms).stream().mapToInt(CallDefinitions::size).sum();
 
         assertTrue("There are no callDefinitions", callDefinitionCount > 0);
 
-        SortedSet<MacroNameArity> macroNameAritySortedSet =
-                CallDefinitions.macroNameAritySortedSet(beam.callDefinitionsStream(), atoms);
+        SortedSet<MacroNameArity> macroNameAritySortedSet = CallDefinitions.macroNameAritySortedSet(beam, atoms);
 
         assertEquals("There are nameless callDefinitions", callDefinitionCount, macroNameAritySortedSet.size());
 
@@ -68,12 +70,11 @@ public class BeamTest {
 
         assertEquals("elixir_interpolation", atoms.moduleName());
 
-        long callDefinitionCount = beam.callDefinitionsStream().mapToInt(CallDefinitions::size).sum();
+        long callDefinitionCount = beam.callDefinitionsList(atoms).stream().mapToInt(CallDefinitions::size).sum();
 
         assertTrue("There are no callDefinitions", callDefinitionCount > 0);
 
-        SortedSet<MacroNameArity> macroNameAritySortedSet =
-                CallDefinitions.macroNameAritySortedSet(beam.callDefinitionsStream(), atoms);
+        SortedSet<MacroNameArity> macroNameAritySortedSet = CallDefinitions.macroNameAritySortedSet(beam, atoms);
 
         assertEquals("There are nameless callDefinitions", callDefinitionCount, macroNameAritySortedSet.size());
 
@@ -103,7 +104,7 @@ public class BeamTest {
                 )
         );
 
-        return Beam.from(dataInputStream, path);
+        return Beam.Companion.from(dataInputStream, path);
     }
 
     @Before

@@ -68,11 +68,11 @@ public class ElixirDebuggerNode {
   }
 
   public void setBreakpoint(@NotNull String module, @NotNull String file, int line) {
-    addCommand(ElixirDebuggerCommandsProducer.getSetBreakpointCommand(ElixirModulesUtil.elixirModuleNameToErlang(module), line, file));
+    addCommand(ElixirDebuggerCommandsProducer.getSetBreakpointCommand(ElixirModulesUtil.INSTANCE.elixirModuleNameToErlang(module), line, file));
   }
 
   public void removeBreakpoint(@NotNull String module, int line) {
-    addCommand(ElixirDebuggerCommandsProducer.getRemoveBreakpointCommand(ElixirModulesUtil.elixirModuleNameToErlang(module), line));
+    addCommand(ElixirDebuggerCommandsProducer.getRemoveBreakpointCommand(ElixirModulesUtil.INSTANCE.elixirModuleNameToErlang(module), line));
   }
 
   public void runTask() {

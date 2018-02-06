@@ -25,7 +25,7 @@ public class ModuleDefinition {
 
     public String name() {
         OtpErlangTuple quotedDefmodule = (OtpErlangTuple) defmodule.quote();
-        OtpErlangList callArguments = Macro.callArguments(quotedDefmodule);
+        OtpErlangList callArguments = Macro.INSTANCE.callArguments(quotedDefmodule);
 
         // Alias + block
         assert callArguments.arity() == 2;
@@ -33,9 +33,9 @@ public class ModuleDefinition {
         OtpErlangObject quotedName = callArguments.elementAt(0);
 
         // TODO handle other forms for module names
-        assert Macro.isAliases(quotedName);
+        assert Macro.INSTANCE.isAliases(quotedName);
 
-        return Macro.toString(quotedName);
+        return Macro.INSTANCE.toString(quotedName);
     }
 
     public String fullyQualifiedName(){

@@ -87,7 +87,7 @@ public class BeamFileImpl extends ModuleElementImpl implements ModuleOwner, PsiC
         Optional<Beam> beamOptional;
 
         try {
-            beamOptional = Beam.from(bytes, path);
+            beamOptional = Optional.ofNullable(Beam.Companion.from(bytes, path));
         } catch (IOException e) {
             LOGGER.error("IOException during BeamFileImpl.buildFileStub(bytes, " + path + ")",  e);
             beamOptional = Optional.empty();

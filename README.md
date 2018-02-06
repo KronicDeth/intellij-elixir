@@ -91,6 +91,49 @@
           - [Creating/Running `mix test` Run Configurations from directory](#creatingrunning-mix-test-run-configurations-from-directory)
           - [Creating/Running `mix test` Run Configurations from file](#creatingrunning-mix-test-run-configurations-from-file)
           - [Creating/Running `mix test` Run Configurations from line](#creatingrunning-mix-test-run-configurations-from-line)
+    - [`.beam` Files](#beam-files)
+      - [Decompression](#decompression)
+      - [BEAM Chunks](#beam-chunks)
+        - [`Atom` / `AtU8`](#atom--atu8)
+          - [Format](#format)
+          - [Tab](#tab)
+        - [`Attr`](#attr)
+          - [Format](#format-1)
+          - [Tab](#tab-1)
+        - [`CInf`](#cinf)
+          - [Format](#format-2)
+          - [Tab](#tab-2)
+        - [`Code`](#code)
+          - [Format](#format-3)
+          - [Tab](#tab-3)
+        - [`Dbgi`](#dbgi)
+          - [Format](#format-4)
+          - [Tab](#tab-4)
+        - [`ExDc`](#exdc)
+          - [Format](#format-5)
+          - [Tab](#tab-5)
+        - [`ExpT`](#expt)
+          - [Format](#format-6)
+          - [Tab](#tab-6)
+        - [`ImpT`](#impt)
+          - [Format](#format-7)
+          - [Tab](#tab-7)
+        - [`LitT`](#litt)
+          - [Format](#format-8)
+          - [Tab](#tab-8)
+        - [`Line`](#line)
+          - [Format](#format-9)
+          - [Tab](#tab-9)
+        - [`LocT`](#loct)
+          - [Format](#format-10)
+          - [Tab](#tab-10)
+        - [`StrT`](#strt)
+          - [Format](#format-11)
+          - [Tab](#tab-11)
+      - [Decompilation (Text)](#decompilation-text)
+        - [Call definition macros](#call-definition-macros)
+          - [`defp` with `/` in name](#defp-with--in-name)
+        - [Special handling of call definition names](#special-handling-of-call-definition-names)
     - [Completion](#completion)
       - [Aliases and Modules](#aliases-and-modules)
         - [Aliases inside `{ }`](#aliases-inside--)
@@ -99,11 +142,6 @@
         - [Unqualified](#unqualified)
       - [Module Attributes](#module-attributes)
       - [Parameters and Variables](#parameters-and-variables)
-    - [Decompilation](#decompilation)
-      - [Decompression](#decompression)
-      - [Call definition macros](#call-definition-macros)
-        - [`defp` with `/` in name](#defp-with--in-name)
-      - [Special handling of call definition names](#special-handling-of-call-definition-names)
     - [Go To Declaration](#go-to-declaration)
       - [Alias](#alias)
       - [Function or Macro](#function-or-macro)
@@ -2401,58 +2439,15 @@ Alternatively, you can use keyboard shortcuts
 1. Place the cursor on the line you want to test
 2. `Ctrl+Shift+R` will create the Run Configuration and Run it.
 
-### Completion
+### `.beam` Files
 
-#### Aliases and Modules
-
-When you start typing an Alias, completion will look in three locations:
-
-1. `alias` aliased names in the current file
-    1. `Suffix` for `alias Prefix.Suffix`
-    2. `MultipleAliasA` or `MultipleAliasB` for `alias Prefix.{MultipleAliasA, MultipleAliasB}`
-    3. `As` for `alias Prefix.Suffix, as: As`
-2. Indexed module names (as available from [Go To Symbol](#go-to-symbol))
-    1. `Prefix.Suffix` from `defmodule Prefix.Suffix`
-    2. `MyProtocol` from `defprotocol MyProtocol`
-    3. `MyProtocol.MyStruct`
-        1. `defimpl MyProtocol, for: MyStruct`
-        2. `defimpl MyProtocol` nested under `defmodule MyStruct`
-3. Nested modules under aliased names
-    1. `Suffix.Nested` for `alias Prefix.Suffix` where `Prefix.Suffix.Nested` is an indexed module, implementation or protocol name.
-    2. `MultipleAliasA.Nested` for `alias Prefix.{MultipleAliasA, MultipleAliasB}` where `Prefix.MultipleAliasA.Nested` `alias Prefix.{MultipleAliasA, MultipleAliasB}` is an indexed module, implementation or protocol name.
-    3. `As.Nested` for `alias Prefix.Suffix, as: As` where `Prefix.Suffix.Nested` is an indexed module, implementation, or protocol name.
-
-##### Aliases inside `{ }`
-
-When you start typing inside `{ }` for `alias Prefix.{}` or `import Prefix.{}`, completion will look for nested modules under `Prefix` and then remove the `Prefix.`, so completion will look like `Suffix`.
-
-#### Function and Macro Calls
-
-Completion uses the same presentation as [Structure](#structure), so you can tell whether the name is function/macro ([Time](#time)), whether it is public/private ([Visibility](#visibility)) and the Module where it is defined.  Between the icons and the Modules is the name itself, which is highlighted in **bold**, the parameters for the call definition follow, so that you can preview the patterns required for the different clauses.
-
-![Function and Macro Calls Completion](/screenshots/Function%20and%20Macro%20Calls%20Completion.png?raw=true "Function and Macro Calls Completion")
-
-##### Qualified
-
-Qualified functions and macro calls will complete using those functions and macros defined in the qualifying Module (`defmodule`), Implementation (`defimpl`) or Protocol (`defprotocol`).  Completion starts as shown as `.` is typed after a qualifying Alias.
-
-##### Unqualified
-
-Function and macro calls that are unqualified are completed from the index of all function and macro definitions, both public and private. (The index contains only those Elixir functions and macro defined in parsable source, such as those in the project or its dependencies.  Erlang functions and Elixir functions only in compiled `.beam` files, such as the standard library will not complete.)  Private function and macros are shown, so you can choose them and then make the chosen function or macro public if it is a remote call.
-
-#### Module Attributes
-
-Module attributes declared earlier in the file can be completed whenever you type `@` and some letter.  If you want to see all module attributes, you can type `@a`, wait for the completions to appear, then delete the `@` to remove the filtering to `a`.
-
-#### Parameters and Variables
-
-Parameter and variable usages can be completed whenever typing an identifier.  The completions will include all variables know up from that part of the file.  It can include variables from outside macros, like quote blocks.
-
-### Decompilation
-
-`.beam` files, such as those in the Elixir SDK, the Elixir SDK's Internal Erlang SDK, and in your project's `build` directory will be decompiled to equivalent `def` and `defmacro` calls.  The bodies will not be decompiled, only the call definition head and placeholder parameters.  These decompiled call definition heads are enough to allow Go To Declaration, the Structure pane, and Completion to work with the decompiled `.beam` files.
+`.beam` files are the compiled version of modules on the BEAM virtual machine used by Elixir and Erlang.  They are the equivalent of `.class` files in Java.
 
 `.beam` files are not detected purely by their file extension: the BEAM file format starts with a magic number, `FOR1`, that is checked for before decompiling.
+
+`.beam` files have 2 editors registered: [decompiled Text](#decompilation-text) and [BEAM Chunks](#beam-chunks)
+
+![`.beam` file Editor Tabs](/screenshots/features/beam_files/Editor%20Tabs.png?raw=true ".beam file Editor Tabs")
 
 #### Decompression
 
@@ -2470,7 +2465,518 @@ and in Elixir looks like
 
 then the outer file format is [GZip](https://en.wikipedia.org/wiki/Gzip) (which is detected by checking for the gzip magic number, `1f 8b`, at the start of the file) and the `.beam` will be (stream) decompressed before the `.beam` header is checked and the chunks decoded.
 
-#### Call definition macros
+#### BEAM Chunks
+
+`.beam` files are composed of binary chunks.  Each chunk is formatted
+
+<table>
+  <thead>
+    <tr>
+      <th>Offset</th>
+      <th>+0</th>
+      <th>+1</th>
+      <th>+2</th>
+      <th>+3</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td colspan="4">Name (ASCII Characters)</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td colspan="4">Length (`unsigned-big-integer`)</td>
+    </tr>
+    <tr>
+      <th>8+</th>
+      <td colspan="4">Chunk-Specific</td>
+    </tr>
+  </tbody>
+</table>
+
+This format is generically referred to as [Type-Length-Value](https://en.wikipedia.org/wiki/Type-length-value)
+
+The BEAM Chunks editor tab is subdivided into further tabs, one for each chunk in the `.beam` file.
+
+![BEAM Chunks editor chunk tabs](/screenshots/features/beam_files/beam_chunks/Chunk%20Tabs.png?raw=true "BEAM Chunks editor chunk tabs")
+
+The tabs are listed in the order that the chunks occur in the .beam file.
+
+##### `Atom` / `AtU8`
+
+The `Atom `chunk holds [LATIN-1](https://en.wikipedia.org/wiki/ISO/IEC_8859-1) encoded atoms while `AtU8` chunk holds [UTF-8](https://en.wikipedia.org/wiki/UTF-8) atoms. There will only be one of these atom-related chunks in any given `.beam` file. `AtU8` is used in newer versions of OTP that support UTF-8 atoms.  `AtU8` was [introduced](https://github.com/erlang/otp/pull/1078) in OTP 20.
+
+###### Format
+
+<table>
+  <thead>
+    <tr>
+      <th>Offset</th>
+      <th>+0</th>
+      <th>+1</th>
+      <th>+2</th>
+      <th>+3</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td colspan="4">atom count (`unsigned-big-integer`)</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>length<sub>1</sub> (`unsigned-byte`)</td>
+      <td colspan="3">bytes (for length<sub>1</sub>)</td>
+    </tr>
+    <tr>
+      <th>4+length<sub>1</sub>+...+length<sub>n-1</sub></th>
+      <td>length<sub>n</sub> (`unsigned-byte`)</td>
+      <td colspan="3">bytes (for length<sub>n</sub>)</td>
+    </tr>
+  </tbody>
+</table>
+
+###### Tab
+
+The `Atom`/`AtU8` tab shows a table with the columns
+
+| Column     | Description                                                                                                  | Source  |
+|:-----------|:-------------------------------------------------------------------------------------------------------------|:--------|
+| Index      | 1-based to match Erlang convention.  In the `Code` chunk, `atom(0)` is reserved to always translate to `nil` | Derived |
+| Byte Count | The byte count for the atom's bytes                                                                          | Raw     |
+| Characters | From encoding the bytes as LATIN-1 for `Atom` chunk or UTF-8 for `AtU8` chunk                                | Derived |
+
+![AtU8 Table](screenshots/features/beam_files/beam_chunks/atu8/tab/Table.png?raw=true)
+
+##### `Attr`
+
+The `Attr` chunk holds the module attributes, but only those that are persisted.  Erlang module attributes are persisted by default, but in Elixir module attributes need to be marked as persisted with [`Module.register_attribute/3`](https://hexdocs.pm/elixir/Module.html#register_attribute/3)
+
+###### Format
+
+The `Attr` chunk uses External Term Format (`term_to_binary`'s output) to encode a [proplist](http://erlang.org/doc/man/proplists.html), which is similar to, but not quite the same an Elixir [Keyword list](https://hexdocs.pm/elixir/Keyword.html#t:t/0)
+
+All modules will have a `:vsn` attribute that is either set explicitly or defaults to the MD5 of the module.
+
+###### Tab
+
+The `Attr` tab shows a table with the columns
+
+| Column | Description                                                                                                      | Source |
+|:-------|:-----------------------------------------------------------------------------------------------------------------|:-------|
+| Key    | Attribute name                                                                                                   | Raw    |
+| Value  | Attribute value. **Note: The value always appears as a list as read from the binary format.  I don't know why.** | Raw    |
+
+![Attr Table](screenshots/features/beam_files/beam_chunks/attr/tab/Table.png?raw=true)
+
+##### `CInf`
+
+The `CInf` chunk is the Compilation Information for the Erlang or Erlang Core compiler.  Even Elixir modules have it because Elixir code passes through this part of the Erlang Core compiler
+
+###### Format
+
+The `CInf` chunk uses External Term Format (`term_to_binary`'s output) to encode a [proplist](http://erlang.org/doc/man/proplists.html), which is similar to, but not quite the same an Elixir [Keyword list](https://hexdocs.pm/elixir/Keyword.html#t:t/0)
+
+###### Tab
+
+The `CInf` tab shows a table with the columns
+
+| Column | Description     | Source |
+|:-------|:----------------|:-------|
+| Key    | Option name     | Raw    |
+| Value  | Inspected value | Raw    |
+
+![CInf Table](screenshots/features/beam_files/beam_chunks/cinf/tab/Table.png?raw=true)
+
+##### `Code`
+
+The `Code` chunk contains the byte code for the module.
+
+###### Format
+
+It is encoded in [BEAM Compact Term Encoding](http://beam-wisdoms.clau.se/en/latest/indepth-beam-file.html#beam-compact-term-encoding), which differs from the binary format produced by `term_to_binary`.
+
+###### Tab
+
+The `Code` tab shows a read-only editor with one byte code operation on each line.  For ease of reading, operations are grouped by function and then label block with indentation indicating scope.
+
+![Code Chunk Read-Only Editor](screenshots/features/beam_files/beam_chunks/code/tab/Editor.png?raw=true)
+
+By default as many references to other chunks and references to other parts of `Code` chunk are inlined to ease understanding.  If you want to see the raw byte code operations, you can turn off the various inliners.
+
+####### Controls
+
+<table>
+  <thead>
+    <tr>
+      <th>Control</th>
+      <th>On</th>
+      <th>Off</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="2">Inline Atoms</td>
+      <td>
+        <code>atom(0)</code> is inlined as <code>nil</code>
+      </td>
+      <td>
+        <code>atom(N)</code> if "Inline Integers" is Off
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>atom(n)</code> looks up index `n` in `Atom`/`AtU8` chunk and inlines its `inspect`ed version
+      </td>
+      <td>
+        <code>N</code> if "Inline Integers" is On and the argument supports "Inline Integers"
+      </td>
+    </tr>
+    <tr>
+      <td rowspan="2">Inline Functions</td>
+      <td rowspan="2">
+        <code>literal(n)</code> looks up index <code>n</code> in <code>FunT</code> chunk and inlines the name if the argument supports "Inline Functions"
+      </td>
+      <td>
+        <code>literal(n)</code> if "Inline Integers" is Off
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>n</code> if "Inline Integers" is On and the argument supports "Inline Integers"
+      </td>
+    </tr>
+    <tr>
+      <td rowspan="2">
+        Inline Imports
+      </td>
+      <td rowspan="2">
+        <code>literal(n)</code> looks up index <code>n</code> in <code>ImpT</code> and inlines it as a function reference: <code>&amp;module.name/arity</code> if argument supports "Inline Functions"
+      </td>
+      <td>
+        <code>literal(n)</code> if "Inline Integers" Is Off
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>n</code> if "Inline Integers" is On and the argument supports "Inline Integers"
+      </td>
+    </tr>
+    <tr>
+      <td rowspan="2">Inline Integers</td>
+      <td><code>atom(n)</code> and <code>literal(n)</code> inline as <code>n</code> if argument supports "Inline Integers"</td>
+      <td rowspan="2"><code>atom(n)</code>, <code>integer(n)</code>, and <code>literal(n)</code></td>
+    </tr>
+    <tr>
+      <td><code>integer(n)</code> inlines as <code>n</code></td>
+    </tr>
+    <tr>
+      <td>Inline Labels</td>
+      <td><code>label(n)</code> inlines as <code>n</code> if argument supports "Inline Labels"</td>
+      <td><code>label(n)</code></td>
+    </tr>
+    <tr>
+      <td>Inline Lines</td>
+      <td><code>line(literal(n))</code> looks up index `n` in the "Line Reference" table in the `Lines` chunk.  The Line Reference contains a file name index and line.  The file name index is looked up in the "File Name" table in the `Lines` chunk.  The line from the Line Reference and the File name from the "File Name" table are inlined as `line(file_name: file_name, line: line)`.</td>
+      <td><code>line</code> operations are left as is</td>
+    </tr>
+    <tr>
+      <td>Inline Literals</td>
+      <td><code>literal(n)</code> looks up index <code>n</code> in <code>LitT</code> chunk and inlines its `inspect`ed version if the argument supports "Inline Literals"</td>
+      <td><code>literal(n)</code></td>
+    </tr>
+    <tr>
+      <td>Inline Local Calls</td>
+      <td><code>label(n)</code> finds <code>label(n)</code> in <code>Code</code> chunk, then searches back for the previous <code>func_info</code> operation, then inlines it as a function reference: <code>&amp;module.name/arity</code> if argument supports "Inline Local Calls"</td>
+      <td><code>label(n)</code></td>
+    </tr>
+    <tr>
+      <td>Inline Strings</td>
+      <td>Looks up <code>bit_length<code> and <code>byte_offset</code> into `StrT` chunk as their CharList value if supported by operation as value to <code>string</code> argument name</td>
+      <td><code>bit_length<code> and <code>byte_offset</code>arguments are left as is</td>
+    </tr>
+    <tr>
+      <td>Show Argument Names</td>
+      <td>Adds keyword argument names before each argument value</td>
+      <td>Leaves values as positional arguments</td>
+    </tr>
+  </tbody>
+</table>
+
+If any of the inliners are incorrect or you have an argument name that makes more sense, please open an [issue](https://github.com/KronicDeth/intellij-elixir/issues).
+
+##### `Dbgi`
+
+The `Dbgi` chunk contains Debug Info.  It was [introduced](https://github.com/erlang/otp/pull/1367) in OTP 20 as a replacement for the `Abst` chunk.  While the `Abst` chunk was required to contain the Erlang AST, the `Dbgi` format can contain the debug info for other languages, such as Elixir `quoted` form AST.
+
+###### Format
+
+Because the format is language neutral, the format is a set of nested, versioned formats.  The outer most layer is
+
+```elixir
+{:debug_info_v1, backend, metadata | :none}
+```
+
+For `:debug_info_v1`, Elixir's `backend` is `:elixir_erl`.  The `metadata` for `:elixir_erl` is further versioned: `{:elixir_v1, map, specs}`.
+
+`map` contains the bulk of the data.
+
+| Key             | Value                                                                                                                                                                                                          |
+|:----------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `:attributes`   | Attributes similar to the `Attr` chunk, but at the Elixir, instead of Core Erlang level.  Usually they match with the exception that `attributes` doesn't contain `vsn` when `Attr` contains the `MD5` version |
+| `:compile_opts` | Compilation options similar to `CInf` chunk's `options` key, but at for Elixir, instead of Core Erlang level.                                                                                                  |
+| `:definitions`  | The Elixir `quoted` AST for reach function clause.                                                                                                                                                             |
+| `:file`         | The name of the file the module was generated from.                                                                                                                                                            |
+| `:line`         | The line in `:file` where the module was defined, such as the line `defmodule` occurred.                                                                                                                       |
+| `:module`       | The name of the module as an `atom`                                                                                                                                                                            |
+| `:unreachable`  | Unreachable functions                                                                                                                                                                                          |
+
+###### Tab
+
+The `Dbgi` tag show the single value map entries: `:file`, `:line`, and `:module`.
+
+![Singletons](screenshots/features/beam_files/beam_chunks/dbgi/tab/Singletons.png?raw=true)
+
+For the multi-value keys: `:attributes`, `:compile_opts`, and `:definitions`, there are individual tabs.
+
+![Multivalue Tabs](screenshots/features/beam_files/beam_chunks/dbgi/tab/Multivalue%20Tabs.png?raw=true)
+
+####### Attributes
+
+The Attributes tab has the same format as the `Attr`s chunk.
+
+![Dbgi Attributes Table](screenshots/features/beam_files/beam_chunks/dbgi/tab/attributes/Table.png?raw=true)
+
+####### Compile Options
+
+The Compile Options tab is usually empty, much like the `CInf` `options` key for Erlang.
+
+![Table](screenshots/features/beam_files/beam_chunks/dbgi/tab/compile_options/Table.png?raw=true)
+
+####### Definitions
+
+The Definitions tab is split between a tree of Module, Function/Arity and clauses.
+
+![Tree](screenshots/features/beam_files/beam_chunks/dbgi/tab/definitions/Tree.png?raw=true)
+
+Clicking on a clause will show only that clause, but clicking on a higher level in the tree will show all clauses in the function or the entire Module.
+
+![Clause](screenshots/features/beam_files/beam_chunks/dbgi/tab/definitions/Clause.png?raw=true)
+![Function](screenshots/features/beam_files/beam_chunks/dbgi/tab/definitions/Function.png?raw=true)
+![Module](screenshots/features/beam_files/beam_chunks/dbgi/tab/definitions/Module.png?raw=true)
+
+The AST stored in the `definitions` tab and the process of converting it back to code is not format preserves, so it will not look precisely like the source code as the AST has undergone some macro expansion before its put in the `Dbgi` chunk.  *As common idioms are understood, reversals will be add to the renderer.*
+
+##### `ExDc`
+
+The `ExDc` chunk stores ExDoc.  Not the rendered HTML from the `ex_doc` package, but the the `@doc`, `@moduledoc`, and `@typedoc` attribute values that work even without `ex_doc` installed.  This chunk is what is consulted when the `h` helper is used in `iex`.
+
+###### Format
+
+The `ExDc` chunk is the encoded with `term_to_binary`.  The term format is a versioned as `{version, versioned_format}`.  The current `version` tag is `:elixir_docs_v1` and the `versioned_format` is a [Keyword.t](https://hexdocs.pm/elixir/Keyword.html#t:t/0) with keys matching the [`Code.get_docs/2`](https://hexdocs.pm/elixir/Code.html#get_docs/2) tags `:callback_docs`, `:docs`, `:moduledoc`, and `:type_docs` keys.
+
+###### Tab
+
+Like `Dbgi`, the `ExDc` tab is split between a tree to navigate and an editor to show the decompiled value.
+
+![ExDc Tree](screenshots/features/beam_files/beam_chunks/exdc/tab/Tree.png?raw=true)
+![Function selected in ExDc tree](screenshots/features/beam_files/beam_chunks/exdc/tab/Function.png?raw=true)
+
+Click on a node in the tree will show all docs at that level and any descendants.
+
+| Node                     | Description                        |
+|:-------------------------|:-----------------------------------|
+| *Root*                   | All docs                           |
+| Module                   | `@moduledoc`                       |
+| Types                    | All `@typedoc`s                    |
+| Types *child*            | A specific `@typedoc`              |
+| Callbacks                | All `@callback` `@doc`s            |
+| Callbacks *child*        | A specific `@callback`'s `@doc`    |
+| Functions/Macros         | All `@doc`s for functions/macros   |
+| Functions/Macros *child* | A specific function/macro's `@doc` |
+
+##### `ExpT`
+
+The `ExpT` chunk is the Export Table.  The name "Export" derives from the `Erlang` module attribute `-export`, which is used to "export" functions from a module.  It is the equivalent of making a function or macro public with `def` and `defmacro` as opposed to making it private with `defp` and `defmacrop` in Elixir.
+
+###### Format
+
+The BEAM format and the `ExpT` chunk, being made for Erlang, has no concept of macros. It only understands functions, so Elixir macros, like `__using__/1` called by `use` are compiled to plain Erlang functions with `MACRO-` prefixed to their name and an extra argument (the `__CALLER__` environment) as the first argument, which increases the arity, yielding a full MFA of `MACRO-__using__/2` as seen above.
+
+###### Tab
+
+The `ExpT` tab shows a table with the columns
+
+| Column     | Description                                                                                                                                                                             | Source  |
+|:-----------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:--------|
+| Atom Index | Index into the `Atom` or `AtU8` chunk for the function's name                                                                                                                           | Raw     |
+| Name       | The atom referenced by "Atom Index"                                                                                                                                                     | Derived |
+| Arity      | The arity (argument count) of the function                                                                                                                                              | Raw     |
+| Label      | Label index in the `Code` chunk where the function is defined. This label is usually immediately after the `func_info` operation and before the first pattern match or guard operation. | Raw     |
+
+![ExpT Table](screenshots/features/beam_files/beam_chunks/expt/tab/Table.png?raw=true)
+
+##### `ImpT`
+
+The `ImpT` chunk is the Import Table.  It **DOES NOT** encode just the Erlang `-import` attributes or Elixir `import` macro calls: it tracks any external function or macro called from another module.  `call_ext_*` operations in the `Code` chunk don't store the Module and Function (MF) of the function they will call directly in the bytecode, instead, one of the arguments is an index into the `ImpT` chunk.   This way, all external calls are normalized into the `ImpT` chunk instead of being denormalized to the call site.  The arity still appears at the call site to help with checking the argument count.
+
+###### Format
+
+You may notice that `erlang.byte_size/1` is included in the table.  This is because even BIFs are referenced by MFA and not a pre-assigned number as would be the case for system calls in operating systems like Linux.  BEAM is like an Operation System, but not in all ways.
+
+###### Tab
+
+The `ImpT` tab shows a table with the columns
+
+| Column              | Description                                                  | Source  |
+|:--------------------|:-------------------------------------------------------------|:--------|
+| Index               | 0-based index used by references in the `Code` chunk.        | Derived |
+| Module Atom Index   | Index into the `Atom` or `AtU8` chunk for the Module's name  | Raw     |
+| Module Atom         | The atom referenced by "Module Atom Index".                  | Derived |
+| Function Atom Index | Index into the `Atom` or `AtU8` chunk for the functon's name | Raw     |
+| Function Atom       | The atom referened by "Function Atom Index".                 | Derived |
+
+![ImpT Table](screenshots/features/beam_files/beam_chunks/impt/tab/Table.png?raw=true)
+
+##### `LitT`
+
+The `LitT` chunk contains literals loaded as arguments in `Code` chunk.
+
+###### Format
+
+Confusingly, in the `Code` chunk sometimes the `literal(N)` term is used to encode integer `N`, an index into another chunk, or an actual `index` into the `LitT`.  How `literal` terms are handled is completely dependent on the specific operation, so without having outside knowledge about the bytecode operation arguments for BEAM, the best way to figure out if `literal` terms are an integer or an index is to toggle the various controls in the `Code` tab to see if `literal` with no inlining turns into a `LitT` literal, `FunT` function reference, `ImpT` function reference, or integer.
+
+###### Tab
+
+The `LitT` tab shows a table with the columns
+
+| Column | Description                                                    | Source  |
+|:-------|:---------------------------------------------------------------|:--------|
+| #      | 0-based index used by references in the `Code` chunk.          | Derived |
+| Term   | The equivalent of `raw |&gt; binary_to_term() |&gt; inspect()` | Raw     |
+
+![LitT Table](screenshots/features/beam_files/beam_chunks/litt/tab/Table.png?raw=true)
+
+##### `Line`
+
+The `Line` chunk encodes both the file name and line number for each `line(literal(n))` operation in the `Code` chunk.  The `n` in `line(literal(n))` is an index in to the Line References table in the `Line` chunk.  This is used in Phoenix view modules to show where code from templates comes from.
+
+###### Format
+
+The `Line` chunk is composed of 2 subsections: (1) Line References and (2) File Names.  First there is a header setting up the number of each entry to expect.
+
+<table>
+  <thead>
+    <tr>
+      <th>Offset</th>
+      <th>+0</th>
+      <th>+1</th>
+      <th>+2</th>
+      <th>+3</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td colspan="4">emulator version (`unsigned-big-integer`)</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td colspan="4">flags (`unsigned-big-integer`)</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td colspan="4">Line Instruction Count (`unsigned-big-integer`)</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td colspan="4">Line Reference Count (`unsigned-big-integer`)</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td colspan="4">File Name Count (`unsigned-big-integer`)</td>
+    </tr>
+  </tbody>
+</table>
+
+####### Line References
+
+This uses the Compact Term Format used for the `Code` chunk.  The format ends up producing `{file_name_index, line}` pairs using the following algorithm:
+
+| Term         | Interpretation                                       |
+|:-------------|:-----------------------------------------------------|
+| `atom(n)`    | Change `file_name_index` to `n`                      |
+| `integer(n)` | Add `{file_name_index, n}` to end of Line References |
+
+####### File Names
+
+<table>
+  <thead>
+    <tr>
+      <th>Offset</th>
+      <th>+0</th>
+      <th>+1</th>
+      <th>+2</th>
+      <th>+3</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td colspan="2">Byte Count (`unsigned-big-integer`)</td>
+      <td colspan="2">Bytes</td>
+    </tr>
+  </tbody>
+</table>
+
+###### Tab
+
+The `Line` tab has one subtab for each subsection in the tab.  Each subsection has its own table.
+
+![Line References Table](screenshots/features/beam_files/beam_chunks/line/tab/line_references/Table.png?raw=true)
+![File Names TableTable](screenshots/features/beam_files/beam_chunks/line/tab/file_names/Table.png?raw=true)
+
+##### `LocT`
+
+The `LocT` chunk is the dual to the `ExpT` chunk: it contains all private functions and macros.
+
+###### Format
+
+You'll notice entries like `-__struct__/1-fun-0-`, starts with `-` and have a `/` suffix with `fun` in it. This naming scheme is used for anonymous functions such as those defined with `fn` or the capture operator (`&`) in Elixir.  Much like how macros don't really exist and use a `MACRO-` suffix, anonymous functions/lambdas don't exist, and instead use a distinct naming scheme `-<PARENT_FUNCTION>/*fun*`.  Unlike `MACRO-`, which is an Elixir invention, anonymous functions/lambdas really being local named functions with derived names is also done in pure Erlang modules.  Erlang's anonymous functions are defined with `fun`, which is where the `fun` part of the naming scheme comes from.
+
+###### Tab
+
+The `LocT` tab shows a table with the columns
+
+| Column     | Description                                                                                                                                                                             | Source  |
+|:-----------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:--------|
+| Atom Index | Index into the `Atom` or `AtU8` chunk for the function's name                                                                                                                           | Raw     |
+| Name       | The atom referenced by "Atom Index"                                                                                                                                                     | Derived |
+| Arity      | The arity (argument count) of the function                                                                                                                                              | Raw     |
+| Label      | Label index in the `Code` chunk where the function is defined. This label is usually immediately after the `func_info` operation and before the first pattern match or guard operation. | Raw     |
+
+![LocT Table](screenshots/features/beam_files/beam_chunks/loct/tab/Table.png?raw=true)
+
+##### `StrT`
+
+The `StrT` chunk contains all Erlang strings (that is, Elixir charlists) used in the `Code` chunk.
+
+###### Format
+
+The `StrT` chunk contains a single contiguous pool.  These strings are used for byte code operations like `bs_put_string`.  Not all strings appear in `StrT`.  Some strings, including most Elixir strings (Erlang binaries) appear in the `LitT` chunk that holds literals. *I'm not sure how the compiler determines whether to use `StrT` or `LitT`.  I think it all depends on the byte code operation.*
+
+Instead of encoding the start and length of each string in the chunk itself, the start and length for any given string is passed as arguments to the byte code operations in the `Code` chunk. By doing this, shared substrings can be efficiently encoded in `StrT`.
+
+###### Tab
+
+![StrT Pool](screenshots/features/beam_files/beam_chunks/strt/tab/Pool.png?raw=true)
+
+#### Decompilation (Text)
+
+`.beam` files, such as those in the Elixir SDK, the Elixir SDK's Internal Erlang SDK, and in your project's `build` directory will be decompiled to equivalent `def` and `defmacro` calls.  The bodies will not be decompiled, only the call definition head and placeholder parameters.  These decompiled call definition heads are enough to allow Go To Declaration, the Structure pane, and Completion to work with the decompiled `.beam` files.
+
+##### Call definition macros
 
 It turns out that in the `.beam` binary format there are no macros.  This makes sense since the BEAM format was made for Erlang, which does not have macros, and only has functions.  Elixir marks its macros in the compiled `.beam` by prefixing them with `MACRO-`.
 
@@ -2483,7 +2989,7 @@ There are 2 chunks in the BEAM format for function references: `ExpT`, which is 
 | `LocT`     | `MACRO-`    | `defmacrop` |
 | `LocT`     | N/A         | `defp`      |
 
-##### `defp` with `/` in name
+###### `defp` with `/` in name
 
 Much like there are no macros in BEAM, there are no anonymous functions either.  Any anonymous function (using `fn` in Elixir or `fun` in Erlang) ends up being a named function in the `LocT` chunk.  Anonymous functions names start with `-`, then the parent function's name, a `/` and a unique number for that scope.
 
@@ -2507,7 +3013,7 @@ which is generated from the `for` in
 ```
 > -- [Kernel.binding/1](https://github.com/elixir-lang/elixir/blob/v1.5.2/lib/elixir/lib/kernel.ex#L2560-L2565)
 
-#### Special handling of call definition names
+##### Special handling of call definition names
 
 Functions and macros can have names that aren't valid identifier names, so the decompiler has special handlers to detect these invalid identifiers and escape them to make decompiled code that is parsable as valid Elixir.
 
@@ -2778,6 +3284,54 @@ Functions and macros can have names that aren't valid identifier names, so the d
   </tr>
   </tbody>
 </table>
+
+### Completion
+
+#### Aliases and Modules
+
+When you start typing an Alias, completion will look in three locations:
+
+1. `alias` aliased names in the current file
+    1. `Suffix` for `alias Prefix.Suffix`
+    2. `MultipleAliasA` or `MultipleAliasB` for `alias Prefix.{MultipleAliasA, MultipleAliasB}`
+    3. `As` for `alias Prefix.Suffix, as: As`
+2. Indexed module names (as available from [Go To Symbol](#go-to-symbol))
+    1. `Prefix.Suffix` from `defmodule Prefix.Suffix`
+    2. `MyProtocol` from `defprotocol MyProtocol`
+    3. `MyProtocol.MyStruct`
+        1. `defimpl MyProtocol, for: MyStruct`
+        2. `defimpl MyProtocol` nested under `defmodule MyStruct`
+3. Nested modules under aliased names
+    1. `Suffix.Nested` for `alias Prefix.Suffix` where `Prefix.Suffix.Nested` is an indexed module, implementation or protocol name.
+    2. `MultipleAliasA.Nested` for `alias Prefix.{MultipleAliasA, MultipleAliasB}` where `Prefix.MultipleAliasA.Nested` `alias Prefix.{MultipleAliasA, MultipleAliasB}` is an indexed module, implementation or protocol name.
+    3. `As.Nested` for `alias Prefix.Suffix, as: As` where `Prefix.Suffix.Nested` is an indexed module, implementation, or protocol name.
+
+##### Aliases inside `{ }`
+
+When you start typing inside `{ }` for `alias Prefix.{}` or `import Prefix.{}`, completion will look for nested modules under `Prefix` and then remove the `Prefix.`, so completion will look like `Suffix`.
+
+#### Function and Macro Calls
+
+Completion uses the same presentation as [Structure](#structure), so you can tell whether the name is function/macro ([Time](#time)), whether it is public/private ([Visibility](#visibility)) and the Module where it is defined.  Between the icons and the Modules is the name itself, which is highlighted in **bold**, the parameters for the call definition follow, so that you can preview the patterns required for the different clauses.
+
+![Function and Macro Calls Completion](/screenshots/Function%20and%20Macro%20Calls%20Completion.png?raw=true "Function and Macro Calls Completion")
+
+##### Qualified
+
+Qualified functions and macro calls will complete using those functions and macros defined in the qualifying Module (`defmodule`), Implementation (`defimpl`) or Protocol (`defprotocol`).  Completion starts as shown as `.` is typed after a qualifying Alias.
+
+##### Unqualified
+
+Function and macro calls that are unqualified are completed from the index of all function and macro definitions, both public and private. (The index contains only those Elixir functions and macro defined in parsable source, such as those in the project or its dependencies.  Erlang functions and Elixir functions only in compiled `.beam` files, such as the standard library will not complete.)  Private function and macros are shown, so you can choose them and then make the chosen function or macro public if it is a remote call.
+
+#### Module Attributes
+
+Module attributes declared earlier in the file can be completed whenever you type `@` and some letter.  If you want to see all module attributes, you can type `@a`, wait for the completions to appear, then delete the `@` to remove the filtering to `a`.
+
+#### Parameters and Variables
+
+Parameter and variable usages can be completed whenever typing an identifier.  The completions will include all variables know up from that part of the file.  It can include variables from outside macros, like quote blocks.
+
 
 ### Go To Declaration
 
