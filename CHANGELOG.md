@@ -336,6 +336,9 @@
 
 ### Bug Fixes
 * [#1019](https://github.com/KronicDeth/intellij-elixir/pull/1019) - Don't use `StreamEx` because support is inconsistent across IDEs - [@KronicDeth](https://github.com/KronicDeth)
+* [#999](https://github.com/KronicDeth/intellij-elixir/pull/999) - [@ronanboiteau](https://github.com/ronanboiteau)
+  * Jetbrains' Gogland is now named GoLand, updated README accordingly
+  * In donors list, Garrett Hart had his GitHub URL (`@https://github.com/thirdshift`) shown instead of his GitHub username (`@thirdshift`)
 
 ## v7.2.1
 
