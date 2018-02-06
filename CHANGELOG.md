@@ -333,6 +333,15 @@
       ![screen shot 2018-02-01 at 7 56 15 pm](https://user-images.githubusercontent.com/298259/35712876-040796d8-078a-11e8-8eb6-6b7f203bbd4a.png)
 
       The `StrT` is contiguous with no separation of strings.  Instead of encoding the start and length of each string in the chunk itself, the start and length for any given string is passed as arguments to the byte code operations in the `Code` chunk. By doing this, shared substrings can be efficiently encoded in `StrT`.
+* [#1021](https://github.com/KronicDeth/intellij-elixir/pull/1021) - [@KronicDeth](https://github.com/KronicDeth)
+  * Support for https://github.com/elixir-lang/elixir/commit/23c7542d95683a497a7b93071b9ccbbeb9e45d2f
+
+    | Version  | Struct               | Started Event     | Finished Event     | `%ExUnit.Test{}` field |
+    |----------|----------------------|-------------------|--------------------|------------------------|
+    | < 1.6.0  | `%ExUnit.TestCase{}` | `:case_started`   | `:case_finished`   | `case`                 |
+    | >= 1.6.0 | `%ExUnit.TestCase{}` | `:module_started` | `:module_finished` | `module`               |
+
+    Because Elixir 1.6.0 could not introduce a breaking change, the `< 1.6.0` events are fired, but `resources/exunit/1.6.0/team_city_ex_unit_formatting.ex` will ignore them and only convert the `>= 1.6.0` events to TeamCity event used in the JetBrains Test Runner UI.
 
 ### Bug Fixes
 * [#1019](https://github.com/KronicDeth/intellij-elixir/pull/1019) - Don't use `StreamEx` because support is inconsistent across IDEs - [@KronicDeth](https://github.com/KronicDeth)

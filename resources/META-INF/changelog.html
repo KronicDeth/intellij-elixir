@@ -342,6 +342,35 @@
           </li>
         </ul>
       </li>
+      <li>
+        <p>Support for <a href="https://github.com/elixir-lang/elixir/commit/23c7542d95683a497a7b93071b9ccbbeb9e45d2f">elixir-lang/elixir@<tt>23c7542</tt></a></p>
+        <table>
+          <thead>
+          <tr>
+            <th>Version</th>
+            <th>Struct</th>
+            <th>Started Event</th>
+            <th>Finished Event</th>
+            <th><code>%ExUnit.Test{}</code> field</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td>&lt; 1.6.0</td>
+            <td><code>%ExUnit.TestCase{}</code></td>
+            <td><code>:case_started</code></td>
+            <td><code>:case_finished</code></td>
+            <td><code>case</code></td>
+          </tr>
+          <tr>
+            <td>&gt;= 1.6.0</td>
+            <td><code>%ExUnit.TestCase{}</code></td>
+            <td><code>:module_started</code></td>
+            <td><code>:module_finished</code></td>
+            <td><code>module</code></td>
+          </tr></tbody></table>
+        <p>Because Elixir 1.6.0 could not introduce a breaking change, the <code>&lt; 1.6.0</code> events are fired, but <code>resources/exunit/1.6.0/team_city_ex_unit_formatting.ex</code> will ignore them and only convert the <code>&gt;= 1.6.0</code> events to TeamCity event used in the JetBrains Test Runner UI.</p>
+      </li>
     </ul>
   </li>
   <li>
