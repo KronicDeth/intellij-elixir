@@ -342,6 +342,7 @@
     | >= 1.6.0 | `%ExUnit.TestCase{}` | `:module_started` | `:module_finished` | `module`               |
 
     Because Elixir 1.6.0 could not introduce a breaking change, the `< 1.6.0` events are fired, but `resources/exunit/1.6.0/team_city_ex_unit_formatting.ex` will ignore them and only convert the `>= 1.6.0` events to TeamCity event used in the JetBrains Test Runner UI.
+* [#1018](https://github.com/KronicDeth/intellij-elixir/pull/1018) - Expose Declarations > Functions and Declarations > Macros in Color Settings - [@dimcha](https://github.com/dimcha)
 
 ### Bug Fixes
 * [#1019](https://github.com/KronicDeth/intellij-elixir/pull/1019) - Don't use `StreamEx` because support is inconsistent across IDEs - [@KronicDeth](https://github.com/KronicDeth)
