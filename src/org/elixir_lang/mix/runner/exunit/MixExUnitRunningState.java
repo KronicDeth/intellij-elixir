@@ -40,7 +40,7 @@ final class MixExUnitRunningState extends MixRunningState {
 
     @NotNull
     private static ParametersList elixirParametersList(@Nullable Sdk sdk) throws IOException {
-        return ElixirModules.parametersList(level(sdk));
+        return ElixirModules.INSTANCE.parametersList(level(sdk));
     }
 
     /**

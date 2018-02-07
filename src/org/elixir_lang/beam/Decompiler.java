@@ -183,6 +183,6 @@ public class Decompiler implements BinaryFileDecompiler {
     @NotNull
     @Override
     public CharSequence decompile(@NotNull VirtualFile virtualFile) {
-        return decompiled(Beam.from(virtualFile));
+        return decompiled(Optional.ofNullable(Beam.Companion.from(virtualFile)));
     }
 }

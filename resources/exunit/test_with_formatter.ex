@@ -4,24 +4,26 @@ defmodule Mix.Tasks.TestWithFormatter do
     @moduledoc false
 
     def start(compile_path, opts) do
-      Mix.shell.info "Cover compiling modules ..."
-      _ = :cover.start
+      Mix.shell().info("Cover compiling modules ...")
+      _ = :cover.start()
 
       case :cover.compile_beam_directory(compile_path |> to_charlist) do
         results when is_list(results) ->
           :ok
+
         {:error, _} ->
-          Mix.raise "Failed to cover compile directory: " <> compile_path
+          Mix.raise("Failed to cover compile directory: " <> compile_path)
       end
 
       output = opts[:output]
 
-      fn() ->
-        Mix.shell.info "\nGenerating cover results ..."
+      fn ->
+        Mix.shell().info("\nGenerating cover results ...")
         File.mkdir_p!(output)
-        Enum.each :cover.modules, fn(mod) ->
+
+        Enum.each(:cover.modules(), fn mod ->
           {:ok, _} = :cover.analyse_to_file(mod, '#{output}/#{mod}.html', [:html])
-        end
+        end)
       end
     end
   end
@@ -164,40 +166,57 @@ defmodule Mix.Tasks.TestWithFormatter do
   been changed since the last run with `--stale`.
   """
 
-  @switches [force: :boolean, color: :boolean, cover: :boolean,
-             trace: :boolean, max_cases: :integer, include: :keep,
-             exclude: :keep, seed: :integer, only: :keep, compile: :boolean,
-             start: :boolean, timeout: :integer, raise: :boolean,
-             deps_check: :boolean, archives_check: :boolean, elixir_version_check: :boolean,
-             stale: :boolean, listen_on_stdin: :boolean, formatter: :keep]
+  @switches [
+    force: :boolean,
+    color: :boolean,
+    cover: :boolean,
+    trace: :boolean,
+    max_cases: :integer,
+    include: :keep,
+    exclude: :keep,
+    seed: :integer,
+    only: :keep,
+    compile: :boolean,
+    start: :boolean,
+    timeout: :integer,
+    raise: :boolean,
+    deps_check: :boolean,
+    archives_check: :boolean,
+    elixir_version_check: :boolean,
+    stale: :boolean,
+    listen_on_stdin: :boolean,
+    formatter: :keep
+  ]
 
   @cover [output: "cover", tool: Cover]
 
-  @spec run(OptionParser.argv) :: :ok
+  @spec run(OptionParser.argv()) :: :ok
   def run(args) do
     {opts, files} = OptionParser.parse!(args, strict: @switches)
 
     if opts[:listen_on_stdin] do
-      System.at_exit fn _ ->
+      System.at_exit(fn _ ->
         IO.gets(:stdio, "")
-        Mix.shell.info "Restarting..."
+        Mix.shell().info("Restarting...")
         :init.restart()
         :timer.sleep(:infinity)
-      end
+      end)
     end
 
-    unless System.get_env("MIX_ENV") || Mix.env == :test do
-      Mix.raise "\"mix test\" is running on environment \"#{Mix.env}\". If you are " <>
-                                "running tests along another task, please set MIX_ENV explicitly"
+    unless System.get_env("MIX_ENV") || Mix.env() == :test do
+      Mix.raise(
+        "\"mix test\" is running on environment \"#{Mix.env()}\". If you are " <>
+          "running tests along another task, please set MIX_ENV explicitly"
+      )
     end
 
-    Mix.Task.run "loadpaths", args
+    Mix.Task.run("loadpaths", args)
 
     if Keyword.get(opts, :compile, true) do
       Mix.Project.compile(args)
     end
 
-    project = Mix.Project.config
+    project = Mix.Project.config()
 
     # Start cover after we load deps but before we start the app.
     cover =
@@ -211,8 +230,8 @@ defmodule Mix.Tasks.TestWithFormatter do
     # before requiring test_helper.exs so that the configuration is
     # available in test_helper.exs. Then configure exunit again so
     # that command line options override test_helper.exs
-    Mix.shell.print_app
-    Mix.Task.run "app.start", args
+    Mix.shell().print_app
+    Mix.Task.run("app.start", args)
 
     # Ensure ExUnit is loaded.
     case Application.load(:ex_unit) do
@@ -236,6 +255,7 @@ defmodule Mix.Tasks.TestWithFormatter do
     warn_test_pattern = project[:warn_test_pattern] || "*_test.ex"
 
     matched_test_files = Mix.Utils.extract_files(test_files, test_pattern)
+
     matched_warn_test_files =
       Mix.Utils.extract_files(test_files, warn_test_pattern) -- matched_test_files
 
@@ -247,9 +267,11 @@ defmodule Mix.Tasks.TestWithFormatter do
 
         cond do
           failures > 0 and opts[:raise] ->
-            Mix.raise "mix test failed"
+            Mix.raise("mix test failed")
+
           failures > 0 ->
-            System.at_exit fn _ -> exit({:shutdown, 1}) end
+            System.at_exit(fn _ -> exit({:shutdown, 1}) end)
+
           true ->
             :ok
         end
@@ -261,7 +283,7 @@ defmodule Mix.Tasks.TestWithFormatter do
 
   defp display_warn_test_pattern(files, pattern) do
     for file <- files do
-      Mix.shell.info "warning: #{file} does not match #{inspect pattern} and won't be loaded"
+      Mix.shell().info("warning: #{file} does not match #{inspect(pattern)} and won't be loaded")
     end
   end
 
@@ -327,7 +349,7 @@ defmodule Mix.Tasks.TestWithFormatter do
       formatters =
         opts
         |> Keyword.get_values(:formatter)
-        |> Enum.map(&(Module.concat(String.split(&1, "."))))
+        |> Enum.map(&Module.concat(String.split(&1, ".")))
 
       Keyword.put(opts, :formatters, formatters)
     else
@@ -336,7 +358,7 @@ defmodule Mix.Tasks.TestWithFormatter do
   end
 
   defp merge_opts(opts, key) do
-    value = List.wrap Application.get_env(:ex_unit, key, [])
+    value = List.wrap(Application.get_env(:ex_unit, key, []))
     Keyword.update(opts, key, value, &Enum.uniq(&1 ++ value))
   end
 
@@ -356,9 +378,9 @@ defmodule Mix.Tasks.TestWithFormatter do
     file = Path.join(dir, "test_helper.exs")
 
     if File.exists?(file) do
-      Code.require_file file
+      Code.require_file(file)
     else
-      Mix.raise "Cannot run tests because test helper file #{inspect file} does not exist"
+      Mix.raise("Cannot run tests because test helper file #{inspect(file)} does not exist")
     end
   end
 end

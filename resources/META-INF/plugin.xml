@@ -96,6 +96,7 @@
     <projectService serviceImplementation="org.elixir_lang.credo.Service"/>
 
     <!-- <code>.beam</code> -->
+    <fileEditorProvider implementation="org.elixir_lang.beam.file_editor.Provider"/>
     <filetype.decompiler filetype="BEAM" implementationClass="org.elixir_lang.beam.Decompiler"/>
     <fileType.fileViewProviderFactory filetype="BEAM" implementationClass="org.elixir_lang.beam.FileViewProviderFactory"/>
     <filetype.stubBuilder filetype="BEAM" implementationClass="org.elixir_lang.beam.StubBuilder"/>
@@ -103,6 +104,11 @@
     <structureViewBuilder key="BEAM" factoryClass="org.elixir_lang.beam.StructureViewBuilderProvider"/>
     <stubElementTypeHolder class="org.elixir_lang.beam.psi.stubs.ModuleStubElementTypes"/>
     <syntaxHighlighter key="BEAM" factoryClass="org.elixir_lang.ElixirSyntaxHighlighterFactory"/>
+
+    <!-- `.beam.asm` -->
+    <fileTypeFactory implementation="org.elixir_lang.beam.assembly.file.type.Factory"/>
+    <lang.parserDefinition implementationClass="org.elixir_lang.beam.assembly.ParserDefinition" language="BEAM.ASSEMBLY"/>
+    <lang.syntaxHighlighterFactory implementationClass="org.elixir_lang.beam.assembly.syntax_highlighter.Factory" language="BEAM.ASSEMBLY"/>
 
     <completion.contributor implementationClass="org.elixir_lang.code_insight.completion.contributor.CallDefinitionClause" language="Elixir"/>
 

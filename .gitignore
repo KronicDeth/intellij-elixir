@@ -15,6 +15,8 @@ jflex-*.jar
 idea-flex.skeleton
 # old lexer generated from Elixir.flex
 src/org/elixir_lang/ElixirFlexLexer.java~
+# old lexer generated from BEAM.Assembly.flex
+src/org/elixir_lang/beam/assembly/FlexLexer.java~
 # OS X thumbnail store
 .DS_Store
 

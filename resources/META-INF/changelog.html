@@ -1,5 +1,390 @@
 <html>
 <body>
+<h1>v7.3.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>Add supplemental file editor for <code>.beam</code> files: "BEAM Chunks".  The decompiled binary file will continue to be shown on the default "Text" editor tab.<br>
+        <a href="https://user-images.githubusercontent.com/298259/35710803-17198a52-077f-11e8-8991-2aebe7f3eb38.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35710803-17198a52-077f-11e8-8991-2aebe7f3eb38.png" alt="screen shot 2018-02-01 at 6 38 07 pm" style="max-width:100%;"></a><br>
+        The BEAM Chunks editor is subdivided into further tabs, one for each chunk in the <code>.beam</code> file.<br>
+        <a href="https://user-images.githubusercontent.com/298259/35710979-1d367930-0780-11e8-8a40-acaef92e621c.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35710979-1d367930-0780-11e8-8a40-acaef92e621c.png" alt="screen shot 2018-02-01 at 6 45 23 pm" style="max-width:100%;"></a><br>
+        The tabs are listed in the order that the chunks occur in the <code>.beam</code> file.
+        <ul>
+          <li>
+            <p>The <code>Atom</code> chunk holds <code>LATIN-1</code> atoms while <code>AtU8</code> holds <code>UTF8</code> atoms.  There will only be one of these atom-related chunks in any given <code>.beam</code> file.  <code>AtU8</code> is used in newer versions of OTP that support UTF8 atoms.</p>
+            <p>The <code>Atom</code>/<code>AtU8</code> tab shows a table with the columns</p>
+            <table>
+              <thead>
+              <tr>
+                <th>Column</th>
+                <th>Description</th>
+                <th>Source</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td>Index</td>
+                <td>Which is 1-based to match Erlang convention.  In the <code>Code</code> chunk, <code>atom(0)</code> is reserved to always translate to <code>nil</code></td>
+                <td>Derived</td>
+              </tr>
+              <tr>
+                <td>Byte Count</td>
+                <td>The byte count for the atom's bytes</td>
+                <td>Raw</td>
+              </tr>
+              <tr>
+                <td>Characters</td>
+                <td>From encoding the bytes as LATIN-1 for <code>Atom</code> chunk or UTF-8 for <code>AtU8</code> chunk</td>
+                <td>Derived</td>
+              </tr></tbody></table>
+            <p><a href="https://user-images.githubusercontent.com/298259/35711460-9aeea9ae-0782-11e8-9d3f-074c05326b4c.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35711460-9aeea9ae-0782-11e8-9d3f-074c05326b4c.png" alt="screen shot 2018-02-01 at 7 01 43 pm" style="max-width:100%;"></a></p>
+            <p>Index 1 is always the module name for the <code>.beam</code> file.  Since <code>.beam</code> is originally an Erlang format, for Elixir modules, you'll see the full atom name of with the <code>Elixir.</code> prefix instead of the Alias name used in Elixir source.</p>
+          </li>
+          <li>
+            <p>The <code>Attr</code> chunk holds the module attributes, but only those that are persisted.</p>
+            <p>The <code>Attr</code> tab shows a table with the columns</p>
+            <table>
+              <thead>
+              <tr>
+                <th>Column</th>
+                <th>Description</th>
+                <th>Source</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td>Key</td>
+                <td>Attribute name</td>
+                <td>Raw</td>
+              </tr>
+              <tr>
+                <td>Value</td>
+                <td>Attribute value. <strong>Note: The value always appears as a list as read from the binary format.  I don't know why.</strong></td>
+                <td>Raw</td>
+              </tr></tbody></table>
+            <p><a href="https://user-images.githubusercontent.com/298259/35753689-576eaf18-0826-11e8-838c-f00fc93fd667.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35753689-576eaf18-0826-11e8-838c-f00fc93fd667.png" alt="screen shot 2018-02-02 at 2 34 22 pm" style="max-width:100%;"></a></p>
+            <p>All modules will have a <code>:vsn</code> attribute that is either set explicitly or defaults to the MD5 of the module.</p>
+          </li>
+          <li>
+            <p>The <code>CInf</code> chunk is the Compilation Information for the Erlang or Erlang Core compiler.  Even Elixir modules have it because Elixir code passes through this part of the Erlang Core compiler.</p>
+            <p>The <code>CInf</code> tab shows a table with the columns</p>
+            <table>
+              <thead>
+              <tr>
+                <th>Column</th>
+                <th>Description</th>
+                <th>Source</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td>Key</td>
+                <td>Option name</td>
+                <td>Raw</td>
+              </tr>
+              <tr>
+                <td>Value</td>
+                <td>Inspected value</td>
+                <td>Raw</td>
+              </tr></tbody></table>
+            <p><a href="https://user-images.githubusercontent.com/298259/35755542-4d769c76-082d-11e8-84d9-ef04ff45b346.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35755542-4d769c76-082d-11e8-84d9-ef04ff45b346.png" alt="screen shot 2018-02-02 at 3 19 50 pm" style="max-width:100%;"></a></p>
+          </li>
+          <li>
+            <p>The <code>Code</code> chunk contains the byte code for the module.  It is encoded in <a href="http://beam-wisdoms.clau.se/en/latest/indepth-beam-file.html#beam-compact-term-encoding" rel="nofollow">BEAM Compact Term Encoding</a>, which differs from the binary format produced by <code>term_to_binary</code>.</p>
+            <p>The <code>Code</code> tab shows a read-only editor with one byte code operation on each line.  For ease of reading, operations are grouped by function and then label block with indentation indicating scope.</p>
+            <p><a href="https://user-images.githubusercontent.com/298259/35762701-18b0882e-0861-11e8-9d3d-675811bd45dd.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35762701-18b0882e-0861-11e8-9d3d-675811bd45dd.png" alt="screen shot 2018-02-02 at 9 35 59 pm" style="max-width:100%;"></a></p>
+            <p>By default as many references to other chunks and references to other parts of <code>Code</code> chunk are inlined to ease understanding.  If you want to see the raw byte code operations, you can turn off the various inliners.</p>
+          </li>
+          <li>
+            <p>The <code>Dbgi</code> chunk contains Debug Info.  It was <a href="https://github.com/erlang/otp/pull/1367">introduced</a> in OTP 20 as a replacement for the <code>Abst</code> chunk.  While the <code>Abst</code> chunk was required to contain the Erlang AST, the <code>Dbgi</code> format can contain the debug info for other languages, such as Elixir <code>quoted</code> form AST.</p>
+            <p>Because the format is language neutral, the format is a set of nested, versioned formats.  The outer most layer is</p>
+            <div class="highlight highlight-source-elixir"><pre>{<span class="pl-c1">:debug_info_v1</span>, backend, metadata <span class="pl-k">|</span> <span class="pl-c1">:none</span>}</pre></div>
+            <p>For <code>:debug_info_v1</code>, Elixir's <code>backend</code> is <code>:elixir_erl</code>.  The <code>metadata</code> for <code>:elixir_erl</code> is further versioned: <code>{:elixir_v1, map, specs}</code>.</p>
+            <p><code>map</code> contains the bulk of the data.</p>
+            <table>
+              <thead>
+              <tr>
+                <th>Key</th>
+                <th>Value</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td><code>:attributes</code></td>
+                <td>Attributes similar to the <code>Attr</code> chunk, but at the Elixir, instead of Core Erlang level.  Usually they match with the exception that <code>attributes</code> doesn't contain <code>vsn</code> when <code>Attr</code> contains the <code>MD5</code> version</td>
+              </tr>
+              <tr>
+                <td><code>:compile_opts</code></td>
+                <td>Compilation options similar to <code>CInf</code> chunk's <code>options</code> key, but at for Elixir, instead of Core Erlang level.</td>
+              </tr>
+              <tr>
+                <td><code>:definitions</code></td>
+                <td>The Elixir <code>quoted</code> AST for reach function clause.</td>
+              </tr>
+              <tr>
+                <td><code>:file</code></td>
+                <td>The name of the file the module was generated from.</td>
+              </tr>
+              <tr>
+                <td><code>:line</code></td>
+                <td>The line in <code>:file</code> where the module was defined, such as the line <code>defmodule</code> occurred.</td>
+              </tr>
+              <tr>
+                <td><code>:module</code></td>
+                <td>The name of the module as an <code>atom</code></td>
+              </tr>
+              <tr>
+                <td><code>:unreachable</code></td>
+                <td>Unreachable functions</td>
+              </tr></tbody></table>
+            <p>The <code>Dbgi</code> tag show the single value map entries: <code>:file</code>, <code>:line</code>, and <code>:module</code></p>
+            <p><a href="https://user-images.githubusercontent.com/298259/35759265-33c33742-083e-11e8-9a4f-97cfd52bbe8e.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35759265-33c33742-083e-11e8-9a4f-97cfd52bbe8e.png" alt="screen shot 2018-02-02 at 5 26 04 pm" style="max-width:100%;"></a></p>
+            <p>For the multi-value keys: <code>:attributes</code>, <code>:compile_opts</code>, and <code>:definitions</code>, there are individual tabs.</p>
+            <p><a href="https://user-images.githubusercontent.com/298259/35759293-6117c83e-083e-11e8-8327-ec7c66cade69.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35759293-6117c83e-083e-11e8-8327-ec7c66cade69.png" alt="screen shot 2018-02-02 at 5 27 29 pm" style="max-width:100%;"></a></p>
+            <p>The Attributes tab has the same format as the <code>Attr</code>s chunk</p>
+            <p><a href="https://user-images.githubusercontent.com/298259/35760967-9c7e0914-0849-11e8-8d53-e402653b70fa.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35760967-9c7e0914-0849-11e8-8d53-e402653b70fa.png" alt="screen shot 2018-02-02 at 6 47 49 pm" style="max-width:100%;"></a></p>
+            <p>The Compile Options tab is usually empty, much like the <code>CInf</code> <code>options</code> key for Erlang.</p>
+            <p><a href="https://user-images.githubusercontent.com/298259/35760988-c3ef0f52-0849-11e8-9ca6-2cbeba8eda23.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35760988-c3ef0f52-0849-11e8-9ca6-2cbeba8eda23.png" alt="screen shot 2018-02-02 at 6 48 34 pm" style="max-width:100%;"></a></p>
+            <p>The Definitions tab is split between a tree of Module, Function/Arity and clauses.</p>
+            <p><a href="https://user-images.githubusercontent.com/298259/35761058-3710d04c-084a-11e8-99e3-0f2aa4f8837d.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35761058-3710d04c-084a-11e8-99e3-0f2aa4f8837d.png" alt="screen shot 2018-02-02 at 6 50 14 pm" style="max-width:100%;"></a></p>
+            <p>Clicking on a clause will show only that clause, but clicking on a higher level in the tree will show all clauses in the function or the entire Module.</p>
+            <p><a href="https://user-images.githubusercontent.com/298259/35761087-7a6e0b8e-084a-11e8-9f86-6e4840eab25d.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35761087-7a6e0b8e-084a-11e8-9f86-6e4840eab25d.png" alt="screen shot 2018-02-02 at 6 53 17 pm" style="max-width:100%;"></a><br>
+              <a href="https://user-images.githubusercontent.com/298259/35762314-55fb0dd2-085a-11e8-8381-faacc880d29e.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35762314-55fb0dd2-085a-11e8-8381-faacc880d29e.png" alt="screen shot 2018-02-02 at 8 47 05 pm" style="max-width:100%;"></a><br>
+              <a href="https://user-images.githubusercontent.com/298259/35762317-5b9f9136-085a-11e8-8b53-03be16b7a06c.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35762317-5b9f9136-085a-11e8-8b53-03be16b7a06c.png" alt="screen shot 2018-02-02 at 8 47 20 pm" style="max-width:100%;"></a></p>
+            <p>The AST stored in the <code>definitions</code> tab and the process of converting it back to code is not format preserves, so it will not look precisely like the source code as the AST has undergone some macro expansion before its put in the Dbgi chunk.  <em>As common idioms are understood, reversals will be add to the renderer.</em></p>
+          </li>
+          <li>
+            <p>The <code>ExDc</code> chunk stores ExDoc.  Not the rendered HTML from the <code>ex_doc</code> package, but the the <code>@doc</code>, <code>@moduledoc</code>, and <code>@typedoc</code> attribute values that work even without <code>ex_doc</code> installed.  This chunk is what is consulted when the <code>h</code> helper is used in <code>iex</code>.</p>
+            <p>The <code>ExDc</code> binary format is from <code>term_to_binary</code>, so it can be reversed with <code>binary_to_term</code>.  The term format is a versioned as <code>{version, versioned_format}</code>.  The current <code>version</code> tag is <code>:elixir_docs_v1</code> and the <code>versioned_format</code> is a <a href="https://hexdocs.pm/elixir/Keyword.html#t:t/0" rel="nofollow">Keyword.t</a> with <code>:callback_docs</code>, <code>:docs</code>, <code>:moduledoc</code>, and <code>:type_docs</code> keys.</p>
+            <p>Like <code>Dbgi</code>, the <code>ExDc</code> tab is split between a tree to navigate and an editor to show the decompiled value.</p>
+            <p><a href="https://user-images.githubusercontent.com/298259/35762423-024913d0-085c-11e8-88ee-c794474a5da5.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35762423-024913d0-085c-11e8-88ee-c794474a5da5.png" alt="screen shot 2018-02-02 at 8 58 38 pm" style="max-width:100%;"></a><br>
+              <a href="https://user-images.githubusercontent.com/298259/35762502-139d2b8e-085d-11e8-97a6-4b16d19dfccb.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35762502-139d2b8e-085d-11e8-97a6-4b16d19dfccb.png" alt="screen shot 2018-02-02 at 9 07 03 pm" style="max-width:100%;"></a></p>
+            <table>
+              <thead>
+              <tr>
+                <th>Node</th>
+                <th>Description</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td><em>Root</em></td>
+                <td>All docs</td>
+              </tr>
+              <tr>
+                <td>Module</td>
+                <td><code>@moduledoc</code></td>
+              </tr>
+              <tr>
+                <td>Types</td>
+                <td>All <code>@typedoc</code>s</td>
+              </tr>
+              <tr>
+                <td>Types <em>child</em></td>
+                <td>A specific <code>@typedoc</code></td>
+              </tr>
+              <tr>
+                <td>Callbacks</td>
+                <td>All <code>@callback</code> <code>@doc</code>s</td>
+              </tr>
+              <tr>
+                <td>Callbacks <em>child</em></td>
+                <td>A specific <code>@callback</code>'s <code>@doc</code></td>
+              </tr>
+              <tr>
+                <td>Functions/Macros</td>
+                <td>All <code>@doc</code>s for functions/macros</td>
+              </tr>
+              <tr>
+                <td>Functions/Macros <em>child</em></td>
+                <td>A specific function/macro's <code>@doc</code></td>
+              </tr></tbody></table>
+          </li>
+          <li>
+            <p>The <code>ExpT</code> chunk is the Export Table.  The name "Export" derives from the <code>Erlang</code> module attribute <code>-export</code>, which is used to "export" functions from a module.  It is the equivalent of making a function or macro public with <code>def</code> and <code>defmacro</code> as opposed to making it private with <code>defp</code> and <code>defmacrop</code> in Elixir.</p>
+            <p>The <code>ExpT</code> tab shows a table with the columns</p>
+            <table>
+              <thead>
+              <tr>
+                <th>Column</th>
+                <th>Description</th>
+                <th>Source</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td>Atom Index</td>
+                <td>Index into the <code>Atom</code> or <code>AtU8</code> chunk for the function's name</td>
+                <td>Raw</td>
+              </tr>
+              <tr>
+                <td>Name</td>
+                <td>The atom referenced by "Atom Index"</td>
+                <td>Derived</td>
+              </tr>
+              <tr>
+                <td>Arity</td>
+                <td>The arity (argument count) of the function</td>
+                <td>Raw</td>
+              </tr>
+              <tr>
+                <td>Label</td>
+                <td>Label index in the <code>Code</code> chunk where the function is defined. This label is usually immediately after the <code>func_info</code> operation and before the first pattern match or guard operation.</td>
+                <td>Raw</td>
+              </tr></tbody></table>
+            <p><a href="https://user-images.githubusercontent.com/298259/35713581-b36f17ba-078d-11e8-87e3-0c50b2624676.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35713581-b36f17ba-078d-11e8-87e3-0c50b2624676.png" alt="screen shot 2018-02-01 at 8 21 13 pm" style="max-width:100%;"></a></p>
+            <p>You'll notice the first entry starts with <code>MACRO-</code>.  This is because the BEAM, being made for Erlang has no concept of macros. It only understands functions, so Elixir macros, like <code>__using__/1</code> called by <code>use</code> are compiled to plain Erlang functions with <code>MACRO-</code> prefixed to their name and an extra argument (the <code>__CALLER__</code> environment) as the first argument, which increases the arity, yielding a full MFA of <code>MACRO-__using__/2</code> as seen above.</p>
+          </li>
+          <li>
+            <p>The <code>ImpT</code> chunk is the Import Table.  It <strong>DOES NOT</strong> encode just the Erlang <code>-import</code> attributes or Elixir <code>import</code> macro calls: it tracks any external function or macro called from another module.  <code>call_ext_*</code> operations in the <code>Code</code> chunk don't store the Module and Function (MF) of the function they will call directly in the bytecode, instead, one of the arguments is an index into the <code>ImpT</code> chunk.   This way, all external calls are normalized into the <code>ImpT</code> chunk instead of being denormalized to the call site.  The arity still appears at the call site to help with checking the argument count.</p>
+            <p>The <code>ImpT</code> tab shows a table with the columns</p>
+            <table>
+              <thead>
+              <tr>
+                <th>Column</th>
+                <th>Description</th>
+                <th>Source</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td>Index</td>
+                <td>0-based index used by references in the <code>Code</code> chunk.</td>
+                <td>Derived</td>
+              </tr>
+              <tr>
+                <td>Module Atom Index</td>
+                <td>Index into the <code>Atom</code> or <code>AtU8</code> chunk for the Module's name</td>
+                <td>Raw</td>
+              </tr>
+              <tr>
+                <td>Module Atom</td>
+                <td>The atom referenced by "Module Atom Index".</td>
+                <td>Derived</td>
+              </tr>
+              <tr>
+                <td>Function Atom Index</td>
+                <td>Index into the <code>Atom</code> or <code>AtU8</code> chunk for the functon's name</td>
+                <td>Raw</td>
+              </tr>
+              <tr>
+                <td>Function Atom</td>
+                <td>The atom referened by "Function Atom Index".</td>
+                <td>Derived</td>
+              </tr></tbody></table>
+            <p><a href="https://user-images.githubusercontent.com/298259/35713189-93432ff0-078b-11e8-8856-df067459adf9.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35713189-93432ff0-078b-11e8-8856-df067459adf9.png" alt="screen shot 2018-02-01 at 8 07 15 pm" style="max-width:100%;"></a></p>
+            <p>You may notice that <code>erlang.byte_size/1</code> is included in the table.  This is because even bifs are referenced by MFA and not a pre-assigned number as would be the case for system calls in operating systems like Linux.  BEAM is like an Operation System, but not in all ways.</p>
+          </li>
+          <li>
+            <p>The <code>LitT</code> chunk contains literals loaded as arguments in <code>Code</code> chunk.  Confusingly, in the <code>Code</code> chunk sometimes the <code>literal(N)</code> term is used to encode integer <code>N</code>, an index into another chunk, or an actual <code>index</code> into the <code>LitT</code>.  How <code>literal</code> terms are handled is completely dependent on the specific operation, so without having outside knowledge about the bytecode operation arguments for BEAM, the best way to figure out if <code>literal</code> terms are an integer or an index is to toggle the various controls in the <code>Code</code> tab to see if <code>literal</code> with no inlining turns into a <code>LitT</code> literal, <code>FunT</code> function reference, <code>ImpT</code> function reference, or integer.</p>
+            <p>The <code>LitT</code> tab shows a table with the columns</p>
+            <table>
+              <thead>
+              <tr>
+                <th>Column</th>
+                <th>Description</th>
+                <th>Source</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td>#</td>
+                <td>0-based index used by references in the <code>Code</code> chunk.</td>
+                <td>Derived</td>
+              </tr>
+              <tr>
+                <td>Term</td>
+                <td>The equivalent of `raw</td>
+                <td>&gt; binary_to_term()</td>
+              </tr></tbody></table>
+            <p><a href="https://user-images.githubusercontent.com/298259/35715153-674f088c-0796-11e8-89e8-fd3c6c083a45.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35715153-674f088c-0796-11e8-89e8-fd3c6c083a45.png" alt="screen shot 2018-02-01 at 9 25 07 pm" style="max-width:100%;"></a></p>
+          </li>
+          <li>
+            <p>The <code>LocT</code> chunk is the dual to the <code>ExpT</code> chunk: it contains all private functions and macros.</p>
+            <p>The <code>LocT</code> tab shows a table with the columns</p>
+            <table>
+              <thead>
+              <tr>
+                <th>Column</th>
+                <th>Description</th>
+                <th>Source</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td>Atom Index</td>
+                <td>Index into the <code>Atom</code> or <code>AtU8</code> chunk for the function's name</td>
+                <td>Raw</td>
+              </tr>
+              <tr>
+                <td>Name</td>
+                <td>The atom referenced by "Atom Index"</td>
+                <td>Derived</td>
+              </tr>
+              <tr>
+                <td>Arity</td>
+                <td>The arity (argument count) of the function</td>
+                <td>Raw</td>
+              </tr>
+              <tr>
+                <td>Label</td>
+                <td>Label index in the <code>Code</code> chunk where the function is defined. This label is usually immediately after the <code>func_info</code> operation and before the first pattern match or guard operation.</td>
+                <td>Raw</td>
+              </tr></tbody></table>
+            <p><a href="https://user-images.githubusercontent.com/298259/35715229-ca135b1c-0796-11e8-80a4-971470f1c6d2.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35715229-ca135b1c-0796-11e8-80a4-971470f1c6d2.png" alt="screen shot 2018-02-01 at 9 27 49 pm" style="max-width:100%;"></a></p>
+            <p>You'll notice the first entry <code>-__struct__/1-fun-0-</code>, starts with <code>-</code> and have a <code>/</code> suffix with <code>fun</code> in it. This naming scheme is used for anonymous functions such as those defined with <code>fn</code> or the capture operator (<code>&amp;</code>) in Elixir.  Much like how macros don't really exist and use a <code>MACRO-</code> suffix, anonymous functions/lambdas don't exist, and instead use a distinct naming scheme <code>-&lt;PARENT_FUNCTION&gt;/*fun*</code>.  Unlike <code>MACRO-</code>, which is an Elixir invention, anonymous functions/lambdas really being local named functions with derived names is also done in pure Erlang modules.  Erlang's anonymous functions are defined with <code>fun</code>, which is where the <code>fun</code> part of the naming scheme comes from.</p>
+          </li>
+          <li>
+            <p>The <code>StrT</code> chunk contains a single contiguous pool of all Erlang strings (that is, Elixir charlists) used in the <code>Code</code> chunk.  These strings are used for byte code operations like <code>bs_put_string</code>.  Not all strings appear in <code>StrT</code>.  Some strings, including most Elixir strings (Erlang binaries) appear in the <code>LitT</code> chunk that holds literals.</p>
+            <p><a href="https://user-images.githubusercontent.com/298259/35712876-040796d8-078a-11e8-8eb6-6b7f203bbd4a.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35712876-040796d8-078a-11e8-8eb6-6b7f203bbd4a.png" alt="screen shot 2018-02-01 at 7 56 15 pm" style="max-width:100%;"></a></p>
+            <p>The <code>StrT</code> is contiguous with no separation of strings.  Instead of encoding the start and length of each string in the chunk itself, the start and length for any given string is passed as arguments to the byte code operations in the <code>Code</code> chunk. By doing this, shared substrings can be efficiently encoded in <code>StrT</code>.</p>
+          </li>
+        </ul>
+      </li>
+      <li>
+        <p>Support for <a href="https://github.com/elixir-lang/elixir/commit/23c7542d95683a497a7b93071b9ccbbeb9e45d2f">elixir-lang/elixir@<tt>23c7542</tt></a></p>
+        <table>
+          <thead>
+          <tr>
+            <th>Version</th>
+            <th>Struct</th>
+            <th>Started Event</th>
+            <th>Finished Event</th>
+            <th><code>%ExUnit.Test{}</code> field</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td>&lt; 1.6.0</td>
+            <td><code>%ExUnit.TestCase{}</code></td>
+            <td><code>:case_started</code></td>
+            <td><code>:case_finished</code></td>
+            <td><code>case</code></td>
+          </tr>
+          <tr>
+            <td>&gt;= 1.6.0</td>
+            <td><code>%ExUnit.TestCase{}</code></td>
+            <td><code>:module_started</code></td>
+            <td><code>:module_finished</code></td>
+            <td><code>module</code></td>
+          </tr></tbody></table>
+        <p>Because Elixir 1.6.0 could not introduce a breaking change, the <code>&lt; 1.6.0</code> events are fired, but <code>resources/exunit/1.6.0/team_city_ex_unit_formatting.ex</code> will ignore them and only convert the <code>&gt;= 1.6.0</code> events to TeamCity event used in the JetBrains Test Runner UI.</p>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>Don't use <code>StreamEx</code> because support is inconsistent across IDEs</li>
+      <li>Jetbrains' Gogland is now named GoLand, updated README accordingly</li>
+      <li>
+        In donors list, Garrett Hart had his GitHub URL (<code>@https://github.com/thirdshift</code>) shown instead of
+        his GitHub username (<code>@thirdshift</code>)
+      </li>
+    </ul>
+  </li>
+</ul>
 <h1>v7.2.1</h1>
 <ul>
   <li>
@@ -702,484 +1087,6 @@
         instead of copying <code>.beam</code> and using <code>-pa</code> to add the <code>ebin</code> directory.
         Fix was verified local under macOS and in Windows VM that reproduced
         <a href="https://github.com/KronicDeth/intellij-elixir/issues/739">#739</a>.
-      </li>
-    </ul>
-  </li>
-</ul>
-<h1>v6.0.0</h1>
-<ul>
-  <li>
-    <p>Enhancements</p>
-    <ul>
-      <li>Code Formatter
-        <ul>
-          <li><code>do</code> block lines are indented</li>
-          <li><code>do</code> blocks <code>end</code> as the last argument of a no parentheses call unindents to the
-            start of the call
-          </li>
-          <li>If one clause of a multi-clause anonymous function wraps, all clauses wrap.</li>
-          <li>Indent after <code>else</code></li>
-          <li>Indent map and struct keys</li>
-          <li>All keys wrap if any key wraps</li>
-          <li>No spaces around...
-            <ul>
-              <li><code>.</code></li>
-            </ul>
-          </li>
-          <li>Spaces around...
-            <ul>
-              <li><code>and</code></li>
-              <li><code>in</code></li>
-              <li><code>or</code></li>
-              <li><code>when</code></li>
-            </ul>
-          </li>
-          <li>Configure spaces around...
-            <ul>
-              <li><code>=</code></li>
-              <li><code>&lt;-</code> and <code>\\</code></li>
-              <li><code>!=</code>, <code>==</code>, <code>=~</code>, <code>!==</code>, and <code>===</code></li>
-              <li><code>&lt;</code>, <code>&lt;=</code>, <code>&gt;=</code>, and <code>&gt;</code></li>
-              <li><code>+</code> and <code>-</code></li>
-              <li><code>*</code> and <code>/</code></li>
-              <li>Unary <code>+</code>, <code>-</code>, <code>!</code>, <code>^</code>, and <code>~~~</code></li>
-              <li><code>-&gt;</code></li>
-              <li><code>::</code></li>
-              <li><code>|</code></li>
-              <li><code>||</code> and <code>|||</code></li>
-              <li><code>&amp;&amp;</code> and <code>&amp;&amp;&amp;</code></li>
-              <li><code>&lt;~</code>, <code>|&gt;</code>, <code>~&gt;</code>, <code>&lt;&lt;&lt;</code>,
-                <code>&lt;&lt;~</code>, <code>&lt;|&gt;</code>, <code>&lt;~&gt;</code>, <code>&gt;&gt;&gt;</code>, and
-                <code>~&gt;&gt;</code></li>
-              <li><code>..</code></li>
-              <li><code>^^^</code></li>
-              <li><code>++</code>, <code>--</code>, <code>..</code>, <code>&lt;&gt;</code></li>
-              <li><code>=&gt;</code></li>
-            </ul>
-          </li>
-          <li>Configure spaces before...
-            <ul>
-              <li><code>,</code></li>
-            </ul>
-          </li>
-          <li>No space after...
-            <ul>
-              <li><code>@</code></li>
-            </ul>
-          </li>
-          <li>Spaces after...
-            <ul>
-              <li><code>not</code></li>
-              <li><code>fn</code></li>
-              <li><code>after</code></li>
-              <li><code>catch</code></li>
-              <li><code>rescue</code></li>
-              <li><code>key:</code></li>
-            </ul>
-          </li>
-          <li>Configure space after...
-            <ul>
-              <li><code>&amp;</code></li>
-              <li><code>,</code></li>
-            </ul>
-          </li>
-          <li>Configure spaces within...
-            <ul>
-              <li><code>{ }</code></li>
-              <li><code>&lt;&lt; &gt;&gt;</code></li>
-              <li><code>[ ]</code></li>
-              <li><code>( )</code></li>
-            </ul>
-          </li>
-          <li>No space around <code>/</code> in <code>&amp;NAME/ARITY</code> and <code>&amp;QUALIFIER.NAME/ARITY</code>
-          </li>
-          <li><code>when</code> wraps when its right operand wraps, so that guards start with <code>when</code> on a
-            newline when they are too long.
-          </li>
-          <li>Align <code>|&gt;</code> at start of indented line for pipelines</li>
-          <li>Align <code>end</code> with start of call instead of start of line for <code>do</code> blocks in pipelines
-          </li>
-          <li>Indent list elements when wrapped</li>
-          <li>Indent tuple elements when wrapped</li>
-          <li>Align type definition to right of <code>::</code></li>
-          <li>Align guard to right of <code>when</code> when guards span multiple lines</li>
-          <li>Align two operator (<code>++</code>, <code>--</code>, <code>..</code>, <code>&lt;&gt;</code>) operands, so
-            that <code>&lt;&gt;</code> binaries are multiple lines align their starts instead of using continuation
-            indent and being indented relative to first operand.
-          </li>
-          <li>Align pipe <code>|</code> operands, so that alternates in types and specs are aligned instead of
-            continuation indented relative to the first operand.
-          </li>
-          <li>Comments in <code>spec</code> (that is above operands to <code>|</code> align with the operands</li>
-          <li>Remove newlines from pipelines, so that all pipelines start with an initial value or call and each <code>|&gt;</code>
-            is the start of a successive line.
-          </li>
-          <li>Key exclusivity: if an association operation or keyword key is already on a line, the container value
-            automatically has it's elements wrapped if there is nested associations or keyword pairs, so that two levels
-            of keys are not on the same line.
-          </li>
-          <li>Indent bit string (<code>&lt;&lt; &gt;&gt;</code>) elements when wrapped</li>
-        </ul>
-      </li>
-      <li>Update IntelliJ IDEA version to latest in each MINOR version:
-        <ul>
-          <li><code>2017.1.1</code> -&gt; <code>2017.1.5</code></li>
-          <li><code>2016.3.5</code> -&gt; <code>2016.3.7</code></li>
-        </ul>
-      </li>
-      <li>Update Elixir version <code>1.4.2</code> -&gt; <code>1.4.5</code></li>
-      <li><code>TeamCityExUnitFormatting.put_event</code></li>
-      <li>Always match on <code>%__MODULE__{}</code> for state in clauses to prevent state update errors</li>
-      <li>Match on <code>:suite_finished</code> and <code>:suite_started</code> events, so that only events added to the
-        interface will be unknown and <code>IO.warn</code> can be used tell anyone spotting the new event to file an
-        issue.
-      </li>
-      <li>Instead of pinning position (<code>1</code> for lines or <code>3</code> for heredocs), <code>pin</code> <code>*_PROMOTER</code>
-        token, so it's more obvious the pattern is that the promoter is pinned.
-      </li>
-      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/659">#659</a>.</li>
-      <li>Search for Elixir SDKs in <code>/nix/store</code> on Mac if homebrew path does not exist</li>
-      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/672">#672</a></li>
-      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/674">#674</a></li>
-      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/683">#683</a></li>
-      <li>Store expected decompilation in files to shrink <code>DecompilerTest</code> length</li>
-      <li>Update to <code>org.jetbrains.intellij</code> <code>0.2.15</code></li>
-      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/687">#687</a></li>
-      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/692">#692</a></li>
-      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/694">#694</a></li>
-      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/699">#699</a></li>
-      <li>Use <code>Elixir.LDAPEx.ELDAPv3.beam</code> as regression test for <a
-          href="https://github.com/KronicDeth/intellij-elixir/issues/703">#703</a>.
-      </li>
-      <li>Use <code>THashSet</code> instead of the more specific <code>SmartHashSet</code> because <code>THashSet</code>
-        allows <code>null</code> keys, which are expected for the <code>canonicalNameSet</code>.
-      </li>
-      <li>Show <code>quote</code>s in list in macros in Structure View</li>
-      <li>
-        References will be cached until the file containing the PSI element changes, so that results from
-        <code>Callable#multiResolve</code>, <code>CallDefinitionClause#multiResolve</code>,
-        <code>Module#multiResolve</code>, and <code>ModuleAttribute#multiResolve</code>, which are all the extant
-        references, can be cached and invalidated correctly.
-      </li>
-      <li>Use <code>ParameterLists</code> to support Path Variables in program parameters.</li>
-      <li>Adjust SDK home path when <code>bin</code>, <code>lib,</code> or <code>src</code> to parent directory.</li>
-      <li>Format <code>ElixirSdkType</code>.</li>
-      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/354">#354</a></li>
-      <li>Include specific message for each decompilation error reason.</li>
-      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/772"
-                                 class="issue-link js-issue-link" data-id="248110529"
-                                 data-error-text="Failed to load issue title"
-                                 data-permission-text="Issue title is private"
-                                 title="Decompilation not working with OTP 20 using AtU8 chunk for ASCII atoms">#772</a>
-      </li>
-      <li><code>AtU8</code> UTF8 atoms chunk decompilation to support OTP 20 compiled <code>.beam</code> files.</li>
-      <li>
-        Regression test for Elixir 1.5.0 announcement to ensure that unicode from <code>AtU8</code> chunk can be read
-        from beam file produced by following Elixir code:
-        <pre><code>
-defmodule AtU8Test do
-  def こんにちは世界 do
-    :こんにちは世界
-
-     saudação = "Bom dia!"
-
-    saudação
-  end
-end
-</code></pre>
-      </li>
-      <li>Guard against read/write mismatch in stubs</li>
-      <li>
-        Always install <code>IdeaVIM</code> in the gradle sandbox because it got annoying having to reinstall it
-        when the sandbox reset.
-      </li>
-      <li>Merge both homebrew and nix store on Mac</li>
-      <li>Merge default and nix store on Linux</li>
-      <li>Format <code>MixRunningStateUtil</code> and fix warnings.</li>
-    </ul>
-  </li>
-  <li>
-    <p>Bug Fixes</p>
-    <ul>
-      <li>Treat <code>::</code> the same as <code>:</code> in <code>key:</code> after <code>when</code> in type
-        specifications as it's a realistic error.
-      </li>
-      <li>Change <code>.</code> to <code>#</code> when referring to constants in javadocs</li>
-      <li>Remove <code>@param</code> without descriptions</li>
-      <li>Remove explicit type from generics when the type can be inferred.</li>
-      <li>Check if <code>atNonNumericOperation</code> reference is non-<code>null</code> before resolving</li>
-      <li>Swap empty branches to inverted conditions for final <code>else</code>.</li>
-      <li>Check if <code>Type</code> <code>leftOperand</code> is <code>null</code> before using it.</li>
-      <li>Remove empty <code>highlightTypesAndTypeParameterUsages(When...)</code></li>
-      <li>Remove unused <code>highlightTypesAndSpecificationTypeParameterDeclarations</code></li>
-      <li>Flip <code>equals</code> to eliminate need for <code>null</code> check</li>
-      <li>Remove redundant type arguments (<code>&lt;...&gt;</code>)</li>
-      <li>Change <code>Collections.EMPTY_SET</code> to <code>Collections.emptySet()</code> to prevent uncheck cast
-        warnings.
-      </li>
-      <li>Inline constant argument for errors.</li>
-      <li>Check if <code>when</code> <code>rightOperand</code> is non-<code>null</code> before scanning it for parameter
-        names.
-      </li>
-      <li>Fix typos</li>
-      <li>When compilation error is detected during <code>mix test</code>, it will be turned into a test failure.
-        <ul>
-          <li>Compilation errors are any stacktraces to <code>stderr</code> that end in <code>(elixir)
-            lib/kernel/parallel_require.ex:</code>.
-          </li>
-          <li>The test failure for the compilation will be attributed to either <code>mix test</code> or the inferred
-            module name of test file.
-            <ul>
-              <li>If the first line of the stacktrace contains <code>test/.*_test.exs:\d+: \(module\)</code>
-                <ul>
-                  <li>The file and line from that line will be used as the location of failure</li>
-                  <li>The <code>test/</code> and <code>.exs</code> will be stripped from the file and it will be
-                    camelized to produce the derived test module name of the failure
-                  </li>
-                </ul>
-              </li>
-              <li>Otherwise, <code>mix test</code> is used</li>
-            </ul>
-          </li>
-        </ul>
-      </li>
-      <li>Rearrange doc test names to emphasize the function being tested: <code>"test doc at MODULE.FUNCTION/ARITY
-        (COUNT)"</code> becomes <code>"MODULE.FUNCTION/ARITY doc (COUNT)"</code>
-        <ul>
-          <li>If <code>MODULE</code> is the same as the test case without the <code>Test</code> suffix, then <code>MODULE.</code>
-            is stripped too and the test name becomes only <code>FUNCTION/ARITY doc (COUNT)</code></li>
-        </ul>
-      </li>
-      <li>Fix parallel test cases nesting under each other due to asynchronous reporting from formatter. <code>##teamCity</code>
-        <code>testSuiteStarted</code> messages automatically nest, so switched to using <code>nodeId</code> and <code>parentNodeId</code>
-        system, so that nesting is explicit. This will allow multiple parallel tests to show up in GUI too.
-      </li>
-      <li><code>Elixir.</code> prefix is stripped from test case names.</li>
-      <li>Handle Elixir versions with non-numeric parts</li>
-      <li>Use a separate formatter, one GenEvent-based and one GenServer-based, depending on whether the SDK is &gt;=
-        1.4.0 as that's when GenEvent was deprecated and GenServer was preferred.
-      </li>
-      <li>Merge <code>Callable</code> and <code>Kernel</code> annotators</li>
-      <li>Use <code>PsiElementVisitor</code> instead of <code>PsiRecursiveElementVisitor</code>, so that macros in
-        <code>defmodule</code> block don't get double annotated.
-      </li>
-      <li>Instead of erasing and then applying multiple <code>TextAttributeKey</code>, erase as before, but then merge
-        the <code>TextAttributeKey</code>'s <code>TextAttributes</code> and apply as single <code>setEnforcedTextAttributes</code>.
-        For some reason, this fixes the inconsistency of whether <code>PREDEFINED_CALL</code> or <code>MACRO_CALL</code>
-        is applied first.
-      </li>
-      <li>In case of multiple <code>resolved</code>s, make those that need <code>PREDEFINED_CALL</code> to win.</li>
-      <li><code>TeamCityExUnitFormatting.new</code> should return struct only because none of the formatters
-        expects an <code>:ok</code> tuple.
-      </li>
-      <li>Fix order of <code>TeamCityExUnitFormatting.put_Event</code> catchall parameters.</li>
-      <li><code>FileReferenceFilter</code>
-        <ul>
-          <li>Add <code>.exs</code> to pattern for stacktrace linking.</li>
-          <li>Highlight only stacktrace path and line umber instead of entire line</li>
-          <li>Better path match in stacktraces
-            <ul>
-              <li>Only accept VirtualFile if it has a suffix matching the stacktrace's path instead of accepting the
-                first index file with a matching basename.
-              </li>
-              <li>Allow multiple VirtualFiles to be linked if it turns out there is a true file path collision between
-                two OTP apps in the Project or Libraries.
-              </li>
-            </ul>
-          </li>
-          <li>Format and fix warnings</li>
-        </ul>
-      </li>
-      <li>Pin promoter for all quotes, including the previously missing <code>stringLine</code> and
-        <code>charListLine</code>.
-      </li>
-      <li>Only insert closing quote if previous token was an opening quote.</li>
-      <li>On <code>unquote</code>, include argument in name of call definition clause</li>
-      <li>Look outside tuple containing <code>quote</code> for <code>enclosingMacroCall</code>, which allows going to <a
-          href="https://github.com/phoenixframework/phoenix/blob/v1.2.4/lib/phoenix/template.ex#L380-L392">Phoenix.Template.compile's
-        quote's defp</a></li>
-      <li>Treat <code>Module.create</code> as `Modular</li>
-      <li><code>Or</code> interface to unify <code>Matched</code> and <code>Unmatched</code> <code>Or</code>s.</li>
-      <li>Look at both side of <code>Or</code> operation for nested child calls for Structure view.</li>
-      <li>Make <code>unquote(ARG1)</code> name for <code>getName</code> and indexing</li>
-      <li><code>ElementDescription</code> for <code>ElixirVariable</code></li>
-      <li>Mark <code>UnqualifiedParenthesesCall</code>s as <code>call</code> instead of <code>variable</code>.</li>
-      <li><code>mix local.hex --force</code> before <code>mix deps.get</code> during project import to prevent prompt
-        for hex update when local hex is earlier than that required by <code>mix</code>.
-      </li>
-      <li>Fix warnings and format <code>MixProjectRootStep</code></li>
-      <li>Mark <code>ElixirDecimalFloat</code> as error in types.
-        <ul>
-          <li>If in a Range: "Floats aren't allowed in Ranges"</li>
-          <li>Otherwise: "Float literals are not allowed in types. Use float() instead".</li>
-        </ul>
-      </li>
-      <li>Ignore <code>jps-*/out</code> directories.</li>
-      <li>Look at parent for <code>isParameter</code> for <code>AtUnqualifiedBracketOperation</code>.</li>
-      <li>Treat <code>AtUnqualifiedBracketOperation</code> the same as <code>UnqualifiedBracketOperation</code> for
-        <code>isVariable</code>.
-      </li>
-      <li>Include path in error messages from <code>buildFileStub</code></li>
-      <li>Erlang allows <code>do</code> as a function name, but it's a keyword in Elixir, so wrap it as <code>unquote(:do)</code>.
-        The <code>SpecialForm</code> decompiler already did this <code>unquote(...)</code> wrapping, but <code>do</code>
-        is a keyword and not a special form, so rename the decompiler to <code>Unquoted</code>.
-      </li>
-      <li>
-        <p>Move {3} inside <code>|</code> for <code>SIGIL</code> <code>PROMOTER</code> and <code>TERMINATOR</code>:</p>
-        <blockquote>
-<pre><code>SIGIL_HEREDOC_PROMOTER = ({SIGIL_DOUBLE_QUOTES_PROMOTER}|&gt;
-{SIGIL_SINGLE_QUOTES_PROMOTER}){3}
-SIGIL_HEREDOC_TERMINATOR = ({SIGIL_DOUBLE_QUOTES_TERMINATOR}|&gt;
-{SIGIL_SINGLE_QUOTES_TERMINATOR}){3}
-</code></pre>
-          <p>-- <a
-              href="https://github.com/KronicDeth/intellij-elixir/blob/v5.1.0/src/org/elixir_lang/Elixir.flex?utf8=%E2%9C%93#L524-L525">https://github.com/KronicDeth/intellij-elixir/blob/v5.1.0/src/org/elixir_lang/Elixir.flex?utf8=%E2%9C%93#L524-L525</a>
-          </p>
-        </blockquote>
-        <p>The <code>|</code> is inside group that is then <code>{3}</code>'d, so it allows either <code>'</code> or
-          <code>"</code> in groups of three. This is only applies to the sigils. It's correct for normal string and
-          charlist heredocs:</p>
-        <blockquote>
-<pre><code>CHAR_LIST_HEREDOC_PROMOTER = {CHAR_LIST_PROMOTER}{3}
-CHAR_LIST_HEREDOC_TERMINATOR = {CHAR_LIST_TERMINATOR}{3}
-
-STRING_HEREDOC_PROMOTER = {STRING_PROMOTER}{3}
-STRING_HEREDOC_TERMINATOR = {STRING_TERMINATOR}{3}
-
-QUOTE_HEREDOC_PROMOTER = {CHAR_LIST_HEREDOC_PROMOTER} | {STRING_HEREDOC_PROMOTER}
-QUOTE_HEREDOC_TERMINATOR = {CHAR_LIST_HEREDOC_TERMINATOR} | {STRING_HEREDOC_TERMINATOR}
-</code></pre>
-          <p>-- <a
-              href="https://github.com/KronicDeth/intellij-elixir/blob/v5.1.0/src/org/elixir_lang/Elixir.flex?utf8=%E2%9C%93#L441-L448">https://github.com/KronicDeth/intellij-elixir/blob/v5.1.0/src/org/elixir_lang/Elixir.flex?utf8=%E2%9C%93#L441-L448</a>
-          </p>
-        </blockquote>
-      </li>
-      <li>Unquote function names that start with an uppercase codepoint, so that they aren't parsed as Aliases. These
-        function names occur in the CORBA modules in OTP.
-      </li>
-      <li>Using intellij.plugins will prevent packaging intellij-erlang as a runtime dependency, which leads to
-        duplicate templates.
-      </li>
-      <li>Don't use the <code>JPS</code> <code>type</code> for <code>jps-*</code> projects because their deps become
-        incompatible with other projects.
-      </li>
-      <li>Add missing <code>break</code>s to <code>case</code> statement in <code>processDeclarations(Match, ...)</code>
-        that caused the logic of whether to check left, right, or both operand based on the whether the treeWalkUp came
-        from always fell through to the <code>RIGHT</code> case, so it was only, always checking the right operand of
-        the match and never the left operand.
-      </li>
-      <li>Skip <code>processDeclarationsInPreviousSibling</code> when <code>lastParent</code> is <code>ElixirFile</code>
-      </li>
-      <li>Remove background color from sigils because it stands out really badly in the Default theme where it's black
-        on white and while it doesn't in Darcula, it's unnecessary there because it's so close to the editor background
-        color in Darcula.
-      </li>
-      <li>Treat <code>Alias</code> as miscapitalized type parameter.</li>
-      <li>Ignore call definition clauses after <code>when</code> in type specifications as it is a common occurrence
-        when typing a specification above a pre-existing call definition clause.
-      </li>
-      <li>Look above <code>List</code> for enclosing modular macro.</li>
-      <li>Look above <code>ElixirNoParenthesesManyStrictNoParenthesesExpression</code> for enclosing modular macro.</li>
-      <li>Remove background color from Sigil Color Scheme Design to match changes in <a
-          href="https://github.com/KronicDeth/intellij-elixir/pull/757">#757</a>.
-      </li>
-      <li>Check if program parameters is blank before splitting into mix args.</li>
-      <li>Use <code>ParametersList</code> to properly parse quote program parameters.</li>
-      <li>Move <code>Quoter</code> into <code>test</code> directory, so it and its dependency on <code>JUnit</code> is
-        only used for test compilation and runtime and not the shipped runtime.
-      </li>
-      <li>Fix <code>Quoter</code> warnings and format.</li>
-      <li>
-        Show expected SDK home path structure when invalid.
-        <a href="https://user-images.githubusercontent.com/298259/29006393-5ce71dfe-7ab4-11e7-88c9-732856f6259d.png"
-           target="_blank">
-          <img src="https://user-images.githubusercontent.com/298259/29006393-5ce71dfe-7ab4-11e7-88c9-732856f6259d.png"
-               alt="screen shot 2017-08-06 at 2 28 36 pm" style="max-width:100%;"/>
-        </a>
-      </li>
-      <li>Suppress invalid warnings in <code>ElixirSdkType</code>.</li>
-      <li>Always check if resolution result is right operand of match.</li>
-      <li>
-        <code>CallDefinitionClause</code> <code>InsertHandler</code> always assumed there was a character after
-        the insert location, but when inserting at the very end of the file, there isn't, which caused an
-        <code>IndexOutOfBoundsException</code>. Only check if the following character is not a space,
-        <code>(</code>, or <code>[</code> when the document is longer than the tail offset to prevent the
-        <code>IndexOutOfBoundsException</code>. If the insertion is at the end of the file, then the
-        <code>()</code> will always be inserted.
-      </li>
-      <li><code>Decompilated</code> -&gt; <code>Decompilation</code></li>
-      <li>
-        The lower-level <code>Data(Output|IntputStream</code> <code>(write|read)Int</code> don't work correctly
-        with sizes, so use the JetBrains <code>(write|read)VarInt</code> ones instead.
-      </li>
-      <li>
-        Delegate <code>ChildAttributes</code> to previous child when available:
-        <code>Block.getChildAttributes</code> is used when Enter is pressed to determine the indentation and
-        alignment. Using the default implementation, newlines in stabs look overly indented, but there is a
-        constant, <code>DELEGATE_TO_PREV_CHILD</code> that can be used to just use the last child's indent as long
-        as there is one, which appears to work well for stabs (do block bodies, etc).
-      </li>
-      <li>
-        Increase suspect <code>nameSetSize</code> from <code>4</code> to <code>10</code> because a
-        <code>Poison.Encoder</code> has an <code>impl</code> module for 4 types, and so has 4 canonical names.
-      </li>
-      <li>
-        Only read-ahead if guard length is non-zero; otherwise, only warn the nameSetSize may be suspect and don't
-        read-ahead as this can mess up OK namesets.
-      </li>
-      <li>Override <code>Kernel.SpecialFroms</code> arity intervals
-        <ul>
-          <li><code>alias</code> overridden from <code>2</code> to <code>1-2</code> to support without <code>:as</code>
-            option.
-          </li>
-          <li><code>import</code> overridden from <code>2</code> to <code>1-2</code> to support without
-            <code>:except</code> or <code>:only</code> options.
-          </li>
-          <li><code>quote</code> overridden from <code>2</code> to <code>1-2</code> to support block without options.
-          </li>
-          <li><code>require</code> overridden from <code>2</code> to <code>1-2</code> to support without
-            <code>:as</code> option.
-          </li>
-          <li><code>super</code> overridden from <code>1</code> to <code>0-</code> to support calling any super method.
-          </li>
-        </ul>
-      </li>
-      <li>
-        <code>elixir.bat</code> in at least Elixir 1.5.1, will not properly parse a mix path with spaces in it on
-        Windows even when the path has outer quotes (see
-        <a href="https://github.com/elixir-lang/elixir/issues/6455">elixir-lang/elixir#6455</a>). It is not
-        possible to use inner quotes, as you can do in cmd.exe, using the JetBrains and Java libraries that
-        auto-matically quote, so instead bypass the bad quoting in <code>elixir.bat</code> by doing what
-        <code>elixir.bat</code> does: call <code>erl.exe</code> with all the SDK ebin paths added with
-        <code>-pa</code>, then <code>-noshell -s elixir start_cli</code> to run Elixir and<code>-extra</code> to
-        run requires (<code>-r</code>), mix and its tasks.
-      </li>
-    </ul>
-  </li>
-  <li>
-    <p>Incompatible Changes</p>
-    <ul>
-      <li>Drop <code>14.1.X</code> support because it does not have support for nodeId test output, so it's not possible
-        to handle the ExUnit test output in a safe manner while still allowing concurrent output for asynchronous tests.
-      </li>
-    </ul>
-  </li>
-</ul>
-<h1>v5.1.0</h1>
-<ul>
-  <li>
-    <p>Enhancements</p>
-    <ul>
-      <li>Graphical debugger with line breakpoints</li>
-      <li>Add Debugger to README</li>
-    </ul>
-  </li>
-  <li>
-    <p>Bug Fixes</p>
-    <ul>
-      <li>
-        Replace <code>assert scope.isEquivalentTo(lastParent.getParent())</code> with an <code>if</code> and log
-        what <code>lastParent</code> was when condition is <code>false</code>, so root cause can be traced.
       </li>
     </ul>
   </li>

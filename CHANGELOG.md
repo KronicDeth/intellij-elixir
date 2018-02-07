@@ -5,114 +5,115 @@
 - [Changelog](#changelog)
   - [v7.3.0](#v730)
     - [Enhancements](#enhancements)
-  - [v7.2.1](#v721)
     - [Bug Fixes](#bug-fixes)
+  - [v7.2.1](#v721)
+    - [Bug Fixes](#bug-fixes-1)
   - [v7.2.0](#v720)
     - [Enhancements](#enhancements-1)
-    - [Bug Fixes](#bug-fixes-1)
+    - [Bug Fixes](#bug-fixes-2)
   - [v7.1.0](#v710)
     - [Enhancements](#enhancements-2)
-    - [Bug Fixes](#bug-fixes-2)
+    - [Bug Fixes](#bug-fixes-3)
   - [v7.0.0](#v700)
     - [Enhancements](#enhancements-3)
-    - [Bug Fixes](#bug-fixes-3)
+    - [Bug Fixes](#bug-fixes-4)
   - [Incompatible Changes](#incompatible-changes)
   - [v6.7.0](#v670)
     - [Enhancements](#enhancements-4)
-    - [Bug Fixes](#bug-fixes-4)
+    - [Bug Fixes](#bug-fixes-5)
   - [v6.6.0](#v660)
     - [Enhancements](#enhancements-5)
-    - [Bug Fixes](#bug-fixes-5)
-  - [v6.5.1](#v651)
     - [Bug Fixes](#bug-fixes-6)
+  - [v6.5.1](#v651)
+    - [Bug Fixes](#bug-fixes-7)
   - [v6.5.0](#v650)
     - [Enhancements](#enhancements-6)
-    - [Bug Fixes](#bug-fixes-7)
+    - [Bug Fixes](#bug-fixes-8)
   - [v6.4.0](#v640)
     - [Enhancements](#enhancements-7)
-    - [Bug Fixes](#bug-fixes-8)
+    - [Bug Fixes](#bug-fixes-9)
   - [v6.3.0](#v630)
     - [Enhancements](#enhancements-8)
-    - [Bug Fixes](#bug-fixes-9)
+    - [Bug Fixes](#bug-fixes-10)
   - [v6.2.0](#v620)
     - [Enhancements](#enhancements-9)
-    - [Bug Fixes](#bug-fixes-10)
-  - [v6.1.1](#v611)
     - [Bug Fixes](#bug-fixes-11)
+  - [v6.1.1](#v611)
+    - [Bug Fixes](#bug-fixes-12)
   - [v6.1.0](#v610)
     - [Enhancements](#enhancements-10)
-    - [Bug Fixes](#bug-fixes-12)
+    - [Bug Fixes](#bug-fixes-13)
   - [v6.0.0](#v600)
     - [Enhancements](#enhancements-11)
-    - [Bug Fixes](#bug-fixes-13)
+    - [Bug Fixes](#bug-fixes-14)
     - [Incompatible Changes](#incompatible-changes-1)
   - [v5.1.0](#v510)
     - [Enhancements](#enhancements-12)
-    - [Bug Fixes](#bug-fixes-14)
+    - [Bug Fixes](#bug-fixes-15)
   - [v5.0.0](#v500)
     - [Enhancements](#enhancements-13)
-    - [Bug Fixes](#bug-fixes-15)
+    - [Bug Fixes](#bug-fixes-16)
     - [Incompatible Changes](#incompatible-changes-2)
   - [v4.7.0](#v470)
     - [Enhancements](#enhancements-14)
-    - [Bug Fixes](#bug-fixes-16)
+    - [Bug Fixes](#bug-fixes-17)
   - [v4.6.0](#v460)
     - [Enhancements](#enhancements-15)
-    - [Bug Fixes](#bug-fixes-17)
+    - [Bug Fixes](#bug-fixes-18)
   - [v4.5.0](#v450)
     - [Enhancements](#enhancements-16)
   - [v4.4.0](#v440)
     - [Enhancements](#enhancements-17)
-    - [Bug Fixes](#bug-fixes-18)
+    - [Bug Fixes](#bug-fixes-19)
   - [v4.3.0](#v430)
     - [Enhancements](#enhancements-18)
-    - [Bug Fixes](#bug-fixes-19)
+    - [Bug Fixes](#bug-fixes-20)
   - [v4.2.0](#v420)
     - [Enhancements](#enhancements-19)
-    - [Bug Fixes](#bug-fixes-20)
+    - [Bug Fixes](#bug-fixes-21)
   - [v4.1.0](#v410)
     - [Enhancements](#enhancements-20)
-    - [Bug Fixes](#bug-fixes-21)
+    - [Bug Fixes](#bug-fixes-22)
   - [v4.0.0](#v400)
     - [Enhancements](#enhancements-21)
-    - [Bug Fixes](#bug-fixes-22)
+    - [Bug Fixes](#bug-fixes-23)
     - [Incompatible Changes](#incompatible-changes-3)
   - [v3.0.1](#v301)
-    - [Bug Fixes](#bug-fixes-23)
+    - [Bug Fixes](#bug-fixes-24)
   - [v3.0.0](#v300)
     - [Enhancements](#enhancements-22)
-    - [Bug Fixes](#bug-fixes-24)
+    - [Bug Fixes](#bug-fixes-25)
     - [Incompatible Changes](#incompatible-changes-4)
   - [v2.2.0](#v220)
     - [Enhancement](#enhancement)
-    - [Bug Fixes](#bug-fixes-25)
+    - [Bug Fixes](#bug-fixes-26)
   - [v2.1.0](#v210)
     - [Enhancement](#enhancement-1)
-    - [Bug Fixes](#bug-fixes-26)
+    - [Bug Fixes](#bug-fixes-27)
   - [v2.0.0](#v200)
     - [Enhancements](#enhancements-23)
-    - [Bug Fixes](#bug-fixes-27)
+    - [Bug Fixes](#bug-fixes-28)
     - [Incompatible Changes](#incompatible-changes-5)
   - [v1.2.1](#v121)
     - [Enhancements](#enhancements-24)
-    - [Bug Fixes](#bug-fixes-28)
+    - [Bug Fixes](#bug-fixes-29)
   - [v1.2.0](#v120)
     - [Enhancements](#enhancements-25)
   - [v1.1.0](#v110)
     - [Enhancements](#enhancements-26)
   - [v1.0.0](#v100)
     - [Enhancements](#enhancements-27)
-    - [Bug Fixes](#bug-fixes-29)
+    - [Bug Fixes](#bug-fixes-30)
     - [Incompatible Fixes](#incompatible-fixes)
   - [v0.3.5](#v035)
     - [Enhancements](#enhancements-28)
-    - [Bug Fixes](#bug-fixes-30)
+    - [Bug Fixes](#bug-fixes-31)
   - [v0.3.4](#v034)
     - [Enhancements](#enhancements-29)
   - [v0.3.3](#v033)
     - [Enhancements](#enhancements-30)
   - [v0.3.2](#v032)
-    - [Bug Fixes](#bug-fixes-31)
+    - [Bug Fixes](#bug-fixes-32)
   - [v0.3.1](#v031)
     - [Enhancements](#enhancements-31)
   - [v0.3.0](#v030)
@@ -120,27 +121,27 @@
     - [Incompatible Changes](#incompatible-changes-6)
   - [v0.2.1](#v021)
     - [Enhancements](#enhancements-33)
-    - [Bug Fixes](#bug-fixes-32)
+    - [Bug Fixes](#bug-fixes-33)
   - [v0.2.0](#v020)
     - [Enhancements](#enhancements-34)
     - [Incompatible Changes](#incompatible-changes-7)
   - [v0.1.4](#v014)
     - [Enhancements](#enhancements-35)
-    - [Bug Fixes](#bug-fixes-33)
-  - [v0.1.3](#v013)
     - [Bug Fixes](#bug-fixes-34)
+  - [v0.1.3](#v013)
+    - [Bug Fixes](#bug-fixes-35)
   - [v0.1.2](#v012)
     - [Enhancements](#enhancements-36)
   - [v0.1.1](#v011)
-    - [Bug Fixes](#bug-fixes-35)
+    - [Bug Fixes](#bug-fixes-36)
   - [v0.1.0](#v010)
     - [Enhancements](#enhancements-37)
-    - [Bug Fixes](#bug-fixes-36)
+    - [Bug Fixes](#bug-fixes-37)
   - [v0.0.3](#v003)
     - [Enhancements](#enhancements-38)
   - [v0.0.2](#v002)
     - [Enhancements](#enhancements-39)
-    - [Bug Fixes](#bug-fixes-37)
+    - [Bug Fixes](#bug-fixes-38)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -153,6 +154,200 @@
   * Update build matrix
     * Update IntelliJ IDEA version `2017.3` to `2017.3.2`
     * Update Elixir version `1.5.2` to `1.5.3`
+* [#1015](https://github.com/KronicDeth/intellij-elixir/pull/1015) - [@KronicDeth](https://github.com/KronicDeth)
+  * Add supplemental file editor for `.beam` files: "BEAM Chunks".  The decompiled binary file will continue to be shown on the default "Text" editor tab.
+    ![screen shot 2018-02-01 at 6 38 07 pm](https://user-images.githubusercontent.com/298259/35710803-17198a52-077f-11e8-8991-2aebe7f3eb38.png)
+    The BEAM Chunks editor is subdivided into further tabs, one for each chunk in the `.beam` file.
+    ![screen shot 2018-02-01 at 6 45 23 pm](https://user-images.githubusercontent.com/298259/35710979-1d367930-0780-11e8-8a40-acaef92e621c.png)
+    The tabs are listed in the order that the chunks occur in the `.beam` file.
+    * The `Atom` chunk holds `LATIN-1` atoms while `AtU8` holds `UTF8` atoms.  There will only be one of these atom-related chunks in any given `.beam` file.  `AtU8` is used in newer versions of OTP that support UTF8 atoms.
+
+      The `Atom`/`AtU8` tab shows a table with the columns
+
+      | Column     | Description                                                                                                           | Source  |
+      |:-----------|:----------------------------------------------------------------------------------------------------------------------|:--------|
+      | Index      | Which is 1-based to match Erlang convention.  In the `Code` chunk, `atom(0)` is reserved to always translate to `nil` | Derived |
+      | Byte Count | The byte count for the atom's bytes                                                                                   | Raw     |
+      | Characters | From encoding the bytes as LATIN-1 for `Atom` chunk or UTF-8 for `AtU8` chunk                                         | Derived |
+
+      ![screen shot 2018-02-01 at 7 01 43 pm](https://user-images.githubusercontent.com/298259/35711460-9aeea9ae-0782-11e8-9d3f-074c05326b4c.png)
+
+      Index 1 is always the module name for the `.beam` file.  Since `.beam` is originally an Erlang format, for Elixir modules, you'll see the full atom name of with the `Elixir.` prefix instead of the Alias name used in Elixir source.
+    * The `Attr` chunk holds the module attributes, but only those that are persisted.
+
+      The `Attr` tab shows a table with the columns
+
+      | Column | Description                                                                                                      | Source |
+      |:-------|:-----------------------------------------------------------------------------------------------------------------|:-------|
+      | Key    | Attribute name                                                                                                   | Raw    |
+      | Value  | Attribute value. **Note: The value always appears as a list as read from the binary format.  I don't know why.** | Raw    |
+
+      ![screen shot 2018-02-02 at 2 34 22 pm](https://user-images.githubusercontent.com/298259/35753689-576eaf18-0826-11e8-838c-f00fc93fd667.png)
+
+      All modules will have a `:vsn` attribute that is either set explicitly or defaults to the MD5 of the module.
+    * The `CInf` chunk is the Compilation Information for the Erlang or Erlang Core compiler.  Even Elixir modules have it because Elixir code passes through this part of the Erlang Core compiler.
+
+      The `CInf` tab shows a table with the columns
+
+      | Column | Description     | Source |
+      |:-------|:----------------|:-------|
+      | Key    | Option name     | Raw    |
+      | Value  | Inspected value | Raw    |
+
+      ![screen shot 2018-02-02 at 3 19 50 pm](https://user-images.githubusercontent.com/298259/35755542-4d769c76-082d-11e8-84d9-ef04ff45b346.png)
+    * The `Code` chunk contains the byte code for the module.  It is encoded in [BEAM Compact Term Encoding](http://beam-wisdoms.clau.se/en/latest/indepth-beam-file.html#beam-compact-term-encoding), which differs from the binary format produced by `term_to_binary`.
+
+      The `Code` tab shows a read-only editor with one byte code operation on each line.  For ease of reading, operations are grouped by function and then label block with indentation indicating scope.
+
+      ![screen shot 2018-02-02 at 9 35 59 pm](https://user-images.githubusercontent.com/298259/35762701-18b0882e-0861-11e8-9d3d-675811bd45dd.png)
+
+      By default as many references to other chunks and references to other parts of `Code` chunk are inlined to ease understanding.  If you want to see the raw byte code operations, you can turn off the various inliners.
+    * The `Dbgi` chunk contains Debug Info.  It was [introduced](https://github.com/erlang/otp/pull/1367) in OTP 20 as a replacement for the `Abst` chunk.  While the `Abst` chunk was required to contain the Erlang AST, the `Dbgi` format can contain the debug info for other languages, such as Elixir `quoted` form AST.
+
+      Because the format is language neutral, the format is a set of nested, versioned formats.  The outer most layer is
+
+      ```elixir
+      {:debug_info_v1, backend, metadata | :none}
+      ```
+
+      For `:debug_info_v1`, Elixir's `backend` is `:elixir_erl`.  The `metadata` for `:elixir_erl` is further versioned: `{:elixir_v1, map, specs}`.
+
+      `map` contains the bulk of the data.
+
+      | Key             | Value                                                                                                                                                                                                          |
+      |:----------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+      | `:attributes`   | Attributes similar to the `Attr` chunk, but at the Elixir, instead of Core Erlang level.  Usually they match with the exception that `attributes` doesn't contain `vsn` when `Attr` contains the `MD5` version |
+      | `:compile_opts` | Compilation options similar to `CInf` chunk's `options` key, but at for Elixir, instead of Core Erlang level.                                                                                                  |
+      | `:definitions`  | The Elixir `quoted` AST for reach function clause.                                                                                                                                                             |
+      | `:file`         | The name of the file the module was generated from.                                                                                                                                                            |
+      | `:line`         | The line in `:file` where the module was defined, such as the line `defmodule` occurred.                                                                                                                       |
+      | `:module`       | The name of the module as an `atom`                                                                                                                                                                            |
+      | `:unreachable`  | Unreachable functions                                                                                                                                                                                          |
+
+      The `Dbgi` tag show the single value map entries: `:file`, `:line`, and `:module`
+
+      ![screen shot 2018-02-02 at 5 26 04 pm](https://user-images.githubusercontent.com/298259/35759265-33c33742-083e-11e8-9a4f-97cfd52bbe8e.png)
+
+      For the multi-value keys: `:attributes`, `:compile_opts`, and `:definitions`, there are individual tabs.
+
+      ![screen shot 2018-02-02 at 5 27 29 pm](https://user-images.githubusercontent.com/298259/35759293-6117c83e-083e-11e8-8327-ec7c66cade69.png)
+
+      The Attributes tab has the same format as the `Attr`s chunk
+
+      ![screen shot 2018-02-02 at 6 47 49 pm](https://user-images.githubusercontent.com/298259/35760967-9c7e0914-0849-11e8-8d53-e402653b70fa.png)
+
+      The Compile Options tab is usually empty, much like the `CInf` `options` key for Erlang.
+
+      ![screen shot 2018-02-02 at 6 48 34 pm](https://user-images.githubusercontent.com/298259/35760988-c3ef0f52-0849-11e8-9ca6-2cbeba8eda23.png)
+
+      The Definitions tab is split between a tree of Module, Function/Arity and clauses.
+
+      ![screen shot 2018-02-02 at 6 50 14 pm](https://user-images.githubusercontent.com/298259/35761058-3710d04c-084a-11e8-99e3-0f2aa4f8837d.png)
+
+      Clicking on a clause will show only that clause, but clicking on a higher level in the tree will show all clauses in the function or the entire Module.
+
+      ![screen shot 2018-02-02 at 6 53 17 pm](https://user-images.githubusercontent.com/298259/35761087-7a6e0b8e-084a-11e8-9f86-6e4840eab25d.png)
+
+      ![screen shot 2018-02-02 at 8 47 05 pm](https://user-images.githubusercontent.com/298259/35762314-55fb0dd2-085a-11e8-8381-faacc880d29e.png)
+
+      ![screen shot 2018-02-02 at 8 47 20 pm](https://user-images.githubusercontent.com/298259/35762317-5b9f9136-085a-11e8-8b53-03be16b7a06c.png)
+
+      The AST stored in the `definitions` tab and the process of converting it back to code is not format preserves, so it will not look precisely like the source code as the AST has undergone some macro expansion before its put in the Dbgi chunk.  *As common idioms are understood, reversals will be add to the renderer.*
+    * The `ExDc` chunk stores ExDoc.  Not the rendered HTML from the `ex_doc` package, but the the `@doc`, `@moduledoc`, and `@typedoc` attribute values that work even without `ex_doc` installed.  This chunk is what is consulted when the `h` helper is used in `iex`.
+
+      The `ExDc` binary format is from `term_to_binary`, so it can be reversed with `binary_to_term`.  The term format is a versioned as `{version, versioned_format}`.  The current `version` tag is `:elixir_docs_v1` and the `versioned_format` is a [Keyword.t](https://hexdocs.pm/elixir/Keyword.html#t:t/0) with `:callback_docs`, `:docs`, `:moduledoc`, and `:type_docs` keys.
+
+      Like `Dbgi`, the `ExDc` tab is split between a tree to navigate and an editor to show the decompiled value.
+
+      ![screen shot 2018-02-02 at 8 58 38 pm](https://user-images.githubusercontent.com/298259/35762423-024913d0-085c-11e8-88ee-c794474a5da5.png)
+
+      ![screen shot 2018-02-02 at 9 07 03 pm](https://user-images.githubusercontent.com/298259/35762502-139d2b8e-085d-11e8-97a6-4b16d19dfccb.png)
+
+      | Node                     | Description                        |
+      |:-------------------------|:-----------------------------------|
+      | *Root*                   | All docs                           |
+      | Module                   | `@moduledoc`                       |
+      | Types                    | All `@typedoc`s                    |
+      | Types *child*            | A specific `@typedoc`              |
+      | Callbacks                | All `@callback` `@doc`s            |
+      | Callbacks *child*        | A specific `@callback`'s `@doc`    |
+      | Functions/Macros         | All `@doc`s for functions/macros   |
+      | Functions/Macros *child* | A specific function/macro's `@doc` |
+
+    * The `ExpT` chunk is the Export Table.  The name "Export" derives from the `Erlang` module attribute `-export`, which is used to "export" functions from a module.  It is the equivalent of making a function or macro public with `def` and `defmacro` as opposed to making it private with `defp` and `defmacrop` in Elixir.
+
+      The `ExpT` tab shows a table with the columns
+
+      | Column     | Description                                                                                                                                                                             | Source  |
+      |:-----------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:--------|
+      | Atom Index | Index into the `Atom` or `AtU8` chunk for the function's name                                                                                                                           | Raw     |
+      | Name       | The atom referenced by "Atom Index"                                                                                                                                                     | Derived |
+      | Arity      | The arity (argument count) of the function                                                                                                                                              | Raw     |
+      | Label      | Label index in the `Code` chunk where the function is defined. This label is usually immediately after the `func_info` operation and before the first pattern match or guard operation. | Raw     |
+
+      ![screen shot 2018-02-01 at 8 21 13 pm](https://user-images.githubusercontent.com/298259/35713581-b36f17ba-078d-11e8-87e3-0c50b2624676.png)
+
+      You'll notice the first entry starts with `MACRO-`.  This is because the BEAM, being made for Erlang has no concept of macros. It only understands functions, so Elixir macros, like `__using__/1` called by `use` are compiled to plain Erlang functions with `MACRO-` prefixed to their name and an extra argument (the `__CALLER__` environment) as the first argument, which increases the arity, yielding a full MFA of `MACRO-__using__/2` as seen above.
+
+    * The `ImpT` chunk is the Import Table.  It **DOES NOT** encode just the Erlang `-import` attributes or Elixir `import` macro calls: it tracks any external function or macro called from another module.  `call_ext_*` operations in the `Code` chunk don't store the Module and Function (MF) of the function they will call directly in the bytecode, instead, one of the arguments is an index into the `ImpT` chunk.   This way, all external calls are normalized into the `ImpT` chunk instead of being denormalized to the call site.  The arity still appears at the call site to help with checking the argument count.
+
+      The `ImpT` tab shows a table with the columns
+
+      | Column              | Description                                                  | Source  |
+      |:--------------------|:-------------------------------------------------------------|:--------|
+      | Index               | 0-based index used by references in the `Code` chunk.        | Derived |
+      | Module Atom Index   | Index into the `Atom` or `AtU8` chunk for the Module's name  | Raw     |
+      | Module Atom         | The atom referenced by "Module Atom Index".                  | Derived |
+      | Function Atom Index | Index into the `Atom` or `AtU8` chunk for the functon's name | Raw     |
+      | Function Atom       | The atom referened by "Function Atom Index".                 | Derived |
+
+      ![screen shot 2018-02-01 at 8 07 15 pm](https://user-images.githubusercontent.com/298259/35713189-93432ff0-078b-11e8-8856-df067459adf9.png)
+
+      You may notice that `erlang.byte_size/1` is included in the table.  This is because even bifs are referenced by MFA and not a pre-assigned number as would be the case for system calls in operating systems like Linux.  BEAM is like an Operation System, but not in all ways.
+    * The `LitT` chunk contains literals loaded as arguments in `Code` chunk.  Confusingly, in the `Code` chunk sometimes the `literal(N)` term is used to encode integer `N`, an index into another chunk, or an actual `index` into the `LitT`.  How `literal` terms are handled is completely dependent on the specific operation, so without having outside knowledge about the bytecode operation arguments for BEAM, the best way to figure out if `literal` terms are an integer or an index is to toggle the various controls in the `Code` tab to see if `literal` with no inlining turns into a `LitT` literal, `FunT` function reference, `ImpT` function reference, or integer.
+
+      The `LitT` tab shows a table with the columns
+
+      | Column | Description                                              | Source  |
+      |:-------|:---------------------------------------------------------|:--------|
+      | #      | 0-based index used by references in the `Code` chunk.    | Derived |
+      | Term   | The equivalent of `raw |> binary_to_term() |> inspect()` | Raw     |
+
+      ![screen shot 2018-02-01 at 9 25 07 pm](https://user-images.githubusercontent.com/298259/35715153-674f088c-0796-11e8-89e8-fd3c6c083a45.png)
+    * The `LocT` chunk is the dual to the `ExpT` chunk: it contains all private functions and macros.
+
+      The `LocT` tab shows a table with the columns
+
+      | Column     | Description                                                                                                                                                                             | Source  |
+      |:-----------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:--------|
+      | Atom Index | Index into the `Atom` or `AtU8` chunk for the function's name                                                                                                                           | Raw     |
+      | Name       | The atom referenced by "Atom Index"                                                                                                                                                     | Derived |
+      | Arity      | The arity (argument count) of the function                                                                                                                                              | Raw     |
+      | Label      | Label index in the `Code` chunk where the function is defined. This label is usually immediately after the `func_info` operation and before the first pattern match or guard operation. | Raw     |
+
+      ![screen shot 2018-02-01 at 9 27 49 pm](https://user-images.githubusercontent.com/298259/35715229-ca135b1c-0796-11e8-80a4-971470f1c6d2.png)
+
+      You'll notice the first entry `-__struct__/1-fun-0-`, starts with `-` and have a `/` suffix with `fun` in it. This naming scheme is used for anonymous functions such as those defined with `fn` or the capture operator (`&`) in Elixir.  Much like how macros don't really exist and use a `MACRO-` suffix, anonymous functions/lambdas don't exist, and instead use a distinct naming scheme `-<PARENT_FUNCTION>/*fun*`.  Unlike `MACRO-`, which is an Elixir invention, anonymous functions/lambdas really being local named functions with derived names is also done in pure Erlang modules.  Erlang's anonymous functions are defined with `fun`, which is where the `fun` part of the naming scheme comes from.
+    * The `StrT` chunk contains a single contiguous pool of all Erlang strings (that is, Elixir charlists) used in the `Code` chunk.  These strings are used for byte code operations like `bs_put_string`.  Not all strings appear in `StrT`.  Some strings, including most Elixir strings (Erlang binaries) appear in the `LitT` chunk that holds literals.
+
+      ![screen shot 2018-02-01 at 7 56 15 pm](https://user-images.githubusercontent.com/298259/35712876-040796d8-078a-11e8-8eb6-6b7f203bbd4a.png)
+
+      The `StrT` is contiguous with no separation of strings.  Instead of encoding the start and length of each string in the chunk itself, the start and length for any given string is passed as arguments to the byte code operations in the `Code` chunk. By doing this, shared substrings can be efficiently encoded in `StrT`.
+* [#1021](https://github.com/KronicDeth/intellij-elixir/pull/1021) - [@KronicDeth](https://github.com/KronicDeth)
+  * Support for https://github.com/elixir-lang/elixir/commit/23c7542d95683a497a7b93071b9ccbbeb9e45d2f
+
+    | Version  | Struct               | Started Event     | Finished Event     | `%ExUnit.Test{}` field |
+    |----------|----------------------|-------------------|--------------------|------------------------|
+    | < 1.6.0  | `%ExUnit.TestCase{}` | `:case_started`   | `:case_finished`   | `case`                 |
+    | >= 1.6.0 | `%ExUnit.TestCase{}` | `:module_started` | `:module_finished` | `module`               |
+
+    Because Elixir 1.6.0 could not introduce a breaking change, the `< 1.6.0` events are fired, but `resources/exunit/1.6.0/team_city_ex_unit_formatting.ex` will ignore them and only convert the `>= 1.6.0` events to TeamCity event used in the JetBrains Test Runner UI.
+
+### Bug Fixes
+* [#1019](https://github.com/KronicDeth/intellij-elixir/pull/1019) - Don't use `StreamEx` because support is inconsistent across IDEs - [@KronicDeth](https://github.com/KronicDeth)
+* [#999](https://github.com/KronicDeth/intellij-elixir/pull/999) - [@ronanboiteau](https://github.com/ronanboiteau)
+  * Jetbrains' Gogland is now named GoLand, updated README accordingly
+  * In donors list, Garrett Hart had his GitHub URL (`@https://github.com/thirdshift`) shown instead of his GitHub username (`@thirdshift`)
 
 ## v7.2.1
 

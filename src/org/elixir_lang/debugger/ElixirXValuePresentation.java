@@ -96,7 +96,7 @@ public class ElixirXValuePresentation extends XValuePresentation {
   }
 
   private static void renderAtom(OtpErlangAtom atom, XValueTextRenderer renderer) {
-    renderer.renderKeywordValue(ElixirModulesUtil.erlangModuleNameToElixir(atom.atomValue()));
+    renderer.renderKeywordValue(ElixirModulesUtil.INSTANCE.erlangModuleNameToElixir(atom.atomValue()));
   }
 
   private static void renderTuple(OtpErlangTuple tuple, XValueTextRenderer renderer) {
@@ -122,6 +122,15 @@ public class ElixirXValuePresentation extends XValuePresentation {
         renderer.renderSpecialSymbol(", ");
       }
       renderObject(list.elementAt(i), renderer);
+    }
+
+    // Improper lists have a lastTail
+    OtpErlangObject lastTail = list.getLastTail();
+
+    if (lastTail != null) {
+      // Improper lists need to render the head tail joiner, `|`, explicitly
+      renderer.renderSpecialSymbol(" | ");
+      renderObject(lastTail, renderer);
     }
 
     renderer.renderSpecialSymbol("]");
@@ -187,7 +196,7 @@ public class ElixirXValuePresentation extends XValuePresentation {
   private static String structType(OtpErlangMap map) {
     OtpErlangObject structValue = map.get(new OtpErlangAtom("__struct__"));
     if (structValue instanceof OtpErlangAtom) {
-      return ElixirModulesUtil.erlangModuleNameToElixir(((OtpErlangAtom) structValue).atomValue());
+      return ElixirModulesUtil.INSTANCE.erlangModuleNameToElixir(((OtpErlangAtom) structValue).atomValue());
     } else {
       return null;
     }
