@@ -26,7 +26,7 @@ defmodule Mix.Tasks.IntellijElixir.DebugTask do
 
     # Start debugger server with the task and debugger port
     init_args = {{task_name, task_args}, Keyword.get(options, :debugger_port)}
-    {:ok, pid} = GenServer.start_link(IntellijElixir.DebugServer, init_args, [name: IntellijElixir.DebugServer, debug: [:statistics, :trace]])
+    {:ok, pid} = GenServer.start_link(IntellijElixir.DebugServer, init_args, [name: IntellijElixir.DebugServer])
     ref = Process.monitor(pid)
 
     # Wait for debugger server to finish
