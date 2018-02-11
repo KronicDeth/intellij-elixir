@@ -1,7 +1,5 @@
 defmodule Mix.Tasks.IntellijElixir.DebugTask do
   @moduledoc false
-  
-  @regex_lowcase ~r/^[a-z]/
 
   use Mix.Task
 
@@ -58,39 +56,29 @@ defmodule Mix.Tasks.IntellijElixir.DebugTask do
   end
 
   defp interpret_modules_in(path) do
-    blacklist = get_blacklist()
+    reject_name_set = reject_name_set()
+
     path
     |> Path.join("**/*.beam")
-    |> Path.wildcard
-    |> Enum.map(&(Path.basename(&1, ".beam") |> String.to_atom))
+    |> Path.wildcard()
+    |> Enum.map(&Path.basename(&1, ".beam"))
+    |> Enum.reject(&MapSet.member?(reject_name_set, &1))
+    |> Stream.map(&String.to_atom/1)
     |> Enum.filter(&(:int.interpretable(&1) == true && !:code.is_sticky(&1) && &1 != __MODULE__))
-    |> Enum.filter(&(!Enum.any?(blacklist, fn(x) -> &1 == x end)))
     |> Enum.each(&(:int.ni(&1)))
   end
 
-  defp get_blacklist() do
-    blacklist = System.get_env("INTELLIJ_ELIXIR_DEBUG_BLACKLIST") || ""
-    blacklist
-      |> String.split(",")
-      |> Enum.map(&(atom_fix(&1)))
-  end
+  defp elixir_module_name_to_erlang_module_name(":" <> erlang_module_name), do: erlang_module_name
+  defp elixir_module_name_to_erlang_module_name(erlang_module_name = "Elixir." <> _), do: erlang_module_name
+  defp elixir_module_name_to_erlang_module_name(elixir_module_name), do: "Elixir." <> elixir_module_name
 
-  defp atom_fix(str) do
-    case Regex.match?(@regex_lowcase, str) do
-      true -> str
-      false ->
-        with {:ok, new_str} <- detect_module(str) do
-          new_str
-        else
-          str -> str
-        end
-    end
-    |> String.to_atom()
+  defp reject_name_set() do
+    comma_separated_elixir_module_names = System.get_env("INTELLIJ_ELIXIR_DEBUG_BLACKLIST") || ""
+
+    comma_separated_elixir_module_names
+    |> String.split(",")
+    |> Enum.into(MapSet.new(), &elixir_module_name_to_erlang_module_name/1)
   end
-  
-  defp detect_module("Elixir." <> str), do: {:ok, str}
-  defp detect_module(":" <> str), do: {:ok, str}
-  defp detect_module(str), do: str
 
   defp get_task(["-" <> _ | _]) do
     Mix.shell.error "** (Mix) Cannot implicitly pass flags to default Mix task, " <>
