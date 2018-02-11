@@ -28,8 +28,7 @@ defmodule IntellijElixir.DebugServer do
     {:noreply, state}
   end
 
-  def handle_cast({:remove_breakpoint, module, line}, state)
-      when is_atom(module) and is_integer(line) do
+  def handle_cast({:remove_breakpoint, module, line}, state) when is_atom(module) and is_integer(line) do
     :int.delete_break(module, line)
     {:noreply, state}
   end
@@ -89,37 +88,8 @@ defmodule IntellijElixir.DebugServer do
 
   ## Private Functions
 
-  defp do_get_stackframes(pid, {_, break_line, break_file}) do
-    case :dbg_iserver.safe_call({:get_meta, pid}) do
-      {:ok, metaPid} ->
-        [{level, mfa} | backtrace_rest] = :int.meta(metaPid, :backtrace, :all)
-        first_frame = {level, mfa, get_bindings(metaPid, level), {break_file, break_line}}
-
-        # If backtrace_rest is empty, calling stack_frames causes an exception
-        other_frames =
-          case backtrace_rest do
-            [] ->
-              []
-
-            _ ->
-              frames = stack_frames(metaPid, level)
-
-              for {{level, mfa = {module, _, _}}, {level, {module, line}, bindings}} <-
-                    List.zip([backtrace_rest, frames]) do
-                {level, mfa, bindings, {get_file(module), line}}
-              end
-          end
-
-        [first_frame | other_frames]
-
-      error ->
-        :io.format('Failed to obtain meta pid for ~p: ~p~n', [pid, error])
-        []
-    end
-  end
-
-  defp get_bindings(metaPid, sP) do
-    :int.meta(metaPid, :bindings, sP)
+  defp bindings(meta_pid, level) do
+    :int.meta(meta_pid, :bindings, level)
   end
 
   defp get_file(module) do
@@ -130,11 +100,39 @@ defmodule IntellijElixir.DebugServer do
     end
   end
 
-  defp get_stack(pid, :break, full_info) do
-    do_get_stackframes(pid, full_info)
+  defp meta_pid_to_stack(meta_pid, %{file: break_file, line: break_line}) do
+    [{level, mfa} | backtrace_tail] = :int.meta(meta_pid, :backtrace, :all)
+    head_frame = {level, mfa, bindings(meta_pid, level), {break_file, break_line}}
+
+    tail_frames =
+      case backtrace_tail do
+        # If `backtrace_tail` is empty, calling `stack_frames_above` causes an exception
+        [] ->
+          []
+
+        _ ->
+          frames = stack_frames_above(meta_pid, level)
+
+          for {{level, mfa = {module, _, _}}, {level, {module, line}, bindings}} <-
+                List.zip([backtrace_tail, frames]) do
+            {level, mfa, bindings, {get_file(module), line}}
+          end
+      end
+
+    [head_frame | tail_frames]
   end
 
-  defp get_stack(_, _, _), do: []
+  defp pid_to_stack(pid, options) do
+    case :dbg_iserver.safe_call({:get_meta, pid}) do
+      {:ok, meta_pid} ->
+        meta_pid_to_stack(meta_pid, options)
+
+      error ->
+        IO.warn("Failed to obtain meta pid for #{inspect(pid)}: #{inspect(error)}")
+
+        []
+    end
+  end
 
   defp send_message(socket, message) do
     :gen_tcp.send(socket, :erlang.term_to_binary(message))
@@ -148,15 +146,21 @@ defmodule IntellijElixir.DebugServer do
           _ -> info
         end
 
-      {pid, init, status, full_info, get_stack(pid, status, full_info)}
+      {pid, init, status, full_info, stack(pid, status, full_info)}
     end
   end
 
-  defp stack_frames(metaPid, level) do
-    frame = :int.meta(metaPid, :stack_frame, {:up, level})
+  defp stack(pid, :break, {_, break_line, break_file}) do
+    pid_to_stack(pid, %{file: break_file, line: break_line})
+  end
+
+  defp stack(_, _, _), do: []
+
+  defp stack_frames_above(meta_pid, level) do
+    frame = :int.meta(meta_pid, :stack_frame, {:up, level})
 
     case frame do
-      {nextLevel, _, _} -> [frame | stack_frames(metaPid, nextLevel)]
+      {next_level, _, _} -> [frame | stack_frames_above(meta_pid, next_level)]
       _ -> []
     end
   end

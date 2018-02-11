@@ -2,13 +2,15 @@ defmodule IntellijElixir.Debugger.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :intellij_elixir_debugger,
-     version: "0.1.0",
-     elixir: "~> 1.4",
-     build_per_environment: false,
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     deps: deps()]
+    [
+      app: :intellij_elixir_debugger,
+      version: "0.1.0",
+      elixir: "~> 1.4",
+      build_per_environment: false,
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
+      deps: deps()
+    ]
   end
 
   # Configuration for the OTP application

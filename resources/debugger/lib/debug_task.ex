@@ -23,9 +23,7 @@ defmodule Mix.Tasks.IntellijElixir.DebugTask do
     version = String.to_integer(to_string(:erlang.system_info(:otp_release)))
 
     if version < 19 do
-      IO.warn(
-        "Erlang version OTP 19 or higher required to debug Elixir. (Current version: #{version})"
-      )
+      IO.warn("Erlang version OTP 19 or higher required to debug Elixir. (Current version: #{version})")
     end
 
     # Start debugger server with the task and debugger port
@@ -61,11 +59,9 @@ defmodule Mix.Tasks.IntellijElixir.DebugTask do
 
   defp elixir_module_name_to_erlang_module_name(":" <> erlang_module_name), do: erlang_module_name
 
-  defp elixir_module_name_to_erlang_module_name(erlang_module_name = "Elixir." <> _),
-    do: erlang_module_name
+  defp elixir_module_name_to_erlang_module_name(erlang_module_name = "Elixir." <> _), do: erlang_module_name
 
-  defp elixir_module_name_to_erlang_module_name(elixir_module_name),
-    do: "Elixir." <> elixir_module_name
+  defp elixir_module_name_to_erlang_module_name(elixir_module_name), do: "Elixir." <> elixir_module_name
 
   defp get_task(["-" <> _ | _]) do
     Mix.shell().error(
