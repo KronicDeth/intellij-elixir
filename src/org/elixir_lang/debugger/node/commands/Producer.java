@@ -28,7 +28,7 @@ public final class Producer {
 
   @NotNull
   public static Command getSetBreakpointCommand(@NotNull String module, int line, @NotNull String file) {
-    return new SetBreakpointCommand(module, line, file);
+    return new SetBreakpoint(module, line, file);
   }
 
   @NotNull
@@ -64,29 +64,6 @@ public final class Producer {
   private static class StepOverCommand extends Pid {
     StepOverCommand(@NotNull OtpErlangPid pid) {
       super("step_over", pid);
-    }
-  }
-
-  private static class SetBreakpointCommand implements Command {
-    private final String myModule;
-    private final int myLine;
-    private final String myFile;
-
-    SetBreakpointCommand(@NotNull String module, int line, @NotNull String file) {
-      myModule = module;
-      myLine = line + 1;
-      myFile = file;
-    }
-
-    @NotNull
-    @Override
-    public OtpErlangTuple toMessage() {
-      return new OtpErlangTuple(new OtpErlangObject[]{
-        new OtpErlangAtom("set_breakpoint"),
-        new OtpErlangAtom(myModule),
-        new OtpErlangInt(myLine),
-        new OtpErlangString(myFile)
-      });
     }
   }
 
