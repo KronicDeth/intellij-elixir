@@ -23,6 +23,8 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static org.elixir_lang.debugger.ElixirXValuePresentation.toUtf8String;
+
 final class OtpErlangTermUtil {
   private OtpErlangTermUtil() {
   }
@@ -70,10 +72,11 @@ final class OtpErlangTermUtil {
 
   @Nullable
   static String getStringText(@Nullable OtpErlangObject stringObject) {
-    if (stringObject instanceof OtpErlangString) {
+    if (stringObject instanceof OtpErlangBinary) {
+      return toUtf8String((OtpErlangBinary) stringObject);
+    } else if (stringObject instanceof OtpErlangString) {
       return ((OtpErlangString) stringObject).stringValue();
-    }
-    else if (stringObject instanceof OtpErlangList) {
+    } else if (stringObject instanceof OtpErlangList) {
       try {
         return ((OtpErlangList) stringObject).stringValue();
       } catch (OtpErlangException ignore) {

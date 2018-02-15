@@ -92,17 +92,9 @@ defmodule IntellijElixir.DebugServer do
     :int.meta(meta_pid, :bindings, level)
   end
 
-  defp get_file(module) do
-    if Code.ensure_loaded?(module) do
-      module.module_info
-      |> Keyword.get(:compile)
-      |> Keyword.get(:source)
-    end
-  end
-
-  defp meta_pid_to_stack(meta_pid, %{file: break_file, line: break_line}) do
+  defp meta_pid_to_stack(meta_pid, %{line: break_line}) do
     [{level, mfa} | backtrace_tail] = :int.meta(meta_pid, :backtrace, :all)
-    head_frame = {level, mfa, bindings(meta_pid, level), {break_file, break_line}}
+    head_frame = {level, mfa, bindings(meta_pid, level), {to_file(mfa), break_line}}
 
     tail_frames =
       case backtrace_tail do
@@ -113,13 +105,26 @@ defmodule IntellijElixir.DebugServer do
         _ ->
           frames = stack_frames_above(meta_pid, level)
 
-          for {{level, mfa = {module, _, _}}, {level, {module, line}, bindings}} <-
-                List.zip([backtrace_tail, frames]) do
-            {level, mfa, bindings, {get_file(module), line}}
+          for {{level, mfa = {module, _, _}}, {level, {module, line}, bindings}} <- List.zip([backtrace_tail, frames]) do
+            {level, mfa, bindings, {to_file(mfa), line}}
           end
       end
 
     [head_frame | tail_frames]
+  end
+
+  defp to_file(arg = {module, function, arguments}) do
+    source = source(module)
+
+    with [_] <- arguments,
+         {:ok, {root, _pattern, names}} <- templates(module),
+         function_string = to_string(function),
+         true <- (function_string in names) do
+      root_parent = root_parent(source)
+      List.foldr([root_parent, root, "#{function_string}.eex"], "", &Path.join/2)
+    else
+      _ -> source
+    end
   end
 
   defp pid_to_stack(pid, options) do
@@ -134,6 +139,16 @@ defmodule IntellijElixir.DebugServer do
     end
   end
 
+  defp root_parent(ancestor) do
+    if File.dir?(ancestor) and ancestor |> Path.join("mix.exs") |> File.exists?() do
+      ancestor
+    else
+      ancestor
+      |> Path.dirname()
+      |> root_parent()
+    end
+  end
+
   defp send_message(socket, message) do
     :gen_tcp.send(socket, :erlang.term_to_binary(message))
   end
@@ -142,7 +157,7 @@ defmodule IntellijElixir.DebugServer do
     for {pid, init, status, info} <- :int.snapshot(), into: [] do
       full_info =
         case info do
-          {break_module, break_line} -> {break_module, break_line, get_file(break_module)}
+          {break_module, break_line} -> {break_module, break_line, source(break_module)}
           _ -> info
         end
 
@@ -150,8 +165,14 @@ defmodule IntellijElixir.DebugServer do
     end
   end
 
-  defp stack(pid, :break, {_, break_line, break_file}) do
-    pid_to_stack(pid, %{file: break_file, line: break_line})
+  defp source(module) do
+    if Code.ensure_loaded?(module) do
+      module.module_info[:compile][:source]
+    end
+  end
+
+  defp stack(pid, :break, {_, break_line, _}) do
+    pid_to_stack(pid, %{line: break_line})
   end
 
   defp stack(_, _, _), do: []
@@ -162,6 +183,21 @@ defmodule IntellijElixir.DebugServer do
     case frame do
       {next_level, _, _} -> [frame | stack_frames_above(meta_pid, next_level)]
       _ -> []
+    end
+  end
+
+  defp templates(module) do
+    if Code.ensure_loaded?(module) && function_exported?(module, :__templates__, 0) do
+      try do
+        module.__templates__()
+      rescue
+        _ -> :error
+      else
+        templates = {_root, _pattern, _names} -> {:ok, templates}
+        _ -> :error
+      end
+    else
+      :error
     end
   end
 end
