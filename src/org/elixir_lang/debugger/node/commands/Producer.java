@@ -48,7 +48,7 @@ public final class Producer {
 
   @NotNull
   public static Command getStepOutCommand(@NotNull OtpErlangPid pid) {
-    return new StepOutCommand(pid);
+    return new StepOut(pid);
   }
 
   @NotNull
@@ -87,12 +87,6 @@ public final class Producer {
         new OtpErlangInt(myLine),
         new OtpErlangString(myFile)
       });
-    }
-  }
-
-  private static class StepOutCommand extends Pid {
-    StepOutCommand(@NotNull OtpErlangPid pid) {
-      super("step_out", pid);
     }
   }
 
