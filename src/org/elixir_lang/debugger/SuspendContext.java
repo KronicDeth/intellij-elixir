@@ -33,7 +33,7 @@ class SuspendContext extends XSuspendContext {
   private final int myActiveStackIdx;
 
   SuspendContext(@NotNull OtpErlangPid activePid,
-                 @NotNull List<ProcessSnapshot> snapshots) {
+                 @NotNull List<? extends ProcessSnapshot> snapshots) {
     myExecutionStacks = new XExecutionStack[snapshots.size()];
     int activeStackIdx = 0;
     for (int i = 0; i < snapshots.size(); i++) {

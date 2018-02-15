@@ -46,12 +46,11 @@ import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
 import com.intellij.xdebugger.evaluation.EvaluationMode;
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
 import org.elixir_lang.ElixirFileType;
-import org.elixir_lang.debugger.node.event.Listener;
-import org.elixir_lang.debugger.node.Exception;
-import org.elixir_lang.debugger.node.ProcessSnapshot;
-import org.elixir_lang.debugger.SuspendContext;
 import org.elixir_lang.debugger.line_breakpoint.Handler;
 import org.elixir_lang.debugger.line_breakpoint.Properties;
+import org.elixir_lang.debugger.node.Exception;
+import org.elixir_lang.debugger.node.ProcessSnapshot;
+import org.elixir_lang.debugger.node.event.Listener;
 import org.elixir_lang.jps.builder.ParametersList;
 import org.elixir_lang.mix.runner.MixRunConfigurationBase;
 import org.elixir_lang.mix.runner.MixRunningState;
@@ -143,7 +142,7 @@ public class Process extends com.intellij.xdebugger.XDebugProcess implements Lis
     }
 
     @Override
-    public void breakpointReached(@NotNull final OtpErlangPid pid, @NotNull List<ProcessSnapshot> snapshots) {
+    public void breakpointReached(@NotNull final OtpErlangPid pid, @NotNull List<? extends ProcessSnapshot> snapshots) {
         ProcessSnapshot processInBreakpoint = ContainerUtil.find(snapshots, elixirProcessSnapshot -> elixirProcessSnapshot.getPid().equals(pid));
         assert processInBreakpoint != null;
         SourcePosition breakPosition = SourcePosition.create(processInBreakpoint);
