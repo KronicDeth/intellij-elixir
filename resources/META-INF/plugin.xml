@@ -166,8 +166,8 @@
     <typedHandler implementation="org.elixir_lang.TypedHandler"/>
 
     <!-- debug -->
-    <programRunner implementation="org.elixir_lang.debugger.xdebug.DebugRunner"/>
-    <xdebugger.breakpointType implementation="org.elixir_lang.debugger.xdebug.LineBreakpointType"/>
+    <programRunner implementation="org.elixir_lang.debugger.Runner"/>
+    <xdebugger.breakpointType implementation="org.elixir_lang.debugger.line_breakpoint.Type"/>
 
   </extensions>
 

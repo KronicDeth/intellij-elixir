@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.elixir_lang.debugger.xdebug.xvalue;
+package org.elixir_lang.debugger.stack_frame.value;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.ericsson.otp.erlang.OtpErlangTuple;

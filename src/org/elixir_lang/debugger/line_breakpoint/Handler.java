@@ -16,27 +16,28 @@
  * limitations under the License.
  */
 
-package org.elixir_lang.debugger.xdebug;
+package org.elixir_lang.debugger.line_breakpoint;
 
 import com.intellij.xdebugger.breakpoints.XBreakpointHandler;
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
+import org.elixir_lang.debugger.Process;
 import org.jetbrains.annotations.NotNull;
 
-class LineBreakpointHandler extends XBreakpointHandler<XLineBreakpoint<LineBreakpointProperties>> {
-  private final XDebugProcess myDebugProcess;
+public class Handler extends XBreakpointHandler<XLineBreakpoint<Properties>> {
+  private final Process myDebugProcess;
 
-  LineBreakpointHandler(XDebugProcess debugProcess) {
-    super(LineBreakpointType.class);
+  public Handler(Process debugProcess) {
+    super(Type.class);
     myDebugProcess = debugProcess;
   }
 
   @Override
-  public void registerBreakpoint(@NotNull XLineBreakpoint<LineBreakpointProperties> breakpoint) {
+  public void registerBreakpoint(@NotNull XLineBreakpoint<Properties> breakpoint) {
     myDebugProcess.addBreakpoint(breakpoint);
   }
 
   @Override
-  public void unregisterBreakpoint(@NotNull XLineBreakpoint<LineBreakpointProperties> breakpoint, boolean temporary) {
+  public void unregisterBreakpoint(@NotNull XLineBreakpoint<Properties> breakpoint, boolean temporary) {
     myDebugProcess.removeBreakpoint(breakpoint, temporary);
   }
 }

@@ -16,23 +16,19 @@
  * limitations under the License.
  */
 
-package org.elixir_lang.debugger.xdebug.xvalue;
+package org.elixir_lang.debugger.stack_frame.value;
 
-import com.ericsson.otp.erlang.OtpErlangPort;
-import com.intellij.xdebugger.frame.XCompositeNode;
+import com.ericsson.otp.erlang.OtpErlangTuple;
 import com.intellij.xdebugger.frame.XValueChildrenList;
 import org.jetbrains.annotations.NotNull;
 
-public class Port extends Base<OtpErlangPort> {
-  Port(OtpErlangPort value) {
-    super(value, 2);
+class Tuple extends ArrayBase<OtpErlangTuple> {
+  Tuple(@NotNull OtpErlangTuple value) {
+    super(value, value.arity());
   }
 
   @Override
-  public void computeChildren(@NotNull XCompositeNode node) {
-    XValueChildrenList childrenList = new XValueChildrenList(2);
-    addNamedChild(childrenList, getValue().node(), "node");
-    addNamedChild(childrenList, getValue().id(), "id");
-    node.addChildren(childrenList, true);
+  protected void computeChild(@NotNull XValueChildrenList children, int childIdx) {
+    addIndexedChild(children, getValue().elementAt(childIdx), childIdx);
   }
 }

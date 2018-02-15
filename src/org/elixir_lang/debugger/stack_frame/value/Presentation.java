@@ -16,22 +16,23 @@
  * limitations under the License.
  */
 
-package org.elixir_lang.debugger;
+package org.elixir_lang.debugger.stack_frame.value;
 
 import com.ericsson.otp.erlang.*;
 import org.elixir_lang.utils.ElixirModulesUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.String;
 import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.util.Map;
 
-public class XValuePresentation extends com.intellij.xdebugger.frame.presentation.XValuePresentation {
+public class Presentation extends com.intellij.xdebugger.frame.presentation.XValuePresentation {
   private final OtpErlangObject myValue;
 
-  public XValuePresentation(OtpErlangObject value) {
+  public Presentation(OtpErlangObject value) {
     myValue = value;
   }
 
@@ -58,7 +59,7 @@ public class XValuePresentation extends com.intellij.xdebugger.frame.presentatio
   private static void renderMap(OtpErlangMap map, XValueTextRenderer renderer) {
     renderer.renderSpecialSymbol("%");
     if (isStruct(map)) {
-      String structType = structType(map);
+      java.lang.String structType = structType(map);
 
       assert structType != null;
 
@@ -136,7 +137,7 @@ public class XValuePresentation extends com.intellij.xdebugger.frame.presentatio
   }
 
   private static void renderBitstr(OtpErlangBitstr bitstr, XValueTextRenderer renderer) {
-    String utf8String = toUtf8String(bitstr);
+    java.lang.String utf8String = toUtf8String(bitstr);
     if (utf8String != null) {
       renderer.renderStringValue(utf8String);
     } else {
@@ -157,7 +158,7 @@ public class XValuePresentation extends com.intellij.xdebugger.frame.presentatio
   }
 
   public static boolean isPrintable(OtpErlangString s) {
-    String str = s.toString();
+    java.lang.String str = s.toString();
     for (int i = 0; i < str.length(); i++) {
       char c = str.charAt(i);
       if (!isPrintable(c)) return false;
@@ -182,7 +183,7 @@ public class XValuePresentation extends com.intellij.xdebugger.frame.presentatio
   }
 
   @Nullable
-  public static String toUtf8String(OtpErlangBitstr bitstr) {
+  public static java.lang.String toUtf8String(OtpErlangBitstr bitstr) {
     if (bitstr.pad_bits() > 0) return null;
     try {
       return Charset.availableCharsets().get("UTF-8").newDecoder().decode(ByteBuffer.wrap(bitstr.binaryValue())).toString();
@@ -214,6 +215,6 @@ public class XValuePresentation extends com.intellij.xdebugger.frame.presentatio
 
   @Override
   public void renderValue(@NotNull XValueTextRenderer renderer) {
-    XValuePresentation.renderObject(myValue, renderer);
+    Presentation.renderObject(myValue, renderer);
   }
 }

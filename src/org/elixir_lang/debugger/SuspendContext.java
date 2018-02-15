@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.elixir_lang.debugger.xdebug;
+package org.elixir_lang.debugger;
 
 import com.ericsson.otp.erlang.OtpErlangPid;
 import com.intellij.xdebugger.frame.XExecutionStack;

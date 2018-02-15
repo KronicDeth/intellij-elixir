@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.elixir_lang.debugger.xdebug;
+package org.elixir_lang.debugger;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.icons.AllIcons;
@@ -29,7 +29,7 @@ import com.intellij.xdebugger.frame.XValue;
 import com.intellij.xdebugger.frame.XValueChildrenList;
 import org.elixir_lang.debugger.node.TraceElement;
 import org.elixir_lang.debugger.node.VariableBinding;
-import org.elixir_lang.debugger.xdebug.xvalue.Factory;
+import org.elixir_lang.debugger.stack_frame.value.Factory;
 import org.elixir_lang.utils.ElixirModulesUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

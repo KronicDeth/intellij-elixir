@@ -16,24 +16,27 @@
  * limitations under the License.
  */
 
-package org.elixir_lang.debugger.xdebug.xvalue;
+package org.elixir_lang.debugger.stack_frame.value;
 
-import com.ericsson.otp.erlang.OtpErlangObject;
+import com.ericsson.otp.erlang.OtpErlangString;
+import com.intellij.xdebugger.frame.ImmediateFullValueEvaluator;
 import com.intellij.xdebugger.frame.XValueNode;
 import com.intellij.xdebugger.frame.XValuePlace;
-import com.intellij.xdebugger.frame.presentation.XNumericValuePresentation;
-import com.intellij.xdebugger.frame.presentation.XValuePresentation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-class Numeric extends PrimitiveBase<OtpErlangObject> {
-  Numeric(OtpErlangObject value) {
+class CharList extends PrimitiveBase<OtpErlangString> {
+  CharList(OtpErlangString value) {
     super(value);
   }
 
   @Nullable
   @Override
-  protected XValuePresentation getPresentation(@NotNull XValueNode node, @NotNull XValuePlace place) {
-    return new XNumericValuePresentation(getValue().toString());
+  protected com.intellij.xdebugger.frame.presentation.XValuePresentation getPresentation(@NotNull XValueNode node, @NotNull XValuePlace place) {
+    java.lang.String text = getValue().stringValue();
+    if (text.length() > XValueNode.MAX_VALUE_LENGTH) {
+      node.setFullValueEvaluator(new ImmediateFullValueEvaluator(text));
+    }
+    return new Presentation(getValue());
   }
 }

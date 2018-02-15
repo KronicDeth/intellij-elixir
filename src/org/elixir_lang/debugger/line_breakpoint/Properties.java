@@ -15,19 +15,19 @@
  * limitations under the License.
  */
 
-package org.elixir_lang.debugger.xdebug;
+package org.elixir_lang.debugger.line_breakpoint;
 
 import com.intellij.xdebugger.breakpoints.XBreakpointProperties;
 import org.jetbrains.annotations.Nullable;
 
-public class LineBreakpointProperties extends XBreakpointProperties<LineBreakpointProperties> {
+public class Properties extends XBreakpointProperties<Properties> {
   @Nullable
   @Override
-  public LineBreakpointProperties getState() {
+  public Properties getState() {
     return this;
   }
 
   @Override
-  public void loadState(LineBreakpointProperties state) {
+  public void loadState(Properties state) {
   }
 }

@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static org.elixir_lang.debugger.XValuePresentation.toUtf8String;
+import static org.elixir_lang.debugger.stack_frame.value.Presentation.toUtf8String;
 
 public final class OtpErlangTermUtil {
   private OtpErlangTermUtil() {

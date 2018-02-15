@@ -26,7 +26,7 @@ import java.util.Queue;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.elixir_lang.debugger.DebuggerLog.LOG;
+import static org.elixir_lang.debugger.Log.LOG;
 
 public class Node {
   private static final int RECEIVE_TIMEOUT = 50;

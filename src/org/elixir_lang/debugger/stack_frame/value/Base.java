@@ -16,14 +16,13 @@
  * limitations under the License.
  */
 
-package org.elixir_lang.debugger.xdebug.xvalue;
+package org.elixir_lang.debugger.stack_frame.value;
 
 import com.ericsson.otp.erlang.OtpErlangAtom;
 import com.ericsson.otp.erlang.OtpErlangLong;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.icons.AllIcons;
 import com.intellij.xdebugger.frame.*;
-import org.elixir_lang.debugger.XValuePresentation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -88,7 +87,7 @@ class Base<T extends OtpErlangObject> extends XValue {
 
   @Nullable
   com.intellij.xdebugger.frame.presentation.XValuePresentation getPresentation(@NotNull XValueNode node, @NotNull XValuePlace place) {
-    return new XValuePresentation(getValue());
+    return new Presentation(getValue());
   }
 
   @Nullable

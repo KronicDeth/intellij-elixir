@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.elixir_lang.debugger.xdebug;
+package org.elixir_lang.debugger;
 
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;

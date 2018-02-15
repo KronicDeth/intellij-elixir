@@ -15,11 +15,10 @@
  * limitations under the License.
  */
 
-package org.elixir_lang.debugger.xdebug.xvalue;
+package org.elixir_lang.debugger.stack_frame.value;
 
 import com.ericsson.otp.erlang.*;
 import com.intellij.xdebugger.frame.XValue;
-import org.elixir_lang.debugger.XValuePresentation;
 import org.jetbrains.annotations.NotNull;
 
 public final class Factory {
@@ -47,7 +46,7 @@ public final class Factory {
       return new Tuple((OtpErlangTuple) object);
     }
     if (object instanceof OtpErlangString) {
-      if (XValuePresentation.isPrintable((OtpErlangString)object)) {
+      if (Presentation.isPrintable((OtpErlangString)object)) {
         return new CharList((OtpErlangString) object);
       } else {
         return new List(new OtpErlangList(((OtpErlangString) object).stringValue()));
@@ -57,7 +56,7 @@ public final class Factory {
       return new List((OtpErlangList) object);
     }
     if (object instanceof OtpErlangBitstr) {
-      if (XValuePresentation.toUtf8String((OtpErlangBitstr)object) != null) {
+      if (Presentation.toUtf8String((OtpErlangBitstr)object) != null) {
         return new String((OtpErlangBitstr) object);
       } else {
         return new BitString((OtpErlangBitstr) object);

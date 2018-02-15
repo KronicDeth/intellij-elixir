@@ -16,13 +16,12 @@
  * limitations under the License.
  */
 
-package org.elixir_lang.debugger.xdebug.xvalue;
+package org.elixir_lang.debugger.stack_frame.value;
 
 import com.ericsson.otp.erlang.OtpErlangAtom;
 import com.ericsson.otp.erlang.OtpErlangMap;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.xdebugger.frame.XValueChildrenList;
-import org.elixir_lang.debugger.XValuePresentation;
 import org.jetbrains.annotations.NotNull;
 
 public class Map extends Base<OtpErlangMap> {
@@ -35,7 +34,7 @@ public class Map extends Base<OtpErlangMap> {
     OtpErlangObject key = getValue().keys()[childIdx];
     OtpErlangObject value = getValue().get(key);
 
-    if (XValuePresentation.hasSymbolKeys(getValue()) && key instanceof OtpErlangAtom) {
+    if (Presentation.hasSymbolKeys(getValue()) && key instanceof OtpErlangAtom) {
       java.lang.String keyStr = ((OtpErlangAtom)key).atomValue();
       if (!keyStr.equals("__struct__")) addNamedChild(children, value, keyStr);
     } else {

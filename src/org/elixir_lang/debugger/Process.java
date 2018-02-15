@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.elixir_lang.debugger.xdebug;
+package org.elixir_lang.debugger;
 
 import com.ericsson.otp.erlang.OtpErlangPid;
 import com.intellij.execution.ExecutionException;
@@ -46,11 +46,12 @@ import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
 import com.intellij.xdebugger.evaluation.EvaluationMode;
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
 import org.elixir_lang.ElixirFileType;
-import org.elixir_lang.debugger.Modules;
 import org.elixir_lang.debugger.node.event.Listener;
-import org.elixir_lang.debugger.Node;
 import org.elixir_lang.debugger.node.Exception;
 import org.elixir_lang.debugger.node.ProcessSnapshot;
+import org.elixir_lang.debugger.SuspendContext;
+import org.elixir_lang.debugger.line_breakpoint.Handler;
+import org.elixir_lang.debugger.line_breakpoint.Properties;
 import org.elixir_lang.jps.builder.ParametersList;
 import org.elixir_lang.mix.runner.MixRunConfigurationBase;
 import org.elixir_lang.mix.runner.MixRunningState;
@@ -65,23 +66,23 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static org.elixir_lang.debugger.DebuggerLog.LOG;
+import static org.elixir_lang.debugger.Log.LOG;
 
-class XDebugProcess extends com.intellij.xdebugger.XDebugProcess implements Listener {
+public class Process extends com.intellij.xdebugger.XDebugProcess implements Listener {
     @NotNull
-    private final XBreakpointHandler<?>[] myBreakpointHandlers = new XBreakpointHandler[]{new LineBreakpointHandler(this)};
+    private final XBreakpointHandler<?>[] myBreakpointHandlers = new XBreakpointHandler[]{new Handler(this)};
     @NotNull
     private final Node myNode;
     @NotNull
     private final OSProcessHandler myElixirProcessHandler;
     private final ExecutionEnvironment myExecutionEnvironment;
     @NotNull
-    private final ConcurrentHashMap<SourcePosition, XLineBreakpoint<LineBreakpointProperties>> myPositionToLineBreakpointMap =
+    private final ConcurrentHashMap<SourcePosition, XLineBreakpoint<Properties>> myPositionToLineBreakpointMap =
             new ConcurrentHashMap<>();
     @NotNull
     private final MixRunningState myRunningState;
 
-    XDebugProcess(@NotNull XDebugSession session, ExecutionEnvironment env) throws ExecutionException {
+    Process(@NotNull XDebugSession session, ExecutionEnvironment env) throws ExecutionException {
         super(session);
 
         session.setPauseActionSupported(false);
@@ -114,13 +115,13 @@ class XDebugProcess extends com.intellij.xdebugger.XDebugProcess implements List
     }
 
     @Nullable
-    private static SourcePosition getElixirSourcePosition(@NotNull XLineBreakpoint<LineBreakpointProperties> breakpoint) {
+    private static SourcePosition getElixirSourcePosition(@NotNull XLineBreakpoint<Properties> breakpoint) {
         XSourcePosition sourcePosition = breakpoint.getSourcePosition();
 
         return sourcePosition != null ? SourcePosition.create(sourcePosition) : null;
     }
 
-    void addBreakpoint(@NotNull XLineBreakpoint<LineBreakpointProperties> breakpoint) {
+    public void addBreakpoint(@NotNull XLineBreakpoint<Properties> breakpoint) {
         SourcePosition breakpointPosition = getElixirSourcePosition(breakpoint);
         if (breakpointPosition == null) {
             return;
@@ -146,7 +147,7 @@ class XDebugProcess extends com.intellij.xdebugger.XDebugProcess implements List
         ProcessSnapshot processInBreakpoint = ContainerUtil.find(snapshots, elixirProcessSnapshot -> elixirProcessSnapshot.getPid().equals(pid));
         assert processInBreakpoint != null;
         SourcePosition breakPosition = SourcePosition.create(processInBreakpoint);
-        XLineBreakpoint<LineBreakpointProperties> breakpoint = getLineBreakpoint(breakPosition);
+        XLineBreakpoint<Properties> breakpoint = getLineBreakpoint(breakPosition);
         SuspendContext suspendContext = new SuspendContext(pid, snapshots);
         if (breakpoint == null) {
             getSession().positionReached(suspendContext);
@@ -202,7 +203,7 @@ class XDebugProcess extends com.intellij.xdebugger.XDebugProcess implements List
     @Override
     public void failedToSetBreakpoint(String module, @NotNull String file, int line, String errorMessage) {
         SourcePosition sourcePosition = SourcePosition.create(file, line);
-        XLineBreakpoint<LineBreakpointProperties> breakpoint = getLineBreakpoint(sourcePosition);
+        XLineBreakpoint<Properties> breakpoint = getLineBreakpoint(sourcePosition);
         if (breakpoint != null) {
             getSession().updateBreakpointPresentation(breakpoint, AllIcons.Debugger.Db_invalid_breakpoint, errorMessage);
         }
@@ -239,7 +240,7 @@ class XDebugProcess extends com.intellij.xdebugger.XDebugProcess implements List
     }
 
     @Nullable
-    private XLineBreakpoint<LineBreakpointProperties> getLineBreakpoint(@Nullable SourcePosition sourcePosition) {
+    private XLineBreakpoint<Properties> getLineBreakpoint(@Nullable SourcePosition sourcePosition) {
         return sourcePosition != null ? myPositionToLineBreakpointMap.get(sourcePosition) : null;
     }
 
@@ -261,7 +262,7 @@ class XDebugProcess extends com.intellij.xdebugger.XDebugProcess implements List
         return runConfig;
     }
 
-    void removeBreakpoint(@NotNull XLineBreakpoint<LineBreakpointProperties> breakpoint,
+    public void removeBreakpoint(@NotNull XLineBreakpoint<Properties> breakpoint,
                           @SuppressWarnings("UnusedParameters") boolean temporary) {
         SourcePosition breakpointPosition = getElixirSourcePosition(breakpoint);
         if (breakpointPosition == null) {
@@ -317,7 +318,7 @@ class XDebugProcess extends com.intellij.xdebugger.XDebugProcess implements List
         LOG.debug("Running debugger process. Command line (platform-independent): ");
         LOG.debug(commandLine.getCommandLineString());
 
-        Process process = commandLine.createProcess();
+        java.lang.Process process = commandLine.createProcess();
         elixirProcessHandler = new ColoredProcessHandler(process, commandLine.getCommandLineString());
 
         LOG.debug("Event process started.");

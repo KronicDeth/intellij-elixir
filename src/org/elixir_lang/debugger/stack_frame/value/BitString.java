@@ -1,6 +1,7 @@
 /*
  * Copyright 2012-2014 Sergey Ignatov
  * Copyright 2017 Jake Becker
+ * Copyright 2017 Luke Imhoff
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +16,19 @@
  * limitations under the License.
  */
 
-package org.elixir_lang.debugger;
+package org.elixir_lang.debugger.stack_frame.value;
 
-import com.intellij.openapi.diagnostic.Logger;
+import com.ericsson.otp.erlang.OtpErlangBitstr;
+import com.intellij.xdebugger.frame.XValueChildrenList;
+import org.jetbrains.annotations.NotNull;
 
-public interface DebuggerLog {
-  Logger LOG = Logger.getInstance(DebuggerLog.class);
+class BitString extends ArrayBase<OtpErlangBitstr> {
+  BitString(@NotNull OtpErlangBitstr value) {
+    super(value, value.binaryValue().length);
+  }
+
+  @Override
+  protected void computeChild(@NotNull XValueChildrenList children, int childIdx) {
+    addIndexedChild(children, getValue().binaryValue()[childIdx] & 0xFF, childIdx);
+  }
 }

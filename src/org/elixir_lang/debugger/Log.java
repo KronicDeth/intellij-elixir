@@ -1,7 +1,6 @@
 /*
  * Copyright 2012-2014 Sergey Ignatov
  * Copyright 2017 Jake Becker
- * Copyright 2017 Luke Imhoff
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +15,10 @@
  * limitations under the License.
  */
 
-package org.elixir_lang.debugger.xdebug.xvalue;
+package org.elixir_lang.debugger;
 
-import com.ericsson.otp.erlang.OtpErlangAtom;
+import com.intellij.openapi.diagnostic.Logger;
 
-class Atom extends PrimitiveBase<OtpErlangAtom> {
-  Atom(OtpErlangAtom value) {
-    super(value);
-  }
+public interface Log {
+  Logger LOG = Logger.getInstance(Log.class);
 }

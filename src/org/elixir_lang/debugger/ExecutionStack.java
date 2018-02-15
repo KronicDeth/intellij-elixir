@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.elixir_lang.debugger.xdebug;
+package org.elixir_lang.debugger;
 
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.xdebugger.frame.XExecutionStack;

@@ -1907,7 +1907,7 @@ Debug quick menu
 </figure>
 
 * Press `Up` or `Down` to change frames
-* Click the frame from the list
+* Click the stack_frame from the list
 
 ###### Jump to Current Execution Point
 
@@ -2352,7 +2352,7 @@ Much like `rake` tasks in Rubymine, this plugin can run `mix` tasks.
 8. Click the Run arrow in the Toolbar to run the `mix` task
    ![Run](/screenshots/features/run_configurations/mix_tasks/Toolbar%20Run%20Button.png?raw=true "Run Elixir Mix Run Configuration")
 9. The Run pane will open, showing the results of the `mix` task.
-    * If there is an error with a FILE:LINE stack frame, it will be a clickable link that will take you to that location
+    * If there is an error with a FILE:LINE stack stack_frame, it will be a clickable link that will take you to that location
       ![Error link](/screenshots/features/run_configurations/mix_tasks/Error%20Link.png?raw=true "Clickable Error Link")
 
 #### `mix test`

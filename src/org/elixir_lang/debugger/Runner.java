@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.elixir_lang.debugger.xdebug;
+package org.elixir_lang.debugger;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.RunProfile;
@@ -31,7 +31,7 @@ import org.elixir_lang.mix.runner.MixRunConfigurationBase;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class DebugRunner extends GenericProgramRunner {
+public class Runner extends GenericProgramRunner {
   private static final String ELIXIR_DEBUG_RUNNER_ID = "ElixirDebugRunner";
 
   @Nullable
@@ -43,7 +43,7 @@ public class DebugRunner extends GenericProgramRunner {
       @NotNull
       @Override
       public com.intellij.xdebugger.XDebugProcess start(@NotNull XDebugSession session) throws ExecutionException {
-        return new XDebugProcess(session, environment);
+        return new Process(session, environment);
       }
     }).getRunContentDescriptor();
   }

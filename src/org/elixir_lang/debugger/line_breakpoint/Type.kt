@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.elixir_lang.debugger.xdebug
+package org.elixir_lang.debugger.line_breakpoint
 
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
@@ -29,12 +29,12 @@ import org.elixir_lang.ElixirFileType
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil
 import org.jetbrains.annotations.Contract
 
-class LineBreakpointType private constructor() : XLineBreakpointType<LineBreakpointProperties>(ID, NAME) {
+class Type private constructor() : XLineBreakpointType<org.elixir_lang.debugger.line_breakpoint.Properties>(ID, NAME) {
     override fun canPutAt(file: VirtualFile, line: Int, project: Project): Boolean =
             file.fileType === ElixirFileType.INSTANCE && isLineBreakpointAvailable(file, line, project)
 
-    override fun createBreakpointProperties(file: VirtualFile, line: Int): LineBreakpointProperties =
-            LineBreakpointProperties()
+    override fun createBreakpointProperties(file: VirtualFile, line: Int): Properties =
+            Properties()
 
     private class LineBreakpointAvailabilityProcessor : Processor<PsiElement> {
         @get:Contract(pure = true)

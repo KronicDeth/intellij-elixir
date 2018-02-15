@@ -16,19 +16,12 @@
  * limitations under the License.
  */
 
-package org.elixir_lang.debugger.xdebug.xvalue;
+package org.elixir_lang.debugger.stack_frame.value;
 
-import com.ericsson.otp.erlang.OtpErlangList;
-import com.intellij.xdebugger.frame.XValueChildrenList;
-import org.jetbrains.annotations.NotNull;
+import com.ericsson.otp.erlang.OtpErlangBitstr;
 
-class List extends ArrayBase<OtpErlangList> {
-  List(@NotNull OtpErlangList value) {
-    super(value, value.arity());
-  }
-
-  @Override
-  protected void computeChild(XValueChildrenList children, int childIdx) {
-    addIndexedChild(children, getValue().elementAt(childIdx), childIdx);
+class String extends PrimitiveBase<OtpErlangBitstr> {
+  String(OtpErlangBitstr value) {
+    super(value);
   }
 }
