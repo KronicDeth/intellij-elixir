@@ -1,6 +1,7 @@
 /*
  * Copyright 2012-2014 Sergey Ignatov
  * Copyright 2017 Jake Becker
+ * Copyright 2018 Luke Imhoff
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +16,11 @@
  * limitations under the License.
  */
 
-package org.elixir_lang.debugger.line_breakpoint;
+package org.elixir_lang.debugger.line_breakpoint
 
-import com.intellij.xdebugger.breakpoints.XBreakpointProperties;
-import org.jetbrains.annotations.Nullable;
+import com.intellij.xdebugger.breakpoints.XBreakpointProperties
 
-public class Properties extends XBreakpointProperties<Properties> {
-  @Nullable
-  @Override
-  public Properties getState() {
-    return this;
-  }
-
-  @Override
-  public void loadState(Properties state) {
-  }
+class Properties : XBreakpointProperties<Properties>() {
+    override fun getState(): Properties = this
+    override fun loadState(state: Properties) {}
 }
