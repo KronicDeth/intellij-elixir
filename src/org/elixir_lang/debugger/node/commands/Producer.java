@@ -20,6 +20,7 @@ package org.elixir_lang.debugger.node.commands;
 import com.ericsson.otp.erlang.*;
 import org.elixir_lang.debugger.node.Command;
 import org.elixir_lang.debugger.node.command.Pid;
+import org.elixir_lang.debugger.node.command.RemoveBreakpoint;
 import org.elixir_lang.debugger.node.command.RunTask;
 import org.jetbrains.annotations.NotNull;
 
@@ -34,7 +35,7 @@ public final class Producer {
 
   @NotNull
   public static Command getRemoveBreakpointCommand(@NotNull String module, int line) {
-    return new RemoveBreakpointCommand(module, line);
+    return new RemoveBreakpoint(module, line);
   }
 
   @NotNull
@@ -106,26 +107,6 @@ public final class Producer {
   private static class ContinueCommand extends Pid {
     ContinueCommand(@NotNull OtpErlangPid pid) {
       super("continue", pid);
-    }
-  }
-
-  private static class RemoveBreakpointCommand implements Command {
-    private final String myModule;
-    private final int myLine;
-
-    RemoveBreakpointCommand(@NotNull String module, int line) {
-      myModule = module;
-      myLine = line + 1;
-    }
-
-    @NotNull
-    @Override
-    public OtpErlangTuple toMessage() {
-      return new OtpErlangTuple(new OtpErlangObject[] {
-        new OtpErlangAtom("remove_breakpoint"),
-        new OtpErlangAtom(myModule),
-        new OtpErlangInt(myLine)
-      });
     }
   }
 
