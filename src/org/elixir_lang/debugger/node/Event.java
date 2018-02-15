@@ -39,8 +39,8 @@ public abstract class Event {
       if (BreakpointReached.NAME.equals(messageName)) return new BreakpointReached(messageTuple);
       if (DebugRemoteNodeResponse.NAME.equals(messageName)) return new DebugRemoteNodeResponse(messageTuple);
     } catch (FormatException e) {
-      return new UnknownMessage(messageTuple);
+      return new Unknown(messageTuple);
     }
-    return new UnknownMessage(messageTuple);
+    return new Unknown(messageTuple);
   }
 }

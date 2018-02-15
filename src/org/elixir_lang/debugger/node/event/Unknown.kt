@@ -15,21 +15,17 @@
  * limitations under the License.
  */
 
-package org.elixir_lang.debugger.node.event;
+package org.elixir_lang.debugger.node.event
 
-import com.ericsson.otp.erlang.OtpErlangTuple;
-import org.elixir_lang.debugger.node.Event;
-import org.elixir_lang.debugger.Node;
+import com.ericsson.otp.erlang.OtpErlangTuple
+import org.elixir_lang.beam.term.inspect
+import org.elixir_lang.debugger.Node
+import org.elixir_lang.debugger.node.Event
 
-public class UnknownMessage extends Event {
-  private final String myUnknownMessageText;
+class Unknown(message: OtpErlangTuple) : Event() {
+    private val inspectedMessage: String by lazy { inspect(message) }
 
-  public UnknownMessage(OtpErlangTuple message) {
-    myUnknownMessageText = message.toString();
-  }
-
-  @Override
-  public void process(Node node, Listener eventListener) {
-    eventListener.unknownMessage(myUnknownMessageText);
-  }
+    override fun process(node: Node, eventListener: Listener) {
+        eventListener.unknownMessage(inspectedMessage)
+    }
 }
