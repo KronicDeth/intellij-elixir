@@ -18,6 +18,7 @@
 
 package org.elixir_lang.debugger;
 
+import com.ericsson.otp.erlang.OtpErlangObject;
 import com.ericsson.otp.erlang.OtpErlangPid;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.RunnerAndConfigurationSettings;
@@ -34,7 +35,6 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
-import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiManager;
 import com.intellij.testFramework.LightVirtualFile;
@@ -63,8 +63,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static org.elixir_lang.beam.term.InspectKt.inspect;
 import static org.elixir_lang.debugger.Log.LOG;
 
 public class Process extends com.intellij.xdebugger.XDebugProcess implements Listener {
@@ -191,12 +193,22 @@ public class Process extends com.intellij.xdebugger.XDebugProcess implements Lis
     }
 
     @Override
-    public void failedToInterpretModules(String nodeName, @NotNull List<String> modules) {
-        String messagePrefix = "Failed to interpret modules on node " + nodeName + ": ";
-        String modulesString = StringUtil.join(modules, ", ");
-        String messageSuffix = ".\nMake sure they are compiled with debug_info option, their sources are located in same directory as .beam files, modules are available on the node.";
-        String message = messagePrefix + modulesString + messageSuffix;
-        getSession().reportMessage(message, MessageType.WARNING);
+    public void failedToInterpretModules(@NotNull String nodeName,
+                                         @NotNull Map<String, ? extends OtpErlangObject> errorReasonByModule) {
+        StringBuilder stringBuilder = new StringBuilder("Failed to interpret modules on node (")
+                .append(nodeName)
+                .append("):\n\n");
+
+        for (Map.Entry<String, ? extends OtpErlangObject> entry : errorReasonByModule.entrySet()) {
+            stringBuilder.append(entry.getKey()).append(": ").append(inspect(entry.getValue())).append("\n\n");
+        }
+
+        stringBuilder.append(
+                "Make sure they are compiled with debug_info option, their sources are located in same directory as " +
+                ".beam files, modules are available on the node."
+        );
+
+        getSession().reportMessage(stringBuilder.toString(), MessageType.WARNING);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package org.elixir_lang.debugger.node.event
 
+import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangPid
 import org.elixir_lang.debugger.node.ProcessSnapshot
 
@@ -9,7 +10,7 @@ interface Listener {
     fun debuggerStarted()
     fun debuggerStopped()
     fun failedToDebugRemoteNode(nodeName: String, error: String)
-    fun failedToInterpretModules(nodeName: String, modules: List<String>)
+    fun failedToInterpretModules(nodeName: String, errorReasonByModule: Map<String, OtpErlangObject>)
     fun failedToSetBreakpoint(module: String, file: String, line: Int, errorMessage: String)
     fun unknownMessage(messageText: String)
 }
