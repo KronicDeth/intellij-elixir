@@ -19,6 +19,7 @@ package org.elixir_lang.debugger.node.commands;
 
 import com.ericsson.otp.erlang.*;
 import org.elixir_lang.debugger.node.Command;
+import org.elixir_lang.debugger.node.command.Continue;
 import org.elixir_lang.debugger.node.command.Pid;
 import org.elixir_lang.debugger.node.command.RemoveBreakpoint;
 import org.elixir_lang.debugger.node.command.RunTask;
@@ -55,7 +56,7 @@ public final class Producer {
 
   @NotNull
   public static Command getContinueCommand(@NotNull OtpErlangPid pid) {
-    return new ContinueCommand(pid);
+    return new Continue(pid);
   }
 
   @NotNull
@@ -101,12 +102,6 @@ public final class Producer {
   private static class StepIntoCommand extends Pid {
     StepIntoCommand(@NotNull OtpErlangPid pid) {
       super("step_into", pid);
-    }
-  }
-
-  private static class ContinueCommand extends Pid {
-    ContinueCommand(@NotNull OtpErlangPid pid) {
-      super("continue", pid);
     }
   }
 
