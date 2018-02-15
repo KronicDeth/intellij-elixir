@@ -4,6 +4,7 @@ import com.ericsson.otp.erlang.*;
 import com.intellij.concurrency.AsyncFutureFactory;
 import com.intellij.concurrency.AsyncFutureResult;
 import com.intellij.openapi.application.ApplicationManager;
+import org.elixir_lang.debugger.node.Command;
 import org.elixir_lang.debugger.node.event.Listener;
 import org.elixir_lang.debugger.node.Exception;
 import org.elixir_lang.debugger.node.Event;
@@ -34,7 +35,7 @@ public class Node {
 
   private OtpErlangPid myLastSuspendedPid;
 
-  private final Queue<Producer.ErlangDebuggerCommand> myCommandsQueue = new LinkedList<>();
+  private final Queue<Command> myCommandsQueue = new LinkedList<>();
   private int myLocalDebuggerPort = -1;
   @NotNull
   private final Listener myEventListener;
@@ -97,7 +98,7 @@ public class Node {
     addCommand(Producer.getContinueCommand(myLastSuspendedPid));
   }
 
-  private void addCommand(Producer.ErlangDebuggerCommand command) {
+  private void addCommand(Command command) {
     synchronized (myCommandsQueue) {
       myCommandsQueue.add(command);
     }

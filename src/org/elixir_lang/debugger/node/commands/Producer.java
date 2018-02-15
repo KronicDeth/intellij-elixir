@@ -18,6 +18,7 @@
 package org.elixir_lang.debugger.node.commands;
 
 import com.ericsson.otp.erlang.*;
+import org.elixir_lang.debugger.node.Command;
 import org.jetbrains.annotations.NotNull;
 
 public final class Producer {
@@ -25,37 +26,37 @@ public final class Producer {
   }
 
   @NotNull
-  public static ErlangDebuggerCommand getSetBreakpointCommand(@NotNull String module, int line, @NotNull String file) {
+  public static Command getSetBreakpointCommand(@NotNull String module, int line, @NotNull String file) {
     return new SetBreakpointCommand(module, line, file);
   }
 
   @NotNull
-  public static ErlangDebuggerCommand getRemoveBreakpointCommand(@NotNull String module, int line) {
+  public static Command getRemoveBreakpointCommand(@NotNull String module, int line) {
     return new RemoveBreakpointCommand(module, line);
   }
 
   @NotNull
-  public static ErlangDebuggerCommand getStepIntoCommand(@NotNull OtpErlangPid pid) {
+  public static Command getStepIntoCommand(@NotNull OtpErlangPid pid) {
     return new StepIntoCommand(pid);
   }
 
   @NotNull
-  public static ErlangDebuggerCommand getStepOverCommand(@NotNull OtpErlangPid pid) {
+  public static Command getStepOverCommand(@NotNull OtpErlangPid pid) {
     return new StepOverCommand(pid);
   }
 
   @NotNull
-  public static ErlangDebuggerCommand getStepOutCommand(@NotNull OtpErlangPid pid) {
+  public static Command getStepOutCommand(@NotNull OtpErlangPid pid) {
     return new StepOutCommand(pid);
   }
 
   @NotNull
-  public static ErlangDebuggerCommand getContinueCommand(@NotNull OtpErlangPid pid) {
+  public static Command getContinueCommand(@NotNull OtpErlangPid pid) {
     return new ContinueCommand(pid);
   }
 
   @NotNull
-  public static ErlangDebuggerCommand getRunTaskCommand() {
+  public static Command getRunTaskCommand() {
     return new RunTaskCommand();
   }
 
@@ -65,7 +66,7 @@ public final class Producer {
     }
   }
 
-  private static class SetBreakpointCommand implements ErlangDebuggerCommand {
+  private static class SetBreakpointCommand implements Command {
     private final String myModule;
     private final int myLine;
     private final String myFile;
@@ -88,7 +89,7 @@ public final class Producer {
     }
   }
 
-  private static abstract class AbstractPidCommand implements ErlangDebuggerCommand {
+  private static abstract class AbstractPidCommand implements Command {
     private final String myName;
     private final OtpErlangPid myPid;
 
@@ -122,7 +123,7 @@ public final class Producer {
     }
   }
 
-  private static class RemoveBreakpointCommand implements ErlangDebuggerCommand {
+  private static class RemoveBreakpointCommand implements Command {
     private final String myModule;
     private final int myLine;
 
@@ -142,16 +143,11 @@ public final class Producer {
     }
   }
 
-  private static class RunTaskCommand implements ErlangDebuggerCommand {
+  private static class RunTaskCommand implements Command {
     @NotNull
     @Override
     public OtpErlangTuple toMessage() {
       return new OtpErlangTuple(new OtpErlangAtom("run_task"));
     }
-  }
-
-  public interface ErlangDebuggerCommand {
-    @NotNull
-    OtpErlangTuple toMessage();
   }
 }
