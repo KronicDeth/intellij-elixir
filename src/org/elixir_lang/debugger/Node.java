@@ -83,19 +83,23 @@ public class Node {
   }
 
   public void stepInto() {
-    addCommand(new StepInto(myLastSuspendedPid));
+    OtpErlangPid pid = myLastSuspendedPid;
+    addCommand(new Pid("step_into", pid));
   }
 
   public void stepOver() {
-    addCommand(new StepOver(myLastSuspendedPid));
+    OtpErlangPid pid = myLastSuspendedPid;
+    addCommand(new Pid("step_over", pid));
   }
 
   public void stepOut() {
-    addCommand(new StepOut(myLastSuspendedPid));
+    OtpErlangPid pid = myLastSuspendedPid;
+    addCommand(new Pid("step_out", pid));
   }
 
   public void resume() {
-    addCommand(new Continue(myLastSuspendedPid));
+    OtpErlangPid pid = myLastSuspendedPid;
+    addCommand(new Pid("continue", pid));
   }
 
   private void addCommand(Command command) {

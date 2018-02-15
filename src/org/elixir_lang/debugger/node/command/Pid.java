@@ -7,7 +7,7 @@ import com.ericsson.otp.erlang.OtpErlangTuple;
 import org.elixir_lang.debugger.node.Command;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class Pid implements Command {
+public class Pid implements Command {
   private final String myName;
   private final OtpErlangPid myPid;
 
