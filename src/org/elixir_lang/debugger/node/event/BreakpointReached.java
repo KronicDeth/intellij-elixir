@@ -15,13 +15,14 @@
  * limitations under the License.
  */
 
-package org.elixir_lang.debugger.node.events;
+package org.elixir_lang.debugger.node.event;
 
 import com.ericsson.otp.erlang.OtpErlangList;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.ericsson.otp.erlang.OtpErlangPid;
 import com.ericsson.otp.erlang.OtpErlangTuple;
 import com.intellij.util.containers.ContainerUtil;
+import org.elixir_lang.debugger.Node;
 import org.elixir_lang.debugger.node.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,18 +31,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static org.elixir_lang.debugger.node.events.OtpErlangTermUtil.*;
+import static org.elixir_lang.debugger.node.event.OtpErlangTermUtil.*;
 
-class BreakpointReachedEvent extends ErlangDebuggerEvent {
+public class BreakpointReached extends Event {
   public static final String NAME = "breakpoint_reached";
 
   private final OtpErlangPid myActivePid;
   private final List<ProcessSnapshot> mySnapshots;
 
-  BreakpointReachedEvent(OtpErlangTuple breakpointReachedMessage) throws DebuggerEventFormatException {
+  public BreakpointReached(OtpErlangTuple breakpointReachedMessage) throws FormatException {
     OtpErlangPid activePid = getPidValue(elementAt(breakpointReachedMessage, 1));
     OtpErlangList snapshots = getListValue(elementAt(breakpointReachedMessage, 2));
-    if (activePid == null || snapshots == null) throw new DebuggerEventFormatException();
+    if (activePid == null || snapshots == null) throw new FormatException();
 
     myActivePid = activePid;
     mySnapshots = new ArrayList<>(snapshots.arity());
@@ -54,7 +55,7 @@ class BreakpointReachedEvent extends ErlangDebuggerEvent {
       List<TraceElement> stack = getStack(getListValue(elementAt(snapshotTuple, 4)));
 
       if (pid == null /*|| init == null*/ || status == null || info == null || stack == null) {
-        throw new DebuggerEventFormatException();
+        throw new FormatException();
       }
 
       if ("break".equals(status)) {
@@ -64,7 +65,7 @@ class BreakpointReachedEvent extends ErlangDebuggerEvent {
         String breakFile = getStringText(elementAt(infoTuple, 2));
 
         if (breakLine == null || breakModule == null || breakFile == null) {
-          throw new DebuggerEventFormatException();
+          throw new FormatException();
         }
         mySnapshots.add(new ProcessSnapshot(pid, stack));
       }
@@ -78,8 +79,8 @@ class BreakpointReachedEvent extends ErlangDebuggerEvent {
   }
 
   @Override
-  public void process(@NotNull DebuggerNode debuggerNode, @NotNull DebuggerEventListener eventListener) {
-    debuggerNode.processSuspended(myActivePid);
+  public void process(@NotNull Node node, @NotNull Listener eventListener) {
+    node.processSuspended(myActivePid);
     eventListener.breakpointReached(myActivePid, mySnapshots);
   }
 

@@ -15,27 +15,27 @@
  * limitations under the License.
  */
 
-package org.elixir_lang.debugger.node.events;
+package org.elixir_lang.debugger.node.event;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.ericsson.otp.erlang.OtpErlangTuple;
-import org.elixir_lang.debugger.node.DebuggerEventListener;
-import org.elixir_lang.debugger.node.DebuggerNode;
+import org.elixir_lang.debugger.node.Event;
+import org.elixir_lang.debugger.Node;
 
-class DebugRemoteNodeResponseEvent extends ErlangDebuggerEvent {
+public class DebugRemoteNodeResponse extends Event {
   public static final String NAME = "debug_remote_node_response";
 
   private final String myNodeName;
   private final String myError;
 
-  DebugRemoteNodeResponseEvent(OtpErlangTuple receivedMessage) throws DebuggerEventFormatException {
+  public DebugRemoteNodeResponse(OtpErlangTuple receivedMessage) throws FormatException {
     myNodeName = OtpErlangTermUtil.getAtomText(receivedMessage.elementAt(1));
     OtpErlangObject status = receivedMessage.elementAt(2);
     myError = "ok".equals(OtpErlangTermUtil.getAtomText(status)) ? null : status.toString();
   }
 
   @Override
-  public void process(DebuggerNode debuggerNode, DebuggerEventListener eventListener) {
+  public void process(Node node, Listener eventListener) {
     if (myError != null) {
       eventListener.failedToDebugRemoteNode(myNodeName, myError);
     }

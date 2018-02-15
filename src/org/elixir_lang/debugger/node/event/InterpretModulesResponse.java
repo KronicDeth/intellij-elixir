@@ -15,28 +15,28 @@
  * limitations under the License.
  */
 
-package org.elixir_lang.debugger.node.events;
+package org.elixir_lang.debugger.node.event;
 
 import com.ericsson.otp.erlang.OtpErlangList;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.ericsson.otp.erlang.OtpErlangTuple;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
-import org.elixir_lang.debugger.node.DebuggerEventListener;
-import org.elixir_lang.debugger.node.DebuggerNode;
+import org.elixir_lang.debugger.node.Event;
+import org.elixir_lang.debugger.Node;
 
 import java.util.ArrayList;
 import java.util.List;
 
-class InterpretModulesResponseEvent extends ErlangDebuggerEvent {
+public class InterpretModulesResponse extends Event {
   public static final String NAME = "interpret_modules_response";
   private final String myNodeName;
   private final List<String> myFailedToInterpretModules = new ArrayList<>();
 
-  InterpretModulesResponseEvent(OtpErlangTuple receivedMessage) throws DebuggerEventFormatException {
+  public InterpretModulesResponse(OtpErlangTuple receivedMessage) throws FormatException {
     myNodeName = OtpErlangTermUtil.getAtomText(receivedMessage.elementAt(1));
     OtpErlangList interpretModuleStatuses = OtpErlangTermUtil.getListValue(receivedMessage.elementAt(2));
-    if (interpretModuleStatuses == null || myNodeName == null) throw new DebuggerEventFormatException();
+    if (interpretModuleStatuses == null || myNodeName == null) throw new FormatException();
     for (OtpErlangObject status : interpretModuleStatuses) {
       OtpErlangTuple statusTuple = OtpErlangTermUtil.getTupleValue(status);
 
@@ -47,20 +47,20 @@ class InterpretModulesResponseEvent extends ErlangDebuggerEvent {
         VirtualFile erlFile = modulePath != null ? LocalFileSystem.getInstance().findFileByPath(modulePath) : null;
         module = erlFile != null ? erlFile.getNameWithoutExtension() : null;
       }
-      if (module == null) throw new DebuggerEventFormatException();
+      if (module == null) throw new FormatException();
 
       OtpErlangObject moduleStatusObject = OtpErlangTermUtil.elementAt(statusTuple, 1);
       if (moduleStatusObject instanceof OtpErlangTuple) {
         //here moduleStatusObject is a tuple {error, details} - we can use that to provide error messages.
         myFailedToInterpretModules.add(module);
       } else if (!OtpErlangTermUtil.isOkAtom(moduleStatusObject)) {
-        throw new DebuggerEventFormatException();
+        throw new FormatException();
       }
     }
   }
 
   @Override
-  public void process(DebuggerNode debuggerNode, DebuggerEventListener eventListener) {
+  public void process(Node node, Listener eventListener) {
     if (!myFailedToInterpretModules.isEmpty()) {
       eventListener.failedToInterpretModules(myNodeName, myFailedToInterpretModules);
     }

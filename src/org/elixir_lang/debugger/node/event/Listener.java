@@ -1,10 +1,11 @@
-package org.elixir_lang.debugger.node;
+package org.elixir_lang.debugger.node.event;
 
 import com.ericsson.otp.erlang.OtpErlangPid;
+import org.elixir_lang.debugger.node.ProcessSnapshot;
 
 import java.util.List;
 
-public interface DebuggerEventListener {
+public interface Listener {
   void debuggerStarted();
   void failedToInterpretModules(String nodeName, List<String> modules);
   void failedToDebugRemoteNode(String nodeName, String error);

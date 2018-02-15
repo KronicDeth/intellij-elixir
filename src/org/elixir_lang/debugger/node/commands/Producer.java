@@ -20,8 +20,8 @@ package org.elixir_lang.debugger.node.commands;
 import com.ericsson.otp.erlang.*;
 import org.jetbrains.annotations.NotNull;
 
-public final class DebuggerCommandsProducer {
-  private DebuggerCommandsProducer() {
+public final class Producer {
+  private Producer() {
   }
 
   @NotNull

@@ -478,7 +478,7 @@ public class BeamFileImpl extends ModuleElementImpl implements ModuleOwner, PsiC
     /**
      * Checks if an actual source or class file corresponds to the element. Non-physical elements include,
      * for example, PSI elements created for the watch expressions in the debugger.
-     * Non-physical elements do not generate tree change events.
+     * Non-physical elements do not generate tree change event.
      * Also, {@link PsiDocumentManager#getDocument(PsiFile)} returns null for non-physical elements.
      * Not to be confused with {@link FileViewProvider#isPhysical()}.
      *

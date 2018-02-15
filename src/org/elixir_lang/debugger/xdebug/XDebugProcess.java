@@ -47,9 +47,9 @@ import com.intellij.xdebugger.evaluation.EvaluationMode;
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
 import org.elixir_lang.ElixirFileType;
 import org.elixir_lang.debugger.Modules;
-import org.elixir_lang.debugger.node.DebuggerEventListener;
-import org.elixir_lang.debugger.node.DebuggerNode;
-import org.elixir_lang.debugger.node.DebuggerNodeException;
+import org.elixir_lang.debugger.node.event.Listener;
+import org.elixir_lang.debugger.Node;
+import org.elixir_lang.debugger.node.Exception;
 import org.elixir_lang.debugger.node.ProcessSnapshot;
 import org.elixir_lang.jps.builder.ParametersList;
 import org.elixir_lang.mix.runner.MixRunConfigurationBase;
@@ -67,11 +67,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static org.elixir_lang.debugger.DebuggerLog.LOG;
 
-class XDebugProcess extends com.intellij.xdebugger.XDebugProcess implements DebuggerEventListener {
+class XDebugProcess extends com.intellij.xdebugger.XDebugProcess implements Listener {
     @NotNull
     private final XBreakpointHandler<?>[] myBreakpointHandlers = new XBreakpointHandler[]{new LineBreakpointHandler(this)};
     @NotNull
-    private final DebuggerNode myDebuggerNode;
+    private final Node myNode;
     @NotNull
     private final OSProcessHandler myElixirProcessHandler;
     private final ExecutionEnvironment myExecutionEnvironment;
@@ -91,8 +91,8 @@ class XDebugProcess extends com.intellij.xdebugger.XDebugProcess implements Debu
 
         try {
             //TODO add the debugger node to disposable hierarchy (we may fail to initialize session so the session will not be stopped!)
-            myDebuggerNode = new DebuggerNode(this);
-        } catch (DebuggerNodeException e) {
+            myNode = new Node(this);
+        } catch (Exception e) {
             throw new ExecutionException(e);
         }
 
@@ -128,7 +128,7 @@ class XDebugProcess extends com.intellij.xdebugger.XDebugProcess implements Debu
         String moduleName = getModuleName(breakpointPosition);
         if (moduleName != null) {
             myPositionToLineBreakpointMap.put(breakpointPosition, breakpoint);
-            myDebuggerNode.setBreakpoint(moduleName, breakpointPosition.getFile().getPath(), breakpointPosition.getLine());
+            myNode.setBreakpoint(moduleName, breakpointPosition.getFile().getPath(), breakpointPosition.getLine());
         } else {
             final String message =
                     "Unable to determine module for breakpoint at " +
@@ -270,14 +270,14 @@ class XDebugProcess extends com.intellij.xdebugger.XDebugProcess implements Debu
         myPositionToLineBreakpointMap.remove(breakpointPosition);
         String moduleName = getModuleName(breakpointPosition);
         if (moduleName != null) {
-            myDebuggerNode.removeBreakpoint(moduleName, breakpointPosition.getLine());
+            myNode.removeBreakpoint(moduleName, breakpointPosition.getLine());
         }
     }
 
     @Override
     @SuppressWarnings("deprecation")
     public void resume() {
-        myDebuggerNode.resume();
+        myNode.resume();
     }
 
     @NotNull
@@ -299,7 +299,7 @@ class XDebugProcess extends com.intellij.xdebugger.XDebugProcess implements Debu
         mixParametersList.addAll(
                 "intellij_elixir.debug_task",
                 "--debugger-port",
-                Integer.toString(myDebuggerNode.getLocalDebuggerPort()),
+                Integer.toString(myNode.getLocalDebuggerPort()),
                 "--"
         );
         MixRunConfigurationBase mixRunConfigurationBase = getRunConfiguration();
@@ -320,7 +320,7 @@ class XDebugProcess extends com.intellij.xdebugger.XDebugProcess implements Debu
         Process process = commandLine.createProcess();
         elixirProcessHandler = new ColoredProcessHandler(process, commandLine.getCommandLineString());
 
-        LOG.debug("Debugger process started.");
+        LOG.debug("Event process started.");
         return elixirProcessHandler;
     }
 
@@ -332,30 +332,30 @@ class XDebugProcess extends com.intellij.xdebugger.XDebugProcess implements Debu
 
     @Override
     public void sessionInitialized() {
-        myDebuggerNode.runTask();
+        myNode.runTask();
     }
 
     @Override
     @SuppressWarnings("deprecation")
     public void startStepInto() {
-        myDebuggerNode.stepInto();
+        myNode.stepInto();
     }
 
     @Override
     @SuppressWarnings("deprecation")
     public void startStepOut() {
-        myDebuggerNode.stepOut();
+        myNode.stepOut();
     }
 
     @Override
     @SuppressWarnings("deprecation")
     public void startStepOver() {
-        myDebuggerNode.stepOver();
+        myNode.stepOver();
     }
 
     @Override
     public void stop() {
-        myDebuggerNode.stop();
+        myNode.stop();
     }
 
     @Override

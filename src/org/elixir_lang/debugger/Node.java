@@ -1,11 +1,13 @@
-package org.elixir_lang.debugger.node;
+package org.elixir_lang.debugger;
 
 import com.ericsson.otp.erlang.*;
 import com.intellij.concurrency.AsyncFutureFactory;
 import com.intellij.concurrency.AsyncFutureResult;
 import com.intellij.openapi.application.ApplicationManager;
-import org.elixir_lang.debugger.node.commands.DebuggerCommandsProducer;
-import org.elixir_lang.debugger.node.events.ErlangDebuggerEvent;
+import org.elixir_lang.debugger.node.event.Listener;
+import org.elixir_lang.debugger.node.Exception;
+import org.elixir_lang.debugger.node.Event;
+import org.elixir_lang.debugger.node.commands.Producer;
 import org.elixir_lang.utils.ElixirModulesUtil;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -26,27 +28,27 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.elixir_lang.debugger.DebuggerLog.LOG;
 
-public class DebuggerNode {
+public class Node {
   private static final int RECEIVE_TIMEOUT = 50;
   private static final int RETRIES_ON_TIMEOUT = 10;
 
   private OtpErlangPid myLastSuspendedPid;
 
-  private final Queue<DebuggerCommandsProducer.ErlangDebuggerCommand> myCommandsQueue = new LinkedList<>();
+  private final Queue<Producer.ErlangDebuggerCommand> myCommandsQueue = new LinkedList<>();
   private int myLocalDebuggerPort = -1;
   @NotNull
-  private final DebuggerEventListener myEventListener;
+  private final Listener myEventListener;
   @NotNull
   private AtomicBoolean myStopped = new AtomicBoolean(false);
 
-  public DebuggerNode(@NotNull DebuggerEventListener eventListener) throws DebuggerNodeException {
+  public Node(@NotNull Listener eventListener) throws Exception {
     myEventListener = eventListener;
     LOG.debug("Starting debugger server.");
     try {
       myLocalDebuggerPort = runDebuggerServer().get();
     }
     catch (Throwable e) {
-      throw new DebuggerNodeException("Failed to start debugger server", e);
+      throw new Exception("Failed to start debugger server", e);
     }
   }
 
@@ -68,34 +70,34 @@ public class DebuggerNode {
   }
 
   public void setBreakpoint(@NotNull String module, @NotNull String file, int line) {
-    addCommand(DebuggerCommandsProducer.getSetBreakpointCommand(ElixirModulesUtil.INSTANCE.elixirModuleNameToErlang(module), line, file));
+    addCommand(Producer.getSetBreakpointCommand(ElixirModulesUtil.INSTANCE.elixirModuleNameToErlang(module), line, file));
   }
 
   public void removeBreakpoint(@NotNull String module, int line) {
-    addCommand(DebuggerCommandsProducer.getRemoveBreakpointCommand(ElixirModulesUtil.INSTANCE.elixirModuleNameToErlang(module), line));
+    addCommand(Producer.getRemoveBreakpointCommand(ElixirModulesUtil.INSTANCE.elixirModuleNameToErlang(module), line));
   }
 
   public void runTask() {
-    addCommand(DebuggerCommandsProducer.getRunTaskCommand());
+    addCommand(Producer.getRunTaskCommand());
   }
 
   public void stepInto() {
-    addCommand(DebuggerCommandsProducer.getStepIntoCommand(myLastSuspendedPid));
+    addCommand(Producer.getStepIntoCommand(myLastSuspendedPid));
   }
 
   public void stepOver() {
-    addCommand(DebuggerCommandsProducer.getStepOverCommand(myLastSuspendedPid));
+    addCommand(Producer.getStepOverCommand(myLastSuspendedPid));
   }
 
   public void stepOut() {
-    addCommand(DebuggerCommandsProducer.getStepOutCommand(myLastSuspendedPid));
+    addCommand(Producer.getStepOutCommand(myLastSuspendedPid));
   }
 
   public void resume() {
-    addCommand(DebuggerCommandsProducer.getContinueCommand(myLastSuspendedPid));
+    addCommand(Producer.getContinueCommand(myLastSuspendedPid));
   }
 
-  private void addCommand(DebuggerCommandsProducer.ErlangDebuggerCommand command) {
+  private void addCommand(Producer.ErlangDebuggerCommand command) {
     synchronized (myCommandsQueue) {
       myCommandsQueue.add(command);
     }
@@ -110,7 +112,7 @@ public class DebuggerNode {
 
   private void runDebuggerServerImpl(@NotNull AsyncFutureResult<Integer> portFuture) {
     try {
-      Exception cachedException = null;
+      java.lang.Exception cachedException = null;
       LOG.debug("Opening a server socket.");
 
       try (ServerSocket serverSocket = new ServerSocket(0)) {
@@ -119,19 +121,19 @@ public class DebuggerNode {
         LOG.debug("Listening on port " + serverSocket.getLocalPort() + ".");
 
         try (Socket debuggerSocket = serverSocket.accept()) {
-          LOG.debug("Debugger connected, closing the server socket.");
+          LOG.debug("Event connected, closing the server socket.");
           serverSocket.close();
           myEventListener.debuggerStarted();
           LOG.debug("Starting send/receive loop.");
           serverLoop(debuggerSocket);
-        } catch (Exception e) {
+        } catch (java.lang.Exception e) {
           cachedException = e;
           throw e;
         } finally {
           myStopped.set(true);
           myEventListener.debuggerStopped();
         }
-      } catch (Exception e) {
+      } catch (java.lang.Exception e) {
         if (cachedException != null && cachedException != e) {
           if (e.getCause() == null) {
             e.initCause(cachedException);
@@ -142,7 +144,7 @@ public class DebuggerNode {
         throw e;
       }
     }
-    catch (Exception th) {
+    catch (java.lang.Exception th) {
       if (!portFuture.isDone()) {
         portFuture.setException(th);
       }
@@ -171,7 +173,7 @@ public class DebuggerNode {
 
     LOG.debug("Message received: " + String.valueOf(receivedMessage));
 
-    ErlangDebuggerEvent event = ErlangDebuggerEvent.create(receivedMessage);
+    Event event = Event.create(receivedMessage);
     boolean messageRecognized = event != null;
     if (messageRecognized) {
       event.process(this, myEventListener);

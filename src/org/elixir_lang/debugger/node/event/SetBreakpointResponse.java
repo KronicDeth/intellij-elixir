@@ -15,15 +15,15 @@
  * limitations under the License.
  */
 
-package org.elixir_lang.debugger.node.events;
+package org.elixir_lang.debugger.node.event;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.ericsson.otp.erlang.OtpErlangTuple;
-import org.elixir_lang.debugger.node.DebuggerEventListener;
-import org.elixir_lang.debugger.node.DebuggerNode;
+import org.elixir_lang.debugger.node.Event;
+import org.elixir_lang.debugger.Node;
 import org.jetbrains.annotations.NotNull;
 
-class SetBreakpointResponseEvent extends ErlangDebuggerEvent {
+public class SetBreakpointResponse extends Event {
   public static final String NAME = "set_breakpoint_response";
 
   private final String myModule;
@@ -31,12 +31,12 @@ class SetBreakpointResponseEvent extends ErlangDebuggerEvent {
   private final String myError;
   private final String myFile;
 
-  SetBreakpointResponseEvent(@NotNull OtpErlangTuple message) throws DebuggerEventFormatException {
+  public SetBreakpointResponse(@NotNull OtpErlangTuple message) throws FormatException {
     myModule = OtpErlangTermUtil.getAtomText(message.elementAt(1));
-    if (myModule == null) throw new DebuggerEventFormatException();
+    if (myModule == null) throw new FormatException();
 
     Integer line = OtpErlangTermUtil.getIntegerValue(message.elementAt(2));
-    if (line == null) throw new DebuggerEventFormatException();
+    if (line == null) throw new FormatException();
     myLine = line - 1;
 
     myFile = OtpErlangTermUtil.getStringText(message.elementAt(4));
@@ -47,16 +47,16 @@ class SetBreakpointResponseEvent extends ErlangDebuggerEvent {
     }
     else if (statusObject instanceof OtpErlangTuple) {
       OtpErlangTuple errorTuple = (OtpErlangTuple) statusObject;
-      if (!OtpErlangTermUtil.isErrorAtom(errorTuple.elementAt(0))) throw new DebuggerEventFormatException();
+      if (!OtpErlangTermUtil.isErrorAtom(errorTuple.elementAt(0))) throw new FormatException();
       myError = OtpErlangTermUtil.toString(errorTuple.elementAt(1));
     }
     else {
-      throw new DebuggerEventFormatException();
+      throw new FormatException();
     }
   }
 
   @Override
-  public void process(DebuggerNode debuggerNode, @NotNull DebuggerEventListener eventListener) {
+  public void process(Node node, @NotNull Listener eventListener) {
     if (myError == null) {
       eventListener.breakpointIsSet(myModule, myFile, myLine);
     }

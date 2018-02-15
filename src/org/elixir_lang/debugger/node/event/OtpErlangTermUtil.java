@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.elixir_lang.debugger.node.events;
+package org.elixir_lang.debugger.node.event;
 
 import com.ericsson.otp.erlang.*;
 import com.intellij.openapi.util.text.StringUtil;
@@ -25,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 
 import static org.elixir_lang.debugger.XValuePresentation.toUtf8String;
 
-final class OtpErlangTermUtil {
+public final class OtpErlangTermUtil {
   private OtpErlangTermUtil() {
   }
 
@@ -60,12 +60,12 @@ final class OtpErlangTermUtil {
 
   @Contract(value = "null -> null", pure = true)
   @Nullable
-  static OtpErlangPid getPidValue(@Nullable OtpErlangObject pidObject) {
+  public static OtpErlangPid getPidValue(@Nullable OtpErlangObject pidObject) {
     return pidObject instanceof OtpErlangPid ? (OtpErlangPid) pidObject : null;
   }
 
   @Nullable
-  static String getAtomText(@Nullable OtpErlangObject atomObject) {
+  public static String getAtomText(@Nullable OtpErlangObject atomObject) {
     OtpErlangAtom atom = atomObject instanceof OtpErlangAtom ? (OtpErlangAtom) atomObject : null;
     return atom != null ? atom.atomValue() : null;
   }

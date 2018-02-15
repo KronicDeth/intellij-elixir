@@ -1,6 +1,5 @@
 /*
  * Copyright 2012-2014 Sergey Ignatov
- * Copyright 2017 Luke Imhoff
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +14,7 @@
  * limitations under the License.
  */
 
-package org.elixir_lang.debugger.node.events;
+package org.elixir_lang.debugger.node.event;
 
-import com.ericsson.otp.erlang.OtpErlangTuple;
-import org.elixir_lang.debugger.node.DebuggerEventListener;
-import org.elixir_lang.debugger.node.DebuggerNode;
-
-class UnknownMessageEvent extends ErlangDebuggerEvent {
-  private final String myUnknownMessageText;
-
-  UnknownMessageEvent(OtpErlangTuple message) {
-    myUnknownMessageText = message.toString();
-  }
-
-  @Override
-  public void process(DebuggerNode debuggerNode, DebuggerEventListener eventListener) {
-    eventListener.unknownMessage(myUnknownMessageText);
-  }
+public class FormatException extends Exception {
 }

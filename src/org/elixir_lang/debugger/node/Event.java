@@ -14,33 +14,33 @@
  * limitations under the License.
  */
 
-package org.elixir_lang.debugger.node.events;
+package org.elixir_lang.debugger.node;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.ericsson.otp.erlang.OtpErlangTuple;
-import org.elixir_lang.debugger.node.DebuggerEventListener;
-import org.elixir_lang.debugger.node.DebuggerNode;
+import org.elixir_lang.debugger.Node;
+import org.elixir_lang.debugger.node.event.*;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class ErlangDebuggerEvent {
+public abstract class Event {
 
-  public abstract void process(DebuggerNode debuggerNode, DebuggerEventListener eventListener);
+  public abstract void process(Node node, Listener eventListener);
 
   @Nullable
-  public static ErlangDebuggerEvent create(OtpErlangObject message) {
+  public static Event create(OtpErlangObject message) {
     if (!(message instanceof OtpErlangTuple)) return null;
     OtpErlangTuple messageTuple = (OtpErlangTuple) message;
     String messageName = OtpErlangTermUtil.getAtomText(messageTuple.elementAt(0));
     if (messageName == null) return null;
 
     try {
-      if (InterpretModulesResponseEvent.NAME.equals(messageName)) return new InterpretModulesResponseEvent(messageTuple);
-      if (SetBreakpointResponseEvent.NAME.equals(messageName)) return new SetBreakpointResponseEvent(messageTuple);
-      if (BreakpointReachedEvent.NAME.equals(messageName)) return new BreakpointReachedEvent(messageTuple);
-      if (DebugRemoteNodeResponseEvent.NAME.equals(messageName)) return new DebugRemoteNodeResponseEvent(messageTuple);
-    } catch (DebuggerEventFormatException e) {
-      return new UnknownMessageEvent(messageTuple);
+      if (InterpretModulesResponse.NAME.equals(messageName)) return new InterpretModulesResponse(messageTuple);
+      if (SetBreakpointResponse.NAME.equals(messageName)) return new SetBreakpointResponse(messageTuple);
+      if (BreakpointReached.NAME.equals(messageName)) return new BreakpointReached(messageTuple);
+      if (DebugRemoteNodeResponse.NAME.equals(messageName)) return new DebugRemoteNodeResponse(messageTuple);
+    } catch (FormatException e) {
+      return new UnknownMessage(messageTuple);
     }
-    return new UnknownMessageEvent(messageTuple);
+    return new UnknownMessage(messageTuple);
   }
 }

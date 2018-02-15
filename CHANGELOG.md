@@ -341,7 +341,7 @@
     | < 1.6.0  | `%ExUnit.TestCase{}` | `:case_started`   | `:case_finished`   | `case`                 |
     | >= 1.6.0 | `%ExUnit.TestCase{}` | `:module_started` | `:module_finished` | `module`               |
 
-    Because Elixir 1.6.0 could not introduce a breaking change, the `< 1.6.0` events are fired, but `resources/exunit/1.6.0/team_city_ex_unit_formatting.ex` will ignore them and only convert the `>= 1.6.0` events to TeamCity event used in the JetBrains Test Runner UI.
+    Because Elixir 1.6.0 could not introduce a breaking change, the `< 1.6.0` event are fired, but `resources/exunit/1.6.0/team_city_ex_unit_formatting.ex` will ignore them and only convert the `>= 1.6.0` event to TeamCity event used in the JetBrains Test Runner UI.
 * [#1018](https://github.com/KronicDeth/intellij-elixir/pull/1018) - Expose Declarations > Functions and Declarations > Macros in Color Settings - [@dimcha](https://github.com/dimcha)
 
 ### Bug Fixes
@@ -727,7 +727,7 @@
 * [#738](https://github.com/KronicDeth/intellij-elixir/pull/738) - [@KronicDeth](https://github.com/KronicDeth)
   *  `TeamCityExUnitFormatting.put_event`
     * Always match on `%__MODULE__{}` for state in clauses to prevent state update errors
-    * Match on `:suite_finished` and `:suite_started` events, so that only events added to the interface will be unknown and `IO.warn` can be used tell anyone spotting the new event to file an issue.
+    * Match on `:suite_finished` and `:suite_started` event, so that only event added to the interface will be unknown and `IO.warn` can be used tell anyone spotting the new event to file an issue.
 * [#741](https://github.com/KronicDeth/intellij-elixir/pull/741) - Instead of pinning position (`1` for lines or `3` for heredocs), `pin` `*_PROMOTER` token, so it's more obvious the pattern is that the promoter is pinned. - [@KronicDeth](https://github.com/KronicDeth)
 * [#747](https://github.com/KronicDeth/intellij-elixir/pull/747) - Regression test for [#659](https://github.com/KronicDeth/intellij-elixir/issues/659) - [@KronicDeth](https://github.com/KronicDeth)
 * [#629](https://github.com/KronicDeth/intellij-elixir/pull/629) - Search for Elixir SDKs in `/nix/store` on Mac if homebrew path does not exist - [@KronicDeth](https://github.com/KronicDeth)
