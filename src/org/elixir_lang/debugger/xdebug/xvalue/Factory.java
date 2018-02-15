@@ -22,50 +22,50 @@ import com.intellij.xdebugger.frame.XValue;
 import org.elixir_lang.debugger.XValuePresentation;
 import org.jetbrains.annotations.NotNull;
 
-public final class XValueFactory {
-  private XValueFactory() {
+public final class Factory {
+  private Factory() {
   }
 
   @NotNull
   public static XValue create(OtpErlangObject object) {
     if (object instanceof OtpErlangLong || object instanceof OtpErlangDouble) {
-      return new NumericXValue(object);
+      return new Numeric(object);
     }
     if (object instanceof OtpErlangAtom) {
-      return new AtomXValue((OtpErlangAtom) object);
+      return new Atom((OtpErlangAtom) object);
     }
     if (object instanceof OtpErlangPid) {
-      return new PidXValue((OtpErlangPid) object);
+      return new Pid((OtpErlangPid) object);
     }
     if (object instanceof OtpErlangPort) {
-      return new PortXValue((OtpErlangPort) object);
+      return new Port((OtpErlangPort) object);
     }
     if (object instanceof OtpErlangRef) {
-      return new RefXValue((OtpErlangRef) object);
+      return new Ref((OtpErlangRef) object);
     }
     if (object instanceof OtpErlangTuple) {
-      return new TupleXValue((OtpErlangTuple) object);
+      return new Tuple((OtpErlangTuple) object);
     }
     if (object instanceof OtpErlangString) {
       if (XValuePresentation.isPrintable((OtpErlangString)object)) {
-        return new CharListXValue((OtpErlangString) object);
+        return new CharList((OtpErlangString) object);
       } else {
-        return new ListXValue(new OtpErlangList(((OtpErlangString) object).stringValue()));
+        return new List(new OtpErlangList(((OtpErlangString) object).stringValue()));
       }
     }
     if (object instanceof OtpErlangList) {
-      return new ListXValue((OtpErlangList) object);
+      return new List((OtpErlangList) object);
     }
     if (object instanceof OtpErlangBitstr) {
       if (XValuePresentation.toUtf8String((OtpErlangBitstr)object) != null) {
-        return new StringXValue((OtpErlangBitstr) object);
+        return new String((OtpErlangBitstr) object);
       } else {
-        return new BitStringXValue((OtpErlangBitstr) object);
+        return new BitString((OtpErlangBitstr) object);
       }
     }
     if (object instanceof OtpErlangMap) {
-      return new MapXValue((OtpErlangMap) object);
+      return new Map((OtpErlangMap) object);
     }
-    return new PrimitiveXValueBase<>(object);
+    return new PrimitiveBase<>(object);
   }
 }

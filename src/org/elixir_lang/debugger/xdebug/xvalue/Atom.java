@@ -18,10 +18,10 @@
 
 package org.elixir_lang.debugger.xdebug.xvalue;
 
-import com.ericsson.otp.erlang.OtpErlangBitstr;
+import com.ericsson.otp.erlang.OtpErlangAtom;
 
-class StringXValue extends PrimitiveXValueBase<OtpErlangBitstr> {
-  StringXValue(OtpErlangBitstr value) {
+class Atom extends PrimitiveBase<OtpErlangAtom> {
+  Atom(OtpErlangAtom value) {
     super(value);
   }
 }

@@ -18,26 +18,28 @@
 
 package org.elixir_lang.debugger.xdebug.xvalue;
 
-import com.ericsson.otp.erlang.OtpErlangString;
-import com.intellij.xdebugger.frame.ImmediateFullValueEvaluator;
-import com.intellij.xdebugger.frame.XValueNode;
-import com.intellij.xdebugger.frame.XValuePlace;
+import com.ericsson.otp.erlang.OtpErlangAtom;
+import com.ericsson.otp.erlang.OtpErlangMap;
+import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.xdebugger.frame.XValueChildrenList;
 import org.elixir_lang.debugger.XValuePresentation;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-class CharListXValue extends PrimitiveXValueBase<OtpErlangString> {
-  CharListXValue(OtpErlangString value) {
-    super(value);
+public class Map extends Base<OtpErlangMap> {
+  Map(@NotNull OtpErlangMap value) {
+    super(value, value.arity());
   }
 
-  @Nullable
   @Override
-  protected com.intellij.xdebugger.frame.presentation.XValuePresentation getPresentation(@NotNull XValueNode node, @NotNull XValuePlace place) {
-    String text = getValue().stringValue();
-    if (text.length() > XValueNode.MAX_VALUE_LENGTH) {
-      node.setFullValueEvaluator(new ImmediateFullValueEvaluator(text));
+  protected void computeChild(XValueChildrenList children, int childIdx) {
+    OtpErlangObject key = getValue().keys()[childIdx];
+    OtpErlangObject value = getValue().get(key);
+
+    if (XValuePresentation.hasSymbolKeys(getValue()) && key instanceof OtpErlangAtom) {
+      java.lang.String keyStr = ((OtpErlangAtom)key).atomValue();
+      if (!keyStr.equals("__struct__")) addNamedChild(children, value, keyStr);
+    } else {
+      addIndexedChild(children, new Mapping(key, value), childIdx);
     }
-    return new XValuePresentation(getValue());
   }
 }

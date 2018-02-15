@@ -18,21 +18,43 @@
 
 package org.elixir_lang.debugger.xdebug.xvalue;
 
-import com.ericsson.otp.erlang.OtpErlangPort;
+import com.ericsson.otp.erlang.OtpErlangObject;
+import com.ericsson.otp.erlang.OtpErlangTuple;
 import com.intellij.xdebugger.frame.XCompositeNode;
 import com.intellij.xdebugger.frame.XValueChildrenList;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class PortXValue extends XValueBase<OtpErlangPort> {
-  PortXValue(OtpErlangPort value) {
-    super(value, 2);
+class Mapping extends Base<OtpErlangTuple> {
+  Mapping(OtpErlangObject key, OtpErlangObject value) {
+    super(new OtpErlangTuple(new OtpErlangObject[]{key, value}), 2);
   }
 
   @Override
   public void computeChildren(@NotNull XCompositeNode node) {
-    XValueChildrenList childrenList = new XValueChildrenList(2);
-    addNamedChild(childrenList, getValue().node(), "node");
-    addNamedChild(childrenList, getValue().id(), "id");
-    node.addChildren(childrenList, true);
+    XValueChildrenList children = new XValueChildrenList(2);
+    addNamedChild(children, getMappingKey(), "key");
+    addNamedChild(children, getMappingValue(), "value");
+    node.addChildren(children, true);
+  }
+
+  @Nullable
+  @Override
+  protected java.lang.String getType() {
+    return "Mapping";
+  }
+
+  @NotNull
+  @Override
+  protected java.lang.String getStringRepr() {
+    return getMappingKey() + " => " + getMappingValue();
+  }
+
+  private OtpErlangObject getMappingKey() {
+    return getValue().elementAt(0);
+  }
+
+  private OtpErlangObject getMappingValue() {
+    return getValue().elementAt(1);
   }
 }

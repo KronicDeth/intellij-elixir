@@ -29,16 +29,16 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
-class XValueBase<T extends OtpErlangObject> extends XValue {
+class Base<T extends OtpErlangObject> extends XValue {
   private final T myValue;
   private final int myChildrenCount;
   private int myNextChildIdxToCompute;
 
-  XValueBase(T value) {
+  Base(T value) {
     this(value, 0);
   }
 
-  XValueBase(T value, int childrenCount) {
+  Base(T value, int childrenCount) {
     myValue = value;
     myChildrenCount = childrenCount;
   }
@@ -69,7 +69,7 @@ class XValueBase<T extends OtpErlangObject> extends XValue {
       node.setPresentation(getIcon(), presentation, hasChildren());
     }
     else {
-      String repr = getStringRepr();
+      java.lang.String repr = getStringRepr();
       if (repr.length() > XValueNode.MAX_VALUE_LENGTH) {
         node.setFullValueEvaluator(new ImmediateFullValueEvaluator(repr));
         repr = repr.substring(0, XValueNode.MAX_VALUE_LENGTH - 3) + "...";
@@ -92,12 +92,12 @@ class XValueBase<T extends OtpErlangObject> extends XValue {
   }
 
   @Nullable
-  String getType() {
+  java.lang.String getType() {
     return null;
   }
 
   @NotNull
-  String getStringRepr() {
+  java.lang.String getStringRepr() {
     return getValue().toString();
   }
 
@@ -114,34 +114,34 @@ class XValueBase<T extends OtpErlangObject> extends XValue {
   }
 
   static void addIndexedChild(@NotNull XValueChildrenList childrenList, OtpErlangObject child, int childIdx) {
-    addIndexedChild(childrenList, XValueFactory.create(child), childIdx);
+    addIndexedChild(childrenList, Factory.create(child), childIdx);
   }
 
   static void addIndexedChild(@NotNull XValueChildrenList childrenList, @NotNull XValue child, int childIdx) {
     addNamedChild(childrenList, child, "[" + (childIdx + 1) + "]");
   }
 
-  static void addNamedChild(@NotNull XValueChildrenList childrenList, long numericChild, String name) {
+  static void addNamedChild(@NotNull XValueChildrenList childrenList, long numericChild, java.lang.String name) {
     addNamedChild(childrenList, new OtpErlangLong(numericChild), name);
   }
 
   static void addNamedChild(@NotNull XValueChildrenList childrenList,
-                            @NotNull String atomicChild,
-                            @SuppressWarnings("SameParameterValue") String name) {
+                            @NotNull java.lang.String atomicChild,
+                            @SuppressWarnings("SameParameterValue") java.lang.String name) {
     addNamedChild(childrenList, new OtpErlangAtom(atomicChild), name);
   }
 
-  static void addNamedChild(@NotNull XValueChildrenList childrenList, OtpErlangObject child, String name) {
-    addNamedChild(childrenList, XValueFactory.create(child), name);
+  static void addNamedChild(@NotNull XValueChildrenList childrenList, OtpErlangObject child, java.lang.String name) {
+    addNamedChild(childrenList, Factory.create(child), name);
   }
 
-  private static void addNamedChild(@NotNull XValueChildrenList childrenList, @NotNull XValue child, String name) {
+  private static void addNamedChild(@NotNull XValueChildrenList childrenList, @NotNull XValue child, java.lang.String name) {
     childrenList.add(name, child);
   }
 }
 
-class PrimitiveXValueBase<T extends OtpErlangObject> extends XValueBase<T> {
-  PrimitiveXValueBase(T value) {
+class PrimitiveBase<T extends OtpErlangObject> extends Base<T> {
+  PrimitiveBase(T value) {
     super(value);
   }
 
@@ -151,8 +151,8 @@ class PrimitiveXValueBase<T extends OtpErlangObject> extends XValueBase<T> {
   }
 }
 
-class ArrayXValueBase<T extends OtpErlangObject> extends XValueBase<T> {
-  ArrayXValueBase(T value, int childrenCount) {
+class ArrayBase<T extends OtpErlangObject> extends Base<T> {
+  ArrayBase(T value, int childrenCount) {
     super(value, childrenCount);
   }
 

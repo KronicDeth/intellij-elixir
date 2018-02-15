@@ -18,22 +18,10 @@
 
 package org.elixir_lang.debugger.xdebug.xvalue;
 
-import com.ericsson.otp.erlang.OtpErlangPid;
-import com.intellij.xdebugger.frame.XCompositeNode;
-import com.intellij.xdebugger.frame.XValueChildrenList;
-import org.jetbrains.annotations.NotNull;
+import com.ericsson.otp.erlang.OtpErlangBitstr;
 
-class PidXValue extends XValueBase<OtpErlangPid> {
-  PidXValue(OtpErlangPid value) {
-    super(value, 3);
-  }
-
-  @Override
-  public void computeChildren(@NotNull XCompositeNode node) {
-    XValueChildrenList childrenList = new XValueChildrenList(3);
-    addNamedChild(childrenList, getValue().node(), "node");
-    addNamedChild(childrenList, getValue().id(), "id");
-    addNamedChild(childrenList, getValue().serial(), "serial");
-    node.addChildren(childrenList, true);
+class String extends PrimitiveBase<OtpErlangBitstr> {
+  String(OtpErlangBitstr value) {
+    super(value);
   }
 }

@@ -18,22 +18,17 @@
 
 package org.elixir_lang.debugger.xdebug.xvalue;
 
-import com.ericsson.otp.erlang.OtpErlangObject;
-import com.intellij.xdebugger.frame.XValueNode;
-import com.intellij.xdebugger.frame.XValuePlace;
-import com.intellij.xdebugger.frame.presentation.XNumericValuePresentation;
-import com.intellij.xdebugger.frame.presentation.XValuePresentation;
+import com.ericsson.otp.erlang.OtpErlangBitstr;
+import com.intellij.xdebugger.frame.XValueChildrenList;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-class NumericXValue extends PrimitiveXValueBase<OtpErlangObject> {
-  NumericXValue(OtpErlangObject value) {
-    super(value);
+class BitString extends ArrayBase<OtpErlangBitstr> {
+  BitString(@NotNull OtpErlangBitstr value) {
+    super(value, value.binaryValue().length);
   }
 
-  @Nullable
   @Override
-  protected XValuePresentation getPresentation(@NotNull XValueNode node, @NotNull XValuePlace place) {
-    return new XNumericValuePresentation(getValue().toString());
+  protected void computeChild(@NotNull XValueChildrenList children, int childIdx) {
+    addIndexedChild(children, getValue().binaryValue()[childIdx] & 0xFF, childIdx);
   }
 }

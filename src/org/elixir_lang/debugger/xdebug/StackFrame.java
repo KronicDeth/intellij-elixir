@@ -29,7 +29,7 @@ import com.intellij.xdebugger.frame.XValue;
 import com.intellij.xdebugger.frame.XValueChildrenList;
 import org.elixir_lang.debugger.node.TraceElement;
 import org.elixir_lang.debugger.node.VariableBinding;
-import org.elixir_lang.debugger.xdebug.xvalue.XValueFactory;
+import org.elixir_lang.debugger.xdebug.xvalue.Factory;
 import org.elixir_lang.utils.ElixirModulesUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -72,6 +72,6 @@ class StackFrame extends XStackFrame {
 
   @NotNull
   private static XValue getVariableValue(OtpErlangObject value) {
-    return XValueFactory.create(value);
+    return Factory.create(value);
   }
 }

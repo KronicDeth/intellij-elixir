@@ -18,24 +18,17 @@
 
 package org.elixir_lang.debugger.xdebug.xvalue;
 
-import com.ericsson.otp.erlang.OtpErlangRef;
-import com.intellij.xdebugger.frame.XCompositeNode;
+import com.ericsson.otp.erlang.OtpErlangTuple;
 import com.intellij.xdebugger.frame.XValueChildrenList;
 import org.jetbrains.annotations.NotNull;
 
-public class RefXValue extends XValueBase<OtpErlangRef> {
-  RefXValue(@NotNull OtpErlangRef value) {
-    super(value, 1 + value.ids().length);
+class Tuple extends ArrayBase<OtpErlangTuple> {
+  Tuple(@NotNull OtpErlangTuple value) {
+    super(value, value.arity());
   }
 
   @Override
-  public void computeChildren(@NotNull XCompositeNode node) {
-    int[] ids = getValue().ids();
-    XValueChildrenList children = new XValueChildrenList(1 + ids.length);
-    addNamedChild(children, getValue().node(), "node");
-    for (int i = 0; i < ids.length; i++) {
-      addNamedChild(children, ids[i], "id" + i);
-    }
-    node.addChildren(children, true);
+  protected void computeChild(@NotNull XValueChildrenList children, int childIdx) {
+    addIndexedChild(children, getValue().elementAt(childIdx), childIdx);
   }
 }

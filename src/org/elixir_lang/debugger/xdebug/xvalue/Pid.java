@@ -18,28 +18,22 @@
 
 package org.elixir_lang.debugger.xdebug.xvalue;
 
-import com.ericsson.otp.erlang.OtpErlangAtom;
-import com.ericsson.otp.erlang.OtpErlangMap;
-import com.ericsson.otp.erlang.OtpErlangObject;
+import com.ericsson.otp.erlang.OtpErlangPid;
+import com.intellij.xdebugger.frame.XCompositeNode;
 import com.intellij.xdebugger.frame.XValueChildrenList;
-import org.elixir_lang.debugger.XValuePresentation;
 import org.jetbrains.annotations.NotNull;
 
-public class MapXValue extends XValueBase<OtpErlangMap> {
-  MapXValue(@NotNull OtpErlangMap value) {
-    super(value, value.arity());
+class Pid extends Base<OtpErlangPid> {
+  Pid(OtpErlangPid value) {
+    super(value, 3);
   }
 
   @Override
-  protected void computeChild(XValueChildrenList children, int childIdx) {
-    OtpErlangObject key = getValue().keys()[childIdx];
-    OtpErlangObject value = getValue().get(key);
-
-    if (XValuePresentation.hasSymbolKeys(getValue()) && key instanceof OtpErlangAtom) {
-      String keyStr = ((OtpErlangAtom)key).atomValue();
-      if (!keyStr.equals("__struct__")) addNamedChild(children, value, keyStr);
-    } else {
-      addIndexedChild(children, new MappingXValue(key, value), childIdx);
-    }
+  public void computeChildren(@NotNull XCompositeNode node) {
+    XValueChildrenList childrenList = new XValueChildrenList(3);
+    addNamedChild(childrenList, getValue().node(), "node");
+    addNamedChild(childrenList, getValue().id(), "id");
+    addNamedChild(childrenList, getValue().serial(), "serial");
+    node.addChildren(childrenList, true);
   }
 }

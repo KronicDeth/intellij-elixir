@@ -18,17 +18,17 @@
 
 package org.elixir_lang.debugger.xdebug.xvalue;
 
-import com.ericsson.otp.erlang.OtpErlangBitstr;
+import com.ericsson.otp.erlang.OtpErlangList;
 import com.intellij.xdebugger.frame.XValueChildrenList;
 import org.jetbrains.annotations.NotNull;
 
-class BitStringXValue extends ArrayXValueBase<OtpErlangBitstr> {
-  BitStringXValue(@NotNull OtpErlangBitstr value) {
-    super(value, value.binaryValue().length);
+class List extends ArrayBase<OtpErlangList> {
+  List(@NotNull OtpErlangList value) {
+    super(value, value.arity());
   }
 
   @Override
-  protected void computeChild(@NotNull XValueChildrenList children, int childIdx) {
-    addIndexedChild(children, getValue().binaryValue()[childIdx] & 0xFF, childIdx);
+  protected void computeChild(XValueChildrenList children, int childIdx) {
+    addIndexedChild(children, getValue().elementAt(childIdx), childIdx);
   }
 }
