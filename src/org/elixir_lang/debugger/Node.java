@@ -5,10 +5,10 @@ import com.intellij.concurrency.AsyncFutureFactory;
 import com.intellij.concurrency.AsyncFutureResult;
 import com.intellij.openapi.application.ApplicationManager;
 import org.elixir_lang.debugger.node.Command;
+import org.elixir_lang.debugger.node.command.*;
 import org.elixir_lang.debugger.node.event.Listener;
 import org.elixir_lang.debugger.node.Exception;
 import org.elixir_lang.debugger.node.Event;
-import org.elixir_lang.debugger.node.commands.Producer;
 import org.elixir_lang.utils.ElixirModulesUtil;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -71,31 +71,31 @@ public class Node {
   }
 
   public void setBreakpoint(@NotNull String module, @NotNull String file, int line) {
-    addCommand(Producer.getSetBreakpointCommand(ElixirModulesUtil.INSTANCE.elixirModuleNameToErlang(module), line, file));
+    addCommand(new SetBreakpoint(ElixirModulesUtil.INSTANCE.elixirModuleNameToErlang(module), line, file));
   }
 
   public void removeBreakpoint(@NotNull String module, int line) {
-    addCommand(Producer.getRemoveBreakpointCommand(ElixirModulesUtil.INSTANCE.elixirModuleNameToErlang(module), line));
+    addCommand(new RemoveBreakpoint(ElixirModulesUtil.INSTANCE.elixirModuleNameToErlang(module), line));
   }
 
   public void runTask() {
-    addCommand(Producer.getRunTaskCommand());
+    addCommand(new RunTask());
   }
 
   public void stepInto() {
-    addCommand(Producer.getStepIntoCommand(myLastSuspendedPid));
+    addCommand(new StepInto(myLastSuspendedPid));
   }
 
   public void stepOver() {
-    addCommand(Producer.getStepOverCommand(myLastSuspendedPid));
+    addCommand(new StepOver(myLastSuspendedPid));
   }
 
   public void stepOut() {
-    addCommand(Producer.getStepOutCommand(myLastSuspendedPid));
+    addCommand(new StepOut(myLastSuspendedPid));
   }
 
   public void resume() {
-    addCommand(Producer.getContinueCommand(myLastSuspendedPid));
+    addCommand(new Continue(myLastSuspendedPid));
   }
 
   private void addCommand(Command command) {
