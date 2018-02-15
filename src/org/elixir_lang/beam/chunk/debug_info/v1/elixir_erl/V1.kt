@@ -8,7 +8,7 @@ import org.elixir_lang.beam.chunk.debug_info.v1.ElixirErl
 import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.Definitions
 import org.elixir_lang.beam.chunk.from
 import org.elixir_lang.beam.term.inspect
-import org.elixir_lang.debugger.ElixirXValuePresentation.toUtf8String
+import org.elixir_lang.debugger.XValuePresentation.toUtf8String
 
 fun v1(metadata: OtpErlangObject, elixirErl: ElixirErl): DebugInfo =
     when (metadata) {

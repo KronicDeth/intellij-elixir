@@ -22,8 +22,8 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.ericsson.otp.erlang.OtpErlangTuple;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
-import org.elixir_lang.debugger.node.ElixirDebuggerEventListener;
-import org.elixir_lang.debugger.node.ElixirDebuggerNode;
+import org.elixir_lang.debugger.node.DebuggerEventListener;
+import org.elixir_lang.debugger.node.DebuggerNode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +60,7 @@ class InterpretModulesResponseEvent extends ErlangDebuggerEvent {
   }
 
   @Override
-  public void process(ElixirDebuggerNode debuggerNode, ElixirDebuggerEventListener eventListener) {
+  public void process(DebuggerNode debuggerNode, DebuggerEventListener eventListener) {
     if (!myFailedToInterpretModules.isEmpty()) {
       eventListener.failedToInterpretModules(myNodeName, myFailedToInterpretModules);
     }

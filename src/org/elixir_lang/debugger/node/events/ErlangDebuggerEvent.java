@@ -18,13 +18,13 @@ package org.elixir_lang.debugger.node.events;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.ericsson.otp.erlang.OtpErlangTuple;
-import org.elixir_lang.debugger.node.ElixirDebuggerEventListener;
-import org.elixir_lang.debugger.node.ElixirDebuggerNode;
+import org.elixir_lang.debugger.node.DebuggerEventListener;
+import org.elixir_lang.debugger.node.DebuggerNode;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class ErlangDebuggerEvent {
 
-  public abstract void process(ElixirDebuggerNode debuggerNode, ElixirDebuggerEventListener eventListener);
+  public abstract void process(DebuggerNode debuggerNode, DebuggerEventListener eventListener);
 
   @Nullable
   public static ErlangDebuggerEvent create(OtpErlangObject message) {

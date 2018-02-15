@@ -36,7 +36,7 @@ class BreakpointReachedEvent extends ErlangDebuggerEvent {
   public static final String NAME = "breakpoint_reached";
 
   private final OtpErlangPid myActivePid;
-  private final List<ElixirProcessSnapshot> mySnapshots;
+  private final List<ProcessSnapshot> mySnapshots;
 
   BreakpointReachedEvent(OtpErlangTuple breakpointReachedMessage) throws DebuggerEventFormatException {
     OtpErlangPid activePid = getPidValue(elementAt(breakpointReachedMessage, 1));
@@ -51,7 +51,7 @@ class BreakpointReachedEvent extends ErlangDebuggerEvent {
       OtpErlangPid pid = getPidValue(elementAt(snapshotTuple, 0));
       String status = getAtomText(elementAt(snapshotTuple, 2));
       OtpErlangObject info = elementAt(snapshotTuple, 3);
-      List<ElixirTraceElement> stack = getStack(getListValue(elementAt(snapshotTuple, 4)));
+      List<TraceElement> stack = getStack(getListValue(elementAt(snapshotTuple, 4)));
 
       if (pid == null /*|| init == null*/ || status == null || info == null || stack == null) {
         throw new DebuggerEventFormatException();
@@ -66,27 +66,27 @@ class BreakpointReachedEvent extends ErlangDebuggerEvent {
         if (breakLine == null || breakModule == null || breakFile == null) {
           throw new DebuggerEventFormatException();
         }
-        mySnapshots.add(new ElixirProcessSnapshot(pid, stack));
+        mySnapshots.add(new ProcessSnapshot(pid, stack));
       }
       else if ("exit".equals(status)) {
-        mySnapshots.add(new ElixirProcessSnapshot(pid, stack));
+        mySnapshots.add(new ProcessSnapshot(pid, stack));
       }
       else {
-        mySnapshots.add(new ElixirProcessSnapshot(pid, stack));
+        mySnapshots.add(new ProcessSnapshot(pid, stack));
       }
     }
   }
 
   @Override
-  public void process(@NotNull ElixirDebuggerNode debuggerNode, @NotNull ElixirDebuggerEventListener eventListener) {
+  public void process(@NotNull DebuggerNode debuggerNode, @NotNull DebuggerEventListener eventListener) {
     debuggerNode.processSuspended(myActivePid);
     eventListener.breakpointReached(myActivePid, mySnapshots);
   }
 
   @Nullable
-  private static List<ElixirTraceElement> getStack(@Nullable OtpErlangList traceElementsList) {
+  private static List<TraceElement> getStack(@Nullable OtpErlangList traceElementsList) {
     if (traceElementsList == null) return null;
-    List<ElixirTraceElement> stack = new ArrayList<>(traceElementsList.arity());
+    List<TraceElement> stack = new ArrayList<>(traceElementsList.arity());
     for (OtpErlangObject traceElementObject : traceElementsList) {
       OtpErlangTuple traceElementTuple = getTupleValue(traceElementObject);
       // ignoring SP at 0
@@ -96,7 +96,7 @@ class BreakpointReachedEvent extends ErlangDebuggerEvent {
       String file = getStringText(elementAt(fileLineTuple, 0));
       Integer line = getIntegerValue(elementAt(fileLineTuple, 1));
 
-      ElixirTraceElement traceElement = getTraceElement(moduleFunctionArgsTuple, bindingsList, file, line);
+      TraceElement traceElement = getTraceElement(moduleFunctionArgsTuple, bindingsList, file, line);
       if (traceElement == null) return null;
       stack.add(traceElement);
     }
@@ -104,29 +104,29 @@ class BreakpointReachedEvent extends ErlangDebuggerEvent {
   }
 
   @Nullable
-  private static ElixirTraceElement getTraceElement(@Nullable OtpErlangTuple moduleFunctionArgsTuple,
-                                                    @Nullable OtpErlangList bindingsList,
-                                                    String file,
-                                                    Integer line) {
+  private static TraceElement getTraceElement(@Nullable OtpErlangTuple moduleFunctionArgsTuple,
+                                              @Nullable OtpErlangList bindingsList,
+                                              String file,
+                                              Integer line) {
 
     String moduleName = getAtomText(elementAt(moduleFunctionArgsTuple, 0));
     String functionName = getAtomText(elementAt(moduleFunctionArgsTuple, 1));
     OtpErlangList args = getListValue(elementAt(moduleFunctionArgsTuple, 2));
-    Collection<ElixirVariableBinding> bindings = getBindings(bindingsList);
+    Collection<VariableBinding> bindings = getBindings(bindingsList);
     if (moduleName == null || functionName == null || args == null) return null; // bindings are not necessarily present
-    return new ElixirTraceElement(moduleName, functionName, args, bindings, file, line);
+    return new TraceElement(moduleName, functionName, args, bindings, file, line);
   }
 
   @NotNull
-  private static Collection<ElixirVariableBinding> getBindings(@Nullable OtpErlangList bindingsList) {
+  private static Collection<VariableBinding> getBindings(@Nullable OtpErlangList bindingsList) {
     if (bindingsList == null) return ContainerUtil.emptyList();
-    Collection<ElixirVariableBinding> bindings = new ArrayList<>(bindingsList.arity());
+    Collection<VariableBinding> bindings = new ArrayList<>(bindingsList.arity());
     for (OtpErlangObject bindingObject : bindingsList) {
       OtpErlangTuple bindingTuple = getTupleValue(bindingObject);
       String variableName = getAtomText(elementAt(bindingTuple, 0));
       OtpErlangObject variableValue = elementAt(bindingTuple, 1);
       if (variableName == null || variableValue == null) return ContainerUtil.emptyList();
-      bindings.add(new ElixirVariableBinding(variableName, variableValue));
+      bindings.add(new VariableBinding(variableName, variableValue));
     }
     return bindings;
   }

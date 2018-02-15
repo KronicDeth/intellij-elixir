@@ -9,7 +9,7 @@ import org.elixir_lang.beam.chunk.elixir_documentation.Docs
 import org.elixir_lang.beam.chunk.elixir_documentation.ModuleDoc
 import org.elixir_lang.beam.chunk.elixir_documentation.TypeDocs
 import org.elixir_lang.beam.term.inspect
-import org.elixir_lang.debugger.ElixirXValuePresentation.toUtf8String
+import org.elixir_lang.debugger.XValuePresentation.toUtf8String
 
 class ElixirDocumentation(keyword: OtpErlangList) {
     val callbackDocs: CallbackDocs? by lazy { CallbackDocs.from(Keyword.get(keyword, "callback_docs")) }

@@ -1,5 +1,6 @@
 /*
  * Copyright 2012-2014 Sergey Ignatov
+ * Copyright 2017 Jake Becker
  * Copyright 2017 Luke Imhoff
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,21 +16,19 @@
  * limitations under the License.
  */
 
-package org.elixir_lang.debugger.node.events;
+package org.elixir_lang.debugger.xdebug.xvalue;
 
-import com.ericsson.otp.erlang.OtpErlangTuple;
-import org.elixir_lang.debugger.node.DebuggerEventListener;
-import org.elixir_lang.debugger.node.DebuggerNode;
+import com.ericsson.otp.erlang.OtpErlangList;
+import com.intellij.xdebugger.frame.XValueChildrenList;
+import org.jetbrains.annotations.NotNull;
 
-class UnknownMessageEvent extends ErlangDebuggerEvent {
-  private final String myUnknownMessageText;
-
-  UnknownMessageEvent(OtpErlangTuple message) {
-    myUnknownMessageText = message.toString();
+class ListXValue extends ArrayXValueBase<OtpErlangList> {
+  ListXValue(@NotNull OtpErlangList value) {
+    super(value, value.arity());
   }
 
   @Override
-  public void process(DebuggerNode debuggerNode, DebuggerEventListener eventListener) {
-    eventListener.unknownMessage(myUnknownMessageText);
+  protected void computeChild(XValueChildrenList children, int childIdx) {
+    addIndexedChild(children, getValue().elementAt(childIdx), childIdx);
   }
 }

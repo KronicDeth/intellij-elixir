@@ -19,8 +19,8 @@ package org.elixir_lang.debugger.node.events;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.ericsson.otp.erlang.OtpErlangTuple;
-import org.elixir_lang.debugger.node.ElixirDebuggerEventListener;
-import org.elixir_lang.debugger.node.ElixirDebuggerNode;
+import org.elixir_lang.debugger.node.DebuggerEventListener;
+import org.elixir_lang.debugger.node.DebuggerNode;
 import org.jetbrains.annotations.NotNull;
 
 class SetBreakpointResponseEvent extends ErlangDebuggerEvent {
@@ -56,7 +56,7 @@ class SetBreakpointResponseEvent extends ErlangDebuggerEvent {
   }
 
   @Override
-  public void process(ElixirDebuggerNode debuggerNode, @NotNull ElixirDebuggerEventListener eventListener) {
+  public void process(DebuggerNode debuggerNode, @NotNull DebuggerEventListener eventListener) {
     if (myError == null) {
       eventListener.breakpointIsSet(myModule, myFile, myLine);
     }

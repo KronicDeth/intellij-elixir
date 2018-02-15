@@ -19,8 +19,8 @@ package org.elixir_lang.debugger.node.events;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.ericsson.otp.erlang.OtpErlangTuple;
-import org.elixir_lang.debugger.node.ElixirDebuggerEventListener;
-import org.elixir_lang.debugger.node.ElixirDebuggerNode;
+import org.elixir_lang.debugger.node.DebuggerEventListener;
+import org.elixir_lang.debugger.node.DebuggerNode;
 
 class DebugRemoteNodeResponseEvent extends ErlangDebuggerEvent {
   public static final String NAME = "debug_remote_node_response";
@@ -35,7 +35,7 @@ class DebugRemoteNodeResponseEvent extends ErlangDebuggerEvent {
   }
 
   @Override
-  public void process(ElixirDebuggerNode debuggerNode, ElixirDebuggerEventListener eventListener) {
+  public void process(DebuggerNode debuggerNode, DebuggerEventListener eventListener) {
     if (myError != null) {
       eventListener.failedToDebugRemoteNode(myNodeName, myError);
     }
