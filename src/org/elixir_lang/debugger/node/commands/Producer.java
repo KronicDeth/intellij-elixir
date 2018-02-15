@@ -43,7 +43,7 @@ public final class Producer {
 
   @NotNull
   public static Command getStepOverCommand(@NotNull OtpErlangPid pid) {
-    return new StepOverCommand(pid);
+    return new StepOver(pid);
   }
 
   @NotNull
@@ -59,12 +59,6 @@ public final class Producer {
   @NotNull
   public static Command getRunTaskCommand() {
     return new RunTask();
-  }
-
-  private static class StepOverCommand extends Pid {
-    StepOverCommand(@NotNull OtpErlangPid pid) {
-      super("step_over", pid);
-    }
   }
 
 }
