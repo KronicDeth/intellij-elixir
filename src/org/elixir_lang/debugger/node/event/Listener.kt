@@ -11,6 +11,6 @@ interface Listener {
     fun debuggerStopped()
     fun failedToDebugRemoteNode(nodeName: String, error: String)
     fun failedToInterpretModules(nodeName: String, errorReasonByModule: Map<String, OtpErlangObject>)
-    fun failedToSetBreakpoint(module: String, file: String, line: Int, errorMessage: String)
+    fun failedToSetBreakpoint(module: String, file: String, line: Int, errorMessage: OtpErlangObject)
     fun unknownMessage(messageText: String)
 }

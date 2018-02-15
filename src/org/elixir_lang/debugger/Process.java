@@ -212,12 +212,17 @@ public class Process extends com.intellij.xdebugger.XDebugProcess implements Lis
     }
 
     @Override
-    public void failedToSetBreakpoint(String module, @NotNull String file, int line, String errorMessage) {
+    public void failedToSetBreakpoint(@NotNull String module,
+                                      @NotNull String file,
+                                      int line,
+                                      @NotNull OtpErlangObject errorMessage) {
         SourcePosition sourcePosition = SourcePosition.create(file, line);
         XLineBreakpoint<Properties> breakpoint = getLineBreakpoint(sourcePosition);
+
         if (breakpoint != null) {
-            getSession().updateBreakpointPresentation(breakpoint, AllIcons.Debugger.Db_invalid_breakpoint, errorMessage);
+            getSession().updateBreakpointPresentation(breakpoint, AllIcons.Debugger.Db_invalid_breakpoint, inspect(errorMessage));
         }
+
         getSession().reportMessage("Failed to set breakpoint. Module: " + module + " Line: " + (line + 1), MessageType.WARNING);
     }
 
