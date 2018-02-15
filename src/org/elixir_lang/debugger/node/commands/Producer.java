@@ -20,6 +20,7 @@ package org.elixir_lang.debugger.node.commands;
 import com.ericsson.otp.erlang.*;
 import org.elixir_lang.debugger.node.Command;
 import org.elixir_lang.debugger.node.command.Pid;
+import org.elixir_lang.debugger.node.command.RunTask;
 import org.jetbrains.annotations.NotNull;
 
 public final class Producer {
@@ -58,7 +59,7 @@ public final class Producer {
 
   @NotNull
   public static Command getRunTaskCommand() {
-    return new RunTaskCommand();
+    return new RunTask();
   }
 
   private static class StepOverCommand extends Pid {
@@ -128,11 +129,4 @@ public final class Producer {
     }
   }
 
-  private static class RunTaskCommand implements Command {
-    @NotNull
-    @Override
-    public OtpErlangTuple toMessage() {
-      return new OtpErlangTuple(new OtpErlangAtom("run_task"));
-    }
-  }
 }
