@@ -19,6 +19,7 @@ package org.elixir_lang.debugger.node.commands;
 
 import com.ericsson.otp.erlang.*;
 import org.elixir_lang.debugger.node.Command;
+import org.elixir_lang.debugger.node.command.Pid;
 import org.jetbrains.annotations.NotNull;
 
 public final class Producer {
@@ -60,7 +61,7 @@ public final class Producer {
     return new RunTaskCommand();
   }
 
-  private static class StepOverCommand extends AbstractPidCommand {
+  private static class StepOverCommand extends Pid {
     StepOverCommand(@NotNull OtpErlangPid pid) {
       super("step_over", pid);
     }
@@ -89,35 +90,19 @@ public final class Producer {
     }
   }
 
-  private static abstract class AbstractPidCommand implements Command {
-    private final String myName;
-    private final OtpErlangPid myPid;
-
-    AbstractPidCommand(@NotNull String cmdName, @NotNull OtpErlangPid pid) {
-      myName = cmdName;
-      myPid = pid;
-    }
-
-    @NotNull
-    @Override
-    public OtpErlangTuple toMessage() {
-      return new OtpErlangTuple(new OtpErlangObject[]{new OtpErlangAtom(myName), myPid});
-    }
-  }
-
-  private static class StepOutCommand extends AbstractPidCommand {
+  private static class StepOutCommand extends Pid {
     StepOutCommand(@NotNull OtpErlangPid pid) {
       super("step_out", pid);
     }
   }
 
-  private static class StepIntoCommand extends AbstractPidCommand {
+  private static class StepIntoCommand extends Pid {
     StepIntoCommand(@NotNull OtpErlangPid pid) {
       super("step_into", pid);
     }
   }
 
-  private static class ContinueCommand extends AbstractPidCommand {
+  private static class ContinueCommand extends Pid {
     ContinueCommand(@NotNull OtpErlangPid pid) {
       super("continue", pid);
     }
