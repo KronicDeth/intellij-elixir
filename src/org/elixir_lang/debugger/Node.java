@@ -27,6 +27,7 @@ import java.util.Queue;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static org.elixir_lang.beam.term.InspectKt.inspect;
 import static org.elixir_lang.debugger.Log.LOG;
 
 public class Node {
@@ -176,9 +177,9 @@ public class Node {
     OtpErlangObject receivedMessage = receive(socket);
     if (receivedMessage == null) return;
 
-    LOG.debug("Message received: " + String.valueOf(receivedMessage));
+    LOG.debug("Message received: " + inspect(receivedMessage));
 
-    Event event = Event.create(receivedMessage);
+    Event event = Event.Companion.from(receivedMessage);
     boolean messageRecognized = event != null;
     if (messageRecognized) {
       event.process(this, myEventListener);

@@ -28,11 +28,12 @@ import com.intellij.xdebugger.frame.XStackFrame;
 import com.intellij.xdebugger.frame.XValue;
 import com.intellij.xdebugger.frame.XValueChildrenList;
 import org.elixir_lang.debugger.node.TraceElement;
-import org.elixir_lang.debugger.node.VariableBinding;
 import org.elixir_lang.debugger.stack_frame.value.Factory;
 import org.elixir_lang.utils.ElixirModulesUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Map;
 
 class StackFrame extends XStackFrame {
   @NotNull
@@ -55,7 +56,7 @@ class StackFrame extends XStackFrame {
   @Override
   public void customizePresentation(@NotNull ColoredTextContainer component) {
     String title = ElixirModulesUtil.INSTANCE.erlangModuleNameToElixir(myTraceElement.getModule()) +
-      "." + myTraceElement.getFunction() + "/" + myTraceElement.getFunctionArgs().arity();
+      "." + myTraceElement.getFunction() + "/" + myTraceElement.getArguments().size();
     if (myTraceElement.getLine() > 1) title += ", line " + myTraceElement.getLine();
     component.append(title, SimpleTextAttributes.REGULAR_ATTRIBUTES);
     component.setIcon(AllIcons.Debugger.StackFrame);
@@ -64,8 +65,8 @@ class StackFrame extends XStackFrame {
   @Override
   public void computeChildren(@NotNull XCompositeNode node) {
     XValueChildrenList myVariables = new XValueChildrenList(myTraceElement.getBindings().size());
-    for (VariableBinding binding : myTraceElement.getBindings()) {
-      myVariables.add(binding.getName(), getVariableValue(binding.getValue()));
+    for (Map.Entry<String, OtpErlangObject> binding : myTraceElement.getBindings().entrySet()) {
+      myVariables.add(binding.getKey(), getVariableValue(binding.getValue()));
     }
     node.addChildren(myVariables, true);
   }

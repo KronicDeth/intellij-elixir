@@ -17,12 +17,12 @@
 
 package org.elixir_lang.debugger.node.event
 
-import com.ericsson.otp.erlang.OtpErlangTuple
+import com.ericsson.otp.erlang.OtpErlangObject
 import org.elixir_lang.beam.term.inspect
 import org.elixir_lang.debugger.Node
 import org.elixir_lang.debugger.node.Event
 
-class Unknown(message: OtpErlangTuple) : Event() {
+class Unknown(message: OtpErlangObject) : Event() {
     private val inspectedMessage: String by lazy { inspect(message) }
 
     override fun process(node: Node, eventListener: Listener) {

@@ -144,7 +144,7 @@ public class Process extends com.intellij.xdebugger.XDebugProcess implements Lis
     }
 
     @Override
-    public void breakpointReached(@NotNull final OtpErlangPid pid, @NotNull List<? extends ProcessSnapshot> snapshots) {
+    public void breakpointReached(@NotNull final OtpErlangPid pid, @NotNull List<ProcessSnapshot> snapshots) {
         ProcessSnapshot processInBreakpoint = ContainerUtil.find(snapshots, elixirProcessSnapshot -> elixirProcessSnapshot.getPid().equals(pid));
         assert processInBreakpoint != null;
         SourcePosition breakPosition = SourcePosition.create(processInBreakpoint);

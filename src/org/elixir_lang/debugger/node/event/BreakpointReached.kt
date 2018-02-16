@@ -17,87 +17,65 @@
 
 package org.elixir_lang.debugger.node.event
 
-import com.ericsson.otp.erlang.OtpErlangAtom
 import com.ericsson.otp.erlang.OtpErlangList
 import com.ericsson.otp.erlang.OtpErlangPid
 import com.ericsson.otp.erlang.OtpErlangTuple
+import com.intellij.openapi.diagnostic.Logger
+import org.elixir_lang.beam.term.inspect
 import org.elixir_lang.debugger.Node
 import org.elixir_lang.debugger.node.Event
 import org.elixir_lang.debugger.node.ProcessSnapshot
-import org.elixir_lang.debugger.node.TraceElement
-import org.elixir_lang.debugger.node.VariableBinding
-import org.elixir_lang.debugger.node.event.OtpErlangTermUtil.*
 
-class BreakpointReached @Throws(FormatException::class)
-constructor(breakpointReachedMessage: OtpErlangTuple) : Event() {
-    init {
-        assert(breakpointReachedMessage.arity() == 3)
-    }
-
-    private val pid: OtpErlangPid = breakpointReachedMessage.elementAt(1) as OtpErlangPid
-    private val processSnapshotList: List<ProcessSnapshot> =
-            (breakpointReachedMessage.elementAt(2) as OtpErlangList).map { element ->
-                val elementTuple = element as OtpErlangTuple
-
-                // {Pid, Function, Status, Info, Stack}
-                assert(elementTuple.arity() == 5)
-
-                val pid = elementTuple.elementAt(0) as OtpErlangPid
-                val stack = otpStackToDebuggerStack(elementTuple.elementAt(4) as OtpErlangList)
-
-                ProcessSnapshot(pid, stack)
-            }
-
+class BreakpointReached(private val pid: OtpErlangPid, private val processSnapshotList: List<ProcessSnapshot>) : Event() {
     override fun process(node: Node, eventListener: Listener) {
         node.processSuspended(pid)
         eventListener.breakpointReached(pid, processSnapshotList)
     }
 
     companion object {
+        private const val EXPECTED_ARITY = 3
         const val NAME = "breakpoint_reached"
 
-        private fun otpBindingsToDebuggerBindings(otpBindings: OtpErlangList?): Collection<VariableBinding> =
-            otpBindings?.map { otpBindingObject ->
-                val otpBindingTuple = otpBindingObject as OtpErlangTuple
+        private val LOGGER = Logger.getInstance(BreakpointReached::class.java)
 
-                assert(otpBindingTuple.arity() == 2)
+        fun from(tuple: OtpErlangTuple): Event? {
+            val arity = tuple.arity()
 
-                val variableName = (otpBindingTuple.elementAt(0) as OtpErlangAtom).atomValue()!!
-                val variableValue = otpBindingTuple.elementAt(1)!!
+            return if (arity == EXPECTED_ARITY) {
+                val pid = tuple.elementAt(1)
 
-                VariableBinding(variableName, variableValue)
-            }.orEmpty()
+                if (pid is OtpErlangPid) {
+                    val otpSnapshotWithStacks = tuple.elementAt(2)
 
-        private fun otpStackToDebuggerStack(otpStack: OtpErlangList): List<TraceElement> =
-            otpStack.map { otpStackElementObject ->
-                val otpStackElementTuple = otpStackElementObject as OtpErlangTuple
+                    if (otpSnapshotWithStacks is OtpErlangList) {
+                        otpSnapshotWithStacksToProcessSnapshotList(otpSnapshotWithStacks)?.let { processSnapshotList ->
+                            BreakpointReached(pid, processSnapshotList)
+                        }
+                    } else {
+                        LOGGER.error("Element at index 2 (${inspect(otpSnapshotWithStacks)}) is not an OtpErlangList")
 
-                assert(otpStackElementTuple.arity() == 4)
+                        null
+                    }
+                } else {
+                    LOGGER.error("Element at index 1 (${inspect(pid)}) is not an OtpErlangPid")
 
-                val moduleFunctionArgumentsTuple = otpStackElementTuple.elementAt(1) as OtpErlangTuple
-                val bindingsList = getListValue(otpStackElementTuple.elementAt(2))
-                val fileLineTuple = otpStackElementTuple.elementAt(3) as OtpErlangTuple
+                    null
+                }
+            } else {
+                LOGGER.error(
+                        "Tuple arity ($arity) differs from expected arity ($EXPECTED_ARITY) in `:breakpoint_reached` " +
+                                "message (`${inspect(tuple)}`)"
+                )
 
-                assert(fileLineTuple.arity() == 2)
-
-                val file = getStringText(fileLineTuple.elementAt(0))!!
-                val line = getIntegerValue(fileLineTuple.elementAt( 1))!!
-
-                traceElement(moduleFunctionArgumentsTuple, bindingsList, file, line)
+                null
             }
-
-        private fun traceElement(moduleFunctionArgsTuple: OtpErlangTuple,
-                                 bindingsList: OtpErlangList?,
-                                 file: String?,
-                                 line: Int?): TraceElement {
-            assert(moduleFunctionArgsTuple.arity() == 3)
-
-            val moduleName = (moduleFunctionArgsTuple.elementAt( 0) as OtpErlangAtom).atomValue()!!
-            val functionName = (moduleFunctionArgsTuple.elementAt( 1) as OtpErlangAtom).atomValue()!!
-            val args = getListValue(moduleFunctionArgsTuple.elementAt( 2))!!
-            val bindings = otpBindingsToDebuggerBindings(bindingsList)
-
-            return TraceElement(moduleName, functionName, args, bindings, file, line!!)
         }
+
+        private fun otpSnapshotWithStacksToProcessSnapshotList(
+                otpSnapshotWithStacks: OtpErlangList
+        ): List<ProcessSnapshot> =
+                otpSnapshotWithStacks.withIndex().mapNotNull { indexedTerm->
+                    ProcessSnapshot.from(indexedTerm)
+                }
     }
 }
