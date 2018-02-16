@@ -37,7 +37,7 @@ abstract class Event {
                 (message.elementAt(0) as? OtpErlangAtom)?.atomValue()?.let { messageName ->
                     when (messageName) {
                         BreakpointReached.NAME -> BreakpointReached.from(message)
-                        DebugRemoteNodeResponse.NAME -> DebugRemoteNodeResponse(message)
+                        DebugRemoteNodeResponse.NAME -> DebugRemoteNodeResponse.from(message)
                         InterpretModulesResponse.NAME -> InterpretModulesResponse(message)
                         SetBreakpointResponse.NAME -> SetBreakpointResponse(message)
                         else -> Unknown(message)

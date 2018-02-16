@@ -19,25 +19,55 @@ package org.elixir_lang.debugger.node.event
 
 import com.ericsson.otp.erlang.OtpErlangAtom
 import com.ericsson.otp.erlang.OtpErlangTuple
+import com.intellij.openapi.diagnostic.Logger
+import org.elixir_lang.beam.term.inspect
 import org.elixir_lang.debugger.Node
+import org.elixir_lang.debugger.node.ErrorReason
 import org.elixir_lang.debugger.node.Event
+import org.elixir_lang.debugger.node.OK
+import org.elixir_lang.debugger.node.OKErrorReason
 
-class DebugRemoteNodeResponse(receivedMessage: OtpErlangTuple) : Event() {
-    private val nodeName: String = (receivedMessage.elementAt(1) as OtpErlangAtom).atomValue()
-    private val error: String?
-
-    init {
-        val status = (receivedMessage.elementAt(2) as OtpErlangAtom).atomValue()!!
-        error = if ("ok" == status) null else status
-    }
-
-    override fun process(node: Node, eventListener: Listener) {
-        error?.let { error ->
-            eventListener.failedToDebugRemoteNode(nodeName, error)
+class DebugRemoteNodeResponse(val node: String, private val okErrorReason: OKErrorReason) : Event() {
+    override fun process(node: Node, eventListener: Listener) =
+        when (okErrorReason) {
+            OK -> Unit
+            is ErrorReason -> eventListener.failedToDebugRemoteNode(this.node, okErrorReason.reason)
         }
-    }
 
     companion object {
+        // {node, :ok | {:error, reason}}
+        const val ARITY = 2
         const val NAME = "debug_remote_node_response"
+
+        private val LOGGER = Logger.getInstance(DebugRemoteNodeResponse::class.java)
+
+        fun from(tuple: OtpErlangTuple): DebugRemoteNodeResponse? {
+            val arity = tuple.arity()
+
+            return if (arity == ARITY) {
+                node(tuple)?.let { node ->
+                    OKErrorReason.from(tuple.elementAt(1))?.let { okErrorReason ->
+                        DebugRemoteNodeResponse(node, okErrorReason)
+                    }
+                }
+            } else {
+                LOGGER.error(":$NAME message (${inspect(tuple)}) arity ($arity) is not $ARITY")
+
+                null
+            }
+        }
+
+        private fun node(tuple: OtpErlangTuple): String? {
+            val node = tuple.elementAt(0)
+
+            return when (node) {
+                is OtpErlangAtom -> node.atomValue()
+                else -> {
+                    LOGGER.error("Node (${inspect(node)}) is not an OtpErlangAtom")
+
+                    null
+                }
+            }
+        }
     }
 }

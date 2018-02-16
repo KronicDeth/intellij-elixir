@@ -187,8 +187,8 @@ public class Process extends com.intellij.xdebugger.XDebugProcess implements Lis
     }
 
     @Override
-    public void failedToDebugRemoteNode(String nodeName, String error) {
-        String message = "Failed to debug remote node '" + nodeName + "'. Details: " + error;
+    public void failedToDebugRemoteNode(@NotNull String nodeName, @NotNull OtpErlangObject error) {
+        String message = "Failed to debug remote node '" + nodeName + "'. Details: " + inspect(error);
         getSession().reportMessage(message, MessageType.ERROR);
     }
 

@@ -9,7 +9,7 @@ interface Listener {
     fun breakpointReached(pid: OtpErlangPid, snapshots: List<ProcessSnapshot>)
     fun debuggerStarted()
     fun debuggerStopped()
-    fun failedToDebugRemoteNode(nodeName: String, error: String)
+    fun failedToDebugRemoteNode(nodeName: String, error: OtpErlangObject)
     fun failedToInterpretModules(nodeName: String, errorReasonByModule: Map<String, OtpErlangObject>)
     fun failedToSetBreakpoint(module: String, file: String, line: Int, errorMessage: OtpErlangObject)
     fun unknownMessage(messageText: String)
