@@ -1,5 +1,6 @@
 /*
  * Copyright 2012-2014 Sergey Ignatov
+ * Copyright 2018 Luke Imhoff
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +39,7 @@ abstract class Event {
                     when (messageName) {
                         BreakpointReached.NAME -> BreakpointReached.from(message)
                         DebugRemoteNodeResponse.NAME -> DebugRemoteNodeResponse.from(message)
-                        InterpretModulesResponse.NAME -> InterpretModulesResponse(message)
+                        InterpretModulesResponse.NAME -> InterpretModulesResponse.from(message)
                         SetBreakpointResponse.NAME -> SetBreakpointResponse(message)
                         else -> Unknown(message)
                     }
