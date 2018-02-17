@@ -27,11 +27,11 @@ abstract class Event {
     abstract fun process(node: Node, eventListener: Listener)
 
     companion object {
-        fun from(message: OtpErlangObject): Event =
+        fun from(message: OtpErlangObject): Event? =
             when (message) {
                 is OtpErlangTuple -> from(message)
                 else -> null
-            } ?: Unknown(message)
+            }
 
         fun from(message: OtpErlangTuple): Event? =
             if (message.arity() > 0) {
@@ -40,8 +40,8 @@ abstract class Event {
                         BreakpointReached.NAME -> BreakpointReached.from(message)
                         DebugRemoteNodeResponse.NAME -> DebugRemoteNodeResponse.from(message)
                         InterpretModulesResponse.NAME -> InterpretModulesResponse.from(message)
-                        SetBreakpointResponse.NAME -> SetBreakpointResponse(message)
-                        else -> Unknown(message)
+                        SetBreakpointResponse.NAME -> SetBreakpointResponse.from(message)
+                        else -> null
                     }
                 }
             } else {

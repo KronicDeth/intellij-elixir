@@ -17,61 +17,85 @@
 
 package org.elixir_lang.debugger.node.event
 
-import com.ericsson.otp.erlang.OtpErlangAtom
-import com.ericsson.otp.erlang.OtpErlangObject
-import com.ericsson.otp.erlang.OtpErlangTuple
+import com.ericsson.otp.erlang.*
+import com.intellij.openapi.diagnostic.Logger
+import org.elixir_lang.beam.term.inspect
 import org.elixir_lang.debugger.Node
+import org.elixir_lang.debugger.node.ErrorReason
 import org.elixir_lang.debugger.node.Event
+import org.elixir_lang.debugger.node.OK
+import org.elixir_lang.debugger.node.OKErrorReason
+import org.elixir_lang.debugger.stack_frame.value.Presentation.toUtf8String
 
-class SetBreakpointResponse(message: OtpErlangTuple) : Event() {
-    init {
-        assert(message.arity() == 5)
-    }
-
-    private val module: String = messageToModule(message)
-    private val line: Int = messageToLine(message)
-    private val errorReason: OtpErlangObject? = messageToErrorReason(message)
-    private val file: String = messageToFile(message)
-
-    override fun process(node: Node, eventListener: Listener) {
-        if (errorReason == null) {
-            eventListener.breakpointIsSet(module, file, line)
-        } else {
-            eventListener.failedToSetBreakpoint(module, file, line, errorReason)
+class SetBreakpointResponse(
+        private val module: String,
+        private val line: Int,
+        private val okErrorReason: OKErrorReason,
+        private val file: String
+) : Event() {
+    override fun process(node: Node, eventListener: Listener) =
+        when (okErrorReason) {
+            OK -> eventListener.breakpointIsSet(module, file, line)
+            is ErrorReason -> eventListener.failedToSetBreakpoint(module, file, line, okErrorReason.reason)
         }
-    }
 
     companion object {
+        // {:set_breakpoint_response, module, line, :ok | {:error, :break_exists}, file}
+        private const val ARITY = 5
         const val NAME = "set_breakpoint_response"
 
-        private fun messageToErrorReason(message: OtpErlangTuple) =
-            statusToErrorReason(message.elementAt(3))
+        private val LOGGER by lazy { Logger.getInstance(SetBreakpointResponse::class.java) }
 
-        private fun messageToFile(message: OtpErlangTuple) =
-                OtpErlangTermUtil.getStringText(message.elementAt(4))!!
+        fun from(tuple: OtpErlangTuple): SetBreakpointResponse? {
+            val arity = tuple.arity()
 
-        private fun messageToLine(message: OtpErlangTuple) =
-                OtpErlangTermUtil.getIntegerValue(message.elementAt(2))!! - 1
-
-        private fun messageToModule(message: OtpErlangTuple) =
-                (message.elementAt(1) as OtpErlangAtom).atomValue()
-
-        private fun statusToErrorReason(status: OtpErlangObject) =
-            if (status is OtpErlangTuple) {
-                statusToErrorReason(status)
+            return if (arity == ARITY) {
+                module(tuple.elementAt(1))?.let { module ->
+                    line(tuple)?.let { line ->
+                        OKErrorReason.from(tuple.elementAt(3))?.let { okErrorReason ->
+                            file(tuple)?.let { file ->
+                                SetBreakpointResponse(module, line, okErrorReason, file)
+                            }
+                        }
+                    }
+                }
             } else {
-                assert(status is OtpErlangAtom && status.atomValue() == "ok")
+                LOGGER.error(":$NAME tuple (${inspect(tuple)}) arity ($arity) is not $ARITY")
 
                 null
             }
-
-        private fun statusToErrorReason(status: OtpErlangTuple): OtpErlangObject {
-            assert(status.arity() == 2)
-
-            val tag = status.elementAt(0)!!
-            assert(tag is OtpErlangAtom && tag.atomValue() == "error")
-
-            return status.elementAt(1)!!
         }
+
+        // Private Functions
+
+        private fun file(term: OtpErlangObject): String? =
+                when (term) {
+                    is OtpErlangBinary -> toUtf8String(term)
+                    else -> {
+                        LOGGER.error("file (${inspect(term)}) is not an OtpErlangBinary")
+
+                        null
+                    }
+                }
+
+        private fun line(term: OtpErlangObject): Int? =
+                when (term) {
+                    is OtpErlangLong -> term.intValue()
+                    else -> {
+                        LOGGER.error("line (${inspect(term)}) is not an OtpErlangLong")
+
+                        null
+                    }
+                }
+
+        private fun module(term: OtpErlangObject): String? =
+                when (term) {
+                    is OtpErlangAtom -> term.atomValue()
+                    else -> {
+                        LOGGER.error("module (${inspect(term)}) is not an OtpErlangAtom")
+
+                        null
+                    }
+                }
     }
 }
