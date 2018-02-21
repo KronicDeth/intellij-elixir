@@ -168,6 +168,7 @@
     <!-- debug -->
     <programRunner implementation="org.elixir_lang.debugger.Runner"/>
     <xdebugger.breakpointType implementation="org.elixir_lang.debugger.line_breakpoint.Type"/>
+    <xdebugger.settings implementation="org.elixir_lang.debugger.Settings"/>
 
   </extensions>
 
