@@ -1,10 +1,11 @@
 package org.elixir_lang.debugger.settings.stepping.module_filter
 
-import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.wm.IdeFocusManager
-import com.intellij.ui.*
+import com.intellij.ui.BooleanTableCellEditor
+import com.intellij.ui.BooleanTableCellRenderer
+import com.intellij.ui.TableUtil
+import com.intellij.ui.ToolbarDecorator
 import com.intellij.ui.table.JBTable
-import com.intellij.util.IconUtil
 import com.intellij.util.ui.ComponentWithEmptyText
 import com.intellij.util.ui.StatusText
 import org.elixir_lang.debugger.settings.stepping.ModuleFilter
@@ -14,8 +15,6 @@ import java.awt.Dimension
 import javax.swing.JPanel
 import javax.swing.JTable
 import org.elixir_lang.debugger.settings.stepping.module_filter.editor.table.cell_renderer.ModuleFilter as ModuleFilterCellRenderer
-
-private const val ADD_PATTERN_TEXT = "Add Pattern..."
 
 class Editor: JPanel(BorderLayout()), ComponentWithEmptyText {
     var filters: List<ModuleFilter>
@@ -46,14 +45,10 @@ class Editor: JPanel(BorderLayout()), ComponentWithEmptyText {
     init {
         val decorator = ToolbarDecorator
                 .createDecorator(table)
-                .addExtraAction(object : AnActionButton(ADD_PATTERN_TEXT, IconUtil.getAddPatternIcon()) {
-                    override fun actionPerformed(event: AnActionEvent?) {
-                        addPatternFilter()
-                    }
-                })
+                .setAddAction { addPatternFilter()  }
                 .setRemoveAction { TableUtil.removeSelectedItems(table) }
-                .setButtonComparator(ADD_PATTERN_TEXT, "Remove")
-                .disableUpDownActions().createPanel()
+                .setButtonComparator("Add", "Remove")
+                .createPanel()
 
         add(decorator, BorderLayout.CENTER)
 

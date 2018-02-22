@@ -75,6 +75,10 @@ public class Node {
     addCommand(new SetBreakpoint(ElixirModulesUtil.INSTANCE.elixirModuleNameToErlang(module), line, file));
   }
 
+  public void rejectedModuleNames() {
+    addCommand(new RejectedModuleNames());
+  }
+
   public void removeBreakpoint(@NotNull String module, int line) {
     addCommand(new RemoveBreakpoint(ElixirModulesUtil.INSTANCE.elixirModuleNameToErlang(module), line));
   }
@@ -191,8 +195,8 @@ public class Node {
   private void sendMessages(@NotNull Socket socket) throws SocketException {
     synchronized (myCommandsQueue) {
       while (!myCommandsQueue.isEmpty()) {
-        OtpErlangTuple message = myCommandsQueue.remove().toMessage();
-        LOG.debug("Sending message: " + message);
+        OtpErlangObject message = myCommandsQueue.remove().toMessage();
+        LOG.debug("Sending message: " + inspect(message));
         send(socket, message);
       }
     }

@@ -3,6 +3,14 @@ defmodule IntellijElixir.DebugServer do
 
   use GenServer
 
+  defstruct port: nil,
+            ref: nil,
+            reject_erlang_module_name_patterns: [],
+            reject_regex: nil,
+            rejected_module_names: [],
+            socket: nil,
+            task: nil
+
   # Functions
 
   ## Client Functions
@@ -11,15 +19,33 @@ defmodule IntellijElixir.DebugServer do
     GenServer.cast(__MODULE__, {:breakpoint_reached, pid})
   end
 
+  def put_reject_elixir_module_name_patterns(state = %__MODULE__{}, elixir_module_name_patterns)
+      when is_list(elixir_module_name_patterns) do
+    erlang_module_name_patterns = Enum.map(elixir_module_name_patterns, &elixir_module_name_to_erlang_module_name/1)
+    regex = erlang_module_name_patterns_to_regex(erlang_module_name_patterns)
+
+    %__MODULE__{state | reject_erlang_module_name_patterns: erlang_module_name_patterns, reject_regex: regex}
+  end
+
   ## GenServer callbacks
 
   @impl GenServer
-  def handle_cast({:run_task}, state = %{task: {task_name, task_args}}) do
+  def handle_cast(
+        :rejected_module_names,
+        state = %__MODULE__{rejected_module_names: rejected_module_names, socket: socket}
+      ) do
+    response = {:rejected_module_names, rejected_module_names}
+    send_message(socket, response)
+    {:noreply, state}
+  end
+
+  def handle_cast(:run_task, state = %__MODULE__{task: {task_name, task_args}}) do
     {_pid, ref} = spawn_monitor(Mix.Task, :run, [task_name, task_args])
     {:noreply, %{state | ref: ref}}
   end
 
-  def handle_cast({:set_breakpoint, module, line, file}, state = %{socket: socket})
+  def handle_cast({:set_breakpoint, module, line, file}, state = %__MODULE__{socket: socket})
+      when is_binary(file)
       when is_atom(module) and is_integer(line) do
     unless module in :int.interpreted(), do: :int.ni(module)
 
@@ -53,7 +79,7 @@ defmodule IntellijElixir.DebugServer do
     {:noreply, state}
   end
 
-  def handle_cast({:breakpoint_reached, pid}, state = %{socket: socket}) do
+  def handle_cast({:breakpoint_reached, pid}, state = %__MODULE__{socket: socket}) do
     send_message(socket, {:breakpoint_reached, pid, snapshot_with_stacks()})
     {:noreply, state}
   end
@@ -63,12 +89,12 @@ defmodule IntellijElixir.DebugServer do
   end
 
   @impl GenServer
-  def handle_info({:tcp, socket, message}, state = %{socket: socket}) do
+  def handle_info({:tcp, socket, message}, state = %__MODULE__{socket: socket}) do
     handle_cast(:erlang.binary_to_term(message), state)
   end
 
   # When task finishes, stop the server
-  def handle_info({:DOWN, ref, :process, _, status}, state = %{ref: ref}) do
+  def handle_info({:DOWN, ref, :process, _, status}, state = %__MODULE__{ref: ref}) do
     {:stop, status, state}
   end
 
@@ -77,19 +103,40 @@ defmodule IntellijElixir.DebugServer do
   end
 
   @impl GenServer
-  def init({task, port}) do
+  def init(state = %__MODULE__{port: port}) do
     opts = [:binary, {:packet, 4}, {:active, true}]
     {:ok, host} = :inet.gethostname()
     {:ok, socket} = :gen_tcp.connect(host, port, opts)
     :int.auto_attach([:break], {__MODULE__, :breakpoint_reached, []})
 
-    {:ok, %{task: task, socket: socket, ref: nil}}
+    {:ok, %__MODULE__{state | socket: socket}}
   end
 
   ## Private Functions
 
   defp bindings(meta_pid, level) do
     :int.meta(meta_pid, :bindings, level)
+  end
+
+  defp elixir_module_name_to_erlang_module_name(":" <> erlang_module_name), do: erlang_module_name
+
+  defp elixir_module_name_to_erlang_module_name(erlang_module_name = "Elixir." <> _), do: erlang_module_name
+
+  defp elixir_module_name_to_erlang_module_name(elixir_module_name), do: "Elixir." <> elixir_module_name
+
+  defp erlang_module_name_pattern_to_regex_pattern(erlang_module_name_pattern) do
+    erlang_module_name_pattern
+    |> Regex.escape()
+    |> String.replace(~S"\*", ".*")
+  end
+
+  defp erlang_module_name_patterns_to_regex(erlang_module_name_patterns) do
+    unpinned_pattern =
+      erlang_module_name_patterns
+      |> Stream.map(&erlang_module_name_pattern_to_regex_pattern/1)
+      |> Enum.join("|")
+
+    Regex.compile!("^#{unpinned_pattern}$")
   end
 
   defp meta_pid_to_stack(meta_pid, %{line: break_line}) do
@@ -119,7 +166,7 @@ defmodule IntellijElixir.DebugServer do
     with [_] <- arguments,
          {:ok, {root, _pattern, names}} <- templates(module),
          function_string = to_string(function),
-         true <- (function_string in names) do
+         true <- function_string in names do
       root_parent = root_parent(source)
       List.foldr([root_parent, root, "#{function_string}.eex"], "", &Path.join/2)
     else

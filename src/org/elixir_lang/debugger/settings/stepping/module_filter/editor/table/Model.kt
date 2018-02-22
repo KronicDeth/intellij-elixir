@@ -67,8 +67,8 @@ class Model : AbstractTableModel(), ItemRemovable {
         val filter = _filterList[rowIndex]
 
         when (columnIndex) {
-            0 -> _filterList[rowIndex] = filter.copy(enabled = value as Boolean)
-            1 -> _filterList[rowIndex] = filter.copy(pattern = value as String)
+            0 -> _filterList[rowIndex] = ModuleFilter(enabled = value as Boolean, pattern = filter.pattern)
+            1 -> _filterList[rowIndex] = ModuleFilter(enabled = filter.enabled, pattern = value as String)
             else -> throw IllegalArgumentException("Column $columnIndex out of bounds")
         }
 

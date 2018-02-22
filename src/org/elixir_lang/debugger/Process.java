@@ -316,9 +316,17 @@ public class Process extends com.intellij.xdebugger.XDebugProcess implements Lis
         mixParametersList.addAll(
                 "intellij_elixir.debug_task",
                 "--debugger-port",
-                Integer.toString(myNode.getLocalDebuggerPort()),
-                "--"
+                Integer.toString(myNode.getLocalDebuggerPort())
         );
+
+        List<String> doNotInterpretPatterns = Settings.Companion.getInstance().enabledModuleFilterPatternList();
+
+        for (String doNotInterpretPattern : doNotInterpretPatterns) {
+            mixParametersList.addAll("--do-not-interpret-pattern", doNotInterpretPattern);
+        }
+
+        mixParametersList.add("--");
+
         MixRunConfigurationBase mixRunConfigurationBase = getRunConfiguration();
         ParametersList runConfigurationMixParametersList = mixRunConfigurationBase.mixParametersList();
         mixParametersList.addAll(runConfigurationMixParametersList.getList());

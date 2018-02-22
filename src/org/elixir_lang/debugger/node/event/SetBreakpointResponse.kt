@@ -51,9 +51,9 @@ class SetBreakpointResponse(
 
             return if (arity == ARITY) {
                 module(tuple.elementAt(1))?.let { module ->
-                    line(tuple)?.let { line ->
+                    line(tuple.elementAt(2))?.let { line ->
                         OKErrorReason.from(tuple.elementAt(3))?.let { okErrorReason ->
-                            file(tuple)?.let { file ->
+                            file(tuple.elementAt(4))?.let { file ->
                                 SetBreakpointResponse(module, line, okErrorReason, file)
                             }
                         }

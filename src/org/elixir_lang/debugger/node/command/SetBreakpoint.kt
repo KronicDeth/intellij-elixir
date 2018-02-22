@@ -1,8 +1,8 @@
 package org.elixir_lang.debugger.node.command
 
 import com.ericsson.otp.erlang.OtpErlangAtom
+import com.ericsson.otp.erlang.OtpErlangBinary
 import com.ericsson.otp.erlang.OtpErlangInt
-import com.ericsson.otp.erlang.OtpErlangString
 import com.ericsson.otp.erlang.OtpErlangTuple
 import org.elixir_lang.debugger.node.Command
 
@@ -14,6 +14,6 @@ class SetBreakpoint(private val module: String, line: Int, private val file: Str
                     OtpErlangAtom("set_breakpoint"),
                     OtpErlangAtom(module),
                     OtpErlangInt(line),
-                    OtpErlangString(file)
+                    OtpErlangBinary(file)
             ))
 }

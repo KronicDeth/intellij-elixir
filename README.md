@@ -54,6 +54,11 @@
       - [Steps](#steps)
       - [Basics](#basics)
         - [Keyboard Shortcuts](#keyboard-shortcuts)
+        - [Excluding Modules](#excluding-modules)
+          - [Disabling Existing Module Patterns](#disabling-existing-module-patterns)
+          - [Editing Existing Module Patterns](#editing-existing-module-patterns)
+          - [Removing Existing Module Patterns](#removing-existing-module-patterns)
+          - [Adding New Module Patterns](#adding-new-module-patterns)
         - [Environment Variables](#environment-variables)
       - [Breakpoints](#breakpoints)
         - [Accessing Breakpoint Properties](#accessing-breakpoint-properties)
@@ -1761,14 +1766,68 @@ After you have configured a [run configuration](#run-configuration) for your pro
 | Step Into                               | `F7`             |
 | View breakpoint details/all breakpoints | `Shift+Cmd+F8`   |
 
+##### Excluding Modules
+
+By default, the debugger will scan all the [load paths](https://hexdocs.pm/mix/Mix.Project.html#load_paths/1) and [build path](https://hexdocs.pm/mix/Mix.Project.html#build_path/1) for `.beam` files and the corresponding modules will be [interpreted](http://erlang.org/doc/man/int.html#ni-1) which causes the Module's [Erlang abstract code chunk](http://beam-wisdoms.clau.se/en/latest/indepth-beam-file.html#abst-abstract-syntax-tree) to be interpreted in Erlang instead of the [bytecode chunk](#code) being executed in the C parts of the BEAM.  This interpretation is **much** slower than execution, so by default all of the Elixir standard library and the common modules installed in Phoenix projects are excluded from being interpreted when the debugger starts.  The modules can be still be stepped into or have breakpoints explicitly set.
+
+1. Preferences > Build, Execution, Deployment > Debugger > Stepping
+2. Scroll to Elixir
+
+![Do Not Step Into The Modules](screenshots/debugger/excluding_modules/Do%20Not%20Step%20Into%20The%20Modules.png?raw=true)
+
+You can customize these module patterns as an application setting.
+
+###### Disabling Existing Module Patterns
+
+1. Preferences > Build, Execution, Deployment > Debugger > Stepping
+2. Scroll to Elixir
+3. Click the Checkbox next to the pattern you want to disable
+4. Click Apply to save or OK to save and close Preferences
+
+![Disable](screenshots/debugger/excluding_modules/Disable.png)
+
+###### Editing Existing Module Patterns
+
+1. Preferences > Build, Execution, Deployment > Debugger > Stepping
+2. Scroll to Elixir
+3. Click the pattern text box
+4. Click Apply to save or OK to save and close Preferences
+
+![Edit](screenshots/debugger/excluding_modules/Edit.png?raw=true)
+
+###### Removing Existing Module Patterns
+
+1. Preferences > Build, Execution, Deployment > Debugger > Stepping
+2. Scroll to Elixir
+3. Click the row of the pattern you want to remove
+4. Click the "-" Remove button.
+5. Click Apply to save or OK to save and close Preferences
+
+![Remove](screenshots/debugger/excluding_modules/Remove.png?raw=true)
+
+![Removed](screenshots/debugger/excluding_modules/Removed.png?raw=true)
+
+###### Adding New Module Patterns
+
+1. Preferences > Build, Execution, Deployment > Debugger > Stepping
+2. Scroll to Elixir
+3. Click the "+" Add button
+4. Click the default "*" pattern to edit it
+5. Click Apply to save or OK to save and close Preferences
+
+![Add](screenshots/debugger/excluding_modules/Add.png?raw=true)
+
+![Added](screenshots/debugger/excluding_modules/Added.png?raw=true)
+
 ##### Environment Variables
+
+If you want to customize the modules to ignore on a per-Run-Configuration basis, you can set an environment variable in the Run Configuration.
 
 | Variable                           | Example    | Description                     |
 | -----------------------------------|------------| --------------------------------|
 | INTELLIJ\_ELIXIR\_DEBUG\_BLACKLIST | iconv,some | Excluding modules from debugger |
 
-*Notice: If you want non `Elixir.` module in blacklist, write it with: `:`.
-This rule applies only to module atoms.*
+*Notice: If you want non `Elixir.` module in blacklist, write it with: `:`. This rule applies only to module atoms.*
 
 #### Breakpoints
 

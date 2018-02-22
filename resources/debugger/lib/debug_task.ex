@@ -3,6 +3,8 @@ defmodule Mix.Tasks.IntellijElixir.DebugTask do
 
   use Mix.Task
 
+  alias IntellijElixir.DebugServer
+
   # Functions
 
   @impl Mix.Task
@@ -15,9 +17,20 @@ defmodule Mix.Tasks.IntellijElixir.DebugTask do
     Mix.Task.run("loadconfig")
     Mix.Task.run("compile", [])
 
+    elixir_module_name_patterns = elixir_module_name_patterns(options)
+
+    state =
+      DebugServer.put_reject_elixir_module_name_patterns(
+        %DebugServer{
+          port: Keyword.get(options, :debugger_port),
+          task: {task_name, task_args}
+        },
+        elixir_module_name_patterns
+      )
+
     # Interpret project modules and project dependencies
-    interpret_modules_in(Mix.Project.load_paths())
-    interpret_modules_in(Mix.Project.build_path())
+    state = interpret_modules_in(Mix.Project.load_paths(), state)
+    state = interpret_modules_in(Mix.Project.build_path(), state)
 
     # Check version, but continue anyway in case they've patched Erlang < OTP 19 to allow debugging Elixir
     version = String.to_integer(to_string(:erlang.system_info(:otp_release)))
@@ -26,13 +39,10 @@ defmodule Mix.Tasks.IntellijElixir.DebugTask do
       IO.warn("Erlang version OTP 19 or higher required to debug Elixir. (Current version: #{version})")
     end
 
-    # Start debugger server with the task and debugger port
-    init_args = {{task_name, task_args}, Keyword.get(options, :debugger_port)}
-
     {:ok, pid} =
       GenServer.start_link(
-        IntellijElixir.DebugServer,
-        init_args,
+        DebugServer,
+        state,
         name: IntellijElixir.DebugServer
       )
 
@@ -57,11 +67,18 @@ defmodule Mix.Tasks.IntellijElixir.DebugTask do
     end
   end
 
-  defp elixir_module_name_to_erlang_module_name(":" <> erlang_module_name), do: erlang_module_name
+  defp elixir_module_name_patterns(options) do
+    environment_variables_to_elixir_module_name_patterns()
+    |> Stream.concat(options_to_elixir_module_name_patterns(options))
+    |> Enum.to_list()
+  end
 
-  defp elixir_module_name_to_erlang_module_name(erlang_module_name = "Elixir." <> _), do: erlang_module_name
-
-  defp elixir_module_name_to_erlang_module_name(elixir_module_name), do: "Elixir." <> elixir_module_name
+  defp environment_variables_to_elixir_module_name_patterns do
+    "INTELLIJ_ELIXIR_DEBUG_BLACKLIST"
+    |> System.get_env()
+    |> Kernel.||("")
+    |> String.split(",")
+  end
 
   defp get_task(["-" <> _ | _]) do
     Mix.shell().error(
@@ -80,21 +97,37 @@ defmodule Mix.Tasks.IntellijElixir.DebugTask do
     {Mix.Project.config()[:default_task], []}
   end
 
-  defp interpret_modules_in(paths) when is_list(paths) do
-    Enum.each(paths, &interpret_modules_in/1)
+  defp interpret_modules_in(paths, state) when is_list(paths) do
+    Enum.reduce(paths, state, &interpret_modules_in/2)
   end
 
-  defp interpret_modules_in(path) do
-    reject_name_set = reject_name_set()
+  defp interpret_modules_in(
+         path,
+         state = %DebugServer{reject_regex: reject_regex, rejected_module_names: rejected_module_names}
+       ) do
+    {filtered, rejected} =
+      path
+      |> Path.join("**/*.beam")
+      |> Path.wildcard()
+      |> Stream.map(&Path.basename(&1, ".beam"))
+      |> Enum.reduce({[], []}, fn basename, {filter, reject} ->
+        if Regex.match?(reject_regex, basename) do
+          {[basename | filter], reject}
+        else
+          {filter, [basename | reject]}
+        end
+      end)
 
-    path
-    |> Path.join("**/*.beam")
-    |> Path.wildcard()
-    |> Enum.map(&Path.basename(&1, ".beam"))
-    |> Enum.reject(&MapSet.member?(reject_name_set, &1))
+    filtered
     |> Stream.map(&String.to_atom/1)
-    |> Enum.filter(&(:int.interpretable(&1) == true && !:code.is_sticky(&1) && &1 != __MODULE__))
+    |> Stream.filter(&(:int.interpretable(&1) == true && !:code.is_sticky(&1) && &1 != __MODULE__))
     |> Enum.each(&:int.ni(&1))
+
+    %DebugServer{state | rejected_module_names: rejected ++ rejected_module_names}
+  end
+
+  defp options_to_elixir_module_name_patterns(options) do
+    Keyword.get_values(options, :do_not_interpret_pattern)
   end
 
   defp parse_args(argv) do
@@ -106,7 +139,7 @@ defmodule Mix.Tasks.IntellijElixir.DebugTask do
         _ -> command_argv
       end
 
-    {options, _} = OptionParser.parse!(debug_argv, strict: [debugger_port: :integer])
+    {options, _} = OptionParser.parse!(debug_argv, strict: [debugger_port: :integer, do_not_interpret_pattern: :keep])
 
     unless Keyword.get(options, :debugger_port) do
       Mix.shell().error("Option --debugger-port required")
@@ -123,13 +156,5 @@ defmodule Mix.Tasks.IntellijElixir.DebugTask do
       task = String.to_atom(task)
       Mix.Project.config()[:preferred_cli_env][task] || Mix.Task.preferred_cli_env(task)
     end
-  end
-
-  defp reject_name_set() do
-    comma_separated_elixir_module_names = System.get_env("INTELLIJ_ELIXIR_DEBUG_BLACKLIST") || ""
-
-    comma_separated_elixir_module_names
-    |> String.split(",")
-    |> Enum.into(MapSet.new(), &elixir_module_name_to_erlang_module_name/1)
   end
 end
