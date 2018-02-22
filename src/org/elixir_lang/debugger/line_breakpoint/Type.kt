@@ -18,51 +18,55 @@
 
 package org.elixir_lang.debugger.line_breakpoint
 
+import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.psi.PsiElement
-import com.intellij.util.Processor
 import com.intellij.xdebugger.XDebuggerUtil
 import com.intellij.xdebugger.breakpoints.XLineBreakpointType
 import org.elixir_lang.ElixirFileType
-import org.elixir_lang.psi.impl.ElixirPsiImplUtil
-import org.jetbrains.annotations.Contract
+import org.elixir_lang.debugger.line_breakpoint.availability_processor.EEx
+import org.elixir_lang.debugger.line_breakpoint.availability_processor.Elixir
 
-class Type private constructor() : XLineBreakpointType<org.elixir_lang.debugger.line_breakpoint.Properties>(ID, NAME) {
+class Type private constructor() : XLineBreakpointType<Properties>(ID, NAME) {
     override fun canPutAt(file: VirtualFile, line: Int, project: Project): Boolean =
-            file.fileType === ElixirFileType.INSTANCE && isLineBreakpointAvailable(file, line, project)
+        processor(file)?.let { processor ->
+           canPutAt(file, line, project, processor)
+        } ?: false
 
     override fun createBreakpointProperties(file: VirtualFile, line: Int): Properties =
             Properties()
 
-    private class LineBreakpointAvailabilityProcessor : Processor<PsiElement> {
-        @get:Contract(pure = true)
-        internal var isLineBreakpointAvailable: Boolean = false
-            private set
-
-        override fun process(psiElement: PsiElement): Boolean =
-                if (ElixirPsiImplUtil.getModuleName(psiElement) != null) {
-                    isLineBreakpointAvailable = true
-                    false
-                } else {
-                    true
-                }
-    }
-
     companion object {
         private const val ID = "ElixirLineBreakpoint"
-        private const val NAME = "Line breakpoint"
+        private const val NAME = "Elixir Line Breakpoints"
 
-        // TODO: it should return true for lines matching "Executable Lines"
-        // description at http://www.erlang.org/doc/apps/debugger/debugger_chapter.html
-        // and, ideally, it should return false otherwise
-        private fun isLineBreakpointAvailable(file: VirtualFile, line: Int, project: Project): Boolean =
-            FileDocumentManager.getInstance().getDocument(file)?.let { document ->
-                val canPutAtChecker = LineBreakpointAvailabilityProcessor()
-                XDebuggerUtil.getInstance().iterateLine(project, document, line, canPutAtChecker)
+        private fun canPutAt(
+                file: VirtualFile,
+                line: Int,
+                project: Project,
+                availabilityProcessor: AvailabilityProcessor
+        ) =
+                FileDocumentManager.getInstance().getDocument(file)?.let { document ->
+                    canPutAt(document, line, project, availabilityProcessor)
+                } ?: false
 
-                canPutAtChecker.isLineBreakpointAvailable
-            } ?: false
+        private fun canPutAt(
+                document: Document,
+                line: Int,
+                project: Project,
+                availabilityProcessor: AvailabilityProcessor
+        ): Boolean {
+            XDebuggerUtil.getInstance().iterateLine(project, document, line, availabilityProcessor)
+
+            return availabilityProcessor.isAvailable
+        }
+
+        private fun processor(file: VirtualFile): AvailabilityProcessor? =
+                when (file.fileType) {
+                    ElixirFileType.INSTANCE -> Elixir()
+                    org.elixir_lang.eex.file.Type.INSTANCE -> EEx()
+                    else -> null
+                }
     }
 }
