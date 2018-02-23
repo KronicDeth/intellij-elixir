@@ -375,9 +375,7 @@ object Macro {
         }
     }
 
-    private fun atomToString(atom: OtpErlangAtom): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    private fun atomToString(atom: OtpErlangAtom): String = inspect(atom)
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex#L662-L669
     private fun ifAccessToString(macro: OtpErlangObject): String? =
