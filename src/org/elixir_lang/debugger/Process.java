@@ -33,24 +33,34 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.util.containers.ContainerUtil;
+import com.intellij.util.indexing.FileBasedIndex;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.breakpoints.XBreakpointHandler;
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
 import com.intellij.xdebugger.evaluation.EvaluationMode;
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
+import gnu.trove.THashSet;
+import kotlin.io.FilesKt;
 import org.elixir_lang.ElixirFileType;
+import org.elixir_lang.beam.chunk.lines.file_names.Index;
 import org.elixir_lang.debugger.line_breakpoint.Handler;
 import org.elixir_lang.debugger.line_breakpoint.Properties;
 import org.elixir_lang.debugger.node.Exception;
 import org.elixir_lang.debugger.node.ProcessSnapshot;
 import org.elixir_lang.debugger.node.event.Listener;
+import org.elixir_lang.eex.File;
 import org.elixir_lang.jps.builder.ParametersList;
 import org.elixir_lang.mix.runner.MixRunConfigurationBase;
 import org.elixir_lang.mix.runner.MixRunningState;
@@ -62,12 +72,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.elixir_lang.beam.term.InspectKt.inspect;
 import static org.elixir_lang.debugger.Log.LOG;
+import static org.elixir_lang.mix.runner.MixRunningStateUtil.workingDirectory;
 
 public class Process extends com.intellij.xdebugger.XDebugProcess implements Listener {
     @NotNull
@@ -127,10 +137,14 @@ public class Process extends com.intellij.xdebugger.XDebugProcess implements Lis
         if (breakpointPosition == null) {
             return;
         }
-        String moduleName = getModuleName(breakpointPosition);
-        if (moduleName != null) {
+        Set<String> moduleNameSet = moduleNameSet(breakpointPosition);
+
+        if (!moduleNameSet.isEmpty()) {
             myPositionToLineBreakpointMap.put(breakpointPosition, breakpoint);
-            myNode.setBreakpoint(moduleName, breakpointPosition.getFile().getPath(), breakpointPosition.getLine());
+
+            for (String moduleName : moduleNameSet) {
+                myNode.setBreakpoint(moduleName, breakpointPosition.getFile().getPath(), breakpointPosition.getLine());
+            }
         } else {
             final String message =
                     "Unable to determine module for breakpoint at " +
@@ -260,15 +274,82 @@ public class Process extends com.intellij.xdebugger.XDebugProcess implements Lis
         return sourcePosition != null ? myPositionToLineBreakpointMap.get(sourcePosition) : null;
     }
 
-    @Nullable
-    private String getModuleName(@NotNull SourcePosition breakpointPosition) {
-        ElixirFile psiFile = (ElixirFile) PsiManager.getInstance(getRunConfiguration().getProject()).findFile(breakpointPosition.getFile());
-        if (psiFile == null) {
-            return null;
+    @NotNull
+    private Set<String> moduleNameSet(@NotNull SourcePosition breakpointPosition) {
+        VirtualFile virtualFile = breakpointPosition.getFile();
+        Project project = getRunConfiguration().getProject();
+        PsiFile psiFile = PsiManager
+                .getInstance(project)
+                .findFile(virtualFile);
+
+        Set<String> moduleNameSet;
+
+        if (psiFile != null) {
+            PsiElement element = psiFile.findElementAt(breakpointPosition.getSourcePosition().getOffset());
+
+            if (psiFile instanceof ElixirFile) {
+                // TODO allow multiple module names for `defimpl`
+                moduleNameSet = Collections.singleton(ElixirPsiImplUtil.getModuleName(element));
+            } else if (psiFile instanceof File) {
+                Module module = ModuleUtilCore.findModuleForPsiElement(psiFile);
+                String rootDirectory = null;
+
+                if (module != null) {
+                    rootDirectory = workingDirectory(module);
+                }
+
+                if (rootDirectory == null) {
+                    rootDirectory = workingDirectory(project);
+                }
+
+                String path = virtualFile.getPath();
+                java.io.File relativeFile;
+
+                try {
+                    relativeFile = FilesKt.relativeTo(
+                            new java.io.File(path),
+                            new java.io.File(rootDirectory)
+                    );
+                } catch (IllegalArgumentException illegalArgumentException) {
+                    relativeFile = null;
+                }
+
+                if (relativeFile != null) {
+                    String filename = relativeFile.getPath();
+
+                    Collection<VirtualFile> fileNameVirtualFileCollection =
+                            FileBasedIndex
+                                    .getInstance()
+                                    .getContainingFiles(
+                                            Index.Companion.getNAME(),
+                                            filename,
+                                            GlobalSearchScope.allScope(project)
+                                    );
+
+                    moduleNameSet = new THashSet<>();
+
+                    for (VirtualFile fileNameVirtualFile : fileNameVirtualFileCollection) {
+                        String beamName = fileNameVirtualFile.getName();
+                        String erlangModuleName = kotlin.text.StringsKt.removeSuffix(beamName, ".beam");
+                        String elixirModuleName = kotlin.text.StringsKt.removePrefix(erlangModuleName, "Elixir.");
+
+                        moduleNameSet.add(elixirModuleName);
+                    }
+                } else {
+                    moduleNameSet = null;
+                }
+            } else {
+                moduleNameSet = null;
+            }
+        } else {
+            moduleNameSet = null;
         }
 
-        PsiElement elem = psiFile.findElementAt(breakpointPosition.getSourcePosition().getOffset());
-        return ElixirPsiImplUtil.getModuleName(elem);
+        if (moduleNameSet == null) {
+            moduleNameSet = Collections.emptySet();
+        }
+
+        return moduleNameSet;
     }
 
     @NotNull
@@ -285,8 +366,9 @@ public class Process extends com.intellij.xdebugger.XDebugProcess implements Lis
             return;
         }
         myPositionToLineBreakpointMap.remove(breakpointPosition);
-        String moduleName = getModuleName(breakpointPosition);
-        if (moduleName != null) {
+        Set<String> moduleNameSet = moduleNameSet(breakpointPosition);
+
+        for (String moduleName : moduleNameSet) {
             myNode.removeBreakpoint(moduleName, breakpointPosition.getLine());
         }
     }
