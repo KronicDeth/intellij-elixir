@@ -16,19 +16,14 @@
  * limitations under the License.
  */
 
-package org.elixir_lang.debugger.stack_frame.value;
+package org.elixir_lang.debugger.stack_frame.value.list
 
-import com.ericsson.otp.erlang.OtpErlangList;
-import com.intellij.xdebugger.frame.XValueChildrenList;
-import org.jetbrains.annotations.NotNull;
+import com.ericsson.otp.erlang.OtpErlangList
+import com.intellij.xdebugger.frame.XValueChildrenList
+import org.elixir_lang.debugger.stack_frame.value.ArrayBase
 
-class List extends ArrayBase<OtpErlangList> {
-  List(@NotNull OtpErlangList value) {
-    super(value, value.arity());
-  }
-
-  @Override
-  protected void computeChild(XValueChildrenList children, int childIdx) {
-    addIndexedChild(children, getValue().elementAt(childIdx), childIdx);
-  }
+internal class Proper(value: OtpErlangList) : ArrayBase<OtpErlangList>(value, value.arity()) {
+    override fun computeChild(children: XValueChildrenList, childIdx: Int) {
+        addIndexedChild(children, value.elementAt(childIdx), childIdx)
+    }
 }

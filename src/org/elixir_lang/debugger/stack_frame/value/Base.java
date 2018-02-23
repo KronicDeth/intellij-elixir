@@ -28,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
-class Base<T extends OtpErlangObject> extends XValue {
+public class Base<T extends OtpErlangObject> extends XValue {
   private final T myValue;
   private final int myChildrenCount;
   private int myNextChildIdxToCompute;
@@ -37,12 +37,12 @@ class Base<T extends OtpErlangObject> extends XValue {
     this(value, 0);
   }
 
-  Base(T value, int childrenCount) {
+  public Base(T value, int childrenCount) {
     myValue = value;
     myChildrenCount = childrenCount;
   }
 
-  T getValue() {
+  protected T getValue() {
     return myValue;
   }
 
@@ -82,7 +82,7 @@ class Base<T extends OtpErlangObject> extends XValue {
     return false;
   }
 
-  void computeChild(XValueChildrenList children, int childIdx) {
+  protected void computeChild(XValueChildrenList children, int childIdx) {
   }
 
   @Nullable
@@ -112,7 +112,7 @@ class Base<T extends OtpErlangObject> extends XValue {
     addIndexedChild(childrenList, new OtpErlangLong(numericChild), childIdx);
   }
 
-  static void addIndexedChild(@NotNull XValueChildrenList childrenList, OtpErlangObject child, int childIdx) {
+  public static void addIndexedChild(@NotNull XValueChildrenList childrenList, OtpErlangObject child, int childIdx) {
     addIndexedChild(childrenList, Factory.create(child), childIdx);
   }
 
@@ -130,7 +130,7 @@ class Base<T extends OtpErlangObject> extends XValue {
     addNamedChild(childrenList, new OtpErlangAtom(atomicChild), name);
   }
 
-  static void addNamedChild(@NotNull XValueChildrenList childrenList, OtpErlangObject child, java.lang.String name) {
+  public static void addNamedChild(@NotNull XValueChildrenList childrenList, OtpErlangObject child, java.lang.String name) {
     addNamedChild(childrenList, Factory.create(child), name);
   }
 
@@ -139,24 +139,3 @@ class Base<T extends OtpErlangObject> extends XValue {
   }
 }
 
-class PrimitiveBase<T extends OtpErlangObject> extends Base<T> {
-  PrimitiveBase(T value) {
-    super(value);
-  }
-
-  @Override
-  protected Icon getIcon() {
-    return AllIcons.Debugger.Db_primitive;
-  }
-}
-
-class ArrayBase<T extends OtpErlangObject> extends Base<T> {
-  ArrayBase(T value, int childrenCount) {
-    super(value, childrenCount);
-  }
-
-  @Override
-  protected Icon getIcon() {
-    return AllIcons.Debugger.Db_array;
-  }
-}

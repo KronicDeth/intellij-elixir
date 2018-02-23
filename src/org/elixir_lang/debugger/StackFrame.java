@@ -73,6 +73,6 @@ class StackFrame extends XStackFrame {
 
   @NotNull
   private static XValue getVariableValue(OtpErlangObject value) {
-    return Factory.create(value);
+    return Factory.INSTANCE.create(value);
   }
 }
