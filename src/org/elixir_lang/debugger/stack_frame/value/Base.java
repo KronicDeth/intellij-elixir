@@ -117,7 +117,7 @@ class Base<T extends OtpErlangObject> extends XValue {
   }
 
   static void addIndexedChild(@NotNull XValueChildrenList childrenList, @NotNull XValue child, int childIdx) {
-    addNamedChild(childrenList, child, "[" + (childIdx + 1) + "]");
+    addNamedChild(childrenList, child, "[" + childIdx + "]");
   }
 
   static void addNamedChild(@NotNull XValueChildrenList childrenList, long numericChild, java.lang.String name) {
