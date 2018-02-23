@@ -166,6 +166,7 @@
     <typedHandler implementation="org.elixir_lang.TypedHandler"/>
 
     <!-- debug -->
+    <fileBasedIndex implementation="org.elixir_lang.beam.chunk.lines.file_names.Index"/>
     <programRunner implementation="org.elixir_lang.debugger.Runner"/>
     <xdebugger.breakpointType implementation="org.elixir_lang.debugger.line_breakpoint.Type"/>
     <xdebugger.settings implementation="org.elixir_lang.debugger.Settings"/>
