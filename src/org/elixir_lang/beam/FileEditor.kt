@@ -33,9 +33,7 @@ class FileEditor(
     override fun getComponent(): JComponent {
         rootTabbedPane = JBTabbedPane(JTabbedPane.TOP, JTabbedPane.SCROLL_TAB_LAYOUT)
 
-        Beam.from(virtualFile)?.let { beam ->
-            val cache = Cache(beam)
-
+        Cache.from(virtualFile)?.let { cache ->
             cache.chunkCollection().forEach { chunk ->
                 addTab(rootTabbedPane, cache, chunk)
             }
