@@ -3725,6 +3725,84 @@ Because Elixir is built on top of Erlang, Elixir command line commands don't hav
 
 Since JetBrains' OpenAPI only supports one SDK per Project or Module, to support Elixir and Erlang SDK at the same time, the Elixir SDK keeps track of an Internal Erlang SDK.  When setting up your first Elixir SDK, you will be prompted to create an Erlang SDK (if you have the [`intellij-erlang`](https://github.com/ignatov/intellij-erlang) plugin [installed](https://plugins.jetbrains.com/plugin/7083-erlang)) or and Erlang for Elixir SDK (if you don't have `intellij-erlang` installed and you need to use the minimal Erlang for Elixir SDK supplied by this plugin).
 
+#### Package Manager Install Locations
+
+When configuring an SDK, if you don't want to use the suggested SDK home path, you'll need to know where each package manager puts Elixir and Erlang.
+
+<table>
+  <thead>
+    <tr>
+      <th>Package Manager</th>
+      <th>SDK Type</th>
+      <th>Directory</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="3">
+        <a href="https://github.com/asdf-vm/asdf">ASDF</a>
+      </td>
+      <td>Elixir SDK</td>
+      <td>
+        <code>~/.asdf/installs/elixir/VERSION</code>
+      </td>
+    </tr>
+    <tr>
+      <td>Erlang SDK</td>
+      <td rowspan="2">
+        <code>~/.asdf/installs/erlang/VERSION</code>
+      </td>
+    </tr>
+    <tr>
+      <td>Erlang for Elixir SDK</td>
+    </tr>
+    <tr>
+      <td rowspan="3">
+        <a href="https://brew.sh/">Homebrew</a>
+      </td>
+      <td>Elixir SDK</td>
+      <td>
+         <code>/usr/local/Cellar/elixir/VERSION</code>
+      </td>
+    </tr>
+    <tr>
+      <td>Erlang SDK</td>
+      <td rowspan="2">
+        <code>/usr/local/Cellar/erlang/VERSION/lib/erlang</code>
+      </td>
+    </tr>
+    <tr>
+      <td>Erlang for Elixir SDK</td>
+    </tr>
+    <tr>
+      <td rowspan="3">
+        <a href="https://nixos.org/nix/download.html">Nix</a>
+      </td>
+      <td>Elixir SDK</td>
+      <td>
+         <code>/nix/store/SHA256-elixir-VERSION/lib/elixir</code>
+      </td>
+    </tr>
+    <tr>
+      <td>Erlang SDK</td>
+      <td rowspan="2">
+        <code>/nix/store/SHA256-erlang-VERSION/lib/erlang</code>
+      </td>
+    </tr>
+    <tr>
+      <td>Erlang for Elixir SDK</td>
+    </tr>
+  </tbody>
+</table>
+
+If you can can't see hidden files, such as `.asdf` in your home directory (`~`), or system directories, such as `/usr`, you will need to enable Show Hidden Files in the Home Path dialog.
+
+If your dialog looks like this, click the Show Hidden Files button
+
+![IntelliJ](screenshots/features/sdk/show_hidden_files_and_directories/IntelliJ.png?raw=true)
+
+If you're using the macOS native File Picker, use the keyboard shortcut ⌘⇧. (Command+Shift+Period).
+
 #### Rich IDEs
 
 Rich IDEs can use the Project Structure system to configure Elixir and Erlang SDKs and select the Project/Module SDK.

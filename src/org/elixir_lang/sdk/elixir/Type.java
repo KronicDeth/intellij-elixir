@@ -240,8 +240,11 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
 
             /* Erlang SDK from intellij-erlang uses lib/erlang/lib as class path, but intellij-elixir needs the ebin
                directories under lib/erlang/lib/APP-VERSION/ebin that works as a code path used by `-pa` argument to
-               `erl.exe` */
-            if (path.endsWith("lib/erlang/lib")) {
+               `erl.exe`
+
+               For ASDF the path ends in erlang/VERSION/lib, in both cases, going to the parent directory will get the
+               right ebin paths from `eachEbinPath` */
+            if (path.endsWith("lib")) {
                 expandedInternalRootList = new ArrayList<>();
                 String parentPath = Paths.get(path).getParent().toString();
                 eachEbinPath(parentPath, ebinPath -> ebinPathChainVirtualFile(ebinPath, expandedInternalRootList::add));
