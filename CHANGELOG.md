@@ -165,6 +165,7 @@
     * Allow setting breakpoints in `.eex` files when a `.beam` file using the template's relative can be found.  **This means that the Phoenix view module `.beam` file must exist in `_build` prior to setting a breakpoint.  Run the Run Configuration once, before debugging to complete the build if setting a breakpoint does not work.**
       * `.beam` files are now indexed by their `Line` chunk `filenames` subsection to power this feature.
   * Cache `.beam` `Beam` `Cache` on `VirtualFile`.  Cache is invalidated and refreshed on modification of the `VirtualFile`.  Cache is used for both BEAM Chunks read-only editors and `Line` chunk file name index.
+* [#1037](https://github.com/KronicDeth/intellij-elixir/pull/1037) - Each package manager uses a different root path and which directory to pick above the ebins varies by package manager, so document package manager install paths. - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#1036](https://github.com/KronicDeth/intellij-elixir/pull/1036) - [@KronicDeth](https://github.com/KronicDeth)
@@ -176,6 +177,7 @@
     * Show improper list with explicit `|` for presenation
     * Children of improper lists show `head` and `tail` instead of index.
   * Show Elixir indices (`0`-based) instead of Erlang indices (`1`-based`) for lists and tuples.
+* [#1037](https://github.com/KronicDeth/intellij-elixir/pull/1037) - Loosen check on the path suffix by looking for only `lib` and not `lib/erlang/lib`, so that it works for both Homebrew's `ebin` paths and ASDF's `ebin` paths. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v7.3.0
 
