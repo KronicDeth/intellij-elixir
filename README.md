@@ -4946,6 +4946,7 @@ I'd like to thank those who have donated to help support this project.
 * Garrett Hart ([@thirdshift](https://github.com/thirdshift))
 * Mateusz Jadczak
 * Jeremy Jackson ([@jejacks0n](https://github.com/jejacks0n))
+* Nathan Yam ([@nathancyam](https://github.com/nathancyam))
 * Raúl Vázquez González ([@rvazquezglez](https://github.com/rvazquezglez))
 * Ryan Scheel ([@Havvy](https://github.com/Havvy))
 * Szymon Jeż ([@szymon-jez](https://github.com/szymon-jez))
@@ -4956,6 +4957,7 @@ I'd like to thank those who have donated to help support this project.
 * Angelika Tyborska ([@angelikatyborska](https://github.com/angelikatyborska))
 * César Salazar Hernández ([@cesarslzr](https://github.com/cesarslzr))
 * Dimitrios Fragkos
+* Dmitry Stropaloff
 * Milan Köpke
 * Percy Grunwald ([@pgrunwald](https://github.com/pgrunwald))
 * William De Melo Gueiros ([@williamgueiros](https://github.com/williamgueiros))
