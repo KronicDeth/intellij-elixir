@@ -1880,7 +1880,15 @@ To configure actions, suspend policy and dependencies of a breakpoint
 
 A line breakpoint is a breakpoint assigned to a specific line in the source code.
 
-Line breakpoints can be set on executable lines. Comments, declarations and empty lines are not valid locations for the line breakpoints.
+Line breakpoints can be set on executable lines. Comments, declarations and empty lines are not valid locations for the line breakpoints.  Line break points can be set in `.ex` and `.eex` files.
+
+![ex](screenshots/debugger/breakpoints/creating/ex.png?raw=true)
+
+`.eex` line breaks will only work on Elixir code that is used in Phoenix view modules.
+
+![eex](screenshots/debugger/breakpoints/creating/eex.png?raw=true)
+
+`.eex` breakpoints only work if a `.beam` file using the template's relative can be found.  **This means that the Phoenix view module `.beam` file must exist in `_build` prior to setting a breakpoint.  Run the Run Configuration once, before debugging to complete the build if setting a breakpoint does not work.**
 
 1. Place the caret on the desired line of the source code.
 2. Do one of the following:
