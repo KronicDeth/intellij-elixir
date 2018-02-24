@@ -454,7 +454,7 @@ public class GeneratedParserUtilBase {
     public static final int _NOT_        = 0x10;
     public static final int _UPPER_      = 0x20;
 
-    // simple enter/exit methods pair that doesn't require frame object
+    // simple enter/exit methods pair that doesn't require stack_frame object
     public static PsiBuilder.Marker enter_section_(PsiBuilder builder) {
         ErrorState.get(builder).level++;
         return builder.mark();
@@ -470,7 +470,7 @@ public class GeneratedParserUtilBase {
         state.level--;
     }
 
-    // complex enter/exit methods pair with frame object
+    // complex enter/exit methods pair with stack_frame object
     public static PsiBuilder.Marker enter_section_(PsiBuilder builder, int level, int modifiers, String frameName) {
         return enter_section_(builder, level, modifiers, null, frameName);
     }
@@ -491,7 +491,7 @@ public class GeneratedParserUtilBase {
         Frame frame = state.FRAMES.alloc().init(builder, state, level, modifiers, elementType, frameName);
         Frame prevFrame = state.currentFrame;
         if (prevFrame != null && prevFrame.errorReportedAt > frame.position) {
-            // report error for previous unsuccessful frame
+            // report error for previous unsuccessful stack_frame
             reportError(builder, state, frame, null, true, false);
         }
         if (((frame.modifiers & _LEFT_) | (frame.modifiers & _LEFT_INNER_)) != 0) {
@@ -601,7 +601,7 @@ public class GeneratedParserUtilBase {
                             eatMoreFlagOnce ? (PsiBuilderImpl.ProductionMarker)builder.getLatestDoneMarker() : null;
             PsiBuilder.Marker extensionMarker = null;
             IElementType extensionTokenType = null;
-            // whitespace prefix makes the very first frame offset bigger than marker start offset which is always 0
+            // whitespace prefix makes the very first stack_frame offset bigger than marker start offset which is always 0
             if (latestDoneMarker != null &&
                     frame.position >= latestDoneMarker.getStartIndex() &&
                     frame.position <= latestDoneMarker.getEndIndex()) {

@@ -436,29 +436,31 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
 
     @Nullable
     private Release detectSdkVersion(@NotNull String sdkHome) {
-        Release cachedRelease = mySdkHomeToReleaseCache.get(getVersionCacheKey(sdkHome));
-        if (cachedRelease != null) {
-            return cachedRelease;
-        }
+        String versionCacheKey = getVersionCacheKey(sdkHome);
+        Release release;
 
-        File elixir = JpsElixirSdkType.getScriptInterpreterExecutable(sdkHome);
-        if (!elixir.canExecute()) {
-            String reason = elixir.getPath() + (elixir.exists() ? " is not executable." : " is missing.");
-            LOG.warn("Can't detect Elixir version: " + reason);
-            return null;
-        }
+        if (mySdkHomeToReleaseCache.containsKey(versionCacheKey)) {
+            release = mySdkHomeToReleaseCache.get(versionCacheKey);
+        } else {
+            File elixir = JpsElixirSdkType.getScriptInterpreterExecutable(sdkHome);
 
-        Release release = transformStdoutLine(
-                Release::fromString,
-                STANDARD_TIMEOUT,
-                sdkHome,
-                elixir.getAbsolutePath(),
-                "-e",
-                "System.version() |> IO.puts()"
-        );
+            if (!elixir.canExecute()) {
+                String reason = elixir.getPath() + (elixir.exists() ? " is not executable." : " is missing.");
+                LOG.warn("Can't detect Elixir version: " + reason);
 
-        if (release != null) {
-            mySdkHomeToReleaseCache.put(getVersionCacheKey(sdkHome), release);
+                release = null;
+            } else {
+                release = transformStdoutLine(
+                        Release::fromString,
+                        STANDARD_TIMEOUT,
+                        sdkHome,
+                        elixir.getAbsolutePath(),
+                        "-e",
+                        "System.version() |> IO.puts()"
+                );
+            }
+
+            mySdkHomeToReleaseCache.put(versionCacheKey, release);
         }
 
         return release;

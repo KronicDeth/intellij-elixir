@@ -54,6 +54,11 @@
       - [Steps](#steps)
       - [Basics](#basics)
         - [Keyboard Shortcuts](#keyboard-shortcuts)
+        - [Excluding Modules](#excluding-modules)
+          - [Disabling Existing Module Patterns](#disabling-existing-module-patterns)
+          - [Editing Existing Module Patterns](#editing-existing-module-patterns)
+          - [Removing Existing Module Patterns](#removing-existing-module-patterns)
+          - [Adding New Module Patterns](#adding-new-module-patterns)
         - [Environment Variables](#environment-variables)
       - [Breakpoints](#breakpoints)
         - [Accessing Breakpoint Properties](#accessing-breakpoint-properties)
@@ -1761,14 +1766,68 @@ After you have configured a [run configuration](#run-configuration) for your pro
 | Step Into                               | `F7`             |
 | View breakpoint details/all breakpoints | `Shift+Cmd+F8`   |
 
+##### Excluding Modules
+
+By default, the debugger will scan all the [load paths](https://hexdocs.pm/mix/Mix.Project.html#load_paths/1) and [build path](https://hexdocs.pm/mix/Mix.Project.html#build_path/1) for `.beam` files and the corresponding modules will be [interpreted](http://erlang.org/doc/man/int.html#ni-1) which causes the Module's [Erlang abstract code chunk](http://beam-wisdoms.clau.se/en/latest/indepth-beam-file.html#abst-abstract-syntax-tree) to be interpreted in Erlang instead of the [bytecode chunk](#code) being executed in the C parts of the BEAM.  This interpretation is **much** slower than execution, so by default all of the Elixir standard library and the common modules installed in Phoenix projects are excluded from being interpreted when the debugger starts.  The modules can be still be stepped into or have breakpoints explicitly set.
+
+1. Preferences > Build, Execution, Deployment > Debugger > Stepping
+2. Scroll to Elixir
+
+![Do Not Step Into The Modules](screenshots/debugger/excluding_modules/Do%20Not%20Step%20Into%20The%20Modules.png?raw=true)
+
+You can customize these module patterns as an application setting.
+
+###### Disabling Existing Module Patterns
+
+1. Preferences > Build, Execution, Deployment > Debugger > Stepping
+2. Scroll to Elixir
+3. Click the Checkbox next to the pattern you want to disable
+4. Click Apply to save or OK to save and close Preferences
+
+![Disable](screenshots/debugger/excluding_modules/Disable.png)
+
+###### Editing Existing Module Patterns
+
+1. Preferences > Build, Execution, Deployment > Debugger > Stepping
+2. Scroll to Elixir
+3. Click the pattern text box
+4. Click Apply to save or OK to save and close Preferences
+
+![Edit](screenshots/debugger/excluding_modules/Edit.png?raw=true)
+
+###### Removing Existing Module Patterns
+
+1. Preferences > Build, Execution, Deployment > Debugger > Stepping
+2. Scroll to Elixir
+3. Click the row of the pattern you want to remove
+4. Click the "-" Remove button.
+5. Click Apply to save or OK to save and close Preferences
+
+![Remove](screenshots/debugger/excluding_modules/Remove.png?raw=true)
+
+![Removed](screenshots/debugger/excluding_modules/Removed.png?raw=true)
+
+###### Adding New Module Patterns
+
+1. Preferences > Build, Execution, Deployment > Debugger > Stepping
+2. Scroll to Elixir
+3. Click the "+" Add button
+4. Click the default "*" pattern to edit it
+5. Click Apply to save or OK to save and close Preferences
+
+![Add](screenshots/debugger/excluding_modules/Add.png?raw=true)
+
+![Added](screenshots/debugger/excluding_modules/Added.png?raw=true)
+
 ##### Environment Variables
+
+If you want to customize the modules to ignore on a per-Run-Configuration basis, you can set an environment variable in the Run Configuration.
 
 | Variable                           | Example    | Description                     |
 | -----------------------------------|------------| --------------------------------|
 | INTELLIJ\_ELIXIR\_DEBUG\_BLACKLIST | iconv,some | Excluding modules from debugger |
 
-*Notice: If you want non `Elixir.` module in blacklist, write it with: `:`.
-This rule applies only to module atoms.*
+*Notice: If you want non `Elixir.` module in blacklist, write it with: `:`. This rule applies only to module atoms.*
 
 #### Breakpoints
 
@@ -1821,7 +1880,15 @@ To configure actions, suspend policy and dependencies of a breakpoint
 
 A line breakpoint is a breakpoint assigned to a specific line in the source code.
 
-Line breakpoints can be set on executable lines. Comments, declarations and empty lines are not valid locations for the line breakpoints.
+Line breakpoints can be set on executable lines. Comments, declarations and empty lines are not valid locations for the line breakpoints.  Line break points can be set in `.ex` and `.eex` files.
+
+![ex](screenshots/debugger/breakpoints/creating/ex.png?raw=true)
+
+`.eex` line breaks will only work on Elixir code that is used in Phoenix view modules.
+
+![eex](screenshots/debugger/breakpoints/creating/eex.png?raw=true)
+
+`.eex` breakpoints only work if a `.beam` file using the template's relative can be found.  **This means that the Phoenix view module `.beam` file must exist in `_build` prior to setting a breakpoint.  Run the Run Configuration once, before debugging to complete the build if setting a breakpoint does not work.**
 
 1. Place the caret on the desired line of the source code.
 2. Do one of the following:
@@ -1907,7 +1974,7 @@ Debug quick menu
 </figure>
 
 * Press `Up` or `Down` to change frames
-* Click the frame from the list
+* Click the stack_frame from the list
 
 ###### Jump to Current Execution Point
 
@@ -2352,7 +2419,7 @@ Much like `rake` tasks in Rubymine, this plugin can run `mix` tasks.
 8. Click the Run arrow in the Toolbar to run the `mix` task
    ![Run](/screenshots/features/run_configurations/mix_tasks/Toolbar%20Run%20Button.png?raw=true "Run Elixir Mix Run Configuration")
 9. The Run pane will open, showing the results of the `mix` task.
-    * If there is an error with a FILE:LINE stack frame, it will be a clickable link that will take you to that location
+    * If there is an error with a FILE:LINE stack stack_frame, it will be a clickable link that will take you to that location
       ![Error link](/screenshots/features/run_configurations/mix_tasks/Error%20Link.png?raw=true "Clickable Error Link")
 
 #### `mix test`

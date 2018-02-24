@@ -3,39 +3,52 @@ defmodule IntellijElixir.DebugServer do
 
   use GenServer
 
-  def init({task, port}) do
-    opts = [:binary, {:packet, 4}, {:active, true}]
-    {:ok, host} = :inet.gethostname()
-    {:ok, socket} = :gen_tcp.connect(host, port, opts)
-    :int.auto_attach([:break], {__MODULE__, :breakpoint_reached, []})
+  defstruct port: nil,
+            ref: nil,
+            reject_erlang_module_name_patterns: [],
+            reject_regex: nil,
+            rejected_module_names: [],
+            socket: nil,
+            task: nil
 
-    {:ok, %{task: task, socket: socket, ref: nil}}
-  end
+  # Functions
+
+  ## Client Functions
 
   def breakpoint_reached(pid) do
     GenServer.cast(__MODULE__, {:breakpoint_reached, pid})
   end
 
-  def handle_info({:tcp, socket, message}, state = %{socket: socket}) do
-    handle_cast(:erlang.binary_to_term(message), state)
+  def put_reject_elixir_module_name_patterns(state = %__MODULE__{}, elixir_module_name_patterns)
+      when is_list(elixir_module_name_patterns) do
+    erlang_module_name_patterns = Enum.map(elixir_module_name_patterns, &elixir_module_name_to_erlang_module_name/1)
+    regex = erlang_module_name_patterns_to_regex(erlang_module_name_patterns)
+
+    %__MODULE__{state | reject_erlang_module_name_patterns: erlang_module_name_patterns, reject_regex: regex}
   end
 
-  # When task finishes, stop the server
-  def handle_info({:DOWN, ref, :process, _, status}, state = %{ref: ref}) do
-    {:stop, status, state}
+  ## GenServer callbacks
+
+  @impl GenServer
+  def handle_cast(
+        :rejected_module_names,
+        state = %__MODULE__{rejected_module_names: rejected_module_names, socket: socket}
+      ) do
+    response = {:rejected_module_names, rejected_module_names}
+    send_message(socket, response)
+    {:noreply, state}
   end
 
-  def handle_info(request, state) do
-    super(request, state)
-  end
-
-  def handle_cast({:run_task}, state = %{task: {task_name, task_args}}) do
+  def handle_cast(:run_task, state = %__MODULE__{task: {task_name, task_args}}) do
     {_pid, ref} = spawn_monitor(Mix.Task, :run, [task_name, task_args])
     {:noreply, %{state | ref: ref}}
   end
 
-  def handle_cast({:set_breakpoint, module, line, file}, state = %{socket: socket}) when is_atom(module) and is_integer(line) do
-    unless module in :int.interpreted, do: :int.ni(module)
+  def handle_cast({:set_breakpoint, module, line, file}, state = %__MODULE__{socket: socket})
+      when is_binary(file)
+      when is_atom(module) and is_integer(line) do
+    unless module in :int.interpreted(), do: :int.ni(module)
+
     response = {:set_breakpoint_response, module, line, :int.break(module, line), file}
     send_message(socket, response)
     {:noreply, state}
@@ -66,7 +79,7 @@ defmodule IntellijElixir.DebugServer do
     {:noreply, state}
   end
 
-  def handle_cast({:breakpoint_reached, pid}, state = %{socket: socket}) do
+  def handle_cast({:breakpoint_reached, pid}, state = %__MODULE__{socket: socket}) do
     send_message(socket, {:breakpoint_reached, pid, snapshot_with_stacks()})
     {:noreply, state}
   end
@@ -75,69 +88,163 @@ defmodule IntellijElixir.DebugServer do
     super(request, state)
   end
 
+  @impl GenServer
+  def handle_info({:tcp, socket, message}, state = %__MODULE__{socket: socket}) do
+    handle_cast(:erlang.binary_to_term(message), state)
+  end
+
+  # When task finishes, stop the server
+  def handle_info({:DOWN, ref, :process, _, status}, state = %__MODULE__{ref: ref}) do
+    {:stop, status, state}
+  end
+
+  def handle_info(request, state) do
+    super(request, state)
+  end
+
+  @impl GenServer
+  def init(state = %__MODULE__{port: port}) do
+    opts = [:binary, {:packet, 4}, {:active, true}]
+    {:ok, host} = :inet.gethostname()
+    {:ok, socket} = :gen_tcp.connect(host, port, opts)
+    :int.auto_attach([:break], {__MODULE__, :breakpoint_reached, []})
+
+    {:ok, %__MODULE__{state | socket: socket}}
+  end
+
+  ## Private Functions
+
+  defp bindings(meta_pid, level) do
+    :int.meta(meta_pid, :bindings, level)
+  end
+
+  defp elixir_module_name_to_erlang_module_name(":" <> erlang_module_name), do: erlang_module_name
+
+  defp elixir_module_name_to_erlang_module_name(erlang_module_name = "Elixir." <> _), do: erlang_module_name
+
+  defp elixir_module_name_to_erlang_module_name(elixir_module_name), do: "Elixir." <> elixir_module_name
+
+  defp erlang_module_name_pattern_to_regex_pattern(erlang_module_name_pattern) do
+    erlang_module_name_pattern
+    |> Regex.escape()
+    |> String.replace(~S"\*", ".*")
+  end
+
+  defp erlang_module_name_patterns_to_regex(erlang_module_name_patterns) do
+    unpinned_pattern =
+      erlang_module_name_patterns
+      |> Stream.map(&erlang_module_name_pattern_to_regex_pattern/1)
+      |> Enum.join("|")
+
+    Regex.compile!("^#{unpinned_pattern}$")
+  end
+
+  defp meta_pid_to_stack(meta_pid, %{line: break_line}) do
+    [{level, mfa} | backtrace_tail] = :int.meta(meta_pid, :backtrace, :all)
+    head_frame = {level, mfa, bindings(meta_pid, level), {to_file(mfa), break_line}}
+
+    tail_frames =
+      case backtrace_tail do
+        # If `backtrace_tail` is empty, calling `stack_frames_above` causes an exception
+        [] ->
+          []
+
+        _ ->
+          frames = stack_frames_above(meta_pid, level)
+
+          for {{level, mfa = {module, _, _}}, {level, {module, line}, bindings}} <- List.zip([backtrace_tail, frames]) do
+            {level, mfa, bindings, {to_file(mfa), line}}
+          end
+      end
+
+    [head_frame | tail_frames]
+  end
+
+  defp to_file(arg = {module, function, arguments}) do
+    source = source(module)
+
+    with [_] <- arguments,
+         {:ok, {root, _pattern, names}} <- templates(module),
+         function_string = to_string(function),
+         true <- function_string in names do
+      root_parent = root_parent(source)
+      List.foldr([root_parent, root, "#{function_string}.eex"], "", &Path.join/2)
+    else
+      _ -> source
+    end
+  end
+
+  defp pid_to_stack(pid, options) do
+    case :dbg_iserver.safe_call({:get_meta, pid}) do
+      {:ok, meta_pid} ->
+        meta_pid_to_stack(meta_pid, options)
+
+      error ->
+        IO.warn("Failed to obtain meta pid for #{inspect(pid)}: #{inspect(error)}")
+
+        []
+    end
+  end
+
+  defp root_parent(ancestor) do
+    if File.dir?(ancestor) and ancestor |> Path.join("mix.exs") |> File.exists?() do
+      ancestor
+    else
+      ancestor
+      |> Path.dirname()
+      |> root_parent()
+    end
+  end
+
   defp send_message(socket, message) do
     :gen_tcp.send(socket, :erlang.term_to_binary(message))
   end
 
   defp snapshot_with_stacks() do
     for {pid, init, status, info} <- :int.snapshot(), into: [] do
-      full_info = case info do
-        {break_module, break_line} -> {break_module, break_line, get_file(break_module)}
-        _ -> info
-      end
-      {pid, init, status, full_info, get_stack(pid, status, full_info)}
+      full_info =
+        case info do
+          {break_module, break_line} -> {break_module, break_line, source(break_module)}
+          _ -> info
+        end
+
+      {pid, init, status, full_info, stack(pid, status, full_info)}
     end
   end
 
-  defp get_stack(pid, :break, full_info) do
-    do_get_stackframes(pid, full_info)
-  end
-
-  defp get_stack(_, _, _) do
-    []
-  end
-
-  defp do_get_stackframes(pid, {_, break_line, break_file}) do
-    case(:dbg_iserver.safe_call({:get_meta, pid})) do
-      {:ok, metaPid} ->
-        [{level, mfa} | backtrace_rest] = :int.meta(metaPid, :backtrace, :all)
-        first_frame = {level, mfa, get_bindings(metaPid, level), {break_file, break_line}}
-
-        # If backtrace_rest is empty, calling stack_frames causes an exception
-        other_frames =
-          case backtrace_rest do
-            [] -> []
-            _ ->
-              frames = stack_frames(metaPid, level)
-              for {{level, mfa = {module, _, _}}, {level, {module, line}, bindings}} <- List.zip([backtrace_rest, frames]) do
-                {level, mfa, bindings, {get_file(module), line}}
-              end
-          end
-
-        [first_frame | other_frames]
-      error ->
-        :io.format('Failed to obtain meta pid for ~p: ~p~n', [pid, error])
-        []
+  defp source(module) do
+    if Code.ensure_loaded?(module) do
+      module.module_info[:compile][:source]
     end
   end
 
-  defp stack_frames(metaPid, level) do
-    frame = :int.meta(metaPid, :stack_frame, {:up, level})
+  defp stack(pid, :break, {_, break_line, _}) do
+    pid_to_stack(pid, %{line: break_line})
+  end
+
+  defp stack(_, _, _), do: []
+
+  defp stack_frames_above(meta_pid, level) do
+    frame = :int.meta(meta_pid, :stack_frame, {:up, level})
+
     case frame do
-      {nextLevel, _, _} -> [frame | stack_frames(metaPid, nextLevel)]
+      {next_level, _, _} -> [frame | stack_frames_above(meta_pid, next_level)]
       _ -> []
     end
   end
 
-  defp get_bindings(metaPid, sP) do
-    :int.meta(metaPid, :bindings, sP)
-  end
-
-  defp get_file(module) do
-    if Code.ensure_loaded?(module) do
-      module.module_info
-      |> Keyword.get(:compile)
-      |> Keyword.get(:source)
+  defp templates(module) do
+    if Code.ensure_loaded?(module) && function_exported?(module, :__templates__, 0) do
+      try do
+        module.__templates__()
+      rescue
+        _ -> :error
+      else
+        templates = {_root, _pattern, _names} -> {:ok, templates}
+        _ -> :error
+      end
+    else
+      :error
     end
   end
 end
