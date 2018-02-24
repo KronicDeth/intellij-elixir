@@ -2,9 +2,11 @@ package org.elixir_lang.jps.model;
 
 import com.intellij.openapi.util.SystemInfo;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jps.model.JpsDummyElement;
 import org.jetbrains.jps.model.JpsElementFactory;
 import org.jetbrains.jps.model.JpsElementTypeWithDefaultProperties;
+import org.jetbrains.jps.model.library.sdk.JpsSdk;
 import org.jetbrains.jps.model.library.sdk.JpsSdkType;
 
 import java.io.File;
@@ -28,6 +30,25 @@ public class JpsElixirSdkType extends JpsSdkType<JpsDummyElement> implements Jps
   @NotNull
   public static File getByteCodeCompilerExecutable(@NotNull String sdkHome){
     return getSdkExecutable(sdkHome, BYTECODE_COMPILER);
+  }
+
+  @NotNull
+  public static String getMixScript(@Nullable JpsSdk<JpsDummyElement> sdk) {
+    String mixPath;
+
+    if (sdk != null) {
+      String homePath = sdk.getHomePath();
+
+      if (homePath != null) {
+        mixPath = getMixScript(homePath).getPath();
+      } else {
+        mixPath = ELIXIR_TOOL_MIX;
+      }
+    } else {
+      mixPath = ELIXIR_TOOL_MIX;
+    }
+
+    return mixPath;
   }
 
   @NotNull

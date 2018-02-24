@@ -186,15 +186,9 @@ public class ElixirBuilder extends TargetBuilder<ElixirSourceRootDescriptor, Eli
                                      CompileContext context,
                                      JpsModule module,
                                      ElixirCompilerOptions compilerOptions) throws ProjectBuildException, IOException {
-
-    String mixPath = getMixExecutablePath(module.getProject());
-    if(mixPath == null){
-      String errorMessage = "Mix path is not set.";
-      context.processMessage(new CompilerMessage(MIX_NAME, BuildMessage.Kind.ERROR, errorMessage));
-      throw new ProjectBuildException(errorMessage);
-    }
-
     JpsSdk<JpsDummyElement> sdk = ElixirTargetBuilderUtil.getSdk(context, module);
+
+    String mixPath = JpsElixirSdkType.getMixScript(sdk);
     String elixirPath = JpsElixirSdkType.getScriptInterpreterExecutable(sdk.getHomePath()).getAbsolutePath();
 
     for(String contentRootUrl: module.getContentRootsList().getUrls()){
@@ -406,7 +400,6 @@ public class ElixirBuilder extends TargetBuilder<ElixirSourceRootDescriptor, Eli
                              @Nullable String contentRootPath,
                              @NotNull ElixirCompilerOptions compilerOptions,
                              @NotNull CompileContext context) throws ProjectBuildException{
-
     GeneralCommandLine commandLine = new GeneralCommandLine();
     commandLine.withWorkDirectory(contentRootPath);
     commandLine.setExePath(elixirPath);
