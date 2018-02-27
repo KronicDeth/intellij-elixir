@@ -1,6 +1,5 @@
 package org.elixir_lang.jps.builder;
 
-import com.intellij.execution.process.ProcessAdapter;
 import com.intellij.execution.process.ProcessEvent;
 import com.intellij.openapi.util.Key;
 import org.apache.commons.lang3.StringUtils;
@@ -14,7 +13,7 @@ import org.jetbrains.jps.incremental.messages.CompilerMessage;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ElixirCompilerProcessAdapter extends ProcessAdapter {
+public class ProcessAdapter extends com.intellij.execution.process.ProcessAdapter {
     private static final Pattern COMPILATION_ERROR_PATTERN =
             Pattern.compile("^== Compilation error in file (?<file>.+) ==\n");
     private static final String INDENT = "  ";
@@ -39,10 +38,10 @@ public class ElixirCompilerProcessAdapter extends ProcessAdapter {
     private String sourcePath = null;
     private State state = State.INITIAL;
 
-    public ElixirCompilerProcessAdapter(@NotNull CompileContext context,
-                                        @NotNull String builderName,
-                                        @NotNull String compileTargetRootPath,
-                                        ElixirCompilerOptions compilerOptions) {
+    public ProcessAdapter(@NotNull CompileContext context,
+                          @NotNull String builderName,
+                          @NotNull String compileTargetRootPath,
+                          ElixirCompilerOptions compilerOptions) {
         this.context = context;
         this.builderName = builderName;
         this.compileTargetRootPath = compileTargetRootPath;

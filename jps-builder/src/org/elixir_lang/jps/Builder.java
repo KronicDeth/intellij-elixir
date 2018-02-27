@@ -1,7 +1,6 @@
 package org.elixir_lang.jps;
 
 import com.intellij.execution.process.BaseOSProcessHandler;
-import com.intellij.execution.process.ProcessAdapter;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.io.FileUtilRt;
@@ -207,7 +206,7 @@ public class Builder extends TargetBuilder<ElixirSourceRootDescriptor, Target> {
     }
 
     BaseOSProcessHandler handler = new BaseOSProcessHandler(process, commandLine.getCommandLineString(), Charset.defaultCharset());
-    ProcessAdapter adapter = new ElixirCompilerProcessAdapter(context, ElIXIRC_NAME, "", compilerOptions);
+    com.intellij.execution.process.ProcessAdapter adapter = new ProcessAdapter(context, ElIXIRC_NAME, "", compilerOptions);
     handler.addProcessListener(adapter);
     handler.startNotify();
     handler.waitFor();
@@ -377,7 +376,7 @@ public class Builder extends TargetBuilder<ElixirSourceRootDescriptor, Target> {
     }
 
     BaseOSProcessHandler handler = new BaseOSProcessHandler(process, commandLine.getCommandLineString(), Charset.defaultCharset());
-    ProcessAdapter adapter = new ElixirCompilerProcessAdapter(context, MIX_NAME, commandLine.getWorkDirectory().getPath(), compilerOptions);
+    com.intellij.execution.process.ProcessAdapter adapter = new ProcessAdapter(context, MIX_NAME, commandLine.getWorkDirectory().getPath(), compilerOptions);
     handler.addProcessListener(adapter);
     handler.startNotify();
     handler.waitFor();
