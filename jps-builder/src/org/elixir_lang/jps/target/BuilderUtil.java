@@ -1,4 +1,4 @@
-package org.elixir_lang.jps.builder;
+package org.elixir_lang.jps.target;
 
 import org.elixir_lang.jps.Builder;
 import org.elixir_lang.jps.model.JpsElixirSdkType;
@@ -14,8 +14,8 @@ import org.jetbrains.jps.model.module.JpsModule;
 /**
  * Created by zyuyou on 15/7/12.
  */
-public class ElixirTargetBuilderUtil {
-  public ElixirTargetBuilderUtil() {
+public class BuilderUtil {
+  public BuilderUtil() {
   }
 
   @NotNull
