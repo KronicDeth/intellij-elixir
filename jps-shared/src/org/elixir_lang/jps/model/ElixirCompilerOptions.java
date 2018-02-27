@@ -7,10 +7,10 @@ import com.intellij.util.xmlb.annotations.Tag;
  */
 public class ElixirCompilerOptions {
   @Tag("useMixCompiler")
-  public boolean myUseMixCompiler = false;
+  public boolean myUseMixCompiler = true;
 
   @Tag("useDocs")
-  public boolean myAttachDocsEnabled = false;
+  public boolean myAttachDocsEnabled = true;
 
   @Tag("useDebugInfo")
   public boolean myAttachDebugInfoEnabled = true;
