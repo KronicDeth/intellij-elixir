@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Created by zyuyou on 15/7/10.
  */
-public class ElixirBuilderService extends BuilderService {
+public class Service extends BuilderService {
   @NotNull
   @Override
   public List<? extends BuildTargetType<?>> getTargetTypes() {
