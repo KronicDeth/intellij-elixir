@@ -5,10 +5,12 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.io.FileUtilRt;
 import com.intellij.util.CommonProcessors;
-import com.intellij.util.Function;
 import com.intellij.util.containers.ContainerUtil;
 import gnu.trove.THashSet;
-import org.elixir_lang.jps.builder.*;
+import org.elixir_lang.jps.builder.ExecutionException;
+import org.elixir_lang.jps.builder.GeneralCommandLine;
+import org.elixir_lang.jps.builder.ProcessAdapter;
+import org.elixir_lang.jps.builder.SourceRootDescriptor;
 import org.elixir_lang.jps.model.ElixirCompilerOptions;
 import org.elixir_lang.jps.model.JpsElixirCompilerOptionsExtension;
 import org.elixir_lang.jps.model.JpsElixirModuleType;
@@ -19,14 +21,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jps.builders.BuildOutputConsumer;
 import org.jetbrains.jps.builders.DirtyFilesHolder;
-import org.jetbrains.jps.builders.FileProcessor;
 import org.jetbrains.jps.incremental.CompileContext;
 import org.jetbrains.jps.incremental.ProjectBuildException;
 import org.jetbrains.jps.incremental.TargetBuilder;
 import org.jetbrains.jps.incremental.messages.BuildMessage;
 import org.jetbrains.jps.incremental.messages.CompilerMessage;
 import org.jetbrains.jps.incremental.resources.ResourcesBuilder;
-import org.jetbrains.jps.incremental.resources.StandardResourceBuilderEnabler;
 import org.jetbrains.jps.model.JpsDummyElement;
 import org.jetbrains.jps.model.JpsProject;
 import org.jetbrains.jps.model.java.JavaSourceRootType;
@@ -47,338 +47,306 @@ import java.util.*;
  * https://github.com/ignatov/intellij-erlang/tree/master/jps-plugin/src/org/intellij/erlang/jps/rebar
  */
 public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
-  public static final String BUILDER_NAME = "Elixir Builder";
+    public static final String BUILDER_NAME = "Elixir Builder";
 
-  public static final String ELIXIR_SOURCE_EXTENSION = "ex";
-  public static final String ELIXIR_SCRIPT_EXTENSION = "exs";
-  public static final String ELIXIR_TEST_SOURCE_EXTENSION = ELIXIR_SCRIPT_EXTENSION;
+    public static final String ELIXIR_SOURCE_EXTENSION = "ex";
+    public static final String ELIXIR_SCRIPT_EXTENSION = "exs";
+    private static final String ELIXIR_TEST_SOURCE_EXTENSION = ELIXIR_SCRIPT_EXTENSION;
 
-  public static final String ElIXIRC_NAME = "elixirc";
-  public static final String MIX_NAME = "mix";
+    private static final String ElIXIRC_NAME = "elixirc";
+    private static final String MIX_NAME = "mix";
+    private static final String ADD_PATH_TO_FRONT_OF_CODE_PATH = "-pa";
+    private static final FileFilter ELIXIR_SOURCE_FILTER =
+            file -> FileUtilRt.extensionEquals(file.getName(), ELIXIR_SOURCE_EXTENSION);
+    private static final FileFilter ELIXIR_TEST_SOURCE_FILTER =
+            file -> FileUtilRt.extensionEquals(file.getName(), ELIXIR_TEST_SOURCE_EXTENSION);
+    // use JavaBuilderExtension?
+    private static final Set<? extends JpsModuleType<?>> ourCompilableModuleTypes =
+            Collections.singleton(JpsElixirModuleType.INSTANCE);
+    private static final String MIX_CONFIG_FILE_NAME = "mix." + ELIXIR_SCRIPT_EXTENSION;
+    private final static Logger LOG = Logger.getInstance(Builder.class);
 
-  private static final String MIX_CONFIG_FILE_NAME = "mix." + ELIXIR_SCRIPT_EXTENSION;
+    public Builder() {
+        super(Arrays.asList(Type.PRODUCTION, Type.TEST));
 
-  private final static Logger LOG = Logger.getInstance(Builder.class);
-
-  public static final String ADD_PATH_TO_FRONT_OF_CODE_PATH = "-pa";
-
-  public static final FileFilter ELIXIR_SOURCE_FILTER = new FileFilter() {
-    @Override
-    public boolean accept(File file) {
-      return FileUtilRt.extensionEquals(file.getName(), ELIXIR_SOURCE_EXTENSION);
+        // disables java resource builder for elixir modules
+        ResourcesBuilder.registerEnabler(module -> !(module.getModuleType() instanceof JpsElixirModuleType));
     }
-  };
 
-  public static final FileFilter ELIXIR_TEST_SOURCE_FILTER = new FileFilter() {
-    @Override
-    public boolean accept(File file) {
-      return FileUtilRt.extensionEquals(file.getName(), ELIXIR_TEST_SOURCE_EXTENSION);
+    /**
+     * Build With elixirc.
+     * if "isMake": compile all files of the module and dependent module.
+     * else: just for compile the target affected file.
+     */
+    private static void doBuildWithElixirc(Target target,
+                                           CompileContext context,
+                                           JpsModule module,
+                                           ElixirCompilerOptions compilerOptions,
+                                           Collection<File> filesToCompile) throws ProjectBuildException {
+
+        // ensure compile output directory
+        File outputDirectory = getBuildOutputDirectory(module, target.isTests(), context);
+
+        runElixirc(target, context, compilerOptions, filesToCompile, outputDirectory);
     }
-  };
 
-  // use JavaBuilderExtension?
-  public static final Set<? extends JpsModuleType<?>> ourCompilableModuleTypes = Collections.singleton(JpsElixirModuleType.INSTANCE);
+    private static void doBuildWithMix(Target target,
+                                       CompileContext context,
+                                       JpsModule module,
+                                       ElixirCompilerOptions compilerOptions) throws ProjectBuildException, IOException {
+        JpsSdk<JpsDummyElement> sdk = BuilderUtil.getSdk(context, module);
 
-  public Builder(){
-    super(Arrays.asList(Type.PRODUCTION, Type.TEST));
+        String mixPath = JpsElixirSdkType.getMixScript(sdk);
+        String elixirPath = JpsElixirSdkType.getScriptInterpreterExecutable(sdk.getHomePath()).getAbsolutePath();
 
-    // disables java resource builder for elixir modules
-    ResourcesBuilder.registerEnabler(new StandardResourceBuilderEnabler() {
-      @Override
-      public boolean isResourceProcessingEnabled(JpsModule module) {
-        return !(module.getModuleType() instanceof JpsElixirModuleType);
-      }
-    });
-  }
+        for (String contentRootUrl : module.getContentRootsList().getUrls()) {
+            String contentRootPath = new URL(contentRootUrl).getPath();
+            File contentRootDir = new File(contentRootPath);
+            File mixConfigFile = new File(contentRootDir, MIX_CONFIG_FILE_NAME);
+            if (!mixConfigFile.exists()) continue;
 
-  @Override
-  public void build(@NotNull Target target,
-                    @NotNull DirtyFilesHolder<SourceRootDescriptor, Target> holder,
-                    @NotNull BuildOutputConsumer outputConsumer,
-                    @NotNull CompileContext context) throws ProjectBuildException, IOException {
-
-    LOG.info(target.getPresentableName());
-    final Set<File> filesToCompile = new THashSet<File>(FileUtil.FILE_HASHING_STRATEGY);
-
-    holder.processDirtyFiles(new FileProcessor<SourceRootDescriptor, Target>() {
-      @Override
-      public boolean apply(Target target, File file, SourceRootDescriptor root) throws IOException {
-        boolean isAcceptFile = target.isTests() ? ELIXIR_TEST_SOURCE_FILTER.accept(file) : ELIXIR_SOURCE_FILTER.accept(file);
-        if(isAcceptFile && ourCompilableModuleTypes.contains(target.getModule().getModuleType())){
-          filesToCompile.add(file);
+            runMix(target, elixirPath, mixPath, contentRootPath, compilerOptions, context);
         }
-        return true;
-      }
-    });
-
-    if(filesToCompile.isEmpty() && !holder.hasRemovedFiles()) return;
-
-    JpsModule module = target.getModule();
-    JpsProject project = module.getProject();
-    ElixirCompilerOptions compilerOptions = JpsElixirCompilerOptionsExtension.getOrCreateExtension(project).getOptions();
-
-    if(compilerOptions.myUseMixCompiler){
-      doBuildWithMix(target, context, module, compilerOptions);
-    } else {
-      // elixirc can not compile tests now.
-      if(!target.isTests()){
-        doBuildWithElixirc(target, context, module, compilerOptions, filesToCompile);
-      }
-    }
-  }
-
-  @NotNull
-  @Override
-  public String getPresentableName() {
-    return BUILDER_NAME;
-  }
-
-  /**
-   * Build With elixirc.
-   * if "isMake": compile all files of the module and dependent module.
-   * else: just for compile the target affected file.
-   * */
-  private static void doBuildWithElixirc(Target target,
-                                         CompileContext context,
-                                         JpsModule module,
-                                         ElixirCompilerOptions compilerOptions,
-                                         Collection<File> filesToCompile) throws ProjectBuildException{
-
-    // ensure compile output directory
-    File outputDirectory = getBuildOutputDirectory(module, target.isTests(), context);
-
-    runElixirc(target, context, compilerOptions, filesToCompile, outputDirectory);
-  }
-
-  private static void doBuildWithMix(Target target,
-                                     CompileContext context,
-                                     JpsModule module,
-                                     ElixirCompilerOptions compilerOptions) throws ProjectBuildException, IOException {
-    JpsSdk<JpsDummyElement> sdk = BuilderUtil.getSdk(context, module);
-
-    String mixPath = JpsElixirSdkType.getMixScript(sdk);
-    String elixirPath = JpsElixirSdkType.getScriptInterpreterExecutable(sdk.getHomePath()).getAbsolutePath();
-
-    for(String contentRootUrl: module.getContentRootsList().getUrls()){
-      String contentRootPath = new URL(contentRootUrl).getPath();
-      File contentRootDir = new File(contentRootPath);
-      File mixConfigFile = new File(contentRootDir, MIX_CONFIG_FILE_NAME);
-      if(!mixConfigFile.exists()) continue;
-
-      runMix(target, elixirPath, mixPath, contentRootPath, compilerOptions, context);
-    }
-  }
-
-  /*** doBuildWithElixirc releated private methods */
-
-  @NotNull
-  private static File getBuildOutputDirectory(@NotNull JpsModule module,
-                                              boolean forTests,
-                                              @NotNull CompileContext context) throws ProjectBuildException{
-
-    JpsJavaExtensionService instance = JpsJavaExtensionService.getInstance();
-    File outputDirectory = instance.getOutputDirectory(module, forTests);
-    if(outputDirectory == null){
-      String errorMessage = "No output directory for module " + module.getName();
-      context.processMessage(new CompilerMessage(ElIXIRC_NAME, BuildMessage.Kind.ERROR, errorMessage));
-      throw new ProjectBuildException(errorMessage);
     }
 
-    if(!outputDirectory.exists()){
-      FileUtil.createDirectory(outputDirectory);
-    }
-    return outputDirectory;
-  }
+    /*** doBuildWithElixirc releated private methods */
 
-  private static void runElixirc(Target target,
-                                 CompileContext context,
-                                 ElixirCompilerOptions compilerOptions,
-                                 Collection<File> files,
-                                 File outputDirectory) throws ProjectBuildException {
+    @NotNull
+    private static File getBuildOutputDirectory(@NotNull JpsModule module,
+                                                boolean forTests,
+                                                @NotNull CompileContext context) throws ProjectBuildException {
 
-    GeneralCommandLine commandLine = getElixircCommandLine(target, context, compilerOptions, files, outputDirectory);
+        JpsJavaExtensionService instance = JpsJavaExtensionService.getInstance();
+        File outputDirectory = instance.getOutputDirectory(module, forTests);
+        if (outputDirectory == null) {
+            String errorMessage = "No output directory for module " + module.getName();
+            context.processMessage(new CompilerMessage(ElIXIRC_NAME, BuildMessage.Kind.ERROR, errorMessage));
+            throw new ProjectBuildException(errorMessage);
+        }
 
-    Process process;
-    try{
-      process = commandLine.createProcess();
-    }catch (ExecutionException e){
-      throw new ProjectBuildException("Failed to launch elixir compiler", e);
-    }
-
-    BaseOSProcessHandler handler = new BaseOSProcessHandler(process, commandLine.getCommandLineString(), Charset.defaultCharset());
-    com.intellij.execution.process.ProcessAdapter adapter = new ProcessAdapter(context, ElIXIRC_NAME, "", compilerOptions);
-    handler.addProcessListener(adapter);
-    handler.startNotify();
-    handler.waitFor();
-  }
-
-  private static GeneralCommandLine getElixircCommandLine(Target target,
-                                                          CompileContext context,
-                                                          ElixirCompilerOptions compilerOptions,
-                                                          Collection<File> files,
-                                                          File outputDirectory) throws ProjectBuildException{
-
-    GeneralCommandLine commandLine = new GeneralCommandLine();
-
-    // get executable
-    JpsModule module = target.getModule();
-    JpsSdk<JpsDummyElement> sdk = BuilderUtil.getSdk(context, module);
-    File executable = JpsElixirSdkType.getByteCodeCompilerExecutable(sdk.getHomePath());
-
-    List<String> compileFilePaths = getCompileFilePaths(module, target, context, files);
-
-    commandLine.withWorkDirectory(outputDirectory);
-    commandLine.setExePath(executable.getAbsolutePath());
-    addDependentModuleCodePath(commandLine, module, target, context);
-    addCompileOptions(commandLine, compilerOptions);
-    commandLine.addParameters(compileFilePaths);
-
-    return commandLine;
-  }
-
-  @NotNull
-  private static List<String> getCompileFilePaths(@NotNull JpsModule module,
-                                                  @NotNull Target target,
-                                                  @NotNull CompileContext context,
-                                                  Collection<File> files){
-    // make
-    if(context.getScope().isBuildIncrementally(target.getTargetType())){
-      return getCompileFilePathsDefault(module, target);
+        if (!outputDirectory.exists()) {
+            FileUtil.createDirectory(outputDirectory);
+        }
+        return outputDirectory;
     }
 
-    // force build files
-    return ContainerUtil.map(files, new Function<File, String>() {
-      @Override
-      public String fun(File file) {
-        return file.getAbsolutePath();
-      }
-    });
-  }
+    private static void runElixirc(Target target,
+                                   CompileContext context,
+                                   ElixirCompilerOptions compilerOptions,
+                                   Collection<File> files,
+                                   File outputDirectory) throws ProjectBuildException {
 
-  @NotNull
-  private static List<String> getCompileFilePathsDefault(@NotNull JpsModule module, @NotNull Target target){
-    CommonProcessors.CollectProcessor<File> exFilesCollector = new CommonProcessors.CollectProcessor<File>(){
-      @Override
-      protected boolean accept(File file) {
-        return !file.isDirectory() && FileUtilRt.extensionEquals(file.getName(), ELIXIR_SOURCE_EXTENSION);
-      }
-    };
+        GeneralCommandLine commandLine = getElixircCommandLine(target, context, compilerOptions, files, outputDirectory);
 
-    List<JpsModuleSourceRoot> sourceRoots = new ArrayList<JpsModuleSourceRoot>();
-    ContainerUtil.addAll(sourceRoots, module.getSourceRoots(JavaSourceRootType.SOURCE));
-    if(target.isTests()){
-      ContainerUtil.addAll(sourceRoots, module.getSourceRoots(JavaSourceRootType.TEST_SOURCE));
+        Process process;
+        try {
+            process = commandLine.createProcess();
+        } catch (ExecutionException e) {
+            throw new ProjectBuildException("Failed to launch elixir compiler", e);
+        }
+
+        BaseOSProcessHandler handler = new BaseOSProcessHandler(process, commandLine.getCommandLineString(), Charset.defaultCharset());
+        com.intellij.execution.process.ProcessAdapter adapter = new ProcessAdapter(context, ElIXIRC_NAME, "", compilerOptions);
+        handler.addProcessListener(adapter);
+        handler.startNotify();
+        handler.waitFor();
     }
 
-    for (JpsModuleSourceRoot root : sourceRoots){
-      FileUtil.processFilesRecursively(root.getFile(), exFilesCollector);
+    private static GeneralCommandLine getElixircCommandLine(Target target,
+                                                            CompileContext context,
+                                                            ElixirCompilerOptions compilerOptions,
+                                                            Collection<File> files,
+                                                            File outputDirectory) throws ProjectBuildException {
+
+        GeneralCommandLine commandLine = new GeneralCommandLine();
+
+        // get executable
+        JpsModule module = target.getModule();
+        JpsSdk<JpsDummyElement> sdk = BuilderUtil.getSdk(context, module);
+        File executable = JpsElixirSdkType.getByteCodeCompilerExecutable(sdk.getHomePath());
+
+        List<String> compileFilePaths = getCompileFilePaths(module, target, context, files);
+
+        commandLine.withWorkDirectory(outputDirectory);
+        commandLine.setExePath(executable.getAbsolutePath());
+        addDependentModuleCodePath(commandLine, module, target, context);
+        addCompileOptions(commandLine, compilerOptions);
+        commandLine.addParameters(compileFilePaths);
+
+        return commandLine;
     }
 
-    return ContainerUtil.map(exFilesCollector.getResults(), new Function<File, String>() {
-      @NotNull
-      @Override
-      public String fun(@NotNull File file) {
-        return file.getAbsolutePath();
-      }
-    });
-  }
+    @NotNull
+    private static List<String> getCompileFilePaths(@NotNull JpsModule module,
+                                                    @NotNull Target target,
+                                                    @NotNull CompileContext context,
+                                                    Collection<File> files) {
+        // make
+        if (context.getScope().isBuildIncrementally(target.getTargetType())) {
+            return getCompileFilePathsDefault(module, target);
+        }
 
-  private static void addDependentModuleCodePath(@NotNull GeneralCommandLine commandLine,
-                                                 @NotNull JpsModule module,
-                                                 @NotNull Target target,
-                                                 @NotNull CompileContext context) throws ProjectBuildException{
-
-    ArrayList<JpsModule> codePathModules = new ArrayList<JpsModule>();
-    collectDependentModules(module, codePathModules, new HashSet<String>());
-
-    addModuleToCodePath(commandLine, module, target.isTests(), context);
-    for(JpsModule codePathModule : codePathModules){
-      if(codePathModule != module){
-        addModuleToCodePath(commandLine, codePathModule, false, context);
-      }
-    }
-  }
-
-  private static void collectDependentModules(@NotNull JpsModule module,
-                                              @NotNull Collection<JpsModule> addedModules,
-                                              @NotNull Set<String> addedModuleNames){
-
-    String moduleName = module.getName();
-    if(addedModuleNames.contains(moduleName)) return;
-    addedModuleNames.add(moduleName);
-    addedModules.add(module);
-
-    for (JpsDependencyElement dependency : module.getDependenciesList().getDependencies()){
-      if(!(dependency instanceof JpsModuleDependency)) continue;
-      JpsModuleDependency moduleDependency = (JpsModuleDependency) dependency;
-      JpsModule depModule = moduleDependency.getModule();
-      if(depModule != null){
-        collectDependentModules(depModule, addedModules, addedModuleNames);
-      }
-    }
-  }
-
-  private static void addModuleToCodePath(@NotNull GeneralCommandLine commandLine,
-                                          @NotNull JpsModule module,
-                                          boolean forTests,
-                                          @NotNull CompileContext context) throws ProjectBuildException{
-
-    File outputDirectory = getBuildOutputDirectory(module, forTests, context);
-    commandLine.addParameters(ADD_PATH_TO_FRONT_OF_CODE_PATH, outputDirectory.getPath());
-    for(String rootUrl : module.getContentRootsList().getUrls()){
-      try{
-        String path = new URL(rootUrl).getPath();
-        commandLine.addParameters(ADD_PATH_TO_FRONT_OF_CODE_PATH, path);
-      }catch (MalformedURLException e){
-        context.processMessage(new CompilerMessage(ElIXIRC_NAME, BuildMessage.Kind.ERROR, "Failed to find content root for module: " + module.getName()));
-      }
-    }
-  }
-
-  private static void addCompileOptions(@NotNull GeneralCommandLine commandLine, ElixirCompilerOptions compilerOptions){
-    if(!compilerOptions.myAttachDocsEnabled){
-      commandLine.addParameter("--no-docs");
+        // force build files
+        return ContainerUtil.map(files, File::getAbsolutePath);
     }
 
-    if(!compilerOptions.myAttachDebugInfoEnabled){
-      commandLine.addParameter("--no-debug-info");
+    @NotNull
+    private static List<String> getCompileFilePathsDefault(@NotNull JpsModule module, @NotNull Target target) {
+        CommonProcessors.CollectProcessor<File> exFilesCollector = new CommonProcessors.CollectProcessor<File>() {
+            @Override
+            protected boolean accept(File file) {
+                return !file.isDirectory() && FileUtilRt.extensionEquals(file.getName(), ELIXIR_SOURCE_EXTENSION);
+            }
+        };
+
+        List<JpsModuleSourceRoot> sourceRoots = new ArrayList<>();
+        ContainerUtil.addAll(sourceRoots, module.getSourceRoots(JavaSourceRootType.SOURCE));
+        if (target.isTests()) {
+            ContainerUtil.addAll(sourceRoots, module.getSourceRoots(JavaSourceRootType.TEST_SOURCE));
+        }
+
+        for (JpsModuleSourceRoot root : sourceRoots) {
+            FileUtil.processFilesRecursively(root.getFile(), exFilesCollector);
+        }
+
+        return ContainerUtil.map(exFilesCollector.getResults(), File::getAbsolutePath);
     }
 
-    if(compilerOptions.myWarningsAsErrorsEnabled){
-      commandLine.addParameter("--warnings-as-errors");
+    private static void addDependentModuleCodePath(@NotNull GeneralCommandLine commandLine,
+                                                   @NotNull JpsModule module,
+                                                   @NotNull Target target,
+                                                   @NotNull CompileContext context) throws ProjectBuildException {
+
+        ArrayList<JpsModule> codePathModules = new ArrayList<>();
+        collectDependentModules(module, codePathModules, new HashSet<>());
+
+        addModuleToCodePath(commandLine, module, target.isTests(), context);
+        for (JpsModule codePathModule : codePathModules) {
+            if (codePathModule != module) {
+                addModuleToCodePath(commandLine, codePathModule, false, context);
+            }
+        }
     }
 
-    if(compilerOptions.myIgnoreModuleConflictEnabled){
-      commandLine.addParameter("--ignore-module-conflict");
-    }
-  }
+    private static void collectDependentModules(@NotNull JpsModule module,
+                                                @NotNull Collection<JpsModule> addedModules,
+                                                @NotNull Set<String> addedModuleNames) {
 
-  /*** doBuildWithMix related private methods */
+        String moduleName = module.getName();
+        if (addedModuleNames.contains(moduleName)) return;
+        addedModuleNames.add(moduleName);
+        addedModules.add(module);
 
-  private static void runMix(@NotNull Target target,
-                             @NotNull String elixirPath,
-                             @NotNull String mixPath,
-                             @Nullable String contentRootPath,
-                             @NotNull ElixirCompilerOptions compilerOptions,
-                             @NotNull CompileContext context) throws ProjectBuildException{
-    GeneralCommandLine commandLine = new GeneralCommandLine();
-    commandLine.withWorkDirectory(contentRootPath);
-    commandLine.setExePath(elixirPath);
-    commandLine.addParameter(mixPath);
-    commandLine.addParameter(target.isTests()? "test":"compile");
-    addCompileOptions(commandLine, compilerOptions);
-
-    Process process;
-    try{
-      process = commandLine.createProcess();
-    } catch (ExecutionException e) {
-      throw new ProjectBuildException("Failed to run mix.", e);
+        for (JpsDependencyElement dependency : module.getDependenciesList().getDependencies()) {
+            if (!(dependency instanceof JpsModuleDependency)) continue;
+            JpsModuleDependency moduleDependency = (JpsModuleDependency) dependency;
+            JpsModule depModule = moduleDependency.getModule();
+            if (depModule != null) {
+                collectDependentModules(depModule, addedModules, addedModuleNames);
+            }
+        }
     }
 
-    BaseOSProcessHandler handler = new BaseOSProcessHandler(process, commandLine.getCommandLineString(), Charset.defaultCharset());
-    com.intellij.execution.process.ProcessAdapter adapter = new ProcessAdapter(context, MIX_NAME, commandLine.getWorkDirectory().getPath(), compilerOptions);
-    handler.addProcessListener(adapter);
-    handler.startNotify();
-    handler.waitFor();
-  }
+    private static void addModuleToCodePath(@NotNull GeneralCommandLine commandLine,
+                                            @NotNull JpsModule module,
+                                            boolean forTests,
+                                            @NotNull CompileContext context) throws ProjectBuildException {
+
+        File outputDirectory = getBuildOutputDirectory(module, forTests, context);
+        commandLine.addParameters(ADD_PATH_TO_FRONT_OF_CODE_PATH, outputDirectory.getPath());
+        for (String rootUrl : module.getContentRootsList().getUrls()) {
+            try {
+                String path = new URL(rootUrl).getPath();
+                commandLine.addParameters(ADD_PATH_TO_FRONT_OF_CODE_PATH, path);
+            } catch (MalformedURLException e) {
+                context.processMessage(new CompilerMessage(ElIXIRC_NAME, BuildMessage.Kind.ERROR, "Failed to find content root for module: " + module.getName()));
+            }
+        }
+    }
+
+    private static void addCompileOptions(@NotNull GeneralCommandLine commandLine, ElixirCompilerOptions compilerOptions) {
+        if (!compilerOptions.myAttachDocsEnabled) {
+            commandLine.addParameter("--no-docs");
+        }
+
+        if (!compilerOptions.myAttachDebugInfoEnabled) {
+            commandLine.addParameter("--no-debug-info");
+        }
+
+        if (compilerOptions.myWarningsAsErrorsEnabled) {
+            commandLine.addParameter("--warnings-as-errors");
+        }
+
+        if (compilerOptions.myIgnoreModuleConflictEnabled) {
+            commandLine.addParameter("--ignore-module-conflict");
+        }
+    }
+
+    /*** doBuildWithMix related private methods */
+
+    private static void runMix(@NotNull Target target,
+                               @NotNull String elixirPath,
+                               @NotNull String mixPath,
+                               @Nullable String contentRootPath,
+                               @NotNull ElixirCompilerOptions compilerOptions,
+                               @NotNull CompileContext context) throws ProjectBuildException {
+        GeneralCommandLine commandLine = new GeneralCommandLine();
+        commandLine.withWorkDirectory(contentRootPath);
+        commandLine.setExePath(elixirPath);
+        commandLine.addParameter(mixPath);
+        commandLine.addParameter(target.isTests() ? "test" : "compile");
+        addCompileOptions(commandLine, compilerOptions);
+
+        Process process;
+        try {
+            process = commandLine.createProcess();
+        } catch (ExecutionException e) {
+            throw new ProjectBuildException("Failed to run mix.", e);
+        }
+
+        BaseOSProcessHandler handler = new BaseOSProcessHandler(process, commandLine.getCommandLineString(), Charset.defaultCharset());
+        com.intellij.execution.process.ProcessAdapter adapter = new ProcessAdapter(context, MIX_NAME, commandLine.getWorkDirectory().getPath(), compilerOptions);
+        handler.addProcessListener(adapter);
+        handler.startNotify();
+        handler.waitFor();
+    }
+
+    @Override
+    public void build(@NotNull Target target,
+                      @NotNull DirtyFilesHolder<SourceRootDescriptor, Target> holder,
+                      @NotNull BuildOutputConsumer outputConsumer,
+                      @NotNull CompileContext context) throws ProjectBuildException, IOException {
+
+        LOG.info(target.getPresentableName());
+        final Set<File> filesToCompile = new THashSet<>(FileUtil.FILE_HASHING_STRATEGY);
+
+        holder.processDirtyFiles((target1, file, root) -> {
+            boolean isAcceptFile = target1.isTests() ? ELIXIR_TEST_SOURCE_FILTER.accept(file) : ELIXIR_SOURCE_FILTER.accept(file);
+            if (isAcceptFile && ourCompilableModuleTypes.contains(target1.getModule().getModuleType())) {
+                filesToCompile.add(file);
+            }
+            return true;
+        });
+
+        if (filesToCompile.isEmpty() && !holder.hasRemovedFiles()) return;
+
+        JpsModule module = target.getModule();
+        JpsProject project = module.getProject();
+        ElixirCompilerOptions compilerOptions = JpsElixirCompilerOptionsExtension.getOrCreateExtension(project).getOptions();
+
+        if (compilerOptions.myUseMixCompiler) {
+            doBuildWithMix(target, context, module, compilerOptions);
+        } else {
+            // elixirc can not compile tests now.
+            if (!target.isTests()) {
+                doBuildWithElixirc(target, context, module, compilerOptions, filesToCompile);
+            }
+        }
+    }
+
+    @NotNull
+    @Override
+    public String getPresentableName() {
+        return BUILDER_NAME;
+    }
 }
