@@ -1,5 +1,6 @@
 package org.elixir_lang.jps.model;
 
+import org.elixir_lang.jps.compiler_options.Serializer;
 import org.elixir_lang.jps.mix.JpsMixSettingsSerializer;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
@@ -57,6 +58,6 @@ public class JpsElixirModelSerializerExtension extends JpsModelSerializerExtensi
   @NotNull
   @Override
   public List<? extends JpsProjectExtensionSerializer> getProjectExtensionSerializers() {
-    return Arrays.asList(new JpsMixSettingsSerializer(), new JpsElixirCompilerOptionsSerializer());
+    return Arrays.asList(new JpsMixSettingsSerializer(), new Serializer());
   }
 }

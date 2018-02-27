@@ -2,8 +2,8 @@ package org.elixir_lang.configuration;
 
 import com.intellij.openapi.components.*;
 import com.intellij.openapi.project.Project;
-import org.elixir_lang.jps.model.ElixirCompilerOptions;
-import org.elixir_lang.jps.model.JpsElixirCompilerOptionsSerializer;
+import org.elixir_lang.jps.CompilerOptions;
+import org.elixir_lang.jps.compiler_options.Serializer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -11,23 +11,23 @@ import org.jetbrains.annotations.Nullable;
  * Created by zyuyou on 15/7/6.
  */
 @State(
-    name = JpsElixirCompilerOptionsSerializer.COMPILER_OPTIONS_COMPONENT_NAME,
+    name = Serializer.COMPILER_OPTIONS_COMPONENT_NAME,
     storages = {
         @Storage(file = StoragePathMacros.PROJECT_FILE),
         @Storage(file = StoragePathMacros.PROJECT_CONFIG_DIR + "/compiler.xml", scheme = StorageScheme.DIRECTORY_BASED)
     }
 )
-public class ElixirCompilerSettings implements PersistentStateComponent<ElixirCompilerOptions>{
-  private ElixirCompilerOptions myCompilerOptions = new ElixirCompilerOptions();
+public class ElixirCompilerSettings implements PersistentStateComponent<CompilerOptions>{
+  private CompilerOptions myCompilerOptions = new CompilerOptions();
 
   @Nullable
   @Override
-  public ElixirCompilerOptions getState() {
+  public CompilerOptions getState() {
     return myCompilerOptions;
   }
 
   @Override
-  public void loadState(ElixirCompilerOptions state) {
+  public void loadState(CompilerOptions state) {
     myCompilerOptions = state;
   }
 
@@ -39,47 +39,47 @@ public class ElixirCompilerSettings implements PersistentStateComponent<ElixirCo
 
   /* use mix-compiler */
   public boolean isUseMixCompilerEnabled(){
-    return myCompilerOptions.myUseMixCompiler;
+    return myCompilerOptions.useMixCompiler;
   }
 
   public void setUseMixCompilerEnabled(boolean useMixCompiler){
-    myCompilerOptions.myUseMixCompiler = useMixCompiler;
+    myCompilerOptions.useMixCompiler = useMixCompiler;
   }
 
   /* attach docs */
   public boolean isAttachDocsEnabled(){
-    return myCompilerOptions.myAttachDocsEnabled;
+    return myCompilerOptions.attachDocsEnabled;
   }
 
   public void setAttachDocsEnabled(boolean useDocs){
-    myCompilerOptions.myAttachDocsEnabled = useDocs;
+    myCompilerOptions.attachDocsEnabled = useDocs;
   }
 
   /* attach debug-info */
   public boolean isAttachDebugInfoEnabled(){
-    return myCompilerOptions.myAttachDebugInfoEnabled;
+    return myCompilerOptions.attachDebugInfoEnabled;
   }
 
   public void setAttachDebugInfoEnabled(boolean useDebugInfo){
-    myCompilerOptions.myAttachDebugInfoEnabled = useDebugInfo;
+    myCompilerOptions.attachDebugInfoEnabled = useDebugInfo;
   }
 
   /* warnings-as-errors */
   public boolean isWarningsAsErrorsEnabled(){
-    return myCompilerOptions.myWarningsAsErrorsEnabled;
+    return myCompilerOptions.warningsAsErrorsEnabled;
   }
 
   public void setWarningsAsErrorsEnabled(boolean useWarningsAsErrors){
-    myCompilerOptions.myWarningsAsErrorsEnabled = useWarningsAsErrors;
+    myCompilerOptions.warningsAsErrorsEnabled = useWarningsAsErrors;
   }
 
   /* ignore-module-conflict */
   public boolean isIgnoreModuleConflictEnabled(){
-    return myCompilerOptions.myIgnoreModuleConflictEnabled;
+    return myCompilerOptions.ignoreModuleConflictEnabled;
   }
 
   public void setIgnoreModuleConflictEnabled(boolean useIgnoreModuleConflict){
-    myCompilerOptions.myIgnoreModuleConflictEnabled = useIgnoreModuleConflict;
+    myCompilerOptions.ignoreModuleConflictEnabled = useIgnoreModuleConflict;
   }
 
 }

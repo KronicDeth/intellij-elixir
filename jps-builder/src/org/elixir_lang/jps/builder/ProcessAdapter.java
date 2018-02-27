@@ -3,7 +3,7 @@ package org.elixir_lang.jps.builder;
 import com.intellij.execution.process.ProcessEvent;
 import com.intellij.openapi.util.Key;
 import org.apache.commons.lang3.StringUtils;
-import org.elixir_lang.jps.model.ElixirCompilerOptions;
+import org.elixir_lang.jps.CompilerOptions;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.incremental.CompileContext;
@@ -29,7 +29,7 @@ public class ProcessAdapter extends com.intellij.execution.process.ProcessAdapte
     private static final Pattern WARNING_PATTERN = Pattern.compile("^warning:\\s*(.*)", Pattern.DOTALL);
 
     private final String builderName;
-    private final ElixirCompilerOptions compilerOptions;
+    private final CompilerOptions compilerOptions;
     private final String compileTargetRootPath;
     private final CompileContext context;
     private final StringBuilder text = new StringBuilder();
@@ -41,7 +41,7 @@ public class ProcessAdapter extends com.intellij.execution.process.ProcessAdapte
     public ProcessAdapter(@NotNull CompileContext context,
                           @NotNull String builderName,
                           @NotNull String compileTargetRootPath,
-                          ElixirCompilerOptions compilerOptions) {
+                          CompilerOptions compilerOptions) {
         this.context = context;
         this.builderName = builderName;
         this.compileTargetRootPath = compileTargetRootPath;
@@ -209,7 +209,7 @@ public class ProcessAdapter extends com.intellij.execution.process.ProcessAdapte
     private BuildMessage.Kind warningKind() {
         BuildMessage.Kind kind;
 
-        if (compilerOptions.myWarningsAsErrorsEnabled) {
+        if (compilerOptions.warningsAsErrorsEnabled) {
             kind = BuildMessage.Kind.ERROR;
         } else {
             kind = BuildMessage.Kind.WARNING;

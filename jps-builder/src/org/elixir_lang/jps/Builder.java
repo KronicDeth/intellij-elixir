@@ -11,8 +11,7 @@ import org.elixir_lang.jps.builder.ExecutionException;
 import org.elixir_lang.jps.builder.GeneralCommandLine;
 import org.elixir_lang.jps.builder.ProcessAdapter;
 import org.elixir_lang.jps.builder.SourceRootDescriptor;
-import org.elixir_lang.jps.model.ElixirCompilerOptions;
-import org.elixir_lang.jps.model.JpsElixirCompilerOptionsExtension;
+import org.elixir_lang.jps.compiler_options.Extension;
 import org.elixir_lang.jps.model.JpsElixirModuleType;
 import org.elixir_lang.jps.model.JpsElixirSdkType;
 import org.elixir_lang.jps.target.BuilderUtil;
@@ -81,7 +80,7 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
     private static void doBuildWithElixirc(Target target,
                                            CompileContext context,
                                            JpsModule module,
-                                           ElixirCompilerOptions compilerOptions,
+                                           CompilerOptions compilerOptions,
                                            Collection<File> filesToCompile) throws ProjectBuildException {
 
         // ensure compile output directory
@@ -93,7 +92,7 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
     private static void doBuildWithMix(Target target,
                                        CompileContext context,
                                        JpsModule module,
-                                       ElixirCompilerOptions compilerOptions) throws ProjectBuildException, IOException {
+                                       CompilerOptions compilerOptions) throws ProjectBuildException, IOException {
         JpsSdk<JpsDummyElement> sdk = BuilderUtil.getSdk(context, module);
 
         String mixPath = JpsElixirSdkType.getMixScript(sdk);
@@ -132,7 +131,7 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
 
     private static void runElixirc(Target target,
                                    CompileContext context,
-                                   ElixirCompilerOptions compilerOptions,
+                                   CompilerOptions compilerOptions,
                                    Collection<File> files,
                                    File outputDirectory) throws ProjectBuildException {
 
@@ -154,7 +153,7 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
 
     private static GeneralCommandLine getElixircCommandLine(Target target,
                                                             CompileContext context,
-                                                            ElixirCompilerOptions compilerOptions,
+                                                            CompilerOptions compilerOptions,
                                                             Collection<File> files,
                                                             File outputDirectory) throws ProjectBuildException {
 
@@ -264,20 +263,20 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
         }
     }
 
-    private static void addCompileOptions(@NotNull GeneralCommandLine commandLine, ElixirCompilerOptions compilerOptions) {
-        if (!compilerOptions.myAttachDocsEnabled) {
+    private static void addCompileOptions(@NotNull GeneralCommandLine commandLine, CompilerOptions compilerOptions) {
+        if (!compilerOptions.attachDocsEnabled) {
             commandLine.addParameter("--no-docs");
         }
 
-        if (!compilerOptions.myAttachDebugInfoEnabled) {
+        if (!compilerOptions.attachDebugInfoEnabled) {
             commandLine.addParameter("--no-debug-info");
         }
 
-        if (compilerOptions.myWarningsAsErrorsEnabled) {
+        if (compilerOptions.warningsAsErrorsEnabled) {
             commandLine.addParameter("--warnings-as-errors");
         }
 
-        if (compilerOptions.myIgnoreModuleConflictEnabled) {
+        if (compilerOptions.ignoreModuleConflictEnabled) {
             commandLine.addParameter("--ignore-module-conflict");
         }
     }
@@ -288,7 +287,7 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
                                @NotNull String elixirPath,
                                @NotNull String mixPath,
                                @Nullable String contentRootPath,
-                               @NotNull ElixirCompilerOptions compilerOptions,
+                               @NotNull CompilerOptions compilerOptions,
                                @NotNull CompileContext context) throws ProjectBuildException {
         GeneralCommandLine commandLine = new GeneralCommandLine();
         commandLine.withWorkDirectory(contentRootPath);
@@ -332,9 +331,9 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
 
         JpsModule module = target.getModule();
         JpsProject project = module.getProject();
-        ElixirCompilerOptions compilerOptions = JpsElixirCompilerOptionsExtension.getOrCreateExtension(project).getOptions();
+        CompilerOptions compilerOptions = Extension.getOrCreateExtension(project).getOptions();
 
-        if (compilerOptions.myUseMixCompiler) {
+        if (compilerOptions.useMixCompiler) {
             doBuildWithMix(target, context, module, compilerOptions);
         } else {
             // elixirc can not compile tests now.

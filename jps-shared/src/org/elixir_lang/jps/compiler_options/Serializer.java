@@ -1,25 +1,24 @@
-package org.elixir_lang.jps.model;
+package org.elixir_lang.jps.compiler_options;
 
 import com.intellij.util.xmlb.XmlSerializer;
+import org.elixir_lang.jps.CompilerOptions;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.model.JpsProject;
 import org.jetbrains.jps.model.serialization.JpsProjectExtensionSerializer;
 
-/**
- * Created by zyuyou on 15/7/6.
- */
-public class JpsElixirCompilerOptionsSerializer extends JpsProjectExtensionSerializer {
-  public static final String COMPILER_OPTIONS_COMPONENT_NAME = "ElixirCompilerOptions";
+public class Serializer extends JpsProjectExtensionSerializer {
+  public static final String COMPILER_OPTIONS_COMPONENT_NAME = "CompilerOptions";
 
-  public JpsElixirCompilerOptionsSerializer() {
+  public Serializer() {
     super("compiler.xml", COMPILER_OPTIONS_COMPONENT_NAME);
   }
 
   @Override
   public void loadExtension(@NotNull JpsProject project, @NotNull Element componentTag) {
-    JpsElixirCompilerOptionsExtension extension = JpsElixirCompilerOptionsExtension.getOrCreateExtension(project);
-    ElixirCompilerOptions options = XmlSerializer.deserialize(componentTag, ElixirCompilerOptions.class);
+    Extension extension = Extension.getOrCreateExtension(project);
+    CompilerOptions options = XmlSerializer.deserialize(componentTag, CompilerOptions.class);
+
     if(options != null){
       extension.setOptions(options);
     }
