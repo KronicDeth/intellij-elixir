@@ -1,67 +1,35 @@
 package org.elixir_lang.jps.builder;
 
-// 52.0 in openapi.jar
-// import com.intellij.execution.ExecutionException;
-// 52.0 in openapi.jar
-//import com.intellij.execution.configurations.GeneralCommandLine;
-// 50.0 in util.jar
 import com.intellij.execution.process.BaseOSProcessHandler;
-// 50.0 in util.jar
 import com.intellij.execution.process.ProcessAdapter;
-// 50.0 in util.jar
 import com.intellij.openapi.diagnostic.Logger;
-// 50.0 in util.jar
 import com.intellij.openapi.util.io.FileUtil;
-// 49.0 in util.jar
 import com.intellij.openapi.util.io.FileUtilRt;
-// 50.0 in util.jar
-import com.intellij.openapi.util.text.StringUtil;
-// 50.0 in util.jar
 import com.intellij.util.CommonProcessors;
-// 49.0 in util.jar
 import com.intellij.util.Function;
-// 50.0 in util.jar
 import com.intellij.util.containers.ContainerUtil;
-// 49.0 in trove4j.jar
 import gnu.trove.THashSet;
-import org.elixir_lang.jps.mix.JpsMixConfigurationExtension;
 import org.elixir_lang.jps.model.ElixirCompilerOptions;
 import org.elixir_lang.jps.model.JpsElixirCompilerOptionsExtension;
 import org.elixir_lang.jps.model.JpsElixirModuleType;
 import org.elixir_lang.jps.model.JpsElixirSdkType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-// 50.0 in jsp-builders.jar
 import org.jetbrains.jps.builders.BuildOutputConsumer;
-// 50.0 in jsp-builders.jar
 import org.jetbrains.jps.builders.DirtyFilesHolder;
-// 50.0 in jsp-builders.jar
 import org.jetbrains.jps.builders.FileProcessor;
-// 50.0 in jsp-builders.jar
 import org.jetbrains.jps.incremental.CompileContext;
-// 50.0 in jsp-builders.jar
 import org.jetbrains.jps.incremental.ProjectBuildException;
-// 50.0 in jsp-builders.jar
 import org.jetbrains.jps.incremental.TargetBuilder;
-// 50.0 in jsp-builders.jar
 import org.jetbrains.jps.incremental.messages.BuildMessage;
-// 50.0 in jsp-builders.jar
 import org.jetbrains.jps.incremental.messages.CompilerMessage;
-// 50.0 in jsp-builders.jar
 import org.jetbrains.jps.incremental.resources.ResourcesBuilder;
-// 50.0 in jsp-builders.jar
 import org.jetbrains.jps.incremental.resources.StandardResourceBuilderEnabler;
-// 50.0 in openapi.jar
 import org.jetbrains.jps.model.JpsDummyElement;
-// 50.0 in openapi.jar
 import org.jetbrains.jps.model.JpsProject;
-// 50.0 in openapi.jar
 import org.jetbrains.jps.model.java.JavaSourceRootType;
-// 50.0 in openapi.jar
 import org.jetbrains.jps.model.java.JpsJavaExtensionService;
-// 50.0 in openapi.jar
 import org.jetbrains.jps.model.library.sdk.JpsSdk;
-// 50.0 in openapi.jar
 import org.jetbrains.jps.model.module.*;
 
 import java.io.File;
@@ -238,7 +206,7 @@ public class ElixirBuilder extends TargetBuilder<ElixirSourceRootDescriptor, Eli
     }
 
     BaseOSProcessHandler handler = new BaseOSProcessHandler(process, commandLine.getCommandLineString(), Charset.defaultCharset());
-    ProcessAdapter adapter = new ElixirCompilerProcessAdapter(context, ElIXIRC_NAME, "");
+    ProcessAdapter adapter = new ElixirCompilerProcessAdapter(context, ElIXIRC_NAME, "", compilerOptions);
     handler.addProcessListener(adapter);
     handler.startNotify();
     handler.waitFor();
@@ -385,14 +353,7 @@ public class ElixirBuilder extends TargetBuilder<ElixirSourceRootDescriptor, Eli
     }
   }
 
-  /*** doBuildWithMix releated private methods */
-
-  @Nullable
-  private static String getMixExecutablePath(@Nullable JpsProject project){
-    JpsMixConfigurationExtension mixConfigurationExtension = JpsMixConfigurationExtension.getExtension(project);
-    String mixPath = mixConfigurationExtension != null ? mixConfigurationExtension.getMixPath() : null;
-    return StringUtil.isEmptyOrSpaces(mixPath) ? null : mixPath;
-  }
+  /*** doBuildWithMix related private methods */
 
   private static void runMix(@NotNull ElixirTarget target,
                              @NotNull String elixirPath,
@@ -415,7 +376,7 @@ public class ElixirBuilder extends TargetBuilder<ElixirSourceRootDescriptor, Eli
     }
 
     BaseOSProcessHandler handler = new BaseOSProcessHandler(process, commandLine.getCommandLineString(), Charset.defaultCharset());
-    ProcessAdapter adapter = new ElixirCompilerProcessAdapter(context, MIX_NAME, commandLine.getWorkDirectory().getPath());
+    ProcessAdapter adapter = new ElixirCompilerProcessAdapter(context, MIX_NAME, commandLine.getWorkDirectory().getPath(), compilerOptions);
     handler.addProcessListener(adapter);
     handler.startNotify();
     handler.waitFor();
