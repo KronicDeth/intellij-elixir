@@ -6,24 +6,24 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by zyuyou on 2015/5/26.
  */
-public class MixSettingsState {
+public class SettingsState {
   @Tag("mixPath")
   @NotNull
-  public String myMixPath;
-  public boolean supportsFormatterOption;
+  private String myMixPath;
+  private boolean supportsFormatterOption;
 
-  public MixSettingsState(){
+  SettingsState(){
     myMixPath = "";
     supportsFormatterOption = false;
   }
 
-  MixSettingsState(MixSettingsState state){
+  SettingsState(SettingsState state){
     myMixPath = state.myMixPath;
     supportsFormatterOption = state.supportsFormatterOption;
   }
 
   @Override
   public String toString() {
-    return "MixSettingsState(mixPath='" + myMixPath + "')";
+    return "SettingsState(mixPath='" + myMixPath + "')";
   }
 }
