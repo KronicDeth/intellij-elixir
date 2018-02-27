@@ -1,6 +1,7 @@
 package org.elixir_lang.jps.builder;
 
 import com.intellij.openapi.util.io.FileUtilRt;
+import org.elixir_lang.jps.Builder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.builders.BuildRootDescriptor;
 import org.jetbrains.jps.builders.BuildTarget;
@@ -42,8 +43,8 @@ public class ElixirSourceRootDescriptor extends BuildRootDescriptor {
       @Override
       public boolean accept(File file) {
         String name = file.getName();
-        return FileUtilRt.extensionEquals(name, ElixirBuilder.ELIXIR_SOURCE_EXTENSION) ||
-            FileUtilRt.extensionEquals(name, ElixirBuilder.ELIXIR_SCRIPT_EXTENSION);
+        return FileUtilRt.extensionEquals(name, Builder.ELIXIR_SOURCE_EXTENSION) ||
+            FileUtilRt.extensionEquals(name, Builder.ELIXIR_SCRIPT_EXTENSION);
       }
     };
   }

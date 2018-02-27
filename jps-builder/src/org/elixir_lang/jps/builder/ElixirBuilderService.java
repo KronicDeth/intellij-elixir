@@ -1,5 +1,6 @@
 package org.elixir_lang.jps.builder;
 
+import org.elixir_lang.jps.Builder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.builders.BuildTargetType;
 import org.jetbrains.jps.incremental.BuilderService;
@@ -22,6 +23,6 @@ public class ElixirBuilderService extends BuilderService {
   @NotNull
   @Override
   public List<? extends TargetBuilder<?, ?>> createBuilders() {
-    return Collections.singletonList(new ElixirBuilder());
+    return Collections.singletonList(new Builder());
   }
 }

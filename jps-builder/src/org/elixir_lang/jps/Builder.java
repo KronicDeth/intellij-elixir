@@ -1,4 +1,4 @@
-package org.elixir_lang.jps.builder;
+package org.elixir_lang.jps;
 
 import com.intellij.execution.process.BaseOSProcessHandler;
 import com.intellij.execution.process.ProcessAdapter;
@@ -9,6 +9,7 @@ import com.intellij.util.CommonProcessors;
 import com.intellij.util.Function;
 import com.intellij.util.containers.ContainerUtil;
 import gnu.trove.THashSet;
+import org.elixir_lang.jps.builder.*;
 import org.elixir_lang.jps.model.ElixirCompilerOptions;
 import org.elixir_lang.jps.model.JpsElixirCompilerOptionsExtension;
 import org.elixir_lang.jps.model.JpsElixirModuleType;
@@ -41,12 +42,10 @@ import java.nio.charset.Charset;
 import java.util.*;
 
 /**
- * Created by zyuyou on 15/7/10.
- *
  * https://github.com/ignatov/intellij-erlang/blob/master/jps-plugin/src/org/intellij/erlang/jps/builder/ErlangBuilder.java
  * https://github.com/ignatov/intellij-erlang/tree/master/jps-plugin/src/org/intellij/erlang/jps/rebar
  */
-public class ElixirBuilder extends TargetBuilder<ElixirSourceRootDescriptor, ElixirTarget> {
+public class Builder extends TargetBuilder<ElixirSourceRootDescriptor, ElixirTarget> {
   public static final String BUILDER_NAME = "Elixir Builder";
 
   public static final String ELIXIR_SOURCE_EXTENSION = "ex";
@@ -58,7 +57,7 @@ public class ElixirBuilder extends TargetBuilder<ElixirSourceRootDescriptor, Eli
 
   private static final String MIX_CONFIG_FILE_NAME = "mix." + ELIXIR_SCRIPT_EXTENSION;
 
-  private final static Logger LOG = Logger.getInstance(ElixirBuilder.class);
+  private final static Logger LOG = Logger.getInstance(Builder.class);
 
   public static final String ADD_PATH_TO_FRONT_OF_CODE_PATH = "-pa";
 
@@ -79,7 +78,7 @@ public class ElixirBuilder extends TargetBuilder<ElixirSourceRootDescriptor, Eli
   // use JavaBuilderExtension?
   public static final Set<? extends JpsModuleType<?>> ourCompilableModuleTypes = Collections.singleton(JpsElixirModuleType.INSTANCE);
 
-  public ElixirBuilder(){
+  public Builder(){
     super(Arrays.asList(ElixirTargetType.PRODUCTION, ElixirTargetType.TEST));
 
     // disables java resource builder for elixir modules

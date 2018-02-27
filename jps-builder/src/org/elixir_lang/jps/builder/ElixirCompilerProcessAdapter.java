@@ -39,10 +39,10 @@ public class ElixirCompilerProcessAdapter extends ProcessAdapter {
     private String sourcePath = null;
     private State state = State.INITIAL;
 
-    ElixirCompilerProcessAdapter(@NotNull CompileContext context,
-                                 @NotNull String builderName,
-                                 @NotNull String compileTargetRootPath,
-                                 ElixirCompilerOptions compilerOptions) {
+    public ElixirCompilerProcessAdapter(@NotNull CompileContext context,
+                                        @NotNull String builderName,
+                                        @NotNull String compileTargetRootPath,
+                                        ElixirCompilerOptions compilerOptions) {
         this.context = context;
         this.builderName = builderName;
         this.compileTargetRootPath = compileTargetRootPath;

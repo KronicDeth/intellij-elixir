@@ -1,5 +1,6 @@
 package org.elixir_lang.jps.builder;
 
+import org.elixir_lang.jps.Builder;
 import org.elixir_lang.jps.model.JpsElixirSdkType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.incremental.CompileContext;
@@ -24,7 +25,7 @@ public class ElixirTargetBuilderUtil {
     JpsSdk<JpsDummyElement> sdk = module.getSdk(JpsElixirSdkType.INSTANCE);
     if(sdk == null){
       String errorMessage = "No SDK for module " + module.getName();
-      context.processMessage(new CompilerMessage(ElixirBuilder.BUILDER_NAME, BuildMessage.Kind.ERROR, errorMessage));
+      context.processMessage(new CompilerMessage(Builder.BUILDER_NAME, BuildMessage.Kind.ERROR, errorMessage));
       throw new ProjectBuildException(errorMessage);
     }
 
