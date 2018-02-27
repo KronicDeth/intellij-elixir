@@ -2,6 +2,7 @@ package org.elixir_lang.jps.model;
 
 import org.elixir_lang.jps.compiler_options.Serializer;
 import org.elixir_lang.jps.mix.SettingsSerializer;
+import org.elixir_lang.jps.sdk_type.Elixir;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -42,7 +43,7 @@ public class JpsElixirModelSerializerExtension extends JpsModelSerializerExtensi
   @NotNull
   @Override
   public List<? extends JpsSdkPropertiesSerializer<?>> getSdkPropertiesSerializers() {
-    return Collections.singletonList(new JpsSdkPropertiesSerializer<JpsDummyElement>(ELIXIR_SDK_TYPE_ID, JpsElixirSdkType.INSTANCE) {
+    return Collections.singletonList(new JpsSdkPropertiesSerializer<JpsDummyElement>(ELIXIR_SDK_TYPE_ID, Elixir.INSTANCE) {
       @NotNull
       @Override
       public JpsDummyElement loadProperties(@Nullable Element propertiesElement) {

@@ -1,4 +1,4 @@
-package org.elixir_lang.jps.model;
+package org.elixir_lang.jps.sdk_type;
 
 import com.intellij.openapi.util.SystemInfo;
 import org.jetbrains.annotations.NotNull;
@@ -11,16 +11,13 @@ import org.jetbrains.jps.model.library.sdk.JpsSdkType;
 
 import java.io.File;
 
-/**
- * Created by zyuyou on 2015/5/27.
- */
-public class JpsElixirSdkType extends JpsSdkType<JpsDummyElement> implements JpsElementTypeWithDefaultProperties<JpsDummyElement>{
-  public static final JpsElixirSdkType INSTANCE = new JpsElixirSdkType();
+public class Elixir extends JpsSdkType<JpsDummyElement> implements JpsElementTypeWithDefaultProperties<JpsDummyElement>{
+  public static final Elixir INSTANCE = new Elixir();
 
   public static final String SCRIPT_INTERPRETER = "elixir";
-  public static final String BYTECODE_COMPILER = "elixirc";
   public static final String ELIXIR_TOOL_MIX = "mix";
-  public static final String ELIXIR_TOOL_IEX = "iex";
+  private static final String BYTECODE_COMPILER = "elixirc";
+  private static final String ELIXIR_TOOL_IEX = "iex";
 
   @NotNull
   public static File getScriptInterpreterExecutable(@NotNull String sdkHome){

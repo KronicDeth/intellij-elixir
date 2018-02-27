@@ -1,7 +1,7 @@
 package org.elixir_lang.jps.target;
 
 import org.elixir_lang.jps.Builder;
-import org.elixir_lang.jps.model.JpsElixirSdkType;
+import org.elixir_lang.jps.sdk_type.Elixir;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.incremental.CompileContext;
 import org.jetbrains.jps.incremental.ProjectBuildException;
@@ -22,7 +22,7 @@ public class BuilderUtil {
   public static JpsSdk<JpsDummyElement> getSdk(@NotNull CompileContext context,
                                                @NotNull JpsModule module) throws ProjectBuildException {
 
-    JpsSdk<JpsDummyElement> sdk = module.getSdk(JpsElixirSdkType.INSTANCE);
+    JpsSdk<JpsDummyElement> sdk = module.getSdk(Elixir.INSTANCE);
     if(sdk == null){
       String errorMessage = "No SDK for module " + module.getName();
       context.processMessage(new CompilerMessage(Builder.BUILDER_NAME, BuildMessage.Kind.ERROR, errorMessage));

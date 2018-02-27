@@ -20,8 +20,8 @@ import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.ObjectUtils;
 import org.elixir_lang.jps.builder.ParametersList;
-import org.elixir_lang.jps.model.JpsElixirSdkType;
-import org.elixir_lang.jps.model.JpsErlangSdkType;
+import org.elixir_lang.jps.sdk_type.Elixir;
+import org.elixir_lang.jps.sdk_type.Erlang;
 import org.elixir_lang.utils.SetupElixirSDKNotificationListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,7 +29,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.elixir_lang.jps.model.JpsElixirSdkType.ELIXIR_TOOL_MIX;
+import static org.elixir_lang.jps.sdk_type.Elixir.ELIXIR_TOOL_MIX;
 import static org.elixir_lang.sdk.elixir.Type.mostSpecificSdk;
 
 /**
@@ -180,7 +180,7 @@ public class MixRunningStateUtil {
             String homePath = sdk.getHomePath();
 
             if (homePath != null) {
-                mixPath = JpsElixirSdkType.getMixScript(homePath).getPath();
+                mixPath = Elixir.getMixScript(homePath).getPath();
             } else {
                 mixPath = ELIXIR_TOOL_MIX;
             }
@@ -230,7 +230,7 @@ public class MixRunningStateUtil {
                     String erlangHomePath = erlangSdk.getHomePath();
 
                     if (erlangHomePath != null) {
-                        File erlFile = JpsErlangSdkType.getByteCodeInterpreterExecutable(erlangHomePath);
+                        File erlFile = Erlang.getByteCodeInterpreterExecutable(erlangHomePath);
 
                         if (erlFile.exists() && erlFile.canExecute()) {
                             // See https://github.com/elixir-lang/elixir/blob/v1.5.1/bin/elixir.bat#L111
@@ -244,7 +244,7 @@ public class MixRunningStateUtil {
                         }
                     }
                 } else {
-                    String erl = JpsErlangSdkType.getExecutableFileName("erl");
+                    String erl = Erlang.getExecutableFileName("erl");
 
                     // See https://github.com/elixir-lang/elixir/blob/v1.5.1/bin/elixir.bat#L111
                     commandLine.setExePath(erl);
@@ -257,7 +257,7 @@ public class MixRunningStateUtil {
                 }
             }
         } else {
-            String elixir = JpsElixirSdkType.getExecutableFileName("elixir");
+            String elixir = Elixir.getExecutableFileName("elixir");
             commandLine.setExePath(elixir);
         }
 

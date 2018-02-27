@@ -13,7 +13,7 @@ import org.elixir_lang.jps.builder.ProcessAdapter;
 import org.elixir_lang.jps.builder.SourceRootDescriptor;
 import org.elixir_lang.jps.compiler_options.Extension;
 import org.elixir_lang.jps.model.JpsElixirModuleType;
-import org.elixir_lang.jps.model.JpsElixirSdkType;
+import org.elixir_lang.jps.sdk_type.Elixir;
 import org.elixir_lang.jps.target.BuilderUtil;
 import org.elixir_lang.jps.target.Type;
 import org.jetbrains.annotations.NotNull;
@@ -95,8 +95,8 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
                                        CompilerOptions compilerOptions) throws ProjectBuildException, IOException {
         JpsSdk<JpsDummyElement> sdk = BuilderUtil.getSdk(context, module);
 
-        String mixPath = JpsElixirSdkType.getMixScript(sdk);
-        String elixirPath = JpsElixirSdkType.getScriptInterpreterExecutable(sdk.getHomePath()).getAbsolutePath();
+        String mixPath = Elixir.getMixScript(sdk);
+        String elixirPath = Elixir.getScriptInterpreterExecutable(sdk.getHomePath()).getAbsolutePath();
 
         for (String contentRootUrl : module.getContentRootsList().getUrls()) {
             String contentRootPath = new URL(contentRootUrl).getPath();
@@ -162,7 +162,7 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
         // get executable
         JpsModule module = target.getModule();
         JpsSdk<JpsDummyElement> sdk = BuilderUtil.getSdk(context, module);
-        File executable = JpsElixirSdkType.getByteCodeCompilerExecutable(sdk.getHomePath());
+        File executable = Elixir.getByteCodeCompilerExecutable(sdk.getHomePath());
 
         List<String> compileFilePaths = getCompileFilePaths(module, target, context, files);
 

@@ -25,7 +25,7 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.projectImport.ProjectImportWizardStep;
 import org.elixir_lang.jps.builder.ParametersList;
-import org.elixir_lang.jps.model.JpsElixirSdkType;
+import org.elixir_lang.jps.sdk_type.Elixir;
 import org.elixir_lang.mix.runner.MixRunningStateUtil;
 import org.elixir_lang.sdk.elixir.Type;
 import org.jetbrains.annotations.NotNull;
@@ -88,9 +88,9 @@ public class MixProjectRootStep extends ProjectImportWizardStep {
         String elixirPath;
 
         if (sdkPath != null) {
-            elixirPath = JpsElixirSdkType.getScriptInterpreterExecutable(sdkPath).getAbsolutePath();
+            elixirPath = Elixir.getScriptInterpreterExecutable(sdkPath).getAbsolutePath();
         } else {
-            elixirPath = JpsElixirSdkType.getExecutableFileName(JpsElixirSdkType.SCRIPT_INTERPRETER);
+            elixirPath = Elixir.getExecutableFileName(Elixir.SCRIPT_INTERPRETER);
         }
 
         return elixirPath;

@@ -1,4 +1,4 @@
-package org.elixir_lang.jps.model;
+package org.elixir_lang.jps.sdk_type;
 
 import com.intellij.openapi.util.SystemInfo;
 import org.jetbrains.annotations.NotNull;
@@ -9,7 +9,7 @@ import org.jetbrains.jps.model.library.sdk.JpsSdkType;
 
 import java.io.File;
 
-public class JpsErlangSdkType extends JpsSdkType<JpsDummyElement> implements JpsElementTypeWithDefaultProperties<JpsDummyElement> {
+public class Erlang extends JpsSdkType<JpsDummyElement> implements JpsElementTypeWithDefaultProperties<JpsDummyElement> {
     private static final String BYTECODE_INTERPRETER = "erl";
 
     @NotNull

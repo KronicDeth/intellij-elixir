@@ -1,10 +1,9 @@
 package org.elixir_lang.jps;
 
-import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.util.PathUtilRt;
 import org.elixir_lang.jps.model.JpsElixirModuleType;
-import org.elixir_lang.jps.model.JpsElixirSdkType;
+import org.elixir_lang.jps.sdk_type.Elixir;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jps.model.JpsDummyElement;
@@ -33,7 +32,7 @@ public class ElixirBuilderTest extends JpsBuildTestCase {
     String elixirVersion = elixirVersion();
     JpsTypedLibrary<JpsSdk<JpsDummyElement>> jdk = myModel
             .getGlobal()
-            .addSdk("Elixir: " + elixirVersion, sdkHome, elixirVersion, JpsElixirSdkType.INSTANCE);
+            .addSdk("Elixir: " + elixirVersion, sdkHome, elixirVersion, Elixir.INSTANCE);
     jdk.addRoot(JpsPathUtil.pathToUrl(sdkHome), JpsOrderRootType.COMPILED);
 
     return jdk.getProperties();
