@@ -2,6 +2,7 @@ package org.elixir_lang.jps.builder;
 
 import com.intellij.openapi.util.io.FileUtilRt;
 import org.elixir_lang.jps.Builder;
+import org.elixir_lang.jps.Target;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.builders.BuildRootDescriptor;
 import org.jetbrains.jps.builders.BuildTarget;
@@ -14,11 +15,11 @@ import java.io.FileFilter;
  */
 public class ElixirSourceRootDescriptor extends BuildRootDescriptor {
   private File myRoot;
-  private final ElixirTarget myElixirTarget;
+  private final Target myTarget;
 
-  public ElixirSourceRootDescriptor(File root, ElixirTarget elixirTarget) {
+  public ElixirSourceRootDescriptor(File root, Target target) {
     myRoot = root;
-    myElixirTarget = elixirTarget;
+    myTarget = target;
   }
 
   @Override
@@ -33,7 +34,7 @@ public class ElixirSourceRootDescriptor extends BuildRootDescriptor {
 
   @Override
   public BuildTarget<?> getTarget() {
-    return myElixirTarget;
+    return myTarget;
   }
 
   @NotNull

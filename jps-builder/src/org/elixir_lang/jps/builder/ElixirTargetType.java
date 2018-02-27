@@ -1,5 +1,6 @@
 package org.elixir_lang.jps.builder;
 
+import org.elixir_lang.jps.Target;
 import org.elixir_lang.jps.model.JpsElixirModuleType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -15,7 +16,7 @@ import java.util.List;
 /**
  * Created by zyuyou on 15/7/10.
  */
-public class ElixirTargetType extends ModuleBasedBuildTargetType<ElixirTarget>{
+public class ElixirTargetType extends ModuleBasedBuildTargetType<Target>{
   public static final ElixirTargetType PRODUCTION = new ElixirTargetType("elixir-production", false);
   public static final ElixirTargetType TEST = new ElixirTargetType("elixir-test", true);
 
@@ -28,24 +29,24 @@ public class ElixirTargetType extends ModuleBasedBuildTargetType<ElixirTarget>{
 
   @NotNull
   @Override
-  public List<ElixirTarget> computeAllTargets(@NotNull JpsModel model) {
-    List<ElixirTarget> targets = new ArrayList<ElixirTarget>();
+  public List<Target> computeAllTargets(@NotNull JpsModel model) {
+    List<Target> targets = new ArrayList<Target>();
     for (JpsTypedModule<JpsDummyElement> module : model.getProject().getModules(JpsElixirModuleType.INSTANCE)){
-      targets.add(new ElixirTarget(this, module));
+      targets.add(new Target(this, module));
     }
     return targets;
   }
 
   @NotNull
   @Override
-  public BuildTargetLoader<ElixirTarget> createLoader(@NotNull final JpsModel model) {
-    return new BuildTargetLoader<ElixirTarget>() {
+  public BuildTargetLoader<Target> createLoader(@NotNull final JpsModel model) {
+    return new BuildTargetLoader<Target>() {
       @Nullable
       @Override
-      public ElixirTarget createTarget(@NotNull String targetId) {
+      public Target createTarget(@NotNull String targetId) {
         for (JpsTypedModule<JpsDummyElement> module : model.getProject().getModules(JpsElixirModuleType.INSTANCE)){
           if(module.getName().equals(targetId)){
-            return new ElixirTarget(ElixirTargetType.this, module);
+            return new Target(ElixirTargetType.this, module);
           }
         }
         return null;

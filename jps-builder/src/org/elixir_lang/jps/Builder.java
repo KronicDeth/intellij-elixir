@@ -45,7 +45,7 @@ import java.util.*;
  * https://github.com/ignatov/intellij-erlang/blob/master/jps-plugin/src/org/intellij/erlang/jps/builder/ErlangBuilder.java
  * https://github.com/ignatov/intellij-erlang/tree/master/jps-plugin/src/org/intellij/erlang/jps/rebar
  */
-public class Builder extends TargetBuilder<ElixirSourceRootDescriptor, ElixirTarget> {
+public class Builder extends TargetBuilder<ElixirSourceRootDescriptor, Target> {
   public static final String BUILDER_NAME = "Elixir Builder";
 
   public static final String ELIXIR_SOURCE_EXTENSION = "ex";
@@ -91,17 +91,17 @@ public class Builder extends TargetBuilder<ElixirSourceRootDescriptor, ElixirTar
   }
 
   @Override
-  public void build(@NotNull ElixirTarget target,
-                    @NotNull DirtyFilesHolder<ElixirSourceRootDescriptor, ElixirTarget> holder,
+  public void build(@NotNull Target target,
+                    @NotNull DirtyFilesHolder<ElixirSourceRootDescriptor, Target> holder,
                     @NotNull BuildOutputConsumer outputConsumer,
                     @NotNull CompileContext context) throws ProjectBuildException, IOException {
 
     LOG.info(target.getPresentableName());
     final Set<File> filesToCompile = new THashSet<File>(FileUtil.FILE_HASHING_STRATEGY);
 
-    holder.processDirtyFiles(new FileProcessor<ElixirSourceRootDescriptor, ElixirTarget>() {
+    holder.processDirtyFiles(new FileProcessor<ElixirSourceRootDescriptor, Target>() {
       @Override
-      public boolean apply(ElixirTarget target, File file, ElixirSourceRootDescriptor root) throws IOException {
+      public boolean apply(Target target, File file, ElixirSourceRootDescriptor root) throws IOException {
         boolean isAcceptFile = target.isTests() ? ELIXIR_TEST_SOURCE_FILTER.accept(file) : ELIXIR_SOURCE_FILTER.accept(file);
         if(isAcceptFile && ourCompilableModuleTypes.contains(target.getModule().getModuleType())){
           filesToCompile.add(file);
@@ -137,7 +137,7 @@ public class Builder extends TargetBuilder<ElixirSourceRootDescriptor, ElixirTar
    * if "isMake": compile all files of the module and dependent module.
    * else: just for compile the target affected file.
    * */
-  private static void doBuildWithElixirc(ElixirTarget target,
+  private static void doBuildWithElixirc(Target target,
                                          CompileContext context,
                                          JpsModule module,
                                          ElixirCompilerOptions compilerOptions,
@@ -149,7 +149,7 @@ public class Builder extends TargetBuilder<ElixirSourceRootDescriptor, ElixirTar
     runElixirc(target, context, compilerOptions, filesToCompile, outputDirectory);
   }
 
-  private static void doBuildWithMix(ElixirTarget target,
+  private static void doBuildWithMix(Target target,
                                      CompileContext context,
                                      JpsModule module,
                                      ElixirCompilerOptions compilerOptions) throws ProjectBuildException, IOException {
@@ -189,7 +189,7 @@ public class Builder extends TargetBuilder<ElixirSourceRootDescriptor, ElixirTar
     return outputDirectory;
   }
 
-  private static void runElixirc(ElixirTarget target,
+  private static void runElixirc(Target target,
                                  CompileContext context,
                                  ElixirCompilerOptions compilerOptions,
                                  Collection<File> files,
@@ -211,7 +211,7 @@ public class Builder extends TargetBuilder<ElixirSourceRootDescriptor, ElixirTar
     handler.waitFor();
   }
 
-  private static GeneralCommandLine getElixircCommandLine(ElixirTarget target,
+  private static GeneralCommandLine getElixircCommandLine(Target target,
                                                           CompileContext context,
                                                           ElixirCompilerOptions compilerOptions,
                                                           Collection<File> files,
@@ -237,7 +237,7 @@ public class Builder extends TargetBuilder<ElixirSourceRootDescriptor, ElixirTar
 
   @NotNull
   private static List<String> getCompileFilePaths(@NotNull JpsModule module,
-                                                  @NotNull ElixirTarget target,
+                                                  @NotNull Target target,
                                                   @NotNull CompileContext context,
                                                   Collection<File> files){
     // make
@@ -255,7 +255,7 @@ public class Builder extends TargetBuilder<ElixirSourceRootDescriptor, ElixirTar
   }
 
   @NotNull
-  private static List<String> getCompileFilePathsDefault(@NotNull JpsModule module, @NotNull ElixirTarget target){
+  private static List<String> getCompileFilePathsDefault(@NotNull JpsModule module, @NotNull Target target){
     CommonProcessors.CollectProcessor<File> exFilesCollector = new CommonProcessors.CollectProcessor<File>(){
       @Override
       protected boolean accept(File file) {
@@ -284,7 +284,7 @@ public class Builder extends TargetBuilder<ElixirSourceRootDescriptor, ElixirTar
 
   private static void addDependentModuleCodePath(@NotNull GeneralCommandLine commandLine,
                                                  @NotNull JpsModule module,
-                                                 @NotNull ElixirTarget target,
+                                                 @NotNull Target target,
                                                  @NotNull CompileContext context) throws ProjectBuildException{
 
     ArrayList<JpsModule> codePathModules = new ArrayList<JpsModule>();
@@ -354,7 +354,7 @@ public class Builder extends TargetBuilder<ElixirSourceRootDescriptor, ElixirTar
 
   /*** doBuildWithMix related private methods */
 
-  private static void runMix(@NotNull ElixirTarget target,
+  private static void runMix(@NotNull Target target,
                              @NotNull String elixirPath,
                              @NotNull String mixPath,
                              @Nullable String contentRootPath,

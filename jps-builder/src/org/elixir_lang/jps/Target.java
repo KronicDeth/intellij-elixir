@@ -1,6 +1,8 @@
-package org.elixir_lang.jps.builder;
+package org.elixir_lang.jps;
 
 import com.intellij.util.containers.ContainerUtil;
+import org.elixir_lang.jps.builder.ElixirSourceRootDescriptor;
+import org.elixir_lang.jps.builder.ElixirTargetType;
 import org.elixir_lang.jps.model.JpsElixirModuleType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -23,8 +25,8 @@ import java.util.*;
 /**
  * Created by zyuyou on 15/7/10.
  */
-public class ElixirTarget extends ModuleBasedTarget<ElixirSourceRootDescriptor> {
-  public ElixirTarget(ElixirTargetType targetType, @NotNull JpsModule module) {
+public class Target extends ModuleBasedTarget<ElixirSourceRootDescriptor> {
+  public Target(ElixirTargetType targetType, @NotNull JpsModule module) {
     super(targetType, module);
   }
 
@@ -44,12 +46,12 @@ public class ElixirTarget extends ModuleBasedTarget<ElixirSourceRootDescriptor> 
     Set<JpsModule> modules = JpsJavaExtensionService.dependencies(myModule).includedIn(JpsJavaClasspathKind.compile(isTests())).getModules();
     for (JpsModule module : modules){
       if(module.getModuleType().equals(JpsElixirModuleType.INSTANCE)){
-        dependencies.add(new ElixirTarget(getElixirTargetType(), module));
+        dependencies.add(new Target(getElixirTargetType(), module));
       }
     }
 
     if(isTests()){
-      dependencies.add(new ElixirTarget(ElixirTargetType.PRODUCTION, myModule));
+      dependencies.add(new Target(ElixirTargetType.PRODUCTION, myModule));
     }
 
     return dependencies;
