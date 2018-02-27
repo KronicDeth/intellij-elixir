@@ -1,7 +1,7 @@
 package org.elixir_lang.jps;
 
 import com.intellij.util.containers.ContainerUtil;
-import org.elixir_lang.jps.builder.ElixirSourceRootDescriptor;
+import org.elixir_lang.jps.builder.SourceRootDescriptor;
 import org.elixir_lang.jps.target.Type;
 import org.elixir_lang.jps.model.JpsElixirModuleType;
 import org.jetbrains.annotations.NotNull;
@@ -25,7 +25,7 @@ import java.util.*;
 /**
  * Created by zyuyou on 15/7/10.
  */
-public class Target extends ModuleBasedTarget<ElixirSourceRootDescriptor> {
+public class Target extends ModuleBasedTarget<SourceRootDescriptor> {
   public Target(Type targetType, @NotNull JpsModule module) {
     super(targetType, module);
   }
@@ -59,22 +59,22 @@ public class Target extends ModuleBasedTarget<ElixirSourceRootDescriptor> {
 
   @NotNull
   @Override
-  public List<ElixirSourceRootDescriptor> computeRootDescriptors(JpsModel model,
-                                                                 ModuleExcludeIndex index,
-                                                                 IgnoredFileIndex ignoredFileIndex,
-                                                                 BuildDataPaths dataPaths) {
+  public List<SourceRootDescriptor> computeRootDescriptors(JpsModel model,
+                                                           ModuleExcludeIndex index,
+                                                           IgnoredFileIndex ignoredFileIndex,
+                                                           BuildDataPaths dataPaths) {
 
-    List<ElixirSourceRootDescriptor> result = new ArrayList<ElixirSourceRootDescriptor>();
+    List<SourceRootDescriptor> result = new ArrayList<SourceRootDescriptor>();
     JavaSourceRootType type = isTests() ? JavaSourceRootType.TEST_SOURCE : JavaSourceRootType.SOURCE;
     for(JpsTypedModuleSourceRoot<JavaSourceRootProperties> root : myModule.getSourceRoots(type)){
-      result.add(new ElixirSourceRootDescriptor(root.getFile(), this));
+      result.add(new SourceRootDescriptor(root.getFile(), this));
     }
     return result;
   }
 
   @Nullable
   @Override
-  public ElixirSourceRootDescriptor findRootDescriptor(String rootId, BuildRootIndex rootIndex) {
+  public SourceRootDescriptor findRootDescriptor(String rootId, BuildRootIndex rootIndex) {
     return ContainerUtil.getFirstItem(rootIndex.getRootDescriptors(new File(rootId), Collections.singletonList(getElixirTargetType()), null));
   }
 

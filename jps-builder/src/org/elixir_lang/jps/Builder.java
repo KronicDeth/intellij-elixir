@@ -46,7 +46,7 @@ import java.util.*;
  * https://github.com/ignatov/intellij-erlang/blob/master/jps-plugin/src/org/intellij/erlang/jps/builder/ErlangBuilder.java
  * https://github.com/ignatov/intellij-erlang/tree/master/jps-plugin/src/org/intellij/erlang/jps/rebar
  */
-public class Builder extends TargetBuilder<ElixirSourceRootDescriptor, Target> {
+public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
   public static final String BUILDER_NAME = "Elixir Builder";
 
   public static final String ELIXIR_SOURCE_EXTENSION = "ex";
@@ -93,16 +93,16 @@ public class Builder extends TargetBuilder<ElixirSourceRootDescriptor, Target> {
 
   @Override
   public void build(@NotNull Target target,
-                    @NotNull DirtyFilesHolder<ElixirSourceRootDescriptor, Target> holder,
+                    @NotNull DirtyFilesHolder<SourceRootDescriptor, Target> holder,
                     @NotNull BuildOutputConsumer outputConsumer,
                     @NotNull CompileContext context) throws ProjectBuildException, IOException {
 
     LOG.info(target.getPresentableName());
     final Set<File> filesToCompile = new THashSet<File>(FileUtil.FILE_HASHING_STRATEGY);
 
-    holder.processDirtyFiles(new FileProcessor<ElixirSourceRootDescriptor, Target>() {
+    holder.processDirtyFiles(new FileProcessor<SourceRootDescriptor, Target>() {
       @Override
-      public boolean apply(Target target, File file, ElixirSourceRootDescriptor root) throws IOException {
+      public boolean apply(Target target, File file, SourceRootDescriptor root) throws IOException {
         boolean isAcceptFile = target.isTests() ? ELIXIR_TEST_SOURCE_FILTER.accept(file) : ELIXIR_SOURCE_FILTER.accept(file);
         if(isAcceptFile && ourCompilableModuleTypes.contains(target.getModule().getModuleType())){
           filesToCompile.add(file);

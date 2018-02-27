@@ -13,11 +13,11 @@ import java.io.FileFilter;
 /**
  * Created by zyuyou on 15/7/10.
  */
-public class ElixirSourceRootDescriptor extends BuildRootDescriptor {
+public class SourceRootDescriptor extends BuildRootDescriptor {
   private File myRoot;
   private final Target myTarget;
 
-  public ElixirSourceRootDescriptor(File root, Target target) {
+  public SourceRootDescriptor(File root, Target target) {
     myRoot = root;
     myTarget = target;
   }
