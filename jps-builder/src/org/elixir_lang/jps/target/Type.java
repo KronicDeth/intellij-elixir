@@ -1,4 +1,4 @@
-package org.elixir_lang.jps.builder;
+package org.elixir_lang.jps.target;
 
 import org.elixir_lang.jps.Target;
 import org.elixir_lang.jps.model.JpsElixirModuleType;
@@ -16,13 +16,13 @@ import java.util.List;
 /**
  * Created by zyuyou on 15/7/10.
  */
-public class ElixirTargetType extends ModuleBasedBuildTargetType<Target>{
-  public static final ElixirTargetType PRODUCTION = new ElixirTargetType("elixir-production", false);
-  public static final ElixirTargetType TEST = new ElixirTargetType("elixir-test", true);
+public class Type extends ModuleBasedBuildTargetType<Target>{
+  public static final Type PRODUCTION = new Type("elixir-production", false);
+  public static final Type TEST = new Type("elixir-test", true);
 
   private final boolean myTests;
 
-  private ElixirTargetType(String elixir, boolean tests){
+  private Type(String elixir, boolean tests){
     super(elixir);
     myTests = tests;
   }
@@ -46,7 +46,7 @@ public class ElixirTargetType extends ModuleBasedBuildTargetType<Target>{
       public Target createTarget(@NotNull String targetId) {
         for (JpsTypedModule<JpsDummyElement> module : model.getProject().getModules(JpsElixirModuleType.INSTANCE)){
           if(module.getName().equals(targetId)){
-            return new Target(ElixirTargetType.this, module);
+            return new Target(Type.this, module);
           }
         }
         return null;

@@ -2,7 +2,7 @@ package org.elixir_lang.jps;
 
 import com.intellij.util.containers.ContainerUtil;
 import org.elixir_lang.jps.builder.ElixirSourceRootDescriptor;
-import org.elixir_lang.jps.builder.ElixirTargetType;
+import org.elixir_lang.jps.target.Type;
 import org.elixir_lang.jps.model.JpsElixirModuleType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,7 +26,7 @@ import java.util.*;
  * Created by zyuyou on 15/7/10.
  */
 public class Target extends ModuleBasedTarget<ElixirSourceRootDescriptor> {
-  public Target(ElixirTargetType targetType, @NotNull JpsModule module) {
+  public Target(Type targetType, @NotNull JpsModule module) {
     super(targetType, module);
   }
 
@@ -51,7 +51,7 @@ public class Target extends ModuleBasedTarget<ElixirSourceRootDescriptor> {
     }
 
     if(isTests()){
-      dependencies.add(new Target(ElixirTargetType.PRODUCTION, myModule));
+      dependencies.add(new Target(Type.PRODUCTION, myModule));
     }
 
     return dependencies;
@@ -95,7 +95,7 @@ public class Target extends ModuleBasedTarget<ElixirSourceRootDescriptor> {
     return getElixirTargetType().isTests();
   }
 
-  public ElixirTargetType getElixirTargetType(){
-    return (ElixirTargetType)getTargetType();
+  public Type getElixirTargetType(){
+    return (Type)getTargetType();
   }
 }

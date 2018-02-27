@@ -1,6 +1,7 @@
 package org.elixir_lang.jps.builder;
 
 import org.elixir_lang.jps.Builder;
+import org.elixir_lang.jps.target.Type;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.builders.BuildTargetType;
 import org.jetbrains.jps.incremental.BuilderService;
@@ -17,7 +18,7 @@ public class Service extends BuilderService {
   @NotNull
   @Override
   public List<? extends BuildTargetType<?>> getTargetTypes() {
-    return Arrays.asList(ElixirTargetType.PRODUCTION, ElixirTargetType.TEST);
+    return Arrays.asList(Type.PRODUCTION, Type.TEST);
   }
 
   @NotNull

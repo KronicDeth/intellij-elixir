@@ -14,6 +14,7 @@ import org.elixir_lang.jps.model.ElixirCompilerOptions;
 import org.elixir_lang.jps.model.JpsElixirCompilerOptionsExtension;
 import org.elixir_lang.jps.model.JpsElixirModuleType;
 import org.elixir_lang.jps.model.JpsElixirSdkType;
+import org.elixir_lang.jps.target.Type;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jps.builders.BuildOutputConsumer;
@@ -79,7 +80,7 @@ public class Builder extends TargetBuilder<ElixirSourceRootDescriptor, Target> {
   public static final Set<? extends JpsModuleType<?>> ourCompilableModuleTypes = Collections.singleton(JpsElixirModuleType.INSTANCE);
 
   public Builder(){
-    super(Arrays.asList(ElixirTargetType.PRODUCTION, ElixirTargetType.TEST));
+    super(Arrays.asList(Type.PRODUCTION, Type.TEST));
 
     // disables java resource builder for elixir modules
     ResourcesBuilder.registerEnabler(new StandardResourceBuilderEnabler() {
