@@ -30,6 +30,7 @@ import java.io.File;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.elixir_lang.jps.sdk_type.Elixir.ELIXIR_TOOL_MIX;
+import static org.elixir_lang.jps.sdk_type.Elixir.SCRIPT_INTERPRETER;
 import static org.elixir_lang.sdk.elixir.Type.mostSpecificSdk;
 
 /**
@@ -99,7 +100,8 @@ public class MixRunningStateUtil {
                                                  @Nullable Sdk sdk,
                                                  @NotNull ParametersList elixirParametersList,
                                                  @NotNull ParametersList mixParametersList) {
-        setElixir(baseMixCommandLine, sdk, elixirParametersList);
+        setElixir(baseMixCommandLine, sdk);
+        baseMixCommandLine.addParameters(elixirParametersList.getParameters());
 
         String mixPath = mixPath(sdk);
         baseMixCommandLine.addParameter(mixPath);
@@ -216,52 +218,89 @@ public class MixRunningStateUtil {
         }
     }
 
-    private static void setElixir(@NotNull GeneralCommandLine commandLine,
-                                  @Nullable Sdk sdk,
-                                  @NotNull ParametersList parametersList) {
+    private static void setElixir(@NotNull GeneralCommandLine commandLine) {
+        String exePath = Elixir.getExecutableFileName(SCRIPT_INTERPRETER);
+        commandLine.setExePath(exePath);
+    }
+
+    private static void setElixir(@NotNull GeneralCommandLine commandLine, @Nullable Sdk sdk) {
         if (sdk != null) {
             org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData sdkAdditionalData =
                     (org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData) sdk.getSdkAdditionalData();
 
             if (sdkAdditionalData != null) {
-                Sdk erlangSdk = sdkAdditionalData.getErlangSdk();
-
-                if (erlangSdk != null) {
-                    String erlangHomePath = erlangSdk.getHomePath();
-
-                    if (erlangHomePath != null) {
-                        File erlFile = Erlang.getByteCodeInterpreterExecutable(erlangHomePath);
-
-                        if (erlFile.exists() && erlFile.canExecute()) {
-                            // See https://github.com/elixir-lang/elixir/blob/v1.5.1/bin/elixir.bat#L111
-                            commandLine.setExePath(erlFile.getAbsolutePath());
-                            // See https://github.com/elixir-lang/elixir/blob/v1.5.1/bin/elixir.bat#L96-L102
-                            prependCodePaths(commandLine, sdk);
-                            // See https://github.com/elixir-lang/elixir/blob/v1.5.1/bin/elixir.bat#L106
-                            commandLine.addParameters("-noshell", "-s", "elixir", "start_cli");
-                            // See https://github.com/elixir-lang/elixir/blob/v1.5.1/bin/elixir.bat#L111
-                            commandLine.addParameter("-extra");
-                        }
-                    }
-                } else {
-                    String erl = Erlang.getExecutableFileName("erl");
-
-                    // See https://github.com/elixir-lang/elixir/blob/v1.5.1/bin/elixir.bat#L111
-                    commandLine.setExePath(erl);
-                    // See https://github.com/elixir-lang/elixir/blob/v1.5.1/bin/elixir.bat#L96-L102
-                    prependCodePaths(commandLine, sdk);
-                    // See https://github.com/elixir-lang/elixir/blob/v1.5.1/bin/elixir.bat#L106
-                    commandLine.addParameters("-noshell", "-s", "elixir", "start_cli");
-                    // See https://github.com/elixir-lang/elixir/blob/v1.5.1/bin/elixir.bat#L111
-                    commandLine.addParameter("-extra");
-                }
+                setElixir(commandLine, sdk, sdkAdditionalData);
+            } else {
+                setElixir(commandLine);
             }
         } else {
-            String elixir = Elixir.getExecutableFileName("elixir");
-            commandLine.setExePath(elixir);
+            setElixir(commandLine);
+        }
+    }
+
+    private static void setElixir(@NotNull GeneralCommandLine commandLine,
+                                  @NotNull Sdk sdk,
+                                  @NotNull org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData sdkAdditionalData) {
+        String erlExePath = sdkAdditionalDataToErlExePath(sdkAdditionalData);
+
+        if (erlExePath != null) {
+            setExePath(commandLine, erlExePath, sdk);
+            // See https://github.com/elixir-lang/elixir/blob/v1.5.1/bin/elixir.bat#L106
+            commandLine.addParameters("-noshell", "-s", "elixir", "start_cli");
+            // See https://github.com/elixir-lang/elixir/blob/v1.5.1/bin/elixir.bat#L111
+            commandLine.addParameter("-extra");
+        } else {
+            String elixirExePath = elixirSdkToElixirExePath(sdk);
+
+            if (elixirExePath == null) {
+                elixirExePath = Elixir.getExecutableFileName(SCRIPT_INTERPRETER);
+            }
+
+            setExePath(commandLine, elixirExePath, sdk);
+        }
+    }
+
+    @Nullable
+    private static String elixirSdkToElixirExePath(@NotNull Sdk elixrSdk) {
+        String elixirHomePath = elixrSdk.getHomePath();
+        String elixirExePath = null;
+
+        if (elixirHomePath != null) {
+            elixirExePath = Elixir.homePathToElixirExePath(elixirHomePath);
         }
 
-        commandLine.addParameters(parametersList.getList());
+        return elixirExePath;
+    }
+
+    @Nullable
+    private static String erlangSdkToErlExePath(@NotNull Sdk erlangSdk) {
+        String erlangHomePath = erlangSdk.getHomePath();
+        String exePath = null;
+
+        if (erlangHomePath != null) {
+            exePath = Erlang.homePathToErlExePath(erlangHomePath);
+        }
+
+        return exePath;
+    }
+
+    @Nullable
+    private static String sdkAdditionalDataToErlExePath(
+            @NotNull org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData sdkAdditionalData
+    ) {
+        Sdk erlangSdk = sdkAdditionalData.getErlangSdk();
+        String erlExePath = null;
+
+        if (erlangSdk != null) {
+            erlExePath = erlangSdkToErlExePath(erlangSdk);
+        }
+
+        return erlExePath;
+    }
+
+    private static void setExePath(@NotNull GeneralCommandLine generalCommandLine, @NotNull String exePath, @NotNull Sdk sdk) {
+        generalCommandLine.setExePath(exePath);
+        prependCodePaths(generalCommandLine, sdk);
     }
 
     @NotNull

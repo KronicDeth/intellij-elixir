@@ -6,12 +6,12 @@ import org.jetbrains.jps.model.module.JpsModuleType;
 
 /**
  * Created by zyuyou on 2015/5/27.
- * 
+ *
  */
-public class JpsElixirModuleType extends JpsElementTypeWithDummyProperties implements JpsModuleType<JpsDummyElement>{
-  public static final JpsElixirModuleType INSTANCE = new JpsElixirModuleType();
+public class ModuleType extends JpsElementTypeWithDummyProperties implements JpsModuleType<JpsDummyElement>{
+  public static final ModuleType INSTANCE = new ModuleType();
 
-  private JpsElixirModuleType(){
+  private ModuleType(){
 
   }
 }

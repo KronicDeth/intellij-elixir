@@ -3,7 +3,7 @@ package org.elixir_lang.jps;
 import com.intellij.util.containers.ContainerUtil;
 import org.elixir_lang.jps.builder.SourceRootDescriptor;
 import org.elixir_lang.jps.target.Type;
-import org.elixir_lang.jps.model.JpsElixirModuleType;
+import org.elixir_lang.jps.model.ModuleType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jps.builders.*;
@@ -45,7 +45,7 @@ public class Target extends ModuleBasedTarget<SourceRootDescriptor> {
 
     Set<JpsModule> modules = JpsJavaExtensionService.dependencies(myModule).includedIn(JpsJavaClasspathKind.compile(isTests())).getModules();
     for (JpsModule module : modules){
-      if(module.getModuleType().equals(JpsElixirModuleType.INSTANCE)){
+      if(module.getModuleType().equals(ModuleType.INSTANCE)){
         dependencies.add(new Target(getElixirTargetType(), module));
       }
     }

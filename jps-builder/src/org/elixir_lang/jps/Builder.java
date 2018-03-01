@@ -12,8 +12,10 @@ import org.elixir_lang.jps.builder.GeneralCommandLine;
 import org.elixir_lang.jps.builder.ProcessAdapter;
 import org.elixir_lang.jps.builder.SourceRootDescriptor;
 import org.elixir_lang.jps.compiler_options.Extension;
-import org.elixir_lang.jps.model.JpsElixirModuleType;
+import org.elixir_lang.jps.model.ModuleType;
+import org.elixir_lang.jps.model.SdkProperties;
 import org.elixir_lang.jps.sdk_type.Elixir;
+import org.elixir_lang.jps.sdk_type.Erlang;
 import org.elixir_lang.jps.target.BuilderUtil;
 import org.elixir_lang.jps.target.Type;
 import org.jetbrains.annotations.NotNull;
@@ -26,10 +28,14 @@ import org.jetbrains.jps.incremental.TargetBuilder;
 import org.jetbrains.jps.incremental.messages.BuildMessage;
 import org.jetbrains.jps.incremental.messages.CompilerMessage;
 import org.jetbrains.jps.incremental.resources.ResourcesBuilder;
-import org.jetbrains.jps.model.JpsDummyElement;
+import org.jetbrains.jps.model.JpsElement;
 import org.jetbrains.jps.model.JpsProject;
 import org.jetbrains.jps.model.java.JavaSourceRootType;
 import org.jetbrains.jps.model.java.JpsJavaExtensionService;
+import org.jetbrains.jps.model.library.JpsLibrary;
+import org.jetbrains.jps.model.library.JpsLibraryCollection;
+import org.jetbrains.jps.model.library.JpsLibraryRoot;
+import org.jetbrains.jps.model.library.JpsOrderRootType;
 import org.jetbrains.jps.model.library.sdk.JpsSdk;
 import org.jetbrains.jps.model.module.*;
 
@@ -46,6 +52,7 @@ import java.util.*;
  * https://github.com/ignatov/intellij-erlang/tree/master/jps-plugin/src/org/intellij/erlang/jps/rebar
  */
 public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
+    private static final String URL_PREFIX = "file://";
     public static final String BUILDER_NAME = "Elixir Builder";
 
     public static final String ELIXIR_SOURCE_EXTENSION = "ex";
@@ -61,15 +68,15 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
             file -> FileUtilRt.extensionEquals(file.getName(), ELIXIR_TEST_SOURCE_EXTENSION);
     // use JavaBuilderExtension?
     private static final Set<? extends JpsModuleType<?>> ourCompilableModuleTypes =
-            Collections.singleton(JpsElixirModuleType.INSTANCE);
+            Collections.singleton(ModuleType.INSTANCE);
     private static final String MIX_CONFIG_FILE_NAME = "mix." + ELIXIR_SCRIPT_EXTENSION;
-    private final static Logger LOG = Logger.getInstance(Builder.class);
+    private final static Logger LOGGER = Logger.getInstance(Builder.class);
 
     public Builder() {
         super(Arrays.asList(Type.PRODUCTION, Type.TEST));
 
         // disables java resource builder for elixir modules
-        ResourcesBuilder.registerEnabler(module -> !(module.getModuleType() instanceof JpsElixirModuleType));
+        ResourcesBuilder.registerEnabler(module -> !(module.getModuleType() instanceof ModuleType));
     }
 
     /**
@@ -93,10 +100,51 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
                                        CompileContext context,
                                        JpsModule module,
                                        CompilerOptions compilerOptions) throws ProjectBuildException, IOException {
-        JpsSdk<JpsDummyElement> sdk = BuilderUtil.getSdk(context, module);
+        JpsSdk<SdkProperties> sdk = BuilderUtil.getSdk(context, module);
+        SdkProperties sdkProperties = sdk.getSdkProperties();
+        LOGGER.warn("sdk.getSdkProperties() = " + sdkProperties);
+
+        String erlangSdkName = sdk.getSdkProperties().erlangSdkName;
+        LOGGER.warn("erlangSdkName = " + erlangSdkName);
+
+        if (erlangSdkName != null) {
+            JpsLibraryCollection libraryCollection = module.getProject().getModel().getGlobal().getLibraryCollection();
+            JpsLibrary erlangSdkLibrary = libraryCollection.findLibrary(erlangSdkName);
+
+            LOGGER.warn("erlangSdkLibrary = " + erlangSdkLibrary);
+
+            if (erlangSdkLibrary != null) {
+                JpsElement erlangSdkLibraryProperties = erlangSdkLibrary.getProperties();
+
+                LOGGER.warn("erlangSdkLibraryProperties = " + erlangSdkLibraryProperties);
+
+                if (erlangSdkLibraryProperties instanceof JpsSdk) {
+                    JpsSdk erlangSdk = (JpsSdk) erlangSdkLibraryProperties;
+
+                    String erlangHomePath = erlangSdk.getHomePath();
+                    LOGGER.warn("erlangHomePath = " + erlangHomePath);
+
+                    File erlFile = Erlang.getByteCodeInterpreterExecutable(erlangHomePath);
+
+                    LOGGER.warn("erlFile = " + erlFile);
+                    LOGGER.warn("erlFile.canExecute() = " + erlFile.canExecute());
+                }
+
+            }
+        }
+
+        JpsLibrary jpsLibrary = sdk.getParent();
+        LOGGER.warn("sdk.getParent() = " + jpsLibrary);
+
+        List<JpsLibraryRoot> compiledRoots = jpsLibrary.getRoots(JpsOrderRootType.COMPILED);
+        LOGGER.warn("compiledRoots = " + compiledRoots);
+
+        for (JpsLibraryRoot compiledRoot : compiledRoots) {
+            LOGGER.warn("compiledRoot.getUrl() = " + compiledRoot.getUrl());
+        }
+        LOGGER.warn("END compiledRoots");
 
         String mixPath = Elixir.getMixScript(sdk);
-        String elixirPath = Elixir.getScriptInterpreterExecutable(sdk.getHomePath()).getAbsolutePath();
 
         for (String contentRootUrl : module.getContentRootsList().getUrls()) {
             String contentRootPath = new URL(contentRootUrl).getPath();
@@ -104,7 +152,7 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
             File mixConfigFile = new File(contentRootDir, MIX_CONFIG_FILE_NAME);
             if (!mixConfigFile.exists()) continue;
 
-            runMix(target, elixirPath, mixPath, contentRootPath, compilerOptions, context);
+            runMix(target, sdk, mixPath, contentRootPath, compilerOptions, context, module);
         }
     }
 
@@ -161,7 +209,7 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
 
         // get executable
         JpsModule module = target.getModule();
-        JpsSdk<JpsDummyElement> sdk = BuilderUtil.getSdk(context, module);
+        JpsSdk<SdkProperties> sdk = BuilderUtil.getSdk(context, module);
         File executable = Elixir.getByteCodeCompilerExecutable(sdk.getHomePath());
 
         List<String> compileFilePaths = getCompileFilePaths(module, target, context, files);
@@ -283,15 +331,142 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
 
     /*** doBuildWithMix related private methods */
 
+    @Nullable
+    private static String elixirSdkToElixirExePath(@NotNull JpsSdk elixirSdk) {
+        String elixirHomePath = elixirSdk.getHomePath();
+        String elixirExePath = null;
+
+        if (elixirHomePath != null) {
+            elixirExePath = Elixir.homePathToElixirExePath(elixirHomePath);
+        }
+
+        return elixirExePath;
+    }
+
+    @Nullable
+    private static String erlangSdkLibraryToErlExePath(@NotNull JpsLibrary erlangSdkLibrary) {
+        String erlExePath = null;
+
+        JpsElement erlangSdkLibraryProperties = erlangSdkLibrary.getProperties();
+
+        if (erlangSdkLibraryProperties instanceof JpsSdk) {
+            erlExePath = erlangSdkToErlExePath((JpsSdk) erlangSdkLibraryProperties);
+        }
+
+        return erlExePath;
+    }
+
+    @Nullable
+    private static String erlangSdkNameToErlExePath(@NotNull String erlangSdkName, @NotNull JpsModule module) {
+        JpsLibraryCollection libraryCollection = module.getProject().getModel().getGlobal().getLibraryCollection();
+        JpsLibrary erlangSdkLibrary = libraryCollection.findLibrary(erlangSdkName);
+        String erlExePath = null;
+
+        if (erlangSdkLibrary != null) {
+            erlExePath = erlangSdkLibraryToErlExePath(erlangSdkLibrary);
+        }
+
+        return erlExePath;
+    }
+
+    @Nullable
+    private static String erlangSdkToErlExePath(@NotNull JpsSdk erlangSdk) {
+        String erlangHomePath = erlangSdk.getHomePath();
+        String erlExePath = null;
+
+        if (erlangHomePath != null) {
+            erlExePath = Erlang.homePathToErlExePath(erlangHomePath);
+        }
+
+        return erlExePath;
+    }
+
+    private static void prependCodePaths(@NotNull GeneralCommandLine commandLine, @NotNull JpsSdk sdk) {
+        JpsLibrary jpsLibrary = sdk.getParent();
+        List<JpsLibraryRoot> compiledRoots = jpsLibrary.getRoots(JpsOrderRootType.COMPILED);
+
+        for (JpsLibraryRoot compiledRoot : compiledRoots) {
+            String url = compiledRoot.getUrl();
+
+            assert url.startsWith(URL_PREFIX);
+
+            String path = url.substring(URL_PREFIX.length(), url.length());
+
+            commandLine.addParameters("-pa", path);
+        }
+    }
+
+    @Nullable
+    private static String sdkPropertiesToErlExePath(@NotNull SdkProperties sdkProperties, @NotNull JpsModule module) {
+        String erlangSdkName = sdkProperties.erlangSdkName;
+        String erlExePath = null;
+
+        if (erlangSdkName != null) {
+            erlExePath = erlangSdkNameToErlExePath(erlangSdkName, module);
+        }
+
+        return erlExePath;
+    }
+
+    private static void setElixir(@NotNull GeneralCommandLine commandLine) {
+        String exePath = Elixir.getExecutableFileName(Elixir.SCRIPT_INTERPRETER);
+        commandLine.setExePath(exePath);
+    }
+
+    private static void setElixir(@NotNull GeneralCommandLine commandLine,
+                                  @Nullable JpsSdk<SdkProperties> sdk,
+                                  @NotNull JpsModule module) {
+        if (sdk != null) {
+            SdkProperties sdkProperties = sdk.getSdkProperties();
+
+            if (sdkProperties != null) {
+                setElixir(commandLine, sdk, sdkProperties, module);
+            } else {
+                setElixir(commandLine);
+            }
+        } else {
+            setElixir(commandLine);
+        }
+    }
+
+    private static void setElixir(@NotNull GeneralCommandLine commandLine,
+                                  @NotNull JpsSdk<SdkProperties> sdk,
+                                  @NotNull SdkProperties sdkProperties,
+                                  @NotNull JpsModule module) {
+        String erlExePath = sdkPropertiesToErlExePath(sdkProperties, module);
+
+        if (erlExePath != null) {
+            setExePath(commandLine, erlExePath, sdk);
+            commandLine.addParameters("-noshell", "-s", "elixir", "start_cli");
+            commandLine.addParameter("-extra");
+        } else {
+            String elixirExePath = elixirSdkToElixirExePath(sdk);
+
+            if (elixirExePath == null) {
+                elixirExePath = Elixir.getExecutableFileName(Elixir.SCRIPT_INTERPRETER);
+            }
+
+            setExePath(commandLine, elixirExePath, sdk);
+        }
+    }
+
+    private static void setExePath(@NotNull GeneralCommandLine generalCommandLine,
+                                   @NotNull String exePath,
+                                   @NotNull JpsSdk sdk) {
+        generalCommandLine.setExePath(exePath);
+        prependCodePaths(generalCommandLine, sdk);
+    }
+
     private static void runMix(@NotNull Target target,
-                               @NotNull String elixirPath,
+                               @Nullable JpsSdk<SdkProperties> sdk,
                                @NotNull String mixPath,
                                @Nullable String contentRootPath,
                                @NotNull CompilerOptions compilerOptions,
-                               @NotNull CompileContext context) throws ProjectBuildException {
+                               @NotNull CompileContext context,
+                               @NotNull JpsModule module) throws ProjectBuildException {
         GeneralCommandLine commandLine = new GeneralCommandLine();
         commandLine.withWorkDirectory(contentRootPath);
-        commandLine.setExePath(elixirPath);
+        setElixir(commandLine, sdk, module);
         commandLine.addParameter(mixPath);
         commandLine.addParameter(target.isTests() ? "test" : "compile");
         addCompileOptions(commandLine, compilerOptions);
@@ -315,8 +490,7 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
                       @NotNull DirtyFilesHolder<SourceRootDescriptor, Target> holder,
                       @NotNull BuildOutputConsumer outputConsumer,
                       @NotNull CompileContext context) throws ProjectBuildException, IOException {
-
-        LOG.info(target.getPresentableName());
+        LOGGER.info(target.getPresentableName());
         final Set<File> filesToCompile = new THashSet<>(FileUtil.FILE_HASHING_STRATEGY);
 
         holder.processDirtyFiles((target1, file, root) -> {

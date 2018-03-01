@@ -1,17 +1,18 @@
 package org.elixir_lang.jps.sdk_type;
 
 import com.intellij.openapi.util.SystemInfo;
+import org.elixir_lang.jps.model.SdkProperties;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.jps.model.JpsDummyElement;
-import org.jetbrains.jps.model.JpsElementFactory;
 import org.jetbrains.jps.model.JpsElementTypeWithDefaultProperties;
 import org.jetbrains.jps.model.library.sdk.JpsSdk;
 import org.jetbrains.jps.model.library.sdk.JpsSdkType;
 
 import java.io.File;
 
-public class Elixir extends JpsSdkType<JpsDummyElement> implements JpsElementTypeWithDefaultProperties<JpsDummyElement>{
+import static org.elixir_lang.jps.SdkType.exeFileToExePath;
+
+public class Elixir extends JpsSdkType<SdkProperties> implements JpsElementTypeWithDefaultProperties<SdkProperties>{
   public static final Elixir INSTANCE = new Elixir();
 
   public static final String SCRIPT_INTERPRETER = "elixir";
@@ -30,7 +31,7 @@ public class Elixir extends JpsSdkType<JpsDummyElement> implements JpsElementTyp
   }
 
   @NotNull
-  public static String getMixScript(@Nullable JpsSdk<JpsDummyElement> sdk) {
+  public static String getMixScript(@Nullable JpsSdk<SdkProperties> sdk) {
     String mixPath;
 
     if (sdk != null) {
@@ -75,7 +76,13 @@ public class Elixir extends JpsSdkType<JpsDummyElement> implements JpsElementTyp
 
   @NotNull
   @Override
-  public JpsDummyElement createDefaultProperties() {
-    return JpsElementFactory.getInstance().createDummyElement();
+  public SdkProperties createDefaultProperties() {
+    return new SdkProperties(null);
+  }
+
+  @Nullable
+  public static String homePathToElixirExePath(@NotNull String elixirHomePath) {
+      File elixirFile = getScriptInterpreterExecutable(elixirHomePath);
+      return exeFileToExePath(elixirFile);
   }
 }

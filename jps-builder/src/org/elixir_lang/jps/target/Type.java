@@ -1,7 +1,7 @@
 package org.elixir_lang.jps.target;
 
 import org.elixir_lang.jps.Target;
-import org.elixir_lang.jps.model.JpsElixirModuleType;
+import org.elixir_lang.jps.model.ModuleType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jps.builders.BuildTargetLoader;
@@ -31,7 +31,7 @@ public class Type extends ModuleBasedBuildTargetType<Target>{
   @Override
   public List<Target> computeAllTargets(@NotNull JpsModel model) {
     List<Target> targets = new ArrayList<Target>();
-    for (JpsTypedModule<JpsDummyElement> module : model.getProject().getModules(JpsElixirModuleType.INSTANCE)){
+    for (JpsTypedModule<JpsDummyElement> module : model.getProject().getModules(ModuleType.INSTANCE)){
       targets.add(new Target(this, module));
     }
     return targets;
@@ -44,7 +44,7 @@ public class Type extends ModuleBasedBuildTargetType<Target>{
       @Nullable
       @Override
       public Target createTarget(@NotNull String targetId) {
-        for (JpsTypedModule<JpsDummyElement> module : model.getProject().getModules(JpsElixirModuleType.INSTANCE)){
+        for (JpsTypedModule<JpsDummyElement> module : model.getProject().getModules(ModuleType.INSTANCE)){
           if(module.getName().equals(targetId)){
             return new Target(Type.this, module);
           }

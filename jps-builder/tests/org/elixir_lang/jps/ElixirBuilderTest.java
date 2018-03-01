@@ -2,11 +2,11 @@ package org.elixir_lang.jps;
 
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.util.PathUtilRt;
-import org.elixir_lang.jps.model.JpsElixirModuleType;
+import org.elixir_lang.jps.model.ModuleType;
+import org.elixir_lang.jps.model.SdkProperties;
 import org.elixir_lang.jps.sdk_type.Elixir;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.jps.model.JpsDummyElement;
 import org.jetbrains.jps.model.JpsElement;
 import org.jetbrains.jps.model.library.JpsOrderRootType;
 import org.jetbrains.jps.model.library.JpsTypedLibrary;
@@ -27,15 +27,15 @@ public class ElixirBuilderTest extends JpsBuildTestCase {
   }
 
   @Override
-  protected JpsSdk<JpsDummyElement> addJdk(String name, String path) {
+  protected JpsSdk<SdkProperties> addJdk(String name, String path) {
     String sdkHome = sdkHome();
     String elixirVersion = elixirVersion();
-    JpsTypedLibrary<JpsSdk<JpsDummyElement>> jdk = myModel
+    JpsTypedLibrary<JpsSdk<SdkProperties>> sdk = myModel
             .getGlobal()
             .addSdk("Elixir: " + elixirVersion, sdkHome, elixirVersion, Elixir.INSTANCE);
-    jdk.addRoot(JpsPathUtil.pathToUrl(sdkHome), JpsOrderRootType.COMPILED);
+    sdk.addRoot(JpsPathUtil.pathToUrl(sdkHome), JpsOrderRootType.COMPILED);
 
-    return jdk.getProperties();
+    return sdk.getProperties();
   }
 
   @Override
@@ -44,7 +44,7 @@ public class ElixirBuilderTest extends JpsBuildTestCase {
                                                        @Nullable String outputPath,
                                                        @Nullable String testOutputPath,
                                                        JpsSdk<T> sdk) {
-    return super.addModule(moduleName, srcPaths, outputPath, testOutputPath, sdk, JpsElixirModuleType.INSTANCE);
+    return super.addModule(moduleName, srcPaths, outputPath, testOutputPath, sdk, ModuleType.INSTANCE);
   }
 
   @NotNull

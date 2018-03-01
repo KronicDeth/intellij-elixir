@@ -2,6 +2,7 @@ package org.elixir_lang.jps.sdk_type;
 
 import com.intellij.openapi.util.SystemInfo;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jps.model.JpsDummyElement;
 import org.jetbrains.jps.model.JpsElementFactory;
 import org.jetbrains.jps.model.JpsElementTypeWithDefaultProperties;
@@ -9,8 +10,11 @@ import org.jetbrains.jps.model.library.sdk.JpsSdkType;
 
 import java.io.File;
 
+import static org.elixir_lang.jps.SdkType.exeFileToExePath;
+
 public class Erlang extends JpsSdkType<JpsDummyElement> implements JpsElementTypeWithDefaultProperties<JpsDummyElement> {
     private static final String BYTECODE_INTERPRETER = "erl";
+    public static final Erlang INSTANCE = new Erlang();
 
     @NotNull
     public static File getByteCodeInterpreterExecutable(@NotNull String sdkHome) {
@@ -31,5 +35,11 @@ public class Erlang extends JpsSdkType<JpsDummyElement> implements JpsElementTyp
     @Override
     public JpsDummyElement createDefaultProperties() {
         return JpsElementFactory.getInstance().createDummyElement();
+    }
+
+    @Nullable
+    public static String homePathToErlExePath(@NotNull String erlangHomePath) {
+        File erlFile = getByteCodeInterpreterExecutable(erlangHomePath);
+        return exeFileToExePath(erlFile);
     }
 }

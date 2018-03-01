@@ -1,8 +1,10 @@
 package org.elixir_lang.jps.model;
 
+import com.intellij.openapi.diagnostic.Logger;
 import org.elixir_lang.jps.compiler_options.Serializer;
 import org.elixir_lang.jps.mix.SettingsSerializer;
 import org.elixir_lang.jps.sdk_type.Elixir;
+import org.jdom.Attribute;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,13 +23,14 @@ import java.util.List;
  * Created by zyuyou on 2015/5/27.
  * https://github.com/ignatov/intellij-erlang/blob/master/jps-shared/src/org/intellij/erlang/jps/model/JpsErlangModelSerializerExtension.java
  */
-public class JpsElixirModelSerializerExtension extends JpsModelSerializerExtension{
+public class SerializerExtension extends JpsModelSerializerExtension{
+  public static final Logger LOGGER = Logger.getInstance(SerializerExtension.class);
   public static final String ELIXIR_SDK_TYPE_ID = "Elixir SDK";
 
   @NotNull
   @Override
   public List<? extends JpsModulePropertiesSerializer<?>> getModulePropertiesSerializers() {
-    return Collections.singletonList(new JpsModulePropertiesSerializer<JpsDummyElement>(JpsElixirModuleType.INSTANCE, "ELIXIR_MODULE", null) {
+    return Collections.singletonList(new JpsModulePropertiesSerializer<JpsDummyElement>(ModuleType.INSTANCE, "ELIXIR_MODULE", null) {
       @Override
       public JpsDummyElement loadProperties(@Nullable Element componentElement) {
         return JpsElementFactory.getInstance().createDummyElement();
@@ -42,16 +45,26 @@ public class JpsElixirModelSerializerExtension extends JpsModelSerializerExtensi
 
   @NotNull
   @Override
-  public List<? extends JpsSdkPropertiesSerializer<?>> getSdkPropertiesSerializers() {
-    return Collections.singletonList(new JpsSdkPropertiesSerializer<JpsDummyElement>(ELIXIR_SDK_TYPE_ID, Elixir.INSTANCE) {
+  public List<JpsSdkPropertiesSerializer<SdkProperties>> getSdkPropertiesSerializers() {
+    return Collections.singletonList(new JpsSdkPropertiesSerializer<SdkProperties>(ELIXIR_SDK_TYPE_ID, Elixir.INSTANCE) {
       @NotNull
       @Override
-      public JpsDummyElement loadProperties(@Nullable Element propertiesElement) {
-        return JpsElementFactory.getInstance().createDummyElement();
+      public SdkProperties loadProperties(@Nullable Element propertiesElement) {
+          String erlangSdkName = null;
+
+        if (propertiesElement != null) {
+          @Nullable Attribute erlangSdkNameAttribute = propertiesElement.getAttribute("erlang-sdk-name");
+
+          if (erlangSdkNameAttribute != null) {
+            erlangSdkName = erlangSdkNameAttribute.getValue();
+          }
+        }
+
+        return new SdkProperties(erlangSdkName);
       }
 
       @Override
-      public void saveProperties(@NotNull JpsDummyElement properties, @NotNull Element element) {
+      public void saveProperties(@NotNull SdkProperties properties, @NotNull Element element) {
       }
     });
   }

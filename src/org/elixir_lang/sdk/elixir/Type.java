@@ -26,7 +26,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.elixir_lang.Facet;
 import org.elixir_lang.icons.ElixirIcons;
-import org.elixir_lang.jps.model.JpsElixirModelSerializerExtension;
+import org.elixir_lang.jps.model.SerializerExtension;
 import org.elixir_lang.jps.sdk_type.Elixir;
 import org.elixir_lang.mix.runner.MixRunConfigurationBase;
 import org.elixir_lang.sdk.HomePath;
@@ -66,7 +66,7 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
             ApplicationManager.getApplication().isUnitTestMode() ? new HashMap<>() : new WeakHashMap<>();
 
     public Type() {
-        super(JpsElixirModelSerializerExtension.ELIXIR_SDK_TYPE_ID);
+        super(SerializerExtension.ELIXIR_SDK_TYPE_ID);
     }
 
     @Nullable
