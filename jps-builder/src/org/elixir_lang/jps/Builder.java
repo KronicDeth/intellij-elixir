@@ -101,49 +101,6 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
                                        JpsModule module,
                                        CompilerOptions compilerOptions) throws ProjectBuildException, IOException {
         JpsSdk<SdkProperties> sdk = BuilderUtil.getSdk(context, module);
-        SdkProperties sdkProperties = sdk.getSdkProperties();
-        LOGGER.warn("sdk.getSdkProperties() = " + sdkProperties);
-
-        String erlangSdkName = sdk.getSdkProperties().erlangSdkName;
-        LOGGER.warn("erlangSdkName = " + erlangSdkName);
-
-        if (erlangSdkName != null) {
-            JpsLibraryCollection libraryCollection = module.getProject().getModel().getGlobal().getLibraryCollection();
-            JpsLibrary erlangSdkLibrary = libraryCollection.findLibrary(erlangSdkName);
-
-            LOGGER.warn("erlangSdkLibrary = " + erlangSdkLibrary);
-
-            if (erlangSdkLibrary != null) {
-                JpsElement erlangSdkLibraryProperties = erlangSdkLibrary.getProperties();
-
-                LOGGER.warn("erlangSdkLibraryProperties = " + erlangSdkLibraryProperties);
-
-                if (erlangSdkLibraryProperties instanceof JpsSdk) {
-                    JpsSdk erlangSdk = (JpsSdk) erlangSdkLibraryProperties;
-
-                    String erlangHomePath = erlangSdk.getHomePath();
-                    LOGGER.warn("erlangHomePath = " + erlangHomePath);
-
-                    File erlFile = Erlang.getByteCodeInterpreterExecutable(erlangHomePath);
-
-                    LOGGER.warn("erlFile = " + erlFile);
-                    LOGGER.warn("erlFile.canExecute() = " + erlFile.canExecute());
-                }
-
-            }
-        }
-
-        JpsLibrary jpsLibrary = sdk.getParent();
-        LOGGER.warn("sdk.getParent() = " + jpsLibrary);
-
-        List<JpsLibraryRoot> compiledRoots = jpsLibrary.getRoots(JpsOrderRootType.COMPILED);
-        LOGGER.warn("compiledRoots = " + compiledRoots);
-
-        for (JpsLibraryRoot compiledRoot : compiledRoots) {
-            LOGGER.warn("compiledRoot.getUrl() = " + compiledRoot.getUrl());
-        }
-        LOGGER.warn("END compiledRoots");
-
         String mixPath = Elixir.getMixScript(sdk);
 
         for (String contentRootUrl : module.getContentRootsList().getUrls()) {
