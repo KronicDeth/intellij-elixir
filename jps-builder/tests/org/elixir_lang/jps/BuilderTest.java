@@ -2,6 +2,7 @@ package org.elixir_lang.jps;
 
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.util.PathUtilRt;
+import org.elixir_lang.jps.compiler_options.Extension;
 import org.elixir_lang.jps.model.ModuleType;
 import org.elixir_lang.jps.model.SdkProperties;
 import org.elixir_lang.jps.sdk_type.Elixir;
@@ -19,10 +20,13 @@ import java.io.File;
 /**
  * Created by zyuyou on 15/7/17.
  */
-public class ElixirBuilderTest extends JpsBuildTestCase {
+public class BuilderTest extends JpsBuildTestCase {
   private static final String TEST_MODULE_NAME = "m";
 
-  public void testSimple() throws Exception{
+  public void testSimple() {
+    CompilerOptions compilerOptions = Extension.getOrCreateExtension(myModel.getProject()).getOptions();
+    compilerOptions.useMixCompiler = false;
+
     doSingleFileTest("lib/simple.ex", "defmodule Simple do def foo() do :ok end end", "Elixir.Simple.beam");
   }
 
