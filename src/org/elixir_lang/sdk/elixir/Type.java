@@ -29,7 +29,7 @@ import org.elixir_lang.icons.ElixirIcons;
 import org.elixir_lang.jps.model.SerializerExtension;
 import org.elixir_lang.jps.sdk_type.Elixir;
 import org.elixir_lang.mix.runner.MixRunConfigurationBase;
-import org.elixir_lang.sdk.HomePath;
+import org.elixir_lang.jps.HomePath;
 import org.elixir_lang.sdk.erlang_dependent.SdkModificatorRootTypeConsumer;
 import org.jdom.Element;
 import org.jetbrains.annotations.Contract;
@@ -47,7 +47,7 @@ import java.util.regex.Pattern;
 
 import static com.intellij.openapi.application.ModalityState.NON_MODAL;
 import static org.elixir_lang.mix.runner.MixRunningStateUtil.module;
-import static org.elixir_lang.sdk.HomePath.*;
+import static org.elixir_lang.jps.HomePath.*;
 import static org.elixir_lang.sdk.ProcessOutput.STANDARD_TIMEOUT;
 import static org.elixir_lang.sdk.ProcessOutput.isSmallIde;
 import static org.elixir_lang.sdk.ProcessOutput.transformStdoutLine;

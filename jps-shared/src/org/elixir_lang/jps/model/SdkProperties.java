@@ -6,7 +6,7 @@ import org.jetbrains.jps.model.ex.JpsElementBase;
 
 public class SdkProperties extends JpsElementBase<SdkProperties> {
     @Nullable
-    public final String erlangSdkName;
+    public String erlangSdkName;
 
     public SdkProperties(@Nullable String erlangSdkName) {
         this.erlangSdkName = erlangSdkName;

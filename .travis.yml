@@ -55,10 +55,12 @@ matrix:
       otp_release: 19.3
 before_install:
 - mix local.hex --force
+- "export DISPLAY=:99.0"
 - "export ELIXIR_VERSION=${TRAVIS_ELIXIR_VERSION}"
 - "export ORG_GRADLE_PROJECT_elixirVersion=${TRAVIS_ELIXIR_VERSION}"
 - "export ORG_GRADLE_PROJECT_ideaVersion=${IDEA_VERSION}"
-- "export DISPLAY=:99.0"
+- "export OTP_RELEASE=${TRAVIS_OTP_RELEASE}"
+- export ERLANG_SDK_HOME=`erl -eval 'io:format("~s", [code:root_dir()]).' -noshell -run init stop`
 - export TERM=dumb
 - "sh -e /etc/init.d/xvfb start"
 - "wget -v -c --header \"Cookie: oraclelicense=accept-securebackup-cookie\" http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.tar.gz"

@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import java.nio.file.Path;
 import java.util.function.Consumer;
 
-import static org.elixir_lang.sdk.HomePath.eachEbinPath;
+import static org.elixir_lang.jps.HomePath.eachEbinPath;
 import static org.elixir_lang.sdk.ProcessOutput.isSmallIde;
 
 public class Type {

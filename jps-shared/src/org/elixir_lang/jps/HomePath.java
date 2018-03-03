@@ -1,4 +1,4 @@
-package org.elixir_lang.sdk;
+package org.elixir_lang.jps;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.Version;
