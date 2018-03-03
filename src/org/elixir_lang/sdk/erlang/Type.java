@@ -11,8 +11,8 @@ import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.Version;
 import com.intellij.util.containers.WeakHashMap;
-import org.elixir_lang.jps.model.JpsErlangSdkType;
-import org.elixir_lang.sdk.HomePath;
+import org.elixir_lang.jps.sdk_type.Erlang;
+import org.elixir_lang.jps.HomePath;
 import org.elixir_lang.sdk.erlang_dependent.AdditionalDataConfigurable;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +23,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
-import static org.elixir_lang.sdk.HomePath.*;
+import static org.elixir_lang.jps.HomePath.*;
 import static org.elixir_lang.sdk.Type.addCodePaths;
 import static org.elixir_lang.sdk.Type.documentationRootType;
 
@@ -184,7 +184,7 @@ public class Type extends SdkType {
 
     @Override
     public boolean isValidSdkHome(String path) {
-        File erl = JpsErlangSdkType.getByteCodeInterpreterExecutable(path);
+        File erl = Erlang.getByteCodeInterpreterExecutable(path);
 
         return erl.canExecute();
     }
@@ -237,7 +237,7 @@ public class Type extends SdkType {
         if (cachedRelease != null) {
             release = cachedRelease;
         } else {
-            File erl = JpsErlangSdkType.getByteCodeInterpreterExecutable(sdkHome);
+            File erl = Erlang.getByteCodeInterpreterExecutable(sdkHome);
 
             if (!erl.canExecute()) {
                 StringBuilder messageBuilder = new StringBuilder("Can't detect Erlang version: ").append(erl.getPath());

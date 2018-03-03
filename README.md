@@ -2067,7 +2067,57 @@ See [JetBrains Documentation](https://www.jetbrains.com/help/idea/template-data-
 * Compile project with mix (use `mix compile` instead of `elixirc` directly)
 * Attach docs (don't use `--no-docs` `elixirc` flag)
 * Attach debug info (don't use `--no-debug-info` `elixirc` flag)
+* Warnings as errors (use `--warnings-as-errors` `elixirc` flag)
 * Ignore module conflict (use `--ignore-module-conflict` `elixirc` flag)
+
+#### Build Messages
+
+![Source](screenshots/features/building/messages/errors_and_warnings/Source.png?raw=true)
+
+If a file has errors and warnings, they are group together in Build Messages under that file.
+
+![Errors and Warnings](screenshots/features/building/messages/errors_and_warnings/Errors%20and%20Warnings.png)
+
+##### Jump To Source
+
+You can jump to errors and warnings in the Build Messages
+
+1. Highlight the error or warning you want to jump to source
+2. Do one of the following
+
+   1. Right-Click the error or warning
+   2. Select Jump to Source from the context menu
+
+      ![Jump to Source](screenshots/features/building/messages/Jump%20to%20Source.png?raw=true)
+
+   OR
+
+   1. Click the error or warning
+   2. Press Cmd+Down
+
+You can also turn on Autoscroll to Source, which will Jump To Source whenever you Click or select an error or warning.
+
+![Autoscroll to Source](screenshots/features/building/messages/Autoscroll%20to%20Source.png?raw=true)
+
+##### Warnings as Errors
+
+![Setting](screenshots/features/building/messages/warnings_as_errors/Setting.png?raw=true)
+
+If you enable Warnings as Errors in the settings, then the Warnings will be treated as Errors by `elixirc` and `mix` and the Build Messages will show the Warnings as Errors.
+
+![Messages](screenshots/features/building/messages/warnings_as_errors/Messages.png?raw=true)
+
+If only warnings remain in the source.
+
+![Source](screenshots/features/building/messages/warnings_as_errors/warnings_only/Source.png?raw=true)
+
+With Warnings as Errors On, all the Warnings will appear as Errors and still fail the build
+
+![Errors](screenshots/features/building/messages/warnings_as_errors/warnings_only/Errors.png?raw=true)
+
+With Warnings as Errors Off, the Warnings will appear as Warnings and the build will succeed
+
+![Warnings](screenshots/features/building/messages/warnings_as_errors/warnings_only/Warnings.png?raw=true)
 
 #### Individual File
 
@@ -2081,7 +2131,9 @@ See [JetBrains Documentation](https://www.jetbrains.com/help/idea/template-data-
 
 #### Project
 
-1. Build > Make Project
+![Project](screenshots/features/building/Project.png?raw=true)
+
+1. Build > Build Project
 2. Build results will be shown
     * If compilation is successful, you'll see "Compilation completed successfully" in the Event Log
     * If compilation had errors, you'll see "Compilation completed with N errors and M warnings" in the Event Log and

@@ -130,7 +130,7 @@ public abstract class JpsBuildTestCase extends UsefulTestCase {
     assertTrue("Cannot modify timestamp for " + file.getAbsolutePath(), updated);
   }
 
-  protected JpsSdk<JpsDummyElement> addJdk(String name){
+  private JpsSdk<JpsDummyElement> addJdk(@SuppressWarnings("SameParameterValue") String name) {
     try{
       return addJdk(name, FileUtil.toSystemIndependentName(ClasspathBootstrap.getResourceFile(Object.class).getCanonicalPath()));
     } catch (IOException e) {
@@ -138,7 +138,7 @@ public abstract class JpsBuildTestCase extends UsefulTestCase {
     }
   }
 
-  protected JpsSdk<JpsDummyElement> addJdk(String name, String path){
+  protected JpsSdk addJdk(String name, String path){
     String homePath = System.getProperty("java.home");
     String versionString = System.getProperty("java.version");
     JpsTypedLibrary<JpsSdk<JpsDummyElement>> jdk = myModel.getGlobal().addSdk(name, homePath, versionString, JpsJavaSdkType.INSTANCE);

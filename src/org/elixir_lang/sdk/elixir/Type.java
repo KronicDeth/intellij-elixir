@@ -26,10 +26,10 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.elixir_lang.Facet;
 import org.elixir_lang.icons.ElixirIcons;
-import org.elixir_lang.jps.model.JpsElixirModelSerializerExtension;
-import org.elixir_lang.jps.model.JpsElixirSdkType;
+import org.elixir_lang.jps.model.SerializerExtension;
+import org.elixir_lang.jps.sdk_type.Elixir;
 import org.elixir_lang.mix.runner.MixRunConfigurationBase;
-import org.elixir_lang.sdk.HomePath;
+import org.elixir_lang.jps.HomePath;
 import org.elixir_lang.sdk.erlang_dependent.SdkModificatorRootTypeConsumer;
 import org.jdom.Element;
 import org.jetbrains.annotations.Contract;
@@ -47,7 +47,7 @@ import java.util.regex.Pattern;
 
 import static com.intellij.openapi.application.ModalityState.NON_MODAL;
 import static org.elixir_lang.mix.runner.MixRunningStateUtil.module;
-import static org.elixir_lang.sdk.HomePath.*;
+import static org.elixir_lang.jps.HomePath.*;
 import static org.elixir_lang.sdk.ProcessOutput.STANDARD_TIMEOUT;
 import static org.elixir_lang.sdk.ProcessOutput.isSmallIde;
 import static org.elixir_lang.sdk.ProcessOutput.transformStdoutLine;
@@ -66,7 +66,7 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
             ApplicationManager.getApplication().isUnitTestMode() ? new HashMap<>() : new WeakHashMap<>();
 
     public Type() {
-        super(JpsElixirModelSerializerExtension.ELIXIR_SDK_TYPE_ID);
+        super(SerializerExtension.ELIXIR_SDK_TYPE_ID);
     }
 
     @Nullable
@@ -445,7 +445,7 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
         if (mySdkHomeToReleaseCache.containsKey(versionCacheKey)) {
             release = mySdkHomeToReleaseCache.get(versionCacheKey);
         } else {
-            File elixir = JpsElixirSdkType.getScriptInterpreterExecutable(sdkHome);
+            File elixir = Elixir.getScriptInterpreterExecutable(sdkHome);
 
             if (!elixir.canExecute()) {
                 String reason = elixir.getPath() + (elixir.exists() ? " is not executable." : " is missing.");
@@ -587,10 +587,10 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
 
     @Override
     public boolean isValidSdkHome(@NotNull String path) {
-        File elixir = JpsElixirSdkType.getScriptInterpreterExecutable(path);
-        File elixirc = JpsElixirSdkType.getByteCodeCompilerExecutable(path);
-        File iex = JpsElixirSdkType.getIExExecutable(path);
-        File mix = JpsElixirSdkType.getMixScript(path);
+        File elixir = Elixir.getScriptInterpreterExecutable(path);
+        File elixirc = Elixir.getByteCodeCompilerExecutable(path);
+        File iex = Elixir.getIExExecutable(path);
+        File mix = Elixir.getMixScript(path);
 
         // Determine whether everything is can run
         return elixir.canExecute() && elixirc.canExecute() && iex.canExecute() && mix.canRead();
