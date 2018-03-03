@@ -26,12 +26,6 @@ public class ElixirCompilerOptionsConfigurable extends CompilerConfigurable {
 
     mySettings = ElixirCompilerSettings.getInstance(project);
 
-    /*
-    * for now, --warnings-as-errors not like erlang's warn_as_error, it just return non-zero exit code
-    * @see https://github.com/elixir-lang/elixir/issues/3116#issuecomment-87316125
-    * */
-    myWarningsAsErrorsCheckBox.setVisible(false);
-
     setupUiListeners();
   }
 
