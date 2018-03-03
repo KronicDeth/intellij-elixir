@@ -2,10 +2,10 @@ package org.elixir_lang.jps.builder;
 
 import com.intellij.execution.process.ProcessEvent;
 import com.intellij.openapi.util.Key;
-import org.apache.commons.lang3.StringUtils;
 import org.elixir_lang.jps.CompilerOptions;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jps.incremental.CompileContext;
 import org.jetbrains.jps.incremental.messages.BuildMessage;
 import org.jetbrains.jps.incremental.messages.CompilerMessage;
@@ -85,7 +85,7 @@ public class ProcessAdapter extends com.intellij.execution.process.ProcessAdapte
     private void onTextAvailableInAny(@NotNull ProcessEvent event, @NotNull Key outputType) {
         String eventText = event.getText();
 
-        if (StringUtils.isNotBlank(eventText)) {
+        if (!isBlank(eventText)) {
             text.append(eventText);
         }
     }
@@ -222,5 +222,24 @@ public class ProcessAdapter extends com.intellij.execution.process.ProcessAdapte
         INITIAL,
         COMPILATION_ERROR,
         WARNING
+    }
+
+    private boolean isBlank(@Nullable CharSequence charSequence) {
+        boolean isBlank = true;
+
+        if (charSequence != null) {
+            int charSequenceLength = charSequence.length();
+
+            if (charSequenceLength > 0) {
+                for (int i = 0; i < charSequenceLength; i++) {
+                    if (!Character.isWhitespace(charSequence.charAt(i))) {
+                        isBlank = false;
+                        break;
+                    }
+                }
+            }
+        }
+
+        return isBlank;
     }
 }
