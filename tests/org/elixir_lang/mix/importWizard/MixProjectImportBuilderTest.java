@@ -18,7 +18,6 @@ import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.util.Arrays;
 
 /**
  * Created by zyuyou on 15/7/17.
@@ -80,7 +79,7 @@ public class MixProjectImportBuilderTest extends ProjectWizardTestCase{
       File expectedImlFile = new File(projectPath + "/expected/" + format + "/" + module.getName() + ".iml");
       Document expectedIml = JDOMUtil.loadDocument(expectedImlFile);
       Element expectedImlElement = expectedIml.getRootElement();
-      expected.append(Arrays.toString(JDOMUtil.printDocument(expectedIml, "\n"))).append('\n');
+      expected.append(JDOMUtil.writeDocument(expectedIml, "\n")).append('\n');
 
       if (JDOMUtil.areElementsEqual(expectedImlElement, actualImlElement)) {
         assertTrue(true);
@@ -91,7 +90,7 @@ public class MixProjectImportBuilderTest extends ProjectWizardTestCase{
     if (!formattedFound) {
       String errorMsg = expected
               .append("\nBut got:\n")
-              .append(Arrays.toString(JDOMUtil.printDocument(new Document(actualImlElement), "\n")))
+              .append(JDOMUtil.writeDocument(new Document(actualImlElement), "\n"))
               .toString();
      assertTrue(errorMsg, false);
     }
