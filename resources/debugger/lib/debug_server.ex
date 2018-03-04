@@ -136,7 +136,7 @@ defmodule IntellijElixir.DebugServer do
       |> Stream.map(&erlang_module_name_pattern_to_regex_pattern/1)
       |> Enum.join("|")
 
-    Regex.compile!("^#{unpinned_pattern}$")
+    Regex.compile!("^(#{unpinned_pattern})$")
   end
 
   defp meta_pid_to_stack(meta_pid, %{line: break_line}) do
