@@ -61,6 +61,13 @@
         <a href="https://github.com/elixir-lang/elixir/issues/3116#issuecomment-87316125">original blocker</a> has been
         fixed for awhile and <code>ProcessAdapter</code> turns warning text into errors that IDE understands.
       </li>
+      <li>
+        When importing Mix projects, don't exclude compiler output from indexing because it is needed to resolve Elixir
+        Line Breakpoints in EEx files.
+        <ul>
+          <li>For pre-existing Elixir modules, they will be converted to not exclude compiler output.</li>
+        </ul>
+      </li>
     </ul>
   </li>
   <li>
@@ -119,6 +126,11 @@
           </li>
         </ul>
       </li>
+      <li>
+        Group alternatives in <code>erlang_module_name_patterns_to_regex</code> before pinning: I always forget that the
+        <code>|</code> swallows the <code>^</code> and <code>$</code> in regexes.
+      </li>
+      <li>Reject vs filter accumulation got flipped when switching to <code>Enum.reduce</code> to track rejections.</li>
     </ul>
   </li>
 </ul>

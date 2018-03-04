@@ -169,6 +169,9 @@
 * [#1041](https://github.com/KronicDeth/intellij-elixir/pull/1041) - [@KronicDeth](https://github.com/KronicDeth)
   * Restructure JPS code to remove  prefixes and suffixes in class names that redundant with package names.
   * Show warnings-as-errors checkbox as [original blocker](https://github.com/elixir-lang/elixir/issues/3116#issuecomment-87316125) has been fixed for awhile and `ProcessAdapter` turns warning text into errors that IDE understands.
+* [#1045](https://github.com/KronicDeth/intellij-elixir/pull/1045) - [@KronicDeth](https://github.com/KronicDeth)
+  * When importing Mix projects, don't exclude compiler output from indexing because it is needed to resolve Elixir Line Breakpoints in EEx files.
+    * For pre-existing Elixir modules, they will be converted to not exclude compiler output.
 
 ### Bug Fixes
 * [#1036](https://github.com/KronicDeth/intellij-elixir/pull/1036) - [@KronicDeth](https://github.com/KronicDeth)
@@ -189,6 +192,9 @@
     * Parse `mix compile` output for compilation errors and warnings
       * When "warnings-as-errors" is enabled in "Elixir compiler" settings, IDE also shows warnings as errors.
       * IDE will know build failed if there are errors (or warnings treated as errors) and properly allow rebuild.
+* [#1045](https://github.com/KronicDeth/intellij-elixir/pull/1045) - [@KronicDeth](https://github.com/KronicDeth)
+  * Group alternatives in `erlang_module_name_patterns_to_regex` before pinning: I always forget that the `|` swallows the `^` and `$` in regexes.
+  * Reject vs filter accumulation got flipped when switching to `Enum.reduce` to track rejections.
 
 ## v7.3.0
 
