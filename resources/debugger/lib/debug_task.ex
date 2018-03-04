@@ -112,9 +112,9 @@ defmodule Mix.Tasks.IntellijElixir.DebugTask do
       |> Stream.map(&Path.basename(&1, ".beam"))
       |> Enum.reduce({[], []}, fn basename, {filter, reject} ->
         if Regex.match?(reject_regex, basename) do
-          {[basename | filter], reject}
-        else
           {filter, [basename | reject]}
+        else
+          {[basename | filter], reject}
         end
       end)
 

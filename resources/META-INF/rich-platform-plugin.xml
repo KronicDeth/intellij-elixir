@@ -10,6 +10,7 @@
 
       <projectImportProvider implementation="org.elixir_lang.mix.importWizard.MixProjectImportProvider" />
       <projectImportBuilder implementation="org.elixir_lang.mix.importWizard.MixProjectImportBuilder" />
+      <project.converterProvider implementation="org.elixir_lang.mix.importWizard.conversion.Provider"/>
 
       <!-- for doQuickImport when open directory which contains mix.exs file -->
       <projectOpenProcessor implementation="org.elixir_lang.mix.importWizard.MixProjectOpenProcessor" />

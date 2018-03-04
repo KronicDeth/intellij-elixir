@@ -183,6 +183,8 @@ public class MixProjectImportBuilder extends ProjectImportBuilder<ImportedOtpApp
         _buildDir = myProjectRoot != null && myProjectRoot.equals(ideaModuleDir) ? ideaModuleDir : ideaModuleDir.getParent().getParent();
         compilerModuleExt.setCompilerOutputPath(_buildDir + StringUtil.replace("/_build/dev/lib/" + importedOtpApp.getName() + "/ebin", "/", File.separator));
         compilerModuleExt.setCompilerOutputPathForTests(_buildDir + StringUtil.replace("/_build/test/lib/" + importedOtpApp.getName() + "/ebin", "/", File.separator));
+        // output paths need to be included, so that they are indexed for Phoenix EEx Template Elixir Line Breakpoints
+        compilerModuleExt.setExcludeOutput(false);
 
         createdRootModels.add(rootModel);
 
