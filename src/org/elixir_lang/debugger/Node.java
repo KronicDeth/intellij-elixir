@@ -75,6 +75,10 @@ public class Node {
     addCommand(new SetBreakpoint(ElixirModulesUtil.INSTANCE.elixirModuleNameToErlang(module), line, file));
   }
 
+  public void reasonByUninterpretable() {
+    addCommand(new ReasonByUninterpretable());
+  }
+
   public void rejectedModuleNames() {
     addCommand(new RejectedModuleNames());
   }
