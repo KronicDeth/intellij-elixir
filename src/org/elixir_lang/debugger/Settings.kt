@@ -62,6 +62,8 @@ class Settings(moduleFilters: List<ModuleFilter> = defaultModuleFilters()):
                 ModuleFilter(pattern = "Application"),
                 ModuleFilter(pattern = "Atom"),
                 ModuleFilter(pattern = "Base"),
+                // bcrypt_elixir
+                ModuleFilter(pattern = "Bcrypt.Base"),
                 ModuleFilter(pattern = "Behaviour"),
                 ModuleFilter(pattern = "Bitwise"),
                 ModuleFilter(pattern = "Calendar"),
