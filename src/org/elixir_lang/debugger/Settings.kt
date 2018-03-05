@@ -155,6 +155,8 @@ class Settings(moduleFilters: List<ModuleFilter> = defaultModuleFilters()):
                 ModuleFilter(pattern = "Version"),
                 ModuleFilter(pattern = ":cow*"),
                 ModuleFilter(pattern = ":elixir_*"),
+                // See https://github.com/KronicDeth/intellij-elixir/issues/915
+                ModuleFilter(pattern = ":erocksdb"),
                 // See https://github.com/KronicDeth/intellij-elixir/issues/989
                 ModuleFilter(pattern = ":lz4"),
                 ModuleFilter(pattern = ":ranch*"),
