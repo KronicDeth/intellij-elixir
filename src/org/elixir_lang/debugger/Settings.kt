@@ -155,7 +155,9 @@ class Settings(moduleFilters: List<ModuleFilter> = defaultModuleFilters()):
                 ModuleFilter(pattern = ":elixir_*"),
                 // See https://github.com/KronicDeth/intellij-elixir/issues/989
                 ModuleFilter(pattern = ":lz4"),
-                ModuleFilter(pattern = ":ranch*")
+                ModuleFilter(pattern = ":ranch*"),
+                // See https://github.com/KronicDeth/intellij-elixir/issues/989
+                ModuleFilter(pattern = ":re2")
         )
 
         fun getInstance(): Settings = XDebuggerSettings.getInstance(Settings::class.java)
