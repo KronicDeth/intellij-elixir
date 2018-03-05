@@ -151,11 +151,11 @@ class Settings(moduleFilters: List<ModuleFilter> = defaultModuleFilters()):
                 ModuleFilter(pattern = "Tuple"),
                 ModuleFilter(pattern = "URI"),
                 ModuleFilter(pattern = "Version"),
-                ModuleFilter(pattern = "cow*"),
-                ModuleFilter(pattern = "elixir_*"),
+                ModuleFilter(pattern = ":cow*"),
+                ModuleFilter(pattern = ":elixir_*"),
                 // See https://github.com/KronicDeth/intellij-elixir/issues/989
                 ModuleFilter(pattern = ":lz4"),
-                ModuleFilter(pattern = "ranch*")
+                ModuleFilter(pattern = ":ranch*")
         )
 
         fun getInstance(): Settings = XDebuggerSettings.getInstance(Settings::class.java)
