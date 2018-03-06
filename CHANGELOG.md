@@ -172,6 +172,12 @@
 * [#1045](https://github.com/KronicDeth/intellij-elixir/pull/1045) - [@KronicDeth](https://github.com/KronicDeth)
   * When importing Mix projects, don't exclude compiler output from indexing because it is needed to resolve Elixir Line Breakpoints in EEx files.
     * For pre-existing Elixir modules, they will be converted to not exclude compiler output.
+* [#1047](https://github.com/KronicDeth/intellij-elixir/pull/1047) - [@KronicDeth](https://github.com/KronicDeth)
+  * Exclude known uninterpretable modules
+    * `Bcrypt.Base`
+    * `:erocksdb`
+    * `:lz4`
+    * `:re2`
 
 ### Bug Fixes
 * [#1036](https://github.com/KronicDeth/intellij-elixir/pull/1036) - [@KronicDeth](https://github.com/KronicDeth)
@@ -195,6 +201,9 @@
 * [#1045](https://github.com/KronicDeth/intellij-elixir/pull/1045) - [@KronicDeth](https://github.com/KronicDeth)
   * Group alternatives in `erlang_module_name_patterns_to_regex` before pinning: I always forget that the `|` swallows the `^` and `$` in regexes.
   * Reject vs filter accumulation got flipped when switching to `Enum.reduce` to track rejections.
+* [#1047](https://github.com/KronicDeth/intellij-elixir/pull/1047) - [@KronicDeth](https://github.com/KronicDeth)
+  * Some modules, like NIF modules, can't be loaded into the debugger. Individual modules not being debuggable shouldn't kill the debugger task, so rescue the known error and record it for later debugging of the debugger.
+  * Add `:` to start of Erlang module names for included debugger excludes
 
 ## v7.3.0
 

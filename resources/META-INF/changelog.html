@@ -68,6 +68,14 @@
           <li>For pre-existing Elixir modules, they will be converted to not exclude compiler output.</li>
         </ul>
       </li>
+      <li>Exclude known uninterpretable modules
+        <ul>
+          <li><code>Bcrypt.Base</code></li>
+          <li><code>:erocksdb</code></li>
+          <li><code>:lz4</code></li>
+          <li><code>:re2</code></li>
+        </ul>
+      </li>
     </ul>
   </li>
   <li>
@@ -131,6 +139,11 @@
         <code>|</code> swallows the <code>^</code> and <code>$</code> in regexes.
       </li>
       <li>Reject vs filter accumulation got flipped when switching to <code>Enum.reduce</code> to track rejections.</li>
+      <li>
+        Some modules, like NIF modules, can't be loaded into the debugger. Individual modules not being debuggable
+        shouldn't kill the debugger task, so rescue the known error and record it for later debugging of the debugger.
+      </li>
+      <li>Add <code>:</code> to start of Erlang module names for included debugger excludes</li>
     </ul>
   </li>
 </ul>
@@ -1031,199 +1044,6 @@
       <li>
         Put Import from external model first in Project subsections, so that people are more likely to import as a mix
         project correctly.
-      </li>
-    </ul>
-  </li>
-</ul>
-<h1>v6.2.0</h1>
-<ul>
-  <li>
-    <p>Enhancements</p>
-    <ul>
-      <li>Add note to README that atom module names should be prefixed with <code>:</code></li>
-      <li>
-        <p>Elixir SDK will now have an Internal Erlang SDK, which can be supplied one of two ways:</p>
-        <ol>
-          <li>If <code>intellij-erlang</code> is installed: its Erlang SDK can be used</li>
-          <li>Otherwise: the Erlang SDK for Elixir SDK from this plugin can be used</li>
-        </ol>
-        <p>Either Internal Erlang SDK's home path is used to locate the <code>erl</code> (or <code>erl.exe</code> on Windows) executable and it is used to run Elixir; bypassing the <code>elixir</code> (or <code>elixir.bat</code> on Windows) script.  Instead, as was done in <a href="https://github.com/KronicDeth/intellij-elixir/pull/789" class="issue-link js-issue-link" data-url="https://github.com/KronicDeth/intellij-elixir/issues/789" data-id="249841680" data-error-text="Failed to load issue title" data-permission-text="Issue title is private">#789</a>, the ebin directories for the Elixir SDK are passed as <code>-pa</code> options to <code>erl</code>.</p>
-        <p>The Elixir SDK's configuration becomes more important: the classpath entries are now the list of <code>ebin</code> directories to pass to <code>erl</code> using <code>-pa</code> instead of scanning for ebins in the homepath, so additional code paths can be added to the Classpaths configuration and they will be used when running <code>mix</code> and <code>mix test</code>.  The classpaths will be initialized to the ebin directories under the home path.</p>
-        <ul>
-          <li>To support migrating from earlier version of the plugin, an SDK will be updated when it is used for Mix ExUnit Run Configurations
-            <ul>
-              <li>The default Internal Erlang SDK will be set, which uses the latest version of Erlang that can be found on the system.  When <code>intellij-erlang</code> is installed, <code>intellij-elixir</code>'s Erlang version suggestion is still used because <code>intellij-elixir</code> favors the latest version while <code>intellij-erlang</code> favors the first found, which is usually the oldest version.</li>
-              <li>Update roots (class path, source paths, documentation paths):
-                <ul>
-                  <li>Class path of <code>HOMEPATH/lib</code> is replaced with <code>HOMEPATH/lib/APP/ebin</code>.</li>
-                  <li>Source path of <code>HOMEPATH/lib</code> is replaced with <code>HOMEPATH/lib/APP/lib</code> IF it exists (so only for source SDKs)</li>
-                  <li>Documentation of <code>http://elixir-lang.org/docs/stable/elixir/</code> will be replaced with <code>https://hexdoc.pm/APP/VERSION</code> for every <code>APP</code> in <code>HOMEPATH/lib</code>.</li>
-                </ul>
-              </li>
-            </ul>
-          </li>
-        </ul>
-      </li>
-      <li>
-        All <code>ebin</code> paths in the Internal Erlang SDK will be copied to the Elixir SDK, so that they are
-        indexed, which makes the Internal Erlang SDK modules show up in Symbol search.
-      </li>
-      <li>
-        Erlang SDK modules can be completed and then functions in those modules can be completed after typing
-        <code>.</code>.
-        <ul>
-          <li>Atoms have References.
-            <ul>
-              <li>
-                Indexed atoms (from decompiled Erlang <code>.beams</code> from the Internal Erlang SDK) will be used for
-                completing atoms as soon the atom is parseable: either after the first letter <code>:</code> or inside
-                the quotes when making a quoted atom.
-              </li>
-              <li>
-                Atoms will resolve to modules if the atom is a module name.  If the atom is quoted and contains
-                interpolation, it will treat each interpolation as <code>.*</code> and look for regex matches to this
-                derived potential atom name.
-              </li>
-            </ul>
-          </li>
-        </ul>
-      </li>
-      <li>
-        Completions for functions after <code>.</code> will now work at the end of file.  Previously, completions only
-        worked in the middle of a file, where the <code>.</code> could parse the next work an existing call, now if that
-        parse doesn't work and the only thing after is a new line, it will still complete.
-      </li>
-      <li>
-        Auto test for mix test case runner will automatically run tests after a change is detected in the project files,
-        which normally happens on save, which happens when losing focus on a changed editor tab by default.
-      </li>
-      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/821">#821</a></li>
-      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/803">#803</a></li>
-      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/833">#833</a></li>
-      <li>
-        Port <a href="https://github.com/elixir-lang/elixir/pull/2774">elixir-lang/elixir#2774</a>: Allow
-        <code>A-Z</code> as sigil modifiers in addition to <code>a-z</code> to support <code>U</code> ungreedy modifier
-        that replaced <code>r</code> ungreedy modifier for regexes.
-      </li>
-    </ul>
-  </li>
-  <li>
-    <p>Bug Fixes</p>
-    <ul>
-      <li>
-        Add notice for debug blacklist that it uses atoms, not Aliases, so you need to qualifier module aliases with
-        <code>Elixir.</code>.
-      </li>
-      <li>Support atoms (prefixed with <code>:</code>) and<code>Elixir.</code> and plain Aliases for debugger blacklist.</li>
-      <li>Add space to import window text</li>
-      <li>Add <code>END</code> to allowed <code>keywordKey</code> tokens</li>
-      <li>
-        Only use "Macros" as first header in decompiled <code>.beam</code> files if <code>macro</code> is
-        <code>defmacro</code>.  "Macros" header was being printed when there was only functions because the check when
-        there was no <code>lastMacroNameArity</code> didn't care what the current <code>macroNameArity.macro</code> was.
-      </li>
-      <li>
-        When an <code>.erl</code> file has <code>-compile([compressed])</code>, it will be compiled normally, and then
-        gzipped, so that the <code>.beam</code> will not contain the BEAM magic number <code>FOR1</code>, but instead
-        the gzip magic number <code>0x1f</code> <code>0x8b</code>.  So, to properly handle normal and compressed, the
-        decompiler needs to look-ahead 2-bytes and check the gzip magic number.  If the gzip magic number is detected,
-        the InputStream will be passed through <code>GZIPInputStream</code> before the the normal decoding process.
-      </li>
-      <li>
-        When decompiling function and macro names from Erlang module, its possible for the name to contain
-        <code>#</code> and they would be interpreted as comments.  Accepting those names in <code>Unquoted</code>
-        wouldn't escape the <code>#</code> from being treated as a comment, so in addition to <code>unquote</code>ing
-        the name, surround it in double quotes.
-      </li>
-      <li>
-        <code>AdditionalDataConfigurable</code> only copied the the Internal Erlang SDK Code Paths when the selection in
-        the <code>ComboBox</code> was changed, which meant if the there was only one Erlang SDK or the user never
-        changed the selection, the Code Paths were never copied.  To get the Code Paths copied when the Elixir SDK is
-        first created and <code>setupSdkPaths</code> interface method is called
-        <ol>
-          <li>All paths are set directly on the Elixir SDK as before</li>
-          <li>
-            The default Erlang SDK, which should be the one that was last created, is configured in
-            <code>SdkAdditionalaData</code>
-          </li>
-          <li>The Code paths from the Erlang SDK are copied to the Elixir SDK
-            <ol>
-              <li>
-                If the the Erlang SDK is from intellij-elixir and does not have <code>ebin</code> directories for its
-                Class Paths, then the Class Paths is expanded to Code Paths.
-              </li>
-            </ol>
-          </li>
-        </ol>
-      </li>
-      <li>
-        The Code Paths from the Internal Erlang SDK were not being copied from the default Erlang SDK to the Elixir SDK
-        when the default Erlang SDK was set during `mix test` runs, which meant that the Elixir SDK would not upgrade
-        correctly from 6.1.1 to 6.2.0 without the user deleting the Elixir SDK and recreating it.
-      </li>
-    </ul>
-  </li>
-</ul>
-<h1>v6.1.1</h1>
-<ul>
-  <li>
-    <p>Bug Fixes</p>
-    <ul>
-      <li>
-        When <a href="https://github.com/KronicDeth/intellij-elixir/pull/754">#754</a> made
-        <code>intellij-erlang</code> a soft-dependency, it broke the debugger's icons that referenced
-        <code>ErlangIcons</code>, but it turns out all the icon constants were aliases to
-        <code>AllIcons.Debugger</code> constants, so by using the <code>AllIcons.Debugger</code> icons directly,
-        the dependency on <code>ErlangIcons</code> can be removed without the need to copy the image files into
-        <code>intellij-elixir</code>.
-      </li>
-      <li>
-        When <code>do ... end</code> template is inserted, it did not have a previous child whose attributes to
-        use, so it used the default, which left the cursor unindented. To get the cursor indented by default,
-        when the <code>ElementType</code> is <code>DO</code>, apply the <code>stabChildrenIndent</code> rules:
-        indent normal and determine whether to indent relative to direct parent using code style setting.
-      </li>
-      <li>Include <code>VirtualFile</code> path in Beam read errors</li>
-    </ul>
-  </li>
-</ul>
-<h1>v6.1.0</h1>
-<ul>
-  <li>
-    <p>Enhancements</p>
-    <ul>
-      <li>
-        Since the process of requiring resource files is the same, <code>org.elixir_lang.ElixirModules</code> has
-        static methods for copying resources out to a temporary directory and adding the
-        <code>-r &lt;temporary_path&gt;</code> for one or more resource files to a new or existing ParametersList.
-        These are now shared for the Mix ExUnit and Debugger code paths.
-      </li>
-      <li>Format class
-        <ul>
-          <li><code>ElixirXDebugProcess</code></li>
-          <li><code>MixExUnitRunningState</code></li>
-          <li><code>MIxRunningState</code></li>
-        </ul>
-      </li>
-    </ul>
-  </li>
-  <li>
-    <p>Bug Fixes</p>
-    <ul>
-      <li>
-        The compiled <code>.beam</code> files were removed in
-        <a href="https://github.com/KronicDeth/intellij-elixir/commit/58e7d4aafa6ad44279d15dd92f40c35e00d7357e">
-          <tt>58e7d4a</tt>
-        </a>, which was before v5.1.0, but not all users had problems with using the debugger.
-        <a href="https://github.com/KronicDeth/intellij-elixir/issues/739">#739</a>
-        <a href="https://github.com/KronicDeth/intellij-elixir/issues/739#issuecomment-322032123">persisted</a>
-        (as reported by <a href="https://github.com/erikreedstrom" class="user-mention">@erikreedstrom</a>) when
-        6.0.0 was released; I retried reproducing on a clean VM and I got it. I'm not sure why it worked for some
-        people in prior releases since the <code>.beam</code> don't exist that were being copied, but now the
-        debugger uses the same system of copying <code>.ex</code> files and requiring them with <code>-r</code>
-        instead of copying <code>.beam</code> and using <code>-pa</code> to add the <code>ebin</code> directory.
-        Fix was verified local under macOS and in Windows VM that reproduced
-        <a href="https://github.com/KronicDeth/intellij-elixir/issues/739">#739</a>.
       </li>
     </ul>
   </li>
