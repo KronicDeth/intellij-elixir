@@ -3,7 +3,8 @@ defmodule IntellijElixir.DebugServer do
 
   use GenServer
 
-  defstruct port: nil,
+  defstruct reason_by_uninterpretable: %{},
+            port: nil,
             ref: nil,
             reject_erlang_module_name_patterns: [],
             reject_regex: nil,
@@ -30,6 +31,15 @@ defmodule IntellijElixir.DebugServer do
   ## GenServer callbacks
 
   @impl GenServer
+
+  def handle_cast(
+        :reason_by_uninterpretable,
+        state = %__MODULE__{socket: socket, reason_by_uninterpretable: reason_by_uninterpretable}
+      ) do
+    send_message(socket, {:reason_by_uninterpretable, reason_by_uninterpretable})
+    {:noreply, state}
+  end
+
   def handle_cast(
         :rejected_module_names,
         state = %__MODULE__{rejected_module_names: rejected_module_names, socket: socket}

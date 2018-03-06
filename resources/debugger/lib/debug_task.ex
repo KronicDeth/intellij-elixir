@@ -103,7 +103,11 @@ defmodule Mix.Tasks.IntellijElixir.DebugTask do
 
   defp interpret_modules_in(
          path,
-         state = %DebugServer{reject_regex: reject_regex, rejected_module_names: rejected_module_names}
+         state = %DebugServer{
+           reason_by_uninterpretable: acc_reason_by_uninterpretable,
+           reject_regex: reject_regex,
+           rejected_module_names: rejected_module_names
+         }
        ) do
     {filtered, rejected} =
       path
@@ -118,12 +122,23 @@ defmodule Mix.Tasks.IntellijElixir.DebugTask do
         end
       end)
 
-    filtered
-    |> Stream.map(&String.to_atom/1)
-    |> Stream.filter(&(:int.interpretable(&1) == true && !:code.is_sticky(&1) && &1 != __MODULE__))
-    |> Enum.each(&:int.ni(&1))
+    reason_by_uninterpretable =
+      filtered
+      |> Stream.map(&String.to_atom/1)
+      |> Stream.filter(&(:int.interpretable(&1) == true && !:code.is_sticky(&1) && &1 != __MODULE__))
+      |> Enum.reduce(%{}, fn module, reason_by_uninterpretable ->
+        case safely_interpret(module) do
+          :ok -> reason_by_uninterpretable
+          :error -> Map.put(reason_by_uninterpretable, module, nil)
+          {:error, reason} -> Map.put(reason_by_uninterpretable, module, reason)
+        end
+      end)
 
-    %DebugServer{state | rejected_module_names: rejected ++ rejected_module_names}
+    %DebugServer{
+      state
+      | reason_by_uninterpretable: Map.merge(acc_reason_by_uninterpretable, reason_by_uninterpretable),
+        rejected_module_names: rejected ++ rejected_module_names
+    }
   end
 
   defp options_to_elixir_module_name_patterns(options) do
@@ -156,5 +171,13 @@ defmodule Mix.Tasks.IntellijElixir.DebugTask do
       task = String.to_atom(task)
       Mix.Project.config()[:preferred_cli_env][task] || Mix.Task.preferred_cli_env(task)
     end
+  end
+
+  defp safely_interpret(module) when is_atom(module) do
+    with {:module, _} <- :int.ni(module) do
+      :ok
+    end
+  rescue
+    e -> {:error, e}
   end
 end
