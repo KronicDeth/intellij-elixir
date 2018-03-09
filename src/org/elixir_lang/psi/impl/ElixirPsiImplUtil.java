@@ -148,12 +148,6 @@ public class ElixirPsiImplUtil {
             NOT
     };
     public static final OtpErlangAtom UTF_8 = new OtpErlangAtom("utf8");
-    public static final int BINARY_BASE = 2;
-    public static final int DECIMAL_BASE = 10;
-    public static final int HEXADECIMAL_BASE = 16;
-    public static final int OCTAL_BASE = 8;
-    // NOTE: Unknown is all bases not 2, 8, 10, or 16, but 36 is used because all digits and letters are parsed.
-    public static final int UNKNOWN_BASE = 36;
     public static final TokenSet IDENTIFIER_TOKEN_SET = TokenSet.create(ElixirTypes.IDENTIFIER_TOKEN);
     public static final com.intellij.util.Function<PsiElement, PsiElement> NEXT_SIBLING = new com.intellij.util.Function<PsiElement, PsiElement>() {
                 @Override
@@ -207,63 +201,53 @@ public class ElixirPsiImplUtil {
     }
 
     @Contract(pure = true)
-    @NotNull
-    public static int base(@SuppressWarnings("unused") @NotNull final ElixirBinaryDigits binaryDigits) {
-        return BINARY_BASE;
+    public static int base(@NotNull final ElixirBinaryDigits binaryDigits) {
+        return WholeNumberImpl.INSTANCE.base(binaryDigits);
     }
 
     @Contract(pure = true)
-    @NotNull
-    public static int base(@SuppressWarnings("unused") @NotNull final ElixirBinaryWholeNumber binaryWholeNumber) {
-        return BINARY_BASE;
+    public static int base(@NotNull final ElixirBinaryWholeNumber binaryWholeNumber) {
+        return WholeNumberImpl.INSTANCE.base(binaryWholeNumber);
     }
 
     @Contract(pure = true)
-    @NotNull
-    public static int base(@NotNull @SuppressWarnings("unused") final ElixirDecimalDigits decimalDigits) {
-        return DECIMAL_BASE;
+    public static int base(@NotNull final ElixirDecimalDigits decimalDigits) {
+        return WholeNumberImpl.INSTANCE.base(decimalDigits);
     }
 
     @Contract(pure = true)
-    @NotNull
-    public static int base(@NotNull @SuppressWarnings("unused") final ElixirDecimalWholeNumber decimalWholeNumber) {
-        return DECIMAL_BASE;
+    public static int base(@NotNull final ElixirDecimalWholeNumber decimalWholeNumber) {
+        return WholeNumberImpl.INSTANCE.base(decimalWholeNumber);
     }
 
     @Contract(pure = true)
-    @NotNull
-    public static int base(@NotNull @SuppressWarnings("unused") final ElixirHexadecimalDigits hexadecimalDigits) {
-        return HEXADECIMAL_BASE;
+    public static int base(@NotNull final ElixirHexadecimalDigits hexadecimalDigits) {
+        return WholeNumberImpl.INSTANCE.base(hexadecimalDigits);
     }
 
     @Contract(pure = true)
-    @NotNull
-    public static int base(@NotNull @SuppressWarnings("unused") final ElixirHexadecimalWholeNumber hexadecimalWholeNumber) {
-        return HEXADECIMAL_BASE;
+    public static int base(@NotNull final ElixirHexadecimalWholeNumber hexadecimalWholeNumber) {
+        return WholeNumberImpl.INSTANCE.base(hexadecimalWholeNumber);
     }
 
     @Contract(pure = true)
-    @NotNull
-    public static int base(@NotNull @SuppressWarnings("unused") final ElixirOctalDigits octalDigits) {
-        return OCTAL_BASE;
+    public static int base(@NotNull final ElixirOctalDigits octalDigits) {
+        return WholeNumberImpl.INSTANCE.base(octalDigits);
     }
 
     @Contract(pure = true)
-    @NotNull
-    public static int base(@NotNull @SuppressWarnings("unused") final ElixirOctalWholeNumber octalWholeNumber) {
-        return OCTAL_BASE;
+    public static int base(@NotNull final ElixirOctalWholeNumber octalWholeNumber) {
+        return WholeNumberImpl.INSTANCE.base(octalWholeNumber);
     }
 
     @Contract(pure = true)
-    @NotNull
-    public static int base(@NotNull @SuppressWarnings("unused") final ElixirUnknownBaseDigits unknownBaseDigits) {
-        return UNKNOWN_BASE;
+    public static int base(@NotNull final ElixirUnknownBaseDigits unknownBaseDigits) {
+        return WholeNumberImpl.INSTANCE.base(unknownBaseDigits);
     }
 
     @Contract(pure = true)
-    @NotNull
-    public static int base(@NotNull @SuppressWarnings("unused") final ElixirUnknownBaseWholeNumber unknownBaseWholeNumber) {
-        return UNKNOWN_BASE;
+    public static int base(@NotNull final ElixirUnknownBaseWholeNumber unknownBaseWholeNumber) {
+        return WholeNumberImpl.INSTANCE.base(unknownBaseWholeNumber);
     }
 
     @NotNull
@@ -453,46 +437,26 @@ public class ElixirPsiImplUtil {
 
     @NotNull
     public static List<Digits> digitsList(@NotNull ElixirBinaryWholeNumber binaryWholeNumber) {
-        List<Digits> digitsList = new LinkedList<Digits>();
-
-        digitsList.addAll(binaryWholeNumber.getBinaryDigitsList());
-
-        return digitsList;
+        return WholeNumberImpl.INSTANCE.digitsList(binaryWholeNumber);
     }
 
     @NotNull
     public static List<Digits> digitsList(@NotNull ElixirDecimalWholeNumber decimalWholeNumber) {
-        List<Digits> digitsList = new LinkedList<Digits>();
-
-        digitsList.addAll(decimalWholeNumber.getDecimalDigitsList());
-
-        return digitsList;
+        return WholeNumberImpl.INSTANCE.digitsList(decimalWholeNumber);
     }
 
     @NotNull static List<Digits> digitsList(@NotNull ElixirHexadecimalWholeNumber hexadecimalWholeNumber) {
-        List<Digits> digitsList = new LinkedList<Digits>();
-
-        digitsList.addAll(hexadecimalWholeNumber.getHexadecimalDigitsList());
-
-        return digitsList;
+        return WholeNumberImpl.INSTANCE.digitsList(hexadecimalWholeNumber);
     }
 
     @NotNull
     public static List<Digits> digitsList(@NotNull ElixirOctalWholeNumber octalWholeNumber) {
-        List<Digits> digitsList = new LinkedList<Digits>();
-
-        digitsList.addAll(octalWholeNumber.getOctalDigitsList());
-
-        return digitsList;
+        return WholeNumberImpl.INSTANCE.digitsList(octalWholeNumber);
     }
 
     @NotNull
     public static List<Digits> digitsList(@NotNull ElixirUnknownBaseWholeNumber unknownBaseWholeNumber) {
-        List<Digits> digitsList = new LinkedList<Digits>();
-
-        digitsList.addAll(unknownBaseWholeNumber.getUnknownBaseDigitsList());
-
-        return digitsList;
+        return WholeNumberImpl.INSTANCE.digitsList(unknownBaseWholeNumber);
     }
 
     public static Document document(PsiElement element) {
