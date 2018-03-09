@@ -70,6 +70,9 @@ import static org.elixir_lang.errorreport.Logger.error;
 import static org.elixir_lang.mix.importWizard.ImportedOtpAppKt.computeReadAction;
 import static org.elixir_lang.psi.call.name.Function.*;
 import static org.elixir_lang.psi.call.name.Module.*;
+import static org.elixir_lang.psi.impl.ParentImpl.addChildTextCodePoints;
+import static org.elixir_lang.psi.impl.ParentImpl.elixirCharList;
+import static org.elixir_lang.psi.impl.ParentImpl.elixirString;
 import static org.elixir_lang.psi.stub.type.call.Stub.isModular;
 import static org.elixir_lang.reference.Callable.*;
 import static org.elixir_lang.reference.ModuleAttribute.isNonReferencing;
@@ -260,108 +263,6 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static int base(@NotNull @SuppressWarnings("unused") final ElixirUnknownBaseWholeNumber unknownBaseWholeNumber) {
         return UNKNOWN_BASE;
-    }
-
-    @NotNull
-    private static OtpErlangObject elixirCharList(@NotNull final List<Integer> codePointList) {
-        OtpErlangList elixirCodePointList = elixirCodePointList(codePointList);
-
-        return elixirCharList(elixirCodePointList);
-    }
-
-    /**
-     * Erlang will automatically stringify a list that is just a list of LATIN-1 printable code
-     * points.
-     * OtpErlangString and OtpErlangList are not equal when they have the same content, so to check against
-     * Elixir.Code.string_to_quoted, this code must determine if Erlang would return an OtpErlangString instead
-     * of OtpErlangList and do the same.
-     */
-    @NotNull
-    private static OtpErlangObject elixirCharList(@NotNull final OtpErlangList erlangList) {
-        OtpErlangObject charList;
-
-        /* JInterface will return an OtpErlangString in some case and an OtpErlangList in other.  Right now, I'm
-           assuming it works similar to the printing in `iex` and is based on whether the codePoint is printable, but
-           ASCII printable instead of Unicode printable since Erlang is ASCII/LATIN-1 based */
-        if (isErlangPrintable(erlangList))  {
-            try {
-                charList = new OtpErlangString(erlangList);
-            } catch (OtpErlangException e) {
-                throw new NotImplementedException(e);
-            }
-        } else {
-            charList = erlangList;
-        }
-
-        return charList;
-    }
-
-    @NotNull
-    private static OtpErlangList elixirCodePointList(@NotNull final List<Integer> codePointList) {
-        OtpErlangLong[] erlangCodePoints = new OtpErlangLong[codePointList.size()];
-
-        int i = 0;
-        for (int codePoint : codePointList) {
-            erlangCodePoints[i++] = new OtpErlangLong(codePoint);
-        }
-
-        return new OtpErlangList(erlangCodePoints);
-    }
-
-    @NotNull
-    private static OtpErlangBinary elixirString(@NotNull final List<Integer> codePointList) {
-        StringBuilder stringAccumulator = new StringBuilder();
-
-        for (int codePoint : codePointList) {
-            stringAccumulator.appendCodePoint(codePoint);
-        }
-
-        return elixirString(stringAccumulator.toString());
-    }
-
-    @NotNull
-    public static OtpErlangBinary elixirString(@NotNull String javaString) {
-        final byte[] bytes = javaString.getBytes(Charset.forName("UTF-8"));
-        return new OtpErlangBinary(bytes);
-    }
-
-    private static boolean isErlangPrintable(@NotNull final OtpErlangList erlangList) {
-        boolean isErlangPrintable = true;
-
-        for (OtpErlangObject erlangObject : erlangList) {
-
-            if (erlangObject instanceof OtpErlangLong) {
-                OtpErlangLong erlangLong = (OtpErlangLong) erlangObject;
-
-                final int codePoint;
-
-                try {
-                    codePoint = erlangLong.intValue();
-                } catch (OtpErlangRangeException e) {
-                    isErlangPrintable = false;
-                    break;
-                }
-
-                if (!isErlangPrintable(codePoint)) {
-                    isErlangPrintable = false;
-                    break;
-                }
-            } else {
-                isErlangPrintable = false;
-                break;
-            }
-        }
-
-        if (erlangList.arity() == 0) {
-            isErlangPrintable = false;
-        }
-
-        return isErlangPrintable;
-    }
-
-    @Contract(pure = true)
-    private static boolean isErlangPrintable(int codePoint) {
-        return (codePoint >= 0 && codePoint <= 255);
     }
 
     @NotNull
@@ -662,34 +563,6 @@ public class ElixirPsiImplUtil {
         }
 
         return escapeSequence.codePoint();
-    }
-
-    /*
-     * @todo use String.codePoints in Java 8 when IntelliJ is using it
-     * @see https://stackoverflow.com/questions/1527856/how-can-i-iterate-through-the-unicode-codepoints-of-a-java-string/21791059#21791059
-     */
-    public static Iterable<Integer> codePoints(final String string) {
-        return new Iterable<Integer>() {
-            public Iterator<Integer> iterator() {
-                return new Iterator<Integer>() {
-                    int nextIndex = 0;
-
-                    public boolean hasNext() {
-                        return nextIndex < string.length();
-                    }
-
-                    public Integer next() {
-                        int result = string.codePointAt(nextIndex);
-                        nextIndex += Character.charCount(result);
-                        return result;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
-            }
-        };
     }
 
     public enum UseScopeSelector {
@@ -4985,76 +4858,55 @@ if (quoted == null) {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quoteBinary(InterpolatedCharList interpolatedCharList, OtpErlangTuple binary) {
-
-
-        return quotedFunctionCall(
-                "Elixir.String",
-                quoteBinaryFunctionIdentifier(interpolatedCharList),
-                metadata(interpolatedCharList),
-                binary
-        );
+        return ParentImpl.quoteBinary(interpolatedCharList, binary);
     }
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quoteBinary(@SuppressWarnings("unused") InterpolatedString interpolatedString, OtpErlangTuple binary) {
-        return binary;
+    public static OtpErlangObject quoteBinary(InterpolatedString interpolatedString, OtpErlangTuple binary) {
+        return ParentImpl.quoteBinary(interpolatedString, binary);
     }
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quoteBinary(@SuppressWarnings("unused") Sigil sigil, OtpErlangTuple binary) {
-        return binary;
-    }
-
-    /**
-     * Elixir 1.3 changed from `to_char_list` to `to_charlist`
-     * (https://github.com/elixir-lang/elixir/blob/v1.3/CHANGELOG.md)
-     *
-     * @return {@code "to_charlist} by default;  {@code "to_char_list"}
-     */
-    @Contract(pure = true)
-    @NotNull
-    private static String quoteBinaryFunctionIdentifier(@NotNull final InterpolatedCharList interpolatedCharList) {
-        Release release = getNonNullRelease(interpolatedCharList);
-
-        return release.level().quoteBinaryFunctionIdentifier;
+    public static OtpErlangObject quoteBinary(Sigil sigil, OtpErlangTuple binary) {
+        return ParentImpl.quoteBinary(sigil, binary);
     }
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quoteEmpty(@SuppressWarnings("unused") InterpolatedCharList interpolatedCharList) {
-        return new OtpErlangList();
+    public static OtpErlangObject quoteEmpty(InterpolatedCharList interpolatedCharList) {
+        return ParentImpl.quoteEmpty(interpolatedCharList);
     }
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quoteEmpty(@SuppressWarnings("unused") InterpolatedString interpolatedString) {
-        return elixirString("");
+    public static OtpErlangObject quoteEmpty(InterpolatedString interpolatedString) {
+        return ParentImpl.quoteEmpty(interpolatedString);
     }
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quoteEmpty(@SuppressWarnings("unused") Sigil sigil) {
-        return elixirString("");
+    public static OtpErlangObject quoteEmpty(Sigil sigil) {
+        return ParentImpl.quoteEmpty(sigil);
     }
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quoteLiteral(@SuppressWarnings("unused") InterpolatedCharList interpolatedCharList, List<Integer> codePointList) {
-        return elixirCharList(codePointList);
+    public static OtpErlangObject quoteLiteral(InterpolatedCharList interpolatedCharList, List<Integer> codePointList) {
+        return ParentImpl.quoteLiteral(interpolatedCharList, codePointList);
     }
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quoteLiteral(@SuppressWarnings("unused") InterpolatedString interpolatedString, List<Integer> codePointList) {
-        return elixirString(codePointList);
+    public static OtpErlangObject quoteLiteral(InterpolatedString interpolatedString, List<Integer> codePointList) {
+        return ParentImpl.quoteLiteral(interpolatedString, codePointList);
     }
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quoteLiteral(@SuppressWarnings("unused") Sigil sigil, List<Integer> codePointList) {
-        return elixirString(codePointList);
+    public static OtpErlangObject quoteLiteral(Sigil sigil, List<Integer> codePointList) {
+        return ParentImpl.quoteLiteral(sigil, codePointList);
     }
 
     @NotNull
@@ -5928,96 +5780,45 @@ if (quoted == null) {
     }
 
     @NotNull
-    private static List<Integer> ensureCodePointList(@Nullable List<Integer> codePointList) {
-        if (codePointList == null) {
-            codePointList = new LinkedList<Integer>();
-        }
-
-        return codePointList;
+    public static List<Integer> addEscapedCharacterCodePoints(@NotNull Quote parent,
+                                                              @Nullable List<Integer> codePointList,
+                                                              @NotNull ASTNode child) {
+        return ParentImpl.addEscapedCharacterCodePoints(parent, codePointList, child);
     }
 
     @NotNull
-    public static List<Integer> addChildTextCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode child) {
-        return addStringCodePoints(codePointList, child.getText());
-    }
-
-    @NotNull
-    public static List<Integer> addEscapedCharacterCodePoints(@NotNull @SuppressWarnings("unused") Quote parent, @Nullable List<Integer> codePointList, @NotNull ASTNode child) {
-        codePointList = ensureCodePointList(codePointList);
-
-        ElixirEscapedCharacter escapedCharacter = (ElixirEscapedCharacter) child.getPsi();
-
-        codePointList.add(
-                escapedCharacter.codePoint()
-        );
-
-        return codePointList;
-    }
-
-    @NotNull
-    public static List<Integer> addEscapedCharacterCodePoints(@NotNull @SuppressWarnings("unused") Sigil parent, @Nullable List<Integer> codePointList, @NotNull ASTNode child) {
-        String childText = child.getText();
-
-        // Not sure, why, but \ gets stripped in front of # when quoting using Quoter.
-        if (childText.equals("\\#")) {
-            childText = "#";
-        } else if (parent instanceof SigilLine) {
-            SigilLine sigilLine = (SigilLine) parent;
-
-            char terminator = sigilLine.terminator();
-
-            if (childText.equals("\\" + terminator)) {
-                childText = new String(
-                        new char[] {
-                                terminator
-                        }
-                );
-            }
-        }
-
-        return addStringCodePoints(codePointList, childText);
+    public static List<Integer> addEscapedCharacterCodePoints(@NotNull Sigil parent,
+                                                              @Nullable List<Integer> codePointList,
+                                                              @NotNull ASTNode child) {
+        return ParentImpl.addEscapedCharacterCodePoints(parent, codePointList, child);
     }
 
     @NotNull
     public static List<Integer> addEscapedEOL(@NotNull Parent parent,
                                               @Nullable List<Integer> maybeCodePointList,
-                                              @NotNull @SuppressWarnings("unused") ASTNode child) {
-        List<Integer> codePointList = ensureCodePointList(maybeCodePointList);
-
-        Level level = getNonNullRelease(parent).level();
-
-        if (level.compareTo(V_1_3) >= 0) {
-            if (parent instanceof LiteralSigilHeredoc) {
-                codePointList = addStringCodePoints(codePointList, "\\");
-            } else if (parent instanceof LiteralSigilLine) {
-                for (Integer codePoint : codePoints("\\\n")) {
-                    codePointList.add(codePoint);
-                }
-            }
-        }
-
-        return codePointList;
+                                              @NotNull ASTNode child) {
+        return ParentImpl.addEscapedEOL(parent, maybeCodePointList, child);
     }
 
     @NotNull
-    public static List<Integer> addFragmentCodePoints(@NotNull @SuppressWarnings("unused") Parent parent, @Nullable List<Integer> codePointList, @NotNull ASTNode child) {
-        return addChildTextCodePoints(codePointList, child);
+    public static List<Integer> addFragmentCodePoints(@NotNull Parent parent,
+                                                      @Nullable List<Integer> codePointList,
+                                                      @NotNull ASTNode child) {
+        return ParentImpl.addFragmentCodePoints(parent, codePointList, child);
     }
 
     @NotNull
-    public static List<Integer> addHexadecimalEscapeSequenceCodePoints(@NotNull @SuppressWarnings("unused") Quote parent, @Nullable List<Integer> codePointList, @NotNull ASTNode child) {
-        codePointList = ensureCodePointList(codePointList);
-
-        ElixirQuoteHexadecimalEscapeSequence hexadecimalEscapeSequence = (ElixirQuoteHexadecimalEscapeSequence) child.getPsi();
-
-        codePointList.add(hexadecimalEscapeSequence.codePoint());
-
-        return codePointList;
+    public static List<Integer> addHexadecimalEscapeSequenceCodePoints(@NotNull Quote parent,
+                                                                       @Nullable List<Integer> codePointList,
+                                                                       @NotNull ASTNode child) {
+        return ParentImpl.addHexadecimalEscapeSequenceCodePoints(parent, codePointList, child);
     }
 
     @NotNull
-    public static List<Integer> addHexadecimalEscapeSequenceCodePoints(@NotNull @SuppressWarnings("unused") Sigil parent, @Nullable List<Integer> codePointList, @NotNull ASTNode child) {
-        return addChildTextCodePoints(codePointList, child);
+    public static List<Integer> addHexadecimalEscapeSequenceCodePoints(@NotNull Sigil parent,
+                                                                       @Nullable List<Integer> codePointList,
+                                                                       @NotNull ASTNode child) {
+        return ParentImpl.addHexadecimalEscapeSequenceCodePoints(parent, codePointList, child);
     }
 
     /**
@@ -6076,23 +5877,6 @@ if (quoted == null) {
         }
 
         return modular;
-    }
-
-    @NotNull
-    private static String filterEscapedEOL(String unfiltered) {
-        return unfiltered.replace("\\\n", "");
-    }
-
-    @NotNull
-    private static List<Integer> addStringCodePoints(@Nullable List<Integer> codePointList, @NotNull String string) {
-        codePointList = ensureCodePointList(codePointList);
-        String filteredString = filterEscapedEOL(string);
-
-        for (Integer codePoint : codePoints(filteredString)) {
-            codePointList.add(codePoint);
-        }
-
-        return codePointList;
     }
 
     @NotNull

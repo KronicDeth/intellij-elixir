@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.addChildTextCodePoints;
+import static org.elixir_lang.psi.impl.ParentImpl.addChildTextCodePoints;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.childNodes;
 
 /**
