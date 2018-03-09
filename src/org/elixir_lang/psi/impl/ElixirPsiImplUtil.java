@@ -39,6 +39,7 @@ import org.elixir_lang.psi.call.arguments.star.NoParentheses;
 import org.elixir_lang.psi.call.arguments.star.NoParenthesesOneArgument;
 import org.elixir_lang.psi.call.arguments.star.Parentheses;
 import org.elixir_lang.psi.call.name.Function;
+import org.elixir_lang.psi.impl.call.CallImpl;
 import org.elixir_lang.psi.impl.call.CanonicallyNamedImpl;
 import org.elixir_lang.psi.operation.*;
 import org.elixir_lang.psi.operation.infix.Position;
@@ -404,22 +405,6 @@ public class ElixirPsiImplUtil {
         return useScopeSelector(element) == UseScopeSelector.SELF;
     }
 
-    /**
-     * The number of arguments that have defaults.
-     * @param arguments arguments to a definition call
-     * @return
-     */
-    public static int defaultArgumentCount(@NotNull PsiElement[] arguments) {
-        int count = 0;
-
-        for (PsiElement argument : arguments) {
-            if (isDefaultArgument(argument)) {
-                count++;
-            }
-        }
-
-        return count;
-    }
 
     @Nullable
     public static String definedModuleName(@NotNull final ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall) {
@@ -601,83 +586,31 @@ public class ElixirPsiImplUtil {
         return valid;
     }
 
-    /**
-     * Whether the {@code call} is calling the given `functionName` in the `resolvedModuleName` with any arity
-     * @param call the call element
-     * @param resolvedModuleName the expected {@link Call#resolvedModuleName()}
-     * @param functionName the expected {@link Call#functionName()}
-     * @return {@code true} if the {@code call} has non-{@code null} {@link Call#resolvedModuleName()} that equals
-     *   {@code resolvedModuleName} and has non-{@code null} {@link Call#functionName()} that equals
-     *   {@code functionName}; otherwise, {@code false}.
-     */
     public static boolean isCalling(@NotNull final Call call,
                                     @NotNull final String resolvedModuleName,
                                     @NotNull final String functionName) {
-        String callResolvedModuleName = call.resolvedModuleName();
-        String callFunctionName = call.functionName();
-
-        return callResolvedModuleName != null && callResolvedModuleName.equals(resolvedModuleName) &&
-                callFunctionName != null && callFunctionName.equals(functionName);
+        return CallImpl.INSTANCE.isCalling(call, resolvedModuleName, functionName);
     }
 
-    /**
-     * Whether the {@code call} is calling the given `functionName` in the `resolvedModuleName` with the
-     * `resolvedFinalArity`
-     *
-     * @param call the call element
-     * @param resolvedModuleName  the expected {@link Call#resolvedModuleName()}
-     * @param functionName the expected {@link Call#functionName()}
-     * @param resolvedFinalArity the expected {@link Call#resolvedFinalArity()}
-     * @return {@code true} if the {@code call} has non-{@code null} {@link Call#resolvedModuleName()} that equals
-     *   {@code resolvedModuleName} and has non-{@code null} {@link Call#functionName()} that equals
-     *   {@code functionName} and the {@link Call#resolvedFinalArity()}; otherwise, {@code false}.
-     */
     public static boolean isCalling(@NotNull final Call call,
                                     @NotNull final String resolvedModuleName,
                                     @NotNull final String functionName,
                                     final int resolvedFinalArity) {
-        return call.isCalling(resolvedModuleName, functionName) &&
-                call.resolvedFinalArity() == resolvedFinalArity;
+        return CallImpl.INSTANCE.isCalling(call, resolvedModuleName, functionName, resolvedFinalArity);
     }
 
-    /**
-     * Whether {@code call} is of the named macro.
-     *
-     * Differs from {@link ElixirPsiImplUtil#isCallingMacro(Call, String, String, int)} because no arity is necessary,
-     * which is useful for special forms, which don't have a set arity.  (That's actually why they need to be special
-     * forms since Erlang/Elixir doesn't support variable arity functions otherwise.)
-     *
-     * @param call the call element
-     * @param resolvedModuleName the expected {@link Call#resolvedModuleName()}
-     * @param functionName the expected {@link Call#functionName()}
-     * @return {@code true} if all arguments match and {@link Call#getDoBlock()} is not {@code null}; {@code false}.
-     */
     public static boolean isCallingMacro(@NotNull final Call call,
                                          @NotNull final String resolvedModuleName,
                                          @NotNull final String functionName) {
-        return call.isCalling(resolvedModuleName, functionName) && call.hasDoBlockOrKeyword();
+        return CallImpl.INSTANCE.isCallingMacro(call, resolvedModuleName, functionName);
     }
 
-    /**
-     * Whether {@code call} is of the named macro.
-     *
-     * Differs from {@link ElixirPsiImplUtil#isCalling(Call, String, String, int)} because this function ensures there
-     * is a {@code do} block.  If the macro can be called without a {@code do} block, then
-     * {@link ElixirPsiImplUtil#isCalling(Call, String, String, int)} should be called instead.
-     *
-     * @param call the call element
-     * @param resolvedModuleName the expected {@link Call#resolvedModuleName()}
-     * @param functionName the expected {@link Call#functionName()}
-     * @param resolvedFinalArity the expected {@link Call#resolvedFinalArity()}
-     * @return {@code true} if all arguments match and {@link Call#getDoBlock()} is not {@code null}; {@code false}.
-     */
     @Contract(pure = true)
     public static boolean isCallingMacro(@NotNull final Call call,
                                          @NotNull final String resolvedModuleName,
                                          @NotNull final  String functionName,
                                          final int resolvedFinalArity) {
-        return call.isCalling(resolvedModuleName, functionName, resolvedFinalArity) &&
-                call.hasDoBlockOrKeyword();
+        return CallImpl.INSTANCE.isCallingMacro(call, resolvedModuleName, functionName, resolvedFinalArity);
     }
 
     public static boolean isDeclaringScope(@NotNull final ElixirStabOperation stabOperation) {
@@ -710,25 +643,6 @@ public class ElixirPsiImplUtil {
         return declaringScope;
     }
 
-    /**
-     * Whether the given element presents a default argument (with {@code \\} in it.
-     * @param argument an argument to a {@link Call}
-     * @return {@code true} if in match operation with {@code \\} operator; otherwise, {@code false}.
-     */
-    private static boolean isDefaultArgument(PsiElement argument) {
-        boolean defaultArgument = false;
-
-        if (argument instanceof InMatch) {
-            Operation operation = (Operation) argument;
-
-            if (operation.operator().getText().trim().equals(DEFAULT_OPERATOR)) {
-                defaultArgument = true;
-            }
-        }
-
-        return defaultArgument;
-    }
-
     public static boolean isExported(@NotNull final UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
         return CallDefinitionClause.isPublicFunction(unqualifiedNoParenthesesCall) ||
                 CallDefinitionClause.isPublicMacro(unqualifiedNoParenthesesCall);
@@ -740,7 +654,7 @@ public class ElixirPsiImplUtil {
      * @param arrow the parent (or futher ancestor of a {@link Call} that may be piped.
      * @return {@code} true if {@code arrow} is using the {@code "|>"} operator token.
      */
-    private static boolean isPipe(@NotNull Arrow arrow) {
+    public static boolean isPipe(@NotNull Arrow arrow) {
         Operator operator = arrow.operator();
         ASTNode[] arrowOperatorChildren = operator.getNode().getChildren(ARROW_OPERATOR_TOKEN_SET);
         boolean isPipe = false;
@@ -762,7 +676,7 @@ public class ElixirPsiImplUtil {
      * @param callAncestor the parent (or further ancestor) of a {@link Call} that may be piped
      * @return {@code} true if {@code callAncestor} is an {@link Arrow} using the {@code "|>"} operator token.
      */
-    private static boolean isPipe(@NotNull PsiElement callAncestor) {
+    public static boolean isPipe(@NotNull PsiElement callAncestor) {
         boolean isPipe = false;
 
         if (callAncestor instanceof Arrow) {
@@ -1017,43 +931,38 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true, value = "_ -> null")
     @Nullable
-    public static String moduleName(@NotNull @SuppressWarnings("unused") final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
-        // Always null because it's unqualified.
-        return null;
+    public static String moduleName(@NotNull AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
+        return CallImpl.INSTANCE.moduleName(atUnqualifiedNoParenthesesCall);
     }
 
     @Contract(pure = true, value = "_ -> null")
     @Nullable
-    public static String moduleName(@NotNull @SuppressWarnings("unused") final DotCall dotCall) {
-        // Always null because anonymous
-        return null;
+    public static String moduleName(@NotNull DotCall dotCall) {
+        return CallImpl.INSTANCE.moduleName(dotCall);
     }
 
     @Contract(pure = true, value = "_ -> null")
     @Nullable
-    public static String moduleName(@NotNull @SuppressWarnings("unused") final NotIn notIn) {
-        // Always null because it's unqualified.
-        return null;
+    public static String moduleName(@NotNull NotIn notIn) {
+        return CallImpl.INSTANCE.moduleName(notIn);
     }
 
     @Contract(pure = true, value = "_ -> null")
     @Nullable
-    public static String moduleName(@NotNull @SuppressWarnings("unused") final Operation operation) {
-        return null;
+    public static String moduleName(@NotNull Operation operation) {
+        return CallImpl.INSTANCE.moduleName(operation);
     }
 
     @Contract(pure = true, value = "_ -> null")
     @Nullable
-    public static String moduleName(@NotNull @SuppressWarnings("unused") final Unqualified unqualified) {
-        // Always null because it's unqualified.
-        return null;
+    public static String moduleName(@NotNull Unqualified unqualified) {
+        return CallImpl.INSTANCE.moduleName(unqualified);
     }
 
     @Contract(pure = true)
     @NotNull
     public static String moduleName(@NotNull final Qualified qualified) {
-        // TODO handle more complex qualifiers besides Aliases
-        return computeReadAction(qualified.getFirstChild()::getText);
+        return CallImpl.INSTANCE.moduleName(qualified);
     }
 
     private static GlobalSearchScope moduleWithDependentsScope(PsiElement element) {
@@ -1257,102 +1166,57 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static PsiElement[] primaryArguments(@NotNull final DotCall dotCall) {
-        List<ElixirParenthesesArguments> parenthesesArgumentsList = dotCall.getParenthesesArgumentsList();
-
-        ElixirParenthesesArguments primaryParenthesesArguments = parenthesesArgumentsList.get(0);
-        return primaryParenthesesArguments.arguments();
+        return CallImpl.INSTANCE.primaryArguments(dotCall);
     }
 
     @Contract(pure = true)
     @NotNull
     public static PsiElement[] primaryArguments(@NotNull final Infix infix) {
-        PsiElement[] children = infix.getChildren();
-        int operatorIndex = Normalized.operatorIndex(children);
-        Quotable leftOperand = org.elixir_lang.psi.operation.infix.Normalized.leftOperand(children, operatorIndex);
-        Quotable rightOperand = org.elixir_lang.psi.operation.infix.Normalized.rightOperand(children, operatorIndex);
-
-        return new PsiElement[]{
-                leftOperand,
-                rightOperand
-        };
+        return CallImpl.INSTANCE.primaryArguments(infix);
     }
 
     @Contract(pure = true)
     @NotNull
-    public static PsiElement[] primaryArguments(@NotNull final ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall) {
-        Arguments arguments = unqualifiedNoParenthesesManyArgumentsCall.getNoParenthesesStrict();
-        PsiElement[] primaryArguments;
-
-        if (arguments != null) {
-            primaryArguments = arguments.arguments();
-        } else {
-            /* noParenthesesManyArguments is a private rule, so when noParenthesesStrict is not present, then the
-               noParenthesesManyArguments are direct children, but so is he identifier, so the identifier needs to be
-               ignored  */
-            PsiElement[] children = unqualifiedNoParenthesesManyArgumentsCall.getChildren();
-
-            assert children[0] instanceof ElixirIdentifier;
-
-            primaryArguments = Arrays.copyOfRange(children, 1, children.length);
-        }
-
-        return primaryArguments;
+    public static PsiElement[] primaryArguments(
+            @NotNull final ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall
+    ) {
+        return CallImpl.INSTANCE.primaryArguments(unqualifiedNoParenthesesManyArgumentsCall);
     }
 
     @Contract(pure = true)
     @Nullable
-    public static PsiElement[] primaryArguments(@NotNull @SuppressWarnings("unused") final None none) {
-        return null;
+    public static PsiElement[] primaryArguments(@NotNull None none) {
+        return CallImpl.INSTANCE.primaryArguments(none);
     }
 
     @Contract(pure = true)
     @NotNull
     public static PsiElement[] primaryArguments(@NotNull final NotIn notIn) {
-        PsiElement[] children = notIn.getChildren();
-        Quotable leftOperand = org.elixir_lang.psi.operation.not_in.Normalized.leftOperand(children);
-        Quotable rightOperand = org.elixir_lang.psi.operation.not_in.Normalized.rightOperand(children);
-
-        return new PsiElement[]{
-                leftOperand,
-                rightOperand
-        };
+        return CallImpl.INSTANCE.primaryArguments(notIn);
     }
 
     @Contract(pure = true)
     @NotNull
     public static PsiElement[] primaryArguments(@NotNull final NoParenthesesOneArgument noParenthesesOneArgument) {
-        return noParenthesesOneArgument.getNoParenthesesOneArgument().arguments();
+        return CallImpl.INSTANCE.primaryArguments(noParenthesesOneArgument);
     }
 
     @Contract(pure = true)
     @NotNull
     public static PsiElement[] primaryArguments(@NotNull final Parentheses parentheses) {
-        ElixirMatchedParenthesesArguments matchedParenthesesArguments = parentheses.getMatchedParenthesesArguments();
-        List<ElixirParenthesesArguments> parenthesesArgumentsList = matchedParenthesesArguments.getParenthesesArgumentsList();
-
-        ElixirParenthesesArguments primaryParenthesesArguments = parenthesesArgumentsList.get(0);
-        return primaryParenthesesArguments.arguments();
+        return CallImpl.INSTANCE.primaryArguments(parentheses);
     }
 
     @Contract(pure = true)
     @NotNull
     public static PsiElement[] primaryArguments(@NotNull final Prefix prefix) {
-        return new PsiElement[]{
-            prefix.operand()
-        };
+        return CallImpl.INSTANCE.primaryArguments(prefix);
     }
 
     @Contract(pure = true)
     @Nullable
     public static Integer primaryArity(@NotNull final Call call) {
-        PsiElement[] primaryArguments = call.primaryArguments();
-        Integer primaryArity = null;
-
-        if (primaryArguments != null) {
-            primaryArity = primaryArguments.length;
-        }
-
-        return primaryArity;
+        return CallImpl.INSTANCE.primaryArity(call);
     }
 
     /**
@@ -2288,59 +2152,45 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @Nullable
     public static String functionName(@NotNull final Call call) {
-        String functionName = null;
-        PsiElement element = call.functionNameElement();
-
-        if (element != null) {
-            functionName = computeReadAction(element::getText);
-        }
-
-        return functionName;
+        return CallImpl.INSTANCE.functionName(call);
     }
 
-    /**
-     *
-     * @param atUnqualifiedNoParenthesesCall
-     * @return `null` because the `IDENTIFIER`, `foo` in `@foo 1` is not the local name of a function, but the name of a
-     *   Module attribute.
-     */
     @Contract(pure = true, value = "_ -> null")
     @Nullable
-    public static PsiElement functionNameElement(@NotNull @SuppressWarnings("unused") final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
-        return null;
+    public static PsiElement functionNameElement(
+            @NotNull final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall
+    ) {
+        return CallImpl.INSTANCE.functionNameElement(atUnqualifiedNoParenthesesCall);
     }
 
-    /**
-     *
-     * @param dotCall
-     * @return `null` because the expression before the `.` is a variable name and not a function name.
-     */
     @Contract(pure = true, value = "_ -> null")
     @Nullable
-    public static PsiElement functionNameElement(@NotNull @SuppressWarnings("unused") final DotCall dotCall) {
-        return null;
+    public static PsiElement functionNameElement(@NotNull final DotCall dotCall) {
+        return CallImpl.INSTANCE.functionNameElement(dotCall);
     }
 
     @Contract(pure = true, value = "_ -> null")
     @Nullable
     public static PsiElement functionNameElement(@NotNull final NotIn notIn) {
-        return null;
+        return CallImpl.INSTANCE.functionNameElement(notIn);
     }
 
     @Contract(pure = true)
     @NotNull
     public static PsiElement functionNameElement(@NotNull final Operation operation) {
-        return operation.operator();
+        return CallImpl.INSTANCE.functionNameElement(operation);
     }
 
+    @Contract(pure = true)
+    @NotNull
     public static PsiElement functionNameElement(@NotNull final Qualified qualified) {
-        return qualified.getRelativeIdentifier();
+        return CallImpl.INSTANCE.functionNameElement(qualified);
     }
 
     @Contract(pure = true)
     @NotNull
     public static PsiElement functionNameElement(@NotNull final Unqualified unqualified) {
-        return unqualified.getFirstChild();
+        return CallImpl.INSTANCE.functionNameElement(unqualified);
     }
 
     public static Body getBody(ElixirCharListHeredocLine charListHeredocLine) {
@@ -2442,25 +2292,27 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true, value = "_ -> null")
     @Nullable
-    public static ElixirDoBlock getDoBlock(@NotNull @SuppressWarnings("unused") final ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall) {
-        return null;
+    public static ElixirDoBlock getDoBlock(
+            @NotNull ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall
+    ) {
+        return CallImpl.INSTANCE.getDoBlock(unqualifiedNoParenthesesManyArgumentsCall);
     }
 
     @Contract(pure = true, value = "_ -> null")
     @Nullable
-    public static ElixirDoBlock getDoBlock(@NotNull @SuppressWarnings("unused") final NotIn notIn) {
-        return null;
+    public static ElixirDoBlock getDoBlock(@NotNull NotIn notIn) {
+        return CallImpl.INSTANCE.getDoBlock(notIn);
     }
 
     @Contract(pure = true, value = "_ -> null")
     @Nullable
-    public static ElixirDoBlock getDoBlock(@NotNull @SuppressWarnings("unused") final Operation operation) {
-        return null;
+    public static ElixirDoBlock getDoBlock(@NotNull Operation operation) {
+        return CallImpl.INSTANCE.getDoBlock(operation);
     }
 
     @Nullable
-    public static ElixirDoBlock getDoBlock(@SuppressWarnings("unused") MatchedCall matchedCall) {
-        return null;
+    public static ElixirDoBlock getDoBlock(@NotNull MatchedCall matchedCall) {
+        return CallImpl.INSTANCE.getDoBlock(matchedCall);
     }
 
     public static IElementType getFragmentType(@SuppressWarnings("unused") CharListFragmented charListFragmented) {
@@ -3042,20 +2894,11 @@ public class ElixirPsiImplUtil {
     }
 
     public static boolean hasDoBlockOrKeyword(@NotNull final Call call) {
-        return call.getDoBlock() != null || keywordArgument(call, "do") != null;
+        return CallImpl.INSTANCE.hasDoBlockOrKeyword(call);
     }
 
     public static boolean hasDoBlockOrKeyword(@NotNull final StubBased<Stub> stubBased) {
-        Stub stub = stubBased.getStub();
-        boolean has;
-
-        if (stub != null) {
-            has = stub.hasDoBlockOrKeyword();
-        } else {
-            has = hasDoBlockOrKeyword((Call) stubBased);
-        }
-
-        return has;
+        return CallImpl.INSTANCE.hasDoBlockOrKeyword(stubBased);
     }
 
     public static boolean hasKeywordKey(@NotNull QuotableKeywordPair quotableKeywordPair, @NotNull String keywordKeyText) {
@@ -4831,55 +4674,20 @@ if (quoted == null) {
 
     @Contract(pure = true)
     @NotNull
-    public static int resolvedFinalArity(@NotNull final Call call) {
-        Integer resolvedFinalArity = call.resolvedSecondaryArity();
-
-        if (resolvedFinalArity == null) {
-            resolvedFinalArity = call.resolvedPrimaryArity();
-        }
-
-        if (resolvedFinalArity == null) {
-            resolvedFinalArity = 0;
-        }
-
-        return resolvedFinalArity;
+    public static int resolvedFinalArity(@NotNull Call call) {
+        return CallImpl.INSTANCE.resolvedFinalArity(call);
     }
 
     @Contract(pure = true)
     @NotNull
-    public static int resolvedFinalArity(@NotNull final org.elixir_lang.psi.call.StubBased<Stub> stubBased) {
-        Stub stub = stubBased.getStub();
-        Integer resolvedFinalArity;
-
-        if (stub != null) {
-            resolvedFinalArity = stub.resolvedFinalArity();
-        } else {
-            resolvedFinalArity = resolvedFinalArity((Call) stubBased);
-        }
-
-        if (resolvedFinalArity == null) {
-            resolvedFinalArity = 0;
-        }
-
-        return resolvedFinalArity;
+    public static int resolvedFinalArity(@NotNull org.elixir_lang.psi.call.StubBased<Stub> stubBased) {
+        return CallImpl.INSTANCE.resolvedFinalArity(stubBased);
     }
 
     @Contract(pure = true)
     @NotNull
-    public static IntRange resolvedFinalArityRange(@NotNull final Call call) {
-        IntRange arityRange;
-        PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(call);
-
-        if (finalArguments != null) {
-            int defaultCount = defaultArgumentCount(finalArguments);
-            int maximum = finalArguments.length;
-            int minimum = maximum - defaultCount;
-            arityRange = new IntRange(minimum, maximum);
-        } else {
-            arityRange = new IntRange(0);
-        }
-
-        return arityRange;
+    public static IntRange resolvedFinalArityRange(@NotNull Call call) {
+        return CallImpl.INSTANCE.resolvedFinalArityRange(call);
     }
 
     /**
@@ -4948,179 +4756,62 @@ if (quoted == null) {
         return resolvedFunctionName;
     }
 
-    /**
-     * Similar to {@link moduleName}, but takes into account `alias`es and `import`s.
-     *
-     * @param element
-     * @param newName
-     * @return
-     */
     @Contract(pure = true, value = "_ -> null")
     @Nullable
-    public static String resolvedModuleName(@NotNull @SuppressWarnings("unused") final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
-        // TODO handle resolving module name from module attribute's declaration
-        return null;
+    public static String resolvedModuleName(@NotNull AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
+        return CallImpl.INSTANCE.resolvedModuleName(atUnqualifiedNoParenthesesCall);
     }
 
-    /**
-     * Similar to {@link moduleName}, but takes into account `alias`es and `import`s.
-     *
-     * @param element
-     * @param newName
-     * @return
-     */
     @Contract(pure = true, value = "_ -> null")
     @Nullable
-    public static String resolvedModuleName(@NotNull @SuppressWarnings("unused") final DotCall dotCall) {
-        // TODO handle resolving module name from any capture from variable declaration
-        return null;
+    public static String resolvedModuleName(@NotNull DotCall dotCall) {
+        return CallImpl.INSTANCE.resolvedModuleName(dotCall);
     }
 
     @Contract(pure = true)
     @NotNull
-    public static String resolvedModuleName(@NotNull final Infix infix) {
-        /* TODO handle resolving module name from imports.  Assume KERNEL for now, but some are actually from
-           Bitwise */
-        return KERNEL;
+    public static String resolvedModuleName(@NotNull Infix infix) {
+        return CallImpl.INSTANCE.resolvedModuleName(infix);
     }
 
     @Contract(pure = true)
     @NotNull
-    public static String resolvedModuleName(@NotNull final NotIn notIn) {
-        return KERNEL;
+    public static String resolvedModuleName(@NotNull NotIn notIn) {
+        return CallImpl.INSTANCE.resolvedModuleName(notIn);
     }
 
     @Contract(pure = true)
     @NotNull
-    public static String resolvedModuleName(@NotNull final Prefix prefix) {
-        /* TODO handle resolving module name from imports.  Assume KERNEL for now. */
-        return KERNEL;
+    public static String resolvedModuleName(@NotNull Prefix prefix) {
+        return CallImpl.INSTANCE.resolvedModuleName(prefix);
     }
 
-    /**
-     * Similar to {@link moduleName}, but takes into account `alias`es and `import`s.
-     *
-     * @param qualifiedNoArgumentsCall
-     * @return
-     */
     @NotNull
-    public static String resolvedModuleName(@NotNull final org.elixir_lang.psi.call.qualification.Qualified qualified) {
-        Stub stub = null;
-
-        if (qualified instanceof org.elixir_lang.psi.call.StubBased) {
-            org.elixir_lang.psi.call.StubBased<Stub> qualifiedNamedCall = (org.elixir_lang.psi.call.StubBased<Stub>) qualified;
-            stub = qualifiedNamedCall.getStub();
-        }
-
-        String resolvedModuleName;
-
-        if (stub != null) {
-            resolvedModuleName = stub.resolvedModuleName();
-        } else {
-            // TODO handle `alias`es and `import`s
-            resolvedModuleName = stripElixirPrefix(qualified.moduleName());
-        }
-
-        //noinspection ConstantConditions
-        return resolvedModuleName;
+    public static String resolvedModuleName(@NotNull org.elixir_lang.psi.call.qualification.Qualified qualified) {
+        return CallImpl.INSTANCE.resolvedModuleName(qualified);
     }
 
-    /**
-     * Similar to {@link moduleName}, but takes into account `alias`es and `import`s.
-     *
-     * @param element
-     * @param newName
-     * @return
-     */
     @NotNull
-    public static String resolvedModuleName(@NotNull final Unqualified unqualified) {
-        Call unqualifiedCall = (Call) unqualified;
-        Stub stub = null;
-
-        if (unqualifiedCall instanceof org.elixir_lang.psi.call.StubBased) {
-            org.elixir_lang.psi.call.StubBased<Stub> unqualifiedNamed = (org.elixir_lang.psi.call.StubBased<Stub>) unqualifiedCall;
-            stub = unqualifiedNamed.getStub();
-        }
-
-        String resolvedModuleName;
-
-        if (stub != null) {
-            resolvedModuleName = stub.resolvedModuleName();
-        } else {
-            // TODO handle `import`s
-            resolvedModuleName = KERNEL;
-        }
-
-        //noinspection ConstantConditions
-        return resolvedModuleName;
+    public static String resolvedModuleName(@NotNull Unqualified unqualified) {
+        return CallImpl.INSTANCE.resolvedModuleName(unqualified);
     }
 
-    /**
-     * Similar to {@link moduleName}, but takes into account `alias`es and `import`s.
-     *
-     * @param element
-     * @param newName
-     * @return
-     */
+    @Contract(pure = true)
     @NotNull
-    public static String resolvedModuleName(@NotNull @SuppressWarnings("unused") final UnqualifiedNoArgumentsCall unqualifiedNoArgumentsCall) {
-        // TODO handle `import`s and determine whether actually a local variable
-        return KERNEL;
+    public static String resolvedModuleName(@NotNull UnqualifiedNoArgumentsCall unqualifiedNoArgumentsCall) {
+        return CallImpl.INSTANCE.resolvedModuleName(unqualifiedNoArgumentsCall);
     }
 
     @Contract(pure = true)
     @Nullable
-    public static Integer resolvedPrimaryArity(@NotNull final Call call) {
-        Integer primaryArity = call.primaryArity();
-        Integer resolvedPrimaryArity = primaryArity;
-
-        /* do block and piping attach to the outer most parentheses, only count do block and piping for primary if there
-           are no secondary. */
-        if (call.secondaryArity() == null) {
-            if (call.getDoBlock() != null) {
-                if (primaryArity == null) {
-                    resolvedPrimaryArity = 1;
-                } else {
-                    resolvedPrimaryArity += 1;
-                }
-            }
-
-            PsiElement parent = computeReadAction(call::getParent);
-
-            if (isPipe(parent)) {
-                Arrow parentPipeOperation = (Arrow) parent;
-                PsiElement pipedInto = parentPipeOperation.rightOperand();
-
-                /* only the right operand has its arity increased because it is the operand that has the output of the
-                   left operand prepended to its arguments */
-                if (pipedInto != null && call.isEquivalentTo(pipedInto)) {
-                    if (primaryArity == null) {
-                        resolvedPrimaryArity = 1;
-                    } else {
-                        resolvedPrimaryArity += 1;
-                    }
-                }
-            }
-        }
-
-        return resolvedPrimaryArity;
+    public static Integer resolvedPrimaryArity(@NotNull Call call) {
+        return CallImpl.INSTANCE.resolvedPrimaryArity(call);
     }
 
     @Contract(pure = true)
     @Nullable
-    public static Integer resolvedSecondaryArity(@NotNull final Call call) {
-        Integer secondaryArity = call.secondaryArity();
-        Integer resolvedSecondaryArity = secondaryArity;
-
-        if (secondaryArity != null) {
-            if (call.getDoBlock() != null) {
-                resolvedSecondaryArity += 1;
-            }
-
-            // TODO handle piping
-        }
-
-        return resolvedSecondaryArity;
+    public static Integer resolvedSecondaryArity(@NotNull Call call) {
+        return CallImpl.INSTANCE.resolvedSecondaryArity(call);
     }
 
     @Contract(pure = true)
@@ -5143,85 +4834,56 @@ if (quoted == null) {
 
     @Contract(pure = true)
     @Nullable
-    public static PsiElement[] secondaryArguments(@NotNull final DotCall dotCall) {
-        List<ElixirParenthesesArguments> parenthesesArgumentsList = dotCall.getParenthesesArgumentsList();
-        PsiElement[] arguments;
-
-        if (parenthesesArgumentsList.size() < 2) {
-            arguments = null;
-        } else {
-            ElixirParenthesesArguments parenthesesArguments = parenthesesArgumentsList.get(1);
-            arguments = parenthesesArguments.arguments();
-        }
-
-        return arguments;
+    public static PsiElement[] secondaryArguments(@NotNull DotCall dotCall) {
+        return CallImpl.INSTANCE.secondaryArguments(dotCall);
     }
 
     @Contract(pure = true)
     @Nullable
-    public static PsiElement[] secondaryArguments(@NotNull @SuppressWarnings("unused") final Infix infix) {
-        return null;
+    public static PsiElement[] secondaryArguments(@NotNull Infix infix) {
+        return CallImpl.INSTANCE.secondaryArguments(infix);
     }
 
     @Contract(pure = true, value = "_ -> null")
     @Nullable
-    public static PsiElement[] secondaryArguments(@NotNull @SuppressWarnings("unused") final None none) {
-        return null;
+    public static PsiElement[] secondaryArguments(@NotNull None none) {
+        return CallImpl.INSTANCE.secondaryArguments(none);
     }
 
     @Contract(pure = true)
     @Nullable
-    public static PsiElement[] secondaryArguments(@NotNull @SuppressWarnings("unused") final NotIn notIn) {
-        return null;
+    public static PsiElement[] secondaryArguments(@NotNull NotIn notIn) {
+        return CallImpl.INSTANCE.secondaryArguments(notIn);
     }
 
     @Contract(pure = true, value = "_ -> null")
     @Nullable
-    public static PsiElement[] secondaryArguments(@NotNull @SuppressWarnings("unused") final NoParentheses noParentheses) {
-        return null;
+    public static PsiElement[] secondaryArguments(@NotNull NoParentheses noParentheses) {
+        return CallImpl.INSTANCE.secondaryArguments(noParentheses);
     }
 
     @Contract(pure = true)
     @Nullable
-    public static PsiElement[] secondaryArguments(@NotNull final Parentheses parentheses) {
-        ElixirMatchedParenthesesArguments matchedParenthesesArguments = parentheses.getMatchedParenthesesArguments();
-        List<ElixirParenthesesArguments> parenthesesArgumentsList = matchedParenthesesArguments.getParenthesesArgumentsList();
-        PsiElement[] arguments;
-
-        if (parenthesesArgumentsList.size() < 2) {
-            arguments = null;
-        } else {
-            ElixirParenthesesArguments parenthesesArguments = parenthesesArgumentsList.get(1);
-            arguments = parenthesesArguments.arguments();
-        }
-
-        return arguments;
+    public static PsiElement[] secondaryArguments(@NotNull Parentheses parentheses) {
+        return CallImpl.INSTANCE.secondaryArguments(parentheses);
     }
 
     @Contract(pure = true, value = "_ -> null")
     @Nullable
-    public static PsiElement[] secondaryArguments(@NotNull @SuppressWarnings("unused") final Prefix prefix) {
-        return null;
+    public static PsiElement[] secondaryArguments(@NotNull Prefix prefix) {
+        return CallImpl.INSTANCE.secondaryArguments(prefix);
     }
 
     @Contract(pure = true)
     @Nullable
-    public static Integer secondaryArity(@NotNull final Call call) {
-        PsiElement[] secondaryArguments = call.secondaryArguments();
-        Integer secondaryArity = null;
-
-        if (secondaryArguments != null) {
-            secondaryArity = secondaryArguments.length;
-        }
-
-        return secondaryArity;
+    public static Integer secondaryArity(@NotNull Call call) {
+        return CallImpl.INSTANCE.secondaryArity(call);
     }
 
     @NotNull
     public static PsiElement setName(@NotNull PsiElement element, @NotNull String newName) {
         return null;
     }
-
 
     @NotNull
     public static PsiElement setName(@NotNull final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall,
