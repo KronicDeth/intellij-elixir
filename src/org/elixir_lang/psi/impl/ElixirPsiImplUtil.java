@@ -39,6 +39,7 @@ import org.elixir_lang.psi.call.arguments.star.NoParentheses;
 import org.elixir_lang.psi.call.arguments.star.NoParenthesesOneArgument;
 import org.elixir_lang.psi.call.arguments.star.Parentheses;
 import org.elixir_lang.psi.call.name.Function;
+import org.elixir_lang.psi.impl.call.CanonicallyNamedImpl;
 import org.elixir_lang.psi.operation.*;
 import org.elixir_lang.psi.operation.infix.Position;
 import org.elixir_lang.psi.operation.infix.Triple;
@@ -345,119 +346,12 @@ public class ElixirPsiImplUtil {
 
     @Nullable
     public static String canonicalName(@NotNull StubBased stubBased) {
-        String canonicalName;
-
-        if (isModular(stubBased)) {
-            String canonicalNameSuffix = null;
-
-            if (Implementation.is(stubBased)) {
-                String protocolName = Implementation.protocolName(stubBased);
-                PsiElement forNameElement = Implementation.forNameElement(stubBased);
-                String forName = null;
-
-                if (forNameElement != null) {
-                    forName = forNameElement.getText();
-                }
-
-                canonicalNameSuffix = StringUtil.notNullize(protocolName, "?") +
-                        "." +
-                        StringUtil.notNullize(forName, "?");
-            } else if (Module.is(stubBased) || Protocol.is(stubBased)) {
-                canonicalNameSuffix = org.elixir_lang.navigation.item_presentation.modular.Module.presentableText(
-                        stubBased
-                );
-            }
-
-            Call enclosing = enclosingModularMacroCall(stubBased);
-
-            if (enclosing instanceof StubBased) {
-                StubBased enclosingStubBased = (StubBased) enclosing;
-                String canonicalNamePrefix = enclosingStubBased.canonicalName();
-
-                canonicalName = StringUtil.notNullize(canonicalNamePrefix, "?") +
-                        "." +
-                        StringUtil.notNullize(canonicalNameSuffix, "?");
-            } else {
-                canonicalName = StringUtil.notNullize(canonicalNameSuffix, "?");
-            }
-        } else {
-            canonicalName = stubBased.getName();
-        }
-
-        return canonicalName;
+       return CanonicallyNamedImpl.canonicalName(stubBased);
     }
 
     @NotNull
     public static Set<String> canonicalNameSet(@NotNull StubBased stubBased) {
-        Set<String> canonicalNameSet;
-
-        if (isModular(stubBased)) {
-            Set<String> canonicalNameSuffixSet;
-
-            if (Implementation.is(stubBased)) {
-                String maybeProtocolName = Implementation.protocolName(stubBased);
-                PsiElement forNameElement = Implementation.forNameElement(stubBased);
-                Collection<String> maybeForNameCollection = null;
-
-                if (forNameElement != null) {
-                    maybeForNameCollection = forNameCollection(forNameElement);
-                }
-
-                String protocolName = StringUtil.notNullize(maybeProtocolName, "?");
-
-                if (maybeForNameCollection == null) {
-                    canonicalNameSuffixSet = Collections.singleton(protocolName + ".?");
-                } else {
-                    canonicalNameSuffixSet = new SmartHashSet<String>(maybeForNameCollection.size());
-
-                    for (@Nullable String maybeForName : maybeForNameCollection) {
-                        String canonicalName = protocolName + "." + StringUtil.notNullize(maybeForName, "?");
-                        canonicalNameSuffixSet.add(canonicalName);
-                    }
-                }
-            } else if (Module.is(stubBased) || Protocol.is(stubBased)) {
-                canonicalNameSuffixSet = Collections.singleton(
-                        org.elixir_lang.navigation.item_presentation.modular.Module.presentableText(stubBased)
-                );
-            } else {
-                canonicalNameSuffixSet = Collections.singleton("?");
-            }
-
-            Call enclosing = enclosingModularMacroCall(stubBased);
-
-            if (enclosing instanceof StubBased) {
-                StubBased enclosingStubBased = (StubBased) enclosing;
-                Set<String> canonicalNamePrefixSet = enclosingStubBased.canonicalNameSet();
-
-                if (canonicalNamePrefixSet == null) {
-                    canonicalNamePrefixSet = Collections.singleton("?");
-                }
-
-                canonicalNameSet = new SmartHashSet<String>(
-                        canonicalNamePrefixSet.size() * canonicalNameSuffixSet.size()
-                );
-
-                for (String canonicalNamePrefix : canonicalNamePrefixSet) {
-                    for (String canonicalNameSuffix : canonicalNameSuffixSet) {
-                        canonicalNameSet.add(
-                                canonicalNamePrefix + "." + canonicalNameSuffix
-                        );
-                    }
-                }
-            } else {
-                canonicalNameSet = canonicalNameSuffixSet;
-            }
-        } else {
-            String canonicalName = stubBased.getName();
-
-            if (canonicalName != null) {
-                canonicalNameSet = Collections.singleton(canonicalName);
-            } else {
-                canonicalNameSet = Collections.emptySet();
-            }
-        }
-
-        return canonicalNameSet;
+        return CanonicallyNamedImpl.canonicalNameSet(stubBased);
     }
 
     // @return -1 if codePoint cannot be parsed.
