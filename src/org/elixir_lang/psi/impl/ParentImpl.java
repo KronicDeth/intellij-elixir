@@ -16,8 +16,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static org.elixir_lang.Level.V_1_3;
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.metadata;
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.quotedFunctionCall;
+import static org.elixir_lang.psi.impl.QuotableImpl.metadata;
+import static org.elixir_lang.psi.impl.QuotableImpl.quotedFunctionCall;
 import static org.elixir_lang.sdk.elixir.Type.getNonNullRelease;
 
 public class ParentImpl {

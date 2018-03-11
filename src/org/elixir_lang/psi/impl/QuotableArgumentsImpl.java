@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.DO;
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.NIL;
+import static org.elixir_lang.psi.impl.QuotableImpl.NIL;
 
 public class QuotableArgumentsImpl {
     @Contract(pure = true)
