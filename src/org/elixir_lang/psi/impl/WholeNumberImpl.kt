@@ -15,37 +15,48 @@ object WholeNumberImpl {
     // WholeNumber Functions
 
     @Contract(pure = true)
+    @JvmStatic
     fun base(@Suppress("UNUSED_PARAMETER") binaryDigits: ElixirBinaryDigits): Int = BINARY_BASE
 
     @Contract(pure = true)
+    @JvmStatic
     fun base(@Suppress("UNUSED_PARAMETER") binaryWholeNumber: ElixirBinaryWholeNumber): Int = BINARY_BASE
 
     @Contract(pure = true)
+    @JvmStatic
     fun base(@Suppress("UNUSED_PARAMETER") decimalDigits: ElixirDecimalDigits): Int = DECIMAL_BASE
 
     @Contract(pure = true)
+    @JvmStatic
     fun base(@Suppress("UNUSED_PARAMETER") decimalWholeNumber: ElixirDecimalWholeNumber): Int = DECIMAL_BASE
 
     @Contract(pure = true)
+    @JvmStatic
     fun base(@Suppress("UNUSED_PARAMETER") hexadecimalDigits: ElixirHexadecimalDigits): Int = HEXADECIMAL_BASE
 
     @Contract(pure = true)
+    @JvmStatic
     fun base(@Suppress("UNUSED_PARAMETER") hexadecimalWholeNumber: ElixirHexadecimalWholeNumber): Int =
             HEXADECIMAL_BASE
 
     @Contract(pure = true)
+    @JvmStatic
     fun base(@Suppress("UNUSED_PARAMETER") octalDigits: ElixirOctalDigits): Int = OCTAL_BASE
 
     @Contract(pure = true)
+    @JvmStatic
     fun base(@Suppress("UNUSED_PARAMETER") octalWholeNumber: ElixirOctalWholeNumber): Int = OCTAL_BASE
 
     @Contract(pure = true)
+    @JvmStatic
     fun base(@Suppress("UNUSED_PARAMETER") unknownBaseDigits: ElixirUnknownBaseDigits): Int = UNKNOWN_BASE
 
     @Contract(pure = true)
+    @JvmStatic
     fun base(@Suppress("UNUSED_PARAMETER") unknownBaseWholeNumber: ElixirUnknownBaseWholeNumber): Int =
             UNKNOWN_BASE
 
+    @JvmStatic
     fun digitsList(binaryWholeNumber: ElixirBinaryWholeNumber): List<Digits> {
         val digitsList = LinkedList<Digits>()
 
@@ -54,6 +65,7 @@ object WholeNumberImpl {
         return digitsList
     }
 
+    @JvmStatic
     fun digitsList(decimalWholeNumber: ElixirDecimalWholeNumber): List<Digits> {
         val digitsList = LinkedList<Digits>()
 
@@ -62,6 +74,7 @@ object WholeNumberImpl {
         return digitsList
     }
 
+    @JvmStatic
     fun digitsList(hexadecimalWholeNumber: ElixirHexadecimalWholeNumber): List<Digits> {
         val digitsList = LinkedList<Digits>()
 
@@ -70,6 +83,7 @@ object WholeNumberImpl {
         return digitsList
     }
 
+    @JvmStatic
     fun digitsList(octalWholeNumber: ElixirOctalWholeNumber): List<Digits> {
         val digitsList = LinkedList<Digits>()
 
@@ -78,6 +92,7 @@ object WholeNumberImpl {
         return digitsList
     }
 
+    @JvmStatic
     fun digitsList(unknownBaseWholeNumber: ElixirUnknownBaseWholeNumber): List<Digits> {
         val digitsList = LinkedList<Digits>()
 

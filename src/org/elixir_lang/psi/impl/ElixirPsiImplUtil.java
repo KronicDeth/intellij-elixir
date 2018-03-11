@@ -173,52 +173,52 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     public static int base(@NotNull final ElixirBinaryDigits binaryDigits) {
-        return WholeNumberImpl.INSTANCE.base(binaryDigits);
+        return WholeNumberImpl.base(binaryDigits);
     }
 
     @Contract(pure = true)
     public static int base(@NotNull final ElixirBinaryWholeNumber binaryWholeNumber) {
-        return WholeNumberImpl.INSTANCE.base(binaryWholeNumber);
+        return WholeNumberImpl.base(binaryWholeNumber);
     }
 
     @Contract(pure = true)
     public static int base(@NotNull final ElixirDecimalDigits decimalDigits) {
-        return WholeNumberImpl.INSTANCE.base(decimalDigits);
+        return WholeNumberImpl.base(decimalDigits);
     }
 
     @Contract(pure = true)
     public static int base(@NotNull final ElixirDecimalWholeNumber decimalWholeNumber) {
-        return WholeNumberImpl.INSTANCE.base(decimalWholeNumber);
+        return WholeNumberImpl.base(decimalWholeNumber);
     }
 
     @Contract(pure = true)
     public static int base(@NotNull final ElixirHexadecimalDigits hexadecimalDigits) {
-        return WholeNumberImpl.INSTANCE.base(hexadecimalDigits);
+        return WholeNumberImpl.base(hexadecimalDigits);
     }
 
     @Contract(pure = true)
     public static int base(@NotNull final ElixirHexadecimalWholeNumber hexadecimalWholeNumber) {
-        return WholeNumberImpl.INSTANCE.base(hexadecimalWholeNumber);
+        return WholeNumberImpl.base(hexadecimalWholeNumber);
     }
 
     @Contract(pure = true)
     public static int base(@NotNull final ElixirOctalDigits octalDigits) {
-        return WholeNumberImpl.INSTANCE.base(octalDigits);
+        return WholeNumberImpl.base(octalDigits);
     }
 
     @Contract(pure = true)
     public static int base(@NotNull final ElixirOctalWholeNumber octalWholeNumber) {
-        return WholeNumberImpl.INSTANCE.base(octalWholeNumber);
+        return WholeNumberImpl.base(octalWholeNumber);
     }
 
     @Contract(pure = true)
     public static int base(@NotNull final ElixirUnknownBaseDigits unknownBaseDigits) {
-        return WholeNumberImpl.INSTANCE.base(unknownBaseDigits);
+        return WholeNumberImpl.base(unknownBaseDigits);
     }
 
     @Contract(pure = true)
     public static int base(@NotNull final ElixirUnknownBaseWholeNumber unknownBaseWholeNumber) {
-        return WholeNumberImpl.INSTANCE.base(unknownBaseWholeNumber);
+        return WholeNumberImpl.base(unknownBaseWholeNumber);
     }
 
     @NotNull
@@ -320,26 +320,26 @@ public class ElixirPsiImplUtil {
 
     @NotNull
     public static List<Digits> digitsList(@NotNull ElixirBinaryWholeNumber binaryWholeNumber) {
-        return WholeNumberImpl.INSTANCE.digitsList(binaryWholeNumber);
+        return WholeNumberImpl.digitsList(binaryWholeNumber);
     }
 
     @NotNull
     public static List<Digits> digitsList(@NotNull ElixirDecimalWholeNumber decimalWholeNumber) {
-        return WholeNumberImpl.INSTANCE.digitsList(decimalWholeNumber);
+        return WholeNumberImpl.digitsList(decimalWholeNumber);
     }
 
     @NotNull static List<Digits> digitsList(@NotNull ElixirHexadecimalWholeNumber hexadecimalWholeNumber) {
-        return WholeNumberImpl.INSTANCE.digitsList(hexadecimalWholeNumber);
+        return WholeNumberImpl.digitsList(hexadecimalWholeNumber);
     }
 
     @NotNull
     public static List<Digits> digitsList(@NotNull ElixirOctalWholeNumber octalWholeNumber) {
-        return WholeNumberImpl.INSTANCE.digitsList(octalWholeNumber);
+        return WholeNumberImpl.digitsList(octalWholeNumber);
     }
 
     @NotNull
     public static List<Digits> digitsList(@NotNull ElixirUnknownBaseWholeNumber unknownBaseWholeNumber) {
-        return WholeNumberImpl.INSTANCE.digitsList(unknownBaseWholeNumber);
+        return WholeNumberImpl.digitsList(unknownBaseWholeNumber);
     }
 
     public static Document document(PsiElement element) {
@@ -487,20 +487,20 @@ public class ElixirPsiImplUtil {
     public static boolean isCalling(@NotNull final Call call,
                                     @NotNull final String resolvedModuleName,
                                     @NotNull final String functionName) {
-        return CallImpl.INSTANCE.isCalling(call, resolvedModuleName, functionName);
+        return CallImpl.isCalling(call, resolvedModuleName, functionName);
     }
 
     public static boolean isCalling(@NotNull final Call call,
                                     @NotNull final String resolvedModuleName,
                                     @NotNull final String functionName,
                                     final int resolvedFinalArity) {
-        return CallImpl.INSTANCE.isCalling(call, resolvedModuleName, functionName, resolvedFinalArity);
+        return CallImpl.isCalling(call, resolvedModuleName, functionName, resolvedFinalArity);
     }
 
     public static boolean isCallingMacro(@NotNull final Call call,
                                          @NotNull final String resolvedModuleName,
                                          @NotNull final String functionName) {
-        return CallImpl.INSTANCE.isCallingMacro(call, resolvedModuleName, functionName);
+        return CallImpl.isCallingMacro(call, resolvedModuleName, functionName);
     }
 
     @Contract(pure = true)
@@ -508,7 +508,7 @@ public class ElixirPsiImplUtil {
                                          @NotNull final String resolvedModuleName,
                                          @NotNull final  String functionName,
                                          final int resolvedFinalArity) {
-        return CallImpl.INSTANCE.isCallingMacro(call, resolvedModuleName, functionName, resolvedFinalArity);
+        return CallImpl.isCallingMacro(call, resolvedModuleName, functionName, resolvedFinalArity);
     }
 
     public static boolean isDeclaringScope(@NotNull final ElixirStabOperation stabOperation) {
@@ -801,37 +801,37 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true, value = "_ -> null")
     @Nullable
     public static String moduleName(@NotNull AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
-        return CallImpl.INSTANCE.moduleName(atUnqualifiedNoParenthesesCall);
+        return CallImpl.moduleName(atUnqualifiedNoParenthesesCall);
     }
 
     @Contract(pure = true, value = "_ -> null")
     @Nullable
     public static String moduleName(@NotNull DotCall dotCall) {
-        return CallImpl.INSTANCE.moduleName(dotCall);
+        return CallImpl.moduleName(dotCall);
     }
 
     @Contract(pure = true, value = "_ -> null")
     @Nullable
     public static String moduleName(@NotNull NotIn notIn) {
-        return CallImpl.INSTANCE.moduleName(notIn);
+        return CallImpl.moduleName(notIn);
     }
 
     @Contract(pure = true, value = "_ -> null")
     @Nullable
     public static String moduleName(@NotNull Operation operation) {
-        return CallImpl.INSTANCE.moduleName(operation);
+        return CallImpl.moduleName(operation);
     }
 
     @Contract(pure = true, value = "_ -> null")
     @Nullable
     public static String moduleName(@NotNull Unqualified unqualified) {
-        return CallImpl.INSTANCE.moduleName(unqualified);
+        return CallImpl.moduleName(unqualified);
     }
 
     @Contract(pure = true)
     @NotNull
     public static String moduleName(@NotNull final Qualified qualified) {
-        return CallImpl.INSTANCE.moduleName(qualified);
+        return CallImpl.moduleName(qualified);
     }
 
     private static GlobalSearchScope moduleWithDependentsScope(PsiElement element) {
@@ -1035,13 +1035,13 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static PsiElement[] primaryArguments(@NotNull final DotCall dotCall) {
-        return CallImpl.INSTANCE.primaryArguments(dotCall);
+        return CallImpl.primaryArguments(dotCall);
     }
 
     @Contract(pure = true)
     @NotNull
     public static PsiElement[] primaryArguments(@NotNull final Infix infix) {
-        return CallImpl.INSTANCE.primaryArguments(infix);
+        return CallImpl.primaryArguments(infix);
     }
 
     @Contract(pure = true)
@@ -1049,43 +1049,43 @@ public class ElixirPsiImplUtil {
     public static PsiElement[] primaryArguments(
             @NotNull final ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall
     ) {
-        return CallImpl.INSTANCE.primaryArguments(unqualifiedNoParenthesesManyArgumentsCall);
+        return CallImpl.primaryArguments(unqualifiedNoParenthesesManyArgumentsCall);
     }
 
     @Contract(pure = true)
     @Nullable
     public static PsiElement[] primaryArguments(@NotNull None none) {
-        return CallImpl.INSTANCE.primaryArguments(none);
+        return CallImpl.primaryArguments(none);
     }
 
     @Contract(pure = true)
     @NotNull
     public static PsiElement[] primaryArguments(@NotNull final NotIn notIn) {
-        return CallImpl.INSTANCE.primaryArguments(notIn);
+        return CallImpl.primaryArguments(notIn);
     }
 
     @Contract(pure = true)
     @NotNull
     public static PsiElement[] primaryArguments(@NotNull final NoParenthesesOneArgument noParenthesesOneArgument) {
-        return CallImpl.INSTANCE.primaryArguments(noParenthesesOneArgument);
+        return CallImpl.primaryArguments(noParenthesesOneArgument);
     }
 
     @Contract(pure = true)
     @NotNull
     public static PsiElement[] primaryArguments(@NotNull final Parentheses parentheses) {
-        return CallImpl.INSTANCE.primaryArguments(parentheses);
+        return CallImpl.primaryArguments(parentheses);
     }
 
     @Contract(pure = true)
     @NotNull
     public static PsiElement[] primaryArguments(@NotNull final Prefix prefix) {
-        return CallImpl.INSTANCE.primaryArguments(prefix);
+        return CallImpl.primaryArguments(prefix);
     }
 
     @Contract(pure = true)
     @Nullable
     public static Integer primaryArity(@NotNull final Call call) {
-        return CallImpl.INSTANCE.primaryArity(call);
+        return CallImpl.primaryArity(call);
     }
 
     /**
@@ -1336,109 +1336,109 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull AssociationOperation associationOperation) {
-        return INSTANCE.quote(associationOperation);
+        return QuotableImpl.quote(associationOperation);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull Infix infix) {
-        return INSTANCE.quote(infix);
+        return QuotableImpl.quote(infix);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull NotIn notIn) {
-        return INSTANCE.quote(notIn);
+        return QuotableImpl.quote(notIn);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull ElixirBitString bitString) {
-        return INSTANCE.quote(bitString);
+        return QuotableImpl.quote(bitString);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull ElixirBlockIdentifier blockIdentifier) {
-        return INSTANCE.quote(blockIdentifier);
+        return QuotableImpl.quote(blockIdentifier);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull ElixirBlockItem blockItem) {
-        return INSTANCE.quote(blockItem);
+        return QuotableImpl.quote(blockItem);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull ElixirBracketArguments bracketArguments) {
-        return INSTANCE.quote(bracketArguments);
+        return QuotableImpl.quote(bracketArguments);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull Digits digits) {
-        return INSTANCE.quote(digits);
+        return QuotableImpl.quote(digits);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull ElixirAccessExpression accessExpression) {
-        return INSTANCE.quote(accessExpression);
+        return QuotableImpl.quote(accessExpression);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull ElixirAlias alias) {
-        return INSTANCE.quote(alias);
+        return QuotableImpl.quote(alias);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull ElixirAnonymousFunction anonymousFunction) {
-        return INSTANCE.quote(anonymousFunction);
+        return QuotableImpl.quote(anonymousFunction);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull ElixirAssociations associations) {
-        return INSTANCE.quote(associations);
+        return QuotableImpl.quote(associations);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull ElixirAssociationsBase associationsBase) {
-        return INSTANCE.quote(associationsBase);
+        return QuotableImpl.quote(associationsBase);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull ElixirAtom atom) {
-        return INSTANCE.quote(atom);
+        return QuotableImpl.quote(atom);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull ElixirAtomKeyword atomKeyword) {
-        return INSTANCE.quote(atomKeyword);
+        return QuotableImpl.quote(atomKeyword);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull ElixirCharListLine charListLine) {
-        return INSTANCE.quote(charListLine);
+        return QuotableImpl.quote(charListLine);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull ElixirCharToken charToken) {
-        return INSTANCE.quote(charToken);
+        return QuotableImpl.quote(charToken);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull ElixirContainerAssociationOperation containerAssociationOperation) {
-        return INSTANCE.quote(containerAssociationOperation);
+        return QuotableImpl.quote(containerAssociationOperation);
     }
 
     /**
@@ -1812,7 +1812,7 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @Nullable
     public static String functionName(@NotNull final Call call) {
-        return CallImpl.INSTANCE.functionName(call);
+        return CallImpl.functionName(call);
     }
 
     @Contract(pure = true, value = "_ -> null")
@@ -1820,37 +1820,37 @@ public class ElixirPsiImplUtil {
     public static PsiElement functionNameElement(
             @NotNull final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall
     ) {
-        return CallImpl.INSTANCE.functionNameElement(atUnqualifiedNoParenthesesCall);
+        return CallImpl.functionNameElement(atUnqualifiedNoParenthesesCall);
     }
 
     @Contract(pure = true, value = "_ -> null")
     @Nullable
     public static PsiElement functionNameElement(@NotNull final DotCall dotCall) {
-        return CallImpl.INSTANCE.functionNameElement(dotCall);
+        return CallImpl.functionNameElement(dotCall);
     }
 
     @Contract(pure = true, value = "_ -> null")
     @Nullable
     public static PsiElement functionNameElement(@NotNull final NotIn notIn) {
-        return CallImpl.INSTANCE.functionNameElement(notIn);
+        return CallImpl.functionNameElement(notIn);
     }
 
     @Contract(pure = true)
     @NotNull
     public static PsiElement functionNameElement(@NotNull final Operation operation) {
-        return CallImpl.INSTANCE.functionNameElement(operation);
+        return CallImpl.functionNameElement(operation);
     }
 
     @Contract(pure = true)
     @NotNull
     public static PsiElement functionNameElement(@NotNull final Qualified qualified) {
-        return CallImpl.INSTANCE.functionNameElement(qualified);
+        return CallImpl.functionNameElement(qualified);
     }
 
     @Contract(pure = true)
     @NotNull
     public static PsiElement functionNameElement(@NotNull final Unqualified unqualified) {
-        return CallImpl.INSTANCE.functionNameElement(unqualified);
+        return CallImpl.functionNameElement(unqualified);
     }
 
     public static Body getBody(ElixirCharListHeredocLine charListHeredocLine) {
@@ -1955,24 +1955,24 @@ public class ElixirPsiImplUtil {
     public static ElixirDoBlock getDoBlock(
             @NotNull ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall
     ) {
-        return CallImpl.INSTANCE.getDoBlock(unqualifiedNoParenthesesManyArgumentsCall);
+        return CallImpl.getDoBlock(unqualifiedNoParenthesesManyArgumentsCall);
     }
 
     @Contract(pure = true, value = "_ -> null")
     @Nullable
     public static ElixirDoBlock getDoBlock(@NotNull NotIn notIn) {
-        return CallImpl.INSTANCE.getDoBlock(notIn);
+        return CallImpl.getDoBlock(notIn);
     }
 
     @Contract(pure = true, value = "_ -> null")
     @Nullable
     public static ElixirDoBlock getDoBlock(@NotNull Operation operation) {
-        return CallImpl.INSTANCE.getDoBlock(operation);
+        return CallImpl.getDoBlock(operation);
     }
 
     @Nullable
     public static ElixirDoBlock getDoBlock(@NotNull MatchedCall matchedCall) {
-        return CallImpl.INSTANCE.getDoBlock(matchedCall);
+        return CallImpl.getDoBlock(matchedCall);
     }
 
     public static IElementType getFragmentType(@SuppressWarnings("unused") CharListFragmented charListFragmented) {
@@ -2554,11 +2554,11 @@ public class ElixirPsiImplUtil {
     }
 
     public static boolean hasDoBlockOrKeyword(@NotNull final Call call) {
-        return CallImpl.INSTANCE.hasDoBlockOrKeyword(call);
+        return CallImpl.hasDoBlockOrKeyword(call);
     }
 
     public static boolean hasDoBlockOrKeyword(@NotNull final StubBased<Stub> stubBased) {
-        return CallImpl.INSTANCE.hasDoBlockOrKeyword(stubBased);
+        return CallImpl.hasDoBlockOrKeyword(stubBased);
     }
 
     public static boolean hasKeywordKey(@NotNull QuotableKeywordPair quotableKeywordPair, @NotNull String keywordKeyText) {
@@ -2598,23 +2598,23 @@ public class ElixirPsiImplUtil {
 
     @NotNull
     public static OtpErlangObject quote(@NotNull ElixirDecimalFloat decimalFloat) {
-       return INSTANCE.quote(decimalFloat);
+       return QuotableImpl.quote(decimalFloat);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull ElixirEmptyParentheses emptyParentheses) {
-        return INSTANCE.quote(emptyParentheses);
+        return QuotableImpl.quote(emptyParentheses);
     }
 
     public static OtpErlangObject quote(@NotNull ElixirFile file) {
-        return INSTANCE.quote(file);
+        return QuotableImpl.quote(file);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final WholeNumber wholeNumber) {
-        return INSTANCE.quote(wholeNumber);
+        return QuotableImpl.quote(wholeNumber);
     }
 
     @Contract(pure = true)
@@ -2656,10 +2656,10 @@ public class ElixirPsiImplUtil {
             String atomText = ((OtpErlangString) quoted).stringValue();
             quotedAsAtom = new OtpErlangAtom(atomText);
         } else {
-            quotedAsAtom = INSTANCE.quotedFunctionCall(
+            quotedAsAtom = quotedFunctionCall(
                     "erlang",
                     "binary_to_atom",
-                    INSTANCE.metadata(stringLine),
+                    metadata(stringLine),
                     quoted,
                     UTF_8
             );
@@ -2671,133 +2671,133 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirIdentifier identifier) {
-        return INSTANCE.quote(identifier);
+        return QuotableImpl.quote(identifier);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirInterpolation interpolation) {
-        return INSTANCE.quote(interpolation);
+        return QuotableImpl.quote(interpolation);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(ElixirRelativeIdentifier relativeIdentifier) {
-        return INSTANCE.quote(relativeIdentifier);
+        return QuotableImpl.quote(relativeIdentifier);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(ElixirSigilModifiers sigilModifiers) {
-        return INSTANCE.quote(sigilModifiers);
+        return QuotableImpl.quote(sigilModifiers);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(ElixirStab stab) {
-        return INSTANCE.quote(stab);
+        return QuotableImpl.quote(stab);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirStabBody stabBody) {
-        return INSTANCE.quote(stabBody);
+        return QuotableImpl.quote(stabBody);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirStabNoParenthesesSignature stabNoParenthesesSignature) {
-        return INSTANCE.quote(stabNoParenthesesSignature);
+        return QuotableImpl.quote(stabNoParenthesesSignature);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(ElixirStabOperation stabOperation) {
-        return INSTANCE.quote(stabOperation);
+        return QuotableImpl.quote(stabOperation);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirStabParenthesesSignature stabParenthesesSignature) {
-        return INSTANCE.quote(stabParenthesesSignature);
+        return QuotableImpl.quote(stabParenthesesSignature);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirStringLine stringLine) {
-        return INSTANCE.quote(stringLine);
+        return QuotableImpl.quote(stringLine);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirStructOperation structOperation) {
-        return INSTANCE.quote(structOperation);
+        return QuotableImpl.quote(structOperation);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirTuple tuple) {
-        return INSTANCE.quote(tuple);
+        return QuotableImpl.quote(tuple);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final Heredoc heredoc) {
-        return INSTANCE.quote(heredoc);
+        return QuotableImpl.quote(heredoc);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final HeredocLine heredocLine, @NotNull final Heredoc heredoc, int prefixLength) {
-        return INSTANCE.quote(heredocLine, heredoc, prefixLength);
+        return QuotableImpl.quote(heredocLine, heredoc, prefixLength);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final QuotableKeywordList quotableKeywordList) {
-        return INSTANCE.quote(quotableKeywordList);
+        return QuotableImpl.quote(quotableKeywordList);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final QuotableKeywordPair quotableKeywordPair) {
-        return INSTANCE.quote(quotableKeywordPair);
+        return QuotableImpl.quote(quotableKeywordPair);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirKeywordKey keywordKey) {
-        return INSTANCE.quote(keywordKey);
+        return QuotableImpl.quote(keywordKey);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirList list) {
-        return INSTANCE.quote(list);
+        return QuotableImpl.quote(list);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirMapArguments mapArguments) {
-        return INSTANCE.quote(mapArguments);
+        return QuotableImpl.quote(mapArguments);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirMapOperation mapOperation) {
-        return INSTANCE.quote(mapOperation);
+        return QuotableImpl.quote(mapOperation);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirMapUpdateArguments mapUpdateArguments) {
-        return INSTANCE.quote(mapUpdateArguments);
+        return QuotableImpl.quote(mapUpdateArguments);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull ElixirMultipleAliases multipleAliases) {
-        return INSTANCE.quote(multipleAliases);
+        return QuotableImpl.quote(multipleAliases);
     }
 
     @Contract(pure = true)
@@ -2806,84 +2806,84 @@ public class ElixirPsiImplUtil {
             @NotNull
                     ElixirNoParenthesesManyStrictNoParenthesesExpression noParenthesesManyStrictNoParenthesesExpression
     ) {
-        return INSTANCE.quote(noParenthesesManyStrictNoParenthesesExpression);
+        return QuotableImpl.quote(noParenthesesManyStrictNoParenthesesExpression);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull AtNumericBracketOperation atUnqualifiedBracketOperation) {
-        return INSTANCE.quote(atUnqualifiedBracketOperation);
+        return QuotableImpl.quote(atUnqualifiedBracketOperation);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull AtUnqualifiedBracketOperation atUnqualifiedBracketOperation) {
-        return INSTANCE.quote(atUnqualifiedBracketOperation);
+        return QuotableImpl.quote(atUnqualifiedBracketOperation);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
-        return INSTANCE.quote(atUnqualifiedNoParenthesesCall);
+        return QuotableImpl.quote(atUnqualifiedNoParenthesesCall);
     }
 
     @NotNull
     public static OtpErlangObject quote(@NotNull BracketOperation bracketOperation) {
-        return INSTANCE.quote(bracketOperation);
+        return QuotableImpl.quote(bracketOperation);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull DotCall dotCall) {
-        return INSTANCE.quote(dotCall);
+        return QuotableImpl.quote(dotCall);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull In in) {
-        return INSTANCE.quote(in);
+        return QuotableImpl.quote(in);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull QualifiedAlias qualifiedAlias) {
-        return INSTANCE.quote(qualifiedAlias);
+        return QuotableImpl.quote(qualifiedAlias);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull QualifiedMultipleAliases qualifiedMultipleAliases) {
-        return INSTANCE.quote(qualifiedMultipleAliases);
+        return QuotableImpl.quote(qualifiedMultipleAliases);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull QualifiedBracketOperation qualifiedBracketOperation) {
-        return INSTANCE.quote(qualifiedBracketOperation);
+        return QuotableImpl.quote(qualifiedBracketOperation);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull QualifiedNoArgumentsCall qualifiedNoArgumentsCall) {
-        return INSTANCE.quote(qualifiedNoArgumentsCall);
+        return QuotableImpl.quote(qualifiedNoArgumentsCall);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull QualifiedNoParenthesesCall qualifiedNoParenthesesCall) {
-        return INSTANCE.quote(qualifiedNoParenthesesCall);
+        return QuotableImpl.quote(qualifiedNoParenthesesCall);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull QualifiedParenthesesCall qualifiedParenthesesCall) {
-        return INSTANCE.quote(qualifiedParenthesesCall);
+        return QuotableImpl.quote(qualifiedParenthesesCall);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull UnqualifiedBracketOperation unqualifiedBracketOperation) {
-        return INSTANCE.quote(unqualifiedBracketOperation);
+        return QuotableImpl.quote(unqualifiedBracketOperation);
     }
 
     /* Replaces `nil` argument in variables with the quoted ElixirMatchdNotParenthesesArguments.
@@ -2892,55 +2892,55 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
-        return INSTANCE.quote(unqualifiedNoParenthesesCall);
+        return QuotableImpl.quote(unqualifiedNoParenthesesCall);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final UnqualifiedNoArgumentsCall unqualifiedNoArgumentsCall) {
-        return INSTANCE.quote(unqualifiedNoArgumentsCall);
+        return QuotableImpl.quote(unqualifiedNoArgumentsCall);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final UnqualifiedParenthesesCall unqualifiedParenthesesCall) {
-        return INSTANCE.quote(unqualifiedParenthesesCall);
+        return QuotableImpl.quote(unqualifiedParenthesesCall);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirParentheticalStab parentheticalStab) {
-        return INSTANCE.quote(parentheticalStab);
+        return QuotableImpl.quote(parentheticalStab);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirVariable variable) {
-        return INSTANCE.quote(variable);
+        return QuotableImpl.quote(variable);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(Operator operator) {
-        return INSTANCE.quote(operator);
+        return QuotableImpl.quote(operator);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(Prefix prefix) {
-        return INSTANCE.quote(prefix);
+        return QuotableImpl.quote(prefix);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(PsiElement[] children) {
-        return INSTANCE.quote(children);
+        return QuotableImpl.quote(children);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(PsiFile file) {
-        return INSTANCE.quote(file);
+        return QuotableImpl.quote(file);
     }
 
     @Contract(pure = true)
@@ -2949,19 +2949,19 @@ public class ElixirPsiImplUtil {
             @NotNull
                     ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall
     ) {
-        return INSTANCE.quote(unqualifiedNoParenthesesManyArgumentsCall);
+        return QuotableImpl.quote(unqualifiedNoParenthesesManyArgumentsCall);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(SigilHeredoc sigilHeredoc) {
-        return INSTANCE.quote(sigilHeredoc);
+        return QuotableImpl.quote(sigilHeredoc);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(SigilLine sigilLine) {
-        return INSTANCE.quote(sigilLine);
+        return QuotableImpl.quote(sigilLine);
     }
 
     @Contract(pure = true)
@@ -3109,19 +3109,19 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static int resolvedFinalArity(@NotNull Call call) {
-        return CallImpl.INSTANCE.resolvedFinalArity(call);
+        return CallImpl.resolvedFinalArity(call);
     }
 
     @Contract(pure = true)
     @NotNull
     public static int resolvedFinalArity(@NotNull org.elixir_lang.psi.call.StubBased<Stub> stubBased) {
-        return CallImpl.INSTANCE.resolvedFinalArity(stubBased);
+        return CallImpl.resolvedFinalArity(stubBased);
     }
 
     @Contract(pure = true)
     @NotNull
     public static IntRange resolvedFinalArityRange(@NotNull Call call) {
-        return CallImpl.INSTANCE.resolvedFinalArityRange(call);
+        return CallImpl.resolvedFinalArityRange(call);
     }
 
     /**
@@ -3193,59 +3193,59 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true, value = "_ -> null")
     @Nullable
     public static String resolvedModuleName(@NotNull AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
-        return CallImpl.INSTANCE.resolvedModuleName(atUnqualifiedNoParenthesesCall);
+        return CallImpl.resolvedModuleName(atUnqualifiedNoParenthesesCall);
     }
 
     @Contract(pure = true, value = "_ -> null")
     @Nullable
     public static String resolvedModuleName(@NotNull DotCall dotCall) {
-        return CallImpl.INSTANCE.resolvedModuleName(dotCall);
+        return CallImpl.resolvedModuleName(dotCall);
     }
 
     @Contract(pure = true)
     @NotNull
     public static String resolvedModuleName(@NotNull Infix infix) {
-        return CallImpl.INSTANCE.resolvedModuleName(infix);
+        return CallImpl.resolvedModuleName(infix);
     }
 
     @Contract(pure = true)
     @NotNull
     public static String resolvedModuleName(@NotNull NotIn notIn) {
-        return CallImpl.INSTANCE.resolvedModuleName(notIn);
+        return CallImpl.resolvedModuleName(notIn);
     }
 
     @Contract(pure = true)
     @NotNull
     public static String resolvedModuleName(@NotNull Prefix prefix) {
-        return CallImpl.INSTANCE.resolvedModuleName(prefix);
+        return CallImpl.resolvedModuleName(prefix);
     }
 
     @NotNull
     public static String resolvedModuleName(@NotNull org.elixir_lang.psi.call.qualification.Qualified qualified) {
-        return CallImpl.INSTANCE.resolvedModuleName(qualified);
+        return CallImpl.resolvedModuleName(qualified);
     }
 
     @NotNull
     public static String resolvedModuleName(@NotNull Unqualified unqualified) {
-        return CallImpl.INSTANCE.resolvedModuleName(unqualified);
+        return CallImpl.resolvedModuleName(unqualified);
     }
 
     @Contract(pure = true)
     @NotNull
     public static String resolvedModuleName(@NotNull UnqualifiedNoArgumentsCall unqualifiedNoArgumentsCall) {
-        return CallImpl.INSTANCE.resolvedModuleName(unqualifiedNoArgumentsCall);
+        return CallImpl.resolvedModuleName(unqualifiedNoArgumentsCall);
     }
 
     @Contract(pure = true)
     @Nullable
     public static Integer resolvedPrimaryArity(@NotNull Call call) {
-        return CallImpl.INSTANCE.resolvedPrimaryArity(call);
+        return CallImpl.resolvedPrimaryArity(call);
     }
 
     @Contract(pure = true)
     @Nullable
     public static Integer resolvedSecondaryArity(@NotNull Call call) {
-        return CallImpl.INSTANCE.resolvedSecondaryArity(call);
+        return CallImpl.resolvedSecondaryArity(call);
     }
 
     @Contract(pure = true)
@@ -3269,49 +3269,49 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @Nullable
     public static PsiElement[] secondaryArguments(@NotNull DotCall dotCall) {
-        return CallImpl.INSTANCE.secondaryArguments(dotCall);
+        return CallImpl.secondaryArguments(dotCall);
     }
 
     @Contract(pure = true)
     @Nullable
     public static PsiElement[] secondaryArguments(@NotNull Infix infix) {
-        return CallImpl.INSTANCE.secondaryArguments(infix);
+        return CallImpl.secondaryArguments(infix);
     }
 
     @Contract(pure = true, value = "_ -> null")
     @Nullable
     public static PsiElement[] secondaryArguments(@NotNull None none) {
-        return CallImpl.INSTANCE.secondaryArguments(none);
+        return CallImpl.secondaryArguments(none);
     }
 
     @Contract(pure = true)
     @Nullable
     public static PsiElement[] secondaryArguments(@NotNull NotIn notIn) {
-        return CallImpl.INSTANCE.secondaryArguments(notIn);
+        return CallImpl.secondaryArguments(notIn);
     }
 
     @Contract(pure = true, value = "_ -> null")
     @Nullable
     public static PsiElement[] secondaryArguments(@NotNull NoParentheses noParentheses) {
-        return CallImpl.INSTANCE.secondaryArguments(noParentheses);
+        return CallImpl.secondaryArguments(noParentheses);
     }
 
     @Contract(pure = true)
     @Nullable
     public static PsiElement[] secondaryArguments(@NotNull Parentheses parentheses) {
-        return CallImpl.INSTANCE.secondaryArguments(parentheses);
+        return CallImpl.secondaryArguments(parentheses);
     }
 
     @Contract(pure = true, value = "_ -> null")
     @Nullable
     public static PsiElement[] secondaryArguments(@NotNull Prefix prefix) {
-        return CallImpl.INSTANCE.secondaryArguments(prefix);
+        return CallImpl.secondaryArguments(prefix);
     }
 
     @Contract(pure = true)
     @Nullable
     public static Integer secondaryArity(@NotNull Call call) {
-        return CallImpl.INSTANCE.secondaryArity(call);
+        return CallImpl.secondaryArity(call);
     }
 
     @NotNull
@@ -3471,7 +3471,7 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull Sigil sigil, @NotNull OtpErlangObject quotedContent) {
-        return INSTANCE.quote(sigil, quotedContent);
+        return QuotableImpl.quote(sigil, quotedContent);
     }
 
     @NotNull

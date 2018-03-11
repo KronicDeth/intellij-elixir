@@ -24,6 +24,7 @@ import java.util.*
 
 object CallImpl {
     @Contract(pure = true)
+    @JvmStatic
     fun functionName(call: Call): String? =
             call.functionNameElement()?.let { element ->
                 computeReadAction(Computable<String> { element.text })
@@ -34,6 +35,7 @@ object CallImpl {
      * Module attribute.
      */
     @Contract(pure = true, value = "_ -> null")
+    @JvmStatic
     fun functionNameElement(
             @Suppress("UNUSED_PARAMETER") atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>
     ): PsiElement? = null
@@ -42,20 +44,26 @@ object CallImpl {
      * @return `null` because the expression before the `.` is a variable name and not a function name.
      */
     @Contract(pure = true, value = "_ -> null")
+    @JvmStatic
     fun functionNameElement(@Suppress("UNUSED_PARAMETER") dotCall: DotCall<*>): PsiElement? = null
 
     @Contract(pure = true, value = "_ -> null")
+    @JvmStatic
     fun functionNameElement(@Suppress("UNUSED_PARAMETER") notIn: NotIn): PsiElement? = null
 
     @Contract(pure = true)
+    @JvmStatic
     fun functionNameElement(operation: Operation): PsiElement = operation.operator()
 
+    @JvmStatic
     fun functionNameElement(qualified: Qualified): PsiElement = qualified.relativeIdentifier
 
     @Contract(pure = true)
+    @JvmStatic
     fun functionNameElement(unqualified: Unqualified): PsiElement = unqualified.firstChild
 
     @Contract(pure = true, value = "_ -> null")
+    @JvmStatic
     fun getDoBlock(
             @Suppress("UNUSED_PARAMETER")
             unqualifiedNoParenthesesManyArgumentsCall: ElixirUnqualifiedNoParenthesesManyArgumentsCall
@@ -63,17 +71,22 @@ object CallImpl {
             null
 
     @Contract(pure = true, value = "_ -> null")
+    @JvmStatic
     fun getDoBlock(@Suppress("UNUSED_PARAMETER") notIn: NotIn): ElixirDoBlock? = null
 
     @Contract(pure = true, value = "_ -> null")
+    @JvmStatic
     fun getDoBlock(@Suppress("UNUSED_PARAMETER") operation: Operation): ElixirDoBlock? = null
 
     @Contract(pure = true)
+    @JvmStatic
     fun getDoBlock(@Suppress("UNUSED_PARAMETER") matchedCall: MatchedCall): ElixirDoBlock? = null
 
+    @JvmStatic
     fun hasDoBlockOrKeyword(call: Call): Boolean =
             call.doBlock != null || keywordArgument(call, "do") != null
 
+    @JvmStatic
     fun hasDoBlockOrKeyword(stubBased: StubBased<Stub<*>>): Boolean =
             stubBased.stub?.hasDoBlockOrKeyword() ?: hasDoBlockOrKeyword(stubBased as Call)
 
@@ -87,6 +100,7 @@ object CallImpl {
      * `resolvedModuleName` and has non-`null` [Call.functionName] that equals
      * `functionName`; otherwise, `false`.
      */
+    @JvmStatic
     fun isCalling(call: Call,
                   resolvedModuleName: String,
                   functionName: String): Boolean {
@@ -109,6 +123,7 @@ object CallImpl {
      * `resolvedModuleName` and has non-`null` [Call.functionName] that equals
      * `functionName` and the [Call.resolvedFinalArity]; otherwise, `false`.
      */
+    @JvmStatic
     fun isCalling(call: Call,
                   resolvedModuleName: String,
                   functionName: String,
@@ -128,6 +143,7 @@ object CallImpl {
      * @param functionName       the expected [Call.functionName]
      * @return `true` if all arguments match and [Call.getDoBlock] is not `null`; `false`.
      */
+    @JvmStatic
     fun isCallingMacro(call: Call,
                        resolvedModuleName: String,
                        functionName: String): Boolean =
@@ -148,6 +164,7 @@ object CallImpl {
      * @return `true` if all arguments match and [Call.getDoBlock] is not `null`; `false`.
      */
     @Contract(pure = true)
+    @JvmStatic
     fun isCallingMacro(call: Call,
                        resolvedModuleName: String,
                        functionName: String,
@@ -155,6 +172,7 @@ object CallImpl {
             call.isCalling(resolvedModuleName, functionName, resolvedFinalArity) && call.hasDoBlockOrKeyword()
 
     @Contract(pure = true, value = "_ -> null")
+    @JvmStatic
     fun moduleName(@Suppress("UNUSED_PARAMETER")
                    atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>): String? =
             // Always null because it's unqualified.
@@ -162,27 +180,34 @@ object CallImpl {
 
     // Always null because anonymous
     @Contract(pure = true, value = "_ -> null")
+    @JvmStatic
     fun moduleName(@Suppress("UNUSED_PARAMETER") dotCall: DotCall<*>): String? = null
 
     // Always null because it's unqualified.
     @Contract(pure = true, value = "_ -> null")
+    @JvmStatic
     fun moduleName(@Suppress("UNUSED_PARAMETER") notIn: NotIn): String? = null
 
     @Contract(pure = true, value = "_ -> null")
+    @JvmStatic
     fun moduleName(@Suppress("UNUSED_PARAMETER") operation: Operation): String? = null
 
     // Always null because it's unqualified.
     @Contract(pure = true, value = "_ -> null")
+    @JvmStatic
     fun moduleName(@Suppress("UNUSED_PARAMETER") unqualified: Unqualified): String? = null
 
     // TODO handle more complex qualifiers besides Aliases
     @Contract(pure = true)
+    @JvmStatic
     fun moduleName(qualified: Qualified): String = computeReadAction(Computable<String> { qualified.firstChild.text })
 
     @Contract(pure = true)
+    @JvmStatic
     fun primaryArguments(dotCall: DotCall<*>): Array<PsiElement> = dotCall.parenthesesArgumentsList[0].arguments()
 
     @Contract(pure = true)
+    @JvmStatic
     fun primaryArguments(infix: Infix): Array<PsiElement?> {
         val children = infix.children
         val operatorIndex = Normalized.operatorIndex(children)
@@ -193,6 +218,7 @@ object CallImpl {
     }
 
     @Contract(pure = true)
+    @JvmStatic
     fun primaryArguments(unqualifiedNoParenthesesManyArgumentsCall: ElixirUnqualifiedNoParenthesesManyArgumentsCall): Array<PsiElement> {
         val arguments = unqualifiedNoParenthesesManyArgumentsCall.noParenthesesStrict
 
@@ -211,9 +237,11 @@ object CallImpl {
     }
 
     @Contract(pure = true)
+    @JvmStatic
     fun primaryArguments(@Suppress("UNUSED_PARAMETER") none: None): Array<PsiElement>? = null
 
     @Contract(pure = true)
+    @JvmStatic
     fun primaryArguments(notIn: NotIn): Array<PsiElement?> {
         val children = notIn.children
         val leftOperand = org.elixir_lang.psi.operation.not_in.Normalized.leftOperand(children)
@@ -223,10 +251,12 @@ object CallImpl {
     }
 
     @Contract(pure = true)
+    @JvmStatic
     fun primaryArguments(noParenthesesOneArgument: NoParenthesesOneArgument): Array<PsiElement> =
             noParenthesesOneArgument.noParenthesesOneArgument.arguments()
 
     @Contract(pure = true)
+    @JvmStatic
     fun primaryArguments(parentheses: Parentheses): Array<PsiElement> {
         val matchedParenthesesArguments = parentheses.matchedParenthesesArguments
         val parenthesesArgumentsList = matchedParenthesesArguments.parenthesesArgumentsList
@@ -236,12 +266,15 @@ object CallImpl {
     }
 
     @Contract(pure = true)
+    @JvmStatic
     fun primaryArguments(prefix: Prefix): Array<PsiElement?> = arrayOf(prefix.operand())
 
     @Contract(pure = true)
+    @JvmStatic
     fun primaryArity(call: Call): Int? = call.primaryArguments()?.size
 
     @Contract(pure = true)
+    @JvmStatic
     fun secondaryArguments(dotCall: DotCall<*>): Array<PsiElement>? {
         val parenthesesArgumentsList = dotCall.parenthesesArgumentsList
 
@@ -254,18 +287,23 @@ object CallImpl {
     }
 
     @Contract(pure = true)
+    @JvmStatic
     fun secondaryArguments(@Suppress("UNUSED_PARAMETER") infix: Infix): Array<PsiElement>? = null
 
     @Contract(pure = true, value = "_ -> null")
+    @JvmStatic
     fun secondaryArguments(@Suppress("UNUSED_PARAMETER") none: None): Array<PsiElement>? = null
 
     @Contract(pure = true)
+    @JvmStatic
     fun secondaryArguments(@Suppress("UNUSED_PARAMETER") notIn: NotIn): Array<PsiElement>? = null
 
     @Contract(pure = true, value = "_ -> null")
+    @JvmStatic
     fun secondaryArguments(@Suppress("UNUSED_PARAMETER") noParentheses: NoParentheses): Array<PsiElement>? = null
 
     @Contract(pure = true)
+    @JvmStatic
     fun secondaryArguments(parentheses: Parentheses): Array<PsiElement>? {
         val matchedParenthesesArguments = parentheses.matchedParenthesesArguments
         val parenthesesArgumentsList = matchedParenthesesArguments.parenthesesArgumentsList
@@ -279,48 +317,59 @@ object CallImpl {
     }
 
     @Contract(pure = true, value = "_ -> null")
+    @JvmStatic
     fun secondaryArguments(@Suppress("UNUSED_PARAMETER") prefix: Prefix): Array<PsiElement>? = null
 
     @Contract(pure = true)
+    @JvmStatic
     fun secondaryArity(call: Call): Int? = call.secondaryArguments()?.size
 
     // TODO handle resolving module name from module attribute's declaration
     @Contract(pure = true, value = "_ -> null")
+    @JvmStatic
     fun resolvedModuleName(
             @Suppress("UNUSED_PARAMETER") atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>
     ): String? = null
 
     // TODO handle resolving module name from any capture from variable declaration
     @Contract(pure = true, value = "_ -> null")
+    @JvmStatic
     fun resolvedModuleName(@Suppress("UNUSED_PARAMETER") dotCall: DotCall<*>): String? = null
 
     /* TODO handle resolving module name from imports.  Assume KERNEL for now, but some are actually from Bitwise */
     @Contract(pure = true)
+    @JvmStatic
     fun resolvedModuleName(@Suppress("UNUSED_PARAMETER") infix: Infix): String = KERNEL
 
     @Contract(pure = true)
+    @JvmStatic
     fun resolvedModuleName(@Suppress("UNUSED_PARAMETER") notIn: NotIn): String = KERNEL
 
     /* TODO handle resolving module name from imports.  Assume KERNEL for now. */
     @Contract(pure = true)
+    @JvmStatic
     fun resolvedModuleName(@Suppress("UNUSED_PARAMETER") prefix: Prefix): String = KERNEL
 
     @Suppress("UNCHECKED_CAST")
+    @JvmStatic
     fun resolvedModuleName(qualified: org.elixir_lang.psi.call.qualification.Qualified): String? =
         (qualified as? org.elixir_lang.psi.call.StubBased<Stub<*>>)?.stub?.resolvedFunctionName() ?:
         stripElixirPrefix(qualified.moduleName())
 
     @Suppress("UNCHECKED_CAST")
+    @JvmStatic
     fun resolvedModuleName(unqualified: Unqualified): String? =
         (unqualified as? org.elixir_lang.psi.call.StubBased<Stub<*>>)?.stub?.resolvedModuleName() ?: KERNEL
 
     // TODO handle `import`s and determine whether actually a local variable
     @Contract(pure = true)
+    @JvmStatic
     fun resolvedModuleName(
             @Suppress("UNUSED_PARAMETER") unqualifiedNoArgumentsCall: UnqualifiedNoArgumentsCall<*>
     ): String = KERNEL
 
     @Contract(pure = true)
+    @JvmStatic
     fun resolvedPrimaryArity(call: Call): Int? {
         val primaryArity = call.primaryArity()
         var resolvedPrimaryArity = primaryArity
@@ -360,13 +409,16 @@ object CallImpl {
     }
 
     @Contract(pure = true)
+    @JvmStatic
     fun resolvedFinalArity(call: Call): Int = call.resolvedSecondaryArity() ?: call.resolvedPrimaryArity() ?: 0
 
     @Contract(pure = true)
+    @JvmStatic
     fun resolvedFinalArity(stubBased: org.elixir_lang.psi.call.StubBased<Stub<*>>): Int =
             stubBased.stub?.resolvedFinalArity() ?: resolvedFinalArity(stubBased as Call) ?: 0
 
     @Contract(pure = true)
+    @JvmStatic
     fun resolvedFinalArityRange(call: Call): IntRange =
             ElixirPsiImplUtil.finalArguments(call)?.let { finalArguments ->
                 val defaultCount = defaultArgumentCount(finalArguments)
@@ -376,6 +428,7 @@ object CallImpl {
             } ?: IntRange(0)
 
     @Contract(pure = true)
+    @JvmStatic
     fun resolvedSecondaryArity(call: Call): Int? =
         call.secondaryArity()?.let { secondaryArity ->
             if (call.doBlock != null) {
