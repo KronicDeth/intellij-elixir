@@ -10,7 +10,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.ElixirFileType;
 import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.psi.call.StubBased;
-import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
+import org.elixir_lang.psi.impl.ProcessDeclarationsImpl;
 import org.elixir_lang.structure_view.element.modular.Implementation;
 import org.elixir_lang.structure_view.element.modular.Module;
 import org.elixir_lang.structure_view.element.modular.Protocol;
@@ -49,13 +49,7 @@ public class ElixirFile extends PsiFileBase implements ModuleOwner {
                                        @NotNull ResolveState state,
                                        PsiElement lastParent,
                                        @NotNull PsiElement place) {
-        boolean keepProcessing = ElixirPsiImplUtil.processDeclarationsInPreviousSibling(this, processor, state, lastParent, place);
-
-        if (keepProcessing) {
-            processor.execute(this, state);
-        }
-
-        return keepProcessing;
+        return ProcessDeclarationsImpl.processDeclarations(this, processor, state, lastParent, place);
     }
 
     /**

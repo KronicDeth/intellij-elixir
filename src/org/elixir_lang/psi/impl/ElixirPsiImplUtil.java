@@ -81,7 +81,6 @@ public class ElixirPsiImplUtil {
     };
 
     public static final OtpErlangAtom BLOCK = new OtpErlangAtom("__block__");
-    public static final Key<Boolean> DECLARING_SCOPE = new Key<Boolean>("DECLARING_SCOPE");
     public static final String DEFAULT_OPERATOR = "\\\\";
     public static final OtpErlangAtom DO = new OtpErlangAtom("do");
     public static final Key<PsiElement> ENTRANCE = new Key<PsiElement>("ENTRANCE");
@@ -295,15 +294,6 @@ public class ElixirPsiImplUtil {
         return useScopeSelector;
     }
 
-    /**
-     * @see <a href="https://elixir-lang.readthedocs.io/en/latest/technical/scoping.html">Elixir Scoping</a>
-     * @see <a href="https://github.com/alco/elixir/wiki/Scoping-Rules-in-Elixir-(and-Erlang)#scopes-that-change-the-existing-binding">Scoping Rules in Elixir (and Erlang)</a>
-     */
-    public static boolean createsNewScope(@NotNull PsiElement element) {
-        return useScopeSelector(element) == UseScopeSelector.SELF;
-    }
-
-
     @Nullable
     public static String definedModuleName(@NotNull final ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall) {
         PsiElement[] arguments = unmatchedUnqualifiedNoParenthesesCall.primaryArguments();
@@ -311,8 +301,6 @@ public class ElixirPsiImplUtil {
 
         if (arguments.length > 1) {
             PsiElement argument = arguments[0];
-
-
         }
 
         return definedModuleName;
@@ -481,36 +469,6 @@ public class ElixirPsiImplUtil {
                                          @NotNull final  String functionName,
                                          final int resolvedFinalArity) {
         return CallImpl.isCallingMacro(call, resolvedModuleName, functionName, resolvedFinalArity);
-    }
-
-    public static boolean isDeclaringScope(@NotNull final ElixirStabOperation stabOperation) {
-        boolean declaringScope = true;
-        PsiElement parent = stabOperation.getParent();
-
-        if (parent instanceof ElixirStab) {
-            PsiElement grandParent = parent.getParent();
-
-            if (grandParent instanceof ElixirBlockItem) {
-                ElixirBlockItem blockItem = (ElixirBlockItem) grandParent;
-                ElixirBlockIdentifier blockIdentifier = blockItem.getBlockIdentifier();
-
-                String blockIdentifierText = blockIdentifier.getText();
-
-                /* `after` is not a declaring scope because the timeout value does not need to be pinned even though it
-                    must be a literal or declared in an outer scope */
-                if (blockIdentifierText.equals("after")) {
-                    declaringScope = false;
-                }
-            } else if (grandParent instanceof ElixirDoBlock) {
-                Call call = (Call) grandParent.getParent();
-
-                if (call.isCalling(KERNEL, COND)) {
-                    declaringScope = false;
-                }
-            }
-        }
-
-        return declaringScope;
     }
 
     public static boolean isExported(@NotNull final UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
@@ -1060,66 +1018,20 @@ public class ElixirPsiImplUtil {
         return CallImpl.primaryArity(call);
     }
 
-    /**
-     * {@code {:ok, value} = func() && value == literal}
-     */
     public static boolean processDeclarations(@NotNull final And and,
                                               @NotNull PsiScopeProcessor processor,
                                               @NotNull ResolveState state,
                                               PsiElement lastParent,
-                                              @NotNull @SuppressWarnings("unused") PsiElement place) {
-        boolean keepProcessing = true;
-
-        if (Normalized.operator(and).getText().equals("&&")) {
-            PsiElement leftOperand = org.elixir_lang.psi.operation.infix.Normalized.leftOperand(and);
-
-            if (leftOperand != null && !PsiTreeUtil.isAncestor(leftOperand, lastParent, false)) {
-                // the left operand is not inherently declaring, it should only be if a match is in the left operand
-                keepProcessing = processor.execute(leftOperand, state.put(DECLARING_SCOPE, false));
-            }
-        }
-
-        return keepProcessing;
+                                              @NotNull PsiElement place) {
+        return ProcessDeclarationsImpl.processDeclarations(and, processor, state, lastParent, place);
     }
 
-    /**
-     * {@code def(macro)?p?}, {@code for}, or {@code with} can declare variables
-     */
     public static boolean processDeclarations(@NotNull final Call call,
                                               @NotNull PsiScopeProcessor processor,
                                               @NotNull ResolveState state,
                                               PsiElement lastParent,
-                                              @NotNull @SuppressWarnings("unused") PsiElement place) {
-        boolean keepProcessing = true;
-
-        // need to check if call is place because lastParent is set to place at start of treeWalkUp
-        if (!call.isEquivalentTo(lastParent) || call.isEquivalentTo(place)) {
-            if (call.isCalling(KERNEL, ALIAS)) {
-                keepProcessing = processor.execute(call, state);
-            } else if (CallDefinitionClause.is(call) || // call parameters
-                    Delegation.is(call) || // delegation call parameters
-                    Module.is(call) || // module Alias
-                    call.isCalling(KERNEL, DESTRUCTURE) || // left operand
-                    call.isCallingMacro(KERNEL, IF) || // match in condition
-                    call.isCallingMacro(KERNEL, Function.FOR) || // comprehension match variable
-                    call.isCallingMacro(KERNEL, UNLESS) || // match in condition
-                    call.isCallingMacro(KERNEL, "with") // <- or = variable
-                    ) {
-                keepProcessing = processor.execute(call, state);
-            } else if (org.elixir_lang.structure_view.element.Quote.is(call)) { // quote :bind_quoted keys{
-                PsiElement bindQuoted = ElixirPsiImplUtil.keywordArgument(call, "bind_quoted");
-                /* the bind_quoted keys declare variable only valid inside the do block, so any place in the
-                   bindQuoted already must be the bind_quoted values that must be declared before the quote */
-                if (bindQuoted != null && !PsiTreeUtil.isAncestor(bindQuoted, place, false)) {
-                    keepProcessing = processor.execute(call, state);
-                }
-            } else if (hasDoBlockOrKeyword(call)) {
-                // unknown macros that take do blocks often allow variables to be declared in their arguments
-                keepProcessing = processor.execute(call, state);
-            }
-        }
-
-        return keepProcessing;
+                                              @NotNull PsiElement place) {
+        return ProcessDeclarationsImpl.processDeclarations(call, processor, state, lastParent, place);
     }
 
     public static boolean processDeclarations(@NotNull final ElixirAlias alias,
@@ -1127,13 +1039,7 @@ public class ElixirPsiImplUtil {
                                               @NotNull ResolveState state,
                                               PsiElement lastParent,
                                               @NotNull PsiElement place) {
-        return processDeclarationsRecursively(
-                alias,
-                processor,
-                state,
-                lastParent,
-                place
-        );
+        return ProcessDeclarationsImpl.processDeclarations(alias, processor, state, lastParent, place);
     }
 
     public static boolean processDeclarations(@NotNull final ElixirMultipleAliases multipleAliases,
@@ -1141,13 +1047,7 @@ public class ElixirPsiImplUtil {
                                               @NotNull ResolveState state,
                                               PsiElement lastParent,
                                               @NotNull PsiElement entrance) {
-        return processDeclarationsRecursively(
-                multipleAliases,
-                processor,
-                state,
-                lastParent,
-                entrance
-        );
+        return ProcessDeclarationsImpl.processDeclarations(multipleAliases, processor, state, lastParent, entrance);
     }
 
     public static boolean processDeclarations(@NotNull final ElixirStabBody scope,
@@ -1155,154 +1055,31 @@ public class ElixirPsiImplUtil {
                                               @NotNull ResolveState state,
                                               PsiElement lastParent,
                                               @NotNull @SuppressWarnings("unused") PsiElement place) {
-        return processDeclarationsInPreviousSibling(scope, processor, state, lastParent, place);
+        return ProcessDeclarationsImpl.processDeclarations(scope, processor, state, lastParent, place);
     }
 
     public static boolean processDeclarations(@NotNull final ElixirStabOperation stabOperation,
                                               @NotNull PsiScopeProcessor processor,
                                               @NotNull ResolveState state,
-                                              @SuppressWarnings("unused") PsiElement lastParent,
-                                              @NotNull @SuppressWarnings("unused") PsiElement place) {
-        boolean keepProcessing = true;
-        PsiElement signature = stabOperation.leftOperand();
-
-        if (signature != null) {
-            boolean declaringScope = isDeclaringScope(stabOperation);
-
-            keepProcessing = processor.execute(signature, state.put(DECLARING_SCOPE, declaringScope));
-        }
-
-        return keepProcessing;
+                                              PsiElement lastParent,
+                                              @NotNull PsiElement place) {
+        return ProcessDeclarationsImpl.processDeclarations(stabOperation, processor, state, lastParent, place);
     }
 
     public static boolean processDeclarations(@NotNull final Match match,
                                               @NotNull PsiScopeProcessor processor,
                                               @NotNull ResolveState state,
                                               PsiElement lastParent,
-                                              @NotNull @SuppressWarnings("unused") PsiElement place) {
-        PsiElement rightOperand = match.rightOperand();
-        PsiElement leftOperand = match.leftOperand();
-        boolean checkRight = false;
-        boolean checkLeft = false;
-
-        Triple triple = new Triple(match.getChildren());
-        Position position = triple.ancestorPosition(lastParent);
-
-        if (position != null) {
-            switch (position) {
-                case LEFT:
-                    checkLeft  = true;
-                    checkRight = false;
-                    break;
-                case OPERATOR:
-                    checkLeft  = true;
-                    checkRight = true;
-                    break;
-                case RIGHT:
-                    checkLeft  = false;
-                    checkRight = true;
-                    break;
-            }
-        } else if (PsiTreeUtil.isAncestor(match, lastParent, false)) {
-            checkLeft  = true;
-            checkRight = true;
-        }
-
-        boolean keepProcessing = true;
-
-        if (checkRight || checkLeft) {
-            // check right-operand first if both sides need to be checked because only left-side can do rebinding
-            if (checkRight && rightOperand != null) {
-                keepProcessing = processor.execute(rightOperand, state);
-            }
-
-            if (checkLeft && leftOperand != null && keepProcessing) {
-                keepProcessing = processor.execute(leftOperand, state);
-            }
-        } else {
-            error(
-                    Match.class,
-                    "Could not determine whether to check left operand, right operand, or both of match, " +
-                            "so checking none when processing declarations",
-                    match
-            );
-        }
-
-        return keepProcessing;
+                                              @NotNull PsiElement place) {
+        return ProcessDeclarationsImpl.processDeclarations(match, processor, state, lastParent, place);
     }
 
     public static boolean processDeclarations(@NotNull final QualifiedAlias qualifiedAlias,
                                               @NotNull PsiScopeProcessor processor,
                                               @NotNull ResolveState state,
-                                              @SuppressWarnings("unused") PsiElement lastParent,
-                                              @NotNull @SuppressWarnings("unused") PsiElement place) {
-        return processor.execute(qualifiedAlias, state);
-    }
-
-    /**
-     * Processes declarations in siblings of {@code lastParent} backwards from {@code lastParent}.
-     *
-     * @param scope an {@link ElixirStabBody} or {@link ElixirFile} that has a sequence of expressions as children
-     */
-    public static boolean processDeclarationsInPreviousSibling(@NotNull final PsiElement scope,
-                                                               @NotNull PsiScopeProcessor processor,
-                                                               @NotNull ResolveState state,
-                                                               PsiElement lastParent,
-                                                               @NotNull @SuppressWarnings("unused") PsiElement entrance) {
-        boolean keepProcessing = true;
-
-        if (scope.isEquivalentTo(lastParent.getParent())) {
-            PsiElement previousSibling = lastParent.getPrevSibling();
-
-            while (previousSibling != null) {
-                if (!(previousSibling instanceof ElixirEndOfExpression ||
-                        previousSibling instanceof PsiComment ||
-                        previousSibling instanceof PsiWhiteSpace)) {
-                    if (!createsNewScope(previousSibling)) {
-                        keepProcessing = processor.execute(previousSibling, state);
-
-                        if (!keepProcessing) {
-                            break;
-                        }
-                    }
-                }
-
-                previousSibling = previousSibling.getPrevSibling();
-            }
-        } else if (!(lastParent instanceof ElixirFile)) {
-            error(
-                    PsiElement.class,
-                    "Scope is not lastParent's parent\nlastParent:\n" + lastParent.getText(),
-                    scope
-            );
-        }
-
-        return keepProcessing;
-    }
-
-    public static boolean processDeclarationsRecursively(@NotNull final PsiElement psiElement,
-                                                         @NotNull PsiScopeProcessor processor,
-                                                         @NotNull ResolveState state,
-                                                         PsiElement lastParent,
-                                                         @NotNull PsiElement place) {
-        boolean keepProcessing = processor.execute(psiElement, state);
-
-        if (keepProcessing) {
-            @Nullable
-            PsiElement child = psiElement.getFirstChild();
-
-            while (child != null && child != lastParent) {
-                if (!child.processDeclarations(processor, state, lastParent, place)) {
-                    keepProcessing = false;
-
-                    break;
-                }
-
-                child = child.getNextSibling();
-            }
-        }
-
-        return keepProcessing;
+                                              PsiElement lastParent,
+                                              @NotNull PsiElement place) {
+        return ProcessDeclarationsImpl.processDeclarations(qualifiedAlias, processor, state, lastParent, place);
     }
 
     @Contract(pure = true)

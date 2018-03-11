@@ -23,6 +23,8 @@ import java.util.List;
 import static org.elixir_lang.grammar.parser.GeneratedParserUtilBase.DUMMY_BLOCK;
 import static org.elixir_lang.psi.call.name.Function.*;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.*;
+import static org.elixir_lang.psi.impl.ProcessDeclarationsImpl.DECLARING_SCOPE;
+import static org.elixir_lang.psi.impl.ProcessDeclarationsImpl.isDeclaringScope;
 import static org.elixir_lang.psi.operation.Normalized.operatorIndex;
 import static org.elixir_lang.psi.operation.infix.Normalized.leftOperand;
 import static org.elixir_lang.psi.operation.infix.Normalized.rightOperand;
