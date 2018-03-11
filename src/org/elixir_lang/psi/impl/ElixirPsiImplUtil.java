@@ -260,40 +260,6 @@ public class ElixirPsiImplUtil {
         return EscapeSequenceImpl.codePoint(sigilHexadecimalEscapeSequence);
     }
 
-    public enum UseScopeSelector {
-        PARENT,
-        SELF,
-        SELF_AND_FOLLOWING_SIBLINGS,
-    }
-
-    public static UseScopeSelector useScopeSelector(@NotNull PsiElement element) {
-        UseScopeSelector useScopeSelector = UseScopeSelector.PARENT;
-
-        if (element instanceof AtUnqualifiedNoParenthesesCall) {
-            /* Module Attribute declarations can't declare variables, so this is a variable usage without declaration,
-               so limit to SELF */
-            useScopeSelector = UseScopeSelector.SELF;
-        } else if (element instanceof ElixirAnonymousFunction) {
-            useScopeSelector = UseScopeSelector.SELF;
-        } else if (element instanceof Call) {
-            Call call = (Call) element;
-
-            if (call.isCalling(KERNEL, CASE) ||
-                    call.isCalling(KERNEL, COND) ||
-                    call.isCalling(KERNEL, IF) ||
-                    call.isCalling(KERNEL, RECEIVE) ||
-                    call.isCalling(KERNEL, UNLESS) ||
-                    call.isCalling(KERNEL, VAR_BANG)
-                    ) {
-               useScopeSelector = UseScopeSelector.SELF_AND_FOLLOWING_SIBLINGS;
-            } else if (CallDefinitionClause.is(call) || isModular(call) || hasDoBlockOrKeyword(call)) {
-                useScopeSelector = UseScopeSelector.SELF;
-            }
-        }
-
-        return useScopeSelector;
-    }
-
     @Nullable
     public static String definedModuleName(@NotNull final ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall) {
         PsiElement[] arguments = unmatchedUnqualifiedNoParenthesesCall.primaryArguments();
