@@ -1754,4 +1754,19 @@ object QuotableImpl {
                 }
                 else -> QuotableImpl.blockFunctionCall(quotedChildren)
             }
+
+    private fun inBase(digitsList: List<Digits>): Boolean {
+        var validDigitsCount = 0
+        var invalidDigitsCount = 0
+
+        for (digits in digitsList) {
+            if (digits.inBase()) {
+                validDigitsCount++
+            } else {
+                invalidDigitsCount++
+            }
+        }
+
+        return invalidDigitsCount < 1 && validDigitsCount > 0
+    }
 }

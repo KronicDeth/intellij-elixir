@@ -5,18 +5,14 @@ import org.jetbrains.annotations.Contract
 import java.util.*
 
 object WholeNumberImpl {
-    private const val BINARY_BASE = 2
-    private const val DECIMAL_BASE = 10
-    private const val HEXADECIMAL_BASE = 16
-    private const val OCTAL_BASE = 8
+    const val BINARY_BASE = 2
+    const val DECIMAL_BASE = 10
+    const val HEXADECIMAL_BASE = 16
+    const val OCTAL_BASE = 8
     // NOTE: Unknown is all bases not 2, 8, 10, or 16, but 36 is used because all digits and letters are parsed.
-    private const val UNKNOWN_BASE = 36
+    const val UNKNOWN_BASE = 36
 
     // WholeNumber Functions
-
-    @Contract(pure = true)
-    @JvmStatic
-    fun base(@Suppress("UNUSED_PARAMETER") binaryDigits: ElixirBinaryDigits): Int = BINARY_BASE
 
     @Contract(pure = true)
     @JvmStatic
@@ -24,15 +20,7 @@ object WholeNumberImpl {
 
     @Contract(pure = true)
     @JvmStatic
-    fun base(@Suppress("UNUSED_PARAMETER") decimalDigits: ElixirDecimalDigits): Int = DECIMAL_BASE
-
-    @Contract(pure = true)
-    @JvmStatic
     fun base(@Suppress("UNUSED_PARAMETER") decimalWholeNumber: ElixirDecimalWholeNumber): Int = DECIMAL_BASE
-
-    @Contract(pure = true)
-    @JvmStatic
-    fun base(@Suppress("UNUSED_PARAMETER") hexadecimalDigits: ElixirHexadecimalDigits): Int = HEXADECIMAL_BASE
 
     @Contract(pure = true)
     @JvmStatic
@@ -41,15 +29,7 @@ object WholeNumberImpl {
 
     @Contract(pure = true)
     @JvmStatic
-    fun base(@Suppress("UNUSED_PARAMETER") octalDigits: ElixirOctalDigits): Int = OCTAL_BASE
-
-    @Contract(pure = true)
-    @JvmStatic
     fun base(@Suppress("UNUSED_PARAMETER") octalWholeNumber: ElixirOctalWholeNumber): Int = OCTAL_BASE
-
-    @Contract(pure = true)
-    @JvmStatic
-    fun base(@Suppress("UNUSED_PARAMETER") unknownBaseDigits: ElixirUnknownBaseDigits): Int = UNKNOWN_BASE
 
     @Contract(pure = true)
     @JvmStatic

@@ -173,7 +173,7 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     public static int base(@NotNull final ElixirBinaryDigits binaryDigits) {
-        return WholeNumberImpl.base(binaryDigits);
+        return DigitsImpl.base(binaryDigits);
     }
 
     @Contract(pure = true)
@@ -183,7 +183,7 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     public static int base(@NotNull final ElixirDecimalDigits decimalDigits) {
-        return WholeNumberImpl.base(decimalDigits);
+        return DigitsImpl.base(decimalDigits);
     }
 
     @Contract(pure = true)
@@ -193,7 +193,7 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     public static int base(@NotNull final ElixirHexadecimalDigits hexadecimalDigits) {
-        return WholeNumberImpl.base(hexadecimalDigits);
+        return DigitsImpl.base(hexadecimalDigits);
     }
 
     @Contract(pure = true)
@@ -203,7 +203,7 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     public static int base(@NotNull final ElixirOctalDigits octalDigits) {
-        return WholeNumberImpl.base(octalDigits);
+        return DigitsImpl.base(octalDigits);
     }
 
     @Contract(pure = true)
@@ -213,7 +213,7 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     public static int base(@NotNull final ElixirUnknownBaseDigits unknownBaseDigits) {
-        return WholeNumberImpl.base(unknownBaseDigits);
+        return DigitsImpl.base(unknownBaseDigits);
     }
 
     @Contract(pure = true)
@@ -453,35 +453,7 @@ public class ElixirPsiImplUtil {
     }
 
     public static boolean inBase(@NotNull final Digits digits) {
-        ASTNode child = digits.getNode().getFirstChildNode();
-        boolean inBase = false;
-
-        if (child.getElementType() == digits.validElementType()) {
-            inBase = true;
-        }
-
-        return inBase;
-    }
-
-    public static boolean inBase(@NotNull final List<Digits> digitsList) {
-        int validDigitsCount = 0;
-        int invalidDigitsCount = 0;
-
-        for (Digits digits : digitsList) {
-            if (digits.inBase()) {
-                validDigitsCount++;
-            } else {
-                invalidDigitsCount++;
-            }
-        }
-
-        boolean valid = false;
-
-        if (invalidDigitsCount < 1 && validDigitsCount > 0) {
-            valid = true;
-        }
-
-        return valid;
+        return DigitsImpl.inBase(digits);
     }
 
     public static boolean isCalling(@NotNull final Call call,
@@ -3400,29 +3372,29 @@ public class ElixirPsiImplUtil {
     }
 
     @NotNull
-    public static IElementType validElementType(@SuppressWarnings("unused") @NotNull ElixirBinaryDigits binaryDigits) {
-        return ElixirTypes.VALID_BINARY_DIGITS;
+    public static IElementType validElementType(@NotNull ElixirBinaryDigits binaryDigits) {
+        return DigitsImpl.validElementType(binaryDigits);
     }
 
     @Contract(pure = true)
     @NotNull
-    public static IElementType validElementType(@NotNull @SuppressWarnings("unused") ElixirDecimalDigits decimalDigits) {
-        return ElixirTypes.VALID_DECIMAL_DIGITS;
+    public static IElementType validElementType(@NotNull ElixirDecimalDigits decimalDigits) {
+        return DigitsImpl.validElementType(decimalDigits);
     }
 
     @NotNull
-    public static IElementType validElementType(@SuppressWarnings("unused") @NotNull ElixirHexadecimalDigits hexadecimalDigits) {
-        return ElixirTypes.VALID_HEXADECIMAL_DIGITS;
+    public static IElementType validElementType(@NotNull ElixirHexadecimalDigits hexadecimalDigits) {
+        return DigitsImpl.validElementType(hexadecimalDigits);
     }
 
     @NotNull
-    public static IElementType validElementType(@NotNull @SuppressWarnings("unused") ElixirOctalDigits octalDigits) {
-        return ElixirTypes.VALID_OCTAL_DIGITS;
+    public static IElementType validElementType(@NotNull ElixirOctalDigits octalDigits) {
+        return DigitsImpl.validElementType(octalDigits);
     }
 
     @Nullable
-    public static IElementType validElementType(@NotNull @SuppressWarnings("unused") ElixirUnknownBaseDigits unknownBaseDigits) {
-        return null;
+    public static IElementType validElementType(@NotNull ElixirUnknownBaseDigits unknownBaseDigits) {
+        return DigitsImpl.validElementType(unknownBaseDigits);
     }
 
     /*
