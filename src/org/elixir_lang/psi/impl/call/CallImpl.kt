@@ -421,7 +421,7 @@ object CallImpl {
     @JvmStatic
     fun resolvedFinalArityRange(call: Call): IntRange =
             ElixirPsiImplUtil.finalArguments(call)?.let { finalArguments ->
-                val defaultCount = defaultArgumentCount(finalArguments)
+                val defaultCount = finalArguments.defaultArgumentCount()
                 val maximum = finalArguments.size
                 val minimum = maximum - defaultCount
                 IntRange(minimum, maximum)
@@ -443,21 +443,21 @@ object CallImpl {
     /**
      * The number of arguments that have defaults.
      *
-     * @param arguments arguments to a definition call
+     * @param this@defaultArgumentCount arguments to a definition call
      */
-    private fun defaultArgumentCount(arguments: Array<PsiElement>): Int = arguments.count { isDefaultArgument(it) }
+    private fun Array<PsiElement>.defaultArgumentCount(): Int = count { it.isDefaultArgument() }
 
     /**
      * Whether the given element presents a default argument (with `\\` in it.
      *
-     * @param argument an argument to a [Call]
+     * @param this@isDefaultArgument an argument to a [Call]
      * @return `true` if in match operation with `\\` operator; otherwise, `false`.
      */
-    private fun isDefaultArgument(argument: PsiElement): Boolean {
+    private fun PsiElement.isDefaultArgument(): Boolean {
         var defaultArgument = false
 
-        if (argument is InMatch) {
-            val operation = argument as Operation
+        if (this is InMatch) {
+            val operation = this as Operation
 
             if (operation.operator().text.trim { it <= ' ' } == DEFAULT_OPERATOR) {
                 defaultArgument = true
