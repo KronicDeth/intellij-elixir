@@ -17,6 +17,7 @@ object UseScopeImpl {
         SELF_AND_FOLLOWING_SIBLINGS
     }
 
+    @JvmStatic
     fun selector(element: PsiElement): UseScopeSelector {
         var useScopeSelector = UseScopeSelector.PARENT
 

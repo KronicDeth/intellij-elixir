@@ -1387,58 +1387,13 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static String fullyQualifiedName(@NotNull final ElixirAlias alias) {
-        return alias.getName();
+        return QualifiableAliasImpl.fullyQualifiedName(alias);
     }
 
     @Contract(pure = true)
     @Nullable
     public static String fullyQualifiedName(@NotNull final QualifiableAlias qualifiableAlias) {
-        String fullyQualifiedName = null;
-        PsiElement[] children = qualifiableAlias.getChildren();
-        int operatorIndex = Normalized.operatorIndex(children);
-        Quotable qualifier = org.elixir_lang.psi.operation.infix.Normalized.leftOperand(children, operatorIndex);
-
-        String qualifierName = null;
-
-        if (qualifier instanceof Call) {
-            Call qualifierCall = (Call) qualifier;
-
-            if (qualifierCall.isCalling(KERNEL, __MODULE__, 0)) {
-                Call enclosingCall = enclosingModularMacroCall(qualifierCall);
-
-                if (enclosingCall != null && enclosingCall instanceof StubBased) {
-                    StubBased enclosingStubBasedCall = (StubBased) enclosingCall;
-                    qualifierName = enclosingStubBasedCall.canonicalName();
-                }
-            }
-        } else if (qualifier instanceof QualifiableAlias) {
-            QualifiableAlias qualifiableQualifier = (QualifiableAlias) qualifier;
-
-            qualifierName = qualifiableQualifier.fullyQualifiedName();
-        } else if (qualifier instanceof ElixirAccessExpression) {
-            PsiElement qualifierChild = stripAccessExpression(qualifier);
-
-            if (qualifierChild instanceof ElixirAlias) {
-                ElixirAlias childAlias = (ElixirAlias) qualifierChild;
-
-                qualifierName = childAlias.getName();
-            }
-        }
-
-        if (qualifierName != null) {
-            Quotable rightOperand = org.elixir_lang.psi.operation.infix.Normalized.rightOperand(
-                    children,
-                    operatorIndex
-            );
-
-            if (rightOperand instanceof ElixirAlias) {
-                ElixirAlias relativeAlias = (ElixirAlias) rightOperand;
-
-                fullyQualifiedName = qualifierName + "." + relativeAlias.getName();
-            }
-        }
-
-        return fullyQualifiedName;
+        return QualifiableAliasImpl.fullyQualifiedName(qualifiableAlias);
     }
 
     @NotNull
