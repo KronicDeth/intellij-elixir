@@ -388,7 +388,7 @@ object CallImpl {
 
             val parent = computeReadAction(Computable<PsiElement> { call.parent })
 
-            if (isPipe(parent)) {
+            if (parent.isPipe()) {
                 val parentPipeOperation = parent as Arrow
                 val pipedInto = parentPipeOperation.rightOperand()
 
@@ -466,4 +466,23 @@ object CallImpl {
 
         return defaultArgument
     }
+
+    /**
+     * Whether the `arrow` is a pipe operation.
+     *
+     * @param this@isPipe the parent (or futher ancestor of a [Call] that may be piped.
+     * @return `` true if `arrow` is using the `"|>"` operator token.
+     */
+    private fun Arrow.isPipe(): Boolean =
+            operator().node.getChildren(ARROW_OPERATOR_TOKEN_SET).let { arrowOperatorChildren ->
+                arrowOperatorChildren.size == 1 && arrowOperatorChildren[0].text == "|>"
+            }
+
+    /**
+     * Whether the `callAncestor` is a pipe operation.
+     *
+     * @param this@isPipe the parent (or further ancestor) of a [Call] that may be piped
+     * @return `` true if `callAncestor` is an [Arrow] using the `"|>"` operator token.
+     */
+    private fun PsiElement.isPipe(): Boolean = (this as? Arrow)?.isPipe() ?: false
 }

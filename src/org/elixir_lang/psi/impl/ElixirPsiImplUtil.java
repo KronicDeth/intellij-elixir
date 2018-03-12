@@ -427,44 +427,6 @@ public class ElixirPsiImplUtil {
                 CallDefinitionClause.isPublicMacro(unqualifiedNoParenthesesCall);
     }
 
-    /**
-     * Whether the {@code arrow} is a pipe operation.
-     *
-     * @param arrow the parent (or futher ancestor of a {@link Call} that may be piped.
-     * @return {@code} true if {@code arrow} is using the {@code "|>"} operator token.
-     */
-    public static boolean isPipe(@NotNull Arrow arrow) {
-        Operator operator = arrow.operator();
-        ASTNode[] arrowOperatorChildren = operator.getNode().getChildren(ARROW_OPERATOR_TOKEN_SET);
-        boolean isPipe = false;
-
-        if (arrowOperatorChildren.length == 1) {
-            ASTNode arrowOperatorChild = arrowOperatorChildren[0];
-
-            if (arrowOperatorChild.getText().equals("|>")) {
-                isPipe = true;
-            }
-        }
-
-        return isPipe;
-    }
-
-    /**
-     * Whether the {@code callAncestor} is a pipe operation.
-     *
-     * @param callAncestor the parent (or further ancestor) of a {@link Call} that may be piped
-     * @return {@code} true if {@code callAncestor} is an {@link Arrow} using the {@code "|>"} operator token.
-     */
-    public static boolean isPipe(@NotNull PsiElement callAncestor) {
-        boolean isPipe = false;
-
-        if (callAncestor instanceof Arrow) {
-            isPipe = isPipe((Arrow) callAncestor);
-        }
-
-        return isPipe;
-    }
-
     /*
      * Whether this is an argument in `defmodule <argument> do end` call.
      */
