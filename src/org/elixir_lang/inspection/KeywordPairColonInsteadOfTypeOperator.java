@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.identifierName;
+import static org.elixir_lang.psi.impl.ElixirAtIdentifierImplKt.identifierName;
 import static org.elixir_lang.reference.ModuleAttribute.isTypeName;
 
 public class KeywordPairColonInsteadOfTypeOperator extends LocalInspectionTool {

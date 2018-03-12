@@ -28,7 +28,7 @@ import java.util.Set;
 import static org.elixir_lang.psi.ElixirTypes.RANGE_OPERATOR;
 import static org.elixir_lang.psi.call.name.Function.UNQUOTE;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.identifierName;
+import static org.elixir_lang.psi.impl.ElixirAtIdentifierImplKt.identifierName;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.stripAccessExpression;
 import static org.elixir_lang.reference.ModuleAttribute.*;
 import static org.elixir_lang.structure_view.element.CallDefinitionHead.stripAllOuterParentheses;

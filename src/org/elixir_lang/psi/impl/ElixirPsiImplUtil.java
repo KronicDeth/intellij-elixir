@@ -299,17 +299,6 @@ public class ElixirPsiImplUtil {
         return fileViewProvider.getDocument();
     }
 
-    @NotNull
-    public static String identifierName(ElixirAtIdentifier atIdentifier) {
-        ASTNode node = atIdentifier.getNode();
-        ASTNode[] identifierNodes = node.getChildren(ElixirPsiImplUtil.IDENTIFIER_TOKEN_SET);
-
-        assert identifierNodes.length == 1;
-
-        ASTNode identifierNode = identifierNodes[0];
-        return identifierNode.getText();
-    }
-
     /**
      * The keyword arguments for {@code call}.
      * @param call call to search for keyword arguments.
