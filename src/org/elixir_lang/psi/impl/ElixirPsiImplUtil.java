@@ -32,12 +32,9 @@ import org.elixir_lang.psi.call.arguments.None;
 import org.elixir_lang.psi.call.arguments.star.NoParentheses;
 import org.elixir_lang.psi.call.arguments.star.NoParenthesesOneArgument;
 import org.elixir_lang.psi.call.arguments.star.Parentheses;
-import org.elixir_lang.psi.call.name.Function;
 import org.elixir_lang.psi.impl.call.CallImpl;
 import org.elixir_lang.psi.impl.call.CanonicallyNamedImpl;
 import org.elixir_lang.psi.operation.*;
-import org.elixir_lang.psi.operation.infix.Position;
-import org.elixir_lang.psi.operation.infix.Triple;
 import org.elixir_lang.psi.qualification.Qualified;
 import org.elixir_lang.psi.qualification.Unqualified;
 import org.elixir_lang.psi.stub.call.Stub;
@@ -68,7 +65,6 @@ import static org.elixir_lang.psi.impl.QuotableImpl.NIL;
 import static org.elixir_lang.psi.stub.type.call.Stub.isModular;
 import static org.elixir_lang.reference.Callable.*;
 import static org.elixir_lang.reference.ModuleAttribute.isNonReferencing;
-import static org.elixir_lang.structure_view.element.CallDefinitionClause.enclosingModularMacroCall;
 
 /**
  * Created by luke.imhoff on 12/29/14.
@@ -1894,39 +1890,18 @@ public class ElixirPsiImplUtil {
 
     @NotNull
     public static String getName(@NotNull ElixirAlias alias) {
-        return alias.getText();
+        return PsiNamedElementImpl.getName(alias);
     }
 
     @NotNull
     public static String getName(@NotNull QualifiedAlias qualifiedAlias) {
-        return qualifiedAlias.getText();
+        return PsiNamedElementImpl.getName(qualifiedAlias);
     }
 
     @Contract(pure = true)
     @Nullable
     public static String getName(@NotNull NamedElement namedElement) {
-        PsiElement nameIdentifier = namedElement.getNameIdentifier();
-        String name = null;
-
-        if (nameIdentifier != null) {
-            name = unquoteName(namedElement, nameIdentifier.getText());
-        } else {
-            if (namedElement instanceof Call) {
-                Call call = (Call) namedElement;
-
-                /* The name of the module defined by {@code defimpl PROTOCOL[ for: MODULE]} is derived by combining the
-                   PROTOCOL and MODULE name into PROTOCOL.MODULE.  Neither piece is really the "name" or
-                   "nameIdentifier" element of the implementation because changing the PROTOCOL make the implementation
-                   just for that different Protocol and changing the MODULE makes the implementation for a different
-                   MODULE.  If `for:` isn't given, it's really the enclosing {@code defmodule MODULE} whose name should
-                   be changed. */
-                if (Implementation.is(call)) {
-                    name = Implementation.name(call);
-                }
-            }
-        }
-
-        return name;
+        return PsiNamedElementImpl.getName(namedElement);
     }
 
     @Nullable
@@ -3258,27 +3233,6 @@ public class ElixirPsiImplUtil {
                 expression instanceof PsiWhiteSpace);
 
         return expression;
-    }
-
-    /**
-     * If {@code name} is {@code "unquote"} then the {@link Call#primaryArguments()} single argument is added to the
-     * name.
-     */
-    @Nullable
-    public static String unquoteName(@NotNull PsiElement named, @Nullable String name) {
-        String unquotedName = name;
-
-        if (named instanceof Call && UNQUOTE.equals(name)) {
-            Call namedElementCall = (Call) named;
-
-            PsiElement[] primaryArguments = namedElementCall.primaryArguments();
-
-            if (primaryArguments != null && primaryArguments.length == 1) {
-                unquotedName += "(" + primaryArguments[0].getText() + ")";
-            }
-        }
-
-        return unquotedName;
     }
 
     @Nullable
