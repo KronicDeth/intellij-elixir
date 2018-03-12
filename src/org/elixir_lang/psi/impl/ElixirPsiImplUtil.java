@@ -427,52 +427,16 @@ public class ElixirPsiImplUtil {
                 CallDefinitionClause.isPublicMacro(unqualifiedNoParenthesesCall);
     }
 
-    /*
-     * Whether this is an argument in `defmodule <argument> do end` call.
-     */
     public static boolean isModuleName(@NotNull final ElixirAccessExpression accessExpression) {
-        PsiElement parent = accessExpression.getParent();
-        boolean isModuleName = false;
-
-        if (parent instanceof ElixirNoParenthesesOneArgument) {
-            ElixirNoParenthesesOneArgument noParenthesesOneArgument = (ElixirNoParenthesesOneArgument) parent;
-
-            isModuleName = noParenthesesOneArgument.isModuleName();
-        }
-
-        return isModuleName;
+        return MaybeModuleNameImpl.isModuleName(accessExpression);
     }
 
     public static boolean isModuleName(@NotNull final QualifiableAlias qualifiableAlias) {
-        PsiElement parent = qualifiableAlias.getParent();
-        int siblingCount = parent.getChildren().length - 1;
-        boolean isModuleName = false;
-
-        /* check that this qualifiableAlias is the only child so subsections of alias chains don't say they are module
-           names. */
-        if (siblingCount == 0 && parent instanceof MaybeModuleName) {
-            MaybeModuleName maybeModuleName = (MaybeModuleName) parent;
-
-            isModuleName = maybeModuleName.isModuleName();
-        }
-
-        return isModuleName;
+        return MaybeModuleNameImpl.isModuleName(qualifiableAlias);
     }
 
-    /*
-     * Whether this is an argument in `defmodule <argument> do end` call.
-     */
     public static boolean isModuleName(@NotNull final ElixirNoParenthesesOneArgument noParenthesesOneArgument) {
-        PsiElement parent = noParenthesesOneArgument.getParent();
-        boolean isModuleName = false;
-
-        if (parent instanceof ElixirUnmatchedUnqualifiedNoParenthesesCall) {
-            ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall = (ElixirUnmatchedUnqualifiedNoParenthesesCall) parent;
-
-            isModuleName = unmatchedUnqualifiedNoParenthesesCall.isCallingMacro(KERNEL, DEFMODULE, 2);
-        }
-
-        return isModuleName;
+        return MaybeModuleNameImpl.isModuleName(noParenthesesOneArgument);
     }
 
     @Contract(pure = true)
