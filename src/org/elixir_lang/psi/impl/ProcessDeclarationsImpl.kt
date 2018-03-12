@@ -13,12 +13,13 @@ import org.elixir_lang.psi.call.name.Function
 import org.elixir_lang.psi.call.name.Function.*
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.call.CallImpl.hasDoBlockOrKeyword
+import org.elixir_lang.psi.impl.declarations.UseScopeImpl
+import org.elixir_lang.psi.impl.declarations.UseScopeImpl.selector
 import org.elixir_lang.psi.operation.And
 import org.elixir_lang.psi.operation.Match
 import org.elixir_lang.psi.operation.Normalized
 import org.elixir_lang.psi.operation.infix.Position
 import org.elixir_lang.psi.operation.infix.Triple
-import org.elixir_lang.psi.stub.type.call.Stub.isModular
 import org.elixir_lang.structure_view.element.CallDefinitionClause
 import org.elixir_lang.structure_view.element.Delegation
 import org.elixir_lang.structure_view.element.modular.Module
@@ -26,12 +27,6 @@ import org.elixir_lang.structure_view.element.modular.Module
 object ProcessDeclarationsImpl {
     @JvmField
     val DECLARING_SCOPE = Key<Boolean>("DECLARING_SCOPE")
-
-    enum class UseScopeSelector {
-        PARENT,
-        SELF,
-        SELF_AND_FOLLOWING_SIBLINGS
-    }
 
     /**
      * `{:ok, value} = func() && value == literal`
@@ -239,7 +234,7 @@ object ProcessDeclarationsImpl {
      * @see [](https://github.com/alco/elixir/wiki/Scoping-Rules-in-Elixir-
     ) */
     private fun createsNewScope(element: PsiElement): Boolean {
-        return useScopeSelector(element) == UseScopeSelector.SELF
+        return selector(element) == UseScopeImpl.UseScopeSelector.SELF
     }
 
     @JvmStatic
@@ -270,33 +265,6 @@ object ProcessDeclarationsImpl {
         }
 
         return declaringScope
-    }
-
-    @JvmStatic
-    fun useScopeSelector(element: PsiElement): UseScopeSelector {
-        var useScopeSelector = UseScopeSelector.PARENT
-
-        if (element is AtUnqualifiedNoParenthesesCall<*>) {
-            /* Module Attribute declarations can't declare variables, so this is a variable usage without declaration,
-               so limit to SELF */
-            useScopeSelector = UseScopeSelector.SELF
-        } else if (element is ElixirAnonymousFunction) {
-            useScopeSelector = UseScopeSelector.SELF
-        } else if (element is Call) {
-
-            if (element.isCalling(KERNEL, CASE) ||
-                    element.isCalling(KERNEL, COND) ||
-                    element.isCalling(KERNEL, IF) ||
-                    element.isCalling(KERNEL, RECEIVE) ||
-                    element.isCalling(KERNEL, UNLESS) ||
-                    element.isCalling(KERNEL, VAR_BANG)) {
-                useScopeSelector = UseScopeSelector.SELF_AND_FOLLOWING_SIBLINGS
-            } else if (CallDefinitionClause.`is`(element) || isModular(element) || hasDoBlockOrKeyword(element)) {
-                useScopeSelector = UseScopeSelector.SELF
-            }
-        }
-
-        return useScopeSelector
     }
 
     /**
