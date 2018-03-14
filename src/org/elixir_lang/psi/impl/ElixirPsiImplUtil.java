@@ -139,31 +139,19 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static PsiElement[] arguments(@NotNull final ElixirNoParenthesesOneArgument noParenthesesOneArgument) {
-        PsiElement[] children = noParenthesesOneArgument.getChildren();
-        PsiElement[] arguments = children;
-
-        if (children.length == 1) {
-            PsiElement child = children[0];
-
-            if (child instanceof Arguments) {
-                Arguments childArguments = (Arguments) child;
-                arguments = childArguments.arguments();
-            }
-        }
-
-        return arguments;
+        return ArgumentsImpl.arguments(noParenthesesOneArgument);
     }
 
     @Contract(pure = true)
     @NotNull
     public static PsiElement[] arguments(@NotNull final ElixirNoParenthesesStrict noParenthesesStrict) {
-        return noParenthesesStrict.getChildren();
+        return ArgumentsImpl.arguments(noParenthesesStrict);
     }
 
     @Contract(pure = true)
     @NotNull
     public static PsiElement[] arguments(@NotNull final ElixirParenthesesArguments parenthesesArguments) {
-        return parenthesesArguments.getChildren();
+        return ArgumentsImpl.arguments(parenthesesArguments);
     }
 
     @Contract(pure = true)
