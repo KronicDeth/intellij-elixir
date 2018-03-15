@@ -244,18 +244,6 @@ public class ElixirPsiImplUtil {
         return EscapeSequenceImpl.codePoint(sigilHexadecimalEscapeSequence);
     }
 
-    @Nullable
-    public static String definedModuleName(@NotNull final ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall) {
-        PsiElement[] arguments = unmatchedUnqualifiedNoParenthesesCall.primaryArguments();
-        String definedModuleName = null;
-
-        if (arguments.length > 1) {
-            PsiElement argument = arguments[0];
-        }
-
-        return definedModuleName;
-    }
-
     @NotNull
     public static List<Digits> digitsList(@NotNull ElixirBinaryWholeNumber binaryWholeNumber) {
         return WholeNumberImpl.digitsList(binaryWholeNumber);
