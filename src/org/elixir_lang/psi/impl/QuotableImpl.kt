@@ -1406,6 +1406,15 @@ object QuotableImpl {
         )
     }
 
+    /* Returns the 0-indexed line number for the element */
+    private fun lineNumber(node: ASTNode): Int = node.psi.document()!!.getLineNumber(node.startOffset)
+
+    private fun lineNumberKeywordTuple(node: ASTNode): OtpErlangTuple =
+            keywordTuple(
+                    "line",
+                    lineNumber(node) + 1
+            )
+
     @Contract(pure = true)
     private fun quote(children: Array<Quotable>) =
         // Uses toBlock because this is for inside interpolation, which functions the same as an embedded file

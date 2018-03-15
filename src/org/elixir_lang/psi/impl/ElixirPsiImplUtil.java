@@ -268,13 +268,6 @@ public class ElixirPsiImplUtil {
         return WholeNumberImpl.digitsList(unknownBaseWholeNumber);
     }
 
-    public static Document document(PsiElement element) {
-        PsiFile containingFile = element.getContainingFile();
-        FileViewProvider fileViewProvider = containingFile.getViewProvider();
-
-        return fileViewProvider.getDocument();
-    }
-
     /**
      * The keyword arguments for {@code call}.
      * @param call call to search for keyword arguments.
@@ -473,18 +466,6 @@ public class ElixirPsiImplUtil {
     @Nullable
     public static Quotable leftOperand(@NotNull NotIn notIn) {
         return org.elixir_lang.psi.operation.not_in.Normalized.leftOperand(notIn);
-    }
-
-    /* Returns the 0-indexed line number for the element */
-    public static int lineNumber(ASTNode node) {
-        return document(node.getPsi()).getLineNumber(node.getStartOffset());
-    }
-
-    public static OtpErlangTuple lineNumberKeywordTuple(ASTNode node) {
-        return keywordTuple(
-                "line",
-                lineNumber(node) + 1
-        );
     }
 
     @NotNull
