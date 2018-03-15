@@ -12,6 +12,25 @@ import org.elixir_lang.psi.operation.Normalized
 import org.elixir_lang.structure_view.element.CallDefinitionClause.enclosingModularMacroCall
 import org.jetbrains.annotations.Contract
 
+@Contract(pure = true)
+fun QualifiableAlias.isOutermostQualifiableAlias(): Boolean {
+    val parent = parent
+    var outermost = false
+
+    /* prevents individual Aliases or tail qualified aliases of qualified chain from having reference separate
+           reference from overall chain */
+    if (parent !is QualifiableAlias) {
+        val grandParent = parent.parent
+
+        // prevents first Alias of a qualified chain from having a separate reference from overall chain
+        if (grandParent !is QualifiableAlias) {
+            outermost = true
+        }
+    }
+
+    return outermost
+}
+
 object QualifiableAliasImpl {
     @Contract(pure = true)
     @JvmStatic

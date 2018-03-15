@@ -60,6 +60,7 @@ import static org.elixir_lang.errorreport.Logger.error;
 import static org.elixir_lang.mix.importWizard.ImportedOtpAppKt.computeReadAction;
 import static org.elixir_lang.psi.call.name.Function.*;
 import static org.elixir_lang.psi.call.name.Module.*;
+import static org.elixir_lang.psi.impl.QualifiableAliasImplKt.isOutermostQualifiableAlias;
 import static org.elixir_lang.psi.impl.QuotableImpl.*;
 import static org.elixir_lang.psi.impl.QuotableImpl.NIL;
 import static org.elixir_lang.psi.stub.type.call.Stub.isModular;
@@ -314,25 +315,6 @@ public class ElixirPsiImplUtil {
 
     public static boolean isModuleName(@NotNull final ElixirNoParenthesesOneArgument noParenthesesOneArgument) {
         return MaybeModuleNameImpl.isModuleName(noParenthesesOneArgument);
-    }
-
-    @Contract(pure = true)
-    public static boolean isOutermostQualifiableAlias(@NotNull QualifiableAlias qualifiableAlias) {
-        PsiElement parent = qualifiableAlias.getParent();
-        boolean outermost = false;
-
-        /* prevents individual Aliases or tail qualified aliases of qualified chain from having reference separate
-           reference from overall chain */
-        if (!(parent instanceof QualifiableAlias)) {
-            PsiElement grandParent = parent.getParent();
-
-            // prevents first Alias of a qualified chain from having a separate reference from overall chain
-            if (!(grandParent instanceof QualifiableAlias)) {
-                outermost = true;
-            }
-        }
-
-        return outermost;
     }
 
     /*
