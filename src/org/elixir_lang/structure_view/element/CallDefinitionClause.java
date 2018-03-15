@@ -23,6 +23,7 @@ import java.util.List;
 import static org.elixir_lang.psi.call.name.Function.*;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.enclosingMacroCall;
+import static org.elixir_lang.psi.impl.call.CallImplKt.macroChildCalls;
 
 public class CallDefinitionClause extends Element<Call> implements Presentable, Visible {
     /*
@@ -345,7 +346,7 @@ public class CallDefinitionClause extends Element<Call> implements Presentable, 
     @NotNull
     @Override
     public TreeElement[] getChildren() {
-        Call[] childCalls = ElixirPsiImplUtil.macroChildCalls(navigationItem);
+        Call[] childCalls = macroChildCalls(navigationItem);
         TreeElement[] children = childCallTreeElements(childCalls);
 
         if (children == null) {

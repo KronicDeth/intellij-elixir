@@ -22,6 +22,7 @@ import org.elixir_lang.psi.qualification.Unqualified
 import org.elixir_lang.psi.stub.call.Stub
 import org.jetbrains.annotations.Contract
 import java.util.*
+import org.elixir_lang.psi.impl.macroChildCallList as psiElementToMacroChildCallList
 
 /**
  * The keyword arguments for `call`.
@@ -60,6 +61,60 @@ fun Call.keywordArguments(): QuotableKeywordList? {
     }
 
     return keywordArguments
+}
+
+fun Call.macroChildCalls(): Array<Call> {
+    val childCallList = macroChildCallList()
+
+    return childCallList.toTypedArray()
+}
+
+fun Call.macroChildCallList(): List<Call> {
+    var childCallList: List<Call>? = null
+    val doBlock = doBlock
+
+    if (doBlock != null) {
+        val stab = doBlock.stab
+
+        if (stab != null) {
+            val stabChildren = stab.children
+
+            if (stabChildren.size == 1) {
+                val stabChild = stabChildren[0]
+
+                if (stabChild is ElixirStabBody) {
+                    childCallList = stabChild.psiElementToMacroChildCallList()
+                }
+            }
+        }
+    } else { // one liner version with `do:` keyword argument
+        val finalArguments = ElixirPsiImplUtil.finalArguments(this)!!
+
+        assert(finalArguments.size > 0)
+
+        val potentialKeywords = finalArguments[finalArguments.size - 1]
+
+        if (potentialKeywords is QuotableKeywordList) {
+            val quotableKeywordPairList = potentialKeywords.quotableKeywordPairList()
+            val firstQuotableKeywordPair = quotableKeywordPairList[0]
+            val keywordKey = firstQuotableKeywordPair.keywordKey
+
+            if (keywordKey.text == "do") {
+                val keywordValue = firstQuotableKeywordPair.keywordValue
+
+                if (keywordValue is Call) {
+                    val childCall = keywordValue as Call
+                    childCallList = listOf(childCall)
+                }
+            }
+        }
+    }
+
+    if (childCallList == null) {
+        childCallList = emptyList()
+    }
+
+    return childCallList
 }
 
 

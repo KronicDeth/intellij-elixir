@@ -12,7 +12,7 @@ import org.elixir_lang.ElixirFileType
 import org.elixir_lang.psi.ElixirAccessExpression
 import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.psi.ElixirList
-import org.elixir_lang.psi.impl.ElixirPsiImplUtil.macroChildCallList
+import org.elixir_lang.psi.impl.call.macroChildCallList
 import org.elixir_lang.psi.impl.keywordValue
 import org.elixir_lang.structure_view.element.CallDefinitionClause.isPublicFunction
 import org.elixir_lang.structure_view.element.CallDefinitionClause.nameArityRange
@@ -43,7 +43,7 @@ private fun appList(elixirFile: ElixirFile): List<String> {
 
     return modulars.asSequence()
             .flatMap { modular ->
-                macroChildCallList(modular).asSequence()
+                modular.macroChildCallList().asSequence()
             }
             .filter { call ->
                 isPublicFunction(call) && nameArityRange(call)?.let {

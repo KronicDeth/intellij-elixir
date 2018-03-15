@@ -5,7 +5,6 @@ import com.intellij.openapi.util.Key;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
-import com.intellij.util.Function;
 import org.elixir_lang.errorreport.Logger;
 import org.elixir_lang.psi.ElixirFile;
 import org.elixir_lang.psi.Import;
@@ -17,15 +16,15 @@ import org.jetbrains.annotations.Nullable;
 
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
 import static org.elixir_lang.psi.call.name.Module.KERNEL_SPECIAL_FORMS;
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.macroChildCalls;
+import static org.elixir_lang.psi.impl.call.CallImplKt.macroChildCalls;
 
 public abstract class CallDefinitionClause implements PsiScopeProcessor {
     /*
      * CONSTANTS
      */
 
-    protected static final Key<Call> IMPORT_CALL = new Key<Call>("IMPORT_CALL");
-    public static final Key<String> MODULAR_CANONICAL_NAME = new Key<String>("MODULAR_CANONICAL_NAME");
+    protected static final Key<Call> IMPORT_CALL = new Key<>("IMPORT_CALL");
+    public static final Key<String> MODULAR_CANONICAL_NAME = new Key<>("MODULAR_CANONICAL_NAME");
 
     /*
      * Public Instance Methods
@@ -93,12 +92,7 @@ public abstract class CallDefinitionClause implements PsiScopeProcessor {
             try {
                 Import.callDefinitionClauseCallWhile(
                         element,
-                        new Function<Call, Boolean>() {
-                            @Override
-                            public Boolean fun(Call callDefinitionClause) {
-                                return executeOnCallDefinitionClause(callDefinitionClause, importState);
-                            }
-                        }
+                        callDefinitionClause -> executeOnCallDefinitionClause(callDefinitionClause, importState)
                 );
             } catch (StackOverflowError stackOverflowError) {
                 Logger.error(CallDefinitionClause.class, "StackOverflowError while processing import", element);
@@ -106,11 +100,9 @@ public abstract class CallDefinitionClause implements PsiScopeProcessor {
         } else if (Module.is(element)) {
             Call[] childCalls = macroChildCalls(element);
 
-            if (childCalls != null) {
-                for (Call childCall : childCalls) {
-                    if (!execute(childCall, state)) {
-                        break;
-                    }
+            for (Call childCall : childCalls) {
+                if (!execute(childCall, state)) {
+                    break;
                 }
             }
 
@@ -132,27 +124,19 @@ public abstract class CallDefinitionClause implements PsiScopeProcessor {
         boolean keepProcessing = org.elixir_lang.Reference.forEachNavigationElement(
                 project,
                 KERNEL,
-                new Function<PsiElement, Boolean>() {
-                    @Override
-                    public Boolean fun(PsiElement navigationElement) {
-                        boolean keepProcessingNavigationElements = true;
+                navigationElement -> {
+                    boolean keepProcessingNavigationElements = true;
 
-                        if (navigationElement instanceof Call) {
-                            Call modular = (Call) navigationElement;
+                    if (navigationElement instanceof Call) {
+                        Call modular = (Call) navigationElement;
 
-                            keepProcessingNavigationElements = Modular.callDefinitionClauseCallWhile(
-                                    modular,
-                                    new Function<Call, Boolean>() {
-                                        @Override
-                                        public Boolean fun(Call callDefinitionClause) {
-                                            return executeOnCallDefinitionClause(callDefinitionClause, state);
-                                        }
-                                    }
-                            );
-                        }
-
-                        return keepProcessingNavigationElements;
+                        keepProcessingNavigationElements = Modular.callDefinitionClauseCallWhile(
+                                modular,
+                                callDefinitionClause -> executeOnCallDefinitionClause(callDefinitionClause, state)
+                        );
                     }
+
+                    return keepProcessingNavigationElements;
                 }
         );
 
@@ -162,30 +146,22 @@ public abstract class CallDefinitionClause implements PsiScopeProcessor {
             keepProcessing = org.elixir_lang.Reference.forEachNavigationElement(
                     project,
                     KERNEL_SPECIAL_FORMS,
-                    new Function<PsiElement, Boolean>() {
-                        @Override
-                        public Boolean fun(PsiElement navigationElement) {
-                            boolean keepProcessingNavigationElements = true;
+                    navigationElement -> {
+                        boolean keepProcessingNavigationElements = true;
 
-                            if (navigationElement instanceof Call) {
-                                Call modular = (Call) navigationElement;
+                        if (navigationElement instanceof Call) {
+                            Call modular = (Call) navigationElement;
 
-                                keepProcessingNavigationElements = Modular.callDefinitionClauseCallWhile(
-                                        modular,
-                                        new Function<Call, Boolean>() {
-                                            @Override
-                                            public Boolean fun(Call callDefinitionClause) {
-                                                return executeOnCallDefinitionClause(
-                                                        callDefinitionClause,
-                                                        modularCanonicalNameState
-                                                );
-                                            }
-                                        }
-                                );
-                            }
-
-                            return keepProcessingNavigationElements;
+                            keepProcessingNavigationElements = Modular.callDefinitionClauseCallWhile(
+                                    modular,
+                                    callDefinitionClause -> executeOnCallDefinitionClause(
+                                            callDefinitionClause,
+                                            modularCanonicalNameState
+                                    )
+                            );
                         }
+
+                        return keepProcessingNavigationElements;
                     }
             );
         }

@@ -9,7 +9,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiWhiteSpace;
 import com.intellij.util.ProcessingContext;
 import org.apache.commons.lang.math.IntRange;
-import org.elixir_lang.psi.ElixirEndOfExpression;
 import org.elixir_lang.psi.ElixirTypes;
 import org.elixir_lang.psi.call.Call;
 import org.jetbrains.annotations.NotNull;
@@ -19,8 +18,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.macroChildCalls;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.maybeModularNameToModular;
+import static org.elixir_lang.psi.impl.call.CallImplKt.macroChildCalls;
 import static org.elixir_lang.structure_view.element.CallDefinitionClause.nameArityRange;
 
 public class CallDefinitionClause extends CompletionProvider<CompletionParameters> {
@@ -29,7 +28,7 @@ public class CallDefinitionClause extends CompletionProvider<CompletionParameter
         Call[] childCalls = macroChildCalls(scope);
         List<LookupElement> lookupElementList = null;
 
-        if (childCalls != null && childCalls.length > 0) {
+        if (childCalls.length > 0) {
             for (Call childCall : childCalls) {
                 if (org.elixir_lang.structure_view.element.CallDefinitionClause.is(childCall)) {
                     Pair<String, IntRange> nameArityRange = nameArityRange(childCall);
