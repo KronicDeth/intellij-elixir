@@ -15,12 +15,63 @@ import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.call.name.Module.stripElixirPrefix
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.*
+import org.elixir_lang.psi.impl.keywordValue
 import org.elixir_lang.psi.operation.*
 import org.elixir_lang.psi.qualification.Qualified
 import org.elixir_lang.psi.qualification.Unqualified
 import org.elixir_lang.psi.stub.call.Stub
 import org.jetbrains.annotations.Contract
 import java.util.*
+
+/**
+ * The keyword arguments for `call`.
+ * @param this@keywordArguments call to search for keyword arguments.
+ * @return the final element of the [ElixirPsiImplUtil.finalArguments] of `` if they are a
+ * [QuotableKeywordList]; otherwise, `null`.
+ */
+fun Call.keywordArguments(): QuotableKeywordList? {
+    val finalArguments = finalArguments(this)
+    var keywordArguments: QuotableKeywordList? = null
+
+    if (finalArguments != null) {
+        val finalArgumentCount = finalArguments.size
+
+        if (finalArgumentCount > 0) {
+            val potentialKeywords = finalArguments[finalArgumentCount - 1]
+
+            if (potentialKeywords is QuotableKeywordList) {
+                keywordArguments = potentialKeywords
+            } else if (potentialKeywords is ElixirAccessExpression) {
+                val accessExpressionChild = stripAccessExpression(potentialKeywords)
+
+                if (accessExpressionChild is ElixirList) {
+                    val listChildren = accessExpressionChild.children
+
+                    if (listChildren.size == 1) {
+                        val listChild = listChildren[0]
+
+                        if (listChild is QuotableKeywordList) {
+                            keywordArguments = listChild
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return keywordArguments
+}
+
+
+/**
+ * The value of the keyword argument with the given keywordKeyText.
+ *
+ * @param this@keywordArgument call to seach for the keyword argument.
+ * @param keywordKeyText the text of the key, such as `"do"`
+ * @return the keyword value `PsiElement` if `call` has [ElixirPsiImplUtil.keywordArguments]
+ * and there is a [] for `keywordKeyText`.
+ */
+fun Call.keywordArgument(keywordKeyText: String): PsiElement? = keywordArguments()?.keywordValue(keywordKeyText)
 
 object CallImpl {
     @Contract(pure = true)
@@ -84,7 +135,7 @@ object CallImpl {
 
     @JvmStatic
     fun hasDoBlockOrKeyword(call: Call): Boolean =
-            call.doBlock != null || keywordArgument(call, "do") != null
+            call.doBlock != null || call.keywordArgument("do") != null
 
     @JvmStatic
     fun hasDoBlockOrKeyword(stubBased: StubBased<Stub<*>>): Boolean =

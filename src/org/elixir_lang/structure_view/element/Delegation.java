@@ -22,6 +22,7 @@ import java.util.List;
 import static org.elixir_lang.psi.call.name.Function.DEFDELEGATE;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.stripAccessExpression;
+import static org.elixir_lang.psi.impl.call.CallImplKt.keywordArgument;
 
 public class Delegation extends Element<Call>  {
     /*
@@ -126,7 +127,7 @@ public class Delegation extends Element<Call>  {
      * @return defaults to {@code false} and when keyword argument is not parsable as boolean.
      */
     public boolean appendFirst() {
-        PsiElement keywordValue = ElixirPsiImplUtil.keywordArgument(navigationItem, "append_first");
+        PsiElement keywordValue = keywordArgument(navigationItem, "append_first");
         boolean appendFirst = false;
 
         if (keywordValue != null) {
@@ -212,7 +213,7 @@ public class Delegation extends Element<Call>  {
      */
     @Nullable
     private String keywordArgumentText(@NotNull final String keywordValueText) {
-        PsiElement keywordValue = ElixirPsiImplUtil.keywordArgument(navigationItem, keywordValueText);
+        PsiElement keywordValue = keywordArgument(navigationItem, keywordValueText);
         String text = null;
 
         if (keywordValue != null) {

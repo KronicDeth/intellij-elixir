@@ -6,7 +6,6 @@ import com.intellij.ui.RowIcon;
 import com.intellij.util.PlatformIcons;
 import org.elixir_lang.icons.ElixirIcons;
 import org.elixir_lang.psi.call.Call;
-import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,6 +14,7 @@ import javax.swing.*;
 import static org.elixir_lang.psi.call.name.Function.QUOTE;
 import static org.elixir_lang.psi.call.name.Quote.KeywordArgument.LOCATION;
 import static org.elixir_lang.psi.call.name.Quote.KeywordArgument.UNQUOTE;
+import static org.elixir_lang.psi.impl.call.CallImplKt.keywordArgument;
 
 public class Quote implements ItemPresentation {
     /*
@@ -72,8 +72,8 @@ public class Quote implements ItemPresentation {
     public String getPresentableText() {
         StringBuilder presentableTextBuilder = new StringBuilder(QUOTE);
 
-        PsiElement locationValueElement = ElixirPsiImplUtil.keywordArgument(call, LOCATION);
-        PsiElement unquoteValueElement = ElixirPsiImplUtil.keywordArgument(call, org.elixir_lang.psi.call.name.Quote.KeywordArgument.UNQUOTE);
+        PsiElement locationValueElement = keywordArgument(call, LOCATION);
+        PsiElement unquoteValueElement = keywordArgument(call, org.elixir_lang.psi.call.name.Quote.KeywordArgument.UNQUOTE);
 
         if (locationValueElement != null) {
             presentableTextBuilder

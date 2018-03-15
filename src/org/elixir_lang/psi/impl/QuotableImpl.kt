@@ -1406,6 +1406,13 @@ object QuotableImpl {
         )
     }
 
+    private fun keywordTuple(key: String, value: Int): OtpErlangTuple {
+        val keyAtom = OtpErlangAtom(key)
+        val valueInt = OtpErlangInt(value)
+
+        return OtpErlangTuple(arrayOf(keyAtom, valueInt))
+    }
+
     /* Returns the 0-indexed line number for the element */
     private fun lineNumber(node: ASTNode): Int = node.psi.document()!!.getLineNumber(node.startOffset)
 

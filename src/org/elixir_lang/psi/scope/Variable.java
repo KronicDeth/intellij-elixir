@@ -25,6 +25,7 @@ import static org.elixir_lang.psi.call.name.Function.*;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.*;
 import static org.elixir_lang.psi.impl.ProcessDeclarationsImpl.DECLARING_SCOPE;
 import static org.elixir_lang.psi.impl.ProcessDeclarationsImpl.isDeclaringScope;
+import static org.elixir_lang.psi.impl.call.CallImplKt.keywordArgument;
 import static org.elixir_lang.psi.operation.Normalized.operatorIndex;
 import static org.elixir_lang.psi.operation.infix.Normalized.leftOperand;
 import static org.elixir_lang.psi.operation.infix.Normalized.rightOperand;
@@ -287,7 +288,7 @@ public abstract class Variable implements PsiScopeProcessor {
                 );
             }
         } else if (org.elixir_lang.structure_view.element.Quote.is(match)) {
-            PsiElement bindQuoted = ElixirPsiImplUtil.keywordArgument(match, "bind_quoted");
+            PsiElement bindQuoted = keywordArgument(match, "bind_quoted");
 
             if (bindQuoted instanceof ElixirAccessExpression) {
                 PsiElement child = stripAccessExpression(bindQuoted);

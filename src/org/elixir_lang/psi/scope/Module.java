@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import static org.elixir_lang.psi.call.name.Function.ALIAS;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.finalArguments;
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.keywordArgument;
+import static org.elixir_lang.psi.impl.call.CallImplKt.keywordArgument;
 import static org.elixir_lang.psi.stub.type.call.Stub.isModular;
 
 public abstract class Module implements PsiScopeProcessor {

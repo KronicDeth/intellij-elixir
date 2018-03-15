@@ -20,6 +20,7 @@ import static org.elixir_lang.psi.call.name.Function.DEFIMPL;
 import static org.elixir_lang.psi.call.name.Function.FOR;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.stripAccessExpression;
+import static org.elixir_lang.psi.impl.QuotableKeywordListImplKt.keywordValue;
 
 public class Implementation extends Module {
     /*
@@ -135,7 +136,7 @@ public class Implementation extends Module {
 
             if (finalArgument instanceof QuotableKeywordList) {
                 QuotableKeywordList quotableKeywordList = (QuotableKeywordList) finalArgument;
-                forNameElement = ElixirPsiImplUtil.keywordValue(quotableKeywordList, FOR);
+                forNameElement = keywordValue(quotableKeywordList, FOR);
             }
         }
 
@@ -314,9 +315,13 @@ public class Implementation extends Module {
 
             if (finalArgument instanceof QuotableKeywordList) {
                 QuotableKeywordList quotableKeywordList = (QuotableKeywordList) finalArgument;
-                PsiElement keywordValue = ElixirPsiImplUtil.keywordValue(quotableKeywordList, FOR);
+                PsiElement keywordValue = keywordValue(quotableKeywordList, FOR);
 
-                forName = keywordValue.getText();
+                if (keywordValue != null) {
+                    forName = keywordValue.getText();
+                } else {
+                    forName = "?";
+                }
             } else {
                 forName = "?";
             }

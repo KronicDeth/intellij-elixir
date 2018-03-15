@@ -13,6 +13,7 @@ import org.elixir_lang.psi.call.name.Function
 import org.elixir_lang.psi.call.name.Function.*
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.call.CallImpl.hasDoBlockOrKeyword
+import org.elixir_lang.psi.impl.call.keywordArgument
 import org.elixir_lang.psi.impl.declarations.UseScopeImpl
 import org.elixir_lang.psi.impl.declarations.UseScopeImpl.selector
 import org.elixir_lang.psi.operation.And
@@ -76,7 +77,7 @@ object ProcessDeclarationsImpl {
                         call.isCallingMacro(KERNEL, "with") // <- or = variable
                 -> keepProcessing = processor.execute(call, state)
                 org.elixir_lang.structure_view.element.Quote.`is`(call) -> { // quote :bind_quoted keys{
-                    val bindQuoted = ElixirPsiImplUtil.keywordArgument(call, "bind_quoted")
+                    val bindQuoted = call.keywordArgument("bind_quoted")
                     /* the bind_quoted keys declare variable only valid inside the do block, so any place in the
                        bindQuoted already must be the bind_quoted values that must be declared before the quote */
                     if (bindQuoted != null && !PsiTreeUtil.isAncestor(bindQuoted, place, false)) {
