@@ -5,10 +5,7 @@ package org.elixir_lang.psi.impl
 import com.ericsson.otp.erlang.*
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.util.Computable
-import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiElementVisitor
-import com.intellij.psi.PsiFile
-import com.intellij.psi.PsiManager
+import com.intellij.psi.*
 import com.intellij.psi.impl.source.tree.Factory
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
@@ -31,6 +28,26 @@ import java.lang.Double
 import java.lang.Long
 import java.math.BigInteger
 import java.util.*
+
+val UNQUOTED_TYPES = arrayOf<Class<*>>(ElixirEndOfExpression::class.java, PsiComment::class.java, PsiWhiteSpace::class.java)
+
+/**
+ * @return {@code true} if {@code element} should not have {@code quote} called on it because Elixir natively
+ *   ignores such tokens.  {@code false} if {@code element} should have {@code quote} called on it.
+ */
+fun PsiElement.isUnquoted(): Boolean {
+    var unquoted = false
+
+    for (unquotedType in UNQUOTED_TYPES) {
+        if (unquotedType.isInstance(this)) {
+            unquoted = true
+            break
+        }
+    }
+
+    return unquoted
+}
+
 
 object QuotableImpl {
     private val AMBIGUOUS_OP = OtpErlangAtom("ambiguous_op")
@@ -1167,7 +1184,7 @@ object QuotableImpl {
                     .asSequence()
                     .filterNot {
                         // skip endOfExpression
-                        isUnquoted(it)
+                        it.isUnquoted()
                     }
                     .map { it as Quotable }
                     .map { it.quote() }
@@ -1312,8 +1329,8 @@ object QuotableImpl {
                     override fun visitElement(element: PsiElement?) {
                         if (element is Quotable) {
                             visitQuotable((element as Quotable?)!!)
-                        } else if (!isUnquoted(element)) {
-                            throw TODO("Don't know how to visit " + element!!)
+                        } else if (element != null && !element.isUnquoted()) {
+                            throw TODO("Don't know how to visit $element")
                         }
 
                         super.visitElement(element)

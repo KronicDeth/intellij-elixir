@@ -71,12 +71,6 @@ import static org.elixir_lang.reference.ModuleAttribute.isNonReferencing;
  * Created by luke.imhoff on 12/29/14.
  */
 public class ElixirPsiImplUtil {
-    public static final Class[] UNQUOTED_TYPES = new Class[]{
-            ElixirEndOfExpression.class,
-            PsiComment.class,
-            PsiWhiteSpace.class
-    };
-
     public static final OtpErlangAtom BLOCK = new OtpErlangAtom("__block__");
     public static final String DEFAULT_OPERATOR = "\\\\";
     public static final OtpErlangAtom DO = new OtpErlangAtom("do");
@@ -315,23 +309,6 @@ public class ElixirPsiImplUtil {
 
     public static boolean isModuleName(@NotNull final ElixirNoParenthesesOneArgument noParenthesesOneArgument) {
         return MaybeModuleNameImpl.isModuleName(noParenthesesOneArgument);
-    }
-
-    /*
-     * @return {@code true} if {@code element} should not have {@code quote} called on it because Elixir natively
-     *   ignores such tokens.  {@code false} if {@code element} should have {@code quote} called on it.
-     */
-    public static boolean isUnquoted(PsiElement element) {
-        boolean unquoted = false;
-
-        for (Class unquotedType : UNQUOTED_TYPES) {
-            if (unquotedType.isInstance(element)) {
-                unquoted = true;
-                break;
-            }
-        }
-
-        return unquoted;
     }
 
     @Contract(pure = true)
