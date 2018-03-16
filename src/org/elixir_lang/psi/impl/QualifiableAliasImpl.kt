@@ -3,6 +3,8 @@ package org.elixir_lang.psi.impl
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.PsiReference
+import com.intellij.psi.util.CachedValueProvider
+import com.intellij.psi.util.CachedValuesManager
 import org.elixir_lang.psi.ElixirAccessExpression
 import org.elixir_lang.psi.ElixirAlias
 import org.elixir_lang.psi.QualifiableAlias
@@ -13,8 +15,21 @@ import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.stripAccessExpression
 import org.elixir_lang.psi.operation.Normalized
 import org.elixir_lang.psi.stub.type.call.Stub.isModular
+import org.elixir_lang.reference.Module
 import org.elixir_lang.structure_view.element.CallDefinitionClause.enclosingModularMacroCall
 import org.jetbrains.annotations.Contract
+
+fun QualifiableAlias.computeReference(maxScope: PsiElement): PsiPolyVariantReference? =
+        if (isOutermostQualifiableAlias()) {
+            Module(this, maxScope)
+        } else {
+            null
+        }
+
+fun QualifiableAlias.getReference(maxScope: PsiElement): PsiPolyVariantReference? =
+        CachedValuesManager.getCachedValue(this) {
+            CachedValueProvider.Result.create(computeReference(maxScope), this)
+        }
 
 fun QualifiableAlias.fullyResolve(startingReference: PsiReference?): PsiElement {
     val fullyResolved: PsiElement

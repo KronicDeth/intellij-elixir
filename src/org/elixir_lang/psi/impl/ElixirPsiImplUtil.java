@@ -27,6 +27,7 @@ import org.elixir_lang.psi.call.arguments.star.NoParentheses;
 import org.elixir_lang.psi.call.arguments.star.NoParenthesesOneArgument;
 import org.elixir_lang.psi.call.arguments.star.Parentheses;
 import org.elixir_lang.psi.impl.call.CallImpl;
+import org.elixir_lang.psi.impl.call.CallImplKt;
 import org.elixir_lang.psi.impl.call.CanonicallyNamedImpl;
 import org.elixir_lang.psi.impl.declarations.UseScopeImpl;
 import org.elixir_lang.psi.operation.*;
@@ -1180,72 +1181,8 @@ public class ElixirPsiImplUtil {
     }
 
     @Nullable
-    private static PsiReference computeReference(@NotNull Call call) {
-        PsiReference reference = null;
-
-        /* if the call is just the identifier for a module attribute reference, then don't return a Callable reference,
-           and instead let {@link #getReference(AtNonNumbericOperation) handle it */
-        if (!(call instanceof UnqualifiedNoArgumentsCall && call.getParent() instanceof AtNonNumericOperation) &&
-                // if a bitstring segment option then the option is a pseudo-function
-                !isBitStreamSegmentOption(call)) {
-            PsiElement parent = call.getParent();
-
-            if (parent instanceof Type) {
-                PsiElement grandParent = parent.getParent();
-                AtUnqualifiedNoParenthesesCall moduleAttribute = null;
-                PsiElement maybeArgument = grandParent;
-
-                if (grandParent instanceof When) {
-                    maybeArgument = grandParent.getParent();
-                }
-
-                if (maybeArgument instanceof ElixirNoParenthesesOneArgument) {
-                    PsiElement maybeModuleAttribute = maybeArgument.getParent();
-
-                    if (maybeModuleAttribute instanceof AtUnqualifiedNoParenthesesCall) {
-                        moduleAttribute = (AtUnqualifiedNoParenthesesCall) maybeModuleAttribute;
-                    }
-
-                    if (moduleAttribute != null) {
-                        String name = moduleAttributeName(moduleAttribute);
-
-                        if (name.equals("@spec")) {
-                            reference = new org.elixir_lang.reference.CallDefinitionClause(call, moduleAttribute);
-                        }
-                    }
-                }
-            }
-
-            if (reference == null) {
-                if (CallDefinitionClause.is(call) || Implementation.is(call) || Module.is(call) || Protocol.is(call)) {
-                    reference = Callable.definer(call);
-                } else {
-                    reference = new Callable(call);
-                }
-            }
-        }
-
-        return reference;
-    }
-
-    @Nullable
     public static PsiReference getReference(@NotNull Call call) {
-        return CachedValuesManager.getCachedValue(
-                call,
-                () -> CachedValueProvider.Result.create(computeReference(call), call)
-        );
-    }
-
-    @Nullable
-    private static PsiPolyVariantReference computeReference(@NotNull QualifiableAlias qualifiableAlias,
-                                                            @NotNull PsiElement maxScope) {
-        PsiPolyVariantReference reference = null;
-
-        if (isOutermostQualifiableAlias(qualifiableAlias)) {
-            reference = new org.elixir_lang.reference.Module(qualifiableAlias, maxScope);
-        }
-
-        return reference;
+        return CallImplKt.computeReference(call);
     }
 
     @Nullable
@@ -1263,16 +1200,13 @@ public class ElixirPsiImplUtil {
 
     @Nullable
     public static PsiReference getReference(@NotNull QualifiableAlias qualifiableAlias) {
-        return getReference(qualifiableAlias, qualifiableAlias.getContainingFile());
+        return QualifiableAliasImplKt.getReference(qualifiableAlias, qualifiableAlias.getContainingFile());
     }
 
     @Nullable
     public static PsiPolyVariantReference getReference(@NotNull QualifiableAlias qualifiableAlias,
                                                        @NotNull PsiElement maxScope) {
-        return CachedValuesManager.getCachedValue(
-                qualifiableAlias,
-                () -> CachedValueProvider.Result.create(computeReference(qualifiableAlias, maxScope), qualifiableAlias)
-        );
+        return QualifiableAliasImplKt.getReference(qualifiableAlias, maxScope);
     }
 
     @NotNull
@@ -2266,7 +2200,7 @@ public class ElixirPsiImplUtil {
             if (!recursiveKernelImport(qualifiableAlias, maxScope)) {
                 /* need to construct reference directly as qualified aliases don't return a reference except for the
                    outermost */
-                PsiPolyVariantReference reference = getReference(qualifiableAlias, maxScope);
+                PsiPolyVariantReference reference = QualifiableAliasImplKt.getReference(qualifiableAlias, maxScope);
                 modular = toModular(qualifiableAlias, reference);
             }
         }

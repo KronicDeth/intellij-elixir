@@ -2,6 +2,9 @@ package org.elixir_lang.psi.impl.call
 
 import com.intellij.openapi.util.Computable
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiReference
+import com.intellij.psi.util.CachedValueProvider
+import com.intellij.psi.util.CachedValuesManager
 import org.apache.commons.lang.math.IntRange
 import org.elixir_lang.mix.importWizard.computeReadAction
 import org.elixir_lang.psi.*
@@ -20,10 +23,63 @@ import org.elixir_lang.psi.operation.*
 import org.elixir_lang.psi.qualification.Qualified
 import org.elixir_lang.psi.qualification.Unqualified
 import org.elixir_lang.psi.stub.call.Stub
+import org.elixir_lang.reference.Callable
+import org.elixir_lang.reference.Callable.isBitStreamSegmentOption
 import org.elixir_lang.structure_view.element.CallDefinitionClause
+import org.elixir_lang.structure_view.element.modular.Implementation
+import org.elixir_lang.structure_view.element.modular.Module
+import org.elixir_lang.structure_view.element.modular.Protocol
 import org.jetbrains.annotations.Contract
 import java.util.*
 import org.elixir_lang.psi.impl.macroChildCallList as psiElementToMacroChildCallList
+
+fun Call.computeReference(): PsiReference? {
+    var reference: PsiReference? = null
+
+    /* if the call is just the identifier for a module attribute reference, then don't return a Callable reference,
+           and instead let {@link #getReference(AtNonNumbericOperation) handle it */
+    if (!(this is UnqualifiedNoArgumentsCall<*> && parent is AtNonNumericOperation) &&
+            // if a bitstring segment option then the option is a pseudo-function
+            !isBitStreamSegmentOption(this)) {
+        val parent = parent
+
+        if (parent is Type) {
+            val grandParent = parent.getParent()
+            var moduleAttribute: AtUnqualifiedNoParenthesesCall<*>? = null
+            var maybeArgument = grandParent
+
+            if (grandParent is When) {
+                maybeArgument = grandParent.getParent()
+            }
+
+            if (maybeArgument is ElixirNoParenthesesOneArgument) {
+                val maybeModuleAttribute = maybeArgument.getParent()
+
+                if (maybeModuleAttribute is AtUnqualifiedNoParenthesesCall<*>) {
+                    moduleAttribute = maybeModuleAttribute
+                }
+
+                if (moduleAttribute != null) {
+                    val name = moduleAttributeName(moduleAttribute)
+
+                    if (name == "@spec") {
+                        reference = org.elixir_lang.reference.CallDefinitionClause(this, moduleAttribute)
+                    }
+                }
+            }
+        }
+
+        if (reference == null) {
+            reference = if (CallDefinitionClause.`is`(this) || Implementation.`is`(this) || Module.`is`(this) || Protocol.`is`(this)) {
+                Callable.definer(this)
+            } else {
+                Callable(this)
+            }
+        }
+    }
+
+    return reference
+}
 
 /**
  * The outer most arguments
@@ -31,6 +87,11 @@ import org.elixir_lang.psi.impl.macroChildCallList as psiElementToMacroChildCall
  * @return [Call.primaryArguments]
  */
 fun Call.finalArguments(): Array<PsiElement>? = secondaryArguments() ?: primaryArguments()
+
+fun Call.getReference(): PsiReference =
+        CachedValuesManager.getCachedValue(this) {
+            CachedValueProvider.Result.create(computeReference(), this)
+        }
 
 /**
  * The value of the keyword argument with the given keywordKeyText.
