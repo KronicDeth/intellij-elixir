@@ -1115,20 +1115,14 @@ public class ElixirPsiImplUtil {
         return HeredocImpl.getHeredocLineList(stringHeredoc);
     }
 
+    @NotNull
     public static Quotable getKeywordValue(ElixirKeywordPair keywordPair) {
-        PsiElement[] children = keywordPair.getChildren();
-
-        assert children.length == 2;
-
-        return (Quotable) children[1];
+        return QuotableKeywordPairImpl.getKeywordValue(keywordPair);
     }
 
+    @NotNull
     public static Quotable getKeywordValue(ElixirNoParenthesesKeywordPair noParenthesesKeywordPair) {
-        PsiElement[] children = noParenthesesKeywordPair.getChildren();
-
-        assert children.length == 2;
-
-        return (Quotable) children[1];
+        return QuotableKeywordPairImpl.getKeywordValue(noParenthesesKeywordPair);
     }
 
     @NotNull
