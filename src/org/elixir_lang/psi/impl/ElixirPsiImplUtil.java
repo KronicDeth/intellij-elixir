@@ -1143,111 +1143,28 @@ public class ElixirPsiImplUtil {
 
     @Nullable
     public static PsiElement getNameIdentifier(@NotNull ElixirAlias alias) {
-        PsiElement parent = alias.getParent();
-        PsiElement nameIdentifier = null;
-
-        if (parent instanceof ElixirAccessExpression) {
-            PsiElement grandParent = parent.getParent();
-
-            // alias is first alias in chain of qualifiers
-            if (grandParent instanceof QualifiableAlias) {
-                QualifiableAlias grandParentQualifiableAlias = (QualifiableAlias) grandParent;
-                nameIdentifier = grandParentQualifiableAlias.getNameIdentifier();
-            } else {
-                /* NamedStubbedPsiElementBase#getTextOffset assumes getNameIdentifier is null when the NameIdentifier is
-                   the element itself. */
-                // alias is single, unqualified alias
-                nameIdentifier = null;
-            }
-        } else if (parent instanceof QualifiableAlias) {
-            // alias is last in chain of qualifiers
-            QualifiableAlias parentQualifiableAlias = (QualifiableAlias) parent;
-            nameIdentifier = parentQualifiableAlias.getNameIdentifier();
-        }
-
-        return nameIdentifier;
+        return PsiNameIdentifierOwnerImpl.getNameIdentifier(alias);
     }
 
     @Nullable
     public static PsiElement getNameIdentifier(@NotNull ElixirKeywordKey keywordKey) {
-        ElixirCharListLine charListLine = keywordKey.getCharListLine();
-        PsiElement nameIdentifier;
-
-        if (charListLine != null) {
-            nameIdentifier = null;
-        } else {
-            ElixirStringLine stringLine = keywordKey.getStringLine();
-
-            if (stringLine != null) {
-                nameIdentifier = null;
-            } else {
-                nameIdentifier = keywordKey;
-            }
-        }
-
-        return nameIdentifier;
+        return PsiNameIdentifierOwnerImpl.getNameIdentifier(keywordKey);
     }
 
     @Contract(pure = true)
-    @Nullable
+    @NotNull
     public static PsiElement getNameIdentifier(@NotNull ElixirVariable variable) {
-        return variable;
+        return PsiNameIdentifierOwnerImpl.getNameIdentifier(variable);
     }
 
-    public static PsiElement getNameIdentifier(
-            @NotNull org.elixir_lang.psi.call.Named named
-    ) {
-        PsiElement nameIdentifier;
-
-        /* can't be a {@code public static PsiElement getNameIdentifier(@NotNull Operation operation)} because it leads
-           to "reference to getNameIdentifier is ambiguous" */
-        if (named instanceof Operation) {
-            Operation operation = (Operation) named;
-            nameIdentifier = operation.operator();
-        } else if (CallDefinitionClause.is(named)) {
-            nameIdentifier = CallDefinitionClause.nameIdentifier(named);
-        } else if (CallDefinitionSpecification.is(named)) {
-            nameIdentifier = CallDefinitionSpecification.nameIdentifier(named);
-        } else if (Callback.is(named)) {
-            nameIdentifier = Callback.nameIdentifier(named);
-        } else if (Implementation.is(named)) {
-            /* have to set to null so that {@code else} clause doesn't return the {@code defimpl} element as the name
-               identifier */
-            nameIdentifier = null;
-        } else if (Module.is(named)) {
-            nameIdentifier = Module.nameIdentifier(named);
-        } else if (Protocol.is(named)) {
-            nameIdentifier = Protocol.nameIdentifier(named);
-        } else if (named instanceof AtUnqualifiedNoParenthesesCall) { // module attribute
-            AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall = (AtUnqualifiedNoParenthesesCall) named;
-            nameIdentifier = atUnqualifiedNoParenthesesCall.getAtIdentifier();
-        } else {
-            nameIdentifier = named.functionNameElement();
-        }
-
-        return nameIdentifier;
+    @Nullable
+    public static PsiElement getNameIdentifier(@NotNull org.elixir_lang.psi.call.Named named) {
+        return PsiNameIdentifierOwnerImpl.getNameIdentifier(named);
     }
 
-    /**
-     *
-     * @param qualifiableAlias
-     * @return null if qualifiableAlias is its own name identifier
-     * @return PsiElement if qualifiableAlias is a subalias of a bigger qualified alias
-     */
     @Nullable
     public static PsiElement getNameIdentifier(@NotNull QualifiableAlias qualifiableAlias) {
-        PsiElement parent = qualifiableAlias.getParent();
-        PsiElement nameIdentifier;
-
-        if (parent instanceof QualifiableAlias) {
-            QualifiableAlias parentQualifiedAlias = (QualifiableAlias) parent;
-
-            nameIdentifier = parentQualifiedAlias.getNameIdentifier();
-        } else {
-            nameIdentifier = null;
-        }
-
-        return nameIdentifier;
+        return PsiNameIdentifierOwnerImpl.getNameIdentifier(qualifiableAlias);
     }
 
     @Contract(pure = true)
