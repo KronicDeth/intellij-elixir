@@ -215,7 +215,7 @@ public class Builder extends FoldingBuilderEx {
                         Call last = first;
 
                         while (true) {
-                            expression = nextSiblingExpression(expression);
+                            expression = siblingExpression(expression, NEXT_SIBLING);
 
                             if (expression instanceof Call) {
                                 Call call = (Call) expression;

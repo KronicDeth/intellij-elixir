@@ -9,7 +9,6 @@ import com.intellij.psi.*;
 import com.intellij.psi.impl.source.tree.Factory;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.scope.PsiScopeProcessor;
-import com.intellij.psi.search.LocalSearchScope;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
@@ -52,7 +51,6 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static org.elixir_lang.mix.importWizard.ImportedOtpAppKt.computeReadAction;
-import static org.elixir_lang.psi.call.name.Function.*;
 import static org.elixir_lang.psi.call.name.Module.*;
 import static org.elixir_lang.psi.impl.QualifiableAliasImplKt.isOutermostQualifiableAlias;
 import static org.elixir_lang.psi.impl.QuotableImpl.*;
@@ -375,12 +373,6 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static String moduleName(@NotNull final Qualified qualified) {
         return CallImpl.moduleName(qualified);
-    }
-
-    @Contract(pure = true)
-    @Nullable
-    public static PsiElement nextSiblingExpression(@NotNull PsiElement element) {
-        return siblingExpression(element, NEXT_SIBLING);
     }
 
     @Contract(pure = true)
