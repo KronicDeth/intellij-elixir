@@ -1360,27 +1360,6 @@ public class ElixirPsiImplUtil {
         return CallImpl.hasDoBlockOrKeyword(stubBased);
     }
 
-    public static boolean hasKeywordKey(@NotNull QuotableKeywordPair quotableKeywordPair, @NotNull String keywordKeyText) {
-        Quotable keywordKey = quotableKeywordPair.getKeywordKey();
-        boolean has = false;
-
-        if (computeReadAction(keywordKey::getText).equals(keywordKeyText)) {
-            has = true;
-        } else {
-            OtpErlangObject quotedKeywordKey = keywordKey.quote();
-
-            if (quotedKeywordKey instanceof OtpErlangAtom) {
-                OtpErlangAtom keywordKeyAtom = (OtpErlangAtom) quotedKeywordKey;
-
-                if (keywordKeyAtom.atomValue().equals(keywordKeyText)) {
-                    has = true;
-                }
-            }
-        }
-
-        return has;
-    }
-
     @Contract(pure = true)
     @NotNull
     public static PsiElement qualifier(@NotNull final Qualified qualified) {

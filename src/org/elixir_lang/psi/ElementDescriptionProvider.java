@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 import static org.elixir_lang.psi.call.name.Function.ALIAS;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.hasKeywordKey;
+import static org.elixir_lang.psi.impl.QuotableKeywordPairImplKt.hasKeywordKey;
 import static org.elixir_lang.reference.module.ResolvableName.resolvableName;
 
 /**

@@ -9,7 +9,6 @@ import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.ALIAS
 import org.elixir_lang.psi.call.name.Function.CREATE
 import org.elixir_lang.psi.call.name.Module.KERNEL
-import org.elixir_lang.psi.impl.ElixirPsiImplUtil.hasKeywordKey
 import org.elixir_lang.psi.operation.Match
 import org.jetbrains.annotations.Contract
 import java.util.*
@@ -119,7 +118,7 @@ fun PsiElement.enclosingMacroCall(): Call? {
         }
     } else if (parent is QuotableKeywordPair) {
 
-        if (hasKeywordKey(parent, "do")) {
+        if (parent.hasKeywordKey("do")) {
             val grandParent = parent.getParent()
 
             if (grandParent is QuotableKeywordList) {

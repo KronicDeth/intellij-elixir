@@ -2,7 +2,6 @@ package org.elixir_lang.psi.impl
 
 import org.elixir_lang.psi.Quotable
 import org.elixir_lang.psi.QuotableKeywordList
-import org.elixir_lang.psi.impl.ElixirPsiImplUtil.hasKeywordKey
 
 
 /**
@@ -16,7 +15,7 @@ fun QuotableKeywordList.keywordValue(keywordKeyText: String): Quotable? {
     var keywordValue: Quotable? = null
 
     for (quotableKeywordPair in quotableKeywordPairList()) {
-        if (hasKeywordKey(quotableKeywordPair, keywordKeyText)) {
+        if (quotableKeywordPair.hasKeywordKey(keywordKeyText)) {
             keywordValue = quotableKeywordPair.keywordValue
         }
     }
