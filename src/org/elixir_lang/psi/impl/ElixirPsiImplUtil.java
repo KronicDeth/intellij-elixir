@@ -15,9 +15,7 @@ import com.intellij.psi.tree.TokenSet;
 import com.intellij.psi.util.CachedValueProvider;
 import com.intellij.psi.util.CachedValuesManager;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.usageView.UsageViewUtil;
 import org.apache.commons.lang.math.IntRange;
-import org.elixir_lang.annotator.Parameter;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.call.MaybeExported;
@@ -34,31 +32,20 @@ import org.elixir_lang.psi.operation.*;
 import org.elixir_lang.psi.qualification.Qualified;
 import org.elixir_lang.psi.qualification.Unqualified;
 import org.elixir_lang.psi.stub.call.Stub;
-import org.elixir_lang.reference.Callable;
 import org.elixir_lang.structure_view.element.CallDefinitionClause;
-import org.elixir_lang.structure_view.element.CallDefinitionSpecification;
-import org.elixir_lang.structure_view.element.Callback;
-import org.elixir_lang.structure_view.element.modular.Implementation;
-import org.elixir_lang.structure_view.element.modular.Module;
-import org.elixir_lang.structure_view.element.modular.Protocol;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import static org.elixir_lang.mix.importWizard.ImportedOtpAppKt.computeReadAction;
-import static org.elixir_lang.psi.call.name.Module.*;
-import static org.elixir_lang.psi.impl.QualifiableAliasImplKt.isOutermostQualifiableAlias;
+import static org.elixir_lang.psi.call.name.Module.KERNEL;
 import static org.elixir_lang.psi.impl.QualifiableAliasImplKt.toModular;
 import static org.elixir_lang.psi.impl.QuotableImpl.*;
-import static org.elixir_lang.psi.impl.QuotableImpl.NIL;
 import static org.elixir_lang.psi.stub.type.call.Stub.isModular;
-import static org.elixir_lang.reference.Callable.*;
 import static org.elixir_lang.reference.ModuleAttribute.isNonReferencing;
 
 /**
@@ -1799,72 +1786,6 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static IntRange resolvedFinalArityRange(@NotNull Call call) {
         return CallImpl.resolvedFinalArityRange(call);
-    }
-
-    /**
-     * Similar to {@link functionName}, but takes into account `import`s.
-     *
-     * @return
-     */
-    @Nullable
-    public static String resolvedFunctionName(@NotNull @SuppressWarnings("unused") final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
-        // TODO handle resolving function name from module attribute's declaration
-        return null;
-    }
-
-    /**
-     * Similar to {@link functionName}, but takes into account `import`s.
-     *
-     * @return
-     */
-    @Contract(pure = true, value = "_ -> null")
-    @Nullable
-    public static String resolvedFunctionName(@NotNull @SuppressWarnings("unused") final DotCall dotCall) {
-        // TODO handle resolving function name from potential capture when declaring variable
-        return null;
-    }
-
-    /**
-     * Similar to {@link #functionName(Call)}}, but takes into account `import`s.
-     *
-     * @return
-     */
-    @Contract(pure = true)
-    @NotNull
-    public static String resolvedFunctionName(@NotNull final Call call) {
-        // TODO handle `import`s
-        return call.functionName();
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static String resolvedFunctionName(@NotNull final org.elixir_lang.psi.call.StubBased<Stub> stubBased) {
-        Stub stub = stubBased.getStub();
-        String resolvedFunctionName;
-
-        if (stub != null) {
-            resolvedFunctionName = stub.resolvedFunctionName();
-        } else {
-            resolvedFunctionName = resolvedFunctionName((Call) stubBased);
-        }
-
-        //noinspection ConstantConditions
-        return resolvedFunctionName;
-    }
-
-    @Nullable
-    public static String resolvedFunctionName(@NotNull final UnqualifiedNoArgumentsCall<Stub> unqualifiedNoArgumentsCall) {
-        Stub stub = unqualifiedNoArgumentsCall.getStub();
-        String resolvedFunctionName;
-
-        if (stub != null) {
-            resolvedFunctionName = stub.resolvedFunctionName();
-        } else {
-            // TODO handle `import`s and determine whether actually local variable
-            resolvedFunctionName = unqualifiedNoArgumentsCall.functionName();
-        }
-
-        return resolvedFunctionName;
     }
 
     @Contract(pure = true, value = "_ -> null")
