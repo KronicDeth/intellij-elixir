@@ -1170,48 +1170,13 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static ItemPresentation getPresentation(@NotNull final Call call) {
-        final String text = UsageViewUtil.createNodeText(call);
-
-        return new ItemPresentation() {
-            @Nullable
-            public String getPresentableText() {
-                return text;
-            }
-
-            @Nullable
-            public String getLocationString() {
-                return call.getContainingFile().getName();
-            }
-
-            @Nullable
-            public Icon getIcon(boolean b) {
-                return call.getIcon(0);
-            }
-        };
+        return PresentationImpl.getPresentation(call);
     }
 
     @Contract(pure = true)
     @Nullable
     public static ItemPresentation getPresentation(@NotNull final ElixirIdentifier identifier) {
-        Parameter parameter = new Parameter(identifier);
-        Parameter parameterizedParameter = Parameter.putParameterized(parameter);
-        ItemPresentation itemPresentation = null;
-
-        if ((parameterizedParameter.type == Parameter.Type.FUNCTION_NAME ||
-                parameterizedParameter.type == Parameter.Type.MACRO_NAME) &&
-                parameterizedParameter.parameterized != null) {
-            final NavigatablePsiElement parameterized = parameterizedParameter.parameterized;
-
-            if (parameterized instanceof Call) {
-                CallDefinitionClause callDefinitionClause = CallDefinitionClause.fromCall((Call) parameterized);
-
-                if (callDefinitionClause != null) {
-                    itemPresentation = callDefinitionClause.getPresentation();
-                }
-            }
-        }
-
-        return itemPresentation;
+        return PresentationImpl.getPresentation(identifier);
     }
 
     @Nullable
