@@ -35,6 +35,7 @@ import java.util.Set;
 import static org.elixir_lang.psi.ElementDescriptionProvider.VARIABLE_USAGE_VIEW_TYPE_LOCATION_ELEMENT_DESCRIPTION;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.*;
 import static org.elixir_lang.psi.impl.declarations.UseScopeImpl.selector;
+import static org.elixir_lang.psi.impl.declarations.UseScopeImplKt.followingSiblingsSearchScope;
 
 public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantReference {
     /*

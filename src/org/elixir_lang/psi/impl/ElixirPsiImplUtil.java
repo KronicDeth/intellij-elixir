@@ -3,17 +3,12 @@ package org.elixir_lang.psi.impl;
 import com.ericsson.otp.erlang.*;
 import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
-import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.module.ModuleUtilCore;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.Pair;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.tree.Factory;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.scope.PsiScopeProcessor;
-import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.LocalSearchScope;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.tree.IElementType;
@@ -34,6 +29,7 @@ import org.elixir_lang.psi.call.arguments.star.NoParenthesesOneArgument;
 import org.elixir_lang.psi.call.arguments.star.Parentheses;
 import org.elixir_lang.psi.impl.call.CallImpl;
 import org.elixir_lang.psi.impl.call.CanonicallyNamedImpl;
+import org.elixir_lang.psi.impl.declarations.UseScopeImpl;
 import org.elixir_lang.psi.operation.*;
 import org.elixir_lang.psi.qualification.Qualified;
 import org.elixir_lang.psi.qualification.Unqualified;
@@ -42,7 +38,6 @@ import org.elixir_lang.reference.Callable;
 import org.elixir_lang.structure_view.element.CallDefinitionClause;
 import org.elixir_lang.structure_view.element.CallDefinitionSpecification;
 import org.elixir_lang.structure_view.element.Callback;
-import org.elixir_lang.structure_view.element.Delegation;
 import org.elixir_lang.structure_view.element.modular.Implementation;
 import org.elixir_lang.structure_view.element.modular.Module;
 import org.elixir_lang.structure_view.element.modular.Protocol;
@@ -56,7 +51,6 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import static org.elixir_lang.errorreport.Logger.error;
 import static org.elixir_lang.mix.importWizard.ImportedOtpAppKt.computeReadAction;
 import static org.elixir_lang.psi.call.name.Function.*;
 import static org.elixir_lang.psi.call.name.Module.*;
@@ -381,26 +375,6 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static String moduleName(@NotNull final Qualified qualified) {
         return CallImpl.moduleName(qualified);
-    }
-
-    private static GlobalSearchScope moduleWithDependentsScope(PsiElement element) {
-        VirtualFile virtualFile = element.getContainingFile().getVirtualFile();
-        Project project = element.getProject();
-        com.intellij.openapi.module.Module module = ModuleUtilCore.findModuleForFile(
-                virtualFile,
-                project
-        );
-
-        GlobalSearchScope globalSearchScope;
-
-        // module can be null for scratch files
-        if (module != null) {
-            globalSearchScope = GlobalSearchScope.moduleWithDependentsScope(module);
-        } else {
-            globalSearchScope = GlobalSearchScope.allScope(project);
-        }
-
-        return globalSearchScope;
     }
 
     @Contract(pure = true)
@@ -1022,21 +996,6 @@ public class ElixirPsiImplUtil {
         return finalArguments;
     }
 
-    public static LocalSearchScope followingSiblingsSearchScope(PsiElement element) {
-        List<PsiElement> followingSiblingList = new ArrayList<PsiElement>();
-        PsiElement previousSibling = element;
-        PsiElement followingSibling = previousSibling.getNextSibling();
-
-        while (followingSibling != null) {
-            followingSiblingList.add(followingSibling);
-
-            previousSibling = followingSibling;
-            followingSibling = previousSibling.getNextSibling();
-        }
-
-        return new LocalSearchScope(followingSiblingList.toArray(new PsiElement[followingSiblingList.size()]));
-    }
-
     @Contract(pure = true)
     @NotNull
     public static String fullyQualifiedName(@NotNull final ElixirAlias alias) {
@@ -1318,83 +1277,16 @@ public class ElixirPsiImplUtil {
         return ElixirTypes.WORDS_FRAGMENT;
     }
 
-    /**
-     * Returns the scope in which references to this element are searched.
-     *
-     * @return the search scope instance.
-     * @see {@link com.intellij.psi.search.PsiSearchHelper#getUseScope(PsiElement)}
-     */
     @NotNull
     @Contract(pure=true)
-    static SearchScope getUseScope(AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
-        SearchScope useScope;
-
-        if (isNonReferencing(atUnqualifiedNoParenthesesCall.getAtIdentifier())) {
-            useScope = moduleWithDependentsScope(atUnqualifiedNoParenthesesCall);
-        } else {
-            useScope = followingSiblingsSearchScope(atUnqualifiedNoParenthesesCall);
-        }
-
-        return useScope;
+    static SearchScope getUseScope(@NotNull AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
+        return UseScopeImpl.get(atUnqualifiedNoParenthesesCall);
     }
 
-    /**
-     * Returns the scope in which references to this element are searched.
-     *
-     * @return the search scope instance.
-     * @see {@link com.intellij.psi.search.PsiSearchHelper#getUseScope(PsiElement)}
-     */
     @NotNull
     @Contract(pure=true)
-    static SearchScope getUseScope(UnqualifiedNoArgumentsCall unqualifiedNoArgumentsCall) {
-        SearchScope useScope;
-
-        if (isBitStreamSegmentOption(unqualifiedNoArgumentsCall)) {
-            // Bit Stream Segment Options aren't variables or even real functions, so no use scope
-            useScope = LocalSearchScope.EMPTY;
-        } else if (isParameter(unqualifiedNoArgumentsCall) || isParameterWithDefault(unqualifiedNoArgumentsCall)) {
-            PsiElement ancestor = unqualifiedNoArgumentsCall.getParent();
-
-            while (true) {
-                if (ancestor instanceof Call) {
-                    Call ancestorCall = (Call) ancestor;
-
-                    if (CallDefinitionClause.is(ancestorCall)) {
-                        PsiElement macroDefinitionClause = macroDefinitionClauseForArgument(ancestorCall);
-
-                        if (macroDefinitionClause != null) {
-                            ancestor = macroDefinitionClause;
-                        }
-
-                        break;
-                    } else if (Delegation.is(ancestorCall)) {
-                        break;
-                    } else if (ancestorCall.hasDoBlockOrKeyword()) {
-                        break;
-                    }
-                } else if (ancestor instanceof ElixirStabOperation) {
-                    break;
-                } else if (ancestor instanceof PsiFile) {
-                    error(
-                            UnqualifiedNoArgumentsCall.class,
-                            "Use scope for parameter not found before reaching file scope",
-                            unqualifiedNoArgumentsCall
-                    );
-                    break;
-                }
-
-                ancestor = ancestor.getParent();
-            }
-
-            useScope = new LocalSearchScope(ancestor);
-        } else if (isVariable(unqualifiedNoArgumentsCall)) {
-            useScope = variableUseScope(unqualifiedNoArgumentsCall);
-        } else {
-            // if the type of callable isn't known, fallback to default scope
-            useScope = moduleWithDependentsScope(unqualifiedNoArgumentsCall);
-        }
-
-        return useScope;
+    static SearchScope getUseScope(@NotNull UnqualifiedNoArgumentsCall unqualifiedNoArgumentsCall) {
+        return UseScopeImpl.get(unqualifiedNoArgumentsCall);
     }
 
     public static List<HeredocLine> getHeredocLineList(InterpolatedCharListHeredocLined interpolatedCharListHeredocLined) {
@@ -2730,31 +2622,6 @@ public class ElixirPsiImplUtil {
     /*
      * Private static methods
      */
-
-    @Contract(pure = true)
-    @Nullable
-    private static Call macroDefinitionClauseForArgument(Call callDefinitionClause) {
-        Call macroDefinitionClause = null;
-        PsiElement parent = callDefinitionClause.getParent();
-
-        if (parent instanceof ElixirMatchedWhenOperation) {
-            PsiElement grandParent =  parent.getParent();
-
-            if (grandParent instanceof ElixirNoParenthesesOneArgument) {
-                PsiElement greatGrandParent = grandParent.getParent();
-
-                if (greatGrandParent instanceof Call) {
-                    Call greatGrandParentCall = (Call) greatGrandParent;
-
-                    if (CallDefinitionClause.isMacro(greatGrandParentCall)) {
-                        macroDefinitionClause = greatGrandParentCall;
-                    }
-                }
-            }
-        }
-
-        return macroDefinitionClause;
-    }
 
     /**
      * Finds modular ({@code defmodule}, {@code defimpl}, or {@code defprotocol}) for the qualifier of

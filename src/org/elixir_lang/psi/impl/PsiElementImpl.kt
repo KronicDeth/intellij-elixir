@@ -1,7 +1,9 @@
 package org.elixir_lang.psi.impl
 
 import com.intellij.openapi.editor.Document
+import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.psi.PsiElement
+import com.intellij.psi.search.GlobalSearchScope
 import org.elixir_lang.psi.ElixirAccessExpression
 import org.elixir_lang.psi.ElixirList
 import org.elixir_lang.psi.ElixirStabBody
@@ -34,3 +36,18 @@ fun PsiElement.macroChildCallList(): MutableList<Call> {
     return callList
 }
 
+fun PsiElement.moduleWithDependentsScope(): GlobalSearchScope {
+    val virtualFile = containingFile.virtualFile
+    val project = project
+    val module = ModuleUtilCore.findModuleForFile(
+            virtualFile,
+            project
+    )
+
+    // module can be null for scratch files
+    return if (module != null) {
+        GlobalSearchScope.moduleWithDependentsScope(module)
+    } else {
+        GlobalSearchScope.allScope(project)
+    }
+}

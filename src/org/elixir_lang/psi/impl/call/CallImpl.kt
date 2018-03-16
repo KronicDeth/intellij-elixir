@@ -20,9 +20,20 @@ import org.elixir_lang.psi.operation.*
 import org.elixir_lang.psi.qualification.Qualified
 import org.elixir_lang.psi.qualification.Unqualified
 import org.elixir_lang.psi.stub.call.Stub
+import org.elixir_lang.structure_view.element.CallDefinitionClause
 import org.jetbrains.annotations.Contract
 import java.util.*
 import org.elixir_lang.psi.impl.macroChildCallList as psiElementToMacroChildCallList
+
+/**
+ * The value of the keyword argument with the given keywordKeyText.
+ *
+ * @param this@keywordArgument call to seach for the keyword argument.
+ * @param keywordKeyText the text of the key, such as `"do"`
+ * @return the keyword value `PsiElement` if `call` has [ElixirPsiImplUtil.keywordArguments]
+ * and there is a [] for `keywordKeyText`.
+ */
+fun Call.keywordArgument(keywordKeyText: String): PsiElement? = keywordArguments()?.keywordValue(keywordKeyText)
 
 /**
  * The keyword arguments for `call`.
@@ -117,16 +128,27 @@ fun Call.macroChildCallList(): List<Call> {
     return childCallList
 }
 
+@Contract(pure = true)
+fun Call.macroDefinitionClauseForArgument(): Call? {
+    var macroDefinitionClause: Call? = null
+    val parent = parent
 
-/**
- * The value of the keyword argument with the given keywordKeyText.
- *
- * @param this@keywordArgument call to seach for the keyword argument.
- * @param keywordKeyText the text of the key, such as `"do"`
- * @return the keyword value `PsiElement` if `call` has [ElixirPsiImplUtil.keywordArguments]
- * and there is a [] for `keywordKeyText`.
- */
-fun Call.keywordArgument(keywordKeyText: String): PsiElement? = keywordArguments()?.keywordValue(keywordKeyText)
+    if (parent is ElixirMatchedWhenOperation) {
+        val grandParent = parent.getParent()
+
+        if (grandParent is ElixirNoParenthesesOneArgument) {
+            val greatGrandParent = grandParent.getParent()
+
+            if (greatGrandParent is Call) {
+                if (CallDefinitionClause.isMacro(greatGrandParent)) {
+                    macroDefinitionClause = greatGrandParent
+                }
+            }
+        }
+    }
+
+    return macroDefinitionClause
+}
 
 object CallImpl {
     @Contract(pure = true)
