@@ -10,7 +10,6 @@ import org.elixir_lang.navigation.item_presentation.Parent;
 import org.elixir_lang.psi.ElixirAccessExpression;
 import org.elixir_lang.psi.ElixirList;
 import org.elixir_lang.psi.call.Call;
-import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.elixir_lang.structure_view.element.modular.Modular;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -22,6 +21,7 @@ import java.util.List;
 import static org.elixir_lang.psi.call.name.Function.DEFDELEGATE;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.stripAccessExpression;
+import static org.elixir_lang.psi.impl.call.CallImplKt.finalArguments;
 import static org.elixir_lang.psi.impl.call.CallImplKt.keywordArgument;
 
 public class Delegation extends Element<Call>  {
@@ -41,7 +41,7 @@ public class Delegation extends Element<Call>  {
     public static List<Call> callDefinitionHeadCallList(Call defdelegateCall) {
         List<Call> callDefinitionHeadCallList = null;
 
-        PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(defdelegateCall);
+        PsiElement[] finalArguments = finalArguments(defdelegateCall);
 
         assert finalArguments != null;
         assert finalArguments.length > 0;

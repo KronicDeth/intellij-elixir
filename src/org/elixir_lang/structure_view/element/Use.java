@@ -7,12 +7,12 @@ import com.intellij.psi.PsiElement;
 import com.intellij.usageView.UsageViewTypeLocation;
 import org.elixir_lang.navigation.item_presentation.Parent;
 import org.elixir_lang.psi.call.Call;
-import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.elixir_lang.structure_view.element.modular.Modular;
 import org.jetbrains.annotations.NotNull;
 
 import static org.elixir_lang.psi.call.name.Function.USE;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
+import static org.elixir_lang.psi.impl.call.CallImplKt.finalArguments;
 
 public class Use extends Element<Call> {
     /*
@@ -85,7 +85,7 @@ public class Use extends Element<Call> {
             location = parentPresenation.getLocatedPresentableText();
         }
 
-        PsiElement[] arguments = ElixirPsiImplUtil.finalArguments(navigationItem);
+        PsiElement[] arguments = finalArguments(navigationItem);
 
         return new org.elixir_lang.navigation.item_presentation.Use(location, arguments);
     }

@@ -844,22 +844,6 @@ public class ElixirPsiImplUtil {
         return name;
     }
 
-    /**
-     * The outer most arguments
-     *
-     * @return {@link Call#primaryArguments}
-     */
-    @Nullable
-    public static PsiElement[] finalArguments(@NotNull final Call call) {
-        PsiElement[] finalArguments = call.secondaryArguments();
-
-        if (finalArguments == null) {
-            finalArguments = call.primaryArguments();
-        }
-
-        return finalArguments;
-    }
-
     @Contract(pure = true)
     @NotNull
     public static String fullyQualifiedName(@NotNull final ElixirAlias alias) {

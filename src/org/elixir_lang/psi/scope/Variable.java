@@ -10,11 +10,10 @@ import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.call.name.Function;
 import org.elixir_lang.psi.call.name.Module;
-import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.elixir_lang.psi.operation.*;
-import org.elixir_lang.psi.operation.Type;
 import org.elixir_lang.reference.Callable;
-import org.elixir_lang.structure_view.element.*;
+import org.elixir_lang.structure_view.element.CallDefinitionHead;
+import org.elixir_lang.structure_view.element.Delegation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,6 +24,7 @@ import static org.elixir_lang.psi.call.name.Function.*;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.*;
 import static org.elixir_lang.psi.impl.ProcessDeclarationsImpl.DECLARING_SCOPE;
 import static org.elixir_lang.psi.impl.ProcessDeclarationsImpl.isDeclaringScope;
+import static org.elixir_lang.psi.impl.call.CallImplKt.finalArguments;
 import static org.elixir_lang.psi.impl.call.CallImplKt.keywordArgument;
 import static org.elixir_lang.psi.operation.Normalized.operatorIndex;
 import static org.elixir_lang.psi.operation.infix.Normalized.leftOperand;
@@ -239,13 +239,13 @@ public abstract class Variable implements PsiScopeProcessor {
                 }
             }
         } else if  (match.isCalling(Module.KERNEL, Function.DESTRUCTURE, 2)) {
-            PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(match);
+            PsiElement[] finalArguments = finalArguments(match);
 
             if (finalArguments != null) {
                 keepProcessing = execute(finalArguments[0], state.put(DECLARING_SCOPE, true));
             }
         } else if (match.isCallingMacro(Module.KERNEL, Function.FOR) || match.isCallingMacro(Module.KERNEL, "with")) {
-            PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(match);
+            PsiElement[] finalArguments = finalArguments(match);
 
             if (finalArguments != null) {
                 PsiElement entrance = state.get(ENTRANCE);
@@ -277,7 +277,7 @@ public abstract class Variable implements PsiScopeProcessor {
                 match.isCallingMacro(Module.KERNEL, COND) ||
                 match.isCallingMacro(Module.KERNEL, IF) ||
                 match.isCallingMacro(Module.KERNEL, UNLESS)) {
-            PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(match);
+            PsiElement[] finalArguments = finalArguments(match);
 
             if (finalArguments != null && finalArguments.length > 0) {
                 keepProcessing = execute(
@@ -578,7 +578,7 @@ public abstract class Variable implements PsiScopeProcessor {
     private boolean executeStrippedCallDefinitionHead(@NotNull Call strippedCallDefinitionHead, @NotNull ResolveState state) {
         boolean keepProcessing = true;
 
-        PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(strippedCallDefinitionHead);
+        PsiElement[] finalArguments = finalArguments(strippedCallDefinitionHead);
 
         if (finalArguments != null) {
             // set scope to declaring so that calls inside the arguments are treated as maybe macros

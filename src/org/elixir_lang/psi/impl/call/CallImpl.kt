@@ -26,6 +26,13 @@ import java.util.*
 import org.elixir_lang.psi.impl.macroChildCallList as psiElementToMacroChildCallList
 
 /**
+ * The outer most arguments
+ *
+ * @return [Call.primaryArguments]
+ */
+fun Call.finalArguments(): Array<PsiElement>? = secondaryArguments() ?: primaryArguments()
+
+/**
  * The value of the keyword argument with the given keywordKeyText.
  *
  * @param this@keywordArgument call to seach for the keyword argument.
@@ -42,7 +49,7 @@ fun Call.keywordArgument(keywordKeyText: String): PsiElement? = keywordArguments
  * [QuotableKeywordList]; otherwise, `null`.
  */
 fun Call.keywordArguments(): QuotableKeywordList? {
-    val finalArguments = finalArguments(this)
+    val finalArguments = this.finalArguments()
     var keywordArguments: QuotableKeywordList? = null
 
     if (finalArguments != null) {
@@ -99,9 +106,9 @@ fun Call.macroChildCallList(): List<Call> {
             }
         }
     } else { // one liner version with `do:` keyword argument
-        val finalArguments = ElixirPsiImplUtil.finalArguments(this)!!
+        val finalArguments = finalArguments()!!
 
-        assert(finalArguments.size > 0)
+        assert(finalArguments.isNotEmpty())
 
         val potentialKeywords = finalArguments[finalArguments.size - 1]
 
@@ -548,7 +555,7 @@ object CallImpl {
     @Contract(pure = true)
     @JvmStatic
     fun resolvedFinalArityRange(call: Call): IntRange =
-            ElixirPsiImplUtil.finalArguments(call)?.let { finalArguments ->
+            call.finalArguments()?.let { finalArguments ->
                 val defaultCount = finalArguments.defaultArgumentCount()
                 val maximum = finalArguments.size
                 val minimum = maximum - defaultCount

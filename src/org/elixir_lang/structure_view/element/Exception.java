@@ -12,7 +12,6 @@ import org.elixir_lang.psi.ElixirList;
 import org.elixir_lang.psi.QuotableKeywordList;
 import org.elixir_lang.psi.QuotableKeywordPair;
 import org.elixir_lang.psi.call.Call;
-import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.elixir_lang.structure_view.element.modular.Modular;
 import org.elixir_lang.structure_view.element.structure.Structure;
 import org.jetbrains.annotations.Contract;
@@ -27,6 +26,7 @@ import java.util.Map;
 import static org.elixir_lang.psi.call.name.Function.DEFEXCEPTION;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.stripAccessExpression;
+import static org.elixir_lang.psi.impl.call.CallImplKt.finalArguments;
 
 /**
  * A `defexception` with its fields and the callbacks `exception/1` and `message/1` if overridden.
@@ -104,7 +104,7 @@ public class Exception extends Element<Call> {
      */
     @NotNull
     public Map<PsiElement, PsiElement> defaultValueElementByKeyElement() {
-        PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(navigationItem);
+        PsiElement[] finalArguments = finalArguments(navigationItem);
 
         assert finalArguments != null;
         assert finalArguments.length == 1;

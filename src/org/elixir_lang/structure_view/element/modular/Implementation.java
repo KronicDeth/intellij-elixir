@@ -7,7 +7,6 @@ import com.intellij.psi.PsiNamedElement;
 import com.intellij.usageView.UsageViewTypeLocation;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
-import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.elixir_lang.structure_view.element.CallDefinitionClause;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,6 +20,7 @@ import static org.elixir_lang.psi.call.name.Function.FOR;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.stripAccessExpression;
 import static org.elixir_lang.psi.impl.QuotableKeywordListImplKt.keywordValue;
+import static org.elixir_lang.psi.impl.call.CallImplKt.finalArguments;
 
 public class Implementation extends Module {
     /*
@@ -128,7 +128,7 @@ public class Implementation extends Module {
 
     @Nullable
     public static PsiElement forNameElement(@NotNull Call call) {
-        PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(call);
+        PsiElement[] finalArguments = finalArguments(call);
         PsiElement forNameElement = null;
 
         if (finalArguments != null && finalArguments.length > 0) {
@@ -221,7 +221,7 @@ public class Implementation extends Module {
 
     @Nullable
     public static QualifiableAlias protocolNameElement(@NotNull Call call) {
-        PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(call);
+        PsiElement[] finalArguments = finalArguments(call);
         QualifiableAlias protocolNameElement = null;
 
         if (finalArguments != null && finalArguments.length > 0) {
@@ -306,7 +306,7 @@ public class Implementation extends Module {
     @NotNull
     private String derivedForName() {
         String forName;
-        PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(navigationItem);
+        PsiElement[] finalArguments = finalArguments(navigationItem);
 
         assert finalArguments != null;
 

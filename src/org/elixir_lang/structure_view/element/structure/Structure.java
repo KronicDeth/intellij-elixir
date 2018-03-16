@@ -8,7 +8,6 @@ import com.intellij.usageView.UsageViewTypeLocation;
 import org.elixir_lang.navigation.item_presentation.Parent;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
-import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.elixir_lang.structure_view.element.Element;
 import org.elixir_lang.structure_view.element.modular.Modular;
 import org.jetbrains.annotations.NotNull;
@@ -19,6 +18,7 @@ import java.util.List;
 import static org.elixir_lang.psi.call.name.Function.DEFSTRUCT;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.stripAccessExpression;
+import static org.elixir_lang.psi.impl.call.CallImplKt.finalArguments;
 
 public class Structure extends Element<Call> {
     /*
@@ -67,7 +67,7 @@ public class Structure extends Element<Call> {
     @NotNull
     @Override
     public TreeElement[] getChildren() {
-        PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(navigationItem);
+        PsiElement[] finalArguments = finalArguments(navigationItem);
         List<TreeElement> childList = new ArrayList<TreeElement>();
 
         assert finalArguments != null;

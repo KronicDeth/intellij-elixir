@@ -19,6 +19,8 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static org.elixir_lang.psi.impl.call.CallImplKt.finalArguments;
+
 public class Callback extends Element<AtUnqualifiedNoParenthesesCall> implements Timed {
     /*
      * Fields
@@ -197,7 +199,7 @@ public class Callback extends Element<AtUnqualifiedNoParenthesesCall> implements
         Parent parentPresentation = (Parent) modular.getPresentation();
         String location = parentPresentation.getLocatedPresentableText();
 
-        PsiElement[] arguments = ElixirPsiImplUtil.finalArguments(navigationItem);
+        PsiElement[] arguments = finalArguments(navigationItem);
 
         assert arguments != null;
 

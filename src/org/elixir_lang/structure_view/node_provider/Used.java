@@ -16,7 +16,6 @@ import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.ElixirAccessExpression;
 import org.elixir_lang.psi.QualifiableAlias;
 import org.elixir_lang.psi.call.Call;
-import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.elixir_lang.structure_view.element.*;
 import org.elixir_lang.structure_view.element.modular.Module;
 import org.jetbrains.annotations.NonNls;
@@ -27,6 +26,7 @@ import java.util.*;
 
 import static com.intellij.openapi.util.Pair.pair;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.stripAccessExpression;
+import static org.elixir_lang.psi.impl.call.CallImplKt.finalArguments;
 import static org.elixir_lang.psi.impl.call.CallImplKt.macroChildCalls;
 import static org.elixir_lang.structure_view.element.modular.Module.addClausesToCallDefinition;
 
@@ -90,7 +90,7 @@ public class Used implements FileStructureNodeProvider<TreeElement>, ActionShort
 
         if (child instanceof Use) {
             Use use = (Use) child;
-            PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(use.call());
+            PsiElement[] finalArguments = finalArguments(use.call());
 
             assert finalArguments != null;
 
