@@ -1055,136 +1055,64 @@ public class ElixirPsiImplUtil {
         return UseScopeImpl.get(unqualifiedNoArgumentsCall);
     }
 
+    @NotNull
     public static List<HeredocLine> getHeredocLineList(InterpolatedCharListHeredocLined interpolatedCharListHeredocLined) {
-        List<ElixirInterpolatedCharListHeredocLine> interpolatedCharListHeredocLineList = interpolatedCharListHeredocLined.getInterpolatedCharListHeredocLineList();
-        List<HeredocLine> heredocLineList = new ArrayList<HeredocLine>(interpolatedCharListHeredocLineList.size());
-
-        for (HeredocLine heredocLine : interpolatedCharListHeredocLineList) {
-            heredocLineList.add(heredocLine);
-        }
-
-        return heredocLineList;
+        return HeredocImpl.getHeredocLineList(interpolatedCharListHeredocLined);
     }
 
+    @NotNull
     public static List<HeredocLine> getHeredocLineList(InterpolatedStringHeredocLined interpolatedStringHeredocLined) {
-        List<ElixirInterpolatedStringHeredocLine> interpolatedStringHeredocLineList = interpolatedStringHeredocLined.getInterpolatedStringHeredocLineList();
-        List<HeredocLine> heredocLineList = new ArrayList<HeredocLine>(interpolatedStringHeredocLineList.size());
-
-        for (HeredocLine heredocLine : interpolatedStringHeredocLineList) {
-            heredocLineList.add(heredocLine);
-        }
-
-        return heredocLineList;
+        return HeredocImpl.getHeredocLineList(interpolatedStringHeredocLined);
     }
 
+    @NotNull
     public static List<HeredocLine> getHeredocLineList(ElixirCharListHeredoc charListHeredoc) {
-        List<ElixirCharListHeredocLine> charListHeredocLines = charListHeredoc.getCharListHeredocLineList();
-        List<HeredocLine> heredocLineList = new ArrayList<HeredocLine>(charListHeredocLines.size());
-
-        for (HeredocLine heredocLine : charListHeredocLines) {
-            heredocLineList.add(heredocLine);
-        }
-
-        return heredocLineList;
+        return HeredocImpl.getHeredocLineList(charListHeredoc);
     }
 
+    @NotNull
     public static List<HeredocLine> getHeredocLineList(ElixirInterpolatedRegexHeredoc interpolatedRegexHeredoc) {
-        List<ElixirInterpolatedRegexHeredocLine> interpolatedRegexHeredocLines = interpolatedRegexHeredoc.getInterpolatedRegexHeredocLineList();
-        List<HeredocLine> heredocLineList = new ArrayList<HeredocLine>(interpolatedRegexHeredocLines.size());
-
-        for (HeredocLine heredocLine : interpolatedRegexHeredocLines) {
-            heredocLineList.add(heredocLine);
-        }
-
-        return heredocLineList;
+        return HeredocImpl.getHeredocLineList(interpolatedRegexHeredoc);
     }
 
+    @NotNull
     public static List<HeredocLine> getHeredocLineList(ElixirInterpolatedSigilHeredoc interpolatedSigilHeredoc) {
-        List<ElixirInterpolatedSigilHeredocLine> interpolatedSigilHeredocLines = interpolatedSigilHeredoc.getInterpolatedSigilHeredocLineList();
-        List<HeredocLine> heredocLineList = new ArrayList<HeredocLine>(interpolatedSigilHeredocLines.size());
-
-        for (HeredocLine heredocLine : interpolatedSigilHeredocLines) {
-            heredocLineList.add(heredocLine);
-        }
-
-        return heredocLineList;
+        return HeredocImpl.getHeredocLineList(interpolatedSigilHeredoc);
     }
 
+    @NotNull
     public static List<HeredocLine> getHeredocLineList(ElixirInterpolatedWordsHeredoc interpolatedWordsHeredoc) {
-        List<ElixirInterpolatedWordsHeredocLine> interpolatedWordsHeredocLines = interpolatedWordsHeredoc.getInterpolatedWordsHeredocLineList();
-        List<HeredocLine> heredocLineList = new ArrayList<HeredocLine>(interpolatedWordsHeredocLines.size());
-
-        for (HeredocLine heredocLine : interpolatedWordsHeredocLines) {
-            heredocLineList.add(heredocLine);
-        }
-
-        return heredocLineList;
+        return HeredocImpl.getHeredocLineList(interpolatedWordsHeredoc);
     }
 
+    @NotNull
     public static List<HeredocLine> getHeredocLineList(ElixirLiteralCharListSigilHeredoc literalCharListSigilHeredoc) {
-        List<ElixirLiteralCharListHeredocLine> literalCharListHeredocLines = literalCharListSigilHeredoc.getLiteralCharListHeredocLineList();
-        List<HeredocLine> heredocLineList = new ArrayList<HeredocLine>(literalCharListHeredocLines.size());
-
-        for (HeredocLine heredocLine : literalCharListHeredocLines) {
-            heredocLineList.add(heredocLine);
-        }
-
-        return heredocLineList;
+        return HeredocImpl.getHeredocLineList(literalCharListSigilHeredoc);
     }
 
+    @NotNull
     public static List<HeredocLine> getHeredocLineList(ElixirLiteralRegexHeredoc literalRegexSigilHeredoc) {
-        List<ElixirLiteralRegexHeredocLine> literalRegexHeredocLines = literalRegexSigilHeredoc.getLiteralRegexHeredocLineList();
-        List<HeredocLine> heredocLineList = new ArrayList<HeredocLine>(literalRegexHeredocLines.size());
-
-        for (HeredocLine heredocLine : literalRegexHeredocLines) {
-            heredocLineList.add(heredocLine);
-        }
-
-        return heredocLineList;
+        return HeredocImpl.getHeredocLineList(literalRegexSigilHeredoc);
     }
 
+    @NotNull
     public static List<HeredocLine> getHeredocLineList(ElixirLiteralSigilHeredoc literalSigilHeredoc) {
-        List<ElixirLiteralSigilHeredocLine> literalSigilHeredocLines = literalSigilHeredoc.getLiteralSigilHeredocLineList();
-        List<HeredocLine> heredocLineList = new ArrayList<HeredocLine>(literalSigilHeredocLines.size());
-
-        for (HeredocLine heredocLine : literalSigilHeredocLines) {
-            heredocLineList.add(heredocLine);
-        }
-
-        return heredocLineList;
+        return HeredocImpl.getHeredocLineList(literalSigilHeredoc);
     }
 
+    @NotNull
     public static List<HeredocLine> getHeredocLineList(ElixirLiteralStringSigilHeredoc literalStringSigilHeredoc) {
-        List<ElixirLiteralStringHeredocLine> literalStringHeredocLines = literalStringSigilHeredoc.getLiteralStringHeredocLineList();
-        List<HeredocLine> heredocLineList = new ArrayList<HeredocLine>(literalStringHeredocLines.size());
-
-        for (HeredocLine heredocLine : literalStringHeredocLines) {
-            heredocLineList.add(heredocLine);
-        }
-
-        return heredocLineList;
+        return HeredocImpl.getHeredocLineList(literalStringSigilHeredoc);
     }
 
+    @NotNull
     public static List<HeredocLine> getHeredocLineList(ElixirLiteralWordsHeredoc literalWordsSigilHeredoc) {
-        List<ElixirLiteralWordsHeredocLine> literalWordsHeredocLines = literalWordsSigilHeredoc.getLiteralWordsHeredocLineList();
-        List<HeredocLine> heredocLineList = new ArrayList<HeredocLine>(literalWordsHeredocLines.size());
-
-        for (HeredocLine heredocLine : literalWordsHeredocLines) {
-            heredocLineList.add(heredocLine);
-        }
-
-        return heredocLineList;
+        return HeredocImpl.getHeredocLineList(literalWordsSigilHeredoc);
     }
 
+    @NotNull
     public static List<HeredocLine> getHeredocLineList(ElixirStringHeredoc stringHeredoc) {
-        List<ElixirStringHeredocLine> stringHeredocLineList = stringHeredoc.getStringHeredocLineList();
-        List<HeredocLine> heredocLineList = new ArrayList<HeredocLine>(stringHeredocLineList.size());
-
-        for (HeredocLine heredocLine : stringHeredocLineList) {
-            heredocLineList.add(heredocLine);
-        }
-
-        return heredocLineList;
+        return HeredocImpl.getHeredocLineList(stringHeredoc);
     }
 
     public static Quotable getKeywordValue(ElixirKeywordPair keywordPair) {
