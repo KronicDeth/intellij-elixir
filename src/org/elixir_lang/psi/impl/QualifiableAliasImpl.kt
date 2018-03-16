@@ -1,5 +1,8 @@
 package org.elixir_lang.psi.impl
 
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiPolyVariantReference
+import com.intellij.psi.PsiReference
 import org.elixir_lang.psi.ElixirAccessExpression
 import org.elixir_lang.psi.ElixirAlias
 import org.elixir_lang.psi.QualifiableAlias
@@ -9,8 +12,90 @@ import org.elixir_lang.psi.call.name.Function.__MODULE__
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.stripAccessExpression
 import org.elixir_lang.psi.operation.Normalized
+import org.elixir_lang.psi.stub.type.call.Stub.isModular
 import org.elixir_lang.structure_view.element.CallDefinitionClause.enclosingModularMacroCall
 import org.jetbrains.annotations.Contract
+
+fun QualifiableAlias.fullyResolve(startingReference: PsiReference?): PsiElement {
+    val fullyResolved: PsiElement
+    var currentResolved: PsiElement = this
+    var reference = startingReference
+
+    do {
+        if (reference == null) {
+            reference = currentResolved.reference
+        }
+
+        if (reference != null) {
+            if (reference is PsiPolyVariantReference) {
+                val resolveResults = reference.multiResolve(false)
+                val resolveResultCount = resolveResults.size
+
+                if (resolveResultCount == 0) {
+                    fullyResolved = currentResolved
+
+                    break
+                } else if (resolveResultCount == 1) {
+                    val resolveResult = resolveResults[0]
+
+                    val nextResolved = resolveResult.element
+
+                    if (nextResolved != null && nextResolved is Call && isModular(nextResolved)) {
+                        fullyResolved = nextResolved
+                        break
+                    }
+
+                    if (nextResolved == null || nextResolved.isEquivalentTo(currentResolved)) {
+                        fullyResolved = currentResolved
+                        break
+                    } else {
+                        currentResolved = nextResolved
+                    }
+                } else {
+                    var nextResolved: PsiElement? = null
+
+                    for (resolveResult in resolveResults) {
+                        val resolveResultElement = resolveResult.element
+
+                        if (resolveResultElement != null &&
+                                resolveResultElement is Call &&
+                                isModular(resolveResultElement)) {
+                            nextResolved = resolveResultElement
+
+                            break
+                        }
+                    }
+
+                    fullyResolved = if (nextResolved == null) {
+                        currentResolved
+                    } else {
+                        nextResolved
+                    }
+
+                    break
+                }
+            } else {
+                val nextResolved = reference.resolve()
+
+                if (nextResolved == null || nextResolved.isEquivalentTo(currentResolved)) {
+                    fullyResolved = currentResolved
+                    break
+                } else {
+                    currentResolved = nextResolved
+                }
+            }
+        } else {
+            fullyResolved = currentResolved
+
+            break
+        }
+
+        reference = null
+    } while (true)
+
+    return fullyResolved
+}
+
 
 @Contract(pure = true)
 fun QualifiableAlias.isOutermostQualifiableAlias(): Boolean {
@@ -29,6 +114,17 @@ fun QualifiableAlias.isOutermostQualifiableAlias(): Boolean {
     }
 
     return outermost
+}
+
+@Contract(pure = true)
+fun QualifiableAlias.toModular(startingReference: PsiReference): Call? {
+    val fullyResolvedAlias = fullyResolve(startingReference)
+
+    return if (fullyResolvedAlias is Call && isModular(fullyResolvedAlias)) {
+        fullyResolvedAlias
+    } else {
+        null
+    }
 }
 
 object QualifiableAliasImpl {
@@ -55,8 +151,7 @@ object QualifiableAliasImpl {
                 val enclosingCall = enclosingModularMacroCall(qualifierCall)
 
                 if (enclosingCall != null && enclosingCall is StubBased<*>) {
-                    val enclosingStubBasedCall = enclosingCall as StubBased<*>
-                    qualifierName = enclosingStubBasedCall.canonicalName()
+                    qualifierName = enclosingCall.canonicalName()
                 }
             }
         } else if (qualifier is QualifiableAlias) {

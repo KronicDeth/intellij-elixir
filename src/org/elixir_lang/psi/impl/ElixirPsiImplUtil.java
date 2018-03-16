@@ -53,6 +53,7 @@ import java.util.stream.Stream;
 import static org.elixir_lang.mix.importWizard.ImportedOtpAppKt.computeReadAction;
 import static org.elixir_lang.psi.call.name.Module.*;
 import static org.elixir_lang.psi.impl.QualifiableAliasImplKt.isOutermostQualifiableAlias;
+import static org.elixir_lang.psi.impl.QualifiableAliasImplKt.toModular;
 import static org.elixir_lang.psi.impl.QuotableImpl.*;
 import static org.elixir_lang.psi.impl.QuotableImpl.NIL;
 import static org.elixir_lang.psi.stub.type.call.Stub.isModular;
@@ -854,89 +855,6 @@ public class ElixirPsiImplUtil {
     @Nullable
     public static String fullyQualifiedName(@NotNull final QualifiableAlias qualifiableAlias) {
         return QualifiableAliasImpl.fullyQualifiedName(qualifiableAlias);
-    }
-
-    @NotNull
-    public static PsiElement fullyResolveAlias(@NotNull QualifiableAlias alias,
-                                               @Nullable PsiReference startingReference) {
-        PsiElement fullyResolved;
-        PsiElement currentResolved = alias;
-        PsiReference reference = startingReference;
-
-        do {
-            if (reference == null) {
-                reference = currentResolved.getReference();
-            }
-
-            if (reference != null) {
-                if (reference instanceof PsiPolyVariantReference) {
-                    PsiPolyVariantReference polyVariantReference = (PsiPolyVariantReference) reference;
-                    ResolveResult[] resolveResults = polyVariantReference.multiResolve(false);
-                    int resolveResultCount = resolveResults.length;
-
-                    if (resolveResultCount == 0) {
-                        fullyResolved = currentResolved;
-
-                        break;
-                    } else if (resolveResultCount == 1) {
-                        ResolveResult resolveResult = resolveResults[0];
-
-                        PsiElement nextResolved = resolveResult.getElement();
-
-                        if (nextResolved != null && nextResolved instanceof Call && isModular((Call) nextResolved)) {
-                            fullyResolved = nextResolved;
-                            break;
-                        }
-
-                        if (nextResolved == null || nextResolved.isEquivalentTo(currentResolved)) {
-                            fullyResolved = currentResolved;
-                            break;
-                        } else {
-                            currentResolved = nextResolved;
-                        }
-                    } else {
-                        PsiElement nextResolved = null;
-
-                        for (ResolveResult resolveResult : resolveResults) {
-                            PsiElement resolveResultElement = resolveResult.getElement();
-
-                            if (resolveResultElement != null &&
-                                    resolveResultElement instanceof Call &&
-                                    isModular((Call) resolveResultElement)) {
-                                nextResolved = resolveResultElement;
-
-                                break;
-                            }
-                        }
-
-                        if (nextResolved == null) {
-                            fullyResolved = currentResolved;
-                        } else {
-                            fullyResolved = nextResolved;
-                        }
-
-                        break;
-                    }
-                } else {
-                    PsiElement nextResolved = reference.resolve();
-
-                    if (nextResolved == null || nextResolved.isEquivalentTo(currentResolved)) {
-                        fullyResolved = currentResolved;
-                        break;
-                    } else {
-                        currentResolved = nextResolved;
-                    }
-                }
-            } else {
-                fullyResolved = currentResolved;
-
-                break;
-            }
-
-            reference = null;
-        } while (true);
-
-        return fullyResolved;
     }
 
     @Contract(pure = true)
@@ -2566,26 +2484,8 @@ public class ElixirPsiImplUtil {
                 /* need to construct reference directly as qualified aliases don't return a reference except for the
                    outermost */
                 PsiPolyVariantReference reference = getReference(qualifiableAlias, maxScope);
-                modular = aliasToModular(qualifiableAlias, reference);
+                modular = toModular(qualifiableAlias, reference);
             }
-        }
-
-        return modular;
-    }
-
-    @Contract(pure = true)
-    @Nullable
-    private static Call aliasToModular(@NotNull QualifiableAlias alias,
-                                       @NotNull PsiReference startingReference) {
-        PsiElement fullyResolvedAlias = fullyResolveAlias(alias, startingReference);
-        Call modular = null;
-
-        if (fullyResolvedAlias instanceof Call) {
-           Call fullyResolvedAliasCall = (Call) fullyResolvedAlias;
-
-           if (isModular(fullyResolvedAliasCall)) {
-               modular = fullyResolvedAliasCall;
-           }
         }
 
         return modular;
