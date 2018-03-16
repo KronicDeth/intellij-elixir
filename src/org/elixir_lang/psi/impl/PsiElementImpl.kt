@@ -4,13 +4,140 @@ import com.intellij.openapi.editor.Document
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.psi.PsiElement
 import com.intellij.psi.search.GlobalSearchScope
-import org.elixir_lang.psi.ElixirAccessExpression
-import org.elixir_lang.psi.ElixirList
-import org.elixir_lang.psi.ElixirStabBody
+import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
+import org.elixir_lang.psi.call.name.Function.ALIAS
+import org.elixir_lang.psi.call.name.Function.CREATE
+import org.elixir_lang.psi.call.name.Module.KERNEL
+import org.elixir_lang.psi.impl.ElixirPsiImplUtil.hasKeywordKey
+import org.elixir_lang.psi.operation.Match
+import org.jetbrains.annotations.Contract
 import java.util.*
 
 fun PsiElement.document(): Document? = containingFile.viewProvider.document
+
+/**
+ *
+ * @param call
+ * @return `null` if call is at top-level
+ */
+@Contract(pure = true)
+fun PsiElement.enclosingMacroCall(): Call? {
+    var enclosingMacroCall: Call? = null
+    val parent = parent
+
+    if (parent is ElixirDoBlock) {
+        val grandParent = parent.getParent()
+
+        if (grandParent is Call) {
+            enclosingMacroCall = grandParent
+        }
+    } else if (parent is ElixirStabBody) {
+        val grandParent = parent.getParent()
+
+        if (grandParent is ElixirStab) {
+            val greatGrandParent = grandParent.getParent()
+
+            if (greatGrandParent is ElixirBlockItem) {
+                val greatGreatGrandParent = greatGrandParent.getParent()
+
+                if (greatGreatGrandParent is ElixirBlockList) {
+                    val greatGreatGreatGrandParent = greatGreatGrandParent.getParent()
+
+                    if (greatGreatGreatGrandParent is ElixirDoBlock) {
+                        val greatGreatGreatGreatGrandParent = greatGreatGreatGrandParent.getParent()
+
+                        if (greatGreatGreatGreatGrandParent is Call) {
+                            enclosingMacroCall = greatGreatGreatGreatGrandParent
+                        }
+                    }
+                }
+            } else if (greatGrandParent is ElixirDoBlock) {
+                val greatGreatGrandParent = greatGrandParent.getParent()
+
+                if (greatGreatGrandParent is Call) {
+                    enclosingMacroCall = greatGreatGrandParent
+                }
+            } else if (greatGrandParent is ElixirParentheticalStab) {
+                val greatGreatGrandParent = greatGrandParent.getParent()
+
+                if (greatGreatGrandParent is ElixirAccessExpression) {
+                    enclosingMacroCall = greatGreatGrandParent.enclosingMacroCall()
+                }
+            }
+        } else if (grandParent is ElixirStabOperation) {
+            val stabOperationParent = grandParent.getParent()
+
+            if (stabOperationParent is ElixirStab) {
+                val stabParent = stabOperationParent.getParent()
+
+                if (stabParent is ElixirAnonymousFunction) {
+                    val anonymousFunctionParent = stabParent.getParent()
+
+                    if (anonymousFunctionParent is ElixirAccessExpression) {
+                        val accessExpressionParent = anonymousFunctionParent.getParent()
+
+                        if (accessExpressionParent is Arguments) {
+                            val argumentsParent = accessExpressionParent.getParent()
+
+                            if (argumentsParent is ElixirMatchedParenthesesArguments) {
+                                val matchedParenthesesArgumentsParent = argumentsParent.getParent()
+
+                                if (matchedParenthesesArgumentsParent is Call) {
+
+                                    if (matchedParenthesesArgumentsParent.isCalling("Enum", "map") || matchedParenthesesArgumentsParent.isCalling("Enum", "each")) {
+                                        enclosingMacroCall = matchedParenthesesArgumentsParent.enclosingMacroCall()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    } else if (parent is Arguments ||
+            // See https://github.com/elixir-lang/elixir/blob/v1.5/lib/elixir/lib/protocol.ex#L633
+            parent is AtUnqualifiedNoParenthesesCall<*> ||
+            // See https://github.com/phoenixframework/phoenix/blob/v1.2.4/lib/phoenix/template.ex#L380-L392
+            parent is ElixirAccessExpression ||
+            // See https://github.com/absinthe-graphql/absinthe/blob/v1.3.0/lib/absinthe/schema/notation/writer.ex#L24-L44
+            parent is ElixirList ||
+            parent is ElixirMatchedParenthesesArguments ||
+            // See https://github.com/absinthe-graphql/absinthe/blob/v1.3.0/lib/absinthe/schema/notation/writer.ex#L96
+            parent is ElixirNoParenthesesManyStrictNoParenthesesExpression ||
+            parent is ElixirTuple ||
+            parent is Match ||
+            parent is QualifiedAlias ||
+            parent is QualifiedMultipleAliases) {
+        enclosingMacroCall = parent.enclosingMacroCall()
+    } else if (parent is Call) {
+
+        if (parent.isCalling(KERNEL, ALIAS)) {
+            enclosingMacroCall = parent
+        } else if (parent.isCalling(org.elixir_lang.psi.call.name.Module.MODULE, CREATE, 3)) {
+            enclosingMacroCall = parent
+        }
+    } else if (parent is QuotableKeywordPair) {
+
+        if (hasKeywordKey(parent, "do")) {
+            val grandParent = parent.getParent()
+
+            if (grandParent is QuotableKeywordList) {
+                val greatGrandParent = grandParent.getParent()
+
+                if (greatGrandParent is ElixirNoParenthesesOneArgument) {
+                    val greatGreatGrandParent = greatGrandParent.getParent()
+
+                    if (greatGreatGrandParent is Call) {
+                        enclosingMacroCall = greatGreatGrandParent
+                    }
+                }
+            }
+        }
+    }
+
+    return enclosingMacroCall
+}
 
 fun PsiElement.macroChildCallList(): MutableList<Call> {
     val callList: MutableList<Call>

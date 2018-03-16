@@ -11,7 +11,6 @@ import org.elixir_lang.Visibility;
 import org.elixir_lang.errorreport.Logger;
 import org.elixir_lang.navigation.item_presentation.NameArity;
 import org.elixir_lang.psi.call.Call;
-import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.elixir_lang.structure_view.element.modular.*;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +21,7 @@ import java.util.List;
 
 import static org.elixir_lang.psi.call.name.Function.*;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.enclosingMacroCall;
+import static org.elixir_lang.psi.impl.PsiElementImplKt.enclosingMacroCall;
 import static org.elixir_lang.psi.impl.call.CallImplKt.macroChildCalls;
 
 public class CallDefinitionClause extends Element<Call> implements Presentable, Visible {
@@ -83,7 +82,7 @@ public class CallDefinitionClause extends Element<Call> implements Presentable, 
 
     /**
      * The enclosing macro call that acts as the modular scope of {@code call}.  Ignores enclosing {@code for} calls that
-     * {@link ElixirPsiImplUtil#enclosingMacroCall} doesn't.
+     * {@link org.elixir_lang.psi.impl.PsiElementImplKt#enclosingMacroCall} doesn't.
      *
      * @param call a def(macro)?p?
      */

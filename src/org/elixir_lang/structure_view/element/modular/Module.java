@@ -31,7 +31,7 @@ import static org.elixir_lang.psi.call.name.Function.CREATE;
 import static org.elixir_lang.psi.call.name.Function.DEFMODULE;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
 import static org.elixir_lang.psi.call.name.Module.MODULE;
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.enclosingMacroCall;
+import static org.elixir_lang.psi.impl.PsiElementImplKt.enclosingMacroCall;
 import static org.elixir_lang.psi.impl.call.CallImplKt.macroChildCalls;
 
 public class Module extends Element<Call> implements Modular {
