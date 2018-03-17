@@ -7,6 +7,7 @@ import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
 import org.elixir_lang.psi.ElixirAccessExpression
 import org.elixir_lang.psi.ElixirAlias
+import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.psi.QualifiableAlias
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.StubBased
@@ -131,13 +132,18 @@ fun QualifiableAlias.isOutermostQualifiableAlias(): Boolean {
 }
 
 fun QualifiableAlias.maybeModularNameToModular(maxScope: PsiElement): Call? =
-    if (!ElixirPsiImplUtil.recursiveKernelImport(this, maxScope)) {
+    if (!recursiveKernelImport(maxScope)) {
         /* need to construct reference directly as qualified aliases don't return a reference except for the
            outermost */
         getReference(maxScope)?.let { this.toModular(it) }
     } else {
         null
     }
+
+
+@Contract(pure = true)
+private fun QualifiableAlias.recursiveKernelImport(maxScope: PsiElement): Boolean =
+        maxScope is ElixirFile && maxScope.name == "kernel.ex" && name == KERNEL
 
 @Contract(pure = true)
 fun QualifiableAlias.toModular(startingReference: PsiReference): Call? {

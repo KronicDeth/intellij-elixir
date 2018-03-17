@@ -1,6 +1,8 @@
 package org.elixir_lang.psi.impl;
 
-import com.ericsson.otp.erlang.*;
+import com.ericsson.otp.erlang.OtpErlangBinary;
+import com.ericsson.otp.erlang.OtpErlangObject;
+import com.ericsson.otp.erlang.OtpErlangTuple;
 import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.util.Key;
@@ -36,9 +38,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import static org.elixir_lang.psi.call.name.Module.KERNEL;
 import static org.elixir_lang.psi.impl.PsiElementImplKt.siblingExpression;
-import static org.elixir_lang.psi.impl.QuotableImpl.*;
+import static org.elixir_lang.psi.impl.QuotableImpl.NIL;
 
 public class ElixirPsiImplUtil {
     public static final String DEFAULT_OPERATOR = "\\\\";
@@ -1572,24 +1573,6 @@ public class ElixirPsiImplUtil {
         }
 
         return quotedRightOperand;
-    }
-
-    @Contract(pure = true)
-    public static boolean recursiveKernelImport(@NotNull QualifiableAlias qualifiableAlias,
-                                                @NotNull PsiElement maxScope) {
-        boolean recursiveKernelImport = false;
-
-        if (maxScope instanceof ElixirFile) {
-            ElixirFile elixirFile = (ElixirFile) maxScope;
-
-            if (elixirFile.getName().equals("kernel.ex")) {
-                String qualifiableAliasName = qualifiableAlias.getName();
-
-                recursiveKernelImport = qualifiableAliasName != null && qualifiableAliasName.equals(KERNEL);
-            }
-        }
-
-        return recursiveKernelImport;
     }
 
     @Contract(pure = true)
