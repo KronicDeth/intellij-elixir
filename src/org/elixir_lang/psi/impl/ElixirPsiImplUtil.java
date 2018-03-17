@@ -366,16 +366,6 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static ASTNode operatorTokenNode(@NotNull Operator operator) {
-        return operator
-                    .getNode()
-                    .getChildren(
-                            operator.operatorTokenSet()
-                    )[0];
-    }
-
-    @Contract(pure = true)
-    @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirAdditionInfixOperator additionInfixOperator) {
         return ADDITION_OPERATOR_TOKEN_SET;
     }

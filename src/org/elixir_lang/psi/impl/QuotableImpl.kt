@@ -968,7 +968,7 @@ object QuotableImpl {
 
     @Contract(pure = true)
     @JvmStatic
-    fun quote(operator: Operator): OtpErlangObject = OtpErlangAtom(operatorTokenNode(operator).text)
+    fun quote(operator: Operator): OtpErlangObject = OtpErlangAtom(operator.operatorTokenNode().text)
 
     @Contract(pure = true)
     @JvmStatic
@@ -1459,7 +1459,7 @@ object QuotableImpl {
     @JvmStatic
     fun metadata(node: ASTNode): OtpErlangList = OtpErlangList(arrayOf<OtpErlangObject>(lineNumberKeywordTuple(node)))
     @JvmStatic
-    fun metadata(operator: Operator): OtpErlangList = metadata(operatorTokenNode(operator))
+    fun metadata(operator: Operator): OtpErlangList = metadata(operator.operatorTokenNode())
     @JvmStatic
     fun metadata(element: PsiElement): OtpErlangList = metadata(element.node)
 
