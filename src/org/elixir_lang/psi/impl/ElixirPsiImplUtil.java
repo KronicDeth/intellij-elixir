@@ -4,20 +4,15 @@ import com.ericsson.otp.erlang.*;
 import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.util.Key;
-import com.intellij.openapi.util.Pair;
 import com.intellij.psi.*;
-import com.intellij.psi.impl.source.tree.Factory;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
-import com.intellij.psi.util.CachedValueProvider;
-import com.intellij.psi.util.CachedValuesManager;
 import kotlin.jvm.functions.Function1;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
-import org.elixir_lang.psi.call.MaybeExported;
 import org.elixir_lang.psi.call.StubBased;
 import org.elixir_lang.psi.call.arguments.None;
 import org.elixir_lang.psi.call.arguments.star.NoParentheses;
@@ -38,14 +33,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
 import static org.elixir_lang.psi.impl.PsiElementImplKt.siblingExpression;
 import static org.elixir_lang.psi.impl.QuotableImpl.*;
-import static org.elixir_lang.reference.ModuleAttribute.isNonReferencing;
 
 public class ElixirPsiImplUtil {
     public static final String DEFAULT_OPERATOR = "\\\\";
@@ -730,73 +723,23 @@ public class ElixirPsiImplUtil {
         return QuotableImpl.quote(containerAssociationOperation);
     }
 
-    /* Returns a virtual PsiElement representing the spaces at the end of charListHeredocLineWhitespace that are not
-     * consumed by prefixLength.
-     *
-     * @return null if prefixLength is greater than or equal to text length of charListHeredocLineWhitespace.
-     */
     @Contract(pure = true)
     @Nullable
-    public static ASTNode excessWhitespace(@NotNull final ElixirHeredocLinePrefix heredocLinePrefix, @NotNull final IElementType fragmentType, final int prefixLength) {
-        int availableLength = heredocLinePrefix.getTextLength();
-        int excessLength = availableLength - prefixLength;
-        ASTNode excessWhitespaceASTNode = null;
-
-        if (excessLength > 0) {
-            char[] excessWhitespaceChars = new char[excessLength];
-            Arrays.fill(excessWhitespaceChars, ' ');
-            String excessWhitespaceString = new String(excessWhitespaceChars);
-            excessWhitespaceASTNode = Factory.createSingleLeafElement(
-                    fragmentType,
-                    excessWhitespaceString,
-                    0,
-                    excessLength,
-                    null,
-                    heredocLinePrefix.getManager()
-            );
-        }
-
-        return excessWhitespaceASTNode;
+    public static ASTNode excessWhitespace(@NotNull final ElixirHeredocLinePrefix heredocLinePrefix,
+                                           @NotNull final IElementType fragmentType,
+                                           final int prefixLength) {
+        return ElixirHeredocLinePrefixImplKt.excessWhitespace(heredocLinePrefix, fragmentType, prefixLength);
     }
 
     @Contract(pure = true)
     public static int exportedArity(@NotNull final UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
-        int arity = MaybeExported.UNEXPORTED_ARITY;
-
-        if (isExported(unqualifiedNoParenthesesCall)) {
-            Pair<String, IntRange> nameArityRange = CallDefinitionClause.nameArityRange(unqualifiedNoParenthesesCall);
-
-            if (nameArityRange != null) {
-                IntRange arityRange = nameArityRange.second;
-
-                if (arityRange != null) {
-                    int minimumArity = arityRange.getMinimumInteger();
-                    int maximumArity = arityRange.getMaximumInteger();
-
-                    if (minimumArity == maximumArity) {
-                        arity = minimumArity;
-                    }
-                }
-            }
-        }
-
-        return arity;
+        return UnqualifiedNoParenthesesCallImplKt.exportedArity(unqualifiedNoParenthesesCall);
     }
 
     @Contract(pure = true)
     @Nullable
     public static String exportedName(@NotNull final UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
-        String name = null;
-
-        if (isExported(unqualifiedNoParenthesesCall)) {
-            Pair<String, IntRange> nameArityRange = CallDefinitionClause.nameArityRange(unqualifiedNoParenthesesCall);
-
-            if (nameArityRange != null) {
-                name = nameArityRange.first;
-            }
-        }
-
-        return name;
+        return UnqualifiedNoParenthesesCallImplKt.exportedName(unqualifiedNoParenthesesCall);
     }
 
     @Contract(pure = true)
@@ -1140,15 +1083,7 @@ public class ElixirPsiImplUtil {
 
     @Nullable
     public static PsiReference getReference(@NotNull ElixirAtom atom) {
-        return CachedValuesManager.getCachedValue(
-                atom,
-                () -> CachedValueProvider.Result.create(computeReference(atom), atom)
-        );
-    }
-
-    @NotNull
-    private static PsiReference computeReference(@NotNull ElixirAtom atom) {
-        return new org.elixir_lang.reference.Atom(atom);
+        return ElixirAtomImplKt.getReference(atom);
     }
 
     @Nullable
@@ -1162,44 +1097,15 @@ public class ElixirPsiImplUtil {
         return QualifiableAliasImplKt.getReference(qualifiableAlias, maxScope);
     }
 
-    @NotNull
-    private static PsiReference computeReference(@NotNull final ElixirAtIdentifier atIdentifier) {
-        return new org.elixir_lang.reference.ModuleAttribute(atIdentifier);
-    }
-
-    /**
-     * <blockquote>
-     *     The PSI element at the cursor (the direct tree parent of the token at the cursor position) must be either a
-     *     PsiNamedElement or <em>a PsiReference which resolves to a PsiNamedElement.</em>
-     * </blockquote>
-     * @see <a href="http://www.jetbrains.org/intellij/sdk/docs/reference_guide/custom_language_support/find_usages.html?search=PsiNameIdentifierOwner">IntelliJ Platform SDK DevGuide | Find Usages</a>
-     */
     @Contract(pure = true)
     @NotNull
     public static PsiReference getReference(@NotNull final ElixirAtIdentifier atIdentifier) {
-        return CachedValuesManager.getCachedValue(
-                atIdentifier,
-                () -> CachedValueProvider.Result.create(computeReference(atIdentifier), atIdentifier)
-        );
-    }
-
-    @Nullable
-    private static PsiReference computeReference(@NotNull final AtNonNumericOperation atNonNumericOperation) {
-        PsiReference reference = null;
-
-        if (!isNonReferencing(atNonNumericOperation)) {
-            reference = new org.elixir_lang.reference.ModuleAttribute(atNonNumericOperation);
-        }
-
-        return reference;
+        return ElixirAtIdentifierImplKt.getReference(atIdentifier);
     }
 
     @Nullable
     public static PsiReference getReference(@NotNull final AtNonNumericOperation atNonNumericOperation) {
-        return CachedValuesManager.getCachedValue(
-                atNonNumericOperation,
-                () -> CachedValueProvider.Result.create(computeReference(atNonNumericOperation), atNonNumericOperation)
-        );
+        return AtNonNumericOperationImplKt.getReference(atNonNumericOperation);
     }
 
     public static boolean hasDoBlockOrKeyword(@NotNull final Call call) {

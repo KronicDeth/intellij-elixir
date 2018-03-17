@@ -189,7 +189,7 @@ fun PsiElement.maybeModularNameToModular(maxScope: PsiElement): Call? {
     val strippedMaybeModuleName = stripAccessExpression()
 
     return when (strippedMaybeModuleName) {
-        is ElixirAtom -> strippedMaybeModuleName.maybeModularNameToModular(maxScope)
+        is ElixirAtom -> strippedMaybeModuleName.maybeModularNameToModular()
         is QualifiableAlias -> strippedMaybeModuleName.maybeModularNameToModular(maxScope)
         else -> null
     }
