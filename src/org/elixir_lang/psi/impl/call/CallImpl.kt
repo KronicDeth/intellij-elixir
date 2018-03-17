@@ -19,6 +19,7 @@ import org.elixir_lang.psi.call.name.Module.stripElixirPrefix
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.*
 import org.elixir_lang.psi.impl.keywordValue
+import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.operation.*
 import org.elixir_lang.psi.qualification.Qualified
 import org.elixir_lang.psi.qualification.Unqualified
@@ -122,7 +123,7 @@ fun Call.keywordArguments(): QuotableKeywordList? {
             if (potentialKeywords is QuotableKeywordList) {
                 keywordArguments = potentialKeywords
             } else if (potentialKeywords is ElixirAccessExpression) {
-                val accessExpressionChild = stripAccessExpression(potentialKeywords)
+                val accessExpressionChild = potentialKeywords.stripAccessExpression()
 
                 if (accessExpressionChild is ElixirList) {
                     val listChildren = accessExpressionChild.children
@@ -548,13 +549,13 @@ object CallImpl {
 
     @Suppress("UNCHECKED_CAST")
     @JvmStatic
-    fun resolvedModuleName(qualified: org.elixir_lang.psi.call.qualification.Qualified): String? =
+    fun resolvedModuleName(qualified: org.elixir_lang.psi.call.qualification.Qualified): String =
         (qualified as? org.elixir_lang.psi.call.StubBased<Stub<*>>)?.stub?.resolvedFunctionName() ?:
         stripElixirPrefix(qualified.moduleName())
 
     @Suppress("UNCHECKED_CAST")
     @JvmStatic
-    fun resolvedModuleName(unqualified: Unqualified): String? =
+    fun resolvedModuleName(unqualified: Unqualified): String =
         (unqualified as? org.elixir_lang.psi.call.StubBased<Stub<*>>)?.stub?.resolvedModuleName() ?: KERNEL
 
     // TODO handle `import`s and determine whether actually a local variable

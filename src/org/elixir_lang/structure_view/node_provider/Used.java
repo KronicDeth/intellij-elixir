@@ -25,7 +25,7 @@ import javax.swing.*;
 import java.util.*;
 
 import static com.intellij.openapi.util.Pair.pair;
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.stripAccessExpression;
+import static org.elixir_lang.psi.impl.PsiElementImplKt.stripAccessExpression;
 import static org.elixir_lang.psi.impl.call.CallImplKt.finalArguments;
 import static org.elixir_lang.psi.impl.call.CallImplKt.macroChildCalls;
 import static org.elixir_lang.structure_view.element.modular.Module.addClausesToCallDefinition;

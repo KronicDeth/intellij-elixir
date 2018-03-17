@@ -12,7 +12,6 @@ import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.StubBased
 import org.elixir_lang.psi.call.name.Function.__MODULE__
 import org.elixir_lang.psi.call.name.Module.KERNEL
-import org.elixir_lang.psi.impl.ElixirPsiImplUtil.stripAccessExpression
 import org.elixir_lang.psi.operation.Normalized
 import org.elixir_lang.psi.stub.type.call.Stub.isModular
 import org.elixir_lang.reference.Module
@@ -131,6 +130,15 @@ fun QualifiableAlias.isOutermostQualifiableAlias(): Boolean {
     return outermost
 }
 
+fun QualifiableAlias.maybeModularNameToModular(maxScope: PsiElement): Call? =
+    if (!ElixirPsiImplUtil.recursiveKernelImport(this, maxScope)) {
+        /* need to construct reference directly as qualified aliases don't return a reference except for the
+           outermost */
+        getReference(maxScope)?.let { this.toModular(it) }
+    } else {
+        null
+    }
+
 @Contract(pure = true)
 fun QualifiableAlias.toModular(startingReference: PsiReference): Call? {
     val fullyResolvedAlias = fullyResolve(startingReference)
@@ -174,7 +182,7 @@ object QualifiableAliasImpl {
 
             qualifierName = qualifiableQualifier!!.fullyQualifiedName()
         } else if (qualifier is ElixirAccessExpression) {
-            val qualifierChild = stripAccessExpression(qualifier)
+            val qualifierChild = qualifier.stripAccessExpression()
 
             if (qualifierChild is ElixirAlias) {
                 qualifierName = qualifierChild.name

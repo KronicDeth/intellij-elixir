@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.qualifiedToModular;
+import static org.elixir_lang.psi.impl.call.qualification.QualifiedImplKt.qualifiedToModular;
 
 public class Callable implements ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Callable> {
     public static final Callable INSTANCE = new Callable();

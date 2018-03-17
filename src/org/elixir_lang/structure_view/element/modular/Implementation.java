@@ -18,7 +18,7 @@ import java.util.Collections;
 import static org.elixir_lang.psi.call.name.Function.DEFIMPL;
 import static org.elixir_lang.psi.call.name.Function.FOR;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.stripAccessExpression;
+import static org.elixir_lang.psi.impl.PsiElementImplKt.stripAccessExpression;
 import static org.elixir_lang.psi.impl.QuotableKeywordListImplKt.keywordValue;
 import static org.elixir_lang.psi.impl.call.CallImplKt.finalArguments;
 

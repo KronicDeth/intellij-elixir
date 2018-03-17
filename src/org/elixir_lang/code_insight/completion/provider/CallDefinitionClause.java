@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.maybeModularNameToModular;
+import static org.elixir_lang.psi.impl.PsiElementImplKt.maybeModularNameToModular;
 import static org.elixir_lang.psi.impl.call.CallImplKt.macroChildCalls;
 import static org.elixir_lang.structure_view.element.CallDefinitionClause.nameArityRange;
 

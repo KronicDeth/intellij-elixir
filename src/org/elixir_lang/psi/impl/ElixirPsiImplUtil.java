@@ -7,14 +7,13 @@ import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.tree.Factory;
-import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.psi.util.CachedValueProvider;
 import com.intellij.psi.util.CachedValuesManager;
-import com.intellij.psi.util.PsiTreeUtil;
+import kotlin.jvm.functions.Function1;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
@@ -38,24 +37,21 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.charset.Charset;
-import java.util.*;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
-import static org.elixir_lang.psi.impl.QualifiableAliasImplKt.toModular;
+import static org.elixir_lang.psi.impl.PsiElementImplKt.siblingExpression;
 import static org.elixir_lang.psi.impl.QuotableImpl.*;
-import static org.elixir_lang.psi.stub.type.call.Stub.isModular;
 import static org.elixir_lang.reference.ModuleAttribute.isNonReferencing;
 
-/**
- * Created by luke.imhoff on 12/29/14.
- */
 public class ElixirPsiImplUtil {
     public static final OtpErlangAtom BLOCK = new OtpErlangAtom("__block__");
     public static final String DEFAULT_OPERATOR = "\\\\";
     public static final OtpErlangAtom DO = new OtpErlangAtom("do");
-    public static final Key<PsiElement> ENTRANCE = new Key<PsiElement>("ENTRANCE");
+    public static final Key<PsiElement> ENTRANCE = new Key<>("ENTRANCE");
 
     public static final OtpErlangAtom FALSE = new OtpErlangAtom("false");
     public static final OtpErlangAtom FN = new OtpErlangAtom("fn");
@@ -70,7 +66,7 @@ public class ElixirPsiImplUtil {
     public static final TokenSet IN_MATCH_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.IN_MATCH_OPERATOR);
     public static final TokenSet IN_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.IN_OPERATOR);
     public static final TokenSet MATCH_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.MATCH_OPERATOR);
-    public static final TokenSet NOT_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.NOT_OPERATOR);
+    private static final TokenSet NOT_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.NOT_OPERATOR);
     public static final TokenSet MULTIPLICATIVE_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.DIVISION_OPERATOR, ElixirTypes.MULTIPLICATION_OPERATOR);
     public static final TokenSet OR_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.OR_SYMBOL_OPERATOR, ElixirTypes.OR_WORD_OPERATOR);
     public static final TokenSet PIPE_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.PIPE_OPERATOR);
@@ -89,20 +85,12 @@ public class ElixirPsiImplUtil {
             TRUE,
             NIL
     };
-    public static final OtpErlangAtom UTF_8 = new OtpErlangAtom("utf8");
+    private static final OtpErlangAtom UTF_8 = new OtpErlangAtom("utf8");
     public static final TokenSet IDENTIFIER_TOKEN_SET = TokenSet.create(ElixirTypes.IDENTIFIER_TOKEN);
-    public static final com.intellij.util.Function<PsiElement, PsiElement> NEXT_SIBLING = new com.intellij.util.Function<PsiElement, PsiElement>() {
-                @Override
-                public PsiElement fun(PsiElement element) {
-                    return element.getNextSibling();
-                }
-            };
-    public static final com.intellij.util.Function<PsiElement, PsiElement> PREVIOUS_SIBLING = new com.intellij.util.Function<PsiElement, PsiElement>() {
-                @Override
-                public PsiElement fun(PsiElement element) {
-                    return element.getPrevSibling();
-                }
-            };
+    public static final Function1<? super PsiElement, ? extends PsiElement>  NEXT_SIBLING =
+            (Function1<PsiElement, PsiElement>) PsiElement::getNextSibling;
+    public static final Function1<? super PsiElement, ? extends PsiElement> PREVIOUS_SIBLING =
+            (Function1<PsiElement, PsiElement>) PsiElement::getPrevSibling;
     public static final TokenSet ARROW_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.ARROW_OPERATOR);
     public static final TokenSet WHEN_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.WHEN_OPERATOR);
 
@@ -767,7 +755,7 @@ public class ElixirPsiImplUtil {
     /* Returns a virtual PsiElement representing the spaces at the end of charListHeredocLineWhitespace that are not
      * consumed by prefixLength.
      *
-     * @return null if prefixLength is greater than or equal to text length of charListHeredcoLineWhitespace.
+     * @return null if prefixLength is greater than or equal to text length of charListHeredocLineWhitespace.
      */
     @Contract(pure = true)
     @Nullable
@@ -893,7 +881,7 @@ public class ElixirPsiImplUtil {
         return charListHeredocLine.getQuoteCharListBody();
     }
 
-    @NotNull
+    @Nullable
     public static Body getBody(@NotNull final ElixirCharListLine charListLine) {
         return charListLine.getQuoteCharListBody();
     }
@@ -1206,8 +1194,6 @@ public class ElixirPsiImplUtil {
      *     The PSI element at the cursor (the direct tree parent of the token at the cursor position) must be either a
      *     PsiNamedElement or <em>a PsiReference which resolves to a PsiNamedElement.</em>
      * </blockquote>
-     * @param atIdentifier
-     * @return
      * @see <a href="http://www.jetbrains.org/intellij/sdk/docs/reference_guide/custom_language_support/find_usages.html?search=PsiNameIdentifierOwner">IntelliJ Platform SDK DevGuide | Find Usages</a>
      */
     @Contract(pure = true)
@@ -1253,11 +1239,11 @@ public class ElixirPsiImplUtil {
     }
 
     public static List<QuotableKeywordPair> quotableKeywordPairList(ElixirKeywords keywords) {
-        return new ArrayList<QuotableKeywordPair>(keywords.getKeywordPairList());
+        return new ArrayList<>(keywords.getKeywordPairList());
     }
 
     public static List<QuotableKeywordPair> quotableKeywordPairList(ElixirNoParenthesesKeywords noParenthesesKeywords) {
-        return new ArrayList<QuotableKeywordPair>(noParenthesesKeywords.getNoParenthesesKeywordPairList());
+        return new ArrayList<>(noParenthesesKeywords.getNoParenthesesKeywordPairList());
     }
 
     @NotNull
@@ -1550,7 +1536,7 @@ public class ElixirPsiImplUtil {
         return QuotableImpl.quote(unqualifiedBracketOperation);
     }
 
-    /* Replaces `nil` argument in variables with the quoted ElixirMatchdNotParenthesesArguments.
+    /* Replaces `nil` argument in variables with the quoted ElixirMatchedNotParenthesesArguments.
      *
      */
     @Contract(pure = true)
@@ -1728,20 +1714,13 @@ public class ElixirPsiImplUtil {
         return ParentImpl.quoteLiteral(sigil, codePointList);
     }
 
-    @NotNull
-    @Contract(pure = true)
-    public static OtpErlangObject quotedEmpty(@SuppressWarnings("unused") ElixirCharListHeredoc charListHeredoc) {
-        // an empty CharList is just an empty list
-        return new OtpErlangList();
-    }
-
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quotedRightOperand(@NotNull final ElixirStabOperation stabOperation) {
         PsiElement rightOperand = stabOperation.rightOperand();
         OtpErlangObject quotedRightOperand;
 
-        if (rightOperand != null && rightOperand instanceof Quotable) {
+        if (rightOperand != null) {
             Quotable quotableRightOperand = (Quotable) rightOperand;
             quotedRightOperand = quotableRightOperand.quote();
         } else {
@@ -1752,7 +1731,6 @@ public class ElixirPsiImplUtil {
     }
 
     @Contract(pure = true)
-    @NotNull
     public static boolean recursiveKernelImport(@NotNull QualifiableAlias qualifiableAlias,
                                                 @NotNull PsiElement maxScope) {
         boolean recursiveKernelImport = false;
@@ -1771,13 +1749,11 @@ public class ElixirPsiImplUtil {
     }
 
     @Contract(pure = true)
-    @NotNull
     public static int resolvedFinalArity(@NotNull Call call) {
         return CallImpl.resolvedFinalArity(call);
     }
 
     @Contract(pure = true)
-    @NotNull
     public static int resolvedFinalArity(@NotNull org.elixir_lang.psi.call.StubBased<Stub> stubBased) {
         return CallImpl.resolvedFinalArity(stubBased);
     }
@@ -1935,32 +1911,7 @@ public class ElixirPsiImplUtil {
     }
 
     public static char sigilName(@NotNull org.elixir_lang.psi.Sigil sigil) {
-        return SigilImpl.sigilName(sigil)
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static PsiElement stripAccessExpression(@NotNull PsiElement maybeWrapped) {
-        PsiElement unwrapped = maybeWrapped;
-
-        if (maybeWrapped instanceof ElixirAccessExpression) {
-            unwrapped = stripOnlyChildParent(maybeWrapped);
-        }
-
-        return unwrapped;
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static PsiElement stripOnlyChildParent(@NotNull PsiElement parent) {
-        PsiElement unwrapped = parent;
-        PsiElement[] children = parent.getChildren();
-
-        if (children.length == 1) {
-            unwrapped = children[0];
-        }
-
-        return unwrapped;
+        return SigilImpl.sigilName(sigil);
     }
 
     public static char terminator(@NotNull SigilLine sigilLine) {
@@ -2001,20 +1952,6 @@ public class ElixirPsiImplUtil {
     /*
      * Private static methods
      */
-
-    /**
-     * Finds modular ({@code defmodule}, {@code defimpl}, or {@code defprotocol}) for the qualifier of
-     * {@code qualified}.
-     *
-     * @param qualified a qualified expression
-     * @return {@code null} if the modular cannot be resolved, such as when the qualifying Alias is invalid or is an
-     *   unparsed module like {@code Kernel} or {@code Enum} OR if the qualified isn't an Alias.
-     */
-    @Contract(pure = true)
-    @Nullable
-    public static Call qualifiedToModular(@NotNull final org.elixir_lang.psi.call.qualification.Qualified qualified) {
-        return maybeModularNameToModular(qualified.qualifier(), qualified.getContainingFile());
-    }
 
     @Contract(pure = true)
     @NotNull
@@ -2062,89 +1999,5 @@ public class ElixirPsiImplUtil {
                                                                        @Nullable List<Integer> codePointList,
                                                                        @NotNull ASTNode child) {
         return ParentImpl.addHexadecimalEscapeSequenceCodePoints(parent, codePointList, child);
-    }
-
-    /**
-     * @return {@link Call} for the {@code defmodule}, {@code defimpl}, or {@code defprotocol} that defines
-     *   {@code maybeAlias} after it is resolved through any {@code alias}es.
-     */
-    @Contract(pure = true)
-    @Nullable
-    public static Call maybeModularNameToModular(@NotNull final PsiElement maybeModularName, @NotNull PsiElement maxScope) {
-        PsiElement strippedMaybeModuleName = stripAccessExpression(maybeModularName);
-
-        Call modular = null;
-
-        if (strippedMaybeModuleName instanceof ElixirAtom) {
-            ElixirAtom atom = (ElixirAtom) strippedMaybeModuleName;
-            PsiReference reference = atom.getReference();
-
-            if (reference != null) {
-                final PsiElement resolved = reference.resolve();
-
-                if (resolved != null && resolved instanceof Call) {
-                    Call call = (Call) resolved;
-
-                    if (isModular(call)) {
-                        modular = call;
-                    }
-                }
-            }
-        } else if (strippedMaybeModuleName instanceof QualifiableAlias) {
-            QualifiableAlias qualifiableAlias = (QualifiableAlias) strippedMaybeModuleName;
-
-            if (!recursiveKernelImport(qualifiableAlias, maxScope)) {
-                /* need to construct reference directly as qualified aliases don't return a reference except for the
-                   outermost */
-                PsiPolyVariantReference reference = QualifiableAliasImplKt.getReference(qualifiableAlias, maxScope);
-                modular = toModular(qualifiableAlias, reference);
-            }
-        }
-
-        return modular;
-    }
-
-    @Contract(pure = true)
-    @Nullable
-    public static PsiElement siblingExpression(@NotNull PsiElement element,
-                                                @NotNull com.intellij.util.Function<PsiElement, PsiElement> function) {
-        PsiElement expression = element;
-
-        do {
-            expression = function.fun(expression);
-        } while (expression instanceof ElixirEndOfExpression ||
-                expression instanceof LeafPsiElement ||
-                expression instanceof PsiComment ||
-                expression instanceof PsiWhiteSpace);
-
-        return expression;
-    }
-
-    @Nullable
-    public static String getModuleName(PsiElement elem) {
-        final Predicate<PsiElement> isModuleName = (PsiElement c) ->
-          c instanceof MaybeModuleName && ((MaybeModuleName) c).isModuleName();
-
-        PsiElement moduleDefinition = PsiTreeUtil.findFirstParent(elem, e ->
-          Stream.of(e.getChildren()).anyMatch(isModuleName)
-        );
-        if (moduleDefinition != null) {
-            Optional<PsiElement> moduleName =
-              Stream.of(moduleDefinition.getChildren())
-                .filter(isModuleName)
-                .findAny();
-            if (moduleName.isPresent()) {
-                String parentModuleName = getModuleName(moduleDefinition.getParent());
-                if (parentModuleName != null) {
-                    return parentModuleName + "." + moduleName.get().getText();
-                } else {
-                    return moduleName.get().getText();
-                }
-            } else {
-                return null;
-            }
-        } else {
-            return null;
-        }
     }
 }

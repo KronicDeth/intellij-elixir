@@ -25,7 +25,7 @@ import java.util.Map;
 
 import static org.elixir_lang.psi.call.name.Function.DEFEXCEPTION;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.stripAccessExpression;
+import static org.elixir_lang.psi.impl.PsiElementImplKt.stripAccessExpression;
 import static org.elixir_lang.psi.impl.call.CallImplKt.finalArguments;
 
 /**

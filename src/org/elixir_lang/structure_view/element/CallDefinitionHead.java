@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static com.intellij.openapi.util.Pair.pair;
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.stripAccessExpression;
+import static org.elixir_lang.psi.impl.PsiElementImplKt.stripAccessExpression;
 import static org.elixir_lang.psi.impl.PsiNamedElementImpl.unquoteName;
 import static org.elixir_lang.psi.operation.Normalized.operatorIndex;
 

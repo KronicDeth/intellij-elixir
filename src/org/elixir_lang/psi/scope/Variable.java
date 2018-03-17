@@ -24,6 +24,7 @@ import static org.elixir_lang.psi.call.name.Function.*;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.*;
 import static org.elixir_lang.psi.impl.ProcessDeclarationsImpl.DECLARING_SCOPE;
 import static org.elixir_lang.psi.impl.ProcessDeclarationsImpl.isDeclaringScope;
+import static org.elixir_lang.psi.impl.PsiElementImplKt.stripAccessExpression;
 import static org.elixir_lang.psi.impl.call.CallImplKt.finalArguments;
 import static org.elixir_lang.psi.impl.call.CallImplKt.keywordArgument;
 import static org.elixir_lang.psi.operation.Normalized.operatorIndex;

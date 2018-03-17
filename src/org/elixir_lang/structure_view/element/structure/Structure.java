@@ -17,7 +17,7 @@ import java.util.List;
 
 import static org.elixir_lang.psi.call.name.Function.DEFSTRUCT;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.stripAccessExpression;
+import static org.elixir_lang.psi.impl.PsiElementImplKt.stripAccessExpression;
 import static org.elixir_lang.psi.impl.call.CallImplKt.finalArguments;
 
 public class Structure extends Element<Call> {

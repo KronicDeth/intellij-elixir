@@ -24,6 +24,7 @@ import java.util.*;
 import static org.elixir_lang.psi.call.name.Function.*;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.*;
+import static org.elixir_lang.psi.impl.PsiElementImplKt.siblingExpression;
 import static org.elixir_lang.psi.impl.call.CallImplKt.finalArguments;
 
 public class Builder extends FoldingBuilderEx {

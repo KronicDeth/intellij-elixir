@@ -12,6 +12,7 @@ import com.intellij.openapi.editor.markup.SeparatorPlacement;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
+import kotlin.jvm.functions.Function1;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall;
 import org.elixir_lang.psi.ElixirTypes;
@@ -26,6 +27,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.*;
+import static org.elixir_lang.psi.impl.PsiElementImplKt.siblingExpression;
 import static org.elixir_lang.structure_view.element.CallDefinitionClause.nameArityRange;
 import static org.elixir_lang.structure_view.element.CallDefinitionSpecification.*;
 
@@ -354,7 +356,7 @@ public class CallDefinition implements LineMarkerProvider {
 
     @Nullable
     private Call siblingCallDefinitionClause(@NotNull PsiElement element,
-                                             @NotNull com.intellij.util.Function<PsiElement, PsiElement> function) {
+                                             @NotNull Function1<? super PsiElement, ? extends PsiElement> function) {
         PsiElement expression = element;
         Call siblingCallDefinitionClause = null;
 
