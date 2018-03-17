@@ -39,7 +39,6 @@ import java.util.List;
 import java.util.Set;
 
 import static org.elixir_lang.psi.impl.PsiElementImplKt.siblingExpression;
-import static org.elixir_lang.psi.impl.QuotableImpl.NIL;
 
 public class ElixirPsiImplUtil {
     public static final String DEFAULT_OPERATOR = "\\\\";
@@ -1557,22 +1556,6 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static OtpErlangObject quoteLiteral(Sigil sigil, List<Integer> codePointList) {
         return ParentImpl.quoteLiteral(sigil, codePointList);
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static OtpErlangObject quotedRightOperand(@NotNull final ElixirStabOperation stabOperation) {
-        PsiElement rightOperand = stabOperation.rightOperand();
-        OtpErlangObject quotedRightOperand;
-
-        if (rightOperand != null) {
-            Quotable quotableRightOperand = (Quotable) rightOperand;
-            quotedRightOperand = quotableRightOperand.quote();
-        } else {
-            quotedRightOperand = NIL;
-        }
-
-        return quotedRightOperand;
     }
 
     @Contract(pure = true)

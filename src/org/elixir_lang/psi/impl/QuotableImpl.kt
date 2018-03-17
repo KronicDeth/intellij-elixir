@@ -16,7 +16,7 @@ import org.elixir_lang.mix.importWizard.computeReadAction
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.call.name.Module.prependElixirPrefix
-import org.elixir_lang.psi.impl.ElixirPsiImplUtil.*
+import org.elixir_lang.psi.impl.ElixirPsiImplUtil.IDENTIFIER_TOKEN_SET
 import org.elixir_lang.psi.impl.ParentImpl.*
 import org.elixir_lang.psi.operation.In
 import org.elixir_lang.psi.operation.Infix
@@ -1169,6 +1169,21 @@ object QuotableImpl {
                 quotedLeftOperand(stabOperation),
                 quotedRightOperand(stabOperation)
         )
+    }
+
+    @Contract(pure = true)
+    fun quotedRightOperand(stabOperation: ElixirStabOperation): OtpErlangObject {
+        val rightOperand = stabOperation.rightOperand()
+        val quotedRightOperand: OtpErlangObject
+
+        if (rightOperand != null) {
+            val quotableRightOperand = rightOperand as Quotable?
+            quotedRightOperand = quotableRightOperand!!.quote()
+        } else {
+            quotedRightOperand = NIL
+        }
+
+        return quotedRightOperand
     }
 
     // https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L277
