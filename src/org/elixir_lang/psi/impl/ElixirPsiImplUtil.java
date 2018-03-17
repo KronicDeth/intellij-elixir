@@ -66,7 +66,6 @@ public class ElixirPsiImplUtil {
     public static final TokenSet UNARY_OPERATOR_TOKEN_SET = TokenSet.create(
             ElixirTypes.DUAL_OPERATOR, ElixirTypes.NOT_OPERATOR, ElixirTypes.SIGN_OPERATOR, ElixirTypes.UNARY_OPERATOR
     );
-    private static final OtpErlangAtom UTF_8 = new OtpErlangAtom("utf8");
     public static final TokenSet IDENTIFIER_TOKEN_SET = TokenSet.create(ElixirTypes.IDENTIFIER_TOKEN);
     public static final Function1<? super PsiElement, ? extends PsiElement>  NEXT_SIBLING =
             (Function1<PsiElement, PsiElement>) PsiElement::getNextSibling;
@@ -1154,52 +1153,13 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quoteAsAtom(@NotNull final ElixirCharListLine charListLine) {
-        OtpErlangObject quoted = charListLine.quote();
-        OtpErlangObject quotedAsAtom;
-
-        if (quoted instanceof OtpErlangString) {
-            final String atomText = ((OtpErlangString) quoted).stringValue();
-            quotedAsAtom = new OtpErlangAtom(atomText);
-        } else {
-            final OtpErlangTuple quotedStringToCharListCall = (OtpErlangTuple) quoted;
-            final OtpErlangList quotedStringToCharListArguments = (OtpErlangList) quotedStringToCharListCall.elementAt(2);
-            final OtpErlangObject binaryConstruction = quotedStringToCharListArguments.getHead();
-
-            quotedAsAtom = quotedFunctionCall(
-                    "erlang",
-                    "binary_to_atom",
-                    (OtpErlangList) quotedStringToCharListCall.elementAt(1),
-                    binaryConstruction,
-                    UTF_8
-            );
-        }
-
-        return quotedAsAtom;
+        return AtomableImplKt.quoteAsAtom(charListLine);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quoteAsAtom(@NotNull final ElixirStringLine stringLine) {
-        OtpErlangObject quoted = stringLine.quote();
-        OtpErlangObject quotedAsAtom;
-
-        if (quoted instanceof OtpErlangBinary) {
-            String atomText = javaString((OtpErlangBinary) quoted);
-            quotedAsAtom = new OtpErlangAtom(atomText);
-        } else if (quoted instanceof OtpErlangString) {
-            String atomText = ((OtpErlangString) quoted).stringValue();
-            quotedAsAtom = new OtpErlangAtom(atomText);
-        } else {
-            quotedAsAtom = quotedFunctionCall(
-                    "erlang",
-                    "binary_to_atom",
-                    metadata(stringLine),
-                    quoted,
-                    UTF_8
-            );
-        }
-
-        return quotedAsAtom;
+        return AtomableImplKt.quoteAsAtom(stringLine);
     }
 
     @Contract(pure = true)
