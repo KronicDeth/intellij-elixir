@@ -1,5 +1,6 @@
 package org.elixir_lang.psi.impl;
 
+import com.ericsson.otp.erlang.OtpErlangAtom;
 import com.ericsson.otp.erlang.OtpErlangList;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.ericsson.otp.erlang.OtpErlangTuple;
@@ -12,10 +13,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.DO;
 import static org.elixir_lang.psi.impl.QuotableImpl.NIL;
 
 public class QuotableArgumentsImpl {
+    public static final OtpErlangAtom DO = new OtpErlangAtom("do");
+
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject[] quoteArguments(@NotNull final Arguments arguments) {

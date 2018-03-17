@@ -48,15 +48,9 @@ import static org.elixir_lang.psi.impl.QuotableImpl.*;
 import static org.elixir_lang.reference.ModuleAttribute.isNonReferencing;
 
 public class ElixirPsiImplUtil {
-    public static final OtpErlangAtom BLOCK = new OtpErlangAtom("__block__");
     public static final String DEFAULT_OPERATOR = "\\\\";
-    public static final OtpErlangAtom DO = new OtpErlangAtom("do");
     public static final Key<PsiElement> ENTRANCE = new Key<>("ENTRANCE");
 
-    public static final OtpErlangAtom FALSE = new OtpErlangAtom("false");
-    public static final OtpErlangAtom FN = new OtpErlangAtom("fn");
-
-    public static final OtpErlangAtom TRUE = new OtpErlangAtom("true");
     public static final TokenSet ADDITION_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.DUAL_OPERATOR);
     public static final TokenSet AND_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.AND_SYMBOL_OPERATOR, ElixirTypes.AND_WORD_OPERATOR);
     public static final TokenSet AT_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.AT_OPERATOR);
@@ -79,7 +73,6 @@ public class ElixirPsiImplUtil {
     public static final TokenSet UNARY_OPERATOR_TOKEN_SET = TokenSet.create(
             ElixirTypes.DUAL_OPERATOR, ElixirTypes.NOT_OPERATOR, ElixirTypes.SIGN_OPERATOR, ElixirTypes.UNARY_OPERATOR
     );
-    public static final OtpErlangAtom UNQUOTE_SPLICING = new OtpErlangAtom("unquote_splicing");
     private static final OtpErlangAtom UTF_8 = new OtpErlangAtom("utf8");
     public static final TokenSet IDENTIFIER_TOKEN_SET = TokenSet.create(ElixirTypes.IDENTIFIER_TOKEN);
     public static final Function1<? super PsiElement, ? extends PsiElement>  NEXT_SIBLING =
