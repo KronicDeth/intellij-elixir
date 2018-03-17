@@ -7,7 +7,6 @@ import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.definitions.compon
 import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.definitions.component3
 import org.elixir_lang.beam.term.inspect
 import org.elixir_lang.code.Identifier
-import org.elixir_lang.psi.impl.ElixirPsiImplUtil
 
 val binaryOps = arrayOf(
         "===",
@@ -79,47 +78,6 @@ object Macro {
         }
 
         return aliases
-    }
-
-    /**
-     * Return whether quoted form contains an Elixir keyword that is just an alias to an atom, such as `false`,
-     * `true`, or `nil`.
-     *
-     * @param macro a quoted form from a `quote` method.
-     * @return `true` if OtpErlangAtom containing one of the keywords.
-     */
-    fun isAtomKeyword(macro: OtpErlangObject): Boolean {
-        var atomKeyword = false
-
-        for (knownAtomKeyword in ElixirPsiImplUtil.ATOM_KEYWORDS) {
-            if (macro == knownAtomKeyword) {
-                atomKeyword = true
-
-                break
-            }
-        }
-
-        return atomKeyword
-    }
-
-    /**
-     * Return whether the macro is a __block__ expression representing sequential lines.
-     *
-     * @param macro a quoted form from a `quote` method.
-     * @return `true` if `{:__block__, _, _}`.
-     */
-    fun isBlock(macro: OtpErlangObject): Boolean {
-        var block = false
-
-        if (isExpression(macro)) {
-            val expression = macro as OtpErlangTuple
-
-            if (expression.elementAt(0) == ElixirPsiImplUtil.BLOCK) {
-                block = true
-            }
-        }
-
-        return block
     }
 
     /**

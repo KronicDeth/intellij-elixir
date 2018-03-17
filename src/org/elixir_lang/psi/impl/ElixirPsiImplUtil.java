@@ -80,11 +80,6 @@ public class ElixirPsiImplUtil {
             ElixirTypes.DUAL_OPERATOR, ElixirTypes.NOT_OPERATOR, ElixirTypes.SIGN_OPERATOR, ElixirTypes.UNARY_OPERATOR
     );
     public static final OtpErlangAtom UNQUOTE_SPLICING = new OtpErlangAtom("unquote_splicing");
-    public static final OtpErlangAtom[] ATOM_KEYWORDS = new OtpErlangAtom[]{
-            FALSE,
-            TRUE,
-            NIL
-    };
     private static final OtpErlangAtom UTF_8 = new OtpErlangAtom("utf8");
     public static final TokenSet IDENTIFIER_TOKEN_SET = TokenSet.create(ElixirTypes.IDENTIFIER_TOKEN);
     public static final Function1<? super PsiElement, ? extends PsiElement>  NEXT_SIBLING =
