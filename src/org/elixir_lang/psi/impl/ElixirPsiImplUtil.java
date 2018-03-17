@@ -1935,11 +1935,7 @@ public class ElixirPsiImplUtil {
     }
 
     public static char sigilName(@NotNull org.elixir_lang.psi.Sigil sigil) {
-        ASTNode sigilNode = sigil.getNode();
-        ASTNode[] childNodes = sigilNode.getChildren(null);
-        ASTNode nameNode = childNodes[1];
-        CharSequence chars = nameNode.getChars();
-        return chars.charAt(0);
+        return SigilImpl.sigilName(sigil)
     }
 
     @Contract(pure = true)
