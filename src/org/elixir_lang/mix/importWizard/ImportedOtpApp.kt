@@ -12,8 +12,8 @@ import org.elixir_lang.ElixirFileType
 import org.elixir_lang.psi.ElixirAccessExpression
 import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.psi.ElixirList
-import org.elixir_lang.psi.impl.ElixirPsiImplUtil.keywordValue
-import org.elixir_lang.psi.impl.ElixirPsiImplUtil.macroChildCallList
+import org.elixir_lang.psi.impl.call.macroChildCallList
+import org.elixir_lang.psi.impl.keywordValue
 import org.elixir_lang.structure_view.element.CallDefinitionClause.isPublicFunction
 import org.elixir_lang.structure_view.element.CallDefinitionClause.nameArityRange
 import java.io.IOException
@@ -43,7 +43,7 @@ private fun appList(elixirFile: ElixirFile): List<String> {
 
     return modulars.asSequence()
             .flatMap { modular ->
-                macroChildCallList(modular).asSequence()
+                modular.macroChildCallList().asSequence()
             }
             .filter { call ->
                 isPublicFunction(call) && nameArityRange(call)?.let {
@@ -57,7 +57,7 @@ private fun appList(elixirFile: ElixirFile): List<String> {
             .mapNotNull(ElixirAccessExpression::getList)
             .mapNotNull(ElixirList::getKeywords)
             .mapNotNull { keywordList ->
-                keywordValue(keywordList, "app")
+                keywordList.keywordValue("app")
             }
             .map { keywordValue ->
                 keywordValue.quote()

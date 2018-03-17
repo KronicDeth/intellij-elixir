@@ -10,7 +10,7 @@ import org.elixir_lang.structure_view.element.CallDefinitionClause;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.macroChildCalls;
+import static org.elixir_lang.psi.impl.call.CallImplKt.macroChildCalls;
 import static org.elixir_lang.structure_view.element.CallDefinitionClause.nameArityRange;
 
 public class Modular {
@@ -23,13 +23,11 @@ public class Modular {
         Call[] childCalls = macroChildCalls(modular);
         boolean keepProcessing = true;
 
-        if (childCalls != null) {
-            for (Call childCall : childCalls) {
-                if (CallDefinitionClause.is(childCall) && !function.fun(childCall)) {
-                    keepProcessing = false;
+        for (Call childCall : childCalls) {
+            if (CallDefinitionClause.is(childCall) && !function.fun(childCall)) {
+                keepProcessing = false;
 
-                    break;
-                }
+                break;
             }
         }
 

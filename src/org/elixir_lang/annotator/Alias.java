@@ -9,14 +9,11 @@ import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiRecursiveElementVisitor;
-import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import org.elixir_lang.ElixirSyntaxHighlighter;
-import org.elixir_lang.psi.ElixirAlias;
-import org.elixir_lang.psi.ElixirKeywordKey;
 import org.elixir_lang.psi.QualifiableAlias;
 import org.jetbrains.annotations.NotNull;
 
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.isOutermostQualifiableAlias;
+import static org.elixir_lang.psi.impl.QualifiableAliasImplKt.isOutermostQualifiableAlias;
 
 /**
  * Annotates aliases

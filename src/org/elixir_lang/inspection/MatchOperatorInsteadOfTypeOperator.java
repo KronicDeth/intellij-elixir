@@ -13,8 +13,8 @@ import org.elixir_lang.psi.operation.Match;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.identifierName;
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.operatorTokenNode;
+import static org.elixir_lang.psi.impl.ElixirAtIdentifierImplKt.identifierName;
+import static org.elixir_lang.psi.impl.OperatorImplKt.operatorTokenNode;
 import static org.elixir_lang.reference.ModuleAttribute.isTypeName;
 
 public class MatchOperatorInsteadOfTypeOperator extends LocalInspectionTool {

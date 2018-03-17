@@ -4,7 +4,8 @@ package org.elixir_lang;
 import com.ericsson.otp.erlang.OtpErlangList;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.ericsson.otp.erlang.OtpErlangTuple;
-import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
+
+import static org.elixir_lang.psi.impl.QuotableImpl.NIL;
 
 /*
  * Java version of Elixir's List module, so that keyword pairs can be extracted from list.
@@ -20,7 +21,7 @@ public class List {
      * @return tuple with equal key or {@node NIL}.
      */
     public static OtpErlangObject keyfind(OtpErlangList tupleList, OtpErlangObject key, int position) {
-      return keyfind(tupleList, key, position, ElixirPsiImplUtil.NIL);
+      return keyfind(tupleList, key, position, NIL);
     }
 
     /**

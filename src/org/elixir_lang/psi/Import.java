@@ -24,7 +24,10 @@ import java.util.Map;
 
 import static org.elixir_lang.psi.call.name.Function.IMPORT;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.*;
+import static org.elixir_lang.psi.impl.PsiElementImplKt.maybeModularNameToModular;
+import static org.elixir_lang.psi.impl.PsiElementImplKt.stripAccessExpression;
+import static org.elixir_lang.psi.impl.QuotableKeywordPairImplKt.hasKeywordKey;
+import static org.elixir_lang.psi.impl.call.CallImplKt.finalArguments;
 import static org.elixir_lang.structure_view.element.CallDefinitionClause.nameArityRange;
 
 /**

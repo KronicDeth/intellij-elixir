@@ -68,13 +68,13 @@ public interface ElixirUnmatchedQualifiedNoParenthesesCall extends ElixirUnmatch
   //matching getUseScope(ElixirUnmatchedQualifiedNoParenthesesCall, ...)
   //methods are not found in ElixirPsiImplUtil
 
-  boolean isCalling(String resolvedModuleName, String functionName);
+  boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName);
 
-  boolean isCalling(String resolvedModuleName, String functionName, int resolvedFinalArity);
+  boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity);
 
-  boolean isCallingMacro(String resolvedModuleName, String functionName);
+  boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName);
 
-  boolean isCallingMacro(String resolvedModuleName, String functionName, int resolvedFinalArity);
+  boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity);
 
   @NotNull
   String moduleName();

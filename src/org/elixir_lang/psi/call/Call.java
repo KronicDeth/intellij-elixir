@@ -11,8 +11,6 @@ import org.jetbrains.annotations.Nullable;
  * A general function or macro call.
  */
 public interface Call extends NavigatablePsiElement {
-
-
     /**
      *
      * @return name of the function/macro as given in the source
@@ -20,10 +18,6 @@ public interface Call extends NavigatablePsiElement {
     @Nullable
     String functionName();
 
-    /**
-     *
-     * @return
-     */
     @Nullable
     PsiElement functionNameElement();
 

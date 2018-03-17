@@ -16,7 +16,6 @@ import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.ElixirAccessExpression;
 import org.elixir_lang.psi.QualifiableAlias;
 import org.elixir_lang.psi.call.Call;
-import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.elixir_lang.structure_view.element.*;
 import org.elixir_lang.structure_view.element.modular.Module;
 import org.jetbrains.annotations.NonNls;
@@ -26,7 +25,9 @@ import javax.swing.*;
 import java.util.*;
 
 import static com.intellij.openapi.util.Pair.pair;
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.stripAccessExpression;
+import static org.elixir_lang.psi.impl.PsiElementImplKt.stripAccessExpression;
+import static org.elixir_lang.psi.impl.call.CallImplKt.finalArguments;
+import static org.elixir_lang.psi.impl.call.CallImplKt.macroChildCalls;
 import static org.elixir_lang.structure_view.element.modular.Module.addClausesToCallDefinition;
 
 public class Used implements FileStructureNodeProvider<TreeElement>, ActionShortcutProvider {
@@ -36,16 +37,16 @@ public class Used implements FileStructureNodeProvider<TreeElement>, ActionShort
 
     @NonNls
     public static final String ID = "SHOW_USED";
-    public static final String USING = "__using__";
+    private static final String USING = "__using__";
 
     /*
      * Static Methods
      */
 
-    public static Collection<TreeElement> filterOverridden(@NotNull Collection<TreeElement> nodesFromChildren,
-                                                           @NotNull Collection<TreeElement> children) {
+    private static Collection<TreeElement> filterOverridden(@NotNull Collection<TreeElement> nodesFromChildren,
+                                                            @NotNull Collection<TreeElement> children) {
         Map<Pair<String, Integer>, CallDefinition> childFunctionByNameArity = functionByNameArity(children);
-        Collection<TreeElement> filtered = new ArrayList<TreeElement>(nodesFromChildren.size());
+        Collection<TreeElement> filtered = new ArrayList<>(nodesFromChildren.size());
 
         for (TreeElement nodeFromChildren : nodesFromChildren) {
             if (nodeFromChildren instanceof CallDefinition) {
@@ -68,7 +69,7 @@ public class Used implements FileStructureNodeProvider<TreeElement>, ActionShort
     }
 
     public static Map<Pair<String, Integer>, CallDefinition> functionByNameArity(@NotNull Collection<TreeElement> children) {
-        Map<Pair<String, Integer>, CallDefinition> functionByNameArity = new HashMap<Pair<String, Integer>, CallDefinition>(children.size());
+        Map<Pair<String, Integer>, CallDefinition> functionByNameArity = new HashMap<>(children.size());
 
         for (TreeElement child : children) {
             if (child instanceof CallDefinition) {
@@ -84,12 +85,12 @@ public class Used implements FileStructureNodeProvider<TreeElement>, ActionShort
         return functionByNameArity;
     }
 
-    public static Collection<TreeElement> provideNodesFromChild(@NotNull TreeElement child) {
+    private static Collection<TreeElement> provideNodesFromChild(@NotNull TreeElement child) {
         Collection<TreeElement> nodes = null;
 
         if (child instanceof Use) {
             Use use = (Use) child;
-            PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(use.call());
+            PsiElement[] finalArguments = finalArguments(use.call());
 
             assert finalArguments != null;
 
@@ -111,88 +112,83 @@ public class Used implements FileStructureNodeProvider<TreeElement>, ActionShort
 
                                     if (Module.is(call)) {
                                         Module module = new Module(call);
-                                        Call[] childCalls = ElixirPsiImplUtil.macroChildCalls(call);
+                                        Call[] childCalls = macroChildCalls(call);
 
-                                        if (childCalls != null) {
-                                            Map<Pair<String, Integer>, CallDefinition> macroByNameArity = new HashMap<Pair<String, Integer>, CallDefinition>(childCalls.length);
+                                        Map<Pair<String, Integer>, CallDefinition> macroByNameArity = new HashMap<>(childCalls.length);
 
-                                            for (Call childCall : childCalls) {
-                                                    /* portion of {@link org.elixir_lang.structure_view.element.enclosingModular.Module#childCallTreeElements}
-                                                       dealing with macros, restricted to __using__/1 */
-                                                if (CallDefinitionClause.isMacro(childCall)) {
-                                                    Pair<String, IntRange> nameArityRange = CallDefinitionClause.nameArityRange(childCall);
+                                        for (Call childCall : childCalls) {
+                                                /* portion of {@link org.elixir_lang.structure_view.element.enclosingModular.Module#childCallTreeElements}
+                                                   dealing with macros, restricted to __using__/1 */
+                                            if (CallDefinitionClause.isMacro(childCall)) {
+                                                Pair<String, IntRange> nameArityRange = CallDefinitionClause.nameArityRange(childCall);
 
-                                                    if (nameArityRange != null) {
-                                                        String name = nameArityRange.first;
-                                                        IntRange arityRange = nameArityRange.second;
+                                                if (nameArityRange != null) {
+                                                    String name = nameArityRange.first;
+                                                    IntRange arityRange = nameArityRange.second;
 
-                                                        if (name.equals(USING) && arityRange.containsInteger(1)) {
-                                                            addClausesToCallDefinition(
-                                                                    childCall,
-                                                                    name,
-                                                                    arityRange,
-                                                                    macroByNameArity,
-                                                                    module,
-                                                                    Timed.Time.COMPILE,
-                                                                    new Inserter<CallDefinition>() {
-                                                                        @Override
-                                                                        public void insert(CallDefinition element) {
-                                                                        }
-                                                                    }
-                                                            );
-                                                        }
+                                                    if (name.equals(USING) && arityRange.containsInteger(1)) {
+                                                        addClausesToCallDefinition(
+                                                                childCall,
+                                                                name,
+                                                                arityRange,
+                                                                macroByNameArity,
+                                                                module,
+                                                                Timed.Time.COMPILE,
+                                                                element -> {
+                                                                }
+                                                        );
                                                     }
                                                 }
                                             }
+                                        }
 
-                                            if (macroByNameArity.size() > 0) {
-                                                PsiElement[] usingArguments;
-                                                CallDefinition macro;
-                                                CallDefinitionClause matchingClause = null;
+                                        if (macroByNameArity.size() > 0) {
+                                            PsiElement[] usingArguments;
+                                            CallDefinition macro;
+                                            CallDefinitionClause matchingClause = null;
 
-                                                if (finalArguments.length > 1) {
-                                                    usingArguments = Arrays.copyOfRange(finalArguments, 1, finalArguments.length);
-                                                    Pair<String, Integer> nameArity = pair(USING, usingArguments.length);
-                                                    macro = macroByNameArity.get(nameArity);
+                                            if (finalArguments.length > 1) {
+                                                usingArguments = Arrays.copyOfRange(finalArguments, 1, finalArguments.length);
+                                                Pair<String, Integer> nameArity = pair(USING, usingArguments.length);
+                                                macro = macroByNameArity.get(nameArity);
 
-                                                    if (macro != null) {
-                                                        matchingClause = macro.matchingClause(usingArguments);
-                                                    }
-                                                } else {
-                                                        /* `use <ALIAS>` will calls `__using__/1` even though there is
-                                                           no additional argument, but it obviously can't select a clause. */
-                                                    Pair<String, Integer> nameArity = pair(USING, 1);
-                                                    macro = macroByNameArity.get(nameArity);
-                                                    List<CallDefinitionClause> macroClauseList = macro.clauseList();
-
-                                                    if (macroClauseList.size() == 1) {
-                                                        matchingClause = macroClauseList.get(0);
-                                                    } else {
-                                                        // TODO match default argument clause/head to non-default argument clause that would be executed.
-                                                    }
+                                                if (macro != null) {
+                                                    matchingClause = macro.matchingClause(usingArguments);
                                                 }
+                                            } else {
+                                                    /* `use <ALIAS>` will calls `__using__/1` even though there is
+                                                       no additional argument, but it obviously can't select a clause. */
+                                                Pair<String, Integer> nameArity = pair(USING, 1);
+                                                macro = macroByNameArity.get(nameArity);
+                                                List<CallDefinitionClause> macroClauseList = macro.clauseList();
 
-                                                if (matchingClause != null) {
-                                                    TreeElement[] callDefinitionClauseChildren = matchingClause.getChildren();
-                                                    int length = callDefinitionClauseChildren.length;
+                                                if (macroClauseList.size() == 1) {
+                                                    matchingClause = macroClauseList.get(0);
+                                                } else {
+                                                    // TODO match default argument clause/head to non-default argument clause that would be executed.
+                                                }
+                                            }
 
-                                                    if (length > 0) {
-                                                        TreeElement lastCallDefinitionClauseChild = callDefinitionClauseChildren[length - 1];
+                                            if (matchingClause != null) {
+                                                TreeElement[] callDefinitionClauseChildren = matchingClause.getChildren();
+                                                int length = callDefinitionClauseChildren.length;
 
-                                                        if (lastCallDefinitionClauseChild instanceof Quote) {
-                                                            Quote quote = (Quote) lastCallDefinitionClauseChild;
-                                                            Quote injectedQuote = quote.used(use);
-                                                            TreeElement[] injectedQuoteChildren = injectedQuote.getChildren();
-                                                            nodes = new ArrayList<TreeElement>(injectedQuoteChildren.length);
+                                                if (length > 0) {
+                                                    TreeElement lastCallDefinitionClauseChild = callDefinitionClauseChildren[length - 1];
 
-                                                            for (TreeElement injectedQuoteChild : injectedQuoteChildren) {
-                                                                if (!(injectedQuoteChild instanceof Overridable)) {
-                                                                    nodes.add(injectedQuoteChild);
-                                                                }
+                                                    if (lastCallDefinitionClauseChild instanceof Quote) {
+                                                        Quote quote = (Quote) lastCallDefinitionClauseChild;
+                                                        Quote injectedQuote = quote.used(use);
+                                                        TreeElement[] injectedQuoteChildren = injectedQuote.getChildren();
+                                                        nodes = new ArrayList<>(injectedQuoteChildren.length);
+
+                                                        for (TreeElement injectedQuoteChild : injectedQuoteChildren) {
+                                                            if (!(injectedQuoteChild instanceof Overridable)) {
+                                                                nodes.add(injectedQuoteChild);
                                                             }
-
-                                                            break;
                                                         }
+
+                                                        break;
                                                     }
                                                 }
                                             }
@@ -218,7 +214,7 @@ public class Used implements FileStructureNodeProvider<TreeElement>, ActionShort
     }
 
     public static Collection<TreeElement> provideNodesFromChildren(@NotNull Collection<TreeElement> children) {
-        Collection<TreeElement> nodes = new ArrayList<TreeElement>();
+        Collection<TreeElement> nodes = new ArrayList<>();
 
         for (TreeElement child : children) {
             Collection<TreeElement>  nodesFromChild = provideNodesFromChild(child);
@@ -276,7 +272,7 @@ public class Used implements FileStructureNodeProvider<TreeElement>, ActionShort
     @NotNull
     @Override
     public Collection<TreeElement> provideNodes(@NotNull TreeElement node) {
-        Collection<TreeElement> nodes = new ArrayList<TreeElement>();
+        Collection<TreeElement> nodes = new ArrayList<>();
 
         if (node instanceof Module) {
             Module module = (Module) node;

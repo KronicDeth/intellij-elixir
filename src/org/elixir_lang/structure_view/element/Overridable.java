@@ -13,16 +13,15 @@ import org.elixir_lang.psi.Quotable;
 import org.elixir_lang.psi.QuotableKeywordList;
 import org.elixir_lang.psi.QuotableKeywordPair;
 import org.elixir_lang.psi.call.Call;
-import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.elixir_lang.structure_view.element.modular.Modular;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.*;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.elixir_lang.psi.call.name.Function.DEFOVERRIDABLE;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
+import static org.elixir_lang.psi.impl.call.CallImplKt.keywordArguments;
 
 public class Overridable extends Element<Call> {
     /*
@@ -67,7 +66,7 @@ public class Overridable extends Element<Call> {
     @NotNull
     @Override
     public TreeElement[] getChildren() {
-        QuotableKeywordList keywordArguments = ElixirPsiImplUtil.keywordArguments(navigationItem);
+        QuotableKeywordList keywordArguments = keywordArguments(navigationItem);
         TreeElement[] children;
 
         if (keywordArguments != null) {

@@ -67,7 +67,6 @@ import org.elixir_lang.mix.runner.MixRunningState;
 import org.elixir_lang.mix.runner.MixRunningStateUtil;
 import org.elixir_lang.mix.runner.exunit.MixExUnitRunConfiguration;
 import org.elixir_lang.psi.ElixirFile;
-import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -78,6 +77,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static org.elixir_lang.beam.term.InspectKt.inspect;
 import static org.elixir_lang.debugger.Log.LOG;
 import static org.elixir_lang.mix.runner.MixRunningStateUtil.workingDirectory;
+import static org.elixir_lang.psi.impl.PsiElementImplKt.getModuleName;
 
 public class Process extends com.intellij.xdebugger.XDebugProcess implements Listener {
     @NotNull
@@ -289,7 +289,7 @@ public class Process extends com.intellij.xdebugger.XDebugProcess implements Lis
 
             if (psiFile instanceof ElixirFile) {
                 // TODO allow multiple module names for `defimpl`
-                moduleNameSet = Collections.singleton(ElixirPsiImplUtil.getModuleName(element));
+                moduleNameSet = Collections.singleton(getModuleName(element));
             } else if (psiFile instanceof File) {
                 Module module = ModuleUtilCore.findModuleForPsiElement(psiFile);
                 String rootDirectory = null;

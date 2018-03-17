@@ -12,6 +12,7 @@ import org.junit.ComparisonFailure;
 import java.io.IOException;
 
 import static org.apache.commons.lang.CharUtils.isAsciiPrintable;
+import static org.elixir_lang.psi.impl.ParentImpl.elixirString;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.*;
 
@@ -107,7 +108,7 @@ public class Quoter {
     public static OtpErlangTuple quote(@NotNull String code) throws IOException, OtpErlangExit, OtpErlangDecodeException {
         final OtpNode otpNode = IntellijElixir.getLocalNode();
         final OtpMbox otpMbox = otpNode.createMbox();
-        OtpErlangObject request = ElixirPsiImplUtil.elixirString(code);
+        OtpErlangObject request = elixirString(code);
 
         return (OtpErlangTuple) GenericServer.call(
                 otpMbox,

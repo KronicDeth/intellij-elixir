@@ -12,7 +12,6 @@ import com.intellij.usageView.UsageViewTypeLocation;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.navigation.item_presentation.Parent;
 import org.elixir_lang.psi.call.Call;
-import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.elixir_lang.psi.operation.Or;
 import org.elixir_lang.structure_view.element.*;
 import org.elixir_lang.structure_view.element.Exception;
@@ -32,7 +31,8 @@ import static org.elixir_lang.psi.call.name.Function.CREATE;
 import static org.elixir_lang.psi.call.name.Function.DEFMODULE;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
 import static org.elixir_lang.psi.call.name.Module.MODULE;
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.enclosingMacroCall;
+import static org.elixir_lang.psi.impl.PsiElementImplKt.enclosingMacroCall;
+import static org.elixir_lang.psi.impl.call.CallImplKt.macroChildCalls;
 
 public class Module extends Element<Call> implements Modular {
     /*
@@ -110,7 +110,7 @@ public class Module extends Element<Call> implements Modular {
 
     @NotNull
     public static TreeElement[] callChildren(@NotNull Modular modular, @NotNull Call call) {
-        Call[] childCalls = ElixirPsiImplUtil.macroChildCalls(call);
+        Call[] childCalls = macroChildCalls(call);
         TreeElement[] children = childCallTreeElements(modular, childCalls);
 
         if (children == null) {

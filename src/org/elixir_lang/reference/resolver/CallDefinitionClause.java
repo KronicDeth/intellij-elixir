@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.macroChildCalls;
+import static org.elixir_lang.psi.impl.call.CallImplKt.macroChildCalls;
 import static org.elixir_lang.structure_view.element.CallDefinitionClause.enclosingModularMacroCall;
 import static org.elixir_lang.structure_view.element.CallDefinitionSpecification.typeNameArity;
 
@@ -46,7 +46,7 @@ public class CallDefinitionClause implements ResolveCache.PolyVariantResolver<or
         if (enclosingModularMacroCall != null) {
             Call[] siblings = macroChildCalls(enclosingModularMacroCall);
 
-            if (siblings != null && siblings.length > 0) {
+            if (siblings.length > 0) {
                 Pair<String, Integer> nameArity = typeNameArity(callDefinitionClause.getElement());
                 String name = nameArity.first;
                 int arity = nameArity.second;

@@ -33,6 +33,7 @@ import static org.elixir_lang.psi.ElixirTypes.FN;
 import static org.elixir_lang.psi.ElixirTypes.MULTIPLE_ALIASES;
 import static org.elixir_lang.psi.call.name.Function.IMPORT;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.*;
+import static org.elixir_lang.psi.impl.PsiElementImplKt.document;
 
 /**
  * @note MUST implement {@link BlockEx} or language-specific indent settings will NOT be used and only the generic ones
@@ -2204,6 +2205,9 @@ public class Block extends AbstractBlock implements BlockEx {
 
     private boolean firstOnLine(@NotNull ASTNode node) {
         Document document = document(node.getPsi());
+
+        assert document != null;
+
         int nodeStartOffset = node.getStartOffset();
         int lineNumber = document.getLineNumber(nodeStartOffset);
         int lineStartOffset = document.getLineStartOffset(lineNumber);

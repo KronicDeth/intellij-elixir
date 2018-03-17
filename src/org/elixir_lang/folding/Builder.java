@@ -24,6 +24,8 @@ import java.util.*;
 import static org.elixir_lang.psi.call.name.Function.*;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.*;
+import static org.elixir_lang.psi.impl.PsiElementImplKt.siblingExpression;
+import static org.elixir_lang.psi.impl.call.CallImplKt.finalArguments;
 
 public class Builder extends FoldingBuilderEx {
     /*
@@ -215,7 +217,7 @@ public class Builder extends FoldingBuilderEx {
                         Call last = first;
 
                         while (true) {
-                            expression = nextSiblingExpression(expression);
+                            expression = siblingExpression(expression, NEXT_SIBLING);
 
                             if (expression instanceof Call) {
                                 Call call = (Call) expression;
@@ -296,19 +298,14 @@ public class Builder extends FoldingBuilderEx {
                                                 @NotNull PsiElement element,
                                                 @Nullable final String placeHolderText) {
                         String moduleAttributeName = atNonNumericOperation.moduleAttributeName();
-                        FoldingGroup foldingGroup = foldingGroupByModuleAttributeName.get(moduleAttributeName);
-
-                        if (foldingGroup == null) {
-                            foldingGroup = FoldingGroup.newGroup(moduleAttributeName);
-                            foldingGroupByModuleAttributeName.put(moduleAttributeName, foldingGroup);
-                        }
+                        FoldingGroup foldingGroup = foldingGroupByModuleAttributeName.computeIfAbsent(moduleAttributeName, FoldingGroup::newGroup);
 
                         foldingDescriptorList.add(
                                 new FoldingDescriptor(
                                         atNonNumericOperation.getNode(),
                                         atNonNumericOperation.getTextRange(),
                                         foldingGroup,
-                                        Collections.<Object>singleton(element)
+                                        Collections.singleton(element)
                                 ) {
                                     @Nullable
                                     @Override

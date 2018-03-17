@@ -10,7 +10,6 @@ import org.elixir_lang.navigation.item_presentation.Parent;
 import org.elixir_lang.psi.ElixirAccessExpression;
 import org.elixir_lang.psi.ElixirList;
 import org.elixir_lang.psi.call.Call;
-import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.elixir_lang.structure_view.element.modular.Modular;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,7 +20,9 @@ import java.util.List;
 
 import static org.elixir_lang.psi.call.name.Function.DEFDELEGATE;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.stripAccessExpression;
+import static org.elixir_lang.psi.impl.PsiElementImplKt.stripAccessExpression;
+import static org.elixir_lang.psi.impl.call.CallImplKt.finalArguments;
+import static org.elixir_lang.psi.impl.call.CallImplKt.keywordArgument;
 
 public class Delegation extends Element<Call>  {
     /*
@@ -40,7 +41,7 @@ public class Delegation extends Element<Call>  {
     public static List<Call> callDefinitionHeadCallList(Call defdelegateCall) {
         List<Call> callDefinitionHeadCallList = null;
 
-        PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(defdelegateCall);
+        PsiElement[] finalArguments = finalArguments(defdelegateCall);
 
         assert finalArguments != null;
         assert finalArguments.length > 0;
@@ -126,7 +127,7 @@ public class Delegation extends Element<Call>  {
      * @return defaults to {@code false} and when keyword argument is not parsable as boolean.
      */
     public boolean appendFirst() {
-        PsiElement keywordValue = ElixirPsiImplUtil.keywordArgument(navigationItem, "append_first");
+        PsiElement keywordValue = keywordArgument(navigationItem, "append_first");
         boolean appendFirst = false;
 
         if (keywordValue != null) {
@@ -212,7 +213,7 @@ public class Delegation extends Element<Call>  {
      */
     @Nullable
     private String keywordArgumentText(@NotNull final String keywordValueText) {
-        PsiElement keywordValue = ElixirPsiImplUtil.keywordArgument(navigationItem, keywordValueText);
+        PsiElement keywordValue = keywordArgument(navigationItem, keywordValueText);
         String text = null;
 
         if (keywordValue != null) {

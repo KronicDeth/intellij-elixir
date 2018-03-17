@@ -18,8 +18,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.DECLARING_SCOPE;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE;
+import static org.elixir_lang.psi.impl.ProcessDeclarationsImpl.DECLARING_SCOPE;
 import static org.elixir_lang.reference.Callable.IGNORED;
 
 /**
