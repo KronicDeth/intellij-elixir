@@ -1,9 +1,7 @@
 package org.elixir_lang.psi.impl
 
 import com.intellij.psi.PsiElement
-import org.elixir_lang.psi.ElixirAlias
-import org.elixir_lang.psi.NamedElement
-import org.elixir_lang.psi.QualifiedAlias
+import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.UNQUOTE
 import org.elixir_lang.structure_view.element.modular.Implementation
@@ -45,6 +43,49 @@ object PsiNamedElementImpl {
         }
 
         return name
+    }
+
+    @JvmStatic
+    fun setName(@Suppress("UNUSED_PARAMETER") element: PsiElement, @Suppress("UNUSED_PARAMETER") newName: String): PsiElement {
+        TODO("Rename not implemented")
+    }
+
+    @JvmStatic
+    fun setName(atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>,
+                newName: String): PsiElement {
+        val newAtUnqualifiedNoParenthesesCall = ElementFactory.createModuleAttributeDeclaration(
+                atUnqualifiedNoParenthesesCall.project,
+                newName,
+                "dummy_value"
+        )
+
+        val nameNode = atUnqualifiedNoParenthesesCall.atIdentifier.node
+        val newNameNode = newAtUnqualifiedNoParenthesesCall.atIdentifier.node
+
+        val node = atUnqualifiedNoParenthesesCall.node
+        node.replaceChild(nameNode, newNameNode)
+
+        return atUnqualifiedNoParenthesesCall
+    }
+
+    @JvmStatic
+    fun setName(variable: ElixirVariable, newName: String): PsiElement {
+        TODO("Rename not implemented")
+    }
+
+    @JvmStatic
+    fun setName(named: org.elixir_lang.psi.call.Named,
+                newName: String): PsiElement {
+        val functionNameElement = named.functionNameElement()
+        val newFunctionNameElementCall = ElementFactory.createUnqualifiedNoArgumentsCall(named.project, newName)
+
+        val nameNode = functionNameElement!!.node
+        val newNameNode = newFunctionNameElementCall.functionNameElement().node
+
+        val node = nameNode.treeParent
+        node.replaceChild(nameNode, newNameNode)
+
+        return named
     }
 
     /**

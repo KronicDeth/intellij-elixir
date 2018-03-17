@@ -1914,45 +1914,24 @@ public class ElixirPsiImplUtil {
 
     @NotNull
     public static PsiElement setName(@NotNull PsiElement element, @NotNull String newName) {
-        return null;
+        return PsiNamedElementImpl.setName(element, newName);
     }
 
     @NotNull
     public static PsiElement setName(@NotNull final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall,
                                      @NotNull final String newName) {
-        AtUnqualifiedNoParenthesesCall newAtUnqualifiedNoParenthesesCall = ElementFactory.createModuleAttributeDeclaration(
-                atUnqualifiedNoParenthesesCall.getProject(),
-                newName,
-                "dummy_value"
-        );
-
-        ASTNode nameNode = atUnqualifiedNoParenthesesCall.getAtIdentifier().getNode();
-        ASTNode newNameNode = newAtUnqualifiedNoParenthesesCall.getAtIdentifier().getNode();
-
-        ASTNode node = atUnqualifiedNoParenthesesCall.getNode();
-        node.replaceChild(nameNode, newNameNode);
-
-        return atUnqualifiedNoParenthesesCall;
+        return PsiNamedElementImpl.setName(atUnqualifiedNoParenthesesCall, newName);
     }
 
     @NotNull
     public static PsiElement setName(@NotNull ElixirVariable variable, @NotNull String newName) {
-        return null;
+        return PsiNamedElementImpl.setName(variable, newName);
     }
 
     @NotNull
     public static PsiElement setName(@NotNull final org.elixir_lang.psi.call.Named named,
                                      @NotNull final String newName) {
-        PsiElement functionNameElement = named.functionNameElement();
-        Call newFunctionNameElementCall = ElementFactory.createUnqualifiedNoArgumentsCall(named.getProject(), newName);
-
-        ASTNode nameNode = functionNameElement.getNode();
-        ASTNode newNameNode = newFunctionNameElementCall.functionNameElement().getNode();
-
-        ASTNode node = nameNode.getTreeParent();
-        node.replaceChild(nameNode, newNameNode);
-
-        return named;
+        return PsiNamedElementImpl.setName(named, newName);
     }
 
     public static char sigilName(@NotNull org.elixir_lang.psi.Sigil sigil) {
