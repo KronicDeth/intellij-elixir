@@ -1759,12 +1759,7 @@ public class ElixirPsiImplUtil {
     }
 
     public static char terminator(@NotNull SigilLine sigilLine) {
-        ASTNode node = sigilLine.getNode();
-        ASTNode[] childNodes = node.getChildren(null);
-        ASTNode terminatorNode = childNodes[4];
-        CharSequence chars = terminatorNode.getChars();
-
-        return chars.charAt(0);
+        return SigilLineImplKt.terminator(sigilLine);
     }
 
     @NotNull
