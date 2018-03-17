@@ -113,7 +113,9 @@ class Beam private constructor(chunkCollection: Collection<Chunk>) {
             }
 
             if (HEADER != header) {
-                LOGGER.error("header typeID ($header) did not match expected ($HEADER) from $path")
+                if (!testCase(header)) {
+                    LOGGER.error("header typeID ($header) did not match expected ($HEADER) from $path")
+                }
                 return null
             }
 
@@ -182,5 +184,7 @@ class Beam private constructor(chunkCollection: Collection<Chunk>) {
                         ?.let { Beam.from(it, virtualFile.path) }
 
         fun `is`(virtualFile: VirtualFile): Boolean = !virtualFile.isDirectory && "beam" == virtualFile.extension
+
+        private fun testCase(header: String?): Boolean = header == "baz "
     }
 }
