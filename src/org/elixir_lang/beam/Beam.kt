@@ -11,10 +11,7 @@ import org.elixir_lang.beam.chunk.Chunk.TypeID.*
 import org.elixir_lang.beam.chunk.Chunk.length
 import org.elixir_lang.beam.chunk.Chunk.typeID
 import org.elixir_lang.beam.term.ByteCount
-import java.io.ByteArrayInputStream
-import java.io.DataInputStream
-import java.io.IOException
-import java.io.InputStream
+import java.io.*
 import java.nio.charset.Charset
 import java.util.*
 import java.util.zip.GZIPInputStream
@@ -114,7 +111,11 @@ class Beam private constructor(chunkCollection: Collection<Chunk>) {
 
             if (HEADER != header) {
                 if (!testCase(header)) {
-                    LOGGER.error("header typeID ($header) did not match expected ($HEADER) from $path")
+                    LOGGER.error(
+                            "header typeID ($header) did not match expected ($HEADER) from $path. " +
+                                    "There are ${dataInputStream.available()} bytes available on the " +
+                                    "dataInputStream. File size is ${File(path).length()} bytes."
+                    )
                 }
                 return null
             }
