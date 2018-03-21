@@ -160,6 +160,7 @@
 
 ### Bug Fixes
 * [#1056](https://github.com/KronicDeth/intellij-elixir/pull/1056) - Certain `.beam` files in the OTP source are purposely invalid, so ignore them when trying to parse and don't log the expected error. - [@KronicDeth](https://github.com/KronicDeth)
+* [#1060](https://github.com/KronicDeth/intellij-elixir/pull/1060) - Log available bytes and total size when header is not `FOR1`. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v7.4.0
 
