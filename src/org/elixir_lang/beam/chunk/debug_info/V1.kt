@@ -5,6 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
 import org.elixir_lang.beam.chunk.DebugInfo
 import org.elixir_lang.beam.chunk.debug_info.v1.elixirErl
+import org.elixir_lang.beam.chunk.debug_info.v1.erlAbstractCode
 import org.elixir_lang.beam.term.inspect
 
 fun v1(term: Term): DebugInfo {
@@ -57,6 +58,8 @@ private fun v1FromBackend(backend: OtpErlangAtom, v1: V1): DebugInfo {
     return when (backendAtom) {
         "elixir_erl" ->
             elixirErl(v1)
+        "erl_abstract_code" ->
+            erlAbstractCode(v1)
         else -> {
             logger.error("""
                          Dbgi tuple with :debug_info_v1 tag has unknown backend ($backendAtom)

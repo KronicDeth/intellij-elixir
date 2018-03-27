@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.definitions.definition.clause
 
 import com.intellij.openapi.application.ApplicationManager
@@ -132,6 +134,6 @@ class Panel(private val definitionsTree: Tree, project: Project): JPanel(GridLay
             "defmodule ${debugInfo.inspectedModule!!} do\n" +
                     "  # ...\n" +
                     "  ${adjustNewLines(inner(), "\n  ")}\n" +
-                    "  #...\n" +
+                    "  # ...\n" +
                     "end"
 }
