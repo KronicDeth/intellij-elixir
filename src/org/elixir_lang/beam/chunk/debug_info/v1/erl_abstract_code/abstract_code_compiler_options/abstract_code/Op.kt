@@ -3,44 +3,78 @@ package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code
 import com.ericsson.otp.erlang.OtpErlangAtom
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
 import org.elixir_lang.code.Identifier.inspectAsFunction
 
-private const val TAG = "op"
+object Op {
+    fun ifToMacroString(term: OtpErlangObject?): String? = AbstractCode.ifTag(term, TAG) { toMacroString(it) }
 
-class Op(term: OtpErlangTuple): Node(term) {
-    val operator by lazy { term.elementAt(2) as? OtpErlangAtom }
-    val operands by lazy {
-        term.elements().drop(3).mapNotNull { Node.from(it) }
+    fun toMacroString(term: OtpErlangObject): String =
+            when (term) {
+                is OtpErlangTuple -> toMacroString(term)
+                else -> "unknown_op"
+            }
+
+    fun toMacroString(term: OtpErlangTuple): String =
+            toOperator(term)
+                    ?.let { operationToMacroString(it, toOperands(term)) }
+                    ?: "missing_operator"
+
+    private const val TAG = "op"
+
+    private fun binaryOperationToMacroString(
+            leftOperand: OtpErlangObject,
+            operator: OtpErlangObject,
+            rightOperand: OtpErlangObject
+    ): String {
+        val operatorMacroString = binaryOperatorToMacroString(operator)
+        val leftOperandMacroString = AbstractCode.toMacroString(leftOperand)
+        val rightOperandMacroString = AbstractCode.toMacroString(rightOperand)
+
+        return "$leftOperandMacroString $operatorMacroString $rightOperandMacroString"
     }
 
-    override fun toMacroString(): String =
-        when (operands.size) {
-            1 -> "${operatorToMacroString()}${operands[0].toMacroString()}"
-            2 -> {
-                val leftMacroString = operands[0].toMacroString()
-                val rightMacroString = operands[1].toMacroString()
+    private fun binaryOperatorToMacroString(operator: OtpErlangAtom): String {
+        val name = operator.atomValue()
 
-                val operatorMacroString = operator?.let {
-                    val operatorAtomValue = it.atomValue()
+        return when (name) {
+            "band" -> "&&&"
+            "bor" -> "|||"
+            "bsl" -> "<<<"
+            "bsr" -> ">>>"
+            "bxor" -> "^^^"
+            else -> name
+        }
+    }
 
-                    when (operatorAtomValue) {
-                        "band" -> "&&&"
-                        "bor" -> "|||"
-                        "bsl" -> "<<<"
-                        "bsr" -> ">>>"
-                        "bxor" -> "^^^"
-                        else -> operatorAtomValue
-                    }
-                } ?: operatorToMacroString()
-
-                "$leftMacroString $operatorMacroString $rightMacroString"
+    private fun binaryOperatorToMacroString(operator: OtpErlangObject): String =
+            when (operator) {
+                is OtpErlangAtom -> binaryOperatorToMacroString(operator)
+                else -> "unknown_binary_operator"
             }
-            else -> TODO()
+
+    private fun operationToMacroString(operator: OtpErlangObject, operands: List<OtpErlangObject>): String =
+        when (operands.size) {
+            1 -> unaryOperationToMacroString(operator, operands.single())
+            2 -> binaryOperationToMacroString(operands.first(), operator, operands.last())
+            else -> "unknown_operation_arity"
         }
 
-    private fun operatorToMacroString(): String = operator?.let { inspectAsFunction(it) } ?: "?"
+    private fun toOperator(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
+    private fun toOperands(term: OtpErlangTuple): List<OtpErlangObject> = term.elements().drop(3)
 
-    companion object {
-        fun from(term: OtpErlangObject) = ifTag(term, TAG, ::Op)
+    private fun unaryOperationToMacroString(operator: OtpErlangObject, operand: OtpErlangObject): String {
+        val operatorMacroString = unaryOperatorToMacroString(operator)
+        val operandMacroString = AbstractCode.toMacroString(operand)
+
+        return "$operatorMacroString $operandMacroString"
     }
+
+    private fun unaryOperatorToMacroString(operator: OtpErlangAtom): String = inspectAsFunction(operator)
+
+    private fun unaryOperatorToMacroString(operator: OtpErlangObject): String =
+            when (operator) {
+                is OtpErlangAtom -> unaryOperatorToMacroString(operator)
+                else -> "unknown_unary_operator"
+            }
 }

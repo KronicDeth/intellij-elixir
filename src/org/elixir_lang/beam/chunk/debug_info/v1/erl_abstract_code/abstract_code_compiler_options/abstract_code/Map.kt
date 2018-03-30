@@ -3,17 +3,39 @@ package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code
 import com.ericsson.otp.erlang.OtpErlangList
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
 
-private const val TAG = "map"
 
-class Map(term: OtpErlangTuple): Node(term) {
-    val associations by lazy { (term.elementAt(2) as? OtpErlangList)?.mapNotNull { Node.from(it) } }
+object Map {
+    fun ifToMacroString(term: OtpErlangObject?): String? = AbstractCode.ifTag(term, TAG) { toMacroString(it) }
 
-    override fun toMacroString(): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    fun toMacroString(term: OtpErlangObject): String =
+            when (term) {
+                is OtpErlangTuple -> toMacroString(term)
+                else -> "unknown_map"
+            }
+
+    fun toMacroString(term: OtpErlangTuple): String {
+        val associationsMacroString = associationsMacroString(term)
+
+        return "%{$associationsMacroString}"
     }
 
-    companion object {
-        fun from(term: OtpErlangObject): Map? = ifTag(term, TAG, ::Map)
-    }
+    private const val TAG = "map"
+
+    private fun associationsMacroString(term: OtpErlangTuple): String =
+        toAssociations(term)
+                ?.let { associationsToMacroString(it) }
+                ?: "missing_associations"
+
+    private fun associationsToMacroString(term: OtpErlangList): String =
+            term.joinToString(", ") { AbstractCode.toMacroString(it) }
+
+    private fun associationsToMacroString(term: OtpErlangObject): String =
+            when (term) {
+                is OtpErlangList -> associationsToMacroString(term)
+                else -> "unknown_associations"
+            }
+
+    private fun toAssociations(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
 }

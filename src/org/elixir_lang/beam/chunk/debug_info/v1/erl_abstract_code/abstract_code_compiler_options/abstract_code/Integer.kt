@@ -3,15 +3,31 @@ package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code
 import com.ericsson.otp.erlang.OtpErlangLong
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
 
-private const val TAG = "integer"
+object Integer {
+    fun ifToMacroString(term: OtpErlangObject?): String? = AbstractCode.ifTag(term, TAG) { toMacroString(it) }
 
-class Integer(term: OtpErlangTuple): Node(term) {
-    val integer by lazy { (term.elementAt(2) as OtpErlangLong).intValue() }
+    fun toMacroString(term: OtpErlangObject): String =
+            when (term) {
+                is OtpErlangTuple -> toMacroString(term)
+                else -> "unknown_integer"
+            }
 
-    override fun toMacroString(): String = integer.toString()
+    fun toMacroString(term: OtpErlangTuple): String =
+            toInteger(term)
+                    ?.let { integerToMacroString(it) }
+    ?: "missing_integer"
 
-    companion object {
-        fun from(term: OtpErlangObject) = ifTag(term, TAG, ::Integer)
-    }
+    private const val TAG = "integer"
+
+    private fun integerToMacroString(term: OtpErlangLong): String = term.intValue().toString()
+
+    private fun integerToMacroString(term: OtpErlangObject): String =
+            when (term) {
+                is OtpErlangLong -> integerToMacroString(term)
+                else -> "unknown_integer"
+            }
+
+    private fun toInteger(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
 }

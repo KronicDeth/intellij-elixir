@@ -1,19 +1,45 @@
 package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code
 
+import com.ericsson.otp.erlang.OtpErlangAtom
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
+import org.elixir_lang.code.Identifier.inspectAsKey
 
-private const val TAG = "record_field"
+object RecordField {
+    fun ifToMacroString(term: OtpErlangObject?): String? = AbstractCode.ifTag(term, TAG) { toMacroString(it) }
 
-class RecordField(term: OtpErlangTuple): Node(term) {
-    val field by lazy { term.elementAt(2)?.let { Node.from(it) } }
-    val expression by lazy { term.elementAt(3)?.let { Node.from(it) } }
+    fun toMacroString(term: OtpErlangObject): String =
+            when (term) {
+                is OtpErlangTuple -> toMacroString(term)
+                else -> "unknown_record_field"
+            }
 
-    override fun toMacroString(): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    fun toMacroString(term: OtpErlangTuple): String {
+        val fieldMacroString = fieldMacroString(term)
+        val expressionMacroString = expressionMacroString(term)
+
+        return "$fieldMacroString $expressionMacroString"
     }
 
-    companion object {
-        fun from(term: OtpErlangObject) = ifTag(term, TAG, ::RecordField)
-    }
+    private const val TAG = "record_field"
+
+    private fun expressionMacroString(term: OtpErlangTuple): String =
+            toExpression(term)
+                    ?.let { AbstractCode.toMacroString(it) }
+                    ?: "missing_expression"
+
+    private fun fieldMacroString(term: OtpErlangTuple): String =
+            toField(term)
+                    ?.let { fieldToMacroString(it) }
+                    ?: "missing_field:"
+
+    private fun fieldToMacroString(term: OtpErlangObject): String =
+            when (term) {
+                is OtpErlangAtom -> inspectAsKey(term)
+                else -> "unknown_field:"
+            }
+
+    private fun toExpression(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(3)
+    private fun toField(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
 }

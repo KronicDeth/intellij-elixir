@@ -3,25 +3,32 @@ package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code
 import com.ericsson.otp.erlang.OtpErlangAtom
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
 
-private const val TAG = "var"
-private const val DEFAULT_NAME_TO_MACRO_STRING = "..."
+object Var {
+    fun ifToMacroString(term: OtpErlangObject?): String? = AbstractCode.ifTag(term, TAG) { toMacroString(it) }
 
-class Var(term: OtpErlangTuple): Node(term) {
-    val name by lazy { term.elementAt(2) as? OtpErlangAtom }
+    fun toMacroString(term: OtpErlangObject): String =
+            when (term) {
+                is OtpErlangTuple -> toMacroString(term)
+                else -> "unknown_var"
+            }
 
-    override fun toMacroString(): String = nameToMacroString(name)
+    fun toMacroString(term: OtpErlangTuple): String = nameMacroString(term)
 
-    companion object {
-        fun nameToMacroString(name: OtpErlangObject?) =
-                when (name) {
-                    is OtpErlangAtom? -> nameToMacroString(name)
-                    else -> DEFAULT_NAME_TO_MACRO_STRING
-                }
+    private const val TAG = "var"
 
-        fun nameToMacroString(name: OtpErlangAtom?) =
-                name?.let { it.atomValue().decapitalize() } ?: DEFAULT_NAME_TO_MACRO_STRING
+    private fun nameMacroString(term: OtpErlangTuple): String =
+            toName(term)
+                    ?.let{ nameToMacroString(it) }
+                    ?: "name_missing"
 
-        fun from(term: OtpErlangObject) = ifTag(term, TAG, ::Var)
-    }
+    fun nameToMacroString(name: OtpErlangObject) =
+            when (name) {
+                is OtpErlangAtom -> nameToMacroString(name)
+                else -> "unknown_name"
+            }
+
+    private fun nameToMacroString(name: OtpErlangAtom) = name.atomValue().decapitalize()
+    private fun toName(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
 }

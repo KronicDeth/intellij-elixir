@@ -1,99 +1,130 @@
 package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code
 
-import com.ericsson.otp.erlang.OtpErlangAtom
-import com.ericsson.otp.erlang.OtpErlangList
-import com.ericsson.otp.erlang.OtpErlangLong
-import com.ericsson.otp.erlang.OtpErlangTuple
+import com.ericsson.otp.erlang.*
 import org.elixir_lang.beam.chunk.component1
 import org.elixir_lang.beam.chunk.component2
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
 
-private const val TAG = "bin_element"
+object BinElement {
+    fun toMacroString(term: OtpErlangTuple): String {
+        val patternMacroString = patternMacroString(term)
+        val optionsMacroString = ifOptionsMacroString(term)
 
-class BinElement(private val term: OtpErlangTuple): Node(term) {
-    val pattern by lazy {
-        (term.elementAt(2) as? OtpErlangTuple)?.let { Node.from(it) }
-    }
-    val size by lazy {
-        term.elementAt(3)?.let { element ->
-            when (element) {
-                is OtpErlangAtom -> element
-                else -> Node.from(element)
-            }
-        }
-    }
-    val typeSpecifierList by lazy {
-        term.elementAt(4)?.let { element ->
-            when (element) {
-                is OtpErlangAtom -> element
-                is OtpErlangList -> element.toList()
-                else -> TODO()
-            }
-        }
-    }
-
-    override fun toMacroString(): String =
-        arrayOf(pattern?.toMacroString(), optionsToMacroString()).filterNotNull().joinToString(" :: ")
-
-    private fun optionsToMacroString(): String? {
-        val nonNullOptionMacroStrings =
-                arrayOf(typeSpecifierListToMacroString(), sizeToMacroString()).filterNotNull()
-
-        return if (nonNullOptionMacroStrings.isEmpty()) {
-            null
+        return if (optionsMacroString != null) {
+            "$patternMacroString :: $optionsMacroString"
         } else {
-            nonNullOptionMacroStrings.joinToString("-")
+            patternMacroString
         }
     }
 
-    private fun sizeToMacroString(): String? =
-        when (size) {
-            is OtpErlangAtom ->
-                if ((size as OtpErlangAtom).atomValue() == "default") {
-                    null
-                } else {
-                    "?"
-                }
-            is Node -> (size as Node).toMacroString()
-            else -> "?"
-        }
-
-    private fun typeSpecifierListToMacroString(): String? =
-            when (typeSpecifierList) {
-                is OtpErlangAtom ->
-                    if ((typeSpecifierList as OtpErlangAtom).atomValue() == "default") {
-                        null
-                    } else {
-                        "?"
-                    }
-                is List<*> -> (typeSpecifierList as List<*>).joinToString("-") {
-                    when (it) {
-                        is OtpErlangAtom -> it.atomValue()
-                        is OtpErlangTuple ->
-                                if (it.arity() == 2) {
-                                    val (name, value) = it
-
-                                    if (name is OtpErlangAtom && value is OtpErlangLong) {
-                                        "${name.atomValue()}(${value.longValue()})"
-                                    } else {
-                                        TODO()
-                                    }
-                                } else {
-                                    TODO()
-                                }
-                        else -> TODO()
-                    }
-                }
-                else -> "?"
+    fun toMacroString(term: OtpErlangObject?): String =
+            when (term) {
+                is OtpErlangTuple -> toMacroString(term)
+                else -> "unknown_bin_element"
             }
 
-    companion object {
-        fun from(form: OtpErlangTuple): BinElement? =
-                (form.elementAt(0) as? OtpErlangAtom)?.let { tag ->
-                    if (tag.atomValue() == TAG) {
-                        BinElement(form)
-                    } else {
-                        null
-                    }
-                }
+    private const val TAG = "bin_element"
+
+    private fun ifOptionsMacroString(term: OtpErlangTuple): String? {
+        val sizeMacroString = sizeMacroString(term)
+        val typeSpecifierListMacroString = typeSpecifierListMacroString(term)
+
+        return if (sizeMacroString != null) {
+            if (typeSpecifierListMacroString != null) {
+                "$sizeMacroString-$typeSpecifierListMacroString"
+            } else {
+                sizeMacroString
+            }
+        } else {
+            @Suppress("IfThenToSafeAccess")
+            if (typeSpecifierListMacroString != null) {
+                typeSpecifierListMacroString
+            } else {
+                null
+            }
+        }
     }
+
+    private fun typeSpecifierListMacroString(term: OtpErlangTuple): String? {
+        val typeSpecifierList = toTypeSpecifierList(term)
+
+        return if (typeSpecifierList != null) {
+            typeSpecifierListToMacroString(typeSpecifierList)
+        } else {
+            "unknown_type_specifier_list"
+        }
+    }
+
+    private fun patternMacroString(term: OtpErlangTuple): String =
+            toPattern(term)
+                    ?.let { patternToMacroString(it) } ?:
+            "unknown_pattern"
+
+    private fun patternToMacroString(term: OtpErlangObject): String = AbstractCode.toMacroString(term)
+
+    private fun sizeMacroString(term: OtpErlangTuple): String? {
+        val size = toSize(term)
+
+        return if (size != null) {
+            sizeToMacroString(size)
+        } else {
+            "unknown_size"
+        }
+    }
+
+    private fun sizeToMacroString(term: OtpErlangAtom): String? =
+            if (term.atomValue() == "default") {
+                null
+            } else {
+                "unknown_size_atom"
+            }
+
+    private fun sizeToMacroString(term: OtpErlangObject): String? =
+        when (term) {
+            is OtpErlangAtom -> sizeToMacroString(term)
+            else -> AbstractCode.toMacroString(term)
+        }
+
+    private fun toPattern(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
+    private fun toSize(term: OtpErlangTuple) : OtpErlangObject? = term.elementAt(3)
+    private fun toTypeSpecifierList(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(4)
+
+    private fun typeSpecifierListToMacroString(term: OtpErlangAtom): String? =
+            if (term.atomValue() == "default") {
+                null
+            } else {
+                "unknown_type_specifier_list_atom"
+            }
+
+    private fun typeSpecifierListToMacroString(term: OtpErlangList): String =
+            term.joinToString("-") { typeSpecifierToMacroString(it) }
+
+    private fun typeSpecifierListToMacroString(term: OtpErlangObject): String? =
+            when (term) {
+                is OtpErlangAtom -> typeSpecifierListToMacroString(term)
+                is OtpErlangList -> typeSpecifierListToMacroString(term)
+                else -> "unknown_type_specifier_list"
+            }
+
+    private fun typeSpecifierToMacroString(term: OtpErlangAtom): String = term.atomValue()
+
+    private fun typeSpecifierToMacroString(term: OtpErlangTuple): String =
+           if (term.arity() == 2) {
+               val (name, value) = term
+
+               if (name is OtpErlangAtom && value is OtpErlangLong) {
+                   "${name.atomValue()}(${value.longValue()})"
+               } else {
+                   "unknown_type_specifier_name_value_pair"
+               }
+           } else {
+               "unknown_type_specifier_tuple"
+           }
+
+    private fun typeSpecifierToMacroString(term: OtpErlangObject): String =
+            when (term) {
+                is OtpErlangAtom -> typeSpecifierToMacroString(term)
+                is OtpErlangTuple -> typeSpecifierToMacroString(term)
+                else -> "unknown_type_specifier"
+            }
 }

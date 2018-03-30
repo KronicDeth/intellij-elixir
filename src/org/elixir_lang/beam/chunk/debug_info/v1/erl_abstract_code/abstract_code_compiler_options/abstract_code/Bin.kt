@@ -3,18 +3,17 @@ package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code
 import com.ericsson.otp.erlang.OtpErlangList
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
 
-private const val TAG = "bin"
 
-class Bin(term: OtpErlangTuple): Node(term) {
-    val binElements by lazy {
-        (term.elementAt(2) as? OtpErlangList)?.filterIsInstance<OtpErlangTuple>()?.mapNotNull { BinElement.from(it) }
-    }
+object Bin {
+    fun ifToMacroString(term: OtpErlangObject?): String? = AbstractCode.ifTag(term, TAG) { toMacroString(it) }
 
-    override fun toMacroString(): String =
-        "<<${binElements?.joinToString(", ", transform = BinElement::toMacroString) ?: "?"}>>"
+    fun toMacroString(term: OtpErlangTuple): String = "<<${binElementsMacroString(term)}>>"
 
-    companion object {
-        fun from(term: OtpErlangObject): Bin? = ifTag(term, TAG, ::Bin)
-    }
+    private const val TAG = "bin"
+
+    private fun binElementsMacroString(term: OtpErlangTuple): String =
+            (term.elementAt(2) as? OtpErlangList)?.joinToString(", ") { BinElement.toMacroString(it) } ?:
+            "unknown_bin_elements"
 }

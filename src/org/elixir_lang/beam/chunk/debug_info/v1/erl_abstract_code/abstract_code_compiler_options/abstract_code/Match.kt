@@ -2,16 +2,36 @@ package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code
 
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
 
-private const val TAG = "match"
+object Match {
+    fun ifToMacroString(term: OtpErlangObject?): String? = AbstractCode.ifTag(term, TAG) { toMacroString(it) }
 
-class Match(term: OtpErlangTuple): Node(term) {
-    val left by lazy { term.elementAt(2)?.let { Node.from(it) }  }
-    val right by lazy { term.elementAt(3)?.let { Node.from(it) }  }
+    fun toMacroString(term: OtpErlangObject): String =
+            when (term) {
+                is OtpErlangTuple -> toMacroString(term)
+                else -> "unknown_match"
+            }
 
-    override fun toMacroString(): String = "${left.toMacroString()} = ${right.toMacroString()}"
+    fun toMacroString(term: OtpErlangTuple): String {
+        val leftMacroString = leftMacroString(term)
+        val rightMacroString = rightMacroString(term)
 
-    companion object {
-        fun from(term: OtpErlangObject) = ifTag(term, TAG, ::Match)
+        return "$leftMacroString = $rightMacroString"
     }
+
+    private const val TAG = "match"
+
+    private fun leftMacroString(term: OtpErlangTuple): String =
+            toLeft(term)
+                    ?.let { AbstractCode.toMacroString(it) }
+                    ?: "missing_left"
+
+    private fun rightMacroString(term: OtpErlangTuple): String =
+            toRight(term)
+                    ?.let { AbstractCode.toMacroString(it) }
+                    ?: "missing_right"
+
+    private fun toLeft(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
+    private fun toRight(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(3)
 }

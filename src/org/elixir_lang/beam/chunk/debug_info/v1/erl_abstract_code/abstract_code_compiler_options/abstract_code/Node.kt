@@ -27,32 +27,5 @@ abstract class Node(term: OtpErlangTuple): ToMacroString {
                     null
                 }
             }
-
-        fun from(term: OtpErlangObject): Node? =
-            when (term) {
-                is OtpErlangTuple -> from(term)
-                else -> null
-            }
-
-        fun from(term: OtpErlangTuple): Node? =
-                Atom.from(term) ?:
-                Bin.from(term) ?:
-                Call.from(term) ?:
-                Char.from(term) ?:
-                Cons.from(term) ?:
-                Integer.from(term) ?:
-                Map.from(term) ?:
-                Match.from(term) ?:
-                Nil.from(term) ?:
-                Op.from(term) ?:
-                Record.from(term) ?:
-                RecordField.from(term) ?:
-                RecordIndex.from(term) ?:
-                Remote.from(term) ?:
-                Tuple.from(term) ?:
-                Var.from(term) ?:
-                TODO()
-//
-//                Var.from(term)
     }
 }

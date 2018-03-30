@@ -2,16 +2,40 @@ package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code
 
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
 
-private const val TAG = "cons"
 
-class Cons(term: OtpErlangTuple): Node(term) {
-    val head by lazy { term.elementAt(2)?.let { Node.from(it) } }
-    val tail by lazy { term.elementAt(3)?.let { Node.from(it) } }
+object Cons {
+    fun ifToMacroString(term: OtpErlangObject?): String? = AbstractCode.ifTag(term, TAG) { toMacroString(it) }
 
-    override fun toMacroString(): String = "[${head.toMacroString()} | ${tail.toMacroString()}]"
+    fun toMacroString(term: OtpErlangObject): String =
+            when (term) {
+                is OtpErlangTuple -> toMacroString(term)
+                else -> "unknown_cons"
+            }
 
-    companion object {
-        fun from(term: OtpErlangObject): Cons? = ifTag(term, TAG, ::Cons)
+    fun toMacroString(term: OtpErlangTuple): String {
+        val headMacroString = headMacroString(term)
+        val tailMacroString = tailMacroString(term)
+
+        return "[$headMacroString | $tailMacroString]"
     }
+
+    private const val TAG = "cons"
+
+    private fun headMacroString(term: OtpErlangTuple): String =
+            toHead(term)
+                    ?.let { headToMacroString(it) }
+                    ?: "missing_head"
+
+    private fun headToMacroString(term: OtpErlangObject) = AbstractCode.toMacroString(term)
+
+    private fun tailMacroString(term: OtpErlangTuple): String =
+            toTail(term)
+                    ?.let { tailToMacroString(it) }
+                    ?: "missing_tail"
+
+    private fun tailToMacroString(term: OtpErlangObject) = AbstractCode.toMacroString(term)
+    private fun toHead(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
+    private fun toTail(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(3)
 }
