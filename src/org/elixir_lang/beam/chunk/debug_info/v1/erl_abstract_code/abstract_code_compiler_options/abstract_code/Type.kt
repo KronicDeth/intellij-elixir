@@ -45,7 +45,7 @@ object Type {
 
                         when (kind) {
                             // built-ins
-                            "any", "atom", "binary", "iodata", "non_neg_integer", "pid" -> "$kind()"
+                            "any", "atom", "binary", "char", "iodata", "non_neg_integer", "pid" -> "$kind()"
                             "fun" -> anonymousFunctionToMacroString(term.elementAt(3))
                             "list" -> listToMacroString(term.elementAt(3))
                             "product" -> productToMacroString(term.elementAt(3))
