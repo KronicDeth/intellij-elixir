@@ -27,6 +27,7 @@ object AbstractCode {
             AbstractCodeString.ifToMacroString(term) ?:
             Atom.ifToMacroString(term) ?:
             Bin.ifToMacroString(term) ?:
+            BinElement.ifToMacroString(term) ?:
             Call.ifToMacroString(term) ?:
             Char.ifToMacroString(term) ?:
             Cons.ifToMacroString(term) ?:

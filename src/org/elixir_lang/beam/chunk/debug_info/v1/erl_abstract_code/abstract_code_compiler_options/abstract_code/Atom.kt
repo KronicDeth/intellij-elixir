@@ -9,9 +9,7 @@ object Atom {
     private const val TAG = "atom"
 
     fun <T> ifTo(term: OtpErlangObject?, ifTrue: (OtpErlangTuple) -> T): T? = AbstractCode.ifTag(term, TAG, ifTrue)
-
     fun ifToMacroString(term: OtpErlangObject?): String? = ifTo(term) { toMacroString(it) }
-
     fun toAtom(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
 
     fun toMacroString(term: OtpErlangTuple): String =

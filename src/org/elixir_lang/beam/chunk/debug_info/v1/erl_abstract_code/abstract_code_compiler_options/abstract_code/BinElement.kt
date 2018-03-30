@@ -4,8 +4,12 @@ import com.ericsson.otp.erlang.*
 import org.elixir_lang.beam.chunk.component1
 import org.elixir_lang.beam.chunk.component2
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
+import org.elixir_lang.beam.term.inspect
+import java.nio.charset.Charset
 
 object BinElement {
+    fun ifToMacroString(term: OtpErlangObject?): String? = AbstractCode.ifTag(term, TAG) { toMacroString(it) }
+
     fun toMacroString(term: OtpErlangTuple): String {
         val patternMacroString = patternMacroString(term)
         val optionsMacroString = ifOptionsMacroString(term)
@@ -60,7 +64,22 @@ object BinElement {
                     ?.let { patternToMacroString(it) } ?:
             "unknown_pattern"
 
-    private fun patternToMacroString(term: OtpErlangObject): String = AbstractCode.toMacroString(term)
+    /**
+     * Elixir does not have `<<'charlist'>>`, but `<<"string">`
+     */
+    private fun patternToMacroString(term: OtpErlangObject): String =
+        AbstractCodeString.ifTo(term) {
+            AbstractCodeString.toString(it)?.let { string ->
+                if (string is OtpErlangString) {
+                    string
+                            .stringValue()
+                            .let { OtpErlangBinary(it.toByteArray(Charset.forName("UTF-8"))) }
+                            .let { inspect(it) }
+                } else {
+                    null
+                }
+            }
+        } ?: AbstractCode.toMacroString(term)
 
     private fun sizeMacroString(term: OtpErlangTuple): String? {
         val size = toSize(term)

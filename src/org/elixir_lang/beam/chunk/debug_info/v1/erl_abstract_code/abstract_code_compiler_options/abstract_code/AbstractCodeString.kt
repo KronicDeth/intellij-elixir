@@ -8,9 +8,10 @@ import org.elixir_lang.beam.term.inspect
 
 // not named String because I don't want to delay with the name collision with normal `String`
 object AbstractCodeString {
-    fun ifToMacroString(term: OtpErlangObject?): String? = AbstractCode.ifTag(term, TAG) { toMacroString(it) }
-
+    fun <T> ifTo(term: OtpErlangObject?, ifTrue: (OtpErlangTuple) -> T): T? = AbstractCode.ifTag(term, TAG, ifTrue)
+    fun ifToMacroString(term: OtpErlangObject?): String? = ifTo(term) { toMacroString(it) }
     fun toMacroString(term: OtpErlangTuple): String  = stringMacroString(term)
+    fun toString(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
 
     private const val TAG = "string"
 
@@ -26,5 +27,4 @@ object AbstractCodeString {
         }
 
     private fun stringToMacroString(term: OtpErlangString): String = inspect(term)
-    private fun toString(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
 }
