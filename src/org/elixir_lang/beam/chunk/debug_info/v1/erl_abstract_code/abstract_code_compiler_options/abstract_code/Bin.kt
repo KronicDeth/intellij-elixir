@@ -7,7 +7,14 @@ import org.elixir_lang.beam.term.inspect
 
 
 object Bin {
-    fun ifToMacroString(term: OtpErlangObject?): String? = AbstractCode.ifTag(term, TAG) { toMacroString(it) }
+    fun ifBinElementsToMacroString(term: OtpErlangTuple): String? =
+        toBinElements(term)?.let { binElements ->
+            BinElements.toElixirString(binElements)?.let(::inspect)
+                    ?: BinElements.toMacroString(binElements)
+        }
+
+    fun <T> ifTo(term: OtpErlangObject?, ifTrue: (OtpErlangTuple) -> T): T? = AbstractCode.ifTag(term, TAG, ifTrue)
+    fun ifToMacroString(term: OtpErlangObject?): String? = ifTo(term) { toMacroString(it) }
 
     fun toMacroString(term: OtpErlangTuple): String {
         val binElements = toBinElements(term)
@@ -23,9 +30,4 @@ object Bin {
     private const val TAG = "bin"
 
     private fun toBinElements(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
-
-    private fun binElementsMacroString(term: OtpErlangTuple): String =
-            toBinElements(term)
-                    ?.let { BinElements.toMacroString(it) }
-                    ?: "missing_bin_elements"
 }
