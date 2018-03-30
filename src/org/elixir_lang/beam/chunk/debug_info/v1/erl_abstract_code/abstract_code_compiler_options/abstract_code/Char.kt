@@ -23,7 +23,7 @@ object Char {
     private const val TAG = "char"
 
     private fun codePointToMacroString(term: OtpErlangLong): String =
-            StringBuilder().append('?').append(term.intValue()).toString()
+            StringBuilder().append('?').appendCodePoint(term.intValue()).toString()
 
     private fun codePointToMacroString(term: OtpErlangObject): String =
             when (term) {
