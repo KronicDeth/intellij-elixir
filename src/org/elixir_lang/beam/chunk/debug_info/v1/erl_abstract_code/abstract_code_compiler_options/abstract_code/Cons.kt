@@ -16,9 +16,15 @@ object Cons {
 
     fun toMacroString(term: OtpErlangTuple): String {
         val headMacroString = headMacroString(term)
-        val tailMacroString = tailMacroString(term)
+        val tail = toTail(term)
 
-        return "[$headMacroString | $tailMacroString]"
+        return if (Nil.`is`(tail)) {
+            "[$headMacroString]"
+        } else {
+            val tailMacroString = tailMacroString(term)
+
+            "[$headMacroString | $tailMacroString]"
+        }
     }
 
     private const val TAG = "cons"

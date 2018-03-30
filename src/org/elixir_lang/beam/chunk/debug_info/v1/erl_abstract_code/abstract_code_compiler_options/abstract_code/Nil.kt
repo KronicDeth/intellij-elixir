@@ -5,6 +5,7 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_
 
 object Nil {
     fun ifToMacroString(term: OtpErlangObject?): String? = AbstractCode.ifTag(term, TAG) { toMacroString(it) }
+    fun `is`(term: OtpErlangObject?): Boolean = AbstractCode.ifTag(term, TAG) { true } ?: false
     fun toMacroString(@Suppress("UNUSED_PARAMETER") term: OtpErlangObject) = "[]"
 
     private const val TAG = "nil"
