@@ -1,6 +1,5 @@
 package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code
 
-import com.ericsson.otp.erlang.OtpErlangAtom
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
@@ -31,16 +30,9 @@ object Remote {
                     ?: "missing_function"
 
     private fun functionToMacroString(function: OtpErlangObject): String =
-            Atom.ifTo(function) {
-                Atom.toAtom(it)?.let { atom ->
-                    if (atom is OtpErlangAtom) {
-                        inspectAsFunction(atom)
-                    } else {
-                        null
-                    }
-                }
-            } ?:
-            "unknown_function"
+            Atom.toElixirAtom(function)
+                    ?.let { inspectAsFunction(it) }
+                    ?: "unknown_function"
 
     private fun moduleMacroString(term: OtpErlangTuple): String =
             toModule(term)
