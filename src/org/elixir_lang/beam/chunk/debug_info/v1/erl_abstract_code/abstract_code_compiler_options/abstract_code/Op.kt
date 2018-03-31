@@ -9,12 +9,6 @@ import org.elixir_lang.code.Identifier.inspectAsFunction
 object Op {
     fun ifToMacroString(term: OtpErlangObject?): String? = AbstractCode.ifTag(term, TAG) { toMacroString(it) }
 
-    fun toMacroString(term: OtpErlangObject): String =
-            when (term) {
-                is OtpErlangTuple -> toMacroString(term)
-                else -> "unknown_op"
-            }
-
     fun toMacroString(term: OtpErlangTuple): String =
             toOperator(term)
                     ?.let { operationToMacroString(it, toOperands(term)) }

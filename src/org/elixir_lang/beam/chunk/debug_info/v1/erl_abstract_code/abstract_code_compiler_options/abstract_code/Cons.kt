@@ -10,12 +10,6 @@ object Cons {
     fun ifToMacroString(term: OtpErlangObject?): String? = ifTo(term) { toMacroString(it) }
     fun `is`(term: OtpErlangObject?): Boolean = ifTo(term) { true } ?: false
 
-    fun toMacroString(term: OtpErlangObject): String =
-            when (term) {
-                is OtpErlangTuple -> toMacroString(term)
-                else -> "unknown_cons"
-            }
-
     fun toMacroString(term: OtpErlangTuple): String {
         val headTailMacroString = headTailMacroString(term)
 

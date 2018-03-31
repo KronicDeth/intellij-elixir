@@ -32,12 +32,6 @@ object BinElement {
         }
     }
 
-    fun toMacroString(term: OtpErlangObject?): String =
-            when (term) {
-                is OtpErlangTuple -> toMacroString(term)
-                else -> "unknown_bin_element"
-            }
-
     fun toPattern(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
 
     private const val TAG = "bin_element"

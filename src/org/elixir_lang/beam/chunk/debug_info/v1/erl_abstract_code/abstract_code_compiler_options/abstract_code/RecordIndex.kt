@@ -10,12 +10,6 @@ import org.elixir_lang.code.Identifier.inspectAsFunction
 object RecordIndex {
     fun ifToMacroString(term: OtpErlangObject?): String? = AbstractCode.ifTag(term, TAG) { toMacroString(it) }
 
-    fun toMacroString(term: OtpErlangObject): String =
-            when (term) {
-                is OtpErlangTuple -> toMacroString(term)
-                else -> "unknown_record_index"
-            }
-
     fun toMacroString(term: OtpErlangTuple): String {
         val nameMacroString = nameMacroString(term)
         val fieldMacroString = fieldMacroString(term)

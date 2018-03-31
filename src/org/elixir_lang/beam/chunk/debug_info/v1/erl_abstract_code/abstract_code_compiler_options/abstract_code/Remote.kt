@@ -9,12 +9,6 @@ import org.elixir_lang.code.Identifier.inspectAsFunction
 object Remote {
     fun ifToMacroString(term: OtpErlangObject?) = AbstractCode.ifTag(term, TAG) { toMacroString(it) }
 
-    fun toMacroString(term: OtpErlangObject): String =
-            when (term) {
-                is OtpErlangTuple -> toMacroString(term)
-                else -> "unknown_remote"
-            }
-
     fun toMacroString(term: OtpErlangTuple): String {
         val moduleMacroString = moduleMacroString(term)
         val functionMacroString = functionMacroString(term)

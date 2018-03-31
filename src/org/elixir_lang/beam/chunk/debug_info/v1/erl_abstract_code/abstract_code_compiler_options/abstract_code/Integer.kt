@@ -8,12 +8,6 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_
 object Integer {
     fun ifToMacroString(term: OtpErlangObject?): String? = AbstractCode.ifTag(term, TAG) { toMacroString(it) }
 
-    fun toMacroString(term: OtpErlangObject): String =
-            when (term) {
-                is OtpErlangTuple -> toMacroString(term)
-                else -> "unknown_integer"
-            }
-
     fun toMacroString(term: OtpErlangTuple): String =
             toInteger(term)
                     ?.let { integerToMacroString(it) }

@@ -23,10 +23,4 @@ object Atom {
             toAtom(term)
                     ?.let { inspect(it) }
                     ?: ":unknown_atom"
-
-    fun toMacroString(term: OtpErlangObject?): String =
-            when (term) {
-                is OtpErlangTuple -> toMacroString(term)
-                else -> ":unknown_atom"
-            }
 }
