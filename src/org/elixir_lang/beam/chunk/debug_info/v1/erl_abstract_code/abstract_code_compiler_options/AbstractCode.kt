@@ -33,6 +33,7 @@ object AbstractCode {
             Case.ifToMacroString(term) ?:
             Char.ifToMacroString(term) ?:
             Cons.ifToMacroString(term) ?:
+            If.ifToMacroString(term) ?:
             Integer.ifToMacroString(term) ?:
             Map.ifToMacroString(term) ?:
             Match.ifToMacroString(term) ?:
