@@ -42,6 +42,7 @@ object AbstractCode {
             RecordField.ifToMacroString(term) ?:
             RecordIndex.ifToMacroString(term) ?:
             Remote.ifToMacroString(term) ?:
+            Try.ifToMacroString(term) ?:
             Tuple.ifToMacroString(term) ?:
             Var.ifToMacroString(term) ?:
             "unknown_abstract_code"
