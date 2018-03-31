@@ -38,6 +38,7 @@ object AbstractCode {
             Match.ifToMacroString(term) ?:
             Nil.ifToMacroString(term) ?:
             Op.ifToMacroString(term) ?:
+            Receive.ifToMacroString(term) ?:
             Record.ifToMacroString(term) ?:
             RecordField.ifToMacroString(term) ?:
             RecordIndex.ifToMacroString(term) ?:
