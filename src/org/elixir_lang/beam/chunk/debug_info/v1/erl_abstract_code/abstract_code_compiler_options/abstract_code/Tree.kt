@@ -1,6 +1,7 @@
 package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code
 
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.AbstractCodeCompileOptions
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.function.Clause
 import javax.swing.JTree
 import javax.swing.tree.TreeModel
 import javax.swing.tree.TreeSelectionModel.SINGLE_TREE_SELECTION

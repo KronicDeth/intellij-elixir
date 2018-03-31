@@ -30,6 +30,7 @@ object AbstractCode {
             BinElement.ifToMacroString(term) ?:
             BitstringComprehension.ifToMacroString(term) ?:
             Call.ifToMacroString(term) ?:
+            Case.ifToMacroString(term) ?:
             Char.ifToMacroString(term) ?:
             Cons.ifToMacroString(term) ?:
             Integer.ifToMacroString(term) ?:

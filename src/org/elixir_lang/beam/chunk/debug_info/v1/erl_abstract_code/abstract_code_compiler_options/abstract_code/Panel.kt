@@ -13,6 +13,7 @@ import org.elixir_lang.ElixirLanguage
 import org.elixir_lang.Macro.adjustNewLines
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.AbstractCodeCompileOptions
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.attribute.MacroString
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.function.Clause
 import java.awt.GridLayout
 import java.lang.ref.WeakReference
 import javax.swing.JPanel

@@ -3,39 +3,39 @@ package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
 import org.elixir_lang.Macro.adjustNewLines
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.clause.Body
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.clause.GuardSequence
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.clause.PatternSequence
 
-private const val TAG = "clause"
+object Clause {
+    fun bodyMacroString(clause: OtpErlangTuple): String =
+            toBody(clause)
+                    .let { Body.toMacroString(it) }
+                    .let { adjustNewLines(it, "\n  ") }
 
-class Clause(val attributes: Attributes, val function: Function, val term: OtpErlangTuple): Node(term) {
-    val head by lazy { "${function.name}(${patternSequenceMacroString()})${guardSequenceMacroString()}" }
-
-    private fun guardSequenceMacroString() =
-            toGuardSequence()
+    fun guardSequenceMacroString(clause: OtpErlangTuple): String =
+            toGuardSequence(clause)
                     .let { GuardSequence.toMacroString(it) }
 
-    private fun patternSequenceMacroString() =
-            toPatternSequence()
+    fun ifToMacroString(term: OtpErlangObject): String? = AbstractCode.ifTag(term, TAG) { toMacroString(it) }
+
+    fun toMacroString(clause: OtpErlangTuple): String {
+        val patternSequenceMacroString = patternSequenceMacroString(clause)
+        val guardSequenceMacroString = guardSequenceMacroString(clause)
+        val bodyMacroString = bodyMacroString(clause)
+
+        return "$patternSequenceMacroString$guardSequenceMacroString ->\n" +
+                "  $bodyMacroString"
+    }
+
+    fun patternSequenceMacroString(clause: OtpErlangTuple): String =
+            toPatternSequence(clause)
                     .let { PatternSequence.toMacroString(it) }
 
-    private fun toBody(): OtpErlangObject? = term.elementAt(4)
-    private fun toGuardSequence(): OtpErlangObject? = term.elementAt(3)
-    private fun toPatternSequence(): OtpErlangObject? = term.elementAt(2)
+    private const val TAG = "clause"
 
-    override fun toMacroString(): String {
-        val indentedBody =  toBody()
-                .let { Body.toMacroString(it) }
-                .let { adjustNewLines(it, "\n  ") }
-
-        return "def $head do\n" +
-                "  $indentedBody\n" +
-                "end"
-    }
-
-    companion object {
-        fun from(term: OtpErlangObject, attributes: Attributes, function: Function): Clause? =
-                ifTag(term, TAG) { Clause(attributes, function, it) }
-    }
+    private fun toBody(clause: OtpErlangTuple): OtpErlangObject? = clause.elementAt(4)
+    private fun toGuardSequence(clause: OtpErlangTuple): OtpErlangObject? = clause.elementAt(3)
+    private fun toPatternSequence(clause: OtpErlangTuple): OtpErlangObject? = clause.elementAt(2)
 }
