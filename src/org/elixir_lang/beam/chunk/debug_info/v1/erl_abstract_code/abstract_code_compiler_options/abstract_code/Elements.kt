@@ -23,7 +23,7 @@ object Elements {
                     .unzip()
                     .let { (macroStrings, declaredScopes) ->
                         val macroString = macroStrings.joinToString(", ")
-                        val declaredScope = declaredScopes.reduce(Scope::union)
+                        val declaredScope = declaredScopes.fold(Scope.EMPTY, Scope::union)
 
                         MacroStringDeclaredScope(macroString, declaredScope)
                     }
