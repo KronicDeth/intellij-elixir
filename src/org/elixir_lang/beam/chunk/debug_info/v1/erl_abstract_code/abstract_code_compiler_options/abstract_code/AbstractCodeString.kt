@@ -11,7 +11,9 @@ import java.nio.charset.Charset
 // not named String because I don't want to delay with the name collision with normal `String`
 object AbstractCodeString {
     fun <T> ifTo(term: OtpErlangObject?, ifTrue: (OtpErlangTuple) -> T): T? = AbstractCode.ifTag(term, TAG, ifTrue)
-    fun ifToMacroString(term: OtpErlangObject?): String? = ifTo(term) { toMacroString(it) }
+
+    fun ifToMacroStringDeclaredScope(term: OtpErlangObject?): MacroStringDeclaredScope? =
+            ifTo(term) { toMacroStringDeclaredScope(it) }
 
     fun toElixirString(term: OtpErlangObject): OtpErlangBinary? =
             toErlangString(term)?.let { erlangString ->
@@ -26,7 +28,8 @@ object AbstractCodeString {
                         ?.let { it as? OtpErlangString }
             }
 
-    fun toMacroString(term: OtpErlangTuple): String  = stringMacroString(term)
+    fun toMacroStringDeclaredScope(term: OtpErlangTuple): MacroStringDeclaredScope =
+            MacroStringDeclaredScope(stringMacroString(term), Scope.EMPTY)
 
     fun toString(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
 

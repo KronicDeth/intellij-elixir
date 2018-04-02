@@ -9,9 +9,9 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.clause.PatternSequence
 
 object Clause {
-    fun bodyMacroString(clause: OtpErlangTuple): String =
+    fun bodyMacroString(clause: OtpErlangTuple, scope: Scope): String =
             toBody(clause)
-                    .let { Body.toMacroString(it) }
+                    .let { Body.toMacroStringDeclaredScope(it, scope).macroString }
                     .let { adjustNewLines(it, "\n  ") }
 
     fun guardsMacroString(clause: OtpErlangTuple): String =
@@ -24,20 +24,20 @@ object Clause {
                     .let { GuardSequence.toMacroString(it) }
 
     fun <T> ifTo(term: OtpErlangObject, ifTrue: (OtpErlangTuple) -> T): T? = ifTag(term, TAG, ifTrue)
-    fun ifToMacroString(term: OtpErlangObject): String? = ifTo(term) { toMacroString(it) }
+    fun ifToMacroString(term: OtpErlangObject, scope: Scope): String? = ifTo(term) { toMacroString(it, scope) }
 
-    fun toMacroString(clause: OtpErlangTuple): String {
-        val patternSequenceMacroString = patternSequenceMacroString(clause)
+    fun toMacroString(clause: OtpErlangTuple, scope: Scope): String {
+        val (patternSequenceMacroString, patternSequenceDeclaredScope) = patternSequenceMacroStringDeclaredScope(clause, scope)
         val guardSequenceMacroString = guardSequenceMacroString(clause)
-        val bodyMacroString = bodyMacroString(clause)
+        val bodyMacroString = bodyMacroString(clause, patternSequenceDeclaredScope)
 
         return "$patternSequenceMacroString$guardSequenceMacroString ->\n" +
                 "  $bodyMacroString"
     }
 
-    fun patternSequenceMacroString(clause: OtpErlangTuple): String =
+    fun patternSequenceMacroStringDeclaredScope(clause: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope =
             toPatternSequence(clause)
-                    .let { PatternSequence.toMacroString(it) }
+                    .let { PatternSequence.toMacroStringDeclaredScope(it, scope) }
 
     private const val TAG = "clause"
 

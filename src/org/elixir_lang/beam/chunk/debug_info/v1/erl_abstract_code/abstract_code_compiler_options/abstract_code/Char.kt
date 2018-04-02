@@ -3,16 +3,14 @@ package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code
 import com.ericsson.otp.erlang.OtpErlangLong
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
-import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
-
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode.ifTag
 
 object Char {
-    fun ifToMacroString(term: OtpErlangObject?): String? = AbstractCode.ifTag(term, TAG) { toMacroString(it) }
+    fun ifToMacroStringDeclaredScope(term: OtpErlangObject?): MacroStringDeclaredScope? =
+            ifTag(term, TAG) { toMacroStringDeclaredScope(it) }
 
-    fun toMacroString(term: OtpErlangTuple): String =
-            toCodePoint(term)
-                    ?.let { codePointToMacroString(it) }
-                    ?: "missing_code_point"
+    fun toMacroStringDeclaredScope(term: OtpErlangTuple): MacroStringDeclaredScope =
+            toMacroString(term).let { MacroStringDeclaredScope(it, Scope.EMPTY) }
 
     private const val TAG = "char"
 
@@ -26,4 +24,9 @@ object Char {
             }
 
     private fun toCodePoint(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
+
+    private fun toMacroString(term: OtpErlangTuple): String =
+            toCodePoint(term)
+                    ?.let { codePointToMacroString(it) }
+                    ?: "missing_code_point"
 }

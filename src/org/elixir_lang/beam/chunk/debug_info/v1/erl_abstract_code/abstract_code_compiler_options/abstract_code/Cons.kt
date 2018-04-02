@@ -7,50 +7,65 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_
 
 object Cons {
     fun <T> ifTo(term: OtpErlangObject?, ifTrue: (OtpErlangTuple) -> T): T? = AbstractCode.ifTag(term, TAG, ifTrue)
-    fun ifToMacroString(term: OtpErlangObject?): String? = ifTo(term) { toMacroString(it) }
+    fun ifToMacroStringDeclaredScope(term: OtpErlangObject, scope: Scope): MacroStringDeclaredScope? =
+            ifTo(term) { toMacroStringDeclaredScope(it, scope) }
+
     fun `is`(term: OtpErlangObject?): Boolean = ifTo(term) { true } ?: false
 
-    fun toMacroString(term: OtpErlangTuple): String {
-        val headTailMacroString = headTailMacroString(term)
-
-        return "[$headTailMacroString]"
-    }
+    fun toMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope =
+        headTailMacroStringDeclaredScope(term, scope).let { (headTailMacroString, headTailDeclaredScope) ->
+            MacroStringDeclaredScope("[$headTailMacroString]", headTailDeclaredScope)
+        }
 
     private const val TAG = "cons"
 
-    private fun headMacroString(term: OtpErlangTuple): String =
+    private fun headMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope =
             toHead(term)
-                    ?.let { headToMacroString(it) }
-                    ?: "missing_head"
+                    ?.let { headToMacroStringDeclaredScope(it, scope) }
+                    ?: MacroStringDeclaredScope("missing_head", Scope.EMPTY)
 
-    private fun headTailMacroString(term: OtpErlangTuple): String {
-        val headMacroString = headMacroString(term)
+    private fun headTailMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope {
+        val headMacroStringDeclaredScope = headMacroStringDeclaredScope(term, scope)
         val tail = toTail(term)
 
         return when {
-            Nil.`is`(tail) -> headMacroString
+            Nil.`is`(tail) -> headMacroStringDeclaredScope
             Cons.`is`(tail) -> {
-                val tailHeadTailMacroString = Cons.headTailMacroString(tail as OtpErlangTuple)
+                val (headMacroString, headDeclaredScope) = headMacroStringDeclaredScope
+                val (tailHeadTailMacroString, tailHeadTailDeclaredScope) = Cons.headTailMacroStringDeclaredScope(
+                        tail as OtpErlangTuple,
+                        // don't use headDeclaredScope because in a list pattern, reuse of a variable does not need to be pinned
+                        scope
+                )
 
-                "$headMacroString, $tailHeadTailMacroString"
+                MacroStringDeclaredScope(
+                        "$headMacroString, $tailHeadTailMacroString",
+                        headDeclaredScope.union(tailHeadTailDeclaredScope)
+                )
             }
             else -> {
-                val tailMacroString = tailMacroString(term)
+                val (headMacroString, headDeclaredScope) = headMacroStringDeclaredScope
+                val (tailMacroString, tailDeclaredScope) = tailMacroStringDeclaredScope(term, scope)
 
-                "$headMacroString | $tailMacroString"
+                MacroStringDeclaredScope(
+                        "$headMacroString | $tailMacroString",
+                        headDeclaredScope.union(tailDeclaredScope)
+                )
             }
         }
     }
 
+    private fun headToMacroStringDeclaredScope(term: OtpErlangObject, scope: Scope) =
+            AbstractCode.toMacroStringDeclaredScope(term, scope)
 
-    private fun headToMacroString(term: OtpErlangObject) = AbstractCode.toMacroString(term)
-
-    private fun tailMacroString(term: OtpErlangTuple): String =
+    private fun tailMacroStringDeclaredScope(term: OtpErlangTuple, scope : Scope) =
             toTail(term)
-                    ?.let { tailToMacroString(it) }
-                    ?: "missing_tail"
+                    ?.let { tailToMacroStringDeclaredScope(it, scope) }
+                    ?: MacroStringDeclaredScope("missing_tail", Scope.EMPTY)
 
-    private fun tailToMacroString(term: OtpErlangObject) = AbstractCode.toMacroString(term)
+    private fun tailToMacroStringDeclaredScope(term: OtpErlangObject, scope: Scope) =
+            AbstractCode.toMacroStringDeclaredScope(term, scope)
+
     private fun toHead(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
     private fun toTail(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(3)
 }

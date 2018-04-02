@@ -7,6 +7,7 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Char
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Map
 
+
 object AbstractCode {
     inline fun <T> ifTag(term: OtpErlangObject?, tag: String, ifTrue: (OtpErlangTuple) -> T?): T? =
             when (term) {
@@ -23,29 +24,29 @@ object AbstractCode {
                 }
             }
 
-    fun toMacroString(term: OtpErlangObject): String =
-            AbstractCodeString.ifToMacroString(term) ?:
-            Atom.ifToMacroString(term) ?:
-            Bin.ifToMacroString(term) ?:
-            BinElement.ifToMacroString(term) ?:
-            BitstringComprehension.ifToMacroString(term) ?:
-            Call.ifToMacroString(term) ?:
-            Case.ifToMacroString(term) ?:
-            Char.ifToMacroString(term) ?:
-            Cons.ifToMacroString(term) ?:
-            If.ifToMacroString(term) ?:
-            Integer.ifToMacroString(term) ?:
-            Map.ifToMacroString(term) ?:
-            Match.ifToMacroString(term) ?:
-            Nil.ifToMacroString(term) ?:
-            Op.ifToMacroString(term) ?:
-            Receive.ifToMacroString(term) ?:
-            Record.ifToMacroString(term) ?:
-            RecordField.ifToMacroString(term) ?:
-            RecordIndex.ifToMacroString(term) ?:
-            Remote.ifToMacroString(term) ?:
-            Try.ifToMacroString(term) ?:
-            Tuple.ifToMacroString(term) ?:
-            Var.ifToMacroString(term) ?:
-            "unknown_abstract_code"
+    fun toMacroStringDeclaredScope(term: OtpErlangObject, scope: Scope): MacroStringDeclaredScope =
+            AbstractCodeString.ifToMacroStringDeclaredScope(term) ?:
+            Atom.ifToMacroStringDeclaredScope(term) ?:
+            Bin.ifToMacroStringDeclaredScope(term, scope) ?:
+            BinElement.ifToMacroStringDeclaredScope(term, scope) ?:
+            BitstringComprehension.ifToMacroStringDeclaredScope(term, scope) ?:
+            Call.ifToMacroStringDeclaredScope(term) ?:
+            Case.ifToMacroStringDeclaredScope(term, scope) ?:
+            Char.ifToMacroStringDeclaredScope(term) ?:
+            Cons.ifToMacroStringDeclaredScope(term, scope) ?:
+            If.ifToMacroStringDeclaredScope(term, scope) ?:
+            Integer.ifToMacroStringDeclaredScope(term) ?:
+            Map.ifToMacroStringDeclaredScope(term, scope) ?:
+            Match.ifToMacroStringDeclaredScope(term, scope) ?:
+            Nil.ifToMacroStringDeclaredScope(term) ?:
+            Op.ifToMacroStringDeclaredScope(term, scope) ?:
+            Receive.ifToMacroStringDeclaredScope(term, scope) ?:
+            Record.ifToMacroStringDeclaredScope(term, scope) ?:
+            RecordField.ifToMacroStringDeclaredScope(term, scope) ?:
+            RecordIndex.ifToMacroStringDeclaredScope(term) ?:
+            Remote.ifToMacroStringDeclaredScope(term) ?:
+            Try.ifToMacroStringDeclaredScope(term, scope) ?:
+            Tuple.ifToMacroStringDeclaredScope(term, scope) ?:
+            Var.ifToMacroStringDeclaredScope(term, scope) ?:
+            MacroStringDeclaredScope("unknown_abstract_code", Scope.EMPTY)
 }

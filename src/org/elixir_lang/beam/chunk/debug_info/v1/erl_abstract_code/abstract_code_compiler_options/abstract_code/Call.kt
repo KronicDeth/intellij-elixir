@@ -5,17 +5,18 @@ import com.ericsson.otp.erlang.OtpErlangList
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode.ifTag
 import org.elixir_lang.code.Identifier.inspectAsFunction
 
 
 object Call {
-    fun ifToMacroString(term: OtpErlangObject?): String? = AbstractCode.ifTag(term, TAG) { toMacroString(it) }
+    fun ifToMacroStringDeclaredScope(term: OtpErlangObject): MacroStringDeclaredScope? =
+            ifTag(term, TAG) { toMacroStringDeclaredScope(it) }
 
-    fun toMacroString(term: OtpErlangTuple): String {
-        val nameMacroString = nameMacroString(term)
-        val argumentsMacroString = argumentsMacroString(term)
+    fun toMacroStringDeclaredScope(term: OtpErlangTuple): MacroStringDeclaredScope {
+        val macroString = toMacroString(term)
 
-        return "$nameMacroString($argumentsMacroString)"
+        return MacroStringDeclaredScope(macroString, Scope.EMPTY)
     }
 
     private const val TAG = "call"
@@ -26,7 +27,7 @@ object Call {
                     ?: "missing_arguments"
 
     private fun argumentsToMacroString(term: OtpErlangList): String =
-            term.joinToString(", ") { AbstractCode.toMacroString(it) }
+            term.joinToString(", ") { AbstractCode.toMacroStringDeclaredScope(it, Scope.EMPTY).macroString }
 
     private fun argumentsToMacroString(term: OtpErlangObject): String =
         when (term) {
@@ -48,8 +49,16 @@ object Call {
                         null
                     }
                 } ?: "unknown_function"
-            } ?: AbstractCode.toMacroString(term)
+            } ?: AbstractCode.toMacroStringDeclaredScope(term, Scope.EMPTY).macroString
 
     private fun toArguments(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(3)
+
+    private fun toMacroString(term: OtpErlangTuple): String {
+        val nameMacroString = nameMacroString(term)
+        val argumentsMacroString = argumentsMacroString(term)
+
+        return "$nameMacroString($argumentsMacroString)"
+    }
+
     private fun toName(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
 }

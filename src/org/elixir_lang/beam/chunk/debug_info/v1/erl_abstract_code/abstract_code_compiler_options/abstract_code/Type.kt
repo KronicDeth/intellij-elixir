@@ -26,7 +26,7 @@ object Type {
                 when (tag) {
                     "atom" -> atomToMacroString(term.elementAt(2))
                     "remote_type" -> remoteTypeToMacroString(term.elementAt(2))
-                    "var" -> Var.nameToMacroString(term.elementAt(2))
+                    "var" -> Var.nameToMacroStringDeclaredScope(term.elementAt(2), Scope.EMPTY).macroString
                     else -> {
                         logger.error("""
                                  Type (${inspect(term)}) tag ($tag) is unrecognized

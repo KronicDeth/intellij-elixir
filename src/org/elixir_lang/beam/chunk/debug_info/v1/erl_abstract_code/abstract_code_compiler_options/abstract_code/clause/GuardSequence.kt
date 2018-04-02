@@ -4,11 +4,6 @@ import com.ericsson.otp.erlang.OtpErlangList
 import com.ericsson.otp.erlang.OtpErlangObject
 
 object GuardSequence {
-    fun guardsMacroString(guardSequence: OtpErlangList): String =
-            guardSequence.joinToString(" or ") { guard ->
-                Guard.toMacroString(guard)
-            }
-
     fun guardsMacroString(guardSequence: OtpErlangObject): String =
             when (guardSequence) {
                 is OtpErlangList -> guardsMacroString(guardSequence)
@@ -29,4 +24,9 @@ object GuardSequence {
             is OtpErlangList -> toMacroString(term)
             else -> " when unknown_guard_sequence"
         }
+
+    private fun guardsMacroString(guardSequence: OtpErlangList): String =
+            guardSequence.joinToString(" or ") { guard ->
+                Guard.toMacroString(guard)
+            }
 }

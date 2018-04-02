@@ -3,27 +3,30 @@ package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode.ifTag
 
 object Match {
-    fun ifToMacroString(term: OtpErlangObject?): String? = AbstractCode.ifTag(term, TAG) { toMacroString(it) }
+    fun ifToMacroStringDeclaredScope(term: OtpErlangObject, scope: Scope): MacroStringDeclaredScope? =
+            ifTag(term, TAG) { toMacroStringDeclaredScope(it, scope) }
 
-    fun toMacroString(term: OtpErlangTuple): String {
-        val leftMacroString = leftMacroString(term)
-        val rightMacroString = rightMacroString(term)
+    fun toMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope {
+        // right executes before left
+        val rightMacroString = rightMacroString(term, scope)
+        val (leftMacroString, leftDeclaredScope) = leftMacroStringDeclaredScope(term, scope)
 
-        return "$leftMacroString = $rightMacroString"
+        return MacroStringDeclaredScope("$leftMacroString = $rightMacroString", leftDeclaredScope)
     }
 
     private const val TAG = "match"
 
-    private fun leftMacroString(term: OtpErlangTuple): String =
+    private fun leftMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope =
             toLeft(term)
-                    ?.let { AbstractCode.toMacroString(it) }
-                    ?: "missing_left"
+                    ?.let { AbstractCode.toMacroStringDeclaredScope(it, scope) }
+                    ?: MacroStringDeclaredScope("missing_left", Scope.EMPTY)
 
-    private fun rightMacroString(term: OtpErlangTuple): String =
+    private fun rightMacroString(term: OtpErlangTuple, scope: Scope): String =
             toRight(term)
-                    ?.let { AbstractCode.toMacroString(it) }
+                    ?.let { AbstractCode.toMacroStringDeclaredScope(it, scope).macroString }
                     ?: "missing_right"
 
     private fun toLeft(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)

@@ -10,34 +10,29 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.clause.Body
 
 object Receive {
-    fun ifToMacroString(term: OtpErlangObject): String? = ifTag(term, TAG) { toMacroString(it) }
+    fun ifToMacroStringDeclaredScope(term: OtpErlangObject, scope: Scope): MacroStringDeclaredScope? =
+            ifTag(term, TAG) { toMacroStringDeclaredScope(it, scope) }
 
-    fun toMacroString(term: OtpErlangTuple): String {
-        val clausesMacroString = clausesMacroString(term)
-        val afterMacroString = afterMacroString(term)
-
-        return "receive do\n" +
-                "  $clausesMacroString\n" +
-                "$afterMacroString\n" +
-                "end"
-    }
+    fun toMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope) =
+            toMacroString(term, scope).let { MacroStringDeclaredScope(it, scope) }
 
     private const val TAG = "receive"
 
-    private fun afterMacroString(term: OtpErlangTuple): String {
+    private fun afterMacroString(term: OtpErlangTuple, scope: Scope): String {
         val arity = term.arity()
 
         return when (arity) {
             3 -> ""
-            5 -> afterToMacroString(term.elementAt(3), term.elementAt(4))
+            5 -> afterToMacroString(term.elementAt(3), term.elementAt(4), scope)
             else -> "unknown_receive_arity($arity)"
         }
     }
 
-    private fun afterToMacroString(expression: OtpErlangObject, body: OtpErlangObject): String {
-        val expressionMacroString = AbstractCode.toMacroString(expression)
+    private fun afterToMacroString(expression: OtpErlangObject, body: OtpErlangObject, scope: Scope): String {
+        val (expressionMacroString, expressionDeclaredScope) = AbstractCode.toMacroStringDeclaredScope(expression, scope)
         val bodyMacroString = Body
-                .toMacroString(body)
+                .toMacroStringDeclaredScope(body, scope.union(expressionDeclaredScope))
+                .macroString
                 .let { adjustNewLines(it, "\n    ") }
 
         return "after\n" +
@@ -45,25 +40,35 @@ object Receive {
                 "    $bodyMacroString"
     }
 
-    private fun clausesMacroString(term: OtpErlangTuple): String =
+    private fun clausesMacroString(term: OtpErlangTuple, scope: Scope): String =
             toClauses(term)
-                    ?.let { clausesToMacroString(it) }
+                    ?.let { clausesToMacroString(it, scope) }
                     ?: "missing_clauses"
 
 
-    private fun clausesToMacroString(caseClauses: OtpErlangList): String =
+    private fun clausesToMacroString(caseClauses: OtpErlangList, scope: Scope): String =
             caseClauses
                     .joinToString("\n") {
-                        Clause.ifToMacroString(it) ?:
+                        Clause.ifToMacroString(it, scope) ?:
                         "unknown_clause"
                     }
                     .let { Macro.adjustNewLines(it, "\n  ") }
 
-    private fun clausesToMacroString(caseClauses: OtpErlangObject): String =
+    private fun clausesToMacroString(caseClauses: OtpErlangObject, scope: Scope): String =
             when (caseClauses) {
-                is OtpErlangList -> clausesToMacroString(caseClauses)
+                is OtpErlangList -> clausesToMacroString(caseClauses, scope)
                 else -> "unknown_clauses"
             }
 
     private fun toClauses(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
+
+    private fun toMacroString(term: OtpErlangTuple, scope: Scope): String {
+        val clausesMacroString = clausesMacroString(term, scope)
+        val afterMacroString = afterMacroString(term, scope)
+
+        return "receive do\n" +
+                "  $clausesMacroString\n" +
+                "$afterMacroString\n" +
+                "end"
+    }
 }
