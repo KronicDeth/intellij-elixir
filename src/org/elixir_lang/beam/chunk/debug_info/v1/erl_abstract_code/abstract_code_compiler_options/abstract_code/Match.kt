@@ -21,7 +21,7 @@ object Match {
 
     private fun leftMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope =
             toLeft(term)
-                    ?.let { AbstractCode.toMacroStringDeclaredScope(it, scope) }
+                    ?.let { AbstractCode.toMacroStringDeclaredScope(it, scope.copy(pinning = true)) }
                     ?: MacroStringDeclaredScope("missing_left", Scope.EMPTY)
 
     private fun rightMacroString(term: OtpErlangTuple, scope: Scope): String =

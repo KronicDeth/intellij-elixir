@@ -32,8 +32,15 @@ object Var {
         return when {
             varName == IGNORE ->
                 MacroStringDeclaredScope(varName, Scope(emptySet()))
-            scope.varNameSet.contains(varName) ->
-                MacroStringDeclaredScope("^$varName", Scope.EMPTY)
+            scope.varNameSet.contains(varName) -> {
+                val pin = if (scope.pinning) {
+                    "^"
+                } else {
+                    ""
+                }
+
+                MacroStringDeclaredScope("$pin$varName", Scope.EMPTY)
+            }
             else ->
                 MacroStringDeclaredScope(varName, Scope(setOf(varName)))
         }
