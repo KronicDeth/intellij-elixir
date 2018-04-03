@@ -16,11 +16,13 @@ object Char {
 
     private fun codePointToMacroString(term: OtpErlangLong): String {
         val macroStringBuilder = StringBuilder().append('?')
-                val codePoint = term.intValue()
+        val codePoint = term.intValue()
 
         when (codePoint) {
             '\n'.toInt() -> macroStringBuilder.append("\\n")
             '\r'.toInt() -> macroStringBuilder.append("\\r")
+            ' '.toInt() -> macroStringBuilder.append("\\s")
+            '\t'.toInt() -> macroStringBuilder.append("\\t")
             else -> macroStringBuilder.appendCodePoint(codePoint)
         }
 
