@@ -14,8 +14,18 @@ object Char {
 
     private const val TAG = "char"
 
-    private fun codePointToMacroString(term: OtpErlangLong): String =
-            StringBuilder().append('?').appendCodePoint(term.intValue()).toString()
+    private fun codePointToMacroString(term: OtpErlangLong): String {
+        val macroStringBuilder = StringBuilder().append('?')
+                val codePoint = term.intValue()
+
+        when (codePoint) {
+            '\n'.toInt() -> macroStringBuilder.append("\\n")
+            '\r'.toInt() -> macroStringBuilder.append("\\r")
+            else -> macroStringBuilder.appendCodePoint(codePoint)
+        }
+
+        return macroStringBuilder.toString()
+    }
 
     private fun codePointToMacroString(term: OtpErlangObject): String =
             when (term) {
