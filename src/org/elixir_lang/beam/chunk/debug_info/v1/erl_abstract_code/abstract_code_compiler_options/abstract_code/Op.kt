@@ -38,6 +38,10 @@ object Op {
         val name = operator.atomValue()
 
         return when (name) {
+            "=:=" -> "==="
+            "=/=" -> "!=="
+            "/=" -> "!="
+            "=<" -> "<="
             "band" -> "&&&"
             "bor" -> "|||"
             "bsl" -> "<<<"
