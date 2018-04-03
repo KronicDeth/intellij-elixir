@@ -10,30 +10,60 @@ object RecordField {
     fun ifToMacroStringDeclaredScope(term: OtpErlangObject, scope: Scope): MacroStringDeclaredScope? =
             ifTag(term, TAG) { toMacroStringDeclaredScope(it, scope) }
 
-    fun toMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope =
-        expressionMacroStringDeclaredScope(term, scope).let { (expressionMacroString, expressionDeclaredScope) ->
-            val fieldMacroString = fieldMacroString(term)
+    fun toMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope {
+        val arity = term.arity()
 
-            MacroStringDeclaredScope("$fieldMacroString $expressionMacroString", expressionDeclaredScope)
+        return when (arity) {
+            4 -> setToMacroStringDeclaredScope(term, scope)
+            5 -> getToMacroStringDeclaredScope(term)
+            else -> MacroStringDeclaredScope("unknown_record_field_arity($arity)", Scope.EMPTY)
         }
+    }
 
     private const val TAG = "record_field"
-
-    private fun expressionMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope =
-            toExpression(term)
-                    ?.let { AbstractCode.toMacroStringDeclaredScope(it, scope) }
-                    ?: MacroStringDeclaredScope("missing_expression", Scope.EMPTY)
-
-    private fun fieldMacroString(term: OtpErlangTuple): String =
-            toField(term)
-                    ?.let { fieldToMacroString(it) }
-                    ?: "missing_field:"
 
     private fun fieldToMacroString(term: OtpErlangObject): String =
             Atom.toElixirAtom(term)
                     ?.let { inspectAsKey(it) }
                     ?: "unknown_field:"
 
-    private fun toExpression(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(3)
-    private fun toField(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
+    private fun getExpressionMacroString(term: OtpErlangTuple): String =
+            getToExpression(term).let { AbstractCode.toMacroStringDeclaredScope(it, Scope.EMPTY).macroString }
+
+    private fun getFieldMacroString(term: OtpErlangTuple): String =
+            getToField(term).let{ AbstractCode.toMacroStringDeclaredScope(it, Scope.EMPTY).macroString }
+
+    private fun getNameMacroString(term: OtpErlangTuple): String =
+            getToName(term).let { Record.nameToMacroString(it) }
+
+    private fun getToExpression(term: OtpErlangTuple): OtpErlangObject = term.elementAt(2)
+    private fun getToField(term: OtpErlangTuple): OtpErlangObject = term.elementAt(4)
+
+    private fun getToMacroStringDeclaredScope(term: OtpErlangTuple): MacroStringDeclaredScope {
+        val nameMacroString = getNameMacroString(term)
+        val expressionMacroString = getExpressionMacroString(term)
+        val fieldMacroString = getFieldMacroString(term)
+
+        return MacroStringDeclaredScope(
+                "$nameMacroString($expressionMacroString, $fieldMacroString)",
+                Scope.EMPTY
+        )
+    }
+
+    private fun getToName(term: OtpErlangTuple): OtpErlangObject = term.elementAt(3)
+
+    private fun setFieldMacroString(term: OtpErlangTuple): String = setToField(term).let { fieldToMacroString(it) }
+
+    private fun setToMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope =
+            setValueMacroStringDeclaredScope(term, scope).let { (valueMacroString, valueDeclaredScope) ->
+                val fieldMacroString = setFieldMacroString(term)
+
+                MacroStringDeclaredScope("$fieldMacroString $valueMacroString", valueDeclaredScope)
+            }
+
+    private fun setToValue(term: OtpErlangTuple): OtpErlangObject = term.elementAt(3)
+    private fun setToField(term: OtpErlangTuple): OtpErlangObject = term.elementAt(2)
+
+    private fun setValueMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope =
+            setToValue(term).let { AbstractCode.toMacroStringDeclaredScope(it, scope) }
 }
