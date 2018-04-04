@@ -21,6 +21,13 @@ object Call {
 
     private const val TAG = "call"
 
+    private fun anonymousFunctionCallToMacroString(name: OtpErlangTuple, term: OtpErlangTuple): MacroString {
+        val nameMacroString = Var.toMacroStringDeclaredScope(name, Scope.EMPTY).macroString
+        val argumentsMacroString = argumentsMacroString(term)
+
+        return "$nameMacroString.($argumentsMacroString)"
+    }
+
     private fun argumentsMacroString(term: OtpErlangTuple): String =
             toArguments(term)
                     ?.let { argumentsToMacroString(it) }
@@ -34,6 +41,13 @@ object Call {
             is OtpErlangList -> argumentsToMacroString(term)
             else -> "unknown_arguments"
         }
+
+    private fun namedFunctionCallToMacroString(term: OtpErlangTuple): MacroString {
+        val nameMacroString = nameMacroString(term)
+        val argumentsMacroString = argumentsMacroString(term)
+
+        return "$nameMacroString($argumentsMacroString)"
+    }
 
     private fun nameMacroString(term: OtpErlangTuple): String =
             toName(term)
@@ -54,10 +68,12 @@ object Call {
     private fun toArguments(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(3)
 
     private fun toMacroString(term: OtpErlangTuple): String {
-        val nameMacroString = nameMacroString(term)
-        val argumentsMacroString = argumentsMacroString(term)
+        val name = toName(term)
 
-        return "$nameMacroString($argumentsMacroString)"
+        return when {
+            Var.`is`(name) -> anonymousFunctionCallToMacroString(name as OtpErlangTuple, term)
+            else -> namedFunctionCallToMacroString(term)
+        }
     }
 
     private fun toName(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
