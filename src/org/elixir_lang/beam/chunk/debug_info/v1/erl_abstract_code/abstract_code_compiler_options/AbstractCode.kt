@@ -34,6 +34,7 @@ object AbstractCode {
             Case.ifToMacroStringDeclaredScope(term, scope) ?:
             Char.ifToMacroStringDeclaredScope(term) ?:
             Cons.ifToMacroStringDeclaredScope(term, scope) ?:
+            Fun.ifToMacroStringDeclaredScope(term, scope) ?:
             If.ifToMacroStringDeclaredScope(term, scope) ?:
             Integer.ifToMacroStringDeclaredScope(term) ?:
             Map.ifToMacroStringDeclaredScope(term, scope) ?:

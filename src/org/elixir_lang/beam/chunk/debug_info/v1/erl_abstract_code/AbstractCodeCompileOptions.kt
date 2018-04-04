@@ -9,6 +9,7 @@ import org.elixir_lang.beam.chunk.debug_info.v1.ErlAbstractCode
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Attribute
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Attributes
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Functions
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Function
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.compiler_options.PropertyList
 import org.elixir_lang.beam.term.inspect
 
@@ -23,7 +24,7 @@ class AbstractCodeCompileOptions(val v1: ErlAbstractCode, abstractCode: OtpErlan
     }
     val functions by lazy {
         forms.mapNotNull {
-            org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Function.from(it, attributes)
+            Function.from(it, attributes)
         }.let(::Functions)
     }
     val inspectedModule by lazy { (attributes.module?.value as? OtpErlangAtom)?.let(::inspect) }

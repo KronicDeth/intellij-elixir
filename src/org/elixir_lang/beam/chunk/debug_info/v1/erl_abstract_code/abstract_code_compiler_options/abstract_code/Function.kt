@@ -13,7 +13,7 @@ class Function(term: OtpErlangTuple, attributes: Attributes): Node(term) {
             it
                     .asSequence()
                     .filterIsInstance<OtpErlangTuple>()
-                    .mapNotNull { Clause.from(it, attributes,this) }
+                    .mapNotNull { Clause.from(it, attributes, this) }
                     .toList()
         } ?: emptyList()
     }
