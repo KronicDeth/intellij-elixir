@@ -29,7 +29,7 @@ object AbstractCode {
             Atom.ifToMacroStringDeclaredScope(term) ?:
             Bin.ifToMacroStringDeclaredScope(term, scope) ?:
             BinElement.ifToMacroStringDeclaredScope(term, scope) ?:
-            BitstringComprehension.ifToMacroStringDeclaredScope(term, scope) ?:
+            Comprehension.ifToMacroStringDeclaredScope(term, scope) ?:
             Call.ifToMacroStringDeclaredScope(term) ?:
             Case.ifToMacroStringDeclaredScope(term, scope) ?:
             Char.ifToMacroStringDeclaredScope(term) ?:
