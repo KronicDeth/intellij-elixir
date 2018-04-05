@@ -15,7 +15,7 @@ object Integer {
 
     private const val TAG = "integer"
 
-    private fun integerToMacroString(term: OtpErlangLong): String = term.intValue().toString()
+    private fun integerToMacroString(term: OtpErlangLong): String = term.bigIntegerValue().toString()
 
     private fun integerToMacroString(term: OtpErlangObject): String =
             when (term) {
