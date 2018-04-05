@@ -28,10 +28,13 @@ object Op {
         val (leftOperandMacroString, leftOperandDeclaredScope) = AbstractCode.toMacroStringDeclaredScope(leftOperand, scope)
         val (rightOperandMacroString, rightOperandDeclaredScope) = AbstractCode.toMacroStringDeclaredScope(rightOperand, scope)
 
-        return MacroStringDeclaredScope(
-                "$leftOperandMacroString $operatorMacroString $rightOperandMacroString",
-                leftOperandDeclaredScope.union(rightOperandDeclaredScope)
-        )
+        val macroString = if (operatorMacroString == "!") {
+            "send($leftOperandMacroString, $rightOperandMacroString)"
+        } else {
+            "$leftOperandMacroString $operatorMacroString $rightOperandMacroString"
+        }
+
+        return MacroStringDeclaredScope(macroString, leftOperandDeclaredScope.union(rightOperandDeclaredScope))
     }
 
     private fun binaryOperatorToMacroString(operator: OtpErlangAtom): String {
