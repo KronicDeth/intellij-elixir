@@ -27,7 +27,7 @@ object Remote {
                     ?.let { functionToMacroString(it) }
                     ?: "missing_function"
 
-    internal fun functionToMacroString(function: OtpErlangObject): MacroString =
+    private fun functionToMacroString(function: OtpErlangObject): MacroString =
             Atom.toElixirAtom(function)
                     ?.let { inspectAsFunction(it) }
                     ?: "remote_unknown_function"
