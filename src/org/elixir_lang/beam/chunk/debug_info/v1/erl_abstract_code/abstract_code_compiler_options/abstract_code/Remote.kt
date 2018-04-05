@@ -8,8 +8,10 @@ import org.elixir_lang.code.Identifier.inspectAsFunction
 
 
 object Remote {
+    fun <T> ifTo(term: OtpErlangObject?, ifTrue: (OtpErlangTuple) -> T) = ifTag(term, TAG, ifTrue)
+
     fun ifToMacroStringDeclaredScope(term: OtpErlangObject?) =
-            ifTag(term, TAG) { toMacroStringDeclaredScope(it) }
+            ifTo(term) { toMacroStringDeclaredScope(it) }
 
     fun toMacroStringDeclaredScope(term: OtpErlangTuple): MacroStringDeclaredScope {
         val moduleMacroString = moduleMacroString(term)
@@ -25,12 +27,12 @@ object Remote {
                     ?.let { functionToMacroString(it) }
                     ?: "missing_function"
 
-    private fun functionToMacroString(function: OtpErlangObject): MacroString =
+    internal fun functionToMacroString(function: OtpErlangObject): MacroString =
             Atom.toElixirAtom(function)
                     ?.let { inspectAsFunction(it) }
-                    ?: "unknown_function"
+                    ?: "remote_unknown_function"
 
-    private fun moduleMacroString(term: OtpErlangTuple): MacroString =
+    internal fun moduleMacroString(term: OtpErlangTuple): MacroString =
             toModule(term)
                     ?.let { moduleToMacroString(it) }
                     ?: ":missing_module"
@@ -38,6 +40,6 @@ object Remote {
     private fun moduleToMacroString(module: OtpErlangObject) =
             AbstractCode.toMacroStringDeclaredScope(module, Scope.EMPTY).macroString
 
-    private fun toFunction(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(3)
+    internal fun toFunction(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(3)
     private fun toModule(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
 }

@@ -42,11 +42,22 @@ object Call {
             else -> "unknown_arguments"
         }
 
-    private fun namedFunctionCallToMacroString(term: OtpErlangTuple): MacroString {
+    private fun localNamedFunctionCallToMacroString(
+            term: OtpErlangTuple,
+            argumentsMacroString: MacroString
+    ): MacroString {
         val nameMacroString = nameMacroString(term)
-        val argumentsMacroString = argumentsMacroString(term)
 
         return "$nameMacroString($argumentsMacroString)"
+    }
+
+    private fun namedFunctionCallToMacroString(term: OtpErlangTuple): MacroString {
+        val name = toName(term)
+        val argumentsMacroString = argumentsMacroString(term)
+
+        return Remote.ifTo(name) { remoteName ->
+            remoteNamedFunctionCallToMacroString(remoteName, argumentsMacroString)
+        } ?: localNamedFunctionCallToMacroString(term, argumentsMacroString)
     }
 
     private fun nameMacroString(term: OtpErlangTuple): String =
@@ -62,8 +73,27 @@ object Call {
                     } else {
                         null
                     }
-                } ?: "unknown_function"
+                } ?: "call_unknown_function"
             } ?: AbstractCode.toMacroStringDeclaredScope(term, Scope.EMPTY).macroString
+
+    private fun remoteNamedFunctionCallToMacroString(
+            remoteName: OtpErlangTuple,
+            argumentsMacroString: MacroString
+    ): MacroString {
+        val remoteFunction = Remote.toFunction(remoteName)
+
+        return if (Var.`is`(remoteFunction)) {
+            val remoteModuleMacroString = Remote.moduleMacroString(remoteName)
+
+            val remoteFunctionMacroString =
+                    Var.toMacroStringDeclaredScope(remoteFunction as OtpErlangTuple, Scope.EMPTY).macroString
+
+            "apply($remoteModuleMacroString, $remoteFunctionMacroString, [$argumentsMacroString])"
+        } else {
+            val remoteNameMacroString = Remote.toMacroStringDeclaredScope(remoteName).macroString
+            "$remoteNameMacroString($argumentsMacroString)"
+        }
+    }
 
     private fun toArguments(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(3)
 
