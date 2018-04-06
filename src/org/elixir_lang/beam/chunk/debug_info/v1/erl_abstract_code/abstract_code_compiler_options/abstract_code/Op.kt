@@ -28,10 +28,11 @@ object Op {
         val (leftOperandMacroString, leftOperandDeclaredScope) = AbstractCode.toMacroStringDeclaredScope(leftOperand, scope)
         val (rightOperandMacroString, rightOperandDeclaredScope) = AbstractCode.toMacroStringDeclaredScope(rightOperand, scope)
 
-        val macroString = if (operatorMacroString == "!") {
-            "send($leftOperandMacroString, $rightOperandMacroString)"
-        } else {
-            "$leftOperandMacroString $operatorMacroString $rightOperandMacroString"
+        val macroString = when (operatorMacroString) {
+            "div", "rem", "send" ->
+                "$operatorMacroString($leftOperandMacroString, $rightOperandMacroString)"
+            else ->
+                "$leftOperandMacroString $operatorMacroString $rightOperandMacroString"
         }
 
         return MacroStringDeclaredScope(macroString, leftOperandDeclaredScope.union(rightOperandDeclaredScope))
@@ -41,9 +42,10 @@ object Op {
         val name = operator.atomValue()
 
         return when (name) {
-            "=:=" -> "==="
-            "=/=" -> "!=="
+            "!" -> "send"
             "/=" -> "!="
+            "=/=" -> "!=="
+            "=:=" -> "==="
             "=<" -> "<="
             "andalso" -> "and"
             "band" -> "&&&"
