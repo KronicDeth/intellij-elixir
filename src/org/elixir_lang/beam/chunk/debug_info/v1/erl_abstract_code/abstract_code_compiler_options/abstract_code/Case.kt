@@ -49,9 +49,20 @@ object Case {
     private fun toMacroString(term: OtpErlangTuple, scope: Scope): String {
         val (expressionMacroString, expressionDeclaredScope) = expressionMacroStringDeclaredScope(term, scope)
         val clausesMacroString = clausesMacroString(term, expressionDeclaredScope)
+        val macroStringBuilder = StringBuilder()
 
-        return "case $expressionMacroString do\n" +
-                "  $clausesMacroString\n" +
-                "end"
+        if (expressionMacroString.contains(" do\n")) {
+            macroStringBuilder
+                    .append(expressionMacroString).append('\n')
+                    .append("|> case do\n")
+        } else {
+            macroStringBuilder.append("case $expressionMacroString do\n")
+        }
+
+        macroStringBuilder
+                .append("  $clausesMacroString\n")
+                .append("end")
+
+        return macroStringBuilder.toString()
     }
 }
