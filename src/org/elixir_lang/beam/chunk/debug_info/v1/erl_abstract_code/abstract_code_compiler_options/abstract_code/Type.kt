@@ -24,6 +24,7 @@ object Type {
                 val tag = (term.elementAt(0) as? OtpErlangAtom)?.atomValue()
 
                 when (tag) {
+                    "ann_type" -> annotatedTypeToMacroString(term.elementAt(2))
                     "atom" -> atomToMacroString(term.elementAt(2))
                     "remote_type" -> remoteTypeToMacroString(term.elementAt(2))
                     "var" -> Var.nameToMacroStringDeclaredScope(term.elementAt(2), Scope.EMPTY).macroString
@@ -74,17 +75,36 @@ object Type {
         }
     }
 
+    private const val UNKNOWN_ANONYMOUS_FUNCTION = "(... -> ...)"
+    private const val UNKNOWN_ANNOTATED_TYPE = "... :: ..."
+
+    private fun annotatedTypeToMacroString(term: OtpErlangList) =
+            if (term.arity() == 2) {
+                val varMacroString = toMacroString(term.elementAt(0))
+                val typeMacroString = toMacroString(term.elementAt(1))
+
+                "$varMacroString :: $typeMacroString"
+            } else {
+                UNKNOWN_ANNOTATED_TYPE
+            }
+
+    private fun annotatedTypeToMacroString(term: OtpErlangObject) =
+            when (term) {
+                is OtpErlangList -> annotatedTypeToMacroString(term)
+                else -> UNKNOWN_ANNOTATED_TYPE
+            }
+
     private fun anonymousFunctionToMacroString(term: OtpErlangList): String =
             if (term.arity() == 2) {
                 "(${toMacroString(term.elementAt(0))} -> ${toMacroString(term.elementAt(1))})"
             } else {
-                "(... -> ...)"
+                UNKNOWN_ANONYMOUS_FUNCTION
             }
 
     private fun anonymousFunctionToMacroString(term: OtpErlangObject): String =
             when (term) {
                 is OtpErlangList -> anonymousFunctionToMacroString(term)
-                else -> "(... -> ...)"
+                else -> UNKNOWN_ANONYMOUS_FUNCTION
             }
 
     private fun argumentsToMacroString(term: OtpErlangList): String =
