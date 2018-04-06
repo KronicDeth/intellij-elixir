@@ -84,12 +84,27 @@ object Op {
             scope: Scope
     ): MacroStringDeclaredScope {
         val operatorMacroString = unaryOperatorToMacroString(operator)
+        val macroStringBuilder = StringBuilder().append(operatorMacroString)
+
         val (operandMacroString, operandDeclaredScope) = AbstractCode.toMacroStringDeclaredScope(operand, scope)
 
-        return MacroStringDeclaredScope("$operatorMacroString $operandMacroString", operandDeclaredScope)
+        if (operandMacroString == "not") {
+            macroStringBuilder.append(' ')
+        }
+
+        macroStringBuilder.append(operandMacroString)
+
+        return MacroStringDeclaredScope(macroStringBuilder.toString(), operandDeclaredScope)
     }
 
-    private fun unaryOperatorToMacroString(operator: OtpErlangAtom): MacroString = inspectAsFunction(operator)
+    private fun unaryOperatorToMacroString(operator: OtpErlangAtom): MacroString {
+        val inspectedAsFunction = inspectAsFunction(operator)
+
+        return when (inspectedAsFunction) {
+            "bnot" -> "~~~"
+            else -> inspectedAsFunction
+        }
+    }
 
     private fun unaryOperatorToMacroString(operator: OtpErlangObject) =
             when (operator) {
