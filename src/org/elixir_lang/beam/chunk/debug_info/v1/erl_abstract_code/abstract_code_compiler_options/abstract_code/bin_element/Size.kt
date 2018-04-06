@@ -6,7 +6,7 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Scope
 
 object Size {
-    fun isDefault(term: OtpErlangObject): Boolean = (term as OtpErlangAtom?)?.atomValue() == default
+    fun isDefault(term: OtpErlangObject): Boolean = (term as? OtpErlangAtom?)?.atomValue() == default
 
     fun toMacroString(term: OtpErlangAtom): String? =
             if (term.atomValue() == default) {
