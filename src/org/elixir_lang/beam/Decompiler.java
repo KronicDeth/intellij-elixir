@@ -29,7 +29,7 @@ public class Decompiler implements BinaryFileDecompiler {
         HEADER_NAME_BY_MACRO.put(DEFP, "Private Functions");
     }
 
-    private static final List<org.elixir_lang.beam.decompiler.MacroNameArity> MACRO_NAME_ARITY_DECOMPILER_LIST =
+    public static final List<org.elixir_lang.beam.decompiler.MacroNameArity> MACRO_NAME_ARITY_DECOMPILER_LIST =
             new ArrayList<org.elixir_lang.beam.decompiler.MacroNameArity>();
 
     static {

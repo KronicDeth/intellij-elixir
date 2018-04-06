@@ -22,7 +22,7 @@ class Clause(val attributes: Attributes, val function: Function, val term: OtpEr
     private val headMacroStringDeclaredScope by lazy {
         val (patternSequenceMacroString, patternSequenceDeclaredScope) = patternSequenceMacroStringDeclaredScope()
 
-        MacroStringDeclaredScope("${function.name}($patternSequenceMacroString)${guardSequenceMacroString()}", patternSequenceDeclaredScope)
+        MacroStringDeclaredScope("${function.callDefinitionName}($patternSequenceMacroString)${guardSequenceMacroString()}", patternSequenceDeclaredScope)
     }
 
     private fun guardSequenceMacroString() =

@@ -58,9 +58,15 @@ public class PrefixOperator extends MacroNameArity {
         decompiled
                 .append("  ")
                 .append(macroNameArity.macro)
-                .append(" (")
-                .append(macroNameArity.name)
-                .append("value)");
+                .append(" (");
+
+        appendName(decompiled, macroNameArity.name);
+        decompiled.append("value)");
         appendBody(decompiled);
+    }
+
+    @Override
+    public void appendName(@NotNull StringBuilder decompiled, @NotNull String name) {
+        decompiled.append(name);
     }
 }

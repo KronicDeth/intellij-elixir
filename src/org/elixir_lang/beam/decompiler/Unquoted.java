@@ -82,11 +82,19 @@ public class Unquoted extends MacroNameArity {
         decompiled
                 .append("  ")
                 .append(macroNameArity.macro)
-                .append(" unquote(:")
-                .append(macroNameToAtomName(macroNameArity.name))
-                .append(")");
+                .append(' ');
+
+        appendName(decompiled, macroNameArity.name);
         appendParameters(decompiled, macroNameArity);
         appendBody(decompiled);
+    }
+
+    @Override
+    public void appendName(@NotNull StringBuilder decompiled, @NotNull String name) {
+        decompiled
+                .append("unquote(:")
+                .append(macroNameToAtomName(name))
+                .append(")");
     }
 
     @NotNull

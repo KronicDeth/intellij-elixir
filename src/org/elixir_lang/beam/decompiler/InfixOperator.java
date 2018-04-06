@@ -99,9 +99,15 @@ public class InfixOperator extends MacroNameArity {
         decompiled
                 .append("  ")
                 .append(macroNameArity.macro)
-                .append(" left ")
-                .append(macroNameArity.name)
-                .append(" right");
+                .append(" left ");
+
+        appendName(decompiled, macroNameArity.name);
+        decompiled.append(" right");
         appendBody(decompiled);
+    }
+
+    @Override
+    public void appendName(@NotNull StringBuilder decompiled, @NotNull String name) {
+        decompiled.append(name);
     }
 }
