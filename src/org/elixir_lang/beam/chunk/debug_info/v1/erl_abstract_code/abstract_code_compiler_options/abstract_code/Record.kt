@@ -21,9 +21,9 @@ object Record {
         }
     }
 
-    internal fun nameToMacroString(term: OtpErlangObject): String =
+    internal fun nameToMacroString(term: OtpErlangObject): MacroString =
             when (term) {
-                is OtpErlangAtom -> inspectAsFunction(term)
+                is OtpErlangAtom -> nameToMacroString(term)
                 else -> "unknown_record_name"
             }
 
@@ -48,6 +48,16 @@ object Record {
             toCreationRecordFields(term)
                     ?.let { Elements.toMacroStringDeclaredScope(it, scope) }
                     ?: MacroStringDeclaredScope("missing_record_fields", Scope.EMPTY)
+
+    private fun nameToMacroString(name: OtpErlangAtom): MacroString {
+        val inspectedAsFunction = inspectAsFunction(name)
+
+        return if (inspectedAsFunction.startsWith("\"")) {
+            "__MODULE__.$inspectedAsFunction"
+        } else {
+            inspectedAsFunction
+        }
+    }
 
     private fun toCreationName(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
     private fun toCreationRecordFields(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(3)
