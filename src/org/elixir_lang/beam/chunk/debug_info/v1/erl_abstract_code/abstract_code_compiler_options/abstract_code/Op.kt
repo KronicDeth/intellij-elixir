@@ -51,6 +51,7 @@ object Op {
             "bsl" -> "<<<"
             "bsr" -> ">>>"
             "bxor" -> "^^^"
+            "orelse" -> "or"
             else -> name
         }
     }
