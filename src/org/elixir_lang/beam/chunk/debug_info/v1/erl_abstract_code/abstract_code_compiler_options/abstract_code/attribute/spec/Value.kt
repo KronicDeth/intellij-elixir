@@ -9,25 +9,21 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_
 import org.elixir_lang.code.Identifier.inspectAsFunction
 
 object Value {
-    fun toMacroString(value: OtpErlangObject): MacroString =
+    fun toMacroStrings(value: OtpErlangObject): List<MacroString> =
             when (value) {
-                is OtpErlangTuple -> toMacroString(value)
-                else -> "unknown_spec_value"
+                is OtpErlangTuple -> toMacroStrings(value)
+                else -> emptyList()
             }
 
-    private fun definitionsToMacroString(definitions: OtpErlangList, nameMacroString: MacroString): MacroString {
-        val arity = definitions.arity()
-
-        return when (arity) {
-            1 -> Definition.toMacroString(definitions.elementAt(0), nameMacroString)
-            else -> "unknown_definitions_arity($arity)"
+    private fun definitionsToMacroStrings(definitions: OtpErlangList, nameMacroString: MacroString) =
+        definitions.map {
+            Definition.toMacroString(it, nameMacroString)
         }
-    }
 
-    private fun definitionsToMacroString(definitions: OtpErlangObject, nameMacroString: MacroString) =
+    private fun definitionsToMacroStrings(definitions: OtpErlangObject, nameMacroString: MacroString) =
             when (definitions) {
-                is OtpErlangList -> definitionsToMacroString(definitions, nameMacroString)
-                else -> "unknown_definitions"
+                is OtpErlangList -> definitionsToMacroStrings(definitions, nameMacroString)
+                else -> emptyList()
             }
 
     private fun nameArityToName(nameArity: OtpErlangObject) =
@@ -53,16 +49,15 @@ object Value {
 
     private fun toDefinitions(value: OtpErlangTuple): OtpErlangObject? = value.elementAt(1)
 
-    private fun toMacroString(value: OtpErlangTuple): MacroString {
-        val nameMacroString = nameMacroString(value)
+    private fun toMacroStrings(value: OtpErlangTuple) =
+            nameMacroString(value).let {
+                toMacroStrings(value, it)
+            }
 
-        return toMacroString(value, nameMacroString)
-    }
-
-    private fun toMacroString(value: OtpErlangTuple, nameMacroString: MacroString): MacroString =
-        toDefinitions(value)
-                ?.let { definitionsToMacroString(it, nameMacroString) }
-                ?: "missing_definitions"
+    private fun toMacroStrings(value: OtpErlangTuple, nameMacroString: MacroString) =
+            toDefinitions(value)
+                    ?.let { definitionsToMacroStrings(it, nameMacroString) }
+                    ?: emptyList()
 
     private fun toName(value: OtpErlangTuple) =
             toNameArity(value)

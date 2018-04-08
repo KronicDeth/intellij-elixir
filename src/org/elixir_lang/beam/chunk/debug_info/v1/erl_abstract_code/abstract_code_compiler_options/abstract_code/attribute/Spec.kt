@@ -7,14 +7,14 @@ private const val ATTRIBUTE_NAME = "spec"
 
 class Spec(attribute: Attribute): MacroString(attribute) {
     override fun toMacroString(): String =
-        valueMacroString().let { valueMacroString ->
+        valueMacroStrings().joinToString("\n") { valueMacroString ->
             "@spec $valueMacroString"
         }
 
-    private fun valueMacroString() =
+    private fun valueMacroStrings() =
             attribute.value
-                    ?.let { Value.toMacroString(it) }
-                    ?: "missing_value"
+                    ?.let { Value.toMacroStrings(it) }
+                    ?: emptyList()
 
     companion object {
         fun from(attribute: Attribute): Spec? =
