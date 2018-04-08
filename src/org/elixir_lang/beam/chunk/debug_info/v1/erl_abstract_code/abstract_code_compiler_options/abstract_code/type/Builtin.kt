@@ -19,6 +19,7 @@ object Builtin {
             "atom",
             "binary",
             "boolean",
+            "function",
             "integer",
             "iodata",
             "iolist",
