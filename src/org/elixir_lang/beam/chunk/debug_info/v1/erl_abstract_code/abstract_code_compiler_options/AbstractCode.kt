@@ -40,6 +40,7 @@ object AbstractCode {
             If.ifToMacroStringDeclaredScope(term, scope) ?:
             Integer.ifToMacroStringDeclaredScope(term) ?:
             Map.ifToMacroStringDeclaredScope(term, scope) ?:
+            MapFieldAssociation.ifToMacroStringDeclaredScope(term, scope) ?:
             Match.ifToMacroStringDeclaredScope(term, scope) ?:
             Nil.ifToMacroStringDeclaredScope(term) ?:
             Op.ifToMacroStringDeclaredScope(term, scope) ?:
