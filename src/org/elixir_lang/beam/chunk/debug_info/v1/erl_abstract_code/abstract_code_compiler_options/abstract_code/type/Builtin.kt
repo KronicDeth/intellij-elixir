@@ -27,6 +27,7 @@ object Builtin {
             "iolist",
             "list",
             "map",
+            "maybe_improper_list",
             "mfa",
             "module",
             "neg_integer",
