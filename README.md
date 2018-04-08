@@ -2853,7 +2853,11 @@ For `:debug_info_v1`, Elixir's `backend` is `:elixir_erl`.  The `metadata` for `
 
 ###### Tab
 
-The `Dbgi` tag show the single value map entries: `:file`, `:line`, and `:module`.
+The `Dbgi` tab appearance varies based on whether it was created with Erlang or Elixir, reflecting the fact that the Dbgi format is dependent on the backend that wrote it.
+
+####### Elixir (`:elixir_erl` backend)
+
+The `Dbgi` tab show the single value map entries: `:file`, `:line`, and `:module`.
 
 ![Singletons](screenshots/features/beam_files/beam_chunks/dbgi/tab/Singletons.png?raw=true)
 
@@ -2861,19 +2865,19 @@ For the multi-value keys: `:attributes`, `:compile_opts`, and `:definitions`, th
 
 ![Multivalue Tabs](screenshots/features/beam_files/beam_chunks/dbgi/tab/Multivalue%20Tabs.png?raw=true)
 
-####### Attributes
+######## Attributes
 
 The Attributes tab has the same format as the `Attr`s chunk.
 
 ![Dbgi Attributes Table](screenshots/features/beam_files/beam_chunks/dbgi/tab/attributes/Table.png?raw=true)
 
-####### Compile Options
+######## Compile Options
 
 The Compile Options tab is usually empty, much like the `CInf` `options` key for Erlang.
 
 ![Table](screenshots/features/beam_files/beam_chunks/dbgi/tab/compile_options/Table.png?raw=true)
 
-####### Definitions
+######## Definitions
 
 The Definitions tab is split between a tree of Module, Function/Arity and clauses.
 
@@ -2886,6 +2890,16 @@ Clicking on a clause will show only that clause, but clicking on a higher level 
 ![Module](screenshots/features/beam_files/beam_chunks/dbgi/tab/definitions/Module.png?raw=true)
 
 The AST stored in the `definitions` tab and the process of converting it back to code is not format preserves, so it will not look precisely like the source code as the AST has undergone some macro expansion before its put in the `Dbgi` chunk.  *As common idioms are understood, reversals will be add to the renderer.*
+
+####### Erlang (`:erlang_abstract_code` backend)
+
+The `Dbgi` tab has Abstract Code and Compile Options tabs.
+
+######## Abstract Code
+
+The Abstract Code tab is split between a tree of Attributes, Functions, Function/Arity, and clauses.
+
+
 
 ##### `ExDc`
 

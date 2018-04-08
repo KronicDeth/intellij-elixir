@@ -26,6 +26,7 @@ object AbstractCode {
 
     fun toMacroStringDeclaredScope(term: OtpErlangObject, scope: Scope): MacroStringDeclaredScope =
             AbstractCodeString.ifToMacroStringDeclaredScope(term) ?:
+            AnnotatedType.ifToMacroStringDeclaredScope(term) ?:
             Atom.ifToMacroStringDeclaredScope(term) ?:
             Bin.ifToMacroStringDeclaredScope(term, scope) ?:
             BinElement.ifToMacroStringDeclaredScope(term, scope) ?:
@@ -47,8 +48,11 @@ object AbstractCode {
             RecordField.ifToMacroStringDeclaredScope(term, scope) ?:
             RecordIndex.ifToMacroStringDeclaredScope(term) ?:
             Remote.ifToMacroStringDeclaredScope(term) ?:
+            RemoteType.ifToMacroStringDeclaredScope(term) ?:
             Try.ifToMacroStringDeclaredScope(term, scope) ?:
             Tuple.ifToMacroStringDeclaredScope(term, scope) ?:
+            Type.ifToMacroStringDeclaredScope(term) ?:
+            UserType.ifToMacroStringDeclaredScope(term) ?:
             Var.ifToMacroStringDeclaredScope(term, scope) ?:
             MacroStringDeclaredScope("unknown_abstract_code", Scope.EMPTY)
 }
