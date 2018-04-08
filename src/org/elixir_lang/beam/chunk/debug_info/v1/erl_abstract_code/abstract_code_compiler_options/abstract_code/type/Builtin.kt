@@ -37,6 +37,7 @@ object Builtin {
             "none",
             "nonempty_list",
             "nonempty_string",
+            "number",
             "pid",
             "port",
             "pos_integer",
