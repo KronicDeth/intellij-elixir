@@ -5,11 +5,11 @@ import com.ericsson.otp.erlang.OtpErlangTuple
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode.ifTag
 
-object MapFieldAssociation {
+object MapField {
     fun ifToMacroStringDeclaredScope(term: OtpErlangObject, scope: Scope): MacroStringDeclaredScope? =
-            ifTag(term, TAG) { toMacroStringDeclaredScope(it, scope) }
+            ifTag(term, TAG_SET) { toMacroStringDeclaredScope(it, scope) }
 
-    private const val TAG = "map_field_assoc"
+    private val TAG_SET = setOf("map_field_assoc", "map_field_exact")
 
     private fun keyMacroStringDeclaredScope(mapFieldAssociation: OtpErlangTuple, scope: Scope) =
             toKey(mapFieldAssociation)

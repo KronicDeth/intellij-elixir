@@ -10,14 +10,30 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_
 
 object AbstractCode {
     inline fun <T> ifTag(term: OtpErlangObject?, tag: String, ifTrue: (OtpErlangTuple) -> T?): T? =
+            ifTag(term, tag, { actualTag, expectedTag -> actualTag == expectedTag }, ifTrue)
+
+    inline fun <T> ifTag(term: OtpErlangObject?, tagSet: Set<String>, ifTrue: (OtpErlangTuple) -> T?): T? =
+            ifTag(term, tagSet, { actualTag, expectedTagSet -> expectedTagSet.contains(actualTag) }, ifTrue)
+
+    inline fun <E, R> ifTag(
+            term: OtpErlangObject?,
+            tag: E,
+            test: (String, E) -> Boolean,
+            ifTrue: (OtpErlangTuple) -> R?
+    ): R? =
             when (term) {
-                is OtpErlangTuple -> ifTag(term, tag, ifTrue)
+                is OtpErlangTuple -> ifTag(term, tag, test, ifTrue)
                 else -> null
             }
 
-    inline fun <T> ifTag(term: OtpErlangTuple, tag: String, ifTrue: (OtpErlangTuple) -> T?): T? =
+    inline fun <E, R> ifTag(
+            term: OtpErlangTuple,
+            tag: E,
+            test: (String, E) -> Boolean,
+            ifTrue: (OtpErlangTuple) -> R?
+    ): R? =
             (term.elementAt(0) as? OtpErlangAtom)?.let { actualTag ->
-                if (actualTag.atomValue() == tag) {
+                if (test(actualTag.atomValue(), tag)) {
                     ifTrue(term)
                 } else {
                     null
@@ -40,7 +56,7 @@ object AbstractCode {
             If.ifToMacroStringDeclaredScope(term, scope) ?:
             Integer.ifToMacroStringDeclaredScope(term) ?:
             Map.ifToMacroStringDeclaredScope(term, scope) ?:
-            MapFieldAssociation.ifToMacroStringDeclaredScope(term, scope) ?:
+            MapField.ifToMacroStringDeclaredScope(term, scope) ?:
             Match.ifToMacroStringDeclaredScope(term, scope) ?:
             Nil.ifToMacroStringDeclaredScope(term) ?:
             Op.ifToMacroStringDeclaredScope(term, scope) ?:
