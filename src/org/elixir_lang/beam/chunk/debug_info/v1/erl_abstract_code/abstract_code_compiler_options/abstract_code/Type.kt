@@ -51,6 +51,7 @@ object Type {
         MapFieldExact.ifToMacroString(type) ?:
         Fun.ifToMacroString(type) ?:
         Product.ifToMacroString(type) ?:
+        Range.ifToMacroString(type) ?:
         Record.ifToMacroString(type) ?:
         Union.ifToMacroString(type) ?:
         "unknown_type"
