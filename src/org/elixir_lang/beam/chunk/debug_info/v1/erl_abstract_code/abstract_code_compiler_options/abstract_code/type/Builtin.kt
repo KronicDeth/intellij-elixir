@@ -19,6 +19,7 @@ object Builtin {
             "atom",
             "binary",
             "boolean",
+            "byte",
             "char",
             "function",
             "integer",
