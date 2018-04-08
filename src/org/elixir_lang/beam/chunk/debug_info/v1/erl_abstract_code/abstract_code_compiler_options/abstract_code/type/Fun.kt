@@ -17,15 +17,19 @@ object Fun {
 
     private fun <T> ifTo(type: OtpErlangTuple, ifTrue: (OtpErlangTuple) -> T): T? = ifSubtypeTo(type, SUBTYPE, ifTrue)
 
-    private fun toMacroString(type: OtpErlangTuple): MacroString {
-        TODO()
-    }
+    private fun toMacroString(type: OtpErlangTuple) = toMacroString(type) { ParameterReturn.toMacroString(it) }
 
-    private fun toMacroString(type: OtpErlangTuple, nameMacroString: MacroString): MacroString {
-        val parameterReturn = Fun.toParameterReturn(type)
+    private fun toMacroString(type: OtpErlangTuple, nameMacroString: MacroString) =
+            toMacroString(type) { ParameterReturn.toMacroString(it, nameMacroString) }
+
+    private fun toMacroString(
+            type: OtpErlangTuple,
+            parameterReturnToMacroString: (OtpErlangList) -> MacroString
+    ): MacroString {
+        val parameterReturn = toParameterReturn(type)
 
         return when (parameterReturn) {
-            is OtpErlangList -> ParameterReturn.toMacroString(parameterReturn, nameMacroString)
+            is OtpErlangList -> parameterReturnToMacroString(parameterReturn)
             else -> "unknown_parameter_return"
         }
     }

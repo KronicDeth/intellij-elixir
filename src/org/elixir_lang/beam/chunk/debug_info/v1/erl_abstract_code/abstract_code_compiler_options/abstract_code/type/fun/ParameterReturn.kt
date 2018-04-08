@@ -7,11 +7,33 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Scope
 
 object ParameterReturn {
+    fun toMacroString(parameterReturn: OtpErlangList): MacroString {
+        val arity = parameterReturn.arity()
+
+        return when (arity) {
+            0 -> "function()"
+            2 -> toMacroString(parameterReturn.elementAt(0), parameterReturn.elementAt(1))
+            else -> "unknown_parameter_return_arity($arity)"
+        }
+    }
+
     fun toMacroString(parameterReturn: OtpErlangList, nameMacroString: MacroString): MacroString {
         val parameterMacroString = parameterMacroString(parameterReturn)
         val returnMacroString = returnMacroString(parameterReturn)
 
         return "$nameMacroString($parameterMacroString) :: $returnMacroString"
+    }
+
+    fun toMacroString(parameter: OtpErlangObject, `return`: OtpErlangObject): MacroString {
+        val parameterMacroString = parameterToMacroString(parameter)
+        val returnMacroString = returnToMacroString(`return`)
+
+        val fnParameterMacroString = when (parameterMacroString) {
+            "" -> "()"
+            else -> parameterMacroString
+        }
+
+        return "($fnParameterMacroString -> $returnMacroString)"
     }
 
     private fun parameterMacroString(parameterReturn: OtpErlangList) =
