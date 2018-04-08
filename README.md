@@ -2859,35 +2859,35 @@ The `Dbgi` tab appearance varies based on whether it was created with Erlang or 
 
 The `Dbgi` tab show the single value map entries: `:file`, `:line`, and `:module`.
 
-![Singletons](screenshots/features/beam_files/beam_chunks/dbgi/tab/Singletons.png?raw=true)
+![Singletons](screenshots/features/beam_files/beam_chunks/dbgi/tab/elixir_erl/Singletons.png?raw=true)
 
 For the multi-value keys: `:attributes`, `:compile_opts`, and `:definitions`, there are individual tabs.
 
-![Multivalue Tabs](screenshots/features/beam_files/beam_chunks/dbgi/tab/Multivalue%20Tabs.png?raw=true)
+![Multivalue Tabs](screenshots/features/beam_files/beam_chunks/dbgi/tab/elixir_erl/Multivalue%20Tabs.png?raw=true)
 
 ######## Attributes
 
 The Attributes tab has the same format as the `Attr`s chunk.
 
-![Dbgi Attributes Table](screenshots/features/beam_files/beam_chunks/dbgi/tab/attributes/Table.png?raw=true)
+![Dbgi Attributes Table](screenshots/features/beam_files/beam_chunks/dbgi/tab/elixir_erl/attributes/Table.png?raw=true)
 
 ######## Compile Options
 
 The Compile Options tab is usually empty, much like the `CInf` `options` key for Erlang.
 
-![Table](screenshots/features/beam_files/beam_chunks/dbgi/tab/compile_options/Table.png?raw=true)
+![Table](screenshots/features/beam_files/beam_chunks/dbgi/tab/elixir_erl/compile_options/Table.png?raw=true)
 
 ######## Definitions
 
 The Definitions tab is split between a tree of Module, Function/Arity and clauses.
 
-![Tree](screenshots/features/beam_files/beam_chunks/dbgi/tab/definitions/Tree.png?raw=true)
+![Tree](screenshots/features/beam_files/beam_chunks/dbgi/tab/elixir_erl/definitions/Tree.png?raw=true)
 
 Clicking on a clause will show only that clause, but clicking on a higher level in the tree will show all clauses in the function or the entire Module.
 
-![Clause](screenshots/features/beam_files/beam_chunks/dbgi/tab/definitions/Clause.png?raw=true)
-![Function](screenshots/features/beam_files/beam_chunks/dbgi/tab/definitions/Function.png?raw=true)
-![Module](screenshots/features/beam_files/beam_chunks/dbgi/tab/definitions/Module.png?raw=true)
+![Clause](screenshots/features/beam_files/beam_chunks/dbgi/tab/elixir_erl/definitions/Clause.png?raw=true)
+![Function](screenshots/features/beam_files/beam_chunks/dbgi/tab/elixir_erl/definitions/Function.png?raw=true)
+![Module](screenshots/features/beam_files/beam_chunks/dbgi/tab/elixir_erl/definitions/Module.png?raw=true)
 
 The AST stored in the `definitions` tab and the process of converting it back to code is not format preserves, so it will not look precisely like the source code as the AST has undergone some macro expansion before its put in the `Dbgi` chunk.  *As common idioms are understood, reversals will be add to the renderer.*
 
@@ -2895,11 +2895,21 @@ The AST stored in the `definitions` tab and the process of converting it back to
 
 The `Dbgi` tab has Abstract Code and Compile Options tabs.
 
+![Dbgi Tabs](screenshots/features/beam_files/beam_chunks/dbgi/tab/erlang_abstract_code/Tabs.png?raw=true)
+
 ######## Abstract Code
 
 The Abstract Code tab is split between a tree of Attributes, Functions, Function/Arity, and clauses.
 
+![Tree](screenshots/features/beam_files/beam_chunks/dbgi/tab/erlang_abstract_code/abstract_code/Tree.png?raw=true)
 
+Clicking on a clause will show only that clause, but clicking on a higher level in the tree will show all clauses in the function or the entire Module.
+
+![Clause](screenshots/features/beam_files/beam_chunks/dbgi/tab/erlang_abstract_code/abstract_code/functions/Clause.png?raw=true)
+![Function](screenshots/features/beam_files/beam_chunks/dbgi/tab/erlang_abstract_code/abstract_code/functions/Function.png?raw=true)
+![Module](screenshots/features/beam_files/beam_chunks/dbgi/tab/erlang_abstract_code/abstract_code/functions/Module.png?raw=true)
+
+The abstract code stored in the `:erlang_abstract_code` backend format is the [Erlang Abstract Format](http://erlang.org/doc/apps/erts/absform.html#id95337).  Instead of converting the Erlang Abstract Format back to Erlang, which would require [IntelliJ Erlang](https://github.com/ignatov/intellij-erlang) to highlight and annotate and for you to be used to reading Erlang, the Erlang Abstract Format is translated back to Elixir. **Using the BEAM Chunk Dbgi viewer can be a way to convert compiled Erlang code to Elixir source automatically.**
 
 ##### `ExDc`
 
