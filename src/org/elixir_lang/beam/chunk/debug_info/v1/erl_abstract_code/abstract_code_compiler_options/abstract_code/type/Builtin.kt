@@ -24,6 +24,7 @@ object Builtin {
             "iodata",
             "iolist",
             "list",
+            "map",
             "mfa",
             "module",
             "neg_integer",
@@ -88,10 +89,11 @@ object Builtin {
         val argumentsMacroString = argumentsMaybeToMacroString(arguments)
 
         return when (subtypeMacroString) {
+            "list" -> "[$argumentsMacroString]"
+            "map" -> "%{$argumentsMacroString}"
+            "nil" -> "[]"
             "nonempty_list" -> "[$argumentsMacroString, ...]"
             "nonempty_string" -> "[char(), ...]"
-            "list" -> "[$argumentsMacroString]"
-            "nil" -> "[]"
             "string" -> "charlist($argumentsMacroString)"
             "tuple" -> "{$argumentsMacroString}"
             else -> "$subtypeMacroString($argumentsMacroString)"
