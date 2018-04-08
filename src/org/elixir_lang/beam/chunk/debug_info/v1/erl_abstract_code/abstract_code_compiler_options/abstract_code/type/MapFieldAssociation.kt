@@ -9,7 +9,5 @@ object MapFieldAssociation {
 
     private const val SUBTYPE = "map_field_assoc"
 
-    private fun toMacroString(type: OtpErlangTuple): MacroString {
-        TODO()
-    }
+    private fun toMacroString(type: OtpErlangTuple) = MapField.toMacroString(type, "optional")
 }
