@@ -27,7 +27,7 @@ object Var {
                     ?.let{ nameToMacroStringDeclaredScope(it, scope) }
                     ?: MacroStringDeclaredScope("name_missing", Scope.EMPTY)
 
-    private fun nameToKey(name: OtpErlangAtom) = name.atomValue().decapitalize().let { inspectAsKey(it) }
+    private fun nameToKey(name: OtpErlangAtom) = name.let { nameToMacroString(it) }.let { inspectAsKey(it) }
 
     private fun nameToKey(name: OtpErlangObject) =
             when (name) {
@@ -35,8 +35,10 @@ object Var {
                 else -> "unknown_name:"
             }
 
+    private fun nameToMacroString(name: OtpErlangAtom) = name.atomValue().decapitalize().escapeElixirKeyword()
+
     private fun nameToMacroStringDeclaredScope(name: OtpErlangAtom, scope: Scope): MacroStringDeclaredScope {
-        val varName = name.atomValue().decapitalize().escapeElixirKeyword()
+        val varName = nameToMacroString(name)
 
         return when {
             varName == IGNORE ->
@@ -72,7 +74,7 @@ object Var {
 private val KEYWORD_BLOCK_KEYWORD_SET = Macro.KEYWORD_BLOCK_KEYWORDS.toSet()
 
 private fun String.escapeElixirKeyword(): MacroString =
-    if (KEYWORD_BLOCK_KEYWORD_SET.contains(this) || this == "end") {
+    if (KEYWORD_BLOCK_KEYWORD_SET.contains(this) || this == "end" || this == "when") {
         "erlangVariable${this.capitalize()}"
     } else {
         this
