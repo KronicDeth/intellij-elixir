@@ -15,6 +15,7 @@ object Builtin {
 
     private val SUBTYPE_SET = setOf(
             "any",
+            "arity",
             "atom",
             "binary",
             "boolean",
