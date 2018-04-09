@@ -175,7 +175,11 @@ public class Presentation extends com.intellij.xdebugger.frame.presentation.XVal
   private static void renderErlangString(OtpErlangString str, XValueTextRenderer renderer) {
     if (isPrintable(str)) {
       renderer.renderSpecialSymbol("'");
-      renderer.renderValue(str.stringValue());
+      renderer.renderValue(
+              str
+                      .stringValue()
+                      .replace("'", "\\'")
+      );
       renderer.renderSpecialSymbol("'");
     } else {
       renderObject(new OtpErlangList(str.stringValue()), renderer);

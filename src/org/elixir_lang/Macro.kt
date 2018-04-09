@@ -400,11 +400,11 @@ object Macro {
             "$keyword\n  ${adjustNewLines(blockToString(block), "\n  ")}\n"
 
     // in order they should be rendered in keywordBlocksToString
-    private val keywordBlockKeywords = arrayOf("do", "catch", "rescue", "after", "else")
+    val KEYWORD_BLOCK_KEYWORDS = arrayOf("do", "catch", "rescue", "after", "else")
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex?utf8=%E2%9C%93#L910-L917
     private fun keywordBlocksToString(keywordBlocks: OtpErlangList): String =
-        keywordBlockKeywords.mapNotNull { keywordBlockKeyword ->
+        KEYWORD_BLOCK_KEYWORDS.mapNotNull { keywordBlockKeyword ->
             Keyword.get(keywordBlocks, keywordBlockKeyword)?.let { keywordBlock ->
                 keywordBlockToString(keywordBlockKeyword, keywordBlock)
             }
@@ -421,7 +421,7 @@ object Macro {
             }
 
     private fun isKeywordBlock(tuple: OtpErlangTuple): Boolean =
-            tuple.arity() == 2 && (tuple.elementAt(0) as? OtpErlangAtom)?.atomValue() in keywordBlockKeywords
+            tuple.arity() == 2 && (tuple.elementAt(0) as? OtpErlangAtom)?.atomValue() in KEYWORD_BLOCK_KEYWORDS
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex?utf8=%E2%9C%93#L750-L754
     private fun isKeywordBlocks(list: OtpErlangList): Boolean =

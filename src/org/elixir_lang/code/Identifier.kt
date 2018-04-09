@@ -97,14 +97,13 @@ object Identifier {
         }
     }
 
-    fun inspectAsKey(atom: OtpErlangAtom): String {
-        val string = Atom.toString(atom)
-        val classification = classify(atom)
+    fun inspectAsKey(atom: OtpErlangAtom): String = Atom.toString(atom).let { inspectAsKey(it) }
 
-        return if (classify(atom) in arrayOf(Classification.CALLABLE_LOCAL, Classification.CALLABLE_OPERATOR, Classification.NOT_CALLABLE)) {
-            "$string:"
+    fun inspectAsKey(atomValue: String): String {
+        return if (classify(atomValue) in arrayOf(Classification.CALLABLE_LOCAL, Classification.CALLABLE_OPERATOR, Classification.NOT_CALLABLE)) {
+            "$atomValue:"
         } else {
-            val escaped = string.replace("\"", "\\\"")
+            val escaped = atomValue.replace("\"", "\\\"")
 
             "\"$escaped\":"
         }

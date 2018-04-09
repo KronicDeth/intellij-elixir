@@ -53,10 +53,15 @@ public class Default extends MacroNameArity {
         decompiled
                 .append("  ")
                 .append(macroNameArity.macro)
-                .append(" ")
-                .append(macroNameArity.name);
+                .append(" ");
 
+        appendName(decompiled, macroNameArity.name);
         appendParameters(decompiled, macroNameArity);
         appendBody(decompiled);
+    }
+
+    @Override
+    public void appendName(@NotNull StringBuilder decompiled, @NotNull String name) {
+        decompiled.append(name);
     }
 }

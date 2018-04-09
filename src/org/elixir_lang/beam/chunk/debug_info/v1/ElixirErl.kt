@@ -41,7 +41,8 @@ private fun elixirErlFromMetadata(metadata: OtpErlangTuple, elixirErl: ElixirErl
         elixirErlFromMetadataTag(tag, metadata, elixirErl)
     } else {
         logger.error("""
-                     Dbgi :debug_info_v1 version :elixir_erl backend metadata arity ($arity) does not match (2)
+                     Dbgi :debug_info_v1 version :elixir_erl backend metadata arity ($arity) is not greater than 1, and
+                     so can't be tagged.
 
                      ## metadata
 
@@ -83,7 +84,7 @@ fun elixirErlFromMetadataTag(tag: OtpErlangAtom, metadata: OtpErlangObject, elix
     }
 }
 
-private operator fun OtpErlangTuple.component1(): OtpErlangObject = this.elementAt(0)
-private operator fun OtpErlangTuple.component2(): OtpErlangObject = this.elementAt(1)
+internal operator fun OtpErlangTuple.component1(): OtpErlangObject = this.elementAt(0)
+internal operator fun OtpErlangTuple.component2(): OtpErlangObject = this.elementAt(1)
 
 class ElixirErl(val v1: V1): DebugInfo

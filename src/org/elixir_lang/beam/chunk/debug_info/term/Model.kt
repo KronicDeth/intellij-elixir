@@ -7,7 +7,6 @@ import org.elixir_lang.beam.chunk.DebugInfo
 import org.elixir_lang.beam.chunk.Table
 import org.elixir_lang.beam.chunk.debug_info.Term
 import org.elixir_lang.beam.chunk.debug_info.v1.ElixirErl
-import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.Component
 import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.table.AbstractTableModel
@@ -15,7 +14,12 @@ import javax.swing.table.AbstractTableModel
 fun component(debugInfo: DebugInfo?, project: Project): JComponent =
     when (debugInfo) {
         is org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.V1 ->
-            Component(debugInfo, project)
+            org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.Component(debugInfo, project)
+        is org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.AbstractCodeCompileOptions ->
+            org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.Component(
+                    debugInfo,
+                    project
+            )
         is ElixirErl ->
             JBScrollPane(Table(org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.Model(debugInfo)))
         is org.elixir_lang.beam.chunk.debug_info.V1 ->
