@@ -92,6 +92,19 @@ public class TypedHandler extends TypedHandlerDelegate {
                         result = Result.STOP;
                     }
                 }
+            } else if (charTyped == '{') { // #{
+                int caret = editor.getCaretModel().getOffset();
+
+                if (caret > 1) {
+                    final EditorHighlighter highlighter = ((EditorEx) editor).getHighlighter();
+                    HighlighterIterator iterator = highlighter.createIterator(caret - 1);
+                    IElementType tokenType = iterator.getTokenType();
+
+                    if (tokenType == ElixirTypes.INTERPOLATION_START) {
+                        editor.getDocument().insertString(caret, "}");
+                        result = Result.STOP;
+                    }
+                }
             }
         }
 
