@@ -157,6 +157,7 @@
 
 ### Enhancements
 * [#1055](https://github.com/KronicDeth/intellij-elixir/pull/1055) - Refactor `ElixirPsiImplUtil` into separate files tied to specific classes or interfaces to shrink its size. - [@KronicDeth](https://github.com/KronicDeth)
+* [#1073](https://github.com/KronicDeth/intellij-elixir/pull/1073) - Complete `#{` with `}`. - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#1056](https://github.com/KronicDeth/intellij-elixir/pull/1056) - Certain `.beam` files in the OTP source are purposely invalid, so ignore them when trying to parse and don't log the expected error. - [@KronicDeth](https://github.com/KronicDeth)
