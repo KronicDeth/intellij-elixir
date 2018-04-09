@@ -19,6 +19,14 @@
         and don't log the expected error.
       </li>
       <li>Log available bytes and total size when header is not <code>FOR1</code>.</li>
+      <li>
+        <code>erl_abstract_code</code> format <code>Dbgi</code> chunks can now be navigated similar to how
+        <code>elixir_erl</code> format Dbgi chunks can be navigated.  Instead of converting the
+        <a href="http://erlang.org/doc/apps/erts/absform.html" rel="nofollow">Erlang Abstract Code</a> back to Erlang,
+        which would not be highlighted if <a href="https://github.com/ignatov/intellij-erlang">intellij-erlang</a> and
+        requires the user to know Erlang, the Erlang Abstract Code is translated back to Elixir source, so you can use
+        the <code>Dbgi</code> chunk view to translate Erlang to Elixir.
+      </li>
     </ul>
   </li>
 </ul>
