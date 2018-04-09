@@ -12,6 +12,7 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_
 private const val ATTRIBUTE_NAME = "type"
 
 class Type(val attributes: Attributes, attribute: Attribute): MacroString(attribute) {
+    val elixirAttributeName by lazy { elixirAttributeName() }
     val name by lazy { ((attribute.value as? OtpErlangTuple)?.elementAt(0) as? OtpErlangAtom)?.atomValue() }
     val value by lazy { ((attribute.value as? OtpErlangTuple)?.elementAt(1) as? OtpErlangTuple) }
 

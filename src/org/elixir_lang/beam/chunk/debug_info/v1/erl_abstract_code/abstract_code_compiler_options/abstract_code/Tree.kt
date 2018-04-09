@@ -1,6 +1,8 @@
 package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code
 
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.AbstractCodeCompileOptions
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.attribute.Spec
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.attribute.Type
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.function.Clause
 import javax.swing.JTree
 import javax.swing.tree.TreeModel
@@ -26,6 +28,8 @@ class Tree(model: TreeModel): JTree(model) {
             is Clause -> value.head
             is Function -> "${value.name}/${value.arity}"
             is Functions -> "Functions"
+            is Spec -> "@spec ${value.name}/${value.arity}"
+            is Type -> "@${value.elixirAttributeName} ${value.name}"
             else -> super.convertValueToText(value, selected, expanded, leaf, row, hasFocus)
         }
 }
