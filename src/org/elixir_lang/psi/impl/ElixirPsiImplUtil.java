@@ -1077,7 +1077,7 @@ public class ElixirPsiImplUtil {
 
     @Nullable
     public static PsiReference getReference(@NotNull Call call) {
-        return CallImplKt.computeReference(call);
+        return CallImplKt.getReference(call);
     }
 
     @Nullable
