@@ -89,7 +89,7 @@ fun Call.computeReference(): PsiReference? {
  */
 fun Call.finalArguments(): Array<PsiElement>? = secondaryArguments() ?: primaryArguments()
 
-fun Call.getReference(): PsiReference =
+fun Call.getReference(): PsiReference? =
         CachedValuesManager.getCachedValue(this) {
             CachedValueProvider.Result.create(computeReference(), this)
         }
