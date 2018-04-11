@@ -2,16 +2,39 @@ package org.elixir_lang
 
 import com.intellij.find.FindManager
 import com.intellij.find.impl.HelpID
-import com.intellij.lang.cacheBuilder.SimpleWordsScanner
+import com.intellij.lang.cacheBuilder.DefaultWordsScanner
 import com.intellij.lang.cacheBuilder.WordsScanner
 import com.intellij.psi.ElementDescriptionUtil
 import com.intellij.psi.PsiElement
+import com.intellij.psi.tree.TokenSet
 import com.intellij.usageView.UsageViewLongNameLocation
 import com.intellij.usageView.UsageViewNodeTextLocation
 import com.intellij.usageView.UsageViewTypeLocation
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
+import org.elixir_lang.psi.ElixirTypes.*
 import org.elixir_lang.psi.MaybeModuleName
 import org.elixir_lang.psi.call.Call
+
+private val IDENTIFIER_TOKEN_SET = TokenSet.create(
+        ALIAS_TOKEN,
+        AND_SYMBOL_OPERATOR,
+        AND_WORD_OPERATOR,
+        ARROW_OPERATOR,
+        COMPARISON_OPERATOR,
+        DIVISION_OPERATOR,
+        DUAL_OPERATOR,
+        IDENTIFIER_TOKEN,
+        MULTIPLICATION_OPERATOR,
+        NOT_OPERATOR,
+        OR_SYMBOL_OPERATOR,
+        OR_WORD_OPERATOR,
+        PIPE_OPERATOR,
+        RANGE_OPERATOR,
+        SIGN_OPERATOR,
+        THREE_OPERATOR,
+        TWO_OPERATOR,
+        UNARY_OPERATOR
+)
 
 class FindUsagesProvider : com.intellij.lang.findUsages.FindUsagesProvider {
     /**
@@ -19,9 +42,15 @@ class FindUsagesProvider : com.intellij.lang.findUsages.FindUsagesProvider {
      * Note that the implementation MUST be thread-safe, otherwise you should return a new instance of your scanner
      * (that can be recommended as a best practice).
      *
-     * @return the word scanner implementation, or null if [SimpleWordsScanner] is OK.
+     * @return the word scanner implementation.
      */
-    override fun getWordsScanner(): WordsScanner? = null
+    override fun getWordsScanner(): WordsScanner? =
+            DefaultWordsScanner(
+                    ElixirLexer(),
+                    IDENTIFIER_TOKEN_SET,
+                    ElixirParserDefinition.COMMENTS,
+                    ElixirParserDefinition.STRING_LITERALS
+            )
 
     /**
      * Checks if it makes sense to search for usages of the specified element.

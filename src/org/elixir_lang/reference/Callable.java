@@ -603,6 +603,38 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         return ((NamedElement) myElement).setName(newElementName);
     }
 
+    @Override
+    public boolean isReferenceTo(PsiElement element) {
+        ResolveResult[] resolveResults = this.multiResolve(false);
+        boolean isReferenceTo = false;
+
+        for (ResolveResult resolveResult : resolveResults) {
+            PsiElement resolvedElement = resolveResult.getElement();
+
+            if (resolvedElement != null) {
+                isReferenceTo = resolvedElement.isEquivalentTo(element);
+
+                if (isReferenceTo) {
+                    break;
+                }
+
+                if (element instanceof Call && resolvedElement instanceof ElixirIdentifier) {
+                    PsiElement resolvedParent = resolvedElement.getParent();
+
+                    if (resolvedParent != null) {
+                        isReferenceTo = resolvedParent.isEquivalentTo(element);
+
+                        if (isReferenceTo) {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        return isReferenceTo;
+    }
+
     /*
      *
      * Instance Methods
