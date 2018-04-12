@@ -331,13 +331,30 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         return isVariable;
     }
 
-    public static String parameterElementDescription(Call call, ElementDescriptionLocation location) {
+    public static String parameterElementDescription(@NotNull Call call, ElementDescriptionLocation location) {
         String elementDescription = null;
 
         if (location == UsageViewLongNameLocation.INSTANCE || location == UsageViewShortNameLocation.INSTANCE) {
             elementDescription = call.getName();
         } else if (location == UsageViewTypeLocation.INSTANCE) {
-            elementDescription = "parameter";
+            PsiElement parent = call.getParent();
+
+            if (parent instanceof ElixirNoParenthesesOneArgument) {
+                PsiElement grandParent = parent.getParent();
+
+                if (grandParent instanceof Call) {
+                    Call grandParentCall = (Call) grandParent;
+
+                    if (org.elixir_lang.structure_view.element.CallDefinitionClause.is(grandParentCall)) {
+                        elementDescription =
+                                org.elixir_lang.structure_view.element.CallDefinitionClause.elementDescription(grandParentCall, location);
+                    }
+                }
+            }
+
+            if (elementDescription == null) {
+                elementDescription = "parameter";
+            }
         }
 
         return elementDescription;
