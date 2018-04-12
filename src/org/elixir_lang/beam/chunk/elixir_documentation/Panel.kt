@@ -18,7 +18,7 @@ import javax.swing.event.TreeSelectionListener
 const val DEFAULT_TEXT = "# Select a module, definition, or clause to view its AST as code"
 
 class Panel(private val elixirDocumentationTree: Tree, project: Project, private val moduleName: String?): JPanel(GridLayout(1, 1)), TreeSelectionListener {
-    private val psiFile = PsiFileFactory.getInstance(project).createFileFromText(ElixirLanguage.INSTANCE, DEFAULT_TEXT)
+    private val psiFile = PsiFileFactory.getInstance(project).createFileFromText(ElixirLanguage, DEFAULT_TEXT)
     private val document = PsiDocumentManager.getInstance(project).getDocument(psiFile)!!
     private val editor = EditorFactory.getInstance().createEditor(document, project, ElixirFileType.INSTANCE, true)
 

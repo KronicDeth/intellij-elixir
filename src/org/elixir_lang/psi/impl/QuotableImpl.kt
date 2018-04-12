@@ -999,7 +999,7 @@ object QuotableImpl {
     @Contract(pure = true)
     @JvmStatic
     fun quote(file: PsiFile): OtpErlangObject =
-            (file.viewProvider.getPsi(ElixirLanguage.INSTANCE) as ElixirFile).let { root ->
+            (file.viewProvider.getPsi(ElixirLanguage) as ElixirFile).let { root ->
                 ElixirPsiImplUtil.quote(root)
             }
 

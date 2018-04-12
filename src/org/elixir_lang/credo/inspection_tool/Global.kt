@@ -145,7 +145,7 @@ private fun workingDirectorySet(project: Project): Set<String> {
 }
 
 private fun annotator(): Annotator {
-    val externalAnnotatorList = ExternalLanguageAnnotators.INSTANCE.allForLanguage(ElixirLanguage.INSTANCE)
+    val externalAnnotatorList = ExternalLanguageAnnotators.INSTANCE.allForLanguage(ElixirLanguage)
     var annotator: Annotator? = null
 
     for (element in externalAnnotatorList) {

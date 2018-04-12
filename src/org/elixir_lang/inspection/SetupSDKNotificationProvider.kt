@@ -59,7 +59,7 @@ class SetupSDKNotificationProvider(private val project: Project,
             val psiFile = PsiManager.getInstance(project).findFile(virtualFile)
 
             if (psiFile != null &&
-                    psiFile.language === ElixirLanguage.INSTANCE &&
+                    psiFile.language === ElixirLanguage &&
                     Type.mostSpecificSdk(psiFile) == null) {
                 notificationPanel = createPanel(project, psiFile)
             }

@@ -15,7 +15,7 @@ import org.elixir_lang.credo.Annotator
 class Local: LocalInspectionTool() {
     override fun checkFile(file: PsiFile, manager: InspectionManager, isOnTheFly: Boolean): Array<ProblemDescriptor>? {
         val viewProvider = file.viewProvider
-        val language = ElixirLanguage.INSTANCE
+        val language = ElixirLanguage
 
         return viewProvider
                 .getPsi(language)
