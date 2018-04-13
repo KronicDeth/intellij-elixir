@@ -18,6 +18,7 @@ import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.call.name.Module.KERNEL_SPECIAL_FORMS
 import org.elixir_lang.reference.Callable.BIT_STRING_TYPES
 import org.elixir_lang.reference.Callable.isBitStreamSegmentOption
+import org.elixir_lang.structure_view.element.CallDefinitionClause
 import java.util.*
 
 /**
@@ -145,77 +146,72 @@ class Callable : Annotator, DumbAware {
         )
     }
 
-    private fun callHighlight(resolved: PsiElement, previousCallHighlight: CallHighlight?): CallHighlight? {
-        var callHighlight: CallHighlight? = null
-
-        if (org.elixir_lang.reference.Callable.isIgnored(resolved)) {
-            callHighlight = CallHighlight.nullablePut(
-                    previousCallHighlight,
-                    IGNORED_VARIABLE_TEXT_ATTRIBUTE_KEYS,
+    private fun callHighlight(resolved: Call, previousCallHighlight: CallHighlight?): CallHighlight? =
+        if (CallDefinitionClause.isFunction(resolved)) {
+            val referrerTextAttributesKeys = referrerTextAttributesKeys(
                     resolved,
-                    ElixirSyntaxHighlighter.IGNORED_VARIABLE
+                    FUNCTION_CALL_TEXT_ATTRIBUTE_KEYS,
+                    PREDEFINED_FUNCTION_CALL_TEXT_ATTRIBUTE_KEYS
+            )
+
+            CallHighlight.nullablePut(
+                    previousCallHighlight,
+                    referrerTextAttributesKeys,
+                    resolved, null
+            )
+        } else if (CallDefinitionClause.isMacro(resolved)) {
+            val referrerTextAttributesKeys = referrerTextAttributesKeys(
+                    resolved,
+                    MACRO_CALL_TEXT_ATTRIBUTES_KEYS,
+                    PREDEFINED_MACRO_CALL_TEXT_ATTRIBUTES_KEYS
+            )
+
+            CallHighlight.nullablePut(
+                    previousCallHighlight,
+                    referrerTextAttributesKeys,
+                    resolved,
+                    null
+            )
+        } else if (org.elixir_lang.reference.Callable.isParameter(resolved)) {
+            CallHighlight.nullablePut(
+                    previousCallHighlight,
+                    PARAMETER_TEXT_ATTRIBUTE_KEYS,
+                    resolved,
+                    ElixirSyntaxHighlighter.PARAMETER
+            )
+        } else if (org.elixir_lang.reference.Callable.isParameterWithDefault(resolved)) {
+            CallHighlight.nullablePut(
+                    previousCallHighlight,
+                    PARAMETER_TEXT_ATTRIBUTE_KEYS,
+                    resolved,
+                    ElixirSyntaxHighlighter.PARAMETER
+            )
+        } else if (org.elixir_lang.reference.Callable.isVariable(resolved)) {
+            CallHighlight.nullablePut(
+                    previousCallHighlight,
+                    VARIABLE_TEXT_ATTRIBUTE_KEYS,
+                    resolved,
+                    ElixirSyntaxHighlighter.VARIABLE
             )
         } else {
-            val parameter = Parameter.putParameterized(Parameter(resolved))
-            val parameterType = parameter.type
-            val referrerTextAttributesKeys: Array<TextAttributesKey>
-
-            if (parameterType != null) {
-                when (parameterType) {
-                    Parameter.Type.FUNCTION_NAME -> {
-                        referrerTextAttributesKeys = referrerTextAttributesKeys(
-                                parameter,
-                                FUNCTION_CALL_TEXT_ATTRIBUTE_KEYS,
-                                PREDEFINED_FUNCTION_CALL_TEXT_ATTRIBUTE_KEYS
-                        )
-
-                        callHighlight = CallHighlight.nullablePut(
-                                previousCallHighlight,
-                                referrerTextAttributesKeys,
-                                resolved, null
-                        )// will be handled visitCallDefinitionClause
-                    }
-
-                    Parameter.Type.MACRO_NAME -> {
-                        referrerTextAttributesKeys = referrerTextAttributesKeys(
-                                parameter,
-                                MACRO_CALL_TEXT_ATTRIBUTES_KEYS,
-                                PREDEFINED_MACRO_CALL_TEXT_ATTRIBUTES_KEYS
-                        )
-
-                        callHighlight = CallHighlight.nullablePut(
-                                previousCallHighlight,
-                                referrerTextAttributesKeys,
-                                resolved, null
-                        )// will be handled visitCallDefinitionClause
-                    }
-
-                    Parameter.Type.VARIABLE -> callHighlight = CallHighlight.nullablePut(
-                            previousCallHighlight,
-                            PARAMETER_TEXT_ATTRIBUTE_KEYS,
-                            resolved,
-                            ElixirSyntaxHighlighter.PARAMETER
-                    )
-                }
-            } else if (org.elixir_lang.reference.Callable.isParameterWithDefault(resolved)) {
-                callHighlight = CallHighlight.nullablePut(
-                        previousCallHighlight,
-                        PARAMETER_TEXT_ATTRIBUTE_KEYS,
-                        resolved,
-                        ElixirSyntaxHighlighter.PARAMETER
-                )
-            } else if (org.elixir_lang.reference.Callable.isVariable(resolved)) {
-                callHighlight = CallHighlight.nullablePut(
-                        previousCallHighlight,
-                        VARIABLE_TEXT_ATTRIBUTE_KEYS,
-                        resolved,
-                        ElixirSyntaxHighlighter.VARIABLE
-                )
-            }
+            previousCallHighlight
         }
 
-        return callHighlight
-    }
+    private fun callHighlight(resolved: PsiElement, previousCallHighlight: CallHighlight?): CallHighlight? =
+            when (resolved) {
+                is Call -> callHighlight(resolved, previousCallHighlight)
+                else ->
+                    if (org.elixir_lang.reference.Callable.isIgnored(resolved)) {
+                        CallHighlight.nullablePut(
+                                previousCallHighlight,
+                                IGNORED_VARIABLE_TEXT_ATTRIBUTE_KEYS,
+                                resolved,
+                                ElixirSyntaxHighlighter.IGNORED_VARIABLE
+                        )
+                    } else {
+                        previousCallHighlight
+                    }
+            }
 
     private fun callHighlight(resolvedCollection: Collection<PsiElement>): CallHighlight? =
         resolvedCollection.fold(null) { acc: CallHighlight?, resolved ->
@@ -375,24 +371,21 @@ class Callable : Annotator, DumbAware {
         private val VARIABLE_TEXT_ATTRIBUTE_KEYS = arrayOf(ElixirSyntaxHighlighter.VARIABLE)
 
         private fun referrerTextAttributesKeys(
-                parameter: Parameter,
+                psiElement: PsiElement,
                 standardTextAttributeKeys: Array<TextAttributesKey>,
                 predefinedTextAttributesKeys: Array<TextAttributesKey>
-        ): Array<TextAttributesKey> {
-            val entrance = parameter.entrance
-
-            return if (entrance is NavigationItem) {
-                entrance.presentation?.let { presentation ->
-                    if (PREDEFINED_LOCATION_STRING_SET.contains(presentation.locationString)) {
-                        predefinedTextAttributesKeys
-                    } else {
-                        null
-                    }
-                } ?: standardTextAttributeKeys
-            } else {
-                standardTextAttributeKeys
-            }
-        }
+        ): Array<TextAttributesKey> =
+                if (psiElement is NavigationItem) {
+                    psiElement.presentation?.let { presentation ->
+                        if (PREDEFINED_LOCATION_STRING_SET.contains(presentation.locationString)) {
+                            predefinedTextAttributesKeys
+                        } else {
+                            null
+                        }
+                    } ?: standardTextAttributeKeys
+                } else {
+                    standardTextAttributeKeys
+                }
 
         private fun sameFile(referrer: PsiElement, resolved: PsiElement): Boolean =
             referrer.containingFile.virtualFile == resolved.containingFile.virtualFile
