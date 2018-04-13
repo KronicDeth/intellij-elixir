@@ -98,13 +98,13 @@ public class MultiResolve extends org.elixir_lang.psi.scope.CallDefinitionClause
 
             if (nameIdentifier != null) {
                 if (PsiTreeUtil.isAncestor(state.get(ENTRANCE), nameIdentifier, false)) {
-                    addNewToResolveResultList(nameIdentifier, validResult);
+                    addNewToResolveResultList(named, validResult);
 
                     keepProcessing = false;
                 } else {
                 /* Doesn't use a Map<PsiElement, ResolveSet> so that MultiResolve's helpers that require a
                    List<ResolveResult> can still work */
-                    addNewToResolveResultList(nameIdentifier, validResult);
+                    addNewToResolveResultList(named, validResult);
 
                     Call importCall = state.get(IMPORT_CALL);
 

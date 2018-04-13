@@ -102,22 +102,19 @@ public class Variants extends CallDefinitionClause {
     private void addToLookupElementByPsiElement(@NotNull Call call) {
         if (call instanceof Named) {
             Named named = (Named) call;
+            String name = named.getName();
 
-            PsiElement nameIdentifier = named.getNameIdentifier();
-
-            if (nameIdentifier != null) {
-                if (lookupElementByPsiElement == null || !lookupElementByPsiElement.containsKey(nameIdentifier)) {
+            if (name != null) {
+                if (lookupElementByPsiElement == null || !lookupElementByPsiElement.containsKey(named)) {
                     if (lookupElementByPsiElement == null) {
-                        lookupElementByPsiElement = new THashMap<PsiElement, LookupElement>();
+                        lookupElementByPsiElement = new THashMap<>();
                     }
 
-                    String name = nameIdentifier.getText();
-
                     lookupElementByPsiElement.put(
-                            nameIdentifier,
+                            named,
                             LookupElementBuilder.createWithSmartPointer(
                                     name,
-                                    nameIdentifier
+                                    named
                             ).withRenderer(
                                     new org.elixir_lang.code_insight.lookup.element_renderer.CallDefinitionClause(name)
                             )
