@@ -23,19 +23,21 @@ import org.elixir_lang.structure_view.element.Delegation
 import org.jetbrains.annotations.Contract
 import java.util.*
 
-fun PsiElement.followingSiblingsSearchScope(): LocalSearchScope {
-    val followingSiblingList = ArrayList<PsiElement>()
+fun PsiElement.selfAndFollowingSiblingsSearchScope(): LocalSearchScope {
+    val selfAndFollowingSiblingList = ArrayList<PsiElement>()
+    selfAndFollowingSiblingList.add(this)
+
     var previousSibling = this
     var followingSibling: PsiElement? = previousSibling.nextSibling
 
     while (followingSibling != null) {
-        followingSiblingList.add(followingSibling)
+        selfAndFollowingSiblingList.add(followingSibling)
 
         previousSibling = followingSibling
         followingSibling = previousSibling.nextSibling
     }
 
-    return LocalSearchScope(followingSiblingList.toTypedArray())
+    return LocalSearchScope(selfAndFollowingSiblingList.toTypedArray())
 }
 
 object UseScopeImpl {
@@ -57,7 +59,7 @@ object UseScopeImpl {
             if (isNonReferencing(atUnqualifiedNoParenthesesCall.atIdentifier)) {
                 atUnqualifiedNoParenthesesCall.moduleWithDependentsScope()
             } else {
-                atUnqualifiedNoParenthesesCall.followingSiblingsSearchScope()
+                atUnqualifiedNoParenthesesCall.selfAndFollowingSiblingsSearchScope()
             }
 
     /**
