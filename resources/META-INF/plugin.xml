@@ -120,6 +120,7 @@
     <lang.findUsagesProvider language="Elixir" implementationClass="org.elixir_lang.FindUsagesProvider"/>
     <readWriteAccessDetector implementation="org.elixir_lang.ReadWriteAccessDetector"/>
     <targetElementEvaluator implementationClass="org.elixir_lang.TargetElementEvaluator" language="Elixir"/>
+    <usageTypeProvider implementation="org.elixir_lang.UsageTypeProvider"/>
 
     <!-- folding -->
     <applicationService serviceInterface="org.elixir_lang.folding.ElixirFoldingSettings"
