@@ -2,13 +2,11 @@ package org.elixir_lang.psi.impl.declarations
 
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
+import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.search.LocalSearchScope
 import com.intellij.psi.search.SearchScope
 import org.elixir_lang.errorreport.Logger
-import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
-import org.elixir_lang.psi.ElixirAnonymousFunction
-import org.elixir_lang.psi.ElixirStabOperation
-import org.elixir_lang.psi.UnqualifiedNoArgumentsCall
+import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.*
 import org.elixir_lang.psi.call.name.Module.KERNEL
@@ -31,7 +29,10 @@ fun PsiElement.selfAndFollowingSiblingsSearchScope(): LocalSearchScope {
     var followingSibling: PsiElement? = previousSibling.nextSibling
 
     while (followingSibling != null) {
-        selfAndFollowingSiblingList.add(followingSibling)
+        // Does not exclude PsiComment as Search In Comments is an option
+        if (followingSibling !is ElixirEndOfExpression && followingSibling !is PsiWhiteSpace) {
+            selfAndFollowingSiblingList.add(followingSibling)
+        }
 
         previousSibling = followingSibling
         followingSibling = previousSibling.nextSibling
