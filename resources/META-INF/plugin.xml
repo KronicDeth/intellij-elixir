@@ -118,6 +118,7 @@
     <lang.braceMatcher language="Elixir" implementationClass="org.elixir_lang.code_insight.highlighting.brace_matcher.NonTrivial"/>
     <lang.commenter language="Elixir" implementationClass="org.elixir_lang.ElixirCommenter"/>
     <lang.findUsagesProvider language="Elixir" implementationClass="org.elixir_lang.FindUsagesProvider"/>
+    <readWriteAccessDetector implementation="org.elixir_lang.ReadWriteAccessDetector"/>
     <targetElementEvaluator implementationClass="org.elixir_lang.TargetElementEvaluator" language="Elixir"/>
 
     <!-- folding -->
