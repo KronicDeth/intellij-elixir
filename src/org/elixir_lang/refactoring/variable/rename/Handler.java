@@ -27,7 +27,7 @@ public class Handler extends VariableInplaceRenameHandler {
 
     static boolean isAvailable(PsiElement element) {
         return element instanceof Call &&
-                Callable.isVariable((Call) element);
+                Callable.Companion.isVariable((Call) element);
     }
 
     /*

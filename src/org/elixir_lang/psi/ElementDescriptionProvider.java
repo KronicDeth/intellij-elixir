@@ -214,16 +214,16 @@ public class ElementDescriptionProvider implements com.intellij.psi.ElementDescr
             elementDescription = Use.elementDescription(call, location);
         } else if (call instanceof AtUnqualifiedNoParenthesesCall) {
             elementDescription = getElementDescription((AtUnqualifiedNoParenthesesCall) call, location);
-        } else if (Callable.isBitStreamSegmentOption(call)) {
-            elementDescription = Callable.bitStringSegmentOptionElementDescription(call, location);
-        } else if (Callable.isIgnored(call)) {
-            elementDescription = Callable.ignoredElementDescription(call, location);
-        } else if (Callable.isParameter(call)) {
-            elementDescription = Callable.parameterElementDescription(call, location);
-        } else if (Callable.isParameterWithDefault(call)) {
-            elementDescription = Callable.parameterWithDefaultElementDescription(call, location);
-        } else if (Callable.isVariable(call)) {
-            elementDescription = Callable.variableElementDescription(call, location);
+        } else if (Callable.Companion.isBitStreamSegmentOption(call)) {
+            elementDescription = Callable.Companion.bitStringSegmentOptionElementDescription(call, location);
+        } else if (Callable.Companion.isIgnored(call)) {
+            elementDescription = Callable.Companion.ignoredElementDescription(location);
+        } else if (Callable.Companion.isParameter(call)) {
+            elementDescription = Callable.Companion.parameterElementDescription(call, location);
+        } else if (Callable.Companion.isParameterWithDefault(call)) {
+            elementDescription = Callable.Companion.parameterWithDefaultElementDescription(location);
+        } else if (Callable.Companion.isVariable(call)) {
+            elementDescription = Callable.Companion.variableElementDescription(call, location);
         } else {
             if (location == UsageViewTypeLocation.INSTANCE) {
                 elementDescription = "call";

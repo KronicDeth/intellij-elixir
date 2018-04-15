@@ -21,7 +21,7 @@ public class Variants extends Variable {
      * Static Methods
      */
 
-    @Nullable
+    @NotNull
     public static List<LookupElement> lookupElementList(@NotNull PsiElement entrance) {
         Variants variants = new Variants();
         PsiTreeUtil.treeWalkUp(

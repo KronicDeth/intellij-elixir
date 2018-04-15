@@ -82,7 +82,7 @@ class Variants : CallDefinitionClause() {
         private val ENTRANCE_CALL_DEFINITION_CLAUSE = Key<Call>("ENTRANCE_CALL_DEFINITION_CLAUSE")
 
         @JvmStatic
-        fun lookupElementList(entrance: Call): List<LookupElement>? {
+        fun lookupElementList(entrance: Call): List<LookupElement> {
             val variants = Variants()
 
             val parameter = Parameter.putParameterized(Parameter(entrance))

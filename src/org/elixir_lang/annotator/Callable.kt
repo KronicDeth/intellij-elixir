@@ -16,8 +16,8 @@ import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.call.name.Module.KERNEL_SPECIAL_FORMS
-import org.elixir_lang.reference.Callable.BIT_STRING_TYPES
-import org.elixir_lang.reference.Callable.isBitStreamSegmentOption
+import org.elixir_lang.reference.Callable.Companion.BIT_STRING_TYPES
+import org.elixir_lang.reference.Callable.Companion.isBitStreamSegmentOption
 import org.elixir_lang.structure_view.element.CallDefinitionClause
 import java.util.*
 

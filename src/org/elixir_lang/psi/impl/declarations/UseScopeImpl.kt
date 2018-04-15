@@ -14,7 +14,11 @@ import org.elixir_lang.psi.impl.call.CallImpl.hasDoBlockOrKeyword
 import org.elixir_lang.psi.impl.call.macroDefinitionClauseForArgument
 import org.elixir_lang.psi.impl.moduleWithDependentsScope
 import org.elixir_lang.psi.stub.type.call.Stub.isModular
-import org.elixir_lang.reference.Callable.*
+import org.elixir_lang.reference.Callable.Companion.isBitStreamSegmentOption
+import org.elixir_lang.reference.Callable.Companion.isParameter
+import org.elixir_lang.reference.Callable.Companion.isParameterWithDefault
+import org.elixir_lang.reference.Callable.Companion.isVariable
+import org.elixir_lang.reference.Callable.Companion.variableUseScope
 import org.elixir_lang.reference.ModuleAttribute.isNonReferencing
 import org.elixir_lang.structure_view.element.CallDefinitionClause
 import org.elixir_lang.structure_view.element.Delegation

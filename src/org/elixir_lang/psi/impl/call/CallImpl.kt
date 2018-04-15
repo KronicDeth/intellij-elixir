@@ -25,7 +25,7 @@ import org.elixir_lang.psi.qualification.Qualified
 import org.elixir_lang.psi.qualification.Unqualified
 import org.elixir_lang.psi.stub.call.Stub
 import org.elixir_lang.reference.Callable
-import org.elixir_lang.reference.Callable.isBitStreamSegmentOption
+import org.elixir_lang.reference.Callable.Companion.isBitStreamSegmentOption
 import org.elixir_lang.structure_view.element.CallDefinitionClause
 import org.elixir_lang.structure_view.element.modular.Implementation
 import org.elixir_lang.structure_view.element.modular.Module
