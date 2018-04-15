@@ -1,4 +1,4 @@
-package org.elixir_lang
+package org.elixir_lang.find_usages
 
 import com.intellij.find.FindManager
 import com.intellij.find.impl.HelpID
@@ -10,6 +10,8 @@ import com.intellij.psi.tree.TokenSet
 import com.intellij.usageView.UsageViewLongNameLocation
 import com.intellij.usageView.UsageViewNodeTextLocation
 import com.intellij.usageView.UsageViewTypeLocation
+import org.elixir_lang.ElixirLexer
+import org.elixir_lang.ElixirParserDefinition
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.ElixirTypes.*
 import org.elixir_lang.psi.MaybeModuleName
@@ -36,7 +38,7 @@ private val IDENTIFIER_TOKEN_SET = TokenSet.create(
         UNARY_OPERATOR
 )
 
-class FindUsagesProvider : com.intellij.lang.findUsages.FindUsagesProvider {
+class Provider : com.intellij.lang.findUsages.FindUsagesProvider {
     /**
      * Gets the word scanner for building a word index for the specified language.
      * Note that the implementation MUST be thread-safe, otherwise you should return a new instance of your scanner

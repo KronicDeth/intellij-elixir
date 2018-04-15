@@ -9,6 +9,7 @@ import com.intellij.usageView.UsageViewTypeLocation;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.Visibility;
 import org.elixir_lang.errorreport.Logger;
+import org.elixir_lang.find_usages.Provider;
 import org.elixir_lang.navigation.item_presentation.NameArity;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.structure_view.element.modular.*;
@@ -42,7 +43,7 @@ public class CallDefinitionClause extends Element<Call> implements Presentable, 
      */
 
     /**
-     * Description of element used in {@link org.elixir_lang.FindUsagesProvider}.
+     * Description of element used in {@link Provider}.
      *
      * @param call a {@link Call} that has already been checked with {@link #is(Call)}
      * @param location where the description will be used

@@ -6,6 +6,7 @@ import com.intellij.usageView.UsageViewLongNameLocation;
 import com.intellij.usageView.UsageViewShortNameLocation;
 import com.intellij.usageView.UsageViewTypeLocation;
 import org.elixir_lang.annotator.Parameter;
+import org.elixir_lang.find_usages.Provider;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.reference.Callable;
 import org.elixir_lang.structure_view.element.*;
@@ -22,12 +23,12 @@ import static org.elixir_lang.psi.impl.QuotableKeywordPairImplKt.hasKeywordKey;
 import static org.elixir_lang.reference.module.ResolvableName.resolvableName;
 
 /**
- * Dual to {@link org.elixir_lang.FindUsagesProvider}, where instead of each location being a separate method, they
+ * Dual to {@link Provider}, where instead of each location being a separate method, they
  * are all one method, which means the same code can be used to detect the type of an element and then group all the
- * text ({@link org.elixir_lang.FindUsagesProvider#getDescriptiveName(PsiElement)},
- * {@link org.elixir_lang.FindUsagesProvider#getHelpId(PsiElement)},
- * {@link org.elixir_lang.FindUsagesProvider#getNodeText(PsiElement, boolean)}
- * {@link org.elixir_lang.FindUsagesProvider#getType(PsiElement)}) together together.
+ * text ({@link Provider#getDescriptiveName(PsiElement)},
+ * {@link Provider#getHelpId(PsiElement)},
+ * {@link Provider#getNodeText(PsiElement, boolean)}
+ * {@link Provider#getType(PsiElement)}) together together.
  */
 public class ElementDescriptionProvider implements com.intellij.psi.ElementDescriptionProvider {
     public static final String VARIABLE_USAGE_VIEW_TYPE_LOCATION_ELEMENT_DESCRIPTION = "variable";

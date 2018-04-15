@@ -117,9 +117,13 @@
     <gotoSymbolContributor implementation="org.elixir_lang.navigation.GotoSymbolContributor"/>
     <lang.braceMatcher language="Elixir" implementationClass="org.elixir_lang.code_insight.highlighting.brace_matcher.NonTrivial"/>
     <lang.commenter language="Elixir" implementationClass="org.elixir_lang.ElixirCommenter"/>
-    <lang.findUsagesProvider language="Elixir" implementationClass="org.elixir_lang.FindUsagesProvider"/>
+
+    <!-- Find Usages -->
+    <lang.findUsagesProvider language="Elixir" implementationClass="org.elixir_lang.find_usages.Provider"/>
     <readWriteAccessDetector implementation="org.elixir_lang.ReadWriteAccessDetector"/>
+    <usageTargetProvider implementation="org.elixir_lang.UsageTargetProvider" />
     <usageTypeProvider implementation="org.elixir_lang.UsageTypeProvider"/>
+    <findUsagesHandlerFactory implementation="org.elixir_lang.find_usages.handler.Factory" />
 
     <!-- folding -->
     <applicationService serviceInterface="org.elixir_lang.folding.ElixirFoldingSettings"
