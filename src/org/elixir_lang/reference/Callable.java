@@ -4,6 +4,8 @@ import com.google.common.collect.Sets;
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElement;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.resolve.ResolveCache;
@@ -33,7 +35,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.elixir_lang.psi.ElementDescriptionProvider.VARIABLE_USAGE_VIEW_TYPE_LOCATION_ELEMENT_DESCRIPTION;
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.*;
+import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.DEFAULT_OPERATOR;
 import static org.elixir_lang.psi.impl.declarations.UseScopeImpl.selector;
 import static org.elixir_lang.psi.impl.declarations.UseScopeImplKt.selfAndFollowingSiblingsSearchScope;
 
@@ -196,7 +198,9 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
     public static boolean isBitStreamSegmentOption(@NotNull PsiElement element) {
         boolean isBitStreamSegmentOption = false;
 
-        Type type = PsiTreeUtil.getContextOfType(element, Type.class);
+        Type type = ApplicationManager.getApplication().runReadAction((Computable<Type>) () ->
+                PsiTreeUtil.getContextOfType(element, Type.class)
+        );
 
         if (type != null) {
             PsiElement typeParent = type.getParent();
@@ -682,9 +686,18 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
     @NotNull
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
-        return ResolveCache
-                .getInstance(this.myElement.getProject())
-                .resolveWithCaching(this, org.elixir_lang.reference.resolver.Callable.INSTANCE, false, incompleteCode);
+        /* Needs to be wrapped in a ReadAction for Find Usage of call definition clauses when the potential usage is a
+           Call as the Find Usage isn't executed in an overall ReadAction, which is checked by resolveWithCaching */
+        return ApplicationManager.getApplication().runReadAction((Computable<ResolveResult[]>) () ->
+                ResolveCache
+                        .getInstance(Callable.this.myElement.getProject())
+                        .resolveWithCaching(
+                                Callable.this,
+                                org.elixir_lang.reference.resolver.Callable.INSTANCE,
+                                false,
+                                incompleteCode
+                        )
+        );
     }
 
     /**
