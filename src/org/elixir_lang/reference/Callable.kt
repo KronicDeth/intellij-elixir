@@ -87,6 +87,13 @@ class Callable : PsiReferenceBase<Call>, PsiPolyVariantReference {
             emptyArray()
         }
 
+    override fun isReferenceTo(maybeElement: PsiElement?): Boolean =
+        maybeElement?.let { element ->
+            multiResolve(false).any {
+                it.isValidResult && element.manager.areElementsEquivalent(it.element, element)
+            }
+        } ?: false
+
     /**
      * Returns the results of resolving the reference.
      *
