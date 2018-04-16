@@ -4,6 +4,7 @@ import com.intellij.find.findUsages.PsiElement2UsageTargetAdapter
 import com.intellij.psi.PsiElement
 import com.intellij.usages.UsageTarget
 import com.intellij.usages.impl.rules.UsageType
+import org.elixir_lang.annotator.Parameter
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.reference.Callable
 import org.elixir_lang.structure_view.element.CallDefinitionClause
@@ -57,9 +58,16 @@ class UsageTypeProvider : com.intellij.usages.impl.rules.UsageTypeProviderEx {
             CallDefinitionClause.isMacro(call) -> MACRO_CALL
             else -> {
                 val targetsUsageType = getUsageType(targets)
+                val parameter = Parameter(call).let { Parameter.putParameterized(it) }
 
-                if (targets.anyEquivalentElement(call)) {
-                    targetsUsageType
+                if (parameter.isCallDefinitionClauseName) {
+                     val parameterized = parameter.parameterized
+
+                    if (parameterized != null && targets.anyEquivalentElement(parameterized)) {
+                        targetsUsageType
+                    } else {
+                        CALL_DEFINITION_CLAUSE
+                    }
                 } else {
                     when (targetsUsageType) {
                         CALL_DEFINITION_CLAUSE -> CALL
