@@ -47,6 +47,7 @@ public interface ElixirUnmatchedUnqualifiedParenthesesCall extends ElixirUnmatch
   @Nullable
   String getName();
 
+  @Nullable
   PsiElement getNameIdentifier();
 
   @NotNull
@@ -63,13 +64,13 @@ public interface ElixirUnmatchedUnqualifiedParenthesesCall extends ElixirUnmatch
   //matching getUseScope(ElixirUnmatchedUnqualifiedParenthesesCall, ...)
   //methods are not found in ElixirPsiImplUtil
 
-  boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName);
+  boolean isCalling(String resolvedModuleName, String functionName);
 
-  boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity);
+  boolean isCalling(String resolvedModuleName, String functionName, int resolvedFinalArity);
 
-  boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName);
+  boolean isCallingMacro(String resolvedModuleName, String functionName);
 
-  boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity);
+  boolean isCallingMacro(String resolvedModuleName, String functionName, int resolvedFinalArity);
 
   @Nullable
   String moduleName();
@@ -85,7 +86,6 @@ public interface ElixirUnmatchedUnqualifiedParenthesesCall extends ElixirUnmatch
   @NotNull
   OtpErlangObject quote();
 
-  @NotNull
   int resolvedFinalArity();
 
   @NotNull

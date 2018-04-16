@@ -35,6 +35,7 @@ public interface ElixirInterpolatedStringSigilHeredoc extends StringFragmented, 
 
   IElementType getFragmentType();
 
+  @NotNull
   List<HeredocLine> getHeredocLineList();
 
   @NotNull

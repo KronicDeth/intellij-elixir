@@ -11,7 +11,6 @@ public interface ElixirBinaryWholeNumber extends WholeNumber {
   @NotNull
   List<ElixirBinaryDigits> getBinaryDigitsList();
 
-  @NotNull
   int base();
 
   @NotNull

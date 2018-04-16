@@ -23,6 +23,7 @@ public interface ElixirNoParenthesesKeywordPair extends QuotableKeywordPair {
   //matching getKeywordKey(ElixirNoParenthesesKeywordPair, ...)
   //methods are not found in ElixirPsiImplUtil
 
+  @NotNull
   Quotable getKeywordValue();
 
   @NotNull

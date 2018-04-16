@@ -25,7 +25,6 @@ public class ElixirBinaryDigitsImpl extends ASTWrapperPsiElement implements Elix
     else super.accept(visitor);
   }
 
-  @NotNull
   public int base() {
     return ElixirPsiImplUtil.base(this);
   }

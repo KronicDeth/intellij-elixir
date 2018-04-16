@@ -7,7 +7,6 @@ import org.jetbrains.annotations.NotNull;
 
 public interface ElixirDecimalDigits extends Digits {
 
-  @NotNull
   int base();
 
   boolean inBase();

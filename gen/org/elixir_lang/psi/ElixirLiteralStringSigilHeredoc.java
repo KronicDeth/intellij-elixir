@@ -35,6 +35,7 @@ public interface ElixirLiteralStringSigilHeredoc extends StringFragmented, Liter
 
   IElementType getFragmentType();
 
+  @NotNull
   List<HeredocLine> getHeredocLineList();
 
   @NotNull

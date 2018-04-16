@@ -35,6 +35,7 @@ public interface ElixirInterpolatedWordsHeredoc extends WordsFragmented, Interpo
 
   IElementType getFragmentType();
 
+  @NotNull
   List<HeredocLine> getHeredocLineList();
 
   @NotNull

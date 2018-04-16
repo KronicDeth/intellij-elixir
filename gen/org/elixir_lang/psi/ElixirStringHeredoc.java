@@ -32,6 +32,7 @@ public interface ElixirStringHeredoc extends Heredoc, InterpolatedString {
 
   IElementType getFragmentType();
 
+  @NotNull
   List<HeredocLine> getHeredocLineList();
 
   @NotNull

@@ -35,6 +35,7 @@ public interface ElixirLiteralCharListSigilHeredoc extends CharListFragmented, L
 
   IElementType getFragmentType();
 
+  @NotNull
   List<HeredocLine> getHeredocLineList();
 
   @NotNull

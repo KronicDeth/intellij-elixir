@@ -43,13 +43,13 @@ public interface ElixirMatchedNotInOperation extends ElixirMatchedExpression, Ca
 
   boolean hasDoBlockOrKeyword();
 
-  boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName);
+  boolean isCalling(String resolvedModuleName, String functionName);
 
-  boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity);
+  boolean isCalling(String resolvedModuleName, String functionName, int resolvedFinalArity);
 
-  boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName);
+  boolean isCallingMacro(String resolvedModuleName, String functionName);
 
-  boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity);
+  boolean isCallingMacro(String resolvedModuleName, String functionName, int resolvedFinalArity);
 
   @Nullable
   Quotable leftOperand();
@@ -72,7 +72,6 @@ public interface ElixirMatchedNotInOperation extends ElixirMatchedExpression, Ca
   @NotNull
   OtpErlangObject quote();
 
-  @NotNull
   int resolvedFinalArity();
 
   @NotNull

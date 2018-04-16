@@ -25,7 +25,6 @@ public class ElixirHexadecimalDigitsImpl extends ASTWrapperPsiElement implements
     else super.accept(visitor);
   }
 
-  @NotNull
   public int base() {
     return ElixirPsiImplUtil.base(this);
   }

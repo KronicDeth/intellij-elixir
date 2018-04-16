@@ -11,7 +11,7 @@ public interface ElixirVariable extends NamedElement, Quotable {
   @Nullable
   String getName();
 
-  @Nullable
+  @NotNull
   PsiElement getNameIdentifier();
 
   @NotNull

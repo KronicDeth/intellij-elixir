@@ -27,7 +27,7 @@ public interface ElixirCharListLine extends Atomable, InterpolatedCharList, Line
   @NotNull
   List<Integer> addHexadecimalEscapeSequenceCodePoints(List<Integer> codePointList, ASTNode node);
 
-  @NotNull
+  @Nullable
   Body getBody();
 
   IElementType getFragmentType();

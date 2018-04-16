@@ -35,6 +35,7 @@ public interface ElixirLiteralSigilHeredoc extends SigilFragmented, LiteralSigil
 
   IElementType getFragmentType();
 
+  @NotNull
   List<HeredocLine> getHeredocLineList();
 
   @NotNull

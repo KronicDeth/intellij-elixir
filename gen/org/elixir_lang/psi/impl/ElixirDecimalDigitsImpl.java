@@ -25,7 +25,6 @@ public class ElixirDecimalDigitsImpl extends ASTWrapperPsiElement implements Eli
     else super.accept(visitor);
   }
 
-  @NotNull
   public int base() {
     return ElixirPsiImplUtil.base(this);
   }

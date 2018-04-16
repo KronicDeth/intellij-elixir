@@ -35,6 +35,7 @@ public interface ElixirLiteralRegexHeredoc extends RegexFragmented, LiteralSigil
 
   IElementType getFragmentType();
 
+  @NotNull
   List<HeredocLine> getHeredocLineList();
 
   @NotNull

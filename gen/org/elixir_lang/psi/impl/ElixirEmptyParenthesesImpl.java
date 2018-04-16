@@ -24,6 +24,7 @@ public class ElixirEmptyParenthesesImpl extends ASTWrapperPsiElement implements 
     else super.accept(visitor);
   }
 
+  @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }

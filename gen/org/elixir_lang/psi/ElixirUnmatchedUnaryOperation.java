@@ -27,17 +27,18 @@ public interface ElixirUnmatchedUnaryOperation extends ElixirUnmatchedExpression
   @Nullable
   String getName();
 
+  @Nullable
   PsiElement getNameIdentifier();
 
   boolean hasDoBlockOrKeyword();
 
-  boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName);
+  boolean isCalling(String resolvedModuleName, String functionName);
 
-  boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity);
+  boolean isCalling(String resolvedModuleName, String functionName, int resolvedFinalArity);
 
-  boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName);
+  boolean isCallingMacro(String resolvedModuleName, String functionName);
 
-  boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity);
+  boolean isCallingMacro(String resolvedModuleName, String functionName, int resolvedFinalArity);
 
   @Nullable
   String moduleName();
@@ -63,7 +64,6 @@ public interface ElixirUnmatchedUnaryOperation extends ElixirUnmatchedExpression
   @Nullable
   Integer secondaryArity();
 
-  @NotNull
   int resolvedFinalArity();
 
   @NotNull

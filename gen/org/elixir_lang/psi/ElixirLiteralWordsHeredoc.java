@@ -35,6 +35,7 @@ public interface ElixirLiteralWordsHeredoc extends WordsFragmented, LiteralSigil
 
   IElementType getFragmentType();
 
+  @NotNull
   List<HeredocLine> getHeredocLineList();
 
   @NotNull

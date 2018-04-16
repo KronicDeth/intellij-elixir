@@ -11,7 +11,6 @@ public interface ElixirOctalWholeNumber extends WholeNumber {
   @NotNull
   List<ElixirOctalDigits> getOctalDigitsList();
 
-  @NotNull
   int base();
 
   @NotNull

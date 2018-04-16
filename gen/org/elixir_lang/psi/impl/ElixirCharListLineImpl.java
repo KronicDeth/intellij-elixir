@@ -58,7 +58,7 @@ public class ElixirCharListLineImpl extends ASTWrapperPsiElement implements Elix
     return ElixirPsiImplUtil.addHexadecimalEscapeSequenceCodePoints(this, codePointList, node);
   }
 
-  @NotNull
+  @Nullable
   public Body getBody() {
     return ElixirPsiImplUtil.getBody(this);
   }

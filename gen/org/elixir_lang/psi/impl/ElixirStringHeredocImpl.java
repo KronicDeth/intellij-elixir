@@ -65,6 +65,7 @@ public class ElixirStringHeredocImpl extends ASTWrapperPsiElement implements Eli
     return ElixirPsiImplUtil.getFragmentType(this);
   }
 
+  @NotNull
   public List<HeredocLine> getHeredocLineList() {
     return ElixirPsiImplUtil.getHeredocLineList(this);
   }
