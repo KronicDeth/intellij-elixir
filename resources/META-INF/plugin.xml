@@ -121,7 +121,6 @@
     <!-- Find Usages -->
     <lang.findUsagesProvider language="Elixir" implementationClass="org.elixir_lang.find_usages.Provider"/>
     <readWriteAccessDetector implementation="org.elixir_lang.ReadWriteAccessDetector"/>
-    <usageTargetProvider implementation="org.elixir_lang.UsageTargetProvider" />
     <usageTypeProvider implementation="org.elixir_lang.UsageTypeProvider"/>
     <findUsagesHandlerFactory implementation="org.elixir_lang.find_usages.handler.Factory" />
 
