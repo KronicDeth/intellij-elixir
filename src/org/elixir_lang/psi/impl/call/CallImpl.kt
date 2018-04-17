@@ -27,9 +27,6 @@ import org.elixir_lang.psi.stub.call.Stub
 import org.elixir_lang.reference.Callable
 import org.elixir_lang.reference.Callable.Companion.isBitStreamSegmentOption
 import org.elixir_lang.structure_view.element.CallDefinitionClause
-import org.elixir_lang.structure_view.element.modular.Implementation
-import org.elixir_lang.structure_view.element.modular.Module
-import org.elixir_lang.structure_view.element.modular.Protocol
 import org.jetbrains.annotations.Contract
 import java.util.*
 import org.elixir_lang.psi.impl.macroChildCallList as psiElementToMacroChildCallList
@@ -71,7 +68,7 @@ fun Call.computeReference(): PsiReference? {
         }
 
         if (reference == null) {
-            reference = if (CallDefinitionClause.`is`(this) || Implementation.`is`(this) || Module.`is`(this) || Protocol.`is`(this)) {
+            reference = if (Callable.isDefiner(this)) {
                 Callable.definer(this)
             } else {
                 Callable(this)

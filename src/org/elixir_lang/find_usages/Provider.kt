@@ -16,6 +16,7 @@ import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.ElixirTypes.*
 import org.elixir_lang.psi.MaybeModuleName
 import org.elixir_lang.psi.call.Call
+import org.elixir_lang.reference.Callable
 
 private val IDENTIFIER_TOKEN_SET = TokenSet.create(
         ALIAS_TOKEN,
@@ -63,7 +64,10 @@ class Provider : com.intellij.lang.findUsages.FindUsagesProvider {
      */
     override fun canFindUsagesFor(psiElement: PsiElement): Boolean =
             when (psiElement) {
-                is Call -> true
+                is Call ->
+                    /* On a definer, the position of the caret is important to determine whether the thing being defined
+                       or the definer macro's usage should be found */
+                    !Callable.isDefiner(psiElement)
                 is MaybeModuleName -> psiElement.isModuleName
                 else -> false
             }
