@@ -4,10 +4,15 @@ import com.intellij.psi.PsiElement
 import com.intellij.util.Function
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.Named
+import org.elixir_lang.psi.impl.call.macroChildCallSequence
 import org.elixir_lang.psi.impl.call.macroChildCalls
 import org.elixir_lang.structure_view.element.CallDefinitionClause
 
 object Modular {
+    @JvmStatic
+    fun callDefinitionClauseCallSequence(modular: Call): Sequence<Call> =
+            modular.macroChildCallSequence().filter { CallDefinitionClause.`is`(it) }
+
     @JvmStatic
     fun callDefinitionClauseCallWhile(modular: Call, function: (Call) -> Boolean): Boolean {
         val childCalls = modular.macroChildCalls()

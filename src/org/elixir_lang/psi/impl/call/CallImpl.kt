@@ -194,6 +194,8 @@ fun Call.macroChildCallList(): List<Call> {
     return childCallList
 }
 
+fun Call.macroChildCallSequence(): Sequence<Call> = this.macroChildCallList().asSequence()
+
 @Contract(pure = true)
 fun Call.macroDefinitionClauseForArgument(): Call? {
     var macroDefinitionClause: Call? = null
