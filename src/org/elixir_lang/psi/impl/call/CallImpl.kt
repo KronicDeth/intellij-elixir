@@ -680,3 +680,4 @@ object CallImpl {
      */
     private fun PsiElement.isPipe(): Boolean = (this as? Arrow)?.isPipe() ?: false
 }
+

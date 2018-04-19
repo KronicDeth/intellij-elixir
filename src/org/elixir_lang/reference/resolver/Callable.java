@@ -1,6 +1,5 @@
 package org.elixir_lang.reference.resolver;
 
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementResolveResult;
 import com.intellij.psi.ResolveResult;
 import com.intellij.psi.impl.source.resolve.ResolveCache;
@@ -35,13 +34,10 @@ public class Callable implements ResolveCache.PolyVariantResolver<org.elixir_lan
                         modular,
                         element.functionName(),
                         resolvedFinalArity,
-                        new com.intellij.util.Function<PsiElement, Boolean>() {
-                            @Override
-                            public Boolean fun(PsiElement nameIdentifier) {
-                                resolveResultList.add(new PsiElementResolveResult(nameIdentifier, true));
+                        nameIdentifier -> {
+                            resolveResultList.add(new PsiElementResolveResult(nameIdentifier, true));
 
-                                return true;
-                            }
+                            return true;
                         }
                 );
             }

@@ -75,15 +75,7 @@ public class Import {
         if (modularCall != null) {
             final Function<Call, Boolean> optionsFilter = callDefinitionClauseCallFilter(importCall);
 
-            Modular.callDefinitionClauseCallWhile(
-                    modularCall,
-                    new Function<Call, Boolean>() {
-                        @Override
-                        public Boolean fun(Call call) {
-                            return !optionsFilter.fun(call) || function.fun(call);
-                        }
-                    }
-            );
+            Modular.callDefinitionClauseCallWhile(modularCall, call -> !optionsFilter.fun(call) || function.fun(call));
         }
     }
 
