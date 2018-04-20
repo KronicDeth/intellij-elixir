@@ -1,4 +1,4 @@
-package org.elixir_lang.find_usages
+package org.elixir_lang.find_usages.handler
 
 import com.intellij.find.findUsages.FindUsagesHandler
 import com.intellij.psi.PsiElement
@@ -10,7 +10,7 @@ import org.elixir_lang.psi.call.Call
 import org.elixir_lang.structure_view.element.CallDefinitionClause.enclosingModularMacroCall
 import org.elixir_lang.structure_view.element.CallDefinitionClause.nameArityRange
 
-class Handler(psiElement: PsiElement) : FindUsagesHandler(psiElement) {
+class Call(call: Call) : FindUsagesHandler(call) {
     private val _primaryElements by lazy {
         super
                 .getPrimaryElements()
