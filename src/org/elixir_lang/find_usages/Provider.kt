@@ -15,7 +15,9 @@ import org.elixir_lang.ElixirParserDefinition
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.ElixirTypes.*
 import org.elixir_lang.psi.MaybeModuleName
+import org.elixir_lang.psi.QualifiableAlias
 import org.elixir_lang.psi.call.Call
+import org.elixir_lang.psi.impl.isOutermostQualifiableAlias
 import org.elixir_lang.reference.Callable
 
 private val IDENTIFIER_TOKEN_SET = TokenSet.create(
@@ -68,7 +70,7 @@ class Provider : com.intellij.lang.findUsages.FindUsagesProvider {
                     /* On a definer, the position of the caret is important to determine whether the thing being defined
                        or the definer macro's usage should be found */
                     !Callable.isDefiner(psiElement)
-                is MaybeModuleName -> psiElement.isModuleName
+                is QualifiableAlias -> psiElement.isOutermostQualifiableAlias()
                 else -> false
             }
 

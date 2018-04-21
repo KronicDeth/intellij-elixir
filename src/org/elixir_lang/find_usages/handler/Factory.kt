@@ -9,6 +9,7 @@ class Factory : com.intellij.find.findUsages.FindUsagesHandlerFactory() {
     override fun createFindUsagesHandler(element: PsiElement, forHighlightUsages: Boolean): FindUsagesHandler =
             when (element) {
                 is org.elixir_lang.psi.call.Call -> Call(element)
+                is org.elixir_lang.psi.QualifiableAlias -> QualifiableAlias(element)
                 else -> throw IllegalArgumentException("Cannot create FindUsageHandler for ${element.javaClass.canonicalName}")
             }
 

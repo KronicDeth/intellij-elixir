@@ -2,9 +2,8 @@ package org.elixir_lang.find_usages.handler
 
 import com.intellij.find.findUsages.FindUsagesHandler
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiPolyVariantReference
-import com.intellij.psi.PsiReference
 import org.apache.commons.lang.math.Range
+import org.elixir_lang.find_usages.toPsiElementList
 import org.elixir_lang.psi.Modular
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.structure_view.element.CallDefinitionClause.enclosingModularMacroCall
@@ -89,15 +88,3 @@ private fun Iterable<CallNameArityRange>.withEnclosingModularMacroCall(): Iterab
 
 private fun Iterable<EnclosingCallEnclosedCallNameArityRange>.toSecondaryElements(): List<PsiElement> =
         this.flatMap { it.toSecondaryElements() }
-
-private fun PsiPolyVariantReference.toPsiElementList(): List<PsiElement> =
-        multiResolve(true)
-                .filter { it.isValidResult }
-                .mapNotNull { it.element }
-
-private fun PsiReference.toPsiElementList(): List<PsiElement> =
-        if (this is PsiPolyVariantReference) {
-            this.toPsiElementList()
-        } else {
-            resolve()?.let { listOf(it) } ?: emptyList()
-        }
