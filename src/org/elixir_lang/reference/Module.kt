@@ -15,6 +15,14 @@ class Module(qualifiableAlias: QualifiableAlias, val maxScope: PsiElement) :
         PsiPolyVariantReference {
     override fun getVariants(): Array<LookupElement> = Variants.lookupElementList(myElement).toTypedArray()
 
+    override fun isReferenceTo(element: PsiElement): Boolean {
+        val manager = this.element.manager
+
+        return multiResolve(false).any {
+            it.isValidResult && manager.areElementsEquivalent(it.element, element)
+        }
+    }
+
     override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> =
             ResolveCache
                     .getInstance(this.myElement.project)
