@@ -42,7 +42,7 @@ public class Module implements ResolveCache.PolyVariantResolver<org.elixir_lang.
         final String name = resolvableName(element);
 
         if (name != null) {
-            resolveResultList = MultiResolve.resolveResultList(name, incompleteCode, element, module.maxScope);
+            resolveResultList = MultiResolve.resolveResultList(name, incompleteCode, element, module.getMaxScope());
 
             if (resolveResultList == null || resolveResultList.isEmpty()) {
                 resolveResultList = multiResolveProject(
