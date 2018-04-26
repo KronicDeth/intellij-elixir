@@ -118,7 +118,7 @@
   /* infix operations that work as name identifier owner calls - specifically support getNameIdentifier so they can
      return their operator, so it is easy to use a different operator when making customer operators like in Bitwise or
      the free arrow operators */
-  implements(        "(un)?matched(Comparison|Multiplication|Relational)Operation")=[
+  implements(        "(un)?matched(Comparison|Relational)Operation")=[
     "org.elixir_lang.psi.call.Named"
     "org.elixir_lang.psi.operation.Infix"
   ]
@@ -178,6 +178,12 @@
   ]
   // methods set by infix operations above
 
+  implements("(un)?matchedMultiplicationOperation")=[
+    "org.elixir_lang.psi.call.Named"
+    "org.elixir_lang.psi.operation.Multiplication"
+  ]
+  // methods set by infix operations above
+
   implements("(un)?matchedOrOperation")=[
     "org.elixir_lang.psi.call.Named"
     "org.elixir_lang.psi.operation.Or"
@@ -219,11 +225,11 @@
    *
    * Have names (their operators), but aren't stubbed because they don't define structures.
    */
-  implements(        "((at|capture|unary)Numeric|(un)?matchedCaptureNonNumeric)Operation")=[
+  implements(        "(at|capture|unary)NumericOperation")=[
     "org.elixir_lang.psi.call.Named"
     "org.elixir_lang.psi.operation.Prefix"
   ]
-  methods(           "((at|capture|unary)Numeric|(un)?matched((Capture|Unary)NonNumeric|Unary))Operation")=[
+  methods(           "((at|capture|unary)Numeric|(un)?matched(UnaryNonNumeric|Unary))Operation")=[
     functionName
     functionNameElement
     getDoBlock
@@ -258,6 +264,37 @@
     operand
     operator
     quote
+  ]
+
+  // captureNonNumeric operations
+  implements(        "(un)?matchedCaptureNonNumericOperation")=[
+    "org.elixir_lang.psi.call.Named"
+    "org.elixir_lang.psi.operation.capture.NonNumeric"
+  ]
+  methods(           "(un)?matchedCaptureNonNumericOperation")=[
+    functionName
+    functionNameElement
+    getDoBlock
+    getName
+    getNameIdentifier
+    getReference
+    hasDoBlockOrKeyword
+    isCalling
+    isCallingMacro
+    moduleName
+    operand
+    operator
+    primaryArguments
+    primaryArity
+    quote
+    secondaryArguments
+    secondaryArity
+    resolvedFinalArity
+    resolvedFinalArityRange
+    resolvedModuleName
+    resolvedPrimaryArity
+    resolvedSecondaryArity
+    setName
   ]
 
   // unaryNonNumeric operations

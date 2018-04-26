@@ -5,9 +5,11 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.PsiReference;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.*;
+import org.elixir_lang.psi.operation.capture.NonNumeric;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -61,6 +63,11 @@ public class ElixirUnmatchedCaptureNonNumericOperationImpl extends ElixirUnmatch
   @Nullable
   public PsiElement getNameIdentifier() {
     return ElixirPsiImplUtil.getNameIdentifier(this);
+  }
+
+  @Nullable
+  public PsiReference getReference() {
+    return ElixirPsiImplUtil.getReference((NonNumeric) this);
   }
 
   public boolean hasDoBlockOrKeyword() {

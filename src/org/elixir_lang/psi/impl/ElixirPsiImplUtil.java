@@ -24,7 +24,9 @@ import org.elixir_lang.psi.impl.call.CallImpl;
 import org.elixir_lang.psi.impl.call.CallImplKt;
 import org.elixir_lang.psi.impl.call.CanonicallyNamedImpl;
 import org.elixir_lang.psi.impl.declarations.UseScopeImpl;
+import org.elixir_lang.psi.impl.operation.capture.NonNumericImplKt;
 import org.elixir_lang.psi.operation.*;
+import org.elixir_lang.psi.operation.capture.NonNumeric;
 import org.elixir_lang.psi.qualification.Qualified;
 import org.elixir_lang.psi.qualification.Unqualified;
 import org.elixir_lang.psi.stub.call.Stub;
@@ -1083,6 +1085,11 @@ public class ElixirPsiImplUtil {
     @Nullable
     public static PsiReference getReference(@NotNull ElixirAtom atom) {
         return ElixirAtomImplKt.getReference(atom);
+    }
+
+    @Nullable
+    public static PsiReference getReference(@NotNull NonNumeric nonNumeric) {
+        return NonNumericImplKt.getReference(nonNumeric);
     }
 
     @Nullable

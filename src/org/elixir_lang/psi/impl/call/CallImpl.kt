@@ -3,6 +3,7 @@ package org.elixir_lang.psi.impl.call
 import com.intellij.openapi.util.Computable
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
+import com.intellij.psi.tree.TokenSet
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
 import org.apache.commons.lang.math.IntRange
@@ -31,53 +32,76 @@ import org.jetbrains.annotations.Contract
 import java.util.*
 import org.elixir_lang.psi.impl.macroChildCallList as psiElementToMacroChildCallList
 
-fun Call.computeReference(): PsiReference? {
-    var reference: PsiReference? = null
-
+fun Call.computeReference(): PsiReference? =
     /* if the call is just the identifier for a module attribute reference, then don't return a Callable reference,
-           and instead let {@link #getReference(AtNonNumbericOperation) handle it */
+           and instead let {@link #getReference(AtNonNumericOperation) handle it */
     if (!(this is UnqualifiedNoArgumentsCall<*> && parent is AtNonNumericOperation) &&
             // if a bitstring segment option then the option is a pseudo-function
-            !isBitStreamSegmentOption(this)) {
+            !isBitStreamSegmentOption(this) && !this.isSlashInCaptureNameSlashArity()) {
         val parent = parent
 
-        if (parent is Type) {
-            val grandParent = parent.getParent()
-            var moduleAttribute: AtUnqualifiedNoParenthesesCall<*>? = null
-            var maybeArgument = grandParent
+        when {
+            parent is Type -> {
+                val grandParent = parent.parent
 
-            if (grandParent is When) {
-                maybeArgument = grandParent.getParent()
-            }
-
-            if (maybeArgument is ElixirNoParenthesesOneArgument) {
-                val maybeModuleAttribute = maybeArgument.getParent()
-
-                if (maybeModuleAttribute is AtUnqualifiedNoParenthesesCall<*>) {
-                    moduleAttribute = maybeModuleAttribute
+                val maybeArgument = if (grandParent is When) {
+                    grandParent.parent
+                } else {
+                    grandParent
                 }
 
-                if (moduleAttribute != null) {
-                    val name = moduleAttributeName(moduleAttribute)
+                (maybeArgument as? ElixirNoParenthesesOneArgument)?.let { argument ->
+                    (argument.parent as? AtUnqualifiedNoParenthesesCall<*>)?.let { moduleAttribute ->
+                        val name = moduleAttributeName(moduleAttribute)
 
-                    if (name == "@spec") {
-                        reference = org.elixir_lang.reference.CallDefinitionClause(this, moduleAttribute)
+                        if (name == "@spec") {
+                            org.elixir_lang.reference.CallDefinitionClause(this, moduleAttribute)
+                        } else {
+                            null
+                        }
                     }
-                }
+                }  ?: computeCallableReference()
             }
+            parent.isSlashInCaptureNameSlashArity() -> null
+            else -> computeCallableReference()
         }
-
-        if (reference == null) {
-            reference = if (Callable.isDefiner(this)) {
-                Callable.definer(this)
-            } else {
-                Callable(this)
-            }
-        }
+    } else {
+        null
     }
 
-    return reference
-}
+private fun PsiElement.isCaptureNonNumericOperation(): Boolean =
+        this is ElixirMatchedCaptureNonNumericOperation || this is ElixirUnmatchedCaptureNonNumericOperation
+
+private fun PsiElement.isSlashInCaptureNameSlashArity(): Boolean =
+        if (this is Infix &&
+                (this is ElixirMatchedMultiplicationOperation || this is ElixirUnmatchedMultiplicationOperation)) {
+            val operator = org.elixir_lang.psi.operation.Normalized.operator(this)
+            val divisionOperatorChildren = operator.node.getChildren(TokenSet.create(ElixirTypes.DIVISION_OPERATOR))
+
+            if (divisionOperatorChildren.isNotEmpty()) {
+                val rightOperand = org.elixir_lang.psi.operation.infix.Normalized.rightOperand(this)?.stripAccessExpression()
+
+                if (rightOperand is ElixirDecimalWholeNumber) {
+                    val parent = this.parent
+
+                    parent.isCaptureNonNumericOperation()
+                } else {
+                    false
+                }
+            } else {
+                false
+            }
+        } else {
+            false
+        }
+
+
+private fun Call.computeCallableReference(): PsiReference =
+        if (Callable.isDefiner(this)) {
+            Callable.definer(this)
+        } else {
+            Callable(this)
+        }
 
 /**
  * The outer most arguments

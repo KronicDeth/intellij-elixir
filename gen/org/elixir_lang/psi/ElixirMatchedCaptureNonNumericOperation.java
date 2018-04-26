@@ -3,13 +3,14 @@ package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiReference;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.call.Named;
-import org.elixir_lang.psi.operation.Prefix;
+import org.elixir_lang.psi.operation.capture.NonNumeric;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirMatchedCaptureNonNumericOperation extends ElixirMatchedExpression, Named, Prefix {
+public interface ElixirMatchedCaptureNonNumericOperation extends ElixirMatchedExpression, Named, NonNumeric {
 
   @NotNull
   ElixirCapturePrefixOperator getCapturePrefixOperator();
@@ -31,6 +32,9 @@ public interface ElixirMatchedCaptureNonNumericOperation extends ElixirMatchedEx
 
   @Nullable
   PsiElement getNameIdentifier();
+
+  @Nullable
+  PsiReference getReference();
 
   boolean hasDoBlockOrKeyword();
 

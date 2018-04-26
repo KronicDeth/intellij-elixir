@@ -7,13 +7,13 @@ import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.call.Named;
-import org.elixir_lang.psi.operation.Infix;
+import org.elixir_lang.psi.operation.Multiplication;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public interface ElixirMatchedMultiplicationOperation extends ElixirMatchedExpression, Named, Infix {
+public interface ElixirMatchedMultiplicationOperation extends ElixirMatchedExpression, Named, Multiplication {
 
   @NotNull
   List<ElixirMatchedExpression> getMatchedExpressionList();

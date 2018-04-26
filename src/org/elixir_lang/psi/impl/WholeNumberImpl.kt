@@ -2,7 +2,21 @@ package org.elixir_lang.psi.impl
 
 import org.elixir_lang.psi.*
 import org.jetbrains.annotations.Contract
+import java.math.BigInteger
 import java.util.*
+
+fun WholeNumber.toBigInteger(): BigInteger? {
+    val digitsList = digitsList()
+
+    return if (digitsList.inBase()) {
+        val text = digitsList.textToString()
+        val base = base()
+
+        BigInteger(text, base)
+    } else {
+        null
+    }
+}
 
 object WholeNumberImpl {
     const val BINARY_BASE = 2
