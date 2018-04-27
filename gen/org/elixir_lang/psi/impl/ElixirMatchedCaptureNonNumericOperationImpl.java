@@ -62,7 +62,7 @@ public class ElixirMatchedCaptureNonNumericOperationImpl extends ElixirMatchedEx
 
   @Nullable
   public PsiElement getNameIdentifier() {
-    return ElixirPsiImplUtil.getNameIdentifier(this);
+    return ElixirPsiImplUtil.getNameIdentifier((NonNumeric) this);
   }
 
   @Nullable

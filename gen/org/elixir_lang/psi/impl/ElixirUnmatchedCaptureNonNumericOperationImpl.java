@@ -62,7 +62,7 @@ public class ElixirUnmatchedCaptureNonNumericOperationImpl extends ElixirUnmatch
 
   @Nullable
   public PsiElement getNameIdentifier() {
-    return ElixirPsiImplUtil.getNameIdentifier(this);
+    return ElixirPsiImplUtil.getNameIdentifier((NonNumeric) this);
   }
 
   @Nullable

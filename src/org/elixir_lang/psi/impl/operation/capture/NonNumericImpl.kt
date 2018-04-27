@@ -1,11 +1,14 @@
 package org.elixir_lang.psi.impl.operation.capture
 
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager.getCachedValue
 import org.elixir_lang.psi.ElixirDecimalWholeNumber
 import org.elixir_lang.psi.ElixirTypes
 import org.elixir_lang.psi.call.Call
+import org.elixir_lang.psi.call.Named
+import org.elixir_lang.psi.impl.PsiNameIdentifierOwnerImpl
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.impl.toBigInteger
 import org.elixir_lang.psi.operation.Multiplication
@@ -55,4 +58,10 @@ private fun NonNumeric.computeReference(): PsiReference? =
 fun getReference(nonNumeric: NonNumeric): PsiReference? =
         getCachedValue(nonNumeric) {
             CachedValueProvider.Result.create(nonNumeric.computeReference(), nonNumeric)
+        }
+
+fun getNameIdentifier(nonNumeric: NonNumeric): PsiElement? =
+        when (nonNumeric.reference) {
+            is CaptureNameArity -> Normalized.operand(nonNumeric)
+            else -> PsiNameIdentifierOwnerImpl.getNameIdentifier(nonNumeric as Named)
         }

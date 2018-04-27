@@ -1061,6 +1061,11 @@ public class ElixirPsiImplUtil {
     }
 
     @Nullable
+    public static PsiElement getNameIdentifier(@NotNull NonNumeric nonNumeric) {
+        return NonNumericImplKt.getNameIdentifier(nonNumeric);
+    }
+
+    @Nullable
     public static PsiElement getNameIdentifier(@NotNull QualifiableAlias qualifiableAlias) {
         return PsiNameIdentifierOwnerImpl.getNameIdentifier(qualifiableAlias);
     }
