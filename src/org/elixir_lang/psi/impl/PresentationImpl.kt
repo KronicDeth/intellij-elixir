@@ -1,12 +1,13 @@
 package org.elixir_lang.psi.impl
 
 import com.intellij.navigation.ItemPresentation
+import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiFile
 import com.intellij.usageView.UsageViewUtil
 import org.elixir_lang.annotator.Parameter
+import org.elixir_lang.beam.psi.BeamFileImpl
 import org.elixir_lang.psi.ElixirIdentifier
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.structure_view.element.CallDefinitionClause
@@ -52,16 +53,20 @@ object PresentationImpl {
 
 private fun Call.locationString(): String = this.containingFile!!.locationString(this.project)
 
-private fun PsiFile.locationString(project: Project): String = this.virtualFile?.locationString(project) ?: this.name
+private fun PsiFile.locationString(project: Project): String {
+    val originalFile = originalFile
 
-private fun VirtualFile.locationString(project: Project): String =
-        this.path.let { path ->
-            ProjectRootManager
-                    .getInstance(project)
-                    .fileIndex
-                    .getSourceRootForFile(this)
-                    ?.let { sourceRoot ->
-                        File(path).relativeToOrSelf(File(sourceRoot.path)).path
-                    }
-                    ?: path
-        }
+    return when (originalFile) {
+        is BeamFileImpl -> originalFile.virtualFile?.locationString(project)?.let { "$it.decompiled.ex" }
+        else -> virtualFile?.locationString(project)
+    } ?: name
+}
+
+private fun VirtualFile.locationString(project: Project): String {
+    val rootFile = project.basePath!!.let { File(it) }
+
+    return File(path).relativeToOrSelf(rootFile).path
+}
+
+private fun root(project: Project, module: Module?): String =
+    module?.moduleFilePath?.let { File(it).parent } ?: project.basePath!!
