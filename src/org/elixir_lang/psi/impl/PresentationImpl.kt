@@ -63,9 +63,16 @@ private fun PsiFile.locationString(project: Project): String {
 }
 
 private fun VirtualFile.locationString(project: Project): String {
-    val rootFile = project.basePath!!.let { File(it) }
+    val basePath = project.basePath!!
+    val path = path
 
-    return File(path).relativeToOrSelf(rootFile).path
+    /* relativeTo always works on unix-like system and ends up with `../../../usr/local/...` for paths that should be
+       absolute */
+    return if (path.startsWith(basePath)) {
+        File(path).relativeToOrSelf(File(basePath)).path
+    } else {
+        path
+    }
 }
 
 private fun root(project: Project, module: Module?): String =
