@@ -1,11 +1,16 @@
 package org.elixir_lang.psi.impl
 
 import com.intellij.navigation.ItemPresentation
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.roots.ProjectRootManager
+import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.psi.PsiFile
 import com.intellij.usageView.UsageViewUtil
 import org.elixir_lang.annotator.Parameter
 import org.elixir_lang.psi.ElixirIdentifier
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.structure_view.element.CallDefinitionClause
+import java.io.File
 import javax.swing.Icon
 
 object PresentationImpl {
@@ -36,17 +41,27 @@ object PresentationImpl {
         val text = UsageViewUtil.createNodeText(call)
 
         return object : ItemPresentation {
-            override fun getPresentableText(): String? {
-                return text
-            }
+            private val _locationString by lazy { call.locationString() }
 
-            override fun getLocationString(): String? {
-                return call.containingFile.name
-            }
-
-            override fun getIcon(b: Boolean): Icon? {
-                return call.getIcon(0)
-            }
+            override fun getIcon(b: Boolean): Icon? = call.getIcon(0)
+            override fun getLocationString(): String? = _locationString
+            override fun getPresentableText(): String? = text
         }
     }
 }
+
+private fun Call.locationString(): String = this.containingFile!!.locationString(this.project)
+
+private fun PsiFile.locationString(project: Project): String = this.virtualFile?.locationString(project) ?: this.name
+
+private fun VirtualFile.locationString(project: Project): String =
+        this.path.let { path ->
+            ProjectRootManager
+                    .getInstance(project)
+                    .fileIndex
+                    .getSourceRootForFile(this)
+                    ?.let { sourceRoot ->
+                        File(path).relativeToOrSelf(File(sourceRoot.path)).path
+                    }
+                    ?: path
+        }
