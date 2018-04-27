@@ -23,7 +23,7 @@ import java.util.List;
 
 // See com.intellij.psi.impl.compiled.ClsElementImpl
 public abstract class ModuleElementImpl extends PsiElementBase implements PsiCompiledElement {
-    private static final Key<PsiCompiledElement> COMPILED_ELEMENT = Key.create("COMPILED_ELEMENT");
+    public static final Key<PsiCompiledElement> COMPILED_ELEMENT = Key.create("COMPILED_ELEMENT");
     private static final Logger LOGGER = Logger.getInstance(ModuleElementImpl.class);
 
     private volatile TreeElement mirror = null;
