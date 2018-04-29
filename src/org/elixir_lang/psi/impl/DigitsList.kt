@@ -17,5 +17,5 @@ fun List<Digits>.inBase(): Boolean {
     return invalidDigitsCount < 1 && validDigitsCount > 0
 }
 
-fun List<Digits>.textToString(): String = this.joinToString { it.text }
+fun List<Digits>.textToString(): String = this.joinToString("") { it.text }
 
