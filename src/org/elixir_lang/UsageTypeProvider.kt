@@ -6,11 +6,13 @@ import com.intellij.usages.UsageTarget
 import com.intellij.usages.impl.rules.UsageType
 import org.elixir_lang.annotator.Parameter
 import org.elixir_lang.psi.ElixirAccessExpression
+import org.elixir_lang.psi.ElixirNoParenthesesOneArgument
 import org.elixir_lang.psi.QualifiableAlias
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.qualification.Qualified
 import org.elixir_lang.reference.Callable
 import org.elixir_lang.structure_view.element.CallDefinitionClause
+import org.elixir_lang.structure_view.element.Use
 
 class UsageTypeProvider : com.intellij.usages.impl.rules.UsageTypeProviderEx {
     override fun getUsageType(element: PsiElement?, targets: Array<out UsageTarget>): UsageType? =
@@ -57,13 +59,23 @@ class UsageTypeProvider : com.intellij.usages.impl.rules.UsageTypeProviderEx {
         }
 
     private fun getUsageType(qualifiableAlias: QualifiableAlias, targets: Array<out UsageTarget>): UsageType? =
-            qualifiableAlias.parent?.let { it as? ElixirAccessExpression }?.let { parent ->
-                parent.parent?.let { it as? Qualified }?.let { qualified ->
-                    if (qualified.qualifier().isEquivalentTo(parent)) {
+            qualifiableAlias.parent?.let { it as? ElixirAccessExpression }?.let { accessExpression ->
+                val accessExpressionParent = accessExpression.parent
+
+                when (accessExpressionParent) {
+                    is Qualified -> if (accessExpressionParent.qualifier().isEquivalentTo(accessExpression)) {
                         REMOTE_CALL
                     } else {
                         null
                     }
+                    is ElixirNoParenthesesOneArgument -> {
+                        if (accessExpressionParent.parent?.let { it as? Call }?.let { Use.`is`(it) } == true) {
+                            USE
+                        } else {
+                            null
+                        }
+                    }
+                    else -> null
                 }
             }
 
@@ -111,6 +123,7 @@ private val FUNCTION_PARAMETER = UsageType("Parameter declaration")
 private val MACRO_CALL = UsageType("Macro call")
 private val MACRO_DEFINITION_CLAUSE = UsageType("Macro definition clause")
 private val REMOTE_CALL = UsageType("Remote call")
+private val USE = UsageType("Use")
 
 private fun Array<out UsageTarget>.anyEquivalentElement(element: PsiElement): Boolean =
     element.manager.let { manager ->
