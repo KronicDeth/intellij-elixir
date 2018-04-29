@@ -2,6 +2,9 @@ package org.elixir_lang.psi
 
 import com.intellij.psi.PsiElement
 import com.intellij.util.Function
+import org.elixir_lang.Arity
+import org.elixir_lang.ArityRange
+import org.elixir_lang.Name
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.Named
 import org.elixir_lang.psi.impl.call.macroChildCallSequence
@@ -55,9 +58,9 @@ object Modular {
 
     inline fun <R> callDefinitionClauseCallFoldWhile(
             modular: Call,
-            functionName: String,
+            functionName: Name,
             initial: R,
-            foldWhile: (Call, String, IntRange,  R) -> AccumulatorContinue<R>
+            foldWhile: (Call, Name, ArityRange,  R) -> AccumulatorContinue<R>
     ): AccumulatorContinue<R> =
             callDefinitionClauseCallFoldWhile(modular, initial) { callDefinitionClauseCall, acc ->
                 CallDefinitionClause.nameArityRange(callDefinitionClauseCall)?.let { (name, arityRange) ->
@@ -70,10 +73,11 @@ object Modular {
                 AccumulatorContinue(acc, true)
             }
 
+    @JvmStatic
     inline fun <R> callDefinitionClauseCallFoldWhile(
             modular: Call,
-            functionName: String,
-            resolvedFinalArity: Int,
+            functionName: Name,
+            resolvedFinalArity: Arity,
             initial: R,
             foldWhile: (Call, String, IntRange, R) -> AccumulatorContinue<R>
     ): AccumulatorContinue<R> =

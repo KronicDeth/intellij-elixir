@@ -595,7 +595,7 @@ private class ResolveWithCachingComputable(
                     .getInstance(project)
                     .resolveWithCaching(
                             callable,
-                            org.elixir_lang.reference.resolver.Callable.INSTANCE,
+                            org.elixir_lang.reference.resolver.Callable,
                             false,
                             incompleteCode
                     )
