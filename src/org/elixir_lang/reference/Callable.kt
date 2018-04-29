@@ -16,7 +16,7 @@ import com.intellij.util.IncorrectOperationException
 import org.elixir_lang.annotator.Parameter
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
-import org.elixir_lang.psi.ElementDescriptionProvider.VARIABLE_USAGE_VIEW_TYPE_LOCATION_ELEMENT_DESCRIPTION
+import org.elixir_lang.psi.ElementDescriptionProvider.Companion.VARIABLE_USAGE_VIEW_TYPE_LOCATION_ELEMENT_DESCRIPTION
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.Named
 import org.elixir_lang.psi.call.name.Function

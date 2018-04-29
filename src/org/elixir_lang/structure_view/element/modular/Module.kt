@@ -17,6 +17,7 @@ import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.call.name.Module.MODULE
 import org.elixir_lang.psi.impl.call.macroChildCalls
 import org.elixir_lang.psi.impl.enclosingMacroCall
+import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.operation.Or
 import org.elixir_lang.structure_view.element.*
 import org.elixir_lang.structure_view.element.Quote
@@ -111,7 +112,8 @@ open class Module(protected val parent: Modular?, call: Call) : Element<Call>(ca
             return childCallTreeElements(modular, childCalls)
         }
 
-        fun elementDescription(call: Call, location: ElementDescriptionLocation): String? =
+        @JvmStatic
+        open fun elementDescription(call: Call, location: ElementDescriptionLocation): String? =
                 when(location) {
                     UsageViewLongNameLocation.INSTANCE -> {
                         val enclosingCall = call.enclosingMacroCall()
@@ -131,14 +133,13 @@ open class Module(protected val parent: Modular?, call: Call) : Element<Call>(ca
                     else -> null
                 }
 
-        @JvmOverloads
         @JvmStatic
         open fun `is`(call: Call): Boolean =
                 call.isCallingMacro(KERNEL, DEFMODULE, 2) ||
                         call.isCalling(MODULE, CREATE, 3)
 
         @JvmStatic
-        fun nameIdentifier(call: Call): PsiElement? = call.primaryArguments()?.firstOrNull()
+        fun nameIdentifier(call: Call): PsiElement? = call.primaryArguments()?.firstOrNull()?.stripAccessExpression()
 
         @Contract(pure = true)
         private fun childCallTreeElements(modular: Modular, childCalls: Array<Call>?): Array<TreeElement> {
