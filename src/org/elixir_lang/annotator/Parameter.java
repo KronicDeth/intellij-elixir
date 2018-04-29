@@ -70,14 +70,14 @@ public class Parameter {
     private static Parameter putParameterized(@NotNull final Parameter parameter, final @NotNull Call ancestor) {
         Parameter parameterizedParameter;
 
-        if (CallDefinitionClause.isFunction(ancestor) || Delegation.is(ancestor)) {
+        if (CallDefinitionClause.Companion.isFunction(ancestor) || Delegation.is(ancestor)) {
             parameterizedParameter = new Parameter(
                     parameter.defaultValue,
                     parameter.entrance,
                     notNullize(parameter.parameterized, ancestor),
                     notNullize(parameter.type, Type.FUNCTION_NAME)
             );
-        } else if (CallDefinitionClause.isMacro(ancestor)) {
+        } else if (CallDefinitionClause.Companion.isMacro(ancestor)) {
             parameterizedParameter = new Parameter(
                     parameter.defaultValue,
                     parameter.entrance,

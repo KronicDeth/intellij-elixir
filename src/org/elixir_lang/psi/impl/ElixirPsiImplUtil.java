@@ -12,7 +12,7 @@ import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import kotlin.jvm.functions.Function1;
-import org.apache.commons.lang.math.IntRange;
+import kotlin.ranges.IntRange;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.call.StubBased;
@@ -246,8 +246,8 @@ public class ElixirPsiImplUtil {
     }
 
     public static boolean isExported(@NotNull final UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
-        return CallDefinitionClause.isPublicFunction(unqualifiedNoParenthesesCall) ||
-                CallDefinitionClause.isPublicMacro(unqualifiedNoParenthesesCall);
+        return CallDefinitionClause.Companion.isPublicFunction(unqualifiedNoParenthesesCall) ||
+                CallDefinitionClause.Companion.isPublicMacro(unqualifiedNoParenthesesCall);
     }
 
     public static boolean isModuleName(@NotNull final ElixirAccessExpression accessExpression) {

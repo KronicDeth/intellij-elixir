@@ -2,7 +2,7 @@ package org.elixir_lang.psi.call;
 
 import com.intellij.psi.NavigatablePsiElement;
 import com.intellij.psi.PsiElement;
-import org.apache.commons.lang.math.IntRange;
+import kotlin.ranges.IntRange;
 import org.elixir_lang.psi.ElixirDoBlock;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

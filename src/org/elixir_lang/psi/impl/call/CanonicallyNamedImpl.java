@@ -94,7 +94,7 @@ public class CanonicallyNamedImpl {
                         canonicalNameSuffixSet.add(canonicalName);
                     }
                 }
-            } else if (Module.is(stubBased) || Protocol.is(stubBased)) {
+            } else if (Module.Companion.is(stubBased) || Protocol.is(stubBased)) {
                 canonicalNameSuffixSet = Collections.singleton(
                         org.elixir_lang.navigation.item_presentation.modular.Module.presentableText(stubBased)
                 );

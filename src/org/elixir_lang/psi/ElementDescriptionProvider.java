@@ -184,26 +184,26 @@ public class ElementDescriptionProvider implements com.intellij.psi.ElementDescr
     private String getElementDescription(@NotNull Call call, @NotNull ElementDescriptionLocation location) {
         String elementDescription = null;
 
-        if (CallDefinitionClause.is(call)) {
-            elementDescription = CallDefinitionClause.elementDescription(call, location);
-        } else if (CallDefinitionSpecification.is(call)) {
-            elementDescription = CallDefinitionSpecification.elementDescription(call, location);
-        } else if (Callback.is(call)) {
-            elementDescription = Callback.elementDescription(call, location);
+        if (CallDefinitionClause.Companion.is(call)) {
+            elementDescription = CallDefinitionClause.Companion.elementDescription(call, location);
+        } else if (CallDefinitionSpecification.Companion.is(call)) {
+            elementDescription = CallDefinitionSpecification.Companion.elementDescription(call, location);
+        } else if (Callback.Companion.is(call)) {
+            elementDescription = Callback.Companion.elementDescription(call, location);
         } else if (Delegation.is(call)) {
             elementDescription = Delegation.elementDescription(call, location);
         } else if (org.elixir_lang.structure_view.element.Exception.is(call)) {
             elementDescription = org.elixir_lang.structure_view.element.Exception.elementDescription(call, location);
         } else if (Implementation.is(call)) {
             elementDescription = Implementation.elementDescription(call, location);
-        } else if (Import.is(call)) {
-            elementDescription = Import.elementDescription(call, location);
-        } else if (Module.is(call)) {
-            elementDescription = Module.elementDescription(call, location);
+        } else if (Import.INSTANCE.is(call)) {
+            elementDescription = Import.INSTANCE.elementDescription(call, location);
+        } else if (Module.Companion.is(call)) {
+            elementDescription = Module.Companion.elementDescription(call, location);
         } else if (Overridable.is(call)) {
             elementDescription = Overridable.elementDescription(call, location);
         } else if (Protocol.is((call))) {
-            elementDescription = Protocol.elementDescription(call, location);
+            elementDescription = Protocol.Companion.elementDescription(call, location);
         } else if (org.elixir_lang.structure_view.element.Quote.is(call)) {
             elementDescription = org.elixir_lang.structure_view.element.Quote.elementDescription(call, location);
         } else if (Structure.is(call)) {

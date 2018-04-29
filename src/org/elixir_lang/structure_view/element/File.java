@@ -42,7 +42,7 @@ public class File extends Element<ElixirFile> {
             for (Call call : calls) {
                 if (Implementation.is(call)) {
                     treeElementList.add(new Implementation(call));
-                } else if (Module.is(call)) {
+                } else if (Module.Companion.is(call)) {
                     treeElementList.add(new Module(call));
                 } else if (Protocol.is(call)) {
                     treeElementList.add(new Protocol(call));

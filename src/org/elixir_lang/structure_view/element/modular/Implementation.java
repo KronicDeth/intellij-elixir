@@ -179,7 +179,7 @@ public class Implementation extends Module {
      */
     @Nullable
     public static String name(@NotNull Call call) {
-        Collection<String> nameCollection = nameCollection(CallDefinitionClause.enclosingModular(call), call);
+        Collection<String> nameCollection = nameCollection(CallDefinitionClause.Companion.enclosingModular(call), call);
         String name = null;
 
         if (nameCollection != null && nameCollection.size() == 1) {
@@ -325,8 +325,8 @@ public class Implementation extends Module {
             } else {
                 forName = "?";
             }
-        } else if (parent != null) {
-            org.elixir_lang.navigation.item_presentation.Parent parentPresentation = (org.elixir_lang.navigation.item_presentation.Parent) parent.getPresentation();
+        } else if (getParent() != null) {
+            org.elixir_lang.navigation.item_presentation.Parent parentPresentation = (org.elixir_lang.navigation.item_presentation.Parent) getParent().getPresentation();
             forName = parentPresentation.getLocatedPresentableText();
         } else {
             forName = "?";

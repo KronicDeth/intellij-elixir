@@ -11,7 +11,7 @@ import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.util.PsiTreeUtil;
-import org.apache.commons.lang.math.IntRange;
+import kotlin.ranges.IntRange;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.stub.MatchedQualifiedNoArgumentsCall;
 import org.jetbrains.annotations.NotNull;

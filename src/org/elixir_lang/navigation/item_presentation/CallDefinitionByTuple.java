@@ -18,7 +18,7 @@ public class CallDefinitionByTuple extends HashMap<CallDefinition.Tuple, CallDef
         CallDefinition callDefinition = get(tuple);
 
         if (callDefinition == null) {
-            callDefinition = new CallDefinition(tuple.modular, tuple.time, tuple.name, tuple.arity);
+            callDefinition = new CallDefinition(tuple.getModular(), tuple.getTime(), tuple.getName(), tuple.getArity());
             put(tuple, callDefinition);
         }
 

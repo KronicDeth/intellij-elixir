@@ -50,14 +50,14 @@ public class CallDefinitionClause extends com.intellij.codeInsight.lookup.Lookup
      */
 
     private void renderCall(@NotNull Call call, @NotNull LookupElementPresentation presentation) {
-        if (org.elixir_lang.structure_view.element.CallDefinitionClause.is(call)) {
+        if (org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.is(call)) {
             renderCallDefinitionClause(call, presentation);
         }
     }
 
     private void renderCallDefinitionClause(@NotNull Call call, @NotNull LookupElementPresentation presentation) {
         org.elixir_lang.structure_view.element.CallDefinitionClause structureView =
-                org.elixir_lang.structure_view.element.CallDefinitionClause.fromCall(call);
+                org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.fromCall(call);
 
         if (structureView != null) {
             renderStructureView(structureView, presentation);

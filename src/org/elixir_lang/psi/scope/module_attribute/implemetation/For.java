@@ -111,7 +111,7 @@ public class For implements PsiScopeProcessor {
 
                 if (enclosingModularMacroCall != null) {
                     if (enclosingModularMacroCall.isCalling(KERNEL, DEFMODULE)) {
-                        element = Module.nameIdentifier(enclosingModularMacroCall);
+                        element = Module.Companion.nameIdentifier(enclosingModularMacroCall);
                         validResult = this.validResult;
                     } else {
                         element = enclosingModularMacroCall;

@@ -84,20 +84,20 @@ public abstract class CallDefinitionClause implements PsiScopeProcessor {
     private boolean execute(@NotNull Call element, @NotNull final ResolveState state) {
         boolean keepProcessing = true;
 
-        if (org.elixir_lang.structure_view.element.CallDefinitionClause.is(element)) {
+        if (org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.is(element)) {
             keepProcessing = executeOnCallDefinitionClause(element, state);
-        } else if (Import.is(element)) {
+        } else if (Import.INSTANCE.is(element)) {
             final ResolveState importState = state.put(IMPORT_CALL, element);
 
             try {
-                Import.callDefinitionClauseCallWhile(
+                Import.INSTANCE.callDefinitionClauseCallWhile(
                         element,
                         callDefinitionClause -> executeOnCallDefinitionClause(callDefinitionClause, importState)
                 );
             } catch (StackOverflowError stackOverflowError) {
                 Logger.error(CallDefinitionClause.class, "StackOverflowError while processing import", element);
             }
-        } else if (Module.is(element)) {
+        } else if (Module.Companion.is(element)) {
             Call[] childCalls = macroChildCalls(element);
 
             for (Call childCall : childCalls) {

@@ -8,7 +8,7 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.StubBasedPsiElement;
 import com.intellij.psi.scope.PsiScopeProcessor;
-import org.apache.commons.lang.math.IntRange;
+import kotlin.ranges.IntRange;
 import org.elixir_lang.psi.call.StubBased;
 import org.elixir_lang.psi.call.arguments.star.NoParentheses;
 import org.elixir_lang.psi.qualification.Unqualified;

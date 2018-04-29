@@ -6,7 +6,6 @@ import com.intellij.psi.PsiReference
 import com.intellij.psi.tree.TokenSet
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
-import org.apache.commons.lang.math.IntRange
 import org.elixir_lang.mix.importWizard.computeReadAction
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
@@ -645,7 +644,7 @@ object CallImpl {
                 val maximum = finalArguments.size
                 val minimum = maximum - defaultCount
                 IntRange(minimum, maximum)
-            } ?: IntRange(0)
+            } ?: IntRange(0, 0)
 
     @Contract(pure = true)
     @JvmStatic

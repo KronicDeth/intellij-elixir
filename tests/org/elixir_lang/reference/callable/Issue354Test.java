@@ -69,7 +69,7 @@ public class Issue354Test extends LightCodeInsightFixtureTestCase {
 
         Call resolvedGreatGreatGreatGreatGrandParentCall = (Call) resolvedGreatGreatGreatGreatGrandParent;
 
-        assertTrue(CallDefinitionClause.is(resolvedGreatGreatGreatGreatGrandParentCall));
+        assertTrue(CallDefinitionClause.Companion.is(resolvedGreatGreatGreatGreatGrandParentCall));
     }
 
     /*

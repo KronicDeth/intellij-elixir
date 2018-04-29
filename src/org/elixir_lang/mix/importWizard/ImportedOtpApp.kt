@@ -14,8 +14,8 @@ import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.psi.ElixirList
 import org.elixir_lang.psi.impl.call.macroChildCallList
 import org.elixir_lang.psi.impl.keywordValue
-import org.elixir_lang.structure_view.element.CallDefinitionClause.isPublicFunction
-import org.elixir_lang.structure_view.element.CallDefinitionClause.nameArityRange
+import org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.isPublicFunction
+import org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.nameArityRange
 import java.io.IOException
 import java.nio.file.Paths
 
@@ -46,8 +46,8 @@ private fun appList(elixirFile: ElixirFile): List<String> {
                 modular.macroChildCallList().asSequence()
             }
             .filter { call ->
-                isPublicFunction(call) && nameArityRange(call)?.let {
-                    it.first == "project" && it.second?.containsInteger(0) == true
+                isPublicFunction(call) && nameArityRange(call)?.let { (name, arityName) ->
+                    name == "project" && arityName.contains(0)
                 } == true
             }
             .flatMap { projectCallDefinition ->

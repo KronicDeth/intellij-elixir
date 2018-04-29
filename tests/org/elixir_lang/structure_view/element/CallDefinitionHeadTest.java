@@ -51,14 +51,14 @@ public class CallDefinitionHeadTest extends LightPlatformCodeInsightFixtureTestC
 
         Call call = (Call) element;
 
-        assertTrue("Call at caret is not a call definition clause", CallDefinitionClause.is(call));
-        PsiElement head = CallDefinitionClause.head(call);
+        assertTrue("Call at caret is not a call definition clause", CallDefinitionClause.Companion.is(call));
+        PsiElement head = CallDefinitionClause.Companion.head(call);
 
         assertNotNull("Call definition has a null head", head);
 
         assertEquals(
                 "create(state = %__MODULE__{ecto_schema_module: ecto_schema_module, view: view}, params)",
-                CallDefinitionHead.stripGuard(head).getText()
+                CallDefinitionHead.Companion.stripGuard(head).getText()
         );
     }
 }

@@ -78,7 +78,7 @@ public class Delegation extends Element<Call>  {
             callList = new ArrayList<Call>(calls.length);
 
             for (Call call : calls) {
-                if (CallDefinitionHead.is(call)) {
+                if (CallDefinitionHead.Companion.is(call)) {
                     callList.add(call);
                 }
             }

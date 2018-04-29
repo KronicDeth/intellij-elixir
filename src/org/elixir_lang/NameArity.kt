@@ -1,4 +1,4 @@
-package org.elixir_lang.beam
+package org.elixir_lang
 
 import com.ericsson.otp.erlang.OtpErlangAtom
 import com.ericsson.otp.erlang.OtpErlangLong
@@ -8,7 +8,10 @@ import com.intellij.openapi.diagnostic.Logger
 import org.elixir_lang.beam.term.inspect
 import org.elixir_lang.beam.term.unsignedIntToInt
 
-data class NameArity(val name: String, val arity: Int) {
+typealias Name = String
+typealias Arity = Int
+
+data class NameArity(val name: Name, val arity: Arity) {
     companion object {
         private val logger = Logger.getInstance(NameArity::class.java)
 
@@ -32,7 +35,7 @@ data class NameArity(val name: String, val arity: Int) {
 
         // Private Functions
 
-        private fun arity(term: OtpErlangObject): Int? =
+        private fun arity(term: OtpErlangObject): Arity? =
                 when (term) {
                     is OtpErlangLong -> unsignedIntToInt(term.longValue())
                     else -> {
@@ -73,7 +76,7 @@ data class NameArity(val name: String, val arity: Int) {
             }
         }
 
-        private fun name(term: OtpErlangObject): String? =
+        private fun name(term: OtpErlangObject): Name? =
                 when (term) {
                     is OtpErlangAtom -> term.atomValue()
                     else -> {

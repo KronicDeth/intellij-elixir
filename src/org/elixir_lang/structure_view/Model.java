@@ -42,15 +42,15 @@ public class Model extends TextEditorBasedStructureViewModel implements Structur
 
     public static boolean isSuitable(Call call) {
         // everything in {@link Module#childCallTreeElements}
-        return CallDefinitionClause.isFunction(call) ||
-                CallDefinitionClause.isMacro(call) ||
-                CallDefinitionHead.is(call) ||
-                CallDefinitionSpecification.is(call) ||
-                Callback.is(call) ||
+        return CallDefinitionClause.Companion.isFunction(call) ||
+                CallDefinitionClause.Companion.isMacro(call) ||
+                CallDefinitionHead.Companion.is(call) ||
+                CallDefinitionSpecification.Companion.is(call) ||
+                Callback.Companion.is(call) ||
                 Delegation.is(call) ||
                 Exception.is(call) ||
                 Implementation.is(call) ||
-                Module.is(call) ||
+                Module.Companion.is(call) ||
                 Overridable.is(call) ||
                 Protocol.is(call) ||
                 Quote.is(call) ||

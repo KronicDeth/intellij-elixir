@@ -2,7 +2,6 @@ package org.elixir_lang.psi
 
 import com.intellij.psi.PsiElement
 import com.intellij.util.Function
-import org.apache.commons.lang.math.IntRange
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.Named
 import org.elixir_lang.psi.impl.call.macroChildCallSequence
@@ -61,15 +60,11 @@ object Modular {
             foldWhile: (Call, String, IntRange,  R) -> AccumulatorContinue<R>
     ): AccumulatorContinue<R> =
             callDefinitionClauseCallFoldWhile(modular, initial) { callDefinitionClauseCall, acc ->
-                CallDefinitionClause.nameArityRange(callDefinitionClauseCall)?.let { nameArityRange ->
-                    nameArityRange.first?.let { name ->
-                        if (name == functionName) {
-                            nameArityRange.second?.let { arityRange ->
-                                foldWhile(callDefinitionClauseCall, name, arityRange, acc)
-                            }
-                        } else {
-                            null
-                        }
+                CallDefinitionClause.nameArityRange(callDefinitionClauseCall)?.let { (name, arityRange) ->
+                    if (name == functionName) {
+                            foldWhile(callDefinitionClauseCall, name, arityRange, acc)
+                    } else {
+                        null
                     }
                 } ?:
                 AccumulatorContinue(acc, true)
@@ -87,7 +82,7 @@ object Modular {
                     functionName,
                     initial
             ) { callDefinitionClauseCall, name, arityRange, acc ->
-                if (arityRange.containsInteger(resolvedFinalArity)) {
+                if (arityRange.contains(resolvedFinalArity)) {
                     foldWhile(callDefinitionClauseCall, name, arityRange, acc)
                 } else {
                     AccumulatorContinue(acc, true)
@@ -122,22 +117,13 @@ object Modular {
                                               function: (Call) -> Boolean) {
         if (functionName != null) {
             callDefinitionClauseCallWhile(modular) { callDefinitionClauseCall ->
-                val nameArityRange = CallDefinitionClause.nameArityRange(callDefinitionClauseCall)
-                var keepProcessing = true
-
-                if (nameArityRange != null) {
-                    val name = nameArityRange.first
-
-                    if (name != null && name == functionName) {
-                        val arityRange = nameArityRange.second
-
-                        if (arityRange.containsInteger(resolvedFinalArity) && !function(callDefinitionClauseCall)) {
-                            keepProcessing = false
-                        }
+                CallDefinitionClause.nameArityRange(callDefinitionClauseCall)?.let { (name, arityRange) ->
+                    if (name == functionName) {
+                        !(arityRange.contains(resolvedFinalArity) && !function(callDefinitionClauseCall))
+                    } else {
+                        null
                     }
-                }
-
-                keepProcessing
+                } ?: true
             }
         }
     }

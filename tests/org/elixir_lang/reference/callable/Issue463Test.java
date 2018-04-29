@@ -39,7 +39,7 @@ public class Issue463Test extends LightCodeInsightFixtureTestCase {
         PsiElement maybeDefCall = resolved.getParent().getParent().getParent();
         assertInstanceOf(maybeDefCall, Call.class);
 
-        assertTrue(CallDefinitionClause.is((Call) maybeDefCall));
+        assertTrue(CallDefinitionClause.Companion.is((Call) maybeDefCall));
     }
 
     public void testAliasedModuleQualifier() {
@@ -69,7 +69,7 @@ public class Issue463Test extends LightCodeInsightFixtureTestCase {
         PsiElement maybeDefCall = resolved.getParent().getParent().getParent();
         assertInstanceOf(maybeDefCall, Call.class);
 
-        assertTrue(CallDefinitionClause.is((Call) maybeDefCall));
+        assertTrue(CallDefinitionClause.Companion.is((Call) maybeDefCall));
     }
 
     public void testDoubleAliasesModuleQualifier() {

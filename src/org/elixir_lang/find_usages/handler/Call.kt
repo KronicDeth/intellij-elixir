@@ -2,12 +2,13 @@ package org.elixir_lang.find_usages.handler
 
 import com.intellij.find.findUsages.FindUsagesHandler
 import com.intellij.psi.PsiElement
-import org.apache.commons.lang.math.Range
+import org.elixir_lang.ArityRange
 import org.elixir_lang.find_usages.toPsiElementList
+import org.elixir_lang.overlaps
 import org.elixir_lang.psi.Modular
 import org.elixir_lang.psi.call.Call
-import org.elixir_lang.structure_view.element.CallDefinitionClause.enclosingModularMacroCall
-import org.elixir_lang.structure_view.element.CallDefinitionClause.nameArityRange
+import org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.enclosingModularMacroCall
+import org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.nameArityRange
 
 class Call(call: Call) : FindUsagesHandler(call) {
     private val _primaryElements by lazy {
@@ -32,8 +33,6 @@ class Call(call: Call) : FindUsagesHandler(call) {
     override fun getSecondaryElements(): Array<PsiElement> = _secondaryElements
 }
 
-typealias ArityRange = IntRange
-
 private data class CallNameArityRange(val call: Call, val name: String, val arityRange: ArityRange) {
     fun toEnclosingCallEnclosedCallNameArityRange(): EnclosingCallEnclosedCallNameArityRange? =
             enclosingModularMacroCall(call)?.let { enclosingCall ->
@@ -52,13 +51,11 @@ private data class EnclosingCallEnclosedCallNameArityRange(
                 .map { it to nameArityRange(it) }
                 .filter { (_, nameArityRange) ->
                     nameArityRange != null &&
-                            nameArityRange.first == name &&
-                            nameArityRange.second.overlapsRange(arityRange.toRange())
+                            nameArityRange.name == name &&
+                            nameArityRange.arityRange.overlaps(arityRange)
                 }.map { (call, _) -> call }
                 .asIterable()
 }
-
-private fun IntRange.toRange(): Range? = org.apache.commons.lang.math.IntRange(this.first, this.last)
 
 private fun Array<PsiElement>.toCallDefinitionCallSet(): Set<Call> =
         this
@@ -67,23 +64,15 @@ private fun Array<PsiElement>.toCallDefinitionCallSet(): Set<Call> =
                 .toSet()
 
 private fun Call.toCallNameArityRange(): CallNameArityRange? =
-        nameArityRange(this)?.let { nameArityRange ->
-            nameArityRange.first?.let { name ->
-                nameArityRange.second?.let { arityRange ->
-                    CallNameArityRange(
-                            this,
-                            name,
-                            ArityRange(arityRange.minimumInteger, arityRange.maximumInteger)
-                    )
-                }
-            }
-
+        nameArityRange(this)?.let { (name, arityRange) ->
+            CallNameArityRange(this, name, arityRange)
         }
 
 private fun Iterable<Call>.withNameArityRange(): Iterable<CallNameArityRange> =
     this.mapNotNull { it.toCallNameArityRange() }
 
-private fun Iterable<CallNameArityRange>.withEnclosingModularMacroCall(): Iterable<EnclosingCallEnclosedCallNameArityRange> =
+private fun Iterable<CallNameArityRange>.withEnclosingModularMacroCall():
+        Iterable<EnclosingCallEnclosedCallNameArityRange> =
         this.mapNotNull { it.toEnclosingCallEnclosedCallNameArityRange() }
 
 private fun Iterable<EnclosingCallEnclosedCallNameArityRange>.toSecondaryElements(): List<PsiElement> =

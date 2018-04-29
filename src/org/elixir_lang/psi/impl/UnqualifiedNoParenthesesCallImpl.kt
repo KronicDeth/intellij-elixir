@@ -9,18 +9,7 @@ import org.jetbrains.annotations.Contract
 @Contract(pure = true)
 fun UnqualifiedNoParenthesesCall<*>.exportedArity(): Int =
     if (isExported(this)) {
-        CallDefinitionClause.nameArityRange(this)?.let { nameArityRange ->
-            nameArityRange.second?.let { arityRange ->
-                val minimumArity = arityRange.minimumInteger
-                val maximumArity = arityRange.maximumInteger
-
-                if (minimumArity == maximumArity) {
-                    minimumArity
-                } else {
-                    null
-                }
-            }
-        }
+        CallDefinitionClause.nameArityRange(this)?.arityRange?.singleOrNull()
     } else {
         null
     } ?: MaybeExported.UNEXPORTED_ARITY
@@ -28,7 +17,7 @@ fun UnqualifiedNoParenthesesCall<*>.exportedArity(): Int =
 @Contract(pure = true)
 fun UnqualifiedNoParenthesesCall<*>.exportedName(): String? =
     if (isExported(this)) {
-        CallDefinitionClause.nameArityRange(this)?.first
+        CallDefinitionClause.nameArityRange(this)?.name
     } else {
         null
     }

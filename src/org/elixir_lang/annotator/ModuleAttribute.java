@@ -857,7 +857,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
 
     private void highlightTypesAndSpecificationTypeParameterDeclarations(
             UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
-        if (!CallDefinitionClause.is(unqualifiedNoParenthesesCall)) {
+        if (!CallDefinitionClause.Companion.is(unqualifiedNoParenthesesCall)) {
             error(
                     "Cannot highlight types and specification type parameter declarations in UnqualifiedNoParenthesesCall that is not a call definition clause", unqualifiedNoParenthesesCall);
         }
@@ -1452,7 +1452,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
     private Set<String> specificationTypeParameterNameSet(
             @NotNull UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall
     ) {
-        if (!CallDefinitionClause.is(unqualifiedNoParenthesesCall)) {
+        if (!CallDefinitionClause.Companion.is(unqualifiedNoParenthesesCall)) {
             error(
                     "Cannot extract specification type parameter name set from " +
                             "unqualifiedNoParenthesesCall that is a not a call definition clause",
