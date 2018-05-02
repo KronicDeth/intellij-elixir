@@ -33,7 +33,7 @@ public class IntramoduleTest extends LightCodeInsightFixtureTestCase {
         assertEquals(
                 "ambiguous reference does not resolve to previous function declaration",
                 "def referenced do\n\n  end",
-                resolved.getParent().getParent().getParent().getText()
+                resolved.getText()
         );
     }
 
@@ -56,7 +56,7 @@ public class IntramoduleTest extends LightCodeInsightFixtureTestCase {
         assertEquals(
                 "ambiguous reference does not resolve to forward function declaration",
                 "def referenced do\n\n  end",
-                resolved.getParent().getParent().getParent().getText()
+                resolved.getText()
         );
     }
 
@@ -79,7 +79,7 @@ public class IntramoduleTest extends LightCodeInsightFixtureTestCase {
         assertEquals(
                 "ambiguous reference does not resolve to recursive function declaration",
                 "def referenced do\n    referenced\n\n    a = 1\n  end",
-                resolved.getParent().getParent().getParent().getText()
+                resolved.getText()
         );
     }
 
@@ -110,7 +110,7 @@ public class IntramoduleTest extends LightCodeInsightFixtureTestCase {
         PsiElement resolved = reference.resolve();
 
         assertNotNull("Reference not resolved", resolved);
-        assertEquals("def referenced(true) do\n  end", resolved.getParent().getParent().getParent().getText());
+        assertEquals("def referenced(true) do\n  end", resolved.getText());
     }
 
     public void testParenthesesRecursiveReference() {
@@ -134,7 +134,7 @@ public class IntramoduleTest extends LightCodeInsightFixtureTestCase {
         assertEquals(
                 "ambiguous reference does not resolve to recursive function declaration",
                 "def referenced do\n    referenced()\n\n    a = 1\n  end",
-                resolved.getParent().getParent().getParent().getText()
+                resolved.getText()
         );
     }
 
@@ -167,7 +167,7 @@ public class IntramoduleTest extends LightCodeInsightFixtureTestCase {
         assertEquals(
                 "first ResolveResult is not the true clause",
                 "def referenced(true) do\n  end",
-                firstResolved.getParent().getParent().getParent().getText()
+                firstResolved.getText()
         );
 
         assertInstanceOf(firstResolved, NavigatablePsiElement.class);
@@ -187,7 +187,7 @@ public class IntramoduleTest extends LightCodeInsightFixtureTestCase {
         assertEquals(
                 "second ResolveResult is not the false clause",
                 "def referenced(false) do\n  end",
-                secondResolved.getParent().getParent().getParent().getText()
+                secondResolved.getText()
         );
 
         assertInstanceOf(secondResolved, NavigatablePsiElement.class);
@@ -223,7 +223,7 @@ public class IntramoduleTest extends LightCodeInsightFixtureTestCase {
         assertEquals(
                 "parentheses 1-arity reference does not resolve to single 1-arity function declaration",
                 "def referenced(_) do\n  end",
-                resolved.getParent().getParent().getParent().getText()
+                resolved.getText()
         );
     }
 

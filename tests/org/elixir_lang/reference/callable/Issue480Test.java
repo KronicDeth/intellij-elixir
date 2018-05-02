@@ -5,7 +5,6 @@ import com.intellij.psi.PsiReference;
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
 import kotlin.ranges.IntRange;
 import org.elixir_lang.NameArityRange;
-import org.elixir_lang.psi.ElixirIdentifier;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.structure_view.element.CallDefinitionClause;
 import org.jetbrains.annotations.NotNull;
@@ -120,12 +119,9 @@ public class Issue480Test extends LightCodeInsightFixtureTestCase {
 
         assertNotNull(resolved);
 
-        assertInstanceOf(resolved, ElixirIdentifier.class);
+        assertInstanceOf(resolved, Call.class);
 
-        PsiElement maybeDefMaybeCall = resolved.getParent().getParent().getParent();
-        assertInstanceOf(maybeDefMaybeCall, Call.class);
-
-        Call maybeDefCall = (Call) maybeDefMaybeCall;
+        Call maybeDefCall = (Call) resolved;
 
         assertTrue(CallDefinitionClause.Companion.is(maybeDefCall));
 
