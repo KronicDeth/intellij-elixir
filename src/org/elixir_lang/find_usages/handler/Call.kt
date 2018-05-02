@@ -12,11 +12,13 @@ import org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.nam
 
 class Call(call: Call) : FindUsagesHandler(call) {
     private val _primaryElements by lazy {
-        super
-                .getPrimaryElements()
-                .flatMap { it.references.toList() }
-                .flatMap { it.toPsiElementList() }
-                .toTypedArray()
+        val resolvedElements = resolvedElements()
+
+        if (resolvedElements.isNotEmpty()) {
+            resolvedElements
+        } else {
+            super.getPrimaryElements()
+        }
     }
 
     private val _secondaryElements by lazy {
@@ -31,6 +33,14 @@ class Call(call: Call) : FindUsagesHandler(call) {
 
     override fun getPrimaryElements(): Array<PsiElement> = _primaryElements
     override fun getSecondaryElements(): Array<PsiElement> = _secondaryElements
+
+    private fun resolvedElements() =
+            super
+                    .getPrimaryElements()
+                    .flatMap { it.references.toList() }
+                    .flatMap { it.toPsiElementList() }
+                    .toTypedArray()
+
 }
 
 private data class CallNameArityRange(val call: Call, val name: String, val arityRange: ArityRange) {

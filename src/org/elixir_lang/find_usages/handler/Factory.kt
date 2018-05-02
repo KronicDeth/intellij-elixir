@@ -4,7 +4,6 @@ import com.intellij.find.findUsages.FindUsagesHandler
 import com.intellij.lang.findUsages.LanguageFindUsages
 import com.intellij.psi.PsiElement
 import org.elixir_lang.ElixirLanguage
-import org.elixir_lang.psi.call.Named
 
 class Factory : com.intellij.find.findUsages.FindUsagesHandlerFactory() {
     override fun createFindUsagesHandler(element: PsiElement, forHighlightUsages: Boolean): FindUsagesHandler =

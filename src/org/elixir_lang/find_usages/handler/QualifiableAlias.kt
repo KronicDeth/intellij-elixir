@@ -8,21 +8,26 @@ import org.elixir_lang.psi.QualifiableAlias
 
 class QualifiableAlias(qualifiableAlias: QualifiableAlias) : FindUsagesHandler(qualifiableAlias) {
     private val _primaryElements by lazy {
-        val sourceAndCompiledElementList = super
-                .getPrimaryElements()
-                .flatMap { it.references.toList() }
-                .flatMap { it.toPsiElementList() }
+        val resolvedElementList = resolvedElementList()
 
-        if (sourceAndCompiledElementList.any(PsiElement::isSourceElement)) {
-            sourceAndCompiledElementList.filter(PsiElement::isSourceElement)
+        if (resolvedElementList.isNotEmpty()) {
+            if (resolvedElementList.any(PsiElement::isSourceElement)) {
+                resolvedElementList.filter(PsiElement::isSourceElement)
+            } else {
+                // all compiled, no preferred between environments
+                resolvedElementList
+            }.toTypedArray()
         } else {
-            // all compiled, no preferred between environments
-            sourceAndCompiledElementList
+            super.getPrimaryElements()
         }
-        .toTypedArray()
     }
 
     override fun getPrimaryElements(): Array<PsiElement> = _primaryElements
+
+    private fun resolvedElementList() = super
+            .getPrimaryElements()
+            .flatMap { it.references.toList() }
+            .flatMap { it.toPsiElementList() }
 }
 
 private fun PsiElement.isSourceElement(): Boolean = this.getUserData(COMPILED_ELEMENT) == null
