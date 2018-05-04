@@ -117,12 +117,12 @@ class UsageTypeProvider : com.intellij.usages.impl.rules.UsageTypeProviderEx {
         }
 
     companion object {
+        internal val CALL = UsageType("Call")
+        internal val CALL_DEFINITION_CLAUSE = UsageType("Call definition clause")
         internal val FUNCTION_PARAMETER = UsageType("Parameter declaration")
     }
 }
 
-private val CALL = UsageType("Call")
-private val CALL_DEFINITION_CLAUSE = UsageType("Call definition clause")
 private val FUNCTION_DEFINITION_CLAUSE = UsageType("Function definition clause")
 private val FUNCTION_CALL = UsageType("Function call")
 private val MACRO_CALL = UsageType("Macro call")
