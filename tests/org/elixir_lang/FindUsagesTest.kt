@@ -46,15 +46,15 @@ class FindUsagesTest : LightCodeInsightFixtureTestCase() {
 
         assertEquals(UsageTypeProvider.FUNCTION_PARAMETER, getUsageType(firstElement, usageTargets))
 
-        val secondElement = usages[0].element!!
+        val secondElement = usages[1].element!!
 
-        assertEquals(39, secondElement.textOffset)
+        assertEquals(70, secondElement.textOffset)
 
-        assertTrue(readWriteAccessDetector.isDeclarationWriteAccess(secondElement))
-        assertTrue(readWriteAccessDetector.isReadWriteAccessible(secondElement))
-        assertEquals(ReadWriteAccessDetector.Access.Write, readWriteAccessDetector.getExpressionAccess(secondElement))
+        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(secondElement))
+        assertFalse(readWriteAccessDetector.isReadWriteAccessible(secondElement))
+        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(secondElement))
 
-        assertEquals(UsageTypeProvider.FUNCTION_PARAMETER, getUsageType(secondElement, usageTargets))
+        assertEquals(UsageType.READ, getUsageType(secondElement, usageTargets))
     }
 
     fun testParameterUnused() {
@@ -114,15 +114,128 @@ class FindUsagesTest : LightCodeInsightFixtureTestCase() {
 
         assertEquals(UsageTypeProvider.FUNCTION_PARAMETER, getUsageType(firstElement, usageTargets))
 
-        val secondElement = usages[0].element!!
+        val secondElement = usages[1].element!!
 
-        assertEquals(39, secondElement.textOffset)
+        assertEquals(70, secondElement.textOffset)
 
-        assertTrue(readWriteAccessDetector.isDeclarationWriteAccess(secondElement))
-        assertTrue(readWriteAccessDetector.isReadWriteAccessible(secondElement))
-        assertEquals(ReadWriteAccessDetector.Access.Write, readWriteAccessDetector.getExpressionAccess(secondElement))
+        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(secondElement))
+        assertFalse(readWriteAccessDetector.isReadWriteAccessible(secondElement))
+        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(secondElement))
 
-        assertEquals(UsageTypeProvider.FUNCTION_PARAMETER, getUsageType(secondElement, usageTargets))
+        assertEquals(UsageType.READ, getUsageType(secondElement, usageTargets))
+    }
+
+    fun testVariableDeclaration() {
+        myFixture.configureByFiles("variable_declaration.ex")
+
+        val usageTargets = UsageTargetUtil.findUsageTargets(myFixture.editor, myFixture.file)
+
+        assertEquals(1, usageTargets.size)
+
+        val usageTarget = usageTargets[0]
+
+        assertInstanceOf(usageTarget, PsiElement2UsageTargetAdapter::class.java)
+
+        val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
+        val readWriteAccessDetector = readWriteAccessDetector(target)
+
+        assertEquals("variable", findUsagesProvider.getType(target))
+
+        val usages = myFixture.findUsages(target).toList()
+
+        assertEquals(2, usages.size)
+
+        val firstElement = usages[0].element!!
+
+        assertEquals(46, firstElement.textOffset)
+
+        assertTrue(readWriteAccessDetector.isDeclarationWriteAccess(firstElement))
+        assertTrue(readWriteAccessDetector.isReadWriteAccessible(firstElement))
+        assertEquals(ReadWriteAccessDetector.Access.Write, readWriteAccessDetector.getExpressionAccess(firstElement))
+
+        assertEquals(UsageType.WRITE, getUsageType(firstElement, usageTargets))
+
+        val secondElement = usages[1].element!!
+
+        assertEquals(99, secondElement.textOffset)
+
+        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(secondElement))
+        assertFalse(readWriteAccessDetector.isReadWriteAccessible(secondElement))
+        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(secondElement))
+
+        assertEquals(UsageType.READ, getUsageType(secondElement, usageTargets))
+    }
+
+    fun testVariableUnused() {
+        myFixture.configureByFiles("variable_unused.ex")
+
+        val usageTargets = UsageTargetUtil.findUsageTargets(myFixture.editor, myFixture.file)
+
+        assertEquals(1, usageTargets.size)
+
+        val usageTarget = usageTargets[0]
+
+        assertInstanceOf(usageTarget, PsiElement2UsageTargetAdapter::class.java)
+
+        val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
+        val readWriteAccessDetector = readWriteAccessDetector(target)
+
+        assertEquals("variable", findUsagesProvider.getType(target))
+
+        val usages = myFixture.findUsages(target).toList()
+
+        assertEquals(1, usages.size)
+
+        val firstElement = usages[0].element!!
+
+        assertEquals(46, firstElement.textOffset)
+
+        assertTrue(readWriteAccessDetector.isDeclarationWriteAccess(firstElement))
+        assertTrue(readWriteAccessDetector.isReadWriteAccessible(firstElement))
+        assertEquals(ReadWriteAccessDetector.Access.Write, readWriteAccessDetector.getExpressionAccess(firstElement))
+
+        assertEquals(UsageType.WRITE, getUsageType(firstElement, usageTargets))
+    }
+
+    fun testVariableUsage() {
+        myFixture.configureByFiles("variable_usage.ex")
+
+        val usageTargets = UsageTargetUtil.findUsageTargets(myFixture.editor, myFixture.file)
+
+        assertEquals(1, usageTargets.size)
+
+        val usageTarget = usageTargets[0]
+
+        assertInstanceOf(usageTarget, PsiElement2UsageTargetAdapter::class.java)
+
+        val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
+
+        assertEquals("call", findUsagesProvider.getType(target))
+
+        val usages = myFixture.findUsages(target).toList()
+
+        assertEquals(2, usages.size)
+
+        val firstElement = usages[0].element!!
+
+        assertEquals(46, firstElement.textOffset)
+
+        val readWriteAccessDetector = readWriteAccessDetector(firstElement)
+        assertTrue(readWriteAccessDetector.isDeclarationWriteAccess(firstElement))
+        assertTrue(readWriteAccessDetector.isReadWriteAccessible(firstElement))
+        assertEquals(ReadWriteAccessDetector.Access.Write, readWriteAccessDetector.getExpressionAccess(firstElement))
+
+        assertEquals(UsageType.WRITE, getUsageType(firstElement, usageTargets))
+
+        val secondElement = usages[1].element!!
+
+        assertEquals(99, secondElement.textOffset)
+
+        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(secondElement))
+        assertFalse(readWriteAccessDetector.isReadWriteAccessible(secondElement))
+        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(secondElement))
+
+        assertEquals(UsageType.READ, getUsageType(secondElement, usageTargets))
     }
 
     private val findUsagesProvider by lazy { LanguageFindUsages.INSTANCE.forLanguage(ElixirLanguage) }

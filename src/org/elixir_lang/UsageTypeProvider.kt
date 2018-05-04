@@ -25,7 +25,7 @@ class UsageTypeProvider : com.intellij.usages.impl.rules.UsageTypeProviderEx {
     override fun getUsageType(element: PsiElement?): UsageType? = getUsageType(element, emptyArray())
 
     private fun getUsageType(targets: Array<out UsageTarget>): UsageType? =
-            targets.map { getUsageType(it) }.reduce { acc, targetUsageType ->
+            targets.map { getUsageType(it) }.fold(null as UsageType?) { acc, targetUsageType ->
                 when {
                     acc == targetUsageType ->
                         acc
@@ -33,6 +33,8 @@ class UsageTypeProvider : com.intellij.usages.impl.rules.UsageTypeProviderEx {
                             (acc == MACRO_DEFINITION_CLAUSE && targetUsageType == FUNCTION_DEFINITION_CLAUSE) ||
                             (acc == CALL_DEFINITION_CLAUSE && (targetUsageType == FUNCTION_DEFINITION_CLAUSE || targetUsageType == MACRO_DEFINITION_CLAUSE)) ->
                         CALL_DEFINITION_CLAUSE
+                    acc == null ->
+                        targetUsageType
                     else ->
                         TODO()
                 }
