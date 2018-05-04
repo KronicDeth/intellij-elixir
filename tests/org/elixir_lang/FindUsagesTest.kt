@@ -160,6 +160,95 @@ class FindUsagesTest : LightCodeInsightFixtureTestCase() {
         assertEquals(UsageType.READ, getUsageType(fourthElement, usageTargets))
     }
 
+    fun testFunctionSingleClauseUnused() {
+        myFixture.configureByFiles("function_single_clause_unused.ex")
+
+        val usageTargets = UsageTargetUtil.findUsageTargets(myFixture.editor, myFixture.file)
+
+        assertEquals(1, usageTargets.size)
+
+        val usageTarget = usageTargets[0]
+
+        assertInstanceOf(usageTarget, PsiElement2UsageTargetAdapter::class.java)
+
+        val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
+
+        assertEquals("function", findUsagesProvider.getType(target))
+
+        val readWriteAccessDetector = readWriteAccessDetector(target)
+        val findUsagesHandler = findUsagesHandler(target)
+
+        val primaryElements = findUsagesHandler.primaryElements
+
+        assertEquals(1, primaryElements.size)
+
+        val secondaryElements = findUsagesHandler.secondaryElements
+
+        assertEquals(0, secondaryElements.size)
+
+        val usages = myFixture.findUsages(target).toList()
+
+        assertEquals(1, usages.size)
+
+        val firstElement = usages[0].element!!
+
+        assertEquals(26, firstElement.textOffset)
+
+        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(firstElement))
+        assertTrue(readWriteAccessDetector.isReadWriteAccessible(firstElement))
+        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(firstElement))
+
+        assertEquals(UsageTypeProvider.CALL_DEFINITION_CLAUSE, getUsageType(firstElement, usageTargets))
+    }
+
+    fun testFunctionMultipleClausesUnused() {
+        myFixture.configureByFiles("function_multiple_clauses_unused.ex")
+
+        val usageTargets = UsageTargetUtil.findUsageTargets(myFixture.editor, myFixture.file)
+
+        assertEquals(1, usageTargets.size)
+
+        val usageTarget = usageTargets[0]
+
+        assertInstanceOf(usageTarget, PsiElement2UsageTargetAdapter::class.java)
+
+        val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
+        val readWriteAccessDetector = readWriteAccessDetector(target)
+        val findUsagesHandler = findUsagesHandler(target)
+
+        val primaryElements = findUsagesHandler.primaryElements
+
+        assertEquals(1, primaryElements.size)
+
+        val secondaryElements = findUsagesHandler.secondaryElements
+
+        assertEquals(1, secondaryElements.size)
+
+        val usages = myFixture.findUsages(target).toList()
+
+        assertEquals(2, usages.size)
+
+        val firstElement = usages[0].element!!
+
+        assertEquals(26, firstElement.textOffset)
+
+        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(firstElement))
+        assertTrue(readWriteAccessDetector.isReadWriteAccessible(firstElement))
+        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(firstElement))
+
+        assertEquals(UsageTypeProvider.CALL_DEFINITION_CLAUSE, getUsageType(firstElement, usageTargets))
+
+        val secondElement = usages[1].element!!
+
+        assertEquals(74, secondElement.textOffset)
+
+        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(secondElement))
+        assertTrue(readWriteAccessDetector.isReadWriteAccessible(secondElement))
+        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(secondElement))
+
+        assertEquals(UsageTypeProvider.CALL_DEFINITION_CLAUSE, getUsageType(secondElement, usageTargets))
+    }
+
     fun testParameterDeclaration() {
         myFixture.configureByFiles("parameter_declaration.ex")
 
