@@ -345,6 +345,102 @@ class FindUsagesTest : LightCodeInsightFixtureTestCase() {
         assertEquals(UsageType.READ, getUsageType(secondElement, usageTargets))
     }
 
+    fun testFunctionImportDeclaration() {
+        myFixture.configureByFiles("function_import_declaration_target.ex", "function_import_declaration_usage.ex")
+
+        val usageTargets = UsageTargetUtil.findUsageTargets(myFixture.editor, myFixture.file)
+
+        assertEquals(1, usageTargets.size)
+
+        val usageTarget = usageTargets[0]
+
+        assertInstanceOf(usageTarget, PsiElement2UsageTargetAdapter::class.java)
+
+        val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
+        val findUsagesHandler = findUsagesHandler(target)
+        val readWriteAccessDetector = readWriteAccessDetector(target)
+
+        val primaryElements = findUsagesHandler.primaryElements
+
+        assertEquals(1, primaryElements.size)
+
+        val secondaryElements = findUsagesHandler.secondaryElements
+
+        assertEquals(0, secondaryElements.size)
+
+        val usages = myFixture.findUsages(target).toList()
+
+        assertEquals(2, usages.size)
+
+        val firstElement = usages[0].element!!
+
+        assertEquals(60, firstElement.textOffset)
+
+        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(firstElement))
+        assertFalse(readWriteAccessDetector.isReadWriteAccessible(firstElement))
+        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(firstElement))
+
+        assertEquals(UsageTypeProvider.CALL, getUsageType(firstElement, usageTargets))
+
+        val secondElement = usages[1].element!!
+
+        assertEquals(31, secondElement.textOffset)
+
+        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(secondElement))
+        assertTrue(readWriteAccessDetector.isReadWriteAccessible(secondElement))
+        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(secondElement))
+
+        assertEquals(UsageTypeProvider.CALL_DEFINITION_CLAUSE, getUsageType(secondElement, usageTargets))
+    }
+
+    fun testFunctionImportUsage() {
+        myFixture.configureByFiles("function_import_usage_target.ex", "function_import_usage_declaration.ex")
+
+        val usageTargets = UsageTargetUtil.findUsageTargets(myFixture.editor, myFixture.file)
+
+        assertEquals(1, usageTargets.size)
+
+        val usageTarget = usageTargets[0]
+
+        assertInstanceOf(usageTarget, PsiElement2UsageTargetAdapter::class.java)
+
+        val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
+        val findUsagesHandler = findUsagesHandler(target)
+
+        val primaryElements = findUsagesHandler.primaryElements
+
+        assertEquals(2, primaryElements.size)
+
+        val secondaryElements = findUsagesHandler.secondaryElements
+
+        assertEquals(0, secondaryElements.size)
+
+        val usages = myFixture.findUsages(target).toList()
+
+        assertEquals(2, usages.size)
+
+        val firstElement = usages[0].element!!
+
+        assertEquals(31, firstElement.textOffset)
+
+        val readWriteAccessDetector = readWriteAccessDetector(firstElement)
+        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(firstElement))
+        assertTrue(readWriteAccessDetector.isReadWriteAccessible(firstElement))
+        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(firstElement))
+
+        assertEquals(UsageTypeProvider.CALL_DEFINITION_CLAUSE, getUsageType(firstElement, usageTargets))
+
+        val secondElement = usages[1].element!!
+
+        assertEquals(60, secondElement.textOffset)
+
+        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(secondElement))
+        assertFalse(readWriteAccessDetector.isReadWriteAccessible(secondElement))
+        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(secondElement))
+
+        assertEquals(UsageType.READ, getUsageType(secondElement, usageTargets))
+    }
+
     fun testParameterDeclaration() {
         myFixture.configureByFiles("parameter_declaration.ex")
 
