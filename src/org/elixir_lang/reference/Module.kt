@@ -28,7 +28,7 @@ class Module(qualifiableAlias: QualifiableAlias, val maxScope: PsiElement) :
                     .getInstance(this.myElement.project)
                     .resolveWithCaching(
                             this,
-                            org.elixir_lang.reference.resolver.Module.INSTANCE,
+                            org.elixir_lang.reference.resolver.Module,
                             false,
                             incompleteCode
                     )
