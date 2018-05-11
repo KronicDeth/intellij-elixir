@@ -113,10 +113,10 @@ class MultiResolve internal constructor(private val name: String, private val in
         }
 
         private fun unaliasedName(match: PsiNamedElement, namePartList: List<String>): String {
-            val matchUnaliasedName = UnaliasedName.unaliasedName(match)!!
+            val matchUnaliasedName = UnaliasedName.unaliasedName(match)
 
             val unaliasedNamePartList = ArrayList<String>(namePartList.size)
-            unaliasedNamePartList.add(matchUnaliasedName)
+            unaliasedNamePartList.add(matchUnaliasedName!!)
 
             for (i in 1 until namePartList.size) {
                 unaliasedNamePartList.add(namePartList[i])

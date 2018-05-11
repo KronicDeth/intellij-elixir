@@ -226,7 +226,7 @@ public class Variants extends Module {
                 )
         );
 
-        String unaliasedName = UnaliasedName.unaliasedName(match);
+        String unaliasedName = UnaliasedName.INSTANCE.unaliasedName(match);
 
         if (unaliasedName != null) {
             Project project = match.getProject();
