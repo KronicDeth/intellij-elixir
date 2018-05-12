@@ -15,9 +15,7 @@ class ItemPresentation(private val qualifiableAlias: QualifiableAlias) : ItemPre
     override fun getLocationString(): String =
         qualifiableAlias.containingFile.locationString(qualifiableAlias.project)
 
-    override fun getIcon(unused: Boolean): Icon? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun getIcon(unused: Boolean): Icon? = null
 
     override fun getPresentableText(): String? =
             qualifiableAlias.parent.let { parent ->
