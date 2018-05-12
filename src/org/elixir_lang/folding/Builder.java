@@ -106,7 +106,7 @@ public class Builder extends FoldingBuilderEx {
                         String moduleAttributeName = moduleAttributeName(atUnqualifiedNoParenthesesCall);
                         String name = moduleAttributeName.substring(1);
 
-                        if (ModuleAttribute.isDocumentationName(name)) {
+                        if (ModuleAttribute.Companion.isDocumentationName(name)) {
                             ElixirNoParenthesesOneArgument noParenthesesOneArgument =
                                     atUnqualifiedNoParenthesesCall.getNoParenthesesOneArgument();
 
@@ -118,7 +118,7 @@ public class Builder extends FoldingBuilderEx {
                                             "\"...\""
                                     )
                             );
-                        } else if (ModuleAttribute.isTypeName(name)) {
+                        } else if (ModuleAttribute.Companion.isTypeName(name)) {
                             ElixirNoParenthesesOneArgument noParenthesesOneArgument =
                                     atUnqualifiedNoParenthesesCall.getNoParenthesesOneArgument();
 

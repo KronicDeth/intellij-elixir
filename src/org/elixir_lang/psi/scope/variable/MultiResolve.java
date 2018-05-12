@@ -154,7 +154,7 @@ public class MultiResolve extends Variable {
     protected boolean executeOnVariable(@NotNull PsiNamedElement match, @NotNull ResolveState state) {
         addToResolveResultListIfMatchingName(match, state);
 
-        return org.elixir_lang.psi.scope.MultiResolve.keepProcessing(incompleteCode, resolveResultList);
+        return org.elixir_lang.psi.scope.MultiResolve.INSTANCE.keepProcessing(incompleteCode, resolveResultList);
     }
 
     /*
@@ -165,7 +165,7 @@ public class MultiResolve extends Variable {
      * Adds {@code resolveResult} to {@link #resolveResultList} if it exists; otherwise, create new
      * {@code List<ResolveList>}, set {@link #resolveResultList} to it, and add {@code resolveResult} to it.
      *
-     * @param resolveResult The element to add to {@code resolveResultList}
+     * @param resolveResult The element to add to {@code resolveResults}
      */
     private void addToResolveResultList(@NotNull ResolveResult resolveResult) {
         if (resolveResultList == null) {

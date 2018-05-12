@@ -13,6 +13,7 @@ import org.elixir_lang.psi.call.qualification.Qualified
 import org.elixir_lang.reference.Callable
 import org.elixir_lang.structure_view.element.CallDefinitionClause
 import org.elixir_lang.structure_view.element.Use
+import org.elixir_lang.structure_view.element.modular.Module
 
 class UsageTypeProvider : com.intellij.usages.impl.rules.UsageTypeProviderEx {
     override fun getUsageType(element: PsiElement?, targets: Array<out UsageTarget>): UsageType? =
@@ -71,10 +72,12 @@ class UsageTypeProvider : com.intellij.usages.impl.rules.UsageTypeProviderEx {
                         null
                     }
                     is ElixirNoParenthesesOneArgument -> {
-                        if (accessExpressionParent.parent?.let { it as? Call }?.let { Use.`is`(it) } == true) {
-                            USE
-                        } else {
-                            null
+                        accessExpressionParent.parent?.let { it as? Call }?.let {
+                            when {
+                                Use.`is`(it) -> USE
+                                Module.`is`(it) -> MODULE_DEFINITION
+                                else -> null
+                            }
                         }
                     }
                     else -> null
@@ -120,6 +123,7 @@ class UsageTypeProvider : com.intellij.usages.impl.rules.UsageTypeProviderEx {
         internal val CALL = UsageType("Call")
         internal val CALL_DEFINITION_CLAUSE = UsageType("Call definition clause")
         internal val FUNCTION_PARAMETER = UsageType("Parameter declaration")
+        internal val MODULE_DEFINITION = UsageType("Module definition")
     }
 }
 

@@ -11,7 +11,7 @@ import org.elixir_lang.psi.scope.call_definition_clause.MultiResolve
 import org.elixir_lang.reference.CaptureNameArity
 
 object CaptureNameArity : ResolveCache.PolyVariantResolver<CaptureNameArity> {
-    override fun resolve(reference: CaptureNameArity, incompleteCode: Boolean): Array<ResolveResult> {
+    override fun resolve(reference: CaptureNameArity, incompleteCode: Boolean): Array<out ResolveResult> {
         val nameElement  = reference.nameElement
 
         return nameElement.functionName()?.let { name ->
@@ -31,7 +31,7 @@ object CaptureNameArity : ResolveCache.PolyVariantResolver<CaptureNameArity> {
                     }.accumulator.toTypedArray()
                 }
             } else {
-                MultiResolve.resolveResultList(name, arity, incompleteCode, reference.element)?.toTypedArray()
+                MultiResolve.resolveResults(name, arity, incompleteCode, reference.element)
             }
         } ?: emptyArray()
     }

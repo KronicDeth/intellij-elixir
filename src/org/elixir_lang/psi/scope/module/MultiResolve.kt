@@ -1,7 +1,10 @@
 package org.elixir_lang.psi.scope.module
 
 import com.intellij.openapi.project.DumbService
-import com.intellij.psi.*
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiElementResolveResult
+import com.intellij.psi.PsiNamedElement
+import com.intellij.psi.ResolveState
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.util.PsiTreeUtil
@@ -11,14 +14,12 @@ import org.elixir_lang.psi.NamedElement
 import org.elixir_lang.psi.call.Named
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.scope.Module
+import org.elixir_lang.psi.scope.ResolveResultOrderedSet
 import org.elixir_lang.psi.stub.index.AllName
 import org.elixir_lang.reference.module.UnaliasedName
 import java.util.*
 
 class MultiResolve internal constructor(private val name: String, private val incompleteCode: Boolean) : Module() {
-    var resolveResultList: List<ResolveResult>? = null
-        private set
-
     override fun execute(match: PsiElement, state: ResolveState): Boolean =
             if (match is Named) {
                 execute(match, state)
@@ -39,7 +40,7 @@ class MultiResolve internal constructor(private val name: String, private val in
             val namePartList = split(name)
 
             // adds `Foo.SSH` in `alias Foo.SSH`
-            addToResolveResultList(match, true)
+            resolveResultOrderedSet.add(match, true)
 
             // adds `defmodule Foo.SSH` for `alias Foo.SSH`
             addUnaliasedNamedElementsToResolveResultList(match, namePartList)
@@ -49,35 +50,33 @@ class MultiResolve internal constructor(private val name: String, private val in
 
             // alias Foo.SSH, then SSH.Key is name
             if (aliasedName == firstNamePart) {
-                addToResolveResultList(match, true)
+                resolveResultOrderedSet.add(match, true)
 
                 addUnaliasedNamedElementsToResolveResultList(match, namePartList)
             } else if (incompleteCode && aliasedName.startsWith(name)) {
-                addToResolveResultList(match, false)
+                resolveResultOrderedSet.add(match, false)
             }
         }
 
-        return org.elixir_lang.psi.scope.MultiResolve.keepProcessing(incompleteCode, resolveResultList)
+        return resolveResultOrderedSet.keepProcessing(incompleteCode)
     }
 
-    private fun addToResolveResultList(element: PsiElement, validResult: Boolean) {
-        resolveResultList = org.elixir_lang.psi.scope.MultiResolve.addToResolveResultList(
-                resolveResultList, PsiElementResolveResult(element, validResult)
-        )
-    }
+    fun resolveResults(): Array<PsiElementResolveResult> = resolveResultOrderedSet.toTypedArray()
+
+    private val resolveResultOrderedSet = ResolveResultOrderedSet()
 
     private fun addUnaliasedNamedElementsToResolveResultList(match: PsiNamedElement, namePartList: List<String>) {
         unaliasedName(match, namePartList)
                 .let { indexedNamedElements(match, it) }
-                .forEach { addToResolveResultList(it, true) }
+                .forEach { resolveResultOrderedSet.add(it, true) }
     }
 
     companion object {
-        fun resolveResultList(name: String,
-                              incompleteCode: Boolean,
-                              entrance: PsiElement,
-                              maxScope: PsiElement): List<ResolveResult>? =
-                resolveResultList(name, incompleteCode, entrance, maxScope, ResolveState.initial())
+        fun resolveResults(name: String,
+                           incompleteCode: Boolean,
+                           entrance: PsiElement,
+                           maxScope: PsiElement): Array<PsiElementResolveResult> =
+                resolveResults(name, incompleteCode, entrance, maxScope, ResolveState.initial())
 
         private fun indexedNamedElements(match: PsiNamedElement, unaliasedName: String): Collection<NamedElement> {
             val project = match.project
@@ -95,11 +94,11 @@ class MultiResolve internal constructor(private val name: String, private val in
             }
         }
 
-        private fun resolveResultList(name: String,
-                                      incompleteCode: Boolean,
-                                      entrance: PsiElement,
-                                      maxScope: PsiElement,
-                                      state: ResolveState): List<ResolveResult>? {
+        private fun resolveResults(name: String,
+                                   incompleteCode: Boolean,
+                                   entrance: PsiElement,
+                                   maxScope: PsiElement,
+                                   state: ResolveState): Array<PsiElementResolveResult> {
             val multiResolve = MultiResolve(name, incompleteCode)
 
             PsiTreeUtil.treeWalkUp(
@@ -109,7 +108,7 @@ class MultiResolve internal constructor(private val name: String, private val in
                     state.put(ENTRANCE, entrance)
             )
 
-            return multiResolve.resolveResultList
+            return multiResolve.resolveResults()
         }
 
         private fun unaliasedName(match: PsiNamedElement, namePartList: List<String>): String {

@@ -17,6 +17,7 @@ import org.elixir_lang.psi.operation.Match
 import org.jetbrains.annotations.Contract
 import java.util.*
 
+fun PsiElement.ancestorSequence() = generateSequence(this) { it.parent }
 fun PsiElement.document(): Document? = containingFile.viewProvider.document
 
 /**
@@ -210,6 +211,8 @@ fun PsiElement.moduleWithDependentsScope(): GlobalSearchScope {
         GlobalSearchScope.allScope(project)
     }
 }
+
+fun PsiElement.prevSiblingSequence() = generateSequence(this) { it.prevSibling }
 
 @Contract(pure = true)
 fun PsiElement.siblingExpression(function: (PsiElement) -> PsiElement): PsiElement? {

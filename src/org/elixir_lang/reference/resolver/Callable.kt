@@ -42,7 +42,7 @@ object Callable : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Cal
                 }
             }
 
-            val callDefinitionClauseResolveResultList = org.elixir_lang.psi.scope.call_definition_clause.MultiResolve.resolveResultList(
+            val callDefinitionClauseResolveResultList = org.elixir_lang.psi.scope.call_definition_clause.MultiResolve.resolveResults(
                     name,
                     resolvedFinalArity,
                     incompleteCode,

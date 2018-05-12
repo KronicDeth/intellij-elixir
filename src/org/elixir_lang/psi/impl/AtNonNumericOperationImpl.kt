@@ -5,7 +5,7 @@ import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager.getCachedValue
 import org.elixir_lang.psi.AtNonNumericOperation
 import org.elixir_lang.reference.ModuleAttribute
-import org.elixir_lang.reference.ModuleAttribute.isNonReferencing
+import org.elixir_lang.reference.ModuleAttribute.Companion.isNonReferencing
 
 private fun AtNonNumericOperation.computeReference(): PsiReference? =
         if (!isNonReferencing(this)) {
