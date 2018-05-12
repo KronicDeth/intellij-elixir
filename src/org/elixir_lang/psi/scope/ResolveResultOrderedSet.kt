@@ -10,16 +10,14 @@ class ResolveResultOrderedSet : Collection<PsiElementResolveResult> {
    fun add(resolveResult: PsiElementResolveResult) {
       resolveResult.element.let { element ->
          if (element !in resolvedSet) {
-            resolvedResultList.add(resolveResult)
-            resolvedSet.add(element)
+            addConfirmedUnique(element, resolveResult)
          }
       }
    }
 
    fun add(element: PsiElement, validResult: Boolean) {
       if (element !in resolvedSet) {
-         resolvedResultList.add(PsiElementResolveResult(element, validResult))
-         resolvedSet.add(element)
+         addConfirmedUnique(element, PsiElementResolveResult(element, validResult))
       }
    }
 
@@ -42,6 +40,11 @@ class ResolveResultOrderedSet : Collection<PsiElementResolveResult> {
 
    private val resolvedSet = mutableSetOf<PsiElement>()
    private val resolvedResultList = mutableListOf<PsiElementResolveResult>()
+
+   private fun addConfirmedUnique(element: PsiElement, resolveResult: PsiElementResolveResult) {
+      resolvedResultList.add(resolveResult)
+      resolvedSet.add(element)
+   }
 
    private fun hasValidResult() = any { it.isValidResult }
 }
