@@ -9,7 +9,7 @@ import com.intellij.psi.ResolveState;
 import com.intellij.psi.StubBasedPsiElement;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.search.SearchScope;
-import kotlin.ranges.IntRange;;
+import kotlin.ranges.IntRange;
 import org.elixir_lang.psi.stub.MatchedAtUnqualifiedNoParenthesesCall;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

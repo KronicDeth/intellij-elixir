@@ -1083,6 +1083,11 @@ public class ElixirPsiImplUtil {
     }
 
     @Nullable
+    public static ItemPresentation getPresentation(@NotNull final QualifiableAlias qualifiableAlias) {
+        return PresentationImpl.getPresentation(qualifiableAlias);
+    }
+
+    @Nullable
     public static PsiReference getReference(@NotNull Call call) {
         return CallImplKt.getReference(call);
     }

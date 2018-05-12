@@ -4,7 +4,7 @@ package org.elixir_lang.psi;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
-import kotlin.ranges.IntRange;;
+import kotlin.ranges.IntRange;
 import org.elixir_lang.psi.call.Named;
 import org.elixir_lang.psi.operation.capture.NonNumeric;
 import org.jetbrains.annotations.NotNull;

@@ -9,7 +9,9 @@ import com.intellij.usageView.UsageViewUtil
 import org.elixir_lang.annotator.Parameter
 import org.elixir_lang.beam.psi.BeamFileImpl
 import org.elixir_lang.psi.ElixirIdentifier
+import org.elixir_lang.psi.QualifiableAlias
 import org.elixir_lang.psi.call.Call
+import org.elixir_lang.psi.outerMostQualifiableAlias
 import org.elixir_lang.structure_view.element.CallDefinitionClause
 import java.io.File
 import javax.swing.Icon
@@ -41,6 +43,12 @@ object PresentationImpl {
         }
     }
 
+    @JvmStatic
+    fun getPresentation(qualifiableAlias: QualifiableAlias): ItemPresentation =
+        qualifiableAlias
+                .outerMostQualifiableAlias()
+                .let { org.elixir_lang.psi.impl.qualifiable_alias.ItemPresentation(it) }
+
     private fun getDefaultPresentation(call: Call): ItemPresentation {
         val text = UsageViewUtil.createNodeText(call)
 
@@ -56,7 +64,7 @@ object PresentationImpl {
 
 private fun Call.locationString(): String = this.containingFile!!.locationString(this.project)
 
-private fun PsiFile.locationString(project: Project): String {
+fun PsiFile.locationString(project: Project): String {
     val originalFile = originalFile
 
     return when (originalFile) {

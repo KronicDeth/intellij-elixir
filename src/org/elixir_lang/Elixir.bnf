@@ -1832,6 +1832,7 @@ matchedQualifiedAlias ::= matchedExpression dotInfixOperator alias
                               fullyQualifiedName
                               getName
                               getNameIdentifier
+                              getPresentation
                               getReference
                               isModuleName
                               processDeclarations
@@ -2340,6 +2341,7 @@ alias ::= ALIAS_TOKEN notKeywordPairColon
               fullyQualifiedName
               getName
               getNameIdentifier
+              getPresentation
               getReference
               isModuleName
               processDeclarations
@@ -2654,6 +2656,7 @@ unmatchedQualifiedAlias ::= unmatchedExpression dotInfixOperator alias
                                 fullyQualifiedName
                                 getName
                                 getNameIdentifier
+                                getPresentation
                                 getReference
                                 isModuleName
                                 processDeclarations

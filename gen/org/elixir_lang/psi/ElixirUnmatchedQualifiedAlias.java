@@ -2,6 +2,7 @@
 package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiPolyVariantReference;
 import com.intellij.psi.PsiReference;
@@ -29,6 +30,9 @@ public interface ElixirUnmatchedQualifiedAlias extends ElixirUnmatchedExpression
 
   @Nullable
   PsiElement getNameIdentifier();
+
+  @Nullable
+  ItemPresentation getPresentation();
 
   @Nullable
   PsiReference getReference();
