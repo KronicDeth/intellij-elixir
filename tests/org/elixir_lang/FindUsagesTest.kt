@@ -627,6 +627,48 @@ class FindUsagesTest : LightCodeInsightFixtureTestCase() {
         assertEquals(UsageTypeProvider.ALIAS, getUsageType(thirdElement, usageTargets))
     }
 
+    fun testModuleNestedRecursiveDeclaration() {
+        myFixture.configureByFiles("module_nested_recursive_declaration.ex")
+
+        val usageTargets = UsageTargetUtil.findUsageTargets(myFixture.editor, myFixture.file)
+
+        assertEquals(1, usageTargets.size)
+
+        val usageTarget = usageTargets[0]
+
+        assertInstanceOf(usageTarget, PsiElement2UsageTargetAdapter::class.java)
+
+        val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
+
+        assertEquals("module", findUsagesProvider.getType(target))
+
+        val findUsagesHandler = findUsagesHandler(target)
+
+        val primaryElements = findUsagesHandler.primaryElements
+
+        assertEquals(1, primaryElements.size)
+
+        val secondaryElements = findUsagesHandler.secondaryElements
+
+        assertEquals(0, secondaryElements.size)
+
+        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
+
+        assertEquals(2, usages.size)
+
+        val firstElement = usages[0].element!!
+
+        assertEquals(10, firstElement.textOffset)
+        assertNull(readWriteAccessDetector(firstElement))
+        assertEquals(UsageTypeProvider.MODULE_DEFINITION, getUsageType(firstElement, usageTargets))
+
+        val secondElement = usages[1].element!!
+
+        assertEquals(40, secondElement.textOffset)
+        assertNull(readWriteAccessDetector(secondElement))
+        assertEquals(UsageTypeProvider.ALIAS, getUsageType(secondElement, usageTargets))
+    }
+
     fun testParameterUnused() {
         myFixture.configureByFiles("parameter_unused.ex")
 

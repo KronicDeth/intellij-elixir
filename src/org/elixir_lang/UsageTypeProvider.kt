@@ -20,7 +20,7 @@ import org.elixir_lang.structure_view.element.modular.Module
 class UsageTypeProvider : com.intellij.usages.impl.rules.UsageTypeProviderEx {
     override fun getUsageType(element: PsiElement?, targets: Array<out UsageTarget>): UsageType? =
             when (element) {
-                is QualifiableAlias -> getUsageType(element, targets)
+                is QualifiableAlias -> qualifiableAliasUsageType(element, entrance = element)
                 is Call -> getUsageType(element, targets)
                 else -> null
             }
@@ -63,28 +63,27 @@ class UsageTypeProvider : com.intellij.usages.impl.rules.UsageTypeProviderEx {
             com.intellij.codeInsight.highlighting.ReadWriteAccessDetector.Access.ReadWrite -> null
         }
 
-    private fun getUsageType(qualifiableAlias: QualifiableAlias, targets: Array<out UsageTarget>): UsageType? =
-            qualifiableAlias.parent?.let { it as? ElixirAccessExpression }?.let { accessExpression ->
-                val accessExpressionParent = accessExpression.parent
-
-                when (accessExpressionParent) {
-                    is Qualified -> if (accessExpressionParent.qualifier().isEquivalentTo(accessExpression)) {
+    private tailrec fun qualifiableAliasUsageType(psiElement: PsiElement, entrance: QualifiableAlias): UsageType? =
+            when (psiElement) {
+                is ElixirAccessExpression,
+                is ElixirNoParenthesesOneArgument,
+                is QualifiableAlias ->
+                    qualifiableAliasUsageType(psiElement.parent, entrance)
+                is Qualified ->
+                    if (psiElement.qualifier().isEquivalentTo(entrance)) {
                         REMOTE_CALL
                     } else {
                         null
                     }
-                    is ElixirNoParenthesesOneArgument -> {
-                        accessExpressionParent.parent?.let { it as? Call }?.let {
-                            when {
-                                Use.`is`(it) -> USE
-                                Module.`is`(it) -> MODULE_DEFINITION
-                                it.isCalling(KERNEL, Function.ALIAS) -> ALIAS
-                                else -> null
-                            }
-                        }
+                is Call ->
+                    when {
+                        Use.`is`(psiElement) -> USE
+                        Module.`is`(psiElement) -> MODULE_DEFINITION
+                        psiElement.isCalling(KERNEL, Function.ALIAS) -> ALIAS
+                        else -> null
                     }
-                    else -> null
-                }
+                else ->
+                    null
             }
 
     private fun getReadUsageType(call: Call, targets: Array<out UsageTarget>): UsageType {
