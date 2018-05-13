@@ -690,6 +690,135 @@ class FindUsagesTest : LightCodeInsightFixtureTestCase() {
         assertEquals(UsageTypeProvider.ALIAS, getUsageType(thirdElement, usageTargets))
     }
 
+    fun testModuleMultipleModulesDeclaration() {
+        myFixture.configureByFiles("module_multiple_modules_declaration_target.ex", "module_multiple_modules_declaration_usage.ex")
+
+        val usageTargets = UsageTargetUtil.findUsageTargets(myFixture.editor, myFixture.file)
+
+        assertEquals(1, usageTargets.size)
+
+        val usageTarget = usageTargets[0]
+
+        assertInstanceOf(usageTarget, PsiElement2UsageTargetAdapter::class.java)
+
+        val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
+
+        assertEquals("module", findUsagesProvider.getType(target))
+
+        val findUsagesHandler = findUsagesHandler(target)
+
+        val primaryElements = findUsagesHandler.primaryElements
+
+        assertEquals(1, primaryElements.size)
+
+        val secondaryElements = findUsagesHandler.secondaryElements
+
+        assertEquals(0, secondaryElements.size)
+
+        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
+
+        assertEquals(2, usages.size)
+
+        val firstElement = usages[0].element!!
+
+        assertEquals(
+                "defmodule Declaration do\n" +
+                        "end",
+                firstElement.parent.parent.parent.text
+        )
+        assertEquals(10, firstElement.textOffset)
+        assertNull(readWriteAccessDetector(firstElement))
+        assertEquals(UsageTypeProvider.MODULE_DEFINITION, getUsageType(firstElement, usageTargets))
+
+        val secondElement = usages[1].element!!
+
+        assertEquals(
+                "alias Declaration",
+                secondElement.parent.parent.parent.text
+        )
+        assertEquals(27, secondElement.textOffset)
+        assertNull(readWriteAccessDetector(secondElement))
+        assertEquals(UsageTypeProvider.ALIAS, getUsageType(secondElement, usageTargets))
+    }
+
+    fun testModuleMultipleModulesUsage() {
+        myFixture.configureByFiles("module_multiple_modules_usage_target.ex", "module_multiple_modules_usage_declaration.ex")
+
+        val usageTargets = UsageTargetUtil.findUsageTargets(myFixture.editor, myFixture.file)
+
+        assertEquals(1, usageTargets.size)
+
+        val usageTarget = usageTargets[0]
+
+        assertInstanceOf(usageTarget, PsiElement2UsageTargetAdapter::class.java)
+
+        val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
+
+        assertEquals("alias", findUsagesProvider.getType(target))
+
+        val findUsagesHandler = findUsagesHandler(target)
+
+        val primaryElements = findUsagesHandler.primaryElements.sortedBy { it.textOffset }
+
+        assertEquals(2, primaryElements.size)
+
+        val firstPrimaryElement = primaryElements[0]
+
+        assertEquals(
+                "defmodule Declaration do\n" +
+                        "end",
+                firstPrimaryElement.text
+        )
+        assertEquals(10, firstPrimaryElement.textOffset)
+
+        val secondPrimaryElement = primaryElements[1]
+
+        assertEquals(
+                "alias Declaration",
+                secondPrimaryElement.parent.parent.parent.text
+        )
+        assertEquals(27, secondPrimaryElement.textOffset)
+
+        val secondaryElements = findUsagesHandler.secondaryElements
+
+        assertEquals(0, secondaryElements.size)
+
+        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
+
+        assertEquals(3, usages.size)
+
+        val firstElement = usages[0].element!!
+
+        assertEquals(
+                "defmodule Declaration do\n" +
+                        "end",
+                firstElement.parent.parent.parent.text
+        )
+        assertEquals(10, firstElement.textOffset)
+        assertNull(readWriteAccessDetector(firstElement))
+        assertEquals(UsageTypeProvider.MODULE_DEFINITION, getUsageType(firstElement, usageTargets))
+
+        val secondElement = usages[1].element!!
+
+        assertEquals(
+                "alias Declaration",
+                secondElement.parent.parent.parent.text
+        )
+        assertEquals(27, secondElement.textOffset)
+        assertNull(readWriteAccessDetector(secondElement))
+        assertEquals(UsageTypeProvider.ALIAS, getUsageType(secondElement, usageTargets))
+
+        val thirdElement = usages[2].element!!
+
+        assertEquals(
+                "alias Declaration",
+                thirdElement.parent.parent.parent.text
+        )
+        assertEquals(27, thirdElement.textOffset)
+        assertNull(readWriteAccessDetector(thirdElement))
+        assertEquals(UsageTypeProvider.ALIAS, getUsageType(thirdElement, usageTargets))
+    }
+
     fun testParameterUnused() {
         myFixture.configureByFiles("parameter_unused.ex")
 

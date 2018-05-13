@@ -1,0 +1,2 @@
+defmodule Declaration do
+end
