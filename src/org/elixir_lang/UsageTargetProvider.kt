@@ -9,6 +9,7 @@ import com.intellij.usages.UsageTarget
 import org.elixir_lang.beam.psi.impl.ModuleImpl
 import org.elixir_lang.psi.QualifiableAlias
 import org.elixir_lang.psi.call.Call
+import org.elixir_lang.psi.outerMostQualifiableAlias
 
 class UsageTargetProvider : com.intellij.usages.UsageTargetProvider {
     override fun getTargets(editor: Editor, file: PsiFile): Array<UsageTarget>? {
@@ -39,18 +40,3 @@ class UsageTargetProvider : com.intellij.usages.UsageTargetProvider {
         qualifiableAlias.outerMostQualifiableAlias().let { PsiElement2UsageTargetAdapter(it) }.let { arrayOf(it) }
 }
 
-private tailrec fun QualifiableAlias.outerMostQualifiableAlias(): QualifiableAlias {
-    val parent = parent!!
-
-    return if (parent is QualifiableAlias) {
-        parent.outerMostQualifiableAlias()
-    } else {
-        val grandParent = parent.parent
-
-        if (grandParent is QualifiableAlias) {
-            grandParent.outerMostQualifiableAlias()
-        } else {
-            this
-        }
-    }
-}

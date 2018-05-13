@@ -33,7 +33,7 @@ class FindUsagesTest : LightCodeInsightFixtureTestCase() {
 
         assertEquals("function", findUsagesProvider.getType(target))
 
-        val readWriteAccessDetector = readWriteAccessDetector(target)
+        val readWriteAccessDetector = readWriteAccessDetector(target)!!
         val findUsagesHandler = findUsagesHandler(target)
 
         val primaryElements = findUsagesHandler.primaryElements
@@ -44,13 +44,17 @@ class FindUsagesTest : LightCodeInsightFixtureTestCase() {
 
         assertEquals(1, secondaryElements.size)
 
-        val usages = myFixture.findUsages(target).toList()
+        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
 
         assertEquals(4, usages.size)
 
         val firstElement = usages[0].element!!
 
-        assertEquals(63, firstElement.textOffset)
+        assertEquals(
+                "def function([], acc), do: acc",
+                firstElement.parent.parent.text
+        )
+        assertEquals(29, firstElement.textOffset)
 
         assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(firstElement))
         assertTrue(readWriteAccessDetector.isReadWriteAccessible(firstElement))
@@ -60,26 +64,44 @@ class FindUsagesTest : LightCodeInsightFixtureTestCase() {
 
         val secondElement = usages[1].element!!
 
-        assertEquals(93, secondElement.textOffset)
+        assertEquals(
+                "def function([h | t], acc) do\n" +
+                        "    function(t, [h | acc])\n" +
+                        "  end",
+                secondElement.parent.parent.text
+        )
+        assertEquals(63, secondElement.textOffset)
 
         assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(secondElement))
-        assertFalse(readWriteAccessDetector.isReadWriteAccessible(secondElement))
+        assertTrue(readWriteAccessDetector.isReadWriteAccessible(secondElement))
         assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(secondElement))
 
-        assertEquals(UsageTypeProvider.CALL, getUsageType(secondElement, usageTargets))
+        assertEquals(UsageTypeProvider.CALL_DEFINITION_CLAUSE, getUsageType(secondElement, usageTargets))
 
         val thirdElement = usages[2].element!!
 
-        assertEquals(29, thirdElement.textOffset)
+        assertEquals(
+                "do\n" +
+                        "    function(t, [h | acc])\n" +
+                        "  end",
+                thirdElement.parent.parent.parent.text
+        )
+        assertEquals(93, thirdElement.textOffset)
 
         assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(thirdElement))
-        assertTrue(readWriteAccessDetector.isReadWriteAccessible(thirdElement))
+        assertFalse(readWriteAccessDetector.isReadWriteAccessible(thirdElement))
         assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(thirdElement))
 
-        assertEquals(UsageTypeProvider.CALL_DEFINITION_CLAUSE, getUsageType(thirdElement, usageTargets))
+        assertEquals(UsageTypeProvider.CALL, getUsageType(thirdElement, usageTargets))
 
         val fourthElement = usages[3].element!!
 
+        assertEquals(
+                "do\n" +
+                        "    function(t, [h | acc])\n" +
+                        "  end",
+                fourthElement.parent.parent.parent.text
+        )
         assertEquals(93, fourthElement.textOffset)
 
         assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(fourthElement))
@@ -114,14 +136,18 @@ class FindUsagesTest : LightCodeInsightFixtureTestCase() {
 
         assertEquals(0, secondaryElements.size)
 
-        val usages = myFixture.findUsages(target).toList()
+        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
 
         assertEquals(4, usages.size)
 
         val firstElement = usages[0].element!!
-        val readWriteAccessDetector = readWriteAccessDetector(firstElement)
+        val readWriteAccessDetector = readWriteAccessDetector(firstElement)!!
 
-        assertEquals(63, firstElement.textOffset)
+        assertEquals(
+                "def function([], acc), do: acc",
+                firstElement.parent.parent.text
+        )
+        assertEquals(29, firstElement.textOffset)
 
         assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(firstElement))
         assertTrue(readWriteAccessDetector.isReadWriteAccessible(firstElement))
@@ -131,26 +157,44 @@ class FindUsagesTest : LightCodeInsightFixtureTestCase() {
 
         val secondElement = usages[1].element!!
 
-        assertEquals(93, secondElement.textOffset)
+        assertEquals(
+                "def function([h | t], acc) do\n" +
+                        "    function(t, [h | acc])\n" +
+                        "  end",
+                secondElement.parent.parent.text
+        )
+        assertEquals(63, secondElement.textOffset)
 
         assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(secondElement))
-        assertFalse(readWriteAccessDetector.isReadWriteAccessible(secondElement))
+        assertTrue(readWriteAccessDetector.isReadWriteAccessible(secondElement))
         assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(secondElement))
 
-        assertEquals(UsageType.READ, getUsageType(secondElement, usageTargets))
+        assertEquals(UsageTypeProvider.CALL_DEFINITION_CLAUSE, getUsageType(secondElement, usageTargets))
 
         val thirdElement = usages[2].element!!
 
-        assertEquals(29, thirdElement.textOffset)
+        assertEquals(
+                "do\n" +
+                        "    function(t, [h | acc])\n" +
+                        "  end",
+                thirdElement.parent.parent.parent.text
+        )
+        assertEquals(93, thirdElement.textOffset)
 
         assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(thirdElement))
-        assertTrue(readWriteAccessDetector.isReadWriteAccessible(thirdElement))
+        assertFalse(readWriteAccessDetector.isReadWriteAccessible(thirdElement))
         assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(thirdElement))
 
-        assertEquals(UsageTypeProvider.CALL_DEFINITION_CLAUSE, getUsageType(thirdElement, usageTargets))
+        assertEquals(UsageType.READ, getUsageType(thirdElement, usageTargets))
 
         val fourthElement = usages[3].element!!
 
+        assertEquals(
+                "do\n" +
+                        "    function(t, [h | acc])\n" +
+                        "  end",
+                thirdElement.parent.parent.parent.text
+        )
         assertEquals(93, fourthElement.textOffset)
 
         assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(fourthElement))
@@ -175,7 +219,7 @@ class FindUsagesTest : LightCodeInsightFixtureTestCase() {
 
         assertEquals("function", findUsagesProvider.getType(target))
 
-        val readWriteAccessDetector = readWriteAccessDetector(target)
+        val readWriteAccessDetector = readWriteAccessDetector(target)!!
         val findUsagesHandler = findUsagesHandler(target)
 
         val primaryElements = findUsagesHandler.primaryElements
@@ -186,7 +230,7 @@ class FindUsagesTest : LightCodeInsightFixtureTestCase() {
 
         assertEquals(0, secondaryElements.size)
 
-        val usages = myFixture.findUsages(target).toList()
+        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
 
         assertEquals(1, usages.size)
 
@@ -213,7 +257,7 @@ class FindUsagesTest : LightCodeInsightFixtureTestCase() {
         assertInstanceOf(usageTarget, PsiElement2UsageTargetAdapter::class.java)
 
         val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
-        val readWriteAccessDetector = readWriteAccessDetector(target)
+        val readWriteAccessDetector = readWriteAccessDetector(target)!!
         val findUsagesHandler = findUsagesHandler(target)
 
         val primaryElements = findUsagesHandler.primaryElements
@@ -224,7 +268,7 @@ class FindUsagesTest : LightCodeInsightFixtureTestCase() {
 
         assertEquals(1, secondaryElements.size)
 
-        val usages = myFixture.findUsages(target).toList()
+        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
 
         assertEquals(2, usages.size)
 
@@ -262,7 +306,7 @@ class FindUsagesTest : LightCodeInsightFixtureTestCase() {
 
         val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
         val findUsagesHandler = findUsagesHandler(target)
-        val readWriteAccessDetector = readWriteAccessDetector(target)
+        val readWriteAccessDetector = readWriteAccessDetector(target)!!
 
         val primaryElements = findUsagesHandler.primaryElements
 
@@ -272,29 +316,28 @@ class FindUsagesTest : LightCodeInsightFixtureTestCase() {
 
         assertEquals(0, secondaryElements.size)
 
-        val usages = myFixture.findUsages(target).toList()
+        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
 
         assertEquals(2, usages.size)
 
         val firstElement = usages[0].element!!
-
-        assertEquals(50, firstElement.textOffset)
-
-        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(firstElement))
-        assertFalse(readWriteAccessDetector.isReadWriteAccessible(firstElement))
-        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(firstElement))
-
-        assertEquals(UsageTypeProvider.CALL, getUsageType(firstElement, usageTargets))
-
         val secondElement = usages[1].element!!
 
-        assertEquals(31, secondElement.textOffset)
+        assertEquals(31, firstElement.textOffset)
+
+        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(firstElement))
+        assertTrue(readWriteAccessDetector.isReadWriteAccessible(firstElement))
+        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(firstElement))
+
+        assertEquals(UsageTypeProvider.CALL_DEFINITION_CLAUSE, getUsageType(firstElement, usageTargets))
+
+        assertEquals(50, secondElement.textOffset)
 
         assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(secondElement))
-        assertTrue(readWriteAccessDetector.isReadWriteAccessible(secondElement))
+        assertFalse(readWriteAccessDetector.isReadWriteAccessible(secondElement))
         assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(secondElement))
 
-        assertEquals(UsageTypeProvider.CALL_DEFINITION_CLAUSE, getUsageType(secondElement, usageTargets))
+        assertEquals(UsageTypeProvider.CALL, getUsageType(secondElement, usageTargets))
     }
 
     fun testFunctionMultipleModulesUsage() {
@@ -319,7 +362,7 @@ class FindUsagesTest : LightCodeInsightFixtureTestCase() {
 
         assertEquals(0, secondaryElements.size)
 
-        val usages = myFixture.findUsages(target).toList()
+        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
 
         assertEquals(2, usages.size)
 
@@ -327,7 +370,7 @@ class FindUsagesTest : LightCodeInsightFixtureTestCase() {
 
         assertEquals(31, firstElement.textOffset)
 
-        val readWriteAccessDetector = readWriteAccessDetector(firstElement)
+        val readWriteAccessDetector = readWriteAccessDetector(firstElement)!!
         assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(firstElement))
         assertTrue(readWriteAccessDetector.isReadWriteAccessible(firstElement))
         assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(firstElement))
@@ -358,7 +401,7 @@ class FindUsagesTest : LightCodeInsightFixtureTestCase() {
 
         val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
         val findUsagesHandler = findUsagesHandler(target)
-        val readWriteAccessDetector = readWriteAccessDetector(target)
+        val readWriteAccessDetector = readWriteAccessDetector(target)!!
 
         val primaryElements = findUsagesHandler.primaryElements
 
@@ -368,29 +411,32 @@ class FindUsagesTest : LightCodeInsightFixtureTestCase() {
 
         assertEquals(0, secondaryElements.size)
 
-        val usages = myFixture.findUsages(target).toList()
+        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
 
         assertEquals(2, usages.size)
 
         val firstElement = usages[0].element!!
-
-        assertEquals(60, firstElement.textOffset)
-
-        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(firstElement))
-        assertFalse(readWriteAccessDetector.isReadWriteAccessible(firstElement))
-        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(firstElement))
-
-        assertEquals(UsageTypeProvider.CALL, getUsageType(firstElement, usageTargets))
-
         val secondElement = usages[1].element!!
 
-        assertEquals(31, secondElement.textOffset)
+        assertEquals(
+                "def declaration, do: :ok",
+                firstElement.parent.parent.text
+        )
+        assertEquals(31, firstElement.textOffset)
+
+        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(firstElement))
+        assertTrue(readWriteAccessDetector.isReadWriteAccessible(firstElement))
+        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(firstElement))
+
+        assertEquals(UsageTypeProvider.CALL_DEFINITION_CLAUSE, getUsageType(firstElement, usageTargets))
+
+        assertEquals(60, secondElement.textOffset)
 
         assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(secondElement))
-        assertTrue(readWriteAccessDetector.isReadWriteAccessible(secondElement))
+        assertFalse(readWriteAccessDetector.isReadWriteAccessible(secondElement))
         assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(secondElement))
 
-        assertEquals(UsageTypeProvider.CALL_DEFINITION_CLAUSE, getUsageType(secondElement, usageTargets))
+        assertEquals(UsageTypeProvider.CALL, getUsageType(secondElement, usageTargets))
     }
 
     fun testFunctionImportUsage() {
@@ -415,23 +461,32 @@ class FindUsagesTest : LightCodeInsightFixtureTestCase() {
 
         assertEquals(0, secondaryElements.size)
 
-        val usages = myFixture.findUsages(target).toList()
+        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
 
         assertEquals(2, usages.size)
 
         val firstElement = usages[0].element!!
+        val secondElement = usages[1].element!!
+        val readWriteAccessDetector = readWriteAccessDetector(firstElement)!!
 
+        assertEquals(
+                "def declaration, do: :ok",
+                firstElement.parent.parent.text
+        )
         assertEquals(31, firstElement.textOffset)
 
-        val readWriteAccessDetector = readWriteAccessDetector(firstElement)
         assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(firstElement))
         assertTrue(readWriteAccessDetector.isReadWriteAccessible(firstElement))
         assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(firstElement))
 
         assertEquals(UsageTypeProvider.CALL_DEFINITION_CLAUSE, getUsageType(firstElement, usageTargets))
 
-        val secondElement = usages[1].element!!
-
+        assertEquals(
+                "do\n" +
+                "    declaration()\n" +
+                "  end",
+                secondElement.parent.parent.parent.text
+        )
         assertEquals(60, secondElement.textOffset)
 
         assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(secondElement))
@@ -453,11 +508,11 @@ class FindUsagesTest : LightCodeInsightFixtureTestCase() {
         assertInstanceOf(usageTarget, PsiElement2UsageTargetAdapter::class.java)
 
         val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
-        val readWriteAccessDetector = readWriteAccessDetector(target)
+        val readWriteAccessDetector = readWriteAccessDetector(target)!!
 
         assertEquals("parameter", findUsagesProvider.getType(target))
 
-        val usages = myFixture.findUsages(target).toList()
+        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
 
         assertEquals(2, usages.size)
 
@@ -482,6 +537,96 @@ class FindUsagesTest : LightCodeInsightFixtureTestCase() {
         assertEquals(UsageType.READ, getUsageType(secondElement, usageTargets))
     }
 
+    fun testModuleRecursiveDeclaration() {
+        myFixture.configureByFiles("module_recursive_declaration.ex")
+
+        val usageTargets = UsageTargetUtil.findUsageTargets(myFixture.editor, myFixture.file)
+
+        assertEquals(1, usageTargets.size)
+
+        val usageTarget = usageTargets[0]
+
+        assertInstanceOf(usageTarget, PsiElement2UsageTargetAdapter::class.java)
+
+        val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
+
+        assertEquals("module", findUsagesProvider.getType(target))
+
+        val findUsagesHandler = findUsagesHandler(target)
+
+        val primaryElements = findUsagesHandler.primaryElements
+
+        assertEquals(1, primaryElements.size)
+
+        val secondaryElements = findUsagesHandler.secondaryElements
+
+        assertEquals(0, secondaryElements.size)
+
+        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
+
+        assertEquals(2, usages.size)
+
+        val firstElement = usages[0].element!!
+
+        assertEquals(10, firstElement.textOffset)
+        assertNull(readWriteAccessDetector(firstElement))
+        assertEquals(UsageTypeProvider.MODULE_DEFINITION, getUsageType(firstElement, usageTargets))
+
+        val secondElement = usages[1].element!!
+
+        assertEquals(33, secondElement.textOffset)
+        assertNull(readWriteAccessDetector(secondElement))
+        assertEquals(UsageTypeProvider.ALIAS, getUsageType(secondElement, usageTargets))
+    }
+
+    fun testModuleRecursiveUsage() {
+        myFixture.configureByFiles("module_recursive_usage.ex")
+
+        val usageTargets = UsageTargetUtil.findUsageTargets(myFixture.editor, myFixture.file)
+
+        assertEquals(1, usageTargets.size)
+
+        val usageTarget = usageTargets[0]
+
+        assertInstanceOf(usageTarget, PsiElement2UsageTargetAdapter::class.java)
+
+        val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
+
+        assertEquals("alias", findUsagesProvider.getType(target))
+
+        val findUsagesHandler = findUsagesHandler(target)
+
+        val primaryElements = findUsagesHandler.primaryElements
+
+        assertEquals(2, primaryElements.size)
+
+        val secondaryElements = findUsagesHandler.secondaryElements
+
+        assertEquals(0, secondaryElements.size)
+
+        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
+
+        assertEquals(3, usages.size)
+
+        val firstElement = usages[0].element!!
+
+        assertEquals(10, firstElement.textOffset)
+        assertNull(readWriteAccessDetector(firstElement))
+        assertEquals(UsageTypeProvider.MODULE_DEFINITION, getUsageType(firstElement, usageTargets))
+
+        val secondElement = usages[1].element!!
+
+        assertEquals(33, secondElement.textOffset)
+        assertNull(readWriteAccessDetector(secondElement))
+        assertEquals(UsageTypeProvider.ALIAS, getUsageType(secondElement, usageTargets))
+
+        val thirdElement = usages[2].element!!
+
+        assertEquals(33, thirdElement.textOffset)
+        assertNull(readWriteAccessDetector(thirdElement))
+        assertEquals(UsageTypeProvider.ALIAS, getUsageType(thirdElement, usageTargets))
+    }
+
     fun testParameterUnused() {
         myFixture.configureByFiles("parameter_unused.ex")
 
@@ -492,11 +637,11 @@ class FindUsagesTest : LightCodeInsightFixtureTestCase() {
         assertInstanceOf(usageTarget, PsiElement2UsageTargetAdapter::class.java)
 
         val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
-        val readWriteAccessDetector = readWriteAccessDetector(target)
+        val readWriteAccessDetector = readWriteAccessDetector(target)!!
 
         assertEquals("parameter", findUsagesProvider.getType(target))
 
-        val usages = myFixture.findUsages(target).toList()
+        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
 
         assertEquals(1, usages.size)
 
@@ -524,7 +669,7 @@ class FindUsagesTest : LightCodeInsightFixtureTestCase() {
 
         val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
 
-        val usages = myFixture.findUsages(target).toList()
+        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
 
         assertEquals(2, usages.size)
 
@@ -532,7 +677,7 @@ class FindUsagesTest : LightCodeInsightFixtureTestCase() {
 
         assertEquals(39, firstElement.textOffset)
 
-        val readWriteAccessDetector = readWriteAccessDetector(firstElement)
+        val readWriteAccessDetector = readWriteAccessDetector(firstElement)!!
         assertTrue(readWriteAccessDetector.isDeclarationWriteAccess(firstElement))
         assertTrue(readWriteAccessDetector.isReadWriteAccessible(firstElement))
         assertEquals(ReadWriteAccessDetector.Access.Write, readWriteAccessDetector.getExpressionAccess(firstElement))
@@ -562,11 +707,11 @@ class FindUsagesTest : LightCodeInsightFixtureTestCase() {
         assertInstanceOf(usageTarget, PsiElement2UsageTargetAdapter::class.java)
 
         val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
-        val readWriteAccessDetector = readWriteAccessDetector(target)
+        val readWriteAccessDetector = readWriteAccessDetector(target)!!
 
         assertEquals("variable", findUsagesProvider.getType(target))
 
-        val usages = myFixture.findUsages(target).toList()
+        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
 
         assertEquals(2, usages.size)
 
@@ -603,11 +748,11 @@ class FindUsagesTest : LightCodeInsightFixtureTestCase() {
         assertInstanceOf(usageTarget, PsiElement2UsageTargetAdapter::class.java)
 
         val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
-        val readWriteAccessDetector = readWriteAccessDetector(target)
+        val readWriteAccessDetector = readWriteAccessDetector(target)!!
 
         assertEquals("variable", findUsagesProvider.getType(target))
 
-        val usages = myFixture.findUsages(target).toList()
+        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
 
         assertEquals(1, usages.size)
 
@@ -637,7 +782,7 @@ class FindUsagesTest : LightCodeInsightFixtureTestCase() {
 
         assertEquals("call", findUsagesProvider.getType(target))
 
-        val usages = myFixture.findUsages(target).toList()
+        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
 
         assertEquals(2, usages.size)
 
@@ -645,7 +790,7 @@ class FindUsagesTest : LightCodeInsightFixtureTestCase() {
 
         assertEquals(46, firstElement.textOffset)
 
-        val readWriteAccessDetector = readWriteAccessDetector(firstElement)
+        val readWriteAccessDetector = readWriteAccessDetector(firstElement)!!
         assertTrue(readWriteAccessDetector.isDeclarationWriteAccess(firstElement))
         assertTrue(readWriteAccessDetector.isReadWriteAccessible(firstElement))
         assertEquals(ReadWriteAccessDetector.Access.Write, readWriteAccessDetector.getExpressionAccess(firstElement))
@@ -673,7 +818,7 @@ class FindUsagesTest : LightCodeInsightFixtureTestCase() {
                 .getFindUsagesHandler(element, false)!!
 
     private fun readWriteAccessDetector(element: PsiElement) =
-            com.intellij.codeInsight.highlighting.ReadWriteAccessDetector.findDetector(element)!!
+            com.intellij.codeInsight.highlighting.ReadWriteAccessDetector.findDetector(element)
 
     private fun getUsageType(element: PsiElement, targets: Array<UsageTarget>): UsageType? =
             Extensions

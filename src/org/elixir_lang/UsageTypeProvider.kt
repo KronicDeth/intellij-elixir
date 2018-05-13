@@ -9,6 +9,8 @@ import org.elixir_lang.psi.ElixirAccessExpression
 import org.elixir_lang.psi.ElixirNoParenthesesOneArgument
 import org.elixir_lang.psi.QualifiableAlias
 import org.elixir_lang.psi.call.Call
+import org.elixir_lang.psi.call.name.Function
+import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.call.qualification.Qualified
 import org.elixir_lang.reference.Callable
 import org.elixir_lang.structure_view.element.CallDefinitionClause
@@ -76,6 +78,7 @@ class UsageTypeProvider : com.intellij.usages.impl.rules.UsageTypeProviderEx {
                             when {
                                 Use.`is`(it) -> USE
                                 Module.`is`(it) -> MODULE_DEFINITION
+                                it.isCalling(KERNEL, Function.ALIAS) -> ALIAS
                                 else -> null
                             }
                         }
@@ -120,6 +123,7 @@ class UsageTypeProvider : com.intellij.usages.impl.rules.UsageTypeProviderEx {
         }
 
     companion object {
+        internal val ALIAS = UsageType("Alias")
         internal val CALL = UsageType("Call")
         internal val CALL_DEFINITION_CLAUSE = UsageType("Call definition clause")
         internal val FUNCTION_PARAMETER = UsageType("Parameter declaration")
