@@ -158,12 +158,12 @@ public class ElixirPsiImplUtil {
 
     @Nullable
     public static String canonicalName(@NotNull StubBased stubBased) {
-       return CanonicallyNamedImpl.canonicalName(stubBased);
+       return CanonicallyNamedImpl.INSTANCE.canonicalName(stubBased);
     }
 
     @NotNull
     public static Set<String> canonicalNameSet(@NotNull StubBased stubBased) {
-        return CanonicallyNamedImpl.canonicalNameSet(stubBased);
+        return CanonicallyNamedImpl.INSTANCE.canonicalNameSet(stubBased);
     }
 
     // @return -1 if codePoint cannot be parsed.

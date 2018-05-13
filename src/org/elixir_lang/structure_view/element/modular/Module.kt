@@ -17,6 +17,7 @@ import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.call.name.Module.MODULE
 import org.elixir_lang.psi.impl.call.macroChildCalls
 import org.elixir_lang.psi.impl.enclosingMacroCall
+import org.elixir_lang.psi.impl.locationString
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.operation.Or
 import org.elixir_lang.structure_view.element.*
@@ -49,39 +50,9 @@ open class Module(protected val parent: Modular?, call: Call) : Element<Call>(ca
     }
 
     protected fun location(): String? =
-            if (parent != null) {
-                val itemPresentation = parent.presentation
-
-                if (itemPresentation is Parent) {
-                    itemPresentation.locatedPresentableText
-                } else {
-                    null
-                }
-            } else {
-                null
-            }
+            parent?.presentation.let { it as? Parent }?.locatedPresentableText ?: navigationItem.locationString()
 
     companion object {
-        fun addClausesToCallDefinition(
-                call: Call,
-                callDefinitionByNameArity: MutableMap<NameArity, CallDefinition>,
-                modular: Modular,
-                time: Timed.Time,
-                callDefinitionInserter: (CallDefinition) -> Unit
-        ) {
-            CallDefinitionClause.nameArityRange(call)?.let { (name, arityRange) ->
-                addClausesToCallDefinition(
-                        call,
-                        name,
-                        arityRange,
-                        callDefinitionByNameArity,
-                        modular,
-                        time,
-                        callDefinitionInserter
-                )
-            }
-        }
-
         fun addClausesToCallDefinition(
                 call: Call,
                 name: String,

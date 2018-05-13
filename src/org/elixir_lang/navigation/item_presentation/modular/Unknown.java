@@ -2,7 +2,6 @@ package org.elixir_lang.navigation.item_presentation.modular;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.psi.PsiElement;
-import org.elixir_lang.icons.ElixirIcons;
 import org.elixir_lang.psi.call.Call;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -34,13 +33,13 @@ public class Unknown extends Module {
     @NotNull
     @Override
     public String getPresentableText() {
-        PsiElement[] primaryArguments = call.primaryArguments();
+        PsiElement[] primaryArguments = getCall().primaryArguments();
         String presentableText;
 
         if (primaryArguments != null && primaryArguments.length > 0) {
             presentableText = primaryArguments[0].getText();
         } else {
-            presentableText = call.functionName();
+            presentableText = getCall().functionName();
 
             if (presentableText == null) {
                 presentableText = "?";

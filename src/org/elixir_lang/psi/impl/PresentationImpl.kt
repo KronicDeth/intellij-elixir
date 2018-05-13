@@ -62,7 +62,7 @@ object PresentationImpl {
     }
 }
 
-private fun Call.locationString(): String = this.containingFile!!.locationString(this.project)
+fun Call.locationString(): String = this.containingFile!!.locationString(this.project)
 
 fun PsiFile.locationString(project: Project): String {
     val originalFile = originalFile
