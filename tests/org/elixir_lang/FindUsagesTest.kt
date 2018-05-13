@@ -654,19 +654,40 @@ class FindUsagesTest : LightCodeInsightFixtureTestCase() {
 
         val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
 
-        assertEquals(2, usages.size)
+        assertEquals(3, usages.size)
 
         val firstElement = usages[0].element!!
 
+        assertEquals(
+                "defmodule Parent.Declaration do\n" +
+                        "  alias Parent.Declaration\n" +
+                        "  alias Parent.{Declaration}\n" +
+                        "end",
+                firstElement.parent.parent.text
+        )
         assertEquals(10, firstElement.textOffset)
         assertNull(readWriteAccessDetector(firstElement))
         assertEquals(UsageTypeProvider.MODULE_DEFINITION, getUsageType(firstElement, usageTargets))
 
         val secondElement = usages[1].element!!
 
+        assertEquals(
+                "alias Parent.Declaration",
+                secondElement.parent.parent.text
+        )
         assertEquals(40, secondElement.textOffset)
         assertNull(readWriteAccessDetector(secondElement))
         assertEquals(UsageTypeProvider.ALIAS, getUsageType(secondElement, usageTargets))
+
+        val thirdElement = usages[2].element!!
+
+        assertEquals(
+                "alias Parent.{Declaration}",
+                thirdElement.parent.parent.parent.parent.parent.text
+        )
+        assertEquals(75, thirdElement.textOffset)
+        assertNull(readWriteAccessDetector(thirdElement))
+        assertEquals(UsageTypeProvider.ALIAS, getUsageType(thirdElement, usageTargets))
     }
 
     fun testParameterUnused() {

@@ -122,6 +122,7 @@
     <findUsagesHandlerFactory implementation="org.elixir_lang.find_usages.handler.Factory" />
     <lang.findUsagesProvider language="Elixir" implementationClass="org.elixir_lang.find_usages.Provider"/>
     <readWriteAccessDetector implementation="org.elixir_lang.ReadWriteAccessDetector"/>
+    <referencesSearch implementation="org.elixir_lang.ReferencesSearch"/>
     <targetElementEvaluator implementationClass="org.elixir_lang.TargetElementEvaluator" language="Elixir" />
     <usageTargetProvider implementation="org.elixir_lang.UsageTargetProvider"/>
     <usageTypeProvider implementation="org.elixir_lang.UsageTypeProvider"/>

@@ -5,9 +5,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.usages.UsageTarget
 import com.intellij.usages.impl.rules.UsageType
 import org.elixir_lang.annotator.Parameter
-import org.elixir_lang.psi.ElixirAccessExpression
-import org.elixir_lang.psi.ElixirNoParenthesesOneArgument
-import org.elixir_lang.psi.QualifiableAlias
+import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function
 import org.elixir_lang.psi.call.name.Module.KERNEL
@@ -66,7 +64,10 @@ class UsageTypeProvider : com.intellij.usages.impl.rules.UsageTypeProviderEx {
     private tailrec fun qualifiableAliasUsageType(psiElement: PsiElement, entrance: QualifiableAlias): UsageType? =
             when (psiElement) {
                 is ElixirAccessExpression,
+                is ElixirMatchedQualifiedMultipleAliases,
+                is ElixirMultipleAliases,
                 is ElixirNoParenthesesOneArgument,
+                is ElixirUnmatchedQualifiedMultipleAliases,
                 is QualifiableAlias ->
                     qualifiableAliasUsageType(psiElement.parent, entrance)
                 is Qualified ->
