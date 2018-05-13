@@ -6,7 +6,6 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
 import org.elixir_lang.psi.QualifiedAlias
 import org.elixir_lang.psi.call.Call
-import org.elixir_lang.reference.Callable
 
 class TargetElementEvaluator : TargetElementEvaluatorEx2() {
     override fun adjustTargetElement(editor: Editor?, offset: Int, flags: Int, targetElement: PsiElement): PsiElement? =
@@ -21,7 +20,9 @@ class TargetElementEvaluator : TargetElementEvaluatorEx2() {
         reference.resolve().let { resolved ->
             /* DO NOT let references to definers resolve as targets as it causes the definer to be the target, which
                then has a reference to the definer's macro */
-            if (resolved != null && resolved is Call && Callable.isDefiner(resolved)) {
+            if (resolved != null &&
+                    resolved is Call &&
+                    org.elixir_lang.structure_view.element.CallDefinitionClause.`is`(resolved)) {
                 reference.element
             } else {
                 resolved
