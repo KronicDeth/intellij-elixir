@@ -4,6 +4,7 @@ import com.intellij.codeInsight.TargetElementEvaluatorEx2
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
+import org.elixir_lang.psi.QualifiedAlias
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.reference.Callable
 
@@ -25,5 +26,20 @@ class TargetElementEvaluator : TargetElementEvaluatorEx2() {
             } else {
                 resolved
             }
+        }
+
+    override fun getGotoDeclarationTarget(element: PsiElement, navElement: PsiElement?): PsiElement? =
+        when (element) {
+            is QualifiedAlias -> {
+                element
+                        .references
+                        .asSequence()
+                        .flatMap {
+                            it.resolve()?.let { sequenceOf(it) } ?:
+                            emptySequence()
+                        }
+                        .singleOrNull()
+            }
+            else -> super.getGotoDeclarationTarget(element, navElement)
         }
 }
