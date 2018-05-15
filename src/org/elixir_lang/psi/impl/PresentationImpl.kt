@@ -12,6 +12,7 @@ import org.elixir_lang.psi.ElixirIdentifier
 import org.elixir_lang.psi.QualifiableAlias
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.outerMostQualifiableAlias
+import org.elixir_lang.structure_view.element.CallDefinition
 import org.elixir_lang.structure_view.element.CallDefinitionClause
 import java.io.File
 import javax.swing.Icon
@@ -20,7 +21,17 @@ object PresentationImpl {
     @JvmStatic
     fun getPresentation(call: Call): ItemPresentation =
             when {
-                CallDefinitionClause.`is`(call) -> CallDefinitionClause.fromCall(call)!!.presentation
+                CallDefinitionClause.`is`(call) -> {
+                    val callDefinitionClause = CallDefinitionClause.fromCall(call)
+
+                    if (callDefinitionClause == null) {
+                        val callDefinition = CallDefinition.fromCall(call)
+
+                        CallDefinitionClause(callDefinition!!, call)
+                    }
+
+                    callDefinitionClause!!.presentation
+                }
                 org.elixir_lang.structure_view.element.modular.Module.`is`(call) -> {
                     val modular = CallDefinitionClause.enclosingModular(call)
                     org.elixir_lang.structure_view.element.modular.Module(modular, call).presentation
