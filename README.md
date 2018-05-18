@@ -165,7 +165,8 @@
     - [Go To Symbol](#go-to-symbol)
     - [Go To Test](#go-to-test)
     - [Go To Test Subject](#go-to-test-subject)
-    - [Find Usage](#find-usage)
+    - [Find Usage](#find-usages-and-show-usages)
+      - [Function](#function)
       - [Module](#module-1)
       - [Module Attribute](#module-attribute-1)
       - [Parameters and Variables](#parameters-and-variables-2)
@@ -3732,10 +3733,36 @@ Go to Test Subject allows you to jump from the a Test Module to its correspondin
     1. `Shift+Cmd+T`
     2. Select Navigate &gt Test Subject from the menu.
 
-### Find Usage
+### Find Usages and Show Usages
 
-Find Usage is a feature of JetBrains IDEs that allows you to find all the places a declared symbol, such a Module Alias
-in a `defmodule`, is used, including in strings and comments.
+Find Usages is a feature of JetBrains IDEs.  It is the dual of Go To Declaration.  While Go To Declaration jumps from a usage to the declaration, Find Usages finds all usages that could jump to a declaration.  When used on a usage, Find Usage first finds the declaration(s) and then finds usages of those declaration(s).
+
+Find Usages will open all the found usages in the Find Tool Window (unless you have it configured to not open and jump direct if only one usage is found).  If you want to jump to usages quickly, Show Usages, which opens a lookup dialog at the cursor and allows you to select a usage to jump to in the lookup dialog with the arrow keys may be more useful.
+
+#### Function
+
+1. Place the cursor over the name of a function, such as `hd` in the definition `def hd([h | t]]) do` or `hd` in a usage `hd(list)`.
+2. Active the Find Usages action with one of the following:
+   * `Alt+F7`
+   * Select Edit &gt; Find &gt; Find Usages from the menu.
+3. A Find Usages dialog will appear in the Find Tool Window.
+
+If a function has multiple clauses, all clauses for the function will be resolved and used as targets.
+
+![Multiple Clauses.png](screenshots/find_usages/Multiple%20Clauses.png?raw=true)
+
+You can be sure that all clauses were correctly identified as targets because of the multiple entries in the top "Functions" target grouping.
+
+![Multiple Functions.png](screenshots/find_usages/Multiple%20Functions.png?raw=true)
+
+If instead of bringing up the Find Tool Window, you'd like a lookup dialog above the cursor, you can use Show Usages.
+
+1. Place the cursor over the name of a function, such as `hd` in `def hd([h | t]]) do`
+2. Active the Show Usages action with one of the following:
+   * `Alt+Cmd+F7`
+   * Select Edit &gt; Find &gt; Show Usages from the menu.
+3. A Usages lookup will appear above the cursor.
+4. Select an element from the lookup to jump to that usage
 
 #### Module
 
