@@ -8,6 +8,7 @@ import org.elixir_lang.ElixirLanguage
 class Factory : com.intellij.find.findUsages.FindUsagesHandlerFactory() {
     override fun createFindUsagesHandler(element: PsiElement, forHighlightUsages: Boolean): FindUsagesHandler =
             when (element) {
+                is org.elixir_lang.psi.AtNonNumericOperation -> AtNonNumericOperation(element)
                 is org.elixir_lang.psi.call.Call -> Call(element)
                 is org.elixir_lang.beam.psi.impl.ModuleImpl<*> -> ModuleImpl(element)
                 is org.elixir_lang.psi.QualifiableAlias -> QualifiableAlias(element)

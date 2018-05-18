@@ -3,6 +3,7 @@ package org.elixir_lang.psi
 import com.intellij.psi.ElementDescriptionLocation
 import com.intellij.psi.PsiElement
 import com.intellij.usageView.UsageViewLongNameLocation
+import com.intellij.usageView.UsageViewNodeTextLocation
 import com.intellij.usageView.UsageViewShortNameLocation
 import com.intellij.usageView.UsageViewTypeLocation
 import org.elixir_lang.annotator.Parameter
@@ -31,6 +32,7 @@ import org.elixir_lang.structure_view.element.structure.Structure
 class ElementDescriptionProvider : com.intellij.psi.ElementDescriptionProvider {
     override fun getElementDescription(element: PsiElement, location: ElementDescriptionLocation): String? =
             when (element) {
+                is AtNonNumericOperation -> getElementDescription(element, location)
                 is Call -> getElementDescription(element, location)
                 is ElixirIdentifier -> getElementDescription(element, location)
                 is ElixirKeywordKey -> getElementDescription(element, location)
@@ -44,19 +46,26 @@ class ElementDescriptionProvider : com.intellij.psi.ElementDescriptionProvider {
      * Private Instance Methods
      */
 
+    private fun getElementDescription(atNonNumericOperation: AtNonNumericOperation, location: ElementDescriptionLocation): String? =
+            when (location) {
+                UsageViewNodeTextLocation.INSTANCE -> atNonNumericOperation.text
+                UsageViewTypeLocation.INSTANCE -> "module attribute"
+                else -> null
+            }
+
     private fun getElementDescription(identifier: ElixirIdentifier, location: ElementDescriptionLocation): String? {
         val parameter = Parameter(identifier)
         val type = Parameter.putParameterized(parameter).type
 
         return when (type) {
-            Parameter.Type.FUNCTION_NAME -> when {
-                location === UsageViewShortNameLocation.INSTANCE -> identifier.text
-                location === UsageViewTypeLocation.INSTANCE -> "function"
+            Parameter.Type.FUNCTION_NAME -> when (location) {
+                UsageViewShortNameLocation.INSTANCE -> identifier.text
+                UsageViewTypeLocation.INSTANCE -> "function"
                 else -> null
             }
-            Parameter.Type.MACRO_NAME -> when {
-                location === UsageViewShortNameLocation.INSTANCE -> identifier.text
-                location === UsageViewTypeLocation.INSTANCE -> "macro"
+            Parameter.Type.MACRO_NAME -> when (location) {
+                UsageViewShortNameLocation.INSTANCE -> identifier.text
+                UsageViewTypeLocation.INSTANCE -> "macro"
                 else -> null
             }
             else -> null

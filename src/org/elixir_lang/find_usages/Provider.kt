@@ -13,6 +13,7 @@ import com.intellij.usageView.UsageViewTypeLocation
 import org.elixir_lang.ElixirLexer
 import org.elixir_lang.ElixirParserDefinition
 import org.elixir_lang.beam.psi.impl.ModuleImpl
+import org.elixir_lang.psi.AtNonNumericOperation
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.ElixirTypes.*
 import org.elixir_lang.psi.MaybeModuleName
@@ -67,11 +68,11 @@ class Provider : com.intellij.lang.findUsages.FindUsagesProvider {
      */
     override fun canFindUsagesFor(psiElement: PsiElement): Boolean =
             when (psiElement) {
+                is AtNonNumericOperation, is ModuleImpl<*> -> true
                 is Call ->
                     /* On a definer, the position of the caret is important to determine whether the thing being defined
                        or the definer macro's usage should be found */
                     !Callable.isDefiner(psiElement)
-                is ModuleImpl<*> -> true
                 is QualifiableAlias -> psiElement.isOutermostQualifiableAlias()
                 else -> false
             }

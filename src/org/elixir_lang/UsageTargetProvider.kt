@@ -7,6 +7,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.usages.UsageTarget
 import org.elixir_lang.beam.psi.impl.ModuleImpl
+import org.elixir_lang.psi.AtNonNumericOperation
 import org.elixir_lang.psi.QualifiableAlias
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.outerMostQualifiableAlias
@@ -24,17 +25,13 @@ class UsageTargetProvider : com.intellij.usages.UsageTargetProvider {
 
     override fun getTargets(psiElement: PsiElement): Array<UsageTarget>? =
         when (psiElement) {
-            is Call -> getTargets(psiElement)
-            is ModuleImpl<*> -> getTargets(psiElement)
-            is QualifiableAlias -> getTargets(psiElement)
-            else -> null
+            is AtNonNumericOperation, is Call, is ModuleImpl<*> ->
+                PsiElement2UsageTargetAdapter(psiElement).let { arrayOf<UsageTarget>(it) }
+            is QualifiableAlias ->
+                getTargets(psiElement)
+            else ->
+                null
         }
-
-    private fun getTargets(call: Call): Array<UsageTarget> =
-            PsiElement2UsageTargetAdapter(call).let { arrayOf(it) }
-
-    private fun getTargets(moduleImpl: ModuleImpl<*>): Array<UsageTarget> =
-            PsiElement2UsageTargetAdapter(moduleImpl).let { arrayOf(it) }
 
     private fun getTargets(qualifiableAlias: QualifiableAlias): Array<UsageTarget> =
         qualifiableAlias.outerMostQualifiableAlias().let { PsiElement2UsageTargetAdapter(it) }.let { arrayOf(it) }

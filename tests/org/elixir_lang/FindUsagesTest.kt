@@ -1031,6 +1031,37 @@ class FindUsagesTest : LightCodeInsightFixtureTestCase() {
         assertEquals(UsageTypeProvider.MODULE_ATTRIBUTE_READ, getUsageType(firstElement, usageTargets))
     }
 
+    fun testModuleAttributeUsage() {
+        myFixture.configureByFiles("module_attribute_usage.ex")
+
+        val usageTargets = UsageTargetUtil.findUsageTargets(myFixture.editor, myFixture.file)
+
+        assertEquals(1, usageTargets.size)
+
+        val usageTarget = usageTargets[0]
+
+        assertInstanceOf(usageTarget, PsiElement2UsageTargetAdapter::class.java)
+
+        val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
+        val readWriteAccessDetector = readWriteAccessDetector(target)!!
+
+        assertEquals("module attribute", findUsagesProvider.getType(target))
+
+        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
+
+        assertEquals(1, usages.size)
+
+        val firstElement = usages[0].element!!
+
+        assertEquals(69, firstElement.textOffset)
+
+        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(firstElement))
+        assertTrue(readWriteAccessDetector.isReadWriteAccessible(firstElement))
+        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(firstElement))
+
+        assertEquals(UsageTypeProvider.MODULE_ATTRIBUTE_READ, getUsageType(firstElement, usageTargets))
+    }
+
     private val findUsagesProvider by lazy { LanguageFindUsages.INSTANCE.forLanguage(ElixirLanguage) }
 
     private fun findUsagesHandler(element: PsiElement) =
