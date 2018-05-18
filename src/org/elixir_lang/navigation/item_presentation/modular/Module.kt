@@ -47,6 +47,9 @@ open class Module(private val location: String?, protected val call: Call) : Ite
 
     companion object {
         @Contract(pure = true)
-        fun presentableText(definer: String, call: Call): String = "$definer ${call.primaryArguments()!!.first().text}"
+        fun name(call: Call): String = call.primaryArguments()!!.first().text
+
+        @Contract(pure = true)
+        fun presentableText(definer: String, call: Call): String = "$definer ${name(call)}"
     }
 }

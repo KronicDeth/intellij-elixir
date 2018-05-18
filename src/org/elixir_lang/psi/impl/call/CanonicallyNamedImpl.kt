@@ -19,14 +19,9 @@ object CanonicallyNamedImpl {
                     "${protocolName ?: '?'}.${forName ?: '?'}"
                 }
                 Module.`is`(stubBased) ->
-                    org.elixir_lang.navigation.item_presentation.modular.Module.presentableText(
-                        definer = "defmodule",
-                        call = stubBased
-                )
-                Protocol.`is`(stubBased) -> org.elixir_lang.navigation.item_presentation.modular.Module.presentableText(
-                        definer = "defprotocol",
-                        call = stubBased
-                )
+                    org.elixir_lang.navigation.item_presentation.modular.Module.name(stubBased)
+                Protocol.`is`(stubBased) ->
+                    org.elixir_lang.navigation.item_presentation.modular.Module.name(stubBased)
                 else -> null
             }
 
@@ -58,15 +53,9 @@ object CanonicallyNamedImpl {
                             ?.toSet()
                             ?: setOf("$prefix?")
                 } else if (Module.`is`(stubBased)) {
-                    setOf(org.elixir_lang.navigation.item_presentation.modular.Module.presentableText(
-                            definer = "defmodule",
-                            call = stubBased
-                    ))
+                    setOf(org.elixir_lang.navigation.item_presentation.modular.Module.name(stubBased))
                 } else if (Protocol.`is`(stubBased)) {
-                    setOf(org.elixir_lang.navigation.item_presentation.modular.Module.presentableText(
-                            definer = "defmodule",
-                            call = stubBased
-                    ))
+                    setOf(org.elixir_lang.navigation.item_presentation.modular.Module.name(stubBased))
                 } else {
                     setOf("?")
                 }
