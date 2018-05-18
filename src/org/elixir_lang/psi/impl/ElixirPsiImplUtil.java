@@ -1088,6 +1088,11 @@ public class ElixirPsiImplUtil {
     }
 
     @Nullable
+    public static PsiReference getReference(@NotNull AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
+        return AtUnqualifiedNoParenthesesCallImplKt.getReference(atUnqualifiedNoParenthesesCall);
+    }
+
+    @Nullable
     public static PsiReference getReference(@NotNull Call call) {
         return CallImplKt.getReference(call);
     }
@@ -1114,7 +1119,7 @@ public class ElixirPsiImplUtil {
     }
 
     @Contract(pure = true)
-    @NotNull
+    @Nullable
     public static PsiReference getReference(@NotNull final ElixirAtIdentifier atIdentifier) {
         return ElixirAtIdentifierImplKt.getReference(atIdentifier);
     }

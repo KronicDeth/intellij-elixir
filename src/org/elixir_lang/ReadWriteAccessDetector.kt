@@ -2,6 +2,8 @@ package org.elixir_lang
 
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
+import org.elixir_lang.psi.AtNonNumericOperation
+import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.reference.Callable
 
@@ -19,6 +21,8 @@ class ReadWriteAccessDetector : com.intellij.codeInsight.highlighting.ReadWriteA
 
     override fun isReadWriteAccessible(element: PsiElement): Boolean =
         when (element) {
+            is AtNonNumericOperation -> true
+            is AtUnqualifiedNoParenthesesCall<*> -> true
             is Call -> isReadWriteAccessible(element)
             else -> false
         }
@@ -31,7 +35,7 @@ class ReadWriteAccessDetector : com.intellij.codeInsight.highlighting.ReadWriteA
 
     companion object {
         fun getExpressionAccess(expression: PsiElement): Access =
-                if (isDeclarationWriteAccess(expression)) {
+                if (expression !is AtNonNumericOperation && isDeclarationWriteAccess(expression)) {
                     Access.Write
                 } else {
                     Access.Read
