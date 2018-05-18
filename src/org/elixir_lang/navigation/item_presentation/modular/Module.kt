@@ -27,7 +27,7 @@ open class Module(private val location: String?, protected val call: Call) : Ite
      * @return [.getLocationString] + "." + [.getPresentableText] if [.getLocationString] is not
      * `null`; otherwise, [.getPresentableText].
      */
-    override fun getLocatedPresentableText(): String = locationString?.let { "$it$presentableText" } ?: presentableText
+    override fun getLocatedPresentableText(): String = locationString?.let { "$it $presentableText" } ?: presentableText
 
     /**
      * Returns the location of the object (for example, the package of a class). The location

@@ -178,7 +178,7 @@ public class IntramoduleTest extends LightCodeInsightFixtureTestCase {
 
         assertNotNull("first ResolveResult element has no presentation", firstPresentation);
 
-        assertEquals("A", firstPresentation.getLocationString());
+        assertEquals("/src/parentheses_multiple_correct_arity.ex defmodule A", firstPresentation.getLocationString());
         assertEquals("referenced(true)", firstPresentation.getPresentableText());
 
         ResolveResult secondResolveResult = resolveResults[1];
@@ -198,7 +198,7 @@ public class IntramoduleTest extends LightCodeInsightFixtureTestCase {
 
         assertNotNull("second ResolveResult element has no presentation", secondPresentation);
 
-        assertEquals("A", secondPresentation.getLocationString());
+        assertEquals("/src/parentheses_multiple_correct_arity.ex defmodule A", secondPresentation.getLocationString());
         assertEquals("referenced(false)", secondPresentation.getPresentableText());
     }
 
