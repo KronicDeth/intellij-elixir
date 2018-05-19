@@ -30,7 +30,7 @@ import org.elixir_lang.structure_view.element.structure.Structure
  * [Provider.getType]) together together.
  */
 class ElementDescriptionProvider : com.intellij.psi.ElementDescriptionProvider {
-    override fun getElementDescription(element: PsiElement, location: ElementDescriptionLocation): String? =
+    override tailrec fun getElementDescription(element: PsiElement, location: ElementDescriptionLocation): String? =
             when (element) {
                 is AtNonNumericOperation -> getElementDescription(element, location)
                 is Call -> getElementDescription(element, location)
@@ -38,7 +38,7 @@ class ElementDescriptionProvider : com.intellij.psi.ElementDescriptionProvider {
                 is ElixirKeywordKey -> getElementDescription(element, location)
                 is ElixirVariable -> getElementDescription(element, location)
                 is MaybeModuleName -> getElementDescription(element, location)
-                is ModuleImpl<*> -> getElementDescription(element, location)
+                is ModuleImpl<*> -> getElementDescription(element.navigationElement, location)
                 else -> null
             }
 
@@ -136,14 +136,6 @@ class ElementDescriptionProvider : com.intellij.psi.ElementDescriptionProvider {
 
         return elementDescription
     }
-
-    private fun getElementDescription(moduleImpl: ModuleImpl<*>, location: ElementDescriptionLocation): String? =
-            when {
-                location === UsageViewShortNameLocation.INSTANCE ||
-                        location === UsageViewShortNameLocation.INSTANCE -> moduleImpl.name
-                location === UsageViewTypeLocation.INSTANCE -> "module"
-                else -> null
-            }
 
     private fun getElementDescription(call: Call, location: ElementDescriptionLocation): String? =
             when {
