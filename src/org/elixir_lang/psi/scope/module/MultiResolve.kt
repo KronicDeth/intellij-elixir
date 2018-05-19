@@ -68,6 +68,7 @@ class MultiResolve internal constructor(private val name: String, private val in
     private fun addUnaliasedNamedElementsToResolveResultList(match: PsiNamedElement, namePartList: List<String>) {
         unaliasedName(match, namePartList)
                 .let { indexedNamedElements(match, it) }
+                .map(PsiElement::getNavigationElement)
                 .forEach { resolveResultOrderedSet.add(it, true) }
     }
 
