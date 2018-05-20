@@ -1,5 +1,6 @@
 package org.elixir_lang.psi.impl.call
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.util.Computable
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
@@ -578,7 +579,11 @@ object CallImpl {
     @Suppress("UNCHECKED_CAST")
     @JvmStatic
     fun resolvedModuleName(unqualified: Unqualified): String =
-        (unqualified as? org.elixir_lang.psi.call.StubBased<Stub<*>>)?.stub?.resolvedModuleName() ?: KERNEL
+        (unqualified as? org.elixir_lang.psi.call.StubBased<Stub<*>>)?.let { stubBased ->
+            ApplicationManager.getApplication().runReadAction(Computable {
+                stubBased.stub
+            })?.resolvedModuleName()
+        } ?: KERNEL
 
     // TODO handle `import`s and determine whether actually a local variable
     @Contract(pure = true)

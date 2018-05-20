@@ -1,5 +1,7 @@
 package org.elixir_lang.psi.impl
 
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.util.Computable
 import com.intellij.psi.PsiElement
 import org.elixir_lang.Name
 import org.elixir_lang.psi.*
@@ -26,7 +28,8 @@ object PsiNamedElementImpl {
         var name: String? = null
 
         if (nameIdentifier != null) {
-            name = unquoteName(namedElement, nameIdentifier.text)
+            val text = ApplicationManager.getApplication().runReadAction(Computable { nameIdentifier.text })
+            name = unquoteName(namedElement, text)
         } else {
             if (namedElement is Call) {
                 val call = namedElement as Call
