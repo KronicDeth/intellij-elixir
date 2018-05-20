@@ -4774,7 +4774,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // mapPrefixOperator mapExpression mapArguments
+  // mapPrefixOperator mapExpression eolStar mapArguments
   public static boolean structOperation(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "structOperation")) return false;
     if (!nextTokenIs(b, STRUCT_OPERATOR)) return false;
@@ -4782,6 +4782,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b);
     r = mapPrefixOperator(b, l + 1);
     r = r && mapExpression(b, l + 1);
+    r = r && eolStar(b, l + 1);
     r = r && mapArguments(b, l + 1);
     exit_section_(b, m, STRUCT_OPERATION, r);
     return r;
