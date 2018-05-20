@@ -158,6 +158,16 @@
 ### Enhancements
 * [#1055](https://github.com/KronicDeth/intellij-elixir/pull/1055) - Refactor `ElixirPsiImplUtil` into separate files tied to specific classes or interfaces to shrink its size. - [@KronicDeth](https://github.com/KronicDeth)
 * [#1073](https://github.com/KronicDeth/intellij-elixir/pull/1073) - Complete `#{` with `}`. - [@KronicDeth](https://github.com/KronicDeth)
+* [#1109](https://github.com/KronicDeth/intellij-elixir/pull/1109) - [@KronicDeth](https://github.com/KronicDeth)
+  * Read Write Accessor Detector
+    * Variable/Parameter declarations/rebindings are highlighted as writes while other usages are highlighted as reads.
+  * Improved Find & Show Usages
+    * Added Find & Show Usages for Functions at declaration and usage site
+      * Multi-clause functions use all clauses as targets and find usages of all clauses.
+    * Improved Find & Show Usages for Modules/Aliases
+  * Improved Element Descriptions
+    * It is easier to distinguish `alias`es and the `defmodule` that is being aliased because element description now include `alias` or `defmodule` before the Alias name based on how the Alias is defined in the scope.
+    * Call definitions use the same presentation for Structure View and Find Usages, so that Compile/Runtime time icons, and visibility are the same in both.
 
 ### Bug Fixes
 * [#1056](https://github.com/KronicDeth/intellij-elixir/pull/1056) - Certain `.beam` files in the OTP source are purposely invalid, so ignore them when trying to parse and don't log the expected error. - [@KronicDeth](https://github.com/KronicDeth)

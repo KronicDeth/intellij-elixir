@@ -12,6 +12,37 @@
       <li>
         Complete <code>#{</code> with <code>}</code>.
       </li>
+      <li>Read Write Accessor Detector
+        <ul>
+          <li>
+            Variable/Parameter declarations/rebindings are highlighted as writes while other usages are highlighted as
+            reads.
+          </li>
+        </ul>
+      </li>
+      <li>Improved Find &amp; Show Usages
+        <ul>
+          <li>Added Find &amp; Show Usages for Functions at declaration and usage site
+            <ul>
+              <li>Multi-clause functions use all clauses as targets and find usages of all clauses.</li>
+            </ul>
+          </li>
+          <li>Improved Find &amp; Show Usages for Modules/Aliases</li>
+        </ul>
+      </li>
+      <li>Improved Element Descriptions
+        <ul>
+          <li>
+            It is easier to distinguish <code>alias</code>es and the <code>defmodule</code> that is being aliased
+            because element description now include <code>alias</code> or <code>defmodule</code> before the Alias name
+            based on how the Alias is defined in the scope.
+          </li>
+          <li>
+            Call definitions use the same presentation for Structure View and Find Usages, so that Compile/Runtime time
+            icons, and visibility are the same in both.
+          </li>
+        </ul>
+      </li>
     </ul>
   </li>
   <li>
