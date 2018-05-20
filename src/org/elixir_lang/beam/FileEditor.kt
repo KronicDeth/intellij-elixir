@@ -78,7 +78,7 @@ class FileEditor(
             Chunk.TypeID.CODE.toString() ->
                 org.elixir_lang.beam.chunk.code.Component(cache, project, tabbedPane)
             Chunk.TypeID.DBGI.toString() ->
-                org.elixir_lang.beam.chunk.debug_info.term.component(cache.debugInfo, project)
+                org.elixir_lang.beam.chunk.debug_info.term.component(cache.debugInfo, project, tabbedPane)
             Chunk.TypeID.EXDC.toString() ->
                 org.elixir_lang.beam.chunk.elixir_documentation.component(
                         cache.elixirDocumentation,

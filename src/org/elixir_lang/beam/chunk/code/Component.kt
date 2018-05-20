@@ -19,26 +19,29 @@ class Component(private val cache: Cache, private val project: Project, tabbedPa
     }
 
     override fun stateChanged(changeEvent: ChangeEvent) {
-        if (changeEvent.source.let { it  as JBTabbedPane }.selectedComponent == this) {
+        if (changeEvent.source.let { it as JBTabbedPane }.selectedComponent == this) {
             ensureChildrenAdded()
         }
     }
 
     private var childrenAdded = false
 
+    private fun addChildren() {
+        val controls = Controls(cache, project)
+        addToTop(controls)
+
+        val document = controls.document
+        val editorComponent = editorComponent(document, project)
+        addToCenter(editorComponent)
+    }
+
     private fun ensureChildrenAdded() {
         if (!childrenAdded) {
-            val controls = Controls(cache, project)
-            addToTop(controls)
-
-            val document = controls.document
-            val editorComponent = editorComponent(document, project)
-            addToCenter(editorComponent)
-
+            addChildren()
             childrenAdded = true
         }
     }
 }
 
 private fun editorComponent(document: Document, project: Project): JComponent =
-    EditorFactory.getInstance().createEditor(document, project, Type, true).component
+        EditorFactory.getInstance().createEditor(document, project, Type, true).component
