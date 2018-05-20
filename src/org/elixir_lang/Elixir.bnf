@@ -2128,7 +2128,7 @@ mapArguments ::= OPENING_CURLY
 mapOperation ::= mapPrefixOperator mapArguments
                  { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
-structOperation ::= mapPrefixOperator mapExpression mapArguments
+structOperation ::= mapPrefixOperator mapExpression eolStar mapArguments
                     { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 private map ::= mapOperation |
