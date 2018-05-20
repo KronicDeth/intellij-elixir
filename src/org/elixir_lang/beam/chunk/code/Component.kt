@@ -9,16 +9,18 @@ import org.elixir_lang.beam.assembly.Controls
 import org.elixir_lang.beam.assembly.file.Type
 import javax.swing.JComponent
 
+class Component(private val cache: Cache, private val project: Project) : BorderLayoutPanel() {
+    override fun addNotify() {
+        val controls = Controls(cache, project)
+        addToTop(controls)
 
-fun component(cache: Cache, project: Project): JComponent {
-    val controls = Controls(cache, project)
-    val document = controls.document
-    val editorComponent = editorComponent(document, project)
+        val document = controls.document
+        val editorComponent = editorComponent(document, project)
+        addToCenter(editorComponent)
 
-    return BorderLayoutPanel().addToTop(controls).addToCenter(editorComponent)
+        super.addNotify()
+    }
 }
-
-// Private functions
 
 private fun editorComponent(document: Document, project: Project): JComponent =
     EditorFactory.getInstance().createEditor(document, project, Type, true).component

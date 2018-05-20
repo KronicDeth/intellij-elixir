@@ -76,7 +76,7 @@ class FileEditor(
             Chunk.TypeID.CINF.toString() ->
                 JBScrollPane(Table(org.elixir_lang.beam.chunk.keyword.Model(cache.compileInfo)))
             Chunk.TypeID.CODE.toString() ->
-                org.elixir_lang.beam.chunk.code.component(cache, project)
+                org.elixir_lang.beam.chunk.code.Component(cache, project)
             Chunk.TypeID.DBGI.toString() ->
                 org.elixir_lang.beam.chunk.debug_info.term.component(cache.debugInfo, project)
             Chunk.TypeID.EXDC.toString() ->
