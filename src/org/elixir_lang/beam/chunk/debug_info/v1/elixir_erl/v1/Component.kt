@@ -18,7 +18,7 @@ class Component(private val debugInfo: V1, private val project: Project, tabbedP
     }
 
     override fun stateChanged(changeEvent: ChangeEvent) {
-        if (changeEvent.let { it as JBTabbedPane }.selectedComponent == this) {
+        if (changeEvent.source.let { it as JBTabbedPane }.selectedComponent == this) {
             ensureChildrenAdded()
         }
     }

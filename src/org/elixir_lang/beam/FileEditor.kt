@@ -83,7 +83,8 @@ class FileEditor(
                 org.elixir_lang.beam.chunk.elixir_documentation.component(
                         cache.elixirDocumentation,
                         project,
-                        cache.atoms?.moduleName()
+                        cache.atoms?.moduleName(),
+                        tabbedPane
                 )
             Chunk.TypeID.EXPT.toString() ->
                 JBScrollPane(Table(org.elixir_lang.beam.chunk.call_definitions.Model(cache.exports)))
