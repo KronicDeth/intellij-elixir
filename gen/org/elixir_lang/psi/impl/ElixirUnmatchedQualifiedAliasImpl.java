@@ -3,6 +3,7 @@ package org.elixir_lang.psi.impl;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
+import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.*;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -56,6 +57,11 @@ public class ElixirUnmatchedQualifiedAliasImpl extends ElixirUnmatchedExpression
   @Nullable
   public PsiElement getNameIdentifier() {
     return ElixirPsiImplUtil.getNameIdentifier(this);
+  }
+
+  @Nullable
+  public ItemPresentation getPresentation() {
+    return ElixirPsiImplUtil.getPresentation(this);
   }
 
   @Nullable

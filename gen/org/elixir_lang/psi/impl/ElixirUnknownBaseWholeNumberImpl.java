@@ -35,7 +35,6 @@ public class ElixirUnknownBaseWholeNumberImpl extends ASTWrapperPsiElement imple
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirUnknownBaseDigits.class);
   }
 
-  @NotNull
   public int base() {
     return ElixirPsiImplUtil.base(this);
   }

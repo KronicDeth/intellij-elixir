@@ -27,7 +27,7 @@ public abstract class Stub<Stub extends org.elixir_lang.psi.stub.call.Stub<Psi>,
     }
 
     public static boolean isModular(Call call) {
-        return Implementation.is(call) || Module.is(call) || Protocol.is(call);
+        return Implementation.is(call) || Module.Companion.is(call) || Protocol.is(call);
     }
 
     private boolean hasCanonicalNames(Call call) {
@@ -51,16 +51,16 @@ public abstract class Stub<Stub extends org.elixir_lang.psi.stub.call.Stub<Psi>,
     }
 
     private boolean isDelegationCallDefinitionHead(Call call) {
-        return CallDefinitionHead.is(call) && CallDefinitionHead.enclosingDelegationCall(call) != null;
+        return CallDefinitionHead.Companion.is(call) && CallDefinitionHead.Companion.enclosingDelegationCall(call) != null;
     }
 
     private boolean isEnclosableByModular(Call call) {
-        return CallDefinitionClause.is(call) ||
+        return CallDefinitionClause.Companion.is(call) ||
                 /* skip CallDefinitionHead because there can be false positives the the ancestor calls need to be
                    checked */
-                CallDefinitionSpecification.is(call) ||
+                CallDefinitionSpecification.Companion.is(call) ||
                 // skip CallDefinitionHead because it is covered by CallDefinitionClause
-                Callback.is(call);
+                Callback.Companion.is(call);
     }
 
     private boolean isNameable(Call call) {

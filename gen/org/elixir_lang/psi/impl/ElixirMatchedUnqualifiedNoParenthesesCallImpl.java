@@ -11,7 +11,7 @@ import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.util.PsiTreeUtil;
-import org.apache.commons.lang.math.IntRange;
+import kotlin.ranges.IntRange;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.stub.MatchedUnqualifiedNoParenthesesCall;
 import org.jetbrains.annotations.NotNull;
@@ -97,6 +97,7 @@ public class ElixirMatchedUnqualifiedNoParenthesesCallImpl extends NamedStubbedP
     return ElixirPsiImplUtil.getName(this);
   }
 
+  @Nullable
   public PsiElement getNameIdentifier() {
     return ElixirPsiImplUtil.getNameIdentifier(this);
   }
@@ -111,19 +112,19 @@ public class ElixirMatchedUnqualifiedNoParenthesesCallImpl extends NamedStubbedP
     return ElixirPsiImplUtil.getReference(this);
   }
 
-  public boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName) {
+  public boolean isCalling(String resolvedModuleName, String functionName) {
     return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, functionName);
   }
 
-  public boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity) {
+  public boolean isCalling(String resolvedModuleName, String functionName, int resolvedFinalArity) {
     return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, functionName, resolvedFinalArity);
   }
 
-  public boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName) {
+  public boolean isCallingMacro(String resolvedModuleName, String functionName) {
     return ElixirPsiImplUtil.isCallingMacro(this, resolvedModuleName, functionName);
   }
 
-  public boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity) {
+  public boolean isCallingMacro(String resolvedModuleName, String functionName, int resolvedFinalArity) {
     return ElixirPsiImplUtil.isCallingMacro(this, resolvedModuleName, functionName, resolvedFinalArity);
   }
 
@@ -151,7 +152,6 @@ public class ElixirMatchedUnqualifiedNoParenthesesCallImpl extends NamedStubbedP
     return ElixirPsiImplUtil.quote(this);
   }
 
-  @NotNull
   public int resolvedFinalArity() {
     return ElixirPsiImplUtil.resolvedFinalArity(this);
   }

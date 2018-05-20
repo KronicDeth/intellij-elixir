@@ -114,7 +114,7 @@ public class Quote extends Element<Call> {
         TreeElement[] children;
 
         if (modular != null) {
-            children = Module.callChildren(modular, navigationItem);
+            children = Module.Companion.callChildren(modular, navigationItem);
         } else {
             children = new TreeElement[0];
         }

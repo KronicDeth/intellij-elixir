@@ -17,7 +17,63 @@ import org.elixir_lang.psi.operation.Match
 import org.jetbrains.annotations.Contract
 import java.util.*
 
+fun PsiElement.ancestorSequence() = generateSequence(this) { it.parent }
 fun PsiElement.document(): Document? = containingFile.viewProvider.document
+
+tailrec fun PsiElement.selfOrEnclosingMacroCall(): Call? =
+        when (this) {
+            is ElixirDoBlock ->
+                parent.let { it as? Call }
+            is ElixirAnonymousFunction -> {
+                parent.let { it as? ElixirAccessExpression }?.
+                        parent.let { it as? Arguments }?.
+                        parent.let { it as? ElixirMatchedParenthesesArguments }?.
+                        parent.let { it as?  Call }?.
+                        let { call ->
+                            if (call.isCalling("Enum", "map") ||
+                                        call.isCalling("Enum", "each")) {
+                                    call
+                                } else {
+                                    null
+                                }
+                        }?.
+                        parent?.
+                        selfOrEnclosingMacroCall()
+            }
+            is Arguments,
+            is AtUnqualifiedNoParenthesesCall<*>,
+            is ElixirAccessExpression,
+            is ElixirBlockItem,
+            is ElixirBlockList,
+            is ElixirList,
+            is ElixirMatchedParenthesesArguments,
+            is ElixirMatchedWhenOperation,
+            is ElixirNoParenthesesManyStrictNoParenthesesExpression,
+            is ElixirParentheticalStab,
+            is ElixirStab,
+            is ElixirStabBody,
+            is ElixirStabOperation,
+            is ElixirTuple,
+            is Match,
+            is QualifiedAlias,
+            is QualifiedMultipleAliases ->
+                parent.selfOrEnclosingMacroCall()
+            is Call ->
+                when {
+                    isCalling(KERNEL, ALIAS) -> this
+                    isCalling(org.elixir_lang.psi.call.name.Module.MODULE, CREATE, 3) -> this
+                    else -> null
+                }
+            is QuotableKeywordPair ->
+                if (this.hasKeywordKey("do")) {
+                    parent.let { it as? QuotableKeywordList }?.
+                            parent.let { it as? ElixirNoParenthesesOneArgument }?.
+                            parent.let { it as? Call }
+                } else {
+                    null
+                }
+            else -> null
+        }
 
 /**
  *
@@ -25,122 +81,7 @@ fun PsiElement.document(): Document? = containingFile.viewProvider.document
  * @return `null` if call is at top-level
  */
 @Contract(pure = true)
-fun PsiElement.enclosingMacroCall(): Call? {
-    var enclosingMacroCall: Call? = null
-    val parent = parent
-
-    if (parent is ElixirDoBlock) {
-        val grandParent = parent.getParent()
-
-        if (grandParent is Call) {
-            enclosingMacroCall = grandParent
-        }
-    } else if (parent is ElixirStabBody) {
-        val grandParent = parent.getParent()
-
-        if (grandParent is ElixirStab) {
-            val greatGrandParent = grandParent.getParent()
-
-            if (greatGrandParent is ElixirBlockItem) {
-                val greatGreatGrandParent = greatGrandParent.getParent()
-
-                if (greatGreatGrandParent is ElixirBlockList) {
-                    val greatGreatGreatGrandParent = greatGreatGrandParent.getParent()
-
-                    if (greatGreatGreatGrandParent is ElixirDoBlock) {
-                        val greatGreatGreatGreatGrandParent = greatGreatGreatGrandParent.getParent()
-
-                        if (greatGreatGreatGreatGrandParent is Call) {
-                            enclosingMacroCall = greatGreatGreatGreatGrandParent
-                        }
-                    }
-                }
-            } else if (greatGrandParent is ElixirDoBlock) {
-                val greatGreatGrandParent = greatGrandParent.getParent()
-
-                if (greatGreatGrandParent is Call) {
-                    enclosingMacroCall = greatGreatGrandParent
-                }
-            } else if (greatGrandParent is ElixirParentheticalStab) {
-                val greatGreatGrandParent = greatGrandParent.getParent()
-
-                if (greatGreatGrandParent is ElixirAccessExpression) {
-                    enclosingMacroCall = greatGreatGrandParent.enclosingMacroCall()
-                }
-            }
-        } else if (grandParent is ElixirStabOperation) {
-            val stabOperationParent = grandParent.getParent()
-
-            if (stabOperationParent is ElixirStab) {
-                val stabParent = stabOperationParent.getParent()
-
-                if (stabParent is ElixirAnonymousFunction) {
-                    val anonymousFunctionParent = stabParent.getParent()
-
-                    if (anonymousFunctionParent is ElixirAccessExpression) {
-                        val accessExpressionParent = anonymousFunctionParent.getParent()
-
-                        if (accessExpressionParent is Arguments) {
-                            val argumentsParent = accessExpressionParent.getParent()
-
-                            if (argumentsParent is ElixirMatchedParenthesesArguments) {
-                                val matchedParenthesesArgumentsParent = argumentsParent.getParent()
-
-                                if (matchedParenthesesArgumentsParent is Call) {
-
-                                    if (matchedParenthesesArgumentsParent.isCalling("Enum", "map") || matchedParenthesesArgumentsParent.isCalling("Enum", "each")) {
-                                        enclosingMacroCall = matchedParenthesesArgumentsParent.enclosingMacroCall()
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    } else if (parent is Arguments ||
-            // See https://github.com/elixir-lang/elixir/blob/v1.5/lib/elixir/lib/protocol.ex#L633
-            parent is AtUnqualifiedNoParenthesesCall<*> ||
-            // See https://github.com/phoenixframework/phoenix/blob/v1.2.4/lib/phoenix/template.ex#L380-L392
-            parent is ElixirAccessExpression ||
-            // See https://github.com/absinthe-graphql/absinthe/blob/v1.3.0/lib/absinthe/schema/notation/writer.ex#L24-L44
-            parent is ElixirList ||
-            parent is ElixirMatchedParenthesesArguments ||
-            // See https://github.com/absinthe-graphql/absinthe/blob/v1.3.0/lib/absinthe/schema/notation/writer.ex#L96
-            parent is ElixirNoParenthesesManyStrictNoParenthesesExpression ||
-            parent is ElixirTuple ||
-            parent is Match ||
-            parent is QualifiedAlias ||
-            parent is QualifiedMultipleAliases) {
-        enclosingMacroCall = parent.enclosingMacroCall()
-    } else if (parent is Call) {
-
-        if (parent.isCalling(KERNEL, ALIAS)) {
-            enclosingMacroCall = parent
-        } else if (parent.isCalling(org.elixir_lang.psi.call.name.Module.MODULE, CREATE, 3)) {
-            enclosingMacroCall = parent
-        }
-    } else if (parent is QuotableKeywordPair) {
-
-        if (parent.hasKeywordKey("do")) {
-            val grandParent = parent.getParent()
-
-            if (grandParent is QuotableKeywordList) {
-                val greatGrandParent = grandParent.getParent()
-
-                if (greatGrandParent is ElixirNoParenthesesOneArgument) {
-                    val greatGreatGrandParent = greatGrandParent.getParent()
-
-                    if (greatGreatGrandParent is Call) {
-                        enclosingMacroCall = greatGreatGrandParent
-                    }
-                }
-            }
-        }
-    }
-
-    return enclosingMacroCall
-}
+fun PsiElement.enclosingMacroCall(): Call? = parent.selfOrEnclosingMacroCall()
 
 fun PsiElement.getModuleName(): String? {
     val isModuleName = { c: PsiElement -> c is MaybeModuleName && c.isModuleName }
@@ -210,6 +151,8 @@ fun PsiElement.moduleWithDependentsScope(): GlobalSearchScope {
         GlobalSearchScope.allScope(project)
     }
 }
+
+fun PsiElement.prevSiblingSequence() = generateSequence(this) { it.prevSibling }
 
 @Contract(pure = true)
 fun PsiElement.siblingExpression(function: (PsiElement) -> PsiElement): PsiElement? {

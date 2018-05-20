@@ -10,6 +10,7 @@ import org.elixir_lang.psi.ElixirAtIdentifier;
 import org.elixir_lang.psi.ElixirAtPrefixOperator;
 import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ElixirAtIdentifierImpl extends ASTWrapperPsiElement implements ElixirAtIdentifier {
 
@@ -32,7 +33,7 @@ public class ElixirAtIdentifierImpl extends ASTWrapperPsiElement implements Elix
     return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirAtPrefixOperator.class));
   }
 
-  @NotNull
+  @Nullable
   public PsiReference getReference() {
     return ElixirPsiImplUtil.getReference(this);
   }

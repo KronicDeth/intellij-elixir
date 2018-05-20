@@ -583,7 +583,7 @@ public class BeamFileImpl extends ModuleElementImpl implements ModuleOwner, PsiC
                 mirrorTreeElement = mirrorFileElement;
                 if (mirrorTreeElement == null) {
                     VirtualFile file = getVirtualFile();
-                    String fileName = file.getNameWithoutExtension() + ".ex";
+                    String fileName = file.getName() + ".decompiled.ex";
 
                     final Document document = FileDocumentManager.getInstance().getDocument(file);
                     assert document != null : file.getUrl();

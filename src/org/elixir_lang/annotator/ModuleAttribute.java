@@ -83,19 +83,19 @@ public class ModuleAttribute implements Annotator, DumbAware {
 
                         String identifier = identifierName(atIdentifier);
 
-                        if (isCallbackName(identifier)) {
+                        if (Companion.isCallbackName(identifier)) {
                             highlight(textRange, holder, ElixirSyntaxHighlighter.MODULE_ATTRIBUTE);
 
                             highlightCallback(atUnqualifiedNoParenthesesCall, holder);
-                        } else if (isDocumentationName(identifier)) {
+                        } else if (Companion.isDocumentationName(identifier)) {
                             highlight(textRange, holder, ElixirSyntaxHighlighter.DOCUMENTATION_MODULE_ATTRIBUTE);
 
                             highlightDocumentationText(atUnqualifiedNoParenthesesCall, holder);
-                        } else if (isTypeName(identifier)) {
+                        } else if (Companion.isTypeName(identifier)) {
                             highlight(textRange, holder, ElixirSyntaxHighlighter.MODULE_ATTRIBUTE);
 
                             highlightType(atUnqualifiedNoParenthesesCall, holder);
-                        } else if (isSpecificationName(identifier)) {
+                        } else if (Companion.isSpecificationName(identifier)) {
                             highlight(textRange, holder, ElixirSyntaxHighlighter.MODULE_ATTRIBUTE);
 
                             highlightSpecification(atUnqualifiedNoParenthesesCall, holder);
@@ -120,7 +120,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
                                 ElixirSyntaxHighlighter.MODULE_ATTRIBUTE
                         );
 
-                        if (!isNonReferencing(atNonNumericOperation)) {
+                        if (!Companion.isNonReferencing(atNonNumericOperation)) {
                             PsiReference reference = atNonNumericOperation.getReference();
 
                             if (reference != null && reference.resolve() == null) {
@@ -857,7 +857,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
 
     private void highlightTypesAndSpecificationTypeParameterDeclarations(
             UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
-        if (!CallDefinitionClause.is(unqualifiedNoParenthesesCall)) {
+        if (!CallDefinitionClause.Companion.is(unqualifiedNoParenthesesCall)) {
             error(
                     "Cannot highlight types and specification type parameter declarations in UnqualifiedNoParenthesesCall that is not a call definition clause", unqualifiedNoParenthesesCall);
         }
@@ -1452,7 +1452,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
     private Set<String> specificationTypeParameterNameSet(
             @NotNull UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall
     ) {
-        if (!CallDefinitionClause.is(unqualifiedNoParenthesesCall)) {
+        if (!CallDefinitionClause.Companion.is(unqualifiedNoParenthesesCall)) {
             error(
                     "Cannot extract specification type parameter name set from " +
                             "unqualifiedNoParenthesesCall that is a not a call definition clause",

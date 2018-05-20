@@ -3,13 +3,12 @@ package org.elixir_lang.reference.callable;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
-import org.apache.commons.lang.math.IntRange;
-import org.elixir_lang.psi.ElixirIdentifier;
+import kotlin.ranges.IntRange;
+import org.elixir_lang.NameArityRange;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.structure_view.element.CallDefinitionClause;
 import org.jetbrains.annotations.NotNull;
 
-import static com.intellij.openapi.util.Pair.pair;
 import static org.elixir_lang.structure_view.element.CallDefinitionClause.nameArityRange;
 
 public class Issue480Test extends LightCodeInsightFixtureTestCase {
@@ -120,15 +119,12 @@ public class Issue480Test extends LightCodeInsightFixtureTestCase {
 
         assertNotNull(resolved);
 
-        assertInstanceOf(resolved, ElixirIdentifier.class);
+        assertInstanceOf(resolved, Call.class);
 
-        PsiElement maybeDefMaybeCall = resolved.getParent().getParent().getParent();
-        assertInstanceOf(maybeDefMaybeCall, Call.class);
+        Call maybeDefCall = (Call) resolved;
 
-        Call maybeDefCall = (Call) maybeDefMaybeCall;
+        assertTrue(CallDefinitionClause.Companion.is(maybeDefCall));
 
-        assertTrue(CallDefinitionClause.is(maybeDefCall));
-
-        assertEquals(pair(name, new IntRange(arity)), nameArityRange(maybeDefCall));
+        assertEquals(new NameArityRange(name, new IntRange(arity, arity)), nameArityRange(maybeDefCall));
     }
 }

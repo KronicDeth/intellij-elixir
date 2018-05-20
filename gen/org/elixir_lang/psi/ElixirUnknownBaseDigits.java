@@ -8,7 +8,6 @@ import org.jetbrains.annotations.Nullable;
 
 public interface ElixirUnknownBaseDigits extends Digits {
 
-  @NotNull
   int base();
 
   boolean inBase();

@@ -35,7 +35,6 @@ public class ElixirOctalWholeNumberImpl extends ASTWrapperPsiElement implements 
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirOctalDigits.class);
   }
 
-  @NotNull
   public int base() {
     return ElixirPsiImplUtil.base(this);
   }

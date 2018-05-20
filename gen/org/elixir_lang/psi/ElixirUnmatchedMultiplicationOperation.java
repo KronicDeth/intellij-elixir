@@ -5,15 +5,15 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
-import org.apache.commons.lang.math.IntRange;
+import kotlin.ranges.IntRange;
 import org.elixir_lang.psi.call.Named;
-import org.elixir_lang.psi.operation.Infix;
+import org.elixir_lang.psi.operation.Multiplication;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public interface ElixirUnmatchedMultiplicationOperation extends ElixirUnmatchedExpression, Named, Infix {
+public interface ElixirUnmatchedMultiplicationOperation extends ElixirUnmatchedExpression, Named, Multiplication {
 
   @NotNull
   ElixirMultiplicationInfixOperator getMultiplicationInfixOperator();
@@ -33,17 +33,18 @@ public interface ElixirUnmatchedMultiplicationOperation extends ElixirUnmatchedE
   @Nullable
   String getName();
 
+  @Nullable
   PsiElement getNameIdentifier();
 
   boolean hasDoBlockOrKeyword();
 
-  boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName);
+  boolean isCalling(String resolvedModuleName, String functionName);
 
-  boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity);
+  boolean isCalling(String resolvedModuleName, String functionName, int resolvedFinalArity);
 
-  boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName);
+  boolean isCallingMacro(String resolvedModuleName, String functionName);
 
-  boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity);
+  boolean isCallingMacro(String resolvedModuleName, String functionName, int resolvedFinalArity);
 
   @Nullable
   Quotable leftOperand();
@@ -65,7 +66,6 @@ public interface ElixirUnmatchedMultiplicationOperation extends ElixirUnmatchedE
   @NotNull
   OtpErlangObject quote();
 
-  @NotNull
   int resolvedFinalArity();
 
   @NotNull

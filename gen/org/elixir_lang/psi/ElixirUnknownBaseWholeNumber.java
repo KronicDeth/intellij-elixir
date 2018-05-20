@@ -11,7 +11,6 @@ public interface ElixirUnknownBaseWholeNumber extends WholeNumber {
   @NotNull
   List<ElixirUnknownBaseDigits> getUnknownBaseDigitsList();
 
-  @NotNull
   int base();
 
   @NotNull

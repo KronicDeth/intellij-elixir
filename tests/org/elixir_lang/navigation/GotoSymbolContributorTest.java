@@ -65,10 +65,10 @@ public class GotoSymbolContributorTest extends LightPlatformCodeInsightFixtureTe
 
         Call call = (Call) elementAtCaret.getParent().getParent().getParent().getParent();
 
-        Call enclosingModularMacroCall = CallDefinitionClause.enclosingModularMacroCall(call);
+        Call enclosingModularMacroCall = CallDefinitionClause.Companion.enclosingModularMacroCall(call);
         assertNotNull(enclosingModularMacroCall);
 
-        Modular modular = CallDefinitionClause.enclosingModular(call);
+        Modular modular = CallDefinitionClause.Companion.enclosingModular(call);
         assertNotNull(modular);
     }
 
@@ -78,10 +78,10 @@ public class GotoSymbolContributorTest extends LightPlatformCodeInsightFixtureTe
 
         Call call = (Call) elementAtCaret.getParent().getParent().getParent();
 
-        Call enclosingModularMacroCall = CallDefinitionClause.enclosingModularMacroCall(call);
+        Call enclosingModularMacroCall = CallDefinitionClause.Companion.enclosingModularMacroCall(call);
         assertNotNull(enclosingModularMacroCall);
 
-        Modular modular = CallDefinitionClause.enclosingModular(call);
+        Modular modular = CallDefinitionClause.Companion.enclosingModular(call);
         assertNotNull(modular);
     }
 

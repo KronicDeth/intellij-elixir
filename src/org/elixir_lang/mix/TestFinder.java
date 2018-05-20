@@ -70,7 +70,7 @@ public class TestFinder implements com.intellij.testIntegration.TestFinder {
     }
 
     private static boolean isModular(@NotNull Call call) {
-        return Implementation.is(call) || Module.is(call) || Protocol.is(call) || Quote.is(call);
+        return Implementation.is(call) || Module.Companion.is(call) || Protocol.is(call) || Quote.is(call);
     }
 
     @Nullable
@@ -131,7 +131,7 @@ public class TestFinder implements com.intellij.testIntegration.TestFinder {
                 new Condition<Call>() {
                     @Override
                     public boolean value(Call call) {
-                        return Module.is(call);
+                        return Module.Companion.is(call);
                     }
                 }
         );

@@ -11,7 +11,6 @@ public interface ElixirHexadecimalWholeNumber extends WholeNumber {
   @NotNull
   List<ElixirHexadecimalDigits> getHexadecimalDigitsList();
 
-  @NotNull
   int base();
 
   @NotNull

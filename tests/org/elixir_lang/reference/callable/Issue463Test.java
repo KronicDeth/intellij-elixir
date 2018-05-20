@@ -3,7 +3,6 @@ package org.elixir_lang.reference.callable;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
-import org.elixir_lang.psi.ElixirIdentifier;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.structure_view.element.CallDefinitionClause;
 
@@ -33,13 +32,19 @@ public class Issue463Test extends LightCodeInsightFixtureTestCase {
 
         assertNotNull(resolved);
 
-        assertInstanceOf(resolved, ElixirIdentifier.class);
-        assertEquals(resolved.getText(), "changeset");
+        assertInstanceOf(resolved, Call.class);
+        assertEquals(
+                "def changeset(params) do\n" +
+                "    %__MODULE__{}\n" +
+                "    |> cast(params, ~w(name))\n" +
+                "    |> validate_required(:name)\n" +
+                "  end",
+                resolved.getText()
+        );
 
-        PsiElement maybeDefCall = resolved.getParent().getParent().getParent();
-        assertInstanceOf(maybeDefCall, Call.class);
+        assertInstanceOf(resolved, Call.class);
 
-        assertTrue(CallDefinitionClause.is((Call) maybeDefCall));
+        assertTrue(CallDefinitionClause.Companion.is((Call) resolved));
     }
 
     public void testAliasedModuleQualifier() {
@@ -63,13 +68,19 @@ public class Issue463Test extends LightCodeInsightFixtureTestCase {
 
         assertNotNull(resolved);
 
-        assertInstanceOf(resolved, ElixirIdentifier.class);
-        assertEquals(resolved.getText(), "changeset");
+        assertInstanceOf(resolved, Call.class);
+        assertEquals(
+                "def changeset(params) do\n" +
+                        "    %__MODULE__{}\n" +
+                        "    |> cast(params, ~w(name))\n" +
+                        "    |> validate_required(:name)\n" +
+                        "  end",
+                resolved.getText()
+        );
 
-        PsiElement maybeDefCall = resolved.getParent().getParent().getParent();
-        assertInstanceOf(maybeDefCall, Call.class);
+        assertInstanceOf(resolved, Call.class);
 
-        assertTrue(CallDefinitionClause.is((Call) maybeDefCall));
+        assertTrue(CallDefinitionClause.Companion.is((Call) resolved));
     }
 
     public void testDoubleAliasesModuleQualifier() {

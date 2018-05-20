@@ -43,6 +43,7 @@ public class ElixirKeywordPairImpl extends ASTWrapperPsiElement implements Elixi
     return PsiTreeUtil.getChildOfType(this, ElixirUnmatchedExpression.class);
   }
 
+  @NotNull
   public Quotable getKeywordValue() {
     return ElixirPsiImplUtil.getKeywordValue(this);
   }

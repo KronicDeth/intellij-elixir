@@ -67,7 +67,7 @@ public class ElixirFile extends PsiFileBase implements ModuleOwner {
 
         if (stubBaseds != null) {
             for (StubBased stubBased : stubBaseds) {
-                if (Implementation.is(stubBased) || Module.is(stubBased) || Protocol.is(stubBased)) {
+                if (Implementation.is(stubBased) || Module.Companion.is(stubBased) || Protocol.is(stubBased)) {
                     modularList.add(stubBased);
                 }
             }

@@ -35,6 +35,7 @@ public interface ElixirInterpolatedRegexHeredoc extends RegexFragmented, Interpo
 
   IElementType getFragmentType();
 
+  @NotNull
   List<HeredocLine> getHeredocLineList();
 
   @NotNull

@@ -4,7 +4,7 @@ import com.ericsson.otp.erlang.OtpErlangAtom
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
 import com.intellij.openapi.diagnostic.Logger
-import org.elixir_lang.beam.NameArity
+import org.elixir_lang.NameArity
 import org.elixir_lang.beam.chunk.ElixirDocumentation.Companion.doc
 import org.elixir_lang.beam.term.inspect
 import org.elixir_lang.beam.term.line

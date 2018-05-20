@@ -1,0 +1,112 @@
+package org.elixir_lang.psi.scope.call_definition_clause
+
+import com.intellij.codeInsight.lookup.LookupElement
+import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.openapi.util.Key
+import com.intellij.psi.PsiElement
+import com.intellij.psi.ResolveState
+import com.intellij.psi.util.PsiTreeUtil
+import org.elixir_lang.annotator.Parameter
+import org.elixir_lang.psi.call.Call
+import org.elixir_lang.psi.call.Named
+import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
+import org.elixir_lang.psi.scope.CallDefinitionClause
+import java.util.*
+
+class Variants : CallDefinitionClause() {
+
+    /*
+     * Fields
+     */
+
+    private var lookupElementByPsiElement: MutableMap<PsiElement, LookupElement>? = null
+
+    private val lookupElementCollection: Collection<LookupElement>
+        get() = lookupElementByPsiElement?.values ?: emptySet()
+
+    /*
+     * Protected Instance Methods
+     */
+
+    /**
+     * Called on every [Call] where [org.elixir_lang.structure_view.element.CallDefinitionClause. is] is
+     * `true` when checking tree with [.execute]
+     *
+     * @return `true` to keep searching up tree; `false` to stop searching.
+     */
+    override fun executeOnCallDefinitionClause(element: Call, state: ResolveState): Boolean {
+        state.get(ENTRANCE_CALL_DEFINITION_CLAUSE)?.let { entranceCallDefinitionClause ->
+            if (!element.isEquivalentTo(entranceCallDefinitionClause)) {
+                addToLookupElementByPsiElement(element)
+            }
+        }
+
+        return true
+    }
+
+    /**
+     * Whether to continue searching after each Module's children have been searched.
+     *
+     * @return `true` to keep searching up the PSI tree; `false` to stop searching.
+     */
+    override fun keepProcessing(): Boolean = false
+
+    /*
+     * Private Instance Methods
+     */
+
+    private fun addToLookupElementByPsiElement(call: Call) {
+        when (call) {
+            is Named -> addToLookupElementByPsiElement(call)
+        }
+    }
+
+    private fun addToLookupElementByPsiElement(named: Named) {
+        named.name?.let { name ->
+            val lookupElementByPsiElement = lookupElementByPsiElement  ?: mutableMapOf()
+
+            if (lookupElementByPsiElement.containsKey(named)) {
+                lookupElementByPsiElement[named] = LookupElementBuilder.createWithSmartPointer(
+                        name,
+                        named
+                ).withRenderer(
+                        org.elixir_lang.code_insight.lookup.element_renderer.CallDefinitionClause(name)
+                )
+            }
+
+            this.lookupElementByPsiElement = lookupElementByPsiElement
+        }
+    }
+
+    companion object {
+        private val ENTRANCE_CALL_DEFINITION_CLAUSE = Key<Call>("ENTRANCE_CALL_DEFINITION_CLAUSE")
+
+        @JvmStatic
+        fun lookupElementList(entrance: Call): List<LookupElement> {
+            val variants = Variants()
+
+            val parameter = Parameter.putParameterized(Parameter(entrance))
+            var entranceCallDefinitionClause: Call? = null
+
+            if (parameter.isCallDefinitionClauseName) {
+                entranceCallDefinitionClause = parameter.parameterized as Call?
+            }
+
+            val resolveState = ResolveState
+                    .initial()
+                    .put(ENTRANCE, entrance)
+                    .put(ENTRANCE_CALL_DEFINITION_CLAUSE, entranceCallDefinitionClause)
+
+            PsiTreeUtil.treeWalkUp(
+                    variants,
+                    entrance,
+                    entrance.containingFile,
+                    resolveState
+            )
+            val lookupElementList = ArrayList<LookupElement>()
+            lookupElementList.addAll(variants.lookupElementCollection)
+
+            return lookupElementList
+        }
+    }
+}

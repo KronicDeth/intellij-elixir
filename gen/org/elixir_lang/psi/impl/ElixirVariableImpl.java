@@ -31,7 +31,7 @@ public class ElixirVariableImpl extends ASTWrapperPsiElement implements ElixirVa
     return ElixirPsiImplUtil.getName(this);
   }
 
-  @Nullable
+  @NotNull
   public PsiElement getNameIdentifier() {
     return ElixirPsiImplUtil.getNameIdentifier(this);
   }

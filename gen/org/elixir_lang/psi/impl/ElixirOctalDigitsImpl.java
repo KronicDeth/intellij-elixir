@@ -25,7 +25,6 @@ public class ElixirOctalDigitsImpl extends ASTWrapperPsiElement implements Elixi
     else super.accept(visitor);
   }
 
-  @NotNull
   public int base() {
     return ElixirPsiImplUtil.base(this);
   }

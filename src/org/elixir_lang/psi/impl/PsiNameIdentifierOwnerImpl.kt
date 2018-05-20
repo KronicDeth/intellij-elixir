@@ -73,7 +73,7 @@ object PsiNameIdentifierOwnerImpl {
         } else if (Module.`is`(named)) {
             nameIdentifier = Module.nameIdentifier(named)
         } else if (Protocol.`is`(named)) {
-            nameIdentifier = Protocol.nameIdentifier(named)
+            nameIdentifier = Module.nameIdentifier(named)
         } else if (named is AtUnqualifiedNoParenthesesCall<*>) { // module attribute
             nameIdentifier = named.atIdentifier
         } else {

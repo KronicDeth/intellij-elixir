@@ -2,13 +2,11 @@ package org.elixir_lang.psi.impl.declarations
 
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
+import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.search.LocalSearchScope
 import com.intellij.psi.search.SearchScope
 import org.elixir_lang.errorreport.Logger
-import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
-import org.elixir_lang.psi.ElixirAnonymousFunction
-import org.elixir_lang.psi.ElixirStabOperation
-import org.elixir_lang.psi.UnqualifiedNoArgumentsCall
+import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.*
 import org.elixir_lang.psi.call.name.Module.KERNEL
@@ -16,26 +14,35 @@ import org.elixir_lang.psi.impl.call.CallImpl.hasDoBlockOrKeyword
 import org.elixir_lang.psi.impl.call.macroDefinitionClauseForArgument
 import org.elixir_lang.psi.impl.moduleWithDependentsScope
 import org.elixir_lang.psi.stub.type.call.Stub.isModular
-import org.elixir_lang.reference.Callable.*
-import org.elixir_lang.reference.ModuleAttribute.isNonReferencing
+import org.elixir_lang.reference.Callable.Companion.isBitStreamSegmentOption
+import org.elixir_lang.reference.Callable.Companion.isParameter
+import org.elixir_lang.reference.Callable.Companion.isParameterWithDefault
+import org.elixir_lang.reference.Callable.Companion.isVariable
+import org.elixir_lang.reference.Callable.Companion.variableUseScope
+import org.elixir_lang.reference.ModuleAttribute.Companion.isNonReferencing
 import org.elixir_lang.structure_view.element.CallDefinitionClause
 import org.elixir_lang.structure_view.element.Delegation
 import org.jetbrains.annotations.Contract
 import java.util.*
 
-fun PsiElement.followingSiblingsSearchScope(): LocalSearchScope {
-    val followingSiblingList = ArrayList<PsiElement>()
+fun PsiElement.selfAndFollowingSiblingsSearchScope(): LocalSearchScope {
+    val selfAndFollowingSiblingList = ArrayList<PsiElement>()
+    selfAndFollowingSiblingList.add(this)
+
     var previousSibling = this
     var followingSibling: PsiElement? = previousSibling.nextSibling
 
     while (followingSibling != null) {
-        followingSiblingList.add(followingSibling)
+        // Does not exclude PsiComment as Search In Comments is an option
+        if (followingSibling !is ElixirEndOfExpression && followingSibling !is PsiWhiteSpace) {
+            selfAndFollowingSiblingList.add(followingSibling)
+        }
 
         previousSibling = followingSibling
         followingSibling = previousSibling.nextSibling
     }
 
-    return LocalSearchScope(followingSiblingList.toTypedArray())
+    return LocalSearchScope(selfAndFollowingSiblingList.toTypedArray())
 }
 
 object UseScopeImpl {
@@ -57,7 +64,7 @@ object UseScopeImpl {
             if (isNonReferencing(atUnqualifiedNoParenthesesCall.atIdentifier)) {
                 atUnqualifiedNoParenthesesCall.moduleWithDependentsScope()
             } else {
-                atUnqualifiedNoParenthesesCall.followingSiblingsSearchScope()
+                atUnqualifiedNoParenthesesCall.selfAndFollowingSiblingsSearchScope()
             }
 
     /**

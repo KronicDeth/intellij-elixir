@@ -28,7 +28,7 @@ public class EnclosingModularByCall extends HashMap<Call, Modular> {
         if (containsKey(call)) {
             modular = get(call);
         } else {
-            modular = CallDefinitionClause.enclosingModular(call);
+            modular = CallDefinitionClause.Companion.enclosingModular(call);
             put(call, modular);
         }
 

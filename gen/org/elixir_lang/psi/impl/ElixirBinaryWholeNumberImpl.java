@@ -35,7 +35,6 @@ public class ElixirBinaryWholeNumberImpl extends ASTWrapperPsiElement implements
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirBinaryDigits.class);
   }
 
-  @NotNull
   public int base() {
     return ElixirPsiImplUtil.base(this);
   }

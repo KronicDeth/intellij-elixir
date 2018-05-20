@@ -999,7 +999,7 @@ object QuotableImpl {
     @Contract(pure = true)
     @JvmStatic
     fun quote(file: PsiFile): OtpErlangObject =
-            (file.viewProvider.getPsi(ElixirLanguage.INSTANCE) as ElixirFile).let { root ->
+            (file.viewProvider.getPsi(ElixirLanguage) as ElixirFile).let { root ->
                 ElixirPsiImplUtil.quote(root)
             }
 
@@ -1303,7 +1303,7 @@ object QuotableImpl {
                     exponentString
             )
 
-            if (inBase(integralDigitsList) && inBase(fractionalDigitsList) && inBase(exponentDigitsList)) {
+            if (integralDigitsList.inBase() && fractionalDigitsList.inBase() && exponentDigitsList.inBase()) {
                 Double.parseDouble(floatString).let(::OtpErlangDouble)
             } else {
                 // Convert parser error to runtime ArgumentError
@@ -1321,7 +1321,7 @@ object QuotableImpl {
                     fractionalString
             )
 
-            if (inBase(integralDigitsList) && inBase(fractionalDigitsList)) {
+            if (integralDigitsList.inBase() && fractionalDigitsList.inBase()) {
                 java.lang.Double.parseDouble(floatString).let(::OtpErlangDouble)
             } else {
                 // Convert parser error to runtime ArgumentError
@@ -1385,34 +1385,22 @@ object QuotableImpl {
     @JvmStatic
     fun quote(wholeNumber: WholeNumber): OtpErlangObject {
         val digitsList = wholeNumber.digitsList()
+        val digitsListString = digitsList.textToString()
+        val base = wholeNumber.base()
 
-        return if (inBase(digitsList)) {
-            val stringBuilder = StringBuilder()
-
-            for (digits in digitsList) {
-                stringBuilder.append(digits.text)
-            }
-
-            quoteInBase(stringBuilder.toString(), wholeNumber.base())
+        return if (digitsList.inBase()) {
+            quoteInBase(digitsListString, base)
         } else {
             /* 0 elements is invalid in native Elixir and can be emulated as `String.to_integer("", base)` while
                2 elements implies at least one element is invalidDigitsElementType which is invalid in native Elixir and
                can be emulated as String.to_integer(<all-digits>, base) so that it raises an ArgumentError on the invalid
                digits */
-            val stringBuilder = StringBuilder()
-
-            for (digits in digitsList) {
-                stringBuilder.append(digits.text)
-            }
-
             quotedFunctionCall(
                     "String",
                     "to_integer",
                     metadata(wholeNumber),
-                    elixirString(
-                            stringBuilder.toString()
-                    ),
-                    OtpErlangLong(wholeNumber.base().toLong())
+                    elixirString(digitsListString),
+                    OtpErlangLong(base.toLong())
             )
         }
     }
@@ -1805,19 +1793,4 @@ object QuotableImpl {
                 }
                 else -> QuotableImpl.blockFunctionCall(quotedChildren)
             }
-
-    private fun inBase(digitsList: List<Digits>): Boolean {
-        var validDigitsCount = 0
-        var invalidDigitsCount = 0
-
-        for (digits in digitsList) {
-            if (digits.inBase()) {
-                validDigitsCount++
-            } else {
-                invalidDigitsCount++
-            }
-        }
-
-        return invalidDigitsCount < 1 && validDigitsCount > 0
-    }
 }

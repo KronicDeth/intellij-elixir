@@ -1,18 +1,17 @@
 package org.elixir_lang.psi;
 
-import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiElement;
 import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase;
-import com.intellij.util.Function;
 import com.intellij.util.containers.ContainerUtil;
-import org.apache.commons.lang.math.IntRange;
+import kotlin.ranges.IntRange;
+import org.elixir_lang.NameArityRange;
 import org.elixir_lang.psi.call.Call;
+import org.elixir_lang.structure_view.element.CallDefinitionClause;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.intellij.openapi.util.Pair.pair;
 import static org.elixir_lang.structure_view.element.CallDefinitionClause.nameArityRange;
 
 
@@ -34,14 +33,11 @@ public class ImportTest extends LightPlatformCodeInsightFixtureTestCase {
         Call call = (Call) maybeCall;
         assertTrue(Import.is(call));
 
-        final ArrayList importedCallList = new ArrayList<Call>();
+        final ArrayList<Call> importedCallList = new ArrayList<>();
 
-        Import.callDefinitionClauseCallWhile(call, new Function<Call, Boolean>() {
-            @Override
-            public Boolean fun(Call call) {
-                importedCallList.add(call);
-                return true;
-            }
+        Import.callDefinitionClauseCallWhile(call, call1 -> {
+            importedCallList.add(call1);
+            return true;
         });
 
         assertEquals(3, importedCallList.size());
@@ -60,32 +56,24 @@ public class ImportTest extends LightPlatformCodeInsightFixtureTestCase {
         Call call = (Call) maybeCall;
         assertTrue(Import.is(call));
 
-        final ArrayList<Call> importedCallList = new ArrayList<Call>();
+        final ArrayList<Call> importedCallList = new ArrayList<>();
 
-        Import.callDefinitionClauseCallWhile(call, new Function<Call, Boolean>() {
-            @Override
-            public Boolean fun(Call call) {
-                importedCallList.add(call);
-                return true;
-            }
+        Import.callDefinitionClauseCallWhile(call, call1 -> {
+            importedCallList.add(call1);
+            return true;
         });
 
         assertEquals(2, importedCallList.size());
 
-        List<Pair<String, IntRange>> nameArityRangeList = ContainerUtil.map(
+        List<NameArityRange> nameArityRangeList = ContainerUtil.map(
                 importedCallList,
-                new Function<Call, Pair<String, IntRange>>() {
-                    @Override
-                    public Pair<String, IntRange> fun(Call call) {
-                        return nameArityRange(call);
-                    }
-                }
+                CallDefinitionClause::nameArityRange
         );
 
         assertContainsElements(
                 Arrays.asList(
-                        pair("imported", new IntRange(1)),
-                        pair("imported", new IntRange(0))
+                        new NameArityRange("imported", new IntRange(1, 1)),
+                        new NameArityRange("imported", new IntRange(0, 0))
                 ),
                 nameArityRangeList
         );
@@ -104,21 +92,18 @@ public class ImportTest extends LightPlatformCodeInsightFixtureTestCase {
         Call call = (Call) maybeCall;
         assertTrue(Import.is(call));
 
-        final ArrayList<Call> importedCallList = new ArrayList<Call>();
+        final ArrayList<Call> importedCallList = new ArrayList<>();
 
-        Import.callDefinitionClauseCallWhile(call, new Function<Call, Boolean>() {
-            @Override
-            public Boolean fun(Call call) {
-                importedCallList.add(call);
-                return true;
-            }
+        Import.callDefinitionClauseCallWhile(call, call1 -> {
+            importedCallList.add(call1);
+            return true;
         });
 
         assertEquals(1, importedCallList.size());
 
         Call importedCall = importedCallList.get(0);
 
-        assertEquals(pair("imported", new IntRange(0)), nameArityRange(importedCall));
+        assertEquals(new NameArityRange("imported", new IntRange(0, 0)), nameArityRange(importedCall));
     }
 
     /*

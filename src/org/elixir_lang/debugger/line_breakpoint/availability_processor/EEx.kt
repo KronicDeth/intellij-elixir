@@ -10,7 +10,7 @@ import org.elixir_lang.psi.ElixirTypes
 class EEx : AvailabilityProcessor() {
     override fun process(psiElement: PsiElement): Boolean =
             when (psiElement.language) {
-                ElixirLanguage.INSTANCE ->
+                ElixirLanguage ->
                     if (psiElement is LeafPsiElement) {
                         when (psiElement.elementType) {
                             ElixirTypes.COMMENT,

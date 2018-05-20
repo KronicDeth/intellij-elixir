@@ -7,7 +7,7 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
-import org.apache.commons.lang.math.IntRange;
+import kotlin.ranges.IntRange;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -95,6 +95,7 @@ public class ElixirUnaryNumericOperationImpl extends ASTWrapperPsiElement implem
     return ElixirPsiImplUtil.getName(this);
   }
 
+  @Nullable
   public PsiElement getNameIdentifier() {
     return ElixirPsiImplUtil.getNameIdentifier(this);
   }
@@ -103,19 +104,19 @@ public class ElixirUnaryNumericOperationImpl extends ASTWrapperPsiElement implem
     return ElixirPsiImplUtil.hasDoBlockOrKeyword(this);
   }
 
-  public boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName) {
+  public boolean isCalling(String resolvedModuleName, String functionName) {
     return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, functionName);
   }
 
-  public boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity) {
+  public boolean isCalling(String resolvedModuleName, String functionName, int resolvedFinalArity) {
     return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, functionName, resolvedFinalArity);
   }
 
-  public boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName) {
+  public boolean isCallingMacro(String resolvedModuleName, String functionName) {
     return ElixirPsiImplUtil.isCallingMacro(this, resolvedModuleName, functionName);
   }
 
-  public boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity) {
+  public boolean isCallingMacro(String resolvedModuleName, String functionName, int resolvedFinalArity) {
     return ElixirPsiImplUtil.isCallingMacro(this, resolvedModuleName, functionName, resolvedFinalArity);
   }
 
@@ -159,7 +160,6 @@ public class ElixirUnaryNumericOperationImpl extends ASTWrapperPsiElement implem
     return ElixirPsiImplUtil.secondaryArity(this);
   }
 
-  @NotNull
   public int resolvedFinalArity() {
     return ElixirPsiImplUtil.resolvedFinalArity(this);
   }

@@ -16,7 +16,7 @@ import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.operation.Normalized
 import org.elixir_lang.psi.stub.type.call.Stub.isModular
 import org.elixir_lang.reference.Module
-import org.elixir_lang.structure_view.element.CallDefinitionClause.enclosingModularMacroCall
+import org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.enclosingModularMacroCall
 import org.jetbrains.annotations.Contract
 
 fun QualifiableAlias.computeReference(maxScope: PsiElement): PsiPolyVariantReference? =

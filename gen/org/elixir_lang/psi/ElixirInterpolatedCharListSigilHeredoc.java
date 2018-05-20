@@ -35,6 +35,7 @@ public interface ElixirInterpolatedCharListSigilHeredoc extends CharListFragment
 
   IElementType getFragmentType();
 
+  @NotNull
   List<HeredocLine> getHeredocLineList();
 
   @NotNull

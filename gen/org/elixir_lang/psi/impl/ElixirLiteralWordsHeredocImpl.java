@@ -71,6 +71,7 @@ public class ElixirLiteralWordsHeredocImpl extends ASTWrapperPsiElement implemen
     return ElixirPsiImplUtil.getFragmentType(this);
   }
 
+  @NotNull
   public List<HeredocLine> getHeredocLineList() {
     return ElixirPsiImplUtil.getHeredocLineList(this);
   }

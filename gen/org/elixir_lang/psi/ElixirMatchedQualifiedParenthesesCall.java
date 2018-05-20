@@ -8,7 +8,7 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.StubBasedPsiElement;
 import com.intellij.psi.scope.PsiScopeProcessor;
-import org.apache.commons.lang.math.IntRange;
+import kotlin.ranges.IntRange;
 import org.elixir_lang.psi.stub.MatchedQualifiedParenthesesCall;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -38,6 +38,7 @@ public interface ElixirMatchedQualifiedParenthesesCall extends ElixirMatchedExpr
   @Nullable
   String functionName();
 
+  @NotNull
   PsiElement functionNameElement();
 
   @Nullable
@@ -48,6 +49,7 @@ public interface ElixirMatchedQualifiedParenthesesCall extends ElixirMatchedExpr
   @Nullable
   String getName();
 
+  @Nullable
   PsiElement getNameIdentifier();
 
   @NotNull
@@ -64,13 +66,13 @@ public interface ElixirMatchedQualifiedParenthesesCall extends ElixirMatchedExpr
   //matching getUseScope(ElixirMatchedQualifiedParenthesesCall, ...)
   //methods are not found in ElixirPsiImplUtil
 
-  boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName);
+  boolean isCalling(String resolvedModuleName, String functionName);
 
-  boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity);
+  boolean isCalling(String resolvedModuleName, String functionName, int resolvedFinalArity);
 
-  boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName);
+  boolean isCallingMacro(String resolvedModuleName, String functionName);
 
-  boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity);
+  boolean isCallingMacro(String resolvedModuleName, String functionName, int resolvedFinalArity);
 
   @NotNull
   String moduleName();
@@ -89,7 +91,6 @@ public interface ElixirMatchedQualifiedParenthesesCall extends ElixirMatchedExpr
   @NotNull
   OtpErlangObject quote();
 
-  @NotNull
   int resolvedFinalArity();
 
   @NotNull

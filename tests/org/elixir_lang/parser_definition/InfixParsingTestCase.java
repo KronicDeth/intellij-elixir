@@ -1,12 +1,11 @@
 package org.elixir_lang.parser_definition;
 
 import com.intellij.openapi.fileEditor.impl.LoadTextUtil;
-import com.intellij.psi.*;
-import com.intellij.psi.impl.source.tree.LeafPsiElement;
+import com.intellij.psi.FileViewProvider;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.testFramework.LightVirtualFile;
 import org.elixir_lang.ElixirLanguage;
-import org.elixir_lang.psi.Operator;
 import org.elixir_lang.psi.operation.Operation;
 import org.jetbrains.annotations.NotNull;
 

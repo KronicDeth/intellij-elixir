@@ -12,7 +12,7 @@ import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import kotlin.jvm.functions.Function1;
-import org.apache.commons.lang.math.IntRange;
+import kotlin.ranges.IntRange;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.call.StubBased;
@@ -24,7 +24,9 @@ import org.elixir_lang.psi.impl.call.CallImpl;
 import org.elixir_lang.psi.impl.call.CallImplKt;
 import org.elixir_lang.psi.impl.call.CanonicallyNamedImpl;
 import org.elixir_lang.psi.impl.declarations.UseScopeImpl;
+import org.elixir_lang.psi.impl.operation.capture.NonNumericImplKt;
 import org.elixir_lang.psi.operation.*;
+import org.elixir_lang.psi.operation.capture.NonNumeric;
 import org.elixir_lang.psi.qualification.Qualified;
 import org.elixir_lang.psi.qualification.Unqualified;
 import org.elixir_lang.psi.stub.call.Stub;
@@ -156,12 +158,12 @@ public class ElixirPsiImplUtil {
 
     @Nullable
     public static String canonicalName(@NotNull StubBased stubBased) {
-       return CanonicallyNamedImpl.canonicalName(stubBased);
+       return CanonicallyNamedImpl.INSTANCE.canonicalName(stubBased);
     }
 
     @NotNull
     public static Set<String> canonicalNameSet(@NotNull StubBased stubBased) {
-        return CanonicallyNamedImpl.canonicalNameSet(stubBased);
+        return CanonicallyNamedImpl.INSTANCE.canonicalNameSet(stubBased);
     }
 
     // @return -1 if codePoint cannot be parsed.
@@ -244,8 +246,8 @@ public class ElixirPsiImplUtil {
     }
 
     public static boolean isExported(@NotNull final UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
-        return CallDefinitionClause.isPublicFunction(unqualifiedNoParenthesesCall) ||
-                CallDefinitionClause.isPublicMacro(unqualifiedNoParenthesesCall);
+        return CallDefinitionClause.Companion.isPublicFunction(unqualifiedNoParenthesesCall) ||
+                CallDefinitionClause.Companion.isPublicMacro(unqualifiedNoParenthesesCall);
     }
 
     public static boolean isModuleName(@NotNull final ElixirAccessExpression accessExpression) {
@@ -1059,6 +1061,11 @@ public class ElixirPsiImplUtil {
     }
 
     @Nullable
+    public static PsiElement getNameIdentifier(@NotNull NonNumeric nonNumeric) {
+        return NonNumericImplKt.getNameIdentifier(nonNumeric);
+    }
+
+    @Nullable
     public static PsiElement getNameIdentifier(@NotNull QualifiableAlias qualifiableAlias) {
         return PsiNameIdentifierOwnerImpl.getNameIdentifier(qualifiableAlias);
     }
@@ -1076,13 +1083,28 @@ public class ElixirPsiImplUtil {
     }
 
     @Nullable
+    public static ItemPresentation getPresentation(@NotNull final QualifiableAlias qualifiableAlias) {
+        return PresentationImpl.getPresentation(qualifiableAlias);
+    }
+
+    @Nullable
+    public static PsiReference getReference(@NotNull AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
+        return AtUnqualifiedNoParenthesesCallImplKt.getReference(atUnqualifiedNoParenthesesCall);
+    }
+
+    @Nullable
     public static PsiReference getReference(@NotNull Call call) {
-        return CallImplKt.computeReference(call);
+        return CallImplKt.getReference(call);
     }
 
     @Nullable
     public static PsiReference getReference(@NotNull ElixirAtom atom) {
         return ElixirAtomImplKt.getReference(atom);
+    }
+
+    @Nullable
+    public static PsiReference getReference(@NotNull NonNumeric nonNumeric) {
+        return NonNumericImplKt.getReference(nonNumeric);
     }
 
     @Nullable
@@ -1097,7 +1119,7 @@ public class ElixirPsiImplUtil {
     }
 
     @Contract(pure = true)
-    @NotNull
+    @Nullable
     public static PsiReference getReference(@NotNull final ElixirAtIdentifier atIdentifier) {
         return ElixirAtIdentifierImplKt.getReference(atIdentifier);
     }

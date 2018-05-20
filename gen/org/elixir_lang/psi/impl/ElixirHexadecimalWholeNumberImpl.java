@@ -35,7 +35,6 @@ public class ElixirHexadecimalWholeNumberImpl extends ASTWrapperPsiElement imple
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirHexadecimalDigits.class);
   }
 
-  @NotNull
   public int base() {
     return ElixirPsiImplUtil.base(this);
   }

@@ -11,7 +11,6 @@ public interface ElixirDecimalWholeNumber extends WholeNumber {
   @NotNull
   List<ElixirDecimalDigits> getDecimalDigitsList();
 
-  @NotNull
   int base();
 
   @NotNull

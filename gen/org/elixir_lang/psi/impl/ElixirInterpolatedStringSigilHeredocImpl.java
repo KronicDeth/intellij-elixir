@@ -71,6 +71,7 @@ public class ElixirInterpolatedStringSigilHeredocImpl extends ASTWrapperPsiEleme
     return ElixirPsiImplUtil.getFragmentType(this);
   }
 
+  @NotNull
   public List<HeredocLine> getHeredocLineList() {
     return ElixirPsiImplUtil.getHeredocLineList(this);
   }
