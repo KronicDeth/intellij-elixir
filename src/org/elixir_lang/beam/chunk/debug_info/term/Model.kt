@@ -19,7 +19,8 @@ fun component(debugInfo: DebugInfo?, project: Project, tabbedPane: JBTabbedPane)
         is org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.AbstractCodeCompileOptions ->
             org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.Component(
                     debugInfo,
-                    project
+                    project,
+                    tabbedPane
             )
         is ElixirErl ->
             JBScrollPane(Table(org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.Model(debugInfo)))
