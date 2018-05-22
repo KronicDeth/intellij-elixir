@@ -3,6 +3,7 @@ package org.elixir_lang.beam.chunk.debug_info.term
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBScrollPane
+import com.intellij.ui.components.JBTabbedPane
 import org.elixir_lang.beam.chunk.DebugInfo
 import org.elixir_lang.beam.chunk.Table
 import org.elixir_lang.beam.chunk.debug_info.Term
@@ -11,14 +12,15 @@ import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.table.AbstractTableModel
 
-fun component(debugInfo: DebugInfo?, project: Project): JComponent =
+fun component(debugInfo: DebugInfo?, project: Project, tabbedPane: JBTabbedPane): JComponent =
     when (debugInfo) {
         is org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.V1 ->
-            org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.Component(debugInfo, project)
+            org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.Component(debugInfo, project, tabbedPane)
         is org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.AbstractCodeCompileOptions ->
             org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.Component(
                     debugInfo,
-                    project
+                    project,
+                    tabbedPane
             )
         is ElixirErl ->
             JBScrollPane(Table(org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.Model(debugInfo)))
