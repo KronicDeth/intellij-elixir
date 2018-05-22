@@ -63,6 +63,19 @@
         the <code>Dbgi</code> chunk view to translate Erlang to Elixir.
       </li>
       <li>Allow zero or more new lines after the struct name before the opening curly brace (<code>{</code>).</li>
+      <li>
+        <p>
+          In order to prevent <code>Access is allowed from event dispatch thread only</code> errors when creating
+          read-only code editor in subtabs of the BEAM Chunks editor, only create those editors when their parent tab is
+          selected.
+        </p>
+        <p>Affected tabs:</p>
+        <ul>
+          <li>Code (Elixir &amp; Erlang)</li>
+          <li>ExDc</li>
+          <li>Dbgi (Elixir &amp; Erlang)</li>
+        </ul>
+      </li>
     </ul>
   </li>
 </ul>

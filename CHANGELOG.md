@@ -175,6 +175,13 @@
 * [#1060](https://github.com/KronicDeth/intellij-elixir/pull/1060) - Log available bytes and total size when header is not `FOR1`. - [@KronicDeth](https://github.com/KronicDeth)
 * [#1071](https://github.com/KronicDeth/intellij-elixir/pull/1071) - `erl_abstract_code` format `Dbgi` chunks can now be navigated similar to how `elixir_erl` format Dbgi chunks can be navigated.  Instead of converting the [Erlang Abstract Code](http://erlang.org/doc/apps/erts/absform.html) back to Erlang, which would not be highlighted if [intellij-erlang](https://github.com/ignatov/intellij-erlang) and requires the user to know Erlang, the Erlang Abstract Code is translated back to Elixir source, so you can use the Dbgi chunk view to translate Erlang to Elixir. - [@KronicDeth](https://github.com/KronicDeth)
 * [#1111](https://github.com/KronicDeth/intellij-elixir/pull/1111) - Allow zero or more new lines after the struct name before the opening curly brace (`{`). - [@KronicDeth](https://github.com/KronicDeth)
+* [#1112](https://github.com/KronicDeth/intellij-elixir/pull/1112) - [@KronicDeth](https://github.com/KronicDeth)
+  * In order to prevent `Access is allowed from event dispatch thread only` errors when creating read-only code editor in subtabs of the BEAM Chunks editor, only create those editors when their parent tab is selected.
+
+    Affected tabs:
+    * Code (Elixir & Erlang)
+    * ExDc
+    * Dbgi (Elixir & Erlang)
 
 ## v7.4.0
 
