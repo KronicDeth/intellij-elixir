@@ -375,17 +375,13 @@ class Callable : Annotator, DumbAware {
                 standardTextAttributeKeys: Array<TextAttributesKey>,
                 predefinedTextAttributesKeys: Array<TextAttributesKey>
         ): Array<TextAttributesKey> =
-                if (psiElement is NavigationItem) {
-                    psiElement.presentation?.let { presentation ->
-                        if (PREDEFINED_LOCATION_STRING_SET.contains(presentation.locationString)) {
-                            predefinedTextAttributesKeys
-                        } else {
-                            null
-                        }
-                    } ?: standardTextAttributeKeys
-                } else {
-                    standardTextAttributeKeys
-                }
+                psiElement.let { it as? NavigationItem }?.presentation?.locationString?.let { locationString ->
+                    if (PREDEFINED_LOCATION_STRING_SET.any { locationString.endsWith(it) }) {
+                        predefinedTextAttributesKeys
+                    } else {
+                        null
+                    }
+                } ?: standardTextAttributeKeys
 
         private fun sameFile(referrer: PsiElement, resolved: PsiElement): Boolean =
             referrer.containingFile.virtualFile == resolved.containingFile.virtualFile
