@@ -182,6 +182,7 @@
     * Code (Elixir & Erlang)
     * ExDc
     * Dbgi (Elixir & Erlang)
+* [#1114](https://github.com/KronicDeth/intellij-elixir/pull/1114) - Check for suffix instead of full match to detect predefined macros when annotating.  Location strings have become more complex, such as including the file path for root level modules, so the old exact matching on the module name no longer works. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v7.4.0
 
