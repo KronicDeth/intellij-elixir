@@ -8,7 +8,7 @@ import com.intellij.refactoring.rename.RenameInputValidator
 import com.intellij.refactoring.rename.RenameInputValidatorEx
 import com.intellij.util.ProcessingContext
 import org.elixir_lang.psi.call.Call
-import org.elixir_lang.refactoring.variable.rename.Handler.Companion.isAvailable
+import org.elixir_lang.refactoring.variable.rename.Handler.Companion.isAvailableOnResolved
 import org.elixir_lang.refactoring.variable.rename.Inplace.isIdentifier
 
 class InputValidator : RenameInputValidatorEx {
@@ -21,32 +21,24 @@ class InputValidator : RenameInputValidatorEx {
      * @param project
      * @return null if newName is a valid name, custom error message otherwise
      */
-    override fun getErrorMessage(newName: String, project: Project): String? {
-        var errorMessage: String? = null
-
-        if (!isIdentifier(newName)) {
-            errorMessage = "`" + newName + "` is not a valid variable name: variables (1) MUST start with a " +
-                    "lowercase letter or underscore (`_`) and (2) then any combination of digits (`0` - `9`), " +
-                    "lowercase letters (`a` - `z`), uppercase letters (`A` - `Z`) and underscore in the " +
-                    "middle and (3) optional, end with `?` or `!`."
-        }
-
-        return errorMessage
-    }
+    override fun getErrorMessage(newName: String, project: Project): String? =
+            if (!isIdentifier(newName)) {
+                "`" + newName + "` is not a valid variable name: variables (1) MUST start with a " +
+                        "lowercase letter or underscore (`_`) and (2) then any combination of digits (`0` - `9`), " +
+                        "lowercase letters (`a` - `z`), uppercase letters (`A` - `Z`) and underscore in the " +
+                        "middle and (3) optional, end with `?` or `!`."
+            } else {
+                null
+            }
 
     override fun getPattern(): ElementPattern<out PsiElement> {
         return object : ElementPattern<Call> {
-            override fun accepts(o: Any?): Boolean {
-                return false
-            }
+            override fun accepts(o: Any?): Boolean = false
 
-            override fun accepts(o: Any?, context: ProcessingContext): Boolean {
-                return o is PsiElement && isAvailable(o)
-            }
+            override fun accepts(o: Any?, context: ProcessingContext): Boolean =
+                    o is PsiElement && isAvailableOnResolved(o)
 
-            override fun getCondition(): ElementPatternCondition<Call>? {
-                return null
-            }
+            override fun getCondition(): ElementPatternCondition<Call>? = null
         }
     }
 
