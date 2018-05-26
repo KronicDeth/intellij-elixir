@@ -19,8 +19,7 @@ import org.elixir_lang.psi.impl.prevSiblingSequence
 import org.elixir_lang.reference.resolver.ModuleAttribute
 import org.elixir_lang.structure_view.element.modular.Implementation
 
-class ModuleAttribute(psiElement: PsiElement) :
-        PsiPolyVariantReferenceBase<PsiElement>(psiElement, TextRange.create(0, psiElement.textLength)) {
+class ModuleAttribute(psiElement: PsiElement) : PsiPolyVariantReferenceBase<PsiElement>(psiElement) {
     /**
      * Returns the array of String, [PsiElement] and/or [LookupElement]
      * instances representing all identifiers that are visible at the location of the reference. The contents
@@ -62,13 +61,33 @@ class ModuleAttribute(psiElement: PsiElement) :
      */
     override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> =
             ResolveCache
-            .getInstance(this.myElement.project)
-            .resolveWithCaching(
-                    this,
-                    ModuleAttribute,
-                    false,
-                    incompleteCode
+                    .getInstance(this.myElement.project)
+                    .resolveWithCaching(
+                            this,
+                            ModuleAttribute,
+                            false,
+                            incompleteCode
+                    )
+
+    override fun calculateDefaultRangeInElement(): TextRange {
+        val elementTextRange = element.textRange
+        val startOffset = elementTextRange.startOffset
+
+        return when (myElement) {
+            is AtUnqualifiedNoParenthesesCall<*> -> {
+                val atIdentifierTextRange = myElement.atIdentifier.textRange
+
+                TextRange.create(
+                        atIdentifierTextRange.startOffset - startOffset,
+                        atIdentifierTextRange.endOffset - startOffset
+                )
+            }
+            else -> TextRange.create(
+                    startOffset - startOffset,
+                    elementTextRange.endOffset - startOffset
             )
+        }
+    }
 
     private fun getVariantsSibling(lastSibling: PsiElement): List<LookupElement> =
         lastSibling
