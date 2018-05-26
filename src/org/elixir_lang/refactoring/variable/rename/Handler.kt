@@ -120,6 +120,8 @@ class Handler : RenameHandler {
         }
 
     companion object {
-        internal fun isAvailableOnResolved(element: PsiElement): Boolean = element is Call && Callable.isVariable(element)
+        internal fun isAvailableOnResolved(element: PsiElement): Boolean = element is Call && (
+                Callable.isVariable(element) || Callable.isParameter(element)
+                )
     }
 }
