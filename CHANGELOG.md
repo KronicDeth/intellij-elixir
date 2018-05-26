@@ -169,6 +169,7 @@
     * It is easier to distinguish `alias`es and the `defmodule` that is being aliased because element description now include `alias` or `defmodule` before the Alias name based on how the Alias is defined in the scope.
     * Call definitions use the same presentation for Structure View and Find Usages, so that Compile/Runtime time icons, and visibility are the same in both.
 * [#1111](https://github.com/KronicDeth/intellij-elixir/pull/1111) - Regression test for [#1091](https://github.com/KronicDeth/intellij-elixir/issues/1091) - [@KronicDeth](https://github.com/KronicDeth)
+* [#1120](https://github.com/KronicDeth/intellij-elixir/pull/1120) - Add regression tests for [#1116](https:/github.com/KronicDeth/intellij-elixir/issues/1116) that test that parameter and variables can be renamed. - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#1056](https://github.com/KronicDeth/intellij-elixir/pull/1056) - Certain `.beam` files in the OTP source are purposely invalid, so ignore them when trying to parse and don't log the expected error. - [@KronicDeth](https://github.com/KronicDeth)
@@ -183,6 +184,7 @@
     * ExDc
     * Dbgi (Elixir & Erlang)
 * [#1114](https://github.com/KronicDeth/intellij-elixir/pull/1114) - Check for suffix instead of full match to detect predefined macros when annotating.  Location strings have become more complex, such as including the file path for root level modules, so the old exact matching on the module name no longer works. - [@KronicDeth](https://github.com/KronicDeth)
+* [#1120](https://github.com/KronicDeth/intellij-elixir/pull/1120) - Restore parameter and variable rename.  It broke because the changes to make Find Usages work and have Go To Declaration default to Find Usage when there is only one target disabled the default selected element code that the `VariableInplaceRenameHandler` used. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v7.4.0
 

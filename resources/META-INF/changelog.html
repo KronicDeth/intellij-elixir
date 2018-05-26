@@ -44,6 +44,10 @@
         </ul>
       </li>
       <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/1091">#1091</a>.</li>
+      <li>
+        Add regression tests for <a href="https://github.com/KronicDeth/intellij-elixir/issues/1116">#1116</a> that test
+        that parameter and variables can be renamed.
+      </li>
     </ul>
   </li>
   <li>
@@ -80,6 +84,11 @@
         Check for suffix instead of full match to detect predefined macros when annotating.  Location strings have
         become more complex, such as including the file path for root level modules, so the old exact matching on the
         module name no longer works.
+      </li>
+      <li>
+        Restore parameter and variable rename.  It broke because the changes to make Find Usages work and have Go To
+        Declaration default to Find Usage when there is only one target disabled the default selected element code that
+        the <code>VariableInplaceRenameHandler</code> used.
       </li>
     </ul>
   </li>
