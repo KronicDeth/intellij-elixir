@@ -15,7 +15,6 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 
 public class ElementType extends IStubFileElementType<Stub> {
-    public static final int VERSION = 1;
     public static final IStubFileElementType INSTANCE = new ElementType();
 
     public ElementType() {
@@ -40,11 +39,6 @@ public class ElementType extends IStubFileElementType<Stub> {
         };
     }
 
-    @Override
-    public int getStubVersion() {
-        return VERSION;
-    }
-
     @NotNull
     @Override
     public String getExternalId() {
@@ -52,7 +46,7 @@ public class ElementType extends IStubFileElementType<Stub> {
     }
 
     @Override
-    public void serialize(@NotNull Stub stub, @NotNull StubOutputStream dataStream) throws IOException {
+    public void serialize(@NotNull Stub stub, @NotNull StubOutputStream dataStream) {
     }
 
     @NotNull
