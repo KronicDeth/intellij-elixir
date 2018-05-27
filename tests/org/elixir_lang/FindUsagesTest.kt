@@ -1018,17 +1018,30 @@ class FindUsagesTest : LightCodeInsightFixtureTestCase() {
 
         val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
 
-        assertEquals(1, usages.size)
+        assertEquals(2, usages.size)
 
         val firstElement = usages[0].element!!
 
-        assertEquals(69, firstElement.textOffset)
+        assertEquals(31, firstElement.textOffset)
 
-        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(firstElement))
+        assertTrue(readWriteAccessDetector.isDeclarationWriteAccess(firstElement))
         assertTrue(readWriteAccessDetector.isReadWriteAccessible(firstElement))
-        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(firstElement))
+        assertEquals(ReadWriteAccessDetector.Access.Write, readWriteAccessDetector.getExpressionAccess(firstElement))
 
-        assertEquals(UsageTypeProvider.MODULE_ATTRIBUTE_READ, getUsageType(firstElement, usageTargets))
+        assertEquals(
+                UsageTypeProvider.MODULE_ATTRIBUTE_ACCUMULATE_OR_OVERRIDE,
+                getUsageType(firstElement, usageTargets)
+        )
+
+        val secondElement = usages[1].element!!
+
+        assertEquals(69, secondElement.textOffset)
+
+        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(secondElement))
+        assertTrue(readWriteAccessDetector.isReadWriteAccessible(secondElement))
+        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(secondElement))
+
+        assertEquals(UsageTypeProvider.MODULE_ATTRIBUTE_READ, getUsageType(secondElement, usageTargets))
     }
 
     fun testModuleAttributeUsage() {
@@ -1049,17 +1062,30 @@ class FindUsagesTest : LightCodeInsightFixtureTestCase() {
 
         val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
 
-        assertEquals(1, usages.size)
+        assertEquals(2, usages.size)
 
         val firstElement = usages[0].element!!
 
-        assertEquals(69, firstElement.textOffset)
+        assertEquals(31, firstElement.textOffset)
 
-        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(firstElement))
+        assertTrue(readWriteAccessDetector.isDeclarationWriteAccess(firstElement))
         assertTrue(readWriteAccessDetector.isReadWriteAccessible(firstElement))
-        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(firstElement))
+        assertEquals(ReadWriteAccessDetector.Access.Write, readWriteAccessDetector.getExpressionAccess(firstElement))
 
-        assertEquals(UsageTypeProvider.MODULE_ATTRIBUTE_READ, getUsageType(firstElement, usageTargets))
+        assertEquals(
+                UsageTypeProvider.MODULE_ATTRIBUTE_ACCUMULATE_OR_OVERRIDE,
+                getUsageType(firstElement, usageTargets)
+        )
+
+        val secondElement = usages[1].element!!
+
+        assertEquals(69, secondElement.textOffset)
+
+        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(secondElement))
+        assertTrue(readWriteAccessDetector.isReadWriteAccessible(secondElement))
+        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(secondElement))
+
+        assertEquals(UsageTypeProvider.MODULE_ATTRIBUTE_READ, getUsageType(secondElement, usageTargets))
     }
 
     private val findUsagesProvider by lazy { LanguageFindUsages.INSTANCE.forLanguage(ElixirLanguage) }

@@ -19,8 +19,7 @@ import org.elixir_lang.psi.impl.prevSiblingSequence
 import org.elixir_lang.reference.resolver.ModuleAttribute
 import org.elixir_lang.structure_view.element.modular.Implementation
 
-class ModuleAttribute(psiElement: PsiElement) :
-        PsiPolyVariantReferenceBase<PsiElement>(psiElement, TextRange.create(0, psiElement.textLength)) {
+class ModuleAttribute(psiElement: PsiElement) : PsiPolyVariantReferenceBase<PsiElement>(psiElement) {
     /**
      * Returns the array of String, [PsiElement] and/or [LookupElement]
      * instances representing all identifiers that are visible at the location of the reference. The contents
@@ -33,24 +32,24 @@ class ModuleAttribute(psiElement: PsiElement) :
     override fun getVariants(): Array<Any> = getVariantsUpFromElement(myElement).toTypedArray()
 
     override fun handleElementRename(newModuleAttributeName: String): PsiElement =
-        when (myElement) {
-            is AtNonNumericOperation -> {
-                val moduleAttributeUsage = ElementFactory.createModuleAttributeUsage(
-                        myElement.getProject(),
-                        newModuleAttributeName
-                )
-                myElement.replace(moduleAttributeUsage)
+            when (myElement) {
+                is AtNonNumericOperation -> {
+                    val moduleAttributeUsage = ElementFactory.createModuleAttributeUsage(
+                            myElement.getProject(),
+                            newModuleAttributeName
+                    )
+                    myElement.replace(moduleAttributeUsage)
+                }
+                is ElixirAtIdentifier -> {
+                    // do nothing; handled by setName on ElixirAtUnqualifiedNoParenthesesCall
+                    myElement
+                }
+                else -> throw NotImplementedException(
+                        "Renaming module attribute reference on " + myElement.javaClass.canonicalName +
+                                " PsiElements is not implemented yet.  Please open an issue " +
+                                "(https://github.com/KronicDeth/intellij-elixir/issues/new) with the class name and the " +
+                                "sample text:\n" + myElement.text)
             }
-            is ElixirAtIdentifier -> {
-                // do nothing; handled by setName on ElixirAtUnqualifiedNoParenthesesCall
-                myElement
-            }
-            else -> throw NotImplementedException(
-                    "Renaming module attribute reference on " + myElement.javaClass.canonicalName +
-                            " PsiElements is not implemented yet.  Please open an issue " +
-                            "(https://github.com/KronicDeth/intellij-elixir/issues/new) with the class name and the " +
-                            "sample text:\n" + myElement.text)
-        }
 
     /**
      * Returns the results of resolving the reference.
@@ -62,47 +61,67 @@ class ModuleAttribute(psiElement: PsiElement) :
      */
     override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> =
             ResolveCache
-            .getInstance(this.myElement.project)
-            .resolveWithCaching(
-                    this,
-                    ModuleAttribute,
-                    false,
-                    incompleteCode
+                    .getInstance(this.myElement.project)
+                    .resolveWithCaching(
+                            this,
+                            ModuleAttribute,
+                            false,
+                            incompleteCode
+                    )
+
+    override fun calculateDefaultRangeInElement(): TextRange {
+        val elementTextRange = element.textRange
+        val startOffset = elementTextRange.startOffset
+
+        return when (myElement) {
+            is AtUnqualifiedNoParenthesesCall<*> -> {
+                val atIdentifierTextRange = myElement.atIdentifier.textRange
+
+                TextRange.create(
+                        atIdentifierTextRange.startOffset - startOffset,
+                        atIdentifierTextRange.endOffset - startOffset
+                )
+            }
+            else -> TextRange.create(
+                    startOffset - startOffset,
+                    elementTextRange.endOffset - startOffset
             )
+        }
+    }
 
     private fun getVariantsSibling(lastSibling: PsiElement): List<LookupElement> =
-        lastSibling
-                .prevSiblingSequence()
-                .mapNotNull {
-                    when (it) {
-                        is AtUnqualifiedNoParenthesesCall<*> -> {
-                            LookupElementBuilder.createWithSmartPointer(
-                                    ElixirPsiImplUtil.moduleAttributeName(it),
-                                    it
-                            )
-                        }
-                        is Call -> {
-                            if (Implementation.`is`(it)) {
-                                val element = Implementation.protocolNameElement(it) ?: it
-
+            lastSibling
+                    .prevSiblingSequence()
+                    .mapNotNull {
+                        when (it) {
+                            is AtUnqualifiedNoParenthesesCall<*> -> {
                                 LookupElementBuilder.createWithSmartPointer(
-                                        "@protocol",
-                                        element
+                                        ElixirPsiImplUtil.moduleAttributeName(it),
+                                        it
                                 )
-                            } else {
-                                null
                             }
+                            is Call -> {
+                                if (Implementation.`is`(it)) {
+                                    val element = Implementation.protocolNameElement(it) ?: it
+
+                                    LookupElementBuilder.createWithSmartPointer(
+                                            "@protocol",
+                                            element
+                                    )
+                                } else {
+                                    null
+                                }
+                            }
+                            else -> null
                         }
-                        else -> null
                     }
-                }
-                .toList()
+                    .toList()
 
     private fun getVariantsUpFromElement(element: PsiElement): List<LookupElement> =
-        element
-                .ancestorSequence()
-                .flatMap { getVariantsSibling(it).asSequence() }
-                .toList()
+            element
+                    .ancestorSequence()
+                    .flatMap { getVariantsSibling(it).asSequence() }
+                    .toList()
 
     companion object {
         private const val BEHAVIOUR_NAME = "behaviour"

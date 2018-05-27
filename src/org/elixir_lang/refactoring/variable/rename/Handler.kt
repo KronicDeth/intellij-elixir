@@ -35,16 +35,17 @@ class Handler : RenameHandler {
 
     // called on rename actionPerformed. Can obtain additional info from user
     override fun isRenaming(dataContext: DataContext): Boolean = isAvailableOnDataContext(dataContext)
+
     /**
-   * Invokes refactoring action from editor. The refactoring obtains
-   * all data from editor selection.
-   *
-   * @param project     the project in which the refactoring is invoked.
-   * @param editor      editor that refactoring is invoked in
-   * @param file        file should correspond to <code>editor</code>
-   * @param dataContext can be null for some but not all of refactoring action handlers
-   *                    (it is recommended to pass DataManager.getDataContext() instead of null)
-   */
+     * Invokes refactoring action from editor. The refactoring obtains
+     * all data from editor selection.
+     *
+     * @param project     the project in which the refactoring is invoked.
+     * @param editor      editor that refactoring is invoked in
+     * @param file        file should correspond to <code>editor</code>
+     * @param dataContext can be null for some but not all of refactoring action handlers
+     *                    (it is recommended to pass DataManager.getDataContext() instead of null)
+     */
     override fun invoke(project: Project, editor: Editor?, file: PsiFile?, dataContext: DataContext?) {
         val elements = reference(editor, file)?.toPsiElementList()?.toTypedArray() ?: emptyArray()
 
@@ -52,14 +53,14 @@ class Handler : RenameHandler {
     }
 
     /**
-   * Invokes refactoring action from elsewhere (not from editor). Some refactorings
-   * do not implement this method.
-   *
-   * @param project     the project in which the refactoring is invoked.
-   * @param elements    list of elements that refactoring should work on. Refactoring-dependent.
-   * @param dataContext can be null for some but not all of refactoring action handlers
-   *                    (it is recommended to pass DataManager.getDataContext() instead of null)
-   */
+     * Invokes refactoring action from elsewhere (not from editor). Some refactorings
+     * do not implement this method.
+     *
+     * @param project     the project in which the refactoring is invoked.
+     * @param elements    list of elements that refactoring should work on. Refactoring-dependent.
+     * @param dataContext can be null for some but not all of refactoring action handlers
+     *                    (it is recommended to pass DataManager.getDataContext() instead of null)
+     */
     override fun invoke(project: Project, elements: Array<out PsiElement>, dataContext: DataContext?) {
         invoke(dataContext?.let { CommonDataKeys.EDITOR.getData(it) }, elements, dataContext)
     }
@@ -101,23 +102,23 @@ class Handler : RenameHandler {
     }
 
     private fun reference(editor: Editor?, file: PsiFile?): PsiReference? =
-         if (editor != null && file != null) {
-            // matches logic in `UsageTargetProvider`, but with null checks for editor and file
-            val document = editor.document
-            val offset = editor.caretModel.offset
+            if (editor != null && file != null) {
+                // matches logic in `UsageTargetProvider`, but with null checks for editor and file
+                val document = editor.document
+                val offset = editor.caretModel.offset
 
-            val adjustOffset = adjustOffset(file, document, offset)
+                val adjustOffset = adjustOffset(file, document, offset)
 
-            file.findReferenceAt(adjustOffset)?.let { reference ->
-                if (isAvailableOnReference(reference)) {
-                    reference
-                } else {
-                    null
+                file.findReferenceAt(adjustOffset)?.let { reference ->
+                    if (isAvailableOnReference(reference)) {
+                        reference
+                    } else {
+                        null
+                    }
                 }
+            } else {
+                null
             }
-        } else {
-            null
-        }
 
     companion object {
         internal fun isAvailableOnResolved(element: PsiElement): Boolean = element is Call && (

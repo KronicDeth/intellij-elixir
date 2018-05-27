@@ -8,7 +8,7 @@ import org.elixir_lang.ElixirLanguage
 
 import java.util.regex.Pattern
 
-internal class Inplace (elementToRename: PsiNamedElement, editor: Editor) :
+internal class Inplace (elementToRename: PsiNamedElement, editor: Editor?) :
         VariableInplaceRenamer(elementToRename, editor) {
     override fun isIdentifier(newName: String, language: Language): Boolean =
             language === ElixirLanguage && isIdentifier(newName)

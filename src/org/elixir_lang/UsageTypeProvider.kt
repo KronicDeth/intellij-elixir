@@ -18,6 +18,7 @@ import org.elixir_lang.structure_view.element.modular.Module
 class UsageTypeProvider : com.intellij.usages.impl.rules.UsageTypeProviderEx {
     override fun getUsageType(element: PsiElement?, targets: Array<out UsageTarget>): UsageType? =
             when (element) {
+                is AtUnqualifiedNoParenthesesCall<*> -> MODULE_ATTRIBUTE_ACCUMULATE_OR_OVERRIDE
                 is AtNonNumericOperation -> MODULE_ATTRIBUTE_READ
                 is QualifiableAlias -> qualifiableAliasUsageType(element, entrance = element)
                 is Call -> getUsageType(element, targets)
@@ -129,6 +130,7 @@ class UsageTypeProvider : com.intellij.usages.impl.rules.UsageTypeProviderEx {
         internal val CALL_DEFINITION_CLAUSE = UsageType("Call definition clause")
         internal val FUNCTION_PARAMETER = UsageType("Parameter declaration")
         internal val MODULE_DEFINITION = UsageType("Module definition")
+        internal val MODULE_ATTRIBUTE_ACCUMULATE_OR_OVERRIDE = UsageType("Module attribute accumulate or override")
         internal val MODULE_ATTRIBUTE_READ = UsageType("Module attribute read")
     }
 }

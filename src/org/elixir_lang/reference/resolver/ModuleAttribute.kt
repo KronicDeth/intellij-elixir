@@ -68,15 +68,7 @@ object ModuleAttribute : ResolveCache.PolyVariantResolver<org.elixir_lang.refere
             lastSibling
                     .prevSiblingSequence()
                     .forEach {
-                        if (it is AtUnqualifiedNoParenthesesCall<*>) {
-                            val moduleAttributeName = ElixirPsiImplUtil.moduleAttributeName(it)
-
-                            if (moduleAttributeName == value) {
-                                resolveResultOrderedSet.add(it, true)
-                            } else if (incompleteCode && moduleAttributeName.startsWith(value)) {
-                                resolveResultOrderedSet.add(it, false)
-                            }
-                        }
+                        resolveResultOrderedSet.addIfResolved(it, value, incompleteCode)
                     }
         }
 
@@ -89,6 +81,8 @@ object ModuleAttribute : ResolveCache.PolyVariantResolver<org.elixir_lang.refere
             incompleteCode: Boolean
     ): ResolveResultOrderedSet {
         val resolveResultOrderedSet = ResolveResultOrderedSet()
+
+        resolveResultOrderedSet.addIfResolved(element, moduleAttribute.value, incompleteCode)
 
         element
                 .ancestorSequence()
@@ -108,4 +102,29 @@ object ModuleAttribute : ResolveCache.PolyVariantResolver<org.elixir_lang.refere
                 }
             }
 }
+
+private fun ResolveResultOrderedSet.addIfResolved(
+        element: PsiElement,
+        resolvingName: String,
+        incompleteCode: Boolean
+) {
+    when (element) {
+        is AtUnqualifiedNoParenthesesCall<*> -> addIfResolved(element, resolvingName, incompleteCode)
+    }
+}
+
+private fun ResolveResultOrderedSet.addIfResolved(
+        element: AtUnqualifiedNoParenthesesCall<*>,
+        resolvingName: String,
+        incompleteCode: Boolean
+) {
+    val moduleAttributeName = ElixirPsiImplUtil.moduleAttributeName(element)
+
+    if (moduleAttributeName == resolvingName) {
+        this.add(element, true)
+    } else if (incompleteCode && moduleAttributeName.startsWith(resolvingName)) {
+        this.add(element, false)
+    }
+}
+
 
