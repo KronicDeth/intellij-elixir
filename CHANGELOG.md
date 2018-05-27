@@ -170,6 +170,7 @@
     * Call definitions use the same presentation for Structure View and Find Usages, so that Compile/Runtime time icons, and visibility are the same in both.
 * [#1111](https://github.com/KronicDeth/intellij-elixir/pull/1111) - Regression test for [#1091](https://github.com/KronicDeth/intellij-elixir/issues/1091) - [@KronicDeth](https://github.com/KronicDeth)
 * [#1120](https://github.com/KronicDeth/intellij-elixir/pull/1120) - Add regression tests for [#1116](https:/github.com/KronicDeth/intellij-elixir/issues/1116) that test that parameter and variables can be renamed. - [@KronicDeth](https://github.com/KronicDeth)
+* [#1124](https://github.com/KronicDeth/intellij-elixir/pull/1124) - Update IntelliJ versions in build matrix to include `2018.1` and latest patch version of other versions. - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#1056](https://github.com/KronicDeth/intellij-elixir/pull/1056) - Certain `.beam` files in the OTP source are purposely invalid, so ignore them when trying to parse and don't log the expected error. - [@KronicDeth](https://github.com/KronicDeth)
