@@ -185,6 +185,9 @@
     * Dbgi (Elixir & Erlang)
 * [#1114](https://github.com/KronicDeth/intellij-elixir/pull/1114) - Check for suffix instead of full match to detect predefined macros when annotating.  Location strings have become more complex, such as including the file path for root level modules, so the old exact matching on the module name no longer works. - [@KronicDeth](https://github.com/KronicDeth)
 * [#1120](https://github.com/KronicDeth/intellij-elixir/pull/1120) - Restore parameter and variable rename.  It broke because the changes to make Find Usages work and have Go To Declaration default to Find Usage when there is only one target disabled the default selected element code that the `VariableInplaceRenameHandler` used. - [@KronicDeth](https://github.com/KronicDeth)
+* [#1121](https://github.com/KronicDeth/intellij-elixir/pull/1121) - [@KronicDeth](https://github.com/KronicDeth)
+  * Allow module attribute declaration to resolve to itself, so that unused module attributes don't say they can't find the declaration.
+  * Restore rename module attributes.
 
 ## v7.4.0
 
