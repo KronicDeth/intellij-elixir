@@ -12,6 +12,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import static org.elixir_lang.Level.V_1_3;
 import static org.elixir_lang.Level.V_1_5;
+import static org.elixir_lang.Level.V_1_6;
 import static org.elixir_lang.test.ElixirVersion.elixirSdkLevel;
 
 public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
@@ -135,7 +136,13 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     }
 
     public void testGenServer() {
-        assertParsed("lib/elixir/lib/gen_server.ex", Parse.CORRECT);
+        boolean beforeV_1_6 = elixirSdkLevel().compareTo(V_1_6) < 0;
+
+        if (beforeV_1_6) {
+            assertParsed("lib/elixir/lib/gen_server.ex", Parse.CORRECT);
+        } else {
+            assertFalse(beforeV_1_6);
+        }
     }
 
     public void testHashDict() {
@@ -175,7 +182,13 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     }
 
     public void testKernel() {
-        assertParsed("lib/elixir/lib/kernel.ex", Parse.CORRECT);
+        boolean beforeV_1_6 = elixirSdkLevel().compareTo(V_1_6) < 0;
+
+        if (beforeV_1_6) {
+            assertParsed("lib/elixir/lib/kernel.ex", Parse.CORRECT);
+        } else {
+            assertFalse(beforeV_1_6);
+        }
     }
 
     public void testKernelCli() {
@@ -426,7 +439,13 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     }
 
     public void testExUnitDocTest() {
-        assertParsed("lib/ex_unit/lib/ex_unit/doc_test.ex", Parse.CORRECT);
+        boolean beforeV_1_6 = elixirSdkLevel().compareTo(V_1_6) < 0;
+
+        if (beforeV_1_6) {
+            assertParsed("lib/ex_unit/lib/ex_unit/doc_test.ex", Parse.CORRECT);
+        } else {
+            assertFalse(beforeV_1_6);
+        }
     }
 
     public void testExUnitEventManager() {
@@ -466,7 +485,13 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     }
 
     public void testIexAutocomplete() {
-        assertParsed("lib/iex/lib/iex/autocomplete.ex", Parse.CORRECT);
+        boolean beforeV_1_6 = elixirSdkLevel().compareTo(V_1_6) < 0;
+
+        if (beforeV_1_6) {
+            assertParsed("lib/iex/lib/iex/autocomplete.ex", Parse.CORRECT);
+        } else {
+            assertFalse(beforeV_1_6);
+        }
     }
 
     public void testIexCli() {
@@ -490,7 +515,13 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     }
 
     public void testIexIntrospection() {
-        assertParsed("lib/iex/lib/iex/introspection.ex", Parse.CORRECT);
+        boolean beforeV_1_6 = elixirSdkLevel().compareTo(V_1_6) < 0;
+
+        if (beforeV_1_6) {
+            assertParsed("lib/iex/lib/iex/introspection.ex", Parse.CORRECT);
+        } else {
+            assertFalse(beforeV_1_6);
+        }
     }
 
     public void testIexRemsh() {
@@ -591,7 +622,13 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     }
 
     public void testMixDepLoader() {
-        assertParsed("lib/mix/lib/mix/dep/loader.ex", Parse.CORRECT);
+        boolean beforeV_1_6 = elixirSdkLevel().compareTo(V_1_6) < 0;
+
+        if (beforeV_1_6) {
+            assertParsed("lib/mix/lib/mix/dep/loader.ex", Parse.CORRECT);
+        } else {
+            assertFalse(beforeV_1_6);
+        }
     }
 
     public void testMixDepLock() {
@@ -623,7 +660,13 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     }
 
     public void testMixProjectStack() {
-        assertParsed("lib/mix/lib/mix/project_stack.ex", Parse.CORRECT);
+        boolean beforeV_1_6 = elixirSdkLevel().compareTo(V_1_6) < 0;
+
+        if (beforeV_1_6) {
+            assertParsed("lib/mix/lib/mix/project_stack.ex", Parse.CORRECT);
+        } else {
+            assertFalse(beforeV_1_6);
+        }
     }
 
     public void testMixRebar() {
@@ -723,7 +766,13 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     }
 
     public void testMixTasksCompileProtocols() {
-        assertParsed("lib/mix/lib/mix/tasks/compile.protocols.ex", Parse.CORRECT);
+        boolean beforeV_1_6 = elixirSdkLevel().compareTo(V_1_6) < 0;
+
+        if (beforeV_1_6) {
+            assertParsed("lib/mix/lib/mix/tasks/compile.protocols.ex", Parse.CORRECT);
+        } else {
+            assertFalse(beforeV_1_6);
+        }
     }
 
     public void testMixTasksCompileYecc() {
@@ -760,7 +809,13 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     }
 
     public void testMixTasksDepsLoadpaths() {
-        assertParsed("lib/mix/lib/mix/tasks/deps.loadpaths.ex", Parse.CORRECT);
+        boolean beforeV_1_6 = elixirSdkLevel().compareTo(V_1_6) < 0;
+
+        if (beforeV_1_6) {
+            assertParsed("lib/mix/lib/mix/tasks/deps.loadpaths.ex", Parse.CORRECT);
+        } else {
+            assertFalse(beforeV_1_6);
+        }
     }
 
     public void testMixTasksDepsUnlock() {
