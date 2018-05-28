@@ -11,6 +11,7 @@ import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
 import org.elixir_lang.ElixirLanguage
 import org.elixir_lang.Level.V_1_3
+import org.elixir_lang.Level.V_1_6
 import org.elixir_lang.Macro
 import org.elixir_lang.mix.importWizard.computeReadAction
 import org.elixir_lang.psi.*
@@ -1466,13 +1467,19 @@ object QuotableImpl {
     @JvmStatic
     fun metadata(element: PsiElement): OtpErlangList = metadata(element.node)
 
-    /* TODO determine what counter means in Code.string_to_quoted("Foo")
-       {:ok, {:__aliases__, [counter: 0, line: 1], [:Foo]}} */
     @JvmStatic
-    fun metadata(element: PsiElement, counter: Int): OtpErlangList =
-        /* QuotableKeywordList should be compared by sorting keys, but Elixir does counter first, so it's simpler to just use
-           same order than detect a OtpErlangList is a QuotableKeywordList */
-        arrayOf<OtpErlangObject>(keywordTuple("counter", counter), lineNumberKeywordTuple(element.node)).let(::OtpErlangList)
+    fun metadata(element: PsiElement, counter: Int): OtpErlangList {
+        val level = getNonNullRelease(element).level()
+        val lineNumberKeywordTuple = lineNumberKeywordTuple(element.node)
+
+        return if (level < V_1_6) {
+            /* QuotableKeywordList should be compared by sorting keys, but Elixir does counter first, so it's simpler to just use
+               same order than detect a OtpErlangList is a QuotableKeywordList */
+            arrayOf<OtpErlangObject>(keywordTuple("counter", counter), lineNumberKeywordTuple)
+        } else {
+            arrayOf<OtpErlangObject>(lineNumberKeywordTuple)
+        }.let(::OtpErlangList)
+    }
 
     @JvmStatic
     fun quotedFunctionCall(
