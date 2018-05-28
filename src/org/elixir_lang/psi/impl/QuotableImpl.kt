@@ -952,12 +952,22 @@ object QuotableImpl {
     @Contract(pure = true)
     @JvmStatic
     fun quote(parentheticalStab: ElixirParentheticalStab): OtpErlangObject =
-            parentheticalStab.stab?.quote() ?:
-            // @note CANNOT use quotedFunctionCall because it requires metadata and gives nil instead of [] when no
-            //   arguments are given while empty block is quoted as `{__block__, [], []}`
-            OtpErlangTuple(
-                    arrayOf(BLOCK, OtpErlangList(), OtpErlangList())
-            )
+        parentheticalStab.stab?.quote() ?:
+        // @note CANNOT use quotedFunctionCall because it requires metadata and gives nil instead of [] when no
+        //   arguments are given while empty block is quoted as `{__block__, [], []}`
+        OtpErlangTuple(
+                arrayOf(BLOCK, emptyMetadata(parentheticalStab), OtpErlangList())
+        )
+
+    private fun emptyMetadata(parentheticalStab: ElixirParentheticalStab): OtpErlangObject {
+        val level = getNonNullRelease(parentheticalStab).level()
+
+        return if (level < V_1_6) {
+            OtpErlangList()
+        } else {
+            metadata(parentheticalStab)
+        }
+    }
 
     /* @note quotedFunctionCall cannot be used here because in the 3-tuple for function calls, the elements are
        {name, metadata, arguments}, while for an ambiguous call or variable, the elements are
