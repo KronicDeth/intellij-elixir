@@ -1337,7 +1337,17 @@ object QuotableImpl {
     }
 
     @JvmStatic
-    fun quote(@Suppress("UNUSED_PARAMETER") emptyParentheses: ElixirEmptyParentheses): OtpErlangObject = NIL
+    fun quote(@Suppress("UNUSED_PARAMETER") emptyParentheses: ElixirEmptyParentheses): OtpErlangObject {
+        val level = getNonNullRelease(emptyParentheses).level()
+
+        return if (level < V_1_6) {
+            NIL
+        } else {
+            OtpErlangTuple(
+                    arrayOf(BLOCK, OtpErlangList(), OtpErlangList())
+            )
+        }
+    }
 
     @JvmStatic
     fun quote(file: ElixirFile): OtpErlangObject {

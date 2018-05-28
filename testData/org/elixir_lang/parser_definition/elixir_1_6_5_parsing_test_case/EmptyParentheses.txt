@@ -1,0 +1,4 @@
+Elixir File(0,2)
+  ElixirEmptyParenthesesImpl(EMPTY_PARENTHESES)(0,2)
+    PsiElement(()('(')(0,1)
+    PsiElement())(')')(1,2)

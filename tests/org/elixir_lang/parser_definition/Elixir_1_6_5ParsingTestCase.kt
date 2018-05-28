@@ -8,4 +8,8 @@ class Elixir_1_6_5ParsingTestCase : ParsingTestCase() {
     fun testBareDual() {
         assertParsedAndQuotedCorrectly(true)
     }
+
+    fun testEmptyParentheses() {
+        assertParsedAndQuotedCorrectly(true)
+    }
 }
