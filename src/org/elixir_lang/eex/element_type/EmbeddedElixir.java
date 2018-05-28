@@ -30,7 +30,7 @@ public class EmbeddedElixir extends IFileElementType {
         PsiBuilder builder = PsiBuilderFactory.getInstance().createBuilder(
                 project,
                 chameleon,
-                new org.elixir_lang.eex.lexer.EmbeddedElixir(),
+                new org.elixir_lang.eex.lexer.EmbeddedElixir(project),
                 languageForParser,
                 chameleon.getChars()
         );

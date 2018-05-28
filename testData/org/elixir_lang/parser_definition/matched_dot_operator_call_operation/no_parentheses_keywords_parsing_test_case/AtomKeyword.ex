@@ -15,7 +15,6 @@ nil.or key1: value1, key2: value2
 nil.|| key1: value1, key2: value2
 nil.| key1: value1, key2: value2
 nil.<= key1: value1, key2: value2
-nil.-> key1: value1, key2: value2
 nil.<> key1: value1, key2: value2
 nil.^ key1: value1, key2: value2
 nil.not key1: value1, key2: value2
