@@ -4,8 +4,11 @@ import com.ericsson.otp.erlang.OtpErlangAtom
 import com.ericsson.otp.erlang.OtpErlangList
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
+import org.elixir_lang.Level.V_1_6
 import org.elixir_lang.psi.*
+import org.elixir_lang.psi.impl.QuotableImpl.BLOCK
 import org.elixir_lang.psi.impl.QuotableImpl.NIL
+import org.elixir_lang.sdk.elixir.Type.getNonNullRelease
 import org.jetbrains.annotations.Contract
 
 object QuotableArgumentsImpl {
@@ -42,7 +45,7 @@ object QuotableArgumentsImpl {
     @Contract(pure = true)
     @JvmStatic
     fun quoteArguments(doBlock: ElixirDoBlock): Array<OtpErlangObject> {
-        val doValue = doBlock.stab?.quote() ?: NIL
+        val doValue = doBlock.stab?.quote() ?: emptyDoValue(doBlock)
 
         val quotedKeywordPairListPrefix = arrayOf(DO, doValue).let(::OtpErlangTuple).let { listOf(it) }
         val quotedKeywordPairListSuffix = doBlock.blockList?.quoteArguments()?.toList() ?: emptyList()
@@ -82,4 +85,16 @@ object QuotableArgumentsImpl {
                     .map { it as Quotable }
                     .map(Quotable::quote)
                     .toTypedArray()
+
+    private fun emptyDoValue(doBlock: ElixirDoBlock): OtpErlangObject {
+        val level = getNonNullRelease(doBlock).level()
+
+        return if (level < V_1_6) {
+            NIL
+        } else {
+            OtpErlangTuple(
+                    arrayOf(BLOCK, OtpErlangList(), OtpErlangList())
+            )
+        }
+    }
 }

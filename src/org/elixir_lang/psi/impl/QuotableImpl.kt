@@ -58,7 +58,7 @@ object QuotableImpl {
             arrayOf<OtpErlangObject>(AMBIGUOUS_OP, NIL)
     )
     private val ALIASES = OtpErlangAtom("__aliases__")
-    private val BLOCK = OtpErlangAtom("__block__")
+    internal val BLOCK = OtpErlangAtom("__block__")
     private val FN = OtpErlangAtom("fn")
     private val EXCLAMATION_POINT = OtpErlangAtom("!")
     private val MINUS = OtpErlangAtom("-")
