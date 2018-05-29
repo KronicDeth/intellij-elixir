@@ -2,6 +2,7 @@ package org.elixir_lang.psi.impl
 
 import com.ericsson.otp.erlang.*
 import com.intellij.lang.ASTNode
+import org.elixir_lang.Level
 import org.elixir_lang.Level.V_1_3
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.impl.QuotableImpl.metadata
@@ -69,8 +70,8 @@ object ParentImpl {
     fun addEscapedCharacterCodePoints(parent: Sigil, codePointList: MutableList<Int>?, child: ASTNode): List<Int> {
         val childText = child.text
 
-        // Not sure, why, but \ gets stripped in front of # when quoting using Quoter.
-        val string = if (childText == "\\#") {
+        // Not sure, why, but \ gets stripped in front of # when quoting using Quoter prior to 1.6
+        val string = if (childText == "\\#" && getNonNullRelease(parent).level() < Level.V_1_6) {
             "#"
         } else if (parent is SigilLine) {
             val terminator = parent.terminator()
