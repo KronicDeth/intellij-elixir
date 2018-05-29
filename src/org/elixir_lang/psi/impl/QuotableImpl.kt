@@ -19,7 +19,9 @@ import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.call.name.Module.prependElixirPrefix
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.IDENTIFIER_TOKEN_SET
-import org.elixir_lang.psi.impl.ParentImpl.*
+import org.elixir_lang.psi.impl.ParentImpl.addChildTextCodePoints
+import org.elixir_lang.psi.impl.ParentImpl.elixirCharList
+import org.elixir_lang.psi.impl.ParentImpl.elixirString
 import org.elixir_lang.psi.operation.In
 import org.elixir_lang.psi.operation.Infix
 import org.elixir_lang.psi.operation.NotIn
@@ -1562,7 +1564,7 @@ object QuotableImpl {
             quoted = parent.quoteEmpty()
         } else {
             val quotedParentList = LinkedList<OtpErlangObject>()
-            var codePointList: List<Int>? = null
+            var codePointList: MutableList<Int>? = null
 
             for (child in children) {
                 val elementType = child.elementType
