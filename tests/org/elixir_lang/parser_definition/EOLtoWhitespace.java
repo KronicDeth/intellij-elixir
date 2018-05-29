@@ -19,7 +19,7 @@ public class EOLtoWhitespace extends ParsingTestCase {
    }
 
    public void testCapture() {
-      assertParsedAndQuotedCorrectly();
+      assertParsedAndQuotedCorrectly(false);
    }
 
    public void testClosingBit() {

@@ -20,7 +20,7 @@ public class NoParenthesesNoArgumentsCallParsingTestCase extends ParsingTestCase
      */
 
     public void testCaptureLeftOperationDotIdentifier() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testUnaryLeftOperationDotIdentifier() {

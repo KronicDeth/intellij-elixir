@@ -50,19 +50,19 @@ public class UnmatchedExpressionParsingTestCase extends ParsingTestCase {
     }
 
     public void testCaptureQualifiedParenthesesCallBlock() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testCaptureUnqualifiedNoArgumentsBlock() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testCaptureUnqualifiedNoParenthesesCallBlock() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testCaptureUnqualifiedParenthesesCallBlock() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testDotCallBlock() {

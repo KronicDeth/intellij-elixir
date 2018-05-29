@@ -70,7 +70,15 @@ fun Call.computeReference(): PsiReference? =
     }
 
 private fun PsiElement.isCaptureNonNumericOperation(): Boolean =
-        this is ElixirMatchedCaptureNonNumericOperation || this is ElixirUnmatchedCaptureNonNumericOperation
+        when (this) {
+            is ElixirMatchedLessThanOnePointSixCaptureNonNumericOperation,
+            is ElixirMatchedGreaterThanOrEqualToOnePointSixCaptureNonNumericOperation,
+            is ElixirUnmatchedLessThanOnePointSixCaptureNonNumericOperation,
+            is ElixirUnmatchedGreaterThanOrEqualToOnePointSixCaptureNonNumericOperation ->
+                true
+            else ->
+                false
+        }
 
 private fun PsiElement.isSlashInCaptureNameSlashArity(): Boolean =
         if (this is Infix &&

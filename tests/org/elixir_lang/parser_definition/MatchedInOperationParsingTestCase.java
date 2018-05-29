@@ -13,7 +13,7 @@ public class MatchedInOperationParsingTestCase extends ParsingTestCase {
      */
 
     public void testCaptureNonNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testMatchedTwoOperation() {

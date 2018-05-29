@@ -13,14 +13,14 @@ import org.elixir_lang.psi.operation.capture.NonNumeric;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ElixirUnmatchedCaptureNonNumericOperationImpl extends ElixirUnmatchedExpressionImpl implements ElixirUnmatchedCaptureNonNumericOperation {
+public class ElixirUnmatchedLessThanOnePointSixCaptureNonNumericOperationImpl extends ElixirUnmatchedExpressionImpl implements ElixirUnmatchedLessThanOnePointSixCaptureNonNumericOperation {
 
-  public ElixirUnmatchedCaptureNonNumericOperationImpl(ASTNode node) {
+  public ElixirUnmatchedLessThanOnePointSixCaptureNonNumericOperationImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull ElixirVisitor visitor) {
-    visitor.visitUnmatchedCaptureNonNumericOperation(this);
+    visitor.visitUnmatchedLessThanOnePointSixCaptureNonNumericOperation(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

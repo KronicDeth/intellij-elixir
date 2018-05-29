@@ -10,7 +10,7 @@ import org.elixir_lang.psi.operation.capture.NonNumeric;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirUnmatchedCaptureNonNumericOperation extends ElixirUnmatchedExpression, Named, NonNumeric {
+public interface ElixirUnmatchedGreaterThanOrEqualToOnePointSixCaptureNonNumericOperation extends ElixirUnmatchedExpression, Named, NonNumeric {
 
   @NotNull
   ElixirCapturePrefixOperator getCapturePrefixOperator();

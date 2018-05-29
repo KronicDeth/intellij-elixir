@@ -26,8 +26,10 @@ public class ModelBuilder implements FormattingModelBuilder {
             ElixirTypes.RESCUE
     );
     private static final TokenSet CAPTURE_NON_NUMERIC_OPERATION_TOKEN_SET = TokenSet.create(
-            ElixirTypes.MATCHED_CAPTURE_NON_NUMERIC_OPERATION,
-            ElixirTypes.UNMATCHED_CAPTURE_NON_NUMERIC_OPERATION
+            ElixirTypes.MATCHED_LESS_THAN_ONE_POINT_SIX_CAPTURE_NON_NUMERIC_OPERATION,
+            ElixirTypes.MATCHED_GREATER_THAN_OR_EQUAL_TO_ONE_POINT_SIX_CAPTURE_NON_NUMERIC_OPERATION,
+            ElixirTypes.UNMATCHED_LESS_THAN_ONE_POINT_SIX_CAPTURE_NON_NUMERIC_OPERATION,
+            ElixirTypes.UNMATCHED_GREATER_THAN_OR_EQUAL_TO_ONE_POINT_SIX_CAPTURE_NON_NUMERIC_OPERATION
     );
     private static final boolean DUMP_FORMATTING_AST = false;
     private static final TokenSet MULTIPLICATIVE_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.DIVISION_OPERATOR, ElixirTypes.MULTIPLICATION_OPERATOR);

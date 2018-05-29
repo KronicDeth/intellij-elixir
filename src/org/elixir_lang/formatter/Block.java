@@ -63,8 +63,10 @@ public class Block extends AbstractBlock implements BlockEx {
             OR_WORD_OPERATOR
     );
     private static final TokenSet CAPTURE_NON_NUMERIC_OPERATION_TOKEN_SET = TokenSet.create(
-            MATCHED_CAPTURE_NON_NUMERIC_OPERATION,
-            UNMATCHED_CAPTURE_NON_NUMERIC_OPERATION
+            MATCHED_LESS_THAN_ONE_POINT_SIX_CAPTURE_NON_NUMERIC_OPERATION,
+            MATCHED_GREATER_THAN_OR_EQUAL_TO_ONE_POINT_SIX_CAPTURE_NON_NUMERIC_OPERATION,
+            UNMATCHED_LESS_THAN_ONE_POINT_SIX_CAPTURE_NON_NUMERIC_OPERATION,
+            UNMATCHED_GREATER_THAN_OR_EQUAL_TO_ONE_POINT_SIX_CAPTURE_NON_NUMERIC_OPERATION
     );
     private static final TokenSet COMPARISON_OPERATION_TOKEN_SET = TokenSet.create(
             MATCHED_COMPARISON_OPERATION,
@@ -162,9 +164,10 @@ public class Block extends AbstractBlock implements BlockEx {
     private static final TokenSet OPERATION_TOKEN_SET = TokenSet.orSet(
             TokenSet.create(
                     MATCHED_ADDITION_OPERATION,
-                    MATCHED_CAPTURE_NON_NUMERIC_OPERATION,
+                    MATCHED_GREATER_THAN_OR_EQUAL_TO_ONE_POINT_SIX_CAPTURE_NON_NUMERIC_OPERATION,
                     MATCHED_IN_MATCH_OPERATION,
                     MATCHED_IN_OPERATION,
+                    MATCHED_LESS_THAN_ONE_POINT_SIX_CAPTURE_NON_NUMERIC_OPERATION,
                     MATCHED_MATCH_OPERATION,
                     MATCHED_MULTIPLICATION_OPERATION,
                     MATCHED_RELATIONAL_OPERATION,
@@ -172,9 +175,10 @@ public class Block extends AbstractBlock implements BlockEx {
                     MATCHED_UNARY_OPERATION,
                     MATCHED_WHEN_OPERATION,
                     UNMATCHED_ADDITION_OPERATION,
-                    UNMATCHED_CAPTURE_NON_NUMERIC_OPERATION,
+                    UNMATCHED_GREATER_THAN_OR_EQUAL_TO_ONE_POINT_SIX_CAPTURE_NON_NUMERIC_OPERATION,
                     UNMATCHED_IN_MATCH_OPERATION,
                     UNMATCHED_IN_OPERATION,
+                    UNMATCHED_LESS_THAN_ONE_POINT_SIX_CAPTURE_NON_NUMERIC_OPERATION,
                     UNMATCHED_MATCH_OPERATION,
                     UNMATCHED_MULTIPLICATION_OPERATION,
                     UNMATCHED_RELATIONAL_OPERATION,

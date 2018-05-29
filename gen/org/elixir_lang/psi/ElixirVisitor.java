@@ -505,12 +505,6 @@ public class ElixirVisitor extends PsiElementVisitor {
     // visitBracketOperation(o);
   }
 
-  public void visitMatchedCaptureNonNumericOperation(@NotNull ElixirMatchedCaptureNonNumericOperation o) {
-    visitMatchedExpression(o);
-    // visitNamed(o);
-    // visitNonNumeric(o);
-  }
-
   public void visitMatchedComparisonOperation(@NotNull ElixirMatchedComparisonOperation o) {
     visitMatchedExpression(o);
     // visitNamed(o);
@@ -527,6 +521,12 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitMatchedGreaterThanOrEqualToOnePointSixCaptureNonNumericOperation(@NotNull ElixirMatchedGreaterThanOrEqualToOnePointSixCaptureNonNumericOperation o) {
+    visitMatchedExpression(o);
+    // visitNamed(o);
+    // visitNonNumeric(o);
+  }
+
   public void visitMatchedInMatchOperation(@NotNull ElixirMatchedInMatchOperation o) {
     visitMatchedExpression(o);
     // visitNamed(o);
@@ -537,6 +537,12 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitMatchedExpression(o);
     // visitCall(o);
     // visitIn(o);
+  }
+
+  public void visitMatchedLessThanOnePointSixCaptureNonNumericOperation(@NotNull ElixirMatchedLessThanOnePointSixCaptureNonNumericOperation o) {
+    visitMatchedExpression(o);
+    // visitNamed(o);
+    // visitNonNumeric(o);
   }
 
   public void visitMatchedMatchOperation(@NotNull ElixirMatchedMatchOperation o) {
@@ -892,12 +898,6 @@ public class ElixirVisitor extends PsiElementVisitor {
     // visitBracketOperation(o);
   }
 
-  public void visitUnmatchedCaptureNonNumericOperation(@NotNull ElixirUnmatchedCaptureNonNumericOperation o) {
-    visitUnmatchedExpression(o);
-    // visitNamed(o);
-    // visitNonNumeric(o);
-  }
-
   public void visitUnmatchedComparisonOperation(@NotNull ElixirUnmatchedComparisonOperation o) {
     visitUnmatchedExpression(o);
     // visitNamed(o);
@@ -913,6 +913,12 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitUnmatchedGreaterThanOrEqualToOnePointSixCaptureNonNumericOperation(@NotNull ElixirUnmatchedGreaterThanOrEqualToOnePointSixCaptureNonNumericOperation o) {
+    visitUnmatchedExpression(o);
+    // visitNamed(o);
+    // visitNonNumeric(o);
+  }
+
   public void visitUnmatchedInMatchOperation(@NotNull ElixirUnmatchedInMatchOperation o) {
     visitUnmatchedExpression(o);
     // visitNamed(o);
@@ -923,6 +929,12 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitUnmatchedExpression(o);
     // visitCall(o);
     // visitIn(o);
+  }
+
+  public void visitUnmatchedLessThanOnePointSixCaptureNonNumericOperation(@NotNull ElixirUnmatchedLessThanOnePointSixCaptureNonNumericOperation o) {
+    visitUnmatchedExpression(o);
+    // visitNamed(o);
+    // visitNonNumeric(o);
   }
 
   public void visitUnmatchedMatchOperation(@NotNull ElixirUnmatchedMatchOperation o) {

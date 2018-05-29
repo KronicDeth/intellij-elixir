@@ -12,7 +12,7 @@ public class MatchedQualifiedMultipleAliasesParsingTestCase extends ParsingTestC
      */
 
     public void testMatchedCaptureNonNumericOperation() {
-        assertParsedAndQuotedCorrectlyInOneThree();
+        assertParsedAndQuotedCorrectlyInOneThree(false);
     }
 
     public void testMatchedInMatchOperation() {
@@ -116,7 +116,7 @@ public class MatchedQualifiedMultipleAliasesParsingTestCase extends ParsingTestC
     }
 
     public void testCaptureNumericOperation() {
-        assertParsedAndQuotedCorrectlyInOneThree();
+        assertParsedAndQuotedCorrectlyInOneThree(false);
     }
 
     public void testUnaryNumericOperation() {
