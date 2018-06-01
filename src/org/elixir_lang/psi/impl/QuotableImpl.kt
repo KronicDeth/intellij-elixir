@@ -168,7 +168,8 @@ object QuotableImpl {
     @JvmStatic
     fun quote(blockItem: ElixirBlockItem): OtpErlangObject {
         val blockIdentifier = blockItem.blockIdentifier
-        val quotedValue = blockItem.stab?.quote() ?: NIL
+        val quotedValue = blockItem.stab?.quote() ?:
+                getNonNullRelease(blockItem).level().let { level -> emptyBlock(level) }
 
         return OtpErlangTuple(
                 arrayOf(blockIdentifier.quote(), quotedValue)
