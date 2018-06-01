@@ -11,15 +11,20 @@ ext {
     quoterVersion = "0.1.1"
   }
 
-  quoterPath = "${rootDir}/cache/intellij_elixir-${quoterVersion}"
+  cachePath = "${rootDir}/cache"
+
+  elixirPath = "${cachePath}/elixir-${elixirVersion}"
+
+  quoterUnzippedPath = "${cachePath}/elixir-${elixirVersion}-intellij_elixir-${quoterVersion}"
 
   if (elixirVersion.startsWith("1.5") || elixirVersion.startsWith("1.6")) {
-    quoterExe = "${quoterPath}/_build/dev/rel/intellij_elixir/bin/intellij_elixir"
+    quoterExe = "${quoterUnzippedPath}/_build/dev/rel/intellij_elixir/bin/intellij_elixir"
   } else {
-    quoterExe = "${quoterPath}/rel/intellij_elixir/bin/intellij_elixir"
+    quoterExe = "${quoterUnzippedPath}/rel/intellij_elixir/bin/intellij_elixir"
   }
 
-  elixirPath = "${rootDir}/cache/elixir-${elixirVersion}"
+  quoterZipPath = "${cachePath}/intellij_elixir-${quoterVersion}.zip"
+  quoterZipRootPath = "${cachePath}/intellij_elixir-${quoterVersion}"
 }
 
 allprojects {
@@ -181,25 +186,29 @@ task getQuoter {
   doLast {
     download {
       src "https://github.com/KronicDeth/intellij_elixir/archive/v${quoterVersion}.zip"
-      dest "${quoterPath}.zip"
+      dest quoterZipPath
       overwrite false
     }
 
-    def folder = new File(quoterPath)
+    def folder = new File(quoterUnzippedPath)
     if (!folder.isDirectory() || folder.list().size() == 0) {
       copy {
-        from zipTree("${quoterPath}.zip")
-        into "${rootDir}/cache/"
+        from zipTree(quoterZipPath)
+        into cachePath
       }
 
+      def quoterZipRootFile = new File(quoterZipRootPath)
+
+      quoterZipRootFile.renameTo(quoterUnzippedPath)
+
       exec {
-        workingDir quoterPath
+        workingDir quoterUnzippedPath
         executable "mix"
         args "deps.get"
       }
 
       exec {
-        workingDir quoterPath
+        workingDir quoterUnzippedPath
         executable "mix"
         args "release"
       }
