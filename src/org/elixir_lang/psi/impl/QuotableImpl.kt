@@ -52,6 +52,20 @@ fun PsiElement.isUnquoted(): Boolean {
     return unquoted
 }
 
+fun ElixirStab.quote(metadata: OtpErlangList): OtpErlangObject =
+        stabBody?.quote(metadata) ?:
+        stabOperationList.map(Quotable::quote).toTypedArray().let(::OtpErlangList)
+
+fun ElixirStabBody.quote(metadata: OtpErlangList): OtpErlangObject =
+        children
+                .asSequence()
+                .filterNot {
+                    // skip endOfExpression
+                    it.isUnquoted()
+                }
+                .map { it as Quotable }
+                .map { it.quote() }
+                .let { QuotableImpl.buildBlock(it.toList(), metadata) }
 
 object QuotableImpl {
     private val AMBIGUOUS_OP = OtpErlangAtom("ambiguous_op")
@@ -955,14 +969,14 @@ object QuotableImpl {
     @Contract(pure = true)
     @JvmStatic
     fun quote(parentheticalStab: ElixirParentheticalStab): OtpErlangObject =
-        parentheticalStab.stab?.quote() ?:
+        parentheticalStab.stab?.quote(emptyMetadata(parentheticalStab)) ?:
         // @note CANNOT use quotedFunctionCall because it requires metadata and gives nil instead of [] when no
         //   arguments are given while empty block is quoted as `{__block__, [], []}`
         OtpErlangTuple(
                 arrayOf(BLOCK, emptyMetadata(parentheticalStab), OtpErlangList())
         )
 
-    private fun emptyMetadata(parentheticalStab: ElixirParentheticalStab): OtpErlangObject {
+    private fun emptyMetadata(parentheticalStab: ElixirParentheticalStab): OtpErlangList {
         val level = getNonNullRelease(parentheticalStab).level()
 
         return if (level < V_1_6) {
@@ -1211,21 +1225,11 @@ object QuotableImpl {
 
     @Contract(pure = true)
     @JvmStatic
-    fun quote(stabBody: ElixirStabBody): OtpErlangObject =
-            stabBody.children
-                    .asSequence()
-                    .filterNot {
-                        // skip endOfExpression
-                        it.isUnquoted()
-                    }
-                    .map { it as Quotable }
-                    .map { it.quote() }
-                    .let { buildBlock(it.toList()) }
+    fun quote(stabBody: ElixirStabBody): OtpErlangObject = stabBody.quote(OtpErlangList())
 
     @Contract(pure = true)
     @JvmStatic
-    fun quote(stab: ElixirStab): OtpErlangObject =
-            stab.stabBody?.quote() ?: stab.stabOperationList.map(Quotable::quote).toTypedArray().let(::OtpErlangList)
+    fun quote(stab: ElixirStab): OtpErlangObject = stab.quote(OtpErlangList())
 
     @Contract(pure = true)
     @JvmStatic
@@ -1780,7 +1784,7 @@ object QuotableImpl {
             when (quotedChildren.size) {
                 0 -> emptyBlock(level)
                 1 -> quotedChildren.first()
-                else -> blockFunctionCall(quotedChildren)
+                else -> blockFunctionCall(quotedChildren, OtpErlangList())
             }
 
     private fun emptyBlock(level: Level) =
@@ -1793,10 +1797,10 @@ object QuotableImpl {
             }
 
     @Contract(pure = true)
-    private fun blockFunctionCall(quotedChildren: List<OtpErlangObject>): OtpErlangTuple =
+    private fun blockFunctionCall(quotedChildren: List<OtpErlangObject>, metadata: OtpErlangList): OtpErlangTuple =
             quotedFunctionCall(
                     BLOCK,
-                    OtpErlangList(),
+                    metadata,
                     *quotedChildren.toTypedArray()
             )
 
@@ -1807,7 +1811,7 @@ object QuotableImpl {
      * @param quotedChildren
      */
     @Contract(pure = true)
-    private fun buildBlock(quotedChildren: List<OtpErlangObject>): OtpErlangObject =
+    internal fun buildBlock(quotedChildren: List<OtpErlangObject>, metadata: OtpErlangList): OtpErlangObject =
             when (quotedChildren.size) {
                 0 -> NIL
                 1 -> {
@@ -1818,7 +1822,7 @@ object QuotableImpl {
                         // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L547
                         when ((quotedChild as OtpErlangTuple).elementAt(0)) {
                             EXCLAMATION_POINT, NOT, UNQUOTE_SPLICING ->
-                                QuotableImpl.blockFunctionCall(quotedChildren)
+                                QuotableImpl.blockFunctionCall(quotedChildren, metadata)
                             else ->
                                 quotedChild
                         }
@@ -1826,6 +1830,6 @@ object QuotableImpl {
                         quotedChild
                     }
                 }
-                else -> QuotableImpl.blockFunctionCall(quotedChildren)
+                else -> QuotableImpl.blockFunctionCall(quotedChildren, metadata)
             }
 }
