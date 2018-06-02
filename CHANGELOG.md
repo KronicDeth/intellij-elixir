@@ -171,6 +171,10 @@
 * [#1111](https://github.com/KronicDeth/intellij-elixir/pull/1111) - Regression test for [#1091](https://github.com/KronicDeth/intellij-elixir/issues/1091) - [@KronicDeth](https://github.com/KronicDeth)
 * [#1120](https://github.com/KronicDeth/intellij-elixir/pull/1120) - Add regression tests for [#1116](https:/github.com/KronicDeth/intellij-elixir/issues/1116) that test that parameter and variables can be renamed. - [@KronicDeth](https://github.com/KronicDeth)
 * [#1124](https://github.com/KronicDeth/intellij-elixir/pull/1124) - Update IntelliJ versions in build matrix to include `2018.1` and latest patch version of other versions. - [@KronicDeth](https://github.com/KronicDeth)
+* [#1126](https://github.com/KronicDeth/intellij-elixir/pull/1126) - [@KronicDeth](https://github.com/KronicDeth)
+  * Add Elixir 1.6.X to build matrix
+  * Update grammar and quoter to match native 1.6 behavior when SDK is >= 1.6.
+  * New default SDK level is 1.7 to handle builds from `master`.
 
 ### Bug Fixes
 * [#1056](https://github.com/KronicDeth/intellij-elixir/pull/1056) - Certain `.beam` files in the OTP source are purposely invalid, so ignore them when trying to parse and don't log the expected error. - [@KronicDeth](https://github.com/KronicDeth)
