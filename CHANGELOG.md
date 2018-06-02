@@ -175,6 +175,7 @@
   * Add Elixir 1.6.X to build matrix
   * Update grammar and quoter to match native 1.6 behavior when SDK is >= 1.6.
   * New default SDK level is 1.7 to handle builds from `master`.
+* [#1127](https://github.com/KronicDeth/intellij-elixir/pull/1127) - Regression test for [#1105](https://github.com/KronicDeth/intellij-elixir/issues/1105) - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#1056](https://github.com/KronicDeth/intellij-elixir/pull/1056) - Certain `.beam` files in the OTP source are purposely invalid, so ignore them when trying to parse and don't log the expected error. - [@KronicDeth](https://github.com/KronicDeth)
@@ -193,6 +194,7 @@
 * [#1121](https://github.com/KronicDeth/intellij-elixir/pull/1121) - [@KronicDeth](https://github.com/KronicDeth)
   * Allow module attribute declaration to resolve to itself, so that unused module attributes don't say they can't find the declaration.
   * Restore rename module attributes.
+* [#1127](https://github.com/KronicDeth/intellij-elixir/pull/1127) - Allow `true` and `false` to be keyword keys. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v7.4.0
 
