@@ -3053,6 +3053,7 @@ keywordKey ::= AFTER |
                DUAL_OPERATOR |
                ELSE |
                END |
+               FALSE |
                IDENTIFIER_TOKEN |
                IN_MATCH_OPERATOR |
                IN_OPERATOR |
@@ -3071,6 +3072,7 @@ keywordKey ::= AFTER |
                STAB_OPERATOR |
                STRUCT_OPERATOR |
                THREE_OPERATOR |
+               TRUE |
                TUPLE_OPERATOR |
                TWO_OPERATOR |
                UNARY_OPERATOR |

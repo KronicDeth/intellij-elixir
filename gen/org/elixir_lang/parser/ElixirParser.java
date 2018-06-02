@@ -2562,6 +2562,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   //                DUAL_OPERATOR |
   //                ELSE |
   //                END |
+  //                FALSE |
   //                IDENTIFIER_TOKEN |
   //                IN_MATCH_OPERATOR |
   //                IN_OPERATOR |
@@ -2580,6 +2581,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   //                STAB_OPERATOR |
   //                STRUCT_OPERATOR |
   //                THREE_OPERATOR |
+  //                TRUE |
   //                TUPLE_OPERATOR |
   //                TWO_OPERATOR |
   //                UNARY_OPERATOR |
@@ -2605,6 +2607,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, DUAL_OPERATOR);
     if (!r) r = consumeToken(b, ELSE);
     if (!r) r = consumeToken(b, END);
+    if (!r) r = consumeToken(b, FALSE);
     if (!r) r = consumeToken(b, IDENTIFIER_TOKEN);
     if (!r) r = consumeToken(b, IN_MATCH_OPERATOR);
     if (!r) r = consumeToken(b, IN_OPERATOR);
@@ -2623,6 +2626,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, STAB_OPERATOR);
     if (!r) r = consumeToken(b, STRUCT_OPERATOR);
     if (!r) r = consumeToken(b, THREE_OPERATOR);
+    if (!r) r = consumeToken(b, TRUE);
     if (!r) r = consumeToken(b, TUPLE_OPERATOR);
     if (!r) r = consumeToken(b, TWO_OPERATOR);
     if (!r) r = consumeToken(b, UNARY_OPERATOR);
@@ -5230,7 +5234,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r || p;
   }
 
-  // <<ifVersion 'GT' 'V_1_6'>> capturePrefixOperator nonNumeric
+  // <<ifVersion 'GE' 'V_1_6'>> capturePrefixOperator nonNumeric
   private static boolean matchedGreaterThanOrEqualToOnePointSixCaptureNonNumericOperation_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedGreaterThanOrEqualToOnePointSixCaptureNonNumericOperation_0")) return false;
     boolean r;
