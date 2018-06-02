@@ -1784,7 +1784,11 @@ object QuotableImpl {
     private fun toBlock(quotedChildren: List<OtpErlangObject>, level: Level): OtpErlangObject =
             when (quotedChildren.size) {
                 0 -> emptyBlock(level)
-                1 -> quotedChildren.first()
+                1 ->  if (level < V_1_6) {
+                    quotedChildren.first()
+                } else {
+                    buildBlock(quotedChildren, OtpErlangList())
+                }
                 else -> blockFunctionCall(quotedChildren, OtpErlangList())
             }
 
