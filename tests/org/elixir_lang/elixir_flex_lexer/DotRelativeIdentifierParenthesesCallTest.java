@@ -1,17 +1,18 @@
 package org.elixir_lang.elixir_flex_lexer;
 
 import org.elixir_lang.ElixirFlexLexer;
+import org.elixir_lang.Level;
 import org.elixir_lang.TokenTypeState;
 import org.elixir_lang.psi.ElixirTypes;
 import org.jetbrains.annotations.NotNull;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import static org.elixir_lang.test.ElixirVersion.elixirSdkLevel;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -516,11 +517,7 @@ public class DotRelativeIdentifierParenthesesCallTest extends Test {
                         },
                         {
                                 "->",
-                                Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.STAB_OPERATOR, ElixirFlexLexer.CALL_MAYBE),
-                                        new TokenTypeState(ElixirTypes.CALL, ElixirFlexLexer.YYINITIAL),
-                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE)
-                                )
+                                stabTokenTypeStates()
                         },
                         {
                                 "%",
@@ -567,6 +564,27 @@ public class DotRelativeIdentifierParenthesesCallTest extends Test {
                         }
                 }
         );
+    }
+
+    @NotNull
+    private static List<TokenTypeState> stabTokenTypeStates() {
+        List<TokenTypeState> list;
+
+        if (elixirSdkLevel().compareTo(Level.V_1_6) < 0) {
+            list = Arrays.asList(
+                    new TokenTypeState(ElixirTypes.STAB_OPERATOR, ElixirFlexLexer.CALL_MAYBE),
+                    new TokenTypeState(ElixirTypes.CALL, ElixirFlexLexer.YYINITIAL),
+                    new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE)
+            );
+        } else {
+            list = Arrays.asList(
+                    new TokenTypeState(ElixirTypes.DUAL_OPERATOR, ElixirFlexLexer.CALL_MAYBE),
+                    new TokenTypeState(ElixirTypes.RELATIONAL_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
+                    new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE)
+            );
+        }
+
+        return list;
     }
 
     /*

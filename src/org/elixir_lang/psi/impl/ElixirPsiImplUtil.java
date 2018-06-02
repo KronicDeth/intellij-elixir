@@ -1449,12 +1449,6 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quote(PsiElement[] children) {
-        return QuotableImpl.quote(children);
-    }
-
-    @Contract(pure = true)
-    @NotNull
     public static OtpErlangObject quote(PsiFile file) {
         return QuotableImpl.quote(file);
     }

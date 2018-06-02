@@ -10,7 +10,7 @@ public class MatchedQualifiedCallOperationParsingTestCase extends ParsingTestCas
      */
 
     public void testMatchedCaptureNonNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testMatchedInMatchOperation() {
@@ -114,7 +114,7 @@ public class MatchedQualifiedCallOperationParsingTestCase extends ParsingTestCas
     }
 
     public void testCaptureNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testUnaryNumericOperation() {

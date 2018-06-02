@@ -267,11 +267,11 @@
   ]
 
   // captureNonNumeric operations
-  implements(        "(un)?matchedCaptureNonNumericOperation")=[
+  implements(        "(un)?matched.*CaptureNonNumericOperation")=[
     "org.elixir_lang.psi.call.Named"
     "org.elixir_lang.psi.operation.capture.NonNumeric"
   ]
-  methods(           "(un)?matchedCaptureNonNumericOperation")=[
+  methods(           "(un)?matched.*CaptureNonNumericOperation")=[
     functionName
     functionNameElement
     getDoBlock
@@ -1184,7 +1184,7 @@ literalWordsLine ::=  TILDE LITERAL_WORDS_SIGIL_NAME WORDS_PROMOTER literalWords
  *
  */
 
-matchedExpression ::= matchedCaptureNonNumericOperation |
+matchedExpression ::= matchedLessThanOnePointSixCaptureNonNumericOperation |
                       matchedInMatchOperation |
                       /* noParenthesesKeywords needs to be first as matchedExpression will match due to the error
                          handling built into the Pratt parser. */
@@ -1192,6 +1192,7 @@ matchedExpression ::= matchedCaptureNonNumericOperation |
                       matchedWhenOperation |
                       matchedTypeOperation |
                       matchedPipeOperation |
+                      matchedGreaterThanOrEqualToOnePointSixCaptureNonNumericOperation |
                       matchedMatchOperation |
                       matchedOrOperation |
                       matchedAndOperation |
@@ -1242,7 +1243,8 @@ capturePrefixOperator ::= CAPTURE_OPERATOR
                             ]
                             name = "&"
                           }
-matchedCaptureNonNumericOperation ::= capturePrefixOperator nonNumeric matchedExpression
+matchedLessThanOnePointSixCaptureNonNumericOperation ::= <<ifVersion 'LT' 'V_1_6'>> capturePrefixOperator nonNumeric matchedExpression
+matchedGreaterThanOrEqualToOnePointSixCaptureNonNumericOperation ::= <<ifVersion 'GE' 'V_1_6'>> capturePrefixOperator nonNumeric matchedExpression
 
 /*
  * In Match Operation - left-associative
@@ -2364,7 +2366,8 @@ alias ::= ALIAS_TOKEN notKeywordPairColon
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L50
  */
 
-unmatchedCaptureNonNumericOperation ::= capturePrefixOperator nonNumeric unmatchedExpression
+unmatchedLessThanOnePointSixCaptureNonNumericOperation ::= <<ifVersion 'LT' 'V_1_6'>> capturePrefixOperator nonNumeric unmatchedExpression
+unmatchedGreaterThanOrEqualToOnePointSixCaptureNonNumericOperation ::= <<ifVersion 'GE' 'V_1_6'>> capturePrefixOperator nonNumeric unmatchedExpression
 
 /*
  * In Match Operation - left-associative
@@ -2819,7 +2822,7 @@ doBlock ::= DO doStabSeparatorMaybe
 
 
 // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L143-L148
-unmatchedExpression ::= unmatchedCaptureNonNumericOperation |
+unmatchedExpression ::= unmatchedLessThanOnePointSixCaptureNonNumericOperation |
                         unmatchedInMatchOperation |
                         /* noParenthesesKeywords needs to be first as matchedExpression will match due to the error
                          handling built into the Pratt parser. */
@@ -2827,6 +2830,7 @@ unmatchedExpression ::= unmatchedCaptureNonNumericOperation |
                         unmatchedWhenOperation |
                         unmatchedTypeOperation |
                         unmatchedPipeOperation |
+                        unmatchedGreaterThanOrEqualToOnePointSixCaptureNonNumericOperation |
                         unmatchedMatchOperation |
                         unmatchedOrOperation |
                         unmatchedAndOperation |

@@ -1,6 +1,9 @@
 package org.elixir_lang.eex.lexer;
 
-import com.intellij.lexer.*;
+import com.intellij.lexer.Lexer;
+import com.intellij.lexer.LexerBase;
+import com.intellij.lexer.LexerPosition;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.tree.IElementType;
 import gnu.trove.THashMap;
 import org.elixir_lang.ElixirLanguage;
@@ -45,9 +48,9 @@ public class EmbeddedElixir extends LexerBase {
         EEX_TOKEN_TYPE_TO_ELIXIR_TOKEN_TYPE.put(WHITE_SPACE, WHITE_SPACE);
     }
 
-    public EmbeddedElixir() {
+    public EmbeddedElixir(Project project) {
         this.eexLexer = new LookAhead();
-        this.elixirLexer = new ElixirLexer();
+        this.elixirLexer = new ElixirLexer(project);
     }
 
     @Contract(pure = true)

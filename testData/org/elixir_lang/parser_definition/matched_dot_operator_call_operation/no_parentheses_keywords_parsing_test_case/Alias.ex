@@ -15,7 +15,6 @@ Alias.or key1: value1, key2: value2
 Alias.|| key1: value1, key2: value2
 Alias.| key1: value1, key2: value2
 Alias.<= key1: value1, key2: value2
-Alias.-> key1: value1, key2: value2
 Alias.<> key1: value1, key2: value2
 Alias.^ key1: value1, key2: value2
 Alias.not key1: value1, key2: value2

@@ -78,7 +78,7 @@ public class BracketOperationParsingTestCase extends ParsingTestCase {
     }
 
     public void testStabOperator() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testStructOperator() {

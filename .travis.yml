@@ -16,6 +16,10 @@ matrix:
   include:
     # version groups based on https://www.jetbrains.com/idea/download/previous.html
 
+    - elixir: 1.6.5
+      env: IDEA_VERSION="2018.1.3"
+      jdk: oraclejdk8
+      otp_release: 20.1
     - elixir: 1.5.3
       env: IDEA_VERSION="2018.1.3"
       jdk: oraclejdk8
@@ -25,6 +29,10 @@ matrix:
       jdk: oraclejdk8
       otp_release: 19.3
 
+    - elixir: 1.6.5
+      env: IDEA_VERSION="2017.3.5"
+      jdk: oraclejdk8
+      otp_release: 20.1
     - elixir: 1.5.3
       env: IDEA_VERSION="2017.3.5"
       jdk: oraclejdk8
@@ -34,6 +42,11 @@ matrix:
       jdk: oraclejdk8
       otp_release: 19.3
 
+
+    - elixir: 1.6.5
+      env: IDEA_VERSION="2017.2.7"
+      jdk: oraclejdk8
+      otp_release: 20.1
     - elixir: 1.5.3
       env: IDEA_VERSION="2017.2.7"
       jdk: oraclejdk8
@@ -43,6 +56,10 @@ matrix:
       jdk: oraclejdk8
       otp_release: 19.3
 
+    - elixir: 1.6.5
+      env: IDEA_VERSION="2017.1.6"
+      jdk: oraclejdk8
+      otp_release: 20.1
     - elixir: 1.5.3
       env: IDEA_VERSION="2017.1.6"
       jdk: oraclejdk8
@@ -52,7 +69,10 @@ matrix:
       jdk: oraclejdk8
       otp_release: 19.3
 
-
+    - elixir: 1.6.5
+      env: IDEA_VERSION="2016.3.8"
+      jdk: oraclejdk8
+      otp_release: 20.1
     - elixir: 1.5.3
       env: IDEA_VERSION="2016.3.8"
       jdk: oraclejdk8
@@ -71,12 +91,7 @@ before_install:
 - export ERLANG_SDK_HOME=`erl -eval 'io:format("~s", [code:root_dir()]).' -noshell -run init stop`
 - export TERM=dumb
 - "sh -e /etc/init.d/xvfb start"
-- "wget -v -c --header \"Cookie: oraclelicense=accept-securebackup-cookie\" http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.tar.gz"
-- tar xvfz jdk-8u131-linux-x64.tar.gz
-- export JAVA_HOME=${PWD}/jdk1.8.0_131
-- export PATH=${JAVA_HOME}/bin:${PATH}
 - export CASHER_TIME_OUT=360
-- java -version
 install:
 - ./gradlew compileTestJava
 script: travis_wait ./gradlew test

@@ -1,7 +1,5 @@
 package org.elixir_lang.parser_definition;
 
-import org.elixir_lang.sdk.elixir.Release;
-
 import static org.elixir_lang.Level.V_1_2;
 import static org.elixir_lang.test.ElixirVersion.elixirSdkLevel;
 
@@ -20,7 +18,7 @@ public class MatchedThreeOperationParsingTestCase extends ParsingTestCase {
      */
 
     public void testCaptureNonNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testMatchedInOperation() {

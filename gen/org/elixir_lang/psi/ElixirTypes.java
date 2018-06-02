@@ -120,12 +120,13 @@ public interface ElixirTypes {
   IElementType MATCHED_AT_UNQUALIFIED_BRACKET_OPERATION = new ElixirElementType("MATCHED_AT_UNQUALIFIED_BRACKET_OPERATION");
   IElementType MATCHED_AT_UNQUALIFIED_NO_PARENTHESES_CALL = ElementTypeFactory.factory("MATCHED_AT_UNQUALIFIED_NO_PARENTHESES_CALL");
   IElementType MATCHED_BRACKET_OPERATION = new ElixirElementType("MATCHED_BRACKET_OPERATION");
-  IElementType MATCHED_CAPTURE_NON_NUMERIC_OPERATION = new ElixirElementType("MATCHED_CAPTURE_NON_NUMERIC_OPERATION");
   IElementType MATCHED_COMPARISON_OPERATION = new ElixirElementType("MATCHED_COMPARISON_OPERATION");
   IElementType MATCHED_DOT_CALL = ElementTypeFactory.factory("MATCHED_DOT_CALL");
   IElementType MATCHED_EXPRESSION = new ElixirElementType("MATCHED_EXPRESSION");
+  IElementType MATCHED_GREATER_THAN_OR_EQUAL_TO_ONE_POINT_SIX_CAPTURE_NON_NUMERIC_OPERATION = new ElixirElementType("MATCHED_GREATER_THAN_OR_EQUAL_TO_ONE_POINT_SIX_CAPTURE_NON_NUMERIC_OPERATION");
   IElementType MATCHED_IN_MATCH_OPERATION = new ElixirElementType("MATCHED_IN_MATCH_OPERATION");
   IElementType MATCHED_IN_OPERATION = new ElixirElementType("MATCHED_IN_OPERATION");
+  IElementType MATCHED_LESS_THAN_ONE_POINT_SIX_CAPTURE_NON_NUMERIC_OPERATION = new ElixirElementType("MATCHED_LESS_THAN_ONE_POINT_SIX_CAPTURE_NON_NUMERIC_OPERATION");
   IElementType MATCHED_MATCH_OPERATION = new ElixirElementType("MATCHED_MATCH_OPERATION");
   IElementType MATCHED_MULTIPLICATION_OPERATION = new ElixirElementType("MATCHED_MULTIPLICATION_OPERATION");
   IElementType MATCHED_NOT_IN_OPERATION = new ElixirElementType("MATCHED_NOT_IN_OPERATION");
@@ -200,12 +201,13 @@ public interface ElixirTypes {
   IElementType UNMATCHED_AT_UNQUALIFIED_BRACKET_OPERATION = new ElixirElementType("UNMATCHED_AT_UNQUALIFIED_BRACKET_OPERATION");
   IElementType UNMATCHED_AT_UNQUALIFIED_NO_PARENTHESES_CALL = ElementTypeFactory.factory("UNMATCHED_AT_UNQUALIFIED_NO_PARENTHESES_CALL");
   IElementType UNMATCHED_BRACKET_OPERATION = new ElixirElementType("UNMATCHED_BRACKET_OPERATION");
-  IElementType UNMATCHED_CAPTURE_NON_NUMERIC_OPERATION = new ElixirElementType("UNMATCHED_CAPTURE_NON_NUMERIC_OPERATION");
   IElementType UNMATCHED_COMPARISON_OPERATION = new ElixirElementType("UNMATCHED_COMPARISON_OPERATION");
   IElementType UNMATCHED_DOT_CALL = ElementTypeFactory.factory("UNMATCHED_DOT_CALL");
   IElementType UNMATCHED_EXPRESSION = new ElixirElementType("UNMATCHED_EXPRESSION");
+  IElementType UNMATCHED_GREATER_THAN_OR_EQUAL_TO_ONE_POINT_SIX_CAPTURE_NON_NUMERIC_OPERATION = new ElixirElementType("UNMATCHED_GREATER_THAN_OR_EQUAL_TO_ONE_POINT_SIX_CAPTURE_NON_NUMERIC_OPERATION");
   IElementType UNMATCHED_IN_MATCH_OPERATION = new ElixirElementType("UNMATCHED_IN_MATCH_OPERATION");
   IElementType UNMATCHED_IN_OPERATION = new ElixirElementType("UNMATCHED_IN_OPERATION");
+  IElementType UNMATCHED_LESS_THAN_ONE_POINT_SIX_CAPTURE_NON_NUMERIC_OPERATION = new ElixirElementType("UNMATCHED_LESS_THAN_ONE_POINT_SIX_CAPTURE_NON_NUMERIC_OPERATION");
   IElementType UNMATCHED_MATCH_OPERATION = new ElixirElementType("UNMATCHED_MATCH_OPERATION");
   IElementType UNMATCHED_MULTIPLICATION_OPERATION = new ElixirElementType("UNMATCHED_MULTIPLICATION_OPERATION");
   IElementType UNMATCHED_NOT_IN_OPERATION = new ElixirElementType("UNMATCHED_NOT_IN_OPERATION");
@@ -711,20 +713,23 @@ public interface ElixirTypes {
       else if (type == MATCHED_BRACKET_OPERATION) {
         return new ElixirMatchedBracketOperationImpl(node);
       }
-      else if (type == MATCHED_CAPTURE_NON_NUMERIC_OPERATION) {
-        return new ElixirMatchedCaptureNonNumericOperationImpl(node);
-      }
       else if (type == MATCHED_COMPARISON_OPERATION) {
         return new ElixirMatchedComparisonOperationImpl(node);
       }
       else if (type == MATCHED_DOT_CALL) {
         return new ElixirMatchedDotCallImpl(node);
       }
+      else if (type == MATCHED_GREATER_THAN_OR_EQUAL_TO_ONE_POINT_SIX_CAPTURE_NON_NUMERIC_OPERATION) {
+        return new ElixirMatchedGreaterThanOrEqualToOnePointSixCaptureNonNumericOperationImpl(node);
+      }
       else if (type == MATCHED_IN_MATCH_OPERATION) {
         return new ElixirMatchedInMatchOperationImpl(node);
       }
       else if (type == MATCHED_IN_OPERATION) {
         return new ElixirMatchedInOperationImpl(node);
+      }
+      else if (type == MATCHED_LESS_THAN_ONE_POINT_SIX_CAPTURE_NON_NUMERIC_OPERATION) {
+        return new ElixirMatchedLessThanOnePointSixCaptureNonNumericOperationImpl(node);
       }
       else if (type == MATCHED_MATCH_OPERATION) {
         return new ElixirMatchedMatchOperationImpl(node);
@@ -948,20 +953,23 @@ public interface ElixirTypes {
       else if (type == UNMATCHED_BRACKET_OPERATION) {
         return new ElixirUnmatchedBracketOperationImpl(node);
       }
-      else if (type == UNMATCHED_CAPTURE_NON_NUMERIC_OPERATION) {
-        return new ElixirUnmatchedCaptureNonNumericOperationImpl(node);
-      }
       else if (type == UNMATCHED_COMPARISON_OPERATION) {
         return new ElixirUnmatchedComparisonOperationImpl(node);
       }
       else if (type == UNMATCHED_DOT_CALL) {
         return new ElixirUnmatchedDotCallImpl(node);
       }
+      else if (type == UNMATCHED_GREATER_THAN_OR_EQUAL_TO_ONE_POINT_SIX_CAPTURE_NON_NUMERIC_OPERATION) {
+        return new ElixirUnmatchedGreaterThanOrEqualToOnePointSixCaptureNonNumericOperationImpl(node);
+      }
       else if (type == UNMATCHED_IN_MATCH_OPERATION) {
         return new ElixirUnmatchedInMatchOperationImpl(node);
       }
       else if (type == UNMATCHED_IN_OPERATION) {
         return new ElixirUnmatchedInOperationImpl(node);
+      }
+      else if (type == UNMATCHED_LESS_THAN_ONE_POINT_SIX_CAPTURE_NON_NUMERIC_OPERATION) {
+        return new ElixirUnmatchedLessThanOnePointSixCaptureNonNumericOperationImpl(node);
       }
       else if (type == UNMATCHED_MATCH_OPERATION) {
         return new ElixirUnmatchedMatchOperationImpl(node);

@@ -30,7 +30,7 @@ public class MapOperationParsingTestCase extends ParsingTestCase {
     }
 
     public void testMapConstructionArgumentsWithPipes() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testMapExpression() {

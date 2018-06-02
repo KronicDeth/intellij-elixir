@@ -89,7 +89,7 @@ public class LevelPropertyPusher implements FilePropertyPusher<Level> {
     }
 
     @NotNull
-    private static Level level(@NotNull Project project) {
+    public static Level level(@NotNull Project project) {
         Level level;
 
         final ModuleManager moduleManager = ModuleManager.getInstance(project);

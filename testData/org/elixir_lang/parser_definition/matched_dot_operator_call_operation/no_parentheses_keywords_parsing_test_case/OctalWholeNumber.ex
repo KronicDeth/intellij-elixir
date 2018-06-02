@@ -15,7 +15,6 @@
 0o76543210.|| key1: value1, key2: value2
 0o76543210.| key1: value1, key2: value2
 0o76543210.<= key1: value1, key2: value2
-0o76543210.-> key1: value1, key2: value2
 0o76543210.<> key1: value1, key2: value2
 0o76543210.^ key1: value1, key2: value2
 0o76543210.not key1: value1, key2: value2

@@ -1,5 +1,8 @@
 package org.elixir_lang.parser_definition;
 
+import static org.elixir_lang.Level.V_1_6;
+import static org.elixir_lang.test.ElixirVersion.elixirSdkLevel;
+
 /**
  * Created by luke.imhoff on 8/3/14.
  */
@@ -13,7 +16,10 @@ public class GeneralParsingTestCase extends ParsingTestCase {
     }
 
     public void testComments() {
-        assertParsedAndQuotedCorrectly();
+        // Elixir injects the line as 1 when there are comments, but not where there are no comments, which can't be emulated
+        if (elixirSdkLevel().compareTo(V_1_6) < 0) {
+            assertParsedAndQuotedCorrectly();
+        }
     }
 
     public void testCommentEOL() {

@@ -1,5 +1,5 @@
 Elixir File(0,27)
-  ElixirUnmatchedCaptureNonNumericOperationImpl(UNMATCHED_CAPTURE_NON_NUMERIC_OPERATION)(0,27)
+  ElixirUnmatchedGreaterThanOrEqualToOnePointSixCaptureNonNumericOperationImpl(UNMATCHED_GREATER_THAN_OR_EQUAL_TO_ONE_POINT_SIX_CAPTURE_NON_NUMERIC_OPERATION)(0,27)
     ElixirCapturePrefixOperatorImpl(CAPTURE_PREFIX_OPERATOR)(0,1)
       PsiElement(&)('&')(0,1)
     UNMATCHED_QUALIFIED_NO_ARGUMENTS_CALL(1,27)

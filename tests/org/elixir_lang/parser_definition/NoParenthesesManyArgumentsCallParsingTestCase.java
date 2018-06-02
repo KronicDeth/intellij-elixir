@@ -93,7 +93,7 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
     }
 
     public void testKeywordValueMatchedCaptureNonNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testKeywordValueMatchedUnaryNonNumericOperation() {
@@ -221,7 +221,7 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
     }
 
     public void testPositionalCaptureNonNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testPositionalUnaryNonNumericOperation() {
