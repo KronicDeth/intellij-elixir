@@ -28,7 +28,6 @@ import org.elixir_lang.Facet;
 import org.elixir_lang.icons.ElixirIcons;
 import org.elixir_lang.jps.model.SerializerExtension;
 import org.elixir_lang.jps.sdk_type.Elixir;
-import org.elixir_lang.mix.runner.MixRunConfigurationBase;
 import org.elixir_lang.jps.HomePath;
 import org.elixir_lang.sdk.erlang_dependent.SdkModificatorRootTypeConsumer;
 import org.jdom.Element;
@@ -46,7 +45,6 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import static com.intellij.openapi.application.ModalityState.NON_MODAL;
-import static org.elixir_lang.mix.runner.MixRunningStateUtil.module;
 import static org.elixir_lang.jps.HomePath.*;
 import static org.elixir_lang.sdk.ProcessOutput.STANDARD_TIMEOUT;
 import static org.elixir_lang.sdk.ProcessOutput.isSmallIde;
@@ -590,7 +588,7 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
         File elixir = Elixir.getScriptInterpreterExecutable(path);
         File elixirc = Elixir.getByteCodeCompilerExecutable(path);
         File iex = Elixir.getIExExecutable(path);
-        File mix = Elixir.getMixScript(path);
+        File mix = Elixir.mixFile(path);
 
         // Determine whether everything is can run
         return elixir.canExecute() && elixirc.canExecute() && iex.canExecute() && mix.canRead();
@@ -695,21 +693,6 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
         }
 
         return elixirSdk;
-    }
-
-    @Nullable
-    public static Sdk mostSpecificSdk(@NotNull MixRunConfigurationBase mixRunConfigurationBase) {
-        Module module = module(mixRunConfigurationBase);
-        Sdk sdk;
-
-        if (module != null) {
-            sdk = mostSpecificSdk(module);
-        } else {
-            Project project = mixRunConfigurationBase.getProject();
-            sdk = mostSpecificSdk(project);
-        }
-
-        return sdk;
     }
 
     @Nullable

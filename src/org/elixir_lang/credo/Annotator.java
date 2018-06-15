@@ -1,6 +1,5 @@
 package org.elixir_lang.credo;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.intellij.diagnostic.LogMessageEx;
 import com.intellij.execution.ExecutionException;
@@ -24,10 +23,10 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import gnu.trove.THashMap;
+import org.elixir_lang.Mix;
 import org.elixir_lang.annotator.FunctionWithIndex;
 import org.elixir_lang.credo.inspection_tool.Global;
-import org.elixir_lang.jps.builder.ParametersList;
-import org.elixir_lang.mix.runner.MixRunningStateUtil;
+import org.elixir_lang.mix.MissingSdk;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -40,8 +39,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
-import static org.elixir_lang.mix.runner.MixRunningStateUtil.workingDirectory;
+import static org.elixir_lang.run.ConfigurationKt.ensureWorkingDirectory;
 import static org.elixir_lang.sdk.elixir.Type.mostSpecificSdk;
 
 // See https://github.com/antlr/jetbrains-plugin-sample/blob/7c400e02f89477dbe179123a2d43f839b4df05d7/src/java/org/antlr/jetbrains/sample/SampleExternalAnnotator.java
@@ -57,14 +58,14 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
     private static final String WHY_IT_MATTERS_HEADER = "WHY IT MATTERS";
 
     @NotNull
-    public static List<Issue> lineListToIssueList(@NotNull List<String> lineList) {
+    public static List<Issue> lineListToIssueList(@NotNull List<String> lineList) throws MissingSdk {
         return lineListToIssueList(lineList, false, null, null);
     }
 
     @NotNull
     private static List<Issue> lineListToIssueList(@NotNull List<String> lineList,
                                                    @NotNull Project project,
-                                                   @Nullable Module module) {
+                                                   @Nullable Module module) throws MissingSdk {
         return lineListToIssueList(
                 lineList,
                 Service.getInstance(project).includeExplanation(),
@@ -77,7 +78,7 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
     private static List<Issue> lineListToIssueList(@NotNull List<String> lineList,
                                                    boolean includeExplanation,
                                                    @Nullable Project project,
-                                                   @Nullable Module module) {
+                                                   @Nullable Module module) throws MissingSdk {
         List<Issue> issueList;
 
         if (!lineList.isEmpty()) {
@@ -91,7 +92,7 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
                 }
             }
         } else {
-            issueList = Collections.emptyList();
+            issueList = emptyList();
         }
 
         return issueList;
@@ -101,7 +102,7 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
     private static Issue lineToIssue(@NotNull String line,
                                      boolean includeExplanation,
                                      @Nullable Project project,
-                                     @Nullable Module module) {
+                                     @Nullable Module module) throws MissingSdk {
         Matcher matcher = LINE_PATTERN.matcher(line);
         Issue issue;
 
@@ -134,10 +135,10 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
     }
 
     @NotNull
-    private static GeneralCommandLine generalCommandLine(@NotNull GeneralCommandLine workingDirectoryGeneralCommandLine,
+    private static GeneralCommandLine generalCommandLine(@NotNull String workingDirectory,
                                                          @NotNull Project project,
                                                          @Nullable Module module,
-                                                         @NotNull ParametersList mixParametersList) {
+                                                         @NotNull List<String> parameters) throws MissingSdk {
         Sdk sdk;
 
         if (module != null) {
@@ -146,24 +147,33 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
             sdk = mostSpecificSdk(project);
         }
 
-        return MixRunningStateUtil.commandLine(
-                workingDirectoryGeneralCommandLine,
+        if (sdk == null) {
+            throw new MissingSdk(project, module);
+        }
+
+        GeneralCommandLine commandLine = Mix.commandLine(
+                emptyMap(),
+                workingDirectory,
                 sdk,
-                new ParametersList(),
-                mixParametersList
+                emptyList(),
+                emptyList()
         );
+
+        commandLine.addParameters(parameters);
+
+        return commandLine;
     }
 
     @NotNull
-    private static ParametersList mixParametersList() {
-        ParametersList parametersList = new ParametersList();
+    private static List<String> mixParametersList() {
+        List<String> parametersList = new ArrayList<>();
         parametersList.add("credo");
 
         return parametersList;
     }
 
     @NotNull
-    private static ParametersList mixParametersList(@NotNull Issue issue) {
+    private static List<String> mixParametersList(@NotNull Issue issue) {
         StringBuilder explainableBuilder = new StringBuilder(issue.path).append(':').append(issue.line + 1);
 
         if (issue.column != null) {
@@ -174,8 +184,8 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
     }
 
     @NotNull
-    private static ParametersList mixParametersList(@NotNull String explainable) {
-        ParametersList parametersList = mixParametersList();
+    private static List<String> mixParametersList(@NotNull String explainable) {
+        List<String> parametersList = mixParametersList();
         parametersList.add(explainable);
 
         return parametersList;
@@ -184,23 +194,14 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
     @NotNull
     private static GeneralCommandLine generalCommandLine(@NotNull Project project,
                                                          @Nullable Module module,
-                                                         @NotNull ParametersList mixParametersList) {
-        GeneralCommandLine workingDirectoryGeneralCommandLine = new GeneralCommandLine().withCharset(Charsets.UTF_8);
-        String workingDirectory;
-
-        if (module != null) {
-            workingDirectory = workingDirectory(module);
-        } else {
-            workingDirectory = workingDirectory(project);
-        }
-
-        workingDirectoryGeneralCommandLine.withWorkDirectory(workingDirectory);
+                                                         @NotNull List<String> parameters) throws MissingSdk {
+        String workingDirectory = ensureWorkingDirectory(project, module);
 
         return generalCommandLine(
-                workingDirectoryGeneralCommandLine,
+                workingDirectory,
                 project,
                 module,
-                mixParametersList
+                parameters
         );
     }
 
@@ -324,16 +325,16 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
             Module module = ModuleUtilCore.findModuleForPsiElement(file);
 
             issueList = lineListToIssueList(processOutput.getStdoutLines(), project, module);
-        } catch (ExecutionException executionException) {
-            issueList = Collections.emptyList();
+        } catch (ExecutionException | MissingSdk executionException) {
+            issueList = emptyList();
         }
 
         return issueList;
     }
 
     @NotNull
-    private ParametersList mixParametersList(@NotNull PsiFile file) {
-        ParametersList parametersList = mixParametersList();
+    private List<String> mixParametersList(@NotNull PsiFile file) {
+        List<String> parametersList = mixParametersList();
         parametersList.add("--format");
         parametersList.add("flycheck");
         parametersList.add(file.getVirtualFile().getPath());
@@ -342,7 +343,7 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
     }
 
     @NotNull
-    private GeneralCommandLine generalCommandLine(@NotNull PsiFile file) {
+    private GeneralCommandLine generalCommandLine(@NotNull PsiFile file) throws MissingSdk {
         Project project = file.getProject();
         Module module = ModuleUtilCore.findModuleForPsiElement(file);
 
@@ -359,7 +360,7 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
             @Nullable Document document = file.getViewProvider().getDocument();
 
             if (document != null) {
-                String workingDirectory = workingDirectory(file.getProject());
+                String workingDirectory = ensureWorkingDirectory(file.getProject());
 
                 for (Issue issue : issueList) {
                     int lineStartOffset = document.getLineStartOffset(issue.line);
@@ -420,7 +421,7 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
                         header ->
                                 sectionToHTML(
                                         header,
-                                        contentsByHeader.getOrDefault(header, Collections.emptyList()),
+                                        contentsByHeader.getOrDefault(header, emptyList()),
                                         workingDirectory
                                 )
                 )
@@ -558,8 +559,8 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
         }
 
         @NotNull
-        private Optional<Stream<String>> explanation(@NotNull Project project, @Nullable Module module) {
-            ParametersList mixParametersList = mixParametersList(this);
+        private Optional<Stream<String>> explanation(@NotNull Project project, @Nullable Module module) throws MissingSdk {
+            List<String> mixParametersList = mixParametersList(this);
             GeneralCommandLine generalCommandLine = generalCommandLine(project, module, mixParametersList);
             Optional<Stream<String>> explanation;
 
@@ -579,7 +580,7 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
             return explanation;
         }
 
-        void putExplanation(@NotNull Project project, @Nullable Module module) {
+        void putExplanation(@NotNull Project project, @Nullable Module module) throws MissingSdk {
             this.explanation = explanation(project, module);
         }
 

@@ -37,7 +37,7 @@ object ElixirModules {
             org.elixir_lang.ElixirModules.copy(BASE_PATH, relativeSourcePathList(level))
 
     @Throws(IOException::class)
-    fun parametersList(level: Level): ParametersList = org.elixir_lang.ElixirModules.parametersList(copy(level))
+    fun parametersList(level: Level): List<String> = org.elixir_lang.ElixirModules.parametersList(copy(level))
 
     private fun relativeSourcePathList(level: Level): List<String> {
         val relativeSourcePathList = ArrayList<String>()

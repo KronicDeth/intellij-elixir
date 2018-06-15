@@ -61,11 +61,7 @@ import org.elixir_lang.debugger.node.Exception;
 import org.elixir_lang.debugger.node.ProcessSnapshot;
 import org.elixir_lang.debugger.node.event.Listener;
 import org.elixir_lang.eex.File;
-import org.elixir_lang.jps.builder.ParametersList;
-import org.elixir_lang.mix.runner.MixRunConfigurationBase;
-import org.elixir_lang.mix.runner.MixRunningState;
-import org.elixir_lang.mix.runner.MixRunningStateUtil;
-import org.elixir_lang.mix.runner.exunit.MixExUnitRunConfiguration;
+import org.elixir_lang.mix.State;
 import org.elixir_lang.psi.ElixirFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -76,8 +72,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static org.elixir_lang.beam.term.InspectKt.inspect;
 import static org.elixir_lang.debugger.Log.LOG;
-import static org.elixir_lang.mix.runner.MixRunningStateUtil.workingDirectory;
 import static org.elixir_lang.psi.impl.PsiElementImplKt.getModuleName;
+import static org.elixir_lang.run.ConfigurationKt.ensureWorkingDirectory;
 
 public class Process extends com.intellij.xdebugger.XDebugProcess implements Listener {
     @NotNull
@@ -91,7 +87,7 @@ public class Process extends com.intellij.xdebugger.XDebugProcess implements Lis
     private final ConcurrentHashMap<SourcePosition, XLineBreakpoint<Properties>> myPositionToLineBreakpointMap =
             new ConcurrentHashMap<>();
     @NotNull
-    private final MixRunningState myRunningState;
+    private final State myRunningState;
 
     Process(@NotNull XDebugSession session, ExecutionEnvironment env) throws ExecutionException {
         super(session);
@@ -99,7 +95,7 @@ public class Process extends com.intellij.xdebugger.XDebugProcess implements Lis
         session.setPauseActionSupported(false);
 
         myExecutionEnvironment = env;
-        myRunningState = (MixRunningState) getRunConfiguration().getState(myExecutionEnvironment.getExecutor(), myExecutionEnvironment);
+        myRunningState = (State) getRunConfiguration().getState(myExecutionEnvironment.getExecutor(), myExecutionEnvironment);
 
         try {
             //TODO add the debugger node to disposable hierarchy (we may fail to initialize session so the session will not be stopped!)
@@ -113,11 +109,11 @@ public class Process extends com.intellij.xdebugger.XDebugProcess implements Lis
     }
 
     @NotNull
-    private static ParametersList addRequires(@NotNull ParametersList elixirParametersList) throws ExecutionException {
-        ParametersList updated;
+    private static List<String> addRequires(@NotNull List<String> elixirParametersList) throws ExecutionException {
+        List<String> updated;
 
         try {
-            updated = Modules.add(elixirParametersList);
+            updated = Modules.INSTANCE.add(elixirParametersList);
         } catch (IOException e) {
             throw new ExecutionException("Failed to setup debugger environment", e);
         }
@@ -292,15 +288,7 @@ public class Process extends com.intellij.xdebugger.XDebugProcess implements Lis
                 moduleNameSet = Collections.singleton(getModuleName(element));
             } else if (psiFile instanceof File) {
                 Module module = ModuleUtilCore.findModuleForPsiElement(psiFile);
-                String rootDirectory = null;
-
-                if (module != null) {
-                    rootDirectory = workingDirectory(module);
-                }
-
-                if (rootDirectory == null) {
-                    rootDirectory = workingDirectory(project);
-                }
+                String rootDirectory = ensureWorkingDirectory(project, module);
 
                 String path = virtualFile.getPath();
                 java.io.File relativeFile;
@@ -353,8 +341,8 @@ public class Process extends com.intellij.xdebugger.XDebugProcess implements Lis
     }
 
     @NotNull
-    private MixRunConfigurationBase getRunConfiguration() {
-        MixRunConfigurationBase runConfig = (MixRunConfigurationBase) getSession().getRunProfile();
+    private org.elixir_lang.run.Configuration getRunConfiguration() {
+        org.elixir_lang.mix.Configuration runConfig = (org.elixir_lang.mix.Configuration) getSession().getRunProfile();
         assert runConfig != null;
         return runConfig;
     }
@@ -385,41 +373,40 @@ public class Process extends com.intellij.xdebugger.XDebugProcess implements Lis
         LOG.debug("Preparing to run debug target.");
 
         RunnerAndConfigurationSettings runnerAndConfigurationSettings = myExecutionEnvironment.getRunnerAndConfigurationSettings();
-        MixRunConfigurationBase runConfiguration = null;
 
-        if (runnerAndConfigurationSettings != null) {
-            runConfiguration = (MixRunConfigurationBase) runnerAndConfigurationSettings.getConfiguration();
-        }
-
-        ParametersList elixirParametersList = myRunningState.elixirParametersList(runConfiguration);
-        addRequires(elixirParametersList);
-
-        ParametersList mixParametersList = new ParametersList();
-        mixParametersList.addAll(
-                "intellij_elixir.debug_task",
-                "--debugger-port",
-                Integer.toString(myNode.getLocalDebuggerPort())
-        );
-
-        List<String> doNotInterpretPatterns = Settings.Companion.getInstance().enabledModuleFilterPatternList();
-
-        for (String doNotInterpretPattern : doNotInterpretPatterns) {
-            mixParametersList.addAll("--do-not-interpret-pattern", doNotInterpretPattern);
-        }
-
-        mixParametersList.add("--");
-
-        MixRunConfigurationBase mixRunConfigurationBase = getRunConfiguration();
-        ParametersList runConfigurationMixParametersList = mixRunConfigurationBase.mixParametersList();
-        mixParametersList.addAll(runConfigurationMixParametersList.getList());
-
-        if (mixRunConfigurationBase instanceof MixExUnitRunConfiguration &&
-                !runConfigurationMixParametersList.getList().contains("--trace")) {
-            // Prevents tests from timing out while debugging
-            mixParametersList.add("--trace");
-        }
-
-        GeneralCommandLine commandLine = MixRunningStateUtil.commandLine(mixRunConfigurationBase, elixirParametersList, mixParametersList);
+//        MixRunConfigurationBase runConfiguration = null;
+//
+//        if (runnerAndConfigurationSettings != null) {
+//            runConfiguration = (MixRunConfigurationBase) runnerAndConfigurationSettings.getConfiguration();
+//        }
+//
+//        addRequires(elixirParametersList);
+//
+        GeneralCommandLine commandLine = new GeneralCommandLine(); //mixRunConfigurationBase.commandLine(elixirParametersList = elixirParametersList);
+//
+//        commandLine.addParameters(
+//                "intellij_elixir.debug_task",
+//                "--debugger-port",
+//                Integer.toString(myNode.getLocalDebuggerPort())
+//        );
+//
+//        List<String> doNotInterpretPatterns = Settings.Companion.getInstance().enabledModuleFilterPatternList();
+//
+//        for (String doNotInterpretPattern : doNotInterpretPatterns) {
+//            commandLine.addParameters("--do-not-interpret-pattern", doNotInterpretPattern);
+//        }
+//
+//        mixParametersList.add("--");
+//
+//        MixRunConfigurationBase mixRunConfigurationBase = getRunConfiguration();
+//        ParametersList runConfigurationMixParametersList = mixRunConfigurationBase.mixParametersList();
+//        mixParametersList.addAll(runConfigurationMixParametersList.getList());
+//
+//        if (mixRunConfigurationBase instanceof Configuration &&
+//                !runConfigurationMixParametersList.getList().contains("--trace")) {
+//            // Prevents tests from timing out while debugging
+//            mixParametersList.add("--trace");
+//        }
 
         LOG.debug("Running debugger process. Command line (platform-independent): ");
         LOG.debug(commandLine.getCommandLineString());

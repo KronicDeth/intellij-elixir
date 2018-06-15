@@ -1,6 +1,5 @@
 package org.elixir_lang.mix.importWizard;
 
-import com.google.common.base.Charsets;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.Platform;
 import com.intellij.execution.configurations.GeneralCommandLine;
@@ -15,7 +14,6 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.Key;
@@ -24,14 +22,13 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.projectImport.ProjectImportWizardStep;
-import org.elixir_lang.jps.builder.ParametersList;
-import org.elixir_lang.jps.sdk_type.Elixir;
-import org.elixir_lang.mix.runner.MixRunningStateUtil;
-import org.elixir_lang.sdk.elixir.Type;
+import org.elixir_lang.Mix;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 
 /**
  * https://github.com/ignatov/intellij-erlang/blob/master/src/org/intellij/erlang/rebar/importWizard/RebarProjectRootStep.java
@@ -60,61 +57,34 @@ public class MixProjectRootStep extends ProjectImportWizardStep {
         myGetDepsCheckbox.setVisible(ourEnabled);
     }
 
-    private static void fetchDependencies(@NotNull final GeneralCommandLine workingDirectoryGeneralCommandLine,
-                                          @NotNull final Sdk sdk) {
-        mixTask(workingDirectoryGeneralCommandLine, sdk, "Fetching dependencies", "deps.get");
+    private static void fetchDependencies(@NotNull final String workingDirectory, @NotNull final Sdk sdk) {
+        mixTask(workingDirectory, sdk, "Fetching dependencies", "deps.get");
     }
 
     /**
      * private methods
      */
 
-
-    @Nullable
-    private static String maybeProjectToMaybeSdkPath(@Nullable Project project) {
-        String sdkPath;
-
-        if (project != null) {
-            sdkPath = Type.getSdkPath(project);
-        } else {
-            sdkPath = null;
-        }
-
-        return sdkPath;
-    }
-
-    @NotNull
-    private static String maybeSdkPathToElixirPath(@Nullable String sdkPath) {
-        String elixirPath;
-
-        if (sdkPath != null) {
-            elixirPath = Elixir.getScriptInterpreterExecutable(sdkPath).getAbsolutePath();
-        } else {
-            elixirPath = Elixir.getExecutableFileName(Elixir.SCRIPT_INTERPRETER);
-        }
-
-        return elixirPath;
-    }
-
-    private static void mixTask(@NotNull final GeneralCommandLine workingDirectoryGeneralCommandLine,
-                                @Nullable final Sdk sdk,
-                                @NotNull final String title,
-                                @NotNull final String... parameters) {
+    private static void mixTask(@NotNull final String workingDirectory,
+                                @NotNull final Sdk sdk,
+                                @SuppressWarnings("SameParameterValue") @NotNull final String title,
+                                @SuppressWarnings("SameParameterValue") @NotNull final String task,
+                                @NotNull final String... taskParameters) {
         ProgressManager.getInstance().run(
                 new Task.Modal(null, title, true) {
                     @Override
                     public void run(@NotNull final ProgressIndicator indicator) {
                         indicator.setIndeterminate(true);
 
-                        ParametersList mixParametersList = new ParametersList();
-                        mixParametersList.addAll(parameters);
-
-                        GeneralCommandLine generalCommandLine = MixRunningStateUtil.commandLine(
-                                workingDirectoryGeneralCommandLine,
+                        GeneralCommandLine generalCommandLine = Mix.commandLine(
+                                emptyMap(),
+                                workingDirectory,
                                 sdk,
-                                new ParametersList(),
-                                mixParametersList
+                                emptyList(),
+                                emptyList()
                         );
+                        generalCommandLine.addParameter(task);
+                        generalCommandLine.addParameters(taskParameters);
 
                         try {
                             OSProcessHandler handler = new OSProcessHandler(
@@ -142,9 +112,9 @@ public class MixProjectRootStep extends ProjectImportWizardStep {
         );
     }
 
-    private static void updateHex(@NotNull final GeneralCommandLine workingDirectoryGeneralCommandLine,
+    private static void updateHex(@NotNull final String workingDirectory,
                                   @NotNull final Sdk sdk) {
-        mixTask(workingDirectoryGeneralCommandLine, sdk, "Updating hex", "local.hex", "--force");
+        mixTask(workingDirectory, sdk, "Updating hex", "local.hex", "--force");
     }
 
     @Override
@@ -189,14 +159,10 @@ public class MixProjectRootStep extends ProjectImportWizardStep {
 
             assert workingDirectory != null;
 
-            GeneralCommandLine workingDirectoryGeneralCommandLine =
-                    new GeneralCommandLine().withCharset(Charsets.UTF_8);
-            workingDirectoryGeneralCommandLine.withWorkDirectory(workingDirectory);
-
             Sdk sdk = getWizardContext().getProjectJdk();
 
-            updateHex(workingDirectoryGeneralCommandLine, sdk);
-            fetchDependencies(workingDirectoryGeneralCommandLine, sdk);
+            updateHex(workingDirectory, sdk);
+            fetchDependencies(workingDirectory, sdk);
         }
 
         MixProjectImportBuilder builder = getBuilder();

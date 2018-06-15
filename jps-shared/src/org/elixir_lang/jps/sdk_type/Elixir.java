@@ -9,6 +9,8 @@ import org.jetbrains.jps.model.library.sdk.JpsSdk;
 import org.jetbrains.jps.model.library.sdk.JpsSdkType;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.nio.file.AccessDeniedException;
 
 import static org.elixir_lang.jps.SdkType.exeFileToExePath;
 
@@ -31,27 +33,30 @@ public class Elixir extends JpsSdkType<SdkProperties> implements JpsElementTypeW
   }
 
   @NotNull
-  public static String getMixScript(@Nullable JpsSdk<SdkProperties> sdk) {
-    String mixPath;
-
-    if (sdk != null) {
-      String homePath = sdk.getHomePath();
-
-      if (homePath != null) {
-        mixPath = getMixScript(homePath).getPath();
-      } else {
-        mixPath = ELIXIR_TOOL_MIX;
-      }
-    } else {
-      mixPath = ELIXIR_TOOL_MIX;
-    }
-
-    return mixPath;
+  public static String mixPath(@NotNull JpsSdk<SdkProperties> sdk) throws MissingHomePath {
+    String maybeHomePath = sdk.getHomePath();
+    return mixPath(maybeHomePath);
   }
 
   @NotNull
-  public static File getMixScript(@NotNull String sdkHome) {
-    return getSdkScript(sdkHome, ELIXIR_TOOL_MIX);
+  public static String mixPath(@Nullable String maybeHomePath) throws MissingHomePath {
+    String homePath = ensureHomePath(maybeHomePath);
+
+    return mixFile(homePath).getPath();
+  }
+
+  @NotNull
+  private static String ensureHomePath(@Nullable String homePath) throws MissingHomePath {
+    if (homePath == null) {
+      throw new MissingHomePath();
+    }
+
+    return homePath;
+  }
+
+  @NotNull
+  public static File mixFile(@NotNull String sdkHome) {
+    return sdkScript(sdkHome, ELIXIR_TOOL_MIX);
   }
 
   @NotNull
@@ -65,7 +70,7 @@ public class Elixir extends JpsSdkType<SdkProperties> implements JpsElementTypeW
   }
 
   @NotNull
-  private static File getSdkScript(@NotNull String sdkHome, @NotNull String command) {
+  private static File sdkScript(@NotNull String sdkHome, @NotNull String command) {
     return new File(new File(sdkHome, "bin").getAbsolutePath(), command);
   }
 
@@ -82,7 +87,16 @@ public class Elixir extends JpsSdkType<SdkProperties> implements JpsElementTypeW
 
   @Nullable
   public static String homePathToElixirExePath(@NotNull String elixirHomePath) {
-      File elixirFile = getScriptInterpreterExecutable(elixirHomePath);
-      return exeFileToExePath(elixirFile);
+    File elixirFile = getScriptInterpreterExecutable(elixirHomePath);
+
+    String elixirExePath;
+
+    try {
+      elixirExePath = exeFileToExePath(elixirFile);
+    } catch (FileNotFoundException | AccessDeniedException e) {
+      elixirExePath = null;
+    }
+
+    return elixirExePath;
   }
 }

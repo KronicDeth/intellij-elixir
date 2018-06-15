@@ -25,6 +25,11 @@
 
     <editorNotificationProvider implementation="org.elixir_lang.inspection.SetupSDKNotificationProvider"/>
 
+    <!-- IEx -->
+    <actionPromoter implementation="org.elixir_lang.iex.execute.Promoter"/>
+    <configurationType implementation="org.elixir_lang.iex.configuration.Type"/>
+    <programRunner implementation="org.elixir_lang.iex.Runner"/>
+
     <!-- EEX -->
     <!--<braceMatcher filetype="EEx" implementationClass="org.elixir_lang.eex.BraceMatcher"/>-->
     <fileType.fileViewProviderFactory filetype="EEx" implementationClass="org.elixir_lang.eex.file.view_provider.Factory"/>
@@ -34,13 +39,13 @@
     <!--<lang.psiStructureViewFactory language="EEx" implementationClass="org.elixir_lang.eex.PsiStructureViewFactory"/>-->
 
     <!-- Mix related extensions -->
-    <programRunner implementation="org.elixir_lang.mix.runner.MixRunner" />
-    <configurationType implementation="org.elixir_lang.mix.runner.MixRunConfigurationType" />
+    <programRunner implementation="org.elixir_lang.mix.Runner" />
+    <configurationType implementation="org.elixir_lang.mix.configuration.Type" />
 
     <!-- Tesing -->
-    <configurationType implementation="org.elixir_lang.mix.runner.exunit.MixExUnitRunConfigurationType" />
-    <programRunner implementation="org.elixir_lang.mix.runner.exunit.MixExUnitRunner" />
-    <runConfigurationProducer implementation="org.elixir_lang.mix.runner.exunit.MixExUnitRunConfigurationProducer" />
+    <configurationType implementation="org.elixir_lang.exunit.configuration.Type" />
+    <programRunner implementation="org.elixir_lang.exunit.Runner" />
+    <runConfigurationProducer implementation="org.elixir_lang.exunit.configuration.MixExUnitRunConfigurationProducer" />
     <testFinder implementation="org.elixir_lang.mix.TestFinder"/>
 
     <colorSettingsPage implementation="org.elixir_lang.ElixirColorSettingsPage"/>
@@ -196,6 +201,10 @@
       <!--suppress PluginXmlValidity -->
       <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewXml" />
     </group>
+    <!-- IEx -->
+    <action id="Elixir.IEx.Execute" class="org.elixir_lang.iex.Execute">
+      <keyboard-shortcut first-keystroke="ENTER" keymap="$default"/>
+    </action>
   </actions>
 
 </idea-plugin>

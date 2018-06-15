@@ -91,4 +91,15 @@ public class SdkAdditionalData implements ValidatableSdkAdditionalData {
     public void setErlangSdk(@Nullable Sdk erlangSdk) {
         this.erlangSdk = erlangSdk;
     }
+
+    @NotNull
+    public Sdk ensureErlangSdk() throws MissingErlangSdk {
+        Sdk erlangSdk = getErlangSdk();
+
+        if (erlangSdk == null) {
+            throw new MissingErlangSdk(elixirSdk);
+        }
+
+        return erlangSdk;
+    }
 }
