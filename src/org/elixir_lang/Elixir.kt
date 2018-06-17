@@ -47,6 +47,7 @@ object Elixir {
     private fun addElixir(commandLine: GeneralCommandLine, elixirSdk: Sdk, erlangSdk: Sdk) {
         prependNewCodePaths(commandLine, elixirSdk, erlangSdk)
         commandLine.addParameters("-noshell", "-s", "elixir", "start_cli")
+        commandLine.addParameters("-elixir", "ansi_enabled", "true")
         commandLine.addParameter("-extra")
     }
 

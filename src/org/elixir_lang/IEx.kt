@@ -19,6 +19,7 @@ object IEx {
         val erlangSdk = elixirSdkToEnsuredErlangSdk(elixirSdk)
         val commandLine = org.elixir_lang.Erl.commandLine(pty, environment, workingDirectory, erlangSdk)
         prependNewCodePaths(commandLine, elixirSdk, erlangSdk)
+        commandLine.addParameters("-elixir", "ansi_enabled", "true")
         commandLine.addParameters(erlArgumentList)
         addIEx(commandLine)
         commandLine.addParameter("--no-halt")
