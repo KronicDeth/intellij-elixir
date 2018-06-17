@@ -41,7 +41,13 @@ class Configuration(name: String, project: Project, configurationFactory: Config
         val workingDirectory = ensureWorkingDirectory()
         val module = ensureModule()
         val sdk = ensureMostSpecificSdk(module)
-        val commandLine = IEx.commandLine(envs, workingDirectory, sdk, erlArgumentList)
+        val commandLine = IEx.commandLine(
+                pty = true,
+                environment = envs,
+                workingDirectory = workingDirectory,
+                elixirSdk = sdk,
+                erlArgumentList = erlArgumentList
+        )
         commandLine.addParameters(iexArgumentList)
 
         return commandLine

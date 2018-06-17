@@ -26,7 +26,6 @@
     <editorNotificationProvider implementation="org.elixir_lang.inspection.SetupSDKNotificationProvider"/>
 
     <!-- IEx -->
-    <actionPromoter implementation="org.elixir_lang.iex.execute.Promoter"/>
     <configurationType implementation="org.elixir_lang.iex.configuration.Type"/>
     <programRunner implementation="org.elixir_lang.iex.Runner"/>
 
@@ -201,10 +200,6 @@
       <!--suppress PluginXmlValidity -->
       <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewXml" />
     </group>
-    <!-- IEx -->
-    <action id="Elixir.IEx.Execute" class="org.elixir_lang.iex.Execute">
-      <keyboard-shortcut first-keystroke="ENTER" keymap="$default"/>
-    </action>
   </actions>
 
 </idea-plugin>

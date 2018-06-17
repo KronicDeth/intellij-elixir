@@ -10,12 +10,9 @@ object Erl {
     /**
      * Keep in-sync with [org.elixir_lang.jps.Builder.erlCommandLine]
      */
-    fun commandLine(environment: Map<String, String>, workingDirectory: String?, erlangSdk: Sdk):
+    fun commandLine(pty: Boolean, environment: Map<String, String>, workingDirectory: String?, erlangSdk: Sdk):
             GeneralCommandLine {
-        val commandLine = GeneralCommandLine()
-                .withCharset(Charsets.UTF_8)
-                .withEnvironment(environment)
-                .withWorkDirectory(workingDirectory)
+        val commandLine = commandLine(pty, environment, workingDirectory)
         setErl(commandLine, erlangSdk)
 
         return commandLine

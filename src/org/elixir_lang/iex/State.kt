@@ -1,18 +1,17 @@
 package org.elixir_lang.iex
 
+import com.intellij.execution.DefaultExecutionResult
 import com.intellij.execution.ExecutionException
 import com.intellij.execution.ExecutionResult
 import com.intellij.execution.Executor
 import com.intellij.execution.configurations.CommandLineState
-import com.intellij.execution.filters.TextConsoleBuilderImpl
-import com.intellij.execution.process.ColoredProcessHandler
 import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.execution.runners.ProgramRunner
-import com.intellij.execution.ui.ConsoleView
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationType
 import com.intellij.notification.Notifications
+import com.intellij.terminal.TerminalExecutionConsole
 import org.elixir_lang.console.ElixirConsoleUtil
 import org.elixir_lang.utils.SetupElixirSDKNotificationListener
 
@@ -22,16 +21,13 @@ class State(environment: ExecutionEnvironment, private val configuration: Config
     override fun execute(executor: Executor, runner: ProgramRunner<*>): ExecutionResult {
         val project = configuration.project
 
-        val consoleBuilder = object : TextConsoleBuilderImpl(project) {
-            override fun getConsole(): ConsoleView {
-                val consoleView = org.elixir_lang.iex.console.View(project)
-                ElixirConsoleUtil.attachFilters(project, consoleView)
-                return consoleView
-            }
-        }
-        setConsoleBuilder(consoleBuilder)
+        val processHandler = startProcess()
+        processHandler.processInput
+        val console = TerminalExecutionConsole(project, processHandler)
+        ElixirConsoleUtil.attachFilters(project, console)
+        processHandler.startNotify()
 
-        return super.execute(executor, runner)
+        return DefaultExecutionResult(console, processHandler)
     }
 
     @Throws(ExecutionException::class)
@@ -39,7 +35,7 @@ class State(environment: ExecutionEnvironment, private val configuration: Config
         val commandLine = configuration.commandLine()
 
         try {
-            return ColoredProcessHandler(commandLine.createProcess(), commandLine.commandLineString)
+            return ProcessHandler(commandLine)
         } catch (e: ExecutionException) {
             val message = e.message
             val isEmpty = "Executable is not specified" == message

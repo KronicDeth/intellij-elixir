@@ -17,7 +17,12 @@ object Elixir {
             erlParameters: kotlin.collections.List<String> = emptyList()
     ): GeneralCommandLine {
         val erlangSdk = elixirSdkToEnsuredErlangSdk(elixirSdk)
-        val commandLine = org.elixir_lang.Erl.commandLine(environment, workingDirectory, erlangSdk)
+        val commandLine = org.elixir_lang.Erl.commandLine(
+                pty = false,
+                environment = environment,
+                workingDirectory = workingDirectory,
+                erlangSdk = erlangSdk
+        )
         addElixir(commandLine, elixirSdk, erlangSdk)
         commandLine.addParameters(erlParameters)
 
