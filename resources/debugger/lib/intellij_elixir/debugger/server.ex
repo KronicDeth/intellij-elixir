@@ -1,11 +1,10 @@
-defmodule IntellijElixir.DebugServer do
+defmodule IntelliJElixir.Debugger.Server do
   @moduledoc false
 
   use GenServer
 
   defstruct reason_by_uninterpretable: %{},
             port: nil,
-            ref: nil,
             reject_erlang_module_name_patterns: [],
             reject_regex: nil,
             rejected_module_names: [],
@@ -49,9 +48,11 @@ defmodule IntellijElixir.DebugServer do
     {:noreply, state}
   end
 
-  def handle_cast(:run_task, state = %__MODULE__{task: {task_name, task_args}}) do
-    {_pid, ref} = spawn_monitor(Mix.Task, :run, [task_name, task_args])
-    {:noreply, %{state | ref: ref}}
+  def handle_cast({:connect, name}, state = %__MODULE__{}) when is_atom(name) do
+    true = Node.connect(name)
+    # unpause debugged process waiting in `IntelliJElixir.Debugged.wait()`
+    GenServer.call({IntelliJElixir.Debugged, name}, :continue)
+    {:noreply, state}
   end
 
   def handle_cast({:set_breakpoint, module, line, file}, state = %__MODULE__{socket: socket})
@@ -94,6 +95,11 @@ defmodule IntellijElixir.DebugServer do
     {:noreply, state}
   end
 
+  def handle_cast(:stop, state = %__MODULE__{socket: socket}) do
+    send_message(socket, :stopped)
+    {:stop, :normal, state}
+  end
+
   def handle_cast(request, state) do
     super(request, state)
   end
@@ -101,11 +107,6 @@ defmodule IntellijElixir.DebugServer do
   @impl GenServer
   def handle_info({:tcp, socket, message}, state = %__MODULE__{socket: socket}) do
     handle_cast(:erlang.binary_to_term(message), state)
-  end
-
-  # When task finishes, stop the server
-  def handle_info({:DOWN, ref, :process, _, status}, state = %__MODULE__{ref: ref}) do
-    {:stop, status, state}
   end
 
   def handle_info(request, state) do

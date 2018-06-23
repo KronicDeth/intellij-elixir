@@ -18,6 +18,11 @@ object ElixirModules {
         return parametersList
     }
 
+    fun toRequireList(fileList: kotlin.collections.List<File>): kotlin.collections.List<String> =
+            fileList.flatMap { file ->
+                listOf("-r", file.path)
+            }
+
     @Throws(IOException::class)
     private fun copy(basePath: String,
                      relativePathList: kotlin.collections.List<String>,

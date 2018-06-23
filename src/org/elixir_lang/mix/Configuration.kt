@@ -9,6 +9,8 @@ import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.search.GlobalSearchScope
 import org.elixir_lang.Mix
+import org.elixir_lang.debugged.Modules
+import org.elixir_lang.debugger.configuration.Debuggable
 import org.elixir_lang.mix.configuration.Editor
 import org.elixir_lang.run.*
 import org.elixir_lang.run.Configuration
@@ -17,10 +19,37 @@ import org.jdom.Element
 /**
  * https://github.com/ignatov/intellij-erlang/blob/master/src/org/intellij/erlang/rebar/runner/RebarRunConfigurationBase.java
  */
-class Configuration(name: String, project: Project, configurationFactory: ConfigurationFactory) :
+open class Configuration(name: String, project: Project, configurationFactory: ConfigurationFactory) :
         Configuration(name, project, configurationFactory),
+        Debuggable<org.elixir_lang.mix.Configuration>,
         RunConfigurationWithSuppressedDefaultRunAction,
         RunConfigurationWithSuppressedDefaultDebugAction {
+    override fun debuggerConfiguration(name: String, configPath: String, javaPort: Int): org.elixir_lang.debugger.Configuration {
+        val debugger = org.elixir_lang.debugger.Configuration(name, project, factory)
+        debugger.erlArgumentList.addAll(erlArgumentList)
+        debugger.erlArgumentList.addAll(arrayOf("-name", name))
+        debugger.erlArgumentList.addAll(arrayOf("-config", configPath))
+
+        debugger.elixirArgumentList.addAll(elixirArgumentList)
+
+        return debugger
+    }
+
+    override fun debuggedConfiguration(name: String, configPath: String): org.elixir_lang.mix.Configuration {
+        val debugged = org.elixir_lang.mix.Configuration(this.name, project, factory)
+
+        debugged.erlArgumentList.addAll(erlArgumentList)
+        debugged.erlArgumentList.addAll(arrayOf("-name", name))
+        debugged.erlArgumentList.addAll(arrayOf("-config", configPath))
+        debugged.erlArgumentList.addAll(Modules.erlArgumentList())
+
+        debugged.elixirArgumentList.addAll(elixirArgumentList)
+
+        debugged.mixArgumentList.addAll(mixArgumentList)
+
+        return debugged
+    }
+
     override fun getProgramParameters(): String? = mixArguments
 
     override fun setProgramParameters(value: String?) {

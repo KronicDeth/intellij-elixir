@@ -1,9 +1,9 @@
-defmodule Mix.Tasks.IntellijElixir.DebugTask do
+defmodule Mix.Tasks.IntellijElixir.Debug do
   @moduledoc false
 
   use Mix.Task
 
-  alias IntellijElixir.DebugServer
+  alias IntelliJElixir.Debugger.Server
 
   # Functions
 
@@ -20,8 +20,8 @@ defmodule Mix.Tasks.IntellijElixir.DebugTask do
     elixir_module_name_patterns = elixir_module_name_patterns(options)
 
     state =
-      DebugServer.put_reject_elixir_module_name_patterns(
-        %DebugServer{
+      Server.put_reject_elixir_module_name_patterns(
+        %Server{
           port: Keyword.get(options, :debugger_port),
           task: {task_name, task_args}
         },
@@ -41,9 +41,9 @@ defmodule Mix.Tasks.IntellijElixir.DebugTask do
 
     {:ok, pid} =
       GenServer.start_link(
-        DebugServer,
+        Server,
         state,
-        name: IntellijElixir.DebugServer
+        name: Server
       )
 
     ref = Process.monitor(pid)
@@ -103,7 +103,7 @@ defmodule Mix.Tasks.IntellijElixir.DebugTask do
 
   defp interpret_modules_in(
          path,
-         state = %DebugServer{
+         state = %Server{
            reason_by_uninterpretable: acc_reason_by_uninterpretable,
            reject_regex: reject_regex,
            rejected_module_names: rejected_module_names
@@ -134,7 +134,7 @@ defmodule Mix.Tasks.IntellijElixir.DebugTask do
         end
       end)
 
-    %DebugServer{
+    %Server{
       state
       | reason_by_uninterpretable: Map.merge(acc_reason_by_uninterpretable, reason_by_uninterpretable),
         rejected_module_names: rejected ++ rejected_module_names

@@ -4,7 +4,7 @@ defmodule IntellijElixir.Debugger.Mixfile do
   def project do
     [
       app: :intellij_elixir_debugger,
-      version: "0.1.0",
+      version: "0.2.0",
       elixir: "~> 1.4",
       build_per_environment: false,
       build_embedded: Mix.env() == :prod,

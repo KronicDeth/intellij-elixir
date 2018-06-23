@@ -59,6 +59,10 @@ public class Node {
   }
 
   public void stop() {
+    addCommand(new Stop());
+  }
+
+  public void stopped() {
     myStopped.set(true);
   }
 
@@ -87,8 +91,8 @@ public class Node {
     addCommand(new RemoveBreakpoint(ElixirModulesUtil.INSTANCE.elixirModuleNameToErlang(module), line));
   }
 
-  public void runTask() {
-    addCommand(new RunTask());
+  public void connect(@NotNull String name) {
+    addCommand(new Connect(name));
   }
 
   public void stepInto() {

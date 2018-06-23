@@ -13,19 +13,49 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.Sdk
 import org.elixir_lang.ExUnit
 import org.elixir_lang.Level.V_1_4
+import org.elixir_lang.debugged.Modules
+import org.elixir_lang.debugger.configuration.Debuggable
 import org.elixir_lang.exunit.configuration.Editor
 import org.elixir_lang.exunit.configuration.Factory
 import org.elixir_lang.file.LevelPropertyPusher.level
 import org.elixir_lang.mix.ensureMostSpecificSdk
 import org.elixir_lang.run.*
-import org.elixir_lang.run.Configuration
 import org.elixir_lang.sdk.elixir.Type.mostSpecificSdk
 import org.jdom.Element
 
 class Configuration(name: String, project: Project) :
-        Configuration(name, project, Factory),
+        org.elixir_lang.run.Configuration(name, project, Factory),
+        Debuggable<org.elixir_lang.exunit.Configuration>,
         RunConfigurationWithSuppressedDefaultRunAction,
         RunConfigurationWithSuppressedDefaultDebugAction {
+    override fun debuggerConfiguration(name: String, configPath: String, javaPort: Int): org.elixir_lang.debugger.Configuration {
+        val debugger = org.elixir_lang.debugger.Configuration(name, project, factory)
+        debugger.erlArgumentList.addAll(erlArgumentList)
+        debugger.erlArgumentList.addAll(arrayOf("-name", name))
+        debugger.erlArgumentList.addAll(arrayOf("-config", configPath))
+
+        debugger.elixirArgumentList.addAll(elixirArgumentList)
+        debugger.javaPort = javaPort
+
+        return debugger
+    }
+
+    override fun debuggedConfiguration(name: String, configPath: String): Configuration {
+        val debugged = Configuration(this.name, project)
+
+        debugged.erlArgumentList.addAll(erlArgumentList)
+        debugged.erlArgumentList.addAll(arrayOf("-name", name))
+        debugged.erlArgumentList.addAll(arrayOf("-config", configPath))
+        debugged.erlArgumentList.addAll(Modules.erlArgumentList())
+
+        debugged.elixirArgumentList.addAll(elixirArgumentList)
+
+        debugged.mixTestArgumentList.addAll(mixTestArgumentList)
+        debugged.mixTestArgumentList.add("--trace")
+
+        return debugged
+    }
+
     val task
         get() =
             if (level(sdk()) >= V_1_4) {
@@ -50,13 +80,13 @@ class Configuration(name: String, project: Project) :
         mixTestArguments = value
     }
 
-    private var erlArgumentList: MutableList<String> = mutableListOf()
+    var erlArgumentList: MutableList<String> = mutableListOf()
 
     var erlArguments: String?
         get() = erlArgumentList.toArguments()
         set(arguments) = erlArgumentList.fromArguments(arguments)
 
-    private var elixirArgumentList: MutableList<String> = mutableListOf()
+    var elixirArgumentList: MutableList<String> = mutableListOf()
 
     var elixirArguments: String?
         get() = elixirArgumentList.toArguments()
@@ -66,7 +96,7 @@ class Configuration(name: String, project: Project) :
         get() = mixTestArgumentList.toArguments()
         set(arguments) = mixTestArgumentList.fromArguments(arguments)
 
-    private var mixTestArgumentList: MutableList<String> = mutableListOf()
+    var mixTestArgumentList: MutableList<String> = mutableListOf()
 
     fun commandLine(): GeneralCommandLine {
         val workingDirectory = ensureWorkingDirectory()

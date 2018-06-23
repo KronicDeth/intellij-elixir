@@ -23,8 +23,9 @@ object Elixir {
                 workingDirectory = workingDirectory,
                 erlangSdk = erlangSdk
         )
-        addElixir(commandLine, elixirSdk, erlangSdk)
+        // MUST be before `addElixir` because it ends with `-extra` which turns off argument parsing for `erl`
         commandLine.addParameters(erlParameters)
+        addElixir(commandLine, elixirSdk, erlangSdk)
 
         return commandLine
     }

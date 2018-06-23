@@ -46,7 +46,9 @@ class Runner : GenericProgramRunner<RunnerSettings>() {
 
     override fun canRun(executorId: String, profile: RunProfile): Boolean =
             DefaultDebugExecutor.EXECUTOR_ID == executorId &&
-                    (profile is org.elixir_lang.mix.Configuration || profile is org.elixir_lang.exunit.Configuration)
+                    (profile is org.elixir_lang.iex.Configuration ||
+                            profile is org.elixir_lang.mix.Configuration ||
+                            profile is org.elixir_lang.exunit.Configuration)
 }
 
 private const val ELIXIR_DEBUG_RUNNER_ID = "ElixirDebugRunner"

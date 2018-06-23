@@ -29,9 +29,16 @@ abstract class Event {
     companion object {
         fun from(message: OtpErlangObject): Event? =
             when (message) {
+                is OtpErlangAtom -> from(message)
                 is OtpErlangTuple -> from(message)
                 else -> null
             }
+
+        fun from(message: OtpErlangAtom): Event? =
+                when (message.atomValue()) {
+                    Stopped.NAME -> Stopped
+                    else -> null
+                }
 
         fun from(message: OtpErlangTuple): Event? =
             if (message.arity() > 0) {
