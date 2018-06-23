@@ -31,7 +31,15 @@ class State(environment: ExecutionEnvironment, private val configuration: Config
     }
 
     @Throws(ExecutionException::class)
-    override fun startProcess(): ProcessHandler {
+    override fun startProcess(): ProcessHandler =
+        processHandler().apply {
+            /* KillProcessSoftly kills with SIGINT, but SIGINT will just bring up the BREAK VM control menu in iex,
+               which we don't want, so kill violently with SIGKILL immediately. */
+            setShouldKillProcessSoftly(false)
+        }
+
+    @Throws(ExecutionException::class)
+    private fun processHandler(): org.elixir_lang.iex.ProcessHandler {
         val commandLine = configuration.commandLine()
 
         try {
