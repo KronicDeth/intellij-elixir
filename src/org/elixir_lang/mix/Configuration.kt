@@ -32,6 +32,8 @@ open class Configuration(name: String, project: Project, configurationFactory: C
 
         debugger.elixirArgumentList.addAll(elixirArgumentList)
 
+        debugger.javaPort = javaPort
+
         return debugger
     }
 
