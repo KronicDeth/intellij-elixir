@@ -70,6 +70,7 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
     }
 
     override fun createConsole(): ExecutionConsole = debuggedExecutionResult.executionConsole
+    override fun createTabLayouter(): TabLayouter = TabLayouter(debuggerExecutionResult.executionConsole)
 
     private fun sourcePosition(breakpoint: XLineBreakpoint<Properties>): SourcePosition? =
         breakpoint.sourcePosition?.let { SourcePosition.create(it) }

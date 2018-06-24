@@ -28,7 +28,9 @@ class State(environment: ExecutionEnvironment, private val configuration: Config
             }
         }
         setConsoleBuilder(consoleBuilder)
-        return super.execute(executor, runner)
+        val executionResult = super.execute(executor, runner)
+        executionResult.processHandler.startNotify()
+        return executionResult
     }
 
     @Throws(ExecutionException::class)
