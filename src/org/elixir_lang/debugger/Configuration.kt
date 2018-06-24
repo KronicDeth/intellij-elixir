@@ -53,6 +53,12 @@ class Configuration(name: String, project: Project, configurationFactory: Config
                 elixirArgumentList + Modules.requiresList()
         )
         commandLine.addParameter("intellij_elixir.debug")
+
+        assert(javaPort != null) {
+            "Port for Java node not set before generating Elixir debugger node command line.  " +
+                    "It would not be able to communicate with Java node."
+        }
+
         commandLine.addParameters("--debugger-port", javaPort.toString())
 
         Settings.Companion.getInstance().enabledModuleFilterPatternList().forEach { doNotInterpretPatterns ->
