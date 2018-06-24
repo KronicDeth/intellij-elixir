@@ -22,7 +22,6 @@ class State(environment: ExecutionEnvironment, private val configuration: Config
         val project = configuration.project
 
         val processHandler = startProcess()
-        processHandler.processInput
         val console = TerminalExecutionConsole(project, processHandler)
         ElixirConsoleUtil.attachFilters(project, console)
         processHandler.startNotify()
