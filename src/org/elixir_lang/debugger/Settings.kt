@@ -108,6 +108,9 @@ class Settings(moduleFilters: List<ModuleFilter> = defaultModuleFilters()):
                 ModuleFilter(pattern = "IEx.*"),
                 ModuleFilter(pattern = "IO"),
                 ModuleFilter(pattern = "IO.*"),
+                // inch_ex
+                ModuleFilter(pattern = "InchEx"),
+                ModuleFilter(pattern = "InchEx.*"),
                 ModuleFilter(pattern = "Inspect"),
                 ModuleFilter(pattern = "Inspect.*"),
                 ModuleFilter(pattern = "Kernel"),
