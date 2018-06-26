@@ -70,7 +70,11 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
     }
 
     override fun createConsole(): ExecutionConsole = debuggedExecutionResult.executionConsole
-    override fun createTabLayouter(): TabLayouter = TabLayouter(debuggerExecutionResult.executionConsole)
+    override fun createTabLayouter(): TabLayouter = tabLayouter
+
+    private val tabLayouter by lazy {
+        TabLayouter(node, debuggerExecutionResult.executionConsole)
+    }
 
     private fun sourcePosition(breakpoint: XLineBreakpoint<Properties>): SourcePosition? =
         breakpoint.sourcePosition?.let { SourcePosition.create(it) }
@@ -217,6 +221,10 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
         session.reportMessage("Failed to set breakpoint. Module: " + module + " Line: " + (line + 1), MessageType.WARNING)
     }
 
+    override fun interpretedModules(interpretedModuleList: List<InterpretedModule>) {
+        tabLayouter.interpretedModules(interpretedModuleList)
+    }
+
     override fun getBreakpointHandlers(): Array<XBreakpointHandler<*>> = breakpointHandlers
 
     override fun getEditorsProvider(): XDebuggerEditorsProvider {
@@ -319,7 +327,10 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
             override fun processWillTerminate(event: ProcessEvent, willBeDestroyed: Boolean) {}
 
             override fun processTerminated(event: ProcessEvent) {
-                session.reportMessage(event.text, MessageType.INFO)
+                event.text?.let { text ->
+                    session.reportMessage(text, MessageType.INFO)
+                }
+
                 session.reportMessage("Debugger node terminated", MessageType.INFO)
 
                 debuggedExecutionResult.processHandler.destroyProcess()
@@ -329,6 +340,7 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
         })
 
         node.connect(debuggedName)
+        node.interpreted()
     }
 
     override fun startStepInto() {

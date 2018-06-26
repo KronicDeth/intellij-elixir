@@ -7,12 +7,17 @@ import com.intellij.icons.AllIcons
 import com.intellij.ui.content.Content
 import com.intellij.xdebugger.ui.XDebugTabLayouter
 
-class TabLayouter(private val debuggerConsole: ExecutionConsole) : XDebugTabLayouter() {
+class TabLayouter(private val node: Node, private val debuggerConsole: ExecutionConsole) : XDebugTabLayouter() {
+    private val interpretedModuleEditor: org.elixir_lang.debugger.interpreted_modules.Editor by lazy {
+        org.elixir_lang.debugger.interpreted_modules.Editor(node)
+    }
+
     override fun registerConsoleContent(ui: RunnerLayoutUi, console: ExecutionConsole): Content =
             registerDebuggedConsoleContent(ui, console)
 
     override fun registerAdditionalContent(ui: RunnerLayoutUi) {
         registerDebuggerConsoleContent(ui, debuggerConsole)
+        registerInterpretedModules(ui)
     }
 
     private fun registerDebuggedConsoleContent(ui: RunnerLayoutUi, console: ExecutionConsole): Content =
@@ -41,5 +46,16 @@ class TabLayouter(private val debuggerConsole: ExecutionConsole) : XDebugTabLayo
         ui.addContent(content, defaultTabId, defaultPlaceInGrid, defaultMinimized)
 
         return content
+    }
+
+    private fun registerInterpretedModules(ui: RunnerLayoutUi): Content {
+        val content = ui.createContent("InterpretedModulesContent", interpretedModuleEditor, "Interpreted Modules", AllIcons.General.Filter, interpretedModuleEditor.table)
+        ui.addContent(content, 0, PlaceInGrid.left, true)
+
+        return content
+    }
+
+    fun interpretedModules(interpretedModuleList: List<InterpretedModule>) {
+        interpretedModuleEditor.interpretedModules(interpretedModuleList)
     }
 }

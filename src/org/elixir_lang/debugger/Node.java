@@ -95,6 +95,18 @@ public class Node {
     addCommand(new Connect(name));
   }
 
+  public void interpret(@NotNull OtpErlangAtom module) {
+    addCommand(new Interpret(module));
+  }
+
+  public void interpreted() {
+    addCommand(new Interpreted());
+  }
+
+  public void stopInterpreting(@NotNull OtpErlangAtom module) {
+    addCommand(new StopInterpreting(module));
+  }
+
   public void stepInto() {
     OtpErlangPid pid = myLastSuspendedPid;
     addCommand(new Pid("step_into", pid));

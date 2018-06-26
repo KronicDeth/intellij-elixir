@@ -24,7 +24,7 @@ class Editor: JPanel(BorderLayout()), ComponentWithEmptyText {
          }
 
     private val tableModel = Model()
-    private val table = JBTable(tableModel).apply {
+    val table = JBTable(tableModel).apply {
         setShowGrid(false)
         intercellSpacing = Dimension(0, 0)
         autoResizeMode = JTable.AUTO_RESIZE_LAST_COLUMN

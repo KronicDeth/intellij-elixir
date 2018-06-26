@@ -31,6 +31,40 @@ defmodule IntelliJElixir.Debugger.Server do
 
   @impl GenServer
 
+  def handle_cast({:interpret, module}, state = %__MODULE__{socket: socket}) when is_atom(module) do
+    status =
+      case :int.ni(module) do
+        {:module, ^module} -> :ok
+        :error = error -> error
+      end
+
+    send_message(socket, {:interpreted, module, status})
+
+    {:noreply, state}
+  end
+
+  def handle_cast(:interpreted, state = %__MODULE__{socket: socket}) do
+    interpreted_set = :int.interpreted()
+                      |> MapSet.new()
+    interpreted_modules =
+      :code.all_loaded()
+      |> Stream.map(fn {module, _file} -> module end)
+      |> Enum.sort()
+      |> Enum.map(fn module ->
+        {module in interpreted_set, module}
+      end)
+
+    send_message(socket, {:interpreted, interpreted_modules})
+
+    {:noreply, state}
+  end
+
+  def handle_cast({:stop_interpreting, module}, state = %__MODULE__{socket: socket}) do
+    :int.nn(module)
+    send_message(socket, {:stopped_interpreting, module})
+    {:noreply, state}
+  end
+
   def handle_cast(
         :reason_by_uninterpretable,
         state = %__MODULE__{socket: socket, reason_by_uninterpretable: reason_by_uninterpretable}
