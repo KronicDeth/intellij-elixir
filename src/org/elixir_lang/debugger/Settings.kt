@@ -84,6 +84,9 @@ class Settings(moduleFilters: List<ModuleFilter> = defaultModuleFilters()):
                 ModuleFilter(pattern = "Decimal"),
                 ModuleFilter(pattern = "Dict"),
                 ModuleFilter(pattern = "DynamicSupervisor"),
+                // earmark
+                ModuleFilter(pattern = "Earmark"),
+                ModuleFilter(pattern = "Earmark.*"),
                 ModuleFilter(pattern = "Ecto"),
                 ModuleFilter(pattern = "Ecto.*"),
                 ModuleFilter(pattern = "Enum"),
