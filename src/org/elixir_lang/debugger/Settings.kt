@@ -73,6 +73,9 @@ class Settings(moduleFilters: List<ModuleFilter> = defaultModuleFilters()):
                 ModuleFilter(pattern = "Collectable"),
                 ModuleFilter(pattern = "Collectable.*"),
                 ModuleFilter(pattern = "Connection"),
+                // credo
+                ModuleFilter(pattern = "Credo"),
+                ModuleFilter(pattern = "Credo.*"),
                 ModuleFilter(pattern = "DBConnection"),
                 ModuleFilter(pattern = "DBConnection.*"),
                 ModuleFilter(pattern = "Date"),
