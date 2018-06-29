@@ -9,13 +9,14 @@ import com.intellij.execution.configurations.RunProfileState
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.execution.runners.RunConfigurationWithSuppressedDefaultRunAction
 import com.intellij.openapi.options.SettingsEditor
+import com.intellij.openapi.options.SettingsEditorGroup
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.Sdk
 import org.elixir_lang.ExUnit
 import org.elixir_lang.Level.V_1_4
 import org.elixir_lang.debugged.Modules
 import org.elixir_lang.debugger.configuration.Debuggable
-import org.elixir_lang.exunit.configuration.Editor
+import org.elixir_lang.debugger.settings.stepping.ModuleFilter
 import org.elixir_lang.exunit.configuration.Factory
 import org.elixir_lang.file.LevelPropertyPusher.level
 import org.elixir_lang.mix.ensureMostSpecificSdk
@@ -28,6 +29,9 @@ class Configuration(name: String, project: Project) :
         Debuggable<org.elixir_lang.exunit.Configuration>,
         RunConfigurationWithSuppressedDefaultRunAction,
         RunConfigurationWithSuppressedDefaultDebugAction {
+    override var inheritApplicationModuleFilters: Boolean = true
+    override var moduleFilterList: MutableList<ModuleFilter> = mutableListOf()
+
     override fun debuggerConfiguration(name: String, configPath: String, javaPort: Int): org.elixir_lang.debugger.Configuration {
         val debugger = org.elixir_lang.debugger.Configuration(name, project, factory)
         debugger.erlArgumentList.addAll(erlArgumentList)
@@ -42,6 +46,9 @@ class Configuration(name: String, project: Project) :
         debugger.isPassParentEnvs = isPassParentEnvs
         debugger.envs = envs
         debugger.configurationModule.module = configurationModule.module
+
+        debugger.inheritApplicationModuleFilters = inheritApplicationModuleFilters
+        debugger.moduleFilterList = moduleFilterList
 
         return debugger
     }
@@ -119,7 +126,11 @@ class Configuration(name: String, project: Project) :
         return commandLine
     }
 
-    override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> = Editor()
+    override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> =
+            SettingsEditorGroup<Configuration>().apply {
+                this.addEditor("Configuration", org.elixir_lang.exunit.configuration.Editor())
+                this.addEditor("Interpreted Modules", org.elixir_lang.debugger.configuration.interpreted_modules.Editor<Configuration>())
+            }
 
     override fun getState(executor: Executor, environment: ExecutionEnvironment): RunProfileState =
             State(environment, this)
@@ -132,6 +143,9 @@ class Configuration(name: String, project: Project) :
         workingDirectoryURL = element.readExternalWorkingDirectory()
         EnvironmentVariablesComponent.readExternal(element, envs)
         element.readExternalModule(this)
+        element.readModuleFilters(moduleFilterList) { inheritApplicationModuleFilters ->
+            this.inheritApplicationModuleFilters = inheritApplicationModuleFilters
+        }
     }
 
     override fun writeExternal(element: Element) {
@@ -142,6 +156,7 @@ class Configuration(name: String, project: Project) :
         element.writeExternalWorkingDirectory(workingDirectoryURL)
         EnvironmentVariablesComponent.writeExternal(element, envs)
         element.writeExternalModule(this)
+        element.writeModuleFilters(moduleFilterList, inheritApplicationModuleFilters)
     }
 }
 

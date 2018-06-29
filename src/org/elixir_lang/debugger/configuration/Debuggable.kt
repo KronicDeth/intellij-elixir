@@ -1,6 +1,7 @@
 package org.elixir_lang.debugger.configuration
 
 import com.intellij.openapi.project.Project
+import org.elixir_lang.debugger.settings.stepping.ModuleFilter
 
 /**
  * A [com.intellij.execution.configurations.RunConfiguration] that can be debugged by [org.elixir_lang.debugger.Process]
@@ -31,4 +32,15 @@ interface Debuggable<out T : org.elixir_lang.run.Configuration> {
      * @return the project instance.
      */
     fun getProject(): Project
+
+    /**
+     * Whether to use ModuleFilters from Preferences > Build, Execution, Deployment > Debugger > Stepping > Elixir
+     */
+    var inheritApplicationModuleFilters: Boolean
+
+    /**
+     * 1. The enabled of new module filters added on top of the Preferences > Build, Execution, Deployment > Debugger > Stepping > Elixir.
+     * 2. The disabled module filters inherited from Preferences > Build, Execution, Deployment > Debugger > Stepping > Elixir.
+     */
+    var moduleFilterList: MutableList<ModuleFilter>
 }

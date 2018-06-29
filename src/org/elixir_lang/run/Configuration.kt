@@ -10,6 +10,7 @@ import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.vfs.VfsUtil
+import org.elixir_lang.debugger.settings.stepping.ModuleFilter
 import org.elixir_lang.run.configuration.Module
 import org.jdom.Element
 import java.io.File
@@ -72,6 +73,62 @@ fun Element.readExternalArgumentList(command: String, argumentList: MutableList<
     } ?: emptyList()
 
     argumentList.addAll(newArgumentList)
+}
+
+const val MODULE_FILTERS = "module-filters"
+const val INHERIT_APPLICATION_MODULE_FILTERS = "inherit-application-module-filters"
+const val MODULE_FILTER = "module-filter"
+const val ENABLED = "enabled"
+const val PATTERN = "pattern"
+
+fun Element.writeModuleFilters(moduleFilterList: List<ModuleFilter>, inheritApplicationModuleFilters: Boolean) {
+    val moduleFiltersElement = Element(MODULE_FILTERS)
+    moduleFiltersElement.setAttribute(INHERIT_APPLICATION_MODULE_FILTERS, inheritApplicationModuleFilters.toString())
+
+    moduleFilterList.forEach {
+        moduleFiltersElement.writeModuleFilter(it)
+    }
+
+    addContent(moduleFiltersElement)
+}
+
+fun Element.writeModuleFilter(moduleFilter: ModuleFilter) {
+    val moduleFilterElement = Element(MODULE_FILTER)
+    moduleFilterElement.setAttribute(ENABLED, moduleFilter.enabled.toString())
+    moduleFilterElement.setAttribute(PATTERN, moduleFilter.pattern)
+
+    addContent(moduleFilterElement)
+}
+
+fun Element.readModuleFilters(
+        moduleFilterList: MutableList<ModuleFilter>,
+        inheritApplicationModuleFiltersSetter: (inheritApplicationModuleFilters: Boolean) -> Unit
+) {
+    moduleFilterList.clear()
+
+    val moduleFiltersElement = getChild(MODULE_FILTERS)
+
+    if (moduleFiltersElement != null) {
+        inheritApplicationModuleFiltersSetter(
+                moduleFiltersElement
+                        .getAttributeValue(INHERIT_APPLICATION_MODULE_FILTERS)?.toBoolean()
+                        ?: false
+        )
+
+        moduleFiltersElement
+                .getChildren(MODULE_FILTER)
+                .map { moduleFilterElement ->
+                    val enabled = moduleFilterElement.getAttributeValue(ENABLED)!!.toBoolean()
+                    val pattern = moduleFilterElement.getAttributeValue(PATTERN)!!
+
+                    ModuleFilter(enabled, pattern)
+                }
+                .let {
+                    moduleFilterList.addAll(it)
+                }
+    } else {
+        inheritApplicationModuleFiltersSetter(false)
+    }
 }
 
 fun Element.writeExternalModule(configuration: Configuration) {

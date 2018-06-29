@@ -6,12 +6,13 @@ import com.intellij.execution.configurations.*
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.execution.runners.RunConfigurationWithSuppressedDefaultRunAction
 import com.intellij.openapi.options.SettingsEditor
+import com.intellij.openapi.options.SettingsEditorGroup
 import com.intellij.openapi.project.Project
 import com.intellij.psi.search.GlobalSearchScope
 import org.elixir_lang.Mix
 import org.elixir_lang.debugged.Modules
 import org.elixir_lang.debugger.configuration.Debuggable
-import org.elixir_lang.mix.configuration.Editor
+import org.elixir_lang.debugger.settings.stepping.ModuleFilter
 import org.elixir_lang.run.*
 import org.elixir_lang.run.Configuration
 import org.jdom.Element
@@ -24,6 +25,9 @@ open class Configuration(name: String, project: Project, configurationFactory: C
         Debuggable<org.elixir_lang.mix.Configuration>,
         RunConfigurationWithSuppressedDefaultRunAction,
         RunConfigurationWithSuppressedDefaultDebugAction {
+    override var inheritApplicationModuleFilters: Boolean = true
+    override var moduleFilterList: MutableList<ModuleFilter> = mutableListOf()
+
     override fun debuggerConfiguration(name: String, configPath: String, javaPort: Int): org.elixir_lang.debugger.Configuration {
         val debugger = org.elixir_lang.debugger.Configuration(name, project, factory)
         debugger.erlArgumentList.addAll(erlArgumentList)
@@ -38,6 +42,9 @@ open class Configuration(name: String, project: Project, configurationFactory: C
         debugger.isPassParentEnvs = isPassParentEnvs
         debugger.envs = envs
         debugger.configurationModule.module = configurationModule.module
+
+        debugger.inheritApplicationModuleFilters = inheritApplicationModuleFilters
+        debugger.moduleFilterList = moduleFilterList
 
         return debugger
     }
@@ -96,7 +103,11 @@ open class Configuration(name: String, project: Project, configurationFactory: C
         return commandLine
     }
 
-    override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> = Editor()
+    override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> =
+            SettingsEditorGroup<org.elixir_lang.mix.Configuration>().apply {
+                this.addEditor("Configuration", org.elixir_lang.mix.configuration.Editor())
+                this.addEditor("Interpreted Modules", org.elixir_lang.debugger.configuration.interpreted_modules.Editor<org.elixir_lang.mix.Configuration>())
+            }
 
     /**
      * getModules changed to getSearchScope in
@@ -120,6 +131,9 @@ open class Configuration(name: String, project: Project, configurationFactory: C
         workingDirectoryURL = element.readExternalWorkingDirectory()
         EnvironmentVariablesComponent.readExternal(element, envs)
         element.readExternalModule(this)
+        element.readModuleFilters(moduleFilterList) { inheritApplicationModuleFilters ->
+            this.inheritApplicationModuleFilters = inheritApplicationModuleFilters
+        }
     }
 
     override fun writeExternal(element: Element) {
@@ -130,5 +144,6 @@ open class Configuration(name: String, project: Project, configurationFactory: C
         element.writeExternalWorkingDirectory(workingDirectoryURL)
         EnvironmentVariablesComponent.writeExternal(element, envs)
         element.writeExternalModule(this)
+        element.writeModuleFilters(moduleFilterList, inheritApplicationModuleFilters)
     }
 }
