@@ -30,6 +30,11 @@ class Configuration(name: String, project: Project, configurationFactory: Config
 
         debugger.javaPort = javaPort
 
+        debugger.workingDirectory = workingDirectory
+        debugger.isPassParentEnvs = isPassParentEnvs
+        debugger.envs = envs
+        debugger.configurationModule.module = configurationModule.module
+
         return debugger
     }
 
@@ -42,6 +47,11 @@ class Configuration(name: String, project: Project, configurationFactory: Config
         debugged.erlArgumentList.addAll(Modules.erlArgumentList())
 
         debugged.iexArgumentList.addAll(iexArgumentList)
+
+        debugged.workingDirectory = workingDirectory
+        debugged.isPassParentEnvs = isPassParentEnvs
+        debugged.envs = envs
+        debugged.configurationModule.module = configurationModule.module
 
         return debugged
     }

@@ -35,7 +35,13 @@ class Configuration(name: String, project: Project) :
         debugger.erlArgumentList.addAll(arrayOf("-config", configPath))
 
         debugger.elixirArgumentList.addAll(elixirArgumentList)
+
         debugger.javaPort = javaPort
+
+        debugger.workingDirectory = workingDirectory
+        debugger.isPassParentEnvs = isPassParentEnvs
+        debugger.envs = envs
+        debugger.configurationModule.module = configurationModule.module
 
         return debugger
     }
@@ -52,6 +58,11 @@ class Configuration(name: String, project: Project) :
 
         debugged.mixTestArgumentList.addAll(mixTestArgumentList)
         debugged.mixTestArgumentList.add("--trace")
+
+        debugged.workingDirectory = workingDirectory
+        debugged.isPassParentEnvs = isPassParentEnvs
+        debugged.envs = envs
+        debugged.configurationModule.module = configurationModule.module
 
         return debugged
     }

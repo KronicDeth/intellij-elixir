@@ -34,6 +34,11 @@ open class Configuration(name: String, project: Project, configurationFactory: C
 
         debugger.javaPort = javaPort
 
+        debugger.workingDirectory = workingDirectory
+        debugger.isPassParentEnvs = isPassParentEnvs
+        debugger.envs = envs
+        debugger.configurationModule.module = configurationModule.module
+
         return debugger
     }
 
@@ -48,6 +53,11 @@ open class Configuration(name: String, project: Project, configurationFactory: C
         debugged.elixirArgumentList.addAll(elixirArgumentList)
 
         debugged.mixArgumentList.addAll(mixArgumentList)
+
+        debugged.workingDirectory = workingDirectory
+        debugged.isPassParentEnvs = isPassParentEnvs
+        debugged.envs = envs
+        debugged.configurationModule.module = configurationModule.module
 
         return debugged
     }
