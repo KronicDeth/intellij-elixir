@@ -260,7 +260,7 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
             when (psiFile) {
                 is ElixirFile -> // TODO allow multiple module names for `defimpl`
                     element?.getModuleName()?.let { setOf(it) } ?: emptySet()
-                is File -> {
+                is org.elixir_lang.eex.File -> {
                     val module = ModuleUtilCore.findModuleForPsiElement(psiFile)
                     val rootDirectory = ensureWorkingDirectory(project, module)
 
