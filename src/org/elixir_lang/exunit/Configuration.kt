@@ -44,7 +44,12 @@ class Configuration(name: String, project: Project) :
 
         debugger.workingDirectory = workingDirectory
         debugger.isPassParentEnvs = isPassParentEnvs
-        debugger.envs = envs
+
+        val debuggedEnvs = mutableMapOf<String, String>()
+        debuggedEnvs.putAll(envs)
+        debuggedEnvs.putIfAbsent("MIX_ENV", "test")
+        debugger.envs = debuggedEnvs
+
         debugger.configurationModule.module = configurationModule.module
 
         debugger.inheritApplicationModuleFilters = inheritApplicationModuleFilters
