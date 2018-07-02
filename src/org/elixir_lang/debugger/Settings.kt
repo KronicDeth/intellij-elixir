@@ -64,6 +64,11 @@ class Settings(moduleFilters: List<ModuleFilter> = defaultModuleFilters()):
                 ModuleFilter(pattern = "Base"),
                 // bcrypt_elixir
                 ModuleFilter(pattern = "Bcrypt.Base"),
+                /* Benchee is for benchmarking, you probably don't want to benchmark while debugging.  Developers of
+                   Benchee itself, can either turn off this filter OR placing breakpoints in a specific module will
+                   still allow it to be interpreted */
+                ModuleFilter(pattern = "Benchee"),
+                ModuleFilter(pattern = "Benchee.*"),
                 ModuleFilter(pattern = "Behaviour"),
                 ModuleFilter(pattern = "Bitwise"),
                 ModuleFilter(pattern = "Calendar"),
