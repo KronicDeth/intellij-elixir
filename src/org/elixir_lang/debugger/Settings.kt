@@ -97,6 +97,9 @@ class Settings(moduleFilters: List<ModuleFilter> = defaultModuleFilters()):
                 ModuleFilter(pattern = "Enum"),
                 ModuleFilter(pattern = "Enumerable"),
                 ModuleFilter(pattern = "Enumerable.*"),
+                // excoveralls
+                ModuleFilter(pattern = "ExCoveralls"),
+                ModuleFilter(pattern = "ExCoveralls.*"),
                 // ex_doc
                 ModuleFilter(pattern = "ExDoc"),
                 ModuleFilter(pattern = "ExDoc.*"),
