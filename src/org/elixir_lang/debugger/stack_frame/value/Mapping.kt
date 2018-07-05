@@ -16,15 +16,21 @@
  * limitations under the License.
  */
 
-package org.elixir_lang.debugger.stack_frame.value.list
+package org.elixir_lang.debugger.stack_frame.value
 
-import com.ericsson.otp.erlang.OtpErlangList
+import com.ericsson.otp.erlang.OtpErlangObject
+import com.ericsson.otp.erlang.OtpErlangTuple
+import com.intellij.xdebugger.frame.XCompositeNode
 import com.intellij.xdebugger.frame.XValueChildrenList
-import org.elixir_lang.debugger.stack_frame.value.Indexed
-import org.elixir_lang.debugger.stack_frame.value.add
 
-internal class Proper(term: OtpErlangList) : Indexed<OtpErlangList>(term, term.arity()) {
-    override fun computeChild(children: XValueChildrenList, index: Int) {
-        children.add(index, term.elementAt(index))
+internal class Mapping(private val key: OtpErlangObject, private val value: OtpErlangObject) :
+        Presentable<OtpErlangTuple>(OtpErlangTuple(arrayOf(key, value))) {
+    override val hasChildren: Boolean = true
+
+    override fun computeChildren(node: XCompositeNode) {
+        val children = XValueChildrenList(2)
+        children.add("key", key)
+        children.add("value", value)
+        node.addChildren(children, true)
     }
 }

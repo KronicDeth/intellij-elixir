@@ -6,11 +6,9 @@ import com.intellij.openapi.diagnostic.Logger
 import org.elixir_lang.beam.term.inspect
 
 object Bindings {
-    private const val ARITY = 2
-
     private val LOGGER = Logger.getInstance(Bindings.javaClass)
 
-    fun from(term: OtpErlangObject) =
+    fun from(term: OtpErlangObject): List<Binding>? =
         when (term) {
             is OtpErlangList -> from(term)
             else -> {
@@ -21,7 +19,7 @@ object Bindings {
         }
 
     private fun from(list: OtpErlangList) =
-            list.asSequence().mapNotNull {
-                Binding.from(it)
-            }.associate { it }
+            list
+                    .mapNotNull { Binding.from(it) }
+                    .toList()
 }

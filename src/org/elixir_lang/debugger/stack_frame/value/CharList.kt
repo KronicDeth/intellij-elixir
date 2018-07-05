@@ -16,23 +16,19 @@
  * limitations under the License.
  */
 
-package org.elixir_lang.debugger.stack_frame.value;
+package org.elixir_lang.debugger.stack_frame.value
 
-import com.ericsson.otp.erlang.OtpErlangPort;
-import com.intellij.xdebugger.frame.XCompositeNode;
-import com.intellij.xdebugger.frame.XValueChildrenList;
-import org.jetbrains.annotations.NotNull;
+import com.ericsson.otp.erlang.OtpErlangString
+import com.intellij.xdebugger.frame.ImmediateFullValueEvaluator
+import com.intellij.xdebugger.frame.XValueNode
+import com.intellij.xdebugger.frame.XValuePlace
 
-public class Port extends Base<OtpErlangPort> {
-  Port(OtpErlangPort value) {
-    super(value, 2);
-  }
-
-  @Override
-  public void computeChildren(@NotNull XCompositeNode node) {
-    XValueChildrenList childrenList = new XValueChildrenList(2);
-    addNamedChild(childrenList, getValue().node(), "node");
-    addNamedChild(childrenList, getValue().id(), "id");
-    node.addChildren(childrenList, true);
-  }
+internal class CharList(term: OtpErlangString) : Primitive<OtpErlangString>(term) {
+    override fun computePresentation(node: XValueNode, place: XValuePlace) {
+        val text = term.stringValue()
+        if (text.length > XValueNode.MAX_VALUE_LENGTH) {
+            node.setFullValueEvaluator(ImmediateFullValueEvaluator(text))
+        }
+        super.computePresentation(node, place)
+    }
 }

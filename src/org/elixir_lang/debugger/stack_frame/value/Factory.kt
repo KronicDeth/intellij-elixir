@@ -18,13 +18,12 @@
 package org.elixir_lang.debugger.stack_frame.value
 
 import com.ericsson.otp.erlang.*
-import com.intellij.xdebugger.frame.XValue
 import org.elixir_lang.debugger.stack_frame.value.list.Improper
 import org.elixir_lang.debugger.stack_frame.value.list.Proper
 
 object Factory {
     @JvmStatic
-    fun create(term: OtpErlangObject): XValue =
+    fun create(term: OtpErlangObject): Presentable<*> =
             when (term) {
                 is OtpErlangLong, is OtpErlangDouble -> Numeric(term)
                 is OtpErlangAtom -> Atom(term)
@@ -55,7 +54,7 @@ object Factory {
                     if (term is OtpErlangMap) {
                         Map(term)
                     } else {
-                        PrimitiveBase(term)
+                        Primitive(term)
                     }
             }
 }

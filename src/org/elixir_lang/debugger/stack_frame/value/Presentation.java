@@ -30,13 +30,13 @@ import java.nio.charset.Charset;
 import java.util.Map;
 
 public class Presentation extends com.intellij.xdebugger.frame.presentation.XValuePresentation {
-  private final OtpErlangObject myValue;
+  private final Object myValue;
 
-  public Presentation(OtpErlangObject value) {
+  public Presentation(Object value) {
     myValue = value;
   }
 
-  private static void renderObject(OtpErlangObject o, XValueTextRenderer renderer) {
+  private static void renderObject(Object o, XValueTextRenderer renderer) {
     if (o instanceof OtpErlangMap) {
       renderMap((OtpErlangMap) o, renderer);
     } else if (o instanceof OtpErlangAtom) {

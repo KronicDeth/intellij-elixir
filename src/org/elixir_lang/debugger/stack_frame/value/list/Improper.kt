@@ -2,23 +2,22 @@ package org.elixir_lang.debugger.stack_frame.value.list
 
 import com.ericsson.otp.erlang.OtpErlangList
 import com.intellij.icons.AllIcons
-import com.intellij.xdebugger.frame.*
-import org.elixir_lang.debugger.stack_frame.value.Base.addNamedChild
-import org.elixir_lang.debugger.stack_frame.value.Presentation
+import com.intellij.xdebugger.frame.XCompositeNode
+import com.intellij.xdebugger.frame.XValueChildrenList
+import org.elixir_lang.debugger.stack_frame.value.Presentable
+import org.elixir_lang.debugger.stack_frame.value.add
+import javax.swing.Icon
 
-class Improper(private val value: OtpErlangList): XValue() {
+class Improper(term: OtpErlangList): Presentable<OtpErlangList>(term) {
+    override val hasChildren: Boolean = true
+    override val icon: Icon = AllIcons.Debugger.Db_array
+
     override fun computeChildren(node: XCompositeNode) {
         val children = XValueChildrenList()
 
-        addNamedChild(children, value.head, "head")
-        addNamedChild(children, value.lastTail, "tail")
+        children.add("head", term.head)
+        children.add("tail", term.lastTail)
 
         node.addChildren(children, true)
-    }
-
-    override fun computePresentation(node: XValueNode, place: XValuePlace) {
-        val presentation = Presentation(value)
-
-        node.setPresentation(AllIcons.Debugger.Db_array, presentation, true)
     }
 }

@@ -16,15 +16,24 @@
  * limitations under the License.
  */
 
-package org.elixir_lang.debugger.stack_frame.value.list
+package org.elixir_lang.debugger.stack_frame.value
 
-import com.ericsson.otp.erlang.OtpErlangList
+import com.ericsson.otp.erlang.OtpErlangAtom
+import com.ericsson.otp.erlang.OtpErlangMap
 import com.intellij.xdebugger.frame.XValueChildrenList
-import org.elixir_lang.debugger.stack_frame.value.Indexed
-import org.elixir_lang.debugger.stack_frame.value.add
 
-internal class Proper(term: OtpErlangList) : Indexed<OtpErlangList>(term, term.arity()) {
+class Map internal constructor(term: OtpErlangMap) : LazyParent<OtpErlangMap>(term, term.arity()) {
     override fun computeChild(children: XValueChildrenList, index: Int) {
-        children.add(index, term.elementAt(index))
+        val key = term.keys()[index]
+        val value = term.get(key)
+
+        if (Presentation.hasSymbolKeys(term) && key is OtpErlangAtom) {
+            val keyString = key.atomValue()
+            if (keyString != "__struct__") {
+                children.add(keyString, value)
+            }
+        } else {
+            children.add(index, Mapping(key, value))
+        }
     }
 }

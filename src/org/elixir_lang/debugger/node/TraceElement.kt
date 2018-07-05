@@ -6,7 +6,7 @@ import com.intellij.openapi.diagnostic.Logger
 import org.elixir_lang.beam.term.inspect
 
 class TraceElement(val module: String, val function: String, val arguments: List<OtpErlangObject>,
-                   val bindings: Map<String, OtpErlangObject>, val file: String, val line: Int) {
+                   val bindings: List<Binding>, val file: String, val line: Int) {
     companion object {
         // {level, {module, function, arguments}, bindings, {file, line}}
         private const val ARITY = 4

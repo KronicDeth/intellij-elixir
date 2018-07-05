@@ -16,15 +16,13 @@
  * limitations under the License.
  */
 
-package org.elixir_lang.debugger.stack_frame.value.list
+package org.elixir_lang.debugger.stack_frame.value
 
-import com.ericsson.otp.erlang.OtpErlangList
+import com.ericsson.otp.erlang.OtpErlangBitstr
 import com.intellij.xdebugger.frame.XValueChildrenList
-import org.elixir_lang.debugger.stack_frame.value.Indexed
-import org.elixir_lang.debugger.stack_frame.value.add
 
-internal class Proper(term: OtpErlangList) : Indexed<OtpErlangList>(term, term.arity()) {
+internal class BitString(value: OtpErlangBitstr) : Indexed<OtpErlangBitstr>(value, value.binaryValue().size) {
     override fun computeChild(children: XValueChildrenList, index: Int) {
-        children.add(index, term.elementAt(index))
+        children.add(index, (term.binaryValue()[index].toInt() and 0xFF).toLong())
     }
 }

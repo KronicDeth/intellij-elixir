@@ -1,7 +1,7 @@
 /*
  * Copyright 2012-2014 Sergey Ignatov
  * Copyright 2017 Jake Becker
- * Copyright 2017 Luke Imhoff
+ * Copyright 2017-2018 Luke Imhoff
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,13 @@
  * limitations under the License.
  */
 
-package org.elixir_lang.debugger.stack_frame.value;
+package org.elixir_lang.debugger.stack_frame.value
 
-import com.ericsson.otp.erlang.OtpErlangBitstr;
+import com.ericsson.otp.erlang.OtpErlangTuple
+import com.intellij.xdebugger.frame.XValueChildrenList
 
-class String extends PrimitiveBase<OtpErlangBitstr> {
-  String(OtpErlangBitstr value) {
-    super(value);
-  }
+internal class Tuple(term: OtpErlangTuple) : Indexed<OtpErlangTuple>(term, term.arity()) {
+    override fun computeChild(children: XValueChildrenList, index: Int) {
+        children.add(index, term.elementAt(index))
+    }
 }
