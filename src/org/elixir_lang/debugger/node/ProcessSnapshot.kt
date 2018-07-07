@@ -18,7 +18,7 @@ class ProcessSnapshot(val pid: OtpErlangPid, val stack: List<TraceElement>) {
 
         private fun from(term: OtpErlangObject, index: Int): ProcessSnapshot? =
                 if (term is OtpErlangTuple) {
-                    from(term, index)
+                    from(term)
 
                 } else {
                     LOGGER.error("Element at index $index is not an OtpErlangTuple")
@@ -26,7 +26,7 @@ class ProcessSnapshot(val pid: OtpErlangPid, val stack: List<TraceElement>) {
                     null
                 }
 
-        private fun from(tuple: OtpErlangTuple, index: Int): ProcessSnapshot? {
+        private fun from(tuple: OtpErlangTuple): ProcessSnapshot? {
             val elementArity = tuple.arity()
 
             return if (elementArity == 5) {

@@ -18,6 +18,7 @@
 
 package org.elixir_lang.debugger
 
+import com.ericsson.otp.erlang.OtpErlangAtom
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangPid
 import com.intellij.execution.ExecutionException
@@ -47,6 +48,7 @@ import com.intellij.xdebugger.breakpoints.XBreakpointHandler
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint
 import com.intellij.xdebugger.evaluation.EvaluationMode
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider
+import com.intellij.xdebugger.evaluation.XDebuggerEvaluator
 import org.elixir_lang.ElixirFileType
 import org.elixir_lang.beam.chunk.lines.file_names.Index
 import org.elixir_lang.beam.term.inspect
@@ -161,7 +163,7 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
         val processInBreakpoint = ContainerUtil.find(snapshots) { elixirProcessSnapshot -> elixirProcessSnapshot.pid == pid }!!
         val breakPosition = SourcePosition.create(processInBreakpoint)
         val breakpoint = getLineBreakpoint(breakPosition)
-        val suspendContext = SuspendContext(pid, snapshots)
+        val suspendContext = SuspendContext(this, pid, snapshots)
         if (breakpoint == null) {
             session.positionReached(suspendContext)
         } else {
@@ -363,5 +365,9 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
 
     override fun unknownMessage(messageText: String) {
         session.reportMessage("Unknown message received: $messageText", MessageType.WARNING)
+    }
+
+    fun evaluate(pid: OtpErlangPid, module: OtpErlangAtom, expression: String, stackPointer: Int, callback: XDebuggerEvaluator.XEvaluationCallback) {
+        node.evaluate(pid, module, expression, stackPointer, callback)
     }
 }

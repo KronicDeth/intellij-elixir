@@ -44,8 +44,10 @@ defmodule IntelliJElixir.Debugger.Server do
   end
 
   def handle_cast(:interpreted, state = %__MODULE__{socket: socket}) do
-    interpreted_set = :int.interpreted()
-                      |> MapSet.new()
+    interpreted_set =
+      :int.interpreted()
+      |> MapSet.new()
+
     interpreted_modules =
       :code.all_loaded()
       |> Stream.map(fn {module, _file} -> module end)
@@ -134,11 +136,30 @@ defmodule IntelliJElixir.Debugger.Server do
     {:stop, :normal, state}
   end
 
+  def handle_cast({:evaluate, pid, module, expression, stack_pointer}, state = %__MODULE__{})
+      when is_pid(pid) and is_atom(module) and is_binary(expression) and is_integer(stack_pointer) do
+    case :dbg_iserver.safe_call({:get_meta, pid}) do
+      {:ok, meta_pid} ->
+        :int.meta(meta_pid, :eval, {module, String.to_charlist(expression), stack_pointer})
+
+      error ->
+        IO.warn("Failed to obtain meta pid for #{inspect(pid)}: #{inspect(error)}")
+    end
+
+    {:noreply, state}
+  end
+
   def handle_cast(request, state) do
     super(request, state)
   end
 
   @impl GenServer
+  def handle_info({_meta_pid, {:eval_rsp, result}}, state = %__MODULE__{socket: socket}) do
+    send_message(socket, {:evaluated, result})
+
+    {:noreply, state}
+  end
+
   def handle_info({:tcp, socket, message}, state = %__MODULE__{socket: socket}) do
     handle_cast(:erlang.binary_to_term(message), state)
   end

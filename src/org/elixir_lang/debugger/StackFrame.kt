@@ -18,10 +18,13 @@
 
 package org.elixir_lang.debugger
 
+import com.ericsson.otp.erlang.OtpErlangAtom
+import com.ericsson.otp.erlang.OtpErlangPid
 import com.intellij.icons.AllIcons
 import com.intellij.ui.ColoredTextContainer
 import com.intellij.ui.SimpleTextAttributes
 import com.intellij.xdebugger.XSourcePosition
+import com.intellij.xdebugger.evaluation.XDebuggerEvaluator
 import com.intellij.xdebugger.frame.XCompositeNode
 import com.intellij.xdebugger.frame.XStackFrame
 import com.intellij.xdebugger.frame.XValueChildrenList
@@ -31,8 +34,10 @@ import org.elixir_lang.debugger.stack_frame.variable.Elixir
 import org.elixir_lang.debugger.stack_frame.variable.Erlang
 import org.elixir_lang.utils.ElixirModulesUtil
 
-internal class StackFrame(private val traceElement: TraceElement) : XStackFrame() {
+class StackFrame(private val process: Process, private val pid: OtpErlangPid, private val traceElement: TraceElement) : XStackFrame() {
     private val sourcePosition: SourcePosition? = SourcePosition.create(traceElement)
+
+    override fun getEvaluator(): XDebuggerEvaluator = Evaluator(process, pid, OtpErlangAtom(traceElement.module), traceElement.level)
 
     override fun getSourcePosition(): XSourcePosition? = sourcePosition?.sourcePosition
 

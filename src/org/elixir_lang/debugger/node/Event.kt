@@ -46,6 +46,7 @@ abstract class Event {
                     when (messageName) {
                         BreakpointReached.NAME -> BreakpointReached.from(message)
                         DebugRemoteNodeResponse.NAME -> DebugRemoteNodeResponse.from(message)
+                        Evaluated.NAME -> Evaluated.from(message)
                         Interpreted.NAME -> Interpreted.from(message)
                         InterpretModulesResponse.NAME -> InterpretModulesResponse.from(message)
                         SetBreakpointResponse.NAME -> SetBreakpointResponse.from(message)
