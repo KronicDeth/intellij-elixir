@@ -4,7 +4,6 @@ import com.ericsson.otp.erlang.OtpErlangAtom
 import com.ericsson.otp.erlang.OtpErlangPid
 import com.intellij.xdebugger.XSourcePosition
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator
-import org.elixir_lang.debugger.stack_frame.variable.Elixir
 
 class Evaluator(
         private val process: Process,
@@ -14,10 +13,9 @@ class Evaluator(
         private val function: String,
         private val arity: Int,
         private val file: String,
-        private val line: Int,
-        private val variables: List<Elixir>
+        private val line: Int
 ) : XDebuggerEvaluator() {
     override fun evaluate(expression: String, callback: XEvaluationCallback, expressionPosition: XSourcePosition?) {
-        process.evaluate(pid, stackPointer, module, function, arity, file, line, variables, expression, callback)
+        process.evaluate(pid, stackPointer, module, function, arity, file, line, expression, callback)
     }
 }

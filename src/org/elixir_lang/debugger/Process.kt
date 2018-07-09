@@ -58,7 +58,6 @@ import org.elixir_lang.debugger.line_breakpoint.Properties
 import org.elixir_lang.debugger.node.Exception
 import org.elixir_lang.debugger.node.ProcessSnapshot
 import org.elixir_lang.debugger.node.event.Listener
-import org.elixir_lang.debugger.stack_frame.variable.Elixir
 import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.psi.impl.getModuleName
 import org.elixir_lang.run.ensureWorkingDirectory
@@ -376,10 +375,9 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
             arity: Int,
             file: String,
             line: Int,
-            variables: List<Elixir>,
             expression: String,
             callback: XDebuggerEvaluator.XEvaluationCallback
     ) {
-        node.evaluate(pid, stackPointer, module, function, arity, file, line, variables, expression, callback)
+        node.evaluate(pid, stackPointer, module, function, arity, file, line, expression, callback)
     }
 }

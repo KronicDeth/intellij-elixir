@@ -13,7 +13,6 @@ class Evaluate(
         private val arity: Int,
         private val file: String,
         private val line: Int,
-        private val variables: List<Elixir>,
         private val expression: String
 ) : Command {
     override fun toMessage(): OtpErlangTuple =
@@ -31,7 +30,6 @@ class Evaluate(
                             ),
                             OtpErlangAtom("expression") to elixirString(expression),
                             OtpErlangAtom("pid") to pid,
-                            OtpErlangAtom("elixir_variable_name_to_erlang_variable_name") to variables.mapToErlangVariables(),
                             OtpErlangAtom("stack_pointer") to otpErlangLong(stackPointer)
                     )
             ))

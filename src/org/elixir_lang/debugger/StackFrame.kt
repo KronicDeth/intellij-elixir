@@ -45,8 +45,7 @@ class StackFrame(private val process: Process, private val pid: OtpErlangPid, pr
             traceElement.function,
             traceElement.arguments.size,
             traceElement.file,
-            traceElement.line,
-            elixirVariables
+            traceElement.line
     )
 
     override fun getSourcePosition(): XSourcePosition? = sourcePosition?.sourcePosition
@@ -66,11 +65,6 @@ class StackFrame(private val process: Process, private val pid: OtpErlangPid, pr
 
     override fun computeChildren(node: XCompositeNode) {
         val children = XValueChildrenList(traceElement.bindings.size)
-        variables.forEach { children.add(it) }
-        node.addChildren(children, true)
-    }
-
-    private val variables by lazy {
         traceElement
                 .bindings
                 .groupBy(Binding::elixirName)
@@ -88,9 +82,7 @@ class StackFrame(private val process: Process, private val pid: OtpErlangPid, pr
                         erlangVariables
                     }
                 }
-    }
-
-    private val elixirVariables by lazy {
-        variables.filterIsInstance<Elixir>()
+                .forEach { children.add(it) }
+        node.addChildren(children, true)
     }
 }

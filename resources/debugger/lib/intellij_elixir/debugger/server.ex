@@ -158,24 +158,33 @@ defmodule IntelliJElixir.Debugger.Server do
            env: %{file: file, function: function = {name, arity}, line: line, module: module},
            expression: expression,
            pid: pid,
-           elixir_variable_name_to_erlang_variable_name: elixir_variable_name_to_erlang_variable_name,
            stack_pointer: stack_pointer
          }},
         state = %__MODULE__{socket: socket}
       )
       when is_binary(file) and is_atom(name) and is_integer(arity) and arity >= 0 and is_integer(line) and
-             is_atom(module) and is_binary(expression) and is_pid(pid) and
-             is_map(elixir_variable_name_to_erlang_variable_name) and is_integer(stack_pointer) do
+             is_atom(module) and is_binary(expression) and is_pid(pid) and is_integer(stack_pointer) do
     case :dbg_iserver.safe_call({:get_meta, pid}) do
       {:ok, meta_pid} ->
         # [IEx.Evaluator.do_eval](https://github.com/elixir-lang/elixir/blob/master/lib/iex/lib/iex/evaluator.ex#L223-L233)
         case Code.string_to_quoted(expression) do
           {:ok, quoted} ->
-            context = nil
-
-            binding =
-              Enum.map(elixir_variable_name_to_erlang_variable_name, fn {elixir_variable_name, _} ->
-                {elixir_variable_name, context}
+            elixir_variable_tuples =
+              for erlang_variable_name <-
+                    meta_pid
+                    |> bindings(stack_pointer)
+                    |> Keyword.keys(),
+                  erlang_variable_name_string = to_string(erlang_variable_name),
+                  %{"elixir_variable_name_string" => elixir_variable_name_string, "counter_string" => counter_string} =
+                    Regex.named_captures(
+                      ~r/V(?P<elixir_variable_name_string>.+)@(?<counter_string>\d)+/,
+                      erlang_variable_name_string
+                    ) do
+                {String.to_atom(elixir_variable_name_string), String.to_integer(counter_string), erlang_variable_name}
+              end
+              |> Enum.group_by(fn {elixir_variable_name, _, _} -> elixir_variable_name end)
+              |> Enum.map(fn {_, tuples} ->
+                Enum.max_by(tuples, fn {_, counter, _} -> counter end)
               end)
 
             # [IEX.Evaluator.handle_eval](https://github.com/elixir-lang/elixir/blob/master/lib/iex/lib/iex/evaluator.ex#L247-L258)
@@ -210,12 +219,15 @@ defmodule IntelliJElixir.Debugger.Server do
             # but we know the correct erlang variable names from `elixir_variable_name_to_erlang_variable_name`, so
             # compute "parsed_vars" and "parsed_scope` manually
 
-            parsed_vars = binding
+            parsed_vars =
+              Enum.map(elixir_variable_tuples, fn {elixir_variable_name, _, _} ->
+                {elixir_variable_name, nil}
+              end)
 
             parsed_scope =
               elixir_erl(
-                vars: vars(elixir_variable_name_to_erlang_variable_name),
-                counter: counter(elixir_variable_name_to_erlang_variable_name)
+                vars: vars(elixir_variable_tuples),
+                counter: counter(elixir_variable_tuples)
               )
 
             # https://github.com/elixir-lang/elixir/blob/8a971fcb44391bd8b16456666f3033b633c6ff77/lib/elixir/src/elixir.erl#L255
@@ -281,22 +293,10 @@ defmodule IntelliJElixir.Debugger.Server do
     :int.meta(meta_pid, :bindings, level)
   end
 
-  defp counter(elixir_variable_name_to_erlang_variable_name)
-       when is_map(elixir_variable_name_to_erlang_variable_name) do
-    Enum.into(elixir_variable_name_to_erlang_variable_name, %{}, fn {elixir_variable_name, erlang_variable_name} ->
-      {elixir_variable_name, counter(elixir_variable_name, erlang_variable_name)}
+  defp counter(elixir_variable_tuples) when is_list(elixir_variable_tuples) do
+    Enum.into(elixir_variable_tuples, %{}, fn {elixir_variable_name, counter, _} ->
+      {elixir_variable_name, counter}
     end)
-  end
-
-  defp counter(elixir_variable_name, erlang_variable_name)
-       when is_atom(elixir_variable_name) and is_atom(erlang_variable_name) do
-    elixir_variable_name_string = to_string(elixir_variable_name)
-    elixir_variable_name_string_byte_size = byte_size(elixir_variable_name_string)
-
-    <<"V", ^elixir_variable_name_string::binary-size(elixir_variable_name_string_byte_size), "@", counter::binary>> =
-      to_string(erlang_variable_name)
-
-    String.to_integer(counter)
   end
 
   defp elixir_module_name_to_erlang_module_name(":" <> erlang_module_name), do: erlang_module_name
@@ -429,8 +429,8 @@ defmodule IntelliJElixir.Debugger.Server do
     end
   end
 
-  defp vars(elixir_variable_name_to_erlang_variable_name) when is_map(elixir_variable_name_to_erlang_variable_name) do
-    Enum.into(elixir_variable_name_to_erlang_variable_name, %{}, fn {elixir_variable_name, erlang_variable_name} ->
+  defp vars(elixir_variable_tuples) when is_list(elixir_variable_tuples) do
+    Enum.into(elixir_variable_tuples, %{}, fn {elixir_variable_name, _, erlang_variable_name} ->
       # TODO determine if `0` and `true` should be different
       {{elixir_variable_name, nil}, {erlang_variable_name, 0, true}}
     end)

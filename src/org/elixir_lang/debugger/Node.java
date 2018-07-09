@@ -230,11 +230,10 @@ public class Node {
                          int arity,
                          @NotNull String file,
                          int line,
-                         @NotNull List<Elixir> variables,
                          @NotNull String expression,
                          @NotNull XDebuggerEvaluator.XEvaluationCallback callback) {
         addCallback(callback);
-        addCommand(new Evaluate(pid, stackPointer, module, function, arity, file, line, variables, expression));
+        addCommand(new Evaluate(pid, stackPointer, module, function, arity, file, line, expression));
     }
 
     private void addCommand(Command command) {
