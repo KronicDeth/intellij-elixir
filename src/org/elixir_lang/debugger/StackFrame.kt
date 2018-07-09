@@ -37,7 +37,17 @@ import org.elixir_lang.utils.ElixirModulesUtil
 class StackFrame(private val process: Process, private val pid: OtpErlangPid, private val traceElement: TraceElement) : XStackFrame() {
     private val sourcePosition: SourcePosition? = SourcePosition.create(traceElement)
 
-    override fun getEvaluator(): XDebuggerEvaluator = Evaluator(process, pid, OtpErlangAtom(traceElement.module), traceElement.level)
+    override fun getEvaluator(): XDebuggerEvaluator = Evaluator(
+            process,
+            pid,
+            traceElement.level,
+            OtpErlangAtom(traceElement.module),
+            traceElement.function,
+            traceElement.arguments.size,
+            traceElement.file,
+            traceElement.line,
+            elixirVariables
+    )
 
     override fun getSourcePosition(): XSourcePosition? = sourcePosition?.sourcePosition
 
@@ -56,26 +66,31 @@ class StackFrame(private val process: Process, private val pid: OtpErlangPid, pr
 
     override fun computeChildren(node: XCompositeNode) {
         val children = XValueChildrenList(traceElement.bindings.size)
-
-        val variables =
-                traceElement
-                        .bindings
-                        .groupBy(Binding::elixirName)
-                        .flatMap { (elixirName, bindings) ->
-                            val erlangVariables =
-                                    bindings
-                                            .sorted()
-                                            .map { binding ->
-                                                Erlang(binding.erlangName, binding.value)
-                                            }
-
-                            if (elixirName != null) {
-                                listOf(Elixir(elixirName, erlangVariables))
-                            } else {
-                                erlangVariables
-                            }
-                        }
         variables.forEach { children.add(it) }
         node.addChildren(children, true)
+    }
+
+    private val variables by lazy {
+        traceElement
+                .bindings
+                .groupBy(Binding::elixirName)
+                .flatMap { (elixirName, bindings) ->
+                    val erlangVariables =
+                            bindings
+                                    .sorted()
+                                    .map { binding ->
+                                        Erlang(binding.erlangName, binding.value)
+                                    }
+
+                    if (elixirName != null) {
+                        listOf(Elixir(elixirName, erlangVariables))
+                    } else {
+                        erlangVariables
+                    }
+                }
+    }
+
+    private val elixirVariables by lazy {
+        variables.filterIsInstance<Elixir>()
     }
 }

@@ -5,6 +5,8 @@ import com.intellij.xdebugger.frame.*
 import org.elixir_lang.debugger.stack_frame.variable.elixir.PreviousBindingGroup
 
 class Elixir(name: String, private val erlangVariableList: List<Erlang<OtpErlangObject>>) : XNamedValue(name) {
+    val currentBinding by lazy { erlangVariableList.last() }
+
     override fun computeChildren(node: XCompositeNode) {
         if (hasChildren) {
             val children = XValueChildrenList()
@@ -29,6 +31,5 @@ class Elixir(name: String, private val erlangVariableList: List<Erlang<OtpErlang
     }
 
     private val previousBindings by lazy { erlangVariableList.dropLast(1) }
-    private val currentBinding by lazy { erlangVariableList.last() }
     private val hasChildren by lazy { previousBindings.isNotEmpty() }
 }

@@ -3,6 +3,22 @@ defmodule IntelliJElixir.Debugger.Server do
 
   use GenServer
 
+  require Record
+
+  # *.hrl files are not included in all SDK installs, so need to inline definition here
+  Record.defrecordp(
+    :elixir_erl,
+    context: nil,
+    extra: nil,
+    caller: false,
+    vars: %{},
+    backup_vars: nil,
+    export_vars: nil,
+    extra_guards: [],
+    counter: %{},
+    file: "nofile"
+  )
+
   defstruct reason_by_uninterpretable: %{},
             port: nil,
             reject_erlang_module_name_patterns: [],
@@ -136,14 +152,95 @@ defmodule IntelliJElixir.Debugger.Server do
     {:stop, :normal, state}
   end
 
-  def handle_cast({:evaluate, pid, module, expression, stack_pointer}, state = %__MODULE__{})
-      when is_pid(pid) and is_atom(module) and is_binary(expression) and is_integer(stack_pointer) do
+  def handle_cast(
+        {:evaluate,
+         %{
+           env: %{file: file, function: function = {name, arity}, line: line, module: module},
+           expression: expression,
+           pid: pid,
+           elixir_variable_name_to_erlang_variable_name: elixir_variable_name_to_erlang_variable_name,
+           stack_pointer: stack_pointer
+         }},
+        state = %__MODULE__{socket: socket}
+      )
+      when is_binary(file) and is_atom(name) and is_integer(arity) and arity >= 0 and is_integer(line) and
+             is_atom(module) and is_binary(expression) and is_pid(pid) and
+             is_map(elixir_variable_name_to_erlang_variable_name) and is_integer(stack_pointer) do
     case :dbg_iserver.safe_call({:get_meta, pid}) do
       {:ok, meta_pid} ->
-        :int.meta(meta_pid, :eval, {module, String.to_charlist(expression), stack_pointer})
+        # [IEx.Evaluator.do_eval](https://github.com/elixir-lang/elixir/blob/master/lib/iex/lib/iex/evaluator.ex#L223-L233)
+        case Code.string_to_quoted(expression) do
+          {:ok, quoted} ->
+            context = nil
+
+            binding =
+              Enum.map(elixir_variable_name_to_erlang_variable_name, fn {elixir_variable_name, _} ->
+                {elixir_variable_name, context}
+              end)
+
+            # [IEX.Evaluator.handle_eval](https://github.com/elixir-lang/elixir/blob/master/lib/iex/lib/iex/evaluator.ex#L247-L258)
+            # Can't use `:elixir.eval_forms` directly because we need to use `:int.meta(meta_pid, :eval, ...)`, so the
+            # parts that get to the `erl` format
+
+            # https://github.com/elixir-lang/elixir/blob/8a971fcb44391bd8b16456666f3033b633c6ff77/lib/elixir/src/elixir.erl#L250
+            # Fake options for `env`, so that it matches debugged code's information
+            env = :elixir.env_for_eval(file: file, function: function, line: line, module: module)
+
+            # https://github.com/elixir-lang/elixir/blob/8a971fcb44391bd8b16456666f3033b633c6ff77/lib/elixir/src/elixir.erl#L254
+            # `:elixir_erl_var.load_binding(binding, scope)` gives `_@#{counter}` names for all the Erlang variables,
+            # ```
+            # parsed_binding = [_@0: nil, _@1: nil]
+            # parsed_vars = [direction: nil, string: nil]
+            # parsed_scope =  {
+            #   :elixir_erl,
+            #   nil, # context
+            #   nil, # extra
+            #   false, # caller
+            #   %{
+            #     {:direction, nil} => {:_@0, 0, true},
+            #     {:string, nil} => {:_@1, 0, true}
+            #   }, # vars to aliases
+            #   nil, # backup_vars
+            #   nil, # export_vars
+            #   [], # extra guards
+            #   %{_: 2}, # counter
+            #   "/Users/luke.imhoff/github/C-S-D/alembic/lib/alembic/fetch/sort.ex" # file
+            # }
+            # ```
+            # but we know the correct erlang variable names from `elixir_variable_name_to_erlang_variable_name`, so
+            # compute "parsed_vars" and "parsed_scope` manually
+
+            parsed_vars = binding
+
+            parsed_scope =
+              elixir_erl(
+                vars: vars(elixir_variable_name_to_erlang_variable_name),
+                counter: counter(elixir_variable_name_to_erlang_variable_name)
+              )
+
+            # https://github.com/elixir-lang/elixir/blob/8a971fcb44391bd8b16456666f3033b633c6ff77/lib/elixir/src/elixir.erl#L255
+            # Elixir 1.7+ has :elixir_env.with_vars, but can't use here for Elixir 1.6.5 compatibility, so use
+            # https://github.com/elixir-lang/elixir/blob/v1.6.5/lib/elixir/src/elixir.erl#L223
+            parsed_env = %{env | vars: parsed_vars}
+
+            # https://github.com/elixir-lang/elixir/blob/8a971fcb44391bd8b16456666f3033b633c6ff77/lib/elixir/src/elixir.erl#L256
+            {erl, _new_env, _new_scope} = :elixir.quoted_to_erl(quoted, parsed_env, parsed_scope)
+
+            code =
+              [:erl_pp.expr(erl), ?.]
+              |> IO.chardata_to_string()
+              |> String.to_charlist()
+
+            :int.meta(meta_pid, :eval, {module, code, stack_pointer})
+
+          error ->
+            send_message(socket, {:evaluated, error})
+        end
 
       error ->
         IO.warn("Failed to obtain meta pid for #{inspect(pid)}: #{inspect(error)}")
+
+        send_message(socket, {:evaluated, error})
     end
 
     {:noreply, state}
@@ -182,6 +279,24 @@ defmodule IntelliJElixir.Debugger.Server do
 
   defp bindings(meta_pid, level) do
     :int.meta(meta_pid, :bindings, level)
+  end
+
+  defp counter(elixir_variable_name_to_erlang_variable_name)
+       when is_map(elixir_variable_name_to_erlang_variable_name) do
+    Enum.into(elixir_variable_name_to_erlang_variable_name, %{}, fn {elixir_variable_name, erlang_variable_name} ->
+      {elixir_variable_name, counter(elixir_variable_name, erlang_variable_name)}
+    end)
+  end
+
+  defp counter(elixir_variable_name, erlang_variable_name)
+       when is_atom(elixir_variable_name) and is_atom(erlang_variable_name) do
+    elixir_variable_name_string = to_string(elixir_variable_name)
+    elixir_variable_name_string_byte_size = byte_size(elixir_variable_name_string)
+
+    <<"V", ^elixir_variable_name_string::binary-size(elixir_variable_name_string_byte_size), "@", counter::binary>> =
+      to_string(erlang_variable_name)
+
+    String.to_integer(counter)
   end
 
   defp elixir_module_name_to_erlang_module_name(":" <> erlang_module_name), do: erlang_module_name
@@ -312,5 +427,12 @@ defmodule IntelliJElixir.Debugger.Server do
     else
       :error
     end
+  end
+
+  defp vars(elixir_variable_name_to_erlang_variable_name) when is_map(elixir_variable_name_to_erlang_variable_name) do
+    Enum.into(elixir_variable_name_to_erlang_variable_name, %{}, fn {elixir_variable_name, erlang_variable_name} ->
+      # TODO determine if `0` and `true` should be different
+      {{elixir_variable_name, nil}, {erlang_variable_name, 0, true}}
+    end)
   end
 end

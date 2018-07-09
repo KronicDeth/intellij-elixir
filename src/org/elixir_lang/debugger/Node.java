@@ -11,6 +11,7 @@ import org.elixir_lang.debugger.node.Exception;
 import org.elixir_lang.debugger.node.command.*;
 import org.elixir_lang.debugger.node.event.Listener;
 import org.elixir_lang.debugger.stack_frame.value.Factory;
+import org.elixir_lang.debugger.stack_frame.variable.Elixir;
 import org.elixir_lang.utils.ElixirModulesUtil;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -25,6 +26,7 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -222,12 +224,17 @@ public class Node {
     }
 
     public void evaluate(@NotNull OtpErlangPid pid,
-                         @NotNull OtpErlangAtom module,
-                         @NotNull String expression,
                          int stackPointer,
+                         @NotNull OtpErlangAtom module,
+                         @NotNull String function,
+                         int arity,
+                         @NotNull String file,
+                         int line,
+                         @NotNull List<Elixir> variables,
+                         @NotNull String expression,
                          @NotNull XDebuggerEvaluator.XEvaluationCallback callback) {
         addCallback(callback);
-        addCommand(new Evaluate(pid, module, expression, stackPointer));
+        addCommand(new Evaluate(pid, stackPointer, module, function, arity, file, line, variables, expression));
     }
 
     private void addCommand(Command command) {
