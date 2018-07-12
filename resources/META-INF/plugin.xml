@@ -25,6 +25,10 @@
 
     <editorNotificationProvider implementation="org.elixir_lang.inspection.SetupSDKNotificationProvider"/>
 
+    <!-- Elixir -->
+    <configurationType implementation="org.elixir_lang.elixir.configuration.Type"/>
+    <programRunner implementation="org.elixir_lang.elixir.Runner"/>
+
     <!-- IEx -->
     <configurationType implementation="org.elixir_lang.iex.configuration.Type"/>
     <programRunner implementation="org.elixir_lang.iex.Runner"/>

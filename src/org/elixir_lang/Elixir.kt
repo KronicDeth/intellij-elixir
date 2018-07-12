@@ -14,7 +14,7 @@ object Elixir {
             environment: Map<String, String>,
             workingDirectory: String?,
             elixirSdk: Sdk,
-            erlParameters: kotlin.collections.List<String> = emptyList()
+            erlArgumentList: kotlin.collections.List<String> = emptyList()
     ): GeneralCommandLine {
         val erlangSdk = elixirSdkToEnsuredErlangSdk(elixirSdk)
         val commandLine = org.elixir_lang.Erl.commandLine(
@@ -24,7 +24,7 @@ object Elixir {
                 erlangSdk = erlangSdk
         )
         // MUST be before `addElixir` because it ends with `-extra` which turns off argument parsing for `erl`
-        commandLine.addParameters(erlParameters)
+        commandLine.addParameters(erlArgumentList)
         addElixir(commandLine, elixirSdk, erlangSdk)
 
         return commandLine
