@@ -14,14 +14,6 @@ import java.awt.*;
 public class ParametersPanel extends CommonProgramParametersPanel {
     private LabeledComponent<RawCommandLineEditor> erlArgumentsComponent;
 
-    private String getIExArguments() {
-        return getProgramParametersComponent().getComponent().getText();
-    }
-
-    private void setIExArguments(@Nullable String text) {
-        getProgramParametersComponent().getComponent().setText(text);
-    }
-
     private String getErlArguments() {
         return erlArgumentsComponent.getComponent().getText();
     }
@@ -62,7 +54,7 @@ public class ParametersPanel extends CommonProgramParametersPanel {
     // See CommonJavaParametersPanel's addComponents
     private void addErlArgumentsComponent() {
         erlArgumentsComponent = createArgumentsComponent("erl");
-        addArgumentsComponent(erlArgumentsComponent, 2);
+        addArgumentsComponent(erlArgumentsComponent, 1);
     }
 
     private LabeledComponent<RawCommandLineEditor> createArgumentsComponent(@NotNull String command) {

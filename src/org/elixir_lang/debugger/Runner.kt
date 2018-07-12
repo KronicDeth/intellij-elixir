@@ -49,6 +49,7 @@ class Runner : GenericProgramRunner<RunnerSettings>() {
                     (profile is org.elixir_lang.elixir.Configuration ||
                             profile is org.elixir_lang.exunit.Configuration ||
                             profile is org.elixir_lang.iex.Configuration ||
+                            profile is org.elixir_lang.iex.mix.Configuration ||
                             profile is org.elixir_lang.mix.Configuration)
 }
 

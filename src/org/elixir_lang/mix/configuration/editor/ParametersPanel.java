@@ -15,14 +15,6 @@ public class ParametersPanel extends CommonProgramParametersPanel {
     private LabeledComponent<RawCommandLineEditor> elixirArgumentsComponent;
     private LabeledComponent<RawCommandLineEditor> erlArgumentsComponent;
 
-    private String getMixArguments() {
-        return getProgramParametersComponent().getComponent().getText();
-    }
-
-    private void setMixArguments(@Nullable String text) {
-        getProgramParametersComponent().getComponent().setText(text);
-    }
-
     private String getElixirArguments() {
         return elixirArgumentsComponent.getComponent().getText();
     }

@@ -1,4 +1,4 @@
-package org.elixir_lang.iex
+package org.elixir_lang.iex.mix
 
 import com.intellij.execution.Executor
 import com.intellij.execution.configuration.EnvironmentVariablesComponent
@@ -11,10 +11,11 @@ import com.intellij.execution.runners.RunConfigurationWithSuppressedDefaultRunAc
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.options.SettingsEditorGroup
 import com.intellij.openapi.project.Project
-import org.elixir_lang.IEx
 import org.elixir_lang.debugged.Modules
 import org.elixir_lang.debugger.configuration.Debuggable
 import org.elixir_lang.debugger.settings.stepping.ModuleFilter
+import org.elixir_lang.iex.Mix
+import org.elixir_lang.iex.mix.configuration.Editor
 import org.elixir_lang.mix.ensureMostSpecificSdk
 import org.elixir_lang.run.*
 import org.jdom.Element
@@ -56,6 +57,8 @@ class Configuration(name: String, project: Project, configurationFactory: Config
 
         debugged.iexArgumentList.addAll(iexArgumentList)
 
+        debugged.mixArgumentList.addAll(mixArgumentList)
+
         debugged.workingDirectory = workingDirectory
         debugged.isPassParentEnvs = isPassParentEnvs
         debugged.envs = envs
@@ -64,10 +67,10 @@ class Configuration(name: String, project: Project, configurationFactory: Config
         return debugged
     }
 
-    override fun getProgramParameters(): String? = iexArguments
+    override fun getProgramParameters(): String? = mixArguments
 
     override fun setProgramParameters(value: String?) {
-        iexArguments = value
+        mixArguments = value
     }
 
     var erlArgumentList: MutableList<String> = mutableListOf()
@@ -76,32 +79,37 @@ class Configuration(name: String, project: Project, configurationFactory: Config
         get() = erlArgumentList.toArguments()
         set(arguments) = erlArgumentList.fromArguments(arguments)
 
-    var iexArguments: String?
-        @JvmName("getIExArguments")
+    private var iexArguments: String?
         get() = iexArgumentList.toArguments()
-        @JvmName("setIExArguments")
         set(arguments) = iexArgumentList.fromArguments(arguments)
 
     var iexArgumentList: MutableList<String> = mutableListOf()
+
+    private var mixArguments: String?
+        get() = mixArgumentList.toArguments()
+        set(arguments) = mixArgumentList.fromArguments(arguments)
+
+    private var mixArgumentList: MutableList<String> = mutableListOf()
 
     fun commandLine(): GeneralCommandLine {
         val workingDirectory = ensureWorkingDirectory()
         val module = ensureModule()
         val sdk = ensureMostSpecificSdk(module)
-        val commandLine = IEx.commandLine(
+        val commandLine = Mix.commandLine(
                 environment = envs,
                 workingDirectory = workingDirectory,
                 elixirSdk = sdk,
-                erlArgumentList = erlArgumentList
+                erlArgumentList = erlArgumentList,
+                iexArgumentList = iexArgumentList
         )
-        commandLine.addParameters(iexArgumentList)
+        commandLine.addParameters(mixArgumentList)
 
         return commandLine
     }
 
     override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> =
             SettingsEditorGroup<Configuration>().apply {
-                this.addEditor("Configuration", org.elixir_lang.iex.configuration.Editor())
+                this.addEditor("Configuration", Editor())
                 this.addEditor("Interpreted Modules", org.elixir_lang.debugger.configuration.interpreted_modules.Editor<Configuration>())
             }
 
@@ -112,6 +120,7 @@ class Configuration(name: String, project: Project, configurationFactory: Config
         super.readExternal(element)
         element.readExternalArgumentList(ERL, erlArgumentList)
         element.readExternalArgumentList(IEX, iexArgumentList)
+        element.readExternalArgumentList(MIX, mixArgumentList)
         workingDirectoryURL = element.readExternalWorkingDirectory()
         EnvironmentVariablesComponent.readExternal(element, envs)
         element.readExternalModule(this)
@@ -124,6 +133,7 @@ class Configuration(name: String, project: Project, configurationFactory: Config
         super.writeExternal(element)
         element.writeExternalArgumentList(ERL, erlArgumentList)
         element.writeExternalArgumentList(IEX, iexArgumentList)
+        element.writeExternalArgumentList(MIX, mixArgumentList)
         element.writeExternalWorkingDirectory(workingDirectoryURL)
         EnvironmentVariablesComponent.writeExternal(element, envs)
         element.writeExternalModule(this)

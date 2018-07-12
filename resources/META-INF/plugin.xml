@@ -33,6 +33,10 @@
     <configurationType implementation="org.elixir_lang.iex.configuration.Type"/>
     <programRunner implementation="org.elixir_lang.iex.Runner"/>
 
+    <!-- iex -S mix -->
+    <configurationType implementation="org.elixir_lang.iex.mix.configuration.Type"/>
+    <programRunner implementation="org.elixir_lang.iex.mix.Runner"/>
+
     <!-- EEX -->
     <!--<braceMatcher filetype="EEx" implementationClass="org.elixir_lang.eex.BraceMatcher"/>-->
     <fileType.fileViewProviderFactory filetype="EEx" implementationClass="org.elixir_lang.eex.file.view_provider.Factory"/>
