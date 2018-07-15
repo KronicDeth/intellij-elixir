@@ -148,14 +148,28 @@ fun Element.readExternalModule(configuration: Configuration) {
 }
 
 fun Element.writeExternalWorkingDirectory(workingDirectoryURL: String?) {
-    if (!workingDirectoryURL.isNullOrBlank()) {
-        val workingDirectoryElement = Element(WORKING_DIRECTORY)
-        workingDirectoryElement.setAttribute(URL, workingDirectoryURL)
-        addContent(workingDirectoryElement)
+    writeExternalURL(WORKING_DIRECTORY, workingDirectoryURL)
+}
+
+fun Element.readExternalWorkingDirectory(): String? = readExternalURL(WORKING_DIRECTORY)
+
+fun Element.writeExternalURL(childName: String, url: String?) {
+    if (!url.isNullOrBlank()) {
+        val childElement = ensureChild(childName)
+        childElement.setAttribute(URL, url)
     }
 }
 
-fun Element.readExternalWorkingDirectory(): String? = getChild(WORKING_DIRECTORY)?.getAttributeValue(URL)
+fun Element.readExternalURL(childName: String) = getChild(childName)?.getAttributeValue(URL)
+
+fun Element.ensureChild(name: String): Element = getChild(name) ?: addChild(name)
+
+private fun Element.addChild(name: String): Element {
+    val newChild = Element(name)
+    addContent(newChild)
+
+    return newChild
+}
 
 const val ELIXIR = "elixir"
 const val ERL = "erl"
@@ -203,7 +217,7 @@ abstract class Configuration(name: String, project: Project, configurationFactor
     override fun getValidModules(): Collection<com.intellij.openapi.module.Module> =
             project.let { ModuleManager.getInstance(it) }.modules.asList()
 
-    private val _envs = mutableMapOf<String, String>()
+    protected val _envs = mutableMapOf<String, String>()
     private var _passParentEnvs: Boolean = false
     protected var workingDirectoryURL: String? = null
 }

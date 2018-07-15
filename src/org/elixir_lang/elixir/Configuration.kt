@@ -127,6 +127,7 @@ class Configuration(name: String, project: Project, configurationFactory: Config
         element.writeExternalModule(this)
         element.writeModuleFilters(moduleFilterList, inheritApplicationModuleFilters)
     }
+
 }
 
 private const val ELIXIR = "elixir"

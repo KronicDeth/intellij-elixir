@@ -25,6 +25,10 @@
 
     <editorNotificationProvider implementation="org.elixir_lang.inspection.SetupSDKNotificationProvider"/>
 
+    <!-- Distillery -->
+    <configurationType implementation="org.elixir_lang.distillery.configuration.Type"/>
+    <programRunner implementation="org.elixir_lang.distillery.Runner"/>
+
     <!-- Elixir -->
     <configurationType implementation="org.elixir_lang.elixir.configuration.Type"/>
     <programRunner implementation="org.elixir_lang.elixir.Runner"/>
