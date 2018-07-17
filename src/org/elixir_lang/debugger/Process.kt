@@ -157,6 +157,9 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
         }
     }
 
+    /**
+     * [sourcePositionToBreakpoint] records file:line<->breakpoint correspondence, so this is no-op.
+     */
     override fun breakpointIsSet(module: String, file: String, line: Int) {}
 
     override fun breakpointReached(pid: OtpErlangPid, snapshots: List<ProcessSnapshot>) {

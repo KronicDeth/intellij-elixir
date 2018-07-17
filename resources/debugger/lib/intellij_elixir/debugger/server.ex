@@ -107,6 +107,8 @@ defmodule IntelliJElixir.Debugger.Server do
     {:noreply, state}
   end
 
+  # `file` is passed through, so that in the case of failure, the file's line can be marked as an invalid breakpoint
+  # location without having to recalculate the `file` from the `module` and `line`.
   def handle_cast({:set_breakpoint, module, line, file}, state = %__MODULE__{socket: socket})
       when is_binary(file)
       when is_atom(module) and is_integer(line) do

@@ -31,6 +31,7 @@ class SetBreakpointResponse(
         private val module: String,
         private val line: Int,
         private val okErrorReason: OKErrorReason,
+        // used in the case of errors to make file:line as an invalid break point
         private val file: String
 ) : Event() {
     override fun process(node: Node, eventListener: Listener) =
