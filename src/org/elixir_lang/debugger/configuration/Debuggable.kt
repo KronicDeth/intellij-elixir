@@ -8,23 +8,40 @@ import org.elixir_lang.debugger.settings.stepping.ModuleFilter
  */
 interface Debuggable<out T : org.elixir_lang.run.Configuration> {
     /**
+     * Cookie set in original [Debuggable] configuration.
+     *
+     * @return if non-`null`, will be used for `cookie` passed to [debuggerConfiguration] and [debuggedConfiguration].
+     */
+    val cookie: String?
+
+    /**
+     * Name set in original [Debuggable] configuration.
+     *
+     * @return if non-`null`, will be used for `name` passed to [debuggedConfiguration] and the name for the debugged
+     *   node used in `sys.config` at `configPath` passed to both [debuggerConfiguration] and [debuggedConfiguration].
+     */
+    val nodeName: String?
+
+    /**
      * The configuration for running the debugger `mix intellij_elixir.debug_task` process with enough of the original
      * [Debuggable] configuration's arguments copied over, so that the same modules can be loaded.
      *
      * @param name the `erl` argument `-name` value
+     * @param cookie the cookie used to authorize the debugger and debugged nodes to talk to each other
      * @param configPath the `erl` argument `-config` value
      * @param javaPort the TCP port the Elixir debugger process should connect to the Java [org.elixir_lang.debugger.Node].
      */
-    fun debuggerConfiguration(name: String, configPath: String, javaPort: Int): org.elixir_lang.debugger.Configuration
+    fun debuggerConfiguration(name: String, cookie: String, configPath: String, javaPort: Int): org.elixir_lang.debugger.Configuration
 
     /**
      * The original [Debuggable] configuration with the additions to allow [debuggerConfiguration] to attach to the
      * process for remote debugging.
      *
      * @param name the `erl` argument `-name` value
+     * @param cookie the cookie used to authorize the debugger and debugged nodes to talk to each other
      * @param configPath the `erl` argument `-config` value
      */
-    fun debuggedConfiguration(name: String, configPath: String): T
+    fun debuggedConfiguration(name: String, cookie: String, configPath: String): T
 
     /**
      * Returns the project in which the configuration exists.

@@ -12,6 +12,7 @@ import com.intellij.execution.runners.RunConfigurationWithSuppressedDefaultRunAc
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.options.SettingsEditorGroup
 import com.intellij.openapi.project.Project
+import com.intellij.util.io.exists
 import org.elixir_lang.Distillery
 import org.elixir_lang.debugged.Modules
 import org.elixir_lang.debugger.configuration.Debuggable
@@ -19,18 +20,33 @@ import org.elixir_lang.debugger.settings.stepping.ModuleFilter
 import org.elixir_lang.distillery.configuration.editor.CodeLoadingMode
 import org.elixir_lang.run.*
 import org.jdom.Element
+import java.io.File
+import java.nio.file.Path
+import java.nio.file.Paths
 
 class Configuration(name: String, project: Project, configurationFactory: ConfigurationFactory) :
         org.elixir_lang.run.Configuration(name, project, configurationFactory),
         Debuggable<Configuration>,
         RunConfigurationWithSuppressedDefaultRunAction,
         RunConfigurationWithSuppressedDefaultDebugAction {
+    override val cookie: String?
+        get() = vmArgsPath?.let(::vmArgsPathToCookie)
+
     override var inheritApplicationModuleFilters: Boolean = true
     override var moduleFilterList: MutableList<ModuleFilter> = mutableListOf()
 
-    override fun debuggerConfiguration(name: String, configPath: String, javaPort: Int): org.elixir_lang.debugger.Configuration {
+    override val nodeName: String?
+        get() = vmArgsPath?.let(::vmArgsPathToNodeName)
+
+    override fun debuggerConfiguration(
+            name: String,
+            cookie: String,
+            configPath: String,
+            javaPort: Int
+    ): org.elixir_lang.debugger.Configuration {
         val debugger= org.elixir_lang.debugger.Configuration(name, project, factory)
         debugger.erlArgumentList.addAll(arrayOf("-name", name))
+        debugger.erlArgumentList.addAll(arrayOf("-setcookie", cookie))
         debugger.erlArgumentList.addAll(arrayOf("-config", configPath))
 
         debugger.javaPort = javaPort
@@ -46,22 +62,33 @@ class Configuration(name: String, project: Project, configurationFactory: Config
         return debugger
     }
 
-    override fun debuggedConfiguration(name: String, configPath: String): Configuration {
-        val debugged = Configuration(this.name, project, factory)
+    override fun debuggedConfiguration(name: String, cookie: String, configPath: String): Configuration {
+        val debugged = Configuration(name, project, factory)
 
         debugged.workingDirectory = workingDirectory
         debugged.isPassParentEnvs = isPassParentEnvs
 
         val envs: MutableMap<String, String> = mutableMapOf()
-        envs.putAll(envs)
+        envs.putAll(this.envs)
         envs.compute(ERL_OPTS) { _, current ->
-            "$current -config $configPath ${Modules.erlArgumentList().joinToString(" ")}"
+            val erlArgumentList=  listOfNotNull(
+                    current,
+                    "-config",
+                    configPath
+            ) + Modules.erlArgumentList()
+
+            erlArgumentList.joinToString(" ")
         }
-        envs[NAME_TYPE] = "-name"
-        envs[NAME] = name
+        // shows a full `erlexec` call done by
+        envs[VERBOSE] = "true"
         debugged.envs = envs
 
         debugged.configurationModule.module = configurationModule.module
+
+        // options not stored in `envs`
+        debugged.wantsPTY = wantsPTY
+        debugged.releaseCLIURL = releaseCLIURL
+        debugged.releaseCLIArgumentList = releaseCLIArgumentList
 
         return debugged
     }
@@ -138,18 +165,6 @@ class Configuration(name: String, project: Project, configurationFactory: Config
             }
         }
 
-    var vmArgsPath: String?
-        @JvmName("getVMArgsPath")
-        get() = _envs[VMARGS_PATH]
-        @JvmName("setVMArgsPath")
-        set(vmArgsPath) {
-            if (vmArgsPath.isNullOrBlank()) {
-                _envs.remove(VMARGS_PATH)
-            } else {
-                _envs[VMARGS_PATH] = vmArgsPath!!
-            }
-        }
-
     var sysConfigPath: String?
         get() = _envs[SYS_CONFIG_PATH]
         set(sysConfigPath) {
@@ -180,16 +195,6 @@ class Configuration(name: String, project: Project, configurationFactory: Config
             }
         }
 
-    var cookie: String?
-        get() = _envs[COOKIE]
-        set(cookie) {
-            if (cookie.isNullOrBlank()) {
-                _envs.remove(COOKIE)
-            } else {
-                _envs[COOKIE] = cookie!!
-            }
-        }
-
     fun commandLine(): GeneralCommandLine {
         val workingDirectory = ensureWorkingDirectory()
         val commandLine = Distillery.commandLine(
@@ -208,6 +213,7 @@ class Configuration(name: String, project: Project, configurationFactory: Config
                 this.addEditor("Configuration", org.elixir_lang.distillery.configuration.Editor())
                 this.addEditor("Interpreted Modules", org.elixir_lang.debugger.configuration.interpreted_modules.Editor<Configuration>())
             }
+
     override fun getState(executor: Executor, environment: ExecutionEnvironment): State =
             State(environment, this)
 
@@ -243,19 +249,35 @@ class Configuration(name: String, project: Project, configurationFactory: Config
             get() = releaseCLIArgumentList.needsPTY
 
     private var releaseCLIURL: String? = null
+
+    private val vmArgsPath: String?
+        get() = releaseCLIPath?.let {
+            val releasesPath = Paths.get(it).parent.parent.resolve("releases")
+
+            releasesPath
+                    .resolve("start_erl.data")
+                    .toGroupValue(START_ERL_DATA_REGEX, START_ERL_DATA_REGEX_RELEASE_INDEX)
+                    ?.let { release ->
+                        val vmArgsPath = releasesPath.resolve(release).resolve("vm.args")
+
+                        if (vmArgsPath.exists()) {
+                            vmArgsPath.toString()
+                        } else {
+                            null
+                        }
+                    }
+        }
 }
 
 private const val CODE_LOADING_MODE = "CODE_LOADING_MODE"
-private const val COOKIE = "COOKIE"
 private const val ERL_OPTS = "ERL_OPTS"
 private const val EXTRA_OPTS = "EXTRA_OPTS"
 private const val NAME = "NAME"
-private const val NAME_TYPE = "NAME_TYPE"
 private const val PIPE_DIR = "PIPE_DIR"
 private const val RELEASE_CONFIG_DIR = "RELEASE_CONFIG_DIR"
 private const val RUNNER_LOG_DIR = "RUNNER_LOG_DIR"
 private const val SYS_CONFIG_PATH = "SYS_CONFIG_PATH"
-private const val VMARGS_PATH = "VMARGS_PATH"
+private const val VERBOSE = "VERBOSE"
 
 private const val REPLACE_OS_VARS = "REPLACE_OS_VARS"
 private const val DEFAULT_REPLACE_OS_VARS = false
@@ -266,6 +288,36 @@ private val List<String>.needsPTY: Boolean
 private val NEED_PTY_TASKS = setOf("attach", "console", "console_boot", "console_clean", "remote_console")
 private const val RELEASE_EXECUTABLE = "release-executable"
 private const val WANTS_PTY = "wants-pty"
+
+private val START_ERL_DATA_REGEX = Regex("([^ ]+) ([^ ]+)")
+private const val START_ERL_DATA_REGEX_RELEASE_INDEX = 2
+
+private val SETCOOKIE_REGEX = Regex("-setcookie ([^ ]+)")
+
+private fun vmArgsPathToCookie(vmArgsPath: String): String? = pathToGroupValue(vmArgsPath, SETCOOKIE_REGEX, 1)
+
+private val NAME_REGEX = Regex("-name ([^ ]+)")
+
+private fun vmArgsPathToNodeName(vmArgsPath: String): String? = pathToGroupValue(vmArgsPath, NAME_REGEX, 1)
+
+private fun Path.toGroupValue(regex: Regex, groupIndex: Int): String? = toFile().toGroupValue(regex, groupIndex)
+
+private fun pathToGroupValue(path: String, regex: Regex, groupIndex: Int): String? =
+        File(path).toGroupValue(regex, groupIndex)
+
+private fun File.toGroupValue(regex: Regex, groupIndex: Int): String? =
+        if (exists()) {
+            bufferedReader()
+                    .lineSequence()
+                    .mapNotNull { line ->
+                        regex
+                                .matchEntire(line)
+                                ?.let { it.groupValues[groupIndex] }
+                    }
+                    .firstOrNull()
+        } else {
+            null
+        }
 
 private fun Element.writeExternalWantsPTY(childName: String, wantsPTY: Boolean) =
         ensureChild(childName).setAttribute(WANTS_PTY, wantsPTY.toString())

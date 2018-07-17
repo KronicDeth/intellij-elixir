@@ -9,7 +9,6 @@ import com.intellij.openapi.ui.LabeledComponent;
 import com.intellij.ui.CollectionComboBoxModel;
 import com.intellij.ui.ListCellRendererWrapper;
 import com.intellij.ui.RawCommandLineEditor;
-import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.UIUtil;
 import org.elixir_lang.distillery.Configuration;
 import org.jetbrains.annotations.NotNull;
@@ -26,11 +25,9 @@ public class ParametersPanel extends CommonProgramParametersPanel {
     private LabeledComponent<ComboBox<CodeLoadingMode>> codeLoadingModeComponent;
     private LabeledComponent<MacroComboBoxWithBrowseButton> logDirectoryComponent;
     private LabeledComponent<ComboBox<Boolean>> replaceOSVarsComponent;
-    private LabeledComponent<MacroComboBoxWithBrowseButton> vmArgsPathComponent;
     private LabeledComponent<MacroComboBoxWithBrowseButton> sysConfigPathComponent;
     private LabeledComponent<MacroComboBoxWithBrowseButton> releaseConfigDirectoryComponent;
     private LabeledComponent<MacroComboBoxWithBrowseButton> pipeDirectoryComponent;
-    private LabeledComponent<JTextField> cookieComponent;
     private LabeledComponent<JCheckBox> wantsPTYComponent;
     private static final java.util.List<CodeLoadingMode> CODE_LOADING_MODE_LIST = Arrays.asList(null, CodeLoadingMode.EMBEDDED, CodeLoadingMode.INTERACTIVE);
     private static final java.util.List<Boolean> REPLACE_OS_VARS_LIST = Arrays.asList(null, false, true);
@@ -90,15 +87,6 @@ public class ParametersPanel extends CommonProgramParametersPanel {
     }
 
     @NotNull
-    private String getVMArgsPath() {
-        return vmArgsPathComponent.getComponent().getText();
-    }
-
-    private void setVMArgsPath(@Nullable String vmArgsPath) {
-        vmArgsPathComponent.getComponent().setText(vmArgsPath);
-    }
-
-    @NotNull
     private String getSysConfigPath() {
         return sysConfigPathComponent.getComponent().getText();
     }
@@ -125,15 +113,6 @@ public class ParametersPanel extends CommonProgramParametersPanel {
         pipeDirectoryComponent.getComponent().setText(pipeDirectory);
     }
 
-    @NotNull
-    private String getCookie() {
-        return cookieComponent.getComponent().getText();
-    }
-
-    private void setCookie(@Nullable String cookie) {
-        cookieComponent.getComponent().setText(cookie);
-    }
-
     private boolean getWantsPTY() {
         return wantsPTYComponent.getComponent().isSelected();
     }
@@ -150,11 +129,9 @@ public class ParametersPanel extends CommonProgramParametersPanel {
         configuration.setCodeLoadingMode(getCodeLoadingMode());
         configuration.setLogDirectory(getLogDirectory());
         configuration.setReplaceOSVars(getReplaceOSVars());
-        configuration.setVMArgsPath(getVMArgsPath());
         configuration.setSysConfigPath(getSysConfigPath());
         configuration.setReleaseConfigDirectory(getReleaseConfigDirectory());
         configuration.setPipeDirectory(getPipeDirectory());
-        configuration.setCookie(getCookie());
         configuration.setWantsPTY(getWantsPTY());
     }
 
@@ -166,11 +143,9 @@ public class ParametersPanel extends CommonProgramParametersPanel {
         setCodeLoadingMode(configuration.getCodeLoadingMode());
         setLogDirectory(configuration.getLogDirectory());
         setReplaceOSVars(configuration.getReplaceOSVars());
-        setVMArgsPath(configuration.getVMArgsPath());
         setSysConfigPath(configuration.getSysConfigPath());
         setReleaseConfigDirectory(configuration.getReleaseConfigDirectory());
         setPipeDirectory(configuration.getPipeDirectory());
-        setCookie(configuration.getCookie());
         setWantsPTY(configuration.getWantsPTY());
     }
 
@@ -196,11 +171,9 @@ public class ParametersPanel extends CommonProgramParametersPanel {
         addCodeLoadingModeComponent();
         addLogDirectoryComponent();
         addReplaceOSVarsComponent();
-        addVMArgsPathComponent();
         addSysConfigPathComponent();
         addReleaseConfigDirectoryComponent();
         addPipeDirectoryComponent();
-        addCookieComponent();
         addWantsPtyComponent();
     }
 
@@ -284,16 +257,6 @@ public class ParametersPanel extends CommonProgramParametersPanel {
         add(replaceOSVarsComponent, 6);
     }
 
-    private void addVMArgsPathComponent() {
-        FileChooserDescriptor fileChooserDescriptor = FileChooserDescriptorFactory.createSingleFileDescriptor();
-        //noinspection DialogTitleCapitalization
-        fileChooserDescriptor.setTitle("Select vm.args File");
-        MacroComboBoxWithBrowseButton vmArgsPathComboBox = new MacroComboBoxWithBrowseButton(fileChooserDescriptor, getProject());
-        vmArgsPathComponent = LabeledComponent.create(vmArgsPathComboBox, "vm.args File");
-        vmArgsPathComponent.setLabelLocation(BorderLayout.WEST);
-        add(vmArgsPathComponent, 7);
-    }
-
     private void addSysConfigPathComponent() {
         FileChooserDescriptor fileChooserDescriptor = FileChooserDescriptorFactory.createSingleFileDescriptor();
         //noinspection DialogTitleCapitalization
@@ -301,7 +264,7 @@ public class ParametersPanel extends CommonProgramParametersPanel {
         MacroComboBoxWithBrowseButton sysConfigPathComboBox = new MacroComboBoxWithBrowseButton(fileChooserDescriptor, getProject());
         sysConfigPathComponent = LabeledComponent.create(sysConfigPathComboBox, "sys.config File");
         sysConfigPathComponent.setLabelLocation(BorderLayout.WEST);
-        add(sysConfigPathComponent, 8);
+        add(sysConfigPathComponent, 7);
     }
 
     private void addReleaseConfigDirectoryComponent() {
@@ -310,7 +273,7 @@ public class ParametersPanel extends CommonProgramParametersPanel {
         MacroComboBoxWithBrowseButton releaseConfigDirectoryComboBox = new MacroComboBoxWithBrowseButton(fileChooserDescriptor, getProject());
         releaseConfigDirectoryComponent = LabeledComponent.create(releaseConfigDirectoryComboBox, "Release Config Directory");
         releaseConfigDirectoryComponent.setLabelLocation(BorderLayout.WEST);
-        add(releaseConfigDirectoryComponent, 9);
+        add(releaseConfigDirectoryComponent, 8);
     }
 
     private void addPipeDirectoryComponent() {
@@ -319,19 +282,13 @@ public class ParametersPanel extends CommonProgramParametersPanel {
         MacroComboBoxWithBrowseButton pipeDirectoryComboBox = new MacroComboBoxWithBrowseButton(fileChooserDescriptor, getProject());
         pipeDirectoryComponent = LabeledComponent.create(pipeDirectoryComboBox, "Pipe directory");
         pipeDirectoryComponent.setLabelLocation(BorderLayout.WEST);
-        add(pipeDirectoryComponent, 10);
-    }
-
-    private void addCookieComponent() {
-        cookieComponent = LabeledComponent.create(new JBTextField(), "Cookie");
-        cookieComponent.setLabelLocation(BorderLayout.WEST);
-        add(cookieComponent, 11);
+        add(pipeDirectoryComponent, 9);
     }
 
     private void addWantsPtyComponent() {
         wantsPTYComponent = LabeledComponent.create(new JCheckBox(), "Use Pseudo-terminal (PTY)");
         wantsPTYComponent.setLabelLocation(BorderLayout.WEST);
-        add(wantsPTYComponent, 12);
+        add(wantsPTYComponent, 10);
     }
 
     private LabeledComponent<RawCommandLineEditor> createArgumentsComponent(@NotNull String command) {

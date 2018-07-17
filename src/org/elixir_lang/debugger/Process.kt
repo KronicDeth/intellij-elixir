@@ -86,7 +86,7 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
     private val debuggerExecutionResult by lazy {
         executionEnvironment.executor.let { executor ->
             debuggableConfiguration
-                    .debuggerConfiguration(debuggerName, erlConfigPath, node.localDebuggerPort)
+                    .debuggerConfiguration(debuggerName, cookie, erlConfigPath, node.localDebuggerPort)
                     .getState(executor, executionEnvironment)
                     .execute(executor, executionEnvironment.runner)!!
         }
@@ -95,14 +95,15 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
     private val debuggedExecutionResult by lazy {
         executionEnvironment.executor.let { executor ->
             debuggableConfiguration
-                    .debuggedConfiguration(debuggedName, erlConfigPath)
+                    .debuggedConfiguration(debuggedName, cookie, erlConfigPath)
                     .getState(executor, executionEnvironment)!!
                     .execute(executor, executionEnvironment.runner)!!
         }
     }
 
     private val nodesUUID by lazy { UUID.randomUUID()!! }
-    private val debuggedName by lazy { "debugged$nodesUUID@127.0.0.1" }
+    private val cookie by lazy { debuggableConfiguration.cookie ?: nodesUUID.toString() }
+    private val debuggedName by lazy {  debuggableConfiguration.nodeName ?: "debugged$nodesUUID@127.0.0.1" }
     private val debuggerName by lazy { "debugger$nodesUUID@127.0.0.1" }
 
     private val erlConfig by lazy {
