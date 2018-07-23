@@ -12,7 +12,8 @@ object ElixirModules {
     fun add(parametersList: MutableList<String>, fileList: kotlin.collections.List<File>): MutableList<String> {
         for (file in fileList) {
             parametersList.add("-r")
-            parametersList.add(file.path)
+            // Erlang expects file paths to be separated by '/', even on Windows.
+            parametersList.add(file.path.replace('\\', '/'))
         }
 
         return parametersList
