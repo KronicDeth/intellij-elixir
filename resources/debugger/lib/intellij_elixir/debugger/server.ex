@@ -169,11 +169,15 @@ defmodule IntelliJElixir.Debugger.Server do
                     |> bindings(stack_pointer)
                     |> Keyword.keys(),
                   erlang_variable_name_string = to_string(erlang_variable_name),
-                  %{"elixir_variable_name_string" => elixir_variable_name_string, "counter_string" => counter_string} =
+                  named_captures =
                     Regex.named_captures(
                       ~r/V(?P<elixir_variable_name_string>.+)@(?<counter_string>\d)+/,
                       erlang_variable_name_string
-                    ) do
+                    ),
+                  is_map(named_captures) do
+                %{"elixir_variable_name_string" => elixir_variable_name_string, "counter_string" => counter_string} =
+                  named_captures
+
                 {String.to_atom(elixir_variable_name_string), String.to_integer(counter_string), erlang_variable_name}
               end
               |> Enum.group_by(fn {elixir_variable_name, _, _} -> elixir_variable_name end)
