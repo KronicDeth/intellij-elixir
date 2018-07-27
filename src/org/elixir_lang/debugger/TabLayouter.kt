@@ -7,7 +7,7 @@ import com.intellij.icons.AllIcons
 import com.intellij.ui.content.Content
 import com.intellij.xdebugger.ui.XDebugTabLayouter
 
-class TabLayouter(private val node: Node, private val debuggerConsole: ExecutionConsole) : XDebugTabLayouter() {
+class TabLayouter(private val node: Node) : XDebugTabLayouter() {
     private val interpretedModuleEditor: org.elixir_lang.debugger.interpreted_modules.Editor by lazy {
         org.elixir_lang.debugger.interpreted_modules.Editor(node)
     }
@@ -16,15 +16,11 @@ class TabLayouter(private val node: Node, private val debuggerConsole: Execution
             registerDebuggedConsoleContent(ui, console)
 
     override fun registerAdditionalContent(ui: RunnerLayoutUi) {
-        registerDebuggerConsoleContent(ui, debuggerConsole)
         registerInterpretedModules(ui)
     }
 
     private fun registerDebuggedConsoleContent(ui: RunnerLayoutUi, console: ExecutionConsole): Content =
         registerConsoleContent(ui, console, "DebuggedConsoleContent", "Debugged Console", 1, PlaceInGrid.bottom, false)
-
-    private fun registerDebuggerConsoleContent(ui: RunnerLayoutUi, console: ExecutionConsole): Content =
-        registerConsoleContent(ui, console, "DebuggerConsoleContent", "Debugger Console", 2, PlaceInGrid.right, true)
 
     private fun registerConsoleContent(
             ui: RunnerLayoutUi,

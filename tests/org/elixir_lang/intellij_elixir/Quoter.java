@@ -110,7 +110,7 @@ public class Quoter {
         final OtpMbox otpMbox = otpNode.createMbox();
         OtpErlangObject request = elixirString(code);
 
-        return (OtpErlangTuple) GenericServer.call(
+        return (OtpErlangTuple) GenericServer.INSTANCE.call(
                 otpMbox,
                 otpNode,
                 REMOTE_NAME,

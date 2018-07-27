@@ -10,7 +10,7 @@ import com.intellij.openapi.options.SettingsEditorGroup
 import com.intellij.openapi.project.Project
 import com.intellij.psi.search.GlobalSearchScope
 import org.elixir_lang.Mix
-import org.elixir_lang.debugged.Modules
+import org.elixir_lang.debugger.Modules
 import org.elixir_lang.debugger.configuration.Debuggable
 import org.elixir_lang.debugger.settings.stepping.ModuleFilter
 import org.elixir_lang.run.*
@@ -29,44 +29,12 @@ open class Configuration(name: String, project: Project, configurationFactory: C
     override var moduleFilterList: MutableList<ModuleFilter> = mutableListOf()
     override val nodeName: String? = null
 
-    override fun debuggerConfiguration(
-            name: String,
-            cookie: String,
-            configPath: String,
-            javaPort: Int
-    ): org.elixir_lang.debugger.Configuration {
-        val debugger = org.elixir_lang.debugger.Configuration(name, project, factory)
-        debugger.erlArgumentList.addAll(erlArgumentList)
-        debugger.erlArgumentList.addAll(arrayOf("-name", name))
-        debugger.erlArgumentList.addAll(arrayOf("-setcookie", cookie))
-        debugger.erlArgumentList.addAll(arrayOf("-config", configPath))
-
-        debugger.elixirArgumentList.addAll(elixirArgumentList)
-
-        debugger.javaPort = javaPort
-
-        debugger.workingDirectory = workingDirectory
-        debugger.isPassParentEnvs = isPassParentEnvs
-        debugger.envs = envs
-        debugger.configurationModule.module = configurationModule.module
-
-        debugger.inheritApplicationModuleFilters = inheritApplicationModuleFilters
-        debugger.moduleFilterList = moduleFilterList
-
-        return debugger
-    }
-
-    override fun debuggedConfiguration(
-            name: String,
-            cookie: String,
-            configPath: String
-    ): Configuration {
+    override fun debuggedConfiguration(name: String, cookie: String): Configuration {
         val debugged = org.elixir_lang.mix.Configuration(this.name, project, factory)
 
         debugged.erlArgumentList.addAll(erlArgumentList)
         debugged.erlArgumentList.addAll(arrayOf("-name", name))
         debugged.erlArgumentList.addAll(arrayOf("-setcookie", cookie))
-        debugged.erlArgumentList.addAll(arrayOf("-config", configPath))
         debugged.erlArgumentList.addAll(Modules.erlArgumentList())
 
         debugged.elixirArgumentList.addAll(elixirArgumentList)

@@ -8,9 +8,12 @@ import com.intellij.execution.configurations.ParametersList
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.roots.ModuleRootManager
+import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.vfs.VfsUtil
 import org.elixir_lang.debugger.settings.stepping.ModuleFilter
+import org.elixir_lang.mix.ensureMostSpecificSdk
 import org.elixir_lang.run.configuration.Module
 import org.jdom.Element
 import java.io.File
@@ -217,6 +220,8 @@ abstract class Configuration(name: String, project: Project, configurationFactor
     override fun getValidModules(): Collection<com.intellij.openapi.module.Module> =
             project.let { ModuleManager.getInstance(it) }.modules.asList()
 
+    fun sdkPaths(): List<String> = ensureModule().sdkPaths()
+
     protected val _envs = mutableMapOf<String, String>()
     private var _passParentEnvs: Boolean = false
     protected var workingDirectoryURL: String? = null
@@ -234,3 +239,7 @@ private fun ensureModule(workingDirectory: String, project: Project): com.intell
 
 private fun workingDirectory(module: com.intellij.openapi.module.Module): String? =
         ModuleRootManager.getInstance(module).contentRoots.firstOrNull()?.path
+
+private fun com.intellij.openapi.module.Module.sdkPaths(): List<String> = ensureMostSpecificSdk(this).paths()
+
+private fun Sdk.paths(): List<String> = rootProvider.getFiles(OrderRootType.CLASSES).map { it.canonicalPath!! }

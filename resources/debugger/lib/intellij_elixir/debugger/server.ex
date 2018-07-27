@@ -19,15 +19,14 @@ defmodule IntelliJElixir.Debugger.Server do
     file: "nofile"
   )
 
-  defstruct reason_by_uninterpretable: %{},
-            port: nil,
-            reject_erlang_module_name_patterns: [],
-            reject_regex: nil,
-            rejected_module_names: [],
-            socket: nil,
-            task: nil
+  defstruct attached: nil,
+            evaluate_meta_pid_to_froms: %{}
 
   # Functions
+
+  def start_link(options = []) do
+    GenServer.start_link(__MODULE__, options, name: __MODULE__)
+  end
 
   ## Client Functions
 
@@ -35,31 +34,66 @@ defmodule IntelliJElixir.Debugger.Server do
     GenServer.cast(__MODULE__, {:breakpoint_reached, pid})
   end
 
-  def put_reject_elixir_module_name_patterns(state = %__MODULE__{}, elixir_module_name_patterns)
-      when is_list(elixir_module_name_patterns) do
-    erlang_module_name_patterns = Enum.map(elixir_module_name_patterns, &elixir_module_name_to_erlang_module_name/1)
-    regex = erlang_module_name_patterns_to_regex(erlang_module_name_patterns)
-
-    %__MODULE__{state | reject_erlang_module_name_patterns: erlang_module_name_patterns, reject_regex: regex}
-  end
-
   ## GenServer callbacks
 
   @impl GenServer
-
-  def handle_cast({:interpret, module}, state = %__MODULE__{socket: socket}) when is_atom(module) do
-    status =
-      case :int.ni(module) do
-        {:module, ^module} -> :ok
-        :error = error -> error
-      end
-
-    send_message(socket, {:interpreted, module, status})
-
-    {:noreply, state}
+  def init([]) do
+    {:ok, %__MODULE__{}}
   end
 
-  def handle_cast(:interpreted, state = %__MODULE__{socket: socket}) do
+  @impl GenServer
+
+  def handle_call(:attach, {pid, _ref}, state = %__MODULE__{attached: nil}) when is_pid(pid) do
+    :int.auto_attach([:break], {__MODULE__, :breakpoint_reached, []})
+
+    {:reply, GenServer.call(IntelliJElixir.Debugged, :continue), %__MODULE__{state | attached: pid}}
+  end
+
+  def handle_call(
+        {:interpret, %{sdk_paths: sdk_paths, reject_elixir_module_name_patterns: elixir_module_name_patterns}},
+        _from,
+        state = %__MODULE__{}
+      )
+      when is_list(sdk_paths) and is_list(elixir_module_name_patterns) do
+    erlang_module_name_patterns = Enum.map(elixir_module_name_patterns, &elixir_module_name_to_erlang_module_name/1)
+
+    regex = erlang_module_name_patterns_to_regex(erlang_module_name_patterns)
+
+    code_absolute_paths =
+      :code.get_path()
+      |> Stream.map(&to_string/1)
+      |> Stream.map(&Path.absname/1)
+      |> Enum.sort()
+
+    sdk_absolute_path_set =
+      sdk_paths
+      |> Stream.map(&Path.absname/1)
+      |> MapSet.new()
+
+    Enum.each(code_absolute_paths, fn code_absolute_path ->
+      message = [:blue, "Interpreting modules under ", :magenta, code_absolute_path, :blue, "..."]
+
+      if MapSet.member?(sdk_absolute_path_set, code_absolute_path) do
+        [message, "  ...", :yellow, "skipped"]
+        |> IO.ANSI.format()
+        |> IO.puts()
+      else
+        message
+        |> IO.ANSI.format()
+        |> IO.puts()
+
+        interpret_modules_in(code_absolute_path, regex)
+
+        [:blue, "  ...", :green, "completed"]
+        |> IO.ANSI.format()
+        |> IO.puts()
+      end
+    end)
+
+    {:reply, :ok, state}
+  end
+
+  def handle_call(:interpreted, _from, state = %__MODULE__{}) do
     interpreted_set =
       :int.interpreted()
       |> MapSet.new()
@@ -72,89 +106,45 @@ defmodule IntelliJElixir.Debugger.Server do
         {module in interpreted_set, module}
       end)
 
-    send_message(socket, {:interpreted, interpreted_modules})
-
-    {:noreply, state}
+    {:reply, interpreted_modules, state}
   end
 
-  def handle_cast({:stop_interpreting, module}, state = %__MODULE__{socket: socket}) do
-    :int.nn(module)
-    send_message(socket, {:stopped_interpreting, module})
-    {:noreply, state}
+  def handle_call({:stop_interpreting, module}, _from, state = %__MODULE__{}) do
+    {:reply, :int.nn(module), state}
   end
 
-  def handle_cast(
-        :reason_by_uninterpretable,
-        state = %__MODULE__{socket: socket, reason_by_uninterpretable: reason_by_uninterpretable}
-      ) do
-    send_message(socket, {:reason_by_uninterpretable, reason_by_uninterpretable})
-    {:noreply, state}
-  end
-
-  def handle_cast(
-        :rejected_module_names,
-        state = %__MODULE__{rejected_module_names: rejected_module_names, socket: socket}
-      ) do
-    response = {:rejected_module_names, rejected_module_names}
-    send_message(socket, response)
-    {:noreply, state}
-  end
-
-  def handle_cast({:connect, name}, state = %__MODULE__{}) when is_atom(name) do
-    true = Node.connect(name)
-    # unpause debugged process waiting in `IntelliJElixir.Debugged.wait()`
-    GenServer.call({IntelliJElixir.Debugged, name}, :continue)
-    {:noreply, state}
-  end
-
-  # `file` is passed through, so that in the case of failure, the file's line can be marked as an invalid breakpoint
-  # location without having to recalculate the `file` from the `module` and `line`.
-  def handle_cast({:set_breakpoint, module, line, file}, state = %__MODULE__{socket: socket})
-      when is_binary(file)
+  def handle_call({:set_breakpoint, module, line}, _from, state = %__MODULE__{})
       when is_atom(module) and is_integer(line) do
     unless module in :int.interpreted(), do: :int.ni(module)
 
-    response = {:set_breakpoint_response, module, line, :int.break(module, line), file}
-    send_message(socket, response)
-    {:noreply, state}
+    {:reply, :int.break(module, line), state}
   end
 
-  def handle_cast({:remove_breakpoint, module, line}, state) when is_atom(module) and is_integer(line) do
-    :int.delete_break(module, line)
-    {:noreply, state}
+  def handle_call({:remove_breakpoint, module, line}, _from, state) when is_atom(module) and is_integer(line) do
+    {:reply, :int.delete_break(module, line), state}
   end
 
-  def handle_cast({:step_into, pid}, state) when is_pid(pid) do
-    :int.step(pid)
-    {:noreply, state}
+  def handle_call({:step_into, pid}, _from, state) when is_pid(pid) do
+    {:reply, :int.step(pid), state}
   end
 
-  def handle_cast({:step_over, pid}, state) when is_pid(pid) do
-    :int.next(pid)
-    {:noreply, state}
+  def handle_call({:step_over, pid}, _from, state) when is_pid(pid) do
+    {:reply, :int.next(pid), state}
   end
 
-  def handle_cast({:step_out, pid}, state) when is_pid(pid) do
-    :int.finish(pid)
-    {:noreply, state}
+  def handle_call({:step_out, pid}, _from, state) when is_pid(pid) do
+    {:reply, :int.finish(pid), state}
   end
 
-  def handle_cast({:continue, pid}, state) when is_pid(pid) do
-    :int.continue(pid)
-    {:noreply, state}
+  def handle_call({:continue, pid}, _from, state) when is_pid(pid) do
+    {:reply, :int.continue(pid), state}
   end
 
-  def handle_cast({:breakpoint_reached, pid}, state = %__MODULE__{socket: socket}) do
-    send_message(socket, {:breakpoint_reached, pid, snapshot_with_stacks()})
-    {:noreply, state}
+  def handle_call(:stop, _from, state = %__MODULE__{}) do
+    {:stop, :normal, :ok, state}
   end
 
-  def handle_cast(:stop, state = %__MODULE__{socket: socket}) do
-    send_message(socket, :stopped)
-    {:stop, :normal, state}
-  end
-
-  def handle_cast(
+  def handle_call(
         {:evaluate,
          %{
            env: %{file: file, function: function = {name, arity}, line: line, module: module},
@@ -162,7 +152,8 @@ defmodule IntelliJElixir.Debugger.Server do
            pid: pid,
            stack_pointer: stack_pointer
          }},
-        state = %__MODULE__{socket: socket}
+        from,
+        state = %__MODULE__{}
       )
       when is_binary(file) and is_atom(name) and is_integer(arity) and arity >= 0 and is_integer(line) and
              is_atom(module) and is_binary(expression) and is_pid(pid) and is_integer(stack_pointer) do
@@ -247,46 +238,50 @@ defmodule IntelliJElixir.Debugger.Server do
 
             :int.meta(meta_pid, :eval, {module, code, stack_pointer})
 
+            # reply in `handle_info({_, {:eval_rsp, _}}, state)`
+            {:noreply,
+             update_in(state, [Access.key!(:evaluate_meta_pid_to_froms), Access.key(meta_pid, [])], &[from | &1])}
+
           error ->
-            send_message(socket, {:evaluated, error})
+            {:reply, error, state}
         end
 
       error ->
         IO.warn("Failed to obtain meta pid for #{inspect(pid)}: #{inspect(error)}")
 
-        send_message(socket, {:evaluated, error})
+        {:reply, error, state}
     end
+  end
+
+  @impl GenServer
+
+  def handle_cast({:breakpoint_reached, pid}, state = %__MODULE__{attached: attached}) when is_pid(attached) do
+    GenServer.cast(attached, {:breakpoint_reached, pid, snapshot_with_stacks()})
 
     {:noreply, state}
   end
 
-  def handle_cast(request, state) do
-    super(request, state)
+  @impl GenServer
+
+  def handle_info({meta_pid, {:eval_rsp, result}}, state = %__MODULE__{}) do
+    {froms, new_evaluate_meta_pid_to_froms} = Map.pop(state.evaluate_meta_pid_to_froms, meta_pid)
+
+    froms
+    |> Kernel.||([])
+    |> Enum.each(fn from ->
+      GenServer.reply(from, result)
+    end)
+
+    {:noreply, %__MODULE__{state | evaluate_meta_pid_to_froms: new_evaluate_meta_pid_to_froms}}
   end
 
   @impl GenServer
-  def handle_info({_meta_pid, {:eval_rsp, result}}, state = %__MODULE__{socket: socket}) do
-    send_message(socket, {:evaluated, result})
+  def handle_info({:DOWN, _, :process, pid, reason}, state = %__MODULE__{attached: pid}) do
+    [:red, "Debugger detached: ", :red, inspect(reason)]
+    |> IO.ANSI.format()
+    |> IO.puts()
 
-    {:noreply, state}
-  end
-
-  def handle_info({:tcp, socket, message}, state = %__MODULE__{socket: socket}) do
-    handle_cast(:erlang.binary_to_term(message), state)
-  end
-
-  def handle_info(request, state) do
-    super(request, state)
-  end
-
-  @impl GenServer
-  def init(state = %__MODULE__{port: port}) do
-    opts = [:binary, {:packet, 4}, {:active, true}]
-    {:ok, host} = :inet.gethostname()
-    {:ok, socket} = :gen_tcp.connect(host, port, opts)
-    :int.auto_attach([:break], {__MODULE__, :breakpoint_reached, []})
-
-    {:ok, %__MODULE__{state | socket: socket}}
+    {:noreply, %__MODULE__{state | attached: nil}}
   end
 
   ## Private Functions
@@ -320,6 +315,42 @@ defmodule IntelliJElixir.Debugger.Server do
       |> Enum.join("|")
 
     Regex.compile!("^(#{unpinned_pattern})$")
+  end
+
+  defp interpret_modules_in(paths, reject_regex) when is_list(paths) do
+    Enum.each(paths, &interpret_modules_in(&1, reject_regex))
+  end
+
+  defp interpret_modules_in(path, reject_regex) when is_binary(path) do
+    filtered =
+      path
+      |> Path.join("**/*.beam")
+      |> Path.wildcard()
+      |> Stream.map(&Path.basename(&1, ".beam"))
+      |> Enum.flat_map(fn basename ->
+        if Regex.match?(reject_regex, basename) do
+          []
+        else
+          [basename]
+        end
+      end)
+
+    filtered
+    |> Stream.map(&String.to_atom/1)
+    |> Stream.filter(&(:int.interpretable(&1) == true && !:code.is_sticky(&1) && &1 != __MODULE__))
+    |> Enum.each(&time_interpret/1)
+
+    :ok
+  end
+
+  defp time_interpret(module) when is_atom(module) do
+    {microseconds, result} = :timer.tc(fn -> safely_interpret(module) end)
+
+    [[:blue, "  ", :bright, :magenta, inspect(module), :blue, " in ", :magenta, to_string(microseconds), :italic, "μs"]]
+    |> IO.ANSI.format()
+    |> IO.puts()
+
+    result
   end
 
   defp meta_pid_to_stack(meta_pid, %{line: break_line}) do
@@ -379,8 +410,12 @@ defmodule IntelliJElixir.Debugger.Server do
     end
   end
 
-  defp send_message(socket, message) do
-    :gen_tcp.send(socket, :erlang.term_to_binary(message))
+  defp safely_interpret(module) when is_atom(module) do
+    with {:module, _} <- :int.ni(module) do
+      :ok
+    end
+  rescue
+    e -> {:error, e}
   end
 
   defp snapshot_with_stacks() do

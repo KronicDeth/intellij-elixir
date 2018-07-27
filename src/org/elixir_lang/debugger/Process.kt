@@ -22,20 +22,17 @@ import com.ericsson.otp.erlang.OtpErlangAtom
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangPid
 import com.intellij.execution.ExecutionException
-import com.intellij.execution.process.ProcessEvent
 import com.intellij.execution.process.ProcessHandler
-import com.intellij.execution.process.ProcessListener
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.execution.ui.ExecutionConsole
 import com.intellij.icons.AllIcons
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.MessageType
-import com.intellij.openapi.util.Key
-import com.intellij.openapi.util.io.FileUtil
 import com.intellij.psi.PsiManager
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.testFramework.LightVirtualFile
@@ -53,17 +50,25 @@ import org.elixir_lang.ElixirFileType
 import org.elixir_lang.beam.chunk.lines.file_names.Index
 import org.elixir_lang.beam.term.inspect
 import org.elixir_lang.debugger.configuration.Debuggable
+import org.elixir_lang.debugger.configuration.doNotInterpretPatterns
 import org.elixir_lang.debugger.line_breakpoint.Handler
 import org.elixir_lang.debugger.line_breakpoint.Properties
 import org.elixir_lang.debugger.node.Exception
 import org.elixir_lang.debugger.node.ProcessSnapshot
 import org.elixir_lang.debugger.node.event.Listener
+import org.elixir_lang.debugger.node.ok_error_reason.ErrorReason
+import org.elixir_lang.debugger.node.ok_error_reason.OK
 import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.psi.impl.getModuleName
+import org.elixir_lang.run.Configuration
 import org.elixir_lang.run.ensureWorkingDirectory
-import java.io.File
+import org.elixir_lang.utils.ElixirModulesUtil.elixirModuleNameToErlang
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.system.measureNanoTime
 
 class Process(session: XDebugSession, private val executionEnvironment: ExecutionEnvironment) :
         XDebugProcess(session), Listener {
@@ -75,7 +80,7 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
     override fun createTabLayouter(): TabLayouter = tabLayouter
 
     private val tabLayouter by lazy {
-        TabLayouter(node, debuggerExecutionResult.executionConsole)
+        TabLayouter(node)
     }
 
     private fun sourcePosition(breakpoint: XLineBreakpoint<Properties>): SourcePosition? =
@@ -83,19 +88,10 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
 
     private val breakpointHandlers = arrayOf<XBreakpointHandler<*>>(Handler(this))
 
-    private val debuggerExecutionResult by lazy {
-        executionEnvironment.executor.let { executor ->
-            debuggableConfiguration
-                    .debuggerConfiguration(debuggerName, cookie, erlConfigPath, node.localDebuggerPort)
-                    .getState(executor, executionEnvironment)
-                    .execute(executor, executionEnvironment.runner)!!
-        }
-    }
-
     private val debuggedExecutionResult by lazy {
         executionEnvironment.executor.let { executor ->
             debuggableConfiguration
-                    .debuggedConfiguration(debuggedName, cookie, erlConfigPath)
+                    .debuggedConfiguration(debuggedName, cookie)
                     .getState(executor, executionEnvironment)!!
                     .execute(executor, executionEnvironment.runner)!!
         }
@@ -106,30 +102,13 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
     private val debuggedName by lazy {  debuggableConfiguration.nodeName ?: "debugged$nodesUUID@127.0.0.1" }
     private val debuggerName by lazy { "debugger$nodesUUID@127.0.0.1" }
 
-    private val erlConfig by lazy {
-        """
-        |[{kernel,
-        |  [
-        |    {sync_nodes_mandatory, ['$debuggedName', '$debuggerName']},
-        |    {sync_nodes_timeout, 10000}
-        |  ]}
-        |].
-        """.trimMargin()
-    }
-
-    private val erlConfigPath by lazy {
-        val temporaryDirectory = FileUtil.createTempDirectory("intellij_elixir", null)
-        val file = File(temporaryDirectory, "sys.config")
-        file.writeText(erlConfig)
-
-        file.path
-    }
-
     private val node by lazy {
         try {
             //TODO add the debugger node to disposable hierarchy (we may fail to initialize session so the session will not be stopped!)
-            Node(this)
+            Node(debuggerName, debuggedName, cookie, { debuggedExecutionResult }, this)
         } catch (e: Exception) {
+            session.reportError(e.message ?: "Exception creating JInterface node")
+            session.stop()
             throw ExecutionException(e)
         }
     }
@@ -147,7 +126,12 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
                 sourcePositionToBreakpoint[sourcePosition] = breakpoint
 
                 for (moduleName in moduleNameSet) {
-                    node.setBreakpoint(moduleName, sourcePosition.file.path, sourcePosition.line)
+                    moduleName
+                            .let(::elixirModuleNameToErlang)
+                            .let(::OtpErlangAtom)
+                            .run {
+                                afterInitialized { addBreakpoint(breakpoint, sourcePosition, this) }
+                            }
                 }
             } else {
                 session.reportMessage(
@@ -157,6 +141,30 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
             }
         }
     }
+
+    private fun afterInitialized(task: () -> Unit) {
+        if (initialized.get()) {
+            task()
+        } else {
+            initializers.add(task)
+        }
+    }
+
+    private fun addBreakpoint(breakpoint: XLineBreakpoint<Properties>, sourcePosition: SourcePosition, module: OtpErlangAtom) {
+        try {
+            val response = node.setBreakpoint(module, sourcePositionLineToModuleLine(sourcePosition.line))
+
+            when (response) {
+                OK -> session.reportMessage("Breakpoint at ${sourcePosition.file}:${sourcePosition.line} set", MessageType.INFO)
+                is ErrorReason -> session.updateBreakpointPresentation(breakpoint, null, inspect(response.reason))
+            }
+        } catch (exception: Exception) {
+            session.updateBreakpointPresentation(breakpoint, null, exception.message)
+        }
+    }
+
+    // sourcePosition.line is 0-based, but `:int` lines are 1-based
+    private fun sourcePositionLineToModuleLine(sourcePositionLine: Int) = sourcePositionLine + 1
 
     /**
      * [sourcePositionToBreakpoint] records file:line<->breakpoint correspondence, so this is no-op.
@@ -305,7 +313,10 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
            sourcePositionToBreakpoint.remove(breakpointPosition)
 
            moduleNameSet(breakpointPosition).forEach { moduleName ->
-               node.removeBreakpoint(moduleName, breakpointPosition.line)
+               moduleName
+                       .let(::elixirModuleNameToErlang)
+                       .let(::OtpErlangAtom)
+                       .let { node.removeBreakpoint(it, breakpointPosition.line) }
            }
        }
     }
@@ -318,35 +329,54 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
         //TODO implement me
     }
 
+    private val initialized = AtomicBoolean(false)
+    private val initializers = ConcurrentLinkedQueue<() -> Unit>()
+
     override fun sessionInitialized() {
-        // lazy, so starts node
-        node
+        afterInitialized {
+            session.reportMessage("Interpreting modules... ", MessageType.INFO)
 
-        val debuggerProcessHandler = debuggerExecutionResult.processHandler
-        debuggerProcessHandler.addProcessListener(object : ProcessListener {
-            override fun startNotified(event: ProcessEvent) {}
+            val interpretationSeconds = measureNanoTime {
+                node.interpret(
+                        debuggableConfiguration.let { it as Configuration }.sdkPaths(),
+                        debuggableConfiguration.doNotInterpretPatterns()
+                )
+            }.let { TimeUnit.NANOSECONDS.toSeconds(it) }
 
-            override fun onTextAvailable(event: ProcessEvent, outputType: Key<*>) {
-                session.reportMessage(event.text, MessageType.WARNING)
-            }
+            session.reportMessage("... completed ($interpretationSeconds seconds)", MessageType.INFO)
+        }
+        afterInitialized {
+            node.attach()
+            session.reportMessage("Attached to Elixir node", MessageType.INFO)
+        }
 
-            override fun processWillTerminate(event: ProcessEvent, willBeDestroyed: Boolean) {}
+        asyncRunInitializers()
+    }
 
-            override fun processTerminated(event: ProcessEvent) {
-                event.text?.let { text ->
-                    session.reportMessage(text, MessageType.INFO)
-                }
+    private fun asyncRunInitializers() {
+        ApplicationManager.getApplication().executeOnPooledThread {
+            try {
+                runInitializers()
 
-                session.reportMessage("Debugger node terminated", MessageType.INFO)
+                initialized.set(true)
 
-                debuggedExecutionResult.processHandler.destroyProcess()
-
+                // run anything inserted between first runInitializers and above line
+                runInitializers()
+            } catch (exception: Exception) {
+                session.reportError(exception.message ?: exception.toString())
                 session.stop()
             }
-        })
+        }
+    }
 
-        node.connect(debuggedName)
-        node.interpreted()
+    private fun runInitializers() {
+        while (!initializers.isEmpty()) {
+            val initializer = initializers.poll()
+
+            if (initializer != null) {
+                initializer()
+            }
+        }
     }
 
     override fun startStepInto() {
@@ -363,12 +393,12 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
 
     override fun stop() {
         node.stop()
-        debuggerExecutionResult.processHandler.destroyProcess()
         debuggedExecutionResult.processHandler.destroyProcess()
     }
 
     override fun unknownMessage(messageText: String) {
         session.reportMessage("Unknown message received: $messageText", MessageType.WARNING)
+        session.stop()
     }
 
     fun evaluate(

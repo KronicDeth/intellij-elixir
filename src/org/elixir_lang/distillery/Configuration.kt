@@ -14,7 +14,7 @@ import com.intellij.openapi.options.SettingsEditorGroup
 import com.intellij.openapi.project.Project
 import com.intellij.util.io.exists
 import org.elixir_lang.Distillery
-import org.elixir_lang.debugged.Modules
+import org.elixir_lang.debugger.Modules
 import org.elixir_lang.debugger.configuration.Debuggable
 import org.elixir_lang.debugger.settings.stepping.ModuleFilter
 import org.elixir_lang.distillery.configuration.editor.CodeLoadingMode
@@ -38,31 +38,7 @@ class Configuration(name: String, project: Project, configurationFactory: Config
     override val nodeName: String?
         get() = vmArgsPath?.let(::vmArgsPathToNodeName)
 
-    override fun debuggerConfiguration(
-            name: String,
-            cookie: String,
-            configPath: String,
-            javaPort: Int
-    ): org.elixir_lang.debugger.Configuration {
-        val debugger= org.elixir_lang.debugger.Configuration(name, project, factory)
-        debugger.erlArgumentList.addAll(arrayOf("-name", name))
-        debugger.erlArgumentList.addAll(arrayOf("-setcookie", cookie))
-        debugger.erlArgumentList.addAll(arrayOf("-config", configPath))
-
-        debugger.javaPort = javaPort
-
-        debugger.workingDirectory = workingDirectory
-        debugger.isPassParentEnvs = isPassParentEnvs
-        debugger.envs = envs
-        debugger.configurationModule.module = configurationModule.module
-
-        debugger.inheritApplicationModuleFilters = inheritApplicationModuleFilters
-        debugger.moduleFilterList = moduleFilterList
-
-        return debugger
-    }
-
-    override fun debuggedConfiguration(name: String, cookie: String, configPath: String): Configuration {
+    override fun debuggedConfiguration(name: String, cookie: String): Configuration {
         val debugged = Configuration(name, project, factory)
 
         debugged.workingDirectory = workingDirectory
@@ -71,11 +47,7 @@ class Configuration(name: String, project: Project, configurationFactory: Config
         val envs: MutableMap<String, String> = mutableMapOf()
         envs.putAll(this.envs)
         envs.compute(ERL_OPTS) { _, current ->
-            val erlArgumentList=  listOfNotNull(
-                    current,
-                    "-config",
-                    configPath
-            ) + Modules.erlArgumentList()
+            val erlArgumentList=  listOfNotNull(current) + Modules.erlArgumentList()
 
             erlArgumentList.joinToString(" ")
         }

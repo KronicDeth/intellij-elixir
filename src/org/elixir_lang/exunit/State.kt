@@ -75,7 +75,7 @@ class State(environment: ExecutionEnvironment, private val configuration: Config
 
         val properties = TestConsoleProperties(configuration, TEST_FRAMEWORK_NAME, executor)
         val console = createAndAttachConsole(TEST_FRAMEWORK_NAME, processHandler, properties)
-        ElixirConsoleUtil.attachFilters(configuration.getProject(), console!!)
+        ElixirConsoleUtil.attachFilters(configuration.project, console!!)
 
         val executionResult = DefaultExecutionResult(console, processHandler, *createActions(console, processHandler))
         executionResult.setRestartActions(ToggleAutoTestAction())
