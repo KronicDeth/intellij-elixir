@@ -2,16 +2,17 @@ package org.elixir_lang
 
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.projectRoots.Sdk
-import org.elixir_lang.file.LevelPropertyPusher.level
 import org.elixir_lang.exunit.ElixirModules
+import org.elixir_lang.file.LevelPropertyPusher.level
 
 object ExUnit {
     fun commandLine(environment: Map<String, String>,
                     workingDirectory: String?,
                     elixirSdk: Sdk,
                     erlArgumentList: kotlin.collections.List<String> = emptyList(),
-                    elixirArgumentList: kotlin.collections.List<String> = emptyList()): GeneralCommandLine {
-
+                    elixirArgumentList: kotlin.collections.List<String> = emptyList(),
+                    mixArgumentList: kotlin.collections.List<String> = emptyList()
+    ): GeneralCommandLine {
         val commandLine = org.elixir_lang.Mix.commandLine(
                 environment,
                 workingDirectory,
@@ -19,6 +20,7 @@ object ExUnit {
                 erlArgumentList,
                 ElixirModules.parametersList(level(elixirSdk)) + elixirArgumentList
         )
+        commandLine.addParameters(mixArgumentList)
         addExUnit(commandLine, elixirSdk)
 
         return commandLine

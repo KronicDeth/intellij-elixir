@@ -44,12 +44,20 @@ class Configuration(name: String, project: Project) :
 
         debugged.elixirArgumentList.addAll(elixirArgumentList)
 
+        debugged.mixArgumentList.addAll(listOf("do", "intellij_elixir.debug,"))
+
         debugged.mixTestArgumentList.addAll(mixTestArgumentList)
         debugged.mixTestArgumentList.add("--trace")
 
         debugged.workingDirectory = workingDirectory
         debugged.isPassParentEnvs = isPassParentEnvs
+
+        // Explicit MIX_ENV so that `intellij_elixir.debug` uses the test code paths
+        val envs = mutableMapOf<String, String>()
+        envs.putAll(envs)
+        envs.putIfAbsent("MIX_ENV", "test")
         debugged.envs = envs
+
         debugged.configurationModule.module = configurationModule.module
 
         return debugged
@@ -91,6 +99,12 @@ class Configuration(name: String, project: Project) :
         get() = elixirArgumentList.toArguments()
         set(arguments) = elixirArgumentList.fromArguments(arguments)
 
+    /**
+     * This property only exists so that [Configuration.debuggedConfiguration] can add `do intellij_elixir.debug,`
+     * before `test` task argument in the command line.
+     */
+    private var mixArgumentList: MutableList<String> = mutableListOf()
+
     private var mixTestArguments: String?
         get() = mixTestArgumentList.toArguments()
         set(arguments) = mixTestArgumentList.fromArguments(arguments)
@@ -101,7 +115,14 @@ class Configuration(name: String, project: Project) :
         val workingDirectory = ensureWorkingDirectory()
         val module = ensureModule()
         val sdk = ensureMostSpecificSdk(module)
-        val commandLine = ExUnit.commandLine(envs, workingDirectory, sdk, erlArgumentList, elixirArgumentList)
+        val commandLine = ExUnit.commandLine(
+                envs,
+                workingDirectory,
+                sdk,
+                erlArgumentList,
+                elixirArgumentList,
+                mixArgumentList
+        )
         commandLine.addParameters(mixTestArgumentList)
 
         return commandLine
