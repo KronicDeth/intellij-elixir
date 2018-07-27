@@ -31,7 +31,7 @@ class Configuration(name: String, project: Project, configurationFactory: Config
     override val nodeName: String? = null
 
     override fun debuggedConfiguration(name: String, cookie: String): Configuration {
-        val debugged = Configuration(this.name, project, factory)
+        val debugged = Configuration(this.name, project, factory!!)
 
         debugged.erlArgumentList.addAll(erlArgumentList)
         debugged.erlArgumentList.addAll(arrayOf("-name", name))

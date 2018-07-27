@@ -63,13 +63,13 @@ class Handler : RenameHandler {
         invoke(dataContext?.let { CommonDataKeys.EDITOR.getData(it) }, elements, dataContext)
     }
 
-    private fun createRenamer(elementToRename: PsiElement, editor: Editor?): VariableInplaceRenamer? =
+    private fun createRenamer(elementToRename: PsiElement, editor: Editor): VariableInplaceRenamer =
             Inplace(elementToRename as PsiNamedElement, editor)
 
     // See `com.intellij.refactoring.rename.inplace.VariableInplaceRenameHandler.doRename`
     private fun invoke(editor: Editor?, element: PsiElement, dataContext: DataContext?) {
-        val renamer = createRenamer(element, editor)
-        val startedRename = renamer?.performInplaceRename() ?: false
+        val renamer = createRenamer(element, editor!!)
+        val startedRename = renamer.performInplaceRename()
 
         if (!startedRename) {
             performDialogRename(element, editor, dataContext)

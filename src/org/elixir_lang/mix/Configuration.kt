@@ -30,7 +30,7 @@ open class Configuration(name: String, project: Project, configurationFactory: C
     override val nodeName: String? = null
 
     override fun debuggedConfiguration(name: String, cookie: String): Configuration {
-        val debugged = org.elixir_lang.mix.Configuration(this.name, project, factory)
+        val debugged = org.elixir_lang.mix.Configuration(this.name, project, factory!!)
 
         debugged.erlArgumentList.addAll(erlArgumentList)
         debugged.erlArgumentList.addAll(arrayOf("-name", name))

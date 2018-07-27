@@ -39,7 +39,7 @@ class Configuration(name: String, project: Project, configurationFactory: Config
         get() = vmArgsPath?.let(::vmArgsPathToNodeName)
 
     override fun debuggedConfiguration(name: String, cookie: String): Configuration {
-        val debugged = Configuration(name, project, factory)
+        val debugged = Configuration(name, project, factory!!)
 
         debugged.workingDirectory = workingDirectory
         debugged.isPassParentEnvs = isPassParentEnvs

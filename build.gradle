@@ -8,7 +8,7 @@ ext {
   if (elixirVersion.startsWith("1.5") || elixirVersion.startsWith("1.6")) {
     quoterVersion = "1.0.0"
   } else {
-    quoterVersion = "0.1.1"
+    quoterVersion = "2.0.0"
   }
 
   cachePath = "${rootDir}/cache"
