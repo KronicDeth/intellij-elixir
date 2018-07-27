@@ -61,6 +61,7 @@ defmodule IntelliJElixir.Debugger.Server do
 
     code_absolute_paths =
       :code.get_path()
+      |> Stream.reject(& &1 == '.')
       |> Stream.map(&to_string/1)
       |> Stream.map(&Path.absname/1)
       |> Enum.sort()
