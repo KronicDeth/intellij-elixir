@@ -1,6 +1,5 @@
 package org.elixir_lang
 
-import com.ericsson.otp.erlang.OtpErlangExit
 import com.ericsson.otp.erlang.OtpMbox
 import com.ericsson.otp.erlang.OtpNode
 import com.intellij.util.TimeoutUtil.sleep
@@ -67,17 +66,7 @@ private fun waitForNameServer(nodeName: String, cookie: String): OtpNode {
 private fun OtpNode.waitFor(remote: Server) = waitForNode(remote.nodeName)
 
 private fun OtpNode.waitForNode(remoteNodeName: String) {
-    var totalTime = 0L
-    val timeout = 2000L
-
-    while (totalTime < WAIT_TIMEOUT && !ping(remoteNodeName, timeout)) {
-        totalTime += timeout
-    }
-
-    if (totalTime >= WAIT_TIMEOUT) {
-        throw OtpErlangExit("Timeout waiting for $remoteNodeName after $totalTime milliseconds")
-    }
+    while (!ping(remoteNodeName, 100)) {}
 }
 
-private const val WAIT_TIMEOUT = 20000
 private const val NAME_SERVER_TIMEOUT = 10000

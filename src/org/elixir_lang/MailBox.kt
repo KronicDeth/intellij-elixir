@@ -176,15 +176,19 @@ class MailBox(private val otpNode: OtpNode, private val otpMbox: OtpMbox) {
             wait(timeout, matcher)
 
     fun waitFor(remote: Server) {
-        var totalTimeout = 0
-        val timeout = 100
+        while (true) {
+            try {
+                val pid = processWhereIs(remote, 100)
 
-        while (totalTimeout < 60000 && processWhereIs(remote, timeout) == null) {
-            totalTimeout += timeout
-        }
-
-        if (totalTimeout >= 60000) {
-            throw OtpErlangExit("Timeout locating PID for $remote after $totalTimeout milliseconds")
+                if (pid != null) {
+                    otpMbox.link(pid)
+                    break
+                }
+            } catch (otpErlangExit: OtpErlangExit) {
+                if (otpErlangExit.reason() != TIMEOUT)  {
+                    throw otpErlangExit
+                }
+            }
         }
     }
 
@@ -197,7 +201,7 @@ class MailBox(private val otpNode: OtpNode, private val otpMbox: OtpMbox) {
             try {
                 waitingMatcher.get(timeout.toLong(), TimeUnit.MILLISECONDS)!!
             } catch (timeoutException: TimeoutException) {
-                throw OtpErlangExit("timeout")
+                throw OtpErlangExit(TIMEOUT)
             }
         } else {
             try {
@@ -267,3 +271,4 @@ class MailBox(private val otpNode: OtpNode, private val otpMbox: OtpMbox) {
 }
 
 private val CLOSE = OtpErlangAtom("CLOSE")
+private val TIMEOUT = OtpErlangAtom("timeout")

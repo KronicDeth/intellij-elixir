@@ -35,10 +35,16 @@ open class Configuration(name: String, project: Project, configurationFactory: C
         debugged.erlArgumentList.addAll(erlArgumentList)
         debugged.erlArgumentList.addAll(arrayOf("-name", name))
         debugged.erlArgumentList.addAll(arrayOf("-setcookie", cookie))
-        debugged.erlArgumentList.addAll(Modules.erlArgumentList())
+        debugged.erlArgumentList.addAll(Modules.erlArgumentList(mix = true))
 
         debugged.elixirArgumentList.addAll(elixirArgumentList)
 
+        val mixArgumentList =
+                when {
+                    mixArgumentList.isEmpty() -> listOf("do", "intellij_elixir.debug,", "run")
+                    mixArgumentList.firstOrNull() == "do" -> listOf("do", "intellij_elixir.debug,") + mixArgumentList.drop(1)
+                    else -> listOf("do", "intellij_elixir.debug,") + mixArgumentList
+                }
         debugged.mixArgumentList.addAll(mixArgumentList)
 
         debugged.workingDirectory = workingDirectory

@@ -40,7 +40,7 @@ class Configuration(name: String, project: Project) :
         debugged.erlArgumentList.addAll(erlArgumentList)
         debugged.erlArgumentList.addAll(arrayOf("-name", name))
         debugged.erlArgumentList.addAll(arrayOf("-setcookie", cookie))
-        debugged.erlArgumentList.addAll(Modules.erlArgumentList())
+        debugged.erlArgumentList.addAll(Modules.erlArgumentList(mix = true))
 
         debugged.elixirArgumentList.addAll(elixirArgumentList)
 

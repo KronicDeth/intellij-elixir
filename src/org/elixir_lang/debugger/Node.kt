@@ -54,8 +54,9 @@ class Node(
 
     private val local = Server("Elixir.IntelliJElixir.Debugger.Client", debuggerNodeName)
     private val remote = Server("Elixir.IntelliJElixir.Debugger.Server", debuggedNodeName)
-    // MUST be created on construction, so that it isn't initialized in multiple threads
-    private val mailBox = local.mailBox(remote, cookie, ensureAllStarted)
+    private val mailBox by lazy {
+      local.mailBox(remote, cookie, ensureAllStarted)
+    }
 
     init {
         runDebugger()
