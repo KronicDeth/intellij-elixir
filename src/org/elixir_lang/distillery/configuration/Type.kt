@@ -9,7 +9,7 @@ import javax.swing.Icon
 class Type : com.intellij.execution.configurations.ConfigurationType {
     override fun getConfigurationFactories(): Array<ConfigurationFactory> = arrayOf(Factory)
     override fun getConfigurationTypeDescription(): String = "Run Release CLI produced by Distillery"
-    override fun getIcon(): Icon = ElixirIcons.FILE
+    override fun getIcon(): Icon = ElixirIcons.DISTILLERY
     override fun getId(): String = "org.elixir_lang.distillery.configuration.Type"
     override fun getDisplayName(): String = "Distillery Release CLI"
 
