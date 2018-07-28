@@ -76,6 +76,7 @@ Table of Contents
                * [Frames](#frames)
                   * [Jump to Current Execution Point](#jump-to-current-execution-point)
                * [Variables](#variables)
+            * [Evaluate](#evaluate)
             * [Stepping](#stepping)
          * [Delimiters](#delimiters)
             * [Auto-inserting](#auto-inserting)
@@ -2065,7 +2066,23 @@ Tuples show their elements at their offsets.
 
 While Elixir allows rebinding variable names, Erlang does not, so when viewed in the Variables pane, rebound variables will have an `@VERSION` after their name indicating which rebinding of a the variable is.
 
+#### Evaluate
 
+When stopped at a breakpoint, you can use the Evaluate button (it looks like a simple pocket calculator) to open an editor to type code to be executed in the current stack frame.
+
+![Evaluate.png](screenshots/debugger/Evaluate.png?raw=true)
+
+The evaluator supports the full syntax.
+
+![Result.png](screenshots/debugger/evaluate/Result.png)
+
+The result of evaluating the code with be shown as the value of `result` below the entered "Expression".
+
+![Exception.png](screenshots/debugger/evaluate/Exception.png?raw=true)
+
+![Typo.png](screenshots/debugger/evaluate/Typo.png?raw=true)
+
+Errors in the code will report back as a `result` tuple with an `:EXIT` tag.  This reflects that the error has crashed the process that was evaluating the code.  Thankfully, due to how how the interpreter is written, this does not lose the current stack frame and stepping or other evaluation can continue.
 
 #### Stepping
 
