@@ -54,45 +54,6 @@ matrix:
       env: IDEA_VERSION="2017.3.5"
       jdk: oraclejdk8
       otp_release: 20.1
-
-    - elixir: 1.7.1
-      env: IDEA_VERSION="2017.2.7"
-      jdk: oraclejdk8
-      otp_release: 21.0
-    - elixir: 1.6.6
-      env: IDEA_VERSION="2017.2.7"
-      jdk: oraclejdk8
-      otp_release: 20.1
-    - elixir: 1.5.3
-      env: IDEA_VERSION="2017.2.7"
-      jdk: oraclejdk8
-      otp_release: 20.1
-
-    - elixir: 1.7.1
-      env: IDEA_VERSION="2017.1.6"
-      jdk: oraclejdk8
-      otp_release: 21.0
-    - elixir: 1.6.6
-      env: IDEA_VERSION="2017.1.6"
-      jdk: oraclejdk8
-      otp_release: 20.1
-    - elixir: 1.5.3
-      env: IDEA_VERSION="2017.1.6"
-      jdk: oraclejdk8
-      otp_release: 20.1
-
-    - elixir: 1.7.1
-      env: IDEA_VERSION="2016.3.8"
-      jdk: oraclejdk8
-      otp_release: 21.0
-    - elixir: 1.6.6
-      env: IDEA_VERSION="2016.3.8"
-      jdk: oraclejdk8
-      otp_release: 20.1
-    - elixir: 1.5.3
-      env: IDEA_VERSION="2016.3.8"
-      jdk: oraclejdk8
-      otp_release: 20.1
 before_install:
 - mix local.hex --force
 - "export DISPLAY=:99.0"
