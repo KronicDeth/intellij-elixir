@@ -1768,7 +1768,7 @@ IntelliJ Elixir allows for graphical debugging of `*.ex` files using line breakp
 1. Define a [run/debug configuration](#run-configurations)
 2. [Create breakpoints](#creating-line-breakpoints) in the `*.ex` files
 3. [Launch](#starting-the-debugger-session) a debugging session
-4. During the debugger session, [step through the breakpoints](#stepping), [examine suspended program](#examining-suspended-program), and [explore frames](#frames).
+4. During the debugger session, [step through the breakpoints](#stepping), [examine suspended program](#examining-suspended-program), [explore frames](#frames), and [evaluate code when suspended](#evaluate).
 
 #### Basics
 
@@ -1944,7 +1944,7 @@ When you temporarily disable or enable a breakpoint, its icon changes from <img 
 
 ##### Deleting Line Breakpoints
 
-Do one of he following:
+Do one of the following:
 
 * In the [Breakpoints](#viewing-all-breakpoints) dialog box, select the desired line breakpoint, and click the red minus sign.
 * In the editor, locate the line with the line breakpoint to be deleted, and click its icon in the left gutter.
@@ -1965,6 +1965,20 @@ Debug quick menu
 1. `Ctrl+Alt+D`
 2. Select the configuration from the pop-up menu
 3. Hit `Enter`
+
+It takes awhile, once the debugged process is started to configure the [debugger in BEAM](http://erlang.org/doc/man/int.html).  To ensure that breakpoints are setup before allow the debugged code to run, the debugger blocks until setup is complete.
+
+1. The debugged process will wait for the debugger to attach
+   ![Waiting for debugger to attach.png](screenshots/debugger/starting/Waiting%20for%20debugger%20to%20attach.png?raw=true)
+2. Breakpoints will be set
+3. The debugger will mark modules to be [interpreted](http://erlang.org/doc/man/int.html#ni-1)
+   1. The [code paths](http://erlang.org/doc/man/code.html#get_path-0) will be scanned for `.beam` files
+      * Code paths from the Elixir SDK will be skipped
+        ![Skipped.png](screenshots/debugger/starting/Skipped.png?raw=true)
+      * `.beam` files will be interpreted unless they match the Module Filter Pattern
+        ![Completed.png](screenshots/debugger/starting/Completed.png?raw=true)
+4. The debugger [attaches](http://erlang.org/doc/man/int.html#auto_attach-2) (so it can receive breakpoint events) and allows the debugged process to continue.
+   ![Attached.png](screenshots/debugger/starting/Attached.png?raw=true)
 
 #### Examining Suspended Program
 
@@ -2003,9 +2017,55 @@ When changing frames or jumping to definitions, you can lose track of where the 
 
 ##### Variables
 
-<img src="screenshots/debugger/Variables.png?raw=true"/>
+![Binary.png](screenshots/debugger/variables/Binary.png?raw=true)
 
-While Elixir allows rebinding variable names, Erlang does not, so when viewed in the Variables pane, variables will have an `@VERSION` after their name indicating which rebinding of a the variable is.  Even if there is no variable reuse, the first variable will still have `@1` in its name.
+Binaries show each byte at the byte's offset.
+
+![Bitstring.png](screenshots/debugger/variables/Bitstring.png?raw=true)
+
+Bitstrings show each byte with any partial byte annotated with its bitwidth.
+
+![Boolean.png](screenshots/debugger/variables/Boolean.png?raw=true)
+
+Boolean variables are rendered as their value.
+
+![Charlist.png](screenshots/debugger/variables/Charlist.png?raw=true)
+
+Charlists show the integer values because they're treated as lists
+
+![Functions.png](screenshots/debugger/variables/Functions.png?raw=true)
+
+Functions don't have literal representation, so the inspect form starting with `#Fun<...>` is shown
+
+![Lists.png](screenshots/debugger/variables/Lists.png?raw=true)
+
+Lists render differently based on whether the list is improper or not.  Improper lists show the head and tail while proper lists show their element by offset.
+
+![Maps.png](screenshots/debugger/variables/Maps.png?raw=true)
+
+Maps render differently based on the key type.  If the map uses all `atom` keys, the key will equal the value in the nested children while non-atom keys are shown as entries at a specific offset with the key and value.   This is done, so that complex keys that have subterms can be expanded or collapsed, which is not possible for the simpler atom rendering.
+
+![Numbers.png](screenshots/debugger/variables/Numbers.png?raw=true)
+
+Floats and integers are rendered as literals.
+
+![Pid.png](screenshots/debugger/variables/Pid.png?raw=true)
+
+Pids are broken up into their hidden `node, `id`, and `serial`.
+
+![String.png](screenshots/debugger/variables/String.png?raw=true)
+
+Strings show their literal value and unicode is fully supported.
+
+![Tuple.png](screenshots/debugger/variables/Tuple.png?raw=true)
+
+Tuples show their elements at their offsets.
+
+![Rebound.png](screenshots/debugger/variables/Rebound.png?raw=true)
+
+While Elixir allows rebinding variable names, Erlang does not, so when viewed in the Variables pane, rebound variables will have an `@VERSION` after their name indicating which rebinding of a the variable is.
+
+
 
 #### Stepping
 
