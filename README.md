@@ -1,210 +1,227 @@
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+Table of Contents
+=================
 
-- [Elixir plugin](#elixir-plugin)
-  - [IDEs](#ides)
-  - [Features](#features)
-    - [Project](#project)
-      - [From Existing Sources](#from-existing-sources)
-        - [Import project from external model](#import-project-from-external-model)
-        - [Create project from existing sources](#create-project-from-existing-sources)
-      - [New](#new)
-    - [Project Structure](#project-structure)
-    - [Project Settings](#project-settings)
-    - [Module Settings](#module-settings)
-      - [Sources](#sources)
-      - [Paths](#paths)
-      - [Dependencies](#dependencies)
-    - [New Elixir File](#new-elixir-file)
-      - [Empty module](#empty-module)
-      - [Elixir Application](#elixir-application)
-      - [Elixir Supervisor](#elixir-supervisor)
-      - [Elixir GenServer](#elixir-genserver)
-      - [Elixir GenEvent](#elixir-genevent)
-    - [Syntax Highlighting and Semantic Annotation](#syntax-highlighting-and-semantic-annotation)
-    - [Grammar parsing](#grammar-parsing)
-    - [Inspections](#inspections)
-      - [Ambiguous nested calls](#ambiguous-nested-calls)
-      - [Ambiguous parentheses](#ambiguous-parentheses)
-        - [Empty Parentheses](#empty-parentheses)
-        - [Keywords in Parentheses](#keywords-in-parentheses)
-        - [Positional arguments in Parentheses](#positional-arguments-in-parentheses)
-      - [Keyword pair colon (`:`) used in type spec instead of type operator (`::`)](#keyword-pair-colon--used-in-type-spec-instead-of-type-operator-)
-      - [Keywords appear before the end of list.](#keywords-appear-before-the-end-of-list)
-      - [Match operator (`=`) used in type spec instead of type operator (`::`)](#match-operator--used-in-type-spec-instead-of-type-operator-)
-    - [Quick Fixes](#quick-fixes)
-      - [Convert `:` to ` ::` in type specs](#convert--to---in-type-specs)
-      - [Convert `=` to ` ::` in type specs](#convert--to---in-type-specs)
-      - [Remove space in front of ambiguous parentheses](#remove-space-in-front-of-ambiguous-parentheses)
-    - [Code Folding](#code-folding)
-      - [Controls](#controls)
-        - [Collapsing](#collapsing)
-        - [Expanding](#expanding)
-      - [Regions](#regions)
-    - [Commenter](#commenter)
-    - [Credo](#credo)
-      - [Annotator](#annotator)
-        - [Enable](#enable)
-        - [Disable](#disable)
-      - [Inspection](#inspection)
-        - [Batch Mode](#batch-mode)
-      - [Configuration](#configuration)
-    - [Debugger](#debugger)
-      - [Steps](#steps)
-      - [Basics](#basics)
-        - [Keyboard Shortcuts](#keyboard-shortcuts)
-        - [Excluding Modules](#excluding-modules)
-          - [Disabling Existing Module Patterns](#disabling-existing-module-patterns)
-          - [Editing Existing Module Patterns](#editing-existing-module-patterns)
-          - [Removing Existing Module Patterns](#removing-existing-module-patterns)
-          - [Adding New Module Patterns](#adding-new-module-patterns)
-        - [Environment Variables](#environment-variables)
-      - [Breakpoints](#breakpoints)
-        - [Accessing Breakpoint Properties](#accessing-breakpoint-properties)
-          - [Viewing all breakpoints](#viewing-all-breakpoints)
-          - [Viewing a single breakpoint](#viewing-a-single-breakpoint)
-        - [Configuring Breakpoints](#configuring-breakpoints)
-        - [Creating Line Breakpoints](#creating-line-breakpoints)
-        - [Describing Line Breakpoints](#describing-line-breakpoints)
-        - [Searching for Line Breakpoints](#searching-for-line-breakpoints)
-        - [Jump to Breakpoint Source](#jump-to-breakpoint-source)
-        - [Disabling Line Breakpoints](#disabling-line-breakpoints)
-        - [Deleting Line Breakpoints](#deleting-line-breakpoints)
-      - [Starting the Debugger Session](#starting-the-debugger-session)
-      - [Examining Suspended Program](#examining-suspended-program)
-        - [Processes](#processes)
-        - [Frames](#frames)
-          - [Jump to Current Execution Point](#jump-to-current-execution-point)
-        - [Variables](#variables)
-      - [Stepping](#stepping)
-    - [Delimiters](#delimiters)
-      - [Auto-inserting](#auto-inserting)
-      - [Matching](#matching)
-    - [Embedded Elixir (EEx) Templates](#embedded-elixir-eex-templates)
-      - [Advanced configuration](#advanced-configuration)
-    - [Building/Compiling](#buildingcompiling)
-      - [Settings](#settings)
-      - [Individual File](#individual-file)
-      - [Project](#project-1)
-    - [Live Templates](#live-templates)
-    - [Run Configurations](#run-configurations)
-      - [Mix Tasks](#mix-tasks)
-      - [`mix test`](#mix-test)
-        - [Creating `mix test` Run Configurations Manually](#creating-mix-test-run-configurations-manually)
-        - [Creating `mix test` Run Configurations from context](#creating-mix-test-run-configurations-from-context)
-          - [Creating/Running `mix test` Run Configurations from directory](#creatingrunning-mix-test-run-configurations-from-directory)
-          - [Creating/Running `mix test` Run Configurations from file](#creatingrunning-mix-test-run-configurations-from-file)
-          - [Creating/Running `mix test` Run Configurations from line](#creatingrunning-mix-test-run-configurations-from-line)
-    - [`.beam` Files](#beam-files)
-      - [Decompression](#decompression)
-      - [BEAM Chunks](#beam-chunks)
-        - [`Atom` / `AtU8`](#atom--atu8)
-          - [Format](#format)
-          - [Tab](#tab)
-        - [`Attr`](#attr)
-          - [Format](#format-1)
-          - [Tab](#tab-1)
-        - [`CInf`](#cinf)
-          - [Format](#format-2)
-          - [Tab](#tab-2)
-        - [`Code`](#code)
-          - [Format](#format-3)
-          - [Tab](#tab-3)
-        - [`Dbgi`](#dbgi)
-          - [Format](#format-4)
-          - [Tab](#tab-4)
-        - [`ExDc`](#exdc)
-          - [Format](#format-5)
-          - [Tab](#tab-5)
-        - [`ExpT`](#expt)
-          - [Format](#format-6)
-          - [Tab](#tab-6)
-        - [`ImpT`](#impt)
-          - [Format](#format-7)
-          - [Tab](#tab-7)
-        - [`LitT`](#litt)
-          - [Format](#format-8)
-          - [Tab](#tab-8)
-        - [`Line`](#line)
-          - [Format](#format-9)
-          - [Tab](#tab-9)
-        - [`LocT`](#loct)
-          - [Format](#format-10)
-          - [Tab](#tab-10)
-        - [`StrT`](#strt)
-          - [Format](#format-11)
-          - [Tab](#tab-11)
-      - [Decompilation (Text)](#decompilation-text)
-        - [Call definition macros](#call-definition-macros)
-          - [`defp` with `/` in name](#defp-with--in-name)
-        - [Special handling of call definition names](#special-handling-of-call-definition-names)
-    - [Completion](#completion)
-      - [Aliases and Modules](#aliases-and-modules)
-        - [Aliases inside `{ }`](#aliases-inside--)
-      - [Function and Macro Calls](#function-and-macro-calls)
-        - [Qualified](#qualified)
-        - [Unqualified](#unqualified)
-      - [Module Attributes](#module-attributes)
-      - [Parameters and Variables](#parameters-and-variables)
-    - [Go To Declaration](#go-to-declaration)
-      - [Alias](#alias)
-      - [Function or Macro](#function-or-macro)
-        - [Imported Functions or Macros](#imported-functions-or-macros)
-        - [Local Functions or Macros](#local-functions-or-macros)
-        - [Remote Functions or Macros](#remote-functions-or-macros)
-      - [Module](#module)
-      - [Module Attribute](#module-attribute)
-      - [Parameters and Variables](#parameters-and-variables-1)
-    - [Formatting](#formatting)
-      - [Directory](#directory)
-      - [File](#file)
-        - [Other File](#other-file)
-        - [Current File](#current-file)
-      - [Selection](#selection)
-    - [Go To Symbol](#go-to-symbol)
-    - [Go To Test](#go-to-test)
-    - [Go To Test Subject](#go-to-test-subject)
-    - [Find Usage](#find-usages-and-show-usages)
-      - [Function](#function)
-      - [Module](#module-1)
-      - [Module Attribute](#module-attribute-1)
-      - [Parameters and Variables](#parameters-and-variables-2)
-    - [Refactor](#refactor)
-      - [Rename](#rename)
-        - [Module Attribute](#module-attribute-2)
-        - [Parameters and Variables](#parameters-and-variables-3)
-    - [SDK](#sdk)
-      - [Rich IDEs](#rich-ides)
-        - [Default SDK](#default-sdk)
-      - [Small IDEs](#small-ides)
-        - [Elixir Facet SDK](#elixir-facet-sdk)
-        - [Elixir SDKs](#elixir-sdks)
-        - [Internal Erlang SDK](#internal-erlang-sdk)
-    - [Structure](#structure)
-      - [Viewing Structure](#viewing-structure)
-      - [Buttons](#buttons)
-        - [Sorters](#sorters)
-        - [Providers](#providers)
-        - [Expanders](#expanders)
-        - [Autoscrollers](#autoscrollers)
-      - [Elements](#elements)
-        - [Icons](#icons)
-          - [Time](#time)
-          - [Visibility](#visibility)
-        - [Call to Element](#call-to-element)
-  - [Installation](#installation)
-    - [Inside IDE using JetBrains repository](#inside-ide-using-jetbrains-repository)
-    - [Inside IDE using Github releases](#inside-ide-using-github-releases)
-      - [In browser](#in-browser)
-      - [In IDE](#in-ide)
-  - [Screenshots](#screenshots)
-  - [Error reporting](#error-reporting)
-  - [Donations](#donations)
-    - [Work Time](#work-time)
-    - [Donors](#donors)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+   * [Elixir plugin](#elixir-plugin)
+      * [IDEs](#ides)
+      * [Features](#features)
+         * [Project](#project)
+            * [From Existing Sources](#from-existing-sources)
+               * [Import project from external model](#import-project-from-external-model)
+               * [Create project from existing sources](#create-project-from-existing-sources)
+            * [New](#new)
+         * [Project Structure](#project-structure)
+         * [Project Settings](#project-settings)
+         * [Module Settings](#module-settings)
+            * [Sources](#sources)
+            * [Paths](#paths)
+            * [Dependencies](#dependencies)
+         * [New Elixir File](#new-elixir-file)
+            * [Empty module](#empty-module)
+            * [Elixir Application](#elixir-application)
+            * [Elixir Supervisor](#elixir-supervisor)
+            * [Elixir GenServer](#elixir-genserver)
+            * [Elixir GenEvent](#elixir-genevent)
+         * [Syntax Highlighting and Semantic Annotation](#syntax-highlighting-and-semantic-annotation)
+         * [Grammar parsing](#grammar-parsing)
+         * [Inspections](#inspections)
+            * [Ambiguous nested calls](#ambiguous-nested-calls)
+            * [Ambiguous parentheses](#ambiguous-parentheses)
+               * [Empty Parentheses](#empty-parentheses)
+               * [Keywords in Parentheses](#keywords-in-parentheses)
+               * [Positional arguments in Parentheses](#positional-arguments-in-parentheses)
+            * [Keyword pair colon (:) used in type spec instead of type operator (<code>::</code>)](#keyword-pair-colon--used-in-type-spec-instead-of-type-operator-)
+            * [Keywords appear before the end of list.](#keywords-appear-before-the-end-of-list)
+            * [Match operator (=) used in type spec instead of type operator (<code>::</code>)](#match-operator--used-in-type-spec-instead-of-type-operator-)
+         * [Quick Fixes](#quick-fixes)
+            * [Convert : to <code>::</code> in type specs](#convert--to--in-type-specs)
+            * [Convert = to <code>::</code> in type specs](#convert--to--in-type-specs-1)
+            * [Remove space in front of ambiguous parentheses](#remove-space-in-front-of-ambiguous-parentheses)
+         * [Code Folding](#code-folding)
+            * [Controls](#controls)
+               * [Collapsing](#collapsing)
+               * [Expanding](#expanding)
+            * [Regions](#regions)
+         * [Commenter](#commenter)
+         * [Credo](#credo)
+            * [Annotator](#annotator)
+               * [Enable](#enable)
+               * [Disable](#disable)
+            * [Inspection](#inspection)
+               * [Batch Mode](#batch-mode)
+            * [Configuration](#configuration)
+         * [Debugger](#debugger)
+            * [Steps](#steps)
+            * [Basics](#basics)
+               * [Keyboard Shortcuts](#keyboard-shortcuts)
+               * [Excluding Modules](#excluding-modules)
+                  * [Disabling Existing Module Patterns](#disabling-existing-module-patterns)
+                  * [Editing Existing Module Patterns](#editing-existing-module-patterns)
+                  * [Removing Existing Module Patterns](#removing-existing-module-patterns)
+                  * [Adding New Module Patterns](#adding-new-module-patterns)
+               * [Environment Variables](#environment-variables)
+            * [Breakpoints](#breakpoints)
+               * [Accessing Breakpoint Properties](#accessing-breakpoint-properties)
+                  * [Viewing all breakpoints](#viewing-all-breakpoints)
+                  * [Viewing a single breakpoint](#viewing-a-single-breakpoint)
+               * [Configuring Breakpoints](#configuring-breakpoints)
+               * [Creating Line Breakpoints](#creating-line-breakpoints)
+               * [Describing Line Breakpoints](#describing-line-breakpoints)
+               * [Searching for Line Breakpoints](#searching-for-line-breakpoints)
+               * [Jump to Breakpoint Source](#jump-to-breakpoint-source)
+               * [Disabling Line Breakpoints](#disabling-line-breakpoints)
+               * [Deleting Line Breakpoints](#deleting-line-breakpoints)
+            * [Starting the Debugger Session](#starting-the-debugger-session)
+            * [Examining Suspended Program](#examining-suspended-program)
+               * [Processes](#processes)
+               * [Frames](#frames)
+                  * [Jump to Current Execution Point](#jump-to-current-execution-point)
+               * [Variables](#variables)
+            * [Stepping](#stepping)
+         * [Delimiters](#delimiters)
+            * [Auto-inserting](#auto-inserting)
+            * [Matching](#matching)
+         * [Embedded Elixir (EEx) Templates](#embedded-elixir-eex-templates)
+            * [Advanced configuration](#advanced-configuration)
+         * [Building/Compiling](#buildingcompiling)
+            * [Settings](#settings)
+            * [Build Messages](#build-messages)
+               * [Jump To Source](#jump-to-source)
+               * [Warnings as Errors](#warnings-as-errors)
+            * [Individual File](#individual-file)
+            * [Project](#project-1)
+         * [Live Templates](#live-templates)
+         * [Run/Debug Configurations](#rundebug-configurations)
+            * [Distillery Release CLI <a href="resources/icons/distillery-16.png?tra=true" target="_blank"><img src="resources/icons/distillery-16.png?tra=true" alt="Elixir Mix Icon with tapered neck to make a retort as used in distilleries" title="Distillery Release CLI Icon" style="max-width:100\x;"></a>](#distillery-release-cli-)
+               * [Running](#running)
+               * [Debugging](#debugging)
+            * [Elixir <a href="resources/icons/elixir-16.png" target="_blank"><img src="resources/icons/elixir-16.png" alt="Elixir Drop" title="Elixir Icon" style="max-width:100\x;"></a>](#elixir-)
+               * [Running](#running-1)
+               * [Debugging](#debugging-1)
+            * [IEx (Interactive Elixir)](#iex-interactive-elixir)
+               * [Running](#running-2)
+               * [Debugging](#debugging-2)
+            * [Mix Tasks <a href="resources/icons/mix-16.png?raw=true" target="_blank"><img src="resources/icons/mix-16.png?raw=true" alt="Elixir Drop mixed in a round-bottom flask" title="Mix Icon" style="max-width:100\x;"></a>](#mix-tasks-)
+               * [Running](#running-3)
+               * [Debugging](#debugging-3)
+            * [IEx Mix](#iex-mix)
+               * [Running](#running-4)
+               * [Debugging](#debugging-4)
+            * [mix test](#mix-test)
+               * [Creating mix test Run Configurations Manually](#creating-mix-test-run-configurations-manually)
+               * [Running](#running-5)
+               * [Debugging](#debugging-5)
+               * [Creating mix test Run Configurations from context](#creating-mix-test-run-configurations-from-context)
+                  * [Creating/Running mix test Run Configurations from directory](#creatingrunning-mix-test-run-configurations-from-directory)
+                  * [Creating/Running mix test Run Configurations from file](#creatingrunning-mix-test-run-configurations-from-file)
+                  * [Creating/Running mix test Run Configurations from line](#creatingrunning-mix-test-run-configurations-from-line)
+         * [.beam Files](#beam-files)
+            * [Decompression](#decompression)
+            * [BEAM Chunks](#beam-chunks)
+               * [Atom / <code>AtU8</code>](#atom--atu8)
+                  * [Format](#format)
+                  * [Tab](#tab)
+               * [Attr](#attr)
+                  * [Format](#format-1)
+                  * [Tab](#tab-1)
+               * [CInf](#cinf)
+                  * [Format](#format-2)
+                  * [Tab](#tab-2)
+               * [Code](#code)
+                  * [Format](#format-3)
+                  * [Tab](#tab-3)
+               * [Dbgi](#dbgi)
+                  * [Format](#format-4)
+                  * [Tab](#tab-4)
+               * [ExDc](#exdc)
+                  * [Format](#format-5)
+                  * [Tab](#tab-5)
+               * [ExpT](#expt)
+                  * [Format](#format-6)
+                  * [Tab](#tab-6)
+               * [ImpT](#impt)
+                  * [Format](#format-7)
+                  * [Tab](#tab-7)
+               * [LitT](#litt)
+                  * [Format](#format-8)
+                  * [Tab](#tab-8)
+               * [Line](#line)
+                  * [Format](#format-9)
+                  * [Tab](#tab-9)
+               * [LocT](#loct)
+                  * [Format](#format-10)
+                  * [Tab](#tab-10)
+               * [StrT](#strt)
+                  * [Format](#format-11)
+                  * [Tab](#tab-11)
+            * [Decompilation (Text)](#decompilation-text)
+               * [Call definition macros](#call-definition-macros)
+                  * [defp with <code>/</code> in name](#defp-with--in-name)
+               * [Special handling of call definition names](#special-handling-of-call-definition-names)
+         * [Completion](#completion)
+            * [Aliases and Modules](#aliases-and-modules)
+               * [Aliases inside { }](#aliases-inside--)
+            * [Function and Macro Calls](#function-and-macro-calls)
+               * [Qualified](#qualified)
+               * [Unqualified](#unqualified)
+            * [Module Attributes](#module-attributes)
+            * [Parameters and Variables](#parameters-and-variables)
+         * [Go To Declaration](#go-to-declaration)
+            * [Alias](#alias)
+            * [Function or Macro](#function-or-macro)
+               * [Imported Functions or Macros](#imported-functions-or-macros)
+               * [Local Functions or Macros](#local-functions-or-macros)
+               * [Remote Functions or Macros](#remote-functions-or-macros)
+            * [Module](#module)
+            * [Module Attribute](#module-attribute)
+            * [Parameters and Variables](#parameters-and-variables-1)
+         * [Formatting](#formatting)
+            * [Directory](#directory)
+            * [File](#file)
+               * [Other File](#other-file)
+               * [Current File](#current-file)
+            * [Selection](#selection)
+         * [Go To Symbol](#go-to-symbol)
+         * [Go To Test](#go-to-test)
+         * [Go To Test Subject](#go-to-test-subject)
+         * [Find Usages and Show Usages](#find-usages-and-show-usages)
+            * [Function](#function)
+            * [Module](#module-1)
+            * [Module Attribute](#module-attribute-1)
+            * [Parameters and Variables](#parameters-and-variables-2)
+         * [Refactor](#refactor)
+            * [Rename](#rename)
+               * [Module Attribute](#module-attribute-2)
+               * [Parameters and Variables](#parameters-and-variables-3)
+         * [SDK](#sdk)
+            * [Package Manager Install Locations](#package-manager-install-locations)
+            * [Rich IDEs](#rich-ides)
+               * [Default SDK](#default-sdk)
+            * [Small IDEs](#small-ides)
+               * [Elixir Facet SDK](#elixir-facet-sdk)
+               * [Elixir SDKs](#elixir-sdks)
+               * [Internal Erlang SDK](#internal-erlang-sdk)
+         * [Structure](#structure)
+            * [Viewing Structure](#viewing-structure)
+            * [Buttons](#buttons)
+               * [Sorters](#sorters)
+               * [Providers](#providers)
+               * [Expanders](#expanders)
+               * [Autoscrollers](#autoscrollers)
+            * [Elements](#elements)
+               * [Icons](#icons)
+                  * [Time](#time)
+                  * [Visibility](#visibility)
+               * [Call to Element](#call-to-element)
+      * [Installation](#installation)
+         * [Inside IDE using JetBrains repository](#inside-ide-using-jetbrains-repository)
+         * [Inside IDE using Github releases](#inside-ide-using-github-releases)
+            * [In browser](#in-browser)
+            * [In IDE](#in-ide)
+      * [Screenshots](#screenshots)
+      * [Error reporting](#error-reporting)
+      * [Donations](#donations)
+         * [Work Time](#work-time)
+         * [Donors](#donors)
 
 # Elixir plugin
 
@@ -2452,28 +2469,244 @@ rescue
   </tbody>
 </table>
 
-### Run Configurations
+### Run/Debug Configurations
 
-#### Mix Tasks
+#### Distillery Release CLI ![Elixir Mix Icon with tapered neck to make a retort as used in distilleries](resources/icons/distillery-16.png?tra=true "Distillery Release CLI Icon")
+
+[Distillery](https://github.com/bitwalker/distillery)'s `mix release` produces a [CLI](https://en.wikipedia.org/wiki/Command-line_interface) for running the release.
+
+1. Build the release: `mix release`
+   ```shell
+   ==> Release successfully built!
+       You can run it in one of the following ways:
+         Interactive: _build/ENV/rel/NAME/bin/NAME console
+         Foreground: _build/ENV/rel/NAME/bin/NAME foreground
+         Daemon: _build/ENV/rel/NAME/bin/NAME start
+   ```
+2. Run > Edit Configurations...
+   ![Edit Run Configurations](/screenshots/features/run_debug_configurations/Edit%20Configurations.png?raw=true "Edit Run Configurations")
+3. Click +
+4. Select "Distillery Release CLI"
+   ![Add New Distillery Release CLI](screenshots/features/run_debug_configurations/distillery_release_cli/Add%20New.png)
+5. Fill in the "Release CLI Path" with the full path to the `_build/ENV/rel/NAME/bin/NAME` path produed by `mix release` above.
+6. Fill in the "Release CLI arguments".
+   * `console` runs a shell with the release loaded similar to `iex -S mix`.
+   * `foreground` to runs the release without a shell, like `mix` or `mix run`.
+   The available commands are controlled by your release config `rel/config.exs` that Distillery uses.
+7. (Optionally) fill in "`erl` arguments" with arguments to `erl` before it runs `elixir`.  
+   This is the same as the `ERL_OPTS` environment variable supported by Distillery.
+8. (Optionally) fill in "`elixir -extra` arguments" with arguments to pass to `elixir` before it run the release.
+   This is the same as the `EXTRA_OPTS` environment variable supported by Distillery.
+9. (Optionally) change the Code Loading Mode
+   This is the same as the `CODE_LOADING_MODE` environment variable supported by Distillery.
+   * Use Default - use whatever is configured in `rel/config.exs`.  Don't set `CODE_LOADING_MODE` environment variable.
+   * `embedded` - load all code immediately on boot.  Set `CODE_LOADING_MODE=embedded`.
+   * `interactive` - load code on-demand as it is needed/referenced.  Set `CODE_LOADING_MODE=interactive`.
+10. (Optionally) set the "Log Directory"
+    This is the same as the `RUNNER_LOG_DIR` environment variable supported by Distillery.
+11. (Optionally) change "Replace OS Vars"
+    This is the same as the `REPLACE_OS_VARS` environment variable supported by Distillery.
+    * Use Default - use whatever is configured in `rel/config.exs`.  Don't set `REPLACE_OS_VARS` environment variable.
+    * `false` - don't replace "${A_VAR_NAME}" in the generated configuration with `A_VAR` environment variable at runtime.  Set `REPLACE_OS_VARS=false`.
+    * `true` - replace "${A_VAR_NAME}" in the generated configuration with `A_VAR` environment variable at runtime.  Set `REPLACE_OS_VARS=true`.
+12. (Optionally) set "`sys.config` File"
+    This is the same the `SYS_CONFIG_PATH` environment variable supported by Distillery.
+13. (Optionally) set "Release Config Directory".
+    This is the same as the `RELEASE_CONFIG_DIR` environment variable supported by Distillery.
+14. (Optionally) set "Pipe directory".
+    This is the same as the `PIPE_DIR` environment variable supported by Distillery.
+15. (Optionally) set "Use Pseudo-terminal (PTY).
+    If checked use PTY for interactive shells.  Automatically on when "Release CLI Arguments" starts with one of the known interactive commands (`attach`, `console`, `console_boot`, `console_clean`, or `remote_console`).
+16. Fill in the "Working directory.
+    * Type the absolute path to the directory.
+    * Select the path using directory picker by clicking the `...` button
+17. (Optionally) click the `...` button on the "Environment variables" line to add environment variables.
+18. Click "OK" to save the Run Configuration and close the dialog
+
+##### Running
+
+1. Click the Run Arrow in the Toolbar to run the `_build/ENV/rel/NAME/bin/NAME`
+2. The Run pane will open
+   * If the either "Use Pseduo-terminal (PTY)" is checked of the "Release CLI Arguments" are known to need a PTY, an interactive shell will appear in the Run pane where you can enter `iex` commands.
+   * Otherwise, the output of running the command will be shown.
+
+##### Debugging
+
+1. (Optionally) before debugging, customize the modules that will be interpreted.
+   1. Run > Edit Configurations...
+   2. Click the "Interpreted Modules" tab next to default "Configuration" tab.
+   3. Enable/Disable "Inherit Application Module Filters".  Will change the Module Filters show in the below "Do not interpreter modules matching patterns" list.
+   4. Uncheck any inherited module filters that you would rather be interpreted and therefore debuggable
+   5. Click + to add module filters that are specific to this configuration.  This can be useful if you know interpreting a specific module in your project's dependencies or project leads to too much slowdown when debugging or causes the debugger to hang/crash.
+   6. Click - to remove configuration-specific module filters added with +.  Inherited module filters cannot be removed with -, they can only be disabled by unchecking.
+2. Add the `:debugger` application to your release
+   1. Open `rel/config.exs`
+   2. In the `release NAME` block, in the `set :applications` block add `:debugger`:
+      ```diff
+      --- a/rel/config.exs
+      +++ b/rel/config.exs
+      @@ -41,6 +41,8 @@ end
+       release :intellij_elixir do
+         set version: current_version(:intellij_elixir)
+         set applications: [
+      +    # needed for IntelliJ Elixir debugger
+      +    :debugger,
+           :runtime_tools
+         ]
+       end
+      ```
+3. For how to use the debugger, including how to set breakpoints see the [Debugger](#debugger) section.
+4. Click the Debug bug in the Toolbar to debug the `mix test`s
+
+#### Elixir ![Elixir Drop](resources/icons/elixir-16.png "Elixir Icon")
+
+Although it is exceedingly rare, as most Elixir projects use `mix`, it is supported to run/debug `elixir` directly, such as when doing `elixir script.exs`.
+
+1. Run > Edit Configuations...  
+   ![Edit Run Configurations](/screenshots/features/run_debug_configurations/Edit%20Configurations.png?raw=true "Edit Run Configurations")
+2. Click +
+3. Select "Elixir"
+   ![Add New Elixir](screenshots/features/run_debug_configurations/elixir/Add%20New.png?raw=true "Add New Elixir Run Configuration")
+4. Fill in the "`elixir` arguments".
+5. (Optionally) fill in "`erl` arguments" with arguments to `erl` before it runs `elixir`.
+6. Fill in the "Working directory"
+  * Type the absolute path to the directory.
+  * Select the path using directory picker by clicking the `...` button
+7. (Optionally) click the `...` button on the "Environment variables" line to add environment variables.
+8. Click "OK" to save the Run Configuration and close the dialog
+
+With the Run Configuration defined, you can either Run or Debug `elixir`
+
+##### Running
+
+1. Click the Run arrow in the Toolbar to run `elixir`.
+   ![Run](screenshots/features/run_debug_configurations/elixir/running/Toolbar%20Button.png?raw=true "Run Elixir Run Configuration")
+2. The Run pane will open, showing the results of `elixir`.
+
+##### Debugging
+
+1. (Optionally) before debugging, customize the modules that will be interpreted.
+   1. Run > Edit Configurations...
+   2. Click the "Interpreted Modules" tab next to default "Configuration" tab.
+   3. Enable/Disable "Inherit Application Module Filters".  Will change the Module Filters show in the below "Do not interpreter modules matching patterns" list.
+   4. Uncheck any inherited module filters that you would rather be interpreted and therefore debuggable
+   5. Click + to add module filters that are specific to this configuration.  This can be useful if you know interpreting a specific module in your project's dependencies or project leads to too much slowdown when debugging or causes the debugger to hang/crash.
+   6. Click - to remove configuration-specific module filters added with +.  Inherited module filters cannot be removed with -, they can only be disabled by unchecking.
+2. For how to use the debugger, including how to set breakpoints see the [Debugger](#debugger) section.
+3. Click the Debug bug in the Toolbar to debug `elixir`
+
+#### IEx (Interactive Elixir)
+
+`iex` run configurations allow you to run `iex` with IntelliJ Elixir attached.  It is most useful when debugging, but it also allows you save customizations in the configuration when it is more complicated than just `iex`.
+
+1. Run > Edit Configurations...
+   ![Edit Run Configurations](/screenshots/features/run_debug_configurations/Edit%20Configurations.png?raw=true "Edit Run Configurations")
+2. Click +
+3. Select "IEx"
+   ![Elixir Drop inside round-bottom flask](screenshots/features/run_debug_configurations/iex/Add%20New.png "Add New IEx Configuration")
+4. (Optionally) fill in "`iex` arguments" with arguments to `iex`.
+5. (Optionally) full in "`erl` arguments" with arguments to `erl` before it runs `iex`.
+6. Fill in the "Working directory"
+  * Type the absolute path to the directory.
+  * Select the path using directory picker by clicking the `...` button
+7. (Optionally) click the `...` button on the "Environment variables" line to add environment variables.
+8. Click "OK" to save the Run Configuration and close the dialog
+
+With the Run Configuration defined, you can either Run or Debug the `iex` configuration.
+
+##### Running
+
+1. Click the Run arrow in the Toolbar to run `iex`
+   ![Run](/screenshots/features/run_debug_configurations/iex/running/Toolbar%20Button.png?raw=true "Run Elixir Mix Run Configuration")
+
+##### Debugging
+
+1. (Optionally) before debugging, customize the modules that will be interpreted.
+   1. Run > Edit Configurations...
+   2. Click the "Interpreted Modules" tab next to default "Configuration" tab.
+   3. Enable/Disable "Inherit Application Module Filters".  Will change the Module Filters show in the below "Do not interpreter modules matching patterns" list.
+   4. Uncheck any inherited module filters that you would rather be interpreted and therefore debuggable
+   5. Click + to add module filters that are specific to this configuration.  This can be useful if you know interpreting a specific module in your project's dependencies or project leads to too much slowdown when debugging or causes the debugger to hang/crash.
+   6. Click - to remove configuration-specific module filters added with +.  Inherited module filters cannot be removed with -, they can only be disabled by unchecking.
+2. For how to use the debugger, including how to set breakpoints see the [Debugger](#debugger) section.
+3. Click the Debug bug in the Toolbar to debug `iex`.
+
+#### Mix Tasks ![Elixir Drop mixed in a round-bottom flask](resources/icons/mix-16.png?raw=true "Mix Icon")
 
 Much like `rake` tasks in Rubymine, this plugin can run `mix` tasks.
 
 1. Run > Edit Configurations...
-   ![Edit Run Configurations](/screenshots/features/run_configurations/Edit%20Configurations.png?raw=true "Edit Run Configurations")
+   ![Edit Run Configurations](/screenshots/features/run_debug_configurations/Edit%20Configurations.png?raw=true "Edit Run Configurations")
 2. Click +
 3. Select "Elixir Mix"
-   ![Add New Elixir Mix](/screenshots/features/run_configurations/mix_tasks/Add%20New.png?raw=true "Add New Elixir Mix Run Configuration")
-4. Fill in the "Program arguments" starting with the name of the `mix` task followed by any arguments to that task
-5. Fill in the "Working directory"
+   ![Add New Elixir Mix](/screenshots/features/run_debug_configurations/mix_tasks/Add%20New.png?raw=true "Add New Elixir Mix Run Configuration")
+4. Fill in the "`mix` arguments" starting with the name of the `mix` task followed by any arguments to that task.
+5. (Optionally) fill in "`elixir` arguments" with arguments to `elixir` before it runs `mix`.
+6. (Optionally) fill in "`erl` arguments" with arguments to `erl` before it runs `elixir`.
+7. Fill in the "Working directory"
   * Type the absolute path to the directory.
   * Select the path using directory picker by clicking the `...` button
-6. (Optionally) click the `...` button on the "Environment variables" line to add environment variables.
-7. Click "OK" to save the Run Configuration and close the dialog
-8. Click the Run arrow in the Toolbar to run the `mix` task
-   ![Run](/screenshots/features/run_configurations/mix_tasks/Toolbar%20Run%20Button.png?raw=true "Run Elixir Mix Run Configuration")
-9. The Run pane will open, showing the results of the `mix` task.
+8. (Optionally) click the `...` button on the "Environment variables" line to add environment variables.
+9. Click "OK" to save the Run Configuration and close the dialog
+
+With the Run Configuration defined, you can either Run or Debug the Mix Task
+
+##### Running
+
+1. Click the Run arrow in the Toolbar to run the `mix` task
+   ![Run](/screenshots/features/run_debug_configurations/mix_tasks/running/Toolbar%20Button.png?raw=true "Run Elixir Mix Run Configuration")
+2. The Run pane will open, showing the results of the `mix` task.
     * If there is an error with a FILE:LINE stack stack_frame, it will be a clickable link that will take you to that location
-      ![Error link](/screenshots/features/run_configurations/mix_tasks/Error%20Link.png?raw=true "Clickable Error Link")
+      ![Error link](/screenshots/features/run_debug_configurations/mix_tasks/running/Error%20Link.png?raw=true "Clickable Error Link")
+
+##### Debugging
+
+1. (Optionally) before debugging, customize the modules that will be interpreted.
+   1. Run > Edit Configurations...
+   2. Click the "Interpreted Modules" tab next to default "Configuration" tab.
+   3. Enable/Disable "Inherit Application Module Filters".  Will change the Module Filters show in the below "Do not interpreter modules matching patterns" list.
+   4. Uncheck any inherited module filters that you would rather be interpreted and therefore debuggable
+   5. Click + to add module filters that are specific to this configuration.  This can be useful if you know interpreting a specific module in your project's dependencies or project leads to too much slowdown when debugging or causes the debugger to hang/crash.
+   6. Click - to remove configuration-specific module filters added with +.  Inherited module filters cannot be removed with -, they can only be disabled by unchecking.
+2. For how to use the debugger, including how to set breakpoints see the [Debugger](#debugger) section.
+3. Click the Debug bug in the Toolbar to debug the `mix` task
+
+#### IEx Mix
+
+If you want to run `iex` in the context of the project, you need to run `iex -S mix`, but if you don't want to have to worry about forgetting whether it's `-s` or `-S` or if it is `mix -S iex` or `iex -S mix`, you can use an IEx Mix configuration.
+
+1. Run > Edit Configurations...
+   ![Edit Run Configurations](/screenshots/features/run_debug_configurations/Edit%20Configurations.png?raw=true "Edit Run Configurations")
+2. Click +
+3. Select "IEx Mix"
+   ![The Mix Icon with "&gt;" to indicate the IEX prompt](screenshots/features/run_debug_configurations/iex/mix/Add%20New.png?raw=true)
+4. (Optionally) fill in "`mix` arguments", such as `phx.server` if you want to launch [Phoenix](https://github.com/phoenixframework/phoenix) inside of `iex`.
+5. (Optionally) fill in "`iex` arguments" with arguments to `iex` before `-S mix`.
+6. (Optionally) full in "`erl` arguments" with arguments to `erl` before it runs `iex`.
+7. Fill in the "Working directory"
+  * Type the absolute path to the directory.
+  * Select the path using directory picker by clicking the `...` button
+8. (Optionally) click the `...` button on the "Environment variables" line to add environment variables.
+9. Click "OK" to save the Run Configuration and close the dialog
+
+Wih the Run Configuration defined, you can either Run or Debug `iex -S mix`
+
+##### Running
+
+1. Click the Run Arrow in the Toolbar to run `iex -S mix`
+
+
+##### Debugging
+
+1. (Optionally) before debugging, customize the modules that will be interpreted.
+   1. Run > Edit Configurations...
+   2. Click the "Interpreted Modules" tab next to default "Configuration" tab.
+   3. Enable/Disable "Inherit Application Module Filters".  Will change the Module Filters show in the below "Do not interpreter modules matching patterns" list.
+   4. Uncheck any inherited module filters that you would rather be interpreted and therefore debuggable
+   5. Click + to add module filters that are specific to this configuration.  This can be useful if you know interpreting a specific module in your project's dependencies or project leads to too much slowdown when debugging or causes the debugger to hang/crash.
+   6. Click - to remove configuration-specific module filters added with +.  Inherited module filters cannot be removed with -, they can only be disabled by unchecking.
+2. For how to use the debugger, including how to set breakpoints see the [Debugger](#debugger) section.
+3. Click the Debug bug in the Toolbar to debug `iex -S mix`.
 
 #### `mix test`
 
@@ -2486,19 +2719,38 @@ The Run pane will show Test Results.  If there is a compilation error before or 
 ##### Creating `mix test` Run Configurations Manually
 
 1. Run > Edit Configurations...
-   ![Edit Run Configurations](/screenshots/features/run_configurations/Edit%20Configurations.png?raw=true "Edit Run Configurations")
+   ![Edit Run Configurations](/screenshots/features/run_debug_configurations/Edit%20Configurations.png?raw=true "Edit Run Configurations")
 2. Click +
 3. Select "Elixir Mix ExUnit"
-   ![Add New Elixir Mix ExUnit](/screenshots/features/run_configurations/mix_test/Add%20New.png?raw=true "Add New Elixir Mix ExUnit Run Configuration")
-4. Fill in the "Program arguments" with the argument(s) to pass to `mix test`.  Normally, this will be a directory like `test`, relative to the "Working directory"
-5. Fill in the "Working directory"
+   ![Add New Elixir Mix ExUnit](/screenshots/features/run_debug_configurations/mix_test/Add%20New.png?raw=true "Add New Elixir Mix ExUnit Run Configuration")
+4. Fill in the "`mix test` arguments" with the argument(s) to pass to `mix test`.  Normally, this will be a directory like `test`, relative to the "Working directory"
+5. (Optionally) fill in "`elixir` arguments" with the arguments to `elixir` before it runs `mix test`.
+6. (Optionally) fill in "`erl` arguments"` with the arguments to `erl` before it runs `elixir`.
+7. Fill in the "Working directory"
   * Type the absolute path to the directory.
   * Select the path using directory picker by clicking the `...` button
-6. (Optionally) click the `...` button on the "Environment variables" line to add environment variables.
-7. Click "OK" to save the Run Configuration and close the dialog
-8. Click the RUn arrow in the Toolbar to run the `mix test` task
-9. The Run pane will open showing the Test Results
-   ![Test Results](/screenshots/features/run_configurations/mix_test/Test%20Results.png?raw=true "Full Green Test Results")
+8. (Optionally) click the `...` button on the "Environment variables" line to add environment variables.
+9. Click "OK" to save the Run Configuration and close the dialog
+
+With the Run Configuration defined you can either Run or Debug the `mix test`s
+
+##### Running
+
+1. Click the Run arrow in the Toolbar to run the `mix test` task
+2. The Run pane will open showing the Test Results
+   ![Test Results](/screenshots/features/run_debug_configurations/mix_test/Test%20Results.png?raw=true "Full Green Test Results")
+
+##### Debugging
+
+1. (Optionally) before debugging, customize the modules that will be interpreted.
+   1. Run > Edit Configurations...
+   2. Click the "Interpreted Modules" tab next to default "Configuration" tab.
+   3. Enable/Disable "Inherit Application Module Filters".  Will change the Module Filters show in the below "Do not interpreter modules matching patterns" list.
+   4. Uncheck any inherited module filters that you would rather be interpreted and therefore debuggable
+   5. Click + to add module filters that are specific to this configuration.  This can be useful if you know interpreting a specific module in your project's dependencies or project leads to too much slowdown when debugging or causes the debugger to hang/crash.
+   6. Click - to remove configuration-specific module filters added with +.  Inherited module filters cannot be removed with -, they can only be disabled by unchecking.
+2. For how to use the debugger, including how to set breakpoints see the [Debugger](#debugger) section.
+3. Click the Debug bug in the Toolbar to debug the `mix test`s
 
 While you can create `Elixir Mix ExUnit` run configurations manually using the `Run > Edit Configurations...` menu, it is probably more convenient to use the context menu.
 
@@ -2511,15 +2763,15 @@ The context menu must know that the the directory, file, or line you are right-c
   2. Right-click the `test` directory.
   3. Hover over "Mark Directory As &gt;"
     * If "Unmark as Test Sources Root" is shown, then the directory is already configured correctly, and create from context will work.
-      ![Mark Directory As &gt; Unmark as Test Sources Root](/screenshots/features/run_configurations/mix_test/mark_directory_as/Unmark%20as%20Test%20Sources%20Root.png?raw=true "Unmark Directory as Test Sources Root")
+      ![Mark Directory As &gt; Unmark as Test Sources Root](/screenshots/features/run_debug_configurations/mix_test/mark_directory_as/Unmark%20as%20Test%20Sources%20Root.png?raw=true "Unmark Directory as Test Sources Root")
     * If "Test Sources Root" is shown, then the directory need to be configured by clicking that entry
-      ![Mark Directory As &gt; Test Sources Root](/screenshots/features/run_configurations/mix_test/mark_directory_as/Test%20Sources%20Root.png?raw=true "Mark Directory as Test Sources Root")
+      ![Mark Directory As &gt; Test Sources Root](/screenshots/features/run_debug_configurations/mix_test/mark_directory_as/Test%20Sources%20Root.png?raw=true "Mark Directory as Test Sources Root")
 
 ###### Creating/Running `mix test` Run Configurations from directory
 
 1. Right-click the directory in the Project pane
 2. Click "Run Mix ExUnit", which will both create the Run Configuration and Run it.
-  ![Run Mix ExUnit](/screenshots/features/run_configurations/mix_test/context/directory/Run%20Mix%20ExUnit.png?raw=true "Run Mix ExUnit from right-clicking directory")
+  ![Run Mix ExUnit](/screenshots/features/run_debug_configurations/mix_test/context/directory/Run%20Mix%20ExUnit.png?raw=true "Run Mix ExUnit from right-clicking directory")
   * If you want to only create the Run Configuration, select "Create Mix ExUnit" instead
 
 Alternatively, you can use keyboard shortcuts
@@ -2541,7 +2793,7 @@ Alternatively, you can use keyboard shortcuts
 Finally, you can use the editor tabs
 
 1. Right-click the editor tab for the test file you want to run
-  ![Run Mix ExUnit](/screenshots/features/run_configurations/mix_test/context/file/Run%20Mix%20ExUnit.png?raw=true "Run Mix ExUnit from right-clicking file editor tab")
+  ![Run Mix ExUnit](/screenshots/features/run_debug_configurations/mix_test/context/file/Run%20Mix%20ExUnit.png?raw=true "Run Mix ExUnit from right-clicking file editor tab")
 2. Click "Run Mix ExUnit", which will both create the Run Configuration and Run it.
   * If you want to only create the Run Configuration, select "Create Mix ExUnit" instead
 
@@ -2550,7 +2802,7 @@ Finally, you can use the editor tabs
 If you want to be able to run a single test, you can create a Run Configuration for a line in that test
 
 1. Right-click a line in the test file
-  ![Run Mix ExUnit](/screenshots/features/run_configurations/mix_test/context/line/Run%20Mix%20ExUnit.png?raw=true "Run Mix ExUnit from right-clicking line in editor")
+  ![Run Mix ExUnit](/screenshots/features/run_debug_configurations/mix_test/context/line/Run%20Mix%20ExUnit.png?raw=true "Run Mix ExUnit from right-clicking line in editor")
 2. Click "Run Mix ExUnit", which will both create the Run Configuration and Run it.
   * If you want to only create the Run Configuration, select "Create Mix ExUnit" instead
 

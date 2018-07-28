@@ -88,7 +88,7 @@ class Configuration(name: String, project: Project, configurationFactory: Config
         set(arguments) = releaseCLIArgumentList.fromArguments(arguments)
 
     var erlArguments: String?
-        get() = _envs[EXTRA_OPTS]
+        get() = _envs[ERL_OPTS]
         set(erlArguments) {
             if (erlArguments.isNullOrBlank()) {
                 _envs.remove(ERL_OPTS)
