@@ -1,5 +1,0 @@
-Elixir File(0,8)
-  PsiErrorElement:'<%' unexpected(0,2)
-    PsiElement(<%)('<%')(0,2)
-  PsiElement(EEx Comment Marker (#))('#')(2,3)
-  PsiElement(EEx Comment)(' true')(3,8)
