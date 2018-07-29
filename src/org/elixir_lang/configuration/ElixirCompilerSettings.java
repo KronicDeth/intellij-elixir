@@ -13,8 +13,7 @@ import org.jetbrains.annotations.Nullable;
 @State(
     name = Serializer.COMPILER_OPTIONS_COMPONENT_NAME,
     storages = {
-        @Storage(file = StoragePathMacros.PROJECT_FILE),
-        @Storage(file = StoragePathMacros.PROJECT_CONFIG_DIR + "/compiler.xml", scheme = StorageScheme.DIRECTORY_BASED)
+        @Storage(value = "compiler.xml")
     }
 )
 public class ElixirCompilerSettings implements PersistentStateComponent<CompilerOptions>{

@@ -52,7 +52,7 @@ public class Status {
     }
 
     @Nullable
-    static Status fromStderrLine(@NotNull String line) {
+    public static Status fromStderrLine(@NotNull String line) {
         String status = null;
 
         if (line.startsWith("warning: ")) {
@@ -65,7 +65,7 @@ public class Status {
     }
 
     @Nullable
-    static Status fromStdoutLine(@NotNull String line) {
+    public static Status fromStdoutLine(@NotNull String line) {
         String status = null;
 
         if (line.contains("[error]")) {
@@ -75,7 +75,7 @@ public class Status {
         return fromMaybeStatusLine(status, line);
     }
 
-    void addLine(@NotNull String line) {
+    public void addLine(@NotNull String line) {
         String withoutNewline = line.substring(0, line.length() - 1);
 
         if (stackTraceLines == null) {
@@ -157,7 +157,7 @@ public class Status {
     }
 
     @NotNull
-    List<String> toTeamCityCompilationMessageList() {
+    public List<String> toTeamCityCompilationMessageList() {
         return Arrays.asList(
                 COMPILATION_STARTED,
                 toTeamCityMessage(),
@@ -194,7 +194,7 @@ public class Status {
     }
 
     @NotNull
-    List<String> toTeamCityTestMessageList() {
+    public List<String> toTeamCityTestMessageList() {
         List<String> messageList;
 
         if (isCompilationError()) {

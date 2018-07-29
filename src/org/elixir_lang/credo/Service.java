@@ -8,8 +8,7 @@ import org.jetbrains.annotations.Nullable;
 @com.intellij.openapi.components.State(
     name = "Credo",
     storages = {
-        @Storage(file = StoragePathMacros.PROJECT_FILE),
-        @Storage(file = StoragePathMacros.PROJECT_CONFIG_DIR + "/" + "credo.xml", scheme = StorageScheme.DIRECTORY_BASED)
+        @Storage(value = "credo.xml")
     }
 )
 public class Service implements PersistentStateComponent<State> {

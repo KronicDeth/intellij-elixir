@@ -1,3 +1,0 @@
-PsiFile(plain text):EExTokenizerTestRaiseSyntaxErrorWhenThereIsStartMarkAndNoEndMark1.eex(0,11)
-  PsiElement(PLAIN_TEXT)('foo ')(0,4)
-  PsiElement(EEx)('<% :bar')(4,11)

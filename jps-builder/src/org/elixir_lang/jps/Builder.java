@@ -12,10 +12,12 @@ import org.elixir_lang.jps.builder.GeneralCommandLine;
 import org.elixir_lang.jps.builder.ProcessAdapter;
 import org.elixir_lang.jps.builder.SourceRootDescriptor;
 import org.elixir_lang.jps.compiler_options.Extension;
+import org.elixir_lang.jps.model.ErlangSdkNameMissing;
 import org.elixir_lang.jps.model.ModuleType;
 import org.elixir_lang.jps.model.SdkProperties;
 import org.elixir_lang.jps.sdk_type.Elixir;
 import org.elixir_lang.jps.sdk_type.Erlang;
+import org.elixir_lang.jps.sdk_type.MissingHomePath;
 import org.elixir_lang.jps.target.BuilderUtil;
 import org.elixir_lang.jps.target.Type;
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +30,6 @@ import org.jetbrains.jps.incremental.TargetBuilder;
 import org.jetbrains.jps.incremental.messages.BuildMessage;
 import org.jetbrains.jps.incremental.messages.CompilerMessage;
 import org.jetbrains.jps.incremental.resources.ResourcesBuilder;
-import org.jetbrains.jps.model.JpsElement;
 import org.jetbrains.jps.model.JpsProject;
 import org.jetbrains.jps.model.java.JavaSourceRootType;
 import org.jetbrains.jps.model.java.JpsJavaExtensionService;
@@ -41,10 +42,12 @@ import org.jetbrains.jps.model.module.*;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.file.AccessDeniedException;
 import java.util.*;
 
 /**
@@ -52,11 +55,10 @@ import java.util.*;
  * https://github.com/ignatov/intellij-erlang/tree/master/jps-plugin/src/org/intellij/erlang/jps/rebar
  */
 public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
-    private static final String URL_PREFIX = "file://";
     public static final String BUILDER_NAME = "Elixir Builder";
-
     public static final String ELIXIR_SOURCE_EXTENSION = "ex";
     public static final String ELIXIR_SCRIPT_EXTENSION = "exs";
+    private static final String URL_PREFIX = "file://";
     private static final String ELIXIR_TEST_SOURCE_EXTENSION = ELIXIR_SCRIPT_EXTENSION;
 
     private static final String ElIXIRC_NAME = "elixirc";
@@ -101,7 +103,6 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
                                        JpsModule module,
                                        CompilerOptions compilerOptions) throws ProjectBuildException, IOException {
         JpsSdk<SdkProperties> sdk = BuilderUtil.getSdk(context, module);
-        String mixPath = Elixir.getMixScript(sdk);
 
         for (String contentRootUrl : module.getContentRootsList().getUrls()) {
             String contentRootPath = new URL(contentRootUrl).getPath();
@@ -109,7 +110,9 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
             File mixConfigFile = new File(contentRootDir, MIX_CONFIG_FILE_NAME);
             if (!mixConfigFile.exists()) continue;
 
-            runMix(target, sdk, mixPath, contentRootPath, compilerOptions, context, module);
+            String task = target.isTests() ? "test" : "compile";
+
+            runMix(sdk, module, contentRootPath, task, compilerOptions, context);
         }
     }
 
@@ -139,21 +142,9 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
                                    CompilerOptions compilerOptions,
                                    Collection<File> files,
                                    File outputDirectory) throws ProjectBuildException {
-
         GeneralCommandLine commandLine = getElixircCommandLine(target, context, compilerOptions, files, outputDirectory);
 
-        Process process;
-        try {
-            process = commandLine.createProcess();
-        } catch (ExecutionException e) {
-            throw new ProjectBuildException("Failed to launch elixir compiler", e);
-        }
-
-        BaseOSProcessHandler handler = new BaseOSProcessHandler(process, commandLine.getCommandLineString(), Charset.defaultCharset());
-        com.intellij.execution.process.ProcessAdapter adapter = new ProcessAdapter(context, ElIXIRC_NAME, "", compilerOptions);
-        handler.addProcessListener(adapter);
-        handler.startNotify();
-        handler.waitFor();
+        run(commandLine, context, ElIXIRC_NAME, compilerOptions);
     }
 
     private static GeneralCommandLine getElixircCommandLine(Target target,
@@ -300,42 +291,45 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
         return elixirExePath;
     }
 
-    @Nullable
-    private static String erlangSdkLibraryToErlExePath(@NotNull JpsLibrary erlangSdkLibrary) {
-        String erlExePath = null;
-
-        JpsElement erlangSdkLibraryProperties = erlangSdkLibrary.getProperties();
-
-        if (erlangSdkLibraryProperties instanceof JpsSdk) {
-            erlExePath = erlangSdkToErlExePath((JpsSdk) erlangSdkLibraryProperties);
-        }
-
-        return erlExePath;
+    @NotNull
+    private static String erlangSdkLibraryToErlExePath(@NotNull JpsLibrary erlangSdkLibrary) throws FileNotFoundException, AccessDeniedException {
+        return erlangJpsSdkToErlExePath((JpsSdk) erlangSdkLibrary.getProperties());
     }
 
-    @Nullable
-    private static String erlangSdkNameToErlExePath(@NotNull String erlangSdkName, @NotNull JpsModule module) {
+    @NotNull
+    private static String erlangSdkNameToErlExePath(@NotNull String erlangSdkName, @NotNull JpsModule module) throws LibraryNotFound, FileNotFoundException, AccessDeniedException {
         JpsLibraryCollection libraryCollection = module.getProject().getModel().getGlobal().getLibraryCollection();
         JpsLibrary erlangSdkLibrary = libraryCollection.findLibrary(erlangSdkName);
-        String erlExePath = null;
+
+        String erlExePath;
 
         if (erlangSdkLibrary != null) {
             erlExePath = erlangSdkLibraryToErlExePath(erlangSdkLibrary);
+        } else {
+            throw new LibraryNotFound(erlangSdkName);
         }
 
         return erlExePath;
     }
 
-    @Nullable
-    private static String erlangSdkToErlExePath(@NotNull JpsSdk erlangSdk) {
-        String erlangHomePath = erlangSdk.getHomePath();
-        String erlExePath = null;
+    @NotNull
+    public static String erlangHomePathToErlExePath(@Nullable String erlangHomePath) throws
+            AccessDeniedException, FileNotFoundException {
+        String erlExePath;
 
         if (erlangHomePath != null) {
             erlExePath = Erlang.homePathToErlExePath(erlangHomePath);
+        } else {
+            throw new FileNotFoundException("Erlang SDK home path is not set");
         }
 
         return erlExePath;
+    }
+
+    @NotNull
+    private static String erlangJpsSdkToErlExePath(@NotNull JpsSdk erlangSdk) throws FileNotFoundException, AccessDeniedException {
+        String erlangHomePath = erlangSdk.getHomePath();
+        return erlangHomePathToErlExePath(erlangHomePath);
     }
 
     private static void prependCodePaths(@NotNull GeneralCommandLine commandLine, @NotNull JpsSdk sdk) {
@@ -353,90 +347,134 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
         }
     }
 
-    @Nullable
-    private static String sdkPropertiesToErlExePath(@NotNull SdkProperties sdkProperties, @NotNull JpsModule module) {
-        String erlangSdkName = sdkProperties.erlangSdkName;
-        String erlExePath = null;
+    @NotNull
+    private static String sdkPropertiesToErlExePath(@NotNull SdkProperties sdkProperties, @NotNull JpsModule module) throws ErlangSdkNameMissing, FileNotFoundException, AccessDeniedException, LibraryNotFound {
+        String erlangSdkName = sdkProperties.ensureErlangSdkName();
 
-        if (erlangSdkName != null) {
-            erlExePath = erlangSdkNameToErlExePath(erlangSdkName, module);
+        return erlangSdkNameToErlExePath(erlangSdkName, module);
+    }
+
+    @NotNull
+    private static SdkProperties ensureSdkProperties(@NotNull JpsSdk<SdkProperties> sdk) throws MissingSdkProperties {
+        SdkProperties sdkProperties = sdk.getSdkProperties();
+
+        if (sdkProperties == null) {
+            throw new MissingSdkProperties();
         }
 
-        return erlExePath;
+        return sdkProperties;
     }
 
-    private static void setElixir(@NotNull GeneralCommandLine commandLine) {
-        String exePath = Elixir.getExecutableFileName(Elixir.SCRIPT_INTERPRETER);
-        commandLine.setExePath(exePath);
-    }
-
-    private static void setElixir(@NotNull GeneralCommandLine commandLine,
-                                  @Nullable JpsSdk<SdkProperties> sdk,
-                                  @NotNull JpsModule module) {
-        if (sdk != null) {
-            SdkProperties sdkProperties = sdk.getSdkProperties();
-
-            if (sdkProperties != null) {
-                setElixir(commandLine, sdk, sdkProperties, module);
-            } else {
-                setElixir(commandLine);
-            }
-        } else {
-            setElixir(commandLine);
-        }
-    }
-
-    private static void setElixir(@NotNull GeneralCommandLine commandLine,
-                                  @NotNull JpsSdk<SdkProperties> sdk,
-                                  @NotNull SdkProperties sdkProperties,
-                                  @NotNull JpsModule module) {
+    private static void setErl(@NotNull GeneralCommandLine commandLine,
+                               @NotNull JpsSdk<SdkProperties> sdk,
+                               @NotNull SdkProperties sdkProperties,
+                               @NotNull JpsModule module) throws
+            FileNotFoundException, AccessDeniedException, LibraryNotFound, ErlangSdkNameMissing {
         String erlExePath = sdkPropertiesToErlExePath(sdkProperties, module);
-
-        if (erlExePath != null) {
-            setExePath(commandLine, erlExePath, sdk);
-            commandLine.addParameters("-noshell", "-s", "elixir", "start_cli");
-            commandLine.addParameter("-extra");
-        } else {
-            String elixirExePath = elixirSdkToElixirExePath(sdk);
-
-            if (elixirExePath == null) {
-                elixirExePath = Elixir.getExecutableFileName(Elixir.SCRIPT_INTERPRETER);
-            }
-
-            setExePath(commandLine, elixirExePath, sdk);
-        }
+        setErl(commandLine, erlExePath, sdk);
     }
 
-    private static void setExePath(@NotNull GeneralCommandLine generalCommandLine,
-                                   @NotNull String exePath,
-                                   @NotNull JpsSdk sdk) {
+    private static void setErl(@NotNull GeneralCommandLine generalCommandLine,
+                               @NotNull String exePath,
+                               @NotNull JpsSdk sdk) {
         generalCommandLine.setExePath(exePath);
         prependCodePaths(generalCommandLine, sdk);
     }
 
-    private static void runMix(@NotNull Target target,
-                               @Nullable JpsSdk<SdkProperties> sdk,
-                               @NotNull String mixPath,
-                               @Nullable String contentRootPath,
-                               @NotNull CompilerOptions compilerOptions,
-                               @NotNull CompileContext context,
-                               @NotNull JpsModule module) throws ProjectBuildException {
-        GeneralCommandLine commandLine = new GeneralCommandLine();
-        commandLine.withWorkDirectory(contentRootPath);
-        setElixir(commandLine, sdk, module);
+    private static void addElixir(@NotNull GeneralCommandLine commandLine) {
+        commandLine.addParameters("-noshell", "-s", "elixir", "start_cli");
+        commandLine.addParameter("-extra");
+    }
+
+    private static void addMix(@NotNull GeneralCommandLine commandLine, @NotNull JpsSdk<SdkProperties> sdk) throws MissingHomePath {
+        String mixPath = Elixir.mixPath(sdk);
         commandLine.addParameter(mixPath);
-        commandLine.addParameter(target.isTests() ? "test" : "compile");
+    }
+
+    private static GeneralCommandLine erlCommandLine(@NotNull JpsSdk<SdkProperties> sdk,
+                                                     @NotNull JpsModule module,
+                                                     @Nullable String workingDirectory)
+            throws AccessDeniedException, ErlangSdkNameMissing, FileNotFoundException, LibraryNotFound, MissingSdkProperties {
+        GeneralCommandLine commandLine = new GeneralCommandLine();
+        commandLine.withWorkDirectory(workingDirectory);
+        SdkProperties sdkProperties = ensureSdkProperties(sdk);
+        setErl(commandLine, sdk, sdkProperties, module);
+
+        return commandLine;
+    }
+
+    private static GeneralCommandLine elixirCommandLine(@NotNull JpsSdk<SdkProperties> sdk,
+                                                        @NotNull JpsModule module,
+                                                        @Nullable String workingDirectory)
+            throws AccessDeniedException, ErlangSdkNameMissing, FileNotFoundException, LibraryNotFound, MissingSdkProperties {
+        GeneralCommandLine commandLine = erlCommandLine(sdk, module, workingDirectory);
+        addElixir(commandLine);
+
+        return commandLine;
+    }
+
+    private static GeneralCommandLine mixCommandLine(@NotNull JpsSdk<SdkProperties> sdk,
+                                                     @NotNull JpsModule module,
+                                                     @Nullable String workingDirectory,
+                                                     @NotNull String task,
+                                                     @NotNull CompilerOptions compilerOptions) throws
+            FileNotFoundException, ErlangSdkNameMissing, LibraryNotFound, AccessDeniedException, MissingHomePath, MissingSdkProperties {
+        GeneralCommandLine commandLine = elixirCommandLine(sdk, module, workingDirectory);
+        addMix(commandLine, sdk);
+        commandLine.addParameter(task);
         addCompileOptions(commandLine, compilerOptions);
 
-        Process process;
+        return commandLine;
+    }
+
+    private static void runMix(@NotNull JpsSdk<SdkProperties> sdk,
+                               @NotNull JpsModule module,
+                               @Nullable String contentRootPath,
+                               @NotNull String task,
+                               @NotNull CompilerOptions compilerOptions,
+                               @NotNull CompileContext context) throws ProjectBuildException {
+        GeneralCommandLine commandLine;
+
         try {
-            process = commandLine.createProcess();
-        } catch (ExecutionException e) {
-            throw new ProjectBuildException("Failed to run mix.", e);
+            commandLine = mixCommandLine(sdk, module, contentRootPath, task, compilerOptions);
+        } catch (AccessDeniedException |
+                ErlangSdkNameMissing |
+                FileNotFoundException |
+                LibraryNotFound |
+                MissingHomePath |
+                MissingSdkProperties exception) {
+            throw new ProjectBuildException(
+                    "Couldn't construct command line for mix: " + exception.getMessage(),
+                    exception
+            );
         }
 
-        BaseOSProcessHandler handler = new BaseOSProcessHandler(process, commandLine.getCommandLineString(), Charset.defaultCharset());
-        com.intellij.execution.process.ProcessAdapter adapter = new ProcessAdapter(context, MIX_NAME, commandLine.getWorkDirectory().getPath(), compilerOptions);
+        run(commandLine, context, MIX_NAME, compilerOptions);
+    }
+
+    private static void run(@NotNull GeneralCommandLine commandLine,
+                            @NotNull CompileContext context,
+                            @NotNull String builderName,
+                            @NotNull CompilerOptions compilerOptions) throws ProjectBuildException {
+        Process process;
+
+        try {
+            process = commandLine.createProcess();
+        } catch (ExecutionException executionException) {
+            throw new ProjectBuildException("Failed to run " + builderName, executionException);
+        }
+
+        BaseOSProcessHandler handler = new BaseOSProcessHandler(
+                process,
+                commandLine.getCommandLineString(),
+                Charset.defaultCharset()
+        );
+        com.intellij.execution.process.ProcessAdapter adapter = new ProcessAdapter(
+                context,
+                builderName,
+                commandLine.getWorkDirectory().getPath(),
+                compilerOptions
+        );
         handler.addProcessListener(adapter);
         handler.startNotify();
         handler.waitFor();

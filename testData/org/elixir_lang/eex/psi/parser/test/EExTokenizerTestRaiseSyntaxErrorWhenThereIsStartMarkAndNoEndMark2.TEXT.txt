@@ -1,3 +1,0 @@
-PsiFile(plain text):EExTokenizerTestRaiseSyntaxErrorWhenThereIsStartMarkAndNoEndMark2.eex(0,8)
-  PsiElement(EEx)('<%# true')(0,8)
-  PsiElement(PLAIN_TEXT)('')(8,8)

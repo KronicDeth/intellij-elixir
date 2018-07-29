@@ -20,10 +20,11 @@ package org.elixir_lang.debugger.stack_frame.value.list
 
 import com.ericsson.otp.erlang.OtpErlangList
 import com.intellij.xdebugger.frame.XValueChildrenList
-import org.elixir_lang.debugger.stack_frame.value.ArrayBase
+import org.elixir_lang.debugger.stack_frame.value.Indexed
+import org.elixir_lang.debugger.stack_frame.value.add
 
-internal class Proper(value: OtpErlangList) : ArrayBase<OtpErlangList>(value, value.arity()) {
-    override fun computeChild(children: XValueChildrenList, childIdx: Int) {
-        addIndexedChild(children, value.elementAt(childIdx), childIdx)
+internal class Proper(term: OtpErlangList) : Indexed<OtpErlangList>(term, term.arity()) {
+    override fun computeChild(children: XValueChildrenList, index: Int) {
+        children.add(index, term.elementAt(index))
     }
 }

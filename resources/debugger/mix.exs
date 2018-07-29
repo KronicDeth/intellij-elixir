@@ -4,8 +4,9 @@ defmodule IntellijElixir.Debugger.Mixfile do
   def project do
     [
       app: :intellij_elixir_debugger,
-      version: "0.1.0",
+      version: "0.2.0",
       elixir: "~> 1.4",
+      elixirc_paths: elixirc_paths(Mix.env()),
       build_per_environment: false,
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
@@ -33,4 +34,8 @@ defmodule IntellijElixir.Debugger.Mixfile do
   defp deps do
     []
   end
+
+  # Specifies which paths to compile per environment.
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 end

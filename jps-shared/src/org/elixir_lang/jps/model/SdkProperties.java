@@ -6,7 +6,7 @@ import org.jetbrains.jps.model.ex.JpsElementBase;
 
 public class SdkProperties extends JpsElementBase<SdkProperties> {
     @Nullable
-    public String erlangSdkName;
+    private String erlangSdkName;
 
     public SdkProperties(@Nullable String erlangSdkName) {
         this.erlangSdkName = erlangSdkName;
@@ -21,5 +21,20 @@ public class SdkProperties extends JpsElementBase<SdkProperties> {
     @Override
     public void applyChanges(@NotNull SdkProperties modified) {
         // not supported
+    }
+
+    @NotNull
+    public String ensureErlangSdkName() throws ErlangSdkNameMissing {
+        String erlangSdkName = this.erlangSdkName;
+
+        if (erlangSdkName == null) {
+            throw new ErlangSdkNameMissing();
+        }
+
+        return erlangSdkName;
+    }
+
+    public void setErlangSdkName(@Nullable String erlangSdkName) {
+        this.erlangSdkName = erlangSdkName;
     }
 }

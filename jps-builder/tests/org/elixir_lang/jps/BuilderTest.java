@@ -126,7 +126,7 @@ public class BuilderTest extends JpsBuildTestCase {
         );
 
         JpsLibrary erlangSdkLibrary = erlangSdk.getParent();
-        elixirTypedLibrary.getProperties().getSdkProperties().erlangSdkName = erlangSdkLibrary.getName();
+        elixirTypedLibrary.getProperties().getSdkProperties().setErlangSdkName(erlangSdkLibrary.getName());
 
         for (JpsLibraryRoot erlangLibraryRoot : erlangSdkLibrary.getRoots(JpsOrderRootType.COMPILED)) {
             elixirTypedLibrary.addRoot(erlangLibraryRoot.getUrl(), JpsOrderRootType.COMPILED);

@@ -50,7 +50,7 @@ public abstract class Type extends DependentSdkType {
     }
 
     @Override
-    protected SdkType getDependencyType() {
+    public SdkType getDependencyType() {
         return erlangSdkType(ProjectJdkTable.getInstance());
     }
 

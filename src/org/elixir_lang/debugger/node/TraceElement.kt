@@ -5,8 +5,15 @@ import com.ericsson.otp.erlang.OtpErlangTuple
 import com.intellij.openapi.diagnostic.Logger
 import org.elixir_lang.beam.term.inspect
 
-class TraceElement(val module: String, val function: String, val arguments: List<OtpErlangObject>,
-                   val bindings: Map<String, OtpErlangObject>, val file: String, val line: Int) {
+class TraceElement(
+        val level: Int,
+        val module: String,
+        val function: String,
+        val arguments: List<OtpErlangObject>,
+        val bindings: List<Binding>,
+        val file: String,
+        val line: Int
+) {
     companion object {
         // {level, {module, function, arguments}, bindings, {file, line}}
         private const val ARITY = 4
@@ -26,10 +33,12 @@ class TraceElement(val module: String, val function: String, val arguments: List
             val arity = otpStackFrame.arity()
 
             return if (arity == ARITY) {
-                ModuleFunctionArguments.from(otpStackFrame.elementAt(1))?.let { (module, function, arguments) ->
-                    Bindings.from(otpStackFrame.elementAt(2))?.let { bindings ->
-                        FileLine.from(otpStackFrame.elementAt(3))?.let { (file, line) ->
-                            TraceElement(module, function, arguments, bindings, file, line)
+                Level.from(otpStackFrame.elementAt(0))?.let { level ->
+                    ModuleFunctionArguments.from(otpStackFrame.elementAt(1))?.let { (module, function, arguments) ->
+                        Bindings.from(otpStackFrame.elementAt(2))?.let { bindings ->
+                            FileLine.from(otpStackFrame.elementAt(3))?.let { (file, line) ->
+                                TraceElement(level, module, function, arguments, bindings, file, line)
+                            }
                         }
                     }
                 }

@@ -12,7 +12,7 @@ import static org.elixir_lang.psi.impl.QuotableImpl.NIL;
 public class Process {
     @Nullable
     public static OtpErlangPid whereis(OtpMbox localMbox, OtpNode localNode, String remoteName, String remoteNode, int timeout) throws OtpErlangExit, OtpErlangDecodeException {
-        OtpErlangObject response = RPC.unmonitoredCall(
+        OtpErlangObject response = RPC.INSTANCE.unmonitoredCall(
                 remoteNode,
                 localMbox,
                 localNode,

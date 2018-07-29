@@ -28,6 +28,6 @@ class Handler(private val process: Process) : XBreakpointHandler<XLineBreakpoint
     }
 
     override fun unregisterBreakpoint(breakpoint: XLineBreakpoint<Properties>, temporary: Boolean) {
-        process.removeBreakpoint(breakpoint, temporary)
+        process.removeBreakpoint(breakpoint)
     }
 }

@@ -28,7 +28,7 @@ import com.intellij.util.containers.ContainerUtil
 import org.elixir_lang.ElixirLanguage
 import org.elixir_lang.credo.Annotator
 import org.elixir_lang.jps.builder.ParametersList
-import org.elixir_lang.mix.runner.MixRunningStateUtil
+import org.elixir_lang.mix.MissingSdk
 
 import java.nio.file.Paths
 import java.util.*
@@ -60,12 +60,13 @@ private fun put(pathSetByWorkingDirectory: MutableMap<String, MutableSet<String>
 private fun generalCommandLine(workingDirectoryGeneralCommandLine: GeneralCommandLine,
                                module: Module,
                                mixParametersList: ParametersList): GeneralCommandLine =
-        MixRunningStateUtil.commandLine(
-                workingDirectoryGeneralCommandLine,
-                module,
-                ParametersList(),
-                mixParametersList
-        )
+        TODO()
+//        MixRunningStateUtil.commandLine(
+//                workingDirectoryGeneralCommandLine,
+//                module,
+//                ParametersList(),
+//                mixParametersList
+//        )
 
 private fun runInspection(module: Module,
                           workingDirectory: String,
@@ -77,6 +78,8 @@ private fun runInspection(module: Module,
 
         Annotator.lineListToIssueList(processOutput.stdoutLines)
     } catch (executionException: ExecutionException) {
+        emptyList()
+    } catch (missingSdk: MissingSdk) {
         emptyList()
     }
 }

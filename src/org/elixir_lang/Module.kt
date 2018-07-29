@@ -40,5 +40,6 @@ object Module {
      * Emulates Module.split/1
      */
     @Contract(pure = true)
+    @JvmStatic
     fun split(name: String): kotlin.collections.List<String> = name.split(SEPARATOR)
 }

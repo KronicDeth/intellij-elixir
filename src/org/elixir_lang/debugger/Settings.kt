@@ -64,6 +64,11 @@ class Settings(moduleFilters: List<ModuleFilter> = defaultModuleFilters()):
                 ModuleFilter(pattern = "Base"),
                 // bcrypt_elixir
                 ModuleFilter(pattern = "Bcrypt.Base"),
+                /* Benchee is for benchmarking, you probably don't want to benchmark while debugging.  Developers of
+                   Benchee itself, can either turn off this filter OR placing breakpoints in a specific module will
+                   still allow it to be interpreted */
+                ModuleFilter(pattern = "Benchee"),
+                ModuleFilter(pattern = "Benchee.*"),
                 ModuleFilter(pattern = "Behaviour"),
                 ModuleFilter(pattern = "Bitwise"),
                 ModuleFilter(pattern = "Calendar"),
@@ -73,6 +78,9 @@ class Settings(moduleFilters: List<ModuleFilter> = defaultModuleFilters()):
                 ModuleFilter(pattern = "Collectable"),
                 ModuleFilter(pattern = "Collectable.*"),
                 ModuleFilter(pattern = "Connection"),
+                // credo
+                ModuleFilter(pattern = "Credo"),
+                ModuleFilter(pattern = "Credo.*"),
                 ModuleFilter(pattern = "DBConnection"),
                 ModuleFilter(pattern = "DBConnection.*"),
                 ModuleFilter(pattern = "Date"),
@@ -81,11 +89,20 @@ class Settings(moduleFilters: List<ModuleFilter> = defaultModuleFilters()):
                 ModuleFilter(pattern = "Decimal"),
                 ModuleFilter(pattern = "Dict"),
                 ModuleFilter(pattern = "DynamicSupervisor"),
+                // earmark
+                ModuleFilter(pattern = "Earmark"),
+                ModuleFilter(pattern = "Earmark.*"),
                 ModuleFilter(pattern = "Ecto"),
                 ModuleFilter(pattern = "Ecto.*"),
                 ModuleFilter(pattern = "Enum"),
                 ModuleFilter(pattern = "Enumerable"),
                 ModuleFilter(pattern = "Enumerable.*"),
+                // excoveralls
+                ModuleFilter(pattern = "ExCoveralls"),
+                ModuleFilter(pattern = "ExCoveralls.*"),
+                // ex_doc
+                ModuleFilter(pattern = "ExDoc"),
+                ModuleFilter(pattern = "ExDoc.*"),
                 ModuleFilter(pattern = "ExUnit"),
                 ModuleFilter(pattern = "ExUnit.*"),
                 ModuleFilter(pattern = "File"),
@@ -105,6 +122,9 @@ class Settings(moduleFilters: List<ModuleFilter> = defaultModuleFilters()):
                 ModuleFilter(pattern = "IEx.*"),
                 ModuleFilter(pattern = "IO"),
                 ModuleFilter(pattern = "IO.*"),
+                // inch_ex
+                ModuleFilter(pattern = "InchEx"),
+                ModuleFilter(pattern = "InchEx.*"),
                 ModuleFilter(pattern = "Inspect"),
                 ModuleFilter(pattern = "Inspect.*"),
                 ModuleFilter(pattern = "Kernel"),

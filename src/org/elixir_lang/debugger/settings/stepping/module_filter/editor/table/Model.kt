@@ -5,8 +5,6 @@ import org.elixir_lang.debugger.settings.stepping.ModuleFilter
 import javax.swing.table.AbstractTableModel
 
 class Model : AbstractTableModel(), ItemRemovable {
-    var enabled = false
-
     var filters: List<ModuleFilter>
         get() {
             _filterList.removeIf { it.pattern.isBlank() }
