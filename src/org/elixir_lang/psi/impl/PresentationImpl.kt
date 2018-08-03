@@ -27,10 +27,14 @@ object PresentationImpl {
                     if (callDefinitionClause == null) {
                         val callDefinition = CallDefinition.fromCall(call)
 
-                        CallDefinitionClause(callDefinition!!, call)
+                        if (callDefinition != null) {
+                            CallDefinitionClause(callDefinition, call).presentation
+                        } else {
+                            getDefaultPresentation(call)
+                        }
+                    } else {
+                        callDefinitionClause.presentation
                     }
-
-                    callDefinitionClause!!.presentation
                 }
                 org.elixir_lang.structure_view.element.modular.Module.`is`(call) -> {
                     val modular = CallDefinitionClause.enclosingModular(call)
