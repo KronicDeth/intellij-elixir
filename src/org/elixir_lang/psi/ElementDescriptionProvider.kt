@@ -77,7 +77,7 @@ class ElementDescriptionProvider : com.intellij.psi.ElementDescriptionProvider {
         var elementDescription: String? = keywordKey
                 .parent.let { it as? ElixirKeywordPair }
                 ?.parent?.let { it as? ElixirKeywords }
-                ?.parent?.let { it as ElixirList }
+                ?.parent?.let { it as? ElixirList }
                 ?.parent?.let { it as ElixirAccessExpression }
                 ?.parent?.let { it as? QuotableKeywordPair }
                 ?.keywordKey?.let { outerKeywordKey ->
