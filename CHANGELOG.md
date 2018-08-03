@@ -226,6 +226,7 @@ Table of Contents
 ### Bug Fixes
 * [#1188](https://github.com/KronicDeth/intellij-elixir/pull/1188) - Show `...` for module name when `Dbgi` has no module name as happens for instrumented modules from `IEx.break/4`. - [@KronicDeth](https://github.com/KronicDeth)
 * [#1189](https://github.com/KronicDeth/intellij-elixir/pull/1189) - Don't assume `callDefinitionClause` is non-`null`. - [@KronicDeth](https://github.com/KronicDeth)
+* [#1190](https://github.com/KronicDeth/intellij-elixir/pull/1190) - Don't assume parent of list access expression is `QuotableKeywordPair`- [@KronicDeth](https://github.com/KronicDeth)
 
 ### Incompatible Changes
 * [#1175](https://github.com/KronicDeth/intellij-elixir/pull/1175) - Drop support for IntelliJ IDEA before 2017.3 as they lack the `TerminalExecutionConsole` used to run `iex` in a PTY. - [@KronicDeth](https://github.com/KronicDeth)
