@@ -171,7 +171,7 @@ class Panel(private val formsTree: Tree, project: Project): JPanel(GridLayout(1,
     }
 
     private fun moduleContext(debugInfo: AbstractCodeCompileOptions, inner: () -> String): String =
-            "defmodule ${debugInfo.inspectedModule!!} do \n" +
+            "defmodule ${debugInfo.inspectedModule ?: "..."} do \n" +
                     "  # ... \n" +
                     "  ${adjustNewLines(inner(), "\n  ")}\n" +
                     "  # ...\n" +
