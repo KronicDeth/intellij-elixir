@@ -749,7 +749,27 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
     //       for human consumption. Store it in x(0). Destroys all other registers.
     //       Do a garbage collection if necessary to allocate space on the heap
     //       for the result.
-    BUILD_STACKTRACE(160, "build_stacktrace");
+    BUILD_STACKTRACE(160, "build_stacktrace"),
+
+    // @spec raw_raise
+    // @doc  This instruction works like the erlang:raise/3 BIF, except that the
+    //       stacktrace in x(2) must be a raw stacktrace.
+    //       x(0) is the class of the exception (error, exit, or throw),
+    //       x(1) is the exception term, and x(2) is the raw stackframe.
+    //       If x(0) is not a valid class, the instruction will not throw an
+    //       exception, but store the atom 'badarg' in x(0) and execute the
+    //       next instruction.
+    RAW_RAISE(161, "raw_raise"),
+
+    // @spec get_hd  Source Head
+    // @doc  Get the head (or car) part of a list (a cons cell) from Source and
+    //       put it into the register Head.
+    GET_HD(162, "get_hd", arrayOf(SOURCE, Argument("head"))),
+
+    // @spec get_tl  Source Tail
+    // @doc  Get the tail (or cdr) part of a list (a cons cell) from Source and
+    //       put it into the register Tail.
+    GET_TL(163, "get_tl", arrayOf(SOURCE, Argument("tail")));
 
     fun arity() = arguments.size
 }
