@@ -119,6 +119,38 @@
           <li>Evaluate can evaluate an Elixir expression in any stack frame.</li>
         </ul>
       </li>
+      <li>
+        <p>Add all OTP 21 opcodes to disassembler.  Previous opcode set was frozen prior to OTP 21 release and missed some later additions.</p>
+        <table>
+          <thead>
+          <tr>
+            <th align="left">number</th>
+            <th align="left">name</th>
+            <th align="left">Added</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td align="left"><code>160</code></td>
+            <td align="left"><code>build_stacktrace</code></td>
+            <td align="left">Before OTP 21 release</td>
+          </tr>
+          <tr>
+            <td align="left"><code>161</code></td>
+            <td align="left"><code>raw_raise</code></td>
+            <td align="left">Now</td>
+          </tr>
+          <tr>
+            <td align="left"><code>162</code></td>
+            <td align="left"><code>get_hd</code></td>
+            <td align="left">Now</td>
+          </tr>
+          <tr>
+            <td align="left"><code>163</code></td>
+            <td align="left"><code>get_tl</code></td>
+            <td align="left">Now</td>
+          </tr></tbody></table>
+      </li>
     </ul>
   </li>
   <li>
