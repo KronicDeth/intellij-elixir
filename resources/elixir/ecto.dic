@@ -1,3 +1,7 @@
+App
+API
+MyApp
+Preloader
 assoc
 assocs
 agg
@@ -6,6 +10,8 @@ aggregators
 autogen
 autogenerate
 autoupdate
+barebone
+barebones
 bingenerate
 bys
 cacheable
@@ -40,6 +46,7 @@ mariadb
 mariaex
 mongo
 migrator
+myapp
 nilify
 nrows
 PK

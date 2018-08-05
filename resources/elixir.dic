@@ -1,11 +1,18 @@
+Aliaser
 AST
 BOM
+CaptureIO
+Cprof
 CSV
 DETS
+Dyn
 EOF
+Eprof
+Fprof
 ETS
 FTP
 HTTP
+Mixfile
 NFD
 OTP
 PLT
@@ -13,6 +20,8 @@ PLTs
 REPL
 RPC
 SASL
+StringIO
+Sublevel
 TFTP
 TTY
 UTC
@@ -35,6 +44,7 @@ arity
 asc
 assoc
 atime
+autoload
 autorun
 backend
 backends
@@ -74,6 +84,7 @@ collectable
 concats
 constr
 constrs
+converger
 ctime
 ctx
 cwd
@@ -170,6 +181,7 @@ graphemes
 heredoc
 heredocs
 hexhash
+hexpm
 hib
 httpc
 iex
@@ -189,6 +201,7 @@ keytake
 kw
 kwlist
 leapyear
+leex
 levelpad
 lex
 lexed
@@ -196,6 +209,7 @@ libpath
 lim
 linify
 ljust
+loadconfig
 loadpaths
 lstat
 lstrip
@@ -230,6 +244,7 @@ nosign
 num
 omg
 oneletter
+oneliner
 orelse
 osname
 parenless
@@ -277,6 +292,7 @@ setopts
 sha
 shortdoc
 sigil
+sigils
 snd
 src
 stacktrace
@@ -324,3 +340,4 @@ vsn
 warmup
 whereami
 whereis
+yecc

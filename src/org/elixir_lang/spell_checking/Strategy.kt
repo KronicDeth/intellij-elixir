@@ -15,7 +15,12 @@ class Strategy : com.intellij.spellchecker.tokenizer.SpellcheckingStrategy() {
     private fun getTokenizer(element: LeafPsiElement) =
             element.elementType.let { elementType ->
                 when (elementType) {
-                    ElixirTypes.IDENTIFIER_TOKEN -> org.elixir_lang.spell_checking.identifier.Tokenizer
+                    ElixirTypes.ALIAS_TOKEN -> org.elixir_lang.spell_checking.Tokenizer(
+                            org.elixir_lang.spell_checking.alias.Splitter
+                    )
+                    ElixirTypes.IDENTIFIER_TOKEN -> org.elixir_lang.spell_checking.Tokenizer(
+                            org.elixir_lang.spell_checking.identifier.Splitter
+                    )
                     else -> EMPTY_TOKENIZER
                 }
             }
