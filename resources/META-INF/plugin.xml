@@ -175,6 +175,8 @@
                      enabledByDefault="true" groupName="Elixir"
                      implementationClass="org.elixir_lang.inspection.MatchOperatorInsteadOfTypeOperator"
                      language="Elixir" level="ERROR" shortName="MatchOperatorInsteadOfTypeOperator"/>
+    <spellchecker.support implementationClass="org.elixir_lang.spell_checking.Strategy" language="Elixir"/>
+    <spellchecker.bundledDictionaryProvider implementation="org.elixir_lang.spell_checking.BundledDictionaryProvider"/>
 
     <!-- module attribute refactoring -->
     <renameHandler implementation="org.elixir_lang.refactoring.module_attribute.rename.Handler"/>

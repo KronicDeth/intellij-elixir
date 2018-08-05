@@ -44,7 +44,7 @@ class CallDefinition(
                 .findChildByType(ElixirTypes.IDENTIFIER_TOKEN) as LeafPsiElement?
                 ?: error("AtUnqualifiedNoParenthesesCall (" +
                         atUnqualifiedNoParenthesesCall.text +
-                        ") does not have an Identifier token")
+                        ") does not have an Tokenizer token")
 
         return callDefinitionSeparator(leafPsiElement)
     }

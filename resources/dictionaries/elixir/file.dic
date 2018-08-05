@@ -1,0 +1,10 @@
+BOM
+chgrp
+chown
+EOF
+gid
+lstat
+subdir
+symlink
+symlinked
+uid
