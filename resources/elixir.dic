@@ -28,6 +28,7 @@ anno
 ansicode
 ansidata
 ansilist
+arg
 argless
 arities
 arity
@@ -38,6 +39,7 @@ autorun
 backend
 backends
 band
+baz
 bidi
 binpath
 binread
@@ -59,6 +61,7 @@ callback
 camelize
 chardata
 charlist
+charlists
 checksum
 checksums
 chgrp
@@ -102,6 +105,7 @@ demonitor
 dep
 deps
 desc
+describetag
 destructure
 dialyze
 dialyzer
@@ -114,6 +118,8 @@ dunder
 ebin
 ebins
 ecto
+elem
+elems
 elixir
 elixirc
 emoji
@@ -182,6 +188,7 @@ keysort
 keytake
 kw
 kwlist
+leapyear
 levelpad
 lex
 lexed
@@ -272,6 +279,9 @@ shortdoc
 sigil
 snd
 src
+stacktrace
+stacktraces
+str
 stringified
 subcalls
 subdir
@@ -305,6 +315,7 @@ unsetenv
 upcase
 upcased
 uptitlecase
+usec
 userinfo
 usort
 varify
