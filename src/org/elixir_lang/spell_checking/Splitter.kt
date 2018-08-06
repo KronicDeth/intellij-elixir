@@ -13,8 +13,6 @@ open class Splitter : BaseSplitter() {
         }
     }
 
-    private val WORD_REGEX = Regex("[^_0-9?!]+")
-
     protected open fun wordTextRanges(text: String, range: TextRange): List<TextRange> {
         val startOffset = range.startOffset
 
@@ -34,3 +32,5 @@ open class Splitter : BaseSplitter() {
             }
     }
 }
+
+private val WORD_REGEX = Regex("[^_0-9?!]+")
