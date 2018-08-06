@@ -2,6 +2,9 @@ package org.elixir_lang.spell_checking
 
 import com.intellij.psi.PsiElement
 import com.intellij.psi.impl.source.tree.LeafPsiElement
+import com.intellij.psi.tree.IElementType
+import com.intellij.spellchecker.inspections.PlainTextSplitter
+import com.intellij.spellchecker.inspections.Splitter
 import com.intellij.spellchecker.tokenizer.Tokenizer
 import org.elixir_lang.psi.ElixirTypes
 
@@ -13,15 +16,17 @@ class Strategy : com.intellij.spellchecker.tokenizer.SpellcheckingStrategy() {
         }
 
     private fun getTokenizer(element: LeafPsiElement) =
-            element.elementType.let { elementType ->
-                when (elementType) {
-                    ElixirTypes.ALIAS_TOKEN -> org.elixir_lang.spell_checking.Tokenizer(
-                            org.elixir_lang.spell_checking.alias.Splitter
-                    )
-                    ElixirTypes.IDENTIFIER_TOKEN -> org.elixir_lang.spell_checking.Tokenizer(
-                            org.elixir_lang.spell_checking.identifier.Splitter
-                    )
-                    else -> EMPTY_TOKENIZER
-                }
+            element
+                    .elementType
+                    .let { splitter(it) }
+                    ?.let { org.elixir_lang.spell_checking.Tokenizer(it) }
+                    ?: EMPTY_TOKENIZER
+
+    private fun splitter(elementType: IElementType): Splitter? =
+            when (elementType) {
+                ElixirTypes.ALIAS_TOKEN -> org.elixir_lang.spell_checking.alias.Splitter
+                ElixirTypes.COMMENT -> PlainTextSplitter.getInstance()
+                ElixirTypes.IDENTIFIER_TOKEN -> org.elixir_lang.spell_checking.identifier.Splitter
+                else -> null
             }
 }

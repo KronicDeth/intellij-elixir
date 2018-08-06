@@ -6,6 +6,6 @@ import com.intellij.spellchecker.tokenizer.Tokenizer
 
 class Tokenizer(private val splitter: com.intellij.spellchecker.inspections.Splitter) : Tokenizer<LeafPsiElement>() {
     override fun tokenize(element: LeafPsiElement, consumer: TokenConsumer) {
-        consumer.consumeToken(element, true, splitter)
+        consumer.consumeToken(element, false, splitter)
     }
 }

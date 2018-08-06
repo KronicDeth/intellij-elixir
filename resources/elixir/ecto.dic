@@ -80,11 +80,13 @@ SQLite
 structs
 subcommand
 subcommands
+subpreload
 subquery
 subqueries
 subtransaction
 syntaxes
 throughs
+trackable
 unbox
 unboxed
 unextract
