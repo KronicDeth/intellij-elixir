@@ -223,7 +223,8 @@ Table of Contents
     * Improved Variables pane by showing the Elixir name of variables instead of Erlang names
     * Evaluate can evaluate an Elixir expression in any stack frame.
 * [#1192](https://github.com/KronicDeth/intellij-elixir/pull/1192) - [@KronicDeth](https://github.com/KronicDeth)
-  * Add all OTP 21 opcodes to disassembler.  Previous opcode set was frozen prior to OTP 21 release and missed some later additions.
+  * Add all OTP 21 opcodes to disassembler. Previous opcode set was
+    frozen prior to OTP 21 release and missed some later additions.
 
      | number |        name        |         Added         |
      |:-------|:-------------------|:----------------------|
@@ -231,6 +232,11 @@ Table of Contents
      | `161`  | `raw_raise`        | Now                   |
      | `162`  | `get_hd`           | Now                   |
      | `163`  | `get_tl`           | Now                   |
+* [#1196](https://github.com/KronicDeth/intellij-elixir/pull/1196) - [@KronicDeth](https://github.com/KronicDeth)
+  * Spell checking for identifiers, aliases, comments, and literals (charlists, strings, and sigils).
+    * Dictionaries for common dependencies
+      * Elixir
+      * Ecto
 
 ### Bug Fixes
 * [#1188](https://github.com/KronicDeth/intellij-elixir/pull/1188) - Show `...` for module name when `Dbgi` has no module name as happens for instrumented modules from `IEx.break/4`. - [@KronicDeth](https://github.com/KronicDeth)

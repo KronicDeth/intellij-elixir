@@ -152,6 +152,18 @@
           </tr></tbody></table>
       </li>
     </ul>
+    <ul>
+      <li>Spell checking for identifiers, aliases, comments, and literals (charlists, strings, and sigils).
+        <ul>
+          <li>Dictionaries for common dependencies
+            <ul>
+              <li>Elixir</li>
+              <li>Ecto</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
   </li>
   <li>
     <p>Bug Fixes</p>
@@ -1222,110 +1234,6 @@
       <li>
         Call <code>withCharSet(Charsets.UTF_8)</code> on all <code>GeneralCommandLines</code> to prevent encoding errors
         on Windows.
-      </li>
-    </ul>
-  </li>
-</ul>
-<h1>v6.4.0</h1>
-<ul>
-  <li>
-    <p>Enhancements</p>
-    <ul>
-      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/860">#860</a>.</li>
-      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/859">#859</a>.</li>
-      <li>Convert ANSI escape codes to colored output in <code>mix</code> Run and Debug output</li>
-      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/883">#883</a>.</li>
-      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/878">#878</a>.</li>
-    </ul>
-  </li>
-  <li>
-    <p>Bug Fixes</p>
-    <ul>
-      <li>
-        Quote <code>-</code> in addition to <code>#</code> in <code>Unquoted</code> <code>MacroNameArity</code>
-        decompiler.
-      </li>
-      <li>Quote <code>-</code> in decompiled module names.</li>
-      <li>Wrap call definitions with name <code>nil</code> as <code>unquote(:nil)</code> in the decompiler.</li>
-      <li>
-        <code>Application#runWriteAction</code> MUST be run from EventDispatch thread.  This is true when run from a Run
-        Configuration runner, but when the Credo annotator runs <code>runWriteAction</code>, it's not in an
-        EventDispatch thread, so followed
-        <a href="https://www.jetbrains.org/intellij/sdk/docs/basics/architectural_overview/general_threading_rules.html">
-          IntelliJ Platform SDK DevGuide - General Threading Rules
-        </a> and wrapped the <code>runWriteAction</code> in <code>Application#invokeAndWait</code>.
-      </li>
-      <li>
-        Wrap <code>sdkModificator::commitChanges</code> in <code>invokeAndWait</code> <code>runWriteAction</code> in
-        <code>MixRunningStateUtil#updateRoots</code>.
-      </li>
-      <li>
-        <p>Generalize what needs to be double quoted for <code>Unquoted</code> decompiler</p>
-        <ul>
-          <li>Aliases and special forms are bare atoms</li>
-          <li>Anything that is NEITHER an identifier NOR a prefix operator is a double quoted atom.</li>
-        </ul>
-        <p>Normal identifiers and prefix operators then fall through to the <code>Default</code> decompiler.</p>
-      </li>
-      <li>Add <code>end</code> to <code>Unquoted</code> decompiler bare atoms.</li>
-      <li>Replace <code>assert</code>s in <code>Credo</code> external annotator with extended log messages that record the unexpected line.</li>
-    </ul>
-  </li>
-</ul>
-<h1>v6.3.0</h1>
-<ul>
-  <li>
-    <p>Enhancements</p>
-    <ul>
-      <li><code>credo</code> external annotator
-        <ul>
-          <li>
-            Once modifications have settled on a file and all internal annotators have run, <code>mix credo</code> will
-            be run on any modified file.
-            <ul>
-              <li>
-                Each check failure reported by <code>mix credo</code> will be turned into a warning annotation (yellow
-                highlight) of the line or line and column credo identified.
-              </li>
-              <li>
-                If you hover over the annotation (either in the source or on right gutter), the
-                <code>mix credo PATH:LINE(:COLUMN)</code> explanation will be shown.  Links in the tooltip are clickable
-                and allow you to jump to the specific line or line and column of the failure.
-              </li>
-            </ul>
-          </li>
-        </ul>
-      </li>
-      <li>Explain Rich vs Small IDEs more</li>
-      <li>
-        Add feature support table for Rich vs Small IDEs with links to alternatives for Rich IDEs features not in Small
-        IDEs.
-      </li>
-      <li>Reorder Project subsections based on usage.</li>
-    </ul>
-  </li>
-  <li>
-    <p>Bug Fixes</p>
-    <ul>
-      <li>
-        Rename package with typo <code>org.elixir_lang.annonator</code> -&gt; <code>org.elixir_lang.annotator</code>.
-      </li>
-    </ul>
-    <ul>
-      <li>Change error to say mix, elixir, or erlang path is not set instead of just mix path.</li>
-      <li>
-        Rewrite of <code>MixRunningStateUtil#setElixir</code> to support calling <code>erl</code> directly in IntelliJ
-        IDEA added a check that sdk type was the Elixir SDK Type, but there was no <code>else</code> clauses to handle
-        that there IS an SDK, but its NOT Elixir, which is the common case on all Small IDEs (like Rubymine).  To fill
-        this gap, if the SDK is not Elixir and a Small IDE is detected, then the SDK Home from Preferences &gt; Other
-        Settings &gt; Elixir External Tools &gt; Elixir SDK &gt; Path will be used to get the absolute path to the
-        <code>elixir</code> (or <code>elixir.bat</code> executable and set it in the <code>GeneralCommandLine</code>.
-      </li>
-      <li>Add missing <code>**</code> for bold.</li>
-      <li>Document alternative setup in Small IDEs</li>
-      <li>
-        Put Import from external model first in Project subsections, so that people are more likely to import as a mix
-        project correctly.
       </li>
     </ul>
   </li>
