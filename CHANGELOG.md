@@ -237,6 +237,10 @@ Table of Contents
     * Dictionaries for common dependencies
       * Elixir
       * Ecto
+* [#1203](https://github.com/KronicDeth/intellij-elixir/pull/1203) - [@KronicDeth](https://github.com/KronicDeth)
+  * Elixir 1.7 debugger Variables and Evaluate compatibility
+    * Elixir 1.7 names Erlang variables like `_<elixirVariableName>@<counter>` while Elixir 1.6 used `V<elixirVariableName>@<counter>`
+    * Elixir 1.7 changed `elixir_erl` record and `%Macro.Env{}`, which changed how `:elixir.quoted_to_erl` needed to be called.
 
 ### Bug Fixes
 * [#1188](https://github.com/KronicDeth/intellij-elixir/pull/1188) - Show `...` for module name when `Dbgi` has no module name as happens for instrumented modules from `IEx.break/4`. - [@KronicDeth](https://github.com/KronicDeth)

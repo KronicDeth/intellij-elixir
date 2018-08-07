@@ -1,6 +1,6 @@
 <html>
 <body>
-<h1>v7.6.0</h1>
+<h1>v8.0.0</h1>
 <ul>
   <li>
     <p>Enhancements</p>
@@ -151,8 +151,6 @@
             <td align="left">Now</td>
           </tr></tbody></table>
       </li>
-    </ul>
-    <ul>
       <li>Spell checking for identifiers, aliases, comments, and literals (charlists, strings, and sigils).
         <ul>
           <li>Dictionaries for common dependencies
@@ -160,6 +158,18 @@
               <li>Elixir</li>
               <li>Ecto</li>
             </ul>
+          </li>
+        </ul>
+      </li>
+      <li>Elixir 1.7 debugger Variables and Evaluate compatibility
+        <ul>
+          <li>
+            Elixir 1.7 names Erlang variables like <code>_&lt;elixirVariableName&gt;@&lt;counter&gt;</code> while Elixir
+            1.6 used <code>V&lt;elixirVariableName&gt;@&lt;counter&gt;</code>
+          </li>
+          <li>
+            Elixir 1.7 changed <code>elixir_erl</code> record and <code>%Macro.Env{}</code>, which changed how
+            <code>:elixir.quoted_to_erl</code> needed to be called.
           </li>
         </ul>
       </li>
@@ -1172,68 +1182,6 @@
       <li>
         Don't do <code>project instanceOf MockProjectEx</code> because not all IDEs, such as Rider, ship with
         <code>MockProjectEx</code>; instead, do a <code>Class#getCanonicalName()</code> check.
-      </li>
-    </ul>
-  </li>
-</ul>
-<h1>v6.5.0</h1>
-<ul>
-  <li>
-    <p>Enhancements</p>
-    <ul>
-      <li>Update Build Matrix
-        <ul>
-          <li>
-            Only include IDEA versions within the last year.  Prior versions are supported, but not tested.  It is up to
-            users stuck on older versions to report incompatibilities and then I'm specifically fix those bugs.
-            <ul>
-              <li>Add <code>2017.2</code></li>
-              <li>Drop <code>2016.1.4</code></li>
-            </ul>
-          </li>
-          <li>
-            Only include Elixir versions within the last year.  Prior versions are supported, but not tested.  It is up
-            to users stuck on older versions to report incompatibilities and then I'm specifically fix those bugs.
-            <ul>
-              <li>Add <code>1.5.2</code></li>
-              <li>Drop <code>1.3.4</code></li>
-            </ul>
-          </li>
-          <li>
-            Only include OTP versions within the last year.  Prior versions are supported, but not tested.  It is up to
-            users stuck on older versions to report incompatibilities and then I'm specifically fix those bugs.
-            <ul>
-              <li>Add <code>20.1</code></li>
-              <li>Drop <code>18.3</code></li>
-            </ul>
-          </li>
-        </ul>
-      </li>
-      <li>
-        Support <code>not in</code> grammar added by
-        <a href="https://github.com/elixir-lang/elixir/pull/5620">elixir-lang/elixir#5620</a> shipped with Elixir 1.5.
-      </li>
-      <li>
-        Don't treat numeric operands to <code>@</code> and unary operators as separate operations from non-numeric
-        operands to port
-        <a href="https://github.com/elixir-lang/elixir/commit/9747e58db773c716c01c210642ec1d91475e0c83">
-          elixir-lang/elixir@<tt>9747e58</tt>
-        </a>
-        that shipped with Elixir 1.5.0.  This only kicks in if the Elixir SDK is version &gt;= 1.5.0 or not set.  With
-        an earlier SDK, you'll get the earlier behavior.
-      </li>
-    </ul>
-  </li>
-  <li>
-    <p>Bug Fixes</p>
-    <ul>
-      <li>
-        Make binary infix vs unary prefix <code>+</code>/<code>-</code> handling more robust to support
-        <code>one(two, - three)</code> used in Elixir 1.5 <code>enum.ex</code>.
-      </li>
-      <li>
-        Call <code>withCharSet(Charsets.UTF_8)</code> on all <code>GeneralCommandLines</code> to prevent encoding errors
-        on Windows.
       </li>
     </ul>
   </li>
