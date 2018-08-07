@@ -41,7 +41,9 @@ data class Binding(val erlangName: String, val value: OtpErlangObject) : Compara
     }
 
     companion object {
-        private val elixirNameRegex = Regex("V(.+)@(\\d+)")
+        // 1.6: V<name>@<binding>
+        // 1.7: _<name>@<binding>
+        private val elixirNameRegex = Regex("(?:V|_)(.+)@(\\d+)")
 
         private const val ARITY = 2
 

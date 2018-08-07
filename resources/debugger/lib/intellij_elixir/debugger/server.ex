@@ -6,18 +6,33 @@ defmodule IntelliJElixir.Debugger.Server do
   require Record
 
   # *.hrl files are not included in all SDK installs, so need to inline definition here
-  Record.defrecordp(
-    :elixir_erl,
-    context: nil,
-    extra: nil,
-    caller: false,
-    vars: %{},
-    backup_vars: nil,
-    export_vars: nil,
-    extra_guards: [],
-    counter: %{},
-    file: "nofile"
-  )
+
+  if Version.compare(System.version(), "1.7.0") == :lt do
+    Record.defrecordp(
+      :elixir_erl,
+      context: nil,
+      extra: nil,
+      caller: false,
+      vars: %{},
+      backup_vars: nil,
+      export_vars: nil,
+      extra_guards: [],
+      counter: %{},
+      file: "nofile"
+    )
+  else
+    Record.defrecordp(
+      :elixir_erl,
+      context: nil,
+      extra: nil,
+      caller: false,
+      vars: %{},
+      backup_vars: nil,
+      extra_guards: [],
+      counter: %{},
+      stacktrace: false
+    )
+  end
 
   defstruct attached: nil,
             evaluate_meta_pid_to_froms: %{}
@@ -171,7 +186,7 @@ defmodule IntelliJElixir.Debugger.Server do
                   erlang_variable_name_string = to_string(erlang_variable_name),
                   named_captures =
                     Regex.named_captures(
-                      ~r/V(?P<elixir_variable_name_string>.+)@(?<counter_string>\d)+/,
+                      ~r/(?:_|V)(?P<elixir_variable_name_string>.+)@(?<counter_string>\d)+/,
                       erlang_variable_name_string
                     ),
                   is_map(named_captures) do
@@ -231,10 +246,17 @@ defmodule IntelliJElixir.Debugger.Server do
             # https://github.com/elixir-lang/elixir/blob/8a971fcb44391bd8b16456666f3033b633c6ff77/lib/elixir/src/elixir.erl#L255
             # Elixir 1.7+ has :elixir_env.with_vars, but can't use here for Elixir 1.6.5 compatibility, so use
             # https://github.com/elixir-lang/elixir/blob/v1.6.5/lib/elixir/src/elixir.erl#L223
-            parsed_env = %{env | vars: parsed_vars}
+            vars_env = %{env | vars: parsed_vars}
+
+            # Elixir 1.7+ uses current_vars
+            current_vars_env = if Map.has_key?(vars_env, :current_vars) do
+              %{vars_env | current_vars: Enum.into(parsed_vars, %{}, fn parsed_var -> {parsed_var, {0, :term}} end)}
+            else
+              vars_env
+            end
 
             # https://github.com/elixir-lang/elixir/blob/8a971fcb44391bd8b16456666f3033b633c6ff77/lib/elixir/src/elixir.erl#L256
-            {erl, _new_env, _new_scope} = :elixir.quoted_to_erl(quoted, parsed_env, parsed_scope)
+            {erl, _new_env, _new_scope} = :elixir.quoted_to_erl(quoted, current_vars_env, parsed_scope)
 
             code =
               [:erl_pp.expr(erl), ?.]
@@ -471,10 +493,18 @@ defmodule IntelliJElixir.Debugger.Server do
     end
   end
 
-  defp vars(elixir_variable_tuples) when is_list(elixir_variable_tuples) do
-    Enum.into(elixir_variable_tuples, %{}, fn {elixir_variable_name, _, erlang_variable_name} ->
-      # TODO determine if `0` and `true` should be different
-      {{elixir_variable_name, nil}, {erlang_variable_name, 0, true}}
-    end)
+  if Version.compare(System.version(), "1.7.0") == :lt do
+    defp vars(elixir_variable_tuples) when is_list(elixir_variable_tuples) do
+      Enum.into(elixir_variable_tuples, %{}, fn {elixir_variable_name, _, erlang_variable_name} ->
+        # TODO determine if `0` and `true` should be different
+        {{elixir_variable_name, nil}, {erlang_variable_name, 0, true}}
+      end)
+    end
+  else
+    defp vars(elixir_variable_tuples) when is_list(elixir_variable_tuples) do
+      Enum.into(elixir_variable_tuples, %{}, fn {elixir_variable_name, counter, erlang_variable_name} ->
+        {{elixir_variable_name, nil}, {0, erlang_variable_name}}
+      end)
+    end
   end
 end
