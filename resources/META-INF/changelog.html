@@ -173,6 +173,16 @@
           </li>
         </ul>
       </li>
+      <li>
+        <code>TerminalExecutionConsole</code> itself echos input in <code>2018.2</code> and <code>2018.2.1</code>, which
+        was introduced in
+        <a href="https://github.com/JetBrains/intellij-community/commit/fd7bbd0cb7f3c2a5add8872e0e6c5172be5f074a#diff-5acc2eb2e78fe52d7458d4a48b0eac9f">
+          JetBrains/intellij-community@<tt>fd7bbd0</tt>#diff-5acc2eb2e78fe52d7458d4a48b0eac9f
+        </a>, but it was reverted in
+        <a href="https://github.com/JetBrains/intellij-community/commit/5f4465b">
+          JetBrains/intellij-community@<tt>5f4465b</tt>
+        </a>, so this uses that version to maintain compatibility across supported versions.
+      </li>
     </ul>
   </li>
   <li>
@@ -185,6 +195,7 @@
       <li>Don't assume <code>callDefinitionClause</code> is non-<code>null</code>.</li>
       <li>Don't assume parent of list access expression is <code>QuotableKeywordPair</code></li>
       <li>Don't assume parent of keywords is a list</li>
+      <li>Update <code>2018.2</code> to <code>2018.2.1</code> in build matrix.</li>
     </ul>
   </li>
   <li>
