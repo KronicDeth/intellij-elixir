@@ -46,7 +46,9 @@ public abstract class Type extends DependentSdkType {
 
     @Override
     public String getUnsatisfiedDependencyMessage() {
-        return "You need to configure an " + getDependencyType().getName();
+        return "You need to configure an " + getDependencyType().getName() + ".  Click OK to be taken through the " +
+                getDependencyType().getName() + " configuration.  Click Cancel to stop configuring this SDK AND the "+
+                getDependencyType().getName() + ".";
     }
 
     @Override
