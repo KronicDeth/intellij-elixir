@@ -183,6 +183,7 @@
           JetBrains/intellij-community@<tt>5f4465b</tt>
         </a>, so this uses that version to maintain compatibility across supported versions.
       </li>
+      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/1141">#1141</a>.</li>
     </ul>
   </li>
   <li>
@@ -196,6 +197,10 @@
       <li>Don't assume parent of list access expression is <code>QuotableKeywordPair</code></li>
       <li>Don't assume parent of keywords is a list</li>
       <li>Update <code>2018.2</code> to <code>2018.2.1</code> in build matrix.</li>
+      <li>
+        In <code>Phoenix.Router.Helpers</code>, a <code>quote</code> block appears as the head of
+        <code>[head | tail]</code> list, so add support for search for enclosing macro call above <code>|</code>.
+      </li>
     </ul>
   </li>
   <li>
