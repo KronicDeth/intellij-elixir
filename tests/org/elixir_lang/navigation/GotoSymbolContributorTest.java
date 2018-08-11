@@ -85,4 +85,17 @@ public class GotoSymbolContributorTest extends LightPlatformCodeInsightFixtureTe
         assertNotNull(modular);
     }
 
+    public void testIssue1141() {
+        myFixture.configureByFile("issue_1141.ex");
+        PsiElement elementAtCaret = myFixture.getFile().findElementAt(myFixture.getCaretOffset());
+
+        Call call = (Call) elementAtCaret.getParent().getParent().getParent().getParent();
+
+        Call enclosingModularMacroCall = CallDefinitionClause.Companion.enclosingModularMacroCall(call);
+        assertNotNull(enclosingModularMacroCall);
+
+        Modular modular = CallDefinitionClause.Companion.enclosingModular(call);
+        assertNotNull(modular);
+    }
+
 }

@@ -14,6 +14,7 @@ import org.elixir_lang.psi.call.name.Function.ALIAS
 import org.elixir_lang.psi.call.name.Function.CREATE
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.operation.Match
+import org.elixir_lang.psi.operation.Pipe
 import org.jetbrains.annotations.Contract
 import java.util.*
 
@@ -55,6 +56,7 @@ tailrec fun PsiElement.selfOrEnclosingMacroCall(): Call? =
             is ElixirStabOperation,
             is ElixirTuple,
             is Match,
+            is Pipe,
             is QualifiedAlias,
             is QualifiedMultipleAliases ->
                 parent.selfOrEnclosingMacroCall()
