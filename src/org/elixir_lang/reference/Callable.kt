@@ -504,7 +504,7 @@ class Callable : PsiReferenceBase<Call>, PsiPolyVariantReference {
         private fun variableUseScope(match: Match): LocalSearchScope =
                 match.parent.let { parent ->
                     when (parent) {
-                        is ElixirStabBody -> {
+                        is ElixirEexTag, is ElixirStabBody -> {
                             val ancestor = PsiTreeUtil.getContextOfType(
                                     parent,
                                     ElixirAnonymousFunction::class.java,
