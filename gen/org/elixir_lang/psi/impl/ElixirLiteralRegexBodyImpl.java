@@ -12,7 +12,7 @@ import java.util.List;
 
 public class ElixirLiteralRegexBodyImpl extends ASTWrapperPsiElement implements ElixirLiteralRegexBody {
 
-  public ElixirLiteralRegexBodyImpl(ASTNode node) {
+  public ElixirLiteralRegexBodyImpl(@NotNull ASTNode node) {
     super(node);
   }
 

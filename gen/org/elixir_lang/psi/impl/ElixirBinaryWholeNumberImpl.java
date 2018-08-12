@@ -16,7 +16,7 @@ import java.util.List;
 
 public class ElixirBinaryWholeNumberImpl extends ASTWrapperPsiElement implements ElixirBinaryWholeNumber {
 
-  public ElixirBinaryWholeNumberImpl(ASTNode node) {
+  public ElixirBinaryWholeNumberImpl(@NotNull ASTNode node) {
     super(node);
   }
 

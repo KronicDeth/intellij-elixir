@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 public abstract class ElixirUnmatchedExpressionImpl extends ASTWrapperPsiElement implements ElixirUnmatchedExpression {
 
-  public ElixirUnmatchedExpressionImpl(ASTNode node) {
+  public ElixirUnmatchedExpressionImpl(@NotNull ASTNode node) {
     super(node);
   }
 

@@ -17,7 +17,7 @@ import java.util.List;
 
 public class ElixirMatchedComparisonOperationImpl extends ElixirMatchedExpressionImpl implements ElixirMatchedComparisonOperation {
 
-  public ElixirMatchedComparisonOperationImpl(ASTNode node) {
+  public ElixirMatchedComparisonOperationImpl(@NotNull ASTNode node) {
     super(node);
   }
 
@@ -71,19 +71,19 @@ public class ElixirMatchedComparisonOperationImpl extends ElixirMatchedExpressio
     return ElixirPsiImplUtil.hasDoBlockOrKeyword(this);
   }
 
-  public boolean isCalling(String resolvedModuleName, String functionName) {
+  public boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName) {
     return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, functionName);
   }
 
-  public boolean isCalling(String resolvedModuleName, String functionName, int resolvedFinalArity) {
+  public boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity) {
     return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, functionName, resolvedFinalArity);
   }
 
-  public boolean isCallingMacro(String resolvedModuleName, String functionName) {
+  public boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName) {
     return ElixirPsiImplUtil.isCallingMacro(this, resolvedModuleName, functionName);
   }
 
-  public boolean isCallingMacro(String resolvedModuleName, String functionName, int resolvedFinalArity) {
+  public boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity) {
     return ElixirPsiImplUtil.isCallingMacro(this, resolvedModuleName, functionName, resolvedFinalArity);
   }
 
@@ -112,7 +112,7 @@ public class ElixirMatchedComparisonOperationImpl extends ElixirMatchedExpressio
     return ElixirPsiImplUtil.primaryArity(this);
   }
 
-  public boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent, PsiElement place) {
+  public boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place) {
     return ElixirPsiImplUtil.processDeclarations(this, processor, state, lastParent, place);
   }
 
@@ -161,7 +161,7 @@ public class ElixirMatchedComparisonOperationImpl extends ElixirMatchedExpressio
   }
 
   @NotNull
-  public PsiElement setName(String newName) {
+  public PsiElement setName(@NotNull String newName) {
     return ElixirPsiImplUtil.setName(this, newName);
   }
 

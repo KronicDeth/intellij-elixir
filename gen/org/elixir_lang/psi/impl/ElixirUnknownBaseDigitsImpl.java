@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class ElixirUnknownBaseDigitsImpl extends ASTWrapperPsiElement implements ElixirUnknownBaseDigits {
 
-  public ElixirUnknownBaseDigitsImpl(ASTNode node) {
+  public ElixirUnknownBaseDigitsImpl(@NotNull ASTNode node) {
     super(node);
   }
 

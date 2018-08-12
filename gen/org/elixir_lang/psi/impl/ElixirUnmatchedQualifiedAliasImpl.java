@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class ElixirUnmatchedQualifiedAliasImpl extends ElixirUnmatchedExpressionImpl implements ElixirUnmatchedQualifiedAlias {
 
-  public ElixirUnmatchedQualifiedAliasImpl(ASTNode node) {
+  public ElixirUnmatchedQualifiedAliasImpl(@NotNull ASTNode node) {
     super(node);
   }
 
@@ -70,7 +70,7 @@ public class ElixirUnmatchedQualifiedAliasImpl extends ElixirUnmatchedExpression
   }
 
   @Nullable
-  public PsiPolyVariantReference getReference(PsiElement maxScope) {
+  public PsiPolyVariantReference getReference(@NotNull PsiElement maxScope) {
     return ElixirPsiImplUtil.getReference(this, maxScope);
   }
 
@@ -78,7 +78,7 @@ public class ElixirUnmatchedQualifiedAliasImpl extends ElixirUnmatchedExpression
     return ElixirPsiImplUtil.isModuleName(this);
   }
 
-  public boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent, PsiElement place) {
+  public boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place) {
     return ElixirPsiImplUtil.processDeclarations(this, processor, state, lastParent, place);
   }
 
@@ -88,7 +88,7 @@ public class ElixirUnmatchedQualifiedAliasImpl extends ElixirUnmatchedExpression
   }
 
   @NotNull
-  public PsiElement setName(String newName) {
+  public PsiElement setName(@NotNull String newName) {
     return ElixirPsiImplUtil.setName(this, newName);
   }
 

@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class ElixirAccessExpressionImpl extends ASTWrapperPsiElement implements ElixirAccessExpression {
 
-  public ElixirAccessExpressionImpl(ASTNode node) {
+  public ElixirAccessExpressionImpl(@NotNull ASTNode node) {
     super(node);
   }
 

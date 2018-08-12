@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ElixirHexadecimalEscapePrefixImpl extends ASTWrapperPsiElement implements ElixirHexadecimalEscapePrefix {
 
-  public ElixirHexadecimalEscapePrefixImpl(ASTNode node) {
+  public ElixirHexadecimalEscapePrefixImpl(@NotNull ASTNode node) {
     super(node);
   }
 

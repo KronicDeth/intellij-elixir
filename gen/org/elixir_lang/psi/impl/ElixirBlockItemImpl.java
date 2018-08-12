@@ -14,7 +14,7 @@ import java.util.List;
 
 public class ElixirBlockItemImpl extends ASTWrapperPsiElement implements ElixirBlockItem {
 
-  public ElixirBlockItemImpl(ASTNode node) {
+  public ElixirBlockItemImpl(@NotNull ASTNode node) {
     super(node);
   }
 

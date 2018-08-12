@@ -21,11 +21,11 @@ import java.util.Set;
 
 public class ElixirUnmatchedQualifiedNoParenthesesCallImpl extends NamedStubbedPsiElementBase<UnmatchedQualifiedNoParenthesesCall> implements ElixirUnmatchedQualifiedNoParenthesesCall {
 
-  public ElixirUnmatchedQualifiedNoParenthesesCallImpl(UnmatchedQualifiedNoParenthesesCall stub, IStubElementType type) {
+  public ElixirUnmatchedQualifiedNoParenthesesCallImpl(@NotNull UnmatchedQualifiedNoParenthesesCall stub, @NotNull IStubElementType type) {
     super(stub, type);
   }
 
-  public ElixirUnmatchedQualifiedNoParenthesesCallImpl(ASTNode node) {
+  public ElixirUnmatchedQualifiedNoParenthesesCallImpl(@NotNull ASTNode node) {
     super(node);
   }
 
@@ -112,19 +112,19 @@ public class ElixirUnmatchedQualifiedNoParenthesesCallImpl extends NamedStubbedP
     return ElixirPsiImplUtil.getReference(this);
   }
 
-  public boolean isCalling(String resolvedModuleName, String functionName) {
+  public boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName) {
     return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, functionName);
   }
 
-  public boolean isCalling(String resolvedModuleName, String functionName, int resolvedFinalArity) {
+  public boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity) {
     return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, functionName, resolvedFinalArity);
   }
 
-  public boolean isCallingMacro(String resolvedModuleName, String functionName) {
+  public boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName) {
     return ElixirPsiImplUtil.isCallingMacro(this, resolvedModuleName, functionName);
   }
 
-  public boolean isCallingMacro(String resolvedModuleName, String functionName, int resolvedFinalArity) {
+  public boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity) {
     return ElixirPsiImplUtil.isCallingMacro(this, resolvedModuleName, functionName, resolvedFinalArity);
   }
 
@@ -143,7 +143,7 @@ public class ElixirUnmatchedQualifiedNoParenthesesCallImpl extends NamedStubbedP
     return ElixirPsiImplUtil.primaryArity(this);
   }
 
-  public boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent, PsiElement place) {
+  public boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place) {
     return ElixirPsiImplUtil.processDeclarations(this, processor, state, lastParent, place);
   }
 
@@ -192,7 +192,7 @@ public class ElixirUnmatchedQualifiedNoParenthesesCallImpl extends NamedStubbedP
   }
 
   @NotNull
-  public PsiElement setName(String newName) {
+  public PsiElement setName(@NotNull String newName) {
     return ElixirPsiImplUtil.setName(this, newName);
   }
 

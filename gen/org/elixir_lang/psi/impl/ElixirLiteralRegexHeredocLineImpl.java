@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ElixirLiteralRegexHeredocLineImpl extends ASTWrapperPsiElement implements ElixirLiteralRegexHeredocLine {
 
-  public ElixirLiteralRegexHeredocLineImpl(ASTNode node) {
+  public ElixirLiteralRegexHeredocLineImpl(@NotNull ASTNode node) {
     super(node);
   }
 
@@ -41,7 +41,7 @@ public class ElixirLiteralRegexHeredocLineImpl extends ASTWrapperPsiElement impl
   }
 
   @NotNull
-  public OtpErlangObject quote(Heredoc heredoc, int prefixLength) {
+  public OtpErlangObject quote(@NotNull Heredoc heredoc, int prefixLength) {
     return ElixirPsiImplUtil.quote(this, heredoc, prefixLength);
   }
 

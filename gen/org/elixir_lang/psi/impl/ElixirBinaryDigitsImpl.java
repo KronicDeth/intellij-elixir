@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ElixirBinaryDigitsImpl extends ASTWrapperPsiElement implements ElixirBinaryDigits {
 
-  public ElixirBinaryDigitsImpl(ASTNode node) {
+  public ElixirBinaryDigitsImpl(@NotNull ASTNode node) {
     super(node);
   }
 

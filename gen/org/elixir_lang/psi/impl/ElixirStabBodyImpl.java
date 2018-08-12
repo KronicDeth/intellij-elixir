@@ -16,7 +16,7 @@ import java.util.List;
 
 public class ElixirStabBodyImpl extends ASTWrapperPsiElement implements ElixirStabBody {
 
-  public ElixirStabBodyImpl(ASTNode node) {
+  public ElixirStabBodyImpl(@NotNull ASTNode node) {
     super(node);
   }
 
@@ -59,7 +59,7 @@ public class ElixirStabBodyImpl extends ASTWrapperPsiElement implements ElixirSt
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirUnqualifiedNoParenthesesManyArgumentsCall.class);
   }
 
-  public boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent, PsiElement place) {
+  public boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place) {
     return ElixirPsiImplUtil.processDeclarations(this, processor, state, lastParent, place);
   }
 

@@ -14,7 +14,7 @@ import java.util.List;
 
 public class ElixirStabImpl extends ASTWrapperPsiElement implements ElixirStab {
 
-  public ElixirStabImpl(ASTNode node) {
+  public ElixirStabImpl(@NotNull ASTNode node) {
     super(node);
   }
 

@@ -17,7 +17,7 @@ import java.util.List;
 
 public class ElixirMultipleAliasesImpl extends ASTWrapperPsiElement implements ElixirMultipleAliases {
 
-  public ElixirMultipleAliasesImpl(ASTNode node) {
+  public ElixirMultipleAliasesImpl(@NotNull ASTNode node) {
     super(node);
   }
 
@@ -48,7 +48,7 @@ public class ElixirMultipleAliasesImpl extends ASTWrapperPsiElement implements E
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirUnmatchedExpression.class);
   }
 
-  public boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent, PsiElement entrance) {
+  public boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement entrance) {
     return ElixirPsiImplUtil.processDeclarations(this, processor, state, lastParent, entrance);
   }
 

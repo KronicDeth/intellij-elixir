@@ -15,7 +15,7 @@ import java.util.List;
 
 public class ElixirNoParenthesesStrictImpl extends ASTWrapperPsiElement implements ElixirNoParenthesesStrict {
 
-  public ElixirNoParenthesesStrictImpl(ASTNode node) {
+  public ElixirNoParenthesesStrictImpl(@NotNull ASTNode node) {
     super(node);
   }
 

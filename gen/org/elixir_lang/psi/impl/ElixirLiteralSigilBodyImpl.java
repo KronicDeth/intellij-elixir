@@ -12,7 +12,7 @@ import java.util.List;
 
 public class ElixirLiteralSigilBodyImpl extends ASTWrapperPsiElement implements ElixirLiteralSigilBody {
 
-  public ElixirLiteralSigilBodyImpl(ASTNode node) {
+  public ElixirLiteralSigilBodyImpl(@NotNull ASTNode node) {
     super(node);
   }
 

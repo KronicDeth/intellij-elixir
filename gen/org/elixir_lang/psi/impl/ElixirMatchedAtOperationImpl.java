@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class ElixirMatchedAtOperationImpl extends ElixirMatchedExpressionImpl implements ElixirMatchedAtOperation {
 
-  public ElixirMatchedAtOperationImpl(ASTNode node) {
+  public ElixirMatchedAtOperationImpl(@NotNull ASTNode node) {
     super(node);
   }
 

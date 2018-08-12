@@ -12,7 +12,7 @@ import java.util.List;
 
 public class ElixirLiteralWordsBodyImpl extends ASTWrapperPsiElement implements ElixirLiteralWordsBody {
 
-  public ElixirLiteralWordsBodyImpl(ASTNode node) {
+  public ElixirLiteralWordsBodyImpl(@NotNull ASTNode node) {
     super(node);
   }
 

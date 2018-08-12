@@ -16,7 +16,7 @@ import java.util.List;
 
 public class ElixirNoParenthesesKeywordsImpl extends ASTWrapperPsiElement implements ElixirNoParenthesesKeywords {
 
-  public ElixirNoParenthesesKeywordsImpl(ASTNode node) {
+  public ElixirNoParenthesesKeywordsImpl(@NotNull ASTNode node) {
     super(node);
   }
 

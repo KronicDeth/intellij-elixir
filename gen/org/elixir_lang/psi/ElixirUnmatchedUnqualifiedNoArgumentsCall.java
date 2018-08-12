@@ -61,13 +61,13 @@ public interface ElixirUnmatchedUnqualifiedNoArgumentsCall extends ElixirUnmatch
   @NotNull
   SearchScope getUseScope();
 
-  boolean isCalling(String resolvedModuleName, String functionName);
+  boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName);
 
-  boolean isCalling(String resolvedModuleName, String functionName, int resolvedFinalArity);
+  boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity);
 
-  boolean isCallingMacro(String resolvedModuleName, String functionName);
+  boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName);
 
-  boolean isCallingMacro(String resolvedModuleName, String functionName, int resolvedFinalArity);
+  boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity);
 
   @Nullable
   String moduleName();
@@ -78,7 +78,7 @@ public interface ElixirUnmatchedUnqualifiedNoArgumentsCall extends ElixirUnmatch
   @Nullable
   Integer primaryArity();
 
-  boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent, PsiElement place);
+  boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place);
 
   @NotNull
   OtpErlangObject quote();
@@ -104,6 +104,6 @@ public interface ElixirUnmatchedUnqualifiedNoArgumentsCall extends ElixirUnmatch
   Integer secondaryArity();
 
   @NotNull
-  PsiElement setName(String newName);
+  PsiElement setName(@NotNull String newName);
 
 }

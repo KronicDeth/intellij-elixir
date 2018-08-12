@@ -12,7 +12,7 @@ import java.util.List;
 
 public class ElixirInterpolatedSigilBodyImpl extends ASTWrapperPsiElement implements ElixirInterpolatedSigilBody {
 
-  public ElixirInterpolatedSigilBodyImpl(ASTNode node) {
+  public ElixirInterpolatedSigilBodyImpl(@NotNull ASTNode node) {
     super(node);
   }
 

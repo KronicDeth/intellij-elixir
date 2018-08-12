@@ -3043,6 +3043,7 @@ keywordKey ::= AFTER |
                AND_WORD_OPERATOR |
                ARROW_OPERATOR |
                ASSOCIATION_OPERATOR |
+               ATOM_FRAGMENT |
                AT_OPERATOR |
                BIT_STRING_OPERATOR |
                CAPTURE_OPERATOR |
@@ -3054,7 +3055,6 @@ keywordKey ::= AFTER |
                ELSE |
                END |
                FALSE |
-               IDENTIFIER_TOKEN |
                IN_MATCH_OPERATOR |
                IN_OPERATOR |
                MAP_OPERATOR |

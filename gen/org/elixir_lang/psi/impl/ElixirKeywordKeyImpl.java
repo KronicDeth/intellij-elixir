@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class ElixirKeywordKeyImpl extends ASTWrapperPsiElement implements ElixirKeywordKey {
 
-  public ElixirKeywordKeyImpl(ASTNode node) {
+  public ElixirKeywordKeyImpl(@NotNull ASTNode node) {
     super(node);
   }
 
@@ -57,7 +57,7 @@ public class ElixirKeywordKeyImpl extends ASTWrapperPsiElement implements Elixir
   }
 
   @NotNull
-  public PsiElement setName(String newName) {
+  public PsiElement setName(@NotNull String newName) {
     return ElixirPsiImplUtil.setName(this, newName);
   }
 

@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class ElixirUnmatchedAtOperationImpl extends ElixirUnmatchedExpressionImpl implements ElixirUnmatchedAtOperation {
 
-  public ElixirUnmatchedAtOperationImpl(ASTNode node) {
+  public ElixirUnmatchedAtOperationImpl(@NotNull ASTNode node) {
     super(node);
   }
 

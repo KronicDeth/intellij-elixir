@@ -15,7 +15,7 @@ import java.util.List;
 
 public class ElixirNoParenthesesOneArgumentImpl extends ASTWrapperPsiElement implements ElixirNoParenthesesOneArgument {
 
-  public ElixirNoParenthesesOneArgumentImpl(ASTNode node) {
+  public ElixirNoParenthesesOneArgumentImpl(@NotNull ASTNode node) {
     super(node);
   }
 

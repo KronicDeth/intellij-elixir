@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class ElixirStructOperationImpl extends ASTWrapperPsiElement implements ElixirStructOperation {
 
-  public ElixirStructOperationImpl(ASTNode node) {
+  public ElixirStructOperationImpl(@NotNull ASTNode node) {
     super(node);
   }
 

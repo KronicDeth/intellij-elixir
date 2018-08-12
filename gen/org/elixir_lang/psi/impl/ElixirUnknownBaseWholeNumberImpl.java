@@ -16,7 +16,7 @@ import java.util.List;
 
 public class ElixirUnknownBaseWholeNumberImpl extends ASTWrapperPsiElement implements ElixirUnknownBaseWholeNumber {
 
-  public ElixirUnknownBaseWholeNumberImpl(ASTNode node) {
+  public ElixirUnknownBaseWholeNumberImpl(@NotNull ASTNode node) {
     super(node);
   }
 

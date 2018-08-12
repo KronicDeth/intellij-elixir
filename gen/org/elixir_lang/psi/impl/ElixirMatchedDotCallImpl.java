@@ -22,11 +22,11 @@ import java.util.Set;
 
 public class ElixirMatchedDotCallImpl extends NamedStubbedPsiElementBase<MatchedDotCall> implements ElixirMatchedDotCall {
 
-  public ElixirMatchedDotCallImpl(MatchedDotCall stub, IStubElementType type) {
+  public ElixirMatchedDotCallImpl(@NotNull MatchedDotCall stub, @NotNull IStubElementType type) {
     super(stub, type);
   }
 
-  public ElixirMatchedDotCallImpl(ASTNode node) {
+  public ElixirMatchedDotCallImpl(@NotNull ASTNode node) {
     super(node);
   }
 
@@ -106,19 +106,19 @@ public class ElixirMatchedDotCallImpl extends NamedStubbedPsiElementBase<Matched
     return ElixirPsiImplUtil.getReference(this);
   }
 
-  public boolean isCalling(String resolvedModuleName, String functionName) {
+  public boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName) {
     return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, functionName);
   }
 
-  public boolean isCalling(String resolvedModuleName, String functionName, int resolvedFinalArity) {
+  public boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity) {
     return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, functionName, resolvedFinalArity);
   }
 
-  public boolean isCallingMacro(String resolvedModuleName, String functionName) {
+  public boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName) {
     return ElixirPsiImplUtil.isCallingMacro(this, resolvedModuleName, functionName);
   }
 
-  public boolean isCallingMacro(String resolvedModuleName, String functionName, int resolvedFinalArity) {
+  public boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity) {
     return ElixirPsiImplUtil.isCallingMacro(this, resolvedModuleName, functionName, resolvedFinalArity);
   }
 
@@ -137,7 +137,7 @@ public class ElixirMatchedDotCallImpl extends NamedStubbedPsiElementBase<Matched
     return ElixirPsiImplUtil.primaryArity(this);
   }
 
-  public boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent, PsiElement place) {
+  public boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place) {
     return ElixirPsiImplUtil.processDeclarations(this, processor, state, lastParent, place);
   }
 
@@ -181,7 +181,7 @@ public class ElixirMatchedDotCallImpl extends NamedStubbedPsiElementBase<Matched
   }
 
   @NotNull
-  public PsiElement setName(String newName) {
+  public PsiElement setName(@NotNull String newName) {
     return ElixirPsiImplUtil.setName(this, newName);
   }
 

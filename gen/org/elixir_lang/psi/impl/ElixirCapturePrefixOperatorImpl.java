@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ElixirCapturePrefixOperatorImpl extends ASTWrapperPsiElement implements ElixirCapturePrefixOperator {
 
-  public ElixirCapturePrefixOperatorImpl(ASTNode node) {
+  public ElixirCapturePrefixOperatorImpl(@NotNull ASTNode node) {
     super(node);
   }
 

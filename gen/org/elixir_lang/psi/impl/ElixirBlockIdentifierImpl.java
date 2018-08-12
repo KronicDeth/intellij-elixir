@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ElixirBlockIdentifierImpl extends ASTWrapperPsiElement implements ElixirBlockIdentifier {
 
-  public ElixirBlockIdentifierImpl(ASTNode node) {
+  public ElixirBlockIdentifierImpl(@NotNull ASTNode node) {
     super(node);
   }
 

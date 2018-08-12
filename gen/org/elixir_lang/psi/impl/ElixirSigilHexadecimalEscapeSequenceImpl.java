@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class ElixirSigilHexadecimalEscapeSequenceImpl extends ASTWrapperPsiElement implements ElixirSigilHexadecimalEscapeSequence {
 
-  public ElixirSigilHexadecimalEscapeSequenceImpl(ASTNode node) {
+  public ElixirSigilHexadecimalEscapeSequenceImpl(@NotNull ASTNode node) {
     super(node);
   }
 

@@ -43,13 +43,13 @@ public interface ElixirUnmatchedNotInOperation extends ElixirUnmatchedExpression
 
   boolean hasDoBlockOrKeyword();
 
-  boolean isCalling(String resolvedModuleName, String functionName);
+  boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName);
 
-  boolean isCalling(String resolvedModuleName, String functionName, int resolvedFinalArity);
+  boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity);
 
-  boolean isCallingMacro(String resolvedModuleName, String functionName);
+  boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName);
 
-  boolean isCallingMacro(String resolvedModuleName, String functionName, int resolvedFinalArity);
+  boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity);
 
   @Nullable
   Quotable leftOperand();
@@ -67,7 +67,7 @@ public interface ElixirUnmatchedNotInOperation extends ElixirUnmatchedExpression
   @Nullable
   Integer primaryArity();
 
-  boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent, PsiElement place);
+  boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place);
 
   @NotNull
   OtpErlangObject quote();
@@ -96,6 +96,6 @@ public interface ElixirUnmatchedNotInOperation extends ElixirUnmatchedExpression
   Integer secondaryArity();
 
   @NotNull
-  PsiElement setName(String newName);
+  PsiElement setName(@NotNull String newName);
 
 }

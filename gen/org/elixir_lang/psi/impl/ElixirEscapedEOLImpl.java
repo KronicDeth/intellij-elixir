@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ElixirEscapedEOLImpl extends ASTWrapperPsiElement implements ElixirEscapedEOL {
 
-  public ElixirEscapedEOLImpl(ASTNode node) {
+  public ElixirEscapedEOLImpl(@NotNull ASTNode node) {
     super(node);
   }
 

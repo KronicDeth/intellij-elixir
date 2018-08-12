@@ -13,7 +13,7 @@ import java.util.List;
 
 public class ElixirAssociationsBaseImpl extends ASTWrapperPsiElement implements ElixirAssociationsBase {
 
-  public ElixirAssociationsBaseImpl(ASTNode node) {
+  public ElixirAssociationsBaseImpl(@NotNull ASTNode node) {
     super(node);
   }
 

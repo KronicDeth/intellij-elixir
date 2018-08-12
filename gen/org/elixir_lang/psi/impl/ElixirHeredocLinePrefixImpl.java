@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class ElixirHeredocLinePrefixImpl extends ASTWrapperPsiElement implements ElixirHeredocLinePrefix {
 
-  public ElixirHeredocLinePrefixImpl(ASTNode node) {
+  public ElixirHeredocLinePrefixImpl(@NotNull ASTNode node) {
     super(node);
   }
 
@@ -26,7 +26,7 @@ public class ElixirHeredocLinePrefixImpl extends ASTWrapperPsiElement implements
   }
 
   @Nullable
-  public ASTNode excessWhitespace(IElementType type, int prefixLength) {
+  public ASTNode excessWhitespace(@NotNull IElementType type, int prefixLength) {
     return ElixirPsiImplUtil.excessWhitespace(this, type, prefixLength);
   }
 

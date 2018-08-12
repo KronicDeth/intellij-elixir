@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class ElixirKeywordPairImpl extends ASTWrapperPsiElement implements ElixirKeywordPair {
 
-  public ElixirKeywordPairImpl(ASTNode node) {
+  public ElixirKeywordPairImpl(@NotNull ASTNode node) {
     super(node);
   }
 

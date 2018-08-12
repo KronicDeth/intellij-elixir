@@ -14,7 +14,7 @@ import java.util.List;
 
 public class ElixirBitStringImpl extends ASTWrapperPsiElement implements ElixirBitString {
 
-  public ElixirBitStringImpl(ASTNode node) {
+  public ElixirBitStringImpl(@NotNull ASTNode node) {
     super(node);
   }
 

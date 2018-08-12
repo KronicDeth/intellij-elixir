@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ElixirDecimalDigitsImpl extends ASTWrapperPsiElement implements ElixirDecimalDigits {
 
-  public ElixirDecimalDigitsImpl(ASTNode node) {
+  public ElixirDecimalDigitsImpl(@NotNull ASTNode node) {
     super(node);
   }
 

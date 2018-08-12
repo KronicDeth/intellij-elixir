@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class ElixirMatchedUnaryNonNumericOperationImpl extends ElixirMatchedExpressionImpl implements ElixirMatchedUnaryNonNumericOperation {
 
-  public ElixirMatchedUnaryNonNumericOperationImpl(ASTNode node) {
+  public ElixirMatchedUnaryNonNumericOperationImpl(@NotNull ASTNode node) {
     super(node);
   }
 
@@ -67,19 +67,19 @@ public class ElixirMatchedUnaryNonNumericOperationImpl extends ElixirMatchedExpr
     return ElixirPsiImplUtil.hasDoBlockOrKeyword(this);
   }
 
-  public boolean isCalling(String resolvedModuleName, String functionName) {
+  public boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName) {
     return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, functionName);
   }
 
-  public boolean isCalling(String resolvedModuleName, String functionName, int resolvedFinalArity) {
+  public boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity) {
     return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, functionName, resolvedFinalArity);
   }
 
-  public boolean isCallingMacro(String resolvedModuleName, String functionName) {
+  public boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName) {
     return ElixirPsiImplUtil.isCallingMacro(this, resolvedModuleName, functionName);
   }
 
-  public boolean isCallingMacro(String resolvedModuleName, String functionName, int resolvedFinalArity) {
+  public boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity) {
     return ElixirPsiImplUtil.isCallingMacro(this, resolvedModuleName, functionName, resolvedFinalArity);
   }
 
@@ -148,7 +148,7 @@ public class ElixirMatchedUnaryNonNumericOperationImpl extends ElixirMatchedExpr
   }
 
   @NotNull
-  public PsiElement setName(String newName) {
+  public PsiElement setName(@NotNull String newName) {
     return ElixirPsiImplUtil.setName(this, newName);
   }
 

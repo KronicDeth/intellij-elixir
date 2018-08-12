@@ -12,7 +12,7 @@ import java.util.List;
 
 public class ElixirLiteralCharListBodyImpl extends ASTWrapperPsiElement implements ElixirLiteralCharListBody {
 
-  public ElixirLiteralCharListBodyImpl(ASTNode node) {
+  public ElixirLiteralCharListBodyImpl(@NotNull ASTNode node) {
     super(node);
   }
 

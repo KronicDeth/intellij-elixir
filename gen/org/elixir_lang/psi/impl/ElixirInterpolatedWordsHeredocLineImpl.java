@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ElixirInterpolatedWordsHeredocLineImpl extends ASTWrapperPsiElement implements ElixirInterpolatedWordsHeredocLine {
 
-  public ElixirInterpolatedWordsHeredocLineImpl(ASTNode node) {
+  public ElixirInterpolatedWordsHeredocLineImpl(@NotNull ASTNode node) {
     super(node);
   }
 
@@ -41,7 +41,7 @@ public class ElixirInterpolatedWordsHeredocLineImpl extends ASTWrapperPsiElement
   }
 
   @NotNull
-  public OtpErlangObject quote(Heredoc heredoc, int prefixLength) {
+  public OtpErlangObject quote(@NotNull Heredoc heredoc, int prefixLength) {
     return ElixirPsiImplUtil.quote(this, heredoc, prefixLength);
   }
 

@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ElixirOctalDigitsImpl extends ASTWrapperPsiElement implements ElixirOctalDigits {
 
-  public ElixirOctalDigitsImpl(ASTNode node) {
+  public ElixirOctalDigitsImpl(@NotNull ASTNode node) {
     super(node);
   }
 

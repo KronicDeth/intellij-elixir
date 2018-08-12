@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ElixirUnmatchedQualifiedMultipleAliasesImpl extends ElixirUnmatchedExpressionImpl implements ElixirUnmatchedQualifiedMultipleAliases {
 
-  public ElixirUnmatchedQualifiedMultipleAliasesImpl(ASTNode node) {
+  public ElixirUnmatchedQualifiedMultipleAliasesImpl(@NotNull ASTNode node) {
     super(node);
   }
 

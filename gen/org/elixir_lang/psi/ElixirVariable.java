@@ -18,6 +18,6 @@ public interface ElixirVariable extends NamedElement, Quotable {
   OtpErlangObject quote();
 
   @NotNull
-  PsiElement setName(String newName);
+  PsiElement setName(@NotNull String newName);
 
 }

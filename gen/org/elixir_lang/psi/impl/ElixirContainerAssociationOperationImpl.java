@@ -16,7 +16,7 @@ import java.util.List;
 
 public class ElixirContainerAssociationOperationImpl extends ASTWrapperPsiElement implements ElixirContainerAssociationOperation {
 
-  public ElixirContainerAssociationOperationImpl(ASTNode node) {
+  public ElixirContainerAssociationOperationImpl(@NotNull ASTNode node) {
     super(node);
   }
 

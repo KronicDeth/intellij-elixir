@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class ElixirAliasImpl extends ASTWrapperPsiElement implements ElixirAlias {
 
-  public ElixirAliasImpl(ASTNode node) {
+  public ElixirAliasImpl(@NotNull ASTNode node) {
     super(node);
   }
 
@@ -53,7 +53,7 @@ public class ElixirAliasImpl extends ASTWrapperPsiElement implements ElixirAlias
   }
 
   @Nullable
-  public PsiPolyVariantReference getReference(PsiElement maxScope) {
+  public PsiPolyVariantReference getReference(@NotNull PsiElement maxScope) {
     return ElixirPsiImplUtil.getReference(this, maxScope);
   }
 
@@ -61,7 +61,7 @@ public class ElixirAliasImpl extends ASTWrapperPsiElement implements ElixirAlias
     return ElixirPsiImplUtil.isModuleName(this);
   }
 
-  public boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent, PsiElement place) {
+  public boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place) {
     return ElixirPsiImplUtil.processDeclarations(this, processor, state, lastParent, place);
   }
 
@@ -71,7 +71,7 @@ public class ElixirAliasImpl extends ASTWrapperPsiElement implements ElixirAlias
   }
 
   @NotNull
-  public PsiElement setName(String newName) {
+  public PsiElement setName(@NotNull String newName) {
     return ElixirPsiImplUtil.setName(this, newName);
   }
 

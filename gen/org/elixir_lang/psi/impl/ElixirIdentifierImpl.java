@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class ElixirIdentifierImpl extends ASTWrapperPsiElement implements ElixirIdentifier {
 
-  public ElixirIdentifierImpl(ASTNode node) {
+  public ElixirIdentifierImpl(@NotNull ASTNode node) {
     super(node);
   }
 

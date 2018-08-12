@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class ElixirCharTokenImpl extends ASTWrapperPsiElement implements ElixirCharToken {
 
-  public ElixirCharTokenImpl(ASTNode node) {
+  public ElixirCharTokenImpl(@NotNull ASTNode node) {
     super(node);
   }
 

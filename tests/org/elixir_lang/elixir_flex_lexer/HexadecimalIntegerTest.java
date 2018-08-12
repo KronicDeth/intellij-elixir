@@ -8,7 +8,6 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -110,7 +109,7 @@ public class HexadecimalIntegerTest extends TokenTest {
                 { "\r\n", ElixirTypes.EOL, ElixirFlexLexer.SIGN_OPERATION_MAYBE },
                 { "]", ElixirTypes.CLOSING_BRACKET, ElixirFlexLexer.YYINITIAL },
                 { "^", ElixirTypes.UNARY_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE },
-                { "_", ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_OR_KEYWORD_PAIR_MAYBE },
+                { "_", ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_MAYBE },
                 { "`", TokenType.BAD_CHARACTER, ElixirFlexLexer.YYINITIAL },
                 { "a", ElixirTypes.VALID_HEXADECIMAL_DIGITS, ElixirFlexLexer.HEXADECIMAL_WHOLE_NUMBER },
                 { "b", ElixirTypes.VALID_HEXADECIMAL_DIGITS, ElixirFlexLexer.HEXADECIMAL_WHOLE_NUMBER },

@@ -14,7 +14,7 @@ import java.util.List;
 
 public class ElixirTupleImpl extends ASTWrapperPsiElement implements ElixirTuple {
 
-  public ElixirTupleImpl(ASTNode node) {
+  public ElixirTupleImpl(@NotNull ASTNode node) {
     super(node);
   }
 

@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ElixirAtomKeywordImpl extends ASTWrapperPsiElement implements ElixirAtomKeyword {
 
-  public ElixirAtomKeywordImpl(ASTNode node) {
+  public ElixirAtomKeywordImpl(@NotNull ASTNode node) {
     super(node);
   }
 

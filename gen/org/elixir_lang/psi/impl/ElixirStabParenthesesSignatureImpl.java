@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class ElixirStabParenthesesSignatureImpl extends ASTWrapperPsiElement implements ElixirStabParenthesesSignature {
 
-  public ElixirStabParenthesesSignatureImpl(ASTNode node) {
+  public ElixirStabParenthesesSignatureImpl(@NotNull ASTNode node) {
     super(node);
   }
 

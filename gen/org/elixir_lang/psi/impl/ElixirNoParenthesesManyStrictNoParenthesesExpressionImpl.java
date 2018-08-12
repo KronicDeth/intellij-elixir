@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ElixirNoParenthesesManyStrictNoParenthesesExpressionImpl extends ASTWrapperPsiElement implements ElixirNoParenthesesManyStrictNoParenthesesExpression {
 
-  public ElixirNoParenthesesManyStrictNoParenthesesExpressionImpl(ASTNode node) {
+  public ElixirNoParenthesesManyStrictNoParenthesesExpressionImpl(@NotNull ASTNode node) {
     super(node);
   }
 

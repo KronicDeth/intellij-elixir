@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ElixirMatchedBracketOperationImpl extends ElixirMatchedExpressionImpl implements ElixirMatchedBracketOperation {
 
-  public ElixirMatchedBracketOperationImpl(ASTNode node) {
+  public ElixirMatchedBracketOperationImpl(@NotNull ASTNode node) {
     super(node);
   }
 

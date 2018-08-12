@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ElixirTypeInfixOperatorImpl extends ASTWrapperPsiElement implements ElixirTypeInfixOperator {
 
-  public ElixirTypeInfixOperatorImpl(ASTNode node) {
+  public ElixirTypeInfixOperatorImpl(@NotNull ASTNode node) {
     super(node);
   }
 

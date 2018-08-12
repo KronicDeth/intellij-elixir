@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ElixirUnmatchedUnqualifiedBracketOperationImpl extends ElixirUnmatchedExpressionImpl implements ElixirUnmatchedUnqualifiedBracketOperation {
 
-  public ElixirUnmatchedUnqualifiedBracketOperationImpl(ASTNode node) {
+  public ElixirUnmatchedUnqualifiedBracketOperationImpl(@NotNull ASTNode node) {
     super(node);
   }
 
