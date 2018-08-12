@@ -207,6 +207,10 @@
         <code>[head | tail]</code> list, so add support for search for enclosing macro call above <code>|</code>.
       </li>
       <li>Treat EEx tag the same as <code>StabBody</code> for use scope.</li>
+      <li>
+        Use <code>ATOM</code> for keyword keys instead of <code>IDENTIFIER_TOKEN</code> as <code>ATOM</code> allows for
+        <code>@</code>, which is needed for correctness.
+      </li>
     </ul>
   </li>
   <li>

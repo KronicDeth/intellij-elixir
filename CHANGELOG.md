@@ -253,6 +253,7 @@ Table of Contents
 * [#1208](https://github.com/KronicDeth/intellij-elixir/pull/1208) - `TerminalExecutionConsole` itself echos input in `2018.2` and `2018.2.1`, which was introduced in https://github.com/JetBrains/intellij-community/commit/fd7bbd0cb7f3c2a5add8872e0e6c5172be5f074a#diff-5acc2eb2e78fe52d7458d4a48b0eac9f, but it was reverted in JetBrains/intellij-community@5f4465b, so this uses that version to maintain compatibility across supported versions. - [@KronicDeth](https://github.com/KronicDeth)
 * [#1210](https://github.com/KronicDeth/intellij-elixir/pull/1210) - In `Phoenix.Router.Helpers`, a `quote` block appears as the head of `[head | tail]` list, so add support for search for enclosing macro call above `|`. - [@KronicDeth](https://github.com/KronicDeth)
 * [#1213](https://github.com/KronicDeth/intellij-elixir/pull/1213) - Treat EEx tag the same as `StabBody` for use scope. - [@KronicDeth](https://github.com/KronicDeth)
+* [#1214](https://github.com/KronicDeth/intellij-elixir/pull/1214) - Use `ATOM` for keyword keys instead of `IDENTIFIER_TOKEN` as `ATOM` allows for `@`, which is needed for correctness. - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Incompatible Changes
 * [#1175](https://github.com/KronicDeth/intellij-elixir/pull/1175) - Drop support for IntelliJ IDEA before 2017.3 as they lack the `TerminalExecutionConsole` used to run `iex` in a PTY. - [@KronicDeth](https://github.com/KronicDeth)
