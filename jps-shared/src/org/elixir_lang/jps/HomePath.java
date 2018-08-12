@@ -32,7 +32,7 @@ public class HomePath {
     public static void eachEbinPath(@NotNull String homePath, @NotNull Consumer<Path> ebinPathConsumer) {
         Path lib = Paths.get(homePath, "lib");
 
-        try (DirectoryStream<Path> libDirectoryStream = Files.newDirectoryStream(lib)) {
+        try (DirectoryStream<Path> libDirectoryStream = Files.newDirectoryStream(lib, path -> Files.isDirectory(path))) {
             libDirectoryStream.forEach(
                     app -> {
                         try (DirectoryStream<Path> ebinDirectoryStream = Files.newDirectoryStream(app, "ebin")) {
