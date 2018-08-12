@@ -218,6 +218,12 @@
         like ASDF, there are non-OTP-app files in <code>&lt;SDK_HOME_PATH&gt;/lib</code>, so filter
         <code>&lt;SDK_HOME_PATH&gt;/lib/&lt;APP&gt;</code> to only directories.
       </li>
+      <li>
+        <code>org.elixir.lang.psi.scope.Module.aliasedName(QualifiedAlias)</code> was already converted to use
+        <code>org.elixir_lang.psi.operation.Normalized</code> and <code>org.elixir_lang.psi.infix.Normalized</code>,
+        which makes it work with errors in the PSI tree, so there's no need protect with an assert and that assert would
+        be wrong in times of errors handled by <code>Normalized</code>.
+      </li>
     </ul>
   </li>
   <li>
@@ -1146,64 +1152,6 @@
           <a href="https://docs.google.com/spreadsheets/d/1mASN4BB3IAd5ZLQR5dz0Tzx2Yl-w4g5VUjz3bgd5kD4/edit?usp=sharing">Data and Chart</a>
         </p>
       </li>
-    </ul>
-  </li>
-</ul>
-<h1>v6.6.0</h1>
-<ul>
-  <li>
-    <p>Enhancements</p>
-    <ul>
-      <li>EEx support
-        <ul>
-          <li>Lexer for EEx format</li>
-          <li>Parser for EEx format</li>
-          <li>EEx as a Template Language
-            <ul>
-              <li>
-                Any file with <code>.eex</code> as the final extension will be treated as EEx.  To determine the
-                Template Data Language, the <code>.eex</code> extension will be stripped and any remaining extension
-                will be looked up to get the File Type and its associated Language.  For example, <code>*.txt.eex</code>
-                will be EEx with Plain Text (<code>.txt</code>) as the Data Template Language.  Likewise,
-                <code>*.html.eex</code> will be EEx with HTML as the Data Template Language.  There's no need to
-                register <code>*.txt.eex</code> or <code>*.html.eex</code> or any other
-                <code>*.DATA_TEMPLATE_LANGUAGE_EXTENSION.eex</code> pattern explicitly: the nested extension will be
-                looked up using the normal extension setup.
-              </li>
-            </ul>
-          </li>
-        </ul>
-      </li>
-      <li>Update Build Matrix
-        <ul>
-          <li>
-            IDEA <code>2016.2</code> is dropped because it's over a year old.  It is still supported, but not actively
-            tested.
-          </li>
-        </ul>
-      </li>
-      <li>
-        Decompile <code>LocT</code> chunk for private macros and functions and the derived names of anonymous functions.
-      </li>
-    </ul>
-  </li>
-  <li>
-    <p>Bug Fixes</p>
-    <ul>
-      <li>
-        <code>mix hex.local --force</code> -> <code>mix local.hex --force</code> in <code>README</code>.
-      </li>
-      <li>
-        Parse <code>HEAD-&lt;SHA1&gt;</code> as <code>0.0.&lt;SHA1&gt;</code> for sorting versions from homebrew
-        homepath.  It will almost always be last unless there is an unknown version, which uses <code>0.0.0</code>.
-      </li>
-      <li>Ensure any unparsable version sorts as <code>0.0.0</code> (<code>UKNOWN_VERSION</code>).</li>
-      <li>Look at parent of <code>eexTag</code> to resolve <code>fn</code> parameters</li>
-      <li>
-        Ensure functions <code>fn</code> in <code>eex</code> tags don't error by looking at <code>eex</code> element
-        parent.
-      </li>
-      <li>Search above <code>eexTag</code> and <code>eex</code> to determine if variable.</li>
     </ul>
   </li>
 </ul>
