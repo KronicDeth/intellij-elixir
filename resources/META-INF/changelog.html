@@ -211,6 +211,13 @@
         Use <code>ATOM</code> for keyword keys instead of <code>IDENTIFIER_TOKEN</code> as <code>ATOM</code> allows for
         <code>@</code>, which is needed for correctness.
       </li>
+      <li>
+        In <code>eachEbinPath</code>, the ebin directories were found by iterating
+        <code>&lt;SDK_HOME_PATH&gt;/lib</code> and then iterating grandchild of that, so that all paths matching
+        <code>&lt;SDK_HOME_PATH&gt;/lib/&lt;APP&gt;/ebin</code> would be added, but for some installs from source,
+        like ASDF, there are non-OTP-app files in <code>&lt;SDK_HOME_PATH&gt;/lib</code>, so filter
+        <code>&lt;SDK_HOME_PATH&gt;/lib/&lt;APP&gt;</code> to only directories.
+      </li>
     </ul>
   </li>
   <li>
@@ -1197,18 +1204,6 @@
         parent.
       </li>
       <li>Search above <code>eexTag</code> and <code>eex</code> to determine if variable.</li>
-    </ul>
-  </li>
-</ul>
-<h1>v6.5.1</h1>
-<ul>
-  <li>
-    <p>Bug Fixes</p>
-    <ul>
-      <li>
-        Don't do <code>project instanceOf MockProjectEx</code> because not all IDEs, such as Rider, ship with
-        <code>MockProjectEx</code>; instead, do a <code>Class#getCanonicalName()</code> check.
-      </li>
     </ul>
   </li>
 </ul>

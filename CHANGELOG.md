@@ -254,6 +254,7 @@ Table of Contents
 * [#1210](https://github.com/KronicDeth/intellij-elixir/pull/1210) - In `Phoenix.Router.Helpers`, a `quote` block appears as the head of `[head | tail]` list, so add support for search for enclosing macro call above `|`. - [@KronicDeth](https://github.com/KronicDeth)
 * [#1213](https://github.com/KronicDeth/intellij-elixir/pull/1213) - Treat EEx tag the same as `StabBody` for use scope. - [@KronicDeth](https://github.com/KronicDeth)
 * [#1214](https://github.com/KronicDeth/intellij-elixir/pull/1214) - Use `ATOM` for keyword keys instead of `IDENTIFIER_TOKEN` as `ATOM` allows for `@`, which is needed for correctness. - [@KronicDeth](https://github.com/KronicDeth)
+* [#1215](https://github.com/KronicDeth/intellij-elixir/pull/1215) - * In `eachEbinPath`, the ebin directories were found by iterating `<SDK_HOME_PATH>/lib` and then iterating grandchild of that, so that all paths matching `<SDK_HOME_PATH>/lib/<APP>/ebin` would be added, but for some installs from source, like SDK, there are non-OTP-app files in `<SDK_HOME_PATH>/lib`, so filter `<SDK_HOME_PATH>/lib/<APP>` to only directories. - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Incompatible Changes
 * [#1175](https://github.com/KronicDeth/intellij-elixir/pull/1175) - Drop support for IntelliJ IDEA before 2017.3 as they lack the `TerminalExecutionConsole` used to run `iex` in a PTY. - [@KronicDeth](https://github.com/KronicDeth)
