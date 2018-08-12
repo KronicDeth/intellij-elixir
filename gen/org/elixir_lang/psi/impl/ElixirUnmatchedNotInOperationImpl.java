@@ -17,7 +17,7 @@ import java.util.List;
 
 public class ElixirUnmatchedNotInOperationImpl extends ElixirUnmatchedExpressionImpl implements ElixirUnmatchedNotInOperation {
 
-  public ElixirUnmatchedNotInOperationImpl(ASTNode node) {
+  public ElixirUnmatchedNotInOperationImpl(@NotNull ASTNode node) {
     super(node);
   }
 
@@ -67,19 +67,19 @@ public class ElixirUnmatchedNotInOperationImpl extends ElixirUnmatchedExpression
     return ElixirPsiImplUtil.hasDoBlockOrKeyword(this);
   }
 
-  public boolean isCalling(String resolvedModuleName, String functionName) {
+  public boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName) {
     return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, functionName);
   }
 
-  public boolean isCalling(String resolvedModuleName, String functionName, int resolvedFinalArity) {
+  public boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity) {
     return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, functionName, resolvedFinalArity);
   }
 
-  public boolean isCallingMacro(String resolvedModuleName, String functionName) {
+  public boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName) {
     return ElixirPsiImplUtil.isCallingMacro(this, resolvedModuleName, functionName);
   }
 
-  public boolean isCallingMacro(String resolvedModuleName, String functionName, int resolvedFinalArity) {
+  public boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity) {
     return ElixirPsiImplUtil.isCallingMacro(this, resolvedModuleName, functionName, resolvedFinalArity);
   }
 
@@ -103,7 +103,7 @@ public class ElixirUnmatchedNotInOperationImpl extends ElixirUnmatchedExpression
     return ElixirPsiImplUtil.primaryArity(this);
   }
 
-  public boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent, PsiElement place) {
+  public boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place) {
     return ElixirPsiImplUtil.processDeclarations(this, processor, state, lastParent, place);
   }
 
@@ -152,7 +152,7 @@ public class ElixirUnmatchedNotInOperationImpl extends ElixirUnmatchedExpression
   }
 
   @NotNull
-  public PsiElement setName(String newName) {
+  public PsiElement setName(@NotNull String newName) {
     return ElixirPsiImplUtil.setName(this, newName);
   }
 

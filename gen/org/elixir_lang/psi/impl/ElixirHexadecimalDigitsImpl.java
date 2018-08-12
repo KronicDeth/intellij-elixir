@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ElixirHexadecimalDigitsImpl extends ASTWrapperPsiElement implements ElixirHexadecimalDigits {
 
-  public ElixirHexadecimalDigitsImpl(ASTNode node) {
+  public ElixirHexadecimalDigitsImpl(@NotNull ASTNode node) {
     super(node);
   }
 

@@ -14,7 +14,7 @@ import java.util.List;
 
 public class ElixirListImpl extends ASTWrapperPsiElement implements ElixirList {
 
-  public ElixirListImpl(ASTNode node) {
+  public ElixirListImpl(@NotNull ASTNode node) {
     super(node);
   }
 

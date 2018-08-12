@@ -16,7 +16,7 @@ import java.util.List;
 
 public class ElixirKeywordsImpl extends ASTWrapperPsiElement implements ElixirKeywords {
 
-  public ElixirKeywordsImpl(ASTNode node) {
+  public ElixirKeywordsImpl(@NotNull ASTNode node) {
     super(node);
   }
 

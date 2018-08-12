@@ -16,7 +16,7 @@ import java.util.List;
 
 public class ElixirOctalWholeNumberImpl extends ASTWrapperPsiElement implements ElixirOctalWholeNumber {
 
-  public ElixirOctalWholeNumberImpl(ASTNode node) {
+  public ElixirOctalWholeNumberImpl(@NotNull ASTNode node) {
     super(node);
   }
 

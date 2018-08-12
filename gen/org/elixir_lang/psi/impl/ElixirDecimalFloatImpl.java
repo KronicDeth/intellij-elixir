@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class ElixirDecimalFloatImpl extends ASTWrapperPsiElement implements ElixirDecimalFloat {
 
-  public ElixirDecimalFloatImpl(ASTNode node) {
+  public ElixirDecimalFloatImpl(@NotNull ASTNode node) {
     super(node);
   }
 

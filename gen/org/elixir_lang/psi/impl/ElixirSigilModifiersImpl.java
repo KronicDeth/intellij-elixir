@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ElixirSigilModifiersImpl extends ASTWrapperPsiElement implements ElixirSigilModifiers {
 
-  public ElixirSigilModifiersImpl(ASTNode node) {
+  public ElixirSigilModifiersImpl(@NotNull ASTNode node) {
     super(node);
   }
 

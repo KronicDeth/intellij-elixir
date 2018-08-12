@@ -341,7 +341,7 @@ OPERATOR = {FOUR_TOKEN_OPERATOR} |
 ATOM_END = [?!]
 ATOM_MIDDLE = [0-9a-zA-Z@_]
 ATOM_START = [a-zA-Z_]
-ATOM = {ATOM_START} {ATOM_MIDDLE}* {ATOM_END}?
+ATOM = {ATOM_START} {ATOM_MIDDLE}* {ATOM_END}? | "..."
 COLON = :
 
 /*
@@ -712,6 +712,8 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                                                return ElixirTypes.ALIAS_TOKEN; }
   {AT_OPERATOR}                              { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.AT_OPERATOR; }
+  {ATOM} / {COLON}{SPACE}                    { pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                               return ElixirTypes.ATOM_FRAGMENT; }
   {BASE_WHOLE_NUMBER_PREFIX} / {BASE_WHOLE_NUMBER_BASE} { pushAndBegin(BASE_WHOLE_NUMBER_BASE);
                                                           return ElixirTypes.BASE_WHOLE_NUMBER_PREFIX; }
   /* For bitString rule, OPENING_BIT will be lexed.  This is just for when the operator needs to be one token for
@@ -824,7 +826,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
   // Must be before {IDENTIFIER_TOKEN} as "when" would be parsed as an identifier since it's a lowercase alphanumeric.
   {WHEN_OPERATOR}                            { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.WHEN_OPERATOR; }
-  {IDENTIFIER_TOKEN}                               { pushAndBegin(CALL_OR_KEYWORD_PAIR_MAYBE);
+  {IDENTIFIER_TOKEN}                         { pushAndBegin(CALL_MAYBE);
                                                return ElixirTypes.IDENTIFIER_TOKEN; }
   {IN_MATCH_OPERATOR}                        { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.IN_MATCH_OPERATOR; }

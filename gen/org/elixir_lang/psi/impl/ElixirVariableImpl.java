@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class ElixirVariableImpl extends ASTWrapperPsiElement implements ElixirVariable {
 
-  public ElixirVariableImpl(ASTNode node) {
+  public ElixirVariableImpl(@NotNull ASTNode node) {
     super(node);
   }
 
@@ -42,7 +42,7 @@ public class ElixirVariableImpl extends ASTWrapperPsiElement implements ElixirVa
   }
 
   @NotNull
-  public PsiElement setName(String newName) {
+  public PsiElement setName(@NotNull String newName) {
     return ElixirPsiImplUtil.setName(this, newName);
   }
 

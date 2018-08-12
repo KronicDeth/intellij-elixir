@@ -16,7 +16,7 @@ import java.util.List;
 
 public class ElixirHexadecimalWholeNumberImpl extends ASTWrapperPsiElement implements ElixirHexadecimalWholeNumber {
 
-  public ElixirHexadecimalWholeNumberImpl(ASTNode node) {
+  public ElixirHexadecimalWholeNumberImpl(@NotNull ASTNode node) {
     super(node);
   }
 

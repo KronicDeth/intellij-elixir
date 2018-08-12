@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class ElixirParentheticalStabImpl extends ASTWrapperPsiElement implements ElixirParentheticalStab {
 
-  public ElixirParentheticalStabImpl(ASTNode node) {
+  public ElixirParentheticalStabImpl(@NotNull ASTNode node) {
     super(node);
   }
 

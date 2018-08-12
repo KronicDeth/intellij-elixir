@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class ElixirStabOperationImpl extends ASTWrapperPsiElement implements ElixirStabOperation {
 
-  public ElixirStabOperationImpl(ASTNode node) {
+  public ElixirStabOperationImpl(@NotNull ASTNode node) {
     super(node);
   }
 
@@ -62,7 +62,7 @@ public class ElixirStabOperationImpl extends ASTWrapperPsiElement implements Eli
     return ElixirPsiImplUtil.operator(this);
   }
 
-  public boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent, PsiElement place) {
+  public boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place) {
     return ElixirPsiImplUtil.processDeclarations(this, processor, state, lastParent, place);
   }
 

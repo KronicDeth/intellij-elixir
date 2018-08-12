@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ElixirEmptyParenthesesImpl extends ASTWrapperPsiElement implements ElixirEmptyParentheses {
 
-  public ElixirEmptyParenthesesImpl(ASTNode node) {
+  public ElixirEmptyParenthesesImpl(@NotNull ASTNode node) {
     super(node);
   }
 

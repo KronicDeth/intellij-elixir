@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ElixirAssociationsImpl extends ASTWrapperPsiElement implements ElixirAssociations {
 
-  public ElixirAssociationsImpl(ASTNode node) {
+  public ElixirAssociationsImpl(@NotNull ASTNode node) {
     super(node);
   }
 

@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ElixirDecimalFloatIntegralImpl extends ASTWrapperPsiElement implements ElixirDecimalFloatIntegral {
 
-  public ElixirDecimalFloatIntegralImpl(ASTNode node) {
+  public ElixirDecimalFloatIntegralImpl(@NotNull ASTNode node) {
     super(node);
   }
 

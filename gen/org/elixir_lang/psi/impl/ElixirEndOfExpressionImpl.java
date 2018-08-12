@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ElixirEndOfExpressionImpl extends ASTWrapperPsiElement implements ElixirEndOfExpression {
 
-  public ElixirEndOfExpressionImpl(ASTNode node) {
+  public ElixirEndOfExpressionImpl(@NotNull ASTNode node) {
     super(node);
   }
 

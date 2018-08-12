@@ -12,7 +12,7 @@ import java.util.List;
 
 public class ElixirInterpolatedStringBodyImpl extends ASTWrapperPsiElement implements ElixirInterpolatedStringBody {
 
-  public ElixirInterpolatedStringBodyImpl(ASTNode node) {
+  public ElixirInterpolatedStringBodyImpl(@NotNull ASTNode node) {
     super(node);
   }
 

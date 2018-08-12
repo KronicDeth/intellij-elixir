@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ElixirUnaryPrefixOperatorImpl extends ASTWrapperPsiElement implements ElixirUnaryPrefixOperator {
 
-  public ElixirUnaryPrefixOperatorImpl(ASTNode node) {
+  public ElixirUnaryPrefixOperatorImpl(@NotNull ASTNode node) {
     super(node);
   }
 

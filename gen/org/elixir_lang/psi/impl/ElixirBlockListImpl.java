@@ -15,7 +15,7 @@ import java.util.List;
 
 public class ElixirBlockListImpl extends ASTWrapperPsiElement implements ElixirBlockList {
 
-  public ElixirBlockListImpl(ASTNode node) {
+  public ElixirBlockListImpl(@NotNull ASTNode node) {
     super(node);
   }
 

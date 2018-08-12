@@ -29,16 +29,16 @@ public interface ElixirAlias extends NamedElement, QualifiableAlias, Quotable {
   PsiReference getReference();
 
   @Nullable
-  PsiPolyVariantReference getReference(PsiElement maxScope);
+  PsiPolyVariantReference getReference(@NotNull PsiElement maxScope);
 
   boolean isModuleName();
 
-  boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent, PsiElement place);
+  boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place);
 
   @NotNull
   OtpErlangObject quote();
 
   @NotNull
-  PsiElement setName(String newName);
+  PsiElement setName(@NotNull String newName);
 
 }

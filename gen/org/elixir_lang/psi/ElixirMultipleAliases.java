@@ -21,7 +21,7 @@ public interface ElixirMultipleAliases extends Quotable {
   @NotNull
   List<ElixirUnmatchedExpression> getUnmatchedExpressionList();
 
-  boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent, PsiElement entrance);
+  boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement entrance);
 
   @NotNull
   OtpErlangObject quote();

@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ElixirMapOperationImpl extends ASTWrapperPsiElement implements ElixirMapOperation {
 
-  public ElixirMapOperationImpl(ASTNode node) {
+  public ElixirMapOperationImpl(@NotNull ASTNode node) {
     super(node);
   }
 

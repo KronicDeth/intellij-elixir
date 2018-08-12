@@ -16,7 +16,7 @@ import java.util.List;
 
 public class ElixirAnonymousFunctionImpl extends ASTWrapperPsiElement implements ElixirAnonymousFunction {
 
-  public ElixirAnonymousFunctionImpl(ASTNode node) {
+  public ElixirAnonymousFunctionImpl(@NotNull ASTNode node) {
     super(node);
   }
 

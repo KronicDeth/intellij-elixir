@@ -16,7 +16,7 @@ import java.util.List;
 
 public class ElixirInterpolatedStringSigilLineImpl extends ASTWrapperPsiElement implements ElixirInterpolatedStringSigilLine {
 
-  public ElixirInterpolatedStringSigilLineImpl(ASTNode node) {
+  public ElixirInterpolatedStringSigilLineImpl(@NotNull ASTNode node) {
     super(node);
   }
 
@@ -42,22 +42,22 @@ public class ElixirInterpolatedStringSigilLineImpl extends ASTWrapperPsiElement 
   }
 
   @NotNull
-  public List<Integer> addEscapedCharacterCodePoints(List<Integer> codePointList, ASTNode node) {
+  public List<Integer> addEscapedCharacterCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode node) {
     return ElixirPsiImplUtil.addEscapedCharacterCodePoints(this, codePointList, node);
   }
 
   @NotNull
-  public List<Integer> addEscapedEOL(List<Integer> maybeCodePointList, ASTNode node) {
+  public List<Integer> addEscapedEOL(@Nullable List<Integer> maybeCodePointList, @NotNull ASTNode node) {
     return ElixirPsiImplUtil.addEscapedEOL(this, maybeCodePointList, node);
   }
 
   @NotNull
-  public List<Integer> addFragmentCodePoints(List<Integer> codePointList, ASTNode node) {
+  public List<Integer> addFragmentCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode node) {
     return ElixirPsiImplUtil.addFragmentCodePoints(this, codePointList, node);
   }
 
   @NotNull
-  public List<Integer> addHexadecimalEscapeSequenceCodePoints(List<Integer> codePointList, ASTNode node) {
+  public List<Integer> addHexadecimalEscapeSequenceCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode node) {
     return ElixirPsiImplUtil.addHexadecimalEscapeSequenceCodePoints(this, codePointList, node);
   }
 
@@ -75,7 +75,7 @@ public class ElixirInterpolatedStringSigilLineImpl extends ASTWrapperPsiElement 
   }
 
   @NotNull
-  public OtpErlangObject quote(OtpErlangObject quotedContent) {
+  public OtpErlangObject quote(@NotNull OtpErlangObject quotedContent) {
     return ElixirPsiImplUtil.quote(this, quotedContent);
   }
 

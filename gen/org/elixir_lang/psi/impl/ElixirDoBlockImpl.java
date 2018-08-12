@@ -14,7 +14,7 @@ import java.util.List;
 
 public class ElixirDoBlockImpl extends ASTWrapperPsiElement implements ElixirDoBlock {
 
-  public ElixirDoBlockImpl(ASTNode node) {
+  public ElixirDoBlockImpl(@NotNull ASTNode node) {
     super(node);
   }
 

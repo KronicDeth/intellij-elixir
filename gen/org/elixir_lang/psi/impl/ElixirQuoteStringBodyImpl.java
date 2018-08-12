@@ -12,7 +12,7 @@ import java.util.List;
 
 public class ElixirQuoteStringBodyImpl extends ASTWrapperPsiElement implements ElixirQuoteStringBody {
 
-  public ElixirQuoteStringBodyImpl(ASTNode node) {
+  public ElixirQuoteStringBodyImpl(@NotNull ASTNode node) {
     super(node);
   }
 

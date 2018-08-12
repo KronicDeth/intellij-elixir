@@ -13,7 +13,7 @@ import java.util.List;
 
 public class ElixirInterpolationImpl extends ASTWrapperPsiElement implements ElixirInterpolation {
 
-  public ElixirInterpolationImpl(ASTNode node) {
+  public ElixirInterpolationImpl(@NotNull ASTNode node) {
     super(node);
   }
 

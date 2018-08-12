@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class ElixirBracketArgumentsImpl extends ASTWrapperPsiElement implements ElixirBracketArguments {
 
-  public ElixirBracketArgumentsImpl(ASTNode node) {
+  public ElixirBracketArgumentsImpl(@NotNull ASTNode node) {
     super(node);
   }
 

@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ElixirHeredocPrefixImpl extends ASTWrapperPsiElement implements ElixirHeredocPrefix {
 
-  public ElixirHeredocPrefixImpl(ASTNode node) {
+  public ElixirHeredocPrefixImpl(@NotNull ASTNode node) {
     super(node);
   }
 

@@ -12,7 +12,7 @@ import java.util.List;
 
 public class ElixirEexTagImpl extends ASTWrapperPsiElement implements ElixirEexTag {
 
-  public ElixirEexTagImpl(ASTNode node) {
+  public ElixirEexTagImpl(@NotNull ASTNode node) {
     super(node);
   }
 

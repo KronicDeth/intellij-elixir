@@ -19,16 +19,16 @@ public interface ElixirCharListHeredoc extends Heredoc, InterpolatedCharList, Qu
   ElixirHeredocPrefix getHeredocPrefix();
 
   @NotNull
-  List<Integer> addEscapedCharacterCodePoints(List<Integer> codePointList, ASTNode node);
+  List<Integer> addEscapedCharacterCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode node);
 
   @NotNull
-  List<Integer> addEscapedEOL(List<Integer> maybeCodePointList, ASTNode node);
+  List<Integer> addEscapedEOL(@Nullable List<Integer> maybeCodePointList, @NotNull ASTNode node);
 
   @NotNull
-  List<Integer> addFragmentCodePoints(List<Integer> codePointList, ASTNode node);
+  List<Integer> addFragmentCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode node);
 
   @NotNull
-  List<Integer> addHexadecimalEscapeSequenceCodePoints(List<Integer> codePointList, ASTNode node);
+  List<Integer> addHexadecimalEscapeSequenceCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode node);
 
   IElementType getFragmentType();
 

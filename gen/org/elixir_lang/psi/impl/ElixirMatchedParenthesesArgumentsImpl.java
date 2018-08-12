@@ -14,7 +14,7 @@ import java.util.List;
 
 public class ElixirMatchedParenthesesArgumentsImpl extends ASTWrapperPsiElement implements ElixirMatchedParenthesesArguments {
 
-  public ElixirMatchedParenthesesArgumentsImpl(ASTNode node) {
+  public ElixirMatchedParenthesesArgumentsImpl(@NotNull ASTNode node) {
     super(node);
   }
 

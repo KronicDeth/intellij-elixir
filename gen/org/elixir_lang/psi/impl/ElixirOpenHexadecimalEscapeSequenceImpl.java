@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ElixirOpenHexadecimalEscapeSequenceImpl extends ASTWrapperPsiElement implements ElixirOpenHexadecimalEscapeSequence {
 
-  public ElixirOpenHexadecimalEscapeSequenceImpl(ASTNode node) {
+  public ElixirOpenHexadecimalEscapeSequenceImpl(@NotNull ASTNode node) {
     super(node);
   }
 

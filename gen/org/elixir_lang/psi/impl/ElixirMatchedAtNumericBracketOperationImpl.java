@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class ElixirMatchedAtNumericBracketOperationImpl extends ElixirMatchedExpressionImpl implements ElixirMatchedAtNumericBracketOperation {
 
-  public ElixirMatchedAtNumericBracketOperationImpl(ASTNode node) {
+  public ElixirMatchedAtNumericBracketOperationImpl(@NotNull ASTNode node) {
     super(node);
   }
 

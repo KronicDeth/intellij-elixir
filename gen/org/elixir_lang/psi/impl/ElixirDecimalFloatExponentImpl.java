@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ElixirDecimalFloatExponentImpl extends ASTWrapperPsiElement implements ElixirDecimalFloatExponent {
 
-  public ElixirDecimalFloatExponentImpl(ASTNode node) {
+  public ElixirDecimalFloatExponentImpl(@NotNull ASTNode node) {
     super(node);
   }
 

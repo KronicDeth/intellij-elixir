@@ -70,13 +70,13 @@ public interface ElixirUnmatchedQualifiedParenthesesCall extends ElixirUnmatched
   //matching getUseScope(ElixirUnmatchedQualifiedParenthesesCall, ...)
   //methods are not found in ElixirPsiImplUtil
 
-  boolean isCalling(String resolvedModuleName, String functionName);
+  boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName);
 
-  boolean isCalling(String resolvedModuleName, String functionName, int resolvedFinalArity);
+  boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity);
 
-  boolean isCallingMacro(String resolvedModuleName, String functionName);
+  boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName);
 
-  boolean isCallingMacro(String resolvedModuleName, String functionName, int resolvedFinalArity);
+  boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity);
 
   @NotNull
   String moduleName();
@@ -87,7 +87,7 @@ public interface ElixirUnmatchedQualifiedParenthesesCall extends ElixirUnmatched
   @Nullable
   Integer primaryArity();
 
-  boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent, PsiElement place);
+  boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place);
 
   @NotNull
   PsiElement qualifier();
@@ -116,6 +116,6 @@ public interface ElixirUnmatchedQualifiedParenthesesCall extends ElixirUnmatched
   Integer secondaryArity();
 
   @NotNull
-  PsiElement setName(String newName);
+  PsiElement setName(@NotNull String newName);
 
 }

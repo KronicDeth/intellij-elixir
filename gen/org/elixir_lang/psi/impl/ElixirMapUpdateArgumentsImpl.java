@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class ElixirMapUpdateArgumentsImpl extends ASTWrapperPsiElement implements ElixirMapUpdateArguments {
 
-  public ElixirMapUpdateArgumentsImpl(ASTNode node) {
+  public ElixirMapUpdateArgumentsImpl(@NotNull ASTNode node) {
     super(node);
   }
 

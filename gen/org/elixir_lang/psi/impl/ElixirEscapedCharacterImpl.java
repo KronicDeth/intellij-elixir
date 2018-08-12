@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ElixirEscapedCharacterImpl extends ASTWrapperPsiElement implements ElixirEscapedCharacter {
 
-  public ElixirEscapedCharacterImpl(ASTNode node) {
+  public ElixirEscapedCharacterImpl(@NotNull ASTNode node) {
     super(node);
   }
 

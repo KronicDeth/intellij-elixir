@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class ElixirAtomImpl extends ASTWrapperPsiElement implements ElixirAtom {
 
-  public ElixirAtomImpl(ASTNode node) {
+  public ElixirAtomImpl(@NotNull ASTNode node) {
     super(node);
   }
 

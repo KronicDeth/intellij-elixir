@@ -16,7 +16,7 @@ import java.util.List;
 
 public class ElixirDecimalWholeNumberImpl extends ASTWrapperPsiElement implements ElixirDecimalWholeNumber {
 
-  public ElixirDecimalWholeNumberImpl(ASTNode node) {
+  public ElixirDecimalWholeNumberImpl(@NotNull ASTNode node) {
     super(node);
   }
 

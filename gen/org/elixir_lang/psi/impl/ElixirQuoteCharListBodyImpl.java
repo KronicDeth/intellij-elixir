@@ -12,7 +12,7 @@ import java.util.List;
 
 public class ElixirQuoteCharListBodyImpl extends ASTWrapperPsiElement implements ElixirQuoteCharListBody {
 
-  public ElixirQuoteCharListBodyImpl(ASTNode node) {
+  public ElixirQuoteCharListBodyImpl(@NotNull ASTNode node) {
     super(node);
   }
 

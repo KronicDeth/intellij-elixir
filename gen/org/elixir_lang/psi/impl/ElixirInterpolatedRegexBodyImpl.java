@@ -12,7 +12,7 @@ import java.util.List;
 
 public class ElixirInterpolatedRegexBodyImpl extends ASTWrapperPsiElement implements ElixirInterpolatedRegexBody {
 
-  public ElixirInterpolatedRegexBodyImpl(ASTNode node) {
+  public ElixirInterpolatedRegexBodyImpl(@NotNull ASTNode node) {
     super(node);
   }
 

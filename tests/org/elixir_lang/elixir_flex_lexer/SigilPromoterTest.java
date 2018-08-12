@@ -4,11 +4,9 @@ import com.intellij.psi.TokenType;
 import org.elixir_lang.ElixirFlexLexer;
 import org.elixir_lang.TokenTypeState;
 import org.elixir_lang.psi.ElixirTypes;
-import org.jetbrains.annotations.NotNull;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -48,9 +46,9 @@ public class SigilPromoterTest extends Test {
                         {
                                 "def f () do\nend",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_OR_KEYWORD_PAIR_MAYBE),
+                                        new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_MAYBE),
                                         new TokenTypeState(TokenType.WHITE_SPACE, ElixirFlexLexer.YYINITIAL),
-                                        new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_OR_KEYWORD_PAIR_MAYBE),
+                                        new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_MAYBE),
                                         new TokenTypeState(TokenType.WHITE_SPACE, ElixirFlexLexer.YYINITIAL),
                                         new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.CLOSING_PARENTHESIS, ElixirFlexLexer.YYINITIAL),
@@ -63,9 +61,9 @@ public class SigilPromoterTest extends Test {
                         {
                                 "def f (~) do\nend",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_OR_KEYWORD_PAIR_MAYBE),
+                                        new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_MAYBE),
                                         new TokenTypeState(TokenType.WHITE_SPACE, ElixirFlexLexer.YYINITIAL),
-                                        new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_OR_KEYWORD_PAIR_MAYBE),
+                                        new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_MAYBE),
                                         new TokenTypeState(TokenType.WHITE_SPACE, ElixirFlexLexer.YYINITIAL),
                                         new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.TILDE, ElixirFlexLexer.SIGIL),

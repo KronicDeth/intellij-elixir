@@ -14,7 +14,7 @@ import java.util.List;
 
 public class ElixirEexImpl extends ASTWrapperPsiElement implements ElixirEex {
 
-  public ElixirEexImpl(ASTNode node) {
+  public ElixirEexImpl(@NotNull ASTNode node) {
     super(node);
   }
 

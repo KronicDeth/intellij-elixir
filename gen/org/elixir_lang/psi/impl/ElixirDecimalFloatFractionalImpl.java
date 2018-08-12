@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ElixirDecimalFloatFractionalImpl extends ASTWrapperPsiElement implements ElixirDecimalFloatFractional {
 
-  public ElixirDecimalFloatFractionalImpl(ASTNode node) {
+  public ElixirDecimalFloatFractionalImpl(@NotNull ASTNode node) {
     super(node);
   }
 
