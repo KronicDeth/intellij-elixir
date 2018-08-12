@@ -49,8 +49,6 @@ abstract class Module : PsiScopeProcessor {
         val operatorIndex = org.elixir_lang.psi.operation.Normalized.operatorIndex(children)
         val unqualified = org.elixir_lang.psi.operation.infix.Normalized.rightOperand(children, operatorIndex)
 
-        assert(children.size == 3)
-
         return (unqualified as? PsiNamedElement)?.name
     }
 
