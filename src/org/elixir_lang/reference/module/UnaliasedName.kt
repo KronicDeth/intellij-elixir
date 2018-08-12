@@ -2,6 +2,7 @@ package org.elixir_lang.reference.module
 
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNamedElement
+import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.ALIAS
@@ -27,7 +28,15 @@ object UnaliasedName {
                     down(children[0])
                 }
                 is QualifiableAlias -> element.name
-                else -> TODO()
+                else -> {
+                    Logger.error(
+                            javaClass,
+                            "Don't know how to search down below ${element.javaClass} for unaliased name",
+                            element
+                    )
+
+                    "?"
+                }
             }
 
     private fun unaliasedName(qualifiableAlias: QualifiableAlias): String? =
