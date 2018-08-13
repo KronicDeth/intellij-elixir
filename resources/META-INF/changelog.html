@@ -224,6 +224,13 @@
         which makes it work with errors in the PSI tree, so there's no need protect with an assert and that assert would
         be wrong in times of errors handled by <code>Normalized</code>.
       </li>
+      <li>
+        <code>org.elixir_lang.reference.module.UnaliasedName.down(PsiElement)</code> only expects
+        <code>ElixirAccessExpression</code> or <code>QualifiableAlias</code>, but for unexpected classes of elements, it
+        was a simple Kotlin <code>TODO()</code>, which didn't log anything useful for enhancements.  Replace the
+        <code>TODO()</code> with an <code>org.elixir_lang.errorreport.Logger.error</code>, so that the element's class
+        and content can be reported when this happens again.
+      </li>
     </ul>
   </li>
   <li>
