@@ -63,6 +63,9 @@
     <fileTypeFactory implementation="org.elixir_lang.ElixirFileTypeFactory"/>
     <filePropertyPusher implementation="org.elixir_lang.file.LevelPropertyPusher"/>
 
+    <!-- Run Configurations -->
+    <project.converterProvider implementation="org.elixir_lang.run.conversion.Provider"/>
+
     <!-- Facet -->
     <applicationConfigurable id="language.elixir.sdks.elixir"
                              parentId="language.elixir"
