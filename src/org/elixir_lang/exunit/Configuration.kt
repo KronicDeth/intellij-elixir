@@ -162,4 +162,4 @@ class Configuration(name: String, project: Project) :
     }
 }
 
-private const val MIX_TEST = "mix-test"
+const val MIX_TEST = "mix-test"
