@@ -244,6 +244,7 @@ Table of Contents
 * [#1208](https://github.com/KronicDeth/intellij-elixir/pull/1208) - Update `2018.2` to `2018.2.1` in build matrix. - [@KronicDeth](https://github.com/KronicDeth)
 * [#1210](https://github.com/KronicDeth/intellij-elixir/pull/1210) - Regression test for [#1141](https://github.com/KronicDeth/intellij-elixir/issues/1141) - [@KronicDeth](https://github.com/KronicDeth)
 * [#1212](https://github.com/KronicDeth/intellij-elixir/pull/1212) - Improve Cannot Create SDK error message (additions in **bold**): "You need to configure an Erlang SDK for Elixir SDK. **Click OK to be take through the Erlang SDK configuration.  Click Cancel to stop configuring this SDK AND the Erlang SDK.**" - [@KronicDeth](https://github.com/KronicDeth)
+* [#1223](https://github.com/KronicDeth/intellij-elixir/pull/1223) - Convert mix and mix test run configurations to new format. - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#1188](https://github.com/KronicDeth/intellij-elixir/pull/1188) - Show `...` for module name when `Dbgi` has no module name as happens for instrumented modules from `IEx.break/4`. - [@KronicDeth](https://github.com/KronicDeth)
