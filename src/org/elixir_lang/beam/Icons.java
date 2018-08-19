@@ -1,9 +1,9 @@
 package org.elixir_lang.beam;
 
-import org.elixir_lang.icons.ElixirIcons;
+import com.intellij.openapi.util.IconLoader;
 
 import javax.swing.*;
 
 public class Icons {
-    public static final Icon FILE = ElixirIcons.FILE;
+    public static final Icon FILE = IconLoader.getIcon("/icons/file/beam.svg");
 }

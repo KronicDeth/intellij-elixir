@@ -6,8 +6,8 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.ui.JBColor;
 import org.elixir_lang.ElixirSyntaxHighlighter;
+import org.elixir_lang.Icons;
 import org.elixir_lang.annotator.Parameter;
-import org.elixir_lang.icons.ElixirIcons;
 import org.elixir_lang.psi.operation.InMatch;
 import org.elixir_lang.psi.operation.Match;
 import org.jetbrains.annotations.Contract;
@@ -17,9 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.*;
 
-import static org.elixir_lang.reference.Callable.isIgnored;
-import static org.elixir_lang.reference.Callable.isParameterWithDefault;
-import static org.elixir_lang.reference.Callable.isVariable;
+import static org.elixir_lang.reference.Callable.*;
 
 public class Variable extends com.intellij.codeInsight.lookup.LookupElementRenderer<LookupElement> {
     /*
@@ -132,9 +130,9 @@ public class Variable extends com.intellij.codeInsight.lookup.LookupElementRende
         Parameter.Type parameterType = Parameter.putParameterized(parameter).type;
 
         if (parameterType != null) {
-            icon = ElixirIcons.PARAMETER;
+            icon = Icons.PARAMETER;
         } else {
-            icon = ElixirIcons.VARIABLE;
+            icon = Icons.VARIABLE;
         }
 
         return icon;

@@ -7,7 +7,6 @@ import com.intellij.openapi.options.colors.AttributesDescriptor;
 import com.intellij.openapi.options.colors.ColorDescriptor;
 import com.intellij.openapi.options.colors.ColorSettingsPage;
 import com.intellij.util.containers.ContainerUtil;
-import org.elixir_lang.icons.ElixirIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -121,7 +120,7 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
     @Nullable
     @Override
     public Icon getIcon() {
-        return ElixirIcons.FILE;
+        return Icons.LANGUAGE;
     }
 
     @NotNull

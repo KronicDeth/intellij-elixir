@@ -1,6 +1,6 @@
 package org.elixir_lang.navigation.item_presentation.modular
 
-import org.elixir_lang.icons.ElixirIcons
+import org.elixir_lang.Icons
 import org.elixir_lang.psi.call.Call
 import javax.swing.Icon
 
@@ -12,7 +12,7 @@ class Protocol(location: String?, call: Call) : Module(location, call) {
     /**
      * The protocol icon
      */
-    override fun getIcon(unused: Boolean): Icon = ElixirIcons.PROTOCOL
+    override fun getIcon(unused: Boolean): Icon = Icons.PROTOCOL
 
     override fun definer(): String = "defprotocol"
 }

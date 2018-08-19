@@ -3,8 +3,8 @@ package org.elixir_lang.navigation.item_presentation;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.ui.RowIcon;
+import org.elixir_lang.Icons;
 import org.elixir_lang.Visibility;
-import org.elixir_lang.icons.ElixirIcons;
 import org.elixir_lang.psi.ElixirMatchedWhenOperation;
 import org.elixir_lang.psi.call.Call;
 import org.jetbrains.annotations.NotNull;
@@ -89,9 +89,9 @@ public class Type implements ItemPresentation {
     @Override
     public Icon getIcon(boolean unused) {
         Icon[] icons = new Icon[]{
-            ElixirIcons.Time.COMPILE,
-            ElixirIcons.Visibility.from(visibility),
-            ElixirIcons.TYPE
+            Icons.Time.COMPILE,
+            Icons.Visibility.from(visibility),
+            Icons.TYPE
         };
 
         RowIcon rowIcon = new RowIcon(icons.length);

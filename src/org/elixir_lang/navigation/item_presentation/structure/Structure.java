@@ -1,7 +1,7 @@
 package org.elixir_lang.navigation.item_presentation.structure;
 
 import com.intellij.navigation.ItemPresentation;
-import org.elixir_lang.icons.ElixirIcons;
+import org.elixir_lang.Icons;
 import org.elixir_lang.navigation.item_presentation.Parent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -39,7 +39,7 @@ public class Structure implements ItemPresentation, Parent {
     @NotNull
     @Override
     public Icon getIcon(boolean unused) {
-        return ElixirIcons.STRUCTURE;
+        return Icons.STRUCTURE;
     }
 
     /**

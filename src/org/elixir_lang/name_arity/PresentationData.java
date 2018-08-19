@@ -1,8 +1,8 @@
 package org.elixir_lang.name_arity;
 
 import com.intellij.ui.RowIcon;
+import org.elixir_lang.Icons;
 import org.elixir_lang.Visibility;
-import org.elixir_lang.icons.ElixirIcons;
 import org.elixir_lang.structure_view.element.Timed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -35,23 +35,23 @@ public class PresentationData {
         int layer = 0;
 
         if (callback) {
-            rowIcon.setIcon(ElixirIcons.CALLBACK, layer++);
+            rowIcon.setIcon(Icons.CALLBACK, layer++);
         }
 
-        Icon timeIcon = ElixirIcons.Time.from(time);
+        Icon timeIcon = Icons.Time.from(time);
         rowIcon.setIcon(timeIcon, layer++);
 
-        Icon visibilityIcon = ElixirIcons.Visibility.from(visibility);
+        Icon visibilityIcon = Icons.Visibility.from(visibility);
         rowIcon.setIcon(visibilityIcon, layer++);
 
-        rowIcon.setIcon(ElixirIcons.CALL_DEFINITION, layer++);
+        rowIcon.setIcon(Icons.CALL_DEFINITION, layer++);
 
         if (overridable) {
-            rowIcon.setIcon(ElixirIcons.OVERRIDABLE, layer++);
+            rowIcon.setIcon(Icons.OVERRIDABLE, layer++);
         }
 
         if (override) {
-            rowIcon.setIcon(ElixirIcons.OVERRIDE, layer);
+            rowIcon.setIcon(Icons.OVERRIDE, layer);
         }
 
         return rowIcon;

@@ -3,8 +3,8 @@ package org.elixir_lang.navigation.item_presentation;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.ui.RowIcon;
+import org.elixir_lang.Icons;
 import org.elixir_lang.Visibility;
-import org.elixir_lang.icons.ElixirIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -53,9 +53,9 @@ public class CallDefinitionHead implements ItemPresentation {
     @Override
     public Icon getIcon(boolean unused) {
         Icon[] icons = new Icon[]{
-                ElixirIcons.Time.from(callDefinition.time()),
-                ElixirIcons.Visibility.from(visibility),
-                ElixirIcons.CALL_DEFINITION_CLAUSE
+                Icons.Time.from(callDefinition.time()),
+                Icons.Visibility.from(visibility),
+                Icons.CALL_DEFINITION_CLAUSE
         };
 
         RowIcon rowIcon = new RowIcon(icons.length);

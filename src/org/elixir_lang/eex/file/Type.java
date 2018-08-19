@@ -3,10 +3,9 @@ package org.elixir_lang.eex.file;
 import com.google.common.collect.Iterables;
 import com.intellij.openapi.fileTypes.*;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.newvfs.impl.FakeVirtualFile;
+import org.elixir_lang.eex.Icons;
 import org.elixir_lang.eex.Language;
 import org.elixir_lang.eex.TemplateHighlighter;
-import org.elixir_lang.icons.ElixirIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -92,6 +91,6 @@ public class Type extends LanguageFileType implements TemplateLanguageFileType {
     @Nullable
     @Override
     public Icon getIcon() {
-        return ElixirIcons.FILE;
+        return Icons.FILE;
     }
 }

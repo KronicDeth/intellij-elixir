@@ -5,7 +5,7 @@ import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleType
 import com.intellij.openapi.projectRoots.ProjectJdkTable
 import org.elixir_lang.Facet
-import org.elixir_lang.icons.ElixirIcons
+import org.elixir_lang.Icons
 import org.elixir_lang.module.ElixirModuleType
 import javax.swing.Icon
 
@@ -32,9 +32,7 @@ class Type : FacetType<Facet, Configuration>(Facet.ID, ID, "Elixir") {
         return moduleType.id != ElixirModuleType.MODULE_TYPE_ID
     }
 
-    override fun getIcon(): Icon {
-        return ElixirIcons.FILE
-    }
+    override fun getIcon(): Icon = Icons.LANGUAGE
 
     companion object {
         internal val ID = "Elixir"

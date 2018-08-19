@@ -1,7 +1,7 @@
 package org.elixir_lang.navigation.item_presentation;
 
 import com.intellij.navigation.ItemPresentation;
-import org.elixir_lang.icons.ElixirIcons;
+import org.elixir_lang.Icons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,7 +38,7 @@ public class Implementation implements ItemPresentation, Parent {
     @Nullable
     @Override
     public Icon getIcon(boolean unused) {
-        return ElixirIcons.IMPLEMENTATION;
+        return Icons.IMPLEMENTATION;
     }
 
     /**

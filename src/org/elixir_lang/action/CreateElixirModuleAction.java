@@ -12,14 +12,12 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
-import org.elixir_lang.icons.ElixirIcons;
+import org.elixir_lang.Icons;
 import org.elixir_lang.psi.ElixirFile;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -163,7 +161,7 @@ public class CreateElixirModuleAction extends CreateFromTemplateAction<ElixirFil
      */
 
     public CreateElixirModuleAction() {
-        super(NEW_ELIXIR_MODULE, DESCRIPTION, ElixirIcons.FILE);
+        super(NEW_ELIXIR_MODULE, DESCRIPTION, Icons.FILE);
     }
 
     /*
@@ -199,11 +197,11 @@ public class CreateElixirModuleAction extends CreateFromTemplateAction<ElixirFil
                                @NotNull CreateFileFromTemplateDialog.Builder builder) {
         builder.
                 setTitle(NEW_ELIXIR_MODULE).
-                addKind("Empty module", ElixirIcons.FILE, "Elixir Module").
-                addKind("Elixir Application", ElixirIcons.ELIXIR_APPLICATION, "Elixir Application").
-                addKind("Elixir Supervisor", ElixirIcons.ELIXIR_SUPERVISOR, "Elixir Supervisor").
-                addKind("Elixir GenServer", ElixirIcons.ELIXIR_GEN_SERVER, "Elixir GenServer").
-                addKind("Elixir GenEvent", ElixirIcons.ELIXIR_GEN_EVENT, "Elixir GenEvent").
+                addKind("Empty module", Icons.FILE, "Elixir Module").
+                addKind("Elixir Application", Icons.File.APPLICATION, "Elixir Application").
+                addKind("Elixir Supervisor", Icons.File.SUPERVISOR, "Elixir Supervisor").
+                addKind("Elixir GenServer", Icons.File.GEN_SERVER, "Elixir GenServer").
+                addKind("Elixir GenEvent", Icons.File.GEN_EVENT, "Elixir GenEvent").
                 setValidator(new InputValidatorEx() {
                     /*
                      * Public Instance Methods

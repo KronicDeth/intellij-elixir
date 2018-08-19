@@ -29,7 +29,7 @@ import com.intellij.projectImport.ProjectImportBuilder;
 import com.intellij.util.Function;
 import com.intellij.util.containers.ContainerUtil;
 import org.elixir_lang.configuration.ElixirCompilerSettings;
-import org.elixir_lang.icons.ElixirIcons;
+import org.elixir_lang.mix.Icons;
 import org.elixir_lang.module.ElixirModuleType;
 import org.elixir_lang.sdk.elixir.Type;
 import org.jetbrains.annotations.NotNull;
@@ -63,7 +63,7 @@ public class MixProjectImportBuilder extends ProjectImportBuilder<ImportedOtpApp
 
   @Override
   public Icon getIcon() {
-    return ElixirIcons.MIX;
+    return Icons.PROJECT;
   }
 
   @Override
