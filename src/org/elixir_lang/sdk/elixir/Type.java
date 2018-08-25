@@ -25,7 +25,7 @@ import gnu.trove.THashSet;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.elixir_lang.Facet;
-import org.elixir_lang.icons.ElixirIcons;
+import org.elixir_lang.Icons;
 import org.elixir_lang.jps.model.SerializerExtension;
 import org.elixir_lang.jps.sdk_type.Elixir;
 import org.elixir_lang.jps.HomePath;
@@ -492,7 +492,7 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
 
     @Override
     public Icon getIcon() {
-        return ElixirIcons.FILE;
+        return Icons.LANGUAGE;
     }
 
     @NotNull

@@ -4,7 +4,7 @@ import com.intellij.ide.util.ElementsChooser;
 import com.intellij.ide.util.projectWizard.WizardContext;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.projectImport.SelectImportedProjectsStep;
-import org.elixir_lang.icons.ElixirIcons;
+import org.elixir_lang.Icons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -49,7 +49,7 @@ final class SelectImportedOtpAppsStep extends SelectImportedProjectsStep<Importe
   @Nullable
   @Override
   protected Icon getElementIcon(ImportedOtpApp importedOtpApp) {
-    return myDuplicateModuleNames.contains(importedOtpApp.getName()) ? ElixirIcons.MIX_MODULE_CONFLICT : null;
+    return myDuplicateModuleNames.contains(importedOtpApp.getName()) ? Icons.MIX_MODULE_CONFLICT : null;
   }
 
   /**

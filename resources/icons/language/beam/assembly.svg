@@ -1,0 +1,9 @@
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="16" height="16" fill="black" fill-opacity="0" transform="translate(16) scale(-1 1)"/>
+<path d="M16 8L0 0V2.67L16 8Z" fill="#A91E3B"/>
+<path d="M16 8L0 2.67001V5.34001L16 8Z" fill="#460075"/>
+<path d="M0 7.99999V5.32999L16 7.99999H0Z" fill="#6787C5"/>
+<path d="M0 8H16L0 10.67V8Z" fill="#7ABC42"/>
+<path d="M16 8L0 10.67V13.34L16 8Z" fill="#EBE820"/>
+<path d="M16 8L0 13.33V16L16 8Z" fill="#EAAA20"/>
+</svg>

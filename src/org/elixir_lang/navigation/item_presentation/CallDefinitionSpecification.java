@@ -2,7 +2,7 @@ package org.elixir_lang.navigation.item_presentation;
 
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.ui.RowIcon;
-import org.elixir_lang.icons.ElixirIcons;
+import org.elixir_lang.Icons;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.structure_view.element.Timed;
 import org.jetbrains.annotations.NotNull;
@@ -59,14 +59,14 @@ public class CallDefinitionSpecification implements ItemPresentation {
         int layer = 0;
 
         if (callback) {
-            rowIcon.setIcon(ElixirIcons.CALLBACK, layer++);
+            rowIcon.setIcon(Icons.CALLBACK, layer++);
         }
 
-        Icon timeIcon = ElixirIcons.Time.from(time);
+        Icon timeIcon = Icons.Time.from(time);
         rowIcon.setIcon(timeIcon, layer++);
 
-        rowIcon.setIcon(ElixirIcons.Visibility.PUBLIC, layer++);
-        rowIcon.setIcon(ElixirIcons.SPECIFICATION, layer);
+        rowIcon.setIcon(Icons.Visibility.PUBLIC, layer++);
+        rowIcon.setIcon(Icons.SPECIFICATION, layer);
 
         return rowIcon;
     }

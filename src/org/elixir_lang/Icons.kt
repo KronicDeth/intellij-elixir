@@ -1,10 +1,8 @@
-package org.elixir_lang.icons
+package org.elixir_lang
 
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.util.IconLoader
-import com.intellij.ui.LayeredIcon
 import com.intellij.ui.RowIcon
-import com.intellij.util.IconUtil
 import com.intellij.util.PlatformIcons
 import org.elixir_lang.structure_view.element.Timed
 import javax.swing.Icon
@@ -25,7 +23,7 @@ internal object RowIconFactory {
 /**
  * Created by zyuyou on 15/7/6.
  */
-object ElixirIcons {
+object Icons {
     object Time {
         @JvmField
         val COMPILE = AllIcons.Actions.Compile
@@ -65,7 +63,7 @@ object ElixirIcons {
 
                 assert(icon != null)
             } else {
-                icon = ElixirIcons.UNKNOWN
+                icon = UNKNOWN
             }
 
             return icon!!
@@ -85,13 +83,11 @@ object ElixirIcons {
     @JvmField
     val FIELD = AllIcons.Nodes.Field
     @JvmField
-    val FILE = IconLoader.getIcon("/icons/elixir-16.png")
+    val FILE = IconLoader.getIcon("/icons/file/elixir.svg")
     @JvmField
     val IMPLEMENTATION: Icon = RowIconFactory.create(PlatformIcons.ANONYMOUS_CLASS_ICON, AllIcons.General.OverridingMethod)
     @JvmField
     val MIX_MODULE_CONFLICT = AllIcons.Actions.Cancel
-    @JvmField
-    val MODULE = PlatformIcons.PACKAGE_ICON
     @JvmField
     val OVERRIDABLE = AllIcons.General.OverridenMethod
     @JvmField
@@ -117,31 +113,24 @@ object ElixirIcons {
     @JvmField
     val VARIABLE = AllIcons.Nodes.Variable
 
-    @JvmField
-    val ELIXIR_APPLICATION = IconLoader.getIcon("/icons/elixir-Application-16.png")
-    @JvmField
-    val ELIXIR_SUPERVISOR = IconLoader.getIcon("/icons/elixir-Supervisor-16.png")
-    @JvmField
-    val ELIXIR_GEN_EVENT = IconLoader.getIcon("/icons/elixir-GenEvent-16.png")
-    @JvmField
-    val ELIXIR_GEN_SERVER = IconLoader.getIcon("/icons/elixir-GenServer-16.png")
+    object File {
+        @JvmField
+        val APPLICATION = IconLoader.getIcon("/icons/file/elixir/application.svg")
 
-    private val ELIXIR_MARK = IconUtil.toSize(IconLoader.getIcon("/icons/elixir-16.png"), 8, 8)
-    @JvmField
-    val ELIXIR_MODULE_NODE: Icon = LayeredIcon(PlatformIcons.FOLDER_ICON, ELIXIR_MARK)
+        @JvmField
+        val GEN_EVENT = IconLoader.getIcon("/icons/file/elixir/gen-event.svg")
 
-    private val ELIXIR = IconLoader.getIcon("/icons/elixir-16.png")
-    @JvmField
-    val IEX = IconUtil.addText(ELIXIR, ">")
+        @JvmField
+        val GEN_SERVER = IconLoader.getIcon("/icons/file/elixir/gen-server.svg")
+
+        @JvmField
+        val SUPERVISOR = IconLoader.getIcon("/icons/file/elixir/supervisor.svg")
+    }
 
     @JvmField
-    val MIX = IconLoader.getIcon("/icons/mix-16.png")
-    @JvmField
-    val MIX_EX_UNIT: Icon = LayeredIcon(MIX, AllIcons.Nodes.JunitTestMark)
-    @JvmField
-    val IEX_MIX: Icon = IconUtil.addText(MIX, ">")
+    val LANGUAGE = IconLoader.getIcon("/icons/language/elixir.svg")
 
     @JvmField
-    val DISTILLERY = IconLoader.getIcon("/icons/distillery-16.png")
+    val MODULE = IconLoader.getIcon("/icons/module/elixir.svg")
 }
 

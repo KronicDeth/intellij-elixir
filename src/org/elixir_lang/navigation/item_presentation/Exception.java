@@ -1,17 +1,11 @@
 package org.elixir_lang.navigation.item_presentation;
 
 import com.intellij.navigation.ItemPresentation;
-import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.psi.PsiElement;
-import org.elixir_lang.icons.ElixirIcons;
-import org.elixir_lang.psi.ElixirAtom;
+import org.elixir_lang.Icons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 public class Exception implements ItemPresentation {
     /*
@@ -44,7 +38,7 @@ public class Exception implements ItemPresentation {
     @NotNull
     @Override
     public Icon getIcon(boolean unused) {
-        return ElixirIcons.EXCEPTION;
+        return Icons.EXCEPTION;
     }
 
     /**

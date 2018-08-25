@@ -3,7 +3,7 @@ package org.elixir_lang.navigation.item_presentation.modular;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.ui.RowIcon;
 import com.intellij.util.PlatformIcons;
-import org.elixir_lang.icons.ElixirIcons;
+import org.elixir_lang.Icons;
 import org.elixir_lang.navigation.item_presentation.Parent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,7 +21,7 @@ public class Quote implements ItemPresentation, Parent {
     public Icon getIcon(boolean unused) {
         RowIcon rowIcon = new RowIcon(2);
 
-        rowIcon.setIcon(ElixirIcons.MODULE, 0);
+        rowIcon.setIcon(Icons.MODULE, 0);
         rowIcon.setIcon(PlatformIcons.ANONYMOUS_CLASS_ICON, 1);
 
         return rowIcon;

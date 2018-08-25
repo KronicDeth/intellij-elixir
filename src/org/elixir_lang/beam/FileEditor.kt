@@ -14,6 +14,7 @@ import org.elixir_lang.beam.chunk.Chunk
 import org.elixir_lang.beam.chunk.Table
 import org.elixir_lang.beam.chunk.lines.TabbedPane
 import java.beans.PropertyChangeListener
+import javax.swing.Icon
 import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.JTabbedPane
@@ -68,6 +69,10 @@ class FileEditor(
 
     private fun addTab(tabbedPane: JBTabbedPane, cache: Cache, chunk: Chunk) {
         val typeID = chunk.typeID
+        val icon: Icon? = when (typeID) {
+            Chunk.TypeID.CODE.toString() -> org.elixir_lang.beam.assembly.Icons.LANGUAGE
+            else -> null
+        }
         val component: JComponent = when (typeID) {
             Chunk.TypeID.ATOM.toString(), Chunk.TypeID.ATU8.toString() ->
                 JBScrollPane(Table(org.elixir_lang.beam.chunk.atoms.Model(cache.atoms)))
@@ -104,6 +109,6 @@ class FileEditor(
                 JBScrollPane(JPanel())
         }
 
-        tabbedPane.addTab(typeID, component)
+        tabbedPane.addTab(typeID, icon, component)
     }
 }

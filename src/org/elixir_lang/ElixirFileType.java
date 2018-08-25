@@ -1,7 +1,6 @@
 package org.elixir_lang;
 
 import com.intellij.openapi.fileTypes.LanguageFileType;
-import org.elixir_lang.icons.ElixirIcons;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -38,7 +37,7 @@ public class ElixirFileType extends LanguageFileType {
     @NotNull
     @Override
     public Icon getIcon() {
-        return ElixirIcons.FILE;
+        return Icons.FILE;
     }
 
     public static class ElixirScriptFileType extends ElixirFileType{
@@ -63,7 +62,7 @@ public class ElixirFileType extends LanguageFileType {
         @NotNull
         @Override
         public Icon getIcon() {
-            return ElixirIcons.FILE;
+            return Icons.FILE;
         }
     }
 }

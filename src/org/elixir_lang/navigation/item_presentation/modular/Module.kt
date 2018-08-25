@@ -1,7 +1,7 @@
 package org.elixir_lang.navigation.item_presentation.modular
 
 import com.intellij.navigation.ItemPresentation
-import org.elixir_lang.icons.ElixirIcons
+import org.elixir_lang.Icons
 import org.elixir_lang.navigation.item_presentation.Parent
 import org.elixir_lang.psi.call.Call
 import org.jetbrains.annotations.Contract
@@ -18,7 +18,7 @@ open class Module(private val location: String?, protected val call: Call) : Ite
      *
      * @param unused Used to mean if open/close icons for tree renderer. No longer in use. The parameter is only there for API compatibility reason.
      */
-    override fun getIcon(unused: Boolean): Icon = ElixirIcons.MODULE
+    override fun getIcon(unused: Boolean): Icon = Icons.MODULE
 
     /**
      * Combines [.getLocationString] with [.getPresentableText] for when this Module is the parent of

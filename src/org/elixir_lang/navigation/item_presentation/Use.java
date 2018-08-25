@@ -1,11 +1,8 @@
 package org.elixir_lang.navigation.item_presentation;
 
-import com.intellij.codeInsight.template.postfix.templates.StringBasedPostfixTemplate;
 import com.intellij.navigation.ItemPresentation;
-import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiElement;
-import org.elixir_lang.icons.ElixirIcons;
-import org.elixir_lang.psi.call.Call;
+import org.elixir_lang.Icons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,7 +42,7 @@ public class Use implements ItemPresentation {
     @Override
     public Icon getIcon(boolean unused) {
         // TODO make a custom `ElixirIcons.USE` Icon
-        return ElixirIcons.Time.COMPILE;
+        return Icons.Time.COMPILE;
     }
 
     /**
