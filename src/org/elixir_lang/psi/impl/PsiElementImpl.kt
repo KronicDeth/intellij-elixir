@@ -31,12 +31,12 @@ tailrec fun PsiElement.selfOrEnclosingMacroCall(): Call? =
                         parent.let { it as? ElixirMatchedParenthesesArguments }?.
                         parent.let { it as?  Call }?.
                         let { call ->
-                            if (call.isCalling("Enum", "map") ||
-                                        call.isCalling("Enum", "each")) {
-                                    call
-                                } else {
-                                    null
-                                }
+                            if (call.resolvedModuleName() == "Enum" &&
+                                    call.functionName() in arrayOf("each", "map", "reduce")) {
+                                call
+                            } else {
+                                null
+                            }
                         }?.
                         parent?.
                         selfOrEnclosingMacroCall()
