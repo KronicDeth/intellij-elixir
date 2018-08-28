@@ -78,6 +78,7 @@
                          parentId="language"
                          provider="org.elixir_lang.facet.configurable.Provider"/>
     <project.converterProvider implementation="org.elixir_lang.facet.conversion.Provider"/>
+    <project.converterProvider implementation="org.elixir_lang.facet.external_library.conversion.Provider"/>
 
     <facetType implementation="org.elixir_lang.facet.Type"/>
     <framework.detector implementation="org.elixir_lang.FrameworkDetector"/>

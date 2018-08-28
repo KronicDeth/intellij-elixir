@@ -24,6 +24,12 @@ import org.elixir_lang.facet.sdk.Editor
 import javax.swing.JComponent
 import javax.swing.JPanel
 
+fun Library.ModifiableModel.addRoots(sdk: Sdk) =
+        sdk
+                .rootProvider
+                .getFiles(OrderRootType.CLASSES)
+                .let { addRoots(it) }
+
 abstract class Configurable: SearchableConfigurable, com.intellij.openapi.options.Configurable.NoScroll {
     internal val sdksService by lazy { SdksService.getInstance()!! }
     private val projectSdksModel by lazy { sdksService.getModel() }
@@ -188,12 +194,6 @@ abstract class Configurable: SearchableConfigurable, com.intellij.openapi.option
         sdkPanel.select(selectedEditor, true)
     }
 }
-
-private fun Library.ModifiableModel.addRoots(sdk: Sdk) =
-        sdk
-                .rootProvider
-                .getFiles(OrderRootType.CLASSES)
-                .let { addRoots(it) }
 
 private fun Library.ModifiableModel.addRoots(roots: Array<VirtualFile>) =
         roots.forEach {
