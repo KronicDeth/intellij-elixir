@@ -166,6 +166,9 @@ Table of Contents
 
 ### Bug Fixes
 * [#1233](https://github.com/KronicDeth/intellij-elixir/pull/1233) - Look above `Enum.reduce` for enclosing macro call. - [@KronicDeth](https://github.com/KronicDeth)
+* [#1234](https://github.com/KronicDeth/intellij-elixir/pull/1234) - [@KronicDeth](https://github.com/KronicDeth)
+  * Add Facet SDK as External Library to re-enable indexing.  When the External Library was removed in [4297287](https://github.com/KronicDeth/intellij-elixir/commit/42972876c219e9da7283513bc5677e5121b5e0fe) in favor of a real SDK, completion for SDK `.beam` modules was lost because Small IDEs don't index SDKs, but only External Libraries, so add Application-wide External Libraries for SDKs when they are created (and update, remove on edit or delete), which are then added as a Dependency for the facet's module when the SDK is set for the Small IDE project.
+    * Convert old modules with Elixir facets to also have External Library, so that users don't need to remove and add the SDKs to get the External Library.
 
 ## v8.0.0
 

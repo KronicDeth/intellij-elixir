@@ -19,6 +19,21 @@
     <p>Bug Fixes</p>
     <ul>
       <li>Look above <code>Enum.reduce</code> for enclosing macro call.</li>
+      <li>
+        Add Facet SDK as External Library to re-enable indexing.  When the External Library was removed in
+        <a href="https://github.com/KronicDeth/intellij-elixir/commit/42972876c219e9da7283513bc5677e5121b5e0fe">
+          <tt>4297287</tt>
+        </a> in favor of a real SDK, completion for SDK <code>.beam</code> modules was lost because Small IDEs don't
+        index SDKs, but only External Libraries, so add Application-wide External Libraries for SDKs when they are
+        created (and update, remove on edit or delete), which are then added as a Dependency for the facet's module when
+        the SDK is set for the Small IDE project.
+        <ul>
+          <li>
+            Convert old modules with Elixir facets to also have External Library, so that users don't need to remove and
+            add the SDKs to get the External Library.
+          </li>
+        </ul>
+      </li>
     </ul>
   </li>
 </ul>
@@ -1127,62 +1142,6 @@
     <p>Incompatible Changes</p>
     <ul>
       <li>Drop support for IntelliJ IDEA before 2016.3</li>
-    </ul>
-  </li>
-</ul>
-<h1>v6.7.0</h1>
-<ul>
-  <li>
-    <p>Enhancements</p>
-    <ul>
-      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/580" >#580</a></li>
-      <li><code>{EOL}|.</code> -&gt; <code>{ANY}</code> in <code>Elixir.flex</code></li>
-      <li>
-        Convert (some) unimportant newlines from <code>EOL</code> to <code>WHITE_SPACE</code> token, as GrammarKit is
-        smarter about reparsing when only <code>WHITE_SPACE</code> changes in size.
-        <ul>
-          <li>After
-            <ul>
-              <li><code>fn</code></li>
-              <li><code>do</code></li>
-              <li><code>-&gt;</code></li>
-              <li>
-                block identifier (<code>after</code>, <code>catch</code>, <code>else</code>, and <code>rescue</code>)
-              </li>
-              <li>keyword pair colon</li>
-              <li><code>(</code></li>
-            </ul>
-          </li>
-          <li>Before
-            <ul>
-              <li>Comments</li>
-            </ul>
-          </li>
-        </ul>
-      </li>
-    </ul>
-  </li>
-  <li>
-    <p>Bug Fixes</p>
-    <ul>
-      <li>
-        <p>
-          Remove <code>!stabOperationPrefix</code> before <code>expression</code>, since
-          <code>stabOperationPrefix</code> itself starts with <code>expression</code> and instead put a negative
-          look-ahead, <code>!(infixComma | stabInfixOperator)</code> after<br>
-          <code>expression</code>.  This now works when it previously didn't because <code>COMMA</code> was added to
-          <code>expressionRecoverUntil</code>, which means both <code>COMMA</code> and <code>STAB_OPERATOR</code> are
-          now in both not eaten by <code>expression</code>'s error recovery.
-        </p>
-        <p>
-          This drops Fn1 through Fn8 to ~176ms instead of the previous time of the last optimization of 13 seconds for
-          Fn8.  It started at 26 seconds and now it appears that the time no longer grows with the number of
-          <code>fn</code>.  It also eliminates the pause when hitting entering inside the <code>fn</code> nesting.
-        </p>
-        <p>
-          <a href="https://docs.google.com/spreadsheets/d/1mASN4BB3IAd5ZLQR5dz0Tzx2Yl-w4g5VUjz3bgd5kD4/edit?usp=sharing">Data and Chart</a>
-        </p>
-      </li>
     </ul>
   </li>
 </ul>
