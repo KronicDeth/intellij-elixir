@@ -1,9 +1,8 @@
 <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
 <rect width="10" height="14" fill="black" fill-opacity="0" transform="translate(6 2) scale(2)"/>
-<rect x="16" y="2" width="10" height="10" fill="#C4C4C4"/>
-<path d="M14 10V2L6 10H14Z" fill="#C4C4C4"/>
-<rect x="6" y="12" width="20" height="18" fill="#C4C4C4"/>
-<rect width="8" height="8" fill="black" fill-opacity="0" transform="translate(16 16) scale(2)"/>
+<rect x="16" y="2" width="10" height="10" fill="#AEB9C0"/>
+<path d="M14 10V2L6 10H14Z" fill="#AEB9C0"/>
+<rect x="6" y="12" width="20" height="18" fill="#AEB9C0"/>
 <path d="M16 24L32 16V18.67L16 24Z" fill="#A91E3B"/>
 <path d="M16 24L32 18.67V21.34L16 24Z" fill="#460075"/>
 <path d="M32 24V21.33L16 24H32Z" fill="#6787C5"/>
