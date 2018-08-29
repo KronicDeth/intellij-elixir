@@ -1,8 +1,9 @@
 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g clip-path="url(#clip0)">
-<rect x="8" y="1" width="5" height="5" fill="#C4C4C4"/>
-<path d="M7 5V1L3 5H7Z" fill="#C4C4C4"/>
-<rect x="3" y="6" width="10" height="9" fill="#C4C4C4"/>
+<rect width="10" height="14" fill="black" fill-opacity="0" transform="translate(3 1)"/>
+<rect x="8" y="1" width="5" height="5" fill="#AEB9C0"/>
+<path d="M7 5V1L3 5H7Z" fill="#AEB9C0"/>
+<rect x="3" y="6" width="10" height="9" fill="#AEB9C0"/>
 <rect width="16" height="13" fill="black" fill-opacity="0" transform="translate(0 8)"/>
 <rect width="5" height="8" fill="black" fill-opacity="0" transform="translate(11 8)"/>
 <path fill-rule="evenodd" clip-rule="evenodd" d="M13.721 8C13.1596 8.20654 12.6176 8.80936 12.095 9.80848C11.3112 11.3071 10.2989 13.4368 11.6929 15.1229C12.3378 15.903 13.4026 16.3634 14.8 15.6342C15.9226 15.0485 16.2348 13.3675 15.8317 12.5775C15.0004 10.9481 14.1569 10.5462 13.9311 9.53564C13.7805 8.86196 13.7105 8.35008 13.721 8Z" fill="#460075"/>
