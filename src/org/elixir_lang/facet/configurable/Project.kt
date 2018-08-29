@@ -7,6 +7,8 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.Sdk
+import com.intellij.openapi.roots.ModuleRootModificationUtil
+import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
 import org.elixir_lang.Facet
 import org.elixir_lang.facet.Configurable
 import org.elixir_lang.facet.Type
@@ -26,9 +28,23 @@ class Project(project: Project) : ModuleAwareProjectConfigurable<Configurable>(p
                 if (facet == null) {
                     ApplicationManager.getApplication().runWriteAction {
                         addFacet(facetManager, sdk)
+
+                        if (sdk != null) {
+                            LibraryTablesRegistrar.getInstance().libraryTable.getLibraryByName(sdk.name)!!.let { library ->
+                                ModuleRootModificationUtil.addDependency(module, library)
+                            }
+                        }
                     }
                 } else {
                     setFacetSdk(facet, sdk)
+
+                    ApplicationManager.getApplication().runWriteAction {
+                        if (sdk != null) {
+                            LibraryTablesRegistrar.getInstance().libraryTable.getLibraryByName(sdk.name)!!.let { library ->
+                                ModuleRootModificationUtil.addDependency(module, library)
+                            }
+                        }
+                    }
                 }
             }
 
