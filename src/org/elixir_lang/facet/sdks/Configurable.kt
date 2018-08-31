@@ -119,9 +119,9 @@ abstract class Configurable: SearchableConfigurable, com.intellij.openapi.option
             }
 
             override fun sdkAdded(sdk: Sdk) {
-                LibraryTablesRegistrar.getInstance().libraryTable.createLibrary(sdk.name).let { library ->
+                LibraryTablesRegistrar.getInstance().libraryTable.let { libraryTable ->
                     ApplicationManager.getApplication().runWriteAction {
-                        library.modifiableModel.apply {
+                        libraryTable.createLibrary(sdk.name).modifiableModel.apply {
                             addRoots(sdk)
                             commit()
                         }
