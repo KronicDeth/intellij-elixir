@@ -163,6 +163,7 @@ Table of Contents
 ### Enhancements
 * [#1226](https://github.com/KronicDeth/intellij-elixir/pull/1226) - Flat icons to match [IntelliJ IDEA 2018.2 design rules](https://blog.jetbrains.com/blog/2018/06/26/new-icons-in-intellij-platform-2018-2/).  Thanks to [@nk8](https://github.com/nk8) for consulting on the design and showing me how to use Figma. - [@KronicDeth](https://github.com/KronicDeth), [@nk8](https://github.com/nk8)
 * [#1233](https://github.com/KronicDeth/intellij-elixir/pull/1233) - Regression test for [#1228](https://github.com/KronicDeth/intellij-elixir/issues/1228) - [@KronicDeth](https://github.com/KronicDeth)
+* [#1239](https://github.com/KronicDeth/intellij-elixir/pull/1239) - Use icon provided by Lidiya Chernigovskaya ([@LChernigovskaya](https://github.com/LChernigovskaya)) and created by JetBrains UX (Alina Mishina) for `pluginIcon` compatibility with IntelliJ IDEA 2018.3. - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#1233](https://github.com/KronicDeth/intellij-elixir/pull/1233) - Look above `Enum.reduce` for enclosing macro call. - [@KronicDeth](https://github.com/KronicDeth)
