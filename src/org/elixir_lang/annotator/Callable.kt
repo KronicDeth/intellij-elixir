@@ -13,6 +13,7 @@ import org.elixir_lang.ElixirSyntaxHighlighter
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.AtNonNumericOperation
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
+import org.elixir_lang.psi.UnqualifiedBracketOperation
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.call.name.Module.KERNEL_SPECIAL_FORMS
@@ -73,8 +74,9 @@ class Callable : Annotator, DumbAware {
                     }
 
                     override fun visitElement(element: PsiElement) {
-                        if (element is Call) {
-                            visitCall(element)
+                        when (element) {
+                            is Call -> visitCall(element)
+                            is UnqualifiedBracketOperation -> visitUnqualifiedBracketOperation(element)
                         }
                     }
 
@@ -139,6 +141,18 @@ class Callable : Annotator, DumbAware {
 
                             if (textAttributeKey != null) {
                                 highlight(functionNameElement, holder, textAttributeKey)
+                            }
+                        }
+                    }
+
+                    private fun visitUnqualifiedBracketOperation(unqualifiedBracketOperation: UnqualifiedBracketOperation) {
+                        val identifier = unqualifiedBracketOperation.identifier
+
+                        identifier.reference?.let { it as PsiPolyVariantReference }?.let { reference ->
+                            val resolvedElements = reference.multiResolve(false).filter { it.isValidResult }.map { (it as PsiElementResolveResult).element }
+
+                            if (resolvedElements.isNotEmpty()) {
+                                highlight(identifier, reference.rangeInElement, resolvedElements, holder)
                             }
                         }
                     }
@@ -218,7 +232,7 @@ class Callable : Annotator, DumbAware {
             callHighlight(resolved, acc)
         }
 
-    private fun highlight(referrer: Call,
+    private fun highlight(referrer: PsiElement,
                           rangeInReferrer: TextRange,
                           resolvedCollection: Collection<PsiElement>,
                           annotationHolder: AnnotationHolder) {
