@@ -174,6 +174,9 @@ Table of Contents
   * Use #AEB9C0 for JetBrains Default/Light Gray.  Use #87939A for JetBrains Darcula Gray.  Colors based on IntelliJ's color picker picking its own colors.
 
     Icon matching testing done under both themes in 2018.2.1.  Weirdly, the colors are different in the SVGs in my intellij-community@master.  Hopefully, this doesn't mean the colors change again in 2018.3.
+* [#1244](https://github.com/KronicDeth/intellij-elixir/pull/1244) - [@KronicDeth](https://github.com/KronicDeth)
+  * Run `createLibrary` inside `runWriteAction`.
+  * Remove test that leaks threads and so causes builds to fail.
 
 ## v8.0.0
 
