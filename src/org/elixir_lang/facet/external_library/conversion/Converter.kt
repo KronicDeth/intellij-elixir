@@ -22,12 +22,10 @@ class Converter : ProjectConverter() {
 
         missingLibraryNameSet().forEach { missingLibraryName ->
             SdksService.getInstance()!!.getModel().findSdk(missingLibraryName)!!.let { sdk ->
-                libraryTable.createLibrary(sdk.name).let { library ->
-                    ApplicationManager.getApplication().runWriteAction {
-                        library.modifiableModel.apply {
-                            addRoots(sdk)
-                            commit()
-                        }
+                ApplicationManager.getApplication().runWriteAction {
+                    libraryTable.createLibrary(sdk.name).modifiableModel.apply {
+                        addRoots(sdk)
+                        commit()
                     }
                 }
             }
