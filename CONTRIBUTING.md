@@ -42,6 +42,7 @@
 8. When the "Import Gradle Projects" dialog pops up
    1. Leave "intellij-elixir" checked.  You can remove the old main module:<br/>
      ![Remove module](/screenshots/contributing/remove_module.png?raw=true "Remove module")
+9. Install [Kotlin Plugin](https://plugins.jetbrains.com/plugin/6954-kotlin)
 
 ### Building and running
 
