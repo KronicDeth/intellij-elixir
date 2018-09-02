@@ -6,6 +6,12 @@
     <p>Bug Fixes</p>
     <ul>
       <li>Specify that Kotlin Plugin is needed in <code>CONTRIBUTING.md</code>, so IntelliJ plays nice.</li>
+      <li>
+        Resolve unqualified bracket operation identifiers (<code>var</code> in <code>var[key]</code>) to variables or <code>0</code>-arity calls.
+        <ul>
+          <li>Fixes renames of variables not renaming usage of variables for Access lookups (i.e. <code>var[key]</code>).</li>
+        </ul>
+      </li>
     </ul>
   </li>
 </ul>

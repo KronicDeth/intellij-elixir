@@ -165,6 +165,9 @@ Table of Contents
 
 ### Bug Fixes
 * [#1245](https://github.com/KronicDeth/intellij-elixir/pull/1245) - Specify that Kotlin Plugin is needed in `CONTRIBUTING.md`, so IntelliJ plays nice. - [@sfat](https://github.com/sfat)
+* [#1246](https://github.com/KronicDeth/intellij-elixir/pull/1246) - [@KronicDeth](https://github.com/KronicDeth)
+  * Resolve unqualified bracket operation identifiers (`var` in `var[key]`) to variables or `0`-arity calls.
+    * Fixes renames of variables not renaming usage of variables for Access lookups (i.e. `var[key]`).
 
 ## v8.1.0
 
