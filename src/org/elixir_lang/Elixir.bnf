@@ -652,6 +652,7 @@ identifier ::= IDENTIFIER_TOKEN
                  implements = "org.elixir_lang.psi.Quotable"
                  methods = [
                    getPresentation
+                   getReference
                    quote
                  ]
                }

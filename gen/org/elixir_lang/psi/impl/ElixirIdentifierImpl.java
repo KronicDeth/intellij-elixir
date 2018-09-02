@@ -6,6 +6,7 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.PsiReference;
 import org.elixir_lang.psi.ElixirIdentifier;
 import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
@@ -29,6 +30,11 @@ public class ElixirIdentifierImpl extends ASTWrapperPsiElement implements Elixir
   @Nullable
   public ItemPresentation getPresentation() {
     return ElixirPsiImplUtil.getPresentation(this);
+  }
+
+  @Nullable
+  public PsiReference getReference() {
+    return ElixirPsiImplUtil.getReference(this);
   }
 
   @NotNull

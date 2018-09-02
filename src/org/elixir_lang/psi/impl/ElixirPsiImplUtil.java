@@ -1103,6 +1103,11 @@ public class ElixirPsiImplUtil {
     }
 
     @Nullable
+    public static PsiReference getReference(@NotNull ElixirIdentifier identifier) {
+        return ElixirIdentifierImplKt.getReference(identifier);
+    }
+
+    @Nullable
     public static PsiReference getReference(@NotNull NonNumeric nonNumeric) {
         return NonNumericImplKt.getReference(nonNumeric);
     }

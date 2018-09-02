@@ -7,6 +7,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.annotator.Parameter
+import org.elixir_lang.psi.ElixirIdentifier
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.Named
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
@@ -83,20 +84,26 @@ class Variants : CallDefinitionClause() {
 
         @JvmStatic
         fun lookupElementList(entrance: Call): List<LookupElement> {
-            val variants = Variants()
-
             val parameter = Parameter.putParameterized(Parameter(entrance))
-            var entranceCallDefinitionClause: Call? = null
-
-            if (parameter.isCallDefinitionClauseName) {
-                entranceCallDefinitionClause = parameter.parameterized as Call?
+            val entranceCallDefinitionClause: Call? = if (parameter.isCallDefinitionClauseName) {
+                parameter.parameterized as Call?
+            } else {
+                null
             }
+
+            return lookupElementList(entrance, entranceCallDefinitionClause)
+        }
+
+        @JvmStatic
+        fun lookupElementList(entrance: ElixirIdentifier): List<LookupElement> = lookupElementList(entrance, null)
+
+        private fun lookupElementList(entrance: PsiElement, entranceCallDefinitionClause: Call?): List<LookupElement> {
+            val variants = Variants()
 
             val resolveState = ResolveState
                     .initial()
                     .put(ENTRANCE, entrance)
                     .put(ENTRANCE_CALL_DEFINITION_CLAUSE, entranceCallDefinitionClause)
-
             PsiTreeUtil.treeWalkUp(
                     variants,
                     entrance,
