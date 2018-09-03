@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class Quote implements Modular {
     @NotNull
-    private final CallDefinitionClause callDefinitionClause;
+    public final CallDefinitionClause callDefinitionClause;
 
     /*
      * Constructors

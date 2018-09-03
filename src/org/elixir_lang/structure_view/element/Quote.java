@@ -23,7 +23,7 @@ public class Quote extends Element<Call> {
      */
 
     @Nullable
-    private final Presentable parent;
+    public final Presentable parent;
 
     /*
      * Static Methods

@@ -7,7 +7,6 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.util.ArrayUtil
-import com.intellij.util.containers.ContainerUtil
 import org.elixir_lang.Visibility
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
@@ -52,7 +51,7 @@ class GotoSymbolContributor : ChooseByNameContributor {
         val scope = globalSearchScope(project, includeNonProjectItems)
 
         val result = StubIndex.getElements(AllName.KEY, name, project, scope, NamedElement::class.java)
-        val items = ContainerUtil.newArrayListWithCapacity<NavigationItem>(result.size)
+        val items = SourcePreferredItems()
         val enclosingModularByCall = EnclosingModularByCall()
         val callDefinitionByTuple = HashMap<CallDefinition.Tuple, CallDefinition>()
 
@@ -75,7 +74,7 @@ class GotoSymbolContributor : ChooseByNameContributor {
     }
 
     private fun getItemsByNameFromCall(name: String,
-                                       items: MutableList<NavigationItem>,
+                                       items: SourcePreferredItems,
                                        enclosingModularByCall: EnclosingModularByCall,
                                        callDefinitionByTuple: MutableMap<CallDefinition.Tuple, CallDefinition>,
                                        call: Call) {
@@ -90,7 +89,7 @@ class GotoSymbolContributor : ChooseByNameContributor {
         }
     }
 
-    private fun getItemsFromCallback(items: MutableList<NavigationItem>,
+    private fun getItemsFromCallback(items: SourcePreferredItems,
                                      enclosingModularByCall: EnclosingModularByCall,
                                      call: Call) {
         enclosingModularByCall.putNew(call)?.let { Callback(it, call) }?.run {
@@ -100,7 +99,7 @@ class GotoSymbolContributor : ChooseByNameContributor {
     }
 
     private fun getItemsFromCallDefinitionClause(
-            items: MutableList<NavigationItem>,
+            items: SourcePreferredItems,
             enclosingModularByCall: EnclosingModularByCall,
             callDefinitionByTuple: MutableMap<CallDefinition.Tuple, CallDefinition>,
             call: Call
@@ -130,7 +129,7 @@ class GotoSymbolContributor : ChooseByNameContributor {
     }
 
     private fun getItemsFromCallDefinitionHead(
-            items: MutableList<NavigationItem>,
+            items: SourcePreferredItems,
             enclosingModularByCall: EnclosingModularByCall,
             callDefinitionByTuple: MutableMap<CallDefinition.Tuple, CallDefinition>,
             call: Call
@@ -178,7 +177,7 @@ class GotoSymbolContributor : ChooseByNameContributor {
         }
     }
 
-    private fun getItemsFromCallDefinitionSpecification(items: MutableList<NavigationItem>,
+    private fun getItemsFromCallDefinitionSpecification(items: SourcePreferredItems,
                                                         enclosingModularByCall: EnclosingModularByCall,
                                                         call: Call) {
         enclosingModularByCall.putNew(call)?.let { modular ->
@@ -195,7 +194,7 @@ class GotoSymbolContributor : ChooseByNameContributor {
     }
 
     private fun getItemsFromImplementation(name: String,
-                                           items: MutableList<NavigationItem>,
+                                           items: SourcePreferredItems,
                                            enclosingModularByCall: EnclosingModularByCall,
                                            call: Call) {
         val modular = enclosingModularByCall.putNew(call)
@@ -219,7 +218,7 @@ class GotoSymbolContributor : ChooseByNameContributor {
         }
     }
 
-    private fun getItemsFromModule(items: MutableList<NavigationItem>,
+    private fun getItemsFromModule(items: SourcePreferredItems,
                                    enclosingModularByCall: EnclosingModularByCall,
                                    call: Call) {
         enclosingModularByCall.putNew(call).let { Module(it, call) }.run {
@@ -227,7 +226,7 @@ class GotoSymbolContributor : ChooseByNameContributor {
         }
     }
 
-    private fun getItemsFromProtocol(items: MutableList<NavigationItem>,
+    private fun getItemsFromProtocol(items: SourcePreferredItems,
                                      enclosingModularByCall: EnclosingModularByCall,
                                      call: Call) {
         enclosingModularByCall.putNew(call).let { Protocol(it, call) }.run {

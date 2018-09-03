@@ -25,7 +25,7 @@ import java.util.*
  * @param callDefinition holds all sibling clauses for `call` for the same name, arity. and time
  * @param call           a def(macro)?p? call
  */
-class CallDefinitionClause(private val callDefinition: CallDefinition, call: Call) :
+class CallDefinitionClause(val callDefinition: CallDefinition, call: Call) :
         Element<Call>(call), Presentable, Visible {
     private val visibility: Visibility = visibility(call)!!
 
