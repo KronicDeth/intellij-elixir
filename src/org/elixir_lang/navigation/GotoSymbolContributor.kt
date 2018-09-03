@@ -210,9 +210,7 @@ class GotoSymbolContributor : ChooseByNameContributor {
                     items.add(forNameOverriddenImplementation)
                 }
             }
-        }
-
-        if (forNameCollection == null || forNameCollection.size < 2) {
+        } else {
             val implementation = Implementation(modular, call)
             items.add(implementation)
         }
