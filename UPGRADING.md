@@ -16,6 +16,10 @@
 
 # Upgrading
 
+## v9.0.0
+
+If you depended on the ability of go to either the source or decompiled module or function from Go To Symbol or Go To Declaration, you now need to open the `.beam` file directly using Find File or the Project Tool pane.
+
 ## v6.0.0
 
 IntelliJ IDEA `v14.1.X` is no longer supported because [it lacked the necessary APIs to support concurrent test tracking](https://github.com/KronicDeth/intellij-elixir/pull/732) in the Test Results pane.  You will need to update to a newer version (15+) of IntelliJ IDEA or equivalent JetBrains IDE generation.

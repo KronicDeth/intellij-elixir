@@ -1,17 +1,19 @@
+
 Table of Contents
 =================
 
    * [Table of Contents](#table-of-contents)
    * [Changelog](#changelog)
-      * [v8.1.1](#v811)
+      * [v9.0.0](#v900)
          * [Bug Fixes](#bug-fixes)
+         * [Incompatible Changes](#incompatible-changes)
       * [v8.1.0](#v810)
          * [Enhancements](#enhancements)
          * [Bug Fixes](#bug-fixes-1)
       * [v8.0.0](#v800)
          * [Enhancements](#enhancements-1)
          * [Bug Fixes](#bug-fixes-2)
-         * [Incompatible Changes](#incompatible-changes)
+         * [Incompatible Changes](#incompatible-changes-1)
       * [v7.5.0](#v750)
          * [Enhancements](#enhancements-2)
          * [Bug Fixes](#bug-fixes-3)
@@ -32,7 +34,7 @@ Table of Contents
       * [v7.0.0](#v700)
          * [Enhancements](#enhancements-7)
          * [Bug Fixes](#bug-fixes-9)
-      * [Incompatible Changes](#incompatible-changes-1)
+      * [Incompatible Changes](#incompatible-changes-2)
       * [v6.7.0](#v670)
          * [Enhancements](#enhancements-8)
          * [Bug Fixes](#bug-fixes-10)
@@ -61,14 +63,14 @@ Table of Contents
       * [v6.0.0](#v600)
          * [Enhancements](#enhancements-15)
          * [Bug Fixes](#bug-fixes-19)
-         * [Incompatible Changes](#incompatible-changes-2)
+         * [Incompatible Changes](#incompatible-changes-3)
       * [v5.1.0](#v510)
          * [Enhancements](#enhancements-16)
          * [Bug Fixes](#bug-fixes-20)
       * [v5.0.0](#v500)
          * [Enhancements](#enhancements-17)
          * [Bug Fixes](#bug-fixes-21)
-         * [Incompatible Changes](#incompatible-changes-3)
+         * [Incompatible Changes](#incompatible-changes-4)
       * [v4.7.0](#v470)
          * [Enhancements](#enhancements-18)
          * [Bug Fixes](#bug-fixes-22)
@@ -92,13 +94,13 @@ Table of Contents
       * [v4.0.0](#v400)
          * [Enhancements](#enhancements-25)
          * [Bug Fixes](#bug-fixes-28)
-         * [Incompatible Changes](#incompatible-changes-4)
+         * [Incompatible Changes](#incompatible-changes-5)
       * [v3.0.1](#v301)
          * [Bug Fixes](#bug-fixes-29)
       * [v3.0.0](#v300)
          * [Enhancements](#enhancements-26)
          * [Bug Fixes](#bug-fixes-30)
-         * [Incompatible Changes](#incompatible-changes-5)
+         * [Incompatible Changes](#incompatible-changes-6)
       * [v2.2.0](#v220)
          * [Enhancement](#enhancement)
          * [Bug Fixes](#bug-fixes-31)
@@ -108,7 +110,7 @@ Table of Contents
       * [v2.0.0](#v200)
          * [Enhancements](#enhancements-27)
          * [Bug Fixes](#bug-fixes-33)
-         * [Incompatible Changes](#incompatible-changes-6)
+         * [Incompatible Changes](#incompatible-changes-7)
       * [v1.2.1](#v121)
          * [Enhancements](#enhancements-28)
          * [Bug Fixes](#bug-fixes-34)
@@ -134,13 +136,13 @@ Table of Contents
          * [Enhancements](#enhancements-35)
       * [v0.3.0](#v030)
          * [Enhancements](#enhancements-36)
-         * [Incompatible Changes](#incompatible-changes-7)
+         * [Incompatible Changes](#incompatible-changes-8)
       * [v0.2.1](#v021)
          * [Enhancements](#enhancements-37)
          * [Bug Fixes](#bug-fixes-39)
       * [v0.2.0](#v020)
          * [Enhancements](#enhancements-38)
-         * [Incompatible Changes](#incompatible-changes-8)
+         * [Incompatible Changes](#incompatible-changes-9)
       * [v0.1.4](#v014)
          * [Enhancements](#enhancements-39)
          * [Bug Fixes](#bug-fixes-40)
@@ -161,13 +163,22 @@ Table of Contents
 
 # Changelog
 
-## v8.1.1
+## v9.0.0
 
 ### Bug Fixes
 * [#1245](https://github.com/KronicDeth/intellij-elixir/pull/1245) - Specify that Kotlin Plugin is needed in `CONTRIBUTING.md`, so IntelliJ plays nice. - [@sfat](https://github.com/sfat)
 * [#1246](https://github.com/KronicDeth/intellij-elixir/pull/1246) - [@KronicDeth](https://github.com/KronicDeth)
   * Resolve unqualified bracket operation identifiers (`var` in `var[key]`) to variables or `0`-arity calls.
     * Fixes renames of variables not renaming usage of variables for Access lookups (i.e. `var[key]`).
+* [#1248](https://github.com/KronicDeth/intellij-elixir/pull/1248) - [@KronicDeth](https://github.com/KronicDeth)
+  * Go To Symbol will no longer show redundant entries
+    * Call Definitions (`name/arity`) is no longer shown if the Call Definition Clause is also included.  This isn't a large loss because the `/arity` was not searchable and only part of the presentation.
+    * If there is a decompiled and a source version of a symbol, only the source version will be shown.
+      * The source Implementation will be shown and not the decompiled Module with the same fully-qualified name (`<protocol>.<for>`).
+    * Items will be deduped if they point to the same element, such as function clauses with default arguments because when presented they look the same even if internally one is representing `/1` and `/2`, for example.
+
+### Incompatible Changs
+* [#1248](https://github.com/KronicDeth/intellij-elixir/pull/1248) Go To Symbol and Go To Declaration will no longer suggest decompiled modules or functions if source modules or functions of the same name or module/name/arity exists. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v8.1.0
 

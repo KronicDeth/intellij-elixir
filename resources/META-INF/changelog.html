@@ -1,16 +1,50 @@
 <html>
 <body>
-<h1>v8.1.1</h1>
+<h1>v9.0.0</h1>
 <ul>
   <li>
     <p>Bug Fixes</p>
     <ul>
       <li>Specify that Kotlin Plugin is needed in <code>CONTRIBUTING.md</code>, so IntelliJ plays nice.</li>
       <li>
-        Resolve unqualified bracket operation identifiers (<code>var</code> in <code>var[key]</code>) to variables or <code>0</code>-arity calls.
+        Resolve unqualified bracket operation identifiers (<code>var</code> in <code>var[key]</code>) to variables or
+        <code>0</code>-arity calls.
         <ul>
-          <li>Fixes renames of variables not renaming usage of variables for Access lookups (i.e. <code>var[key]</code>).</li>
+          <li>
+            Fixes renames of variables not renaming usage of variables for Access lookups (i.e. <code>var[key]</code>).
+          </li>
         </ul>
+      </li>
+      <li>Go To Symbol will no longer show redundant entries
+        <ul>
+          <li>
+            Call Definitions (<code>name/arity</code>) is no longer shown if the Call Definition Clause is also
+            included.  This isn't a large loss because the <code>/arity</code> was not searchable and only part of the
+            presentation.
+          </li>
+          <li>If there is a decompiled and a source version of a symbol, only the source version will be shown.
+            <ul>
+              <li>
+                The source Implementation will be shown and not the decompiled Module with the same fully-qualified name
+                (<code>&lt;protocol&gt;.&lt;for&gt;</code>).
+              </li>
+            </ul>
+          </li>
+          <li>
+            Items will be deduped if they point to the same element, such as function clauses with default arguments
+            because when presented they look the same even if internally one is representing <code>/1</code> and
+            <code>/2</code>, for example.
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Incompatible Changes</p>
+    <ul>
+      <li>
+        Go To Symbol and Go To Declaration will no longer suggest decompiled modules or functions if source modules or
+        functions of the same name or module/name/arity exists.
       </li>
     </ul>
   </li>
