@@ -117,9 +117,7 @@ class GotoSymbolContributor : ChooseByNameContributor {
                 for (arity in arityRange) {
                     val tuple = CallDefinition.Tuple(modular, time, name, arity)
                     callDefinitionByTuple.computeIfAbsent(tuple) { (modular, time, name, arity) ->
-                        CallDefinition(modular, time, name, arity).also {
-                            items.add(it)
-                        }
+                        CallDefinition(modular, time, name, arity)
                     }.clause(call).run {
                         items.add(this)
                     }
