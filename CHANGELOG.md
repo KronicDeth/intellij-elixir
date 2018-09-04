@@ -159,7 +159,7 @@ Table of Contents
          * [Enhancements](#enhancements-42)
       * [v0.0.2](#v002)
          * [Enhancements](#enhancements-43)
-         * [Bug Fixes](#bug-fixes-44)
+         * [Bug Fixes](#bug-fixes-4a)
 
 # Changelog
 
@@ -176,6 +176,7 @@ Table of Contents
     * If there is a decompiled and a source version of a symbol, only the source version will be shown.
       * The source Implementation will be shown and not the decompiled Module with the same fully-qualified name (`<protocol>.<for>`).
     * Items will be deduped if they point to the same element, such as function clauses with default arguments because when presented they look the same even if internally one is representing `/1` and `/2`, for example.
+* [#1249](https://github.com/KronicDeth/intellij-elixir/pull/1249) - Ensure that Go To Declaration for qualified calls such as `Module.function(...)` where `Module` is an alias does not return the decompiled version of `Module` when the source is available. - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Incompatible Changs
 * [#1248](https://github.com/KronicDeth/intellij-elixir/pull/1248) Go To Symbol and Go To Declaration will no longer suggest decompiled modules or functions if source modules or functions of the same name or module/name/arity exists. - [@KronicDeth](https://github.com/KronicDeth)

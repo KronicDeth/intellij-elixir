@@ -37,6 +37,11 @@
           </li>
         </ul>
       </li>
+      <li>
+        Ensures that Go To Declaration for qualified calls such as <code>Module.function(...)</code> where
+        <code>Module</code> is an alias does not return the decompiled version of <code>Module</code> when the source is
+        available.
+      </li>
     </ul>
   </li>
   <li>
@@ -1131,82 +1136,6 @@
         generating another configuration from the context as this ensures the logic matches and includes support for
         <code>PsiDirectory</code>.
       </li>
-    </ul>
-  </li>
-</ul>
-<h1>v7.0.0</h1>
-<ul>
-  <li>
-    <p>Enhancements</p>
-    <ul>
-      <li>
-        Eliminate the majority of the <code>eolStar</code> parser rules around operators where they do not matter
-        leaving only the <code>eolStar</code> after <code>COMMA</code> and the the ones that help differentiate unary
-        and binary <code>+</code>/<code>-</code>.  This simplifies the parser and under certain conditions should
-        prevent reparsing when only <code>WHITE_SPACE</code> changes in size.
-        <ul>
-          <li>
-            Look-ahead in the lexer, where it's cheaper than the parser to see if the next token does not care if
-            there's an <code>EOL</code> or normal <code>WHITE_SPACE</code>.
-          </li>
-          <li>
-            After operators that don't care if they are followed by <code>EOL</code>, try to match all following
-            <code>WHITE_SPACE</code>, <code>ESCAPED_EOL</code> and <code>EOL</code>.
-          </li>
-        </ul>
-      </li>
-      <li>
-        <p>If you want to limit the performance impact of the credo annotator because <code>mix credo</code> spikes your CPU, you can limit the number of <code>mix credo</code> runs to 1 per open file by disabling the Explanation tooltip</p>
-        <ol>
-          <li>Preferences &gt; Editor &gt; Inspections &gt; Credo</li>
-          <li>Uncheck "Include Explanation"</li>
-        </ol>
-        <p>If you don't want the annotator to run at all on open editors, then you can disable the paired<br>
-          inspection</p>
-        <ol>
-          <li>Preferences &gt; Editor &gt; Inspections</li>
-          <li>Uncheck Elixir &gt; Credo</li>
-        </ol>
-        <p>If you've unchecked the inspection, it disables both the annotation and the pair inspection when Analyze &gt; Inspect Code... is run.  You can still run the Credo inspection by name.</p>
-        <ol>
-          <li>Analyze &gt; Run Inspection By Name... (⌥⇧⌘I)</li>
-          <li>Type "Credo"</li>
-          <li>Select "Credo" from the shortened list</li>
-          <li>Hit Enter.</li>
-        </ol>
-        <p>You'll be presented with a "Run 'Credo'" dialog</p>
-        <ol>
-          <li>Change the "Inspection scope" from "Whole project", which would include the <code>deps</code> to "Custom scope"</li>
-          <li>Select "Project Production Files" from the "Custom scope" dropdown</li>
-          <li>Click "OK"</li>
-        </ol>
-      </li>
-      <li>Setup <code>VirtualFilePointerManager</code> during <code>ParsingTestCase</code></li>
-      <li>
-        Put <code>LineMarkerInfo</code> on leaf elements for Method (Call Definition) Separators for a performance
-        improvement.
-      </li>
-      <li>Add IntelliJ IDEA 2017.3 to the build matrix</li>
-    </ul>
-  </li>
-  <li>
-    <p>Bug Fixes</p>
-    <ul>
-      <li>
-        When the SDK changes, record what <code>Release</code> of Elixir is used indirectly, using a <code>Level</code>
-        <code>enum</code> that only cares about the major and minor version. Changing the <code>Level</code>, will mark
-        the open files and .beam files as invalidated, so that if the SDK is changed, the stubs and code
-        <code>Level</code> will agree, so there isn't a stub incompatibility with the PSI.
-      </li>
-      <li>Allow credo section to be empty when processing credo explanations</li>
-      <li>Prevent negative indent as it is not supported in IntelliJ IDEA 2017.3</li>
-      <li>Cleanup SDKs from MixProjectImportBuilderTest</li>
-    </ul>
-  </li>
-  <li>
-    <p>Incompatible Changes</p>
-    <ul>
-      <li>Drop support for IntelliJ IDEA before 2016.3</li>
     </ul>
   </li>
 </ul>
