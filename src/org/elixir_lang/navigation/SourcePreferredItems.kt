@@ -1,5 +1,6 @@
 package org.elixir_lang.navigation
 
+import com.intellij.ide.structureView.StructureViewTreeElement
 import com.intellij.navigation.NavigationItem
 import com.intellij.psi.PsiElement
 import org.elixir_lang.beam.psi.BeamFileImpl
@@ -148,14 +149,24 @@ class SourcePreferredItems  {
         }
     }
 
-    fun toTypedArray(): Array<NavigationItem> =
-            (modularListByName.values.flatten() as List<NavigationItem> +
-                    callDefinitionClauseListByArityByNameByModularName.values.flatMap { it.values.flatMap { it.values.flatten() } } +
-                    callDefinitionListByArityByNameByModularName.values.flatMap { it.values.flatMap { it.values.flatten() } } +
-                    callDefinitionSpecificationList +
-                    callDefinitionHeadListByArityByNameByModularName.values.flatMap { it.values.flatMap { it.values.flatten() } } +
-                    callbackList
-                    ).toTypedArray()
+    fun toTypedArray(): Array<NavigationItem> {
+        val navigationItemList =
+                modularListByName.values.flatten() as List<NavigationItem> +
+                        callDefinitionClauseListByArityByNameByModularName.values.flatMap { it.values.flatMap { it.values.flatten() } } +
+                        callDefinitionListByArityByNameByModularName.values.flatMap { it.values.flatMap { it.values.flatten() } } +
+                        callDefinitionSpecificationList +
+                        callDefinitionHeadListByArityByNameByModularName.values.flatMap { it.values.flatMap { it.values.flatten() } } +
+                        callbackList
+
+        return navigationItemList
+                .distinctBy { navigationItem ->
+                    navigationItem
+                            .let { it as? StructureViewTreeElement }
+                            ?.value
+                            ?: navigationItem
+                }
+                .toTypedArray()
+    }
 
     private val callDefinitionListByArityByNameByModularName = mutableMapOf<ModularName, MutableMap<Name, MutableMap<Arity, MutableList<CallDefinition>>>>()
     private val callDefinitionClauseListByArityByNameByModularName = mutableMapOf<ModularName, MutableMap<Name, MutableMap<Arity, MutableList<CallDefinitionClause>>>>()
