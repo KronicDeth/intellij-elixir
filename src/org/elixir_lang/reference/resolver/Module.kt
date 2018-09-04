@@ -1,13 +1,13 @@
 package org.elixir_lang.reference.resolver
 
 import com.intellij.openapi.project.Project
-import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementResolveResult
 import com.intellij.psi.impl.source.resolve.ResolveCache
 import org.elixir_lang.Reference.forEachNavigationElement
-import org.elixir_lang.beam.psi.BeamFileImpl
+import org.elixir_lang.navigation.isDecompiled
 import org.elixir_lang.psi.scope.module.MultiResolve
 import org.elixir_lang.reference.module.ResolvableName.resolvableName
+
 
 object Module : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Module> {
     override fun resolve(
@@ -52,5 +52,3 @@ object Module : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Modul
         }
     }
 }
-
-private fun PsiElement.isDecompiled(): Boolean = containingFile.originalFile is BeamFileImpl

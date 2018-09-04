@@ -3,11 +3,15 @@ package org.elixir_lang.navigation
 import com.intellij.ide.structureView.StructureViewTreeElement
 import com.intellij.navigation.NavigationItem
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiElementResolveResult
 import org.elixir_lang.beam.psi.BeamFileImpl
 import org.elixir_lang.structure_view.element.*
 import org.elixir_lang.structure_view.element.modular.Modular
 import org.elixir_lang.structure_view.element.modular.Module
 import org.elixir_lang.structure_view.element.modular.Quote
+
+fun <E> List<E>.isDecompiled(): Boolean = all { it!!.isDecompiled() }
+fun PsiElement.isDecompiled(): Boolean = containingFile.originalFile is BeamFileImpl
 
 /**
  * Navigation items for [GotoSymbolContributor.getItemsByName] that will only return Source version if both Source and Decompiled version are added.
@@ -176,14 +180,14 @@ class SourcePreferredItems  {
     private val modularListByName = mutableMapOf<Name, MutableList<Modular>>()
 }
 
-private fun <E> List<E>.isDecompiled(): Boolean = all { it!!.isDecompiled() }
-
 private fun Any.isDecompiled(): Boolean =
     when (this) {
         is CallDefinition -> isDecompiled()
         is CallDefinitionClause -> isDecompiled()
         is Module -> isDecompiled()
-        else -> TODO()
+        is PsiElement -> isDecompiled()
+        is PsiElementResolveResult -> isDecompiled()
+        else -> TODO("Don't know how to check if ${this.javaClass} is decompiled")
     }
 
 private fun CallDefinition.isDecompiled(): Boolean = modular.isDecompiled()
@@ -197,6 +201,7 @@ private fun Modular.isDecompiled(): Boolean =
         }
 
 private fun Module.isDecompiled(): Boolean = (value as PsiElement).containingFile.originalFile is BeamFileImpl
+private fun PsiElementResolveResult.isDecompiled(): Boolean = element.isDecompiled()
 
 typealias ModularName = String
 typealias Name = String

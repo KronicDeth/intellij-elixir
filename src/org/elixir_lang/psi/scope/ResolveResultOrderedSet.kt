@@ -2,6 +2,7 @@ package org.elixir_lang.psi.scope
 
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementResolveResult
+import org.elixir_lang.navigation.isDecompiled
 
 class ResolveResultOrderedSet : Collection<PsiElementResolveResult> {
    override val size: Int
@@ -42,8 +43,27 @@ class ResolveResultOrderedSet : Collection<PsiElementResolveResult> {
    private val resolvedResultList = mutableListOf<PsiElementResolveResult>()
 
    private fun addConfirmedUnique(element: PsiElement, resolveResult: PsiElementResolveResult) {
-      resolvedResultList.add(resolveResult)
-      resolvedSet.add(element)
+      if (resolvedResultList.isDecompiled()) {
+         if (element.isDecompiled()) {
+            // collect all decompiled
+            resolvedResultList.add(resolveResult)
+            resolvedSet.add(element)
+         } else {
+            // prefer source over decompiled
+            resolvedResultList.clear()
+            resolvedSet.add(element)
+            resolvedResultList.add(resolveResult)
+            resolvedSet.add(element)
+         }
+      } else {
+         // ignore decompiled when there is source
+         if (!element.isDecompiled()) {
+            // collect all source
+            resolvedResultList.add(resolveResult)
+            resolvedSet.add(element)
+         }
+      }
+
    }
 
    private fun hasValidResult() = any { it.isValidResult }
