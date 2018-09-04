@@ -48,14 +48,10 @@ public class GotoSymbolContributorTest extends LightPlatformCodeInsightFixtureTe
                 false
         );
 
-        assertEquals(2, itemsByName.length);
+        assertEquals(1, itemsByName.length);
 
-        assertInstanceOf(itemsByName[0], CallDefinition.class);
-        CallDefinition callDefinition = (CallDefinition) itemsByName[0];
-        assertEquals("decode_auth_type", callDefinition.name());
-
-        assertInstanceOf(itemsByName[1], CallDefinitionClause.class);
-        CallDefinitionClause callDefinitionClause = (CallDefinitionClause) itemsByName[1];
+        assertInstanceOf(itemsByName[0], CallDefinitionClause.class);
+        CallDefinitionClause callDefinitionClause = (CallDefinitionClause) itemsByName[0];
         assertEquals("decode_auth_type", callDefinitionClause.getName());
     }
 

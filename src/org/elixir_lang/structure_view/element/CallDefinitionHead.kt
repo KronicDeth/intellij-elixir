@@ -14,7 +14,7 @@ import org.elixir_lang.psi.impl.PsiNamedElementImpl.unquoteName
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.operation.Normalized.operatorIndex
 
-class CallDefinitionHead(private val callDefinition: CallDefinition, private val visibility: Visibility, call: Call) :
+class CallDefinitionHead(val callDefinition: CallDefinition, private val visibility: Visibility, call: Call) :
         Element<Call>(call), Presentable, Visible {
     /**
      * Heads have no children since they have no body.
