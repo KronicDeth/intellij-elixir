@@ -4,7 +4,6 @@ import com.intellij.navigation.NavigationItem
 import com.intellij.psi.PsiElement
 import org.elixir_lang.beam.psi.BeamFileImpl
 import org.elixir_lang.structure_view.element.*
-import org.elixir_lang.structure_view.element.modular.Implementation
 import org.elixir_lang.structure_view.element.modular.Modular
 import org.elixir_lang.structure_view.element.modular.Module
 import org.elixir_lang.structure_view.element.modular.Quote
@@ -121,70 +120,41 @@ class SourcePreferredItems  {
         callDefinitionSpecificationList.add(callDefinitionSpecification)
     }
 
-    fun add(implementation: Implementation) {
-        implementationListByName.compute(implementation.name ?: "?") { _, currentImplementationList ->
-            if (currentImplementationList != null) {
-                if (currentImplementationList.isDecompiled()) {
-                    if (implementation.isDecompiled()) {
+    fun add(modular: Modular) {
+        modularListByName.compute(modularName(modular)) { _, currentModularList ->
+            if (currentModularList != null) {
+                if (currentModularList.isDecompiled()) {
+                    if (modular.isDecompiled()) {
                         // collect all decompiled for all environments
-                        currentImplementationList.add(implementation)
-                        currentImplementationList
+                        currentModularList.add(modular)
+                        currentModularList
                     } else {
                         // prefer source over all decompiled
-                        mutableListOf(implementation)
+                        mutableListOf(modular)
                     }
                 } else {
-                    if (implementation.isDecompiled()) {
+                    if (modular.isDecompiled()) {
                         // ignore decompiled when there is source
-                        currentImplementationList
+                        currentModularList
                     } else {
                         // collect all source
-                        currentImplementationList.add(implementation)
-                        currentImplementationList
+                        currentModularList.add(modular)
+                        currentModularList
                     }
                 }
             } else {
-                mutableListOf(implementation)
-            }
-        }
-    }
-
-    fun add(module: Module) {
-        moduleListByName.compute(module.name ?: "?") { _, currentModuleList ->
-            if (currentModuleList != null) {
-                if (currentModuleList.isDecompiled()) {
-                    if (module.isDecompiled()) {
-                        // collect all decompiled for all environments
-                        currentModuleList.add(module)
-                        currentModuleList
-                    } else {
-                        // prefer source over all decompiled
-                        mutableListOf(module)
-                    }
-                } else {
-                    if (module.isDecompiled()) {
-                        // ignore decompiled when there is source
-                        currentModuleList
-                    } else {
-                        // collect all source
-                        currentModuleList.add(module)
-                        currentModuleList
-                    }
-                }
-            } else {
-                mutableListOf(module)
+                mutableListOf(modular)
             }
         }
     }
 
     fun toTypedArray(): Array<NavigationItem> =
-            (moduleListByName.values.flatten() as List<NavigationItem> +
+            (modularListByName.values.flatten() as List<NavigationItem> +
                     callDefinitionClauseListByArityByNameByModularName.values.flatMap { it.values.flatMap { it.values.flatten() } } +
                     callDefinitionListByArityByNameByModularName.values.flatMap { it.values.flatMap { it.values.flatten() } } +
                     callDefinitionSpecificationList +
                     callDefinitionHeadListByArityByNameByModularName.values.flatMap { it.values.flatMap { it.values.flatten() } } +
-                    callbackList +
-                    implementationListByName.values.flatten()
+                    callbackList
                     ).toTypedArray()
 
     private val callDefinitionListByArityByNameByModularName = mutableMapOf<ModularName, MutableMap<Name, MutableMap<Arity, MutableList<CallDefinition>>>>()
@@ -192,8 +162,7 @@ class SourcePreferredItems  {
     private val callDefinitionHeadListByArityByNameByModularName = mutableMapOf<ModularName, MutableMap<Name, MutableMap<Arity, MutableList<CallDefinitionHead>>>>()
     private val callDefinitionSpecificationList = mutableListOf<CallDefinitionSpecification>()
     private val callbackList = mutableListOf<Callback>()
-    private val implementationListByName = mutableMapOf<Name, MutableList<Implementation>>()
-    private val moduleListByName = mutableMapOf<Name, MutableList<Module>>()
+    private val modularListByName = mutableMapOf<Name, MutableList<Modular>>()
 }
 
 private fun <E> List<E>.isDecompiled(): Boolean = all { it!!.isDecompiled() }
