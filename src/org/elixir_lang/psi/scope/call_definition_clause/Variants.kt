@@ -66,10 +66,10 @@ class Variants : CallDefinitionClause() {
         named.name?.let { name ->
             val lookupElementByPsiElement = lookupElementByPsiElement  ?: mutableMapOf()
 
-            if (lookupElementByPsiElement.containsKey(named)) {
-                lookupElementByPsiElement[named] = LookupElementBuilder.createWithSmartPointer(
+            lookupElementByPsiElement.computeIfAbsent(named) { element ->
+                LookupElementBuilder.createWithSmartPointer(
                         name,
-                        named
+                        element
                 ).withRenderer(
                         org.elixir_lang.code_insight.lookup.element_renderer.CallDefinitionClause(name)
                 )
