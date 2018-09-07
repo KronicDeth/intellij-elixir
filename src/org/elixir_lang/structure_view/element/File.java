@@ -4,6 +4,7 @@ import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.ElixirFile;
+import org.elixir_lang.psi.QuoteMacro;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.structure_view.element.modular.Implementation;
 import org.elixir_lang.structure_view.element.modular.Module;
@@ -46,7 +47,7 @@ public class File extends Element<ElixirFile> {
                     treeElementList.add(new Module(call));
                 } else if (Protocol.is(call)) {
                     treeElementList.add(new Protocol(call));
-                } else if (Quote.is(call)) {
+                } else if (QuoteMacro.is(call)) {
                     treeElementList.add(new Quote(call));
                 } else if (Unknown.is(call)) { // should always be last because it will match all macro calls
                     treeElementList.add(new Unknown(call));

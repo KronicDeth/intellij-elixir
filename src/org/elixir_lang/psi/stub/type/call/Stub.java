@@ -2,10 +2,10 @@ package org.elixir_lang.psi.stub.type.call;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.StubOutputStream;
+import org.elixir_lang.psi.CallDefinitionClause;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.call.StubBased;
 import org.elixir_lang.psi.stub.call.Deserialized;
-import org.elixir_lang.structure_view.element.CallDefinitionClause;
 import org.elixir_lang.structure_view.element.CallDefinitionHead;
 import org.elixir_lang.structure_view.element.CallDefinitionSpecification;
 import org.elixir_lang.structure_view.element.Callback;
@@ -55,7 +55,7 @@ public abstract class Stub<Stub extends org.elixir_lang.psi.stub.call.Stub<Psi>,
     }
 
     private boolean isEnclosableByModular(Call call) {
-        return CallDefinitionClause.Companion.is(call) ||
+        return CallDefinitionClause.is(call) ||
                 /* skip CallDefinitionHead because there can be false positives the the ancestor calls need to be
                    checked */
                 CallDefinitionSpecification.Companion.is(call) ||

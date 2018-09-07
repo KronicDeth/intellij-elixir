@@ -11,6 +11,7 @@ import com.intellij.util.Function
 import org.elixir_lang.Arity
 import org.elixir_lang.Name
 import org.elixir_lang.errorreport.Logger
+import org.elixir_lang.psi.CallDefinitionClause.nameArityRange
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.IMPORT
 import org.elixir_lang.psi.call.name.Module.KERNEL
@@ -18,7 +19,6 @@ import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.hasKeywordKey
 import org.elixir_lang.psi.impl.maybeModularNameToModular
 import org.elixir_lang.psi.impl.stripAccessExpression
-import org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.nameArityRange
 
 /**
  * An `import` call
@@ -35,18 +35,19 @@ object Import {
      * matching names in `:except` list.
      */
     @JvmStatic
-    fun callDefinitionClauseCallWhile(importCall: Call, function: (Call) -> Boolean) {
+    fun callDefinitionClauseCallWhile(importCall: Call, function: (Call) -> Boolean): Boolean =
         try {
             modular(importCall)
         } catch (stackOverflowError: StackOverflowError) {
             Logger.error(Import::class.java, "StackoverflowError while finding modular for import", importCall)
             null
-        }?.let { modularCall ->
-            val optionsFilter = callDefinitionClauseCallFilter(importCall)
-
-            Modular.callDefinitionClauseCallWhile(modularCall) { call -> !optionsFilter(call) || function(call) }
         }
-    }
+                ?.let { modularCall ->
+                    val optionsFilter = callDefinitionClauseCallFilter(importCall)
+
+                    Modular.callDefinitionClauseCallWhile(modularCall) { call -> !optionsFilter(call) || function(call) }
+                }
+                ?: true
 
     fun elementDescription(call: Call, location: ElementDescriptionLocation): String? =
             when {
@@ -140,12 +141,15 @@ object Import {
 
     /**
      * The modular that is imported by `importCall`.
-     * @param importCall a [Call] where [.is] is `true`.
+     * @param importCall a [Call] where [is] is `true`.
      * @return `defmodule`, `defimpl`, or `defprotocol` imported by `importCall`.  It can be
      * `null` if Alias passed to `importCall` cannot be resolved.
      */
     private fun modular(importCall: Call): Call? =
-            importCall.finalArguments()?.firstOrNull()?.maybeModularNameToModular(importCall.parent)
+            importCall
+                    .finalArguments()
+                    ?.firstOrNull()
+                    ?.maybeModularNameToModular(maxScope = importCall.parent, useCall = null)
 
     /**
      * A [Function] that returns `true` for call definition clauses that are imported by `importCall`

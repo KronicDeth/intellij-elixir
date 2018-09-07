@@ -1,0 +1,103 @@
+package org.elixir_lang.psi
+
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiPolyVariantReference
+import org.elixir_lang.psi.CallDefinitionClause.nameArityRange
+import org.elixir_lang.psi.call.Call
+import org.elixir_lang.psi.call.name.Function.*
+import org.elixir_lang.psi.call.name.Module.KERNEL
+import org.elixir_lang.psi.impl.call.finalArguments
+import org.elixir_lang.psi.impl.call.macroChildCallSequence
+import org.elixir_lang.psi.impl.maybeModularNameToModular
+
+object Using {
+    fun callDefinitionClauseCallWhile(usingCall: Call, useCall: Call?, keepProcessing: (Call) -> Boolean): Boolean =
+        usingCall.macroChildCallSequence().lastOrNull()?.let { lastChildCall ->
+            val resolvedModuleName = lastChildCall.resolvedModuleName()
+            val functionName = lastChildCall.functionName()
+
+            if (resolvedModuleName != null && functionName != null) {
+                when {
+                    resolvedModuleName == KERNEL && functionName == QUOTE ->
+                        QuoteMacro.callDefinitionClauseCallWhile(lastChildCall, keepProcessing)
+
+                    resolvedModuleName == KERNEL && functionName == APPLY -> {
+                        lastChildCall.finalArguments()?.let { arguments ->
+                            // TODO pipelines to apply/3
+                            if (arguments.size == 3) {
+                                arguments[0].let { maybeModularName ->
+                                    maybeModularName.maybeModularNameToModular(maxScope = maybeModularName.containingFile, useCall = useCall)?.let { modular ->
+                                        // TODO resolve argument[1] AND use its inferred value to select only one of the functions
+                                        Modular.callDefinitionClauseCallWhile(modular) { callDefinitionClauseCall ->
+                                            if (CallDefinitionClause.isFunction(callDefinitionClauseCall)) {
+                                                Using.callDefinitionClauseCallWhile(callDefinitionClauseCall, useCall, keepProcessing)
+                                            } else {
+                                                true
+                                            }
+                                        }
+                                    }
+                                }
+                            } else {
+                                true
+                            }
+                        }
+                    }
+
+                    else -> {
+                        var accumulatedKeepProcessing = true
+
+                        for (reference in lastChildCall.references) {
+                            val resolvedList: List<PsiElement> = if (reference is PsiPolyVariantReference) {
+                                reference
+                                        .multiResolve(false)
+                                        .mapNotNull { it.element }
+                            } else {
+                                reference.resolve()?.let { listOf(it) } ?: emptyList()
+                            }
+
+                            for (resolved in resolvedList) {
+                                val text = resolved.text
+
+                                accumulatedKeepProcessing = if (resolved is Call && CallDefinitionClause.`is`(resolved)) {
+                                    Using.callDefinitionClauseCallWhile(
+                                            usingCall = resolved,
+                                            useCall = useCall,
+                                            keepProcessing = keepProcessing
+                                    )
+                                } else {
+                                    true
+                                }
+
+                                if (!accumulatedKeepProcessing) {
+                                    break
+                                }
+                            }
+
+                            if (!accumulatedKeepProcessing) {
+                                break
+                            }
+                        }
+
+                        accumulatedKeepProcessing
+                    }
+                }
+            } else {
+                true
+            }
+        } ?: true
+
+    fun definers(modularCall: Call): Sequence<Call> =
+            modularCall
+                    .macroChildCallSequence()
+                    .filter { isDefiner(it) }
+
+    private const val ARITY = 1
+    private const val USING = "__using__"
+
+    private fun isDefiner(call: Call): Boolean =
+        call.isCalling(KERNEL, DEFMACRO) &&
+                nameArityRange(call)?.let { nameArityRange ->
+                    nameArityRange.name == USING && nameArityRange.arityRange.contains(ARITY)
+                }
+                ?: false
+}

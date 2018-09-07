@@ -1,7 +1,5 @@
 package org.elixir_lang.structure_view.element;
 
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Disposer;
 import com.intellij.psi.PsiElement;
 import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase;
 import org.elixir_lang.psi.call.Call;
@@ -51,8 +49,8 @@ public class CallDefinitionHeadTest extends LightPlatformCodeInsightFixtureTestC
 
         Call call = (Call) element;
 
-        assertTrue("Call at caret is not a call definition clause", CallDefinitionClause.Companion.is(call));
-        PsiElement head = CallDefinitionClause.Companion.head(call);
+        assertTrue("Call at caret is not a call definition clause", org.elixir_lang.psi.CallDefinitionClause.is(call));
+        PsiElement head = org.elixir_lang.psi.CallDefinitionClause.head(call);
 
         assertNotNull("Call definition has a null head", head);
 

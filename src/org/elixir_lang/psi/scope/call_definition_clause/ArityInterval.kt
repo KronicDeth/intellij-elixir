@@ -5,7 +5,7 @@ import org.elixir_lang.Arity
 import org.elixir_lang.ArityRange
 import org.elixir_lang.NameArityRange
 import org.elixir_lang.psi.call.name.Module.KERNEL_SPECIAL_FORMS
-import org.elixir_lang.psi.scope.CallDefinitionClause.MODULAR_CANONICAL_NAME
+import org.elixir_lang.psi.scope.CallDefinitionClause.Companion.MODULAR_CANONICAL_NAME
 
 /**
  * While an arity range for a normal function or macro is represented as an

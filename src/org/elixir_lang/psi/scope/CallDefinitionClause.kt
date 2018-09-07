@@ -8,6 +8,7 @@ import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.psi.Import
 import org.elixir_lang.psi.Modular
+import org.elixir_lang.psi.Use
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.call.name.Module.KERNEL_SPECIAL_FORMS
@@ -58,7 +59,7 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
      */
 
     private fun execute(element: Call, state: ResolveState): Boolean =
-        if (org.elixir_lang.structure_view.element.CallDefinitionClause.`is`(element)) {
+        if (org.elixir_lang.psi.CallDefinitionClause.`is`(element)) {
             executeOnCallDefinitionClause(element, state)
         } else if (Import.`is`(element)) {
             val importState = state.put(IMPORT_CALL, element)
@@ -89,6 +90,14 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
             keepProcessing() &&
                     // the implicit `import Kernel` and `import Kernel.SpecialForms`
                     implicitImports(element, state)
+        } else if (Use.`is`(element)) {
+            val useState = state.put(USE_CALL, element)
+
+            Use.callDefinitionClauseCallWhile(element) { callDefinitionClause ->
+               executeOnCallDefinitionClause(callDefinitionClause, useState)
+            }
+
+            true
         } else {
             true
         }
@@ -141,7 +150,10 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
     }
 
     companion object {
-        protected val IMPORT_CALL = Key<Call>("IMPORT_CALL")
+        @JvmStatic
+        val IMPORT_CALL = Key<Call>("IMPORT_CALL")
+        @JvmStatic
+        val USE_CALL = Key<Call>("USE_CALL")
         val MODULAR_CANONICAL_NAME = Key<String>("MODULAR_CANONICAL_NAME")
     }
 }

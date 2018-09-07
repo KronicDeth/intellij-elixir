@@ -10,6 +10,7 @@ import com.intellij.psi.PsiElement;
 import org.elixir_lang.psi.ElixirAtom;
 import org.elixir_lang.psi.ElixirFile;
 import org.elixir_lang.psi.QuotableKeywordPair;
+import org.elixir_lang.psi.QuoteMacro;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.structure_view.element.*;
 import org.elixir_lang.structure_view.element.Exception;
@@ -42,8 +43,8 @@ public class Model extends TextEditorBasedStructureViewModel implements Structur
 
     public static boolean isSuitable(Call call) {
         // everything in {@link Module#childCallTreeElements}
-        return CallDefinitionClause.Companion.isFunction(call) ||
-                CallDefinitionClause.Companion.isMacro(call) ||
+        return org.elixir_lang.psi.CallDefinitionClause.isFunction(call) ||
+                org.elixir_lang.psi.CallDefinitionClause.isMacro(call) ||
                 CallDefinitionHead.Companion.is(call) ||
                 CallDefinitionSpecification.Companion.is(call) ||
                 Callback.Companion.is(call) ||
@@ -53,10 +54,10 @@ public class Model extends TextEditorBasedStructureViewModel implements Structur
                 Module.Companion.is(call) ||
                 Overridable.is(call) ||
                 Protocol.is(call) ||
-                Quote.is(call) ||
+                QuoteMacro.is(call) ||
                 Structure.is(call) ||
                 Type.is(call) ||
-                Use.is(call) ||
+                org.elixir_lang.psi.Use.is(call) ||
                 Unknown.is(call);
     }
 

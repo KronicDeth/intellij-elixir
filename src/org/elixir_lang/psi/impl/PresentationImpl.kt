@@ -21,7 +21,7 @@ object PresentationImpl {
     @JvmStatic
     fun getPresentation(call: Call): ItemPresentation =
             when {
-                CallDefinitionClause.`is`(call) -> {
+                org.elixir_lang.psi.CallDefinitionClause.`is`(call) -> {
                     val callDefinitionClause = CallDefinitionClause.fromCall(call)
 
                     if (callDefinitionClause == null) {

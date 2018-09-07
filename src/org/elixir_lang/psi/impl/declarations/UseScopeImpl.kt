@@ -20,7 +20,6 @@ import org.elixir_lang.reference.Callable.Companion.isParameterWithDefault
 import org.elixir_lang.reference.Callable.Companion.isVariable
 import org.elixir_lang.reference.Callable.Companion.variableUseScope
 import org.elixir_lang.reference.ModuleAttribute.Companion.isNonReferencing
-import org.elixir_lang.structure_view.element.CallDefinitionClause
 import org.elixir_lang.structure_view.element.Delegation
 import org.jetbrains.annotations.Contract
 import java.util.*

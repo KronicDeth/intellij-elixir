@@ -7,17 +7,17 @@ import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiWhiteSpace
 import com.intellij.util.ProcessingContext
+import org.elixir_lang.psi.CallDefinitionClause.nameArityRange
 import org.elixir_lang.psi.ElixirTypes
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.call.macroChildCalls
 import org.elixir_lang.psi.impl.maybeModularNameToModular
-import org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.nameArityRange
 
 class CallDefinitionClause : CompletionProvider<CompletionParameters>() {
     private fun callDefinitionClauseLookupElements(scope: Call): Iterable<LookupElement> =
             scope
                     .macroChildCalls()
-                    .filter { org.elixir_lang.structure_view.element.CallDefinitionClause.`is`(it) }
+                    .filter { org.elixir_lang.psi.CallDefinitionClause.`is`(it) }
                     .mapNotNull {
                         nameArityRange(it)?.let { (name, _) ->
                             org.elixir_lang.code_insight.lookup.element.CallDefinitionClause.createWithSmartPointer(
@@ -58,7 +58,7 @@ class CallDefinitionClause : CompletionProvider<CompletionParameters>() {
                                 context: ProcessingContext,
                                 resultSet: CompletionResultSet) {
         maybeModularName(parameters)?.let { maybeModularName ->
-            maybeModularName.maybeModularNameToModular(maybeModularName.containingFile)?.let { modular ->
+            maybeModularName.maybeModularNameToModular(maxScope = maybeModularName.containingFile, useCall = null)?.let { modular ->
                 if (resultSet.prefixMatcher.prefix.endsWith(".")) {
                     resultSet.withPrefixMatcher("")
                 } else {

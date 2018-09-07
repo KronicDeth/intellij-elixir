@@ -9,7 +9,6 @@ import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.Named
 import org.elixir_lang.psi.impl.call.macroChildCallSequence
 import org.elixir_lang.psi.impl.call.macroChildCalls
-import org.elixir_lang.structure_view.element.CallDefinitionClause
 
 data class AccumulatorContinue<out R>(val accumulator: R, val `continue`: Boolean)
 

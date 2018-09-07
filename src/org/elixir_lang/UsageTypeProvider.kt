@@ -11,8 +11,6 @@ import org.elixir_lang.psi.call.name.Function
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.call.qualification.Qualified
 import org.elixir_lang.reference.Callable
-import org.elixir_lang.structure_view.element.CallDefinitionClause
-import org.elixir_lang.structure_view.element.Use
 import org.elixir_lang.structure_view.element.modular.Module
 
 class UsageTypeProvider : com.intellij.usages.impl.rules.UsageTypeProviderEx {

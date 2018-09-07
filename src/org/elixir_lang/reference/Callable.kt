@@ -31,7 +31,6 @@ import org.elixir_lang.psi.operation.Match
 import org.elixir_lang.psi.operation.Type
 import org.elixir_lang.psi.qualification.Unqualified
 import org.elixir_lang.psi.scope.variable.Variants
-import org.elixir_lang.structure_view.element.CallDefinitionClause
 import org.elixir_lang.structure_view.element.modular.Implementation
 import org.elixir_lang.structure_view.element.modular.Protocol
 import org.jetbrains.annotations.Contract
@@ -258,7 +257,7 @@ class Callable : PsiReferenceBase<Call>, PsiPolyVariantReference {
         @JvmStatic
         @Contract(pure = true)
         fun isDefiner(call: Call): Boolean =
-                CallDefinitionClause.`is`(call) ||
+                org.elixir_lang.psi.CallDefinitionClause.`is`(call) ||
                         Implementation.`is`(call) ||
                         org.elixir_lang.structure_view.element.modular.Module.`is`(call) ||
                         Protocol.`is`(call)
@@ -383,8 +382,8 @@ class Callable : PsiReferenceBase<Call>, PsiPolyVariantReference {
                     val grandParent = parent.getParent()
 
                     if (grandParent is Call) {
-                        if (org.elixir_lang.structure_view.element.CallDefinitionClause.`is`(grandParent)) {
-                            org.elixir_lang.structure_view.element.CallDefinitionClause.elementDescription(grandParent, location)
+                        if (org.elixir_lang.psi.CallDefinitionClause.`is`(grandParent)) {
+                            org.elixir_lang.psi.CallDefinitionClause.elementDescription(grandParent, location)
                         } else {
                             null
                         }
