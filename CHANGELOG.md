@@ -165,6 +165,23 @@ Table of Contents
 
 ## v9.0.0
 
+### Enhancements
+* [#1255](https://github.com/KronicDeth/intellij-elixir/pull/1255) - [@KronicDeth](https://github.com/KronicDeth)
+  * Resolve calls through `use AnAlias` calls
+    1. `AnAlias` will be resolved to its modular (module, implementation, or protocol)
+    2. The `__using__` macro in the modular is found
+    3. The last call in `__using__` is checked
+      * If it is a `quote` block, check for call definitions recursively inside the block
+      * If it is an `apply/3` call
+        1. Resolve the first argument as a modular
+        2. Scan for each function in `modular`
+        3. In each function Goto Step 3 above
+
+        This handling is what specifically makes `use MyAppWeb, :controller` in Phoenix apps now work.
+      * If it is a general call
+        1. Resolve the call to its definition
+        2. Goto Step 3 above
+
 ### Bug Fixes
 * [#1245](https://github.com/KronicDeth/intellij-elixir/pull/1245) - Specify that Kotlin Plugin is needed in `CONTRIBUTING.md`, so IntelliJ plays nice. - [@sfat](https://github.com/sfat)
 * [#1246](https://github.com/KronicDeth/intellij-elixir/pull/1246) - [@KronicDeth](https://github.com/KronicDeth)

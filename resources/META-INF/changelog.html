@@ -3,6 +3,41 @@
 <h1>v9.0.0</h1>
 <ul>
   <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>Resolve calls through <code>use AnAlias</code> calls
+        <ol>
+          <li><code>AnAlias</code> will be resolved to its modular (module, implementation, or protocol)</li>
+          <li>The <code>__using__</code> macro in the modular is found</li>
+          <li>The last call in <code>__using__</code> is checked</li>
+        </ol>
+        <ul>
+          <li>
+            <p>If it is a <code>quote</code> block, check for call definitions recursively inside the block</p>
+          </li>
+          <li>
+            <p>If it is an <code>apply/3</code> call</p>
+            <ol>
+              <li>Resolve the first argument as a modular</li>
+              <li>Scan for each function in <code>modular</code></li>
+              <li>In each function Goto Step 3 above</li>
+            </ol>
+            <p>
+              This handling is what specifically makes <code>use MyAppWeb, :controller</code> in Phoenix apps now work.
+            </p>
+          </li>
+          <li>
+            <p>If it is a general call</p>
+            <ol>
+              <li>Resolve the call to its definition</li>
+              <li>Goto Step 3 above</li>
+            </ol>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
     <p>Bug Fixes</p>
     <ul>
       <li>Specify that Kotlin Plugin is needed in <code>CONTRIBUTING.md</code>, so IntelliJ plays nice.</li>
