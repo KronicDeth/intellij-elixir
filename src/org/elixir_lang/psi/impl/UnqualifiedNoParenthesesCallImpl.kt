@@ -1,9 +1,9 @@
 package org.elixir_lang.psi.impl
 
+import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.UnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.call.MaybeExported
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.isExported
-import org.elixir_lang.structure_view.element.CallDefinitionClause
 import org.jetbrains.annotations.Contract
 
 @Contract(pure = true)

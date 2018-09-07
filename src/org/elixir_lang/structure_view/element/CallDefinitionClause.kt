@@ -2,16 +2,21 @@ package org.elixir_lang.structure_view.element
 
 import com.intellij.ide.util.treeView.smartTree.TreeElement
 import com.intellij.navigation.ItemPresentation
-import com.intellij.psi.ElementDescriptionLocation
 import com.intellij.psi.PsiElement
-import com.intellij.usageView.UsageViewTypeLocation
-import org.elixir_lang.NameArityRange
 import org.elixir_lang.Visibility
 import org.elixir_lang.errorreport.Logger
-import org.elixir_lang.find_usages.Provider
 import org.elixir_lang.navigation.item_presentation.NameArity
+import org.elixir_lang.psi.CallDefinitionClause.head
+import org.elixir_lang.psi.CallDefinitionClause.isFunction
+import org.elixir_lang.psi.CallDefinitionClause.isMacro
+import org.elixir_lang.psi.CallDefinitionClause.isPrivateFunction
+import org.elixir_lang.psi.CallDefinitionClause.isPrivateMacro
+import org.elixir_lang.psi.CallDefinitionClause.isPublicFunction
+import org.elixir_lang.psi.CallDefinitionClause.isPublicMacro
+import org.elixir_lang.psi.QuoteMacro
 import org.elixir_lang.psi.call.Call
-import org.elixir_lang.psi.call.name.Function.*
+import org.elixir_lang.psi.call.name.Function.ALIAS
+import org.elixir_lang.psi.call.name.Function.FOR
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.call.macroChildCalls
 import org.elixir_lang.psi.impl.enclosingMacroCall
@@ -62,7 +67,7 @@ class CallDefinitionClause(val callDefinition: CallDefinition, call: Call) :
         when {
             Implementation.`is`(childCall) -> Implementation(callDefinition.modular, childCall)
             Module.`is`(childCall) -> Module(callDefinition.modular, childCall)
-            Quote.`is`(childCall) -> Quote(this, childCall)
+            QuoteMacro.`is`(childCall) -> Quote(this, childCall)
             else -> null
         }?.run {
             treeElementList.add(this)
@@ -91,20 +96,6 @@ class CallDefinitionClause(val callDefinition: CallDefinition, call: Call) :
     fun isMatch(arguments: Array<PsiElement>): Boolean = false
 
     companion object {
-        /**
-         * Description of element used in [Provider].
-         *
-         * @param call a [Call] that has already been checked with [.is]
-         * @param location where the description will be used
-         * @return
-         */
-        fun elementDescription(call: Call, location: ElementDescriptionLocation): String? =
-                when {
-                    isFunction(call) -> functionElementDescription(call, location)
-                    isMacro(call) -> macroElementDescription(call, location)
-                    else -> null
-                }
-
         /**
          * The module or `quote` that encapsulates `call`
          *
@@ -155,13 +146,13 @@ class CallDefinitionClause(val callDefinition: CallDefinition, call: Call) :
             } else if (Protocol.`is`(enclosingMacroCall)) {
                 val grandScope = enclosingModular(enclosingMacroCall)
                 modular = Protocol(grandScope, enclosingMacroCall)
-            } else if (Quote.`is`(enclosingMacroCall)) {
+            } else if (QuoteMacro.`is`(enclosingMacroCall)) {
                 val quoteEnclosingMacroCall = enclosingMacroCall.enclosingMacroCall()
                 var quote: Quote? = null
 
                 if (quoteEnclosingMacroCall == null) {
                     quote = Quote(enclosingMacroCall)
-                } else if (CallDefinitionClause.`is`(quoteEnclosingMacroCall)) {
+                } else if (org.elixir_lang.psi.CallDefinitionClause.`is`(quoteEnclosingMacroCall)) {
                     val callDefinitionClause = CallDefinitionClause.fromCall(quoteEnclosingMacroCall)
 
                     if (callDefinitionClause == null) {
@@ -192,34 +183,6 @@ class CallDefinitionClause(val callDefinition: CallDefinition, call: Call) :
         }
 
         /**
-         * The head of the call definition.
-         *
-         * @param call a call that [.is].
-         * @return element for `name(arg, ...) when ...` in `def* name(arg, ...) when ...`
-         */
-        fun head(call: Call): PsiElement? = call.primaryArguments()?.firstOrNull()
-
-        fun `is`(call: Call): Boolean = isFunction(call) || isMacro(call)
-        fun isFunction(call: Call): Boolean = isPrivateFunction(call) || isPublicFunction(call)
-        fun isMacro(call: Call): Boolean = isPrivateMacro(call) || isPublicMacro(call)
-        fun isPrivateFunction(call: Call): Boolean = isCallingKernelMacroOrHead(call, DEFP)
-        fun isPrivateMacro(call: Call): Boolean = isCallingKernelMacroOrHead(call, DEFMACROP)
-        fun isPublicFunction(call: Call): Boolean = isCallingKernelMacroOrHead(call, DEF)
-        fun isPublicMacro(call: Call): Boolean = isCallingKernelMacroOrHead(call, DEFMACRO)
-        fun nameIdentifier(call: Call): PsiElement? = head(call)?.let { CallDefinitionHead.nameIdentifier(it) }
-
-        /**
-         * The name and arity range of the call definition this clause belongs to.
-         *
-         * @param call
-         * @return The name and arities of the [CallDefinition] this clause belongs.  Multiple arities occur when
-         * default arguments are used, which produces an arity for each default argument that is turned on and off.
-         * @see Call.resolvedFinalArityRange
-         */
-        @JvmStatic
-        fun nameArityRange(call: Call): NameArityRange? = head(call)?.let { CallDefinitionHead.nameArityRange(it) }
-
-        /**
          * Whether the `call` is defining something for runtime, like a function, or something for compile time, like
          * a macro.
          *
@@ -243,27 +206,6 @@ class CallDefinitionClause(val callDefinition: CallDefinition, call: Call) :
                     Visibility.PUBLIC
                 } else if (isPrivateFunction(call) || isPrivateMacro(call)) {
                     Visibility.PRIVATE
-                } else {
-                    null
-                }
-
-        private fun functionElementDescription(
-                @Suppress("UNUSED_PARAMETER") call: Call,
-                location: ElementDescriptionLocation
-        ): String? =
-                if (location === UsageViewTypeLocation.INSTANCE) {
-                    "function"
-                } else {
-                    null
-                }
-
-        private fun isCallingKernelMacroOrHead(call: Call, resolvedName: String): Boolean =
-                call.isCallingMacro(KERNEL, resolvedName, 2) ||
-                        call.isCalling(KERNEL, resolvedName, 1)
-
-        private fun macroElementDescription(call: Call, location: ElementDescriptionLocation): String? =
-                if (location === UsageViewTypeLocation.INSTANCE) {
-                    "macro"
                 } else {
                     null
                 }

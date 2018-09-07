@@ -68,7 +68,7 @@ public class CallDefinitionClauseTest extends LightPlatformCodeInsightFixtureTes
 
         Call maybeDefCall = (Call) maybeDefElement;
 
-        assertTrue(org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.is(maybeDefCall));
+        assertTrue(org.elixir_lang.psi.CallDefinitionClause.is(maybeDefCall));
 
         return org.elixir_lang.code_insight.lookup.element.CallDefinitionClause.createWithSmartPointer(
                 name,

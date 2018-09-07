@@ -15,6 +15,7 @@ import org.elixir_lang.psi.call.arguments.None
 import org.elixir_lang.psi.call.arguments.star.NoParentheses
 import org.elixir_lang.psi.call.arguments.star.NoParenthesesOneArgument
 import org.elixir_lang.psi.call.arguments.star.Parentheses
+import org.elixir_lang.psi.call.name.Function.__MODULE__
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.call.name.Module.stripElixirPrefix
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil
@@ -27,7 +28,6 @@ import org.elixir_lang.psi.qualification.Unqualified
 import org.elixir_lang.psi.stub.call.Stub
 import org.elixir_lang.reference.Callable
 import org.elixir_lang.reference.Callable.Companion.isBitStreamSegmentOption
-import org.elixir_lang.structure_view.element.CallDefinitionClause
 import org.jetbrains.annotations.Contract
 import java.util.*
 import org.elixir_lang.psi.impl.macroChildCallList as psiElementToMacroChildCallList
@@ -249,6 +249,22 @@ fun Call.macroDefinitionClauseForArgument(): Call? {
 
     return macroDefinitionClause
 }
+
+fun Call.maybeModularNameToModular(useCall: Call?): Call? =
+    if (isCalling(KERNEL, __MODULE__, 0)) {
+        org.elixir_lang.psi.__MODULE__
+                .reference(__MODULE__Call = this, useCall = useCall)
+                .resolve()
+                ?.let { it as Call? }?.let { resolved ->
+                    if (org.elixir_lang.psi.stub.type.call.Stub.isModular(resolved)) {
+                        resolved
+                    } else {
+                        null
+                    }
+                }
+    } else {
+        null
+    }
 
 object CallImpl {
     @Contract(pure = true)

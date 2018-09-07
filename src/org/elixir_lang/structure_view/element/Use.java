@@ -2,16 +2,12 @@ package org.elixir_lang.structure_view.element;
 
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
-import com.intellij.psi.ElementDescriptionLocation;
 import com.intellij.psi.PsiElement;
-import com.intellij.usageView.UsageViewTypeLocation;
 import org.elixir_lang.navigation.item_presentation.Parent;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.structure_view.element.modular.Modular;
 import org.jetbrains.annotations.NotNull;
 
-import static org.elixir_lang.psi.call.name.Function.USE;
-import static org.elixir_lang.psi.call.name.Module.KERNEL;
 import static org.elixir_lang.psi.impl.call.CallImplKt.finalArguments;
 
 public class Use extends Element<Call> {
@@ -21,24 +17,6 @@ public class Use extends Element<Call> {
 
     @NotNull
     private final Modular modular;
-
-    /*
-     * Static Methods
-     */
-
-    public static String elementDescription(Call call, ElementDescriptionLocation location) {
-        String elementDescription = null;
-
-        if (location == UsageViewTypeLocation.INSTANCE) {
-            elementDescription = "use";
-        }
-
-        return elementDescription;
-    }
-
-    public static boolean is(Call call) {
-        return call.isCalling(KERNEL, USE, 1) || call.isCalling(KERNEL, USE, 2);
-    }
 
     /*
      * Constructors

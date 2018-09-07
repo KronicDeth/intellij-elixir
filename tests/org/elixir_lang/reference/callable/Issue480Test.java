@@ -5,11 +5,11 @@ import com.intellij.psi.PsiReference;
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
 import kotlin.ranges.IntRange;
 import org.elixir_lang.NameArityRange;
+import org.elixir_lang.psi.CallDefinitionClause;
 import org.elixir_lang.psi.call.Call;
-import org.elixir_lang.structure_view.element.CallDefinitionClause;
 import org.jetbrains.annotations.NotNull;
 
-import static org.elixir_lang.structure_view.element.CallDefinitionClause.nameArityRange;
+import static org.elixir_lang.psi.CallDefinitionClause.nameArityRange;
 
 public class Issue480Test extends LightCodeInsightFixtureTestCase {
     /*
@@ -123,7 +123,7 @@ public class Issue480Test extends LightCodeInsightFixtureTestCase {
 
         Call maybeDefCall = (Call) resolved;
 
-        assertTrue(CallDefinitionClause.Companion.is(maybeDefCall));
+        assertTrue(CallDefinitionClause.is(maybeDefCall));
 
         assertEquals(new NameArityRange(name, new IntRange(arity, arity)), nameArityRange(maybeDefCall));
     }

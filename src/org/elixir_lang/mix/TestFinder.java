@@ -8,10 +8,10 @@ import com.intellij.psi.stubs.StubIndex;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.Function;
 import org.elixir_lang.psi.NamedElement;
+import org.elixir_lang.psi.QuoteMacro;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.call.StubBased;
 import org.elixir_lang.psi.stub.index.AllName;
-import org.elixir_lang.structure_view.element.Quote;
 import org.elixir_lang.structure_view.element.modular.Implementation;
 import org.elixir_lang.structure_view.element.modular.Module;
 import org.elixir_lang.structure_view.element.modular.Protocol;
@@ -70,7 +70,7 @@ public class TestFinder implements com.intellij.testIntegration.TestFinder {
     }
 
     private static boolean isModular(@NotNull Call call) {
-        return Implementation.is(call) || Module.Companion.is(call) || Protocol.is(call) || Quote.is(call);
+        return Implementation.is(call) || Module.Companion.is(call) || Protocol.is(call) || QuoteMacro.is(call);
     }
 
     @Nullable

@@ -15,6 +15,5 @@ import org.jetbrains.annotations.Contract
  * unparsed module like `Kernel` or `Enum` OR if the qualified isn't an Alias.
  */
 @Contract(pure = true)
-fun Qualified.qualifiedToModular(): Call? {
-    return qualifier().maybeModularNameToModular(containingFile)
-}
+fun Qualified.qualifiedToModular(): Call? =
+        qualifier().maybeModularNameToModular(maxScope = containingFile, useCall = null)

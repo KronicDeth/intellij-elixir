@@ -4,6 +4,7 @@ import com.intellij.codeInsight.TargetElementEvaluatorEx2
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
+import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.QualifiedAlias
 import org.elixir_lang.psi.call.Call
 
@@ -22,7 +23,7 @@ class TargetElementEvaluator : TargetElementEvaluatorEx2() {
                then has a reference to the definer's macro */
             if (resolved != null &&
                     resolved is Call &&
-                    org.elixir_lang.structure_view.element.CallDefinitionClause.`is`(resolved)) {
+                    CallDefinitionClause.`is`(resolved)) {
                 reference.element
             } else {
                 resolved

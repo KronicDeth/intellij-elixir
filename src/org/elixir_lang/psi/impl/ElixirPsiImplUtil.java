@@ -30,7 +30,6 @@ import org.elixir_lang.psi.operation.capture.NonNumeric;
 import org.elixir_lang.psi.qualification.Qualified;
 import org.elixir_lang.psi.qualification.Unqualified;
 import org.elixir_lang.psi.stub.call.Stub;
-import org.elixir_lang.structure_view.element.CallDefinitionClause;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -246,8 +245,8 @@ public class ElixirPsiImplUtil {
     }
 
     public static boolean isExported(@NotNull final UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
-        return CallDefinitionClause.Companion.isPublicFunction(unqualifiedNoParenthesesCall) ||
-                CallDefinitionClause.Companion.isPublicMacro(unqualifiedNoParenthesesCall);
+        return CallDefinitionClause.isPublicFunction(unqualifiedNoParenthesesCall) ||
+                CallDefinitionClause.isPublicMacro(unqualifiedNoParenthesesCall);
     }
 
     public static boolean isModuleName(@NotNull final ElixirAccessExpression accessExpression) {

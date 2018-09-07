@@ -9,7 +9,6 @@ import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.operation.InMatch;
 import org.elixir_lang.psi.operation.When;
-import org.elixir_lang.structure_view.element.CallDefinitionClause;
 import org.elixir_lang.structure_view.element.Delegation;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -70,14 +69,14 @@ public class Parameter {
     private static Parameter putParameterized(@NotNull final Parameter parameter, final @NotNull Call ancestor) {
         Parameter parameterizedParameter;
 
-        if (CallDefinitionClause.Companion.isFunction(ancestor) || Delegation.is(ancestor)) {
+        if (CallDefinitionClause.isFunction(ancestor) || Delegation.is(ancestor)) {
             parameterizedParameter = new Parameter(
                     parameter.defaultValue,
                     parameter.entrance,
                     notNullize(parameter.parameterized, ancestor),
                     notNullize(parameter.type, Type.FUNCTION_NAME)
             );
-        } else if (CallDefinitionClause.Companion.isMacro(ancestor)) {
+        } else if (CallDefinitionClause.isMacro(ancestor)) {
             parameterizedParameter = new Parameter(
                     parameter.defaultValue,
                     parameter.entrance,

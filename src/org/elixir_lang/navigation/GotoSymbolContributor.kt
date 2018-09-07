@@ -79,7 +79,7 @@ class GotoSymbolContributor : ChooseByNameContributor {
                                        callDefinitionByTuple: MutableMap<CallDefinition.Tuple, CallDefinition>,
                                        call: Call) {
         when {
-            CallDefinitionClause.`is`(call) -> getItemsFromCallDefinitionClause(items, enclosingModularByCall, callDefinitionByTuple, call)
+            org.elixir_lang.psi.CallDefinitionClause.`is`(call) -> getItemsFromCallDefinitionClause(items, enclosingModularByCall, callDefinitionByTuple, call)
             CallDefinitionHead.`is`(call) -> getItemsFromCallDefinitionHead(items, enclosingModularByCall, callDefinitionByTuple, call)
             CallDefinitionSpecification.`is`(call) -> getItemsFromCallDefinitionSpecification(items, enclosingModularByCall, call)
             Callback.`is`(call) -> getItemsFromCallback(items, enclosingModularByCall, call)
@@ -104,7 +104,7 @@ class GotoSymbolContributor : ChooseByNameContributor {
             callDefinitionByTuple: MutableMap<CallDefinition.Tuple, CallDefinition>,
             call: Call
     ) {
-        CallDefinitionClause.nameArityRange(call)?.let { (name, arityRange) ->
+        org.elixir_lang.psi.CallDefinitionClause.nameArityRange(call)?.let { (name, arityRange) ->
             val time = CallDefinitionClause.time(call)
             val modular = enclosingModularByCall.putNew(call)
 

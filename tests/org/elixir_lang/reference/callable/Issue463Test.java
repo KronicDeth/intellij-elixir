@@ -3,8 +3,8 @@ package org.elixir_lang.reference.callable;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
+import org.elixir_lang.psi.CallDefinitionClause;
 import org.elixir_lang.psi.call.Call;
-import org.elixir_lang.structure_view.element.CallDefinitionClause;
 
 public class Issue463Test extends LightCodeInsightFixtureTestCase {
     /*
@@ -44,7 +44,7 @@ public class Issue463Test extends LightCodeInsightFixtureTestCase {
 
         assertInstanceOf(resolved, Call.class);
 
-        assertTrue(CallDefinitionClause.Companion.is((Call) resolved));
+        assertTrue(CallDefinitionClause.is((Call) resolved));
     }
 
     public void testAliasedModuleQualifier() {
@@ -80,7 +80,7 @@ public class Issue463Test extends LightCodeInsightFixtureTestCase {
 
         assertInstanceOf(resolved, Call.class);
 
-        assertTrue(CallDefinitionClause.Companion.is((Call) resolved));
+        assertTrue(CallDefinitionClause.is((Call) resolved));
     }
 
     public void testDoubleAliasesModuleQualifier() {

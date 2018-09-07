@@ -9,13 +9,13 @@ import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiFileFactory
 import org.elixir_lang.ElixirFileType
+import org.elixir_lang.psi.CallDefinitionClause.isPublicFunction
+import org.elixir_lang.psi.CallDefinitionClause.nameArityRange
 import org.elixir_lang.psi.ElixirAccessExpression
 import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.psi.ElixirList
 import org.elixir_lang.psi.impl.call.macroChildCallList
 import org.elixir_lang.psi.impl.keywordValue
-import org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.isPublicFunction
-import org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.nameArityRange
 import java.io.IOException
 import java.nio.file.Paths
 

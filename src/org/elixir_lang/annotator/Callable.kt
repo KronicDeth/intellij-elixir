@@ -13,13 +13,13 @@ import org.elixir_lang.ElixirSyntaxHighlighter
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.AtNonNumericOperation
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
+import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.UnqualifiedBracketOperation
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.call.name.Module.KERNEL_SPECIAL_FORMS
 import org.elixir_lang.reference.Callable.Companion.BIT_STRING_TYPES
 import org.elixir_lang.reference.Callable.Companion.isBitStreamSegmentOption
-import org.elixir_lang.structure_view.element.CallDefinitionClause
 import java.util.*
 
 /**
@@ -56,7 +56,7 @@ class Callable : Annotator, DumbAware {
                         // visit the `def(macro)?p? for Kernel PREDEFINED highlighting
                         visitPlainCall(call)
 
-                        org.elixir_lang.structure_view.element.CallDefinitionClause.head(call)?.let { head ->
+                        CallDefinitionClause.head(call)?.let { head ->
                             visitCallDefinitionHead(head, call)
                         }
                     }
@@ -81,7 +81,7 @@ class Callable : Annotator, DumbAware {
                     }
 
                     private fun visitNonModuleAttributeCall(call: Call) {
-                        if (org.elixir_lang.structure_view.element.CallDefinitionClause.`is`(call)) {
+                        if (CallDefinitionClause.`is`(call)) {
                             visitCallDefinitionClause(call)
                         } else {
                             visitPlainCall(call)
@@ -131,12 +131,10 @@ class Callable : Annotator, DumbAware {
 
                     private fun visitStrippedCallDefinitionHead(stripped: Call, clause: Call) {
                         stripped.functionNameElement()?.let { functionNameElement ->
-                            val textAttributeKey = if (org.elixir_lang.structure_view.element.CallDefinitionClause.isFunction(clause)) {
-                                ElixirSyntaxHighlighter.FUNCTION_DECLARATION
-                            } else if (org.elixir_lang.structure_view.element.CallDefinitionClause.isMacro(clause)) {
-                                ElixirSyntaxHighlighter.MACRO_DECLARATION
-                            } else {
-                                null
+                            val textAttributeKey = when {
+                                CallDefinitionClause.isFunction(clause) -> ElixirSyntaxHighlighter.FUNCTION_DECLARATION
+                                CallDefinitionClause.isMacro(clause) -> ElixirSyntaxHighlighter.MACRO_DECLARATION
+                                else -> null
                             }
 
                             if (textAttributeKey != null) {

@@ -12,12 +12,12 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
+import org.elixir_lang.psi.CallDefinitionClause
+import org.elixir_lang.psi.CallDefinitionClause.nameArityRange
 import org.elixir_lang.psi.ElixirTypes
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.*
 import org.elixir_lang.psi.impl.siblingExpression
-import org.elixir_lang.structure_view.element.CallDefinitionClause
-import org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.nameArityRange
 import org.elixir_lang.structure_view.element.CallDefinitionSpecification.Companion.moduleAttributeNameArity
 import org.elixir_lang.structure_view.element.CallDefinitionSpecification.Companion.specification
 import org.elixir_lang.structure_view.element.CallDefinitionSpecification.Companion.specificationType

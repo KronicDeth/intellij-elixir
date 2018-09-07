@@ -2,6 +2,7 @@ package org.elixir_lang.psi.call.name;
 
 public class Function {
     public static final String ALIAS = "alias";
+    public static final String APPLY = "apply";
     public static final String CASE = "case";
     public static final String COND = "cond";
     public static final String CREATE = "create";

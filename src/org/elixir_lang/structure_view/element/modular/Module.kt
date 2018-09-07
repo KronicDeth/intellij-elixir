@@ -10,6 +10,7 @@ import com.intellij.usageView.UsageViewShortNameLocation
 import com.intellij.usageView.UsageViewTypeLocation
 import org.elixir_lang.NameArity
 import org.elixir_lang.navigation.item_presentation.Parent
+import org.elixir_lang.psi.QuoteMacro
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.CREATE
 import org.elixir_lang.psi.call.name.Function.DEFMODULE
@@ -133,10 +134,10 @@ open class Module(protected val parent: Modular?, call: Call) : Element<Call>(ca
                         Callback.`is`(childCall) -> treeElementList.add(Callback(modular, childCall))
                         Delegation.`is`(childCall) -> functionByNameArity.addDelegationToTreeElementList(childCall)
                         Exception.`is`(childCall) -> functionByNameArity.exception = Exception(modular, childCall)
-                        CallDefinitionClause.isFunction(childCall) -> functionByNameArity.addClausesToCallDefinition(childCall)
+                        org.elixir_lang.psi.CallDefinitionClause.isFunction(childCall) -> functionByNameArity.addClausesToCallDefinition(childCall)
                         CallDefinitionSpecification.`is`(childCall) -> functionByNameArity.addSpecificationToCallDefinition(childCall)
                         Implementation.`is`(childCall) -> treeElementList.add(Implementation(modular, childCall))
-                        CallDefinitionClause.isMacro(childCall) -> macroByNameArity.addClausesToCallDefinition(childCall)
+                        org.elixir_lang.psi.CallDefinitionClause.isMacro(childCall) -> macroByNameArity.addClausesToCallDefinition(childCall)
                         Module.`is`(childCall) -> treeElementList.add(Module(modular, childCall))
                         Overridable.`is`(childCall) -> {
                             val overridable = Overridable(modular, childCall)
@@ -144,10 +145,10 @@ open class Module(protected val parent: Modular?, call: Call) : Element<Call>(ca
                             treeElementList.add(overridable)
                         }
                         Protocol.`is`(childCall) -> treeElementList.add(Protocol(modular, childCall))
-                        org.elixir_lang.structure_view.element.Quote.`is`(childCall) -> treeElementList.add(Quote(modular, childCall))
+                        QuoteMacro.`is`(childCall) -> treeElementList.add(Quote(modular, childCall))
                         Structure.`is`(childCall) -> treeElementList.add(Structure(modular, childCall))
                         Type.`is`(childCall) -> treeElementList.add(Type.fromCall(modular, childCall))
-                        org.elixir_lang.structure_view.element.Use.`is`(childCall) -> {
+                        org.elixir_lang.psi.Use.`is`(childCall) -> {
                             val use = org.elixir_lang.structure_view.element.Use(modular, childCall)
                             useSet.add(use)
                             treeElementList.add(use)

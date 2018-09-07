@@ -4,12 +4,12 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementResolveResult
 import com.intellij.psi.ResolveState
 import com.intellij.psi.util.PsiTreeUtil
+import org.elixir_lang.psi.CallDefinitionClause.nameArityRange
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.Named
 
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.scope.ResolveResultOrderedSet
-import org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.nameArityRange
 
 class MultiResolve
 private constructor(private val name: String,

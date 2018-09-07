@@ -213,8 +213,8 @@ public abstract class Variable implements PsiScopeProcessor {
     private boolean execute(@NotNull final Call match, @NotNull ResolveState state) {
         boolean keepProcessing = true;
 
-        if (org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.is(match)) {
-            PsiElement head = org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.head(match);
+        if (org.elixir_lang.psi.CallDefinitionClause.is(match)) {
+            PsiElement head = org.elixir_lang.psi.CallDefinitionClause.head(match);
 
             if (head != null) {
                 PsiElement stripped = CallDefinitionHead.Companion.strip(head);
@@ -288,7 +288,7 @@ public abstract class Variable implements PsiScopeProcessor {
                         state.put(DECLARING_SCOPE, false)
                 );
             }
-        } else if (org.elixir_lang.structure_view.element.Quote.is(match)) {
+        } else if (QuoteMacro.is(match)) {
             PsiElement bindQuoted = keywordArgument(match, "bind_quoted");
 
             if (bindQuoted instanceof ElixirAccessExpression) {

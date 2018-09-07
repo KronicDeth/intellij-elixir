@@ -4,10 +4,10 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
+import org.elixir_lang.psi.CallDefinitionClause;
 import org.elixir_lang.psi.ElixirIdentifier;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.operation.Match;
-import org.elixir_lang.structure_view.element.CallDefinitionClause;
 
 public class Issue354Test extends LightCodeInsightFixtureTestCase {
     /*
@@ -69,7 +69,7 @@ public class Issue354Test extends LightCodeInsightFixtureTestCase {
 
         Call resolvedGreatGreatGreatGreatGrandParentCall = (Call) resolvedGreatGreatGreatGreatGrandParent;
 
-        assertTrue(CallDefinitionClause.Companion.is(resolvedGreatGreatGreatGreatGrandParentCall));
+        assertTrue(CallDefinitionClause.is(resolvedGreatGreatGreatGreatGrandParentCall));
     }
 
     /*

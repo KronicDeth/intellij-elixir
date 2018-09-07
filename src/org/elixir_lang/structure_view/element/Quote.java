@@ -39,12 +39,6 @@ public class Quote extends Element<Call> {
         return elementDescription;
     }
 
-    public static boolean is(@NotNull final Call call) {
-        // TODO change Elixir.Kernel to Elixir.Kernel.SpecialForms when resolving works
-        return call.isCallingMacro(KERNEL, QUOTE, 1) || // without keyword arguments
-                call.isCallingMacro(KERNEL, QUOTE, 2); // with keyword arguments
-    }
-
     /*
      * Constructors
      */

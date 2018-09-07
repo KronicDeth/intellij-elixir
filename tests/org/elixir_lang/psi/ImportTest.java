@@ -6,14 +6,12 @@ import com.intellij.util.containers.ContainerUtil;
 import kotlin.ranges.IntRange;
 import org.elixir_lang.NameArityRange;
 import org.elixir_lang.psi.call.Call;
-import org.elixir_lang.structure_view.element.CallDefinitionClause;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.elixir_lang.structure_view.element.CallDefinitionClause.nameArityRange;
-
+import static org.elixir_lang.psi.CallDefinitionClause.nameArityRange;
 
 public class ImportTest extends LightPlatformCodeInsightFixtureTestCase {
     /*

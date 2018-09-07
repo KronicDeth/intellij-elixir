@@ -6,7 +6,6 @@ import org.elixir_lang.Name
 import org.elixir_lang.NameArity
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.structure_view.element.CallDefinition
-import org.elixir_lang.structure_view.element.CallDefinitionClause
 import org.elixir_lang.structure_view.element.Timed
 import org.elixir_lang.structure_view.element.modular.Modular
 import java.util.*
@@ -22,7 +21,7 @@ open class TreeElementList(
         private val time: Timed.Time
 ) : HashMap<NameArity, CallDefinition>(size), CallDefinitionByNameArity {
     fun addClausesToCallDefinition(call: Call) {
-        CallDefinitionClause.nameArityRange(call)?.let { (name, arityRange) ->
+        org.elixir_lang.psi.CallDefinitionClause.nameArityRange(call)?.let { (name, arityRange) ->
             addClausesToCallDefinition(call, name, arityRange)
         }
     }

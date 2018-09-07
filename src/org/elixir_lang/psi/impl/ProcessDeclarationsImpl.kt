@@ -21,7 +21,6 @@ import org.elixir_lang.psi.operation.Match
 import org.elixir_lang.psi.operation.Normalized
 import org.elixir_lang.psi.operation.infix.Position
 import org.elixir_lang.psi.operation.infix.Triple
-import org.elixir_lang.structure_view.element.CallDefinitionClause
 import org.elixir_lang.structure_view.element.Delegation
 import org.elixir_lang.structure_view.element.modular.Module
 
@@ -76,7 +75,7 @@ object ProcessDeclarationsImpl {
                         call.isCallingMacro(KERNEL, UNLESS) || // match in condition
                         call.isCallingMacro(KERNEL, "with") // <- or = variable
                 -> keepProcessing = processor.execute(call, state)
-                org.elixir_lang.structure_view.element.Quote.`is`(call) -> { // quote :bind_quoted keys{
+                QuoteMacro.`is`(call) -> { // quote :bind_quoted keys{
                     val bindQuoted = call.keywordArgument("bind_quoted")
                     /* the bind_quoted keys declare variable only valid inside the do block, so any place in the
                        bindQuoted already must be the bind_quoted values that must be declared before the quote */

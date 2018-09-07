@@ -48,7 +48,7 @@ class CallDefinition(val modular: Modular, private val time: Timed.Time, private
      * @param clause the new clause for the macro
      */
     fun clause(clause: Call): CallDefinitionClause {
-        val nameArityRange = CallDefinitionClause.nameArityRange(clause)!!
+        val nameArityRange = org.elixir_lang.psi.CallDefinitionClause.nameArityRange(clause)!!
 
         assert(nameArityRange.name == name)
         assert(arity in nameArityRange.arityRange)
@@ -233,7 +233,7 @@ class CallDefinition(val modular: Modular, private val time: Timed.Time, private
          */
         fun fromCall(call: Call): CallDefinition? =
                 CallDefinitionClause.enclosingModular(call)?.let { modular ->
-                    CallDefinitionClause.nameArityRange(call)?.let { nameArityRange ->
+                    org.elixir_lang.psi.CallDefinitionClause.nameArityRange(call)?.let { nameArityRange ->
                         val name = nameArityRange.name
                         /* arity is assumed to be max arity in the range because that's how {@code h} and ExDoc treat
                            functions with defaults. */

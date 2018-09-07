@@ -3,7 +3,6 @@ package org.elixir_lang.psi.impl
 import com.intellij.psi.PsiElement
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.operation.Operation
-import org.elixir_lang.structure_view.element.CallDefinitionClause
 import org.elixir_lang.structure_view.element.CallDefinitionSpecification
 import org.elixir_lang.structure_view.element.Callback
 import org.elixir_lang.structure_view.element.modular.Implementation

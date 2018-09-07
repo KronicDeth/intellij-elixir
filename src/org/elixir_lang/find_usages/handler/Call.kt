@@ -5,10 +5,11 @@ import com.intellij.psi.PsiElement
 import org.elixir_lang.ArityRange
 import org.elixir_lang.find_usages.toPsiElementList
 import org.elixir_lang.overlaps
+import org.elixir_lang.psi.CallDefinitionClause
+import org.elixir_lang.psi.CallDefinitionClause.nameArityRange
 import org.elixir_lang.psi.Modular
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.enclosingModularMacroCall
-import org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.nameArityRange
 
 class Call(call: Call) : FindUsagesHandler(call) {
     private val _primaryElements by lazy {
@@ -70,7 +71,7 @@ private data class EnclosingCallEnclosedCallNameArityRange(
 private fun Array<PsiElement>.toCallDefinitionCallSet(): Set<Call> =
         this
                 .filterIsInstance<Call>()
-                .filter { org.elixir_lang.structure_view.element.CallDefinitionClause.`is`(it) }
+                .filter { CallDefinitionClause.`is`(it) }
                 .toSet()
 
 private fun Call.toCallNameArityRange(): CallNameArityRange? =
