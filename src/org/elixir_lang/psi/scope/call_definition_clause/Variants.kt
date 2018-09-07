@@ -36,10 +36,10 @@ class Variants : CallDefinitionClause() {
      * @return `true` to keep searching up tree; `false` to stop searching.
      */
     override fun executeOnCallDefinitionClause(element: Call, state: ResolveState): Boolean {
-        state.get(ENTRANCE_CALL_DEFINITION_CLAUSE)?.let { entranceCallDefinitionClause ->
-            if (!element.isEquivalentTo(entranceCallDefinitionClause)) {
-                addToLookupElementByPsiElement(element)
-            }
+        val entranceCallDefinitionClause = state.get(ENTRANCE_CALL_DEFINITION_CLAUSE)
+
+        if (entranceCallDefinitionClause == null || !element.isEquivalentTo(entranceCallDefinitionClause)) {
+            addToLookupElementByPsiElement(element)
         }
 
         return true
