@@ -77,6 +77,19 @@
         <code>Module</code> is an alias does not return the decompiled version of <code>Module</code> when the source is
         available.
       </li>
+      <li>Fix completion not working for unqualified functions from <code>import</code>s.
+        <ul>
+          <li>
+            When I switched to using <code>?.let</code> I accidentally hid the <code>if</code> from running when there
+            was no <code>ENTRANCE_CALL_DEFINITION_CLAUSE</code>, so the correct form is add if there is no entrance or
+            if there is a non-equivalent entrance.
+          </li>
+          <li>
+            I just straight up forgot an ! on a contains check. I moved to computeIfAbsent, so it is more obvious what
+            the intent is.
+          </li>
+        </ul>
+      </li>
     </ul>
   </li>
   <li>

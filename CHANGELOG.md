@@ -194,6 +194,10 @@ Table of Contents
       * The source Implementation will be shown and not the decompiled Module with the same fully-qualified name (`<protocol>.<for>`).
     * Items will be deduped if they point to the same element, such as function clauses with default arguments because when presented they look the same even if internally one is representing `/1` and `/2`, for example.
 * [#1249](https://github.com/KronicDeth/intellij-elixir/pull/1249) - Ensure that Go To Declaration for qualified calls such as `Module.function(...)` where `Module` is an alias does not return the decompiled version of `Module` when the source is available. - [@KronicDeth](https://github.com/KronicDeth)
+* [#1256](https://github.com/KronicDeth/intellij-elixir/pull/1256) - [@KronicDeth](https://github.com/KronicDeth)
+  * Fix completion not working for unqualified functions from `import`s.
+    * When I switched to using `?.let` I accidentally hid the `if` from running when there was no `ENTRANCE_CALL_DEFINITION_CLAUSE`, so the correct form is add if there is no entrance or if there is a non-equivalent entrance.
+    *  I just straight up forgot an ! on a contains check. I moved to computeIfAbsent, so it is more obvious what the intent is.
 
 ### Incompatible Changs
 * [#1248](https://github.com/KronicDeth/intellij-elixir/pull/1248) Go To Symbol and Go To Declaration will no longer suggest decompiled modules or functions if source modules or functions of the same name or module/name/arity exists. - [@KronicDeth](https://github.com/KronicDeth)
