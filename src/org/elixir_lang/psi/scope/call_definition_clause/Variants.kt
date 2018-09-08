@@ -36,10 +36,10 @@ class Variants : CallDefinitionClause() {
      * @return `true` to keep searching up tree; `false` to stop searching.
      */
     override fun executeOnCallDefinitionClause(element: Call, state: ResolveState): Boolean {
-        state.get(ENTRANCE_CALL_DEFINITION_CLAUSE)?.let { entranceCallDefinitionClause ->
-            if (!element.isEquivalentTo(entranceCallDefinitionClause)) {
-                addToLookupElementByPsiElement(element)
-            }
+        val entranceCallDefinitionClause = state.get(ENTRANCE_CALL_DEFINITION_CLAUSE)
+
+        if (entranceCallDefinitionClause == null || !element.isEquivalentTo(entranceCallDefinitionClause)) {
+            addToLookupElementByPsiElement(element)
         }
 
         return true
@@ -66,10 +66,10 @@ class Variants : CallDefinitionClause() {
         named.name?.let { name ->
             val lookupElementByPsiElement = lookupElementByPsiElement  ?: mutableMapOf()
 
-            if (lookupElementByPsiElement.containsKey(named)) {
-                lookupElementByPsiElement[named] = LookupElementBuilder.createWithSmartPointer(
+            lookupElementByPsiElement.computeIfAbsent(named) { element ->
+                LookupElementBuilder.createWithSmartPointer(
                         name,
-                        named
+                        element
                 ).withRenderer(
                         org.elixir_lang.code_insight.lookup.element_renderer.CallDefinitionClause(name)
                 )
