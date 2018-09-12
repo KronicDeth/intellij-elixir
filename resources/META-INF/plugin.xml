@@ -115,7 +115,7 @@
     <projectService serviceImplementation="org.elixir_lang.credo.Service"/>
 
     <!-- <code>.beam</code> -->
-    <gotoRelatedProvider implementation="org.elixir_lang.beam.GotoDecompiledProvider"/>
+    <gotoRelatedProvider implementation="org.elixir_lang.goto_decompiled.Provider"/>
     <fileEditorProvider implementation="org.elixir_lang.beam.file_editor.Provider"/>
     <filetype.decompiler filetype="BEAM" implementationClass="org.elixir_lang.beam.Decompiler"/>
     <fileType.fileViewProviderFactory filetype="BEAM" implementationClass="org.elixir_lang.beam.FileViewProviderFactory"/>

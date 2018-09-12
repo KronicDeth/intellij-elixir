@@ -1,4 +1,4 @@
-package org.elixir_lang.beam
+package org.elixir_lang.goto_decompiled
 
 import com.intellij.navigation.GotoRelatedItem
 import com.intellij.navigation.GotoRelatedProvider
@@ -21,7 +21,7 @@ import org.elixir_lang.psi.stub.index.AllName
 /**
  * Go To Related from source to decompiled version of the same function
  */
-class GotoDecompiledProvider : GotoRelatedProvider() {
+class Provider : GotoRelatedProvider() {
     override tailrec fun getItems(psiElement: PsiElement): List<GotoRelatedItem> {
         val definitionItems = if (psiElement is Call) {
             val definition = definition(psiElement)
@@ -49,7 +49,7 @@ class GotoDecompiledProvider : GotoRelatedProvider() {
     }
 
     private fun definitionItems(definition: Definition, definer: Call): List<GotoRelatedItem> =
-        definitionDecompiledSet(definition, definer).map { GotoRelatedItem(it, "Decompiled BEAM") }
+        definitionDecompiledSet(definition, definer).map { Item(it) }
 
     private fun definitionDecompiledSet(definition: Definition, definer: Call): Set<Call> =
             if (definition.type == Definition.Type.CALLABLE) {
