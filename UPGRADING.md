@@ -18,7 +18,7 @@
 
 ## v9.0.0
 
-If you depended on the ability of go to either the source or decompiled module or function from Go To Symbol or Go To Declaration, you now need to open the `.beam` file directly using Find File or the Project Tool pane.
+If you depended on the ability of go to either the source or decompiled module or function from Go To Symbol or Go To Declaration, you now need to use Go To Related Symbol (`Ctrl+Cmd+Up`) to get to the decompiled version when the cursor is on the source module or call name.
 
 ## v6.0.0
 
