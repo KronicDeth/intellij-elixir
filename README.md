@@ -92,16 +92,16 @@ Table of Contents
             * [Project](#project-1)
          * [Live Templates](#live-templates)
          * [Run/Debug Configurations](#rundebug-configurations)
-            * [Distillery Release CLI <a href="resources/icons/distillery-16.png?tra=true" target="_blank"><img src="resources/icons/distillery-16.png?tra=true" alt="Elixir Mix Icon with tapered neck to make a retort as used in distilleries" title="Distillery Release CLI Icon" style="max-width:100\x;"></a>](#distillery-release-cli-)
+            * [Distillery Release CLI <a href="resources/icons/distillery-16.png?tra=true" target="_blank" rel="noopener noreferrer"><img src="resources/icons/distillery-16.png?tra=true" alt="Elixir Mix Icon with tapered neck to make a retort as used in distilleries" title="Distillery Release CLI Icon" style="max-width:100\x;"></a>](#distillery-release-cli-)
                * [Running](#running)
                * [Debugging](#debugging)
-            * [Elixir <a href="resources/icons/elixir-16.png" target="_blank"><img src="resources/icons/elixir-16.png" alt="Elixir Drop" title="Elixir Icon" style="max-width:100\x;"></a>](#elixir-)
+            * [Elixir <a href="resources/icons/elixir-16.png" target="_blank" rel="noopener noreferrer"><img src="resources/icons/elixir-16.png" alt="Elixir Drop" title="Elixir Icon" style="max-width:100\x;"></a>](#elixir-)
                * [Running](#running-1)
                * [Debugging](#debugging-1)
             * [IEx (Interactive Elixir)](#iex-interactive-elixir)
                * [Running](#running-2)
                * [Debugging](#debugging-2)
-            * [Mix Tasks <a href="resources/icons/mix-16.png?raw=true" target="_blank"><img src="resources/icons/mix-16.png?raw=true" alt="Elixir Drop mixed in a round-bottom flask" title="Mix Icon" style="max-width:100\x;"></a>](#mix-tasks-)
+            * [Mix Tasks <a href="resources/icons/mix-16.png?raw=true" target="_blank" rel="noopener noreferrer"><img src="resources/icons/mix-16.png?raw=true" alt="Elixir Drop mixed in a round-bottom flask" title="Mix Icon" style="max-width:100\x;"></a>](#mix-tasks-)
                * [Running](#running-3)
                * [Debugging](#debugging-3)
             * [IEx Mix](#iex-mix)
@@ -181,6 +181,9 @@ Table of Contents
                * [Other File](#other-file)
                * [Current File](#current-file)
             * [Selection](#selection)
+         * [Go To Related](#go-to-related)
+            * [Decompiled Module](#decompiled-module)
+            * [Decompiled Call Definition](#decompiled-call-definition)
          * [Go To Symbol](#go-to-symbol)
          * [Go To Test](#go-to-test)
          * [Go To Test Subject](#go-to-test-subject)
@@ -279,6 +282,7 @@ Once you have your IDE of choice installed, you can [install this plugin](#insta
 | Decompilation                               | Yes           | Yes            |                                                                                       |
 | Go To Declaration                           | Yes           | Yes            |                                                                                       |
 | Formatting                                  | Yes           | Yes            |                                                                                       |
+| Go To Related                               | Yes           | Yes            |                                                                                       |
 | Go To Symbol                                | Yes           | Yes            |                                                                                       |
 | Go To Test                                  | Yes           | Yes            |                                                                                       |
 | Go To Test Subject                          | Yes           | Yes            |                                                                                       |
@@ -4030,6 +4034,36 @@ A subset of a file can be reformatted.
 2. Use the Reformat Code action
    * Code > Reformat Code
    * `Alt+Shift+Cmd+L`
+
+### Go To Related
+
+Go To Related is like Go To Declaration, but more general, for anything that is related to an element, but not its declaration.
+
+
+In IntelliJ Elixir, Go To Related can be used to go to the decompiled version of a modular (`defimpl`, `defprotocol`, or `defmodule`) or a callable (`def`, `defp`, `defmacro`, `defmacrop`) definition.
+
+#### Decompiled Module
+
+1. Place the cursor on the name of the modular, such as `EExTest.Accounts` in `defmodule EExTest.Accounts do`
+2. Go To Related
+   * Navigate > Related Symbol
+   * `Ctrl+Cmd+Up`
+3. Select a "Decompiled BEAM" target from the "Choose Target" context menu
+   ![Choose Target.png](screenshots/features/go_to_related/module/Choose%20Target.png?raw=true)
+4. You will be taken to the decompiled module
+   ![Decompiled.png](screenshots/features/go_to_related/module/Decompiled.png?raw=true)
+
+#### Decompiled Call Definition
+
+1. Place the cursor on the name of the call, such as `get_user!` in `def get_user!(id)`
+2. Go To Related
+   * Navigate > Related Symbol
+   * `Ctrl+Cmd+Up`
+3. Select a "Decompiled BEAM" target from the "Choose Target" context menu
+   ![Choose Target.png](screenshots/features/go_to_related/call/Choose%20Target.png?raw=true)
+4. You will be taken to the decompiled module
+   ![Decompiled.png](screenshots/features/go_to_related/call/Decompiled.png?raw=true)
+
 
 ### Go To Symbol
 
