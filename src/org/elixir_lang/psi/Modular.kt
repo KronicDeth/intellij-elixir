@@ -1,12 +1,9 @@
 package org.elixir_lang.psi
 
-import com.intellij.psi.PsiElement
-import com.intellij.util.Function
 import org.elixir_lang.Arity
 import org.elixir_lang.ArityRange
 import org.elixir_lang.Name
 import org.elixir_lang.psi.call.Call
-import org.elixir_lang.psi.call.Named
 import org.elixir_lang.psi.impl.call.macroChildCallSequence
 import org.elixir_lang.psi.impl.call.macroChildCalls
 
@@ -91,43 +88,4 @@ object Modular {
                     AccumulatorContinue(acc, true)
                 }
             }
-
-    @JvmStatic
-    fun forEachCallDefinitionClauseNameIdentifier(
-            modular: Call,
-            functionName: String?,
-            resolvedFinalArity: Int,
-            function: Function<PsiElement, Boolean>
-    ) {
-        callDefinitionClauseCallWhile(modular, functionName, resolvedFinalArity) { call ->
-            var keepProcessing = true
-
-            if (call is Named) {
-                val nameIdentifier = call.nameIdentifier
-
-                if (nameIdentifier != null && !function.`fun`(nameIdentifier)) {
-                    keepProcessing = false
-                }
-            }
-
-            keepProcessing
-        }
-    }
-
-    private fun callDefinitionClauseCallWhile(modular: Call,
-                                              functionName: String?,
-                                              resolvedFinalArity: Int,
-                                              function: (Call) -> Boolean) {
-        if (functionName != null) {
-            callDefinitionClauseCallWhile(modular) { callDefinitionClauseCall ->
-                CallDefinitionClause.nameArityRange(callDefinitionClauseCall)?.let { (name, arityRange) ->
-                    if (name == functionName) {
-                        !(arityRange.contains(resolvedFinalArity) && !function(callDefinitionClauseCall))
-                    } else {
-                        null
-                    }
-                } ?: true
-            }
-        }
-    }
 }
