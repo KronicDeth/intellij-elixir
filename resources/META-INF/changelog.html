@@ -35,6 +35,14 @@
           </li>
         </ul>
       </li>
+      <li>
+        Go To Related (<code>Ctrl+Cmd+Up</code>) can be used to Go To the decompiled Module or call definitions when on
+        a source modular (<code>defimpl</code>, <code>defmodule</code>, or <code>defprotocol</code>) or callable
+        (<code>def</code>, <code>defp</code>, <code>defmacro</code>, <code>defmacrop</code>).  This somewhat restores
+        the ability to go to both source and decompiled module and calls before 9.0.0, but now the source is preferred
+        for Go To Declaration and the decompiled will only be available if there is no source and if you definitely want
+        decompiled, you'll need to use Go To Related.
+      </li>
     </ul>
   </li>
   <li>

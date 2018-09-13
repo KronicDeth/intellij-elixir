@@ -181,6 +181,8 @@ Table of Contents
       * If it is a general call
         1. Resolve the call to its definition
         2. Goto Step 3 above
+* [#1259](https://github.com/KronicDeth/intellij-elixir/pull/1259) - [@KronicDeth](https://github.com/KronicDeth)
+  * Go To Related (`Ctrl+Cmd+Up`) can be used to Go To the decompiled Module or call definitions when on a source modular (`defimpl`, `defmodule`, or `defprotocol`) or callable (`def`, `defp`, `defmacro`, `defmacrop`).  This somewhat restores the ability to go to both source and decompiled module and calls before 9.0.0, but now the source is preferred for Go To Declaration and the decompiled will only be available if there is no source and if you definitely want decompiled, you'll need to use Go To Related.
 
 ### Bug Fixes
 * [#1245](https://github.com/KronicDeth/intellij-elixir/pull/1245) - Specify that Kotlin Plugin is needed in `CONTRIBUTING.md`, so IntelliJ plays nice. - [@sfat](https://github.com/sfat)
