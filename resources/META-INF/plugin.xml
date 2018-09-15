@@ -52,6 +52,8 @@
     <programRunner implementation="org.elixir_lang.mix.Runner" />
     <configurationType implementation="org.elixir_lang.mix.configuration.Type" />
 
+    <library.type implementation="org.elixir_lang.mix.library.Type"/>
+
     <!-- Tesing -->
     <configurationType implementation="org.elixir_lang.exunit.configuration.Type" />
     <programRunner implementation="org.elixir_lang.exunit.Runner" />
@@ -206,6 +208,12 @@
   <application-components>
     <!-- Add your application components here -->
   </application-components>
+
+  <project-components>
+    <component>
+      <implementation-class>org.elixir_lang.DepsWatcher</implementation-class>
+    </component>
+  </project-components>
 
   <actions>
     <group id="LangElixir.NewActions">
