@@ -11,6 +11,9 @@ import com.intellij.openapi.vfs.VirtualFileEvent
 import com.intellij.openapi.vfs.VirtualFileListener
 import com.intellij.openapi.vfs.VirtualFileManager
 
+/**
+ * Watches the [project]'s `deps` folder for changes to `mix` deps
+ */
 class DepsWatcher(private val project: Project, private val virtualFileManager: VirtualFileManager) :
         ProjectComponent, Disposable, VirtualFileListener {
     override fun initComponent() {

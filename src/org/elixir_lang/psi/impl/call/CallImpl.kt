@@ -20,6 +20,7 @@ import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.call.name.Module.stripElixirPrefix
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.*
+import org.elixir_lang.psi.impl.foldChildrenWhile
 import org.elixir_lang.psi.impl.keywordValue
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.operation.*
@@ -176,6 +177,48 @@ fun Call.macroChildCalls(): Array<Call> {
     val childCallList = macroChildCallList()
 
     return childCallList.toTypedArray()
+}
+
+fun <R> Call.foldChildrenWhile(initial: R, operation: (PsiElement, acc: R) -> AccumulatorContinue<R>): AccumulatorContinue<R> {
+    val doBlock = doBlock
+
+    return if (doBlock != null) {
+        doBlock.stab?.let { stab ->
+            val stabChildren = stab.children
+
+            if (stabChildren.size == 1) {
+                val stabChild = stabChildren[0]
+
+                if (stabChild is ElixirStabBody) {
+                    stabChild.foldChildrenWhile(initial, operation)
+                } else {
+                    null
+                }
+            } else {
+                null
+            }
+        }
+    } else { // one liner version with `do:` keyword argument
+        val finalArguments = finalArguments()!!
+
+        assert(finalArguments.isNotEmpty())
+
+        val potentialKeywords = finalArguments[finalArguments.size - 1]
+
+        if (potentialKeywords is QuotableKeywordList) {
+            val quotableKeywordPairList = potentialKeywords.quotableKeywordPairList()
+            val firstQuotableKeywordPair = quotableKeywordPairList[0]
+            val keywordKey = firstQuotableKeywordPair.keywordKey
+
+            if (keywordKey.text == "do") {
+                firstQuotableKeywordPair.keywordValue.foldChildrenWhile(initial, operation)
+            } else {
+                null
+            }
+        } else {
+            null
+        }
+    } ?: AccumulatorContinue(initial, true)
 }
 
 fun Call.macroChildCallList(): List<Call> {

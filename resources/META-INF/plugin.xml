@@ -215,6 +215,11 @@
     </component>
   </project-components>
 
+  <module-components>
+    <component>
+      <implementation-class>org.elixir_lang.mix.Watcher</implementation-class>
+    </component>
+  </module-components>
   <actions>
     <group id="LangElixir.NewActions">
       <separator/>

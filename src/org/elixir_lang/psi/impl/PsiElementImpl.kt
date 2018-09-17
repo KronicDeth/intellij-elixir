@@ -100,6 +100,34 @@ fun PsiElement.getModuleName(): String? {
     }
 }
 
+fun <R> PsiElement.foldChildrenWhile(initial: R, operation: (PsiElement, acc: R) -> AccumulatorContinue<R>): AccumulatorContinue<R> =
+        when (this) {
+            is ElixirAccessExpression ->
+                operation(firstChild, initial)
+            is ElixirList, is ElixirStabBody -> {
+                var child: PsiElement? = firstChild
+                var final = AccumulatorContinue(initial, true)
+
+                while (child != null) {
+                    final = if (child is ElixirAccessExpression) {
+                        child.foldChildrenWhile(initial, operation)
+                    } else {
+                        operation(child, final.accumulator)
+                    }
+
+                    if (!final.`continue`) {
+                        break
+                    } else {
+                        child = child.nextSibling
+                    }
+                }
+
+                final
+            }
+            else ->
+                AccumulatorContinue(initial, true)
+        }
+
 fun PsiElement.macroChildCallList(): MutableList<Call> {
     val callList: MutableList<Call>
 
@@ -174,6 +202,7 @@ fun PsiElement.siblingExpression(function: (PsiElement) -> PsiElement): PsiEleme
 
 @Contract(pure = true)
 fun PsiElement.stripAccessExpression(): PsiElement = (this as? ElixirAccessExpression)?.stripOnlyChildParent() ?: this
+fun Array<PsiElement>.stripAccessExpressions(): List<PsiElement> = map(PsiElement::stripAccessExpression)
 
 @Contract(pure = true)
 fun PsiElement.stripOnlyChildParent(): PsiElement = children.singleOrNull() ?: this
