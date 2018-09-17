@@ -10,9 +10,13 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileEvent
 import com.intellij.openapi.vfs.VirtualFileListener
 import com.intellij.openapi.vfs.VirtualFileManager
+import java.net.URI
 
 /**
  * Watches the [project]'s `deps` folder for changes to `mix` deps
+ *
+ * * `deps/APPLICATION/{c_src,lib,priv,src}` - sources
+ * * `_build/ENVIRONMENT/{consolidated,lib/APPLICATION/ebin` - classes
  */
 class DepsWatcher(private val project: Project, private val virtualFileManager: VirtualFileManager) :
         ProjectComponent, Disposable, VirtualFileListener {
@@ -26,27 +30,93 @@ class DepsWatcher(private val project: Project, private val virtualFileManager: 
         virtualFileManager.addVirtualFileListener(this, this)
     }
 
+    /**
+     * If a file is deleted, it is need to determine whether it affect no deps, 1 dep, or all deps.
+     *
+     * * `deps` - deleteAllLibraries(deps)
+     * * `deps/APPLICATION` - deleteLibrary(deps/APPLICATION)
+     *
+     * Other deletes cause syncs in [syncLibraries]
+     */
     override fun fileDeleted(event: VirtualFileEvent) {
-        event.parent?.let { parent ->
-            if (parent == project.baseDir && event.fileName == "deps") {
-                deleteAllLibraries(event.file)
-            } else if (event.parent == project.baseDir.findChild("deps")) {
-                deleteLibrary(event.file)
-            }
+        if (event.parent == project.baseDir && event.fileName == "deps") {
+            deleteAllLibraries(event.file)
+        } else if (event.parent?.parent == project.baseDir && event.parent?.name == "deps") {
+            deleteLibrary(event.file)
+        } else {
+            syncLibraries(event)
         }
     }
 
+    /**
+     * If a file is created, i is needed to determined whether it affects no deps, 1 dep, or all deps
+     *
+     * * `deps` - syncLibraries(deps)
+     * * `deps/APPLICATION` - syncLibrary(deps/APPLICATION)
+     *
+     * Other creates cause syncs in [syncLibraries]
+     */
     override fun fileCreated(event: VirtualFileEvent) {
-        event.parent?.let { parent ->
-            if (parent == project.baseDir && event.fileName == "deps") {
-                syncLibraries(event.file)
-            } else if (event.parent == project.baseDir.findChild("deps")) {
-                syncLibrary(event.file)
-            }
+        if (event.fileName == "deps" && event.parent == project.baseDir) {
+            syncLibraries(event.file)
+        } else if (event.parent?.name == "deps" && event.parent?.parent == project.baseDir) {
+            syncLibrary(event.file)
+        } else {
+            syncLibraries(event)
         }
     }
 
     override fun dispose() = disposeComponent()
+
+    /**
+     * Common syncs shared with [fileCreated] and [fileDeleted].
+     *
+     * * `_build` - syncLibraries(deps)
+     * * `_build/ENVIRONMENT` - syncLibraries(deps)
+     * * `_build/ENVIRONMENT/consolidated` - syncLibraries(deps)
+     * * `_build/ENVIRONMENT/lib` - syncLibraries(deps)
+     * * `deps/APPLICATION/{c_src,lib,priv,src}` - syncLibrary(deps/APPLICATION)
+     * * `_build/ENVIRONMENT/lib/APPLICATION` - syncLibrary(deps/APPLICATION)
+     * * `_build/ENVIRONMENT/lib/APPLICATION/ebin` - syncLibrary(deps/APPLICATION)
+     */
+    private fun syncLibraries(event: VirtualFileEvent) {
+        val baseDir = project.baseDir
+        val fileName = event.fileName
+
+        event.parent?.let { parent ->
+            if (fileName == "_build" && parent == baseDir) {
+                syncLibraries(project)
+            } else {
+                parent.parent?.let { grandParent ->
+                    if (parent.name == "_build" && grandParent == baseDir) {
+                        syncLibraries(project)
+                    } else {
+                        grandParent.parent?.let { greatGrandParent ->
+                            if (fileName in arrayOf("consolidated", "lib") && grandParent.name == "_build" && greatGrandParent == baseDir) {
+                                syncLibraries(project)
+                            } else if (fileName in SOURCE_NAMES && grandParent.name == "deps" && greatGrandParent == baseDir) {
+                                syncLibrary(parent)
+                            } else {
+                                greatGrandParent.parent?.let { greatGreatGrandParent ->
+                                    if (parent.name == "lib" && greatGrandParent.name == "_build" && greatGreatGrandParent == baseDir) {
+                                        baseDir.findChild("deps")?.findChild(fileName)?.let { syncLibrary(it) }
+                                    } else if (fileName == "ebin" && grandParent.name == "lib" && greatGreatGrandParent.name == "_build" && greatGreatGrandParent.parent == baseDir) {
+                                        baseDir.findChild("deps")?.findChild(parent.name)?.let { syncLibrary(it) }
+                                    } else {
+                                        null
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun syncLibraries(project: Project) {
+        project.baseDir.findChild("deps")?.let { syncLibraries(it) }
+    }
 
     private fun syncLibraries(deps: VirtualFile) = deps.children.forEach { syncLibrary(it) }
 
@@ -81,8 +151,8 @@ class DepsWatcher(private val project: Project, private val virtualFileManager: 
                     }
 
                     dep.children.filter { it.isDirectory }.forEach { child ->
-                        nameToRootType(child.name)?.let { rootType ->
-                            modifiableModel.addRoot(child, rootType)
+                        if (child.name in SOURCE_NAMES) {
+                            modifiableModel.addRoot(child, OrderRootType.SOURCES)
                         }
                     }
 
@@ -92,21 +162,48 @@ class DepsWatcher(private val project: Project, private val virtualFileManager: 
         }
     }
 
-    private fun nameToRootType(name: String): OrderRootType? =
-            when (name) {
-                "c_src", "src", "lib", "priv" -> OrderRootType.SOURCES
-                else -> null
-            }
-
     private fun deleteAllLibraries(deps: VirtualFile) {
         val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
 
-        for (library in libraryTable.libraryIterator) {
-            TODO()
+        val depsLibraries = libraryTable.libraries.filter { library ->
+            // `getFile` won't return a `VirtualFile` that has been deleted, so need to use `getUrls`
+            val urls = library.getUrls(OrderRootType.SOURCES)
+
+            if (urls.isNotEmpty()) {
+                val prefixURI = URI(deps.url)
+
+                urls.all { url ->
+                    val uri = URI(url)
+                    val relativeURI  = prefixURI.relativize(uri)
+
+                    !relativeURI.isAbsolute && !relativeURI.toString().startsWith("../")
+                }
+            } else {
+                false
+            }
+        }
+
+        if (depsLibraries.isNotEmpty()) {
+            ApplicationManager.getApplication().invokeLater {
+                ApplicationManager.getApplication().runWriteAction {
+                    depsLibraries.forEach { libraryTable.removeLibrary(it) }
+                }
+            }
         }
     }
 
     private fun deleteLibrary(dep: VirtualFile) {
-        TODO()
+        val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
+        val depName = dep.name
+
+        libraryTable.getLibraryByName(depName)?.let { library ->
+            ApplicationManager.getApplication().invokeLater {
+                ApplicationManager.getApplication().runWriteAction {
+                    libraryTable.removeLibrary(library)
+                }
+            }
+        }
     }
 }
+
+private val SOURCE_NAMES = arrayOf("c_src", "lib", "priv", "src")
