@@ -1,10 +1,11 @@
-package org.elixir_lang.mix.importWizard;
+package org.elixir_lang.mix.project._import.step;
 
 import com.intellij.ide.util.ElementsChooser;
 import com.intellij.ide.util.projectWizard.WizardContext;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.projectImport.SelectImportedProjectsStep;
 import org.elixir_lang.Icons;
+import org.elixir_lang.mix.project._import.OtpApp;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,14 +17,14 @@ import java.util.Set;
 /**
  * Created by zyuyou on 15/7/3.
  */
-final class SelectImportedOtpAppsStep extends SelectImportedProjectsStep<ImportedOtpApp> {
+public class SelectOtpApps extends SelectImportedProjectsStep<OtpApp> {
   private final Set<String> myDuplicateModuleNames = new HashSet<String>();
 
-  public SelectImportedOtpAppsStep(@NotNull WizardContext context) {
+  public SelectOtpApps(@NotNull WizardContext context) {
     super(context);
-    fileChooser.addElementsMarkListener(new ElementsChooser.ElementsMarkListener<ImportedOtpApp>() {
+    fileChooser.addElementsMarkListener(new ElementsChooser.ElementsMarkListener<OtpApp>() {
       @Override
-      public void elementMarkChanged(ImportedOtpApp element, boolean isMarked) {
+      public void elementMarkChanged(OtpApp element, boolean isMarked) {
         evalDuplicates();
         fileChooser.repaint();
       }
@@ -42,14 +43,14 @@ final class SelectImportedOtpAppsStep extends SelectImportedProjectsStep<Importe
   }
 
   @Override
-  protected String getElementText(ImportedOtpApp importedOtpApp) {
-    return importedOtpApp.toString();
+  protected String getElementText(OtpApp otpApp) {
+    return otpApp.toString();
   }
 
   @Nullable
   @Override
-  protected Icon getElementIcon(ImportedOtpApp importedOtpApp) {
-    return myDuplicateModuleNames.contains(importedOtpApp.getName()) ? Icons.MIX_MODULE_CONFLICT : null;
+  protected Icon getElementIcon(OtpApp otpApp) {
+    return myDuplicateModuleNames.contains(otpApp.getName()) ? Icons.MIX_MODULE_CONFLICT : null;
   }
 
   /**
@@ -58,7 +59,7 @@ final class SelectImportedOtpAppsStep extends SelectImportedProjectsStep<Importe
   public void autoResolveConflicts(){
     // NOTE: It is assumed that elements are sorted by names, therefore conflicting names a grouped together.
     String previousAppName = null;
-    for(ImportedOtpApp selectedOtpApp : fileChooser.getMarkedElements()){
+    for(OtpApp selectedOtpApp : fileChooser.getMarkedElements()){
       if(selectedOtpApp.getName().equals(previousAppName)){
         fileChooser.setElementMarked(selectedOtpApp, false);
       }else{
@@ -68,12 +69,12 @@ final class SelectImportedOtpAppsStep extends SelectImportedProjectsStep<Importe
   }
 
   private void evalDuplicates(){
-    List<ImportedOtpApp> selectedOtpApps = fileChooser.getMarkedElements();
+    List<OtpApp> selectedOtpApps = fileChooser.getMarkedElements();
     Set<String> contains = new HashSet<String>(selectedOtpApps.size());
     myDuplicateModuleNames.clear();
-    for (ImportedOtpApp importedOtpApp:selectedOtpApps){
-      if(!contains.add(importedOtpApp.getName())){
-        myDuplicateModuleNames.add(importedOtpApp.getName());
+    for (OtpApp otpApp :selectedOtpApps){
+      if(!contains.add(otpApp.getName())){
+        myDuplicateModuleNames.add(otpApp.getName());
       }
     }
   }

@@ -1,10 +1,12 @@
-package org.elixir_lang.mix.importWizard;
+package org.elixir_lang.mix.project._import;
 
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.ide.util.projectWizard.ProjectJdkForModuleStep;
 import com.intellij.ide.util.projectWizard.WizardContext;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.projectImport.ProjectImportProvider;
+import org.elixir_lang.mix.project._import.step.Root;
+import org.elixir_lang.mix.project._import.step.SelectOtpApps;
 import org.elixir_lang.sdk.elixir.Type;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -12,8 +14,8 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Created by zyuyou on 15/7/1.
  */
-public class MixProjectImportProvider extends ProjectImportProvider {
-  protected MixProjectImportProvider(@NotNull MixProjectImportBuilder builder) {
+public class Provider extends ProjectImportProvider {
+  protected Provider(@NotNull Builder builder) {
     super(builder);
   }
 
@@ -21,8 +23,8 @@ public class MixProjectImportProvider extends ProjectImportProvider {
   public ModuleWizardStep[] createSteps(@NotNull WizardContext context){
     return new ModuleWizardStep[]{
         new ProjectJdkForModuleStep(context, Type.getInstance()),
-        new MixProjectRootStep(context),
-        new SelectImportedOtpAppsStep(context)
+        new Root(context),
+        new SelectOtpApps(context)
     };
   }
 

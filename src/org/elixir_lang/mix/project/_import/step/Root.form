@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="org.elixir_lang.mix.importWizard.MixProjectRootStep">
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="org.elixir_lang.mix.project._import.step.Root">
   <grid id="27dc6" binding="myPanel" layout-manager="GridLayoutManager" row-count="4" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="4" left="4" bottom="4" right="4"/>
     <constraints>

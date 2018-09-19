@@ -1,4 +1,4 @@
-package org.elixir_lang.mix.importWizard
+package org.elixir_lang.mix.project._import
 
 import com.intellij.compiler.CompilerWorkspaceConfiguration
 import com.intellij.openapi.application.ApplicationManager
@@ -26,7 +26,6 @@ import com.intellij.openapi.vfs.VirtualFileVisitor
 import com.intellij.openapi.vfs.newvfs.impl.VirtualDirectoryImpl
 import com.intellij.packaging.artifacts.ModifiableArtifactModel
 import com.intellij.projectImport.ProjectImportBuilder
-import com.intellij.util.Function
 import com.intellij.util.containers.ContainerUtil
 import org.elixir_lang.configuration.ElixirCompilerSettings
 import org.elixir_lang.mix.Icons
@@ -42,11 +41,11 @@ import java.util.*
  * Created by zyuyou on 15/7/1.
  * https://github.com/ignatov/intellij-erlang/blob/master/src/org/intellij/erlang/rebar/importWizard/RebarProjectImportBuilder.java
  */
-class MixProjectImportBuilder : ProjectImportBuilder<ImportedOtpApp>() {
+class Builder : ProjectImportBuilder<OtpApp>() {
 
     private var myProjectRoot: VirtualFile? = null
-    private var myFoundOtpApps = emptyList<ImportedOtpApp>()
-    private var mySelectedOtpApps = emptyList<ImportedOtpApp>()
+    private var myFoundOtpApps = emptyList<OtpApp>()
+    private var mySelectedOtpApps = emptyList<OtpApp>()
     private var myIsImportingProject: Boolean = false
 
 
@@ -62,19 +61,19 @@ class MixProjectImportBuilder : ProjectImportBuilder<ImportedOtpApp>() {
         return sdkType === Type.getInstance()
     }
 
-    override fun getList(): List<ImportedOtpApp> {
+    override fun getList(): List<OtpApp> {
         return ArrayList(myFoundOtpApps)
     }
 
     @Throws(ConfigurationException::class)
-    override fun setList(selectedOtpApps: List<ImportedOtpApp>?) {
+    override fun setList(selectedOtpApps: List<OtpApp>?) {
         if (selectedOtpApps != null) {
             mySelectedOtpApps = selectedOtpApps
         }
     }
 
-    override fun isMarked(importedOtpApp: ImportedOtpApp?): Boolean {
-        return importedOtpApp != null && mySelectedOtpApps.contains(importedOtpApp)
+    override fun isMarked(otpApp: OtpApp?): Boolean {
+        return otpApp != null && mySelectedOtpApps.contains(otpApp)
     }
 
     override fun setOpenProjectSettingsAfter(openProjectSettingsAfter: Boolean) {}
@@ -205,7 +204,7 @@ class MixProjectImportBuilder : ProjectImportBuilder<ImportedOtpApp>() {
         ProgressManager.getInstance().run(object : Task.Modal(ProjectImportBuilder.getCurrentProject(), "Scanning Mix Projects", true) {
             override fun run(indicator: ProgressIndicator) {
                 val mixExsFiles = findMixExs(myProjectRoot!!, indicator)
-                val importedOtpApps = mutableSetOf<ImportedOtpApp>()
+                val importedOtpApps = mutableSetOf<OtpApp>()
 
                 VfsUtilCore.visitChildrenRecursively(projectRoot, object : VirtualFileVisitor<Object>() {
                     override fun visitFile(file: VirtualFile): Boolean {
@@ -264,7 +263,7 @@ class MixProjectImportBuilder : ProjectImportBuilder<ImportedOtpApp>() {
     }
 
     companion object {
-        private val LOG = Logger.getInstance(MixProjectImportBuilder::class.java)
+        private val LOG = Logger.getInstance(Builder::class.java)
 
         /**
          * private methos
@@ -301,18 +300,18 @@ class MixProjectImportBuilder : ProjectImportBuilder<ImportedOtpApp>() {
             }
         }
 
-        private fun createImportedOtpApp(appRoot: VirtualFile): ImportedOtpApp? =
+        private fun createImportedOtpApp(appRoot: VirtualFile): OtpApp? =
             appRoot.findChild("mix.exs")?.let {
-                ImportedOtpApp(appRoot, it)
+                OtpApp(appRoot, it)
             }
 
         @Throws(IOException::class)
-        private fun deleteIdeaModuleFiles(importedOtpApps: List<ImportedOtpApp>) {
+        private fun deleteIdeaModuleFiles(otpApps: List<OtpApp>) {
             val ex = arrayOfNulls<IOException>(1)
 
             ApplicationManager.getApplication().runWriteAction(object : Runnable {
                 override fun run() {
-                    for (importedOtpApp in importedOtpApps) {
+                    for (importedOtpApp in otpApps) {
                         val ideaModuleFile = importedOtpApp.ideaModuleFile
                         if (ideaModuleFile != null) {
                             try {
@@ -332,9 +331,9 @@ class MixProjectImportBuilder : ProjectImportBuilder<ImportedOtpApp>() {
             }
         }
 
-        private fun findIdeaModuleFiles(importedOtpApps: List<ImportedOtpApp>): Boolean {
+        private fun findIdeaModuleFiles(otpApps: List<OtpApp>): Boolean {
             var ideaModuleFileExists = false
-            for (importedOtpApp in importedOtpApps) {
+            for (importedOtpApp in otpApps) {
                 val applicationRoot = importedOtpApp.root
                 val ideaModuleName = importedOtpApp.name
                 val imlFile = applicationRoot.findChild("$ideaModuleName.iml")
@@ -354,11 +353,11 @@ class MixProjectImportBuilder : ProjectImportBuilder<ImportedOtpApp>() {
         }
 
         private fun resolveModuleDeps(rootModel: ModifiableRootModel,
-                                      importedOtpApp: ImportedOtpApp,
+                                      otpApp: OtpApp,
                                       projectSdk: Sdk?,
                                       allImportedAppNames: Set<String>): Set<String> {
             val unresolvedAppNames = ContainerUtil.newHashSet<String>()
-            for (depAppName in importedOtpApp.deps) {
+            for (depAppName in otpApp.deps) {
                 if (allImportedAppNames.contains(depAppName)) {
                     rootModel.addInvalidModuleEntry(depAppName)
                 } else if (projectSdk != null && isSdkOtpApp(depAppName, projectSdk)) {

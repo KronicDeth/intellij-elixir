@@ -47,7 +47,7 @@ public class ElixirProjectStructureDetector extends ProjectStructureDetector {
    * This detector just for import non-organization project which not like mix-project
    * So that it's no need to detect directories such as libs, deps, tests etc
    *
-   * And mix-project will imported by the MixProjectImportBuilder.java
+   * And mix-project will imported by the Builder.java
    * */
   @Override
   public void setupProjectStructure(@NotNull Collection<DetectedProjectRoot> roots, @NotNull ProjectDescriptor projectDescriptor, @NotNull ProjectFromSourcesBuilder builder) {

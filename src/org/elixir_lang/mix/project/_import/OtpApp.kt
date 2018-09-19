@@ -1,4 +1,4 @@
-package org.elixir_lang.mix.importWizard
+package org.elixir_lang.mix.project._import
 
 import com.ericsson.otp.erlang.OtpErlangAtom
 import com.intellij.openapi.application.ApplicationManager
@@ -84,7 +84,7 @@ private fun text(virtualFile: VirtualFile): String = computeReadAction(Computabl
     VfsUtil.loadText(virtualFile)
 })
 
-class ImportedOtpApp(val root: VirtualFile, appMixFile: VirtualFile) {
+class OtpApp(val root: VirtualFile, appMixFile: VirtualFile) {
     val deps = mutableSetOf<String>()
     var ideaModuleFile: VirtualFile? = null
     var module: Module? = null
@@ -96,7 +96,7 @@ class ImportedOtpApp(val root: VirtualFile, appMixFile: VirtualFile) {
         if (this === other) return true
         if (other == null || javaClass != other.javaClass) return false
 
-        val that = other as ImportedOtpApp
+        val that = other as OtpApp
 
         return name == that.name && root == that.root
     }
