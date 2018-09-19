@@ -16,6 +16,7 @@ import com.intellij.openapi.vfs.VirtualFileListener
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
+import org.elixir_lang.mix.library.Kind
 
 /**
  * Watches the [module]'s `mix.exs` for changes to the `deps`, so that [com.intellij.openapi.roots.Libraries.Library]
@@ -105,7 +106,10 @@ class Watcher(
                                     ModuleRootModificationUtil.addDependency(module, depModule)
                                 }
                             } else {
-                                missingDeps.add(dep)
+                                moduleRootManager.modifiableModel.run {
+                                    addInvalidModuleEntry(depName)
+                                    commit()
+                                }
                             }
                         }
                         Dep.Type.LIBRARY -> {
@@ -116,13 +120,20 @@ class Watcher(
                                     ModuleRootModificationUtil.addDependency(module, depLibrary)
                                 }
                             } else {
-                                missingDeps.add(dep)
+                                val libraryTableModifiableModule = libraryTable.modifiableModel
+
+                                val invalidLibrary = libraryTableModifiableModule.createLibrary(depName, Kind)
+
+                                libraryTableModifiableModule.commit()
+
+                                moduleRootManager.modifiableModel.run {
+                                    addLibraryEntry(invalidLibrary)
+                                    commit()
+                                }
                             }
                         }
                     }
                 }
-
-                assert(missingDeps.size >= 0)
             }
         }
     }
