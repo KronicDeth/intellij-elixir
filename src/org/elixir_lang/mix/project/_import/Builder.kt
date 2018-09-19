@@ -153,7 +153,7 @@ class Builder : ProjectImportBuilder<OtpApp>() {
                 addSourceDirToContent(content, ideaModuleDir, "test", true)
 
                 // Exclude standard folders
-                // excludeDirFromContent(content, ideaModuleDir, "_build");
+                excludeDirFromContent(content, ideaModuleDir, "deps")
 
                 // Initialize output paths according to mix conventions.
                 val compilerModuleExt = rootModel.getModuleExtension(CompilerModuleExtension::class.java)
@@ -298,6 +298,10 @@ class Builder : ProjectImportBuilder<OtpApp>() {
             if (sourceDirFile != null) {
                 content.addSourceFolder(sourceDirFile, test)
             }
+        }
+
+        private fun excludeDirFromContent(content: ContentEntry, root: VirtualFile, excludedDir: String) {
+            content.addExcludeFolder("${root.url}/$excludedDir")
         }
 
         private fun createImportedOtpApp(appRoot: VirtualFile): OtpApp? =
