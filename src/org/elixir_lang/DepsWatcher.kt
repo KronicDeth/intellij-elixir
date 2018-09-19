@@ -10,6 +10,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileEvent
 import com.intellij.openapi.vfs.VirtualFileListener
 import com.intellij.openapi.vfs.VirtualFileManager
+import org.elixir_lang.mix.library.Kind
 import java.net.URI
 
 /**
@@ -125,12 +126,13 @@ class DepsWatcher(private val project: Project, private val virtualFileManager: 
             ApplicationManager.getApplication().invokeLater {
                 ApplicationManager.getApplication().runWriteAction {
                     val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
+                    val libraryTableModifiableModel = libraryTable.modifiableModel
                     val depName = dep.name
 
                     val library = libraryTable.getLibraryByName(depName)
-                            ?: LibraryTablesRegistrar.getInstance().getLibraryTable(project).createLibrary(dep.name)
+                            ?: libraryTableModifiableModel.createLibrary(dep.name, Kind)
 
-                    val modifiableModel = library.modifiableModel
+                    val libraryModifiableModel = library.modifiableModel
 
                     project.baseDir.findChild("_build")?.let { build ->
                         build.children.filter { it.isDirectory }.forEach { environment ->
@@ -138,11 +140,11 @@ class DepsWatcher(private val project: Project, private val virtualFileManager: 
                                 val environmentChildName = environmentChild.name
 
                                 if (environmentChildName == "consolidated") {
-                                    modifiableModel.addRoot(environmentChild, OrderRootType.CLASSES)
+                                    libraryModifiableModel.addRoot(environmentChild, OrderRootType.CLASSES)
                                 } else if (environmentChildName == "lib") {
                                     environmentChild.findChild(depName)?.findChild("ebin")?.let { ebin ->
                                         if (ebin.isDirectory) {
-                                            modifiableModel.addRoot(ebin, OrderRootType.CLASSES)
+                                            libraryModifiableModel.addRoot(ebin, OrderRootType.CLASSES)
                                         }
                                     }
                                 }
@@ -152,11 +154,12 @@ class DepsWatcher(private val project: Project, private val virtualFileManager: 
 
                     dep.children.filter { it.isDirectory }.forEach { child ->
                         if (child.name in SOURCE_NAMES) {
-                            modifiableModel.addRoot(child, OrderRootType.SOURCES)
+                            libraryModifiableModel.addRoot(child, OrderRootType.SOURCES)
                         }
                     }
 
-                    modifiableModel.commit()
+                    libraryModifiableModel.commit()
+                    libraryTableModifiableModel.commit()
                 }
             }
         }
