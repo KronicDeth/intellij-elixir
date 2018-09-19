@@ -6,6 +6,7 @@ import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleComponent
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.roots.LibraryOrderEntry
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.ModuleRootModificationUtil
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
@@ -38,6 +39,7 @@ import org.elixir_lang.psi.impl.stripAccessExpression
 class Watcher(
         private val module: Module,
         private val project: Project,
+        private val moduleManager: ModuleManager,
         private val moduleRootManager: ModuleRootManager,
         private val psiManager: PsiManager,
         private val virtualFileManager: VirtualFileManager
@@ -92,21 +94,27 @@ class Watcher(
                            val missingDeps = mutableListOf<Dep>()
 
                            for (dep in deps) {
+                               val depName = dep.application
+
                                when (dep.type) {
                                    Dep.Type.MODULE -> {
-                                       val depModule = ModuleManager.getInstance(project).findModuleByName(dep.application)
+                                       val depModule = moduleManager.findModuleByName(depName)
 
                                        if (depModule != null) {
-                                           ModuleRootModificationUtil.addDependency(module, depModule)
+                                           if (!moduleRootManager.isDependsOn(depModule)) {
+                                               ModuleRootModificationUtil.addDependency(module, depModule)
+                                           }
                                        } else {
                                            missingDeps.add(dep)
                                        }
                                    }
                                    Dep.Type.LIBRARY -> {
-                                       val depLibrary = libraryTable.getLibraryByName(dep.application)
+                                       val depLibrary = libraryTable.getLibraryByName(depName)
 
                                        if (depLibrary != null) {
-                                           ModuleRootModificationUtil.addDependency(module, depLibrary)
+                                           if (moduleRootManager.orderEntries.none { it is LibraryOrderEntry && it.libraryName == depName }) {
+                                               ModuleRootModificationUtil.addDependency(module, depLibrary)
+                                           }
                                        } else {
                                            missingDeps.add(dep)
                                        }
