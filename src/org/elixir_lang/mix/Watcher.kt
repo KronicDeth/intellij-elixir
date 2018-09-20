@@ -29,15 +29,18 @@ class Watcher(
         private val moduleRootManager: ModuleRootManager,
         private val psiManager: PsiManager,
         private val virtualFileManager: VirtualFileManager
-) :
-        ModuleComponent, Disposable, VirtualFileListener {
+) : ModuleComponent, Disposable, VirtualFileListener {
     override fun initComponent() {
+        syncLibraries()
+
+        virtualFileManager.addVirtualFileListener(this, this)
+    }
+
+    fun syncLibraries() {
         moduleRootManager
                 .contentRoots
                 .let { recursiveRootsToDepSet(it) }
                 .let { syncLibraries(it) }
-
-        virtualFileManager.addVirtualFileListener(this, this)
     }
 
     override fun contentsChanged(event: VirtualFileEvent) {

@@ -3,6 +3,7 @@ package org.elixir_lang
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ProjectComponent
+import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
@@ -10,6 +11,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileEvent
 import com.intellij.openapi.vfs.VirtualFileListener
 import com.intellij.openapi.vfs.VirtualFileManager
+import org.elixir_lang.mix.Watcher
 import org.elixir_lang.mix.library.Kind
 import java.net.URI
 
@@ -19,7 +21,11 @@ import java.net.URI
  * * `deps/APPLICATION/{c_src,lib,priv,src}` - sources
  * * `_build/ENVIRONMENT/{consolidated,lib/APPLICATION/ebin` - classes
  */
-class DepsWatcher(private val project: Project, private val virtualFileManager: VirtualFileManager) :
+class DepsWatcher(
+        private val project: Project,
+        private val moduleManager: ModuleManager,
+        private val virtualFileManager: VirtualFileManager
+) :
         ProjectComponent, Disposable, VirtualFileListener {
     override fun initComponent() {
         if (project.baseDir.findChild("mix.exs") != null) {
@@ -160,6 +166,10 @@ class DepsWatcher(private val project: Project, private val virtualFileManager: 
 
                     libraryModifiableModel.commit()
                     libraryTableModifiableModel.commit()
+
+                    moduleManager.modules.forEach { module ->
+                        module.getComponent(Watcher::class.java).syncLibraries()
+                    }
                 }
             }
         }
