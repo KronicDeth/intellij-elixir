@@ -4,7 +4,9 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ProjectComponent
 import com.intellij.openapi.module.ModuleManager
+import com.intellij.openapi.module.ModuleUtil
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
 import com.intellij.openapi.vfs.VirtualFile
@@ -148,9 +150,26 @@ class DepsWatcher(
                                 if (environmentChildName == "consolidated") {
                                     libraryModifiableModel.addRoot(environmentChild, OrderRootType.CLASSES)
                                 } else if (environmentChildName == "lib") {
-                                    environmentChild.findChild(depName)?.findChild("ebin")?.let { ebin ->
-                                        if (ebin.isDirectory) {
-                                            libraryModifiableModel.addRoot(ebin, OrderRootType.CLASSES)
+                                    environmentChild.findChild(depName)?.let{ depEnvironmentLibrary ->
+                                        depEnvironmentLibrary.findChild("ebin")?.let { ebin ->
+                                            if (ebin.isDirectory) {
+                                                /* Mark build output as excluded when marking it as CLASSES, so that
+                                                   dependency will show up in External Libraries AND be pushed out into
+                                                   non-project results */
+                                                ModuleUtil
+                                                        .findModuleForFile(depEnvironmentLibrary, project)
+                                                        ?.let { module ->
+                                                            ModuleRootManager.getInstance(module).modifiableModel.apply {
+                                                                contentEntries.forEach { contentEntry ->
+                                                                    contentEntry.addExcludeFolder(depEnvironmentLibrary)
+                                                                }
+
+                                                                commit()
+                                                            }
+                                                        }
+
+                                                libraryModifiableModel.addRoot(ebin, OrderRootType.CLASSES)
+                                            }
                                         }
                                     }
                                 }
