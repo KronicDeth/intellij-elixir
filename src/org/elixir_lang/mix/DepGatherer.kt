@@ -1,9 +1,9 @@
 package org.elixir_lang.mix
 
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.PsiFile
 import org.elixir_lang.NameArity
+import org.elixir_lang.package_manager.DepGatherer
 import org.elixir_lang.psi.AccumulatorContinue
 import org.elixir_lang.psi.CallDefinitionClause.isFunction
 import org.elixir_lang.psi.CallDefinitionClause.isPublicFunction
@@ -17,9 +17,7 @@ import org.elixir_lang.psi.impl.call.macroChildCalls
 import org.elixir_lang.psi.impl.keywordValue
 import org.elixir_lang.psi.impl.stripAccessExpression
 
-class DepGatherer : PsiElementVisitor() {
-    val depSet: MutableSet<Dep> = mutableSetOf()
-
+class DepGatherer : DepGatherer() {
     override fun visitFile(file: PsiFile?) {
         if (file is ElixirFile) {
             file.acceptChildren(this)
