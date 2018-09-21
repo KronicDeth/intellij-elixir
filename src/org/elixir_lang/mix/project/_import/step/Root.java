@@ -1,4 +1,4 @@
-package org.elixir_lang.mix.importWizard;
+package org.elixir_lang.mix.project._import.step;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.Platform;
@@ -23,6 +23,7 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.projectImport.ProjectImportWizardStep;
 import org.elixir_lang.Mix;
+import org.elixir_lang.mix.project._import.Builder;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -33,14 +34,14 @@ import static java.util.Collections.emptyMap;
 /**
  * https://github.com/ignatov/intellij-erlang/blob/master/src/org/intellij/erlang/rebar/importWizard/RebarProjectRootStep.java
  */
-public class MixProjectRootStep extends ProjectImportWizardStep {
-    private static final Logger LOG = Logger.getInstance(MixProjectImportBuilder.class);
+public class Root extends ProjectImportWizardStep {
+    private static final Logger LOG = Logger.getInstance(Builder.class);
     private static final boolean ourEnabled = !SystemInfo.isWindows;
     private JCheckBox myGetDepsCheckbox;
     private JPanel myPanel;
     private TextFieldWithBrowseButton myProjectRootComponent;
 
-    MixProjectRootStep(WizardContext context) {
+    public Root(WizardContext context) {
         super(context);
 
         String projectFileDirectory = context.getProjectFileDirectory();
@@ -119,8 +120,8 @@ public class MixProjectRootStep extends ProjectImportWizardStep {
 
     @Override
     @NotNull
-    protected MixProjectImportBuilder getBuilder() {
-        return (MixProjectImportBuilder) super.getBuilder();
+    protected Builder getBuilder() {
+        return (Builder) super.getBuilder();
     }
 
     @Override
@@ -165,7 +166,7 @@ public class MixProjectRootStep extends ProjectImportWizardStep {
             fetchDependencies(workingDirectory, sdk);
         }
 
-        MixProjectImportBuilder builder = getBuilder();
+        Builder builder = getBuilder();
         builder.setIsImportingProject(getWizardContext().isCreatingNewProject());
 
         return builder.setProjectRoot(projectRoot);

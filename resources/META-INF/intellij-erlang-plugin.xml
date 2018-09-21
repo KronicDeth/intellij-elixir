@@ -3,4 +3,8 @@
   <extensions defaultExtensionNs="com.intellij">
     <annotator language="Erlang" implementationClass="org.elixir_lang.annonator.Module"/>
   </extensions>
+
+  <extensions defaultExtensionNs="org.elixir_lang">
+    <packageManager implementation="org.elixir_lang.rebar3.PackageManager"/>
+  </extensions>
 </idea-plugin>

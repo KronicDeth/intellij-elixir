@@ -14,7 +14,7 @@ import org.elixir_lang.Level
 import org.elixir_lang.Level.V_1_3
 import org.elixir_lang.Level.V_1_6
 import org.elixir_lang.Macro
-import org.elixir_lang.mix.importWizard.computeReadAction
+import org.elixir_lang.mix.project._import.computeReadAction
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.call.name.Module.prependElixirPrefix

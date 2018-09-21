@@ -12,6 +12,14 @@
   <depends config-file="intellij-erlang-plugin.xml" optional="true">org.jetbrains.erlang</depends>
   <depends config-file="rich-platform-plugin.xml" optional="true">com.intellij.modules.java</depends>
 
+  <extensionPoints>
+    <extensionPoint qualifiedName="org.elixir_lang.packageManager" interface="org.elixir_lang.PackageManager"/>
+  </extensionPoints>
+
+  <extensions defaultExtensionNs="org.elixir_lang">
+    <packageManager implementation="org.elixir_lang.mix.PackageManager"/>
+  </extensions>
+
   <extensions defaultExtensionNs="com.intellij">
     <errorHandler implementation="org.elixir_lang.errorreport.Submitter"/>
 
@@ -51,6 +59,8 @@
     <!-- Mix related extensions -->
     <programRunner implementation="org.elixir_lang.mix.Runner" />
     <configurationType implementation="org.elixir_lang.mix.configuration.Type" />
+
+    <library.type implementation="org.elixir_lang.mix.library.Type"/>
 
     <!-- Tesing -->
     <configurationType implementation="org.elixir_lang.exunit.configuration.Type" />
@@ -207,6 +217,17 @@
     <!-- Add your application components here -->
   </application-components>
 
+  <project-components>
+    <component>
+      <implementation-class>org.elixir_lang.DepsWatcher</implementation-class>
+    </component>
+  </project-components>
+
+  <module-components>
+    <component>
+      <implementation-class>org.elixir_lang.mix.Watcher</implementation-class>
+    </component>
+  </module-components>
   <actions>
     <group id="LangElixir.NewActions">
       <separator/>
