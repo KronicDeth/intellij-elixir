@@ -22,6 +22,21 @@
         </ul>
       </li>
       <li><code>deps</code> and the <code>_build/#{MIX_ENV}/lib/#{DEP_NAME}</code> will be marked as Excluded, so that Libraries appear in External Libraries at the bottom of the Project Pane.</li>
+      <li>
+        Go To Class action (Cmd+O) to go to modules separately from all functions as would happen with Go To Symbols
+        (Alt+Cmd+O).
+        <ul>
+          <li>
+            <p>New ModuleName index keeps track of only the names of modulars:</p>
+            <ul>
+              <li>defmodule</li>
+              <li>defimpl</li>
+              <li>defprotocol</li>
+            </ul>
+            <p>It is used to power gotoClassContributor for Go To Class action.</p>
+          </li>
+        </ul>
+      </li>
     </ul>
   </li>
   <li>

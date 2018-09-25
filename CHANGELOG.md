@@ -174,6 +174,14 @@ Table of Contents
     * In umbrella projects, when `in_umbrella` is used, the Project Module for each `apps/#{APP_NAME}` will be marked a dependency,
     * Library and Modules are properly connected as dependencies, so that only declared dependencies will resolve, lessening false completions and declarations when different OTP app share common Module or function names.
   * `deps` and the `_build/#{MIX_ENV}/lib/#{DEP_NAME}` will be marked as Excluded, so that Libraries appear in External Libraries at the bottom of the Project Pane.
+* [#1275](https://github.com/KronicDeth/intellij-elixir/pull/1275) - [@KronicDeth](https://github.com/KronicDeth)
+  * Go To Class action (Cmd+O) to go to modules separately from all functions as would happen with Go To Symbols (Alt+Cmd+O).
+    * New ModuleName index keeps track of only the names of modulars:
+      * defmodule
+      * defimpl
+      * defprotocol
+
+      It is used to power gotoClassContributor for Go To Class action.
 
 ### Incompatible Changes
 * [#1272](https://github.com/KronicDeth/intellij-elixir/pull/1272) - [@KronicDeth](https://github.com/KronicDeth)
