@@ -1,5 +1,45 @@
 <html>
 <body>
+<h1>v10.0.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>Go To Symbol and completion will only resolve in project source unless non-project sources are turned on.
+        <ul>
+          <li>
+            <code>deps</code> are properly marked as Libraries and no longer count as being in the project scope for the
+            Go To tools.
+          </li>
+          <li>
+            In umbrella projects, when <code>in_umbrella</code> is used, the Project Module for each
+            <code>apps/#{APP_NAME}</code> will be marked a dependency.
+          </li>
+          <li>
+            Library and Modules are properly connected as dependencies, so that only declared dependencies will resolve,
+            lessening false completions and declarations when different OTP app share common Module or function names.
+          </li>
+        </ul>
+      </li>
+      <li><code>deps</code> and the <code>_build/#{MIX_ENV}/lib/#{DEP_NAME}</code> will be marked as Excluded, so that Libraries appear in External Libraries at the bottom of the Project Pane.</li>
+    </ul>
+  </li>
+  <li>
+    <p>Incompatible Changes</p>
+    <ul>
+      <li>
+        Dependencies are now counted as external to the project, so the Go To tools, like Go To Symbol will no longer
+        include matches for both project sources and dependencies sources together, instead they will follow the more
+        JetBrains native behavior
+        <ul>
+          <li>Project sources will be shown by default</li>
+          <li>If there are no project matches, dependencies will be shown instead.</li>
+          <li>If you want to include dependency (non-project) matches, you can check the box or hit Cmd+O.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
 <h1>v9.0.0</h1>
 <ul>
   <li>
@@ -1122,75 +1162,6 @@
         Path changes were not being written back to disk because the <code>projectSdksModel.apply()</code> was being
         called before the <code>editor.apply()</code>, which would have copied to the <code>editor'</code>s path changes
         to the <code>projectSdksModel</code>.
-      </li>
-    </ul>
-  </li>
-</ul>
-<h1>v7.1.0</h1>
-<ul>
-  <li>
-    <p>Enhancements</p>
-    <ul>
-      <li>Start using Kotlin for new development.</li>
-      <li>Elixir Facet in Small IDEs
-        <ul>
-          <li>
-            Preferences &gt; Languages &amp; Frameworks &gt; Elixir can set the Elixir Facet SDK for the Project Module
-            used in Small IDEs as a per-project settings.
-          </li>
-          <li>
-            Preferences &gt; Languages &amp; Frameworks &gt; Elixir&gt; SDKs can add, delete, and configure Elixir SDKs
-            as per-application settings.
-          </li>
-          <li>
-            Preferences &gt; Languages * Frameworks &gt; Elixir &gt; Internal SDKs can add, delete, and configure Erlang
-            SDK for Elixir SDKs as per-application settings.
-          </li>
-        </ul>
-      </li>
-      <li>
-        Configure SDK before running <code>mix</code> when importing mix projects, so that the <code>mix</code> path
-        does not need to be configured separately from the SDK path.
-        <ul>
-          <li>The <code>mix</code> path no longer needs to be setup independently from the Elixir SDK.</li>
-        </ul>
-      </li>
-      <li>Add Local shared <code>credo</code> inspection, so the the <code>credo</code> inspection works for Code &gt; Code Cleanup.</li>
-      <li>
-        <p>Show Mix ExUnit in context menu in Elixir Facets, so that</p>
-        <ul>
-          <li>Run 'Mix ExUnit ...'</li>
-          <li>Debug 'Mix ExUnit ...'</li>
-          <li>"Create "Mix ExUnit ...'"</li>
-        </ul>
-        <p>
-          appear in Rubymine when you right-click the <code>test</code> directory and it is Marked as a Test Sources
-          Root.  It will appear green in Rubymine if already marked.  To mark it, do the following:
-        </p>
-        <ol>
-          <li>Right-Click <code>test</code> directory</li>
-          <li>Select "Mark Directory as &gt; Test Sources Root"</li>
-        </ol>
-      </li>
-    </ul>
-  </li>
-  <li>
-    <p>Bug Fixes</p>
-    <ul>
-      <li>
-        Protect access to <code>JavadocOrderRootType.getInstance()</code> so that it doesn't cause an error in Small
-        IDEs where its Extension Point is not defined.
-      </li>
-      <li>If the explanation tooltip is empty, fallback to the message for the credo annotator instead.</li>
-      <li>
-        Check if <code>SdkAdditionalData</code> is <code>null</code> before getting <code>ErlangSDK</code> as it can be
-        <code>null</code> in certain scenarios in Rubymine.
-      </li>
-      <li>
-        Fix <code>isConfigurationFromContext</code>, so that it works on Mix ExUnit Run Configurations generated from
-        directories.  Check if the <code>programParameters</code> and <code>workingDirectory</code> match by just<br>
-        generating another configuration from the context as this ensures the logic matches and includes support for
-        <code>PsiDirectory</code>.
       </li>
     </ul>
   </li>

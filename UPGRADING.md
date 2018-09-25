@@ -1,20 +1,28 @@
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+Table of Contents
+=================
 
-- [Upgrading](#upgrading)
-  - [v4.0.0](#v400)
-    - [Preferences/Settings](#preferencessettings)
-  - [v2.0.0](#v200)
-    - [Preferences/Settings](#preferencessettings-1)
-    - [Quick Fix](#quick-fix)
-  - [v1.0.0](#v100)
-  - [v0.3.1](#v031)
-  - [v0.3.0](#v030)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+   * [Upgrading](#upgrading)
+      * [v10.0.0](#v1000)
+      * [v9.0.0](#v900)
+      * [v6.0.0](#v600)
+      * [v5.0.0](#v500)
+      * [v4.0.0](#v400)
+         * [Preferences/Settings](#preferencessettings)
+      * [v2.0.0](#v200)
+         * [Preferences/Settings](#preferencessettings-1)
+         * [Quick Fix](#quick-fix)
+      * [v1.0.0](#v100)
+      * [v0.3.1](#v031)
+      * [v0.3.0](#v030)
 
 # Upgrading
+
+## v10.0.0
+
+If you want dependencies to appear in External Libraries in a pre-existing project, as will happen with an new projects imported into IntelliJ Elixir `10.0.0`, you will need to manually mark the directory as excluded:
+
+1. Right-click `deps`
+2. Select `Mark Directory as > Excluded`
 
 ## v9.0.0
 
