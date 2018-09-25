@@ -20,10 +20,6 @@ abstract class Named<S : NamedStubBase<T>, T : PsiNameIdentifierOwner>(@NonNls d
             val name = stub.name
 
             if (name != null) {
-                if (name.contains("Mixfile")) {
-                    assert(name != null)
-                }
-
                 sink.occurrence<NamedElement, String>(AllName.KEY, name)
 
                 if (stub is Call && definition(stub)?.type == Definition.Type.MODULAR) {
