@@ -6,11 +6,14 @@ import com.intellij.psi.stubs.NamedStubBase;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.util.containers.SmartHashSet;
 import com.intellij.util.io.StringRef;
+import org.elixir_lang.psi.Definition;
 import org.elixir_lang.psi.call.Call;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
+
+import static org.elixir_lang.psi.DefinitionKt.definition;
 
 // I normally wouldn't add the redundant StubBased prefix, but it makes generating from Elixir.bnf work
 public class Stub<T extends org.elixir_lang.psi.call.StubBased> extends NamedStubBase<T> implements Stubbic {
@@ -44,6 +47,8 @@ public class Stub<T extends org.elixir_lang.psi.call.StubBased> extends NamedStu
     private final StringRef resolvedFunctionName;
     @Nullable
     private final StringRef resolvedModuleName;
+    @Nullable
+    private final Definition definition;
 
     /*
      * Constructors
@@ -98,6 +103,7 @@ public class Stub<T extends org.elixir_lang.psi.call.StubBased> extends NamedStu
         this.resolvedFinalArity = resolvedFinalArity;
         this.resolvedFunctionName = resolvedFunctionName;
         this.resolvedModuleName = resolvedModuleName;
+        this.definition = definition(this.resolvedModuleName(), this.resolvedFunctionName(), resolvedFinalArity, hasDoBlockOrKeyword);
     }
 
     /*
@@ -155,4 +161,9 @@ public class Stub<T extends org.elixir_lang.psi.call.StubBased> extends NamedStu
         return StringRef.toString(resolvedModuleName);
     }
 
+    @Nullable
+    @Override
+    public Definition getDefinition() {
+        return definition;
+    }
 }

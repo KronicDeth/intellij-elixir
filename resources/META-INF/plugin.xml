@@ -205,6 +205,9 @@
     <stubIndex implementation="org.elixir_lang.psi.stub.index.AllName"/>
     <typedHandler implementation="org.elixir_lang.TypedHandler"/>
 
+    <stubIndex implementation="org.elixir_lang.psi.stub.index.ModularName"/>
+    <gotoClassContributor implementation="org.elixir_lang.navigation.GotoClassContributor"/>
+
     <!-- debug -->
     <fileBasedIndex implementation="org.elixir_lang.beam.chunk.lines.file_names.Index"/>
     <programRunner implementation="org.elixir_lang.debugger.Runner"/>
