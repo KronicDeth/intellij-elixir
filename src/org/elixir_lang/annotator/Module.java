@@ -9,7 +9,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StubIndex;
 import org.elixir_lang.psi.NamedElement;
-import org.elixir_lang.psi.stub.index.AllName;
+import org.elixir_lang.psi.stub.index.ModularName;
 import org.intellij.erlang.psi.ErlangAtom;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,7 +29,7 @@ public class Module implements Annotator {
                 Project project = psiElement.getProject();
 
                 Collection<NamedElement> namedElementCollection = StubIndex.getElements(
-                        AllName.KEY,
+                        ModularName.KEY,
                         name,
                         project,
                         GlobalSearchScope.allScope(project),

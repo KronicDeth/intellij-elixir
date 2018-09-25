@@ -5,6 +5,7 @@ import com.intellij.util.io.StringRef;
 import org.elixir_lang.beam.psi.Module;
 import org.elixir_lang.beam.psi.stubs.ModuleStub;
 import org.elixir_lang.beam.psi.stubs.ModuleStubElementTypes;
+import org.elixir_lang.psi.Definition;
 import org.elixir_lang.psi.call.name.Function;
 import org.elixir_lang.psi.stub.call.Deserialized;
 import org.jetbrains.annotations.NotNull;
@@ -75,5 +76,11 @@ public class ModuleStubImpl<T extends Module> extends StubbicBase<T> implements 
     @Override
     public String resolvedModuleName() {
         return RESOLVED_MODULE_NAME;
+    }
+
+    @Nullable
+    @Override
+    public Definition getDefinition() {
+        return Definition.MODULE;
     }
 }
