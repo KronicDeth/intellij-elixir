@@ -18,11 +18,17 @@ object __MODULE__ {
                 .getParameterizedCachedValue(__MODULE__Call, KEY, Provider(__MODULE__Call), false, useCall)
 
     private class Provider(private val __MODULE__Call: Call) : ParameterizedCachedValueProvider<PsiReference, Call?> {
-        override fun compute(useCall: Call?): CachedValueProvider.Result<PsiReference>? =
-                CachedValueProvider.Result.create(
-                        Reference(call = __MODULE__Call, useCall = useCall),
-                        __MODULE__Call,
-                        useCall
-                )
+        override fun compute(useCall: Call?): CachedValueProvider.Result<PsiReference>? {
+            val dependencies: Array<Call> = if (useCall != null) {
+                arrayOf(__MODULE__Call, useCall)
+            } else {
+                arrayOf(__MODULE__Call)
+            }
+
+            return CachedValueProvider.Result.create(
+                    Reference(call = __MODULE__Call, useCall = useCall),
+                    dependencies
+            )
+        }
     }
 }
