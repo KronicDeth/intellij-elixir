@@ -113,7 +113,9 @@ abstract class Configurable: SearchableConfigurable, com.intellij.openapi.option
             override fun beforeSdkRemove(sdk: Sdk) {
                 LibraryTablesRegistrar.getInstance().libraryTable.let { libraryTable ->
                     libraryTable.getLibraryByName(sdk.name)?.let { library ->
-                        libraryTable.removeLibrary(library)
+                        ApplicationManager.getApplication().runWriteAction {
+                            libraryTable.removeLibrary(library)
+                        }
                     }
                 }
             }
@@ -134,17 +136,21 @@ abstract class Configurable: SearchableConfigurable, com.intellij.openapi.option
             override fun sdkChanged(sdk: Sdk, previousName: String) {
                 if (sdk.name != previousName) {
                     LibraryTablesRegistrar.getInstance().libraryTable.getLibraryByName(previousName)?.let { library ->
-                        library.modifiableModel.apply {
-                            name = sdk.name
-                            replaceRoots(sdk)
-                            commit()
+                        ApplicationManager.getApplication().runWriteAction {
+                            library.modifiableModel.apply {
+                                name = sdk.name
+                                replaceRoots(sdk)
+                                commit()
+                            }
                         }
                     }
                 } else {
                     LibraryTablesRegistrar.getInstance().libraryTable.getLibraryByName(sdk.name)?.let { library ->
-                        library.modifiableModel.apply {
-                            replaceRoots(sdk)
-                            commit()
+                        ApplicationManager.getApplication().runWriteAction {
+                            library.modifiableModel.apply {
+                                replaceRoots(sdk)
+                                commit()
+                            }
                         }
                     }
                 }
