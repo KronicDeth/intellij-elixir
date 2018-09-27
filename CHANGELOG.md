@@ -186,6 +186,9 @@ Table of Contents
 
 ### Bug Fixes
 * [#1277](https://github.com/KronicDeth/intellij-elixir/pull/1277) - Don't include `null` `useCall` as `__MODULE__` dependency. - [@KronicDeth](https://github.com/KronicDeth)
+* [#1279](https://github.com/KronicDeth/intellij-elixir/pull/1279) - [@KronicDeth](https://github.com/KronicDeth)
+  * Wrap `LibraryTable#removeLibrary` in write action.
+  * Wrap `Library#modifiableModule#commit` in write action.
 
 ### Incompatible Changes
 * [#1272](https://github.com/KronicDeth/intellij-elixir/pull/1272) - [@KronicDeth](https://github.com/KronicDeth)
