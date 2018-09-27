@@ -30,7 +30,7 @@ public final class FileReferenceFilter implements Filter {
     private static final String FILE_PATH_REGEXP = "\\s*([0-9 a-z_A-Z\\-\\\\./]+)";
     private static final String NUMBER_REGEXP = "([0-9]+)";
 
-    private static final Pattern PATTERN_FILENAME = Pattern.compile("[/\\\\]?([^/\\\\]*?\\.exs?)$");
+    private static final Pattern PATTERN_FILENAME = Pattern.compile("[/\\\\]?([^/\\\\]*?\\.e(ex|x|xs))$");
     private final int myColumnMatchGroup;
     private final int myFileMatchGroup;
     private final int myLineMatchGroup;
