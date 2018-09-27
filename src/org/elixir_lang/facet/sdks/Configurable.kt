@@ -113,7 +113,9 @@ abstract class Configurable: SearchableConfigurable, com.intellij.openapi.option
             override fun beforeSdkRemove(sdk: Sdk) {
                 LibraryTablesRegistrar.getInstance().libraryTable.let { libraryTable ->
                     libraryTable.getLibraryByName(sdk.name)?.let { library ->
-                        libraryTable.removeLibrary(library)
+                        ApplicationManager.getApplication().runWriteAction {
+                            libraryTable.removeLibrary(library)
+                        }
                     }
                 }
             }
