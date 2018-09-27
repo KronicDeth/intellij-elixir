@@ -183,6 +183,7 @@ Table of Contents
       * defprotocol
 
       It is used to power gotoClassContributor for Go To Class action.
+* [#1280](https://github.com/KronicDeth/intellij-elixir/pull/1280) - Handle `commit` and `override` for `Mix.Dep`. - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#1277](https://github.com/KronicDeth/intellij-elixir/pull/1277) - Don't include `null` `useCall` as `__MODULE__` dependency. - [@KronicDeth](https://github.com/KronicDeth)
