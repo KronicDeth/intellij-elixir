@@ -190,6 +190,7 @@ Table of Contents
 * [#1279](https://github.com/KronicDeth/intellij-elixir/pull/1279) - [@KronicDeth](https://github.com/KronicDeth)
   * Wrap `LibraryTable#removeLibrary` in write action.
   * Wrap `Library#modifiableModule#commit` in write action.
+* [#1282](https://github.com/KronicDeth/intellij-elixir/pull/1282) - Check if `Mix.Dep` has already been seen to prevent recursive loops. - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Incompatible Changes
 * [#1272](https://github.com/KronicDeth/intellij-elixir/pull/1272) - [@KronicDeth](https://github.com/KronicDeth)
