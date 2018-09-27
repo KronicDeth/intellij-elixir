@@ -41,7 +41,7 @@ class Watcher(
     fun syncLibraries() {
         moduleRootManager
                 .contentRoots
-                .let { recursiveRootsToDepSet(it) }
+                .let { recursiveRootsToDepSet(it, emptySet()) }
                 .let { syncLibraries(it) }
     }
 
@@ -50,42 +50,54 @@ class Watcher(
             event
                     .file
                     .let { org.elixir_lang.package_manager.VirtualFile(org.elixir_lang.mix.PackageManager, it) }
-                    .let { recursivePackageManagerVirtualFileToDepSet(it) }
+                    .let { recursivePackageManagerVirtualFileToDepSet(it, emptySet()) }
                     .let { syncLibraries(it) }
         }
     }
 
     override fun dispose() = disposeComponent()
 
-    private fun recursiveRootsToDepSet(roots: Array<VirtualFile>): Set<Dep> {
+    private fun recursiveRootsToDepSet(roots: Array<VirtualFile>, acc: Set<Dep>): Set<Dep> {
         val packageManagerVirtualFiles = roots.mapNotNull(::virtualFile)
 
-        return recursivePackageManagerVirtualFilesToDepSet(packageManagerVirtualFiles)
+        return recursivePackageManagerVirtualFilesToDepSet(packageManagerVirtualFiles, acc)
     }
 
-    private fun recursivePackageManagerVirtualFilesToDepSet(packageManagerVirtualFiles: List<org.elixir_lang.package_manager.VirtualFile>): Set<Dep> =
-            packageManagerVirtualFiles.fold(emptySet()) { acc, packageManagerVirtualFile ->
-                acc.union(recursivePackageManagerVirtualFileToDepSet(packageManagerVirtualFile))
+    private fun recursivePackageManagerVirtualFilesToDepSet(
+            packageManagerVirtualFiles: List<org.elixir_lang.package_manager.VirtualFile>,
+            initial: Set<Dep>
+    ): Set<Dep> =
+            packageManagerVirtualFiles.fold(initial) { acc, packageManagerVirtualFile ->
+                acc.union(recursivePackageManagerVirtualFileToDepSet(packageManagerVirtualFile, acc))
             }
 
-    private fun recursivePackageManagerVirtualFileToDepSet(packageManagerVirtualFile: org.elixir_lang.package_manager.VirtualFile): Set<Dep> =
-        psiManager.findFile(packageManagerVirtualFile.virtualFile)?.let { recursivePackageManagerPsiFileToDepSet(packageManagerVirtualFile.packageManager, it) } ?: emptySet()
+    private fun recursivePackageManagerVirtualFileToDepSet(
+            packageManagerVirtualFile: org.elixir_lang.package_manager.VirtualFile,
+            initial: Set<Dep>
+    ): Set<Dep> =
+        psiManager
+                .findFile(packageManagerVirtualFile.virtualFile)
+                ?.let { recursivePackageManagerPsiFileToDepSet(packageManagerVirtualFile.packageManager, it, initial) }
+                ?: initial
 
-    private fun recursivePackageManagerPsiFileToDepSet(packageManager: PackageManager, psiFile: PsiFile): Set<Dep> {
-        val directDepSet = packageManagerPsiFileToDepSet(packageManager, psiFile)
-
-        return directDepSet.fold(directDepSet) { acc, dep ->
-            val depDepSet = if (dep.type == Dep.Type.LIBRARY) {
-                project.baseDir.findFileByRelativePath(dep.path)?.let { root ->
-                    recursiveRootsToDepSet(arrayOf(root))
+    private fun recursivePackageManagerPsiFileToDepSet(
+            packageManager: PackageManager,
+            psiFile: PsiFile,
+            initial: Set<Dep>
+    ): Set<Dep> =
+        packageManager
+                .let { packageManagerPsiFileToDepSet(it, psiFile) }
+                .asSequence()
+                .filterNot { it in initial }
+                .filter { it.type == Dep.Type.LIBRARY }
+                .mapNotNull { dep ->
+                    project.baseDir.findFileByRelativePath(dep.path)?.let { root ->
+                        recursiveRootsToDepSet(arrayOf(root), initial.union(setOf(dep)))
+                    }
                 }
-            } else {
-                null
-            } ?: emptySet()
-
-            acc.union(depDepSet)
-        }
-    }
+                .fold(initial) { acc, depDepSet ->
+                    acc.union(depDepSet)
+                }
 
     private fun packageManagerPsiFileToDepSet(packageManager: PackageManager, psiFile: PsiFile): Set<Dep> =
         packageManager
@@ -97,7 +109,6 @@ class Watcher(
         ApplicationManager.getApplication().invokeLater {
             ApplicationManager.getApplication().runWriteAction {
                 val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
-                val missingDeps = mutableListOf<Dep>()
 
                 for (dep in deps) {
                     val depName = dep.application
