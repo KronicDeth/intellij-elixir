@@ -8,6 +8,7 @@ import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.ALIAS
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.call.finalArguments
+import org.elixir_lang.psi.impl.call.maybeModularNameToModular
 import org.elixir_lang.psi.impl.hasKeywordKey
 
 object UnaliasedName {
@@ -20,6 +21,7 @@ object UnaliasedName {
 
     private tailrec fun down(element: PsiElement): String? =
             when (element) {
+                is Call -> element.maybeModularNameToModular(null)?.name
                 is ElixirAccessExpression -> {
                     val children = element.children
 
