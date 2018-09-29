@@ -13,6 +13,8 @@ import org.elixir_lang.Module.split
 import org.elixir_lang.psi.NamedElement
 import org.elixir_lang.psi.call.Named
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
+import org.elixir_lang.psi.impl.call.finalArguments
+import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.scope.Module
 import org.elixir_lang.psi.scope.ResolveResultOrderedSet
 import org.elixir_lang.psi.stub.index.AllName
@@ -35,15 +37,40 @@ class MultiResolve internal constructor(private val name: String, private val in
      */
     override fun executeOnAliasedName(match: PsiNamedElement,
                                       aliasedName: String,
-                                      state: ResolveState): Boolean {
-        if (aliasedName == name) {
-            val namePartList = split(name)
+                                      state: ResolveState): Boolean =
+        executeOnAliasedName(match, aliasedName, name, state)
 
-            // adds `Foo.SSH` in `alias Foo.SSH`
+    private fun executeOnAliasedName(match: PsiNamedElement, aliasedName: String, targetName: String, state: ResolveState): Boolean {
+        if (aliasedName == targetName) {
+            val namePartList = split(targetName)
+
+            // adds `Foo.SSH` in `alias Foo.SSH` or `FSSH` in `alias Foo.SSH, as: FSSH`
             resolveResultOrderedSet.add(match, true)
 
-            // adds `defmodule Foo.SSH` for `alias Foo.SSH`
-            addUnaliasedNamedElementsToResolveResultList(match, namePartList)
+            val aliasCall = state.get(ALIAS_CALL)
+
+            if (aliasCall == null) {
+                // adds `defmodule Foo.SSH` for `alias Foo.SSH`
+                addUnaliasedNamedElementsToResolveResultList(match, namePartList)
+            } else {
+                // adds `Foo.SSH` and `defmodule Foo.SSH` for `alias Foo.SSH, as FSSH`
+                aliasCall
+                        .finalArguments()!!
+                        .first()
+                        .stripAccessExpression()
+                        .let { it as PsiNamedElement }
+                        .let { first ->
+                            UnaliasedName.unaliasedName(first)?.let { unaliasedName ->
+                                val aliasedNameWithoutAs = split(unaliasedName).last()
+                                executeOnAliasedName(
+                                        first,
+                                        aliasedNameWithoutAs,
+                                        aliasedNameWithoutAs,
+                                        state.put(ALIAS_CALL, null)
+                                )
+                            }
+                        }
+            }
         } else {
             val namePartList = split(name)
             val firstNamePart = namePartList[0]

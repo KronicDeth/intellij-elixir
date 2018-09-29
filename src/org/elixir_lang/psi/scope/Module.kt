@@ -6,12 +6,14 @@ import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.ResolveState
 import com.intellij.psi.scope.PsiScopeProcessor
 import org.elixir_lang.psi.*
+import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.Named
 
 import org.elixir_lang.psi.call.name.Function.ALIAS
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.call.keywordArgument
+import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.stub.type.call.Stub.isModular
 
 abstract class Module : PsiScopeProcessor {
@@ -37,7 +39,7 @@ abstract class Module : PsiScopeProcessor {
 
     private fun aliasedName(element: ElixirAlias): String? = element.name
 
-    private fun aliasedName(element: PsiElement): String? =
+    protected fun aliasedName(element: PsiElement): String? =
             when (element) {
                 is ElixirAlias -> aliasedName(element)
                 is QualifiedAlias -> aliasedName(element)
@@ -56,7 +58,9 @@ abstract class Module : PsiScopeProcessor {
         val asKeywordValue = aliasCall.keywordArgument("as")
 
         return if (asKeywordValue != null) {
-            executeOnAs(asKeywordValue, state)
+            asKeywordValue
+                    .stripAccessExpression()
+                    .let { executeOnAs(it, state.put(ALIAS_CALL, aliasCall)) }
         } else {
             val finalArguments = aliasCall.finalArguments()
 
@@ -77,7 +81,7 @@ abstract class Module : PsiScopeProcessor {
             executeOnMultipleAliasChildren(multipleAliases.children, state)
 
 
-    private fun executeOnAliasCallArgument(element: PsiElement?, state: ResolveState): Boolean =
+    protected fun executeOnAliasCallArgument(element: PsiElement?, state: ResolveState): Boolean =
             when (element) {
                 is ElixirAccessExpression -> executeOnAliasCallArgument(element, state)
                 is QualifiableAlias -> executeOnAliasCallArgument(element, state)
@@ -157,19 +161,8 @@ abstract class Module : PsiScopeProcessor {
         }
     }
 
-    private fun executeOnAs(asKeywordValue: ElixirAccessExpression, state: ResolveState): Boolean {
-        val children = asKeywordValue.children
-
-        return if (children.isNotEmpty()) {
-            executeOnAs(children[0], state)
-        } else {
-            true
-        }
-    }
-
     private fun executeOnAs(asKeywordValue: PsiElement, state: ResolveState): Boolean =
             when (asKeywordValue) {
-                is ElixirAccessExpression -> executeOnAs(asKeywordValue, state)
                 is PsiNamedElement -> executeOnMaybeAliasedName(
                         asKeywordValue,
                         asKeywordValue.name,
@@ -186,4 +179,9 @@ abstract class Module : PsiScopeProcessor {
             } else {
                 true
             }
+
+    companion object {
+        @JvmStatic
+        val ALIAS_CALL = Key<Call>("ALIAS_CALL")
+    }
 }
