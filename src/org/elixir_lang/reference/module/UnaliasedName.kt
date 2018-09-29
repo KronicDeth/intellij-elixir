@@ -5,6 +5,7 @@ import com.intellij.psi.PsiNamedElement
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
+import org.elixir_lang.psi.call.name.Function
 import org.elixir_lang.psi.call.name.Function.ALIAS
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.call.finalArguments
@@ -15,6 +16,12 @@ object UnaliasedName {
     fun unaliasedName(namedElement: PsiNamedElement): String? =
             if (namedElement is QualifiableAlias) {
                 unaliasedName(namedElement)
+            } else if (namedElement is Call && namedElement.isCalling(KERNEL, Function.__MODULE__, 0)) {
+                __MODULE__
+                        .reference(namedElement, useCall = null)
+                        .resolve()
+                        ?.let { it as? PsiNamedElement }
+                        ?.name
             } else {
                 namedElement.name
             }
