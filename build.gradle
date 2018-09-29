@@ -236,6 +236,10 @@ task stopQuoter(type: Exec, dependsOn: getQuoter) {
   args "stop"
 }
 
+runIde {
+  jvmArgs "-Didea.ProcessCanceledException=disabled"
+}
+
 test {
   dependsOn runQuoter
   finalizedBy stopQuoter
