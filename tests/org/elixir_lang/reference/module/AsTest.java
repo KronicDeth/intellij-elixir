@@ -46,15 +46,20 @@ public class AsTest extends LightPlatformCodeInsightFixtureTestCase {
 
         ResolveResult[] resolveResults = polyVariantReference.multiResolve(false);
 
-        assertEquals(2, resolveResults.length);
+        assertEquals(3, resolveResults.length);
 
-        // alias
+        // alias .., as:
         assertEquals(
                 "alias Prefix.Suffix1, as: As",
                 resolveResults[0].getElement().getParent().getParent().getParent().getParent().getParent().getText()
         );
-        // defmodule
-        assertEquals("defmodule Prefix.Suffix1 do\nend", resolveResults[1].getElement().getText());
+        // alias ..
+        assertEquals(
+                "alias Prefix.Suffix1, as: As",
+                resolveResults[1].getElement().getParent().getParent().getText()
+        );
+        // defmodule ..
+        assertEquals("defmodule Prefix.Suffix1 do\nend", resolveResults[2].getElement().getText());
     }
 
     /*
