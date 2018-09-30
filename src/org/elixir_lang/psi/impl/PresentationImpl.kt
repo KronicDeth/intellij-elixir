@@ -10,7 +10,11 @@ import org.elixir_lang.annotator.Parameter
 import org.elixir_lang.beam.psi.BeamFileImpl
 import org.elixir_lang.psi.ElixirIdentifier
 import org.elixir_lang.psi.QualifiableAlias
+import org.elixir_lang.psi.__module__.AliasPresentation
 import org.elixir_lang.psi.call.Call
+import org.elixir_lang.psi.call.name.Function
+import org.elixir_lang.psi.call.name.Function.ALIAS
+import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.outerMostQualifiableAlias
 import org.elixir_lang.structure_view.element.CallDefinition
 import org.elixir_lang.structure_view.element.CallDefinitionClause
@@ -39,6 +43,13 @@ object PresentationImpl {
                 org.elixir_lang.structure_view.element.modular.Module.`is`(call) -> {
                     val modular = CallDefinitionClause.enclosingModular(call)
                     org.elixir_lang.structure_view.element.modular.Module(modular, call).presentation
+                }
+                call.isCalling(KERNEL, Function.__MODULE__, 0) -> {
+                    if (call.parent?.parent?.let { it as? Call }?.isCalling(KERNEL, ALIAS) == true) {
+                        AliasPresentation(call)
+                    } else {
+                        getDefaultPresentation(call)
+                    }
                 }
                 else -> getDefaultPresentation(call)
             }
