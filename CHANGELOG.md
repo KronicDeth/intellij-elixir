@@ -185,6 +185,17 @@ Table of Contents
       It is used to power gotoClassContributor for Go To Class action.
 * [#1280](https://github.com/KronicDeth/intellij-elixir/pull/1280) - Handle `commit` and `override` for `Mix.Dep`. - [@KronicDeth](https://github.com/KronicDeth)
 * [#1283](https://github.com/KronicDeth/intellij-elixir/pull/1283) - Add `.eex` to `.ex` and `.exs` for accepted file extensions used to hyperlink files in stacktraces. - [@KronicDeth](https://github.com/KronicDeth)
+* [#1285](https://github.com/KronicDeth/intellij-elixir/pull/1285) - [@KronicDeth](https://github.com/KronicDeth)
+  * Resolve unaliased name when using `alias __MODULE__, as: Mod`
+  * Resolve usage of `Mod` in `alias __MODULE__, as Mod`
+    1. `Mod`
+    2. `__MODULE__` in `alias __MODULE__`
+    3. `defmodule MyModule` that is enclosing `__MODULE__`.
+  * Disable `ProcessCanceledException` for `runIde` gradle task, to allow for easier manual testing of completion and Go To actions during development.
+  * Completion of functions in current module when using `Mod.` after `alias __MODULE__, as: Mod`.
+  * Show more context for `alias` calls in presentations, like "Choose Declaration" pop up for Go To Declaration.
+    * Show resolved `__MODULE__` name (`alias MyModule`) when using `alias __MODULE__`.
+    * Show full `alias MyModule, as: Mod` when listing `Mod` in `alias __MODULE__, as Mod`.
 
 ### Bug Fixes
 * [#1277](https://github.com/KronicDeth/intellij-elixir/pull/1277) - Don't include `null` `useCall` as `__MODULE__` dependency. - [@KronicDeth](https://github.com/KronicDeth)
