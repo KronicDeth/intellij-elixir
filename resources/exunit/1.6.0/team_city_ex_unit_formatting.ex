@@ -87,7 +87,7 @@ defmodule TeamCityExUnitFormatting do
                   Keyword.merge(
                     attributes,
                     details: formatted,
-                    message: inspect(reason)
+                    message: ""
                   )
     put_formatted :test_finished,
                   Keyword.merge(
@@ -118,14 +118,13 @@ defmodule TeamCityExUnitFormatting do
       width,
       &formatter/2
     )
-    message = Enum.map_join(failed, "", fn {_kind, reason, _stack} -> inspect(reason) end)
     attributes = attributes(test)
 
     put_formatted :test_failed,
                   Keyword.merge(
                     attributes,
                     details: formatted,
-                    message: message
+                    message: ""
                   )
     put_formatted :test_finished,
                   Keyword.merge(

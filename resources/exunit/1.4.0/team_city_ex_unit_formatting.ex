@@ -88,7 +88,7 @@ defmodule TeamCityExUnitFormatting do
       Keyword.merge(
         attributes,
         details: formatted,
-        message: inspect(reason)
+        message: ""
       )
     )
 
@@ -135,7 +135,7 @@ defmodule TeamCityExUnitFormatting do
       Keyword.merge(
         attributes,
         details: formatted,
-        message: message
+        message: ""
       )
     )
 
