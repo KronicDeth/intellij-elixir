@@ -79,6 +79,7 @@ defmodule TeamCityExUnitFormatting do
         width,
         &formatter/2
       )
+
     details = IO.iodata_to_binary([formatted_failure, format_logs(logs)])
 
     put_formatted(
@@ -125,6 +126,7 @@ defmodule TeamCityExUnitFormatting do
         width,
         &formatter/2
       )
+
     details = IO.iodata_to_binary([formatted_failure, format_logs(logs)])
 
     put_formatted(
@@ -266,6 +268,7 @@ defmodule TeamCityExUnitFormatting do
   end
 
   defp format_logs(""), do: ""
+
   defp format_logs(logs) do
     indent = "\n     "
     indented_logs = String.replace(logs, "\n", indent)
