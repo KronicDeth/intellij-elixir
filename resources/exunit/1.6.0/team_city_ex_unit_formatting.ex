@@ -20,9 +20,6 @@ defmodule TeamCityExUnitFormatting do
 
   # Functions
 
-  @doc false
-  def formatter(_color, msg), do: msg
-
   def new(opts) do
     %__MODULE__{
       seed: opts[:seed],
@@ -35,13 +32,13 @@ defmodule TeamCityExUnitFormatting do
   def put_event(state = %__MODULE__{}, {:case_started, %ExUnit.TestCase{}}), do: state
 
   def put_event(state = %__MODULE__{}, {:module_finished, test_module = %ExUnit.TestModule{}}) do
-    put_formatted :test_suite_finished, attributes(test_module)
+    put_formatted(:test_suite_finished, attributes(test_module))
 
     state
   end
 
   def put_event(state = %__MODULE__{}, {:module_started, test_module = %ExUnit.TestModule{}}) do
-    put_formatted :test_suite_started, attributes(test_module)
+    put_formatted(:test_suite_started, attributes(test_module))
 
     state
   end
@@ -51,7 +48,7 @@ defmodule TeamCityExUnitFormatting do
   def put_event(state = %__MODULE__{}, {:suite_started, opts}) do
     seed = opts[:seed]
 
-    IO.puts "Suite started with seed #{seed}"
+    IO.puts("Suite started with seed #{seed}")
 
     %__MODULE__{state | seed: seed, trace: opts[:trace]}
   end
@@ -65,40 +62,51 @@ defmodule TeamCityExUnitFormatting do
         {
           :test_finished,
           test = %ExUnit.Test{
-            state: failed = {
-              :failed,
-              {_, reason, _}
-            },
+            logs: logs,
+            state:
+              failed = {
+                :failed,
+                {_, reason, _}
+              },
             time: time
           }
         }
       ) do
     updated_failures_counter = failures_counter + 1
-    formatted = ExUnit.Formatter.format_test_failure(
-      test,
-      failed,
-      updated_failures_counter,
-      width,
-      &formatter/2
-    )
     attributes = attributes(test)
 
-    put_formatted :test_failed,
-                  Keyword.merge(
-                    attributes,
-                    details: formatted,
-                    message: inspect(reason)
-                  )
-    put_formatted :test_finished,
-                  Keyword.merge(
-                    attributes,
-                    duration: div(time, 1000)
-                  )
+    formatted_failure =
+      ExUnit.Formatter.format_test_failure(
+        test,
+        failed,
+        updated_failures_counter,
+        width,
+        &formatter/2
+      )
+
+    details = IO.iodata_to_binary([formatted_failure, format_logs(logs)])
+
+    put_formatted(
+      :test_failed,
+      Keyword.merge(
+        attributes,
+        details: formatted_failure,
+        message: ""
+      )
+    )
+
+    put_formatted(
+      :test_finished,
+      Keyword.merge(
+        attributes,
+        duration: div(time, 1000)
+      )
+    )
 
     %{
-      state |
-      tests_counter: tests_counter + 1,
-      failures_counter: updated_failures_counter
+      state
+      | tests_counter: tests_counter + 1,
+        failures_counter: updated_failures_counter
     }
   end
 
@@ -108,35 +116,44 @@ defmodule TeamCityExUnitFormatting do
           width: width,
           tests_counter: tests_counter
         },
-        {:test_finished, test = %ExUnit.Test{state: {:failed, failed}, time: time}}
-      ) when is_list(failed) do
+        {:test_finished, test = %ExUnit.Test{logs: logs, state: {:failed, failed}, time: time}}
+      )
+      when is_list(failed) do
     updated_failures_counter = failures_counter + 1
-    formatted = ExUnit.Formatter.format_test_failure(
-      test,
-      failed,
-      updated_failures_counter,
-      width,
-      &formatter/2
-    )
-    message = Enum.map_join(failed, "", fn {_kind, reason, _stack} -> inspect(reason) end)
     attributes = attributes(test)
 
-    put_formatted :test_failed,
-                  Keyword.merge(
-                    attributes,
-                    details: formatted,
-                    message: message
-                  )
-    put_formatted :test_finished,
-                  Keyword.merge(
-                    attributes,
-                    duration: div(time, 1000)
-                  )
+    formatted_failure =
+      ExUnit.Formatter.format_test_failure(
+        test,
+        failed,
+        updated_failures_counter,
+        width,
+        &formatter/2
+      )
+
+    details = IO.iodata_to_binary([formatted_failure, format_logs(logs)])
+
+    put_formatted(
+      :test_failed,
+      Keyword.merge(
+        attributes,
+        details: details,
+        message: ""
+      )
+    )
+
+    put_formatted(
+      :test_finished,
+      Keyword.merge(
+        attributes,
+        duration: div(time, 1000)
+      )
+    )
 
     %{
-      state |
-      tests_counter: tests_counter + 1,
-      failures_counter: updated_failures_counter
+      state
+      | tests_counter: tests_counter + 1,
+        failures_counter: updated_failures_counter
     }
   end
 
@@ -149,13 +166,13 @@ defmodule TeamCityExUnitFormatting do
       ) do
     attributes = attributes(test)
 
-    put_formatted :test_ignored, attributes
-    put_formatted :test_finished, attributes
+    put_formatted(:test_ignored, attributes)
+    put_formatted(:test_finished, attributes)
 
     %{
-      state |
-      tests_counter: tests_counter + 1,
-      skipped_counter: skipped_counter + 1
+      state
+      | tests_counter: tests_counter + 1,
+        skipped_counter: skipped_counter + 1
     }
   end
 
@@ -168,30 +185,32 @@ defmodule TeamCityExUnitFormatting do
           }
         }
       ) do
-    put_formatted :test_finished,
-                  test
-                  |> attributes()
-                  |> Keyword.merge(
-                       duration: div(time, 1000)
-                     )
+    put_formatted(
+      :test_finished,
+      test
+      |> attributes()
+      |> Keyword.merge(duration: div(time, 1000))
+    )
 
     state
   end
 
   def put_event(state = %__MODULE__{}, {:test_started, test = %ExUnit.Test{tags: tags}}) do
-    put_formatted :test_started,
-                  test
-                  |> attributes()
-                  |> Keyword.merge(
-                    locationHint: "file://#{tags[:file]}:#{tags[:line]}"
-                  )
+    put_formatted(
+      :test_started,
+      test
+      |> attributes()
+      |> Keyword.merge(locationHint: "file://#{tags[:file]}:#{tags[:line]}")
+    )
 
     state
   end
 
   def put_event(state = %__MODULE__{}, event) do
-    IO.warn "#{inspect(__MODULE__)} does not know how to process event (#{inspect(event)}).  " <>
-            "Please report this message to https://github.com/KronicDeth/intellij-elixir/issues/new."
+    IO.warn(
+      "#{inspect(__MODULE__)} does not know how to process event (#{inspect(event)}).  " <>
+        "Please report this message to https://github.com/KronicDeth/intellij-elixir/issues/new."
+    )
 
     state
   end
@@ -207,13 +226,20 @@ defmodule TeamCityExUnitFormatting do
   end
 
   defp camelize(s) do
-    [head | tail] = String.split s, "_"
-    "#{head}#{Enum.map tail, &String.capitalize/1}"
+    [head | tail] = String.split(s, "_")
+    "#{head}#{Enum.map(tail, &String.capitalize/1)}"
+  end
+
+  defp colorize(escape, string) do
+    [escape, string, :reset]
+    |> IO.ANSI.format_fragment(true)
+    |> IO.iodata_to_binary()
   end
 
   # Must escape certain characters
   # see: https://confluence.jetbrains.com/display/TCD9/Build+Script+Interaction+with+TeamCity
   defp escape_output(s) when not is_binary(s), do: escape_output("#{s}")
+
   defp escape_output(s) do
     s
     |> String.replace("|", "||")
@@ -225,17 +251,29 @@ defmodule TeamCityExUnitFormatting do
   end
 
   defp format(type, attributes) do
-    messageName = type
-                  |> Atom.to_string()
-                  |> camelize()
-    attrs = attributes
-            |> Enum.map(&format_attribute/1)
-            |> Enum.join(" ")
+    messageName =
+      type
+      |> Atom.to_string()
+      |> camelize()
+
+    attrs =
+      attributes
+      |> Enum.map(&format_attribute/1)
+      |> Enum.join(" ")
+
     "##teamcity[#{messageName} #{attrs}]"
   end
 
   defp format_attribute({k, v}) do
-    "#{Atom.to_string k}='#{escape_output v}'"
+    "#{Atom.to_string(k)}='#{escape_output(v)}'"
+  end
+
+  defp format_logs(""), do: ""
+
+  defp format_logs(logs) do
+    indent = "\n     "
+    indented_logs = String.replace(logs, "\n", indent)
+    [indent, "The following output was logged:", indent | indented_logs]
   end
 
   defp format_module_name(module_name) do
@@ -244,16 +282,40 @@ defmodule TeamCityExUnitFormatting do
     |> String.replace(~r/\bElixir\./, "")
   end
 
+  defp formatter(:diff_enabled?, _), do: true
+
+  defp formatter(:error_info, msg), do: colorize(:red, msg)
+
+  defp formatter(:extra_info, msg), do: colorize(:cyan, msg)
+
+  defp formatter(:location_info, msg), do: colorize([:bright, :black], msg)
+
+  defp formatter(:diff_delete, msg), do: colorize(:red, msg)
+
+  defp formatter(:diff_delete_whitespace, msg), do: colorize(IO.ANSI.color_background(2, 0, 0), msg)
+
+  defp formatter(:diff_insert, msg), do: colorize(:green, msg)
+
+  defp formatter(:diff_insert_whitespace, msg), do: colorize(IO.ANSI.color_background(0, 2, 0), msg)
+
+  defp formatter(:blame_diff, msg), do: colorize(:red, msg)
+
+  defp formatter(_, msg), do: msg
+
   defp name(test = %ExUnit.Test{name: name}) do
-    named_captures = Regex.named_captures(
-      ~r|test doc at (?<module>.+)\.(?<function>\w+)/(?<arity>\d+) \((?<count>\d+)\)|,
-      to_string(name)
-    )
+    named_captures =
+      Regex.named_captures(
+        ~r|test doc at (?<module>.+)\.(?<function>\w+)/(?<arity>\d+) \((?<count>\d+)\)|,
+        to_string(name)
+      )
+
     name(test, named_captures)
   end
+
   defp name(%ExUnit.TestModule{name: name}), do: format_module_name(name)
 
   defp name(%ExUnit.Test{name: name}, nil), do: to_string(name)
+
   defp name(
          %ExUnit.Test{module: module_name},
          %{"arity" => arity, "count" => count, "function" => function, "module" => module}

@@ -256,8 +256,7 @@ defmodule Mix.Tasks.TestWithFormatter do
 
     matched_test_files = Mix.Utils.extract_files(test_files, test_pattern)
 
-    matched_warn_test_files =
-      Mix.Utils.extract_files(test_files, warn_test_pattern) -- matched_test_files
+    matched_warn_test_files = Mix.Utils.extract_files(test_files, warn_test_pattern) -- matched_test_files
 
     display_warn_test_pattern(matched_warn_test_files, test_pattern)
 
@@ -296,8 +295,7 @@ defmodule Mix.Tasks.TestWithFormatter do
       |> filter_only_opts()
       |> formatter_opts()
 
-    default_opts(opts) ++
-      Keyword.take(opts, [:trace, :max_cases, :include, :exclude, :seed, :timeout, :formatters])
+    default_opts(opts) ++ Keyword.take(opts, [:trace, :max_cases, :include, :exclude, :seed, :timeout, :formatters])
   end
 
   defp merge_helper_opts(opts) do

@@ -20,9 +20,6 @@ defmodule TeamCityExUnitFormatting do
 
   # Functions
 
-  @doc false
-  def formatter(_color, msg), do: msg
-
   def new(opts) do
     %__MODULE__{
       seed: opts[:seed],
@@ -61,6 +58,7 @@ defmodule TeamCityExUnitFormatting do
         {
           :test_finished,
           test = %ExUnit.Test{
+            logs: logs,
             state:
               failed = {
                 :failed,
@@ -71,8 +69,9 @@ defmodule TeamCityExUnitFormatting do
         }
       ) do
     updated_failures_counter = failures_counter + 1
+    attributes = attributes(test)
 
-    formatted =
+    formatted_failure =
       ExUnit.Formatter.format_test_failure(
         test,
         failed,
@@ -81,14 +80,14 @@ defmodule TeamCityExUnitFormatting do
         &formatter/2
       )
 
-    attributes = attributes(test)
+    details = IO.iodata_to_binary([formatted_failure, format_logs(logs)])
 
     put_formatted(
       :test_failed,
       Keyword.merge(
         attributes,
-        details: formatted,
-        message: inspect(reason)
+        details: details,
+        message: ""
       )
     )
 
@@ -117,8 +116,9 @@ defmodule TeamCityExUnitFormatting do
       )
       when is_list(failed) do
     updated_failures_counter = failures_counter + 1
+    attributes = attributes(test)
 
-    formatted =
+    formatted_failure =
       ExUnit.Formatter.format_test_failure(
         test,
         failed,
@@ -127,15 +127,14 @@ defmodule TeamCityExUnitFormatting do
         &formatter/2
       )
 
-    message = Enum.map_join(failed, "", fn {_kind, reason, _stack} -> inspect(reason) end)
-    attributes = attributes(test)
+    details = IO.iodata_to_binary([formatted_failure, format_logs(logs)])
 
     put_formatted(
       :test_failed,
       Keyword.merge(
         attributes,
-        details: formatted,
-        message: message
+        details: formatted_failure,
+        message: ""
       )
     )
 
@@ -224,6 +223,12 @@ defmodule TeamCityExUnitFormatting do
     "#{head}#{Enum.map(tail, &String.capitalize/1)}"
   end
 
+  defp colorize(escape, string) do
+    [escape, string, :reset]
+    |> IO.ANSI.format_fragment(true)
+    |> IO.iodata_to_binary()
+  end
+
   # Must escape certain characters
   # see: https://confluence.jetbrains.com/display/TCD9/Build+Script+Interaction+with+TeamCity
   defp escape_output(s) when not is_binary(s), do: escape_output("#{s}")
@@ -261,6 +266,34 @@ defmodule TeamCityExUnitFormatting do
     |> to_string()
     |> String.replace(~r/\bElixir\./, "")
   end
+
+  defp format_logs(""), do: ""
+
+  defp format_logs(logs) do
+    indent = "\n     "
+    indented_logs = String.replace(logs, "\n", indent)
+    [indent, "The following output was logged:", indent | indented_logs]
+  end
+
+  defp formatter(:diff_enabled?, _), do: true
+
+  defp formatter(:error_info, msg), do: colorize(:red, msg)
+
+  defp formatter(:extra_info, msg), do: colorize(:cyan, msg)
+
+  defp formatter(:location_info, msg), do: colorize([:bright, :black], msg)
+
+  defp formatter(:diff_delete, msg), do: colorize(:red, msg)
+
+  defp formatter(:diff_delete_whitespace, msg), do: colorize(IO.ANSI.color_background(2, 0, 0), msg)
+
+  defp formatter(:diff_insert, msg), do: colorize(:green, msg)
+
+  defp formatter(:diff_insert_whitespace, msg), do: colorize(IO.ANSI.color_background(0, 2, 0), msg)
+
+  defp formatter(:blame_diff, msg), do: colorize(:red, msg)
+
+  defp formatter(_, msg), do: msg
 
   defp name(test = %ExUnit.Test{name: name}) do
     named_captures =
