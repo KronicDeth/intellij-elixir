@@ -61,6 +61,7 @@ defmodule TeamCityExUnitFormatting do
         {
           :test_finished,
           test = %ExUnit.Test{
+            logs: logs,
             state:
               failed = {
                 :failed,
@@ -71,8 +72,9 @@ defmodule TeamCityExUnitFormatting do
         }
       ) do
     updated_failures_counter = failures_counter + 1
+    attributes = attributes(test)
 
-    formatted =
+    formatted_failure =
       ExUnit.Formatter.format_test_failure(
         test,
         failed,
@@ -80,14 +82,13 @@ defmodule TeamCityExUnitFormatting do
         width,
         &formatter/2
       )
-
-    attributes = attributes(test)
+    details = IO.iodata_to_binary([formatted_failure, format_logs(logs)])
 
     put_formatted(
       :test_failed,
       Keyword.merge(
         attributes,
-        details: formatted,
+        details: details,
         message: ""
       )
     )
@@ -117,8 +118,9 @@ defmodule TeamCityExUnitFormatting do
       )
       when is_list(failed) do
     updated_failures_counter = failures_counter + 1
+    attributes = attributes(test)
 
-    formatted =
+    formatted_failure =
       ExUnit.Formatter.format_test_failure(
         test,
         failed,
@@ -126,14 +128,13 @@ defmodule TeamCityExUnitFormatting do
         width,
         &formatter/2
       )
-
-    attributes = attributes(test)
+    details = IO.iodata_to_binary([formatted_failure, format_logs(logs)])
 
     put_formatted(
       :test_failed,
       Keyword.merge(
         attributes,
-        details: formatted,
+        details: formatted_failure,
         message: ""
       )
     )
@@ -259,6 +260,13 @@ defmodule TeamCityExUnitFormatting do
     case_name
     |> to_string()
     |> String.replace(~r/\bElixir\./, "")
+  end
+
+  defp format_logs(""), do: ""
+  defp format_logs(logs) do
+    indent = "\n     "
+    indented_logs = String.replace(logs, "\n", indent)
+    [indent, "The following output was logged:", indent | indented_logs]
   end
 
   defp name(test = %ExUnit.Test{name: name}) do

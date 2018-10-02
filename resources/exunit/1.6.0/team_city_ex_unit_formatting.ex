@@ -65,6 +65,7 @@ defmodule TeamCityExUnitFormatting do
         {
           :test_finished,
           test = %ExUnit.Test{
+            logs: logs,
             state: failed = {
               :failed,
               {_, reason, _}
@@ -74,19 +75,21 @@ defmodule TeamCityExUnitFormatting do
         }
       ) do
     updated_failures_counter = failures_counter + 1
-    formatted = ExUnit.Formatter.format_test_failure(
+    attributes = attributes(test)
+
+    formatted_failure = ExUnit.Formatter.format_test_failure(
       test,
       failed,
       updated_failures_counter,
       width,
       &formatter/2
     )
-    attributes = attributes(test)
+    details = IO.iodata_to_binary([formatted_failure, format_logs(logs)])
 
     put_formatted :test_failed,
                   Keyword.merge(
                     attributes,
-                    details: formatted,
+                    details: formatted_failure,
                     message: ""
                   )
     put_formatted :test_finished,
@@ -108,22 +111,24 @@ defmodule TeamCityExUnitFormatting do
           width: width,
           tests_counter: tests_counter
         },
-        {:test_finished, test = %ExUnit.Test{state: {:failed, failed}, time: time}}
+        {:test_finished, test = %ExUnit.Test{logs: logs, state: {:failed, failed}, time: time}}
       ) when is_list(failed) do
     updated_failures_counter = failures_counter + 1
-    formatted = ExUnit.Formatter.format_test_failure(
+    attributes = attributes(test)
+
+    formatted_failure = ExUnit.Formatter.format_test_failure(
       test,
       failed,
       updated_failures_counter,
       width,
       &formatter/2
     )
-    attributes = attributes(test)
+    details = IO.iodata_to_binary([formatted_failure, format_logs(logs)])
 
     put_formatted :test_failed,
                   Keyword.merge(
                     attributes,
-                    details: formatted,
+                    details: details,
                     message: ""
                   )
     put_formatted :test_finished,
@@ -235,6 +240,13 @@ defmodule TeamCityExUnitFormatting do
 
   defp format_attribute({k, v}) do
     "#{Atom.to_string k}='#{escape_output v}'"
+  end
+
+  defp format_logs(""), do: ""
+  defp format_logs(logs) do
+    indent = "\n     "
+    indented_logs = String.replace(logs, "\n", indent)
+    [indent, "The following output was logged:", indent | indented_logs]
   end
 
   defp format_module_name(module_name) do
