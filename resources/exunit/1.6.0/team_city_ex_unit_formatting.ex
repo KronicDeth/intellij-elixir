@@ -20,9 +20,6 @@ defmodule TeamCityExUnitFormatting do
 
   # Functions
 
-  @doc false
-  def formatter(_color, msg), do: msg
-
   def new(opts) do
     %__MODULE__{
       seed: opts[:seed],
@@ -215,6 +212,12 @@ defmodule TeamCityExUnitFormatting do
     "#{head}#{Enum.map tail, &String.capitalize/1}"
   end
 
+  defp colorize(escape, string) do
+    [escape, string, :reset]
+    |> IO.ANSI.format_fragment(true)
+    |> IO.iodata_to_binary()
+  end
+
   # Must escape certain characters
   # see: https://confluence.jetbrains.com/display/TCD9/Build+Script+Interaction+with+TeamCity
   defp escape_output(s) when not is_binary(s), do: escape_output("#{s}")
@@ -254,6 +257,26 @@ defmodule TeamCityExUnitFormatting do
     |> to_string()
     |> String.replace(~r/\bElixir\./, "")
   end
+
+  defp formatter(:diff_enabled?, _), do: true
+
+  defp formatter(:error_info, msg), do: colorize(:red, msg)
+
+  defp formatter(:extra_info, msg), do: colorize(:cyan, msg)
+
+  defp formatter(:location_info, msg), do: colorize([:bright, :black], msg)
+
+  defp formatter(:diff_delete, msg), do: colorize(:red, msg)
+
+  defp formatter(:diff_delete_whitespace, msg), do: colorize(IO.ANSI.color_background(2, 0, 0), msg)
+
+  defp formatter(:diff_insert, msg), do: colorize(:green, msg)
+
+  defp formatter(:diff_insert_whitespace, msg), do: colorize(IO.ANSI.color_background(0, 2, 0), msg)
+
+  defp formatter(:blame_diff, msg), do: colorize(:red, msg)
+
+  defp formatter(_, msg), do: msg
 
   defp name(test = %ExUnit.Test{name: name}) do
     named_captures = Regex.named_captures(
