@@ -68,6 +68,26 @@
       <li>Wrap <code>Library#modifiableModule#commit</code> in write action.</li>
       <li>Check if <code>Mix.Dep</code> has already been seen to prevent recursive loops.</li>
     </ul>
+    <ul>
+      <li>
+        More closely match
+        <a href="https://github.com/elixir-lang/elixir/blob/v1.7.3/lib/ex_unit/lib/ex_unit/cli_formatter.ex">
+          ExUnit.CliFormatter
+        </a> output in Test Runner.
+        <ul>
+          <li>
+            Don't <code>inspect</code> ExUnit failure <code>reason</code> as <code>##teamcity</code>
+            <code>message</code>.
+          </li>
+          <li>Add captured logs to failure</li>
+          <li>Colorize test failures - including diff colorization</li>
+        </ul>
+      </li>
+      <li>
+        <code>.formatter.exs</code> input globs would not match file paths because it was default that needed
+        <code>lib</code> on top and not version-dependent paths used in <code>resources/exunit</code>.
+      </li>
+    </ul>
   </li>
   <li>
     <p>Incompatible Changes</p>
@@ -1131,51 +1151,6 @@
       <li>
         In donors list, Garrett Hart had his GitHub URL (<code>@https://github.com/thirdshift</code>) shown instead of
         his GitHub username (<code>@thirdshift</code>)
-      </li>
-    </ul>
-  </li>
-</ul>
-<h1>v7.2.1</h1>
-<ul>
-  <li>
-    <p>Bug Fixes</p>
-    <ul>
-      <li>
-        Use <code>documentionRootType</code> to indirectly get the documentation <code>OrderRootType</code><br> in the
-        Erlang SDK Type, so that it works in Small IDEs that have more than <code>CLASSES</code> and
-        <code>SOURCES</code> root types installed.
-      </li>
-      <li>
-        <p>
-          The <a href="https://github.com/rrrene/credo"><code>credo</code></a> annotator is disabled by default as
-          numerous users find running <code>mix credo</code> in the background has a negative impact on their system
-          performance.  If you like to try enabling the annotation, you can turn it on using the configuration.
-        </p>
-        <ol>
-          <li>Preferences &gt; Editor &gt; Inspections &gt; Elixir</li>
-          <li>Check "Credo"</li>
-          <li>Click OK to save and close Preferences</li>
-        </ol>
-        <p>
-          If you notice a degradation the in the responsiveness of the editor, it is recommended you disable
-          the annotator again.
-        </p>
-        <ol>
-          <li>Preferences &gt; Editor &gt; Inspections &gt; Elixir</li>
-          <li>Uncheck "Credo"</li>
-          <li>Click OK to save and close Preferences</li>
-        </ol>
-      </li>
-      <li>Protect from <code>PsiFile</code> being <code>null</code> in <code>Local</code> credo inspector</li>
-      <li>Run <code>Qualified#moduleName</code> <code>getText</code> in Read Action.</li>
-      <li>
-        Scratch Files have a <code>Project</code>, but not a <code>Module</code>, so change flow to use
-        <code>Project</code> when <code>Module</code> is <code>null</code> in credo annotator.
-      </li>
-      <li>
-        Don't add <code>.bat</code> to <code>mix</code> on Windows. <code>mix</code> is never run as an executable.  It
-        is either run as a script to <code>elixir.bat</code> OR as an argument to <code>erl.exe</code> when
-        <code>erl.exe</code> is running <code>elixir</code>.
       </li>
     </ul>
   </li>

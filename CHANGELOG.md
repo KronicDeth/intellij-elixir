@@ -203,6 +203,12 @@ Table of Contents
   * Wrap `LibraryTable#removeLibrary` in write action.
   * Wrap `Library#modifiableModule#commit` in write action.
 * [#1282](https://github.com/KronicDeth/intellij-elixir/pull/1282) - Check if `Mix.Dep` has already been seen to prevent recursive loops. - [@KronicDeth](https://github.com/KronicDeth)
+* [#1287](https://github.com/KronicDeth/intellij-elixir/pull/1287) - [@KronicDeth](https://github.com/KronicDeth)
+  * More closely match [ExUnit.CliFormatter](https://github.com/elixir-lang/elixir/blob/v1.7.3/lib/ex_unit/lib/ex_unit/cli_formatter.ex) output in Test Runner.
+    * Don't `inspect` ExUnit failure `reason` as `##teamcity` `message`.
+    * Add captured logs to failure
+    * Colorize test failures - including diff colorization
+  * `.formatter.exs` input globs would not match file paths because it was default that needed `lib` on top and not version-dependent paths used in `resources/exunit`.
 
 ### Incompatible Changes
 * [#1272](https://github.com/KronicDeth/intellij-elixir/pull/1272) - [@KronicDeth](https://github.com/KronicDeth)
