@@ -67,8 +67,6 @@
       <li>Wrap <code>LibraryTable#removeLibrary</code> in write action.</li>
       <li>Wrap <code>Library#modifiableModule#commit</code> in write action.</li>
       <li>Check if <code>Mix.Dep</code> has already been seen to prevent recursive loops.</li>
-    </ul>
-    <ul>
       <li>
         More closely match
         <a href="https://github.com/elixir-lang/elixir/blob/v1.7.3/lib/ex_unit/lib/ex_unit/cli_formatter.ex">
@@ -86,6 +84,12 @@
       <li>
         <code>.formatter.exs</code> input globs would not match file paths because it was default that needed
         <code>lib</code> on top and not version-dependent paths used in <code>resources/exunit</code>.
+      </li>
+      <li>Ignore branch and hex options when finding path of Mix.Dep</li>
+      <li>
+        Map Elixir 1.7 <code>:excluded</code> and <code>:skipped</code> (added in
+        <a href="https://github.com/elixir-lang/elixir/pull/7245">elixir-lang/elixir#7245</a>) to
+        <code>testIgnored</code> teamcity message, thereby restoring ignored test counts and markers from Elixir 1.6.
       </li>
     </ul>
   </li>

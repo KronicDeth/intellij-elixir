@@ -209,6 +209,9 @@ Table of Contents
     * Add captured logs to failure
     * Colorize test failures - including diff colorization
   * `.formatter.exs` input globs would not match file paths because it was default that needed `lib` on top and not version-dependent paths used in `resources/exunit`.
+* [#1291](https://github.com/KronicDeth/intellij-elixir/pull/1291) - [@KronicDeth](https://github.com/KronicDeth)
+  * Ignore branch and hex options when finding path of Mix.Dep
+  * Map Elixir 1.7 `:excluded` and `:skipped` (added in [elixir-lang/elixir#7245](https://github.com/elixir-lang/elixir/pull/7245)) to `testIgnored` teamcity message, thereby restoring ignored test counts and markers from Elixir 1.6.
 
 ### Incompatible Changes
 * [#1272](https://github.com/KronicDeth/intellij-elixir/pull/1272) - [@KronicDeth](https://github.com/KronicDeth)
