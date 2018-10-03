@@ -162,8 +162,8 @@ defmodule TeamCityExUnitFormatting do
           tests_counter: tests_counter,
           skipped_counter: skipped_counter
         },
-        {:test_finished, test = %ExUnit.Test{state: {:skip, _}}}
-      ) do
+        {:test_finished, test = %ExUnit.Test{state: {ignored, _}}}
+      ) when ignored in ~w(excluded skip skipped)a do
     attributes = attributes(test)
 
     put_formatted(:test_ignored, attributes)
