@@ -34,7 +34,7 @@ data class Dep(val application: String, val path: String, val type: Type = Type.
                                 val key = keywordPair.keywordKey.text
 
                                 when (key) {
-                                    "app", "commit", "compile", "git", "github", "only", "optional", "override",  "runtime" -> acc
+                                    "app", "branch", "commit", "compile", "git", "github", "hex", "only", "optional", "override",  "runtime" -> acc
                                     "in_umbrella" -> acc.copy(path =  "apps/$name", type = Type.MODULE)
                                     else -> {
                                         Logger.error(logger, "Don't know if Mix.Dep option `$key` is important for determining location of dependency", depsListElement)
