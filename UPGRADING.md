@@ -19,6 +19,8 @@ Table of Contents
 
 ## v10.0.0
 
+Module and Library dependencies will automatically be updated when directories under `deps` or `apps` change, but if you do not want to wait, you can re-import the project and the Module interdependencies and Libraries will be setup.
+
 If you want dependencies to appear in External Libraries in a pre-existing project, as will happen with an new projects imported into IntelliJ Elixir `10.0.0`, you will need to manually mark the directory as excluded:
 
 1. Right-click `deps`

@@ -196,6 +196,14 @@ Table of Contents
   * Show more context for `alias` calls in presentations, like "Choose Declaration" pop up for Go To Declaration.
     * Show resolved `__MODULE__` name (`alias MyModule`) when using `alias __MODULE__`.
     * Show full `alias MyModule, as: Mod` when listing `Mod` in `alias __MODULE__, as Mod`.
+* [#1293](https://github.com/KronicDeth/intellij-elixir/pull/1293) - [@KronicDeth](https://github.com/KronicDeth)
+  * Exclude common directories when importing projects
+    * `cover` for test coverage
+    *  `doc` for `ex_doc`
+    * `logs` for log files
+    * `assets/node_modules/phoenix` for `phoenix`
+    * `assets/node_modules/phoenix_html` for `phoenix_html`
+  * Setup Libraries and Module dependencies when importing projects from Mix.
 
 ### Bug Fixes
 * [#1277](https://github.com/KronicDeth/intellij-elixir/pull/1277) - Don't include `null` `useCall` as `__MODULE__` dependency. - [@KronicDeth](https://github.com/KronicDeth)
@@ -212,6 +220,10 @@ Table of Contents
 * [#1291](https://github.com/KronicDeth/intellij-elixir/pull/1291) - [@KronicDeth](https://github.com/KronicDeth)
   * Ignore branch and hex options when finding path of Mix.Dep
   * Map Elixir 1.7 `:excluded` and `:skipped` (added in [elixir-lang/elixir#7245](https://github.com/elixir-lang/elixir/pull/7245)) to `testIgnored` teamcity message, thereby restoring ignored test counts and markers from Elixir 1.6.
+* [#1293](https://github.com/KronicDeth/intellij-elixir/pull/1293) - [@KronicDeth](https://github.com/KronicDeth)
+  * When the entire deps directory has updated sync the children deps directories and then sync all modules instead of syncing them after each dep.
+  *  For an unknown reason, when sync occurs at `initComponent` time in `DepsWatcher` or `mix.Watcher`, the child directories of the project `basedDir` aren't shown in the Project Pane until a change is applied in Project Structure.
+  * Use `invokeAndWait` instead of `invokeLater` to ensure order of syncs.
 
 ### Incompatible Changes
 * [#1272](https://github.com/KronicDeth/intellij-elixir/pull/1272) - [@KronicDeth](https://github.com/KronicDeth)
@@ -219,6 +231,7 @@ Table of Contents
     * Project sources will be shown by default
     *  If there are no project matches, dependencies will be shown instead.
     * If you want to include dependency (non-project) matches, you can check the box or hit Cmd+O.
+* [#1293](https://github.com/KronicDeth/intellij-elixir/pull/1293) - Modules and Libraries won't be automatically setup when a project or module is opened, but instead only when `apps` or `deps` directories or subdirectories change. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v9.0.0
 

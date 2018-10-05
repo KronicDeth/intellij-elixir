@@ -58,6 +58,16 @@
           <li>Show full <code>alias MyModule, as: Mod</code> when listing <code>Mod</code> in <code>alias __MODULE__, as Mod</code>.</li>
         </ul>
       </li>
+      <li>Exclude common directories when importing projects
+        <ul>
+          <li><code>cover</code> for test coverage</li>
+          <li><code>doc</code> for <code>ex_doc</code></li>
+          <li><code>logs</code> for log files</li>
+          <li><code>assets/node_modules/phoenix</code> for <code>phoenix</code></li>
+          <li><code>assets/node_modules/phoenix_html</code> for <code>phoenix_html</code></li>
+        </ul>
+      </li>
+      <li>Setup Libraries and Module dependencies when importing projects from Mix.</li>
     </ul>
   </li>
   <li>
@@ -91,6 +101,18 @@
         <a href="https://github.com/elixir-lang/elixir/pull/7245">elixir-lang/elixir#7245</a>) to
         <code>testIgnored</code> teamcity message, thereby restoring ignored test counts and markers from Elixir 1.6.
       </li>
+      <li>
+        When the entire deps directory has updated sync the children deps directories and then sync all modules instead
+        of syncing them after each dep.
+      </li>
+      <li>
+        For an unknown reason, when sync occurs at <code>initComponent</code> time in <code>DepsWatcher</code> or
+        <code>mix.Watcher</code>, the child directories of the project <code>basedDir</code> aren't shown in the Project
+        Pane until a change is applied in Project Structure.
+      </li>
+      <li>
+        Use <code>invokeAndWait</code> instead of <code>invokeLater</code> to ensure order of syncs.
+      </li>
     </ul>
   </li>
   <li>
@@ -105,6 +127,10 @@
           <li>If there are no project matches, dependencies will be shown instead.</li>
           <li>If you want to include dependency (non-project) matches, you can check the box or hit Cmd+O.</li>
         </ul>
+      </li>
+      <li>
+        Modules and Libraries won't be automatically setup when a project or module is opened, but instead only when
+        <code>apps</code> or <code>deps</code> directories or subdirectories change.
       </li>
     </ul>
   </li>
@@ -768,394 +794,6 @@
         shouldn't kill the debugger task, so rescue the known error and record it for later debugging of the debugger.
       </li>
       <li>Add <code>:</code> to start of Erlang module names for included debugger excludes</li>
-    </ul>
-  </li>
-</ul>
-<h1>v7.3.0</h1>
-<ul>
-  <li>
-    <p>Enhancements</p>
-    <ul>
-      <li>Add supplemental file editor for <code>.beam</code> files: "BEAM Chunks".  The decompiled binary file will continue to be shown on the default "Text" editor tab.<br>
-        <a href="https://user-images.githubusercontent.com/298259/35710803-17198a52-077f-11e8-8991-2aebe7f3eb38.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35710803-17198a52-077f-11e8-8991-2aebe7f3eb38.png" alt="screen shot 2018-02-01 at 6 38 07 pm" style="max-width:100%;"></a><br>
-        The BEAM Chunks editor is subdivided into further tabs, one for each chunk in the <code>.beam</code> file.<br>
-        <a href="https://user-images.githubusercontent.com/298259/35710979-1d367930-0780-11e8-8a40-acaef92e621c.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35710979-1d367930-0780-11e8-8a40-acaef92e621c.png" alt="screen shot 2018-02-01 at 6 45 23 pm" style="max-width:100%;"></a><br>
-        The tabs are listed in the order that the chunks occur in the <code>.beam</code> file.
-        <ul>
-          <li>
-            <p>The <code>Atom</code> chunk holds <code>LATIN-1</code> atoms while <code>AtU8</code> holds <code>UTF8</code> atoms.  There will only be one of these atom-related chunks in any given <code>.beam</code> file.  <code>AtU8</code> is used in newer versions of OTP that support UTF8 atoms.</p>
-            <p>The <code>Atom</code>/<code>AtU8</code> tab shows a table with the columns</p>
-            <table>
-              <thead>
-              <tr>
-                <th>Column</th>
-                <th>Description</th>
-                <th>Source</th>
-              </tr>
-              </thead>
-              <tbody>
-              <tr>
-                <td>Index</td>
-                <td>Which is 1-based to match Erlang convention.  In the <code>Code</code> chunk, <code>atom(0)</code> is reserved to always translate to <code>nil</code></td>
-                <td>Derived</td>
-              </tr>
-              <tr>
-                <td>Byte Count</td>
-                <td>The byte count for the atom's bytes</td>
-                <td>Raw</td>
-              </tr>
-              <tr>
-                <td>Characters</td>
-                <td>From encoding the bytes as LATIN-1 for <code>Atom</code> chunk or UTF-8 for <code>AtU8</code> chunk</td>
-                <td>Derived</td>
-              </tr></tbody></table>
-            <p><a href="https://user-images.githubusercontent.com/298259/35711460-9aeea9ae-0782-11e8-9d3f-074c05326b4c.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35711460-9aeea9ae-0782-11e8-9d3f-074c05326b4c.png" alt="screen shot 2018-02-01 at 7 01 43 pm" style="max-width:100%;"></a></p>
-            <p>Index 1 is always the module name for the <code>.beam</code> file.  Since <code>.beam</code> is originally an Erlang format, for Elixir modules, you'll see the full atom name of with the <code>Elixir.</code> prefix instead of the Alias name used in Elixir source.</p>
-          </li>
-          <li>
-            <p>The <code>Attr</code> chunk holds the module attributes, but only those that are persisted.</p>
-            <p>The <code>Attr</code> tab shows a table with the columns</p>
-            <table>
-              <thead>
-              <tr>
-                <th>Column</th>
-                <th>Description</th>
-                <th>Source</th>
-              </tr>
-              </thead>
-              <tbody>
-              <tr>
-                <td>Key</td>
-                <td>Attribute name</td>
-                <td>Raw</td>
-              </tr>
-              <tr>
-                <td>Value</td>
-                <td>Attribute value. <strong>Note: The value always appears as a list as read from the binary format.  I don't know why.</strong></td>
-                <td>Raw</td>
-              </tr></tbody></table>
-            <p><a href="https://user-images.githubusercontent.com/298259/35753689-576eaf18-0826-11e8-838c-f00fc93fd667.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35753689-576eaf18-0826-11e8-838c-f00fc93fd667.png" alt="screen shot 2018-02-02 at 2 34 22 pm" style="max-width:100%;"></a></p>
-            <p>All modules will have a <code>:vsn</code> attribute that is either set explicitly or defaults to the MD5 of the module.</p>
-          </li>
-          <li>
-            <p>The <code>CInf</code> chunk is the Compilation Information for the Erlang or Erlang Core compiler.  Even Elixir modules have it because Elixir code passes through this part of the Erlang Core compiler.</p>
-            <p>The <code>CInf</code> tab shows a table with the columns</p>
-            <table>
-              <thead>
-              <tr>
-                <th>Column</th>
-                <th>Description</th>
-                <th>Source</th>
-              </tr>
-              </thead>
-              <tbody>
-              <tr>
-                <td>Key</td>
-                <td>Option name</td>
-                <td>Raw</td>
-              </tr>
-              <tr>
-                <td>Value</td>
-                <td>Inspected value</td>
-                <td>Raw</td>
-              </tr></tbody></table>
-            <p><a href="https://user-images.githubusercontent.com/298259/35755542-4d769c76-082d-11e8-84d9-ef04ff45b346.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35755542-4d769c76-082d-11e8-84d9-ef04ff45b346.png" alt="screen shot 2018-02-02 at 3 19 50 pm" style="max-width:100%;"></a></p>
-          </li>
-          <li>
-            <p>The <code>Code</code> chunk contains the byte code for the module.  It is encoded in <a href="http://beam-wisdoms.clau.se/en/latest/indepth-beam-file.html#beam-compact-term-encoding" rel="nofollow">BEAM Compact Term Encoding</a>, which differs from the binary format produced by <code>term_to_binary</code>.</p>
-            <p>The <code>Code</code> tab shows a read-only editor with one byte code operation on each line.  For ease of reading, operations are grouped by function and then label block with indentation indicating scope.</p>
-            <p><a href="https://user-images.githubusercontent.com/298259/35762701-18b0882e-0861-11e8-9d3d-675811bd45dd.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35762701-18b0882e-0861-11e8-9d3d-675811bd45dd.png" alt="screen shot 2018-02-02 at 9 35 59 pm" style="max-width:100%;"></a></p>
-            <p>By default as many references to other chunks and references to other parts of <code>Code</code> chunk are inlined to ease understanding.  If you want to see the raw byte code operations, you can turn off the various inliners.</p>
-          </li>
-          <li>
-            <p>The <code>Dbgi</code> chunk contains Debug Info.  It was <a href="https://github.com/erlang/otp/pull/1367">introduced</a> in OTP 20 as a replacement for the <code>Abst</code> chunk.  While the <code>Abst</code> chunk was required to contain the Erlang AST, the <code>Dbgi</code> format can contain the debug info for other languages, such as Elixir <code>quoted</code> form AST.</p>
-            <p>Because the format is language neutral, the format is a set of nested, versioned formats.  The outer most layer is</p>
-            <div class="highlight highlight-source-elixir"><pre>{<span class="pl-c1">:debug_info_v1</span>, backend, metadata <span class="pl-k">|</span> <span class="pl-c1">:none</span>}</pre></div>
-            <p>For <code>:debug_info_v1</code>, Elixir's <code>backend</code> is <code>:elixir_erl</code>.  The <code>metadata</code> for <code>:elixir_erl</code> is further versioned: <code>{:elixir_v1, map, specs}</code>.</p>
-            <p><code>map</code> contains the bulk of the data.</p>
-            <table>
-              <thead>
-              <tr>
-                <th>Key</th>
-                <th>Value</th>
-              </tr>
-              </thead>
-              <tbody>
-              <tr>
-                <td><code>:attributes</code></td>
-                <td>Attributes similar to the <code>Attr</code> chunk, but at the Elixir, instead of Core Erlang level.  Usually they match with the exception that <code>attributes</code> doesn't contain <code>vsn</code> when <code>Attr</code> contains the <code>MD5</code> version</td>
-              </tr>
-              <tr>
-                <td><code>:compile_opts</code></td>
-                <td>Compilation options similar to <code>CInf</code> chunk's <code>options</code> key, but at for Elixir, instead of Core Erlang level.</td>
-              </tr>
-              <tr>
-                <td><code>:definitions</code></td>
-                <td>The Elixir <code>quoted</code> AST for reach function clause.</td>
-              </tr>
-              <tr>
-                <td><code>:file</code></td>
-                <td>The name of the file the module was generated from.</td>
-              </tr>
-              <tr>
-                <td><code>:line</code></td>
-                <td>The line in <code>:file</code> where the module was defined, such as the line <code>defmodule</code> occurred.</td>
-              </tr>
-              <tr>
-                <td><code>:module</code></td>
-                <td>The name of the module as an <code>atom</code></td>
-              </tr>
-              <tr>
-                <td><code>:unreachable</code></td>
-                <td>Unreachable functions</td>
-              </tr></tbody></table>
-            <p>The <code>Dbgi</code> tag show the single value map entries: <code>:file</code>, <code>:line</code>, and <code>:module</code></p>
-            <p><a href="https://user-images.githubusercontent.com/298259/35759265-33c33742-083e-11e8-9a4f-97cfd52bbe8e.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35759265-33c33742-083e-11e8-9a4f-97cfd52bbe8e.png" alt="screen shot 2018-02-02 at 5 26 04 pm" style="max-width:100%;"></a></p>
-            <p>For the multi-value keys: <code>:attributes</code>, <code>:compile_opts</code>, and <code>:definitions</code>, there are individual tabs.</p>
-            <p><a href="https://user-images.githubusercontent.com/298259/35759293-6117c83e-083e-11e8-8327-ec7c66cade69.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35759293-6117c83e-083e-11e8-8327-ec7c66cade69.png" alt="screen shot 2018-02-02 at 5 27 29 pm" style="max-width:100%;"></a></p>
-            <p>The Attributes tab has the same format as the <code>Attr</code>s chunk</p>
-            <p><a href="https://user-images.githubusercontent.com/298259/35760967-9c7e0914-0849-11e8-8d53-e402653b70fa.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35760967-9c7e0914-0849-11e8-8d53-e402653b70fa.png" alt="screen shot 2018-02-02 at 6 47 49 pm" style="max-width:100%;"></a></p>
-            <p>The Compile Options tab is usually empty, much like the <code>CInf</code> <code>options</code> key for Erlang.</p>
-            <p><a href="https://user-images.githubusercontent.com/298259/35760988-c3ef0f52-0849-11e8-9ca6-2cbeba8eda23.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35760988-c3ef0f52-0849-11e8-9ca6-2cbeba8eda23.png" alt="screen shot 2018-02-02 at 6 48 34 pm" style="max-width:100%;"></a></p>
-            <p>The Definitions tab is split between a tree of Module, Function/Arity and clauses.</p>
-            <p><a href="https://user-images.githubusercontent.com/298259/35761058-3710d04c-084a-11e8-99e3-0f2aa4f8837d.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35761058-3710d04c-084a-11e8-99e3-0f2aa4f8837d.png" alt="screen shot 2018-02-02 at 6 50 14 pm" style="max-width:100%;"></a></p>
-            <p>Clicking on a clause will show only that clause, but clicking on a higher level in the tree will show all clauses in the function or the entire Module.</p>
-            <p><a href="https://user-images.githubusercontent.com/298259/35761087-7a6e0b8e-084a-11e8-9f86-6e4840eab25d.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35761087-7a6e0b8e-084a-11e8-9f86-6e4840eab25d.png" alt="screen shot 2018-02-02 at 6 53 17 pm" style="max-width:100%;"></a><br>
-              <a href="https://user-images.githubusercontent.com/298259/35762314-55fb0dd2-085a-11e8-8381-faacc880d29e.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35762314-55fb0dd2-085a-11e8-8381-faacc880d29e.png" alt="screen shot 2018-02-02 at 8 47 05 pm" style="max-width:100%;"></a><br>
-              <a href="https://user-images.githubusercontent.com/298259/35762317-5b9f9136-085a-11e8-8b53-03be16b7a06c.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35762317-5b9f9136-085a-11e8-8b53-03be16b7a06c.png" alt="screen shot 2018-02-02 at 8 47 20 pm" style="max-width:100%;"></a></p>
-            <p>The AST stored in the <code>definitions</code> tab and the process of converting it back to code is not format preserves, so it will not look precisely like the source code as the AST has undergone some macro expansion before its put in the Dbgi chunk.  <em>As common idioms are understood, reversals will be add to the renderer.</em></p>
-          </li>
-          <li>
-            <p>The <code>ExDc</code> chunk stores ExDoc.  Not the rendered HTML from the <code>ex_doc</code> package, but the the <code>@doc</code>, <code>@moduledoc</code>, and <code>@typedoc</code> attribute values that work even without <code>ex_doc</code> installed.  This chunk is what is consulted when the <code>h</code> helper is used in <code>iex</code>.</p>
-            <p>The <code>ExDc</code> binary format is from <code>term_to_binary</code>, so it can be reversed with <code>binary_to_term</code>.  The term format is a versioned as <code>{version, versioned_format}</code>.  The current <code>version</code> tag is <code>:elixir_docs_v1</code> and the <code>versioned_format</code> is a <a href="https://hexdocs.pm/elixir/Keyword.html#t:t/0" rel="nofollow">Keyword.t</a> with <code>:callback_docs</code>, <code>:docs</code>, <code>:moduledoc</code>, and <code>:type_docs</code> keys.</p>
-            <p>Like <code>Dbgi</code>, the <code>ExDc</code> tab is split between a tree to navigate and an editor to show the decompiled value.</p>
-            <p><a href="https://user-images.githubusercontent.com/298259/35762423-024913d0-085c-11e8-88ee-c794474a5da5.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35762423-024913d0-085c-11e8-88ee-c794474a5da5.png" alt="screen shot 2018-02-02 at 8 58 38 pm" style="max-width:100%;"></a><br>
-              <a href="https://user-images.githubusercontent.com/298259/35762502-139d2b8e-085d-11e8-97a6-4b16d19dfccb.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35762502-139d2b8e-085d-11e8-97a6-4b16d19dfccb.png" alt="screen shot 2018-02-02 at 9 07 03 pm" style="max-width:100%;"></a></p>
-            <table>
-              <thead>
-              <tr>
-                <th>Node</th>
-                <th>Description</th>
-              </tr>
-              </thead>
-              <tbody>
-              <tr>
-                <td><em>Root</em></td>
-                <td>All docs</td>
-              </tr>
-              <tr>
-                <td>Module</td>
-                <td><code>@moduledoc</code></td>
-              </tr>
-              <tr>
-                <td>Types</td>
-                <td>All <code>@typedoc</code>s</td>
-              </tr>
-              <tr>
-                <td>Types <em>child</em></td>
-                <td>A specific <code>@typedoc</code></td>
-              </tr>
-              <tr>
-                <td>Callbacks</td>
-                <td>All <code>@callback</code> <code>@doc</code>s</td>
-              </tr>
-              <tr>
-                <td>Callbacks <em>child</em></td>
-                <td>A specific <code>@callback</code>'s <code>@doc</code></td>
-              </tr>
-              <tr>
-                <td>Functions/Macros</td>
-                <td>All <code>@doc</code>s for functions/macros</td>
-              </tr>
-              <tr>
-                <td>Functions/Macros <em>child</em></td>
-                <td>A specific function/macro's <code>@doc</code></td>
-              </tr></tbody></table>
-          </li>
-          <li>
-            <p>The <code>ExpT</code> chunk is the Export Table.  The name "Export" derives from the <code>Erlang</code> module attribute <code>-export</code>, which is used to "export" functions from a module.  It is the equivalent of making a function or macro public with <code>def</code> and <code>defmacro</code> as opposed to making it private with <code>defp</code> and <code>defmacrop</code> in Elixir.</p>
-            <p>The <code>ExpT</code> tab shows a table with the columns</p>
-            <table>
-              <thead>
-              <tr>
-                <th>Column</th>
-                <th>Description</th>
-                <th>Source</th>
-              </tr>
-              </thead>
-              <tbody>
-              <tr>
-                <td>Atom Index</td>
-                <td>Index into the <code>Atom</code> or <code>AtU8</code> chunk for the function's name</td>
-                <td>Raw</td>
-              </tr>
-              <tr>
-                <td>Name</td>
-                <td>The atom referenced by "Atom Index"</td>
-                <td>Derived</td>
-              </tr>
-              <tr>
-                <td>Arity</td>
-                <td>The arity (argument count) of the function</td>
-                <td>Raw</td>
-              </tr>
-              <tr>
-                <td>Label</td>
-                <td>Label index in the <code>Code</code> chunk where the function is defined. This label is usually immediately after the <code>func_info</code> operation and before the first pattern match or guard operation.</td>
-                <td>Raw</td>
-              </tr></tbody></table>
-            <p><a href="https://user-images.githubusercontent.com/298259/35713581-b36f17ba-078d-11e8-87e3-0c50b2624676.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35713581-b36f17ba-078d-11e8-87e3-0c50b2624676.png" alt="screen shot 2018-02-01 at 8 21 13 pm" style="max-width:100%;"></a></p>
-            <p>You'll notice the first entry starts with <code>MACRO-</code>.  This is because the BEAM, being made for Erlang has no concept of macros. It only understands functions, so Elixir macros, like <code>__using__/1</code> called by <code>use</code> are compiled to plain Erlang functions with <code>MACRO-</code> prefixed to their name and an extra argument (the <code>__CALLER__</code> environment) as the first argument, which increases the arity, yielding a full MFA of <code>MACRO-__using__/2</code> as seen above.</p>
-          </li>
-          <li>
-            <p>The <code>ImpT</code> chunk is the Import Table.  It <strong>DOES NOT</strong> encode just the Erlang <code>-import</code> attributes or Elixir <code>import</code> macro calls: it tracks any external function or macro called from another module.  <code>call_ext_*</code> operations in the <code>Code</code> chunk don't store the Module and Function (MF) of the function they will call directly in the bytecode, instead, one of the arguments is an index into the <code>ImpT</code> chunk.   This way, all external calls are normalized into the <code>ImpT</code> chunk instead of being denormalized to the call site.  The arity still appears at the call site to help with checking the argument count.</p>
-            <p>The <code>ImpT</code> tab shows a table with the columns</p>
-            <table>
-              <thead>
-              <tr>
-                <th>Column</th>
-                <th>Description</th>
-                <th>Source</th>
-              </tr>
-              </thead>
-              <tbody>
-              <tr>
-                <td>Index</td>
-                <td>0-based index used by references in the <code>Code</code> chunk.</td>
-                <td>Derived</td>
-              </tr>
-              <tr>
-                <td>Module Atom Index</td>
-                <td>Index into the <code>Atom</code> or <code>AtU8</code> chunk for the Module's name</td>
-                <td>Raw</td>
-              </tr>
-              <tr>
-                <td>Module Atom</td>
-                <td>The atom referenced by "Module Atom Index".</td>
-                <td>Derived</td>
-              </tr>
-              <tr>
-                <td>Function Atom Index</td>
-                <td>Index into the <code>Atom</code> or <code>AtU8</code> chunk for the functon's name</td>
-                <td>Raw</td>
-              </tr>
-              <tr>
-                <td>Function Atom</td>
-                <td>The atom referened by "Function Atom Index".</td>
-                <td>Derived</td>
-              </tr></tbody></table>
-            <p><a href="https://user-images.githubusercontent.com/298259/35713189-93432ff0-078b-11e8-8856-df067459adf9.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35713189-93432ff0-078b-11e8-8856-df067459adf9.png" alt="screen shot 2018-02-01 at 8 07 15 pm" style="max-width:100%;"></a></p>
-            <p>You may notice that <code>erlang.byte_size/1</code> is included in the table.  This is because even bifs are referenced by MFA and not a pre-assigned number as would be the case for system calls in operating systems like Linux.  BEAM is like an Operation System, but not in all ways.</p>
-          </li>
-          <li>
-            <p>The <code>LitT</code> chunk contains literals loaded as arguments in <code>Code</code> chunk.  Confusingly, in the <code>Code</code> chunk sometimes the <code>literal(N)</code> term is used to encode integer <code>N</code>, an index into another chunk, or an actual <code>index</code> into the <code>LitT</code>.  How <code>literal</code> terms are handled is completely dependent on the specific operation, so without having outside knowledge about the bytecode operation arguments for BEAM, the best way to figure out if <code>literal</code> terms are an integer or an index is to toggle the various controls in the <code>Code</code> tab to see if <code>literal</code> with no inlining turns into a <code>LitT</code> literal, <code>FunT</code> function reference, <code>ImpT</code> function reference, or integer.</p>
-            <p>The <code>LitT</code> tab shows a table with the columns</p>
-            <table>
-              <thead>
-              <tr>
-                <th>Column</th>
-                <th>Description</th>
-                <th>Source</th>
-              </tr>
-              </thead>
-              <tbody>
-              <tr>
-                <td>#</td>
-                <td>0-based index used by references in the <code>Code</code> chunk.</td>
-                <td>Derived</td>
-              </tr>
-              <tr>
-                <td>Term</td>
-                <td>The equivalent of `raw</td>
-                <td>&gt; binary_to_term()</td>
-              </tr></tbody></table>
-            <p><a href="https://user-images.githubusercontent.com/298259/35715153-674f088c-0796-11e8-89e8-fd3c6c083a45.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35715153-674f088c-0796-11e8-89e8-fd3c6c083a45.png" alt="screen shot 2018-02-01 at 9 25 07 pm" style="max-width:100%;"></a></p>
-          </li>
-          <li>
-            <p>The <code>LocT</code> chunk is the dual to the <code>ExpT</code> chunk: it contains all private functions and macros.</p>
-            <p>The <code>LocT</code> tab shows a table with the columns</p>
-            <table>
-              <thead>
-              <tr>
-                <th>Column</th>
-                <th>Description</th>
-                <th>Source</th>
-              </tr>
-              </thead>
-              <tbody>
-              <tr>
-                <td>Atom Index</td>
-                <td>Index into the <code>Atom</code> or <code>AtU8</code> chunk for the function's name</td>
-                <td>Raw</td>
-              </tr>
-              <tr>
-                <td>Name</td>
-                <td>The atom referenced by "Atom Index"</td>
-                <td>Derived</td>
-              </tr>
-              <tr>
-                <td>Arity</td>
-                <td>The arity (argument count) of the function</td>
-                <td>Raw</td>
-              </tr>
-              <tr>
-                <td>Label</td>
-                <td>Label index in the <code>Code</code> chunk where the function is defined. This label is usually immediately after the <code>func_info</code> operation and before the first pattern match or guard operation.</td>
-                <td>Raw</td>
-              </tr></tbody></table>
-            <p><a href="https://user-images.githubusercontent.com/298259/35715229-ca135b1c-0796-11e8-80a4-971470f1c6d2.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35715229-ca135b1c-0796-11e8-80a4-971470f1c6d2.png" alt="screen shot 2018-02-01 at 9 27 49 pm" style="max-width:100%;"></a></p>
-            <p>You'll notice the first entry <code>-__struct__/1-fun-0-</code>, starts with <code>-</code> and have a <code>/</code> suffix with <code>fun</code> in it. This naming scheme is used for anonymous functions such as those defined with <code>fn</code> or the capture operator (<code>&amp;</code>) in Elixir.  Much like how macros don't really exist and use a <code>MACRO-</code> suffix, anonymous functions/lambdas don't exist, and instead use a distinct naming scheme <code>-&lt;PARENT_FUNCTION&gt;/*fun*</code>.  Unlike <code>MACRO-</code>, which is an Elixir invention, anonymous functions/lambdas really being local named functions with derived names is also done in pure Erlang modules.  Erlang's anonymous functions are defined with <code>fun</code>, which is where the <code>fun</code> part of the naming scheme comes from.</p>
-          </li>
-          <li>
-            <p>The <code>StrT</code> chunk contains a single contiguous pool of all Erlang strings (that is, Elixir charlists) used in the <code>Code</code> chunk.  These strings are used for byte code operations like <code>bs_put_string</code>.  Not all strings appear in <code>StrT</code>.  Some strings, including most Elixir strings (Erlang binaries) appear in the <code>LitT</code> chunk that holds literals.</p>
-            <p><a href="https://user-images.githubusercontent.com/298259/35712876-040796d8-078a-11e8-8eb6-6b7f203bbd4a.png" target="_blank"><img src="https://user-images.githubusercontent.com/298259/35712876-040796d8-078a-11e8-8eb6-6b7f203bbd4a.png" alt="screen shot 2018-02-01 at 7 56 15 pm" style="max-width:100%;"></a></p>
-            <p>The <code>StrT</code> is contiguous with no separation of strings.  Instead of encoding the start and length of each string in the chunk itself, the start and length for any given string is passed as arguments to the byte code operations in the <code>Code</code> chunk. By doing this, shared substrings can be efficiently encoded in <code>StrT</code>.</p>
-          </li>
-        </ul>
-      </li>
-      <li>
-        <p>Support for <a href="https://github.com/elixir-lang/elixir/commit/23c7542d95683a497a7b93071b9ccbbeb9e45d2f">elixir-lang/elixir@<tt>23c7542</tt></a></p>
-        <table>
-          <thead>
-          <tr>
-            <th>Version</th>
-            <th>Struct</th>
-            <th>Started Event</th>
-            <th>Finished Event</th>
-            <th><code>%ExUnit.Test{}</code> field</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr>
-            <td>&lt; 1.6.0</td>
-            <td><code>%ExUnit.TestCase{}</code></td>
-            <td><code>:case_started</code></td>
-            <td><code>:case_finished</code></td>
-            <td><code>case</code></td>
-          </tr>
-          <tr>
-            <td>&gt;= 1.6.0</td>
-            <td><code>%ExUnit.TestCase{}</code></td>
-            <td><code>:module_started</code></td>
-            <td><code>:module_finished</code></td>
-            <td><code>module</code></td>
-          </tr></tbody></table>
-        <p>Because Elixir 1.6.0 could not introduce a breaking change, the <code>&lt; 1.6.0</code> events are fired, but <code>resources/exunit/1.6.0/team_city_ex_unit_formatting.ex</code> will ignore them and only convert the <code>&gt;= 1.6.0</code> events to TeamCity event used in the JetBrains Test Runner UI.</p>
-      </li>
-      <li>
-        expose Declarations &gt; Functions and Declarations &gt; Macros in Color Settings
-      </li>
-    </ul>
-  </li>
-  <li>
-    <p>Bug Fixes</p>
-    <ul>
-      <li>Don't use <code>StreamEx</code> because support is inconsistent across IDEs</li>
-      <li>Jetbrains' Gogland is now named GoLand, updated README accordingly</li>
-      <li>
-        In donors list, Garrett Hart had his GitHub URL (<code>@https://github.com/thirdshift</code>) shown instead of
-        his GitHub username (<code>@thirdshift</code>)
-      </li>
     </ul>
   </li>
 </ul>
