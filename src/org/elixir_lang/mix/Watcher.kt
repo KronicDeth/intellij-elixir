@@ -33,8 +33,6 @@ class Watcher(
         private val virtualFileManager: VirtualFileManager
 ) : ModuleComponent, Disposable, VirtualFileListener {
     override fun initComponent() {
-        syncLibraries()
-
         virtualFileManager.addVirtualFileListener(this, this)
     }
 
@@ -106,7 +104,7 @@ class Watcher(
                 .depSet
 
     private fun syncLibraries(deps: Collection<Dep>) {
-        ApplicationManager.getApplication().invokeLater {
+        ApplicationManager.getApplication().invokeAndWait {
             ApplicationManager.getApplication().runWriteAction {
                 val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
 
