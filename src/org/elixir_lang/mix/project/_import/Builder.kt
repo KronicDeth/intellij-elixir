@@ -294,10 +294,7 @@ class Builder : ProjectImportBuilder<OtpApp>() {
                                           root: VirtualFile,
                                           sourceDir: String,
                                           test: Boolean) {
-            val sourceDirFile = root.findChild(sourceDir)
-            if (sourceDirFile != null) {
-                content.addSourceFolder(sourceDirFile, test)
-            }
+            content.addSourceFolder("${root.url}/$sourceDir", test)
         }
 
         private fun excludeDirFromContent(content: ContentEntry, root: VirtualFile, excludedDir: String) {
