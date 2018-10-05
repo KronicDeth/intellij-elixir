@@ -152,6 +152,9 @@ class Builder : ProjectImportBuilder<OtpApp>() {
                 addSourceDirToContent(content, ideaModuleDir, "lib", false)
                 addSourceDirToContent(content, ideaModuleDir, "test", true)
 
+                // Weird symlink phoenix and phoenix_html make to themselves in deps
+                excludeDirFromContent(content, ideaModuleDir, "assets/node_modules/phoenix")
+                excludeDirFromContent(content, ideaModuleDir, "assets/node_modules/phoenix_html")
                 // Test coverage
                 excludeDirFromContent(content, ideaModuleDir, "cover")
                 // Dependencies (added as Libraries)
