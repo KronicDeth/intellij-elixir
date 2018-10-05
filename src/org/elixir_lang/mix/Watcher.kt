@@ -33,8 +33,6 @@ class Watcher(
         private val virtualFileManager: VirtualFileManager
 ) : ModuleComponent, Disposable, VirtualFileListener {
     override fun initComponent() {
-        syncLibraries()
-
         virtualFileManager.addVirtualFileListener(this, this)
     }
 

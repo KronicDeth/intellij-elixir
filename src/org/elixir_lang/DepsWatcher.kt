@@ -32,12 +32,6 @@ class DepsWatcher(
 ) :
         ProjectComponent, Disposable, VirtualFileListener {
     override fun initComponent() {
-        if (project.baseDir.findChild("mix.exs") != null) {
-            project.baseDir.findChild("deps")?.let { deps ->
-                syncLibraries(deps)
-            }
-        }
-
         virtualFileManager.addVirtualFileListener(this, this)
     }
 
