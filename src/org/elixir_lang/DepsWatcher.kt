@@ -128,7 +128,7 @@ class DepsWatcher(
     private fun syncLibraries(deps: VirtualFile) = deps.children.let { syncLibraries(it) }
 
     private fun syncLibraries(deps: Array<VirtualFile>) {
-        ApplicationManager.getApplication().invokeLater {
+        ApplicationManager.getApplication().invokeAndWait {
             ApplicationManager.getApplication().runWriteAction {
                 val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
 
@@ -237,7 +237,7 @@ class DepsWatcher(
         }
 
         if (depsLibraries.isNotEmpty()) {
-            ApplicationManager.getApplication().invokeLater {
+            ApplicationManager.getApplication().invokeAndWait {
                 ApplicationManager.getApplication().runWriteAction {
                     depsLibraries.forEach { libraryTable.removeLibrary(it) }
                 }
@@ -250,7 +250,7 @@ class DepsWatcher(
         val depName = dep.name
 
         libraryTable.getLibraryByName(depName)?.let { library ->
-            ApplicationManager.getApplication().invokeLater {
+            ApplicationManager.getApplication().invokeAndWait {
                 ApplicationManager.getApplication().runWriteAction {
                     libraryTable.removeLibrary(library)
                 }

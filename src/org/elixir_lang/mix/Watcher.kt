@@ -104,7 +104,7 @@ class Watcher(
                 .depSet
 
     private fun syncLibraries(deps: Collection<Dep>) {
-        ApplicationManager.getApplication().invokeLater {
+        ApplicationManager.getApplication().invokeAndWait {
             ApplicationManager.getApplication().runWriteAction {
                 val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
 
