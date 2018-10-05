@@ -8,6 +8,8 @@ import com.intellij.openapi.module.ModuleUtil
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.OrderRootType
+import com.intellij.openapi.roots.libraries.Library
+import com.intellij.openapi.roots.libraries.LibraryTable
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileEvent
@@ -127,71 +129,96 @@ class DepsWatcher(
         project.baseDir.findChild("deps")?.let { syncLibraries(it) }
     }
 
-    private fun syncLibraries(deps: VirtualFile) = deps.children.forEach { syncLibrary(it) }
+    private fun syncLibrary(dep: VirtualFile) = syncLibraries(arrayOf(dep))
 
-    private fun syncLibrary(dep: VirtualFile) {
-        if (dep.isDirectory) {
-            ApplicationManager.getApplication().invokeLater {
-                ApplicationManager.getApplication().runWriteAction {
-                    val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
-                    val libraryTableModifiableModel = libraryTable.modifiableModel
-                    val depName = dep.name
+    private fun syncLibraries(deps: VirtualFile) = deps.children.let { syncLibraries(it) }
 
-                    val library = libraryTable.getLibraryByName(depName)
-                            ?: libraryTableModifiableModel.createLibrary(dep.name, Kind)
+    private fun syncLibraries(deps: Array<VirtualFile>) {
+        ApplicationManager.getApplication().invokeLater {
+            ApplicationManager.getApplication().runWriteAction {
+                val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
 
-                    val libraryModifiableModel = library.modifiableModel
+                syncLibraries(deps, libraryTable)
+            }
+        }
 
-                    project.baseDir.findChild("_build")?.let { build ->
-                        build.children.filter { it.isDirectory }.forEach { environment ->
-                            environment.children.filter { it.isDirectory }.forEach { environmentChild ->
-                                val environmentChildName = environmentChild.name
+        moduleManager.modules.forEach { module ->
+            module.getComponent(Watcher::class.java).syncLibraries()
+        }
+    }
 
-                                if (environmentChildName == "consolidated") {
-                                    libraryModifiableModel.addRoot(environmentChild, OrderRootType.CLASSES)
-                                } else if (environmentChildName == "lib") {
-                                    environmentChild.findChild(depName)?.let{ depEnvironmentLibrary ->
-                                        depEnvironmentLibrary.findChild("ebin")?.let { ebin ->
-                                            if (ebin.isDirectory) {
-                                                /* Mark build output as excluded when marking it as CLASSES, so that
-                                                   dependency will show up in External Libraries AND be pushed out into
-                                                   non-project results */
-                                                ModuleUtil
-                                                        .findModuleForFile(depEnvironmentLibrary, project)
-                                                        ?.let { module ->
-                                                            ModuleRootManager.getInstance(module).modifiableModel.apply {
-                                                                contentEntries.forEach { contentEntry ->
-                                                                    contentEntry.addExcludeFolder(depEnvironmentLibrary)
-                                                                }
+    private fun syncLibraries(
+            deps: Array<VirtualFile>,
+            libraryTable: LibraryTable
+    ) {
+        val libraryTableModifiableModel = libraryTable.modifiableModel
 
-                                                                commit()
-                                                            }
-                                                        }
+        deps.forEach { dep ->
+            syncLibrary(dep, libraryTable, libraryTableModifiableModel)
+        }
 
-                                                libraryModifiableModel.addRoot(ebin, OrderRootType.CLASSES)
+        libraryTableModifiableModel.commit()
+
+    }
+
+    private fun syncLibrary(
+            dep: VirtualFile,
+            libraryTable: LibraryTable,
+            libraryTableModifiableModel: LibraryTable.ModifiableModel
+    ) {
+        val depName = dep.name
+
+        val library = libraryTable.getLibraryByName(depName)
+                ?: libraryTableModifiableModel.createLibrary(dep.name, Kind)
+
+        syncLibrary(library, dep, depName)
+    }
+
+    private fun syncLibrary(library: Library, dep: VirtualFile, depName: String) {
+        val libraryModifiableModel = library.modifiableModel
+
+        project.baseDir.findChild("_build")?.let { build ->
+            build.children.filter { it.isDirectory }.forEach { environment ->
+                environment.children.filter { it.isDirectory }.forEach { environmentChild ->
+                    val environmentChildName = environmentChild.name
+
+                    if (environmentChildName == "consolidated") {
+                        libraryModifiableModel.addRoot(environmentChild, OrderRootType.CLASSES)
+                    } else if (environmentChildName == "lib") {
+                        environmentChild.findChild(depName)?.let{ depEnvironmentLibrary ->
+                            depEnvironmentLibrary.findChild("ebin")?.let { ebin ->
+                                if (ebin.isDirectory) {
+                                    /* Mark build output as excluded when marking it as CLASSES, so that
+                                       dependency will show up in External Libraries AND be pushed out into
+                                       non-project results */
+                                    ModuleUtil
+                                            .findModuleForFile(depEnvironmentLibrary, project)
+                                            ?.let { module ->
+                                                ModuleRootManager.getInstance(module).modifiableModel.apply {
+                                                    contentEntries.forEach { contentEntry ->
+                                                        contentEntry.addExcludeFolder(depEnvironmentLibrary)
+                                                    }
+
+                                                    commit()
+                                                }
                                             }
-                                        }
-                                    }
+
+                                    libraryModifiableModel.addRoot(ebin, OrderRootType.CLASSES)
                                 }
                             }
                         }
                     }
-
-                    dep.children.filter { it.isDirectory }.forEach { child ->
-                        if (child.name in SOURCE_NAMES) {
-                            libraryModifiableModel.addRoot(child, OrderRootType.SOURCES)
-                        }
-                    }
-
-                    libraryModifiableModel.commit()
-                    libraryTableModifiableModel.commit()
-
-                    moduleManager.modules.forEach { module ->
-                        module.getComponent(Watcher::class.java).syncLibraries()
-                    }
                 }
             }
         }
+
+        dep.children.filter { it.isDirectory }.forEach { child ->
+            if (child.name in SOURCE_NAMES) {
+                libraryModifiableModel.addRoot(child, OrderRootType.SOURCES)
+            }
+        }
+
+        libraryModifiableModel.commit()
     }
 
     private fun deleteAllLibraries(deps: VirtualFile) {
