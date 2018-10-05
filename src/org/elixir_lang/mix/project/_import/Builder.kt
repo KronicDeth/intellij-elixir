@@ -27,6 +27,7 @@ import com.intellij.openapi.vfs.newvfs.impl.VirtualDirectoryImpl
 import com.intellij.packaging.artifacts.ModifiableArtifactModel
 import com.intellij.projectImport.ProjectImportBuilder
 import com.intellij.util.containers.ContainerUtil
+import org.elixir_lang.DepsWatcher
 import org.elixir_lang.configuration.ElixirCompilerSettings
 import org.elixir_lang.mix.Icons
 import org.elixir_lang.module.ElixirModuleType
@@ -171,9 +172,6 @@ class Builder : ProjectImportBuilder<OtpApp>() {
                 compilerModuleExt.isExcludeOutput = false
 
                 createdRootModels.add(rootModel)
-
-                // Set inter-module dependencies
-                resolveModuleDeps(rootModel, importedOtpApp, projectSdk, selectedAppNames)
             }
         }
 
@@ -185,6 +183,8 @@ class Builder : ProjectImportBuilder<OtpApp>() {
             }
             obtainedModuleModel.commit()
         }
+
+        project.getComponent(DepsWatcher::class.java).syncLibraries(project)
 
         if (myIsImportingProject) {
             ElixirCompilerSettings.getInstance(project).isUseMixCompilerEnabled = true
@@ -356,36 +356,6 @@ class Builder : ProjectImportBuilder<OtpApp>() {
             }
 
             return ideaModuleFileExists
-        }
-
-        private fun resolveModuleDeps(rootModel: ModifiableRootModel,
-                                      otpApp: OtpApp,
-                                      projectSdk: Sdk?,
-                                      allImportedAppNames: Set<String>): Set<String> {
-            val unresolvedAppNames = ContainerUtil.newHashSet<String>()
-            for (depAppName in otpApp.deps) {
-                if (allImportedAppNames.contains(depAppName)) {
-                    rootModel.addInvalidModuleEntry(depAppName)
-                } else if (projectSdk != null && isSdkOtpApp(depAppName, projectSdk)) {
-                    // Sdk is already a dependency
-                    LOG.info("Sdk otp-app:[$depAppName] is already a dependy.")
-                } else {
-                    rootModel.addInvalidModuleEntry(depAppName)
-                    unresolvedAppNames.add(depAppName)
-                }
-            }
-            return unresolvedAppNames
-        }
-
-        private fun isSdkOtpApp(otpAppName: String, sdk: Sdk): Boolean {
-            for (sdkLibDir in sdk.rootProvider.getFiles(OrderRootType.SOURCES)) {
-                for (child in sdkLibDir.children) {
-                    if (child.isDirectory && child.name == otpAppName) {
-                        return true
-                    }
-                }
-            }
-            return false
         }
     }
 }

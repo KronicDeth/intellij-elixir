@@ -119,7 +119,7 @@ class DepsWatcher(
         }
     }
 
-    private fun syncLibraries(project: Project) {
+    fun syncLibraries(project: Project) {
         project.baseDir.findChild("deps")?.let { syncLibraries(it) }
     }
 
