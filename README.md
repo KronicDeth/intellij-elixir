@@ -5428,7 +5428,7 @@ I'd like to thank those who have donated to help support this project.
 * Percy Grunwald ([@pgrunwald](https://github.com/pgrunwald))
 * William De Melo Gueiros ([@williamgueiros](https://github.com/williamgueiros))
 * Denis Andrejew ([@seeekr](https://github.com/seeekr))
-* Artem Hordynskyi
+* Artem Gordinsky ([@ArtemGordinsky](https://github.com/ArtemGordinsky))
 * Maximilian Buschner
 * Bartłomiej Kuczyński ([@Koziolek](https://github.com/Koziolek))
 * Nguyen Le
