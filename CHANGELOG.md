@@ -204,6 +204,7 @@ Table of Contents
     * `assets/node_modules/phoenix` for `phoenix`
     * `assets/node_modules/phoenix_html` for `phoenix_html`
   * Setup Libraries and Module dependencies when importing projects from Mix.
+* [#1299](https://github.com/KronicDeth/intellij-elixir/pull/1299) - Regression test for [#1270](https://github.com/KronicDeth/intellij-elixir/issues/1270). - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#1277](https://github.com/KronicDeth/intellij-elixir/pull/1277) - Don't include `null` `useCall` as `__MODULE__` dependency. - [@KronicDeth](https://github.com/KronicDeth)
@@ -224,6 +225,7 @@ Table of Contents
   * When the entire deps directory has updated sync the children deps directories and then sync all modules instead of syncing them after each dep.
   *  For an unknown reason, when sync occurs at `initComponent` time in `DepsWatcher` or `mix.Watcher`, the child directories of the project `basedDir` aren't shown in the Project Pane until a change is applied in Project Structure.
   * Use `invokeAndWait` instead of `invokeLater` to ensure order of syncs.
+* [#1299](https://github.com/KronicDeth/intellij-elixir/pull/1299) - When finding a `defmodule`, check that it is an ancestor of the entrance of the `ResolveState`, so that nested sibling modules are not scanned for potential call definition clauses, but only the outer module of the entrance. - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Incompatible Changes
 * [#1272](https://github.com/KronicDeth/intellij-elixir/pull/1272) - [@KronicDeth](https://github.com/KronicDeth)

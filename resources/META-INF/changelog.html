@@ -68,6 +68,7 @@
         </ul>
       </li>
       <li>Setup Libraries and Module dependencies when importing projects from Mix.</li>
+      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/1270">#1270</a>.</li>
     </ul>
   </li>
   <li>
@@ -112,6 +113,11 @@
       </li>
       <li>
         Use <code>invokeAndWait</code> instead of <code>invokeLater</code> to ensure order of syncs.
+      </li>
+      <li>
+        When finding a <code>defmodule</code>, check that it is an ancestor of the entrance of the
+        <code>ResolveState</code>, so that nested sibling modules are not scanned for potential call definition clauses,
+        but only the outer module of the entrance.
       </li>
     </ul>
   </li>
