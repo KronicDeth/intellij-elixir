@@ -4,6 +4,7 @@ import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import com.intellij.psi.scope.PsiScopeProcessor
+import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.psi.Import
@@ -12,6 +13,7 @@ import org.elixir_lang.psi.Use
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.call.name.Module.KERNEL_SPECIAL_FORMS
+import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.call.macroChildCalls
 import org.elixir_lang.structure_view.element.modular.Module
 
@@ -77,7 +79,10 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
             }
 
             true
-        } else if (Module.`is`(element)) {
+        } else if (Module.`is`(element) &&
+                /* Only allow scanning back down in outer nested modules for siblings.  Prevents scanning in sibling
+                   nested modules in https://github.com/KronicDeth/intellij-elixir/issues/1270 */
+                state.get(ENTRANCE)?.let { entrance -> PsiTreeUtil.isAncestor(element, entrance, false) } == true) {
             val childCalls = element.macroChildCalls()
 
             for (childCall in childCalls) {
