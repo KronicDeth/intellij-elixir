@@ -39,7 +39,7 @@ class Model : AbstractTableModel(), ItemRemovable {
 
     override fun getValueAt(rowIndex: Int, columnIndex: Int): Any {
         if (rowIndex !in 0 until rowCount) {
-            throw IllegalArgumentException("Row $rowIndex out of bounds")
+            throw IndexOutOfBoundsException("Row $rowIndex out of bounds (0-$rowCount)")
         }
 
         val filter = _filterList[rowIndex]
