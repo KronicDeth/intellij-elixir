@@ -226,6 +226,7 @@ Table of Contents
   *  For an unknown reason, when sync occurs at `initComponent` time in `DepsWatcher` or `mix.Watcher`, the child directories of the project `basedDir` aren't shown in the Project Pane until a change is applied in Project Structure.
   * Use `invokeAndWait` instead of `invokeLater` to ensure order of syncs.
 * [#1299](https://github.com/KronicDeth/intellij-elixir/pull/1299) - When finding a `defmodule`, check that it is an ancestor of the entrance of the `ResolveState`, so that nested sibling modules are not scanned for potential call definition clauses, but only the outer module of the entrance. - [@KronicDeth](https://github.com/KronicDeth)
+* [#1300](https://github.com/KronicDeth/intellij-elixir/pull/1300) - Improve error message for `org.elixir_lang.debugger.settings.stepping.module_filter.editor.table.Model.getValueAt`, so we can detect if there is an off-by-1 error. - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Incompatible Changes
 * [#1272](https://github.com/KronicDeth/intellij-elixir/pull/1272) - [@KronicDeth](https://github.com/KronicDeth)
