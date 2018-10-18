@@ -61,6 +61,12 @@ public class MixOutputToGeneralTestEventsConverter extends OutputToGeneralTestEv
     }
 
     @Override
+    public void flushBufferOnProcessTermination(int code) {
+        super.flushBufferOnProcessTermination(code);
+        processStatuses();
+    }
+
+    @Override
     public void process(String text, Key outputType) {
         splitter.process(text, outputType);
     }
