@@ -68,7 +68,7 @@ public class Status {
     public static Status fromStdoutLine(@NotNull String line) {
         String status = null;
 
-        if (line.contains("[error]")) {
+        if (line.contains("[error]") || line.startsWith("== Compilation error in file ")) {
             status = "ERROR";
         }
 
