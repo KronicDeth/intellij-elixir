@@ -62,7 +62,7 @@ defmodule TeamCityExUnitFormatting do
             state:
               failed = {
                 :failed,
-                {_, reason, _}
+                {_, _reason, _}
               },
             time: time
           }
