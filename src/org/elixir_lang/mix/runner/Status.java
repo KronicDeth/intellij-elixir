@@ -12,10 +12,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Status {
-    private static final String COMPILATION_ERROR_PREFIX = "    (elixir) lib/kernel/parallel_require.ex:";
+    private static final String COMPILATION_ERROR_COMPILE_ERROR_PREFIX = "** (CompileError) ";
+    private static final String COMPILATION_ERROR_PARALLEL_REQUIRE_PREFIX = "    (elixir) lib/kernel/parallel_require.ex:";
     private static final String COMPILATION_FINISHED = compilationMessage("Finished");
     private static final String COMPILATION_STARTED = compilationMessage("Started");
-    private static final Pattern TEST_MODULE_PATH_PATTERN = Pattern.compile("(?<file>test/.*_test.exs):(?<line>\\d+): \\(module\\)\\z");
+    private static final Pattern COMPILE_ERROR_PATH_PATTERN = Pattern.compile("\\A\\*\\* \\(CompileError\\) (?<file>test/.*_test\\.exs):(?<line>\\d+): ");
+    private static final Pattern TEST_MODULE_PATH_PATTERN = Pattern.compile("(?<file>test/.*_test\\.exs):(?<line>\\d+): \\(module\\)\\z");
+    private static final Pattern[] PATH_PATTERNS = {COMPILE_ERROR_PATH_PATTERN, TEST_MODULE_PATH_PATTERN};
+
     @NotNull
     private final String status;
     @NotNull
@@ -68,7 +72,7 @@ public class Status {
     public static Status fromStdoutLine(@NotNull String line) {
         String status = null;
 
-        if (line.contains("[error]")) {
+        if (line.contains("[error]") || line.startsWith("== Compilation error in file ")) {
             status = "ERROR";
         }
 
@@ -104,9 +108,10 @@ public class Status {
 
     private boolean isCompilationError() {
         return stackTraceLines != null &&
-                stackTraceLines
+                (stackTraceLines
                         .get(stackTraceLines.size() - 1)
-                        .startsWith(COMPILATION_ERROR_PREFIX);
+                        .startsWith(COMPILATION_ERROR_PARALLEL_REQUIRE_PREFIX) ||
+                stackTraceLines.get(0).startsWith(COMPILATION_ERROR_COMPILE_ERROR_PREFIX));
     }
 
     @Nullable
@@ -116,17 +121,21 @@ public class Status {
         if (stackTraceLines != null && stackTraceLines.size() > 0) {
             String firstStackTraceLine = stackTraceLines.get(0);
 
-            Matcher matcher = TEST_MODULE_PATH_PATTERN.matcher(firstStackTraceLine);
+            for (Pattern path_pattern : PATH_PATTERNS) {
+                Matcher matcher = path_pattern.matcher(firstStackTraceLine);
 
-            if (matcher.find()) {
-                String file = matcher.group("file");
-                String line = matcher.group("line");
-                String locationHint = "file://" + file + ":" + line;
-                attributes = new THashMap<>(2);
-                attributes.put("locationHint", locationHint);
+                if (matcher.find()) {
+                    String file = matcher.group("file");
+                    String line = matcher.group("line");
+                    String locationHint = "file://" + file + ":" + line;
+                    attributes = new THashMap<>(2);
+                    attributes.put("locationHint", locationHint);
 
-                String name = fileToTestName(file);
-                attributes.put("name", name);
+                    String name = fileToTestName(file);
+                    attributes.put("name", name);
+
+                    break;
+                }
             }
         }
 
@@ -157,7 +166,7 @@ public class Status {
     }
 
     @NotNull
-    public List<String> toTeamCityCompilationMessageList() {
+    private List<String> toTeamCityCompilationMessageList() {
         return Arrays.asList(
                 COMPILATION_STARTED,
                 toTeamCityMessage(),
@@ -194,7 +203,18 @@ public class Status {
     }
 
     @NotNull
-    public List<String> toTeamCityTestMessageList() {
+    public List<String> toTeamCityMessageList() {
+        List<String> teamCityMessageList = toTeamCityTestMessageList();
+
+        if (teamCityMessageList.isEmpty()) {
+            teamCityMessageList = toTeamCityCompilationMessageList();
+        }
+
+        return teamCityMessageList;
+    }
+
+    @NotNull
+    private List<String> toTeamCityTestMessageList() {
         List<String> messageList;
 
         if (isCompilationError()) {

@@ -61,19 +61,19 @@ public class MixOutputToGeneralTestEventsConverter extends OutputToGeneralTestEv
     }
 
     @Override
+    public void flushBufferOnProcessTermination(int code) {
+        super.flushBufferOnProcessTermination(code);
+        processStatuses();
+    }
+
+    @Override
     public void process(String text, Key outputType) {
         splitter.process(text, outputType);
     }
 
     private void processStatus(@NotNull Status status, @NotNull Key outputType) {
-        for (String text : status.toTeamCityCompilationMessageList()) {
+        for (String text : status.toTeamCityMessageList()) {
             superProcessConsistentText(text, outputType, false);
-        }
-
-        if (outputType == ProcessOutputTypes.STDERR) {
-            for (String text : status.toTeamCityTestMessageList()) {
-                superProcessConsistentText(text, outputType, false);
-            }
         }
     }
 
