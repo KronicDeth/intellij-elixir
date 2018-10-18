@@ -1,9 +1,0 @@
-<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect width="16" height="16" fill="black" fill-opacity="0" transform="scale(3)"/>
-<path d="M0 24L48 0V8.01L0 24Z" fill="#A91E3B"/>
-<path d="M0 24L48 8.01004V16.02L0 24Z" fill="#460075"/>
-<path d="M48 24V15.99L0 24H48Z" fill="#6787C5"/>
-<path d="M48 24H0L48 32.01V24Z" fill="#7ABC42"/>
-<path d="M0 24L48 32.01V40.02L0 24Z" fill="#EBE820"/>
-<path d="M0 24L48 39.99V48L0 24Z" fill="#EAAA20"/>
-</svg>
