@@ -62,7 +62,7 @@ defmodule TeamCityExUnitFormatting do
             state:
               failed = {
                 :failed,
-                {_, reason, _}
+                {_, _reason, _}
               },
             time: time
           }
@@ -133,7 +133,7 @@ defmodule TeamCityExUnitFormatting do
       :test_failed,
       Keyword.merge(
         attributes,
-        details: formatted_failure,
+        details: details,
         message: ""
       )
     )
