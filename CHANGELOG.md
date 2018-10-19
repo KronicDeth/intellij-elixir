@@ -239,6 +239,7 @@ Table of Contents
 * [#1308](https://github.com/KronicDeth/intellij-elixir/pull/1308) - [@KronicDeth](https://github.com/KronicDeth)
   * Don't treat redefinition of `defmodule` macro as module definition (as occurs in [@bitwalker](https://github.com/bitwalker)'s [distillery](https://github.com/bitwalker/distillery)'s `Mix.Tasks.Release.Init.MixMock`
     * Bump `AllName` `VERSION` to re-index and drop bad call definition head from [#1301](https://github.com/KronicDeth/intellij-elixir/issues/1301).
+* [#1310](https://github.com/KronicDeth/intellij-elixir/pull/1310) - Don't log compilation errors as test failures unless a test has started.   Test name being called `mix test` does not work, so log those compilation errors as normal build messages instead. - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Incompatible Changes
 * [#1272](https://github.com/KronicDeth/intellij-elixir/pull/1272) - [@KronicDeth](https://github.com/KronicDeth)
