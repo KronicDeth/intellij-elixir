@@ -141,6 +141,17 @@
         Convert <code>(CompileError)</code> of a test file to test failure.  The "Test framework quit unexpectedly" is
         converted to a failed run with a single test with the compilation error as the failure message.
       </li>
+      <li>
+        Don't treat redefinition of <code>defmodule</code> macro as module definition (as occurs in
+        <a href="https://github.com/bitwalker">@bitwalker</a>'s
+        <a href="https://github.com/bitwalker/distillery">distillery</a>'s <code>Mix.Tasks.Release.Init.MixMock</code>
+        <ul>
+          <li>
+            Bump <code>AllName</code> <code>VERSION</code> to re-index and drop bad call definition head from
+            <a href="https://github.com/KronicDeth/intellij-elixir/issues/1301">#1301</a>.
+          </li>
+        </ul>
+      </li>
     </ul>
   </li>
   <li>
