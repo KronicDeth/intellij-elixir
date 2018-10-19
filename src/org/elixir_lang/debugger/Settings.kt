@@ -174,6 +174,8 @@ class Settings(moduleFilters: List<ModuleFilter> = defaultModuleFilters()):
                 ModuleFilter(pattern = "URI"),
                 ModuleFilter(pattern = "Version"),
                 ModuleFilter(pattern = ":cow*"),
+                // See https://github.com/KronicDeth/intellij-elixir/issues/1307
+                ModuleFilter(pattern = ":crypto"),
                 ModuleFilter(pattern = ":elixir_*"),
                 // See https://github.com/KronicDeth/intellij-elixir/issues/915
                 ModuleFilter(pattern = ":erocksdb"),
