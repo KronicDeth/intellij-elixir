@@ -8,7 +8,9 @@ import org.jetbrains.annotations.NotNull;
 public class AllName extends StringStubIndexExtension<NamedElement> {
     public static final StubIndexKey<String, NamedElement> KEY = StubIndexKey.createIndexKey("elixir.all.name");
     // 4 - adds defp and defmacrop to decompiled beam files
-    public static final int VERSION = 4;
+    /* 5 - fix bug in Module.is (https://github.com/KronicDeth/intellij-elixir/issues/1301) that caused defmodule macro
+           redefinition to count as actual module */
+    public static final int VERSION = 5;
 
     @Override
     public int getVersion() {
