@@ -131,6 +131,16 @@
           <li><code>details</code> should have been used.</li>
         </ul>
       </li>
+      <li>
+        <code>flushBufferBeforeTerminating</code> was deprecated and in newer IntelliJ the call to
+        <code>processStatuses</code> does not occur unless <code>flushBufferOnProcessTermination</code> is also
+        overridden.
+      </li>
+      <li>Treat <code>== Compilation error</code> in <code>STDOUT</code> as <code>ERROR</code> for ExUnit reporter</li>
+      <li>
+        Convert <code>(CompileError)</code> of a test file to test failure.  The "Test framework quit unexpectedly" is
+        converted to a failed run with a single test with the compilation error as the failure message.
+      </li>
     </ul>
   </li>
   <li>

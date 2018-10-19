@@ -232,6 +232,10 @@ Table of Contents
   * Fix unused variables in `TeamCityExUnitFormatting`
     * `reason` was completely unused.
     * `details` should have been used.
+* [#1306](https://github.com/KronicDeth/intellij-elixir/pull/1306) - [@KronicDeth](https://github.com/KronicDeth)
+  * `flushBufferBeforeTerminating` was deprecated and in newer IntelliJ the call to `processStatuses` does not occur unless `flushBufferOnProcessTermination` is also overridden.
+  * Treat `== Compilation error` in `STDOUT` as `ERROR` for ExUnit reporter
+  * Convert `(CompileError)` of a test file to test failure.  The "Test framework quit unexpectedly" is converted to a failed run with a single test with the compilation error as the failure message.
 
 ### Incompatible Changes
 * [#1272](https://github.com/KronicDeth/intellij-elixir/pull/1272) - [@KronicDeth](https://github.com/KronicDeth)
