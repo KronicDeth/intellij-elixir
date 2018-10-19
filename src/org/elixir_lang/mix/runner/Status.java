@@ -220,18 +220,11 @@ public class Status {
         if (isCompilationError()) {
             messageList = new ArrayList<>();
             Map<String, String> maybeTestStartedAttributes = maybeTestStartedAttributes();
-            String name;
 
             if (maybeTestStartedAttributes != null) {
                 messageList.add(teamCityTestStarted(maybeTestStartedAttributes));
-                name = maybeTestStartedAttributes.get("name");
-            } else {
-                name = "mix test";
-            }
-
-            messageList.add(toTeamCityTestFailed(name));
-
-            if (maybeTestStartedAttributes != null) {
+                String name = maybeTestStartedAttributes.get("name");
+                messageList.add(toTeamCityTestFailed(name));
                 messageList.add(teamCityTestFinished(maybeTestStartedAttributes));
             }
         } else {
