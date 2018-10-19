@@ -10,6 +10,8 @@ import com.intellij.usageView.UsageViewShortNameLocation
 import com.intellij.usageView.UsageViewTypeLocation
 import org.elixir_lang.NameArity
 import org.elixir_lang.navigation.item_presentation.Parent
+import org.elixir_lang.psi.Arguments
+import org.elixir_lang.psi.CallDefinitionClause.isMacro
 import org.elixir_lang.psi.QuoteMacro
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.CREATE
@@ -107,7 +109,15 @@ open class Module(protected val parent: Modular?, call: Call) : Element<Call>(ca
 
         @JvmStatic
         open fun `is`(call: Call): Boolean =
-                call.isCallingMacro(KERNEL, DEFMODULE, 2) ||
+                (call.isCallingMacro(KERNEL, DEFMODULE, 2) &&
+                        /**
+                         * See https://github.com/KronicDeth/intellij-elixir/issues/1301
+                         *
+                         * Check that the this is not the redefinition of defmodule in distillery
+                         */
+                        call
+                                .parent.let { it  as? Arguments }
+                                ?.parent?.let { it as? Call }?.let { isMacro(it) } != true) ||
                         call.isCalling(MODULE, CREATE, 3)
 
         @JvmStatic
