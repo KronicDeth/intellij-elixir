@@ -241,6 +241,7 @@ Table of Contents
     * Bump `AllName` `VERSION` to re-index and drop bad call definition head from [#1301](https://github.com/KronicDeth/intellij-elixir/issues/1301).
 * [#1310](https://github.com/KronicDeth/intellij-elixir/pull/1310) - Don't log compilation errors as test failures unless a test has started.   Test name being called `mix test` does not work, so log those compilation errors as normal build messages instead. - [@KronicDeth](https://github.com/KronicDeth)
 * [#1311](https://github.com/KronicDeth/intellij-elixir/pull/1311) - Don't interpret `:crypto` by default: `:crypto` includes NIFs that can't be reloaded and so kills the debugger. - [@KronicDeth](https://github.com/KronicDeth)
+* [#1312](https://github.com/KronicDeth/intellij-elixir/pull/1312) - Protect from `null` `containingFile` for modular names during completion. - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Incompatible Changes
 * [#1272](https://github.com/KronicDeth/intellij-elixir/pull/1272) - [@KronicDeth](https://github.com/KronicDeth)
