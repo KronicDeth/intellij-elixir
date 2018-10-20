@@ -69,6 +69,11 @@
       </li>
       <li>Setup Libraries and Module dependencies when importing projects from Mix.</li>
       <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/1270">#1270</a>.</li>
+      <li>Update gradle wrapper to 3.5 to allow for environment variable overrides</li>
+      <li>
+        Setup datetime based pre-release versioning to ensure that correct version of pre-release plugin is used when
+        testing Install Plugin From Disk.
+      </li>
     </ul>
   </li>
   <li>
@@ -161,6 +166,7 @@
         so kills the debugger.
       </li>
       <li>Protect from <code>null</code> <code>containingFile</code> for modular names during completion.</li>
+      <li>Wrap <code>syncPublisher(JDK_TABLE_TOPIC)</code> in <code>invokeLater</code> <code>runWriteAction</code>.</li>
     </ul>
   </li>
   <li>

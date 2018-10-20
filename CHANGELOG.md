@@ -205,6 +205,9 @@ Table of Contents
     * `assets/node_modules/phoenix_html` for `phoenix_html`
   * Setup Libraries and Module dependencies when importing projects from Mix.
 * [#1299](https://github.com/KronicDeth/intellij-elixir/pull/1299) - Regression test for [#1270](https://github.com/KronicDeth/intellij-elixir/issues/1270). - [@KronicDeth](https://github.com/KronicDeth)
+* [#1313](https://github.com/KronicDeth/intellij-elixir/pull/1313) - [@KronicDeth](https://github.com/KronicDeth)
+  * Update gradle wrapper to 3.5 to allow for environment variable overrides
+  * Setup datetime based pre-release versioning to ensure that correct version of pre-release plugin is used when testing Install Plugin From Disk.
 
 ### Bug Fixes
 * [#1277](https://github.com/KronicDeth/intellij-elixir/pull/1277) - Don't include `null` `useCall` as `__MODULE__` dependency. - [@KronicDeth](https://github.com/KronicDeth)
@@ -242,6 +245,7 @@ Table of Contents
 * [#1310](https://github.com/KronicDeth/intellij-elixir/pull/1310) - Don't log compilation errors as test failures unless a test has started.   Test name being called `mix test` does not work, so log those compilation errors as normal build messages instead. - [@KronicDeth](https://github.com/KronicDeth)
 * [#1311](https://github.com/KronicDeth/intellij-elixir/pull/1311) - Don't interpret `:crypto` by default: `:crypto` includes NIFs that can't be reloaded and so kills the debugger. - [@KronicDeth](https://github.com/KronicDeth)
 * [#1312](https://github.com/KronicDeth/intellij-elixir/pull/1312) - Protect from `null` `containingFile` for modular names during completion. - [@KronicDeth](https://github.com/KronicDeth)
+* [#1313](https://github.com/KronicDeth/intellij-elixir/pull/1313) - Wrap `syncPublisher(JDK_TABLE_TOPIC)` in `invokeLater` `runWriteAction`. - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Incompatible Changes
 * [#1272](https://github.com/KronicDeth/intellij-elixir/pull/1272) - [@KronicDeth](https://github.com/KronicDeth)
