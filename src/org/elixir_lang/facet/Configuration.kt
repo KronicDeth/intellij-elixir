@@ -31,10 +31,16 @@ class Configuration : FacetConfiguration {
 
         sdk?.let {
             ApplicationManager
-                    .getApplication()
-                    .messageBus
-                    .syncPublisher(ProjectJdkTable.JDK_TABLE_TOPIC)
-                    .jdkAdded(it)
+                    .getApplication().let { application ->
+                        application.invokeLater {
+                            application.runWriteAction {
+                                application
+                                        .messageBus
+                                        .syncPublisher(ProjectJdkTable.JDK_TABLE_TOPIC)
+                                        .jdkAdded(it)
+                            }
+                        }
+                    }
         }
     }
 
