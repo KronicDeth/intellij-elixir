@@ -58,14 +58,16 @@ class CallDefinitionClause : CompletionProvider<CompletionParameters>() {
                                 context: ProcessingContext,
                                 resultSet: CompletionResultSet) {
         maybeModularName(parameters)?.let { maybeModularName ->
-            maybeModularName.maybeModularNameToModular(maxScope = maybeModularName.containingFile, useCall = null)?.let { modular ->
-                if (resultSet.prefixMatcher.prefix.endsWith(".")) {
-                    resultSet.withPrefixMatcher("")
-                } else {
-                    resultSet
-                }.addAllElements(
-                        callDefinitionClauseLookupElements(modular)
-                )
+            maybeModularName.containingFile?.let { containingFile ->
+                maybeModularName.maybeModularNameToModular(maxScope = containingFile, useCall = null)?.let { modular ->
+                    if (resultSet.prefixMatcher.prefix.endsWith(".")) {
+                        resultSet.withPrefixMatcher("")
+                    } else {
+                        resultSet
+                    }.addAllElements(
+                            callDefinitionClauseLookupElements(modular)
+                    )
+                }
             }
         }
     }
