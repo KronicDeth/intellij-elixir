@@ -25,6 +25,15 @@ ext {
 
   quoterZipPath = "${cachePath}/intellij_elixir-${quoterVersion}.zip"
   quoterZipRootPath = "${cachePath}/intellij_elixir-${quoterVersion}"
+
+  if (project.hasProperty("isRelease") && isRelease) {
+    versionSuffix = ""
+  } else {
+    def date = new Date().format("yyyyMMddHHmmss", TimeZone.getTimeZone("UTC"))
+    versionSuffix = "-pre+$date"
+  }
+
+  version "$baseVersion$versionSuffix"
 }
 
 allprojects {
