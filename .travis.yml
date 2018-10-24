@@ -1,64 +1,256 @@
 sudo: false
-addons:
-  apt:
-    packages:
-      - oracle-java8-installer
-cache:
-  directories:
-  - cache
-  - dependencies
-  - $HOME/.gradle/caches/
-  - $HOME/.gradle/wrapper/
-language: elixir
-# NOTE: if you add new MAJOR IDEA versions OR change the MINOR/PATCH version numbers, update the corresponding version
-# in the `runIde` and `test` run configurations, to allow for mirrored local development and test.
-matrix:
+jobs:
   include:
-    # version groups based on https://www.jetbrains.com/idea/download/previous.html
-
-    - elixir: 1.6.6
-      env: IDEA_VERSION="2018.2.1"
-      jdk: oraclejdk8
-      otp_release: 20.1
-    - elixir: 1.5.3
-      env: IDEA_VERSION="2018.2.1"
-      jdk: oraclejdk8
-      otp_release: 20.1
-
-    - elixir: 1.6.6
-      env: IDEA_VERSION="2018.1.6"
-      jdk: oraclejdk8
-      otp_release: 20.1
-    - elixir: 1.5.3
-      env: IDEA_VERSION="2018.1.6"
-      jdk: oraclejdk8
-      otp_release: 20.1
-
-    - elixir: 1.6.6
+#    - stage: Test
+#      language: elixir
+#      elixir: 1.6.6
+#      env: IDEA_VERSION="2018.2.1"
+#      jdk: oraclejdk8
+#      otp_release: 20.1
+#      addons:
+#        apt:
+#          packages:
+#          - oracle-java8-installer
+#      cache:
+#        directories:
+#        - cache
+#        - dependencies
+#        - "$HOME/.gradle/caches/"
+#        - "$HOME/.gradle/wrapper/"
+#      before_install:
+#      - mix local.hex --force
+#      - "export DISPLAY=:99.0"
+#      - "export ELIXIR_VERSION=${TRAVIS_ELIXIR_VERSION}"
+#      - "export ORG_GRADLE_PROJECT_elixirVersion=${TRAVIS_ELIXIR_VERSION}"
+#      - "export ORG_GRADLE_PROJECT_ideaVersion=${IDEA_VERSION}"
+#      - "export OTP_RELEASE=${TRAVIS_OTP_RELEASE}"
+#      - export ERLANG_SDK_HOME=`erl -eval 'io:format("~s", [code:root_dir()]).' -noshell -run init stop`
+#      - export TERM=dumb
+#      - "sh -e /etc/init.d/xvfb start"
+#      - export CASHER_TIME_OUT=360
+#      install:
+#      - "./gradlew compileTestJava"
+#      script: travis_wait ./gradlew test
+#      before_cache:
+#      - rm -fr cache/intellij_elixir-0.1.1/rel/intellij_elixir/log
+#      - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+#      - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+#      - rm -fr $HOME/.gradle/caches/*/fileHashes/
+#    - stage: Test
+#      language: elixir
+#      elixir: 1.5.3
+#      env: IDEA_VERSION="2018.2.1"
+#      jdk: oraclejdk8
+#      otp_release: 20.1
+#      addons:
+#        apt:
+#          packages:
+#          - oracle-java8-installer
+#      cache:
+#        directories:
+#        - cache
+#        - dependencies
+#        - "$HOME/.gradle/caches/"
+#        - "$HOME/.gradle/wrapper/"
+#      before_install:
+#      - mix local.hex --force
+#      - "export DISPLAY=:99.0"
+#      - "export ELIXIR_VERSION=${TRAVIS_ELIXIR_VERSION}"
+#      - "export ORG_GRADLE_PROJECT_elixirVersion=${TRAVIS_ELIXIR_VERSION}"
+#      - "export ORG_GRADLE_PROJECT_ideaVersion=${IDEA_VERSION}"
+#      - "export OTP_RELEASE=${TRAVIS_OTP_RELEASE}"
+#      - export ERLANG_SDK_HOME=`erl -eval 'io:format("~s", [code:root_dir()]).' -noshell -run init stop`
+#      - export TERM=dumb
+#      - "sh -e /etc/init.d/xvfb start"
+#      - export CASHER_TIME_OUT=360
+#      install:
+#      - "./gradlew compileTestJava"
+#      script: travis_wait ./gradlew test
+#      before_cache:
+#      - rm -fr cache/intellij_elixir-0.1.1/rel/intellij_elixir/log
+#      - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+#      - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+#      - rm -fr $HOME/.gradle/caches/*/fileHashes/
+#    - stage: Test
+#      language: elixir
+#      elixir: 1.6.6
+#      env: IDEA_VERSION="2018.1.6"
+#      jdk: oraclejdk8
+#      otp_release: 20.1
+#      addons:
+#        apt:
+#          packages:
+#          - oracle-java8-installer
+#      cache:
+#        directories:
+#        - cache
+#        - dependencies
+#        - "$HOME/.gradle/caches/"
+#        - "$HOME/.gradle/wrapper/"
+#      before_install:
+#      - mix local.hex --force
+#      - "export DISPLAY=:99.0"
+#      - "export ELIXIR_VERSION=${TRAVIS_ELIXIR_VERSION}"
+#      - "export ORG_GRADLE_PROJECT_elixirVersion=${TRAVIS_ELIXIR_VERSION}"
+#      - "export ORG_GRADLE_PROJECT_ideaVersion=${IDEA_VERSION}"
+#      - "export OTP_RELEASE=${TRAVIS_OTP_RELEASE}"
+#      - export ERLANG_SDK_HOME=`erl -eval 'io:format("~s", [code:root_dir()]).' -noshell -run init stop`
+#      - export TERM=dumb
+#      - "sh -e /etc/init.d/xvfb start"
+#      - export CASHER_TIME_OUT=360
+#      install:
+#      - "./gradlew compileTestJava"
+#      script: travis_wait ./gradlew test
+#      before_cache:
+#      - rm -fr cache/intellij_elixir-0.1.1/rel/intellij_elixir/log
+#      - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+#      - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+#      - rm -fr $HOME/.gradle/caches/*/fileHashes/
+#    - stage: Test
+#      language: elixir
+#      elixir: 1.6.6
+#      env: IDEA_VERSION="2018.1.6"
+#      jdk: oraclejdk8
+#      otp_release: 20.1
+#      addons:
+#        apt:
+#          packages:
+#          - oracle-java8-installer
+#      cache:
+#        directories:
+#        - cache
+#        - dependencies
+#        - "$HOME/.gradle/caches/"
+#        - "$HOME/.gradle/wrapper/"
+#      before_install:
+#      - mix local.hex --force
+#      - "export DISPLAY=:99.0"
+#      - "export ELIXIR_VERSION=${TRAVIS_ELIXIR_VERSION}"
+#      - "export ORG_GRADLE_PROJECT_elixirVersion=${TRAVIS_ELIXIR_VERSION}"
+#      - "export ORG_GRADLE_PROJECT_ideaVersion=${IDEA_VERSION}"
+#      - "export OTP_RELEASE=${TRAVIS_OTP_RELEASE}"
+#      - export ERLANG_SDK_HOME=`erl -eval 'io:format("~s", [code:root_dir()]).' -noshell -run init stop`
+#      - export TERM=dumb
+#      - "sh -e /etc/init.d/xvfb start"
+#      - export CASHER_TIME_OUT=360
+#      install:
+#      - "./gradlew compileTestJava"
+#      script: travis_wait ./gradlew test
+#      before_cache:
+#      - rm -fr cache/intellij_elixir-0.1.1/rel/intellij_elixir/log
+#      - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+#      - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+#      - rm -fr $HOME/.gradle/caches/*/fileHashes/
+#    - stage: Test
+#      language: elixir
+#      elixir: 1.6.6
+#      env: IDEA_VERSION="2017.3.5"
+#      jdk: oraclejdk8
+#      otp_release: 20.1
+#      addons:
+#        apt:
+#          packages:
+#          - oracle-java8-installer
+#      cache:
+#        directories:
+#        - cache
+#        - dependencies
+#        - "$HOME/.gradle/caches/"
+#        - "$HOME/.gradle/wrapper/"
+#      before_install:
+#      - mix local.hex --force
+#      - "export DISPLAY=:99.0"
+#      - "export ELIXIR_VERSION=${TRAVIS_ELIXIR_VERSION}"
+#      - "export ORG_GRADLE_PROJECT_elixirVersion=${TRAVIS_ELIXIR_VERSION}"
+#      - "export ORG_GRADLE_PROJECT_ideaVersion=${IDEA_VERSION}"
+#      - "export OTP_RELEASE=${TRAVIS_OTP_RELEASE}"
+#      - export ERLANG_SDK_HOME=`erl -eval 'io:format("~s", [code:root_dir()]).' -noshell -run init stop`
+#      - export TERM=dumb
+#      - "sh -e /etc/init.d/xvfb start"
+#      - export CASHER_TIME_OUT=360
+#      install:
+#      - "./gradlew compileTestJava"
+#      script: travis_wait ./gradlew test
+#      before_cache:
+#      - rm -fr cache/intellij_elixir-0.1.1/rel/intellij_elixir/log
+#      - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+#      - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+#      - rm -fr $HOME/.gradle/caches/*/fileHashes/
+#    - stage: Test
+#      language: elixir
+#      elixir: 1.5.3
+#      env: IDEA_VERSION="2017.3.5"
+#      jdk: oraclejdk8
+#      otp_release: 20.1
+#      addons:
+#        apt:
+#          packages:
+#          - oracle-java8-installer
+#      cache:
+#        directories:
+#        - cache
+#        - dependencies
+#        - "$HOME/.gradle/caches/"
+#        - "$HOME/.gradle/wrapper/"
+#      before_install:
+#      - mix local.hex --force
+#      - "export DISPLAY=:99.0"
+#      - "export ELIXIR_VERSION=${TRAVIS_ELIXIR_VERSION}"
+#      - "export ORG_GRADLE_PROJECT_elixirVersion=${TRAVIS_ELIXIR_VERSION}"
+#      - "export ORG_GRADLE_PROJECT_ideaVersion=${IDEA_VERSION}"
+#      - "export OTP_RELEASE=${TRAVIS_OTP_RELEASE}"
+#      - export ERLANG_SDK_HOME=`erl -eval 'io:format("~s", [code:root_dir()]).' -noshell -run init stop`
+#      - export TERM=dumb
+#      - "sh -e /etc/init.d/xvfb start"
+#      - export CASHER_TIME_OUT=360
+#      install:
+#      - "./gradlew compileTestJava"
+#      script: travis_wait ./gradlew test
+#      before_cache:
+#      - rm -fr cache/intellij_elixir-0.1.1/rel/intellij_elixir/log
+#      - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+#      - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+#      - rm -fr $HOME/.gradle/caches/*/fileHashes/
+    - stage: GitHub Release
+      language: elixir
+      # The earliest `elixir` support in `stage: Test`
+      elixir: 1.6.6
+      # The earliest `IDEA_VERSION` supported in `stage: Test`
       env: IDEA_VERSION="2017.3.5"
       jdk: oraclejdk8
       otp_release: 20.1
-    - elixir: 1.5.3
-      env: IDEA_VERSION="2017.3.5"
-      jdk: oraclejdk8
-      otp_release: 20.1
-before_install:
-- mix local.hex --force
-- "export DISPLAY=:99.0"
-- "export ELIXIR_VERSION=${TRAVIS_ELIXIR_VERSION}"
-- "export ORG_GRADLE_PROJECT_elixirVersion=${TRAVIS_ELIXIR_VERSION}"
-- "export ORG_GRADLE_PROJECT_ideaVersion=${IDEA_VERSION}"
-- "export OTP_RELEASE=${TRAVIS_OTP_RELEASE}"
-- export ERLANG_SDK_HOME=`erl -eval 'io:format("~s", [code:root_dir()]).' -noshell -run init stop`
-- export TERM=dumb
-- "sh -e /etc/init.d/xvfb start"
-- export CASHER_TIME_OUT=360
-install:
-- ./gradlew compileTestJava
-script: travis_wait ./gradlew test
-before_cache:
-- rm -fr cache/intellij_elixir-0.1.1/rel/intellij_elixir/log
-- rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-- rm -fr $HOME/.gradle/caches/*/plugin-resolution/
-- rm -fr $HOME/.gradle/caches/*/fileHashes/
-sudo: false
+      cache:
+        directories:
+        - cache
+        - dependencies
+        - "$HOME/.gradle/caches/"
+        - "$HOME/.gradle/wrapper/"
+      before_install:
+      - "export ELIXIR_VERSION=${TRAVIS_ELIXIR_VERSION}"
+      - "export ORG_GRADLE_PROJECT_elixirVersion=${TRAVIS_ELIXIR_VERSION}"
+      - "export ORG_GRADLE_PROJECT_ideaVersion=${IDEA_VERSION}"
+      - "export OTP_RELEASE=${TRAVIS_OTP_RELEASE}"
+      - export ERLANG_SDK_HOME=`erl -eval 'io:format("~s", [code:root_dir()]).' -noshell -run init stop`
+      - export TERM=dumb
+      - export CASHER_TIME_OUT=360
+      install: skip
+      script: travis_wait ./gradlew buildPlugin
+      before_cache:
+      - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+      - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+      - rm -fr $HOME/.gradle/caches/*/fileHashes/
+      before_deploy:
+        - git config --local user.name "Luke Imhoff"
+        - git config --local user.email "Kronic.Deth@gmail.com"
+        - git tag "v$(zip_path=`ls -1 build/distributions/intellij-elixir-*.zip`; zip_name=${zip_path#build/distributions/intellij-elixir-}; echo ${zip_name%.zip})"
+      deploy:
+        provider: releases
+        api_key:
+          secure: DCGDkpqgem9/N/bJOqq0MkRGGbDLTzUVAkK9juOSb9iNdwoiY6yk2KHRV7Jn4GNjOtsLjLDPGIn3C8YhRq5z+6E0Lhp6GTKvnuFW3fdD8wrVF837TjIIBiSb1r6m/LlDSpN3w7hii8m8rEfK+63Sgm8Lt+JMpX9EniFKW8zwe50=
+        file_glob: true
+        file: build/distributions/intellij-elixir-*.zip
+        prerelease: true
+        skip_cleanup: true
+        on:
+          repo: KronicDeth/intellij-elixir
+          branch: 447
