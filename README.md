@@ -33,8 +33,8 @@ Table of Contents
             * [Keywords appear before the end of list.](#keywords-appear-before-the-end-of-list)
             * [Match operator (=) used in type spec instead of type operator (<code>::</code>)](#match-operator--used-in-type-spec-instead-of-type-operator-)
          * [Quick Fixes](#quick-fixes)
-            * [Convert : to <code>::</code> in type specs](#convert--to--in-type-specs)
-            * [Convert = to <code>::</code> in type specs](#convert--to--in-type-specs-1)
+            * [Convert : to <code> ::</code> in type specs](#convert--to---in-type-specs)
+            * [Convert = to <code> ::</code> in type specs](#convert--to---in-type-specs-1)
             * [Remove space in front of ambiguous parentheses](#remove-space-in-front-of-ambiguous-parentheses)
          * [Code Folding](#code-folding)
             * [Controls](#controls)
@@ -217,10 +217,16 @@ Table of Contents
                   * [Visibility](#visibility)
                * [Call to Element](#call-to-element)
       * [Installation](#installation)
-         * [Inside IDE using JetBrains repository](#inside-ide-using-jetbrains-repository)
-         * [Inside IDE using Github releases](#inside-ide-using-github-releases)
-            * [In browser](#in-browser)
-            * [In IDE](#in-ide)
+         * [Stable releases](#stable-releases)
+            * [Inside IDE using JetBrains repository](#inside-ide-using-jetbrains-repository)
+            * [Inside IDE using Github releases](#inside-ide-using-github-releases)
+               * [In browser](#in-browser)
+               * [In IDE](#in-ide)
+         * [Canary releases](#canary-releases)
+            * [Inside IDE using JetBrains repository](#inside-ide-using-jetbrains-repository-1)
+            * [Inside IDE using Github releases](#inside-ide-using-github-releases-1)
+               * [In browser](#in-browser-1)
+               * [In IDE](#in-ide-1)
       * [Screenshots](#screenshots)
       * [Error reporting](#error-reporting)
       * [Donations](#donations)
@@ -5334,7 +5340,9 @@ The Visibility icons indicated whether the element is usable outside its definin
 
 ## Installation
 
-### Inside IDE using JetBrains repository
+### Stable releases
+
+#### Inside IDE using JetBrains repository
 
 1. Preferences
 2. Plugins
@@ -5344,14 +5352,57 @@ The Visibility icons indicated whether the element is usable outside its definin
 6. Apply
 7. Restart the IDE
 
-### Inside IDE using Github releases
+#### Inside IDE using Github releases
 
-#### In browser
+##### In browser
 
 1. Go to [releases](https://github.com/KronicDeth/intellij-elixir/releases).
-2. Download the lastest zip.
+2. Download the latest release zip.
 
-#### In IDE
+##### In IDE
+
+1. Preferences
+2. Plugins
+3. Install plugin from disk...
+4. Select the downloaded zip.
+5. Apply
+7. Restart the IDE.
+
+### Canary releases
+
+Builds on `master` will produce pre-release builds of format `NEXT_VERSION-pre+YYYYMMDDHHMMSS`.
+
+#### Inside IDE using JetBrains repository
+
+You will need to add the `canary` repository once to your IDE:
+
+1. Preferences
+2. Plugins
+3. Browse Repositories
+4. Manage Repositories
+5. Click +
+6. Enter the IntelliJ Elixir `canary` URL: `https://plugins.jetbrains.com/plugins/list?channel=canary&pluginId=7522`
+7. Click OK
+8. Click OK to close the Custom Plugin Repositories dialog.
+
+With the `canary` repository setup:
+
+1. Preferences
+2. Plugins
+3. Browse Repositories
+4. Select Elixir
+5. Install plugin
+6. Apply
+7. Restart the IDE
+
+#### Inside IDE using Github releases
+
+##### In browser
+
+1. Go to [releases](https://github.com/KronicDeth/intellij-elixir/releases).
+2. Download the latest pre-release zip.
+
+##### In IDE
 
 1. Preferences
 2. Plugins
