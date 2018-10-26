@@ -208,6 +208,10 @@ Table of Contents
 * [#1313](https://github.com/KronicDeth/intellij-elixir/pull/1313) - [@KronicDeth](https://github.com/KronicDeth)
   * Update gradle wrapper to 3.5 to allow for environment variable overrides
   * Setup datetime based pre-release versioning to ensure that correct version of pre-release plugin is used when testing Install Plugin From Disk.
+* [#1318](https://github.com/KronicDeth/intellij-elixir/pull/1318) - [@KronicDeth](https://github.com/KronicDeth)
+  * Canary, pre-release builds (`vMAJOR.MINOR.PATCH-pre+YYYYMMDDHHMMSS`) from `master` branch
+    * GitHub pre-release [releases](https://github.com/KronicDeth/intellij-elixir/releases)
+    * Release on the [canary channel](https://plugins.jetbrains.com/plugins/list?channel=canary&pluginId=7522) in the [JetBrains Plugin Repository](https://plugins.jetbrains.com/plugin/7522-elixir)
 
 ### Bug Fixes
 * [#1277](https://github.com/KronicDeth/intellij-elixir/pull/1277) - Don't include `null` `useCall` as `__MODULE__` dependency. - [@KronicDeth](https://github.com/KronicDeth)
