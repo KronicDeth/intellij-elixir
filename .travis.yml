@@ -211,7 +211,7 @@ jobs:
 #      - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
 #      - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
 #      - rm -fr $HOME/.gradle/caches/*/fileHashes/
-    - stage: GitHub Release
+    - stage: Canary Pre-Release Builds
       language: elixir
       # The earliest `elixir` support in `stage: Test`
       elixir: 1.6.6
@@ -256,10 +256,10 @@ jobs:
           skip_cleanup: true
           on:
             repo: KronicDeth/intellij-elixir
-            branch: 447
+            branch: master
         - provider: script
           skip_cleanup: true
           script: curl --fail -F userName=KronicDeth -F password=${ORG_GRADLE_PROJECT_publishPassword} -F pluginId=7522 -F file=@${ORG_GRADLE_PROJECT_distributionFile} -F channel=canary https://plugins.jetbrains.com/plugin/uploadPlugin
           on:
             repo: KronicDeth/intellij-elixir
-            branch: 447
+            branch: master
