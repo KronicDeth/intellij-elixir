@@ -1,5 +1,6 @@
 package org.elixir_lang.rebar3
 
+import com.intellij.openapi.application.runReadAction
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import org.elixir_lang.errorreport.Logger
@@ -10,7 +11,9 @@ import org.intellij.erlang.psi.*
 class DepGatherer : DepGatherer() {
     override fun visitFile(file: PsiFile?) {
         if (file is ErlangFile) {
-            file.acceptChildren(this)
+            runReadAction {
+                file.acceptChildren(this)
+            }
         }
     }
 

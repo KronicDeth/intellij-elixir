@@ -2,6 +2,8 @@ package org.elixir_lang.structure_view.element.modular
 
 import com.intellij.ide.util.treeView.smartTree.TreeElement
 import com.intellij.navigation.ItemPresentation
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.util.Computable
 import com.intellij.psi.ElementDescriptionLocation
 import com.intellij.psi.ElementDescriptionUtil
 import com.intellij.psi.PsiElement
@@ -115,9 +117,13 @@ open class Module(protected val parent: Modular?, call: Call) : Element<Call>(ca
                          *
                          * Check that the this is not the redefinition of defmodule in distillery
                          */
-                        call
-                                .parent.let { it  as? Arguments }
-                                ?.parent?.let { it as? Call }?.let { isMacro(it) } != true) ||
+                        ApplicationManager
+                                .getApplication()
+                                .runReadAction(Computable {
+                                    call
+                                            .parent.let { it  as? Arguments }
+                                            ?.parent?.let { it as? Call }?.let { isMacro(it) }
+                                }) != true) ||
                         call.isCalling(MODULE, CREATE, 3)
 
         @JvmStatic

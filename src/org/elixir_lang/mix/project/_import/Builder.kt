@@ -187,7 +187,12 @@ class Builder : ProjectImportBuilder<OtpApp>() {
             obtainedModuleModel.commit()
         }
 
-        project.getComponent(DepsWatcher::class.java).syncLibraries(project)
+        ProgressManager.getInstance().run(object : Task.Modal(ProjectImportBuilder.getCurrentProject(), "Scanning dependencies for Libraries", true) {
+            override fun run(indicator: ProgressIndicator) {
+                project.getComponent(DepsWatcher::class.java).syncLibraries(project, indicator)
+            }
+        })
+
 
         if (myIsImportingProject) {
             ElixirCompilerSettings.getInstance(project).isUseMixCompilerEnabled = true
