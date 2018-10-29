@@ -3,9 +3,13 @@ package org.elixir_lang.mix.watcher
 import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
+import com.intellij.psi.util.CachedValue
+import com.intellij.psi.util.CachedValueProvider
+import com.intellij.psi.util.CachedValuesManager.getCachedValue
 import org.elixir_lang.mix.Dep
 import org.elixir_lang.PackageManager
 import org.elixir_lang.package_manager.virtualFile
@@ -99,9 +103,14 @@ class Resolution(
                 packageManager: PackageManager,
                 packagePsiFile: PsiFile
         ): Set<Dep> =
-            packageManager
-                    .depGatherer()
-                    .apply { packagePsiFile.accept(this) }
-                    .depSet
+                getCachedValue(packagePsiFile, DEP_SET) {
+                    packageManager
+                            .depGatherer()
+                            .apply { packagePsiFile.accept(this) }
+                            .depSet.toSet()
+                            .let { CachedValueProvider.Result.create(it, packagePsiFile) }
+                }
     }
 }
+
+private val DEP_SET: Key<CachedValue<Set<Dep>>> = Key.create<CachedValue<Set<Dep>>>("DEP_SET")
