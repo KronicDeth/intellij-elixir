@@ -1,5 +1,6 @@
 package org.elixir_lang.mix
 
+import com.intellij.openapi.application.runReadAction
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import org.elixir_lang.NameArity
@@ -20,7 +21,9 @@ import org.elixir_lang.psi.impl.stripAccessExpression
 class DepGatherer : DepGatherer() {
     override fun visitFile(file: PsiFile?) {
         if (file is ElixirFile) {
-            file.acceptChildren(this)
+            runReadAction {
+                file.acceptChildren(this)
+            }
         }
     }
 

@@ -5,6 +5,9 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ProjectComponent
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.module.ModuleUtil
+import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.OrderRootType
@@ -63,9 +66,17 @@ class DepsWatcher(
      */
     override fun fileCreated(event: VirtualFileEvent) {
         if (event.fileName == "deps" && event.parent == project.baseDir) {
-            syncLibraries(event.file)
+            ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Syncing Libraries in deps", true) {
+                override fun run(indicator: ProgressIndicator) {
+                    syncLibraries(event.file, indicator)
+                }
+            })
         } else if (event.parent?.name == "deps" && event.parent?.parent == project.baseDir) {
-            syncLibrary(event.file)
+            ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Syncing Library in deps/${event.fileName}", true) {
+                override fun run(indicator: ProgressIndicator) {
+                    syncLibrary(event.file, indicator)
+                }
+            })
         } else {
             syncLibraries(event)
         }
@@ -90,23 +101,51 @@ class DepsWatcher(
 
         event.parent?.let { parent ->
             if (fileName == "_build" && parent == baseDir) {
-                syncLibraries(project)
+                ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Syncing Libraries in _build", true) {
+                    override fun run(indicator: ProgressIndicator) {
+                        syncLibraries(project, indicator)
+                    }
+                })
             } else {
                 parent.parent?.let { grandParent ->
                     if (parent.name == "_build" && grandParent == baseDir) {
-                        syncLibraries(project)
+                        ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Syncing Libraries in _build/$fileName", true) {
+                            override fun run(indicator: ProgressIndicator) {
+                                syncLibraries(project, indicator)
+                            }
+                        })
                     } else {
                         grandParent.parent?.let { greatGrandParent ->
                             if (fileName in arrayOf("consolidated", "lib") && grandParent.name == "_build" && greatGrandParent == baseDir) {
-                                syncLibraries(project)
+                                ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Syncing Libraries in _build/${parent.name}/$fileName", true) {
+                                    override fun run(indicator: ProgressIndicator) {
+                                        syncLibraries(project, indicator)
+                                    }
+                                })
                             } else if (fileName in SOURCE_NAMES && grandParent.name == "deps" && greatGrandParent == baseDir) {
-                                syncLibrary(parent)
+                                ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Syncing Library in deps/${parent.name}", true) {
+                                    override fun run(indicator: ProgressIndicator) {
+                                        syncLibrary(parent, indicator)
+                                    }
+                                })
                             } else {
                                 greatGrandParent.parent?.let { greatGreatGrandParent ->
                                     if (parent.name == "lib" && greatGrandParent.name == "_build" && greatGreatGrandParent == baseDir) {
-                                        baseDir.findChild("deps")?.findChild(fileName)?.let { syncLibrary(it) }
+                                        baseDir.findChild("deps")?.findChild(fileName)?.let {
+                                            ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Syncing Library in _build/${grandParent.name}/lib/$fileName", true) {
+                                                override fun run(indicator: ProgressIndicator) {
+                                                    syncLibrary(it, indicator)
+                                                }
+                                            })
+                                        }
                                     } else if (fileName == "ebin" && grandParent.name == "lib" && greatGreatGrandParent.name == "_build" && greatGreatGrandParent.parent == baseDir) {
-                                        baseDir.findChild("deps")?.findChild(parent.name)?.let { syncLibrary(it) }
+                                        baseDir.findChild("deps")?.findChild(parent.name)?.let {
+                                            ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Syncing Library in _build/lib/${parent.name}/ebin", true) {
+                                                override fun run(indicator: ProgressIndicator) {
+                                                    syncLibrary(it, indicator)
+                                                }
+                                            })
+                                        }
                                     } else {
                                         null
                                     }
@@ -119,56 +158,67 @@ class DepsWatcher(
         }
     }
 
-    fun syncLibraries(project: Project) {
-        project.baseDir.findChild("deps")?.let { syncLibraries(it) }
+    fun syncLibraries(project: Project, progressIndicator: ProgressIndicator) {
+        project.baseDir.findChild("deps")?.let { syncLibraries(it, progressIndicator) }
     }
 
-    private fun syncLibrary(dep: VirtualFile) = syncLibraries(arrayOf(dep))
+    private fun syncLibrary(dep: VirtualFile, progressIndicator: ProgressIndicator) = syncLibraries(arrayOf(dep), progressIndicator)
 
-    private fun syncLibraries(deps: VirtualFile) = deps.children.let { syncLibraries(it) }
+    private fun syncLibraries(deps: VirtualFile, progressIndicator: ProgressIndicator) = deps.children.let { syncLibraries(it, progressIndicator) }
 
-    private fun syncLibraries(deps: Array<VirtualFile>) {
-        ApplicationManager.getApplication().invokeAndWait {
-            ApplicationManager.getApplication().runWriteAction {
-                val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
+    private fun syncLibraries(deps: Array<VirtualFile>, progressIndicator: ProgressIndicator) {
+        if (deps.isNotEmpty()) {
+            ApplicationManager.getApplication().invokeAndWait {
+                ApplicationManager.getApplication().runWriteAction {
+                    val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
 
-                syncLibraries(deps, libraryTable)
+                    syncLibraries(deps, libraryTable, progressIndicator)
+                }
             }
-        }
 
-        moduleManager.modules.forEach { module ->
-            module.getComponent(Watcher::class.java).syncLibraries()
+            for (module in moduleManager.modules) {
+                if (progressIndicator.isCanceled) {
+                    break
+                }
+
+                module.getComponent(Watcher::class.java).syncLibraries(progressIndicator)
+            }
         }
     }
 
     private fun syncLibraries(
             deps: Array<VirtualFile>,
-            libraryTable: LibraryTable
+            libraryTable: LibraryTable,
+            progressIndicator: ProgressIndicator
     ) {
         val libraryTableModifiableModel = libraryTable.modifiableModel
 
-        deps.forEach { dep ->
-            syncLibrary(dep, libraryTable, libraryTableModifiableModel)
+        for (dep in deps) {
+            if (progressIndicator.isCanceled) {
+                break
+            }
+
+            syncLibrary(dep, libraryTable, libraryTableModifiableModel, progressIndicator)
         }
 
         libraryTableModifiableModel.commit()
-
     }
 
     private fun syncLibrary(
             dep: VirtualFile,
             libraryTable: LibraryTable,
-            libraryTableModifiableModel: LibraryTable.ModifiableModel
+            libraryTableModifiableModel: LibraryTable.ModifiableModel,
+            progressIndicator: ProgressIndicator
     ) {
         val depName = dep.name
 
         val library = libraryTable.getLibraryByName(depName)
                 ?: libraryTableModifiableModel.createLibrary(dep.name, Kind)
 
-        syncLibrary(library, dep, depName)
+        syncLibrary(library, dep, depName, progressIndicator)
     }
 
-    private fun syncLibrary(library: Library, dep: VirtualFile, depName: String) {
+    private fun syncLibrary(library: Library, dep: VirtualFile, depName: String, progressIndicator: ProgressIndicator) {
         val libraryModifiableModel = library.modifiableModel
 
         project.baseDir.findChild("_build")?.let { build ->
@@ -179,7 +229,7 @@ class DepsWatcher(
                     if (environmentChildName == "consolidated") {
                         libraryModifiableModel.addRoot(environmentChild, OrderRootType.CLASSES)
                     } else if (environmentChildName == "lib") {
-                        environmentChild.findChild(depName)?.let{ depEnvironmentLibrary ->
+                        environmentChild.findChild(depName)?.let { depEnvironmentLibrary ->
                             depEnvironmentLibrary.findChild("ebin")?.let { ebin ->
                                 if (ebin.isDirectory) {
                                     /* Mark build output as excluded when marking it as CLASSES, so that
@@ -189,7 +239,13 @@ class DepsWatcher(
                                             .findModuleForFile(depEnvironmentLibrary, project)
                                             ?.let { module ->
                                                 ModuleRootManager.getInstance(module).modifiableModel.apply {
-                                                    contentEntries.forEach { contentEntry ->
+                                                    progressIndicator.text2 = "Excluding _build/lib/$depName/ebin from project so it is treated as an External Library"
+
+                                                    for (contentEntry in contentEntries) {
+                                                        if (progressIndicator.isCanceled) {
+                                                            break
+                                                        }
+
                                                         contentEntry.addExcludeFolder(depEnvironmentLibrary)
                                                     }
 
@@ -197,7 +253,10 @@ class DepsWatcher(
                                                 }
                                             }
 
-                                    libraryModifiableModel.addRoot(ebin, OrderRootType.CLASSES)
+                                    if (!progressIndicator.isCanceled) {
+                                        progressIndicator.text2 = "Adding _build/lib/$depName/ebin as a Classes root for $"
+                                        libraryModifiableModel.addRoot(ebin, OrderRootType.CLASSES)
+                                    }
                                 }
                             }
                         }
@@ -206,9 +265,18 @@ class DepsWatcher(
             }
         }
 
-        dep.children.filter { it.isDirectory }.forEach { child ->
-            if (child.name in SOURCE_NAMES) {
-                libraryModifiableModel.addRoot(child, OrderRootType.SOURCES)
+        for (child in dep.children) {
+            if (progressIndicator.isCanceled) {
+                break
+            }
+
+            if (child.isDirectory) {
+                val childName = child.name
+
+                if (childName in SOURCE_NAMES) {
+                    progressIndicator.text2 = "Adding $childName as Source root for $depName"
+                    libraryModifiableModel.addRoot(child, OrderRootType.SOURCES)
+                }
             }
         }
 

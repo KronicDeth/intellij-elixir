@@ -1,5 +1,32 @@
 <html>
 <body>
+<h1>v10.0.1</h1>
+<ul>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>Eliminate freezes when calculating Module and Library dependencies during project import and dependency updates.
+        <ul>
+          <li>
+            Run library syncing in tasks: When importing projects, run sync as a modal task while when
+            <code>VirtualFileSystem</code> events occur, run sync as background tasks.  Either style of task is
+            cancellable and importantly, it allows to show what is happening during the syncing.  This converts the
+            unresponsive UI beachball on macOS during import to an updating progress bar.
+          </li>
+          <li>
+            Calculate dep sets iteratively with a work queue instead of recursively to limit the calculation of dep set
+            for a root to 1 time.  Then use normal transitive walk to get complete dep set for module.  Vastly speeds up
+            project import.
+          </li>
+          <li>
+            Cache dep set on package <code>PsiFile</code> to allow faster refreshes when indirect dependencies don't
+            change.
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
 <h1>v10.0.0</h1>
 <ul>
   <li>
