@@ -22,6 +22,9 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 import org.elixir_lang.PackageManager
 import org.elixir_lang.mix.library.Kind
+import org.elixir_lang.mix.watcher.Resolution
+import org.elixir_lang.mix.watcher.Resolution.Companion.resolution
+import org.elixir_lang.mix.watcher.TransitiveResolution.transitiveResolution
 import org.elixir_lang.package_manager.virtualFile
 
 /**
@@ -43,19 +46,20 @@ class Watcher(
     fun syncLibraries(progressIndicator: ProgressIndicator) {
         moduleRootManager
                 .contentRoots
-                .let { recursiveRootsToDepSet(it, emptySet(), progressIndicator) }
+                .let { transitiveResolution(project, psiManager, progressIndicator, *it) }
                 .let { syncLibraries(it, progressIndicator) }
     }
 
     override fun contentsChanged(event: VirtualFileEvent) {
-        if (event.fileName == org.elixir_lang.mix.PackageManager.fileName && event.file.parent == module.moduleFile?.parent) {
-            ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Syncing Libraries for $module.name Module", true) {
+        if (event.fileName == org.elixir_lang.mix.PackageManager.fileName &&
+                event.file.parent == module.moduleFile?.parent) {
+            ProgressManager.getInstance().run(object : Task.Backgroundable(
+                    project,
+                    "Syncing Libraries for ${module.name} Module",
+                    true
+            ) {
                 override fun run(indicator: ProgressIndicator) {
-                    event
-                    .file
-                    .let { org.elixir_lang.package_manager.VirtualFile(org.elixir_lang.mix.PackageManager, it) }
-                    .let { recursivePackageManagerVirtualFileToDepSet(it, emptySet(), indicator) }
-                    .let { syncLibraries(it, indicator) }
+                    syncLibraries(indicator)
                 }
             })
 
@@ -63,68 +67,6 @@ class Watcher(
     }
 
     override fun dispose() = disposeComponent()
-
-    private fun recursiveRootsToDepSet(roots: Array<VirtualFile>, acc: Set<Dep>, progressIndicator: ProgressIndicator): Set<Dep> {
-        val packageManagerVirtualFiles = roots.mapNotNull(::virtualFile)
-
-        return recursivePackageManagerVirtualFilesToDepSet(packageManagerVirtualFiles, acc, progressIndicator)
-    }
-
-    private fun recursivePackageManagerVirtualFilesToDepSet(
-            packageManagerVirtualFiles: List<org.elixir_lang.package_manager.VirtualFile>,
-            initial: Set<Dep>,
-            progressIndicator: ProgressIndicator
-    ): Set<Dep> =
-            packageManagerVirtualFiles.fold(initial) { acc, packageManagerVirtualFile ->
-                acc.union(recursivePackageManagerVirtualFileToDepSet(packageManagerVirtualFile, acc, progressIndicator))
-            }
-
-    private fun recursivePackageManagerVirtualFileToDepSet(
-            packageManagerVirtualFile: org.elixir_lang.package_manager.VirtualFile,
-            initial: Set<Dep>,
-            progressIndicator: ProgressIndicator
-    ): Set<Dep> {
-        val psiFile = runReadAction {
-            psiManager.findFile(packageManagerVirtualFile.virtualFile)
-        }
-
-        return psiFile?.let { recursivePackageManagerPsiFileToDepSet(packageManagerVirtualFile.packageManager, it, initial, progressIndicator) } ?: initial
-    }
-
-    private fun recursivePackageManagerPsiFileToDepSet(
-            packageManager: PackageManager,
-            psiFile: PsiFile,
-            initial: Set<Dep>,
-            progressIndicator: ProgressIndicator
-    ): Set<Dep> =
-        packageManager
-                .let {
-                    packageManagerPsiFileToDepSet(it, psiFile, progressIndicator)
-                }
-                .asSequence()
-                .filterNot { it in initial }
-                .filter { it.type == Dep.Type.LIBRARY }
-                .mapNotNull { dep ->
-                    project.baseDir.findFileByRelativePath(dep.path)?.let { root ->
-                        recursiveRootsToDepSet(arrayOf(root), initial.union(setOf(dep)), progressIndicator)
-                    }
-                }
-                .fold(initial) { acc, depDepSet ->
-                    acc.union(depDepSet)
-                }
-
-    private fun packageManagerPsiFileToDepSet(packageManager: PackageManager, psiFile: PsiFile, progressIndicator: ProgressIndicator): Set<Dep> {
-        progressIndicator.text2 = "Gathering dependency set from ${psiFile.virtualFile.path}"
-
-        return if (!progressIndicator.isCanceled) {
-            packageManager
-                    .depGatherer()
-                    .apply { psiFile.accept(this) }
-                    .depSet
-        } else {
-            emptySet()
-        }
-    }
 
     private fun syncLibraries(deps: Collection<Dep>, progressIndicator: ProgressIndicator) {
         if (deps.isNotEmpty()) {
