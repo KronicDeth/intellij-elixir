@@ -174,7 +174,7 @@ public class Deserialized {
                     .append(SUSPECT_NAME_SET_SIZE)
                     .append(").");
 
-            if (readAheadLength > 0) {
+            if (readAheadLength == 0) {
                 stringBuilder = stringBuilder.append("StubIndex may be corrupt.");
                 LOGGER.warn(stringBuilder.toString());
             } else {
@@ -193,9 +193,31 @@ public class Deserialized {
         }
         Set<StringRef> nameSet = new THashSet<>(nameSetSize);
 
-        for (int i = 0; i < nameSetSize; i++) {
-            StringRef name = dataStream.readName();
-            nameSet.add(name);
+        if (nameSetSize >= SUSPECT_NAME_SET_SIZE) {
+            StringBuilder stringBuilder = new StringBuilder("readNameSet nameSet of suspect (>= ")
+                    .append(SUSPECT_NAME_SET_SIZE)
+                    .append(") size (").append(nameSetSize).append("):\n");
+
+            for (int i = 0; i < nameSetSize; i++) {
+                StringRef name = dataStream.readName();
+                nameSet.add(name);
+
+                String nameString;
+                if (name != null) {
+                    nameString = name.toString();
+                } else {
+                    nameString = "(null)";
+                }
+
+                stringBuilder.append(i + 1).append(". ").append(nameString).append('\n');
+            }
+
+            LOGGER.error(stringBuilder.toString());
+        } else {
+            for (int i = 0; i < nameSetSize; i++) {
+                StringRef name = dataStream.readName();
+                nameSet.add(name);
+            }
         }
 
         assertGuard(dataStream, END);

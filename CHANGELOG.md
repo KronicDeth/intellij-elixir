@@ -176,6 +176,9 @@ Table of Contents
     * Run library syncing in tasks: When importing projects, run sync as a modal task while when `VirtualFileSystem` events occur, run sync as background tasks.  Either style of task is cancellable and importantly, it allows to show what is happening during the syncing.  This converts the unresponsive UI beachball on macOS during import to an updating progress bar.
     * Calculate dep sets iteratively with a work queue instead of recursively to limit the calculation of dep set for a root to 1 time.  Then use normal transitive walk to get complete dep set for module.  Vastly speeds up project import.
     * Cache dep set on package `PsiFile` to allow faster refreshes when indirect dependencies don't change.
+* [#1323](https://github.com/KronicDeth/intellij-elixir/pull/1323) - [@KronicDeth](https://github.com/KronicDeth)
+  * Log `nameSet` when it reaches suspect size (`10`) to allow triaging if it is a real bug or just something with a lot of valid names.
+  * Fix inverted condition around when to warn and when to error and use `readAheadLength`.
 
 ## v10.0.0
 
