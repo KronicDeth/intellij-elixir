@@ -1776,14 +1776,14 @@ IntelliJ Elixir allows for graphical debugging of `*.ex` files using line breakp
 
 #### Steps
 
-1. Define a [run/debug configuration](#run-configurations)
+1. Define a [run/debug configuration](#rundebug-configurations)
 2. [Create breakpoints](#creating-line-breakpoints) in the `*.ex` files
 3. [Launch](#starting-the-debugger-session) a debugging session
 4. During the debugger session, [step through the breakpoints](#stepping), [examine suspended program](#examining-suspended-program), [explore frames](#frames), and [evaluate code when suspended](#evaluate).
 
 #### Basics
 
-After you have configured a [run configuration](#run-configuration) for your project, you can launch it in debug mode by pressing `Ctrl+D`.
+After you have configured a [run configuration](#rundebug-configurations) for your project, you can launch it in debug mode by pressing `Ctrl+D`.
 
 ##### Keyboard Shortcuts
 
