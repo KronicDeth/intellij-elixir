@@ -5457,8 +5457,10 @@ I'd like to thank those who have donated to help support this project.
 * Tynes Consulting
 * Christian Nelson ([@christiannelson](https://github.com/christiannelson))
 * Robin Hillard ([@robinhillard](https://github.com/robinhillard)) of [rocketboots.com](http://www.rocketboots.com)
+* Daniel Temme ([@dmt](https://github.com/dmt))
 * Klemen Sever ([@achedeuzot](https://github.com/achedeuzot))
 * Bjorgvin Reynisson
+* Miroslav Hetteš ([@mirrec](https://github.com/mirrec))
 * Vanja Radovanović ([@elvanja](https://github.com/elvanja))
 * Garrett Hart ([@thirdshift](https://github.com/thirdshift))
 * Mateusz Jadczak
@@ -5468,6 +5470,7 @@ I'd like to thank those who have donated to help support this project.
 * Ryan Scheel ([@Havvy](https://github.com/Havvy))
 * Szymon Jeż ([@szymon-jez](https://github.com/szymon-jez))
 * Yicheng Dong
+* Zvonimir-Zoltan Maric ([@zoltanmaric](https://github.com/zoltanmaric))
 * Ilja Neumann ([@IljaN](https://github.com/IljaN))
 * Purelogic Apps
 * Adrian Philipp ([@adri](https://github.com/adri))
@@ -5477,7 +5480,11 @@ I'd like to thank those who have donated to help support this project.
 * Dmitry Stropaloff
 * Milan Köpke
 * Percy Grunwald ([@pgrunwald](https://github.com/pgrunwald))
+* Steve Wagner ([@ciroque](https://github.com/ciroque))
 * William De Melo Gueiros ([@williamgueiros](https://github.com/williamgueiros))
+* 童童 张
+* IS-Soft Michał Zalewski
+* Michael Howell ([@notriddle](https://github.com/notriddle))
 * Denis Andrejew ([@seeekr](https://github.com/seeekr))
 * Artem Gordinsky ([@ArtemGordinsky](https://github.com/ArtemGordinsky))
 * Maximilian Buschner
