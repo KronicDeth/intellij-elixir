@@ -168,6 +168,11 @@ Table of Contents
 
 # Changelog
 
+## v10.0.2
+
+### Bug Fixes
+* [#1327](https://github.com/KronicDeth/intellij-elixir/pull/1327) - Fix deadlinks to Run Configurations, which broke when section was renamed Run/Debug Configurations and auto-anchor changed name. - [@KronicDeth](https://github.com/KronicDeth)
+
 ## v10.0.1
 
 ### Bug Fixes
