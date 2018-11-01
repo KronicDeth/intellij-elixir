@@ -92,16 +92,16 @@ Table of Contents
             * [Project](#project-1)
          * [Live Templates](#live-templates)
          * [Run/Debug Configurations](#rundebug-configurations)
-            * [Distillery Release CLI <a href="resources/icons/distillery-16.png?tra=true" target="_blank" rel="noopener noreferrer"><img src="resources/icons/distillery-16.png?tra=true" alt="Elixir Mix Icon with tapered neck to make a retort as used in distilleries" title="Distillery Release CLI Icon" style="max-width:100\x;"></a>](#distillery-release-cli-)
+            * [Distillery Release CLI](#distillery-release-cli-)
                * [Running](#running)
                * [Debugging](#debugging)
-            * [Elixir <a href="resources/icons/elixir-16.png" target="_blank" rel="noopener noreferrer"><img src="resources/icons/elixir-16.png" alt="Elixir Drop" title="Elixir Icon" style="max-width:100\x;"></a>](#elixir-)
+            * [Elixir](#elixir-)
                * [Running](#running-1)
                * [Debugging](#debugging-1)
             * [IEx (Interactive Elixir)](#iex-interactive-elixir)
                * [Running](#running-2)
                * [Debugging](#debugging-2)
-            * [Mix Tasks <a href="resources/icons/mix-16.png?raw=true" target="_blank" rel="noopener noreferrer"><img src="resources/icons/mix-16.png?raw=true" alt="Elixir Drop mixed in a round-bottom flask" title="Mix Icon" style="max-width:100\x;"></a>](#mix-tasks-)
+            * [Mix Tasks](#mix-tasks-)
                * [Running](#running-3)
                * [Debugging](#debugging-3)
             * [IEx Mix](#iex-mix)
@@ -314,6 +314,7 @@ If you've already created a `mix` project, you can load it as an Elixir project 
 2. Select the root directory of your project.
 3. Select "Import project from external model"
 4. Select Mix
+
    ![File > New Project > From Existing Sources > Import project from external model > Mix](/screenshots/features/project/from_existing_sources/import_project_from_external_model/Mix.png?raw=true "Import Mix Project")
 5. Click Next
 6. Select a Project SDK directory by clicking Configure.
@@ -364,11 +365,14 @@ If you've already created a (non-`mix`) project, you can load it as an Elixir pr
 If you want to create a basic (non-`mix`) Elixir project with a `lib` directory, perform the following steps.
 
 1. File > New > Project
+
    ![File > New > Project](/screenshots/features/project/New.png?raw=true "New Project")
 2. Select Elixir from the project type menu on the left
 3. Click Next
+
    ![File > New > Project > Elixir](/screenshots/features/project/new/Elixir.png?raw=true "New Elixir Project")
 4. Select a Project SDK directory by clicking Configure.
+
    ![Project SDK](/screenshots/features/project/SDK.png?raw=true "Project SDK")
 4. Select a Project SDK directory by clicking Configure.
 5. The plugin will automatically find the newest version of Elixir installed.
@@ -441,9 +445,11 @@ automatically detected at this time.
 
 1. Right-click a directory (such as `lib` or `test` in the standard `mix new` layout)
 2. Select New > Elixir File.
+
    ![New > Elixir File](/screenshots/features/new/Elixir%20File.png?raw=true "New Elixir File")
 3. Enter an Alias for the Module name, such as `MyModule` or `MyNamespace.MyModule`.
 4. Select a Kind of Elixir File to use a different template.
+
    ![New > Elixir File > Kind](/screenshots/features/new/elixir_file/Kind.png?raw=true "New Elixir File Kind")
 
 #### Empty module
@@ -1980,6 +1986,7 @@ Debug quick menu
 It takes awhile, once the debugged process is started to configure the [debugger in BEAM](http://erlang.org/doc/man/int.html).  To ensure that breakpoints are setup before allow the debugged code to run, the debugger blocks until setup is complete.
 
 1. The debugged process will wait for the debugger to attach
+
    ![Waiting for debugger to attach.png](screenshots/debugger/starting/Waiting%20for%20debugger%20to%20attach.png?raw=true)
 2. Breakpoints will be set
 3. The debugger will mark modules to be [interpreted](http://erlang.org/doc/man/int.html#ni-1)
@@ -2147,7 +2154,7 @@ All delimiters that are auto-inserted are also matched for highlighting
 | `/`   | `/`   |
 | `|`   | `|`   |
 
-### Embedded Elixir (EEx) Templates
+### Embedded Elixir (EEx) Templates ![](/resources/icons/file/eex.svg)
 
 Any file with `.eex` as the final extension will be treated as Embedded Elixir ([EEx](https://hexdocs.pm/eex)) templates.  To determine the Template Data Language, the `.eex` extension will be stripped and any remaining extension will be looked up to get the File Type and its associated Language. For example, `*.txt.eex` will be EEx with Plain Text (`.txt`) as the Data Template Language. Likewise, `*.html.eex` will be EEx with HTML as the Data Template Language. There's no need to register `*.txt.eex` or `*.html.eex` or any other `*.DATA_TEMPLATE_LANGUAGE_EXTENSION.eex` pattern explicitly: the nested extension will be looked up using the normal extension setup.
 
@@ -2558,7 +2565,7 @@ rescue
 
 ### Run/Debug Configurations
 
-#### Distillery Release CLI ![Elixir Mix Icon with tapered neck to make a retort as used in distilleries](resources/icons/distillery-16.png?tra=true "Distillery Release CLI Icon")
+#### Distillery Release CLI ![Elixir Mix Icon with tapered neck to make a retort as used in distilleries](resources/icons/run/distillery/release-cli.svg "Distillery Release CLI Icon")
 
 [Distillery](https://github.com/bitwalker/distillery)'s `mix release` produces a [CLI](https://en.wikipedia.org/wiki/Command-line_interface) for running the release.
 
@@ -2571,16 +2578,18 @@ rescue
          Daemon: _build/ENV/rel/NAME/bin/NAME start
    ```
 2. Run > Edit Configurations...
+
    ![Edit Run Configurations](/screenshots/features/run_debug_configurations/Edit%20Configurations.png?raw=true "Edit Run Configurations")
 3. Click +
 4. Select "Distillery Release CLI"
+
    ![Add New Distillery Release CLI](screenshots/features/run_debug_configurations/distillery_release_cli/Add%20New.png)
 5. Fill in the "Release CLI Path" with the full path to the `_build/ENV/rel/NAME/bin/NAME` path produed by `mix release` above.
 6. Fill in the "Release CLI arguments".
    * `console` runs a shell with the release loaded similar to `iex -S mix`.
    * `foreground` to runs the release without a shell, like `mix` or `mix run`.
    The available commands are controlled by your release config `rel/config.exs` that Distillery uses.
-7. (Optionally) fill in "`erl` arguments" with arguments to `erl` before it runs `elixir`.  
+7. (Optionally) fill in "`erl` arguments" with arguments to `erl` before it runs `elixir`.
    This is the same as the `ERL_OPTS` environment variable supported by Distillery.
 8. (Optionally) fill in "`elixir -extra` arguments" with arguments to pass to `elixir` before it run the release.
    This is the same as the `EXTRA_OPTS` environment variable supported by Distillery.
@@ -2645,14 +2654,16 @@ rescue
 3. For how to use the debugger, including how to set breakpoints see the [Debugger](#debugger) section.
 4. Click the Debug bug in the Toolbar to debug the `mix test`s
 
-#### Elixir ![Elixir Drop](resources/icons/elixir-16.png "Elixir Icon")
+#### Elixir ![Elixir Drop](/resources/icons/run/elixir.svg "Elixir Icon")
 
 Although it is exceedingly rare, as most Elixir projects use `mix`, it is supported to run/debug `elixir` directly, such as when doing `elixir script.exs`.
 
-1. Run > Edit Configuations...  
+1. Run > Edit Configuations...
+
    ![Edit Run Configurations](/screenshots/features/run_debug_configurations/Edit%20Configurations.png?raw=true "Edit Run Configurations")
 2. Click +
 3. Select "Elixir"
+
    ![Add New Elixir](screenshots/features/run_debug_configurations/elixir/Add%20New.png?raw=true "Add New Elixir Run Configuration")
 4. Fill in the "`elixir` arguments".
 5. (Optionally) fill in "`erl` arguments" with arguments to `erl` before it runs `elixir`.
@@ -2667,6 +2678,7 @@ With the Run Configuration defined, you can either Run or Debug `elixir`
 ##### Running
 
 1. Click the Run arrow in the Toolbar to run `elixir`.
+
    ![Run](screenshots/features/run_debug_configurations/elixir/running/Toolbar%20Button.png?raw=true "Run Elixir Run Configuration")
 2. The Run pane will open, showing the results of `elixir`.
 
@@ -2682,14 +2694,16 @@ With the Run Configuration defined, you can either Run or Debug `elixir`
 2. For how to use the debugger, including how to set breakpoints see the [Debugger](#debugger) section.
 3. Click the Debug bug in the Toolbar to debug `elixir`
 
-#### IEx (Interactive Elixir)
+#### IEx (Interactive Elixir) ![](/resources/icons/run/iex.svg)
 
 `iex` run configurations allow you to run `iex` with IntelliJ Elixir attached.  It is most useful when debugging, but it also allows you save customizations in the configuration when it is more complicated than just `iex`.
 
 1. Run > Edit Configurations...
+
    ![Edit Run Configurations](/screenshots/features/run_debug_configurations/Edit%20Configurations.png?raw=true "Edit Run Configurations")
 2. Click +
 3. Select "IEx"
+
    ![Elixir Drop inside round-bottom flask](screenshots/features/run_debug_configurations/iex/Add%20New.png "Add New IEx Configuration")
 4. (Optionally) fill in "`iex` arguments" with arguments to `iex`.
 5. (Optionally) full in "`erl` arguments" with arguments to `erl` before it runs `iex`.
@@ -2704,6 +2718,7 @@ With the Run Configuration defined, you can either Run or Debug the `iex` config
 ##### Running
 
 1. Click the Run arrow in the Toolbar to run `iex`
+
    ![Run](/screenshots/features/run_debug_configurations/iex/running/Toolbar%20Button.png?raw=true "Run Elixir Mix Run Configuration")
 
 ##### Debugging
@@ -2718,14 +2733,16 @@ With the Run Configuration defined, you can either Run or Debug the `iex` config
 2. For how to use the debugger, including how to set breakpoints see the [Debugger](#debugger) section.
 3. Click the Debug bug in the Toolbar to debug `iex`.
 
-#### Mix Tasks ![Elixir Drop mixed in a round-bottom flask](resources/icons/mix-16.png?raw=true "Mix Icon")
+#### Mix Tasks ![Elixir Drop mixed in a round-bottom flask](/resources/icons/run/mix.svg "Mix Icon")
 
 Much like `rake` tasks in Rubymine, this plugin can run `mix` tasks.
 
 1. Run > Edit Configurations...
+
    ![Edit Run Configurations](/screenshots/features/run_debug_configurations/Edit%20Configurations.png?raw=true "Edit Run Configurations")
 2. Click +
 3. Select "Elixir Mix"
+
    ![Add New Elixir Mix](/screenshots/features/run_debug_configurations/mix_tasks/Add%20New.png?raw=true "Add New Elixir Mix Run Configuration")
 4. Fill in the "`mix` arguments" starting with the name of the `mix` task followed by any arguments to that task.
 5. (Optionally) fill in "`elixir` arguments" with arguments to `elixir` before it runs `mix`.
@@ -2741,9 +2758,11 @@ With the Run Configuration defined, you can either Run or Debug the Mix Task
 ##### Running
 
 1. Click the Run arrow in the Toolbar to run the `mix` task
+
    ![Run](/screenshots/features/run_debug_configurations/mix_tasks/running/Toolbar%20Button.png?raw=true "Run Elixir Mix Run Configuration")
 2. The Run pane will open, showing the results of the `mix` task.
     * If there is an error with a FILE:LINE stack stack_frame, it will be a clickable link that will take you to that location
+
       ![Error link](/screenshots/features/run_debug_configurations/mix_tasks/running/Error%20Link.png?raw=true "Clickable Error Link")
 
 ##### Debugging
@@ -2758,14 +2777,16 @@ With the Run Configuration defined, you can either Run or Debug the Mix Task
 2. For how to use the debugger, including how to set breakpoints see the [Debugger](#debugger) section.
 3. Click the Debug bug in the Toolbar to debug the `mix` task
 
-#### IEx Mix
+#### IEx Mix ![IEx Mix](/resources/icons/run/iex/mix.svg "IEx Mix")
 
 If you want to run `iex` in the context of the project, you need to run `iex -S mix`, but if you don't want to have to worry about forgetting whether it's `-s` or `-S` or if it is `mix -S iex` or `iex -S mix`, you can use an IEx Mix configuration.
 
 1. Run > Edit Configurations...
+
    ![Edit Run Configurations](/screenshots/features/run_debug_configurations/Edit%20Configurations.png?raw=true "Edit Run Configurations")
 2. Click +
 3. Select "IEx Mix"
+
    ![The Mix Icon with "&gt;" to indicate the IEX prompt](screenshots/features/run_debug_configurations/iex/mix/Add%20New.png?raw=true)
 4. (Optionally) fill in "`mix` arguments", such as `phx.server` if you want to launch [Phoenix](https://github.com/phoenixframework/phoenix) inside of `iex`.
 5. (Optionally) fill in "`iex` arguments" with arguments to `iex` before `-S mix`.
@@ -2795,7 +2816,7 @@ Wih the Run Configuration defined, you can either Run or Debug `iex -S mix`
 2. For how to use the debugger, including how to set breakpoints see the [Debugger](#debugger) section.
 3. Click the Debug bug in the Toolbar to debug `iex -S mix`.
 
-#### `mix test`
+#### `mix test` ![](/resources/icons/run/mix/test.svg)
 
 The `mix test` task gets a special type of Run Configuration, `Elixir Mix ExUnit`.  Using this Run Configuration type instead, of the basic `Elixir Mix` Run Configuration will cause the IDE to attach a special formatter to `mix test`, so that you get the standard graphical tree of Test Results
 
@@ -2806,16 +2827,18 @@ The Run pane will show Test Results.  If there is a compilation error before or 
 ##### Creating `mix test` Run Configurations Manually
 
 1. Run > Edit Configurations...
+
    ![Edit Run Configurations](/screenshots/features/run_debug_configurations/Edit%20Configurations.png?raw=true "Edit Run Configurations")
 2. Click +
 3. Select "Elixir Mix ExUnit"
+
    ![Add New Elixir Mix ExUnit](/screenshots/features/run_debug_configurations/mix_test/Add%20New.png?raw=true "Add New Elixir Mix ExUnit Run Configuration")
 4. Fill in the "`mix test` arguments" with the argument(s) to pass to `mix test`.  Normally, this will be a directory like `test`, relative to the "Working directory"
 5. (Optionally) fill in "`elixir` arguments" with the arguments to `elixir` before it runs `mix test`.
 6. (Optionally) fill in "`erl` arguments"` with the arguments to `erl` before it runs `elixir`.
 7. Fill in the "Working directory"
-  * Type the absolute path to the directory.
-  * Select the path using directory picker by clicking the `...` button
+   * Type the absolute path to the directory.
+   * Select the path using directory picker by clicking the `...` button
 8. (Optionally) click the `...` button on the "Environment variables" line to add environment variables.
 9. Click "OK" to save the Run Configuration and close the dialog
 
@@ -2849,17 +2872,21 @@ The context menu must know that the the directory, file, or line you are right-c
   1. Check if the `test` directory is green.  If it is, it is likely a Test Sources Root.  This color may differ in different themes, so to be sure you can check the context menu
   2. Right-click the `test` directory.
   3. Hover over "Mark Directory As &gt;"
-    * If "Unmark as Test Sources Root" is shown, then the directory is already configured correctly, and create from context will work.
-      ![Mark Directory As &gt; Unmark as Test Sources Root](/screenshots/features/run_debug_configurations/mix_test/mark_directory_as/Unmark%20as%20Test%20Sources%20Root.png?raw=true "Unmark Directory as Test Sources Root")
-    * If "Test Sources Root" is shown, then the directory need to be configured by clicking that entry
-      ![Mark Directory As &gt; Test Sources Root](/screenshots/features/run_debug_configurations/mix_test/mark_directory_as/Test%20Sources%20Root.png?raw=true "Mark Directory as Test Sources Root")
+     * If "Unmark as Test Sources Root" is shown, then the directory is already configured correctly, and create from context will work.
+
+       ![Mark Directory As &gt; Unmark as Test Sources Root](/screenshots/features/run_debug_configurations/mix_test/mark_directory_as/Unmark%20as%20Test%20Sources%20Root.png?raw=true "Unmark Directory as Test Sources Root")
+     * If "Test Sources Root" is shown, then the directory need to be configured by clicking that entry
+
+       ![Mark Directory As &gt; Test Sources Root](/screenshots/features/run_debug_configurations/mix_test/mark_directory_as/Test%20Sources%20Root.png?raw=true "Mark Directory as Test Sources Root")
 
 ###### Creating/Running `mix test` Run Configurations from directory
 
 1. Right-click the directory in the Project pane
 2. Click "Run Mix ExUnit", which will both create the Run Configuration and Run it.
-  ![Run Mix ExUnit](/screenshots/features/run_debug_configurations/mix_test/context/directory/Run%20Mix%20ExUnit.png?raw=true "Run Mix ExUnit from right-clicking directory")
-  * If you want to only create the Run Configuration, select "Create Mix ExUnit" instead
+
+   ![Run Mix ExUnit](/screenshots/features/run_debug_configurations/mix_test/context/directory/Run%20Mix%20ExUnit.png?raw=true "Run Mix ExUnit from right-clicking directory")
+
+   * If you want to only create the Run Configuration, select "Create Mix ExUnit" instead
 
 Alternatively, you can use keyboard shortcuts
 
@@ -2870,7 +2897,7 @@ Alternatively, you can use keyboard shortcuts
 
 1. Right-click the file in the Project pane
 2. Click "Run Mix ExUnit", which will both create the Run Configuration and Run it.
-  * If you want to only create the Run Configuration, select "Create Mix ExUnit" instead
+   * If you want to only create the Run Configuration, select "Create Mix ExUnit" instead
 
 Alternatively, you can use keyboard shortcuts
 
@@ -2880,18 +2907,20 @@ Alternatively, you can use keyboard shortcuts
 Finally, you can use the editor tabs
 
 1. Right-click the editor tab for the test file you want to run
-  ![Run Mix ExUnit](/screenshots/features/run_debug_configurations/mix_test/context/file/Run%20Mix%20ExUnit.png?raw=true "Run Mix ExUnit from right-clicking file editor tab")
+
+   ![Run Mix ExUnit](/screenshots/features/run_debug_configurations/mix_test/context/file/Run%20Mix%20ExUnit.png?raw=true "Run Mix ExUnit from right-clicking file editor tab")
 2. Click "Run Mix ExUnit", which will both create the Run Configuration and Run it.
-  * If you want to only create the Run Configuration, select "Create Mix ExUnit" instead
+   * If you want to only create the Run Configuration, select "Create Mix ExUnit" instead
 
 ###### Creating/Running `mix test` Run Configurations from line
 
 If you want to be able to run a single test, you can create a Run Configuration for a line in that test
 
 1. Right-click a line in the test file
-  ![Run Mix ExUnit](/screenshots/features/run_debug_configurations/mix_test/context/line/Run%20Mix%20ExUnit.png?raw=true "Run Mix ExUnit from right-clicking line in editor")
+
+   ![Run Mix ExUnit](/screenshots/features/run_debug_configurations/mix_test/context/line/Run%20Mix%20ExUnit.png?raw=true "Run Mix ExUnit from right-clicking line in editor")
 2. Click "Run Mix ExUnit", which will both create the Run Configuration and Run it.
-  * If you want to only create the Run Configuration, select "Create Mix ExUnit" instead
+   * If you want to only create the Run Configuration, select "Create Mix ExUnit" instead
 
 Alternatively, you can use keyboard shortcuts
 
@@ -4055,8 +4084,10 @@ In IntelliJ Elixir, Go To Related can be used to go to the decompiled version of
    * Navigate > Related Symbol
    * `Ctrl+Cmd+Up`
 3. Select a "Decompiled BEAM" target from the "Choose Target" context menu
+
    ![Choose Target.png](screenshots/features/go_to_related/module/Choose%20Target.png?raw=true)
 4. You will be taken to the decompiled module
+
    ![Decompiled.png](screenshots/features/go_to_related/module/Decompiled.png?raw=true)
 
 #### Decompiled Call Definition
@@ -4066,8 +4097,10 @@ In IntelliJ Elixir, Go To Related can be used to go to the decompiled version of
    * Navigate > Related Symbol
    * `Ctrl+Cmd+Up`
 3. Select a "Decompiled BEAM" target from the "Choose Target" context menu
+
    ![Choose Target.png](screenshots/features/go_to_related/call/Choose%20Target.png?raw=true)
 4. You will be taken to the decompiled module
+
    ![Decompiled.png](screenshots/features/go_to_related/call/Decompiled.png?raw=true)
 
 
@@ -4137,11 +4170,11 @@ If instead of bringing up the Find Tool Window, you'd like a lookup dialog above
 
 1. Place cursor over an `defmodule` Alias.
 2. Activate the Find Usage action with one of the following:
-  a.
-    i. Right-click the Alias
-    ii. Select "Find Usages" from the context menu
-  b. Select Edit &gt; Find &gt; Find Usages from the menu
-  c. `Alt+F7`
+   * From Context
+     1. Right-click the Alias
+     2. Select "Find Usages" from the context menu
+   * Select Edit &gt; Find &gt; Find Usages from the menu
+   * `Alt+F7`
 
 [![Find Module Usage Demonstration](http://img.youtube.com/vi/n_EEucKK0N0/0.jpg)](https://www.youtube.com/watch?v=n_EEucKK0N0)
 
@@ -4870,7 +4903,7 @@ The Visibility icons indicated whether the element is usable outside its definin
         <code>defexception</code>
       </td>
       <td>
-        <img alt="Struct" src="https://raw.githubusercontent.com/JetBrains/intellij-community/master/platform/icons/src/toolwindows/toolWindowStructure.png?raw=true" />
+        <img alt="Struct" src="https://raw.githubusercontent.com/JetBrains/intellij-community/ac16fe595e79a893df2bce5ac8e2d5904a483ede/platform/icons/src/toolwindows/toolWindowStructure.svg?sanitize=true" />
       </td>
       <td>
       </td>
@@ -4896,7 +4929,7 @@ The Visibility icons indicated whether the element is usable outside its definin
         <code><i>defexception</i> list_or_keywords</code>
       </td>
       <td>
-        <img alt="Field" src="https://raw.githubusercontent.com/JetBrains/intellij-community/master/platform/icons/src/nodes/field.png?raw=true" />
+        <img alt="Field" src="https://raw.githubusercontent.com/JetBrains/intellij-community/ac16fe595e79a893df2bce5ac8e2d5904a483ede/platform/icons/src/nodes/field.svg?sanitize=true" />
       </td>
       <td>
       </td>
@@ -4923,7 +4956,7 @@ The Visibility icons indicated whether the element is usable outside its definin
         <code>defimpl PROTOCOL, for: MODULE</code>
       </td>
       <td>
-        <img alt="Protocol" src="https://raw.githubusercontent.com/JetBrains/intellij-community/master/platform/icons/src/nodes/anonymousClass.png?raw=true" />
+        <img alt="Protocol" src="https://raw.githubusercontent.com/JetBrains/intellij-community/ac16fe595e79a893df2bce5ac8e2d5904a483ede/platform/icons/src/nodes/anonymousClass.svg?sanitize=true" />
       </td>
       <td>
       </td>
@@ -4936,7 +4969,7 @@ The Visibility icons indicated whether the element is usable outside its definin
       <td>
       </td>
       <td>
-        <img alt="Override" src="https://raw.githubusercontent.com/JetBrains/intellij-community/master/platform/icons/src/general/overridingMethod.png?raw=true" />
+        <img alt="Override" src="https://raw.githubusercontent.com/JetBrains/intellij-community/ac16fe595e79a893df2bce5ac8e2d5904a483ede/platform/icons/src/gutter/overridingMethod.svg?sanitize=true" />
       </td>
       <td>
         <code>MODULE</code> (<code>PROTOCOL</code>)
@@ -5261,7 +5294,7 @@ The Visibility icons indicated whether the element is usable outside its definin
         <code>defprotocol PROTOCOL</code>
       </td>
       <td>
-        <img alt="Protocol" src="https://raw.githubusercontent.com/JetBrains/intellij-community/master/platform/icons/src/nodes/anonymousClass.png?raw=true" />
+        <img alt="Protocol" src="https://raw.githubusercontent.com/JetBrains/intellij-community/ac16fe595e79a893df2bce5ac8e2d5904a483ede/platform/icons/src/nodes/anonymousClass.svg?sanitize=true" />
       </td>
       <td>
       </td>
@@ -5272,7 +5305,7 @@ The Visibility icons indicated whether the element is usable outside its definin
       <td>
       </td>
       <td>
-        <img alt="Overridable" src="https://raw.githubusercontent.com/JetBrains/intellij-community/master/platform/icons/src/general/overridenMethod.png?raw=true" />
+        <img alt="Overridable" src="https://raw.githubusercontent.com/JetBrains/intellij-community/ac16fe595e79a893df2bce5ac8e2d5904a483ede/platform/icons/src/gutter/overridenMethod.svg?sanitize=true" />
       </td>
       <td>
       </td>
@@ -5288,7 +5321,7 @@ The Visibility icons indicated whether the element is usable outside its definin
         <code>defstruct</code>
       </td>
       <td>
-        <img alt="Struct" src="https://raw.githubusercontent.com/JetBrains/intellij-community/master/platform/icons/src/toolwindows/toolWindowStructure.png?raw=true" />
+        <img alt="Struct" src="https://raw.githubusercontent.com/JetBrains/intellij-community/ac16fe595e79a893df2bce5ac8e2d5904a483ede/platform/icons/src/toolwindows/toolWindowStructure.svg?sanitize=true" />
       </td>
       <td>
       </td>
@@ -5314,7 +5347,7 @@ The Visibility icons indicated whether the element is usable outside its definin
         <code><i>defstruct</i> NAME<i>:</i> DEFAULT_VALUE<i>, ...</i></code>
       </td>
       <td>
-        <img alt="Field" src="https://raw.githubusercontent.com/JetBrains/intellij-community/master/platform/icons/src/nodes/field.png?raw=true" />
+        <img alt="Field" src="https://raw.githubusercontent.com/JetBrains/intellij-community/ac16fe595e79a893df2bce5ac8e2d5904a483ede/platform/icons/src/nodes/field.svg?sanitize=true" />
       </td>
       <td>
       </td>
