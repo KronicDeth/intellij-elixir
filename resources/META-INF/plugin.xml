@@ -242,6 +242,12 @@
       <!--suppress PluginXmlValidity -->
       <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewXml" />
     </group>
+    <group id="LangElixir.HelpActions">
+      <separator/>
+      <action id="Elixir.Help" class="org.elixir_lang.action.HelpAction" text="IntelliJ Elixir Help"/>
+      <separator/>
+      <add-to-group group-id="HelpMenu" anchor="before" relative-to-action="ProductivityGuide"/>
+    </group>
   </actions>
 
 </idea-plugin>
