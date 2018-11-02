@@ -181,10 +181,10 @@ Table of Contents
 
     The link will work on released versions that have a tag.
 
-
 ### Bug Fixes
 * [#1327](https://github.com/KronicDeth/intellij-elixir/pull/1327) - Fix deadlinks to Run Configurations, which broke when section was renamed Run/Debug Configurations and auto-anchor changed name. - [@KronicDeth](https://github.com/KronicDeth)
 * [#1328](https://github.com/KronicDeth/intellij-elixir/pull/1328) - Fix image links in `README`. - [@KronicDeth](https://github.com/KronicDeth)
+* [#1331](https://github.com/KronicDeth/intellij-elixir/pull/1331) - Ensure `defmodule` one-liner isn't mistaken for call definition head in Go To Symbol. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v10.0.1
 
