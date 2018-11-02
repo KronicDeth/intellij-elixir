@@ -80,12 +80,13 @@ open class ChooseByNameContributor(private val stubIndexKey: StubIndexKey<String
                                        call: Call) {
         when {
             org.elixir_lang.psi.CallDefinitionClause.`is`(call) -> getItemsFromCallDefinitionClause(items, enclosingModularByCall, callDefinitionByTuple, call)
-            CallDefinitionHead.`is`(call) -> getItemsFromCallDefinitionHead(items, enclosingModularByCall, callDefinitionByTuple, call)
             CallDefinitionSpecification.`is`(call) -> getItemsFromCallDefinitionSpecification(items, enclosingModularByCall, call)
             Callback.`is`(call) -> getItemsFromCallback(items, enclosingModularByCall, call)
             Implementation.`is`(call) -> getItemsFromImplementation(name, items, enclosingModularByCall, call)
             Module.`is`(call) -> getItemsFromModule(items, enclosingModularByCall, call)
             Protocol.`is`(call) -> getItemsFromProtocol(items, enclosingModularByCall, call)
+            // MUST be after modular definition one-liners don't count as call definition heads
+            CallDefinitionHead.`is`(call) -> getItemsFromCallDefinitionHead(items, enclosingModularByCall, callDefinitionByTuple, call)
         }
     }
 
