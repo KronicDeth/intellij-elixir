@@ -22,16 +22,10 @@ import java.util.regex.Pattern
 
 import com.intellij.openapi.util.Pair.pair
 
-/**
- * Created by zyuyou on 15/7/7.
- */
-/*
-     * Constructors
-     */
-
 class CreateElixirModuleAction : CreateFromTemplateAction<ElixirFile>(NEW_ELIXIR_MODULE, DESCRIPTION, Icons.FILE) {
     override fun equals(other: Any?): Boolean = other is CreateElixirModuleAction
     override fun hashCode(): Int = 0
+    override fun isDumbAware(): Boolean = true
 
     override fun buildDialog(project: Project,
                              directory: PsiDirectory,
@@ -39,10 +33,10 @@ class CreateElixirModuleAction : CreateFromTemplateAction<ElixirFile>(NEW_ELIXIR
         builder
                 .setTitle(NEW_ELIXIR_MODULE)
                 .addKind("Empty module", Icons.FILE, "Elixir Module")
-                .addKind("Elixir Application", Icons.File.APPLICATION, "Elixir Application")
-                .addKind("Elixir Supervisor", Icons.File.SUPERVISOR, "Elixir Supervisor")
-                .addKind("Elixir GenServer", Icons.File.GEN_SERVER, "Elixir GenServer")
-                .addKind("Elixir GenEvent", Icons.File.GEN_EVENT, "Elixir GenEvent")
+                .addKind("Application", Icons.File.APPLICATION, "Elixir Application")
+                .addKind("Supervisor", Icons.File.SUPERVISOR, "Elixir Supervisor")
+                .addKind("GenServer", Icons.File.GEN_SERVER, "Elixir GenServer")
+                .addKind("GenEvent", Icons.File.GEN_EVENT, "Elixir GenEvent")
                 .setValidator(object : InputValidatorEx {
             override fun canClose(inputString: String): Boolean =
                     !StringUtil.isEmptyOrSpaces(inputString) && getErrorText(inputString) == null
