@@ -32,7 +32,8 @@ private fun createDirectoryAndModuleFromTemplate(moduleName: String,
                                                  templateName: String): ElixirFile? {
     var currentDirectory = directory
 
-    val ancestorDirectoryNamesBaseNamePair = ancestorDirectoryNamesBaseNamePair(moduleName)
+    val extension = templateNameToExtension(templateName)
+    val ancestorDirectoryNamesBaseNamePair = ancestorDirectoryNamesBaseNamePair(moduleName, extension)
     val ancestorDirectoryNames = ancestorDirectoryNamesBaseNamePair.first
 
     for (ancestorDirectoryName in ancestorDirectoryNames) {
@@ -65,6 +66,13 @@ private fun createModuleFromTemplate(directory: PsiDirectory,
     val defaultProperties = fileTemplateManager.defaultProperties
     val properties = Properties(defaultProperties)
     properties.setProperty(FileTemplate.ATTRIBUTE_NAME, moduleName)
+
+    if (templateName == "ExUnit.Case") {
+        val sourceName= moduleName.removeSuffix("Test")
+        properties.setProperty("SOURCE_NAME", sourceName)
+
+        properties.setProperty("ALIAS", sourceName.split(".").last())
+    }
 
     return try {
         FileTemplateUtil.createFromTemplate(template, basename, properties, directory) as ElixirFile

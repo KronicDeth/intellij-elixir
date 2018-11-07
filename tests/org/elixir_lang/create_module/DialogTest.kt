@@ -29,7 +29,6 @@ class DialogTest : LightCodeInsightFixtureTestCase() {
 
     @Throws(IOException::class)
     private fun checkModuleFile(moduleName: String, path: String) {
-
         // @see https://devnet.jetbrains.com/message/5539349#5539349
         val directoryVirtualFile = myFixture.tempDirFixture.findOrCreateDir("")
         val directory = myFixture.psiManager.findDirectory(directoryVirtualFile)!!
@@ -47,4 +46,5 @@ class DialogTest : LightCodeInsightFixtureTestCase() {
 
     override fun getTestDataPath(): String = "testData/org/elixir_lang/action/create_elixir_module_action_test"
 }
+
 private const val TEMPLATE_NAME = "Elixir Module"

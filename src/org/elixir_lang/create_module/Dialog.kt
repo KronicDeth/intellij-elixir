@@ -18,7 +18,7 @@ const val DESCRIPTION = "Nested Aliases, like Foo.Bar.Baz, are created in subdir
 
 private const val EXTENSION = ".ex"
 
-fun ancestorDirectoryNamesBaseNamePair(moduleName: String): Pair<List<String>, String> {
+fun ancestorDirectoryNamesBaseNamePair(moduleName: String, extension: String): Pair<List<String>, String> {
     val directoryList: MutableList<String>
     val lastAlias: String
 
@@ -39,10 +39,16 @@ fun ancestorDirectoryNamesBaseNamePair(moduleName: String): Pair<List<String>, S
         lastAlias = moduleName
     }
 
-    val basename = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, lastAlias) + EXTENSION
+    val basename = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, lastAlias) + extension
 
     return directoryList to basename
 }
+
+fun templateNameToExtension(templateName: String): String =
+        when (templateName) {
+            "ExUnit.Case" -> ".exs"
+            else -> ".ex"
+        }
 
 class Dialog(private val project: Project, val directory: PsiDirectory) : CreateFileFromTemplateDialog(project), InputValidatorEx {
     init {
@@ -54,6 +60,7 @@ class Dialog(private val project: Project, val directory: PsiDirectory) : Create
             addItem("Supervisor", Icons.File.SUPERVISOR, "Elixir Supervisor")
             addItem("GenServer", Icons.File.GEN_SERVER, "Elixir GenServer")
             addItem("GenEvent", Icons.File.GEN_EVENT, "Elixir GenEvent")
+            addItem("ExUnit.Case", org.elixir_lang.exunit.configuration.Icons.TYPE, "ExUnit.Case")
         }
 
         setTemplateKindComponentsVisible(true)
@@ -77,7 +84,7 @@ class Dialog(private val project: Project, val directory: PsiDirectory) : Create
 
     @VisibleForTesting
     public override fun doOKAction() {
-        val created = org.elixir_lang.create_module.ElementCreator(project, directory, kindCombo.selectedName).tryCreate(getEnteredName())
+        val created = org.elixir_lang.create_module.ElementCreator(project, directory, templateName).tryCreate(getEnteredName())
 
         if (created.isNotEmpty()) {
             this.created = created.single() as ElixirFile
@@ -109,27 +116,37 @@ class Dialog(private val project: Project, val directory: PsiDirectory) : Create
         !inputString.isBlank() && getErrorText(inputString) == null
 
     override fun checkInput(inputString: String): Boolean =
-        checkFormat(inputString) && checkDoesNotExist(inputString)
+        checkFormat(inputString) && checkDoesNotExist(inputString, extension)
 
     override fun getErrorText(inputString: String): String? =
         if (!inputString.isEmpty()) {
             if (!checkFormat(inputString)) {
-                String.format(INVALID_MODULE_MESSAGE_FMT, inputString)
-            } else if (!checkDoesNotExist(inputString)) {
-                val fullPath = fullPath(ancestorDirectoryNamesBaseNamePair(inputString))
-                String.format(EXISTING_MODULE_MESSAGE_FMT, fullPath)
+                val invalidMessageFormat = invalidMessageFormat(templateName)
+                String.format(invalidMessageFormat, inputString)
             } else {
-                null
+                val extension = this.extension
+
+                if (!checkDoesNotExist(inputString, extension)) {
+                    val fullPath = fullPath(ancestorDirectoryNamesBaseNamePair(inputString, extension))
+                    String.format(EXISTING_MODULE_MESSAGE_FMT, fullPath)
+                } else {
+                    null
+                }
             }
         } else {
             "Module name cannot be empty"
         }
 
-    private fun checkFormat(inputString: String): Boolean = MODULE_NAME_REGEX.matches(inputString)
+    private fun checkFormat(inputString: String): Boolean =
+            when (templateName) {
+                "ExUnit.Case" -> EX_UNIT_CASE_NAME_REGEX
+                else -> MODULE_NAME_REGEX
+            }.matches(inputString)
 
-    private fun checkDoesNotExist(moduleName: String): Boolean {
+    private fun checkDoesNotExist(moduleName: String, extension: String): Boolean {
         val ancestorDirectoryNamesBaseNamePair = ancestorDirectoryNamesBaseNamePair(
-                moduleName
+                moduleName,
+                extension
         )
         val ancestorDirectoryNames = ancestorDirectoryNamesBaseNamePair.first
         var currentDirectory: PsiDirectory? = directory
@@ -155,16 +172,33 @@ class Dialog(private val project: Project, val directory: PsiDirectory) : Create
 
         return doesNotExists
     }
+
+    private val extension
+      get() = templateNameToExtension(templateName)
+
     private fun fullPath(ancestorDirectoryNamesBaseNamePair: Pair<List<String>, String>): String =
             directory.virtualFile.canonicalPath + "/" + path(ancestorDirectoryNamesBaseNamePair)
 
 }
+
+private fun invalidMessageFormat(templateName: String): String =
+        when (templateName) {
+            "ExUnit.Case" -> INVALID_EX_UNIT_CASE_MESSAGE_FMT
+            else -> INVALID_MODULE_MESSAGE_FMT
+        }
+
 private const val INVALID_MODULE_MESSAGE_FMT = "'%s' is not a valid Elixir module name. Elixir module " +
                 "names should be a dot-separated-sequence of alphanumeric (and underscore) Aliases, each starting with a " +
                 "capital letter. " + DESCRIPTION
+private const val INVALID_EX_UNIT_CASE_MESSAGE_FMT = "'%s' is not a valid ExUnit.Case module name. ExUnit.Case module " +
+                "names should be a dot-separated-sequence of alphanumeric (and underscore) Aliases, each starting with a " +
+                "capital letter and the final one ending in Test as <code>mix test</code> looks for files matching " +
+                "<code>test/**/*_test.exs</code>.  Nested Aliases, like Foo.Bar.BazTest, are created in subdirectory for the " +
+                "parent Aliases, foo/bar/baz_test.exs"
 private const val EXISTING_MODULE_MESSAGE_FMT = "'%s' already exists"
 private val ALIAS_REGEX = Regex("[A-Z][0-9a-zA-Z_]*")
 private val MODULE_NAME_REGEX = Regex("$ALIAS_REGEX(\\.$ALIAS_REGEX)*")
+private val EX_UNIT_CASE_NAME_REGEX = Regex("${MODULE_NAME_REGEX}Test")
 
 private fun path(ancestorDirectoryNamesBaseNamePair: Pair<List<String>, String>): String {
     val (ancestorDirectoryNames, baseName) = ancestorDirectoryNamesBaseNamePair
