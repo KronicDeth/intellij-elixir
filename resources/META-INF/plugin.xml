@@ -234,9 +234,8 @@
   <actions>
     <group id="LangElixir.NewActions">
       <separator/>
-      <action id="Elixir.NewFile" class="org.elixir_lang.action.CreateElixirModuleAction"
-              text="Elixir File" description="Create new Elixir Module">
-      </action>
+      <action id="Elixir.NewFile" class="org.elixir_lang.create_module.Action"
+              text="Elixir File" description="Create new Elixir Module"/>
       <separator/>
 
       <!--suppress PluginXmlValidity -->
