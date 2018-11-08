@@ -180,6 +180,15 @@ Table of Contents
     ![screen shot 2018-11-02 at 12 06 52 pm](https://user-images.githubusercontent.com/298259/47929684-cfa62400-de97-11e8-9542-2d4bc2b3c825.png)
 
     The link will work on released versions that have a tag.
+* [#1334](https://github.com/KronicDeth/intellij-elixir/pull/1334) - [@KronicDeth](https://github.com/KronicDeth)
+  * Allow creating `ExUnit.Case` modules from template.  Template contains
+     * `use ExUnit.Case`
+     * `alias` of the source module
+     * `@moduletag :capture_log`
+     * `doctest`
+     * `test` that checks that the source module exists.
+  * Convert `CreateElixirModuleAction` to Kotlin.
+  * Drop "Elixir" prefix from templates name in Elixir File dialog since you already know you're creating an Elixir File.
 
 ### Bug Fixes
 * [#1327](https://github.com/KronicDeth/intellij-elixir/pull/1327) - Fix deadlinks to Run Configurations, which broke when section was renamed Run/Debug Configurations and auto-anchor changed name. - [@KronicDeth](https://github.com/KronicDeth)
