@@ -15,6 +15,20 @@
         </p>
         <p>The link will work on released versions that have a tag.</p>
       </li>
+      <li>Allow creating <code>ExUnit.Case</code> modules from template.  Template contains
+        <ul>
+          <li><code>use ExUnit.Case</code></li>
+          <li><code>alias</code> of the source module</li>
+          <li><code>@moduletag :capture_log</code></li>
+          <li><code>doctest</code></li>
+          <li><code>test</code> that checks that the source module exists.</li>
+        </ul>
+      </li>
+      <li>Convert <code>CreateElixirModuleAction</code> to Kotlin.</li>
+      <li>
+        Drop "Elixir" prefix from templates name in Elixir File dialog since you already know you're creating an Elixir
+        File.
+      </li>
     </ul>
   </li>
   <li>

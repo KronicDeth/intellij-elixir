@@ -1,0 +1,13 @@
+defmodule ${NAME} do
+  use ExUnit.Case
+
+  alias ${SOURCE_NAME}
+
+  @moduletag :capture_log
+
+  doctest ${ALIAS}
+
+  test "module exists" do
+    assert is_list(${ALIAS}.module_info())
+  end
+end
