@@ -103,12 +103,14 @@ class Resolution(
                 packageManager: PackageManager,
                 packagePsiFile: PsiFile
         ): Set<Dep> =
-                getCachedValue(packagePsiFile, DEP_SET) {
-                    packageManager
-                            .depGatherer()
-                            .apply { packagePsiFile.accept(this) }
-                            .depSet.toSet()
-                            .let { CachedValueProvider.Result.create(it, packagePsiFile) }
+                runReadAction {
+                    getCachedValue(packagePsiFile, DEP_SET) {
+                        packageManager
+                                .depGatherer()
+                                .apply { packagePsiFile.accept(this) }
+                                .depSet.toSet()
+                                .let { CachedValueProvider.Result.create(it, packagePsiFile) }
+                    }
                 }
     }
 }
