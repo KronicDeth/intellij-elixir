@@ -44,7 +44,7 @@ object Project {
                 if (file.isDirectory) {
                     indicator.text2 = file.path
 
-                    if (isBuildOrConfigOrDepsOrTestsDirectory(root.path, file.path)) {
+                    if (isAssetsOrBuildOrConfigOrDepsOrTestsDirectory(root.path, file.path)) {
                         return false
                     }
                 }
@@ -135,8 +135,9 @@ object Project {
                 OtpApp(appRoot, it)
             }
 
-    private fun isBuildOrConfigOrDepsOrTestsDirectory(projectRootPath: String, path: String): Boolean {
-        return ("$projectRootPath/_build" == path
+    private fun isAssetsOrBuildOrConfigOrDepsOrTestsDirectory(projectRootPath: String, path: String): Boolean {
+        return (path.endsWith("/assets")
+                || "$projectRootPath/_build" == path
                 || "$projectRootPath/config" == path
                 || "$projectRootPath/deps" == path
                 || "$projectRootPath/tests" == path)
