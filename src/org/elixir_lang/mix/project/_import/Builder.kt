@@ -26,11 +26,10 @@ import com.intellij.openapi.vfs.VirtualFileVisitor
 import com.intellij.openapi.vfs.newvfs.impl.VirtualDirectoryImpl
 import com.intellij.packaging.artifacts.ModifiableArtifactModel
 import com.intellij.projectImport.ProjectImportBuilder
-import com.intellij.util.containers.ContainerUtil
-import org.elixir_lang.DepsWatcher
 import org.elixir_lang.configuration.ElixirCompilerSettings
 import org.elixir_lang.mix.Icons
-import org.elixir_lang.module.ElixirModuleType
+import org.elixir_lang.mix.Project.createModulesForOtpApps
+import org.elixir_lang.mix.project.OtpApp
 import org.elixir_lang.sdk.elixir.Type
 
 import javax.swing.*
@@ -43,28 +42,15 @@ import java.util.*
  * https://github.com/ignatov/intellij-erlang/blob/master/src/org/intellij/erlang/rebar/importWizard/RebarProjectImportBuilder.java
  */
 class Builder : ProjectImportBuilder<OtpApp>() {
-
     private var myProjectRoot: VirtualFile? = null
     private var myFoundOtpApps = emptyList<OtpApp>()
     private var mySelectedOtpApps = emptyList<OtpApp>()
     private var myIsImportingProject: Boolean = false
 
-
-    override fun getName(): String {
-        return "Mix"
-    }
-
-    override fun getIcon(): Icon {
-        return Icons.PROJECT
-    }
-
-    override fun isSuitableSdkType(sdkType: SdkTypeId): Boolean {
-        return sdkType === Type.getInstance()
-    }
-
-    override fun getList(): List<OtpApp> {
-        return ArrayList(myFoundOtpApps)
-    }
+    override fun getIcon(): Icon = Icons.PROJECT
+    override fun getName(): String = "Mix"
+    override fun isSuitableSdkType(sdkType: SdkTypeId): Boolean = sdkType === Type.getInstance()
+    override fun getList(): List<OtpApp> = myFoundOtpApps
 
     @Throws(ConfigurationException::class)
     override fun setList(selectedOtpApps: List<OtpApp>?) {
@@ -73,10 +59,7 @@ class Builder : ProjectImportBuilder<OtpApp>() {
         }
     }
 
-    override fun isMarked(otpApp: OtpApp?): Boolean {
-        return otpApp != null && mySelectedOtpApps.contains(otpApp)
-    }
-
+    override fun isMarked(otpApp: OtpApp?): Boolean = otpApp != null && mySelectedOtpApps.contains(otpApp)
     override fun setOpenProjectSettingsAfter(openProjectSettingsAfter: Boolean) {}
 
     override fun cleanup() {
@@ -100,19 +83,16 @@ class Builder : ProjectImportBuilder<OtpApp>() {
                     if (ideaModuleFile != null) "    " + ideaModuleFile.path + "\n" else ""
                 }, "") + "\nWould you like to reuse them?", "Module files found", Messages.getQuestionIcon())
 
-        return if (resultCode == Messages.YES) {
-            true
-        } else if (resultCode == Messages.NO) {
-            try {
+        return when (resultCode) {
+            Messages.YES -> true
+            Messages.NO -> try {
                 deleteIdeaModuleFiles(mySelectedOtpApps)
                 true
             } catch (e: IOException) {
                 LOG.error(e)
                 false
             }
-
-        } else {
-            false
+            else -> false
         }
     }
 
@@ -120,79 +100,28 @@ class Builder : ProjectImportBuilder<OtpApp>() {
                moduleModel: ModifiableModuleModel?,
                modulesProvider: ModulesProvider,
                artifactModel: ModifiableArtifactModel?): List<Module> {
-        val selectedAppNames = ContainerUtil.newHashSet<String>()
+        fixProjectSdk(project)
+        val createModules = createModulesForOtpApps(
+                project,
+                mySelectedOtpApps,
+                { moduleModel ?: ModuleManager.getInstance(project).modifiableModel },
+                { otpApp, rootModel ->
+                    val compilerModuleExt = rootModel.getModuleExtension(CompilerModuleExtension::class.java)
+                    compilerModuleExt.inheritCompilerOutputPath(false)
+                    val ideaModuleDir = otpApp.root
 
-        for (importedOtpApp in mySelectedOtpApps) {
-            selectedAppNames.add(importedOtpApp.name)
-        }
+                    val _buildDir = if (myProjectRoot != null && myProjectRoot == ideaModuleDir) {
+                        ideaModuleDir
+                    } else {
+                        ideaModuleDir.parent.parent
+                    }
 
-        val projectSdk = fixProjectSdk(project)
-        val createModules = ArrayList<Module>()
-        val createdRootModels = ArrayList<ModifiableRootModel>()
-        val obtainedModuleModel = moduleModel ?: ModuleManager.getInstance(project).modifiableModel
-
-        var _buildDir: VirtualFile? = null
-        for (importedOtpApp in mySelectedOtpApps) {
-            // add Module
-            val ideaModuleDir = importedOtpApp.root
-            val ideaModuleFile = ideaModuleDir.canonicalPath + File.separator + importedOtpApp.name + ".iml"
-            val module = obtainedModuleModel.newModule(ideaModuleFile, ElixirModuleType.getInstance().id)
-            createModules.add(module)
-
-            // add rootModule
-            importedOtpApp.module = module
-            if (importedOtpApp.ideaModuleFile == null) {
-                val rootModel = ModuleRootManager.getInstance(module).modifiableModel
-
-                // Make it inherit SDK from the project.
-                rootModel.inheritSdk()
-
-                // Initialize source and test paths.
-                val content = rootModel.addContentEntry(importedOtpApp.root)
-                addSourceDirToContent(content, ideaModuleDir, "lib", false)
-                addSourceDirToContent(content, ideaModuleDir, "test", true)
-
-                // Weird symlink phoenix and phoenix_html make to themselves in deps
-                excludeDirFromContent(content, ideaModuleDir, "assets/node_modules/phoenix")
-                excludeDirFromContent(content, ideaModuleDir, "assets/node_modules/phoenix_html")
-                // Test coverage
-                excludeDirFromContent(content, ideaModuleDir, "cover")
-                // Dependencies (added as Libraries)
-                excludeDirFromContent(content, ideaModuleDir, "deps")
-                // Documentation generated by `ex_doc`
-                excludeDirFromContent(content, ideaModuleDir, "doc")
-                // Conventional logs directory
-                excludeDirFromContent(content, ideaModuleDir, "logs")
-
-                // Initialize output paths according to mix conventions.
-                val compilerModuleExt = rootModel.getModuleExtension(CompilerModuleExtension::class.java)
-                compilerModuleExt.inheritCompilerOutputPath(false)
-
-                _buildDir = if (myProjectRoot != null && myProjectRoot == ideaModuleDir) ideaModuleDir else ideaModuleDir.parent.parent
-                compilerModuleExt.setCompilerOutputPath(_buildDir!!.toString() + StringUtil.replace("/_build/dev/lib/" + importedOtpApp.name + "/ebin", "/", File.separator))
-                compilerModuleExt.setCompilerOutputPathForTests(_buildDir.toString() + StringUtil.replace("/_build/test/lib/" + importedOtpApp.name + "/ebin", "/", File.separator))
-                // output paths need to be included, so that they are indexed for Phoenix EEx Template Elixir Line Breakpoints
-                compilerModuleExt.isExcludeOutput = false
-
-                createdRootModels.add(rootModel)
-            }
-        }
-
-        // Commit project structure.
-        LOG.info("Commit project structure")
-        ApplicationManager.getApplication().runWriteAction {
-            for (rootModel in createdRootModels) {
-                rootModel.commit()
-            }
-            obtainedModuleModel.commit()
-        }
-
-        ProgressManager.getInstance().run(object : Task.Modal(ProjectImportBuilder.getCurrentProject(), "Scanning dependencies for Libraries", true) {
-            override fun run(indicator: ProgressIndicator) {
-                project.getComponent(DepsWatcher::class.java).syncLibraries(project, indicator)
-            }
-        })
-
+                    compilerModuleExt.setCompilerOutputPath(_buildDir!!.toString() + StringUtil.replace("/_build/dev/lib/" + otpApp.name + "/ebin", "/", File.separator))
+                    compilerModuleExt.setCompilerOutputPathForTests(_buildDir.toString() + StringUtil.replace("/_build/test/lib/" + otpApp.name + "/ebin", "/", File.separator))
+                    // output paths need to be included, so that they are indexed for Phoenix EEx Template Elixir Line Breakpoints
+                    compilerModuleExt.isExcludeOutput = false
+                }
+        )
 
         if (myIsImportingProject) {
             ElixirCompilerSettings.getInstance(project).isUseMixCompilerEnabled = true
@@ -216,34 +145,9 @@ class Builder : ProjectImportBuilder<OtpApp>() {
 
         ProgressManager.getInstance().run(object : Task.Modal(ProjectImportBuilder.getCurrentProject(), "Scanning Mix Projects", true) {
             override fun run(indicator: ProgressIndicator) {
-                val mixExsFiles = findMixExs(myProjectRoot!!, indicator)
-                val importedOtpApps = mutableSetOf<OtpApp>()
-
-                VfsUtilCore.visitChildrenRecursively(projectRoot, object : VirtualFileVisitor<Object>() {
-                    override fun visitFile(file: VirtualFile): Boolean {
-                        indicator.checkCanceled()
-
-                        if (file.isDirectory) {
-                            indicator.text2 = file.path
-                            if (isBuildOrConfigOrDepsOrTestsDirectory(projectRoot.path, file.path)) return false
-                        }
-
-                        createImportedOtpApp(file)?.let { importedOtpApps.add(it) }
-
-                        return true
-                    }
-                })
-
-                myFoundOtpApps = ContainerUtil.newArrayList(importedOtpApps)
+                myFoundOtpApps = org.elixir_lang.mix.Project.findOtpApps(projectRoot, indicator)
             }
         })
-
-        Collections.sort(myFoundOtpApps) { o1, o2 ->
-            val nameCompareResult = String.CASE_INSENSITIVE_ORDER.compare(o1.name, o2.name)
-            if (nameCompareResult == 0) {
-                String.CASE_INSENSITIVE_ORDER.compare(o1.root.path, o1.root.path)
-            } else nameCompareResult
-        }
 
         mySelectedOtpApps = myFoundOtpApps
 
@@ -254,39 +158,8 @@ class Builder : ProjectImportBuilder<OtpApp>() {
         myIsImportingProject = isImportingProject
     }
 
-    private fun findMixExs(root: VirtualFile, indicator: ProgressIndicator): List<VirtualFile> {
-        // synchronous and recursive
-        root.refresh(false, true)
-
-        val foundMixExs = ArrayList<VirtualFile>()
-        VfsUtilCore.visitChildrenRecursively(root, object : VirtualFileVisitor<Object>() {
-            override fun visitFile(file: VirtualFile): Boolean {
-                indicator.checkCanceled()
-                if (file.isDirectory) {
-                    if (isBuildOrConfigOrDepsOrTestsDirectory(root.path, file.path)) return false
-                    indicator.text2 = file.path
-                } else if (file.name.equals("mix.exs", ignoreCase = true)) {
-                    foundMixExs.add(file)
-                }
-                return true
-            }
-        })
-
-        return foundMixExs
-    }
-
     companion object {
         private val LOG = Logger.getInstance(Builder::class.java)
-
-        /**
-         * private methos
-         */
-        private fun isBuildOrConfigOrDepsOrTestsDirectory(projectRootPath: String, path: String): Boolean {
-            return ("$projectRootPath/_build" == path
-                    || "$projectRootPath/config" == path
-                    || "$projectRootPath/deps" == path
-                    || "$projectRootPath/tests" == path)
-        }
 
         private fun fixProjectSdk(project: Project): Sdk? {
             val projectRootMgr = ProjectRootManagerEx.getInstanceEx(project)
@@ -302,22 +175,6 @@ class Builder : ProjectImportBuilder<OtpApp>() {
 
             return fixedProjectSdk
         }
-
-        private fun addSourceDirToContent(content: ContentEntry,
-                                          root: VirtualFile,
-                                          sourceDir: String,
-                                          test: Boolean) {
-            content.addSourceFolder("${root.url}/$sourceDir", test)
-        }
-
-        private fun excludeDirFromContent(content: ContentEntry, root: VirtualFile, excludedDir: String) {
-            content.addExcludeFolder("${root.url}/$excludedDir")
-        }
-
-        private fun createImportedOtpApp(appRoot: VirtualFile): OtpApp? =
-            appRoot.findChild("mix.exs")?.let {
-                OtpApp(appRoot, it)
-            }
 
         @Throws(IOException::class)
         private fun deleteIdeaModuleFiles(otpApps: List<OtpApp>) {

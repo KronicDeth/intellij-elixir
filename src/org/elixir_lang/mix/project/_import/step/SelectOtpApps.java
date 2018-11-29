@@ -5,7 +5,7 @@ import com.intellij.ide.util.projectWizard.WizardContext;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.projectImport.SelectImportedProjectsStep;
 import org.elixir_lang.Icons;
-import org.elixir_lang.mix.project._import.OtpApp;
+import org.elixir_lang.mix.project.OtpApp;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
