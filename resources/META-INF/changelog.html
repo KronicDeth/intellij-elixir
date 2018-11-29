@@ -1,5 +1,23 @@
 <html>
 <body>
+<h1>v10.2.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>
+        Improve support for umbrella projects in Small IDEs like Rubymine by create a separate module for each
+        <code>mix.exs</code> when opening a directory (<code>DirectoryConfigurator</code>).  This matches the
+        pre-existing support in Rich IDEs (IntelliJ Community &amp; Ultimate Edition) when using Import From External
+        Model and Quick Import when opening a directory.
+      </li>
+      <li>
+        Ignore <code>assets</code> directory when looking for <code>mix.exs</code> files for Import From External Model,
+        Quick Import and Directory Configurator.
+      </li>
+    </ul>
+  </li>
+</ul>
 <h1>v10.1.0</h1>
 <ul>
   <li>
