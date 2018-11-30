@@ -1,5 +1,5 @@
 plugins {
-  id 'org.jetbrains.intellij' version "0.2.15"
+  id 'org.jetbrains.intellij' version "0.3.12"
   id "org.jetbrains.kotlin.jvm" version "1.2.0"
   id 'de.undercouch.download' version "3.1.2"
 }
