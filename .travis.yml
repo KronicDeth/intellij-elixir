@@ -4,7 +4,7 @@ jobs:
     - stage: Test
       language: elixir
       elixir: 1.6.6
-      env: IDEA_VERSION="2018.2.1"
+      env: IDEA_VERSION="2018.2.7"
       jdk: oraclejdk8
       otp_release: 20.1
       addons:
@@ -39,7 +39,7 @@ jobs:
     - stage: Test
       language: elixir
       elixir: 1.5.3
-      env: IDEA_VERSION="2018.2.1"
+      env: IDEA_VERSION="2018.2.7"
       jdk: oraclejdk8
       otp_release: 20.1
       addons:
