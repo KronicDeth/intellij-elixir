@@ -1,4 +1,4 @@
-package org.elixir_lang.mix.project._import
+package org.elixir_lang.mix.project
 
 import com.ericsson.otp.erlang.OtpErlangAtom
 import com.intellij.openapi.application.ApplicationManager

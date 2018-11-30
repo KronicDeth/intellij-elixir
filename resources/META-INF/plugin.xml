@@ -23,6 +23,9 @@
   <extensions defaultExtensionNs="com.intellij">
     <errorHandler implementation="org.elixir_lang.errorreport.Submitter"/>
 
+    <!-- `openProjectProcessor` for Small IDEs -->
+    <directoryProjectConfigurator implementation="org.elixir_lang.mix.project.DirectoryConfigurator"/>
+
     <!-- Elixir Module Structure -->
     <sdkType implementation="org.elixir_lang.sdk.elixir.Type"/>
     <sdkType implementation="org.elixir_lang.sdk.erlang.Type"/>

@@ -2,7 +2,7 @@ package org.elixir_lang.psi.impl
 
 import com.ericsson.otp.erlang.OtpErlangAtom
 import com.intellij.openapi.util.Computable
-import org.elixir_lang.mix.project._import.computeReadAction
+import org.elixir_lang.mix.project.computeReadAction
 import org.elixir_lang.psi.ElixirKeywordPair
 import org.elixir_lang.psi.ElixirNoParenthesesKeywordPair
 import org.elixir_lang.psi.Quotable
