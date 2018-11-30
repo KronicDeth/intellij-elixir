@@ -144,7 +144,7 @@ jobs:
     - stage: Test
       language: elixir
       elixir: 1.6.6
-      env: IDEA_VERSION="2017.3.5"
+      env: IDEA_VERSION="2017.3.6"
       jdk: oraclejdk8
       otp_release: 20.1
       addons:
@@ -179,7 +179,7 @@ jobs:
     - stage: Test
       language: elixir
       elixir: 1.5.3
-      env: IDEA_VERSION="2017.3.5"
+      env: IDEA_VERSION="2017.3.6"
       jdk: oraclejdk8
       otp_release: 20.1
       addons:
@@ -217,7 +217,7 @@ jobs:
       elixir: 1.6.6
       # The earliest `IDEA_VERSION` supported in `stage: Test`
       env:
-      - IDEA_VERSION="2017.3.5"
+      - IDEA_VERSION="2017.3.6"
       - secure: "sumWWNvahSNr7w6taGFWUXFZKsbeA5JR8qn3OI04z2sJiTE1VKYqpyJQxmJSDIALMaw7pqdF5KoUKooKJ8jIN6Dsraeg+8YS2ekYTNZL/9wFJjcjViHsscCWQhSxTEexLpUFsB1YcTscip8/nLojsgl6c4RO6zuw1d6ghjCAjak="
       jdk: oraclejdk8
       otp_release: 20.1
