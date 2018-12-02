@@ -41,17 +41,19 @@ allprojects {
   sourceCompatibility = javaVersion
   targetCompatibility = javaVersion
   tasks.withType(JavaCompile) { options.encoding = 'UTF-8' }
+}
 
-  sourceSets {
-    main {
-      java.srcDirs 'src', 'gen'
-      resources.srcDirs 'resources', 'plugin/resources'
-    }
-    test {
-      java.srcDir 'tests'
-    }
+sourceSets {
+  main {
+    java.srcDirs 'src', 'gen'
+    resources.srcDirs 'resources'
   }
+  test {
+    java.srcDir 'tests'
+  }
+}
 
+allprojects {
   apply plugin: 'org.jetbrains.intellij'
   intellij {
     def intellij_erlang_version

@@ -1,1 +1,11 @@
 jar.archiveName = "jps-builder.jar"
+
+sourceSets {
+    main {
+        java.srcDirs 'src'
+        resources.srcDirs 'resources'
+    }
+    test {
+        java.srcDir 'tests'
+    }
+}
