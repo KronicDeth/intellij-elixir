@@ -15,6 +15,33 @@
         Ignore <code>assets</code> directory when looking for <code>mix.exs</code> files for Import From External Model,
         Quick Import and Directory Configurator.
       </li>
+      <li>Update Build Matrix
+        <ul>
+          <li>Add <code>2018.3</code>.
+            <ul>
+              <li>Update <code>gradlew</code> to <code>5.0</code>.</li>
+              <li>Update <code>org.jetbrains.intellij</code> to <code>0.3.12</code>.</li>
+              <li>Update <code>org.jetbrains.kotlin.kvm</code> to <code>1.3.10</code>.
+                <ul>
+                  <li>Update Kotlin <code>apiVerision</code> to <code>1.3</code>.</li>
+                </ul>
+              </li>
+              <li>Update <code>de.undercouch.download</code> to <code>3.4.3</code>.</li>
+              <li>Don't configure Kotlin in projects that don't use it.</li>
+            </ul>
+          </li>
+          <li>Remove <code>2017.3</code> to keep version count at <code>3</code>.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>
+        Prevent <code>ConcurrentModificationException</code>s when updating <code>gradle</code> by using
+        <code>allprojects</code> less.
+      </li>
     </ul>
   </li>
 </ul>
