@@ -93,14 +93,14 @@ class Dialog(private val project: Project, val directory: PsiDirectory) : Create
     }
 
     @VisibleForTesting
-    internal var name: String
+    var name: String
       get() = nameField.text.trim()
       set(newName) {
           nameField.text = newName.trim()
       }
 
     @VisibleForTesting
-    internal var templateName: String
+    var templateName: String
       get() = kindCombo.selectedName
       set(newTemplateName) {
           kindCombo.setSelectedName(newTemplateName)

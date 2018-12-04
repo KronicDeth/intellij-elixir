@@ -158,7 +158,7 @@ abstract class Configurable: SearchableConfigurable, com.intellij.openapi.option
                 sdkList.refresh()
             }
 
-            override fun sdkHomeSelected(sdk: Sdk, newSdkHome: String?) {
+            override fun sdkHomeSelected(sdk: Sdk, newSdkHome: String) {
             }
         }
         projectSdksModel.addListener(listener)

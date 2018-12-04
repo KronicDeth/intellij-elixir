@@ -36,7 +36,7 @@ class SetupSDKNotificationProvider(private val project: Project,
         val connection = project.messageBus.connect(project)
 
         connection.subscribe<ModuleRootListener>(ProjectTopics.PROJECT_ROOTS, object : ModuleRootAdapter() {
-            override fun rootsChanged(event: ModuleRootEvent?) {
+            override fun rootsChanged(event: ModuleRootEvent) {
                 notifications.updateAllNotifications()
             }
         })

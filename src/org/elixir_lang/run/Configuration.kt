@@ -183,7 +183,7 @@ private const val URL = "url"
 private const val WORKING_DIRECTORY = "working-directory"
 
 abstract class Configuration(name: String, project: Project, configurationFactory: ConfigurationFactory) :
-        ModuleBasedConfiguration<Module>(name, Module(project), configurationFactory),
+        ModuleBasedConfiguration<Module, Element>(name, Module(project), configurationFactory),
         CommonProgramRunConfigurationParameters {
     override fun getEnvs(): Map<String, String> = _envs
 

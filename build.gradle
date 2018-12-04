@@ -109,33 +109,31 @@ apply plugin: "kotlin"
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
   //noinspection GrUnresolvedAccess
   kotlinOptions {
-    apiVersion = "1.0"
+    apiVersion = "1.2"
     jvmTarget = "1.8"
   }
 }
 
-allprojects {
-  def compilationPackages = ['org/intellij/elixir/build/**', 'org/intellij/elixir/jps/**']
+def compilationPackages = ['org/intellij/elixir/build/**', 'org/intellij/elixir/jps/**']
 
-  test {
-    environment "ELIXIR_LANG_ELIXIR_PATH", elixirPath
-    environment "ELIXIR_EBIN_DIRECTORY", "${elixirPath}/lib/elixir/ebin/"
-    environment "ELIXIR_VERSION", elixirVersion
-    useJUnit {
-      exclude compilationPackages
-    }
-    testLogging {
-      exceptionFormat = 'full'
-    }
+test {
+  environment "ELIXIR_LANG_ELIXIR_PATH", elixirPath
+  environment "ELIXIR_EBIN_DIRECTORY", "${elixirPath}/lib/elixir/ebin/"
+  environment "ELIXIR_VERSION", elixirVersion
+  useJUnit {
+    exclude compilationPackages
   }
+  testLogging {
+    exceptionFormat = 'full'
+  }
+}
 
-  task testCompilation(type: Test, group: 'Verification', dependsOn: [classes, testClasses]) {
-    useJUnit {
-      include compilationPackages
-    }
-    testLogging {
-      exceptionFormat = 'full'
-    }
+task testCompilation(type: Test, group: 'Verification', dependsOn: [classes, testClasses]) {
+  useJUnit {
+    include compilationPackages
+  }
+  testLogging {
+    exceptionFormat = 'full'
   }
 }
 
