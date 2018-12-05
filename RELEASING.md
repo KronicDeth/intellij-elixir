@@ -7,7 +7,7 @@ Any changes to the README are delayed until the last PR before release because i
 ## Build Release
 
 1. Update `version` in `gradle.properties` to the release version used in `resources/META-INF/plugin.xml`.
-2. Update `ideaVersion` in `gradle.properties` to the earliest version being supported (`2017.3.5`).
+2. Update `ideaVersion` in `gradle.properties` to the earliest version being supported (`2018.3`).
 3. Run the `buildPlugin` gradle task.
 
 ## Smoke Test Built Release
