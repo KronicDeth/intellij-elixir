@@ -9,3 +9,17 @@ sourceSets {
         java.srcDir 'tests'
     }
 }
+
+def compilationPackages = ['org/intellij/elixir/build/**', 'org/intellij/elixir/jps/**']
+
+test {
+  environment "ELIXIR_LANG_ELIXIR_PATH", elixirPath
+  environment "ELIXIR_EBIN_DIRECTORY", "${elixirPath}/lib/elixir/ebin/"
+  environment "ELIXIR_VERSION", elixirVersion
+  useJUnit {
+    exclude compilationPackages
+  }
+  testLogging {
+    exceptionFormat = 'full'
+  }
+}
