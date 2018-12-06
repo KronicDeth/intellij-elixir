@@ -17,7 +17,7 @@ ext {
 
   quoterUnzippedPath = "${cachePath}/elixir-${elixirVersion}-intellij_elixir-${quoterVersion}"
 
-  if (elixirVersion.startsWith("1.5") || elixirVersion.startsWith("1.6")) {
+  if (elixirVersion.startsWith("1.5") || elixirVersion.startsWith("1.6") || elixirVersion.startsWith("1.7")) {
     quoterExe = "${quoterUnzippedPath}/_build/dev/rel/intellij_elixir/bin/intellij_elixir"
   } else {
     quoterExe = "${quoterUnzippedPath}/rel/intellij_elixir/bin/intellij_elixir"
@@ -215,13 +215,25 @@ task getQuoter {
       def quoterZipRootFile = new File(quoterZipRootPath)
 
       quoterZipRootFile.renameTo(quoterUnzippedPath)
+    }
+  }
+}
 
-      exec {
-        workingDir quoterUnzippedPath
-        executable "mix"
-        args "deps.get"
-      }
+task getQuoterDeps(dependsOn: getQuoter) {
+  doLast {
+    exec {
+      workingDir quoterUnzippedPath
+      executable "mix"
+      args "deps.get"
+    }
+  }
+}
 
+task releaseQuoter(dependsOn: getQuoterDeps) {
+  doLast {
+    def file = new File(quoterExe)
+
+    if (!file.canExecute()) {
       exec {
         workingDir quoterUnzippedPath
         executable "mix"
@@ -239,12 +251,12 @@ compileTestJava {
   dependsOn getQuoter
 }
 
-task runQuoter(type: Exec, dependsOn: getQuoter) {
+task runQuoter(type: Exec, dependsOn: releaseQuoter) {
   executable quoterExe
   args "start"
 }
 
-task stopQuoter(type: Exec, dependsOn: getQuoter) {
+task stopQuoter(type: Exec, dependsOn: releaseQuoter) {
   executable quoterExe
   args "stop"
 }
