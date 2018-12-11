@@ -74,10 +74,6 @@ public class MatchedDotCallOperationParsingTestcase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly(false);
     }
 
-    public void testEmptyBlock() {
-        assertParsedAndQuotedCorrectly(false);
-    }
-
     public void testEOLs() {
         assertParsedAndQuotedCorrectly();
     }

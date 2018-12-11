@@ -29,10 +29,6 @@ public class OneArgumentParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly(false);
     }
 
-    public void testEmptyBlock() {
-        assertParsedAndQuotedCorrectly(false);
-    }
-
     public void testList() {
         assertParsedAndQuotedCorrectly(false);
     }

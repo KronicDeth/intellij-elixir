@@ -123,10 +123,6 @@ public class MatchedQualifiedMultipleAliasesParsingTestCase extends ParsingTestC
         assertParsedAndQuotedCorrectlyInOneThree(false);
     }
 
-    public void testEmptyBlock() {
-        assertParsedAndQuotedCorrectlyInOneThree();
-    }
-
     public void testList() {
         assertParsedAndQuotedCorrectlyInOneThree();
     }

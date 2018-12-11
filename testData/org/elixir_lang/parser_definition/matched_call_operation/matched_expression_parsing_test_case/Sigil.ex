@@ -25,7 +25,6 @@
 ~x{sigil}modifiers &1
 ~x{sigil}modifiers !1
 ~x{sigil}modifiers not 1
-~x{sigil}modifiers (;)
 ~x{sigil}modifiers ?1
 ~x{sigil}modifiers 0b10
 ~x{sigil}modifiers 1.2e-3

@@ -36,7 +36,6 @@
 ( (key_one: value_one, key_two: value_two) when !1  -> )
 ( (key_one: value_one, key_two: value_two) when not 1  -> )
 ( (key_one: value_one, key_two: value_two) when fn  -> end -> )
-( (key_one: value_one, key_two: value_two) when (;)  -> )
 ( (key_one: value_one, key_two: value_two) when 1  -> )
 ( (key_one: value_one, key_two: value_two) when []  -> )
 ( (key_one: value_one, key_two: value_two) when "one"  -> )

@@ -37,10 +37,6 @@ public class SigilDotOperationParsingTestcase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testEmptyBlock() {
-        assertParsedWithErrors();
-    }
-
     public void testList() {
         assertParsedWithErrors();
     }

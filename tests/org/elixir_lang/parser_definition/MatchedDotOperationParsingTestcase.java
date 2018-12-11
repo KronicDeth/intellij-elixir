@@ -49,10 +49,6 @@ public class MatchedDotOperationParsingTestcase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly(false);
     }
 
-    public void testEmptyBlock() {
-        assertParsedWithErrors();
-    }
-
     public void testList() {
         assertParsedWithErrors();
     }

@@ -10,9 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
-import static org.elixir_lang.Level.V_1_3;
-import static org.elixir_lang.Level.V_1_5;
-import static org.elixir_lang.Level.V_1_6;
+import static org.elixir_lang.Level.*;
 import static org.elixir_lang.test.ElixirVersion.elixirSdkLevel;
 
 public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
@@ -606,7 +604,13 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     }
 
     public void testMixConfigAgent() {
-        assertParsed("lib/mix/lib/mix/config/agent.ex", Parse.CORRECT);
+        boolean lessThanV_1_7 = elixirSdkLevel().compareTo(V_1_7) < 0;
+
+        if (lessThanV_1_7) {
+            assertParsed("lib/mix/lib/mix/config/agent.ex", Parse.CORRECT);
+        } else {
+            assertTrue(!lessThanV_1_7);
+        }
     }
 
     public void testMixDep() {

@@ -37,10 +37,6 @@ public class ListDotOperationParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testEmptyBlock() {
-        assertParsedWithErrors();
-    }
-
     public void testSigil() {
         assertParsedWithErrors();
     }

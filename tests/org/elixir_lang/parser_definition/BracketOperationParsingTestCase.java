@@ -151,10 +151,6 @@ public class BracketOperationParsingTestCase extends ParsingTestCase {
         }
     }
 
-    public void testEmptyBlock() {
-        assertParsedAndQuotedCorrectly();
-    }
-
     public void testList() {
         assertParsedAndQuotedCorrectly();
     }

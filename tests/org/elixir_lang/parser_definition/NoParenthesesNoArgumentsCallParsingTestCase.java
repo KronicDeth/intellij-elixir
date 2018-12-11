@@ -61,10 +61,6 @@ public class NoParenthesesNoArgumentsCallParsingTestCase extends ParsingTestCase
         assertParsedAndQuotedCorrectly(false);
     }
 
-    public void testEmptyBlockDotIdentifier() {
-        assertParsedAndQuotedCorrectly();
-    }
-
     public void testListDotIdentifier() {
         assertParsedAndQuotedCorrectly();
     }

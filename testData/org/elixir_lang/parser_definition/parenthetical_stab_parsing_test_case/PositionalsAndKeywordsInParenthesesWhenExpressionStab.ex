@@ -36,7 +36,6 @@
 ( (positional, key: value) when guard -> !1 )
 ( (positional, key: value) when guard -> not 1 )
 ( (positional, key: value) when guard -> ( (positional, key: value) when guard -> ) )
-( (positional, key: value) when guard -> (;) )
 ( (positional, key: value) when guard -> 1 )
 ( (positional, key: value) when guard -> [] )
 ( (positional, key: value) when guard -> "one" )

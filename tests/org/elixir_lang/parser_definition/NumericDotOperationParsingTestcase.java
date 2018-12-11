@@ -38,10 +38,6 @@ public class NumericDotOperationParsingTestcase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testEmptyBlock() {
-        assertParsedWithErrors();
-    }
-
     public void testList() {
         assertParsedWithErrors();
     }

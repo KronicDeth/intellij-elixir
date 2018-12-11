@@ -5,10 +5,6 @@ public class ParentheticalStabParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testEmpty() {
-        assertParsedAndQuotedCorrectly();
-    }
-
     public void testEmptyParenthesesStab() {
         assertParsedAndQuotedCorrectly();
     }

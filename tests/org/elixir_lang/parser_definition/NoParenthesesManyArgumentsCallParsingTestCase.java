@@ -68,10 +68,6 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testKeywordValueEmptyBlock() {
-        assertParsedAndQuotedCorrectly();
-    }
-
     public void testKeywordValueEmptyParentheses() {
         assertParsedAndQuotedCorrectly();
     }
@@ -153,10 +149,6 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
     }
 
     public void testPositionalDecimalFloat() {
-        assertParsedAndQuotedCorrectly();
-    }
-
-    public void testPositionalEmptyBlock() {
         assertParsedAndQuotedCorrectly();
     }
 

@@ -25,7 +25,6 @@ nil @1
 nil &1
 nil !1
 nil not 1
-nil (;)
 nil ?1
 nil 0b10
 nil 1.2e-3

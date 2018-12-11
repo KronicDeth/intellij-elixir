@@ -34,7 +34,6 @@ fn @1 -> end
 fn &1 -> end
 fn !1 -> end
 fn fn -> end -> end
-fn (;) -> end
 fn 1 -> end
 fn [] -> end
 fn "one" -> end

@@ -1,17 +1,11 @@
 package org.elixir_lang.parser_definition;
 
-import java.lang.reflect.InvocationTargetException;
-
 /**
  * Created by luke.imhoff on 8/7/14.
  */
 public class CharListLineParsingTestCase extends ParsingTestCase {
     public void testEmpty() {
         assertParsedAndQuotedCorrectly();
-    }
-
-    public void testEmptyHexadecimalEscapeSequence() {
-        assertParsedAndQuotedAroundExit();
     }
 
     public void testEmptyUnicodeEscapeSequence() {

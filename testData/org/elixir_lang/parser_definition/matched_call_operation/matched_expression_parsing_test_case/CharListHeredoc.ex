@@ -112,10 +112,6 @@ Heredoc
 '''
 CharList
 Heredoc
-''' (;)
-'''
-CharList
-Heredoc
 ''' ?1
 '''
 CharList
