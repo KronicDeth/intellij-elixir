@@ -36,7 +36,6 @@ fn (positional, key: value) when guard -> @1 end
 fn (positional, key: value) when guard -> &1 end
 fn (positional, key: value) when guard -> !1 end
 fn (positional, key: value) when guard -> fn (positional, key: value) when guard -> end end
-fn (positional, key: value) when guard -> (;) end
 fn (positional, key: value) when guard -> 1 end
 fn (positional, key: value) when guard -> [] end
 fn (positional, key: value) when guard -> "one" end

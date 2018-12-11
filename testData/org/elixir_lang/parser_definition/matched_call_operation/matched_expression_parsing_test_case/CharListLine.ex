@@ -25,7 +25,6 @@
 'CharListLine' 'CharListLine'
 'CharListLine' !1
 'CharListLine' not 1
-'CharListLine' (;)
 'CharListLine' ?1
 'CharListLine' 'CharListLine'
 'CharListLine' 1.2e-3

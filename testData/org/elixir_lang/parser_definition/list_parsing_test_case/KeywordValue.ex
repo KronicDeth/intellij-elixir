@@ -25,7 +25,6 @@
 [key: &1]
 [key: !1]
 [key: not 1]
-[key: (;)]
 [key: 1]
 [key: [inner_key: inner_value]]
 [key: "StringLine"]

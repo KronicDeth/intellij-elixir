@@ -37,10 +37,6 @@ public class AtomDotOperationParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testEmptyBlock() {
-        assertParsedWithErrors();
-    }
-
     public void testList() {
         assertParsedWithErrors();
     }

@@ -29,10 +29,6 @@ public class UnqualifiedNoParenthesesManyArgumentsCallParsingTestCase extends Pa
         assertParsedAndQuotedCorrectly(false);
     }
 
-    public void testEmptyBlock() {
-        assertParsedAndQuotedCorrectly(false);
-    }
-
     public void testList() {
         assertParsedAndQuotedCorrectly(false);
     }

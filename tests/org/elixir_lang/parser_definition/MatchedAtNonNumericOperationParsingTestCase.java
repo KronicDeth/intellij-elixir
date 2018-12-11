@@ -64,10 +64,6 @@ public class MatchedAtNonNumericOperationParsingTestCase extends ParsingTestCase
         assertParsedAndQuotedCorrectly(false);
     }
 
-    public void testEmptyBlock() {
-        assertParsedAndQuotedCorrectly(false);
-    }
-
     public void testList() {
         assertParsedAndQuotedCorrectly(false);
     }
@@ -91,10 +87,6 @@ public class MatchedAtNonNumericOperationParsingTestCase extends ParsingTestCase
     /*
      * numeric
      */
-
-    public void testCharToken() {
-        assertParsedAndQuotedCorrectly(false);
-    }
 
     public void testBinaryWholeNumber() {
         assertParsedAndQuotedCorrectly(false);

@@ -100,10 +100,6 @@ public class MatchedTypeOperationParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly(false);
     }
 
-    public void testEmptyBlock() {
-        assertParsedAndQuotedCorrectly();
-    }
-
     public void testList() {
         assertParsedAndQuotedCorrectly();
     }

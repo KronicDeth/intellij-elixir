@@ -121,10 +121,6 @@ public class MatchedQualifiedCallOperationParsingTestCase extends ParsingTestCas
         assertParsedAndQuotedCorrectly(false);
     }
 
-    public void testEmptyBlock() {
-        assertParsedAndQuotedCorrectly();
-    }
-
     public void testList() {
         assertParsedAndQuotedCorrectly();
     }

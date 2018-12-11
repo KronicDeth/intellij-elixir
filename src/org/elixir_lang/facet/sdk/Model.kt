@@ -25,20 +25,20 @@ class Model:
         internalList.add(0, null)
         SdksService.getInstance()?.apply {
             getModel().addListener(object : SdkModel.Listener {
-                override fun beforeSdkRemove(sdk: Sdk?) {
+                override fun beforeSdkRemove(sdk: Sdk) {
                     sdk?.let {
                         remove(it)
                     }
                 }
 
-                override fun sdkAdded(sdk: Sdk?) {
+                override fun sdkAdded(sdk: Sdk) {
                     sdk?.let {
                         if (it.sdkType is Type) {
                             add(sdk)
                         }
                     }
                 }
-                override fun sdkChanged(sdk: Sdk?, previousName: String?) {
+                override fun sdkChanged(sdk: Sdk, previousName: String) {
                     val previousIndex = internalList.indexOfFirst { indexSdk ->
                         indexSdk?.name == previousName
                     }
@@ -48,7 +48,7 @@ class Model:
                     }
                 }
 
-                override fun sdkHomeSelected(sdk: Sdk?, newSdkHome: String?) {}
+                override fun sdkHomeSelected(sdk: Sdk, newSdkHome: String) {}
             })
         }
     }

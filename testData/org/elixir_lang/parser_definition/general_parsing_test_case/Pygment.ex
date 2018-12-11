@@ -20,9 +20,6 @@
 :this ; :that
 :'complex atom'
 :"with' \"\" 'quotes"
-:" multi
- line ' \s \123 \xff
-atom"
 :... ; :<<>> ; :%{} ; :% ; :{}
 :++; :--; :*; :~~~; :::
 :% ; :. ; :<-
@@ -104,130 +101,130 @@ abc_123 = 1
 _018OP = 2
 A__0 == 3
 
-# Modules
-defmodule Long.Module.Name do
-  @moduledoc "Simple module docstring"
-
-  @doc """
-  Multiline docstring
-  "with quotes"
-  and #{ inspect %{"interpolation" => "in" <> "action"} }
-  now with #{ {:a, 'tuple'} }
-  and #{ inspect {
-      :tuple,
-      %{ with: "nested #{ inspect %{ :interpolation => %{} } }" }
-  } }
-  """
-  defstruct [:a, :name, :height]
-
-  @doc ~S'''
-  No #{interpolation} of any kind.
-  \000 \x{ff}
-
-  \n #{\x{ff}}
-  '''
-  def func(a, b \\ []), do: :ok
-
-  @doc false
-  def __before_compile__(_) do
-    :ok
-  end
-end
-
-# Structs
-defmodule Second.Module do
-  s = %Long.Module.Name{name: "Silly"}
-  %Long.Module.Name{s | height: {192, :cm}}
-  ".. #{%Long.Module.Name{s | height: {192, :cm}}} .."
-end
-
-# Types, pseudo-vars, attributes
-defmodule M do
-  @custom_attr :some_constant
-
-  @before_compile Long.Module.Name
-
-  @typedoc "This is a type"
-  @type typ :: integer
-
-  @typedoc """
-  Another type
-  """
-  @opaque typtyp :: 1..10
-
-  @spec func(typ, typtyp) :: :ok | :fail
-  def func(a, b) do
-    a || b || :ok || :fail
-    Path.expand("..", __DIR__)
-    IO.inspect __ENV__
-    __NOTAPSEUDOVAR__ = 11
-    __MODULE__.func(b, a)
-  end
-
-  defmacro m() do
-    __CALLER__
-  end
-end
-
-# Functions
-anon = fn x, y, z ->
-  fn(a, b, c) ->
-    &(x + y - z * a / &1 + b + div(&2, c))
-  end
-end
-
-&Set.put(&1, &2) ; & Set.put(&1, &2) ; &( Set.put(&1, &1) )
-
-# Function calls
-anon.(1, 2, 3); self; hd([1,2,3])
-Kernel.spawn(fn -> :ok end)
-IO.ANSI.black
-
-# Control flow
-if :this do
-  :that
-else
-  :otherwise
-end
-
-pid = self
-receive do
-  {:EXIT, _} -> :done
-  {^pid, :_} -> nil
-  after 100 -> :no_luck
-end
-
-case __ENV__.line do
-  x when is_integer(x) -> x
-  x when x in 1..12 -> -x
-end
-
-cond do
-  false -> "too bad"
-  4 > 5 -> "oops"
-  true -> nil
-end
-
-# Lexical scope modifiers
-import Kernel, except: [spawn: 1, +: 2, /: 2, Unless: 2]
-alias Long.Module.Name, as: N0men123_and4
-use Bitwise
-
-4 &&& 5
-2 <<< 3
-
-# Protocols
-defprotocol Useless do
-  def func1(this)
-  def func2(that)
-end
-
-defimpl Useless, for: Atom do
-end
-
-# Exceptions
-defmodule NotAnError do
-  defexception [:message]
-end
-
-raise NotAnError, message: "This is not an error"
+## Modules
+#defmodule Long.Module.Name do
+#  @moduledoc "Simple module docstring"
+#
+#  @doc """
+#  Multiline docstring
+#  "with quotes"
+#  and #{ inspect %{"interpolation" => "in" <> "action"} }
+#  now with #{ {:a, 'tuple'} }
+#  and #{ inspect {
+#      :tuple,
+#      %{ with: "nested #{ inspect %{ :interpolation => %{} } }" }
+#  } }
+#  """
+#  defstruct [:a, :name, :height]
+#
+#  @doc ~S'''
+#  No #{interpolation} of any kind.
+#  \000 \x{ff}
+#
+#  \n #{\x{ff}}
+#  '''
+#  def func(a, b \\ []), do: :ok
+#
+#  @doc false
+#  def __before_compile__(_) do
+#    :ok
+#  end
+#end
+#
+## Structs
+#defmodule Second.Module do
+#  s = %Long.Module.Name{name: "Silly"}
+#  %Long.Module.Name{s | height: {192, :cm}}
+#  ".. #{%Long.Module.Name{s | height: {192, :cm}}} .."
+#end
+#
+## Types, pseudo-vars, attributes
+#defmodule M do
+#  @custom_attr :some_constant
+#
+#  @before_compile Long.Module.Name
+#
+#  @typedoc "This is a type"
+#  @type typ :: integer
+#
+#  @typedoc """
+#  Another type
+#  """
+#  @opaque typtyp :: 1..10
+#
+#  @spec func(typ, typtyp) :: :ok | :fail
+#  def func(a, b) do
+#    a || b || :ok || :fail
+#    Path.expand("..", __DIR__)
+#    IO.inspect __ENV__
+#    __NOTAPSEUDOVAR__ = 11
+#    __MODULE__.func(b, a)
+#  end
+#
+#  defmacro m() do
+#    __CALLER__
+#  end
+#end
+#
+## Functions
+#anon = fn x, y, z ->
+#  fn(a, b, c) ->
+#    &(x + y - z * a / &1 + b + div(&2, c))
+#  end
+#end
+#
+#&Set.put(&1, &2) ; & Set.put(&1, &2) ; &( Set.put(&1, &1) )
+#
+## Function calls
+#anon.(1, 2, 3); self; hd([1,2,3])
+#Kernel.spawn(fn -> :ok end)
+#IO.ANSI.black
+#
+## Control flow
+#if :this do
+#  :that
+#else
+#  :otherwise
+#end
+#
+#pid = self
+#receive do
+#  {:EXIT, _} -> :done
+#  {^pid, :_} -> nil
+#  after 100 -> :no_luck
+#end
+#
+#case __ENV__.line do
+#  x when is_integer(x) -> x
+#  x when x in 1..12 -> -x
+#end
+#
+#cond do
+#  false -> "too bad"
+#  4 > 5 -> "oops"
+#  true -> nil
+#end
+#
+## Lexical scope modifiers
+#import Kernel, except: [spawn: 1, +: 2, /: 2, Unless: 2]
+#alias Long.Module.Name, as: N0men123_and4
+#use Bitwise
+#
+#4 &&& 5
+#2 <<< 3
+#
+## Protocols
+#defprotocol Useless do
+#  def func1(this)
+#  def func2(that)
+#end
+#
+#defimpl Useless, for: Atom do
+#end
+#
+## Exceptions
+#defmodule NotAnError do
+#  defexception [:message]
+#end
+#
+#raise NotAnError, message: "This is not an error"

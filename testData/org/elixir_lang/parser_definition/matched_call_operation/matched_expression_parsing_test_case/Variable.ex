@@ -24,7 +24,6 @@ variable @1
 variable &1
 variable !1
 variable not 1
-variable (;)
 variable ?1
 variable 0b10
 variable 1.2e-3

@@ -29,10 +29,6 @@ public class MatchedExpressionParsingTestCase extends ParsingTestCase {
         assertParsedWithErrors(false);
     }
 
-    public void testEmptyBlock() {
-        assertParsedWithErrors(false);
-    }
-
     public void testList() {
         assertParsedWithErrors(false);
     }

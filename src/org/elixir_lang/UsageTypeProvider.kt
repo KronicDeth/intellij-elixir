@@ -123,13 +123,13 @@ class UsageTypeProvider : com.intellij.usages.impl.rules.UsageTypeProviderEx {
         }
 
     companion object {
-        internal val ALIAS = UsageType("Alias")
-        internal val CALL = UsageType("Call")
-        internal val CALL_DEFINITION_CLAUSE = UsageType("Call definition clause")
-        internal val FUNCTION_PARAMETER = UsageType("Parameter declaration")
-        internal val MODULE_DEFINITION = UsageType("Module definition")
-        internal val MODULE_ATTRIBUTE_ACCUMULATE_OR_OVERRIDE = UsageType("Module attribute accumulate or override")
-        internal val MODULE_ATTRIBUTE_READ = UsageType("Module attribute read")
+        val ALIAS = UsageType("Alias")
+        val CALL = UsageType("Call")
+        val CALL_DEFINITION_CLAUSE = UsageType("Call definition clause")
+        val FUNCTION_PARAMETER = UsageType("Parameter declaration")
+        val MODULE_DEFINITION = UsageType("Module definition")
+        val MODULE_ATTRIBUTE_ACCUMULATE_OR_OVERRIDE = UsageType("Module attribute accumulate or override")
+        val MODULE_ATTRIBUTE_READ = UsageType("Module attribute read")
     }
 }
 

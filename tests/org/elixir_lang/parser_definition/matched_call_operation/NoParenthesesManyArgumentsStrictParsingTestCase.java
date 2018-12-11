@@ -29,10 +29,6 @@ public class NoParenthesesManyArgumentsStrictParsingTestCase extends ParsingTest
         assertParsedWithErrors(false);
     }
 
-    public void testEmptyBlock() {
-        assertParsedWithErrors(false);
-    }
-
     public void testList() {
         assertParsedWithErrors(false);
     }

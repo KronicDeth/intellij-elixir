@@ -1,14 +1,14 @@
 plugins {
-  id 'org.jetbrains.intellij' version "0.2.15"
-  id "org.jetbrains.kotlin.jvm" version "1.2.0"
-  id 'de.undercouch.download' version "3.1.2"
+  id 'org.jetbrains.intellij' version "0.3.12"
+  id "org.jetbrains.kotlin.jvm" version "1.3.10"
+  id 'de.undercouch.download' version "3.4.3"
 }
 
 ext {
   if (elixirVersion.startsWith("1.5") || elixirVersion.startsWith("1.6")) {
     quoterVersion = "1.0.0"
   } else {
-    quoterVersion = "2.0.0"
+    quoterVersion = "2.1.0"
   }
 
   cachePath = "${rootDir}/cache"
@@ -17,7 +17,7 @@ ext {
 
   quoterUnzippedPath = "${cachePath}/elixir-${elixirVersion}-intellij_elixir-${quoterVersion}"
 
-  if (elixirVersion.startsWith("1.5") || elixirVersion.startsWith("1.6")) {
+  if (elixirVersion.startsWith("1.5") || elixirVersion.startsWith("1.6") || elixirVersion.startsWith("1.7")) {
     quoterExe = "${quoterUnzippedPath}/_build/dev/rel/intellij_elixir/bin/intellij_elixir"
   } else {
     quoterExe = "${quoterUnzippedPath}/rel/intellij_elixir/bin/intellij_elixir"
@@ -41,22 +41,26 @@ allprojects {
   sourceCompatibility = javaVersion
   targetCompatibility = javaVersion
   tasks.withType(JavaCompile) { options.encoding = 'UTF-8' }
+}
 
-  sourceSets {
-    main {
-      java.srcDirs 'src', 'gen'
-      resources.srcDirs 'resources', 'plugin/resources'
-    }
-    test {
-      java.srcDir 'tests'
-    }
+sourceSets {
+  main {
+    java.srcDirs 'src', 'gen'
+    resources.srcDirs 'resources'
   }
+  test {
+    java.srcDir 'tests'
+  }
+}
 
+allprojects {
   apply plugin: 'org.jetbrains.intellij'
   intellij {
     def intellij_erlang_version
 
-    if (ideaVersion.startsWith("2018.2")) {
+    if (ideaVersion.startsWith("2018.3")) {
+      intellij_erlang_version = "0.11.1000"
+    } else if (ideaVersion.startsWith("2018.2")) {
       intellij_erlang_version = "0.11.985"
     } else if (ideaVersion.startsWith("2018.1")) {
       intellij_erlang_version = "0.11.976"
@@ -97,39 +101,39 @@ allprojects {
     password publishPassword
     channels publishChannels
   }
+}
 
-  apply plugin: "kotlin"
+apply plugin: "kotlin"
 
-  //noinspection GroovyAssignabilityCheck,GrUnresolvedAccess
-  tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
-    //noinspection GrUnresolvedAccess
-    kotlinOptions {
-      apiVersion = "1.0"
-      jvmTarget = "1.8"
-    }
+//noinspection GroovyAssignabilityCheck,GrUnresolvedAccess
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+  //noinspection GrUnresolvedAccess
+  kotlinOptions {
+    apiVersion = "1.2"
+    jvmTarget = "1.8"
   }
+}
 
-  def compilationPackages = ['org/intellij/elixir/build/**', 'org/intellij/elixir/jps/**']
+def compilationPackages = ['org/intellij/elixir/build/**', 'org/intellij/elixir/jps/**']
 
-  test {
-    environment "ELIXIR_LANG_ELIXIR_PATH", elixirPath
-    environment "ELIXIR_EBIN_DIRECTORY", "${elixirPath}/lib/elixir/ebin/"
-    environment "ELIXIR_VERSION", elixirVersion
-    useJUnit {
-      exclude compilationPackages
-    }
-    testLogging {
-      exceptionFormat = 'full'
-    }
+test {
+  environment "ELIXIR_LANG_ELIXIR_PATH", elixirPath
+  environment "ELIXIR_EBIN_DIRECTORY", "${elixirPath}/lib/elixir/ebin/"
+  environment "ELIXIR_VERSION", elixirVersion
+  useJUnit {
+    exclude compilationPackages
   }
+  testLogging {
+    exceptionFormat = 'full'
+  }
+}
 
-  task testCompilation(type: Test, group: 'Verification', dependsOn: [classes, testClasses]) {
-    useJUnit {
-      include compilationPackages
-    }
-    testLogging {
-      exceptionFormat = 'full'
-    }
+task testCompilation(type: Test, group: 'Verification', dependsOn: [classes, testClasses]) {
+  useJUnit {
+    include compilationPackages
+  }
+  testLogging {
+    exceptionFormat = 'full'
   }
 }
 
@@ -211,13 +215,25 @@ task getQuoter {
       def quoterZipRootFile = new File(quoterZipRootPath)
 
       quoterZipRootFile.renameTo(quoterUnzippedPath)
+    }
+  }
+}
 
-      exec {
-        workingDir quoterUnzippedPath
-        executable "mix"
-        args "deps.get"
-      }
+task getQuoterDeps(dependsOn: getQuoter) {
+  doLast {
+    exec {
+      workingDir quoterUnzippedPath
+      executable "mix"
+      args "deps.get"
+    }
+  }
+}
 
+task releaseQuoter(dependsOn: getQuoterDeps) {
+  doLast {
+    def file = new File(quoterExe)
+
+    if (!file.canExecute()) {
       exec {
         workingDir quoterUnzippedPath
         executable "mix"
@@ -235,12 +251,12 @@ compileTestJava {
   dependsOn getQuoter
 }
 
-task runQuoter(type: Exec, dependsOn: getQuoter) {
+task runQuoter(type: Exec, dependsOn: releaseQuoter) {
   executable quoterExe
   args "start"
 }
 
-task stopQuoter(type: Exec, dependsOn: getQuoter) {
+task stopQuoter(type: Exec, dependsOn: releaseQuoter) {
   executable quoterExe
   args "stop"
 }

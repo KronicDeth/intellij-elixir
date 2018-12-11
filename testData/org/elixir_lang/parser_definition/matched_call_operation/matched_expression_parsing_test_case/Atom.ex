@@ -25,7 +25,6 @@
 :atom &1
 :atom !1
 :atom not 1
-:atom (;)
 :atom ?1
 :atom 0b10
 :atom 1.2e-3

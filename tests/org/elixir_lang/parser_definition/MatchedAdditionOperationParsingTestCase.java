@@ -56,10 +56,6 @@ public class MatchedAdditionOperationParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testEmptyBlock() {
-        assertParsedAndQuotedCorrectly();
-    }
-
     public void testList() {
         assertParsedAndQuotedCorrectly();
     }

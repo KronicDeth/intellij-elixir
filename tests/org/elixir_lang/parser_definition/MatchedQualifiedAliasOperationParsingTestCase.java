@@ -121,10 +121,6 @@ public class MatchedQualifiedAliasOperationParsingTestCase extends ParsingTestCa
         assertParsedAndQuotedCorrectly(false);
     }
 
-    public void testEmptyBlock() {
-        assertParsedAndQuotedCorrectly();
-    }
-
     public void testList() {
         assertParsedAndQuotedCorrectly();
     }

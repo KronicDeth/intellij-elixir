@@ -92,10 +92,6 @@ public class MatchedMatchOperationParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly(false);
     }
 
-    public void testEmptyBlock() {
-        assertParsedAndQuotedCorrectly();
-    }
-
     public void testList() {
         assertParsedAndQuotedCorrectly();
     }

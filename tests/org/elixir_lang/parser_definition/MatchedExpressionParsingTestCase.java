@@ -20,10 +20,6 @@ public class MatchedExpressionParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testEmptyBlock() {
-        assertParsedAndQuotedCorrectly();
-    }
-
     public void testFalse() {
         assertParsedAndQuotedCorrectly();
     }

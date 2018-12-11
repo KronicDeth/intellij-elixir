@@ -109,10 +109,6 @@ Heredoc
 """
 String
 Heredoc
-""" (;)
-"""
-String
-Heredoc
 """ ?1
 """
 String
