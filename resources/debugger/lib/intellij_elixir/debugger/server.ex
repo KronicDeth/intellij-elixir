@@ -401,7 +401,7 @@ defmodule IntelliJElixir.Debugger.Server do
     [head_frame | tail_frames]
   end
 
-  defp to_file(arg = {module, function, arguments}) do
+  defp to_file({module, function, arguments}) do
     source = source(module)
 
     with [_] <- arguments,
@@ -502,7 +502,7 @@ defmodule IntelliJElixir.Debugger.Server do
     end
   else
     defp vars(elixir_variable_tuples) when is_list(elixir_variable_tuples) do
-      Enum.into(elixir_variable_tuples, %{}, fn {elixir_variable_name, counter, erlang_variable_name} ->
+      Enum.into(elixir_variable_tuples, %{}, fn {elixir_variable_name, _counter, erlang_variable_name} ->
         {{elixir_variable_name, nil}, {0, erlang_variable_name}}
       end)
     end
