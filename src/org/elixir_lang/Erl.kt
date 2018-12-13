@@ -36,8 +36,22 @@ object Erl {
     private fun prependCodePaths(generalCommandLine: GeneralCommandLine, sdk: Sdk) {
         prependCodePaths(
                 generalCommandLine,
-                sdk.rootProvider.getFiles(OrderRootType.CLASSES).map { it.canonicalPath!! }
+                ebinDirectories(sdk)
         )
+    }
+
+    private fun ebinDirectories(sdk: Sdk): kotlin.collections.List<String> {
+        var ebinDirectories: kotlin.collections.List<String>?
+
+        do {
+            ebinDirectories = try {
+                sdk.rootProvider.getFiles(OrderRootType.CLASSES).map { it.canonicalPath!! }
+            } catch (e: AssertionError) {
+                null
+            }
+        } while (ebinDirectories == null)
+
+        return ebinDirectories
     }
 
     /**
