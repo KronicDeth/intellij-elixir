@@ -194,6 +194,9 @@ Table of Contents
 
 ### Bug Fixes
 * [#1355](https://github.com/KronicDeth/intellij-elixir/pull/1355) - Prevent `ConcurrentModificationException`s when updating `gradle` by using `allprojects` less. - [@KronicDeth](https://github.com/KronicDeth)
+* [#1359](https://github.com/KronicDeth/intellij-elixir/pull/1359) - [@KronicDeth](https://github.com/KronicDeth)
+  * Remove unused variables in Elixir debugger server.
+  * Protect from `AssertionError` when `VirtualFileCache` is disposed.
 
 ## v10.1.0
 
