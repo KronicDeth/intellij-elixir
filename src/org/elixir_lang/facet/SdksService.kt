@@ -15,8 +15,22 @@ class SdksService {
             getModel().sdks.filter { clazz.isInstance(it.sdkType) }.map { it as ProjectJdkImpl }
 
     fun getModel(): ProjectSdksModel {
-        val model = this.model?: ProjectSdksModel().apply { reset(null) }
+        val model = this.model ?: initModel()
         this.model = model
+
+        return model
+    }
+
+    private fun initModel(): ProjectSdksModel {
+        var model : ProjectSdksModel?
+
+        do {
+            model = try {
+                ProjectSdksModel().apply { reset(null) }
+            } catch (e: AssertionError) {
+                null
+            }
+        } while (model == null)
 
         return model
     }
