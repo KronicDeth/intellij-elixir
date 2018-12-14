@@ -197,6 +197,7 @@ Table of Contents
 * [#1359](https://github.com/KronicDeth/intellij-elixir/pull/1359) - [@KronicDeth](https://github.com/KronicDeth)
   * Remove unused variables in Elixir debugger server.
   * Protect from `AssertionError` when `VirtualFileCache` is disposed.
+* [#1360](https://github.com/KronicDeth/intellij-elixir/pull/1360) - Protect from `AssertionError` when `VirtualFilePointerContainer` is disposed. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v10.1.0
 
