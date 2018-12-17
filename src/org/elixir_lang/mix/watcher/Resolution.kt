@@ -46,7 +46,8 @@ class Resolution(
                            Module deps handle transitivity while Library deps don't */
                         if (dep.type == Dep.Type.LIBRARY) {
                             if (!depToRootVirtualFile.contains(dep)) {
-                                val depRootVirtualFile = project.baseDir.findFileByRelativePath(dep.path)
+                                val depRootVirtualFile = dep.virtualFile(project)
+
                                 depToRootVirtualFile[dep] = depRootVirtualFile
 
                                 if (depRootVirtualFile != null &&

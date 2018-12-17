@@ -186,7 +186,7 @@ class DepsWatcher(
         }
     }
 
-    private fun syncLibraries(
+    fun syncLibraries(
             deps: Array<VirtualFile>,
             libraryTable: LibraryTable,
             progressIndicator: ProgressIndicator

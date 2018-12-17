@@ -2,7 +2,6 @@ package org.elixir_lang.mix
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleComponent
 import com.intellij.openapi.module.ModuleManager
@@ -10,22 +9,16 @@ import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.roots.LibraryOrderEntry
-import com.intellij.openapi.roots.ModuleRootManager
-import com.intellij.openapi.roots.ModuleRootModificationUtil
+import com.intellij.openapi.roots.*
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileEvent
 import com.intellij.openapi.vfs.VirtualFileListener
 import com.intellij.openapi.vfs.VirtualFileManager
-import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
-import org.elixir_lang.PackageManager
+import org.elixir_lang.DepsWatcher
 import org.elixir_lang.mix.library.Kind
-import org.elixir_lang.mix.watcher.Resolution
-import org.elixir_lang.mix.watcher.Resolution.Companion.resolution
 import org.elixir_lang.mix.watcher.TransitiveResolution.transitiveResolution
-import org.elixir_lang.package_manager.virtualFile
 
 /**
  * Watches the [module]'s `mix.exs` for changes to the `deps`, so that [com.intellij.openapi.roots.Libraries.Library]
@@ -34,6 +27,7 @@ import org.elixir_lang.package_manager.virtualFile
 class Watcher(
         private val module: Module,
         private val project: Project,
+        private val projectRootManager: ProjectRootManager,
         private val moduleManager: ModuleManager,
         private val moduleRootManager: ModuleRootManager,
         private val psiManager: PsiManager,
@@ -120,11 +114,41 @@ class Watcher(
                                         commit()
                                     }
                                 }
+
                             }
                         }
                     }
+
+                    syncExternalPathLibraries(deps, progressIndicator)
                 }
             }
         }
     }
+
+    private fun syncExternalPathLibraries(deps: Collection<Dep>, progressIndicator: ProgressIndicator) {
+        val externalPaths = deps.externalPaths(project, projectRootManager)
+
+        if (externalPaths.isNotEmpty()) {
+            val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
+
+            project.getComponent(DepsWatcher::class.java).syncLibraries(externalPaths, libraryTable, progressIndicator)
+        }
+    }
 }
+
+private fun Collection<Dep>.externalPaths(project: Project, projectRootManager: ProjectRootManager): Array<VirtualFile> {
+    val projectFileIndex = projectRootManager.fileIndex
+
+    return this.mapNotNull { it.externalPath(project, projectFileIndex) }.toTypedArray()
+}
+
+private fun Dep.externalPath(project: Project, projectFileIndex: ProjectFileIndex): VirtualFile? =
+    virtualFile(project)?.let { virtualFile ->
+        if (projectFileIndex.getContentRootForFile(virtualFile) == null &&
+                !projectFileIndex.isInLibrary(virtualFile)  &&
+                !projectFileIndex.isExcluded(virtualFile)) {
+            virtualFile
+        } else {
+            null
+        }
+    }
