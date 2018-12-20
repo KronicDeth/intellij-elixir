@@ -200,6 +200,7 @@ Table of Contents
 * [#1360](https://github.com/KronicDeth/intellij-elixir/pull/1360) - Protect from `AssertionError` when `VirtualFilePointerContainer` is disposed. - [@KronicDeth](https://github.com/KronicDeth)
 * [#1364](https://github.com/KronicDeth/intellij-elixir/pull/1364) - Use `:path` for deps for paths external to project.  Unfortunately, even though they show up in the Project Structure, only `ebin` directories are shown as it is restricted to those marked as `CLASSES` and the `:path` `lib` is a `SOURCES`. - [@KronicDeth](https://github.com/KronicDeth)
 * [#1367](https://github.com/KronicDeth/intellij-elixir/pull/1367) - Ignore `:tag` when finding path to dep. - [@KronicDeth](https://github.com/KronicDeth)
+* [#1368](https://github.com/KronicDeth/intellij-elixir/pull/1368) - No longer use the forked version of `TerminalExecutionConsole` as `2018.3`'s version doesn't have the text echoing behavior that was being bypassed before. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v10.1.0
 
