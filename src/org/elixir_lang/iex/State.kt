@@ -11,7 +11,7 @@ import com.intellij.execution.runners.ProgramRunner
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationType
 import com.intellij.notification.Notifications
-import org.elixir_lang.run.TerminalExecutionConsole
+import com.intellij.terminal.TerminalExecutionConsole
 import org.elixir_lang.console.ElixirConsoleUtil
 import org.elixir_lang.utils.SetupElixirSDKNotificationListener
 
