@@ -90,7 +90,7 @@ class Panel(private val definitionsTree: Tree, project: Project): JPanel(GridLay
         return if (module != null) {
             module
         } else {
-            val newModule = moduleContext(debugInfo) {
+            val newModule = debugInfo.moduleContext {
                 val definitionsTreeModel = definitionsTree.model
                 val definitionCount = definitionsTreeModel.getChildCount(debugInfo)
 
@@ -128,12 +128,5 @@ class Panel(private val definitionsTree: Tree, project: Project): JPanel(GridLay
     private fun moduleContext(clause: Clause, inner: () -> String): String = moduleContext(clause.definition, inner)
 
     private fun moduleContext(definition: Definition, inner: () -> String): String =
-            moduleContext(definition.debugInfo, inner)
-
-    private fun moduleContext(debugInfo: V1, inner: () -> String): String =
-            "defmodule ${debugInfo.inspectedModule!!} do\n" +
-                    "  # ...\n" +
-                    "  ${adjustNewLines(inner(), "\n  ")}\n" +
-                    "  # ...\n" +
-                    "end"
+            definition.debugInfo.moduleContext(inner)
 }

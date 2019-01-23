@@ -1,11 +1,14 @@
 package org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl
 
 import com.ericsson.otp.erlang.*
+import org.elixir_lang.Macro.adjustNewLines
 import org.elixir_lang.beam.chunk.DebugInfo
 import org.elixir_lang.beam.chunk.Keyword
 import org.elixir_lang.beam.chunk.debug_info.logger
 import org.elixir_lang.beam.chunk.debug_info.v1.ElixirErl
 import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.Definitions
+import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.TypeSpecifications
+import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.type_specifications.Specification
 import org.elixir_lang.beam.chunk.from
 import org.elixir_lang.beam.term.inspect
 import org.elixir_lang.debugger.stack_frame.value.Presentation.toUtf8String
@@ -59,7 +62,14 @@ class V1(val elixirErl: ElixirErl, val metadata: OtpErlangTuple): DebugInfo {
     val module by lazy { get("module") as? OtpErlangAtom }
     val inspectedModule by lazy { module?.let { inspect(it) }  }
     val unreachable by lazy { get("unreachable") as OtpErlangList? }
-    val specs: OtpErlangList? by lazy { metadata.elementAt(2) as? OtpErlangList }
+    val typeSpecifications by lazy { TypeSpecifications.from(metadata.elementAt(2), this) }
+
+    fun moduleContext(inner: () -> String): String =
+            "defmodule ${inspectedModule!!} do\n" +
+                    "  # ...\n" +
+                    "  ${adjustNewLines(inner(), "\n  ")}\n" +
+                    "  # ...\n" +
+                    "end"
 
     private fun get(key: String): OtpErlangObject? = map?.get(OtpErlangAtom(key))
 
