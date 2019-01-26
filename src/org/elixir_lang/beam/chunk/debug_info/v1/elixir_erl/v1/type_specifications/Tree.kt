@@ -22,6 +22,7 @@ class Tree(model: TreeModel): JTree(model) {
             is V1 -> value.inspectedModule ?: "?"
             is Types -> "@type"
             is Type -> value.toString(model.root.let { it as V1 }.typeSpecifications!!)
+            is Callbacks -> "@callback"
             is Specifications -> "@spec"
             is Specification -> "${value.module?.let { "$it." } ?: ""}${value.function}/${value.arity}"
             else -> super.convertValueToText(value, selected, expanded, leaf, row, hasFocus)

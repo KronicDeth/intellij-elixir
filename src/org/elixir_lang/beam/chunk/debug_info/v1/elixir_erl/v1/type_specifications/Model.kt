@@ -18,18 +18,21 @@ class Model(private val debugInfo: V1): TreeModel {
             is V1 ->
                 when (index) {
                     0 -> parent.typeSpecifications?.types
-                    1 -> parent.typeSpecifications?.specifications
+                    1 -> parent.typeSpecifications?.callbacks
+                    2 -> parent.typeSpecifications?.specifications
                     else -> null
                 }
             is Types -> parent[index]
+            is Callbacks -> parent[index]
             is Specifications -> parent[index]
             else -> null
         }
 
     override fun getChildCount(parent: Any?): Int =
             when (parent) {
-                is V1 -> 2
+                is V1 -> 3
                 is Types -> parent.size()
+                is Callbacks -> parent.size()
                 is Specifications -> parent.size()
                 else -> 0
             }
@@ -39,7 +42,8 @@ class Model(private val debugInfo: V1): TreeModel {
             is V1 ->
                 when (child) {
                     is Types -> 0
-                    is Specifications -> 1
+                    is Callbacks -> 1
+                    is Specifications -> 2
                     else -> 0
                 }
             is Types -> parent.indexOf(child as Type)
@@ -53,6 +57,7 @@ class Model(private val debugInfo: V1): TreeModel {
         when (node) {
             is V1 -> false
             is Types -> node.size() == 0
+            is Callbacks -> node.size() == 0
             is Specifications -> node.size() == 0
             else -> true
         }
