@@ -58,6 +58,10 @@ sealed class TypeSpecification {
                     atomToString(type.elementAt(2))
                 } else if (type.arity() == 3 && type.elementAt(0).let { it as? OtpErlangAtom }?.atomValue() == "integer") {
                     integerToString(type.elementAt(2))
+                } else if (type.arity() == 4 && type.elementAt(0).let { it as? OtpErlangAtom }?.atomValue() == "op") {
+                    opToString(type.elementAt(2), type.elementAt(3))
+                } else if (type.arity() == 5 && type.elementAt(0).let { it as? OtpErlangAtom }?.atomValue() == "op") {
+                    opToString(type.elementAt(2), type.elementAt(3), type.elementAt(4))
                 } else if (type.arity() == 3 && type.elementAt(0).let { it as? OtpErlangAtom }?.atomValue() == "var") {
                     varToString(type.elementAt(2))
                 } else if (type.arity() == 3 && type.elementAt(0).let { it as? OtpErlangAtom }?.atomValue() == "remote_type") {
@@ -169,6 +173,40 @@ sealed class TypeSpecification {
 
                     ```
                     ${inspect(integer)}
+                    ```
+                    """.trimIndent())
+
+                    null
+                }
+
+        private fun opToString(op: OtpErlangObject, operand: OtpErlangObject): String? =
+                if (op is OtpErlangAtom) {
+                    "${op.atomValue()}${toString(operand) ?: defaultString()}"
+                } else {
+                    logger.error("""
+                    Op name doesn't match `atom()`.
+
+                    ## op
+
+                    ```elixir
+                    ${inspect(op)}
+                    ```
+                    """.trimIndent())
+
+                    null
+                }
+
+        private fun opToString(op: OtpErlangObject, left: OtpErlangObject, right: OtpErlangObject): String? =
+                if (op is OtpErlangAtom) {
+                    "${toString(left) ?: defaultString()} ${op.atomValue()} ${toString(right) ?: defaultString()}"
+                } else {
+                    logger.error("""
+                    Op name doesn't match `atom()`.
+
+                    ## op
+
+                    ```elixir
+                    ${inspect(op)}
                     ```
                     """.trimIndent())
 
@@ -287,6 +325,7 @@ sealed class TypeSpecification {
                         "fun" -> funToString(arguments)
                         "list" -> listToString(arguments)
                         "map" -> mapToString(arguments)
+                        "nonempty_list" -> nonEmptyList(arguments)
                         "product" -> productToString(arguments)
                         "range" -> rangeToString(arguments)
                         "tuple" -> tupleToString(arguments)
@@ -346,9 +385,9 @@ sealed class TypeSpecification {
                 }
 
         private fun isIsSubtype(term: OtpErlangObject): Boolean =
-            term is OtpErlangTuple && term.arity() == 3 &&
-                    term.elementAt(0).let { it as? OtpErlangAtom }?.atomValue() == "atom" &&
-                    term.elementAt(2).let { it as? OtpErlangAtom }?.atomValue() == "is_subtype"
+                term is OtpErlangTuple && term.arity() == 3 &&
+                        term.elementAt(0).let { it as? OtpErlangAtom }?.atomValue() == "atom" &&
+                        term.elementAt(2).let { it as? OtpErlangAtom }?.atomValue() == "is_subtype"
 
         private fun subtypeToString(subtype: OtpErlangObject): String? =
                 if (subtype is OtpErlangList && subtype.arity() == 2) {
@@ -368,14 +407,14 @@ sealed class TypeSpecification {
                 }
 
         private fun subtypeToString(`var`: OtpErlangObject, type: OtpErlangObject): String? =
-            if (`var` is OtpErlangTuple && `var`.arity() == 3 && `var`.elementAt(0).let { it as OtpErlangAtom }?.atomValue() == "var") {
-                varToString(`var`.elementAt(2))?.let { varString ->
-                    val typeString = toString(type) ?: defaultString()
+                if (`var` is OtpErlangTuple && `var`.arity() == 3 && `var`.elementAt(0).let { it as OtpErlangAtom }?.atomValue() == "var") {
+                    varToString(`var`.elementAt(2))?.let { varString ->
+                        val typeString = toString(type) ?: defaultString()
 
-                    "$varString: $typeString"
-                }
-            } else {
-                logger.error("""
+                        "$varString: $typeString"
+                    }
+                } else {
+                    logger.error("""
                 subtype variable does not match `{:var, _, _}`
 
                 ```elixir
@@ -383,15 +422,15 @@ sealed class TypeSpecification {
                 ```
                 """.trimIndent())
 
-                null
-            }
+                    null
+                }
 
         private fun funToString(arguments: OtpErlangObject): String? =
-                if (arguments is OtpErlangList && arguments.arity() == 2) {
-                    "(${toString(arguments.elementAt(0))} -> ${toString(arguments.elementAt(1))})"
+                if (arguments is OtpErlangList) {
+                    funToString(arguments)
                 } else {
                     logger.error("""
-                    fun does not match `[_, _]`.
+                    fun does not match `list()`.
 
                     ## arguments
 
@@ -401,6 +440,25 @@ sealed class TypeSpecification {
                     """.trimIndent())
 
                     null
+                }
+
+        private fun funToString(arguments: OtpErlangList): String? =
+                when (arguments.arity()) {
+                    0 -> "(... -> any())"
+                    2 -> "(${toString(arguments.elementAt(0))} -> ${toString(arguments.elementAt(1))})"
+                    else -> {
+                        logger.error("""
+                            fun arguments does not match `[]` or `[inputs :: term(), output :: term()]`.
+
+                            ## arguments
+
+                            ```
+                            ${inspect(arguments)}
+                            ```
+                            """.trimIndent())
+
+                        null
+                    }
                 }
 
         private fun listToString(arguments: OtpErlangObject): String? =
@@ -428,12 +486,78 @@ sealed class TypeSpecification {
                 if (arguments is OtpErlangAtom && arguments.atomValue() == "any") {
                     "map()"
                 } else if (arguments is OtpErlangList) {
-                    "%{${argumentsToString(arguments)}}"
+                    mapToString(arguments)
                 } else {
                     logger.error("""
                     map does not match `:any` or `list()`.
 
                     ## arguments
+
+                    ```elixir
+                    ${inspect(arguments)}
+                    ```
+                    """.trimIndent())
+
+                    null
+                }
+
+        private fun mapToString(arguments: OtpErlangList): String? {
+            val mapFieldList = arguments.mapNotNull { MapField.from(it) }
+
+            return if (mapFieldList.size == arguments.arity()) {
+                if (mapFieldList.any { it is MapFieldOptional || it is MapFieldRequiredNonAtom }) {
+                    associationMapToString(mapFieldList)
+                } else {
+                    val mapFieldStruct = mapFieldList.mapNotNull { it as? MapFieldStruct }.singleOrNull()
+
+                    if (mapFieldStruct != null) {
+                        val mapFieldRequiredAtoms =
+                                mapFieldList
+                                        .filter { it !is MapFieldStruct }
+                                        .map { it as MapFieldRequiredAtom }
+
+                        structToString(mapFieldStruct, mapFieldRequiredAtoms)
+                    } else {
+                        keywordMapToString(mapFieldList.map { it as MapFieldRequiredAtom })
+                    }
+                }
+            } else {
+                null
+            }
+        }
+
+        private fun associationMapToString(associations: List<MapField>): String =
+                "%{${associationsToString(associations)}}"
+
+        private fun associationsToString(associations: List<MapField>): String =
+                associations.joinToString(", ") { associationToString(it) }
+
+        private fun associationToString(association: MapField): String =
+                when (association) {
+                    is MapFieldRequiredAtom -> "required(${inspect(association.name)}) => ${toString(association.value)}"
+                    is MapFieldStruct -> "required(:__struct__) => ${toString(association.value)}"
+                    is MapFieldRequiredNonAtom -> "required(${toString(association.name)}) => ${toString(association.value)}"
+                    is MapFieldOptional -> "optional(${toString(association.name)}) => ${toString(association.value)}"
+                }
+
+        private fun structToString(mapFieldStruct: MapFieldStruct, mapFieldRequiredAtoms: List<MapFieldRequiredAtom>): String =
+                "%${inspect(mapFieldStruct.value)}{${keywordsToString(mapFieldRequiredAtoms)}}"
+
+        private fun keywordsToString(keywords: List<MapFieldRequiredAtom>): String =
+                keywords.joinToString(", ") { keywordToString(it) }
+
+        private fun keywordToString(keyword: MapFieldRequiredAtom): String =
+                "${Identifier.inspectAsKey(keyword.name)} ${toString(keyword.value)}"
+
+        private fun keywordMapToString(keywords: List<MapFieldRequiredAtom>): String =
+                "%{${keywordsToString(keywords)}}"
+
+        private fun nonEmptyList(arguments: OtpErlangObject): String? =
+                if (arguments is OtpErlangList) {
+                    "[${arguments.joinToString(", ") { toString(it) ?: defaultString() }}, ...]"
+                } else {
+                    logger.error("""
+                    non-empty list elements does not match `list()`.
 
                     ```elixir
                     ${inspect(arguments)}
@@ -565,6 +689,8 @@ sealed class TypeSpecification {
                 when (attributeType) {
                     "callback" -> fromCallback(attributeValue)
                     "export_type" -> fromExportType(attributeValue)
+                    "opaque" -> fromOpaque(attributeValue)
+                    "optional_callbacks" -> fromOptionalCallbacks(attributeValue)
                     "spec" -> fromSpec(attributeValue)
                     "type" -> Type.from(attributeValue)
                     else -> {
@@ -664,6 +790,89 @@ sealed class TypeSpecification {
 
             return exportType
         }
+
+        private fun fromOpaque(attributeValue: OtpErlangObject): Opaque? =
+                if (attributeValue is OtpErlangTuple && attributeValue.arity() == 3) {
+                    fromOpaque(attributeValue.elementAt(0), attributeValue.elementAt(1), attributeValue.elementAt(2))
+                } else {
+                    logger.error("""
+                    @opaque argument does not match `list()`.
+
+                    ## arguments
+
+                    ```elixir
+                    ${inspect(attributeValue)}
+                    ```
+                    """.trimIndent())
+
+                    null
+                }
+
+        private fun fromOpaque(attributeValue: OtpErlangTuple): Opaque? {
+            TODO()
+        }
+
+        private fun fromOptionalCallbacks(attributeValue: OtpErlangObject): OptionalCallback? =
+                if (attributeValue is OtpErlangList) {
+                    fromOptionalCallbacks(attributeValue)
+                } else {
+                    logger.error("""
+                    @optional_callbacks argument does not match `list()`.
+
+                    ## arguments
+
+                    ```
+                    ${inspect(attributeValue)}
+                    ```
+                    """.trimIndent())
+
+                    null
+                }
+
+        private fun fromOptionalCallbacks(attributeValue: OtpErlangList): OptionalCallback =
+                optionalCallbackList(attributeValue).single()
+
+        private fun optionalCallbackList(list: OtpErlangList): List<OptionalCallback> = list.mapNotNull { optionalCallback(it) }
+
+        private fun optionalCallback(entry: OtpErlangObject): OptionalCallback? =
+                if (entry is OtpErlangTuple && entry.arity() == 2) {
+                    optionalCallback(entry.elementAt(0), entry.elementAt(1))
+                } else {
+                    logger.error("""
+                name_arity does not match `{_, _}`.
+
+                ## name_arity
+
+                ```elixir
+                ${inspect(entry)}
+                ```
+                """.trimIndent())
+
+                    null
+                }
+
+        private fun optionalCallback(name: OtpErlangObject, arity: OtpErlangObject): OptionalCallback? =
+                if (name is OtpErlangAtom && arity is OtpErlangLong) {
+                    OptionalCallback(name.atomValue(), arity.intValue())
+                } else {
+                    logger.error("""
+                    name does not match `atom()` and arity does not match `integer()`.
+
+                    ## name
+
+                    ```elixir
+                    ${inspect(name)}
+                    ```
+
+                    ## arity
+
+                    ```elixir
+                    ${inspect(arity)}
+                    ```
+                    """.trimIndent())
+
+                    null
+                }
 
         private fun fromSpec(attributeValue: OtpErlangObject): Specification? =
                 if (attributeValue is OtpErlangTuple && attributeValue.arity() == 2) {
@@ -885,11 +1094,11 @@ object Function {
             }
 
     private fun boundedFunToString(function: String, `fun`: OtpErlangObject, constraints: OtpErlangObject): String? =
-        bodyElementToString(function, `fun`)?.let { bodyElementString ->
-            constraintsToString(constraints)?.let { constraintsString ->
-                "$bodyElementString when $constraintsString"
-            } ?: bodyElementString
-        }
+            bodyElementToString(function, `fun`)?.let { bodyElementString ->
+                constraintsToString(constraints)?.let { constraintsString ->
+                    "$bodyElementString when $constraintsString"
+                } ?: bodyElementString
+            }
 
     private fun constraintsToString(constraints: OtpErlangObject): String? =
             if (constraints is OtpErlangList) {
@@ -952,6 +1161,58 @@ data class Callback(val function: String, val arity: Long, val body: OtpErlangOb
 
 data class ExportType(val name: String, val arity: Int) : TypeSpecification()
 
+object Typic {
+    fun <T> from(attributeValue: OtpErlangObject, constructor: (name: String, inputs: OtpErlangList, output: OtpErlangObject) -> T): T? {
+        val type = if (attributeValue is OtpErlangTuple && attributeValue.arity() == 3) {
+            val name = attributeValue.elementAt(0).let { it as? OtpErlangAtom }?.atomValue()
+            val output = attributeValue.elementAt(1)
+            val inputs = attributeValue.elementAt(2).let { it as? OtpErlangList }
+
+            if (name != null && inputs != null) {
+                constructor(name, inputs, output)
+            } else {
+                null
+            }
+        } else {
+            null
+        }
+
+        if (type == null) {
+            logger.error("""
+            typic Does not match `{name :: atom(), output :: term(), inputs :: list()}`
+
+            ## typic
+
+            ```
+            ${inspect(attributeValue)}
+            ```
+            """.trimIndent())
+        }
+
+        return type
+    }
+
+    fun toString(moduleAttributeName: String, name: String, inputs: OtpErlangList, val output: OtpErlangObject): String {
+        val inputsString = TypeSpecification.argumentsToString(inputs)
+        val outputString = TypeSpecification.toString(output)
+
+        return "@$moduleAttributeName $name($inputsString) :: $outputString"
+    }
+}
+
+data class Opaque(val name: String, val inputs: OtpErlangList, val output: OtpErlangObject) : TypeSpecification() {
+    val arity = inputs.arity()
+
+    override fun toString(): String =
+            Typic.toString("@opaque", name, inputs, output)
+
+    companion object {
+        fun from(attributeValue: OtpErlangObject): Opaque? = Typic.from(attributeValue, ::Opaque)
+    }
+}
+
+data class OptionalCallback(val name: String, val arity: Int) : TypeSpecification()
+
 data class Type(val name: String, val inputs: OtpErlangList, val output: OtpErlangObject) : TypeSpecification() {
     val arity = inputs.arity()
 
@@ -962,42 +1223,11 @@ data class Type(val name: String, val inputs: OtpErlangList, val output: OtpErla
             "typep"
         }
 
-        val inputsString = TypeSpecification.argumentsToString(inputs)
-        val outputString = TypeSpecification.toString(output)
-
-        return "@$moduleAttributeName $name($inputsString) :: $outputString"
+        return Typic.toString(moduleAttributeName, name, inputs, output)
     }
 
     companion object {
-        fun from(attributeValue: OtpErlangObject): Type? {
-            val type = if (attributeValue is OtpErlangTuple && attributeValue.arity() == 3) {
-                val name = attributeValue.elementAt(0).let { it as? OtpErlangAtom }?.atomValue()
-                val output = attributeValue.elementAt(1)
-                val inputs = attributeValue.elementAt(2).let { it as? OtpErlangList }
-
-                if (name != null && inputs != null) {
-                    Type(name, inputs, output)
-                } else {
-                    null
-                }
-            } else {
-                null
-            }
-
-            if (type == null) {
-                logger.error("""
-                -type does not match `{name :: atom(), output :: term(), inputs :: list()}`
-
-                ## type
-
-                ```
-                ${inspect(attributeValue)}
-                ```
-                """.trimIndent())
-            }
-
-            return type
-        }
+        fun from(attributeValue: OtpErlangObject): Type? = Typic.from(attributeValue, ::Type)
     }
 }
 

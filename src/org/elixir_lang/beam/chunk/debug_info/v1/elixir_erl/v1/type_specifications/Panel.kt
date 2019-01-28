@@ -10,6 +10,7 @@ import com.intellij.psi.PsiFileFactory
 import com.intellij.util.containers.WeakValueHashMap
 import org.elixir_lang.ElixirFileType
 import org.elixir_lang.ElixirLanguage
+import org.elixir_lang.NameArity
 import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.V1
 import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.TypeSpecifications
 import java.awt.GridLayout
@@ -42,6 +43,13 @@ class Panel(private val typeSpecificationTree: Tree, project: Project) : JPanel(
     @Suppress("DEPRECATION")
     private val callbackStringByCallback = WeakValueHashMap<Callback, String>()
 
+    private var optionalCallbacksModuleString: WeakReference<String> = WeakReference<String>(null)
+    private var optionalCallbacksString: WeakReference<String> = WeakReference<String>(null)
+    @Suppress("DEPRECATION")
+    private val optionalCallbackModuleStringByOptionalCallback = WeakValueHashMap<OptionalCallback, String>()
+    @Suppress("DEPRECATION")
+    private val optionalCallbackStringByOptionalCallback = WeakValueHashMap<OptionalCallback, String>()
+
     private var specificationsModuleString: WeakReference<String> = WeakReference<String>(null)
     private var specificationsString: WeakReference<String> = WeakReference<String>(null)
     @Suppress("DEPRECATION")
@@ -63,6 +71,8 @@ class Panel(private val typeSpecificationTree: Tree, project: Project) : JPanel(
             is Type -> typeModuleString(lastPathComponent, event.path.parentPath.parentPath.lastPathComponent as V1)
             is Callbacks -> callbacksModuleString(lastPathComponent, event.path.parentPath.lastPathComponent as V1)
             is Callback -> callbackModuleString(lastPathComponent, event.path.parentPath.parentPath.lastPathComponent as V1)
+            is OptionalCallbacks -> optionalCallbacksModuleString(lastPathComponent, event.path.parentPath.lastPathComponent as V1)
+            is OptionalCallback -> optionalCallbackModuleString(lastPathComponent, event.path.parentPath.parentPath.lastPathComponent as V1)
             is Specifications -> specificationsModuleString(lastPathComponent, event.path.parentPath.lastPathComponent as V1)
             is Specification -> specificationModuleString(lastPathComponent, event.path.parentPath.parentPath.lastPathComponent as V1)
             else -> DEFAULT_TEXT
@@ -85,6 +95,7 @@ class Panel(private val typeSpecificationTree: Tree, project: Project) : JPanel(
                 arrayOf(
                         typesString(typeSpecifications.types),
                         callbacksString(typeSpecifications.callbacks),
+                        optionalCallbacksString(typeSpecifications.optionalCallbacks),
                         specificationsString(typeSpecifications.specifications)
                 )
                         .filter { it.isNotBlank() }
@@ -169,11 +180,11 @@ class Panel(private val typeSpecificationTree: Tree, project: Project) : JPanel(
         return if (callbacksString != null) {
             callbacksString
         } else {
-            val callbackSpecificationTreeModel = typeSpecificationTree.model
-            val callbackCount = callbackSpecificationTreeModel.getChildCount(callbacks)
+            val typeSpecificationTreeModel = typeSpecificationTree.model
+            val callbackCount = typeSpecificationTreeModel.getChildCount(callbacks)
 
             val newCallbacksString = (0 until callbackCount).joinToString("\n\n") { index ->
-                val callback = callbackSpecificationTreeModel.getChild(callbacks, index) as Callback
+                val callback = typeSpecificationTreeModel.getChild(callbacks, index) as Callback
 
                 callbackString(callback)
             }
@@ -193,6 +204,63 @@ class Panel(private val typeSpecificationTree: Tree, project: Project) : JPanel(
 
     private fun callbackString(callback: Callback): String =
             callbackStringByCallback.computeIfAbsent(callback, Callback::toString)
+
+    private fun optionalCallbacksModuleString(optionalCallbacks: OptionalCallbacks, debugInfo: V1): String {
+        val optionalCallbacksModuleString = this.optionalCallbacksModuleString.get()
+
+        return if (optionalCallbacksModuleString != null) {
+            optionalCallbacksModuleString
+        } else {
+            val newOptionalCallbacksModuleString = debugInfo.moduleContext {
+                optionalCallbacksString(optionalCallbacks)
+            }
+
+            this.optionalCallbacksModuleString = WeakReference(newOptionalCallbacksModuleString)
+
+            newOptionalCallbacksModuleString
+        }
+    }
+
+    private fun optionalCallbacksString(optionalCallbacks: OptionalCallbacks): String {
+        val optionalCallbacksString = this.optionalCallbacksString.get()
+
+        return if (optionalCallbacksString != null) {
+            optionalCallbacksString
+        } else {
+            val typeSpecificationTreeModel = typeSpecificationTree.model
+            val optionalCallbackCount = typeSpecificationTreeModel.getChildCount(optionalCallbacks)
+
+            val newOptionalCallbacksString =
+                    if (optionalCallbackCount > 0) {
+                        (0 until optionalCallbackCount)
+                                .joinToString(",\n                    ") { index ->
+                                    val optionalCallback = typeSpecificationTreeModel.getChild(optionalCallbacks, index) as OptionalCallback
+
+                                    optionalCallbackString(optionalCallback)
+                                }.let {
+                                    "@optional_callbacks $it"
+                                }
+                    } else {
+                        ""
+                    }
+
+            this.optionalCallbacksString = WeakReference(newOptionalCallbacksString)
+
+            newOptionalCallbacksString
+        }
+    }
+
+    private fun optionalCallbackModuleString(optionalCallback: OptionalCallback, debugInfo: V1): String =
+            optionalCallbackModuleStringByOptionalCallback.computeIfAbsent(optionalCallback) { key ->
+                debugInfo.moduleContext {
+                    "@optional_callbacks ${optionalCallbackString(optionalCallback)}"
+                }
+            }
+
+    private fun optionalCallbackString(optionalCallback: OptionalCallback): String =
+            optionalCallbackStringByOptionalCallback.computeIfAbsent(optionalCallback) {
+                "${it.name}: ${it.arity}"
+            }
 
     private fun specificationsModuleString(specifications: Specifications, debugInfo: V1): String {
         val specificationsModuleString = this.specificationsModuleString.get()

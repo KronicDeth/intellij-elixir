@@ -11,6 +11,12 @@ class TypeSpecifications(private val typeSpecificationList: List<TypeSpecificati
                 .let { Callbacks(it) }
     }
 
+    val optionalCallbacks: OptionalCallbacks by lazy {
+        typeSpecificationList
+                .mapNotNull { it as? OptionalCallback }
+                .let { OptionalCallbacks(it) }
+    }
+
     val specifications: Specifications by lazy {
         typeSpecificationList
                 .mapNotNull { it as? Specification }
