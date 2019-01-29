@@ -30,6 +30,12 @@ class TypeSpecifications(private val typeSpecificationList: List<TypeSpecificati
                 .let { Types(it) }
     }
 
+    val opaques: Opaques by lazy {
+        typeSpecificationList
+                .mapNotNull { it as? Opaque }
+                .let { Opaques(it) }
+    }
+
     operator fun get(index: Int) = typeSpecificationList.get(index)
     fun indexOf(typeSpecification: TypeSpecification): Int = typeSpecificationList.indexOf(typeSpecification)
     fun size() = typeSpecificationList.size

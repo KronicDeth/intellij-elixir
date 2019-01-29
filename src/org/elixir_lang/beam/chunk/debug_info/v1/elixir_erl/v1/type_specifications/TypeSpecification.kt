@@ -687,313 +687,17 @@ sealed class TypeSpecification {
                 attributeValue: OtpErlangObject
         ): TypeSpecification? =
                 when (attributeType) {
-                    "callback" -> fromCallback(attributeValue)
-                    "export_type" -> fromExportType(attributeValue)
-                    "opaque" -> fromOpaque(attributeValue)
-                    "optional_callbacks" -> fromOptionalCallbacks(attributeValue)
-                    "spec" -> fromSpec(attributeValue)
+                    "callback" -> Callback.from(attributeValue)
+                    "export_type" -> ExportType.from(attributeValue)
+                    "opaque" -> Opaque.from(attributeValue)
+                    "optional_callbacks" -> OptionalCallback.from(attributeValue)
+                    "spec" -> Specification.from(attributeValue)
                     "type" -> Type.from(attributeValue)
                     else -> {
                         logger.error("Don't know how to convert attribute type $attributeType to TypeSpecification")
 
                         null
                     }
-                }
-
-        private fun fromCallback(attributeValue: OtpErlangObject): Callback? =
-                if (attributeValue is OtpErlangTuple && attributeValue.arity() == 2) {
-                    fromCallback(attributeValue.elementAt(0), attributeValue.elementAt(1))
-                } else {
-                    logger.error("""
-                    @callback does not match `{_, _}`
-
-                    ```elixir
-                    ${attributeValue}
-                    ```
-                    """.trimIndent())
-
-                    null
-                }
-
-        private fun fromCallback(head: OtpErlangObject, body: OtpErlangObject): Callback? =
-                if (head is OtpErlangTuple && head.arity() == 2 && body is OtpErlangList) {
-                    fromCallback(head.elementAt(0), head.elementAt(1), body)
-                } else {
-                    logger.error("""
-                    Does not match `{head :: {_, _}, body :: list()}`
-
-                    ## head
-
-                    ```elixir
-                    ${inspect(head)}
-                    ```
-
-                    ## body
-
-                    ```elixir
-                    ${inspect(body)}
-                    ```
-                    """.trimIndent())
-
-                    null
-                }
-
-        private fun fromCallback(function: OtpErlangObject, arity: OtpErlangObject, body: OtpErlangList): Callback? =
-                if (function is OtpErlangAtom && arity is OtpErlangLong) {
-                    Callback(function = function.atomValue(), arity = arity.longValue(), body = body)
-                } else {
-                    logger.error("""
-                    head does not match `{function :: atom(), arity :: non_neg_integer()}`
-
-                    ## function
-
-                    ```elixir
-                    ${inspect(function)}
-                    ```
-
-                    ## arity
-
-                    ```elixir
-                    ${inspect(arity)}
-                    ```
-                    """.trimIndent())
-
-                    null
-                }
-
-        private fun fromExportType(attributeValue: OtpErlangObject): ExportType? {
-            val exportType = if (attributeValue is OtpErlangList && attributeValue.arity() == 1) {
-                attributeValue.elementAt(0).let { it as? OtpErlangTuple }?.let { prop ->
-                    val (key, value) = prop
-
-                    if (key is OtpErlangAtom && value is OtpErlangLong) {
-                        ExportType(key.atomValue(), value.intValue())
-                    } else {
-                        null
-                    }
-                }
-            } else {
-                null
-            }
-
-            if (exportType == null) {
-                logger.error("""
-                -export_type does no match `[{name :: atom(), arity :: non_neg_integer()}]`
-
-                ## export type
-
-                ```
-                ${inspect(attributeValue)}
-                ```
-                """.trimIndent())
-            }
-
-            return exportType
-        }
-
-        private fun fromOpaque(attributeValue: OtpErlangObject): Opaque? =
-                if (attributeValue is OtpErlangTuple && attributeValue.arity() == 3) {
-                    fromOpaque(attributeValue.elementAt(0), attributeValue.elementAt(1), attributeValue.elementAt(2))
-                } else {
-                    logger.error("""
-                    @opaque argument does not match `list()`.
-
-                    ## arguments
-
-                    ```elixir
-                    ${inspect(attributeValue)}
-                    ```
-                    """.trimIndent())
-
-                    null
-                }
-
-        private fun fromOpaque(attributeValue: OtpErlangTuple): Opaque? {
-            TODO()
-        }
-
-        private fun fromOptionalCallbacks(attributeValue: OtpErlangObject): OptionalCallback? =
-                if (attributeValue is OtpErlangList) {
-                    fromOptionalCallbacks(attributeValue)
-                } else {
-                    logger.error("""
-                    @optional_callbacks argument does not match `list()`.
-
-                    ## arguments
-
-                    ```
-                    ${inspect(attributeValue)}
-                    ```
-                    """.trimIndent())
-
-                    null
-                }
-
-        private fun fromOptionalCallbacks(attributeValue: OtpErlangList): OptionalCallback =
-                optionalCallbackList(attributeValue).single()
-
-        private fun optionalCallbackList(list: OtpErlangList): List<OptionalCallback> = list.mapNotNull { optionalCallback(it) }
-
-        private fun optionalCallback(entry: OtpErlangObject): OptionalCallback? =
-                if (entry is OtpErlangTuple && entry.arity() == 2) {
-                    optionalCallback(entry.elementAt(0), entry.elementAt(1))
-                } else {
-                    logger.error("""
-                name_arity does not match `{_, _}`.
-
-                ## name_arity
-
-                ```elixir
-                ${inspect(entry)}
-                ```
-                """.trimIndent())
-
-                    null
-                }
-
-        private fun optionalCallback(name: OtpErlangObject, arity: OtpErlangObject): OptionalCallback? =
-                if (name is OtpErlangAtom && arity is OtpErlangLong) {
-                    OptionalCallback(name.atomValue(), arity.intValue())
-                } else {
-                    logger.error("""
-                    name does not match `atom()` and arity does not match `integer()`.
-
-                    ## name
-
-                    ```elixir
-                    ${inspect(name)}
-                    ```
-
-                    ## arity
-
-                    ```elixir
-                    ${inspect(arity)}
-                    ```
-                    """.trimIndent())
-
-                    null
-                }
-
-        private fun fromSpec(attributeValue: OtpErlangObject): Specification? =
-                if (attributeValue is OtpErlangTuple && attributeValue.arity() == 2) {
-                    val (head, body) = attributeValue
-                    fromSpec(head, body)
-                } else {
-                    logger.error("""
-                                 Function specification attribute value is not a 2-tuple.
-
-                                 ```elixir
-                                 ${inspect(attributeValue)}
-                                 ```
-                                 """.trimIndent())
-                    null
-                }
-
-        private fun fromSpec(head: OtpErlangObject, body: OtpErlangObject): Specification? =
-                if (head is OtpErlangTuple) {
-                    fromSpec(head, body)
-                } else {
-                    logger.error("""
-                                 -spec/@spec head is not a tuple.
-
-                                 ```elixir
-                                 ${inspect(head)}
-                                 ```
-                                 """.trimIndent())
-
-                    null
-                }
-
-        private fun fromSpec(head: OtpErlangTuple, body: OtpErlangObject): Specification? {
-            val arity = head.arity()
-
-            return when (arity) {
-                2 -> {
-                    val (function, arity) = head
-                    fromLocalSpec(function, arity, body)
-                }
-                3 -> {
-                    val (module, function, arity) = head
-                    fromRemoteSpec(module, function, arity, body)
-                }
-                else -> {
-                    logger.error("""
-                                 -spec/@spec head is not a 2-tuple for a local function or a 3-tuple for remote function.
-
-                                 ```elixir
-                                 ${inspect(head)}
-                                 ```
-                                 """.trimIndent())
-
-                    null
-                }
-            }
-        }
-
-        private fun fromLocalSpec(
-                function: OtpErlangObject,
-                arity: OtpErlangObject,
-                body: OtpErlangObject
-        ): Specification? =
-                if (function is OtpErlangAtom && arity is OtpErlangLong) {
-                    Specification(function = function.atomValue(), arity = arity.longValue(), body = body)
-                } else {
-                    logger.error("""
-                                 -spec/@spec head 2-tuple is not `{function :: atom(), arity :: integer()}`:
-
-                                 ### Function
-
-                                 ```elixir
-                                 ${inspect(function)}
-                                 ```
-
-                                 ### Arity
-
-                                 ```elixir
-                                 ${inspect(arity)}
-                                 ```
-                                 """.trimIndent())
-
-                    null
-                }
-
-        private fun fromRemoteSpec(
-                module: OtpErlangObject,
-                function: OtpErlangObject,
-                arity: OtpErlangObject,
-                body: OtpErlangObject
-        ): Specification? =
-                if (module is OtpErlangAtom && function is OtpErlangAtom && arity is OtpErlangLong) {
-                    Specification(
-                            module = module.atomValue(),
-                            function = function.atomValue(),
-                            arity = arity.longValue(),
-                            body = body
-                    )
-                } else {
-                    logger.error("""
-                             -spec/@spec head 3-tuple is not `{module :: atom(), function :: atom(), arity :: integer()}`:
-
-                             ### Module
-
-                             ```elixir
-                             ${inspect(module)}
-                             ```
-
-                             ### Function
-
-                             ```elixir
-                             ${inspect(function)}
-                             ```
-
-                             ### Arity
-
-                             ```elixir
-                             ${inspect(arity)}
-                             ```
-                             """.trimIndent())
-
-                    null
                 }
     }
 }
@@ -1157,9 +861,104 @@ data class Callback(val function: String, val arity: Long, val body: OtpErlangOb
             "@callback $it"
         }
     }
+
+    companion object {
+        fun from(attributeValue: OtpErlangObject): Callback? =
+                if (attributeValue is OtpErlangTuple && attributeValue.arity() == 2) {
+                    from(attributeValue.elementAt(0), attributeValue.elementAt(1))
+                } else {
+                    logger.error("""
+                    @callback does not match `{_, _}`
+
+                    ```elixir
+                    ${attributeValue}
+                    ```
+                    """.trimIndent())
+
+                    null
+                }
+
+        private fun from(head: OtpErlangObject, body: OtpErlangObject): Callback? =
+                if (head is OtpErlangTuple && head.arity() == 2 && body is OtpErlangList) {
+                    from(head.elementAt(0), head.elementAt(1), body)
+                } else {
+                    logger.error("""
+                    Does not match `{head :: {_, _}, body :: list()}`
+
+                    ## head
+
+                    ```elixir
+                    ${inspect(head)}
+                    ```
+
+                    ## body
+
+                    ```elixir
+                    ${inspect(body)}
+                    ```
+                    """.trimIndent())
+
+                    null
+                }
+
+        private fun from(function: OtpErlangObject, arity: OtpErlangObject, body: OtpErlangList): Callback? =
+                if (function is OtpErlangAtom && arity is OtpErlangLong) {
+                    Callback(function = function.atomValue(), arity = arity.longValue(), body = body)
+                } else {
+                    logger.error("""
+                    head does not match `{function :: atom(), arity :: non_neg_integer()}`
+
+                    ## function
+
+                    ```elixir
+                    ${inspect(function)}
+                    ```
+
+                    ## arity
+
+                    ```elixir
+                    ${inspect(arity)}
+                    ```
+                    """.trimIndent())
+
+                    null
+                }
+    }
 }
 
-data class ExportType(val name: String, val arity: Int) : TypeSpecification()
+data class ExportType(val name: String, val arity: Int) : TypeSpecification() {
+    companion object {
+        fun from(attributeValue: OtpErlangObject): ExportType? {
+            val exportType = if (attributeValue is OtpErlangList && attributeValue.arity() == 1) {
+                attributeValue.elementAt(0).let { it as? OtpErlangTuple }?.let { prop ->
+                    val (key, value) = prop
+
+                    if (key is OtpErlangAtom && value is OtpErlangLong) {
+                        ExportType(key.atomValue(), value.intValue())
+                    } else {
+                        null
+                    }
+                }
+            } else {
+                null
+            }
+
+            if (exportType == null) {
+                logger.error("""
+                -export_type does no match `[{name :: atom(), arity :: non_neg_integer()}]`
+
+                ## export type
+
+                ```
+                ${inspect(attributeValue)}
+                ```
+                """.trimIndent())
+            }
+
+            return exportType
+        }
+    }
+}
 
 object Typic {
     fun <T> from(attributeValue: OtpErlangObject, constructor: (name: String, inputs: OtpErlangList, output: OtpErlangObject) -> T): T? {
@@ -1192,7 +991,7 @@ object Typic {
         return type
     }
 
-    fun toString(moduleAttributeName: String, name: String, inputs: OtpErlangList, val output: OtpErlangObject): String {
+    fun toString(moduleAttributeName: String, name: String, inputs: OtpErlangList, output: OtpErlangObject): String {
         val inputsString = TypeSpecification.argumentsToString(inputs)
         val outputString = TypeSpecification.toString(output)
 
@@ -1204,30 +1003,76 @@ data class Opaque(val name: String, val inputs: OtpErlangList, val output: OtpEr
     val arity = inputs.arity()
 
     override fun toString(): String =
-            Typic.toString("@opaque", name, inputs, output)
+            Typic.toString("opaque", name, inputs, output)
 
     companion object {
         fun from(attributeValue: OtpErlangObject): Opaque? = Typic.from(attributeValue, ::Opaque)
     }
 }
 
-data class OptionalCallback(val name: String, val arity: Int) : TypeSpecification()
-
-data class Type(val name: String, val inputs: OtpErlangList, val output: OtpErlangObject) : TypeSpecification() {
-    val arity = inputs.arity()
-
-    fun toString(typeSpecifications: TypeSpecifications): String {
-        val moduleAttributeName = if (typeSpecifications.isExported(name, arity)) {
-            "type"
-        } else {
-            "typep"
-        }
-
-        return Typic.toString(moduleAttributeName, name, inputs, output)
-    }
-
+data class OptionalCallback(val name: String, val arity: Int) : TypeSpecification() {
     companion object {
-        fun from(attributeValue: OtpErlangObject): Type? = Typic.from(attributeValue, ::Type)
+        fun from(attributeValue: OtpErlangObject): OptionalCallback? =
+                if (attributeValue is OtpErlangList) {
+                    from(attributeValue)
+                } else {
+                    logger.error("""
+                    @optional_callbacks argument does not match `list()`.
+
+                    ## arguments
+
+                    ```
+                    ${inspect(attributeValue)}
+                    ```
+                    """.trimIndent())
+
+                    null
+                }
+
+        private fun from(attributeValue: OtpErlangList): OptionalCallback =
+                optionalCallbackList(attributeValue).single()
+
+        private fun optionalCallbackList(list: OtpErlangList): List<OptionalCallback> = list.mapNotNull { optionalCallback(it) }
+
+        private fun optionalCallback(entry: OtpErlangObject): OptionalCallback? =
+                if (entry is OtpErlangTuple && entry.arity() == 2) {
+                    optionalCallback(entry.elementAt(0), entry.elementAt(1))
+                } else {
+                    logger.error("""
+                name_arity does not match `{_, _}`.
+
+                ## name_arity
+
+                ```elixir
+                ${inspect(entry)}
+                ```
+                """.trimIndent())
+
+                    null
+                }
+
+        private fun optionalCallback(name: OtpErlangObject, arity: OtpErlangObject): OptionalCallback? =
+                if (name is OtpErlangAtom && arity is OtpErlangLong) {
+                    OptionalCallback(name.atomValue(), arity.intValue())
+                } else {
+                    logger.error("""
+                    name does not match `atom()` and arity does not match `integer()`.
+
+                    ## name
+
+                    ```elixir
+                    ${inspect(name)}
+                    ```
+
+                    ## arity
+
+                    ```elixir
+                    ${inspect(arity)}
+                    ```
+                    """.trimIndent())
+
+                    null
+                }
     }
 }
 
@@ -1258,6 +1103,148 @@ data class Specification(
     private fun modulePrefixString(): String =
             module?.let { ":$it." }
                     ?: ""
+
+    companion object {
+        fun from(attributeValue: OtpErlangObject): Specification? =
+                if (attributeValue is OtpErlangTuple && attributeValue.arity() == 2) {
+                    val (head, body) = attributeValue
+                    from(head, body)
+                } else {
+                    logger.error("""
+                    Function specification attribute value is not a 2-tuple.
+
+                    ```elixir
+                    ${inspect(attributeValue)}
+                    ```
+                    """.trimIndent())
+                    null
+                }
+
+        private fun from(head: OtpErlangObject, body: OtpErlangObject): Specification? =
+                if (head is OtpErlangTuple) {
+                    from(head, body)
+                } else {
+                    logger.error("""
+                    -spec/@spec head is not a tuple.
+
+                    ```elixir
+                    ${inspect(head)}
+                    ```
+                    """.trimIndent())
+
+                    null
+                }
+
+        private fun from(head: OtpErlangTuple, body: OtpErlangObject): Specification? {
+            val arity = head.arity()
+
+            return when (arity) {
+                2 -> {
+                    val (function, arity) = head
+                    fromLocal(function, arity, body)
+                }
+                3 -> {
+                    val (module, function, arity) = head
+                    fromRemote(module, function, arity, body)
+                }
+                else -> {
+                    logger.error("""
+                    -spec/@spec head is not a 2-tuple for a local function or a 3-tuple for remote function.
+
+                    ```elixir
+                    ${inspect(head)}
+                    ```
+                    """.trimIndent())
+
+                    null
+                }
+            }
+        }
+
+        private fun fromLocal(
+                function: OtpErlangObject,
+                arity: OtpErlangObject,
+                body: OtpErlangObject
+        ): Specification? =
+                if (function is OtpErlangAtom && arity is OtpErlangLong) {
+                    Specification(function = function.atomValue(), arity = arity.longValue(), body = body)
+                } else {
+                    logger.error("""
+                    -spec/@spec head 2-tuple is not `{function :: atom(), arity :: integer()}`:
+
+                    ### Function
+
+                    ```elixir
+                    ${inspect(function)}
+                    ```
+
+                    ### Arity
+
+                    ```elixir
+                    ${inspect(arity)}
+                    ```
+                    """.trimIndent())
+
+                    null
+                }
+
+        private fun fromRemote(
+                module: OtpErlangObject,
+                function: OtpErlangObject,
+                arity: OtpErlangObject,
+                body: OtpErlangObject
+        ): Specification? =
+                if (module is OtpErlangAtom && function is OtpErlangAtom && arity is OtpErlangLong) {
+                    Specification(
+                            module = module.atomValue(),
+                            function = function.atomValue(),
+                            arity = arity.longValue(),
+                            body = body
+                    )
+                } else {
+                    logger.error("""
+                    -spec/@spec head 3-tuple is not `{module :: atom(), function :: atom(), arity :: integer()}`:
+
+                    ### Module
+
+                    ```elixir
+                    ${inspect(module)}
+                    ```
+
+                    ### Function
+
+                    ```elixir
+                    ${inspect(function)}
+                    ```
+
+                    ### Arity
+
+                    ```elixir
+                    ${inspect(arity)}
+                    ```
+                    """.trimIndent())
+
+                    null
+                }
+    }
+}
+
+data class Type(val name: String, val inputs: OtpErlangList, val output: OtpErlangObject) : TypeSpecification() {
+    val arity = inputs.arity()
+
+    fun toString(typeSpecifications: TypeSpecifications): String {
+        val moduleAttributeName = if (typeSpecifications.isExported(name, arity)) {
+            "type"
+        } else {
+            "typep"
+        }
+
+        return Typic.toString(moduleAttributeName, name, inputs, output)
+    }
+
+    companion object {
+        fun from(attributeValue: OtpErlangObject): Type? = Typic.from(attributeValue, ::Type)
+    }
 }
 
 operator fun OtpErlangTuple.component1(): OtpErlangObject = this.elementAt(0)

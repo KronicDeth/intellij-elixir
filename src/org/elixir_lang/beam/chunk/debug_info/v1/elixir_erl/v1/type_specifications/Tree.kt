@@ -22,6 +22,8 @@ class Tree(model: TreeModel): JTree(model) {
             is V1 -> value.inspectedModule ?: "?"
             is Types -> "@type"
             is Type -> "${value.name}/${value.arity}"
+            is Opaques -> "@opaque"
+            is Opaque -> "${value.name}/${value.arity}"
             is Callbacks -> "@callback"
             is Callback -> "${value.function}/${value.arity}"
             is OptionalCallbacks -> "@optional_callbacks"

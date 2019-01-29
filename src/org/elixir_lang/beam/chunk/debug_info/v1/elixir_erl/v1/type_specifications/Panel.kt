@@ -10,7 +10,6 @@ import com.intellij.psi.PsiFileFactory
 import com.intellij.util.containers.WeakValueHashMap
 import org.elixir_lang.ElixirFileType
 import org.elixir_lang.ElixirLanguage
-import org.elixir_lang.NameArity
 import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.V1
 import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.TypeSpecifications
 import java.awt.GridLayout
@@ -35,6 +34,13 @@ class Panel(private val typeSpecificationTree: Tree, project: Project) : JPanel(
     private val typeModuleStringByType = WeakValueHashMap<Type, String>()
     @Suppress("DEPRECATION")
     private val typeStringByType = WeakValueHashMap<Type, String>()
+
+    private var opaquesModuleString: WeakReference<String> = WeakReference<String>(null)
+    private var opaquesString: WeakReference<String> = WeakReference<String>(null)
+    @Suppress("DEPRECATION")
+    private val opaqueModuleStringByOpaque = WeakValueHashMap<Opaque, String>()
+    @Suppress("DEPRECATION")
+    private val opaqueStringByOpaque = WeakValueHashMap<Opaque, String>()
 
     private var callbacksModuleString: WeakReference<String> = WeakReference<String>(null)
     private var callbacksString: WeakReference<String> = WeakReference<String>(null)
@@ -69,6 +75,8 @@ class Panel(private val typeSpecificationTree: Tree, project: Project) : JPanel(
             is V1 -> moduleString(lastPathComponent)
             is Types -> typesModuleString(lastPathComponent, event.path.parentPath.lastPathComponent as V1)
             is Type -> typeModuleString(lastPathComponent, event.path.parentPath.parentPath.lastPathComponent as V1)
+            is Opaques -> opaquesModuleString(lastPathComponent, event.path.parentPath.lastPathComponent as V1)
+            is Opaque -> opaqueModuleString(lastPathComponent, event.path.parentPath.parentPath.lastPathComponent as V1)
             is Callbacks -> callbacksModuleString(lastPathComponent, event.path.parentPath.lastPathComponent as V1)
             is Callback -> callbackModuleString(lastPathComponent, event.path.parentPath.parentPath.lastPathComponent as V1)
             is OptionalCallbacks -> optionalCallbacksModuleString(lastPathComponent, event.path.parentPath.lastPathComponent as V1)
@@ -94,6 +102,7 @@ class Panel(private val typeSpecificationTree: Tree, project: Project) : JPanel(
 
                 arrayOf(
                         typesString(typeSpecifications.types),
+                        opaquesString(typeSpecifications.opaques),
                         callbacksString(typeSpecifications.callbacks),
                         optionalCallbacksString(typeSpecifications.optionalCallbacks),
                         specificationsString(typeSpecifications.specifications)
@@ -156,6 +165,55 @@ class Panel(private val typeSpecificationTree: Tree, project: Project) : JPanel(
     private fun typeString(type: Type, typeSpecifications: TypeSpecifications): String =
             typeStringByType.computeIfAbsent(type) { key ->
                 key.toString(typeSpecifications)
+            }
+
+    private fun opaquesModuleString(opaques: Opaques, debugInfo: V1): String {
+        val opaquesModuleString = this.opaquesModuleString.get()
+
+        return if (opaquesModuleString != null) {
+            opaquesModuleString
+        } else {
+            val newOpaquesModuleString = debugInfo.moduleContext {
+                opaquesString(opaques)
+            }
+
+            this.opaquesModuleString = WeakReference(newOpaquesModuleString)
+
+            newOpaquesModuleString
+        }
+    }
+
+    private fun opaquesString(opaques: Opaques): String {
+        val opaquesString = this.opaquesString.get()
+
+        return if (opaquesString != null) {
+            opaquesString
+        } else {
+            val typeSpecificationTreeModel = typeSpecificationTree.model
+            val opaqueCount = typeSpecificationTreeModel.getChildCount(opaques)
+
+            val newOpaquesString = (0 until opaqueCount).joinToString("\n\n") { index ->
+                val opaque = typeSpecificationTreeModel.getChild(opaques, index) as Opaque
+
+                opaqueString(opaque)
+            }
+
+            this.opaquesString = WeakReference(newOpaquesString)
+
+            newOpaquesString
+        }
+    }
+
+    private fun opaqueModuleString(opaque: Opaque, debugInfo: V1): String =
+            opaqueModuleStringByOpaque.computeIfAbsent(opaque) { key ->
+                debugInfo.moduleContext {
+                    opaqueString(opaque)
+                }
+            }
+
+    private fun opaqueString(opaque: Opaque): String =
+            opaqueStringByOpaque.computeIfAbsent(opaque) { key ->
+                key.toString()
             }
 
     private fun callbacksModuleString(callbacks: Callbacks, debugInfo: V1): String {

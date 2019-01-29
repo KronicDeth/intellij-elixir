@@ -18,12 +18,14 @@ class Model(private val debugInfo: V1): TreeModel {
             is V1 ->
                 when (index) {
                     0 -> parent.typeSpecifications?.types
-                    1 -> parent.typeSpecifications?.callbacks
-                    2 -> parent.typeSpecifications?.optionalCallbacks
-                    3 -> parent.typeSpecifications?.specifications
+                    1 -> parent.typeSpecifications?.opaques
+                    2 -> parent.typeSpecifications?.callbacks
+                    3 -> parent.typeSpecifications?.optionalCallbacks
+                    4 -> parent.typeSpecifications?.specifications
                     else -> null
                 }
             is Types -> parent[index]
+            is Opaques -> parent[index]
             is Callbacks -> parent[index]
             is OptionalCallbacks -> parent[index]
             is Specifications -> parent[index]
@@ -32,8 +34,9 @@ class Model(private val debugInfo: V1): TreeModel {
 
     override fun getChildCount(parent: Any?): Int =
             when (parent) {
-                is V1 -> 3
+                is V1 -> 5
                 is Types -> parent.size()
+                is Opaques -> parent.size()
                 is Callbacks -> parent.size()
                 is OptionalCallbacks -> parent.size()
                 is Specifications -> parent.size()
@@ -45,12 +48,14 @@ class Model(private val debugInfo: V1): TreeModel {
             is V1 ->
                 when (child) {
                     is Types -> 0
-                    is Callbacks -> 1
-                    is OptionalCallbacks -> 2
-                    is Specifications -> 3
+                    is Opaques -> 1
+                    is Callbacks -> 2
+                    is OptionalCallbacks -> 3
+                    is Specifications -> 4
                     else -> 0
                 }
             is Types -> parent.indexOf(child as Type)
+            is Opaques -> parent.indexOf(child as Opaque)
             is Callbacks -> parent.indexOf(child as Callback)
             is OptionalCallbacks -> parent.indexOf(child as OptionalCallback)
             is Specifications -> parent.indexOf(child as Specification)
@@ -63,6 +68,7 @@ class Model(private val debugInfo: V1): TreeModel {
         when (node) {
             is V1 -> false
             is Types -> node.size() == 0
+            is Opaques -> node.size() == 0
             is Callbacks -> node.size() == 0
             is OptionalCallbacks -> node.size() == 0
             is Specifications -> node.size() == 0
