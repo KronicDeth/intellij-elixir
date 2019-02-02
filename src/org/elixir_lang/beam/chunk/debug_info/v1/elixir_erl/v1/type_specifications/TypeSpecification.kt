@@ -214,7 +214,7 @@ sealed class TypeSpecification {
                     val variable = annotation.elementAt(2)
 
                     if (variable is OtpErlangAtom) {
-                        variable
+                        Macro.variable(variable)
                     } else {
                         logger.error("""
                         Annotation did not match `{:var, _, variable :: atom()}`.
