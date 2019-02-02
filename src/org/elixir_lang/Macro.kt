@@ -517,9 +517,15 @@ object Macro {
                                 " $operatorAtomValue "
                             }
 
-                            operandToString(left, operatorAtomValue, Identifier.Associativity.LEFT) +
+                            val operationString = operandToString(left, operatorAtomValue, Identifier.Associativity.LEFT) +
                                     operatorString +
                                     operandToString(right, operatorAtomValue, Identifier.Associativity.RIGHT)
+
+                            if (operatorAtomValue == "->") {
+                                "($operationString)"
+                            } else {
+                                operationString
+                            }
                         }
                     } else {
                         null
