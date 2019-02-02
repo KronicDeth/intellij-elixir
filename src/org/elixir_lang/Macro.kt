@@ -720,12 +720,14 @@ object Macro {
     private fun ifVariableToString(macro: OtpErlangObject): String? =
             (macro as? OtpErlangTuple)?.let { tuple ->
                 if (tuple.arity() == 3) {
-                    val (variable, _, atom) = tuple
+                    tuple.elementAt(0).let { it as? OtpErlangAtom }?.let { variable ->
+                        val scope = tuple.elementAt(2)
 
-                    if (atom is OtpErlangAtom) {
-                        (variable as OtpErlangAtom).atomValue()
-                    } else {
-                        null
+                        if (scope is OtpErlangAtom || (scope is OtpErlangList && scope.arity() == 1 && scope.elementAt(0) == NIL)) {
+                            variable.atomValue()
+                        } else {
+                            null
+                        }
                     }
                 } else {
                     null
