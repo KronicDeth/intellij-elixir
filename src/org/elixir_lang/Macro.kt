@@ -59,6 +59,8 @@ fun otpErlangList(vararg elements: OtpErlangObject): OtpErlangList = OtpErlangLi
 fun otpErlangList(elements: List<OtpErlangObject>): OtpErlangList = OtpErlangList(elements.toTypedArray())
 
 object Macro {
+    private const val MACRO_CALL_PREFIX = "MACRO-"
+
     val logger = Logger.getInstance(Macro.javaClass)
 
     fun block(expressions: List<OtpErlangObject>): OtpErlangTuple =
@@ -1356,7 +1358,7 @@ object Macro {
 
     private fun ifAtomToString(term: OtpErlangObject): String? =
         when (term) {
-            is OtpErlangAtom -> term.atomValue()
+            is OtpErlangAtom -> term.atomValue().removePrefix(MACRO_CALL_PREFIX)
             else -> null
         }
 
