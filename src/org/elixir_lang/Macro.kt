@@ -7,6 +7,7 @@ import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.definitions.compon
 import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.definitions.component3
 import org.elixir_lang.beam.term.inspect
 import org.elixir_lang.code.Identifier
+import kotlin.collections.List
 
 val binaryOps = arrayOf(
         "===",
@@ -54,8 +55,30 @@ val binaryOps = arrayOf(
         "~~~"
 )
 
+fun otpErlangList(vararg elements: OtpErlangObject): OtpErlangList = OtpErlangList(elements)
+fun otpErlangList(elements: List<OtpErlangObject>): OtpErlangList = OtpErlangList(elements.toTypedArray())
+
 object Macro {
     val logger = Logger.getInstance(Macro.javaClass)
+
+    fun block(expressions: List<OtpErlangObject>): OtpErlangTuple =
+            expr("__block__", otpErlangList(expressions))
+
+    fun expr(function: String, vararg arguments: OtpErlangObject) =
+            expr(function, OtpErlangList(arguments))
+
+    fun expr(function: OtpErlangAtom, vararg arguments: OtpErlangObject) =
+            expr(function = function, metadata = OtpErlangList(), arguments = OtpErlangList(arguments))
+
+    fun expr(function: String, arguments: OtpErlangList) =
+            expr(function = OtpErlangAtom(function), metadata = OtpErlangList(), arguments = arguments)
+
+    fun expr(function: OtpErlangObject, metadata: OtpErlangList = OtpErlangList(), arguments: OtpErlangList) =
+            otpErlangTuple(function, metadata, arguments)
+
+    fun variable(name: String) = expr(name, NIL)
+
+    fun variable(name: OtpErlangAtom) = expr(name, NIL)
 
     fun callArguments(callExpression: OtpErlangTuple): OtpErlangList {
         return callExpression.elementAt(2) as OtpErlangList
@@ -369,11 +392,12 @@ object Macro {
     private fun ifCallToString(macro: OtpErlangObject): String? =
             ifTupleTo(macro, 3) { tuple: OtpErlangTuple ->
                 (tuple.elementAt(2) as? OtpErlangList)?.let {
+                    ifModuleAttributeDefinitionToString(tuple) ?:
                     ifUnaryCallToString(tuple) ?:
-                            ifBinaryCallToString(tuple) ?:
-                            ifSigilCallToString(tuple) ?:
-                            ifDeinlineToString(tuple) ?:
-                            otherCallToString(tuple)
+                    ifBinaryCallToString(tuple) ?:
+                    ifSigilCallToString(tuple) ?:
+                    ifDeinlineToString(tuple) ?:
+                    otherCallToString(tuple)
                 }
             }
 
@@ -503,6 +527,38 @@ object Macro {
                 }
             }
         }
+
+    private fun ifModuleAttributeDefinitionToString(macro: OtpErlangObject): String? =
+            ifTupleTo(macro, 3) { tuple ->
+                (tuple.elementAt(0) as? OtpErlangAtom)?.let { operator ->
+                    if (operator.atomValue() == "@") {
+                        (tuple.elementAt(2) as? OtpErlangList)?.let { arguments ->
+                                if (arguments.arity() == 1) {
+                                    val argument = arguments.elementAt(0)
+
+                                    ifTupleTo(argument, 3) { definition ->
+                                        definition.elementAt(0).let { it as? OtpErlangAtom }?.let { name ->
+                                            definition.elementAt(2).let { it as? OtpErlangList }?.let { values ->
+                                                if (values.arity() == 1) {
+                                                    val value = values.elementAt(0)
+                                                    val valueString = toString(value)
+
+                                                    "@$name $valueString"
+                                                } else {
+                                                    null
+                                                }
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    null
+                                }
+                        }
+                    } else {
+                        null
+                    }
+                }
+            }
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex?utf8=%E2%9C%93#L807-L823
     private fun ifUnaryCallToString(macro: OtpErlangObject): String? =
