@@ -892,27 +892,31 @@ object Macro {
             parentOperator: String,
             side: Identifier.Associativity
     ): String =
-        ifTupleTo(expression, 3) { tuple ->
-            (tuple.elementAt(0) as? OtpErlangAtom)?.let { operator ->
-                (tuple.elementAt(2) as? OtpErlangList)?.let { arguments ->
-                    if (arguments.arity() == 2) {
-                        Identifier.binaryOperator(operator)?.let { (_, precedence) ->
-                            val (parentAssociativity, parentPrecedence) = Identifier.binaryOperator(parentOperator)!!
+            ifTupleTo(expression, 3) { tuple ->
+                (tuple.elementAt(0) as? OtpErlangAtom)?.let { operator ->
+                    (tuple.elementAt(2) as? OtpErlangList)?.let { arguments ->
+                        if (arguments.arity() == 2) {
+                            Identifier.binaryOperator(operator)?.let { (_, precedence) ->
+                                val (parentAssociativity, parentPrecedence) = Identifier.binaryOperator(parentOperator)!!
 
-                            when {
-                                parentPrecedence < precedence -> toString(expression)
-                                parentPrecedence > precedence -> wrapInParenthesis(expression)
-                                parentAssociativity == side -> toString(expression)
-                                else -> wrapInParenthesis(expression)
+                                when {
+                                    parentPrecedence < precedence -> toString(expression)
+                                    parentPrecedence > precedence -> wrapInParenthesis(expression)
+                                    parentAssociativity == side -> toString(expression)
+                                    else -> wrapInParenthesis(expression)
+                                }
                             }
+                        } else {
+                            null
                         }
-                    } else {
-                        null
                     }
                 }
+            } ?:
+            if (parentOperator == "->" && side == Identifier.Associativity.LEFT && expression is OtpErlangList && expression.arity() == 0) {
+                "()"
+            } else {
+                toString(expression)
             }
-        } ?:
-        toString(expression)
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex?utf8=%E2%9C%93#L960-L962
     private fun wrapInParenthesis(expression: OtpErlangObject): String =
