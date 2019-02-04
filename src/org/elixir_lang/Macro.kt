@@ -69,11 +69,17 @@ object Macro {
     fun expr(function: String, vararg arguments: OtpErlangObject) =
             expr(function, OtpErlangList(arguments))
 
+    fun expr(function: String, argumentList: List<OtpErlangObject>) =
+            expr(function, otpErlangList(argumentList))
+
     fun expr(function: OtpErlangAtom, vararg arguments: OtpErlangObject) =
             expr(function = function, metadata = OtpErlangList(), arguments = OtpErlangList(arguments))
 
     fun expr(function: String, arguments: OtpErlangList) =
             expr(function = OtpErlangAtom(function), metadata = OtpErlangList(), arguments = arguments)
+
+    fun expr(function: OtpErlangObject, metadata: OtpErlangList = OtpErlangList(), argumentList: List<OtpErlangObject>) =
+            expr(function, metadata, arguments = otpErlangList(argumentList))
 
     fun expr(function: OtpErlangObject, metadata: OtpErlangList = OtpErlangList(), arguments: OtpErlangList) =
             otpErlangTuple(function, metadata, arguments)

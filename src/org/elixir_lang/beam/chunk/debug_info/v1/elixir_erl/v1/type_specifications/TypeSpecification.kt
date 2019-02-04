@@ -18,12 +18,11 @@ sealed class TypeSpecification {
     companion object {
         private const val FORM_TYPE = "attribute"
 
-        fun argumentsToQuoted(arguments: OtpErlangList): OtpErlangList =
+        fun argumentsToQuoted(arguments: OtpErlangList): List<OtpErlangObject> =
                 arguments
                         .elements()
                         .withIndex()
                         .map { indexedTypeToQuoted(it) }
-                        .let { otpErlangList(it) }
 
         fun argumentsToString(arguments: OtpErlangList): String =
                 arguments.elements().withIndex().joinToString(", ") { indexedTypeToString(it) }
@@ -582,11 +581,11 @@ sealed class TypeSpecification {
                 if (moduleName is OtpErlangAtom && functionName is OtpErlangAtom) {
                     // `:elixir` module types are built-in types in Elixir, but not Erlang
                     if (moduleName.atomValue() == "elixir") {
-                        expr(functionName, argumentsToQuoted(arguments))
+                        expr(function = functionName, argumentList = argumentsToQuoted(arguments))
                     } else {
                         expr(
-                                expr(".", otpErlangList(moduleName, functionName)),
-                                arguments = argumentsToQuoted(arguments)
+                                function = expr(".", otpErlangList(moduleName, functionName)),
+                                argumentList = argumentsToQuoted(arguments)
                         )
                     }
                 } else {
@@ -663,8 +662,7 @@ sealed class TypeSpecification {
                             if (arguments is OtpErlangList) {
                                 expr(
                                         function = name,
-                                        metadata = OtpErlangList(),
-                                        arguments = argumentsToQuoted(arguments)
+                                        argumentList = argumentsToQuoted(arguments)
                                 )
                             } else {
                                 logger.error("""
@@ -948,7 +946,7 @@ sealed class TypeSpecification {
                     if (arguments.arity() == 0) {
                         expr("list")
                     } else {
-                        argumentsToQuoted(arguments)
+                        otpErlangList(argumentsToQuoted(arguments))
                     }
                 } else {
                     logger.error("""
@@ -1280,7 +1278,7 @@ sealed class TypeSpecification {
                     if (arguments.arity() == 2) {
                         otpErlangTuple(argumentsToQuoted(arguments))
                     } else {
-                        expr("{}", arguments = argumentsToQuoted(arguments))
+                        expr(function ="{}", argumentList = argumentsToQuoted(arguments))
                     }
                 } else {
                     logger.error("""
@@ -1357,8 +1355,7 @@ sealed class TypeSpecification {
                 if (name is OtpErlangAtom && arguments is OtpErlangList) {
                     expr(
                             function = name,
-                            metadata = OtpErlangList(),
-                            arguments = argumentsToQuoted(arguments)
+                            argumentList = argumentsToQuoted(arguments)
                     )
                 } else {
                     logger.error("""
