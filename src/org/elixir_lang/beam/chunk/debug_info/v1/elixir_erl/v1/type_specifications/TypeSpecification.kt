@@ -653,6 +653,7 @@ sealed class TypeSpecification {
                         "fun" -> funToQuoted(arguments)
                         "list" -> listToQuoted(arguments)
                         "map" -> mapToQuoted(arguments)
+                        "nil" -> nilToQuoted(arguments)
                         "nonempty_list" -> nonEmptyListToQuoted(arguments)
                         "product" -> productToQuoted(arguments)
                         "range" -> rangeToQuoted(arguments)
@@ -1152,6 +1153,21 @@ sealed class TypeSpecification {
 
         private fun keywordMapToString(keywords: List<MapFieldRequiredAtom>): String =
                 "%{${keywordsToString(keywords)}}"
+
+        private fun nilToQuoted(arguments: OtpErlangObject): OtpErlangList? =
+                if (arguments is OtpErlangList && arguments.arity() == 0) {
+                    OtpErlangList()
+                } else {
+                    logger.error("""
+                    empty list arguments do not match `[]`.
+
+                    ```elixir
+                    ${inspect(arguments)}
+                    ```
+                    """.trimIndent())
+
+                    null
+                }
 
         private fun nonEmptyListToQuoted(arguments: OtpErlangObject): OtpErlangList? =
                 if (arguments is OtpErlangList) {
