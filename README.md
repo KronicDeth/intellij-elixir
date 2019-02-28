@@ -81,7 +81,7 @@ Table of Contents
          * [Delimiters](#delimiters)
             * [Auto-inserting](#auto-inserting)
             * [Matching](#matching)
-         * [Embedded Elixir (EEx) Templates](#embedded-elixir-eex-templates)
+         * [Embedded Elixir (EEx) Templates <a href="/resources/icons/file/eex.svg" target="_blank" rel="noopener noreferrer"><img src="/resources/icons/file/eex.svg" alt="" style="max-width:100\x;"></a>](#embedded-elixir-eex-templates-)
             * [Advanced configuration](#advanced-configuration)
          * [Building/Compiling](#buildingcompiling)
             * [Settings](#settings)
@@ -92,22 +92,22 @@ Table of Contents
             * [Project](#project-1)
          * [Live Templates](#live-templates)
          * [Run/Debug Configurations](#rundebug-configurations)
-            * [Distillery Release CLI](#distillery-release-cli-)
+            * [Distillery Release CLI <a href="resources/icons/run/distillery/release-cli.svg" target="_blank" rel="noopener noreferrer"><img src="resources/icons/run/distillery/release-cli.svg" alt="Elixir Mix Icon with tapered neck to make a retort as used in distilleries" title="Distillery Release CLI Icon" style="max-width:100\x;"></a>](#distillery-release-cli-)
                * [Running](#running)
                * [Debugging](#debugging)
-            * [Elixir](#elixir-)
+            * [Elixir <a href="/resources/icons/run/elixir.svg" target="_blank" rel="noopener noreferrer"><img src="/resources/icons/run/elixir.svg" alt="Elixir Drop" title="Elixir Icon" style="max-width:100\x;"></a>](#elixir-)
                * [Running](#running-1)
                * [Debugging](#debugging-1)
-            * [IEx (Interactive Elixir)](#iex-interactive-elixir)
+            * [IEx (Interactive Elixir) <a href="/resources/icons/run/iex.svg" target="_blank" rel="noopener noreferrer"><img src="/resources/icons/run/iex.svg" alt="" style="max-width:100\x;"></a>](#iex-interactive-elixir-)
                * [Running](#running-2)
                * [Debugging](#debugging-2)
-            * [Mix Tasks](#mix-tasks-)
+            * [Mix Tasks <a href="/resources/icons/run/mix.svg" target="_blank" rel="noopener noreferrer"><img src="/resources/icons/run/mix.svg" alt="Elixir Drop mixed in a round-bottom flask" title="Mix Icon" style="max-width:100\x;"></a>](#mix-tasks-)
                * [Running](#running-3)
                * [Debugging](#debugging-3)
-            * [IEx Mix](#iex-mix)
+            * [IEx Mix <a href="/resources/icons/run/iex/mix.svg" target="_blank" rel="noopener noreferrer"><img src="/resources/icons/run/iex/mix.svg" alt="IEx Mix" title="IEx Mix" style="max-width:100\x;"></a>](#iex-mix-)
                * [Running](#running-4)
                * [Debugging](#debugging-4)
-            * [mix test](#mix-test)
+            * [mix test <a href="/resources/icons/run/mix/test.svg" target="_blank" rel="noopener noreferrer"><img src="/resources/icons/run/mix/test.svg" alt="" style="max-width:100\x;"></a>](#mix-test-)
                * [Creating mix test Run Configurations Manually](#creating-mix-test-run-configurations-manually)
                * [Running](#running-5)
                * [Debugging](#debugging-5)
@@ -3259,6 +3259,24 @@ Clicking on a clause will show only that clause, but clicking on a higher level 
 ![Module](screenshots/features/beam_files/beam_chunks/dbgi/tab/elixir_erl/definitions/Module.png?raw=true)
 
 The AST stored in the `definitions` tab and the process of converting it back to code is not format preserves, so it will not look precisely like the source code as the AST has undergone some macro expansion before its put in the `Dbgi` chunk.  *As common idioms are understood, reversals will be add to the renderer.*
+
+######## Type Specifications
+
+The Type Specifications tab is split between a tree of the Module, Module Attribute, and type specifications.
+
+![Tree.png](screenshots/features/beam_files/beam_chunks/dbgi/tab/elixir_erl/type_specifications/Tree.png?raw=true)
+
+Clicking on a type specification will show only that type specification, but clicking on a higher in the tree will show all type specifications for the same module attribute or the entire Module.
+
+![Callback.png](screenshots/features/beam_files/beam_chunks/dbgi/tab/elixir_erl/type_specifications/Callback.png?raw=true)
+![Callbacks.png](screenshots/features/beam_files/beam_chunks/dbgi/tab/elixir_erl/type_specifications/Callbacks.png?raw=true)
+![Optional Callback.png](screenshots/features/beam_files/beam_chunks/dbgi/tab/elixir_erl/type_specifications/Optional%20Callback.png?raw=true)
+![Optional Callbacks.png](screenshots/features/beam_files/beam_chunks/dbgi/tab/elixir_erl/type_specifications/Optional%20Callbacks.png?raw=true)
+![Spec.png](screenshots/features/beam_files/beam_chunks/dbgi/tab/elixir_erl/type_specifications/Spec.png?raw=true)
+![Specs.png](screenshots/features/beam_files/beam_chunks/dbgi/tab/elixir_erl/type_specifications/Specs.png?raw=true)
+![Type.png](screenshots/features/beam_files/beam_chunks/dbgi/tab/elixir_erl/type_specifications/Type.png?raw=true)
+![Types.png](screenshots/features/beam_files/beam_chunks/dbgi/tab/elixir_erl/type_specifications/Types.png?raw=true)
+![Module.png](screenshots/features/beam_files/beam_chunks/dbgi/tab/elixir_erl/type_specifications/Module.png?raw=true)
 
 ####### Erlang (`:erlang_abstract_code` backend)
 
