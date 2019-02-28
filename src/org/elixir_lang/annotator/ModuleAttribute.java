@@ -1178,6 +1178,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
                         psiElement instanceof ElixirAtom ||
                         psiElement instanceof ElixirAtomKeyword ||
                         psiElement instanceof ElixirBitString ||
+                        psiElement instanceof ElixirCharListLine ||
                         psiElement instanceof ElixirCharToken ||
                         psiElement instanceof ElixirDecimalWholeNumber ||
                         psiElement instanceof ElixirKeywordKey ||
