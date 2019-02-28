@@ -854,7 +854,7 @@ object Macro {
                 list.arity() == 0 ->
                     "[]"
                 IOLib.printableList(list) ->
-                    TODO("not implemented")
+                    "'${IOLib.printableListToString(list)}'"
                 org.elixir_lang.Inspect.List.isKeyword(list) ->
                     "[${keywordListToString(list)}]"
                 else ->
