@@ -11,7 +11,7 @@ import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
-fun otpErlangTuple(elementList: kotlin.collections.List<OtpErlangObject>) = OtpErlangList(elementList.toTypedArray())
+fun otpErlangTuple(elementList: kotlin.collections.List<OtpErlangObject>) = OtpErlangTuple(elementList.toTypedArray())
 fun otpErlangTuple(vararg elements: OtpErlangObject) = OtpErlangTuple(elements)
 
 /**
