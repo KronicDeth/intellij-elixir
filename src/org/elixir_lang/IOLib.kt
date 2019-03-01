@@ -7,6 +7,13 @@ import com.ericsson.otp.erlang.OtpErlangLong
 object IOLib {
     fun printableList(list: OtpErlangList): Boolean = printableListUnicode(list)
 
+    fun printableListToString(list: OtpErlangList): String =
+            list
+                    .map { it as OtpErlangLong }
+                    .map { it.intValue() }
+                    .flatMap { Character.toChars(it).asList() }
+                    .joinToString("")
+
     private fun printable(character: Long) =
             when (character) {
                 in 8..13, 27L, in 32..126, in 0xA0..0xD7FF, in 0xE000..0xFFFD, in 0x10000..0x10FFFF -> true

@@ -41,6 +41,7 @@ object Identifier {
 
     fun binaryOperator(atomValue: String): AssociativityPrecedence? =
         when(atomValue) {
+            "->" -> AssociativityPrecedence(Associativity.RIGHT, 10)
             "<-", "\\\\" -> AssociativityPrecedence(Associativity.LEFT, 40)
             "when" -> AssociativityPrecedence(Associativity.RIGHT, 50)
             "::" -> AssociativityPrecedence(Associativity.RIGHT, 60)
