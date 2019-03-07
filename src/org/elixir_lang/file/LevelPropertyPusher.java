@@ -2,6 +2,7 @@ package org.elixir_lang.file;
 
 import com.intellij.ProjectTopics;
 import com.intellij.diagnostic.PerformanceWatcher;
+import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.fileTypes.FileTypeManager;
@@ -62,7 +63,13 @@ public class LevelPropertyPusher implements FilePropertyPusher<Level> {
 
             if (level == null) {
                 level = computeLevel(sdk);
-                sdk.putUserData(LEVEL, level);
+
+                Application application = ApplicationManager.getApplication();
+
+                // MockSdk is not write-able
+                if (application == null || !application.isUnitTestMode()) {
+                    sdk.putUserData(LEVEL, level);
+                }
             }
         } else {
             level = MAXIMUM;
