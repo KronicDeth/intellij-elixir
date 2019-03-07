@@ -2,6 +2,7 @@ package org.elixir_lang.file;
 
 import com.intellij.ProjectTopics;
 import com.intellij.diagnostic.PerformanceWatcher;
+import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.fileTypes.FileTypeManager;
@@ -51,11 +52,74 @@ public class LevelPropertyPusher implements FilePropertyPusher<Level> {
     private final Map<Module, Sdk> sdkByModule = new WeakHashMap<>();
 
     private static void putLevel(@NotNull Project project) {
-        project.putUserData(LEVEL, level(project));
+        project.putUserData(LEVEL, computeLevel(project));
+    }
+
+    public static Level level(@Nullable Sdk sdk) {
+        Level level;
+
+        if (sdk != null) {
+            level = sdk.getUserData(LEVEL);
+
+            if (level == null) {
+                level = computeLevel(sdk);
+
+                Application application = ApplicationManager.getApplication();
+
+                // MockSdk is not write-able
+                if (application == null || !application.isUnitTestMode()) {
+                    sdk.putUserData(LEVEL, level);
+                }
+            }
+        } else {
+            level = MAXIMUM;
+        }
+
+        return level;
+    }
+
+    public static Level level(@NotNull Project project) {
+        Level level = project.getUserData(LEVEL);
+
+        if (level == null) {
+            level = computeLevel(project);
+            project.putUserData(LEVEL, level);
+        }
+
+        return level;
+    }
+
+    public static Level level(@NotNull Module module) {
+        Level level = module.getUserData(LEVEL);
+
+        if (level == null) {
+            level = computeLevel(module);
+            module.putUserData(LEVEL, level);
+        }
+
+        return level;
+    }
+
+    public static Level level(@NotNull Project project, @Nullable VirtualFile virtualFile) {
+        Level level = null;
+
+        if (virtualFile != null) {
+            level = virtualFile.getUserData(LEVEL);
+        }
+
+        if (level == null) {
+            level = computeLevel(project, virtualFile);
+
+            if (virtualFile != null) {
+                virtualFile.putUserData(LEVEL, level);
+            }
+        }
+
+        return level;
     }
 
     @NotNull
-    private static Level level(@NotNull Module module) {
+    private static Level computeLevel(@NotNull Module module) {
         Level level;
 
         Sdk sdk = mostSpecificSdk(module);
@@ -70,7 +134,7 @@ public class LevelPropertyPusher implements FilePropertyPusher<Level> {
     }
 
     @NotNull
-    public static Level level(@NotNull Project project, @Nullable VirtualFile virtualFile) {
+    private static Level computeLevel(@NotNull Project project, @Nullable VirtualFile virtualFile) {
         Level level;
 
         if (virtualFile == null) {
@@ -89,7 +153,7 @@ public class LevelPropertyPusher implements FilePropertyPusher<Level> {
     }
 
     @NotNull
-    public static Level level(@NotNull Project project) {
+    private static Level computeLevel(@NotNull Project project) {
         Level level;
 
         final ModuleManager moduleManager = ModuleManager.getInstance(project);
@@ -114,7 +178,7 @@ public class LevelPropertyPusher implements FilePropertyPusher<Level> {
                 projectLevel = maxLevel;
             } else {
                 Sdk projectSdk = ProjectRootManager.getInstance(project).getProjectSdk();
-                projectLevel = level(projectSdk);
+                projectLevel = computeLevel(projectSdk);
             }
         }
 
@@ -125,7 +189,7 @@ public class LevelPropertyPusher implements FilePropertyPusher<Level> {
 
     @NotNull
     @Contract(pure = true)
-    public static Level level(@Nullable Sdk sdk) {
+    private static Level computeLevel(@Nullable Sdk sdk) {
         Release release = Type.getRelease(sdk);
         Level level;
 
