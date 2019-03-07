@@ -6,6 +6,22 @@
     <p>Enhancements</p>
     <ul>
       <li>Add Type Specifications to Dbgi tab for <code>:elixir_erl</code> backend Debug Info.</li>
+      <li>Add Bug Report issue template.</li>
+    </ul>
+  </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>
+        Cache all computed Elixir levels at the file, module, project, and SDK levels.  The computed Elixir level is
+        used to determine how to emulate the various grammar changes made for the different Elixir versions.  This bug
+        was potentially introduced as earlier as<a href="">v7.0.0</a> (2017-12-15) and as late as
+        <a href="https://github.com/KronicDeth/intellij-elixir/releases/tag/v7.5.0">v7.5.0</a> (2018-06-03) as
+        that's
+        <a href="https://github.com/KronicDeth/intellij-elixir/commits/da149f8430cd378e964ae5a53a127754b3a00bc9/src/org/elixir_lang/file/LevelPropertyPusher.java">
+          the history for <code>LevelPropertyPusher.java</code>
+        </a> and has affected all later versions.
+      </li>
     </ul>
   </li>
 </ul>
