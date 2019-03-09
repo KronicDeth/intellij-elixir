@@ -65,10 +65,15 @@
 
     <library.type implementation="org.elixir_lang.mix.library.Type"/>
 
-    <!-- Tesing -->
+    <!-- Testing -->
+    <configurationType implementation="org.elixir_lang.espec.configuration.Type" />
+    <programRunner implementation="org.elixir_lang.espec.Runner" />
+    <runConfigurationProducer implementation="org.elixir_lang.espec.configuration.MixEspecRunConfigurationProducer" />
+
     <configurationType implementation="org.elixir_lang.exunit.configuration.Type" />
     <programRunner implementation="org.elixir_lang.exunit.Runner" />
     <runConfigurationProducer implementation="org.elixir_lang.exunit.configuration.MixExUnitRunConfigurationProducer" />
+
     <testFinder implementation="org.elixir_lang.mix.TestFinder"/>
 
     <colorSettingsPage implementation="org.elixir_lang.ElixirColorSettingsPage"/>

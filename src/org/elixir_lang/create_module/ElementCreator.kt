@@ -67,11 +67,19 @@ private fun createModuleFromTemplate(directory: PsiDirectory,
     val properties = Properties(defaultProperties)
     properties.setProperty(FileTemplate.ATTRIBUTE_NAME, moduleName)
 
-    if (templateName == "ExUnit.Case") {
-        val sourceName= moduleName.removeSuffix("Test")
-        properties.setProperty("SOURCE_NAME", sourceName)
+    when (templateName) {
+        "Espec" -> {
+            val sourceName= moduleName.removeSuffix("Spec")
+            properties.setProperty("SOURCE_NAME", sourceName)
 
-        properties.setProperty("ALIAS", sourceName.split(".").last())
+            properties.setProperty("ALIAS", sourceName.split(".").last())
+        }
+        "ExUnit.Case" -> {
+            val sourceName= moduleName.removeSuffix("Test")
+            properties.setProperty("SOURCE_NAME", sourceName)
+
+            properties.setProperty("ALIAS", sourceName.split(".").last())
+        }
     }
 
     return try {

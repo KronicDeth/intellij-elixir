@@ -1,4 +1,4 @@
-package org.elixir_lang.exunit
+package org.elixir_lang.espec
 
 import com.intellij.execution.Executor
 import com.intellij.execution.configuration.EnvironmentVariablesComponent
@@ -11,22 +11,18 @@ import com.intellij.execution.runners.RunConfigurationWithSuppressedDefaultRunAc
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.options.SettingsEditorGroup
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.projectRoots.Sdk
-import org.elixir_lang.ExUnit
-import org.elixir_lang.Level.V_1_4
+import org.elixir_lang.Espec
 import org.elixir_lang.debugger.Modules
 import org.elixir_lang.debugger.configuration.Debuggable
 import org.elixir_lang.debugger.settings.stepping.ModuleFilter
-import org.elixir_lang.exunit.configuration.Factory
-import org.elixir_lang.file.LevelPropertyPusher.level
+import org.elixir_lang.espec.configuration.Factory
 import org.elixir_lang.mix.ensureMostSpecificSdk
 import org.elixir_lang.run.*
-import org.elixir_lang.sdk.elixir.Type.mostSpecificSdk
 import org.jdom.Element
 
 class Configuration(name: String, project: Project) :
         org.elixir_lang.run.Configuration(name, project, Factory),
-        Debuggable<org.elixir_lang.exunit.Configuration>,
+        Debuggable<org.elixir_lang.espec.Configuration>,
         RunConfigurationWithSuppressedDefaultRunAction,
         RunConfigurationWithSuppressedDefaultDebugAction {
     override val cookie: String? = null
@@ -46,8 +42,8 @@ class Configuration(name: String, project: Project) :
 
         debugged.mixArgumentList.addAll(listOf("do", "intellij_elixir.debug,"))
 
-        debugged.mixTestArgumentList.addAll(mixTestArgumentList)
-        debugged.mixTestArgumentList.add("--trace")
+        debugged.mixEspecArgumentList.addAll(mixEspecArgumentList)
+        debugged.mixEspecArgumentList.add("--trace")
 
         debugged.workingDirectory = workingDirectory
         debugged.isPassParentEnvs = isPassParentEnvs
@@ -63,10 +59,10 @@ class Configuration(name: String, project: Project) :
         return debugged
     }
 
-    override fun getProgramParameters(): String? = mixTestArguments
+    override fun getProgramParameters(): String? = mixEspecArguments
 
     override fun setProgramParameters(value: String?) {
-        mixTestArguments = value
+        mixEspecArguments = value
     }
 
     var erlArgumentList: MutableList<String> = mutableListOf()
@@ -83,21 +79,21 @@ class Configuration(name: String, project: Project) :
 
     /**
      * This property only exists so that [Configuration.debuggedConfiguration] can add `do intellij_elixir.debug,`
-     * before `test` task argument in the command line.
+     * before `espec` task argument in the command line.
      */
     private var mixArgumentList: MutableList<String> = mutableListOf()
 
-    private var mixTestArguments: String?
-        get() = mixTestArgumentList.toArguments()
-        set(arguments) = mixTestArgumentList.fromArguments(arguments)
+    private var mixEspecArguments: String?
+        get() = mixEspecArgumentList.toArguments()
+        set(arguments) = mixEspecArgumentList.fromArguments(arguments)
 
-    var mixTestArgumentList: MutableList<String> = mutableListOf()
+    var mixEspecArgumentList: MutableList<String> = mutableListOf()
 
     fun commandLine(): GeneralCommandLine {
         val workingDirectory = ensureWorkingDirectory()
         val module = ensureModule()
         val sdk = ensureMostSpecificSdk(module)
-        val commandLine = ExUnit.commandLine(
+        val commandLine = Espec.commandLine(
                 envs,
                 workingDirectory,
                 sdk,
@@ -105,14 +101,14 @@ class Configuration(name: String, project: Project) :
                 elixirArgumentList,
                 mixArgumentList
         )
-        commandLine.addParameters(mixTestArgumentList)
+        commandLine.addParameters(mixEspecArgumentList)
 
         return commandLine
     }
 
     override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> =
             SettingsEditorGroup<Configuration>().apply {
-                this.addEditor("Configuration", org.elixir_lang.exunit.configuration.Editor())
+                this.addEditor("Configuration", org.elixir_lang.espec.configuration.Editor())
                 this.addEditor("Interpreted Modules", org.elixir_lang.debugger.configuration.interpreted_modules.Editor<Configuration>())
             }
 
@@ -123,7 +119,7 @@ class Configuration(name: String, project: Project) :
         super.readExternal(element)
         element.readExternalArgumentList(ERL, erlArgumentList)
         element.readExternalArgumentList(ELIXIR, elixirArgumentList)
-        element.readExternalArgumentList(MIX_TEST, mixTestArgumentList)
+        element.readExternalArgumentList(MIX_ESPEC, mixEspecArgumentList)
         workingDirectoryURL = element.readExternalWorkingDirectory()
         EnvironmentVariablesComponent.readExternal(element, envs)
         element.readExternalModule(this)
@@ -136,7 +132,7 @@ class Configuration(name: String, project: Project) :
         super.writeExternal(element)
         element.writeExternalArgumentList(ERL, erlArgumentList)
         element.writeExternalArgumentList(ELIXIR, elixirArgumentList)
-        element.writeExternalArgumentList(MIX_TEST, mixTestArgumentList)
+        element.writeExternalArgumentList(MIX_ESPEC, mixEspecArgumentList)
         element.writeExternalWorkingDirectory(workingDirectoryURL)
         EnvironmentVariablesComponent.writeExternal(element, envs)
         element.writeExternalModule(this)
@@ -144,4 +140,4 @@ class Configuration(name: String, project: Project) :
     }
 }
 
-const val MIX_TEST = "mix-test"
+const val MIX_ESPEC = "mix-espec"
