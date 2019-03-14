@@ -1,4 +1,4 @@
-package org.elixir_lang.espec.configuration
+package org.elixir_lang.espec
 
 import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiFileSystemItem
@@ -6,7 +6,7 @@ import com.intellij.psi.search.PsiElementProcessor
 import org.elixir_lang.psi.ElixirFile
 import java.io.File
 
-class SpecFileGatherer(val workingDirectory: String?) : PsiElementProcessor<PsiFileSystemItem> {
+class Gatherer(val workingDirectory: String?) : PsiElementProcessor<PsiFileSystemItem> {
     val programParameters
         get() = relativePaths.joinToString(" ")
 

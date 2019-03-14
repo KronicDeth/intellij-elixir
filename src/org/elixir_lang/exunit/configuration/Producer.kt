@@ -8,6 +8,7 @@ import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.Ref
 import com.intellij.psi.*
 import org.elixir_lang.exunit.Configuration
+import org.elixir_lang.file.containsFileWithSuffix
 import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.sdk.elixir.Type
 import org.elixir_lang.sdk.elixir.Type.mostSpecificSdk
@@ -61,8 +62,7 @@ private fun lineNumber(psiElement: PsiElement): Int {
             .getInstance(containingFile.project)
             .getDocument(containingFile)
             ?.getLineNumber(psiElement.textOffset)
-            ?:
-            0
+            ?: 0
 
     return if (documentLineNumber == 0) {
         UNKNOWN_LINE
@@ -105,7 +105,8 @@ private fun setupConfigurationFromContextImpl(configuration: Configuration,
                 val sdkTypeId = sdk?.sdkType
 
                 if ((sdkTypeId == null || sdkTypeId == Type.getInstance()) &&
-                        ProjectRootsUtil.isInTestSource(psiElement.virtualFile, psiElement.project)) {
+                        ProjectRootsUtil.isInTestSource(psiElement.virtualFile, psiElement.project) &&
+                        containsFileWithSuffix(psiElement, "_test.exs")) {
                     val basePath = psiElement.getProject().basePath
                     val workingDirectory = workingDirectory(psiElement, basePath)
 
@@ -118,25 +119,28 @@ private fun setupConfigurationFromContextImpl(configuration: Configuration,
                     false
                 }
             }
+            is ElixirFile -> {
+                if (psiElement.virtualFile.path.endsWith("_test.exs")) {
+                    val basePath = psiElement.project.basePath
+                    val workingDirectory = workingDirectory(psiElement, basePath)
+                    val lineNumber = lineNumber(psiElement)
+
+                    configuration.workingDirectory = workingDirectory
+                    configuration.name = configurationName(psiElement, lineNumber, workingDirectory, basePath)
+                    configuration.programParameters = programParameters(psiElement, lineNumber, workingDirectory)
+
+                    true
+                } else {
+                    false
+                }
+            }
             else -> {
                 val containingFile = psiElement.containingFile
 
-                when {
-                    !(containingFile is ElixirFile || containingFile is PsiDirectory) ->
-                        false
-                    ProjectRootsUtil.isInTestSource(containingFile) -> {
-                        val basePath = psiElement.project.basePath
-                        val workingDirectory = workingDirectory(psiElement, basePath)
-                        val lineNumber = lineNumber(psiElement)
-
-                        configuration.workingDirectory = workingDirectory
-                        configuration.name = configurationName(containingFile, lineNumber, workingDirectory, basePath)
-                        configuration.programParameters = programParameters(containingFile, lineNumber, workingDirectory)
-
-                        true
-                    }
-                    else ->
-                        false
+                if (containingFile is ElixirFile) {
+                    setupConfigurationFromContextImpl(configuration, containingFile)
+                } else {
+                    false
                 }
             }
         }
@@ -158,7 +162,7 @@ private fun workingDirectory(element: PsiElement, basePath: String?): String? =
 private fun workingDirectory(file: PsiFile, basePath: String?): String? =
         workingDirectory(file.containingDirectory, basePath)
 
-class MixExUnitRunConfigurationProducer:
+class MixExUnitRunConfigurationProducer :
         RunConfigurationProducer<Configuration>(org.elixir_lang.exunit.configuration.Type.INSTANCE) {
     override fun setupConfigurationFromContext(runConfig: Configuration,
                                                context: ConfigurationContext,

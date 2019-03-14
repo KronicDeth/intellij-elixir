@@ -8,6 +8,8 @@ import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.Ref
 import com.intellij.psi.*
 import org.elixir_lang.espec.Configuration
+import org.elixir_lang.espec.Gatherer
+import org.elixir_lang.file.containsFileWithSuffix
 import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.sdk.elixir.Type
 import org.elixir_lang.sdk.elixir.Type.mostSpecificSdk
@@ -78,7 +80,7 @@ private fun programParameters(item: PsiFileSystemItem,
                               lineNumber: Int,
                               workingDirectory: String?): String {
     return if (item.isDirectory) {
-        val specFileGatherer = SpecFileGatherer(workingDirectory)
+        val specFileGatherer = Gatherer(workingDirectory)
         item.processChildren(specFileGatherer)
 
         specFileGatherer.programParameters
@@ -112,7 +114,8 @@ private fun setupConfigurationFromContextImpl(configuration: Configuration,
                 val sdkTypeId = sdk?.sdkType
 
                 if ((sdkTypeId == null || sdkTypeId == Type.getInstance()) &&
-                        ProjectRootsUtil.isInTestSource(psiElement.virtualFile, psiElement.project)) {
+                        ProjectRootsUtil.isInTestSource(psiElement.virtualFile, psiElement.project) &&
+                        containsFileWithSuffix(psiElement, "_spec.exs")) {
                     val basePath = psiElement.getProject().basePath
                     val workingDirectory = workingDirectory(psiElement, basePath)
 
@@ -125,25 +128,28 @@ private fun setupConfigurationFromContextImpl(configuration: Configuration,
                     false
                 }
             }
+            is ElixirFile -> {
+                if (psiElement.virtualFile.path.endsWith("_spec.exs")) {
+                    val basePath = psiElement.project.basePath
+                    val workingDirectory = workingDirectory(psiElement, basePath)
+                    val lineNumber = lineNumber(psiElement)
+
+                    configuration.workingDirectory = workingDirectory
+                    configuration.name = configurationName(psiElement, lineNumber, workingDirectory, basePath)
+                    configuration.programParameters = programParameters(psiElement, lineNumber, workingDirectory)
+
+                    true
+                } else {
+                    false
+                }
+            }
             else -> {
                 val containingFile = psiElement.containingFile
 
-                when {
-                    !(containingFile is ElixirFile || containingFile is PsiDirectory) ->
-                        false
-                    ProjectRootsUtil.isInTestSource(containingFile) -> {
-                        val basePath = psiElement.project.basePath
-                        val workingDirectory = workingDirectory(psiElement, basePath)
-                        val lineNumber = lineNumber(psiElement)
-
-                        configuration.workingDirectory = workingDirectory
-                        configuration.name = configurationName(containingFile, lineNumber, workingDirectory, basePath)
-                        configuration.programParameters = programParameters(containingFile, lineNumber, workingDirectory)
-
-                        true
-                    }
-                    else ->
-                        false
+                if (containingFile is ElixirFile) {
+                    setupConfigurationFromContextImpl(configuration, containingFile)
+                } else {
+                    false
                 }
             }
         }
