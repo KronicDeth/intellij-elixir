@@ -77,17 +77,24 @@ private fun programParameters(item: PsiFileSystemItem, workingDirectory: String?
 private fun programParameters(item: PsiFileSystemItem,
                               lineNumber: Int,
                               workingDirectory: String?): String {
-    val path = item.virtualFile.path
-    val relativePath = if (workingDirectory != null) {
-        path.removePrefix(workingDirectory + File.separator)
-    } else {
-        path
-    }
+    return if (item.isDirectory) {
+        val specFileGatherer = SpecFileGatherer(workingDirectory)
+        item.processChildren(specFileGatherer)
 
-    return if (lineNumber != UNKNOWN_LINE) {
-        "$relativePath:$lineNumber"
+        specFileGatherer.programParameters
     } else {
-        relativePath
+        val path = item.virtualFile.path
+        val relativePath = if (workingDirectory != null) {
+            path.removePrefix(workingDirectory + File.separator)
+        } else {
+            path
+        }
+
+        if (lineNumber != UNKNOWN_LINE) {
+            "$relativePath:$lineNumber"
+        } else {
+            relativePath
+        }
     }
 }
 
