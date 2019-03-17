@@ -1,6 +1,8 @@
+
 Table of Contents
 =================
 
+   * [Table of Contents](#table-of-contents)
    * [Elixir plugin](#elixir-plugin)
       * [IDEs](#ides)
       * [Features](#features)
@@ -107,10 +109,19 @@ Table of Contents
             * [IEx Mix <a href="/resources/icons/run/iex/mix.svg" target="_blank" rel="noopener noreferrer"><img src="/resources/icons/run/iex/mix.svg" alt="IEx Mix" title="IEx Mix" style="max-width:100\x;"></a>](#iex-mix-)
                * [Running](#running-4)
                * [Debugging](#debugging-4)
-            * [mix test <a href="/resources/icons/run/mix/test.svg" target="_blank" rel="noopener noreferrer"><img src="/resources/icons/run/mix/test.svg" alt="" style="max-width:100\x;"></a>](#mix-test-)
-               * [Creating mix test Run Configurations Manually](#creating-mix-test-run-configurations-manually)
+            * [mix espec <a href="/resources/icons/run/mix/test.svg" target="_blank" rel="noopener noreferrer"><img src="/resources/icons/run/mix/test.svg" alt="" style="max-width:100\x;"></a>](#mix-espec-)
+               * [Using graphical formatter](#using-graphical-formatter)
+               * [Creating mix espce Run Configurations Manually](#creating-mix-espce-run-configurations-manually)
                * [Running](#running-5)
                * [Debugging](#debugging-5)
+               * [Creating mix espec Run Configurations from context](#creating-mix-espec-run-configurations-from-context)
+                  * [Creating/Running mix espec Run Configurations from directory](#creatingrunning-mix-espec-run-configurations-from-directory)
+                  * [Creating/Running mix espec Run Configurations from file](#creatingrunning-mix-espec-run-configurations-from-file)
+                  * [Creating/Running mix espec Run Configurations from line](#creatingrunning-mix-espec-run-configurations-from-line)
+            * [mix test <a href="/resources/icons/run/mix/test.svg" target="_blank" rel="noopener noreferrer"><img src="/resources/icons/run/mix/test.svg" alt="" style="max-width:100\x;"></a>](#mix-test-)
+               * [Creating mix test Run Configurations Manually](#creating-mix-test-run-configurations-manually)
+               * [Running](#running-6)
+               * [Debugging](#debugging-6)
                * [Creating mix test Run Configurations from context](#creating-mix-test-run-configurations-from-context)
                   * [Creating/Running mix test Run Configurations from directory](#creatingrunning-mix-test-run-configurations-from-directory)
                   * [Creating/Running mix test Run Configurations from file](#creatingrunning-mix-test-run-configurations-from-file)
@@ -2815,6 +2826,168 @@ Wih the Run Configuration defined, you can either Run or Debug `iex -S mix`
    6. Click - to remove configuration-specific module filters added with +.  Inherited module filters cannot be removed with -, they can only be disabled by unchecking.
 2. For how to use the debugger, including how to set breakpoints see the [Debugger](#debugger) section.
 3. Click the Debug bug in the Toolbar to debug `iex -S mix`.
+
+#### `mix espec` ![](/resources/icons/run/mix/test.svg)
+
+The `mix espec` task gets a special type of Run Configuration, `Elixir Mix Espec`.  Using this Run Configuration type instead, of the basic `Elixir Mix` Run Configuration will cause the IDE to attach a special formatter to `mix espec`, so that you get the standard graphical tree of Test Results.
+
+The Run pane will show Test Results.  If there is a compilation error before or during `mix espec`, it will be shown as a test failure.  If the compilation failure is in a `_spec.exs` file can it can be inferred from the stacktrace, the compilation error will show up as a test failure in that specific module.
+
+##### Using graphical formatter
+
+**If you override the default formatters you will need to add the following code to your `spec_helper.exs`.**
+
+If you override formatters similar to below
+
+```elixir
+ESpec.configure fn(config) ->
+  config.formatters ...
+```
+
+```elixir
+ESpec.configure fn(config) ->
+  config.formatters [
+      {ESpec.Formatters.Json, %{out_path: "results.json"}},
+      {ESpec.Formatters.Html, %{out_path: "results.html"}},
+      {ESpec.Formatters.Doc, %{details: true, out_path: "results.txt"}},
+      {ESpec.Formatters.Doc, %{details: true, diff_enabled?: false, out_path: "results-no-diff.txt"}},
+      {ESpec.CustomFormatter, %{a: 1, b: 2}},
+    ]
+end
+```
+
+Replace them with code that checks for the graphical formatter `TeamCityESpecFormatter` and uses only it when available.
+
+```elixir
+ESpec.configure fn(config) ->
+  config.formatters(if Code.ensure_loaded?(TeamCityESpecFormatter) do
+    [{TeamCityESpecFormatter, %{}}]
+  else
+    ...
+  end)
+end
+```
+
+```elixir
+ESpec.configure fn(config) ->
+  config.formatters(if Code.ensure_loaded?(TeamCityESpecFormatter) do
+    [{TeamCityESpecFormatter, %{}}]
+  else
+    [
+      {ESpec.Formatters.Json, %{out_path: "results.json"}},
+      {ESpec.Formatters.Html, %{out_path: "results.html"}},
+      {ESpec.Formatters.Doc, %{details: true, out_path: "results.txt"}},
+      {ESpec.Formatters.Doc, %{details: true, diff_enabled?: false, out_path: "results-no-diff.txt"}},
+      {ESpec.CustomFormatter, %{a: 1, b: 2}},
+    ]
+  end)
+end
+```
+
+##### Creating `mix espce` Run Configurations Manually
+
+1. Run > Edit Configurations...
+
+   ![Edit Run Configurations](/screenshots/features/run_debug_configurations/Edit%20Configurations.png?raw=true "Edit Run Configurations")
+2. Click +
+3. Select "Elixir Mix ESpec"
+
+   ![Add New Elixir Mix ESpec](/screenshots/features/run_debug_configurations/mix_espec/Add%20New.png?raw=true "Add New Elixir Mix ESpec Run Configuration")
+4. Fill in the "`mix espec` arguments" with the argument(s) to pass to `mix espec`.  Normally, this will be list of `*_spec.exs` files, relative to the "Working directory".
+
+   **NOTE: Unlike `mix test`, `mix espec` does not support directories as arguments.**
+5. (Optionally) fill in "`elixir` arguments" with the arguments to `elixir` before it runs `mix test`.
+6. (Optionally) fill in "`erl` arguments"` with the arguments to `erl` before it runs `elixir`.
+7. Fill in the "Working directory"
+   * Type the absolute path to the directory.
+   * Select the path using directory picker by clicking the `...` button
+8. (Optionally) click the `...` button on the "Environment variables" line to add environment variables.
+9. Click "OK" to save the Run Configuration and close the dialog
+
+With the Run Configuration defined you can either Run or Debug the `mix espec`s
+
+##### Running
+
+1. Click the Run arrow in the Toolbar to run the `mix test` task
+2. The Run pane will open showing the Test Results
+   ![Test Results](/screenshots/features/run_debug_configurations/mix_espec/Test%20Results.png?raw=true "Full Green Test Results")
+
+##### Debugging
+
+1. (Optionally) before debugging, customize the modules that will be interpreted.
+   1. Run > Edit Configurations...
+   2. Click the "Interpreted Modules" tab next to default "Configuration" tab.
+   3. Enable/Disable "Inherit Application Module Filters".  Will change the Module Filters show in the below "Do not interpreter modules matching patterns" list.
+   4. Uncheck any inherited module filters that you would rather be interpreted and therefore debuggable
+   5. Click + to add module filters that are specific to this configuration.  This can be useful if you know interpreting a specific module in your project's dependencies or project leads to too much slowdown when debugging or causes the debugger to hang/crash.
+   6. Click - to remove configuration-specific module filters added with +.  Inherited module filters cannot be removed with -, they can only be disabled by unchecking.
+2. For how to use the debugger, including how to set breakpoints see the [Debugger](#debugger) section.
+3. Click the Debug bug in the Toolbar to debug the `mix test`s
+
+While you can create `Elixir Mix ESpec` run configurations manually using the `Run > Edit Configurations...` menu, it is probably more convenient to use the context menu.
+
+##### Creating `mix espec` Run Configurations from context
+
+The context menu must know that the the directory, file, or line you are right-clicking is a test.  It does this by checking if the current directory or an ancestor is marked as a Test Sources Root and contains or is a `*_spec.exs` file(s)
+
+1. In the Project pane, ensure your OTP application's `espec` directory is marked as a Test Sources Root
+  1. Check if the `espec` directory is green.  If it is, it is likely a Test Sources Root.  This color may differ in different themes, so to be sure you can check the context menu
+  2. Right-click the `test` directory.
+  3. Hover over "Mark Directory As &gt;"
+     * If "Unmark as Test Sources Root" is shown, then the directory is already configured correctly, and create from context will work.
+
+       ![Mark Directory As &gt; Unmark as Test Sources Root](/screenshots/features/run_debug_configurations/mix_espec/mark_directory_as/Unmark%20as%20Test%20Sources%20Root.png?raw=true "Unmark Directory as Test Sources Root")
+     * If "Test Sources Root" is shown, then the directory need to be configured by clicking that entry
+
+       ![Mark Directory As &gt; Test Sources Root](/screenshots/features/run_debug_configurations/mix_espec/mark_directory_as/Test%20Sources%20Root.png?raw=true "Mark Directory as Test Sources Root")
+
+###### Creating/Running `mix espec` Run Configurations from directory
+
+1. Right-click the directory in the Project pane
+2. Click "Run Mix ExUnit", which will both create the Run Configuration and Run it.
+
+   ![Run Mix ESpec](/screenshots/features/run_debug_configurations/mix_espec/context/directory/Run%20Mix%20ESpec.png?raw=true "Run Mix ESpec from right-clicking directory")
+
+   * If you want to only create the Run Configuration, select "Create Mix ESpec" instead
+
+Alternatively, you can use keyboard shortcuts
+
+1. Select the directory in the Project pane.
+2. `Ctrl+Shift+R` will create the Run Configuration and Run it.
+
+###### Creating/Running `mix espec` Run Configurations from file
+
+1. Right-click the file in the Project pane
+2. Click "Run Mix ESpec", which will both create the Run Configuration and Run it.
+   * If you want to only create the Run Configuration, select "Create Mix ESpec" instead
+
+Alternatively, you can use keyboard shortcuts
+
+1. Select the directory in the Project pane.
+2. `Ctrl+Shift+R` will create the Run Configuration and Run it.
+
+Finally, you can use the editor tabs
+
+1. Right-click the editor tab for the test file you want to run
+
+   ![Run Mix ESpec](/screenshots/features/run_debug_configurations/mix_espec/context/file/Run%20Mix%20ESpec.png?raw=true "Run Mix ESpec from right-clicking file editor tab")
+2. Click "Run Mix ESpec", which will both create the Run Configuration and Run it.
+   * If you want to only create the Run Configuration, select "Create Mix ESpec" instead
+
+###### Creating/Running `mix espec` Run Configurations from line
+
+If you want to be able to run a single test, you can create a Run Configuration for a line in that test
+
+1. Right-click a line in the test file
+
+   ![Run Mix ESpec](/screenshots/features/run_debug_configurations/mix_espec/context/line/Run%20Mix%20ESpec.png?raw=true "Run Mix ESpec from right-clicking line in editor")
+2. Click "Run Mix ESpec", which will both create the Run Configuration and Run it.
+   * If you want to only create the Run Configuration, select "Create Mix ESpec" instead
+
+Alternatively, you can use keyboard shortcuts
+
+1. Place the cursor on the line you want to test
+2. `Ctrl+Shift+R` will create the Run Configuration and Run it.
 
 #### `mix test` ![](/resources/icons/run/mix/test.svg)
 

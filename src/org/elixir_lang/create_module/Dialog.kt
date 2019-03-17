@@ -46,6 +46,7 @@ fun ancestorDirectoryNamesBaseNamePair(moduleName: String, extension: String): P
 
 fun templateNameToExtension(templateName: String): String =
         when (templateName) {
+            "ESpec" -> ".exs"
             "ExUnit.Case" -> ".exs"
             else -> ".ex"
         }
@@ -61,6 +62,7 @@ class Dialog(private val project: Project, val directory: PsiDirectory) : Create
             addItem("GenServer", Icons.File.GEN_SERVER, "Elixir GenServer")
             addItem("GenEvent", Icons.File.GEN_EVENT, "Elixir GenEvent")
             addItem("ExUnit.Case", org.elixir_lang.exunit.configuration.Icons.TYPE, "ExUnit.Case")
+            addItem("ESpec", org.elixir_lang.espec.configuration.Icons.TYPE, "ESpec")
         }
 
         setTemplateKindComponentsVisible(true)
@@ -139,6 +141,7 @@ class Dialog(private val project: Project, val directory: PsiDirectory) : Create
 
     private fun checkFormat(inputString: String): Boolean =
             when (templateName) {
+                "ESpec" -> ESPEC_CASE_NAME_REGEX
                 "ExUnit.Case" -> EX_UNIT_CASE_NAME_REGEX
                 else -> MODULE_NAME_REGEX
             }.matches(inputString)
@@ -184,20 +187,27 @@ class Dialog(private val project: Project, val directory: PsiDirectory) : Create
 private fun invalidMessageFormat(templateName: String): String =
         when (templateName) {
             "ExUnit.Case" -> INVALID_EX_UNIT_CASE_MESSAGE_FMT
+            "ESpec" -> INVALID_ESPEC_CASE_MESSAGE_FMT
             else -> INVALID_MODULE_MESSAGE_FMT
         }
 
 private const val INVALID_MODULE_MESSAGE_FMT = "'%s' is not a valid Elixir module name. Elixir module " +
                 "names should be a dot-separated-sequence of alphanumeric (and underscore) Aliases, each starting with a " +
                 "capital letter. " + DESCRIPTION
+private const val INVALID_ESPEC_CASE_MESSAGE_FMT = "'%s' is not a valid ESpec module name. ESpec module " +
+        "names should be a dot-separated-sequence of alphanumeric (and underscore) Aliases, each starting with a " +
+        "capital letter and the final one ending in Spec as <code>mix espec</code> looks for files matching " +
+        "<code>spec/**/*_spec.exs</code>.  Nested Aliases, like Foo.Bar.BazSpec, are created in subdirectory for the " +
+        "parent Aliases, foo/bar/baz_spec.exs"
 private const val INVALID_EX_UNIT_CASE_MESSAGE_FMT = "'%s' is not a valid ExUnit.Case module name. ExUnit.Case module " +
-                "names should be a dot-separated-sequence of alphanumeric (and underscore) Aliases, each starting with a " +
-                "capital letter and the final one ending in Test as <code>mix test</code> looks for files matching " +
-                "<code>test/**/*_test.exs</code>.  Nested Aliases, like Foo.Bar.BazTest, are created in subdirectory for the " +
-                "parent Aliases, foo/bar/baz_test.exs"
+        "names should be a dot-separated-sequence of alphanumeric (and underscore) Aliases, each starting with a " +
+        "capital letter and the final one ending in Test as <code>mix test</code> looks for files matching " +
+        "<code>test/**/*_test.exs</code>.  Nested Aliases, like Foo.Bar.BazTest, are created in subdirectory for the " +
+        "parent Aliases, foo/bar/baz_test.exs"
 private const val EXISTING_MODULE_MESSAGE_FMT = "'%s' already exists"
 private val ALIAS_REGEX = Regex("[A-Z][0-9a-zA-Z_]*")
 private val MODULE_NAME_REGEX = Regex("$ALIAS_REGEX(\\.$ALIAS_REGEX)*")
+private val ESPEC_CASE_NAME_REGEX = Regex("${MODULE_NAME_REGEX}Spec")
 private val EX_UNIT_CASE_NAME_REGEX = Regex("${MODULE_NAME_REGEX}Test")
 
 private fun path(ancestorDirectoryNamesBaseNamePair: Pair<List<String>, String>): String {

@@ -2,6 +2,7 @@ package org.elixir_lang.run.conversion
 
 import com.intellij.conversion.ConversionProcessor
 import com.intellij.conversion.RunManagerSettings
+import org.elixir_lang.espec.MIX_ESPEC
 import org.elixir_lang.exunit.MIX_TEST
 import org.elixir_lang.run.*
 import org.jdom.Element
@@ -15,7 +16,7 @@ class RunConfiguration : ConversionProcessor<RunManagerSettings>() {
     }
 }
 
-private val TYPES = arrayOf("MixRunConfigurationType", "MixExUnitRunConfigurationType")
+private val TYPES = arrayOf("MixRunConfigurationType", "MixExUnitRunConfigurationType", "MixESpecRunConfigurationType")
 private val OLD_OPTION_NAMES = arrayOf("programParameters", "workingDirectory")
 
 private fun Element.getOption(name: String): Element? = getChildren("option").first { it.getAttributeValue("name") == name }
@@ -33,9 +34,12 @@ private fun Element.process() {
 
 fun Element.processProgramParametersOption() {
     getOption("programParameters")?.let { programParametersOption ->
-        val command = when {
-            getAttributeValue("type") == "MixRunConfigurationType" -> MIX
-            getAttributeValue("type") == "MixExUnitRunConfigurationType" -> MIX_TEST
+        val type = getAttributeValue("type")
+
+        val command = when (type) {
+            "MixRunConfigurationType" -> MIX
+            "MixESpecRunConfigurationType" -> MIX_ESPEC
+            "MixExUnitRunConfigurationType" -> MIX_TEST
             else -> null
         }
 

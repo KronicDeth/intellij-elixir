@@ -108,6 +108,7 @@ object Project {
 
             val content = rootModel.addContentEntry(otpApp.root)
             addSourceDirToContent(content, ideaModuleDir, "lib", false)
+            addSourceDirToContent(content, ideaModuleDir, "spec", true)
             addSourceDirToContent(content, ideaModuleDir, "test", true)
 
             // Weird symlink phoenix and phoenix_html make to themselves in deps

@@ -1,4 +1,4 @@
-package org.elixir_lang.exunit.configuration
+package org.elixir_lang.espec.configuration
 
 import com.intellij.execution.actions.ConfigurationContext
 import com.intellij.execution.actions.RunConfigurationProducer
@@ -7,15 +7,16 @@ import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.Ref
 import com.intellij.psi.*
-import org.elixir_lang.exunit.Configuration
+import org.elixir_lang.espec.Configuration
+import org.elixir_lang.espec.Gatherer
 import org.elixir_lang.file.containsFileWithSuffix
 import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.sdk.elixir.Type
 import org.elixir_lang.sdk.elixir.Type.mostSpecificSdk
 import java.io.File
 
-class MixExUnitRunConfigurationProducer :
-        RunConfigurationProducer<Configuration>(org.elixir_lang.exunit.configuration.Type.INSTANCE) {
+class MixESpecRunConfigurationProducer:
+        RunConfigurationProducer<Configuration>(org.elixir_lang.espec.configuration.Type.INSTANCE) {
     override fun setupConfigurationFromContext(runConfig: Configuration,
                                                context: ConfigurationContext,
                                                ref: Ref<PsiElement>): Boolean =
@@ -28,7 +29,7 @@ class MixExUnitRunConfigurationProducer :
             } == true
 }
 
-private const val SUFFIX = "_test.exs"
+private const val SUFFIX = "_spec.exs"
 private const val UNKNOWN_LINE = -1
 
 private fun configurationName(file: PsiFileSystemItem,
@@ -50,7 +51,7 @@ private fun configurationName(file: PsiFileSystemItem,
         file.name
     }
 
-    return "Mix ExUnit " + suffix
+    return "Mix ESpec " + suffix
 }
 
 private fun configurationName(file: PsiFileSystemItem,
@@ -77,7 +78,8 @@ private fun lineNumber(psiElement: PsiElement): Int {
             .getInstance(containingFile.project)
             .getDocument(containingFile)
             ?.getLineNumber(psiElement.textOffset)
-            ?: 0
+            ?:
+            0
 
     return if (documentLineNumber == 0) {
         UNKNOWN_LINE
@@ -92,17 +94,24 @@ private fun programParameters(item: PsiFileSystemItem, workingDirectory: String?
 private fun programParameters(item: PsiFileSystemItem,
                               lineNumber: Int,
                               workingDirectory: String?): String {
-    val path = item.virtualFile.path
-    val relativePath = if (workingDirectory != null) {
-        path.removePrefix(workingDirectory + File.separator)
-    } else {
-        path
-    }
+    return if (item.isDirectory) {
+        val specFileGatherer = Gatherer(workingDirectory)
+        item.processChildren(specFileGatherer)
 
-    return if (lineNumber != UNKNOWN_LINE) {
-        "$relativePath:$lineNumber"
+        specFileGatherer.programParameters
     } else {
-        relativePath
+        val path = item.virtualFile.path
+        val relativePath = if (workingDirectory != null) {
+            path.removePrefix(workingDirectory + File.separator)
+        } else {
+            path
+        }
+
+        if (lineNumber != UNKNOWN_LINE) {
+            "$relativePath:$lineNumber"
+        } else {
+            relativePath
+        }
     }
 }
 
@@ -184,3 +193,4 @@ private fun workingDirectory(element: PsiElement, basePath: String?): String? =
 
 private fun workingDirectory(file: PsiFile, basePath: String?): String? =
         workingDirectory(file.containingDirectory, basePath)
+

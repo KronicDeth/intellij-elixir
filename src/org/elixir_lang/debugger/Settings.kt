@@ -103,8 +103,12 @@ class Settings(moduleFilters: List<ModuleFilter> = defaultModuleFilters()):
                 // ex_doc
                 ModuleFilter(pattern = "ExDoc"),
                 ModuleFilter(pattern = "ExDoc.*"),
+                // ex_unit
                 ModuleFilter(pattern = "ExUnit"),
                 ModuleFilter(pattern = "ExUnit.*"),
+                // espec
+                ModuleFilter(pattern = "ESpec"),
+                ModuleFilter(pattern = "ESpec.*"),
                 ModuleFilter(pattern = "File"),
                 ModuleFilter(pattern = "File.Stat"),
                 ModuleFilter(pattern = "File.Stream"),
