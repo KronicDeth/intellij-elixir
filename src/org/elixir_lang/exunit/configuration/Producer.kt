@@ -14,6 +14,21 @@ import org.elixir_lang.sdk.elixir.Type
 import org.elixir_lang.sdk.elixir.Type.mostSpecificSdk
 import java.io.File
 
+class MixExUnitRunConfigurationProducer :
+        RunConfigurationProducer<Configuration>(org.elixir_lang.exunit.configuration.Type.INSTANCE) {
+    override fun setupConfigurationFromContext(runConfig: Configuration,
+                                               context: ConfigurationContext,
+                                               ref: Ref<PsiElement>): Boolean =
+            ref.get()?.let { it.isValid && setupConfigurationFromContextImpl(runConfig, it) } == true
+
+    override fun isConfigurationFromContext(runConfig: Configuration,
+                                            context: ConfigurationContext): Boolean =
+            context.psiLocation?.let {
+                it.isValid && isConfigurationFromContextImpl(runConfig, it)
+            } == true
+}
+
+private const val SUFFIX = "_test.exs"
 private const val UNKNOWN_LINE = -1
 
 private fun configurationName(file: PsiFileSystemItem,
@@ -106,7 +121,7 @@ private fun setupConfigurationFromContextImpl(configuration: Configuration,
 
                 if ((sdkTypeId == null || sdkTypeId == Type.getInstance()) &&
                         ProjectRootsUtil.isInTestSource(psiElement.virtualFile, psiElement.project) &&
-                        containsFileWithSuffix(psiElement, "_test.exs")) {
+                        containsFileWithSuffix(psiElement, SUFFIX)) {
                     val basePath = psiElement.getProject().basePath
                     val workingDirectory = workingDirectory(psiElement, basePath)
 
@@ -120,7 +135,7 @@ private fun setupConfigurationFromContextImpl(configuration: Configuration,
                 }
             }
             is ElixirFile -> {
-                if (psiElement.virtualFile.path.endsWith("_test.exs")) {
+                if (psiElement.virtualFile.path.endsWith(SUFFIX)) {
                     val basePath = psiElement.project.basePath
                     val workingDirectory = workingDirectory(psiElement, basePath)
                     val lineNumber = lineNumber(psiElement)
@@ -137,8 +152,16 @@ private fun setupConfigurationFromContextImpl(configuration: Configuration,
             else -> {
                 val containingFile = psiElement.containingFile
 
-                if (containingFile is ElixirFile) {
-                    setupConfigurationFromContextImpl(configuration, containingFile)
+                if (containingFile is ElixirFile && containingFile.virtualFile.path.endsWith(SUFFIX)) {
+                    val basePath = psiElement.project.basePath
+                    val workingDirectory = workingDirectory(psiElement, basePath)
+                    val lineNumber = lineNumber(psiElement)
+
+                    configuration.workingDirectory = workingDirectory
+                    configuration.name = configurationName(containingFile, lineNumber, workingDirectory, basePath)
+                    configuration.programParameters = programParameters(containingFile, lineNumber, workingDirectory)
+
+                    true
                 } else {
                     false
                 }
@@ -161,17 +184,3 @@ private fun workingDirectory(element: PsiElement, basePath: String?): String? =
 
 private fun workingDirectory(file: PsiFile, basePath: String?): String? =
         workingDirectory(file.containingDirectory, basePath)
-
-class MixExUnitRunConfigurationProducer :
-        RunConfigurationProducer<Configuration>(org.elixir_lang.exunit.configuration.Type.INSTANCE) {
-    override fun setupConfigurationFromContext(runConfig: Configuration,
-                                               context: ConfigurationContext,
-                                               ref: Ref<PsiElement>): Boolean =
-            ref.get()?.let { it.isValid && setupConfigurationFromContextImpl(runConfig, it) } == true
-
-    override fun isConfigurationFromContext(runConfig: Configuration,
-                                            context: ConfigurationContext): Boolean =
-            context.psiLocation?.let {
-                it.isValid && isConfigurationFromContextImpl(runConfig, it)
-            } == true
-}

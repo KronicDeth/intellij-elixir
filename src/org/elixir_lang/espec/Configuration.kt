@@ -11,7 +11,7 @@ import com.intellij.execution.runners.RunConfigurationWithSuppressedDefaultRunAc
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.options.SettingsEditorGroup
 import com.intellij.openapi.project.Project
-import org.elixir_lang.Espec
+import org.elixir_lang.ESpec
 import org.elixir_lang.debugger.Modules
 import org.elixir_lang.debugger.configuration.Debuggable
 import org.elixir_lang.debugger.settings.stepping.ModuleFilter
@@ -42,8 +42,8 @@ class Configuration(name: String, project: Project) :
 
         debugged.mixArgumentList.addAll(listOf("do", "intellij_elixir.debug,"))
 
-        debugged.mixEspecArgumentList.addAll(mixEspecArgumentList)
-        debugged.mixEspecArgumentList.add("--trace")
+        debugged.mixESpecArgumentList.addAll(mixESpecArgumentList)
+        debugged.mixESpecArgumentList.add("--trace")
 
         debugged.workingDirectory = workingDirectory
         debugged.isPassParentEnvs = isPassParentEnvs
@@ -59,10 +59,10 @@ class Configuration(name: String, project: Project) :
         return debugged
     }
 
-    override fun getProgramParameters(): String? = mixEspecArguments
+    override fun getProgramParameters(): String? = mixESpecArguments
 
     override fun setProgramParameters(value: String?) {
-        mixEspecArguments = value
+        mixESpecArguments = value
     }
 
     var erlArgumentList: MutableList<String> = mutableListOf()
@@ -83,17 +83,17 @@ class Configuration(name: String, project: Project) :
      */
     private var mixArgumentList: MutableList<String> = mutableListOf()
 
-    private var mixEspecArguments: String?
-        get() = mixEspecArgumentList.toArguments()
-        set(arguments) = mixEspecArgumentList.fromArguments(arguments)
+    private var mixESpecArguments: String?
+        get() = mixESpecArgumentList.toArguments()
+        set(arguments) = mixESpecArgumentList.fromArguments(arguments)
 
-    var mixEspecArgumentList: MutableList<String> = mutableListOf()
+    var mixESpecArgumentList: MutableList<String> = mutableListOf()
 
     fun commandLine(): GeneralCommandLine {
         val workingDirectory = ensureWorkingDirectory()
         val module = ensureModule()
         val sdk = ensureMostSpecificSdk(module)
-        val commandLine = Espec.commandLine(
+        val commandLine = ESpec.commandLine(
                 envs,
                 workingDirectory,
                 sdk,
@@ -101,7 +101,7 @@ class Configuration(name: String, project: Project) :
                 elixirArgumentList,
                 mixArgumentList
         )
-        commandLine.addParameters(mixEspecArgumentList)
+        commandLine.addParameters(mixESpecArgumentList)
 
         return commandLine
     }
@@ -119,7 +119,7 @@ class Configuration(name: String, project: Project) :
         super.readExternal(element)
         element.readExternalArgumentList(ERL, erlArgumentList)
         element.readExternalArgumentList(ELIXIR, elixirArgumentList)
-        element.readExternalArgumentList(MIX_ESPEC, mixEspecArgumentList)
+        element.readExternalArgumentList(MIX_ESPEC, mixESpecArgumentList)
         workingDirectoryURL = element.readExternalWorkingDirectory()
         EnvironmentVariablesComponent.readExternal(element, envs)
         element.readExternalModule(this)
@@ -132,7 +132,7 @@ class Configuration(name: String, project: Project) :
         super.writeExternal(element)
         element.writeExternalArgumentList(ERL, erlArgumentList)
         element.writeExternalArgumentList(ELIXIR, elixirArgumentList)
-        element.writeExternalArgumentList(MIX_ESPEC, mixEspecArgumentList)
+        element.writeExternalArgumentList(MIX_ESPEC, mixESpecArgumentList)
         element.writeExternalWorkingDirectory(workingDirectoryURL)
         EnvironmentVariablesComponent.writeExternal(element, envs)
         element.writeExternalModule(this)

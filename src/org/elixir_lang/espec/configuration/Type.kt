@@ -9,8 +9,8 @@ class Type : ConfigurationTypeBase(TYPE_ID, TYPE_NAME, "Runs Mix espec", Icons.T
     override fun getConfigurationFactories(): Array<ConfigurationFactory> = arrayOf(Factory)
 
     companion object {
-        private const val TYPE_ID = "MixEspecRunConfigurationType"
-        internal const val TYPE_NAME = "Elixir Mix Espec"
+        private const val TYPE_ID = "MixESpecRunConfigurationType"
+        internal const val TYPE_NAME = "Elixir Mix ESpec"
 
         val INSTANCE: Type
             get() = Extensions.findExtension<ConfigurationType, Type>(ConfigurationType.CONFIGURATION_TYPE_EP, Type::class.java)

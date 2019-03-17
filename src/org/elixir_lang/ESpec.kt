@@ -2,8 +2,9 @@ package org.elixir_lang
 
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.projectRoots.Sdk
+import org.elixir_lang.espec.Modules
 
-object Espec {
+object ESpec {
     fun commandLine(environment: Map<String, String>,
                     workingDirectory: String?,
                     elixirSdk: Sdk,
@@ -15,16 +16,16 @@ object Espec {
                 environment,
                 workingDirectory,
                 elixirSdk,
-                erlArgumentList,
-                elixirArgumentList
+                Modules.erlParametersList() + erlArgumentList,
+                Modules.elixirParametersList() + elixirArgumentList
         )
         commandLine.addParameters(mixArgumentList)
-        addEspec(commandLine)
+        addESpec(commandLine)
 
         return commandLine
     }
 
-    private fun addEspec(commandLine: GeneralCommandLine) {
+    private fun addESpec(commandLine: GeneralCommandLine) {
         commandLine.addParameter("espec")
     }
 }

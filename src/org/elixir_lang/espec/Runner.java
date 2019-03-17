@@ -6,7 +6,7 @@ import com.intellij.execution.runners.DefaultProgramRunner;
 import org.jetbrains.annotations.NotNull;
 
 public final class Runner extends DefaultProgramRunner {
-    private static final String MIX_RUNNER_ID = "MixEspecRunner";
+    private static final String MIX_RUNNER_ID = "MixESpecRunner";
 
     @NotNull
     @Override

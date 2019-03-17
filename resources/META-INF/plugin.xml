@@ -68,7 +68,7 @@
     <!-- Testing -->
     <configurationType implementation="org.elixir_lang.espec.configuration.Type" />
     <programRunner implementation="org.elixir_lang.espec.Runner" />
-    <runConfigurationProducer implementation="org.elixir_lang.espec.configuration.MixEspecRunConfigurationProducer" />
+    <runConfigurationProducer implementation="org.elixir_lang.espec.configuration.MixESpecRunConfigurationProducer" />
 
     <configurationType implementation="org.elixir_lang.exunit.configuration.Type" />
     <programRunner implementation="org.elixir_lang.exunit.Runner" />

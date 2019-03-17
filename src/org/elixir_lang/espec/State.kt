@@ -17,7 +17,7 @@ import org.elixir_lang.console.ElixirConsoleUtil
 import org.elixir_lang.mix.State
 import java.lang.reflect.InvocationTargetException
 
-private const val TEST_FRAMEWORK_NAME = "Espec"
+private const val TEST_FRAMEWORK_NAME = "ESpec"
 
 class State(environment: ExecutionEnvironment, private val configuration: Configuration) :
         CommandLineState(environment) {

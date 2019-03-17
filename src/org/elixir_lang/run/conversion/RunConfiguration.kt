@@ -16,7 +16,7 @@ class RunConfiguration : ConversionProcessor<RunManagerSettings>() {
     }
 }
 
-private val TYPES = arrayOf("MixRunConfigurationType", "MixExUnitRunConfigurationType", "MixEspecRunConfigurationType")
+private val TYPES = arrayOf("MixRunConfigurationType", "MixExUnitRunConfigurationType", "MixESpecRunConfigurationType")
 private val OLD_OPTION_NAMES = arrayOf("programParameters", "workingDirectory")
 
 private fun Element.getOption(name: String): Element? = getChildren("option").first { it.getAttributeValue("name") == name }
@@ -38,7 +38,7 @@ fun Element.processProgramParametersOption() {
 
         val command = when (type) {
             "MixRunConfigurationType" -> MIX
-            "MixEspecRunConfigurationType" -> MIX_ESPEC
+            "MixESpecRunConfigurationType" -> MIX_ESPEC
             "MixExUnitRunConfigurationType" -> MIX_TEST
             else -> null
         }

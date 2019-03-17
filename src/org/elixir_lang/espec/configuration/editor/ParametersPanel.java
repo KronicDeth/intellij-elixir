@@ -19,7 +19,7 @@ public class ParametersPanel extends CommonProgramParametersPanel {
         return getProgramParametersComponent().getComponent().getText();
     }
 
-    private void setMixEspecArguments(@Nullable String text) {
+    private void setMixESpecArguments(@Nullable String text) {
         getProgramParametersComponent().getComponent().setText(text);
     }
 

@@ -46,7 +46,7 @@ fun ancestorDirectoryNamesBaseNamePair(moduleName: String, extension: String): P
 
 fun templateNameToExtension(templateName: String): String =
         when (templateName) {
-            "Espec" -> ".exs"
+            "ESpec" -> ".exs"
             "ExUnit.Case" -> ".exs"
             else -> ".ex"
         }
@@ -62,7 +62,7 @@ class Dialog(private val project: Project, val directory: PsiDirectory) : Create
             addItem("GenServer", Icons.File.GEN_SERVER, "Elixir GenServer")
             addItem("GenEvent", Icons.File.GEN_EVENT, "Elixir GenEvent")
             addItem("ExUnit.Case", org.elixir_lang.exunit.configuration.Icons.TYPE, "ExUnit.Case")
-            addItem("Espec", org.elixir_lang.espec.configuration.Icons.TYPE, "Espec")
+            addItem("ESpec", org.elixir_lang.espec.configuration.Icons.TYPE, "ESpec")
         }
 
         setTemplateKindComponentsVisible(true)
@@ -141,7 +141,7 @@ class Dialog(private val project: Project, val directory: PsiDirectory) : Create
 
     private fun checkFormat(inputString: String): Boolean =
             when (templateName) {
-                "Espec" -> ESPEC_CASE_NAME_REGEX
+                "ESpec" -> ESPEC_CASE_NAME_REGEX
                 "ExUnit.Case" -> EX_UNIT_CASE_NAME_REGEX
                 else -> MODULE_NAME_REGEX
             }.matches(inputString)
@@ -187,14 +187,14 @@ class Dialog(private val project: Project, val directory: PsiDirectory) : Create
 private fun invalidMessageFormat(templateName: String): String =
         when (templateName) {
             "ExUnit.Case" -> INVALID_EX_UNIT_CASE_MESSAGE_FMT
-            "Espec" -> INVALID_ESPEC_CASE_MESSAGE_FMT
+            "ESpec" -> INVALID_ESPEC_CASE_MESSAGE_FMT
             else -> INVALID_MODULE_MESSAGE_FMT
         }
 
 private const val INVALID_MODULE_MESSAGE_FMT = "'%s' is not a valid Elixir module name. Elixir module " +
                 "names should be a dot-separated-sequence of alphanumeric (and underscore) Aliases, each starting with a " +
                 "capital letter. " + DESCRIPTION
-private const val INVALID_ESPEC_CASE_MESSAGE_FMT = "'%s' is not a valid Espec module name. Espec module " +
+private const val INVALID_ESPEC_CASE_MESSAGE_FMT = "'%s' is not a valid ESpec module name. ESpec module " +
         "names should be a dot-separated-sequence of alphanumeric (and underscore) Aliases, each starting with a " +
         "capital letter and the final one ending in Spec as <code>mix espec</code> looks for files matching " +
         "<code>spec/**/*_spec.exs</code>.  Nested Aliases, like Foo.Bar.BazSpec, are created in subdirectory for the " +
