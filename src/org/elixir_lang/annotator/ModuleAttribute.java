@@ -51,84 +51,86 @@ public class ModuleAttribute implements Annotator, DumbAware {
      */
     @Override
     public void annotate(@NotNull final PsiElement element, @NotNull final AnnotationHolder holder) {
-        element.accept(
-                new PsiRecursiveElementVisitor() {
-                    /*
-                     *
-                     * Instance Methods
-                     *
-                     */
+        if (!element.getContainingFile().getViewProvider().getLanguages().contains(org.elixir_lang.eex.Language.INSTANCE)) { // if there exists an EEx tag as a parent, we're in an EEx file
+            element.accept(
+                    new PsiRecursiveElementVisitor() {
+                        /*
+                         *
+                         * Instance Methods
+                         *
+                         */
 
-                    /*
-                     * Public Instance Methods
-                     */
+                        /*
+                         * Public Instance Methods
+                         */
 
-                    @Override
-                    public void visitElement(@NotNull final PsiElement element) {
-                        if (element instanceof AtNonNumericOperation) {
-                            visitMaybeUsage((AtNonNumericOperation) element);
-                        } else if (element instanceof AtUnqualifiedNoParenthesesCall) {
-                            visitDeclaration((AtUnqualifiedNoParenthesesCall) element);
+                        @Override
+                        public void visitElement(@NotNull final PsiElement element) {
+                            if (element instanceof AtNonNumericOperation) {
+                                visitMaybeUsage((AtNonNumericOperation) element);
+                            } else if (element instanceof AtUnqualifiedNoParenthesesCall) {
+                                visitDeclaration((AtUnqualifiedNoParenthesesCall) element);
+                            }
                         }
-                    }
 
-                    /*
-                     * Private Instance Methods
-                     */
+                        /*
+                         * Private Instance Methods
+                         */
 
-                    private void visitDeclaration(@NotNull final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
-                        ElixirAtIdentifier atIdentifier = atUnqualifiedNoParenthesesCall.getAtIdentifier();
-                        TextRange textRange = atIdentifier.getTextRange();
+                        private void visitDeclaration(@NotNull final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
+                            ElixirAtIdentifier atIdentifier = atUnqualifiedNoParenthesesCall.getAtIdentifier();
+                            TextRange textRange = atIdentifier.getTextRange();
 
-                        String identifier = identifierName(atIdentifier);
+                            String identifier = identifierName(atIdentifier);
 
-                        if (Companion.isCallbackName(identifier)) {
-                            highlight(textRange, holder, ElixirSyntaxHighlighter.MODULE_ATTRIBUTE);
+                            if (Companion.isCallbackName(identifier)) {
+                                highlight(textRange, holder, ElixirSyntaxHighlighter.MODULE_ATTRIBUTE);
 
-                            highlightCallback(atUnqualifiedNoParenthesesCall, holder);
-                        } else if (Companion.isDocumentationName(identifier)) {
-                            highlight(textRange, holder, ElixirSyntaxHighlighter.DOCUMENTATION_MODULE_ATTRIBUTE);
+                                highlightCallback(atUnqualifiedNoParenthesesCall, holder);
+                            } else if (Companion.isDocumentationName(identifier)) {
+                                highlight(textRange, holder, ElixirSyntaxHighlighter.DOCUMENTATION_MODULE_ATTRIBUTE);
 
-                            highlightDocumentationText(atUnqualifiedNoParenthesesCall, holder);
-                        } else if (Companion.isTypeName(identifier)) {
-                            highlight(textRange, holder, ElixirSyntaxHighlighter.MODULE_ATTRIBUTE);
+                                highlightDocumentationText(atUnqualifiedNoParenthesesCall, holder);
+                            } else if (Companion.isTypeName(identifier)) {
+                                highlight(textRange, holder, ElixirSyntaxHighlighter.MODULE_ATTRIBUTE);
 
-                            highlightType(atUnqualifiedNoParenthesesCall, holder);
-                        } else if (Companion.isSpecificationName(identifier)) {
-                            highlight(textRange, holder, ElixirSyntaxHighlighter.MODULE_ATTRIBUTE);
+                                highlightType(atUnqualifiedNoParenthesesCall, holder);
+                            } else if (Companion.isSpecificationName(identifier)) {
+                                highlight(textRange, holder, ElixirSyntaxHighlighter.MODULE_ATTRIBUTE);
 
-                            highlightSpecification(atUnqualifiedNoParenthesesCall, holder);
-                        } else {
-                            highlight(textRange, holder, ElixirSyntaxHighlighter.MODULE_ATTRIBUTE);
+                                highlightSpecification(atUnqualifiedNoParenthesesCall, holder);
+                            } else {
+                                highlight(textRange, holder, ElixirSyntaxHighlighter.MODULE_ATTRIBUTE);
+                            }
                         }
-                    }
 
 
-                    private void visitMaybeUsage(@NotNull final AtNonNumericOperation element) {
-                        PsiElement operand = element.operand();
+                        private void visitMaybeUsage(@NotNull final AtNonNumericOperation element) {
+                            PsiElement operand = element.operand();
 
-                        if (operand != null && !(operand instanceof ElixirAccessExpression)) {
-                            visitUsage(element);
+                            if (operand != null && !(operand instanceof ElixirAccessExpression)) {
+                                visitUsage(element);
+                            }
                         }
-                    }
 
-                    private void visitUsage(@NotNull final AtNonNumericOperation atNonNumericOperation) {
-                        highlight(
-                                atNonNumericOperation.getTextRange(),
-                                holder,
-                                ElixirSyntaxHighlighter.MODULE_ATTRIBUTE
-                        );
+                        private void visitUsage(@NotNull final AtNonNumericOperation atNonNumericOperation) {
+                            highlight(
+                                    atNonNumericOperation.getTextRange(),
+                                    holder,
+                                    ElixirSyntaxHighlighter.MODULE_ATTRIBUTE
+                            );
 
-                        if (!Companion.isNonReferencing(atNonNumericOperation)) {
-                            PsiReference reference = atNonNumericOperation.getReference();
+                            if (!Companion.isNonReferencing(atNonNumericOperation)) {
+                                PsiReference reference = atNonNumericOperation.getReference();
 
-                            if (reference != null && reference.resolve() == null) {
-                                holder.createErrorAnnotation(atNonNumericOperation, "Unresolved module attribute");
+                                if (reference != null && reference.resolve() == null) {
+                                    holder.createErrorAnnotation(atNonNumericOperation, "Unresolved module attribute");
+                                }
                             }
                         }
                     }
-                }
-        );
+            );
+        }
     }
 
     /*
