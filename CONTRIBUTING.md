@@ -64,7 +64,7 @@ You can run `./gradlew runIde` or `./gradlew test`.
 
 1. Expand `intellij`
 2. Right-click `runIde`
-3. Select `Create 'intellij-elixir' [runIdea]`
+3. Select `Create 'intellij-elixir' [runIde]`
 
 #### `test`
 
