@@ -194,6 +194,7 @@ Table of Contents
   * Only show Run/Debug ESpec when `*_spec.exs` files exist.
 * [#1415](https://github.com/KronicDeth/intellij-elixir/pull/1415) - Wrap `UnqualifiedNoArgumentCall.quote` `identifier.text` in `runReadAction`. - [@KronicDeth](https://github.com/KronicDeth)
 * [#1419](https://github.com/KronicDeth/intellij-elixir/pull/1419) - Fix typos in `CONTRIBUTING.md` - [@nschulzke](https://github.com/nschulzke)
+* [#1420](https://github.com/KronicDeth/intellij-elixir/pull/1420) - Prevent the module attribute annotator from running in EEx files. - [@nschulzke](https://github.com/nschulzke)
 
 ## v10.3.0
 
