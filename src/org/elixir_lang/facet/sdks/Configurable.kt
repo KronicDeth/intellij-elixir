@@ -175,7 +175,7 @@ abstract class Configurable: SearchableConfigurable, com.intellij.openapi.option
 
     private fun removeSdk() {
         sdkList.selectedValue?.let {
-            val sdk = projectSdksModel.findSdk(it)
+            val sdk = projectSdksModel.findSdk(it)!!
             SdkConfigurationUtil.removeSdk(sdk)
 
             projectSdksModel.removeSdk(sdk)

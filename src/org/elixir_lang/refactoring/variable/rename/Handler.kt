@@ -1,6 +1,7 @@
 package org.elixir_lang.refactoring.variable.rename
 
 import com.intellij.codeInsight.TargetElementUtil.adjustOffset
+import com.intellij.ide.DataManager
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
@@ -47,9 +48,10 @@ class Handler : RenameHandler {
      *                    (it is recommended to pass DataManager.getDataContext() instead of null)
      */
     override fun invoke(project: Project, editor: Editor?, file: PsiFile?, dataContext: DataContext?) {
+        val nonNullDataContext = dataContext ?: DataManager.getInstance().dataContext
         val elements = reference(editor, file)?.toPsiElementList()?.toTypedArray() ?: emptyArray()
 
-        invoke(editor, elements, dataContext)
+        invoke(editor, elements, nonNullDataContext)
     }
 
     /**
@@ -62,14 +64,16 @@ class Handler : RenameHandler {
      *                    (it is recommended to pass DataManager.getDataContext() instead of null)
      */
     override fun invoke(project: Project, elements: Array<out PsiElement>, dataContext: DataContext?) {
-        invoke(dataContext?.let { CommonDataKeys.EDITOR.getData(it) }, elements, dataContext)
+        val nonNullDataContext = dataContext ?: DataManager.getInstance().dataContext
+
+        invoke(nonNullDataContext.let(CommonDataKeys.EDITOR::getData), elements, nonNullDataContext)
     }
 
     private fun createRenamer(elementToRename: PsiElement, editor: Editor?): VariableInplaceRenamer? =
             Inplace(elementToRename as PsiNamedElement, editor)
 
     // See `com.intellij.refactoring.rename.inplace.VariableInplaceRenameHandler.doRename`
-    private fun invoke(editor: Editor?, element: PsiElement, dataContext: DataContext?) {
+    private fun invoke(editor: Editor?, element: PsiElement, dataContext: DataContext) {
         val renamer = createRenamer(element, editor)
         val startedRename = renamer?.performInplaceRename() ?: false
 
@@ -78,7 +82,7 @@ class Handler : RenameHandler {
         }
     }
 
-    private fun invoke(editor: Editor?, elements: Array<out PsiElement>, dataContext: DataContext?) {
+    private fun invoke(editor: Editor?, elements: Array<out PsiElement>, dataContext: DataContext) {
         elements.forEach { element ->
             invoke(editor, element, dataContext)
         }
@@ -89,7 +93,7 @@ class Handler : RenameHandler {
                     .toPsiElementList()
                     .any { isAvailableOnResolved(it) }
 
-    private fun performDialogRename(element: PsiElement, editor: Editor?, dataContext: DataContext?) {
+    private fun performDialogRename(element: PsiElement, editor: Editor?, dataContext: DataContext) {
         RenameHandlerRegistry
                 .getInstance()
                 .getRenameHandler(dataContext)!!
