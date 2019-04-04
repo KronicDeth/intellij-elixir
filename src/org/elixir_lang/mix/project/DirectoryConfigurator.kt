@@ -8,10 +8,12 @@ import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.roots.ModuleRootModificationUtil
 import com.intellij.openapi.util.Ref
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.projectImport.ProjectAttachProcessor
 import org.elixir_lang.Facet
+import org.elixir_lang.mix.Project.addFolders
 import java.nio.file.Path
 import java.nio.file.Paths
 
@@ -34,6 +36,10 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
 
                 if (FacetManager.getInstance(module).findFacet(Facet.ID, "Elixir") == null) {
                     addFacet(module, FacetType.findInstance(org.elixir_lang.facet.Type::class.java))
+
+                    ModuleRootModificationUtil.updateModel(module) { modifiableRootModel ->
+                        addFolders(modifiableRootModel, baseDir)
+                    }
                 }
             } else {
                 attachToProject(project, Paths.get(otpApp.root.path))
