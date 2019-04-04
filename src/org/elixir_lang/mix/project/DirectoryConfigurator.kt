@@ -5,6 +5,7 @@ import com.intellij.facet.FacetType
 import com.intellij.facet.impl.FacetUtil.addFacet
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
+import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
@@ -12,8 +13,10 @@ import com.intellij.openapi.roots.ModuleRootModificationUtil
 import com.intellij.openapi.util.Ref
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.projectImport.ProjectAttachProcessor
+import org.elixir_lang.DepsWatcher
 import org.elixir_lang.Facet
 import org.elixir_lang.mix.Project.addFolders
+import org.elixir_lang.mix.Watcher
 import java.nio.file.Path
 import java.nio.file.Paths
 
@@ -40,9 +43,28 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
                     ModuleRootModificationUtil.updateModel(module) { modifiableRootModel ->
                         addFolders(modifiableRootModel, baseDir)
                     }
+
+                    ProgressManager.getInstance().run(object : Task.Modal(project, "Scanning dependencies for Libraries", true) {
+                        override fun run(indicator: ProgressIndicator) {
+                            project.getComponent(DepsWatcher::class.java).syncLibraries(project, indicator)
+                        }
+                    })
                 }
             } else {
                 attachToProject(project, Paths.get(otpApp.root.path))
+
+                ProgressManager.getInstance().run(object : Task.Modal(project, "Scanning mix.exs to connect libraries for newly attached project for OTP app ${otpApp.name}", true) {
+                    override fun run(progressIndicator: ProgressIndicator) {
+                        for (module in ModuleManager.getInstance(project).modules) {
+                            if (progressIndicator.isCanceled) {
+                                break
+                            }
+
+                            module.getComponent(Watcher::class.java).syncLibraries(progressIndicator)
+                        }
+                    }
+                })
+
             }
         }
     }
