@@ -1,5 +1,8 @@
 package org.elixir_lang.mix.project
 
+import com.intellij.facet.FacetManager
+import com.intellij.facet.FacetType
+import com.intellij.facet.impl.FacetUtil.addFacet
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.progress.ProgressManager
@@ -7,7 +10,10 @@ import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Ref
 import com.intellij.openapi.vfs.VirtualFile
-import org.elixir_lang.mix.Project.createModulesForOtpApps
+import com.intellij.projectImport.ProjectAttachProcessor
+import org.elixir_lang.Facet
+import java.nio.file.Path
+import java.nio.file.Paths
 
 /**
  * Used in Small IDEs like Rubymine that don't support [OpenProcessor].
@@ -22,8 +28,24 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
             }
         })
 
-        createModulesForOtpApps(project, foundOtpApps, {
-            ModuleManager.getInstance(project).modifiableModel
-        })
+        for (otpApp in foundOtpApps) {
+            if (otpApp.root == baseDir) {
+                val module = ModuleManager.getInstance(project).modules[0]
+
+                if (FacetManager.getInstance(module).findFacet(Facet.ID, "Elixir") == null) {
+                    addFacet(module, FacetType.findInstance(org.elixir_lang.facet.Type::class.java))
+                }
+            } else {
+                attachToProject(project, Paths.get(otpApp.root.path))
+            }
+        }
+    }
+
+    private fun attachToProject(project: Project, baseDir: Path) {
+        for (processor in ProjectAttachProcessor.EP_NAME.extensionList) {
+            if (processor.attachToProject(project, baseDir, null)) {
+                break
+            }
+        }
     }
 }
