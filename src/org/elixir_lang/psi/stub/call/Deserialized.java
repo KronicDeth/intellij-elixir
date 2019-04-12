@@ -19,7 +19,9 @@ public class Deserialized {
        https://github.com/KronicDeth/intellij-elixir/issues/767 */
     private static final int GUARD_LENGTH = 0;
     private static final Logger LOGGER = Logger.getInstance(Deserialized.class);
-    private static final int SUSPECT_NAME_SET_SIZE = 10;
+    /* Set > than experimentally observed valid values.  >= 13 is needed to accommodate `geo`'s 13 Protocol `impl`s for
+       `String.Chars`.  */
+    private static final int SUSPECT_NAME_SET_SIZE = 15;
 
     static {
         int i;
