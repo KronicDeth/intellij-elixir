@@ -97,6 +97,7 @@
                          provider="org.elixir_lang.facet.configurable.Provider"/>
     <project.converterProvider implementation="org.elixir_lang.facet.conversion.Provider"/>
     <project.converterProvider implementation="org.elixir_lang.facet.external_library.conversion.Provider"/>
+    <project.converterProvider implementation="org.elixir_lang.facet.elixir_module_deletion.Provider"/>
 
     <facetType implementation="org.elixir_lang.facet.Type"/>
     <framework.detector implementation="org.elixir_lang.FrameworkDetector"/>
