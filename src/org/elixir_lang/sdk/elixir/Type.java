@@ -519,12 +519,7 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
      * @return Map
      */
     private Map<Version, String> homePathByVersion() {
-        Map<Version, String> homePathByVersion = new TreeMap<>(
-                (version1, version2) -> {
-                    // compare version2 to version1 to produce descending instead of ascending order.
-                    return version2.compareTo(version1);
-                }
-        );
+        Map<Version, String> homePathByVersion = new TreeMap<>(Comparator.reverseOrder());
 
         if (SystemInfo.isMac) {
             mergeHomebrew(homePathByVersion, "elixir", java.util.function.Function.identity());
