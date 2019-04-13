@@ -1,4 +1,4 @@
-package org.elixir_lang;
+package org.elixir_lang.sdk.elixir;
 
 import org.junit.Test;
 
@@ -9,11 +9,11 @@ import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 
-public class SdkTypeTest {
+public class TypeTest {
 
     @Test
-    public void testSuggestHomePathWithoutSuggestHomePaths() throws Exception {
-        SdkType spy = spy(new SdkType());
+    public void testSuggestHomePathWithoutSuggestHomePaths() {
+        Type spy = spy(new Type());
 
         doReturn(Collections.<String>emptyList()).when(spy).suggestHomePaths();
 
@@ -21,8 +21,8 @@ public class SdkTypeTest {
     }
 
     @Test
-    public void testSuggestHomePathWithSuggestHomePaths() throws Exception {
-        SdkType spy = spy(new SdkType());
+    public void testSuggestHomePathWithSuggestHomePaths() {
+        Type spy = spy(new Type());
         String expectedSuggestedHomePath = "/suggested/home/path";
 
         doReturn(Collections.singletonList(expectedSuggestedHomePath)).when(spy).suggestHomePaths();
