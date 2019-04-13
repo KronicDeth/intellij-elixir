@@ -1,7 +1,24 @@
 <html>
 <body>
-<h1>v10.4.1</h1>
+<h1>v10.5.0</h1>
 <ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>Replace comparator with Comparator.reverseOrder()</li>
+      <li>
+        The correct home path for <code>kiex</code> is <code>~/.kiex/elixirs/elixir-VERSION/lib/elixir</code> as that
+        contains the true <code>lib</code> and <code>bin</code> directory, but users may select other directories by
+        mistake, so doing the following adjustments:
+        <ul>
+          <li>Adjust <code>bin</code> home path to <code>lib/elixir</code>.</li>
+          <li>
+            Adjust <code>elixirs/elixir-VERSION</code> home path to <code>elixirs/elixir-VERSION/lib/elixir</code>.
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
   <li>
     <p>Bug Fixes</p>
     <ul>
@@ -44,6 +61,14 @@
         <a href="https://hexdocs.pm/geo/3.1.0/api-reference.html" rel="nofollow">
           13 <code>String.Chars</code> implementations
         </a>.
+      </li>
+      <li>
+        Remove obsolete <code>SdkType</code>.  I keep confusing it with its replacement
+        <code>org.elixir_lang.sdk.elixir.Type</code>!
+      </li>
+      <li>
+        Check that HomePath has <code>ebin</code> paths when validation.  Prevents selecting false HomePaths for
+        <code>kiex</code>.
       </li>
     </ul>
   </li>
