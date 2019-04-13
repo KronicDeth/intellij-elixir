@@ -1,5 +1,46 @@
 <html>
 <body>
+<h1>v10.4.1</h1>
+<ul>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>
+        In RubyMine, attach OTP applications as separate projects with Elixir facets instead of directly creating
+        <code>ELIXIR_MODULE</code> modules in <code>DirectoryConfigurator</code>.  This matches the manual steps of
+        opening the OTP apps as separate directories after opening the root of the project.
+        <ul>
+          <li>Mark directories when adding facet</li>
+          <li>
+            Sync libraries when adding facet or attaching to root project.  Ensures External Libraries show up for all
+            OTP applications.
+          </li>
+        </ul>
+      </li>
+      <li>Convert Small IDE projects with <code>ELIXIR_MODULE</code>s:
+        <ol>
+          <li>Remove <code>ELIXIR_MODULE</code> <code>*.iml</code> files</li>
+          <li>Remove <code>ELIXIR_MODULE</code> entries root project's <code>modules.xml</code> file.</li>
+          <li>
+            <a href="https://github.com/JetBrains/intellij-community/blob/1f49fc455d01f4b887463853db48e814f6700fb3/platform/platform-impl/src/com/intellij/platform/PlatformProjectOpenProcessor.java#L186-L188">
+              Lack of modules in project in <code>doOpenProject</code>
+            </a>
+            will trigger <code>DirectoryProjectConfigurator</code>s to be
+            <a href="https://github.com/JetBrains/intellij-community/blob/1f49fc455d01f4b887463853db48e814f6700fb3/platform/platform-impl/src/com/intellij/platform/PlatformProjectOpenProcessor.java#L206">run</a>,
+            which will setup the project and run <code>DirectoryConfigurator</code> to attach the <code>apps</code> OTP
+            apps and Elixir facets.
+            <ul>
+              <li>
+                Only support automatic attaching multiple OTP apps as separate projects in Rubymine.  In IntelliJ normal
+                support for multiple Modules in one Project still works.
+              </li>
+            </ul>
+          </li>
+        </ol>
+      </li>
+    </ul>
+  </li>
+</ul>
 <h1>v10.4.0</h1>
 <ul>
   <li>
