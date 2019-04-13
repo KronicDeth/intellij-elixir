@@ -441,6 +441,9 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
                 }
             } else if (SDK_HOME_CHILD_BASE_NAME_SET.contains(baseName)) {
                 adjustedSdkHome = homePathFile.getParent();
+            } else if (baseName.startsWith("elixir-") && FilenameUtils.getBaseName(homePathFile.getParent()).equals("elixirs")) {
+                // `kiex` versioned directory like `~/.kiex/elixirs/elixir-VERSION`.
+                adjustedSdkHome = new File(new File(homePathFile, "lib"), "elixir").getPath();
             }
         }
 
