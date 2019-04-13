@@ -194,6 +194,7 @@ Table of Contents
      2. Remove `ELIXIR_MODULE` entries root project's `modules.xml` file.
      3. [Lack of modules in project in `doOpenProject`](https://github.com/JetBrains/intellij-community/blob/1f49fc455d01f4b887463853db48e814f6700fb3/platform/platform-impl/src/com/intellij/platform/PlatformProjectOpenProcessor.java#L186-L188) will trigger `DirectoryProjectConfigurator`s to be [run](https://github.com/JetBrains/intellij-community/blob/1f49fc455d01f4b887463853db48e814f6700fb3/platform/platform-impl/src/com/intellij/platform/PlatformProjectOpenProcessor.java#L206), which will setup the project and run `DirectoryConfigurator` to attach the `apps` OTP apps and Elixir facets.
         * Only support automatic attaching multiple OTP apps as separate projects in Rubymine.  In IntelliJ normal support for multiple Modules in one Project still works.
+* [#1444](https://github.com/KronicDeth/intellij-elixir/pull/1444) - Increase suspect `nameSet` size to `15` to support [`geo`](https://hex.pm/packages/geo).  `geo` has [13 `String.Chars` implementations](https://hexdocs.pm/geo/3.1.0/api-reference.html). - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v10.4.0
 
