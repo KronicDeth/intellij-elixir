@@ -57,7 +57,7 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
     private static final String LINUX_DEFAULT_HOME_PATH = HomePath.LINUX_DEFAULT_HOME_PATH + "/elixir";
     private static final Logger LOG = Logger.getInstance(Type.class);
     private static final Pattern NIX_PATTERN = nixPattern("elixir");
-    private static final Set<String> SDK_HOME_CHILD_BASE_NAME_SET = new THashSet<>(Arrays.asList("bin", "lib", "src"));
+    private static final Set<String> SDK_HOME_CHILD_BASE_NAME_SET = new THashSet<>(Arrays.asList("lib", "src"));
     private static final String WINDOWS_32BIT_DEFAULT_HOME_PATH = "C:\\Program Files\\Elixir";
     private static final String WINDOWS_64BIT_DEFAULT_HOME_PATH = "C:\\Program Files (x86)\\Elixir";
     private final Map<String, Release> mySdkHomeToReleaseCache =
@@ -427,8 +427,23 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
         if (homePathFile.isDirectory()) {
             String baseName = FilenameUtils.getBaseName(homePath);
 
-            if (SDK_HOME_CHILD_BASE_NAME_SET.contains(baseName)) {
+            if (baseName.equals("bin")) {
                 adjustedSdkHome = homePathFile.getParent();
+
+                // adjustSelectedSdkHome is only called once, but `bin` could either be the correct `bin` OR in `kiex` a false `bin`.
+                if (!isValidSdkHome(adjustedSdkHome)) {
+                    File libSibling = new File(adjustedSdkHome, "lib");
+
+                    // `kiex` has `lib/elixr` and the false `bin` as the same level
+                    if (libSibling.exists()) {
+                        adjustedSdkHome = new File(libSibling, "elixir").getPath();
+                    }
+                }
+            } else if (SDK_HOME_CHILD_BASE_NAME_SET.contains(baseName)) {
+                adjustedSdkHome = homePathFile.getParent();
+            } else if (baseName.startsWith("elixir-") && FilenameUtils.getBaseName(homePathFile.getParent()).equals("elixirs")) {
+                // `kiex` versioned directory like `~/.kiex/elixirs/elixir-VERSION`.
+                adjustedSdkHome = new File(new File(homePathFile, "lib"), "elixir").getPath();
             }
         }
 
@@ -519,12 +534,7 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
      * @return Map
      */
     private Map<Version, String> homePathByVersion() {
-        Map<Version, String> homePathByVersion = new TreeMap<>(
-                (version1, version2) -> {
-                    // compare version2 to version1 to produce descending instead of ascending order.
-                    return version2.compareTo(version1);
-                }
-        );
+        Map<Version, String> homePathByVersion = new TreeMap<>(Comparator.reverseOrder());
 
         if (SystemInfo.isMac) {
             mergeHomebrew(homePathByVersion, "elixir", java.util.function.Function.identity());
@@ -590,8 +600,8 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
         File iex = Elixir.getIExExecutable(path);
         File mix = Elixir.mixFile(path);
 
-        // Determine whether everything is can run
-        return elixir.canExecute() && elixirc.canExecute() && iex.canExecute() && mix.canRead();
+        return elixir.canExecute() && elixirc.canExecute() && iex.canExecute() && mix.canRead() &&
+                HomePath.hasEbinPath(path);
     }
 
     @Override

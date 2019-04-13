@@ -39,7 +39,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.elixir_lang.SdkType.pathIsValidSdkHome;
 import static org.elixir_lang.test.ElixirVersion.elixirSdkRelease;
 
 /**
@@ -348,6 +347,16 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
         assertNotNull("ELIXIR_EBIN_DIRECTORY is not set", ebinDirectory);
 
         return ebinDirectory;
+    }
+
+    public static boolean pathIsValidSdkHome(String path) {
+        File bin = new File(path, "bin").getAbsoluteFile();
+        File elixir = new File(bin, "elixir");
+        File elixirc = new File(bin, "elixirc");
+        File iex = new File(bin, "iex");
+        File mix = new File(bin, "mix");
+
+        return elixir.canExecute() && elixirc.canExecute() && iex.canExecute() && mix.canExecute();
     }
 
     @NotNull
