@@ -585,8 +585,8 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
         File iex = Elixir.getIExExecutable(path);
         File mix = Elixir.mixFile(path);
 
-        // Determine whether everything is can run
-        return elixir.canExecute() && elixirc.canExecute() && iex.canExecute() && mix.canRead();
+        return elixir.canExecute() && elixirc.canExecute() && iex.canExecute() && mix.canRead() &&
+                HomePath.hasEbinPath(path);
     }
 
     @Override

@@ -47,6 +47,29 @@ public class HomePath {
         }
     }
 
+    public static boolean hasEbinPath(@NotNull String homePath) {
+        Path lib = Paths.get(homePath, "lib");
+        boolean hasEbinPath = false;
+
+        try (DirectoryStream<Path> libDirectoryStream = Files.newDirectoryStream(lib, path -> Files.isDirectory(path))) {
+            for (Path app : libDirectoryStream) {
+                try (DirectoryStream<Path> ebinDirectoryStream = Files.newDirectoryStream(app, "ebin")) {
+                    if (ebinDirectoryStream.iterator().hasNext()) {
+                        hasEbinPath = true;
+
+                        break;
+                    }
+                } catch (IOException ioException) {
+                    LOGGER.error(ioException);
+                }
+            }
+        } catch (IOException ioException) {
+            LOGGER.error(ioException);
+        }
+
+        return hasEbinPath;
+    }
+
     @NotNull
     public static Pattern nixPattern(@NotNull String name) {
         return Pattern.compile(".+-" + name + "-(\\d+)\\.(\\d+)\\.(\\d+)");
