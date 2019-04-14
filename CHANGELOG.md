@@ -207,6 +207,7 @@ Table of Contents
   * Remove obsolete `SdkType`.  I keep confusing it with its replacement `org.elixir_lang.sdk.elixir.Type`!
   * Check that HomePath has `ebin` paths when validation.  Prevents selecting false HomePaths for `kiex`.
 * [#1446](https://github.com/KronicDeth/intellij-elixir/pull/1446) - Adding missing ESpec template.  When reviewing #1410 I missed that the template wasn't in `resources`. 🤦‍♂️ - [@KronicDeth](https://github.com/KronicDeth)
+* [#1447](https://github.com/KronicDeth/intellij-elixir/pull/1447) - Ignore `targets` when calculating `Dep` path. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v10.4.0
 
