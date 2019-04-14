@@ -209,6 +209,7 @@ Table of Contents
 * [#1446](https://github.com/KronicDeth/intellij-elixir/pull/1446) - Adding missing ESpec template.  When reviewing #1410 I missed that the template wasn't in `resources`. 🤦‍♂️ - [@KronicDeth](https://github.com/KronicDeth)
 * [#1447](https://github.com/KronicDeth/intellij-elixir/pull/1447) - Ignore `targets` when calculating `Dep` path. - [@KronicDeth](https://github.com/KronicDeth)
 * [#1448](https://github.com/KronicDeth/intellij-elixir/pull/1448) - Ignore `organization` when calculating `Dep` path. - [@KronicDeth](https://github.com/KronicDeth)
+* [#1449](https://github.com/KronicDeth/intellij-elixir/pull/1449) - Get view provider document in read action. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v10.4.0
 
