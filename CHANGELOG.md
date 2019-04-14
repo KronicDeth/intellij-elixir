@@ -206,6 +206,7 @@ Table of Contents
 * [#1445](https://github.com/KronicDeth/intellij-elixir/pull/1445) - [@KronicDeth](https://github.com/KronicDeth)
   * Remove obsolete `SdkType`.  I keep confusing it with its replacement `org.elixir_lang.sdk.elixir.Type`!
   * Check that HomePath has `ebin` paths when validation.  Prevents selecting false HomePaths for `kiex`.
+* [#1446](https://github.com/KronicDeth/intellij-elixir/pull/1446) - Adding missing ESpec template.  When reviewing #1410 I missed that the template wasn't in `resources`. 🤦‍♂️ - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v10.4.0
 

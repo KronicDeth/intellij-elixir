@@ -1,0 +1,11 @@
+defmodule ${NAME} do
+  use ESpec
+
+  alias ${SOURCE_NAME}
+
+  doctest ${ALIAS}
+
+  it "exists" do
+    assert is_list(${ALIAS}.module_info())
+  end
+end
