@@ -5682,6 +5682,7 @@ I'd like to thank those who have donated to help support this project.
 * Christian Nelson ([@christiannelson](https://github.com/christiannelson))
 * Robin Hillard ([@robinhillard](https://github.com/robinhillard)) of [rocketboots.com](http://www.rocketboots.com)
 * Daniel Temme ([@dmt](https://github.com/dmt))
+* Jean-Francois Cloutier ([@jfcloutier](https://github.com/jfcloutier))
 * Klemen Sever ([@achedeuzot](https://github.com/achedeuzot))
 * Bjorgvin Reynisson
 * Miroslav Hetteš ([@mirrec](https://github.com/mirrec))
