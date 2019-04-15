@@ -5688,6 +5688,7 @@ I'd like to thank those who have donated to help support this project.
 * Vanja Radovanović ([@elvanja](https://github.com/elvanja))
 * Garrett Hart ([@thirdshift](https://github.com/thirdshift))
 * Mateusz Jadczak
+* Fireproof Socks, Inc ([@fireproofsocks](https://github.com/fireproofsocks))
 * Jeremy Jackson ([@jejacks0n](https://github.com/jejacks0n))
 * Nathan Yam ([@nathancyam](https://github.com/nathancyam))
 * Raúl Vázquez González ([@rvazquezglez](https://github.com/rvazquezglez))
