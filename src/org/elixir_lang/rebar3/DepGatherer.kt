@@ -39,15 +39,21 @@ class DepGatherer : DepGatherer() {
 
     private fun dep(expression: ErlangExpression): Dep? =
             when (expression) {
+                is ErlangConfigExpression -> dep(expression)
                 is ErlangTupleExpression -> dep(expression)
                 else -> {
                     Logger.error(
                             logger,
-                            "Don't know if how to extract Mix.Dep from Rebar3 dep expression",
+                            "Don't know how to extract Mix.Dep from Rebar3 dep expression",
                             expression
                     )
                     null
                 }
+            }
+
+    private fun dep(config: ErlangConfigExpression): Dep =
+            config.text.let { name ->
+                Dep(name, path = "deps/$name")
             }
 
     private fun dep(tuple: ErlangTupleExpression): Dep? {
@@ -57,12 +63,11 @@ class DepGatherer : DepGatherer() {
             val firstExpression = expressionList[0]
 
             if (firstExpression is ErlangConfigExpression) {
-                val name = firstExpression.text
-                Dep(name, path = "deps/$name")
+                dep(firstExpression)
             } else {
                 Logger.error(
                         logger,
-                        "Don't know if how to extract Mix.Dep from Rebar3 dep expression",
+                        "Don't know how to extract Mix.Dep from Rebar3 dep expression",
                         tuple
                 )
                 null
@@ -70,7 +75,7 @@ class DepGatherer : DepGatherer() {
         } else {
             Logger.error(
                     logger,
-                    "Don't know if how to extract Mix.Dep from Rebar3 dep expression",
+                    "Don't know how to extract Mix.Dep from Rebar3 dep expression",
                     tuple
             )
             null

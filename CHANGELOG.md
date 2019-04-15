@@ -210,6 +210,7 @@ Table of Contents
 * [#1447](https://github.com/KronicDeth/intellij-elixir/pull/1447) - Ignore `targets` when calculating `Dep` path. - [@KronicDeth](https://github.com/KronicDeth)
 * [#1448](https://github.com/KronicDeth/intellij-elixir/pull/1448) - Ignore `organization` when calculating `Dep` path. - [@KronicDeth](https://github.com/KronicDeth)
 * [#1449](https://github.com/KronicDeth/intellij-elixir/pull/1449) - Get view provider document in read action. - [@KronicDeth](https://github.com/KronicDeth)
+* [#1450](https://github.com/KronicDeth/intellij-elixir/pull/1450) - Support `rebar.config` deps that are name only. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v10.4.0
 
@@ -252,7 +253,7 @@ Table of Contents
       * Update `de.undercouch.download` to `3.4.3`.
       * Don't configure Kotlin in projects that don't use it.
     * Remove `2017.3` to keep version count at `3`.
-
+~~~~
 ### Bug Fixes
 * [#1355](https://github.com/KronicDeth/intellij-elixir/pull/1355) - Prevent `ConcurrentModificationException`s when updating `gradle` by using `allprojects` less. - [@KronicDeth](https://github.com/KronicDeth)
 * [#1359](https://github.com/KronicDeth/intellij-elixir/pull/1359) - [@KronicDeth](https://github.com/KronicDeth)
