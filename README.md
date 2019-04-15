@@ -5697,6 +5697,7 @@ I'd like to thank those who have donated to help support this project.
 * Zvonimir-Zoltan Maric ([@zoltanmaric](https://github.com/zoltanmaric))
 * Ilja Neumann ([@IljaN](https://github.com/IljaN))
 * Purelogic Apps
+* Milan Jaric ([@mjaric](https://github.com/mjaric))
 * Adrian Philipp ([@adri](https://github.com/adri))
 * Angelika Tyborska ([@angelikatyborska](https://github.com/angelikatyborska))
 * César Salazar Hernández ([@cesarslzr](https://github.com/cesarslzr))
