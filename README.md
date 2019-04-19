@@ -5674,6 +5674,7 @@ If you're a developer of open source libraries or tools for the [Ember](https://
 
 I'd like to thank those who have donated to help support this project.
 
+* Thomas Meeks ([@thomas](https://github.com/thomas))
 * Josh Taylor ([@joshuataylor](https://github.com/joshuataylor))
 * Brandon Menc ([@brandonmenc](https://github.com/brandonmenc))
 * Gerard de Brieder ([@smeevil](https://github.com/smeevil)) of [govannon.nl](http://govannon.nl)
