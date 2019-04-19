@@ -5708,6 +5708,7 @@ I'd like to thank those who have donated to help support this project.
 * Dimitrios Fragkos
 * Dmitry Stropaloff
 * Milan Köpke
+* Niklas Bichinger ([@bichinger](https://github.com/bichinger))
 * Percy Grunwald ([@pgrunwald](https://github.com/pgrunwald))
 * Steve Wagner ([@ciroque](https://github.com/ciroque))
 * William De Melo Gueiros ([@williamgueiros](https://github.com/williamgueiros))
