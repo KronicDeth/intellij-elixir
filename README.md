@@ -5686,6 +5686,7 @@ I'd like to thank those who have donated to help support this project.
 * Klemen Sever ([@achedeuzot](https://github.com/achedeuzot))
 * Bjorgvin Reynisson
 * Miroslav Hetteš ([@mirrec](https://github.com/mirrec))
+* Nathan Yam ([@nathancyam](https://github.com/nathancyam))
 * Vanja Radovanović ([@elvanja](https://github.com/elvanja))
 * Garrett Hart ([@thirdshift](https://github.com/thirdshift))
 * Mateusz Jadczak
