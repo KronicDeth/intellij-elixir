@@ -5690,6 +5690,7 @@ I'd like to thank those who have donated to help support this project.
 * Miroslav Hetteš ([@mirrec](https://github.com/mirrec))
 * Nathan Yam ([@nathancyam](https://github.com/nathancyam))
 * Vanja Radovanović ([@elvanja](https://github.com/elvanja))
+* Clifton McIntosh  ([@cliftonmcintosh](https://github.com/cliftonmcintosh), [@clifton-mcintosh](https://github.com/clifton-mcintosh))
 * Garrett Hart ([@thirdshift](https://github.com/thirdshift))
 * Mateusz Jadczak
 * Fireproof Socks, Inc ([@fireproofsocks](https://github.com/fireproofsocks))
