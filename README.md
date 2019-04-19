@@ -5712,6 +5712,7 @@ I'd like to thank those who have donated to help support this project.
 * Percy Grunwald ([@pgrunwald](https://github.com/pgrunwald))
 * Steve Wagner ([@ciroque](https://github.com/ciroque))
 * William De Melo Gueiros ([@williamgueiros](https://github.com/williamgueiros))
+* Дмитрий Цыденов
 * 童童 张
 * IS-Soft Michał Zalewski
 * Michael Howell ([@notriddle](https://github.com/notriddle))
