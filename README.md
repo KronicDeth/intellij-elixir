@@ -5709,6 +5709,7 @@ I'd like to thank those who have donated to help support this project.
 * César Salazar Hernández ([@cesarslzr](https://github.com/cesarslzr))
 * Dimitrios Fragkos
 * Dmitry Stropaloff
+* Matthäus Beyrle ([@magynhard](https://github.com/magynhard))
 * Milan Köpke
 * Niklas Bichinger ([@bichinger](https://github.com/bichinger))
 * Percy Grunwald ([@pgrunwald](https://github.com/pgrunwald))
