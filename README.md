@@ -5660,7 +5660,7 @@ If the plugin encounters an error, there is a custom error handler registered, s
 
 If you would like to make a donation you can use Paypal:
 
-[![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=Kronic%2eDeth%40gmail%2ecom&lc=US&item_name=Elixir%20plugin%20for%20IntelliJ%20IDEA&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted)
+[![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=Kronic%2eDeth%40gmail%2ecom&lc=US&item_name=Elixir%20plugin%20for%20IntelliJ%20IDEA&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted) (Average is $30.29 USD.)
 
 If you'd like to use a different donation mechanism (such as Patreon), please open an issue.
 
@@ -5674,6 +5674,7 @@ If you're a developer of open source libraries or tools for the [Ember](https://
 
 I'd like to thank those who have donated to help support this project.
 
+* Thomas Meeks ([@thomas](https://github.com/thomas))
 * Josh Taylor ([@joshuataylor](https://github.com/joshuataylor))
 * Brandon Menc ([@brandonmenc](https://github.com/brandonmenc))
 * Gerard de Brieder ([@smeevil](https://github.com/smeevil)) of [govannon.nl](http://govannon.nl)
@@ -5682,12 +5683,17 @@ I'd like to thank those who have donated to help support this project.
 * Christian Nelson ([@christiannelson](https://github.com/christiannelson))
 * Robin Hillard ([@robinhillard](https://github.com/robinhillard)) of [rocketboots.com](http://www.rocketboots.com)
 * Daniel Temme ([@dmt](https://github.com/dmt))
+* Jean-Francois Cloutier ([@jfcloutier](https://github.com/jfcloutier))
+* Nathan Modrzewski
 * Klemen Sever ([@achedeuzot](https://github.com/achedeuzot))
 * Bjorgvin Reynisson
 * Miroslav Hetteš ([@mirrec](https://github.com/mirrec))
+* Nathan Yam ([@nathancyam](https://github.com/nathancyam))
 * Vanja Radovanović ([@elvanja](https://github.com/elvanja))
+* Clifton McIntosh  ([@cliftonmcintosh](https://github.com/cliftonmcintosh), [@clifton-mcintosh](https://github.com/clifton-mcintosh))
 * Garrett Hart ([@thirdshift](https://github.com/thirdshift))
 * Mateusz Jadczak
+* Fireproof Socks, Inc ([@fireproofsocks](https://github.com/fireproofsocks))
 * Jeremy Jackson ([@jejacks0n](https://github.com/jejacks0n))
 * Nathan Yam ([@nathancyam](https://github.com/nathancyam))
 * Raúl Vázquez González ([@rvazquezglez](https://github.com/rvazquezglez))
@@ -5697,15 +5703,19 @@ I'd like to thank those who have donated to help support this project.
 * Zvonimir-Zoltan Maric ([@zoltanmaric](https://github.com/zoltanmaric))
 * Ilja Neumann ([@IljaN](https://github.com/IljaN))
 * Purelogic Apps
+* Milan Jaric ([@mjaric](https://github.com/mjaric))
 * Adrian Philipp ([@adri](https://github.com/adri))
 * Angelika Tyborska ([@angelikatyborska](https://github.com/angelikatyborska))
 * César Salazar Hernández ([@cesarslzr](https://github.com/cesarslzr))
 * Dimitrios Fragkos
 * Dmitry Stropaloff
+* Matthäus Beyrle ([@magynhard](https://github.com/magynhard))
 * Milan Köpke
+* Niklas Bichinger ([@bichinger](https://github.com/bichinger))
 * Percy Grunwald ([@pgrunwald](https://github.com/pgrunwald))
 * Steve Wagner ([@ciroque](https://github.com/ciroque))
 * William De Melo Gueiros ([@williamgueiros](https://github.com/williamgueiros))
+* Дмитрий Цыденов
 * 童童 张
 * IS-Soft Michał Zalewski
 * Michael Howell ([@notriddle](https://github.com/notriddle))
