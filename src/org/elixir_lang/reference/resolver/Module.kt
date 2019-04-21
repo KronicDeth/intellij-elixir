@@ -17,7 +17,7 @@ object Module : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Modul
             module.element.let { element ->
                 resolvableName(element)?.let { name ->
                     val sameFileResolveResultList =
-                            MultiResolve.resolveResults(name, incompleteCode, element, module.maxScope)
+                            MultiResolve.resolveResults(name, incompleteCode, element)
 
                     if (sameFileResolveResultList.isNotEmpty()) {
                         sameFileResolveResultList

@@ -19,16 +19,16 @@ import org.elixir_lang.reference.Module
 import org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.enclosingModularMacroCall
 import org.jetbrains.annotations.Contract
 
-fun QualifiableAlias.computeReference(maxScope: PsiElement): PsiPolyVariantReference? =
+fun QualifiableAlias.computeReference(): PsiPolyVariantReference? =
         if (isOutermostQualifiableAlias()) {
-            Module(this, maxScope)
+            Module(this)
         } else {
             null
         }
 
-fun QualifiableAlias.getReference(maxScope: PsiElement): PsiPolyVariantReference? =
+fun QualifiableAlias.getReference(): PsiPolyVariantReference? =
         CachedValuesManager.getCachedValue(this) {
-            CachedValueProvider.Result.create(computeReference(maxScope), this)
+            CachedValueProvider.Result.create(computeReference(), this)
         }
 
 fun QualifiableAlias.fullyResolve(startingReference: PsiReference?): PsiElement {
@@ -135,7 +135,7 @@ fun QualifiableAlias.maybeModularNameToModular(maxScope: PsiElement): Call? =
     if (!recursiveKernelImport(maxScope)) {
         /* need to construct reference directly as qualified aliases don't return a reference except for the
            outermost */
-        getReference(maxScope)?.let { this.toModular(it) }
+        getReference()?.let { this.toModular(it) }
     } else {
         null
     }
