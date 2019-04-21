@@ -79,6 +79,10 @@
       <li>Ignore <code>organization</code> when calculating <code>Dep</code> path.</li>
       <li>Get view provider document in read action.</li>
       <li>Support <code>rebar.config</code> deps that are name only.</li>
+      <li>
+        Always use <code>containingFile</code> for <code>QualifiableAlias</code> <code>maxScope</code> for
+        <code>getReference</code>.  Prevents cache capturing <code>maxScope</code>, which can vary based on invocation.
+      </li>
     </ul>
   </li>
 </ul>

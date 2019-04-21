@@ -211,6 +211,7 @@ Table of Contents
 * [#1448](https://github.com/KronicDeth/intellij-elixir/pull/1448) - Ignore `organization` when calculating `Dep` path. - [@KronicDeth](https://github.com/KronicDeth)
 * [#1449](https://github.com/KronicDeth/intellij-elixir/pull/1449) - Get view provider document in read action. - [@KronicDeth](https://github.com/KronicDeth)
 * [#1450](https://github.com/KronicDeth/intellij-elixir/pull/1450) - Support `rebar.config` deps that are name only. - [@KronicDeth](https://github.com/KronicDeth)
+* [#1456](https://github.com/KronicDeth/intellij-elixir/pull/1456) - Always use `containingFile` for `QualifiableAlias` `maxScope` for `getReference`.  Prevents cache capturing `maxScope`, which can vary based on invocation. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v10.4.0
 
