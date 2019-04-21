@@ -37,9 +37,6 @@ public interface ElixirUnmatchedQualifiedAlias extends ElixirUnmatchedExpression
   @Nullable
   PsiReference getReference();
 
-  @Nullable
-  PsiPolyVariantReference getReference(@NotNull PsiElement maxScope);
-
   boolean isModuleName();
 
   boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place);

@@ -52,11 +52,6 @@ public class ElixirAliasImpl extends ASTWrapperPsiElement implements ElixirAlias
     return ElixirPsiImplUtil.getReference(this);
   }
 
-  @Nullable
-  public PsiPolyVariantReference getReference(@NotNull PsiElement maxScope) {
-    return ElixirPsiImplUtil.getReference(this, maxScope);
-  }
-
   public boolean isModuleName() {
     return ElixirPsiImplUtil.isModuleName(this);
   }

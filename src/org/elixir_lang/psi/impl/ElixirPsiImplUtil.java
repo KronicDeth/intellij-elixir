@@ -1112,14 +1112,8 @@ public class ElixirPsiImplUtil {
     }
 
     @Nullable
-    public static PsiReference getReference(@NotNull QualifiableAlias qualifiableAlias) {
-        return QualifiableAliasImplKt.getReference(qualifiableAlias, qualifiableAlias.getContainingFile());
-    }
-
-    @Nullable
-    public static PsiPolyVariantReference getReference(@NotNull QualifiableAlias qualifiableAlias,
-                                                       @NotNull PsiElement maxScope) {
-        return QualifiableAliasImplKt.getReference(qualifiableAlias, maxScope);
+    public static PsiPolyVariantReference getReference(@NotNull QualifiableAlias qualifiableAlias) {
+        return QualifiableAliasImplKt.getReference(qualifiableAlias);
     }
 
     @Contract(pure = true)

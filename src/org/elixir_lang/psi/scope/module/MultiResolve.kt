@@ -102,9 +102,8 @@ class MultiResolve internal constructor(private val name: String, private val in
     companion object {
         fun resolveResults(name: String,
                            incompleteCode: Boolean,
-                           entrance: PsiElement,
-                           maxScope: PsiElement): Array<PsiElementResolveResult> =
-                resolveResults(name, incompleteCode, entrance, maxScope, ResolveState.initial())
+                           entrance: PsiElement): Array<PsiElementResolveResult> =
+                resolveResults(name, incompleteCode, entrance, ResolveState.initial())
 
         private fun indexedNamedElements(match: PsiNamedElement, unaliasedName: String): Collection<NamedElement> {
             val project = match.project
@@ -125,14 +124,13 @@ class MultiResolve internal constructor(private val name: String, private val in
         private fun resolveResults(name: String,
                                    incompleteCode: Boolean,
                                    entrance: PsiElement,
-                                   maxScope: PsiElement,
                                    state: ResolveState): Array<PsiElementResolveResult> {
             val multiResolve = MultiResolve(name, incompleteCode)
 
             PsiTreeUtil.treeWalkUp(
                     multiResolve,
                     entrance,
-                    maxScope,
+                    entrance.containingFile,
                     state.put(ENTRANCE, entrance)
             )
 

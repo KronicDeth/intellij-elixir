@@ -10,7 +10,7 @@ import com.intellij.psi.impl.source.resolve.ResolveCache
 import org.elixir_lang.psi.QualifiableAlias
 import org.elixir_lang.psi.scope.module.Variants
 
-class Module(qualifiableAlias: QualifiableAlias, val maxScope: PsiElement) :
+class Module(qualifiableAlias: QualifiableAlias) :
         PsiReferenceBase<QualifiableAlias>(qualifiableAlias, TextRange.create(0, qualifiableAlias.textLength)),
         PsiPolyVariantReference {
     override fun getVariants(): Array<LookupElement> = Variants.lookupElementList(myElement).toTypedArray()

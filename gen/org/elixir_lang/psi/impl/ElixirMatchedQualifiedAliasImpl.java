@@ -69,11 +69,6 @@ public class ElixirMatchedQualifiedAliasImpl extends ElixirMatchedExpressionImpl
     return ElixirPsiImplUtil.getReference(this);
   }
 
-  @Nullable
-  public PsiPolyVariantReference getReference(@NotNull PsiElement maxScope) {
-    return ElixirPsiImplUtil.getReference(this, maxScope);
-  }
-
   public boolean isModuleName() {
     return ElixirPsiImplUtil.isModuleName(this);
   }
