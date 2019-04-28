@@ -4,9 +4,6 @@ import com.intellij.configurationStore.StoreUtil
 import com.intellij.facet.FacetManager
 import com.intellij.facet.FacetType
 import com.intellij.facet.impl.FacetUtil.addFacet
-import com.intellij.notification.Notification
-import com.intellij.notification.NotificationType
-import com.intellij.notification.Notifications
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.progress.ProgressIndicator
@@ -25,7 +22,6 @@ import com.intellij.util.PlatformUtils
 import com.intellij.util.io.exists
 import org.elixir_lang.DepsWatcher
 import org.elixir_lang.Facet
-import org.elixir_lang.Icons
 import org.elixir_lang.mix.Project.addFolders
 import org.elixir_lang.mix.Watcher
 import java.nio.file.Path
@@ -72,9 +68,7 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
     }
 
     private fun configureDescendantOtpApp(rootProject: Project, otpApp: OtpApp) {
-        // Only Rubymine supported attaching Project under apps directory during testing.  See Test Report in
-        // https://github.com/KronicDeth/intellij-elixir/pull/1443 for more information.
-        if (PlatformUtils.isRubyMine()) {
+        if (!PlatformUtils.isGoIde() && ProjectAttachProcessor.canAttachToProject()) {
             newProject(otpApp)?.let { otpAppProject ->
                 attachToProject(rootProject, Paths.get(otpApp.root.path))
 
@@ -90,19 +84,6 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
                     }
                 })
             }
-        } else {
-            Notifications.Bus.notify(
-                    Notification(
-                            "Elixir OTP Application Detector",
-                            Icons.LANGUAGE,
-                            "Multiple OTP Applications detected",
-                            "Multiple OTP Applications Not Supported",
-                            "An OTP Applications has been detected in ${otpApp.root}, which is not at the project root.  If you want to open all OTP applications at once and have proper cross-OTP application dependency resolution, you need to use IntelliJ Community Edition or IntelliJ Ultimate Edition with its multiple Modules per Project, or Rubymine's multiple Projects Open in One Window support.  IntelliJ's multiple Modules per Project is recommended as it supports true Elixir Modules instead of Elixir Facets in Ruby Module as happens in Rubymine.",
-                            NotificationType.INFORMATION,
-                            null
-                    ),
-                    rootProject
-            )
         }
     }
 
