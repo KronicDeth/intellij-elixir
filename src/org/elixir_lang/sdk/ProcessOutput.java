@@ -97,6 +97,6 @@ public class ProcessOutput {
   }
 
   public static boolean isSmallIde(){
-    return !PlatformUtils.isIntelliJ();
+    return !(PlatformUtils.isIntelliJ() || PlatformUtils.getPlatformPrefix().equals("AndroidStudio"));
   }
 }
