@@ -1,9 +1,11 @@
 package org.elixir_lang.mix.project
 
-import com.intellij.configurationStore.StoreUtil
 import com.intellij.facet.FacetManager
 import com.intellij.facet.FacetType
 import com.intellij.facet.impl.FacetUtil.addFacet
+import com.intellij.openapi.components.ComponentManager
+import com.intellij.openapi.components.impl.stores.IComponentStore
+import com.intellij.openapi.components.stateStore
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.progress.ProgressIndicator
@@ -102,7 +104,7 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
                 ProjectBaseDirectory.getInstance(project).baseDir = otpApp.root
                 runDirectoryProjectConfigurators(otpApp.root, project)
 
-                StoreUtil.saveSettings(project, true)
+                saveSettings(project)
 
                 project
             }
@@ -113,6 +115,18 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
         for (processor in ProjectAttachProcessor.EP_NAME.extensionList) {
             if (processor.attachToProject(project, baseDir, null)) {
                 break
+            }
+        }
+    }
+
+    companion object {
+        fun saveSettings(project: Project) {
+            try {
+                val storeUtil = Class.forName("com.intellij.configurationStore.StoreUtil")
+                storeUtil.getDeclaredMethod("saveSettings", ComponentManager::class.java, Boolean::class.javaPrimitiveType).invoke(project, true)
+            } catch (_: ClassNotFoundException) {
+                val storeUtil = Class.forName("com.intellij.openapi.components.impl.stores.StoreUtil")
+                storeUtil.getDeclaredMethod("save", IComponentStore::class.java, Project::class.java, Boolean::class.javaPrimitiveType).invoke(null, project.stateStore, project, true)
             }
         }
     }
