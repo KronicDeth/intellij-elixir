@@ -1,8 +1,6 @@
-
-Table of Contents[![Backers on Open Collective](https://opencollective.com/intellij-elixir/backers/badge.svg)](#backers)[![Sponsors on Open Collective](https://opencollective.com/intellij-elixir/sponsors/badge.svg)](#sponsors) 
+Table of Contents[![Backers on Open Collective](https://opencollective.com/intellij-elixir/backers/badge.svg)](#backers)[![Sponsors on Open Collective](https://opencollective.com/intellij-elixir/sponsors/badge.svg)](#sponsors)
 =================
 
-   * [Table of Contents](#table-of-contents)
    * [Elixir plugin](#elixir-plugin)
       * [IDEs](#ides)
       * [Features](#features)
@@ -240,9 +238,13 @@ Table of Contents[![Backers on Open Collective](https://opencollective.com/intel
                * [In IDE](#in-ide-1)
       * [Screenshots](#screenshots)
       * [Error reporting](#error-reporting)
+      * [Contributors](#contributors)
       * [Donations](#donations)
          * [Work Time](#work-time)
          * [Donors](#donors)
+         * [Patrons](#patrons)
+         * [Backers](#backers)
+         * [Sponsors](#sponsors)
 
 # Elixir plugin
 
@@ -5656,13 +5658,19 @@ If the plugin encounters an error, there is a custom error handler registered, s
 8. Click the "Preview" tab to ensure the Markdown formatting looks correct.
 9. Click "Submit new issue".
 
+## Contributors
+
+This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
+<a href="https://github.com/KronicDeth/intellij-elixir/graphs/contributors"><img src="https://opencollective.com/intellij-elixir/contributors.svg?width=890&button=false" /></a>
+
 ## Donations
 
-If you would like to make a donation you can use Paypal:
-
-[![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=Kronic%2eDeth%40gmail%2ecom&lc=US&item_name=Elixir%20plugin%20for%20IntelliJ%20IDEA&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted) (Average is $30.29 USD.)
-
-If you'd like to use a different donation mechanism (such as Patreon), please open an issue.
+| Name    | Service        | Button                                                                                                                                                                                                                                                                                                                       |
+|:--------|:---------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Donor   | PayPal         | [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=Kronic%2eDeth%40gmail%2ecom&lc=US&item_name=Elixir%20plugin%20for%20IntelliJ%20IDEA&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted) (Average is $30.29 USD.) |
+| Patron  | Patreon        | <a href="https://www.patreon.com/bePatron?u=4678158" data-patreon-widget-type="become-patron-button">Become a Patron!</a><script async src="https://c6.patreon.com/becomePatronButton.bundle.js"></script>                                                                                                                   |
+| Backer  | OpenCollective | [[Become a backer](https://opencollective.com/intellij-elixir#backer)]                                                                                                                                                                                                                                                       |
+| Sponsor | OpenCollective | [[Become a sponsor](https://opencollective.com/intellij-elixir#sponsor)]                                                                                                                                                                                                                                                     |
 
 ### Work Time
 
@@ -5725,20 +5733,17 @@ I'd like to thank those who have donated to help support this project.
 * Bartłomiej Kuczyński ([@Koziolek](https://github.com/Koziolek))
 * Nguyen Le
 
-## Contributors
+### Patrons
 
-This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
-<a href="https://github.com/KronicDeth/intellij-elixir/graphs/contributors"><img src="https://opencollective.com/intellij-elixir/contributors.svg?width=890&button=false" /></a>
+Thank you to all my patrons. <a href="https://www.patreon.com/bePatron?u=4678158" data-patreon-widget-type="become-patron-button">Become a Patron!</a><script async src="https://c6.patreon.com/becomePatronButton.bundle.js"></script>
 
-
-## Backers
+### Backers
 
 Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com/intellij-elixir#backer)]
 
 <a href="https://opencollective.com/intellij-elixir#backers" target="_blank"><img src="https://opencollective.com/intellij-elixir/backers.svg?width=890"></a>
 
-
-## Sponsors
+### Sponsors
 
 Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](https://opencollective.com/intellij-elixir#sponsor)]
 
