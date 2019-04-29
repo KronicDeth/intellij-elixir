@@ -17,6 +17,10 @@
           </li>
         </ul>
       </li>
+      <li>
+        Use reflections to allow saving settings when creating the projects before in 2018.3 and 2019.1 even though the
+        API changed.
+      </li>
     </ul>
   </li>
   <li>
@@ -82,6 +86,93 @@
       <li>
         Always use <code>containingFile</code> for <code>QualifiableAlias</code> <code>maxScope</code> for
         <code>getReference</code>.  Prevents cache capturing <code>maxScope</code>, which can vary based on invocation.
+      </li>
+      <li>
+        <p>
+          Create new project before attaching it in Small IDEs.<br>
+          When attaching a directory to a project during startup, saving is disallowed, so the attached directory only
+          has a <code>workspace.xml</code> in its <code>.idea</code> when the attach is attempted.  Attaching requires
+          the <code>.idea/*.iml</code> Module file, so the attaching fails, saying the directory is an unsupported
+          format.
+        </p>
+        <p>
+          Experimentation showed that manually attaching the directory also did not work, but opening the directory in a
+          separate window, then opening and attaching it again would make the directory have the full project files.  To
+          mimic this manual process:
+        </p>
+        <ol>
+          <li>The internals of <code>doOpenProject</code> are copied</li>
+          <li>A save of the project files is forced, bypassing the normal "startup" save blocker</li>
+          <li>The project is attached to the root project.</li>
+        </ol>
+        <p>Tested to work when upgrading from 10.4.0 to 10.5.0-pre in Rubymine when no project was already open.</p>
+      </li>
+      <li>
+        <p>
+          Check if project can be attached instead of if RubyMine<br>
+          Although GoLand supports attaching projects, it doesn't work for non-Go projects, so it is also excluded.  How
+          the support appears in each non-IntelliJ IDEA is shown below:
+        </p>
+        <table>
+          <thead>
+          <tr>
+            <th align="left">IDE</th>
+            <th align="left">Works?</th>
+            <th align="left"></th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td align="left">Android Studio</td>
+            <td align="left">YES</td>
+            <td align="left">Android Studio is built on top of IntelliJ, so it has full multi-Module support.  It is not Small IDE.</td>
+          </tr>
+          <tr>
+            <td align="left">CLion</td>
+            <td align="left">NO</td>
+            <td align="left">No Attach to Project support to multiple module support.</td>
+          </tr>
+          <tr>
+            <td align="left">DataGrip</td>
+            <td align="left">No</td>
+            <td align="left">DataGrip doesn't have a Project View and doesn't support Attach to Project.  You can still run tests if you directly open the file.</td>
+          </tr>
+          <tr>
+            <td align="left">GoLand</td>
+            <td align="left">NO</td>
+            <td align="left">Modules show up, but independent projects are not attached as in other Small IDEs, so disabled.  In general, the Go settings, like Test Runners always win, so it is recommended to not use GoLand at all for Elixir development.</td>
+          </tr>
+          <tr>
+            <td align="left">PHPStorm</td>
+            <td align="left">YES</td>
+            <td align="left">The projects are listed in Directories.  The Languages &amp; Frameworks &gt; Elixir shows all 3 projects.  Right-clicking on the marked Test directory will not show the Elixir Run Configuration, Python ones win, but subdirectories and <code>*_test.exs</code> will show up in the context menu.</td>
+          </tr>
+          <tr>
+            <td align="left">PyCharm</td>
+            <td align="left">YES</td>
+            <td align="left">The root project is listed in Project.  <code>app/*</code> projects are listed listed as Project Dependencies of the root Project.  The Languages &amp; Frameworks &gt; Elixir shows all 3 projects.  Right-clicking on the marked Test directory will not show the Elixir Run Configuration, Python ones win, but subdirectories and <code>*_test.exs</code> will show up in the context menu.</td>
+          </tr>
+          <tr>
+            <td align="left">Rider</td>
+            <td align="left">No</td>
+            <td align="left">Solution system is separate from Project system.</td>
+          </tr>
+          <tr>
+            <td align="left">Rubymine</td>
+            <td align="left">YES</td>
+            <td align="left">The projects are listed in Project Structure. The Languages &amp; Frameworks &gt; Elixir shows all 3 projects.  Right-clicking on the marked Test directory will not show the Elixir Run Configuration, Python ones win, but subdirectories and <code>*_test.exs</code> will show up in the context menu.</td>
+          </tr>
+          <tr>
+            <td align="left">WebStorm</td>
+            <td align="left">NO</td>
+            <td align="left">No Attach to Project support or multiple module support.</td>
+          </tr>
+          </tbody>
+        </table>
+      </li>
+      <li>
+        Don't count Android Studio as a Small IDE.   It includes Project Structure menu with multiple-language,
+        multiple-Module per Project support from IntelliJ.
       </li>
     </ul>
   </li>
