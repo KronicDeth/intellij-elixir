@@ -22,10 +22,7 @@ import org.elixir_lang.structure_view.element.CallDefinitionSpecification.Compan
 import org.elixir_lang.structure_view.element.CallDefinitionSpecification.Companion.specification
 import org.elixir_lang.structure_view.element.CallDefinitionSpecification.Companion.specificationType
 
-class CallDefinition(
-        private val daemonCodeAnalyzerSettings: DaemonCodeAnalyzerSettings,
-        private val editorColorsManager: EditorColorsManager
-) : LineMarkerProvider {
+class CallDefinition : LineMarkerProvider {
     override fun collectSlowLineMarkers(elements: List<PsiElement>, result: Collection<LineMarkerInfo<*>>) {}
 
     override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<*>? =
@@ -34,6 +31,9 @@ class CallDefinition(
                 is Call -> getLineMarkerInfo(element)
                 else -> null
             }
+
+    private val daemonCodeAnalyzerSettings: DaemonCodeAnalyzerSettings = DaemonCodeAnalyzerSettings.getInstance()
+    private val editorColorsManager: EditorColorsManager = EditorColorsManager.getInstance()
 
     private fun callDefinitionSeparator(
             atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>
