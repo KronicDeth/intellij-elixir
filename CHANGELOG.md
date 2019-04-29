@@ -191,6 +191,7 @@ Table of Contents
   * The correct home path for `kiex` is `~/.kiex/elixirs/elixir-VERSION/lib/elixir` as that contains the true `lib` and `bin` directory, but users may select other directories by mistake, so doing the following adjustments:
     * Adjust `bin` home path to `lib/elixir`.
     * Adjust `elixirs/elixir-VERSION` home path to `elixirs/elixir-VERSION/lib/elixir`.
+* [#1462](https://github.com/KronicDeth/intellij-elixir/pull/1462) - Use reflections to allow saving settings when creating the projects before in 2018.3 and 2019.1 even though the API changed. - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#1443](https://github.com/KronicDeth/intellij-elixir/pull/1443) - [@KronicDeth](https://github.com/KronicDeth)
@@ -212,6 +213,32 @@ Table of Contents
 * [#1449](https://github.com/KronicDeth/intellij-elixir/pull/1449) - Get view provider document in read action. - [@KronicDeth](https://github.com/KronicDeth)
 * [#1450](https://github.com/KronicDeth/intellij-elixir/pull/1450) - Support `rebar.config` deps that are name only. - [@KronicDeth](https://github.com/KronicDeth)
 * [#1456](https://github.com/KronicDeth/intellij-elixir/pull/1456) - Always use `containingFile` for `QualifiableAlias` `maxScope` for `getReference`.  Prevents cache capturing `maxScope`, which can vary based on invocation. - [@KronicDeth](https://github.com/KronicDeth)
+* [#1462](https://github.com/KronicDeth/intellij-elixir/pull/1462) - [@KronicDeth](https://github.com/KronicDeth)
+  * Create new project before attaching it in Small IDEs.
+    When attaching a directory to a project during startup, saving is disallowed, so the attached directory only has a `workspace.xml` in its `.idea` when the attach is attempted.  Attaching requires the `.idea/*.iml` Module file, so the attaching fails, saying the directory is an unsupported format.
+
+    Experimentation showed that manually attaching the directory also did not work, but opening the directory in a separate window, then opening and attaching it again would make the directory have the full project files.  To mimic this manual process:
+
+    1. The internals of `doOpenProject` are copied
+    2. A save of the project files is forced, bypassing the normal "startup" save blocker
+    3. The project is attached to the root project.
+
+    Tested to work when upgrading from 10.4.0 to 10.5.0-pre in Rubymine when no project was already open.
+  *  Check if project can be attached instead of if RubyMine
+     Although GoLand supports attaching projects, it doesn't work for non-Go projects, so it is also excluded.  How the support appears in each non-IntelliJ IDEA is shown below:
+
+     | IDE            | Works? |                                                                                                                                                                                                                                                                                                                                                                    |
+     |:---------------|:-------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+     | Android Studio | YES    | Android Studio is built on top of IntelliJ, so it has full multi-Module support.  It is not Small IDE.                                                                                                                                                                                                                                                             |
+     | CLion          | NO     | No Attach to Project support to multiple module support.                                                                                                                                                                                                                                                                                                           |
+     | DataGrip       | No     | DataGrip doesn't have a Project View and doesn't support Attach to Project.  You can still run tests if you directly open the file.                                                                                                                                                                                                                                |
+     | GoLand         | NO     | Modules show up, but independent projects are not attached as in other Small IDEs, so disabled.  In general, the Go settings, like Test Runners always win, so it is recommended to not use GoLand at all for Elixir development.                                                                                                                                  |
+     | PHPStorm       | YES    | The projects are listed in Directories.  The Languages & Frameworks > Elixir shows all 3 projects.  Right-clicking on the marked Test directory will not show the Elixir Run Configuration, Python ones win, but subdirectories and `*_test.exs` will show up in the context menu.                                                                                 |
+     | PyCharm        | YES    | The root project is listed in Project.  `app/*` projects are listed listed as Project Dependencies of the root Project.  The Languages & Frameworks > Elixir shows all 3 projects.  Right-clicking on the marked Test directory will not show the Elixir Run Configuration, Python ones win, but subdirectories and `*_test.exs` will show up in the context menu. |
+     | Rider          | No     | Solution system is separate from Project system.                                                                                                                                                                                                                                                                                                                   |
+     | Rubymine       | YES    | The projects are listed in Project Structure. The Languages & Frameworks > Elixir shows all 3 projects.  Right-clicking on the marked Test directory will not show the Elixir Run Configuration, Python ones win, but subdirectories and `*_test.exs` will show up in the context menu.                                                                            |
+     | WebStorm       | NO     | No Attach to Project support or multiple module support.                                                                                                                                                                                                                                                                                                           |
+  *  Don't count Android Studio as a Small IDE.   It includes Project Structure menu with multiple-language, multiple-Module per Project support from IntelliJ.
 
 ## v10.4.0
 
