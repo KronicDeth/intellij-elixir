@@ -123,7 +123,7 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
         fun saveSettings(project: Project) {
             try {
                 val storeUtil = Class.forName("com.intellij.configurationStore.StoreUtil")
-                storeUtil.getDeclaredMethod("saveSettings", ComponentManager::class.java, Boolean::class.javaPrimitiveType).invoke(project, true)
+                storeUtil.getDeclaredMethod("saveSettings", ComponentManager::class.java, Boolean::class.javaPrimitiveType).invoke(null, project, true)
             } catch (_: ClassNotFoundException) {
                 val storeUtil = Class.forName("com.intellij.openapi.components.impl.stores.StoreUtil")
                 storeUtil.getDeclaredMethod("save", IComponentStore::class.java, Project::class.java, Boolean::class.javaPrimitiveType).invoke(null, project.stateStore, project, true)
