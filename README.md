@@ -1,5 +1,5 @@
 
-Table of Contents
+Table of Contents[![Backers on Open Collective](https://opencollective.com/intellij-elixir/backers/badge.svg)](#backers)[![Sponsors on Open Collective](https://opencollective.com/intellij-elixir/sponsors/badge.svg)](#sponsors) 
 =================
 
    * [Table of Contents](#table-of-contents)
@@ -5724,3 +5724,33 @@ I'd like to thank those who have donated to help support this project.
 * Maximilian Buschner
 * Bartłomiej Kuczyński ([@Koziolek](https://github.com/Koziolek))
 * Nguyen Le
+
+## Contributors
+
+This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
+<a href="https://github.com/KronicDeth/intellij-elixir/graphs/contributors"><img src="https://opencollective.com/intellij-elixir/contributors.svg?width=890&button=false" /></a>
+
+
+## Backers
+
+Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com/intellij-elixir#backer)]
+
+<a href="https://opencollective.com/intellij-elixir#backers" target="_blank"><img src="https://opencollective.com/intellij-elixir/backers.svg?width=890"></a>
+
+
+## Sponsors
+
+Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](https://opencollective.com/intellij-elixir#sponsor)]
+
+<a href="https://opencollective.com/intellij-elixir/sponsor/0/website" target="_blank"><img src="https://opencollective.com/intellij-elixir/sponsor/0/avatar.svg"></a>
+<a href="https://opencollective.com/intellij-elixir/sponsor/1/website" target="_blank"><img src="https://opencollective.com/intellij-elixir/sponsor/1/avatar.svg"></a>
+<a href="https://opencollective.com/intellij-elixir/sponsor/2/website" target="_blank"><img src="https://opencollective.com/intellij-elixir/sponsor/2/avatar.svg"></a>
+<a href="https://opencollective.com/intellij-elixir/sponsor/3/website" target="_blank"><img src="https://opencollective.com/intellij-elixir/sponsor/3/avatar.svg"></a>
+<a href="https://opencollective.com/intellij-elixir/sponsor/4/website" target="_blank"><img src="https://opencollective.com/intellij-elixir/sponsor/4/avatar.svg"></a>
+<a href="https://opencollective.com/intellij-elixir/sponsor/5/website" target="_blank"><img src="https://opencollective.com/intellij-elixir/sponsor/5/avatar.svg"></a>
+<a href="https://opencollective.com/intellij-elixir/sponsor/6/website" target="_blank"><img src="https://opencollective.com/intellij-elixir/sponsor/6/avatar.svg"></a>
+<a href="https://opencollective.com/intellij-elixir/sponsor/7/website" target="_blank"><img src="https://opencollective.com/intellij-elixir/sponsor/7/avatar.svg"></a>
+<a href="https://opencollective.com/intellij-elixir/sponsor/8/website" target="_blank"><img src="https://opencollective.com/intellij-elixir/sponsor/8/avatar.svg"></a>
+<a href="https://opencollective.com/intellij-elixir/sponsor/9/website" target="_blank"><img src="https://opencollective.com/intellij-elixir/sponsor/9/avatar.svg"></a>
+
+
