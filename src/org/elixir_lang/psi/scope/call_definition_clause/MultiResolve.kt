@@ -10,6 +10,7 @@ import org.elixir_lang.psi.call.Named
 
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.scope.ResolveResultOrderedSet
+import org.elixir_lang.psi.scope.putInitialVisitedElement
 
 class MultiResolve
 private constructor(private val name: String,
@@ -70,7 +71,7 @@ private constructor(private val name: String,
                     multiResolve,
                     entrance,
                     entrance.containingFile,
-                    resolveState.put(ENTRANCE, entrance)
+                    resolveState.put(ENTRANCE, entrance).putInitialVisitedElement(entrance)
             )
 
             return multiResolve.resolveResults()

@@ -12,6 +12,8 @@ import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.Named
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.scope.CallDefinitionClause
+import org.elixir_lang.psi.scope.putInitialVisitedElement
+import org.elixir_lang.psi.scope.putVisitedElement
 import java.util.*
 
 class Variants : CallDefinitionClause() {
@@ -104,6 +106,12 @@ class Variants : CallDefinitionClause() {
                     .initial()
                     .put(ENTRANCE, entrance)
                     .put(ENTRANCE_CALL_DEFINITION_CLAUSE, entranceCallDefinitionClause)
+                    .putInitialVisitedElement(entrance)
+
+            if (entranceCallDefinitionClause != null) {
+                resolveState.putVisitedElement(entranceCallDefinitionClause)
+            }
+
             PsiTreeUtil.treeWalkUp(
                     variants,
                     entrance,

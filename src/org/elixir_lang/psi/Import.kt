@@ -5,6 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangLong
 import com.ericsson.otp.erlang.OtpErlangRangeException
 import com.intellij.psi.ElementDescriptionLocation
 import com.intellij.psi.PsiElement
+import com.intellij.psi.ResolveState
 import com.intellij.usageView.UsageViewNodeTextLocation
 import com.intellij.usageView.UsageViewTypeLocation
 import com.intellij.util.Function
@@ -35,7 +36,7 @@ object Import {
      * matching names in `:except` list.
      */
     @JvmStatic
-    fun callDefinitionClauseCallWhile(importCall: Call, function: (Call) -> Boolean): Boolean =
+    fun callDefinitionClauseCallWhile(importCall: Call, resolveState: ResolveState, function: (Call, ResolveState) -> Boolean): Boolean =
         try {
             modular(importCall)
         } catch (stackOverflowError: StackOverflowError) {
@@ -45,7 +46,7 @@ object Import {
                 ?.let { modularCall ->
                     val optionsFilter = callDefinitionClauseCallFilter(importCall)
 
-                    Modular.callDefinitionClauseCallWhile(modularCall) { call -> !optionsFilter(call) || function(call) }
+                    Modular.callDefinitionClauseCallWhile(modularCall, resolveState) { call, accResolveState -> !optionsFilter(call) || function(call, accResolveState) }
                 }
                 ?: true
 

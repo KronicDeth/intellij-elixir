@@ -2,6 +2,7 @@ package org.elixir_lang.beam.psi.impl;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.ResolveState;
 import com.intellij.psi.StubBasedPsiElement;
 import com.intellij.psi.impl.source.tree.TreeElement;
 import com.intellij.psi.stubs.IStubElementType;
@@ -11,6 +12,7 @@ import org.elixir_lang.beam.psi.Module;
 import org.elixir_lang.psi.Modular;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.call.MaybeExported;
+import org.elixir_lang.psi.scope.CallDefinitionClauseKt;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -28,6 +30,35 @@ public class ModuleImpl<T extends StubElement> extends ModuleElementImpl impleme
 
     public ModuleImpl(T stub) {
         this.stub = stub;
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    private static MaybeExported[] callDefinitions(@NotNull TreeElement mirror) {
+        PsiElement mirrorPsi = mirror.getPsi();
+        MaybeExported[] callDefinitions;
+
+        if (mirrorPsi instanceof Call) {
+            Call mirrorCall = (Call) mirrorPsi;
+            final List<MaybeExported> callDefinitionList = new ArrayList<>();
+            final ResolveState initialResolveState = CallDefinitionClauseKt.putInitialVisitedElement(ResolveState.initial(), mirrorCall);
+
+            Modular.callDefinitionClauseCallWhile(mirrorCall, initialResolveState, (call, accResolvedState) -> {
+                if (call instanceof MaybeExported) {
+                    MaybeExported maybeExportedCall = (MaybeExported) call;
+
+                    callDefinitionList.add(maybeExportedCall);
+                }
+
+                return true;
+            });
+
+            callDefinitions = callDefinitionList.toArray(new MaybeExported[callDefinitionList.size()]);
+        } else {
+            callDefinitions = new MaybeExported[0];
+        }
+
+        return callDefinitions;
     }
 
     /**
@@ -72,34 +103,6 @@ public class ModuleImpl<T extends StubElement> extends ModuleElementImpl impleme
         setMirrorCheckingType(element, null);
 
         setMirrors(callDefinitions(), callDefinitions(element));
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    private static MaybeExported[] callDefinitions(@NotNull TreeElement mirror) {
-        PsiElement mirrorPsi = mirror.getPsi();
-        MaybeExported[] callDefinitions;
-
-        if (mirrorPsi instanceof Call) {
-            Call mirrorCall = (Call) mirrorPsi;
-            final List<MaybeExported> callDefinitionList = new ArrayList<>();
-
-            Modular.callDefinitionClauseCallWhile(mirrorCall, call -> {
-                if (call instanceof MaybeExported) {
-                    MaybeExported maybeExportedCall = (MaybeExported) call;
-
-                    callDefinitionList.add(maybeExportedCall);
-                }
-
-                return true;
-            });
-
-            callDefinitions = callDefinitionList.toArray(new MaybeExported[callDefinitionList.size()]);
-        } else {
-            callDefinitions = new MaybeExported[0];
-        }
-
-        return callDefinitions;
     }
 
     private MaybeExported[] callDefinitions() {
