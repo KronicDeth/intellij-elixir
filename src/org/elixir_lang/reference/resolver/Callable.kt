@@ -3,6 +3,7 @@ package org.elixir_lang.reference.resolver
 import com.intellij.psi.PsiElementResolveResult
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.impl.source.resolve.ResolveCache
+import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.AccumulatorContinue
 import org.elixir_lang.psi.Modular
 import org.elixir_lang.psi.UnqualifiedNoArgumentsCall
@@ -14,11 +15,17 @@ object Callable : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Cal
     override fun resolve(callable: org.elixir_lang.reference.Callable, incompleteCode: Boolean): Array<ResolveResult> {
         val element = callable.element
 
-        return if (element is org.elixir_lang.psi.call.qualification.Qualified) {
-            resolveElement(element)
-        } else {
-            resolveElement(element, incompleteCode)
-        }.toTypedArray()
+        return try {
+            if (element is org.elixir_lang.psi.call.qualification.Qualified) {
+                resolveElement(element)
+            } else {
+                resolveElement(element, incompleteCode)
+            }.toTypedArray()
+        } catch (stackOverflowError: StackOverflowError) {
+            Logger.error(Callable::class.java, "StackOverflowError when annotating Call", element)
+
+            emptyArray()
+        }
     }
 
     private fun resolveElement(element: Call, incompleteCode: Boolean): List<ResolveResult> =
@@ -49,9 +56,7 @@ object Callable : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Cal
                     element
             )
 
-            if (callDefinitionClauseResolveResultList != null) {
-                resolveResultList.addAll(callDefinitionClauseResolveResultList)
-            }
+            resolveResultList.addAll(callDefinitionClauseResolveResultList)
 
             resolveResultList
         } ?:

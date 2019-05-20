@@ -61,51 +61,51 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
      */
 
     private fun execute(element: Call, state: ResolveState): Boolean =
-        if (org.elixir_lang.psi.CallDefinitionClause.`is`(element)) {
-            executeOnCallDefinitionClause(element, state)
-        } else if (Import.`is`(element)) {
-            val importState = state.put(IMPORT_CALL, element)
+            if (org.elixir_lang.psi.CallDefinitionClause.`is`(element)) {
+                executeOnCallDefinitionClause(element, state)
+            } else if (Import.`is`(element)) {
+                val importState = state.put(IMPORT_CALL, element).putVisitedElement(element)
 
-            try {
-                Import.callDefinitionClauseCallWhile(element) { callDefinitionClause ->
-                    executeOnCallDefinitionClause(callDefinitionClause, importState)
+                try {
+                    Import.callDefinitionClauseCallWhile(element, importState) { callDefinitionClause, accResolveState ->
+                        executeOnCallDefinitionClause(callDefinitionClause, accResolveState)
+                    }
+                } catch (stackOverflowError: StackOverflowError) {
+                    Logger.error(
+                            CallDefinitionClause::class.java,
+                            "StackOverflowError while processing import",
+                            element
+                    )
                 }
-            } catch (stackOverflowError: StackOverflowError) {
-                Logger.error(
-                        CallDefinitionClause::class.java,
-                        "StackOverflowError while processing import",
-                        element
-                )
-            }
 
-            true
-        } else if (Module.`is`(element) &&
-                /* Only allow scanning back down in outer nested modules for siblings.  Prevents scanning in sibling
-                   nested modules in https://github.com/KronicDeth/intellij-elixir/issues/1270 */
-                state.get(ENTRANCE)?.let { entrance -> PsiTreeUtil.isAncestor(element, entrance, false) } == true) {
-            val childCalls = element.macroChildCalls()
+                true
+            } else if (Module.`is`(element) &&
+                    /* Only allow scanning back down in outer nested modules for siblings.  Prevents scanning in sibling
+                       nested modules in https://github.com/KronicDeth/intellij-elixir/issues/1270 */
+                    state.get(ENTRANCE)?.let { entrance -> PsiTreeUtil.isAncestor(element, entrance, false) } == true) {
+                val childCalls = element.macroChildCalls()
 
-            for (childCall in childCalls) {
-                if (!execute(childCall, state)) {
-                    break
+                for (childCall in childCalls) {
+                    if (!execute(childCall, state)) {
+                        break
+                    }
                 }
+
+                // Only check MultiResolve.keepProcessing at the end of a Module to all multiple arities
+                keepProcessing() &&
+                        // the implicit `import Kernel` and `import Kernel.SpecialForms`
+                        implicitImports(element, state)
+            } else if (Use.`is`(element)) {
+                val useState = state.put(USE_CALL, element).putVisitedElement(element)
+
+                Use.callDefinitionClauseCallWhile(element, useState) { callDefinitionClause, accResolveState ->
+                    executeOnCallDefinitionClause(callDefinitionClause, accResolveState)
+                }
+
+                true
+            } else {
+                true
             }
-
-            // Only check MultiResolve.keepProcessing at the end of a Module to all multiple arities
-            keepProcessing() &&
-                    // the implicit `import Kernel` and `import Kernel.SpecialForms`
-                    implicitImports(element, state)
-        } else if (Use.`is`(element)) {
-            val useState = state.put(USE_CALL, element)
-
-            Use.callDefinitionClauseCallWhile(element) { callDefinitionClause ->
-               executeOnCallDefinitionClause(callDefinitionClause, useState)
-            }
-
-            true
-        } else {
-            true
-        }
 
     private fun implicitImports(element: PsiElement, state: ResolveState): Boolean {
         val project = element.project
@@ -117,10 +117,11 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
             var keepProcessingNavigationElements = true
 
             if (navigationElement is Call) {
+                val navigationElementResolveState = state.putVisitedElement(navigationElement)
 
                 keepProcessingNavigationElements = Modular.callDefinitionClauseCallWhile(
-                        navigationElement
-                ) { callDefinitionClause -> executeOnCallDefinitionClause(callDefinitionClause, state) }
+                        navigationElement, navigationElementResolveState
+                ) { callDefinitionClause, accResolveState -> executeOnCallDefinitionClause(callDefinitionClause, accResolveState) }
             }
 
             keepProcessingNavigationElements
@@ -136,13 +137,15 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
                 var keepProcessingNavigationElements = true
 
                 if (navigationElement is Call) {
+                    val navigationElementResolveState = modularCanonicalNameState.putVisitedElement(navigationElement)
 
                     keepProcessingNavigationElements = Modular.callDefinitionClauseCallWhile(
-                            navigationElement
-                    ) { callDefinitionClause ->
+                            navigationElement,
+                            navigationElementResolveState
+                    ) { callDefinitionClause, accResolveState ->
                         executeOnCallDefinitionClause(
                                 callDefinitionClause,
-                                modularCanonicalNameState
+                                accResolveState
                         )
                     }
                 }
@@ -162,3 +165,24 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
         val MODULAR_CANONICAL_NAME = Key<String>("MODULAR_CANONICAL_NAME")
     }
 }
+
+private val VISITED_ELEMENT_SET = Key<Set<PsiElement>>("VISITED_ELEMENTS")
+
+fun ResolveState.hasBeenVisited(element: PsiElement): Boolean {
+    return this.get(VISITED_ELEMENT_SET).contains(element)
+}
+
+fun ResolveState.putInitialVisitedElement(visitedElement: PsiElement): ResolveState {
+    assert(this.get(VISITED_ELEMENT_SET) == null) {
+        "VISITED_ELEMENT_SET already populated"
+    }
+
+    return this.put(VISITED_ELEMENT_SET, setOf(visitedElement))
+}
+
+fun ResolveState.putVisitedElement(visitedElement: PsiElement): ResolveState {
+    val visitedElementSet = this.get(VISITED_ELEMENT_SET)
+
+    return this.put(VISITED_ELEMENT_SET, visitedElementSet + setOf(visitedElement))
+}
+

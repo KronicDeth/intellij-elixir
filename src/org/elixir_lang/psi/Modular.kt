@@ -1,11 +1,14 @@
 package org.elixir_lang.psi
 
+import com.intellij.psi.ResolveState
 import org.elixir_lang.Arity
 import org.elixir_lang.ArityRange
 import org.elixir_lang.Name
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.call.macroChildCallSequence
 import org.elixir_lang.psi.impl.call.macroChildCalls
+import org.elixir_lang.psi.scope.hasBeenVisited
+import org.elixir_lang.psi.scope.putVisitedElement
 
 data class AccumulatorContinue<out R>(val accumulator: R, val `continue`: Boolean)
 
@@ -15,15 +18,19 @@ object Modular {
             modular.macroChildCallSequence().filter { CallDefinitionClause.`is`(it) }
 
     @JvmStatic
-    fun callDefinitionClauseCallWhile(modular: Call, function: (Call) -> Boolean): Boolean {
+    fun callDefinitionClauseCallWhile(modular: Call, resolveState: ResolveState, function: (Call, ResolveState) -> Boolean): Boolean {
         val childCalls = modular.macroChildCalls()
         var keepProcessing = true
 
         for (childCall in childCalls) {
-            if (CallDefinitionClause.`is`(childCall) && !function(childCall)) {
-                keepProcessing = false
+            if (!resolveState.hasBeenVisited(childCall) && CallDefinitionClause.`is`(childCall)) {
+                val childResolveState = resolveState.putVisitedElement(childCall)
 
-                break
+                if (!function(childCall, childResolveState)) {
+                    keepProcessing = false
+
+                    break
+                }
             }
         }
 

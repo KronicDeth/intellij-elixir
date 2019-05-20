@@ -2,6 +2,7 @@ package org.elixir_lang.psi
 
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiPolyVariantReference
+import com.intellij.psi.ResolveState
 import org.elixir_lang.psi.CallDefinitionClause.nameArityRange
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.*
@@ -9,17 +10,21 @@ import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.call.macroChildCallSequence
 import org.elixir_lang.psi.impl.maybeModularNameToModular
+import org.elixir_lang.psi.scope.putVisitedElement
 
 object Using {
-    fun callDefinitionClauseCallWhile(usingCall: Call, useCall: Call?, keepProcessing: (Call) -> Boolean): Boolean =
+    fun callDefinitionClauseCallWhile(usingCall: Call, useCall: Call?, resolveState: ResolveState, keepProcessing: (Call, ResolveState) -> Boolean): Boolean =
         usingCall.macroChildCallSequence().lastOrNull()?.let { lastChildCall ->
             val resolvedModuleName = lastChildCall.resolvedModuleName()
             val functionName = lastChildCall.functionName()
 
             if (resolvedModuleName != null && functionName != null) {
                 when {
-                    resolvedModuleName == KERNEL && functionName == QUOTE ->
-                        QuoteMacro.callDefinitionClauseCallWhile(lastChildCall, keepProcessing)
+                    resolvedModuleName == KERNEL && functionName == QUOTE -> {
+                        val lastChildCallResolveState = resolveState.putVisitedElement(lastChildCall)
+
+                        QuoteMacro.callDefinitionClauseCallWhile(lastChildCall, lastChildCallResolveState, keepProcessing)
+                    }
 
                     resolvedModuleName == KERNEL && functionName == APPLY -> {
                         lastChildCall.finalArguments()?.let { arguments ->
@@ -27,10 +32,12 @@ object Using {
                             if (arguments.size == 3) {
                                 arguments[0].let { maybeModularName ->
                                     maybeModularName.maybeModularNameToModular(maxScope = maybeModularName.containingFile, useCall = useCall)?.let { modular ->
+                                        val modularResolveState = resolveState.putVisitedElement(modular)
+
                                         // TODO resolve argument[1] AND use its inferred value to select only one of the functions
-                                        Modular.callDefinitionClauseCallWhile(modular) { callDefinitionClauseCall ->
+                                        Modular.callDefinitionClauseCallWhile(modular, modularResolveState) { callDefinitionClauseCall, accResolveState ->
                                             if (CallDefinitionClause.isFunction(callDefinitionClauseCall)) {
-                                                Using.callDefinitionClauseCallWhile(callDefinitionClauseCall, useCall, keepProcessing)
+                                                Using.callDefinitionClauseCallWhile(callDefinitionClauseCall, useCall, accResolveState, keepProcessing)
                                             } else {
                                                 true
                                             }
@@ -56,12 +63,13 @@ object Using {
                             }
 
                             for (resolved in resolvedList) {
-                                val text = resolved.text
-
                                 accumulatedKeepProcessing = if (resolved is Call && CallDefinitionClause.`is`(resolved)) {
+                                    val resolvedResolveSet = resolveState.putVisitedElement(resolved)
+
                                     Using.callDefinitionClauseCallWhile(
                                             usingCall = resolved,
                                             useCall = useCall,
+                                            resolveState = resolvedResolveSet,
                                             keepProcessing = keepProcessing
                                     )
                                 } else {
