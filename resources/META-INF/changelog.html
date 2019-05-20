@@ -1,5 +1,25 @@
 <html>
 <body>
+<h1>v10.5.1</h1>
+<ul>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>
+        Numerous users have reported that annotation can encounter a <code>StackOverflowError</code>.
+        <a href="https://github.com/KronicDeth/intellij-elixir/issues/1475#issuecomment-491616192">
+          A reproduction case
+        </a> shows that they are called by Phoenix <code>Web</code> modules where one function containing
+        <code>quote</code> block <code>use</code>s the same module again, such as an <code>admin_view</code> depending
+        on the base <code>view</code> through <code>use App.Web, :view</code>.  When the <code>use App.Web, :view</code>
+        is resolving, the <code>defmacro __using__</code> is re-entered as is the <code>admin_view</code> because there
+        was no tracking of already visited <code>PsiElement</code>s.  The fix is to track the visited elements and not
+        re-enter the visited elements so that <code>admin_view</code> is skipped and the other call definition clauses
+        can be checked to find <code>view</code>.
+      </li>
+    </ul>
+  </li>
+</ul>
 <h1>v10.5.0</h1>
 <ul>
   <li>
