@@ -5668,7 +5668,7 @@ This project exists thanks to all the people who contribute. [[Contribute](CONTR
 | Name    | Service        | Button                                                                                                                                                                                                                                                                                                                       |
 |:--------|:---------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Donor   | PayPal         | [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=Kronic%2eDeth%40gmail%2ecom&lc=US&item_name=Elixir%20plugin%20for%20IntelliJ%20IDEA&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted) (Average is $30.29 USD.) |
-| Patron  | Patreon        | <a href="https://www.patreon.com/bePatron?u=4678158" data-patreon-widget-type="become-patron-button">Become a Patron!</a><script async src="https://c6.patreon.com/becomePatronButton.bundle.js"></script>                                                                                                                   |
+| Patron  | Patreon        | <a href="https://www.patreon.com/bePatron?u=4678158" data-patreon-widget-type="become-patron-button">Become a Patron!</a>                                                                                                                                                                                                    |
 | Backer  | OpenCollective | [[Become a backer](https://opencollective.com/intellij-elixir#backer)]                                                                                                                                                                                                                                                       |
 | Sponsor | OpenCollective | [[Become a sponsor](https://opencollective.com/intellij-elixir#sponsor)]                                                                                                                                                                                                                                                     |
 
@@ -5771,7 +5771,7 @@ I'd like to thank those who have donated to help support this project.
 
 ### Patrons
 
-Thank you to all my patrons. <a href="https://www.patreon.com/bePatron?u=4678158" data-patreon-widget-type="become-patron-button">Become a Patron!</a><script async src="https://c6.patreon.com/becomePatronButton.bundle.js"></script>
+Thank you to all my patrons. <a href="https://www.patreon.com/bePatron?u=4678158" data-patreon-widget-type="become-patron-button">Become a Patron!</a>
 
 ### Backers
 
