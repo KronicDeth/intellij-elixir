@@ -5718,6 +5718,7 @@ I'd like to thank those who have donated to help support this project.
 ![](https://github.com/notriddle.png?size=40)
 ![](https://github.com/seeekr.png?size=40)
 ![](https://github.com/ArtemGordinsky.png?size=40)
+![](https://github.com/kvakvs.png?size=40)
 ![](https://github.com/Koziolek.png?size=40)
 ![](https://github.com/fitblip.png?size=40)
 
@@ -5770,6 +5771,7 @@ I'd like to thank those who have donated to help support this project.
 * Michael Howell ([@notriddle](https://github.com/notriddle))
 * Denis Andrejew ([@seeekr](https://github.com/seeekr))
 * Artem Gordinsky ([@ArtemGordinsky](https://github.com/ArtemGordinsky))
+* Dmytro Lytovchenko ([@kvakvs](https://github.com/kvakvs))
 * Maximilian Buschner
 * Ryan Sears ([@fitblip](https://github.com/fitblip))
 * Bartłomiej Kuczyński ([@Koziolek](https://github.com/Koziolek))
