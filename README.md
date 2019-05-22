@@ -5717,6 +5717,7 @@ I'd like to thank those who have donated to help support this project.
 ![](https://github.com/seeekr.png?size=40)
 ![](https://github.com/ArtemGordinsky.png?size=40)
 ![](https://github.com/Koziolek.png?size=40)
+![](https://github.com/fitblip.png?size=40)
 
 * Thomas Meeks ([@thomas](https://github.com/thomas))
 * Josh Taylor ([@joshuataylor](https://github.com/joshuataylor))
@@ -5766,6 +5767,7 @@ I'd like to thank those who have donated to help support this project.
 * Denis Andrejew ([@seeekr](https://github.com/seeekr))
 * Artem Gordinsky ([@ArtemGordinsky](https://github.com/ArtemGordinsky))
 * Maximilian Buschner
+* Ryan Sears ([@fitblip](https://github.com/fitblip))
 * Bartłomiej Kuczyński ([@Koziolek](https://github.com/Koziolek))
 * Nguyen Le
 
