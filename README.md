@@ -5696,6 +5696,7 @@ I'd like to thank those who have donated to help support this project.
 ![](https://github.com/nathancyam.png?size=40)
 ![](https://github.com/elvanja.png?size=40)
 ![](https://github.com/clifton.png?size=40)
+![](https://github.com/drl123.png?size=40)
 ![](https://github.com/thirdshift.png?size=40)
 ![](https://github.com/fireproofsocks.png?size=40)
 ![](https://github.com/jejacks0n.png?size=40)
@@ -5738,6 +5739,7 @@ I'd like to thank those who have donated to help support this project.
 * Nathan Yam ([@nathancyam](https://github.com/nathancyam))
 * Vanja Radovanović ([@elvanja](https://github.com/elvanja))
 * Clifton McIntosh  ([@cliftonmcintosh](https://github.com/cliftonmcintosh), [@clifton-mcintosh](https://github.com/clifton-mcintosh))
+* Donald Lettrich ([@drl123](https://github.com/drl123))
 * Garrett Hart ([@thirdshift](https://github.com/thirdshift))
 * Mateusz Jadczak
 * Fireproof Socks, Inc ([@fireproofsocks](https://github.com/fireproofsocks))
