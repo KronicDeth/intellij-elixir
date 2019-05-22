@@ -5783,9 +5783,11 @@ Thank you to all my patrons. <a href="https://www.patreon.com/bePatron?u=4678158
 
 ![](https://github.com/kvakvs.png?size=40)
 ![](https://github.com/jeffperrin.png?size=40)
+![](https://github.com/seanwash.png?size=40)
 
 * Dmytro Lytovchenko ([@kvakvs](https://github.com/kvakvs))
 * Jeff Perrin ([@jeffperrin](https://github.com/jeffperrin))
+* Sean Washington ([@seanwash](https://github.com/seanwash))
 
 ### Backers
 
