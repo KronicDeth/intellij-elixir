@@ -5690,6 +5690,7 @@ I'd like to thank those who have donated to help support this project.
 ![](https://github.com/robinhillard.png?size=40)
 ![](https://github.com/dmt.png?size=40)
 ![](https://github.com/jfcloutier.png?size=40)
+![](https://github.com/GrayBeamTechnology.png?size=40)
 ![](https://github.com/achedeuzot.png?size=40)
 ![](https://github.com/mirrec.png?size=40)
 ![](https://github.com/nathancyam.png?size=40)
@@ -5729,6 +5730,7 @@ I'd like to thank those who have donated to help support this project.
 * Robin Hillard ([@robinhillard](https://github.com/robinhillard)) of [rocketboots.com](http://www.rocketboots.com)
 * Daniel Temme ([@dmt](https://github.com/dmt))
 * Jean-Francois Cloutier ([@jfcloutier](https://github.com/jfcloutier))
+* McHughson Chambers ([@GrayBeamTechnology](https://github.com/GrayBeamTechnology))
 * Nathan Modrzewski
 * Klemen Sever ([@achedeuzot](https://github.com/achedeuzot))
 * Bjorgvin Reynisson
