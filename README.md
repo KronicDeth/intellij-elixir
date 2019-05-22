@@ -5782,8 +5782,10 @@ I'd like to thank those who have donated to help support this project.
 Thank you to all my patrons. <a href="https://www.patreon.com/bePatron?u=4678158" data-patreon-widget-type="become-patron-button">Become a Patron!</a>
 
 ![](https://github.com/kvakvs.png?size=40)
+![](https://github.com/jeffperrin.png?size=40)
 
 * Dmytro Lytovchenko ([@kvakvs](https://github.com/kvakvs))
+* Jeff Perrin ([@jeffperrin](https://github.com/jeffperrin))
 
 ### Backers
 
