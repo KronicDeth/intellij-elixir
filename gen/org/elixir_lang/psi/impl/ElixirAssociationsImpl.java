@@ -32,6 +32,7 @@ public class ElixirAssociationsImpl extends ASTWrapperPsiElement implements Elix
     return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirAssociationsBase.class));
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);

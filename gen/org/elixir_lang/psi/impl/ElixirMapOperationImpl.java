@@ -39,6 +39,7 @@ public class ElixirMapOperationImpl extends ASTWrapperPsiElement implements Elix
     return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirMapPrefixOperator.class));
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);

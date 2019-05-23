@@ -41,6 +41,7 @@ public class ElixirAnonymousFunctionImpl extends ASTWrapperPsiElement implements
     return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirStab.class));
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);

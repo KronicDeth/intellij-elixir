@@ -45,6 +45,7 @@ public class ElixirStabImpl extends ASTWrapperPsiElement implements ElixirStab {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirStabOperation.class);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);

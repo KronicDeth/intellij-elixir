@@ -25,19 +25,23 @@ public class ElixirBinaryDigitsImpl extends ASTWrapperPsiElement implements Elix
     else super.accept(visitor);
   }
 
+  @Override
   public int base() {
     return ElixirPsiImplUtil.base(this);
   }
 
+  @Override
   public boolean inBase() {
     return ElixirPsiImplUtil.inBase(this);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }
 
+  @Override
   @NotNull
   public IElementType validElementType() {
     return ElixirPsiImplUtil.validElementType(this);

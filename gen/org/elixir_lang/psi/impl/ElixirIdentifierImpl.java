@@ -27,16 +27,19 @@ public class ElixirIdentifierImpl extends ASTWrapperPsiElement implements Elixir
     else super.accept(visitor);
   }
 
+  @Override
   @Nullable
   public ItemPresentation getPresentation() {
     return ElixirPsiImplUtil.getPresentation(this);
   }
 
+  @Override
   @Nullable
   public PsiReference getReference() {
     return ElixirPsiImplUtil.getReference(this);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);

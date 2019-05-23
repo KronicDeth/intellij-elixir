@@ -38,6 +38,7 @@ public class ElixirMatchedAtUnqualifiedBracketOperationImpl extends ElixirMatche
     return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirBracketArguments.class));
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);

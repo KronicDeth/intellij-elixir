@@ -45,6 +45,7 @@ public class ElixirListImpl extends ASTWrapperPsiElement implements ElixirList {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirUnmatchedExpression.class);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);

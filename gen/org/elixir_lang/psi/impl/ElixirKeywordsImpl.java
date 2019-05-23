@@ -35,10 +35,12 @@ public class ElixirKeywordsImpl extends ASTWrapperPsiElement implements ElixirKe
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirKeywordPair.class);
   }
 
+  @Override
   public List<QuotableKeywordPair> quotableKeywordPairList() {
     return ElixirPsiImplUtil.quotableKeywordPairList(this);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);

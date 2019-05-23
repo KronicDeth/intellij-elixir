@@ -61,6 +61,7 @@ public class ElixirStructOperationImpl extends ASTWrapperPsiElement implements E
     return PsiTreeUtil.getChildOfType(this, ElixirVariable.class);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);

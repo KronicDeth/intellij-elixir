@@ -37,26 +37,31 @@ public class ElixirMatchedAtOperationImpl extends ElixirMatchedExpressionImpl im
     return PsiTreeUtil.getChildOfType(this, ElixirMatchedExpression.class);
   }
 
+  @Override
   @Nullable
   public PsiReference getReference() {
     return ElixirPsiImplUtil.getReference(this);
   }
 
+  @Override
   @NotNull
   public String moduleAttributeName() {
     return ElixirPsiImplUtil.moduleAttributeName(this);
   }
 
+  @Override
   @Nullable
   public Quotable operand() {
     return ElixirPsiImplUtil.operand(this);
   }
 
+  @Override
   @NotNull
   public Operator operator() {
     return ElixirPsiImplUtil.operator(this);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);

@@ -34,6 +34,7 @@ public class ElixirBlockListImpl extends ASTWrapperPsiElement implements ElixirB
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirBlockItem.class);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject[] quoteArguments() {
     return ElixirPsiImplUtil.quoteArguments(this);

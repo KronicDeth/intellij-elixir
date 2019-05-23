@@ -38,55 +38,66 @@ public class ElixirCharListLineImpl extends ASTWrapperPsiElement implements Elix
     return PsiTreeUtil.getChildOfType(this, ElixirQuoteCharListBody.class);
   }
 
+  @Override
   @NotNull
   public List<Integer> addEscapedCharacterCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode node) {
     return ElixirPsiImplUtil.addEscapedCharacterCodePoints(this, codePointList, node);
   }
 
+  @Override
   @NotNull
   public List<Integer> addEscapedEOL(@Nullable List<Integer> maybeCodePointList, @NotNull ASTNode node) {
     return ElixirPsiImplUtil.addEscapedEOL(this, maybeCodePointList, node);
   }
 
+  @Override
   @NotNull
   public List<Integer> addFragmentCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode node) {
     return ElixirPsiImplUtil.addFragmentCodePoints(this, codePointList, node);
   }
 
+  @Override
   @NotNull
   public List<Integer> addHexadecimalEscapeSequenceCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode node) {
     return ElixirPsiImplUtil.addHexadecimalEscapeSequenceCodePoints(this, codePointList, node);
   }
 
+  @Override
   @Nullable
   public Body getBody() {
     return ElixirPsiImplUtil.getBody(this);
   }
 
+  @Override
   public IElementType getFragmentType() {
     return ElixirPsiImplUtil.getFragmentType(this);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quoteAsAtom() {
     return ElixirPsiImplUtil.quoteAsAtom(this);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quoteBinary(OtpErlangTuple binary) {
     return ElixirPsiImplUtil.quoteBinary(this, binary);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quoteEmpty() {
     return ElixirPsiImplUtil.quoteEmpty(this);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quoteLiteral(List<Integer> codePointList) {
     return ElixirPsiImplUtil.quoteLiteral(this, codePointList);

@@ -78,6 +78,7 @@ public class ElixirMatchedAtNumericBracketOperationImpl extends ElixirMatchedExp
     return PsiTreeUtil.getChildOfType(this, ElixirUnknownBaseWholeNumber.class);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);

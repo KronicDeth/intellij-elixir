@@ -36,10 +36,12 @@ public class ElixirInterpolatedCharListHeredocLineImpl extends ASTWrapperPsiElem
     return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirInterpolatedCharListBody.class));
   }
 
+  @Override
   public Body getBody() {
     return ElixirPsiImplUtil.getBody(this);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote(@NotNull Heredoc heredoc, int prefixLength) {
     return ElixirPsiImplUtil.quote(this, heredoc, prefixLength);

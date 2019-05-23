@@ -40,6 +40,7 @@ public class ElixirMapArgumentsImpl extends ASTWrapperPsiElement implements Elix
     return PsiTreeUtil.getChildOfType(this, ElixirMapUpdateArguments.class);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);

@@ -32,6 +32,7 @@ public class ElixirNoParenthesesManyStrictNoParenthesesExpressionImpl extends AS
     return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirUnqualifiedNoParenthesesManyArgumentsCall.class));
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);

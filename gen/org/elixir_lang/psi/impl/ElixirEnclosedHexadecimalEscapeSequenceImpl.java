@@ -23,6 +23,7 @@ public class ElixirEnclosedHexadecimalEscapeSequenceImpl extends ASTWrapperPsiEl
     else super.accept(visitor);
   }
 
+  @Override
   public int codePoint() {
     return ElixirPsiImplUtil.codePoint(this);
   }

@@ -25,11 +25,13 @@ public class ElixirAdditionInfixOperatorImpl extends ASTWrapperPsiElement implem
     else super.accept(visitor);
   }
 
+  @Override
   @NotNull
   public TokenSet operatorTokenSet() {
     return ElixirPsiImplUtil.operatorTokenSet(this);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);

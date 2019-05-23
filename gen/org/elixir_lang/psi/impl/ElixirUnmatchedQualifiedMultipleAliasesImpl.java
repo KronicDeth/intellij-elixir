@@ -41,6 +41,7 @@ public class ElixirUnmatchedQualifiedMultipleAliasesImpl extends ElixirUnmatched
     return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirUnmatchedExpression.class));
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);

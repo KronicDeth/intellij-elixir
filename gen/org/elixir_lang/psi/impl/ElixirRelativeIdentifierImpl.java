@@ -43,6 +43,7 @@ public class ElixirRelativeIdentifierImpl extends ASTWrapperPsiElement implement
     return PsiTreeUtil.getChildOfType(this, ElixirStringLine.class);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);

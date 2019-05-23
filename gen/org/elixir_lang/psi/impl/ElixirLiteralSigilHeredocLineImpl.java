@@ -36,10 +36,12 @@ public class ElixirLiteralSigilHeredocLineImpl extends ASTWrapperPsiElement impl
     return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirLiteralSigilBody.class));
   }
 
+  @Override
   public Body getBody() {
     return ElixirPsiImplUtil.getBody(this);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote(@NotNull Heredoc heredoc, int prefixLength) {
     return ElixirPsiImplUtil.quote(this, heredoc, prefixLength);

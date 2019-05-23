@@ -45,6 +45,7 @@ public class ElixirBitStringImpl extends ASTWrapperPsiElement implements ElixirB
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirUnmatchedExpression.class);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);

@@ -380,7 +380,7 @@ public interface ElixirTypes {
   class Factory {
     public static PsiElement createElement(ASTNode node) {
       IElementType type = node.getElementType();
-       if (type == ACCESS_EXPRESSION) {
+      if (type == ACCESS_EXPRESSION) {
         return new ElixirAccessExpressionImpl(node);
       }
       else if (type == ADDITION_INFIX_OPERATOR) {

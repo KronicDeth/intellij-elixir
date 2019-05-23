@@ -55,6 +55,7 @@ public class ElixirMapUpdateArgumentsImpl extends ASTWrapperPsiElement implement
     return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirPipeInfixOperator.class));
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);

@@ -24,6 +24,7 @@ public class ElixirSigilModifiersImpl extends ASTWrapperPsiElement implements El
     else super.accept(visitor);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);

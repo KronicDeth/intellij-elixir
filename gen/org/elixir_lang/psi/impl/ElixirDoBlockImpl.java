@@ -45,6 +45,7 @@ public class ElixirDoBlockImpl extends ASTWrapperPsiElement implements ElixirDoB
     return PsiTreeUtil.getChildOfType(this, ElixirStab.class);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject[] quoteArguments() {
     return ElixirPsiImplUtil.quoteArguments(this);

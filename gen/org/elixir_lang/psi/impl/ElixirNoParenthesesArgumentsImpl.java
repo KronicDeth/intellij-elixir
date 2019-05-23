@@ -57,6 +57,7 @@ public class ElixirNoParenthesesArgumentsImpl extends ASTWrapperPsiElement imple
     return PsiTreeUtil.getChildOfType(this, ElixirNoParenthesesOneArgument.class);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject[] quoteArguments() {
     return ElixirPsiImplUtil.quoteArguments(this);

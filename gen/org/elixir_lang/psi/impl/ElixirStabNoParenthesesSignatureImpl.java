@@ -32,6 +32,7 @@ public class ElixirStabNoParenthesesSignatureImpl extends ASTWrapperPsiElement i
     return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirNoParenthesesArguments.class));
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);

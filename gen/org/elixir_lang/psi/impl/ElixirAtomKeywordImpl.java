@@ -24,6 +24,7 @@ public class ElixirAtomKeywordImpl extends ASTWrapperPsiElement implements Elixi
     else super.accept(visitor);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
