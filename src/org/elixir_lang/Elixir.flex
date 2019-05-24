@@ -946,8 +946,8 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
 
 <DECIMAL_WHOLE_NUMBER> {
   /*
-   Error handling with {INVALID_DECIMAL_DIGITS} and {DECIMAL_SEPARATOR} can only occur after at least one valid decimal
-   digit after the decimal mark because {INVALID_DECIMAL_DIGITS} and {DECIMAL_SEPARATOR} will be parsed as an
+   Error handling with {INVALID_DECIMAL_DIGITS} and {NUMBER_SEPARATOR} can only occur after at least one valid decimal
+   digit after the decimal mark because {INVALID_DECIMAL_DIGITS} and {NUMBER_SEPARATOR} will be parsed as an
    identifier immediately after `.`
 
    ```
