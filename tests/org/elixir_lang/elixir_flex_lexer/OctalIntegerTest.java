@@ -109,7 +109,7 @@ public class OctalIntegerTest extends TokenTest {
                 { "\r\n", ElixirTypes.EOL, ElixirFlexLexer.SIGN_OPERATION_MAYBE },
                 { "]", ElixirTypes.CLOSING_BRACKET, ElixirFlexLexer.YYINITIAL },
                 { "^", ElixirTypes.UNARY_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE },
-                { "_", ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_MAYBE },
+                { "_", ElixirTypes.NUMBER_SEPARATOR, ElixirFlexLexer.OCTAL_WHOLE_NUMBER },
                 { "`", TokenType.BAD_CHARACTER, ElixirFlexLexer.YYINITIAL },
                 { "a", ElixirTypes.INVALID_OCTAL_DIGITS, ElixirFlexLexer.OCTAL_WHOLE_NUMBER },
                 { "b", ElixirTypes.INVALID_OCTAL_DIGITS, ElixirFlexLexer.OCTAL_WHOLE_NUMBER },
