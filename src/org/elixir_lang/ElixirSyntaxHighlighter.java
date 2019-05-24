@@ -291,7 +291,7 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     );
     private static final TokenSet DECIMAL_TOKEN_SET = TokenSet.create(
             ElixirTypes.DECIMAL_MARK,
-            ElixirTypes.DECIMAL_SEPARATOR,
+            ElixirTypes.NUMBER_SEPARATOR,
             ElixirTypes.EXPONENT_MARK
     );
     private static final TokenSet EXPRESSION_SUBSTITUTION_MARKS =  TokenSet.create(
@@ -388,7 +388,6 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     );
     private static final TokenSet VALID_DIGITS_TOKEN_SET = TokenSet.create(
             ElixirTypes.VALID_BINARY_DIGITS,
-            ElixirTypes.VALID_DECIMAL_DIGITS,
             ElixirTypes.VALID_DECIMAL_DIGITS,
             ElixirTypes.VALID_HEXADECIMAL_DIGITS,
             ElixirTypes.VALID_OCTAL_DIGITS
