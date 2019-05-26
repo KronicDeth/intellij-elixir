@@ -249,11 +249,12 @@ defmodule IntelliJElixir.Debugger.Server do
             vars_env = %{env | vars: parsed_vars}
 
             # Elixir 1.7+ uses current_vars
-            current_vars_env = if Map.has_key?(vars_env, :current_vars) do
-              %{vars_env | current_vars: Enum.into(parsed_vars, %{}, fn parsed_var -> {parsed_var, {0, :term}} end)}
-            else
-              vars_env
-            end
+            current_vars_env =
+              if Map.has_key?(vars_env, :current_vars) do
+                %{vars_env | current_vars: Enum.into(parsed_vars, %{}, fn parsed_var -> {parsed_var, {0, :term}} end)}
+              else
+                vars_env
+              end
 
             # https://github.com/elixir-lang/elixir/blob/8a971fcb44391bd8b16456666f3033b633c6ff77/lib/elixir/src/elixir.erl#L256
             {erl, _new_env, _new_scope} = quoted_to_erl(quoted, current_vars_env, parsed_scope)
