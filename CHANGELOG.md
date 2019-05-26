@@ -185,6 +185,13 @@ Table of Contents
 
 # Changelog
 
+## v10.5.2
+
+### Bug Fixes
+* [#1491](https://github.com/KronicDeth/intellij-elixir/pull/1491) - [@KronicDeth](https://github.com/KronicDeth)
+  * Elixir 1.8 made `:elixir.quoted_to_erl/3` private, so in Elixir 1.8+, the debugger needs to inline the private version to maintain < 1.8 and >= 1.8 compatibility.
+  * Reformat debugger for Elixir 1.8
+
 ## v10.5.1
 
 ### Bug Fixes
