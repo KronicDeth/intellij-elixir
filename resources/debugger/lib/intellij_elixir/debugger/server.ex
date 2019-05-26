@@ -256,7 +256,7 @@ defmodule IntelliJElixir.Debugger.Server do
             end
 
             # https://github.com/elixir-lang/elixir/blob/8a971fcb44391bd8b16456666f3033b633c6ff77/lib/elixir/src/elixir.erl#L256
-            {erl, _new_env, _new_scope} = :elixir.quoted_to_erl(quoted, current_vars_env, parsed_scope)
+            {erl, _new_env, _new_scope} = quoted_to_erl(quoted, current_vars_env, parsed_scope)
 
             code =
               [:erl_pp.expr(erl), ?.]
@@ -368,6 +368,20 @@ defmodule IntelliJElixir.Debugger.Server do
     |> Enum.each(&time_interpret/1)
 
     :ok
+  end
+
+  # `:elixir.quoted_to_erl/3` became private in Elixir 1.8, so need to inline it here.
+  if Version.compare(System.version(), "1.8.0") == :lt do
+    defp quoted_to_erl(quoted, env, scope) do
+      :elixir.quoted_to_erl(quoted, env, scope)
+    end
+  else
+    defp quoted_to_erl(quoted, env, scope) do
+      {expanded, new_env} = :elixir_expand.expand(quoted, env)
+      {erl, new_scope} = :elixir_erl_pass.translate(expanded, scope)
+
+      {erl, new_env, new_scope}
+    end
   end
 
   defp time_interpret(module) when is_atom(module) do
