@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 
 public class HomePath {
     private static final String HEAD_PREFIX = "HEAD-";
+    public static final String LINUX_MINT_HOME_PATH = "/usr/lib";
     public static final String LINUX_DEFAULT_HOME_PATH = "/usr/local/lib";
     public static final Version UNKNOWN_VERSION = new Version(0, 0, 0);
     private static final File HOMEBREW_ROOT = new File("/usr/local/Cellar");
