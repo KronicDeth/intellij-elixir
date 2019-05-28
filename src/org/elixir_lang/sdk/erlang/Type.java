@@ -42,6 +42,7 @@ public class Type extends SdkType {
                     "]),erlang:halt().";
     private static final String WINDOWS_DEFAULT_HOME_PATH = "C:\\Program Files\\erl9.0";
     private static final Pattern NIX_PATTERN = nixPattern("erlang");
+    private static final String LINUX_MINT_HOME_PATH = HomePath.LINUX_MINT_HOME_PATH + "/erlang";
     private static final String LINUX_DEFAULT_HOME_PATH = HomePath.LINUX_DEFAULT_HOME_PATH + "/erlang";
     private static final Function<File, File> VERSION_PATH_TO_HOME_PATH =
             versionPath -> new File(versionPath, "lib/erlang");
@@ -122,6 +123,7 @@ public class Type extends SdkType {
                 putIfDirectory(homePathByVersion, UNKNOWN_VERSION, WINDOWS_DEFAULT_HOME_PATH);
             } else if (SystemInfo.isLinux) {
                 putIfDirectory(homePathByVersion, UNKNOWN_VERSION, LINUX_DEFAULT_HOME_PATH);
+                putIfDirectory(homePathByVersion, UNKNOWN_VERSION, LINUX_MINT_HOME_PATH);
 
                 mergeTravisCIKerl(homePathByVersion, Function.identity());
                 mergeNixStore(homePathByVersion, NIX_PATTERN, VERSION_PATH_TO_HOME_PATH);

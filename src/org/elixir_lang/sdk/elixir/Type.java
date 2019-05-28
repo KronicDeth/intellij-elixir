@@ -55,6 +55,7 @@ import static org.elixir_lang.sdk.Type.ebinPathChainVirtualFile;
 
 public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
     private static final String LINUX_DEFAULT_HOME_PATH = HomePath.LINUX_DEFAULT_HOME_PATH + "/elixir";
+    private static final String LINUX_MINT_HOME_PATH = HomePath.LINUX_MINT_HOME_PATH + "/elixir";
     private static final Logger LOG = Logger.getInstance(Type.class);
     private static final Pattern NIX_PATTERN = nixPattern("elixir");
     private static final Set<String> SDK_HOME_CHILD_BASE_NAME_SET = new THashSet<>(Arrays.asList("lib", "src"));
@@ -551,13 +552,24 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
 
                 homePathByVersion.put(UNKNOWN_VERSION, sdkPath);
             } else if (SystemInfo.isLinux) {
-                homePathByVersion.put(UNKNOWN_VERSION, LINUX_DEFAULT_HOME_PATH);
+                putIfDirectory(homePathByVersion, UNKNOWN_VERSION, LINUX_DEFAULT_HOME_PATH);
+                putIfDirectory(homePathByVersion, UNKNOWN_VERSION, LINUX_MINT_HOME_PATH);
 
                 mergeNixStore(homePathByVersion, NIX_PATTERN, Function.identity());
             }
         }
 
         return homePathByVersion;
+    }
+
+    private static void putIfDirectory(@NotNull Map<Version, String> homePathByVersion,
+                                       @NotNull Version version,
+                                       @NotNull String homePath) {
+        File homeFile = new File(homePath);
+
+        if (homeFile.isDirectory()) {
+            homePathByVersion.put(version, homePath);
+        }
     }
 
     @NotNull
