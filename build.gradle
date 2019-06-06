@@ -16,13 +16,7 @@ ext {
   elixirPath = "${cachePath}/elixir-${elixirVersion}"
 
   quoterUnzippedPath = "${cachePath}/elixir-${elixirVersion}-intellij_elixir-${quoterVersion}"
-
-  if (elixirVersion.startsWith("1.5") || elixirVersion.startsWith("1.6") || elixirVersion.startsWith("1.7")) {
-    quoterExe = "${quoterUnzippedPath}/_build/dev/rel/intellij_elixir/bin/intellij_elixir"
-  } else {
-    quoterExe = "${quoterUnzippedPath}/rel/intellij_elixir/bin/intellij_elixir"
-  }
-
+  quoterExe = "${quoterUnzippedPath}/_build/dev/rel/intellij_elixir/bin/intellij_elixir"
   quoterZipPath = "${cachePath}/intellij_elixir-${quoterVersion}.zip"
   quoterZipRootPath = "${cachePath}/intellij_elixir-${quoterVersion}"
 
