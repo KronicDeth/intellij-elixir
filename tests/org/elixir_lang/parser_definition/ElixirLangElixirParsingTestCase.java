@@ -362,7 +362,14 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     }
 
     public void testParallelCompilerBar() {
-        assertParsed("lib/elixir/test/elixir/fixtures/parallel_compiler/bar.ex", Parse.CORRECT);
+        boolean beforeV_1_8 = elixirSdkLevel().compareTo(V_1_8) < 0;
+
+        if (beforeV_1_8) {
+            assertParsed("lib/elixir/test/elixir/fixtures/parallel_compiler/bar.ex", Parse.CORRECT);
+        } else {
+            //noinspection ConstantConditions,SimplifiableJUnitAssertion
+            assertTrue(!beforeV_1_8);
+        }
     }
 
     public void testParallelCompilerBat() {
@@ -371,33 +378,75 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         if (beforeV_1_3) {
             assertParsed("lib/elixir/test/elixir/fixtures/parallel_compiler/bat.ex", Parse.ERROR);
         } else {
-            //noinspection ConstantConditions
+            //noinspection ConstantConditions,SimplifiableJUnitAssertion
             assertTrue(!beforeV_1_3);
         }
     }
 
     public void testParallelCompilerFoo() {
-        assertParsed("lib/elixir/test/elixir/fixtures/parallel_compiler/foo.ex", Parse.CORRECT);
+        boolean beforeV_1_8 = elixirSdkLevel().compareTo(V_1_8) < 0;
+
+        if (beforeV_1_8) {
+            assertParsed("lib/elixir/test/elixir/fixtures/parallel_compiler/foo.ex", Parse.CORRECT);
+        } else {
+            //noinspection ConstantConditions,SimplifiableJUnitAssertion
+            assertTrue(!beforeV_1_8);
+        }
     }
 
     public void testParallelDeadlockBar() {
-        assertParsed("lib/elixir/test/elixir/fixtures/parallel_deadlock/bar.ex", Parse.CORRECT);
+        boolean beforeV_1_8 = elixirSdkLevel().compareTo(V_1_8) < 0;
+
+        if (beforeV_1_8) {
+            assertParsed("lib/elixir/test/elixir/fixtures/parallel_deadlock/bar.ex", Parse.CORRECT);
+        } else {
+            //noinspection ConstantConditions,SimplifiableJUnitAssertion
+            assertTrue(!beforeV_1_8);
+        }
     }
 
     public void testParallelDeadlockFoo() {
-        assertParsed("lib/elixir/test/elixir/fixtures/parallel_deadlock/foo.ex", Parse.CORRECT);
+        boolean beforeV_1_8 = elixirSdkLevel().compareTo(V_1_8) < 0;
+
+        if (beforeV_1_8) {
+            assertParsed("lib/elixir/test/elixir/fixtures/parallel_deadlock/foo.ex", Parse.CORRECT);
+        } else {
+            //noinspection ConstantConditions,SimplifiableJUnitAssertion
+            assertTrue(!beforeV_1_8);
+        }
     }
 
     public void testParallelStructBar() {
-        assertParsed("lib/elixir/test/elixir/fixtures/parallel_struct/bar.ex", Parse.CORRECT);
+        boolean beforeV_1_8 = elixirSdkLevel().compareTo(V_1_8) < 0;
+
+        if (beforeV_1_8) {
+            assertParsed("lib/elixir/test/elixir/fixtures/parallel_struct/bar.ex", Parse.CORRECT);
+        } else {
+            //noinspection ConstantConditions,SimplifiableJUnitAssertion
+            assertTrue(!beforeV_1_8);
+        }
     }
 
     public void testParallelStructFoo() {
-        assertParsed("lib/elixir/test/elixir/fixtures/parallel_struct/foo.ex", Parse.CORRECT);
+        boolean beforeV_1_8 = elixirSdkLevel().compareTo(V_1_8) < 0;
+
+        if (beforeV_1_8) {
+            assertParsed("lib/elixir/test/elixir/fixtures/parallel_struct/foo.ex", Parse.CORRECT);
+        } else {
+            //noinspection ConstantConditions,SimplifiableJUnitAssertion
+            assertTrue(!beforeV_1_8);
+        }
     }
 
     public void testWarningsSample() {
-        assertParsed("lib/elixir/test/elixir/fixtures/warnings_sample.ex", Parse.CORRECT);
+        boolean beforeV_1_8 = elixirSdkLevel().compareTo(V_1_8) < 0;
+
+        if (beforeV_1_8) {
+            assertParsed("lib/elixir/test/elixir/fixtures/warnings_sample.ex", Parse.CORRECT);
+        } else {
+            //noinspection ConstantConditions,SimplifiableJUnitAssertion
+            assertTrue(!beforeV_1_8);
+        }
     }
 
     public void testUnicodeUnicode() {

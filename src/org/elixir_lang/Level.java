@@ -17,7 +17,8 @@ public enum Level {
     V_1_4(1, 4, false, true, "to_charlist", true),
     V_1_5(1, 5, false, true, "to_charlist", true),
     V_1_6(1, 6, false, true, "to_charlist", true),
-    V_1_7(1, 7, false, true, "to_charlist", true);
+    V_1_7(1, 7, false, true, "to_charlist", true),
+    V_1_8(1, 8, false, true, "to_charlist", true);
 
     public static final Key<Level> KEY = new Key<>("elixir.level");
 
