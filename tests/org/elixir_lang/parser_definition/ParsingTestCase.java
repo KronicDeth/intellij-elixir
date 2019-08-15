@@ -36,6 +36,7 @@ import org.picocontainer.MutablePicoContainer;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -310,9 +311,9 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
         application.addComponent(
                 VirtualFileManager.class,
                 new VirtualFileManagerImpl(
-                        new VirtualFileSystem[]{
+                        Collections.singletonList(
                                 new MockLocalFileSystem()
-                        },
+                        ),
                         messageBus
                 )
         );

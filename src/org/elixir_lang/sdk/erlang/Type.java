@@ -10,7 +10,7 @@ import com.intellij.openapi.projectRoots.SdkType;
 import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.Version;
-import com.intellij.util.containers.WeakHashMap;
+import com.intellij.util.containers.ContainerUtil;
 import org.elixir_lang.jps.sdk_type.Erlang;
 import org.elixir_lang.jps.HomePath;
 import org.elixir_lang.sdk.erlang_dependent.AdditionalDataConfigurable;
@@ -47,7 +47,7 @@ public class Type extends SdkType {
     private static final Function<File, File> VERSION_PATH_TO_HOME_PATH =
             versionPath -> new File(versionPath, "lib/erlang");
     private static final Logger LOGGER = Logger.getInstance(Type.class);
-    private final Map<String, Release> releaseBySdkHome = new WeakHashMap<>();
+    private final Map<String, Release> releaseBySdkHome = ContainerUtil.createWeakMap();
 
 
     public Type() {

@@ -4,11 +4,13 @@
   <vendor email="Kronic.Deth@gmail.com">Luke Imhoff</vendor>
 
   <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-  <idea-version since-build="173.4674.33"/>
+  <idea-version since-build="192.4820"/>
 
   <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
        on how to target different products -->
   <depends>com.intellij.modules.lang</depends>
+  <!-- Needed for JPS builder -->
+  <depends>com.intellij.modules.java</depends>
   <depends config-file="intellij-erlang-plugin.xml" optional="true">org.jetbrains.erlang</depends>
   <depends config-file="rich-platform-plugin.xml" optional="true">com.intellij.modules.java</depends>
 
@@ -29,7 +31,6 @@
     <!-- Elixir Module Structure -->
     <sdkType implementation="org.elixir_lang.sdk.elixir.Type"/>
     <sdkType implementation="org.elixir_lang.sdk.erlang.Type"/>
-    <project.converterProvider implementation="org.elixir_lang.sdk.elixir.conversion.Provider"/>
 
     <moduleConfigurationEditorProvider implementation="org.elixir_lang.module.DefaultModuleEditorsProvider" order="first"/>
 
@@ -80,9 +81,6 @@
     <fileTypeFactory implementation="org.elixir_lang.ElixirFileTypeFactory"/>
     <filePropertyPusher implementation="org.elixir_lang.file.LevelPropertyPusher"/>
 
-    <!-- Run Configurations -->
-    <project.converterProvider implementation="org.elixir_lang.run.conversion.Provider"/>
-
     <!-- Facet -->
     <applicationConfigurable id="language.elixir.sdks.elixir"
                              parentId="language.elixir"
@@ -95,9 +93,6 @@
     <projectConfigurable id="language.elixir"
                          parentId="language"
                          provider="org.elixir_lang.facet.configurable.Provider"/>
-    <project.converterProvider implementation="org.elixir_lang.facet.conversion.Provider"/>
-    <project.converterProvider implementation="org.elixir_lang.facet.external_library.conversion.Provider"/>
-    <project.converterProvider implementation="org.elixir_lang.facet.elixir_module_deletion.Provider"/>
 
     <facetType implementation="org.elixir_lang.facet.Type"/>
     <framework.detector implementation="org.elixir_lang.FrameworkDetector"/>

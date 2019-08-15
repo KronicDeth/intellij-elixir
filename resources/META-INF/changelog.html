@@ -1,5 +1,78 @@
 <html>
 <body>
+<h1>v11.0.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>Simplifications due to only supporting IntelliJ 2019.2
+        <ul>
+          <li>Don't use reflection for error report Submitter</li>
+          <li>
+            Don't use deprecated WeakHashMap. It was needed for backwards compatibility, but since this build is for
+            2019.2 only, no compatibility is necessary and it clears up the long warnings from the logs for end users.
+          </li>
+          <li>
+            Remove reflection from OutputToGeneralTestEventsConverters.  Only 2019.2 is now supported, so no need for
+            complicated backwards compatibility.
+          </li>
+          <li>Only support IntelliJ 2019.2 in Travis CI</li>
+        </ul>
+      </li>
+      <li>Remove Elixir 1.5 and 1.6 builds as they are both &gt; 1 year since the last release approximately.</li>
+    </ul>
+  </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>IntelliJ 2019.2 compatibility
+        <ul>
+          <li>
+            <p>
+              Explicitly depend on java plugin.  2019.2 extracted the Java functionality to a plugin (as outlined
+              <a href="https://blog.jetbrains.com/platform/2019/06/java-functionality-extracted-as-a-plugin/" rel="nofollow">
+                here
+              </a>), which includes the JPS builder used for Project Build functionality.
+            </p>
+          </li>
+          <li>
+            <p>
+              Remove project converterts.  Project converters are broken in 2019.2 because the
+              <code>DialogWrapper</code> they try to launch isn't being launched in the Event Dispatch Thread (EDT)
+              (
+              <a href="https://youtrack.jetbrains.com/issue/IDEA-218071" rel="nofollow">
+                https://youtrack.jetbrains.com/issue/IDEA-218071
+              </a>
+              ).
+            </p>
+            <p>
+              As this is bug in code wholey controlled by upstream, the only option is to remove the project converters.
+              The work-around is for users to re-import projects when a project layout update is necessary.
+            </p>
+          </li>
+          <li>
+            <p>Fix nullability of <code>override</code> arguments in <code>ChooseByNameModel</code></p>
+          </li>
+          <li>
+            <p>
+              Don't use dependency injection for OpenProcessor builder.  JetBrains has removed dependency injection for
+              Extensions in 2019.2.
+            </p>
+          </li>
+          <li>
+            <p>Don't pass a null name ot findSdk</p>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Incompatible Changes</p>
+    <ul>
+      <li>Changes needed for 2019.2 compatibility make this build incompatible with earlier releases.</li>
+    </ul>
+  </li>
+</ul>
 <h1>v10.6.0</h1>
 <ul>
   <li>
