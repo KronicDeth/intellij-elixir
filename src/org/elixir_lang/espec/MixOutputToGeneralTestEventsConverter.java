@@ -21,7 +21,7 @@ public class MixOutputToGeneralTestEventsConverter extends OutputToGeneralTestEv
     MixOutputToGeneralTestEventsConverter(@NotNull String testFrameworkName, @NotNull TestConsoleProperties consoleProperties) {
         super(testFrameworkName, consoleProperties);
 
-        splitter = new OutputEventSplitter(consoleProperties.isEditable()) {
+        splitter = new OutputEventSplitter() {
             @Override
             public void onTextAvailable(@NotNull String text, @NotNull Key outputType) {
                 processConsistentText(text, outputType);
