@@ -58,7 +58,9 @@ allprojects {
   intellij {
     def intellij_erlang_version
 
-    if (ideaVersion.startsWith("2019.1")) {
+    if (ideaVersion.startsWith("2019.2")) {
+      intellij_erlang_version = "0.11.1008"
+    } else if (ideaVersion.startsWith("2019.1")) {
       intellij_erlang_version = "0.11.1004"
     } else if (ideaVersion.startsWith("2018.3")) {
       intellij_erlang_version = "0.11.1000"
@@ -78,7 +80,9 @@ allprojects {
       throw new IllegalArgumentException("ideaVersion is not a recognized MAJOR.MINOR for IntelliJ Erlang compatibility")
     }
 
-    plugins = ["org.jetbrains.erlang:${intellij_erlang_version}",
+    plugins = [// needed for jps builder
+               "java",
+               "org.jetbrains.erlang:${intellij_erlang_version}",
                // always have IdeaVIM installed in sandbox
                "IdeaVIM:0.48",
                "PsiViewer:3.28.93"]
