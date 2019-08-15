@@ -13,9 +13,6 @@ import com.intellij.openapi.vfs.newvfs.FileAttribute;
 import com.intellij.psi.*;
 import com.intellij.psi.templateLanguages.TemplateDataLanguageMappings;
 import com.intellij.psi.templateLanguages.TemplateDataLanguagePatterns;
-import com.intellij.testFramework.MockSchemeManagerFactory;
-import com.intellij.util.messages.MessageBus;
-import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.ElixirParserDefinition;
 import org.elixir_lang.eex.Language;
 import org.elixir_lang.eex.ParserDefinition;
@@ -23,14 +20,10 @@ import org.elixir_lang.eex.file.Type;
 import org.elixir_lang.eex.file.view_provider.Factory;
 import org.elixir_lang.parser_definition.ParsingTestCase;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.junit.BeforeClass;
 import org.picocontainer.MutablePicoContainer;
 
 import java.lang.reflect.Field;
 import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 public class Test extends ParsingTestCase {
@@ -237,7 +230,6 @@ public class Test extends ParsingTestCase {
         registerExtensionPoint(FileTypeRegistrator.EP_NAME, FileTypeRegistrator.class);
 
         MutablePicoContainer picoContainer = getApplication().getPicoContainer();
-        MessageBus messageBus = messageBus(picoContainer);
 
         registerApplicationService(PropertiesComponent.class, new AppPropertiesComponentImpl());
 
@@ -245,7 +237,7 @@ public class Test extends ParsingTestCase {
 
         unregisterAutoDetectionCacheAttribute();
         FileTypeManagerImpl fileTypeManager =
-                new FileTypeManagerImpl(messageBus, new MockSchemeManagerFactory(), new AppPropertiesComponentImpl());
+                new FileTypeManagerImpl();
 
         registerFileType(fileTypeManager, HtmlFileType.INSTANCE);
         registerFileType(fileTypeManager, Type.INSTANCE);
