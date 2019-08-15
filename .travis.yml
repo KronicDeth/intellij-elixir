@@ -5,12 +5,7 @@ jobs:
       language: elixir
       elixir: 1.7.4
       env: IDEA_VERSION="2019.2"
-      jdk: oraclejdk8
       otp_release: 20.1
-      addons:
-        apt:
-          packages:
-            - oracle-java8-installer
       cache:
         directories:
           - cache
@@ -44,7 +39,6 @@ jobs:
       env:
       - IDEA_VERSION="2019.2"
       - secure: "sumWWNvahSNr7w6taGFWUXFZKsbeA5JR8qn3OI04z2sJiTE1VKYqpyJQxmJSDIALMaw7pqdF5KoUKooKJ8jIN6Dsraeg+8YS2ekYTNZL/9wFJjcjViHsscCWQhSxTEexLpUFsB1YcTscip8/nLojsgl6c4RO6zuw1d6ghjCAjak="
-      jdk: oraclejdk8
       otp_release: 20.1
       cache:
         directories:
