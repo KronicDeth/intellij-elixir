@@ -10,7 +10,7 @@
        on how to target different products -->
   <depends>com.intellij.modules.lang</depends>
   <!-- Needed for JPS builder -->
-  <depends>com.intellij.modules.java</depends>
+  <depends optional="true">com.intellij.modules.java</depends>
   <depends config-file="intellij-erlang-plugin.xml" optional="true">org.jetbrains.erlang</depends>
   <depends config-file="rich-platform-plugin.xml" optional="true">com.intellij.modules.java</depends>
 
