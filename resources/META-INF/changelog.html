@@ -1,5 +1,17 @@
 <html>
 <body>
+<h1>v11.0.2</h1>
+<ul>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>
+        Don't log if partial or no header typeID is read.  It happens too often due to <code>.beam</code> files being
+        written partially to disk during the build process.  They will be re-indexed when they are complete.
+      </li>
+    </ul>
+  </li>
+</ul>
 <h1>v11.0.1</h1>
 <ul>
   <li>
