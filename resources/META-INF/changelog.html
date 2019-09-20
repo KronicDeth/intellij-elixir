@@ -1,7 +1,24 @@
 <html>
 <body>
-<h1>v11.0.2</h1>
+<h1>v11.1.0</h1>
 <ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>Update gradle plugins
+        <ul>
+          <li><code>gradle-intellij-plugin</code> (<code>org.jetbrains.intellij</code>) to <code>0.4.10</code></li>
+          <li><code>org.jetbrains.kotlin.jvm</code> to <code>1.3.50</code></li>
+          <li><code>de.undercrouch.download</code> to <code>4.0.0</code></li>
+        </ul>
+      </li>
+      <li>Update IDEA version in builds
+        <ul>
+          <li><code>2019.2</code> -&gt; <code>2019.2.2</code></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
   <li>
     <p>Bug Fixes</p>
     <ul>
@@ -9,6 +26,7 @@
         Don't log if partial or no header typeID is read.  It happens too often due to <code>.beam</code> files being
         written partially to disk during the build process.  They will be re-indexed when they are complete.
       </li>
+      <li>Update gradle intellij plugin to fix <code>runIde</code> on newer macOS.</li>
     </ul>
   </li>
 </ul>
