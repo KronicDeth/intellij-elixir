@@ -210,6 +210,12 @@
   * Don't log if partial or no header typeID is read.  It happens too often due to `.beam` files being written partially to disk during the build process.  They will be re-indexed when they are complete.
 * [#1587](https://github.com/KronicDeth/intellij-elixir/pull/1587) - [@KronicDeth](https://github.com/KronicDeth)
   * Update gradle intellij plugin to fix `runIde` on newer macOS.
+* [#1588](https://github.com/KronicDeth/intellij-elixir/pull/1588) - [@KronicDeth](https://github.com/KronicDeth)
+  * Fix `ConcurrentModificationException` in Structure View
+
+    Java 9 fixed a bug (https://bugs.openjdk.java.net/browse/JDK-8071667) in `HashMap` where `computeIfAbsent` did not check for concurrent modifications, and it turns out that `TreeElementList` was using concurrent modifications, so it was now broke.
+
+    Fixed by use `get` or `put` if it is absent, so that `putNew` can ensure that the `CallDefinition` is in the `TreeElementList` before it is added to the `MutableList<TreeElement>`, which was the original reason why there was a `put` inside of `computeIfAbsent`, which would have `put` when the function returned anyway.
 
 ## v11.0.1
 ### Bug Fixes

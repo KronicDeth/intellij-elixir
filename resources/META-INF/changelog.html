@@ -27,6 +27,22 @@
         written partially to disk during the build process.  They will be re-indexed when they are complete.
       </li>
       <li>Update gradle intellij plugin to fix <code>runIde</code> on newer macOS.</li>
+      <li>
+        <p>Fix <code>ConcurrentModificationException</code> in Structure View</p>
+        <p>
+          Java 9 fixed a bug (
+          <a href="https://bugs.openjdk.java.net/browse/JDK-8071667" rel="nofollow">
+            https://bugs.openjdk.java.net/browse/JDK-8071667
+          </a>) in <code>HashMap</code> where <code>computeIfAbsent</code> did not check for concurrent modifications,
+          and it turns out that <code>TreeElementList</code> was using concurrent modifications, so it was now broke.
+        </p>
+        <p>
+          Fixed by use <code>get</code> or <code>put</code> if it is absent, so that <code>putNew</code> can ensure that
+          the <code>CallDefinition</code> is in the <code>TreeElementList</code> before it is added to the
+          <code>MutableList&lt;TreeElement&gt;</code>, which was the original reason why there was a <code>put</code>
+          inside of <code>computeIfAbsent</code>, which would have <code>put</code> when the function returned anyway.
+        </p>
+      </li>
     </ul>
   </li>
 </ul>
