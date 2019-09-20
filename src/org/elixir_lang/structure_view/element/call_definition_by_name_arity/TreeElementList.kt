@@ -46,17 +46,17 @@ open class TreeElementList(
      * @return pre-existing [CallDefinition] or new [CallDefinition] add to the `List<TreeElement>`
      */
     override fun putNew(nameArity: NameArity): CallDefinition =
-        computeIfAbsent(nameArity) {
-            CallDefinition(
+    // Don't use `computeIfAbsent` because `addToTreeElementList` needs to be called only when absent, but after
+            // `put`, which would be after `computeIfAbsent` computer returned.
+            get(nameArity) ?: CallDefinition(
                     modular,
                     time,
-                    it.name,
-                    it.arity
+                    nameArity.name,
+                    nameArity.arity
             ).also {
                 put(nameArity, it)
                 addToTreeElementList(it)
             }
-        }
 }
 
 private fun CallDefinition.also(block: (CallDefinition) -> Unit): CallDefinition {
