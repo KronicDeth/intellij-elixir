@@ -206,6 +206,8 @@
 ### Bug Fixes
 * [#1589](https://github.com/KronicDeth/intellij-elixir/pull/1589) - [@KronicDeth](https://github.com/KronicDeth)
   * Don't error on `runtume` in mix deps.  `guardian` is too common of a dependency and too many users have the version with the typo installed.
+* [#1569](https://github.com/KronicDeth/intellij-elixir/pull/1569) - [@chitacan](https://github.com/chitacan)
+  * Fix IEx Mix Run/Debug Configuration for `asdf` by using absolute path to `mix`.
 
 ## v11.1.0
 ### Enhancements
