@@ -208,6 +208,14 @@
   * Don't error on `runtume` in mix deps.  `guardian` is too common of a dependency and too many users have the version with the typo installed.
 * [#1569](https://github.com/KronicDeth/intellij-elixir/pull/1569) - [@chitacan](https://github.com/chitacan)
   * Fix IEx Mix Run/Debug Configuration for `asdf` by using absolute path to `mix`.
+* [#1595](https://github.com/KronicDeth/intellij-elixir/pull/1595) - [@KronicDeth](https://github.com/KronicDeth)
+  * Add OTP 22 and 23 opcodes to Code BEAM Chunk Viewer
+    * `put_tuple/2`
+    * `bs_get_tail/3`
+    * `bs_start_match3/4`
+    * `bs_get_position/3`
+    * `bs_set_position/2`
+    * `swap/2`
 
 ## v11.1.0
 ### Enhancements
