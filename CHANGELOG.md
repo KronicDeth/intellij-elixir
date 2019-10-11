@@ -2,7 +2,7 @@
 
 ## Table of Contents
 
-* [v11.1.1](#v1111)
+* [v11.2.0](#v1120)
    * [Enhancements](#enhancements)
    * [Bug Fixes](#bug-fixes)
 * [v11.1.0](#v1110)
@@ -198,7 +198,7 @@
    * [Enhancements](#enhancements-54)
    * [Bug Fixes](#bug-fixes-57)
 
-## v11.1.1
+## v11.2.0
 ### Enhancements
 * [#1592](https://github.com/KronicDeth/intellij-elixir/pull/1592) - [@alex-dukhno](https://github.com/alex-dukhno)
   * Add `ExUnit` `describe` block template.
