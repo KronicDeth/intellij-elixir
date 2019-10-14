@@ -147,6 +147,7 @@
     <completion.contributor implementationClass="org.elixir_lang.code_insight.completion.contributor.CallDefinitionClause" language="Elixir"/>
 
     <codeInsight.lineMarkerProvider implementationClass="org.elixir_lang.code_insight.line_marker_provider.CallDefinition" language="Elixir"/>
+    <codeInsight.parameterInfo implementationClass="org.elixir_lang.code_insight.ParameterInfo" language="Elixir" />
     <elementDescriptionProvider implementation="org.elixir_lang.psi.ElementDescriptionProvider"/>
     <gotoSymbolContributor implementation="org.elixir_lang.navigation.GotoSymbolContributor"/>
     <lang.braceMatcher language="Elixir" implementationClass="org.elixir_lang.code_insight.highlighting.brace_matcher.NonTrivial"/>

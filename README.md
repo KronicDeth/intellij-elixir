@@ -213,6 +213,7 @@ Table of Contents[![Backers on Open Collective](https://opencollective.com/intel
                * [Elixir Facet SDK](#elixir-facet-sdk)
                * [Elixir SDKs](#elixir-sdks)
                * [Internal Erlang SDK](#internal-erlang-sdk)
+         * [Show Parameters](#show-parameters)
          * [Structure](#structure)
             * [Viewing Structure](#viewing-structure)
             * [Buttons](#buttons)
@@ -4607,6 +4608,12 @@ If you want to change the Internal Erlang SDK, you'll need to create a new Erlan
 
    ![Internal Erlang SDK](/screenshots/features/sdk/small_ides/Internal%20Erlang%20SDK.png?raw=true "Internal Erlang SDK")
 2. Follow the same steps as above to create an SDK
+
+### Show Parameters
+
+The parameter names for the current call can be shown (⌘+P/Ctrl+P)
+
+![Ecto.Schema.cast parameters](/screenshots/features/Show%20Parameters.png?raw=true "Ecto.Schema.cast parameters")
 
 ### Structure
 
