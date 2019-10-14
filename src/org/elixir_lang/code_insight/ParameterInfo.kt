@@ -26,11 +26,21 @@ class ParameterInfo : ParameterInfoHandler<Arguments, Any> {
             val itemToShowList = call.references.flatMap { reference ->
                 if (reference is PsiPolyVariantReference) {
                     reference.multiResolve(true).flatMap { resolveResult ->
-                        resolveResult.element?.let { singletonList(it) } ?: emptyList()
+                        resolveResult.element?.let {
+                            if ((it is Call) && CallDefinitionClause.`is`(it)) {
+                                singletonList(it)
+                            } else {
+                                null
+                            }
+                        } ?: emptyList()
                     }
                 } else {
                     reference.resolve()?.let { resolvedElement ->
-                        singletonList(resolvedElement)
+                        if ((resolvedElement is Call) && CallDefinitionClause.`is`(resolvedElement)) {
+                            singletonList(resolvedElement)
+                        } else {
+                            null
+                        }
                     } ?: emptyList<Any>()
                 }
             }
