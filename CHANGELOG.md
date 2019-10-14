@@ -198,6 +198,11 @@
    * [Enhancements](#enhancements-54)
    * [Bug Fixes](#bug-fixes-57)
 
+## v11.3.0
+### Enhancements
+* [#1600[(https://github.com/KronicDeth/intellij-elixir/pull/1600) - [@KronicDeth](https://github.com/KronicDeth)
+  * Show Parameter Info (⌘+P/Ctrl+P)
+
 ## v11.2.0
 ### Enhancements
 * [#1592](https://github.com/KronicDeth/intellij-elixir/pull/1592) - [@alex-dukhno](https://github.com/alex-dukhno)
