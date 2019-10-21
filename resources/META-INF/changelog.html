@@ -8,6 +8,23 @@
       <li>Show Parameter Info (⌘+P/Ctrl+P)</li>
     </ul>
   </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>Fix must specify non-empty 'commandLine' parameter</li>
+      <li>
+        <p>
+          <code>GeneralCommandLine</code>'s escaping for Windows can't handle the parentheses in a way that both works
+          for the Windows shell and Elixir running the code the shell hands off.  Removing the parentheses leaves
+          runnable code even if it is no longer formatted.
+        </p>
+        <p>
+          Fixes "Unknown Version" naming for Elixir SDKs and the "Probably SDK installed in ... is corrupt" dialog from
+          appearing.
+        </p>
+      </li>
+    </ul>
+  </li>
 </ul>
 <h1>v11.2.0</h1>
 <ul>

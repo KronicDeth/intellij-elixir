@@ -473,7 +473,7 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
                         sdkHome,
                         elixir.getAbsolutePath(),
                         "-e",
-                        "System.version() |> IO.puts()"
+                        "System.version |> IO.puts"
                 );
             }
 
