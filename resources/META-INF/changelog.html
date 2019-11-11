@@ -1,5 +1,32 @@
 <html>
 <body>
+<h1>v11.4.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>
+        <p>Previously, the arity of a function or macro could only disagree with the definition and resolve if</p>
+        <ol>
+          <li>
+            The arity of the call was in the arity range of the defintion and the <code>ResolveResult</code> was marked
+            as a <code>validResult</code>.
+          </li>
+          <li>
+            The code is marked as <code>incomplete</code> (because the IDE detects typing, etc) and the arity mismatches
+            and the <code>ResolveResult</code> is marked as an invalid result.
+          </li>
+        </ol>
+        <p>
+          By marking all arity mismatches, regardless of incompleteness of the code as an invalid result, Go To
+          Definition and Show Parameters works when the the arity is incorrect.  This males Show Parameters work while
+          typing out a call without the correct number of commas and allows jumping to the definition while typing out
+          the call too.
+        </p>
+      </li>
+    </ul>
+  </li>
+</ul>
 <h1>v11.3.0</h1>
 <ul>
   <li>

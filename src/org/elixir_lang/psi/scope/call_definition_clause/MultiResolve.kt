@@ -22,12 +22,9 @@ private constructor(private val name: String,
 
             if (name == this.name) {
                 val arityInterval = ArityInterval.arityInterval(nameArityRange, state)
+                val validResult = resolvedFinalArity in arityInterval
 
-                when {
-                    resolvedFinalArity in arityInterval -> addToResolveResults(element, true, state)
-                    incompleteCode -> addToResolveResults(element, false, state)
-                    else -> null
-                }
+                addToResolveResults(element, validResult, state)
             } else if (incompleteCode && name.startsWith(this.name)) {
                 addToResolveResults(element, false, state)
             } else {
