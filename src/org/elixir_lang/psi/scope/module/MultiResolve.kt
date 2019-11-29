@@ -80,7 +80,7 @@ class MultiResolve internal constructor(private val name: String, private val in
                 resolveResultOrderedSet.add(match, true)
 
                 addUnaliasedNamedElementsToResolveResultList(match, namePartList)
-            } else if (incompleteCode && aliasedName.startsWith(name)) {
+            } else if (aliasedName.startsWith(name)) {
                 resolveResultOrderedSet.add(match, false)
             }
         }
