@@ -120,10 +120,10 @@ private fun ResolveResultOrderedSet.addIfResolved(
 ) {
     val moduleAttributeName = ElixirPsiImplUtil.moduleAttributeName(element)
 
-    if (moduleAttributeName == resolvingName) {
-        this.add(element, true)
-    } else if (incompleteCode && moduleAttributeName.startsWith(resolvingName)) {
-        this.add(element, false)
+    if (moduleAttributeName.startsWith(resolvingName)) {
+        val validResult = moduleAttributeName == resolvingName
+
+        this.add(element, validResult)
     }
 }
 
