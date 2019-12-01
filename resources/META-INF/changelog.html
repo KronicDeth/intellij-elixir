@@ -1,5 +1,60 @@
 <html>
 <body>
+<h1>v11.5.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>
+        <p>
+          Ignore the <code>incompleteCode</code> flag and instead always use the criteria used when
+          <code>incompleteCode</code> was set.
+        </p>
+        <table>
+          <thead>
+          <tr>
+            <th>name prefix</th>
+            <th>exact name</th>
+            <th>ResolveResult</th>
+            <th>valid</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td>❌</td>
+            <td>N/A</td>
+            <td>❌</td>
+            <td>N/A</td>
+          </tr>
+          <tr>
+            <td>✅</td>
+            <td>❌</td>
+            <td>✅</td>
+            <td>❌</td>
+          </tr>
+          <tr>
+            <td>✅</td>
+            <td>✅</td>
+            <td>✅</td>
+            <td>✅</td>
+          </tr>
+          </tbody>
+        </table>
+        <p>
+          This extends <a href="https://github.com/KronicDeth/intellij-elixir/pull/1617">#1617</a> to more cases.
+        </p>
+        <ul>
+          <li>Qualified calls (<code>Process.flag(...)</code>, etc)</li>
+          <li>Type specs (<code>@spec foo(...)</code>)</li>
+          <li>Aliases (<code>alias Foo...</code>)</li>
+          <li>Module Attributes (<code>@attribute</code>)</li>
+          <li>Variables (<code>foo</code>)</li>
+          <li><code>Protocol</code> reserved module attributes (<code>@protocol</code> and <code>@for</code>)</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
 <h1>v11.4.0</h1>
 <ul>
   <li>

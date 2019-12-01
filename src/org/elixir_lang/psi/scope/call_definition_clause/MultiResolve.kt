@@ -20,13 +20,11 @@ private constructor(private val name: String,
         nameArityRange(element)?.let { nameArityRange ->
             val name = nameArityRange.name
 
-            if (name == this.name) {
+            if (name.startsWith(this.name)) {
                 val arityInterval = ArityInterval.arityInterval(nameArityRange, state)
-                val validResult = resolvedFinalArity in arityInterval
+                val validResult = (resolvedFinalArity in arityInterval) && name == this.name
 
                 addToResolveResults(element, validResult, state)
-            } else if (incompleteCode && name.startsWith(this.name)) {
-                addToResolveResults(element, false, state)
             } else {
                 null
             }
