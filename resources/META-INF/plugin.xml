@@ -171,6 +171,7 @@
     <!-- formatting -->
     <codeStyleSettingsProvider implementation="org.elixir_lang.formatter.settings.CodeStyleSettingsProvider"/>
     <lang.formatter language="Elixir" implementationClass="org.elixir_lang.formatting.ModelBuilder"/>
+    <lang.formatter language="EEx" implementationClass="com.intellij.psi.templateLanguages.SimpleTemplateLanguageFormattingModelBuilder"/>
     <langCodeStyleSettingsProvider implementation="org.elixir_lang.formatter.settings.LanguageCodeStyleSettingsProvider"/>
 
     <lang.parserDefinition language="Elixir" implementationClass="org.elixir_lang.ElixirParserDefinition"/>
