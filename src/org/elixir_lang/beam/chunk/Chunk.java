@@ -71,10 +71,6 @@ public class Chunk {
 
         if (bytesRead == bytes.length) {
             typeID = new String(bytes);
-        } else if (bytesRead > 0) {
-            LOGGER.error(
-                    "Could not read typeID: read only " + bytesRead + " of " + bytes.length  + " bytes from " + path
-            );
         }
 
         return typeID;

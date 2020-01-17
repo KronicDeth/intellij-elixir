@@ -35,8 +35,37 @@ public class ImportTest extends LightPlatformCodeInsightFixtureTestCase {
 
         ResolveResult[] resolveResults = polyVariantReference.multiResolve(false);
 
-        assertEquals(2, resolveResults.length);
+        assertEquals(3, resolveResults.length);
+
+        ResolveResult firstResolveResult = resolveResults[0];
+
+        assertTrue(firstResolveResult.isValidResult());
+
+        PsiElement firstResolved = firstResolveResult.getElement();
+
+        assertEquals("def imported() do\n" +
+                "    imported(1)\n" +
+                "  end", firstResolved.getText());
+
+        ResolveResult secondResolveResult = resolveResults[1];
+
+        assertTrue(secondResolveResult.isValidResult());
+
+        PsiElement secondResolved = secondResolveResult.getElement();
+
+        assertEquals("import Imported", secondResolved.getText());
+
+        ResolveResult thirdResolveResult = resolveResults[2];
+
+        assertFalse(thirdResolveResult.isValidResult());
+
+        PsiElement thirdResolved = thirdResolveResult.getElement();
+
+        assertEquals("defp imported(1) do\n" +
+                "    :ok\n" +
+                "  end", thirdResolved.getText());
     }
+
     public void testImportModuleExceptNameArity() {
         myFixture.configureByFiles("import_module_except_name_arity.ex", "imported.ex");
         PsiElement elementAtCaret = myFixture.getFile().findElementAt(myFixture.getCaretOffset());
@@ -60,7 +89,35 @@ public class ImportTest extends LightPlatformCodeInsightFixtureTestCase {
 
         ResolveResult[] resolveResults = polyVariantReference.multiResolve(false);
 
-        assertEquals(2, resolveResults.length);
+        assertEquals(3, resolveResults.length);
+
+        ResolveResult firstResolveResult = resolveResults[0];
+
+        assertTrue(firstResolveResult.isValidResult());
+
+        PsiElement firstResolved = firstResolveResult.getElement();
+
+        assertEquals("def imported() do\n" +
+                "    imported(1)\n" +
+                "  end", firstResolved.getText());
+
+        ResolveResult secondResolveResult = resolveResults[1];
+
+        assertTrue(secondResolveResult.isValidResult());
+
+        PsiElement secondResolved = secondResolveResult.getElement();
+
+        assertEquals("import Imported, except: [unimported: 0]", secondResolved.getText());
+
+        ResolveResult thirdResolveResult = resolveResults[2];
+
+        assertFalse(thirdResolveResult.isValidResult());
+
+        PsiElement thirdResolved = thirdResolveResult.getElement();
+
+        assertEquals("defp imported(1) do\n" +
+                "    :ok\n" +
+                "  end", thirdResolved.getText());
     }
 
     public void testImportModuleOnlyNameArity() {

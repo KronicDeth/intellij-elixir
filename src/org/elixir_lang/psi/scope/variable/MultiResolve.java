@@ -234,12 +234,10 @@ public class MultiResolve extends Variable {
     private void addToResolveResultListIfMatchingName(@NotNull PsiNamedElement match, ResolveState state) {
         String matchName = match.getName();
 
-        if (matchName != null) {
-            if (matchName.equals(name)) {
-                addToResolveResultList(match, state, true);
-            } else if (incompleteCode && matchName.startsWith(name)) {
-                addToResolveResultList(match, state, false);
-            }
+        if (matchName != null && matchName.startsWith(name)) {
+            boolean validResult = matchName.equals(name);
+
+            addToResolveResultList(match, state, validResult);
         }
     }
 }

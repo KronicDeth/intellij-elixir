@@ -12,12 +12,12 @@ class ChooseByNameModel(project: Project): ChooseByNameModel {
     override fun getCheckBoxMnemonic() = 'd'
     override fun getCheckBoxName(): String? = null
 
-    override fun getElementsByName(name: String?, checkBoxState: Boolean, pattern: String?): Array<String> {
+    override fun getElementsByName(name: String, checkBoxState: Boolean, pattern: String): Array<String> {
         return names
     }
 
-    override fun getElementName(element: Any?): String? = element as String?
-    override fun getFullName(element: Any?): String? = element as String?
+    override fun getElementName(element: Any): String? = element as String?
+    override fun getFullName(element: Any): String? = element as String?
     override fun getHelpId(): String? = null
     override fun getListCellRenderer() = DefaultListCellRenderer()
     override fun useMiddleMatching() = true

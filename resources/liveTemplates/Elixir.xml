@@ -81,6 +81,12 @@
       <option name="ELIXIR_CODE" value="true" />
     </context>
   </template>
+  <template name="describe" value="describe &quot;$DESC_BLOCK$&quot; do&#10;  $END$&#10;end" description="describe ... do ... end" toReformat="true" toShortenFQNames="true" >
+    <variable name="DESC_BLOCK" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="ELIXIR_CODE" value="true" />
+    </context>
+  </template>
   <template name="try" value="try do&#10;  $1$&#10;rescue&#10;  $2$ -&gt; $END$&#10;" description="try ... rescue .. end" toReformat="true" toShortenFQNames="true" >
     <variable name="1" expression="" defaultValue="" alwaysStopAt="true" />
     <variable name="2" expression="" defaultValue="" alwaysStopAt="true" />

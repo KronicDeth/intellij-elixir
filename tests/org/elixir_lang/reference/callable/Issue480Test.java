@@ -1,7 +1,9 @@
 package org.elixir_lang.reference.callable;
 
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiPolyVariantReference;
 import com.intellij.psi.PsiReference;
+import com.intellij.psi.ResolveResult;
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
 import kotlin.ranges.IntRange;
 import org.elixir_lang.NameArityRange;
@@ -115,16 +117,24 @@ public class Issue480Test extends LightCodeInsightFixtureTestCase {
 
         assertNotNull(reference);
 
-        PsiElement resolved = reference.resolve();
+        assertInstanceOf(reference, PsiPolyVariantReference.class);
 
-        assertNotNull(resolved);
+        PsiPolyVariantReference psiPolyVariantReference = (PsiPolyVariantReference) reference;
 
-        assertInstanceOf(resolved, Call.class);
+        ResolveResult[] resolveResults = psiPolyVariantReference.multiResolve(false);
 
-        Call maybeDefCall = (Call) resolved;
+        for (ResolveResult resolveResult : resolveResults) {
+            if (resolveResult.isValidResult()) {
+                PsiElement resolved = resolveResult.getElement();
 
-        assertTrue(CallDefinitionClause.is(maybeDefCall));
+                assertInstanceOf(resolved, Call.class);
 
-        assertEquals(new NameArityRange(name, new IntRange(arity, arity)), nameArityRange(maybeDefCall));
+                Call maybeDefCall = (Call) resolved;
+
+                assertTrue(CallDefinitionClause.is(maybeDefCall));
+
+                assertEquals(new NameArityRange(name, new IntRange(arity, arity)), nameArityRange(maybeDefCall));
+            }
+        }
     }
 }

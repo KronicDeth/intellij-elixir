@@ -1,5 +1,278 @@
 <html>
 <body>
+<h1>v11.5.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>
+        <p>
+          Ignore the <code>incompleteCode</code> flag and instead always use the criteria used when
+          <code>incompleteCode</code> was set.
+        </p>
+        <table>
+          <thead>
+          <tr>
+            <th>name prefix</th>
+            <th>exact name</th>
+            <th>ResolveResult</th>
+            <th>valid</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td>❌</td>
+            <td>N/A</td>
+            <td>❌</td>
+            <td>N/A</td>
+          </tr>
+          <tr>
+            <td>✅</td>
+            <td>❌</td>
+            <td>✅</td>
+            <td>❌</td>
+          </tr>
+          <tr>
+            <td>✅</td>
+            <td>✅</td>
+            <td>✅</td>
+            <td>✅</td>
+          </tr>
+          </tbody>
+        </table>
+        <p>
+          This extends <a href="https://github.com/KronicDeth/intellij-elixir/pull/1617">#1617</a> to more cases.
+        </p>
+        <ul>
+          <li>Qualified calls (<code>Process.flag(...)</code>, etc)</li>
+          <li>Type specs (<code>@spec foo(...)</code>)</li>
+          <li>Aliases (<code>alias Foo...</code>)</li>
+          <li>Module Attributes (<code>@attribute</code>)</li>
+          <li>Variables (<code>foo</code>)</li>
+          <li><code>Protocol</code> reserved module attributes (<code>@protocol</code> and <code>@for</code>)</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+<h1>v11.4.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>
+        <p>Previously, the arity of a function or macro could only disagree with the definition and resolve if</p>
+        <ol>
+          <li>
+            The arity of the call was in the arity range of the defintion and the <code>ResolveResult</code> was marked
+            as a <code>validResult</code>.
+          </li>
+          <li>
+            The code is marked as <code>incomplete</code> (because the IDE detects typing, etc) and the arity mismatches
+            and the <code>ResolveResult</code> is marked as an invalid result.
+          </li>
+        </ol>
+        <p>
+          By marking all arity mismatches, regardless of incompleteness of the code as an invalid result, Go To
+          Definition and Show Parameters works when the the arity is incorrect.  This males Show Parameters work while
+          typing out a call without the correct number of commas and allows jumping to the definition while typing out
+          the call too.
+        </p>
+      </li>
+    </ul>
+  </li>
+</ul>
+<h1>v11.3.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>Show Parameter Info (⌘+P/Ctrl+P)</li>
+    </ul>
+  </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>Fix must specify non-empty 'commandLine' parameter</li>
+      <li>
+        <p>
+          <code>GeneralCommandLine</code>'s escaping for Windows can't handle the parentheses in a way that both works
+          for the Windows shell and Elixir running the code the shell hands off.  Removing the parentheses leaves
+          runnable code even if it is no longer formatted.
+        </p>
+        <p>
+          Fixes "Unknown Version" naming for Elixir SDKs and the "Probably SDK installed in ... is corrupt" dialog from
+          appearing.
+        </p>
+      </li>
+    </ul>
+  </li>
+</ul>
+<h1>v11.2.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>
+        Add <code>ExUnit</code> <code>describe</code> block template.
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>
+        Don't error on <code>runtume</code> in mix deps.  <code>guardian</code> is too common of a dependency and too
+        many users have the version with the typo installed.
+      </li>
+      <li>
+        Fix IEx Mix Run/Debug Configuration for <code>asdf</code> by using absolute path to <code>mix</code>.
+      </li>
+      <li>Add OTP 22 and 23 opcodes to Code BEAM Chunk Viewer
+        <ul>
+          <li><code>put_tuple/2</code></li>
+          <li><code>bs_get_tail/3</code></li>
+          <li><code>bs_start_match3/4</code></li>
+          <li><code>bs_get_position/3</code></li>
+          <li><code>bs_set_position/2</code></li>
+          <li><code>swap/2</code></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+<h1>v11.1.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>Update gradle plugins
+        <ul>
+          <li><code>gradle-intellij-plugin</code> (<code>org.jetbrains.intellij</code>) to <code>0.4.10</code></li>
+          <li><code>org.jetbrains.kotlin.jvm</code> to <code>1.3.50</code></li>
+          <li><code>de.undercrouch.download</code> to <code>4.0.0</code></li>
+        </ul>
+      </li>
+      <li>Update IDEA version in builds
+        <ul>
+          <li><code>2019.2</code> -&gt; <code>2019.2.2</code></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>
+        Don't log if partial or no header typeID is read.  It happens too often due to <code>.beam</code> files being
+        written partially to disk during the build process.  They will be re-indexed when they are complete.
+      </li>
+      <li>Update gradle intellij plugin to fix <code>runIde</code> on newer macOS.</li>
+      <li>
+        <p>Fix <code>ConcurrentModificationException</code> in Structure View</p>
+        <p>
+          Java 9 fixed a bug (
+          <a href="https://bugs.openjdk.java.net/browse/JDK-8071667" rel="nofollow">
+            https://bugs.openjdk.java.net/browse/JDK-8071667
+          </a>) in <code>HashMap</code> where <code>computeIfAbsent</code> did not check for concurrent modifications,
+          and it turns out that <code>TreeElementList</code> was using concurrent modifications, so it was now broke.
+        </p>
+        <p>
+          Fixed by use <code>get</code> or <code>put</code> if it is absent, so that <code>putNew</code> can ensure that
+          the <code>CallDefinition</code> is in the <code>TreeElementList</code> before it is added to the
+          <code>MutableList&lt;TreeElement&gt;</code>, which was the original reason why there was a <code>put</code>
+          inside of <code>computeIfAbsent</code>, which would have <code>put</code> when the function returned anyway.
+        </p>
+      </li>
+    </ul>
+  </li>
+</ul>
+<h1>v11.0.1</h1>
+<ul>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>
+        The java plugin dependency needs to be declared so that it shows up for compiling the JPS builder system and the
+        project importer in IntelliJ and Android Studio, but it needs to be optional, so that the plugin is still
+        compatible with Rubymine and the other small IDEs.
+      </li>
+    </ul>
+  </li>
+</ul>
+<h1>v11.0.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>Simplifications due to only supporting IntelliJ 2019.2
+        <ul>
+          <li>Don't use reflection for error report Submitter</li>
+          <li>
+            Don't use deprecated WeakHashMap. It was needed for backwards compatibility, but since this build is for
+            2019.2 only, no compatibility is necessary and it clears up the long warnings from the logs for end users.
+          </li>
+          <li>
+            Remove reflection from OutputToGeneralTestEventsConverters.  Only 2019.2 is now supported, so no need for
+            complicated backwards compatibility.
+          </li>
+          <li>Only support IntelliJ 2019.2 in Travis CI</li>
+        </ul>
+      </li>
+      <li>Remove Elixir 1.5 and 1.6 builds as they are both &gt; 1 year since the last release approximately.</li>
+    </ul>
+  </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>IntelliJ 2019.2 compatibility
+        <ul>
+          <li>
+            <p>
+              Explicitly depend on java plugin.  2019.2 extracted the Java functionality to a plugin (as outlined
+              <a href="https://blog.jetbrains.com/platform/2019/06/java-functionality-extracted-as-a-plugin/" rel="nofollow">
+                here
+              </a>), which includes the JPS builder used for Project Build functionality.
+            </p>
+          </li>
+          <li>
+            <p>
+              Remove project converterts.  Project converters are broken in 2019.2 because the
+              <code>DialogWrapper</code> they try to launch isn't being launched in the Event Dispatch Thread (EDT)
+              (
+              <a href="https://youtrack.jetbrains.com/issue/IDEA-218071" rel="nofollow">
+                https://youtrack.jetbrains.com/issue/IDEA-218071
+              </a>
+              ).
+            </p>
+            <p>
+              As this is bug in code wholey controlled by upstream, the only option is to remove the project converters.
+              The work-around is for users to re-import projects when a project layout update is necessary.
+            </p>
+          </li>
+          <li>
+            <p>Fix nullability of <code>override</code> arguments in <code>ChooseByNameModel</code></p>
+          </li>
+          <li>
+            <p>
+              Don't use dependency injection for OpenProcessor builder.  JetBrains has removed dependency injection for
+              Extensions in 2019.2.
+            </p>
+          </li>
+          <li>
+            <p>Don't pass a null name ot findSdk</p>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Incompatible Changes</p>
+    <ul>
+      <li>Changes needed for 2019.2 compatibility make this build incompatible with earlier releases.</li>
+    </ul>
+  </li>
+</ul>
 <h1>v10.6.0</h1>
 <ul>
   <li>
@@ -1121,153 +1394,6 @@
       </li>
       <li>Restore rename module attributes.</li>
       <li>Allow <code>true</code> and <code>false</code> to be keyword keys.</li>
-    </ul>
-  </li>
-</ul>
-<h1>v7.4.0</h1>
-<ul>
-  <li>
-    <p>Enhancements</p>
-    <ul>
-      <li>Clean up debugger
-        <ul>
-          <li><code>mix format</code> debugger</li>
-          <li>Restructure debugger.</li>
-          <li>Convert IDE-side to Kotlin</li>
-        </ul>
-      </li>
-      <li>
-        Allow files to skip interpreting in the debugger to be configured in Preferences &gt; Build, Execution,
-        Deployment &gt; Debugger &gt; Stepping.  It is recommended to customize these settings instead of using
-        <code>INTELLIJ_ELIXIR_DEBUG_BLACKLIST</code> environment variable.  <code>INTELLIJ_ELIXIR_DEBUG_BLACKLIST</code>
-        should be reserved to additional modules that need to not be interpreted only for specific runs.
-        <ul>
-          <li>
-            Ship a set of patterns that excludes Elixir standard library by default and most <code>mix phx.new</code>
-            dependencies, so that debugger boots faster for most users.
-          </li>
-        </ul>
-      </li>
-      <li>Support debugging <code>.eex</code> templates
-        <ul>
-          <li>
-            Detect MFAs that refer to template functions in Phoenix view modules derived from <code>.eex</code> template
-            files, to allow stepping through Elixir tags in those templates.
-          </li>
-          <li>
-            Allow setting breakpoints in <code>.eex</code> files when a <code>.beam</code> file using the template's
-            relative can be found.  <strong>This means that the Phoenix view module <code>.beam</code> file must exist
-            in <code>_build</code> prior to setting a breakpoint.  Run the Run Configuration once, before debugging to
-            complete the build if setting a breakpoint does not work.</strong>
-            <ul>
-              <li>
-                <code>.beam</code> files are now indexed by their <code>Line</code> chunk <code>filenames</code>
-                subsection to power this feature.
-              </li>
-            </ul>
-          </li>
-        </ul>
-      </li>
-      <li>
-        Cache <code>.beam</code> <code>Beam</code> <code>Cache</code> on <code>VirtualFile</code>.  Cache is invalidated
-        and refreshed on modification of the <code>VirtualFile</code>.  Cache is used for both BEAM Chunks read-only
-        editors and <code>Line</code> chunk file name index.
-      </li>
-      <li>
-        Each package manager uses a different root path and which directory to pick above the ebins varies by package
-        manager, so document package manager install paths.
-      </li>
-      <li>
-        Restructure JPS code to remove  prefixes and suffixes in class names that redundant with package names.
-      </li>
-      <li>
-        Show warnings-as-errors checkbox as
-        <a href="https://github.com/elixir-lang/elixir/issues/3116#issuecomment-87316125">original blocker</a> has been
-        fixed for awhile and <code>ProcessAdapter</code> turns warning text into errors that IDE understands.
-      </li>
-      <li>
-        When importing Mix projects, don't exclude compiler output from indexing because it is needed to resolve Elixir
-        Line Breakpoints in EEx files.
-        <ul>
-          <li>For pre-existing Elixir modules, they will be converted to not exclude compiler output.</li>
-        </ul>
-      </li>
-      <li>Exclude known uninterpretable modules
-        <ul>
-          <li><code>Bcrypt.Base</code></li>
-          <li><code>:erocksdb</code></li>
-          <li><code>:lz4</code></li>
-          <li><code>:re2</code></li>
-        </ul>
-      </li>
-    </ul>
-  </li>
-  <li>
-    <p>Bug Fixes</p>
-    <ul>
-      <li>
-        Turn off <code>dbeug</code> flag when starting <code>IntelliJElixir.DebugServer</code>, which removes the
-        <code>*DBG*</code> statements that kept printing in the ExUnit output when using the debugger.
-      </li>
-      <li>
-        Fix conversion of Elixir module names to Erlang module names for <code>INTELLIJ_ELIXIR_DEBUG_BLACKLIST</code>
-        environment variable.
-      </li>
-      <li>
-        Cache <code>null</code> SDK <code>Release</code>, so that when Elixir is configured, but the Erlang path is
-        broken (such as after a <code>brew unlink erlang</code>, the <code>Release</code> calculating using
-        <code>elixir</code>
-      </li>
-      <li>Implement <code>Macro.atomToString</code></li>
-      <li>Properly render improper lists
-        <ul>
-          <li>Show improper list with explicit <code>|</code> for presenation</li>
-          <li>Children of improper lists show <code>head</code> and <code>tail</code> instead of index.</li>
-        </ul>
-      </li>
-      <li>
-        Show Elixir indices (<code>0</code>-based) instead of Erlang indices (<code>1</code>-based`) for lists and
-        tuples.
-      </li>
-      <li>
-        Loosen check on the path suffix by looking for only <code>lib</code> and not <code>lib/erlang/lib</code>, so
-        that it works for both Homebrew's <code>ebin</code> paths and ASDF's <code>ebin</code> paths.
-      </li>
-      <li>
-        Remove unused <code>MixBuilder</code> because building with <code>mix</code> is just an option in
-        <code>ElixirBuilder</code>.
-      </li>
-      <li>Harmonize JPS compile server's invoking of <code>mix</code> to pattern used in Run Configuration runners.
-        <ul>
-          <li>Use <code>mix</code> path from SDK</li>
-        </ul>
-      </li>
-      <li>No longer say the build succeeded when there are obvious <code>mix</code> errors
-        <ul>
-          <li>Parse <code>mix compile</code> output for compilation errors and warnings
-            <ul>
-              <li>
-                When &quot;warnings-as-errors&quot; is enabled in &quot;Elixir compiler&quot; settings, IDE also shows
-                warnings as errors.
-              </li>
-              <li>
-                IDE will know build failed if there are errors (or warnings treated as errors) and properly allow
-                rebuild.
-              </li>
-            </ul>
-          </li>
-        </ul>
-      </li>
-      <li>
-        Group alternatives in <code>erlang_module_name_patterns_to_regex</code> before pinning: I always forget that the
-        <code>|</code> swallows the <code>^</code> and <code>$</code> in regexes.
-      </li>
-      <li>Reject vs filter accumulation got flipped when switching to <code>Enum.reduce</code> to track rejections.</li>
-      <li>
-        Some modules, like NIF modules, can't be loaded into the debugger. Individual modules not being debuggable
-        shouldn't kill the debugger task, so rescue the known error and record it for later debugging of the debugger.
-      </li>
-      <li>Add <code>:</code> to start of Erlang module names for included debugger excludes</li>
     </ul>
   </li>
 </ul>

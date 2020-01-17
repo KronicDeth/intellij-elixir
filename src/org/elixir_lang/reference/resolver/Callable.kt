@@ -70,10 +70,9 @@ object Callable : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Cal
                 Modular.callDefinitionClauseCallFoldWhile(
                         modular,
                         name,
-                        resolvedFinalArity,
                         mutableListOf<ResolveResult>()
-                ) { callDefinitionClauseCall, _, _, acc ->
-                    acc.add(PsiElementResolveResult(callDefinitionClauseCall, true))
+                ) { callDefinitionClauseCall, _, arityRange, acc ->
+                    acc.add(PsiElementResolveResult(callDefinitionClauseCall, arityRange.contains(resolvedFinalArity)))
                     AccumulatorContinue(acc, true)
                 }.accumulator
             }
