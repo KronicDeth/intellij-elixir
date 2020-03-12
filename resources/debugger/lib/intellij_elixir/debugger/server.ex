@@ -7,31 +7,48 @@ defmodule IntelliJElixir.Debugger.Server do
 
   # *.hrl files are not included in all SDK installs, so need to inline definition here
 
-  if Version.compare(System.version(), "1.7.0") == :lt do
-    Record.defrecordp(
-      :elixir_erl,
-      context: nil,
-      extra: nil,
-      caller: false,
-      vars: %{},
-      backup_vars: nil,
-      export_vars: nil,
-      extra_guards: [],
-      counter: %{},
-      file: "nofile"
-    )
-  else
-    Record.defrecordp(
-      :elixir_erl,
-      context: nil,
-      extra: nil,
-      caller: false,
-      vars: %{},
-      backup_vars: nil,
-      extra_guards: [],
-      counter: %{},
-      stacktrace: false
-    )
+  cond  do
+    Version.compare(System.version(), "1.7.0") == :lt ->
+      # https://github.com/elixir-lang/elixir/blob/v1.5.0/lib/elixir/src/elixir.hrl#L7-L17
+      Record.defrecordp(
+        :elixir_erl,
+        context: nil,
+        extra: nil,
+        caller: false,
+        vars: %{},
+        backup_vars: nil,
+        export_vars: nil,
+        extra_guards: [],
+        counter: %{},
+        file: "nofile"
+      )
+    Version.compare(System.version(), "1.9.2") == :lt ->
+      # https://github.com/elixir-lang/elixir/blob/v1.7.0/lib/elixir/src/elixir.hrl#L7-L16
+      Record.defrecordp(
+        :elixir_erl,
+        context: nil,
+        extra: nil,
+        caller: false,
+        vars: %{},
+        backup_vars: nil,
+        extra_guards: [],
+        counter: %{},
+        stacktrace: false
+      )
+    true ->
+      # https://github.com/elixir-lang/elixir/blob/v1.9.2/lib/elixir/src/elixir.hrl#L8-L18
+      Record.defrecordp(
+        :elixir_erl,
+        context: nil,
+        extra: nil,
+        caller: false,
+        vars: %{},
+        backup_vars: nil,
+        extra_guards: [],
+        counter: %{},
+        expand_captures: false,
+        stacktrace: false
+      )
   end
 
   defstruct attached: nil,
