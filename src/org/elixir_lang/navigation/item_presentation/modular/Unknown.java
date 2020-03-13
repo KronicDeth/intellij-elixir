@@ -57,6 +57,6 @@ public class Unknown extends Module {
     @NotNull
     @Override
     public Icon getIcon(boolean unused) {
-        return AllIcons.General.QuestionDialog;
+        return AllIcons.RunConfigurations.TestUnknown;
     }
 }
