@@ -42,7 +42,7 @@
     </context>
   </template>
   <template name="defm" value="defmodule $MODULNAME$ do&#10;  $END$&#10;end" description="def module" toReformat="true" toShortenFQNames="true" >
-    <variable name="MODULNAME" expression="capitalize(fileNameWithoutExtension())" defaultValue="" alwaysStopAt="true" />
+    <variable name="MODULNAME" expression="capitalize(camelCase(fileNameWithoutExtension()))" defaultValue="" alwaysStopAt="true" />
     <context>
       <option name="ELIXIR_CODE" value="true" />
     </context>
