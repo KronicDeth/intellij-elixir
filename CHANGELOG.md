@@ -212,6 +212,8 @@
 ### Bug Fixes
 * [#1646](https://github.com/KronicDeth/intellij-elixir/pull/1646) - [@seanwash](https://github.com/seanwash)
   * Swap improperly sized `General.QuestionDialog` icon for `RunConfigurations.TestUnknown` icon for Unknown icon in Structure View.
+* [#1632](https://github.com/KronicDeth/intellij-elixir/pull/1632) - [@ortex](https://github.com/ortex)
+  * Fix `MODULENAME` variable in `defm` live template, so that the file name is camel-cased before being capitalized.
 
 ## v11.5.0
 ### Enhancements
