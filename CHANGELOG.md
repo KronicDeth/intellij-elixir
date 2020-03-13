@@ -214,6 +214,8 @@
   * Swap improperly sized `General.QuestionDialog` icon for `RunConfigurations.TestUnknown` icon for Unknown icon in Structure View.
 * [#1632](https://github.com/KronicDeth/intellij-elixir/pull/1632) - [@ortex](https://github.com/ortex)
   * Fix `MODULENAME` variable in `defm` live template, so that the file name is camel-cased before being capitalized.
+* [#1643](https://github.com/KronicDeth/intellij-elixir/pull/1643) - [@zrma](https://github.com/zrma)
+  * Update `README.md` about information for Goland IDE since has been released for awhile and no longer only an EAP.
 
 ## v11.5.0
 ### Enhancements
