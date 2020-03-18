@@ -42,7 +42,7 @@
     </context>
   </template>
   <template name="defm" value="defmodule $MODULNAME$ do&#10;  $END$&#10;end" description="def module" toReformat="true" toShortenFQNames="true" >
-    <variable name="MODULNAME" expression="capitalize(fileNameWithoutExtension())" defaultValue="" alwaysStopAt="true" />
+    <variable name="MODULNAME" expression="capitalize(camelCase(fileNameWithoutExtension()))" defaultValue="" alwaysStopAt="true" />
     <context>
       <option name="ELIXIR_CODE" value="true" />
     </context>
@@ -77,6 +77,12 @@
   </template>
   <template name="test" value="test &quot;$TESTDESC$&quot; do&#10;  $END$&#10;end" description="test ... do ... end" toReformat="true" toShortenFQNames="true" >
     <variable name="TESTDESC" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="ELIXIR_CODE" value="true" />
+    </context>
+  </template>
+  <template name="describe" value="describe &quot;$DESC_BLOCK$&quot; do&#10;  $END$&#10;end" description="describe ... do ... end" toReformat="true" toShortenFQNames="true" >
+    <variable name="DESC_BLOCK" expression="" defaultValue="" alwaysStopAt="true" />
     <context>
       <option name="ELIXIR_CODE" value="true" />
     </context>

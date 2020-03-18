@@ -75,24 +75,4 @@ object Modular {
                 } ?:
                 AccumulatorContinue(acc, true)
             }
-
-    @JvmStatic
-    inline fun <R> callDefinitionClauseCallFoldWhile(
-            modular: Call,
-            functionName: Name,
-            resolvedFinalArity: Arity,
-            initial: R,
-            foldWhile: (Call, String, IntRange, R) -> AccumulatorContinue<R>
-    ): AccumulatorContinue<R> =
-            callDefinitionClauseCallFoldWhile(
-                    modular,
-                    functionName,
-                    initial
-            ) { callDefinitionClauseCall, name, arityRange, acc ->
-                if (arityRange.contains(resolvedFinalArity)) {
-                    foldWhile(callDefinitionClauseCall, name, arityRange, acc)
-                } else {
-                    AccumulatorContinue(acc, true)
-                }
-            }
 }

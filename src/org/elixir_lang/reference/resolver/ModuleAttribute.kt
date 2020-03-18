@@ -13,6 +13,7 @@ import org.elixir_lang.psi.impl.prevSiblingSequence
 import org.elixir_lang.psi.scope.ResolveResultOrderedSet
 import org.elixir_lang.psi.scope.module_attribute.implemetation.For
 import org.elixir_lang.psi.scope.module_attribute.implemetation.Protocol
+import org.elixir_lang.reference.ModuleAttribute
 import org.elixir_lang.reference.ModuleAttribute.Companion.isNonReferencing
 
 object ModuleAttribute : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.ModuleAttribute> {
@@ -27,7 +28,7 @@ object ModuleAttribute : ResolveCache.PolyVariantResolver<org.elixir_lang.refere
         }
 
         if (!isNonReferencing) {
-            val validProtocolResult = validResult(moduleAttribute, "@protocol", incompleteCode)
+            val validProtocolResult = validResult(moduleAttribute, "@protocol")
 
             if (validProtocolResult != ThreeState.UNSURE) {
                 validProtocolResult
@@ -37,7 +38,7 @@ object ModuleAttribute : ResolveCache.PolyVariantResolver<org.elixir_lang.refere
             }
 
             if (resolveResultOrderedSet.keepProcessing(incompleteCode)) {
-                val validForResult = validResult(moduleAttribute, "@for", incompleteCode)
+                val validForResult = validResult(moduleAttribute, "@for")
 
                 if (validForResult != ThreeState.UNSURE) {
                     validForResult
@@ -47,7 +48,7 @@ object ModuleAttribute : ResolveCache.PolyVariantResolver<org.elixir_lang.refere
                 }
 
                 if (resolveResultOrderedSet.keepProcessing(incompleteCode)) {
-                    resolveResultOrderedSet.addAll(multiResolveUpFromElement(moduleAttribute, element, incompleteCode))
+                    resolveResultOrderedSet.addAll(multiResolveUpFromElement(moduleAttribute, element))
                 }
             }
         }
@@ -56,9 +57,8 @@ object ModuleAttribute : ResolveCache.PolyVariantResolver<org.elixir_lang.refere
     }
 
     private fun multiResolveSibling(
-            moduleAttribute: org.elixir_lang.reference.ModuleAttribute,
-            lastSibling: PsiElement?,
-            incompleteCode: Boolean
+            moduleAttribute: ModuleAttribute,
+            lastSibling: PsiElement?
     ): ResolveResultOrderedSet {
         val resolveResultOrderedSet = ResolveResultOrderedSet()
 
@@ -68,7 +68,7 @@ object ModuleAttribute : ResolveCache.PolyVariantResolver<org.elixir_lang.refere
             lastSibling
                     .prevSiblingSequence()
                     .forEach {
-                        resolveResultOrderedSet.addIfResolved(it, value, incompleteCode)
+                        resolveResultOrderedSet.addIfResolved(it, value)
                     }
         }
 
@@ -76,28 +76,26 @@ object ModuleAttribute : ResolveCache.PolyVariantResolver<org.elixir_lang.refere
     }
 
     private fun multiResolveUpFromElement(
-            moduleAttribute: org.elixir_lang.reference.ModuleAttribute,
-            element: PsiElement,
-            incompleteCode: Boolean
+            moduleAttribute: ModuleAttribute,
+            element: PsiElement
     ): ResolveResultOrderedSet {
         val resolveResultOrderedSet = ResolveResultOrderedSet()
 
-        resolveResultOrderedSet.addIfResolved(element, moduleAttribute.value, incompleteCode)
+        resolveResultOrderedSet.addIfResolved(element, moduleAttribute.value)
 
         element
                 .ancestorSequence()
-                .forEach { resolveResultOrderedSet.addAll(multiResolveSibling(moduleAttribute, it, incompleteCode)) }
+                .forEach { resolveResultOrderedSet.addAll(multiResolveSibling(moduleAttribute, it)) }
 
         return resolveResultOrderedSet
     }
 
     private fun validResult(moduleAttribute: org.elixir_lang.reference.ModuleAttribute,
-                            moduleAttributeName: String,
-                            incompleteCode: Boolean): ThreeState =
+                            moduleAttributeName: String): ThreeState =
             moduleAttribute.value.let { value ->
                 when {
                     value == moduleAttributeName -> ThreeState.YES
-                    incompleteCode && moduleAttributeName.startsWith(value) -> ThreeState.NO
+                    moduleAttributeName.startsWith(value) -> ThreeState.NO
                     else -> ThreeState.UNSURE
                 }
             }
@@ -105,25 +103,23 @@ object ModuleAttribute : ResolveCache.PolyVariantResolver<org.elixir_lang.refere
 
 private fun ResolveResultOrderedSet.addIfResolved(
         element: PsiElement,
-        resolvingName: String,
-        incompleteCode: Boolean
+        resolvingName: String
 ) {
     when (element) {
-        is AtUnqualifiedNoParenthesesCall<*> -> addIfResolved(element, resolvingName, incompleteCode)
+        is AtUnqualifiedNoParenthesesCall<*> -> addIfResolved(element, resolvingName)
     }
 }
 
 private fun ResolveResultOrderedSet.addIfResolved(
         element: AtUnqualifiedNoParenthesesCall<*>,
-        resolvingName: String,
-        incompleteCode: Boolean
+        resolvingName: String
 ) {
     val moduleAttributeName = ElixirPsiImplUtil.moduleAttributeName(element)
 
-    if (moduleAttributeName == resolvingName) {
-        this.add(element, true)
-    } else if (incompleteCode && moduleAttributeName.startsWith(resolvingName)) {
-        this.add(element, false)
+    if (moduleAttributeName.startsWith(resolvingName)) {
+        val validResult = moduleAttributeName == resolvingName
+
+        this.add(element, validResult)
     }
 }
 

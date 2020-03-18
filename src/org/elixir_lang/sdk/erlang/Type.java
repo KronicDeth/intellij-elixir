@@ -10,7 +10,7 @@ import com.intellij.openapi.projectRoots.SdkType;
 import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.Version;
-import com.intellij.util.containers.WeakHashMap;
+import com.intellij.util.containers.ContainerUtil;
 import org.elixir_lang.jps.sdk_type.Erlang;
 import org.elixir_lang.jps.HomePath;
 import org.elixir_lang.sdk.erlang_dependent.AdditionalDataConfigurable;
@@ -42,11 +42,12 @@ public class Type extends SdkType {
                     "]),erlang:halt().";
     private static final String WINDOWS_DEFAULT_HOME_PATH = "C:\\Program Files\\erl9.0";
     private static final Pattern NIX_PATTERN = nixPattern("erlang");
+    private static final String LINUX_MINT_HOME_PATH = HomePath.LINUX_MINT_HOME_PATH + "/erlang";
     private static final String LINUX_DEFAULT_HOME_PATH = HomePath.LINUX_DEFAULT_HOME_PATH + "/erlang";
     private static final Function<File, File> VERSION_PATH_TO_HOME_PATH =
             versionPath -> new File(versionPath, "lib/erlang");
     private static final Logger LOGGER = Logger.getInstance(Type.class);
-    private final Map<String, Release> releaseBySdkHome = new WeakHashMap<>();
+    private final Map<String, Release> releaseBySdkHome = ContainerUtil.createWeakMap();
 
 
     public Type() {
@@ -122,6 +123,7 @@ public class Type extends SdkType {
                 putIfDirectory(homePathByVersion, UNKNOWN_VERSION, WINDOWS_DEFAULT_HOME_PATH);
             } else if (SystemInfo.isLinux) {
                 putIfDirectory(homePathByVersion, UNKNOWN_VERSION, LINUX_DEFAULT_HOME_PATH);
+                putIfDirectory(homePathByVersion, UNKNOWN_VERSION, LINUX_MINT_HOME_PATH);
 
                 mergeTravisCIKerl(homePathByVersion, Function.identity());
                 mergeNixStore(homePathByVersion, NIX_PATTERN, VERSION_PATH_TO_HOME_PATH);

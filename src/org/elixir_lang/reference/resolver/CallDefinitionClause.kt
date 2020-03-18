@@ -21,34 +21,23 @@ object CallDefinitionClause : ResolveCache.PolyVariantResolver<org.elixir_lang.r
 
                     siblings
                             .filter { org.elixir_lang.psi.CallDefinitionClause.`is`(it) }
-                            .mapNotNull { call -> callToResolveResult(call, incompleteCode, name, arity) }
+                            .mapNotNull { call -> callToResolveResult(call, name, arity) }
                             .toTypedArray()
                 } else {
                     null
                 }
             } ?: emptyArray()
 
-    private fun callToResolveResult(call: Call, incompleteCode: Boolean, name: Name, arity: Arity): ResolveResult? =
+    private fun callToResolveResult(call: Call, name: Name, arity: Arity): ResolveResult? =
             org.elixir_lang.psi.CallDefinitionClause.nameArityRange(call)
                     ?.let { callNameArityRange ->
                         val callName = callNameArityRange.name
 
-                        if (callName == name) {
+                        if (callName.startsWith(name)) {
                             val callArityRange = callNameArityRange.arityRange
+                            val validResult = (arity in callArityRange) && (callName == name)
 
-                            when {
-                                arity in callArityRange -> PsiElementResolveResult(call, true)
-                                arity < callArityRange.endInclusive -> PsiElementResolveResult(call, false)
-                                else -> null
-                            }
-                        } else if (incompleteCode && callName.startsWith(name)) {
-                            val callArityRange = callNameArityRange.arityRange
-
-                            when {
-                                arity in callArityRange -> PsiElementResolveResult(call, false)
-                                arity < callArityRange.endInclusive -> PsiElementResolveResult(call, false)
-                                else -> null
-                            }
+                            PsiElementResolveResult(call, validResult)
                         } else {
                             null
                         }

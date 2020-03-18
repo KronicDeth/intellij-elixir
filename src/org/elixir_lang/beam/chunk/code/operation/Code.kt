@@ -380,7 +380,7 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
     SET_TUPLE_ELEMENT(
             67,
             "set_tuple_element",
-            arrayOf(Argument("new_element"), TUPLE, Argument("position"))
+            arrayOf(Argument("new_element"), TUPLE, POSITION)
     ),
 
     //
@@ -769,7 +769,36 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
     // @spec get_tl  Source Tail
     // @doc  Get the tail (or cdr) part of a list (a cons cell) from Source and
     //       put it into the register Tail.
-    GET_TL(163, "get_tl", arrayOf(SOURCE, Argument("tail")));
+    GET_TL(163, "get_tl", arrayOf(SOURCE, Argument("tail"))),
+
+    // OTP 22
+
+    // @spec put_tuple2  Destination Elements
+    // @doc  Build a tuple with the elements in the list Elements and put it
+    //       put into register Destination.
+    PUT_TUPLE2(164, "put_tuple2", arrayOf(DESTINATION, Argument("elements"))),
+
+    // @spec bs_get_tail Ctx Dst Live
+    // @doc  Sets Dst to the tail of Ctx at the current position
+    BS_GET_TAIL(165, "bs_get_tail", arrayOf(CONTEXT, DESTINATION, LIVE_X_REGISTER_COUNT)),
+
+    // @spec bs_start_match3 Fail Bin Live Dst
+    // @doc  Starts a binary match sequence
+    BS_START_MATCH3(166, "bs_start_match3", arrayOf(FAIL_LABEL, Argument("binary"), LIVE_X_REGISTER_COUNT, POSITION)),
+
+    // @spec bs_get_position Ctx Dst Live
+    // @doc  Sets Dst to the current position of Ctx
+    BS_GET_POSITION(167, "bs_get_position", arrayOf(CONTEXT, DESTINATION, LIVE_X_REGISTER_COUNT)),
+
+    // @spec bs_set_positon Ctx Pos
+    // @doc  Sets the current position of Ctx to Pos
+    BS_SET_POSITION(168, "bs_set_position", arrayOf(CONTEXT, POSITION)),
+
+    // OTP 23
+
+    // @spec swap Register1 Register2
+    // @doc  Swaps the contents of two registers.
+    SWAP(169, "swap", arrayOf(Argument("register1"), Argument("register2")));
 
     fun arity() = arguments.size
 }

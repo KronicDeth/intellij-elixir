@@ -213,6 +213,7 @@ Table of Contents[![Backers on Open Collective](https://opencollective.com/intel
                * [Elixir Facet SDK](#elixir-facet-sdk)
                * [Elixir SDKs](#elixir-sdks)
                * [Internal Erlang SDK](#internal-erlang-sdk)
+         * [Show Parameters](#show-parameters)
          * [Structure](#structure)
             * [Viewing Structure](#viewing-structure)
             * [Buttons](#buttons)
@@ -265,7 +266,7 @@ The plugin works both in the rich IDEs that allow alternative language SDK selec
 | [AppCode](https://www.jetbrains.com/objc/download/download-thanks.html)                                  | Small      | Objective-C | [Subscription](https://www.jetbrains.com/objc/buy/#edition=discounts)     | 30-days                                                                              | Commercial           | N/A                                                                                                             |
 | [CLion](https://www.jetbrains.com/clion/download/download-thanks.html)                                   | Small      | C/C++       | [Subscription](https://www.jetbrains.com/clion/buy/#edition=discounts)    | 30-days                                                                              | Commercial           | N/A                                                                                                             |
 | [DataGrip](https://www.jetbrains.com/datagrip/download/download-thanks.html)                             | Small      | SQL         | [Subscription](https://www.jetbrains.com/datagrip/buy/#edition=discounts) | 30-days                                                                              | Commercial           | N/A                                                                                                             |
-| [GoLand](https://www.jetbrains.com/go/download/download-thanks.html?type=eap)                           | Small      | Go          | Free                                                                      | N/A                                                                                  | Early Access Preview | N/A                                                                                                             |
+| [GoLand](https://www.jetbrains.com/go/download/download-thanks.html)                                     | Small      | Go          | [Subscription](https://www.jetbrains.com/goland/buy/#edition=discounts)   | 30-days                                                                              | Commercial           | N/A                                                                                                             |
 | [PHPStorm](https://www.jetbrains.com/phpstorm/download/download-thanks.html)                             | Small      | PHP         | [Subscription](https://www.jetbrains.com/phpstorm/buy/#edition=discounts) | 30-days                                                                              | Commercial           | N/A                                                                                                             |
 | [PyCharm Community Edition](https://www.jetbrains.com/pycharm/download/download-thanks.html?code=PCC)    | Small      | Python      | Free                                                                      | N/A                                                                                  | Apache 2.0           | [JetBrains/intellij-community subdirectory](https://github.com/JetBrains/intellij-community/tree/master/python) |
 | [PyCharm Professional Edition](https://www.jetbrains.com/pycharm/download/download-thanks.html)          | Small      | Python      | [Subscription](https://www.jetbrains.com/pycharm/buy/#edition=discounts)  | N/A                                                                                  | Commercial           | N/A                                                                                                             |
@@ -4607,6 +4608,12 @@ If you want to change the Internal Erlang SDK, you'll need to create a new Erlan
 
    ![Internal Erlang SDK](/screenshots/features/sdk/small_ides/Internal%20Erlang%20SDK.png?raw=true "Internal Erlang SDK")
 2. Follow the same steps as above to create an SDK
+
+### Show Parameters
+
+The parameter names for the current call can be shown (⌘+P/Ctrl+P)
+
+![Ecto.Schema.cast parameters](/screenshots/features/Show%20Parameters.png?raw=true "Ecto.Schema.cast parameters")
 
 ### Structure
 

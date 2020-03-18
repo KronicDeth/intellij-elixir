@@ -22,10 +22,9 @@ object CaptureNameArity : ResolveCache.PolyVariantResolver<CaptureNameArity> {
                     Modular.callDefinitionClauseCallFoldWhile(
                             modular,
                             name,
-                            arity,
                             mutableListOf<ResolveResult>()
-                    ) { callDefinitionClauseCall, _, _, acc ->
-                        acc.add(PsiElementResolveResult(callDefinitionClauseCall, true))
+                    ) { callDefinitionClauseCall, _, arityRange, acc ->
+                        acc.add(PsiElementResolveResult(callDefinitionClauseCall, arityRange.contains(arity)))
 
                         AccumulatorContinue(acc, true)
                     }.accumulator.toTypedArray()

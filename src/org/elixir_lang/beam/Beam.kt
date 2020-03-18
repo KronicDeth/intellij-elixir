@@ -110,7 +110,7 @@ class Beam private constructor(chunkCollection: Collection<Chunk>) {
             }
 
             if (HEADER != header) {
-                if (!testCase(header)) {
+                if (header != null && !testCase(header)) {
                     LOGGER.error(
                             "header typeID ($header) did not match expected ($HEADER) from $path. " +
                                     "There are ${dataInputStream.available()} bytes available on the " +

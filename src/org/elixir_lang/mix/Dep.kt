@@ -43,7 +43,7 @@ data class Dep(val application: String, val path: String, val type: Type = Type.
                                 val key = keywordPair.keywordKey.text
 
                                 when (key) {
-                                    "app", "branch", "commit", "compile", "git", "github", "hex", "only", "optional", "organization", "override", "ref", "runtime", "tag", "targets" -> acc
+                                    "app", "branch", "commit", "compile", "git", "github", "hex", "only", "optional", "organization", "override", "ref", "runtime", GUARDIAN_RUNTIME_TYPO, "tag", "targets" -> acc
                                     "in_umbrella" -> acc.copy(path =  "apps/$name", type = Type.MODULE)
                                     "path" -> putPath(acc, keywordPair.keywordValue)
                                     else -> {
@@ -104,3 +104,7 @@ data class Dep(val application: String, val path: String, val type: Type = Type.
         private fun putPath(dep: Dep, stringLine: ElixirStringLine): Dep = dep.copy(path = stringLine.body.text)
     }
 }
+
+// https://github.com/ueberauth/guardian/issues/594
+@Suppress("SpellCheckingInspection")
+const val GUARDIAN_RUNTIME_TYPO: String = "runtume"
