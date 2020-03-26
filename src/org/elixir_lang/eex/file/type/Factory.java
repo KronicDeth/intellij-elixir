@@ -11,5 +11,6 @@ public class Factory extends FileTypeFactory {
     public void createFileTypes(@NotNull FileTypeConsumer fileTypeConsumer) {
         LanguageFileType type = Type.INSTANCE;
         fileTypeConsumer.consume(type, type.getDefaultExtension());
+        fileTypeConsumer.consume(type, "leex");
     }
 }
