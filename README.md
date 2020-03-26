@@ -83,6 +83,8 @@ Table of Contents[![Backers on Open Collective](https://opencollective.com/intel
             * [Matching](#matching)
          * [Embedded Elixir (EEx) Templates <a href="/resources/icons/file/eex.svg" target="_blank" rel="noopener noreferrer"><img src="/resources/icons/file/eex.svg" alt="" style="max-width:100\x;"></a>](#embedded-elixir-eex-templates-)
             * [Advanced configuration](#advanced-configuration)
+         * [Live Embedded Elixir (LEEx) Templates <a href="/resources/icons/file/eex.svg" target="_blank" rel="noopener noreferrer"><img src="/resources/icons/file/eex.svg" alt="" style="max-width:100\x;"></a>](#live-embedded-elixir-leex-templates-)
+            * [Advanced configuration](#advanced-configuration-1)
          * [Building/Compiling](#buildingcompiling)
             * [Settings](#settings)
             * [Build Messages](#build-messages)
@@ -307,6 +309,7 @@ Once you have your IDE of choice installed, you can [install this plugin](#insta
 | Go To Test                                  | Yes           | Yes            |                                                                                       |
 | Go To Test Subject                          | Yes           | Yes            |                                                                                       |
 | Find Usage                                  | Yes           | Yes            |                                                                                       |
+| Live Embedded Elixir (LEEx) Templates       | Yes           | Yes            |                                                                                       |
 | Refactor                                    | Yes           | Yes            |                                                                                       |
 | SDK                                         | Yes           | Yes            |                                                                                       |
 | Structure                                   | Yes           | Yes            |                                                                                       |
@@ -2175,6 +2178,20 @@ Any file with `.eex` as the final extension will be treated as Embedded Elixir (
 ![Form Template](/screenshots/features/eex_templates/Form%20Template.png?raw=true "`lib/*_web/templates/user/form.html.eex` from `mix phx.gen.html Accounts User users name:string age:integer`")
 
 ![Parameter Usage in Form Template](/screenshots/features/eex_templates/Parameter%20Usage%20in%20Form%20Template.png?raw=true "`f` parameter to `fn` passed to `form_for` is highlighted in pink, the parameter highlight color")
+
+#### Advanced configuration
+
+If you need more file-by-file configuration of the Template Data Language than can be achieved with a file extension/pattern, IntelliJ IDEA (Community or Ultimate Edition) has support for setting the Template Data Language on a specific path.
+
+1. Preferences > Languages and Frameworks > Template Data Languages
+
+See [JetBrains Documentation](https://www.jetbrains.com/help/idea/template-data-languages.html) for more details.
+
+### Live Embedded Elixir (LEEx) Templates ![](/resources/icons/file/eex.svg)
+
+Any file with `.leex` as the final extension will be treated as Live Embedded Elixir ([LEEx](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.Engine.html)) templates.  To determine the Template Data Language, the `.leex` extension will be stripped and any remaining extension will be looked up to get the File Type and its associated Language. For example, `*.txt.leex` will be EEx with Plain Text (`.txt`) as the Data Template Language. Likewise, `*.html.leex` will be EEx with HTML as the Data Template Language. There's no need to register `*.txt.leex` or `*.html.leex` or any other `*.DATA_TEMPLATE_LANGUAGE_EXTENSION.leex` pattern explicitly: the nested extension will be looked up using the normal extension setup.
+
+![Index](/screenshots/features/leex_templates/Index.png?raw=true "`lib/*_web/live/user_live/index.html.leex` from `mix phx.gen.live Accounts User users name:string age:integer`")
 
 #### Advanced configuration
 
