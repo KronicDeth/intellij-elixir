@@ -23,3 +23,5 @@ test {
     exceptionFormat = 'full'
   }
 }
+
+verifyPlugin.enabled = false
