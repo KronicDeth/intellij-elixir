@@ -28,9 +28,11 @@ ext {
 
   if (project.hasProperty("isRelease") && isRelease) {
     versionSuffix = ""
+    channel = "default"
   } else {
     def date = new Date().format("yyyyMMddHHmmss", TimeZone.getTimeZone("UTC"))
     versionSuffix = "-pre+$date"
+    channel = "canary"
   }
 
   version "$baseVersion$versionSuffix"
@@ -103,8 +105,7 @@ allprojects {
   }
 
   publishPlugin {
-    username publishUsername
-    password publishPassword
+    token System.getenv("JET_BRAINS_MARKETPLACE_TOKEN")
     channels publishChannels
   }
 }
