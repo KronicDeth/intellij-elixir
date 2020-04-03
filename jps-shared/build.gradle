@@ -7,3 +7,6 @@ sourceSets {
         resources.srcDirs 'resources'
     }
 }
+
+publishPlugin.enabled = false
+verifyPlugin.enabled = false

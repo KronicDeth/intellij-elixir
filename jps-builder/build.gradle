@@ -23,3 +23,6 @@ test {
     exceptionFormat = 'full'
   }
 }
+
+publishPlugin.enabled = false
+verifyPlugin.enabled = false
