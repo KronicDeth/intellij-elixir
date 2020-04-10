@@ -7,6 +7,7 @@
     <ul>
       <li>Treat <code>.leex</code> files as <code>.eex</code> files, so same features apply to both.</li>
       <li>Switch build to GitHub Actions</li>
+      <li>Update build to IntelliJ IDEA 2020.1</li>
     </ul>
   </li>
   <li>
@@ -29,6 +30,20 @@
         <a href="https://plugins.jetbrains.com/plugin/7522-elixir/versions">
           builds being published to JetBrains Marketplace
         </a>.
+      </li>
+      <li>JetBrains IDEs 2020.1 compatibility
+        <ul>
+          <li>
+            Change obsolete references to <code>AllocIcons</code> in <code>Icons</code> to new ones in
+            <code>AlllIcons</code> that are recommended in documentation.
+          </li>
+          <li>Update to <code>@NotNull</code> annotation on <code>PsiElementVisitor</code>
+            <ul>
+              <li><code>DepGatherer</code></li>
+              <li><code>QuotableImpl.quote</code></li>
+            </ul>
+          </li>
+        </ul>
       </li>
     </ul>
   </li>
