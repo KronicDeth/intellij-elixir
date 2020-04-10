@@ -213,6 +213,8 @@
 ### Enhancements
 * [#1691](https://github.com/KronicDeth/intellij-elixir/pull/1691) - [@KronicDeth](https://github.com/KronicDeth)
   * Treat `.leex` files as `.eex` files, so same features apply to both.
+* [#1735](https://github.com/KronicDeth/intellij-elixir/pull/1735) - [@KronciDeth](https://github.com/KronicDeth)
+  * Switch build to GitHub Actions.
 
 ### Bug Fixes
 * [#1646](https://github.com/KronicDeth/intellij-elixir/pull/1646) - [@seanwash](https://github.com/seanwash)
@@ -221,6 +223,8 @@
   * Fix `MODULENAME` variable in `defm` live template, so that the file name is camel-cased before being capitalized.
 * [#1643](https://github.com/KronicDeth/intellij-elixir/pull/1643) - [@zrma](https://github.com/zrma)
   * Update `README.md` about information for Goland IDE since has been released for awhile and no longer only an EAP.
+* [#1735](https://github.com/KronicDeth/intellij-elixir/pull/1735) - [@KronciDeth](https://github.com/KronicDeth)
+  * Restore canary [builds being published to JetBrains Marketplace](https://plugins.jetbrains.com/plugin/7522-elixir/versions).
 
 ## v11.5.0
 ### Enhancements
