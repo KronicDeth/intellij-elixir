@@ -19,7 +19,7 @@ import org.elixir_lang.psi.impl.keywordValue
 import org.elixir_lang.psi.impl.stripAccessExpression
 
 class DepGatherer : DepGatherer() {
-    override fun visitFile(file: PsiFile?) {
+    override fun visitFile(file: PsiFile) {
         if (file is ElixirFile) {
             runReadAction {
                 file.acceptChildren(this)
@@ -27,7 +27,7 @@ class DepGatherer : DepGatherer() {
         }
     }
 
-    override fun visitElement(element: PsiElement?) {
+    override fun visitElement(element: PsiElement) {
         if (element is Call && org.elixir_lang.structure_view.element.modular.Module.`is`(element)) {
             val childCalls = element.macroChildCalls()
 

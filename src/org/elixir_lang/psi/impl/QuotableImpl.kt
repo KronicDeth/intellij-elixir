@@ -1370,7 +1370,7 @@ object QuotableImpl {
 
         file.acceptChildren(
                 object : PsiElementVisitor() {
-                    override fun visitElement(element: PsiElement?) {
+                    override fun visitElement(element: PsiElement) {
                         if (element is Quotable) {
                             visitQuotable((element as Quotable?)!!)
                         } else if (element != null && !element.isUnquoted()) {
