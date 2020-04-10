@@ -9,7 +9,7 @@ import org.elixir_lang.package_manager.DepGatherer
 import org.intellij.erlang.psi.*
 
 class DepGatherer : DepGatherer() {
-    override fun visitFile(file: PsiFile?) {
+    override fun visitFile(file: PsiFile) {
         if (file is ErlangFile) {
             runReadAction {
                 file.acceptChildren(this)
