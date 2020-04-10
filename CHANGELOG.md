@@ -215,6 +215,8 @@
   * Treat `.leex` files as `.eex` files, so same features apply to both.
 * [#1735](https://github.com/KronicDeth/intellij-elixir/pull/1735) - [@KronciDeth](https://github.com/KronicDeth)
   * Switch build to GitHub Actions.
+* [#1738](https://github.com/KronicDeth/intellij-elixir/pull/1738) - [@Koziolek](https://github.com/Koziolek)
+  * Update build to IntelliJ IDEA 2020.1
 
 ### Bug Fixes
 * [#1646](https://github.com/KronicDeth/intellij-elixir/pull/1646) - [@seanwash](https://github.com/seanwash)
@@ -225,6 +227,12 @@
   * Update `README.md` about information for Goland IDE since has been released for awhile and no longer only an EAP.
 * [#1735](https://github.com/KronicDeth/intellij-elixir/pull/1735) - [@KronciDeth](https://github.com/KronicDeth)
   * Restore canary [builds being published to JetBrains Marketplace](https://plugins.jetbrains.com/plugin/7522-elixir/versions).
+* [#1738](https://github.com/KronicDeth/intellij-elixir/pull/1738) - [@Koziolek](https://github.com/Koziolek)
+  * JetBrains IDEs 2020.1 compatibility
+    * Change obsolete references to `AllocIcons` in `Icons` to new ones in `AlllIcons` that are recommended in documentation.
+    * Update to `@NotNull` annotation on `PsiElementVisitor`
+      * `DepGatherer`
+      * `QuotableImpl.quote`
 
 ## v11.5.0
 ### Enhancements
