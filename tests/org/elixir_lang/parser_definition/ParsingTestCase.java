@@ -3,10 +3,12 @@ package org.elixir_lang.parser_definition;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.Language;
 import com.intellij.lang.ParserDefinition;
-import com.intellij.mock.MockApplicationEx;
+import com.intellij.mock.MockApplication;
 import com.intellij.mock.MockLocalFileSystem;
+import com.intellij.openapi.extensions.DefaultPluginDescriptor;
 import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.extensions.ExtensionsArea;
+import com.intellij.openapi.extensions.impl.ExtensionsAreaImpl;
 import com.intellij.openapi.fileTypes.FileTypeRegistry;
 import com.intellij.openapi.fileTypes.MockFileTypeManager;
 import com.intellij.openapi.module.ModuleManager;
@@ -306,7 +308,7 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
 
         registerExtensionPoint(OrderRootType.EP_NAME, OrderRootType.class);
         registerExtension(OrderRootType.EP_NAME, new JavadocOrderRootType());
-        MockApplicationEx application = getApplication();
+        MockApplication application = getApplication();
 
         application.addComponent(
                 VirtualFileManager.class,
@@ -320,7 +322,7 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
         application.addComponent(VirtualFilePointerManager.class, new CoreVirtualFilePointerManager());
 
         ProjectJdkTable projectJdkTable = new ProjectJdkTableImpl();
-        registerApplicationService(ProjectJdkTable.class, projectJdkTable);
+        application.registerService(ProjectJdkTable.class, projectJdkTable);
 
         registerExtensionPoint(
                 com.intellij.openapi.projectRoots.SdkType.EP_NAME,
@@ -332,10 +334,13 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
         Sdk sdk = Type.createMockSdk(sdkHome, elixirSdkRelease());
         projectJdkTable.addJdk(sdk);
 
-        ExtensionsArea area = Extensions.getArea(myProject);
-        registerExtensionPoint(area, ProjectExtension.EP_NAME, ProjectExtension.class);
+        ExtensionsArea area = myProject.getExtensionArea();
+        //noinspection UnstableApiUsage
+        registerExtensionPoint((ExtensionsAreaImpl) area, ProjectExtension.EP_NAME, ProjectExtension.class);
 
-        registerExtensionPoint(FilePropertyPusher.EP_NAME, FilePropertyPusher.class);
+        //noinspection UnstableApiUsage
+        application.getExtensionArea().registerPoint(FilePropertyPusher.EP_NAME.getName(), FilePropertyPusher.class, new DefaultPluginDescriptor(getClass().getName() + "." + getName()));
+
         myProject.addComponent(PushedFilePropertiesUpdater.class, new PushedFilePropertiesUpdaterImpl(myProject));
 
         projectRootManager.setProjectSdk(sdk);
