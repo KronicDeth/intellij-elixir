@@ -28,7 +28,7 @@ object Icons {
         @JvmField
         val COMPILE = AllIcons.Actions.Compile
         @JvmField
-        val RUN = AllIcons.General.Run
+        val RUN = AllIcons.RunConfigurations.TestState.Run
 
         @JvmStatic
         fun from(time: Timed.Time): Icon {
@@ -77,7 +77,7 @@ object Icons {
     @JvmField
     val CALL_DEFINITION_CLAUSE: Icon = RowIconFactory.create(CALL_DEFINITION, PlatformIcons.PACKAGE_LOCAL_ICON)
     @JvmField
-    val DELEGATION: Icon = RowIconFactory.create(AllIcons.General.Run, PlatformIcons.PACKAGE_LOCAL_ICON)
+    val DELEGATION: Icon = RowIconFactory.create(AllIcons.RunConfigurations.TestState.Run, PlatformIcons.PACKAGE_LOCAL_ICON)
     @JvmField
     val EXCEPTION = PlatformIcons.EXCEPTION_CLASS_ICON
     @JvmField
@@ -108,7 +108,7 @@ object Icons {
 
     // it is the unknown that is only a question mark
     @JvmField
-    val UNKNOWN = AllIcons.RunConfigurations.Unknown
+    val UNKNOWN =  AllIcons.Actions.Help
 
     @JvmField
     val VARIABLE = AllIcons.Nodes.Variable
