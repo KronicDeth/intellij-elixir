@@ -6,8 +6,7 @@ Elixir File(0,98)
     ElixirHexadecimalWholeNumberImpl(HEXADECIMAL_WHOLE_NUMBER)(34,36)
       PsiElement(0)('0')(34,35)
       PsiElement(x)('x')(35,36)
-      PsiErrorElement:<hexadecimal digits> expected, got '
-'(36,36)
+      PsiErrorElement:<hexadecimal digits> expected(36,36)
         <empty list>
   PsiWhiteSpace('\n\n')(36,38)
   PsiComment(#)('# No digits should recover at ;')(38,69)
