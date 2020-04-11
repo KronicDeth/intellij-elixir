@@ -1,8 +1,8 @@
 package org.elixir_lang;
 
-import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
+import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 
-public class Issue470 extends LightCodeInsightFixtureTestCase {
+public class Issue470 extends BasePlatformTestCase {
     /*
      * Tests
      */

@@ -3,13 +3,14 @@ package org.elixir_lang;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.codeStyle.CodeStyleSettingsManager;
-import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
+import com.intellij.testFramework.fixtures.BasePlatformTestCase;
+import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.intellij.util.containers.ContainerUtil;
 import org.elixir_lang.code_style.CodeStyleSettings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class FormattingTest extends LightCodeInsightFixtureTestCase {
+public class FormattingTest extends BasePlatformTestCase {
     private com.intellij.psi.codeStyle.CodeStyleSettings temporaryCodeStyleSettings;
 
     @Override

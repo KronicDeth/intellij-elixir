@@ -1,12 +1,12 @@
 package org.elixir_lang.reference.callable;
 
 import com.intellij.psi.PsiElement;
-import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
+import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import org.elixir_lang.psi.call.Call;
 
 import static org.elixir_lang.reference.Callable.isVariable;
 
-public class Issue500Test extends LightCodeInsightFixtureTestCase {
+public class Issue500Test extends BasePlatformTestCase {
     /*
      * Tests
      */

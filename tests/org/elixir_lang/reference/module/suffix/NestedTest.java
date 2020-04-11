@@ -6,14 +6,14 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiPolyVariantReference;
 import com.intellij.psi.ResolveResult;
 import com.intellij.psi.stubs.StubIndex;
-import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
+import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import org.elixir_lang.psi.QualifiedAlias;
 import org.elixir_lang.psi.stub.index.AllName;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class NestedTest extends LightCodeInsightFixtureTestCase {
+public class NestedTest extends BasePlatformTestCase {
 
     /*
      * Tests
