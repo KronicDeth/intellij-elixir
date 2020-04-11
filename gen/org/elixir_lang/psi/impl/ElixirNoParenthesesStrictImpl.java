@@ -52,11 +52,13 @@ public class ElixirNoParenthesesStrictImpl extends ASTWrapperPsiElement implemen
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNoParenthesesManyStrictNoParenthesesExpression.class);
   }
 
+  @Override
   @NotNull
   public PsiElement[] arguments() {
     return ElixirPsiImplUtil.arguments(this);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject[] quoteArguments() {
     return ElixirPsiImplUtil.quoteArguments(this);

@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-import static org.elixir_lang.grammar.parser.GeneratedParserUtilBase.DUMMY_BLOCK;
+import static com.intellij.lang.parser.GeneratedParserUtilBase.DUMMY_BLOCK;
 import static org.elixir_lang.psi.call.name.Function.*;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.*;
 import static org.elixir_lang.psi.impl.ProcessDeclarationsImpl.DECLARING_SCOPE;

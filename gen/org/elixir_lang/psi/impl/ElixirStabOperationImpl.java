@@ -52,25 +52,30 @@ public class ElixirStabOperationImpl extends ASTWrapperPsiElement implements Eli
     return PsiTreeUtil.getChildOfType(this, ElixirStabParenthesesSignature.class);
   }
 
+  @Override
   @Nullable
   public Quotable leftOperand() {
     return ElixirPsiImplUtil.leftOperand(this);
   }
 
+  @Override
   @NotNull
   public Operator operator() {
     return ElixirPsiImplUtil.operator(this);
   }
 
+  @Override
   public boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place) {
     return ElixirPsiImplUtil.processDeclarations(this, processor, state, lastParent, place);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }
 
+  @Override
   @Nullable
   public Quotable rightOperand() {
     return ElixirPsiImplUtil.rightOperand(this);

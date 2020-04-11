@@ -35,15 +35,18 @@ public class ElixirDecimalWholeNumberImpl extends ASTWrapperPsiElement implement
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirDecimalDigits.class);
   }
 
+  @Override
   public int base() {
     return ElixirPsiImplUtil.base(this);
   }
 
+  @Override
   @NotNull
   public List<Digits> digitsList() {
     return ElixirPsiImplUtil.digitsList(this);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);

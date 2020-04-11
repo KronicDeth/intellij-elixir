@@ -26,19 +26,23 @@ public class ElixirUnknownBaseDigitsImpl extends ASTWrapperPsiElement implements
     else super.accept(visitor);
   }
 
+  @Override
   public int base() {
     return ElixirPsiImplUtil.base(this);
   }
 
+  @Override
   public boolean inBase() {
     return ElixirPsiImplUtil.inBase(this);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }
 
+  @Override
   @Nullable
   public IElementType validElementType() {
     return ElixirPsiImplUtil.validElementType(this);

@@ -41,21 +41,25 @@ public class ElixirKeywordKeyImpl extends ASTWrapperPsiElement implements Elixir
     return PsiTreeUtil.getChildOfType(this, ElixirStringLine.class);
   }
 
+  @Override
   @Nullable
   public String getName() {
     return ElixirPsiImplUtil.getName(this);
   }
 
+  @Override
   @Nullable
   public PsiElement getNameIdentifier() {
     return ElixirPsiImplUtil.getNameIdentifier(this);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }
 
+  @Override
   @NotNull
   public PsiElement setName(@NotNull String newName) {
     return ElixirPsiImplUtil.setName(this, newName);

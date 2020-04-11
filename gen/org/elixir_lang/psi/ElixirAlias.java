@@ -5,7 +5,6 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiPolyVariantReference;
-import com.intellij.psi.PsiReference;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +25,7 @@ public interface ElixirAlias extends NamedElement, QualifiableAlias, Quotable {
   ItemPresentation getPresentation();
 
   @Nullable
-  PsiReference getReference();
+  PsiPolyVariantReference getReference();
 
   boolean isModuleName();
 

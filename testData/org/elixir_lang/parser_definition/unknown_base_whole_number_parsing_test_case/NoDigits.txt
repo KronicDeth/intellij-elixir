@@ -6,8 +6,7 @@ Elixir File(0,79)
     ElixirUnknownBaseWholeNumberImpl(UNKNOWN_BASE_WHOLE_NUMBER)(34,36)
       PsiElement(0)('0')(34,35)
       PsiElement(A-Z, a, c-n, p-w, z)('z')(35,36)
-      PsiErrorElement:A-Z, a-z, 0-9 expected, got '
-'(36,36)
+      PsiErrorElement:A-Z, a-z, 0-9 expected(36,36)
         <empty list>
   PsiWhiteSpace('\n\n')(36,38)
   PsiComment(#)('# No digits should recover at ;')(38,69)

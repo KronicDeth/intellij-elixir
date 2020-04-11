@@ -267,7 +267,6 @@ public interface ElixirTypes {
   IElementType COMMENT = new ElixirTokenType("#");
   IElementType COMPARISON_OPERATOR = new ElixirTokenType("!==, ===, !=, ==, =~");
   IElementType DECIMAL_MARK = new ElixirTokenType("Decimal Mark (.)");
-  IElementType DECIMAL_SEPARATOR = new ElixirTokenType("_");
   IElementType DIVISION_OPERATOR = new ElixirTokenType("/");
   IElementType DO = new ElixirTokenType("do");
   IElementType DOT_OPERATOR = new ElixirTokenType(".");
@@ -319,6 +318,7 @@ public interface ElixirTypes {
   IElementType MULTIPLICATION_OPERATOR = new ElixirTokenType("*");
   IElementType NIL = new ElixirTokenType("nil");
   IElementType NOT_OPERATOR = new ElixirTokenType("not");
+  IElementType NUMBER_SEPARATOR = new ElixirTokenType("_");
   IElementType OBSOLETE_BINARY_WHOLE_NUMBER_BASE = new ElixirTokenType("B");
   IElementType OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE = new ElixirTokenType("X");
   IElementType OCTAL_WHOLE_NUMBER_BASE = new ElixirTokenType("o");
@@ -380,7 +380,7 @@ public interface ElixirTypes {
   class Factory {
     public static PsiElement createElement(ASTNode node) {
       IElementType type = node.getElementType();
-       if (type == ACCESS_EXPRESSION) {
+      if (type == ACCESS_EXPRESSION) {
         return new ElixirAccessExpressionImpl(node);
       }
       else if (type == ADDITION_INFIX_OPERATOR) {

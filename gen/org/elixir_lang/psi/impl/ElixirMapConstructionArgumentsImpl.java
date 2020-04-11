@@ -44,11 +44,13 @@ public class ElixirMapConstructionArgumentsImpl extends ASTWrapperPsiElement imp
     return PsiTreeUtil.getChildOfType(this, ElixirKeywords.class);
   }
 
+  @Override
   @NotNull
   public PsiElement[] arguments() {
     return ElixirPsiImplUtil.arguments(this);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject[] quoteArguments() {
     return ElixirPsiImplUtil.quoteArguments(this);

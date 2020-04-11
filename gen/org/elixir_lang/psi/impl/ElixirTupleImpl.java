@@ -45,6 +45,7 @@ public class ElixirTupleImpl extends ASTWrapperPsiElement implements ElixirTuple
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirUnmatchedExpression.class);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);

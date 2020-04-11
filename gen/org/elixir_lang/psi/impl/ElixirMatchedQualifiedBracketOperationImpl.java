@@ -48,11 +48,13 @@ public class ElixirMatchedQualifiedBracketOperationImpl extends ElixirMatchedExp
     return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirRelativeIdentifier.class));
   }
 
+  @Override
   @NotNull
   public PsiElement qualifier() {
     return ElixirPsiImplUtil.qualifier(this);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);

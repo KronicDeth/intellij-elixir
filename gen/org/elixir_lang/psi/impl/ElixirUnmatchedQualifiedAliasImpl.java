@@ -4,7 +4,10 @@ package org.elixir_lang.psi.impl;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.PsiPolyVariantReference;
+import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.*;
@@ -44,44 +47,53 @@ public class ElixirUnmatchedQualifiedAliasImpl extends ElixirUnmatchedExpression
     return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirUnmatchedExpression.class));
   }
 
+  @Override
   @Nullable
   public String fullyQualifiedName() {
     return ElixirPsiImplUtil.fullyQualifiedName(this);
   }
 
+  @Override
   @NotNull
   public String getName() {
     return ElixirPsiImplUtil.getName(this);
   }
 
+  @Override
   @Nullable
   public PsiElement getNameIdentifier() {
     return ElixirPsiImplUtil.getNameIdentifier(this);
   }
 
+  @Override
   @Nullable
   public ItemPresentation getPresentation() {
     return ElixirPsiImplUtil.getPresentation(this);
   }
 
+  @Override
   @Nullable
-  public PsiReference getReference() {
+  public PsiPolyVariantReference getReference() {
     return ElixirPsiImplUtil.getReference(this);
   }
 
+  @Override
   public boolean isModuleName() {
     return ElixirPsiImplUtil.isModuleName(this);
   }
 
+  @Override
   public boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place) {
     return ElixirPsiImplUtil.processDeclarations(this, processor, state, lastParent, place);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }
 
+  @Override
   @NotNull
   public PsiElement setName(@NotNull String newName) {
     return ElixirPsiImplUtil.setName(this, newName);

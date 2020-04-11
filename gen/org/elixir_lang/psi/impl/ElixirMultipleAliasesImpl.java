@@ -48,10 +48,12 @@ public class ElixirMultipleAliasesImpl extends ASTWrapperPsiElement implements E
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirUnmatchedExpression.class);
   }
 
+  @Override
   public boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement entrance) {
     return ElixirPsiImplUtil.processDeclarations(this, processor, state, lastParent, entrance);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);

@@ -50,6 +50,7 @@ public class ElixirInterpolationImpl extends ASTWrapperPsiElement implements Eli
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirUnqualifiedNoParenthesesManyArgumentsCall.class);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);

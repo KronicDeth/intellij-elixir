@@ -41,11 +41,13 @@ public class ElixirAtomImpl extends ASTWrapperPsiElement implements ElixirAtom {
     return PsiTreeUtil.getChildOfType(this, ElixirStringLine.class);
   }
 
+  @Override
   @Nullable
   public PsiReference getReference() {
     return ElixirPsiImplUtil.getReference(this);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);

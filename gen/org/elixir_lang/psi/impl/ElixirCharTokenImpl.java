@@ -43,6 +43,7 @@ public class ElixirCharTokenImpl extends ASTWrapperPsiElement implements ElixirC
     return PsiTreeUtil.getChildOfType(this, ElixirQuoteHexadecimalEscapeSequence.class);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);

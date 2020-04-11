@@ -33,6 +33,7 @@ public class ElixirAtIdentifierImpl extends ASTWrapperPsiElement implements Elix
     return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirAtPrefixOperator.class));
   }
 
+  @Override
   @Nullable
   public PsiReference getReference() {
     return ElixirPsiImplUtil.getReference(this);

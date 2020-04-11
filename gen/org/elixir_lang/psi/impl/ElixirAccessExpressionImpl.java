@@ -289,10 +289,12 @@ public class ElixirAccessExpressionImpl extends ASTWrapperPsiElement implements 
     return PsiTreeUtil.getChildOfType(this, ElixirUnknownBaseWholeNumber.class);
   }
 
+  @Override
   public boolean isModuleName() {
     return ElixirPsiImplUtil.isModuleName(this);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);

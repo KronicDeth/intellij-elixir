@@ -25,6 +25,7 @@ public class ElixirHeredocLinePrefixImpl extends ASTWrapperPsiElement implements
     else super.accept(visitor);
   }
 
+  @Override
   @Nullable
   public ASTNode excessWhitespace(@NotNull IElementType type, int prefixLength) {
     return ElixirPsiImplUtil.excessWhitespace(this, type, prefixLength);

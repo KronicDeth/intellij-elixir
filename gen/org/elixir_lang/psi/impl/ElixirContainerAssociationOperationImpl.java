@@ -41,6 +41,7 @@ public class ElixirContainerAssociationOperationImpl extends ASTWrapperPsiElemen
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirUnmatchedExpression.class);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);

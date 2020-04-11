@@ -49,11 +49,13 @@ public class ElixirNoParenthesesKeywordPairImpl extends ASTWrapperPsiElement imp
     return PsiTreeUtil.getChildOfType(this, ElixirNoParenthesesManyStrictNoParenthesesExpression.class);
   }
 
+  @Override
   @NotNull
   public Quotable getKeywordValue() {
     return ElixirPsiImplUtil.getKeywordValue(this);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);

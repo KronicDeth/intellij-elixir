@@ -16,11 +16,8 @@ Elixir File(0,31)
   PsiErrorElement:'(', <relative identifier>, Alias or '{' expected, got '"""'(12,15)
     PsiElement(String Heredoc Promoter ("""))('"""')(12,15)
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(15,16)
-    PsiErrorElement:<end of expression> expected, got '
-'(15,15)
-      <empty list>
     PsiElement(\\n, \\r\\n)('\n')(15,16)
-  PsiErrorElement:'\\n, \\r\\n' expected, got '    '(16,20)
+  PsiErrorElement:'\\n, \\r\\n' expected(16,20)
     PsiElement(Whitespace at beginning of line of heredoc)('    ')(16,20)
   PsiElement(String Fragment)('Two')(20,23)
   PsiElement(\\n, \\r\\n)('\n')(23,24)

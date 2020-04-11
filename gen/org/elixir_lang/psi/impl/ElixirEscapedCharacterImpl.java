@@ -23,6 +23,7 @@ public class ElixirEscapedCharacterImpl extends ASTWrapperPsiElement implements 
     else super.accept(visitor);
   }
 
+  @Override
   public int codePoint() {
     return ElixirPsiImplUtil.codePoint(this);
   }

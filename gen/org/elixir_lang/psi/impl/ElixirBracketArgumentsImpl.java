@@ -43,6 +43,7 @@ public class ElixirBracketArgumentsImpl extends ASTWrapperPsiElement implements 
     return PsiTreeUtil.getChildOfType(this, ElixirUnmatchedExpression.class);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);

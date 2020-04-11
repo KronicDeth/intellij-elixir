@@ -26,21 +26,25 @@ public class ElixirVariableImpl extends ASTWrapperPsiElement implements ElixirVa
     else super.accept(visitor);
   }
 
+  @Override
   @Nullable
   public String getName() {
     return ElixirPsiImplUtil.getName(this);
   }
 
+  @Override
   @NotNull
   public PsiElement getNameIdentifier() {
     return ElixirPsiImplUtil.getNameIdentifier(this);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }
 
+  @Override
   @NotNull
   public PsiElement setName(@NotNull String newName) {
     return ElixirPsiImplUtil.setName(this, newName);

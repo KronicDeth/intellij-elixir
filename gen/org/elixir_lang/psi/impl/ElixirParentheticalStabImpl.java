@@ -33,6 +33,7 @@ public class ElixirParentheticalStabImpl extends ASTWrapperPsiElement implements
     return PsiTreeUtil.getChildOfType(this, ElixirStab.class);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);

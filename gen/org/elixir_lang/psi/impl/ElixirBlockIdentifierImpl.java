@@ -24,6 +24,7 @@ public class ElixirBlockIdentifierImpl extends ASTWrapperPsiElement implements E
     else super.accept(visitor);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);

@@ -55,21 +55,25 @@ public class ElixirStabParenthesesSignatureImpl extends ASTWrapperPsiElement imp
     return PsiTreeUtil.getChildOfType(this, ElixirWhenInfixOperator.class);
   }
 
+  @Override
   @Nullable
   public Quotable leftOperand() {
     return ElixirPsiImplUtil.leftOperand(this);
   }
 
+  @Override
   @NotNull
   public Operator operator() {
     return ElixirPsiImplUtil.operator(this);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }
 
+  @Override
   @Nullable
   public Quotable rightOperand() {
     return ElixirPsiImplUtil.rightOperand(this);

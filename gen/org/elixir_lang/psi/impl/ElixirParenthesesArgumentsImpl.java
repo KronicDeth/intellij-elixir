@@ -52,11 +52,13 @@ public class ElixirParenthesesArgumentsImpl extends ASTWrapperPsiElement impleme
     return PsiTreeUtil.getChildOfType(this, ElixirUnqualifiedNoParenthesesManyArgumentsCall.class);
   }
 
+  @Override
   @NotNull
   public PsiElement[] arguments() {
     return ElixirPsiImplUtil.arguments(this);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject[] quoteArguments() {
     return ElixirPsiImplUtil.quoteArguments(this);

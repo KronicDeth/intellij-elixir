@@ -23,6 +23,7 @@ public class ElixirEscapedEOLImpl extends ASTWrapperPsiElement implements Elixir
     else super.accept(visitor);
   }
 
+  @Override
   public int codePoint() {
     return ElixirPsiImplUtil.codePoint(this);
   }

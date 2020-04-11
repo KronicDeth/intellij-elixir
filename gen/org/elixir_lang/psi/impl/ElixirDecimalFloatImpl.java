@@ -43,6 +43,7 @@ public class ElixirDecimalFloatImpl extends ASTWrapperPsiElement implements Elix
     return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirDecimalFloatIntegral.class));
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);

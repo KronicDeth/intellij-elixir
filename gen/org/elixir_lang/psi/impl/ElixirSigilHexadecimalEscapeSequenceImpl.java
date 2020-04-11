@@ -42,6 +42,7 @@ public class ElixirSigilHexadecimalEscapeSequenceImpl extends ASTWrapperPsiEleme
     return PsiTreeUtil.getChildOfType(this, ElixirOpenHexadecimalEscapeSequence.class);
   }
 
+  @Override
   public int codePoint() {
     return ElixirPsiImplUtil.codePoint(this);
   }

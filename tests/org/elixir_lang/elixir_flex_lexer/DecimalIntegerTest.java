@@ -111,7 +111,7 @@ public class DecimalIntegerTest extends TokenTest {
                 { "\r\n", ElixirTypes.EOL, ElixirFlexLexer.SIGN_OPERATION_MAYBE, true },
                 { "]", ElixirTypes.CLOSING_BRACKET, ElixirFlexLexer.YYINITIAL, true },
                 { "^", ElixirTypes.UNARY_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
-                { "_", ElixirTypes.DECIMAL_SEPARATOR, ElixirFlexLexer.DECIMAL_WHOLE_NUMBER, true },
+                { "_", ElixirTypes.NUMBER_SEPARATOR, ElixirFlexLexer.DECIMAL_WHOLE_NUMBER, true },
                 { "`", TokenType.BAD_CHARACTER, ElixirFlexLexer.YYINITIAL, true },
                 { "a", ElixirTypes.INVALID_DECIMAL_DIGITS, ElixirFlexLexer.DECIMAL_WHOLE_NUMBER, true },
                 { "b", ElixirTypes.INVALID_DECIMAL_DIGITS, ElixirFlexLexer.DECIMAL_WHOLE_NUMBER, true },

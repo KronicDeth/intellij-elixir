@@ -425,7 +425,6 @@
     COMMENT = "#"
     COMPARISON_OPERATOR = "!==, ===, !=, ==, =~"
     DECIMAL_MARK = "Decimal Mark (.)"
-    DECIMAL_SEPARATOR = "_"
     DIVISION_OPERATOR = "/"
     DO = "do"
     DOT_OPERATOR = "."
@@ -479,6 +478,7 @@
     MULTIPLICATION_OPERATOR = "*"
     NIL = "nil"
     NOT_OPERATOR = "not"
+    NUMBER_SEPARATOR = "_"
     OBSOLETE_BINARY_WHOLE_NUMBER_BASE = "B"
     OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE = "X"
     OCTAL_WHOLE_NUMBER_BASE = "o"
@@ -2877,7 +2877,7 @@ unmatchedExpression ::= unmatchedLessThanOnePointSixCaptureNonNumericOperation |
 
 decimalDigits ::= INVALID_DECIMAL_DIGITS | VALID_DECIMAL_DIGITS
                   { implements = "org.elixir_lang.psi.Digits" methods = [base inBase quote validElementType] }
-decimalWholeNumber ::= decimalDigits (DECIMAL_SEPARATOR? decimalDigits)*
+decimalWholeNumber ::= decimalDigits (NUMBER_SEPARATOR? decimalDigits)*
                         {
                           implements = "org.elixir_lang.psi.WholeNumber"
                           methods = [
@@ -2899,7 +2899,7 @@ decimalWholeNumber ::= decimalDigits (DECIMAL_SEPARATOR? decimalDigits)*
 
 binaryDigits ::= INVALID_BINARY_DIGITS | VALID_BINARY_DIGITS
                  { implements = "org.elixir_lang.psi.Digits" methods = [base inBase quote validElementType] }
-binaryWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX (BINARY_WHOLE_NUMBER_BASE | OBSOLETE_BINARY_WHOLE_NUMBER_BASE) binaryDigits+
+binaryWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX (BINARY_WHOLE_NUMBER_BASE | OBSOLETE_BINARY_WHOLE_NUMBER_BASE) binaryDigits (NUMBER_SEPARATOR? binaryDigits)*
                      {
                        implements = "org.elixir_lang.psi.WholeNumber"
                        methods = [
@@ -2916,7 +2916,7 @@ binaryWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX (BINARY_WHOLE_NUMBER_BASE | OBSOL
 
 hexadecimalDigits ::= INVALID_HEXADECIMAL_DIGITS | VALID_HEXADECIMAL_DIGITS
                       { implements = "org.elixir_lang.psi.Digits" methods = [base inBase quote validElementType] }
-hexadecimalWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX (HEXADECIMAL_WHOLE_NUMBER_BASE | OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE) hexadecimalDigits+
+hexadecimalWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX (HEXADECIMAL_WHOLE_NUMBER_BASE | OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE) hexadecimalDigits (NUMBER_SEPARATOR? hexadecimalDigits)*
                            {
                              implements = "org.elixir_lang.psi.WholeNumber"
                              methods = [
@@ -2933,8 +2933,7 @@ hexadecimalWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX (HEXADECIMAL_WHOLE_NUMBER_BA
 
 octalDigits ::= INVALID_OCTAL_DIGITS | VALID_OCTAL_DIGITS
                 { implements = "org.elixir_lang.psi.Digits" methods = [base inBase quote validElementType] }
-private octalDigitsSome ::= octalDigits+
-octalWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX OCTAL_WHOLE_NUMBER_BASE octalDigitsSome
+octalWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX OCTAL_WHOLE_NUMBER_BASE octalDigits (NUMBER_SEPARATOR? octalDigits)*
                      {
                        implements = "org.elixir_lang.psi.WholeNumber"
                        methods = [

@@ -64,15 +64,18 @@ public class ElixirNoParenthesesOneArgumentImpl extends ASTWrapperPsiElement imp
     return PsiTreeUtil.getChildOfType(this, ElixirUnqualifiedNoParenthesesManyArgumentsCall.class);
   }
 
+  @Override
   @NotNull
   public PsiElement[] arguments() {
     return ElixirPsiImplUtil.arguments(this);
   }
 
+  @Override
   public boolean isModuleName() {
     return ElixirPsiImplUtil.isModuleName(this);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject[] quoteArguments() {
     return ElixirPsiImplUtil.quoteArguments(this);

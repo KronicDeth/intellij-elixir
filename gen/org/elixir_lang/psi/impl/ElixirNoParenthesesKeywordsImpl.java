@@ -35,10 +35,12 @@ public class ElixirNoParenthesesKeywordsImpl extends ASTWrapperPsiElement implem
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNoParenthesesKeywordPair.class);
   }
 
+  @Override
   public List<QuotableKeywordPair> quotableKeywordPairList() {
     return ElixirPsiImplUtil.quotableKeywordPairList(this);
   }
 
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
