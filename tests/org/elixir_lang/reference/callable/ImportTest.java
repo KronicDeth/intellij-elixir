@@ -4,10 +4,10 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiPolyVariantReference;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.ResolveResult;
-import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase;
+import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import org.elixir_lang.psi.call.Call;
 
-public class ImportTest extends LightPlatformCodeInsightFixtureTestCase {
+public class ImportTest extends BasePlatformTestCase {
     /*
      * Tests
      */

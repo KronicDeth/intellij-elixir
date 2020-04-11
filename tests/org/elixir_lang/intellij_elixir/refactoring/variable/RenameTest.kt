@@ -1,8 +1,8 @@
 package org.elixir_lang.intellij_elixir.refactoring.variable
 
-import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase
+import com.intellij.testFramework.fixtures.BasePlatformTestCase
 
-class RenameTest : LightCodeInsightFixtureTestCase() {
+class RenameTest : BasePlatformTestCase() {
     override fun getTestDataPath(): String {
         return "testData/org/elixir_lang/refactoring/variable/rename"
     }

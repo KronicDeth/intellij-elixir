@@ -1,9 +1,9 @@
 package org.elixir_lang.annotator;
 
 
-import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
+import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 
-public class ModuleAttributeTest extends LightCodeInsightFixtureTestCase {
+public class ModuleAttributeTest extends BasePlatformTestCase {
     /*
      * Tests
      */

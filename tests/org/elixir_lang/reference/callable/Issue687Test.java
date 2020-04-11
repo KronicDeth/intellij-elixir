@@ -3,12 +3,13 @@ package org.elixir_lang.reference.callable;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
-import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
+import com.intellij.testFramework.fixtures.BasePlatformTestCase;
+import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import org.elixir_lang.psi.ElixirIdentifier;
 import org.elixir_lang.psi.UnqualifiedNoArgumentsCall;
 import org.elixir_lang.psi.call.Call;
 
-public class Issue687Test extends LightCodeInsightFixtureTestCase {
+public class Issue687Test extends BasePlatformTestCase {
     /*
      * Tests
      */

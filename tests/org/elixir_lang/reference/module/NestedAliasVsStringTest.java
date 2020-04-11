@@ -6,7 +6,7 @@ import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiPolyVariantReference;
 import com.intellij.psi.ResolveResult;
-import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
+import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import org.elixir_lang.psi.QualifiedAlias;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * Checks that nested module resolution is doing substitution at alias separator ("."), instead of name.
  */
-public class NestedAliasVsStringTest extends LightCodeInsightFixtureTestCase {
+public class NestedAliasVsStringTest extends BasePlatformTestCase {
     /*
      * Tests
      */

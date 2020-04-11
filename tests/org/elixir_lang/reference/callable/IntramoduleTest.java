@@ -4,12 +4,12 @@ import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.psi.*;
-import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
+import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import org.elixir_lang.psi.ElixirIdentifier;
 
 import static org.junit.Assert.assertNotEquals;
 
-public class IntramoduleTest extends LightCodeInsightFixtureTestCase {
+public class IntramoduleTest extends BasePlatformTestCase {
     /*
      * Tests
      */
