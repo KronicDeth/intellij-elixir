@@ -233,6 +233,8 @@
     * Update to `@NotNull` annotation on `PsiElementVisitor`
       * `DepGatherer`
       * `QuotableImpl.quote`
+* [#1745](https://github.com/KronicDeth/intellij-elixir/pull/1745) - [@KronciDeth](https://github.com/KronicDeth)
+  * Fix tests for IDEA 2020.1.
 
 ## v11.5.0
 ### Enhancements
