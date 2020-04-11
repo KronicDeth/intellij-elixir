@@ -235,6 +235,20 @@
       * `QuotableImpl.quote`
 * [#1745](https://github.com/KronicDeth/intellij-elixir/pull/1745) - [@KronciDeth](https://github.com/KronicDeth)
   * Fix tests for IDEA 2020.1.
+* [#1753](https://github.com/KronicDeth/intellij-elixir/pull/1753) - [@KronciDeth](https://github.com/KronicDeth)
+  * Get `ProjectImportProvider` builder in `doGetBuilder` instead of constructor.
+  
+    Fixes use of deprecated constructor dependency injection that is incompatible with dynamic, injectable plugins in 2020.1.
+  
+    ```
+    com.intellij.diagnostic.PluginException: getComponentAdapterOfType is
+    used to get org.elixir_lang.mix.project._import.Builder(
+      requestorClass=org.elixir_lang.mix.project._import.Provider,
+      requestorConstructor=protected org.elixir_lang.mix.project._import.Provider(org.elixir_lang.mix.project._import.Builder)
+    ).
+    
+    Probably constructor should be marked as NonInjectable. [Plugin: org.elixir_lang]
+    ```
 
 ## v11.5.0
 ### Enhancements
