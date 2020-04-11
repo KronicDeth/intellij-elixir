@@ -48,7 +48,10 @@
       <li>Fix tests for IDEA 2020.1.</li>
       <li>
         <p>Get <code>ProjectImportProvider</code> builder in <code>doGetBuilder</code> instead of constructor.</p>
-        <p>Fixes use of deprecated constructor dependency injection that is incompatible with dynamic, injectable plugins in 2020.1.</p>
+        <p>
+          Fixes use of deprecated constructor dependency injection that is incompatible with dynamic, injectable plugins
+          in 2020.1.
+        </p>
         <pre><code>com.intellij.diagnostic.PluginException: getComponentAdapterOfType is
 used to get org.elixir_lang.mix.project._import.Builder(
   requestorClass=org.elixir_lang.mix.project._import.Provider,
@@ -57,6 +60,10 @@ used to get org.elixir_lang.mix.project._import.Builder(
 
 Probably constructor should be marked as NonInjectable. [Plugin: org.elixir_lang]
 </code></pre>
+      </li>
+      <li>
+        Allow underscores in binary (<code>0b</code>), octal (<code>0o</code>) , and hexadecimal (<code>0x</code>)
+        numbers.
       </li>
     </ul>
   </li>

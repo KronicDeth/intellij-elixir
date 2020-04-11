@@ -249,6 +249,8 @@
     
     Probably constructor should be marked as NonInjectable. [Plugin: org.elixir_lang]
     ```
+* [#1685](https://github.com/KronicDeth/intellij-elixir/pull/1685) - [@gerritwalther](https://github.com/gerritwalther)
+  * Allow underscores in binary (`0b`), octal (`0o`) , and hexadecimal (`0x`) numbers.
 
 ## v11.5.0
 ### Enhancements
