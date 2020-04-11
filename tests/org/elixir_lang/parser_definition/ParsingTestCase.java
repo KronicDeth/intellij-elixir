@@ -6,7 +6,7 @@ import com.intellij.lang.ParserDefinition;
 import com.intellij.mock.MockApplication;
 import com.intellij.mock.MockLocalFileSystem;
 import com.intellij.openapi.extensions.DefaultPluginDescriptor;
-import com.intellij.openapi.extensions.Extensions;
+import com.intellij.openapi.extensions.ExtensionPoint;
 import com.intellij.openapi.extensions.ExtensionsArea;
 import com.intellij.openapi.extensions.impl.ExtensionsAreaImpl;
 import com.intellij.openapi.fileTypes.FileTypeRegistry;
@@ -21,7 +21,6 @@ import com.intellij.openapi.projectRoots.impl.ProjectJdkTableImpl;
 import com.intellij.openapi.roots.*;
 import com.intellij.openapi.roots.impl.*;
 import com.intellij.openapi.vfs.VirtualFileManager;
-import com.intellij.openapi.vfs.VirtualFileSystem;
 import com.intellij.openapi.vfs.impl.CoreVirtualFilePointerManager;
 import com.intellij.openapi.vfs.impl.VirtualFileManagerImpl;
 import com.intellij.openapi.vfs.pointers.VirtualFilePointerManager;
@@ -42,6 +41,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import static com.intellij.concurrency.IdeaForkJoinWorkerThreadFactory.setupForkJoinCommonPool;
 import static org.elixir_lang.test.ElixirVersion.elixirSdkRelease;
 
 /**
@@ -300,9 +300,9 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
     private void setProjectSdkFromSdkHome(@NotNull String sdkHome)
             throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException,
             IllegalAccessException {
+        ProjectRootManager projectRootManager = registerProjectRootManager();
         MessageBus messageBus = messageBus();
         registerProjectFileIndex(messageBus);
-        ProjectRootManager projectRootManager = registerProjectRootManager();
 
         assertTrue(pathIsValidSdkHome(sdkHome));
 
@@ -310,7 +310,10 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
         registerExtension(OrderRootType.EP_NAME, new JavadocOrderRootType());
         MockApplication application = getApplication();
 
-        application.addComponent(
+        ExtensionsAreaImpl applicationExtensionArea = application.getExtensionArea();
+
+        applicationExtensionArea.registerExtensionPoint("com.intellij.virtualFileManagerListener", "VirtualFileManagerListener", ExtensionPoint.Kind.INTERFACE);
+        application.registerService(
                 VirtualFileManager.class,
                 new VirtualFileManagerImpl(
                         Collections.singletonList(
@@ -319,18 +322,19 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
                         messageBus
                 )
         );
-        application.addComponent(VirtualFilePointerManager.class, new CoreVirtualFilePointerManager());
-
-        ProjectJdkTable projectJdkTable = new ProjectJdkTableImpl();
-        application.registerService(ProjectJdkTable.class, projectJdkTable);
+        application.registerService(VirtualFilePointerManager.class, new CoreVirtualFilePointerManager());
 
         registerExtensionPoint(
                 com.intellij.openapi.projectRoots.SdkType.EP_NAME,
                 com.intellij.openapi.projectRoots.SdkType.class
         );
+        ProjectJdkTable projectJdkTable = new ProjectJdkTableImpl();
+        application.registerService(ProjectJdkTable.class, projectJdkTable);
+
         registerExtension(com.intellij.openapi.projectRoots.SdkType.EP_NAME, new Type());
         registerExtension(com.intellij.openapi.projectRoots.SdkType.EP_NAME, new org.elixir_lang.sdk.erlang.Type());
 
+        setupForkJoinCommonPool(true);
         Sdk sdk = Type.createMockSdk(sdkHome, elixirSdkRelease());
         projectJdkTable.addJdk(sdk);
 
@@ -339,7 +343,7 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
         registerExtensionPoint((ExtensionsAreaImpl) area, ProjectExtension.EP_NAME, ProjectExtension.class);
 
         //noinspection UnstableApiUsage
-        application.getExtensionArea().registerPoint(FilePropertyPusher.EP_NAME.getName(), FilePropertyPusher.class, new DefaultPluginDescriptor(getClass().getName() + "." + getName()));
+        applicationExtensionArea.registerPoint(FilePropertyPusher.EP_NAME.getName(), FilePropertyPusher.class, new DefaultPluginDescriptor(getClass().getName() + "." + getName()));
 
         myProject.addComponent(PushedFilePropertiesUpdater.class, new PushedFilePropertiesUpdaterImpl(myProject));
 
