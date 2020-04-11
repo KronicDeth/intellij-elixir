@@ -28,9 +28,11 @@ ext {
 
   if (project.hasProperty("isRelease") && isRelease) {
     versionSuffix = ""
+    channel = "default"
   } else {
     def date = new Date().format("yyyyMMddHHmmss", TimeZone.getTimeZone("UTC"))
     versionSuffix = "-pre+$date"
+    channel = "canary"
   }
 
   version "$baseVersion$versionSuffix"
@@ -58,7 +60,9 @@ allprojects {
   intellij {
     def intellij_erlang_version
 
-    if (ideaVersion.startsWith("2019.2")) {
+    if (ideaVersion.startsWith("2020.1")) {
+      intellij_erlang_version = "0.11.1059"
+    } else if (ideaVersion.startsWith("2019.2")) {
       intellij_erlang_version = "0.11.1008"
     } else if (ideaVersion.startsWith("2019.1")) {
       intellij_erlang_version = "0.11.1004"
@@ -84,7 +88,7 @@ allprojects {
                "java",
                "org.jetbrains.erlang:${intellij_erlang_version}",
                // always have IdeaVIM installed in sandbox
-               "IdeaVIM:0.48",
+               "IdeaVIM:0.56",
                "PsiViewer:3.28.93"]
     pluginName 'intellij-elixir'
     version ideaVersion
@@ -103,8 +107,8 @@ allprojects {
   }
 
   publishPlugin {
-    username publishUsername
-    password publishPassword
+    distributionFile System.getenv("ASSET_PATH")
+    token System.getenv("JET_BRAINS_MARKETPLACE_TOKEN")
     channels publishChannels
   }
 }

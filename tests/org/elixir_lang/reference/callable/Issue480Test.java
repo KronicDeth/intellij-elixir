@@ -4,7 +4,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiPolyVariantReference;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.ResolveResult;
-import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
+import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import kotlin.ranges.IntRange;
 import org.elixir_lang.NameArityRange;
 import org.elixir_lang.psi.CallDefinitionClause;
@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 import static org.elixir_lang.psi.CallDefinitionClause.nameArityRange;
 
-public class Issue480Test extends LightCodeInsightFixtureTestCase {
+public class Issue480Test extends BasePlatformTestCase {
     /*
      * Tests
      */

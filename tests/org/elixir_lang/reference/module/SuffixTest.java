@@ -7,13 +7,13 @@ import com.intellij.psi.PsiPolyVariantReference;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.ResolveResult;
 import com.intellij.psi.stubs.StubIndex;
-import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
+import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import org.elixir_lang.psi.ElixirAlias;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class SuffixTest extends LightCodeInsightFixtureTestCase {
+public class SuffixTest extends BasePlatformTestCase {
 
     /*
      * Tests

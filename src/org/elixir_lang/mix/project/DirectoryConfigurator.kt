@@ -17,7 +17,7 @@ import com.intellij.openapi.roots.ModuleRootModificationUtil
 import com.intellij.openapi.util.Ref
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.platform.PlatformProjectOpenProcessor.runDirectoryProjectConfigurators
+import com.intellij.platform.PlatformProjectOpenProcessor.Companion.runDirectoryProjectConfigurators
 import com.intellij.platform.ProjectBaseDirectory
 import com.intellij.projectImport.ProjectAttachProcessor
 import com.intellij.util.PlatformUtils
@@ -37,7 +37,7 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
         var foundOtpApps: List<OtpApp> = emptyList()
 
         ProgressManager.getInstance().run(object : Task.Modal(project, "Scanning Mix Projects", true) {
-            override fun run(indicator: com.intellij.openapi.progress.ProgressIndicator) {
+            override fun run(indicator: ProgressIndicator) {
                 foundOtpApps = org.elixir_lang.mix.Project.findOtpApps(baseDir, indicator)
             }
         })
@@ -102,7 +102,7 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
 
             projectManager.newProject(otpApp.name, otpApp.root.path, false, false)?.let { project ->
                 ProjectBaseDirectory.getInstance(project).baseDir = otpApp.root
-                runDirectoryProjectConfigurators(otpApp.root, project)
+                runDirectoryProjectConfigurators(Paths.get(otpApp.root.path), project, false)
 
                 saveSettings(project)
 

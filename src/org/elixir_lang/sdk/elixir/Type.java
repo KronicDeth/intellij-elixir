@@ -329,16 +329,21 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
     }
 
     public static SdkType erlangSdkType(@NotNull ProjectJdkTable projectJdkTable) {
-        SdkType erlangSdkType;
+        SdkType erlangSdkType = null;
 
         if (isSmallIde()) {
             /* intellij-erlang's "Erlang SDK" does not work in small IDEs because it uses JavadocRoot for documentation,
                which isn't available in Small IDEs. */
             erlangSdkType = SdkType.findInstance(org.elixir_lang.sdk.erlang.Type.class);
         } else {
-            erlangSdkType = (SdkType) projectJdkTable.getSdkTypeByName("Erlang SDK");
+            for (SdkType sdkType : SdkType.EP_NAME.getExtensionList()) {
+                if (sdkType.getName().equals("Erlang SDK")) {
+                   erlangSdkType = sdkType;
+                   break;
+                }
+            }
 
-            if (erlangSdkType instanceof UnknownSdkType) {
+            if (erlangSdkType == null) {
                 erlangSdkType = SdkType.findInstance(org.elixir_lang.sdk.erlang.Type.class);
             }
         }

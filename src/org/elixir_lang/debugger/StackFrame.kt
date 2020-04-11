@@ -60,7 +60,7 @@ class StackFrame(private val process: Process, private val pid: OtpErlangPid, pr
         val title = "$elixirModuleName.${traceElement.function}/${traceElement.arguments.size}$lineSuffix"
 
         component.append(title, SimpleTextAttributes.REGULAR_ATTRIBUTES)
-        component.setIcon(AllIcons.Debugger.StackFrame)
+        component.setIcon(AllIcons.Debugger.Frame)
     }
 
     override fun computeChildren(node: XCompositeNode) {

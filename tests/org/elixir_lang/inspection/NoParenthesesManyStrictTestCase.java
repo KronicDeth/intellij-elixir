@@ -1,11 +1,11 @@
 package org.elixir_lang.inspection;
 
-import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
+import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 
 /**
  * Created by luke.imhoff on 12/5/14.
  */
-public class NoParenthesesManyStrictTestCase extends LightCodeInsightFixtureTestCase {
+public class NoParenthesesManyStrictTestCase extends BasePlatformTestCase {
     public void testSingleNestedKeywordValue() {
         myFixture.configureByFiles("SingleNestedKeywordValue.ex");
         myFixture.enableInspections(NoParenthesesManyStrict.class);

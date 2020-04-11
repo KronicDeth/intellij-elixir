@@ -3,6 +3,14 @@
 <h1>v11.5.1</h1>
 <ul>
   <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>Treat <code>.leex</code> files as <code>.eex</code> files, so same features apply to both.</li>
+      <li>Switch build to GitHub Actions</li>
+      <li>Update build to IntelliJ IDEA 2020.1</li>
+    </ul>
+  </li>
+  <li>
     <p>Bug Fixes</p>
     <ul>
       <li>
@@ -16,6 +24,39 @@
       <li>
         Update <code>README.md</code> about information for Goland IDE since has been released for awhile and no longer
         only an EAP.
+      </li>
+      <li>
+        Restore canary
+        <a href="https://plugins.jetbrains.com/plugin/7522-elixir/versions">
+          builds being published to JetBrains Marketplace
+        </a>.
+      </li>
+      <li>JetBrains IDEs 2020.1 compatibility
+        <ul>
+          <li>
+            Change obsolete references to <code>AllocIcons</code> in <code>Icons</code> to new ones in
+            <code>AlllIcons</code> that are recommended in documentation.
+          </li>
+          <li>Update to <code>@NotNull</code> annotation on <code>PsiElementVisitor</code>
+            <ul>
+              <li><code>DepGatherer</code></li>
+              <li><code>QuotableImpl.quote</code></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>Fix tests for IDEA 2020.1.</li>
+      <li>
+        <p>Get <code>ProjectImportProvider</code> builder in <code>doGetBuilder</code> instead of constructor.</p>
+        <p>Fixes use of deprecated constructor dependency injection that is incompatible with dynamic, injectable plugins in 2020.1.</p>
+        <pre><code>com.intellij.diagnostic.PluginException: getComponentAdapterOfType is
+used to get org.elixir_lang.mix.project._import.Builder(
+  requestorClass=org.elixir_lang.mix.project._import.Provider,
+  requestorConstructor=protected org.elixir_lang.mix.project._import.Provider(org.elixir_lang.mix.project._import.Builder)
+).
+
+Probably constructor should be marked as NonInjectable. [Plugin: org.elixir_lang]
+</code></pre>
       </li>
     </ul>
   </li>
