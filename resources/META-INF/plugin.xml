@@ -174,6 +174,9 @@
     <lang.formatter language="EEx" implementationClass="com.intellij.psi.templateLanguages.SimpleTemplateLanguageFormattingModelBuilder"/>
     <langCodeStyleSettingsProvider implementation="org.elixir_lang.formatter.settings.LanguageCodeStyleSettingsProvider"/>
 
+    <!-- test -->
+    <runLineMarkerContributor language="Elixir" implementationClass="org.elixir_lang.exunit.ExUnitLineMarkerProvider"/>
+
     <lang.parserDefinition language="Elixir" implementationClass="org.elixir_lang.ElixirParserDefinition"/>
     <lang.psiStructureViewFactory language="Elixir" implementationClass="org.elixir_lang.structure_view.Factory"/>
     <lang.quoteHandler language="Elixir" implementationClass="org.elixir_lang.QuoteHandler"/>
