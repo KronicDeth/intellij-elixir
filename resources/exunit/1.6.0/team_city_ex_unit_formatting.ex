@@ -230,10 +230,21 @@ defmodule TeamCityExUnitFormatting do
     "#{head}#{Enum.map(tail, &String.capitalize/1)}"
   end
 
+  @colors [
+     diff_delete: :red,
+     diff_delete_whitespace: IO.ANSI.color_background(2, 0, 0),
+     diff_insert: :green,
+     diff_insert_whitespace: IO.ANSI.color_background(0, 2, 0)
+  ]
+
   defp colorize(escape, string) do
     [escape, string, :reset]
     |> IO.ANSI.format_fragment(true)
     |> IO.iodata_to_binary()
+  end
+
+  defp colorize_doc(escape, doc) do
+    Inspect.Algebra.color(doc, escape, %Inspect.Opts{syntax_colors: @colors})
   end
 
   # Must escape certain characters
@@ -290,13 +301,13 @@ defmodule TeamCityExUnitFormatting do
 
   defp formatter(:location_info, msg), do: colorize([:bright, :black], msg)
 
-  defp formatter(:diff_delete, msg), do: colorize(:red, msg)
+  defp formatter(:diff_delete, doc), do: colorize_doc(:diff_delete, doc)
 
-  defp formatter(:diff_delete_whitespace, msg), do: colorize(IO.ANSI.color_background(2, 0, 0), msg)
+  defp formatter(:diff_delete_whitespace, doc), do: colorize_doc(:diff_delete_whitespace, doc)
 
-  defp formatter(:diff_insert, msg), do: colorize(:green, msg)
+  defp formatter(:diff_insert, doc), do: colorize_doc(:diff_insert, doc)
 
-  defp formatter(:diff_insert_whitespace, msg), do: colorize(IO.ANSI.color_background(0, 2, 0), msg)
+  defp formatter(:diff_insert_whitespace, doc), do: colorize_doc(:diff_insert_whitespace, doc)
 
   defp formatter(:blame_diff, msg), do: colorize(:red, msg)
 
