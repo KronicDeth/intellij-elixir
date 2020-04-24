@@ -61,8 +61,7 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
     private static final Set<String> SDK_HOME_CHILD_BASE_NAME_SET = new THashSet<>(Arrays.asList("lib", "src"));
     private static final String WINDOWS_32BIT_DEFAULT_HOME_PATH = "C:\\Program Files\\Elixir";
     private static final String WINDOWS_64BIT_DEFAULT_HOME_PATH = "C:\\Program Files (x86)\\Elixir";
-    private final Map<String, Release> mySdkHomeToReleaseCache =
-            ApplicationManager.getApplication().isUnitTestMode() ? new HashMap<>() : new WeakHashMap<>();
+    private final Map<String, Release> mySdkHomeToReleaseCache = new WeakHashMap<>();
 
     public Type() {
         super(SerializerExtension.ELIXIR_SDK_TYPE_ID);
