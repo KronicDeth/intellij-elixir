@@ -42,7 +42,7 @@ object QuotableKeywordPairImpl {
     fun getKeywordValue(noParenthesesKeywordPair: ElixirNoParenthesesKeywordPair): Quotable {
         val children = noParenthesesKeywordPair.children
 
-        assert(children.size == 2)
+        assert(children.size >= 2)
 
         return children[1] as Quotable
     }
