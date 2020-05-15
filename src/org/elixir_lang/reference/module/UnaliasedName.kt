@@ -32,7 +32,7 @@ object UnaliasedName {
                 is ElixirAccessExpression -> {
                     val children = element.children
 
-                    assert(children.size == 1)
+                    assert(children.size >= 1)
 
                     down(children[0])
                 }

@@ -215,6 +215,8 @@
 ### Bug Fixes
 * [#1762](https://github.com/KronicDeth/intellij-elixir/pull/1762) - [@KronicDeth](https://github.com/KronicDeth)
   * Support diffs in pattern matching added in Elixir `1.10.0` in the ExUnit formatter.  Ports [elixir-lang/elixir@98c6bba436cc4833363295e5fedd3f819504d79d](https://github.com/elixir-lang/elixir/commit/98c6bba436cc4833363295e5fedd3f819504d79d).
+* [#1773](https://github.com/KronicDeth/intellij-elixir/pull/1773) - [@KronicDeth](https://github.com/KronicDeth)
+  * Only require at least the number of children to safely get a specific child instead of exact number to allow getting prefix children when there are grammatical errors.
 
 ## v11.6.0
 ### Enhancements
