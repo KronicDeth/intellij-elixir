@@ -69,8 +69,10 @@ class Configuration(name: String, project: Project, configurationFactory: Config
         get() = erlArgumentList.toArguments()
         set(arguments) = erlArgumentList.fromArguments(arguments)
 
-    private var iexArguments: String?
+    var iexArguments: String?
+        @JvmName("getIExArguments")
         get() = iexArgumentList.toArguments()
+        @JvmName("setIExArguments")
         set(arguments) = iexArgumentList.fromArguments(arguments)
 
     var iexArgumentList: MutableList<String> = mutableListOf()
