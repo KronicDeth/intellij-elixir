@@ -27,7 +27,6 @@ import org.elixir_lang.reference.ModuleAttribute.Companion.isNonReferencing
 import org.elixir_lang.reference.ModuleAttribute.Companion.isSpecificationName
 import org.elixir_lang.reference.ModuleAttribute.Companion.isTypeName
 import org.elixir_lang.structure_view.element.CallDefinitionHead.Companion.stripAllOuterParentheses
-import java.util.*
 
 /**
  * Annotates module attributes.
@@ -46,7 +45,8 @@ class ModuleAttribute : Annotator, DumbAware {
      * @param holder  the container which receives annotations created by the plugin.
      */
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {
-        if (!element.containingFile.viewProvider.languages.contains(Language.INSTANCE)) { // if there exists an EEx tag as a parent, we're in an EEx file
+        // if there exists an EEx tag as a parent, we're in an EEx file
+        if (!element.containingFile.viewProvider.languages.contains(Language.INSTANCE)) {
             element.accept(
                     object : PsiRecursiveElementVisitor() {
                         /*
@@ -72,27 +72,35 @@ class ModuleAttribute : Annotator, DumbAware {
                             val atIdentifier = atUnqualifiedNoParenthesesCall.atIdentifier
                             val textRange = atIdentifier.textRange
                             val identifier = atIdentifier.identifierName()
-                            if (isCallbackName(identifier)) {
-                                highlight(textRange, holder, ElixirSyntaxHighlighter.MODULE_ATTRIBUTE)
-                                highlightCallback(atUnqualifiedNoParenthesesCall, holder)
-                            } else if (isDocumentationName(identifier)) {
-                                highlight(textRange, holder, ElixirSyntaxHighlighter.DOCUMENTATION_MODULE_ATTRIBUTE)
-                                highlightDocumentationText(atUnqualifiedNoParenthesesCall, holder)
-                            } else if (isTypeName(identifier)) {
-                                highlight(textRange, holder, ElixirSyntaxHighlighter.MODULE_ATTRIBUTE)
-                                highlightType(atUnqualifiedNoParenthesesCall, holder)
-                            } else if (isSpecificationName(identifier)) {
-                                highlight(textRange, holder, ElixirSyntaxHighlighter.MODULE_ATTRIBUTE)
-                                highlightSpecification(atUnqualifiedNoParenthesesCall, holder)
-                            } else {
-                                highlight(textRange, holder, ElixirSyntaxHighlighter.MODULE_ATTRIBUTE)
+
+                            when {
+                                isCallbackName(identifier) -> {
+                                    highlight(textRange, holder, ElixirSyntaxHighlighter.MODULE_ATTRIBUTE)
+                                    highlightCallback(atUnqualifiedNoParenthesesCall, holder)
+                                }
+                                isDocumentationName(identifier) -> {
+                                    highlight(textRange, holder, ElixirSyntaxHighlighter.DOCUMENTATION_MODULE_ATTRIBUTE)
+                                    highlightDocumentationText(atUnqualifiedNoParenthesesCall, holder)
+                                }
+                                isTypeName(identifier) -> {
+                                    highlight(textRange, holder, ElixirSyntaxHighlighter.MODULE_ATTRIBUTE)
+                                    highlightType(atUnqualifiedNoParenthesesCall, holder)
+                                }
+                                isSpecificationName(identifier) -> {
+                                    highlight(textRange, holder, ElixirSyntaxHighlighter.MODULE_ATTRIBUTE)
+                                    highlightSpecification(atUnqualifiedNoParenthesesCall, holder)
+                                }
+                                else -> {
+                                    highlight(textRange, holder, ElixirSyntaxHighlighter.MODULE_ATTRIBUTE)
+                                }
                             }
                         }
 
                         private fun visitMaybeUsage(element: AtNonNumericOperation) {
-                            val operand: PsiElement? = element.operand()
-                            if (operand != null && operand !is ElixirAccessExpression) {
-                                visitUsage(element)
+                            element.operand()?.let { operand ->
+                                if (operand !is ElixirAccessExpression) {
+                                    visitUsage(element)
+                                }
                             }
                         }
 
@@ -102,10 +110,12 @@ class ModuleAttribute : Annotator, DumbAware {
                                     holder,
                                     ElixirSyntaxHighlighter.MODULE_ATTRIBUTE
                             )
+
                             if (!isNonReferencing(atNonNumericOperation)) {
-                                val reference = atNonNumericOperation.reference
-                                if (reference != null && reference.resolve() == null) {
-                                    holder.createErrorAnnotation(atNonNumericOperation, "Unresolved module attribute")
+                                atNonNumericOperation.reference?.let { reference ->
+                                    if (reference.resolve() == null) {
+                                        holder.createErrorAnnotation(atNonNumericOperation, "Unresolved module attribute")
+                                    }
                                 }
                             }
                         }
@@ -153,40 +163,43 @@ class ModuleAttribute : Annotator, DumbAware {
     ) {
         val noParenthesesOneArgument: PsiElement = atUnqualifiedNoParenthesesCall.noParenthesesOneArgument
         val grandChildren = noParenthesesOneArgument.children
-        if (grandChildren.size == 1) {
-            val grandChild = grandChildren[0]
+
+        grandChildren.singleOrNull()?.let { grandChild ->
             val greatGrandChildren = grandChild.children
-            if (greatGrandChildren.size == 1) {
-                val greatGrandChild = greatGrandChildren[0]
-                if (greatGrandChild is ElixirAtomKeyword) {
-                    val atomKeyword = greatGrandChild
-                    val text = atomKeyword.text
-                    if (text == "false") {
-                        holder.createWeakWarningAnnotation(
-                                atomKeyword,
-                                "Will make documented invisible to the documentation extraction tools like ExDoc.")
+
+            greatGrandChildren.singleOrNull()?.let { greatGrandChild ->
+                when (greatGrandChild) {
+                    is ElixirAtomKeyword -> {
+                        val text = greatGrandChild.text
+
+                        if (text == "false") {
+                            holder.createWeakWarningAnnotation(
+                                    greatGrandChild,
+                                    "Will make documented invisible to the documentation extraction tools like ExDoc.")
+                        }
                     }
-                } else if (greatGrandChild is Heredoc) {
-                    val heredoc = greatGrandChild
-                    val heredocLineList = heredoc.heredocLineList
-                    for (bodied in heredocLineList) {
-                        val body = bodied.body
+                    is Heredoc -> {
+                        val heredocLineList = greatGrandChild.heredocLineList
+
+                        for (bodied in heredocLineList) {
+                            val body = bodied.body
+                            highlightFragments(
+                                    greatGrandChild,
+                                    body,
+                                    holder,
+                                    ElixirSyntaxHighlighter.DOCUMENTATION_TEXT
+                            )
+                        }
+                    }
+                    is Line -> {
+                        val body = greatGrandChild.body
                         highlightFragments(
-                                heredoc,
+                                greatGrandChild,
                                 body,
                                 holder,
                                 ElixirSyntaxHighlighter.DOCUMENTATION_TEXT
                         )
                     }
-                } else if (greatGrandChild is Line) {
-                    val line = greatGrandChild
-                    val body = line.body
-                    highlightFragments(
-                            line,
-                            body,
-                            holder,
-                            ElixirSyntaxHighlighter.DOCUMENTATION_TEXT
-                    )
                 }
             }
         }
@@ -238,119 +251,128 @@ class ModuleAttribute : Annotator, DumbAware {
                               annotationHolder: AnnotationHolder) {
         val noParenthesesOneArgument: PsiElement = atUnqualifiedNoParenthesesCall.noParenthesesOneArgument
         val grandChildren = noParenthesesOneArgument.children
-        if (grandChildren.size == 1) {
-            val grandChild = grandChildren[0]
-            if (grandChild is Match /* Match is invalid.  It will be marked by
-                                               MatchOperatorInsteadOfTypeOperator inspection as an error */
-                    || grandChild is Type) {
-                val infix = grandChild as Infix
-                val leftOperand: PsiElement? = infix.leftOperand()
-                var typeParameterNameSet: Set<String?> = emptySet<String>()
-                if (leftOperand is Call) {
-                    val call = leftOperand
-                    highlightTypeName(call, annotationHolder)
-                    if (call is ElixirMatchedUnqualifiedParenthesesCall) {
-                        typeParameterNameSet = highlightTypeLeftOperand(
-                                call,
-                                annotationHolder
-                        )
-                    } else if (call !is ElixirMatchedUnqualifiedNoArgumentsCall) {
-                        cannotHighlightTypes(call)
+
+        grandChildren.singleOrNull()?.let { grandChild ->
+            when (grandChild) {
+                /* Match is invalid.  It will be marked by MatchOperatorInsteadOfTypeOperator inspection as an error */
+                is Match, is Type -> {
+                    val infix = grandChild as Infix
+                    val leftOperand: PsiElement? = infix.leftOperand()
+                    var typeParameterNameSet: Set<String?> = emptySet<String>()
+
+                    if (leftOperand is Call) {
+                        val call = leftOperand
+                        highlightTypeName(call, annotationHolder)
+                        if (call is ElixirMatchedUnqualifiedParenthesesCall) {
+                            typeParameterNameSet = highlightTypeLeftOperand(
+                                    call,
+                                    annotationHolder
+                            )
+                        } else if (call !is ElixirMatchedUnqualifiedNoArgumentsCall) {
+                            cannotHighlightTypes(call)
+                        }
+                    } else {
+                        cannotHighlightTypes(leftOperand)
                     }
-                } else {
-                    cannotHighlightTypes(leftOperand)
-                }
-                val rightOperand: PsiElement? = infix.rightOperand()
-                if (rightOperand != null) {
-                    highlightTypesAndTypeParameterUsages(
-                            rightOperand,
-                            typeParameterNameSet,
-                            annotationHolder,
-                            ElixirSyntaxHighlighter.TYPE
-                    )
-                }
-            } else if (grandChild is ElixirMatchedUnqualifiedParenthesesCall) {
-                // seen as `unquote(ast)`, but could also be just the beginning of typing
-                val matchedUnqualifiedParenthesesCall = grandChild
-                if (Function.UNQUOTE == matchedUnqualifiedParenthesesCall.functionName()) {
-                    val secondaryArguments = matchedUnqualifiedParenthesesCall.secondaryArguments()
-                    if (secondaryArguments != null) {
-                        val typeParameterNameSet = typeTypeParameterNameSet(secondaryArguments)
-                        highlightTypesAndTypeTypeParameterDeclarations(
-                                secondaryArguments,
+
+                    val rightOperand: PsiElement? = infix.rightOperand()
+
+                    if (rightOperand != null) {
+                        highlightTypesAndTypeParameterUsages(
+                                rightOperand,
                                 typeParameterNameSet,
                                 annotationHolder,
                                 ElixirSyntaxHighlighter.TYPE
                         )
+                    } else {
+                        null
                     }
-                } else {
-                    highlightTypeName(grandChild, annotationHolder)
-
-                    // Assume it's `@type foo(bar)` before completed as `@type foo(bar) :: bar`
-                    highlightTypeLeftOperand(
-                            grandChild,
-                            annotationHolder
-                    )
                 }
-            } else if (grandChild is QuotableKeywordList) {
-                val quotableKeywordPairList = grandChild.quotableKeywordPairList()
+                is ElixirMatchedUnqualifiedParenthesesCall -> {
+                    // seen as `unquote(ast)`, but could also be just the beginning of typing
+                    val matchedUnqualifiedParenthesesCall = grandChild
 
-                // occurs when user does `my_type: definition` instead of `my_type :: definition`
-                if (quotableKeywordPairList.size == 1) {
-                    val quotableKeywordPair = quotableKeywordPairList[0]
-                    val quotableKeywordKey = quotableKeywordPair.keywordKey
-                    if (quotableKeywordKey is ElixirKeywordKey) {
-                        highlight(
-                                quotableKeywordKey.textRange,
+                    if (Function.UNQUOTE == matchedUnqualifiedParenthesesCall.functionName()) {
+                        matchedUnqualifiedParenthesesCall.secondaryArguments()?.let { secondaryArguments ->
+                            val typeParameterNameSet = typeTypeParameterNameSet(secondaryArguments)
+                            highlightTypesAndTypeTypeParameterDeclarations(
+                                    secondaryArguments,
+                                    typeParameterNameSet,
+                                    annotationHolder,
+                                    ElixirSyntaxHighlighter.TYPE
+                            )
+                        }
+                    } else {
+                        highlightTypeName(grandChild, annotationHolder)
+
+                        // Assume it's `@type foo(bar)` before completed as `@type foo(bar) :: bar`
+                        highlightTypeLeftOperand(
+                                grandChild,
+                                annotationHolder
+                        )
+                    }
+                }
+                is QuotableKeywordList -> {
+                    grandChild.quotableKeywordPairList().singleOrNull()?.let { quotableKeywordPair ->
+                        // occurs when user does `my_type: definition` instead of `my_type :: definition`
+                        val quotableKeywordKey = quotableKeywordPair.keywordKey
+
+                        if (quotableKeywordKey is ElixirKeywordKey) {
+                            highlight(
+                                    quotableKeywordKey.textRange,
+                                    annotationHolder,
+                                    ElixirSyntaxHighlighter.TYPE
+                            )
+                        }
+
+                        val quotableKeywordValue = quotableKeywordPair.keywordValue
+                        highlightTypesAndTypeParameterUsages(
+                                quotableKeywordValue, emptySet<String>(),
                                 annotationHolder,
                                 ElixirSyntaxHighlighter.TYPE
                         )
                     }
-                    val quotableKeywordValue = quotableKeywordPair.keywordValue
+                    // Otherwise, allow the normal, non-type highlighting
+                }
+                is UnqualifiedNoArgumentsCall<*> -> {
+                    // assume it's a type name that is being typed
+                    val grandChildCall = grandChild as Call
+                    grandChildCall.functionNameElement()?.let { functionNameElement ->
+                        highlight(
+                                functionNameElement.textRange,
+                                annotationHolder,
+                                ElixirSyntaxHighlighter.TYPE
+                        )
+                    }
+                }
+                is UnqualifiedNoParenthesesCall<*> -> {
+                    /* Pretend that `::` separates the functionNameElement from the arguments, so that
+                       ```
+                       @type coefficient non_neg_integer | :qNaN | :sNaN | :inf
+                       ```
+                       is retreated like
+                       ```
+                       @type coefficient :: non_neg_integer | :qNaN | :sNaN | :inf
+                       ```
+                     */
+
+                    grandChild.functionNameElement()?.let { functionNameElement ->
+                        highlight(
+                                functionNameElement.textRange,
+                                annotationHolder,
+                                ElixirSyntaxHighlighter.TYPE
+                        )
+                    }
+
                     highlightTypesAndTypeParameterUsages(
-                            quotableKeywordValue, emptySet<String>(),
+                            grandChild.noParenthesesOneArgument, emptySet<String>(),
                             annotationHolder,
                             ElixirSyntaxHighlighter.TYPE
                     )
                 }
-                // Otherwise, allow the normal, non-type highlighting
-            } else if (grandChild is UnqualifiedNoArgumentsCall<*>) {
-                // assume it's a type name that is being typed
-                val grandChildCall = grandChild as Call
-                val functionNameElement = grandChildCall.functionNameElement()
-                if (functionNameElement != null) {
-                    highlight(
-                            functionNameElement.textRange,
-                            annotationHolder,
-                            ElixirSyntaxHighlighter.TYPE
-                    )
+                else -> {
+                    cannotHighlightTypes(grandChild)
                 }
-            } else if (grandChild is UnqualifiedNoParenthesesCall<*>) {
-                /* Pretend that `::` separates the functionNameElement from the arguments, so that
-                   ```
-                   @type coefficient non_neg_integer | :qNaN | :sNaN | :inf
-                   ```
-                   is retreated like
-                   ```
-                   @type coefficient :: non_neg_integer | :qNaN | :sNaN | :inf
-                   ```
-                 */
-                val unqualifiedNoParenthesesCall = grandChild
-                val functionNameElement = unqualifiedNoParenthesesCall.functionNameElement()
-                if (functionNameElement != null) {
-                    highlight(
-                            functionNameElement.textRange,
-                            annotationHolder,
-                            ElixirSyntaxHighlighter.TYPE
-                    )
-                }
-                highlightTypesAndTypeParameterUsages(
-                        unqualifiedNoParenthesesCall.noParenthesesOneArgument, emptySet<String>(),
-                        annotationHolder,
-                        ElixirSyntaxHighlighter.TYPE
-                )
-            } else {
-                cannotHighlightTypes(grandChild)
             }
         }
     }
@@ -364,25 +386,24 @@ class ModuleAttribute : Annotator, DumbAware {
     private fun highlightTypeLeftOperand(call: ElixirMatchedUnqualifiedParenthesesCall,
                                          annotationHolder: AnnotationHolder): Set<String?> {
         val primaryArguments = call.primaryArguments()
-        val secondaryArguments = call.secondaryArguments()
-        val typeParameterNameSet: Set<String?>
 
         /* if there are secondaryArguments, then it is the type parameters as in
-           `@type quote(type_name)(param1, param2) :: {param1, param2}` */if (secondaryArguments != null) {
-            typeParameterNameSet = typeTypeParameterNameSet(secondaryArguments)
-            highlightTypesAndTypeParameterUsages(
-                    primaryArguments, emptySet<String>(),
-                    annotationHolder,
-                    ElixirSyntaxHighlighter.TYPE
-            )
-            highlightTypesAndTypeTypeParameterDeclarations(
-                    secondaryArguments,
-                    typeParameterNameSet,
-                    annotationHolder,
-                    ElixirSyntaxHighlighter.TYPE
-            )
-        } else {
-            typeParameterNameSet = typeTypeParameterNameSet(primaryArguments)
+           `@type quote(type_name)(param1, param2) :: {param1, param2}` */
+        return call.secondaryArguments()?.let { secondaryArguments ->
+            typeTypeParameterNameSet(secondaryArguments).also { typeParameterNameSet ->
+                highlightTypesAndTypeParameterUsages(
+                        primaryArguments, emptySet<String>(),
+                        annotationHolder,
+                        ElixirSyntaxHighlighter.TYPE
+                )
+                highlightTypesAndTypeTypeParameterDeclarations(
+                        secondaryArguments,
+                        typeParameterNameSet,
+                        annotationHolder,
+                        ElixirSyntaxHighlighter.TYPE
+                )
+            }
+        } ?: typeTypeParameterNameSet(primaryArguments).also { typeParameterNameSet ->
             highlightTypesAndTypeTypeParameterDeclarations(
                     primaryArguments,
                     typeParameterNameSet,
@@ -390,12 +411,10 @@ class ModuleAttribute : Annotator, DumbAware {
                     ElixirSyntaxHighlighter.TYPE
             )
         }
-        return typeParameterNameSet
     }
 
     private fun highlightTypeName(call: Call, annotationHolder: AnnotationHolder) {
-        val functionNameElement = call.functionNameElement()
-        if (functionNameElement != null) {
+        call.functionNameElement()?.let { functionNameElement ->
             highlight(
                     functionNameElement.textRange,
                     annotationHolder,
@@ -409,12 +428,13 @@ class ModuleAttribute : Annotator, DumbAware {
                                                                annotationHolder: AnnotationHolder,
                                                                typeTextAttributesKey: TextAttributesKey) {
         val name = alias.name
-        val textAttributesKey: TextAttributesKey
-        textAttributesKey = if (typeParameterNameSet.contains(name)) {
+
+        val textAttributesKey = if (typeParameterNameSet.contains(name)) {
             ElixirSyntaxHighlighter.TYPE_PARAMETER
         } else {
             typeTextAttributesKey
         }
+
         highlight(alias.textRange, annotationHolder, textAttributesKey)
     }
 
@@ -423,12 +443,13 @@ class ModuleAttribute : Annotator, DumbAware {
                                                                annotationHolder: AnnotationHolder,
                                                                typeTextAttributesKey: TextAttributesKey) {
         val name = psiElement.text
-        val textAttributesKey: TextAttributesKey
-        textAttributesKey = if (typeParameterNameSet.contains(name)) {
+
+        val textAttributesKey = if (typeParameterNameSet.contains(name)) {
             ElixirSyntaxHighlighter.TYPE_PARAMETER
         } else {
             typeTextAttributesKey
         }
+
         highlight(psiElement.textRange, annotationHolder, textAttributesKey)
     }
 
@@ -436,32 +457,35 @@ class ModuleAttribute : Annotator, DumbAware {
                                                                typeParameterNameSet: Set<String?>,
                                                                annotationHolder: AnnotationHolder,
                                                                typeTextAttributesKey: TextAttributesKey) {
-        if (psiElement is ElixirAccessExpression ||
-                psiElement is ElixirList ||
-                psiElement is ElixirTuple) {
-            highlightTypesAndTypeTypeParameterDeclarations(
-                    psiElement.children,
-                    typeParameterNameSet,
-                    annotationHolder,
-                    typeTextAttributesKey
-            )
-        } else if (psiElement is ElixirAlias) {
-            highlightTypesAndTypeTypeParameterDeclarations(
-                    psiElement,
-                    typeParameterNameSet,
-                    annotationHolder,
-                    typeTextAttributesKey
-            )
-        } else if (psiElement is ElixirUnmatchedUnqualifiedNoArgumentsCall) {
-            highlightTypesAndTypeTypeParameterDeclarations(
-                    psiElement,
-                    typeParameterNameSet,
-                    annotationHolder,
-                    typeTextAttributesKey
-            )
-        } else {
-            if (psiElement !is ElixirAtomKeyword) {
-                error("Cannot highlight types and type parameter declarations", psiElement)
+        when (psiElement) {
+            is ElixirAccessExpression, is ElixirList, is ElixirTuple -> {
+                highlightTypesAndTypeTypeParameterDeclarations(
+                        psiElement.children,
+                        typeParameterNameSet,
+                        annotationHolder,
+                        typeTextAttributesKey
+                )
+            }
+            is ElixirAlias -> {
+                highlightTypesAndTypeTypeParameterDeclarations(
+                        psiElement,
+                        typeParameterNameSet,
+                        annotationHolder,
+                        typeTextAttributesKey
+                )
+            }
+            is ElixirUnmatchedUnqualifiedNoArgumentsCall -> {
+                highlightTypesAndTypeTypeParameterDeclarations(
+                        psiElement,
+                        typeParameterNameSet,
+                        annotationHolder,
+                        typeTextAttributesKey
+                )
+            }
+            else -> {
+                if (psiElement !is ElixirAtomKeyword) {
+                    error("Cannot highlight types and type parameter declarations", psiElement)
+                }
             }
         }
     }
@@ -494,32 +518,30 @@ class ModuleAttribute : Annotator, DumbAware {
                                        leftMostFunctionNameTextAttributesKey: TextAttributesKey,
                                        leftMostFunctionArgumentsTextAttributesKey: TextAttributesKey) {
         val noParenthesesOneArgument: PsiElement = atUnqualifiedNoParenthesesCall.noParenthesesOneArgument
-        val grandChildren = noParenthesesOneArgument.children
-        if (grandChildren.size == 1) {
-            val grandChild = grandChildren[0]
+
+        noParenthesesOneArgument.children.singleOrNull()?.let { grandChild ->
             if (grandChild is Type) {
                 val infix = grandChild as Infix
                 val leftOperand: PsiElement? = infix.leftOperand()
+
                 if (leftOperand is Call) {
-                    val call = leftOperand
-                    val functionNameElement = call.functionNameElement()
-                    if (functionNameElement != null) {
+                    leftOperand.functionNameElement()?.let { functionNameElement ->
                         highlight(
                                 functionNameElement.textRange,
                                 annotationHolder,
                                 leftMostFunctionNameTextAttributesKey
                         )
                     }
-                    val primaryArguments = call.primaryArguments()
-                    if (primaryArguments != null) {
+
+                    leftOperand.primaryArguments()?.let { primaryArguments ->
                         highlightTypesAndTypeParameterUsages(
                                 primaryArguments, emptySet<String>(),
                                 annotationHolder,
                                 leftMostFunctionArgumentsTextAttributesKey
                         )
                     }
-                    val secondaryArguments = call.secondaryArguments()
-                    if (secondaryArguments != null) {
+
+                    leftOperand.secondaryArguments()?.let { secondaryArguments ->
                         highlightTypesAndTypeParameterUsages(
                                 secondaryArguments, emptySet<String>(),
                                 annotationHolder,
@@ -527,8 +549,8 @@ class ModuleAttribute : Annotator, DumbAware {
                         )
                     }
                 }
-                val rightOperand: PsiElement? = infix.rightOperand()
-                if (rightOperand != null) {
+
+                infix.rightOperand()?.let { rightOperand ->
                     highlightTypesAndTypeParameterUsages(
                             rightOperand, emptySet<String>(),
                             annotationHolder,
@@ -541,44 +563,50 @@ class ModuleAttribute : Annotator, DumbAware {
                 val typeParameterNameSet: Set<String?>
                 typeParameterNameSet = rightOperand?.let { specificationTypeParameterNameSet(it) } ?: emptySet<String>()
                 val leftOperand: PsiElement? = matchedWhenOperation.leftOperand()
-                if (leftOperand is Type) {
-                    val typeOperation = leftOperand
-                    val typeOperationLeftOperand: PsiElement? = typeOperation.leftOperand()
-                    var strippedTypeOperationLeftOperand: PsiElement? = null
-                    if (typeOperationLeftOperand != null) {
-                        strippedTypeOperationLeftOperand = stripAllOuterParentheses(typeOperationLeftOperand)
+
+                when (leftOperand) {
+                    is Type -> {
+                        val typeOperation = leftOperand
+
+                        typeOperation.leftOperand()?.let { typeOperationLeftOperand ->
+                            val strippedTypeOperationLeftOperand = stripAllOuterParentheses(typeOperationLeftOperand)
+
+                            if (strippedTypeOperationLeftOperand is Call) {
+                                highlightSpecification(
+                                        strippedTypeOperationLeftOperand,
+                                        annotationHolder,
+                                        leftMostFunctionNameTextAttributesKey,
+                                        leftMostFunctionNameTextAttributesKey,
+                                        typeParameterNameSet
+                                )
+                            } else {
+                                cannotHighlightTypes(strippedTypeOperationLeftOperand)
+                            }
+                        }
+
+                        typeOperation.rightOperand()?.let { matchedTypeOperationRightOperand ->
+                            highlightTypesAndTypeParameterUsages(
+                                    matchedTypeOperationRightOperand,
+                                    typeParameterNameSet,
+                                    annotationHolder,
+                                    ElixirSyntaxHighlighter.TYPE
+                            )
+                        }
                     }
-                    if (strippedTypeOperationLeftOperand is Call) {
+                    is Call -> {
                         highlightSpecification(
-                                strippedTypeOperationLeftOperand,
+                                leftOperand,
                                 annotationHolder,
                                 leftMostFunctionNameTextAttributesKey,
                                 leftMostFunctionNameTextAttributesKey,
                                 typeParameterNameSet
                         )
-                    } else {
-                        cannotHighlightTypes(strippedTypeOperationLeftOperand)
                     }
-                    val matchedTypeOperationRightOperand: PsiElement? = typeOperation.rightOperand()
-                    if (matchedTypeOperationRightOperand != null) {
-                        highlightTypesAndTypeParameterUsages(
-                                matchedTypeOperationRightOperand,
-                                typeParameterNameSet,
-                                annotationHolder,
-                                ElixirSyntaxHighlighter.TYPE
-                        )
+                    else -> {
+                        cannotHighlightTypes(leftOperand)
                     }
-                } else if (leftOperand is Call) {
-                    highlightSpecification(
-                            leftOperand,
-                            annotationHolder,
-                            leftMostFunctionNameTextAttributesKey,
-                            leftMostFunctionNameTextAttributesKey,
-                            typeParameterNameSet
-                    )
-                } else {
-                    cannotHighlightTypes(leftOperand)
                 }
+
                 if (rightOperand != null) {
                     highlightTypesAndSpecificationTypeParameterDeclarations(
                             rightOperand,
@@ -586,7 +614,11 @@ class ModuleAttribute : Annotator, DumbAware {
                             annotationHolder,
                             ElixirSyntaxHighlighter.TYPE
                     )
+                } else {
+                    null
                 }
+            } else {
+                null
             }
         }
     }
@@ -596,18 +628,16 @@ class ModuleAttribute : Annotator, DumbAware {
                                        leftMostFunctionNameTextAttributesKey: TextAttributesKey,
                                        leftMostFunctionArgumentsTextAttributesKey: TextAttributesKey,
                                        typeParameterNameSet: Set<String?>) {
-        val functionNameElement = call.functionNameElement()
-        if (functionNameElement != null) {
+        call.functionNameElement()?.let {
             highlight(
-                    functionNameElement.textRange,
+                    it.textRange,
                     annotationHolder,
                     leftMostFunctionNameTextAttributesKey
             )
         }
-        val primaryArguments = call.primaryArguments()
-        primaryArguments?.let { highlightTypesAndTypeParameterUsages(it, typeParameterNameSet, annotationHolder, leftMostFunctionArgumentsTextAttributesKey) }
-        val secondaryArguments = call.secondaryArguments()
-        secondaryArguments?.let { highlightTypesAndTypeParameterUsages(it, typeParameterNameSet, annotationHolder, leftMostFunctionArgumentsTextAttributesKey) }
+
+        call.primaryArguments()?.let { highlightTypesAndTypeParameterUsages(it, typeParameterNameSet, annotationHolder, leftMostFunctionArgumentsTextAttributesKey) }
+        call.secondaryArguments()?.let { highlightTypesAndTypeParameterUsages(it, typeParameterNameSet, annotationHolder, leftMostFunctionArgumentsTextAttributesKey) }
     }
 
     private fun highlightTypesAndSpecificationTypeParameterDeclarations(quotableKeywordPair: QuotableKeywordPair,
@@ -615,6 +645,7 @@ class ModuleAttribute : Annotator, DumbAware {
                                                                         annotationHolder: AnnotationHolder,
                                                                         typeTextAttributesKey: TextAttributesKey) {
         val keywordKey: PsiElement = quotableKeywordPair.keywordKey
+
         if (typeParameterNameSet.contains(keywordKey.text)) {
             highlight(keywordKey.textRange, annotationHolder, ElixirSyntaxHighlighter.TYPE_PARAMETER)
         } else {
@@ -625,6 +656,7 @@ class ModuleAttribute : Annotator, DumbAware {
                     typeTextAttributesKey
             )
         }
+
         highlightTypesAndTypeParameterUsages(
                 quotableKeywordPair.keywordValue,
                 typeParameterNameSet,
@@ -641,64 +673,67 @@ class ModuleAttribute : Annotator, DumbAware {
                                                                         typeParameterNameSet: Set<String?>,
                                                                         annotationHolder: AnnotationHolder,
                                                                         typeTextAttributesKey: TextAttributesKey) {
-        val leftOperand: PsiElement? = type.leftOperand()
-        if (leftOperand != null) {
-            if (typeParameterNameSet.contains(leftOperand.text)) {
-                highlight(leftOperand.textRange, annotationHolder, ElixirSyntaxHighlighter.TYPE_PARAMETER)
+        type.leftOperand()?.let {
+            if (typeParameterNameSet.contains(it.text)) {
+                highlight(it.textRange, annotationHolder, ElixirSyntaxHighlighter.TYPE_PARAMETER)
             } else {
                 highlightTypesAndTypeParameterUsages(
-                        leftOperand,
+                        it,
                         typeParameterNameSet,
                         annotationHolder,
                         typeTextAttributesKey
                 )
             }
         }
-        val rightOperand: PsiElement? = type.rightOperand()
-        rightOperand?.let { highlightTypesAndTypeParameterUsages(it, typeParameterNameSet, annotationHolder, typeTextAttributesKey) }
+
+        type.rightOperand()?.let { highlightTypesAndTypeParameterUsages(it, typeParameterNameSet, annotationHolder, typeTextAttributesKey) }
     }
 
     private fun highlightTypesAndSpecificationTypeParameterDeclarations(psiElement: PsiElement,
                                                                         typeParameterNameSet: Set<String?>,
                                                                         annotationHolder: AnnotationHolder,
                                                                         typeTextAttributesKey: TextAttributesKey) {
-        if (psiElement is ElixirAccessExpression ||
-                psiElement is ElixirKeywords ||
-                psiElement is ElixirList ||
-                psiElement is ElixirNoParenthesesKeywords) {
-            highlightTypesAndSpecificationTypeParameterDeclarations(
-                    psiElement.children,
-                    typeParameterNameSet,
-                    annotationHolder,
-                    typeTextAttributesKey
-            )
-        } else if (psiElement is QuotableKeywordPair) {
-            highlightTypesAndSpecificationTypeParameterDeclarations(
-                    psiElement,
-                    typeParameterNameSet,
-                    annotationHolder,
-                    typeTextAttributesKey
-            )
-        } else if (psiElement is Type) {
-            highlightTypesAndSpecificationTypeParameterDeclarations(
-                    psiElement,
-                    typeParameterNameSet,
-                    annotationHolder,
-                    typeTextAttributesKey
-            )
-        } else if (psiElement is UnqualifiedNoArgumentsCall<*>) {
-            highlightTypesAndSpecificationTypeParameterDeclarations(
-                    psiElement,
-                    typeParameterNameSet,
-                    annotationHolder,
-                    typeTextAttributesKey
-            )
-        } else if (psiElement is UnqualifiedNoParenthesesCall<*>) {
-            highlightTypesAndSpecificationTypeParameterDeclarations(
-                    psiElement
-            )
-        } else {
-            error("Cannot highlight types and specification type parameter declarations", psiElement)
+        when (psiElement) {
+            is ElixirAccessExpression, is ElixirKeywords, is ElixirList, is ElixirNoParenthesesKeywords -> {
+                highlightTypesAndSpecificationTypeParameterDeclarations(
+                        psiElement.children,
+                        typeParameterNameSet,
+                        annotationHolder,
+                        typeTextAttributesKey
+                )
+            }
+            is QuotableKeywordPair -> {
+                highlightTypesAndSpecificationTypeParameterDeclarations(
+                        psiElement,
+                        typeParameterNameSet,
+                        annotationHolder,
+                        typeTextAttributesKey
+                )
+            }
+            is Type -> {
+                highlightTypesAndSpecificationTypeParameterDeclarations(
+                        psiElement,
+                        typeParameterNameSet,
+                        annotationHolder,
+                        typeTextAttributesKey
+                )
+            }
+            is UnqualifiedNoArgumentsCall<*> -> {
+                highlightTypesAndSpecificationTypeParameterDeclarations(
+                        psiElement,
+                        typeParameterNameSet,
+                        annotationHolder,
+                        typeTextAttributesKey
+                )
+            }
+            is UnqualifiedNoParenthesesCall<*> -> {
+                highlightTypesAndSpecificationTypeParameterDeclarations(
+                        psiElement
+                )
+            }
+            else -> {
+                error("Cannot highlight types and specification type parameter declarations", psiElement)
+            }
         }
     }
 
@@ -755,13 +790,14 @@ class ModuleAttribute : Annotator, DumbAware {
                                                      annotationHolder: AnnotationHolder) {
         val parent = decimalFloat.parent
         var message: String? = null
+
         if (parent is ElixirAccessExpression) {
             val grandParent = parent.getParent()
             if (grandParent is Two) {
-                val operator = grandParent.operator()
-                if (operator != null) {
+                grandParent.operator()?.let { operator ->
                     val rangeOperators = operator.node.getChildren(TokenSet.create(ElixirTypes.RANGE_OPERATOR))
-                    if (rangeOperators.size > 0) {
+
+                    if (rangeOperators.isNotEmpty()) {
                         message = "Floats aren't allowed in Ranges"
                     }
                 }
@@ -769,10 +805,12 @@ class ModuleAttribute : Annotator, DumbAware {
         } else {
             cannotHighlightTypes(decimalFloat)
         }
+
         if (message == null) {
             message = "Float literals are not allowed in types: use float() instead"
         }
-        highlightTypeError(decimalFloat, message, annotationHolder)
+
+        highlightTypeError(decimalFloat, message!!, annotationHolder)
     }
 
     private fun highlightTypesAndTypeParameterUsages(mapOperation: ElixirMapOperation,
@@ -809,6 +847,7 @@ class ModuleAttribute : Annotator, DumbAware {
             annotationHolder: AnnotationHolder,
             typeTextAttributesKey: TextAttributesKey) {
         val stabParenthesesSignature = stabOperation.stabParenthesesSignature
+
         if (stabParenthesesSignature != null) {
             highlightTypesAndTypeParameterUsages(
                     stabParenthesesSignature,
@@ -817,11 +856,10 @@ class ModuleAttribute : Annotator, DumbAware {
                     typeTextAttributesKey
             )
         } else {
-            val stabNoParenthesesSignatures = stabOperation.stabNoParenthesesSignature
-            stabNoParenthesesSignatures?.let { highlightTypesAndTypeParameterUsages(it, typeParameterNameSet, annotationHolder, typeTextAttributesKey) }
+            stabOperation.stabNoParenthesesSignature?.let { highlightTypesAndTypeParameterUsages(it, typeParameterNameSet, annotationHolder, typeTextAttributesKey) }
         }
-        val stabBody = stabOperation.stabBody
-        stabBody?.let { highlightTypesAndTypeParameterUsages(it, typeParameterNameSet, annotationHolder, typeTextAttributesKey) }
+
+        stabOperation.stabBody?.let { highlightTypesAndTypeParameterUsages(it, typeParameterNameSet, annotationHolder, typeTextAttributesKey) }
     }
 
     private fun highlightTypesAndTypeParameterUsages(
@@ -830,6 +868,7 @@ class ModuleAttribute : Annotator, DumbAware {
             annotationHolder: AnnotationHolder,
             typeTextAttributesKey: TextAttributesKey) {
         val children = stabParenthesesSignature.children
+
         if (children.size == 1) {
             highlightTypesAndTypeParameterUsages(
                     children[0],
@@ -860,164 +899,168 @@ class ModuleAttribute : Annotator, DumbAware {
             typeParameterNameSet: Set<String?>,
             annotationHolder: AnnotationHolder,
             typeTextAttributesKey: TextAttributesKey) {
-        val leftOperand: PsiElement? = infix.leftOperand()
-        leftOperand?.let { highlightTypesAndTypeParameterUsages(it, typeParameterNameSet, annotationHolder, typeTextAttributesKey) }
-        val rightOperand: PsiElement? = infix.rightOperand()
-        rightOperand?.let { highlightTypesAndTypeParameterUsages(it, typeParameterNameSet, annotationHolder, typeTextAttributesKey) }
+        infix.leftOperand()?.let { highlightTypesAndTypeParameterUsages(it, typeParameterNameSet, annotationHolder, typeTextAttributesKey) }
+        infix.rightOperand()?.let { highlightTypesAndTypeParameterUsages(it, typeParameterNameSet, annotationHolder, typeTextAttributesKey) }
     }
 
     private fun highlightTypesAndTypeParameterUsages(psiElement: PsiElement,
                                                      typeParameterNameSet: Set<String?>,
                                                      annotationHolder: AnnotationHolder,
                                                      typeTextAttributesKey: TextAttributesKey) {
-        if (psiElement is Arguments) {
-            highlightTypesAndTypeParameterUsages(
-                    psiElement,
-                    typeParameterNameSet,
-                    annotationHolder,
-                    typeTextAttributesKey
-            )
-        } else if (psiElement is ElixirAccessExpression ||
-                psiElement is ElixirAssociationsBase ||
-                psiElement is ElixirAssociations ||
-                psiElement is ElixirContainerAssociationOperation ||
-                psiElement is ElixirKeywordPair ||
-                psiElement is ElixirKeywords ||
-                psiElement is ElixirList ||
-                psiElement is ElixirMapArguments ||
-                psiElement is ElixirMapConstructionArguments ||
-                psiElement is ElixirNoParenthesesArguments ||
-                psiElement is ElixirParentheticalStab ||
-                psiElement is ElixirStab ||
-                psiElement is ElixirStabBody ||
-                psiElement is ElixirStabNoParenthesesSignature ||
-                psiElement is ElixirTuple) {
-            highlightTypesAndTypeParameterUsages(
-                    psiElement.children,
-                    typeParameterNameSet,
-                    annotationHolder,
-                    typeTextAttributesKey
-            )
-        } else if (psiElement is ElixirDecimalFloat) {
-            highlightTypesAndTypeParameterUsages(
-                    psiElement,
-                    annotationHolder
-            )
-        } else if (psiElement is ElixirMapOperation) {
-            highlightTypesAndTypeParameterUsages(
-                    psiElement,
-                    typeParameterNameSet,
-                    annotationHolder,
-                    typeTextAttributesKey
-            )
-        } else if (psiElement is ElixirMapUpdateArguments) {
-            highlightTypesAndTypeParameterUsages(
-                    psiElement,
-                    typeParameterNameSet,
-                    annotationHolder,
-                    typeTextAttributesKey
-            )
-        } else if (psiElement is ElixirRelativeIdentifier ||
-                psiElement is UnqualifiedNoArgumentsCall<*>) {
-            // highlight entire element
-            val name = psiElement.text
-            val textAttributesKey: TextAttributesKey
-            textAttributesKey = if (typeParameterNameSet.contains(name)) {
-                ElixirSyntaxHighlighter.TYPE_PARAMETER
-            } else {
-                typeTextAttributesKey
+        when {
+            psiElement is Arguments -> {
+                highlightTypesAndTypeParameterUsages(
+                        psiElement,
+                        typeParameterNameSet,
+                        annotationHolder,
+                        typeTextAttributesKey
+                )
             }
-            highlight(psiElement.textRange, annotationHolder, textAttributesKey)
-        } else if (psiElement is ElixirStabParenthesesSignature) {
-            highlightTypesAndTypeParameterUsages(
-                    psiElement,
-                    typeParameterNameSet,
-                    annotationHolder,
+            psiElement is ElixirAccessExpression || psiElement is ElixirAssociationsBase || psiElement is ElixirAssociations || psiElement is ElixirContainerAssociationOperation || psiElement is ElixirKeywordPair || psiElement is ElixirKeywords || psiElement is ElixirList || psiElement is ElixirMapArguments || psiElement is ElixirMapConstructionArguments || psiElement is ElixirNoParenthesesArguments || psiElement is ElixirParentheticalStab || psiElement is ElixirStab || psiElement is ElixirStabBody || psiElement is ElixirStabNoParenthesesSignature || psiElement is ElixirTuple -> {
+                highlightTypesAndTypeParameterUsages(
+                        psiElement.children,
+                        typeParameterNameSet,
+                        annotationHolder,
+                        typeTextAttributesKey
+                )
+            }
+            psiElement is ElixirDecimalFloat -> {
+                highlightTypesAndTypeParameterUsages(
+                        psiElement,
+                        annotationHolder
+                )
+            }
+            psiElement is ElixirMapOperation -> {
+                highlightTypesAndTypeParameterUsages(
+                        psiElement,
+                        typeParameterNameSet,
+                        annotationHolder,
+                        typeTextAttributesKey
+                )
+            }
+            psiElement is ElixirMapUpdateArguments -> {
+                highlightTypesAndTypeParameterUsages(
+                        psiElement,
+                        typeParameterNameSet,
+                        annotationHolder,
+                        typeTextAttributesKey
+                )
+            }
+            psiElement is ElixirRelativeIdentifier || psiElement is UnqualifiedNoArgumentsCall<*> -> {
+                // highlight entire element
+                val name = psiElement.text
+                val textAttributesKey: TextAttributesKey
+                textAttributesKey = if (typeParameterNameSet.contains(name)) {
+                    ElixirSyntaxHighlighter.TYPE_PARAMETER
+                } else {
                     typeTextAttributesKey
-            )
-        } else if (psiElement is ElixirStabOperation) {
-            highlightTypesAndTypeParameterUsages(
-                    psiElement,
-                    typeParameterNameSet,
-                    annotationHolder,
-                    typeTextAttributesKey
-            )
-        } else if (psiElement is ElixirStructOperation) {
-            highlightTypesAndTypeParameterUsages(
-                    psiElement,
-                    typeParameterNameSet,
-                    annotationHolder,
-                    typeTextAttributesKey
-            )
-        } else if (psiElement is InterpolatedString) {
-            highlightTypeError(psiElement, "Strings aren't allowed in types", annotationHolder)
-        } else if (psiElement is Infix && psiElement !is When) {
-            highlightTypesAndTypeParameterUsages(
-                    psiElement,
-                    typeParameterNameSet,
-                    annotationHolder,
-                    typeTextAttributesKey
-            )
-        } else if (psiElement is QualifiedParenthesesCall<*>) {
-            highlightTypesAndTypeParameterUsages(
-                    psiElement,
-                    typeParameterNameSet,
-                    annotationHolder,
-                    typeTextAttributesKey
-            )
-        } else if (psiElement is QualifiedAlias) {
-            highlightTypesAndTypeParameterUsages(
-                    psiElement,
-                    typeParameterNameSet,
-                    annotationHolder,
-                    typeTextAttributesKey
-            )
-        } else if (psiElement is QualifiedNoArgumentsCall<*>) {
-            highlightTypesAndTypeParameterUsages(
-                    psiElement,
-                    typeParameterNameSet,
-                    annotationHolder,
-                    typeTextAttributesKey
-            )
-        } else if (psiElement is QualifiedNoParenthesesCall<*>) {
-            highlightTypesAndTypeParameterUsages(
-                    psiElement,
-                    typeParameterNameSet,
-                    annotationHolder,
-                    typeTextAttributesKey
-            )
-        } else if (psiElement is UnqualifiedNoParenthesesCall<*>) {
-            highlightTypesAndTypeParameterUsages(
-                    psiElement,
-                    typeParameterNameSet,
-                    annotationHolder,
-                    typeTextAttributesKey
-            )
-        } else if (psiElement is UnqualifiedParenthesesCall<*>) {
-            highlightTypesAndTypeParameterUsages(
-                    psiElement,
-                    typeParameterNameSet,
-                    annotationHolder,
-                    typeTextAttributesKey
-            )
-        } else if (!( /* Occurs in the case of typing a {@code @type name ::} above a {@code @doc <HEREDOC>} and the
+                }
+                highlight(psiElement.textRange, annotationHolder, textAttributesKey)
+            }
+            psiElement is ElixirStabParenthesesSignature -> {
+                highlightTypesAndTypeParameterUsages(
+                        psiElement,
+                        typeParameterNameSet,
+                        annotationHolder,
+                        typeTextAttributesKey
+                )
+            }
+            psiElement is ElixirStabOperation -> {
+                highlightTypesAndTypeParameterUsages(
+                        psiElement,
+                        typeParameterNameSet,
+                        annotationHolder,
+                        typeTextAttributesKey
+                )
+            }
+            psiElement is ElixirStructOperation -> {
+                highlightTypesAndTypeParameterUsages(
+                        psiElement,
+                        typeParameterNameSet,
+                        annotationHolder,
+                        typeTextAttributesKey
+                )
+            }
+            psiElement is InterpolatedString -> {
+                highlightTypeError(psiElement, "Strings aren't allowed in types", annotationHolder)
+            }
+            psiElement is Infix && psiElement !is When -> {
+                highlightTypesAndTypeParameterUsages(
+                        psiElement,
+                        typeParameterNameSet,
+                        annotationHolder,
+                        typeTextAttributesKey
+                )
+            }
+            psiElement is QualifiedParenthesesCall<*> -> {
+                highlightTypesAndTypeParameterUsages(
+                        psiElement,
+                        typeParameterNameSet,
+                        annotationHolder,
+                        typeTextAttributesKey
+                )
+            }
+            psiElement is QualifiedAlias -> {
+                highlightTypesAndTypeParameterUsages(
+                        psiElement,
+                        typeParameterNameSet,
+                        annotationHolder,
+                        typeTextAttributesKey
+                )
+            }
+            psiElement is QualifiedNoArgumentsCall<*> -> {
+                highlightTypesAndTypeParameterUsages(
+                        psiElement,
+                        typeParameterNameSet,
+                        annotationHolder,
+                        typeTextAttributesKey
+                )
+            }
+            psiElement is QualifiedNoParenthesesCall<*> -> {
+                highlightTypesAndTypeParameterUsages(
+                        psiElement,
+                        typeParameterNameSet,
+                        annotationHolder,
+                        typeTextAttributesKey
+                )
+            }
+            psiElement is UnqualifiedNoParenthesesCall<*> -> {
+                highlightTypesAndTypeParameterUsages(
+                        psiElement,
+                        typeParameterNameSet,
+                        annotationHolder,
+                        typeTextAttributesKey
+                )
+            }
+            psiElement is UnqualifiedParenthesesCall<*> -> {
+                highlightTypesAndTypeParameterUsages(
+                        psiElement,
+                        typeParameterNameSet,
+                        annotationHolder,
+                        typeTextAttributesKey
+                )
+            }
+            else -> {
+                if (!( /* Occurs in the case of typing a {@code @type name ::} above a {@code @doc <HEREDOC>} and the
                    {@code @doc <HEREDOC>} is interpreted as the right-operand of {@code ::} */psiElement is AtUnqualifiedNoParenthesesCall<*> ||  // leave normal highlighting
-                        psiElement is BracketOperation ||
-                        psiElement is ElixirAlias ||
-                        psiElement is ElixirAtom ||
-                        psiElement is ElixirAtomKeyword ||
-                        psiElement is ElixirBitString ||
-                        psiElement is ElixirCharListLine ||
-                        psiElement is ElixirCharToken ||
-                        psiElement is ElixirDecimalWholeNumber ||
-                        psiElement is ElixirKeywordKey ||  /* happens when :: is typed in `@spec` above function clause that uses `do:` */
-                        psiElement is ElixirNoParenthesesKeywords ||
-                        psiElement is ElixirUnaryNumericOperation ||
-                        psiElement is ElixirMatchedUnaryOperation ||
-                        psiElement is ElixirVariable ||
-                        psiElement is ElixirUnmatchedUnaryOperation ||
-                        psiElement is When)) {
-            cannotHighlightTypes(psiElement)
+                                psiElement is BracketOperation ||
+                                psiElement is ElixirAlias ||
+                                psiElement is ElixirAtom ||
+                                psiElement is ElixirAtomKeyword ||
+                                psiElement is ElixirBitString ||
+                                psiElement is ElixirCharListLine ||
+                                psiElement is ElixirCharToken ||
+                                psiElement is ElixirDecimalWholeNumber ||
+                                psiElement is ElixirKeywordKey ||  /* happens when :: is typed in `@spec` above function clause that uses `do:` */
+                                psiElement is ElixirNoParenthesesKeywords ||
+                                psiElement is ElixirUnaryNumericOperation ||
+                                psiElement is ElixirMatchedUnaryOperation ||
+                                psiElement is ElixirVariable ||
+                                psiElement is ElixirUnmatchedUnaryOperation ||
+                                psiElement is When)) {
+                    cannotHighlightTypes(psiElement)
+                }
+            }
         }
     }
 
@@ -1027,7 +1070,7 @@ class ModuleAttribute : Annotator, DumbAware {
             annotationHolder: AnnotationHolder,
             textAttributesKey: TextAttributesKey) {
         for (psiElement in psiElements) {
-            psiElement?.let { highlightTypesAndTypeParameterUsages(it, typeParameterNameSet, annotationHolder, textAttributesKey) }
+            highlightTypesAndTypeParameterUsages(psiElement, typeParameterNameSet, annotationHolder, textAttributesKey)
         }
     }
 
@@ -1116,8 +1159,7 @@ class ModuleAttribute : Annotator, DumbAware {
                 annotationHolder,
                 textAttributesKey
         )
-        val secondaryArguments = qualifiedParenthesesCall.secondaryArguments()
-        secondaryArguments?.let { highlightTypesAndTypeParameterUsages(it, typeParameterNameSet, annotationHolder, textAttributesKey) }
+        qualifiedParenthesesCall.secondaryArguments()?.let { highlightTypesAndTypeParameterUsages(it, typeParameterNameSet, annotationHolder, textAttributesKey) }
     }
 
     private fun highlightTypesAndTypeParameterUsages(
@@ -1126,6 +1168,7 @@ class ModuleAttribute : Annotator, DumbAware {
             annotationHolder: AnnotationHolder,
             typeTextAttributesKey: TextAttributesKey) {
         val functionNameElement = unqualifiedNoParenthesesCall.functionNameElement()
+
         if (functionNameElement != null) {
             highlight(functionNameElement.textRange, annotationHolder, typeTextAttributesKey)
             highlightTypesAndTypeParameterUsages(
@@ -1146,6 +1189,7 @@ class ModuleAttribute : Annotator, DumbAware {
             typeTextAttributesKey: TextAttributesKey) {
         if (!unqualifiedParenthesesCall.isCalling(Module.KERNEL, Function.UNQUOTE, 1)) {
             val functionNameElement = unqualifiedParenthesesCall.functionNameElement()
+
             if (functionNameElement != null) {
                 highlight(functionNameElement.textRange, annotationHolder, typeTextAttributesKey)
                 highlightTypesAndTypeParameterUsages(
@@ -1154,84 +1198,70 @@ class ModuleAttribute : Annotator, DumbAware {
                         annotationHolder,
                         typeTextAttributesKey
                 )
-                val secondaryArguments = unqualifiedParenthesesCall.secondaryArguments()
-                secondaryArguments?.let { highlightTypesAndTypeParameterUsages(it, typeParameterNameSet, annotationHolder, typeTextAttributesKey) }
+                unqualifiedParenthesesCall.secondaryArguments()?.let { highlightTypesAndTypeParameterUsages(it, typeParameterNameSet, annotationHolder, typeTextAttributesKey) }
             } else {
                 error("Cannot highlight types and type parameter usages", unqualifiedParenthesesCall)
             }
         }
     }
 
-    private fun specificationTypeParameterNameSet(keywordPair: ElixirKeywordPair): Set<String?> {
-        return setOf(keywordPair.keywordKey.text)
-    }
+    private fun specificationTypeParameterNameSet(keywordPair: ElixirKeywordPair): Set<String?> =
+            setOf(keywordPair.keywordKey.text)
 
-    private fun specificationTypeParameterNameSet(noParenthesesKeywordPair: ElixirNoParenthesesKeywordPair): Set<String?> {
-        return setOf(noParenthesesKeywordPair.keywordKey.text)
-    }
+    private fun specificationTypeParameterNameSet(noParenthesesKeywordPair: ElixirNoParenthesesKeywordPair): Set<String?> =
+            setOf(noParenthesesKeywordPair.keywordKey.text)
 
     /**
      * A type operator is an error, keyword pairs should be used for `when type: definition` for expression-local types,
      * but using `::` is a common error, so support it.
      */
-    private fun specificationTypeParameterNameSet(type: Type): Set<String?> {
-        val leftOperand: PsiElement? = type.leftOperand()
-        val typeParameterNameSet: Set<String?>
-        typeParameterNameSet = if (leftOperand != null) {
-            setOf(leftOperand.text)
-        } else {
-            error("Type does not have a left operand", type)
-            emptySet<String>()
-        }
-        return typeParameterNameSet
-    }
+    private fun specificationTypeParameterNameSet(type: Type): Set<String?> =
+            type.leftOperand()?.let {
+                setOf(it.text)
+            } ?: let {
+                error("Type does not have a left operand", type)
+                emptySet<String>()
+            }
 
-    private fun specificationTypeParameterNameSet(psiElement: PsiElement): Set<String?> {
-        val parameterNameSet: Set<String?>
-        parameterNameSet = if (psiElement is ElixirAccessExpression ||
-                psiElement is ElixirKeywords ||
-                psiElement is ElixirList ||
-                psiElement is ElixirNoParenthesesKeywords) {
-            specificationTypeParameterNameSet(psiElement.children)
-        } else if (psiElement is ElixirKeywordPair) {
-            specificationTypeParameterNameSet(psiElement)
-        } else if (psiElement is Type) {
-            specificationTypeParameterNameSet(psiElement)
-        } else if (psiElement is ElixirNoParenthesesKeywordPair) {
-            specificationTypeParameterNameSet(psiElement)
-        } else if (psiElement is UnqualifiedNoArgumentsCall<*>) {
-            specificationTypeParameterNameSet(psiElement)
-        } else if (psiElement is UnqualifiedNoParenthesesCall<*>) {
-            specificationTypeParameterNameSet(psiElement)
-        } else {
-            error("Cannot extract specification type parameter name set", psiElement)
-            emptySet<String>()
-        }
-        return parameterNameSet
-    }
+    private fun specificationTypeParameterNameSet(psiElement: PsiElement): Set<String?> =
+            when (psiElement) {
+                is ElixirAccessExpression, is ElixirKeywords, is ElixirList, is ElixirNoParenthesesKeywords -> {
+                    specificationTypeParameterNameSet(psiElement.children)
+                }
+                is ElixirKeywordPair -> {
+                    specificationTypeParameterNameSet(psiElement)
+                }
+                is Type -> {
+                    specificationTypeParameterNameSet(psiElement)
+                }
+                is ElixirNoParenthesesKeywordPair -> {
+                    specificationTypeParameterNameSet(psiElement)
+                }
+                is UnqualifiedNoArgumentsCall<*> -> {
+                    specificationTypeParameterNameSet(psiElement)
+                }
+                is UnqualifiedNoParenthesesCall<*> -> {
+                    specificationTypeParameterNameSet(psiElement)
+                }
+                else -> {
+                    error("Cannot extract specification type parameter name set", psiElement)
+                    emptySet<String>()
+                }
+            }
 
-    private fun specificationTypeParameterNameSet(psiElements: Array<PsiElement>): Set<String?> {
-        val accumulatedTypeParameterNameSet: MutableSet<String?> = HashSet()
-        for (psiElement in psiElements) {
-            accumulatedTypeParameterNameSet.addAll(specificationTypeParameterNameSet(psiElement))
-        }
-        return accumulatedTypeParameterNameSet
-    }
+    private fun specificationTypeParameterNameSet(psiElements: Array<PsiElement>): Set<String?> =
+            psiElements.flatMapTo(mutableSetOf<String?>()) {
+                specificationTypeParameterNameSet(it)
+            }
 
     /**
      * Occurs temporarily while typing before `:` in KeywordPairs after the `when`, such as in
      * `@spec foo(id) :: id when id` before finishing typing `@spec foo(id) :: id when id: String.t`.
      */
-    private fun specificationTypeParameterNameSet(unqualifiedNoArgumentsCall: UnqualifiedNoArgumentsCall<*>): Set<String?> {
-        val name = unqualifiedNoArgumentsCall.functionName()
-        val nameSet: Set<String?>
-        nameSet = if (name != null) {
-            setOf(unqualifiedNoArgumentsCall.functionName())
-        } else {
-            emptySet<String>()
-        }
-        return nameSet
-    }
+    private fun specificationTypeParameterNameSet(unqualifiedNoArgumentsCall: UnqualifiedNoArgumentsCall<*>): Set<String?> =
+            unqualifiedNoArgumentsCall.functionName()?.let {
+                setOf(it)
+            } ?: emptySet<String>()
 
     private fun specificationTypeParameterNameSet(
             unqualifiedNoParenthesesCall: UnqualifiedNoParenthesesCall<*>
@@ -1247,18 +1277,17 @@ class ModuleAttribute : Annotator, DumbAware {
     }
 
     /**
-     * Assume bare aliases are incorrectly capitalized type parameters, say from someone's that used to generics
+     * Assume bare aliases are incorrectly capitalized type parameters, say from someone's that's used to generics
      * in Java.
      *
      * See https://github.com/KronicDeth/intellij-elixir/issues/694
      */
-    private fun typeTypeParameterNameSet(alias: ElixirAlias): Set<String> {
-        return setOf(alias.name)
-    }
+    private fun typeTypeParameterNameSet(alias: ElixirAlias): Set<String> = setOf(alias.name)
 
     private fun typeTypeParameterNameSet(tuple: ElixirTuple): Set<String> {
         var typeParameterNameSet: Set<String>? = null
         val children = tuple.children
+
         if (children.size == 3) {
             val firstChild = children[0]
             if (firstChild is UnqualifiedNoArgumentsCall<*>) {
@@ -1271,39 +1300,41 @@ class ModuleAttribute : Annotator, DumbAware {
                 }
             }
         }
+
         if (typeParameterNameSet == null) {
             error("Cannot extract type type parameter name set", tuple)
             typeParameterNameSet = emptySet()
         }
+
         return typeParameterNameSet
     }
 
-    private fun typeTypeParameterNameSet(psiElement: PsiElement): Set<String?> {
-        val typeParameterNameSet: Set<String?>
-        typeParameterNameSet = if (psiElement is ElixirAccessExpression) {
-            typeTypeParameterNameSet(psiElement.getChildren())
-        } else if (psiElement is ElixirAlias) {
-            /* Assume bare aliases are incorrectly capitalized type parameters, say from someone's that used to generics
-               in Java.
+    private fun typeTypeParameterNameSet(psiElement: PsiElement): Set<String?> =
+            when (psiElement) {
+                is ElixirAccessExpression -> {
+                    typeTypeParameterNameSet(psiElement.getChildren())
+                }
+                is ElixirAlias -> {
+                    /* Assume bare aliases are incorrectly capitalized type parameters, say from someone's that used to generics
+                       in Java.
 
-               See https://github.com/KronicDeth/intellij-elixir/issues/694 */
-            typeTypeParameterNameSet(psiElement)
-        } else if (psiElement is ElixirTuple) {
-            typeTypeParameterNameSet(psiElement)
-        } else if (psiElement is ElixirUnmatchedUnqualifiedNoArgumentsCall) {
-            setOf(psiElement.getText())
-        } else {
-            error("Cannot extract type type parameter name set", psiElement)
-            emptySet<String>()
-        }
-        return typeParameterNameSet
-    }
+                       See https://github.com/KronicDeth/intellij-elixir/issues/694 */
+                    typeTypeParameterNameSet(psiElement)
+                }
+                is ElixirTuple -> {
+                    typeTypeParameterNameSet(psiElement)
+                }
+                is ElixirUnmatchedUnqualifiedNoArgumentsCall -> {
+                    setOf(psiElement.getText())
+                }
+                else -> {
+                    error("Cannot extract type type parameter name set", psiElement)
+                    emptySet<String>()
+                }
+            }
 
-    private fun typeTypeParameterNameSet(psiElements: Array<PsiElement>): Set<String?> {
-        val typeParameterNameSet: MutableSet<String?> = HashSet()
-        for (psiElement in psiElements) {
-            typeParameterNameSet.addAll(typeTypeParameterNameSet(psiElement))
-        }
-        return typeParameterNameSet
-    }
+    private fun typeTypeParameterNameSet(psiElements: Array<PsiElement>): Set<String?> =
+            psiElements.flatMapTo(mutableSetOf()) {
+                typeTypeParameterNameSet(it)
+            }
 }
