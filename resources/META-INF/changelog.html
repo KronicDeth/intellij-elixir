@@ -1,5 +1,39 @@
 <html>
 <body>
+<h1>v11.7.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>Convert <code>annotator.ModuleAttribute</code> to Kotlin
+        <ul>
+          <li>Apply optional Kotlin transformations.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>
+        <p>Check if at least one resolution for module attribute references is valid</p>
+        <p>
+          Previously, it was checked if module attributes resolved to exactly one declaration, but this is no longer
+          true with the looser reference resolution that allows invalid results for PisPolyVariantReference.
+          <code>resolve()</code> will return <code>null</code> when there is more than one result from
+          <code>multiResolve</code> even if some are invalid, so we need to explicitly check if the
+          <code>PsiReference</code> is a <code>PsiPolyVariantReference</code> and if so check if any are valid.
+        </p>
+      </li>
+      <li>
+        <p>Fix deprecation warnings for <code>annotator.ModuleAttribute</code>.</p>
+      </li>
+      <li>
+        <p>Quick fixes for inlinables in <code>annotator.ModuleAttribute</code>.</p>
+      </li>
+    </ul>
+  </li>
+</ul>
 <h1>v11.6.1</h1>
 <ul>
   <li>
@@ -1384,113 +1418,6 @@ Probably constructor should be marked as NonInjectable. [Plugin: org.elixir_lang
         Drop support for IntelliJ IDEA before 2017.3 as they lack the <code>TerminalExecutionConsole</code> used to run
         <code>iex</code> in a PTY.
       </li>
-    </ul>
-  </li>
-</ul>
-<h1>v7.5.0</h1>
-<ul>
-  <li>
-    <p>Enhancements</p>
-    <ul>
-      <li>
-        Refactor <code>ElixirPsiImplUtil</code> into separate files tied to specific classes or interfaces to shrink its
-        size.
-      </li>
-      <li>
-        Complete <code>#{</code> with <code>}</code>.
-      </li>
-      <li>Read Write Accessor Detector
-        <ul>
-          <li>
-            Variable/Parameter declarations/rebindings are highlighted as writes while other usages are highlighted as
-            reads.
-          </li>
-        </ul>
-      </li>
-      <li>Improved Find &amp; Show Usages
-        <ul>
-          <li>Added Find &amp; Show Usages for Functions at declaration and usage site
-            <ul>
-              <li>Multi-clause functions use all clauses as targets and find usages of all clauses.</li>
-            </ul>
-          </li>
-          <li>Improved Find &amp; Show Usages for Modules/Aliases</li>
-        </ul>
-      </li>
-      <li>Improved Element Descriptions
-        <ul>
-          <li>
-            It is easier to distinguish <code>alias</code>es and the <code>defmodule</code> that is being aliased
-            because element description now include <code>alias</code> or <code>defmodule</code> before the Alias name
-            based on how the Alias is defined in the scope.
-          </li>
-          <li>
-            Call definitions use the same presentation for Structure View and Find Usages, so that Compile/Runtime time
-            icons, and visibility are the same in both.
-          </li>
-        </ul>
-      </li>
-      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/1091">#1091</a>.</li>
-      <li>
-        Add regression tests for <a href="https://github.com/KronicDeth/intellij-elixir/issues/1116">#1116</a> that test
-        that parameter and variables can be renamed.
-      </li>
-      <li>
-        Update IntelliJ versions in build matrix to include <code>2018.1</code> and latest patch version of other
-        versions.
-      </li>
-      <li>Add Elixir 1.6.X to build matrix</li>
-      <li>Update grammar and quoter to match native 1.6 behavior when SDK is &gt;= 1.6.</li>
-      <li>New default SDK level is 1.7 to handle builds from <code>master</code>.</li>
-      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/1105">#1105</a></li>
-    </ul>
-  </li>
-  <li>
-    <p>Bug Fixes</p>
-    <ul>
-      <li>
-        Certain <code>.beam</code> files in the OTP source are purposely invalid, so ignore them when trying to parse
-        and don't log the expected error.
-      </li>
-      <li>Log available bytes and total size when header is not <code>FOR1</code>.</li>
-      <li>
-        <code>erl_abstract_code</code> format <code>Dbgi</code> chunks can now be navigated similar to how
-        <code>elixir_erl</code> format Dbgi chunks can be navigated.  Instead of converting the
-        <a href="http://erlang.org/doc/apps/erts/absform.html" rel="nofollow">Erlang Abstract Code</a> back to Erlang,
-        which would not be highlighted if <a href="https://github.com/ignatov/intellij-erlang">intellij-erlang</a> and
-        requires the user to know Erlang, the Erlang Abstract Code is translated back to Elixir source, so you can use
-        the <code>Dbgi</code> chunk view to translate Erlang to Elixir.
-      </li>
-      <li>Allow zero or more new lines after the struct name before the opening curly brace (<code>{</code>).</li>
-      <li>
-        <p>
-          In order to prevent <code>Access is allowed from event dispatch thread only</code> errors when creating
-          read-only code editor in subtabs of the BEAM Chunks editor, only create those editors when their parent tab is
-          selected.
-        </p>
-        <p>Affected tabs:</p>
-        <ul>
-          <li>Code (Elixir &amp; Erlang)</li>
-          <li>ExDc</li>
-          <li>Dbgi (Elixir &amp; Erlang)</li>
-        </ul>
-      </li>
-      <li>
-        Check for suffix instead of full match to detect predefined macros when annotating.  Location strings have
-        become more complex, such as including the file path for root level modules, so the old exact matching on the
-        module name no longer works.
-      </li>
-      <li>
-        Restore parameter and variable rename.  It broke because the changes to make Find Usages work and have Go To
-        Declaration default to Find Usage when there is only one target disabled the default selected element code that
-        the <code>VariableInplaceRenameHandler</code> used.
-      </li>
-      <li>
-        Allow module attribute declaration to resolve to itself, so that unused module attributes don't say they can't
-        find the declaration.
-      </li>
-      <li>Restore rename module attributes.</li>
-      <li>Allow <code>true</code> and <code>false</code> to be keyword keys.</li>
     </ul>
   </li>
 </ul>
