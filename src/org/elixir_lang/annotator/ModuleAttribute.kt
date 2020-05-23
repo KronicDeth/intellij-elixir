@@ -2,6 +2,7 @@ package org.elixir_lang.annotator
 
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
+import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.editor.markup.TextAttributes
@@ -120,7 +121,10 @@ class ModuleAttribute : Annotator, DumbAware {
                                     }
 
                                     if (!hasValidResults) {
-                                        holder.createErrorAnnotation(atNonNumericOperation, "Unresolved module attribute")
+                                        holder
+                                                .newAnnotation(HighlightSeverity.ERROR,  "Unresolved module attribute")
+                                                .range(atNonNumericOperation)
+                                                .create()
                                     }
                                 }
                             }
@@ -149,8 +153,17 @@ class ModuleAttribute : Annotator, DumbAware {
      * @param textAttributesKey text attributes to apply to the `node`.
      */
     private fun highlight(textRange: TextRange, annotationHolder: AnnotationHolder, textAttributesKey: TextAttributesKey) {
-        annotationHolder.createInfoAnnotation(textRange, null).enforcedTextAttributes = TextAttributes.ERASE_MARKER
-        annotationHolder.createInfoAnnotation(textRange, null).enforcedTextAttributes = EditorColorsManager.getInstance().globalScheme.getAttributes(textAttributesKey)
+        annotationHolder
+                .newSilentAnnotation(HighlightSeverity.INFORMATION)
+                .enforcedTextAttributes(TextAttributes.ERASE_MARKER)
+                .range(textRange)
+                .create()
+
+        annotationHolder
+                .newSilentAnnotation(HighlightSeverity.INFORMATION)
+                .enforcedTextAttributes(EditorColorsManager.getInstance().globalScheme.getAttributes(textAttributesKey))
+                .range(textRange)
+                .create()
     }
 
     private fun highlightCallback(atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>,
@@ -179,9 +192,10 @@ class ModuleAttribute : Annotator, DumbAware {
                         val text = greatGrandChild.text
 
                         if (text == "false") {
-                            holder.createWeakWarningAnnotation(
-                                    greatGrandChild,
-                                    "Will make documented invisible to the documentation extraction tools like ExDoc.")
+                            holder
+                                    .newAnnotation(HighlightSeverity.WEAK_WARNING, "Will make documented invisible to the documentation extraction tools like ExDoc.")
+                                    .range(greatGrandChild)
+                                    .create()
                         }
                     }
                     is Heredoc -> {
@@ -386,7 +400,7 @@ class ModuleAttribute : Annotator, DumbAware {
     private fun highlightTypeError(element: PsiElement,
                                    message: String,
                                    annotationHolder: AnnotationHolder) {
-        annotationHolder.createErrorAnnotation(element, message)
+        annotationHolder.newAnnotation(HighlightSeverity.ERROR, message).range(element).create()
     }
 
     private fun highlightTypeLeftOperand(call: ElixirMatchedUnqualifiedParenthesesCall,
