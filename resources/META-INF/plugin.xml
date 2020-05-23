@@ -4,7 +4,7 @@
   <vendor email="Kronic.Deth@gmail.com">Luke Imhoff</vendor>
 
   <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-  <idea-version since-build="192.4820"/>
+  <idea-version since-build="201.3119"/>
 
   <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
        on how to target different products -->
