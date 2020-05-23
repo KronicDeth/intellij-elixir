@@ -227,6 +227,8 @@
     Previously, it was checked if module attributes resolved to exactly one declaration, but this is no longer true with the looser reference resolution that allows invalid results for PisPolyVariantReference.  `resolve()` will return `null` when there is more than one result from `multiResolve` even if some are invalid, so we need to explicitly check if the `PsiReference` is a `PsiPolyVariantReference` and if so check if any are valid.
   * Fix deprecation warnings for `annotator.ModuleAttribute`.
   * Quick fixes for inlinables in `annotator.ModuleAttribute`.
+* [#1774](https://github.com/KronicDeth/intellij-elixir/pull/1774) - [@odk211](https://github.com/odk211)
+  * Fix `iex` and `erl` arguments not being saved for IEx Mix Run Configurations.
   
 ## v11.6.1
 ### Bug Fixes

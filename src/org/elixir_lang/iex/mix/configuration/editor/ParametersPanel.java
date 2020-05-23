@@ -4,7 +4,7 @@ import com.intellij.execution.ui.CommonProgramParametersPanel;
 import com.intellij.openapi.ui.LabeledComponent;
 import com.intellij.ui.RawCommandLineEditor;
 import com.intellij.util.ui.UIUtil;
-import org.elixir_lang.iex.Configuration;
+import org.elixir_lang.iex.mix.Configuration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
