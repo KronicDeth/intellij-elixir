@@ -8,6 +8,7 @@ import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.PsiRecursiveElementVisitor
 import com.intellij.psi.tree.TokenSet
 import org.elixir_lang.ElixirSyntaxHighlighter
@@ -113,7 +114,12 @@ class ModuleAttribute : Annotator, DumbAware {
 
                             if (!isNonReferencing(atNonNumericOperation)) {
                                 atNonNumericOperation.reference?.let { reference ->
-                                    if (reference.resolve() == null) {
+                                    val hasValidResults = when (reference) {
+                                        is PsiPolyVariantReference -> reference.multiResolve(false).any { it.isValidResult }
+                                        else -> reference.resolve() != null
+                                    }
+
+                                    if (!hasValidResults) {
                                         holder.createErrorAnnotation(atNonNumericOperation, "Unresolved module attribute")
                                     }
                                 }
