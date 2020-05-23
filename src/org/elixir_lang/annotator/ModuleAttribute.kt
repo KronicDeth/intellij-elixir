@@ -171,8 +171,7 @@ class ModuleAttribute : Annotator, DumbAware {
         highlightSpecification(
                 atUnqualifiedNoParenthesesCall,
                 annotationHolder,
-                ElixirSyntaxHighlighter.CALLBACK,
-                ElixirSyntaxHighlighter.TYPE
+                ElixirSyntaxHighlighter.CALLBACK
         )
     }
 
@@ -206,8 +205,7 @@ class ModuleAttribute : Annotator, DumbAware {
                             highlightFragments(
                                     greatGrandChild,
                                     body,
-                                    holder,
-                                    ElixirSyntaxHighlighter.DOCUMENTATION_TEXT
+                                    holder
                             )
                         }
                     }
@@ -216,8 +214,7 @@ class ModuleAttribute : Annotator, DumbAware {
                         highlightFragments(
                                 greatGrandChild,
                                 body,
-                                holder,
-                                ElixirSyntaxHighlighter.DOCUMENTATION_TEXT
+                                holder
                         )
                     }
                 }
@@ -231,12 +228,10 @@ class ModuleAttribute : Annotator, DumbAware {
      * @param fragmented        supplies fragment type
      * @param body              contains fragments
      * @param annotationHolder  the container which receives annotations created by the plugin.
-     * @param textAttributesKey text attributes to apply to the fragments.
      */
     private fun highlightFragments(fragmented: Fragmented,
                                    body: Body,
-                                   annotationHolder: AnnotationHolder,
-                                   textAttributesKey: TextAttributesKey) {
+                                   annotationHolder: AnnotationHolder) {
         val bodyNode = body.node
         val fragmentNodes = bodyNode.getChildren(
                 TokenSet.create(fragmented.fragmentType)
@@ -245,7 +240,7 @@ class ModuleAttribute : Annotator, DumbAware {
             highlight(
                     fragmentNode.textRange,
                     annotationHolder,
-                    textAttributesKey
+                    ElixirSyntaxHighlighter.DOCUMENTATION_TEXT
             )
         }
     }
@@ -258,8 +253,7 @@ class ModuleAttribute : Annotator, DumbAware {
         highlightSpecification(
                 atUnqualifiedNoParenthesesCall,
                 annotationHolder,
-                ElixirSyntaxHighlighter.SPECIFICATION,
-                ElixirSyntaxHighlighter.TYPE
+                ElixirSyntaxHighlighter.SPECIFICATION
         )
     }
 
@@ -281,15 +275,14 @@ class ModuleAttribute : Annotator, DumbAware {
                     var typeParameterNameSet: Set<String?> = emptySet<String>()
 
                     if (leftOperand is Call) {
-                        val call = leftOperand
-                        highlightTypeName(call, annotationHolder)
-                        if (call is ElixirMatchedUnqualifiedParenthesesCall) {
+                        highlightTypeName(leftOperand, annotationHolder)
+                        if (leftOperand is ElixirMatchedUnqualifiedParenthesesCall) {
                             typeParameterNameSet = highlightTypeLeftOperand(
-                                    call,
+                                    leftOperand,
                                     annotationHolder
                             )
-                        } else if (call !is ElixirMatchedUnqualifiedNoArgumentsCall) {
-                            cannotHighlightTypes(call)
+                        } else if (leftOperand !is ElixirMatchedUnqualifiedNoArgumentsCall) {
+                            cannotHighlightTypes(leftOperand)
                         }
                     } else {
                         cannotHighlightTypes(leftOperand)
@@ -310,10 +303,8 @@ class ModuleAttribute : Annotator, DumbAware {
                 }
                 is ElixirMatchedUnqualifiedParenthesesCall -> {
                     // seen as `unquote(ast)`, but could also be just the beginning of typing
-                    val matchedUnqualifiedParenthesesCall = grandChild
-
-                    if (Function.UNQUOTE == matchedUnqualifiedParenthesesCall.functionName()) {
-                        matchedUnqualifiedParenthesesCall.secondaryArguments()?.let { secondaryArguments ->
+                    if (Function.UNQUOTE == grandChild.functionName()) {
+                        grandChild.secondaryArguments()?.let { secondaryArguments ->
                             val typeParameterNameSet = typeTypeParameterNameSet(secondaryArguments)
                             highlightTypesAndTypeTypeParameterDeclarations(
                                     secondaryArguments,
@@ -530,13 +521,10 @@ class ModuleAttribute : Annotator, DumbAware {
      *
      * @param leftMostFunctionNameTextAttributesKey      the [ElixirSyntaxHighlighter] [TextAttributesKey] for the
      * name of the callback, type, or function being declared
-     * @param leftMostFunctionArgumentsTextAttributesKey the [ElixirSyntaxHighlighter] [TextAttributesKey] for the
-     * arguments of the callback, type, or function being declared
      */
     private fun highlightSpecification(atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>,
                                        annotationHolder: AnnotationHolder,
-                                       leftMostFunctionNameTextAttributesKey: TextAttributesKey,
-                                       leftMostFunctionArgumentsTextAttributesKey: TextAttributesKey) {
+                                       leftMostFunctionNameTextAttributesKey: TextAttributesKey) {
         val noParenthesesOneArgument: PsiElement = atUnqualifiedNoParenthesesCall.noParenthesesOneArgument
 
         noParenthesesOneArgument.children.singleOrNull()?.let { grandChild ->
@@ -557,7 +545,7 @@ class ModuleAttribute : Annotator, DumbAware {
                         highlightTypesAndTypeParameterUsages(
                                 primaryArguments, emptySet<String>(),
                                 annotationHolder,
-                                leftMostFunctionArgumentsTextAttributesKey
+                                ElixirSyntaxHighlighter.TYPE
                         )
                     }
 
@@ -565,7 +553,7 @@ class ModuleAttribute : Annotator, DumbAware {
                         highlightTypesAndTypeParameterUsages(
                                 secondaryArguments, emptySet<String>(),
                                 annotationHolder,
-                                leftMostFunctionArgumentsTextAttributesKey
+                                ElixirSyntaxHighlighter.TYPE
                         )
                     }
                 }
@@ -578,17 +566,13 @@ class ModuleAttribute : Annotator, DumbAware {
                     )
                 }
             } else if (grandChild is ElixirMatchedWhenOperation) {
-                val matchedWhenOperation = grandChild
-                val rightOperand: PsiElement? = matchedWhenOperation.rightOperand()
+                val rightOperand: PsiElement? = grandChild.rightOperand()
                 val typeParameterNameSet: Set<String?>
                 typeParameterNameSet = rightOperand?.let { specificationTypeParameterNameSet(it) } ?: emptySet<String>()
-                val leftOperand: PsiElement? = matchedWhenOperation.leftOperand()
 
-                when (leftOperand) {
+                when (val leftOperand: PsiElement? = grandChild.leftOperand()) {
                     is Type -> {
-                        val typeOperation = leftOperand
-
-                        typeOperation.leftOperand()?.let { typeOperationLeftOperand ->
+                        leftOperand.leftOperand()?.let { typeOperationLeftOperand ->
                             val strippedTypeOperationLeftOperand = stripAllOuterParentheses(typeOperationLeftOperand)
 
                             if (strippedTypeOperationLeftOperand is Call) {
@@ -604,7 +588,7 @@ class ModuleAttribute : Annotator, DumbAware {
                             }
                         }
 
-                        typeOperation.rightOperand()?.let { matchedTypeOperationRightOperand ->
+                        leftOperand.rightOperand()?.let { matchedTypeOperationRightOperand ->
                             highlightTypesAndTypeParameterUsages(
                                     matchedTypeOperationRightOperand,
                                     typeParameterNameSet,
@@ -742,8 +726,7 @@ class ModuleAttribute : Annotator, DumbAware {
                 highlightTypesAndSpecificationTypeParameterDeclarations(
                         psiElement,
                         typeParameterNameSet,
-                        annotationHolder,
-                        typeTextAttributesKey
+                        annotationHolder
                 )
             }
             is UnqualifiedNoParenthesesCall<*> -> {
@@ -774,8 +757,7 @@ class ModuleAttribute : Annotator, DumbAware {
     private fun highlightTypesAndSpecificationTypeParameterDeclarations(
             unqualifiedNoArgumentsCall: UnqualifiedNoArgumentsCall<*>,
             typeParameterNameSet: Set<String?>,
-            annotationHolder: AnnotationHolder,
-            textAttributesKey: TextAttributesKey) {
+            annotationHolder: AnnotationHolder) {
         if (typeParameterNameSet.contains(unqualifiedNoArgumentsCall.functionName())) {
             val functionNameElement = unqualifiedNoArgumentsCall.functionNameElement()
             highlight(
@@ -1270,7 +1252,7 @@ class ModuleAttribute : Annotator, DumbAware {
             }
 
     private fun specificationTypeParameterNameSet(psiElements: Array<PsiElement>): Set<String?> =
-            psiElements.flatMapTo(mutableSetOf<String?>()) {
+            psiElements.flatMapTo(mutableSetOf()) {
                 specificationTypeParameterNameSet(it)
             }
 
