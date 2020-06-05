@@ -222,6 +222,8 @@
   * Fix Unchecking Show Method Separator still showing on `@doc` and `@spec`.
   
     Previously, unchecking Show Method Separator would still show the method separator if it was the module attributes (such as `@doc` and `@spec`) associated with the call definition (`def`, `defp`, `defmacro`, or `defmacrop`) and only disabled the ones directly above the call definition.  This is fixed by checking if method separators are enabled in `getLineMarkerInfo(PsiElement)` instead of the specialized `getLineMarkerInfo(Call)`, so that the check happens for both module attributes and call definitions.
+* [#1786](https://github.com/KronicDeth/intellij-elixir/pull/1786) - [@odk211](https://github.com/odk211)
+  * Remove "Unresolved module attribute" error annotation because module attributes cannot be resolved through `use` yet, so current annotation is a false positive in those cases.
 
 ## v11.7.0
 ### Enhancements

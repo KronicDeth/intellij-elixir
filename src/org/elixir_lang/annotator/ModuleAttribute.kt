@@ -9,7 +9,6 @@ import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.PsiRecursiveElementVisitor
 import com.intellij.psi.tree.TokenSet
 import org.elixir_lang.ElixirSyntaxHighlighter
@@ -25,7 +24,6 @@ import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.operation.*
 import org.elixir_lang.reference.ModuleAttribute.Companion.isCallbackName
 import org.elixir_lang.reference.ModuleAttribute.Companion.isDocumentationName
-import org.elixir_lang.reference.ModuleAttribute.Companion.isNonReferencing
 import org.elixir_lang.reference.ModuleAttribute.Companion.isSpecificationName
 import org.elixir_lang.reference.ModuleAttribute.Companion.isTypeName
 import org.elixir_lang.structure_view.element.CallDefinitionHead.Companion.stripAllOuterParentheses
@@ -112,22 +110,6 @@ class ModuleAttribute : Annotator, DumbAware {
                                     holder,
                                     ElixirSyntaxHighlighter.MODULE_ATTRIBUTE
                             )
-
-                            if (!isNonReferencing(atNonNumericOperation)) {
-                                atNonNumericOperation.reference?.let { reference ->
-                                    val hasValidResults = when (reference) {
-                                        is PsiPolyVariantReference -> reference.multiResolve(false).any { it.isValidResult }
-                                        else -> reference.resolve() != null
-                                    }
-
-                                    if (!hasValidResults) {
-                                        holder
-                                                .newAnnotation(HighlightSeverity.ERROR,  "Unresolved module attribute")
-                                                .range(atNonNumericOperation)
-                                                .create()
-                                    }
-                                }
-                            }
                         }
                     }
             )
