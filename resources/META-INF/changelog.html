@@ -1,5 +1,24 @@
 <html>
 <body>
+<h1>v11.7.1</h1>
+<ul>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>
+        <p>Fix Unchecking Show Method Separator still showing on <code>@doc</code> and <code>@spec</code>.</p>
+        <p>
+          Previously, unchecking Show Method Separator would still show the method separator if it was the module
+          attributes (such as <code>@doc</code> and <code>@spec</code>) associated with the call definition
+          (<code>def</code>, <code>defp</code>, <code>defmacro</code>, or <code>defmacrop</code>) and only disabled the
+          ones directly above the call definition.  This is fixed by checking if method separators are enabled in
+          <code>getLineMarkerInfo(PsiElement)</code> instead of the specialized <code>getLineMarkerInfo(Call)</code>, so
+          that the check happens for both module attributes and call definitions.
+        </p>
+      </li>
+    </ul>
+  </li>
+</ul>
 <h1>v11.7.0</h1>
 <ul>
   <li>
