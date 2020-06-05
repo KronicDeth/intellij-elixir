@@ -16,6 +16,10 @@
           that the check happens for both module attributes and call definitions.
         </p>
       </li>
+      <li>
+        Remove "Unresolved module attribute" error annotation because module attributes cannot be resolved through
+        <code>use</code> yet, so current annotation is a false positive in those cases.
+      </li>
     </ul>
   </li>
 </ul>
