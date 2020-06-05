@@ -26,10 +26,14 @@ class CallDefinition : LineMarkerProvider {
     override fun collectSlowLineMarkers(elements: List<PsiElement>, result: Collection<LineMarkerInfo<*>>) {}
 
     override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<*>? =
-            when (element) {
-                is AtUnqualifiedNoParenthesesCall<*> -> getLineMarkerInfo(element)
-                is Call -> getLineMarkerInfo(element)
-                else -> null
+            if (daemonCodeAnalyzerSettings.SHOW_METHOD_SEPARATORS) {
+                when (element) {
+                    is AtUnqualifiedNoParenthesesCall<*> -> getLineMarkerInfo(element)
+                    is Call -> getLineMarkerInfo(element)
+                    else -> null
+                }
+            } else {
+                null
             }
 
     private val daemonCodeAnalyzerSettings: DaemonCodeAnalyzerSettings = DaemonCodeAnalyzerSettings.getInstance()
@@ -181,7 +185,7 @@ class CallDefinition : LineMarkerProvider {
     private fun getLineMarkerInfo(call: Call): LineMarkerInfo<*>? {
         var lineMarkerInfo: LineMarkerInfo<*>? = null
 
-        if (daemonCodeAnalyzerSettings.SHOW_METHOD_SEPARATORS && CallDefinitionClause.`is`(call)) {
+        if (CallDefinitionClause.`is`(call)) {
             val previousCallDefinitionClause = siblingCallDefinitionClause(call, PREVIOUS_SIBLING)
             var firstClause: Boolean
 
