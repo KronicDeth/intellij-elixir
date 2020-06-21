@@ -4,7 +4,6 @@ import com.intellij.lang.documentation.DocumentationProvider
 import com.intellij.psi.PsiElement
 import org.elixir_lang.jps.sdk_type.Elixir
 import org.elixir_lang.psi.*
-import org.elixir_lang.psi.impl.getModuleName
 import org.elixir_lang.psi.impl.isOutermostQualifiableAlias
 import org.elixir_lang.sdk.elixir.Type
 import org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor
@@ -55,16 +54,22 @@ class ElixirDocumentationProvider : DocumentationProvider {
                 return HelpArguments(element.resolvedModuleName(), element.name, element.resolvedPrimaryArity())
             }
             is ElixirMatchedQualifiedNoArgumentsCall -> {
-                return element.getModuleName()?.let { HelpArguments(it, element.name, element.resolvedPrimaryArity()) }
+                return HelpArguments(element.resolvedModuleName(), element.name, element.resolvedPrimaryArity())
             }
             is ElixirUnmatchedQualifiedNoArgumentsCall -> {
-                return element.getModuleName()?.let { HelpArguments(it, element.name, element.resolvedPrimaryArity()) }
+                return HelpArguments(element.resolvedModuleName(), element.name, element.resolvedPrimaryArity())
             }
             is ElixirMatchedUnqualifiedParenthesesCall -> {
-                return element.getModuleName()?.let { HelpArguments(it, element.name, element.resolvedPrimaryArity()) }
+                return HelpArguments(element.resolvedModuleName(), element.name, element.resolvedPrimaryArity())
             }
             is ElixirUnmatchedUnqualifiedParenthesesCall -> {
-                return element.getModuleName()?.let { HelpArguments(it, element.name, element.resolvedPrimaryArity()) }
+                return HelpArguments(element.resolvedModuleName(), element.name, element.resolvedPrimaryArity())
+            }
+            is ElixirMatchedQualifiedParenthesesCall -> {
+                return HelpArguments(element.resolvedModuleName(), element.name, element.resolvedPrimaryArity())
+            }
+            is ElixirMatchedUnqualifiedNoParenthesesCall -> {
+                return HelpArguments(element.resolvedModuleName(), element.name, element.resolvedPrimaryArity())
             }
             else -> return null
         }
