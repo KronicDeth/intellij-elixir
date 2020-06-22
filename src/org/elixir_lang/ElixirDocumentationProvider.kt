@@ -1,6 +1,7 @@
 package org.elixir_lang
 
 import com.intellij.lang.documentation.DocumentationProvider
+import com.intellij.openapi.module.Module
 import com.intellij.psi.PsiElement
 import org.elixir_lang.jps.sdk_type.Elixir
 import org.elixir_lang.psi.*
@@ -9,6 +10,7 @@ import org.elixir_lang.sdk.elixir.Type
 import org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor
 import org.intellij.markdown.html.HtmlGenerator
 import org.intellij.markdown.parser.MarkdownParser
+import org.jetbrains.annotations.NotNull
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
@@ -28,7 +30,10 @@ class ElixirDocumentationProvider : DocumentationProvider {
             return null
         }
 
-        val sdkPath = Type.getSdkPath(element.project).toString()
+        val sdkPath = Type.mostSpecificSdk(element)?.homePath.toString()
+        if (sdkPath.isBlank())
+            return "Please configure Elixir SDK first";
+
         val iexExecutable = Elixir.getIExExecutable(sdkPath).absolutePath
         val projectBasePath = element.project.basePath ?: return null
         return fetchDocumentation(projectBasePath, iexExecutable, helpArguments.moduleName, helpArguments.functionName, helpArguments.arity)
