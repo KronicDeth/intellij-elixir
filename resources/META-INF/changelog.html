@@ -20,6 +20,11 @@
         Remove "Unresolved module attribute" error annotation because module attributes cannot be resolved through
         <code>use</code> yet, so current annotation is a false positive in those cases.
       </li>
+      <li>
+        Use <code>SimpleTemplateLanguageFormattingModelBuilder</code> for EEx files, so that the
+        <code>TemplateDataLanguage</code> (i.e. <code>html</code> when the extension is <code>.html.eex</code>)
+        formatter is used instead of the Elixir formatter.
+      </li>
     </ul>
   </li>
 </ul>
