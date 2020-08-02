@@ -149,6 +149,7 @@ task testCompilation(type: Test, group: 'Verification', dependsOn: [classes, tes
 
 repositories {
   maven { url 'http://dl.bintray.com/jetbrains/intellij-plugin-service' }
+  maven { url 'https://dl.bintray.com/jetbrains/markdown' }
   maven { url 'https://maven-central.storage.googleapis.com' }
   mavenCentral()
 }
@@ -158,6 +159,7 @@ dependencies {
   compile project('jps-shared')
   compile group: 'org.erlang.otp', name: 'jinterface', version: '1.6.1'
   compile group: 'commons-io', name: 'commons-io', version: '2.5'
+  implementation 'org.jetbrains:markdown:0.1.42'
 
   testCompile group: 'org.mockito', name: 'mockito-core', version: '2.2.9'
   testCompile group: 'org.objenesis', name: 'objenesis', version: '2.4'
