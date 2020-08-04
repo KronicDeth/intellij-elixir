@@ -30,11 +30,12 @@ public class TestFinder implements com.intellij.testIntegration.TestFinder {
                                                         @NotNull Function<String, String> correspondingName,
                                                         @NotNull Condition<Call> correspondingCallCondition) {
         Call sourceElement = sourceElement(element);
-        Collection<PsiElement> correspondingCollection = new ArrayList<PsiElement>();
+        Collection<PsiElement> correspondingCollection = new ArrayList<>();
 
-        if (sourceElement != null && sourceElement instanceof StubBased) {
+        if (sourceElement instanceof StubBased) {
+            @SuppressWarnings("rawtypes")
             StubBased sourceStubBased = (StubBased) sourceElement;
-            @SuppressWarnings("unchecked") Set<String> canonicalNameSet = sourceStubBased.canonicalNameSet();
+            Set<String> canonicalNameSet = sourceStubBased.canonicalNameSet();
 
             if (!canonicalNameSet.isEmpty()) {
                 Project project = element.getProject();
@@ -122,18 +123,8 @@ public class TestFinder implements com.intellij.testIntegration.TestFinder {
     public Collection<PsiElement> findTestsForClass(@NotNull PsiElement element) {
         return corresponding(
                 element,
-                new Function<String, String>() {
-                    @Override
-                    public String fun(@NotNull String canonicalName) {
-                        return canonicalName + TEST_SUFFIX;
-                    }
-                },
-                new Condition<Call>() {
-                    @Override
-                    public boolean value(Call call) {
-                        return Module.Companion.is(call);
-                    }
-                }
+                canonicalName -> canonicalName + TEST_SUFFIX,
+                Module.Companion::is
         );
     }
 
@@ -142,36 +133,36 @@ public class TestFinder implements com.intellij.testIntegration.TestFinder {
     public Collection<PsiElement> findClassesForTest(@NotNull PsiElement element) {
         return corresponding(
                 element,
-                new Function<String, String>() {
-                    @Override
-                    public String fun(String canonicalName) {
-                        String correspondingCanonicalName = null;
+                canonicalName -> {
+                    String correspondingCanonicalName = null;
 
-                        if (canonicalName.endsWith(TEST_SUFFIX)) {
-                            correspondingCanonicalName =
-                                    canonicalName.substring(0, canonicalName.length() - TEST_SUFFIX.length());
-                        }
-
-                        return correspondingCanonicalName;
+                    if (canonicalName.endsWith(TEST_SUFFIX)) {
+                        correspondingCanonicalName =
+                                canonicalName.substring(0, canonicalName.length() - TEST_SUFFIX.length());
                     }
+
+                    return correspondingCanonicalName;
                 },
-                new Condition<Call>() {
-                    @Override
-                    public boolean value(Call call) {
-                        return isModular(call);
-                    }
-                }
+                TestFinder::isModular
         );
     }
 
     @Override
     public boolean isTest(@NotNull PsiElement element) {
-        Call sourceElement = findSourceElement(element);
+        return isTestElement(element);
+    }
+
+    /**
+     * Check if the given element is a test or not.
+     */
+    public static boolean isTestElement(@NotNull PsiElement element) {
+        Call sourceElement = sourceElement(element);
         boolean isTest = false;
 
-        if (sourceElement != null && sourceElement instanceof StubBased) {
+        if (sourceElement instanceof StubBased) {
+            @SuppressWarnings("rawtypes")
             StubBased sourceStubBased = (StubBased) sourceElement;
-            @SuppressWarnings("unchecked") Set<String> canonicalNameSet = sourceStubBased.canonicalNameSet();
+            Set<String> canonicalNameSet = sourceStubBased.canonicalNameSet();
 
             if (!canonicalNameSet.isEmpty()) {
                 for (String canonicalName : canonicalNameSet) {

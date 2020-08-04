@@ -221,6 +221,8 @@
 ### Enhancements
 * [#1792](https://github.com/KronicDeth/intellij-elixir/pull/1792) - [@marcindawidziuk](https://github.com/marcindawidziuk)
   * Quick documentation (F1/Ctrl+Q)
+* [#1807](https://github.com/KronicDeth/intellij-elixir/pull/1807) - [@niknetniko](https://github.com/niknetniko)
+  * Run Icons in gutter next to ExUnit tests.  The icon changes to the state of the test: green for passing and red for failing. 
 
 ### Bug Fixes
 * [#1788](https://github.com/KronicDeth/intellij-elixir/pull/1788) - [@KronicDeth](https://github.com/KronicDeth)

@@ -28,7 +28,7 @@ class MixExUnitRunConfigurationProducer :
             } == true
 }
 
-private const val SUFFIX = "_test.exs"
+const val SUFFIX = "_test.exs"
 private const val UNKNOWN_LINE = -1
 
 private fun configurationName(file: PsiFileSystemItem,
@@ -71,7 +71,7 @@ private fun isConfigurationFromContextImpl(configuration: Configuration, psiElem
             contextConfiguration.workingDirectory == configuration.workingDirectory
 }
 
-private fun lineNumber(psiElement: PsiElement): Int {
+fun lineNumber(psiElement: PsiElement): Int {
     val containingFile = psiElement.containingFile
     val documentLineNumber = PsiDocumentManager
             .getInstance(containingFile.project)
