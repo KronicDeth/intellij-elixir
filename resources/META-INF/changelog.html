@@ -1,7 +1,17 @@
 <html>
 <body>
-<h1>v11.7.1</h1>
+<h1>v11.8.0</h1>
 <ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>Quick documentation (F1/Ctrl+Q)</li>
+      <li>
+        Run Icons in gutter next to ExUnit tests.  The icon changes to the state of the test: green for passing and
+        red for failing.
+      </li>
+    </ul>
+  </li>
   <li>
     <p>Bug Fixes</p>
     <ul>
@@ -19,6 +29,11 @@
       <li>
         Remove "Unresolved module attribute" error annotation because module attributes cannot be resolved through
         <code>use</code> yet, so current annotation is a false positive in those cases.
+      </li>
+      <li>
+        Use <code>SimpleTemplateLanguageFormattingModelBuilder</code> for EEx files, so that the
+        <code>TemplateDataLanguage</code> (i.e. <code>html</code> when the extension is <code>.html.eex</code>)
+        formatter is used instead of the Elixir formatter.
       </li>
     </ul>
   </li>

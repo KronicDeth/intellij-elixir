@@ -171,7 +171,11 @@
     <!-- formatting -->
     <codeStyleSettingsProvider implementation="org.elixir_lang.formatter.settings.CodeStyleSettingsProvider"/>
     <lang.formatter language="Elixir" implementationClass="org.elixir_lang.formatting.ModelBuilder"/>
+    <lang.formatter language="EEx" implementationClass="com.intellij.psi.templateLanguages.SimpleTemplateLanguageFormattingModelBuilder"/>
     <langCodeStyleSettingsProvider implementation="org.elixir_lang.formatter.settings.LanguageCodeStyleSettingsProvider"/>
+
+    <!-- test -->
+    <runLineMarkerContributor language="Elixir" implementationClass="org.elixir_lang.exunit.ExUnitLineMarkerProvider"/>
 
     <lang.parserDefinition language="Elixir" implementationClass="org.elixir_lang.ElixirParserDefinition"/>
     <lang.psiStructureViewFactory language="Elixir" implementationClass="org.elixir_lang.structure_view.Factory"/>
@@ -219,6 +223,7 @@
     <xdebugger.breakpointType implementation="org.elixir_lang.debugger.line_breakpoint.Type"/>
     <xdebugger.settings implementation="org.elixir_lang.debugger.Settings"/>
 
+    <lang.documentationProvider implementationClass="org.elixir_lang.ElixirDocumentationProvider" language="Elixir"/>
   </extensions>
 
   <application-components>
