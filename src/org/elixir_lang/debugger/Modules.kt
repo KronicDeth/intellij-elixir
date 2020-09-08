@@ -35,7 +35,7 @@ object Modules {
                         listOf("-eval", "'Elixir.Code:require_file(\"${file.path}\")'")
                     } + if (mix) {
                 emptyList()
-            } else {
+            } else  {
                 listOf("-eval", "'Elixir.IntelliJElixir.Debugged:start()'")
             }
 }
