@@ -157,7 +157,7 @@ repositories {
 dependencies {
   compile project('jps-builder')
   compile project('jps-shared')
-  compile group: 'org.erlang.otp', name: 'jinterface', version: '1.6.1'
+  compile files('lib/OtpErlang.jar')
   compile group: 'commons-io', name: 'commons-io', version: '2.5'
   implementation 'org.jetbrains:markdown:0.1.42'
 
