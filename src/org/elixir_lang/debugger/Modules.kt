@@ -32,7 +32,7 @@ object Modules {
     fun erlArgumentList(mix: Boolean = false): List<String> =
             listOf("-eval", "application:ensure_all_started(elixir)") +
                     copy(mix).flatMap { file ->
-                        listOf("-eval", "'Elixir.Code':require_file(<<\"${file.path}\">>)")
+                        listOf("-eval", "'Elixir.Code':require_file(<<\"${file.path.replace("\\", "\\\\")}\">>)")
                     } + if (mix) {
                 emptyList()
             } else {
