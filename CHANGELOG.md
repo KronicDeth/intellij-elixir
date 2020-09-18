@@ -224,6 +224,8 @@
 * [#1822](https://github.com/KronicDeth/intellij-elixir/pull/1822) - [@KronicDeth](https://github.com/KronicDeth)
   * Vendor JInterface 1.11 to support `BIG_CREATION` when debugging.
     The JInterface on Maven Central has stopped being updated because [the OTP Team didn't actually maintain it](https://bugs.erlang.org/browse/ERL-928?focusedCommentId=16521&page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-16521), that was Basho, and Basho is gone now.  This version of JInterface, 1.11, is from Erlang 23.0.4 from Homebrew, but with the formula edited (`brew edit erlang`) to add `--with-java` and then built with `brew install erlang --build-from-source`.
+* [#1823](https://github.com/KronicDeth/intellij-elixir/pull/1823) - [@KronicDeth](https://github.com/KronicDeth)
+  * On Windows, the `file.path` to the debugger server files has `\`, but they aren't escaped.  Therefore, replace them with escaped version, `\\` to fix debugging on Windows, but leave Linux and macOS unaffected.
 
 ## v11.8.0
 ### Enhancements

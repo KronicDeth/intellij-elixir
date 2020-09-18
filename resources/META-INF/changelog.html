@@ -14,6 +14,11 @@
         Homebrew, but with the formula edited (<code>brew edit erlang</code>) to add <code>--with-java</code> and then
         built with <code>brew install erlang --build-from-source</code>.
       </li>
+      <li>
+        On Windows, the <code>file.path</code> to the debugger server files has <code>\</code>, but they aren't escaped.
+        Therefore, replace them with escaped version, <code>\\</code> to fix debugging on Windows, but leave Linux and
+        macOS unaffected.
+      </li>
     </ul>
   </li>
 </ul>
