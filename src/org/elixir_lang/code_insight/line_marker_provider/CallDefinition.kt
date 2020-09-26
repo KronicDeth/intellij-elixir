@@ -23,9 +23,7 @@ import org.elixir_lang.structure_view.element.CallDefinitionSpecification.Compan
 import org.elixir_lang.structure_view.element.CallDefinitionSpecification.Companion.specificationType
 
 class CallDefinition : LineMarkerProvider {
-    override fun collectSlowLineMarkers(elements: List<PsiElement>, result: Collection<LineMarkerInfo<*>>) {}
-
-    override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<*>? =
+   override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<*>? =
             if (daemonCodeAnalyzerSettings.SHOW_METHOD_SEPARATORS) {
                 when (element) {
                     is AtUnqualifiedNoParenthesesCall<*> -> getLineMarkerInfo(element)

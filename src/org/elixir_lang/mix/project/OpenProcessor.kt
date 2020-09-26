@@ -10,7 +10,7 @@ import org.elixir_lang.mix.project._import.Builder
  * Created by zyuyou on 15/7/1.
  */
 class OpenProcessor : ProjectOpenProcessorBase<Builder>() {
-    override fun getSupportedExtensions(): Array<String> = arrayOf("mix.exs")
+    override val supportedExtensions = arrayOf("mix.exs")
 
     override fun doGetBuilder(): Builder = ProjectImportBuilder.EXTENSIONS_POINT_NAME.findExtensionOrFail(Builder::class.java)
 
