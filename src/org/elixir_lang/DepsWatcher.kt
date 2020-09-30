@@ -1,8 +1,6 @@
 package org.elixir_lang
 
-import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.components.ProjectComponent
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.module.ModuleUtil
 import com.intellij.openapi.progress.ProgressIndicator
@@ -15,9 +13,10 @@ import com.intellij.openapi.roots.libraries.Library
 import com.intellij.openapi.roots.libraries.LibraryTable
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.openapi.vfs.VirtualFileEvent
-import com.intellij.openapi.vfs.VirtualFileListener
-import com.intellij.openapi.vfs.VirtualFileManager
+import com.intellij.openapi.vfs.newvfs.BulkFileListener
+import com.intellij.openapi.vfs.newvfs.events.VFileCreateEvent
+import com.intellij.openapi.vfs.newvfs.events.VFileDeleteEvent
+import com.intellij.openapi.vfs.newvfs.events.VFileEvent
 import org.elixir_lang.mix.Watcher
 import org.elixir_lang.mix.library.Kind
 import java.net.URI
@@ -28,14 +27,15 @@ import java.net.URI
  * * `deps/APPLICATION/{c_src,lib,priv,src}` - sources
  * * `_build/ENVIRONMENT/{consolidated,lib/APPLICATION/ebin` - classes
  */
-class DepsWatcher(
-        private val project: Project,
-        private val moduleManager: ModuleManager,
-        private val virtualFileManager: VirtualFileManager
-) :
-        ProjectComponent, Disposable, VirtualFileListener {
-    override fun initComponent() {
-        virtualFileManager.addVirtualFileListener(this, this)
+class DepsWatcher(val project: Project) : BulkFileListener {
+
+    override fun after(events: MutableList<out VFileEvent>) {
+        events.forEach { vFileEvent ->
+            when (vFileEvent) {
+                is VFileDeleteEvent -> fileDeleted(vFileEvent)
+                is VFileCreateEvent -> fileCreated(vFileEvent)
+            }
+        }
     }
 
     /**
@@ -46,10 +46,10 @@ class DepsWatcher(
      *
      * Other deletes cause syncs in [syncLibraries]
      */
-    override fun fileDeleted(event: VirtualFileEvent) {
-        if (event.parent == project.baseDir && event.fileName == "deps") {
+    private fun fileDeleted(event: VFileDeleteEvent) {
+        if (event.file.parent == project.baseDir && event.file.name == "deps") {
             deleteAllLibraries(event.file)
-        } else if (event.parent?.parent == project.baseDir && event.parent?.name == "deps") {
+        } else if (event.file.parent?.parent == project.baseDir && event.file.parent?.name == "deps") {
             deleteLibrary(event.file)
         } else {
             syncLibraries(event)
@@ -64,25 +64,23 @@ class DepsWatcher(
      *
      * Other creates cause syncs in [syncLibraries]
      */
-    override fun fileCreated(event: VirtualFileEvent) {
-        if (event.fileName == "deps" && event.parent == project.baseDir) {
+    private fun fileCreated(event: VFileCreateEvent) {
+        if (event.file?.name == "deps" && event.parent == project.baseDir) {
             ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Syncing Libraries in deps", true) {
                 override fun run(indicator: ProgressIndicator) {
-                    syncLibraries(event.file, indicator)
+                    syncLibraries(event.file!!, indicator)
                 }
             })
-        } else if (event.parent?.name == "deps" && event.parent?.parent == project.baseDir) {
-            ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Syncing Library in deps/${event.fileName}", true) {
+        } else if (event.parent.name == "deps" && event.parent.parent == project.baseDir) {
+            ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Syncing Library in deps/${event.file!!.name}", true) {
                 override fun run(indicator: ProgressIndicator) {
-                    syncLibrary(event.file, indicator)
+                    syncLibrary(event.file!!, indicator)
                 }
             })
         } else {
             syncLibraries(event)
         }
     }
-
-    override fun dispose() = disposeComponent()
 
     /**
      * Common syncs shared with [fileCreated] and [fileDeleted].
@@ -95,11 +93,14 @@ class DepsWatcher(
      * * `_build/ENVIRONMENT/lib/APPLICATION` - syncLibrary(deps/APPLICATION)
      * * `_build/ENVIRONMENT/lib/APPLICATION/ebin` - syncLibrary(deps/APPLICATION)
      */
-    private fun syncLibraries(event: VirtualFileEvent) {
-        val baseDir = project.baseDir
-        val fileName = event.fileName
+    private fun syncLibraries(event: VFileEvent) {
+        event.file?.let(this::syncLibraries)
+    }
 
-        event.parent?.let { parent ->
+    fun syncLibraries(virtualFile: VirtualFile) {
+        val fileName = virtualFile.name
+        virtualFile.parent?.let { parent ->
+            val baseDir = project.baseDir
             if (fileName == "_build" && parent == baseDir) {
                 ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Syncing Libraries in _build", true) {
                     override fun run(indicator: ProgressIndicator) {
@@ -176,7 +177,7 @@ class DepsWatcher(
                 }
             }
 
-            for (module in moduleManager.modules) {
+            for (module in ModuleManager.getInstance(project).modules) {
                 if (progressIndicator.isCanceled) {
                     break
                 }
@@ -295,7 +296,7 @@ class DepsWatcher(
 
                 urls.all { url ->
                     val uri = URI(url)
-                    val relativeURI  = prefixURI.relativize(uri)
+                    val relativeURI = prefixURI.relativize(uri)
 
                     !relativeURI.isAbsolute && !relativeURI.toString().startsWith("../")
                 }
@@ -325,6 +326,7 @@ class DepsWatcher(
             }
         }
     }
+
 }
 
 private val SOURCE_NAMES = arrayOf("c_src", "lib", "priv", "src")
