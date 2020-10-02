@@ -226,14 +226,9 @@
     <lang.documentationProvider implementationClass="org.elixir_lang.ElixirDocumentationProvider" language="Elixir"/>
   </extensions>
 
-  <module-components>
-    <component>
-      <implementation-class>org.elixir_lang.mix.Watcher</implementation-class>
-    </component>
-  </module-components>
-
   <projectListeners>
     <listener class="org.elixir_lang.DepsWatcher" topic="com.intellij.openapi.vfs.newvfs.BulkFileListener"/>
+    <listener class="org.elixir_lang.mix.Watcher" topic="com.intellij.openapi.vfs.newvfs.BulkFileListener"/>
   </projectListeners>
 
   <actions>

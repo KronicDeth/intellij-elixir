@@ -81,7 +81,7 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
                                 break
                             }
 
-                            module.getComponent(Watcher::class.java).syncLibraries(progressIndicator)
+                            Watcher(otpAppProject).syncLibraries(module, progressIndicator)
                         }
                     }
                 })

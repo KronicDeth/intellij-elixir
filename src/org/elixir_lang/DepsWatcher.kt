@@ -28,7 +28,6 @@ import java.net.URI
  * * `_build/ENVIRONMENT/{consolidated,lib/APPLICATION/ebin` - classes
  */
 class DepsWatcher(val project: Project) : BulkFileListener {
-
     override fun after(events: MutableList<out VFileEvent>) {
         events.forEach { vFileEvent ->
             when (vFileEvent) {
@@ -182,7 +181,7 @@ class DepsWatcher(val project: Project) : BulkFileListener {
                     break
                 }
 
-                module.getComponent(Watcher::class.java).syncLibraries(progressIndicator)
+                Watcher(project).syncLibraries(module, progressIndicator)
             }
         }
     }
