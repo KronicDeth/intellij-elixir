@@ -1,19 +1,11 @@
 package org.elixir_lang.inspection
 
-import com.intellij.ProjectTopics
-import com.intellij.facet.Facet
-import com.intellij.facet.FacetManager
-import com.intellij.facet.FacetManagerAdapter
-import com.intellij.facet.FacetManagerListener
 import com.intellij.ide.actions.ShowSettingsUtilImpl
 import com.intellij.openapi.fileEditor.FileEditor
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectBundle
-import com.intellij.openapi.roots.ModuleRootAdapter
-import com.intellij.openapi.roots.ModuleRootEvent
-import com.intellij.openapi.roots.ModuleRootListener
 import com.intellij.openapi.roots.ui.configuration.ProjectSettingsService
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VirtualFile
@@ -29,44 +21,25 @@ import org.elixir_lang.sdk.elixir.Type
 /**
  * https://github.com/ignatov/intellij-erlang/blob/master/src/org/intellij/erlang/inspection/SetupSDKNotificationProvider.java
  */
-class SetupSDKNotificationProvider(private val project: Project,
-                                   notifications: EditorNotifications):
-        EditorNotifications.Provider<EditorNotificationPanel>() {
-    init {
-        val connection = project.messageBus.connect(project)
-
-        connection.subscribe<ModuleRootListener>(ProjectTopics.PROJECT_ROOTS, object : ModuleRootAdapter() {
-            override fun rootsChanged(event: ModuleRootEvent) {
-                notifications.updateAllNotifications()
-            }
-        })
-        connection.subscribe<FacetManagerListener>(FacetManager.FACETS_TOPIC, object : FacetManagerAdapter() {
-            override fun facetConfigurationChanged(facet: Facet<*>) {
-                if (facet is org.elixir_lang.Facet) {
-                    notifications.updateAllNotifications()
-                }
-            }
-
-        })
-    }
-
+class SetupSDKNotificationProvider : EditorNotifications.Provider<EditorNotificationPanel>() {
     override fun getKey(): Key<EditorNotificationPanel> = KEY
 
-    override fun createNotificationPanel(virtualFile: VirtualFile, fileEditor: FileEditor): EditorNotificationPanel? {
-        var notificationPanel: EditorNotificationPanel? = null
-
-        if (virtualFile.fileType is ElixirFileType) {
-            val psiFile = PsiManager.getInstance(project).findFile(virtualFile)
-
-            if (psiFile != null &&
-                    psiFile.language === ElixirLanguage &&
-                    Type.mostSpecificSdk(psiFile) == null) {
-                notificationPanel = createPanel(project, psiFile)
+    override fun createNotificationPanel(virtualFile: VirtualFile, fileEditor: FileEditor, project: Project): EditorNotificationPanel? =
+            if (virtualFile.fileType is ElixirFileType) {
+                PsiManager
+                        .getInstance(project)
+                        .findFile(virtualFile)
+                        ?.let { psiFile ->
+                            if (psiFile.language === ElixirLanguage &&
+                                    Type.mostSpecificSdk(psiFile) == null) {
+                                createPanel(project, psiFile)
+                            } else {
+                                null
+                            }
+                        }
+            } else {
+                null
             }
-        }
-
-        return notificationPanel
-    }
 
     companion object {
         private val KEY = Key.create<EditorNotificationPanel>("Setup Elixir SDK")
@@ -92,7 +65,7 @@ class SetupSDKNotificationProvider(private val project: Project,
 
         private fun createSmallIDEFacetPanel(project: Project): EditorNotificationPanel {
             return EditorNotificationPanel().apply {
-                setText("Elixir Facet SDK is not defined")
+                text = "Elixir Facet SDK is not defined"
                 createActionLabel("Setup Elixir Facet SDK") {
                     showSmallIDEFacetSettings(project)
                 }
@@ -110,7 +83,7 @@ class SetupSDKNotificationProvider(private val project: Project,
 
         private fun createModulePanel(project: Project, module: Module): EditorNotificationPanel {
             return EditorNotificationPanel().apply {
-                setText("Elixir Module SDK is not defined")
+                text = "Elixir Module SDK is not defined"
                 createActionLabel("Setup Elixir Module SDK") {
                     showModuleSettings(project, module)
                 }
@@ -137,7 +110,7 @@ class SetupSDKNotificationProvider(private val project: Project,
 
         private fun createProjectPanel(project: Project): EditorNotificationPanel {
             return EditorNotificationPanel().apply {
-                setText(ProjectBundle.message("project.sdk.not.defined"))
+                text = ProjectBundle.message("project.sdk.not.defined")
                 createActionLabel(ProjectBundle.message("project.sdk.setup")) {
                     ProjectSettingsService.getInstance(project).chooseAndSetSdk()
                 }
