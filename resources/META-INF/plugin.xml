@@ -15,7 +15,7 @@
   <depends config-file="rich-platform-plugin.xml" optional="true">com.intellij.modules.java</depends>
 
   <extensionPoints>
-    <extensionPoint qualifiedName="org.elixir_lang.packageManager" interface="org.elixir_lang.PackageManager"/>
+    <extensionPoint qualifiedName="org.elixir_lang.packageManager" interface="org.elixir_lang.PackageManager" dynamic="true"/>
   </extensionPoints>
 
   <extensions defaultExtensionNs="org.elixir_lang">
