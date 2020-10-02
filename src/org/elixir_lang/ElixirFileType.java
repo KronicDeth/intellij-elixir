@@ -10,16 +10,15 @@ import javax.swing.*;
  */
 public class ElixirFileType extends LanguageFileType {
     public static final ElixirFileType INSTANCE = new ElixirFileType();
-    public static final ElixirScriptFileType SCRIPT = new ElixirScriptFileType();
 
-    private ElixirFileType() {
+    protected ElixirFileType() {
         super(ElixirLanguage.INSTANCE);
     }
 
     @NotNull
     @Override
     public String getName() {
-        return "Elixir file";
+        return "Elixir";
     }
 
     @NotNull
@@ -38,31 +37,5 @@ public class ElixirFileType extends LanguageFileType {
     @Override
     public Icon getIcon() {
         return Icons.FILE;
-    }
-
-    public static class ElixirScriptFileType extends ElixirFileType{
-        @NotNull
-        @Override
-        public String getName() {
-            return "Elixir Script";
-        }
-
-        @NotNull
-        @Override
-        public String getDescription() {
-            return "Elixir Script File";
-        }
-
-        @NotNull
-        @Override
-        public String getDefaultExtension() {
-            return "exs";
-        }
-
-        @NotNull
-        @Override
-        public Icon getIcon() {
-            return Icons.FILE;
-        }
     }
 }

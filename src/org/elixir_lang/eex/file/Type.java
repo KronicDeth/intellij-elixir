@@ -19,7 +19,7 @@ public class Type extends LanguageFileType implements TemplateLanguageFileType {
     private static final String DEFAULT_EXTENSION = "eex";
     public static final LanguageFileType INSTANCE = new Type();
 
-    private Type() {
+    protected Type() {
         this(Language.INSTANCE);
     }
 
@@ -73,13 +73,13 @@ public class Type extends LanguageFileType implements TemplateLanguageFileType {
     @NotNull
     @Override
     public String getName() {
-        return "EEx";
+        return "Embedded Elixir";
     }
 
     @NotNull
     @Override
     public String getDescription() {
-        return "Embedded Elixir";
+        return "Embedded Elixir file";
     }
 
     @NotNull

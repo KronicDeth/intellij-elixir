@@ -55,7 +55,8 @@
     <!-- EEX -->
     <!--<braceMatcher filetype="EEx" implementationClass="org.elixir_lang.eex.BraceMatcher"/>-->
     <fileType.fileViewProviderFactory filetype="EEx" implementationClass="org.elixir_lang.eex.file.view_provider.Factory"/>
-    <fileType name="(Live) Embedded Elixir" implementationClass="org.elixir_lang.eex.file.Type" fieldName="INSTANCE" language="EEx" extensions="eex;leex"/>
+    <fileType name="Embedded Elixir" implementationClass="org.elixir_lang.eex.file.Type" fieldName="INSTANCE" language="EEx" extensions="eex"/>
+    <fileType name="Live Embedded Elixir" implementationClass="org.elixir_lang.leex.file.Type" fieldName="INSTANCE" language="EEx" extensions="leex"/>
     <lang.fileViewProviderFactory language="EEx" implementationClass="org.elixir_lang.eex.file.view_provider.Factory"/>
     <lang.parserDefinition language="EEx" implementationClass="org.elixir_lang.eex.ParserDefinition"/>
     <!--<lang.psiStructureViewFactory language="EEx" implementationClass="org.elixir_lang.eex.PsiStructureViewFactory"/>-->
@@ -78,7 +79,8 @@
     <testFinder implementation="org.elixir_lang.mix.TestFinder"/>
 
     <colorSettingsPage implementation="org.elixir_lang.ElixirColorSettingsPage"/>
-    <fileTypeFactory implementation="org.elixir_lang.ElixirFileTypeFactory"/>
+    <fileType name="Elixir" implementationClass="org.elixir_lang.ElixirFileType" fieldName="INSTANCE" language="Elixir" extensions="ex"/>
+    <fileType name="Elixir Script" implementationClass="org.elixir_lang.ElixirScriptFileType" fieldName="INSTANCE" language="Elixir" extensions="exs"/>
     <filePropertyPusher implementation="org.elixir_lang.file.LevelPropertyPusher"/>
 
     <!-- Facet -->
@@ -134,13 +136,13 @@
     <filetype.decompiler filetype="BEAM" implementationClass="org.elixir_lang.beam.Decompiler"/>
     <fileType.fileViewProviderFactory filetype="BEAM" implementationClass="org.elixir_lang.beam.FileViewProviderFactory"/>
     <filetype.stubBuilder filetype="BEAM" implementationClass="org.elixir_lang.beam.StubBuilder"/>
-    <fileTypeFactory implementation="org.elixir_lang.beam.FileTypeFactory"/>
+    <fileType name="BEAM" implementationClass="org.elixir_lang.beam.FileType" fieldName="INSTANCE" language="BEAM" extensions="beam"/>
     <structureViewBuilder key="BEAM" factoryClass="org.elixir_lang.beam.StructureViewBuilderProvider"/>
     <stubElementTypeHolder class="org.elixir_lang.beam.psi.stubs.ModuleStubElementTypes"/>
     <syntaxHighlighter key="BEAM" factoryClass="org.elixir_lang.ElixirSyntaxHighlighterFactory"/>
 
     <!-- `.beam.asm` -->
-    <fileTypeFactory implementation="org.elixir_lang.beam.assembly.file.type.Factory"/>
+    <fileType name="BEAM Assembly" implementationClass="org.elixir_lang.beam.assembly.file.Type" fieldName="INSTANCE" language="BEAM.ASSEMBLY" extensions="beam.asm"/>
     <lang.parserDefinition implementationClass="org.elixir_lang.beam.assembly.ParserDefinition" language="BEAM.ASSEMBLY"/>
     <lang.syntaxHighlighterFactory implementationClass="org.elixir_lang.beam.assembly.syntax_highlighter.Factory" language="BEAM.ASSEMBLY"/>
 
