@@ -1,5 +1,6 @@
 package org.elixir_lang
 
+import com.intellij.ide.projectView.impl.ProjectRootsUtil.isModuleContentRoot
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.module.ModuleUtil
@@ -9,6 +10,7 @@ import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.OrderRootType
+import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.roots.libraries.Library
 import com.intellij.openapi.roots.libraries.LibraryTable
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
@@ -46,9 +48,9 @@ class DepsWatcher(val project: Project) : BulkFileListener {
      * Other deletes cause syncs in [syncLibraries]
      */
     private fun fileDeleted(event: VFileDeleteEvent) {
-        if (event.file.parent == project.baseDir && event.file.name == "deps") {
+        if (event.file.let { file -> file.name == "deps" && isModuleContentRoot(file.parent, project) }) {
             deleteAllLibraries(event.file)
-        } else if (event.file.parent?.parent == project.baseDir && event.file.parent?.name == "deps") {
+        } else if (event.file.parent?.let { parent -> parent.name == "deps" && isModuleContentRoot(parent.parent, project) } == true) {
             deleteLibrary(event.file)
         } else {
             syncLibraries(event)
@@ -64,20 +66,22 @@ class DepsWatcher(val project: Project) : BulkFileListener {
      * Other creates cause syncs in [syncLibraries]
      */
     private fun fileCreated(event: VFileCreateEvent) {
-        if (event.file?.name == "deps" && event.parent == project.baseDir) {
-            ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Syncing Libraries in deps", true) {
-                override fun run(indicator: ProgressIndicator) {
-                    syncLibraries(event.file!!, indicator)
-                }
-            })
-        } else if (event.parent.name == "deps" && event.parent.parent == project.baseDir) {
-            ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Syncing Library in deps/${event.file!!.name}", true) {
-                override fun run(indicator: ProgressIndicator) {
-                    syncLibrary(event.file!!, indicator)
-                }
-            })
-        } else {
-            syncLibraries(event)
+        event.file?.let { file ->
+            if (file.name == "deps" && isModuleContentRoot(event.parent, project)) {
+                ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Syncing Libraries in deps", true) {
+                    override fun run(indicator: ProgressIndicator) {
+                        syncLibraries(file, indicator)
+                    }
+                })
+            } else if (event.parent.let { parent -> parent.name == "deps" && isModuleContentRoot(parent.parent, project) }) {
+                ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Syncing Library in deps/${file.name}", true) {
+                    override fun run(indicator: ProgressIndicator) {
+                        syncLibrary(file, indicator)
+                    }
+                })
+            } else {
+                syncLibraries(file)
+            }
         }
     }
 
@@ -99,8 +103,7 @@ class DepsWatcher(val project: Project) : BulkFileListener {
     fun syncLibraries(virtualFile: VirtualFile) {
         val fileName = virtualFile.name
         virtualFile.parent?.let { parent ->
-            val baseDir = project.baseDir
-            if (fileName == "_build" && parent == baseDir) {
+            if (fileName == "_build" && isModuleContentRoot(parent, project)) {
                 ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Syncing Libraries in _build", true) {
                     override fun run(indicator: ProgressIndicator) {
                         syncLibraries(project, indicator)
@@ -108,7 +111,7 @@ class DepsWatcher(val project: Project) : BulkFileListener {
                 })
             } else {
                 parent.parent?.let { grandParent ->
-                    if (parent.name == "_build" && grandParent == baseDir) {
+                    if (parent.name == "_build" && isModuleContentRoot(grandParent, project)) {
                         ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Syncing Libraries in _build/$fileName", true) {
                             override fun run(indicator: ProgressIndicator) {
                                 syncLibraries(project, indicator)
@@ -116,13 +119,13 @@ class DepsWatcher(val project: Project) : BulkFileListener {
                         })
                     } else {
                         grandParent.parent?.let { greatGrandParent ->
-                            if (fileName in arrayOf("consolidated", "lib") && grandParent.name == "_build" && greatGrandParent == baseDir) {
+                            if (fileName in arrayOf("consolidated", "lib") && grandParent.name == "_build" && isModuleContentRoot(greatGrandParent, project)) {
                                 ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Syncing Libraries in _build/${parent.name}/$fileName", true) {
                                     override fun run(indicator: ProgressIndicator) {
                                         syncLibraries(project, indicator)
                                     }
                                 })
-                            } else if (fileName in SOURCE_NAMES && grandParent.name == "deps" && greatGrandParent == baseDir) {
+                            } else if (fileName in SOURCE_NAMES && grandParent.name == "deps" && isModuleContentRoot(greatGrandParent, project)) {
                                 ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Syncing Library in deps/${parent.name}", true) {
                                     override fun run(indicator: ProgressIndicator) {
                                         syncLibrary(parent, indicator)
@@ -130,22 +133,29 @@ class DepsWatcher(val project: Project) : BulkFileListener {
                                 })
                             } else {
                                 greatGrandParent.parent?.let { greatGreatGrandParent ->
-                                    if (parent.name == "lib" && greatGrandParent.name == "_build" && greatGreatGrandParent == baseDir) {
-                                        baseDir.findChild("deps")?.findChild(fileName)?.let {
-                                            ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Syncing Library in _build/${grandParent.name}/lib/$fileName", true) {
-                                                override fun run(indicator: ProgressIndicator) {
-                                                    syncLibrary(it, indicator)
+                                    if (parent.name == "lib" && greatGrandParent.name == "_build" && isModuleContentRoot(greatGreatGrandParent, project)) {
+                                        greatGreatGrandParent
+                                                .findChild("deps")
+                                                ?.findChild(fileName)
+                                                ?.let {
+                                                    ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Syncing Library in _build/${grandParent.name}/lib/$fileName", true) {
+                                                        override fun run(indicator: ProgressIndicator) {
+                                                            syncLibrary(it, indicator)
+                                                        }
+                                                    })
                                                 }
-                                            })
-                                        }
-                                    } else if (fileName == "ebin" && grandParent.name == "lib" && greatGreatGrandParent.name == "_build" && greatGreatGrandParent.parent == baseDir) {
-                                        baseDir.findChild("deps")?.findChild(parent.name)?.let {
-                                            ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Syncing Library in _build/lib/${parent.name}/ebin", true) {
-                                                override fun run(indicator: ProgressIndicator) {
-                                                    syncLibrary(it, indicator)
+                                    } else if (fileName == "ebin" && grandParent.name == "lib" && greatGreatGrandParent.name == "_build" && isModuleContentRoot(greatGreatGrandParent.parent, project)) {
+                                        greatGreatGrandParent
+                                                .parent
+                                                .findChild("deps")
+                                                ?.findChild(parent.name)
+                                                ?.let {
+                                                    ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Syncing Library in _build/lib/${parent.name}/ebin", true) {
+                                                        override fun run(indicator: ProgressIndicator) {
+                                                            syncLibrary(it, indicator)
+                                                        }
+                                                    })
                                                 }
-                                            })
-                                        }
                                     } else {
                                         null
                                     }
@@ -159,7 +169,11 @@ class DepsWatcher(val project: Project) : BulkFileListener {
     }
 
     fun syncLibraries(project: Project, progressIndicator: ProgressIndicator) {
-        project.baseDir.findChild("deps")?.let { syncLibraries(it, progressIndicator) }
+        ProjectRootManager
+                .getInstance(project)
+                .contentRootsFromAllModules
+                .mapNotNull { it.findChild("deps") }
+                .map { syncLibraries(it, progressIndicator) }
     }
 
     private fun syncLibrary(dep: VirtualFile, progressIndicator: ProgressIndicator) = syncLibraries(arrayOf(dep), progressIndicator)
@@ -221,49 +235,59 @@ class DepsWatcher(val project: Project) : BulkFileListener {
     private fun syncLibrary(library: Library, dep: VirtualFile, depName: String, progressIndicator: ProgressIndicator) {
         val libraryModifiableModel = library.modifiableModel
 
-        project.baseDir.findChild("_build")?.let { build ->
-            build.children.filter { it.isDirectory }.forEach { environment ->
-                environment.children.filter { it.isDirectory }.forEach { environmentChild ->
-                    val environmentChildName = environmentChild.name
+        ProjectRootManager
+                .getInstance(project)
+                .contentRootsFromAllModules
+                .mapNotNull { it.findChild("_build") }
+                .forEach { build ->
+                    build
+                            .children
+                            .filter { it.isDirectory }
+                            .forEach { environment ->
+                                environment
+                                        .children
+                                        .filter { it.isDirectory }
+                                        .forEach { environmentChild ->
+                                            val environmentChildName = environmentChild.name
 
-                    if (environmentChildName == "consolidated") {
-                        libraryModifiableModel.addRoot(environmentChild, OrderRootType.CLASSES)
-                    } else if (environmentChildName == "lib") {
-                        environmentChild.findChild(depName)?.let { depEnvironmentLibrary ->
-                            depEnvironmentLibrary.findChild("ebin")?.let { ebin ->
-                                if (ebin.isDirectory) {
-                                    /* Mark build output as excluded when marking it as CLASSES, so that
-                                       dependency will show up in External Libraries AND be pushed out into
-                                       non-project results */
-                                    ModuleUtil
-                                            .findModuleForFile(depEnvironmentLibrary, project)
-                                            ?.let { module ->
-                                                ModuleRootManager.getInstance(module).modifiableModel.apply {
-                                                    progressIndicator.text2 = "Excluding _build/lib/$depName/ebin from project so it is treated as an External Library"
+                                            if (environmentChildName == "consolidated") {
+                                                libraryModifiableModel.addRoot(environmentChild, OrderRootType.CLASSES)
+                                            } else if (environmentChildName == "lib") {
+                                                environmentChild.findChild(depName)?.let { depEnvironmentLibrary ->
+                                                    depEnvironmentLibrary.findChild("ebin")?.let { ebin ->
+                                                        if (ebin.isDirectory) {
+                                                            /* Mark build output as excluded when marking it as CLASSES, so that
+                                                               dependency will show up in External Libraries AND be pushed out into
+                                                               non-project results */
+                                                            ModuleUtil
+                                                                    .findModuleForFile(depEnvironmentLibrary, project)
+                                                                    ?.let { module ->
+                                                                        ModuleRootManager.getInstance(module).modifiableModel.apply {
+                                                                            progressIndicator.text2 = "Excluding _build/lib/$depName/ebin from project so it is treated as an External Library"
 
-                                                    for (contentEntry in contentEntries) {
-                                                        if (progressIndicator.isCanceled) {
-                                                            break
+                                                                            for (contentEntry in contentEntries) {
+                                                                                if (progressIndicator.isCanceled) {
+                                                                                    break
+                                                                                }
+
+                                                                                contentEntry.addExcludeFolder(depEnvironmentLibrary)
+                                                                            }
+
+                                                                            commit()
+                                                                        }
+                                                                    }
+
+                                                            if (!progressIndicator.isCanceled) {
+                                                                progressIndicator.text2 = "Adding _build/lib/$depName/ebin as a Classes root for $"
+                                                                libraryModifiableModel.addRoot(ebin, OrderRootType.CLASSES)
+                                                            }
                                                         }
-
-                                                        contentEntry.addExcludeFolder(depEnvironmentLibrary)
                                                     }
-
-                                                    commit()
                                                 }
                                             }
-
-                                    if (!progressIndicator.isCanceled) {
-                                        progressIndicator.text2 = "Adding _build/lib/$depName/ebin as a Classes root for $"
-                                        libraryModifiableModel.addRoot(ebin, OrderRootType.CLASSES)
-                                    }
-                                }
+                                        }
                             }
-                        }
-                    }
                 }
-            }
-        }
 
         for (child in dep.children) {
             if (progressIndicator.isCanceled) {
