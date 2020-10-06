@@ -107,7 +107,7 @@
     <internalFileTemplate name="Elixir GenEvent"/>
 
     <!-- for liveTemplates -->
-    <defaultLiveTemplatesProvider implementation="org.elixir_lang.templates.ElixirLiveTemplateProvider"/>
+    <defaultLiveTemplates file="liveTemplates/Elixir"/>
     <liveTemplateContext implementation="org.elixir_lang.templates.ElixirContextType"/>
     <!-- end liveTemplates -->
 
