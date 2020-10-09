@@ -9,7 +9,7 @@ import com.intellij.psi.PsiRecursiveElementVisitor
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 import org.elixir_lang.ElixirSyntaxHighlighter
 import org.elixir_lang.annotator.Highlighter.highlight
-import org.elixir_lang.psi.ElixirKeywordKey
+import org.elixir_lang.psi.QuotableKeywordPair
 
 /**
  * Annotates things that act like Atom as Atom
@@ -34,15 +34,16 @@ class Atom : Annotator, DumbAware {
                     * Public Instance Methods
                     */
                     override fun visitElement(element: PsiElement) {
-                        if (element is ElixirKeywordKey) {
-                            visitKeywordKey(element)
+                        if (element is QuotableKeywordPair) {
+                            visitKeywordPair(element)
                         }
                     }
 
                     /*
                     * Private Instance Methods
                     */
-                    private fun visitKeywordKey(keywordKey: ElixirKeywordKey) {
+                    private fun visitKeywordPair(keywordPair: QuotableKeywordPair) {
+                        val keywordKey = keywordPair.keywordKey
                         val child = keywordKey.firstChild
 
                         // a normal, non-quoted keyword key
