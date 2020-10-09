@@ -16,22 +16,12 @@ import kotlin.collections.List
 
 
 class ElixirDocumentationProvider : DocumentationProvider {
-    sealed class FetchedDocs(open val moduleName: String, open val docsMarkdown: String){
-        data class MethodDocumentation(override val moduleName: String,
-                                     override val docsMarkdown: String,
-                                     val methodName: String,
-                                     val arguments: List<String>) : FetchedDocs(moduleName, docsMarkdown)
-
-        data class ModuleDocumentation(override val moduleName: String,
-                                     override val docsMarkdown: String) : FetchedDocs(moduleName, docsMarkdown)
-    }
-
     override fun generateDoc(element: PsiElement, originalElement: PsiElement?): String? {
         return fetchDocs(element)?.let { formatDocs(it) }
     }
 
     override fun generateHoverDoc(element: PsiElement, originalElement: PsiElement?): String? {
-        return generateDoc(element, originalElement);
+        return generateDoc(element, originalElement)
     }
 
     fun formatDocs(fetchedDocs: FetchedDocs): String {
@@ -42,25 +32,25 @@ class ElixirDocumentationProvider : DocumentationProvider {
 
         val documentationHtml = StringBuilder()
 
-        val definitionString = when(fetchedDocs){
-            is FetchedDocs.MethodDocumentation -> {
+        val definitionString = when (fetchedDocs) {
+            is FetchedDocs.FunctionOrMacroDocumentation -> {
                 if (fetchedDocs.arguments.isNotEmpty())
-                    "<b>${fetchedDocs.moduleName}.${fetchedDocs.methodName}" +
-                            "(${fetchedDocs.arguments.joinToString()}) </b>"
+                    "<i>${fetchedDocs.definer} ${fetchedDocs.moduleName}</i>.<b>${fetchedDocs.methodName}</b>" +
+                            "(${fetchedDocs.arguments.joinToString()})"
                 else
-                    "<b>${fetchedDocs.moduleName}.${fetchedDocs.methodName}</b>"
+                    "<i>${fetchedDocs.definer} ${fetchedDocs.moduleName}</i>.<b>${fetchedDocs.methodName}</b>()"
             }
             is FetchedDocs.ModuleDocumentation -> {
-                "Module: <b>${fetchedDocs.moduleName}</b>"
+                "<i>defmodule</i> <b>${fetchedDocs.moduleName}</b>"
             }
         }
 
         documentationHtml.append(DocumentationMarkup.DEFINITION_START)
         documentationHtml.append(definitionString)
         documentationHtml.append(DocumentationMarkup.DEFINITION_END)
-        documentationHtml.append(DocumentationMarkup.SECTIONS_START)
+        documentationHtml.append(DocumentationMarkup.CONTENT_START)
         documentationHtml.append(html)
-        documentationHtml.append(DocumentationMarkup.SECTIONS_END)
+        documentationHtml.append(DocumentationMarkup.CONTENT_END)
         return documentationHtml.toString()
 
     }
@@ -70,43 +60,75 @@ class ElixirDocumentationProvider : DocumentationProvider {
                 ?: (element.reference as? Callable)?.multiResolve(false)?.map { it.element }?.firstOrNull()
                 ?: return null
 
-        if (resolved.firstChild?.text == "defmodule"){
+        // If resolved to a module, then fetch moduledoc from the body
+        if (resolved.firstChild?.text == "defmodule") {
             val moduleDoc = (resolved as? ElixirUnmatchedUnqualifiedNoParenthesesCallImpl)
-                ?.doBlock
-                ?.stab
-                ?.stabBody
-                ?.unmatchedExpressionList
-                ?.filterIsInstance<ElixirUnmatchedAtUnqualifiedNoParenthesesCall>()
-                ?.filter { it.atIdentifier.lastChild.text == "moduledoc" }
-                ?.mapNotNull { (it.lastChild?.firstChild?.firstChild as? Heredoc)?.children?.toList() }
-                ?.flatten()
-                ?.joinToString("") { it.text }
+                    ?.doBlock
+                    ?.stab
+                    ?.stabBody
+                    ?.unmatchedExpressionList
+                    ?.asSequence()
+                    ?.filterIsInstance<ElixirUnmatchedAtUnqualifiedNoParenthesesCall>()
+                    ?.filter { it.atIdentifier.lastChild?.text == "moduledoc" }
+                    ?.mapNotNull { (it.lastChild?.firstChild?.firstChild as? Heredoc)?.children?.toList() }
+                    ?.flatten()
+                    ?.joinToString("") { it.text }
 
-            if (moduleDoc != null){
-                val moduleName = element.text
+            if (moduleDoc != null) {
                 return FetchedDocs.ModuleDocumentation(resolved.canonicalName().orEmpty(), moduleDoc)
             }
         }
 
-        if (element !is Call){
+        if (element !is Call) {
             return null
         }
 
-        val methodName = element.functionName().orEmpty()
+        val functionName = element.functionName().orEmpty()
         val arityRange = element.resolvedFinalArityRange()
-        val arguments = findCall(resolved)?.primaryArguments()?.map { it.text }.orEmpty()
-        val firstMethodDocs = findMethodDocs(resolved)
-                ?: resolved.prevSiblingSequence()
-                        .filterIsInstance<Call>()
-                        .filter { it.name == methodName }
-                        .sortedByDescending { findCall(it)?.primaryArity() }
-                        .filter { call -> findCall(call)?.resolvedFinalArityRange()?.any { arityRange.contains(it) } == true}
-                        .mapNotNull { findMethodDocs(it) }
-                        .firstOrNull()
 
-        val moduleName = resolved.parent?.getModuleName().orEmpty()
-        if (firstMethodDocs != null)
-            return FetchedDocs.MethodDocumentation(moduleName, firstMethodDocs, methodName, arguments)
+        val (functionDocsArity, functionDocs) =
+                resolved.siblings()
+                        .filterIsInstance<Call>()
+                        .filter { it.name == functionName }
+                        .sortedWith(
+                                compareByDescending<PsiElement> { call -> findElixirFunction(call)?.resolvedFinalArityRange()?.any { arityRange.contains(it) } }
+                                        .thenByDescending{ arityRange.max() == findElixirFunction(it)?.primaryArity() }
+                                        .thenBy{ findElixirFunction(it)?.primaryArity() }
+                        )
+                        .map{Pair(findElixirFunction(it)?.primaryArity(), findMethodDocs(it)) }
+                        .filter { it.second != null }
+                        .firstOrNull()
+                        ?: return null
+
+
+
+        val elixirFunction = findElixirFunction(resolved)
+        // If we are hovering over the function declaration then show arguments for that function
+        // not the one we fetched the docs from
+        val functionArguments =
+                if (elixirFunction != null && elixirFunction == findElixirFunction(element))
+                    elixirFunction.primaryArguments().map { it.text }
+                else
+                    resolved.siblings()
+                    .filterIsInstance<Call>()
+                    .filter { it.name == functionName }
+                    .mapNotNull { findElixirFunction(it) }
+                    .sortedWith(
+                            compareByDescending<ElixirMatchedUnqualifiedParenthesesCall>
+                            // Find the arguments with default arguments and  identifiers first
+                            // (i.e. prioritise 'user' over '%{}' argument)
+                            { it.primaryArity() == functionDocsArity }
+                                    .thenByDescending { it.primaryArguments().filterIsInstance<ElixirUnmatchedMatchOperation>().count() }
+                                    .thenByDescending { it.primaryArguments().filterIsInstance<ElixirUnmatchedUnqualifiedNoArgumentsCall>().count() }
+                    )
+                    .firstOrNull()?.primaryArguments()
+                    ?.map { it.text }
+
+        if (!functionDocs.isNullOrBlank()){
+            val definer = resolved.firstChild?.text.orEmpty()
+            val moduleName = resolved.parent?.getModuleName().orEmpty()
+            return FetchedDocs.FunctionOrMacroDocumentation(moduleName, functionDocs, definer, functionName, functionArguments.orEmpty())
+        }
         return null
     }
 
@@ -116,38 +138,48 @@ class ElixirDocumentationProvider : DocumentationProvider {
                 .drop(1)
                 .takeWhile { !isDefiner(it as? ElixirUnmatchedUnqualifiedNoParenthesesCall) }
                 .filterIsInstance<ElixirUnmatchedAtUnqualifiedNoParenthesesCall>()
-                .filter { it.firstChild is ElixirAtIdentifier && it.firstChild.text == "@doc" }
+                .filter { it.firstChild is ElixirAtIdentifier && it.firstChild.lastChild?.text == "doc" }
                 .toList()
 
-        if (methodDocs.isEmpty()){
+        if (methodDocs.isEmpty()) {
             return null
         }
 
         val docsLines = methodDocs
                 .mapNotNull { (it.lastChild?.firstChild?.firstChild as? Heredoc)?.children?.toList() }
                 .flatten()
-                .map{it.text}
+                .map { it.text }
 
         return docsLines.joinToString("") { it }
     }
 
-    private fun findCall(it: PsiElement): ElixirMatchedUnqualifiedParenthesesCall?{
-        if (it is ElixirMatchedUnqualifiedParenthesesCall){
+    private fun findElixirFunction(it: PsiElement): ElixirMatchedUnqualifiedParenthesesCall? {
+        if (it is ElixirMatchedUnqualifiedParenthesesCall) {
             return it
         }
         return it.children.mapNotNull {
-            findCall(it)
+            findElixirFunction(it)
         }.firstOrNull()
     }
 
-    private fun isDoc(elixirAtIdentifier: ElixirAtIdentifier) : Boolean{
-        return elixirAtIdentifier.text == "@doc" || elixirAtIdentifier.text == "@spec"
+    private fun isDefiner(elixirAtIdentifier: ElixirUnmatchedUnqualifiedNoParenthesesCall?): Boolean {
+        val firstChildText = elixirAtIdentifier?.firstChild?.text
+        return firstChildText == "def"
+                || firstChildText == "defp"
+                || firstChildText == "defmacro"
     }
 
-    private fun isDefiner(elixirAtIdentifier: ElixirUnmatchedUnqualifiedNoParenthesesCall?) : Boolean{
-        val firstChild = elixirAtIdentifier?.firstChild?.text
-        return firstChild == "def"
-                || firstChild == "defp"
-                || firstChild == "defmacro"
+    private fun PsiElement.siblings() = this.prevSiblingSequence() + generateSequence(this) { it.nextSibling }
+
+    sealed class FetchedDocs(open val moduleName: String, open val docsMarkdown: String) {
+        data class FunctionOrMacroDocumentation(override val moduleName: String,
+                                                override val docsMarkdown: String,
+                                                val definer: String,
+                                                val methodName: String,
+                                                val arguments: List<String>) : FetchedDocs(moduleName, docsMarkdown)
+
+        data class ModuleDocumentation(override val moduleName: String,
+                                       override val docsMarkdown: String) : FetchedDocs(moduleName, docsMarkdown)
     }
+
 }
