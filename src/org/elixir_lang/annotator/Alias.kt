@@ -3,21 +3,20 @@ package org.elixir_lang.annotator
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
 import com.intellij.openapi.project.DumbAware
-import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiRecursiveElementVisitor
-import com.intellij.psi.impl.source.tree.LeafPsiElement
 import org.elixir_lang.ElixirSyntaxHighlighter
-import org.elixir_lang.annotator.Highlighter.highlight
-import org.elixir_lang.psi.ElixirKeywordKey
+import org.elixir_lang.psi.QualifiableAlias
+import org.elixir_lang.psi.impl.isOutermostQualifiableAlias
 
 /**
- * Annotates things that act like Atom as Atom
+ * Annotates aliases
  */
-class Atom : Annotator, DumbAware {
+class Alias : Annotator, DumbAware {
     /*
      * Public Instance Methods
      */
+
     /**
      * Annotates the specified PSI element.
      * It is guaranteed to be executed in non-reentrant fashion.
@@ -34,26 +33,17 @@ class Atom : Annotator, DumbAware {
                     * Public Instance Methods
                     */
                     override fun visitElement(element: PsiElement) {
-                        if (element is ElixirKeywordKey) {
-                            visitKeywordKey(element)
+                        if (element is QualifiableAlias) {
+                            visitQualifiableAlias(element)
                         }
                     }
 
                     /*
                     * Private Instance Methods
                     */
-                    private fun visitKeywordKey(keywordKey: ElixirKeywordKey) {
-                        val child = keywordKey.firstChild
-
-                        // a normal, non-quoted keyword key
-                        if (child is LeafPsiElement) {
-                            val keywordKeyTextRange = keywordKey.textRange
-                            // highlight the `:` as part of the pseudo-atom
-                            val atomTextRange = TextRange(
-                                    keywordKeyTextRange.startOffset,
-                                    keywordKeyTextRange.endOffset + 1
-                            )
-                            highlight(holder, atomTextRange, ElixirSyntaxHighlighter.ATOM)
+                    private fun visitQualifiableAlias(qualifiableAlias: QualifiableAlias) {
+                        if (qualifiableAlias.isOutermostQualifiableAlias()) {
+                            Highlighter.highlight(holder, ElixirSyntaxHighlighter.ALIAS)
                         }
                     }
                 }

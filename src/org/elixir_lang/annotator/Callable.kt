@@ -289,18 +289,14 @@ class Callable : Annotator, DumbAware {
                           annotationHolder: AnnotationHolder,
                           vararg textAttributesKeys: TextAttributesKey) {
         if (textAttributesKeys.isNotEmpty()) {
-            annotationHolder.createInfoAnnotation(textRange, null).enforcedTextAttributes =
-                    TextAttributes.ERASE_MARKER
-
             val editorColorsScheme = EditorColorsManager.getInstance().globalScheme
             val mergedTextAttributes = textAttributesKeys.fold(null) { acc: TextAttributes?, textAttributesKey->
                 val textAttributes = editorColorsScheme.getAttributes(textAttributesKey)
 
                 TextAttributes.merge(acc, textAttributes)
-            }
+            }!!
 
-            annotationHolder.createInfoAnnotation(textRange, null).enforcedTextAttributes =
-                    mergedTextAttributes
+            Highlighter.highlight(annotationHolder, textRange, mergedTextAttributes)
         }
     }
 
