@@ -1,8 +1,6 @@
 package org.elixir_lang.errorreport;
 
-import com.google.common.base.Joiner;
 import com.intellij.diagnostic.AttachmentFactory;
-import com.intellij.diagnostic.LogMessageEx;
 import com.intellij.openapi.diagnostic.Attachment;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.util.TextRange;
@@ -11,9 +9,6 @@ import com.intellij.psi.FileViewProvider;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Collection;
-import java.util.Collections;
 
 public class Logger {
     /*
@@ -26,8 +21,8 @@ public class Logger {
      * attachment
      *
      * @param klass       Class whose logger to use
-     * @param userMessage User message for
-     *                    {@link com.intellij.diagnostic.LogMessageEx#createEvent(String, String, Attachment...)}
+     * @param userMessage User message to add to the {@link #excerpt(PsiFile, PsiElement)} and
+     *                    {@link #className(PsiElement)}.
      * @param element     element responsible for the error
      */
     public static void error(@NotNull Class klass, @NotNull String userMessage, PsiElement element) {
@@ -39,8 +34,8 @@ public class Logger {
      * text of {@code element} as the details and containing file of {@code element} as an * attachment
      *
      * @param logger      logger to which to log an error.
-     * @param userMessage User message for
-     *                    {@link com.intellij.diagnostic.LogMessageEx#createEvent(String, String, Attachment...)}
+     * @param userMessage User message to add to the {@link #excerpt(PsiFile, PsiElement)} and
+     *                    {@link #className(PsiElement)}.
      * @param element     element responsible for the error
      */
     public static void error(@NotNull com.intellij.openapi.diagnostic.Logger logger,
@@ -48,29 +43,15 @@ public class Logger {
                              @NotNull PsiElement element) {
         PsiFile containingFile = element.getContainingFile();
         String fullUserMessage = fullUserMessage(userMessage, containingFile, element);
-        String details = Joiner.on("\n").join(new Throwable().getStackTrace());
-
-        Collection<Attachment> attachmentCollection;
 
         VirtualFile virtualFile = containingFile.getVirtualFile();
 
         if (virtualFile != null) {
-            attachmentCollection = Collections.singletonList(
-                    AttachmentFactory.createAttachment(virtualFile)
-            );
+            Attachment attachment = AttachmentFactory.createAttachment(virtualFile);
+            logger.error(fullUserMessage, attachment);
         } else {
-            attachmentCollection = Collections.emptyList();
+            logger.error(fullUserMessage);
         }
-
-        logger.error(
-                LogMessageEx.createEvent(
-                        fullUserMessage,
-                        details,
-                        fullUserMessage,
-                        null,
-                        attachmentCollection
-                )
-        );
     }
 
     /*
