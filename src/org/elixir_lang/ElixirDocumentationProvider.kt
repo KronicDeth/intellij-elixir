@@ -74,7 +74,7 @@ class ElixirDocumentationProvider : DocumentationProvider {
                     ?.flatten()
                     ?.joinToString("") { it.text }
 
-            if (moduleDoc != null) {
+            if (!moduleDoc.isNullOrEmpty()) {
                 return FetchedDocs.ModuleDocumentation(resolved.canonicalName().orEmpty(), moduleDoc)
             }
         }
