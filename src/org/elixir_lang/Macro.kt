@@ -370,7 +370,7 @@ object Macro {
     private fun ifAccessToString(macro: OtpErlangObject): String? =
             ifTupleTo(macro, 3) { tuple: OtpErlangTuple ->
                 ifTagged3TupleTo(tuple.elementAt(0), ".") { dotTuple ->
-                    (dotTuple as? OtpErlangList)?.let { dotArguments ->
+                    (dotTuple.elementAt(2) as? OtpErlangList)?.let { dotArguments ->
                         if (dotArguments.arity() == 2 &&
                                 dotArguments.elementAt(0) == OtpErlangAtom("Elixir.Access") &&
                                 dotArguments.elementAt(1) == OtpErlangAtom("get")) {
