@@ -64,7 +64,7 @@ public class ParserDefinition implements com.intellij.lang.ParserDefinition {
     }
 
     @Override
-    public SpaceRequirements spaceExistanceTypeBetweenTokens(ASTNode left, ASTNode right) {
+    public SpaceRequirements spaceExistenceTypeBetweenTokens(ASTNode left, ASTNode right) {
         return null;
     }
 }
