@@ -6,9 +6,7 @@ import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.process.ProcessOutput;
 import com.intellij.execution.util.ExecUtil;
-import com.intellij.lang.annotation.Annotation;
-import com.intellij.lang.annotation.AnnotationHolder;
-import com.intellij.lang.annotation.ExternalAnnotator;
+import com.intellij.lang.annotation.*;
 import com.intellij.openapi.diagnostic.Attachment;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
@@ -375,16 +373,24 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
                         end = document.getLineEndOffset(issue.line);
                     }
 
-                    Annotation annotation = holder.createWarningAnnotation(new TextRange(start, end), issue.message);
-                    annotation.setAfterEndOfLine(end == start);
+                    AnnotationBuilder annotationBuilder = holder
+                            .newAnnotation(HighlightSeverity.WARNING, issue.message)
+                            .range(new TextRange(start, end));
+
+                    if (end == start) {
+                        //noinspection ResultOfMethodCallIgnored
+                        annotationBuilder.afterEndOfLine();
+                    }
 
                     issue.explanation.ifPresent(explanation -> {
                         String toolTip = explanationToToolTip(explanation, workingDirectory);
 
                         if (!toolTip.isEmpty()) {
-                            annotation.setTooltip(toolTip);
+                            annotationBuilder.tooltip(toolTip);
                         }
                     });
+
+                    annotationBuilder.create();
                 }
             }
         }
