@@ -20,37 +20,36 @@ public class Logger {
      * {@code userMessage} and the text of {@code element} as the details and containing file of {@code element} as an
      * attachment
      *
-     * @param klass       Class whose logger to use
-     * @param userMessage User message to add to the {@link #excerpt(PsiFile, PsiElement)} and
-     *                    {@link #className(PsiElement)}.
-     * @param element     element responsible for the error
+     * @param klass   Class whose logger to use
+     * @param title   Title of error stored in {@link Throwable}.
+     * @param element element responsible for the error
      */
-    public static void error(@NotNull Class klass, @NotNull String userMessage, PsiElement element) {
-        error(com.intellij.openapi.diagnostic.Logger.getInstance(klass), userMessage, element);
+    public static void error(@NotNull Class klass, @NotNull String title, PsiElement element) {
+        error(com.intellij.openapi.diagnostic.Logger.getInstance(klass), title, element);
     }
 
     /**
      * Logs error {@link com.intellij.openapi.diagnostic.Logger} instance with the given {@code userMessage} and the
      * text of {@code element} as the details and containing file of {@code element} as an * attachment
      *
-     * @param logger      logger to which to log an error.
-     * @param userMessage User message to add to the {@link #excerpt(PsiFile, PsiElement)} and
-     *                    {@link #className(PsiElement)}.
-     * @param element     element responsible for the error
+     * @param logger  logger to which to log an error.
+     * @param title   Title of error stored in {@link Throwable}.
+     * @param element element responsible for the error
      */
     public static void error(@NotNull com.intellij.openapi.diagnostic.Logger logger,
-                             @NotNull String userMessage,
+                             @NotNull String title,
                              @NotNull PsiElement element) {
+        Throwable throwable = new Throwable(title);
         PsiFile containingFile = element.getContainingFile();
-        String fullUserMessage = fullUserMessage(userMessage, containingFile, element);
+        String message = message(containingFile, element);
 
         VirtualFile virtualFile = containingFile.getVirtualFile();
 
         if (virtualFile != null) {
             Attachment attachment = AttachmentFactory.createAttachment(virtualFile);
-            logger.error(fullUserMessage, attachment);
+            logger.error(message, throwable, attachment);
         } else {
-            logger.error(fullUserMessage);
+            logger.error(message, throwable);
         }
     }
 
@@ -105,11 +104,9 @@ public class Logger {
         return excerptBuilder.toString();
     }
 
-    private static String fullUserMessage(@NotNull String userMessage,
-                                          @NotNull PsiFile containingFile,
-                                          @NotNull PsiElement element) {
-        return userMessage + "\n" +
-                excerpt(containingFile, element) + "\n" +
+    private static String message(@NotNull PsiFile containingFile,
+                                  @NotNull PsiElement element) {
+        return excerpt(containingFile, element) + "\n" +
                 className(element);
     }
 }
