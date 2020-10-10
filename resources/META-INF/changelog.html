@@ -1,5 +1,27 @@
 <html>
 <body>
+<h1>v11.81.</h1>
+<ul>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>
+        Vendor JInterface 1.11 to support <code>BIG_CREATION</code> when debugging.<br>
+        The JInterface on Maven Central has stopped being updated because
+        <a href="https://bugs.erlang.org/browse/ERL-928?focusedCommentId=16521&amp;page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-16521" rel="nofollow">
+          the OTP Team didn't actually maintain it
+        </a>, that was Basho, and Basho is gone now.  This version of JInterface, 1.11, is from Erlang 23.0.4 from
+        Homebrew, but with the formula edited (<code>brew edit erlang</code>) to add <code>--with-java</code> and then
+        built with <code>brew install erlang --build-from-source</code>.
+      </li>
+      <li>
+        On Windows, the <code>file.path</code> to the debugger server files has <code>\</code>, but they aren't escaped.
+        Therefore, replace them with escaped version, <code>\\</code> to fix debugging on Windows, but leave Linux and
+        macOS unaffected.
+      </li>
+    </ul>
+  </li>
+</ul>
 <h1>v11.8.0</h1>
 <ul>
   <li>
