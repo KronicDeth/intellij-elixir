@@ -90,7 +90,7 @@ public class ViewProvider extends MultiplePsiFilesPerDocumentFileViewProvider
         }
 
         com.intellij.lang.Language substituteLang =
-                LanguageSubstitutors.INSTANCE.substituteLanguage(templateDataLanguage, virtualFile, project);
+                LanguageSubstitutors.getInstance().substituteLanguage(templateDataLanguage, virtualFile, project);
 
         // only use a substituted language if it's templateable
         if (TemplateDataLanguageMappings.getTemplateableLanguages().contains(substituteLang)) {
