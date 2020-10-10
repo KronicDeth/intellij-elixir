@@ -8,7 +8,7 @@ import com.intellij.openapi.projectRoots.SdkModificator;
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.util.Comparing;
-import com.intellij.ui.ListCellRendererWrapper;
+import com.intellij.ui.SimpleListCellRenderer;
 import com.intellij.util.ui.JBUI;
 import org.elixir_lang.sdk.elixir.Type;
 import org.jetbrains.annotations.NotNull;
@@ -115,7 +115,7 @@ public class AdditionalDataConfigurable implements com.intellij.openapi.projectR
                 )
         );
         internalErlangSdksComboBox.setRenderer(
-                new ListCellRendererWrapper() {
+                new SimpleListCellRenderer() {
                     @Override
                     public void customize(JList list, Object value, int index, boolean selected, boolean hasFocus) {
                         if (value instanceof Sdk) {
