@@ -55,7 +55,7 @@ public class Submitter extends com.intellij.openapi.diagnostic.ErrorReportSubmit
                     e.getMessage()
             );
             ReportMessages.GROUP.createNotification(
-                    ReportMessages.ERROR_REPORT,
+                    ReportMessages.getErrorReport(),
                     message,
                     NotificationType.ERROR,
                     NotificationListener.URL_OPENING_LISTENER
@@ -135,7 +135,7 @@ public class Submitter extends com.intellij.openapi.diagnostic.ErrorReportSubmit
 
                 //noinspection ConstantConditions
                 ReportMessages.GROUP.createNotification(
-                        ReportMessages.ERROR_REPORT,
+                        ReportMessages.getErrorReport(),
                         "Submitted",
                         NotificationType.INFORMATION,
                         notificationListener
