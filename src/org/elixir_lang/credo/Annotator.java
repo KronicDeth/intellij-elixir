@@ -249,15 +249,8 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
             stripped = matcher.group("content");
         } else {
             final String title = "Edge could not be stripped from explanation line";
-            LOGGER.error(LogMessageEx.createEvent(
-                    title + "\n" +
-                            "\n" +
-                            "`" +explanationLine + "`\n" ,
-                    Joiner.on("\n").join(new Throwable().getStackTrace()),
-                    title,
-                    null,
-                    (Attachment) null
-                    )
+            LOGGER.error("`" +explanationLine + "`",
+                    new Throwable(title)
             );
 
             stripped = explanationLine;
@@ -455,15 +448,10 @@ public class Annotator extends ExternalAnnotator<PsiFile, List<Annotator.Issue>>
                 } else {
                     final String title = header + " content line was neither blank nor starting with " +
                             INDENT.length() + " spaces";
-                    LOGGER.error(LogMessageEx.createEvent(
-                            title + "\n" +
-                                    "\n" +
-                                    "`" + contentLine + "`\n",
-                            Joiner.on("\n").join(new Throwable().getStackTrace()),
-                            title,
-                            null,
-                            (Attachment) null
-                    ));
+                    LOGGER.error(
+                            "`" + contentLine + "`",
+                            new Throwable(title)
+                    );
 
                     unindentedLine = contentLine;
                 }
