@@ -13,7 +13,6 @@ import com.intellij.psi.impl.source.PsiFileImpl;
 import com.intellij.psi.templateLanguages.ConfigurableTemplateLanguageFileViewProvider;
 import com.intellij.psi.templateLanguages.TemplateDataLanguageMappings;
 import com.intellij.psi.tree.IElementType;
-import com.intellij.util.containers.ContainerUtil;
 import gnu.trove.THashSet;
 import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.eex.Language;
@@ -24,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import static org.elixir_lang.eex.file.Type.onlyTemplateDataFileType;
@@ -31,8 +31,7 @@ import static org.elixir_lang.eex.file.Type.onlyTemplateDataFileType;
 // See https://github.com/JetBrains/intellij-plugins/blob/500f42337a87f463e0340f43e2411266fcfa9c5f/handlebars/src/com/dmarcotte/handlebars/file/HbFileViewProvider.java
 public class ViewProvider extends MultiplePsiFilesPerDocumentFileViewProvider
         implements ConfigurableTemplateLanguageFileViewProvider {
-    private static final ConcurrentMap<String, IElementType> ELEMENT_TYPE_BY_LANGUAGE_ID =
-            ContainerUtil.newConcurrentMap();
+    private static final ConcurrentMap<String, IElementType> ELEMENT_TYPE_BY_LANGUAGE_ID = new ConcurrentHashMap<>();
     @NotNull
     private final com.intellij.lang.Language baseLanguage;
     @NotNull
