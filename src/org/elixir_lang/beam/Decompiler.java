@@ -1,12 +1,15 @@
 package org.elixir_lang.beam;
 
+import com.ericsson.otp.erlang.OtpErlangMap;
 import com.google.common.base.Joiner;
 import com.intellij.diagnostic.LogMessageEx;
 import com.intellij.openapi.diagnostic.Attachment;
 import com.intellij.openapi.fileTypes.BinaryFileDecompiler;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.elixir_lang.beam.chunk.Atoms;
+import org.elixir_lang.beam.chunk.BeamDocumentation;
 import org.elixir_lang.beam.chunk.CallDefinitions;
+import org.elixir_lang.beam.chunk.Chunk;
 import org.elixir_lang.beam.decompiler.Default;
 import org.elixir_lang.beam.decompiler.InfixOperator;
 import org.elixir_lang.beam.decompiler.PrefixOperator;
@@ -15,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
+import static org.elixir_lang.beam.BeamKt.binaryToTerm;
 import static org.elixir_lang.beam.chunk.Chunk.TypeID.ATOM;
 import static org.elixir_lang.psi.call.name.Function.*;
 import static org.elixir_lang.psi.call.name.Module.ELIXIR_PREFIX;
@@ -52,6 +56,13 @@ public class Decompiler implements BinaryFileDecompiler {
             if (atoms != null) {
                 String moduleName = atoms.moduleName();
 
+//                docsChunk.
+//                OtpErlangMap moduleDoc = ((binaryToTerm(beam.chunkByTypeID_field["Docs"].data, 0).first as com.ericsson.otp.erlang.OtpErlangTuple).elements())[4] as com.ericsson.otp.erlang.OtpErlangMap;
+//
+//                val bin = moduleDoc.values().first() as com.ericsson.otp.erlang.OtpErlangBinary
+//                String(bin.binaryValue())
+
+
                 if (moduleName != null) {
                     String defmoduleArgument = defmoduleArgument(moduleName);
 
@@ -61,6 +72,14 @@ public class Decompiler implements BinaryFileDecompiler {
                             .append("defmodule ")
                             .append(defmoduleArgument)
                             .append(" do\n");
+
+                    BeamDocumentation beamDocumentation = beam.beamDocumentation();
+                    if (beamDocumentation != null) {
+                        String docs = beamDocumentation.getModuledoc();
+                        decompiled.append("  @moduleDoc \"\"\"\n");
+                        decompiled.append(docs);
+                        decompiled.append("\"\"\"");
+                    }
 
                     appendCallDefinitions(decompiled, beam, atoms);
 
@@ -154,6 +173,17 @@ public class Decompiler implements BinaryFileDecompiler {
                         Collections.<Attachment>emptyList()
                 )
         );
+    }
+
+    @NotNull
+    public static String moduleDocsArgument(String moduleName) {
+        String defmoduleArgument;
+        if (moduleName.startsWith(ELIXIR_PREFIX)) {
+            defmoduleArgument = moduleName.substring(ELIXIR_PREFIX.length());
+        } else {
+            defmoduleArgument = ":" + moduleNameToAtomName(moduleName);
+        }
+        return defmoduleArgument;
     }
 
     @NotNull

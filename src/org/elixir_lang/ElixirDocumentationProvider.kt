@@ -3,6 +3,8 @@ package org.elixir_lang
 import com.intellij.lang.documentation.DocumentationMarkup
 import com.intellij.lang.documentation.DocumentationProvider
 import com.intellij.psi.PsiElement
+import org.elixir_lang.beam.chunk.BeamDocumentationProvider
+import org.elixir_lang.beam.psi.BeamFileImpl
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.ElixirUnmatchedUnqualifiedNoParenthesesCallImpl
@@ -59,6 +61,13 @@ class ElixirDocumentationProvider : DocumentationProvider {
         val resolved = element.reference?.resolve()
                 ?: (element.reference as? Callable)?.multiResolve(false)?.map { it.element }?.firstOrNull()
                 ?: return null
+
+        if (resolved.containingFile.originalFile is BeamFileImpl){
+            val resovler = BeamDocumentationProvider()
+            val moduleDocumentation = resovler.getModuleDocs(resolved.containingFile.originalFile.virtualFile)
+            return moduleDocumentation?.let { FetchedDocs.ModuleDocumentation(resolved.getModuleName().orEmpty(), it) }
+        }
+
 
         // If resolved to a module, then fetch moduledoc from the body
         if (resolved.firstChild?.text == "defmodule") {
