@@ -326,11 +326,6 @@ public class LevelPropertyPusher implements FilePropertyPusher<Level> {
     }
 
     @Override
-    public boolean acceptsFile(@NotNull VirtualFile file) {
-        return false;
-    }
-
-    @Override
     public boolean acceptsDirectory(@NotNull VirtualFile file, @NotNull Project project) {
         return true;
     }
