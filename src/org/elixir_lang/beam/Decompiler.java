@@ -64,10 +64,10 @@ public class Decompiler implements BinaryFileDecompiler {
                             .append(defmoduleArgument)
                             .append(" do\n");
 
-                    Documentation beamDocumentation = beam.documentation();
-                    if (beamDocumentation != null) {
-                        String moduleDocs = beamDocumentation.getModuleDocs() != null
-                                ? beamDocumentation.getModuleDocs().getEnglishDocs()
+                    Documentation documentation = beam.documentation();
+                    if (documentation != null) {
+                        String moduleDocs = documentation.getModuleDocs() != null
+                                ? documentation.getModuleDocs().getEnglishDocs()
                                 : null;
 
                         if (moduleDocs != null){
@@ -77,7 +77,7 @@ public class Decompiler implements BinaryFileDecompiler {
                         }
                     }
 
-                    appendCallDefinitions(decompiled, beam, atoms, beamDocumentation);
+                    appendCallDefinitions(decompiled, beam, atoms, documentation);
 
                     decompiled.append("end\n");
                 } else {
@@ -95,9 +95,9 @@ public class Decompiler implements BinaryFileDecompiler {
 
     private static void appendCallDefinitions(@NotNull StringBuilder decompiled,
                                               @NotNull Beam beam,
-                                              @NotNull Atoms atoms, Documentation beamDocumentation) {
+                                              @NotNull Atoms atoms, Documentation documentation) {
         SortedSet<MacroNameArity> macroNameAritySortedSet = CallDefinitions.macroNameAritySortedSet(beam, atoms);
-        appendCallDefinitions(decompiled, macroNameAritySortedSet, beamDocumentation);
+        appendCallDefinitions(decompiled, macroNameAritySortedSet, documentation);
     }
 
     @NotNull
@@ -106,15 +106,15 @@ public class Decompiler implements BinaryFileDecompiler {
     }
 
     private static void appendCallDefinitions(@NotNull StringBuilder decompiled,
-                                              @NotNull SortedSet<MacroNameArity> macroNameAritySortedSet, Documentation beamDocumentation) {
+                                              @NotNull SortedSet<MacroNameArity> macroNameAritySortedSet, Documentation documentation) {
         MacroNameArity lastMacroNameArity = null;
 
         for (MacroNameArity macroNameArity : macroNameAritySortedSet) {
             String macro = macroNameArity.macro;
 
-            if (beamDocumentation != null){
-                List<FunctionMetadata> functionMetadata = beamDocumentation.getDocs() != null
-                        ? beamDocumentation.getDocs().getFunctionMetadataOrSimilar(macroNameArity.name, macroNameArity.arity)
+            if (documentation != null){
+                List<FunctionMetadata> functionMetadata = documentation.getDocs() != null
+                        ? documentation.getDocs().getFunctionMetadataOrSimilar(macroNameArity.name, macroNameArity.arity)
                         : null;
                 if (functionMetadata != null){
                     functionMetadata.stream().filter(x -> x.getName().equals("deprecated")).forEach(x -> {
@@ -127,8 +127,8 @@ public class Decompiler implements BinaryFileDecompiler {
                         }
                     });
                 }
-                List<Doc> functionDocs = beamDocumentation.getDocs() != null
-                        ? beamDocumentation.getDocs().getFunctionDocs(macroNameArity.name, macroNameArity.arity)
+                List<Doc> functionDocs = documentation.getDocs() != null
+                        ? documentation.getDocs().getFunctionDocs(macroNameArity.name, macroNameArity.arity)
                         : null;
                 if (functionDocs != null){
                     functionDocs.forEach(x -> {
@@ -147,8 +147,8 @@ public class Decompiler implements BinaryFileDecompiler {
 
             decompiled.append("\n");
 
-            List<String> signaturesFromDocs = beamDocumentation != null && beamDocumentation.getBeamLanguage().equals("elixir")
-                    ? beamDocumentation.getDocs().getSignatures(macroNameArity.name, macroNameArity.arity)
+            List<String> signaturesFromDocs = documentation != null && documentation.getBeamLanguage().equals("elixir")
+                    ? documentation.getDocs().getSignatures(macroNameArity.name, macroNameArity.arity)
                     : null;
             if (signaturesFromDocs != null && !signaturesFromDocs.isEmpty()){
                 decompiled.append("  def ");
