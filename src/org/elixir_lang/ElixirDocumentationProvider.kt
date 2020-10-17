@@ -3,6 +3,7 @@ package org.elixir_lang
 import com.intellij.lang.documentation.DocumentationMarkup
 import com.intellij.lang.documentation.DocumentationProvider
 import com.intellij.psi.PsiElement
+import org.elixir_lang.beam.Beam
 import org.elixir_lang.beam.chunk.BeamDocumentationProvider
 import org.elixir_lang.beam.psi.BeamFileImpl
 import org.elixir_lang.psi.*
@@ -11,6 +12,7 @@ import org.elixir_lang.psi.impl.ElixirUnmatchedUnqualifiedNoParenthesesCallImpl
 import org.elixir_lang.psi.impl.getModuleName
 import org.elixir_lang.psi.impl.prevSiblingSequence
 import org.elixir_lang.reference.Callable
+import org.elixir_lang.reference.Module
 import org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor
 import org.intellij.markdown.html.HtmlGenerator
 import org.intellij.markdown.parser.MarkdownParser
@@ -36,11 +38,8 @@ class ElixirDocumentationProvider : DocumentationProvider {
 
         val definitionString = when (fetchedDocs) {
             is FetchedDocs.FunctionOrMacroDocumentation -> {
-                if (fetchedDocs.arguments.isNotEmpty())
-                    "<i>${fetchedDocs.definer} ${fetchedDocs.moduleName}</i>.<b>${fetchedDocs.methodName}</b>" +
+                    "<i>${fetchedDocs.kind} ${fetchedDocs.moduleName}</i>.<b>${fetchedDocs.methodName}</b>" +
                             "(${fetchedDocs.arguments.joinToString()})"
-                else
-                    "<i>${fetchedDocs.definer} ${fetchedDocs.moduleName}</i>.<b>${fetchedDocs.methodName}</b>()"
             }
             is FetchedDocs.ModuleDocumentation -> {
                 "<i>defmodule</i> <b>${fetchedDocs.moduleName}</b>"
@@ -51,6 +50,11 @@ class ElixirDocumentationProvider : DocumentationProvider {
         documentationHtml.append(definitionString)
         documentationHtml.append(DocumentationMarkup.DEFINITION_END)
         documentationHtml.append(DocumentationMarkup.CONTENT_START)
+        if (fetchedDocs is FetchedDocs.FunctionOrMacroDocumentation && fetchedDocs.deprecated != null){
+            documentationHtml.append("<b>deprecated</b> ")
+            documentationHtml.append(fetchedDocs.deprecated)
+            documentationHtml.append("\n")
+        }
         documentationHtml.append(html)
         documentationHtml.append(DocumentationMarkup.CONTENT_END)
         return documentationHtml.toString()
@@ -59,15 +63,44 @@ class ElixirDocumentationProvider : DocumentationProvider {
 
     fun fetchDocs(element: PsiElement): FetchedDocs? {
         val resolved = element.reference?.resolve()
-                ?: (element.reference as? Callable)?.multiResolve(false)?.map { it.element }?.firstOrNull()
+                ?: ((element.reference as? Callable)?.multiResolve(false) ?: (element.reference as? Module)?.multiResolve(false))
+                        ?.map { it.element }
+                        ?.filterIsInstance<ElixirUnmatchedExpression>()
+                        ?.firstOrNull()
                 ?: return null
 
+        // If resolves to .beam file then fetch docs from the decompiled docs
         if (resolved.containingFile.originalFile is BeamFileImpl){
-            val resovler = BeamDocumentationProvider()
-            val moduleDocumentation = resovler.getModuleDocs(resolved.containingFile.originalFile.virtualFile)
-            return moduleDocumentation?.let { FetchedDocs.ModuleDocumentation(resolved.getModuleName().orEmpty(), it) }
-        }
+            if (element is Call){
+                val functionName = element.functionName().orEmpty()
+                val arityRange = element.primaryArity()
 
+                val beam = Beam.from(resolved.containingFile.originalFile.virtualFile) ?: return null
+                val moduleName = beam.atoms()?.moduleName().orEmpty()
+
+                val docs = beam.beamDocumentation()?.docs
+                    ?.docsForOrSimilar(functionName, arityRange ?: 0) ?: return null
+
+                val kind = docs.kind
+
+                val signature = docs.signatures.first()
+                val arguments = signature.removePrefix(functionName)
+                        .removePrefix("(")
+                        .removeSuffix(")")
+                        .split(",")
+
+                val resolver = BeamDocumentationProvider()
+                val functionDocs = resolver.getFunctionDocs(resolved.containingFile.originalFile.virtualFile, functionName, arityRange ?: 0)
+                return functionDocs?.firstOrNull()?.let {
+                    FetchedDocs.FunctionOrMacroDocumentation(moduleName, it.documentationText, kind,
+                    functionName, "", arguments ) }
+            }
+            else if (element.text.first().isUpperCase()){
+                val resolver = BeamDocumentationProvider()
+                val moduleDocumentation = resolver.getModuleDocs(resolved.containingFile.originalFile.virtualFile)
+                return moduleDocumentation?.let { FetchedDocs.ModuleDocumentation(resolved.getModuleName().orEmpty(), it) }
+            }
+        }
 
         // If resolved to a module, then fetch moduledoc from the body
         if (resolved.firstChild?.text == "defmodule") {
@@ -95,20 +128,23 @@ class ElixirDocumentationProvider : DocumentationProvider {
         val functionName = element.functionName().orEmpty()
         val arityRange = element.resolvedFinalArityRange()
 
-        val (functionDocsArity, functionDocs) =
-                resolved.siblings()
-                        .filterIsInstance<Call>()
-                        .filter { it.name == functionName }
-                        .sortedWith(
-                                compareByDescending<PsiElement> { call -> findElixirFunction(call)?.resolvedFinalArityRange()?.any { arityRange.contains(it) } }
-                                        .thenByDescending{ arityRange.max() == findElixirFunction(it)?.primaryArity() }
-                                        .thenBy{ findElixirFunction(it)?.primaryArity() }
-                        )
-                        .map{Pair(findElixirFunction(it)?.primaryArity(), findMethodDocs(it)) }
-                        .filter { it.second != null }
-                        .firstOrNull()
-                        ?: return null
+        val deprecated = findDeprecatedAttribute(resolved)
 
+        val pair =
+        resolved.siblings()
+                .filterIsInstance<Call>()
+                .filter { it.name == functionName }
+                .sortedWith(
+                        compareByDescending<PsiElement> { call -> findElixirFunction(call)?.resolvedFinalArityRange()?.any { arityRange.contains(it) } }
+                                .thenByDescending{ arityRange.max() == findElixirFunction(it)?.primaryArity() }
+                                .thenBy{ findElixirFunction(it)?.primaryArity() }
+                )
+                .map{Pair(findElixirFunction(it)?.primaryArity(), findMethodDocs(it)) }
+                .filter { it.second != null }
+                .firstOrNull()
+
+        val functionDocsArity = pair?.first ?: arityRange.max()
+        val functionDocs = pair?.second
 
 
         val elixirFunction = findElixirFunction(resolved)
@@ -133,10 +169,10 @@ class ElixirDocumentationProvider : DocumentationProvider {
                     .firstOrNull()?.primaryArguments()
                     ?.map { it.text }
 
-        if (!functionDocs.isNullOrBlank()){
-            val definer = resolved.firstChild?.text.orEmpty()
+        if (!functionDocs.isNullOrBlank() || !deprecated.isNullOrBlank()){
+            val kind = resolved.firstChild?.text.orEmpty().toKind()
             val moduleName = resolved.parent?.getModuleName().orEmpty()
-            return FetchedDocs.FunctionOrMacroDocumentation(moduleName, functionDocs, definer, functionName, functionArguments.orEmpty())
+            return FetchedDocs.FunctionOrMacroDocumentation(moduleName, functionDocs.orEmpty(), kind, functionName, deprecated, functionArguments.orEmpty())
         }
         return null
     }
@@ -155,9 +191,25 @@ class ElixirDocumentationProvider : DocumentationProvider {
         }
 
         val docsLines = methodDocs
-                .mapNotNull { (it.lastChild?.firstChild?.firstChild as? Heredoc)?.children?.toList() }
-                .flatten()
-                .map { it.text }
+                .mapNotNull { it.getAttributeText() }
+
+        return docsLines.joinToString("") { it }
+    }
+
+    private fun findDeprecatedAttribute(resolved: PsiElement): String? {
+        val deprecatedAttributes = resolved
+                .prevSiblingSequence()
+                .drop(1)
+                .takeWhile { !isDefiner(it as? ElixirUnmatchedUnqualifiedNoParenthesesCall) }
+                .filterIsInstance<ElixirUnmatchedAtUnqualifiedNoParenthesesCall>()
+                .filter { it.firstChild is ElixirAtIdentifier && it.firstChild.lastChild?.text == "deprecated" }
+                .toList()
+
+        if (deprecatedAttributes.isEmpty()) {
+            return null
+        }
+        val docsLines = deprecatedAttributes
+                .mapNotNull { it.getAttributeText() }
 
         return docsLines.joinToString("") { it }
     }
@@ -183,12 +235,32 @@ class ElixirDocumentationProvider : DocumentationProvider {
     sealed class FetchedDocs(open val moduleName: String, open val docsMarkdown: String) {
         data class FunctionOrMacroDocumentation(override val moduleName: String,
                                                 override val docsMarkdown: String,
-                                                val definer: String,
+                                                val kind: String,
                                                 val methodName: String,
+                                                val deprecated: String?,
                                                 val arguments: List<String>) : FetchedDocs(moduleName, docsMarkdown)
 
         data class ModuleDocumentation(override val moduleName: String,
                                        override val docsMarkdown: String) : FetchedDocs(moduleName, docsMarkdown)
     }
 
+}
+
+private fun ElixirUnmatchedAtUnqualifiedNoParenthesesCall.getAttributeText() : String?{
+    val element = this.lastChild.firstChild.firstChild
+    if (element is Heredoc){
+        return element.children.joinToString("") { it.text }
+    }
+    if (element is ElixirStringLine) {
+        return element.quoteStringBody?.text
+    }
+    return null
+}
+
+private fun String.toKind(): String {
+    if (this == "def")
+        return "function"
+    if (this == "defmacro")
+        return "macro"
+    return this
 }
