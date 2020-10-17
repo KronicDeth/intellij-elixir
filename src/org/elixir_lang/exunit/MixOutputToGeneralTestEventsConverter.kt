@@ -1,107 +1,85 @@
-package org.elixir_lang.exunit;
+package org.elixir_lang.exunit
 
-import com.intellij.execution.process.ProcessOutputTypes;
-import com.intellij.execution.testframework.TestConsoleProperties;
-import com.intellij.execution.testframework.sm.runner.OutputEventSplitter;
-import com.intellij.execution.testframework.sm.runner.OutputToGeneralTestEventsConverter;
-import com.intellij.openapi.util.Key;
-import org.elixir_lang.mix.runner.Status;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.intellij.execution.process.ProcessOutputTypes
+import com.intellij.execution.testframework.TestConsoleProperties
+import com.intellij.execution.testframework.sm.runner.OutputEventSplitter
+import com.intellij.execution.testframework.sm.runner.OutputToGeneralTestEventsConverter
+import com.intellij.openapi.util.Key
+import org.elixir_lang.mix.runner.Status
 
-public class MixOutputToGeneralTestEventsConverter extends OutputToGeneralTestEventsConverter {
-    @NotNull
-    private OutputEventSplitter splitter;
-    @Nullable
-    private Status stderrStatus = null;
-    @Nullable
-    private Status stdoutStatus = null;
+class MixOutputToGeneralTestEventsConverter internal constructor(testFrameworkName: String, consoleProperties: TestConsoleProperties) : OutputToGeneralTestEventsConverter(testFrameworkName, consoleProperties) {
+    private val splitter: OutputEventSplitter = object : OutputEventSplitter() {
+        override fun onTextAvailable(text: String, outputType: Key<*>) {
+            processConsistentText(text, outputType)
+        }
+    }
+    private var stderrStatus: Status? = null
+    private var stdoutStatus: Status? = null
 
-    MixOutputToGeneralTestEventsConverter(@NotNull String testFrameworkName, @NotNull TestConsoleProperties consoleProperties) {
-        super(testFrameworkName, consoleProperties);
-
-        splitter = new OutputEventSplitter() {
-            @Override
-            public void onTextAvailable(@NotNull String text, @NotNull Key outputType) {
-                processConsistentText(text, outputType);
-            }
-        };
+    override fun flushBufferOnProcessTermination(code: Int) {
+        super.flushBufferOnProcessTermination(code)
+        processStatuses()
     }
 
-    /**
-     * Flashes the rest of stdout text buffer after output has been stopped
-     */
-    @Override
-    public void flushBufferBeforeTerminating() {
-        super.flushBufferBeforeTerminating();
-        processStatuses();
+    override fun process(text: String, outputType: Key<*>?) {
+        splitter.process(text, outputType!!)
     }
 
-    @Override
-    public void flushBufferOnProcessTermination(int code) {
-        super.flushBufferOnProcessTermination(code);
-        processStatuses();
-    }
-
-    @Override
-    public void process(String text, Key outputType) {
-        splitter.process(text, outputType);
-    }
-
-    private void processStatus(@NotNull Status status, @NotNull Key outputType) {
-        for (String text : status.toTeamCityMessageList()) {
-            super.processConsistentText(text, outputType);
+    private fun processStatus(status: Status, outputType: Key<*>) {
+        for (text in status.toTeamCityMessageList()) {
+            super.processConsistentText(text, outputType)
         }
     }
 
-    private void processStatuses() {
-        if (stderrStatus != null) {
-            processStatus(stderrStatus, ProcessOutputTypes.STDERR);
-            stderrStatus = null;
+    private fun processStatuses() {
+        stderrStatus?.let {
+            processStatus(it, ProcessOutputTypes.STDERR)
+            stderrStatus = null
         }
-
-        if (stdoutStatus != null) {
-            processStatus(stdoutStatus, ProcessOutputTypes.STDOUT);
-            stdoutStatus = null;
+        stdoutStatus?.let {
+            processStatus(it, ProcessOutputTypes.STDOUT)
+            stdoutStatus = null
         }
     }
 
-    @Override
-    public void processConsistentText(@NotNull String text, @NotNull Key outputType) {
-        if (outputType == ProcessOutputTypes.STDERR) {
+    public override fun processConsistentText(text: String, outputType: Key<*>) {
+        if (outputType === ProcessOutputTypes.STDERR) {
             if (stderrStatus != null) {
-                if (text.startsWith("  ")) {
-                    stderrStatus.addLine(text);
-                } else if (text.equals("\n")) {
-                    processStatus(stderrStatus, outputType);
-                    stderrStatus = null;
-                } else {
-                    super.processConsistentText(text, outputType);
+                when {
+                    text.startsWith("  ") -> {
+                        stderrStatus!!.addLine(text)
+                    }
+                    text == "\n" -> {
+                        processStatus(stderrStatus!!, outputType)
+                        stderrStatus = null
+                    }
+                    else -> {
+                        super.processConsistentText(text, outputType)
+                    }
                 }
             } else {
-                stderrStatus = Status.fromStderrLine(text);
-
+                stderrStatus = Status.fromStderrLine(text)
                 if (stderrStatus == null) {
-                    super.processConsistentText(text, outputType);
+                    super.processConsistentText(text, outputType)
                 }
             }
-        } else if (outputType == ProcessOutputTypes.STDOUT) {
+        } else if (outputType === ProcessOutputTypes.STDOUT) {
             if (stdoutStatus != null) {
-                if (text.equals("\n")) {
-                    processStatus(stdoutStatus, outputType);
-                    stdoutStatus = null;
+                if (text == "\n") {
+                    processStatus(stdoutStatus!!, outputType)
+                    stdoutStatus = null
                 } else {
-                    stdoutStatus.addLine(text);
+                    stdoutStatus!!.addLine(text)
                 }
             } else {
-                stdoutStatus = Status.fromStdoutLine(text);
-
+                stdoutStatus = Status.fromStdoutLine(text)
                 if (stdoutStatus == null) {
-                    super.processConsistentText(text, outputType);
+                    super.processConsistentText(text, outputType)
                 }
             }
         } else {
-            super.processConsistentText(text, outputType);
+            super.processConsistentText(text, outputType)
         }
     }
+
 }
