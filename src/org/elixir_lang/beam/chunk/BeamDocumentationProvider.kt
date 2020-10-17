@@ -4,6 +4,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import org.elixir_lang.beam.Beam
 import org.elixir_lang.beam.Beam.Companion.from
 import org.elixir_lang.beam.chunk.beam_documentation.BeamDoc
+import org.elixir_lang.beam.chunk.beam_documentation.BeamFunctionMetadata
 import java.util.*
 
 /***
@@ -29,6 +30,26 @@ class BeamDocumentationProvider {
         }
         return null
     }
+
+    fun getFunctionAttributes(virtualFile: VirtualFile, functionName: String, arity: Int): List<BeamFunctionMetadata>? {
+        return getFunctionAttributes(Optional.ofNullable(from(virtualFile)), functionName, arity)
+    }
+
+    private fun getFunctionAttributes(beamOptional: Optional<Beam>, functionName: String, arity: Int): List<BeamFunctionMetadata>? {
+        if (beamOptional.isPresent) {
+            val beam: Beam = beamOptional.get()
+            val atoms = beam.atoms()
+            if (atoms != null) {
+                val moduleName = atoms.moduleName()
+
+                if (moduleName != null) {
+                    return beam.beamDocumentation()?.docs?.getFunctionMetadataOrSimilar(functionName, arity)
+                }
+            }
+        }
+        return null
+    }
+
 
     fun getModuleDocs(virtualFile: VirtualFile): String? {
         return getModuleDocs(Optional.ofNullable(from(virtualFile)))

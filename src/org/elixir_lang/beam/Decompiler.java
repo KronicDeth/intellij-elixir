@@ -9,6 +9,7 @@ import org.elixir_lang.beam.chunk.Atoms;
 import org.elixir_lang.beam.chunk.BeamDocumentation;
 import org.elixir_lang.beam.chunk.CallDefinitions;
 import org.elixir_lang.beam.chunk.beam_documentation.BeamDoc;
+import org.elixir_lang.beam.chunk.beam_documentation.BeamFunctionMetadata;
 import org.elixir_lang.beam.decompiler.Default;
 import org.elixir_lang.beam.decompiler.InfixOperator;
 import org.elixir_lang.beam.decompiler.PrefixOperator;
@@ -112,6 +113,20 @@ public class Decompiler implements BinaryFileDecompiler {
             String macro = macroNameArity.macro;
 
             if (beamDocumentation != null){
+                List<BeamFunctionMetadata> functionMetadata = beamDocumentation.getDocs() != null
+                        ? beamDocumentation.getDocs().getFunctionMetadataOrSimilar(macroNameArity.name, macroNameArity.arity)
+                        : null;
+                if (functionMetadata != null){
+                    functionMetadata.stream().filter(x -> x.getName().equals("deprecated")).forEach(x -> {
+                        if (x.getValue() != null){
+                            decompiled.append("\n  @deprecated \"\"\"\n");
+                            decompiled.append(x.getValue());
+                            decompiled.append("\n\"\"\"\n");
+                        }else{
+                            decompiled.append("\n  @deprecated\n");
+                        }
+                    });
+                }
                 List<BeamDoc> functionDocs = beamDocumentation.getDocs() != null
                         ? beamDocumentation.getDocs().getMarkdownFunctionDocs(macroNameArity.name, macroNameArity.arity)
                         : null;

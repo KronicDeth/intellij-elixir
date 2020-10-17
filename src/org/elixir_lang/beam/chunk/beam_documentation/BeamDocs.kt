@@ -6,7 +6,10 @@ data class BeamFunctionInfo(val kind: String,
                             val name: String,
                             val arity: Int,
                             val signatures: List<String>,
-                            val docs: List<BeamDoc>)
+                            val docs: List<BeamDoc>,
+                            val metadata: List<BeamFunctionMetadata>)
+
+data class BeamFunctionMetadata(val name: String, val value: String?)
 
 data class BeamDoc(val language: String,
                    val format: String,
@@ -43,6 +46,14 @@ class BeamDocs(val docsList: OtpErlangList){
                 .flatMap { it.docs }
     }
 
+    fun getFunctionMetadataOrSimilar(name: String, arity: Int = 0): List<BeamFunctionMetadata> {
+        return functionDocs
+                .filter { it.name == name }
+                .sortedByDescending { it.arity == arity }
+                .flatMap { it.metadata }
+    }
+
+
 
     /** Get only markdown formatted docs */
     fun getMarkdownFunctionDocs(name: String, arity: Int): List<BeamDoc> {
@@ -75,7 +86,10 @@ class BeamDocs(val docsList: OtpErlangList){
                                         it.value.getBinaryValueString()) }
                             ?.toList() ?: listOf()
 
-                    return@map BeamFunctionInfo(kind, name, arity, signatures, docs)
+                    val metadata = (element.elementAt(4)) as OtpErlangMap
+                    val metadataList = metadata.entrySet().map { BeamFunctionMetadata((it.key as OtpErlangAtom).atomValue(), ((it.value as? OtpErlangBinary)?.getBinaryValueString())) }
+
+                    return@map BeamFunctionInfo(kind, name, arity, signatures, docs, metadataList)
                 }
     }
 

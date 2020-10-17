@@ -90,10 +90,16 @@ class ElixirDocumentationProvider : DocumentationProvider {
                         .split(",")
 
                 val resolver = BeamDocumentationProvider()
+
+                val metadata = resolver.getFunctionAttributes(resolved.containingFile.originalFile.virtualFile, functionName, arityRange ?: 0)
+                val deprecatedMetadata = metadata?.firstOrNull{it.name == "deprecated"}
+                val deprecatedText: String? = if (deprecatedMetadata == null) null else deprecatedMetadata.value.orEmpty()
+
                 val functionDocs = resolver.getFunctionDocs(resolved.containingFile.originalFile.virtualFile, functionName, arityRange ?: 0)
-                return functionDocs?.firstOrNull()?.let {
-                    FetchedDocs.FunctionOrMacroDocumentation(moduleName, it.documentationText, kind,
-                    functionName, "", arguments ) }
+                val docsText = functionDocs?.firstOrNull()?.documentationText
+                if (docsText != null || deprecatedMetadata != null)
+                    FetchedDocs.FunctionOrMacroDocumentation(moduleName, docsText.orEmpty(), kind,
+                    functionName, deprecatedText, arguments )
             }
             else if (element.text.first().isUpperCase()){
                 val resolver = BeamDocumentationProvider()
