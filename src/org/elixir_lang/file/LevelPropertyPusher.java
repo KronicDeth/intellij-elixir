@@ -26,7 +26,6 @@ import com.intellij.openapi.vfs.VirtualFileVisitor;
 import com.intellij.openapi.vfs.newvfs.FileAttribute;
 import com.intellij.util.FileContentUtil;
 import com.intellij.util.io.DataInputOutputUtil;
-import com.intellij.util.messages.MessageBus;
 import gnu.trove.THashSet;
 import org.elixir_lang.Level;
 import org.elixir_lang.module.ElixirModuleType;
@@ -222,7 +221,7 @@ public class LevelPropertyPusher implements FilePropertyPusher<Level> {
     }
 
     @Override
-    public void initExtra(@NotNull Project project, @NotNull MessageBus bus, @NotNull Engine languageLevelUpdater) {
+    public void initExtra(@NotNull Project project) {
         Map<Module, Sdk> sdkByModule = sdkByModule(project);
         Set<Sdk> sdkSet = sdkByModuleToSdkSet(sdkByModule);
 
