@@ -3,8 +3,8 @@ package org.elixir_lang.beam.chunk
 import com.intellij.openapi.vfs.VirtualFile
 import org.elixir_lang.beam.Beam
 import org.elixir_lang.beam.Beam.Companion.from
-import org.elixir_lang.beam.chunk.beam_documentation.BeamDoc
-import org.elixir_lang.beam.chunk.beam_documentation.BeamFunctionMetadata
+import org.elixir_lang.beam.chunk.beam_documentation.Doc
+import org.elixir_lang.beam.chunk.beam_documentation.FunctionMetadata
 import java.util.*
 
 /***
@@ -12,11 +12,11 @@ import java.util.*
  */
 class BeamDocumentationProvider {
 
-    fun getFunctionDocs(virtualFile: VirtualFile, functionName: String, arity: Int): List<BeamDoc>? {
+    fun getFunctionDocs(virtualFile: VirtualFile, functionName: String, arity: Int): List<Doc>? {
         return getFunctionDocs(Optional.ofNullable(from(virtualFile)), functionName, arity)
     }
 
-    private fun getFunctionDocs(beamOptional: Optional<Beam>, functionName: String, arity: Int): List<BeamDoc>? {
+    private fun getFunctionDocs(beamOptional: Optional<Beam>, functionName: String, arity: Int): List<Doc>? {
         if (beamOptional.isPresent) {
             val beam: Beam = beamOptional.get()
             val atoms = beam.atoms()
@@ -24,18 +24,18 @@ class BeamDocumentationProvider {
                 val moduleName = atoms.moduleName()
 
                 if (moduleName != null) {
-                    return beam.beamDocumentation()?.docs?.getFunctionDocsOrSimilar(functionName, arity)
+                    return beam.documentation()?.docs?.getFunctionDocsOrSimilar(functionName, arity)
                 }
             }
         }
         return null
     }
 
-    fun getFunctionAttributes(virtualFile: VirtualFile, functionName: String, arity: Int): List<BeamFunctionMetadata>? {
+    fun getFunctionAttributes(virtualFile: VirtualFile, functionName: String, arity: Int): List<FunctionMetadata>? {
         return getFunctionAttributes(Optional.ofNullable(from(virtualFile)), functionName, arity)
     }
 
-    private fun getFunctionAttributes(beamOptional: Optional<Beam>, functionName: String, arity: Int): List<BeamFunctionMetadata>? {
+    private fun getFunctionAttributes(beamOptional: Optional<Beam>, functionName: String, arity: Int): List<FunctionMetadata>? {
         if (beamOptional.isPresent) {
             val beam: Beam = beamOptional.get()
             val atoms = beam.atoms()
@@ -43,7 +43,7 @@ class BeamDocumentationProvider {
                 val moduleName = atoms.moduleName()
 
                 if (moduleName != null) {
-                    return beam.beamDocumentation()?.docs?.getFunctionMetadataOrSimilar(functionName, arity)
+                    return beam.documentation()?.docs?.getFunctionMetadataOrSimilar(functionName, arity)
                 }
             }
         }
@@ -63,7 +63,7 @@ class BeamDocumentationProvider {
                 val moduleName = atoms.moduleName()
 
                 if (moduleName != null) {
-                    return beam.beamDocumentation()?.moduleDocs?.englishDocs
+                    return beam.documentation()?.moduleDocs?.englishDocs
                 }
             }
         }

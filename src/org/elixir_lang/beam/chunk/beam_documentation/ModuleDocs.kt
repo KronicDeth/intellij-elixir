@@ -7,7 +7,7 @@ import com.ericsson.otp.erlang.OtpErlangObject
 
 data class BeamModuleDoc(val language: String, val text: String)
 
-class BeamModuleDocs(private val docsMap: OtpErlangMap) {
+class ModuleDocs(private val docsMap: OtpErlangMap) {
     val docsByLanguage: Iterable<BeamModuleDoc> by lazy { fetchModuleDocs() }
     val englishDocs: String? by lazy {
         docsByLanguage
@@ -23,10 +23,10 @@ class BeamModuleDocs(private val docsMap: OtpErlangMap) {
     }
 
     companion object{
-        fun from(term: OtpErlangMap?): BeamModuleDocs? =
+        fun from(term: OtpErlangMap?): ModuleDocs? =
                 when (term) {
                     null -> null
-                    is OtpErlangList -> BeamModuleDocs(term)
+                    is OtpErlangList -> ModuleDocs(term)
                     else -> TODO("Module Docs term is not OtpErlangList")
                 }
         }

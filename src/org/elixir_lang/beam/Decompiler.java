@@ -6,10 +6,10 @@ import com.intellij.openapi.diagnostic.Attachment;
 import com.intellij.openapi.fileTypes.BinaryFileDecompiler;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.elixir_lang.beam.chunk.Atoms;
-import org.elixir_lang.beam.chunk.BeamDocumentation;
+import org.elixir_lang.beam.chunk.beam_documentation.Documentation;
 import org.elixir_lang.beam.chunk.CallDefinitions;
-import org.elixir_lang.beam.chunk.beam_documentation.BeamDoc;
-import org.elixir_lang.beam.chunk.beam_documentation.BeamFunctionMetadata;
+import org.elixir_lang.beam.chunk.beam_documentation.Doc;
+import org.elixir_lang.beam.chunk.beam_documentation.FunctionMetadata;
 import org.elixir_lang.beam.decompiler.Default;
 import org.elixir_lang.beam.decompiler.InfixOperator;
 import org.elixir_lang.beam.decompiler.PrefixOperator;
@@ -64,7 +64,7 @@ public class Decompiler implements BinaryFileDecompiler {
                             .append(defmoduleArgument)
                             .append(" do\n");
 
-                    BeamDocumentation beamDocumentation = beam.beamDocumentation();
+                    Documentation beamDocumentation = beam.documentation();
                     if (beamDocumentation != null) {
                         String moduleDocs = beamDocumentation.getModuleDocs() != null
                                 ? beamDocumentation.getModuleDocs().getEnglishDocs()
@@ -95,7 +95,7 @@ public class Decompiler implements BinaryFileDecompiler {
 
     private static void appendCallDefinitions(@NotNull StringBuilder decompiled,
                                               @NotNull Beam beam,
-                                              @NotNull Atoms atoms, BeamDocumentation beamDocumentation) {
+                                              @NotNull Atoms atoms, Documentation beamDocumentation) {
         SortedSet<MacroNameArity> macroNameAritySortedSet = CallDefinitions.macroNameAritySortedSet(beam, atoms);
         appendCallDefinitions(decompiled, macroNameAritySortedSet, beamDocumentation);
     }
@@ -106,14 +106,14 @@ public class Decompiler implements BinaryFileDecompiler {
     }
 
     private static void appendCallDefinitions(@NotNull StringBuilder decompiled,
-                                              @NotNull SortedSet<MacroNameArity> macroNameAritySortedSet, BeamDocumentation beamDocumentation) {
+                                              @NotNull SortedSet<MacroNameArity> macroNameAritySortedSet, Documentation beamDocumentation) {
         MacroNameArity lastMacroNameArity = null;
 
         for (MacroNameArity macroNameArity : macroNameAritySortedSet) {
             String macro = macroNameArity.macro;
 
             if (beamDocumentation != null){
-                List<BeamFunctionMetadata> functionMetadata = beamDocumentation.getDocs() != null
+                List<FunctionMetadata> functionMetadata = beamDocumentation.getDocs() != null
                         ? beamDocumentation.getDocs().getFunctionMetadataOrSimilar(macroNameArity.name, macroNameArity.arity)
                         : null;
                 if (functionMetadata != null){
@@ -127,8 +127,8 @@ public class Decompiler implements BinaryFileDecompiler {
                         }
                     });
                 }
-                List<BeamDoc> functionDocs = beamDocumentation.getDocs() != null
-                        ? beamDocumentation.getDocs().getMarkdownFunctionDocs(macroNameArity.name, macroNameArity.arity)
+                List<Doc> functionDocs = beamDocumentation.getDocs() != null
+                        ? beamDocumentation.getDocs().getFunctionDocs(macroNameArity.name, macroNameArity.arity)
                         : null;
                 if (functionDocs != null){
                     functionDocs.forEach(x -> {
@@ -147,7 +147,7 @@ public class Decompiler implements BinaryFileDecompiler {
 
             decompiled.append("\n");
 
-            List<String> signaturesFromDocs = beamDocumentation != null && beamDocumentation.getBeamLanguage() == "elixir"
+            List<String> signaturesFromDocs = beamDocumentation != null && beamDocumentation.getBeamLanguage().equals("elixir")
                     ? beamDocumentation.getDocs().getSignatures(macroNameArity.name, macroNameArity.arity)
                     : null;
             if (signaturesFromDocs != null && !signaturesFromDocs.isEmpty()){
