@@ -11,9 +11,6 @@ import org.elixir_lang.beam.chunk.elixir_documentation.TypeDocs
 import org.elixir_lang.beam.term.inspect
 import org.elixir_lang.debugger.stack_frame.value.Presentation.toUtf8String
 
-/***
- * Old way of storing Elixir Documentation,
- */
 class ElixirDocumentation(keyword: OtpErlangList) {
     val callbackDocs: CallbackDocs? by lazy { CallbackDocs.from(Keyword.get(keyword, "callback_docs")) }
     val docs: Docs? by lazy { Docs.from(Keyword.get(keyword, "docs")) }

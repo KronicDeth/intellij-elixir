@@ -210,17 +210,6 @@ public class Decompiler implements BinaryFileDecompiler {
     }
 
     @NotNull
-    public static String moduleDocsArgument(String moduleName) {
-        String defmoduleArgument;
-        if (moduleName.startsWith(ELIXIR_PREFIX)) {
-            defmoduleArgument = moduleName.substring(ELIXIR_PREFIX.length());
-        } else {
-            defmoduleArgument = ":" + moduleNameToAtomName(moduleName);
-        }
-        return defmoduleArgument;
-    }
-
-    @NotNull
     public static String defmoduleArgument(String moduleName) {
         String defmoduleArgument;
         if (moduleName.startsWith(ELIXIR_PREFIX)) {
