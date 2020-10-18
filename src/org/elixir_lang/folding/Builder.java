@@ -111,7 +111,7 @@ public class Builder extends FoldingBuilderEx {
                                     atUnqualifiedNoParenthesesCall.getNoParenthesesOneArgument();
 
                             foldingDescriptorList.add(
-                                    new NamedFoldingDescriptor(
+                                    new FoldingDescriptor(
                                             noParenthesesOneArgument.getNode(),
                                             noParenthesesOneArgument.getTextRange(),
                                             null,
@@ -134,7 +134,7 @@ public class Builder extends FoldingBuilderEx {
 
                                     if (rightOperand != null) {
                                         foldingDescriptorList.add(
-                                                new NamedFoldingDescriptor(
+                                                new FoldingDescriptor(
                                                         rightOperand.getNode(),
                                                         rightOperand.getTextRange(),
                                                         null,
@@ -163,7 +163,7 @@ public class Builder extends FoldingBuilderEx {
                                         );
 
                                         foldingDescriptorList.add(
-                                                new NamedFoldingDescriptor(
+                                                new FoldingDescriptor(
                                                         call.getParent().getNode(),
                                                         textRange,
                                                         null,
