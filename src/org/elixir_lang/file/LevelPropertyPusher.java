@@ -252,7 +252,7 @@ public class LevelPropertyPusher implements FilePropertyPusher<Level> {
 
     private void updateSdkLevels(@NotNull Project project, @NotNull Set<Sdk> sdkSet) {
         final DumbService dumbService = DumbService.getInstance(project);
-        final DumbModeTask task = new DumbModeTask() {
+        final DumbModeTask task = new DumbModeTask(project) {
             @Override
             public void performInDumbMode(@NotNull ProgressIndicator indicator) {
                 if (!project.isDisposed()) {
