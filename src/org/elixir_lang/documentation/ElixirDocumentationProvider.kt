@@ -53,7 +53,6 @@ class ElixirDocumentationProvider : DocumentationProvider {
         documentationHtml.append(html)
         documentationHtml.append(DocumentationMarkup.CONTENT_END)
         return documentationHtml.toString()
-
     }
 
     fun fetchDocs(element: PsiElement): FetchedDocs? {
