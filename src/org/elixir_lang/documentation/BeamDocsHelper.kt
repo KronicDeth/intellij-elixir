@@ -43,7 +43,6 @@ object BeamDocsHelper {
                         functionName, deprecatedText, arguments)
         }
         else if (element.text.first().isUpperCase()){
-//            val moduleDocumentation = resolver.getModuleDocs(resolved.containingFile.originalFile.virtualFile)
             val beam = Beam.from(resolved.containingFile.originalFile.virtualFile) ?: return null
             val moduleDocumentation = beam.documentation()?.moduleDocs?.englishDocs
             return moduleDocumentation?.let { FetchedDocs.ModuleDocumentation(resolved.getModuleName().orEmpty(), it) }
