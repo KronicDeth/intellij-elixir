@@ -64,10 +64,14 @@ class ElixirDocumentationProvider : DocumentationProvider {
                 ?: return null
 
         // If resolves to .beam file then fetch docs from the decompiled docs
-        if (resolved.containingFile.originalFile is BeamFileImpl){
-            return BeamDocsHelper.fetchDocs(element, resolved)
+        if (resolved.containingFile.originalFile is BeamFileImpl || element.containingFile.originalFile is BeamFileImpl){
+            return BeamDocsHelper.fetchDocs(element, element)
+                    ?: SourceFileDocsHelper.fetchDocs(element, element)
+                    ?: BeamDocsHelper.fetchDocs(element, resolved)
+                    ?: SourceFileDocsHelper.fetchDocs(element, resolved)
         }
-        return SourceFileDocsHelper.fetchDocs(element, resolved)
+        return SourceFileDocsHelper.fetchDocs(element, element)
+                ?: SourceFileDocsHelper.fetchDocs(element, resolved)
     }
 }
 

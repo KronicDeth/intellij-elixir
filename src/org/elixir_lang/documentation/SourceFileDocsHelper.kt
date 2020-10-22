@@ -33,7 +33,7 @@ object SourceFileDocsHelper {
             return null
         }
 
-        val functionName = element.functionName().orEmpty()
+        val functionName = (element as? ElixirUnmatchedUnqualifiedNoParenthesesCall)?.canonicalName() ?: element.functionName().orEmpty()
         val arityRange = element.resolvedFinalArityRange()
 
         val deprecated = findDeprecatedAttribute(resolved)

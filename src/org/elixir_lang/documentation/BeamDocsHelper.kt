@@ -2,16 +2,23 @@ package org.elixir_lang.documentation
 
 import com.intellij.psi.PsiElement
 import org.elixir_lang.beam.Beam
+import org.elixir_lang.psi.ElixirUnmatchedUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.getModuleName
 
 object BeamDocsHelper {
     fun fetchDocs(element: PsiElement, resolved: PsiElement) : FetchedDocs? {
-        if (element is Call){
-            val functionName = element.functionName().orEmpty()
+        val beam = Beam.from(resolved.containingFile.originalFile.virtualFile)
+                ?: Beam.from(element.containingFile.originalFile.virtualFile)
+                ?: return null
+
+        if (element.firstChild?.text == "defmodule"){
+            val moduleDocumentation = beam.documentation()?.moduleDocs?.englishDocs
+            return moduleDocumentation?.let { FetchedDocs.ModuleDocumentation(resolved.getModuleName().orEmpty(), it) }
+        } else if (element is Call){
+            val functionName = (element as? ElixirUnmatchedUnqualifiedNoParenthesesCall)?.canonicalName() ?: element.functionName().orEmpty()
             val arityRange = element.primaryArity()
 
-            val beam = Beam.from(resolved.containingFile.originalFile.virtualFile) ?: return null
             val moduleName = beam.atoms()?.moduleName().orEmpty()
 
             val docs = beam.documentation()?.docs
@@ -41,12 +48,6 @@ object BeamDocsHelper {
             if (docsText != null || deprecatedMetadata != null)
                 return FetchedDocs.FunctionOrMacroDocumentation(moduleName, docsText.orEmpty(), kind,
                         functionName, deprecatedText, arguments)
-        }
-        else if (element.text.first().isUpperCase()){
-//            val moduleDocumentation = resolver.getModuleDocs(resolved.containingFile.originalFile.virtualFile)
-            val beam = Beam.from(resolved.containingFile.originalFile.virtualFile) ?: return null
-            val moduleDocumentation = beam.documentation()?.moduleDocs?.englishDocs
-            return moduleDocumentation?.let { FetchedDocs.ModuleDocumentation(resolved.getModuleName().orEmpty(), it) }
         }
 
         return null
