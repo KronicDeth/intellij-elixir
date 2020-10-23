@@ -14,7 +14,11 @@ import org.intellij.markdown.parser.MarkdownParser
 
 class ElixirDocumentationProvider : DocumentationProvider {
     override fun generateDoc(element: PsiElement, originalElement: PsiElement?): String? {
-        return fetchDocs(element)?.let { formatDocs(it) }
+        // When showing docs from auto-completed modules/functions
+        // it will resolve to def/defmodule element
+        // detect that and instead just ignore the definer
+        val ignoreDefiner = originalElement?.parent?.text?.isBlank() == true
+        return fetchDocs(element, ignoreDefiner)?.let { formatDocs(it) }
     }
 
     override fun generateHoverDoc(element: PsiElement, originalElement: PsiElement?): String? {
@@ -55,23 +59,22 @@ class ElixirDocumentationProvider : DocumentationProvider {
         return documentationHtml.toString()
     }
 
-    fun fetchDocs(element: PsiElement): FetchedDocs? {
-        val resolved = element.reference?.resolve()
+    fun fetchDocs(element: PsiElement, ignoreDefiner: Boolean): FetchedDocs? {
+        var resolved = element
+        if (!ignoreDefiner)
+            resolved = element.reference?.resolve()
                 ?: ((element.reference as? Callable)?.multiResolve(false) ?: (element.reference as? Module)?.multiResolve(false))
                         ?.map { it.element }
                         ?.filterIsInstance<ElixirUnmatchedExpression>()
                         ?.firstOrNull()
                 ?: return null
 
+
         // If resolves to .beam file then fetch docs from the decompiled docs
         if (resolved.containingFile.originalFile is BeamFileImpl || element.containingFile.originalFile is BeamFileImpl){
-            return BeamDocsHelper.fetchDocs(element, element)
-                    ?: SourceFileDocsHelper.fetchDocs(element, element)
-                    ?: BeamDocsHelper.fetchDocs(element, resolved)
-                    ?: SourceFileDocsHelper.fetchDocs(element, resolved)
+                return BeamDocsHelper.fetchDocs(element, resolved, ignoreDefiner)
         }
-        return SourceFileDocsHelper.fetchDocs(element, element)
-                ?: SourceFileDocsHelper.fetchDocs(element, resolved)
+        return SourceFileDocsHelper.fetchDocs(element, resolved)
     }
 }
 

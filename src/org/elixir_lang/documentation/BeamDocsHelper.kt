@@ -7,16 +7,16 @@ import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.getModuleName
 
 object BeamDocsHelper {
-    fun fetchDocs(element: PsiElement, resolved: PsiElement) : FetchedDocs? {
+    fun fetchDocs(element: PsiElement, resolved: PsiElement, ignoreDefiner: Boolean) : FetchedDocs? {
         val beam = Beam.from(resolved.containingFile.originalFile.virtualFile)
                 ?: Beam.from(element.containingFile.originalFile.virtualFile)
                 ?: return null
 
-        if (element.firstChild?.text == "defmodule"){
+        if (resolved.firstChild.text == "defmodule"){
             val moduleDocumentation = beam.documentation()?.moduleDocs?.englishDocs
             return moduleDocumentation?.let { FetchedDocs.ModuleDocumentation(resolved.getModuleName().orEmpty(), it) }
         } else if (element is Call){
-            val functionName = (element as? ElixirUnmatchedUnqualifiedNoParenthesesCall)?.canonicalName() ?: element.functionName().orEmpty()
+            val functionName = if (ignoreDefiner) element.name.orEmpty() else element.functionName().orEmpty()
             val arityRange = element.primaryArity()
 
             val moduleName = beam.atoms()?.moduleName().orEmpty()

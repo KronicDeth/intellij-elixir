@@ -164,8 +164,7 @@ public class Decompiler implements BinaryFileDecompiler {
                 decompiled.append(optional.get());
                 decompiled.append(" do\n    # body not decompiled\n  end\n");
             }else{
-
-            appendMacroNameArity(decompiled, macroNameArity);
+                appendMacroNameArity(decompiled, macroNameArity);
             }
 
             lastMacroNameArity = macroNameArity;
