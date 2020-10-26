@@ -17,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ItemEvent;
+import java.util.Objects;
 
 import static org.elixir_lang.sdk.elixir.Type.addNewCodePathsFromInternErlangSdk;
 import static org.elixir_lang.sdk.elixir.Type.removeCodePathsFromInternalErlangSdk;
@@ -232,7 +233,7 @@ public class AdditionalDataConfigurable implements com.intellij.openapi.projectR
                 final SdkAdditionalData sdkAdditionalData = (SdkAdditionalData) currentSdk.getSdkAdditionalData();
                 final Sdk erlangSdk = sdkAdditionalData.getErlangSdk();
 
-                if (erlangSdk != null && Comparing.equal(erlangSdk.getName(), previousName)) {
+                if (erlangSdk != null && Objects.equals(erlangSdk.getName(), previousName)) {
                     sdkAdditionalData.setErlangSdk(sdk);
                 }
             }
