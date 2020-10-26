@@ -22,7 +22,7 @@ public class ElixirFoldingSettings implements PersistentStateComponent<ElixirFol
     public boolean COLLAPSE_ELIXIR_MODULE_DIRECTIVE_GROUPS = false;
     public boolean REPLACE_MODULE_ATTRIBUTES_WITH_VALUES = false;
 
-    @Nullable
+    @NotNull
     @Override
     public ElixirFoldingSettings getState() {
         return this;
