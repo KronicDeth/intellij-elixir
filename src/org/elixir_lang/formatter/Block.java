@@ -13,7 +13,6 @@ import com.intellij.psi.impl.source.tree.CompositeElement;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
-import com.intellij.util.containers.Predicate;
 import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.code_style.CodeStyleSettings;
 import org.elixir_lang.psi.ElixirTypes;
@@ -24,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
 
 import static com.intellij.formatting.ChildAttributes.DELEGATE_TO_PREV_CHILD;
 import static org.apache.commons.lang.StringUtils.isWhitespace;
@@ -426,7 +426,7 @@ public class Block extends AbstractBlock implements BlockEx {
             @NotNull TokenSet operatorRuleTokenSet) {
         Alignment operandAlignment;
 
-        if (alignOperands.apply(codeStyleSettings(operation))) {
+        if (alignOperands.test(codeStyleSettings(operation))) {
             operandAlignment = Alignment.createAlignment();
         } else {
             operandAlignment = null;
