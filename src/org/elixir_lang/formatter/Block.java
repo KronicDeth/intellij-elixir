@@ -1,12 +1,12 @@
 package org.elixir_lang.formatter;
 
+import com.intellij.application.options.CodeStyle;
 import com.intellij.formatting.*;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.Language;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.TokenType;
-import com.intellij.psi.codeStyle.CodeStyleSettingsManager;
 import com.intellij.psi.codeStyle.CommonCodeStyleSettings;
 import com.intellij.psi.formatter.common.AbstractBlock;
 import com.intellij.psi.impl.source.tree.CompositeElement;
@@ -2176,17 +2176,11 @@ public class Block extends AbstractBlock implements BlockEx {
     }
 
     private CodeStyleSettings codeStyleSettings(@NotNull ASTNode node) {
-        return CodeStyleSettingsManager
-                .getInstance(node.getPsi().getProject())
-                .getCurrentSettings()
-                .getCustomSettings(CodeStyleSettings.class);
+        return CodeStyle.getCustomSettings(node.getPsi().getContainingFile(), CodeStyleSettings.class);
     }
 
     private CommonCodeStyleSettings commonCodeStyleSettings(@NotNull ASTNode node) {
-        return CodeStyleSettingsManager
-                .getInstance(node.getPsi().getProject())
-                .getCurrentSettings()
-                .getCommonSettings(ElixirLanguage.INSTANCE);
+        return CodeStyle.getLanguageSettings(node.getPsi().getContainingFile(), ElixirLanguage.INSTANCE);
     }
 
     @NotNull
