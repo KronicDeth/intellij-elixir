@@ -17,7 +17,8 @@ class ElixirDocumentationProvider : DocumentationProvider {
         // When showing docs from auto-completed modules/functions
         // it will resolve to def/defmodule element
         // detect that and instead just ignore the definer
-        val ignoreDefiner = originalElement?.parent?.text?.isBlank() == true
+        val ignoreDefiner = originalElement?.text?.isBlank() == true
+                || originalElement?.parent?.text?.isBlank() == true
         return fetchDocs(element, ignoreDefiner)?.let { formatDocs(it) }
     }
 
