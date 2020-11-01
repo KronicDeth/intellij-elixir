@@ -123,22 +123,22 @@ class UsageTypeProvider : com.intellij.usages.impl.rules.UsageTypeProviderEx {
         }
 
     companion object {
-        val ALIAS = UsageType("Alias")
-        val CALL = UsageType("Call")
-        val CALL_DEFINITION_CLAUSE = UsageType("Call definition clause")
-        val FUNCTION_PARAMETER = UsageType("Parameter declaration")
-        val MODULE_DEFINITION = UsageType("Module definition")
-        val MODULE_ATTRIBUTE_ACCUMULATE_OR_OVERRIDE = UsageType("Module attribute accumulate or override")
-        val MODULE_ATTRIBUTE_READ = UsageType("Module attribute read")
+        val ALIAS = UsageType { "Alias" }
+        val CALL = UsageType { "Call" }
+        val CALL_DEFINITION_CLAUSE = UsageType {"Call definition clause" }
+        val FUNCTION_PARAMETER = UsageType { "Parameter declaration" }
+        val MODULE_DEFINITION = UsageType { "Module definition" }
+        val MODULE_ATTRIBUTE_ACCUMULATE_OR_OVERRIDE = UsageType { "Module attribute accumulate or override" }
+        val MODULE_ATTRIBUTE_READ = UsageType { "Module attribute read" }
     }
 }
 
-private val FUNCTION_DEFINITION_CLAUSE = UsageType("Function definition clause")
-private val FUNCTION_CALL = UsageType("Function call")
-private val MACRO_CALL = UsageType("Macro call")
-private val MACRO_DEFINITION_CLAUSE = UsageType("Macro definition clause")
-private val REMOTE_CALL = UsageType("Remote call")
-private val USE = UsageType("Use")
+private val FUNCTION_DEFINITION_CLAUSE = UsageType { "Function definition clause" }
+private val FUNCTION_CALL = UsageType { "Function call" }
+private val MACRO_CALL = UsageType { "Macro call" }
+private val MACRO_DEFINITION_CLAUSE = UsageType { "Macro definition clause" }
+private val REMOTE_CALL = UsageType { "Remote call" }
+private val USE = UsageType { "Use" }
 
 private fun Array<out UsageTarget>.anyEquivalentElement(element: PsiElement): Boolean =
     element.manager.let { manager ->
