@@ -886,7 +886,7 @@ object Macro {
             }
         } ?: false
 
-    private fun sigilArguments(term: OtpErlangObject): String {
+    private fun sigilArguments(@Suppress("UNUSED_PARAMETER") term: OtpErlangObject): String {
         TODO("not implemented")
     }
 
@@ -1048,7 +1048,7 @@ object Macro {
             }
 
 
-    private fun interpolate(macro: OtpErlangTuple): String {
+    private fun interpolate(@Suppress("UNUSED_PARAMETER") macro: OtpErlangTuple): String {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
@@ -1358,7 +1358,7 @@ object Macro {
                     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex?utf8=%E2%9C%93#L798-L805
                     toString(module)
 
-    private fun kernelToString(term: OtpErlangObject): String {
+    private fun kernelToString(@Suppress("UNUSED_PARAMETER") term: OtpErlangObject): String {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
