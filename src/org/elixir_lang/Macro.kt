@@ -796,7 +796,7 @@ object Macro {
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex#L616-L626
     private fun ifWhenBinaryToString(macro: OtpErlangObject): String? =
             ifTagged3TupleTo(macro, "when") { tuple ->
-                (tuple.elementAt(2) as OtpErlangList)?.let { arguments ->
+                (tuple.elementAt(2) as? OtpErlangList)?.let { arguments ->
                     if (arguments.arity() == 2) {
                         val (left, right) = arguments
 
