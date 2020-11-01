@@ -158,7 +158,7 @@ class Panel(private val typeSpecificationTree: Tree, project: Project) : JPanel(
     private fun typeModuleString(type: Type, debugInfo: V1): String =
             typeModuleStringByType.computeIfAbsent(type) { key ->
                 debugInfo.moduleContext {
-                    typeString(type, debugInfo.typeSpecifications!!)
+                    typeString(key, debugInfo.typeSpecifications!!)
                 }
             }
 
@@ -207,7 +207,7 @@ class Panel(private val typeSpecificationTree: Tree, project: Project) : JPanel(
     private fun opaqueModuleString(opaque: Opaque, debugInfo: V1): String =
             opaqueModuleStringByOpaque.computeIfAbsent(opaque) { key ->
                 debugInfo.moduleContext {
-                    opaqueString(opaque)
+                    opaqueString(key)
                 }
             }
 
@@ -256,7 +256,7 @@ class Panel(private val typeSpecificationTree: Tree, project: Project) : JPanel(
     private fun callbackModuleString(callback: Callback, debugInfo: V1): String =
             callbackModuleStringByCallback.computeIfAbsent(callback) { key ->
                 debugInfo.moduleContext {
-                    callbackString(callback)
+                    callbackString(key)
                 }
             }
 
@@ -311,7 +311,7 @@ class Panel(private val typeSpecificationTree: Tree, project: Project) : JPanel(
     private fun optionalCallbackModuleString(optionalCallback: OptionalCallback, debugInfo: V1): String =
             optionalCallbackModuleStringByOptionalCallback.computeIfAbsent(optionalCallback) { key ->
                 debugInfo.moduleContext {
-                    "@optional_callbacks ${optionalCallbackString(optionalCallback)}"
+                    "@optional_callbacks ${optionalCallbackString(key)}"
                 }
             }
 
@@ -360,7 +360,7 @@ class Panel(private val typeSpecificationTree: Tree, project: Project) : JPanel(
     private fun specificationModuleString(specification: Specification, debugInfo: V1): String =
             specificationModuleStringBySpecification.computeIfAbsent(specification) { key ->
                 debugInfo.moduleContext {
-                    specificationString(specification)
+                    specificationString(key)
                 }
             }
 
