@@ -76,7 +76,7 @@ class Dialog(private val project: Project, val directory: PsiDirectory) : Create
         val canClose = canClose(text)
 
         return if (!canClose) {
-            val errorText = getErrorText(text) ?: LangBundle.message("incorrect.name")!!
+            val errorText = getErrorText(text) ?: LangBundle.message("incorrect.name")
 
             ValidationInfo(errorText, nameField)
         } else {
