@@ -54,8 +54,10 @@ class CallDefinition : LineMarkerProvider {
     private fun callDefinitionSeparator(psiElement: PsiElement): LineMarkerInfo<*> =
             LineMarkerInfo(
                     psiElement,
-                    psiElement.textRange, null,
-                    Pass.UPDATE_ALL, null, null,
+                    psiElement.textRange,
+                    null,
+                    null,
+                    null,
                     GutterIconRenderer.Alignment.RIGHT
             ).apply {
                 separatorColor = editorColorsManager.globalScheme.getColor(CodeInsightColors.METHOD_SEPARATORS_COLOR)
