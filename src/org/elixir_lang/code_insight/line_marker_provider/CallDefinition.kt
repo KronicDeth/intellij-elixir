@@ -75,7 +75,7 @@ class CallDefinition : LineMarkerProvider {
                             .siblingExpression(PREVIOUS_SIBLING)
                             .let { it as? AtUnqualifiedNoParenthesesCall<*>}
                             ?.let { previousModuleAttribute ->
-                                val previousModuleAttributeName = moduleAttributeName(previousModuleAttribute!!)
+                                val previousModuleAttributeName = moduleAttributeName(previousModuleAttribute)
 
                                 if (previousModuleAttributeName == "@spec") {
                                     moduleAttributeNameArity(previousModuleAttribute)?.let { moduleAttributeNameArity ->
