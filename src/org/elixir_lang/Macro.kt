@@ -1382,7 +1382,7 @@ object Macro {
             acc: T,
             pre: (OtpErlangObject, T) -> Pair<OtpErlangObject, T>
     ): Pair<OtpErlangObject, T> =
-        traverse(macro, acc, pre, { expression, acc -> Pair(expression, acc) })
+        traverse(macro, acc, pre, ::Pair)
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex?utf8=%E2%9C%93#L232-L240
     private fun <T> traverse(
