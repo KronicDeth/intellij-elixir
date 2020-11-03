@@ -169,7 +169,7 @@ private fun convertToProblemDescriptors(annotations: List<Annotation>,
     }
 
     val problems = ArrayList<ProblemDescriptor>(annotations.size)
-    val quickFixMappingCache = ContainerUtil.newIdentityHashMap<IntentionAction, LocalQuickFix>()
+    val quickFixMappingCache = IdentityHashMap<IntentionAction, LocalQuickFix>()
     for (annotation in annotations) {
         if (annotation.severity === HighlightSeverity.INFORMATION || annotation.startOffset == annotation.endOffset && !annotation.isAfterEndOfLine) {
             continue
