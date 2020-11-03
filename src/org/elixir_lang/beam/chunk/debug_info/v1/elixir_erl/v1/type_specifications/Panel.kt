@@ -7,7 +7,7 @@ import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFileFactory
-import com.intellij.util.containers.WeakValueHashMap
+import com.intellij.util.containers.ContainerUtil.createWeakValueMap
 import org.elixir_lang.ElixirFileType
 import org.elixir_lang.ElixirLanguage
 import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.V1
@@ -25,43 +25,32 @@ class Panel(private val typeSpecificationTree: Tree, project: Project) : JPanel(
     private val document = PsiDocumentManager.getInstance(project).getDocument(psiFile)!!
     private val editor = EditorFactory.getInstance().createEditor(document, project, ElixirFileType.INSTANCE, true)
 
-
     private var moduleString: WeakReference<String> = WeakReference<String>(null)
 
     private var typesModuleString: WeakReference<String> = WeakReference<String>(null)
     private var typesString: WeakReference<String> = WeakReference<String>(null)
-    @Suppress("DEPRECATION")
-    private val typeModuleStringByType = WeakValueHashMap<Type, String>()
-    @Suppress("DEPRECATION")
-    private val typeStringByType = WeakValueHashMap<Type, String>()
+    private val typeModuleStringByType = createWeakValueMap<Type, String>()
+    private val typeStringByType = createWeakValueMap<Type, String>()
 
     private var opaquesModuleString: WeakReference<String> = WeakReference<String>(null)
     private var opaquesString: WeakReference<String> = WeakReference<String>(null)
-    @Suppress("DEPRECATION")
-    private val opaqueModuleStringByOpaque = WeakValueHashMap<Opaque, String>()
-    @Suppress("DEPRECATION")
-    private val opaqueStringByOpaque = WeakValueHashMap<Opaque, String>()
+    private val opaqueModuleStringByOpaque = createWeakValueMap<Opaque, String>()
+    private val opaqueStringByOpaque = createWeakValueMap<Opaque, String>()
 
     private var callbacksModuleString: WeakReference<String> = WeakReference<String>(null)
     private var callbacksString: WeakReference<String> = WeakReference<String>(null)
-    @Suppress("DEPRECATION")
-    private val callbackModuleStringByCallback = WeakValueHashMap<Callback, String>()
-    @Suppress("DEPRECATION")
-    private val callbackStringByCallback = WeakValueHashMap<Callback, String>()
+    private val callbackModuleStringByCallback = createWeakValueMap<Callback, String>()
+    private val callbackStringByCallback = createWeakValueMap<Callback, String>()
 
     private var optionalCallbacksModuleString: WeakReference<String> = WeakReference<String>(null)
     private var optionalCallbacksString: WeakReference<String> = WeakReference<String>(null)
-    @Suppress("DEPRECATION")
-    private val optionalCallbackModuleStringByOptionalCallback = WeakValueHashMap<OptionalCallback, String>()
-    @Suppress("DEPRECATION")
-    private val optionalCallbackStringByOptionalCallback = WeakValueHashMap<OptionalCallback, String>()
+    private val optionalCallbackModuleStringByOptionalCallback = createWeakValueMap<OptionalCallback, String>()
+    private val optionalCallbackStringByOptionalCallback = createWeakValueMap<OptionalCallback, String>()
 
     private var specificationsModuleString: WeakReference<String> = WeakReference<String>(null)
     private var specificationsString: WeakReference<String> = WeakReference<String>(null)
-    @Suppress("DEPRECATION")
-    private val specificationModuleStringBySpecification = WeakValueHashMap<Specification, String>()
-    @Suppress("DEPRECATION")
-    private val specificationStringBySpecification = WeakValueHashMap<Specification, String>()
+    private val specificationModuleStringBySpecification = createWeakValueMap<Specification, String>()
+    private val specificationStringBySpecification = createWeakValueMap<Specification, String>()
 
     init {
         typeSpecificationTree.addTreeSelectionListener(this)

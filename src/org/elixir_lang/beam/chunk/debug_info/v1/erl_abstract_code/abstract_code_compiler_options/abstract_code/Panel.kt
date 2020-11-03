@@ -7,7 +7,7 @@ import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFileFactory
-import com.intellij.util.containers.WeakValueHashMap
+import com.intellij.util.containers.ContainerUtil.createWeakValueMap
 import org.elixir_lang.ElixirFileType
 import org.elixir_lang.ElixirLanguage
 import org.elixir_lang.Macro.adjustNewLines
@@ -32,23 +32,19 @@ class Panel(private val formsTree: Tree, project: Project): JPanel(GridLayout(1,
             true
     )
 
-    /* Have to use deprecated direct call to `WeakValueHashMap<K, V> instead of
-       `ContainerUtil.createWeakValueMap<K, V>()` because `ContainerUtil.createWeakValueMap<K, V>()` only exists in
-       IntelliJ Elixir >= 2017.3 */
+    private val attributeByToMacroString = createWeakValueMap<ToMacroString, String>()
 
-    private val attributeByToMacroString = WeakValueHashMap<ToMacroString, String>()
-
-    private val attributeModuleByAttribute = WeakValueHashMap<ToMacroString, String>()
+    private val attributeModuleByAttribute = createWeakValueMap<ToMacroString, String>()
 
     private var attributes: WeakReference<String> = WeakReference<String>(null)
     private var attributesModule: WeakReference<String> = WeakReference<String>(null)
 
-    private var clauseByClause = WeakValueHashMap<Clause, String>()
-    private var clauseModuleByClause = WeakValueHashMap<Clause, String>()
+    private var clauseByClause = createWeakValueMap<Clause, String>()
+    private var clauseModuleByClause = createWeakValueMap<Clause, String>()
 
-    private val functionByFunction = WeakValueHashMap<Function, String>()
+    private val functionByFunction = createWeakValueMap<Function, String>()
 
-    private val functionModuleByFunction = WeakValueHashMap<Function, String>()
+    private val functionModuleByFunction = createWeakValueMap<Function, String>()
 
     private var functions: WeakReference<String> = WeakReference<String>(null)
     private var functionsModule: WeakReference<String> = WeakReference<String>(null)
