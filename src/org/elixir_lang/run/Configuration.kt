@@ -31,7 +31,7 @@ fun ensureWorkingDirectory(project: Project, module: com.intellij.openapi.module
         workingDirectory = ensureWorkingDirectory(project)
     }
 
-    return workingDirectory!!
+    return workingDirectory
 }
 
 fun List<String>.toArguments(): String? {
@@ -204,7 +204,7 @@ abstract class Configuration(name: String, project: Project, configurationFactor
             workingDirectory = ensureWorkingDirectory(project, configurationModule.module)
         }
 
-        return workingDirectory!!
+        return workingDirectory
     }
 
     override fun setWorkingDirectory(localPath: String?) {
