@@ -7,6 +7,7 @@ import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectBundle
 import com.intellij.openapi.roots.ui.configuration.ProjectSettingsService
+import com.intellij.openapi.roots.ui.configuration.SdkPopupFactory
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiFile
@@ -56,7 +57,13 @@ class SetupSDKNotificationProvider : EditorNotifications.Provider<EditorNotifica
         }
 
         fun showProjectSettings(project: Project) {
-            ProjectSettingsService.getInstance(project).chooseAndSetSdk()
+            SdkPopupFactory
+                    .newBuilder()
+                    .withProject(project)
+                    .withSdkType(Type.getInstance())
+                    .updateProjectSdkFromSelection()
+                    .buildPopup()
+                    .showInFocusCenter()
         }
 
         fun showSmallIDEFacetSettings(project: Project) {
@@ -112,7 +119,7 @@ class SetupSDKNotificationProvider : EditorNotifications.Provider<EditorNotifica
             return EditorNotificationPanel().apply {
                 text = ProjectBundle.message("project.sdk.not.defined")
                 createActionLabel(ProjectBundle.message("project.sdk.setup")) {
-                    ProjectSettingsService.getInstance(project).chooseAndSetSdk()
+                    showProjectSettings(project)
                 }
             }
 
