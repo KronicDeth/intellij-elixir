@@ -21,7 +21,7 @@ object CallDefinitionClause {
     fun elementDescription(call: Call, location: ElementDescriptionLocation): String? =
             when {
                 isFunction(call) -> functionElementDescription(call, location)
-                isMacro(call) -> macroElementDescription(call, location)
+                isMacro(call) -> macroElementDescription(location)
                 else -> null
             }
 
@@ -72,7 +72,7 @@ object CallDefinitionClause {
                 null
             }
 
-    private fun macroElementDescription(call: Call, location: ElementDescriptionLocation): String? =
+    private fun macroElementDescription(location: ElementDescriptionLocation): String? =
             if (location === UsageViewTypeLocation.INSTANCE) {
                 "macro"
             } else {
