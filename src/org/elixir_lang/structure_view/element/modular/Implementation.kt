@@ -109,7 +109,7 @@ class Implementation : Module {
     fun protocolName(): String = protocolName(navigationItem) ?: "?"
 
     companion object {
-        fun elementDescription(call: Call?, location: ElementDescriptionLocation): String? =
+        fun elementDescription(location: ElementDescriptionLocation): String? =
                 if (location === UsageViewTypeLocation.INSTANCE) {
                     "implementation"
                 } else {
