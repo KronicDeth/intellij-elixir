@@ -49,7 +49,7 @@ object CanonicallyNamedImpl {
                     stubBased
                             .let { Implementation.forNameElement(it) }
                             ?.let { forNameCollection(it) }
-                            ?.map { "$prefix${it ?: '?'}" }
+                            ?.map { "$prefix${it}" }
                             ?.toSet()
                             ?: setOf("$prefix?")
                 } else if (Module.`is`(stubBased)) {
