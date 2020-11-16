@@ -159,46 +159,53 @@ class Callable : Annotator, DumbAware {
     }
 
     private fun callHighlight(resolved: Call, previousCallHighlight: CallHighlight?): CallHighlight? =
-        if (CallDefinitionClause.isFunction(resolved)) {
-            val referrerTextAttributesKeys = referrerTextAttributesKeys(
-                    resolved,
-                    FUNCTION_CALL_TEXT_ATTRIBUTE_KEYS,
-                    PREDEFINED_FUNCTION_CALL_TEXT_ATTRIBUTE_KEYS
-            )
+            when {
+                CallDefinitionClause.isFunction(resolved) -> {
+                    val referrerTextAttributesKeys = referrerTextAttributesKeys(
+                            resolved,
+                            FUNCTION_CALL_TEXT_ATTRIBUTE_KEYS,
+                            PREDEFINED_FUNCTION_CALL_TEXT_ATTRIBUTE_KEYS
+                    )
 
-            CallHighlight.nullablePut(
-                    previousCallHighlight,
-                    referrerTextAttributesKeys
-            )
-        } else if (CallDefinitionClause.isMacro(resolved)) {
-            val referrerTextAttributesKeys = referrerTextAttributesKeys(
-                    resolved,
-                    MACRO_CALL_TEXT_ATTRIBUTES_KEYS,
-                    PREDEFINED_MACRO_CALL_TEXT_ATTRIBUTES_KEYS
-            )
+                    CallHighlight.nullablePut(
+                            previousCallHighlight,
+                            referrerTextAttributesKeys
+                    )
+                }
+                CallDefinitionClause.isMacro(resolved) -> {
+                    val referrerTextAttributesKeys = referrerTextAttributesKeys(
+                            resolved,
+                            MACRO_CALL_TEXT_ATTRIBUTES_KEYS,
+                            PREDEFINED_MACRO_CALL_TEXT_ATTRIBUTES_KEYS
+                    )
 
-            CallHighlight.nullablePut(
-                    previousCallHighlight,
-                    referrerTextAttributesKeys
-            )
-        } else if (org.elixir_lang.reference.Callable.isParameter(resolved)) {
-            CallHighlight.nullablePut(
-                    previousCallHighlight,
-                    PARAMETER_TEXT_ATTRIBUTE_KEYS
-            )
-        } else if (org.elixir_lang.reference.Callable.isParameterWithDefault(resolved)) {
-            CallHighlight.nullablePut(
-                    previousCallHighlight,
-                    PARAMETER_TEXT_ATTRIBUTE_KEYS
-            )
-        } else if (org.elixir_lang.reference.Callable.isVariable(resolved)) {
-            CallHighlight.nullablePut(
-                    previousCallHighlight,
-                    VARIABLE_TEXT_ATTRIBUTE_KEYS
-            )
-        } else {
-            previousCallHighlight
-        }
+                    CallHighlight.nullablePut(
+                            previousCallHighlight,
+                            referrerTextAttributesKeys
+                    )
+                }
+                org.elixir_lang.reference.Callable.isParameter(resolved) -> {
+                    CallHighlight.nullablePut(
+                            previousCallHighlight,
+                            PARAMETER_TEXT_ATTRIBUTE_KEYS
+                    )
+                }
+                org.elixir_lang.reference.Callable.isParameterWithDefault(resolved) -> {
+                    CallHighlight.nullablePut(
+                            previousCallHighlight,
+                            PARAMETER_TEXT_ATTRIBUTE_KEYS
+                    )
+                }
+                org.elixir_lang.reference.Callable.isVariable(resolved) -> {
+                    CallHighlight.nullablePut(
+                            previousCallHighlight,
+                            VARIABLE_TEXT_ATTRIBUTE_KEYS
+                    )
+                }
+                else -> {
+                    previousCallHighlight
+                }
+            }
 
     private fun callHighlight(resolved: PsiElement, previousCallHighlight: CallHighlight?): CallHighlight? =
             when (resolved) {
