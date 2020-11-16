@@ -300,9 +300,9 @@ class Callable : Annotator, DumbAware {
         }
     }
 
-    private class CallHighlight private constructor(internal val referrerTextAttributeKeys: Array<TextAttributesKey>?,
+    private class CallHighlight private constructor(val referrerTextAttributeKeys: Array<TextAttributesKey>?,
                                                     val resolved: PsiElement?,
-                                                    internal val resolvedTextAttributeKey: TextAttributesKey?) {
+                                                    val resolvedTextAttributeKey: TextAttributesKey?) {
         fun put(referrerTextAttributeKeys: Array<TextAttributesKey>?,
                 resolved: PsiElement?,
                 resolvedTextAttributeKey: TextAttributesKey?): CallHighlight {
