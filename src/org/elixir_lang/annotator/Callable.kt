@@ -168,8 +168,7 @@ class Callable : Annotator, DumbAware {
 
             CallHighlight.nullablePut(
                     previousCallHighlight,
-                    referrerTextAttributesKeys,
-                    resolved, null
+                    referrerTextAttributesKeys
             )
         } else if (CallDefinitionClause.isMacro(resolved)) {
             val referrerTextAttributesKeys = referrerTextAttributesKeys(
@@ -180,30 +179,22 @@ class Callable : Annotator, DumbAware {
 
             CallHighlight.nullablePut(
                     previousCallHighlight,
-                    referrerTextAttributesKeys,
-                    resolved,
-                    null
+                    referrerTextAttributesKeys
             )
         } else if (org.elixir_lang.reference.Callable.isParameter(resolved)) {
             CallHighlight.nullablePut(
                     previousCallHighlight,
-                    PARAMETER_TEXT_ATTRIBUTE_KEYS,
-                    resolved,
-                    ElixirSyntaxHighlighter.PARAMETER
+                    PARAMETER_TEXT_ATTRIBUTE_KEYS
             )
         } else if (org.elixir_lang.reference.Callable.isParameterWithDefault(resolved)) {
             CallHighlight.nullablePut(
                     previousCallHighlight,
-                    PARAMETER_TEXT_ATTRIBUTE_KEYS,
-                    resolved,
-                    ElixirSyntaxHighlighter.PARAMETER
+                    PARAMETER_TEXT_ATTRIBUTE_KEYS
             )
         } else if (org.elixir_lang.reference.Callable.isVariable(resolved)) {
             CallHighlight.nullablePut(
                     previousCallHighlight,
-                    VARIABLE_TEXT_ATTRIBUTE_KEYS,
-                    resolved,
-                    ElixirSyntaxHighlighter.VARIABLE
+                    VARIABLE_TEXT_ATTRIBUTE_KEYS
             )
         } else {
             previousCallHighlight
@@ -216,9 +207,7 @@ class Callable : Annotator, DumbAware {
                     if (org.elixir_lang.reference.Callable.isIgnored(resolved)) {
                         CallHighlight.nullablePut(
                                 previousCallHighlight,
-                                IGNORED_VARIABLE_TEXT_ATTRIBUTE_KEYS,
-                                resolved,
-                                ElixirSyntaxHighlighter.IGNORED_VARIABLE
+                                IGNORED_VARIABLE_TEXT_ATTRIBUTE_KEYS
                         )
                     } else {
                         previousCallHighlight
@@ -241,18 +230,6 @@ class Callable : Annotator, DumbAware {
 
             if (referrerTextAttributesKeys != null) {
                 highlight(referrer, rangeInReferrer, annotationHolder, *referrerTextAttributesKeys)
-            }
-
-            val resolvedTextAttributesKey = callHighlight.resolvedTextAttributeKey
-
-            /* Annotations can only be applied to the single, active file, which belongs to the referrer.  The resolved
-               may be outside the file if it is a cross-file function or macro usage */
-            if (resolvedTextAttributesKey != null) {
-                val resolved = callHighlight.resolved
-
-                if (resolved != null && sameFile(referrer, resolved)) {
-                    highlight(resolved, annotationHolder, resolvedTextAttributesKey)
-                }
             }
         }
     }
@@ -300,21 +277,15 @@ class Callable : Annotator, DumbAware {
         }
     }
 
-    private class CallHighlight private constructor(val referrerTextAttributeKeys: Array<TextAttributesKey>?,
-                                                    val resolved: PsiElement?,
-                                                    val resolvedTextAttributeKey: TextAttributesKey?) {
-        fun put(referrerTextAttributeKeys: Array<TextAttributesKey>?,
-                resolved: PsiElement?,
-                resolvedTextAttributeKey: TextAttributesKey?): CallHighlight {
+    private class CallHighlight private constructor(val referrerTextAttributeKeys: Array<TextAttributesKey>?) {
+        fun put(referrerTextAttributeKeys: Array<TextAttributesKey>?): CallHighlight {
             val updatedReferrerTextAttributeKeys = bestReferrerTextAttributeKeys(referrerTextAttributeKeys)
 
             return if (updatedReferrerTextAttributeKeys == this.referrerTextAttributeKeys) {
                 this
             } else {
                 CallHighlight(
-                        updatedReferrerTextAttributeKeys,
-                        resolved,
-                        resolvedTextAttributeKey
+                        updatedReferrerTextAttributeKeys
                 )
             }
         }
@@ -346,18 +317,12 @@ class Callable : Annotator, DumbAware {
         companion object {
             internal fun nullablePut(
                     callHighlight: CallHighlight?,
-                    referrerTextAttributeKeys: Array<TextAttributesKey>?,
-                    resolved: PsiElement?,
-                    resolvedTextAttributeKey: TextAttributesKey?
+                    referrerTextAttributeKeys: Array<TextAttributesKey>?
             ): CallHighlight =
                     callHighlight?.put(
-                            referrerTextAttributeKeys,
-                            resolved,
-                            resolvedTextAttributeKey
+                            referrerTextAttributeKeys
                     ) ?: CallHighlight(
-                            referrerTextAttributeKeys,
-                            resolved,
-                            resolvedTextAttributeKey
+                            referrerTextAttributeKeys
                     )
         }
     }
