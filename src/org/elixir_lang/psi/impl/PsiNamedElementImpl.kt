@@ -104,7 +104,7 @@ object PsiNamedElementImpl {
             val primaryArguments = named.primaryArguments()
 
             if (primaryArguments != null && primaryArguments.size == 1) {
-                unquotedName += "(" + primaryArguments[0].text + ")"
+                unquotedName += "(" + primaryArguments[0]!!.text + ")"
             }
         }
 

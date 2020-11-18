@@ -117,7 +117,7 @@ private fun Call.computeCallableReference(): PsiReference =
  *
  * @return [Call.primaryArguments]
  */
-fun Call.finalArguments(): Array<PsiElement>? = secondaryArguments() ?: primaryArguments()
+fun Call.finalArguments(): Array<PsiElement>? = (secondaryArguments() ?: primaryArguments())?.map { it!! }?.toTypedArray()
 
 fun Call.getReference(): PsiReference? =
         CachedValuesManager.getCachedValue(this) {
