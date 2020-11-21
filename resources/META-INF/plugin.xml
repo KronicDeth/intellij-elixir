@@ -4,7 +4,7 @@
   <vendor email="Kronic.Deth@gmail.com">Luke Imhoff</vendor>
 
   <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-  <idea-version since-build="201.3119"/>
+  <idea-version since-build="201.6668.113"/>
 
   <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
        on how to target different products -->
@@ -15,7 +15,7 @@
   <depends config-file="rich-platform-plugin.xml" optional="true">com.intellij.modules.java</depends>
 
   <extensionPoints>
-    <extensionPoint qualifiedName="org.elixir_lang.packageManager" interface="org.elixir_lang.PackageManager"/>
+    <extensionPoint qualifiedName="org.elixir_lang.packageManager" interface="org.elixir_lang.PackageManager" dynamic="true"/>
   </extensionPoints>
 
   <extensions defaultExtensionNs="org.elixir_lang">
@@ -38,7 +38,6 @@
 
     <!-- Distillery -->
     <configurationType implementation="org.elixir_lang.distillery.configuration.Type"/>
-    <programRunner implementation="org.elixir_lang.distillery.Runner"/>
 
     <!-- Elixir -->
     <configurationType implementation="org.elixir_lang.elixir.configuration.Type"/>
@@ -46,39 +45,36 @@
 
     <!-- IEx -->
     <configurationType implementation="org.elixir_lang.iex.configuration.Type"/>
-    <programRunner implementation="org.elixir_lang.iex.Runner"/>
 
     <!-- iex -S mix -->
     <configurationType implementation="org.elixir_lang.iex.mix.configuration.Type"/>
-    <programRunner implementation="org.elixir_lang.iex.mix.Runner"/>
 
     <!-- EEX -->
     <!--<braceMatcher filetype="EEx" implementationClass="org.elixir_lang.eex.BraceMatcher"/>-->
     <fileType.fileViewProviderFactory filetype="EEx" implementationClass="org.elixir_lang.eex.file.view_provider.Factory"/>
-    <fileTypeFactory implementation="org.elixir_lang.eex.file.type.Factory"/>
+    <fileType name="Embedded Elixir" implementationClass="org.elixir_lang.eex.file.Type" fieldName="INSTANCE" language="EEx" extensions="eex"/>
+    <fileType name="Live Embedded Elixir" implementationClass="org.elixir_lang.leex.file.Type" fieldName="INSTANCE" language="EEx" extensions="leex"/>
     <lang.fileViewProviderFactory language="EEx" implementationClass="org.elixir_lang.eex.file.view_provider.Factory"/>
     <lang.parserDefinition language="EEx" implementationClass="org.elixir_lang.eex.ParserDefinition"/>
     <!--<lang.psiStructureViewFactory language="EEx" implementationClass="org.elixir_lang.eex.PsiStructureViewFactory"/>-->
 
     <!-- Mix related extensions -->
-    <programRunner implementation="org.elixir_lang.mix.Runner" />
     <configurationType implementation="org.elixir_lang.mix.configuration.Type" />
 
     <library.type implementation="org.elixir_lang.mix.library.Type"/>
 
     <!-- Testing -->
     <configurationType implementation="org.elixir_lang.espec.configuration.Type" />
-    <programRunner implementation="org.elixir_lang.espec.Runner" />
     <runConfigurationProducer implementation="org.elixir_lang.espec.configuration.MixESpecRunConfigurationProducer" />
 
     <configurationType implementation="org.elixir_lang.exunit.configuration.Type" />
-    <programRunner implementation="org.elixir_lang.exunit.Runner" />
     <runConfigurationProducer implementation="org.elixir_lang.exunit.configuration.MixExUnitRunConfigurationProducer" />
 
     <testFinder implementation="org.elixir_lang.mix.TestFinder"/>
 
     <colorSettingsPage implementation="org.elixir_lang.ElixirColorSettingsPage"/>
-    <fileTypeFactory implementation="org.elixir_lang.ElixirFileTypeFactory"/>
+    <fileType name="Elixir" implementationClass="org.elixir_lang.ElixirFileType" fieldName="INSTANCE" language="Elixir" extensions="ex"/>
+    <fileType name="Elixir Script" implementationClass="org.elixir_lang.ElixirScriptFileType" fieldName="INSTANCE" language="Elixir" extensions="exs"/>
     <filePropertyPusher implementation="org.elixir_lang.file.LevelPropertyPusher"/>
 
     <!-- Facet -->
@@ -105,7 +101,7 @@
     <internalFileTemplate name="Elixir GenEvent"/>
 
     <!-- for liveTemplates -->
-    <defaultLiveTemplatesProvider implementation="org.elixir_lang.templates.ElixirLiveTemplateProvider"/>
+    <defaultLiveTemplates file="liveTemplates/Elixir"/>
     <liveTemplateContext implementation="org.elixir_lang.templates.ElixirContextType"/>
     <!-- end liveTemplates -->
 
@@ -134,13 +130,13 @@
     <filetype.decompiler filetype="BEAM" implementationClass="org.elixir_lang.beam.Decompiler"/>
     <fileType.fileViewProviderFactory filetype="BEAM" implementationClass="org.elixir_lang.beam.FileViewProviderFactory"/>
     <filetype.stubBuilder filetype="BEAM" implementationClass="org.elixir_lang.beam.StubBuilder"/>
-    <fileTypeFactory implementation="org.elixir_lang.beam.FileTypeFactory"/>
+    <fileType name="BEAM" implementationClass="org.elixir_lang.beam.FileType" fieldName="INSTANCE" language="BEAM" extensions="beam"/>
     <structureViewBuilder key="BEAM" factoryClass="org.elixir_lang.beam.StructureViewBuilderProvider"/>
     <stubElementTypeHolder class="org.elixir_lang.beam.psi.stubs.ModuleStubElementTypes"/>
     <syntaxHighlighter key="BEAM" factoryClass="org.elixir_lang.ElixirSyntaxHighlighterFactory"/>
 
     <!-- `.beam.asm` -->
-    <fileTypeFactory implementation="org.elixir_lang.beam.assembly.file.type.Factory"/>
+    <fileType name="BEAM Assembly" implementationClass="org.elixir_lang.beam.assembly.file.Type" fieldName="INSTANCE" language="BEAM.ASSEMBLY" extensions="beam.asm"/>
     <lang.parserDefinition implementationClass="org.elixir_lang.beam.assembly.ParserDefinition" language="BEAM.ASSEMBLY"/>
     <lang.syntaxHighlighterFactory implementationClass="org.elixir_lang.beam.assembly.syntax_highlighter.Factory" language="BEAM.ASSEMBLY"/>
 
@@ -226,21 +222,11 @@
     <lang.documentationProvider implementationClass="org.elixir_lang.ElixirDocumentationProvider" language="Elixir"/>
   </extensions>
 
-  <application-components>
-    <!-- Add your application components here -->
-  </application-components>
+  <projectListeners>
+    <listener class="org.elixir_lang.DepsWatcher" topic="com.intellij.openapi.vfs.newvfs.BulkFileListener"/>
+    <listener class="org.elixir_lang.mix.Watcher" topic="com.intellij.openapi.vfs.newvfs.BulkFileListener"/>
+  </projectListeners>
 
-  <project-components>
-    <component>
-      <implementation-class>org.elixir_lang.DepsWatcher</implementation-class>
-    </component>
-  </project-components>
-
-  <module-components>
-    <component>
-      <implementation-class>org.elixir_lang.mix.Watcher</implementation-class>
-    </component>
-  </module-components>
   <actions>
     <group id="LangElixir.NewActions">
       <separator/>

@@ -1,8 +1,5 @@
 package org.elixir_lang.beam;
 
-import com.google.common.base.Joiner;
-import com.intellij.diagnostic.LogMessageEx;
-import com.intellij.openapi.diagnostic.Attachment;
 import com.intellij.openapi.fileTypes.BinaryFileDecompiler;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.elixir_lang.beam.chunk.Atoms;
@@ -140,20 +137,8 @@ public class Decompiler implements BinaryFileDecompiler {
         com.intellij.openapi.diagnostic.Logger logger = com.intellij.openapi.diagnostic.Logger.getInstance(
                 Decompiler.class
         );
-        String fullUserMessage = "No decompiler for MacroNameArity (" + macroNameArity + ")";
-        logger.error(
-                LogMessageEx.createEvent(
-                        fullUserMessage,
-                        Joiner
-                                .on("\n")
-                                .join(
-                                        new Throwable().getStackTrace()
-                                ),
-                        fullUserMessage,
-                        null,
-                        Collections.<Attachment>emptyList()
-                )
-        );
+        String message = "No decompiler for MacroNameArity (" + macroNameArity + ")";
+        logger.error(message);
     }
 
     @NotNull

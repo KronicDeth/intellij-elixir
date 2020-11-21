@@ -79,7 +79,7 @@ public interface ElixirCaptureNumericOperation extends Named, Prefix {
   OtpErlangObject quote();
 
   @Nullable
-  PsiElement[] secondaryArguments();
+  PsiElement @NotNull[] secondaryArguments();
 
   @Nullable
   Integer secondaryArity();

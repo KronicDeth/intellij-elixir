@@ -52,7 +52,7 @@ class Lines(val lineReferenceList: List<LineReference>, val fileNameList: List<S
 
             assert(flags == 0L)
 
-            val (lineInstructionCount, lineInstructionCountByteCount) = unsignedInt(data, offset)
+            val (_, lineInstructionCountByteCount) = unsignedInt(data, offset)
             offset += lineInstructionCountByteCount
 
             val (lineReferenceCount, lineReferenceCountByteCount) = unsignedInt(data, offset)

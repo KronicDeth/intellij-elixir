@@ -1,7 +1,7 @@
 plugins {
-  id 'org.jetbrains.intellij' version "0.4.10"
-  id "org.jetbrains.kotlin.jvm" version "1.3.50"
-  id 'de.undercouch.download' version "4.0.0"
+  id 'org.jetbrains.intellij' version "0.6.3"
+  id "org.jetbrains.kotlin.jvm" version "1.3.70"
+  id 'de.undercouch.download' version "4.1.1"
 }
 
 ext {
@@ -60,7 +60,9 @@ allprojects {
   intellij {
     def intellij_erlang_version
 
-    if (ideaVersion.startsWith("2020.1")) {
+    if (ideaVersion.startsWith("2020.2")) {
+      intellij_erlang_version = "0.11.1068"
+    } else if (ideaVersion.startsWith("2020.1")) {
       intellij_erlang_version = "0.11.1059"
     } else if (ideaVersion.startsWith("2019.2")) {
       intellij_erlang_version = "0.11.1008"

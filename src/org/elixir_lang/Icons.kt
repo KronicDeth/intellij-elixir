@@ -27,27 +27,22 @@ object Icons {
     object Time {
         @JvmField
         val COMPILE = AllIcons.Actions.Compile
+
         @JvmField
         val RUN = AllIcons.RunConfigurations.TestState.Run
 
         @JvmStatic
-        fun from(time: Timed.Time): Icon {
-            var icon: Icon? = null
-
-            when (time) {
-                Timed.Time.COMPILE -> icon = COMPILE
-                Timed.Time.RUN -> icon = RUN
-            }
-
-            assert(icon != null)
-
-            return icon
-        }
+        fun from(time: Timed.Time): Icon =
+                when (time) {
+                    Timed.Time.COMPILE -> COMPILE
+                    Timed.Time.RUN -> RUN
+                }
     }
 
     object Visibility {
         @JvmField
         val PRIVATE = PlatformIcons.PRIVATE_ICON
+
         @JvmField
         val PUBLIC = PlatformIcons.PUBLIC_ICON
 
@@ -72,35 +67,50 @@ object Icons {
 
     @JvmField
     val CALLBACK = AllIcons.Gutter.ImplementedMethod
+
     @JvmField
     val CALL_DEFINITION = PlatformIcons.FUNCTION_ICON
+
     @JvmField
     val CALL_DEFINITION_CLAUSE: Icon = RowIconFactory.create(CALL_DEFINITION, PlatformIcons.PACKAGE_LOCAL_ICON)
+
     @JvmField
     val DELEGATION: Icon = RowIconFactory.create(AllIcons.RunConfigurations.TestState.Run, PlatformIcons.PACKAGE_LOCAL_ICON)
+
     @JvmField
     val EXCEPTION = PlatformIcons.EXCEPTION_CLASS_ICON
+
     @JvmField
     val FIELD = AllIcons.Nodes.Field
+
     @JvmField
     val FILE = IconLoader.getIcon("/icons/file/elixir.svg")
+
     @JvmField
     val IMPLEMENTATION: Icon = RowIconFactory.create(PlatformIcons.ANONYMOUS_CLASS_ICON, AllIcons.General.OverridingMethod)
+
     @JvmField
     val MIX_MODULE_CONFLICT = AllIcons.Actions.Cancel
+
     @JvmField
     val OVERRIDABLE = AllIcons.General.OverridenMethod
+
     @JvmField
     val OVERRIDE = AllIcons.General.OverridingMethod
+
     @JvmField
     val PARAMETER = AllIcons.Nodes.Parameter
+
     @JvmField
     val PROTOCOL: Icon = RowIconFactory.create(PlatformIcons.ANONYMOUS_CLASS_ICON, AllIcons.General.OverridenMethod)
+
     @JvmField
     val STRUCTURE = AllIcons.Toolwindows.ToolWindowStructure
+
     // same icon as intellij-erlang to match their look and feel
     @JvmField
     val TYPE = IconLoader.getIcon("/icons/type.png")
+
     // MUST be after TYPE
     @JvmField
     val SPECIFICATION: Icon = RowIconFactory.create(CALL_DEFINITION, TYPE)
@@ -108,7 +118,7 @@ object Icons {
 
     // it is the unknown that is only a question mark
     @JvmField
-    val UNKNOWN =  AllIcons.Actions.Help
+    val UNKNOWN = AllIcons.Actions.Help
 
     @JvmField
     val VARIABLE = AllIcons.Nodes.Variable

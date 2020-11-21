@@ -14,7 +14,7 @@ class Cache private constructor(private val beam: Beam) {
     val elixirDocumentation: ElixirDocumentation? by lazy { beam.elixirDocumentation() }
     val exports: CallDefinitions? by lazy { beam.exports(atoms) }
     val functions: Functions? by lazy { beam.functions(atoms) }
-    val lines: Lines? by lazy { beam.lines(atoms) }
+    val lines: Lines? by lazy { beam.lines() }
     val literals: Literals? by lazy { beam.literals() }
     val locals: CallDefinitions? by lazy { beam.locals(atoms) }
     val imports: Imports? by lazy { beam.imports(atoms) }

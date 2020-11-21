@@ -1373,7 +1373,7 @@ object QuotableImpl {
                     override fun visitElement(element: PsiElement) {
                         if (element is Quotable) {
                             visitQuotable((element as Quotable?)!!)
-                        } else if (element != null && !element.isUnquoted()) {
+                        } else if (!element.isUnquoted()) {
                             throw TODO("Don't know how to visit $element")
                         }
 

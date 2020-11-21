@@ -8,7 +8,7 @@ import com.intellij.openapi.util.Computable
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiFileFactory
-import org.elixir_lang.ElixirFileType
+import org.elixir_lang.ElixirScriptFileType
 import org.elixir_lang.psi.CallDefinitionClause.isPublicFunction
 import org.elixir_lang.psi.CallDefinitionClause.nameArityRange
 import org.elixir_lang.psi.ElixirAccessExpression
@@ -77,7 +77,7 @@ private fun elixirFile(text: String): ElixirFile = computeReadAction(Computable 
 
     PsiFileFactory
             .getInstance(defaultProject)
-            .createFileFromText("mix.exs", ElixirFileType.ElixirScriptFileType.INSTANCE, text) as ElixirFile
+            .createFileFromText("mix.exs", ElixirScriptFileType.INSTANCE, text) as ElixirFile
 })
 
 private fun text(virtualFile: VirtualFile): String = computeReadAction(Computable {

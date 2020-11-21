@@ -8,7 +8,7 @@ import com.intellij.openapi.projectRoots.SdkModificator;
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.util.Comparing;
-import com.intellij.ui.ListCellRendererWrapper;
+import com.intellij.ui.SimpleListCellRenderer;
 import com.intellij.util.ui.JBUI;
 import org.elixir_lang.sdk.elixir.Type;
 import org.jetbrains.annotations.NotNull;
@@ -17,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ItemEvent;
+import java.util.Objects;
 
 import static org.elixir_lang.sdk.elixir.Type.addNewCodePathsFromInternErlangSdk;
 import static org.elixir_lang.sdk.elixir.Type.removeCodePathsFromInternalErlangSdk;
@@ -115,7 +116,7 @@ public class AdditionalDataConfigurable implements com.intellij.openapi.projectR
                 )
         );
         internalErlangSdksComboBox.setRenderer(
-                new ListCellRendererWrapper() {
+                new SimpleListCellRenderer() {
                     @Override
                     public void customize(JList list, Object value, int index, boolean selected, boolean hasFocus) {
                         if (value instanceof Sdk) {
@@ -232,7 +233,7 @@ public class AdditionalDataConfigurable implements com.intellij.openapi.projectR
                 final SdkAdditionalData sdkAdditionalData = (SdkAdditionalData) currentSdk.getSdkAdditionalData();
                 final Sdk erlangSdk = sdkAdditionalData.getErlangSdk();
 
-                if (erlangSdk != null && Comparing.equal(erlangSdk.getName(), previousName)) {
+                if (erlangSdk != null && Objects.equals(erlangSdk.getName(), previousName)) {
                     sdkAdditionalData.setErlangSdk(sdk);
                 }
             }

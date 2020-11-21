@@ -87,9 +87,10 @@ public class CallDefinitionClause extends com.intellij.codeInsight.lookup.Lookup
 
     private void renderObject(@NotNull LookupElement lookupElement) {
         Logger logger = Logger.getInstance(CallDefinitionClause.class);
+
         Object object = lookupElement.getObject();
-        String userMessage = "CallDefinitionClause render called on LookupElement with null getPsiElement\n" +
-                "## name\n" +
+        String title  = "CallDefinitionClause render called on LookupElement with null getPsiElement";
+        String message = "## name\n" +
                 "\n" +
                 "```\n" +
                 name + "\n" +
@@ -109,17 +110,7 @@ public class CallDefinitionClause extends com.intellij.codeInsight.lookup.Lookup
                 object.getClass().getName() + "\n" +
                 "```\n";
 
-        String details = Joiner.on("\n").join(new Throwable().getStackTrace());
-        String title = "CallDefinitionClause render called on LookupElement with null getPsiElement";
-        logger.error(
-                LogMessageEx.createEvent(
-                        userMessage,
-                        details,
-                        title,
-                        null,
-                        (Attachment) null
-                )
-            );
+        logger.error(message, new Throwable(title));
     }
 
     private void renderPsiElement(@NotNull PsiElement psiElement, @NotNull LookupElementPresentation presentation) {

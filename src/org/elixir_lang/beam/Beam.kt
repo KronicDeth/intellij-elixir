@@ -91,7 +91,7 @@ class Beam private constructor(chunkCollection: Collection<Chunk>) {
             Imports.from(it, atoms)
         }
 
-    fun lines(atoms: Atoms?): Lines? = chunk(LINE)?.let { Lines.from(it) }
+    fun lines(): Lines? = chunk(LINE)?.let { Lines.from(it) }
     fun literals(): Literals? = chunk(LITT)?.let { Literals.from(it) }
     fun locals(atoms: Atoms?): CallDefinitions? = callDefinitions(LOCT, atoms)
     fun strings(): Strings? = chunk(STRT)?.let { Strings.from(it) }

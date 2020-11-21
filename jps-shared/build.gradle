@@ -1,6 +1,10 @@
 jar.archiveName = "jps-shared.jar"
 testClasses.enabled = false
 
+repositories {
+    mavenCentral()
+}
+
 sourceSets {
     main {
         java.srcDirs 'src'

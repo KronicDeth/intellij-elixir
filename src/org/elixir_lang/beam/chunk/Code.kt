@@ -172,7 +172,7 @@ class Code(private val operationList: List<Operation>) {
             val data = chunk.data
             var offset = 0
 
-            val (_unknown, unknownByteCount) = unsignedInt(data, offset)
+            val (_, unknownByteCount) = unsignedInt(data, offset)
             offset += unknownByteCount
 
             val (version, versionByteCount) = unsignedInt(data, offset)
@@ -197,10 +197,10 @@ class Code(private val operationList: List<Operation>) {
                 )
             }
 
-            val (labelCount, labelCountByteCount) = unsignedInt(data, offset)
+            val (_, labelCountByteCount) = unsignedInt(data, offset)
             offset += labelCountByteCount
 
-            val (functionCount, functionCountByteCount) = unsignedInt(data, offset)
+            val (_, functionCountByteCount) = unsignedInt(data, offset)
             offset += functionCountByteCount
 
             val operationList = mutableListOf<Operation>()

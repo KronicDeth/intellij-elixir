@@ -132,7 +132,7 @@ class Editor<T : Debuggable<*>> : SettingsEditor<T>() {
 
             tableHeader = null
             columnModel.getColumn(Model.ENABLED_COLUMN_INDEX).let { column ->
-                TableUtil.setupCheckboxColumn(column)
+                TableUtil.setupCheckboxColumn(column, columnModel.columnMargin)
                 column.cellEditor = BooleanTableCellEditor()
                 column.cellRenderer = BooleanTableCellRenderer()
             }

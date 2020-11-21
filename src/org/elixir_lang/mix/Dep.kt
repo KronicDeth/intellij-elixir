@@ -1,6 +1,7 @@
 package org.elixir_lang.mix
 
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiElement
@@ -15,8 +16,12 @@ import java.nio.file.Paths
  */
 data class Dep(val application: String, val path: String, val type: Type = Type.LIBRARY) {
     fun virtualFile(project: Project): VirtualFile? =
-        project.baseDir.findFileByRelativePath(path) ?:
-                                        VfsUtil.findFile(Paths.get(path), true)
+            ProjectRootManager
+                    .getInstance(project)
+                    .contentRootsFromAllModules
+                    .mapNotNull { it.findFileByRelativePath(path) }
+                    .firstOrNull()
+                    ?: VfsUtil.findFile(Paths.get(path), true)
 
     enum class Type {
         LIBRARY,
@@ -25,10 +30,10 @@ data class Dep(val application: String, val path: String, val type: Type = Type.
 
     companion object {
         fun from(depsListElement: PsiElement): Dep? =
-            when (depsListElement) {
-                is ElixirTuple -> from(depsListElement)
-                else -> null
-            }
+                when (depsListElement) {
+                    is ElixirTuple -> from(depsListElement)
+                    else -> null
+                }
 
         fun from(depsListElement: ElixirTuple): Dep? {
             val stripped = depsListElement.children.stripAccessExpressions()
@@ -44,7 +49,7 @@ data class Dep(val application: String, val path: String, val type: Type = Type.
 
                                 when (key) {
                                     "app", "branch", "commit", "compile", "git", "github", "hex", "only", "optional", "organization", "override", "ref", "runtime", GUARDIAN_RUNTIME_TYPO, "tag", "targets" -> acc
-                                    "in_umbrella" -> acc.copy(path =  "apps/$name", type = Type.MODULE)
+                                    "in_umbrella" -> acc.copy(path = "apps/$name", type = Type.MODULE)
                                     "path" -> putPath(acc, keywordPair.keywordValue)
                                     else -> {
                                         Logger.error(logger, "Don't know if Mix.Dep option `$key` is important for determining location of dependency", depsListElement)
@@ -52,8 +57,7 @@ data class Dep(val application: String, val path: String, val type: Type = Type.
                                     }
                                 }
                             }
-                        } ?:
-                        initial
+                        } ?: initial
                     } else {
                         initial
                     }
@@ -66,15 +70,15 @@ data class Dep(val application: String, val path: String, val type: Type = Type.
         private val logger by lazy { com.intellij.openapi.diagnostic.Logger.getInstance(Dep::class.java) }
 
         private fun name(nameElement: PsiElement): String? =
-            when (nameElement) {
-                is ElixirAtom -> name(nameElement)
-                else -> null
-            }
+                when (nameElement) {
+                    is ElixirAtom -> name(nameElement)
+                    else -> null
+                }
 
         private fun name(atom: ElixirAtom): String? =
-            atom.charListLine?.let { name(it) }
-                    ?: atom.stringLine?.let { name(it) }
-                    ?: atom.node.lastChildNode.text
+                atom.charListLine?.let { name(it) }
+                        ?: atom.stringLine?.let { name(it) }
+                        ?: atom.node.lastChildNode.text
 
         private fun name(charListLine: ElixirCharListLine): String? {
             Logger.error(logger, "Don't know how to convert ${charListLine.text} to dep name", charListLine.parent)
