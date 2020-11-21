@@ -39,61 +39,53 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                 "\n" +
                 "  # Macros\n" +
                 "\n" +
-                "  defmacro left &&& right do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
-                "  defmacro left <<< right do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
-                "  defmacro left >>> right do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
-                "  defmacro left ^^^ right do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
                 "  defmacro __using__(p0) do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
-                "  defmacro band(p0, p1) do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
-                "  defmacro bnot(p0) do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
-                "  defmacro bor(p0, p1) do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
-                "  defmacro bsl(p0, p1) do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
-                "  defmacro bsr(p0, p1) do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
-                "  defmacro bxor(p0, p1) do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
-                "  defmacro left ||| right do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
-                "  defmacro ~~~(p0) do\n" +
                 "    # body not decompiled\n" +
                 "  end\n" +
                 "\n" +
                 "  # Functions\n" +
                 "\n" +
+                "  def left &&& right do\n" +
+                "    # body not decompiled\n" +
+                "  end\n" +
+                "\n" +
+                "  def left <<< right do\n" +
+                "    # body not decompiled\n" +
+                "  end\n" +
+                "\n" +
+                "  def left >>> right do\n" +
+                "    # body not decompiled\n" +
+                "  end\n" +
+                "\n" +
+                "  def left ^^^ right do\n" +
+                "    # body not decompiled\n" +
+                "  end\n" +
+                "\n" +
                 "  def __info__(p0) do\n" +
+                "    # body not decompiled\n" +
+                "  end\n" +
+                "\n" +
+                "  def band(p0, p1) do\n" +
+                "    # body not decompiled\n" +
+                "  end\n" +
+                "\n" +
+                "  def bnot(p0) do\n" +
+                "    # body not decompiled\n" +
+                "  end\n" +
+                "\n" +
+                "  def bor(p0, p1) do\n" +
+                "    # body not decompiled\n" +
+                "  end\n" +
+                "\n" +
+                "  def bsl(p0, p1) do\n" +
+                "    # body not decompiled\n" +
+                "  end\n" +
+                "\n" +
+                "  def bsr(p0, p1) do\n" +
+                "    # body not decompiled\n" +
+                "  end\n" +
+                "\n" +
+                "  def bxor(p0, p1) do\n" +
                 "    # body not decompiled\n" +
                 "  end\n" +
                 "\n" +
@@ -102,6 +94,14 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                 "  end\n" +
                 "\n" +
                 "  def module_info(p0) do\n" +
+                "    # body not decompiled\n" +
+                "  end\n" +
+                "\n" +
+                "  def left ||| right do\n" +
+                "    # body not decompiled\n" +
+                "  end\n" +
+                "\n" +
+                "  def ~~~(p0) do\n" +
                 "    # body not decompiled\n" +
                 "  end\n" +
                 "end\n",
