@@ -52,6 +52,8 @@ public interface ElixirInterpolatedWordsHeredoc extends WordsFragmented, Interpo
   @NotNull
   OtpErlangObject quoteLiteral(List<Integer> codePointList);
 
+  char sigilDelimiter();
+
   char sigilName();
 
 }

@@ -52,6 +52,8 @@ public interface ElixirInterpolatedRegexHeredoc extends RegexFragmented, Interpo
   @NotNull
   OtpErlangObject quoteLiteral(List<Integer> codePointList);
 
+  char sigilDelimiter();
+
   char sigilName();
 
 }

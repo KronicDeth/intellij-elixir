@@ -6,7 +6,8 @@ import com.intellij.psi.PsiElement;
  * Created by luke.imhoff on 2/16/15.
  */
 public interface Sigil extends Fragmented, Parent, PsiElement, Quotable {
-    public char sigilName();
+    char sigilDelimiter();
+    char sigilName();
 
     ElixirSigilModifiers getSigilModifiers();
 }

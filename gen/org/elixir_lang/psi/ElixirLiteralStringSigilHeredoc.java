@@ -52,6 +52,8 @@ public interface ElixirLiteralStringSigilHeredoc extends StringFragmented, Liter
   @NotNull
   OtpErlangObject quoteLiteral(List<Integer> codePointList);
 
+  char sigilDelimiter();
+
   char sigilName();
 
 }

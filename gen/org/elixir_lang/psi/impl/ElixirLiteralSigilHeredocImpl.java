@@ -113,6 +113,11 @@ public class ElixirLiteralSigilHeredocImpl extends ASTWrapperPsiElement implemen
   }
 
   @Override
+  public char sigilDelimiter() {
+    return ElixirPsiImplUtil.sigilDelimiter(this);
+  }
+
+  @Override
   public char sigilName() {
     return ElixirPsiImplUtil.sigilName(this);
   }

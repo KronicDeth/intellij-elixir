@@ -106,6 +106,11 @@ public class ElixirLiteralRegexLineImpl extends ASTWrapperPsiElement implements 
   }
 
   @Override
+  public char sigilDelimiter() {
+    return ElixirPsiImplUtil.sigilDelimiter(this);
+  }
+
+  @Override
   public char sigilName() {
     return ElixirPsiImplUtil.sigilName(this);
   }

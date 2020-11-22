@@ -48,6 +48,8 @@ public interface ElixirInterpolatedRegexLine extends RegexFragmented, Interpolat
   @NotNull
   OtpErlangObject quoteLiteral(List<Integer> codePointList);
 
+  char sigilDelimiter();
+
   char sigilName();
 
   char terminator();

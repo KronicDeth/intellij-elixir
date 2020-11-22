@@ -1396,10 +1396,12 @@ object QuotableImpl {
     @Contract(pure = true)
     @JvmStatic
     fun quote(sigil: Sigil, quotedContent: OtpErlangObject): OtpErlangObject {
+        val sigilBinaryMetadata = metadata(sigil)
+        val sigilBinary = quotedContent as? OtpErlangTuple ?: quotedFunctionCall("<<>>", sigilBinaryMetadata, quotedContent)
+
         val sigilName = sigil.sigilName()
-        val sigilMetadata = metadata(sigil)
-        val sigilBinary = quotedContent as? OtpErlangTuple ?: quotedFunctionCall("<<>>", sigilMetadata, quotedContent)
         val quotedModifiers = sigil.sigilModifiers.quote()
+        val sigilMetadata = OtpErlangList(arrayOf<OtpErlangObject>(keywordTuple("delimiter", sigil.sigilDelimiter()), lineNumberKeywordTuple(sigil.node)))
 
         return quotedFunctionCall(
                 "sigil_" + sigilName,
@@ -1461,8 +1463,21 @@ object QuotableImpl {
         val keyAtom = OtpErlangAtom(key)
         val valueInt = OtpErlangInt(value)
 
-        return OtpErlangTuple(arrayOf(keyAtom, valueInt))
+        return keywordTuple(keyAtom, valueInt)
     }
+
+    private fun keywordTuple(key: String, character: Char): OtpErlangTuple {
+        val keyAtom = OtpErlangAtom(key)
+
+        val valueByteArray = ByteArray(1)
+        valueByteArray.set(0, character.toByte())
+        val valueBinary = OtpErlangBinary(valueByteArray)
+
+        return keywordTuple(keyAtom, valueBinary)
+    }
+
+    private fun keywordTuple(key: OtpErlangAtom, value: OtpErlangObject): OtpErlangTuple =
+            OtpErlangTuple(arrayOf(key, value))
 
     /* Returns the 0-indexed line number for the element */
     private fun lineNumber(node: ASTNode): Int = node.psi.document()!!.getLineNumber(node.startOffset)

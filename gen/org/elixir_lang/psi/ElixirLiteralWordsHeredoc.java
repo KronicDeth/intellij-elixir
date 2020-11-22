@@ -52,6 +52,8 @@ public interface ElixirLiteralWordsHeredoc extends WordsFragmented, LiteralSigil
   @NotNull
   OtpErlangObject quoteLiteral(List<Integer> codePointList);
 
+  char sigilDelimiter();
+
   char sigilName();
 
 }

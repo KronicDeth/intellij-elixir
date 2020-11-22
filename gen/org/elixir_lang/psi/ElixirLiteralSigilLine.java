@@ -48,6 +48,8 @@ public interface ElixirLiteralSigilLine extends LiteralSigilLine, SigilFragmente
   @NotNull
   OtpErlangObject quoteLiteral(List<Integer> codePointList);
 
+  char sigilDelimiter();
+
   char sigilName();
 
   char terminator();
