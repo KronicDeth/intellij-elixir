@@ -1,22 +1,18 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.parser;
 
-import com.intellij.lang.ASTNode;
-import com.intellij.lang.LightPsiParser;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiBuilder.Marker;
-import com.intellij.lang.PsiParser;
-import com.intellij.psi.tree.IElementType;
-import com.intellij.psi.tree.IFileElementType;
-import com.intellij.psi.tree.TokenSet;
-
-import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
-import static org.elixir_lang.Level.V_1_5;
-import static org.elixir_lang.Level.V_1_6;
-import static org.elixir_lang.parser.ExternalRules.Operator.GE;
-import static org.elixir_lang.parser.ExternalRules.Operator.LT;
-import static org.elixir_lang.parser.ExternalRules.ifVersion;
 import static org.elixir_lang.psi.ElixirTypes.*;
+import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
+import com.intellij.psi.tree.IElementType;
+import com.intellij.lang.ASTNode;
+import com.intellij.psi.tree.TokenSet;
+import com.intellij.lang.PsiParser;
+import com.intellij.lang.LightPsiParser;
+import static org.elixir_lang.Level.*;
+import static org.elixir_lang.parser.ExternalRules.*;
+import static org.elixir_lang.parser.ExternalRules.Operator.*;
 
 @SuppressWarnings({"SimplifiableIfStatement", "UnusedAssignment"})
 public class ElixirParser implements PsiParser, LightPsiParser {
@@ -30,16 +26,15 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     boolean r;
     b = adapt_builder_(t, b, this, EXTENDS_SETS_);
     Marker m = enter_section_(b, 0, _COLLAPSE_, null);
-    if (t instanceof IFileElementType) {
-      r = parse_root_(t, b, 0);
-    }
-    else {
-      r = false;
-    }
+    r = parse_root_(t, b);
     exit_section_(b, 0, m, t, r, true, TRUE_CONDITION);
   }
 
-  protected boolean parse_root_(IElementType t, PsiBuilder b, int l) {
+  protected boolean parse_root_(IElementType t, PsiBuilder b) {
+    return parse_root_(t, b, 0);
+  }
+
+  static boolean parse_root_(IElementType t, PsiBuilder b, int l) {
     return eexOrElixirFile(b, l + 1);
   }
 
@@ -289,7 +284,6 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   private static boolean additionTail_0_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "additionTail_0_2")) return false;
     boolean r;
-    Marker m = enter_section_(b);
     r = consumeToken(b, DIVISION_OPERATOR);
     if (!r) r = consumeToken(b, ">");
     if (!r) r = consumeToken(b, DUAL_OPERATOR);
@@ -300,7 +294,6 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, OPENING_PARENTHESIS);
     if (!r) r = consumeToken(b, EOL);
     if (!r) r = consumeToken(b, SIGNIFICANT_WHITE_SPACE);
-    exit_section_(b, m, null, r);
     return r;
   }
 

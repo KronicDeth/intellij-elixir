@@ -1,9 +1,9 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi;
 
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.PsiElement;
+import com.intellij.lang.ASTNode;
 import org.elixir_lang.ElementTypeFactory;
 import org.elixir_lang.psi.impl.*;
 
@@ -255,7 +255,7 @@ public interface ElixirTypes {
   IElementType CHAR_LIST_SIGIL_HEREDOC_PROMOTER = new ElixirTokenType("Char List Sigil Heredoc Promoter (\"\"\", ''')");
   IElementType CHAR_LIST_SIGIL_HEREDOC_TERMINATOR = new ElixirTokenType("Char List Sigil Heredoc Terminator (\"\"\", ''')");
   IElementType CHAR_LIST_SIGIL_PROMOTER = new ElixirTokenType("Char List Sigil Promoter ({, [, <, \", /, (, |, ')");
-  IElementType CHAR_LIST_SIGIL_TERMINATOR = new ElixirTokenType("Char List Sigil Terminator ({, [, <, \", /, (, |, ')");
+  IElementType CHAR_LIST_SIGIL_TERMINATOR = new ElixirTokenType("Char List Sigil Terminator (}, ], >, \", /, ), |, ')");
   IElementType CHAR_LIST_TERMINATOR = new ElixirTokenType("Char List Terminator (')");
   IElementType CHAR_TOKENIZER = new ElixirTokenType("?");
   IElementType CLOSING_BIT = new ElixirTokenType(">>");

@@ -1,11 +1,49 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi;
 
-import com.intellij.psi.NavigatablePsiElement;
-import com.intellij.psi.PsiElement;
+import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.PsiElement;
+import org.elixir_lang.psi.stub.UnmatchedQualifiedNoParenthesesCall;
 import org.elixir_lang.psi.call.Named;
-import org.jetbrains.annotations.NotNull;
+import org.elixir_lang.psi.operation.capture.NonNumeric;
+import org.elixir_lang.psi.operation.InMatch;
+import org.elixir_lang.psi.stub.UnmatchedUnqualifiedNoArgumentsCall;
+import org.elixir_lang.psi.operation.When;
+import org.elixir_lang.psi.stub.MatchedQualifiedNoArgumentsCall;
+import org.elixir_lang.psi.operation.And;
+import org.elixir_lang.psi.operation.Infix;
+import org.elixir_lang.psi.stub.MatchedDotCall;
+import org.elixir_lang.psi.operation.Match;
+import org.elixir_lang.psi.stub.MatchedQualifiedParenthesesCall;
+import org.elixir_lang.psi.operation.Or;
+import org.elixir_lang.psi.stub.MatchedQualifiedNoParenthesesCall;
+import org.elixir_lang.psi.stub.UnmatchedAtUnqualifiedNoParenthesesCall;
+import org.elixir_lang.psi.call.Call;
+import org.elixir_lang.psi.operation.NotIn;
+import org.elixir_lang.psi.operation.Three;
+import org.elixir_lang.psi.stub.MatchedAtUnqualifiedNoParenthesesCall;
+import org.elixir_lang.psi.operation.Two;
+import org.elixir_lang.psi.operation.Type;
+import org.elixir_lang.psi.operation.Prefix;
+import org.elixir_lang.psi.operation.Multiplication;
+import org.elixir_lang.psi.stub.MatchedUnqualifiedParenthesesCall;
+import org.elixir_lang.psi.stub.UnmatchedQualifiedParenthesesCall;
+import org.elixir_lang.psi.operation.In;
+import org.elixir_lang.psi.operation.Addition;
+import org.elixir_lang.psi.stub.UnmatchedUnqualifiedParenthesesCall;
+import org.elixir_lang.psi.operation.Arrow;
+import org.elixir_lang.psi.operation.Pipe;
+import org.elixir_lang.psi.stub.UnmatchedUnqualifiedNoParenthesesCall;
+import com.intellij.psi.NavigatablePsiElement;
+import org.elixir_lang.psi.stub.MatchedUnqualifiedNoParenthesesCall;
+import org.elixir_lang.psi.stub.UnmatchedDotCall;
+import org.elixir_lang.psi.stub.UnmatchedQualifiedNoArgumentsCall;
+import org.elixir_lang.psi.stub.MatchedUnqualifiedNoArgumentsCall;
+import org.elixir_lang.psi.call.StubBased;
+import org.elixir_lang.psi.stub.UnqualifiedNoParenthesesManyArgumentsCall;
+import org.elixir_lang.psi.call.arguments.star.NoParentheses;
+import org.elixir_lang.psi.qualification.Unqualified;
 
 public class ElixirVisitor extends PsiElementVisitor {
 
