@@ -5,6 +5,7 @@ import com.intellij.psi.PsiFile
 import org.apache.commons.lang.CharUtils
 import org.elixir_lang.GenericServer.call
 import org.elixir_lang.IntellijElixir
+import org.elixir_lang.Keyword.isKeyword
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil
 import org.elixir_lang.psi.impl.ParentImpl.elixirString
 import org.hamcrest.CoreMatchers
@@ -21,6 +22,7 @@ object Quoter {
        with Elixir. from erlang's perspective. */
     private const val REMOTE_NAME = "Elixir.IntellijElixir.Quoter"
     private const val TIMEOUT_IN_MILLISECONDS = 1000
+
     @JvmStatic
     fun assertError(file: PsiFile) {
         val text = file.text
@@ -100,7 +102,7 @@ object Quoter {
     private fun assertQuotedCorrectly(expectedQuoted: OtpErlangObject,
                                       actualQuoted: OtpErlangObject) {
         if (expectedQuoted != actualQuoted) {
-            throw ComparisonFailure(null, toString(expectedQuoted), toString(actualQuoted))
+            throw ComparisonFailure(null, toString(expectedQuoted, 0), toString(actualQuoted, 0))
         }
     }
 
@@ -118,8 +120,9 @@ object Quoter {
         ) as OtpErlangTuple?
     }
 
-    private fun toString(quoted: OtpErlangBitstr): String =
-        quoted.binaryValue().joinToString(prefix = "\"", postfix = "\"") {
+    private fun toString(quoted: OtpErlangBitstr, depth: Int): String {
+        val indent = indent(depth)
+        return quoted.binaryValue().joinToString(prefix = "$indent\"", separator = "", postfix = "\"") {
             when {
                 it.toInt() == 0x0A -> {
                     "\\n"
@@ -128,15 +131,47 @@ object Quoter {
                     it.toChar().toString()
                 }
                 else -> {
-                   String.format("\\x%02X", it)
+                    String.format("\\x%02X", it)
                 }
             }
         }
+    }
 
-    private fun toString(quoted: OtpErlangList): String =
-        quoted.elements().joinToString(prefix = "[", postfix = "]") { toString(it) }
+    private fun toString(quoted: OtpErlangList, depth: Int): String {
+        val prefix = "["
+        val elements = quoted.elements()
+        val postfix = "]"
 
-    private fun toString(quoted: OtpErlangObject): String = if (quoted is OtpErlangBoolean ||
+        return if (isKeyword(quoted)) {
+            val keyDepth = depth + 1
+            val keyIndent = indent(keyDepth)
+            val valueDepth = keyDepth + 1
+            toString(prefix, elements, postfix, depth) { element ->
+                val pair = element as OtpErlangTuple
+                val key = pair.elementAt(0)
+                val value = pair.elementAt(1)
+
+                val suffix = when (value) {
+                    // One-liners
+                    is OtpErlangInt, is OtpErlangFloat, is OtpErlangDouble, is OtpErlangLong -> " ${toString(value, 0)}"
+                    else -> {
+                        val valueString = toString(value, valueDepth)
+                        valueString.lineSequence().singleOrNull()?.let {
+                            val valueIndent = indent(valueDepth)
+
+                            " ${it.removePrefix(valueIndent)}"
+                        } ?: "\n$valueString"
+                    }
+                }
+
+                "$keyIndent$key:$suffix"
+            }
+        } else {
+            toString(prefix, elements, postfix, depth)
+        }
+    }
+
+    private fun toString(quoted: OtpErlangObject, depth: Int): String = if (quoted is OtpErlangBoolean ||
             quoted is OtpErlangAtom ||
             quoted is OtpErlangByte ||
             quoted is OtpErlangChar ||
@@ -149,17 +184,28 @@ object Quoter {
             quoted is OtpErlangMap ||
             quoted is OtpErlangPid ||
             quoted is OtpErlangString) {
-        quoted.toString()
+        val indent = indent(depth)
+        quoted.toString().prependIndent(indent)
     } else if (quoted is OtpErlangBitstr) {
-        toString(quoted)
+        toString(quoted, depth)
     } else if (quoted is OtpErlangList) {
-        toString(quoted)
+        toString(quoted, depth)
     } else if (quoted is OtpErlangTuple) {
-        toString(quoted)
+        toString(quoted, depth)
     } else {
         throw IllegalArgumentException("Don't know how to convert ${quoted.javaClass} to string")
     }
 
-    private fun toString(quoted: OtpErlangTuple): String =
-        quoted.elements().joinToString(prefix = "{", postfix = "}") { toString(it) }
+    private fun toString(quoted: OtpErlangTuple, depth: Int): String =
+            toString("{", quoted.elements(), "}", depth)
+
+    private fun toString(prefix: String, elements: Array<OtpErlangObject>, postfix: String, depth: Int): String =
+            toString(prefix, elements, postfix, depth) { toString(it, depth + 1) }
+
+    private fun toString(prefix: String, elements: Array<OtpErlangObject>, postfix: String, depth: Int, transform: (OtpErlangObject) -> CharSequence): String {
+        val indent = indent(depth)
+        return elements.joinToString(prefix = "$indent$prefix\n", separator = ",\n", postfix = "\n$indent$postfix", transform = transform)
+    }
+
+    private fun indent(depth: Int): String = "  ".repeat(depth)
 }
