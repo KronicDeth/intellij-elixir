@@ -6,7 +6,7 @@ Elixir File(0,30)
       PsiElement(Char List Sigil Promoter ({, [, <, ", /, (, |, '))('{')(2,3)
       ElixirLiteralCharListBodyImpl(LITERAL_CHAR_LIST_BODY)(3,3)
         <empty list>
-      PsiElement(Char List Sigil Terminator ({, [, <, ", /, (, |, '))('}')(3,4)
+      PsiElement(Char List Sigil Terminator (}, ], >, ", /, ), |, '))('}')(3,4)
       ElixirSigilModifiersImpl(SIGIL_MODIFIERS)(4,30)
         PsiElement(Sigil Modifier (A-Z, a-z))('a')(4,5)
         PsiElement(Sigil Modifier (A-Z, a-z))('b')(5,6)
