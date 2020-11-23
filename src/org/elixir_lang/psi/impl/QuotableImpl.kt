@@ -756,7 +756,10 @@ object QuotableImpl {
                 quotedRelativeIdentifier
         )
 
-        val callMetadata = Macro.metadata(quotedIdentifier)
+        val callMetadata = OtpErlangList(arrayOf<OtpErlangObject>(
+                keywordTuple("no_parens", true),
+                lineNumberKeywordTuple(relativeIdentifier.node)
+        ))
 
         val quotedContainer = quotedFunctionCall(
                 quotedIdentifier,
@@ -792,9 +795,14 @@ object QuotableImpl {
 
         val doBlock = qualifiedNoArgumentsCall.doBlock
 
+        val quotedBlockCallMetadata = OtpErlangList(arrayOf<OtpErlangObject>(
+                keywordTuple("no_parens", true),
+                lineNumberKeywordTuple(relativeIdentifier.node)
+        ))
+
         return quotedBlockCall(
                 quotedIdentifier,
-                metadata(relativeIdentifier),
+                quotedBlockCallMetadata,
                 emptyArray(),
                 doBlock
         )
@@ -1459,6 +1467,13 @@ object QuotableImpl {
         )
     }
 
+    private fun keywordTuple(key: String, value: Boolean): OtpErlangTuple {
+        val keyAtom = OtpErlangAtom(key)
+        val valueAtom = OtpErlangAtom(value)
+
+        return keywordTuple(keyAtom, valueAtom)
+    }
+
     private fun keywordTuple(key: String, value: Int): OtpErlangTuple {
         val keyAtom = OtpErlangAtom(key)
         val valueInt = OtpErlangInt(value)
@@ -1481,6 +1496,9 @@ object QuotableImpl {
 
     /* Returns the 0-indexed line number for the element */
     private fun lineNumber(node: ASTNode): Int = node.psi.document()!!.getLineNumber(node.startOffset)
+
+    private fun lineNumberKeywordTuple(operator: Operator): OtpErlangTuple =
+            lineNumberKeywordTuple(operator.operatorTokenNode())
 
     private fun lineNumberKeywordTuple(node: ASTNode): OtpErlangTuple =
             keywordTuple(
