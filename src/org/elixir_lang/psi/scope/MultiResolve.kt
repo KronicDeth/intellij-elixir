@@ -18,14 +18,10 @@ object MultiResolve {
 
     fun addToResolveResultList(resolveResultList: MutableList<ResolveResult>?,
                                resolveResult: ResolveResult): List<ResolveResult> {
-        var resolveResultList = resolveResultList
-        if (resolveResultList == null) {
-            resolveResultList = ArrayList()
-        }
+        val nonNullResolveResultList = resolveResultList ?: mutableListOf()
+        nonNullResolveResultList.add(resolveResult)
 
-        resolveResultList.add(resolveResult)
-
-        return resolveResultList
+        return nonNullResolveResultList
     }
 
     /**

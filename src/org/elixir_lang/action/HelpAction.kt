@@ -1,7 +1,7 @@
 package org.elixir_lang.action
 
 import com.intellij.ide.BrowserUtil
-import com.intellij.ide.plugins.PluginManager
+import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.extensions.PluginId
@@ -11,7 +11,7 @@ class HelpAction : AnAction() {
         val version =
                 PluginId
                         .findId("org.elixir_lang")!!
-                        .let { PluginManager.getPlugin(it)!! }
+                        .let { PluginManagerCore.getPlugin(it)!! }
                         .version
 
         BrowserUtil.browse("https://github.com/KronicDeth/intellij-elixir/blob/v$version/README.md")

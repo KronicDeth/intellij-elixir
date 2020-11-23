@@ -13,6 +13,6 @@ class Type : com.intellij.execution.configurations.ConfigurationType {
     override fun getDisplayName(): String = "IEx"
 
     companion object {
-        internal fun getInstance(): Type = Extensions.findExtension(CONFIGURATION_TYPE_EP, Type::class.java)
+        internal fun getInstance(): Type = CONFIGURATION_TYPE_EP.findExtensionOrFail(Type::class.java)
     }
 }

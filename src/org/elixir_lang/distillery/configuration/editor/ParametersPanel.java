@@ -7,8 +7,8 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.LabeledComponent;
 import com.intellij.ui.CollectionComboBoxModel;
-import com.intellij.ui.ListCellRendererWrapper;
 import com.intellij.ui.RawCommandLineEditor;
+import com.intellij.ui.SimpleListCellRenderer;
 import com.intellij.util.ui.UIUtil;
 import org.elixir_lang.distillery.Configuration;
 import org.jetbrains.annotations.NotNull;
@@ -202,7 +202,7 @@ public class ParametersPanel extends CommonProgramParametersPanel {
         ComboBoxModel<CodeLoadingMode> codeLoadingModeComboBoxModel = new CollectionComboBoxModel<>(CODE_LOADING_MODE_LIST);
         ComboBox<CodeLoadingMode> codeLoadingModeComboBox = new ComboBox<>(codeLoadingModeComboBoxModel);
         codeLoadingModeComboBox.setRenderer(
-                new ListCellRendererWrapper<CodeLoadingMode>() {
+                new SimpleListCellRenderer<CodeLoadingMode>() {
                     @Override
                     public void customize(@NotNull JList list,
                                           @Nullable CodeLoadingMode value,
@@ -236,7 +236,7 @@ public class ParametersPanel extends CommonProgramParametersPanel {
         ComboBoxModel<Boolean> replaceOsVarsComboBoxModel = new CollectionComboBoxModel<>(REPLACE_OS_VARS_LIST);
         ComboBox<Boolean> replaceOsVarsComboBox = new ComboBox<>(replaceOsVarsComboBoxModel);
         replaceOsVarsComboBox.setRenderer(
-                new ListCellRendererWrapper<Boolean>() {
+                new SimpleListCellRenderer<Boolean>() {
                     @Override
                     public void customize(@NotNull JList list,
                                           @Nullable Boolean value,

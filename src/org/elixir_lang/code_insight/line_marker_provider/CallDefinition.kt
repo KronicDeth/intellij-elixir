@@ -23,9 +23,7 @@ import org.elixir_lang.structure_view.element.CallDefinitionSpecification.Compan
 import org.elixir_lang.structure_view.element.CallDefinitionSpecification.Companion.specificationType
 
 class CallDefinition : LineMarkerProvider {
-    override fun collectSlowLineMarkers(elements: List<PsiElement>, result: Collection<LineMarkerInfo<*>>) {}
-
-    override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<*>? =
+   override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<*>? =
             if (daemonCodeAnalyzerSettings.SHOW_METHOD_SEPARATORS) {
                 when (element) {
                     is AtUnqualifiedNoParenthesesCall<*> -> getLineMarkerInfo(element)
@@ -56,8 +54,10 @@ class CallDefinition : LineMarkerProvider {
     private fun callDefinitionSeparator(psiElement: PsiElement): LineMarkerInfo<*> =
             LineMarkerInfo(
                     psiElement,
-                    psiElement.textRange, null,
-                    Pass.UPDATE_ALL, null, null,
+                    psiElement.textRange,
+                    null,
+                    null,
+                    null,
                     GutterIconRenderer.Alignment.RIGHT
             ).apply {
                 separatorColor = editorColorsManager.globalScheme.getColor(CodeInsightColors.METHOD_SEPARATORS_COLOR)
@@ -75,7 +75,7 @@ class CallDefinition : LineMarkerProvider {
                             .siblingExpression(PREVIOUS_SIBLING)
                             .let { it as? AtUnqualifiedNoParenthesesCall<*>}
                             ?.let { previousModuleAttribute ->
-                                val previousModuleAttributeName = moduleAttributeName(previousModuleAttribute!!)
+                                val previousModuleAttributeName = moduleAttributeName(previousModuleAttribute)
 
                                 if (previousModuleAttributeName == "@spec") {
                                     moduleAttributeNameArity(previousModuleAttribute)?.let { moduleAttributeNameArity ->

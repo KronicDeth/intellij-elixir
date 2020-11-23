@@ -33,7 +33,7 @@ class Editor(node: Node) : JPanel(BorderLayout()), ComponentWithEmptyText {
 
         tableHeader = null
         columnModel.getColumn(Model.INTERPRETED_COLUMN_INDEX).let { column ->
-            TableUtil.setupCheckboxColumn(column)
+            TableUtil.setupCheckboxColumn(column, columnModel.columnMargin)
             column.headerValue = "Interpret"
             column.cellEditor = BooleanTableCellEditor()
             column.cellRenderer = BooleanTableCellRenderer()

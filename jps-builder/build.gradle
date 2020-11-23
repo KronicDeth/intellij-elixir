@@ -1,5 +1,9 @@
 jar.archiveName = "jps-builder.jar"
 
+repositories {
+    mavenCentral()
+}
+
 sourceSets {
     main {
         java.srcDirs 'src'

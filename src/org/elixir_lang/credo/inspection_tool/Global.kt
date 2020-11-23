@@ -168,8 +168,8 @@ private fun convertToProblemDescriptors(annotations: List<Annotation>,
         return ProblemDescriptor.EMPTY_ARRAY
     }
 
-    val problems = ContainerUtil.newArrayListWithCapacity<ProblemDescriptor>(annotations.size)
-    val quickFixMappingCache = ContainerUtil.newIdentityHashMap<IntentionAction, LocalQuickFix>()
+    val problems = ArrayList<ProblemDescriptor>(annotations.size)
+    val quickFixMappingCache = IdentityHashMap<IntentionAction, LocalQuickFix>()
     for (annotation in annotations) {
         if (annotation.severity === HighlightSeverity.INFORMATION || annotation.startOffset == annotation.endOffset && !annotation.isAfterEndOfLine) {
             continue
@@ -293,10 +293,10 @@ class Global : GlobalInspectionTool() {
                             }
                         }
                         is RefFile -> {
-                            val psiFile = refEntity.element
+                            val psiFile = refEntity.psiElement
 
                             val workingDirectorySet: Set<String>
-                            val module = ModuleUtilCore.findModuleForPsiElement(refEntity.element)
+                            val module = ModuleUtilCore.findModuleForPsiElement(psiFile)
 
                             workingDirectorySet = if (module != null) {
                                 workingDirectorySet(module)
@@ -313,13 +313,13 @@ class Global : GlobalInspectionTool() {
                             workingDirectorySet = if (refModule != null) {
                                 workingDirectorySet(refModule.module)
                             } else {
-                                workingDirectorySet(refEntity.element.project)
+                                workingDirectorySet(refEntity.psiElement.project)
                             }
 
                             put(
                                     pathSetByWorkingDirectory,
                                     workingDirectorySet,
-                                    refEntity.element.containingFile.virtualFile.path
+                                    refEntity.psiElement.containingFile.virtualFile.path
                             )
                         }
                     }

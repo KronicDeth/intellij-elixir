@@ -26,7 +26,7 @@ public class FrameworkDetector extends FacetBasedFrameworkDetector<Facet, Config
     @NotNull
     @Override
     public FileType getFileType() {
-        return ElixirFileType.SCRIPT;
+        return ElixirScriptFileType.INSTANCE;
     }
 
     @NotNull

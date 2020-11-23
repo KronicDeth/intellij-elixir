@@ -370,7 +370,7 @@ object Macro {
     private fun ifAccessToString(macro: OtpErlangObject): String? =
             ifTupleTo(macro, 3) { tuple: OtpErlangTuple ->
                 ifTagged3TupleTo(tuple.elementAt(0), ".") { dotTuple ->
-                    (dotTuple as? OtpErlangList)?.let { dotArguments ->
+                    (dotTuple.elementAt(2) as? OtpErlangList)?.let { dotArguments ->
                         if (dotArguments.arity() == 2 &&
                                 dotArguments.elementAt(0) == OtpErlangAtom("Elixir.Access") &&
                                 dotArguments.elementAt(1) == OtpErlangAtom("get")) {
@@ -796,7 +796,7 @@ object Macro {
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex#L616-L626
     private fun ifWhenBinaryToString(macro: OtpErlangObject): String? =
             ifTagged3TupleTo(macro, "when") { tuple ->
-                (tuple.elementAt(2) as OtpErlangList)?.let { arguments ->
+                (tuple.elementAt(2) as? OtpErlangList)?.let { arguments ->
                     if (arguments.arity() == 2) {
                         val (left, right) = arguments
 
@@ -886,7 +886,7 @@ object Macro {
             }
         } ?: false
 
-    private fun sigilArguments(term: OtpErlangObject): String {
+    private fun sigilArguments(@Suppress("UNUSED_PARAMETER") term: OtpErlangObject): String {
         TODO("not implemented")
     }
 
@@ -1048,7 +1048,7 @@ object Macro {
             }
 
 
-    private fun interpolate(macro: OtpErlangTuple): String {
+    private fun interpolate(@Suppress("UNUSED_PARAMETER") macro: OtpErlangTuple): String {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
@@ -1358,7 +1358,7 @@ object Macro {
                     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex?utf8=%E2%9C%93#L798-L805
                     toString(module)
 
-    private fun kernelToString(term: OtpErlangObject): String {
+    private fun kernelToString(@Suppress("UNUSED_PARAMETER") term: OtpErlangObject): String {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
@@ -1382,7 +1382,7 @@ object Macro {
             acc: T,
             pre: (OtpErlangObject, T) -> Pair<OtpErlangObject, T>
     ): Pair<OtpErlangObject, T> =
-        traverse(macro, acc, pre, { expression, acc -> Pair(expression, acc) })
+        traverse(macro, acc, pre, ::Pair)
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex?utf8=%E2%9C%93#L232-L240
     private fun <T> traverse(

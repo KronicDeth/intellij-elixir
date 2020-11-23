@@ -1,6 +1,89 @@
 <html>
 <body>
-<h1>v11.81.</h1>
+<h1>v11.9.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>
+        Make plugin updatable without a restart when installing from the JetBrains Marketplace.  (If installing from
+        file on GitHub you still need to restart due to a limitation in the JetBrains API.). JetBrains refers to this as
+        a
+        <a href="https://jetbrains.org/intellij/sdk/docs/basics/plugin_structure/dynamic_plugins.html">
+          Dynamic Plugin
+        </a>.
+        <ul>
+          <li>Convert <code>DepsWatcher</code> from project component to project listener</li>
+          <li>Convert <code>Watcher</code> from module component to project listener</li>
+          <li>Make org.elixir_lang.packageManager extension point dynamic</li>
+        </ul>
+      </li>
+      <li>Remove unnecessary <code>assert</code>.</li>
+    </ul>
+  </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>Fix deprecation warnings for IntelliJ IDEA 2020.2
+        <ul>
+          <li>Replace <code>fileTypeFactory</code> extensions with <code>fileType</code></li>
+          <li>Convert <code>fileType</code>s to Kotlin</li>
+          <li>Replace uses of deprecated <code>Project#baseDir</code></li>
+          <li>Replace uses of deprecated <code>ContainerUtil.newHashMap</code></li>
+          <li>Replace <code>defaultLiveTemplatesProvider</code> with <code>defaultLiveTemplates</code></li>
+        </ul>
+      </li>
+      <li>Fix error reporting formatting
+        <ul>
+          <li>Fix new lines around excerpts so that code blocks quote correctly</li>
+          <li>Use FILE:LINE format for excerpt location, so it can be used in editors for rapid lookup.</li>
+          <li>Separate title from message</li>
+          <li>Remove use of <code>ErrorBean</code></li>
+          <li>Pass project for LevelPropertyPusher DumbModeTask</li>
+          <li>Don't use constructor injection for <code>SetupSDKNotificationProvider</code></li>
+          <li>Don't use <code>AnnotationHolder::create*</code> APIs and use <code>AnnotationBuilder</code> instead.
+            <ul>
+              <li>Convert <code>Annotator</code>s to Kotlin</li>
+            </ul>
+          </li>
+          <li>Use <code>logger.error</code> directly instead of <code>LogMessageEx</code></li>
+          <li><code>spaceExistanceTypeBetweenTokens</code> replaced with <code>spaceExistenceTypeBetweenTokens</code></li>
+          <li>Replace <code>ListCellRendererWrapper</code> with <code>SimpleListCellRenderer</code></li>
+          <li>Replace <code>StdFileTypes.PLAIN_TEXT</code> with <code>FileTypes.PLAIN_TEXT</code></li>
+          <li>Replace <code>LanguageSubstitutors.INSTANCE</code> with <code>getInstance()</code></li>
+          <li>Replace <code>ReportMessages.ERROR_REPORT</code> with <code>ReportMessages.getErrorReport()</code></li>
+          <li>Replace <code>DefaultProgramRunner</code> with <code>GenericProgramRunner</code>
+            <ul>
+              <li>Have only one runner for all configurations in plugin since body of runner was all the same for non-debug.</li>
+            </ul>
+          </li>
+          <li>Don't override deprecated <code>flushBufferBeforeTerminating()</code></li>
+          <li>Don't override deprecated <code>acceptsFile</code></li>
+          <li>Override <code>initExtra(Project)</code> instead of <code>initExtra(Project, MessageBus, Engine)</code></li>
+          <li>Replace <code>NamedFoldingDescriptor</code> with <code>FoldingDescriptor</code>
+            <ul>
+              <li>Convert <code>folding.Builder</code> to Kotlin</li>
+            </ul>
+          </li>
+          <li>Replace <code>file</code> with <code>value</code> for <code>@Storage</code> annotation</li>
+          <li>Replace <code>checkBox(fieldName, title)</code> with <code>checkBox(title, getter, setter)</code></li>
+          <li>Replace <code>com.intellij.util.contains.Predicate</code> with <code>java.util.function.Predicate</code></li>
+          <li>Replace <code>CodeStyleSettingsManager</code> with <code>CodeStyle</code></li>
+          <li>Replace <code>Comparing.equal</code> with <code>Objects.equals</code></li>
+        </ul>
+      </li>
+      <li>Fix Atom annotator to only annotator within current element.<br>
+        Annotation keyword pair's key and colon instead of annotating the keyword key and the colon outside of it.</li>
+      <li>Fix <code>ifAccessToString</code><br>
+        I missed taking the 3rd element of the tuple to get <code>[Access, :get]</code> and was checking the outer tuple directly.
+        <ul>
+          <li>Convert <code>beam.assembly.ParserDefinition</code> to Kotlin</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+<h1>v11.8.1</h1>
 <ul>
   <li>
     <p>Bug Fixes</p>

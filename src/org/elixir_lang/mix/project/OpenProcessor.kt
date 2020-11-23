@@ -10,12 +10,12 @@ import org.elixir_lang.mix.project._import.Builder
  * Created by zyuyou on 15/7/1.
  */
 class OpenProcessor : ProjectOpenProcessorBase<Builder>() {
-    override fun getSupportedExtensions(): Array<String> = arrayOf("mix.exs")
+    override val supportedExtensions = arrayOf("mix.exs")
 
     override fun doGetBuilder(): Builder = ProjectImportBuilder.EXTENSIONS_POINT_NAME.findExtensionOrFail(Builder::class.java)
 
-    override fun doQuickImport(exsFile: VirtualFile, wizardContext: WizardContext): Boolean {
-        val projectRoot = exsFile.parent
+    override fun doQuickImport(file: VirtualFile, wizardContext: WizardContext): Boolean {
+        val projectRoot = file.parent
         wizardContext.projectName = projectRoot.name
         builder.setProjectRoot(projectRoot)
         return true

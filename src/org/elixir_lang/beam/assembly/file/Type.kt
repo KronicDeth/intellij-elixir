@@ -11,6 +11,6 @@ object Type : LanguageFileType(Language) {
     override fun getDefaultExtension(): String = "beam.asm"
     override fun getDescription(): String = "Bogdan/Björn's Erlang Abstract Machine Code chunk assembly"
     override fun getIcon(): Icon = Icons.FILE
-    override fun getName(): String = "BEAM Assembly file"
+    override fun getName(): String = "BEAM Assembly"
     override fun isReadOnly(): Boolean = true
 }

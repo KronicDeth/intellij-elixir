@@ -25,7 +25,6 @@ import com.intellij.openapi.util.UserDataHolder;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.EnvironmentUtil;
 import com.intellij.util.PlatformUtils;
-import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.text.CaseInsensitiveStringHashingStrategy;
 import gnu.trove.THashMap;
 import org.jetbrains.annotations.NonNls;
@@ -261,7 +260,7 @@ public class GeneralCommandLine implements UserDataHolder {
     @Override
     public <T> void putUserData(@NotNull final Key<T> key, @Nullable final T value) {
         if (myUserData == null) {
-            myUserData = ContainerUtil.newHashMap();
+            myUserData = new HashMap<>();
         }
         myUserData.put(key, value);
     }
