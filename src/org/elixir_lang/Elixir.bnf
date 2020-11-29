@@ -331,6 +331,7 @@
     quote
     quoteBinary
     quoteEmpty
+    quoteInterpolation
     quoteLiteral
   ]
 
@@ -346,6 +347,7 @@
     quoteAsAtom
     quoteBinary
     quoteEmpty
+    quoteInterpolation
     quoteLiteral
   ]
 
@@ -360,6 +362,7 @@
     quote
     quoteBinary
     quoteEmpty
+    quoteInterpolation
     quoteLiteral
     sigilDelimiter
     sigilName
@@ -376,6 +379,7 @@
     quote
     quoteBinary
     quoteEmpty
+    quoteInterpolation
     quoteLiteral
     sigilDelimiter
     sigilName
@@ -3130,7 +3134,6 @@ sigilHexadecimalEscapeSequence ::= hexadecimalEscapePrefix (openHexadecimalEscap
 emptyParentheses ::= OPENING_PARENTHESIS CLOSING_PARENTHESIS
                      { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 interpolation ::= INTERPOLATION_START elixirFile INTERPOLATION_END
-                  { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 /*
  * List

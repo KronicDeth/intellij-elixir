@@ -5,6 +5,7 @@ import com.intellij.lang.ASTNode
 import org.elixir_lang.Level
 import org.elixir_lang.Level.V_1_3
 import org.elixir_lang.psi.*
+import org.elixir_lang.psi.call.name.Module
 import org.elixir_lang.psi.impl.QuotableImpl.metadata
 import org.elixir_lang.psi.impl.QuotableImpl.quotedFunctionCall
 import org.elixir_lang.sdk.elixir.Type.getNonNullRelease
@@ -131,23 +132,26 @@ object ParentImpl {
     fun addHexadecimalEscapeSequenceCodePoints(parent: Sigil, codePointList: MutableList<Int>?, child: ASTNode): List<Int> =
             addChildTextCodePoints(codePointList, child)
 
+    // See https://github.com/elixir-lang/elixir/commit/e89e9d874bf803379d729a3bae185052a5323a85
     @Contract(pure = true)
     @JvmStatic
-    fun quoteBinary(interpolatedCharList: InterpolatedCharList, binary: OtpErlangTuple): OtpErlangObject =
+    fun quoteBinary(interpolatedCharList: InterpolatedCharList, metadata: OtpErlangList, argumentList: List<OtpErlangObject>): OtpErlangObject =
             quotedFunctionCall(
-                    "Elixir.String",
+                    "Elixir.List",
                     quoteBinaryFunctionIdentifier(interpolatedCharList),
                     metadata(interpolatedCharList),
-                    binary
+                    OtpErlangList(argumentList.toTypedArray())
             )
 
     @Contract(pure = true)
     @JvmStatic
-    fun quoteBinary(interpolatedString: InterpolatedString, binary: OtpErlangTuple): OtpErlangObject = binary
+    fun quoteBinary(interpolatedString: InterpolatedString, metadata: OtpErlangList, argumentList: List<OtpErlangObject>): OtpErlangObject =
+            quotedFunctionCall("<<>>", metadata, *argumentList.toTypedArray())
 
     @Contract(pure = true)
     @JvmStatic
-    fun quoteBinary(sigil: Sigil, binary: OtpErlangTuple): OtpErlangObject = binary
+    fun quoteBinary(sigil: Sigil, metadata: OtpErlangList, argumentList: List<OtpErlangObject>): OtpErlangObject =
+            quotedFunctionCall("<<>>", metadata, *argumentList.toTypedArray())
 
     @Contract(pure = true)
     @JvmStatic
@@ -160,6 +164,79 @@ object ParentImpl {
     @Contract(pure = true)
     @JvmStatic
     fun quoteEmpty(sigil: Sigil): OtpErlangObject = elixirString("")
+
+    // See https://github.com/elixir-lang/elixir/commit/e89e9d874bf803379d729a3bae185052a5323a85
+    @JvmStatic
+    fun quoteInterpolation(interpolatedCharList: InterpolatedCharList, interpolation: ElixirInterpolation): OtpErlangObject {
+        val level = getNonNullRelease(interpolation).level()
+        val quotedChildren = QuotableImpl.quote(interpolation.children, level)
+        val interpolationMetadata = metadata(interpolation)
+
+        return quotedFunctionCall(
+                Module.prependElixirPrefix(Module.KERNEL),
+                "to_string",
+                interpolationMetadata,
+                quotedChildren
+        )
+    }
+
+    /* "#{a}" is transformed to "<<Kernel.to_string(a) :: binary>>" in
+     * `"\"\#{a}\"" |> Code.string_to_quoted |> Macro.to_string`, so interpolation has to be represented as a type call
+     * (`:::`) to binary of a call of `Kernel.to_string`
+     */
+    @JvmStatic
+    fun quoteInterpolation(interpolatedString: InterpolatedString, interpolation: ElixirInterpolation): OtpErlangObject {
+        val level = getNonNullRelease(interpolation).level()
+        val quotedChildren = QuotableImpl.quote(interpolation.children, level)
+        val interpolationMetadata = metadata(interpolation)
+
+        val quotedKernelToStringCall = quotedFunctionCall(
+                Module.prependElixirPrefix(Module.KERNEL),
+                "to_string",
+                interpolationMetadata,
+                quotedChildren
+        )
+        val quotedBinaryCall = QuotableImpl.quotedVariable(
+                "binary",
+                interpolationMetadata
+        )
+
+        return quotedFunctionCall(
+                "::",
+                interpolationMetadata,
+                quotedKernelToStringCall,
+                quotedBinaryCall
+        )
+    }
+
+    /* "#{a}" is transformed to "<<Kernel.to_string(a) :: binary>>" in
+     * `"\"\#{a}\"" |> Code.string_to_quoted |> Macro.to_string`, so interpolation has to be represented as a type call
+     * (`:::`) to binary of a call of `Kernel.to_string`
+     */
+    @JvmStatic
+    fun quoteInterpolation(sigil: Sigil, interpolation: ElixirInterpolation): OtpErlangObject {
+        val level = getNonNullRelease(interpolation).level()
+        val quotedChildren = QuotableImpl.quote(interpolation.children, level)
+        val interpolationMetadata = metadata(interpolation)
+
+        val quotedKernelToStringCall = quotedFunctionCall(
+                Module.prependElixirPrefix(Module.KERNEL),
+                "to_string",
+                interpolationMetadata,
+                quotedChildren
+        )
+        val quotedBinaryCall = QuotableImpl.quotedVariable(
+                "binary",
+                interpolationMetadata
+        )
+
+        return quotedFunctionCall(
+                "::",
+                interpolationMetadata,
+                quotedKernelToStringCall,
+                quotedBinaryCall
+        )
+    }
 
     @Contract(pure = true)
     @JvmStatic
@@ -258,4 +335,5 @@ object ParentImpl {
     @Contract(pure = true)
     private fun quoteBinaryFunctionIdentifier(interpolatedCharList: InterpolatedCharList): String =
             getNonNullRelease(interpolatedCharList).level().quoteBinaryFunctionIdentifier
+
 }

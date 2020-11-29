@@ -17,8 +17,6 @@ import org.elixir_lang.Level.V_1_6
 import org.elixir_lang.Macro
 import org.elixir_lang.mix.project.computeReadAction
 import org.elixir_lang.psi.*
-import org.elixir_lang.psi.call.name.Module.KERNEL
-import org.elixir_lang.psi.call.name.Module.prependElixirPrefix
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.IDENTIFIER_TOKEN_SET
 import org.elixir_lang.psi.impl.ParentImpl.addChildTextCodePoints
 import org.elixir_lang.psi.impl.ParentImpl.elixirCharList
@@ -1277,36 +1275,6 @@ object QuotableImpl {
         }
     }
 
-    /* "#{a}" is transformed to "<<Kernel.to_string(a) :: binary>>" in
-     * `"\"\#{a}\"" |> Code.string_to_quoted |> Macro.to_string`, so interpolation has to be represented as a type call
-     * (`:::`) to binary of a call of `Kernel.to_string`
-     */
-    @Contract(pure = true)
-    @JvmStatic
-    fun quote(interpolation: ElixirInterpolation): OtpErlangObject {
-        val level = getNonNullRelease(interpolation).level()
-        val quotedChildren = quote(interpolation.children, level)
-        val interpolationMetadata = metadata(interpolation)
-
-        val quotedKernelToStringCall = quotedFunctionCall(
-                prependElixirPrefix(KERNEL),
-                "to_string",
-                interpolationMetadata,
-                quotedChildren
-        )
-        val quotedBinaryCall = quotedVariable(
-                "binary",
-                interpolationMetadata
-        )
-
-        return quotedFunctionCall(
-                "::",
-                interpolationMetadata,
-                quotedKernelToStringCall,
-                quotedBinaryCall
-        )
-    }
-
     @Contract(pure = true)
     @JvmStatic
     fun quote(identifier: ElixirIdentifier): OtpErlangObject = OtpErlangAtom(identifier.text)
@@ -1622,7 +1590,7 @@ object QuotableImpl {
                     }
 
                     val childElement = child.psi as ElixirInterpolation
-                    quotedParentList.add(childElement.quote())
+                    quotedParentList.add(parent.quoteInterpolation(childElement))
                 } else if (elementType === ElixirTypes.QUOTE_HEXADECIMAL_ESCAPE_SEQUENCE || elementType === ElixirTypes.SIGIL_HEXADECIMAL_ESCAPE_SEQUENCE) {
                     codePointList = parent.addHexadecimalEscapeSequenceCodePoints(codePointList, child)
                 } else {
@@ -1637,8 +1605,7 @@ object QuotableImpl {
                     quotedParentList.add(elixirString(codePointList))
                 }
 
-                val binaryConstruction = quotedFunctionCall("<<>>", metadata, *quotedParentList.toTypedArray())
-                parent.quoteBinary(binaryConstruction)
+                parent.quoteBinary(metadata, quotedParentList)
             }
         }
 
@@ -1653,7 +1620,7 @@ object QuotableImpl {
             )
 
     @Contract(pure = true)
-    private fun quotedVariable(identifier: String, metadata: OtpErlangList): OtpErlangObject =
+    fun quotedVariable(identifier: String, metadata: OtpErlangList): OtpErlangObject =
             quotedVariable(
                     OtpErlangAtom(identifier),
                     metadata

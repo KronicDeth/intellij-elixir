@@ -4,9 +4,8 @@ package org.elixir_lang.psi;
 import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
-import com.ericsson.otp.erlang.OtpErlangObject;
 
-public interface ElixirInterpolation extends Quotable {
+public interface ElixirInterpolation extends PsiElement {
 
   @NotNull
   List<ElixirEmptyParentheses> getEmptyParenthesesList();
@@ -19,8 +18,5 @@ public interface ElixirInterpolation extends Quotable {
 
   @NotNull
   List<ElixirUnqualifiedNoParenthesesManyArgumentsCall> getUnqualifiedNoParenthesesManyArgumentsCallList();
-
-  @NotNull
-  OtpErlangObject quote();
 
 }

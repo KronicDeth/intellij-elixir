@@ -1,6 +1,7 @@
 package org.elixir_lang.psi.impl;
 
 import com.ericsson.otp.erlang.OtpErlangBinary;
+import com.ericsson.otp.erlang.OtpErlangList;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.ericsson.otp.erlang.OtpErlangTuple;
 import com.intellij.lang.ASTNode;
@@ -1190,12 +1191,6 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quote(@NotNull final ElixirInterpolation interpolation) {
-        return QuotableImpl.quote(interpolation);
-    }
-
-    @Contract(pure = true)
-    @NotNull
     public static OtpErlangObject quote(ElixirRelativeIdentifier relativeIdentifier) {
         return QuotableImpl.quote(relativeIdentifier);
     }
@@ -1520,20 +1515,20 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quoteBinary(InterpolatedCharList interpolatedCharList, OtpErlangTuple binary) {
-        return ParentImpl.quoteBinary(interpolatedCharList, binary);
+    public static OtpErlangObject quoteBinary(InterpolatedCharList interpolatedCharList, OtpErlangList metadata, List<OtpErlangObject> argumentList) {
+        return ParentImpl.quoteBinary(interpolatedCharList, metadata, argumentList);
     }
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quoteBinary(InterpolatedString interpolatedString, OtpErlangTuple binary) {
-        return ParentImpl.quoteBinary(interpolatedString, binary);
+    public static OtpErlangObject quoteBinary(InterpolatedString interpolatedString, OtpErlangList metadata, List<OtpErlangObject> argumentList) {
+        return ParentImpl.quoteBinary(interpolatedString, metadata, argumentList);
     }
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quoteBinary(Sigil sigil, OtpErlangTuple binary) {
-        return ParentImpl.quoteBinary(sigil, binary);
+    public static OtpErlangObject quoteBinary(Sigil sigil, OtpErlangList metadata, List<OtpErlangObject> argumentList) {
+        return ParentImpl.quoteBinary(sigil, metadata, argumentList);
     }
 
     @Contract(pure = true)
@@ -1552,6 +1547,24 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static OtpErlangObject quoteEmpty(Sigil sigil) {
         return ParentImpl.quoteEmpty(sigil);
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quoteInterpolation(InterpolatedCharList interpolatedCharList, ElixirInterpolation interpolation) {
+        return ParentImpl.quoteInterpolation(interpolatedCharList, interpolation);
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quoteInterpolation(InterpolatedString interpolatedString, ElixirInterpolation interpolation) {
+        return ParentImpl.quoteInterpolation(interpolatedString, interpolation);
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quoteInterpolation(Sigil sigil, ElixirInterpolation interpolation) {
+        return ParentImpl.quoteInterpolation(sigil, interpolation);
     }
 
     @Contract(pure = true)

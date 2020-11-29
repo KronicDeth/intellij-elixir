@@ -360,7 +360,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitInterpolation(@NotNull ElixirInterpolation o) {
-    visitQuotable(o);
+    visitPsiElement(o);
   }
 
   public void visitKeywordKey(@NotNull ElixirKeywordKey o) {
