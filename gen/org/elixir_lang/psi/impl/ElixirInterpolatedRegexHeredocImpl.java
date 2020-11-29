@@ -113,7 +113,7 @@ public class ElixirInterpolatedRegexHeredocImpl extends ASTWrapperPsiElement imp
   }
 
   @Override
-  public char sigilDelimiter() {
+  public String sigilDelimiter() {
     return ElixirPsiImplUtil.sigilDelimiter(this);
   }
 

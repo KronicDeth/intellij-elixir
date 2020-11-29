@@ -48,7 +48,7 @@ public interface ElixirLiteralCharListSigilLine extends CharListFragmented, Lite
   @NotNull
   OtpErlangObject quoteLiteral(List<Integer> codePointList);
 
-  char sigilDelimiter();
+  String sigilDelimiter();
 
   char sigilName();
 

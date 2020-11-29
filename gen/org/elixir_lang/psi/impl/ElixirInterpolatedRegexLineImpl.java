@@ -106,7 +106,7 @@ public class ElixirInterpolatedRegexLineImpl extends ASTWrapperPsiElement implem
   }
 
   @Override
-  public char sigilDelimiter() {
+  public String sigilDelimiter() {
     return ElixirPsiImplUtil.sigilDelimiter(this);
   }
 

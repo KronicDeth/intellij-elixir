@@ -52,7 +52,7 @@ public interface ElixirInterpolatedCharListSigilHeredoc extends CharListFragment
   @NotNull
   OtpErlangObject quoteLiteral(List<Integer> codePointList);
 
-  char sigilDelimiter();
+  String sigilDelimiter();
 
   char sigilName();
 

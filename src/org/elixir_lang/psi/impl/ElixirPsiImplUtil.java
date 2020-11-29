@@ -1734,7 +1734,8 @@ public class ElixirPsiImplUtil {
         return PsiNamedElementImpl.setName(named, newName);
     }
 
-    public static char sigilDelimiter(@NotNull org.elixir_lang.psi.Sigil sigil) {
+    @NotNull
+    public static String sigilDelimiter(@NotNull org.elixir_lang.psi.Sigil sigil) {
         return SigilImpl.sigilDelimiter(sigil);
     }
 

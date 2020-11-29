@@ -113,7 +113,7 @@ public class ElixirInterpolatedCharListSigilHeredocImpl extends ASTWrapperPsiEle
   }
 
   @Override
-  public char sigilDelimiter() {
+  public String sigilDelimiter() {
     return ElixirPsiImplUtil.sigilDelimiter(this);
   }
 

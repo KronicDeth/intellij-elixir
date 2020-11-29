@@ -106,7 +106,7 @@ public class ElixirLiteralCharListSigilLineImpl extends ASTWrapperPsiElement imp
   }
 
   @Override
-  public char sigilDelimiter() {
+  public String sigilDelimiter() {
     return ElixirPsiImplUtil.sigilDelimiter(this);
   }
 

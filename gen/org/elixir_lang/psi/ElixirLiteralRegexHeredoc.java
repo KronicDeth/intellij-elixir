@@ -52,7 +52,7 @@ public interface ElixirLiteralRegexHeredoc extends RegexFragmented, LiteralSigil
   @NotNull
   OtpErlangObject quoteLiteral(List<Integer> codePointList);
 
-  char sigilDelimiter();
+  String sigilDelimiter();
 
   char sigilName();
 

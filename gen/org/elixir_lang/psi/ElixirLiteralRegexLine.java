@@ -48,7 +48,7 @@ public interface ElixirLiteralRegexLine extends RegexFragmented, LiteralSigilLin
   @NotNull
   OtpErlangObject quoteLiteral(List<Integer> codePointList);
 
-  char sigilDelimiter();
+  String sigilDelimiter();
 
   char sigilName();
 
