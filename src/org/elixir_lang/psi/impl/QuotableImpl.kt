@@ -1481,12 +1481,9 @@ object QuotableImpl {
         return keywordTuple(keyAtom, valueInt)
     }
 
-    private fun keywordTuple(key: String, character: Char): OtpErlangTuple {
-        val keyAtom = OtpErlangAtom(key)
-
-        val valueByteArray = ByteArray(1)
-        valueByteArray.set(0, character.toByte())
-        val valueBinary = OtpErlangBinary(valueByteArray)
+    private fun keywordTuple(key: String, value: String): OtpErlangTuple {
+        val keyAtom  = OtpErlangAtom(key)
+        val valueBinary = OtpErlangBinary(value.toByteArray())
 
         return keywordTuple(keyAtom, valueBinary)
     }
