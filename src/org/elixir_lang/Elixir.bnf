@@ -359,6 +359,7 @@
     addHexadecimalEscapeSequenceCodePoints
     getFragmentType
     getHeredocLineList
+    indentation
     quote
     quoteBinary
     quoteEmpty
@@ -376,6 +377,7 @@
     addHexadecimalEscapeSequenceCodePoints
     getBody
     getFragmentType
+    indentation
     quote
     quoteBinary
     quoteEmpty

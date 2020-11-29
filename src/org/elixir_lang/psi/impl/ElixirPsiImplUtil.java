@@ -1747,6 +1747,16 @@ public class ElixirPsiImplUtil {
         return PsiNamedElementImpl.setName(named, newName);
     }
 
+    @Nullable
+    public static Integer indentation(@NotNull org.elixir_lang.psi.SigilLine sigilLine) {
+        return null;
+    }
+
+    @NotNull
+    public static Integer indentation(@NotNull org.elixir_lang.psi.SigilHeredoc sigilHeredoc) {
+        return SigilHeredocImpl.indentation(sigilHeredoc);
+    }
+
     @NotNull
     public static String sigilDelimiter(@NotNull org.elixir_lang.psi.Sigil sigil) {
         return SigilImpl.sigilDelimiter(sigil);

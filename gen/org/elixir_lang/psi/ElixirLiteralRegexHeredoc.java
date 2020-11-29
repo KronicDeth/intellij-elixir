@@ -3,6 +3,7 @@ package org.elixir_lang.psi;
 
 import java.util.List;
 import org.jetbrains.annotations.*;
+import com.intellij.psi.PsiElement;
 import com.ericsson.otp.erlang.OtpErlangList;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
@@ -37,6 +38,9 @@ public interface ElixirLiteralRegexHeredoc extends RegexFragmented, LiteralSigil
   List<HeredocLine> getHeredocLineList();
 
   @NotNull
+  Integer indentation();
+
+  @NotNull
   OtpErlangObject quote();
 
   @NotNull
@@ -54,6 +58,7 @@ public interface ElixirLiteralRegexHeredoc extends RegexFragmented, LiteralSigil
   @NotNull
   OtpErlangObject quoteLiteral(List<Integer> codePointList);
 
+  @NotNull
   String sigilDelimiter();
 
   char sigilName();

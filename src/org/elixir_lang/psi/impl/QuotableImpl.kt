@@ -1372,15 +1372,20 @@ object QuotableImpl {
     @Contract(pure = true)
     @JvmStatic
     fun quote(sigil: Sigil, quotedContent: OtpErlangObject): OtpErlangObject {
-        val sigilBinaryMetadata = metadata(sigil)
+        val sigilLine = lineNumberKeywordTuple(sigil.node)
+        val sigilBinaryMetadataArray =
+                sigil.indentation()
+                        ?.let { indentation -> arrayOf<OtpErlangObject>(keywordTuple("indentation", indentation), sigilLine) }
+                        ?: arrayOf<OtpErlangObject>(sigilLine)
+        val sigilBinaryMetadata = OtpErlangList(sigilBinaryMetadataArray)
         val sigilBinary = quotedContent as? OtpErlangTuple ?: quotedFunctionCall("<<>>", sigilBinaryMetadata, quotedContent)
 
         val sigilName = sigil.sigilName()
         val quotedModifiers = sigil.sigilModifiers.quote()
-        val sigilMetadata = OtpErlangList(arrayOf<OtpErlangObject>(keywordTuple("delimiter", sigil.sigilDelimiter()), lineNumberKeywordTuple(sigil.node)))
+        val sigilMetadata = OtpErlangList(arrayOf<OtpErlangObject>(keywordTuple("delimiter", sigil.sigilDelimiter()), sigilLine))
 
         return quotedFunctionCall(
-                "sigil_" + sigilName,
+                "sigil_$sigilName",
                 sigilMetadata,
                 sigilBinary,
                 quotedModifiers
