@@ -800,100 +800,100 @@ public class ElixirPsiImplUtil {
     }
 
     public static Body getBody(ElixirCharListHeredocLine charListHeredocLine) {
-        return charListHeredocLine.getQuoteCharListBody();
+        return charListHeredocLine.getCharListHeredocLineBody();
     }
 
     @Nullable
     public static Body getBody(@NotNull final ElixirCharListLine charListLine) {
-        return charListLine.getQuoteCharListBody();
+        return charListLine.getCharListLineBody();
     }
 
     public static Body getBody(ElixirInterpolatedCharListHeredocLine interpolatedCharListHeredocLine) {
-        return interpolatedCharListHeredocLine.getInterpolatedCharListBody();
+        return interpolatedCharListHeredocLine.getInterpolatedCharListHeredocLineBody();
     }
 
     public static Body getBody(ElixirInterpolatedCharListSigilLine interpolatedCharListSigilLine) {
-        return interpolatedCharListSigilLine.getInterpolatedCharListBody();
+        return interpolatedCharListSigilLine.getInterpolatedCharListSigilLineBody();
     }
 
     public static Body getBody(ElixirInterpolatedRegexHeredocLine interpolatedRegexHeredocLine) {
-        return interpolatedRegexHeredocLine.getInterpolatedRegexBody();
+        return interpolatedRegexHeredocLine.getInterpolatedRegexHeredocLineBody();
     }
 
     public static Body getBody(ElixirInterpolatedRegexLine interpolatedRegexLine) {
-        return interpolatedRegexLine.getInterpolatedRegexBody();
+        return interpolatedRegexLine.getInterpolatedRegexLineBody();
     }
 
     public static Body getBody(ElixirInterpolatedSigilHeredocLine sigilHeredocLine) {
-        return sigilHeredocLine.getInterpolatedSigilBody();
+        return sigilHeredocLine.getInterpolatedSigilHeredocLineBody();
     }
 
     public static Body getBody(ElixirInterpolatedSigilLine interpolatedSigilLine) {
-        return interpolatedSigilLine.getInterpolatedSigilBody();
+        return interpolatedSigilLine.getInterpolatedSigilLineBody();
     }
 
     public static Body getBody(ElixirInterpolatedStringHeredocLine stringHeredocLine) {
-        return stringHeredocLine.getInterpolatedStringBody();
+        return stringHeredocLine.getInterpolatedStringHeredocLineBody();
     }
 
     public static Body getBody(ElixirInterpolatedStringSigilLine interpolatedStringSigilLine) {
-        return interpolatedStringSigilLine.getInterpolatedStringBody();
+        return interpolatedStringSigilLine.getInterpolatedStringSigilLineBody();
     }
 
     public static Body getBody(ElixirInterpolatedWordsHeredocLine wordsHeredocLine) {
-        return wordsHeredocLine.getInterpolatedWordsBody();
+        return wordsHeredocLine.getInterpolatedWordsHeredocLineBody();
     }
 
     public static Body getBody(ElixirInterpolatedWordsLine interpolatedWordsLine) {
-        return interpolatedWordsLine.getInterpolatedWordsBody();
+        return interpolatedWordsLine.getInterpolatedWordsLineBody();
     }
 
     public static Body getBody(ElixirLiteralCharListHeredocLine charListHeredocLine) {
-        return charListHeredocLine.getLiteralCharListBody();
+        return charListHeredocLine.getLiteralCharListHeredocLineBody();
     }
 
     public static Body getBody(ElixirLiteralCharListSigilLine literalCharListLine) {
-        return literalCharListLine.getLiteralCharListBody();
+        return literalCharListLine.getLiteralCharListSigilLineBody();
     }
 
     public static Body getBody(ElixirLiteralRegexHeredocLine literalRegexHeredocLine) {
-        return literalRegexHeredocLine.getLiteralRegexBody();
+        return literalRegexHeredocLine.getLiteralRegexHeredocLineBody();
     }
 
     public static Body getBody(ElixirLiteralRegexLine literalRegexLine) {
-        return literalRegexLine.getLiteralRegexBody();
+        return literalRegexLine.getLiteralRegexLineBody();
     }
 
     public static Body getBody(ElixirLiteralSigilHeredocLine literalSigilHeredocLine) {
-        return literalSigilHeredocLine.getLiteralSigilBody();
+        return literalSigilHeredocLine.getLiteralSigilHeredocLineBody();
     }
 
     public static Body getBody(ElixirLiteralSigilLine literalSigilLine) {
-        return literalSigilLine.getLiteralSigilBody();
+        return literalSigilLine.getLiteralSigilLineBody();
     }
 
     public static Body getBody(ElixirLiteralStringHeredocLine literalStringSigilHeredocLine) {
-        return literalStringSigilHeredocLine.getLiteralStringBody();
+        return literalStringSigilHeredocLine.getLiteralStringHeredocLineBody();
     }
 
     public static Body getBody(ElixirLiteralStringSigilLine literalStringSigilLine) {
-        return literalStringSigilLine.getLiteralStringBody();
+        return literalStringSigilLine.getLiteralStringSigilLineBody();
     }
 
     public static Body getBody(ElixirLiteralWordsHeredocLine literalWordsHeredocLine) {
-        return literalWordsHeredocLine.getLiteralWordsBody();
+        return literalWordsHeredocLine.getLiteralWordsHeredocLineBody();
     }
 
     public static Body getBody(ElixirLiteralWordsLine literalWordsLine) {
-        return literalWordsLine.getLiteralWordsBody();
+        return literalWordsLine.getLiteralWordsLineBody();
     }
 
     public static Body getBody(ElixirStringHeredocLine stringHeredocLine) {
-        return stringHeredocLine.getQuoteStringBody();
+        return stringHeredocLine.getStringHeredocLineBody();
     }
 
     public static Body getBody(@NotNull final ElixirStringLine stringLine) {
-        return stringLine.getQuoteStringBody();
+        return stringLine.getStringLineBody();
     }
 
     @Contract(pure = true, value = "_ -> null")
@@ -1824,7 +1824,7 @@ public class ElixirPsiImplUtil {
     public static List<Integer> addEscapedEOL(@NotNull Parent parent,
                                               @Nullable List<Integer> maybeCodePointList,
                                               @NotNull ASTNode child) {
-        return ParentImpl.addEscapedEOL(parent, maybeCodePointList, child);
+        return ParentImpl.addEscapedEOL(parent, maybeCodePointList);
     }
 
     @NotNull

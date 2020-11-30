@@ -12,7 +12,7 @@ import com.intellij.psi.tree.IElementType;
 public interface ElixirInterpolatedWordsLine extends WordsFragmented, InterpolatedSigilLine {
 
   @Nullable
-  ElixirInterpolatedWordsBody getInterpolatedWordsBody();
+  ElixirInterpolatedWordsLineBody getInterpolatedWordsLineBody();
 
   @Nullable
   ElixirSigilModifiers getSigilModifiers();

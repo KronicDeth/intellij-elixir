@@ -8,11 +8,14 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 
 public interface ElixirInterpolatedCharListHeredocLine extends HeredocLine {
 
+  @Nullable
+  ElixirEscapedEOL getEscapedEOL();
+
   @NotNull
   ElixirHeredocLinePrefix getHeredocLinePrefix();
 
   @NotNull
-  ElixirInterpolatedCharListBody getInterpolatedCharListBody();
+  ElixirInterpolatedCharListHeredocLineBody getInterpolatedCharListHeredocLineBody();
 
   Body getBody();
 

@@ -31,8 +31,8 @@ public class ElixirLiteralCharListSigilLineImpl extends ASTWrapperPsiElement imp
 
   @Override
   @Nullable
-  public ElixirLiteralCharListBody getLiteralCharListBody() {
-    return PsiTreeUtil.getChildOfType(this, ElixirLiteralCharListBody.class);
+  public ElixirLiteralCharListSigilLineBody getLiteralCharListSigilLineBody() {
+    return PsiTreeUtil.getChildOfType(this, ElixirLiteralCharListSigilLineBody.class);
   }
 
   @Override

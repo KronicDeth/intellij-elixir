@@ -31,8 +31,8 @@ public class ElixirInterpolatedWordsLineImpl extends ASTWrapperPsiElement implem
 
   @Override
   @Nullable
-  public ElixirInterpolatedWordsBody getInterpolatedWordsBody() {
-    return PsiTreeUtil.getChildOfType(this, ElixirInterpolatedWordsBody.class);
+  public ElixirInterpolatedWordsLineBody getInterpolatedWordsLineBody() {
+    return PsiTreeUtil.getChildOfType(this, ElixirInterpolatedWordsLineBody.class);
   }
 
   @Override

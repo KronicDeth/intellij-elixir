@@ -81,13 +81,21 @@ object Quoter {
                 assertQuotedCorrectly(expectedQuoted, actualQuoted)
             } else if (statusString == "error") {
                 val error = expectedQuoted as OtpErlangTuple
-                val line = error.elementAt(0) as OtpErlangLong
+                val location = when (val metadata = error.elementAt(0)) {
+                    is OtpErlangLong -> "on line $metadata"
+                    is OtpErlangList -> {
+                        val line = metadata.elementAt(0)
+                        val column = metadata.elementAt(1)
+                        "on line $line in column $column"
+                    }
+                    else -> TODO()
+                }
                 val messageBinary = error.elementAt(1) as OtpErlangBinary
                 val message = ElixirPsiImplUtil.javaString(messageBinary)
                 val tokenBinary = error.elementAt(2) as OtpErlangBinary
                 val token = ElixirPsiImplUtil.javaString(tokenBinary)
                 throw AssertionError(
-                        "intellij_elixir returned \"$message\" on line $line due to $token, use assertQuotesAroundError if error is expect in Elixir natively, but not in intellij-elixir plugin"
+                        "intellij_elixir returned \"$message\" $location due to $token, use assertQuotesAroundError if error is expect in Elixir natively, but not in intellij-elixir plugin"
                 )
             }
         } catch (e: IOException) {

@@ -12,7 +12,7 @@ import com.intellij.psi.tree.IElementType;
 public interface ElixirStringLine extends Atomable, InterpolatedString, Line, Quotable {
 
   @Nullable
-  ElixirQuoteStringBody getQuoteStringBody();
+  ElixirStringLineBody getStringLineBody();
 
   @NotNull
   List<Integer> addEscapedCharacterCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode node);

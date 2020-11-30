@@ -9,10 +9,13 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 public interface ElixirCharListHeredocLine extends HeredocLine {
 
   @NotNull
-  ElixirHeredocLinePrefix getHeredocLinePrefix();
+  ElixirCharListHeredocLineBody getCharListHeredocLineBody();
+
+  @Nullable
+  ElixirEscapedEOL getEscapedEOL();
 
   @NotNull
-  ElixirQuoteCharListBody getQuoteCharListBody();
+  ElixirHeredocLinePrefix getHeredocLinePrefix();
 
   Body getBody();
 

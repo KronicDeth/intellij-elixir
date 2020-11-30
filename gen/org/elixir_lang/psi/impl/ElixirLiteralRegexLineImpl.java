@@ -31,8 +31,8 @@ public class ElixirLiteralRegexLineImpl extends ASTWrapperPsiElement implements 
 
   @Override
   @Nullable
-  public ElixirLiteralRegexBody getLiteralRegexBody() {
-    return PsiTreeUtil.getChildOfType(this, ElixirLiteralRegexBody.class);
+  public ElixirLiteralRegexLineBody getLiteralRegexLineBody() {
+    return PsiTreeUtil.getChildOfType(this, ElixirLiteralRegexLineBody.class);
   }
 
   @Override

@@ -31,8 +31,8 @@ public class ElixirLiteralSigilLineImpl extends ASTWrapperPsiElement implements 
 
   @Override
   @Nullable
-  public ElixirLiteralSigilBody getLiteralSigilBody() {
-    return PsiTreeUtil.getChildOfType(this, ElixirLiteralSigilBody.class);
+  public ElixirLiteralSigilLineBody getLiteralSigilLineBody() {
+    return PsiTreeUtil.getChildOfType(this, ElixirLiteralSigilLineBody.class);
   }
 
   @Override

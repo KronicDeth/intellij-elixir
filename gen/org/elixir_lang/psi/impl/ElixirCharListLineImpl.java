@@ -31,8 +31,8 @@ public class ElixirCharListLineImpl extends ASTWrapperPsiElement implements Elix
 
   @Override
   @Nullable
-  public ElixirQuoteCharListBody getQuoteCharListBody() {
-    return PsiTreeUtil.getChildOfType(this, ElixirQuoteCharListBody.class);
+  public ElixirCharListLineBody getCharListLineBody() {
+    return PsiTreeUtil.getChildOfType(this, ElixirCharListLineBody.class);
   }
 
   @Override

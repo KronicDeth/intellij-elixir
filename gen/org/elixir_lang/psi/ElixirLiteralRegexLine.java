@@ -12,7 +12,7 @@ import com.intellij.psi.tree.IElementType;
 public interface ElixirLiteralRegexLine extends RegexFragmented, LiteralSigilLine {
 
   @Nullable
-  ElixirLiteralRegexBody getLiteralRegexBody();
+  ElixirLiteralRegexLineBody getLiteralRegexLineBody();
 
   @Nullable
   ElixirSigilModifiers getSigilModifiers();

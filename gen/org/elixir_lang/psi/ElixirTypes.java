@@ -33,7 +33,9 @@ public interface ElixirTypes {
   IElementType CAPTURE_PREFIX_OPERATOR = new ElixirElementType("CAPTURE_PREFIX_OPERATOR");
   IElementType CHAR_LIST_HEREDOC = new ElixirElementType("CHAR_LIST_HEREDOC");
   IElementType CHAR_LIST_HEREDOC_LINE = new ElixirElementType("CHAR_LIST_HEREDOC_LINE");
+  IElementType CHAR_LIST_HEREDOC_LINE_BODY = new ElixirElementType("CHAR_LIST_HEREDOC_LINE_BODY");
   IElementType CHAR_LIST_LINE = new ElixirElementType("CHAR_LIST_LINE");
+  IElementType CHAR_LIST_LINE_BODY = new ElixirElementType("CHAR_LIST_LINE_BODY");
   IElementType CHAR_TOKEN = new ElixirElementType("CHAR_TOKEN");
   IElementType COMPARISON_INFIX_OPERATOR = new ElixirElementType("COMPARISON_INFIX_OPERATOR");
   IElementType CONTAINER_ASSOCIATION_OPERATION = new ElixirElementType("CONTAINER_ASSOCIATION_OPERATION");
@@ -59,26 +61,31 @@ public interface ElixirTypes {
   IElementType HEXADECIMAL_ESCAPE_PREFIX = new ElixirElementType("HEXADECIMAL_ESCAPE_PREFIX");
   IElementType HEXADECIMAL_WHOLE_NUMBER = new ElixirElementType("HEXADECIMAL_WHOLE_NUMBER");
   IElementType IDENTIFIER = new ElixirElementType("IDENTIFIER");
-  IElementType INTERPOLATED_CHAR_LIST_BODY = new ElixirElementType("INTERPOLATED_CHAR_LIST_BODY");
   IElementType INTERPOLATED_CHAR_LIST_HEREDOC_LINE = new ElixirElementType("INTERPOLATED_CHAR_LIST_HEREDOC_LINE");
+  IElementType INTERPOLATED_CHAR_LIST_HEREDOC_LINE_BODY = new ElixirElementType("INTERPOLATED_CHAR_LIST_HEREDOC_LINE_BODY");
   IElementType INTERPOLATED_CHAR_LIST_SIGIL_HEREDOC = new ElixirElementType("INTERPOLATED_CHAR_LIST_SIGIL_HEREDOC");
   IElementType INTERPOLATED_CHAR_LIST_SIGIL_LINE = new ElixirElementType("INTERPOLATED_CHAR_LIST_SIGIL_LINE");
-  IElementType INTERPOLATED_REGEX_BODY = new ElixirElementType("INTERPOLATED_REGEX_BODY");
+  IElementType INTERPOLATED_CHAR_LIST_SIGIL_LINE_BODY = new ElixirElementType("INTERPOLATED_CHAR_LIST_SIGIL_LINE_BODY");
   IElementType INTERPOLATED_REGEX_HEREDOC = new ElixirElementType("INTERPOLATED_REGEX_HEREDOC");
   IElementType INTERPOLATED_REGEX_HEREDOC_LINE = new ElixirElementType("INTERPOLATED_REGEX_HEREDOC_LINE");
+  IElementType INTERPOLATED_REGEX_HEREDOC_LINE_BODY = new ElixirElementType("INTERPOLATED_REGEX_HEREDOC_LINE_BODY");
   IElementType INTERPOLATED_REGEX_LINE = new ElixirElementType("INTERPOLATED_REGEX_LINE");
-  IElementType INTERPOLATED_SIGIL_BODY = new ElixirElementType("INTERPOLATED_SIGIL_BODY");
+  IElementType INTERPOLATED_REGEX_LINE_BODY = new ElixirElementType("INTERPOLATED_REGEX_LINE_BODY");
   IElementType INTERPOLATED_SIGIL_HEREDOC = new ElixirElementType("INTERPOLATED_SIGIL_HEREDOC");
   IElementType INTERPOLATED_SIGIL_HEREDOC_LINE = new ElixirElementType("INTERPOLATED_SIGIL_HEREDOC_LINE");
+  IElementType INTERPOLATED_SIGIL_HEREDOC_LINE_BODY = new ElixirElementType("INTERPOLATED_SIGIL_HEREDOC_LINE_BODY");
   IElementType INTERPOLATED_SIGIL_LINE = new ElixirElementType("INTERPOLATED_SIGIL_LINE");
-  IElementType INTERPOLATED_STRING_BODY = new ElixirElementType("INTERPOLATED_STRING_BODY");
+  IElementType INTERPOLATED_SIGIL_LINE_BODY = new ElixirElementType("INTERPOLATED_SIGIL_LINE_BODY");
   IElementType INTERPOLATED_STRING_HEREDOC_LINE = new ElixirElementType("INTERPOLATED_STRING_HEREDOC_LINE");
+  IElementType INTERPOLATED_STRING_HEREDOC_LINE_BODY = new ElixirElementType("INTERPOLATED_STRING_HEREDOC_LINE_BODY");
   IElementType INTERPOLATED_STRING_SIGIL_HEREDOC = new ElixirElementType("INTERPOLATED_STRING_SIGIL_HEREDOC");
   IElementType INTERPOLATED_STRING_SIGIL_LINE = new ElixirElementType("INTERPOLATED_STRING_SIGIL_LINE");
-  IElementType INTERPOLATED_WORDS_BODY = new ElixirElementType("INTERPOLATED_WORDS_BODY");
+  IElementType INTERPOLATED_STRING_SIGIL_LINE_BODY = new ElixirElementType("INTERPOLATED_STRING_SIGIL_LINE_BODY");
   IElementType INTERPOLATED_WORDS_HEREDOC = new ElixirElementType("INTERPOLATED_WORDS_HEREDOC");
   IElementType INTERPOLATED_WORDS_HEREDOC_LINE = new ElixirElementType("INTERPOLATED_WORDS_HEREDOC_LINE");
+  IElementType INTERPOLATED_WORDS_HEREDOC_LINE_BODY = new ElixirElementType("INTERPOLATED_WORDS_HEREDOC_LINE_BODY");
   IElementType INTERPOLATED_WORDS_LINE = new ElixirElementType("INTERPOLATED_WORDS_LINE");
+  IElementType INTERPOLATED_WORDS_LINE_BODY = new ElixirElementType("INTERPOLATED_WORDS_LINE_BODY");
   IElementType INTERPOLATION = new ElixirElementType("INTERPOLATION");
   IElementType IN_INFIX_OPERATOR = new ElixirElementType("IN_INFIX_OPERATOR");
   IElementType IN_MATCH_INFIX_OPERATOR = new ElixirElementType("IN_MATCH_INFIX_OPERATOR");
@@ -86,26 +93,31 @@ public interface ElixirTypes {
   IElementType KEYWORD_KEY = new ElixirElementType("KEYWORD_KEY");
   IElementType KEYWORD_PAIR = new ElixirElementType("KEYWORD_PAIR");
   IElementType LIST = new ElixirElementType("LIST");
-  IElementType LITERAL_CHAR_LIST_BODY = new ElixirElementType("LITERAL_CHAR_LIST_BODY");
   IElementType LITERAL_CHAR_LIST_HEREDOC_LINE = new ElixirElementType("LITERAL_CHAR_LIST_HEREDOC_LINE");
+  IElementType LITERAL_CHAR_LIST_HEREDOC_LINE_BODY = new ElixirElementType("LITERAL_CHAR_LIST_HEREDOC_LINE_BODY");
   IElementType LITERAL_CHAR_LIST_SIGIL_HEREDOC = new ElixirElementType("LITERAL_CHAR_LIST_SIGIL_HEREDOC");
   IElementType LITERAL_CHAR_LIST_SIGIL_LINE = new ElixirElementType("LITERAL_CHAR_LIST_SIGIL_LINE");
-  IElementType LITERAL_REGEX_BODY = new ElixirElementType("LITERAL_REGEX_BODY");
+  IElementType LITERAL_CHAR_LIST_SIGIL_LINE_BODY = new ElixirElementType("LITERAL_CHAR_LIST_SIGIL_LINE_BODY");
   IElementType LITERAL_REGEX_HEREDOC = new ElixirElementType("LITERAL_REGEX_HEREDOC");
   IElementType LITERAL_REGEX_HEREDOC_LINE = new ElixirElementType("LITERAL_REGEX_HEREDOC_LINE");
+  IElementType LITERAL_REGEX_HEREDOC_LINE_BODY = new ElixirElementType("LITERAL_REGEX_HEREDOC_LINE_BODY");
   IElementType LITERAL_REGEX_LINE = new ElixirElementType("LITERAL_REGEX_LINE");
-  IElementType LITERAL_SIGIL_BODY = new ElixirElementType("LITERAL_SIGIL_BODY");
+  IElementType LITERAL_REGEX_LINE_BODY = new ElixirElementType("LITERAL_REGEX_LINE_BODY");
   IElementType LITERAL_SIGIL_HEREDOC = new ElixirElementType("LITERAL_SIGIL_HEREDOC");
   IElementType LITERAL_SIGIL_HEREDOC_LINE = new ElixirElementType("LITERAL_SIGIL_HEREDOC_LINE");
+  IElementType LITERAL_SIGIL_HEREDOC_LINE_BODY = new ElixirElementType("LITERAL_SIGIL_HEREDOC_LINE_BODY");
   IElementType LITERAL_SIGIL_LINE = new ElixirElementType("LITERAL_SIGIL_LINE");
-  IElementType LITERAL_STRING_BODY = new ElixirElementType("LITERAL_STRING_BODY");
+  IElementType LITERAL_SIGIL_LINE_BODY = new ElixirElementType("LITERAL_SIGIL_LINE_BODY");
   IElementType LITERAL_STRING_HEREDOC_LINE = new ElixirElementType("LITERAL_STRING_HEREDOC_LINE");
+  IElementType LITERAL_STRING_HEREDOC_LINE_BODY = new ElixirElementType("LITERAL_STRING_HEREDOC_LINE_BODY");
   IElementType LITERAL_STRING_SIGIL_HEREDOC = new ElixirElementType("LITERAL_STRING_SIGIL_HEREDOC");
   IElementType LITERAL_STRING_SIGIL_LINE = new ElixirElementType("LITERAL_STRING_SIGIL_LINE");
-  IElementType LITERAL_WORDS_BODY = new ElixirElementType("LITERAL_WORDS_BODY");
+  IElementType LITERAL_STRING_SIGIL_LINE_BODY = new ElixirElementType("LITERAL_STRING_SIGIL_LINE_BODY");
   IElementType LITERAL_WORDS_HEREDOC = new ElixirElementType("LITERAL_WORDS_HEREDOC");
   IElementType LITERAL_WORDS_HEREDOC_LINE = new ElixirElementType("LITERAL_WORDS_HEREDOC_LINE");
+  IElementType LITERAL_WORDS_HEREDOC_LINE_BODY = new ElixirElementType("LITERAL_WORDS_HEREDOC_LINE_BODY");
   IElementType LITERAL_WORDS_LINE = new ElixirElementType("LITERAL_WORDS_LINE");
+  IElementType LITERAL_WORDS_LINE_BODY = new ElixirElementType("LITERAL_WORDS_LINE_BODY");
   IElementType MAP_ARGUMENTS = new ElixirElementType("MAP_ARGUMENTS");
   IElementType MAP_CONSTRUCTION_ARGUMENTS = new ElixirElementType("MAP_CONSTRUCTION_ARGUMENTS");
   IElementType MAP_OPERATION = new ElixirElementType("MAP_OPERATION");
@@ -167,9 +179,7 @@ public interface ElixirTypes {
   IElementType PARENTHESES_ARGUMENTS = new ElixirElementType("PARENTHESES_ARGUMENTS");
   IElementType PARENTHETICAL_STAB = new ElixirElementType("PARENTHETICAL_STAB");
   IElementType PIPE_INFIX_OPERATOR = new ElixirElementType("PIPE_INFIX_OPERATOR");
-  IElementType QUOTE_CHAR_LIST_BODY = new ElixirElementType("QUOTE_CHAR_LIST_BODY");
   IElementType QUOTE_HEXADECIMAL_ESCAPE_SEQUENCE = new ElixirElementType("QUOTE_HEXADECIMAL_ESCAPE_SEQUENCE");
-  IElementType QUOTE_STRING_BODY = new ElixirElementType("QUOTE_STRING_BODY");
   IElementType RELATIONAL_INFIX_OPERATOR = new ElixirElementType("RELATIONAL_INFIX_OPERATOR");
   IElementType RELATIVE_IDENTIFIER = new ElixirElementType("RELATIVE_IDENTIFIER");
   IElementType SIGIL_HEXADECIMAL_ESCAPE_SEQUENCE = new ElixirElementType("SIGIL_HEXADECIMAL_ESCAPE_SEQUENCE");
@@ -182,7 +192,9 @@ public interface ElixirTypes {
   IElementType STAB_PARENTHESES_SIGNATURE = new ElixirElementType("STAB_PARENTHESES_SIGNATURE");
   IElementType STRING_HEREDOC = new ElixirElementType("STRING_HEREDOC");
   IElementType STRING_HEREDOC_LINE = new ElixirElementType("STRING_HEREDOC_LINE");
+  IElementType STRING_HEREDOC_LINE_BODY = new ElixirElementType("STRING_HEREDOC_LINE_BODY");
   IElementType STRING_LINE = new ElixirElementType("STRING_LINE");
+  IElementType STRING_LINE_BODY = new ElixirElementType("STRING_LINE_BODY");
   IElementType STRUCT_OPERATION = new ElixirElementType("STRUCT_OPERATION");
   IElementType THREE_INFIX_OPERATOR = new ElixirElementType("THREE_INFIX_OPERATOR");
   IElementType TUPLE = new ElixirElementType("TUPLE");
@@ -452,8 +464,14 @@ public interface ElixirTypes {
       else if (type == CHAR_LIST_HEREDOC_LINE) {
         return new ElixirCharListHeredocLineImpl(node);
       }
+      else if (type == CHAR_LIST_HEREDOC_LINE_BODY) {
+        return new ElixirCharListHeredocLineBodyImpl(node);
+      }
       else if (type == CHAR_LIST_LINE) {
         return new ElixirCharListLineImpl(node);
+      }
+      else if (type == CHAR_LIST_LINE_BODY) {
+        return new ElixirCharListLineBodyImpl(node);
       }
       else if (type == CHAR_TOKEN) {
         return new ElixirCharTokenImpl(node);
@@ -530,11 +548,11 @@ public interface ElixirTypes {
       else if (type == IDENTIFIER) {
         return new ElixirIdentifierImpl(node);
       }
-      else if (type == INTERPOLATED_CHAR_LIST_BODY) {
-        return new ElixirInterpolatedCharListBodyImpl(node);
-      }
       else if (type == INTERPOLATED_CHAR_LIST_HEREDOC_LINE) {
         return new ElixirInterpolatedCharListHeredocLineImpl(node);
+      }
+      else if (type == INTERPOLATED_CHAR_LIST_HEREDOC_LINE_BODY) {
+        return new ElixirInterpolatedCharListHeredocLineBodyImpl(node);
       }
       else if (type == INTERPOLATED_CHAR_LIST_SIGIL_HEREDOC) {
         return new ElixirInterpolatedCharListSigilHeredocImpl(node);
@@ -542,8 +560,8 @@ public interface ElixirTypes {
       else if (type == INTERPOLATED_CHAR_LIST_SIGIL_LINE) {
         return new ElixirInterpolatedCharListSigilLineImpl(node);
       }
-      else if (type == INTERPOLATED_REGEX_BODY) {
-        return new ElixirInterpolatedRegexBodyImpl(node);
+      else if (type == INTERPOLATED_CHAR_LIST_SIGIL_LINE_BODY) {
+        return new ElixirInterpolatedCharListSigilLineBodyImpl(node);
       }
       else if (type == INTERPOLATED_REGEX_HEREDOC) {
         return new ElixirInterpolatedRegexHeredocImpl(node);
@@ -551,11 +569,14 @@ public interface ElixirTypes {
       else if (type == INTERPOLATED_REGEX_HEREDOC_LINE) {
         return new ElixirInterpolatedRegexHeredocLineImpl(node);
       }
+      else if (type == INTERPOLATED_REGEX_HEREDOC_LINE_BODY) {
+        return new ElixirInterpolatedRegexHeredocLineBodyImpl(node);
+      }
       else if (type == INTERPOLATED_REGEX_LINE) {
         return new ElixirInterpolatedRegexLineImpl(node);
       }
-      else if (type == INTERPOLATED_SIGIL_BODY) {
-        return new ElixirInterpolatedSigilBodyImpl(node);
+      else if (type == INTERPOLATED_REGEX_LINE_BODY) {
+        return new ElixirInterpolatedRegexLineBodyImpl(node);
       }
       else if (type == INTERPOLATED_SIGIL_HEREDOC) {
         return new ElixirInterpolatedSigilHeredocImpl(node);
@@ -563,14 +584,20 @@ public interface ElixirTypes {
       else if (type == INTERPOLATED_SIGIL_HEREDOC_LINE) {
         return new ElixirInterpolatedSigilHeredocLineImpl(node);
       }
+      else if (type == INTERPOLATED_SIGIL_HEREDOC_LINE_BODY) {
+        return new ElixirInterpolatedSigilHeredocLineBodyImpl(node);
+      }
       else if (type == INTERPOLATED_SIGIL_LINE) {
         return new ElixirInterpolatedSigilLineImpl(node);
       }
-      else if (type == INTERPOLATED_STRING_BODY) {
-        return new ElixirInterpolatedStringBodyImpl(node);
+      else if (type == INTERPOLATED_SIGIL_LINE_BODY) {
+        return new ElixirInterpolatedSigilLineBodyImpl(node);
       }
       else if (type == INTERPOLATED_STRING_HEREDOC_LINE) {
         return new ElixirInterpolatedStringHeredocLineImpl(node);
+      }
+      else if (type == INTERPOLATED_STRING_HEREDOC_LINE_BODY) {
+        return new ElixirInterpolatedStringHeredocLineBodyImpl(node);
       }
       else if (type == INTERPOLATED_STRING_SIGIL_HEREDOC) {
         return new ElixirInterpolatedStringSigilHeredocImpl(node);
@@ -578,8 +605,8 @@ public interface ElixirTypes {
       else if (type == INTERPOLATED_STRING_SIGIL_LINE) {
         return new ElixirInterpolatedStringSigilLineImpl(node);
       }
-      else if (type == INTERPOLATED_WORDS_BODY) {
-        return new ElixirInterpolatedWordsBodyImpl(node);
+      else if (type == INTERPOLATED_STRING_SIGIL_LINE_BODY) {
+        return new ElixirInterpolatedStringSigilLineBodyImpl(node);
       }
       else if (type == INTERPOLATED_WORDS_HEREDOC) {
         return new ElixirInterpolatedWordsHeredocImpl(node);
@@ -587,8 +614,14 @@ public interface ElixirTypes {
       else if (type == INTERPOLATED_WORDS_HEREDOC_LINE) {
         return new ElixirInterpolatedWordsHeredocLineImpl(node);
       }
+      else if (type == INTERPOLATED_WORDS_HEREDOC_LINE_BODY) {
+        return new ElixirInterpolatedWordsHeredocLineBodyImpl(node);
+      }
       else if (type == INTERPOLATED_WORDS_LINE) {
         return new ElixirInterpolatedWordsLineImpl(node);
+      }
+      else if (type == INTERPOLATED_WORDS_LINE_BODY) {
+        return new ElixirInterpolatedWordsLineBodyImpl(node);
       }
       else if (type == INTERPOLATION) {
         return new ElixirInterpolationImpl(node);
@@ -611,11 +644,11 @@ public interface ElixirTypes {
       else if (type == LIST) {
         return new ElixirListImpl(node);
       }
-      else if (type == LITERAL_CHAR_LIST_BODY) {
-        return new ElixirLiteralCharListBodyImpl(node);
-      }
       else if (type == LITERAL_CHAR_LIST_HEREDOC_LINE) {
         return new ElixirLiteralCharListHeredocLineImpl(node);
+      }
+      else if (type == LITERAL_CHAR_LIST_HEREDOC_LINE_BODY) {
+        return new ElixirLiteralCharListHeredocLineBodyImpl(node);
       }
       else if (type == LITERAL_CHAR_LIST_SIGIL_HEREDOC) {
         return new ElixirLiteralCharListSigilHeredocImpl(node);
@@ -623,8 +656,8 @@ public interface ElixirTypes {
       else if (type == LITERAL_CHAR_LIST_SIGIL_LINE) {
         return new ElixirLiteralCharListSigilLineImpl(node);
       }
-      else if (type == LITERAL_REGEX_BODY) {
-        return new ElixirLiteralRegexBodyImpl(node);
+      else if (type == LITERAL_CHAR_LIST_SIGIL_LINE_BODY) {
+        return new ElixirLiteralCharListSigilLineBodyImpl(node);
       }
       else if (type == LITERAL_REGEX_HEREDOC) {
         return new ElixirLiteralRegexHeredocImpl(node);
@@ -632,11 +665,14 @@ public interface ElixirTypes {
       else if (type == LITERAL_REGEX_HEREDOC_LINE) {
         return new ElixirLiteralRegexHeredocLineImpl(node);
       }
+      else if (type == LITERAL_REGEX_HEREDOC_LINE_BODY) {
+        return new ElixirLiteralRegexHeredocLineBodyImpl(node);
+      }
       else if (type == LITERAL_REGEX_LINE) {
         return new ElixirLiteralRegexLineImpl(node);
       }
-      else if (type == LITERAL_SIGIL_BODY) {
-        return new ElixirLiteralSigilBodyImpl(node);
+      else if (type == LITERAL_REGEX_LINE_BODY) {
+        return new ElixirLiteralRegexLineBodyImpl(node);
       }
       else if (type == LITERAL_SIGIL_HEREDOC) {
         return new ElixirLiteralSigilHeredocImpl(node);
@@ -644,14 +680,20 @@ public interface ElixirTypes {
       else if (type == LITERAL_SIGIL_HEREDOC_LINE) {
         return new ElixirLiteralSigilHeredocLineImpl(node);
       }
+      else if (type == LITERAL_SIGIL_HEREDOC_LINE_BODY) {
+        return new ElixirLiteralSigilHeredocLineBodyImpl(node);
+      }
       else if (type == LITERAL_SIGIL_LINE) {
         return new ElixirLiteralSigilLineImpl(node);
       }
-      else if (type == LITERAL_STRING_BODY) {
-        return new ElixirLiteralStringBodyImpl(node);
+      else if (type == LITERAL_SIGIL_LINE_BODY) {
+        return new ElixirLiteralSigilLineBodyImpl(node);
       }
       else if (type == LITERAL_STRING_HEREDOC_LINE) {
         return new ElixirLiteralStringHeredocLineImpl(node);
+      }
+      else if (type == LITERAL_STRING_HEREDOC_LINE_BODY) {
+        return new ElixirLiteralStringHeredocLineBodyImpl(node);
       }
       else if (type == LITERAL_STRING_SIGIL_HEREDOC) {
         return new ElixirLiteralStringSigilHeredocImpl(node);
@@ -659,8 +701,8 @@ public interface ElixirTypes {
       else if (type == LITERAL_STRING_SIGIL_LINE) {
         return new ElixirLiteralStringSigilLineImpl(node);
       }
-      else if (type == LITERAL_WORDS_BODY) {
-        return new ElixirLiteralWordsBodyImpl(node);
+      else if (type == LITERAL_STRING_SIGIL_LINE_BODY) {
+        return new ElixirLiteralStringSigilLineBodyImpl(node);
       }
       else if (type == LITERAL_WORDS_HEREDOC) {
         return new ElixirLiteralWordsHeredocImpl(node);
@@ -668,8 +710,14 @@ public interface ElixirTypes {
       else if (type == LITERAL_WORDS_HEREDOC_LINE) {
         return new ElixirLiteralWordsHeredocLineImpl(node);
       }
+      else if (type == LITERAL_WORDS_HEREDOC_LINE_BODY) {
+        return new ElixirLiteralWordsHeredocLineBodyImpl(node);
+      }
       else if (type == LITERAL_WORDS_LINE) {
         return new ElixirLiteralWordsLineImpl(node);
+      }
+      else if (type == LITERAL_WORDS_LINE_BODY) {
+        return new ElixirLiteralWordsLineBodyImpl(node);
       }
       else if (type == MAP_ARGUMENTS) {
         return new ElixirMapArgumentsImpl(node);
@@ -851,14 +899,8 @@ public interface ElixirTypes {
       else if (type == PIPE_INFIX_OPERATOR) {
         return new ElixirPipeInfixOperatorImpl(node);
       }
-      else if (type == QUOTE_CHAR_LIST_BODY) {
-        return new ElixirQuoteCharListBodyImpl(node);
-      }
       else if (type == QUOTE_HEXADECIMAL_ESCAPE_SEQUENCE) {
         return new ElixirQuoteHexadecimalEscapeSequenceImpl(node);
-      }
-      else if (type == QUOTE_STRING_BODY) {
-        return new ElixirQuoteStringBodyImpl(node);
       }
       else if (type == RELATIONAL_INFIX_OPERATOR) {
         return new ElixirRelationalInfixOperatorImpl(node);
@@ -896,8 +938,14 @@ public interface ElixirTypes {
       else if (type == STRING_HEREDOC_LINE) {
         return new ElixirStringHeredocLineImpl(node);
       }
+      else if (type == STRING_HEREDOC_LINE_BODY) {
+        return new ElixirStringHeredocLineBodyImpl(node);
+      }
       else if (type == STRING_LINE) {
         return new ElixirStringLineImpl(node);
+      }
+      else if (type == STRING_LINE_BODY) {
+        return new ElixirStringLineBodyImpl(node);
       }
       else if (type == STRUCT_OPERATION) {
         return new ElixirStructOperationImpl(node);

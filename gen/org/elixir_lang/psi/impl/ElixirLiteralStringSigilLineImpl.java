@@ -31,8 +31,8 @@ public class ElixirLiteralStringSigilLineImpl extends ASTWrapperPsiElement imple
 
   @Override
   @Nullable
-  public ElixirLiteralStringBody getLiteralStringBody() {
-    return PsiTreeUtil.getChildOfType(this, ElixirLiteralStringBody.class);
+  public ElixirLiteralStringSigilLineBody getLiteralStringSigilLineBody() {
+    return PsiTreeUtil.getChildOfType(this, ElixirLiteralStringSigilLineBody.class);
   }
 
   @Override

@@ -31,8 +31,8 @@ public class ElixirStringLineImpl extends ASTWrapperPsiElement implements Elixir
 
   @Override
   @Nullable
-  public ElixirQuoteStringBody getQuoteStringBody() {
-    return PsiTreeUtil.getChildOfType(this, ElixirQuoteStringBody.class);
+  public ElixirStringLineBody getStringLineBody() {
+    return PsiTreeUtil.getChildOfType(this, ElixirStringLineBody.class);
   }
 
   @Override

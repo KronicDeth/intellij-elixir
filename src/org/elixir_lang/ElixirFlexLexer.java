@@ -1200,7 +1200,7 @@ public class ElixirFlexLexer implements FlexLexer {
   /**
    * Refills the input buffer.
    *
-   * @return      <code>false</code>, iff there was new input.
+   * @return      {@code false}, iff there was new input.
    *
    * @exception   java.io.IOException  if any I/O-Error occurs
    */
@@ -1236,7 +1236,7 @@ public class ElixirFlexLexer implements FlexLexer {
 
 
   /**
-   * Returns the character at position <tt>pos</tt> from the
+   * Returns the character at position {@code pos} from the
    * matched text.
    *
    * It is equivalent to yytext().charAt(pos), but faster
@@ -1260,7 +1260,7 @@ public class ElixirFlexLexer implements FlexLexer {
 
 
   /**
-   * Reports an error that occured while scanning.
+   * Reports an error that occurred while scanning.
    *
    * In a wellformed scanner (no or only correct usage of
    * yypushback(int) and a match-all fallback rule) this method
@@ -1892,10 +1892,7 @@ public class ElixirFlexLexer implements FlexLexer {
             // fall through
           case 254: break;
           case 78: 
-            { /* The EOL after the escape is also needed to end the Heredoc line.  It functions as both, so arbitarily I'm
-             choosing the escaped version to be a zero-width token. */
-          yypushback(yylength());
-          yybegin(GROUP_HEREDOC_LINE_BODY);
+            { yybegin(GROUP_HEREDOC_LINE_START);
           return ElixirTypes.EOL;
             } 
             // fall through
@@ -2341,13 +2338,8 @@ public class ElixirFlexLexer implements FlexLexer {
             // lookahead expression with fixed base length
             zzMarkedPos = Character.offsetByCodePoints
                 (zzBufferL/*, zzStartRead, zzEndRead - zzStartRead*/, zzStartRead, 1);
-            { if (isInterpolating()) {
-                       pushAndBegin(ESCAPE_SEQUENCE);
-                       return ElixirTypes.ESCAPE;
-                     } else {
-                       yybegin(GROUP_HEREDOC_LINE_ESCAPED_EOL);
-                       return ElixirTypes.ESCAPE;
-                     }
+            { yybegin(GROUP_HEREDOC_LINE_ESCAPED_EOL);
+                     return ElixirTypes.ESCAPE;
             } 
             // fall through
           case 311: break;

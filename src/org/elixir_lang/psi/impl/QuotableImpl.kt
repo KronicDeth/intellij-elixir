@@ -260,7 +260,7 @@ object QuotableImpl {
     @Contract(pure = true)
     @JvmStatic
     fun quote(charListLine: ElixirCharListLine): OtpErlangObject =
-            quotedChildNodes(charListLine, *childNodes(charListLine.quoteCharListBody!!))
+            quotedChildNodes(charListLine, *childNodes(charListLine.charListLineBody!!))
 
     @Contract(pure = true)
     @JvmStatic
@@ -1159,7 +1159,7 @@ object QuotableImpl {
     @Contract(pure = true)
     @JvmStatic
     fun quote(stringLine: ElixirStringLine): OtpErlangObject =
-            quotedChildNodes(stringLine, *childNodes(stringLine.quoteStringBody!!))
+            quotedChildNodes(stringLine, *childNodes(stringLine.stringLineBody!!))
 
     @Contract(pure = true)
     @JvmStatic
@@ -1580,7 +1580,7 @@ object QuotableImpl {
             for (child in children) {
                 val elementType = child.elementType
 
-                if (elementType === parent.fragmentType) {
+                if ((elementType === parent.fragmentType) || (elementType === ElixirTypes.EOL)) {
                     codePointList = parent.addFragmentCodePoints(codePointList, child)
                 } else if (elementType === ElixirTypes.ESCAPED_CHARACTER) {
                     codePointList = parent.addEscapedCharacterCodePoints(codePointList, child)
@@ -1653,24 +1653,10 @@ object QuotableImpl {
             heredocDescendantNodes.add(excessWhitespace)
         }
 
-        val level = getNonNullRelease(line).level()
         val childNodes = childNodes(line.body)
+        Collections.addAll(heredocDescendantNodes, *childNodes)
 
-        if (level < V_1_3 &&
-                childNodes.isNotEmpty() &&
-                childNodes[childNodes.size - 1].elementType == ElixirTypes.ESCAPED_EOL) {
-            heredocDescendantNodes.addAll(Arrays.asList(*childNodes).subList(0, childNodes.size - 1))
-        } else {
-            Collections.addAll(heredocDescendantNodes, *childNodes)
-            val eolNode = Factory.createSingleLeafElement(
-                    fragmentType,
-                    "\n",
-                    0,
-                    1, null,
-                    line.manager
-            )
-            heredocDescendantNodes.add(eolNode)
-        }
+        heredocDescendantNodes.add(line.lastChild.node)
     }
 
     @Contract(pure = true)

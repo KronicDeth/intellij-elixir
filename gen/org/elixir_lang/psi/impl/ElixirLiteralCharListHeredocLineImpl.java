@@ -28,6 +28,12 @@ public class ElixirLiteralCharListHeredocLineImpl extends ASTWrapperPsiElement i
   }
 
   @Override
+  @Nullable
+  public ElixirEscapedEOL getEscapedEOL() {
+    return PsiTreeUtil.getChildOfType(this, ElixirEscapedEOL.class);
+  }
+
+  @Override
   @NotNull
   public ElixirHeredocLinePrefix getHeredocLinePrefix() {
     return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirHeredocLinePrefix.class));
@@ -35,8 +41,8 @@ public class ElixirLiteralCharListHeredocLineImpl extends ASTWrapperPsiElement i
 
   @Override
   @NotNull
-  public ElixirLiteralCharListBody getLiteralCharListBody() {
-    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirLiteralCharListBody.class));
+  public ElixirLiteralCharListHeredocLineBody getLiteralCharListHeredocLineBody() {
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirLiteralCharListHeredocLineBody.class));
   }
 
   @Override

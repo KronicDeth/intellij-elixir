@@ -29,14 +29,20 @@ public class ElixirCharListHeredocLineImpl extends ASTWrapperPsiElement implemen
 
   @Override
   @NotNull
-  public ElixirHeredocLinePrefix getHeredocLinePrefix() {
-    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirHeredocLinePrefix.class));
+  public ElixirCharListHeredocLineBody getCharListHeredocLineBody() {
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirCharListHeredocLineBody.class));
+  }
+
+  @Override
+  @Nullable
+  public ElixirEscapedEOL getEscapedEOL() {
+    return PsiTreeUtil.getChildOfType(this, ElixirEscapedEOL.class);
   }
 
   @Override
   @NotNull
-  public ElixirQuoteCharListBody getQuoteCharListBody() {
-    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirQuoteCharListBody.class));
+  public ElixirHeredocLinePrefix getHeredocLinePrefix() {
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirHeredocLinePrefix.class));
   }
 
   @Override

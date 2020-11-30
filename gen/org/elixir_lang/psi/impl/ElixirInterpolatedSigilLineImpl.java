@@ -31,8 +31,8 @@ public class ElixirInterpolatedSigilLineImpl extends ASTWrapperPsiElement implem
 
   @Override
   @Nullable
-  public ElixirInterpolatedSigilBody getInterpolatedSigilBody() {
-    return PsiTreeUtil.getChildOfType(this, ElixirInterpolatedSigilBody.class);
+  public ElixirInterpolatedSigilLineBody getInterpolatedSigilLineBody() {
+    return PsiTreeUtil.getChildOfType(this, ElixirInterpolatedSigilLineBody.class);
   }
 
   @Override

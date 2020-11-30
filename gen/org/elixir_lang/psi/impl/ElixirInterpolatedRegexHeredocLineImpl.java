@@ -28,6 +28,12 @@ public class ElixirInterpolatedRegexHeredocLineImpl extends ASTWrapperPsiElement
   }
 
   @Override
+  @Nullable
+  public ElixirEscapedEOL getEscapedEOL() {
+    return PsiTreeUtil.getChildOfType(this, ElixirEscapedEOL.class);
+  }
+
+  @Override
   @NotNull
   public ElixirHeredocLinePrefix getHeredocLinePrefix() {
     return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirHeredocLinePrefix.class));
@@ -35,8 +41,8 @@ public class ElixirInterpolatedRegexHeredocLineImpl extends ASTWrapperPsiElement
 
   @Override
   @NotNull
-  public ElixirInterpolatedRegexBody getInterpolatedRegexBody() {
-    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirInterpolatedRegexBody.class));
+  public ElixirInterpolatedRegexHeredocLineBody getInterpolatedRegexHeredocLineBody() {
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirInterpolatedRegexHeredocLineBody.class));
   }
 
   @Override

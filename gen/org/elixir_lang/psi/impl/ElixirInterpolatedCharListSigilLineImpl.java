@@ -31,8 +31,8 @@ public class ElixirInterpolatedCharListSigilLineImpl extends ASTWrapperPsiElemen
 
   @Override
   @Nullable
-  public ElixirInterpolatedCharListBody getInterpolatedCharListBody() {
-    return PsiTreeUtil.getChildOfType(this, ElixirInterpolatedCharListBody.class);
+  public ElixirInterpolatedCharListSigilLineBody getInterpolatedCharListSigilLineBody() {
+    return PsiTreeUtil.getChildOfType(this, ElixirInterpolatedCharListSigilLineBody.class);
   }
 
   @Override

@@ -31,8 +31,8 @@ public class ElixirLiteralWordsLineImpl extends ASTWrapperPsiElement implements 
 
   @Override
   @Nullable
-  public ElixirLiteralWordsBody getLiteralWordsBody() {
-    return PsiTreeUtil.getChildOfType(this, ElixirLiteralWordsBody.class);
+  public ElixirLiteralWordsLineBody getLiteralWordsLineBody() {
+    return PsiTreeUtil.getChildOfType(this, ElixirLiteralWordsLineBody.class);
   }
 
   @Override

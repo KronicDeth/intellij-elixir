@@ -31,8 +31,8 @@ public class ElixirInterpolatedRegexLineImpl extends ASTWrapperPsiElement implem
 
   @Override
   @Nullable
-  public ElixirInterpolatedRegexBody getInterpolatedRegexBody() {
-    return PsiTreeUtil.getChildOfType(this, ElixirInterpolatedRegexBody.class);
+  public ElixirInterpolatedRegexLineBody getInterpolatedRegexLineBody() {
+    return PsiTreeUtil.getChildOfType(this, ElixirInterpolatedRegexLineBody.class);
   }
 
   @Override

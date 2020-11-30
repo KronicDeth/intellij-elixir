@@ -1196,13 +1196,8 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
 <GROUP_HEREDOC_LINE_BODY> {
   // See https://github.com/elixir-lang/elixir/pull/4341
   {ESCAPE} / {EOL} {
-                     if (isInterpolating()) {
-                       pushAndBegin(ESCAPE_SEQUENCE);
-                       return ElixirTypes.ESCAPE;
-                     } else {
-                       yybegin(GROUP_HEREDOC_LINE_ESCAPED_EOL);
-                       return ElixirTypes.ESCAPE;
-                     }
+                     yybegin(GROUP_HEREDOC_LINE_ESCAPED_EOL);
+                     return ElixirTypes.ESCAPE;
                    }
   {ESCAPE}         {
                      if (isInterpolating()) {
@@ -1222,10 +1217,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
 // See https://github.com/elixir-lang/elixir/pull/4341
 <GROUP_HEREDOC_LINE_ESCAPED_EOL> {
   {EOL} {
-          /* The EOL after the escape is also needed to end the Heredoc line.  It functions as both, so arbitarily I'm
-             choosing the escaped version to be a zero-width token. */
-          yypushback(yylength());
-          yybegin(GROUP_HEREDOC_LINE_BODY);
+          yybegin(GROUP_HEREDOC_LINE_START);
           return ElixirTypes.EOL;
         }
 }

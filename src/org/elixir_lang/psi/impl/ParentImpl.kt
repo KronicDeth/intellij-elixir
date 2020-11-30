@@ -3,7 +3,6 @@ package org.elixir_lang.psi.impl
 import com.ericsson.otp.erlang.*
 import com.intellij.lang.ASTNode
 import org.elixir_lang.Level
-import org.elixir_lang.Level.V_1_3
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.name.Module
 import org.elixir_lang.psi.impl.QuotableImpl.metadata
@@ -93,19 +92,12 @@ object ParentImpl {
 
     @JvmStatic
     fun addEscapedEOL(parent: Parent,
-                      maybeCodePointList: MutableList<Int>?,
-                      child: ASTNode): List<Int> {
-        var codePointList: MutableList<Int> = ensureCodePointList(maybeCodePointList)
+                      maybeCodePointList: MutableList<Int>?): List<Int> {
+        val codePointList: MutableList<Int> = ensureCodePointList(maybeCodePointList)
 
-        val level = getNonNullRelease(parent).level()
-
-        if (level >= V_1_3) {
-            if (parent is LiteralSigilHeredoc) {
-                codePointList = addStringCodePoints(codePointList, "\\")
-            } else if (parent is LiteralSigilLine) {
-                for (codePoint in codePoints("\\\n")) {
-                    codePointList.add(codePoint)
-                }
+        if (parent is Literal) {
+            for (codePoint in codePoints("\\\n")) {
+                codePointList.add(codePoint)
             }
         }
 
