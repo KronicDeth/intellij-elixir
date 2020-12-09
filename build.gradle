@@ -5,24 +5,15 @@ plugins {
 }
 
 ext {
-  if (elixirVersion.startsWith("1.5") || elixirVersion.startsWith("1.6")) {
-    quoterVersion = "1.0.0"
-  } else {
-    quoterVersion = "2.1.0"
-  }
-
   cachePath = "${rootDir}/cache"
 
   elixirPath = "${cachePath}/elixir-${elixirVersion}"
 
+  quoterVersion = "2.1.0"
+
   quoterUnzippedPath = "${cachePath}/elixir-${elixirVersion}-intellij_elixir-${quoterVersion}"
-
-  if (elixirVersion.startsWith("1.5") || elixirVersion.startsWith("1.6") || elixirVersion.startsWith("1.7")) {
-    quoterExe = "${quoterUnzippedPath}/_build/dev/rel/intellij_elixir/bin/intellij_elixir"
-  } else {
-    quoterExe = "${quoterUnzippedPath}/rel/intellij_elixir/bin/intellij_elixir"
-  }
-
+  quoterReleasePath = "${quoterUnzippedPath}/_build/dev/rel/intellij_elixir"
+  quoterExe = "${quoterReleasePath}/bin/intellij_elixir"
   quoterZipPath = "${cachePath}/intellij_elixir-${quoterVersion}.zip"
   quoterZipRootPath = "${cachePath}/intellij_elixir-${quoterVersion}"
 
@@ -266,11 +257,17 @@ compileTestJava {
 }
 
 task runQuoter(type: Exec, dependsOn: releaseQuoter) {
+  environment "RELEASE_COOKIE", "intellij_elixir"
+  environment "RELEASE_DISTRIBUTION", "name"
+  environment "RELEASE_NAME", "intellij_elixir@127.0.0.1"
   executable quoterExe
-  args "start"
+  args "daemon"
 }
 
 task stopQuoter(type: Exec, dependsOn: releaseQuoter) {
+  environment "RELEASE_COOKIE", "intellij_elixir"
+  environment "RELEASE_DISTRIBUTION", "name"
+  environment "RELEASE_NAME", "intellij_elixir@127.0.0.1"
   executable quoterExe
   args "stop"
 }
