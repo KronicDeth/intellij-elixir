@@ -1563,7 +1563,7 @@ object QuotableImpl {
     @JvmStatic
     fun childNodes(parentElement: PsiElement): Array<ASTNode> = parentElement.node.getChildren(null)
 
-    private fun quotedChildNodes(parent: Parent, vararg children: ASTNode): OtpErlangObject =
+    fun quotedChildNodes(parent: Parent, vararg children: ASTNode): OtpErlangObject =
             quotedChildNodes(parent, metadata(parent), *children)
 
     private fun quotedChildNodes(parent: Parent, metadata: OtpErlangList, vararg children: ASTNode): OtpErlangObject {
