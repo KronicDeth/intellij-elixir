@@ -1378,7 +1378,13 @@ object QuotableImpl {
                         ?.let { indentation -> arrayOf<OtpErlangObject>(keywordTuple("indentation", indentation), sigilLine) }
                         ?: arrayOf<OtpErlangObject>(sigilLine)
         val sigilBinaryMetadata = OtpErlangList(sigilBinaryMetadataArray)
-        val sigilBinary = quotedContent as? OtpErlangTuple ?: quotedFunctionCall("<<>>", sigilBinaryMetadata, quotedContent)
+        val sigilBinary = when (quotedContent) {
+            is OtpErlangTuple -> {
+                assert(quotedContent.arity() == 3)
+                OtpErlangTuple(arrayOf(quotedContent.elementAt(0), sigilBinaryMetadata, quotedContent.elementAt(2)))
+            }
+            else -> quotedFunctionCall("<<>>", sigilBinaryMetadata, quotedContent)
+        }
 
         val sigilName = sigil.sigilName()
         val quotedModifiers = sigil.sigilModifiers.quote()
