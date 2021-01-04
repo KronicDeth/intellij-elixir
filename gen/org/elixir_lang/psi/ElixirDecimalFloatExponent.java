@@ -7,7 +7,7 @@ import com.intellij.psi.PsiElement;
 
 public interface ElixirDecimalFloatExponent extends PsiElement {
 
-  @NotNull
+  @Nullable
   ElixirDecimalFloatExponentSign getDecimalFloatExponentSign();
 
   @NotNull

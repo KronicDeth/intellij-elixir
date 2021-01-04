@@ -399,6 +399,7 @@
   tokenTypeClass="org.elixir_lang.psi.ElixirTokenType"
 
   tokens = [
+    ADDITION_OPERATOR = "+"
     AFTER = "after"
     ALIAS_TOKEN = "Alias"
     AND_SYMBOL_OPERATOR = "&&&, &&"
@@ -436,7 +437,6 @@
     DIVISION_OPERATOR = "/"
     DO = "do"
     DOT_OPERATOR = "."
-    DUAL_OPERATOR = "Dual Operator (+, -)"
     EEX_CLOSING = "%>"
     EEX_COMMENT = "EEx Comment"
     EEX_COMMENT_MARKER = "EEx Comment Marker (#)"
@@ -483,10 +483,13 @@
     LITERAL_WORDS_SIGIL_NAME = "W"
     MAP_OPERATOR = "%{}"
     MATCH_OPERATOR = "="
+    MINUS_OPERATOR = "-"
     MULTIPLICATION_OPERATOR = "*"
+    NEGATE_OPERATOR = "-"
     NIL = "nil"
     NOT_OPERATOR = "not"
     NUMBER_SEPARATOR = "_"
+    NUMBER_OR_BADARITH_OPERATOR = "+"
     OBSOLETE_BINARY_WHOLE_NUMBER_BASE = "B"
     OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE = "X"
     OCTAL_WHOLE_NUMBER_BASE = "o"
@@ -497,6 +500,7 @@
     OR_SYMBOL_OPERATOR = "|||, ||"
     OR_WORD_OPERATOR = "`or`"
     PIPE_OPERATOR = "|"
+    PLUS_OPERATOR = "+"
     RANGE_OPERATOR = ".."
     REGEX_FRAGMENT = "Regex Fragment"
     REGEX_HEREDOC_PROMOTER = "Regex Heredoc Promoter (\"\"\", ''')"
@@ -513,7 +517,6 @@
     SIGIL_MODIFIER = "Sigil Modifier (A-Z, a-z)"
     SIGIL_PROMOTER = "Sigil Promoter ({, [, <, \", /, (, |, ')"
     SIGIL_TERMINATOR = "Sigil Terminator ({, [, <, \", /, (, |, ')"
-    SIGNIFICANT_WHITE_SPACE = "<significant-space>";
     SIGN_OPERATOR = "Sign Operator (+, -)"
     STAB_OPERATOR = "->"
     STRING_FRAGMENT = "String Fragment"
@@ -527,6 +530,7 @@
     STRING_TERMINATOR = "String Terminator (\")"
     // TODO remove once containers are available for `{}` after alias for empty structs
     STRUCT_OPERATOR = "%"
+    SUBTRACTION_OPERATOR = "-"
     TILDE = "~"
     TRUE = "true"
     TUPLE_OPERATOR = "{}"
@@ -650,7 +654,7 @@ noParenthesesStrict ::= emptyParentheses |
    2. (positional, positional)
    3. (positional, positional, keywords) */
 private noParenthesesManyArguments ::= matchedExpression infixComma noParenthesesKeywords |
-                                       !additionTail matchedExpression (infixComma noParenthesesExpression)+ (infixComma noParenthesesKeywords)?
+                                       matchedExpression (infixComma noParenthesesExpression)+ (infixComma noParenthesesKeywords)?
 private noParenthesesManyArgumentsStrict ::= noParenthesesManyArguments |
                                              noParenthesesStrict
 
@@ -1552,15 +1556,9 @@ matchedTwoOperation ::= matchedExpression twoInfixOperator matchedExpression
  *
  */
 
-private significantWhiteSpaceMaybe ::= SIGNIFICANT_WHITE_SPACE?
-
 /* Unlike other binary operation, additionOperations cannot begin with EOLs: if there are EOLs, then the +/- is
-   interpreted as unaryOperation.
-
-   See https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L605-L613
-   for rules for SIGNIFICANT_WHITE_SPACE */
-additionInfixOperator ::= (SIGNIFICANT_WHITE_SPACE DUAL_OPERATOR (SIGNIFICANT_WHITE_SPACE | &EOL) |
-                           DUAL_OPERATOR significantWhiteSpaceMaybe) eolStar
+   interpreted as unaryOperation. */
+additionInfixOperator ::= ADDITION_OPERATOR | SUBTRACTION_OPERATOR
                           {
                             implements = "org.elixir_lang.psi.Operator"
                             methods = [
@@ -1591,7 +1589,7 @@ multiplicationInfixOperator ::= DIVISION_OPERATOR | MULTIPLICATION_OPERATOR
 // implements and methods defined by "infix operations" section above
 matchedMultiplicationOperation ::= matchedExpression multiplicationInfixOperator matchedExpression
 
-unaryPrefixOperator ::= (significantWhiteSpaceMaybe DUAL_OPERATOR | SIGN_OPERATOR | UNARY_OPERATOR) eolStar |
+unaryPrefixOperator ::= (NEGATE_OPERATOR | NUMBER_OR_BADARITH_OPERATOR | UNARY_OPERATOR) eolStar |
                         NOT_OPERATOR !IN_OPERATOR
                         {
                           implements = "org.elixir_lang.psi.Operator"
@@ -1651,13 +1649,14 @@ relativeIdentifier ::= IDENTIFIER_TOKEN |
                        COMPARISON_OPERATOR |
                        DO |
                        DIVISION_OPERATOR |
-                       DUAL_OPERATOR significantWhiteSpaceMaybe |
+                       PLUS_OPERATOR |
                        ELSE |
                        END |
                        IN_MATCH_OPERATOR |
                        IN_OPERATOR |
                        // NOT MAP_OPERATOR because it is a special form
                        MATCH_OPERATOR |
+                       MINUS_OPERATOR |
                        MULTIPLICATION_OPERATOR |
                        OR_SYMBOL_OPERATOR |
                        OR_WORD_OPERATOR |
@@ -1715,7 +1714,7 @@ noParenthesesOneArgument ::= noParenthesesKeywords | // @see https://github.com/
 
                                 @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L418
                                 @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L609-L610 */
-                             !additionTail matchedExpression
+                             matchedExpression
                              {
                                implements = [
                                  "org.elixir_lang.psi.Arguments"
@@ -1729,19 +1728,6 @@ noParenthesesOneArgument ::= noParenthesesKeywords | // @see https://github.com/
                                  quoteArguments
                                ]
                              }
-
-/* @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L418
-  @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L609-L610 */
-private additionTail ::= significantWhiteSpaceMaybe DUAL_OPERATOR (
-                           // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L610
-                           "/" | ">" | DUAL_OPERATOR | STRUCT_OPERATOR |
-                           // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L609
-                           OPENING_BIT | OPENING_BRACKET | OPENING_CURLY | OPENING_PARENTHESIS |
-                           // white spaces
-                           EOL | SIGNIFICANT_WHITE_SPACE
-                         )
-                         |
-                         DUAL_OPERATOR
 
 matchedParenthesesArguments ::= CALL parenthesesArguments parenthesesArguments? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L254-255
 
@@ -3033,8 +3019,8 @@ private containerExpression ::= emptyParentheses |
 
 decimalFloat ::= decimalFloatIntegral DECIMAL_MARK decimalFloatFractional (EXPONENT_MARK decimalFloatExponent)?
                  { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
-decimalFloatExponent ::= decimalFloatExponentSign decimalWholeNumber
-decimalFloatExponentSign ::= DUAL_OPERATOR?
+decimalFloatExponent ::= decimalFloatExponentSign? decimalWholeNumber
+decimalFloatExponentSign ::= SIGN_OPERATOR
 decimalFloatFractional ::= decimalWholeNumber
 decimalFloatIntegral ::= decimalWholeNumber
 
@@ -3099,7 +3085,6 @@ keywordKey ::= AFTER |
                COMPARISON_OPERATOR |
                DO |
                DIVISION_OPERATOR |
-               DUAL_OPERATOR |
                ELSE |
                END |
                FALSE |
@@ -3107,12 +3092,14 @@ keywordKey ::= AFTER |
                IN_OPERATOR |
                MAP_OPERATOR |
                MATCH_OPERATOR |
+               MINUS_OPERATOR |
                MULTIPLICATION_OPERATOR |
                NIL |
                NOT_OPERATOR |
                OR_SYMBOL_OPERATOR |
                OR_WORD_OPERATOR |
                PIPE_OPERATOR |
+               PLUS_OPERATOR |
                RANGE_OPERATOR |
                RESCUE |
                RELATIONAL_OPERATOR |

@@ -793,10 +793,15 @@ object QuotableImpl {
 
         val doBlock = qualifiedNoArgumentsCall.doBlock
 
-        val quotedBlockCallMetadata = OtpErlangList(arrayOf<OtpErlangObject>(
-                keywordTuple("no_parens", true),
-                lineNumberKeywordTuple(relativeIdentifier.node)
-        ))
+        val line = lineNumberKeywordTuple(relativeIdentifier.node)
+
+        val metadataElements = if (doBlock != null) {
+            arrayOf(line)
+        } else {
+            arrayOf(keywordTuple("no_parens", true), line)
+        }
+
+        val quotedBlockCallMetadata = OtpErlangList(metadataElements)
 
         return quotedBlockCall(
                 quotedIdentifier,
@@ -1291,7 +1296,7 @@ object QuotableImpl {
 
         return if (decimalFloatExponent != null) {
             val exponentDigitsList = decimalFloatExponent.decimalWholeNumber.digitsList()
-            val exponentSignString = decimalFloatExponent.decimalFloatExponentSign.text
+            val exponentSignString = decimalFloatExponent.decimalFloatExponentSign?.text ?: ""
             val exponentString = compactDigits(exponentDigitsList)
 
             val floatString = String.format(

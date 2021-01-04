@@ -253,38 +253,46 @@ TWO_TOKEN_OPERATOR = {TWO_TOKEN_AND_SYMBOL_OPERATOR} |
                      {TWO_TOKEN_TWO_OPERATOR} |
                      {TWO_TOKEN_TYPE_OPERATOR}
 
+ONE_TOKEN_ADDITION_OPERATOR = "+"
 ONE_TOKEN_AT_OPERATOR = "@"
 ONE_TOKEN_CAPTURE_OPERATOR = "&"
 ONE_TOKEN_DIVISION_OPERATOR = "/"
 ONE_TOKEN_DOT_OPERATOR = "."
-/* Dual because they have a dual role as unary operators and binary operators
-   @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L31-L32 */
-ONE_TOKEN_DUAL_OPERATOR = "+" |
-                          "-"
 ONE_TOKEN_IN_OPERATOR = "in"
 ONE_TOKEN_MATCH_OPERATOR = "="
+ONE_TOKEN_MINUS_OPERATOR = "-"
 ONE_TOKEN_MULTIPLICATION_OPERATOR = "*"
+ONE_TOKEN_NEGATE_OPERATOR = "-"
+ONE_TOKEN_NUMBER_OR_BADARITH_OPERATOR = "+"
 ONE_TOKEN_PIPE_OPERATOR = "|"
+ONE_TOKEN_PLUS_OPERATOR = "+"
 ONE_TOKEN_RELATIONAL_OPERATOR = "<" |
                                 ">"
+ONE_TOKEN_SIGN_OPERATOR = "+" |
+                          "-"
 ONE_TOKEN_STRUCT_OPERATOR = "%"
+ONE_TOKEN_SUBTRACTION_OPERATOR = "-"
 ONE_TOKEN_UNARY_OPERATOR = "!" |
                            "^"
 ONE_TOKEN_REFERENCABLE_OPERATOR = {ONE_TOKEN_AT_OPERATOR} |
                                   {ONE_TOKEN_CAPTURE_OPERATOR} |
                                   {ONE_TOKEN_DIVISION_OPERATOR} |
-                                  {ONE_TOKEN_DUAL_OPERATOR} |
                                   {ONE_TOKEN_IN_OPERATOR} |
                                   {ONE_TOKEN_MATCH_OPERATOR} |
+                                  {ONE_TOKEN_MINUS_OPERATOR} |
                                   {ONE_TOKEN_MULTIPLICATION_OPERATOR} |
+                                  {ONE_TOKEN_NUMBER_OR_BADARITH_OPERATOR} |
                                   {ONE_TOKEN_PIPE_OPERATOR} |
+                                  {ONE_TOKEN_PLUS_OPERATOR} |
                                   {ONE_TOKEN_RELATIONAL_OPERATOR} |
+                                  {ONE_TOKEN_SUBTRACTION_OPERATOR} |
                                   {ONE_TOKEN_UNARY_OPERATOR}
 ONE_TOKEN_UNREFERENCABLE_OPERATOR = {ONE_TOKEN_DOT_OPERATOR} |
                                     {ONE_TOKEN_STRUCT_OPERATOR}
 ONE_TOKEN_OPERATOR = {ONE_TOKEN_REFERENCABLE_OPERATOR} |
                      {ONE_TOKEN_UNREFERENCABLE_OPERATOR}
 
+ADDITION_OPERATOR = {ONE_TOKEN_ADDITION_OPERATOR}
 AND_SYMBOL_OPERATOR = {THREE_TOKEN_AND_SYMBOL_OPERATOR} |
                       {TWO_TOKEN_AND_SYMBOL_OPERATOR}
 AND_WORD_OPERATOR = {THREE_TOKEN_AND_WORD_OPERATOR}
@@ -296,25 +304,29 @@ BIT_STRING_OPERATOR = {FOUR_TOKEN_BITSTRING_OPERATOR}
 CAPTURE_OPERATOR = {ONE_TOKEN_CAPTURE_OPERATOR}
 DIVISION_OPERATOR = {ONE_TOKEN_DIVISION_OPERATOR}
 DOT_OPERATOR = {ONE_TOKEN_DOT_OPERATOR}
-// Dual because they have a dual role as unary operators and binary operators
-DUAL_OPERATOR = {ONE_TOKEN_DUAL_OPERATOR}
 COMPARISON_OPERATOR = {THREE_TOKEN_COMPARISON_OPERATOR} |
                       {TWO_TOKEN_COMPARISON_OPERATOR}
 IN_MATCH_OPERATOR = {TWO_TOKEN_IN_MATCH_OPERATOR}
 IN_OPERATOR = {ONE_TOKEN_IN_OPERATOR}
 MAP_OPERATOR = {THREE_TOKEN_MAP_OPERATOR}
 MATCH_OPERATOR = {ONE_TOKEN_MATCH_OPERATOR}
+MINUS_OPERATOR = {ONE_TOKEN_MINUS_OPERATOR}
 MULTIPLICATION_OPERATOR = {ONE_TOKEN_MULTIPLICATION_OPERATOR}
+NEGATE_OPERATOR = {ONE_TOKEN_NEGATE_OPERATOR}
+NUMBER_OR_BADARITH_OPERATOR = {ONE_TOKEN_NUMBER_OR_BADARITH_OPERATOR}
 NOT_OPERATOR = {THREE_TOKEN_NOT_OPERATOR}
 OR_WORD_OPERATOR = {TWO_TOKEN_OR_WORD_OPERATOR}
 OR_SYMBOL_OPERATOR = {THREE_TOKEN_OR_SYMBOL_OPERATOR} |
                      {TWO_TOKEN_OR_SYMBOL_OPERATOR}
 PIPE_OPERATOR = {ONE_TOKEN_PIPE_OPERATOR}
+PLUS_OPERATOR = {ONE_TOKEN_PLUS_OPERATOR}
 RANGE_OPERATOR = {TWO_TOKEN_RANGE_OPERATOR}
 RELATIONAL_OPERATOR = {TWO_TOKEN_RELATIONAL_OPERATOR} |
                       {ONE_TOKEN_RELATIONAL_OPERATOR}
+SIGN_OPERATOR = {ONE_TOKEN_SIGN_OPERATOR}
 STAB_OPERATOR = {TWO_TOKEN_STAB_OPERATOR}
 STRUCT_OPERATOR = {ONE_TOKEN_STRUCT_OPERATOR}
+SUBTRACTION_OPERATOR = {ONE_TOKEN_SUBTRACTION_OPERATOR}
 // https://github.com/elixir-lang/elixir/commit/3487d00ddb5e90c7cf0e65d03717903b9b27eafd
 THREE_OPERATOR = {THREE_TOKEN_THREE_OPERATOR}
 TUPLE_OPERATOR = {TWO_TOKEN_TUPLE_OPERATOR}
@@ -402,8 +414,6 @@ SPACE = {HORIZONTAL_SPACE} | {VERTICAL_SPACE}
 WHITE_SPACE=[\ \t\f]
 MULTILINE_WHITE_SPACE = ({ESCAPED_EOL} | {EOL} | {WHITE_SPACE})+
 LAST_EOL = {MULTILINE_WHITE_SPACE}? {EOL} ({ESCAPED_EOL} | {WHITE_SPACE})*
-// see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L609-L610
-SPACE_SENSITIVE={DUAL_OPERATOR}[^(\[<{%+-/>:]
 
 /*
  *  Comments
@@ -497,6 +507,8 @@ OPENING_BRACKET = "["
 
 CLOSING_PARENTHESIS = ")"
 OPENING_PARENTHESIS = "("
+
+OPENING = {OPENING_BIT} | {OPENING_BRACKET} | {OPENING_CURLY} | {OPENING_PARENTHESIS}
 
 /*
  *
@@ -651,18 +663,22 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
  *  States - Ordered lexigraphically
  */
 
+%state ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE
+%state ADDITION_OR_SUBTRACTION_MAYBE
+%state ADDITION_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE
+%state AFTER_IDENTIFIER_WHITE_SPACE
+%state AFTER_RELATIVE_IDENTIFIER
+%state AFTER_UNQUALIFIED_IDENTIFIER
 %state ATOM_START
 %state BASE_WHOLE_NUMBER_BASE
 %state BINARY_WHOLE_NUMBER
 %state CALL_MAYBE
-%state CALL_OR_KEYWORD_PAIR_MAYBE
 %state CHAR_TOKENIZATION
 %state DECIMAL_EXPONENT
 %state DECIMAL_EXPONENT_SIGN
 %state DECIMAL_FRACTION
 %state DECIMAL_WHOLE_NUMBER
 %state DOT_OPERATION
-%state DUAL_OPERATION
 %state ESCAPE_IN_LITERAL_GROUP
 %state ESCAPE_SEQUENCE
 %state EXTENDED_HEXADECIMAL_ESCAPE_SEQUENCE
@@ -681,9 +697,6 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
 %state MULTILINE_WHITE_SPACE_MAYBE
 %state NAMED_SIGIL
 %state OCTAL_WHOLE_NUMBER
-%state SIGN_OPERATION
-%state SIGN_OPERATION_KEYWORD_PAIR_MAYBE
-%state SIGN_OPERATION_MAYBE
 %state REFERENCE_OPERATION
 %state SIGIL
 %state SIGIL_MODIFIERS
@@ -709,7 +722,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                                                return ElixirTypes.ARROW_OPERATOR; }
   {ASSOCIATION_OPERATOR}                     { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.ASSOCIATION_OPERATOR; }
-  {ALIAS}                                    { pushAndBegin(KEYWORD_PAIR_MAYBE);
+  {ALIAS}                                    { pushAndBegin(ADDITION_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.ALIAS_TOKEN; }
   {AT_OPERATOR}                              { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.AT_OPERATOR; }
@@ -729,19 +742,19 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
   /* Must be after {BIT_STRING_OPERATOR} as {BIT_STRING_OPERATOR} combines {OPENING_BIT} {CLOSING_BIT} and must be
      before {COMPARISON_OPERATOR} as {COMPARISON_OPERATOR} includes ">" which would match the begining of {CLOSING_BIT}
    */
-  {CLOSING_BIT}                              { return ElixirTypes.CLOSING_BIT; }
-  {CLOSING_BRACKET}                          { return ElixirTypes.CLOSING_BRACKET; }
-  {CLOSING_PARENTHESIS}                      { return ElixirTypes.CLOSING_PARENTHESIS; }
+  {CLOSING_BIT}                              { pushAndBegin(ADDITION_OR_SUBTRACTION_MAYBE);
+                                               return ElixirTypes.CLOSING_BIT; }
+  {CLOSING_BRACKET}                          { pushAndBegin(ADDITION_OR_SUBTRACTION_MAYBE);
+                                               return ElixirTypes.CLOSING_BRACKET; }
+  {CLOSING_PARENTHESIS}                      { pushAndBegin(ADDITION_OR_SUBTRACTION_MAYBE);
+                                               return ElixirTypes.CLOSING_PARENTHESIS; }
   {DO}                                       { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.DO; }
   {ELSE}                                     { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.ELSE; }
-  {EOL}                                      { pushAndBegin(SIGN_OPERATION_MAYBE);
-                                               return ElixirTypes.EOL; }
+  {EOL}                                      { return ElixirTypes.EOL; }
   {END}                                      { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.END; }
-  // see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L605-L613
-  {ESCAPED_EOL}|{WHITE_SPACE}+ / {SPACE_SENSITIVE} { return ElixirTypes.SIGNIFICANT_WHITE_SPACE; }
   {ESCAPED_EOL}|{WHITE_SPACE}+                     { return TokenType.WHITE_SPACE; }
   {MULTILINE_WHITE_SPACE} / {EOL_INSENSITIVE}      { return TokenType.WHITE_SPACE; }
   {LAST_EOL} / {REFERENCABLE_OPERATOR}{REFERENCE_INFIX_OPERATOR} { handleLastEOL();
@@ -753,7 +766,8 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                                                      return TokenType.WHITE_SPACE; }
   {LAST_EOL} / {IDENTIFIER_TOKEN}                  { handleLastEOL();
                                                      return TokenType.WHITE_SPACE; }
-  {CHAR_TOKENIZER}                                      { pushAndBegin(CHAR_TOKENIZATION);
+  {CHAR_TOKENIZER}                                      { pushAndBegin(ADDITION_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE);
+                                                          pushAndBegin(CHAR_TOKENIZATION);
                                                           return ElixirTypes.CHAR_TOKENIZER; }
   /* So that that atom of comparison operator consumes all 3 ':' instead of {TYPE_OPERATOR} consuming '::'
      and ':' being leftover */
@@ -766,8 +780,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
   // Must be after {TYPE_OPERATOR}, so that 1 ':' is consumed after 2
   {COLON}                                    { pushAndBegin(ATOM_START);
                                                return ElixirTypes.COLON; }
-  {COMMA}                                    { pushAndBegin(SIGN_OPERATION_MAYBE);
-                                               return ElixirTypes.COMMA; }
+  {COMMA}                                    { return ElixirTypes.COMMA; }
   {COMMENT}                                  { return ElixirTypes.COMMENT; }
   /* Must be after {BIT_STRING_OPERATOR} as {BIT_STRING_OPERATOR} combines {OPENING_BIT} {CLOSING_BIT}; must be after
      {ARROW_OPERATOR} because {ARROW_OPERATOR} includes "<<<", which is a longer match than {OPENING_BIT}'s "<<"; and
@@ -782,9 +795,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
   // DOT_OPERATOR is not a valid keywordKey, so no need to go to KEYWORD_PAIR_MAYBE
   {DOT_OPERATOR}                             { pushAndBegin(DOT_OPERATION);
                                                return ElixirTypes.DOT_OPERATOR; }
-  {DUAL_OPERATOR}                            { pushAndBegin(DUAL_OPERATION);
-                                               return ElixirTypes.DUAL_OPERATOR; }
-  {FALSE}                                    { pushAndBegin(KEYWORD_PAIR_MAYBE);
+  {FALSE}                                    { pushAndBegin(ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.FALSE; }
   {FN}                                       { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.FN; }
@@ -807,7 +818,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
   {IN_OPERATOR}                              { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.IN_OPERATOR; }
   // Must be before {IDENTIFIER_TOKEN} as "nil" would be parsed as an identifier since it's a lowercase alphanumeric.
-  {NIL}                                      { pushAndBegin(KEYWORD_PAIR_MAYBE);
+  {NIL}                                      { pushAndBegin(ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.NIL; }
   // Must be before {IDENTIFIER_TOKEN} as "not" would be parsed as an identifier since it's a lowercase alphanumeric.
   {NOT_OPERATOR}                             { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
@@ -819,7 +830,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
   {RESCUE}                                   { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.RESCUE; }
   // Must be before {IDENTIFIER_TOKEN} as "true" would be parsed as an identifier since it's a lowercase alphanumeric.
-  {TRUE}                                     { pushAndBegin(KEYWORD_PAIR_MAYBE);
+  {TRUE}                                     { pushAndBegin(ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.TRUE; }
   // Must be before {UNARY_OPERATOR} as "^^^" is longer than "^" in {UNARY_OPERATOR}
   {THREE_OPERATOR}                           { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
@@ -827,7 +838,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
   // Must be before {IDENTIFIER_TOKEN} as "when" would be parsed as an identifier since it's a lowercase alphanumeric.
   {WHEN_OPERATOR}                            { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.WHEN_OPERATOR; }
-  {IDENTIFIER_TOKEN}                         { pushAndBegin(CALL_MAYBE);
+  {IDENTIFIER_TOKEN}                         { pushAndBegin(AFTER_UNQUALIFIED_IDENTIFIER);
                                                return ElixirTypes.IDENTIFIER_TOKEN; }
   {IN_MATCH_OPERATOR}                        { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.IN_MATCH_OPERATOR; }
@@ -840,6 +851,19 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                                                return ElixirTypes.MATCH_OPERATOR; }
   {MULTIPLICATION_OPERATOR}                  { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.MULTIPLICATION_OPERATOR; }
+  // Must be before NEGATE_OPERATOR (-) or NUMBER_OR_BADARITH_OPERATOR (+)
+  // as they are both prefixes of the TWO_OPERATORs (-- and ++)
+  {TWO_OPERATOR}                             { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
+                                               return ElixirTypes.TWO_OPERATOR; }
+  {MINUS_OPERATOR} / {COLON}{SPACE}          { // Definitely a Keyword pair, but KEYWORD_PAIR_MAYBE state will still work.
+                                               pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                               return ElixirTypes.MINUS_OPERATOR; }
+  {NEGATE_OPERATOR}                          { return ElixirTypes.NEGATE_OPERATOR; }
+  {PLUS_OPERATOR} / {COLON}{SPACE}           { // Definitely a Keyword pair, but KEYWORD_PAIR_MAYBE state will still work.
+                                               pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                               return ElixirTypes.PLUS_OPERATOR; }
+
+  {NUMBER_OR_BADARITH_OPERATOR}              { return ElixirTypes.NUMBER_OR_BADARITH_OPERATOR; }
   {OR_SYMBOL_OPERATOR}                       { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.OR_SYMBOL_OPERATOR; }
   {PIPE_OPERATOR}                            { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
@@ -856,22 +880,64 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                                                return ElixirTypes.STRUCT_OPERATOR; }
   {TILDE}                                    { pushAndBegin(SIGIL);
                                                return ElixirTypes.TILDE; }
-  {TWO_OPERATOR}                             { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
-                                               return ElixirTypes.TWO_OPERATOR; }
+
   {UNARY_OPERATOR}                           { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.UNARY_OPERATOR; }
   {VALID_DECIMAL_DIGITS}                     { pushAndBegin(DECIMAL_WHOLE_NUMBER);
                                                return ElixirTypes.VALID_DECIMAL_DIGITS; }
-  {QUOTE_HEREDOC_PROMOTER}                   { startQuote(yytext());
+  {QUOTE_HEREDOC_PROMOTER}                   { pushAndBegin(ADDITION_OR_SUBTRACTION_MAYBE);
+                                               startQuote(yytext());
                                                return promoterType(); }
   /* MUST be after {QUOTE_HEREDOC_PROMOTER} for <BODY, INTERPOLATION> as {QUOTE_HEREDOC_PROMOTER} is prefixed by
      {QUOTE_PROMOTER} */
   {QUOTE_PROMOTER}                           { /* return to KEYWORD_PAIR_MAYBE so that COLON after quote can be parsed
                                                   as KEYWORD_PAIR_COLON to differentiate between valid `<quote><colon>`
                                                   and invalid `<quote><space><colon>`. */
-                                               pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                               pushAndBegin(ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE);
                                                startQuote(yytext());
                                                return promoterType(); }
+}
+
+<ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE, ADDITION_OR_SUBTRACTION_MAYBE, ADDITION_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE, CALL_MAYBE> {
+  {ESCAPED_EOL}|{WHITE_SPACE}+         { yybegin(ADDITION_OR_SUBTRACTION_MAYBE);
+                                         return TokenType.WHITE_SPACE; }
+}
+
+<ADDITION_OR_SUBTRACTION_MAYBE, ADDITION_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE,
+ AFTER_RELATIVE_IDENTIFIER, AFTER_UNQUALIFIED_IDENTIFIER,
+ CALL_MAYBE> {
+  {TWO_OPERATOR}         { yybegin(MULTILINE_WHITE_SPACE_MAYBE);
+                           return ElixirTypes.TWO_OPERATOR; }
+  {ADDITION_OPERATOR}    { yybegin(MULTILINE_WHITE_SPACE_MAYBE);
+                           return ElixirTypes.ADDITION_OPERATOR; }
+  // STAB_OPERATOR is an extension of SUBTRACTION_OPERATOR, so it needs to be before SUBTRACTION_OPERATOR instead of
+  // part of {ANY} to be matched preferentially
+  {STAB_OPERATOR}        { handleInLastState(); }
+  {SUBTRACTION_OPERATOR} { yybegin(MULTILINE_WHITE_SPACE_MAYBE);
+                           return ElixirTypes.SUBTRACTION_OPERATOR; }
+
+}
+
+<AFTER_RELATIVE_IDENTIFIER, AFTER_UNQUALIFIED_IDENTIFIER> {
+  {WHITE_SPACE}+         { yybegin(AFTER_IDENTIFIER_WHITE_SPACE);
+                           return TokenType.WHITE_SPACE; }
+}
+
+<AFTER_RELATIVE_IDENTIFIER, AFTER_UNQUALIFIED_IDENTIFIER, CALL_MAYBE> {
+  {OPENING_BRACKET}|{OPENING_PARENTHESIS} { handleInLastState();
+                                            // zero-width token
+                                            return ElixirTypes.CALL; }
+}
+
+<AFTER_IDENTIFIER_WHITE_SPACE> {
+  {ADDITION_OPERATOR} / {MULTILINE_WHITE_SPACE}                          { yybegin(MULTILINE_WHITE_SPACE_MAYBE);
+                                                                           return ElixirTypes.ADDITION_OPERATOR; }
+  {ADDITION_OPERATOR} / ({OPENING}|{MINUS_OPERATOR}|{STRUCT_OPERATOR})   { popAndBegin();
+                                                                           return ElixirTypes.ADDITION_OPERATOR; }
+  {SUBTRACTION_OPERATOR} / {MULTILINE_WHITE_SPACE}                       { yybegin(MULTILINE_WHITE_SPACE_MAYBE);
+                                                                           return ElixirTypes.SUBTRACTION_OPERATOR; }
+  {SUBTRACTION_OPERATOR} / ({OPENING}|{PLUS_OPERATOR}|{STRUCT_OPERATOR}) { popAndBegin();
+                                                                           return ElixirTypes.SUBTRACTION_OPERATOR; }
 }
 
 /*
@@ -881,17 +947,14 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
 
 /// Must be after {QUOTE_PROMOTER} for <ATOM_START> so that
 <ATOM_START> {
-  {ATOM}           { popAndBegin();
-                     return ElixirTypes.ATOM_FRAGMENT; }
-  {QUOTE_PROMOTER} { /* At the end of the quote, return the state (YYINITIAL or INTERPOLATION) before ATOM_START as
-                        anything after the closing quote should be handle by the state prior to ATOM_START.  Without
-                        this, EOL and WHITESPACE won't be handled correctly */
-                     popAndBegin();
-                     startQuote(yytext());
-                     return promoterType(); }
-  {OPERATOR}       { popAndBegin();
-                     return ElixirTypes.ATOM_FRAGMENT; }
-  {ANY}            { return TokenType.BAD_CHARACTER; }
+  {ATOM}|{OPERATOR} { yybegin(ADDITION_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE);
+                      return ElixirTypes.ATOM_FRAGMENT; }
+  {QUOTE_PROMOTER}  { /* At the end of the quote, return the state (YYINITIAL or INTERPOLATION) before ATOM_START as
+                         anything after the closing quote should be handle by the state prior to ATOM_START.  Without
+                         this, EOL and WHITESPACE won't be handled correctly */
+                      yybegin(ADDITION_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE);
+                      startQuote(yytext());
+                      return promoterType(); }
 }
 
 <BASE_WHOLE_NUMBER_BASE> {
@@ -916,16 +979,6 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
   {VALID_BINARY_DIGITS}   { return ElixirTypes.VALID_BINARY_DIGITS; }
 }
 
-<CALL_MAYBE, CALL_OR_KEYWORD_PAIR_MAYBE> {
-  {OPENING_BRACKET}|{OPENING_PARENTHESIS} { handleInLastState();
-                                            // zero-width token
-                                            return ElixirTypes.CALL; }
-}
-
-<CALL_OR_KEYWORD_PAIR_MAYBE> {
-  {ANY} { handleInState(KEYWORD_PAIR_MAYBE); }
-}
-
 <CHAR_TOKENIZATION> {
   {ESCAPE} { yybegin(ESCAPE_SEQUENCE);
              return ElixirTypes.ESCAPE; }
@@ -934,8 +987,8 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
 }
 
 <DECIMAL_EXPONENT_SIGN> {
-  {DUAL_OPERATOR} { yybegin(DECIMAL_EXPONENT);
-                    return ElixirTypes.DUAL_OPERATOR; }
+  {SIGN_OPERATOR} { yybegin(DECIMAL_EXPONENT);
+                    return ElixirTypes.SIGN_OPERATOR; }
   {ANY}           { handleInState(DECIMAL_EXPONENT); }
 }
 
@@ -990,8 +1043,6 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                                                       return ElixirTypes.DO; }
   {DIVISION_OPERATOR}                               { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.DIVISION_OPERATOR; }
-  {DUAL_OPERATOR}                                   { yybegin(CALL_MAYBE);
-                                                      return ElixirTypes.DUAL_OPERATOR; }
   {END}                                             { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.END; }
   {ELSE}                                            { yybegin(CALL_MAYBE);
@@ -1004,6 +1055,8 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                                                       return ElixirTypes.IN_OPERATOR; }
   {MATCH_OPERATOR}                                  { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.MATCH_OPERATOR; }
+  {MINUS_OPERATOR}                                  { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.MINUS_OPERATOR; }
   {MULTIPLICATION_OPERATOR}                         { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.MULTIPLICATION_OPERATOR; }
   {NIL}                                             { yybegin(CALL_MAYBE);
@@ -1014,6 +1067,8 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                                                       return ElixirTypes.OR_WORD_OPERATOR; }
   {PIPE_OPERATOR}                                   { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.PIPE_OPERATOR; }
+  {PLUS_OPERATOR}                                   { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.PLUS_OPERATOR; }
   {RANGE_OPERATOR}                                  { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.RANGE_OPERATOR; }
   {RELATIONAL_OPERATOR}                             { yybegin(CALL_MAYBE);
@@ -1027,7 +1082,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                                                         return ElixirTypes.STAB_OPERATOR;
                                                       } else {
                                                         yypushback(1);
-                                                        return ElixirTypes.DUAL_OPERATOR;
+                                                        return ElixirTypes.MINUS_OPERATOR;
                                                       }
                                                     }
   {STRUCT_OPERATOR}                                 { yybegin(CALL_MAYBE);
@@ -1045,7 +1100,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
 
   /* Must be after {AFTER}, {CATCH}, {DO}, {END}, {ELSE}, {IN_OPERATOR}, {OR_OPERATOR} (for 'or'), and {WHEN_OPERATOR}
      as all those keywords would match {IDENTIFIER_TOKEN} */
-  {IDENTIFIER_TOKEN}                                { yybegin(CALL_OR_KEYWORD_PAIR_MAYBE);
+  {IDENTIFIER_TOKEN}                                { yybegin(AFTER_RELATIVE_IDENTIFIER);
                                                       return ElixirTypes.IDENTIFIER_TOKEN; }
 
   {MULTILINE_WHITE_SPACE}                           { return TokenType.WHITE_SPACE; }
@@ -1071,12 +1126,6 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                                                       return promoterType(); }
 
   .                                                 { handleInLastState(); }
-}
-
-<DUAL_OPERATION> {
-  {WHITE_SPACE}+ { popAndBegin();
-                   return ElixirTypes.SIGNIFICANT_WHITE_SPACE; }
-  {ANY}          { handleInState(KEYWORD_PAIR_MAYBE); }
 }
 
 <ESCAPE_IN_LITERAL_GROUP> {
@@ -1296,7 +1345,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                                         return TokenType.WHITE_SPACE; }
 }
 
-<KEYWORD_PAIR_MAYBE, KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE> {
+<ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE, AFTER_RELATIVE_IDENTIFIER, KEYWORD_PAIR_MAYBE, KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE> {
   {COLON} / {SPACE} { yybegin(MULTILINE_WHITE_SPACE_MAYBE);
                       return ElixirTypes.KEYWORD_PAIR_COLON; }
 }
@@ -1340,27 +1389,6 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
   {SIGIL_MODIFIER} { return ElixirTypes.SIGIL_MODIFIER; }
 }
 
-<SIGN_OPERATION> {
-  {ESCAPED_EOL}|{WHITE_SPACE}+ { return TokenType.WHITE_SPACE; }
-}
-
-<SIGN_OPERATION_KEYWORD_PAIR_MAYBE> {
-  {COLON} / {SPACE} { popAndBegin();
-                      return ElixirTypes.KEYWORD_PAIR_COLON; }
-  {ANY}             { handleInState(SIGN_OPERATION); }
-}
-
-<SIGN_OPERATION_MAYBE> {
-  // Must be before any single operator's match
-  {REFERENCABLE_OPERATOR} / {REFERENCE_INFIX_OPERATOR} { handleInLastState(); }
-  {ESCAPED_EOL}|{WHITE_SPACE}+ { return TokenType.WHITE_SPACE; }
-  {DUAL_OPERATOR}              { yybegin(SIGN_OPERATION_KEYWORD_PAIR_MAYBE);
-                                 return ElixirTypes.SIGN_OPERATOR; }
-  /* STAB_OPERATOR needs to be included explicitly because `-` in `DUAL_OPERATOR` is a prefix of `->` (`STAB_OPERATOR`)
-     and `.` would only match one character and be a shorter match otherwise. */
-  {EOL}|{STAB_OPERATOR}|.      { handleInLastState(); }
-}
-
 <UNICODE_ESCAPE_SEQUENCE> {
   {OPENING_CURLY}          { yybegin(EXTENDED_HEXADECIMAL_ESCAPE_SEQUENCE);
                              return ElixirTypes.OPENING_CURLY; }
@@ -1374,28 +1402,27 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
 
 /* Only rules for <YYINITIAL>, but not <INTERPOLATION> go here. */
 <YYINITIAL> {
-  {CLOSING_CURLY} { // protect from too many "}"
-                    if (!stack.empty()) {
-                      popAndBegin();
-                    }
-
+  {CLOSING_CURLY} { yybegin(ADDITION_OR_SUBTRACTION_MAYBE);
                     return ElixirTypes.CLOSING_CURLY; }
 }
 
-<BINARY_WHOLE_NUMBER,
+// States where it is known that
+<BINARY_WHOLE_NUMBER, DECIMAL_EXPONENT, DECIMAL_FRACTION, DECIMAL_WHOLE_NUMBER, HEXADECIMAL_WHOLE_NUMBER,
+ OCTAL_WHOLE_NUMBER, SIGIL_MODIFIERS, UNKNOWN_BASE_WHOLE_NUMBER> {
+   {ANY} { handleInState(ADDITION_OR_SUBTRACTION_MAYBE); }
+}
+
+<ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE, ADDITION_OR_SUBTRACTION_MAYBE, ADDITION_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE,
+ AFTER_RELATIVE_IDENTIFIER, AFTER_IDENTIFIER_WHITE_SPACE, AFTER_UNQUALIFIED_IDENTIFIER,
  CALL_MAYBE,
- DECIMAL_EXPONENT, DECIMAL_FRACTION, DECIMAL_WHOLE_NUMBER,
- HEXADECIMAL_ESCAPE_SEQUENCE, HEXADECIMAL_WHOLE_NUMBER,
- KEYWORD_PAIR_MAYBE, KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE, MULTILINE_WHITE_SPACE_MAYBE,
- OCTAL_WHOLE_NUMBER,
- SIGIL_MODIFIERS,
- SIGN_OPERATION,
- UNICODE_ESCAPE_SEQUENCE,
- UNKNOWN_BASE_WHOLE_NUMBER> {
+ HEXADECIMAL_ESCAPE_SEQUENCE,
+ KEYWORD_PAIR_MAYBE, KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE,
+ MULTILINE_WHITE_SPACE_MAYBE,
+ UNICODE_ESCAPE_SEQUENCE> {
   {ANY} { handleInLastState(); }
 }
 
 // MUST go last so that . mapping to BAD_CHARACTER is the rule of last resort for the listed states
-<GROUP_HEREDOC_START, INTERPOLATION, NAMED_SIGIL, SIGIL, YYINITIAL> {
+<ATOM_START, GROUP_HEREDOC_START, INTERPOLATION, NAMED_SIGIL, SIGIL, YYINITIAL> {
   . { return TokenType.BAD_CHARACTER; }
 }

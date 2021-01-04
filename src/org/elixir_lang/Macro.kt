@@ -88,9 +88,12 @@ object Macro {
 
     fun variable(name: OtpErlangAtom) = expr(name, NIL)
 
-    fun callArguments(callExpression: OtpErlangTuple): OtpErlangList {
-        return callExpression.elementAt(2) as OtpErlangList
-    }
+    fun callArguments(callExpression: OtpErlangTuple): OtpErlangList =
+            when (val arguments = callExpression.elementAt(2)) {
+                is OtpErlangList -> arguments
+                is OtpErlangString -> OtpErlangList(arguments.stringValue())
+                else -> TODO()
+            }
 
     fun isAliases(macro: OtpErlangObject): Boolean {
         var aliases = false

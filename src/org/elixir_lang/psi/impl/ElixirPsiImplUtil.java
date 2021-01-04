@@ -46,7 +46,7 @@ public class ElixirPsiImplUtil {
     public static final String DEFAULT_OPERATOR = "\\\\";
     public static final Key<PsiElement> ENTRANCE = new Key<>("ENTRANCE");
 
-    public static final TokenSet ADDITION_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.DUAL_OPERATOR);
+    public static final TokenSet ADDITION_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.ADDITION_OPERATOR, ElixirTypes.SUBTRACTION_OPERATOR);
     public static final TokenSet AND_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.AND_SYMBOL_OPERATOR, ElixirTypes.AND_WORD_OPERATOR);
     public static final TokenSet AT_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.AT_OPERATOR);
     public static final TokenSet CAPTURE_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.CAPTURE_OPERATOR);
@@ -66,7 +66,11 @@ public class ElixirPsiImplUtil {
     public static final TokenSet TWO_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.RANGE_OPERATOR, ElixirTypes.TWO_OPERATOR);
     public static final TokenSet TYPE_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.TYPE_OPERATOR);
     public static final TokenSet UNARY_OPERATOR_TOKEN_SET = TokenSet.create(
-            ElixirTypes.DUAL_OPERATOR, ElixirTypes.NOT_OPERATOR, ElixirTypes.SIGN_OPERATOR, ElixirTypes.UNARY_OPERATOR
+            ElixirTypes.NEGATE_OPERATOR,
+            ElixirTypes.NOT_OPERATOR,
+            ElixirTypes.NUMBER_OR_BADARITH_OPERATOR,
+            ElixirTypes.SIGN_OPERATOR,
+            ElixirTypes.UNARY_OPERATOR
     );
     public static final TokenSet IDENTIFIER_TOKEN_SET = TokenSet.create(ElixirTypes.IDENTIFIER_TOKEN);
     public static final Function1<? super PsiElement, ? extends PsiElement>  NEXT_SIBLING =

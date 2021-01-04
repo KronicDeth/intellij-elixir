@@ -27,9 +27,9 @@ public class ElixirDecimalFloatExponentImpl extends ASTWrapperPsiElement impleme
   }
 
   @Override
-  @NotNull
+  @Nullable
   public ElixirDecimalFloatExponentSign getDecimalFloatExponentSign() {
-    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirDecimalFloatExponentSign.class));
+    return PsiTreeUtil.getChildOfType(this, ElixirDecimalFloatExponentSign.class);
   }
 
   @Override

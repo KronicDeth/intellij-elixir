@@ -39,7 +39,7 @@ public class StringTest extends TokenTest {
                         {" \"\"\"", ElixirTypes.HEREDOC_PREFIX_WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false },
                         {"'''", ElixirTypes.STRING_FRAGMENT, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY, true },
                         { ";", ElixirTypes.STRING_FRAGMENT, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY, true },
-                        {"\"\"\"", ElixirTypes.STRING_HEREDOC_TERMINATOR, ElixirFlexLexer.YYINITIAL, true },
+                        {"\"\"\"", ElixirTypes.STRING_HEREDOC_TERMINATOR, ElixirFlexLexer.ADDITION_OR_SUBTRACTION_MAYBE, true },
                         {"\f'''", ElixirTypes.HEREDOC_LINE_WHITE_SPACE_TOKEN, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY, false },
                         {"\f\"\"\"", ElixirTypes.HEREDOC_PREFIX_WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false },
                         {"\n", ElixirTypes.EOL, ElixirFlexLexer.GROUP_HEREDOC_LINE_START, true },

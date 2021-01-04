@@ -290,8 +290,7 @@ public class Block extends AbstractBlock implements BlockEx {
             MATCHED_WHEN_OPERATION,
             UNMATCHED_WHEN_OPERATION
     );
-    private static final TokenSet WHITESPACE_TOKEN_SET =
-            TokenSet.create(EOL, TokenType.WHITE_SPACE, SIGNIFICANT_WHITE_SPACE);
+    private static final TokenSet WHITESPACE_TOKEN_SET = TokenSet.create(EOL, TokenType.WHITE_SPACE);
     @Nullable
     private final Alignment childrenAlignment;
     @Nullable

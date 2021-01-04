@@ -17,11 +17,13 @@ public interface ElixirCharListLine extends Atomable, InterpolatedCharList, Line
   @NotNull
   List<Integer> addEscapedCharacterCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode node);
 
-  @NotNull
-  List<Integer> addEscapedEOL(@Nullable List<Integer> maybeCodePointList, @NotNull ASTNode node);
+  //WARNING: addEscapedEOL(...) is skipped
+  //matching addEscapedEOL(ElixirCharListLine, ...)
+  //methods are not found in ElixirPsiImplUtil
 
-  @NotNull
-  List<Integer> addFragmentCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode node);
+  //WARNING: addFragmentCodePoints(...) is skipped
+  //matching addFragmentCodePoints(ElixirCharListLine, ...)
+  //methods are not found in ElixirPsiImplUtil
 
   @NotNull
   List<Integer> addHexadecimalEscapeSequenceCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode node);

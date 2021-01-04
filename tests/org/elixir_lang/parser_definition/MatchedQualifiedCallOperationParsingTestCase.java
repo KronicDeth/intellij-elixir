@@ -78,7 +78,7 @@ public class MatchedQualifiedCallOperationParsingTestCase extends ParsingTestCas
     }
 
     public void testMatchedUnaryNonNumericOperation() {
-        assertParsedAndQuotedCorrectly(false);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testMatchedDotCallOperation() {
@@ -118,7 +118,7 @@ public class MatchedQualifiedCallOperationParsingTestCase extends ParsingTestCas
     }
 
     public void testUnaryNumericOperation() {
-        assertParsedAndQuotedCorrectly(false);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testList() {
