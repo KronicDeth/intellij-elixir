@@ -1,17 +1,15 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi;
 
-import com.ericsson.otp.erlang.OtpErlangObject;
+import java.util.List;
+import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
+import org.elixir_lang.psi.call.Call;
+import org.elixir_lang.psi.operation.NotIn;
+import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import kotlin.ranges.IntRange;
-import org.elixir_lang.psi.call.Call;
-import org.elixir_lang.psi.operation.NotIn;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 public interface ElixirMatchedNotInOperation extends ElixirMatchedExpression, Call, NotIn {
 

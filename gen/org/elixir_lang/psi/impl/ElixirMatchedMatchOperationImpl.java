@@ -1,20 +1,20 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi.impl;
 
-import com.ericsson.otp.erlang.OtpErlangObject;
+import java.util.List;
+
+import org.elixir_lang.psi.operation.Match;
+import org.jetbrains.annotations.*;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
+import static org.elixir_lang.psi.ElixirTypes.*;
+import org.elixir_lang.psi.*;
+import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
-import com.intellij.psi.util.PsiTreeUtil;
 import kotlin.ranges.IntRange;
-import org.elixir_lang.psi.*;
-import org.elixir_lang.psi.operation.Match;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 public class ElixirMatchedMatchOperationImpl extends ElixirMatchedExpressionImpl implements ElixirMatchedMatchOperation {
 

@@ -181,7 +181,8 @@ public class Parameter {
                 parent instanceof ElixirInterpolation ||
                 parent instanceof ElixirMapUpdateArguments ||
                 parent instanceof ElixirMultipleAliases ||
-                parent instanceof ElixirQuoteStringBody ||
+                parent instanceof ElixirStringHeredocLineBody ||
+                parent instanceof ElixirStringLineBody ||
                 parent instanceof PsiFile ||
                 parent instanceof QualifiedAlias ||
                 parent instanceof QualifiedMultipleAliases) {

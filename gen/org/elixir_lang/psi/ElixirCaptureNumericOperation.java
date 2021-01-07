@@ -1,13 +1,13 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi;
 
-import com.ericsson.otp.erlang.OtpErlangObject;
+import java.util.List;
+import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
-import kotlin.ranges.IntRange;
 import org.elixir_lang.psi.call.Named;
 import org.elixir_lang.psi.operation.Prefix;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.ericsson.otp.erlang.OtpErlangObject;
+import kotlin.ranges.IntRange;
 
 public interface ElixirCaptureNumericOperation extends Named, Prefix {
 
@@ -79,7 +79,7 @@ public interface ElixirCaptureNumericOperation extends Named, Prefix {
   OtpErlangObject quote();
 
   @Nullable
-  PsiElement @NotNull[] secondaryArguments();
+  PsiElement[] secondaryArguments();
 
   @Nullable
   Integer secondaryArity();

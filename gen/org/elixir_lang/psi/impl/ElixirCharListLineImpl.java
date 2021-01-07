@@ -1,21 +1,18 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi.impl;
 
-import com.ericsson.otp.erlang.OtpErlangObject;
-import com.ericsson.otp.erlang.OtpErlangTuple;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElementVisitor;
-import com.intellij.psi.tree.IElementType;
-import com.intellij.psi.util.PsiTreeUtil;
-import org.elixir_lang.psi.Body;
-import org.elixir_lang.psi.ElixirCharListLine;
-import org.elixir_lang.psi.ElixirQuoteCharListBody;
-import org.elixir_lang.psi.ElixirVisitor;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.List;
+import org.jetbrains.annotations.*;
+import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
+import static org.elixir_lang.psi.ElixirTypes.*;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import org.elixir_lang.psi.*;
+import com.ericsson.otp.erlang.OtpErlangList;
+import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.psi.tree.IElementType;
 
 public class ElixirCharListLineImpl extends ASTWrapperPsiElement implements ElixirCharListLine {
 
@@ -34,8 +31,8 @@ public class ElixirCharListLineImpl extends ASTWrapperPsiElement implements Elix
 
   @Override
   @Nullable
-  public ElixirQuoteCharListBody getQuoteCharListBody() {
-    return PsiTreeUtil.getChildOfType(this, ElixirQuoteCharListBody.class);
+  public ElixirCharListLineBody getCharListLineBody() {
+    return PsiTreeUtil.getChildOfType(this, ElixirCharListLineBody.class);
   }
 
   @Override
@@ -87,14 +84,20 @@ public class ElixirCharListLineImpl extends ASTWrapperPsiElement implements Elix
 
   @Override
   @NotNull
-  public OtpErlangObject quoteBinary(OtpErlangTuple binary) {
-    return ElixirPsiImplUtil.quoteBinary(this, binary);
+  public OtpErlangObject quoteBinary(OtpErlangList metadata, List<OtpErlangObject> argumentList) {
+    return ElixirPsiImplUtil.quoteBinary(this, metadata, argumentList);
   }
 
   @Override
   @NotNull
   public OtpErlangObject quoteEmpty() {
     return ElixirPsiImplUtil.quoteEmpty(this);
+  }
+
+  @Override
+  @NotNull
+  public OtpErlangObject quoteInterpolation(ElixirInterpolation interpolation) {
+    return ElixirPsiImplUtil.quoteInterpolation(this, interpolation);
   }
 
   @Override

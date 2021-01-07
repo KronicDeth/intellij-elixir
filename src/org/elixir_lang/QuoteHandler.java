@@ -125,12 +125,22 @@ public class QuoteHandler implements MultiCharQuoteHandler {
      */
     @Override
     public boolean isClosingQuote(HighlighterIterator highlighterIterator, int offset) {
-        boolean isClosingQuote = false;
+        IElementType tokenType;
 
-        if (CLOSING_QUOTES.contains(highlighterIterator.getTokenType())) {
+        try {
+            tokenType = highlighterIterator.getTokenType();
+        } catch (IndexOutOfBoundsException e) {
+            tokenType = null;
+        }
+
+        boolean isClosingQuote;
+
+        if (CLOSING_QUOTES.contains(tokenType)) {
             int start = highlighterIterator.getStart();
             int end = highlighterIterator.getEnd();
             isClosingQuote = end - start >= 1 && offset == end - 1;
+        } else {
+            isClosingQuote = false;
         }
 
         return isClosingQuote;
@@ -143,11 +153,21 @@ public class QuoteHandler implements MultiCharQuoteHandler {
 
     @Override
     public boolean isOpeningQuote(HighlighterIterator highlighterIterator, int offset) {
-        boolean isOpeningQuote = false;
+        IElementType tokenType;
 
-        if (OPENING_QUOTES.contains(highlighterIterator.getTokenType())){
+        try {
+            tokenType = highlighterIterator.getTokenType();
+        } catch (IndexOutOfBoundsException e) {
+            tokenType = null;
+        }
+
+        boolean isOpeningQuote;
+
+        if (OPENING_QUOTES.contains(tokenType)){
             int start = highlighterIterator.getStart();
             isOpeningQuote = offset == start;
+        } else {
+            isOpeningQuote = false;
         }
 
         return isOpeningQuote;

@@ -43,7 +43,7 @@ public class BinaryIntegerTest extends TokenTest {
     )
     public static Collection<Object[]> generateData() {
         return Arrays.asList(new Object[][]{
-                { " ", TokenType.WHITE_SPACE, ElixirFlexLexer.YYINITIAL },
+                { " ", TokenType.WHITE_SPACE, ElixirFlexLexer.ADDITION_OR_SUBTRACTION_MAYBE },
                 { "!", ElixirTypes.UNARY_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE },
                 { "#", ElixirTypes.COMMENT, ElixirFlexLexer.YYINITIAL },
                 { "$", TokenType.BAD_CHARACTER, ElixirFlexLexer.YYINITIAL },
@@ -52,11 +52,11 @@ public class BinaryIntegerTest extends TokenTest {
                 { "'", ElixirTypes.CHAR_LIST_PROMOTER, ElixirFlexLexer.GROUP },
                 { "'''", ElixirTypes.CHAR_LIST_HEREDOC_PROMOTER, ElixirFlexLexer.GROUP_HEREDOC_START },
                 { "(", ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE },
-                { ")", ElixirTypes.CLOSING_PARENTHESIS, ElixirFlexLexer.YYINITIAL },
+                { ")", ElixirTypes.CLOSING_PARENTHESIS, ElixirFlexLexer.ADDITION_OR_SUBTRACTION_MAYBE },
                 { "*", ElixirTypes.MULTIPLICATION_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE },
-                { "+", ElixirTypes.DUAL_OPERATOR, ElixirFlexLexer.DUAL_OPERATION },
-                { ",", ElixirTypes.COMMA, ElixirFlexLexer.SIGN_OPERATION_MAYBE },
-                { "-", ElixirTypes.DUAL_OPERATOR, ElixirFlexLexer.DUAL_OPERATION },
+                { "+", ElixirTypes.ADDITION_OPERATOR, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE },
+                { ",", ElixirTypes.COMMA, ElixirFlexLexer.YYINITIAL },
+                { "-", ElixirTypes.SUBTRACTION_OPERATOR, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE },
                 { ".", ElixirTypes.DOT_OPERATOR, ElixirFlexLexer.DOT_OPERATION },
                 { "/", ElixirTypes.DIVISION_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE },
                 { "0", ElixirTypes.VALID_BINARY_DIGITS, ElixirFlexLexer.BINARY_WHOLE_NUMBER },
@@ -105,9 +105,9 @@ public class BinaryIntegerTest extends TokenTest {
                 { "[", ElixirTypes.OPENING_BRACKET, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE },
                 { "\"", ElixirTypes.STRING_PROMOTER, ElixirFlexLexer.GROUP },
                 { "\"\"\"", ElixirTypes.STRING_HEREDOC_PROMOTER, ElixirFlexLexer.GROUP_HEREDOC_START },
-                { "\n", ElixirTypes.EOL, ElixirFlexLexer.SIGN_OPERATION_MAYBE },
-                { "\r\n", ElixirTypes.EOL, ElixirFlexLexer.SIGN_OPERATION_MAYBE },
-                { "]", ElixirTypes.CLOSING_BRACKET, ElixirFlexLexer.YYINITIAL },
+                { "\n", ElixirTypes.EOL, ElixirFlexLexer.YYINITIAL },
+                { "\r\n", ElixirTypes.EOL, ElixirFlexLexer.YYINITIAL },
+                { "]", ElixirTypes.CLOSING_BRACKET, ElixirFlexLexer.ADDITION_OR_SUBTRACTION_MAYBE },
                 { "^", ElixirTypes.UNARY_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE },
                 { "_", ElixirTypes.NUMBER_SEPARATOR, ElixirFlexLexer.BINARY_WHOLE_NUMBER },
                 { "`", TokenType.BAD_CHARACTER, ElixirFlexLexer.YYINITIAL },
@@ -139,7 +139,7 @@ public class BinaryIntegerTest extends TokenTest {
                 { "z", ElixirTypes.INVALID_BINARY_DIGITS, ElixirFlexLexer.BINARY_WHOLE_NUMBER },
                 { "{", ElixirTypes.OPENING_CURLY, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE },
                 { "|", ElixirTypes.PIPE_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE },
-                { "}", ElixirTypes.CLOSING_CURLY, ElixirFlexLexer.YYINITIAL },
+                { "}", ElixirTypes.CLOSING_CURLY, ElixirFlexLexer.ADDITION_OR_SUBTRACTION_MAYBE },
                 { "~", ElixirTypes.TILDE, ElixirFlexLexer.SIGIL }
         });
     }

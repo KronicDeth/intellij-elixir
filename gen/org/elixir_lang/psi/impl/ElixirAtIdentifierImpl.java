@@ -1,16 +1,16 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi.impl;
 
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import java.util.List;
+import org.jetbrains.annotations.*;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
-import com.intellij.psi.PsiReference;
 import com.intellij.psi.util.PsiTreeUtil;
-import org.elixir_lang.psi.ElixirAtIdentifier;
-import org.elixir_lang.psi.ElixirAtPrefixOperator;
-import org.elixir_lang.psi.ElixirVisitor;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import static org.elixir_lang.psi.ElixirTypes.*;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import org.elixir_lang.psi.*;
+import com.intellij.psi.PsiReference;
 
 public class ElixirAtIdentifierImpl extends ASTWrapperPsiElement implements ElixirAtIdentifier {
 

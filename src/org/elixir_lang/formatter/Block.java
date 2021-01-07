@@ -45,18 +45,30 @@ public class Block extends AbstractBlock implements BlockEx {
             UNMATCHED_ARROW_OPERATION
     );
     private static final TokenSet BODY_TOKEN_SET = TokenSet.create(
-            INTERPOLATED_CHAR_LIST_BODY,
-            INTERPOLATED_REGEX_BODY,
-            INTERPOLATED_SIGIL_BODY,
-            INTERPOLATED_STRING_BODY,
-            INTERPOLATED_WORDS_BODY,
-            LITERAL_CHAR_LIST_BODY,
-            LITERAL_REGEX_BODY,
-            LITERAL_SIGIL_BODY,
-            LITERAL_STRING_BODY,
-            LITERAL_WORDS_BODY,
-            QUOTE_CHAR_LIST_BODY,
-            QUOTE_STRING_BODY
+            CHAR_LIST_HEREDOC_LINE_BODY,
+            CHAR_LIST_LINE_BODY,
+            INTERPOLATED_CHAR_LIST_HEREDOC_LINE_BODY,
+            INTERPOLATED_CHAR_LIST_SIGIL_LINE_BODY,
+            INTERPOLATED_REGEX_HEREDOC_LINE_BODY,
+            INTERPOLATED_REGEX_LINE_BODY,
+            INTERPOLATED_SIGIL_HEREDOC_LINE_BODY,
+            INTERPOLATED_SIGIL_LINE_BODY,
+            INTERPOLATED_STRING_HEREDOC_LINE_BODY,
+            INTERPOLATED_STRING_SIGIL_LINE_BODY,
+            INTERPOLATED_WORDS_HEREDOC_LINE_BODY,
+            INTERPOLATED_WORDS_LINE_BODY,
+            LITERAL_CHAR_LIST_HEREDOC_LINE_BODY,
+            LITERAL_CHAR_LIST_SIGIL_LINE_BODY,
+            LITERAL_REGEX_HEREDOC_LINE_BODY,
+            LITERAL_REGEX_LINE_BODY,
+            LITERAL_SIGIL_HEREDOC_LINE_BODY,
+            LITERAL_SIGIL_LINE_BODY,
+            LITERAL_STRING_HEREDOC_LINE_BODY,
+            LITERAL_STRING_SIGIL_LINE_BODY,
+            LITERAL_WORDS_HEREDOC_LINE_BODY,
+            LITERAL_WORDS_LINE_BODY,
+            STRING_HEREDOC_LINE_BODY,
+            STRING_LINE_BODY
     );
     private static final TokenSet BOOLEAN_WORD_OPERATOR_TOKEN_SET = TokenSet.create(
             AND_WORD_OPERATOR,
@@ -278,8 +290,7 @@ public class Block extends AbstractBlock implements BlockEx {
             MATCHED_WHEN_OPERATION,
             UNMATCHED_WHEN_OPERATION
     );
-    private static final TokenSet WHITESPACE_TOKEN_SET =
-            TokenSet.create(EOL, TokenType.WHITE_SPACE, SIGNIFICANT_WHITE_SPACE);
+    private static final TokenSet WHITESPACE_TOKEN_SET = TokenSet.create(EOL, TokenType.WHITE_SPACE);
     @Nullable
     private final Alignment childrenAlignment;
     @Nullable

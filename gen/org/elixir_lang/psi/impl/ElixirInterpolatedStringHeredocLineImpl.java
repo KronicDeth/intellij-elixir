@@ -1,13 +1,16 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi.impl;
 
-import com.ericsson.otp.erlang.OtpErlangObject;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import java.util.List;
+import org.jetbrains.annotations.*;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
+import static org.elixir_lang.psi.ElixirTypes.*;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
-import org.jetbrains.annotations.NotNull;
+import com.ericsson.otp.erlang.OtpErlangObject;
 
 public class ElixirInterpolatedStringHeredocLineImpl extends ASTWrapperPsiElement implements ElixirInterpolatedStringHeredocLine {
 
@@ -25,6 +28,12 @@ public class ElixirInterpolatedStringHeredocLineImpl extends ASTWrapperPsiElemen
   }
 
   @Override
+  @Nullable
+  public ElixirEscapedEOL getEscapedEOL() {
+    return PsiTreeUtil.getChildOfType(this, ElixirEscapedEOL.class);
+  }
+
+  @Override
   @NotNull
   public ElixirHeredocLinePrefix getHeredocLinePrefix() {
     return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirHeredocLinePrefix.class));
@@ -32,8 +41,8 @@ public class ElixirInterpolatedStringHeredocLineImpl extends ASTWrapperPsiElemen
 
   @Override
   @NotNull
-  public ElixirInterpolatedStringBody getInterpolatedStringBody() {
-    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirInterpolatedStringBody.class));
+  public ElixirInterpolatedStringHeredocLineBody getInterpolatedStringHeredocLineBody() {
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirInterpolatedStringHeredocLineBody.class));
   }
 
   @Override
