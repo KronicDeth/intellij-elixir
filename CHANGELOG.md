@@ -240,6 +240,27 @@
     * `org.jetbrains.kotlin.jvm` `1.3.70`
     * `de.undercouch.download` to `4.4.1`
   * Update to GitHub Environment Files
+* [#1859](https://github.com/KronicDeth/intellij-elixir/pull/1859) - [@KronicDeth](https://github.com/KronicDeth)
+  * Update CI to Elixir 1.11.2 and Erlang 23.1
+    * Quoting (for verification of correspondences between plugin and Elixir native lexer and parser.)
+      * Port elixir-lang/elixir#9725
+        * Indentations for sigil binaries with complex content.
+          Makes sure the indentation metadata is added to sigils that have content with metadata already.
+      * Quote charlist the same as string when used for a quoted atom
+      * Port elixir-lang/elixir@e89e9d874bf803379d729a3bae185052a5323a85
+      * Add sigil delimiter to metadata
+        Ports elixir-lang/elixir#9671
+        * Have 3 character delimiter for heredocs
+      * Add `no_parens: true` metadata
+        Port elixir-lang/elixir@8e7befb1087bd37d5acb883e21925b1c0eb0a55f
+    * Remove elixir-lang parsing tests for files that don't exist in Elixir 1.11
+    * Add missing `@Deprecated` to match overridden method
+    * Format expected and actual quoted
+      Makes the diff not be a one-liner. so easier to spot the difference.
+    * Convert `Quoter` to Kotlin
+    * Regenerate Parser for newer GrammarParser version.
+    * Port elixir-lang/elixir@1e4e05ef78b3105065f0a313bd0e1e78b2aa973e
+
 
 ### Bug Fixes
 * [#1844](https://github.com/KronicDeth/intellij-elixir/pull/1844) - [@KronicDeth](https://github.com/KronicDeth)
@@ -315,6 +336,14 @@
   * Remove redundant `internal`
   * Don't highlight resolved callables along with referrers 
     Newest annotation API asserts that the annotator only annotates the PsiElement being visited, so can't highlight the resolved call definitions at the same time anymore.
+* [#1859](https://github.com/KronicDeth/intellij-elixir/pull/1859) - [@KronicDeth](https://github.com/KronicDeth)
+  * Differentiate signs, unary +/-, and addition/subtraction in lexer.
+    Fix parsing of `-1` for `case` clauses (#1316) by more strictly parsing decimal exponent signs differently than addition/subtraction and differently from unary `+` and `-`.  No longer have a "dual" operation emitted from the lexer like the Elixir native lexer and instead use specific tokens for each use case so that the parser doesn't need to decide on the operation.
+  * Heredoc with escapable newlines (#1843)
+    Heredocs allow the final newline to be escaped so you can write a heredoc in the code, but have no newlines in the string term at runtime.
+  * Fix terminators docs to show closing version and not opening version
+
+
 
 ## v11.8.1
 ### Bug Fixes
