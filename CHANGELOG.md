@@ -261,7 +261,6 @@
     * Regenerate Parser for newer GrammarParser version.
     * Port elixir-lang/elixir@1e4e05ef78b3105065f0a313bd0e1e78b2aa973e
 
-
 ### Bug Fixes
 * [#1844](https://github.com/KronicDeth/intellij-elixir/pull/1844) - [@KronicDeth](https://github.com/KronicDeth)
   * Fix deprecation warnings for IntelliJ IDEA 2020.2
@@ -342,8 +341,8 @@
   * Heredoc with escapable newlines (#1843)
     Heredocs allow the final newline to be escaped so you can write a heredoc in the code, but have no newlines in the string term at runtime.
   * Fix terminators docs to show closing version and not opening version
-
-
+* [#1866](https://github.com/KronicDeth/intellij-elixir/pull/1866) - [@KronicDeth](https://github.com/KronicDeth)
+  * Protect against `IndexOutOfBounds` from `highlighterIterator` in `QuoteHandler`.
 
 ## v11.8.1
 ### Bug Fixes
