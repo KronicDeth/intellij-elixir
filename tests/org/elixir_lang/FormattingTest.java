@@ -71,30 +71,6 @@ public class FormattingTest extends BasePlatformTestCase {
         myFixture.checkResultByFile("align_boolean_operands_true.ex");
     }
 
-    public void testAlignPipeOperandsFalse() {
-        myFixture.configureByFile("align_pipe_operands_true.ex");
-
-        temporaryCodeStyleSettings
-                .getCustomSettings(CodeStyleSettings.class)
-                .ALIGN_PIPE_OPERANDS = false;
-
-        reformatFixture();
-
-        myFixture.checkResultByFile("align_pipe_operands_false.ex");
-    }
-
-    public void testAlignPipeOperandsTrue() {
-        myFixture.configureByFile("align_pipe_operands_false.ex");
-
-        temporaryCodeStyleSettings
-                .getCustomSettings(CodeStyleSettings.class)
-                .ALIGN_PIPE_OPERANDS = true;
-
-        reformatFixture();
-
-        myFixture.checkResultByFile("align_pipe_operands_true.ex");
-    }
-
     public void testAlignTwoOperandsFalse() {
         myFixture.configureByFile("align_two_operands_true.ex");
 
@@ -740,14 +716,6 @@ public class FormattingTest extends BasePlatformTestCase {
 
     public void testMapAndStructCompactEmpty() {
         assertFormatted("map_and_struct_compact_empty.ex");
-    }
-
-    public void testMapAndStructConstructionOneKeyPerLine() {
-        myFixture.configureByFile("map_and_struct_construction_one_key_per_line_before.ex");
-
-        reformatFixture();
-
-        myFixture.checkResultByFile("map_and_struct_construction_one_key_per_line_after.ex");
     }
 
     public void testMapAndStructUpdateOneKeyPerLine() {

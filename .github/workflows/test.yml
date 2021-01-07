@@ -15,8 +15,8 @@ jobs:
       - name: Set up Elixir
         uses: actions/setup-elixir@v1
         with:
-          otp-version: 22.2
-          elixir-version: 1.7.4
+          otp-version: 23.1
+          elixir-version: 1.11.2
       - name: Export OTP_RELEASE
         run: echo "OTP_RELEASE=22.2" >> $GITHUB_ENV
       - name: Export ERLANG_SDK_HOME

@@ -138,7 +138,7 @@ public class BracketCallTest extends Test {
                                 "<<>>",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.OPENING_BIT, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE),
-                                        new TokenTypeState(ElixirTypes.CLOSING_BIT, ElixirFlexLexer.YYINITIAL),
+                                        new TokenTypeState(ElixirTypes.CLOSING_BIT, ElixirFlexLexer.ADDITION_OR_SUBTRACTION_MAYBE),
                                         new TokenTypeState(ElixirTypes.OPENING_BRACKET, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE)
                                 )
                         },
@@ -159,7 +159,7 @@ public class BracketCallTest extends Test {
                         {
                                 "afterwards",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_MAYBE),
+                                        new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.AFTER_UNQUALIFIED_IDENTIFIER),
                                         new TokenTypeState(ElixirTypes.CALL, ElixirFlexLexer.YYINITIAL),
                                         new TokenTypeState(ElixirTypes.OPENING_BRACKET, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE)
                                 )
@@ -174,7 +174,7 @@ public class BracketCallTest extends Test {
                         {
                                 "androids",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_MAYBE),
+                                        new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.AFTER_UNQUALIFIED_IDENTIFIER),
                                         new TokenTypeState(ElixirTypes.CALL, ElixirFlexLexer.YYINITIAL),
                                         new TokenTypeState(ElixirTypes.OPENING_BRACKET, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE)
                                 )
@@ -189,7 +189,7 @@ public class BracketCallTest extends Test {
                         {
                                 "catchall",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_MAYBE),
+                                        new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.AFTER_UNQUALIFIED_IDENTIFIER),
                                         new TokenTypeState(ElixirTypes.CALL, ElixirFlexLexer.YYINITIAL),
                                         new TokenTypeState(ElixirTypes.OPENING_BRACKET, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE)
                                 )
@@ -204,7 +204,7 @@ public class BracketCallTest extends Test {
                         {
                                 "done",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_MAYBE),
+                                        new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.AFTER_UNQUALIFIED_IDENTIFIER),
                                         new TokenTypeState(ElixirTypes.CALL, ElixirFlexLexer.YYINITIAL),
                                         new TokenTypeState(ElixirTypes.OPENING_BRACKET, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE)
                                 )
@@ -219,7 +219,7 @@ public class BracketCallTest extends Test {
                         {
                                 "elsewhere",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_MAYBE),
+                                        new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.AFTER_UNQUALIFIED_IDENTIFIER),
                                         new TokenTypeState(ElixirTypes.CALL, ElixirFlexLexer.YYINITIAL),
                                         new TokenTypeState(ElixirTypes.OPENING_BRACKET, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE)
                                 )
@@ -234,7 +234,7 @@ public class BracketCallTest extends Test {
                         {
                                 "ending",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_MAYBE),
+                                        new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.AFTER_UNQUALIFIED_IDENTIFIER),
                                         new TokenTypeState(ElixirTypes.CALL, ElixirFlexLexer.YYINITIAL),
                                         new TokenTypeState(ElixirTypes.OPENING_BRACKET, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE)
                                 )
@@ -242,7 +242,7 @@ public class BracketCallTest extends Test {
                         {
                                 "identifier",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_MAYBE),
+                                        new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.AFTER_UNQUALIFIED_IDENTIFIER),
                                         new TokenTypeState(ElixirTypes.CALL, ElixirFlexLexer.YYINITIAL)
                                 )
                         },
@@ -256,7 +256,7 @@ public class BracketCallTest extends Test {
                         {
                                 "inner",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_MAYBE),
+                                        new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.AFTER_UNQUALIFIED_IDENTIFIER),
                                         new TokenTypeState(ElixirTypes.CALL, ElixirFlexLexer.YYINITIAL),
                                         new TokenTypeState(ElixirTypes.OPENING_BRACKET, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE)
                                 )
@@ -271,7 +271,7 @@ public class BracketCallTest extends Test {
                         {
                                 "notifiers",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_MAYBE),
+                                        new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.AFTER_UNQUALIFIED_IDENTIFIER),
                                         new TokenTypeState(ElixirTypes.CALL, ElixirFlexLexer.YYINITIAL),
                                         new TokenTypeState(ElixirTypes.OPENING_BRACKET, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE)
                                 )
@@ -286,7 +286,7 @@ public class BracketCallTest extends Test {
                         {
                                 "order",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_MAYBE),
+                                        new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.AFTER_UNQUALIFIED_IDENTIFIER),
                                         new TokenTypeState(ElixirTypes.CALL, ElixirFlexLexer.YYINITIAL),
                                         new TokenTypeState(ElixirTypes.OPENING_BRACKET, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE)
                                 )
@@ -301,7 +301,7 @@ public class BracketCallTest extends Test {
                         {
                                 "rescuer",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_MAYBE),
+                                        new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.AFTER_UNQUALIFIED_IDENTIFIER),
                                         new TokenTypeState(ElixirTypes.CALL, ElixirFlexLexer.YYINITIAL),
                                         new TokenTypeState(ElixirTypes.OPENING_BRACKET, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE)
                                 )
@@ -316,7 +316,7 @@ public class BracketCallTest extends Test {
                         {
                                 "whenever",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_MAYBE),
+                                        new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.AFTER_UNQUALIFIED_IDENTIFIER),
                                         new TokenTypeState(ElixirTypes.CALL, ElixirFlexLexer.YYINITIAL),
                                         new TokenTypeState(ElixirTypes.OPENING_BRACKET, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE)
                                 )
@@ -345,14 +345,14 @@ public class BracketCallTest extends Test {
                         {
                                 "+",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.DUAL_OPERATOR, ElixirFlexLexer.DUAL_OPERATION),
+                                        new TokenTypeState(ElixirTypes.NUMBER_OR_BADARITH_OPERATOR, ElixirFlexLexer.YYINITIAL),
                                         new TokenTypeState(ElixirTypes.OPENING_BRACKET, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
                                 "-",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.DUAL_OPERATOR, ElixirFlexLexer.DUAL_OPERATION),
+                                        new TokenTypeState(ElixirTypes.NEGATE_OPERATOR, ElixirFlexLexer.YYINITIAL),
                                         new TokenTypeState(ElixirTypes.OPENING_BRACKET, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE)
                                 )
                         },
@@ -420,7 +420,7 @@ public class BracketCallTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.STRUCT_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
                                         new TokenTypeState(ElixirTypes.OPENING_CURLY, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE),
-                                        new TokenTypeState(ElixirTypes.CLOSING_CURLY, ElixirFlexLexer.YYINITIAL),
+                                        new TokenTypeState(ElixirTypes.CLOSING_CURLY, ElixirFlexLexer.ADDITION_OR_SUBTRACTION_MAYBE),
                                         new TokenTypeState(ElixirTypes.OPENING_BRACKET, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE)
                                 )
                         },
@@ -498,7 +498,7 @@ public class BracketCallTest extends Test {
                                 "{}",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.OPENING_CURLY, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE),
-                                        new TokenTypeState(ElixirTypes.CLOSING_CURLY, ElixirFlexLexer.YYINITIAL),
+                                        new TokenTypeState(ElixirTypes.CLOSING_CURLY, ElixirFlexLexer.ADDITION_OR_SUBTRACTION_MAYBE),
                                         new TokenTypeState(ElixirTypes.OPENING_BRACKET, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE)
                                 )
                         },
@@ -553,7 +553,7 @@ public class BracketCallTest extends Test {
 
     @Override
     protected void start(@NotNull CharSequence charSequence) {
-        // append "(" to trigger CALL_OR_KEYWORD_PAIR_MAYBE
+        // append "(" to trigger AFTER_RELATIVE_IDENTIFIER
         CharSequence fullCharSequence = charSequence + "[";
         super.start(fullCharSequence);
     }

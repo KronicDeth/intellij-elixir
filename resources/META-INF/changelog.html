@@ -19,6 +19,54 @@
         </ul>
       </li>
       <li>Remove unnecessary <code>assert</code>.</li>
+      <li>Update CI to Elixir 1.11.2 and Erlang 23.1
+        <ul>
+          <li>Quoting (for verification of correspondences between plugin and Elixir native lexer and parser.)
+            <ul>
+              <li>Port <a href="https://github.com/elixir-lang/elixir/pull/9725">elixir-lang/elixir#9725</a>
+                <ul>
+                  <li>
+                    Indentations for sigil binaries with complex content.<br>
+                    Makes sure the indentation metadata is added to sigils that have content with metadata already.
+                  </li>
+                </ul>
+              </li>
+              <li>Quote charlist the same as string when used for a quoted atom</li>
+              <li>
+                Port
+                <a href="https://github.com/elixir-lang/elixir/commit/e89e9d874bf803379d729a3bae185052a5323a85">
+                  elixir-lang/elixir@<tt>e89e9d8</tt>
+                </a>
+              </li>
+              <li>Add sigil delimiter to metadata<br>
+                Ports <a href="https://github.com/elixir-lang/elixir/pull/9671">elixir-lang/elixir#9671</a>
+                <ul>
+                  <li>Have 3 character delimiter for heredocs</li>
+                </ul>
+              </li>
+              <li>
+                Add <code>no_parens: true</code> metadata<br>
+                Port
+                <a href="https://github.com/elixir-lang/elixir/commit/8e7befb1087bd37d5acb883e21925b1c0eb0a55f">
+                  elixir-lang/elixir@<tt>8e7befb</tt>
+                </a>
+              </li>
+            </ul>
+          </li>
+          <li>Remove elixir-lang parsing tests for files that don't exist in Elixir 1.11</li>
+          <li>Add missing <code>@Deprecated</code> to match overridden method</li>
+          <li>Format expected and actual quoted<br>
+            Makes the diff not be a one-liner. so easier to spot the difference.</li>
+          <li>Convert <code>Quoter</code> to Kotlin</li>
+          <li>Regenerate Parser for newer GrammarParser version.</li>
+          <li>
+            Port
+            <a href="https://github.com/elixir-lang/elixir/commit/1e4e05ef78b3105065f0a313bd0e1e78b2aa973e">
+              elixir-lang/elixir@<tt>1e4e05e</tt>
+            </a>
+          </li>
+        </ul>
+      </li>
     </ul>
   </li>
   <li>
@@ -1317,251 +1365,6 @@ Probably constructor should be marked as NonInjectable. [Plugin: org.elixir_lang
       </li>
       <li>Run <code>createLibrary</code> inside <code>runWriteAction</code>.</li>
       <li>Remove test that leaks threads and so causes builds to fail.</li>
-    </ul>
-  </li>
-</ul>
-<h1>v8.0.0</h1>
-<ul>
-  <li>
-    <p>Enhancements</p>
-    <ul>
-      <li>New and improved Run/Debug Configurations
-        <ul>
-          <li>Distillery Release CLIs for running <code>console</code>, <code>foreground</code>, etc<br>
-            Options for configuring each part of the command line
-            <ul>
-              <li>Path to Release CLI</li>
-              <li>Release CLI arguments (like a command <code>console</code>)</li>
-              <li>Settings that are normally hidden in environment variables
-                <ul>
-                  <li><code>erl</code> arguments (<code>ERL_OPTS</code>)</li>
-                  <li><code>elixir -extra</code> arguments (<code>EXTRA_OPTS</code>)</li>
-                  <li>Code Loading Mode (<code>CODE_LOADING_MODE</code>)</li>
-                  <li>Log Directory (<code>RUNNER_LOG_DIR</code>)</li>
-                  <li>Replace OS Vars (<code>REPLACE_OS_VARS</code>)</li>
-                  <li><code>sys.config</code> file (<code>SYS_CONFIG_PATH</code>)</li>
-                  <li>Release Config Directory (<code>RELEASE_CONFIG_DIR</code>)</li>
-                  <li>Pipe directory (<code>PIPE_DIR</code>)</li>
-                </ul>
-              </li>
-              <li>
-                Use  Pseudo-Terminal (PTY) to allow overriding console type when it can't be inferred from the Release
-                CLI arguments, such as using PTY for <code>console</code> because it uses an <code>iex</code>-like
-                shell.
-              </li>
-              <li>Working Directory</li>
-              <li>Environment Variables</li>
-            </ul>
-          </li>
-          <li><code>iex</code> console with proper PTY support (colors, tab completion, history)<br>
-            Options for configuring each part of the command line
-            <ul>
-              <li><code>iex</code> arguments</li>
-              <li><code>erl</code> arguments</li>
-              <li>Working Directory</li>
-              <li>Environment Variables</li>
-            </ul>
-          </li>
-          <li><code>elixir</code> with colors<br>
-            Options for configuring each part of the command line
-            <ul>
-              <li><code>elixir</code> arguments</li>
-              <li><code>erl</code> arguments</li>
-              <li>Working Directory</li>
-              <li>Environment Variables</li>
-            </ul>
-          </li>
-          <li><code>mix</code> tasks getting expanded options to match the new configurations
-            <ul>
-              <li>
-                <code>mix</code> arguments, which used to be called "Program Arguments" (I figured out how to customize
-                that name. 😉)
-              </li>
-              <li><code>elixir</code> arguments</li>
-              <li><code>erl</code> arguments</li>
-              <li>Working Directory</li>
-              <li>Environment Variables</li>
-            </ul>
-          </li>
-          <li><code>iex -S mix</code><br>
-            Options for configuring each part of the command line
-            <ul>
-              <li><code>mix</code> arguments</li>
-              <li><code>iex</code> arguments</li>
-              <li><code>erl</code> arguments</li>
-              <li>Working Directory</li>
-              <li>Environment Variables</li>
-            </ul>
-          </li>
-          <li><code>mix test</code>
-            <ul>
-              <li><code>mix test</code> arguments, which used to be called "Program Arguments"</li>
-              <li><code>elixir</code> arguments</li>
-              <li><code>erl</code> arguments</li>
-              <li>Working Directory</li>
-              <li>Environment Variables</li>
-            </ul>
-          </li>
-        </ul>
-      </li>
-      <li>Debugger enhancements
-        <ul>
-          <li>
-            All the above configurations can be debugged using the debugger.  It is no longer restricted to only working
-            with <code>mix</code>-based configurations.
-          </li>
-          <li>Filter more common dependency modules from being interpreted by default.
-            <ul>
-              <li><code>credo</code></li>
-              <li><code>inch_ex</code></li>
-              <li><code>earmark</code></li>
-              <li><code>ex_doc</code></li>
-            </ul>
-          </li>
-          <li>More ways to filter interpreted modules
-            <ul>
-              <li>
-                Run Configurations now have an Interpreted Modules tab, next to Configuration, which by default imports
-                the Application-wide settings, but allows
-                <ul>
-                  <li>Disabling inherited filters</li>
-                  <li>Adding configuration-specific filters</li>
-                  <li>Remove configuration-specific filters</li>
-                </ul>
-              </li>
-              <li>
-                Allow interpreted modules to be uninterpreted when the debugger is running, using the
-                "Interpreted Modules" tab.
-              </li>
-            </ul>
-          </li>
-          <li>Improved Variables pane by showing the Elixir name of variables instead of Erlang names</li>
-          <li>Evaluate can evaluate an Elixir expression in any stack frame.</li>
-        </ul>
-      </li>
-      <li>
-        <p>Add all OTP 21 opcodes to disassembler.  Previous opcode set was frozen prior to OTP 21 release and missed some later additions.</p>
-        <table>
-          <thead>
-          <tr>
-            <th align="left">number</th>
-            <th align="left">name</th>
-            <th align="left">Added</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr>
-            <td align="left"><code>160</code></td>
-            <td align="left"><code>build_stacktrace</code></td>
-            <td align="left">Before OTP 21 release</td>
-          </tr>
-          <tr>
-            <td align="left"><code>161</code></td>
-            <td align="left"><code>raw_raise</code></td>
-            <td align="left">Now</td>
-          </tr>
-          <tr>
-            <td align="left"><code>162</code></td>
-            <td align="left"><code>get_hd</code></td>
-            <td align="left">Now</td>
-          </tr>
-          <tr>
-            <td align="left"><code>163</code></td>
-            <td align="left"><code>get_tl</code></td>
-            <td align="left">Now</td>
-          </tr></tbody></table>
-      </li>
-      <li>Spell checking for identifiers, aliases, comments, and literals (charlists, strings, and sigils).
-        <ul>
-          <li>Dictionaries for common dependencies
-            <ul>
-              <li>Elixir</li>
-              <li>Ecto</li>
-            </ul>
-          </li>
-        </ul>
-      </li>
-      <li>Elixir 1.7 debugger Variables and Evaluate compatibility
-        <ul>
-          <li>
-            Elixir 1.7 names Erlang variables like <code>_&lt;elixirVariableName&gt;@&lt;counter&gt;</code> while Elixir
-            1.6 used <code>V&lt;elixirVariableName&gt;@&lt;counter&gt;</code>
-          </li>
-          <li>
-            Elixir 1.7 changed <code>elixir_erl</code> record and <code>%Macro.Env{}</code>, which changed how
-            <code>:elixir.quoted_to_erl</code> needed to be called.
-          </li>
-        </ul>
-      </li>
-      <li>
-        <code>TerminalExecutionConsole</code> itself echos input in <code>2018.2</code> and <code>2018.2.1</code>, which
-        was introduced in
-        <a href="https://github.com/JetBrains/intellij-community/commit/fd7bbd0cb7f3c2a5add8872e0e6c5172be5f074a#diff-5acc2eb2e78fe52d7458d4a48b0eac9f">
-          JetBrains/intellij-community@<tt>fd7bbd0</tt>#diff-5acc2eb2e78fe52d7458d4a48b0eac9f
-        </a>, but it was reverted in
-        <a href="https://github.com/JetBrains/intellij-community/commit/5f4465b">
-          JetBrains/intellij-community@<tt>5f4465b</tt>
-        </a>, so this uses that version to maintain compatibility across supported versions.
-      </li>
-      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/1141">#1141</a>.</li>
-      <li>
-        Improve Cannot Create SDK error message (additions in <strong>bold</strong>):
-        "You need to configure an Erlang SDK for Elixir SDK. <strong>Click OK to be take through the Erlang SDK
-        configuration.  Click Cancel to stop configuring this SDK AND the Erlang SDK.</strong>"
-      </li>
-    </ul>
-  </li>
-  <li>
-    <p>Bug Fixes</p>
-    <ul>
-      <li>
-        Show <code>...</code> for module name when <code>Dbgi</code> has no module name as happens for instrumented
-        modules from <code>IEx.break/4</code>.
-      </li>
-      <li>Don't assume <code>callDefinitionClause</code> is non-<code>null</code>.</li>
-      <li>Don't assume parent of list access expression is <code>QuotableKeywordPair</code></li>
-      <li>Don't assume parent of keywords is a list</li>
-      <li>Update <code>2018.2</code> to <code>2018.2.1</code> in build matrix.</li>
-      <li>
-        In <code>Phoenix.Router.Helpers</code>, a <code>quote</code> block appears as the head of
-        <code>[head | tail]</code> list, so add support for search for enclosing macro call above <code>|</code>.
-      </li>
-      <li>Treat EEx tag the same as <code>StabBody</code> for use scope.</li>
-      <li>
-        Use <code>ATOM</code> for keyword keys instead of <code>IDENTIFIER_TOKEN</code> as <code>ATOM</code> allows for
-        <code>@</code>, which is needed for correctness.
-      </li>
-      <li>
-        In <code>eachEbinPath</code>, the ebin directories were found by iterating
-        <code>&lt;SDK_HOME_PATH&gt;/lib</code> and then iterating grandchild of that, so that all paths matching
-        <code>&lt;SDK_HOME_PATH&gt;/lib/&lt;APP&gt;/ebin</code> would be added, but for some installs from source,
-        like ASDF, there are non-OTP-app files in <code>&lt;SDK_HOME_PATH&gt;/lib</code>, so filter
-        <code>&lt;SDK_HOME_PATH&gt;/lib/&lt;APP&gt;</code> to only directories.
-      </li>
-      <li>
-        <code>org.elixir.lang.psi.scope.Module.aliasedName(QualifiedAlias)</code> was already converted to use
-        <code>org.elixir_lang.psi.operation.Normalized</code> and <code>org.elixir_lang.psi.infix.Normalized</code>,
-        which makes it work with errors in the PSI tree, so there's no need protect with an assert and that assert would
-        be wrong in times of errors handled by <code>Normalized</code>.
-      </li>
-      <li>
-        <code>org.elixir_lang.reference.module.UnaliasedName.down(PsiElement)</code> only expects
-        <code>ElixirAccessExpression</code> or <code>QualifiableAlias</code>, but for unexpected classes of elements, it
-        was a simple Kotlin <code>TODO()</code>, which didn't log anything useful for enhancements.  Replace the
-        <code>TODO()</code> with an <code>org.elixir_lang.errorreport.Logger.error</code>, so that the element's class
-        and content can be reported when this happens again.
-      </li>
-      <li>Use <code>/</code> in paths passed to Erlang, even on Windows </li>
-      <li>Convert mix and mix test run configurations to new format.</li>
-    </ul>
-  </li>
-  <li>
-    <p>Incompatible Changes</p>
-    <ul>
-      <li>
-        Drop support for IntelliJ IDEA before 2017.3 as they lack the <code>TerminalExecutionConsole</code> used to run
-        <code>iex</code> in a PTY.
-      </li>
     </ul>
   </li>
 </ul>

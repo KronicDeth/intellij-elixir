@@ -1,20 +1,19 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi;
 
+import java.util.List;
+import org.jetbrains.annotations.*;
+import com.intellij.psi.PsiElement;
+import org.elixir_lang.psi.stub.UnmatchedUnqualifiedNoArgumentsCall;
+import com.intellij.psi.StubBasedPsiElement;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.navigation.ItemPresentation;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.ResolveState;
-import com.intellij.psi.StubBasedPsiElement;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.search.SearchScope;
-import kotlin.ranges.IntRange;
-import org.elixir_lang.psi.stub.UnmatchedUnqualifiedNoArgumentsCall;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.Set;
+import kotlin.ranges.IntRange;
 
 public interface ElixirUnmatchedUnqualifiedNoArgumentsCall extends ElixirUnmatchedExpression, UnqualifiedNoArgumentsCall<UnmatchedUnqualifiedNoArgumentsCall>, StubBasedPsiElement<UnmatchedUnqualifiedNoArgumentsCall> {
 

@@ -2,6 +2,6 @@ Elixir File(0,2)
   ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(0,2)
     ElixirStringLineImpl(STRING_LINE)(0,2)
       PsiElement(String Promoter ("))('"')(0,1)
-      ElixirQuoteStringBodyImpl(QUOTE_STRING_BODY)(1,1)
+      ElixirStringLineBodyImpl(STRING_LINE_BODY)(1,1)
         <empty list>
       PsiElement(String Terminator ("))('"')(1,2)

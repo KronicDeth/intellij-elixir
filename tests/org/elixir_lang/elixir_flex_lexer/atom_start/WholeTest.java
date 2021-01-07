@@ -92,7 +92,7 @@ public class WholeTest extends org.elixir_lang.elixir_flex_lexer.Test {
 
         lexer.advance();
 
-        assertEquals(ElixirFlexLexer.YYINITIAL, lexer.getState());
+        assertEquals(ElixirFlexLexer.ADDITION_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE, lexer.getState());
 
         lexer.advance();
 

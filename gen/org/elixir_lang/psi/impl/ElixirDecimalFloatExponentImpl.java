@@ -1,15 +1,15 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi.impl;
 
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import java.util.List;
+import org.jetbrains.annotations.*;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
-import org.elixir_lang.psi.ElixirDecimalFloatExponent;
-import org.elixir_lang.psi.ElixirDecimalFloatExponentSign;
-import org.elixir_lang.psi.ElixirDecimalWholeNumber;
-import org.elixir_lang.psi.ElixirVisitor;
-import org.jetbrains.annotations.NotNull;
+import static org.elixir_lang.psi.ElixirTypes.*;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import org.elixir_lang.psi.*;
 
 public class ElixirDecimalFloatExponentImpl extends ASTWrapperPsiElement implements ElixirDecimalFloatExponent {
 
@@ -27,9 +27,9 @@ public class ElixirDecimalFloatExponentImpl extends ASTWrapperPsiElement impleme
   }
 
   @Override
-  @NotNull
+  @Nullable
   public ElixirDecimalFloatExponentSign getDecimalFloatExponentSign() {
-    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirDecimalFloatExponentSign.class));
+    return PsiTreeUtil.getChildOfType(this, ElixirDecimalFloatExponentSign.class);
   }
 
   @Override
