@@ -10,6 +10,7 @@ import org.elixir_lang.beam.chunk.*
 import org.elixir_lang.beam.chunk.Chunk.TypeID.*
 import org.elixir_lang.beam.chunk.Chunk.length
 import org.elixir_lang.beam.chunk.Chunk.typeID
+import org.elixir_lang.beam.chunk.beam_documentation.Documentation
 import org.elixir_lang.beam.term.ByteCount
 import java.io.*
 import java.nio.charset.Charset
@@ -82,6 +83,7 @@ class Beam private constructor(chunkCollection: Collection<Chunk>) {
     fun code(): Code? = chunk(CODE)?.let { Code.from(it) }
     fun compileInfo(): Keyword? = chunk(CINF)?.let(::from)
     fun elixirDocumentation(): ElixirDocumentation? = chunk(EXDC)?.let { ElixirDocumentation.from(it) }
+    fun documentation(): Documentation? = chunk(DOCS)?.let { Documentation.from(it) }
     fun debugInfo(): DebugInfo? = chunk(DBGI)?.let { org.elixir_lang.beam.chunk.debug_info.from(it) }
     fun exports(atoms: Atoms?): CallDefinitions? = callDefinitions(EXPT, atoms)
     fun functions(atoms: Atoms?): Functions? = chunk(FUNT)?.let { Functions.from(it, atoms) }

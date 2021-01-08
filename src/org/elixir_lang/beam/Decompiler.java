@@ -1,9 +1,16 @@
 package org.elixir_lang.beam;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.Iterators;
+import com.intellij.diagnostic.LogMessageEx;
+import com.intellij.openapi.diagnostic.Attachment;
 import com.intellij.openapi.fileTypes.BinaryFileDecompiler;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.elixir_lang.beam.chunk.Atoms;
+import org.elixir_lang.beam.chunk.beam_documentation.Documentation;
 import org.elixir_lang.beam.chunk.CallDefinitions;
+import org.elixir_lang.beam.chunk.beam_documentation.Doc;
+import org.elixir_lang.beam.chunk.beam_documentation.FunctionMetadata;
 import org.elixir_lang.beam.decompiler.Default;
 import org.elixir_lang.beam.decompiler.InfixOperator;
 import org.elixir_lang.beam.decompiler.PrefixOperator;
@@ -11,6 +18,7 @@ import org.elixir_lang.beam.decompiler.Unquoted;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.elixir_lang.beam.chunk.Chunk.TypeID.ATOM;
 import static org.elixir_lang.psi.call.name.Function.*;
@@ -48,7 +56,6 @@ public class Decompiler implements BinaryFileDecompiler {
 
             if (atoms != null) {
                 String moduleName = atoms.moduleName();
-
                 if (moduleName != null) {
                     String defmoduleArgument = defmoduleArgument(moduleName);
 
@@ -59,7 +66,23 @@ public class Decompiler implements BinaryFileDecompiler {
                             .append(defmoduleArgument)
                             .append(" do\n");
 
-                    appendCallDefinitions(decompiled, beam, atoms);
+                    Documentation documentation = beam.documentation();
+                    if (documentation != null) {
+                        String moduleDocs = documentation.getModuleDocs() != null
+                                ? documentation.getModuleDocs().getEnglishDocs()
+                                : null;
+
+                        if (moduleDocs != null){
+                            decompiled.append("  @moduleDoc \"\"\"\n");
+                            String indentedModuleDocs = Arrays.stream(moduleDocs.split("\n"))
+                                    .map(x -> "  " + x)
+                                    .collect(Collectors.joining("\n"));
+                            decompiled.append(indentedModuleDocs);
+                            decompiled.append("\n  \"\"\"\n");
+                        }
+                    }
+
+                    appendCallDefinitions(decompiled, beam, atoms, documentation);
 
                     decompiled.append("end\n");
                 } else {
@@ -77,9 +100,9 @@ public class Decompiler implements BinaryFileDecompiler {
 
     private static void appendCallDefinitions(@NotNull StringBuilder decompiled,
                                               @NotNull Beam beam,
-                                              @NotNull Atoms atoms) {
+                                              @NotNull Atoms atoms, Documentation documentation) {
         SortedSet<MacroNameArity> macroNameAritySortedSet = CallDefinitions.macroNameAritySortedSet(beam, atoms);
-        appendCallDefinitions(decompiled, macroNameAritySortedSet);
+        appendCallDefinitions(decompiled, macroNameAritySortedSet, documentation);
     }
 
     @NotNull
@@ -88,7 +111,7 @@ public class Decompiler implements BinaryFileDecompiler {
     }
 
     private static void appendCallDefinitions(@NotNull StringBuilder decompiled,
-                                              @NotNull SortedSet<MacroNameArity> macroNameAritySortedSet) {
+                                              @NotNull SortedSet<MacroNameArity> macroNameAritySortedSet, Documentation documentation) {
         MacroNameArity lastMacroNameArity = null;
 
         for (MacroNameArity macroNameArity : macroNameAritySortedSet) {
@@ -99,10 +122,50 @@ public class Decompiler implements BinaryFileDecompiler {
             } else if (!lastMacroNameArity.macro.equals(macro)) {
                 appendHeader(decompiled, macroToHeaderName(macro));
             }
-
             decompiled.append("\n");
 
-            appendMacroNameArity(decompiled, macroNameArity);
+            if (documentation != null){
+                List<FunctionMetadata> functionMetadata = documentation.getDocs() != null
+                        ? documentation.getDocs().getFunctionMetadataOrSimilar(macroNameArity.name, macroNameArity.arity)
+                        : null;
+                if (functionMetadata != null){
+                    functionMetadata.stream().filter(x -> x.getName().equals("deprecated")).forEach(x -> {
+                        if (x.getValue() != null){
+                            decompiled.append("\n  @deprecated \"\"\"\n")
+                                    .append("  ")
+                                    .append(x.getValue())
+                                    .append("\n  \"\"\"\n\n");
+                        }else{
+                            decompiled.append("\n  @deprecated\n");
+                        }
+                    });
+                }
+                List<Doc> functionDocs = documentation.getDocs() != null
+                        ? documentation.getDocs().getFunctionDocs(macroNameArity.name, macroNameArity.arity)
+                        : null;
+                if (functionDocs != null){
+                    functionDocs.forEach(x -> {
+                        String indentedDocs = Arrays.stream(x.getDocumentationText().split("\n"))
+                                .map(d -> "  " + d)
+                                .collect(Collectors.joining("\n"));
+                        decompiled.append("  @doc \"\"\"\n")
+                                .append(indentedDocs)
+                                .append("\n  \"\"\"\n");
+                    });
+                }
+            }
+
+            List<String> signaturesFromDocs = documentation != null && documentation.getBeamLanguage().equals("elixir")
+                    ? documentation.getDocs().getSignatures(macroNameArity.name, macroNameArity.arity)
+                    : null;
+            if (signaturesFromDocs != null && !signaturesFromDocs.isEmpty()){
+                decompiled.append("  def ");
+                Optional<String> optional = signaturesFromDocs.stream().findFirst();
+                decompiled.append(optional.get());
+                decompiled.append(" do\n    # body not decompiled\n  end\n");
+            }else{
+                appendMacroNameArity(decompiled, macroNameArity);
+            }
 
             lastMacroNameArity = macroNameArity;
         }

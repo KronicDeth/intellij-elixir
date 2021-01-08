@@ -33,78 +33,292 @@ public class DecompilerTest extends LightCodeInsightTestCase {
         Decompiler decompiler = new Decompiler();
         CharSequence decompiled = decompiler.decompile(virtualFile);
 
-        assertEquals(
-                "# Source code recreated from a .beam file by IntelliJ Elixir\n" +
-                "defmodule Bitwise do\n" +
-                "\n" +
-                "  # Macros\n" +
-                "\n" +
-                "  defmacro __using__(p0) do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
-                "  # Functions\n" +
-                "\n" +
-                "  def left &&& right do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
-                "  def left <<< right do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
-                "  def left >>> right do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
-                "  def left ^^^ right do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
-                "  def __info__(p0) do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
-                "  def band(p0, p1) do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
-                "  def bnot(p0) do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
-                "  def bor(p0, p1) do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
-                "  def bsl(p0, p1) do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
-                "  def bsr(p0, p1) do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
-                "  def bxor(p0, p1) do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
-                "  def module_info() do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
-                "  def module_info(p0) do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
-                "  def left ||| right do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
-                "  def ~~~(p0) do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "end\n",
+        assertEquals("# Source code recreated from a .beam file by IntelliJ Elixir\n" +
+                        "defmodule Bitwise do\n" +
+                        "  @moduleDoc \"\"\"\n" +
+                        "  A set of functions that perform calculations on bits.\n" +
+                        "  \n" +
+                        "  All bitwise functions work only on integers; otherwise an\n" +
+                        "  `ArithmeticError` is raised.\n" +
+                        "  \n" +
+                        "  The functions in this module come in two flavors: named or\n" +
+                        "  operators. For example:\n" +
+                        "  \n" +
+                        "      iex> use Bitwise\n" +
+                        "      iex> bnot(1) # named\n" +
+                        "      -2\n" +
+                        "      iex> 1 &&& 1 # operator\n" +
+                        "      1\n" +
+                        "  \n" +
+                        "  If you prefer to use only operators or skip them, you can\n" +
+                        "  pass the following options:\n" +
+                        "  \n" +
+                        "    * `:only_operators` - includes only operators\n" +
+                        "    * `:skip_operators` - skips operators\n" +
+                        "  \n" +
+                        "  For example:\n" +
+                        "  \n" +
+                        "      iex> use Bitwise, only_operators: true\n" +
+                        "      iex> 1 &&& 1\n" +
+                        "      1\n" +
+                        "  \n" +
+                        "  When invoked with no options, `use Bitwise` is equivalent\n" +
+                        "  to `import Bitwise`.\n" +
+                        "  \n" +
+                        "  All bitwise functions can be used in guards:\n" +
+                        "  \n" +
+                        "      iex> odd? = fn\n" +
+                        "      ...>   int when Bitwise.band(int, 1) == 1 -> true\n" +
+                        "      ...>   _ -> false\n" +
+                        "      ...> end\n" +
+                        "      iex> odd?.(1)\n" +
+                        "      true\n" +
+                        "  \n" +
+                        "  All functions in this module are inlined by the compiler.\n" +
+                        "  \"\"\"\n" +
+                        "\n" +
+                        "  # Macros\n" +
+                        "\n" +
+                        "  def __using__(options) do\n" +
+                        "    # body not decompiled\n" +
+                        "  end\n" +
+                        "\n" +
+                        "  # Functions\n" +
+                        "\n" +
+                        "  @doc \"\"\"\n" +
+                        "  Bitwise AND operator.\n" +
+                        "  \n" +
+                        "  Calculates the bitwise AND of its arguments.\n" +
+                        "  \n" +
+                        "  Allowed in guard tests. Inlined by the compiler.\n" +
+                        "  \n" +
+                        "  ## Examples\n" +
+                        "  \n" +
+                        "      iex> 9 &&& 3\n" +
+                        "      1\n" +
+                        "  \"\"\"\n" +
+                        "  def left &&& right do\n" +
+                        "    # body not decompiled\n" +
+                        "  end\n" +
+                        "\n" +
+                        "  @doc \"\"\"\n" +
+                        "  Arithmetic left bitshift operator.\n" +
+                        "  \n" +
+                        "  Calculates the result of an arithmetic left bitshift.\n" +
+                        "  \n" +
+                        "  Allowed in guard tests. Inlined by the compiler.\n" +
+                        "  \n" +
+                        "  ## Examples\n" +
+                        "  \n" +
+                        "      iex> 1 <<< 2\n" +
+                        "      4\n" +
+                        "  \n" +
+                        "      iex> 1 <<< -2\n" +
+                        "      0\n" +
+                        "  \n" +
+                        "      iex> -1 <<< 2\n" +
+                        "      -4\n" +
+                        "  \n" +
+                        "      iex> -1 <<< -2\n" +
+                        "      -1\n" +
+                        "  \"\"\"\n" +
+                        "  def left <<< right do\n" +
+                        "    # body not decompiled\n" +
+                        "  end\n" +
+                        "\n" +
+                        "  @doc \"\"\"\n" +
+                        "  Arithmetic right bitshift operator.\n" +
+                        "  \n" +
+                        "  Calculates the result of an arithmetic right bitshift.\n" +
+                        "  \n" +
+                        "  Allowed in guard tests. Inlined by the compiler.\n" +
+                        "  \n" +
+                        "  ## Examples\n" +
+                        "  \n" +
+                        "      iex> 1 >>> 2\n" +
+                        "      0\n" +
+                        "  \n" +
+                        "      iex> 1 >>> -2\n" +
+                        "      4\n" +
+                        "  \n" +
+                        "      iex> -1 >>> 2\n" +
+                        "      -1\n" +
+                        "  \n" +
+                        "      iex> -1 >>> -2\n" +
+                        "      -4\n" +
+                        "  \"\"\"\n" +
+                        "  def left >>> right do\n" +
+                        "    # body not decompiled\n" +
+                        "  end\n" +
+                        "\n" +
+                        "  @doc \"\"\"\n" +
+                        "  Bitwise XOR operator.\n" +
+                        "  \n" +
+                        "  Calculates the bitwise XOR of its arguments.\n" +
+                        "  \n" +
+                        "  Allowed in guard tests. Inlined by the compiler.\n" +
+                        "  \n" +
+                        "  ## Examples\n" +
+                        "  \n" +
+                        "      iex> 9 ^^^ 3\n" +
+                        "      10\n" +
+                        "  \"\"\"\n" +
+                        "  def left ^^^ right do\n" +
+                        "    # body not decompiled\n" +
+                        "  end\n" +
+                        "\n" +
+                        "  def __info__(p0) do\n" +
+                        "    # body not decompiled\n" +
+                        "  end\n" +
+                        "\n" +
+                        "  @doc \"\"\"\n" +
+                        "  Calculates the bitwise AND of its arguments.\n" +
+                        "  \n" +
+                        "  Allowed in guard tests. Inlined by the compiler.\n" +
+                        "  \n" +
+                        "  ## Examples\n" +
+                        "  \n" +
+                        "      iex> band(9, 3)\n" +
+                        "      1\n" +
+                        "  \"\"\"\n" +
+                        "  def band(left, right) do\n" +
+                        "    # body not decompiled\n" +
+                        "  end\n" +
+                        "\n" +
+                        "  @doc \"\"\"\n" +
+                        "  Calculates the bitwise NOT of the argument.\n" +
+                        "  \n" +
+                        "  Allowed in guard tests. Inlined by the compiler.\n" +
+                        "  \n" +
+                        "  ## Examples\n" +
+                        "  \n" +
+                        "      iex> bnot(2)\n" +
+                        "      -3\n" +
+                        "  \n" +
+                        "      iex> bnot(2) &&& 3\n" +
+                        "      1\n" +
+                        "  \"\"\"\n" +
+                        "  def bnot(expr) do\n" +
+                        "    # body not decompiled\n" +
+                        "  end\n" +
+                        "\n" +
+                        "  @doc \"\"\"\n" +
+                        "  Calculates the bitwise OR of its arguments.\n" +
+                        "  \n" +
+                        "  Allowed in guard tests. Inlined by the compiler.\n" +
+                        "  \n" +
+                        "  ## Examples\n" +
+                        "  \n" +
+                        "      iex> bor(9, 3)\n" +
+                        "      11\n" +
+                        "  \"\"\"\n" +
+                        "  def bor(left, right) do\n" +
+                        "    # body not decompiled\n" +
+                        "  end\n" +
+                        "\n" +
+                        "  @doc \"\"\"\n" +
+                        "  Calculates the result of an arithmetic left bitshift.\n" +
+                        "  \n" +
+                        "  Allowed in guard tests. Inlined by the compiler.\n" +
+                        "  \n" +
+                        "  ## Examples\n" +
+                        "  \n" +
+                        "      iex> bsl(1, 2)\n" +
+                        "      4\n" +
+                        "  \n" +
+                        "      iex> bsl(1, -2)\n" +
+                        "      0\n" +
+                        "  \n" +
+                        "      iex> bsl(-1, 2)\n" +
+                        "      -4\n" +
+                        "  \n" +
+                        "      iex> bsl(-1, -2)\n" +
+                        "      -1\n" +
+                        "  \"\"\"\n" +
+                        "  def bsl(left, right) do\n" +
+                        "    # body not decompiled\n" +
+                        "  end\n" +
+                        "\n" +
+                        "  @doc \"\"\"\n" +
+                        "  Calculates the result of an arithmetic right bitshift.\n" +
+                        "  \n" +
+                        "  Allowed in guard tests. Inlined by the compiler.\n" +
+                        "  \n" +
+                        "  ## Examples\n" +
+                        "  \n" +
+                        "      iex> bsr(1, 2)\n" +
+                        "      0\n" +
+                        "  \n" +
+                        "      iex> bsr(1, -2)\n" +
+                        "      4\n" +
+                        "  \n" +
+                        "      iex> bsr(-1, 2)\n" +
+                        "      -1\n" +
+                        "  \n" +
+                        "      iex> bsr(-1, -2)\n" +
+                        "      -4\n" +
+                        "  \"\"\"\n" +
+                        "  def bsr(left, right) do\n" +
+                        "    # body not decompiled\n" +
+                        "  end\n" +
+                        "\n" +
+                        "  @doc \"\"\"\n" +
+                        "  Calculates the bitwise XOR of its arguments.\n" +
+                        "  \n" +
+                        "  Allowed in guard tests. Inlined by the compiler.\n" +
+                        "  \n" +
+                        "  ## Examples\n" +
+                        "  \n" +
+                        "      iex> bxor(9, 3)\n" +
+                        "      10\n" +
+                        "  \"\"\"\n" +
+                        "  def bxor(left, right) do\n" +
+                        "    # body not decompiled\n" +
+                        "  end\n" +
+                        "\n" +
+                        "  def module_info() do\n" +
+                        "    # body not decompiled\n" +
+                        "  end\n" +
+                        "\n" +
+                        "  def module_info(p0) do\n" +
+                        "    # body not decompiled\n" +
+                        "  end\n" +
+                        "\n" +
+                        "  @doc \"\"\"\n" +
+                        "  Bitwise OR operator.\n" +
+                        "  \n" +
+                        "  Calculates the bitwise OR of its arguments.\n" +
+                        "  \n" +
+                        "  Allowed in guard tests. Inlined by the compiler.\n" +
+                        "  \n" +
+                        "  ## Examples\n" +
+                        "  \n" +
+                        "      iex> 9 ||| 3\n" +
+                        "      11\n" +
+                        "  \"\"\"\n" +
+                        "  def left ||| right do\n" +
+                        "    # body not decompiled\n" +
+                        "  end\n" +
+                        "\n" +
+                        "  @doc \"\"\"\n" +
+                        "  Bitwise NOT unary operator.\n" +
+                        "  \n" +
+                        "  Calculates the bitwise NOT of the argument.\n" +
+                        "  \n" +
+                        "  Allowed in guard tests. Inlined by the compiler.\n" +
+                        "  \n" +
+                        "  ## Examples\n" +
+                        "  \n" +
+                        "      iex> ~~~2\n" +
+                        "      -3\n" +
+                        "  \n" +
+                        "      iex> ~~~2 &&& 3\n" +
+                        "      1\n" +
+                        "  \"\"\"\n" +
+                        "  def ~~~expr do\n" +
+                        "    # body not decompiled\n" +
+                        "  end\n" +
+                        "end\n",
                 decompiled.toString()
         );
     }
