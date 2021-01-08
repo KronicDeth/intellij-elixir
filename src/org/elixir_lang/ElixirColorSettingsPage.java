@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
 
 import static com.intellij.openapi.util.io.FileUtil.loadTextAndClose;
@@ -70,7 +71,7 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
     };
 
     static {
-        TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG = ContainerUtil.newHashMap();
+        TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG = new HashMap<>();
         TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG.put(
                 "alias",
                 ElixirSyntaxHighlighter.ALIAS

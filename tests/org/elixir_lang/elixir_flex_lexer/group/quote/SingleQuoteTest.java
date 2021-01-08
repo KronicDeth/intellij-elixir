@@ -42,7 +42,7 @@ public class SingleQuoteTest extends Test {
                FRAGMENT_TYPE,
                Arrays.asList(
                        new Object[][] {
-                               { "'", ElixirTypes.CHAR_LIST_TERMINATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE },
+                               { "'", ElixirTypes.CHAR_LIST_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE },
                                { "\"", FRAGMENT_TYPE, LEXICAL_STATE }
                        }
                )

@@ -9,7 +9,7 @@ object FieldType {
 
     private const val SUBTYPE = "field_type"
 
-    private fun toMacroString(type: OtpErlangTuple): MacroString {
+    private fun toMacroString(@Suppress("UNUSED_PARAMETER") type: OtpErlangTuple): MacroString {
         TODO()
     }
 }

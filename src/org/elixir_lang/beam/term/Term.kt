@@ -207,7 +207,7 @@ class Character(val codePoint: Int) : Term() {
 class Float : Term() {
     companion object {
         fun from(data: ByteArray, offset: Int): Pair<Float, ByteCount> {
-            return Pair(Float(), 0)
+            TODO("decode $data at offset $offset as Float")
         }
     }
 }

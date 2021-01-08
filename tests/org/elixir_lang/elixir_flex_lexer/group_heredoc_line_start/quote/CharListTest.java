@@ -37,7 +37,7 @@ public class CharListTest extends TokenTest {
                 new Object[][]{
                         { " '''", ElixirTypes.HEREDOC_PREFIX_WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false },
                         { " \"\"\"", ElixirTypes.HEREDOC_LINE_WHITE_SPACE_TOKEN, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY, false },
-                        { "'''", ElixirTypes.CHAR_LIST_HEREDOC_TERMINATOR, ElixirFlexLexer.YYINITIAL, true },
+                        { "'''", ElixirTypes.CHAR_LIST_HEREDOC_TERMINATOR, ElixirFlexLexer.ADDITION_OR_SUBTRACTION_MAYBE, true },
                         { ";", ElixirTypes.CHAR_LIST_FRAGMENT, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY, true },
                         { "\"\"\"", ElixirTypes.CHAR_LIST_FRAGMENT, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY, true },
                         { "\f'''", ElixirTypes.HEREDOC_PREFIX_WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false },

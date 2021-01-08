@@ -17,8 +17,6 @@ import org.elixir_lang.Level.V_1_6
 import org.elixir_lang.Macro
 import org.elixir_lang.mix.project.computeReadAction
 import org.elixir_lang.psi.*
-import org.elixir_lang.psi.call.name.Module.KERNEL
-import org.elixir_lang.psi.call.name.Module.prependElixirPrefix
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.IDENTIFIER_TOKEN_SET
 import org.elixir_lang.psi.impl.ParentImpl.addChildTextCodePoints
 import org.elixir_lang.psi.impl.ParentImpl.elixirCharList
@@ -262,7 +260,7 @@ object QuotableImpl {
     @Contract(pure = true)
     @JvmStatic
     fun quote(charListLine: ElixirCharListLine): OtpErlangObject =
-            quotedChildNodes(charListLine, *childNodes(charListLine.quoteCharListBody!!))
+            quotedChildNodes(charListLine, *childNodes(charListLine.charListLineBody!!))
 
     @Contract(pure = true)
     @JvmStatic
@@ -756,7 +754,10 @@ object QuotableImpl {
                 quotedRelativeIdentifier
         )
 
-        val callMetadata = Macro.metadata(quotedIdentifier)
+        val callMetadata = OtpErlangList(arrayOf<OtpErlangObject>(
+                keywordTuple("no_parens", true),
+                lineNumberKeywordTuple(relativeIdentifier.node)
+        ))
 
         val quotedContainer = quotedFunctionCall(
                 quotedIdentifier,
@@ -792,9 +793,19 @@ object QuotableImpl {
 
         val doBlock = qualifiedNoArgumentsCall.doBlock
 
+        val line = lineNumberKeywordTuple(relativeIdentifier.node)
+
+        val metadataElements = if (doBlock != null) {
+            arrayOf(line)
+        } else {
+            arrayOf(keywordTuple("no_parens", true), line)
+        }
+
+        val quotedBlockCallMetadata = OtpErlangList(metadataElements)
+
         return quotedBlockCall(
                 quotedIdentifier,
-                metadata(relativeIdentifier),
+                quotedBlockCallMetadata,
                 emptyArray(),
                 doBlock
         )
@@ -1153,7 +1164,7 @@ object QuotableImpl {
     @Contract(pure = true)
     @JvmStatic
     fun quote(stringLine: ElixirStringLine): OtpErlangObject =
-            quotedChildNodes(stringLine, *childNodes(stringLine.quoteStringBody!!))
+            quotedChildNodes(stringLine, *childNodes(stringLine.stringLineBody!!))
 
     @Contract(pure = true)
     @JvmStatic
@@ -1269,36 +1280,6 @@ object QuotableImpl {
         }
     }
 
-    /* "#{a}" is transformed to "<<Kernel.to_string(a) :: binary>>" in
-     * `"\"\#{a}\"" |> Code.string_to_quoted |> Macro.to_string`, so interpolation has to be represented as a type call
-     * (`:::`) to binary of a call of `Kernel.to_string`
-     */
-    @Contract(pure = true)
-    @JvmStatic
-    fun quote(interpolation: ElixirInterpolation): OtpErlangObject {
-        val level = getNonNullRelease(interpolation).level()
-        val quotedChildren = quote(interpolation.children, level)
-        val interpolationMetadata = metadata(interpolation)
-
-        val quotedKernelToStringCall = quotedFunctionCall(
-                prependElixirPrefix(KERNEL),
-                "to_string",
-                interpolationMetadata,
-                quotedChildren
-        )
-        val quotedBinaryCall = quotedVariable(
-                "binary",
-                interpolationMetadata
-        )
-
-        return quotedFunctionCall(
-                "::",
-                interpolationMetadata,
-                quotedKernelToStringCall,
-                quotedBinaryCall
-        )
-    }
-
     @Contract(pure = true)
     @JvmStatic
     fun quote(identifier: ElixirIdentifier): OtpErlangObject = OtpErlangAtom(identifier.text)
@@ -1315,7 +1296,7 @@ object QuotableImpl {
 
         return if (decimalFloatExponent != null) {
             val exponentDigitsList = decimalFloatExponent.decimalWholeNumber.digitsList()
-            val exponentSignString = decimalFloatExponent.decimalFloatExponentSign.text
+            val exponentSignString = decimalFloatExponent.decimalFloatExponentSign?.text ?: ""
             val exponentString = compactDigits(exponentDigitsList)
 
             val floatString = String.format(
@@ -1373,7 +1354,7 @@ object QuotableImpl {
                     override fun visitElement(element: PsiElement) {
                         if (element is Quotable) {
                             visitQuotable((element as Quotable?)!!)
-                        } else if (element != null && !element.isUnquoted()) {
+                        } else if (!element.isUnquoted()) {
                             throw TODO("Don't know how to visit $element")
                         }
 
@@ -1396,13 +1377,26 @@ object QuotableImpl {
     @Contract(pure = true)
     @JvmStatic
     fun quote(sigil: Sigil, quotedContent: OtpErlangObject): OtpErlangObject {
+        val sigilLine = lineNumberKeywordTuple(sigil.node)
+        val sigilBinaryMetadataArray =
+                sigil.indentation()
+                        ?.let { indentation -> arrayOf<OtpErlangObject>(keywordTuple("indentation", indentation), sigilLine) }
+                        ?: arrayOf<OtpErlangObject>(sigilLine)
+        val sigilBinaryMetadata = OtpErlangList(sigilBinaryMetadataArray)
+        val sigilBinary = when (quotedContent) {
+            is OtpErlangTuple -> {
+                assert(quotedContent.arity() == 3)
+                OtpErlangTuple(arrayOf(quotedContent.elementAt(0), sigilBinaryMetadata, quotedContent.elementAt(2)))
+            }
+            else -> quotedFunctionCall("<<>>", sigilBinaryMetadata, quotedContent)
+        }
+
         val sigilName = sigil.sigilName()
-        val sigilMetadata = metadata(sigil)
-        val sigilBinary = quotedContent as? OtpErlangTuple ?: quotedFunctionCall("<<>>", sigilMetadata, quotedContent)
         val quotedModifiers = sigil.sigilModifiers.quote()
+        val sigilMetadata = OtpErlangList(arrayOf<OtpErlangObject>(keywordTuple("delimiter", sigil.sigilDelimiter()), sigilLine))
 
         return quotedFunctionCall(
-                "sigil_" + sigilName,
+                "sigil_$sigilName",
                 sigilMetadata,
                 sigilBinary,
                 quotedModifiers
@@ -1457,15 +1451,35 @@ object QuotableImpl {
         )
     }
 
+    private fun keywordTuple(key: String, value: Boolean): OtpErlangTuple {
+        val keyAtom = OtpErlangAtom(key)
+        val valueAtom = OtpErlangAtom(value)
+
+        return keywordTuple(keyAtom, valueAtom)
+    }
+
     private fun keywordTuple(key: String, value: Int): OtpErlangTuple {
         val keyAtom = OtpErlangAtom(key)
         val valueInt = OtpErlangInt(value)
 
-        return OtpErlangTuple(arrayOf(keyAtom, valueInt))
+        return keywordTuple(keyAtom, valueInt)
     }
+
+    private fun keywordTuple(key: String, value: String): OtpErlangTuple {
+        val keyAtom  = OtpErlangAtom(key)
+        val valueBinary = OtpErlangBinary(value.toByteArray())
+
+        return keywordTuple(keyAtom, valueBinary)
+    }
+
+    private fun keywordTuple(key: OtpErlangAtom, value: OtpErlangObject): OtpErlangTuple =
+            OtpErlangTuple(arrayOf(key, value))
 
     /* Returns the 0-indexed line number for the element */
     private fun lineNumber(node: ASTNode): Int = node.psi.document()!!.getLineNumber(node.startOffset)
+
+    private fun lineNumberKeywordTuple(operator: Operator): OtpErlangTuple =
+            lineNumberKeywordTuple(operator.operatorTokenNode())
 
     private fun lineNumberKeywordTuple(node: ASTNode): OtpErlangTuple =
             keywordTuple(
@@ -1560,7 +1574,7 @@ object QuotableImpl {
     @JvmStatic
     fun childNodes(parentElement: PsiElement): Array<ASTNode> = parentElement.node.getChildren(null)
 
-    private fun quotedChildNodes(parent: Parent, vararg children: ASTNode): OtpErlangObject =
+    fun quotedChildNodes(parent: Parent, vararg children: ASTNode): OtpErlangObject =
             quotedChildNodes(parent, metadata(parent), *children)
 
     private fun quotedChildNodes(parent: Parent, metadata: OtpErlangList, vararg children: ASTNode): OtpErlangObject {
@@ -1577,7 +1591,7 @@ object QuotableImpl {
             for (child in children) {
                 val elementType = child.elementType
 
-                if (elementType === parent.fragmentType) {
+                if ((elementType === parent.fragmentType) || (elementType === ElixirTypes.EOL)) {
                     codePointList = parent.addFragmentCodePoints(codePointList, child)
                 } else if (elementType === ElixirTypes.ESCAPED_CHARACTER) {
                     codePointList = parent.addEscapedCharacterCodePoints(codePointList, child)
@@ -1592,7 +1606,7 @@ object QuotableImpl {
                     }
 
                     val childElement = child.psi as ElixirInterpolation
-                    quotedParentList.add(childElement.quote())
+                    quotedParentList.add(parent.quoteInterpolation(childElement))
                 } else if (elementType === ElixirTypes.QUOTE_HEXADECIMAL_ESCAPE_SEQUENCE || elementType === ElixirTypes.SIGIL_HEXADECIMAL_ESCAPE_SEQUENCE) {
                     codePointList = parent.addHexadecimalEscapeSequenceCodePoints(codePointList, child)
                 } else {
@@ -1607,8 +1621,7 @@ object QuotableImpl {
                     quotedParentList.add(elixirString(codePointList))
                 }
 
-                val binaryConstruction = quotedFunctionCall("<<>>", metadata, *quotedParentList.toTypedArray())
-                parent.quoteBinary(binaryConstruction)
+                parent.quoteBinary(metadata, quotedParentList)
             }
         }
 
@@ -1623,7 +1636,7 @@ object QuotableImpl {
             )
 
     @Contract(pure = true)
-    private fun quotedVariable(identifier: String, metadata: OtpErlangList): OtpErlangObject =
+    fun quotedVariable(identifier: String, metadata: OtpErlangList): OtpErlangObject =
             quotedVariable(
                     OtpErlangAtom(identifier),
                     metadata
@@ -1651,24 +1664,10 @@ object QuotableImpl {
             heredocDescendantNodes.add(excessWhitespace)
         }
 
-        val level = getNonNullRelease(line).level()
         val childNodes = childNodes(line.body)
+        Collections.addAll(heredocDescendantNodes, *childNodes)
 
-        if (level < V_1_3 &&
-                childNodes.isNotEmpty() &&
-                childNodes[childNodes.size - 1].elementType == ElixirTypes.ESCAPED_EOL) {
-            heredocDescendantNodes.addAll(Arrays.asList(*childNodes).subList(0, childNodes.size - 1))
-        } else {
-            Collections.addAll(heredocDescendantNodes, *childNodes)
-            val eolNode = Factory.createSingleLeafElement(
-                    fragmentType,
-                    "\n",
-                    0,
-                    1, null,
-                    line.manager
-            )
-            heredocDescendantNodes.add(eolNode)
-        }
+        heredocDescendantNodes.add(line.lastChild.node)
     }
 
     @Contract(pure = true)

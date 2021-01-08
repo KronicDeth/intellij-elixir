@@ -41,7 +41,7 @@ public class TripleDoubleQuotesTest extends Test {
         return Arrays.asList(
                 new Object[][]{
                         {"'''", FRAGMENT_TYPE, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY, true},
-                        {"\"\"\"", TERMINATOR_TYPE, ElixirFlexLexer.YYINITIAL, true}
+                        {"\"\"\"", TERMINATOR_TYPE, ElixirFlexLexer.ADDITION_OR_SUBTRACTION_MAYBE, true}
                 }
         );
     }

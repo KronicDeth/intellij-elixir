@@ -13,7 +13,7 @@ class Type: ConfigurationTypeBase(TYPE_ID, TYPE_NAME, "Runs a Mix command", Icon
 
     companion object {
         val INSTANCE: Type
-            get() = Extensions.findExtension<ConfigurationType, Type>(ConfigurationType.CONFIGURATION_TYPE_EP, Type::class.java)
+            get() = ConfigurationType.CONFIGURATION_TYPE_EP.findExtensionOrFail(Type::class.java)
     }
 }
 

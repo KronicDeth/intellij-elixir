@@ -35,7 +35,7 @@ public class DecimalIntegerTest extends TokenTest {
         // start to trigger DECIMAL_WHOLE_NUMBER state
         CharSequence fullCharSequence = "1" + charSequence;
         super.start(fullCharSequence);
-        // consume '0'
+        // consume '1'
         lexer.advance();
     }
 
@@ -44,7 +44,7 @@ public class DecimalIntegerTest extends TokenTest {
     )
     public static Collection<Object[]> generateData() {
         return Arrays.asList(new Object[][]{
-                { " ", TokenType.WHITE_SPACE, ElixirFlexLexer.YYINITIAL, true },
+                { " ", TokenType.WHITE_SPACE, ElixirFlexLexer.ADDITION_OR_SUBTRACTION_MAYBE, true },
                 { "!", ElixirTypes.UNARY_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
                 { "#", ElixirTypes.COMMENT, ElixirFlexLexer.YYINITIAL, true },
                 { "$", TokenType.BAD_CHARACTER, ElixirFlexLexer.YYINITIAL, true },
@@ -53,11 +53,11 @@ public class DecimalIntegerTest extends TokenTest {
                 { "'", ElixirTypes.CHAR_LIST_PROMOTER, ElixirFlexLexer.GROUP, true },
                 { "'''", ElixirTypes.CHAR_LIST_HEREDOC_PROMOTER, ElixirFlexLexer.GROUP_HEREDOC_START, true },
                 { "(", ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE, true },
-                { ")", ElixirTypes.CLOSING_PARENTHESIS, ElixirFlexLexer.YYINITIAL, true },
+                { ")", ElixirTypes.CLOSING_PARENTHESIS, ElixirFlexLexer.ADDITION_OR_SUBTRACTION_MAYBE, true },
                 { "*", ElixirTypes.MULTIPLICATION_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE, true },
-                { "+", ElixirTypes.DUAL_OPERATOR, ElixirFlexLexer.DUAL_OPERATION, true },
-                { ",", ElixirTypes.COMMA, ElixirFlexLexer.SIGN_OPERATION_MAYBE, true },
-                { "-", ElixirTypes.DUAL_OPERATOR, ElixirFlexLexer.DUAL_OPERATION, true },
+                { "+", ElixirTypes.ADDITION_OPERATOR, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE, true },
+                { ",", ElixirTypes.COMMA, ElixirFlexLexer.YYINITIAL, true },
+                { "-", ElixirTypes.SUBTRACTION_OPERATOR, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE, true },
                 { ".", ElixirTypes.DOT_OPERATOR, ElixirFlexLexer.DOT_OPERATION, true },
                 { ".2", ElixirTypes.DECIMAL_MARK, ElixirFlexLexer.DECIMAL_FRACTION, false },
                 { "/", ElixirTypes.DIVISION_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE, true },
@@ -107,9 +107,9 @@ public class DecimalIntegerTest extends TokenTest {
                 { "[", ElixirTypes.OPENING_BRACKET, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE, true },
                 { "\"", ElixirTypes.STRING_PROMOTER, ElixirFlexLexer.GROUP, true },
                 { "\"\"\"", ElixirTypes.STRING_HEREDOC_PROMOTER, ElixirFlexLexer.GROUP_HEREDOC_START, true },
-                { "\n", ElixirTypes.EOL, ElixirFlexLexer.SIGN_OPERATION_MAYBE, true },
-                { "\r\n", ElixirTypes.EOL, ElixirFlexLexer.SIGN_OPERATION_MAYBE, true },
-                { "]", ElixirTypes.CLOSING_BRACKET, ElixirFlexLexer.YYINITIAL, true },
+                { "\n", ElixirTypes.EOL, ElixirFlexLexer.YYINITIAL, true },
+                { "\r\n", ElixirTypes.EOL, ElixirFlexLexer.YYINITIAL, true },
+                { "]", ElixirTypes.CLOSING_BRACKET, ElixirFlexLexer.ADDITION_OR_SUBTRACTION_MAYBE, true },
                 { "^", ElixirTypes.UNARY_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
                 { "_", ElixirTypes.NUMBER_SEPARATOR, ElixirFlexLexer.DECIMAL_WHOLE_NUMBER, true },
                 { "`", TokenType.BAD_CHARACTER, ElixirFlexLexer.YYINITIAL, true },
@@ -141,7 +141,7 @@ public class DecimalIntegerTest extends TokenTest {
                 { "z", ElixirTypes.INVALID_DECIMAL_DIGITS, ElixirFlexLexer.DECIMAL_WHOLE_NUMBER, true },
                 { "{", ElixirTypes.OPENING_CURLY, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE, true },
                 { "|", ElixirTypes.PIPE_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE, true },
-                { "}", ElixirTypes.CLOSING_CURLY, ElixirFlexLexer.YYINITIAL, true },
+                { "}", ElixirTypes.CLOSING_CURLY, ElixirFlexLexer.ADDITION_OR_SUBTRACTION_MAYBE, true },
                 { "~", ElixirTypes.TILDE, ElixirFlexLexer.SIGIL, true }
         });
     }

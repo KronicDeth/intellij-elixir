@@ -32,7 +32,7 @@ internal class SuspendContext(val process: Process,
     init {
         var activeExecutionStack: ExecutionStack? = null
 
-        executionStacks = snapshots.mapIndexed { index, snapshot ->
+        executionStacks = snapshots.map { snapshot ->
             val executionStack = ExecutionStack(process, snapshot)
 
             if (snapshot.pid == activePid) {

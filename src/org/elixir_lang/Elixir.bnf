@@ -331,6 +331,7 @@
     quote
     quoteBinary
     quoteEmpty
+    quoteInterpolation
     quoteLiteral
   ]
 
@@ -346,6 +347,7 @@
     quoteAsAtom
     quoteBinary
     quoteEmpty
+    quoteInterpolation
     quoteLiteral
   ]
 
@@ -357,10 +359,13 @@
     addHexadecimalEscapeSequenceCodePoints
     getFragmentType
     getHeredocLineList
+    indentation
     quote
     quoteBinary
     quoteEmpty
+    quoteInterpolation
     quoteLiteral
+    sigilDelimiter
     sigilName
   ]
 
@@ -372,10 +377,13 @@
     addHexadecimalEscapeSequenceCodePoints
     getBody
     getFragmentType
+    indentation
     quote
     quoteBinary
     quoteEmpty
+    quoteInterpolation
     quoteLiteral
+    sigilDelimiter
     sigilName
     terminator
   ]
@@ -391,6 +399,7 @@
   tokenTypeClass="org.elixir_lang.psi.ElixirTokenType"
 
   tokens = [
+    ADDITION_OPERATOR = "+"
     AFTER = "after"
     ALIAS_TOKEN = "Alias"
     AND_SYMBOL_OPERATOR = "&&&, &&"
@@ -412,7 +421,7 @@
     CHAR_LIST_SIGIL_HEREDOC_PROMOTER = "Char List Sigil Heredoc Promoter (\"\"\", ''')"
     CHAR_LIST_SIGIL_HEREDOC_TERMINATOR = "Char List Sigil Heredoc Terminator (\"\"\", ''')"
     CHAR_LIST_SIGIL_PROMOTER = "Char List Sigil Promoter ({, [, <, \", /, (, |, ')"
-    CHAR_LIST_SIGIL_TERMINATOR = "Char List Sigil Terminator ({, [, <, \", /, (, |, ')"
+    CHAR_LIST_SIGIL_TERMINATOR = "Char List Sigil Terminator (}, ], >, \", /, ), |, ')"
     CHAR_LIST_TERMINATOR = "Char List Terminator (')"
     CHAR_TOKENIZER = "?"
     CLOSING_BIT = ">>"
@@ -428,7 +437,6 @@
     DIVISION_OPERATOR = "/"
     DO = "do"
     DOT_OPERATOR = "."
-    DUAL_OPERATOR = "Dual Operator (+, -)"
     EEX_CLOSING = "%>"
     EEX_COMMENT = "EEx Comment"
     EEX_COMMENT_MARKER = "EEx Comment Marker (#)"
@@ -475,10 +483,13 @@
     LITERAL_WORDS_SIGIL_NAME = "W"
     MAP_OPERATOR = "%{}"
     MATCH_OPERATOR = "="
+    MINUS_OPERATOR = "-"
     MULTIPLICATION_OPERATOR = "*"
+    NEGATE_OPERATOR = "-"
     NIL = "nil"
     NOT_OPERATOR = "not"
     NUMBER_SEPARATOR = "_"
+    NUMBER_OR_BADARITH_OPERATOR = "+"
     OBSOLETE_BINARY_WHOLE_NUMBER_BASE = "B"
     OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE = "X"
     OCTAL_WHOLE_NUMBER_BASE = "o"
@@ -489,6 +500,7 @@
     OR_SYMBOL_OPERATOR = "|||, ||"
     OR_WORD_OPERATOR = "`or`"
     PIPE_OPERATOR = "|"
+    PLUS_OPERATOR = "+"
     RANGE_OPERATOR = ".."
     REGEX_FRAGMENT = "Regex Fragment"
     REGEX_HEREDOC_PROMOTER = "Regex Heredoc Promoter (\"\"\", ''')"
@@ -505,7 +517,6 @@
     SIGIL_MODIFIER = "Sigil Modifier (A-Z, a-z)"
     SIGIL_PROMOTER = "Sigil Promoter ({, [, <, \", /, (, |, ')"
     SIGIL_TERMINATOR = "Sigil Terminator ({, [, <, \", /, (, |, ')"
-    SIGNIFICANT_WHITE_SPACE = "<significant-space>";
     SIGN_OPERATOR = "Sign Operator (+, -)"
     STAB_OPERATOR = "->"
     STRING_FRAGMENT = "String Fragment"
@@ -519,6 +530,7 @@
     STRING_TERMINATOR = "String Terminator (\")"
     // TODO remove once containers are available for `{}` after alias for empty structs
     STRUCT_OPERATOR = "%"
+    SUBTRACTION_OPERATOR = "-"
     TILDE = "~"
     TRUE = "true"
     TUPLE_OPERATOR = "{}"
@@ -642,7 +654,7 @@ noParenthesesStrict ::= emptyParentheses |
    2. (positional, positional)
    3. (positional, positional, keywords) */
 private noParenthesesManyArguments ::= matchedExpression infixComma noParenthesesKeywords |
-                                       !additionTail matchedExpression (infixComma noParenthesesExpression)+ (infixComma noParenthesesKeywords)?
+                                       matchedExpression (infixComma noParenthesesExpression)+ (infixComma noParenthesesKeywords)?
 private noParenthesesManyArgumentsStrict ::= noParenthesesManyArguments |
                                              noParenthesesStrict
 
@@ -746,7 +758,8 @@ charListHeredoc ::= CHAR_LIST_HEREDOC_PROMOTER EOL
                       ]
                       pin = CHAR_LIST_HEREDOC_PROMOTER
                     }
-charListHeredocLine ::= heredocLinePrefix quoteCharListBody EOL
+// EOL is optional because when last line EOL is escaped (See https://github.com/KronicDeth/intellij-elixir/issues/1843)
+charListHeredocLine ::= heredocLinePrefix charListHeredocLineBody heredocLineEnd
                         {
                           implements = [
                             "org.elixir_lang.psi.HeredocLine"
@@ -756,6 +769,8 @@ charListHeredocLine ::= heredocLinePrefix quoteCharListBody EOL
                             quote
                           ]
                         }
+charListHeredocLineBody ::= (interpolation | CHAR_LIST_FRAGMENT | heredocEscapeSequence)*
+                            { implements = "org.elixir_lang.psi.Body" }
 
 /*
  * String Heredoc
@@ -771,7 +786,8 @@ stringHeredoc ::= STRING_HEREDOC_PROMOTER EOL
                     ]
                     pin = STRING_HEREDOC_PROMOTER
                   }
-stringHeredocLine ::= heredocLinePrefix quoteStringBody EOL
+// EOL is optional because when last line EOL is escaped (See https://github.com/KronicDeth/intellij-elixir/issues/1843)
+stringHeredocLine ::= heredocLinePrefix stringHeredocLineBody heredocLineEnd
                       {
                         implements = [
                           "org.elixir_lang.psi.HeredocLine"
@@ -781,6 +797,8 @@ stringHeredocLine ::= heredocLinePrefix quoteStringBody EOL
                           quote
                         ]
                       }
+stringHeredocLineBody ::= (interpolation | STRING_FRAGMENT | heredocEscapeSequence)*
+                          { implements = "org.elixir_lang.psi.Body" }
 
 /*
  *
@@ -801,7 +819,7 @@ interpolatedCharListSigilHeredoc ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CH
                                        ]
                                        pin = CHAR_LIST_SIGIL_HEREDOC_PROMOTER
                                      }
-interpolatedCharListHeredocLine ::= heredocLinePrefix interpolatedCharListBody EOL
+interpolatedCharListHeredocLine ::= heredocLinePrefix interpolatedCharListHeredocLineBody heredocLineEnd
                                     {
                                       implements = [
                                         "org.elixir_lang.psi.HeredocLine"
@@ -811,8 +829,8 @@ interpolatedCharListHeredocLine ::= heredocLinePrefix interpolatedCharListBody E
                                         quote
                                       ]
                                     }
-interpolatedCharListBody ::= (interpolation | CHAR_LIST_FRAGMENT | sigilEscapeSequence)*
-                             { implements = "org.elixir_lang.psi.Body" }
+interpolatedCharListHeredocLineBody ::= (interpolation | CHAR_LIST_FRAGMENT | sigilHeredocEscapeSequence)*
+                                        { implements = "org.elixir_lang.psi.Body" }
 
 interpolatedRegexHeredoc ::= TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_HEREDOC_PROMOTER EOL
                              interpolatedRegexHeredocLine*
@@ -824,7 +842,7 @@ interpolatedRegexHeredoc ::= TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_HEREDOC_
                                ]
                                pin = REGEX_HEREDOC_PROMOTER
                              }
-interpolatedRegexHeredocLine ::= heredocLinePrefix interpolatedRegexBody EOL
+interpolatedRegexHeredocLine ::= heredocLinePrefix interpolatedRegexHeredocLineBody heredocLineEnd
                                  {
                                    implements = [
                                      "org.elixir_lang.psi.HeredocLine"
@@ -834,7 +852,7 @@ interpolatedRegexHeredocLine ::= heredocLinePrefix interpolatedRegexBody EOL
                                      quote
                                    ]
                                  }
-interpolatedRegexBody ::= (interpolation | REGEX_FRAGMENT | sigilEscapeSequence)*
+interpolatedRegexHeredocLineBody ::= (interpolation | REGEX_FRAGMENT | sigilHeredocEscapeSequence)*
                           { implements = "org.elixir_lang.psi.Body" }
 
 interpolatedSigilHeredoc ::= TILDE INTERPOLATING_SIGIL_NAME SIGIL_HEREDOC_PROMOTER EOL
@@ -847,7 +865,7 @@ interpolatedSigilHeredoc ::= TILDE INTERPOLATING_SIGIL_NAME SIGIL_HEREDOC_PROMOT
                                ]
                                pin = SIGIL_HEREDOC_PROMOTER
                              }
-interpolatedSigilHeredocLine ::= heredocLinePrefix interpolatedSigilBody EOL
+interpolatedSigilHeredocLine ::= heredocLinePrefix interpolatedSigilHeredocLineBody heredocLineEnd
                                  {
                                    implements = [
                                      "org.elixir_lang.psi.HeredocLine"
@@ -857,8 +875,8 @@ interpolatedSigilHeredocLine ::= heredocLinePrefix interpolatedSigilBody EOL
                                      quote
                                    ]
                                  }
-interpolatedSigilBody ::= (interpolation | SIGIL_FRAGMENT | sigilEscapeSequence)*
-                          { implements = "org.elixir_lang.psi.Body" }
+interpolatedSigilHeredocLineBody ::= (interpolation | SIGIL_FRAGMENT | sigilHeredocEscapeSequence)*
+                                     { implements = "org.elixir_lang.psi.Body" }
 
 interpolatedStringSigilHeredoc ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_HEREDOC_PROMOTER EOL
                                    interpolatedStringHeredocLine*
@@ -871,7 +889,7 @@ interpolatedStringSigilHeredoc ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_
                                      ]
                                      pin = STRING_SIGIL_HEREDOC_PROMOTER
                                    }
-interpolatedStringHeredocLine ::= heredocLinePrefix interpolatedStringBody EOL
+interpolatedStringHeredocLine ::= heredocLinePrefix interpolatedStringHeredocLineBody heredocLineEnd
                                   {
                                     implements = [
                                       "org.elixir_lang.psi.HeredocLine"
@@ -881,8 +899,8 @@ interpolatedStringHeredocLine ::= heredocLinePrefix interpolatedStringBody EOL
                                       quote
                                     ]
                                   }
-interpolatedStringBody ::= (interpolation | STRING_FRAGMENT | sigilEscapeSequence)*
-                           { implements = "org.elixir_lang.psi.Body" }
+interpolatedStringHeredocLineBody ::= (interpolation | STRING_FRAGMENT | sigilHeredocEscapeSequence)*
+                                      { implements = "org.elixir_lang.psi.Body" }
 
 interpolatedWordsHeredoc ::= TILDE INTERPOLATING_WORDS_SIGIL_NAME WORDS_HEREDOC_PROMOTER EOL
                              interpolatedWordsHeredocLine*
@@ -894,7 +912,8 @@ interpolatedWordsHeredoc ::= TILDE INTERPOLATING_WORDS_SIGIL_NAME WORDS_HEREDOC_
                                ]
                                pin = WORDS_HEREDOC_PROMOTER
                              }
-interpolatedWordsHeredocLine ::= heredocLinePrefix interpolatedWordsBody EOL
+// EOL is optional because when last line EOL is escaped (See https://github.com/KronicDeth/intellij-elixir/issues/1843)
+interpolatedWordsHeredocLine ::= heredocLinePrefix interpolatedWordsHeredocLineBody heredocLineEnd
                                  {
                                    implements = [
                                      "org.elixir_lang.psi.HeredocLine"
@@ -904,8 +923,8 @@ interpolatedWordsHeredocLine ::= heredocLinePrefix interpolatedWordsBody EOL
                                      quote
                                    ]
                                  }
-interpolatedWordsBody ::= (interpolation | WORDS_FRAGMENT | sigilEscapeSequence)*
-                          { implements = "org.elixir_lang.psi.Body" }
+interpolatedWordsHeredocLineBody ::= (interpolation | WORDS_FRAGMENT | sigilHeredocEscapeSequence)*
+                                     { implements = "org.elixir_lang.psi.Body" }
 
 /*
  * Literal Sigil Heredocs
@@ -921,7 +940,8 @@ literalCharListSigilHeredoc ::= TILDE LITERAL_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIG
                                   ]
                                   pin = CHAR_LIST_SIGIL_HEREDOC_PROMOTER
                                 }
-literalCharListHeredocLine ::= heredocLinePrefix literalCharListBody EOL
+// EOL is optional because when last line EOL is escaped (See https://github.com/KronicDeth/intellij-elixir/issues/1843)
+literalCharListHeredocLine ::= heredocLinePrefix literalCharListHeredocLineBody heredocLineEnd
                                {
                                  implements = [
                                    "org.elixir_lang.psi.HeredocLine"
@@ -932,8 +952,8 @@ literalCharListHeredocLine ::= heredocLinePrefix literalCharListBody EOL
                                  ]
                                }
 // literals can have escape sequences for escaped terminator
-literalCharListBody ::= (CHAR_LIST_FRAGMENT | sigilEscapeSequence)*
-                        { implements = "org.elixir_lang.psi.Body" }
+literalCharListHeredocLineBody ::= (CHAR_LIST_FRAGMENT | sigilHeredocEscapeSequence)*
+                                   { implements = "org.elixir_lang.psi.Body" }
 
 literalRegexHeredoc ::= TILDE LITERAL_REGEX_SIGIL_NAME REGEX_HEREDOC_PROMOTER EOL
                         literalRegexHeredocLine*
@@ -945,7 +965,8 @@ literalRegexHeredoc ::= TILDE LITERAL_REGEX_SIGIL_NAME REGEX_HEREDOC_PROMOTER EO
                           ]
                           pin = REGEX_HEREDOC_PROMOTER
                         }
-literalRegexHeredocLine ::= heredocLinePrefix literalRegexBody EOL
+// EOL is optional because when last line EOL is escaped (See https://github.com/KronicDeth/intellij-elixir/issues/1843)
+literalRegexHeredocLine ::= heredocLinePrefix literalRegexHeredocLineBody heredocLineEnd
                             {
                               implements = [
                                 "org.elixir_lang.psi.HeredocLine"
@@ -956,8 +977,8 @@ literalRegexHeredocLine ::= heredocLinePrefix literalRegexBody EOL
                               ]
                             }
 // literals can have escape sequences for escaped terminator
-literalRegexBody ::= (REGEX_FRAGMENT | sigilEscapeSequence)*
-                     { implements = "org.elixir_lang.psi.Body" }
+literalRegexHeredocLineBody ::= (REGEX_FRAGMENT | sigilHeredocEscapeSequence)*
+                                { implements = "org.elixir_lang.psi.Body" }
 
 literalSigilHeredoc ::= TILDE LITERAL_SIGIL_NAME SIGIL_HEREDOC_PROMOTER EOL
                         literalSigilHeredocLine*
@@ -969,7 +990,7 @@ literalSigilHeredoc ::= TILDE LITERAL_SIGIL_NAME SIGIL_HEREDOC_PROMOTER EOL
                           ]
                           pin = SIGIL_HEREDOC_PROMOTER
                         }
-literalSigilHeredocLine ::= heredocLinePrefix literalSigilBody EOL
+literalSigilHeredocLine ::= heredocLinePrefix literalSigilHeredocLineBody heredocLineEnd
                             {
                               implements = [
                                 "org.elixir_lang.psi.HeredocLine"
@@ -980,8 +1001,8 @@ literalSigilHeredocLine ::= heredocLinePrefix literalSigilBody EOL
                               ]
                             }
 // literals can have escape sequences for escaped terminator
-literalSigilBody ::= (SIGIL_FRAGMENT | sigilEscapeSequence)*
-                     { implements = "org.elixir_lang.psi.Body" }
+literalSigilHeredocLineBody ::= (SIGIL_FRAGMENT | sigilHeredocEscapeSequence)*
+                                { implements = "org.elixir_lang.psi.Body" }
 
 literalStringSigilHeredoc ::= TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_HEREDOC_PROMOTER EOL
                               literalStringHeredocLine*
@@ -993,7 +1014,7 @@ literalStringSigilHeredoc ::= TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_HERED
                                 ]
                                 pin = STRING_SIGIL_HEREDOC_PROMOTER
                               }
-literalStringHeredocLine ::= heredocLinePrefix literalStringBody EOL
+literalStringHeredocLine ::= heredocLinePrefix literalStringHeredocLineBody heredocLineEnd
                              {
                                implements = [
                                  "org.elixir_lang.psi.HeredocLine"
@@ -1004,8 +1025,8 @@ literalStringHeredocLine ::= heredocLinePrefix literalStringBody EOL
                                ]
                              }
 // literals can have escape sequences for escaped terminator
-literalStringBody ::= (STRING_FRAGMENT | sigilEscapeSequence)*
-                      { implements = "org.elixir_lang.psi.Body" }
+literalStringHeredocLineBody ::= (STRING_FRAGMENT | sigilHeredocEscapeSequence)*
+                                 { implements = "org.elixir_lang.psi.Body" }
 
 literalWordsHeredoc ::= TILDE LITERAL_WORDS_SIGIL_NAME WORDS_HEREDOC_PROMOTER EOL
                         literalWordsHeredocLine*
@@ -1017,7 +1038,8 @@ literalWordsHeredoc ::= TILDE LITERAL_WORDS_SIGIL_NAME WORDS_HEREDOC_PROMOTER EO
                           ]
                           pin = WORDS_HEREDOC_PROMOTER
                         }
-literalWordsHeredocLine ::= heredocLinePrefix literalWordsBody EOL
+// EOL is optional because when last line EOL is escaped (See https://github.com/KronicDeth/intellij-elixir/issues/1843)
+literalWordsHeredocLine ::= heredocLinePrefix literalWordsHeredocLineBody heredocLineEnd
                             {
                               implements = [
                                 "org.elixir_lang.psi.HeredocLine"
@@ -1028,8 +1050,8 @@ literalWordsHeredocLine ::= heredocLinePrefix literalWordsBody EOL
                               ]
                             }
 // literals can have escape sequences for escaped terminator
-literalWordsBody ::= (WORDS_FRAGMENT | sigilEscapeSequence)*
-                     { implements = "org.elixir_lang.psi.Body" }
+literalWordsHeredocLineBody ::= (WORDS_FRAGMENT | sigilHeredocEscapeSequence)*
+                                { implements = "org.elixir_lang.psi.Body" }
 
 /*
  *
@@ -1046,9 +1068,7 @@ literalWordsBody ::= (WORDS_FRAGMENT | sigilEscapeSequence)*
  */
 
 
-quoteCharListBody ::= (interpolation | CHAR_LIST_FRAGMENT | quoteEscapeSequence)*
-                      { implements =  "org.elixir_lang.psi.Body" }
-charListLine ::= CHAR_LIST_PROMOTER quoteCharListBody CHAR_LIST_TERMINATOR
+charListLine ::= CHAR_LIST_PROMOTER charListLineBody CHAR_LIST_TERMINATOR
                  {
                    implements = [
                      "org.elixir_lang.psi.Atomable"
@@ -1059,9 +1079,10 @@ charListLine ::= CHAR_LIST_PROMOTER quoteCharListBody CHAR_LIST_TERMINATOR
                    pin = CHAR_LIST_PROMOTER
                  }
 
-quoteStringBody ::=  (interpolation | STRING_FRAGMENT | quoteEscapeSequence)*
-                     { implements = "org.elixir_lang.psi.Body" }
-stringLine ::= STRING_PROMOTER quoteStringBody STRING_TERMINATOR
+charListLineBody ::= (interpolation | CHAR_LIST_FRAGMENT | lineEscapeSequence)*
+                      { implements =  "org.elixir_lang.psi.Body" }
+
+stringLine ::= STRING_PROMOTER stringLineBody STRING_TERMINATOR
                {
                  implements = [
                    "org.elixir_lang.psi.Atomable"
@@ -1071,6 +1092,9 @@ stringLine ::= STRING_PROMOTER quoteStringBody STRING_TERMINATOR
                  ]
                  pin = STRING_PROMOTER
                }
+
+stringLineBody ::= (interpolation | STRING_FRAGMENT | lineEscapeSequence)*
+                   { implements = "org.elixir_lang.psi.Body" }
 
 /*
  *
@@ -1082,7 +1106,7 @@ stringLine ::= STRING_PROMOTER quoteStringBody STRING_TERMINATOR
  * Interpolated Sigil Lines
  */
 
-interpolatedCharListSigilLine ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER interpolatedCharListBody CHAR_LIST_SIGIL_TERMINATOR sigilModifiers
+interpolatedCharListSigilLine ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER interpolatedCharListSigilLineBody CHAR_LIST_SIGIL_TERMINATOR sigilModifiers
                                   {
                                     implements = [
                                       "org.elixir_lang.psi.CharListFragmented"
@@ -1090,8 +1114,10 @@ interpolatedCharListSigilLine ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_
                                     ]
                                     pin = CHAR_LIST_SIGIL_PROMOTER
                                   }
+interpolatedCharListSigilLineBody ::= (interpolation | CHAR_LIST_FRAGMENT | sigilLineEscapeSequence)*
+                                      { implements = "org.elixir_lang.psi.Body" }
 
-interpolatedRegexLine ::= TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_PROMOTER interpolatedRegexBody REGEX_TERMINATOR sigilModifiers
+interpolatedRegexLine ::= TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_PROMOTER interpolatedRegexLineBody REGEX_TERMINATOR sigilModifiers
                           {
                             implements = [
                               "org.elixir_lang.psi.RegexFragmented"
@@ -1099,8 +1125,10 @@ interpolatedRegexLine ::= TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_PROMOTER in
                             ]
                             pin = REGEX_PROMOTER
                           }
+interpolatedRegexLineBody ::= (interpolation | REGEX_FRAGMENT | sigilLineEscapeSequence)*
+                              { implements = "org.elixir_lang.psi.Body" }
 
-interpolatedSigilLine ::= TILDE INTERPOLATING_SIGIL_NAME SIGIL_PROMOTER interpolatedSigilBody SIGIL_TERMINATOR sigilModifiers
+interpolatedSigilLine ::= TILDE INTERPOLATING_SIGIL_NAME SIGIL_PROMOTER interpolatedSigilLineBody SIGIL_TERMINATOR sigilModifiers
                           {
                             implements = [
                               "org.elixir_lang.psi.SigilFragmented"
@@ -1108,8 +1136,10 @@ interpolatedSigilLine ::= TILDE INTERPOLATING_SIGIL_NAME SIGIL_PROMOTER interpol
                             ]
                             pin = SIGIL_PROMOTER
                           }
+interpolatedSigilLineBody ::= (interpolation | SIGIL_FRAGMENT | sigilLineEscapeSequence)*
+                              { implements = "org.elixir_lang.psi.Body" }
 
-interpolatedStringSigilLine ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER interpolatedStringBody STRING_SIGIL_TERMINATOR sigilModifiers
+interpolatedStringSigilLine ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER interpolatedStringSigilLineBody STRING_SIGIL_TERMINATOR sigilModifiers
                                 {
                                   implements = [
                                     "org.elixir_lang.psi.StringFragmented"
@@ -1117,8 +1147,10 @@ interpolatedStringSigilLine ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIG
                                   ]
                                   pin = STRING_SIGIL_PROMOTER
                                 }
+interpolatedStringSigilLineBody ::= (interpolation | STRING_FRAGMENT | sigilLineEscapeSequence)*
+                                    { implements = "org.elixir_lang.psi.Body" }
 
-interpolatedWordsLine ::= TILDE INTERPOLATING_WORDS_SIGIL_NAME WORDS_PROMOTER interpolatedWordsBody WORDS_TERMINATOR sigilModifiers
+interpolatedWordsLine ::= TILDE INTERPOLATING_WORDS_SIGIL_NAME WORDS_PROMOTER interpolatedWordsLineBody WORDS_TERMINATOR sigilModifiers
                           {
                             implements = [
                               "org.elixir_lang.psi.WordsFragmented"
@@ -1126,11 +1158,14 @@ interpolatedWordsLine ::= TILDE INTERPOLATING_WORDS_SIGIL_NAME WORDS_PROMOTER in
                             ]
                             pin = WORDS_PROMOTER
                           }
+interpolatedWordsLineBody ::= (interpolation | WORDS_FRAGMENT | sigilLineEscapeSequence)*
+                              { implements = "org.elixir_lang.psi.Body" }
+
 /*
  * Literal Sigils
  */
 
-literalCharListSigilLine ::= TILDE LITERAL_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER literalCharListBody CHAR_LIST_SIGIL_TERMINATOR sigilModifiers
+literalCharListSigilLine ::= TILDE LITERAL_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER literalCharListSigilLineBody CHAR_LIST_SIGIL_TERMINATOR sigilModifiers
                              {
                                implements = [
                                  "org.elixir_lang.psi.CharListFragmented"
@@ -1138,8 +1173,10 @@ literalCharListSigilLine ::= TILDE LITERAL_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_
                                ]
                                pin = CHAR_LIST_SIGIL_PROMOTER
                              }
+literalCharListSigilLineBody ::= (CHAR_LIST_FRAGMENT | sigilLineEscapeSequence)*
+                                 { implements = "org.elixir_lang.psi.Body" }
 
-literalRegexLine ::= TILDE LITERAL_REGEX_SIGIL_NAME REGEX_PROMOTER literalRegexBody REGEX_TERMINATOR sigilModifiers
+literalRegexLine ::= TILDE LITERAL_REGEX_SIGIL_NAME REGEX_PROMOTER literalRegexLineBody REGEX_TERMINATOR sigilModifiers
                      {
                        implements = [
                          "org.elixir_lang.psi.RegexFragmented"
@@ -1147,8 +1184,10 @@ literalRegexLine ::= TILDE LITERAL_REGEX_SIGIL_NAME REGEX_PROMOTER literalRegexB
                        ]
                        pin = REGEX_PROMOTER
                      }
+literalRegexLineBody ::= (REGEX_FRAGMENT | sigilLineEscapeSequence)*
+                         { implements = "org.elixir_lang.psi.Body" }
 
-literalSigilLine ::= TILDE LITERAL_SIGIL_NAME SIGIL_PROMOTER literalSigilBody SIGIL_TERMINATOR sigilModifiers
+literalSigilLine ::= TILDE LITERAL_SIGIL_NAME SIGIL_PROMOTER literalSigilLineBody SIGIL_TERMINATOR sigilModifiers
                      {
                        implements = [
                          "org.elixir_lang.psi.LiteralSigilLine"
@@ -1156,8 +1195,10 @@ literalSigilLine ::= TILDE LITERAL_SIGIL_NAME SIGIL_PROMOTER literalSigilBody SI
                        ]
                        pin = SIGIL_PROMOTER
                      }
+literalSigilLineBody ::= (SIGIL_FRAGMENT | sigilLineEscapeSequence)*
+                         { implements = "org.elixir_lang.psi.Body" }
 
-literalStringSigilLine ::= TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER literalStringBody STRING_SIGIL_TERMINATOR sigilModifiers
+literalStringSigilLine ::= TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER literalStringSigilLineBody STRING_SIGIL_TERMINATOR sigilModifiers
                            {
                              implements = [
                                "org.elixir_lang.psi.StringFragmented"
@@ -1165,8 +1206,10 @@ literalStringSigilLine ::= TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER
                              ]
                              pin = STRING_SIGIL_PROMOTER
                            }
+literalStringSigilLineBody ::= (STRING_FRAGMENT | sigilLineEscapeSequence)*
+                               { implements = "org.elixir_lang.psi.Body" }
 
-literalWordsLine ::=  TILDE LITERAL_WORDS_SIGIL_NAME WORDS_PROMOTER literalWordsBody WORDS_TERMINATOR sigilModifiers
+literalWordsLine ::=  TILDE LITERAL_WORDS_SIGIL_NAME WORDS_PROMOTER literalWordsLineBody WORDS_TERMINATOR sigilModifiers
                       {
                         implements = [
                           "org.elixir_lang.psi.WordsFragmented"
@@ -1174,6 +1217,8 @@ literalWordsLine ::=  TILDE LITERAL_WORDS_SIGIL_NAME WORDS_PROMOTER literalWords
                         ]
                         pin = WORDS_PROMOTER
                       }
+literalWordsLineBody ::= (WORDS_FRAGMENT | sigilLineEscapeSequence)*
+                         { implements = "org.elixir_lang.psi.Body" }
 
 /*
  *
@@ -1511,15 +1556,9 @@ matchedTwoOperation ::= matchedExpression twoInfixOperator matchedExpression
  *
  */
 
-private significantWhiteSpaceMaybe ::= SIGNIFICANT_WHITE_SPACE?
-
 /* Unlike other binary operation, additionOperations cannot begin with EOLs: if there are EOLs, then the +/- is
-   interpreted as unaryOperation.
-
-   See https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L605-L613
-   for rules for SIGNIFICANT_WHITE_SPACE */
-additionInfixOperator ::= (SIGNIFICANT_WHITE_SPACE DUAL_OPERATOR (SIGNIFICANT_WHITE_SPACE | &EOL) |
-                           DUAL_OPERATOR significantWhiteSpaceMaybe) eolStar
+   interpreted as unaryOperation. */
+additionInfixOperator ::= ADDITION_OPERATOR | SUBTRACTION_OPERATOR
                           {
                             implements = "org.elixir_lang.psi.Operator"
                             methods = [
@@ -1550,7 +1589,7 @@ multiplicationInfixOperator ::= DIVISION_OPERATOR | MULTIPLICATION_OPERATOR
 // implements and methods defined by "infix operations" section above
 matchedMultiplicationOperation ::= matchedExpression multiplicationInfixOperator matchedExpression
 
-unaryPrefixOperator ::= (significantWhiteSpaceMaybe DUAL_OPERATOR | SIGN_OPERATOR | UNARY_OPERATOR) eolStar |
+unaryPrefixOperator ::= (NEGATE_OPERATOR | NUMBER_OR_BADARITH_OPERATOR | UNARY_OPERATOR) eolStar |
                         NOT_OPERATOR !IN_OPERATOR
                         {
                           implements = "org.elixir_lang.psi.Operator"
@@ -1610,13 +1649,14 @@ relativeIdentifier ::= IDENTIFIER_TOKEN |
                        COMPARISON_OPERATOR |
                        DO |
                        DIVISION_OPERATOR |
-                       DUAL_OPERATOR significantWhiteSpaceMaybe |
+                       PLUS_OPERATOR |
                        ELSE |
                        END |
                        IN_MATCH_OPERATOR |
                        IN_OPERATOR |
                        // NOT MAP_OPERATOR because it is a special form
                        MATCH_OPERATOR |
+                       MINUS_OPERATOR |
                        MULTIPLICATION_OPERATOR |
                        OR_SYMBOL_OPERATOR |
                        OR_WORD_OPERATOR |
@@ -1674,7 +1714,7 @@ noParenthesesOneArgument ::= noParenthesesKeywords | // @see https://github.com/
 
                                 @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L418
                                 @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L609-L610 */
-                             !additionTail matchedExpression
+                             matchedExpression
                              {
                                implements = [
                                  "org.elixir_lang.psi.Arguments"
@@ -1688,19 +1728,6 @@ noParenthesesOneArgument ::= noParenthesesKeywords | // @see https://github.com/
                                  quoteArguments
                                ]
                              }
-
-/* @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L418
-  @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L609-L610 */
-private additionTail ::= significantWhiteSpaceMaybe DUAL_OPERATOR (
-                           // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L610
-                           "/" | ">" | DUAL_OPERATOR | STRUCT_OPERATOR |
-                           // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L609
-                           OPENING_BIT | OPENING_BRACKET | OPENING_CURLY | OPENING_PARENTHESIS |
-                           // white spaces
-                           EOL | SIGNIFICANT_WHITE_SPACE
-                         )
-                         |
-                         DUAL_OPERATOR
 
 matchedParenthesesArguments ::= CALL parenthesesArguments parenthesesArguments? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L254-255
 
@@ -2984,7 +3011,7 @@ atom ::= COLON (ATOM_FRAGMENT | quote)
 private infixComma ::= COMMA eolStar
 private infixCommaMaybe ::= infixComma?
 
-charToken ::= CHAR_TOKENIZER (CHAR_LIST_FRAGMENT | quoteEscapeSequence)
+charToken ::= CHAR_TOKENIZER (CHAR_LIST_FRAGMENT | lineEscapeSequence)
               { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 private containerExpression ::= emptyParentheses |
@@ -2992,8 +3019,8 @@ private containerExpression ::= emptyParentheses |
 
 decimalFloat ::= decimalFloatIntegral DECIMAL_MARK decimalFloatFractional (EXPONENT_MARK decimalFloatExponent)?
                  { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
-decimalFloatExponent ::= decimalFloatExponentSign decimalWholeNumber
-decimalFloatExponentSign ::= DUAL_OPERATOR?
+decimalFloatExponent ::= decimalFloatExponentSign? decimalWholeNumber
+decimalFloatExponentSign ::= SIGN_OPERATOR
 decimalFloatFractional ::= decimalWholeNumber
 decimalFloatIntegral ::= decimalWholeNumber
 
@@ -3013,19 +3040,26 @@ enclosedHexadecimalEscapeSequence ::= OPENING_CURLY VALID_HEXADECIMAL_DIGITS CLO
 openHexadecimalEscapeSequence ::= VALID_HEXADECIMAL_DIGITS
                                   { implements = "org.elixir_lang.psi.EscapedHexadecimalDigits" methods = [codePoint] }
 escapedCharacter ::= ESCAPE ESCAPED_CHARACTER_TOKEN
-                     { implements = "org.elixir_lang.psi.EscapeSequence" methods = [codePoint] pin = 1 }
+                     { implements = "org.elixir_lang.psi.EscapeSequence" methods = [codePoint] }
 escapedEOL ::= ESCAPE EOL
                { implements = "org.elixir_lang.psi.EscapeSequence" methods = [codePoint] }
+private heredocLineEnd ::= (escapedEOL | EOL)
 
 /*
  * Quotes (charListHeredoc, charListLine, stringHeredoc, stringLine)
  */
 
-private quoteEscapeSequence ::= quoteHexadecimalEscapeSequence |
-                                escapedEOL |
-                                /* Must be last so that ESCAPE ('\') can be pinned in escapedCharacter without excluding
-                                   ("\x") in hexadecimalEscapeSequence  */
-                                escapedCharacter
+/*
+ * Does not contain `escapedEOL` as heredocs require EOL to end each line even if they are escaped by the user
+ */
+private heredocEscapeSequence ::= quoteHexadecimalEscapeSequence |
+                                  escapedCharacter
+
+private lineEscapeSequence ::= quoteHexadecimalEscapeSequence |
+                               escapedEOL |
+                               /* Must be last so that ESCAPE ('\') can be pinned in escapedCharacter without excluding
+                                  ("\x") in hexadecimalEscapeSequence  */
+                               escapedCharacter
 quoteHexadecimalEscapeSequence ::= hexadecimalEscapePrefix (openHexadecimalEscapeSequence | enclosedHexadecimalEscapeSequence)
                                    {
                                      implements = "org.elixir_lang.psi.EscapeSequence"
@@ -3051,7 +3085,6 @@ keywordKey ::= AFTER |
                COMPARISON_OPERATOR |
                DO |
                DIVISION_OPERATOR |
-               DUAL_OPERATOR |
                ELSE |
                END |
                FALSE |
@@ -3059,12 +3092,14 @@ keywordKey ::= AFTER |
                IN_OPERATOR |
                MAP_OPERATOR |
                MATCH_OPERATOR |
+               MINUS_OPERATOR |
                MULTIPLICATION_OPERATOR |
                NIL |
                NOT_OPERATOR |
                OR_SYMBOL_OPERATOR |
                OR_WORD_OPERATOR |
                PIPE_OPERATOR |
+               PLUS_OPERATOR |
                RANGE_OPERATOR |
                RESCUE |
                RELATIONAL_OPERATOR |
@@ -3112,23 +3147,23 @@ keywords ::= keywordPair (infixComma keywordPair)* COMMA?
  * Sigil
  */
 
-private sigilEscapeSequence ::= sigilHexadecimalEscapeSequence |
-                                hexadecimalEscapePrefix |
-                                escapedEOL |
-                                /* Must be last so that ESCAPE ('\') can be pinned in escapedCharacter without excluding
-                                   ("\x") or ("\\u") in hexadecimalEscapeSequence  */
-                                escapedCharacter
+private sigilLineEscapeSequence ::= sigilHexadecimalEscapeSequence |
+                                    hexadecimalEscapePrefix |
+                                    escapedEOL |
+                                    escapedCharacter
 // Does not pin so that escapePrefix can match separately as `\x` and `\u` is valid for sigils
 sigilHexadecimalEscapeSequence ::= hexadecimalEscapePrefix (openHexadecimalEscapeSequence | enclosedHexadecimalEscapeSequence)
                                    {
                                      implements = "org.elixir_lang.psi.EscapeSequence"
                                      methods = [codePoint]
                                    }
+private sigilHeredocEscapeSequence ::= sigilHexadecimalEscapeSequence |
+                                       hexadecimalEscapePrefix |
+                                       escapedCharacter
 
 emptyParentheses ::= OPENING_PARENTHESIS CLOSING_PARENTHESIS
                      { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 interpolation ::= INTERPOLATION_START elixirFile INTERPOLATION_END
-                  { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 /*
  * List

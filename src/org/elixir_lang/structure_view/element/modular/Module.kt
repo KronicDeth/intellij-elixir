@@ -89,7 +89,7 @@ open class Module(protected val parent: Modular?, call: Call) : Element<Call>(ca
         }
 
         @JvmStatic
-        open fun elementDescription(call: Call, location: ElementDescriptionLocation): String? =
+        fun elementDescription(call: Call, location: ElementDescriptionLocation): String? =
                 when(location) {
                     UsageViewLongNameLocation.INSTANCE -> {
                         val enclosingCall = call.enclosingMacroCall()
@@ -110,7 +110,7 @@ open class Module(protected val parent: Modular?, call: Call) : Element<Call>(ca
                 }
 
         @JvmStatic
-        open fun `is`(call: Call): Boolean =
+        fun `is`(call: Call): Boolean =
                 (call.isCallingMacro(KERNEL, DEFMODULE, 2) &&
                         /**
                          * See https://github.com/KronicDeth/intellij-elixir/issues/1301

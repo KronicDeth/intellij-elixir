@@ -133,16 +133,6 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/elixir/lib/gen_event/stream.ex", Parse.CORRECT);
     }
 
-    public void testGenServer() {
-        boolean beforeV_1_6 = elixirSdkLevel().compareTo(V_1_6) < 0;
-
-        if (beforeV_1_6) {
-            assertParsed("lib/elixir/lib/gen_server.ex", Parse.CORRECT);
-        } else {
-            assertFalse(beforeV_1_6);
-        }
-    }
-
     public void testHashDict() {
         assertParsed("lib/elixir/lib/hash_dict.ex", Parse.CORRECT);
     }
@@ -177,16 +167,6 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
 
     public void testIoStream() {
         assertParsed("lib/elixir/lib/io/stream.ex", Parse.CORRECT);
-    }
-
-    public void testKernel() {
-        boolean beforeV_1_6 = elixirSdkLevel().compareTo(V_1_6) < 0;
-
-        if (beforeV_1_6) {
-            assertParsed("lib/elixir/lib/kernel.ex", Parse.CORRECT);
-        } else {
-            assertFalse(beforeV_1_6);
-        }
     }
 
     public void testKernelCli() {
@@ -361,45 +341,6 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/elixir/test/elixir/fixtures/compile_sample.ex", Parse.CORRECT);
     }
 
-    public void testParallelCompilerBar() {
-        assertParsed("lib/elixir/test/elixir/fixtures/parallel_compiler/bar.ex", Parse.CORRECT);
-    }
-
-    public void testParallelCompilerBat() {
-        boolean beforeV_1_3 = elixirSdkLevel().compareTo(V_1_3) < 0;
-
-        if (beforeV_1_3) {
-            assertParsed("lib/elixir/test/elixir/fixtures/parallel_compiler/bat.ex", Parse.ERROR);
-        } else {
-            //noinspection ConstantConditions
-            assertTrue(!beforeV_1_3);
-        }
-    }
-
-    public void testParallelCompilerFoo() {
-        assertParsed("lib/elixir/test/elixir/fixtures/parallel_compiler/foo.ex", Parse.CORRECT);
-    }
-
-    public void testParallelDeadlockBar() {
-        assertParsed("lib/elixir/test/elixir/fixtures/parallel_deadlock/bar.ex", Parse.CORRECT);
-    }
-
-    public void testParallelDeadlockFoo() {
-        assertParsed("lib/elixir/test/elixir/fixtures/parallel_deadlock/foo.ex", Parse.CORRECT);
-    }
-
-    public void testParallelStructBar() {
-        assertParsed("lib/elixir/test/elixir/fixtures/parallel_struct/bar.ex", Parse.CORRECT);
-    }
-
-    public void testParallelStructFoo() {
-        assertParsed("lib/elixir/test/elixir/fixtures/parallel_struct/foo.ex", Parse.CORRECT);
-    }
-
-    public void testWarningsSample() {
-        assertParsed("lib/elixir/test/elixir/fixtures/warnings_sample.ex", Parse.CORRECT);
-    }
-
     public void testUnicodeUnicode() {
         assertParsed("lib/elixir/unicode/unicode.ex", Parse.CORRECT);
     }
@@ -434,16 +375,6 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
 
     public void testExUnitCliFormatter() {
         assertParsed("lib/ex_unit/lib/ex_unit/cli_formatter.ex", Parse.CORRECT);
-    }
-
-    public void testExUnitDocTest() {
-        boolean beforeV_1_6 = elixirSdkLevel().compareTo(V_1_6) < 0;
-
-        if (beforeV_1_6) {
-            assertParsed("lib/ex_unit/lib/ex_unit/doc_test.ex", Parse.CORRECT);
-        } else {
-            assertFalse(beforeV_1_6);
-        }
     }
 
     public void testExUnitEventManager() {
@@ -482,16 +413,6 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/iex/lib/iex/app.ex", Parse.CORRECT);
     }
 
-    public void testIexAutocomplete() {
-        boolean beforeV_1_6 = elixirSdkLevel().compareTo(V_1_6) < 0;
-
-        if (beforeV_1_6) {
-            assertParsed("lib/iex/lib/iex/autocomplete.ex", Parse.CORRECT);
-        } else {
-            assertFalse(beforeV_1_6);
-        }
-    }
-
     public void testIexCli() {
         assertParsed("lib/iex/lib/iex/cli.ex", Parse.CORRECT);
     }
@@ -510,20 +431,6 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
 
     public void testIexHistory() {
         assertParsed("lib/iex/lib/iex/history.ex", Parse.CORRECT);
-    }
-
-    public void testIexIntrospection() {
-        boolean beforeV_1_6 = elixirSdkLevel().compareTo(V_1_6) < 0;
-
-        if (beforeV_1_6) {
-            assertParsed("lib/iex/lib/iex/introspection.ex", Parse.CORRECT);
-        } else {
-            assertFalse(beforeV_1_6);
-        }
-    }
-
-    public void testIexRemsh() {
-        assertParsed("lib/iex/lib/iex/remsh.ex", Parse.CORRECT);
     }
 
     public void testIexServer() {
@@ -546,10 +453,6 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/logger/lib/logger/config.ex", Parse.CORRECT);
     }
 
-    public void testLoggerErrorHandler() {
-        assertParsed("lib/logger/lib/logger/error_handler.ex", Parse.CORRECT);
-    }
-
     public void testLoggerFormatter() {
         assertParsed("lib/logger/lib/logger/formatter.ex", Parse.CORRECT);
     }
@@ -570,29 +473,8 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/mix/lib/mix.ex", Parse.CORRECT);
     }
 
-    public void testMixArchive() {
-        boolean beforeV_1_3 = elixirSdkLevel().compareTo(V_1_3) < 0;
-
-        if (beforeV_1_3) {
-            assertParsed("lib/mix/lib/mix/archive.ex", Parse.CORRECT);
-        } else {
-            //noinspection ConstantConditions
-            assertTrue(!beforeV_1_3);
-        }
-    }
-
     public void testMixCli() {
         assertParsed("lib/mix/lib/mix/cli.ex", Parse.CORRECT);
-    }
-
-    public void testMixCompilersElixir() {
-        boolean atLeastV_1_5 = elixirSdkLevel().compareTo(V_1_5) >= 0;
-
-        if (atLeastV_1_5) {
-            assertParsed("lib/mix/lib/mix/compilers/elixir.ex", Parse.CORRECT);
-        } else {
-            assertTrue(!atLeastV_1_5);
-        }
     }
 
     public void testMixCompilersErlang() {
@@ -601,16 +483,6 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
 
     public void testMixConfig() {
         assertParsed("lib/mix/lib/mix/config.ex", Parse.CORRECT);
-    }
-
-    public void testMixConfigAgent() {
-        boolean lessThanV_1_7 = elixirSdkLevel().compareTo(V_1_7) < 0;
-
-        if (lessThanV_1_7) {
-            assertParsed("lib/mix/lib/mix/config/agent.ex", Parse.CORRECT);
-        } else {
-            assertTrue(!lessThanV_1_7);
-        }
     }
 
     public void testMixDep() {
@@ -623,16 +495,6 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
 
     public void testMixDepFetcher() {
         assertParsed("lib/mix/lib/mix/dep/fetcher.ex", Parse.CORRECT);
-    }
-
-    public void testMixDepLoader() {
-        boolean beforeV_1_6 = elixirSdkLevel().compareTo(V_1_6) < 0;
-
-        if (beforeV_1_6) {
-            assertParsed("lib/mix/lib/mix/dep/loader.ex", Parse.CORRECT);
-        } else {
-            assertFalse(beforeV_1_6);
-        }
     }
 
     public void testMixDepLock() {
@@ -661,16 +523,6 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
 
     public void testMixProject() {
         assertParsed("lib/mix/lib/mix/project.ex", Parse.CORRECT);
-    }
-
-    public void testMixProjectStack() {
-        boolean beforeV_1_6 = elixirSdkLevel().compareTo(V_1_6) < 0;
-
-        if (beforeV_1_6) {
-            assertParsed("lib/mix/lib/mix/project_stack.ex", Parse.CORRECT);
-        } else {
-            assertFalse(beforeV_1_6);
-        }
     }
 
     public void testMixRebar() {
@@ -769,36 +621,9 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/mix/lib/mix/tasks/compile.leex.ex", Parse.CORRECT);
     }
 
-    public void testMixTasksCompileProtocols() {
-        boolean beforeV_1_6 = elixirSdkLevel().compareTo(V_1_6) < 0;
-
-        if (beforeV_1_6) {
-            assertParsed("lib/mix/lib/mix/tasks/compile.protocols.ex", Parse.CORRECT);
-        } else {
-            assertFalse(beforeV_1_6);
-        }
-    }
-
     public void testMixTasksCompileYecc() {
         assertParsed("lib/mix/lib/mix/tasks/compile.yecc.ex", Parse.CORRECT);
     }
-
-    public void testMixTasksDepsCheck() {
-        boolean beforeV_1_3 = elixirSdkLevel().compareTo(V_1_3) < 0;
-
-        if (beforeV_1_3) {
-            assertParsed("lib/mix/lib/mix/tasks/deps.check.ex", Parse.CORRECT);
-        } else {
-            assertTrue(!beforeV_1_3);
-        }
-    }
-
-    // TODO re-enable once travis-ci run elixir with https://github.com/elixir-lang/elixir/commit/3e52ed0fbbc09a156e6ea180baff3b89a8da183e so intellij_elixir matches intellij-elixir behavior
-    /*
-    public void testMixTasksDepsClean() {
-        assertParsed("lib/mix/lib/mix/tasks/deps.clean.ex", Parse.CORRECT);
-    }
-    */
 
     public void testMixTasksDepsCompile() {
         assertParsed("lib/mix/lib/mix/tasks/deps.compile.ex", Parse.CORRECT);
@@ -810,16 +635,6 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
 
     public void testMixTasksDepsGet() {
         assertParsed("lib/mix/lib/mix/tasks/deps.get.ex", Parse.CORRECT);
-    }
-
-    public void testMixTasksDepsLoadpaths() {
-        boolean beforeV_1_6 = elixirSdkLevel().compareTo(V_1_6) < 0;
-
-        if (beforeV_1_6) {
-            assertParsed("lib/mix/lib/mix/tasks/deps.loadpaths.ex", Parse.CORRECT);
-        } else {
-            assertFalse(beforeV_1_6);
-        }
     }
 
     public void testMixTasksDepsUnlock() {
@@ -902,33 +717,12 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/mix/test/fixtures/deps_status/custom/raw_repo/lib/raw_repo.ex", Parse.CORRECT);
     }
 
-    public void testEscripttestLibEscripttest() {
-        boolean beforeV_1_5 = elixirSdkLevel().compareTo(V_1_5) < 0;
-
-        if (beforeV_1_5) {
-            assertParsed("lib/mix/test/fixtures/escripttest/lib/escripttest.ex", Parse.CORRECT);
-        } else {
-            //noinspection ConstantConditions
-            assertTrue(!beforeV_1_5);
-        }
-    }
-
     public void testNoMixfileLibA() {
         assertParsed("lib/mix/test/fixtures/no_mixfile/lib/a.ex", Parse.CORRECT);
     }
 
     public void testNoMixfileLibB() {
         assertParsed("lib/mix/test/fixtures/no_mixfile/lib/b.ex", Parse.CORRECT);
-    }
-
-    public void testNoMixfileLibC() {
-        boolean beforeV_1_3 = elixirSdkLevel().compareTo(V_1_3) < 0;
-
-        if (beforeV_1_3) {
-            assertParsed("lib/mix/test/fixtures/no_mixfile/lib/c.ex", Parse.CORRECT);
-        } else {
-            assertTrue(!beforeV_1_3);
-        }
     }
 
     public void testUmbrellaDepDepsUmbrellaAppsBarLibBar() {

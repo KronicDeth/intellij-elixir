@@ -78,11 +78,8 @@ public class ModelBuilder implements FormattingModelBuilder {
                 .withinPair(ElixirTypes.OPENING_CURLY, ElixirTypes.CLOSING_CURLY).spaceIf(elixirCommonSettings.SPACE_WITHIN_BRACES)
                 .around(ElixirTypes.DOT_OPERATOR).none()
                 .after(ElixirTypes.FN).spaces(1)
-                // MUST specific inside *_ADDITION_OPERATION as DUAL_OPERATOR is also used IN UNARY_PREFIX_OPERATOR
-                .aroundInside(
-                        ElixirTypes.DUAL_OPERATOR,
-                        ADDITION_OPERATION_TOKEN_SET
-                ).spaceIf(elixirCommonSettings.SPACE_AROUND_ADDITIVE_OPERATORS)
+                .around(ElixirTypes.ADDITION_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_ADDITIVE_OPERATORS)
+                .around(ElixirTypes.SUBTRACTION_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_ADDITIVE_OPERATORS)
                 .aroundInside(
                         // Cannot contain `ElixirTypes.DUAL_OPERATOR` because a space makes them invalid.
                         // Cannot contain `ElixirTypes.NOT_OPERATOR` because it MUST have a space.

@@ -44,7 +44,7 @@ public class DoubleQuotesTest extends Test {
                Arrays.asList(
                        new Object[][] {
                                { "'", FRAGMENT_TYPE, LEXICAL_STATE },
-                               { "\"", ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE }
+                               { "\"", ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE }
                        }
                )
        );

@@ -4,8 +4,8 @@ Elixir File(0,4)
       PsiElement(~)('~')(0,1)
       PsiElement(c)('c')(1,2)
       PsiElement(Char List Sigil Promoter ({, [, <, ", /, (, |, '))('{')(2,3)
-      ElixirInterpolatedCharListBodyImpl(INTERPOLATED_CHAR_LIST_BODY)(3,3)
+      ElixirInterpolatedCharListSigilLineBodyImpl(INTERPOLATED_CHAR_LIST_SIGIL_LINE_BODY)(3,3)
         <empty list>
-      PsiElement(Char List Sigil Terminator ({, [, <, ", /, (, |, '))('}')(3,4)
+      PsiElement(Char List Sigil Terminator (}, ], >, ", /, ), |, '))('}')(3,4)
       ElixirSigilModifiersImpl(SIGIL_MODIFIERS)(4,4)
         <empty list>

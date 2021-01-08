@@ -37,7 +37,7 @@ object Project {
         // synchronous and recursive
         root.refresh(false, true)
 
-        VfsUtilCore.visitChildrenRecursively(root, object : VirtualFileVisitor<Object>() {
+        VfsUtilCore.visitChildrenRecursively(root, object : VirtualFileVisitor<Any>() {
             override fun visitFile(file: VirtualFile): Boolean {
                 indicator.checkCanceled()
 

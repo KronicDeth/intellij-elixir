@@ -25,7 +25,7 @@ class ElixirParserDefinition : ParserDefinition {
     override fun getStringLiteralElements(): TokenSet = STRING_LITERALS
     override fun getWhitespaceTokens(): TokenSet = WHITE_SPACES
 
-    override fun spaceExistanceTypeBetweenTokens(left: ASTNode, right: ASTNode): ParserDefinition.SpaceRequirements =
+    override fun spaceExistenceTypeBetweenTokens(left: ASTNode, right: ASTNode): ParserDefinition.SpaceRequirements =
             if (left.elementType === ElixirTypes.KEYWORD_PAIR_COLON) {
                 ParserDefinition.SpaceRequirements.MUST
             } else {

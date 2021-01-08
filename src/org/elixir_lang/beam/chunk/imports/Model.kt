@@ -31,7 +31,7 @@ class Model(private val imports: Imports?): AbstractTableModel() {
             throw IllegalArgumentException("Row $rowIndex out of bounds")
         }
 
-        val import = imports!![rowIndex]!!
+        val import = imports!![rowIndex]
 
         return when (columnIndex) {
             0 -> rowIndex

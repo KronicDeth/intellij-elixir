@@ -12,8 +12,6 @@ Elixir File(0,5)
             PsiElement(0-9)('2')(2,3)
       PsiElement(E, e)('e')(3,4)
       ElixirDecimalFloatExponentImpl(DECIMAL_FLOAT_EXPONENT)(4,5)
-        ElixirDecimalFloatExponentSignImpl(DECIMAL_FLOAT_EXPONENT_SIGN)(4,4)
-          <empty list>
         ElixirDecimalWholeNumberImpl(DECIMAL_WHOLE_NUMBER)(4,5)
           ElixirDecimalDigitsImpl(DECIMAL_DIGITS)(4,5)
             PsiElement(0-9)('3')(4,5)

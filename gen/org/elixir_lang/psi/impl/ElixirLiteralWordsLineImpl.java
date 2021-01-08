@@ -1,18 +1,18 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi.impl;
 
-import com.ericsson.otp.erlang.OtpErlangObject;
-import com.ericsson.otp.erlang.OtpErlangTuple;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElementVisitor;
-import com.intellij.psi.tree.IElementType;
-import com.intellij.psi.util.PsiTreeUtil;
-import org.elixir_lang.psi.*;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.List;
+import org.jetbrains.annotations.*;
+import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
+import static org.elixir_lang.psi.ElixirTypes.*;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import org.elixir_lang.psi.*;
+import com.ericsson.otp.erlang.OtpErlangList;
+import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.psi.tree.IElementType;
 
 public class ElixirLiteralWordsLineImpl extends ASTWrapperPsiElement implements ElixirLiteralWordsLine {
 
@@ -31,8 +31,8 @@ public class ElixirLiteralWordsLineImpl extends ASTWrapperPsiElement implements 
 
   @Override
   @Nullable
-  public ElixirLiteralWordsBody getLiteralWordsBody() {
-    return PsiTreeUtil.getChildOfType(this, ElixirLiteralWordsBody.class);
+  public ElixirLiteralWordsLineBody getLiteralWordsLineBody() {
+    return PsiTreeUtil.getChildOfType(this, ElixirLiteralWordsLineBody.class);
   }
 
   @Override
@@ -76,6 +76,12 @@ public class ElixirLiteralWordsLineImpl extends ASTWrapperPsiElement implements 
   }
 
   @Override
+  @Nullable
+  public Integer indentation() {
+    return ElixirPsiImplUtil.indentation(this);
+  }
+
+  @Override
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
@@ -89,8 +95,8 @@ public class ElixirLiteralWordsLineImpl extends ASTWrapperPsiElement implements 
 
   @Override
   @NotNull
-  public OtpErlangObject quoteBinary(OtpErlangTuple binary) {
-    return ElixirPsiImplUtil.quoteBinary(this, binary);
+  public OtpErlangObject quoteBinary(OtpErlangList metadata, List<OtpErlangObject> argumentList) {
+    return ElixirPsiImplUtil.quoteBinary(this, metadata, argumentList);
   }
 
   @Override
@@ -101,8 +107,20 @@ public class ElixirLiteralWordsLineImpl extends ASTWrapperPsiElement implements 
 
   @Override
   @NotNull
+  public OtpErlangObject quoteInterpolation(ElixirInterpolation interpolation) {
+    return ElixirPsiImplUtil.quoteInterpolation(this, interpolation);
+  }
+
+  @Override
+  @NotNull
   public OtpErlangObject quoteLiteral(List<Integer> codePointList) {
     return ElixirPsiImplUtil.quoteLiteral(this, codePointList);
+  }
+
+  @Override
+  @NotNull
+  public String sigilDelimiter() {
+    return ElixirPsiImplUtil.sigilDelimiter(this);
   }
 
   @Override

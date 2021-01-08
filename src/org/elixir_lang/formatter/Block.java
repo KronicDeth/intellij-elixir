@@ -1,19 +1,18 @@
 package org.elixir_lang.formatter;
 
+import com.intellij.application.options.CodeStyle;
 import com.intellij.formatting.*;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.Language;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.TokenType;
-import com.intellij.psi.codeStyle.CodeStyleSettingsManager;
 import com.intellij.psi.codeStyle.CommonCodeStyleSettings;
 import com.intellij.psi.formatter.common.AbstractBlock;
 import com.intellij.psi.impl.source.tree.CompositeElement;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
-import com.intellij.util.containers.Predicate;
 import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.code_style.CodeStyleSettings;
 import org.elixir_lang.psi.ElixirTypes;
@@ -24,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
 
 import static com.intellij.formatting.ChildAttributes.DELEGATE_TO_PREV_CHILD;
 import static org.apache.commons.lang.StringUtils.isWhitespace;
@@ -45,18 +45,30 @@ public class Block extends AbstractBlock implements BlockEx {
             UNMATCHED_ARROW_OPERATION
     );
     private static final TokenSet BODY_TOKEN_SET = TokenSet.create(
-            INTERPOLATED_CHAR_LIST_BODY,
-            INTERPOLATED_REGEX_BODY,
-            INTERPOLATED_SIGIL_BODY,
-            INTERPOLATED_STRING_BODY,
-            INTERPOLATED_WORDS_BODY,
-            LITERAL_CHAR_LIST_BODY,
-            LITERAL_REGEX_BODY,
-            LITERAL_SIGIL_BODY,
-            LITERAL_STRING_BODY,
-            LITERAL_WORDS_BODY,
-            QUOTE_CHAR_LIST_BODY,
-            QUOTE_STRING_BODY
+            CHAR_LIST_HEREDOC_LINE_BODY,
+            CHAR_LIST_LINE_BODY,
+            INTERPOLATED_CHAR_LIST_HEREDOC_LINE_BODY,
+            INTERPOLATED_CHAR_LIST_SIGIL_LINE_BODY,
+            INTERPOLATED_REGEX_HEREDOC_LINE_BODY,
+            INTERPOLATED_REGEX_LINE_BODY,
+            INTERPOLATED_SIGIL_HEREDOC_LINE_BODY,
+            INTERPOLATED_SIGIL_LINE_BODY,
+            INTERPOLATED_STRING_HEREDOC_LINE_BODY,
+            INTERPOLATED_STRING_SIGIL_LINE_BODY,
+            INTERPOLATED_WORDS_HEREDOC_LINE_BODY,
+            INTERPOLATED_WORDS_LINE_BODY,
+            LITERAL_CHAR_LIST_HEREDOC_LINE_BODY,
+            LITERAL_CHAR_LIST_SIGIL_LINE_BODY,
+            LITERAL_REGEX_HEREDOC_LINE_BODY,
+            LITERAL_REGEX_LINE_BODY,
+            LITERAL_SIGIL_HEREDOC_LINE_BODY,
+            LITERAL_SIGIL_LINE_BODY,
+            LITERAL_STRING_HEREDOC_LINE_BODY,
+            LITERAL_STRING_SIGIL_LINE_BODY,
+            LITERAL_WORDS_HEREDOC_LINE_BODY,
+            LITERAL_WORDS_LINE_BODY,
+            STRING_HEREDOC_LINE_BODY,
+            STRING_LINE_BODY
     );
     private static final TokenSet BOOLEAN_WORD_OPERATOR_TOKEN_SET = TokenSet.create(
             AND_WORD_OPERATOR,
@@ -278,8 +290,7 @@ public class Block extends AbstractBlock implements BlockEx {
             MATCHED_WHEN_OPERATION,
             UNMATCHED_WHEN_OPERATION
     );
-    private static final TokenSet WHITESPACE_TOKEN_SET =
-            TokenSet.create(EOL, TokenType.WHITE_SPACE, SIGNIFICANT_WHITE_SPACE);
+    private static final TokenSet WHITESPACE_TOKEN_SET = TokenSet.create(EOL, TokenType.WHITE_SPACE);
     @Nullable
     private final Alignment childrenAlignment;
     @Nullable
@@ -426,7 +437,7 @@ public class Block extends AbstractBlock implements BlockEx {
             @NotNull TokenSet operatorRuleTokenSet) {
         Alignment operandAlignment;
 
-        if (alignOperands.apply(codeStyleSettings(operation))) {
+        if (alignOperands.test(codeStyleSettings(operation))) {
             operandAlignment = Alignment.createAlignment();
         } else {
             operandAlignment = null;
@@ -2176,17 +2187,11 @@ public class Block extends AbstractBlock implements BlockEx {
     }
 
     private CodeStyleSettings codeStyleSettings(@NotNull ASTNode node) {
-        return CodeStyleSettingsManager
-                .getInstance(node.getPsi().getProject())
-                .getCurrentSettings()
-                .getCustomSettings(CodeStyleSettings.class);
+        return CodeStyle.getCustomSettings(node.getPsi().getContainingFile(), CodeStyleSettings.class);
     }
 
     private CommonCodeStyleSettings commonCodeStyleSettings(@NotNull ASTNode node) {
-        return CodeStyleSettingsManager
-                .getInstance(node.getPsi().getProject())
-                .getCurrentSettings()
-                .getCommonSettings(ElixirLanguage.INSTANCE);
+        return CodeStyle.getLanguageSettings(node.getPsi().getContainingFile(), ElixirLanguage.INSTANCE);
     }
 
     @NotNull

@@ -529,6 +529,7 @@ public class BeamFileImpl extends ModuleElementImpl implements ModuleOwner, PsiC
      * @return a single-element array containing <code>this</code>
      * @deprecated Use {@link FileViewProvider#getAllFiles()} instead.
      */
+    @Deprecated
     @NotNull
     @Override
     public PsiFile[] getPsiRoots() {

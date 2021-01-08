@@ -13,6 +13,6 @@ class Type : ConfigurationTypeBase(TYPE_ID, TYPE_NAME, "Runs Mix test", Icons.TY
         internal const val TYPE_NAME = "Elixir Mix ExUnit"
 
         val INSTANCE: Type
-            get() = Extensions.findExtension<ConfigurationType, Type>(ConfigurationType.CONFIGURATION_TYPE_EP, Type::class.java)
+            get() = ConfigurationType.CONFIGURATION_TYPE_EP.findExtensionOrFail(Type::class.java)
     }
 }

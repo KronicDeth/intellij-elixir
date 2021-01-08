@@ -4,7 +4,7 @@ import org.elixir_lang.psi.call.StubBased
 import org.elixir_lang.psi.stub.type.call.Stub.isModular
 import org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.enclosingModularMacroCall
 import org.elixir_lang.structure_view.element.modular.Implementation
-import org.elixir_lang.structure_view.element.modular.Implementation.forNameCollection
+import org.elixir_lang.structure_view.element.modular.Implementation.Companion.forNameCollection
 import org.elixir_lang.structure_view.element.modular.Module
 import org.elixir_lang.structure_view.element.modular.Protocol
 
@@ -49,7 +49,7 @@ object CanonicallyNamedImpl {
                     stubBased
                             .let { Implementation.forNameElement(it) }
                             ?.let { forNameCollection(it) }
-                            ?.map { "$prefix${it ?: '?'}" }
+                            ?.map { "$prefix${it}" }
                             ?.toSet()
                             ?: setOf("$prefix?")
                 } else if (Module.`is`(stubBased)) {

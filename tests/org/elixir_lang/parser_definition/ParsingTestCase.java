@@ -5,6 +5,8 @@ import com.intellij.lang.Language;
 import com.intellij.lang.ParserDefinition;
 import com.intellij.mock.MockApplication;
 import com.intellij.mock.MockLocalFileSystem;
+import com.intellij.openapi.editor.EditorFactory;
+import com.intellij.openapi.editor.impl.EditorFactoryImpl;
 import com.intellij.openapi.extensions.DefaultPluginDescriptor;
 import com.intellij.openapi.extensions.ExtensionPoint;
 import com.intellij.openapi.extensions.ExtensionsArea;
@@ -21,6 +23,8 @@ import com.intellij.openapi.projectRoots.impl.ProjectJdkTableImpl;
 import com.intellij.openapi.roots.*;
 import com.intellij.openapi.roots.impl.*;
 import com.intellij.openapi.vfs.VirtualFileManager;
+import com.intellij.openapi.vfs.encoding.EncodingManager;
+import com.intellij.openapi.vfs.encoding.EncodingManagerImpl;
 import com.intellij.openapi.vfs.impl.CoreVirtualFilePointerManager;
 import com.intellij.openapi.vfs.impl.VirtualFileManagerImpl;
 import com.intellij.openapi.vfs.pointers.VirtualFilePointerManager;
@@ -335,6 +339,13 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
         registerExtension(com.intellij.openapi.projectRoots.SdkType.EP_NAME, new org.elixir_lang.sdk.erlang.Type());
 
         setupForkJoinCommonPool(true);
+
+        EditorFactory editorFactory = new EditorFactoryImpl();
+        application.registerService(EditorFactory.class, editorFactory);
+
+        EncodingManager encodingManager = new EncodingManagerImpl();
+        application.registerService(EncodingManager.class, encodingManager);
+
         Sdk sdk = Type.createMockSdk(sdkHome, elixirSdkRelease());
         projectJdkTable.addJdk(sdk);
 

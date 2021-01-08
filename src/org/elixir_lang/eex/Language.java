@@ -1,7 +1,7 @@
 package org.elixir_lang.eex;
 
+import com.intellij.openapi.fileTypes.FileTypes;
 import com.intellij.openapi.fileTypes.LanguageFileType;
-import com.intellij.openapi.fileTypes.StdFileTypes;
 import com.intellij.psi.templateLanguages.TemplateLanguage;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -23,6 +23,6 @@ public class Language extends com.intellij.lang.Language implements TemplateLang
 
     @Contract(pure = true)
     public static LanguageFileType defaultTemplateLanguageFileType() {
-        return StdFileTypes.PLAIN_TEXT;
+        return FileTypes.PLAIN_TEXT;
     }
 }

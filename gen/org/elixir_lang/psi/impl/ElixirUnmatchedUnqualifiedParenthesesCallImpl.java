@@ -1,23 +1,23 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi.impl;
 
-import com.ericsson.otp.erlang.OtpErlangObject;
+import java.util.List;
+import org.jetbrains.annotations.*;
 import com.intellij.lang.ASTNode;
-import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
+import static org.elixir_lang.psi.ElixirTypes.*;
+import org.elixir_lang.psi.stub.UnmatchedUnqualifiedParenthesesCall;
+import org.elixir_lang.psi.*;
+import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
-import com.intellij.psi.stubs.IStubElementType;
-import com.intellij.psi.util.PsiTreeUtil;
-import kotlin.ranges.IntRange;
-import org.elixir_lang.psi.*;
-import org.elixir_lang.psi.stub.UnmatchedUnqualifiedParenthesesCall;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.Set;
+import kotlin.ranges.IntRange;
+import com.intellij.psi.stubs.IStubElementType;
 
 public class ElixirUnmatchedUnqualifiedParenthesesCallImpl extends NamedStubbedPsiElementBase<UnmatchedUnqualifiedParenthesesCall> implements ElixirUnmatchedUnqualifiedParenthesesCall {
 

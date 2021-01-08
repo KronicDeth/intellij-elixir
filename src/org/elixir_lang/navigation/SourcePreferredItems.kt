@@ -93,7 +93,7 @@ class SourcePreferredItems  {
         val callDefinitionClauseListByArityByName = callDefinitionClauseListByArityByNameByModularName.computeIfAbsent(modularName) { mutableMapOf() }
         val callDefinitionClauseListByArity = callDefinitionClauseListByArityByName.computeIfAbsent(callDefinition.name()) { mutableMapOf() }
 
-        callDefinitionClauseListByArity.compute(callDefinition.arity) { arity, currentCallDefinitionClauseList ->
+        callDefinitionClauseListByArity.compute(callDefinition.arity) { _, currentCallDefinitionClauseList ->
             if (currentCallDefinitionClauseList != null) {
                 if (currentCallDefinitionClauseList.isDecompiled()) {
                     if (callDefinitionClause.isDecompiled()) {

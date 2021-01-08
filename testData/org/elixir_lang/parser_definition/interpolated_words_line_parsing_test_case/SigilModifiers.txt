@@ -4,7 +4,7 @@ Elixir File(0,30)
       PsiElement(~)('~')(0,1)
       PsiElement(w)('w')(1,2)
       PsiElement(Words Promoter ({, [, <, ", /, (, |, '))('{')(2,3)
-      ElixirInterpolatedWordsBodyImpl(INTERPOLATED_WORDS_BODY)(3,3)
+      ElixirInterpolatedWordsLineBodyImpl(INTERPOLATED_WORDS_LINE_BODY)(3,3)
         <empty list>
       PsiElement(Words Terminator ({, [, <, ", /, (, |, '))('}')(3,4)
       ElixirSigilModifiersImpl(SIGIL_MODIFIERS)(4,30)

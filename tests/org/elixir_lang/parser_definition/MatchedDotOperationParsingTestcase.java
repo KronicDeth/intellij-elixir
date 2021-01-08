@@ -117,7 +117,6 @@ public class MatchedDotOperationParsingTestcase extends ParsingTestCase {
     public void testCharListHeredoc() {
         assertParsedWithErrors();
     }
-
     @Override
     protected String getTestDataPath() {
         return super.getTestDataPath() + "/matched_dot_operation_parsing_test_case";

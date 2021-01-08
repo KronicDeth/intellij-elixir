@@ -1,6 +1,7 @@
 package org.elixir_lang.psi.impl;
 
 import com.ericsson.otp.erlang.OtpErlangBinary;
+import com.ericsson.otp.erlang.OtpErlangList;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.ericsson.otp.erlang.OtpErlangTuple;
 import com.intellij.lang.ASTNode;
@@ -45,7 +46,7 @@ public class ElixirPsiImplUtil {
     public static final String DEFAULT_OPERATOR = "\\\\";
     public static final Key<PsiElement> ENTRANCE = new Key<>("ENTRANCE");
 
-    public static final TokenSet ADDITION_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.DUAL_OPERATOR);
+    public static final TokenSet ADDITION_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.ADDITION_OPERATOR, ElixirTypes.SUBTRACTION_OPERATOR);
     public static final TokenSet AND_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.AND_SYMBOL_OPERATOR, ElixirTypes.AND_WORD_OPERATOR);
     public static final TokenSet AT_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.AT_OPERATOR);
     public static final TokenSet CAPTURE_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.CAPTURE_OPERATOR);
@@ -65,7 +66,11 @@ public class ElixirPsiImplUtil {
     public static final TokenSet TWO_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.RANGE_OPERATOR, ElixirTypes.TWO_OPERATOR);
     public static final TokenSet TYPE_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.TYPE_OPERATOR);
     public static final TokenSet UNARY_OPERATOR_TOKEN_SET = TokenSet.create(
-            ElixirTypes.DUAL_OPERATOR, ElixirTypes.NOT_OPERATOR, ElixirTypes.SIGN_OPERATOR, ElixirTypes.UNARY_OPERATOR
+            ElixirTypes.NEGATE_OPERATOR,
+            ElixirTypes.NOT_OPERATOR,
+            ElixirTypes.NUMBER_OR_BADARITH_OPERATOR,
+            ElixirTypes.SIGN_OPERATOR,
+            ElixirTypes.UNARY_OPERATOR
     );
     public static final TokenSet IDENTIFIER_TOKEN_SET = TokenSet.create(ElixirTypes.IDENTIFIER_TOKEN);
     public static final Function1<? super PsiElement, ? extends PsiElement>  NEXT_SIBLING =
@@ -799,100 +804,100 @@ public class ElixirPsiImplUtil {
     }
 
     public static Body getBody(ElixirCharListHeredocLine charListHeredocLine) {
-        return charListHeredocLine.getQuoteCharListBody();
+        return charListHeredocLine.getCharListHeredocLineBody();
     }
 
     @Nullable
     public static Body getBody(@NotNull final ElixirCharListLine charListLine) {
-        return charListLine.getQuoteCharListBody();
+        return charListLine.getCharListLineBody();
     }
 
     public static Body getBody(ElixirInterpolatedCharListHeredocLine interpolatedCharListHeredocLine) {
-        return interpolatedCharListHeredocLine.getInterpolatedCharListBody();
+        return interpolatedCharListHeredocLine.getInterpolatedCharListHeredocLineBody();
     }
 
     public static Body getBody(ElixirInterpolatedCharListSigilLine interpolatedCharListSigilLine) {
-        return interpolatedCharListSigilLine.getInterpolatedCharListBody();
+        return interpolatedCharListSigilLine.getInterpolatedCharListSigilLineBody();
     }
 
     public static Body getBody(ElixirInterpolatedRegexHeredocLine interpolatedRegexHeredocLine) {
-        return interpolatedRegexHeredocLine.getInterpolatedRegexBody();
+        return interpolatedRegexHeredocLine.getInterpolatedRegexHeredocLineBody();
     }
 
     public static Body getBody(ElixirInterpolatedRegexLine interpolatedRegexLine) {
-        return interpolatedRegexLine.getInterpolatedRegexBody();
+        return interpolatedRegexLine.getInterpolatedRegexLineBody();
     }
 
     public static Body getBody(ElixirInterpolatedSigilHeredocLine sigilHeredocLine) {
-        return sigilHeredocLine.getInterpolatedSigilBody();
+        return sigilHeredocLine.getInterpolatedSigilHeredocLineBody();
     }
 
     public static Body getBody(ElixirInterpolatedSigilLine interpolatedSigilLine) {
-        return interpolatedSigilLine.getInterpolatedSigilBody();
+        return interpolatedSigilLine.getInterpolatedSigilLineBody();
     }
 
     public static Body getBody(ElixirInterpolatedStringHeredocLine stringHeredocLine) {
-        return stringHeredocLine.getInterpolatedStringBody();
+        return stringHeredocLine.getInterpolatedStringHeredocLineBody();
     }
 
     public static Body getBody(ElixirInterpolatedStringSigilLine interpolatedStringSigilLine) {
-        return interpolatedStringSigilLine.getInterpolatedStringBody();
+        return interpolatedStringSigilLine.getInterpolatedStringSigilLineBody();
     }
 
     public static Body getBody(ElixirInterpolatedWordsHeredocLine wordsHeredocLine) {
-        return wordsHeredocLine.getInterpolatedWordsBody();
+        return wordsHeredocLine.getInterpolatedWordsHeredocLineBody();
     }
 
     public static Body getBody(ElixirInterpolatedWordsLine interpolatedWordsLine) {
-        return interpolatedWordsLine.getInterpolatedWordsBody();
+        return interpolatedWordsLine.getInterpolatedWordsLineBody();
     }
 
     public static Body getBody(ElixirLiteralCharListHeredocLine charListHeredocLine) {
-        return charListHeredocLine.getLiteralCharListBody();
+        return charListHeredocLine.getLiteralCharListHeredocLineBody();
     }
 
     public static Body getBody(ElixirLiteralCharListSigilLine literalCharListLine) {
-        return literalCharListLine.getLiteralCharListBody();
+        return literalCharListLine.getLiteralCharListSigilLineBody();
     }
 
     public static Body getBody(ElixirLiteralRegexHeredocLine literalRegexHeredocLine) {
-        return literalRegexHeredocLine.getLiteralRegexBody();
+        return literalRegexHeredocLine.getLiteralRegexHeredocLineBody();
     }
 
     public static Body getBody(ElixirLiteralRegexLine literalRegexLine) {
-        return literalRegexLine.getLiteralRegexBody();
+        return literalRegexLine.getLiteralRegexLineBody();
     }
 
     public static Body getBody(ElixirLiteralSigilHeredocLine literalSigilHeredocLine) {
-        return literalSigilHeredocLine.getLiteralSigilBody();
+        return literalSigilHeredocLine.getLiteralSigilHeredocLineBody();
     }
 
     public static Body getBody(ElixirLiteralSigilLine literalSigilLine) {
-        return literalSigilLine.getLiteralSigilBody();
+        return literalSigilLine.getLiteralSigilLineBody();
     }
 
     public static Body getBody(ElixirLiteralStringHeredocLine literalStringSigilHeredocLine) {
-        return literalStringSigilHeredocLine.getLiteralStringBody();
+        return literalStringSigilHeredocLine.getLiteralStringHeredocLineBody();
     }
 
     public static Body getBody(ElixirLiteralStringSigilLine literalStringSigilLine) {
-        return literalStringSigilLine.getLiteralStringBody();
+        return literalStringSigilLine.getLiteralStringSigilLineBody();
     }
 
     public static Body getBody(ElixirLiteralWordsHeredocLine literalWordsHeredocLine) {
-        return literalWordsHeredocLine.getLiteralWordsBody();
+        return literalWordsHeredocLine.getLiteralWordsHeredocLineBody();
     }
 
     public static Body getBody(ElixirLiteralWordsLine literalWordsLine) {
-        return literalWordsLine.getLiteralWordsBody();
+        return literalWordsLine.getLiteralWordsLineBody();
     }
 
     public static Body getBody(ElixirStringHeredocLine stringHeredocLine) {
-        return stringHeredocLine.getQuoteStringBody();
+        return stringHeredocLine.getStringHeredocLineBody();
     }
 
     public static Body getBody(@NotNull final ElixirStringLine stringLine) {
-        return stringLine.getQuoteStringBody();
+        return stringLine.getStringLineBody();
     }
 
     @Contract(pure = true, value = "_ -> null")
@@ -1186,12 +1191,6 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirIdentifier identifier) {
         return QuotableImpl.quote(identifier);
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static OtpErlangObject quote(@NotNull final ElixirInterpolation interpolation) {
-        return QuotableImpl.quote(interpolation);
     }
 
     @Contract(pure = true)
@@ -1520,20 +1519,20 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quoteBinary(InterpolatedCharList interpolatedCharList, OtpErlangTuple binary) {
-        return ParentImpl.quoteBinary(interpolatedCharList, binary);
+    public static OtpErlangObject quoteBinary(InterpolatedCharList interpolatedCharList, OtpErlangList metadata, List<OtpErlangObject> argumentList) {
+        return ParentImpl.quoteBinary(interpolatedCharList, metadata, argumentList);
     }
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quoteBinary(InterpolatedString interpolatedString, OtpErlangTuple binary) {
-        return ParentImpl.quoteBinary(interpolatedString, binary);
+    public static OtpErlangObject quoteBinary(InterpolatedString interpolatedString, OtpErlangList metadata, List<OtpErlangObject> argumentList) {
+        return ParentImpl.quoteBinary(interpolatedString, metadata, argumentList);
     }
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quoteBinary(Sigil sigil, OtpErlangTuple binary) {
-        return ParentImpl.quoteBinary(sigil, binary);
+    public static OtpErlangObject quoteBinary(Sigil sigil, OtpErlangList metadata, List<OtpErlangObject> argumentList) {
+        return ParentImpl.quoteBinary(sigil, metadata, argumentList);
     }
 
     @Contract(pure = true)
@@ -1552,6 +1551,24 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static OtpErlangObject quoteEmpty(Sigil sigil) {
         return ParentImpl.quoteEmpty(sigil);
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quoteInterpolation(InterpolatedCharList interpolatedCharList, ElixirInterpolation interpolation) {
+        return ParentImpl.quoteInterpolation(interpolatedCharList, interpolation);
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quoteInterpolation(InterpolatedString interpolatedString, ElixirInterpolation interpolation) {
+        return ParentImpl.quoteInterpolation(interpolatedString, interpolation);
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quoteInterpolation(Sigil sigil, ElixirInterpolation interpolation) {
+        return ParentImpl.quoteInterpolation(sigil, interpolation);
     }
 
     @Contract(pure = true)
@@ -1734,6 +1751,21 @@ public class ElixirPsiImplUtil {
         return PsiNamedElementImpl.setName(named, newName);
     }
 
+    @Nullable
+    public static Integer indentation(@NotNull org.elixir_lang.psi.SigilLine sigilLine) {
+        return null;
+    }
+
+    @NotNull
+    public static Integer indentation(@NotNull org.elixir_lang.psi.SigilHeredoc sigilHeredoc) {
+        return SigilHeredocImpl.indentation(sigilHeredoc);
+    }
+
+    @NotNull
+    public static String sigilDelimiter(@NotNull org.elixir_lang.psi.Sigil sigil) {
+        return SigilImpl.sigilDelimiter(sigil);
+    }
+
     public static char sigilName(@NotNull org.elixir_lang.psi.Sigil sigil) {
         return SigilImpl.sigilName(sigil);
     }
@@ -1796,7 +1828,7 @@ public class ElixirPsiImplUtil {
     public static List<Integer> addEscapedEOL(@NotNull Parent parent,
                                               @Nullable List<Integer> maybeCodePointList,
                                               @NotNull ASTNode child) {
-        return ParentImpl.addEscapedEOL(parent, maybeCodePointList, child);
+        return ParentImpl.addEscapedEOL(parent, maybeCodePointList);
     }
 
     @NotNull

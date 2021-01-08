@@ -1101,9 +1101,8 @@ class FindUsagesTest : BasePlatformTestCase() {
             com.intellij.codeInsight.highlighting.ReadWriteAccessDetector.findDetector(element)
 
     private fun getUsageType(element: PsiElement, targets: Array<UsageTarget>): UsageType? =
-            Extensions
-                    .getExtensions(com.intellij.usages.impl.rules.UsageTypeProvider.EP_NAME)
-                    .asSequence()
+            com.intellij.usages.impl.rules.UsageTypeProvider.EP_NAME
+                    .extensionList
                     .mapNotNull { usageTypeProvider ->
                         when (usageTypeProvider) {
                             is UsageTypeProviderEx -> usageTypeProvider.getUsageType(element, targets)

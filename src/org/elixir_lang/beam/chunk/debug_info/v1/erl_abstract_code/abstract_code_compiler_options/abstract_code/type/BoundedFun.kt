@@ -18,7 +18,7 @@ object BoundedFun {
 
     private const val SUBTYPE = "bounded_fun"
 
-    private fun toMacroString(type: OtpErlangTuple): MacroString {
+    private fun toMacroString(@Suppress("UNUSED_PARAMETER") type: OtpErlangTuple): MacroString {
         TODO()
     }
 

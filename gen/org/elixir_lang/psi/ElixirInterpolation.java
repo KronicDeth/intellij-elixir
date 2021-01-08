@@ -1,12 +1,11 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi;
 
-import com.ericsson.otp.erlang.OtpErlangObject;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.List;
+import org.jetbrains.annotations.*;
+import com.intellij.psi.PsiElement;
 
-public interface ElixirInterpolation extends Quotable {
+public interface ElixirInterpolation extends PsiElement {
 
   @NotNull
   List<ElixirEmptyParentheses> getEmptyParenthesesList();
@@ -19,8 +18,5 @@ public interface ElixirInterpolation extends Quotable {
 
   @NotNull
   List<ElixirUnqualifiedNoParenthesesManyArgumentsCall> getUnqualifiedNoParenthesesManyArgumentsCallList();
-
-  @NotNull
-  OtpErlangObject quote();
 
 }
