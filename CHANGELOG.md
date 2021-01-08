@@ -260,6 +260,14 @@
     * Convert `Quoter` to Kotlin
     * Regenerate Parser for newer GrammarParser version.
     * Port elixir-lang/elixir@1e4e05ef78b3105065f0a313bd0e1e78b2aa973e
+* [#1834](https://github.com/KronicDeth/intellij-elixir/pull/1834) - [@marcindawidziuk](https://github.com/marcindawidziuk)
+  * Rewrote the `DocumentationProvider` so it no longer relies on invoking `mix` (which I admit was more like a hack than a real solution). This now works so quickly that it actually makes sense to show docs on mouse hover.
+    * It can get the documentation from both the source code and decompiled .beam files.
+  * Decompilation of documentation was implemented according to EEP-48. 
+  * The experience on navigating through decompiled file has also been improved a bit
+    * See the `@moduledoc`  and `@doc`s
+    * See if a function has been deprecated
+    * See the original signature of the function (instead of just `p0`, `p1`, ...).
 
 ### Bug Fixes
 * [#1844](https://github.com/KronicDeth/intellij-elixir/pull/1844) - [@KronicDeth](https://github.com/KronicDeth)
