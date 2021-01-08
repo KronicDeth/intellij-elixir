@@ -76,6 +76,7 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "  \n" +
                         "  All functions in this module are inlined by the compiler.\n" +
                         "  \"\"\"\n" +
+                        "\n" +
                         "  # Macros\n" +
                         "\n" +
                         "  def __using__(options) do\n" +
@@ -329,7 +330,7 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "  def ~~~expr do\n" +
                         "    # body not decompiled\n" +
                         "  end\n" +
-                        "end\ngit s",
+                        "end\n",
                 decompiled.toString()
         );
     }

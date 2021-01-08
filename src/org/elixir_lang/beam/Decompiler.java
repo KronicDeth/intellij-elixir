@@ -78,7 +78,7 @@ public class Decompiler implements BinaryFileDecompiler {
                                     .map(x -> "  " + x)
                                     .collect(Collectors.joining("\n"));
                             decompiled.append(indentedModuleDocs);
-                            decompiled.append("\n  \"\"\"");
+                            decompiled.append("\n  \"\"\"\n");
                         }
                     }
 
