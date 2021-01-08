@@ -219,7 +219,7 @@
     <xdebugger.breakpointType implementation="org.elixir_lang.debugger.line_breakpoint.Type"/>
     <xdebugger.settings implementation="org.elixir_lang.debugger.Settings"/>
 
-    <lang.documentationProvider implementationClass="org.elixir_lang.ElixirDocumentationProvider" language="Elixir"/>
+    <lang.documentationProvider implementationClass="org.elixir_lang.documentation.ElixirDocumentationProvider" language="Elixir"/>
   </extensions>
 
   <projectListeners>

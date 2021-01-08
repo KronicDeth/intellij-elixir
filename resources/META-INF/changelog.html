@@ -67,6 +67,19 @@
           </li>
         </ul>
       </li>
+      <li>Rewrote the <code>DocumentationProvider</code> so it no longer relies on invoking <code>mix</code> (which I admit was more like a hack than a real solution). This now works so quickly that it actually makes sense to show docs on mouse hover.
+        <ul>
+          <li>It can get the documentation from both the source code and decompiled .beam files.</li>
+        </ul>
+      </li>
+      <li>Decompilation of documentation was implemented according to EEP-48.</li>
+      <li>The experience on navigating through decompiled file has also been improved a bit.
+        <ul>
+          <li>See the <code>@moduledoc</code>  and <code>@doc</code>s</li>
+          <li>See if a function has been deprecated</li>
+          <li>See the original signature of the function (instead of just <code>p0</code>, <code>p1</code>, ...).</li>
+        </ul>
+      </li>
     </ul>
   </li>
   <li>
