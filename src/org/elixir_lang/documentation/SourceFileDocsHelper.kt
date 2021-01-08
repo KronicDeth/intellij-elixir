@@ -146,7 +146,7 @@ object SourceFileDocsHelper {
             return element.children.joinToString("") { it.text }
         }
         if (element is ElixirStringLine) {
-            return element.quoteStringBody?.text
+            return element.body?.text
         }
         return null
     }
