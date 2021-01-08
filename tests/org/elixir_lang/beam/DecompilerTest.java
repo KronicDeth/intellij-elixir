@@ -85,7 +85,6 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "\n" +
                         "  # Functions\n" +
                         "\n" +
-                        "\n" +
                         "  @doc \"\"\"\n" +
                         "  Bitwise AND operator.\n" +
                         "  \n" +
@@ -101,7 +100,6 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "  def left &&& right do\n" +
                         "    # body not decompiled\n" +
                         "  end\n" +
-                        "\n" +
                         "\n" +
                         "  @doc \"\"\"\n" +
                         "  Arithmetic left bitshift operator.\n" +
@@ -128,7 +126,6 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "    # body not decompiled\n" +
                         "  end\n" +
                         "\n" +
-                        "\n" +
                         "  @doc \"\"\"\n" +
                         "  Arithmetic right bitshift operator.\n" +
                         "  \n" +
@@ -154,7 +151,6 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "    # body not decompiled\n" +
                         "  end\n" +
                         "\n" +
-                        "\n" +
                         "  @doc \"\"\"\n" +
                         "  Bitwise XOR operator.\n" +
                         "  \n" +
@@ -175,7 +171,6 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "    # body not decompiled\n" +
                         "  end\n" +
                         "\n" +
-                        "\n" +
                         "  @doc \"\"\"\n" +
                         "  Calculates the bitwise AND of its arguments.\n" +
                         "  \n" +
@@ -189,7 +184,6 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "  def band(left, right) do\n" +
                         "    # body not decompiled\n" +
                         "  end\n" +
-                        "\n" +
                         "\n" +
                         "  @doc \"\"\"\n" +
                         "  Calculates the bitwise NOT of the argument.\n" +
@@ -208,7 +202,6 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "    # body not decompiled\n" +
                         "  end\n" +
                         "\n" +
-                        "\n" +
                         "  @doc \"\"\"\n" +
                         "  Calculates the bitwise OR of its arguments.\n" +
                         "  \n" +
@@ -222,7 +215,6 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "  def bor(left, right) do\n" +
                         "    # body not decompiled\n" +
                         "  end\n" +
-                        "\n" +
                         "\n" +
                         "  @doc \"\"\"\n" +
                         "  Calculates the result of an arithmetic left bitshift.\n" +
@@ -247,7 +239,6 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "    # body not decompiled\n" +
                         "  end\n" +
                         "\n" +
-                        "\n" +
                         "  @doc \"\"\"\n" +
                         "  Calculates the result of an arithmetic right bitshift.\n" +
                         "  \n" +
@@ -271,7 +262,6 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "    # body not decompiled\n" +
                         "  end\n" +
                         "\n" +
-                        "\n" +
                         "  @doc \"\"\"\n" +
                         "  Calculates the bitwise XOR of its arguments.\n" +
                         "  \n" +
@@ -294,7 +284,6 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "    # body not decompiled\n" +
                         "  end\n" +
                         "\n" +
-                        "\n" +
                         "  @doc \"\"\"\n" +
                         "  Bitwise OR operator.\n" +
                         "  \n" +
@@ -310,7 +299,6 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "  def left ||| right do\n" +
                         "    # body not decompiled\n" +
                         "  end\n" +
-                        "\n" +
                         "\n" +
                         "  @doc \"\"\"\n" +
                         "  Bitwise NOT unary operator.\n" +

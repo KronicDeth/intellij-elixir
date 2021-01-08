@@ -148,7 +148,7 @@ public class Decompiler implements BinaryFileDecompiler {
                         String indentedDocs = Arrays.stream(x.getDocumentationText().split("\n"))
                                 .map(d -> "  " + d)
                                 .collect(Collectors.joining("\n"));
-                        decompiled.append("\n  @doc \"\"\"\n")
+                        decompiled.append("  @doc \"\"\"\n")
                                 .append(indentedDocs)
                                 .append("\n  \"\"\"\n");
                     });
