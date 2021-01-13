@@ -11,8 +11,8 @@ import org.elixir_lang.psi.call.MaybeExported
 import org.elixir_lang.beam.psi.stubs.ModuleStubElementTypes
 import com.intellij.util.IncorrectOperationException
 import com.intellij.psi.ResolveState
+import com.intellij.psi.impl.source.SourceTreeToPsiMap
 import com.intellij.psi.impl.source.tree.TreeElement
-import com.intellij.util.ArrayFactory
 import org.elixir_lang.beam.psi.Module
 import org.elixir_lang.psi.call.Call
 import org.jetbrains.annotations.Contract
@@ -46,7 +46,14 @@ class ModuleImpl<T : StubElement<*>?>(private val stub: T) : ModuleElementImpl()
 
     override fun setMirror(element: TreeElement) {
         setMirrorCheckingType(element, null)
-        setMirrors(callDefinitions(), callDefinitions(element))
+
+        val callDefinitionByArityByName = callDefinitionByArityByName(element)
+
+        for (callDefinitionStub in callDefinitions()) {
+            callDefinitionByArityByName[callDefinitionStub.exportedName()]
+                    ?.get(callDefinitionStub.exportedArity())
+                    ?.let { (callDefinitionStub as ModuleElementImpl).setMirror(SourceTreeToPsiMap.psiToTreeNotNull(it)) }
+        }
     }
 
     private fun callDefinitions(): Array<MaybeExported> =
@@ -87,24 +94,30 @@ class ModuleImpl<T : StubElement<*>?>(private val stub: T) : ModuleElementImpl()
 
     companion object {
         @Contract(pure = true)
-        private fun callDefinitions(mirror: TreeElement): Array<MaybeExported> {
+        private fun callDefinitionByArityByName(mirror: TreeElement): Map<String, Map<Int, MaybeExported>> {
             val mirrorPsi = mirror.psi
 
             return if (mirrorPsi is Call) {
-                val callDefinitionList: MutableList<MaybeExported> = ArrayList()
                 val initialResolveState = ResolveState.initial().putInitialVisitedElement(mirrorPsi)
+                val callDefinitionByArityByName = mutableMapOf<String, MutableMap<Int, MaybeExported>>()
 
                 callDefinitionClauseCallWhile(mirrorPsi, initialResolveState) { call: Call?, accResolvedState: ResolveState? ->
                     if (call is MaybeExported) {
                         val maybeExportedCall = call as MaybeExported
-                        callDefinitionList.add(maybeExportedCall)
+
+                        maybeExportedCall
+                                .exportedName()
+                                ?.let { exportedName ->
+                                    callDefinitionByArityByName
+                                            .getOrPut(exportedName) { mutableMapOf() }[maybeExportedCall.exportedArity()] = maybeExportedCall
+                                }
                     }
                     true
                 }
 
-                callDefinitionList.toTypedArray()
+                callDefinitionByArityByName
             } else {
-                emptyArray()
+                emptyMap()
             }
         }
     }
