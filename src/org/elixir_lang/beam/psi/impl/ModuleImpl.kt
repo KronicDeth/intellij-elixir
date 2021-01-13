@@ -1,164 +1,111 @@
-package org.elixir_lang.beam.psi.impl;
+package org.elixir_lang.beam.psi.impl
 
-import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.ResolveState;
-import com.intellij.psi.StubBasedPsiElement;
-import com.intellij.psi.impl.source.tree.TreeElement;
-import com.intellij.psi.stubs.IStubElementType;
-import com.intellij.psi.stubs.StubElement;
-import com.intellij.util.IncorrectOperationException;
-import org.elixir_lang.beam.psi.Module;
-import org.elixir_lang.psi.Modular;
-import org.elixir_lang.psi.call.Call;
-import org.elixir_lang.psi.call.MaybeExported;
-import org.elixir_lang.psi.scope.CallDefinitionClauseKt;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NonNls;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-import static org.elixir_lang.beam.psi.stubs.ModuleStubElementTypes.CALL_DEFINITION;
+import com.intellij.openapi.project.Project
+import org.elixir_lang.psi.scope.putInitialVisitedElement
+import org.elixir_lang.psi.Modular.callDefinitionClauseCallWhile
+import com.intellij.psi.stubs.StubElement
+import com.intellij.psi.StubBasedPsiElement
+import com.intellij.psi.PsiElement
+import com.intellij.psi.stubs.IStubElementType
+import org.elixir_lang.psi.call.MaybeExported
+import org.elixir_lang.beam.psi.stubs.ModuleStubElementTypes
+import com.intellij.util.IncorrectOperationException
+import com.intellij.psi.ResolveState
+import com.intellij.psi.impl.source.tree.TreeElement
+import com.intellij.util.ArrayFactory
+import org.elixir_lang.beam.psi.Module
+import org.elixir_lang.psi.call.Call
+import org.jetbrains.annotations.Contract
+import org.jetbrains.annotations.NonNls
+import java.lang.StringBuilder
+import java.util.ArrayList
 
 // See com.intellij.psi.impl.compiled.ClsClassImpl
-public class ModuleImpl<T extends StubElement> extends ModuleElementImpl implements Module, StubBasedPsiElement<T> {
-    private final T stub;
-
-    public ModuleImpl(T stub) {
-        this.stub = stub;
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    private static MaybeExported[] callDefinitions(@NotNull TreeElement mirror) {
-        PsiElement mirrorPsi = mirror.getPsi();
-        MaybeExported[] callDefinitions;
-
-        if (mirrorPsi instanceof Call) {
-            Call mirrorCall = (Call) mirrorPsi;
-            final List<MaybeExported> callDefinitionList = new ArrayList<>();
-            final ResolveState initialResolveState = CallDefinitionClauseKt.putInitialVisitedElement(ResolveState.initial(), mirrorCall);
-
-            Modular.callDefinitionClauseCallWhile(mirrorCall, initialResolveState, (call, accResolvedState) -> {
-                if (call instanceof MaybeExported) {
-                    MaybeExported maybeExportedCall = (MaybeExported) call;
-
-                    callDefinitionList.add(maybeExportedCall);
-                }
-
-                return true;
-            });
-
-            callDefinitions = callDefinitionList.toArray(new MaybeExported[callDefinitionList.size()]);
-        } else {
-            callDefinitions = new MaybeExported[0];
-        }
-
-        return callDefinitions;
-    }
-
+class ModuleImpl<T : StubElement<*>?>(private val stub: T) : ModuleElementImpl(), Module, StubBasedPsiElement<T> {
     /**
      * Returns the array of children for the PSI element.
      * Important: In some implementations children are only composite elements, i.e. not a leaf elements
      *
      * @return the array of child elements.
      */
-    @NotNull
-    @Override
-    public PsiElement[] getChildren() {
-        return new PsiElement[0];
-    }
+    override fun getChildren(): Array<PsiElement> = emptyArray()
 
     /**
      * Returns the parent of the PSI element.
      *
      * @return the parent of the element, or null if the element has no parent.
      */
-    @Override
-    public PsiElement getParent() {
-        return stub.getParentStub().getPsi();
+    override fun getParent(): PsiElement = stub!!.getParentStub().psi
+
+    override fun getElementType(): IStubElementType<*, *> = stub!!.getStubType()
+
+    override fun getStub(): T = stub
+
+    override fun appendMirrorText(buffer: StringBuilder, indentLevel: Int) {
     }
 
-    @Override
-    public IStubElementType getElementType() {
-        return stub.getStubType();
+    override fun setMirror(element: TreeElement) {
+        setMirrorCheckingType(element, null)
+        setMirrors(callDefinitions(), callDefinitions(element))
     }
 
-    @Override
-    public T getStub() {
-        return stub;
-    }
-
-    @Override
-    public void appendMirrorText(@NotNull StringBuilder buffer, int indentLevel) {
-        assert buffer != null;
-    }
-
-    @Override
-    public void setMirror(@NotNull TreeElement element) throws InvalidMirrorException {
-        setMirrorCheckingType(element, null);
-
-        setMirrors(callDefinitions(), callDefinitions(element));
-    }
-
-    private MaybeExported[] callDefinitions() {
-        return (MaybeExported[]) getStub().getChildrenByType(CALL_DEFINITION, CallDefinitionImpl[]::new);
-    }
+    private fun callDefinitions(): Array<MaybeExported> =
+            getStub()!!.getChildrenByType(ModuleStubElementTypes.CALL_DEFINITION, emptyArray())
 
     /**
-     * @return {@code null} if it does not have a canonical name OR if it has more than one canonical name
+     * @return `null` if it does not have a canonical name OR if it has more than one canonical name
      */
-    @Nullable
-    @Override
-    public String canonicalName() {
-        assert stub != null;
-
-        return null;
+    override fun canonicalName(): String? {
+        assert(stub != null)
+        return null
     }
 
     /**
      * @return empty set if no canonical names
      */
-    @NotNull
-    @Override
-    public Set<String> canonicalNameSet() {
-        assert stub != null;
-
-        return null;
+    override fun canonicalNameSet(): Set<String> {
+        assert(stub != null)
+        return emptySet()
     }
 
-    @Nullable
-    @Override
-    public PsiElement getNameIdentifier() {
-        return this;
-    }
+    override fun getNameIdentifier(): PsiElement = this
 
     /**
      * Renames the element.
      *
      * @param name the new element name.
-     * @return the element corresponding to this element after the rename (either <code>this</code>
+     * @return the element corresponding to this element after the rename (either `this`
      * or a different element if the rename caused the element to be replaced).
      * @throws IncorrectOperationException if the modification is not supported or not possible for some reason.
      */
-    @Override
-    public PsiElement setName(@NonNls @NotNull String name) throws IncorrectOperationException {
-        throw new IncorrectOperationException("Cannot modify module name in Beam files");
-    }
+    override fun setName(@NonNls name: String): PsiElement =
+            throw IncorrectOperationException("Cannot modify module name in Beam files")
 
-    @NotNull
-    @Override
-    public PsiElement getNavigationElement() {
-        return getMirror();
-    }
+    override fun getNavigationElement(): PsiElement = mirror
 
-    @NotNull
-    @Override
-    public Project getProject() {
-        return getMirror().getProject();
+    override fun getProject(): Project = mirror.project
+
+    companion object {
+        @Contract(pure = true)
+        private fun callDefinitions(mirror: TreeElement): Array<MaybeExported> {
+            val mirrorPsi = mirror.psi
+
+            return if (mirrorPsi is Call) {
+                val callDefinitionList: MutableList<MaybeExported> = ArrayList()
+                val initialResolveState = ResolveState.initial().putInitialVisitedElement(mirrorPsi)
+
+                callDefinitionClauseCallWhile(mirrorPsi, initialResolveState) { call: Call?, accResolvedState: ResolveState? ->
+                    if (call is MaybeExported) {
+                        val maybeExportedCall = call as MaybeExported
+                        callDefinitionList.add(maybeExportedCall)
+                    }
+                    true
+                }
+
+                callDefinitionList.toTypedArray()
+            } else {
+                emptyArray()
+            }
+        }
     }
 }
