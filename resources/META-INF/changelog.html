@@ -58,6 +58,8 @@
         <code>DepsWatcher</code> were still trying to get its instance for project using
         <code>project.getComponent()</code>, which would now return <code>null</code>.
       </li>
+      <li>Target Java 1.8 for JPS compatibility<br>
+        JPS (JetBrains Project System) is the API used to allow External Builders, like <code>mix</code> to build projects.</li>
     </ul>
   </li>
 </ul>

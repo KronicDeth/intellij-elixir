@@ -244,6 +244,9 @@
 * [1878](https://github.com/KronicDeth/intellij-elixir/pull/1878) - [@KronicDeth](https://github.com/KronicDeth)
   * Fix missed references to `DepsWatcher` as project component
     `DepsWatcher` was converted to a Project Listener in #1844 to support installing the plugin from the Marketplace without reloading, but some references to `DepsWatcher` were still trying to get its instance for project using `project.getComponent()`, which would now return `null`.
+* [#1879](https://github.com/KronicDeth/intellij-elixir/pull/1879) - [@KronicDeth](https://github.com/KronicDeth)
+  * Target Java 1.8 for JPS compatibility.
+    JPS (JetBrains Project System) is the API used to allow External Builders, like `mix` to build projects.
 
 ## v11.9.0
 
