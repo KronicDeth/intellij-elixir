@@ -106,7 +106,7 @@ class DepsWatcher(val project: Project) : BulkFileListener {
             if (fileName == "_build" && isModuleContentRoot(parent, project)) {
                 ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Syncing Libraries in _build", true) {
                     override fun run(indicator: ProgressIndicator) {
-                        syncLibraries(project, indicator)
+                        syncLibraries(indicator)
                     }
                 })
             } else {
@@ -114,7 +114,7 @@ class DepsWatcher(val project: Project) : BulkFileListener {
                     if (parent.name == "_build" && isModuleContentRoot(grandParent, project)) {
                         ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Syncing Libraries in _build/$fileName", true) {
                             override fun run(indicator: ProgressIndicator) {
-                                syncLibraries(project, indicator)
+                                syncLibraries(indicator)
                             }
                         })
                     } else {
@@ -122,7 +122,7 @@ class DepsWatcher(val project: Project) : BulkFileListener {
                             if (fileName in arrayOf("consolidated", "lib") && grandParent.name == "_build" && isModuleContentRoot(greatGrandParent, project)) {
                                 ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Syncing Libraries in _build/${parent.name}/$fileName", true) {
                                     override fun run(indicator: ProgressIndicator) {
-                                        syncLibraries(project, indicator)
+                                        syncLibraries(indicator)
                                     }
                                 })
                             } else if (fileName in SOURCE_NAMES && grandParent.name == "deps" && isModuleContentRoot(greatGrandParent, project)) {
@@ -168,7 +168,7 @@ class DepsWatcher(val project: Project) : BulkFileListener {
         }
     }
 
-    fun syncLibraries(project: Project, progressIndicator: ProgressIndicator) {
+    fun syncLibraries(progressIndicator: ProgressIndicator) {
         ProjectRootManager
                 .getInstance(project)
                 .contentRootsFromAllModules

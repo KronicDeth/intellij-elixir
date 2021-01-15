@@ -129,7 +129,7 @@ class Watcher(private val project: Project) : BulkFileListener {
         if (externalPaths.isNotEmpty()) {
             val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
 
-            project.getComponent(DepsWatcher::class.java).syncLibraries(externalPaths, libraryTable, progressIndicator)
+            DepsWatcher(project).syncLibraries(externalPaths, libraryTable, progressIndicator)
         }
     }
 }

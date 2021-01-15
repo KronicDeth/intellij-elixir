@@ -241,6 +241,9 @@
       The docs from the `Docs` chunk may contain interpolation in the code samples or `#{` in regex examples, but these should not be treated as an interpolation start as the `Docs` format does not support interpolation.  Anything that looks like interpolation in the docs text was actually escaped in the original docs, so also escape it here by using `S"""`, which turns off interpolation.
     * Log an error if `Code` function can't be matched to decompiled source.
       Unlike the old `InvalidMirrorException`, this won't be an exception and the binary <-> decompile will still work for the other functions/macros in the file, so it will be a more graceful degradation.
+* [1878](https://github.com/KronicDeth/intellij-elixir/pull/1878) - [@KronicDeth](https://github.com/KronicDeth)
+  * Fix missed references to `DepsWatcher` as project component
+    `DepsWatcher` was converted to a Project Listener in #1844 to support installing the plugin from the Marketplace without reloading, but some references to `DepsWatcher` were still trying to get its instance for project using `project.getComponent()`, which would now return `null`.
 
 ## v11.9.0
 

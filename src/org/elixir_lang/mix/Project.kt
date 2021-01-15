@@ -87,7 +87,7 @@ object Project {
 
                 ProgressManager.getInstance().run(object : Task.Modal(project, "Scanning dependencies for Libraries", true) {
                     override fun run(indicator: ProgressIndicator) {
-                        project.getComponent(DepsWatcher::class.java).syncLibraries(project, indicator)
+                        DepsWatcher(project).syncLibraries(indicator)
                     }
                 })
             }

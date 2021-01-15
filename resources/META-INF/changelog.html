@@ -50,6 +50,14 @@
           </li>
         </ul>
       </li>
+      <li>
+        Fix missed references to <code>DepsWatcher</code> as project component<br>
+        <code>DepsWatcher</code> was converted to a Project Listener in
+        <a href="https://github.com/KronicDeth/intellij-elixir/pull/1844">#1844</a>
+        to support installing the plugin from the Marketplace without reloading, but some references to
+        <code>DepsWatcher</code> were still trying to get its instance for project using
+        <code>project.getComponent()</code>, which would now return <code>null</code>.
+      </li>
     </ul>
   </li>
 </ul>
