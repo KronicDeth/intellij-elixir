@@ -71,7 +71,7 @@ public interface ModuleStubElementTypes {
 
         @Override
         public Module createPsi(@NotNull ModuleStub stub) {
-            return new ModuleImpl<ModuleStub>(stub);
+            return new ModuleImpl<>(stub);
         }
 
         @NotNull

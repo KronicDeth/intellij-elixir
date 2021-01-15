@@ -79,13 +79,13 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "\n" +
                         "  # Macros\n" +
                         "\n" +
-                        "  def __using__(options) do\n" +
+                        "  defmacro __using__(options) do\n" +
                         "    # body not decompiled\n" +
                         "  end\n" +
                         "\n" +
                         "  # Functions\n" +
                         "\n" +
-                        "  @doc \"\"\"\n" +
+                        "  @doc ~S\"\"\"\n" +
                         "  Bitwise AND operator.\n" +
                         "  \n" +
                         "  Calculates the bitwise AND of its arguments.\n" +
@@ -101,7 +101,7 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "    # body not decompiled\n" +
                         "  end\n" +
                         "\n" +
-                        "  @doc \"\"\"\n" +
+                        "  @doc ~S\"\"\"\n" +
                         "  Arithmetic left bitshift operator.\n" +
                         "  \n" +
                         "  Calculates the result of an arithmetic left bitshift.\n" +
@@ -126,7 +126,7 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "    # body not decompiled\n" +
                         "  end\n" +
                         "\n" +
-                        "  @doc \"\"\"\n" +
+                        "  @doc ~S\"\"\"\n" +
                         "  Arithmetic right bitshift operator.\n" +
                         "  \n" +
                         "  Calculates the result of an arithmetic right bitshift.\n" +
@@ -151,7 +151,7 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "    # body not decompiled\n" +
                         "  end\n" +
                         "\n" +
-                        "  @doc \"\"\"\n" +
+                        "  @doc ~S\"\"\"\n" +
                         "  Bitwise XOR operator.\n" +
                         "  \n" +
                         "  Calculates the bitwise XOR of its arguments.\n" +
@@ -171,7 +171,7 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "    # body not decompiled\n" +
                         "  end\n" +
                         "\n" +
-                        "  @doc \"\"\"\n" +
+                        "  @doc ~S\"\"\"\n" +
                         "  Calculates the bitwise AND of its arguments.\n" +
                         "  \n" +
                         "  Allowed in guard tests. Inlined by the compiler.\n" +
@@ -185,7 +185,7 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "    # body not decompiled\n" +
                         "  end\n" +
                         "\n" +
-                        "  @doc \"\"\"\n" +
+                        "  @doc ~S\"\"\"\n" +
                         "  Calculates the bitwise NOT of the argument.\n" +
                         "  \n" +
                         "  Allowed in guard tests. Inlined by the compiler.\n" +
@@ -202,7 +202,7 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "    # body not decompiled\n" +
                         "  end\n" +
                         "\n" +
-                        "  @doc \"\"\"\n" +
+                        "  @doc ~S\"\"\"\n" +
                         "  Calculates the bitwise OR of its arguments.\n" +
                         "  \n" +
                         "  Allowed in guard tests. Inlined by the compiler.\n" +
@@ -216,7 +216,7 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "    # body not decompiled\n" +
                         "  end\n" +
                         "\n" +
-                        "  @doc \"\"\"\n" +
+                        "  @doc ~S\"\"\"\n" +
                         "  Calculates the result of an arithmetic left bitshift.\n" +
                         "  \n" +
                         "  Allowed in guard tests. Inlined by the compiler.\n" +
@@ -239,7 +239,7 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "    # body not decompiled\n" +
                         "  end\n" +
                         "\n" +
-                        "  @doc \"\"\"\n" +
+                        "  @doc ~S\"\"\"\n" +
                         "  Calculates the result of an arithmetic right bitshift.\n" +
                         "  \n" +
                         "  Allowed in guard tests. Inlined by the compiler.\n" +
@@ -262,7 +262,7 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "    # body not decompiled\n" +
                         "  end\n" +
                         "\n" +
-                        "  @doc \"\"\"\n" +
+                        "  @doc ~S\"\"\"\n" +
                         "  Calculates the bitwise XOR of its arguments.\n" +
                         "  \n" +
                         "  Allowed in guard tests. Inlined by the compiler.\n" +
@@ -284,7 +284,7 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "    # body not decompiled\n" +
                         "  end\n" +
                         "\n" +
-                        "  @doc \"\"\"\n" +
+                        "  @doc ~S\"\"\"\n" +
                         "  Bitwise OR operator.\n" +
                         "  \n" +
                         "  Calculates the bitwise OR of its arguments.\n" +
@@ -300,7 +300,7 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "    # body not decompiled\n" +
                         "  end\n" +
                         "\n" +
-                        "  @doc \"\"\"\n" +
+                        "  @doc ~S\"\"\"\n" +
                         "  Bitwise NOT unary operator.\n" +
                         "  \n" +
                         "  Calculates the bitwise NOT of the argument.\n" +

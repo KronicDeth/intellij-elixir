@@ -148,7 +148,9 @@ public class Decompiler implements BinaryFileDecompiler {
                         String indentedDocs = Arrays.stream(x.getDocumentationText().split("\n"))
                                 .map(d -> "  " + d)
                                 .collect(Collectors.joining("\n"));
-                        decompiled.append("  @doc \"\"\"\n")
+                        // Use ~S sigil to stop interpolation in docs as an interpolation stored in the docs was
+                        // escaped in the original source.
+                        decompiled.append("  @doc ~S\"\"\"\n")
                                 .append(indentedDocs)
                                 .append("\n  \"\"\"\n");
                     });
@@ -159,7 +161,7 @@ public class Decompiler implements BinaryFileDecompiler {
                     ? documentation.getDocs().getSignatures(macroNameArity.name, macroNameArity.arity)
                     : null;
             if (signaturesFromDocs != null && !signaturesFromDocs.isEmpty()){
-                decompiled.append("  def ");
+                decompiled.append("  ").append(macroNameArity.macro).append(' ');
                 Optional<String> optional = signaturesFromDocs.stream().findFirst();
                 decompiled.append(optional.get());
                 decompiled.append(" do\n    # body not decompiled\n  end\n");

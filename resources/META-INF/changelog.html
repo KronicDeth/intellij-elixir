@@ -1,5 +1,58 @@
 <html>
 <body>
+<h1>v11.9.1</h1>
+<ul>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>
+        <p>
+          Fix syntax highlighting stopping due to decompiling of <code>Kernel</code> failing caused by bugs introduced
+          in <a href="https://github.com/KronicDeth/intellij-elixir/pull/1834">#1834</a>.<br>
+          Syntax highlighting could fail part way through a file when <code>Kernel</code> needed to be decompiled to
+          resolve parts of the syntax.  This would lead to the file to be colored above a certain point, but then the
+          default gray after that point.
+        </p>
+        <ul>
+          <li>
+            Connect compiled stubs to decompiled source by name/arity.<br>
+            Previously, when the decompiler didn't use the <code>Docs</code>, it was guaranteed that the
+            <code>PsiCompiled</code> stubs would correlate, in-order, with the decompiled source call definitions, and
+            so mirrors could be set by matching up the list of them in order.  Since the <code>Docs</code> doesn't have
+            to correspond to and doesn't correspond to the binary precisely for some BEAMs, most importantly,
+            <code>Elixir.Kernel.beam</code>, the PsiCompiled stub and decompiled source is now matched by name and
+            arity.  This means some mirrors are missed, but no errors are produced.
+          </li>
+          <li>
+            Allow decompile source to map to entire arity range<br>
+            Since the decompile source from <code>Docs</code> can have default arguments the call definition clauses can
+            have an arity range and not just a fixed arity, so all arities in the range need to be mappable to
+            <code>PsiCompiled</code> functions.
+          </li>
+          <li>
+            Use correct macro for signature from <code>Docs</code>.<br>
+            Ensures that defmacro is used for macros instead of hard-coding <code>def</code> as in
+            <a href="https://github.com/KronicDeth/intellij-elixir/pull/1834">#1834</a>.
+          </li>
+          <li>
+            Use <code>~S"""</code> for docs from <code>Docs</code> chunk.<br>
+            The docs from the <code>Docs</code> chunk may contain interpolation in the code samples or <code>#{</code>
+            in regex examples, but these should not be treated as an interpolation start as the <code>Docs</code> format
+            does not support interpolation.  Anything that looks like interpolation in the docs text was actually
+            escaped in the original docs, so also escape it here by using <code>S"""</code>, which turns off
+            interpolation.
+          </li>
+          <li>
+            Log an error if <code>Code</code> function can't be matched to decompiled source.<br>
+            Unlike the old <code>InvalidMirrorException</code>, this won't be an exception and the binary &lt;-&gt;
+            decompile will still work for the other functions/macros in the file, so it will be a more graceful
+            degradation.
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
 <h1>v11.9.0</h1>
 <ul>
   <li>
