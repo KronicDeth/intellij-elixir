@@ -148,7 +148,9 @@ public class Decompiler implements BinaryFileDecompiler {
                         String indentedDocs = Arrays.stream(x.getDocumentationText().split("\n"))
                                 .map(d -> "  " + d)
                                 .collect(Collectors.joining("\n"));
-                        decompiled.append("  @doc \"\"\"\n")
+                        // Use ~S sigil to stop interpolation in docs as an interpolation stored in the docs was
+                        // escaped in the original source.
+                        decompiled.append("  @doc ~S\"\"\"\n")
                                 .append(indentedDocs)
                                 .append("\n  \"\"\"\n");
                     });
