@@ -1,5 +1,6 @@
 package org.elixir_lang.beam.psi.impl
 
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import org.elixir_lang.psi.scope.putInitialVisitedElement
 import org.elixir_lang.psi.Modular.callDefinitionClauseCallWhile
@@ -51,9 +52,21 @@ class ModuleImpl<T : StubElement<*>?>(private val stub: T) : ModuleElementImpl()
         val callDefinitionClauseByArityByName = callDefinitionClauseByArityByName(element)
 
         for (callDefinitionStub in callDefinitions()) {
-            callDefinitionClauseByArityByName[callDefinitionStub.exportedName()]
-                    ?.get(callDefinitionStub.exportedArity())
-                    ?.let { (callDefinitionStub as ModuleElementImpl).setMirror(SourceTreeToPsiMap.psiToTreeNotNull(it)) }
+            val name = callDefinitionStub.exportedName()
+            val callDefinitionClauseByArity = callDefinitionClauseByArityByName[name]
+
+            if (callDefinitionClauseByArity != null) {
+                val arity = callDefinitionStub.exportedArity()
+                val callDefinitionClause = callDefinitionClauseByArity[arity]
+
+                if (callDefinitionClause != null) {
+                    (callDefinitionStub as ModuleElementImpl).setMirror(SourceTreeToPsiMap.psiToTreeNotNull(callDefinitionClause))
+                } else {
+                    LOGGER.error("No decompiled source function with name/arity (${name}/${arity})")
+                }
+            } else {
+                LOGGER.error("No decompiled source function with name ($name)")
+            }
         }
     }
 
@@ -94,6 +107,8 @@ class ModuleImpl<T : StubElement<*>?>(private val stub: T) : ModuleElementImpl()
     override fun getProject(): Project = mirror.project
 
     companion object {
+        private val LOGGER = Logger.getInstance(ModuleImpl::class.java)
+
         @Contract(pure = true)
         private fun callDefinitionClauseByArityByName(mirror: TreeElement): Map<String, Map<Int, Call>> {
             val mirrorPsi = mirror.psi
