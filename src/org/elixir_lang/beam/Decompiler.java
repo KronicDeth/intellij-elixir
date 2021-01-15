@@ -159,7 +159,7 @@ public class Decompiler implements BinaryFileDecompiler {
                     ? documentation.getDocs().getSignatures(macroNameArity.name, macroNameArity.arity)
                     : null;
             if (signaturesFromDocs != null && !signaturesFromDocs.isEmpty()){
-                decompiled.append("  def ");
+                decompiled.append("  ").append(macroNameArity.macro).append(' ');
                 Optional<String> optional = signaturesFromDocs.stream().findFirst();
                 decompiled.append(optional.get());
                 decompiled.append(" do\n    # body not decompiled\n  end\n");
