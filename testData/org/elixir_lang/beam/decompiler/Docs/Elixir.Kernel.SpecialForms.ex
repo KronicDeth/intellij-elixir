@@ -1,6 +1,6 @@
 # Source code recreated from a .beam file by IntelliJ Elixir
 defmodule Kernel.SpecialForms do
-  @moduleDoc """
+  @moduledoc """
   Special forms are the basic building blocks of Elixir, and therefore
   cannot be overridden by the developer.
 
