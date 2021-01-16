@@ -3,7 +3,7 @@ defmodule Kernel do
 
   # Macros
 
-  defmacro !(p0) do
+  defmacro unquote(:!)(p0) do
     # body not decompiled
   end
 
@@ -19,7 +19,7 @@ defmodule Kernel do
     # body not decompiled
   end
 
-  defmacro @(p0) do
+  defmacro unquote(:@)(p0) do
     # body not decompiled
   end
 

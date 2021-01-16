@@ -37,43 +37,43 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "defmodule Bitwise do\n" +
                         "  @moduleDoc \"\"\"\n" +
                         "  A set of functions that perform calculations on bits.\n" +
-                        "  \n" +
+                        "\n" +
                         "  All bitwise functions work only on integers; otherwise an\n" +
                         "  `ArithmeticError` is raised.\n" +
-                        "  \n" +
+                        "\n" +
                         "  The functions in this module come in two flavors: named or\n" +
                         "  operators. For example:\n" +
-                        "  \n" +
+                        "\n" +
                         "      iex> use Bitwise\n" +
                         "      iex> bnot(1) # named\n" +
                         "      -2\n" +
                         "      iex> 1 &&& 1 # operator\n" +
                         "      1\n" +
-                        "  \n" +
+                        "\n" +
                         "  If you prefer to use only operators or skip them, you can\n" +
                         "  pass the following options:\n" +
-                        "  \n" +
+                        "\n" +
                         "    * `:only_operators` - includes only operators\n" +
                         "    * `:skip_operators` - skips operators\n" +
-                        "  \n" +
+                        "\n" +
                         "  For example:\n" +
-                        "  \n" +
+                        "\n" +
                         "      iex> use Bitwise, only_operators: true\n" +
                         "      iex> 1 &&& 1\n" +
                         "      1\n" +
-                        "  \n" +
+                        "\n" +
                         "  When invoked with no options, `use Bitwise` is equivalent\n" +
                         "  to `import Bitwise`.\n" +
-                        "  \n" +
+                        "\n" +
                         "  All bitwise functions can be used in guards:\n" +
-                        "  \n" +
+                        "\n" +
                         "      iex> odd? = fn\n" +
                         "      ...>   int when Bitwise.band(int, 1) == 1 -> true\n" +
                         "      ...>   _ -> false\n" +
                         "      ...> end\n" +
                         "      iex> odd?.(1)\n" +
                         "      true\n" +
-                        "  \n" +
+                        "\n" +
                         "  All functions in this module are inlined by the compiler.\n" +
                         "  \"\"\"\n" +
                         "\n" +
@@ -87,13 +87,13 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "\n" +
                         "  @doc ~S\"\"\"\n" +
                         "  Bitwise AND operator.\n" +
-                        "  \n" +
+                        "\n" +
                         "  Calculates the bitwise AND of its arguments.\n" +
-                        "  \n" +
+                        "\n" +
                         "  Allowed in guard tests. Inlined by the compiler.\n" +
-                        "  \n" +
+                        "\n" +
                         "  ## Examples\n" +
-                        "  \n" +
+                        "\n" +
                         "      iex> 9 &&& 3\n" +
                         "      1\n" +
                         "  \"\"\"\n" +
@@ -103,22 +103,22 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "\n" +
                         "  @doc ~S\"\"\"\n" +
                         "  Arithmetic left bitshift operator.\n" +
-                        "  \n" +
+                        "\n" +
                         "  Calculates the result of an arithmetic left bitshift.\n" +
-                        "  \n" +
+                        "\n" +
                         "  Allowed in guard tests. Inlined by the compiler.\n" +
-                        "  \n" +
+                        "\n" +
                         "  ## Examples\n" +
-                        "  \n" +
+                        "\n" +
                         "      iex> 1 <<< 2\n" +
                         "      4\n" +
-                        "  \n" +
+                        "\n" +
                         "      iex> 1 <<< -2\n" +
                         "      0\n" +
-                        "  \n" +
+                        "\n" +
                         "      iex> -1 <<< 2\n" +
                         "      -4\n" +
-                        "  \n" +
+                        "\n" +
                         "      iex> -1 <<< -2\n" +
                         "      -1\n" +
                         "  \"\"\"\n" +
@@ -128,22 +128,22 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "\n" +
                         "  @doc ~S\"\"\"\n" +
                         "  Arithmetic right bitshift operator.\n" +
-                        "  \n" +
+                        "\n" +
                         "  Calculates the result of an arithmetic right bitshift.\n" +
-                        "  \n" +
+                        "\n" +
                         "  Allowed in guard tests. Inlined by the compiler.\n" +
-                        "  \n" +
+                        "\n" +
                         "  ## Examples\n" +
-                        "  \n" +
+                        "\n" +
                         "      iex> 1 >>> 2\n" +
                         "      0\n" +
-                        "  \n" +
+                        "\n" +
                         "      iex> 1 >>> -2\n" +
                         "      4\n" +
-                        "  \n" +
+                        "\n" +
                         "      iex> -1 >>> 2\n" +
                         "      -1\n" +
-                        "  \n" +
+                        "\n" +
                         "      iex> -1 >>> -2\n" +
                         "      -4\n" +
                         "  \"\"\"\n" +
@@ -153,13 +153,13 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "\n" +
                         "  @doc ~S\"\"\"\n" +
                         "  Bitwise XOR operator.\n" +
-                        "  \n" +
+                        "\n" +
                         "  Calculates the bitwise XOR of its arguments.\n" +
-                        "  \n" +
+                        "\n" +
                         "  Allowed in guard tests. Inlined by the compiler.\n" +
-                        "  \n" +
+                        "\n" +
                         "  ## Examples\n" +
-                        "  \n" +
+                        "\n" +
                         "      iex> 9 ^^^ 3\n" +
                         "      10\n" +
                         "  \"\"\"\n" +
@@ -173,11 +173,11 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "\n" +
                         "  @doc ~S\"\"\"\n" +
                         "  Calculates the bitwise AND of its arguments.\n" +
-                        "  \n" +
+                        "\n" +
                         "  Allowed in guard tests. Inlined by the compiler.\n" +
-                        "  \n" +
+                        "\n" +
                         "  ## Examples\n" +
-                        "  \n" +
+                        "\n" +
                         "      iex> band(9, 3)\n" +
                         "      1\n" +
                         "  \"\"\"\n" +
@@ -187,14 +187,14 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "\n" +
                         "  @doc ~S\"\"\"\n" +
                         "  Calculates the bitwise NOT of the argument.\n" +
-                        "  \n" +
+                        "\n" +
                         "  Allowed in guard tests. Inlined by the compiler.\n" +
-                        "  \n" +
+                        "\n" +
                         "  ## Examples\n" +
-                        "  \n" +
+                        "\n" +
                         "      iex> bnot(2)\n" +
                         "      -3\n" +
-                        "  \n" +
+                        "\n" +
                         "      iex> bnot(2) &&& 3\n" +
                         "      1\n" +
                         "  \"\"\"\n" +
@@ -204,11 +204,11 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "\n" +
                         "  @doc ~S\"\"\"\n" +
                         "  Calculates the bitwise OR of its arguments.\n" +
-                        "  \n" +
+                        "\n" +
                         "  Allowed in guard tests. Inlined by the compiler.\n" +
-                        "  \n" +
+                        "\n" +
                         "  ## Examples\n" +
-                        "  \n" +
+                        "\n" +
                         "      iex> bor(9, 3)\n" +
                         "      11\n" +
                         "  \"\"\"\n" +
@@ -218,20 +218,20 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "\n" +
                         "  @doc ~S\"\"\"\n" +
                         "  Calculates the result of an arithmetic left bitshift.\n" +
-                        "  \n" +
+                        "\n" +
                         "  Allowed in guard tests. Inlined by the compiler.\n" +
-                        "  \n" +
+                        "\n" +
                         "  ## Examples\n" +
-                        "  \n" +
+                        "\n" +
                         "      iex> bsl(1, 2)\n" +
                         "      4\n" +
-                        "  \n" +
+                        "\n" +
                         "      iex> bsl(1, -2)\n" +
                         "      0\n" +
-                        "  \n" +
+                        "\n" +
                         "      iex> bsl(-1, 2)\n" +
                         "      -4\n" +
-                        "  \n" +
+                        "\n" +
                         "      iex> bsl(-1, -2)\n" +
                         "      -1\n" +
                         "  \"\"\"\n" +
@@ -241,20 +241,20 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "\n" +
                         "  @doc ~S\"\"\"\n" +
                         "  Calculates the result of an arithmetic right bitshift.\n" +
-                        "  \n" +
+                        "\n" +
                         "  Allowed in guard tests. Inlined by the compiler.\n" +
-                        "  \n" +
+                        "\n" +
                         "  ## Examples\n" +
-                        "  \n" +
+                        "\n" +
                         "      iex> bsr(1, 2)\n" +
                         "      0\n" +
-                        "  \n" +
+                        "\n" +
                         "      iex> bsr(1, -2)\n" +
                         "      4\n" +
-                        "  \n" +
+                        "\n" +
                         "      iex> bsr(-1, 2)\n" +
                         "      -1\n" +
-                        "  \n" +
+                        "\n" +
                         "      iex> bsr(-1, -2)\n" +
                         "      -4\n" +
                         "  \"\"\"\n" +
@@ -264,11 +264,11 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "\n" +
                         "  @doc ~S\"\"\"\n" +
                         "  Calculates the bitwise XOR of its arguments.\n" +
-                        "  \n" +
+                        "\n" +
                         "  Allowed in guard tests. Inlined by the compiler.\n" +
-                        "  \n" +
+                        "\n" +
                         "  ## Examples\n" +
-                        "  \n" +
+                        "\n" +
                         "      iex> bxor(9, 3)\n" +
                         "      10\n" +
                         "  \"\"\"\n" +
@@ -286,13 +286,13 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "\n" +
                         "  @doc ~S\"\"\"\n" +
                         "  Bitwise OR operator.\n" +
-                        "  \n" +
+                        "\n" +
                         "  Calculates the bitwise OR of its arguments.\n" +
-                        "  \n" +
+                        "\n" +
                         "  Allowed in guard tests. Inlined by the compiler.\n" +
-                        "  \n" +
+                        "\n" +
                         "  ## Examples\n" +
-                        "  \n" +
+                        "\n" +
                         "      iex> 9 ||| 3\n" +
                         "      11\n" +
                         "  \"\"\"\n" +
@@ -302,16 +302,16 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "\n" +
                         "  @doc ~S\"\"\"\n" +
                         "  Bitwise NOT unary operator.\n" +
-                        "  \n" +
+                        "\n" +
                         "  Calculates the bitwise NOT of the argument.\n" +
-                        "  \n" +
+                        "\n" +
                         "  Allowed in guard tests. Inlined by the compiler.\n" +
-                        "  \n" +
+                        "\n" +
                         "  ## Examples\n" +
-                        "  \n" +
+                        "\n" +
                         "      iex> ~~~2\n" +
                         "      -3\n" +
-                        "  \n" +
+                        "\n" +
                         "      iex> ~~~2 &&& 3\n" +
                         "      1\n" +
                         "  \"\"\"\n" +
@@ -365,6 +365,22 @@ public class DecompilerTest extends LightCodeInsightTestCase {
 
     public void testElixir_1_5_0() throws IOException, OtpErlangDecodeException {
         assertDecompiled("OTP20/Elixir.AtU8Test");
+    }
+
+    public void testDocsElixirKernel() throws IOException {
+        assertDecompiled("Docs/Elixir.Kernel");
+    }
+
+    public void testDocsElixirKernelSpecialForms() throws IOException {
+        assertDecompiled("Docs/Elixir.Kernel.SpecialForms");
+    }
+
+    public void testDocsElixirRuntimeError() throws IOException {
+        assertDecompiled("Docs/Elixir.RuntimeError");
+    }
+
+    public void testDocsErlang() throws IOException {
+        assertDecompiled("Docs/erlang");
     }
 
     /*

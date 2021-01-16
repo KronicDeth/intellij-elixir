@@ -74,7 +74,13 @@ public class Decompiler implements BinaryFileDecompiler {
                         if (moduleDocs != null){
                             decompiled.append("  @moduleDoc \"\"\"\n");
                             String indentedModuleDocs = Arrays.stream(moduleDocs.split("\n"))
-                                    .map(x -> "  " + x)
+                                    .map(line -> {
+                                        if (line.isEmpty()) {
+                                            return line;
+                                        } else {
+                                            return "  " + line;
+                                        }
+                                    })
                                     .collect(Collectors.joining("\n"));
                             decompiled.append(indentedModuleDocs);
                             decompiled.append("\n  \"\"\"\n");
@@ -145,7 +151,13 @@ public class Decompiler implements BinaryFileDecompiler {
                 if (functionDocs != null){
                     functionDocs.forEach(x -> {
                         String indentedDocs = Arrays.stream(x.getDocumentationText().split("\n"))
-                                .map(d -> "  " + d)
+                                .map(line -> {
+                                    if (line.isEmpty()) {
+                                        return line;
+                                    } else {
+                                        return "  " + line;
+                                    }
+                                })
                                 .collect(Collectors.joining("\n"));
                         // Use ~S sigil to stop interpolation in docs as an interpolation stored in the docs was
                         // escaped in the original source.

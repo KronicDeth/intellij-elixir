@@ -254,6 +254,7 @@
   The signatures for operators and `unquote`d don't produce valid code that can be parsed.
 *  Don't use signatures for `__struct__` functions.
    The signatures for the `__struct__` functions are like `%Module{}`, but that's not parseable, so bypass the signatures with a specialized `SignatureOverride` decompiler that matches the actual code in `defstruct`.
+* Don't indent empty lines from `Docs` for `@moduledoc` and `@doc` to match the formatter output. 
 
 ## v11.9.0
 
