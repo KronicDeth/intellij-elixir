@@ -60,6 +60,27 @@
       </li>
       <li>Target Java 1.8 for JPS compatibility<br>
         JPS (JetBrains Project System) is the API used to allow External Builders, like <code>mix</code> to build projects.</li>
+      <li>
+        Fix matching <code>unquote(ATOM)</code> call definitions to compiled function by using the argument to
+        <code>unquote</code> when calculating the name of the call definition clause if possible.<br>
+        Needed to match anonymous function names that are <code>unquote</code>d because they contain <code>/</code> to
+        separate the outer function name from the anonymous function naming convention.
+      </li>
+      <li>
+        Don't use <code>Docs</code> signature for <code>MacroNameArity</code> that is an operator or
+        <code>unquote</code>d<br>
+        The signatures for operators and <code>unquote</code>d don't produce valid code that can be parsed.
+      </li>
+      <li>
+        Don't use signatures for <code>__struct__</code> functions.<br>
+        The signatures for the <code>__struct__</code> functions are like <code>%Module{}</code>, but that's not
+        parseable, so bypass the signatures with a specialized <code>SignatureOverride</code> decompiler that matches
+        the actual code in <code>defstruct</code>.
+      </li>
+      <li>
+        Don't indent empty lines from <code>Docs</code> for <code>@moduledoc</code> and <code>@doc</code> to match the
+        formatter output.
+      </li>
     </ul>
   </li>
 </ul>
