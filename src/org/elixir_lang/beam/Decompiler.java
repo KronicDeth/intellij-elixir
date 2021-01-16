@@ -11,11 +11,9 @@ import org.elixir_lang.beam.chunk.beam_documentation.Documentation;
 import org.elixir_lang.beam.chunk.CallDefinitions;
 import org.elixir_lang.beam.chunk.beam_documentation.Doc;
 import org.elixir_lang.beam.chunk.beam_documentation.FunctionMetadata;
-import org.elixir_lang.beam.decompiler.Default;
-import org.elixir_lang.beam.decompiler.InfixOperator;
-import org.elixir_lang.beam.decompiler.PrefixOperator;
-import org.elixir_lang.beam.decompiler.Unquoted;
+import org.elixir_lang.beam.decompiler.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -157,17 +155,7 @@ public class Decompiler implements BinaryFileDecompiler {
                 }
             }
 
-            List<String> signaturesFromDocs = documentation != null && documentation.getBeamLanguage().equals("elixir")
-                    ? documentation.getDocs().getSignatures(macroNameArity.name, macroNameArity.arity)
-                    : null;
-            if (signaturesFromDocs != null && !signaturesFromDocs.isEmpty()){
-                decompiled.append("  ").append(macroNameArity.macro).append(' ');
-                Optional<String> optional = signaturesFromDocs.stream().findFirst();
-                decompiled.append(optional.get());
-                decompiled.append(" do\n    # body not decompiled\n  end\n");
-            }else{
-                appendMacroNameArity(decompiled, macroNameArity);
-            }
+            appendMacroNameArity(decompiled, macroNameArity, documentation);
 
             lastMacroNameArity = macroNameArity;
         }
@@ -182,20 +170,47 @@ public class Decompiler implements BinaryFileDecompiler {
     }
 
     private static void appendMacroNameArity(@NotNull StringBuilder decompiled,
-                                             @NotNull MacroNameArity macroNameArity) {
-        boolean accepted = false;
+                                             @NotNull MacroNameArity macroNameArity, Documentation documentation) {
+        org.elixir_lang.beam.decompiler.MacroNameArity decompiler = decompiler(macroNameArity);
+
+        if (decompiler != null) {
+            // The signature while easier for users to read are not proper code for those that need to use unquote, so
+            // only allow signatures for default decompiler
+            if (decompiler == Default.INSTANCE) {
+                List<String> signaturesFromDocs = documentation != null && documentation.getBeamLanguage().equals("elixir")
+                        ? documentation.getDocs().getSignatures(macroNameArity.name, macroNameArity.arity)
+                        : null;
+
+                if (signaturesFromDocs != null && !signaturesFromDocs.isEmpty()) {
+                    decompiled.append("  ").append(macroNameArity.macro).append(' ');
+                    Optional<String> optional = signaturesFromDocs.stream().findFirst();
+                    decompiled.append(optional.get());
+                    decompiled.append(" do\n    # body not decompiled\n  end\n");
+                } else {
+                    decompiler.append(decompiled, macroNameArity);
+                }
+            } else {
+                decompiler.append(decompiled, macroNameArity);
+            }
+        }
+    }
+
+    @Nullable
+    static org.elixir_lang.beam.decompiler.MacroNameArity decompiler(@NotNull MacroNameArity macroNameArity) {
+        org.elixir_lang.beam.decompiler.MacroNameArity accepted = null;
 
         for (org.elixir_lang.beam.decompiler.MacroNameArity decompiler : MACRO_NAME_ARITY_DECOMPILER_LIST) {
             if (decompiler.accept(macroNameArity)) {
-                decompiler.append(decompiled, macroNameArity);
-                accepted = true;
+                accepted = decompiler;
                 break;
             }
         }
 
-        if (!accepted) {
+        if (accepted == null) {
             error(macroNameArity);
         }
+
+        return accepted;
     }
 
     private static void error(@NotNull MacroNameArity macroNameArity) {
