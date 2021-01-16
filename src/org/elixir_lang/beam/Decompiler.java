@@ -39,6 +39,7 @@ public class Decompiler implements BinaryFileDecompiler {
         MACRO_NAME_ARITY_DECOMPILER_LIST.add(InfixOperator.INSTANCE);
         MACRO_NAME_ARITY_DECOMPILER_LIST.add(PrefixOperator.INSTANCE);
         MACRO_NAME_ARITY_DECOMPILER_LIST.add(Unquoted.INSTANCE);
+        MACRO_NAME_ARITY_DECOMPILER_LIST.add(SignatureOverride.INSTANCE);
         MACRO_NAME_ARITY_DECOMPILER_LIST.add(Default.INSTANCE);
     }
 
