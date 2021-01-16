@@ -35,7 +35,7 @@ public class DecompilerTest extends LightCodeInsightTestCase {
 
         assertEquals("# Source code recreated from a .beam file by IntelliJ Elixir\n" +
                         "defmodule Bitwise do\n" +
-                        "  @moduleDoc \"\"\"\n" +
+                        "  @moduledoc \"\"\"\n" +
                         "  A set of functions that perform calculations on bits.\n" +
                         "\n" +
                         "  All bitwise functions work only on integers; otherwise an\n" +

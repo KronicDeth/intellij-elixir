@@ -250,11 +250,14 @@
 * [#1880](https://github.com/KronicDeth/intellij-elixir/pull/1880) - [@KronicDeth](https://github.com/KronicDeth)
   * Fix matching `unquote(ATOM)` call definitions to compiled function by using the argument to`unquote` when calculating the name of the call definition clause if possible.
     Needed to match anonymous function names that are `unquote`d because they contain `/` to separate the outer function name from the anonymous function naming convention.
-* Don't use `Docs` signature for `MacroNameArity` that is an operator or `unquote`d
-  The signatures for operators and `unquote`d don't produce valid code that can be parsed.
-*  Don't use signatures for `__struct__` functions.
-   The signatures for the `__struct__` functions are like `%Module{}`, but that's not parseable, so bypass the signatures with a specialized `SignatureOverride` decompiler that matches the actual code in `defstruct`.
-* Don't indent empty lines from `Docs` for `@moduledoc` and `@doc` to match the formatter output. 
+  * Don't use `Docs` signature for `MacroNameArity` that is an operator or `unquote`d
+    The signatures for operators and `unquote`d don't produce valid code that can be parsed.
+  *  Don't use signatures for `__struct__` functions.
+     The signatures for the `__struct__` functions are like `%Module{}`, but that's not parseable, so bypass the signatures with a specialized `SignatureOverride` decompiler that matches the actual code in `defstruct`.
+  * Don't indent empty lines from `Docs` for `@moduledoc` and `@doc` to match the formatter output. 
+* [#1881](https://github.com/KronicDeth/intellij-elixir/pull/1881) - [@KronicDeth](https://github.com/KronicDeth)
+  * Fix capitalization of `Docs` `@moduledoc`
+    `@moduleDoc` -> `@moduledoc`
 
 ## v11.9.0
 

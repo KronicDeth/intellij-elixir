@@ -72,7 +72,7 @@ public class Decompiler implements BinaryFileDecompiler {
                                 : null;
 
                         if (moduleDocs != null){
-                            decompiled.append("  @moduleDoc \"\"\"\n");
+                            decompiled.append("  @moduledoc \"\"\"\n");
                             String indentedModuleDocs = Arrays.stream(moduleDocs.split("\n"))
                                     .map(line -> {
                                         if (line.isEmpty()) {
