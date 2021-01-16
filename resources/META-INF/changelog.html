@@ -1420,58 +1420,5 @@ Probably constructor should be marked as NonInjectable. [Plugin: org.elixir_lang
     </ul>
   </li>
 </ul>
-<h1>v8.1.0</h1>
-<ul>
-  <li>
-    <p>Enhancements</p>
-    <ul>
-      <li>
-        Flat icons to match
-        <a href="https://blog.jetbrains.com/blog/2018/06/26/new-icons-in-intellij-platform-2018-2/">
-          IntelliJ IDEA 2018.2 design rules
-        </a>.  Thanks to <a href="https://github.com/nk8">@nk8</a> for consulting on the design and showing me how to
-        use Figma.
-      </li>
-      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/1228">#1228</a></li>
-      <li>
-        Use icon provided by Lidiya Chernigovskaya (<a href="https://github.com/LChernigovskaya">@LChernigovskaya</a>)
-        and created by JetBrains UX (Alina Mishina) for <code>pluginIcon</code> compatibility with IntelliJ IDEA 2018.3.
-      </li>
-    </ul>
-  </li>
-  <li>
-    <p>Bug Fixes</p>
-    <ul>
-      <li>Look above <code>Enum.reduce</code> for enclosing macro call.</li>
-      <li>
-        Add Facet SDK as External Library to re-enable indexing.  When the External Library was removed in
-        <a href="https://github.com/KronicDeth/intellij-elixir/commit/42972876c219e9da7283513bc5677e5121b5e0fe">
-          <tt>4297287</tt>
-        </a> in favor of a real SDK, completion for SDK <code>.beam</code> modules was lost because Small IDEs don't
-        index SDKs, but only External Libraries, so add Application-wide External Libraries for SDKs when they are
-        created (and update, remove on edit or delete), which are then added as a Dependency for the facet's module when
-        the SDK is set for the Small IDE project.
-        <ul>
-          <li>
-            Convert old modules with Elixir facets to also have External Library, so that users don't need to remove and
-            add the SDKs to get the External Library.
-          </li>
-        </ul>
-      </li>
-      <li>
-        <p>
-          Use #AEB9C0 for JetBrains Default/Light Gray.  Use #87939A for JetBrains Darcula Gray.  Colors based on
-          IntelliJ's color picker picking its own colors.
-        </p>
-        <p>
-          Icon matching testing done under both themes in 2018.2.1.  Weirdly, the colors are different in the SVGs in my
-          intellij-community@master.  Hopefully, this doesn't mean the colors change again in 2018.3.
-        </p>
-      </li>
-      <li>Run <code>createLibrary</code> inside <code>runWriteAction</code>.</li>
-      <li>Remove test that leaks threads and so causes builds to fail.</li>
-    </ul>
-  </li>
-</ul>
 </body>
 </html>
