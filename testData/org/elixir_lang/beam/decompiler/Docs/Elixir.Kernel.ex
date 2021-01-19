@@ -1,6 +1,6 @@
 # Source code recreated from a .beam file by IntelliJ Elixir
 defmodule Kernel do
-  @moduledoc """
+  @moduledoc ~S"""
   `Kernel` is Elixir's default environment.
 
   It mainly consists of:

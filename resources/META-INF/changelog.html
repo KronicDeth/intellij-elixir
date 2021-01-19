@@ -1,5 +1,29 @@
 <html>
 <body>
+<h1>v11.9.2</h1>
+<ul>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>
+        Protect from nested heredocs in documentation from stopping documentation's heredoc as happens in
+        <code>Module</code> and <code>Ecto.Query</code>.
+        <ul>
+          <li>Use <code>~S</code> for <code>@moduledoc</code> too, in addition to <code>@doc</code>.</li>
+          <li>
+            Check if the documentation contains <code>"""</code> or <code>'''</code> and use the opposite one as the
+            promoter/terminator.
+            <ul>
+              <li>If neither is used, use <code>"""</code>.</li>
+              <li>If both are used, use <code>"""</code>, but then escape <code>"""</code> as <code>\"\"\"</code>.</li>
+            </ul>
+          </li>
+          <li>Trim trailing whitespace from documentation lines to match formatter output.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
 <h1>v11.9.1</h1>
 <ul>
   <li>
