@@ -35,7 +35,7 @@ public class DecompilerTest extends LightCodeInsightTestCase {
 
         assertEquals("# Source code recreated from a .beam file by IntelliJ Elixir\n" +
                         "defmodule Bitwise do\n" +
-                        "  @moduledoc \"\"\"\n" +
+                        "  @moduledoc ~S\"\"\"\n" +
                         "  A set of functions that perform calculations on bits.\n" +
                         "\n" +
                         "  All bitwise functions work only on integers; otherwise an\n" +
@@ -381,6 +381,14 @@ public class DecompilerTest extends LightCodeInsightTestCase {
 
     public void testDocsErlang() throws IOException {
         assertDecompiled("Docs/erlang");
+    }
+
+    public void testIssue1882() throws IOException {
+        assertDecompiled("Elixir.Ecto.Query");
+    }
+
+    public void testIssue1886() throws IOException {
+        assertDecompiled("Elixir.Module");
     }
 
     /*
