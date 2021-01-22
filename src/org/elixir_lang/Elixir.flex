@@ -30,6 +30,10 @@ import org.jetbrains.annotations.Nullable;
   private Project project = null;
   private org.elixir_lang.lexer.Stack stack = new org.elixir_lang.lexer.Stack();
 
+  public int stackSize() {
+      return stack.size();
+  }
+
   private void startQuote(CharSequence quotePromoterCharSequence) {
     String quotePromoter = quotePromoterCharSequence.toString();
     stack.push(quotePromoter, yystate());
@@ -131,6 +135,11 @@ import org.jetbrains.annotations.Nullable;
   // public for testing
   public void pushAndBegin(int lexicalState) {
     stack.push(yystate());
+
+    if (lexicalState == YYINITIAL) {
+        throw new org.elixir_lang.lexer.NestedInitial(stack);
+    }
+
     yybegin(lexicalState);
   }
 
@@ -691,6 +700,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
 %state HEXADECIMAL_ESCAPE_SEQUENCE
 %state HEXADECIMAL_WHOLE_NUMBER
 %state INTERPOLATION
+%state INTERPOLATION_CURLY
 %state KEYWORD_PAIR_MAYBE
 %state KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE
 %state LAST_EOL
@@ -706,9 +716,9 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
 %%
 
 /* <YYINITIAL> is first even though it isn't lexicographically first because it is the first state.
-   Rules that aren't dependent on detecting the end of INTERPOLATION can be shared between <YYINITIAL> and
-   <INTERPOLATION> */
-<YYINITIAL, INTERPOLATION> {
+   Rules that aren't dependent on detecting the end of INTERPOLATION can be shared between <YYINITIAL>,
+   <INTERPOLATION>, and <INTERPOLATION_CURLY> */
+<YYINITIAL, INTERPOLATION, INTERPOLATION_CURLY> {
   {AFTER}                                    { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.AFTER; }
   // Must be before any single operator's match
@@ -808,10 +818,6 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
   {TUPLE_OPERATOR} / {COLON}{SPACE}          { // Definitely a Keyword pair, but KEYWORD_PAIR_MAYBE state will still work.
                                                pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.TUPLE_OPERATOR; }
-  {OPENING_CURLY}                            { // use stack to match up nested OPENING_CURLY and CLOSING_CURLY
-                                               pushAndBegin(YYINITIAL);
-                                               pushAndBegin(MULTILINE_WHITE_SPACE_MAYBE);
-                                               return ElixirTypes.OPENING_CURLY; }
   {OPENING_PARENTHESIS}                      { pushAndBegin(MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.OPENING_PARENTHESIS; }
   // Must be before {IDENTIFIER_TOKEN} as "in" would be parsed as an identifier since it's a lowercase alphanumeric.
@@ -1330,12 +1336,27 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
   {VALID_HEXADECIMAL_DIGITS}   { return ElixirTypes.VALID_HEXADECIMAL_DIGITS; }
 }
 
+<INTERPOLATION, INTERPOLATION_CURLY> {
+  {OPENING_CURLY}    { // use stack to match up nested OPENING_CURLY and CLOSING_CURLY
+                       pushAndBegin(INTERPOLATION_CURLY);
+                       pushAndBegin(MULTILINE_WHITE_SPACE_MAYBE);
+                       return ElixirTypes.OPENING_CURLY; }
+}
+
 /* Only rules for <INTERPOLATON>, but not <YYINITIAL> go here.
    @note must be after <YYINITIAL, INTERPOLATION> so that BAD_CHARACTER doesn't match a single ' ' instead of
      {WHITE_SPACE}+. */
 <INTERPOLATION> {
-  {INTERPOLATION_END}         { popAndBegin();
-                                return ElixirTypes.INTERPOLATION_END; }
+  {INTERPOLATION_END} { popAndBegin();
+                        return ElixirTypes.INTERPOLATION_END; }
+}
+
+<INTERPOLATION_CURLY> {
+  {CLOSING_CURLY} { // exit CURLY and begin YYINITIAL or INTERPOLATION
+                    popAndBegin();
+                    // Check for trailing +/-
+                    pushAndBegin(ADDITION_OR_SUBTRACTION_MAYBE);
+                    return ElixirTypes.CLOSING_CURLY; }
 }
 
 <KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE, MULTILINE_WHITE_SPACE_MAYBE> {
@@ -1400,9 +1421,10 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
   {INVALID_UNKNOWN_BASE_DIGITS} { return ElixirTypes.INVALID_UNKNOWN_BASE_DIGITS; }
 }
 
-/* Only rules for <YYINITIAL>, but not <INTERPOLATION> go here. */
 <YYINITIAL> {
-  {CLOSING_CURLY} { yybegin(ADDITION_OR_SUBTRACTION_MAYBE);
+  {OPENING_CURLY} { pushAndBegin(MULTILINE_WHITE_SPACE_MAYBE);
+                    return ElixirTypes.OPENING_CURLY; }
+  {CLOSING_CURLY} { pushAndBegin(ADDITION_OR_SUBTRACTION_MAYBE);
                     return ElixirTypes.CLOSING_CURLY; }
 }
 

@@ -6,7 +6,17 @@ import org.elixir_lang.lexer.group.Quote;
 /**
  * Created by luke.imhoff on 8/19/14.
  */
-public class Stack extends java.util.Stack<StackFrame> {
+public class Stack {
+    private final java.util.Stack<StackFrame> stack = new java.util.Stack<>();
+
+    public void clear() {
+        stack.clear();
+    }
+
+    public int size() {
+        return stack.size();
+    }
+
     /*
      * Instance
      */
@@ -26,39 +36,51 @@ public class Stack extends java.util.Stack<StackFrame> {
         push(stackFrame);
     }
 
+    private void push(StackFrame stackFrame) {
+        if (stackFrame.getLastLexicalState() == 0 && !stack.empty()) {
+            throw new NestedInitial(this);
+        }
+
+        stack.push(stackFrame);
+    }
+
+    public StackFrame pop() {
+        return stack.pop();
+    }
+
     public IElementType fragmentType() {
-        return peek().fragmentType();
+        return stack.peek().fragmentType();
     }
 
     public boolean isInterpolating() {
-        return peek().isInterpolating();
+        return stack.peek().isInterpolating();
     }
 
     public boolean isSigil() {
-        return peek().isSigil();
+        return stack.peek().isSigil();
     }
 
     public void nameSigil(char sigilName) {
-        peek().nameSigil(sigilName);
+        stack.peek().nameSigil(sigilName);
     }
 
     public IElementType promoterType() {
-        return peek().promoterType();
+        return stack.peek().promoterType();
     }
 
     public void setPromoter(String promoter) {
-        peek().setPromoter(promoter);
+        stack.peek().setPromoter(promoter);
     }
 
     public IElementType sigilNameType() {
-        return peek().sigilNameType();
+        return stack.peek().sigilNameType();
     }
 
     public String terminator() {
-        return peek().getTerminator();
+        return stack.peek().getTerminator();
     }
 
     public IElementType terminatorType() {
-        return peek().terminatorType();
+        return stack.peek().terminatorType();
     }
 }

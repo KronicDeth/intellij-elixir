@@ -13,4 +13,6 @@ class ElixirFlexLexerAdapter(project: Project?) : FlexAdapter(ElixirFlexLexer(nu
     init {
         (flex as ElixirFlexLexer).project = project
     }
+
+    fun stackSize(): Int = (flex as ElixirFlexLexer).stackSize()
 }
