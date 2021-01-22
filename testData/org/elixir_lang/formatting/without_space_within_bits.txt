@@ -1,0 +1,8 @@
+Elixir File(0,7)
+  ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(0,7)
+    ElixirBitStringImpl(BIT_STRING)(0,7)
+      PsiElement(<<)('<<')(0,2)
+      UNMATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL(2,5)
+        ElixirIdentifierImpl(IDENTIFIER)(2,5)
+          PsiElement(identifier)('one')(2,5)
+      PsiElement(>>)('>>')(5,7)
