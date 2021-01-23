@@ -17,6 +17,8 @@ class ElixirLexer(private val elixirFlexLexerAdapter: ElixirFlexLexerAdapter) :
           elixirFlexLexerAdapter.level = value
       }
 
+    fun stackSize(): Int = elixirFlexLexerAdapter.stackSize()
+
     companion object {
         val FRAGMENTS = TokenSet.create(
                 ElixirTypes.ATOM_FRAGMENT,

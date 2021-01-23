@@ -236,6 +236,21 @@
       * If neither is used, use `"""`.
       * If both are used, use `"""`, but then escape `"""` as `\"\"\"`.
     * Trim trailing whitespace from documentation lines to match formatter output.
+* [#1890](https://github.com/KronicDeth/intellij-elixir/pull/1890) - [@KronicDeth](https://github.com/KronicDeth)
+  * Set `runIde` `maxHeapSize` to `7g`
+    * Set to the same I run my own IDE at, so the debugged instance isn't any slower than the normal IDE when I need to do extended all day testing to trigger bugs.
+  * Test that all `FormattingTest` files can be parsed.
+  * `YYINITIAL` is special - wrappers of the lexer assume that if in `YYINITIAL`, it is safe to shift the lexer over when there is an error, having `{OPENING_CURLY}` `pushAndBegin(YYINITIAL)` when it was either in `YYINITIAL` or `INTERPOLATION` (https://github.com/KronicDeth/intellij-elixir/blob/36b53331967950453906c3bde9c7f79dc3f9cd2f/src/org/elixir_lang/Elixir.flex#L812) means that the lexer looked like it was restartable when it really wasn't.  This code has been in the lexer for 6 years (https://github.com/KronicDeth/intellij-elixir/blame/36b53331967950453906c3bde9c7f79dc3f9cd2f/src/org/elixir_lang/Elixir.flex#L812).
+    * When in `YYINITIAL`, `{` no longer recurses into `YYINITIAL` as `}` does not need to be counted to determine if it is closing an interpolation.
+    * When in `INTERPOLATION`, `{` enters `INTERPOLATION_CURLY` to allow counting and matching of `}` until it can exit and go back to `INTERPOLATION`, where `}` will exit the interpolation.
+    * When in `INTERPOLATION_CURLY`, `{` enters another level of `INTERPOLATION_CURLY` to allow counting and matching of `}` until it can exit and go up a level.
+  * The `}` in `YYINITIAL` did `yybegin(ADDITION_OR_SUBTRACTION_MAYBE)`, but it should have been `pushAndBegin(ADDITION_OR_SUBTRACTION)` as `ADDITION_OR_SUBTRACTION_MAYBE` or its following states all exit with `handleInLastState()` or `popAndBegin()`.  This was not caught in #1859 because the extra `YYINITIAL` from `pushAndBegin(YYINTIAL)` hid the bug.
+  * Prevent nested `YYINITIAL` bugs in the future by erroring
+    * If trying to `pushAndBegin(YYINITIAL)`.
+    * If trying to `push(YYINITIAL)` and the state stack is not empty
+  * Clear the state Stack when `ElixirFlexLexer#reset` is called, as at the level of typing and pasting, the `ElixirFlexLexer` is wrapped in many layers of lexers including `LexerEditorHighlighter` where the `ElixirFlexLexer` is no longer re-instantiated when there is no text, but instead, `ElixirFlexLexer#reset` is only called.  This has always been an invariant violation since the stack state was added 7 years ago in https://github.com/KronicDeth/intellij-elixir/commit/52cb2fbf6368ba551a4784bd1de49e1fc21c969a.  It likely only became more apparent with the changes to +/- parsing in #1859 that made return-to-YYINITIAL less likely.
+    * Since this `stack.clear()` has to be manually added to `ElixirFlexLexer.java`, which is generated from `Elixir.flex`, `ResetTest` is added to check that the code is still there.
+  *  For a reason I haven't been able to explain, the `LexerEditorHighlighter` stops working after `:` is typed at the start of an atom in certain situations, such as before `)` inside a function call, like when adding an argument.  In this case, the old version of the lexer would mark `)` as a `BAD_CHARACTER` and continue to do so until an expected atom start of [a-zA-Z_], `'`, `"`, or an operator occurred.  Now, if an invalid atom start is matched, the `ATOM_START` state ends and the previous state handles the text, which in the function case mean `)` is parsed as `CLOSING_PARENTHESIS`.  This change allows the highlighting to continue.   I do not know if returning `BAD_CHARACTER` will always break the `LexerEditorHighlighter`, but I don't think, so since [the `GroovyLexer` in `intellij-community` returns it](https://github.com/JetBrains/intellij-community/blob/f66e9644fa683fba22f4ce9e30c037720f745989/plugins/groovy/groovy-psi/src/org/jetbrains/plugins/groovy/lang/lexer/groovy.flex#L538), but it may be the case that it isn't actually returned ever when users are typing and only handled by the lexer for completeness.
 
 ## v11.9.1
 
