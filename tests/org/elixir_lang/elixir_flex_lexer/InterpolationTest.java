@@ -404,8 +404,8 @@ public class InterpolationTest extends Test {
                                 ":",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.COLON, ElixirFlexLexer.ATOM_START),
-                                        new TokenTypeState(TokenType.BAD_CHARACTER, ElixirFlexLexer.ATOM_START),
-                                        new TokenTypeState(ElixirTypes.STRING_PROMOTER, ElixirFlexLexer.GROUP)
+                                        new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
+                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
