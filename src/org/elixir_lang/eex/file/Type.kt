@@ -29,7 +29,7 @@ open class Type protected constructor(lang: Language? = org.elixir_lang.eex.Lang
             val pathLength = path.length
             val fileTypeManager = FileTypeManager.getInstance()
             return fileTypeManager
-                    .getAssociations(INSTANCE)
+                    .getAssociations(virtualFile.fileType)
                     .stream()
                     .filter { obj: FileNameMatcher? -> ExtensionFileNameMatcher::class.java.isInstance(obj) }
                     .map { obj: FileNameMatcher? -> ExtensionFileNameMatcher::class.java.cast(obj) }
