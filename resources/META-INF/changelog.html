@@ -1,5 +1,31 @@
 <html>
 <body>
+<h1>v11.10.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>Simplify <code>onlyTemplateDateFileType</code></li>
+    </ul>
+  </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>
+        <p>
+          Use <code>VirtualFile#fileType</code> instead of EEx Type::INSTANCE when looking up extensions.
+        </p>
+        <p>
+          Since LEEx file <code>Type</code> is a subclass of EEx's file <code>Type</code>, it calls
+          <code>templateDataFileTypeSet</code> in EEx's <code>Type</code>, but <code>templateDataFileTypeSet</code> uses
+          <code>INSTANCE</code> from EEx.  By using the <code>VirtualFile#fileType</code> instead, it will properly be
+          EEx or LEEx based on the actual file extension and then it can be used to strip that off and find the
+          DataTemplateLanguage, such as <code>HTMLLanguage</code> for <code>.html.leex</code>.
+        </p>
+      </li>
+    </ul>
+  </li>
+</ul>
 <h1>v11.9.2</h1>
 <ul>
   <li>
