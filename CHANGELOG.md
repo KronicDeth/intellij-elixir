@@ -226,6 +226,17 @@
   * [Enhancements](#enhancements-61)
   * [Bug Fixes](#bug-fixes-67)
 
+## v11.10.0
+
+### Enhancements
+* [#1893](https://github.com/KronicDeth/intellij-elixir/pull/1893) - [@KronicDeth](https://github.com/KronicDeth)
+  * Simplify `onlyTemplateDateFileType`
+  
+### Bug Fixes
+* [#1893](https://github.com/KronicDeth/intellij-elixir/pull/1893) - [@KronicDeth](https://github.com/KronicDeth)
+  * Use `VirtualFile#fileType` instead of EEx Type::INSTANCE when looking up extensions.
+    Since LEEx file `Type` is a subclass of EEx's file `Type`, it calls `templateDataFileTypeSet` in EEx's `Type`, but `templateDataFileTypeSet` uses `INSTANCE` from EEx.  By using the `VirtualFile#fileType` instead, it will properly be EEx or LEEx based on the actual file extension and then it can be used to strip that off and find the DataTemplateLanguage, such as `HTMLLanguage` for `.html.leex`.
+
 ## v11.9.2
 
 ### Bug Fixes
