@@ -124,6 +124,7 @@ data class Argument(val name: String, val supportedOptions: Code.Options = Code.
 }
 
 val ARITY = Argument("arity", Options(Inline(integers = true, literals = false)))
+val BINARY = Argument("binary")
 val CONTEXT = Argument("context")
 val DESTINATION = Argument("destination")
 val DEALLOCATE_WORDS_OF_STACK = Argument("deallocate_words_of_stack", Options(Inline(integers = true)))
@@ -132,8 +133,10 @@ val FLAGS = Argument("flags", Options(Inline(integers = true, literals = false))
 val IMPORT = Argument("import", Options(Inline(imports = true, integers = true, literals = false)))
 val LABEL_ARGUMENT = Argument("label", Options(Inline(labels = true)))
 val LIVE_X_REGISTER_COUNT = Argument("live_x_register_count", Options(Inline(integers = true, literals = false)))
+val MARKER = Argument("marker")
 val MATCH_STATE = Argument("match_state")
 val POSITION = Argument("position")
+val REFERENCE = Argument("reference")
 val SIZE = Argument("size")
 val SOURCE = Argument("source", Options(Inline(atoms = true, integers = false, literals = true)))
 val TUPLE = Argument("tuple")

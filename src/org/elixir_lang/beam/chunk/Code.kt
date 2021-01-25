@@ -188,7 +188,7 @@ class Code(private val operationList: List<Operation>) {
             val (maxOpcode, maxOpcodeByteCount) = unsignedInt(data, offset)
             offset += maxOpcodeByteCount
 
-            val expectedMaxOpcode = org.elixir_lang.beam.chunk.code.operation.Code.values().max()?.ordinal ?: 0
+            val expectedMaxOpcode = org.elixir_lang.beam.chunk.code.operation.Code.values().max()?.number ?: 0
             if (maxOpcode > expectedMaxOpcode) {
                 LOGGER.error(
                         "Max opcode ($maxOpcode) exceeds expected max opcode ($expectedMaxOpcode).  Additional " +
