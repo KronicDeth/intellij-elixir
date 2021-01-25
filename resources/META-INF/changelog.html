@@ -6,6 +6,21 @@
     <p>Enhancements</p>
     <ul>
       <li>Simplify <code>onlyTemplateDateFileType</code></li>
+      <li>Add missing opcodes to <code>Code</code> disassembler
+        <ul>
+          <li>OTP 23 opcode <code>bs_start_match4</code></li>
+          <li>Current (in-development) OTP 24 opcodes
+            <ul>
+              <li><code>make_fun3</code></li>
+              <li><code>init_yregs</code></li>
+              <li><code>recv_marker_bind</code></li>
+              <li><code>recv_marker_clear</code></li>
+              <li><code>recv_marker_clear</code></li>
+              <li><code>recv_marker_user </code></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
     </ul>
   </li>
   <li>
@@ -22,6 +37,11 @@
           EEx or LEEx based on the actual file extension and then it can be used to strip that off and find the
           DataTemplateLanguage, such as <code>HTMLLanguage</code> for <code>.html.leex</code>.
         </p>
+      </li>
+      <li>
+        Compare max opcode in to file to max opcode number, not ordinal.<br>
+        Opcodes are 1-based, but the ordinal of the Kotlin <code>Enum</code>s are 0-based, so the comparison was
+        off-by-1 when a file had the max opcode and would be incorrectly marked as too new.
       </li>
     </ul>
   </li>

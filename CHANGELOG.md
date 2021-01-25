@@ -231,11 +231,24 @@
 ### Enhancements
 * [#1893](https://github.com/KronicDeth/intellij-elixir/pull/1893) - [@KronicDeth](https://github.com/KronicDeth)
   * Simplify `onlyTemplateDateFileType`
+* [#1897](https://github.com/KronicDeth/intellij-elixir/pull/1897) - [@KronicDeth](https://github.com/KronicDeth)
+  * Add missing opcodes to `Code` disassembler
+    * OTP 23 opcode `bs_start_match4`
+    * Current (in-development) OTP 24 opcodes
+      * `make_fun3`
+      * `init_yregs`
+      * `recv_marker_bind`
+      * `recv_marker_clear`
+      * `recv_marker_clear`
+      * `recv_marker_user `
   
 ### Bug Fixes
 * [#1893](https://github.com/KronicDeth/intellij-elixir/pull/1893) - [@KronicDeth](https://github.com/KronicDeth)
   * Use `VirtualFile#fileType` instead of EEx Type::INSTANCE when looking up extensions.
     Since LEEx file `Type` is a subclass of EEx's file `Type`, it calls `templateDataFileTypeSet` in EEx's `Type`, but `templateDataFileTypeSet` uses `INSTANCE` from EEx.  By using the `VirtualFile#fileType` instead, it will properly be EEx or LEEx based on the actual file extension and then it can be used to strip that off and find the DataTemplateLanguage, such as `HTMLLanguage` for `.html.leex`.
+* [#1897](https://github.com/KronicDeth/intellij-elixir/pull/1897) - [@KronicDeth](https://github.com/KronicDeth)
+  * Compare max opcode in to file to max opcode number, not ordinal.
+    Opcodes are 1-based, but the ordinal of the Kotlin `Enum`s are 0-based, so the comparison was off-by-1 when a file had the max opcode and would be incorrectly marked as too new.
 
 ## v11.9.2
 
