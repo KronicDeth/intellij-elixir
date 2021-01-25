@@ -784,7 +784,7 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
 
     // @spec bs_start_match3 Fail Bin Live Dst
     // @doc  Starts a binary match sequence
-    BS_START_MATCH3(166, "bs_start_match3", arrayOf(FAIL_LABEL, Argument("binary"), LIVE_X_REGISTER_COUNT, POSITION)),
+    BS_START_MATCH3(166, "bs_start_match3", arrayOf(FAIL_LABEL, BINARY, LIVE_X_REGISTER_COUNT, POSITION)),
 
     // @spec bs_get_position Ctx Dst Live
     // @doc  Sets Dst to the current position of Ctx
@@ -798,7 +798,13 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
 
     // @spec swap Register1 Register2
     // @doc  Swaps the contents of two registers.
-    SWAP(169, "swap", arrayOf(Argument("register1"), Argument("register2")));
+    SWAP(169, "swap", arrayOf(Argument("register1"), Argument("register2"))),
+
+    // @spec bs_start_match4 Fail Bin Live Dst
+    // @doc  As bs_start_match3, but the fail label can be 'no_fail' when we know
+    //       it will never fail at runtime, or 'resume' when we know the input is
+    //       a match context.
+    BS_START_MATCH4(170, "bs_start_match4", arrayOf(FAIL_LABEL, BINARY, LIVE_X_REGISTER_COUNT, POSITION));
 
     fun arity() = arguments.size
 }

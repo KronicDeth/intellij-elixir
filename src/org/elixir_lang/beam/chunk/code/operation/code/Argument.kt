@@ -124,6 +124,7 @@ data class Argument(val name: String, val supportedOptions: Code.Options = Code.
 }
 
 val ARITY = Argument("arity", Options(Inline(integers = true, literals = false)))
+val BINARY = Argument("binary")
 val CONTEXT = Argument("context")
 val DESTINATION = Argument("destination")
 val DEALLOCATE_WORDS_OF_STACK = Argument("deallocate_words_of_stack", Options(Inline(integers = true)))
