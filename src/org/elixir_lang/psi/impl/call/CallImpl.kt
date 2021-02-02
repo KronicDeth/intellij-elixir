@@ -501,13 +501,25 @@ object CallImpl {
 
     @Contract(pure = true)
     @JvmStatic
-    fun primaryArguments(infix: Infix): Array<PsiElement?> {
+    fun primaryArguments(infix: Infix): Array<PsiElement> {
         val children = infix.children
         val operatorIndex = Normalized.operatorIndex(children)
         val leftOperand = org.elixir_lang.psi.operation.infix.Normalized.leftOperand(children, operatorIndex)
         val rightOperand = org.elixir_lang.psi.operation.infix.Normalized.rightOperand(children, operatorIndex)
 
-        return arrayOf(leftOperand, rightOperand)
+        return if (leftOperand != null) {
+            if (rightOperand != null) {
+                arrayOf<PsiElement>(leftOperand, rightOperand)
+            } else {
+                arrayOf<PsiElement>(leftOperand)
+            }
+        } else {
+            if (rightOperand != null) {
+                arrayOf<PsiElement>(rightOperand)
+            } else {
+                emptyArray()
+            }
+        }
     }
 
     @Contract(pure = true)
