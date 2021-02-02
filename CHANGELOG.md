@@ -241,6 +241,8 @@
       * `recv_marker_clear`
       * `recv_marker_clear`
       * `recv_marker_user `
+* [#1899](https://github.com/KronicDeth/intellij-elixir/pull/1899) - [@KronicDeth](https://github.com/KronicDeth)
+  * Log `PsiElement` if `Call#finalArguments` contain a `null`.
   
 ### Bug Fixes
 * [#1893](https://github.com/KronicDeth/intellij-elixir/pull/1893) - [@KronicDeth](https://github.com/KronicDeth)
@@ -249,6 +251,9 @@
 * [#1897](https://github.com/KronicDeth/intellij-elixir/pull/1897) - [@KronicDeth](https://github.com/KronicDeth)
   * Compare max opcode in to file to max opcode number, not ordinal.
     Opcodes are 1-based, but the ordinal of the Kotlin `Enum`s are 0-based, so the comparison was off-by-1 when a file had the max opcode and would be incorrectly marked as too new.
+* [#1899](https://github.com/KronicDeth/intellij-elixir/pull/1899) - [@KronicDeth](https://github.com/KronicDeth)
+  * Don't return null left or right infix operands in `primaryArguments`
+    `operation.infix.Normalized.leftOperand` and `.rightOperand` ensures that `PsiErrorElement` is not returned: they can return `null` when there is no left or right operand.  `Infix.primaryArguments` was not taking this into account and so could return a `null` as one of the `primaryArguments`, which broke `Call.finalArguments`.
 
 ## v11.9.2
 
