@@ -542,6 +542,7 @@ public class Type extends org.elixir_lang.sdk.erlang_dependent.Type {
         Map<Version, String> homePathByVersion = new TreeMap<>(Comparator.reverseOrder());
 
         if (SystemInfo.isMac) {
+            mergeASDF(homePathByVersion, "elixir");
             mergeHomebrew(homePathByVersion, "elixir", java.util.function.Function.identity());
             mergeNixStore(homePathByVersion, NIX_PATTERN, Function.identity());
         } else {
