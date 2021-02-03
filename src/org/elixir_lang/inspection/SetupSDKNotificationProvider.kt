@@ -60,7 +60,7 @@ class SetupSDKNotificationProvider : EditorNotifications.Provider<EditorNotifica
             SdkPopupFactory
                     .newBuilder()
                     .withProject(project)
-                    .withSdkType(Type.getInstance())
+                    .withSdkType(Type.instance)
                     .updateProjectSdkFromSelection()
                     .buildPopup()
                     .showInFocusCenter()

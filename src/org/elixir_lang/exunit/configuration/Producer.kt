@@ -11,7 +11,7 @@ import org.elixir_lang.exunit.Configuration
 import org.elixir_lang.file.containsFileWithSuffix
 import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.sdk.elixir.Type
-import org.elixir_lang.sdk.elixir.Type.mostSpecificSdk
+import org.elixir_lang.sdk.elixir.Type.Companion.mostSpecificSdk
 import java.io.File
 
 class MixExUnitRunConfigurationProducer :
@@ -119,7 +119,7 @@ private fun setupConfigurationFromContextImpl(configuration: Configuration,
                 }
                 val sdkTypeId = sdk?.sdkType
 
-                if ((sdkTypeId == null || sdkTypeId == Type.getInstance()) &&
+                if ((sdkTypeId == null || sdkTypeId == Type.instance) &&
                         ProjectRootsUtil.isInTestSource(psiElement.virtualFile, psiElement.project) &&
                         containsFileWithSuffix(psiElement, SUFFIX)) {
                     val basePath = psiElement.getProject().basePath

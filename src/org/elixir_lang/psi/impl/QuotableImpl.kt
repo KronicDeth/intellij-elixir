@@ -25,7 +25,7 @@ import org.elixir_lang.psi.operation.In
 import org.elixir_lang.psi.operation.Infix
 import org.elixir_lang.psi.operation.NotIn
 import org.elixir_lang.psi.operation.Prefix
-import org.elixir_lang.sdk.elixir.Type.getNonNullRelease
+import org.elixir_lang.sdk.elixir.Type.Companion.getNonNullRelease
 import org.jetbrains.annotations.Contract
 import java.lang.Double
 import java.lang.Long
@@ -167,8 +167,7 @@ object QuotableImpl {
     @JvmStatic
     fun quote(blockItem: ElixirBlockItem): OtpErlangObject {
         val blockIdentifier = blockItem.blockIdentifier
-        val quotedValue = blockItem.stab?.quote() ?:
-                getNonNullRelease(blockItem).level().let { level -> emptyBlock(level) }
+        val quotedValue = blockItem.stab?.quote() ?: emptyBlock(getNonNullRelease(blockItem).level())
 
         return OtpErlangTuple(
                 arrayOf(blockIdentifier.quote(), quotedValue)
