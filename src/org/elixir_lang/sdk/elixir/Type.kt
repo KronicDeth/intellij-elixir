@@ -19,12 +19,10 @@ import com.intellij.openapi.util.InvalidDataException
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.util.Version
 import com.intellij.openapi.util.WriteExternalException
-import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.psi.PsiElement
-import com.intellij.util.Function
 import gnu.trove.THashSet
 import org.apache.commons.io.FilenameUtils
 import org.apache.commons.lang.ArrayUtils
@@ -48,8 +46,6 @@ import java.util.*
 import javax.swing.Icon
 
 class Type : org.elixir_lang.sdk.erlang_dependent.Type(SerializerExtension.ELIXIR_SDK_TYPE_ID) {
-    private val mySdkHomeToReleaseCache: MutableMap<String?, Release?> = WeakHashMap()
-
     /**
      * If a path selected in the file chooser is not a valid SDK home path, and the base name is one of the commonly
      * incorrectly selected subdirectories - bin, lib, or src - then return the parent path, so it can be checked for
@@ -70,7 +66,7 @@ class Type : org.elixir_lang.sdk.erlang_dependent.Type(SerializerExtension.ELIXI
                 if (!isValidSdkHome(adjustedSdkHome)) {
                     val libSibling = File(adjustedSdkHome, "lib")
 
-                    // `kiex` has `lib/elixr` and the false `bin` as the same level
+                    // `kiex` has `lib/elixir` and the false `bin` as the same level
                     if (libSibling.exists()) {
                         adjustedSdkHome = File(libSibling, "elixir").path
                     }
@@ -85,31 +81,6 @@ class Type : org.elixir_lang.sdk.erlang_dependent.Type(SerializerExtension.ELIXI
         return adjustedSdkHome
     }
 
-    private fun detectSdkVersion(sdkHome: String): Release? {
-        val versionCacheKey = getVersionCacheKey(sdkHome)
-        val release: Release?
-        if (mySdkHomeToReleaseCache.containsKey(versionCacheKey)) {
-            release = mySdkHomeToReleaseCache[versionCacheKey]
-        } else {
-            val elixir = Elixir.getScriptInterpreterExecutable(sdkHome)
-            release = if (!elixir.canExecute()) {
-                val reason = elixir.path + if (elixir.exists()) " is not executable." else " is missing."
-                LOG.warn("Can't detect Elixir version: $reason")
-                null
-            } else {
-                ProcessOutput.transformStdoutLine(Function { versionString: String? -> Release.fromString(versionString) },
-                        ProcessOutput.STANDARD_TIMEOUT,
-                        sdkHome,
-                        elixir.absolutePath,
-                        "-e",
-                        "System.version |> IO.puts"
-                )
-            }
-            mySdkHomeToReleaseCache[versionCacheKey] = release
-        }
-        return release
-    }
-
     override fun getDefaultDocumentationUrl(sdk: Sdk): String? = getDefaultDocumentationUrl(getRelease(sdk))
 
     override fun getHomeChooserDescriptor(): FileChooserDescriptor {
@@ -122,21 +93,13 @@ class Type : org.elixir_lang.sdk.erlang_dependent.Type(SerializerExtension.ELIXI
         return descriptor
     }
 
-    override fun getIcon(): Icon {
-        return Icons.LANGUAGE
-    }
+    override fun getIcon(): Icon = Icons.LANGUAGE
 
-    override fun getIconForAddAction(): Icon {
-        return icon
-    }
+    override fun getIconForAddAction(): Icon = icon
 
-    override fun getPresentableName(): String {
-        return "Elixir SDK"
-    }
+    override fun getPresentableName(): String = "Elixir SDK"
 
-    override fun getVersionString(sdkHome: String): String? {
-        return getVersionString(detectSdkVersion(sdkHome))
-    }
+    override fun getVersionString(sdkHome: String): String = Release.fromString(File(sdkHome).name)?.version() ?: "Unknown"
 
     /**
      * Map of home paths to versions in descending version order so that newer versions are favored.
@@ -171,10 +134,8 @@ class Type : org.elixir_lang.sdk.erlang_dependent.Type(SerializerExtension.ELIXI
         return Exception(invalidSdkHomeMessage(virtualFile))
     }
 
-    private fun invalidSdkHomeMessage(virtualFile: VirtualFile): String {
-        val message: String
-        message = if (virtualFile.isDirectory) {
-            """A valid home for $presentableName has the following structure:
+    private fun invalidSdkHomeMessage(virtualFile: VirtualFile): String = if (virtualFile.isDirectory) {
+        """A valid home for $presentableName has the following structure:
 
 ELIXIR_SDK_HOME
 * bin
@@ -190,10 +151,8 @@ ELIXIR_SDK_HOME
 ** logger
 ** mix
 """
-        } else {
-            "A directory must be select for the home for $presentableName"
-        }
-        return message
+    } else {
+        "A directory must be select for the home for $presentableName"
     }
 
     override fun isValidSdkHome(path: String): Boolean {
@@ -222,9 +181,8 @@ ELIXIR_SDK_HOME
         return homePathByVersion().values
     }
 
-    override fun suggestSdkName(currentSdkName: String?, sdkHome: String): String {
-        return getDefaultSdkName(sdkHome, detectSdkVersion(sdkHome))
-    }
+    override fun suggestSdkName(currentSdkName: String?, sdkHome: String): String =
+            Release.fromString(File(sdkHome).name)?.toString() ?: "Elixir at $sdkHome"
 
     private fun validateSdkHomePath(virtualFile: VirtualFile) {
         val selectedPath = virtualFile.path
@@ -240,7 +198,7 @@ ELIXIR_SDK_HOME
     override fun createAdditionalDataConfigurable(
             sdkModel: SdkModel,
             sdkModificator: SdkModificator
-    ): com.intellij.openapi.projectRoots.AdditionalDataConfigurable? {
+    ): com.intellij.openapi.projectRoots.AdditionalDataConfigurable {
         return AdditionalDataConfigurable(sdkModel, sdkModificator)
     }
 
@@ -254,7 +212,8 @@ ELIXIR_SDK_HOME
         }
     }
 
-    override fun loadAdditionalData(elixirSdk: Sdk, additional: Element): com.intellij.openapi.projectRoots.SdkAdditionalData? {
+    @Suppress("SameParameterValue")
+    override fun loadAdditionalData(elixirSdk: Sdk, additional: Element): com.intellij.openapi.projectRoots.SdkAdditionalData {
         val sdkAdditionalData = SdkAdditionalData(elixirSdk)
         try {
             sdkAdditionalData.readExternal(additional)
@@ -269,20 +228,12 @@ ELIXIR_SDK_HOME
         private const val LINUX_MINT_HOME_PATH = HomePath.LINUX_MINT_HOME_PATH + "/elixir"
         private val LOG = Logger.getInstance(Type::class.java)
         private val NIX_PATTERN = HomePath.nixPattern("elixir")
-        private val SDK_HOME_CHILD_BASE_NAME_SET: Set<String> = THashSet(Arrays.asList("lib", "src"))
+        private val SDK_HOME_CHILD_BASE_NAME_SET: Set<String> = THashSet(listOf("lib", "src"))
         private const val WINDOWS_32BIT_DEFAULT_HOME_PATH = "C:\\Program Files\\Elixir"
         private const val WINDOWS_64BIT_DEFAULT_HOME_PATH = "C:\\Program Files (x86)\\Elixir"
-        private fun releaseVersion(sdkModificator: SdkModificator): String? {
-            val versionString = sdkModificator.versionString
-            val releaseVersion: String?
-            releaseVersion = if (versionString != null) {
-                val release = Release.fromString(versionString)
-                release?.version()
-            } else {
-                null
-            }
-            return releaseVersion
-        }
+
+        private fun releaseVersion(sdkModificator: SdkModificator): String? =
+                sdkModificator.versionString?.let { Release.fromString(it) }?.version()
 
         private fun addDocumentationPath(sdkModificator: SdkModificator,
                                          releaseVersion: String?,
@@ -307,14 +258,14 @@ ELIXIR_SDK_HOME
             addDocumentationPath(sdkModificator, releaseVersion, appName)
         }
 
-        fun addDocumentationPaths(sdkModificator: SdkModificator) {
+        private fun addDocumentationPaths(sdkModificator: SdkModificator) {
             val releaseVersion = releaseVersion(sdkModificator)
             HomePath.eachEbinPath(
                     sdkModificator.homePath
             ) { ebinPath: Path -> addDocumentationPath(sdkModificator, releaseVersion, ebinPath) }
         }
 
-        fun addSourcePaths(sdkModificator: SdkModificator) {
+        private fun addSourcePaths(sdkModificator: SdkModificator) {
             HomePath.eachEbinPath(
                     sdkModificator.homePath
             ) { ebinPath: Path -> addSourcePath(sdkModificator, ebinPath) }
@@ -345,7 +296,7 @@ ELIXIR_SDK_HOME
             sdkModificator.commitChanges()
         }
 
-        fun configureInternalErlangSdk(elixirSdk: Sdk, elixirSdkModificator: SdkModificator): Sdk? {
+        private fun configureInternalErlangSdk(elixirSdk: Sdk, elixirSdkModificator: SdkModificator): Sdk? {
             val erlangSdk = defaultErlangSdk()
             if (erlangSdk != null) {
                 val sdkAdditionData: com.intellij.openapi.projectRoots.SdkAdditionalData = SdkAdditionalData(erlangSdk, elixirSdk)
@@ -432,12 +383,11 @@ ELIXIR_SDK_HOME
 
         @JvmStatic
         @TestOnly
-        fun createMockSdk(sdkHome: String, version: Release): Sdk {
-            instance.mySdkHomeToReleaseCache[getVersionCacheKey(sdkHome)] = version // we'll not try to detect sdk version in tests environment
-            val sdk: Sdk = ProjectJdkImpl(getDefaultSdkName(sdkHome, version), instance)
+        fun createMockSdk(sdkHome: String, release: Release): Sdk {
+            val sdk: Sdk = ProjectJdkImpl(release.toString(), instance)
             val sdkModificator = sdk.sdkModificator
             sdkModificator.homePath = sdkHome
-            sdkModificator.setVersionString(getVersionString(version)) // must be set after home path, otherwise setting home path clears the version string
+            sdkModificator.versionString = getVersionString(release) // must be set after home path, otherwise setting home path clears the version string
             sdkModificator.commitChanges()
             configureSdkPaths(sdk)
             return sdk
@@ -445,9 +395,6 @@ ELIXIR_SDK_HOME
 
         private fun getDefaultDocumentationUrl(version: Release?): String? =
                 if (version == null) null else "http://elixir-lang.org/docs/stable/elixir/"
-
-        private fun getDefaultSdkName(sdkHome: String, release: Release?): String =
-                release?.toString() ?: "Unknown Elixir version at $sdkHome"
 
         private fun defaultErlangSdkHomePath(): String? =
                 // Will suggest newest version, unlike `intellij-erlang`
@@ -458,7 +405,7 @@ ELIXIR_SDK_HOME
                                            homePath: String): Sdk? {
             val sdkName = erlangSdkType.suggestSdkName("Default " + erlangSdkType.name, homePath)
             val projectJdkImpl = ProjectJdkImpl(sdkName, erlangSdkType)
-            projectJdkImpl.setHomePath(homePath)
+            projectJdkImpl.homePath = homePath
             erlangSdkType.setupSdkPaths(projectJdkImpl)
 
             return if (projectJdkImpl.versionString != null) {
@@ -507,21 +454,17 @@ ELIXIR_SDK_HOME
 
         @JvmStatic
         @Contract("null -> null")
-        fun getRelease(sdk: Sdk?): Release? {
-            if (sdk != null && sdk.sdkType === instance) {
-                val fromVersionString = Release.fromString(sdk.versionString)
-                return fromVersionString
-                        ?: instance.detectSdkVersion(StringUtil.notNullize(sdk.homePath))
-            }
-            return null
+        fun getRelease(sdk: Sdk?): Release? = if (sdk != null && sdk.sdkType === instance) {
+            Release.fromString(sdk.versionString)
+                    ?: sdk.homePath?.let { Release.fromString(File(it).name) }
+        } else {
+            null
         }
-
-        private fun getVersionCacheKey(sdkHome: String?): String? = sdkHome?.let { File(it).absolutePath }
 
         private fun getVersionString(version: Release?): String? = version?.toString()
 
         private fun putIfDirectory(homePathByVersion: MutableMap<Version, String>,
-                                   version: Version,
+                                   @Suppress("SameParameterValue") version: Version,
                                    homePath: String) {
             val homeFile = File(homePath)
             if (homeFile.isDirectory) {
