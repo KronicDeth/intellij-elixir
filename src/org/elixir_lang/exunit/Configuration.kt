@@ -11,22 +11,18 @@ import com.intellij.execution.runners.RunConfigurationWithSuppressedDefaultRunAc
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.options.SettingsEditorGroup
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.projectRoots.Sdk
 import org.elixir_lang.ExUnit
-import org.elixir_lang.Level.V_1_4
 import org.elixir_lang.debugger.Modules
 import org.elixir_lang.debugger.configuration.Debuggable
 import org.elixir_lang.debugger.settings.stepping.ModuleFilter
 import org.elixir_lang.exunit.configuration.Factory
-import org.elixir_lang.file.LevelPropertyPusher.level
 import org.elixir_lang.mix.ensureMostSpecificSdk
 import org.elixir_lang.run.*
-import org.elixir_lang.sdk.elixir.Type.mostSpecificSdk
 import org.jdom.Element
 
 class Configuration(name: String, project: Project) :
         org.elixir_lang.run.Configuration(name, project, Factory),
-        Debuggable<org.elixir_lang.exunit.Configuration>,
+        Debuggable<Configuration>,
         RunConfigurationWithSuppressedDefaultRunAction,
         RunConfigurationWithSuppressedDefaultDebugAction {
     override val cookie: String? = null

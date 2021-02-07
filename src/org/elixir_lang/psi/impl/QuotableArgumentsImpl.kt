@@ -8,7 +8,7 @@ import org.elixir_lang.Level.V_1_6
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.impl.QuotableImpl.BLOCK
 import org.elixir_lang.psi.impl.QuotableImpl.NIL
-import org.elixir_lang.sdk.elixir.Type.getNonNullRelease
+import org.elixir_lang.sdk.elixir.Type.Companion.getNonNullRelease
 import org.jetbrains.annotations.Contract
 
 object QuotableArgumentsImpl {

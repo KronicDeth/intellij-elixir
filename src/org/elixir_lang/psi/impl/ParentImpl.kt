@@ -7,7 +7,7 @@ import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.name.Module
 import org.elixir_lang.psi.impl.QuotableImpl.metadata
 import org.elixir_lang.psi.impl.QuotableImpl.quotedFunctionCall
-import org.elixir_lang.sdk.elixir.Type.getNonNullRelease
+import org.elixir_lang.sdk.elixir.Type.Companion.getNonNullRelease
 import org.jetbrains.annotations.Contract
 import java.nio.charset.Charset
 

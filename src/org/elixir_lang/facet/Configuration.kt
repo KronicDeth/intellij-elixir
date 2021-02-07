@@ -26,7 +26,7 @@ class Configuration : FacetConfiguration {
         sdk = if (StringUtil.isEmpty(sdkName)) {
             null
         } else {
-            ProjectJdkTable.getInstance().findJdk(sdkName, Type.getInstance().name)
+            ProjectJdkTable.getInstance().findJdk(sdkName, Type.instance.name)
         }
 
         sdk?.let {
