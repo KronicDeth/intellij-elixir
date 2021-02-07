@@ -274,6 +274,7 @@ task stopQuoter(type: Exec, dependsOn: releaseQuoter) {
 
 runIde {
   jvmArgs "-Didea.ProcessCanceledException=disabled"
+  maxHeapSize = "7g"
 }
 
 test {

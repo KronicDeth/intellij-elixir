@@ -116,6 +116,7 @@ public class Type extends SdkType {
         Map<Version, String> homePathByVersion = HomePath.homePathByVersion();
 
         if (SystemInfo.isMac) {
+            mergeASDF(homePathByVersion, "erlang");
             mergeHomebrew(homePathByVersion, "erlang", VERSION_PATH_TO_HOME_PATH);
             mergeNixStore(homePathByVersion, NIX_PATTERN, VERSION_PATH_TO_HOME_PATH);
         } else {

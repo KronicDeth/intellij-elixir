@@ -784,7 +784,7 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
 
     // @spec bs_start_match3 Fail Bin Live Dst
     // @doc  Starts a binary match sequence
-    BS_START_MATCH3(166, "bs_start_match3", arrayOf(FAIL_LABEL, Argument("binary"), LIVE_X_REGISTER_COUNT, POSITION)),
+    BS_START_MATCH3(166, "bs_start_match3", arrayOf(FAIL_LABEL, BINARY, LIVE_X_REGISTER_COUNT, POSITION)),
 
     // @spec bs_get_position Ctx Dst Live
     // @doc  Sets Dst to the current position of Ctx
@@ -798,7 +798,41 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
 
     // @spec swap Register1 Register2
     // @doc  Swaps the contents of two registers.
-    SWAP(169, "swap", arrayOf(Argument("register1"), Argument("register2")));
+    SWAP(169, "swap", arrayOf(Argument("register1"), Argument("register2"))),
+
+    // @spec bs_start_match4 Fail Bin Live Dst
+    // @doc  As bs_start_match3, but the fail label can be 'no_fail' when we know
+    //       it will never fail at runtime, or 'resume' when we know the input is
+    //       a match context.
+    BS_START_MATCH4(170, "bs_start_match4", arrayOf(FAIL_LABEL, BINARY, LIVE_X_REGISTER_COUNT, POSITION)),
+
+    // OTP 24
+
+    // @spec make_fun3 OldIndex Dst EnvTerms
+    // @doc  Build a fun with the environment in the list EnvTerms and put it
+    //       into register Dst.
+    MAKE_FUN3(171, "make_fun3", arrayOf(Argument("old_index"), DESTINATION, Argument("env_terms"))),
+
+    // @spec init_yregs ListOfYRegs
+    // @doc  Initialize the Y registers in the list.
+    INIT_YREGS(172, "init_yregs", arrayOf(Argument("list_of_yregs"))),
+
+    // @spec recv_marker_bind Marker Reference
+    // @doc  Associates Reference with a previously reserved marker.
+    RECV_MARKER_BIND(173, "recv_marker_bind", arrayOf(MARKER, REFERENCE)),
+
+    // @spec recv_marker_clear Reference
+    // @doc  Clears the receive marker associated with the given Reference.
+    RECV_MARKER_CLEAR(174, "recv_marker_clear", arrayOf(REFERENCE)),
+
+    // @spec recv_marker_reserve Marker
+    // @doc  Creates a receive marker which can be later bound to a reference.
+    RECV_MARKER_RESERVE(175, "recv_marker_reserve", arrayOf(MARKER)),
+
+    // @spec recv_marker_use Reference
+    // @doc  Sets the current receive cursor to the marker associated with
+    //       the given Reference
+    RECV_MARKER_USE(176, "recv_marker_user", arrayOf(REFERENCE));
 
     fun arity() = arguments.size
 }

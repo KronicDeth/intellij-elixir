@@ -1,9 +1,5 @@
 package org.elixir_lang.beam;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.Iterators;
-import com.intellij.diagnostic.LogMessageEx;
-import com.intellij.openapi.diagnostic.Attachment;
 import com.intellij.openapi.fileTypes.BinaryFileDecompiler;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.elixir_lang.beam.chunk.Atoms;
@@ -11,11 +7,9 @@ import org.elixir_lang.beam.chunk.beam_documentation.Documentation;
 import org.elixir_lang.beam.chunk.CallDefinitions;
 import org.elixir_lang.beam.chunk.beam_documentation.Doc;
 import org.elixir_lang.beam.chunk.beam_documentation.FunctionMetadata;
-import org.elixir_lang.beam.decompiler.Default;
-import org.elixir_lang.beam.decompiler.InfixOperator;
-import org.elixir_lang.beam.decompiler.PrefixOperator;
-import org.elixir_lang.beam.decompiler.Unquoted;
+import org.elixir_lang.beam.decompiler.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -41,6 +35,7 @@ public class Decompiler implements BinaryFileDecompiler {
         MACRO_NAME_ARITY_DECOMPILER_LIST.add(InfixOperator.INSTANCE);
         MACRO_NAME_ARITY_DECOMPILER_LIST.add(PrefixOperator.INSTANCE);
         MACRO_NAME_ARITY_DECOMPILER_LIST.add(Unquoted.INSTANCE);
+        MACRO_NAME_ARITY_DECOMPILER_LIST.add(SignatureOverride.INSTANCE);
         MACRO_NAME_ARITY_DECOMPILER_LIST.add(Default.INSTANCE);
     }
 
@@ -72,13 +67,8 @@ public class Decompiler implements BinaryFileDecompiler {
                                 ? documentation.getModuleDocs().getEnglishDocs()
                                 : null;
 
-                        if (moduleDocs != null){
-                            decompiled.append("  @moduleDoc \"\"\"\n");
-                            String indentedModuleDocs = Arrays.stream(moduleDocs.split("\n"))
-                                    .map(x -> "  " + x)
-                                    .collect(Collectors.joining("\n"));
-                            decompiled.append(indentedModuleDocs);
-                            decompiled.append("\n  \"\"\"\n");
+                        if (moduleDocs != null) {
+                            appendDocumentation(decompiled, "moduledoc", moduleDocs);
                         }
                     }
 
@@ -145,27 +135,12 @@ public class Decompiler implements BinaryFileDecompiler {
                         : null;
                 if (functionDocs != null){
                     functionDocs.forEach(x -> {
-                        String indentedDocs = Arrays.stream(x.getDocumentationText().split("\n"))
-                                .map(d -> "  " + d)
-                                .collect(Collectors.joining("\n"));
-                        decompiled.append("  @doc \"\"\"\n")
-                                .append(indentedDocs)
-                                .append("\n  \"\"\"\n");
+                        appendDocumentation(decompiled, "doc", x.getDocumentationText());
                     });
                 }
             }
 
-            List<String> signaturesFromDocs = documentation != null && documentation.getBeamLanguage().equals("elixir")
-                    ? documentation.getDocs().getSignatures(macroNameArity.name, macroNameArity.arity)
-                    : null;
-            if (signaturesFromDocs != null && !signaturesFromDocs.isEmpty()){
-                decompiled.append("  def ");
-                Optional<String> optional = signaturesFromDocs.stream().findFirst();
-                decompiled.append(optional.get());
-                decompiled.append(" do\n    # body not decompiled\n  end\n");
-            }else{
-                appendMacroNameArity(decompiled, macroNameArity);
-            }
+            appendMacroNameArity(decompiled, macroNameArity, documentation);
 
             lastMacroNameArity = macroNameArity;
         }
@@ -179,21 +154,121 @@ public class Decompiler implements BinaryFileDecompiler {
                 .append("\n");
     }
 
+    private static void appendDocumentation(@NotNull StringBuilder decompiled, @NotNull String moduleAttribute, @NotNull String text) {
+        String safePromoterTerminator = safePromoterTerminator(text);
+
+        String promoterTerminator;
+        if (safePromoterTerminator != null) {
+            promoterTerminator = safePromoterTerminator;
+        } else {
+            promoterTerminator = "\"\"\"";
+        }
+
+        decompiled
+                .append("  @")
+                .append(moduleAttribute)
+                // Use ~S sigil to stop interpolation in docs as an interpolation stored in the docs was
+                // escaped in the original source.
+                .append(" ~S")
+                .append(promoterTerminator)
+                .append('\n');
+        appendDocumentationText(decompiled, safePromoterTerminator, text);
+        decompiled
+                .append("\n  ")
+                .append(promoterTerminator)
+                .append('\n');
+    }
+
+    private static final String CHARLIST_HEREDOC_PROMOTER_TERMINATOR = "'''";
+    private static final String STRING_HEREDOC_PROMOTER_TERMINATOR = "\"\"\"";
+
+    @Nullable
+    private static String safePromoterTerminator(String text) {
+        boolean containsCharlistHeredoc = text.contains(CHARLIST_HEREDOC_PROMOTER_TERMINATOR);
+        boolean containsStringHeredoc = text.contains(STRING_HEREDOC_PROMOTER_TERMINATOR);
+
+        @Nullable String safePromoterTerminator;
+        if (containsCharlistHeredoc && containsStringHeredoc) {
+            safePromoterTerminator = null;
+        } else if (containsCharlistHeredoc) {
+            safePromoterTerminator = STRING_HEREDOC_PROMOTER_TERMINATOR;
+        } else if (containsStringHeredoc) {
+            safePromoterTerminator = CHARLIST_HEREDOC_PROMOTER_TERMINATOR;
+        } else {
+            // Default to String since it is what actual developers would use most often
+            safePromoterTerminator = STRING_HEREDOC_PROMOTER_TERMINATOR;
+        }
+
+        return safePromoterTerminator;
+    }
+
+    private static void appendDocumentationText(@NotNull StringBuilder decompiled, @Nullable String safePromoterTerminator, @NotNull String text) {
+        String[] lines = text.split("\n");
+
+        int lastI = lines.length - 1;
+        for (int i = 0; i < lines.length; i++) {
+            String line = lines[i];
+
+            String stripped = line.stripTrailing();
+
+            if (!stripped.isEmpty()) {
+                decompiled.append("  ");
+
+                if (safePromoterTerminator == null) {
+                    decompiled.append(stripped.replace(STRING_HEREDOC_PROMOTER_TERMINATOR, "\"\"\""));
+                } else {
+                    decompiled.append(stripped);
+                }
+            }
+
+            if (i != lastI) {
+                decompiled.append("\n");
+            }
+        }
+    }
+
     private static void appendMacroNameArity(@NotNull StringBuilder decompiled,
-                                             @NotNull MacroNameArity macroNameArity) {
-        boolean accepted = false;
+                                             @NotNull MacroNameArity macroNameArity, Documentation documentation) {
+        org.elixir_lang.beam.decompiler.MacroNameArity decompiler = decompiler(macroNameArity);
+
+        if (decompiler != null) {
+            // The signature while easier for users to read are not proper code for those that need to use unquote, so
+            // only allow signatures for default decompiler
+            if (decompiler == Default.INSTANCE) {
+                List<String> signaturesFromDocs = documentation != null && documentation.getBeamLanguage().equals("elixir")
+                        ? documentation.getDocs().getSignatures(macroNameArity.name, macroNameArity.arity)
+                        : null;
+
+                if (signaturesFromDocs != null && !signaturesFromDocs.isEmpty()) {
+                    decompiled.append("  ").append(macroNameArity.macro).append(' ');
+                    Optional<String> optional = signaturesFromDocs.stream().findFirst();
+                    decompiled.append(optional.get());
+                    decompiled.append(" do\n    # body not decompiled\n  end\n");
+                } else {
+                    decompiler.append(decompiled, macroNameArity);
+                }
+            } else {
+                decompiler.append(decompiled, macroNameArity);
+            }
+        }
+    }
+
+    @Nullable
+    static org.elixir_lang.beam.decompiler.MacroNameArity decompiler(@NotNull MacroNameArity macroNameArity) {
+        org.elixir_lang.beam.decompiler.MacroNameArity accepted = null;
 
         for (org.elixir_lang.beam.decompiler.MacroNameArity decompiler : MACRO_NAME_ARITY_DECOMPILER_LIST) {
             if (decompiler.accept(macroNameArity)) {
-                decompiler.append(decompiled, macroNameArity);
-                accepted = true;
+                accepted = decompiler;
                 break;
             }
         }
 
-        if (!accepted) {
+        if (accepted == null) {
             error(macroNameArity);
         }
+
+        return accepted;
     }
 
     private static void error(@NotNull MacroNameArity macroNameArity) {

@@ -97,17 +97,34 @@ object PsiNamedElementImpl {
      * name.
      */
     @JvmStatic
-    fun unquoteName(named: PsiElement, name: Name): Name {
-        var unquotedName = name
+    fun unquoteName(named: PsiElement, name: Name): Name = if (named is Call && UNQUOTE == name) {
+        val primaryArguments = named.primaryArguments()
 
-        if (named is Call && UNQUOTE == name) {
-            val primaryArguments = named.primaryArguments()
+        if (primaryArguments != null && primaryArguments.size == 1) {
+            val primaryArgument = primaryArguments[0]!!
 
-            if (primaryArguments != null && primaryArguments.size == 1) {
-                unquotedName += "(" + primaryArguments[0]!!.text + ")"
-            }
+            primaryArgument
+                    .let { it as? ElixirAccessExpression}
+                    ?.children
+                    ?.singleOrNull()
+                    ?.let { it as? ElixirAtom }
+                    ?.let { atom ->
+                        val body = atom.charListLine?.body ?: atom.stringLine?.body
+
+                        if (body != null) {
+                            if (body.children.isEmpty()) {
+                               body.text
+                            } else {
+                               null
+                            }
+                        } else {
+                            atom.node.lastChildNode.text
+                        }
+                    } ?: "${name}(${primaryArgument.text})"
+        } else {
+            null
         }
-
-        return unquotedName
-    }
+    } else {
+        null
+    } ?: name
 }

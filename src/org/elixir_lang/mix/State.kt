@@ -16,7 +16,7 @@ import com.intellij.notification.Notifications
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.projectRoots.Sdk
 import org.elixir_lang.console.ElixirConsoleUtil
-import org.elixir_lang.sdk.elixir.Type.mostSpecificSdk
+import org.elixir_lang.sdk.elixir.Type.Companion.mostSpecificSdk
 import org.elixir_lang.utils.SetupElixirSDKNotificationListener
 
 fun ensureMostSpecificSdk(module: Module): Sdk = mostSpecificSdk(module) ?: throw MissingSdk(module)

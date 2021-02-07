@@ -7,6 +7,7 @@ import com.intellij.psi.PsiReference
 import com.intellij.psi.tree.TokenSet
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
+import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.mix.project.computeReadAction
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
@@ -117,7 +118,12 @@ private fun Call.computeCallableReference(): PsiReference =
  *
  * @return [Call.primaryArguments]
  */
-fun Call.finalArguments(): Array<PsiElement>? = (secondaryArguments() ?: primaryArguments())?.map { it!! }?.toTypedArray()
+fun Call.finalArguments(): Array<PsiElement>? = try {
+        (secondaryArguments() ?: primaryArguments())?.map { it!! }?.toTypedArray()
+} catch (e: NullPointerException) {
+    Logger.error(this.javaClass, "NullPointerException getting Call.finalArguments()", this);
+    null
+}
 
 fun Call.getReference(): PsiReference? =
         CachedValuesManager.getCachedValue(this) {
@@ -495,13 +501,25 @@ object CallImpl {
 
     @Contract(pure = true)
     @JvmStatic
-    fun primaryArguments(infix: Infix): Array<PsiElement?> {
+    fun primaryArguments(infix: Infix): Array<PsiElement> {
         val children = infix.children
         val operatorIndex = Normalized.operatorIndex(children)
         val leftOperand = org.elixir_lang.psi.operation.infix.Normalized.leftOperand(children, operatorIndex)
         val rightOperand = org.elixir_lang.psi.operation.infix.Normalized.rightOperand(children, operatorIndex)
 
-        return arrayOf(leftOperand, rightOperand)
+        return if (leftOperand != null) {
+            if (rightOperand != null) {
+                arrayOf<PsiElement>(leftOperand, rightOperand)
+            } else {
+                arrayOf<PsiElement>(leftOperand)
+            }
+        } else {
+            if (rightOperand != null) {
+                arrayOf<PsiElement>(rightOperand)
+            } else {
+                emptyArray()
+            }
+        }
     }
 
     @Contract(pure = true)

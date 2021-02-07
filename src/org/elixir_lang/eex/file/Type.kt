@@ -29,7 +29,7 @@ open class Type protected constructor(lang: Language? = org.elixir_lang.eex.Lang
             val pathLength = path.length
             val fileTypeManager = FileTypeManager.getInstance()
             return fileTypeManager
-                    .getAssociations(INSTANCE)
+                    .getAssociations(virtualFile.fileType)
                     .stream()
                     .filter { obj: FileNameMatcher? -> ExtensionFileNameMatcher::class.java.isInstance(obj) }
                     .map { obj: FileNameMatcher? -> ExtensionFileNameMatcher::class.java.cast(obj) }
@@ -42,21 +42,17 @@ open class Type protected constructor(lang: Language? = org.elixir_lang.eex.Lang
         }
 
         @JvmStatic
-        fun onlyTemplateDataFileType(virtualFile: VirtualFile): Optional<FileType> {
-            val typeSet = templateDataFileTypeSet(virtualFile)
-            val optionalType: Optional<FileType>
-            optionalType = if (typeSet.size == 1) {
-                val type = Iterables.getOnlyElement(typeSet)
-                if (type === FileTypes.UNKNOWN) {
-                    Optional.empty()
-                } else {
-                    Optional.of(type)
-                }
-            } else {
-                Optional.empty()
-            }
-            return optionalType
-        }
+        fun onlyTemplateDataFileType(virtualFile: VirtualFile): Optional<FileType> =
+                templateDataFileTypeSet(virtualFile)
+                        .singleOrNull()
+                        ?.let { type ->
+                            if (type === FileTypes.UNKNOWN) {
+                                null
+                            } else {
+                                Optional.of(type)
+                            }
+                        }
+                        ?: Optional.empty()
     }
 
     init {

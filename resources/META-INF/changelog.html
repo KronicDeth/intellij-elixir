@@ -1,5 +1,269 @@
 <html>
 <body>
+<h1>v11.10.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>Simplify <code>onlyTemplateDateFileType</code></li>
+      <li>Add missing opcodes to <code>Code</code> disassembler
+        <ul>
+          <li>OTP 23 opcode <code>bs_start_match4</code></li>
+          <li>Current (in-development) OTP 24 opcodes
+            <ul>
+              <li><code>make_fun3</code></li>
+              <li><code>init_yregs</code></li>
+              <li><code>recv_marker_bind</code></li>
+              <li><code>recv_marker_clear</code></li>
+              <li><code>recv_marker_clear</code></li>
+              <li><code>recv_marker_user </code></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>Log <code>PsiElement</code> if <code>Call#finalArguments</code> contain a <code>null</code>.</li>
+      <li>Suggest ASDF directories as <code>homepath</code>s for both Elixir and Erlang for Elixir SDKs.</li>
+    </ul>
+  </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>
+        <p>
+          Use <code>VirtualFile#fileType</code> instead of EEx Type::INSTANCE when looking up extensions.
+        </p>
+        <p>
+          Since LEEx file <code>Type</code> is a subclass of EEx's file <code>Type</code>, it calls
+          <code>templateDataFileTypeSet</code> in EEx's <code>Type</code>, but <code>templateDataFileTypeSet</code> uses
+          <code>INSTANCE</code> from EEx.  By using the <code>VirtualFile#fileType</code> instead, it will properly be
+          EEx or LEEx based on the actual file extension and then it can be used to strip that off and find the
+          DataTemplateLanguage, such as <code>HTMLLanguage</code> for <code>.html.leex</code>.
+        </p>
+      </li>
+      <li>
+        Compare max opcode in to file to max opcode number, not ordinal.<br>
+        Opcodes are 1-based, but the ordinal of the Kotlin <code>Enum</code>s are 0-based, so the comparison was
+        off-by-1 when a file had the max opcode and would be incorrectly marked as too new.
+      </li>
+      <li>
+        Don't return null left or right infix operands in <code>primaryArguments</code><br>
+        <code>operation.infix.Normalized.leftOperand</code> and <code>.rightOperand</code> ensures that
+        <code>PsiErrorElement</code> is not returned: they can return <code>null</code> when there is no left or right
+        operand.  <code>Infix.primaryArguments</code> was not taking this into account and so could return a
+        <code>null</code> as one of the <code>primaryArguments</code>, which broke <code>Call.finalArguments</code>.
+      </li>
+      <li>
+        Don't attempt to execute <code>elixir -e "System.version |&gt; IO.puts"</code> to get the version number as it
+        requires too much of a full SDK to be built and from the Erlang paths to be correct too, which was rarely the
+        case for ASDF.  Since for Homebrew and ASDF, the directory name is the version name, this shouldn't be a loss in
+        naming ability.  If the directory name is not a parseable version it will be of the format
+        <code>Elixir at &lt;path&gt;</code>.  This is probably more correct for installs directories that aren't
+        versioned as SDK versions aren't updated if the version installed at the path changes, such as
+        <code>/usr/local/elixir</code> or <code>/opt/elixir</code>, etc.
+      </li>
+    </ul>
+  </li>
+</ul>
+<h1>v11.9.2</h1>
+<ul>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>
+        Protect from nested heredocs in documentation from stopping documentation's heredoc as happens in
+        <code>Module</code> and <code>Ecto.Query</code>.
+        <ul>
+          <li>Use <code>~S</code> for <code>@moduledoc</code> too, in addition to <code>@doc</code>.</li>
+          <li>
+            Check if the documentation contains <code>"""</code> or <code>'''</code> and use the opposite one as the
+            promoter/terminator.
+            <ul>
+              <li>If neither is used, use <code>"""</code>.</li>
+              <li>If both are used, use <code>"""</code>, but then escape <code>"""</code> as <code>\"\"\"</code>.</li>
+            </ul>
+          </li>
+          <li>Trim trailing whitespace from documentation lines to match formatter output.</li>
+        </ul>
+      </li>
+      <li>Set <code>runIde</code> <code>maxHeapSize</code> to <code>7g</code>
+        <ul>
+          <li>
+            Set to the same I run my own IDE at, so the debugged instance isn't any slower than the normal IDE when I
+            need to do extended all day testing to trigger bugs.
+          </li>
+        </ul>
+      </li>
+      <li>Test that all <code>FormattingTest</code> files can be parsed.</li>
+      <li>
+        <code>YYINITIAL</code> is special - wrappers of the lexer assume that if in <code>YYINITIAL</code>, it is safe
+        to shift the lexer over when there is an error, having <code>{OPENING_CURLY}</code>
+        <code>pushAndBegin(YYINITIAL)</code> when it was either in <code>YYINITIAL</code> or <code>INTERPOLATION</code>
+        (
+        <a href="https://github.com/KronicDeth/intellij-elixir/blob/36b53331967950453906c3bde9c7f79dc3f9cd2f/src/org/elixir_lang/Elixir.flex#L812">
+          intellij-elixir/src/org/elixir_lang/Elixir.flex
+        </a>
+        ) means that the lexer looked like it was restartable when it really wasn't.   (
+        <a href="https://github.com/KronicDeth/intellij-elixir/blame/36b53331967950453906c3bde9c7f79dc3f9cd2f/src/org/elixir_lang/Elixir.flex#L812">
+          This code has been in the lexer for 6 years
+        </a>
+        ).
+        <ul>
+          <li>
+            When in <code>YYINITIAL</code>, <code>{</code> no longer recurses into <code>YYINITIAL</code> as
+            <code>}</code> does not need to be counted to determine if it is closing an interpolation.
+          </li>
+          <li>
+            When in <code>INTERPOLATION</code>, <code>{</code> enters <code>INTERPOLATION_CURLY</code> to allow counting
+            and matching of <code>}</code> until it can exit and go back to <code>INTERPOLATION</code>, where
+            <code>}</code> will exit the interpolation.
+          </li>
+          <li>
+            When in <code>INTERPOLATION_CURLY</code>, <code>{</code> enters another level of
+            <code>INTERPOLATION_CURLY</code> to allow counting and matching of <code>}</code> until it can exit and go
+            up a level.
+          </li>
+        </ul>
+      </li>
+      <li>
+        The <code>}</code> in <code>YYINITIAL</code> did <code>yybegin(ADDITION_OR_SUBTRACTION_MAYBE)</code>, but it
+        should have been <code>pushAndBegin(ADDITION_OR_SUBTRACTION)</code> as
+        <code>ADDITION_OR_SUBTRACTION_MAYBE</code> or its following states all exit with
+        <code>handleInLastState()</code> or <code>popAndBegin()</code>.  This was not caught in
+        <a href="https://github.com/KronicDeth/intellij-elixir/pull/1859">#1859</a> because the extra
+        <code>YYINITIAL</code> from <code>pushAndBegin(YYINTIAL)</code> hid the bug.
+      </li>
+      <li>
+        Prevent nested <code>YYINITIAL</code> bugs in the future by erroring
+        <ul>
+          <li>If trying to <code>pushAndBegin(YYINITIAL)</code>.</li>
+          <li>If trying to <code>push(YYINITIAL)</code> and the state stack is not empty</li>
+        </ul>
+      </li>
+      <li>
+        Clear the state Stack when <code>ElixirFlexLexer#reset</code> is called, as at the level of typing and pasting,
+        the <code>ElixirFlexLexer</code> is wrapped in many layers of lexers including
+        <code>LexerEditorHighlighter</code> where the <code>ElixirFlexLexer</code> is no longer re-instantiated when
+        there is no text, but instead, <code>ElixirFlexLexer#reset</code> is only called.  This has always been an
+        invariant violation since the stack state was added 7 years ago in
+        <a href="https://github.com/KronicDeth/intellij-elixir/commit/52cb2fbf6368ba551a4784bd1de49e1fc21c969a">
+          <tt>52cb2fb</tt>
+        </a>.  It likely only became more apparent with the changes to +/- parsing in
+        <a href="https://github.com/KronicDeth/intellij-elixir/pull/1859">#1859</a> that made return-to-YYINITIAL less
+        likely.
+        <ul>
+          <li>
+            Since this <code>stack.clear()</code> has to be manually added to <code>ElixirFlexLexer.java</code>, which
+            is generated from <code>Elixir.flex</code>, <code>ResetTest</code> is added to check that the code is still
+            there.
+          </li>
+        </ul>
+      </li>
+      <li>
+        For a reason I haven't been able to explain, the <code>LexerEditorHighlighter</code> stops working after
+        <code>:</code> is typed at the start of an atom in certain situations, such as before <code>)</code> inside a
+        function call, like when adding an argument.  In this case, the old version of the lexer would mark
+        <code>)</code> as a <code>BAD_CHARACTER</code> and continue to do so until an expected atom start of [a-zA-Z_],
+        <code>'</code>, <code>"</code>, or an operator occurred.  Now, if an invalid atom start is matched, the
+        <code>ATOM_START</code> state ends and the previous state handles the text, which in the function case mean
+        <code>)</code> is parsed as <code>CLOSING_PARENTHESIS</code>.  This change allows the highlighting to continue.
+        I do not know if returning <code>BAD_CHARACTER</code> will always break the <code>LexerEditorHighlighter</code>,
+        but I don't think, so since
+        <a href="https://github.com/JetBrains/intellij-community/blob/f66e9644fa683fba22f4ce9e30c037720f745989/plugins/groovy/groovy-psi/src/org/jetbrains/plugins/groovy/lang/lexer/groovy.flex#L538">
+          the <code>GroovyLexer</code> in <code>intellij-community</code> returns it
+        </a>, but it may be the case that it isn't actually returned ever when users are typing and only handled by the
+        lexer for completeness.
+      </li>
+    </ul>
+  </li>
+</ul>
+<h1>v11.9.1</h1>
+<ul>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>
+        <p>
+          Fix syntax highlighting stopping due to decompiling of <code>Kernel</code> failing caused by bugs introduced
+          in <a href="https://github.com/KronicDeth/intellij-elixir/pull/1834">#1834</a>.<br>
+          Syntax highlighting could fail part way through a file when <code>Kernel</code> needed to be decompiled to
+          resolve parts of the syntax.  This would lead to the file to be colored above a certain point, but then the
+          default gray after that point.
+        </p>
+        <ul>
+          <li>
+            Connect compiled stubs to decompiled source by name/arity.<br>
+            Previously, when the decompiler didn't use the <code>Docs</code>, it was guaranteed that the
+            <code>PsiCompiled</code> stubs would correlate, in-order, with the decompiled source call definitions, and
+            so mirrors could be set by matching up the list of them in order.  Since the <code>Docs</code> doesn't have
+            to correspond to and doesn't correspond to the binary precisely for some BEAMs, most importantly,
+            <code>Elixir.Kernel.beam</code>, the PsiCompiled stub and decompiled source is now matched by name and
+            arity.  This means some mirrors are missed, but no errors are produced.
+          </li>
+          <li>
+            Allow decompile source to map to entire arity range<br>
+            Since the decompile source from <code>Docs</code> can have default arguments the call definition clauses can
+            have an arity range and not just a fixed arity, so all arities in the range need to be mappable to
+            <code>PsiCompiled</code> functions.
+          </li>
+          <li>
+            Use correct macro for signature from <code>Docs</code>.<br>
+            Ensures that defmacro is used for macros instead of hard-coding <code>def</code> as in
+            <a href="https://github.com/KronicDeth/intellij-elixir/pull/1834">#1834</a>.
+          </li>
+          <li>
+            Use <code>~S"""</code> for docs from <code>Docs</code> chunk.<br>
+            The docs from the <code>Docs</code> chunk may contain interpolation in the code samples or <code>#{</code>
+            in regex examples, but these should not be treated as an interpolation start as the <code>Docs</code> format
+            does not support interpolation.  Anything that looks like interpolation in the docs text was actually
+            escaped in the original docs, so also escape it here by using <code>S"""</code>, which turns off
+            interpolation.
+          </li>
+          <li>
+            Log an error if <code>Code</code> function can't be matched to decompiled source.<br>
+            Unlike the old <code>InvalidMirrorException</code>, this won't be an exception and the binary &lt;-&gt;
+            decompile will still work for the other functions/macros in the file, so it will be a more graceful
+            degradation.
+          </li>
+        </ul>
+      </li>
+      <li>
+        Fix missed references to <code>DepsWatcher</code> as project component<br>
+        <code>DepsWatcher</code> was converted to a Project Listener in
+        <a href="https://github.com/KronicDeth/intellij-elixir/pull/1844">#1844</a>
+        to support installing the plugin from the Marketplace without reloading, but some references to
+        <code>DepsWatcher</code> were still trying to get its instance for project using
+        <code>project.getComponent()</code>, which would now return <code>null</code>.
+      </li>
+      <li>Target Java 1.8 for JPS compatibility<br>
+        JPS (JetBrains Project System) is the API used to allow External Builders, like <code>mix</code> to build projects.</li>
+      <li>
+        Fix matching <code>unquote(ATOM)</code> call definitions to compiled function by using the argument to
+        <code>unquote</code> when calculating the name of the call definition clause if possible.<br>
+        Needed to match anonymous function names that are <code>unquote</code>d because they contain <code>/</code> to
+        separate the outer function name from the anonymous function naming convention.
+      </li>
+      <li>
+        Don't use <code>Docs</code> signature for <code>MacroNameArity</code> that is an operator or
+        <code>unquote</code>d<br>
+        The signatures for operators and <code>unquote</code>d don't produce valid code that can be parsed.
+      </li>
+      <li>
+        Don't use signatures for <code>__struct__</code> functions.<br>
+        The signatures for the <code>__struct__</code> functions are like <code>%Module{}</code>, but that's not
+        parseable, so bypass the signatures with a specialized <code>SignatureOverride</code> decompiler that matches
+        the actual code in <code>defstruct</code>.
+      </li>
+      <li>
+        Don't indent empty lines from <code>Docs</code> for <code>@moduledoc</code> and <code>@doc</code> to match the
+        formatter output.
+      </li>
+      <li>
+        Fix capitalization of <code>Docs</code> <code>@moduledoc</code><br>
+        <code>@moduleDoc</code> -&gt; <code>@moduledoc</code>
+      </li>
+    </ul>
+  </li>
+</ul>
 <h1>v11.9.0</h1>
 <ul>
   <li>
@@ -1017,371 +1281,6 @@ Probably constructor should be marked as NonInjectable. [Plugin: org.elixir_lang
         just something with a lot of valid names.
       </li>
       <li>Fix inverted condition around when to warn and when to error and use <code>readAheadLength</code>.</li>
-    </ul>
-  </li>
-</ul>
-<h1>v10.0.0</h1>
-<ul>
-  <li>
-    <p>Enhancements</p>
-    <ul>
-      <li>Go To Symbol and completion will only resolve in project source unless non-project sources are turned on.
-        <ul>
-          <li>
-            <code>deps</code> are properly marked as Libraries and no longer count as being in the project scope for the
-            Go To tools.
-          </li>
-          <li>
-            In umbrella projects, when <code>in_umbrella</code> is used, the Project Module for each
-            <code>apps/#{APP_NAME}</code> will be marked a dependency.
-          </li>
-          <li>
-            Library and Modules are properly connected as dependencies, so that only declared dependencies will resolve,
-            lessening false completions and declarations when different OTP app share common Module or function names.
-          </li>
-        </ul>
-      </li>
-      <li><code>deps</code> and the <code>_build/#{MIX_ENV}/lib/#{DEP_NAME}</code> will be marked as Excluded, so that Libraries appear in External Libraries at the bottom of the Project Pane.</li>
-      <li>
-        Go To Class action (Cmd+O) to go to modules separately from all functions as would happen with Go To Symbols
-        (Alt+Cmd+O).
-        <ul>
-          <li>
-            <p>New ModuleName index keeps track of only the names of modulars:</p>
-            <ul>
-              <li>defmodule</li>
-              <li>defimpl</li>
-              <li>defprotocol</li>
-            </ul>
-            <p>It is used to power gotoClassContributor for Go To Class action.</p>
-          </li>
-        </ul>
-      </li>
-      <li>Handle <code>commit</code> and <code>override</code> for <code>Mix.Dep</code>.</li>
-      <li>
-        Add <code>.eex</code> to <code>.ex</code> and <code>.exs</code> for accepted file extensions used to hyperlink
-        files in stacktraces.
-      </li>
-      <li>Resolve unaliased name when using <code>alias __MODULE__, as: Mod</code></li>
-      <li>Resolve usage of <code>Mod</code> in <code>alias __MODULE__, as Mod</code>
-        <ol>
-          <li><code>Mod</code></li>
-          <li><code>__MODULE__</code> in <code>alias __MODULE__</code></li>
-          <li><code>defmodule MyModule</code> that is enclosing <code>__MODULE__</code>.</li>
-        </ol>
-      </li>
-      <li>Disable <code>ProcessCanceledException</code> for <code>runIde</code> gradle task, to allow for easier manual testing of completion and Go To actions during development.</li>
-      <li>Completion of functions in current module when using <code>Mod.</code> after <code>alias __MODULE__, as: Mod</code>.</li>
-      <li>Show more context for <code>alias</code> calls in presentations, like "Choose Declaration" pop up for Go To Declaration.
-        <ul>
-          <li>Show resolved <code>__MODULE__</code> name (<code>alias MyModule</code>) when using <code>alias __MODULE__</code>.</li>
-          <li>Show full <code>alias MyModule, as: Mod</code> when listing <code>Mod</code> in <code>alias __MODULE__, as Mod</code>.</li>
-        </ul>
-      </li>
-      <li>Exclude common directories when importing projects
-        <ul>
-          <li><code>cover</code> for test coverage</li>
-          <li><code>doc</code> for <code>ex_doc</code></li>
-          <li><code>logs</code> for log files</li>
-          <li><code>assets/node_modules/phoenix</code> for <code>phoenix</code></li>
-          <li><code>assets/node_modules/phoenix_html</code> for <code>phoenix_html</code></li>
-        </ul>
-      </li>
-      <li>Setup Libraries and Module dependencies when importing projects from Mix.</li>
-      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/1270">#1270</a>.</li>
-      <li>Update gradle wrapper to 3.5 to allow for environment variable overrides</li>
-      <li>
-        Setup datetime based pre-release versioning to ensure that correct version of pre-release plugin is used when
-        testing Install Plugin From Disk.
-      </li>
-      <li>
-        Canary, pre-release builds (<code>vMAJOR.MINOR.PATCH-pre+YYYYMMDDHHMMSS</code>) from <code>master</code> branch
-        <ul>
-          <li>GitHub pre-release <a href="https://github.com/KronicDeth/intellij-elixir/releases">releases</a></li>
-          <li>
-            Release on the
-            <a href="https://plugins.jetbrains.com/plugins/list?channel=canary&amp;pluginId=7522" rel="nofollow">
-              canary channel
-            </a> in the
-            <a href="https://plugins.jetbrains.com/plugin/7522-elixir" rel="nofollow">JetBrains Plugin Repository</a>
-          </li>
-        </ul>
-      </li>
-    </ul>
-  </li>
-  <li>
-    <p>Bug Fixes</p>
-    <ul>
-      <li>Don't include <code>null</code> <code>useCall</code> as <code>__MODULE__</code> dependency.</li>
-      <li>Wrap <code>LibraryTable#removeLibrary</code> in write action.</li>
-      <li>Wrap <code>Library#modifiableModule#commit</code> in write action.</li>
-      <li>Check if <code>Mix.Dep</code> has already been seen to prevent recursive loops.</li>
-      <li>
-        More closely match
-        <a href="https://github.com/elixir-lang/elixir/blob/v1.7.3/lib/ex_unit/lib/ex_unit/cli_formatter.ex">
-          ExUnit.CliFormatter
-        </a> output in Test Runner.
-        <ul>
-          <li>
-            Don't <code>inspect</code> ExUnit failure <code>reason</code> as <code>##teamcity</code>
-            <code>message</code>.
-          </li>
-          <li>Add captured logs to failure</li>
-          <li>Colorize test failures - including diff colorization</li>
-        </ul>
-      </li>
-      <li>
-        <code>.formatter.exs</code> input globs would not match file paths because it was default that needed
-        <code>lib</code> on top and not version-dependent paths used in <code>resources/exunit</code>.
-      </li>
-      <li>Ignore branch and hex options when finding path of Mix.Dep</li>
-      <li>
-        Map Elixir 1.7 <code>:excluded</code> and <code>:skipped</code> (added in
-        <a href="https://github.com/elixir-lang/elixir/pull/7245">elixir-lang/elixir#7245</a>) to
-        <code>testIgnored</code> teamcity message, thereby restoring ignored test counts and markers from Elixir 1.6.
-      </li>
-      <li>
-        When the entire deps directory has updated sync the children deps directories and then sync all modules instead
-        of syncing them after each dep.
-      </li>
-      <li>
-        For an unknown reason, when sync occurs at <code>initComponent</code> time in <code>DepsWatcher</code> or
-        <code>mix.Watcher</code>, the child directories of the project <code>basedDir</code> aren't shown in the Project
-        Pane until a change is applied in Project Structure.
-      </li>
-      <li>
-        Use <code>invokeAndWait</code> instead of <code>invokeLater</code> to ensure order of syncs.
-      </li>
-      <li>
-        When finding a <code>defmodule</code>, check that it is an ancestor of the entrance of the
-        <code>ResolveState</code>, so that nested sibling modules are not scanned for potential call definition clauses,
-        but only the outer module of the entrance.
-      </li>
-      <li>
-        Improve error message for
-        <code>org.elixir_lang.debugger.settings.stepping.module_filter.editor.table.Model.getValueAt</code>, so we can
-        detect if there is an off-by-1 error.
-      </li>
-      <li>Remove <code>@2x</code> and <code>@3x</code> SVG icons that render wrong size in 2018.3 EAP.</li>
-      <li>Fix unused variables in <code>TeamCityExUnitFormatting</code>
-        <ul>
-          <li><code>reason</code> was completely unused.</li>
-          <li><code>details</code> should have been used.</li>
-        </ul>
-      </li>
-      <li>
-        <code>flushBufferBeforeTerminating</code> was deprecated and in newer IntelliJ the call to
-        <code>processStatuses</code> does not occur unless <code>flushBufferOnProcessTermination</code> is also
-        overridden.
-      </li>
-      <li>Treat <code>== Compilation error</code> in <code>STDOUT</code> as <code>ERROR</code> for ExUnit reporter</li>
-      <li>
-        Convert <code>(CompileError)</code> of a test file to test failure.  The "Test framework quit unexpectedly" is
-        converted to a failed run with a single test with the compilation error as the failure message.
-      </li>
-      <li>
-        Don't treat redefinition of <code>defmodule</code> macro as module definition (as occurs in
-        <a href="https://github.com/bitwalker">@bitwalker</a>'s
-        <a href="https://github.com/bitwalker/distillery">distillery</a>'s <code>Mix.Tasks.Release.Init.MixMock</code>
-        <ul>
-          <li>
-            Bump <code>AllName</code> <code>VERSION</code> to re-index and drop bad call definition head from
-            <a href="https://github.com/KronicDeth/intellij-elixir/issues/1301">#1301</a>.
-          </li>
-        </ul>
-      </li>
-      <li>
-        Don't log compilation errors as test failures unless a test has started.   Test name being called
-        <code>mix test</code> does not work, so log those compilation errors as normal build messages instead.
-      </li>
-      <li>
-        Don't interpret <code>:crypto</code> by default: <code>:crypto</code> includes NIFs that can't be reloaded and
-        so kills the debugger.
-      </li>
-      <li>Protect from <code>null</code> <code>containingFile</code> for modular names during completion.</li>
-      <li>Wrap <code>syncPublisher(JDK_TABLE_TOPIC)</code> in <code>invokeLater</code> <code>runWriteAction</code>.</li>
-    </ul>
-  </li>
-  <li>
-    <p>Incompatible Changes</p>
-    <ul>
-      <li>
-        Dependencies are now counted as external to the project, so the Go To tools, like Go To Symbol will no longer
-        include matches for both project sources and dependencies sources together, instead they will follow the more
-        JetBrains native behavior
-        <ul>
-          <li>Project sources will be shown by default</li>
-          <li>If there are no project matches, dependencies will be shown instead.</li>
-          <li>If you want to include dependency (non-project) matches, you can check the box or hit Cmd+O.</li>
-        </ul>
-      </li>
-      <li>
-        Modules and Libraries won't be automatically setup when a project or module is opened, but instead only when
-        <code>apps</code> or <code>deps</code> directories or subdirectories change.
-      </li>
-    </ul>
-  </li>
-</ul>
-<h1>v9.0.0</h1>
-<ul>
-  <li>
-    <p>Enhancements</p>
-    <ul>
-      <li>Resolve calls through <code>use AnAlias</code> calls
-        <ol>
-          <li><code>AnAlias</code> will be resolved to its modular (module, implementation, or protocol)</li>
-          <li>The <code>__using__</code> macro in the modular is found</li>
-          <li>The last call in <code>__using__</code> is checked</li>
-        </ol>
-        <ul>
-          <li>
-            <p>If it is a <code>quote</code> block, check for call definitions recursively inside the block</p>
-          </li>
-          <li>
-            <p>If it is an <code>apply/3</code> call</p>
-            <ol>
-              <li>Resolve the first argument as a modular</li>
-              <li>Scan for each function in <code>modular</code></li>
-              <li>In each function Goto Step 3 above</li>
-            </ol>
-            <p>
-              This handling is what specifically makes <code>use MyAppWeb, :controller</code> in Phoenix apps now work.
-            </p>
-          </li>
-          <li>
-            <p>If it is a general call</p>
-            <ol>
-              <li>Resolve the call to its definition</li>
-              <li>Goto Step 3 above</li>
-            </ol>
-          </li>
-        </ul>
-      </li>
-      <li>
-        Go To Related (<code>Ctrl+Cmd+Up</code>) can be used to Go To the decompiled Module or call definitions when on
-        a source modular (<code>defimpl</code>, <code>defmodule</code>, or <code>defprotocol</code>) or callable
-        (<code>def</code>, <code>defp</code>, <code>defmacro</code>, <code>defmacrop</code>).  This somewhat restores
-        the ability to go to both source and decompiled module and calls before 9.0.0, but now the source is preferred
-        for Go To Declaration and the decompiled will only be available if there is no source and if you definitely want
-        decompiled, you'll need to use Go To Related.
-      </li>
-    </ul>
-  </li>
-  <li>
-    <p>Bug Fixes</p>
-    <ul>
-      <li>Specify that Kotlin Plugin is needed in <code>CONTRIBUTING.md</code>, so IntelliJ plays nice.</li>
-      <li>
-        Resolve unqualified bracket operation identifiers (<code>var</code> in <code>var[key]</code>) to variables or
-        <code>0</code>-arity calls.
-        <ul>
-          <li>
-            Fixes renames of variables not renaming usage of variables for Access lookups (i.e. <code>var[key]</code>).
-          </li>
-        </ul>
-      </li>
-      <li>Go To Symbol will no longer show redundant entries
-        <ul>
-          <li>
-            Call Definitions (<code>name/arity</code>) is no longer shown if the Call Definition Clause is also
-            included.  This isn't a large loss because the <code>/arity</code> was not searchable and only part of the
-            presentation.
-          </li>
-          <li>If there is a decompiled and a source version of a symbol, only the source version will be shown.
-            <ul>
-              <li>
-                The source Implementation will be shown and not the decompiled Module with the same fully-qualified name
-                (<code>&lt;protocol&gt;.&lt;for&gt;</code>).
-              </li>
-            </ul>
-          </li>
-          <li>
-            Items will be deduped if they point to the same element, such as function clauses with default arguments
-            because when presented they look the same even if internally one is representing <code>/1</code> and
-            <code>/2</code>, for example.
-          </li>
-        </ul>
-      </li>
-      <li>
-        Ensures that Go To Declaration for qualified calls such as <code>Module.function(...)</code> where
-        <code>Module</code> is an alias does not return the decompiled version of <code>Module</code> when the source is
-        available.
-      </li>
-      <li>Fix completion not working for unqualified functions from <code>import</code>s.
-        <ul>
-          <li>
-            When I switched to using <code>?.let</code> I accidentally hid the <code>if</code> from running when there
-            was no <code>ENTRANCE_CALL_DEFINITION_CLAUSE</code>, so the correct form is add if there is no entrance or
-            if there is a non-equivalent entrance.
-          </li>
-          <li>
-            I just straight up forgot an ! on a contains check. I moved to computeIfAbsent, so it is more obvious what
-            the intent is.
-          </li>
-        </ul>
-      </li>
-    </ul>
-  </li>
-  <li>
-    <p>Incompatible Changes</p>
-    <ul>
-      <li>
-        Go To Symbol and Go To Declaration will no longer suggest decompiled modules or functions if source modules or
-        functions of the same name or module/name/arity exists.
-      </li>
-    </ul>
-  </li>
-</ul>
-<h1>v8.1.0</h1>
-<ul>
-  <li>
-    <p>Enhancements</p>
-    <ul>
-      <li>
-        Flat icons to match
-        <a href="https://blog.jetbrains.com/blog/2018/06/26/new-icons-in-intellij-platform-2018-2/">
-          IntelliJ IDEA 2018.2 design rules
-        </a>.  Thanks to <a href="https://github.com/nk8">@nk8</a> for consulting on the design and showing me how to
-        use Figma.
-      </li>
-      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/1228">#1228</a></li>
-      <li>
-        Use icon provided by Lidiya Chernigovskaya (<a href="https://github.com/LChernigovskaya">@LChernigovskaya</a>)
-        and created by JetBrains UX (Alina Mishina) for <code>pluginIcon</code> compatibility with IntelliJ IDEA 2018.3.
-      </li>
-    </ul>
-  </li>
-  <li>
-    <p>Bug Fixes</p>
-    <ul>
-      <li>Look above <code>Enum.reduce</code> for enclosing macro call.</li>
-      <li>
-        Add Facet SDK as External Library to re-enable indexing.  When the External Library was removed in
-        <a href="https://github.com/KronicDeth/intellij-elixir/commit/42972876c219e9da7283513bc5677e5121b5e0fe">
-          <tt>4297287</tt>
-        </a> in favor of a real SDK, completion for SDK <code>.beam</code> modules was lost because Small IDEs don't
-        index SDKs, but only External Libraries, so add Application-wide External Libraries for SDKs when they are
-        created (and update, remove on edit or delete), which are then added as a Dependency for the facet's module when
-        the SDK is set for the Small IDE project.
-        <ul>
-          <li>
-            Convert old modules with Elixir facets to also have External Library, so that users don't need to remove and
-            add the SDKs to get the External Library.
-          </li>
-        </ul>
-      </li>
-      <li>
-        <p>
-          Use #AEB9C0 for JetBrains Default/Light Gray.  Use #87939A for JetBrains Darcula Gray.  Colors based on
-          IntelliJ's color picker picking its own colors.
-        </p>
-        <p>
-          Icon matching testing done under both themes in 2018.2.1.  Weirdly, the colors are different in the SVGs in my
-          intellij-community@master.  Hopefully, this doesn't mean the colors change again in 2018.3.
-        </p>
-      </li>
-      <li>Run <code>createLibrary</code> inside <code>runWriteAction</code>.</li>
-      <li>Remove test that leaks threads and so causes builds to fail.</li>
     </ul>
   </li>
 </ul>

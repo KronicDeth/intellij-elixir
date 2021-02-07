@@ -12,7 +12,7 @@ import javax.swing.Icon
 class Type : FacetType<Facet, Configuration>(Facet.ID, ID, "Elixir") {
     override fun createDefaultConfiguration(): Configuration {
         val defaultConfiguration = Configuration()
-        val sdkList = ProjectJdkTable.getInstance().getSdksOfType(org.elixir_lang.sdk.elixir.Type.getInstance())
+        val sdkList = ProjectJdkTable.getInstance().getSdksOfType(org.elixir_lang.sdk.elixir.Type.instance)
 
         if (sdkList.size > 0) {
             defaultConfiguration.sdk = sdkList[0]

@@ -26,11 +26,13 @@ public class Unquoted extends MacroNameArity {
                 "nil"
         );
         Stream<String> specialFormStream = Stream.of(
+                "!",
                 "%",
                 "%{}",
                 "&",
                 ".",
                 "<<>>",
+                "@",
                 "fn",
                 "unquote",
                 "unquote_splicing",

@@ -7,5 +7,5 @@ import org.elixir_lang.sdk.elixir.Type
 class Configurable: Configurable() {
     override fun getDisplayName() = "SDKs"
     override fun getId() = "language.elixir.sdks.elixir"
-    override fun sdkType(): SdkType = Type.getInstance()
+    override fun sdkType(): SdkType = Type.instance
 }

@@ -18,7 +18,7 @@ jobs:
           otp-version: 23.1
           elixir-version: 1.11.2
       - name: Export OTP_RELEASE
-        run: echo "OTP_RELEASE=22.2" >> $GITHUB_ENV
+        run: echo "OTP_RELEASE=23.1" >> $GITHUB_ENV
       - name: Export ERLANG_SDK_HOME
         run: echo "ERLANG_SDK_HOME=`erl -eval 'io:format("~s", [code:root_dir()]).' -noshell -run init stop`" >> $GITHUB_ENV
       - name: Grant execute permission for gradlew

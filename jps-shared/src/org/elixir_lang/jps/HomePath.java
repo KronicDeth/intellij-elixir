@@ -76,6 +76,10 @@ public class HomePath {
         return Pattern.compile(".+-" + name + "-(\\d+)\\.(\\d+)\\.(\\d+)");
     }
 
+    public static void mergeASDF(@NotNull Map<Version, String> homePathByVersion, @NotNull String name) {
+        mergeNameSubdirectories(homePathByVersion, Paths.get(System.getProperty("user.home"), ".asdf", "installs").toFile(), name, Function.identity());
+    }
+
     public static void mergeHomebrew(@NotNull Map<Version, String> homePathByVersion,
                                      @NotNull String name,
                                      @NotNull Function<File, File> versionPathToHomePath) {

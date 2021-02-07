@@ -45,7 +45,7 @@ public class FragmentTest extends TokenTest {
     public static Collection<Object[]> generateData() {
         return Arrays.asList(new Object[][] {
                         { "'", ElixirTypes.CHAR_LIST_PROMOTER, ElixirFlexLexer.GROUP },
-                        { ";", TokenType.BAD_CHARACTER, ElixirFlexLexer.ATOM_START },
+                        { ";", ElixirTypes.SEMICOLON, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE },
                         { "A", ElixirTypes.ATOM_FRAGMENT, ElixirFlexLexer.ADDITION_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE },
                         { "\"", ElixirTypes.STRING_PROMOTER, ElixirFlexLexer.GROUP },
                         { "\n", ElixirTypes.EOL, ElixirFlexLexer.YYINITIAL },
