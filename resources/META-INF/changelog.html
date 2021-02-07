@@ -22,6 +22,7 @@
         </ul>
       </li>
       <li>Log <code>PsiElement</code> if <code>Call#finalArguments</code> contain a <code>null</code>.</li>
+      <li>Suggest ASDF directories as <code>homepath</code>s for both Elixir and Erlang for Elixir SDKs.</li>
     </ul>
   </li>
   <li>
@@ -50,6 +51,15 @@
         <code>PsiErrorElement</code> is not returned: they can return <code>null</code> when there is no left or right
         operand.  <code>Infix.primaryArguments</code> was not taking this into account and so could return a
         <code>null</code> as one of the <code>primaryArguments</code>, which broke <code>Call.finalArguments</code>.
+      </li>
+      <li>
+        Don't attempt to execute <code>elixir -e "System.version |&gt; IO.puts"</code> to get the version number as it
+        requires too much of a full SDK to be built and from the Erlang paths to be correct too, which was rarely the
+        case for ASDF.  Since for Homebrew and ASDF, the directory name is the version name, this shouldn't be a loss in
+        naming ability.  If the directory name is not a parseable version it will be of the format
+        <code>Elixir at &lt;path&gt;</code>.  This is probably more correct for installs directories that aren't
+        versioned as SDK versions aren't updated if the version installed at the path changes, such as
+        <code>/usr/local/elixir</code> or <code>/opt/elixir</code>, etc.
       </li>
     </ul>
   </li>

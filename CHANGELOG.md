@@ -243,7 +243,9 @@
       * `recv_marker_user `
 * [#1899](https://github.com/KronicDeth/intellij-elixir/pull/1899) - [@KronicDeth](https://github.com/KronicDeth)
   * Log `PsiElement` if `Call#finalArguments` contain a `null`.
-  
+* [#1902](https://github.com/KronicDeth/intellij-elixir/pull/1902) - [@KronicDeth](https://github.com/KronicDeth)
+  * Suggest ASDF directories as `homepath`s for both Elixir and Erlang for Elixir SDKs.
+
 ### Bug Fixes
 * [#1893](https://github.com/KronicDeth/intellij-elixir/pull/1893) - [@KronicDeth](https://github.com/KronicDeth)
   * Use `VirtualFile#fileType` instead of EEx Type::INSTANCE when looking up extensions.
@@ -254,6 +256,8 @@
 * [#1899](https://github.com/KronicDeth/intellij-elixir/pull/1899) - [@KronicDeth](https://github.com/KronicDeth)
   * Don't return null left or right infix operands in `primaryArguments`
     `operation.infix.Normalized.leftOperand` and `.rightOperand` ensures that `PsiErrorElement` is not returned: they can return `null` when there is no left or right operand.  `Infix.primaryArguments` was not taking this into account and so could return a `null` as one of the `primaryArguments`, which broke `Call.finalArguments`.
+* [#1902](https://github.com/KronicDeth/intellij-elixir/pull/1902) - [@KronicDeth](https://github.com/KronicDeth)
+  * Don't attempt to execute `elixir -e "System.version |> IO.puts"` to get the version number as it requires too much of a full SDK to be built and from the Erlang paths to be correct too, which was rarely the case for ASDF.  Since for Homebrew and ASDF, the directory name is the version name, this shouldn't be a loss in naming ability.  If the directory name is not a parseable version it will be of the format `Elixir at <path>`.  This is probably more correct for installs directories that aren't versioned as SDK versions aren't updated if the version installed at the path changes, such as `/usr/local/elixir` or `/opt/elixir`, etc.
 
 ## v11.9.2
 
