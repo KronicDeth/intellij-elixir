@@ -15,8 +15,10 @@ private fun parseStdErr(stderr: String): List<DialyzerWarn> {
     val entries = mutableListOf<List<String>>()
     for (line in stderr.lines()) {
         if (line == separator) {
-            entries.add(entry.toList())
-            entry.clear()
+            if (entry.isNotEmpty()) {
+                entries.add(entry.toList())
+                entry.clear()
+            }
             start = false
         } else if (filePattern.toRegex().matches(line)) {
             start = true
