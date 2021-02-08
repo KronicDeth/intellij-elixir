@@ -34,6 +34,9 @@ fun ensureWorkingDirectory(project: Project, module: com.intellij.openapi.module
     return workingDirectory
 }
 
+fun ensureWorkingDirectory(module: com.intellij.openapi.module.Module): String =
+        ensureWorkingDirectory(module.project, module)
+
 fun List<String>.toArguments(): String? {
     val joined = ParametersList.join(this)
 

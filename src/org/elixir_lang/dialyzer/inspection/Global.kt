@@ -8,6 +8,8 @@ import com.intellij.codeInspection.ProblemDescriptionsProcessor
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
+import com.intellij.openapi.module.Module
+import com.intellij.openapi.module.ModuleUtil
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.PsiFile
@@ -23,11 +25,11 @@ import java.io.File
 class Global : GlobalInspectionTool() {
 
     override fun runInspection(scope: AnalysisScope, manager: InspectionManager, globalContext: GlobalInspectionContext, problemDescriptionsProcessor: ProblemDescriptionsProcessor) {
-        val service = globalContext.project.getService(DialyzerService::class.java)
-        val dialyzerErrors = service.getDialyzerWarnings().toMutableList()
+        val dialyzerWarnsByModule = mutableMapOf<Module, MutableList<DialyzerWarn>>()
+
         scope.accept(object : PsiElementVisitor() {
             override fun visitFile(file: PsiFile) {
-                for (problem in checkFile(file, manager, dialyzerErrors)) {
+                for (problem in checkFile(file, manager, globalContext, dialyzerWarnsByModule)) {
                     problemDescriptionsProcessor.addProblemElement(globalContext.refManager.getReference(file), problem)
                 }
             }
@@ -37,29 +39,41 @@ class Global : GlobalInspectionTool() {
 
     fun checkFile(file: PsiFile,
                   manager: InspectionManager,
-                  dialyzerErrors: MutableList<DialyzerWarn>): List<ProblemDescriptor> {
-
+                  globalContext: GlobalInspectionContext,
+                  dialyzerWarnsByModule: MutableMap<Module, MutableList<DialyzerWarn>>): List<ProblemDescriptor> {
         val problemsHolder = ProblemsHolder(manager, file, false)
 
-        val filePath = (file.containingDirectory.toString() + File.separator + file.name)
+        // if the file isn't in a module, then we can't find its working directory or the SDK, so don't check the file
+        // further.
+        ModuleUtil.findModuleForFile(file)?.let { module ->
+            val dialyzerWarns = dialyzerWarnsByModule.computeIfAbsent(module) {
+                globalContext
+                        .project
+                        .getService(DialyzerService::class.java)
+                        .dialyzerWarnings(it)
+                        .toMutableList()
+            }
 
-        file.accept(
-                object : PsiRecursiveElementWalkingVisitor() {
-                    override fun visitElement(element: PsiElement) {
-                        val lineNumber = element.document()?.getLineNumber(element.textOffset)
-                        if (lineNumber != null) {
-                            val found = dialyzerErrors.filter { it.line == lineNumber + 1}
-                                    .filter { filePath.endsWith(it.fileName) }
-                                    .map {
-                                        problemsHolder.registerProblem(element, it.message, ProblemHighlightType.ERROR)
-                                        it
-                                    }
-                            dialyzerErrors.removeAll(found)
+            val filePath = (file.containingDirectory.toString() + File.separator + file.name)
+
+            file.accept(
+                    object : PsiRecursiveElementWalkingVisitor() {
+                        override fun visitElement(element: PsiElement) {
+                            val lineNumber = element.document()?.getLineNumber(element.textOffset)
+                            if (lineNumber != null) {
+                                val found = dialyzerWarns.filter { it.line == lineNumber + 1}
+                                        .filter { filePath.endsWith(it.fileName) }
+                                        .map {
+                                            problemsHolder.registerProblem(element, it.message, ProblemHighlightType.ERROR)
+                                            it
+                                        }
+                                dialyzerWarns.removeAll(found)
+                            }
+                            super.visitElement(element)
                         }
-                        super.visitElement(element)
                     }
-                }
-        )
+            )
+        }
 
         return problemsHolder.results
     }

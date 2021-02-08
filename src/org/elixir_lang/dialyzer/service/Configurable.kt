@@ -9,31 +9,37 @@ import javax.swing.JTextField
 
 class Configurable(project: Project) : SearchableConfigurable {
     private val service: DialyzerService = project.getService(DialyzerService::class.java)
-    private var mixDialyzerCommand: JTextField? = null
+    private var mixArguments: JTextField? = null
+    private var elixirArguments: JTextField? = null
+    private var erlArguments: JTextField? = null
     private var panel: JPanel? = null
     override fun getId() = "Dialyzer"
 
     @Nls(capitalization = Nls.Capitalization.Title)
-    override fun getDisplayName(): String {
-        return id
-    }
+    override fun getDisplayName(): String = id
 
-    override fun createComponent(): JComponent? {
-        return panel
-    }
+    override fun createComponent(): JComponent? = panel
 
-    override fun isModified(): Boolean {
-        return service.mixDialyzerCommand != mixDialyzerCommand?.text
-    }
+    override fun isModified(): Boolean =
+            (service.mixArguments != mixArguments?.text) ||
+            (service.elixirArguments != elixirArguments?.text) ||
+            (service.erlArguments != erlArguments?.text)
 
     override fun apply() {
-        val textField = mixDialyzerCommand
-        if (textField?.text != null) {
-            service.mixDialyzerCommand = textField.text
+        mixArguments?.text?.let {
+            service.mixArguments = it
+        }
+        elixirArguments?.text?.let {
+            service.elixirArguments = it
+        }
+        erlArguments?.text?.let {
+            service.erlArguments = it
         }
     }
 
     override fun reset() {
-        mixDialyzerCommand?.text = service.mixDialyzerCommand
+        mixArguments?.text = service.mixArguments
+        elixirArguments?.text = service.elixirArguments
+        erlArguments?.text = service.erlArguments
     }
 }
