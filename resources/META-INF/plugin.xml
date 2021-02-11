@@ -220,6 +220,14 @@
     <xdebugger.settings implementation="org.elixir_lang.debugger.Settings"/>
 
     <lang.documentationProvider implementationClass="org.elixir_lang.documentation.ElixirDocumentationProvider" language="Elixir"/>
+
+     <!-- Dialyzer -->
+    <globalInspection displayName="Dialyzer based inspections (Elixir)" shortName="Dialyzer"
+                     enabledByDefault="true" groupName="Elixir" implementationClass="org.elixir_lang.dialyzer.inspection.Global"
+                      language="Elixir" level="ERROR"/>
+    <projectService serviceInterface="org.elixir_lang.dialyzer.service.DialyzerService"
+            serviceImplementation="org.elixir_lang.dialyzer.service.DialyzerServiceImpl"/>
+    <projectConfigurable instance="org.elixir_lang.dialyzer.service.Configurable" groupId="Errors" parentId="Errors"/>
   </extensions>
 
   <projectListeners>
