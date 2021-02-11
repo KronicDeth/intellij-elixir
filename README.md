@@ -81,6 +81,8 @@ Table of Contents[![Backers on Open Collective](https://opencollective.com/intel
          * [Delimiters](#delimiters)
             * [Auto-inserting](#auto-inserting)
             * [Matching](#matching)
+         * [Dialyzer](#dialyzer)
+           * [Inspection](#inspection-1)
          * [Embedded Elixir (EEx) Templates <a href="/resources/icons/file/eex.svg" target="_blank" rel="noopener noreferrer"><img src="/resources/icons/file/eex.svg" alt="" style="max-width:100\x;"></a>](#embedded-elixir-eex-templates-)
             * [Advanced configuration](#advanced-configuration)
          * [Live Embedded Elixir (LEEx) Templates <a href="/resources/icons/file/eex.svg" target="_blank" rel="noopener noreferrer"><img src="/resources/icons/file/eex.svg" alt="" style="max-width:100\x;"></a>](#live-embedded-elixir-leex-templates-)
@@ -2172,6 +2174,33 @@ All delimiters that are auto-inserted are also matched for highlighting
 | `<`   | `>`   |
 | `/`   | `/`   |
 | `|`   | `|`   |
+
+### Dialyzer
+
+#### Inspection
+
+##### Batch Mode
+
+1. Analyze > Run Inspection by Name... (⌥⇧⌘I)
+2. Type "Dialyzer"
+3. Select "Dialyzer based inspections (Elixir)" from the shortened list
+4. Hit Enter.
+
+You'll be presented with a "Run 'Dialyzer based inspections (Elixir)'" dialog
+
+![Run 'Dialyzer based inspections (Elixir)'](/screenshots/features/dialyzer/inspection/batch_mode/Run%20Dialyzer%20based%20inspections%20(Elixir)%20Whole%20Project.png?raw=true)
+
+1. Change the scope if you want.
+2. Click "OK"
+
+The Inspections Result Tool Pane will open and show results as each file is processed.
+
+1. Click the ▶ to expand the Credo section to show all warnings
+ 
+   ![Individual Entry](/screenshots/features/dialyzer/inspection/batch_mode/Individual%20Entry.png?raw=true)
+2. Click an entry for the details of an individual warning with a code highlighting.
+
+   ![Code Highlighting](/screenshots/features/dialyzer/inspection/batch_mode/Code%20Highlighting.png?raw=true)
 
 ### Embedded Elixir (EEx) Templates ![](/resources/icons/file/eex.svg)
 
