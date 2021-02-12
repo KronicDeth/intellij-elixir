@@ -154,6 +154,7 @@
     <lang.findUsagesProvider language="Elixir" implementationClass="org.elixir_lang.find_usages.Provider"/>
     <readWriteAccessDetector implementation="org.elixir_lang.ReadWriteAccessDetector"/>
     <referencesSearch implementation="org.elixir_lang.ReferencesSearch"/>
+    <gotoDeclarationHandler implementation="org.elixir_lang.GotoDeclarationHandler"/>
     <targetElementEvaluator implementationClass="org.elixir_lang.TargetElementEvaluator" language="Elixir" />
     <usageTargetProvider implementation="org.elixir_lang.UsageTargetProvider"/>
     <usageTypeProvider implementation="org.elixir_lang.UsageTypeProvider"/>
