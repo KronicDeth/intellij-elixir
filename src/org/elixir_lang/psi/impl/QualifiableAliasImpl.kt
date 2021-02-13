@@ -19,14 +19,9 @@ import org.elixir_lang.reference.Module
 import org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.enclosingModularMacroCall
 import org.jetbrains.annotations.Contract
 
-fun QualifiableAlias.computeReference(): PsiPolyVariantReference? =
-        if (isOutermostQualifiableAlias()) {
-            Module(this)
-        } else {
-            null
-        }
+fun QualifiableAlias.computeReference(): PsiPolyVariantReference = Module(this)
 
-fun QualifiableAlias.getReference(): PsiPolyVariantReference? =
+fun QualifiableAlias.getReference(): PsiPolyVariantReference =
         CachedValuesManager.getCachedValue(this) {
             CachedValueProvider.Result.create(computeReference(), this)
         }
