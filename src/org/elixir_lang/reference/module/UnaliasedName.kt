@@ -76,7 +76,7 @@ object UnaliasedName {
                 is QuotableKeywordList ->
                     up(element.parent, entrance)
                 is ElixirMultipleAliases ->
-                    ResolvableName.resolvableName(entrance)
+                    entrance.fullyQualifiedName()
                 is QuotableKeywordPair ->
                     up(element, entrance)
                 else ->

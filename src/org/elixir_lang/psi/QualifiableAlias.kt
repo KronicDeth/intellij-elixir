@@ -6,7 +6,7 @@ import com.intellij.psi.PsiNameIdentifierOwner
  * An alias that may or may not be qualified.
  */
 interface QualifiableAlias : MaybeModuleName, PsiNameIdentifierOwner {
-    fun fullyQualifiedName(): String?
+    fun fullyQualifiedName(): String
 }
 
 tailrec fun QualifiableAlias.outerMostQualifiableAlias(): QualifiableAlias {

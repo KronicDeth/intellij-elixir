@@ -6,7 +6,6 @@ import com.intellij.psi.impl.source.resolve.ResolveCache
 import org.elixir_lang.Reference.forEachNavigationElement
 import org.elixir_lang.navigation.isDecompiled
 import org.elixir_lang.psi.scope.module.MultiResolve
-import org.elixir_lang.reference.module.ResolvableName.resolvableName
 
 
 object Module : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Module> {
@@ -15,7 +14,7 @@ object Module : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Modul
             incompleteCode: Boolean
     ): Array<PsiElementResolveResult> =
             module.element.let { element ->
-                resolvableName(element)?.let { name ->
+                element.fullyQualifiedName().let { name ->
                     val sameFileResolveResultList =
                             MultiResolve.resolveResults(name, incompleteCode, element)
 
@@ -27,7 +26,7 @@ object Module : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Modul
                                 name
                         )
                     }
-                } ?: emptyArray()
+                }
             }
 
     private fun multiResolveProject(project: Project,

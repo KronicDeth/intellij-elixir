@@ -5,10 +5,8 @@ import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.PsiReference
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
-import org.elixir_lang.psi.ElixirAccessExpression
-import org.elixir_lang.psi.ElixirAlias
-import org.elixir_lang.psi.ElixirFile
-import org.elixir_lang.psi.QualifiableAlias
+import org.elixir_lang.Module.concat
+import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.StubBased
 import org.elixir_lang.psi.call.name.Function.__MODULE__
@@ -154,8 +152,31 @@ fun QualifiableAlias.toModular(startingReference: PsiReference): Call? {
 object QualifiableAliasImpl {
     @Contract(pure = true)
     @JvmStatic
-    fun fullyQualifiedName(alias: ElixirAlias): String {
-        return alias.name
+    fun fullyQualifiedName(alias: ElixirAlias): String = fullyQualifiedName(alias.parent, alias, listOf(alias.name))
+
+    tailrec fun fullyQualifiedName(currentAncestor: PsiElement?, previousAncestor: PsiElement, nameTail: List<String>): String =
+        when (currentAncestor) {
+            is ElixirAccessExpression, is ElixirMultipleAliases -> fullyQualifiedName(currentAncestor.parent, currentAncestor, nameTail)
+            is QualifiedAlias, is QualifiedMultipleAliases -> {
+                val children = currentAncestor.children
+                val operatorIndex = Normalized.operatorIndex(children)
+                val previousAncestorIndex = children.indexOf(previousAncestor)
+                // if `previousAncestor` was the left operand, then the `accNameList` is complete
+                if (previousAncestorIndex < operatorIndex) {
+                    concat(nameTail)
+                // if the `previousAncestor` was the right operand, then the `accNameList` needs to
+                } else {
+                    val leftOperand = org.elixir_lang.psi.operation.infix.Normalized.leftOperand(children, operatorIndex)!!
+                    fullyQualifiedName(leftOperand, nameTail)
+                }
+            }
+            else -> concat(nameTail)
+        }
+
+    tailrec fun fullyQualifiedName(leftElement: PsiElement, rightNames: List<String>): String = when (leftElement) {
+        is ElixirAccessExpression -> fullyQualifiedName(leftElement.stripAccessExpression(), rightNames)
+        is ElixirAlias -> concat(listOf(leftElement.name) + rightNames)
+        else -> concat(rightNames)
     }
 
     @Contract(pure = true)
