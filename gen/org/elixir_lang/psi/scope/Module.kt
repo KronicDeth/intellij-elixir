@@ -104,7 +104,7 @@ abstract class Module : PsiScopeProcessor {
     }
 
     private fun executeOnMultipleAliasChild(child: ElixirAccessExpression, state: ResolveState): Boolean =
-        child.children.let { executeOnMultipleAliasChild(it, state) }
+        child.children.let { executeOnMultipleAliasChildren(it, state) }
 
     private fun executeOnMultipleAliasChild(child: PsiElement, state: ResolveState): Boolean =
             when (child) {
@@ -112,20 +112,6 @@ abstract class Module : PsiScopeProcessor {
                 is QualifiableAlias -> executeOnMultipleAliasChild(child, state)
                 else -> true
             }
-
-    private fun executeOnMultipleAliasChild(elements: Array<PsiElement>, state: ResolveState): Boolean {
-        var keepProcessing = true
-
-        for (element in elements) {
-            keepProcessing = executeOnMultipleAliasChild(element, state)
-
-            if (!keepProcessing) {
-                break
-            }
-        }
-
-        return keepProcessing
-    }
 
     private fun executeOnMultipleAliasChild(element: QualifiableAlias, state: ResolveState): Boolean =
             executeOnMaybeAliasedName(element, aliasedName(element), state)
