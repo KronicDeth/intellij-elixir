@@ -5,6 +5,7 @@ import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.PsiReference
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
+import com.intellij.refactoring.suggested.endOffset
 import org.elixir_lang.Module.concat
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
@@ -17,9 +18,24 @@ import org.elixir_lang.reference.Module
 import org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.enclosingModularMacroCall
 import org.jetbrains.annotations.Contract
 
-fun QualifiableAlias.computeReference(): PsiPolyVariantReference = Module(this)
+fun QualifiableAlias.computeReference(): PsiPolyVariantReference? =
+    when (val parent = this.parent) {
+        is QualifiableAlias ->
+            // If the `parent` goes beyond this element then this element is the outermost Qualifiable alias that is still
+            // ends in this element, so it represents the fully-qualified name.
+            if (endOffset < parent.endOffset) {
+                // The range in the element though should only be the final to match the guidance in
+                // `com.intellij.psi.PsiReference#getRangeInElement`, which appears necessary to make completion to
+                // work
+                Module(this)
+            } else {
+                // If the parent ends at the same offset, then the parent should supply the reference
+                null
+            }
+        else -> Module(this)
+    }
 
-fun QualifiableAlias.getReference(): PsiPolyVariantReference =
+fun QualifiableAlias.getReference(): PsiPolyVariantReference? =
         CachedValuesManager.getCachedValue(this) {
             CachedValueProvider.Result.create(computeReference(), this)
         }

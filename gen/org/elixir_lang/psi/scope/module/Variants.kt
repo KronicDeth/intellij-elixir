@@ -1,26 +1,23 @@
 package org.elixir_lang.psi.scope.module
 
 import com.intellij.codeInsight.lookup.LookupElement
-import com.intellij.codeInsight.lookup.LookupElementBuilder
-import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiNamedElement
-import com.intellij.psi.ResolveState
+import com.intellij.openapi.project.Project
+import com.intellij.psi.*
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
-import com.intellij.psi.util.PsiTreeUtil.treeWalkUp
-import com.intellij.util.containers.ContainerUtil
-import org.elixir_lang.Module.concat
-import org.elixir_lang.Module.split
-import org.elixir_lang.Reference.indexedNameCollection
+import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.psi.*
+import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.Named
-import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
+import org.elixir_lang.psi.impl.ElixirPsiImplUtil
 import org.elixir_lang.psi.operation.Normalized
+import org.elixir_lang.psi.scope.LookupElementByLookupName
 import org.elixir_lang.psi.scope.Module
 import org.elixir_lang.psi.stub.index.AllName
+import org.elixir_lang.psi.stub.type.call.Stub
 import org.elixir_lang.reference.module.UnaliasedName
 
-class Variants : Module() {
+class Variants(private val entrance: PsiElement) : Module() {
     override fun execute(match: PsiElement, state: ResolveState): Boolean =
             when (match) {
                 is ElixirMultipleAliases -> execute(match)
@@ -38,100 +35,16 @@ class Variants : Module() {
      * @return `true` to keep processing; `false` to stop processing.
      */
     override fun executeOnAliasedName(match: PsiNamedElement, aliasedName: String, state: ResolveState): Boolean {
-        lookupElementList.add(
-                LookupElementBuilder.createWithSmartPointer(
-                        aliasedName,
-                        match
-                )
-        )
+        lookupElementByLookupName.put(aliasedName, match)
 
-        UnaliasedName.unaliasedName(match)?.let { unaliasedName ->
-            val project = match.project
-
-            val indexedNameCollection = indexedNameCollection(project)
-            val unaliasedNestedNames = ContainerUtil.findAll(
-                    indexedNameCollection,
-                    org.elixir_lang.Module.IsNestedUnder(unaliasedName)
-            )
-
-            if (unaliasedNestedNames.isNotEmpty()) {
-                val scope = GlobalSearchScope.allScope(project)
-
-                for (unaliasedNestedName in unaliasedNestedNames) {
-                    val unaliasedNestedNamedElementCollection = StubIndex.getElements(
-                            AllName.KEY,
-                            unaliasedNestedName,
-                            project,
-                            scope,
-                            NamedElement::class.java
-                    )
-
-                    if (unaliasedNestedNamedElementCollection.isNotEmpty()) {
-                        val unaliasedNestedNamePartList = split(unaliasedNestedName)
-                        val unaliasedNamePartList = split(unaliasedName)
-                        val aliasedNamePartList = split(aliasedName)
-                        val aliasedNestedNamePartList = mutableListOf<String>()
-
-                        aliasedNestedNamePartList.addAll(aliasedNamePartList)
-
-                        for (i in unaliasedNamePartList.size until unaliasedNestedNamePartList.size) {
-                            aliasedNestedNamePartList.add(unaliasedNestedNamePartList[i])
-                        }
-
-                        val aliasedNestedName = concat(aliasedNestedNamePartList)
-
-                        for (unaliasedNestedNamedElement in unaliasedNestedNamedElementCollection) {
-                            lookupElementList.add(
-                                    LookupElementBuilder.createWithSmartPointer(
-                                            aliasedNestedName,
-                                            unaliasedNestedNamedElement
-                                    )
-                            )
-                        }
-                    }
-                }
-            }
-        }
+        val splitPrefix = org.elixir_lang.Module.split(aliasedName)
+        putNestedAliased(lookupElementByLookupName, splitPrefix, match)
 
         return true
     }
 
     private var multipleAliases: ElixirMultipleAliases? = null
-    private val lookupElementList: MutableList<LookupElement> = mutableListOf()
-
-    private fun projectNameElements(entrance: PsiElement): List<LookupElement> {
-        val project = entrance.project
-        val prefix = multipleAliases.indexedNamePrefix()
-        /* getAllKeys is not the actual keys in the actual project.  They need to be checked.
-           See https://intellij-support.jetbrains.com/hc/en-us/community/posts/207930789-StubIndex-persisting-between-test-runs-leading-to-incorrect-completions */
-        val prefixedNameCollection = StubIndex.getInstance()
-                .getAllKeys(AllName.KEY, project)
-                .filter(String::isAlias)
-                .filterStartsWithMaybe(prefix)
-
-        val scope = GlobalSearchScope.allScope(project)
-
-        return prefixedNameCollection.flatMap { prefixedName ->
-            val lookupName = prefixedName.removeMaybePrefix(prefix)
-
-            StubIndex.getElements(
-                    AllName.KEY,
-                    prefixedName,
-                    project,
-                    scope,
-                    NamedElement::class.java
-            ).map { prefixedNameNamedElement ->
-                /* Generalizes over whether the prefixedNameNamedElement is a source element or a compiled element as
-                   the navigation element is defined to be always be a source element */
-                val navigationElement = prefixedNameNamedElement.navigationElement
-
-                LookupElementBuilder.createWithSmartPointer(
-                        lookupName,
-                        navigationElement
-                )
-            }
-        }
-    }
+    private val lookupElementByLookupName: LookupElementByLookupName = LookupElementByLookupName()
 
     private fun execute(match: ElixirMultipleAliases): Boolean {
         multipleAliases = match
@@ -139,26 +52,156 @@ class Variants : Module() {
         return false
     }
 
-    companion object {
-        fun lookupElementList(entrance: PsiElement): List<LookupElement> {
-            val variants = Variants()
+    /**
+     * Puts all `aliases` in scope from `entrance` and any modules nested under those modules in
+     * `lookupElementByLookupName`.
+     */
+    private fun putAliases(): Variants {
+        PsiTreeUtil.treeWalkUp(
+                this,
+                entrance,
+                entrance.containingFile,
+                ResolveState.initial().put(ElixirPsiImplUtil.ENTRANCE, entrance)
+        )
 
-            treeWalkUp(
-                    variants,
-                    entrance,
-                    entrance.containingFile,
-                    ResolveState.initial().put(ENTRANCE, entrance)
-            )
+        return this
+    }
 
-            return variants.lookupElementList + variants.projectNameElements(entrance)
+    /**
+     * Puts all project `Alias`es.
+     */
+    private fun putProject(): Variants {
+        val project = entrance.project
+        val scope = GlobalSearchScope.allScope(project)
+
+        val stubIndex = StubIndex.getInstance()
+        stubIndex.processAllKeys(AllName.KEY, project) { name ->
+            if (name.isAlias() && !lookupElementByLookupName.contains(name)) {
+                stubIndex.processElements(AllName.KEY, name, project, scope, NamedElement::class.java) { named_element ->
+                    lookupElementByLookupName.put(name, named_element.navigationElement)
+
+                    // just use the first element
+                    false
+                }
+            }
+
+            true
         }
+
+        return this
+    }
+
+    private fun lookupElements(): Collection<LookupElement> = lookupElementByLookupName.lookupElements()
+
+    companion object {
+        fun lookupElements(entrance: QualifiableAlias): Collection<LookupElement> =
+                entrance
+                        .qualifier()
+                        // if there is a qualifier, then it is only modules nested under `qualifier`'s alias or it's fully
+                        // qualified name if unaliased that are valid variants because the completions are after a `.`
+                        ?.let { qualifier ->
+                            filteredLookupElements(qualifier as PsiNamedElement)
+                        }
+                        ?:
+                        // if there is no qualifier then all aliases in the file and all project names are valid
+                        unfilteredLookupElements(entrance)
+
+        /**
+         * Any modules nested under `qualifier`
+         */
+        private fun filteredLookupElements(qualifier: PsiNamedElement): Collection<LookupElement> =
+                qualifier
+                        .reference
+                        ?.let { qualifierReference ->
+                            when (qualifierReference) {
+                                is PsiPolyVariantReference -> {
+                                    val lookupElementByLookupName = LookupElementByLookupName()
+
+                                    val resolvedElements = qualifierReference
+                                            .multiResolve(false)
+                                            .filter(ResolveResult::isValidResult)
+                                            .mapNotNull(ResolveResult::getElement)
+
+                                    val resolvedModulars = resolvedElements.filterIsInstance<Call>().filter { Stub.isModular(it) }
+
+                                    val resolveds = if (resolvedModulars.isNotEmpty()) {
+                                        resolvedModulars
+                                    } else {
+                                        resolvedElements
+
+                                    }
+
+                                    for (resolved in resolveds) {
+                                        putNestedAliased(lookupElementByLookupName, emptyList(), resolved as PsiNamedElement)
+                                    }
+
+                                    lookupElementByLookupName.lookupElements()
+                                }
+                                else -> {
+                                    val resolved = qualifierReference.resolve()
+                                    TODO()
+                                }
+                            }
+                        }
+                        ?:
+                        // if the qualifier can't be resolved to an `alias` or a modular, then we can't find the nested
+                        // modulars.
+                        emptyList()
+
+        private fun putNested(lookupElementByLookupName: LookupElementByLookupName, project: Project) {
+
+        }
+
+        private fun putNestedAliased(lookupElementByLookupName: LookupElementByLookupName, splitPrefix: List<String>, aliasedElement: PsiNamedElement) {
+            UnaliasedName.unaliasedName(aliasedElement)?.let { unaliasedName ->
+                val splitUnaliasedName = org.elixir_lang.Module.split(unaliasedName)
+                val project = aliasedElement.project
+                val scope = GlobalSearchScope.allScope(project)
+
+                val stubIndex = StubIndex.getInstance()
+                stubIndex.processAllKeys(AllName.KEY, project) { name ->
+                    if (name.isAlias()) {
+                        val splitRelativeName = org.elixir_lang.Module.relative(ancestors = splitUnaliasedName, descendant = name)
+
+                        if (splitRelativeName.isNotEmpty()) {
+                            val aliasedNestedName = org.elixir_lang.Module.concat(splitPrefix + splitRelativeName)
+
+                            if (!lookupElementByLookupName.contains(aliasedNestedName)) {
+                                stubIndex.processElements(AllName.KEY, name, project, scope, NamedElement::class.java) { named_element ->
+                                    lookupElementByLookupName.put(aliasedNestedName, named_element.navigationElement)
+
+                                    // only take the first element
+                                    false
+                                }
+                            }
+                        }
+                    }
+
+                    true
+                }
+            }
+        }
+
+        /**
+         * * All `alias`es in scope from `entrance` and any modules nested under those modules.
+         * * All project `Alias`es.
+         */
+        private fun unfilteredLookupElements(entrance: PsiElement): Collection<LookupElement> =
+                Variants(entrance)
+                        .putAliases()
+                        .putProject()
+                        .lookupElements()
     }
 }
 
+private fun QualifiableAlias.splitModulePrefix(): List<String> =
+        this
+                .fullyQualifiedName()
+                .let { org.elixir_lang.Module.prefix(it) }
+
 private fun ElixirMultipleAliases?.indexedNamePrefix(): String? =
         this?.let {
-            val children = parent.let { it  as QualifiedMultipleAliases }.
-                    children
+            val children = parent.let { it as QualifiedMultipleAliases }.children
             val operatorIndex = Normalized.operatorIndex(children)
 
             return org.elixir_lang.psi.operation.infix.Normalized.leftOperand(
@@ -170,8 +213,7 @@ private fun ElixirMultipleAliases?.indexedNamePrefix(): String? =
 private fun List<String>.filterStartsWithMaybe(maybePrefix: String?): List<String> =
         maybePrefix?.let { prefix ->
             filter { element -> element.startsWith(prefix) }
-        } ?:
-        this
+        } ?: this
 
 private fun ElixirAccessExpression.indexNamePrefix(): String? =
         children.singleOrNull()?.indexNamePrefix()
@@ -191,5 +233,4 @@ private fun QualifiableAlias.indexNamePrefix(): String? = fullyQualifiedName()?.
 private fun String?.isAlias(): Boolean = this?.codePointAt(0)?.let { Character.isUpperCase(it) } ?: false
 
 private fun String.removeMaybePrefix(maybePrefix: String?): String =
-        maybePrefix?.let { prefix -> this.removePrefix(prefix) } ?:
-        this
+        maybePrefix?.let { prefix -> this.removePrefix(prefix) } ?: this

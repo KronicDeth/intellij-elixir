@@ -1117,7 +1117,7 @@ public class ElixirPsiImplUtil {
         return NonNumericImplKt.getReference(nonNumeric);
     }
 
-    @NotNull
+    @Nullable
     public static PsiPolyVariantReference getReference(@NotNull QualifiableAlias qualifiableAlias) {
         return QualifiableAliasImplKt.getReference(qualifiableAlias);
     }

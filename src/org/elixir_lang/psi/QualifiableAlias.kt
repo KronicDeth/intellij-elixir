@@ -1,5 +1,6 @@
 package org.elixir_lang.psi
 
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNameIdentifierOwner
 
 /**
@@ -7,6 +8,17 @@ import com.intellij.psi.PsiNameIdentifierOwner
  */
 interface QualifiableAlias : MaybeModuleName, PsiNameIdentifierOwner {
     fun fullyQualifiedName(): String
+}
+
+fun QualifiableAlias.qualifier(): PsiElement? = when (this) {
+    is ElixirAlias -> {
+        when (val parent = this.parent) {
+            is QualifiedAlias -> parent.qualifier()
+            else -> null
+        }
+    }
+    is QualifiedAlias -> this.qualifier()
+    else -> null
 }
 
 tailrec fun QualifiableAlias.outerMostQualifiableAlias(): QualifiableAlias {

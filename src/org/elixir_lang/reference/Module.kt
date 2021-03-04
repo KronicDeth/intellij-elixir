@@ -7,13 +7,15 @@ import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.PsiReferenceBase
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.impl.source.resolve.ResolveCache
+import org.elixir_lang.psi.ElixirAlias
 import org.elixir_lang.psi.QualifiableAlias
+import org.elixir_lang.psi.QualifiedAlias
 import org.elixir_lang.psi.scope.module.Variants
 
 class Module(qualifiableAlias: QualifiableAlias) :
-        PsiReferenceBase<QualifiableAlias>(qualifiableAlias, TextRange.create(0, qualifiableAlias.textLength)),
+        PsiReferenceBase<QualifiableAlias>(qualifiableAlias, textRange(qualifiableAlias)),
         PsiPolyVariantReference {
-    override fun getVariants(): Array<LookupElement> = Variants.lookupElementList(myElement).toTypedArray()
+    override fun getVariants(): Array<LookupElement> = Variants.lookupElements(myElement).toTypedArray()
 
     override fun isReferenceTo(element: PsiElement): Boolean {
         val manager = this.element.manager
@@ -34,4 +36,10 @@ class Module(qualifiableAlias: QualifiableAlias) :
                     )
 
     override fun resolve(): PsiElement? = multiResolve(false).singleOrNull()?.element
+}
+
+private fun textRange(qualifiableAlias: QualifiableAlias): TextRange = when (qualifiableAlias) {
+    is ElixirAlias -> TextRange.create(0, qualifiableAlias.textLength)
+    is QualifiedAlias -> qualifiableAlias.getAlias().textRangeInParent
+    else -> TODO()
 }
