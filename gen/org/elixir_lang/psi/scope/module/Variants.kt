@@ -14,6 +14,7 @@ import org.elixir_lang.psi.operation.Normalized
 import org.elixir_lang.psi.scope.LookupElementByLookupName
 import org.elixir_lang.psi.scope.Module
 import org.elixir_lang.psi.stub.index.AllName
+import org.elixir_lang.psi.stub.index.ModularName
 import org.elixir_lang.psi.stub.type.call.Stub
 import org.elixir_lang.reference.module.UnaliasedName
 
@@ -75,8 +76,8 @@ class Variants(private val entrance: PsiElement) : Module() {
         val scope = GlobalSearchScope.allScope(project)
 
         val stubIndex = StubIndex.getInstance()
-        stubIndex.processAllKeys(AllName.KEY, project) { name ->
-            if (name.isAlias() && !lookupElementByLookupName.contains(name)) {
+        stubIndex.processAllKeys(ModularName.KEY, project) { name ->
+            if (!lookupElementByLookupName.contains(name)) {
                 stubIndex.processElements(AllName.KEY, name, project, scope, NamedElement::class.java) { named_element ->
                     lookupElementByLookupName.put(name, named_element.navigationElement)
 
@@ -159,20 +160,18 @@ class Variants(private val entrance: PsiElement) : Module() {
                 val scope = GlobalSearchScope.allScope(project)
 
                 val stubIndex = StubIndex.getInstance()
-                stubIndex.processAllKeys(AllName.KEY, project) { name ->
-                    if (name.isAlias()) {
-                        val splitRelativeName = org.elixir_lang.Module.relative(ancestors = splitUnaliasedName, descendant = name)
+                stubIndex.processAllKeys(ModularName.KEY, project) { name ->
+                    val splitRelativeName = org.elixir_lang.Module.relative(ancestors = splitUnaliasedName, descendant = name)
 
-                        if (splitRelativeName.isNotEmpty()) {
-                            val aliasedNestedName = org.elixir_lang.Module.concat(splitPrefix + splitRelativeName)
+                    if (splitRelativeName.isNotEmpty()) {
+                        val aliasedNestedName = org.elixir_lang.Module.concat(splitPrefix + splitRelativeName)
 
-                            if (!lookupElementByLookupName.contains(aliasedNestedName)) {
-                                stubIndex.processElements(AllName.KEY, name, project, scope, NamedElement::class.java) { named_element ->
-                                    lookupElementByLookupName.put(aliasedNestedName, named_element.navigationElement)
+                        if (!lookupElementByLookupName.contains(aliasedNestedName)) {
+                            stubIndex.processElements(AllName.KEY, name, project, scope, NamedElement::class.java) { named_element ->
+                                lookupElementByLookupName.put(aliasedNestedName, named_element.navigationElement)
 
-                                    // only take the first element
-                                    false
-                                }
+                                // only take the first element
+                                false
                             }
                         }
                     }
@@ -226,11 +225,6 @@ private fun PsiElement.indexNamePrefix(): String? =
         }
 
 private fun QualifiableAlias.indexNamePrefix(): String? = fullyQualifiedName()?.let { "$it." }
-
-/**
- * Only those names that work as Alias, that is those that start with a capital letter
- */
-private fun String?.isAlias(): Boolean = this?.codePointAt(0)?.let { Character.isUpperCase(it) } ?: false
 
 private fun String.removeMaybePrefix(maybePrefix: String?): String =
         maybePrefix?.let { prefix -> this.removePrefix(prefix) } ?: this
