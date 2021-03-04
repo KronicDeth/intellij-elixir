@@ -192,39 +192,3 @@ class Variants(private val entrance: PsiElement) : Module() {
                         .lookupElements()
     }
 }
-
-private fun QualifiableAlias.splitModulePrefix(): List<String> =
-        this
-                .fullyQualifiedName()
-                .let { org.elixir_lang.Module.prefix(it) }
-
-private fun ElixirMultipleAliases?.indexedNamePrefix(): String? =
-        this?.let {
-            val children = parent.let { it as QualifiedMultipleAliases }.children
-            val operatorIndex = Normalized.operatorIndex(children)
-
-            return org.elixir_lang.psi.operation.infix.Normalized.leftOperand(
-                    children,
-                    operatorIndex
-            )!!.indexNamePrefix()
-        }
-
-private fun List<String>.filterStartsWithMaybe(maybePrefix: String?): List<String> =
-        maybePrefix?.let { prefix ->
-            filter { element -> element.startsWith(prefix) }
-        } ?: this
-
-private fun ElixirAccessExpression.indexNamePrefix(): String? =
-        children.singleOrNull()?.indexNamePrefix()
-
-private fun PsiElement.indexNamePrefix(): String? =
-        when (this) {
-            is ElixirAccessExpression -> indexNamePrefix()
-            is QualifiableAlias -> indexNamePrefix()
-            else -> null
-        }
-
-private fun QualifiableAlias.indexNamePrefix(): String? = fullyQualifiedName()?.let { "$it." }
-
-private fun String.removeMaybePrefix(maybePrefix: String?): String =
-        maybePrefix?.let { prefix -> this.removePrefix(prefix) } ?: this
