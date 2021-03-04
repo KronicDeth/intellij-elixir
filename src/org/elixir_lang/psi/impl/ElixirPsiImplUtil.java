@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.elixir_lang.psi.impl.PsiElementImplKt.siblingExpression;
+import static org.elixir_lang.psi.impl.PsiElementImplKt.stripAccessExpression;
 
 public class ElixirPsiImplUtil {
     public static final String DEFAULT_OPERATOR = "\\\\";
@@ -1143,7 +1144,7 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static PsiElement qualifier(@NotNull final Qualified qualified) {
-        return qualified.getFirstChild();
+        return stripAccessExpression(qualified.getFirstChild());
     }
 
     public static List<QuotableKeywordPair> quotableKeywordPairList(ElixirKeywords keywords) {
