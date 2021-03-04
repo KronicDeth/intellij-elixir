@@ -18,7 +18,7 @@ object Module : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Modul
                     val sameFileResolveResultList =
                             MultiResolve.resolveResults(name, incompleteCode, element)
 
-                    if (sameFileResolveResultList.isNotEmpty()) {
+                    if (sameFileResolveResultList.any(PsiElementResolveResult::isValidResult)) {
                         sameFileResolveResultList
                     } else {
                         multiResolveProject(
