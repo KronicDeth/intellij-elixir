@@ -34,13 +34,7 @@ abstract class Named<S : NamedStubBase<T>, T : PsiNameIdentifierOwner>(@NonNls d
     companion object {
         @JvmStatic
         fun <T : Stubbic> indexStubbic(stubbic: T, sink: IndexSink) {
-            val nameSet = mutableSetOf<String>()
-
-            stubbic.name?.let {
-                nameSet.add(it)
-            }
-
-            stubbic.canonicalNameSet().let { nameSet.addAll(it) }
+            val nameSet = stubbic.canonicalNameSet()
 
             nameSet.forEach { name ->
                 sink.occurrence<NamedElement, String>(AllName.KEY, name)

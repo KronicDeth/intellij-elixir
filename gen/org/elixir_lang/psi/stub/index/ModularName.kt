@@ -15,4 +15,5 @@ class ModularName : StringStubIndexExtension<NamedElement>() {
     }
 }
 
-private const val VERSION = 0
+// 1 - Remove non-canonical names from being index
+private const val VERSION = 1
