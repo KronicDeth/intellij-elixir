@@ -25,6 +25,11 @@ object QuoteMacro {
 
                         Import.callDefinitionClauseCallWhile(childCall, childResolveState, keepProcessing)
                     }
+                    Unquote.`is`(childCall) -> {
+                        val childResolveState = resolveState.putVisitedElement(childCall)
+
+                        Unquote.callDefinitionClauseCallWhile(childCall, childResolveState, keepProcessing)
+                    }
                     Use.`is`(childCall) -> {
                         val childResolveState = resolveState.putVisitedElement(childCall)
 
