@@ -71,12 +71,29 @@ object Module : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Modul
                     resolveResultList.add(PsiElementResolveResult(namedElement.navigationElement))
                 }
 
-        val sourceResolveResultList = resolveResultList.filter { !it.element.isDecompiled() }
+        val nearResolveResultList = if (module != null) {
+            val contentRootSet = ModuleRootManager.getInstance(module).contentRoots.toSet()
+            resolveResultList.filter { resolveResult ->
+                // The `Module` of a Library source will be `null`, so have to check for a library in `deps` of module
+                // using path instead.
+                resolveResult
+                        .element
+                        .containingFile
+                        .virtualFile
+                        ?.let { virtualFile -> VfsUtilCore.isUnder(virtualFile, contentRootSet) }
+                        ?:
+                        false
+            }
+        } else {
+            resolveResultList
+        }
+
+        val sourceResolveResultList = nearResolveResultList.filter { !it.element.isDecompiled() }
 
         return if (sourceResolveResultList.isNotEmpty()) {
             sourceResolveResultList.toTypedArray()
         } else {
-            resolveResultList.toTypedArray()
+            nearResolveResultList.toTypedArray()
         }
     }
 }
