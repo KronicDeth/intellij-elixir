@@ -1,7 +1,10 @@
 package org.elixir_lang.reference.resolver
 
 import com.intellij.openapi.module.ModuleUtil
+import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.ProjectRootManager
+import com.intellij.openapi.roots.impl.LibraryScopeCache
+import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementResolveResult
 import com.intellij.psi.impl.source.resolve.ResolveCache
@@ -37,16 +40,28 @@ object Module : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Modul
     private fun multiResolveProject(entrance: PsiElement,
                                     name: String): Array<PsiElementResolveResult> {
         val resolveResultList = mutableListOf<PsiElementResolveResult>()
-
         val project = entrance.project
-        val globalSearchScope = ModuleUtil
-                .findModuleForPsiElement(entrance)
-                ?.let { module ->
-                    val includeTests = ProjectRootManager.getInstance(project).fileIndex.isInTestSourceContent(entrance.containingFile.virtualFile)
+        val projectFileIndex = ProjectRootManager.getInstance(project).fileIndex
+        val module = ModuleUtil.findModuleForPsiElement(entrance)
+        val entranceVirtualFile = entrance.containingFile.virtualFile
+
+        val globalSearchScope = if (module != null) {
+            val includeTests = projectFileIndex.isInTestSourceContent(entranceVirtualFile)
+            // DOES NOT include the libraries sources, but...
+            val moduleWithDependenciesAndLibrariesScope =
                     GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module, includeTests)
-                }
-                ?:
-                GlobalSearchScope.allScope(project)
+
+            // ... we prefer sources compared to decompiled, so use LibraryScope to get the Library source too.
+            val orderEntries = projectFileIndex.getOrderEntriesForFile(entranceVirtualFile)
+            val libraryScope =
+                    LibraryScopeCache
+                            .getInstance(project)
+                            .getLibraryScope(orderEntries)
+
+            moduleWithDependenciesAndLibrariesScope.uniteWith(libraryScope)
+        } else {
+            GlobalSearchScope.allScope(project)
+        }
 
         StubIndex
                 .getInstance()
