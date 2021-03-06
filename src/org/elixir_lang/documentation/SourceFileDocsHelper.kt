@@ -51,7 +51,7 @@ object SourceFileDocsHelper {
                                             .thenByDescending { arityRange.max() == findElixirFunction(it)?.primaryArity() }
                                             .thenBy { findElixirFunction(it)?.primaryArity() }
                             )
-                            .map { Pair(findElixirFunction(it)?.primaryArity(), findMethodDocs(it)) }
+                            .map { Pair(findElixirFunction(it)?.primaryArity(), callDefinitionDoc(it)) }
                             .filter { it.second != null }
                             .firstOrNull()
 
@@ -129,7 +129,7 @@ private fun isDefiner(elixirAtIdentifier: ElixirUnmatchedUnqualifiedNoParenthese
 
 private fun PsiElement.siblings() = this.prevSiblingSequence() + generateSequence(this) { it.nextSibling }
 
-private fun findMethodDocs(resolved: PsiElement): String? {
+private fun callDefinitionDoc(resolved: PsiElement): String? {
     val methodDocs = resolved
             .prevSiblingSequence()
             .drop(1)
