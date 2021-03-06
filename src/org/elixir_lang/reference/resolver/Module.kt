@@ -1,19 +1,17 @@
 package org.elixir_lang.reference.resolver
 
 import com.intellij.openapi.module.ModuleUtil
-import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.roots.impl.LibraryScopeCache
-import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementResolveResult
 import com.intellij.psi.impl.source.resolve.ResolveCache
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
-import org.elixir_lang.navigation.isDecompiled
 import org.elixir_lang.psi.NamedElement
 import org.elixir_lang.psi.scope.module.MultiResolve
 import org.elixir_lang.psi.stub.index.ModularName
+import org.elixir_lang.reference.Resolver
 
 
 object Module : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Module> {
@@ -23,11 +21,11 @@ object Module : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Modul
     ): Array<PsiElementResolveResult> =
             module.element.let { element ->
                 element.fullyQualifiedName().let { name ->
-                    val sameFileResolveResultList =
+                    val sameFileResolveResults =
                             MultiResolve.resolveResults(name, incompleteCode, element)
 
-                    if (sameFileResolveResultList.any(PsiElementResolveResult::isValidResult)) {
-                        sameFileResolveResultList
+                    if (sameFileResolveResults.any(PsiElementResolveResult::isValidResult)) {
+                        sameFileResolveResults
                     } else {
                         multiResolveProject(
                                 element,
@@ -71,29 +69,6 @@ object Module : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Modul
                     resolveResultList.add(PsiElementResolveResult(namedElement.navigationElement))
                 }
 
-        val nearResolveResultList = if (module != null) {
-            val contentRootSet = ModuleRootManager.getInstance(module).contentRoots.toSet()
-            resolveResultList.filter { resolveResult ->
-                // The `Module` of a Library source will be `null`, so have to check for a library in `deps` of module
-                // using path instead.
-                resolveResult
-                        .element
-                        .containingFile
-                        .virtualFile
-                        ?.let { virtualFile -> VfsUtilCore.isUnder(virtualFile, contentRootSet) }
-                        ?:
-                        false
-            }
-        } else {
-            resolveResultList
-        }
-
-        val sourceResolveResultList = nearResolveResultList.filter { !it.element.isDecompiled() }
-
-        return if (sourceResolveResultList.isNotEmpty()) {
-            sourceResolveResultList.toTypedArray()
-        } else {
-            nearResolveResultList.toTypedArray()
-        }
+        return Resolver.preferred(entrance, incompleteCode = false, resolveResultList = resolveResultList).toTypedArray()
     }
 }

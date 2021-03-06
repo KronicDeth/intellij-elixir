@@ -29,53 +29,51 @@ object Callable : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Cal
     }
 
     private fun resolveElement(element: Call, incompleteCode: Boolean): List<ResolveResult> =
-        /* DO NOT use `getName()` as it will return the NameIdentifier's text, which for `defmodule` is the Alias, not
-          `defmodule` */
-        element.functionName()?.let { name ->
-            val resolvedFinalArity = element.resolvedFinalArity()
-            val resolveResultList = mutableListOf<ResolveResult>()
+            /* DO NOT use `getName()` as it will return the NameIdentifier's text, which for `defmodule` is the Alias, not
+              `defmodule` */
+            element.functionName()?.let { name ->
+                val resolvedFinalArity = element.resolvedFinalArity()
+                val resolveResultList = mutableListOf<ResolveResult>()
 
-            // UnqualifiedNorArgumentsCall prevents `foo()` from being treated as a variable.
-            // resolvedFinalArity prevents `|> foo` from being counted as 0-arity
-            if (element is UnqualifiedNoArgumentsCall<*> && resolvedFinalArity == 0) {
-                val variableResolveList = org.elixir_lang.psi.scope.variable.MultiResolve.resolveResultList(
+                // UnqualifiedNorArgumentsCall prevents `foo()` from being treated as a variable.
+                // resolvedFinalArity prevents `|> foo` from being counted as 0-arity
+                if (element is UnqualifiedNoArgumentsCall<*> && resolvedFinalArity == 0) {
+                    val variableResolveList = org.elixir_lang.psi.scope.variable.MultiResolve.resolveResultList(
+                            name,
+                            incompleteCode,
+                            element
+                    )
+
+                    if (variableResolveList != null) {
+                        resolveResultList.addAll(variableResolveList)
+                    }
+                }
+
+                val callDefinitionClauseResolveResultList = org.elixir_lang.psi.scope.call_definition_clause.MultiResolve.resolveResults(
                         name,
+                        resolvedFinalArity,
                         incompleteCode,
                         element
                 )
 
-                if (variableResolveList != null) {
-                    resolveResultList.addAll(variableResolveList)
-                }
-            }
+                resolveResultList.addAll(callDefinitionClauseResolveResultList)
 
-            val callDefinitionClauseResolveResultList = org.elixir_lang.psi.scope.call_definition_clause.MultiResolve.resolveResults(
-                    name,
-                    resolvedFinalArity,
-                    incompleteCode,
-                    element
-            )
-
-            resolveResultList.addAll(callDefinitionClauseResolveResultList)
-
-            resolveResultList
-        } ?:
-        emptyList()
+                org.elixir_lang.reference.Resolver.preferred(element, incompleteCode, resolveResultList)
+            } ?: emptyList()
 
     private fun resolveElement(element: Qualified): List<ResolveResult> =
-        element.qualifiedToModular()?.let { modular ->
-            element.functionName()?.let { name ->
-                val resolvedFinalArity = element.resolvedFinalArity()
+            element.qualifiedToModular()?.let { modular ->
+                element.functionName()?.let { name ->
+                    val resolvedFinalArity = element.resolvedFinalArity()
 
-                Modular.callDefinitionClauseCallFoldWhile(
-                        modular,
-                        name,
-                        mutableListOf<ResolveResult>()
-                ) { callDefinitionClauseCall, _, arityRange, acc ->
-                    acc.add(PsiElementResolveResult(callDefinitionClauseCall, arityRange.contains(resolvedFinalArity)))
-                    AccumulatorContinue(acc, true)
-                }.accumulator
-            }
-        } ?:
-        emptyList()
+                    Modular.callDefinitionClauseCallFoldWhile(
+                            modular,
+                            name,
+                            mutableListOf<ResolveResult>()
+                    ) { callDefinitionClauseCall, _, arityRange, acc ->
+                        acc.add(PsiElementResolveResult(callDefinitionClauseCall, arityRange.contains(resolvedFinalArity)))
+                        AccumulatorContinue(acc, true)
+                    }.accumulator
+                }
+            } ?: emptyList()
 }
