@@ -10,6 +10,7 @@ import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.call.macroChildCallSequence
 import org.elixir_lang.psi.impl.maybeModularNameToModular
+import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.scope.putVisitedElement
 
 object Using {
@@ -34,12 +35,34 @@ object Using {
                                     maybeModularName.maybeModularNameToModular(maxScope = maybeModularName.containingFile, useCall = useCall)?.let { modular ->
                                         val modularResolveState = resolveState.putVisitedElement(modular)
 
-                                        // TODO resolve argument[1] AND use its inferred value to select only one of the functions
-                                        Modular.callDefinitionClauseCallWhile(modular, modularResolveState) { callDefinitionClauseCall, accResolveState ->
-                                            if (CallDefinitionClause.isFunction(callDefinitionClauseCall)) {
-                                                Using.callDefinitionClauseCallWhile(callDefinitionClauseCall, useCall, accResolveState, keepProcessing)
+                                        val name = useCall?.finalArguments()?.let { arguments ->
+                                            if (arguments.size == 2) {
+                                                when (val which = arguments[1].stripAccessExpression()) {
+                                                    is ElixirAtom -> if (which.charListLine == null && which.stringLine == null) {
+                                                        which.lastChild.text
+                                                    } else {
+                                                        null
+                                                    }
+                                                    else -> null
+                                                }
+
                                             } else {
-                                                true
+                                                null
+                                            }
+                                        }
+
+                                        if (name != null) {
+                                            Modular.callDefinitionClauseCallFoldWhile(modular, name, modularResolveState) { callDefinitionClauseCall, _, arityRange, accResolveState ->
+                                                val finalContinue = callDefinitionClauseCallWhile(callDefinitionClauseCall, useCall, accResolveState, keepProcessing)
+                                                AccumulatorContinue(accResolveState, finalContinue)
+                                            }.`continue`
+                                        } else {
+                                            Modular.callDefinitionClauseCallWhile(modular, modularResolveState) { callDefinitionClauseCall, accResolveState ->
+                                                if (CallDefinitionClause.isFunction(callDefinitionClauseCall)) {
+                                                    callDefinitionClauseCallWhile(callDefinitionClauseCall, useCall, accResolveState, keepProcessing)
+                                                } else {
+                                                    true
+                                                }
                                             }
                                         }
                                     }
