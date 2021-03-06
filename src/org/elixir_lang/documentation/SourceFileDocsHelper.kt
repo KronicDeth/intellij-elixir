@@ -3,6 +3,7 @@ package org.elixir_lang.documentation
 import com.intellij.psi.PsiElement
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
+import org.elixir_lang.psi.call.CanonicallyNamed
 import org.elixir_lang.psi.impl.ElixirUnmatchedUnqualifiedNoParenthesesCallImpl
 import org.elixir_lang.psi.impl.getModuleName
 import org.elixir_lang.psi.impl.prevSiblingSequence
@@ -35,7 +36,7 @@ object SourceFileDocsHelper {
             }
         }
         CallDefinitionClause.`is`(call) -> {
-            val functionName = (call as? ElixirUnmatchedUnqualifiedNoParenthesesCall)?.canonicalName()
+            val functionName = (call as? CanonicallyNamed)?.canonicalName()
                     ?: call.functionName().orEmpty()
             val arityRange = call.resolvedFinalArityRange()
 
