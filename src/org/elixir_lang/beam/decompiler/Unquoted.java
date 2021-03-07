@@ -27,6 +27,8 @@ public class Unquoted extends MacroNameArity {
                 "end",
                 "false",
                 "nil",
+                // When not `or/2`
+                "or",
                 "true"
         );
         Stream<String> specialFormStream = Stream.of(
