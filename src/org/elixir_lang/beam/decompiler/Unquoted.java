@@ -26,6 +26,8 @@ public class Unquoted extends MacroNameArity {
                 "do",
                 "end",
                 "false",
+                // When not `in/2`
+                "in",
                 "nil",
                 // When not `or/2`
                 "or",
