@@ -1,144 +1,81 @@
-package org.elixir_lang.beam.psi.impl;
+package org.elixir_lang.beam.psi.impl
 
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.StubBasedPsiElement;
-import com.intellij.psi.impl.source.tree.TreeElement;
-import com.intellij.psi.stubs.IStubElementType;
-import com.intellij.util.IncorrectOperationException;
-import org.elixir_lang.beam.psi.CallDefinition;
-import org.elixir_lang.beam.psi.stubs.CallDefinitionStub;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NonNls;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.intellij.lang.ASTNode
+import org.elixir_lang.beam.psi.stubs.CallDefinitionStub
+import com.intellij.psi.StubBasedPsiElement
+import com.intellij.psi.PsiElement
+import com.intellij.psi.impl.source.tree.TreeElement
+import com.intellij.psi.stubs.IStubElementType
+import com.intellij.util.IncorrectOperationException
+import org.elixir_lang.beam.psi.CallDefinition
+import org.jetbrains.annotations.Contract
+import org.jetbrains.annotations.NonNls
+import java.lang.StringBuilder
 
-import java.util.Set;
-
-public class CallDefinitionImpl<T extends CallDefinitionStub> extends ModuleElementImpl implements CallDefinition, StubBasedPsiElement<T> {
-    private final T stub;
-
-    public CallDefinitionImpl(T stub) {
-        this.stub = stub;
-    }
-
+class CallDefinitionImpl<T : CallDefinitionStub<*>>(private val stub: T) : ModuleElementImpl(), CallDefinition, StubBasedPsiElement<T> {
     /**
      * Returns the array of children for the PSI element.
      * Important: In some implementations children are only composite elements, i.e. not a leaf elements
      *
      * @return the array of child elements.
      */
-    @NotNull
-    @Override
-    public PsiElement[] getChildren() {
-        return new PsiElement[0];
-    }
+    override fun getChildren(): Array<PsiElement> = emptyArray()
 
     /**
      * Returns the parent of the PSI element.
      *
      * @return the parent of the element, or null if the element has no parent.
      */
-    @Override
-    public PsiElement getParent() {
-        return stub.getParentStub().getPsi();
-    }
+    override fun getParent(): PsiElement = stub.parentStub.psi
 
-    @Override
-    public IStubElementType getElementType() {
-        return stub.getStubType();
-    }
+    override fun getElementType(): IStubElementType<*, *> = stub.stubType
 
-    @Override
-    public T getStub() {
-        return stub;
-    }
+    override fun getStub(): T = stub
 
-    @Override
-    public void appendMirrorText(@NotNull StringBuilder buffer, int indentLevel) {
-        assert buffer != null;
-    }
+    override fun appendMirrorText(buffer: StringBuilder, indentLevel: Int) {}
 
-    @Override
-    public void setMirror(@NotNull TreeElement element) throws InvalidMirrorException {
-        setMirrorCheckingType(element, null);
-    }
+    override fun setMirror(element: TreeElement) = setMirrorCheckingType(element, null)
 
     /**
-     * @return {@code null} if it does not have a canonical name OR if it has more than one canonical name
+     * @return `null` if it does not have a canonical name OR if it has more than one canonical name
      */
-    @Nullable
-    @Override
-    public String canonicalName() {
-        assert stub != null;
-
-        return null;
-    }
+    override fun canonicalName(): String? = null
 
     /**
      * @return empty set if no canonical names
      */
-    @NotNull
-    @Override
-    public Set<String> canonicalNameSet() {
-        assert stub != null;
+    override fun canonicalNameSet(): Set<String> = emptySet()
 
-        return null;
-    }
-
-    @Nullable
-    @Override
-    public PsiElement getNameIdentifier() {
-        return this;
-    }
+    override fun getNameIdentifier(): PsiElement = this
 
     /**
      * Renames the element.
      *
      * @param name the new element name.
-     * @return the element corresponding to this element after the rename (either <code>this</code>
+     * @return the element corresponding to this element after the rename (either `this`
      * or a different element if the rename caused the element to be replaced).
      * @throws IncorrectOperationException if the modification is not supported or not possible for some reason.
      */
-    @Override
-    public PsiElement setName(@NonNls @NotNull String name) throws IncorrectOperationException {
-        throw new IncorrectOperationException("Cannot modify module name in Beam files");
-    }
+    override fun setName(@NonNls name: String): PsiElement =
+            throw IncorrectOperationException("Cannot modify module name in Beam files")
 
-    @NotNull
-    @Override
-    public PsiElement getNavigationElement() {
-        return getMirror();
-    }
+    override fun getNavigationElement(): PsiElement = mirror
 
-    @Override
-    public ASTNode getNode() {
-        return null;
-    }
+    override fun getNode(): ASTNode? = null
 
     /**
-     * @return {@code true}
+     * @return `true`
      */
     @Contract(pure = true)
-    @Override
-    public boolean isExported() {
-        return true;
-    }
+    override fun isExported(): Boolean = true
 
     /**
      * The arity of the function or macro that was exported into the compiled .beam file
      */
-    @Override
-    public int exportedArity() {
-        return stub.callDefinitionClauseHeadArity();
-    }
+    override fun exportedArity(): Int = stub.callDefinitionClauseHeadArity()
 
     /**
      * The name that was exported into the compiled .beam file
      */
-    @NotNull
-    @Override
-    public String exportedName() {
-        return stub.getName();
-    }
+    override fun exportedName(): String = stub.name
 }
