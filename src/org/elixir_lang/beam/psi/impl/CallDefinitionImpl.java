@@ -1,5 +1,6 @@
 package org.elixir_lang.beam.psi.impl;
 
+import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.StubBasedPsiElement;
 import com.intellij.psi.impl.source.tree.TreeElement;
@@ -108,6 +109,11 @@ public class CallDefinitionImpl<T extends CallDefinitionStub> extends ModuleElem
     @Override
     public PsiElement getNavigationElement() {
         return getMirror();
+    }
+
+    @Override
+    public ASTNode getNode() {
+        return null;
     }
 
     /**

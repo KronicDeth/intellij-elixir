@@ -1,5 +1,6 @@
 package org.elixir_lang.beam.psi.impl
 
+import com.intellij.lang.ASTNode
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import org.elixir_lang.psi.scope.putInitialVisitedElement
@@ -108,6 +109,8 @@ class ModuleImpl<T : StubElement<*>?>(private val stub: T) : ModuleElementImpl()
             throw IncorrectOperationException("Cannot modify module name in Beam files")
 
     override fun getNavigationElement(): PsiElement = mirror
+
+    override fun getNode(): ASTNode? = null
 
     override fun getProject(): Project = mirror.project
 
