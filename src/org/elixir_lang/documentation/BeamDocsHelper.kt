@@ -22,14 +22,7 @@ object BeamDocsHelper {
                     val docs = beam.documentation()?.docs
                             ?.docsForOrSimilar(functionName, arityRange ?: 0) ?: return null
 
-                    val kind = docs.kind
-
-                    val signature = docs.signatures.first()
-                    val arguments = signature.removePrefix(functionName)
-                            .removePrefix("(")
-                            .removeSuffix(")")
-                            .split(",")
-                            .map { it.trim() }
+                    val signatures = docs.signatures
 
                     val metadata = beam.documentation()?.docs?.getFunctionMetadataOrSimilar(functionName, arityRange ?: 0)
                     val deprecatedMetadata = metadata?.firstOrNull{it.name == "deprecated"}
@@ -44,8 +37,7 @@ object BeamDocsHelper {
 
                     val docsText = functionDocs?.firstOrNull()?.documentationText
                     if (docsText != null || deprecatedMetadata != null) {
-                        FetchedDocs.FunctionOrMacroDocumentation(moduleName, docsText.orEmpty(), kind,
-                                functionName, deprecatedText, arguments)
+                        FetchedDocs.FunctionOrMacroDocumentation(moduleName, deprecatedText, docsText.orEmpty(), impls = emptyList(), specs = emptyList(), heads = signatures)
                     } else {
                         null
                     }
