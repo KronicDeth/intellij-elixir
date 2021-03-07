@@ -23,7 +23,9 @@ public class Unquoted extends MacroNameArity {
         Stream<String> keywordStream = Stream.of(
                 "do",
                 "end",
-                "nil"
+                "false",
+                "nil",
+                "true"
         );
         Stream<String> specialFormStream = Stream.of(
                 "!",
