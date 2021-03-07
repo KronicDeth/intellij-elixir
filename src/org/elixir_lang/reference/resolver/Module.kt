@@ -44,7 +44,7 @@ object Module : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Modul
         val entranceVirtualFile = entrance.containingFile.virtualFile
 
         val globalSearchScope = if (module != null) {
-            val includeTests = projectFileIndex.isInTestSourceContent(entranceVirtualFile)
+            val includeTests = entranceVirtualFile?.let { projectFileIndex.isInTestSourceContent(it) } ?: false
             // DOES NOT include the libraries sources, but...
             val moduleWithDependenciesAndLibrariesScope =
                     GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module, includeTests)
