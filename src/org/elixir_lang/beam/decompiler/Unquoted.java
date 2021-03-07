@@ -21,6 +21,8 @@ public class Unquoted extends MacroNameArity {
 
     static {
         Stream<String> keywordStream = Stream.of(
+                // When not `and/2`
+                "and",
                 "do",
                 "end",
                 "false",
