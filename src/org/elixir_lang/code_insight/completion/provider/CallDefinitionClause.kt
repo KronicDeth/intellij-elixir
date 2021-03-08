@@ -7,6 +7,7 @@ import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiWhiteSpace
 import com.intellij.util.ProcessingContext
+import org.elixir_lang.navigation.isDecompiled
 import org.elixir_lang.psi.CallDefinitionClause.nameArityRange
 import org.elixir_lang.psi.ElixirTypes
 import org.elixir_lang.psi.call.Call
@@ -14,18 +15,28 @@ import org.elixir_lang.psi.impl.call.macroChildCalls
 import org.elixir_lang.psi.impl.maybeModularNameToModular
 
 class CallDefinitionClause : CompletionProvider<CompletionParameters>() {
-    private fun callDefinitionClauseLookupElements(scope: Call): Iterable<LookupElement> =
-            scope
-                    .macroChildCalls()
-                    .filter { org.elixir_lang.psi.CallDefinitionClause.`is`(it) }
-                    .mapNotNull {
-                        nameArityRange(it)?.let { (name, _) ->
-                            org.elixir_lang.code_insight.lookup.element.CallDefinitionClause.createWithSmartPointer(
-                                    name,
-                                    it
-                            )
-                        }
+    private fun callDefinitionClauseLookupElements(scope: Call): Iterable<LookupElement> {
+        val callDefinitionClauseList = scope
+                .macroChildCalls()
+                .filter { org.elixir_lang.psi.CallDefinitionClause.`is`(it) }
+
+        // decompiled private functions can't be made public, so exclude them
+        val callable = if (scope.isDecompiled()) {
+            callDefinitionClauseList.filter { org.elixir_lang.psi.CallDefinitionClause.isPublic(it) }
+        } else {
+            callDefinitionClauseList
+        }
+
+        return callable
+                .mapNotNull {
+                    nameArityRange(it)?.let { (name, _) ->
+                        org.elixir_lang.code_insight.lookup.element.CallDefinitionClause.createWithSmartPointer(
+                                name,
+                                it
+                        )
                     }
+                }
+    }
 
     private fun maybeModularName(parameters: CompletionParameters): PsiElement? =
         parameters.originalPosition?.let { originalPosition ->

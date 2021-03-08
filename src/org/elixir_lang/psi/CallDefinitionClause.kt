@@ -49,6 +49,8 @@ object CallDefinitionClause {
     fun isPublicMacro(call: Call): Boolean = isCallingKernelMacroOrHead(call, DEFMACRO)
     fun isPrivateMacro(call: Call): Boolean = isCallingKernelMacroOrHead(call, DEFMACROP)
 
+    fun isPublic(call: Call): Boolean = isPublicFunction(call) || isPublicMacro(call)
+
     /**
      * The name and arity range of the call definition this clause belongs to.
      *
