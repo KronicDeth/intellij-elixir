@@ -31,7 +31,7 @@ public interface ModuleStubElementTypes {
 
         @Override
         public CallDefinition createPsi(@NotNull CallDefinitionStub stub) {
-            return new CallDefinitionImpl<CallDefinitionStub>(stub);
+            return new CallDefinitionImpl(stub);
         }
 
         @NotNull
