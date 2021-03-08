@@ -1,15 +1,11 @@
 package org.elixir_lang.beam.psi
 
 import com.ericsson.otp.erlang.OtpErlangDecodeException
-import com.intellij.lang.ASTNode
 import com.intellij.lang.FileASTNode
 import org.elixir_lang.beam.Beam.Companion.from
-import org.elixir_lang.psi.ModuleOwner
 import com.intellij.psi.impl.source.PsiFileWithStubSupport
 import com.intellij.util.IncorrectOperationException
 import com.intellij.psi.search.PsiElementProcessor
-import org.elixir_lang.psi.call.CanonicallyNamed
-import org.elixir_lang.beam.psi.stubs.ModuleStubElementTypes
 import com.intellij.openapi.application.ApplicationManager
 import org.elixir_lang.psi.stub.impl.ElixirFileStubImpl
 import com.intellij.psi.scope.ElementClassHint
@@ -21,6 +17,7 @@ import com.intellij.openapi.fileTypes.FileType
 import org.elixir_lang.ElixirLanguage
 import com.intellij.psi.impl.source.SourceTreeToPsiMap
 import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.*
@@ -47,7 +44,7 @@ import java.util.*
 import java.util.function.Consumer
 
 // See com.intellij.psi.impl.compiled.ClsFileImpl
-class BeamFileImpl private constructor(private val fileViewProvider: FileViewProvider, private val isForDecompiling: Boolean) : ModuleElementImpl(), ModuleOwner, PsiCompiledFile, PsiFileWithStubSupport {
+class BeamFileImpl private constructor(private val fileViewProvider: FileViewProvider, private val isForDecompiling: Boolean) : ModuleElementImpl(), PsiCompiledFile, PsiFileWithStubSupport {
     /**
      * NOTE: you absolutely MUST NOT hold PsiLock under the mirror lock
      */
@@ -92,6 +89,8 @@ class BeamFileImpl private constructor(private val fileViewProvider: FileViewPro
 
     override fun isDirectory(): Boolean = false
 
+    override fun getProject(): Project = manager.project
+
     /**
      * Returns the PSI manager for the project to which the PSI element belongs.
      *
@@ -105,12 +104,12 @@ class BeamFileImpl private constructor(private val fileViewProvider: FileViewPro
      *
      * @return the array of child elements.
      */
-    override fun getChildren(): Array<PsiElement> = modulars() as Array<PsiElement>
+    override fun getChildren(): Array<PsiElement> = arrayOf(module())
 
-    override fun modulars(): Array<CanonicallyNamed> =
-            getStub().getChildrenByType(ModuleStubElementTypes.MODULE, emptyArray())
+    private fun module(): Module = moduleStub().psi
+    private fun moduleStub(): ModuleStub<Module> = getStub().childrenStubs.single() as ModuleStub<Module>
 
-    fun getStub(): PsiFileStub<*> = stubTree.root
+    private fun getStub(): PsiFileStub<*> = stubTree.root
 
     override fun getStubTree(): StubTree {
         ApplicationManager.getApplication().assertReadAccessAllowed()
@@ -153,8 +152,6 @@ class BeamFileImpl private constructor(private val fileViewProvider: FileViewPro
             }
         }
     }
-
-    fun findTreeForStub(stubTree: StubTree?, stubElement: StubElement<*>?): ASTNode? = null
 
     override fun getParent(): PsiDirectory = containingDirectory
 
@@ -220,10 +217,7 @@ class BeamFileImpl private constructor(private val fileViewProvider: FileViewPro
 
     override fun appendMirrorText(buffer: StringBuilder, indentLevel: Int) {
         buffer.append(BANNER)
-        val modulars = modulars()
-        if (modulars.size > 0) {
-            appendText(modulars[0], buffer, 0)
-        }
+        getStub().childrenStubs.single().psi.let { it as ModuleElementImpl }.appendMirrorText(buffer, 0)
     }
 
     /**
@@ -285,16 +279,11 @@ class BeamFileImpl private constructor(private val fileViewProvider: FileViewPro
                                      place: PsiElement): Boolean {
         processor.handleEvent(PsiScopeProcessor.Event.SET_DECLARATION_HOLDER, this)
         val classHint = processor.getHint(ElementClassHint.KEY)
-        var keepProcessing = true
-        if (classHint == null || classHint.shouldProcess(ElementClassHint.DeclarationKind.CLASS)) {
-            for (modular in modulars()) {
-                if (!processor.execute(modular, state)) {
-                    keepProcessing = false
-                    break
-                }
-            }
+        return if (classHint == null || classHint.shouldProcess(ElementClassHint.DeclarationKind.CLASS)) {
+            processor.execute(module(), state)
+        } else {
+            true
         }
-        return keepProcessing
     }
 
     /**
@@ -419,7 +408,7 @@ class BeamFileImpl private constructor(private val fileViewProvider: FileViewPro
         if (mirrorElement !is ElixirFile) {
             throw InvalidMirrorException("Unexpected mirror file: $mirrorElement")
         }
-        setMirrors(modulars(), mirrorElement.modulars())
+        setMirrors(arrayOf(module()), mirrorElement.modulars())
     }
 
     companion object {

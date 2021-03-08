@@ -2,47 +2,55 @@ package org.elixir_lang.documentation
 
 import com.intellij.psi.PsiElement
 import org.elixir_lang.beam.Beam
-import org.elixir_lang.psi.ElixirUnmatchedUnqualifiedNoParenthesesCall
-import org.elixir_lang.psi.call.Call
-import org.elixir_lang.psi.impl.getModuleName
+import org.elixir_lang.beam.psi.Module
+import org.elixir_lang.psi.call.MaybeExported
+import org.elixir_lang.utils.ElixirModulesUtil.erlangModuleNameToElixir
 
 object BeamDocsHelper {
-    fun fetchDocs(element: PsiElement) : FetchedDocs? = Beam
+    fun fetchDocs(element: PsiElement): FetchedDocs? = Beam
             .from(element.containingFile.originalFile.virtualFile)
             ?.let { beam ->
-                if (element.firstChild.text == "defmodule"){
-                    val moduleDocumentation = beam.documentation()?.moduleDocs?.englishDocs
-                    moduleDocumentation?.let { FetchedDocs.ModuleDocumentation(element.getModuleName().orEmpty(), it) }
-                } else if (element is Call){
-                    val functionName = element.name.orEmpty()
-                    val arityRange = element.primaryArity()
+                beam.atoms()?.moduleName()?.let { erlangModuleNameToElixir(it) }?.let { module ->
+                    when (element) {
+                        is Module -> beam.documentation()?.moduleDocs?.englishDocs?.let { moduleDoc ->
+                            FetchedDocs.ModuleDocumentation(module, moduleDoc)
+                        }
+                        is MaybeExported -> {
+                            element.exportedName()?.let { name ->
+                                val arity = element.exportedArity()
 
-                    val moduleName = beam.atoms()?.moduleName().orEmpty()
+                                beam.documentation()?.docs?.let { docs ->
+                                    docs.docsForOrSimilar(name, arity)?.let { functionInfo ->
+                                        val signatures = functionInfo.signatures
 
-                    val docs = beam.documentation()?.docs
-                            ?.docsForOrSimilar(functionName, arityRange ?: 0) ?: return null
+                                        val deprecated = docs
+                                                .getFunctionMetadataOrSimilar(name, arity)
+                                                .firstOrNull { it.name == "deprecated" }
+                                                ?.let { it.value.orEmpty() }
 
-                    val signatures = docs.signatures
+                                        val functionDoc = docs
+                                                .getFunctionDocsOrSimilar(name, arity)
+                                                .firstOrNull()
+                                                ?.documentationText
 
-                    val metadata = beam.documentation()?.docs?.getFunctionMetadataOrSimilar(functionName, arityRange ?: 0)
-                    val deprecatedMetadata = metadata?.firstOrNull{it.name == "deprecated"}
-
-                    val deprecatedText: String? = when (deprecatedMetadata){
-                        null -> null
-                        else -> deprecatedMetadata.value.orEmpty()
+                                        if (deprecated != null || functionDoc != null) {
+                                            FetchedDocs.FunctionOrMacroDocumentation(
+                                                    module,
+                                                    deprecated,
+                                                    functionDoc,
+                                                    impls = emptyList(),
+                                                    specs = emptyList(),
+                                                    heads = signatures
+                                            )
+                                        } else {
+                                            null
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else -> TODO()
                     }
-
-                    val functionDocs =
-                            beam.documentation()?.docs?.getFunctionDocsOrSimilar(functionName, arityRange ?: 0)
-
-                    val docsText = functionDocs?.firstOrNull()?.documentationText
-                    if (docsText != null || deprecatedMetadata != null) {
-                        FetchedDocs.FunctionOrMacroDocumentation(moduleName, deprecatedText, docsText.orEmpty(), impls = emptyList(), specs = emptyList(), heads = signatures)
-                    } else {
-                        null
-                    }
-                } else {
-                    null
                 }
             }
 }

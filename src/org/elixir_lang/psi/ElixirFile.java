@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * Created by luke.imhoff on 8/2/14.
  */
-public class ElixirFile extends PsiFileBase implements ModuleOwner {
+public class ElixirFile extends PsiFileBase {
     public ElixirFile(@NotNull FileViewProvider viewProvider) {
         super(viewProvider, ElixirLanguage.INSTANCE);
     }
@@ -56,7 +56,6 @@ public class ElixirFile extends PsiFileBase implements ModuleOwner {
      * @return modulars owned (declared) by this element.
      */
     @NotNull
-    @Override
     public StubBased[] modulars() {
         StubBased[] stubBaseds = PsiTreeUtil.getChildrenOfType(
                 this,
