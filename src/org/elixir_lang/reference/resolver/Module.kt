@@ -41,7 +41,8 @@ object Module : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Modul
         val project = entrance.project
         val projectFileIndex = ProjectRootManager.getInstance(project).fileIndex
         val module = ModuleUtil.findModuleForPsiElement(entrance)
-        val entranceVirtualFile = entrance.containingFile.virtualFile
+        // MUST use `originalFile` to get the PsiFile with a VirtualFile for decompiled elements
+        val entranceVirtualFile = entrance.containingFile.originalFile.virtualFile
 
         val globalSearchScope = if (module != null) {
             val includeTests = entranceVirtualFile?.let { projectFileIndex.isInTestSourceContent(it) } ?: false
@@ -49,14 +50,16 @@ object Module : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Modul
             val moduleWithDependenciesAndLibrariesScope =
                     GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module, includeTests)
 
-            // ... we prefer sources compared to decompiled, so use LibraryScope to get the Library source too.
-            val orderEntries = projectFileIndex.getOrderEntriesForFile(entranceVirtualFile)
-            val libraryScope =
-                    LibraryScopeCache
-                            .getInstance(project)
-                            .getLibraryScope(orderEntries)
+            entranceVirtualFile?.let {
+                // ... we prefer sources compared to decompiled, so use LibraryScope to get the Library source too.
+                val orderEntries = projectFileIndex.getOrderEntriesForFile(entranceVirtualFile)
+                val libraryScope =
+                        LibraryScopeCache
+                                .getInstance(project)
+                                .getLibraryScope(orderEntries)
 
-            moduleWithDependenciesAndLibrariesScope.uniteWith(libraryScope)
+                moduleWithDependenciesAndLibrariesScope.uniteWith(libraryScope)
+            } ?: moduleWithDependenciesAndLibrariesScope
         } else {
             GlobalSearchScope.allScope(project)
         }
