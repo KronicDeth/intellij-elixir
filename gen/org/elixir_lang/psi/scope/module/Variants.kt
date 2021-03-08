@@ -79,7 +79,7 @@ class Variants(private val entrance: PsiElement) : Module() {
         stubIndex.processAllKeys(ModularName.KEY, project) { name ->
             if (!lookupElementByLookupName.contains(name)) {
                 stubIndex.processElements(AllName.KEY, name, project, scope, NamedElement::class.java) { named_element ->
-                    lookupElementByLookupName.put(name, named_element.navigationElement)
+                    lookupElementByLookupName.put(name, named_element)
 
                     // just use the first element
                     false
@@ -168,7 +168,7 @@ class Variants(private val entrance: PsiElement) : Module() {
 
                         if (!lookupElementByLookupName.contains(aliasedNestedName)) {
                             stubIndex.processElements(AllName.KEY, name, project, scope, NamedElement::class.java) { named_element ->
-                                lookupElementByLookupName.put(aliasedNestedName, named_element.navigationElement)
+                                lookupElementByLookupName.put(aliasedNestedName, named_element)
 
                                 // only take the first element
                                 false
