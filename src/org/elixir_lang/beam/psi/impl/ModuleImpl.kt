@@ -112,7 +112,9 @@ class ModuleImpl<T : StubElement<*>?>(private val stub: T) : ModuleElementImpl()
 
     override fun getNode(): ASTNode? = null
 
-    override fun getProject(): Project = mirror.project
+    override fun getProject(): Project {
+        return parent.project
+    }
 
     companion object {
         private val LOGGER = Logger.getInstance(ModuleImpl::class.java)

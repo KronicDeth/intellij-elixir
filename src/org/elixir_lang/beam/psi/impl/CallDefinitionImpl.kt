@@ -1,18 +1,20 @@
 package org.elixir_lang.beam.psi.impl
 
 import com.intellij.lang.ASTNode
-import org.elixir_lang.beam.psi.stubs.CallDefinitionStub
-import com.intellij.psi.StubBasedPsiElement
+import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
+import com.intellij.psi.StubBasedPsiElement
 import com.intellij.psi.impl.source.tree.TreeElement
 import com.intellij.psi.stubs.IStubElementType
 import com.intellij.util.IncorrectOperationException
 import org.elixir_lang.beam.psi.CallDefinition
+import org.elixir_lang.beam.psi.stubs.CallDefinitionStub
 import org.jetbrains.annotations.Contract
 import org.jetbrains.annotations.NonNls
-import java.lang.StringBuilder
 
 class CallDefinitionImpl<T : CallDefinitionStub<*>>(private val stub: T) : ModuleElementImpl(), CallDefinition, StubBasedPsiElement<T> {
+    override fun getProject(): Project = parent.project
+
     /**
      * Returns the array of children for the PSI element.
      * Important: In some implementations children are only composite elements, i.e. not a leaf elements
