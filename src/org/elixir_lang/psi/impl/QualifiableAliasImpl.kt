@@ -7,6 +7,7 @@ import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
 import com.intellij.refactoring.suggested.endOffset
 import org.elixir_lang.Module.concat
+import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.StubBased
@@ -170,7 +171,7 @@ object QualifiableAliasImpl {
     @JvmStatic
     fun fullyQualifiedName(alias: ElixirAlias): String = fullyQualifiedName(alias.parent, alias, listOf(alias.name))
 
-    tailrec fun fullyQualifiedName(currentAncestor: PsiElement?, previousAncestor: PsiElement, nameTail: List<String>): String =
+    private tailrec fun fullyQualifiedName(currentAncestor: PsiElement?, previousAncestor: PsiElement, nameTail: List<String>): String =
         when (currentAncestor) {
             is ElixirAccessExpression, is ElixirMultipleAliases -> fullyQualifiedName(currentAncestor.parent, currentAncestor, nameTail)
             is QualifiedAlias, is QualifiedMultipleAliases -> {
@@ -189,9 +190,32 @@ object QualifiableAliasImpl {
             else -> concat(nameTail)
         }
 
-    tailrec fun fullyQualifiedName(leftElement: PsiElement, rightNames: List<String>): String = when (leftElement) {
+    private tailrec fun fullyQualifiedName(leftElement: PsiElement, rightNames: List<String>): String = when (leftElement) {
         is ElixirAccessExpression -> fullyQualifiedName(leftElement.stripAccessExpression(), rightNames)
         is ElixirAlias -> concat(listOf(leftElement.name) + rightNames)
+        is QualifiedAlias -> {
+            val children = leftElement.children
+            val operatorIndex = org.elixir_lang.psi.operation.Normalized.operatorIndex(children)
+
+            val qualifier = org.elixir_lang.psi.operation.infix.Normalized.leftOperand(children, operatorIndex)
+
+            if (qualifier != null) {
+                val relativeName = org.elixir_lang.psi.operation.infix.Normalized.rightOperand(children, operatorIndex)?.let { relative ->
+                    when (relative) {
+                        is ElixirAlias -> relative.name
+                        else -> {
+                            Logger.error(this.javaClass, "Don't know how to calculate relative name", relative)
+
+                            null
+                        }
+                    }
+                } ?: "?"
+
+                fullyQualifiedName(qualifier, listOf(relativeName) + rightNames)
+            } else {
+                concat(listOf("?") + rightNames)
+            }
+        }
         else -> concat(rightNames)
     }
 
