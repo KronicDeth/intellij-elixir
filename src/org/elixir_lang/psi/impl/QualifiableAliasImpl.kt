@@ -171,6 +171,11 @@ object QualifiableAliasImpl {
     @JvmStatic
     fun fullyQualifiedName(alias: ElixirAlias): String = fullyQualifiedName(alias.parent, alias, listOf(alias.name))
 
+    @Contract(pure = true)
+    @JvmStatic
+    fun fullyQualifiedName(qualifiableAlias: QualifiableAlias): String =
+            fullyQualifiedName(qualifiableAlias, listOf())
+
     private tailrec fun fullyQualifiedName(currentAncestor: PsiElement?, previousAncestor: PsiElement, nameTail: List<String>): String =
         when (currentAncestor) {
             is ElixirAccessExpression, is ElixirMultipleAliases -> fullyQualifiedName(currentAncestor.parent, currentAncestor, nameTail)
@@ -216,54 +221,21 @@ object QualifiableAliasImpl {
                 concat(listOf("?") + rightNames)
             }
         }
-        else -> concat(rightNames)
-    }
-
-    @Contract(pure = true)
-    @JvmStatic
-    fun fullyQualifiedName(qualifiableAlias: QualifiableAlias): String? {
-        var fullyQualifiedName: String? = null
-        val children = qualifiableAlias.children
-        val operatorIndex = Normalized.operatorIndex(children)
-        val qualifier = org.elixir_lang.psi.operation.infix.Normalized.leftOperand(children, operatorIndex)
-
-        var qualifierName: String? = null
-
-        if (qualifier is Call) {
-            val qualifierCall = qualifier as Call?
-
-            if (qualifierCall!!.isCalling(KERNEL, __MODULE__, 0)) {
-                val enclosingCall = enclosingModularMacroCall(qualifierCall)
+        is Call -> {
+            val qualifierName = if (leftElement.isCalling(KERNEL, __MODULE__, 0)) {
+                val enclosingCall = enclosingModularMacroCall(leftElement)
 
                 if (enclosingCall != null && enclosingCall is StubBased<*>) {
-                    qualifierName = enclosingCall.canonicalName()
+                    enclosingCall.canonicalName()
+                } else {
+                    null
                 }
-            }
-        } else if (qualifier is QualifiableAlias) {
-            val qualifiableQualifier = qualifier as QualifiableAlias?
+            } else {
+                null
+            } ?: "?"
 
-            qualifierName = qualifiableQualifier!!.fullyQualifiedName()
-        } else if (qualifier is ElixirAccessExpression) {
-            val qualifierChild = qualifier.stripAccessExpression()
-
-            if (qualifierChild is ElixirAlias) {
-                qualifierName = qualifierChild.name
-            }
+            concat(listOf(qualifierName) + rightNames)
         }
-
-        if (qualifierName != null) {
-            val rightOperand = org.elixir_lang.psi.operation.infix.Normalized.rightOperand(
-                    children,
-                    operatorIndex
-            )
-
-            if (rightOperand is ElixirAlias) {
-                val relativeAlias = rightOperand as ElixirAlias?
-
-                fullyQualifiedName = qualifierName + "." + relativeAlias!!.name
-            }
-        }
-
-        return fullyQualifiedName
+        else -> concat(rightNames)
     }
 }
