@@ -466,8 +466,8 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitLiteralSigilLine(@NotNull ElixirLiteralSigilLine o) {
-    visitLiteralSigilLine(o);
-    // visitSigilFragmented(o);
+    visitLiteralSigilLineBody(o.getLiteralSigilLineBody());
+    visitSigilModifiers(o.getSigilModifiers());
   }
 
   public void visitLiteralSigilLineBody(@NotNull ElixirLiteralSigilLineBody o) {
