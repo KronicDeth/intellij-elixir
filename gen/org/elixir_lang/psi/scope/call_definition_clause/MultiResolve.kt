@@ -1,10 +1,12 @@
 package org.elixir_lang.psi.scope.call_definition_clause
 
+import com.intellij.openapi.fileTypes.FileTypeManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementResolveResult
 import com.intellij.psi.ResolveState
 import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.psi.CallDefinitionClause.nameArityRange
+import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.Named
 
@@ -61,15 +63,22 @@ private constructor(private val name: String,
                            entrance: PsiElement,
                            resolveState: ResolveState = ResolveState.initial()): Array<PsiElementResolveResult> {
             val multiResolve = MultiResolve(name, resolvedFinalArity, incompleteCode)
+            val maxScope = maxScope(entrance)
 
             PsiTreeUtil.treeWalkUp(
                     multiResolve,
                     entrance,
-                    entrance.containingFile,
+                    maxScope,
                     resolveState.put(ENTRANCE, entrance).putInitialVisitedElement(entrance)
             )
 
             return multiResolve.resolveResults()
+        }
+
+        fun maxScope(entrance: PsiElement): PsiElement {
+            val containingFile = entrance.containingFile
+
+            return (containingFile as? ElixirFile)?.viewFile() ?: containingFile
         }
     }
 }

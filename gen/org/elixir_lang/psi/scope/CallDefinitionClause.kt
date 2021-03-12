@@ -5,6 +5,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import com.intellij.psi.scope.PsiScopeProcessor
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.util.isAncestor
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.psi.Import
@@ -79,10 +80,7 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
                 }
 
                 true
-            } else if (Module.`is`(element) &&
-                    /* Only allow scanning back down in outer nested modules for siblings.  Prevents scanning in sibling
-                       nested modules in https://github.com/KronicDeth/intellij-elixir/issues/1270 */
-                    state.get(ENTRANCE)?.let { entrance -> PsiTreeUtil.isAncestor(element, entrance, false) } == true) {
+            } else if (Module.`is`(element) && moduleContainsEntrance(element, state)) {
                 val childCalls = element.macroChildCalls()
 
                 for (childCall in childCalls) {
@@ -106,6 +104,20 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
             } else {
                 true
             }
+
+
+    private fun moduleContainsEntrance(call: Call, state: ResolveState): Boolean = state.get(ENTRANCE)?.let { entrance ->
+        val callFile = call.containingFile
+
+        if (callFile == entrance.containingFile) {
+            /* Only allow scanning back down in outer nested modules for siblings.  Prevents scanning in sibling
+               nested modules in https://github.com/KronicDeth/intellij-elixir/issues/1270 */
+            call.isAncestor(entrance, false)
+        } else {
+            // done by injection or viewFile
+            true
+        }
+    } ?: false
 
     private fun implicitImports(element: PsiElement, state: ResolveState): Boolean {
         val project = element.project

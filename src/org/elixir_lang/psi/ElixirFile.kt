@@ -27,6 +27,22 @@ class ElixirFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvider, Eli
                                      place: PsiElement): Boolean =
             ProcessDeclarationsImpl.processDeclarations(this, processor, state, lastParent!!, place)
 
+    override fun getContext(): PsiElement? = viewFile()?.modulars()?.singleOrNull()
+
+    /**
+     * If this file is a LEEx template (`*.html.leex`), then this is the file that should contain the view module.
+     */
+    fun viewFile(): ElixirFile? = if (virtualFile.fileType == org.elixir_lang.leex.file.Type.INSTANCE) {
+        containingFile.parent?.let { directory ->
+            val nameWithoutExtension = containingFile.name.removeSuffix(".html.leex")
+            val liveName = "${nameWithoutExtension}.ex"
+
+            directory.findFile(liveName) as? ElixirFile
+        }
+    } else {
+        null
+    }
+
     /**
      * @return modulars owned (declared) by this element.
      */
