@@ -118,7 +118,7 @@ public class Model extends TextEditorBasedStructureViewModel implements Structur
 
     @Override
     public boolean isAlwaysLeaf(StructureViewTreeElement element) {
-        return element instanceof ElixirFile;
+        return false;
     }
 
     @Override
