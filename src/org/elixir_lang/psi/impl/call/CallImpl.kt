@@ -37,7 +37,7 @@ import org.elixir_lang.psi.impl.macroChildCallList as psiElementToMacroChildCall
 fun Call.computeReference(): PsiReference? =
     /* if the call is just the identifier for a module attribute reference, then don't return a Callable reference,
            and instead let {@link #getReference(AtNonNumericOperation) handle it */
-    if (!(this is UnqualifiedNoArgumentsCall<*> && parent is AtNonNumericOperation) &&
+    if (!this.isModuleAttributeNameElement() &&
             // if a bitstring segment option then the option is a pseudo-function
             !isBitStreamSegmentOption(this) && !this.isSlashInCaptureNameSlashArity()) {
         val parent = parent

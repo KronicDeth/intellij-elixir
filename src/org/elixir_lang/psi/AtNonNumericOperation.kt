@@ -1,16 +1,20 @@
-package org.elixir_lang.psi;
+package org.elixir_lang.psi
 
-import com.intellij.psi.PsiReference;
-import org.elixir_lang.psi.operation.Prefix;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.Nullable;
+import com.intellij.psi.PsiReference
+import org.elixir_lang.psi.call.Call
+import org.elixir_lang.psi.operation.Prefix
+import org.jetbrains.annotations.Contract
 
 /**
- * {@code atPrefixOperator !numeric ...}
+ * `atPrefixOperator !numeric ...`
  */
-public interface AtNonNumericOperation extends ModuleAttributeNameable, Prefix {
-    @Contract(pure=true)
-    @Nullable
-    @Override
-    PsiReference getReference();
+interface AtNonNumericOperation : ModuleAttributeNameable, Prefix {
+    @Contract(pure = true)
+    override fun getReference(): PsiReference?
 }
+
+fun Call.isModuleAttributeNameElement(): Boolean =
+        this is UnqualifiedNoArgumentsCall<*> && this.isModuleAttributeNameElement()
+
+fun UnqualifiedNoArgumentsCall<*>.isModuleAttributeNameElement(): Boolean =
+        parent is AtNonNumericOperation

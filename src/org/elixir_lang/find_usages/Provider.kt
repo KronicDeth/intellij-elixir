@@ -13,11 +13,8 @@ import com.intellij.usageView.UsageViewTypeLocation
 import org.elixir_lang.ElixirLexer
 import org.elixir_lang.ElixirParserDefinition
 import org.elixir_lang.beam.psi.impl.ModuleImpl
-import org.elixir_lang.psi.AtNonNumericOperation
-import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
+import org.elixir_lang.psi.*
 import org.elixir_lang.psi.ElixirTypes.*
-import org.elixir_lang.psi.MaybeModuleName
-import org.elixir_lang.psi.QualifiableAlias
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.isOutermostQualifiableAlias
 import org.elixir_lang.reference.Callable
@@ -75,7 +72,10 @@ class Provider : com.intellij.lang.findUsages.FindUsagesProvider {
                 is Call ->
                     /* On a definer, the position of the caret is important to determine whether the thing being defined
                        or the definer macro's usage should be found */
-                    !Callable.isDefiner(psiElement)
+                    !(Callable.isDefiner(psiElement)  ||
+                            // Don't find usage for the `name` in `@name`.  `AtNonNumericOperation` above will instead
+                            // be used for all of `@name.
+                            psiElement.isModuleAttributeNameElement())
                 is QualifiableAlias -> psiElement.isOutermostQualifiableAlias()
                 else -> false
             }
