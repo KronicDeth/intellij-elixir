@@ -2,6 +2,7 @@ package org.elixir_lang.inspection
 
 import com.intellij.codeInspection.*
 import com.intellij.psi.*
+import org.elixir_lang.psi.AtNonNumericOperation
 import org.elixir_lang.psi.ElixirAlias
 import org.elixir_lang.psi.ElixirVisitor
 import org.elixir_lang.psi.call.Call
@@ -18,6 +19,10 @@ class References : LocalInspectionTool() {
 
             override fun visitAlias(alias: ElixirAlias) {
                 alias.reference?.let { reference -> registerProblem(alias, reference) }
+            }
+
+            override fun visitAtNonNumericOperation(atNonNumericOperation: AtNonNumericOperation) {
+                atNonNumericOperation.reference?.let { reference -> registerProblem(atNonNumericOperation, reference) }
             }
 
             private fun visitCall(call: Call) {
