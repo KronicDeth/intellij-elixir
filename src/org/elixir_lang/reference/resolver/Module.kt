@@ -5,6 +5,7 @@ import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.roots.impl.LibraryScopeCache
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementResolveResult
+import com.intellij.psi.ResolveResult
 import com.intellij.psi.impl.source.resolve.ResolveCache
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
@@ -18,13 +19,13 @@ object Module : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Modul
     override fun resolve(
             module: org.elixir_lang.reference.Module,
             incompleteCode: Boolean
-    ): Array<PsiElementResolveResult> =
+    ): Array<ResolveResult> =
             module.element.let { element ->
                 element.fullyQualifiedName().let { name ->
                     val sameFileResolveResults =
                             MultiResolve.resolveResults(name, incompleteCode, element)
 
-                    if (sameFileResolveResults.any(PsiElementResolveResult::isValidResult)) {
+                    if (sameFileResolveResults.any(ResolveResult::isValidResult)) {
                         sameFileResolveResults
                     } else {
                         multiResolveProject(
@@ -36,7 +37,7 @@ object Module : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Modul
             }
 
     private fun multiResolveProject(entrance: PsiElement,
-                                    name: String): Array<PsiElementResolveResult> {
+                                    name: String): Array<ResolveResult> {
         val resolveResultList = mutableListOf<PsiElementResolveResult>()
         val project = entrance.project
         val projectFileIndex = ProjectRootManager.getInstance(project).fileIndex

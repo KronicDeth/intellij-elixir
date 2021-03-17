@@ -3,6 +3,7 @@ package org.elixir_lang.psi.scope.call_definition_clause
 import com.intellij.openapi.fileTypes.FileTypeManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementResolveResult
+import com.intellij.psi.ResolveResult
 import com.intellij.psi.ResolveState
 import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.psi.CallDefinitionClause.nameArityRange
@@ -34,21 +35,21 @@ private constructor(private val name: String,
         } ?: true
 
     override fun keepProcessing(): Boolean = resolveResultOrderedSet.keepProcessing(incompleteCode)
-    fun resolveResults(): Array<PsiElementResolveResult> = resolveResultOrderedSet.toTypedArray()
+    fun resolveResults(): Array<ResolveResult> = resolveResultOrderedSet.toTypedArray()
 
     private val resolveResultOrderedSet = ResolveResultOrderedSet()
 
     private fun addToResolveResults(call: Call, validResult: Boolean, state: ResolveState): Boolean =
             (call as? Named)?.nameIdentifier?.let { nameIdentifier ->
                 if (PsiTreeUtil.isAncestor(state.get(ENTRANCE), nameIdentifier, false)) {
-                    resolveResultOrderedSet.add(call, validResult)
+                    resolveResultOrderedSet.add(call, name, validResult)
 
                     false
                 } else {
-                    resolveResultOrderedSet.add(call, validResult)
+                    resolveResultOrderedSet.add(call, name, validResult)
 
                     state.get<Call>(IMPORT_CALL)?.let { importCall ->
-                        resolveResultOrderedSet.add(importCall, validResult)
+                        resolveResultOrderedSet.add(importCall, importCall.text, validResult)
                     }
 
                     null
@@ -62,7 +63,7 @@ private constructor(private val name: String,
                            resolvedFinalArity: Int,
                            incompleteCode: Boolean,
                            entrance: PsiElement,
-                           resolveState: ResolveState = ResolveState.initial()): Array<PsiElementResolveResult> {
+                           resolveState: ResolveState = ResolveState.initial()): Array<ResolveResult> {
             val multiResolve = MultiResolve(name, resolvedFinalArity, incompleteCode)
             val maxScope = maxScope(entrance)
 

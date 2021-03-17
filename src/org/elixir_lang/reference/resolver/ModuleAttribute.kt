@@ -119,7 +119,7 @@ private fun ResolveResultOrderedSet.addIfResolved(
     if (moduleAttributeName.startsWith(resolvingName)) {
         val validResult = moduleAttributeName == resolvingName
 
-        this.add(element, validResult)
+        this.add(element, moduleAttributeName, validResult)
     }
 }
 

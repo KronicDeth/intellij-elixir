@@ -29,10 +29,12 @@ class For(private val validResult: Boolean) : PsiScopeProcessor {
             if (org.elixir_lang.structure_view.element.modular.Implementation.`is`(call)) {
                 val forNameElement = org.elixir_lang.structure_view.element.modular.Implementation.forNameElement(call)
                 val element: PsiElement
+                val name: String
                 val validResult: Boolean
 
                 if (forNameElement != null) {
                     element = forNameElement
+                    name = forNameElement.text
                     validResult = this.validResult
                 } else {
                     val enclosingModularMacroCall = enclosingModularMacroCall(call)
@@ -40,18 +42,21 @@ class For(private val validResult: Boolean) : PsiScopeProcessor {
                     if (enclosingModularMacroCall != null) {
                         if (enclosingModularMacroCall.isCalling(KERNEL, DEFMODULE)) {
                             element = Module.nameIdentifier(enclosingModularMacroCall)!!
+                            name = element.text
                             validResult = this.validResult
                         } else {
                             element = enclosingModularMacroCall
+                            name = "modular"
                             validResult = false
                         }
                     } else {
                         element = call
+                        name = "impl"
                         validResult = false
                     }
                 }
 
-                resolveResultOrderedSet.add(element, validResult)
+                resolveResultOrderedSet.add(element, name, validResult)
 
                 false
             } else {

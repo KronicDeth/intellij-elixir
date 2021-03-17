@@ -32,7 +32,7 @@ class ElixirFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvider, Eli
     /**
      * If this file is a LEEx template (`*.html.leex`), then this is the file that should contain the view module.
      */
-    fun viewFile(): ElixirFile? = if (virtualFile.fileType == org.elixir_lang.leex.file.Type.INSTANCE) {
+    fun viewFile(): ElixirFile? = if (virtualFile?.fileType == org.elixir_lang.leex.file.Type.INSTANCE) {
         containingFile.parent?.let { directory ->
             val nameWithoutExtension = containingFile.name.removeSuffix(".html.leex")
             val liveName = "${nameWithoutExtension}.ex"

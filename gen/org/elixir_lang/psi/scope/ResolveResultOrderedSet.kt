@@ -2,72 +2,85 @@ package org.elixir_lang.psi.scope
 
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementResolveResult
+import com.intellij.psi.ResolveResult
 import org.elixir_lang.navigation.isDecompiled
 
-class ResolveResultOrderedSet : Collection<PsiElementResolveResult> {
-   override val size: Int
-      get() = resolvedResultList.size
+class ResolveResultOrderedSet {
+   fun add(element: PsiElement, name: String, validResult: Boolean) {
+      if (element !in psiElementSet) {
+         val existingDecompiledPsiElementResolveResultList = decompiledPsiElementResolveResultListByName[name]
+         val decompiled = element.isDecompiled()
 
-   fun add(resolveResult: PsiElementResolveResult) {
-      resolveResult.element.let { element ->
-         if (element !in resolvedSet) {
-            addConfirmedUnique(element, resolveResult)
-         }
-      }
-   }
+         if (existingDecompiledPsiElementResolveResultList != null) {
+            val existingDecompiled = existingDecompiledPsiElementResolveResultList.decompiled
 
-   fun add(element: PsiElement, validResult: Boolean) {
-      if (element !in resolvedSet) {
-         addConfirmedUnique(element, PsiElementResolveResult(element, validResult))
-      }
-   }
+            if (existingDecompiled) {
+               val psiElementResolveResult = PsiElementResolveResult(element, validResult)
 
-   fun addAll(resolveResultOrderedSet: ResolveResultOrderedSet) {
-      addAll(resolveResultOrderedSet.resolvedResultList)
-   }
+               // add more decompiled
+               if (decompiled) {
+                  existingDecompiledPsiElementResolveResultList.psiElementResolveResultList.add(psiElementResolveResult)
+                  psiElementSet.add(element)
 
-   fun addAll(resolveResultList: List<PsiElementResolveResult>) {
-      for (resolveResult in resolveResultList) {
-         add(resolveResult)
-      }
-   }
+               }
+               // favor a source of the same name
+               else {
+                  val psiElemetResolveResultList = mutableListOf(psiElementResolveResult)
+                  val decompiledPsiElemetResolveResultList = DecompiledPsiElemetResolveResultList(decompiled, psiElemetResolveResultList)
+                  decompiledPsiElementResolveResultListByName[name] = decompiledPsiElemetResolveResultList
+                  psiElementSet.add(element)
 
-   override fun contains(element: PsiElementResolveResult): Boolean = resolvedSet.contains(element.element)
-   override fun containsAll(elements: Collection<PsiElementResolveResult>): Boolean = all { contains(it) }
-   override fun isEmpty(): Boolean = resolvedResultList.isEmpty()
-   override fun iterator(): Iterator<PsiElementResolveResult> = resolvedResultList.iterator()
-   fun keepProcessing(incompleteCode: Boolean): Boolean = incompleteCode || !hasValidResult()
-   fun toList(): List<PsiElementResolveResult> = resolvedResultList
+                  existingDecompiledPsiElementResolveResultList.psiElementResolveResultList.forEach { existingPsiElementResolveResult ->
+                     psiElementSet.remove(existingPsiElementResolveResult.element)
+                  }
+               }
+            } else {
+               // ignore decompiled since source is favored
 
-   private val resolvedSet = mutableSetOf<PsiElement>()
-   private val resolvedResultList = mutableListOf<PsiElementResolveResult>()
-
-   private fun addConfirmedUnique(element: PsiElement, resolveResult: PsiElementResolveResult) {
-      if (resolvedResultList.isDecompiled()) {
-         if (element.isDecompiled()) {
-            // collect all decompiled
-            resolvedResultList.add(resolveResult)
-            resolvedSet.add(element)
+               // add more source
+               if (!decompiled) {
+                  val psiElementResolveResult = PsiElementResolveResult(element, validResult)
+                  existingDecompiledPsiElementResolveResultList.psiElementResolveResultList.add(psiElementResolveResult)
+                  psiElementSet.add(element)
+               }
+            }
          } else {
-            // prefer source over decompiled
-            resolvedResultList.clear()
-            resolvedSet.add(element)
-            resolvedResultList.add(resolveResult)
-            resolvedSet.add(element)
-         }
-      } else {
-         // ignore decompiled when there is source
-         if (!element.isDecompiled()) {
-            // collect all source
-            resolvedResultList.add(resolveResult)
-            resolvedSet.add(element)
+            psiElementSet.add(element)
+            nameOrder.add(name)
+
+            val psiElementResolveResult = PsiElementResolveResult(element, validResult)
+            val psiElemetResolveResultList = mutableListOf(psiElementResolveResult)
+            val decompiledPsiElemetResolveResultList = DecompiledPsiElemetResolveResultList(decompiled, psiElemetResolveResultList)
+            decompiledPsiElementResolveResultListByName[name] = decompiledPsiElemetResolveResultList
          }
       }
-
    }
 
-   private fun hasValidResult() = any { it.isValidResult }
+   fun addAll(other: ResolveResultOrderedSet) {
+      other.nameOrder.forEach { name ->
+         other.decompiledPsiElementResolveResultListByName[name]!!.psiElementResolveResultList.forEach { psiElementResolveResult ->
+            add(psiElementResolveResult.element, name, psiElementResolveResult.isValidResult)
+         }
+      }
+   }
+
+   fun keepProcessing(incompleteCode: Boolean): Boolean = incompleteCode || !hasValidResult()
+
+   fun toTypedArray(): Array<ResolveResult> =
+           nameOrder
+                   .flatMap { name ->
+                      decompiledPsiElementResolveResultListByName[name]!!.psiElementResolveResultList
+                   }
+                   .toTypedArray()
+
+   private val psiElementSet = mutableSetOf<PsiElement>()
+   private val decompiledPsiElementResolveResultListByName = mutableMapOf<String, DecompiledPsiElemetResolveResultList>()
+   private val nameOrder = mutableListOf<String>()
+
+   private fun hasValidResult() =
+           decompiledPsiElementResolveResultListByName.values.any {
+              it.psiElementResolveResultList.any { it.isValidResult }
+           }
 }
 
-private operator fun PsiElementResolveResult.component1(): PsiElement = this.element
-private operator fun PsiElementResolveResult.component2(): Boolean = this.isValidResult
+private data class DecompiledPsiElemetResolveResultList(val decompiled: Boolean, val psiElementResolveResultList: MutableList<PsiElementResolveResult>)
