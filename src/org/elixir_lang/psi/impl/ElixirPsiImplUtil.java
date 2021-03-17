@@ -1098,6 +1098,12 @@ public class ElixirPsiImplUtil {
     }
 
     @Nullable
+    public static PsiReference getReference(@NotNull DotCall dotCall) {
+        // DotCalls do not reference something, instead the expression before the `.` would have the reference.
+        return null;
+    }
+
+    @Nullable
     public static PsiReference getReference(@NotNull Call call) {
         return CallImplKt.getReference(call);
     }

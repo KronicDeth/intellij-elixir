@@ -12,8 +12,8 @@ import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.Named
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.scope.CallDefinitionClause
-import org.elixir_lang.psi.scope.putInitialVisitedElement
-import org.elixir_lang.psi.scope.putVisitedElement
+import org.elixir_lang.psi.putInitialVisitedElement
+import org.elixir_lang.psi.putVisitedElement
 import java.util.*
 
 class Variants : CallDefinitionClause() {

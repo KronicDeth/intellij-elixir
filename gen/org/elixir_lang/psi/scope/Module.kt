@@ -4,13 +4,17 @@ import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.ResolveState
+import com.intellij.psi.impl.source.tree.CompositeElement
 import com.intellij.psi.scope.PsiScopeProcessor
+import com.intellij.psi.util.siblings
 import org.elixir_lang.psi.*
+import org.elixir_lang.psi.Use.modular
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.Named
 
 import org.elixir_lang.psi.call.name.Function.ALIAS
 import org.elixir_lang.psi.call.name.Module.KERNEL
+import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.call.keywordArgument
 import org.elixir_lang.psi.impl.stripAccessExpression
@@ -32,7 +36,8 @@ abstract class Module : PsiScopeProcessor {
 
     protected fun execute(match: Named, state: ResolveState): Boolean =
             when {
-                isModular(match) -> executeOnMaybeAliasedName(match, match.name, state)
+                isModular(match) -> executeOnModular(match, state)
+                Use.`is`(match) -> Use.treeWalkUp(match, state, ::execute)
                 match.isCalling(KERNEL, ALIAS) -> executeOnAliasCall(match, state)
                 else -> true
             }
@@ -164,6 +169,44 @@ abstract class Module : PsiScopeProcessor {
                 executeOnAliasedName(named, aliasedName, state)
             } else {
                 true
+            }
+
+
+    private fun executeOnModular(match: Named, state: ResolveState): Boolean =
+            if (state.get(ENTRANCE).containingFile.context == match) {
+                executeOnViewModular(match, state)
+            } else {
+                executeOnMaybeAliasedName(match, match.name, state)
+            }
+
+    private fun executeOnViewModular(match: Named, state: ResolveState): Boolean =
+        match
+                .doBlock
+                ?.stab
+                ?.stabBody
+                ?.let { executeOnViewModularExpression(it, state) }
+                ?: true
+
+    private fun executeOnViewModularExpression(expression: PsiElement, state: ResolveState): Boolean =
+            when (expression) {
+                is ElixirStabBody -> expression
+                        .lastChild
+                        .siblings(forward = false, withSelf = true)
+                        .filter { it.node is CompositeElement }
+                        .let { childSequence ->
+                            var keepProcessing = true
+
+                            for (child in childSequence) {
+                                keepProcessing = executeOnViewModularExpression(child, state)
+
+                                if (!keepProcessing) {
+                                    break
+                                }
+                            }
+
+                            keepProcessing
+                        }
+                else -> execute(expression, state)
             }
 
     companion object {

@@ -10,13 +10,16 @@ import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.Module.concat
 import org.elixir_lang.Module.split
+import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.psi.NamedElement
 import org.elixir_lang.psi.call.Named
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.stripAccessExpression
+import org.elixir_lang.psi.putInitialVisitedElement
 import org.elixir_lang.psi.scope.Module
 import org.elixir_lang.psi.scope.ResolveResultOrderedSet
+import org.elixir_lang.psi.scope.maxScope
 import org.elixir_lang.psi.stub.index.AllName
 import org.elixir_lang.reference.module.UnaliasedName
 import java.util.*
@@ -126,12 +129,13 @@ class MultiResolve internal constructor(private val name: String, private val in
                                    entrance: PsiElement,
                                    state: ResolveState): Array<PsiElementResolveResult> {
             val multiResolve = MultiResolve(name, incompleteCode)
+            val maxScope = maxScope(entrance)
 
             PsiTreeUtil.treeWalkUp(
                     multiResolve,
                     entrance,
-                    entrance.containingFile,
-                    state.put(ENTRANCE, entrance)
+                    maxScope,
+                    state.put(ENTRANCE, entrance).putInitialVisitedElement(entrance)
             )
 
             return multiResolve.resolveResults()

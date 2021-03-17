@@ -1,5 +1,6 @@
 package org.elixir_lang.psi
 
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.ResolveState
@@ -9,7 +10,7 @@ import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.call.finalArguments
 
 object Unquote {
-    fun callDefinitionClauseCallWhile(unquoteCall: Call, resolveState: ResolveState, keepProcessing: (Call, ResolveState) -> Boolean): Boolean =
+    fun treeWalkUp(unquoteCall: Call, resolveState: ResolveState, keepProcessing: (PsiElement, ResolveState) -> Boolean): Boolean =
             unquoteCall
                     .finalArguments()
                     ?.singleOrNull()
@@ -27,7 +28,7 @@ object Unquote {
                                     var accumulatorKeepProcessing = true
 
                                     for (unquotedFunctionDefinition in unquotedFunctionDefinitionList) {
-                                        accumulatorKeepProcessing = Using.callDefinitionClauseCallWhile(unquotedFunctionDefinition, null, resolveState, keepProcessing)
+                                        accumulatorKeepProcessing = Using.treeWalkUp(unquotedFunctionDefinition, null, resolveState, keepProcessing)
 
                                         if (!accumulatorKeepProcessing) {
                                             break

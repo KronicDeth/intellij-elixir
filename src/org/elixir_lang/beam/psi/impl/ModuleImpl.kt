@@ -3,7 +3,7 @@ package org.elixir_lang.beam.psi.impl
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
-import org.elixir_lang.psi.scope.putInitialVisitedElement
+import org.elixir_lang.psi.putInitialVisitedElement
 import org.elixir_lang.psi.Modular.callDefinitionClauseCallWhile
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.StubBasedPsiElement

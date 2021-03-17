@@ -11,8 +11,9 @@ import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.Named
 
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
+import org.elixir_lang.psi.putInitialVisitedElement
 import org.elixir_lang.psi.scope.ResolveResultOrderedSet
-import org.elixir_lang.psi.scope.putInitialVisitedElement
+import org.elixir_lang.psi.scope.maxScope
 
 class MultiResolve
 private constructor(private val name: String,
@@ -75,10 +76,5 @@ private constructor(private val name: String,
             return multiResolve.resolveResults()
         }
 
-        fun maxScope(entrance: PsiElement): PsiElement {
-            val containingFile = entrance.containingFile
-
-            return (containingFile as? ElixirFile)?.viewFile() ?: containingFile
-        }
     }
 }

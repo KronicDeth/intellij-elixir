@@ -7,10 +7,7 @@ import com.intellij.psi.scope.PsiScopeProcessor
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.isAncestor
 import org.elixir_lang.errorreport.Logger
-import org.elixir_lang.psi.ElixirFile
-import org.elixir_lang.psi.Import
-import org.elixir_lang.psi.Modular
-import org.elixir_lang.psi.Use
+import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.call.name.Module.KERNEL_SPECIAL_FORMS
@@ -96,9 +93,7 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
             } else if (Use.`is`(element)) {
                 val useState = state.put(USE_CALL, element).putVisitedElement(element)
 
-                Use.callDefinitionClauseCallWhile(element, useState) { callDefinitionClause, accResolveState ->
-                    executeOnCallDefinitionClause(callDefinitionClause, accResolveState)
-                }
+                Use.treeWalkUp(element, useState, ::execute)
 
                 true
             } else {
@@ -178,23 +173,4 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
     }
 }
 
-private val VISITED_ELEMENT_SET = Key<Set<PsiElement>>("VISITED_ELEMENTS")
-
-fun ResolveState.hasBeenVisited(element: PsiElement): Boolean {
-    return this.get(VISITED_ELEMENT_SET).contains(element)
-}
-
-fun ResolveState.putInitialVisitedElement(visitedElement: PsiElement): ResolveState {
-    assert(this.get(VISITED_ELEMENT_SET) == null) {
-        "VISITED_ELEMENT_SET already populated"
-    }
-
-    return this.put(VISITED_ELEMENT_SET, setOf(visitedElement))
-}
-
-fun ResolveState.putVisitedElement(visitedElement: PsiElement): ResolveState {
-    val visitedElementSet = this.get(VISITED_ELEMENT_SET)
-
-    return this.put(VISITED_ELEMENT_SET, visitedElementSet + setOf(visitedElement))
-}
 
