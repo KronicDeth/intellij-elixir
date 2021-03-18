@@ -1,26 +1,34 @@
 package org.elixir_lang.leex.reference.resolver
 
+import com.intellij.openapi.roots.ProjectRootManager
+import com.intellij.openapi.roots.impl.LibraryScopeCache
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementResolveResult
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.impl.source.resolve.ResolveCache
 import com.intellij.psi.impl.source.tree.CompositeElement
+import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.util.siblings
 import org.elixir_lang.leex.reference.Assign
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.Modular.callDefinitionClauseCallFoldWhile
 import org.elixir_lang.psi.call.Call
+import org.elixir_lang.psi.call.StubBased
 import org.elixir_lang.psi.call.arguments.None
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.operation.Arrow
 import org.elixir_lang.psi.operation.Match
+import org.elixir_lang.psi.stub.index.AllName
 
 object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.Assign> {
     override fun resolve(assign: Assign, incompleteCode: Boolean): Array<ResolveResult> =
         assign.element.containingFile.context
                 ?.let { it as? Call }
-                ?.let { viewModule -> resolveInViewModule(assign, incompleteCode, viewModule) }
+                ?.let { viewModule ->
+                    resolveInViewModule(assign, incompleteCode, viewModule) + resolveInPhoenixLiveView(assign, incompleteCode)
+                }
                 .orEmpty()
                 .toTypedArray()
 
@@ -136,4 +144,41 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
                     TODO()
                 }
             }
+
+    private const val LIVE_ACTION = "live_action"
+
+    private fun resolveInPhoenixLiveView(assign: Assign, incompleteCode: Boolean): List<ResolveResult> {
+        val assignName = assign.name
+
+        return if (LIVE_ACTION.startsWith(assignName)) {
+            val element = assign.element
+            val project = element.project
+
+            // MUST use `originalFile` to get the PsiFile with a VirtualFile for decompiled elements
+            val globalSearchScope = element.containingFile.originalFile.virtualFile?.let { elementVirtualFile ->
+                val orderEntries =
+                        ProjectRootManager
+                                .getInstance(project)
+                                .fileIndex
+                                .getOrderEntriesForFile(elementVirtualFile)
+
+                LibraryScopeCache.getInstance(project).getLibraryScope(orderEntries)
+            } ?: GlobalSearchScope.allScope(project)
+
+            val resolveResultList = mutableListOf<ResolveResult>()
+
+            StubIndex.getInstance().processElements(AllName.KEY, "assign_action", project, globalSearchScope, NamedElement::class.java) { namedElement ->
+                if (namedElement is StubBased<*>) {
+                    val acc = resolveInCallDefinitionClause(assign, incompleteCode, namedElement, emptyList())
+                    resolveResultList.addAll(acc)
+                }
+
+                true
+            }
+
+            resolveResultList
+        } else {
+            emptyList()
+        }
+    }
 }
