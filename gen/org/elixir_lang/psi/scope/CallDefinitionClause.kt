@@ -28,7 +28,7 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
     override fun execute(element: PsiElement, state: ResolveState): Boolean =
             when (element) {
                 is Call -> execute(element, state)
-                is ElixirFile -> implicitImports(element, state)
+                is ElixirFile -> execute(element, state)
                 else -> true
             }
 
@@ -97,6 +97,15 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
 
                 true
             } else {
+                true
+            }
+
+    private fun execute(element: ElixirFile, state: ResolveState): Boolean =
+            if (element.viewFile() == null) {
+                implicitImports(element, state)
+            }
+            // if there is a view file then it will have implicit imports, not this template
+            else {
                 true
             }
 
