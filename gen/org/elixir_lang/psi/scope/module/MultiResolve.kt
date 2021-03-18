@@ -88,6 +88,15 @@ class MultiResolve internal constructor(private val name: String, private val in
         return resolveResultOrderedSet.keepProcessing(incompleteCode)
     }
 
+    override fun executeOnModularName(modular: Named, modularName: String, state: ResolveState): Boolean {
+        if (modularName.startsWith(name)) {
+            val validResult = modularName == name
+            resolveResultOrderedSet.add(modular, modularName, validResult)
+        }
+
+        return resolveResultOrderedSet.keepProcessing(incompleteCode)
+    }
+
     fun resolveResults(): Array<ResolveResult> = resolveResultOrderedSet.toTypedArray()
 
     private val resolveResultOrderedSet = ResolveResultOrderedSet()

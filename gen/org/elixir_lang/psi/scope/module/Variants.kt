@@ -44,6 +44,9 @@ class Variants(private val entrance: PsiElement) : Module() {
         return true
     }
 
+    override fun executeOnModularName(modular: Named, modularName: String, state: ResolveState): Boolean =
+        executeOnAliasedName(modular, modularName, state)
+
     private var multipleAliases: ElixirMultipleAliases? = null
     private val lookupElementByLookupName: LookupElementByLookupName = LookupElementByLookupName()
 

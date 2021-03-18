@@ -26,13 +26,21 @@ abstract class Module : PsiScopeProcessor {
 
     /**
      * Decides whether `match` matches the criteria being searched for.  All other [.execute] methods
-     * eventually end here.
+     * eventually end here or [.executeOnModularName]
      *
      * @return `true` to keep processing; `false` to stop processing.
      */
     protected abstract fun executeOnAliasedName(match: PsiNamedElement,
                                                 aliasedName: String,
                                                 state: ResolveState): Boolean
+
+    /**
+     * Decides whether `match` matches the criteria being searched for.  All other [.execute] methods
+     * eventually end here or [.executeOnAliasedName]
+     *
+     * @return `true` to keep processing; `false` to stop processing.
+     */
+    protected abstract fun executeOnModularName(modular: Named, modularName: String, state: ResolveState): Boolean
 
     protected fun execute(match: Named, state: ResolveState): Boolean =
             when {
@@ -176,7 +184,9 @@ abstract class Module : PsiScopeProcessor {
             if (state.get(ENTRANCE).containingFile.context == match) {
                 executeOnViewModular(match, state)
             } else {
-                executeOnMaybeAliasedName(match, match.name, state)
+                match.name?.let {
+                    executeOnModularName(match, it, state)
+                } ?: true
             }
 
     private fun executeOnViewModular(match: Named, state: ResolveState): Boolean =
