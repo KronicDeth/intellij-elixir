@@ -12,6 +12,8 @@ import org.elixir_lang.psi.Modular.callDefinitionClauseCallFoldWhile
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.arguments.None
 import org.elixir_lang.psi.impl.call.finalArguments
+import org.elixir_lang.psi.impl.stripAccessExpression
+import org.elixir_lang.psi.operation.Arrow
 import org.elixir_lang.psi.operation.Match
 
 object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.Assign> {
@@ -23,44 +25,31 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
                 .toTypedArray()
 
     private fun resolveInViewModule(assign: Assign, incompleteCode: Boolean, viewModule: Call): List<ResolveResult> =
-        callDefinitionClauseCallFoldWhile(viewModule, "update", emptyList<ResolveResult>()) { callDefinitionClauseCall, name, arityRange, acc ->
-            if (arityRange.contains(2)) {
-                resolveInUpdate(assign, incompleteCode, callDefinitionClauseCall, acc)
-            } else {
-                AccumulatorContinue(acc, true)
-            }
+        callDefinitionClauseCallFoldWhile(viewModule, emptyList<ResolveResult>()) { callDefinitionClauseCall, acc ->
+            // Always continue because there is no way to determine which definition is called last if the view module has enough helper functions.
+            AccumulatorContinue(resolveInCallDefinitionClause(assign, incompleteCode, callDefinitionClauseCall, acc), true)
         }.accumulator
 
-    private fun resolveInUpdate(assign: Assign, incompleteCode: Boolean, updateClause: Call, initial: List<ResolveResult>): AccumulatorContinue<List<ResolveResult>> =
-            updateClause
+    private fun resolveInCallDefinitionClause(assign: Assign, incompleteCode: Boolean, callDefinitionClause: Call, initial: List<ResolveResult>): List<ResolveResult> =
+            callDefinitionClause
                     .doBlock
                     ?.stab
                     ?.stabBody
-                    ?.let { resolveInUpdateExpression(assign, incompleteCode, it, initial) }
-                    ?: AccumulatorContinue(initial, true)
+                    ?.let { resolveInCallDefinitionClauseExpression(assign, incompleteCode, it, initial) }
+                    ?: initial
 
-    private fun resolveInUpdateExpression(assign: Assign, incompleteCode: Boolean, expression: PsiElement, initial: List<ResolveResult>): AccumulatorContinue<List<ResolveResult>> =
+    private fun resolveInCallDefinitionClauseExpression(assign: Assign, incompleteCode: Boolean, expression: PsiElement, initial: List<ResolveResult>): List<ResolveResult> =
             when (expression) {
                 is ElixirAccessExpression, is ElixirStabBody, is ElixirTuple -> expression
                         .lastChild
                         .siblings(forward = false, withSelf = true)
                         .filter { it.node is CompositeElement }
-                        .let { childSequence ->
-                            var accumulatorContinue = AccumulatorContinue(initial, true)
-
-                            for (child in childSequence) {
-                                accumulatorContinue = resolveInUpdateExpression(assign, incompleteCode, child, accumulatorContinue.accumulator)
-
-                                if (!accumulatorContinue.`continue`) {
-                                    break
-                                }
-                            }
-
-                            accumulatorContinue
+                        .fold(initial) { acc, child ->
+                            resolveInCallDefinitionClauseExpression(assign, incompleteCode, child, acc)
                         }
                 is ElixirAtom, is ElixirEndOfExpression, is None -> null
                 is Match -> expression.rightOperand()?.let { rightOperand ->
-                    resolveInUpdateExpression(assign, incompleteCode, rightOperand, initial)
+                    resolveInCallDefinitionClauseExpression(assign, incompleteCode, rightOperand, initial)
                 }
                 // After `None` as `assign/2` and `assign/3` have options
                 // After `Match` because it is a more specific `Call`
@@ -82,12 +71,11 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
                         null
                     }
                 else -> {
-
                     TODO()
                 }
-            } ?: AccumulatorContinue(initial, true)
+            } ?: initial
 
-    private fun resolveInAssign2Argument(assign: Assign, incompleteCode: Boolean, expression: PsiElement, initial: List<ResolveResult>): AccumulatorContinue<List<ResolveResult>> =
+    private fun resolveInAssign2Argument(assign: Assign, incompleteCode: Boolean, expression: PsiElement, initial: List<ResolveResult>): List<ResolveResult> =
         when (expression) {
             is ElixirKeywordKey -> {
                 if (expression.charListLine == null && expression.stringLine == null) {
@@ -96,28 +84,19 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
 
                     if (resolvedName.startsWith(assignName)) {
                         val validResult = resolvedName == assignName
-                        val final = initial + listOf(PsiElementResolveResult(expression, validResult))
 
-                        AccumulatorContinue(final, !validResult)
+                        initial + listOf(PsiElementResolveResult(expression, validResult))
                     } else {
                         null
                     }
                 } else {
                     null
-                } ?: AccumulatorContinue(initial, true)
+                } ?: initial
             }
             is QuotableKeywordList -> {
-                var accumulatorContinue = AccumulatorContinue(initial, true)
-
-                for (keywordPair in expression.quotableKeywordPairList()) {
-                    accumulatorContinue = resolveInAssign2Argument(assign, incompleteCode, keywordPair, accumulatorContinue.accumulator)
-
-                    if (!accumulatorContinue.`continue`) {
-                        break
-                    }
+                expression.quotableKeywordPairList().fold(initial) { acc, keywordPair ->
+                    resolveInAssign2Argument(assign, incompleteCode, keywordPair, acc)
                 }
-
-                accumulatorContinue
             }
             is QuotableKeywordPair -> resolveInAssign2Argument(assign, incompleteCode, expression.keywordKey, initial)
             else -> {
