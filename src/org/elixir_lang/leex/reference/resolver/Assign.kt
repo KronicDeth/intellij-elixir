@@ -71,24 +71,28 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
                 // After `None` as `assign/2` and `assign/3` have options
                 // After `Match` because it is a more specific `Call`
                 is Call ->
-                    if (expression.functionName() == "assign") {
-                        when (expression.resolvedFinalArity()) {
-                            2 -> {
-                                expression
+                    when (expression.functionName()) {
+                        "assign" ->
+                            when (expression.resolvedFinalArity()) {
+                                2 -> expression
                                         .finalArguments()
                                         ?.last()
                                         ?.let { resolveInAssign2Argument(assign, incompleteCode, it, initial) }
-                            }
-                            3 -> {
-                                expression
+                                3 -> expression
                                         .finalArguments()
                                         ?.let { finalArguments -> finalArguments[finalArguments.size - 2] }
-                                        ?.let { resolveInAssign3Argument(assign, incompleteCode, it, initial) }
+                                        ?.let { resolveInAtomArgument(assign, incompleteCode, it, initial) }
+                                else -> null
                             }
-                            else -> null
-                        }
-                    } else {
-                        null
+                        "assign_new" ->
+                            when (expression.resolvedFinalArity()) {
+                                3 -> expression
+                                        .finalArguments()
+                                        ?.let { finalArguments -> finalArguments[finalArguments.size - 2] }
+                                        ?.let { resolveInAtomArgument(assign, incompleteCode, it, initial) }
+                                else -> null
+                            }
+                        else -> null
                     }
                 else -> {
                     TODO()
@@ -124,9 +128,9 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
             }
         }
 
-    private fun resolveInAssign3Argument(assign: Assign, incompleteCode: Boolean, expression: PsiElement, initial: List<ResolveResult>): List<ResolveResult> =
+    private fun resolveInAtomArgument(assign: Assign, incompleteCode: Boolean, expression: PsiElement, initial: List<ResolveResult>): List<ResolveResult> =
             when (expression) {
-                is ElixirAccessExpression -> resolveInAssign3Argument(assign, incompleteCode, expression.stripAccessExpression(), initial)
+                is ElixirAccessExpression -> resolveInAtomArgument(assign, incompleteCode, expression.stripAccessExpression(), initial)
                 is ElixirAtom -> if (expression.charListLine == null && expression.stringLine == null) {
                     val resolvedName = expression.node.lastChildNode.text
                     val assignName = assign.name
