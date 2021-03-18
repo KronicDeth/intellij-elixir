@@ -63,7 +63,10 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
                                         ?.let { resolveInAssign2Argument(assign, incompleteCode, it, initial) }
                             }
                             3 -> {
-                                TODO()
+                                expression
+                                        .finalArguments()
+                                        ?.let { finalArguments -> finalArguments[finalArguments.size - 2] }
+                                        ?.let { resolveInAssign3Argument(assign, incompleteCode, it, initial) }
                             }
                             else -> null
                         }
@@ -103,4 +106,25 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
                 TODO()
             }
         }
+
+    private fun resolveInAssign3Argument(assign: Assign, incompleteCode: Boolean, expression: PsiElement, initial: List<ResolveResult>): List<ResolveResult> =
+            when (expression) {
+                is ElixirAccessExpression -> resolveInAssign3Argument(assign, incompleteCode, expression.stripAccessExpression(), initial)
+                is ElixirAtom -> if (expression.charListLine == null && expression.stringLine == null) {
+                    val resolvedName = expression.node.lastChildNode.text
+                    val assignName = assign.name
+
+                    if (resolvedName.startsWith(assignName)) {
+                        val validResult = resolvedName == assignName
+                        initial + listOf(PsiElementResolveResult(expression, validResult))
+                    } else {
+                        null
+                    }
+                } else {
+                    null
+                } ?: initial
+                else -> {
+                    TODO()
+                }
+            }
 }
