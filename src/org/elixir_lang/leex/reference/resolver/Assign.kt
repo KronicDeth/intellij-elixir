@@ -100,8 +100,9 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
                 }
             } ?: initial
 
-    private fun resolveInAssign2Argument(assign: Assign, incompleteCode: Boolean, expression: PsiElement, initial: List<ResolveResult>): List<ResolveResult> =
+    private tailrec fun resolveInAssign2Argument(assign: Assign, incompleteCode: Boolean, expression: PsiElement, initial: List<ResolveResult>): List<ResolveResult> =
         when (expression) {
+            is ElixirAccessExpression -> resolveInAssign2Argument(assign, incompleteCode, expression.stripAccessExpression(), initial)
             is ElixirKeywordKey -> {
                 if (expression.charListLine == null && expression.stringLine == null) {
                     val resolvedName = expression.text
@@ -118,10 +119,21 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
                     null
                 } ?: initial
             }
-            is QuotableKeywordList -> {
-                expression.quotableKeywordPairList().fold(initial) { acc, keywordPair ->
-                    resolveInAssign2Argument(assign, incompleteCode, keywordPair, acc)
+            is ElixirMapOperation -> resolveInAssign2Argument(assign, incompleteCode, expression.mapArguments, initial)
+            is ElixirMapArguments -> {
+                val child = expression.mapConstructionArguments ?: expression.mapConstructionArguments
+
+                if (child != null) {
+                    resolveInAssign2Argument(assign, incompleteCode, child, initial)
+                } else {
+                    initial
                 }
+            }
+            is ElixirMapConstructionArguments -> expression.arguments().fold(initial) { acc, argument ->
+                resolveInAssign2Argument(assign, incompleteCode, argument, acc)
+            }
+            is QuotableKeywordList -> expression.quotableKeywordPairList().fold(initial) { acc, keywordPair ->
+                resolveInAssign2Argument(assign, incompleteCode, keywordPair, acc)
             }
             is QuotableKeywordPair -> resolveInAssign2Argument(assign, incompleteCode, expression.keywordKey, initial)
             else -> {
