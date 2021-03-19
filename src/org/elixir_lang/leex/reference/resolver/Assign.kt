@@ -136,6 +136,7 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
                 resolveInAssign2Argument(assign, incompleteCode, keywordPair, acc)
             }
             is QuotableKeywordPair -> resolveInAssign2Argument(assign, incompleteCode, expression.keywordKey, initial)
+            is ElixirUnmatchedUnqualifiedNoArgumentsCall -> initial
             else -> {
                 TODO()
             }
