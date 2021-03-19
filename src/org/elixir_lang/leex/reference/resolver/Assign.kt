@@ -40,7 +40,7 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
     private fun resolveInCallDefinitionClause(assign: Assign, incompleteCode: Boolean, callDefinitionClause: Call, initial: List<ResolveResult>): List<ResolveResult> =
             resolveInCallDefinitionClause(assign, incompleteCode, callDefinitionClause, initial, ::resolveInCallDefinitionClauseExpression)
 
-    private fun resolveInCallDefinitionClauseExpression(assign: Assign, incompleteCode: Boolean, expression: PsiElement, initial: List<ResolveResult>): List<ResolveResult> =
+    private tailrec fun resolveInCallDefinitionClauseExpression(assign: Assign, incompleteCode: Boolean, expression: PsiElement, initial: List<ResolveResult>): List<ResolveResult> =
             when (expression) {
                 is ElixirAccessExpression, is ElixirStabBody, is ElixirTuple -> expression
                         .lastChild
@@ -49,18 +49,28 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
                         .fold(initial) { acc, child ->
                             resolveInCallDefinitionClauseExpression(assign, incompleteCode, child, acc)
                         }
-                is ElixirAtom, is ElixirEndOfExpression, is None -> null
+                is ElixirAtom, is ElixirEndOfExpression, is None -> initial
                 is Arrow -> {
                     val leftAcc = expression.leftOperand()?.let { leftOperand ->
                         resolveInCallDefinitionClauseExpression(assign, incompleteCode, leftOperand, initial)
                     } ?: initial
 
-                    expression.rightOperand()?.let { rightOperand ->
+                    val rightOperand = expression.rightOperand()
+
+                    if (rightOperand != null) {
                         resolveInCallDefinitionClauseExpression(assign, incompleteCode, rightOperand, leftAcc)
-                    } ?: leftAcc
+                    } else {
+                        leftAcc
+                    }
                 }
-                is Match -> expression.rightOperand()?.let { rightOperand ->
-                    resolveInCallDefinitionClauseExpression(assign, incompleteCode, rightOperand, initial)
+                is Match -> {
+                    val rightOperand = expression.rightOperand()
+
+                    if (rightOperand != null) {
+                        resolveInCallDefinitionClauseExpression(assign, incompleteCode, rightOperand, initial)
+                    } else {
+                        initial
+                    }
                 }
                 // After `None` as `assign/2` and `assign/3` have options
                 // After `Match` because it is a more specific `Call`
@@ -77,7 +87,7 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
                                         ?.let { finalArguments -> finalArguments[finalArguments.size - 2] }
                                         ?.let { resolveInAtomArgument(assign, incompleteCode, it, initial) }
                                 else -> null
-                            }
+                            } ?: initial
                         "assign_new" ->
                             when (expression.resolvedFinalArity()) {
                                 3 -> expression
@@ -85,14 +95,42 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
                                         ?.let { finalArguments -> finalArguments[finalArguments.size - 2] }
                                         ?.let { resolveInAtomArgument(assign, incompleteCode, it, initial) }
                                 else -> null
+                            } ?: initial
+                        else -> {
+                            val stab = expression.doBlock?.stab
+
+                            if (stab != null) {
+                                resolveInCallDefinitionClauseExpression(assign, incompleteCode, stab, initial)
+                            } else {
+                                initial
                             }
-                        else -> null
+                        }
                     }
-                is ElixirAtomKeyword, is ElixirMapOperation, is ElixirStructOperation, is QuotableKeywordList, is Quote -> null
+                is ElixirStab -> {
+                    val stabBody = expression.stabBody
+
+                    if (stabBody != null) {
+                        resolveInCallDefinitionClauseExpression(assign, incompleteCode, stabBody, initial)
+                    } else {
+                        expression.stabOperationList.fold(initial) { acc, stabOperation ->
+                            resolveInCallDefinitionClauseExpression(assign, incompleteCode, stabOperation, acc)
+                        }
+                    }
+                }
+                is ElixirStabOperation -> {
+                    val rightOperand = expression.rightOperand()
+
+                    if (rightOperand != null) {
+                        resolveInCallDefinitionClauseExpression(assign, incompleteCode, rightOperand, initial)
+                    } else {
+                        initial
+                    }
+                }
+                is ElixirAtomKeyword, is ElixirMapOperation, is ElixirStructOperation, is QuotableKeywordList, is Quote -> initial
                 else -> {
                     TODO()
                 }
-            } ?: initial
+            }
 
     private tailrec fun resolveInAssign2Argument(assign: Assign, incompleteCode: Boolean, expression: PsiElement, initial: List<ResolveResult>): List<ResolveResult> =
         when (expression) {
