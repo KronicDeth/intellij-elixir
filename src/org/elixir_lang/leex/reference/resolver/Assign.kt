@@ -49,7 +49,6 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
                         .fold(initial) { acc, child ->
                             resolveInCallDefinitionClauseExpression(assign, incompleteCode, child, acc)
                         }
-                is ElixirAtom, is ElixirEndOfExpression, is None -> initial
                 is Arrow -> {
                     val leftAcc = expression.leftOperand()?.let { leftOperand ->
                         resolveInCallDefinitionClauseExpression(assign, incompleteCode, leftOperand, initial)
@@ -72,6 +71,7 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
                         initial
                     }
                 }
+                is ElixirAtom, is ElixirAtomKeyword, is ElixirEndOfExpression, is ElixirMapOperation, is ElixirStructOperation, is QuotableKeywordList, is Quote -> initial
                 // After `None` as `assign/2` and `assign/3` have options
                 // After `Match` because it is a more specific `Call`
                 is Call ->
@@ -126,7 +126,6 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
                         initial
                     }
                 }
-                is ElixirAtomKeyword, is ElixirMapOperation, is ElixirStructOperation, is QuotableKeywordList, is Quote -> initial
                 else -> {
                     TODO()
                 }
