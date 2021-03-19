@@ -18,8 +18,7 @@ import org.elixir_lang.psi.call.StubBased
 import org.elixir_lang.psi.call.arguments.None
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.stripAccessExpression
-import org.elixir_lang.psi.operation.Arrow
-import org.elixir_lang.psi.operation.Match
+import org.elixir_lang.psi.operation.*
 import org.elixir_lang.psi.stub.index.AllName
 
 object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.Assign> {
@@ -39,12 +38,7 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
         }.accumulator
 
     private fun resolveInCallDefinitionClause(assign: Assign, incompleteCode: Boolean, callDefinitionClause: Call, initial: List<ResolveResult>): List<ResolveResult> =
-            callDefinitionClause
-                    .doBlock
-                    ?.stab
-                    ?.stabBody
-                    ?.let { resolveInCallDefinitionClauseExpression(assign, incompleteCode, it, initial) }
-                    ?: initial
+            resolveInCallDefinitionClause(assign, incompleteCode, callDefinitionClause, initial, ::resolveInCallDefinitionClauseExpression)
 
     private fun resolveInCallDefinitionClauseExpression(assign: Assign, incompleteCode: Boolean, expression: PsiElement, initial: List<ResolveResult>): List<ResolveResult> =
             when (expression) {
@@ -164,39 +158,178 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
             }
 
     private const val LIVE_ACTION = "live_action"
+    private const val MYSELF = "myself"
 
     private fun resolveInPhoenixLiveView(assign: Assign, incompleteCode: Boolean): List<ResolveResult> {
         val assignName = assign.name
 
         return if (LIVE_ACTION.startsWith(assignName)) {
-            val element = assign.element
-            val project = element.project
-
-            // MUST use `originalFile` to get the PsiFile with a VirtualFile for decompiled elements
-            val globalSearchScope = element.containingFile.originalFile.virtualFile?.let { elementVirtualFile ->
-                val orderEntries =
-                        ProjectRootManager
-                                .getInstance(project)
-                                .fileIndex
-                                .getOrderEntriesForFile(elementVirtualFile)
-
-                LibraryScopeCache.getInstance(project).getLibraryScope(orderEntries)
-            } ?: GlobalSearchScope.allScope(project)
-
-            val resolveResultList = mutableListOf<ResolveResult>()
-
-            StubIndex.getInstance().processElements(AllName.KEY, "assign_action", project, globalSearchScope, NamedElement::class.java) { namedElement ->
-                if (namedElement is StubBased<*>) {
-                    val acc = resolveInCallDefinitionClause(assign, incompleteCode, namedElement, emptyList())
-                    resolveResultList.addAll(acc)
-                }
-
-                true
-            }
-
-            resolveResultList
+            resolveLiveAction(assign, incompleteCode)
+        } else if (MYSELF.startsWith(assignName)) {
+            resolveMyself(assign, incompleteCode)
         } else {
             emptyList()
         }
+    }
+
+    private fun resolveLiveAction(assign: Assign, incompleteCode: Boolean): List<ResolveResult> {
+        val element = assign.element
+        val globalSearchScope = globalSearchScope(element)
+        val resolveResultList = mutableListOf<ResolveResult>()
+
+        StubIndex.getInstance().processElements(AllName.KEY, "assign_action", element.project, globalSearchScope, NamedElement::class.java) { namedElement ->
+            // use `StubBased<*>` to ignore decompiled
+            if (namedElement is StubBased<*>) {
+                val acc = resolveInCallDefinitionClause(assign, incompleteCode, namedElement, emptyList())
+                resolveResultList.addAll(acc)
+            }
+
+            true
+        }
+
+        return resolveResultList
+    }
+
+    private fun resolveMyself(assign: Assign, incompleteCode: Boolean): List<ResolveResult> {
+        val element = assign.element
+        val globalSearchScope = globalSearchScope(element)
+        val resolveResultList = mutableListOf<ResolveResult>()
+
+        StubIndex.getInstance().processElements(AllName.KEY, "render_pending_components", element.project, globalSearchScope, NamedElement::class.java) { namedElement ->
+            // use `StubBased<*>` to ignore decompiled
+            if (namedElement is StubBased<*>) {
+                val acc = resolveInRenderPendingComponentsClause(assign, incompleteCode, namedElement, emptyList())
+                resolveResultList.addAll(acc)
+            }
+
+            true
+        }
+
+        return resolveResultList
+    }
+
+    private fun resolveInRenderPendingComponentsClause(assign: Assign, incompleteCode: Boolean, callDefinitionClause: Call, initial: List<ResolveResult>): List<ResolveResult> =
+    resolveInCallDefinitionClause(assign, incompleteCode, callDefinitionClause, initial, ::resolveMyself)
+
+    private tailrec fun resolveMyself(assign: Assign, incompleteCode: Boolean, expression: PsiElement, initial: List<ResolveResult>): List<ResolveResult> =
+            when (expression) {
+                is ElixirAccessExpression, is ElixirList, is ElixirStabBody, is ElixirTuple -> expression
+                        .lastChild
+                        .siblings(forward = false, withSelf = true)
+                        .filter { it.node is CompositeElement }
+                        .fold(initial) { acc, child ->
+                            resolveMyself(assign, incompleteCode, child, acc)
+                        }
+                is ElixirAnonymousFunction -> resolveMyself(assign, incompleteCode, expression.stab, initial)
+                is Match -> {
+                    val rightOperand = expression.rightOperand()
+
+                    if (rightOperand != null) {
+                        resolveMyself(assign, incompleteCode, rightOperand, initial)
+                    } else {
+                        initial
+                    }
+                }
+                is Arrow, is AtNonNumericOperation, is ElixirAtomKeyword, is ElixirEndOfExpression, is Pipe, is Two -> initial
+                is Operation -> {
+                    TODO()
+                }
+                is Call -> {
+                    val arguments = expression.finalArguments()
+
+                    val argumentsAcc = if (arguments != null) {
+                        arguments.fold(initial) { acc, argument ->
+                            resolveMyself(assign, incompleteCode, argument, acc)
+                        }
+                    } else {
+                        initial
+                    }
+
+                    val stab = expression.doBlock?.stab
+
+                    if (stab != null) {
+                        resolveMyself(assign, incompleteCode, stab, argumentsAcc)
+                    } else {
+                        argumentsAcc
+                    }
+                }
+                is ElixirMapOperation -> resolveMyself(assign, incompleteCode, expression.mapArguments, initial)
+                is ElixirMapArguments -> {
+                    val child = expression.mapConstructionArguments ?: expression.mapConstructionArguments
+
+                    if (child != null) {
+                        resolveMyself(assign, incompleteCode, child, initial)
+                    } else {
+                        initial
+                    }
+                }
+                is ElixirMapConstructionArguments -> expression.arguments().fold(initial) { acc, argument ->
+                    resolveMyself(assign, incompleteCode, argument, acc)
+                }
+                is ElixirStab -> {
+                    val stabBody = expression.stabBody
+
+                    if (stabBody != null) {
+                        resolveMyself(assign, incompleteCode, stabBody, initial)
+                    } else {
+                        expression.stabOperationList.fold(initial) { acc, stabOperation ->
+                            resolveMyself(assign, incompleteCode, stabOperation, acc)
+                        }
+                    }
+                }
+                is ElixirStabOperation -> {
+                    val rightOperand = expression.rightOperand()
+
+                    if (rightOperand != null) {
+                        resolveMyself(assign, incompleteCode, rightOperand, initial)
+                    } else {
+                        initial
+                    }
+                }
+                is QuotableKeywordList -> expression.quotableKeywordPairList().fold(initial) { acc, keywordPair ->
+                    resolveMyself(assign, incompleteCode, keywordPair, acc)
+                }
+                is QuotableKeywordPair -> resolveMyself(assign, incompleteCode, expression.keywordKey, initial)
+                is ElixirKeywordKey -> {
+                    if (expression.charListLine == null && expression.stringLine == null) {
+                        val resolvedName = expression.text
+                        val assignName = assign.name
+
+                        if (resolvedName.startsWith(assignName)) {
+                            val validResult = resolvedName == assignName
+
+                            initial + listOf(PsiElementResolveResult(expression, validResult))
+                        } else {
+                            null
+                        }
+                    } else {
+                        null
+                    } ?: initial
+                }
+                else -> {
+                    TODO()
+                }
+            }
+    private fun resolveInCallDefinitionClause(assign: Assign, incompleteCode: Boolean, callDefinitionClause: Call, initial: List<ResolveResult>, resolveInExpression: (assign: Assign, incompleteCode: Boolean, expression: PsiElement, initial: List<ResolveResult>) -> List<ResolveResult>): List<ResolveResult> =
+            callDefinitionClause
+                    .doBlock
+                    ?.stab
+                    ?.stabBody
+                    ?.let { resolveInExpression(assign, incompleteCode, it, initial) }
+                    ?: initial
+
+    private fun globalSearchScope(element: PsiElement): GlobalSearchScope {
+        val project = element.project
+
+        // MUST use `originalFile` to get the PsiFile with a VirtualFile for decompiled elements
+        return element.containingFile.originalFile.virtualFile?.let { elementVirtualFile ->
+            val orderEntries =
+                    ProjectRootManager
+                            .getInstance(project)
+                            .fileIndex
+                            .getOrderEntriesForFile(elementVirtualFile)
+
+            LibraryScopeCache.getInstance(project).getLibraryScope(orderEntries)
+        } ?: GlobalSearchScope.allScope(project)
     }
 }
