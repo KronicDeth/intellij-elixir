@@ -94,6 +94,7 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
                             }
                         else -> null
                     }
+                is ElixirAtomKeyword, is ElixirMapOperation, is ElixirStructOperation, is QuotableKeywordList, is Quote -> null
                 else -> {
                     TODO()
                 }
