@@ -226,7 +226,11 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
     private tailrec fun liveComponentCall(element: PsiElement): Call? =
             when (element) {
                 is Arguments, is ElixirAccessExpression, is QualifiableAlias -> liveComponentCall(element.parent)
-                is Call -> if (element.functionName() == "live_component" && element.resolvedFinalArity() in 3..4) {
+                is Call -> if ((element.functionName() == "live_component" && element.resolvedFinalArity() == 3) ||
+                        // `live_modal` is auto-generated in `MyAppWeb.LiveHelpers` by the `mix phx.gen.live` generator`
+                        // to turn a live component into modal dialog.  It calls `live_component`, so count it as a
+                        // `live_component` call.
+                        (element.functionName() == "live_modal" && element.resolvedFinalArity() == 3)  ) {
                     element
                 } else {
                     null
