@@ -1087,6 +1087,12 @@ public class ElixirPsiImplUtil {
         return PresentationImpl.getPresentation(identifier);
     }
 
+    @Contract(pure = true)
+    @NotNull
+    public static ItemPresentation getPresentation(@NotNull final ElixirKeywordKey keywordKey) {
+        return PresentationImpl.getPresentation(keywordKey);
+    }
+
     @Nullable
     public static ItemPresentation getPresentation(@NotNull final QualifiableAlias qualifiableAlias) {
         return PresentationImpl.getPresentation(qualifiableAlias);

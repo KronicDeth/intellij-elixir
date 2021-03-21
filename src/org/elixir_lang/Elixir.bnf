@@ -3121,6 +3121,7 @@ keywordKey ::= AFTER |
                  methods = [
                    getName
                    getNameIdentifier
+                   getPresentation
                    quote
                    setName
                  ]

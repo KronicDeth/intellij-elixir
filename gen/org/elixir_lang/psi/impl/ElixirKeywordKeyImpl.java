@@ -52,6 +52,11 @@ public class ElixirKeywordKeyImpl extends ASTWrapperPsiElement implements Elixir
   }
 
   @Override
+  public @NotNull ItemPresentation getPresentation() {
+    return ElixirPsiImplUtil.getPresentation(this);
+  }
+
+  @Override
   public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }

@@ -19,6 +19,8 @@ public interface ElixirKeywordKey extends NamedElement, Quotable {
 
   @Nullable PsiElement getNameIdentifier();
 
+  @NotNull ItemPresentation getPresentation();
+
   @NotNull OtpErlangObject quote();
 
   @NotNull PsiElement setName(@NotNull String newName);

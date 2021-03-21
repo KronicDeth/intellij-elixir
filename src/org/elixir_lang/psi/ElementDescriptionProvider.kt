@@ -73,6 +73,9 @@ class ElementDescriptionProvider : com.intellij.psi.ElementDescriptionProvider {
 
     private fun getElementDescription(keywordKey: ElixirKeywordKey,
                                       location: ElementDescriptionLocation): String? {
+        if (location == UsageViewNodeTextLocation.INSTANCE) {
+            "test"
+        }
         var elementDescription: String? = keywordKey
                 .parent.let { it as? ElixirKeywordPair }
                 ?.parent?.let { it as? ElixirKeywords }

@@ -8,7 +8,9 @@ import com.intellij.psi.PsiFile
 import com.intellij.usageView.UsageViewUtil
 import org.elixir_lang.annotator.Parameter
 import org.elixir_lang.beam.psi.BeamFileImpl
+import org.elixir_lang.navigation.item_presentation.KeywordKey
 import org.elixir_lang.psi.ElixirIdentifier
+import org.elixir_lang.psi.ElixirKeywordKey
 import org.elixir_lang.psi.QualifiableAlias
 import org.elixir_lang.psi.__module__.AliasPresentation
 import org.elixir_lang.psi.call.Call
@@ -68,6 +70,9 @@ object PresentationImpl {
             null
         }
     }
+
+    @JvmStatic
+    fun getPresentation(keywordKey: ElixirKeywordKey): ItemPresentation = KeywordKey(keywordKey)
 
     @JvmStatic
     fun getPresentation(qualifiableAlias: QualifiableAlias): ItemPresentation =
