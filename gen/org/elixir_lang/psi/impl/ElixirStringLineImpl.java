@@ -24,6 +24,7 @@ public class ElixirStringLineImpl extends ASTWrapperPsiElement implements Elixir
     visitor.visitStringLine(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
@@ -36,27 +37,23 @@ public class ElixirStringLineImpl extends ASTWrapperPsiElement implements Elixir
   }
 
   @Override
-  @NotNull
-  public List<Integer> addEscapedCharacterCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode node) {
-    return ElixirPsiImplUtil.addEscapedCharacterCodePoints(this, codePointList, node);
+  public @NotNull List<Integer> addEscapedCharacterCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode child) {
+    return ElixirPsiImplUtil.addEscapedCharacterCodePoints(this, codePointList, child);
   }
 
   @Override
-  @NotNull
-  public List<Integer> addEscapedEOL(@Nullable List<Integer> maybeCodePointList, @NotNull ASTNode node) {
-    return ElixirPsiImplUtil.addEscapedEOL(this, maybeCodePointList, node);
+  public @NotNull List<Integer> addEscapedEOL(@Nullable List<Integer> maybeCodePointList, @NotNull ASTNode child) {
+    return ElixirPsiImplUtil.addEscapedEOL(this, maybeCodePointList, child);
   }
 
   @Override
-  @NotNull
-  public List<Integer> addFragmentCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode node) {
-    return ElixirPsiImplUtil.addFragmentCodePoints(this, codePointList, node);
+  public @NotNull List<Integer> addFragmentCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode child) {
+    return ElixirPsiImplUtil.addFragmentCodePoints(this, codePointList, child);
   }
 
   @Override
-  @NotNull
-  public List<Integer> addHexadecimalEscapeSequenceCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode node) {
-    return ElixirPsiImplUtil.addHexadecimalEscapeSequenceCodePoints(this, codePointList, node);
+  public @NotNull List<Integer> addHexadecimalEscapeSequenceCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode child) {
+    return ElixirPsiImplUtil.addHexadecimalEscapeSequenceCodePoints(this, codePointList, child);
   }
 
   @Override
@@ -70,38 +67,32 @@ public class ElixirStringLineImpl extends ASTWrapperPsiElement implements Elixir
   }
 
   @Override
-  @NotNull
-  public OtpErlangObject quote() {
+  public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }
 
   @Override
-  @NotNull
-  public OtpErlangObject quoteAsAtom() {
+  public @NotNull OtpErlangObject quoteAsAtom() {
     return ElixirPsiImplUtil.quoteAsAtom(this);
   }
 
   @Override
-  @NotNull
-  public OtpErlangObject quoteBinary(OtpErlangList metadata, List<OtpErlangObject> argumentList) {
+  public @NotNull OtpErlangObject quoteBinary(OtpErlangList metadata, List<OtpErlangObject> argumentList) {
     return ElixirPsiImplUtil.quoteBinary(this, metadata, argumentList);
   }
 
   @Override
-  @NotNull
-  public OtpErlangObject quoteEmpty() {
+  public @NotNull OtpErlangObject quoteEmpty() {
     return ElixirPsiImplUtil.quoteEmpty(this);
   }
 
   @Override
-  @NotNull
-  public OtpErlangObject quoteInterpolation(ElixirInterpolation interpolation) {
+  public @NotNull OtpErlangObject quoteInterpolation(ElixirInterpolation interpolation) {
     return ElixirPsiImplUtil.quoteInterpolation(this, interpolation);
   }
 
   @Override
-  @NotNull
-  public OtpErlangObject quoteLiteral(List<Integer> codePointList) {
+  public @NotNull OtpErlangObject quoteLiteral(List<Integer> codePointList) {
     return ElixirPsiImplUtil.quoteLiteral(this, codePointList);
   }
 

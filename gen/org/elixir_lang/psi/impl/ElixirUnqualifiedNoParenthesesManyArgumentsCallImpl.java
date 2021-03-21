@@ -33,6 +33,7 @@ public class ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl extends NamedSt
     visitor.visitUnqualifiedNoParenthesesManyArgumentsCall(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
@@ -75,32 +76,27 @@ public class ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl extends NamedSt
   }
 
   @Override
-  @Nullable
-  public String canonicalName() {
+  public @Nullable String canonicalName() {
     return ElixirPsiImplUtil.canonicalName(this);
   }
 
   @Override
-  @NotNull
-  public Set<String> canonicalNameSet() {
+  public @NotNull Set<String> canonicalNameSet() {
     return ElixirPsiImplUtil.canonicalNameSet(this);
   }
 
   @Override
-  @Nullable
-  public String functionName() {
+  public @Nullable String functionName() {
     return ElixirPsiImplUtil.functionName(this);
   }
 
   @Override
-  @NotNull
-  public PsiElement functionNameElement() {
+  public @NotNull PsiElement functionNameElement() {
     return ElixirPsiImplUtil.functionNameElement(this);
   }
 
   @Override
-  @Nullable
-  public ElixirDoBlock getDoBlock() {
+  public @Nullable ElixirDoBlock getDoBlock() {
     return ElixirPsiImplUtil.getDoBlock(this);
   }
 
@@ -110,26 +106,22 @@ public class ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl extends NamedSt
   }
 
   @Override
-  @Nullable
-  public String getName() {
+  public @Nullable String getName() {
     return ElixirPsiImplUtil.getName(this);
   }
 
   @Override
-  @Nullable
-  public PsiElement getNameIdentifier() {
+  public @Nullable PsiElement getNameIdentifier() {
     return ElixirPsiImplUtil.getNameIdentifier(this);
   }
 
   @Override
-  @NotNull
-  public ItemPresentation getPresentation() {
+  public @NotNull ItemPresentation getPresentation() {
     return ElixirPsiImplUtil.getPresentation(this);
   }
 
   @Override
-  @Nullable
-  public PsiReference getReference() {
+  public @Nullable PsiReference getReference() {
     return ElixirPsiImplUtil.getReference(this);
   }
 
@@ -154,20 +146,17 @@ public class ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl extends NamedSt
   }
 
   @Override
-  @Nullable
-  public String moduleName() {
+  public @Nullable String moduleName() {
     return ElixirPsiImplUtil.moduleName(this);
   }
 
   @Override
-  @NotNull
-  public PsiElement[] primaryArguments() {
+  public @NotNull PsiElement[] primaryArguments() {
     return ElixirPsiImplUtil.primaryArguments(this);
   }
 
   @Override
-  @Nullable
-  public Integer primaryArity() {
+  public @Nullable Integer primaryArity() {
     return ElixirPsiImplUtil.primaryArity(this);
   }
 
@@ -177,8 +166,7 @@ public class ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl extends NamedSt
   }
 
   @Override
-  @NotNull
-  public OtpErlangObject quote() {
+  public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }
 
@@ -188,44 +176,37 @@ public class ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl extends NamedSt
   }
 
   @Override
-  @NotNull
-  public IntRange resolvedFinalArityRange() {
+  public @NotNull IntRange resolvedFinalArityRange() {
     return ElixirPsiImplUtil.resolvedFinalArityRange(this);
   }
 
   @Override
-  @NotNull
-  public String resolvedModuleName() {
+  public @NotNull String resolvedModuleName() {
     return ElixirPsiImplUtil.resolvedModuleName(this);
   }
 
   @Override
-  @Nullable
-  public Integer resolvedPrimaryArity() {
+  public @Nullable Integer resolvedPrimaryArity() {
     return ElixirPsiImplUtil.resolvedPrimaryArity(this);
   }
 
   @Override
-  @Nullable
-  public Integer resolvedSecondaryArity() {
+  public @Nullable Integer resolvedSecondaryArity() {
     return ElixirPsiImplUtil.resolvedSecondaryArity(this);
   }
 
   @Override
-  @Nullable
-  public PsiElement[] secondaryArguments() {
+  public @Nullable PsiElement[] secondaryArguments() {
     return ElixirPsiImplUtil.secondaryArguments(this);
   }
 
   @Override
-  @Nullable
-  public Integer secondaryArity() {
+  public @Nullable Integer secondaryArity() {
     return ElixirPsiImplUtil.secondaryArity(this);
   }
 
   @Override
-  @NotNull
-  public PsiElement setName(@NotNull String newName) {
+  public @NotNull PsiElement setName(@NotNull String newName) {
     return ElixirPsiImplUtil.setName(this, newName);
   }
 

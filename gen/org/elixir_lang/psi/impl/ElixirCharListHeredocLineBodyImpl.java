@@ -21,6 +21,7 @@ public class ElixirCharListHeredocLineBodyImpl extends ASTWrapperPsiElement impl
     visitor.visitCharListHeredocLineBody(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);

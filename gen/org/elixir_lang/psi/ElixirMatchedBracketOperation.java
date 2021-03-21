@@ -14,7 +14,6 @@ public interface ElixirMatchedBracketOperation extends ElixirMatchedExpression, 
   @NotNull
   ElixirMatchedExpression getMatchedExpression();
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
 }

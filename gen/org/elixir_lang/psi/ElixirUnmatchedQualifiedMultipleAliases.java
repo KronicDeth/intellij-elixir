@@ -17,7 +17,6 @@ public interface ElixirUnmatchedQualifiedMultipleAliases extends ElixirUnmatched
   @NotNull
   ElixirUnmatchedExpression getUnmatchedExpression();
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
 }

@@ -14,7 +14,6 @@ public interface ElixirMatchedAtUnqualifiedBracketOperation extends ElixirMatche
   @NotNull
   ElixirBracketArguments getBracketArguments();
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
 }

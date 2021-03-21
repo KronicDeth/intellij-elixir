@@ -22,6 +22,7 @@ public class ElixirLiteralRegexHeredocLineImpl extends ASTWrapperPsiElement impl
     visitor.visitLiteralRegexHeredocLine(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
@@ -51,8 +52,7 @@ public class ElixirLiteralRegexHeredocLineImpl extends ASTWrapperPsiElement impl
   }
 
   @Override
-  @NotNull
-  public OtpErlangObject quote(@NotNull Heredoc heredoc, int prefixLength) {
+  public @NotNull OtpErlangObject quote(@NotNull Heredoc heredoc, int prefixLength) {
     return ElixirPsiImplUtil.quote(this, heredoc, prefixLength);
   }
 

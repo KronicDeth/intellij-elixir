@@ -22,6 +22,7 @@ public class ElixirNoParenthesesKeywordPairImpl extends ASTWrapperPsiElement imp
     visitor.visitNoParenthesesKeywordPair(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
@@ -52,14 +53,12 @@ public class ElixirNoParenthesesKeywordPairImpl extends ASTWrapperPsiElement imp
   }
 
   @Override
-  @NotNull
-  public Quotable getKeywordValue() {
+  public @NotNull Quotable getKeywordValue() {
     return ElixirPsiImplUtil.getKeywordValue(this);
   }
 
   @Override
-  @NotNull
-  public OtpErlangObject quote() {
+  public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }
 

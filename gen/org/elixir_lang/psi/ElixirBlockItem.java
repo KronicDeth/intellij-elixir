@@ -17,7 +17,6 @@ public interface ElixirBlockItem extends Quotable {
   @Nullable
   ElixirStab getStab();
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
 }

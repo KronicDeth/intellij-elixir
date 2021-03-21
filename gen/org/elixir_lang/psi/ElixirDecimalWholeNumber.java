@@ -13,10 +13,8 @@ public interface ElixirDecimalWholeNumber extends WholeNumber {
 
   int base();
 
-  @NotNull
-  List<Digits> digitsList();
+  @NotNull List<Digits> digitsList();
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
 }

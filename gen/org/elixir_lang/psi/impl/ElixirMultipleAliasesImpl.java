@@ -24,6 +24,7 @@ public class ElixirMultipleAliasesImpl extends ASTWrapperPsiElement implements E
     visitor.visitMultipleAliases(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
@@ -53,8 +54,7 @@ public class ElixirMultipleAliasesImpl extends ASTWrapperPsiElement implements E
   }
 
   @Override
-  @NotNull
-  public OtpErlangObject quote() {
+  public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }
 

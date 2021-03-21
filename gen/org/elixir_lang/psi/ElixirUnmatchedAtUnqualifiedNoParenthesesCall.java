@@ -26,17 +26,13 @@ public interface ElixirUnmatchedAtUnqualifiedNoParenthesesCall extends ElixirUnm
   @NotNull
   ElixirNoParenthesesOneArgument getNoParenthesesOneArgument();
 
-  @Nullable
-  String canonicalName();
+  @Nullable String canonicalName();
 
-  @NotNull
-  Set<String> canonicalNameSet();
+  @NotNull Set<String> canonicalNameSet();
 
-  @Nullable
-  String functionName();
+  @Nullable String functionName();
 
-  @Nullable
-  PsiElement functionNameElement();
+  @Nullable PsiElement functionNameElement();
 
   //WARNING: getDoBlock(...) is skipped
   //matching getDoBlock(ElixirUnmatchedAtUnqualifiedNoParenthesesCall, ...)
@@ -44,24 +40,19 @@ public interface ElixirUnmatchedAtUnqualifiedNoParenthesesCall extends ElixirUnm
 
   boolean hasDoBlockOrKeyword();
 
-  @Nullable
-  String getName();
+  @Nullable String getName();
 
-  @Nullable
-  PsiElement getNameIdentifier();
+  @Nullable PsiElement getNameIdentifier();
 
-  @NotNull
-  ItemPresentation getPresentation();
+  @NotNull ItemPresentation getPresentation();
 
-  @Nullable
-  PsiReference getReference();
+  @Nullable PsiReference getReference();
 
   //WARNING: getStub(...) is skipped
   //matching getStub(ElixirUnmatchedAtUnqualifiedNoParenthesesCall, ...)
   //methods are not found in ElixirPsiImplUtil
 
-  @NotNull
-  SearchScope getUseScope();
+  @NotNull SearchScope getUseScope();
 
   boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName);
 
@@ -71,41 +62,30 @@ public interface ElixirUnmatchedAtUnqualifiedNoParenthesesCall extends ElixirUnm
 
   boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity);
 
-  @Nullable
-  String moduleName();
+  @Nullable String moduleName();
 
-  @NotNull
-  PsiElement[] primaryArguments();
+  @NotNull PsiElement[] primaryArguments();
 
-  @Nullable
-  Integer primaryArity();
+  @Nullable Integer primaryArity();
 
   boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place);
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
   int resolvedFinalArity();
 
-  @NotNull
-  IntRange resolvedFinalArityRange();
+  @NotNull IntRange resolvedFinalArityRange();
 
-  @Nullable
-  String resolvedModuleName();
+  @Nullable String resolvedModuleName();
 
-  @Nullable
-  Integer resolvedPrimaryArity();
+  @Nullable Integer resolvedPrimaryArity();
 
-  @Nullable
-  Integer resolvedSecondaryArity();
+  @Nullable Integer resolvedSecondaryArity();
 
-  @Nullable
-  PsiElement[] secondaryArguments();
+  @Nullable PsiElement[] secondaryArguments();
 
-  @Nullable
-  Integer secondaryArity();
+  @Nullable Integer secondaryArity();
 
-  @NotNull
-  PsiElement setName(@NotNull String newName);
+  @NotNull PsiElement setName(@NotNull String newName);
 
 }

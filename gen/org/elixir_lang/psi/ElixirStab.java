@@ -17,7 +17,6 @@ public interface ElixirStab extends Quotable {
   @NotNull
   List<ElixirStabOperation> getStabOperationList();
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
 }

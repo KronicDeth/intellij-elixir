@@ -21,6 +21,7 @@ public class ElixirEexImpl extends ASTWrapperPsiElement implements ElixirEex {
     visitor.visitEex(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);

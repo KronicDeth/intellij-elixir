@@ -22,14 +22,14 @@ public class ElixirHeredocLinePrefixImpl extends ASTWrapperPsiElement implements
     visitor.visitHeredocLinePrefix(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
   }
 
   @Override
-  @Nullable
-  public ASTNode excessWhitespace(@NotNull IElementType type, int prefixLength) {
+  public @Nullable ASTNode excessWhitespace(@NotNull IElementType type, int prefixLength) {
     return ElixirPsiImplUtil.excessWhitespace(this, type, prefixLength);
   }
 

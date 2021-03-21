@@ -22,6 +22,7 @@ public class ElixirNoParenthesesOneArgumentImpl extends ASTWrapperPsiElement imp
     visitor.visitNoParenthesesOneArgument(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
@@ -64,8 +65,7 @@ public class ElixirNoParenthesesOneArgumentImpl extends ASTWrapperPsiElement imp
   }
 
   @Override
-  @NotNull
-  public PsiElement[] arguments() {
+  public @NotNull PsiElement[] arguments() {
     return ElixirPsiImplUtil.arguments(this);
   }
 
@@ -75,8 +75,7 @@ public class ElixirNoParenthesesOneArgumentImpl extends ASTWrapperPsiElement imp
   }
 
   @Override
-  @NotNull
-  public OtpErlangObject[] quoteArguments() {
+  public @NotNull OtpErlangObject[] quoteArguments() {
     return ElixirPsiImplUtil.quoteArguments(this);
   }
 

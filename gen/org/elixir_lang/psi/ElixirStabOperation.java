@@ -22,18 +22,14 @@ public interface ElixirStabOperation extends Quotable {
   @Nullable
   ElixirStabParenthesesSignature getStabParenthesesSignature();
 
-  @Nullable
-  Quotable leftOperand();
+  @Nullable Quotable leftOperand();
 
-  @NotNull
-  Operator operator();
+  @NotNull Operator operator();
 
   boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place);
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
-  @Nullable
-  Quotable rightOperand();
+  @Nullable Quotable rightOperand();
 
 }

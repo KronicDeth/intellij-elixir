@@ -11,7 +11,6 @@ public interface ElixirAtIdentifier extends PsiElement {
   @NotNull
   ElixirAtPrefixOperator getAtPrefixOperator();
 
-  @Nullable
-  PsiReference getReference();
+  @Nullable PsiReference getReference();
 
 }

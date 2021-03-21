@@ -17,7 +17,6 @@ public interface ElixirMatchedQualifiedMultipleAliases extends ElixirMatchedExpr
   @NotNull
   ElixirMultipleAliases getMultipleAliases();
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
 }

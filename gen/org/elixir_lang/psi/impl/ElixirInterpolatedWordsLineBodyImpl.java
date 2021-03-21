@@ -21,6 +21,7 @@ public class ElixirInterpolatedWordsLineBodyImpl extends ASTWrapperPsiElement im
     visitor.visitInterpolatedWordsLineBody(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);

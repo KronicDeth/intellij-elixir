@@ -19,7 +19,6 @@ public interface ElixirStringHeredocLine extends HeredocLine {
 
   Body getBody();
 
-  @NotNull
-  OtpErlangObject quote(@NotNull Heredoc heredoc, int prefixLength);
+  @NotNull OtpErlangObject quote(@NotNull Heredoc heredoc, int prefixLength);
 
 }

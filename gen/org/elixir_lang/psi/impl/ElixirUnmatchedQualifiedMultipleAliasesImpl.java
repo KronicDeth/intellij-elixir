@@ -17,10 +17,12 @@ public class ElixirUnmatchedQualifiedMultipleAliasesImpl extends ElixirUnmatched
     super(node);
   }
 
+  @Override
   public void accept(@NotNull ElixirVisitor visitor) {
     visitor.visitUnmatchedQualifiedMultipleAliases(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
@@ -45,8 +47,7 @@ public class ElixirUnmatchedQualifiedMultipleAliasesImpl extends ElixirUnmatched
   }
 
   @Override
-  @NotNull
-  public OtpErlangObject quote() {
+  public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }
 

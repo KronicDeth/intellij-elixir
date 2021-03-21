@@ -24,6 +24,7 @@ public class ElixirStabOperationImpl extends ASTWrapperPsiElement implements Eli
     visitor.visitStabOperation(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
@@ -54,14 +55,12 @@ public class ElixirStabOperationImpl extends ASTWrapperPsiElement implements Eli
   }
 
   @Override
-  @Nullable
-  public Quotable leftOperand() {
+  public @Nullable Quotable leftOperand() {
     return ElixirPsiImplUtil.leftOperand(this);
   }
 
   @Override
-  @NotNull
-  public Operator operator() {
+  public @NotNull Operator operator() {
     return ElixirPsiImplUtil.operator(this);
   }
 
@@ -71,14 +70,12 @@ public class ElixirStabOperationImpl extends ASTWrapperPsiElement implements Eli
   }
 
   @Override
-  @NotNull
-  public OtpErlangObject quote() {
+  public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }
 
   @Override
-  @Nullable
-  public Quotable rightOperand() {
+  public @Nullable Quotable rightOperand() {
     return ElixirPsiImplUtil.rightOperand(this);
   }
 

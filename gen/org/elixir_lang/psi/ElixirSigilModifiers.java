@@ -8,7 +8,6 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 
 public interface ElixirSigilModifiers extends Quotable {
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
 }

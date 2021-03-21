@@ -17,10 +17,12 @@ public class ElixirMatchedQualifiedBracketOperationImpl extends ElixirMatchedExp
     super(node);
   }
 
+  @Override
   public void accept(@NotNull ElixirVisitor visitor) {
     visitor.visitMatchedQualifiedBracketOperation(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
@@ -51,14 +53,12 @@ public class ElixirMatchedQualifiedBracketOperationImpl extends ElixirMatchedExp
   }
 
   @Override
-  @NotNull
-  public PsiElement qualifier() {
+  public @NotNull PsiElement qualifier() {
     return ElixirPsiImplUtil.qualifier(this);
   }
 
   @Override
-  @NotNull
-  public OtpErlangObject quote() {
+  public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }
 

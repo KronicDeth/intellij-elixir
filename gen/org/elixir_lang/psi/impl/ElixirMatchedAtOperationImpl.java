@@ -18,10 +18,12 @@ public class ElixirMatchedAtOperationImpl extends ElixirMatchedExpressionImpl im
     super(node);
   }
 
+  @Override
   public void accept(@NotNull ElixirVisitor visitor) {
     visitor.visitMatchedAtOperation(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
@@ -40,32 +42,27 @@ public class ElixirMatchedAtOperationImpl extends ElixirMatchedExpressionImpl im
   }
 
   @Override
-  @Nullable
-  public PsiReference getReference() {
+  public @Nullable PsiReference getReference() {
     return ElixirPsiImplUtil.getReference(this);
   }
 
   @Override
-  @NotNull
-  public String moduleAttributeName() {
+  public @NotNull String moduleAttributeName() {
     return ElixirPsiImplUtil.moduleAttributeName(this);
   }
 
   @Override
-  @Nullable
-  public Quotable operand() {
+  public @Nullable Quotable operand() {
     return ElixirPsiImplUtil.operand(this);
   }
 
   @Override
-  @NotNull
-  public Operator operator() {
+  public @NotNull Operator operator() {
     return ElixirPsiImplUtil.operator(this);
   }
 
   @Override
-  @NotNull
-  public OtpErlangObject quote() {
+  public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }
 

@@ -142,7 +142,6 @@ public interface ElixirAccessExpression extends MaybeModuleName, Quotable {
 
   boolean isModuleName();
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
 }

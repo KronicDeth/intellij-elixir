@@ -22,6 +22,7 @@ public class ElixirAccessExpressionImpl extends ASTWrapperPsiElement implements 
     visitor.visitAccessExpression(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
@@ -297,8 +298,7 @@ public class ElixirAccessExpressionImpl extends ASTWrapperPsiElement implements 
   }
 
   @Override
-  @NotNull
-  public OtpErlangObject quote() {
+  public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }
 

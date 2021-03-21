@@ -17,7 +17,6 @@ public interface ElixirDecimalFloat extends Quotable {
   @NotNull
   ElixirDecimalFloatIntegral getDecimalFloatIntegral();
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
 }

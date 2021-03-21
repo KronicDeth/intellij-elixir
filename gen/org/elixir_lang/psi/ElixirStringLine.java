@@ -14,40 +14,28 @@ public interface ElixirStringLine extends Atomable, InterpolatedString, Line, Qu
   @Nullable
   ElixirStringLineBody getStringLineBody();
 
-  @NotNull
-  List<Integer> addEscapedCharacterCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode node);
+  @NotNull List<Integer> addEscapedCharacterCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode child);
 
-  //WARNING: addEscapedEOL(...) is skipped
-  //matching addEscapedEOL(ElixirStringLine, ...)
-  //methods are not found in ElixirPsiImplUtil
+  @NotNull List<Integer> addEscapedEOL(@Nullable List<Integer> maybeCodePointList, @NotNull ASTNode child);
 
-  //WARNING: addFragmentCodePoints(...) is skipped
-  //matching addFragmentCodePoints(ElixirStringLine, ...)
-  //methods are not found in ElixirPsiImplUtil
+  @NotNull List<Integer> addFragmentCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode child);
 
-  @NotNull
-  List<Integer> addHexadecimalEscapeSequenceCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode node);
+  @NotNull List<Integer> addHexadecimalEscapeSequenceCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode child);
 
   Body getBody();
 
   IElementType getFragmentType();
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
-  @NotNull
-  OtpErlangObject quoteAsAtom();
+  @NotNull OtpErlangObject quoteAsAtom();
 
-  @NotNull
-  OtpErlangObject quoteBinary(OtpErlangList metadata, List<OtpErlangObject> argumentList);
+  @NotNull OtpErlangObject quoteBinary(OtpErlangList metadata, List<OtpErlangObject> argumentList);
 
-  @NotNull
-  OtpErlangObject quoteEmpty();
+  @NotNull OtpErlangObject quoteEmpty();
 
-  @NotNull
-  OtpErlangObject quoteInterpolation(ElixirInterpolation interpolation);
+  @NotNull OtpErlangObject quoteInterpolation(ElixirInterpolation interpolation);
 
-  @NotNull
-  OtpErlangObject quoteLiteral(List<Integer> codePointList);
+  @NotNull OtpErlangObject quoteLiteral(List<Integer> codePointList);
 
 }

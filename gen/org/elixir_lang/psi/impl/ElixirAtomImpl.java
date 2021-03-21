@@ -23,6 +23,7 @@ public class ElixirAtomImpl extends ASTWrapperPsiElement implements ElixirAtom {
     visitor.visitAtom(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
@@ -41,14 +42,12 @@ public class ElixirAtomImpl extends ASTWrapperPsiElement implements ElixirAtom {
   }
 
   @Override
-  @Nullable
-  public PsiReference getReference() {
+  public @Nullable PsiReference getReference() {
     return ElixirPsiImplUtil.getReference(this);
   }
 
   @Override
-  @NotNull
-  public OtpErlangObject quote() {
+  public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }
 

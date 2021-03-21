@@ -23,20 +23,19 @@ public class ElixirOrInfixOperatorImpl extends ASTWrapperPsiElement implements E
     visitor.visitOrInfixOperator(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
   }
 
   @Override
-  @NotNull
-  public TokenSet operatorTokenSet() {
+  public @NotNull TokenSet operatorTokenSet() {
     return ElixirPsiImplUtil.operatorTokenSet(this);
   }
 
   @Override
-  @NotNull
-  public OtpErlangObject quote() {
+  public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }
 

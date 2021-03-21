@@ -14,7 +14,6 @@ public interface ElixirMapOperation extends Quotable {
   @NotNull
   ElixirMapPrefixOperator getMapPrefixOperator();
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
 }

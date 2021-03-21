@@ -9,10 +9,8 @@ import com.intellij.psi.tree.TokenSet;
 
 public interface ElixirComparisonInfixOperator extends Operator {
 
-  @NotNull
-  TokenSet operatorTokenSet();
+  @NotNull TokenSet operatorTokenSet();
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
 }

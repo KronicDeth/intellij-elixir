@@ -1337,7 +1337,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     r = emptyParentheses(b, l + 1);
     if (!r) r = unmatchedExpression(b, l + 1, -1);
     if (!r) r = unqualifiedNoParenthesesManyArgumentsCall(b, l + 1);
-    exit_section_(b, l, m, r, false, expressionRecoverWhile_parser_);
+    exit_section_(b, l, m, r, false, ElixirParser::expressionRecoverWhile);
     return r;
   }
 
@@ -5700,9 +5700,4 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  static final Parser expressionRecoverWhile_parser_ = new Parser() {
-    public boolean parse(PsiBuilder b, int l) {
-      return expressionRecoverWhile(b, l + 1);
-    }
-  };
 }

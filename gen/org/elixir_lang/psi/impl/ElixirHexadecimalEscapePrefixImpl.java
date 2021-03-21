@@ -21,6 +21,7 @@ public class ElixirHexadecimalEscapePrefixImpl extends ASTWrapperPsiElement impl
     visitor.visitHexadecimalEscapePrefix(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);

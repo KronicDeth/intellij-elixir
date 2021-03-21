@@ -13,7 +13,6 @@ public interface ElixirNoParenthesesKeywords extends QuotableKeywordList {
 
   List<QuotableKeywordPair> quotableKeywordPairList();
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
 }

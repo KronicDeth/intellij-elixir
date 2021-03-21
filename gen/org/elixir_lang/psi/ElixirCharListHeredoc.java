@@ -17,36 +17,26 @@ public interface ElixirCharListHeredoc extends Heredoc, InterpolatedCharList, Qu
   @Nullable
   ElixirHeredocPrefix getHeredocPrefix();
 
-  @NotNull
-  List<Integer> addEscapedCharacterCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode node);
+  @NotNull List<Integer> addEscapedCharacterCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode child);
 
-  @NotNull
-  List<Integer> addEscapedEOL(@Nullable List<Integer> maybeCodePointList, @NotNull ASTNode node);
+  @NotNull List<Integer> addEscapedEOL(@Nullable List<Integer> maybeCodePointList, @NotNull ASTNode child);
 
-  @NotNull
-  List<Integer> addFragmentCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode node);
+  @NotNull List<Integer> addFragmentCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode child);
 
-  @NotNull
-  List<Integer> addHexadecimalEscapeSequenceCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode node);
+  @NotNull List<Integer> addHexadecimalEscapeSequenceCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode child);
 
   IElementType getFragmentType();
 
-  @NotNull
-  List<HeredocLine> getHeredocLineList();
+  @NotNull List<HeredocLine> getHeredocLineList();
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
-  @NotNull
-  OtpErlangObject quoteBinary(OtpErlangList metadata, List<OtpErlangObject> argumentList);
+  @NotNull OtpErlangObject quoteBinary(OtpErlangList metadata, List<OtpErlangObject> argumentList);
 
-  @NotNull
-  OtpErlangObject quoteEmpty();
+  @NotNull OtpErlangObject quoteEmpty();
 
-  @NotNull
-  OtpErlangObject quoteInterpolation(ElixirInterpolation interpolation);
+  @NotNull OtpErlangObject quoteInterpolation(ElixirInterpolation interpolation);
 
-  @NotNull
-  OtpErlangObject quoteLiteral(List<Integer> codePointList);
+  @NotNull OtpErlangObject quoteLiteral(List<Integer> codePointList);
 
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.navigation.ItemPresentation;
 
 public interface ElixirKeywordKey extends NamedElement, Quotable {
 
@@ -14,16 +15,12 @@ public interface ElixirKeywordKey extends NamedElement, Quotable {
   @Nullable
   ElixirStringLine getStringLine();
 
-  @Nullable
-  String getName();
+  @Nullable String getName();
 
-  @Nullable
-  PsiElement getNameIdentifier();
+  @Nullable PsiElement getNameIdentifier();
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
-  @NotNull
-  PsiElement setName(@NotNull String newName);
+  @NotNull PsiElement setName(@NotNull String newName);
 
 }

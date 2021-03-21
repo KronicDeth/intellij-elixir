@@ -15,19 +15,14 @@ public interface ElixirUnmatchedAtNonNumericOperation extends ElixirUnmatchedExp
   @Nullable
   ElixirUnmatchedExpression getUnmatchedExpression();
 
-  @Nullable
-  PsiReference getReference();
+  @Nullable PsiReference getReference();
 
-  @NotNull
-  String moduleAttributeName();
+  @NotNull String moduleAttributeName();
 
-  @Nullable
-  Quotable operand();
+  @Nullable Quotable operand();
 
-  @NotNull
-  Operator operator();
+  @NotNull Operator operator();
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
 }
