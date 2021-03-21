@@ -4,10 +4,12 @@ import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.roots.impl.LibraryScopeCache
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementResolveResult
+import com.intellij.psi.PsiReference
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.impl.source.resolve.ResolveCache
 import com.intellij.psi.impl.source.tree.CompositeElement
 import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.psi.search.searches.ReferencesSearch
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.util.siblings
 import org.elixir_lang.leex.reference.Assign
@@ -15,7 +17,6 @@ import org.elixir_lang.psi.*
 import org.elixir_lang.psi.Modular.callDefinitionClauseCallFoldWhile
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.StubBased
-import org.elixir_lang.psi.call.arguments.None
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.operation.*
@@ -26,7 +27,21 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
         assign.element.containingFile.context
                 ?.let { it as? Call }
                 ?.let { viewModule ->
-                    resolveInViewModule(assign, incompleteCode, viewModule) + resolveInPhoenixLiveView(assign, incompleteCode)
+                    val viewModuleResolveResultList = resolveInViewModule(assign, incompleteCode, viewModule)
+
+                    if (viewModuleResolveResultList.any(ResolveResult::isValidResult)) {
+                        viewModuleResolveResultList
+                    } else {
+                        val liveComponentCallResolveResultList = resolveInLiveComponentCalls(assign, incompleteCode, viewModule)
+
+                        if (liveComponentCallResolveResultList.any(ResolveResult::isValidResult)) {
+                            viewModuleResolveResultList + liveComponentCallResolveResultList
+                        } else {
+                            val phoenixLiveViewResolveResultList = resolveInPhoenixLiveView(assign, incompleteCode)
+
+                            viewModuleResolveResultList + liveComponentCallResolveResultList + phoenixLiveViewResolveResultList
+                        }
+                    }
                 }
                 .orEmpty()
                 .toTypedArray()
@@ -193,6 +208,64 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
                     TODO()
                 }
             }
+
+    private fun resolveInLiveComponentCalls(assign: Assign, incompleteCode: Boolean, viewModule: Call): List<ResolveResult> {
+        val searchScope = GlobalSearchScope.projectScope(assign.element.project).let { GlobalSearchScope.getScopeRestrictedByFileTypes(it, org.elixir_lang.leex.file.Type.INSTANCE) }
+        val resolveResultList = mutableListOf<ResolveResult>()
+        ReferencesSearch.search(viewModule, searchScope).forEach { psiReference ->
+            liveComponentCall(psiReference)?.let { resolveResultList.addAll(resolveInLiveComponentCall(assign, incompleteCode, it)) }
+
+            true
+        }
+
+        return resolveResultList
+    }
+
+    private fun liveComponentCall(psiReference: PsiReference): Call? = liveComponentCall(psiReference.element)
+
+    private tailrec fun liveComponentCall(element: PsiElement): Call? =
+            when (element) {
+                is Arguments, is ElixirAccessExpression, is QualifiableAlias -> liveComponentCall(element.parent)
+                is Call -> if (element.functionName() == "live_component" && element.resolvedFinalArity() in 3..4) {
+                    element
+                } else {
+                    null
+                }
+                else -> null
+            }
+
+    private fun resolveInLiveComponentCall(assign: Assign, incompleteCode: Boolean, liveComponentCall: Call): List<ResolveResult> =
+            liveComponentCall
+                    .finalArguments()
+                    ?.last()
+                    ?.let { resolveInLiveComponentAssigns(assign, incompleteCode, it) }
+                    ?: emptyList()
+
+    private tailrec fun resolveInLiveComponentAssigns(assign: Assign, incompleteCode: Boolean, assigns: PsiElement): List<ResolveResult> =
+        when (assigns) {
+            is QuotableKeywordList ->
+                assigns.quotableKeywordPairList().flatMap { keywordPair ->
+                    resolveInLiveComponentAssigns(assign, incompleteCode, keywordPair)
+                }
+            is QuotableKeywordPair -> resolveInLiveComponentAssigns(assign, incompleteCode, assigns.keywordKey)
+            is ElixirKeywordKey -> {
+                if (assigns.charListLine == null && assigns.stringLine == null) {
+                    val resolvedName = assigns.text
+                    val assignName = assign.name
+
+                    if (resolvedName.startsWith(assignName)) {
+                        val validResult = resolvedName == assignName
+
+                        listOf(PsiElementResolveResult(assigns, validResult))
+                    } else {
+                        null
+                    }
+                } else {
+                    null
+                } ?: emptyList()
+            }
+            else -> emptyList()
+        }
 
     private const val LIVE_ACTION = "live_action"
     private const val MYSELF = "myself"
