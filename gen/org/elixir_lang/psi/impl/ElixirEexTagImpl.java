@@ -10,6 +10,8 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
+import com.intellij.psi.ResolveState;
+import com.intellij.psi.scope.PsiScopeProcessor;
 
 public class ElixirEexTagImpl extends ASTWrapperPsiElement implements ElixirEexTag {
 
@@ -49,6 +51,11 @@ public class ElixirEexTagImpl extends ASTWrapperPsiElement implements ElixirEexT
   @NotNull
   public List<ElixirUnqualifiedNoParenthesesManyArgumentsCall> getUnqualifiedNoParenthesesManyArgumentsCallList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirUnqualifiedNoParenthesesManyArgumentsCall.class);
+  }
+
+  @Override
+  public boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place) {
+    return ElixirPsiImplUtil.processDeclarations(this, processor, state, lastParent, place);
   }
 
 }

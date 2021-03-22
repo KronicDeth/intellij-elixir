@@ -5,8 +5,10 @@ import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.ResolveState
+import com.intellij.psi.impl.source.tree.CompositeElement
 import com.intellij.psi.scope.PsiScopeProcessor
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.util.siblings
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function
@@ -134,6 +136,29 @@ object ProcessDeclarationsImpl {
                 entrance
         )
     }
+
+    @JvmStatic
+    fun processDeclarations(scope: ElixirEex,
+                            processor: PsiScopeProcessor,
+                            state: ResolveState,
+                            lastParent: PsiElement,
+                            @Suppress("UNUSED_PARAMETER") place: PsiElement): Boolean =
+            processDeclarationsInPreviousSibling(scope, processor, state, lastParent)
+
+    @JvmStatic
+    fun processDeclarations(scope: ElixirEexTag,
+                            processor: PsiScopeProcessor,
+                            state: ResolveState,
+                            lastParent: PsiElement,
+                            place: PsiElement): Boolean =
+        if (scope.isEquivalentTo(lastParent.parent)) {
+            processDeclarationsInPreviousSibling(scope, processor, state, lastParent)
+        } else {
+            scope
+                    .lastChild
+                    .siblings(forward = false)
+                    .let { processDeclarations(it, processor, state) }
+        }
 
     @JvmStatic
     fun processDeclarations(scope: ElixirStabBody,
@@ -275,37 +300,32 @@ object ProcessDeclarationsImpl {
     private fun processDeclarationsInPreviousSibling(scope: PsiElement,
                                                      processor: PsiScopeProcessor,
                                                      state: ResolveState,
-                                                     lastParent: PsiElement): Boolean {
-        var keepProcessing = true
-
+                                                     lastParent: PsiElement): Boolean =
         if (scope.isEquivalentTo(lastParent.parent)) {
-            var previousSibling: PsiElement? = lastParent.prevSibling
-
-            while (previousSibling != null) {
-                if (!(previousSibling is ElixirEndOfExpression ||
-                                previousSibling is PsiComment ||
-                                previousSibling is PsiWhiteSpace)) {
-                    if (!createsNewScope(previousSibling)) {
-                        keepProcessing = processor.execute(previousSibling, state)
-
-                        if (!keepProcessing) {
-                            break
-                        }
-                    }
-                }
-
-                previousSibling = previousSibling.prevSibling
+            lastParent
+                    .siblings(forward = false, withSelf = false)
+                    .let { processDeclarations(it, processor, state) }
+        } else {
+            if (lastParent !is ElixirFile) {
+                org.elixir_lang.errorreport.Logger.error(
+                        PsiElement::class.java,
+                        "Scope is not lastParent's parent\nlastParent:\n" + lastParent.text,
+                        scope
+                )
             }
-        } else if (lastParent !is ElixirFile) {
-            org.elixir_lang.errorreport.Logger.error(
-                    PsiElement::class.java,
-                    "Scope is not lastParent's parent\nlastParent:\n" + lastParent.text,
-                    scope
-            )
+
+            true
         }
 
-        return keepProcessing
-    }
+    private fun processDeclarations(sequence: Sequence<PsiElement>, processor: PsiScopeProcessor, state: ResolveState): Boolean =
+            sequence
+                    .filter { it.node is CompositeElement }
+                    .filter { !(it is ElixirEndOfExpression || it is PsiComment || it is PsiWhiteSpace) }
+                    .filter { !createsNewScope(it) }
+                    .map { processor.execute(it, state) }
+                    .takeWhile { it }
+                    .lastOrNull()
+                    ?: true
 
     private fun processDeclarationsRecursively(psiElement: PsiElement,
                                                processor: PsiScopeProcessor,

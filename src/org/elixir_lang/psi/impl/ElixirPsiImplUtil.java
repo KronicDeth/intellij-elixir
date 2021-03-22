@@ -589,6 +589,22 @@ public class ElixirPsiImplUtil {
         return ProcessDeclarationsImpl.processDeclarations(multipleAliases, processor, state, lastParent, entrance);
     }
 
+    public static boolean processDeclarations(@NotNull final ElixirEex scope,
+                                              @NotNull PsiScopeProcessor processor,
+                                              @NotNull ResolveState state,
+                                              PsiElement lastParent,
+                                              @NotNull PsiElement place) {
+        return ProcessDeclarationsImpl.processDeclarations(scope, processor, state, lastParent, place);
+    }
+
+    public static boolean processDeclarations(@NotNull final ElixirEexTag scope,
+                                              @NotNull PsiScopeProcessor processor,
+                                              @NotNull ResolveState state,
+                                              PsiElement lastParent,
+                                              @NotNull PsiElement place) {
+        return ProcessDeclarationsImpl.processDeclarations(scope, processor, state, lastParent, place);
+    }
+
     public static boolean processDeclarations(@NotNull final ElixirStabBody scope,
                                               @NotNull PsiScopeProcessor processor,
                                               @NotNull ResolveState state,

@@ -2343,9 +2343,19 @@ accessExpression ::= atNumericOperation |
 
 // See eexFile in EEx.bnf
 eex ::= (EEX_DATA | EEX_ESCAPED_OPENING | eexTag)+
+        {
+          methods = [
+            processDeclarations
+          ]
+        }
 
 // CANNOT be `{ pin = 1 }` because an `EEX_OPENING` is also used in `doBlock`
 eexTag ::= EEX_OPENING (eexCommentBody | eexElixirBody) EEX_CLOSING
+           {
+             methods = [
+               processDeclarations
+             ]
+           }
 
 private eexCommentBody ::= EEX_COMMENT_MARKER EEX_COMMENT?
                            { pin = 1 }

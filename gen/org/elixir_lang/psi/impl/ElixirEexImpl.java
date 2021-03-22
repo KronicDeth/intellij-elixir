@@ -10,6 +10,8 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
+import com.intellij.psi.ResolveState;
+import com.intellij.psi.scope.PsiScopeProcessor;
 
 public class ElixirEexImpl extends ASTWrapperPsiElement implements ElixirEex {
 
@@ -33,4 +35,8 @@ public class ElixirEexImpl extends ASTWrapperPsiElement implements ElixirEex {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEexTag.class);
   }
 
+  @Override
+  public boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place) {
+    return ElixirPsiImplUtil.processDeclarations(this, processor, state, lastParent, place);
+  }
 }
