@@ -1,311 +1,241 @@
-package org.elixir_lang.beam;
+package org.elixir_lang.beam
 
-import com.intellij.openapi.fileTypes.BinaryFileDecompiler;
-import com.intellij.openapi.vfs.VirtualFile;
-import org.elixir_lang.beam.chunk.Atoms;
-import org.elixir_lang.beam.chunk.beam_documentation.Documentation;
-import org.elixir_lang.beam.chunk.CallDefinitions;
-import org.elixir_lang.beam.chunk.beam_documentation.Doc;
-import org.elixir_lang.beam.chunk.beam_documentation.FunctionMetadata;
-import org.elixir_lang.beam.decompiler.*;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.fileTypes.BinaryFileDecompiler
+import com.intellij.openapi.vfs.VirtualFile
+import org.elixir_lang.beam.Beam.Companion.from
+import org.elixir_lang.beam.chunk.Atoms
+import org.elixir_lang.beam.chunk.CallDefinitions
+import org.elixir_lang.beam.chunk.Chunk.TypeID
+import org.elixir_lang.beam.chunk.beam_documentation.Documentation
+import org.elixir_lang.beam.decompiler.*
+import org.elixir_lang.psi.call.name.Function
+import org.elixir_lang.psi.call.name.Module
+import java.util.*
+import java.util.function.Consumer
 
-import java.util.*;
-import java.util.stream.Collectors;
+class Decompiler : BinaryFileDecompiler {
+    override fun decompile(virtualFile: VirtualFile): CharSequence = decompiled(from(virtualFile))
 
-import static org.elixir_lang.beam.chunk.Chunk.TypeID.ATOM;
-import static org.elixir_lang.psi.call.name.Function.*;
-import static org.elixir_lang.psi.call.name.Module.ELIXIR_PREFIX;
+    companion object {
+        private val HEADER_NAME_BY_MACRO: Map<String, String> = mapOf(Function.DEFMACRO to "Macros", Function.DEFMACROP to "Private Macros", Function.DEF to "Functions", Function.DEFP to "Private Functions")
+        private val MACRO_NAME_ARITY_DECOMPILER_LIST: List<org.elixir_lang.beam.decompiler.MacroNameArity> = listOf(
+                InfixOperator.INSTANCE,
+                PrefixOperator.INSTANCE,
+                Unquoted.INSTANCE,
+                SignatureOverride.INSTANCE,
+                Default.INSTANCE
+        )
 
-public class Decompiler implements BinaryFileDecompiler {
-    private static final Map<String, String> HEADER_NAME_BY_MACRO = new HashMap<>();
+        private const val DECOMPILATION_ERROR = "# Decompilation Error: "
 
-    static {
-        HEADER_NAME_BY_MACRO.put(DEFMACRO, "Macros");
-        HEADER_NAME_BY_MACRO.put(DEFMACROP, "Private Macros");
-        HEADER_NAME_BY_MACRO.put(DEF, "Functions");
-        HEADER_NAME_BY_MACRO.put(DEFP, "Private Functions");
-    }
+        private fun decompiled(beam: Beam?): CharSequence {
+            val decompiled = StringBuilder()
 
-    public static final List<org.elixir_lang.beam.decompiler.MacroNameArity> MACRO_NAME_ARITY_DECOMPILER_LIST =
-            new ArrayList<org.elixir_lang.beam.decompiler.MacroNameArity>();
+            return if (beam != null) {
+                val atoms = beam.atoms()
+                if (atoms != null) {
+                    val moduleName = atoms.moduleName()
+                    if (moduleName != null) {
+                        val defmoduleArgument = defmoduleArgument(moduleName)
+                        decompiled
+                                .append("# Source code recreated from a .beam file by IntelliJ Elixir\n")
+                                .append("defmodule ")
+                                .append(defmoduleArgument)
+                                .append(" do\n")
+                        val documentation = beam.documentation()
 
-    static {
-        MACRO_NAME_ARITY_DECOMPILER_LIST.add(InfixOperator.INSTANCE);
-        MACRO_NAME_ARITY_DECOMPILER_LIST.add(PrefixOperator.INSTANCE);
-        MACRO_NAME_ARITY_DECOMPILER_LIST.add(Unquoted.INSTANCE);
-        MACRO_NAME_ARITY_DECOMPILER_LIST.add(SignatureOverride.INSTANCE);
-        MACRO_NAME_ARITY_DECOMPILER_LIST.add(Default.INSTANCE);
-    }
-
-    @NotNull
-    private static CharSequence decompiled(
-            @SuppressWarnings("OptionalUsedAsFieldOrParameterType") @NotNull Optional<Beam> beamOptional
-    ) {
-        StringBuilder decompiled = new StringBuilder("# Decompilation Error: ");
-
-        if (beamOptional.isPresent()) {
-            Beam beam = beamOptional.get();
-            Atoms atoms = beam.atoms();
-
-            if (atoms != null) {
-                String moduleName = atoms.moduleName();
-                if (moduleName != null) {
-                    String defmoduleArgument = defmoduleArgument(moduleName);
-
-                    decompiled = new StringBuilder(
-                            "# Source code recreated from a .beam file by IntelliJ Elixir\n"
-                    )
-                            .append("defmodule ")
-                            .append(defmoduleArgument)
-                            .append(" do\n");
-
-                    Documentation documentation = beam.documentation();
-                    if (documentation != null) {
-                        String moduleDocs = documentation.getModuleDocs() != null
-                                ? documentation.getModuleDocs().getEnglishDocs()
-                                : null;
-
-                        if (moduleDocs != null) {
-                            appendDocumentation(decompiled, "moduledoc", moduleDocs);
+                        if (documentation != null) {
+                            documentation.moduleDocs?.englishDocs?.let { moduleDocs ->
+                                appendDocumentation(decompiled, "moduledoc", moduleDocs)
+                            }
                         }
+
+                        appendCallDefinitions(decompiled, beam, atoms, documentation)
+                        decompiled.append("end\n")
+                    } else {
+                        decompiled
+                                .append(DECOMPILATION_ERROR)
+                                .append("No module name found in ")
+                                .append(TypeID.ATOM)
+                                .append(" chunk in BEAM")
                     }
-
-                    appendCallDefinitions(decompiled, beam, atoms, documentation);
-
-                    decompiled.append("end\n");
                 } else {
-                    decompiled.append("No module name found in ").append(ATOM).append(" chunk in BEAM");
+                    decompiled
+                            .append(DECOMPILATION_ERROR)
+                            .append("No ")
+                            .append(TypeID.ATOM)
+                            .append(" chunk found in BEAM")
                 }
             } else {
-                decompiled.append("No ").append(ATOM).append(" chunk found in BEAM");
+                decompiled.append(DECOMPILATION_ERROR).append("BEAM format could not be read")
             }
-        } else {
-            decompiled.append("BEAM format could not be read");
         }
 
-        return decompiled;
-    }
+        private fun appendCallDefinitions(decompiled: StringBuilder,
+                                          beam: Beam,
+                                          atoms: Atoms, documentation: Documentation?) {
+            val macroNameAritySortedSet = CallDefinitions.macroNameAritySortedSet(beam, atoms)
+            appendCallDefinitions(decompiled, macroNameAritySortedSet, documentation)
+        }
 
-    private static void appendCallDefinitions(@NotNull StringBuilder decompiled,
-                                              @NotNull Beam beam,
-                                              @NotNull Atoms atoms, Documentation documentation) {
-        SortedSet<MacroNameArity> macroNameAritySortedSet = CallDefinitions.macroNameAritySortedSet(beam, atoms);
-        appendCallDefinitions(decompiled, macroNameAritySortedSet, documentation);
-    }
+        private fun macroToHeaderName(macro: String): String = HEADER_NAME_BY_MACRO[macro]!!
 
-    @NotNull
-    private static String macroToHeaderName(@NotNull String macro) {
-        return HEADER_NAME_BY_MACRO.get(macro);
-    }
-
-    private static void appendCallDefinitions(@NotNull StringBuilder decompiled,
-                                              @NotNull SortedSet<MacroNameArity> macroNameAritySortedSet, Documentation documentation) {
-        MacroNameArity lastMacroNameArity = null;
-
-        for (MacroNameArity macroNameArity : macroNameAritySortedSet) {
-            String macro = macroNameArity.macro;
-
-            if (lastMacroNameArity == null) {
-                appendHeader(decompiled, macroToHeaderName(macro));
-            } else if (!lastMacroNameArity.macro.equals(macro)) {
-                appendHeader(decompiled, macroToHeaderName(macro));
-            }
-            decompiled.append("\n");
-
-            if (documentation != null){
-                List<FunctionMetadata> functionMetadata = documentation.getDocs() != null
-                        ? documentation.getDocs().getFunctionMetadataOrSimilar(macroNameArity.name, macroNameArity.arity)
-                        : null;
-                if (functionMetadata != null){
-                    functionMetadata.stream().filter(x -> x.getName().equals("deprecated")).forEach(x -> {
-                        if (x.getValue() != null){
+        private fun appendCallDefinitions(decompiled: StringBuilder,
+                                          macroNameAritySortedSet: SortedSet<MacroNameArity>, documentation: Documentation?) {
+            var lastMacroNameArity: MacroNameArity? = null
+            for (macroNameArity in macroNameAritySortedSet) {
+                val macro = macroNameArity.macro
+                if (lastMacroNameArity == null) {
+                    appendHeader(decompiled, macroToHeaderName(macro))
+                } else if (lastMacroNameArity.macro != macro) {
+                    appendHeader(decompiled, macroToHeaderName(macro))
+                }
+                decompiled.append("\n")
+                if (documentation != null) {
+                    val functionMetadata = if (documentation.docs != null) documentation.docs!!.getFunctionMetadataOrSimilar(macroNameArity.name, macroNameArity.arity) else null
+                    functionMetadata?.stream()?.filter { (name) -> name == "deprecated" }?.forEach { (_, value) ->
+                        if (value != null) {
                             decompiled.append("\n  @deprecated \"\"\"\n")
                                     .append("  ")
-                                    .append(x.getValue())
-                                    .append("\n  \"\"\"\n\n");
-                        }else{
-                            decompiled.append("\n  @deprecated\n");
+                                    .append(value)
+                                    .append("\n  \"\"\"\n\n")
+                        } else {
+                            decompiled.append("\n  @deprecated\n")
                         }
-                    });
+                    }
+                    val functionDocs = if (documentation.docs != null) documentation.docs!!.getFunctionDocs(macroNameArity.name, macroNameArity.arity) else null
+                    functionDocs?.forEach(Consumer { (_, documentationText) -> appendDocumentation(decompiled, "doc", documentationText) })
                 }
-                List<Doc> functionDocs = documentation.getDocs() != null
-                        ? documentation.getDocs().getFunctionDocs(macroNameArity.name, macroNameArity.arity)
-                        : null;
-                if (functionDocs != null){
-                    functionDocs.forEach(x -> {
-                        appendDocumentation(decompiled, "doc", x.getDocumentationText());
-                    });
-                }
-            }
-
-            appendMacroNameArity(decompiled, macroNameArity, documentation);
-
-            lastMacroNameArity = macroNameArity;
-        }
-    }
-
-    private static void appendHeader(@NotNull StringBuilder decompiled, @NotNull String name) {
-        decompiled
-                .append("\n")
-                .append("  # ")
-                .append(name)
-                .append("\n");
-    }
-
-    private static void appendDocumentation(@NotNull StringBuilder decompiled, @NotNull String moduleAttribute, @NotNull String text) {
-        String safePromoterTerminator = safePromoterTerminator(text);
-
-        String promoterTerminator;
-        if (safePromoterTerminator != null) {
-            promoterTerminator = safePromoterTerminator;
-        } else {
-            promoterTerminator = "\"\"\"";
-        }
-
-        decompiled
-                .append("  @")
-                .append(moduleAttribute)
-                // Use ~S sigil to stop interpolation in docs as an interpolation stored in the docs was
-                // escaped in the original source.
-                .append(" ~S")
-                .append(promoterTerminator)
-                .append('\n');
-        appendDocumentationText(decompiled, safePromoterTerminator, text);
-        decompiled
-                .append("\n  ")
-                .append(promoterTerminator)
-                .append('\n');
-    }
-
-    private static final String CHARLIST_HEREDOC_PROMOTER_TERMINATOR = "'''";
-    private static final String STRING_HEREDOC_PROMOTER_TERMINATOR = "\"\"\"";
-
-    @Nullable
-    private static String safePromoterTerminator(String text) {
-        boolean containsCharlistHeredoc = text.contains(CHARLIST_HEREDOC_PROMOTER_TERMINATOR);
-        boolean containsStringHeredoc = text.contains(STRING_HEREDOC_PROMOTER_TERMINATOR);
-
-        @Nullable String safePromoterTerminator;
-        if (containsCharlistHeredoc && containsStringHeredoc) {
-            safePromoterTerminator = null;
-        } else if (containsCharlistHeredoc) {
-            safePromoterTerminator = STRING_HEREDOC_PROMOTER_TERMINATOR;
-        } else if (containsStringHeredoc) {
-            safePromoterTerminator = CHARLIST_HEREDOC_PROMOTER_TERMINATOR;
-        } else {
-            // Default to String since it is what actual developers would use most often
-            safePromoterTerminator = STRING_HEREDOC_PROMOTER_TERMINATOR;
-        }
-
-        return safePromoterTerminator;
-    }
-
-    private static void appendDocumentationText(@NotNull StringBuilder decompiled, @Nullable String safePromoterTerminator, @NotNull String text) {
-        String[] lines = text.split("\n");
-
-        int lastI = lines.length - 1;
-        for (int i = 0; i < lines.length; i++) {
-            String line = lines[i];
-
-            String stripped = line.stripTrailing();
-
-            if (!stripped.isEmpty()) {
-                decompiled.append("  ");
-
-                if (safePromoterTerminator == null) {
-                    decompiled.append(stripped.replace(STRING_HEREDOC_PROMOTER_TERMINATOR, "\"\"\""));
-                } else {
-                    decompiled.append(stripped);
-                }
-            }
-
-            if (i != lastI) {
-                decompiled.append("\n");
+                appendMacroNameArity(decompiled, macroNameArity, documentation)
+                lastMacroNameArity = macroNameArity
             }
         }
-    }
 
-    private static void appendMacroNameArity(@NotNull StringBuilder decompiled,
-                                             @NotNull MacroNameArity macroNameArity, Documentation documentation) {
-        org.elixir_lang.beam.decompiler.MacroNameArity decompiler = decompiler(macroNameArity);
+        private fun appendHeader(decompiled: StringBuilder, name: String) {
+            decompiled
+                    .append("\n")
+                    .append("  # ")
+                    .append(name)
+                    .append("\n")
+        }
 
-        if (decompiler != null) {
-            // The signature while easier for users to read are not proper code for those that need to use unquote, so
-            // only allow signatures for default decompiler
-            if (decompiler == Default.INSTANCE) {
-                List<String> signaturesFromDocs = documentation != null && documentation.getBeamLanguage().equals("elixir")
-                        ? documentation.getDocs().getSignatures(macroNameArity.name, macroNameArity.arity)
-                        : null;
+        private fun appendDocumentation(decompiled: StringBuilder, moduleAttribute: String, text: String) {
+            val safePromoterTerminator = safePromoterTerminator(text)
+            val promoterTerminator: String = safePromoterTerminator ?: "\"\"\""
+            decompiled
+                    .append("  @")
+                    .append(moduleAttribute)
+                    // Use ~S sigil to stop interpolation in docs as an interpolation stored in the docs was
+                    // escaped in the original source.
+                    .append(" ~S")
+                    .append(promoterTerminator)
+                    .append('\n')
+            appendDocumentationText(decompiled, safePromoterTerminator, text)
+            decompiled
+                    .append("\n  ")
+                    .append(promoterTerminator)
+                    .append('\n')
+        }
 
-                if (signaturesFromDocs != null && !signaturesFromDocs.isEmpty()) {
-                    decompiled.append("  ").append(macroNameArity.macro).append(' ');
-                    Optional<String> optional = signaturesFromDocs.stream().findFirst();
-                    decompiled.append(optional.get());
-                    decompiled.append(" do\n    # body not decompiled\n  end\n");
-                } else {
-                    decompiler.append(decompiled, macroNameArity);
-                }
+        private const val CHARLIST_HEREDOC_PROMOTER_TERMINATOR = "'''"
+        private const val STRING_HEREDOC_PROMOTER_TERMINATOR = "\"\"\""
+        private fun safePromoterTerminator(text: String): String? {
+            val containsCharlistHeredoc = text.contains(CHARLIST_HEREDOC_PROMOTER_TERMINATOR)
+            val containsStringHeredoc = text.contains(STRING_HEREDOC_PROMOTER_TERMINATOR)
+
+            return if (containsCharlistHeredoc && containsStringHeredoc) {
+                null
+            } else if (containsCharlistHeredoc) {
+                STRING_HEREDOC_PROMOTER_TERMINATOR
+            } else if (containsStringHeredoc) {
+                CHARLIST_HEREDOC_PROMOTER_TERMINATOR
             } else {
-                decompiler.append(decompiled, macroNameArity);
-            }
-        }
-    }
-
-    @Nullable
-    static org.elixir_lang.beam.decompiler.MacroNameArity decompiler(@NotNull MacroNameArity macroNameArity) {
-        org.elixir_lang.beam.decompiler.MacroNameArity accepted = null;
-
-        for (org.elixir_lang.beam.decompiler.MacroNameArity decompiler : MACRO_NAME_ARITY_DECOMPILER_LIST) {
-            if (decompiler.accept(macroNameArity)) {
-                accepted = decompiler;
-                break;
+                // Default to String since it is what actual developers would use most often
+                STRING_HEREDOC_PROMOTER_TERMINATOR
             }
         }
 
-        if (accepted == null) {
-            error(macroNameArity);
+        private fun appendDocumentationText(decompiled: StringBuilder, safePromoterTerminator: String?, text: String) {
+            val lines = text.split("\n").toTypedArray()
+            val lastI = lines.size - 1
+
+            for (i in lines.indices) {
+                val line = lines[i]
+                val stripped: String = line.trimEnd()
+
+                if (stripped.isNotEmpty()) {
+                    decompiled.append("  ")
+
+                    if (safePromoterTerminator == null) {
+                        decompiled.append(stripped.replace(STRING_HEREDOC_PROMOTER_TERMINATOR, "\"\"\""))
+                    } else {
+                        decompiled.append(stripped)
+                    }
+                }
+
+                if (i != lastI) {
+                    decompiled.append("\n")
+                }
+            }
         }
 
-        return accepted;
-    }
+        private fun appendMacroNameArity(decompiled: StringBuilder,
+                                         macroNameArity: MacroNameArity, documentation: Documentation?) {
+            val decompiler = decompiler(macroNameArity)
+            if (decompiler != null) {
+                // The signature while easier for users to read are not proper code for those that need to use unquote, so
+                // only allow signatures for default decompiler
+                if (decompiler === Default.INSTANCE) {
+                    val signaturesFromDocs = if (documentation != null && documentation.beamLanguage == "elixir") documentation.docs!!.getSignatures(macroNameArity.name, macroNameArity.arity) else null
 
-    private static void error(@NotNull MacroNameArity macroNameArity) {
-        com.intellij.openapi.diagnostic.Logger logger = com.intellij.openapi.diagnostic.Logger.getInstance(
-                Decompiler.class
-        );
-        String message = "No decompiler for MacroNameArity (" + macroNameArity + ")";
-        logger.error(message);
-    }
+                    if (signaturesFromDocs != null && signaturesFromDocs.isNotEmpty()) {
+                        decompiled.append("  ").append(macroNameArity.macro).append(' ')
+                        val optional = signaturesFromDocs.stream().findFirst()
+                        decompiled.append(optional.get())
+                        decompiled.append(" do\n    # body not decompiled\n  end\n")
+                    } else {
+                        decompiler.append(decompiled, macroNameArity)
+                    }
+                } else {
+                    decompiler.append(decompiled, macroNameArity)
+                }
+            }
+        }
 
-    @NotNull
-    public static String defmoduleArgument(String moduleName) {
-        String defmoduleArgument;
-        if (moduleName.startsWith(ELIXIR_PREFIX)) {
-            defmoduleArgument = moduleName.substring(ELIXIR_PREFIX.length());
+        fun decompiler(macroNameArity: MacroNameArity): org.elixir_lang.beam.decompiler.MacroNameArity? {
+            var accepted: org.elixir_lang.beam.decompiler.MacroNameArity? = null
+
+            for (decompiler in MACRO_NAME_ARITY_DECOMPILER_LIST) {
+                if (decompiler.accept(macroNameArity)) {
+                    accepted = decompiler
+                    break
+                }
+            }
+
+            if (accepted == null) {
+                error(macroNameArity)
+            }
+
+            return accepted
+        }
+
+        private fun error(macroNameArity: MacroNameArity) {
+            val logger = Logger.getInstance(Decompiler::class.java)
+            val message = "No decompiler for MacroNameArity ($macroNameArity)"
+            logger.error(message)
+        }
+
+        fun defmoduleArgument(moduleName: String): String = if (moduleName.startsWith(Module.ELIXIR_PREFIX)) {
+            moduleName.substring(Module.ELIXIR_PREFIX.length)
         } else {
-            defmoduleArgument = ":" + moduleNameToAtomName(moduleName);
+            ":" + moduleNameToAtomName(moduleName)
         }
-        return defmoduleArgument;
-    }
 
-    @NotNull
-    private static String moduleNameToAtomName(@NotNull String moduleName) {
-        String atom;
-
-        if (moduleName.contains("-")) {
-            atom = "\"" + moduleName + "\"";
+        private fun moduleNameToAtomName(moduleName: String): String = if (moduleName.contains("-")) {
+            "\"" + moduleName + "\""
         } else {
-            atom = moduleName;
+            moduleName
         }
-
-        return atom;
-    }
-
-    @NotNull
-    @Override
-    public CharSequence decompile(@NotNull VirtualFile virtualFile) {
-        return decompiled(Optional.ofNullable(Beam.Companion.from(virtualFile)));
     }
 }
