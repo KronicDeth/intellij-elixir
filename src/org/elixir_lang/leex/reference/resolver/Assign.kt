@@ -86,7 +86,8 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
                         initial
                     }
                 }
-                is ElixirAtom, is ElixirAtomKeyword, is ElixirEndOfExpression, is ElixirMapOperation, is ElixirStructOperation, is QuotableKeywordList, is Quote -> initial
+                is ElixirAtom, is ElixirAtomKeyword, is ElixirEndOfExpression, is ElixirList, is ElixirMapOperation,
+                    is ElixirStructOperation, is QualifiableAlias, is QuotableKeywordList, is Quote -> initial
                 // After `None` as `assign/2` and `assign/3` have options
                 // After `Match` because it is a more specific `Call`
                 is Call ->
