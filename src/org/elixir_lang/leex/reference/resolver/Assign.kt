@@ -2,10 +2,7 @@ package org.elixir_lang.leex.reference.resolver
 
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.roots.impl.LibraryScopeCache
-import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiElementResolveResult
-import com.intellij.psi.PsiReference
-import com.intellij.psi.ResolveResult
+import com.intellij.psi.*
 import com.intellij.psi.impl.source.resolve.ResolveCache
 import com.intellij.psi.impl.source.tree.CompositeElement
 import com.intellij.psi.search.GlobalSearchScope
@@ -37,9 +34,9 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
                         if (liveComponentCallResolveResultList.any(ResolveResult::isValidResult)) {
                             viewModuleResolveResultList + liveComponentCallResolveResultList
                         } else {
-                            val phoenixLiveViewResolveResultList = resolveInPhoenixLiveView(assign, incompleteCode)
+                            val phoenixLiveViewAccumulatorContinue = resolveInPhoenixLiveView(assign, incompleteCode)
 
-                            viewModuleResolveResultList + liveComponentCallResolveResultList + phoenixLiveViewResolveResultList
+                            viewModuleResolveResultList + liveComponentCallResolveResultList + phoenixLiveViewAccumulatorContinue.accumulator
                         }
                     }
                 }
@@ -49,32 +46,37 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
     private fun resolveInViewModule(assign: Assign, incompleteCode: Boolean, viewModule: Call): List<ResolveResult> =
         callDefinitionClauseCallFoldWhile(viewModule, emptyList<ResolveResult>()) { callDefinitionClauseCall, acc ->
             // Always continue because there is no way to determine which definition is called last if the view module has enough helper functions.
-            AccumulatorContinue(resolveInCallDefinitionClause(assign, incompleteCode, callDefinitionClauseCall, acc), true)
+            resolveInCallDefinitionClause(assign, incompleteCode, callDefinitionClauseCall, acc)
         }.accumulator
 
-    private fun resolveInCallDefinitionClause(assign: Assign, incompleteCode: Boolean, callDefinitionClause: Call, initial: List<ResolveResult>): List<ResolveResult> =
+    private fun resolveInCallDefinitionClause(assign: Assign, incompleteCode: Boolean, callDefinitionClause: Call, initial: List<ResolveResult>): AccumulatorContinue<List<ResolveResult>> =
             resolveInCallDefinitionClause(assign, incompleteCode, callDefinitionClause, initial, ::resolveInCallDefinitionClauseExpression)
 
-    private tailrec fun resolveInCallDefinitionClauseExpression(assign: Assign, incompleteCode: Boolean, expression: PsiElement, initial: List<ResolveResult>): List<ResolveResult> =
+    private const val SOCKET = "socket"
+
+    private tailrec fun resolveInCallDefinitionClauseExpression(assign: Assign, incompleteCode: Boolean, expression: PsiElement, initial: List<ResolveResult>): AccumulatorContinue<List<ResolveResult>> =
             when (expression) {
-                is ElixirAccessExpression, is ElixirStabBody, is ElixirTuple -> expression
-                        .lastChild
-                        .siblings(forward = false, withSelf = true)
-                        .filter { it.node is CompositeElement }
-                        .fold(initial) { acc, child ->
-                            resolveInCallDefinitionClauseExpression(assign, incompleteCode, child, acc)
-                        }
+                is ElixirAccessExpression, is ElixirStabBody, is ElixirTuple -> {
+                    val children = expression
+                            .lastChild
+                            .siblings(forward = false, withSelf = true)
+                            .filter { it.node is CompositeElement }
+
+                    AccumulatorContinue.foldWhile(children, initial) { child, accumulator ->
+                        resolveInCallDefinitionClauseExpression(assign, incompleteCode, child, accumulator)
+                    }
+                }
                 is Arrow -> {
-                    val leftAcc = expression.leftOperand()?.let { leftOperand ->
+                    val leftAccumulatorContinue = expression.leftOperand()?.let { leftOperand ->
                         resolveInCallDefinitionClauseExpression(assign, incompleteCode, leftOperand, initial)
-                    } ?: initial
+                    } ?: AccumulatorContinue(initial, true)
 
                     val rightOperand = expression.rightOperand()
 
                     if (rightOperand != null) {
-                        resolveInCallDefinitionClauseExpression(assign, incompleteCode, rightOperand, leftAcc)
+                        resolveInCallDefinitionClauseExpression(assign, incompleteCode, rightOperand, leftAccumulatorContinue.accumulator)
                     } else {
-                        leftAcc
+                        leftAccumulatorContinue
                     }
                 }
                 is Match -> {
@@ -83,11 +85,11 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
                     if (rightOperand != null) {
                         resolveInCallDefinitionClauseExpression(assign, incompleteCode, rightOperand, initial)
                     } else {
-                        initial
+                        AccumulatorContinue(initial, true)
                     }
                 }
                 is ElixirAtom, is ElixirAtomKeyword, is ElixirEndOfExpression, is ElixirList, is ElixirMapOperation,
-                    is ElixirStructOperation, is QualifiableAlias, is QuotableKeywordList, is Quote -> initial
+                    is ElixirStructOperation, is QualifiableAlias, is QuotableKeywordList, is Quote -> AccumulatorContinue(initial, true)
                 // After `None` as `assign/2` and `assign/3` have options
                 // After `Match` because it is a more specific `Call`
                 is Call ->
@@ -96,29 +98,101 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
                             when (expression.resolvedFinalArity()) {
                                 2 -> expression
                                         .finalArguments()
-                                        ?.last()
-                                        ?.let { resolveInAssign2Argument(assign, incompleteCode, it, initial) }
+                                        ?.let { arguments ->
+                                            val socketAccumulatorContinue = if (SOCKET.startsWith(assign.name)) {
+                                                if (arguments.size == 2) {
+                                                    resolveSocket(assign, incompleteCode, arguments[0], initial)
+                                                } else {
+                                                    // if a pipeline
+                                                    resolveSocket(assign, incompleteCode, expression.parent, initial)
+                                                }
+                                            } else {
+                                                AccumulatorContinue(initial, true)
+                                            }
+
+                                            if (socketAccumulatorContinue.`continue`) {
+                                                val assignsElement = arguments.last()
+                                                val accumulator = resolveInAssign2Argument(
+                                                        assign,
+                                                        incompleteCode,
+                                                        assignsElement,
+                                                        socketAccumulatorContinue.accumulator
+                                                )
+
+                                                AccumulatorContinue(accumulator, true)
+                                            } else {
+                                                socketAccumulatorContinue
+                                            }
+                                        }
                                 3 -> expression
                                         .finalArguments()
-                                        ?.let { finalArguments -> finalArguments[finalArguments.size - 2] }
-                                        ?.let { resolveInAtomArgument(assign, incompleteCode, it, initial) }
+                                        ?.let { arguments ->
+                                            val socketAccumulatorContinue = if (SOCKET.startsWith(assign.name)) {
+                                                if (arguments.size == 3) {
+                                                    resolveSocket(assign, incompleteCode, arguments[0], initial)
+                                                } else {
+                                                    // if a pipeline
+                                                    resolveSocket(assign, incompleteCode, expression.parent, initial)
+                                                }
+                                            } else {
+                                                AccumulatorContinue(initial, true)
+                                            }
+
+                                            if (socketAccumulatorContinue.`continue`) {
+                                                val nameElement = arguments[arguments.size - 2]
+                                                val accumulator = resolveInAtomArgument(
+                                                        assign,
+                                                        incompleteCode,
+                                                        nameElement,
+                                                        socketAccumulatorContinue.accumulator
+                                                )
+
+                                                AccumulatorContinue(accumulator, true)
+                                            } else {
+                                                socketAccumulatorContinue
+                                            }
+                                        }
                                 else -> null
-                            } ?: initial
+                            } ?: AccumulatorContinue(initial, true)
                         "assign_new" ->
                             when (expression.resolvedFinalArity()) {
                                 3 -> expression
                                         .finalArguments()
-                                        ?.let { finalArguments -> finalArguments[finalArguments.size - 2] }
-                                        ?.let { resolveInAtomArgument(assign, incompleteCode, it, initial) }
+                                        ?.let { arguments ->
+                                            val socketAccumulatorContinue = if (SOCKET.startsWith(assign.name)) {
+                                                if (arguments.size == 3) {
+                                                    resolveSocket(assign, incompleteCode, arguments[0], initial)
+                                                } else {
+                                                    // if a pipeline
+                                                    resolveSocket(assign, incompleteCode, expression.parent, initial)
+                                                }
+                                            } else {
+                                                AccumulatorContinue(initial, true)
+                                            }
+
+                                            if (socketAccumulatorContinue.`continue`) {
+                                                val nameElement = arguments[arguments.size - 2]
+                                                val accumulator = resolveInAtomArgument(
+                                                        assign,
+                                                        incompleteCode,
+                                                        nameElement,
+                                                        socketAccumulatorContinue.accumulator
+                                                )
+
+                                                AccumulatorContinue(accumulator, true)
+                                            } else {
+                                                socketAccumulatorContinue
+                                            }
+                                        }
                                 else -> null
-                            } ?: initial
+                            } ?: AccumulatorContinue(initial, true)
                         else -> {
                             val stab = expression.doBlock?.stab
 
                             if (stab != null) {
                                 resolveInCallDefinitionClauseExpression(assign, incompleteCode, stab, initial)
                             } else {
-                                initial
+                                AccumulatorContinue(initial, true)
                             }
                         }
                     }
@@ -128,8 +202,13 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
                     if (stabBody != null) {
                         resolveInCallDefinitionClauseExpression(assign, incompleteCode, stabBody, initial)
                     } else {
-                        expression.stabOperationList.fold(initial) { acc, stabOperation ->
-                            resolveInCallDefinitionClauseExpression(assign, incompleteCode, stabOperation, acc)
+                        AccumulatorContinue.foldWhile(expression.stabOperationList, initial) { stabOperation, accumulator ->
+                            resolveInCallDefinitionClauseExpression(
+                                    assign,
+                                    incompleteCode,
+                                    stabOperation,
+                                    accumulator
+                            )
                         }
                     }
                 }
@@ -139,7 +218,7 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
                     if (rightOperand != null) {
                         resolveInCallDefinitionClauseExpression(assign, incompleteCode, rightOperand, initial)
                     } else {
-                        initial
+                        AccumulatorContinue(initial, true)
                     }
                 }
                 else -> {
@@ -147,7 +226,12 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
                 }
             }
 
-    private tailrec fun resolveInAssign2Argument(assign: Assign, incompleteCode: Boolean, expression: PsiElement, initial: List<ResolveResult>): List<ResolveResult> =
+    private tailrec fun resolveInAssign2Argument(
+            assign: Assign,
+            incompleteCode: Boolean,
+            expression: PsiElement,
+            initial: List<ResolveResult>
+    ): List<ResolveResult> =
         when (expression) {
             is ElixirAccessExpression -> resolveInAssign2Argument(assign, incompleteCode, expression.stripAccessExpression(), initial)
             is ElixirKeywordKey -> {
@@ -272,10 +356,59 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
             else -> emptyList()
         }
 
+    private tailrec fun resolveSocket(assign: Assign, incompleteCode: Boolean, expression: PsiElement, initial: List<ResolveResult>): AccumulatorContinue<List<ResolveResult>> =
+        when (expression) {
+            is Arrow -> {
+                val leftOperand = expression.leftOperand()
+
+                if (leftOperand != null) {
+                    resolveSocket(assign, incompleteCode, leftOperand, initial)
+                } else {
+                    AccumulatorContinue(initial, true)
+                }
+            }
+            is UnqualifiedNoArgumentsCall<*> -> if (expression.resolvedFinalArity() == 0) {
+                // resolve as a variable
+                expression.reference?.let { reference ->
+                    if (reference is PsiPolyVariantReference) {
+                        val referenceResolveResults = reference.multiResolve(incompleteCode)
+                        val validResult = referenceResolveResults.any(ResolveResult::isValidResult)
+                        val accumulator = initial + referenceResolveResults
+                        val `continue` = incompleteCode || !validResult
+
+                        AccumulatorContinue(accumulator, `continue`)
+                    } else {
+                        reference.resolve()?.let { resolved ->
+                            resolveSocketAsOtherNamedElement(assign, incompleteCode, resolved, initial)
+                        }
+                    }
+                } ?: AccumulatorContinue(initial, true)
+            } else {
+                // function calls are the source of the socket, don't resolve through the function call
+                resolveSocketAsOtherNamedElement(assign, incompleteCode, expression, initial)
+            }
+            // function calls are the source of the socket, don't resolve through the function call
+            is Call -> resolveSocketAsOtherNamedElement(assign, incompleteCode, expression, initial)
+            else -> {
+                TODO()
+            }
+        }
+
+    private fun resolveSocketAsOtherNamedElement(assign: Assign, incompleteCode: Boolean, element: PsiElement, initial: List<ResolveResult>): AccumulatorContinue<List<ResolveResult>> {
+        // the name of the element doesn't matter as the assign is always `@socket` regardless of the variable name in
+        // the function in the view module.
+        val validResult = assign.name == SOCKET
+
+        val accumulator = initial + listOf(PsiElementResolveResult(element, validResult))
+        val `continue` = incompleteCode || !validResult
+
+        return AccumulatorContinue(accumulator, `continue`)
+    }
+
     private const val LIVE_ACTION = "live_action"
     private const val MYSELF = "myself"
 
-    private fun resolveInPhoenixLiveView(assign: Assign, incompleteCode: Boolean): List<ResolveResult> {
+    private fun resolveInPhoenixLiveView(assign: Assign, incompleteCode: Boolean): AccumulatorContinue<List<ResolveResult>> {
         val assignName = assign.name
 
         return if (LIVE_ACTION.startsWith(assignName)) {
@@ -283,58 +416,65 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
         } else if (MYSELF.startsWith(assignName)) {
             resolveMyself(assign, incompleteCode)
         } else {
-            emptyList()
+            AccumulatorContinue(emptyList(), true)
         }
     }
 
-    private fun resolveLiveAction(assign: Assign, incompleteCode: Boolean): List<ResolveResult> {
+    private fun resolveLiveAction(assign: Assign, incompleteCode: Boolean): AccumulatorContinue<List<ResolveResult>> {
         val element = assign.element
         val globalSearchScope = globalSearchScope(element)
         val resolveResultList = mutableListOf<ResolveResult>()
 
-        StubIndex.getInstance().processElements(AllName.KEY, "assign_action", element.project, globalSearchScope, NamedElement::class.java) { namedElement ->
+        val `continue` = StubIndex.getInstance().processElements(AllName.KEY, "assign_action", element.project, globalSearchScope, NamedElement::class.java) { namedElement ->
             // use `StubBased<*>` to ignore decompiled
             if (namedElement is StubBased<*>) {
-                val acc = resolveInCallDefinitionClause(assign, incompleteCode, namedElement, emptyList())
-                resolveResultList.addAll(acc)
-            }
+                val accumulatorContinue = resolveInCallDefinitionClause(assign, incompleteCode, namedElement, emptyList())
+                resolveResultList.addAll(accumulatorContinue.accumulator)
 
-            true
+                accumulatorContinue.`continue`
+            } else {
+                true
+            }
         }
 
-        return resolveResultList
+        return AccumulatorContinue(resolveResultList, `continue`)
     }
 
-    private fun resolveMyself(assign: Assign, incompleteCode: Boolean): List<ResolveResult> {
+    private fun resolveMyself(assign: Assign, incompleteCode: Boolean): AccumulatorContinue<List<ResolveResult>> {
         val element = assign.element
         val globalSearchScope = globalSearchScope(element)
         val resolveResultList = mutableListOf<ResolveResult>()
 
-        StubIndex.getInstance().processElements(AllName.KEY, "render_pending_components", element.project, globalSearchScope, NamedElement::class.java) { namedElement ->
+        val `continue` = StubIndex.getInstance().processElements(AllName.KEY, "render_pending_components", element.project, globalSearchScope, NamedElement::class.java) { namedElement ->
             // use `StubBased<*>` to ignore decompiled
             if (namedElement is StubBased<*>) {
-                val acc = resolveInRenderPendingComponentsClause(assign, incompleteCode, namedElement, emptyList())
-                resolveResultList.addAll(acc)
-            }
+                val accumulatorContinue = resolveInRenderPendingComponentsClause(assign, incompleteCode, namedElement, emptyList())
+                resolveResultList.addAll(accumulatorContinue.accumulator)
 
-            true
+                accumulatorContinue.`continue`
+            } else {
+                true
+            }
         }
 
-        return resolveResultList
+        return AccumulatorContinue(resolveResultList, `continue`)
     }
 
-    private fun resolveInRenderPendingComponentsClause(assign: Assign, incompleteCode: Boolean, callDefinitionClause: Call, initial: List<ResolveResult>): List<ResolveResult> =
-    resolveInCallDefinitionClause(assign, incompleteCode, callDefinitionClause, initial, ::resolveMyself)
+    private fun resolveInRenderPendingComponentsClause(assign: Assign, incompleteCode: Boolean, callDefinitionClause: Call, initial: List<ResolveResult>): AccumulatorContinue<List<ResolveResult>> =
+            resolveInCallDefinitionClause(assign, incompleteCode, callDefinitionClause, initial, ::resolveMyself)
 
-    private tailrec fun resolveMyself(assign: Assign, incompleteCode: Boolean, expression: PsiElement, initial: List<ResolveResult>): List<ResolveResult> =
+    private tailrec fun resolveMyself(assign: Assign, incompleteCode: Boolean, expression: PsiElement, initial: List<ResolveResult>): AccumulatorContinue<List<ResolveResult>> =
             when (expression) {
-                is ElixirAccessExpression, is ElixirList, is ElixirStabBody, is ElixirTuple -> expression
-                        .lastChild
-                        .siblings(forward = false, withSelf = true)
-                        .filter { it.node is CompositeElement }
-                        .fold(initial) { acc, child ->
-                            resolveMyself(assign, incompleteCode, child, acc)
-                        }
+                is ElixirAccessExpression, is ElixirList, is ElixirStabBody, is ElixirTuple -> {
+                    val children = expression
+                            .lastChild
+                            .siblings(forward = false, withSelf = true)
+                            .filter { it.node is CompositeElement }
+
+                    AccumulatorContinue.foldWhile(children, initial) { child, accumulator ->
+                        resolveMyself(assign, incompleteCode, child, accumulator)
+                    }
+                }
                 is ElixirAnonymousFunction -> resolveMyself(assign, incompleteCode, expression.stab, initial)
                 is Match -> {
                     val rightOperand = expression.rightOperand()
@@ -342,30 +482,34 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
                     if (rightOperand != null) {
                         resolveMyself(assign, incompleteCode, rightOperand, initial)
                     } else {
-                        initial
+                        AccumulatorContinue(initial, true)
                     }
                 }
-                is Arrow, is AtNonNumericOperation, is ElixirAtomKeyword, is ElixirEndOfExpression, is Pipe, is Two -> initial
+                is Arrow, is AtNonNumericOperation, is ElixirAtomKeyword, is ElixirEndOfExpression, is Pipe, is Two -> AccumulatorContinue(initial, true)
                 is Operation -> {
                     TODO()
                 }
                 is Call -> {
                     val arguments = expression.finalArguments()
 
-                    val argumentsAcc = if (arguments != null) {
-                        arguments.fold(initial) { acc, argument ->
-                            resolveMyself(assign, incompleteCode, argument, acc)
+                    val argumentsAccumulatorContinue = if (arguments != null) {
+                        AccumulatorContinue.foldWhile(arguments, initial) { argument, accumulator ->
+                            resolveMyself(assign, incompleteCode, argument, accumulator)
                         }
                     } else {
-                        initial
+                        AccumulatorContinue(initial, true)
                     }
 
-                    val stab = expression.doBlock?.stab
+                    if (argumentsAccumulatorContinue.`continue`) {
+                        val stab = expression.doBlock?.stab
 
-                    if (stab != null) {
-                        resolveMyself(assign, incompleteCode, stab, argumentsAcc)
+                        if (stab != null) {
+                            resolveMyself(assign, incompleteCode, stab, argumentsAccumulatorContinue.accumulator)
+                        } else {
+                            argumentsAccumulatorContinue
+                        }
                     } else {
-                        argumentsAcc
+                        argumentsAccumulatorContinue
                     }
                 }
                 is ElixirMapOperation -> resolveMyself(assign, incompleteCode, expression.mapArguments, initial)
@@ -375,11 +519,13 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
                     if (child != null) {
                         resolveMyself(assign, incompleteCode, child, initial)
                     } else {
-                        initial
+                        AccumulatorContinue(initial, true)
                     }
                 }
-                is ElixirMapConstructionArguments -> expression.arguments().fold(initial) { acc, argument ->
-                    resolveMyself(assign, incompleteCode, argument, acc)
+                is ElixirMapConstructionArguments -> {
+                    AccumulatorContinue.foldWhile(expression.arguments(), initial) { argument, accumulator ->
+                        resolveMyself(assign, incompleteCode, argument, accumulator)
+                    }
                 }
                 is ElixirStab -> {
                     val stabBody = expression.stabBody
@@ -387,8 +533,8 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
                     if (stabBody != null) {
                         resolveMyself(assign, incompleteCode, stabBody, initial)
                     } else {
-                        expression.stabOperationList.fold(initial) { acc, stabOperation ->
-                            resolveMyself(assign, incompleteCode, stabOperation, acc)
+                        AccumulatorContinue.foldWhile(expression.stabOperationList, initial) { stabOperation, accumulator ->
+                            resolveMyself(assign, incompleteCode, stabOperation, accumulator)
                         }
                     }
                 }
@@ -398,12 +544,13 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
                     if (rightOperand != null) {
                         resolveMyself(assign, incompleteCode, rightOperand, initial)
                     } else {
-                        initial
+                        AccumulatorContinue(initial, true)
                     }
                 }
-                is QuotableKeywordList -> expression.quotableKeywordPairList().fold(initial) { acc, keywordPair ->
-                    resolveMyself(assign, incompleteCode, keywordPair, acc)
-                }
+                is QuotableKeywordList ->
+                    AccumulatorContinue.foldWhile(expression.quotableKeywordPairList(), initial) { keywordPair, accumulator ->
+                        resolveMyself(assign, incompleteCode, keywordPair, accumulator)
+                    }
                 is QuotableKeywordPair -> resolveMyself(assign, incompleteCode, expression.keywordKey, initial)
                 is ElixirKeywordKey -> {
                     if (expression.charListLine == null && expression.stringLine == null) {
@@ -413,25 +560,36 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
                         if (resolvedName.startsWith(assignName)) {
                             val validResult = resolvedName == assignName
 
-                            initial + listOf(PsiElementResolveResult(expression, validResult))
+                            val accumulator = initial + listOf(PsiElementResolveResult(expression, validResult))
+
+                            AccumulatorContinue(accumulator, !validResult)
                         } else {
                             null
                         }
                     } else {
                         null
-                    } ?: initial
+                    } ?: AccumulatorContinue(initial, true)
                 }
                 else -> {
                     TODO()
                 }
             }
-    private fun resolveInCallDefinitionClause(assign: Assign, incompleteCode: Boolean, callDefinitionClause: Call, initial: List<ResolveResult>, resolveInExpression: (assign: Assign, incompleteCode: Boolean, expression: PsiElement, initial: List<ResolveResult>) -> List<ResolveResult>): List<ResolveResult> =
+    private fun resolveInCallDefinitionClause(
+            assign: Assign,
+            incompleteCode: Boolean,
+            callDefinitionClause: Call,
+            initial: List<ResolveResult>,
+            resolveInExpression: (assign: Assign,
+                                  incompleteCode: Boolean,
+                                  expression: PsiElement,
+                                  initial: List<ResolveResult>) -> AccumulatorContinue<List<ResolveResult>>
+    ): AccumulatorContinue<List<ResolveResult>> =
             callDefinitionClause
                     .doBlock
                     ?.stab
                     ?.stabBody
                     ?.let { resolveInExpression(assign, incompleteCode, it, initial) }
-                    ?: initial
+                    ?: AccumulatorContinue(initial, true)
 
     private fun globalSearchScope(element: PsiElement): GlobalSearchScope {
         val project = element.project
