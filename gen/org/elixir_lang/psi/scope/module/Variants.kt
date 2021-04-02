@@ -65,7 +65,7 @@ class Variants(private val entrance: PsiElement) : Module() {
                 this,
                 entrance,
                 entrance.containingFile,
-                ResolveState.initial().put(ElixirPsiImplUtil.ENTRANCE, entrance)
+                ResolveState.initial().put(ElixirPsiImplUtil.ENTRANCE, entrance).putInitialVisitedElement(entrance)
         )
 
         return this
