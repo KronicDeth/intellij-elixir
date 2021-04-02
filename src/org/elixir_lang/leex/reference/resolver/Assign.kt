@@ -52,6 +52,7 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
     private fun resolveInCallDefinitionClause(assign: Assign, incompleteCode: Boolean, callDefinitionClause: Call, initial: List<ResolveResult>): AccumulatorContinue<List<ResolveResult>> =
             resolveInCallDefinitionClause(assign, incompleteCode, callDefinitionClause, initial, ::resolveInCallDefinitionClauseExpression)
 
+    private const val FLASH = "flash"
     private const val SOCKET = "socket"
 
     private tailrec fun resolveInCallDefinitionClauseExpression(assign: Assign, incompleteCode: Boolean, expression: PsiElement, initial: List<ResolveResult>): AccumulatorContinue<List<ResolveResult>> =
@@ -186,6 +187,15 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
                                         }
                                 else -> null
                             } ?: AccumulatorContinue(initial, true)
+                        "put_flash" ->
+                            if (expression.resolvedFinalArity() == 3 && FLASH.startsWith(assign.name)) {
+                                val validResult = assign.name == FLASH
+                                val accumulator = initial + listOf(PsiElementResolveResult(expression, validResult))
+
+                                AccumulatorContinue(accumulator, !validResult)
+                            } else {
+                                AccumulatorContinue(initial, true)
+                            }
                         else -> {
                             val stab = expression.doBlock?.stab
 
