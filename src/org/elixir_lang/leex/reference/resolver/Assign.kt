@@ -20,28 +20,35 @@ import org.elixir_lang.psi.operation.*
 import org.elixir_lang.psi.stub.index.AllName
 
 object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.Assign> {
-    override fun resolve(assign: Assign, incompleteCode: Boolean): Array<ResolveResult> =
-        assign.element.containingFile.context
-                ?.let { it as? Call }
-                ?.let { viewModule ->
-                    val viewModuleResolveResultList = resolveInViewModule(assign, incompleteCode, viewModule)
+    override fun resolve(assign: Assign, incompleteCode: Boolean): Array<ResolveResult> {
+        val containingFile = assign.element.containingFile
 
-                    if (viewModuleResolveResultList.any(ResolveResult::isValidResult)) {
-                        viewModuleResolveResultList
-                    } else {
-                        val liveComponentCallResolveResultList = resolveInLiveComponentCalls(assign, incompleteCode, viewModule)
+        val viewModule = containingFile.context as? Call
 
-                        if (liveComponentCallResolveResultList.any(ResolveResult::isValidResult)) {
-                            viewModuleResolveResultList + liveComponentCallResolveResultList
-                        } else {
-                            val phoenixLiveViewAccumulatorContinue = resolveInPhoenixLiveView(assign, incompleteCode)
+        val resolveResultList = if (viewModule != null) {
+            val viewModuleResolveResultList = resolveInViewModule(assign, incompleteCode, viewModule)
 
-                            viewModuleResolveResultList + liveComponentCallResolveResultList + phoenixLiveViewAccumulatorContinue.accumulator
-                        }
-                    }
+            if (viewModuleResolveResultList.any(ResolveResult::isValidResult)) {
+                viewModuleResolveResultList
+            } else {
+                val liveComponentCallResolveResultList = resolveInLiveComponentCalls(assign, incompleteCode, viewModule)
+
+                if (liveComponentCallResolveResultList.any(ResolveResult::isValidResult)) {
+                    viewModuleResolveResultList + liveComponentCallResolveResultList
+                } else {
+                    val phoenixLiveViewAccumulatorContinue = resolveInPhoenixLiveView(assign, incompleteCode)
+
+                    viewModuleResolveResultList + liveComponentCallResolveResultList + phoenixLiveViewAccumulatorContinue.accumulator
                 }
-                .orEmpty()
-                .toTypedArray()
+            }
+        } else if (containingFile.containingDirectory.name == "layout") {
+            resolveInPhoenixLiveView(assign, incompleteCode).accumulator
+        } else {
+            emptyList()
+        }
+
+        return resolveResultList.toTypedArray()
+    }
 
     private fun resolveInViewModule(assign: Assign, incompleteCode: Boolean, viewModule: Call): List<ResolveResult> =
         callDefinitionClauseCallFoldWhile(viewModule, emptyList<ResolveResult>()) { callDefinitionClauseCall, acc ->
@@ -451,20 +458,129 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
         return AccumulatorContinue(accumulator, `continue`)
     }
 
+    private const val INNER_CONTENT = "inner_content"
     private const val LIVE_ACTION = "live_action"
     private const val MYSELF = "myself"
 
     private fun resolveInPhoenixLiveView(assign: Assign, incompleteCode: Boolean): AccumulatorContinue<List<ResolveResult>> {
         val assignName = assign.name
 
-        return if (LIVE_ACTION.startsWith(assignName)) {
-            resolveLiveAction(assign, incompleteCode)
-        } else if (MYSELF.startsWith(assignName)) {
-            resolveMyself(assign, incompleteCode)
-        } else {
-            AccumulatorContinue(emptyList(), true)
+        return when {
+            INNER_CONTENT.startsWith(assignName) -> resolveInnerContent(assign, incompleteCode)
+            LIVE_ACTION.startsWith(assignName) -> resolveLiveAction(assign, incompleteCode)
+            MYSELF.startsWith(assignName) -> resolveMyself(assign, incompleteCode)
+            else -> AccumulatorContinue(emptyList(), true)
         }
     }
+
+    private fun resolveInnerContent(assign: Assign, incompleteCode: Boolean): AccumulatorContinue<List<ResolveResult>> {
+        val element = assign.element
+        val globalSearchScope = globalSearchScope(element)
+        val resolveResultList = mutableListOf<ResolveResult>()
+
+        val `continue` = StubIndex.getInstance().processElements(AllName.KEY, "to_rendered", element.project, globalSearchScope, NamedElement::class.java) { namedElement ->
+            // use `StubBased<*>` to ignore decompiled
+            if (namedElement is StubBased<*>) {
+                val accumulatorContinue = resolveInToRendered(assign, incompleteCode, namedElement, emptyList())
+                resolveResultList.addAll(accumulatorContinue.accumulator)
+
+                accumulatorContinue.`continue`
+            } else {
+                true
+            }
+        }
+
+        return AccumulatorContinue(resolveResultList, `continue`)
+    }
+
+    private tailrec fun resolveInToRendered(assign: Assign, incompleteCode: Boolean, expression: PsiElement, initial: List<ResolveResult>): AccumulatorContinue<List<ResolveResult>> =
+        when (expression) {
+            is ElixirStabBody -> {
+                val children = expression
+                        .lastChild
+                        .siblings(forward = false, withSelf = true)
+                        .filter { it.node is CompositeElement }
+
+                AccumulatorContinue.foldWhile(children, initial) { child, accumulator ->
+                    resolveInToRendered(assign, incompleteCode, child, accumulator)
+                }
+            }
+            is Match -> {
+                val rightOperand = expression.rightOperand()
+
+                if (rightOperand != null) {
+                    resolveInToRendered(assign, incompleteCode, rightOperand, initial)
+                } else {
+                    AccumulatorContinue(initial, true)
+                }
+            }
+            is Call -> when (expression.functionName()) {
+                "put_in" -> when (expression.resolvedFinalArity()) {
+                    2 -> {
+                        expression.finalArguments()?.let { arguments ->
+                            val path = arguments[0];
+
+                            if (path.textMatches("assigns[:${INNER_CONTENT}]")) {
+                                val validResult = INNER_CONTENT == assign.name
+                                val accumulator = initial + listOf(PsiElementResolveResult(path, validResult))
+
+                                AccumulatorContinue(accumulator, !validResult)
+                            } else {
+                                null
+                            }
+                        }
+                    }
+                    else -> null
+                } ?: AccumulatorContinue(initial, true)
+                else -> {
+                    val arguments = expression.finalArguments()
+
+                    val argumentsAccumulatorContinue = if (arguments != null) {
+                        AccumulatorContinue.foldWhile(arguments, initial) { argument, accumulator ->
+                            resolveInToRendered(assign, incompleteCode, argument, accumulator)
+                        }
+                    } else {
+                        AccumulatorContinue(initial, true)
+                    }
+
+                    if (argumentsAccumulatorContinue.`continue`) {
+                        val stab = expression.doBlock?.stab
+
+                        if (stab != null) {
+                            resolveInToRendered(assign, incompleteCode, stab, argumentsAccumulatorContinue.accumulator)
+                        } else {
+                            argumentsAccumulatorContinue
+                        }
+                    } else {
+                        argumentsAccumulatorContinue
+                    }
+                }
+            }
+            is ElixirStab -> {
+                val stabBody = expression.stabBody
+
+                if (stabBody != null) {
+                    resolveInToRendered(assign, incompleteCode, stabBody, initial)
+                } else {
+                    AccumulatorContinue.foldWhile(expression.stabOperationList, initial) { stabOperation, accumulator ->
+                        resolveInToRendered(assign, incompleteCode, stabOperation, accumulator)
+                    }
+                }
+            }
+            is ElixirStabOperation -> {
+                val rightOperand = expression.rightOperand()
+
+                if (rightOperand != null) {
+                    resolveInToRendered(assign, incompleteCode, rightOperand, initial)
+                } else {
+                    AccumulatorContinue(initial, true)
+                }
+            }
+            is ElixirEndOfExpression -> AccumulatorContinue(initial, true)
+            else -> {
+                TODO()
+            }
+        }
 
     private fun resolveLiveAction(assign: Assign, incompleteCode: Boolean): AccumulatorContinue<List<ResolveResult>> {
         val element = assign.element
