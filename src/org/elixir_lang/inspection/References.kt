@@ -2,9 +2,7 @@ package org.elixir_lang.inspection
 
 import com.intellij.codeInspection.*
 import com.intellij.psi.*
-import org.elixir_lang.psi.AtNonNumericOperation
-import org.elixir_lang.psi.ElixirAlias
-import org.elixir_lang.psi.ElixirVisitor
+import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 
 class References : LocalInspectionTool() {
@@ -25,8 +23,26 @@ class References : LocalInspectionTool() {
                 atNonNumericOperation.reference?.let { reference -> registerProblem(atNonNumericOperation, reference) }
             }
 
+            override fun visitUnmatchedQualifiedNoArgumentsCall(qualifiedNoArgumentsCall: ElixirUnmatchedQualifiedNoArgumentsCall) =
+                visitQualifiedNoArgumentsCall(qualifiedNoArgumentsCall)
+
+            override fun visitMatchedQualifiedNoArgumentsCall(qualifiedNoArgumentsCall: ElixirMatchedQualifiedNoArgumentsCall) =
+                visitQualifiedNoArgumentsCall(qualifiedNoArgumentsCall)
+
             private fun visitCall(call: Call) {
                 call.reference?.let { reference -> registerProblem(call, reference) }
+            }
+
+            private fun visitQualifiedNoArgumentsCall(qualifiedNoArgumentsCall: QualifiedNoArgumentsCall<*>) {
+                when (qualifiedNoArgumentsCall.qualifier()) {
+                    // Can't resolve keys or fields of a module attribute or assign
+                    is AtNonNumericOperation,
+                    // Can't resolve keys or fields of a variable
+                    is UnqualifiedNoArgumentsCall<*>,
+                    // Can't resolve a chain of keys or fields
+                    is QualifiedNoArgumentsCall<*> -> Unit
+                    else -> visitCall(qualifiedNoArgumentsCall)
+                }
             }
 
             private fun registerProblem(element: PsiElement, reference: PsiReference) {
