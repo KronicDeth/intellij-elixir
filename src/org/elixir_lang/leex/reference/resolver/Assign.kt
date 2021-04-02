@@ -197,10 +197,33 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
                                 AccumulatorContinue(initial, true)
                             }
                         else -> {
-                            val stab = expression.doBlock?.stab
+                            val doBlock = expression.doBlock
 
-                            if (stab != null) {
-                                resolveInCallDefinitionClauseExpression(assign, incompleteCode, stab, initial)
+                            if (doBlock != null) {
+                                val stab = doBlock.stab
+
+                                val stabAccumulatorContinue = if (stab != null) {
+                                    resolveInCallDefinitionClauseExpression(assign, incompleteCode, stab, initial)
+                                } else {
+                                    AccumulatorContinue(initial, true)
+                                }
+
+                                if (stabAccumulatorContinue.`continue`) {
+                                    val blockList = doBlock.blockList
+
+                                    if (blockList != null) {
+                                        resolveInCallDefinitionClauseExpression(
+                                                assign,
+                                                incompleteCode,
+                                                blockList,
+                                                stabAccumulatorContinue.accumulator
+                                        )
+                                    } else {
+                                        stabAccumulatorContinue
+                                    }
+                                } else {
+                                    stabAccumulatorContinue
+                                }
                             } else {
                                 AccumulatorContinue(initial, true)
                             }
@@ -227,6 +250,19 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
 
                     if (rightOperand != null) {
                         resolveInCallDefinitionClauseExpression(assign, incompleteCode, rightOperand, initial)
+                    } else {
+                        AccumulatorContinue(initial, true)
+                    }
+                }
+                is ElixirBlockList ->
+                    AccumulatorContinue.foldWhile(expression.blockItemList, initial) { blockItem, accumulator ->
+                        resolveInCallDefinitionClauseExpression(assign, incompleteCode, blockItem, accumulator)
+                    }
+                is ElixirBlockItem -> {
+                    val stab = expression.stab
+
+                    if (stab != null) {
+                        resolveInCallDefinitionClauseExpression(assign, incompleteCode, stab, initial)
                     } else {
                         AccumulatorContinue(initial, true)
                     }
