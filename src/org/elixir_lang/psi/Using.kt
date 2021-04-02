@@ -26,6 +26,7 @@ object Using {
                                 .filterIsInstance<Call>()
                                 .lastOrNull()
                     }
+                    ?.takeUnlessHasNotBeenVisited(resolveState)
                     ?.let { lastChildCall -> treeWalkUpFromLastChildCall(lastChildCall, useCall, resolveState, keepProcessing) }
                     ?:
                     true
@@ -96,7 +97,7 @@ object Using {
                                     .mapNotNull { it.element }
                         } else {
                             reference.resolve()?.let { listOf(it) } ?: emptyList()
-                        }
+                        }.filter { !resolveState.hasBeenVisited(it) }
 
                         for (resolved in resolvedList) {
                             accumulatedKeepProcessing = if (resolved is Call && CallDefinitionClause.`is`(resolved)) {

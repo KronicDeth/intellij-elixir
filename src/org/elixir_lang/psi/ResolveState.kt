@@ -6,9 +6,9 @@ import com.intellij.psi.ResolveState
 
 private val VISITED_ELEMENT_SET = Key<Set<PsiElement>>("VISITED_ELEMENTS")
 
-fun ResolveState.hasBeenVisited(element: PsiElement): Boolean {
-    return this.get(VISITED_ELEMENT_SET).contains(element)
-}
+fun <T : PsiElement> T.takeUnlessHasNotBeenVisited(state: ResolveState): T? = takeUnless { state.hasBeenVisited(it) }
+
+fun ResolveState.hasBeenVisited(element: PsiElement): Boolean = this.get(VISITED_ELEMENT_SET).contains(element)
 
 fun ResolveState.putInitialVisitedElement(visitedElement: PsiElement): ResolveState {
     assert(this.get(VISITED_ELEMENT_SET) == null) {

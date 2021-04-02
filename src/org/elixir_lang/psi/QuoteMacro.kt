@@ -11,25 +11,23 @@ object QuoteMacro {
     fun treeWalkUp(quoteCall: Call, resolveState: ResolveState, keepProcessing: (PsiElement, ResolveState) -> Boolean): Boolean {
         var accumulatorKeepProcessing = true
 
-        for (childCall in quoteCall.macroChildCallSequence()) {
-            if (!resolveState.hasBeenVisited(childCall)) {
-                accumulatorKeepProcessing = when {
-                    Unquote.`is`(childCall) -> {
-                        val childResolveState = resolveState.putVisitedElement(childCall)
+        for (childCall in quoteCall.macroChildCallSequence().filter { !resolveState.hasBeenVisited(it) }) {
+            accumulatorKeepProcessing = when {
+                Unquote.`is`(childCall) -> {
+                    val childResolveState = resolveState.putVisitedElement(childCall)
 
-                        Unquote.treeWalkUp(childCall, childResolveState, keepProcessing)
-                    }
-                    Use.`is`(childCall) -> {
-                        val childResolveState = resolveState.putVisitedElement(childCall)
-
-                        Use.treeWalkUp(childCall, childResolveState, keepProcessing)
-                    }
-                    else -> keepProcessing(childCall, resolveState)
+                    Unquote.treeWalkUp(childCall, childResolveState, keepProcessing)
                 }
+                Use.`is`(childCall) -> {
+                    val childResolveState = resolveState.putVisitedElement(childCall)
 
-                if (!accumulatorKeepProcessing) {
-                    break
+                    Use.treeWalkUp(childCall, childResolveState, keepProcessing)
                 }
+                else -> keepProcessing(childCall, resolveState)
+            }
+
+            if (!accumulatorKeepProcessing) {
+                break
             }
         }
 
