@@ -73,6 +73,8 @@ object PsiNameIdentifierOwnerImpl {
             nameIdentifier = Module.nameIdentifier(named)
         } else if (Protocol.`is`(named)) {
             nameIdentifier = Module.nameIdentifier(named)
+        } else if (org.elixir_lang.structure_view.element.Type.`is`(named)) {
+            nameIdentifier = org.elixir_lang.structure_view.element.Type.nameIdentifier(named)
         } else if (named is AtUnqualifiedNoParenthesesCall<*>) { // module attribute
             nameIdentifier = named.atIdentifier
         } else {

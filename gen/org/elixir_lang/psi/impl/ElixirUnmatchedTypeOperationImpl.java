@@ -2,6 +2,8 @@
 package org.elixir_lang.psi.impl;
 
 import java.util.List;
+
+import org.elixir_lang.psi.operation.Type;
 import org.jetbrains.annotations.*;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
@@ -120,7 +122,7 @@ public class ElixirUnmatchedTypeOperationImpl extends ElixirUnmatchedExpressionI
 
   @Override
   public boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place) {
-    return ElixirPsiImplUtil.processDeclarations(this, processor, state, lastParent, place);
+    return ElixirPsiImplUtil.processDeclarations((Type) this, processor, state, lastParent, place);
   }
 
   @Override

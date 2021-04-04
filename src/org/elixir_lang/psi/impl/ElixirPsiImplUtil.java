@@ -629,6 +629,14 @@ public class ElixirPsiImplUtil {
         return ProcessDeclarationsImpl.processDeclarations(match, processor, state, lastParent, place);
     }
 
+    public static boolean processDeclarations(@NotNull final Type type,
+                                              @NotNull PsiScopeProcessor processor,
+                                              @NotNull ResolveState state,
+                                              PsiElement lastParent,
+                                              @NotNull PsiElement place) {
+        return ProcessDeclarationsImpl.processDeclarations(type, processor, state, lastParent, place);
+    }
+
     public static boolean processDeclarations(@NotNull final QualifiedAlias qualifiedAlias,
                                               @NotNull PsiScopeProcessor processor,
                                               @NotNull ResolveState state,

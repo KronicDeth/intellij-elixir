@@ -11,6 +11,7 @@ import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.call.name.Function;
 import org.elixir_lang.psi.call.name.Module;
 import org.elixir_lang.psi.operation.*;
+import org.elixir_lang.psi.operation.Type;
 import org.elixir_lang.reference.Callable;
 import org.elixir_lang.structure_view.element.CallDefinitionHead;
 import org.elixir_lang.structure_view.element.Delegation;
@@ -525,7 +526,7 @@ public abstract class Variable implements PsiScopeProcessor {
         return execute(match.getKeywordValue(), state);
     }
 
-    private boolean execute(@NotNull Type match, @NotNull ResolveState state) {
+    private boolean execute(@NotNull org.elixir_lang.psi.operation.Type match, @NotNull ResolveState state) {
         return executeLeftOperand(match, state);
     }
 

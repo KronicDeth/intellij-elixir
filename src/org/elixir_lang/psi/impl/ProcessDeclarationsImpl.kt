@@ -21,6 +21,7 @@ import org.elixir_lang.psi.impl.declarations.UseScopeImpl.selector
 import org.elixir_lang.psi.operation.And
 import org.elixir_lang.psi.operation.Match
 import org.elixir_lang.psi.operation.Normalized
+import org.elixir_lang.psi.operation.Type
 import org.elixir_lang.psi.operation.infix.Position
 import org.elixir_lang.psi.operation.infix.Triple
 import org.elixir_lang.structure_view.element.Delegation
@@ -241,6 +242,17 @@ object ProcessDeclarationsImpl {
 
         return keepProcessing
     }
+
+    @JvmStatic
+    fun processDeclarations(type: Type,
+                            processor: PsiScopeProcessor,
+                            state: ResolveState,
+                            lastParent: PsiElement,
+                            place: PsiElement): Boolean =
+        type
+                .leftOperand()
+                ?.let { processor.execute(it, state) }
+                ?: true
 
     @JvmStatic
     fun processDeclarations(qualifiedAlias: QualifiedAlias,
