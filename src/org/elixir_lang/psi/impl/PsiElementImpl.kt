@@ -173,21 +173,16 @@ fun PsiElement.maybeModularNameToModular(maxScope: PsiElement, useCall: Call?): 
     }
 }
 
-fun PsiElement.moduleWithDependentsScope(): GlobalSearchScope {
-    val virtualFile = containingFile.virtualFile
-    val project = project
-    val module = ModuleUtilCore.findModuleForFile(
-            virtualFile,
-            project
-    )
-
-    // module can be null for scratch files
-    return if (module != null) {
-        GlobalSearchScope.moduleWithDependentsScope(module)
-    } else {
-        GlobalSearchScope.allScope(project)
-    }
-}
+fun PsiElement.moduleWithDependentsScope(): GlobalSearchScope =
+        containingFile
+                .virtualFile
+                ?.let { virtualFile ->
+                    ModuleUtilCore
+                            .findModuleForFile(virtualFile, project)
+                            // module can be null for scratch files
+                            ?.let { GlobalSearchScope.moduleWithDependentsScope(it) }
+                }
+                ?: GlobalSearchScope.allScope(project)
 
 fun PsiElement.prevSiblingSequence() = generateSequence(this) { it.prevSibling }
 
