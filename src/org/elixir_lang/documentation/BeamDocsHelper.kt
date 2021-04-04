@@ -3,6 +3,7 @@ package org.elixir_lang.documentation
 import com.intellij.psi.PsiElement
 import org.elixir_lang.beam.Beam
 import org.elixir_lang.beam.psi.Module
+import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.call.MaybeExported
 import org.elixir_lang.utils.ElixirModulesUtil.erlangModuleNameToElixir
 
@@ -49,6 +50,8 @@ object BeamDocsHelper {
                                 }
                             }
                         }
+                        // types are only generated for builtins, so no docs
+                        is AtUnqualifiedNoParenthesesCall<*> -> null
                         else -> TODO()
                     }
                 }

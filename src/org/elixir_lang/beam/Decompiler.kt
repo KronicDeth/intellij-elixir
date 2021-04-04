@@ -11,6 +11,7 @@ import org.elixir_lang.beam.chunk.beam_documentation.Documentation
 import org.elixir_lang.beam.decompiler.*
 import org.elixir_lang.psi.call.name.Function
 import org.elixir_lang.psi.call.name.Module
+import org.elixir_lang.reference.resolver.Type.BUILTIN_ARITY_BY_NAME
 import java.util.*
 import java.util.function.Consumer
 
@@ -51,6 +52,7 @@ class Decompiler : BinaryFileDecompiler {
                             }
                         }
 
+                        appendTypes(decompiled, moduleName)
                         appendCallDefinitions(decompiled, beam, atoms, documentation)
                         decompiled.append("end\n")
                     } else {
@@ -69,6 +71,41 @@ class Decompiler : BinaryFileDecompiler {
                 }
             } else {
                 decompiled.append(DECOMPILATION_ERROR).append("BEAM format could not be read")
+            }
+        }
+
+        private fun appendTypes(decompiled: StringBuilder, moduleName: String) {
+            // fake built-in types being defined in `erlang`, so that built-in type resolution can point to a single location
+            if (moduleName == "erlang") {
+                decompiled
+                        .append('\n')
+                        .append("  # Built-in types (not actually declared in :erlang)\n")
+                        .append('\n')
+
+                for (name in BUILTIN_ARITY_BY_NAME.keys.sorted()) {
+                    for (arity in BUILTIN_ARITY_BY_NAME[name]!!.sorted()) {
+                        decompiled.append("  @type ").append(name).append('(')
+
+                        if ((name == "maybe_improper_list" ||
+                                        name == "nonempty_improper_list" ||
+                                        name == "nonempty_maybe_improper_list")
+                                && arity == 2) {
+                            decompiled.append("element :: term(), tail :: term()")
+                        } else if (name == "non_empty_list" && arity == 1) {
+                            decompiled.append("element :: term()")
+                        } else {
+                            for (i in 1..arity) {
+                                if (i > 1) {
+                                    decompiled.append(", ")
+                                }
+
+                                decompiled.append("type").append(i)
+                            }
+                        }
+
+                        decompiled.append(") :: ...\n")
+                    }
+                }
             }
         }
 
