@@ -9,7 +9,7 @@ import org.elixir_lang.reference.ModuleAttribute.Companion.isNonReferencing
 
 private fun AtNonNumericOperation.computeReference(): PsiReference? =
         if (!isNonReferencing(this)) {
-            when (containingFile.virtualFile.fileType) {
+            when (containingFile.virtualFile?.fileType) {
                 org.elixir_lang.leex.file.Type.INSTANCE -> org.elixir_lang.leex.reference.Assign(this)
                 else -> ModuleAttribute(this)
             }
