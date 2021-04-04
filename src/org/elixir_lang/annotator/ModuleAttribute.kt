@@ -419,6 +419,15 @@ class ModuleAttribute : Annotator, DumbAware {
         Highlighter.highlight(annotationHolder, psiElement.textRange, textAttributesKey)
     }
 
+    private fun highlightTypesAndTypeTypeParameterDeclarations(typeOperation: ElixirUnmatchedTypeOperation,
+                                                               typeParameterNameSet: Set<String?>,
+                                                               annotationHolder: AnnotationHolder,
+                                                               typeTextAttributesKey: TextAttributesKey) {
+        typeOperation.leftOperand()?.let {
+            highlightTypesAndTypeTypeParameterDeclarations(it, typeParameterNameSet, annotationHolder, typeTextAttributesKey)
+        }
+    }
+
     private fun highlightTypesAndTypeTypeParameterDeclarations(psiElement: PsiElement,
                                                                typeParameterNameSet: Set<String?>,
                                                                annotationHolder: AnnotationHolder,
@@ -441,6 +450,14 @@ class ModuleAttribute : Annotator, DumbAware {
                 )
             }
             is ElixirUnmatchedUnqualifiedNoArgumentsCall -> {
+                highlightTypesAndTypeTypeParameterDeclarations(
+                        psiElement,
+                        typeParameterNameSet,
+                        annotationHolder,
+                        typeTextAttributesKey
+                )
+            }
+            is ElixirUnmatchedTypeOperation -> {
                 highlightTypesAndTypeTypeParameterDeclarations(
                         psiElement,
                         typeParameterNameSet,
@@ -1310,6 +1327,7 @@ class ModuleAttribute : Annotator, DumbAware {
                 is ElixirTuple -> {
                     typeTypeParameterNameSet(psiElement)
                 }
+                is ElixirUnmatchedTypeOperation -> typeTypeParameterNameSet(psiElement)
                 is ElixirUnmatchedUnqualifiedNoArgumentsCall -> {
                     setOf(psiElement.getText())
                 }
@@ -1328,4 +1346,7 @@ class ModuleAttribute : Annotator, DumbAware {
             psiElements.flatMapTo(mutableSetOf()) {
                 typeTypeParameterNameSet(it)
             }
+
+    private fun typeTypeParameterNameSet(typeOperation: ElixirUnmatchedTypeOperation): Set<String> =
+            typeOperation.leftOperand()?.let { typeTypeParameterNameSet(it) } ?: emptySet()
 }
