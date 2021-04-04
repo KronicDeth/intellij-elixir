@@ -17,6 +17,7 @@ import org.elixir_lang.psi.impl.identifierName
 import org.elixir_lang.psi.operation.Type
 import org.elixir_lang.psi.stub.type.UnmatchedUnqualifiedNoArgumentsCall
 import org.elixir_lang.reference.ModuleAttribute
+import org.elixir_lang.reference.ModuleAttribute.Companion.isCallbackName
 import org.elixir_lang.reference.ModuleAttribute.Companion.isSpecificationName
 import org.elixir_lang.reference.ModuleAttribute.Companion.isTypeName
 import org.elixir_lang.structure_view.element.modular.Module
@@ -65,7 +66,7 @@ abstract class Type : PsiScopeProcessor {
     private fun execute(atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>, state: ResolveState): Boolean {
         val identifierName = atUnqualifiedNoParenthesesCall.atIdentifier.identifierName()
 
-        return if (isTypeName(identifierName) || isSpecificationName(identifierName)) {
+        return if (isCallbackName(identifierName) || isTypeName(identifierName) || isSpecificationName(identifierName)) {
             executeOnType(atUnqualifiedNoParenthesesCall, state)
         } else {
             true
