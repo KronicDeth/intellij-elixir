@@ -24,11 +24,11 @@ import org.elixir_lang.psi.impl.ElixirPsiImplUtil.*
 import org.elixir_lang.psi.operation.*
 import org.elixir_lang.psi.qualification.Qualified
 import org.elixir_lang.psi.qualification.Unqualified
+import org.elixir_lang.psi.scope.ancestorTypeSpec
+import org.elixir_lang.psi.scope.hasMapFieldOptionalityName
 import org.elixir_lang.psi.stub.call.Stub
 import org.elixir_lang.reference.Callable
 import org.elixir_lang.reference.Callable.Companion.isBitStreamSegmentOption
-import org.elixir_lang.reference.ModuleAttribute.Companion.isSpecificationName
-import org.elixir_lang.reference.ModuleAttribute.Companion.isTypeName
 import org.jetbrains.annotations.Contract
 import java.util.*
 import org.elixir_lang.psi.impl.macroChildCallList as psiElementToMacroChildCallList
@@ -112,71 +112,20 @@ private fun PsiElement.isSlashInCaptureNameSlashArity(): Boolean =
         }
 
 
-private fun Call.computeCallableReference(): PsiReference =
+private fun Call.computeCallableReference(): PsiReference? =
         if (Callable.isDefiner(this)) {
             Callable.definer(this)
         } else {
             val ancestorTypeSpec = this.ancestorTypeSpec()
 
             if (ancestorTypeSpec != null) {
-                org.elixir_lang.reference.Type(ancestorTypeSpec, this)
+                if (this.hasMapFieldOptionalityName()) {
+                    null
+                } else {
+                    org.elixir_lang.reference.Type(ancestorTypeSpec, this)
+                }
             } else {
                 Callable(this)
-            }
-        }
-
-private tailrec fun PsiElement.ancestorTypeSpec(): AtUnqualifiedNoParenthesesCall<*>? =
-        when (this) {
-            is AtUnqualifiedNoParenthesesCall<*> -> {
-                val identifierName = this.atIdentifier.identifierName()
-
-                if (isTypeName(identifierName) || isSpecificationName(identifierName)) {
-                    this
-                } else {
-                    null
-                }
-            }
-            is Arguments,
-            is ElixirAccessExpression,
-            is ElixirKeywords,
-            is ElixirKeywordPair,
-            is ElixirMatchedParenthesesArguments,
-            is ElixirStructOperation,
-            is ElixirNoParenthesesOneArgument,
-            is ElixirNoParenthesesArguments,
-            is ElixirNoParenthesesKeywords,
-            is ElixirNoParenthesesKeywordPair,
-            is ElixirNoParenthesesManyStrictNoParenthesesExpression,
-            // For function type
-            is ElixirParentheticalStab, is ElixirStab, is ElixirStabOperation, is ElixirStabNoParenthesesSignature,
-            // containers
-            is ElixirList, is ElixirTuple,
-            // maps
-            is ElixirMapOperation, is ElixirMapArguments, is ElixirMapConstructionArguments,
-            is ElixirAssociations, is ElixirAssociationsBase, is ElixirContainerAssociationOperation,
-            // types
-            is Type, is Call -> parent.ancestorTypeSpec()
-            // `fn` anonymous function type just uses parentheses and `->`, like `(type1, type2 -> type3)`
-            is ElixirAnonymousFunction, is ElixirStabParenthesesSignature,
-            // BitStrings use `::` like types, but cannot contain type parameters or declarations
-            is ElixirBitString,
-            // Types can't be declared inside of bracket operations where they would be used as keys
-            is BracketOperation, is ElixirBracketArguments,
-            // Types cannot be declared in `else`, `rescue`, or `after`
-            is ElixirBlockList, is ElixirBlockItem,
-            is ElixirDoBlock,
-            // No types in EEx
-            is ElixirEex, is ElixirEexTag,
-            // No types in interpolation
-            is ElixirInterpolation,
-            // Map updates aren't used in type specifications unlike `ElixirMapConstructionArguments`
-            is ElixirMapUpdateArguments,
-            // types can't be defined at the file level and must be inside modules.
-            is ElixirFile,
-             // Any stab body has to be parent of a type
-            is ElixirStabBody -> null
-            else -> {
-                TODO()
             }
         }
 
