@@ -8,13 +8,20 @@ import com.intellij.psi.ResolveState
 import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.psi.CallDefinitionClause.nameArityRange
 import org.elixir_lang.psi.ElixirFile
+import org.elixir_lang.psi.Modular
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.Named
 
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
+import org.elixir_lang.psi.impl.call.finalArguments
+import org.elixir_lang.psi.impl.call.keywordArgument
+import org.elixir_lang.psi.impl.maybeModularNameToModular
+import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.putInitialVisitedElement
+import org.elixir_lang.psi.putVisitedElement
 import org.elixir_lang.psi.scope.ResolveResultOrderedSet
 import org.elixir_lang.psi.scope.maxScope
+import org.elixir_lang.structure_view.element.CallDefinitionHead
 
 class MultiResolve
 private constructor(private val name: String,
@@ -34,6 +41,44 @@ private constructor(private val name: String,
             }
         } ?: true
 
+    override fun executeOnDelegation(element: Call, state: ResolveState): Boolean =
+            element.finalArguments()?.takeIf { it.size == 2 }?.let { arguments ->
+                val head = arguments[0]
+
+                CallDefinitionHead.nameArityRange(head)?.let { headNameArityRange ->
+                    val headName = headNameArityRange.name
+                    val name = element.keywordArgument("as")?.stripAccessExpression()?.let { it as? Call }?.functionName() ?: headName
+
+                    if (name.startsWith(this.name)) {
+                        element.keywordArgument("to")?.let { definingModuleName ->
+                            definingModuleName.maybeModularNameToModular(element.containingFile, useCall = null)?.let { modular ->
+                                val delegationState = state.put(DEFDELEGATE_CALL, element).putVisitedElement(element)
+
+                                Modular.callDefinitionClauseCallWhile(modular, delegationState) { callDefinitionClauseCall, state ->
+                                    org.elixir_lang.psi.CallDefinitionClause.nameArityRange(callDefinitionClauseCall)?.let { callNameArityRange ->
+                                        val callName = callNameArityRange.name
+
+                                        if (callName.startsWith(headName)) {
+                                            val validResult = (resolvedFinalArity in callNameArityRange.arityRange) && name == this.name
+
+                                            addToResolveResults(element, validResult, state)
+
+                                        } else {
+                                            null
+                                        }
+                                    }
+
+                                    keepProcessing()
+                                }
+                            }
+                        }
+                    } else {
+                        null
+                    }
+                }
+            }
+                    ?: keepProcessing()
+
     override fun keepProcessing(): Boolean = resolveResultOrderedSet.keepProcessing(incompleteCode)
     fun resolveResults(): Array<ResolveResult> = resolveResultOrderedSet.toTypedArray()
 
@@ -47,6 +92,10 @@ private constructor(private val name: String,
                     false
                 } else {
                     resolveResultOrderedSet.add(call, name, validResult)
+
+                    state.get<Call>(DEFDELEGATE_CALL)?.let{ defdelegateCall ->
+                        resolveResultOrderedSet.add(defdelegateCall, defdelegateCall.text, validResult)
+                    }
 
                     state.get<Call>(IMPORT_CALL)?.let { importCall ->
                         resolveResultOrderedSet.add(importCall, importCall.text, validResult)

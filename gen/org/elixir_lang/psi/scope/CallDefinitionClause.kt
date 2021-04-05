@@ -4,15 +4,20 @@ import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import com.intellij.psi.scope.PsiScopeProcessor
-import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.isAncestor
+import com.intellij.util.castSafelyTo
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.call.name.Module.KERNEL_SPECIAL_FORMS
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
+import org.elixir_lang.psi.impl.call.finalArguments
+import org.elixir_lang.psi.impl.call.keywordArgument
 import org.elixir_lang.psi.impl.call.macroChildCalls
+import org.elixir_lang.psi.impl.maybeModularNameToModular
+import org.elixir_lang.structure_view.element.CallDefinitionHead
+import org.elixir_lang.structure_view.element.Delegation
 import org.elixir_lang.structure_view.element.modular.Module
 
 abstract class CallDefinitionClause : PsiScopeProcessor {
@@ -48,6 +53,14 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
     protected abstract fun executeOnCallDefinitionClause(element: Call, state: ResolveState): Boolean
 
     /**
+     * Called on every [Call] where [org.elixir_lang.structure_view.element.Delegation.is] is `true` when checking tree
+     * with [.execute]].
+     *
+     * @return `true` to keep searching up tree; `false` to stop searching.
+     */
+    protected abstract fun executeOnDelegation(element: Call, state: ResolveState): Boolean
+
+    /**
      * Whether to continue searching after each Module's children have been searched.
      *
      * @return `true` to keep searching up the PSI tree; `false` to stop searching.
@@ -61,6 +74,8 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
     private fun execute(element: Call, state: ResolveState): Boolean =
             if (org.elixir_lang.psi.CallDefinitionClause.`is`(element)) {
                 executeOnCallDefinitionClause(element, state)
+            } else if (Delegation.`is`(element)) {
+                executeOnDelegation(element, state)
             } else if (Import.`is`(element)) {
                 val importState = state.put(IMPORT_CALL, element).putVisitedElement(element)
 
@@ -174,6 +189,7 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
     }
 
     companion object {
+        val DEFDELEGATE_CALL = Key<Call>("DEFDELEGATE_CALL")
         @JvmStatic
         val IMPORT_CALL = Key<Call>("IMPORT_CALL")
         @JvmStatic

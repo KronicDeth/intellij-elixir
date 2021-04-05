@@ -3,6 +3,7 @@ package org.elixir_lang.structure_view.element
 import com.intellij.ide.util.treeView.smartTree.TreeElement
 import com.intellij.navigation.ItemPresentation
 import com.intellij.psi.ElementDescriptionLocation
+import com.intellij.psi.PsiElement
 import com.intellij.usageView.UsageViewTypeLocation
 import org.elixir_lang.navigation.item_presentation.Delegation
 import org.elixir_lang.navigation.item_presentation.Parent
@@ -87,6 +88,7 @@ class Delegation(private val modular: Modular, call: Call) : Element<Call?>(call
             navigationItem!!.keywordArgument(keywordValueText)?.text
 
     companion object {
+        @JvmStatic
         fun callDefinitionHeadCallList(defdelegateCall: Call): List<Call>? {
             var callDefinitionHeadCallList: List<Call>? = null
             val finalArguments = defdelegateCall.finalArguments()!!
@@ -120,5 +122,8 @@ class Delegation(private val modular: Modular, call: Call) : Element<Call?>(call
 
         @JvmStatic
         fun `is`(call: Call): Boolean = call.isCalling(Module.KERNEL, Function.DEFDELEGATE, 2)
+
+        fun nameIdentifier(call: Call): PsiElement? =
+            call.keywordArgument("as") ?: call.finalArguments()?.get(0)?.let { it as? Call }?.functionNameElement()
     }
 }

@@ -5,6 +5,8 @@ import org.elixir_lang.psi.*
 import org.elixir_lang.psi.operation.Operation
 import org.elixir_lang.structure_view.element.CallDefinitionSpecification
 import org.elixir_lang.structure_view.element.Callback
+import org.elixir_lang.structure_view.element.Delegation
+import org.elixir_lang.structure_view.element.Type
 import org.elixir_lang.structure_view.element.modular.Implementation
 import org.elixir_lang.structure_view.element.modular.Module
 import org.elixir_lang.structure_view.element.modular.Protocol
@@ -51,38 +53,28 @@ object PsiNameIdentifierOwnerImpl {
     fun getNameIdentifier(variable: ElixirVariable): PsiElement = variable
 
     @JvmStatic
-    fun getNameIdentifier(named: org.elixir_lang.psi.call.Named): PsiElement? {
-        val nameIdentifier: PsiElement?
-
-        /* can't be a {@code public static PsiElement getNameIdentifier(@NotNull Operation operation)} because it leads
-           to "reference to getNameIdentifier is ambiguous" */
-        if (named is Operation) {
-            val operation = named as Operation
-            nameIdentifier = operation.operator()
-        } else if (CallDefinitionClause.`is`(named)) {
-            nameIdentifier = CallDefinitionClause.nameIdentifier(named)
-        } else if (CallDefinitionSpecification.`is`(named)) {
-            nameIdentifier = CallDefinitionSpecification.nameIdentifier(named)
-        } else if (Callback.`is`(named)) {
-            nameIdentifier = Callback.nameIdentifier(named)
-        } else if (Implementation.`is`(named)) {
-            /* have to set to null so that {@code else} clause doesn't return the {@code defimpl} element as the name
-               identifier */
-            nameIdentifier = null
-        } else if (Module.`is`(named)) {
-            nameIdentifier = Module.nameIdentifier(named)
-        } else if (Protocol.`is`(named)) {
-            nameIdentifier = Module.nameIdentifier(named)
-        } else if (org.elixir_lang.structure_view.element.Type.`is`(named)) {
-            nameIdentifier = org.elixir_lang.structure_view.element.Type.nameIdentifier(named)
-        } else if (named is AtUnqualifiedNoParenthesesCall<*>) { // module attribute
-            nameIdentifier = named.atIdentifier
-        } else {
-            nameIdentifier = named.functionNameElement()
-        }
-
-        return nameIdentifier
-    }
+    fun getNameIdentifier(named: org.elixir_lang.psi.call.Named): PsiElement? =
+            when {
+                /* can't be a {@code public static PsiElement getNameIdentifier(@NotNull Operation operation)} because
+                   it leads to "reference to getNameIdentifier is ambiguous" */
+                named is Operation -> {
+                    val operation = named as Operation
+                    operation.operator()
+                }
+                CallDefinitionClause.`is`(named) -> CallDefinitionClause.nameIdentifier(named)
+                CallDefinitionSpecification.`is`(named) -> CallDefinitionSpecification.nameIdentifier(named)
+                Callback.`is`(named) -> Callback.nameIdentifier(named)
+                Delegation.`is`(named) -> Delegation.nameIdentifier(named)
+                /* have to set to null so that {@code else} clause doesn't return the {@code defimpl} element as the
+                   name identifier */
+                Implementation.`is`(named) -> null
+                Module.`is`(named) -> Module.nameIdentifier(named)
+                Protocol.`is`(named) -> Module.nameIdentifier(named)
+                Type.`is`(named) -> Type.nameIdentifier(named)
+                // module attribute
+                named is AtUnqualifiedNoParenthesesCall<*> ->  named.atIdentifier
+                else -> named.functionNameElement()
+            }
 
     /**
      *

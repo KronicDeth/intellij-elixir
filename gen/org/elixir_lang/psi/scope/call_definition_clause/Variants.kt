@@ -47,6 +47,10 @@ class Variants : CallDefinitionClause() {
         return true
     }
 
+    override fun executeOnDelegation(element: Call, state: ResolveState): Boolean {
+        TODO()
+    }
+
     /**
      * Whether to continue searching after each Module's children have been searched.
      *
