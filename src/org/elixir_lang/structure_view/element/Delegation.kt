@@ -1,226 +1,124 @@
-package org.elixir_lang.structure_view.element;
+package org.elixir_lang.structure_view.element
 
-import com.intellij.ide.util.treeView.smartTree.TreeElement;
-import com.intellij.navigation.ItemPresentation;
-import com.intellij.psi.ElementDescriptionLocation;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.usageView.UsageViewTypeLocation;
-import org.elixir_lang.navigation.item_presentation.Parent;
-import org.elixir_lang.psi.ElixirAccessExpression;
-import org.elixir_lang.psi.ElixirList;
-import org.elixir_lang.psi.call.Call;
-import org.elixir_lang.structure_view.element.modular.Modular;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.intellij.ide.util.treeView.smartTree.TreeElement
+import com.intellij.navigation.ItemPresentation
+import com.intellij.psi.ElementDescriptionLocation
+import com.intellij.usageView.UsageViewTypeLocation
+import org.elixir_lang.navigation.item_presentation.Delegation
+import org.elixir_lang.navigation.item_presentation.Parent
+import org.elixir_lang.psi.ElixirAccessExpression
+import org.elixir_lang.psi.ElixirList
+import org.elixir_lang.psi.call.Call
+import org.elixir_lang.psi.call.name.Function
+import org.elixir_lang.psi.call.name.Module
+import org.elixir_lang.psi.impl.call.finalArguments
+import org.elixir_lang.psi.impl.call.keywordArgument
+import org.elixir_lang.psi.impl.stripAccessExpression
+import org.elixir_lang.structure_view.element.modular.Modular
+import java.util.*
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import static org.elixir_lang.psi.call.name.Function.DEFDELEGATE;
-import static org.elixir_lang.psi.call.name.Module.KERNEL;
-import static org.elixir_lang.psi.impl.PsiElementImplKt.stripAccessExpression;
-import static org.elixir_lang.psi.impl.call.CallImplKt.finalArguments;
-import static org.elixir_lang.psi.impl.call.CallImplKt.keywordArgument;
-
-public class Delegation extends Element<Call>  {
-    /*
-     * Fields
-     */
-
-    @NotNull
-    private final List<TreeElement> childList = new ArrayList<TreeElement>();
-    @NotNull
-    private final Modular modular;
-
-    /*
-     * Static Methods
-     */
-
-    public static List<Call> callDefinitionHeadCallList(Call defdelegateCall) {
-        List<Call> callDefinitionHeadCallList = null;
-
-        PsiElement[] finalArguments = finalArguments(defdelegateCall);
-
-        assert finalArguments != null;
-        assert finalArguments.length > 0;
-
-        PsiElement firstFinalArgument = finalArguments[0];
-
-        if (firstFinalArgument instanceof ElixirAccessExpression) {
-            PsiElement accessExpressionChild = stripAccessExpression(firstFinalArgument);
-
-            if (accessExpressionChild instanceof ElixirList) {
-                ElixirList list = (ElixirList) accessExpressionChild;
-
-                Call[] listCalls = PsiTreeUtil.getChildrenOfType(list, Call.class);
-                callDefinitionHeadCallList = filterCallDefinitionHeadCallList(listCalls);
-            }
-        } else if (firstFinalArgument instanceof Call) {
-            Call call = (Call) firstFinalArgument;
-
-            callDefinitionHeadCallList = filterCallDefinitionHeadCallList(call);
-        }
-
-        if (callDefinitionHeadCallList == null) {
-            callDefinitionHeadCallList = Collections.emptyList();
-        }
-
-        return callDefinitionHeadCallList;
-    }
-
-    @NotNull
-    public static List<Call> filterCallDefinitionHeadCallList(Call... calls) {
-        List<Call> callList = Collections.emptyList();
-
-        if (calls != null) {
-            callList = new ArrayList<Call>(calls.length);
-
-            for (Call call : calls) {
-                if (CallDefinitionHead.Companion.is(call)) {
-                    callList.add(call);
-                }
-            }
-        }
-
-        return callList;
-    }
-
-    public static String elementDescription(Call call, ElementDescriptionLocation location) {
-        String elementDescription = null;
-
-        if (location == UsageViewTypeLocation.INSTANCE) {
-            elementDescription = "delegation";
-        }
-
-        return elementDescription;
-    }
-
-    public static boolean is(Call call) {
-        return call.isCalling(KERNEL, DEFDELEGATE, 2);
-    }
-
-    /*
-     * Constructors
-     */
-
-    public Delegation(@NotNull Modular modular, @NotNull Call call) {
-        super(call);
-        this.modular = modular;
-    }
-
-    /*
-     *
-     * Instance Methods
-     *
-     */
-
-    /*
-     * Public Instance Methods
-     */
+class Delegation(private val modular: Modular, call: Call) : Element<Call?>(call) {
+    private val childList: MutableList<TreeElement> = ArrayList()
 
     /**
-     * If {@code true}, when delegated, the first argument passed to the delegated function will be relocated to the end
+     * If `true`, when delegated, the first argument passed to the delegated function will be relocated to the end
      * of the arguments when dispatched to the target.
      *
-     * @return defaults to {@code false} and when keyword argument is not parsable as boolean.
+     * @return defaults to `false` and when keyword argument is not parsable as boolean.
      */
-    public boolean appendFirst() {
-        PsiElement keywordValue = keywordArgument(navigationItem, "append_first");
-        boolean appendFirst = false;
-
-        if (keywordValue != null) {
-            String keywordValueText = keywordValue.getText();
-
-            if (keywordValueText.equals("true")) {
-                appendFirst = true;
-            }
-        }
-
-        return appendFirst;
-    }
+    fun appendFirst(): Boolean =
+        navigationItem!!.keywordArgument("append_first")?.let { keywordValue ->
+            keywordValue.text == "true"
+        } ?: false
 
     /**
-     * The value of the {@code :as} keyword argument
+     * The value of the `:as` keyword argument
      *
-     * @return text of the {@code :as} keyword value
+     * @return text of the `:as` keyword value
      */
-    @Nullable
-    public String as() {
-        return keywordArgumentText("as");
-    }
+    fun `as`(): String? = keywordArgumentText("as")
 
-    @NotNull
-    public List<Call> callDefinitionHeadCallList() {
-        return callDefinitionHeadCallList(navigationItem);
-    }
+    fun callDefinitionHeadCallList(): List<Call> = callDefinitionHeadCallList(navigationItem!!)!!
 
-    public void definition(CallDefinition callDefinition) {
-      childList.add(callDefinition);
-    }
+    fun definition(callDefinition: CallDefinition) = childList.add(callDefinition)
 
     /**
      * The calls defined by this delegation
      *
-     * @return the list of {@link CallDefinition} elements;
+     * @return the list of [CallDefinition] elements;
      */
-    @NotNull
-    @Override
-    public TreeElement[] getChildren() {
-        return childList.toArray(new TreeElement[childList.size()]);
-    }
+    override fun getChildren(): Array<TreeElement> = childList.toTypedArray()
 
     /**
      * Returns the presentation of the tree element.
      *
      * @return the element presentation.
      */
-    @NotNull
-    @Override
-    public ItemPresentation getPresentation() {
-        Parent parent = (Parent) modular.getPresentation();
-        String location = parent.getLocatedPresentableText();
+    override fun getPresentation(): ItemPresentation {
+        val parent = modular.presentation as Parent
+        val location = parent.locatedPresentableText
 
-        return new org.elixir_lang.navigation.item_presentation.Delegation(
+        return Delegation(
                 location,
                 to(),
-                as(),
+                `as`(),
                 appendFirst()
-        );
+        )
     }
 
     /**
-     * The value of the {@code :to} keyword argument
+     * The value of the `:to` keyword argument
      *
-     * @return text of the {@code :to} keyword value
+     * @return text of the `:to` keyword value
      */
-    @Nullable
-    public String to() {
-        return keywordArgumentText("to");
-    }
+    fun to(): String? = keywordArgumentText("to")
 
     /*
      * Private Instance Methods
      */
-
     /**
-     * The text of the {@code keywordValueText} keyword argument.
+     * The text of the `keywordValueText` keyword argument.
      *
      * @param keywordValueText the text of the keyword value
-     * @return the {@code PsiElement.getText()} of the keyword value if the keyword argument exists of the
-     *   {@link Element#navigationItem}; {@code null} if the keyword argument does not exist.
+     * @return the `PsiElement.getText()` of the keyword value if the keyword argument exists of the
+     * [Element.navigationItem]; `null` if the keyword argument does not exist.
      */
-    @Nullable
-    private String keywordArgumentText(@NotNull final String keywordValueText) {
-        PsiElement keywordValue = keywordArgument(navigationItem, keywordValueText);
-        String text = null;
+    private fun keywordArgumentText(keywordValueText: String): String? =
+            navigationItem!!.keywordArgument(keywordValueText)?.text
 
-        if (keywordValue != null) {
-            text = keywordValue.getText();
+    companion object {
+        fun callDefinitionHeadCallList(defdelegateCall: Call): List<Call>? {
+            var callDefinitionHeadCallList: List<Call>? = null
+            val finalArguments = defdelegateCall.finalArguments()!!
+            val firstFinalArgument = finalArguments[0]
+            if (firstFinalArgument is ElixirAccessExpression) {
+                val accessExpressionChild = firstFinalArgument.stripAccessExpression()
+
+                callDefinitionHeadCallList = if (accessExpressionChild is ElixirList) {
+                    accessExpressionChild.children.filterIsInstance<Call>().filter { CallDefinitionHead.`is`(it) }
+                } else {
+                    null
+                }
+            } else if (firstFinalArgument is Call) {
+                callDefinitionHeadCallList = filterCallDefinitionHeadCallList(firstFinalArgument)
+            }
+            if (callDefinitionHeadCallList == null) {
+                callDefinitionHeadCallList = emptyList()
+            }
+            return callDefinitionHeadCallList
         }
 
-        return text;
-    }
+        fun filterCallDefinitionHeadCallList(vararg calls: Call): List<Call> =
+            calls.filter { CallDefinitionHead.`is`(it) }
 
+        fun elementDescription(call: Call?, location: ElementDescriptionLocation): String? =
+                if (location === UsageViewTypeLocation.INSTANCE) {
+                    "delegation"
+                } else {
+                    null
+                }
+
+        @JvmStatic
+        fun `is`(call: Call): Boolean = call.isCalling(Module.KERNEL, Function.DEFDELEGATE, 2)
+    }
 }
