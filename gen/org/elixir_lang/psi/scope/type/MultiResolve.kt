@@ -6,9 +6,7 @@ import com.intellij.psi.ResolveState
 import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.UnqualifiedNoArgumentsCall
-import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil
-import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.putInitialVisitedElement
 import org.elixir_lang.psi.scope.ResolveResultOrderedSet
 import org.elixir_lang.reference.Type.Companion.typeHead
@@ -50,11 +48,11 @@ private constructor(private val name: String,
 
     override fun keepProcessing(): Boolean = resolveResultOrderedSet.keepProcessing(incompleteCode)
 
-    private fun resolveResults(): Array<ResolveResult> = resolveResultOrderedSet.toTypedArray()
+    private fun resolveResults(): List<ResolveResult> = resolveResultOrderedSet.toList()
     private val resolveResultOrderedSet = ResolveResultOrderedSet()
 
     companion object {
-        fun resolveResults(name: String, resolvedFinalArity: Int, incompleteCode: Boolean, entrance: PsiElement, resolveState: ResolveState = ResolveState.initial()): Array<ResolveResult> {
+        fun resolveResults(name: String, resolvedFinalArity: Int, incompleteCode: Boolean, entrance: PsiElement, resolveState: ResolveState = ResolveState.initial()): List<ResolveResult> {
             val multiResolve = MultiResolve(name, resolvedFinalArity, incompleteCode)
             val maxScope = entrance.containingFile
             val entranceResolveState = resolveState.put(ElixirPsiImplUtil.ENTRANCE, entrance).putInitialVisitedElement(entrance)

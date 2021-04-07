@@ -1,8 +1,6 @@
 package org.elixir_lang.reference.resolver
 
-import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiElementResolveResult
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.impl.source.resolve.ResolveCache
 import com.intellij.psi.search.GlobalSearchScope
@@ -10,8 +8,7 @@ import com.intellij.psi.stubs.StubIndex
 import org.elixir_lang.psi.NamedElement
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.qualification.Qualified
-import org.elixir_lang.psi.impl.call.macroChildCallList
-import org.elixir_lang.psi.impl.call.qualification.qualifiedToModular
+import org.elixir_lang.psi.impl.call.qualification.qualifiedToModulars
 import org.elixir_lang.psi.scope.type.MultiResolve
 import org.elixir_lang.psi.stub.index.ModularName
 import org.elixir_lang.reference.Type
@@ -28,13 +25,13 @@ object Type : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Type> {
     }
 
     private fun resolve(qualified: Qualified, incompleteCode: Boolean): Array<ResolveResult> =
-        qualified.qualifiedToModular()?.let { modular ->
+        qualified.qualifiedToModulars().flatMap { modular ->
             qualified.functionName()?.let { name ->
                 val resolvedFinalArity = qualified.resolvedFinalArity()
 
                 MultiResolve.resolveResults(name, resolvedFinalArity, incompleteCode, modular)
-            }
-        } ?: emptyArray()
+            } ?: emptyList()
+        }.toTypedArray()
 
     private fun resolve(call: Call, incompleteCode: Boolean): Array<ResolveResult> =
             call
@@ -48,7 +45,7 @@ object Type : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Type> {
                             accumulator + resolveBuiltin(call, name, resolvedFinalArity)
                         } else {
                             accumulator
-                        }
+                        }.toTypedArray()
                     }
                     ?: emptyArray()
 

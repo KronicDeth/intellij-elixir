@@ -141,13 +141,13 @@ fun QualifiableAlias.isOutermostQualifiableAlias(): Boolean {
     return outermost
 }
 
-fun QualifiableAlias.maybeModularNameToModular(maxScope: PsiElement): Call? =
+fun QualifiableAlias.maybeModularNameToModulars(maxScope: PsiElement): List<Call> =
     if (!recursiveKernelImport(maxScope)) {
         /* need to construct reference directly as qualified aliases don't return a reference except for the
            outermost */
-        getReference()?.let { this.toModular(it) }
+        reference?.let { toModulars(it) } ?: emptyList()
     } else {
-        null
+        emptyList()
     }
 
 
@@ -156,13 +156,13 @@ private fun QualifiableAlias.recursiveKernelImport(maxScope: PsiElement): Boolea
         maxScope is ElixirFile && maxScope.name == "kernel.ex" && name == KERNEL
 
 @Contract(pure = true)
-fun QualifiableAlias.toModular(startingReference: PsiReference): Call? {
+fun QualifiableAlias.toModulars(startingReference: PsiReference): List<Call> {
     val fullyResolvedAlias = fullyResolve(startingReference)
 
     return if (fullyResolvedAlias is Call && isModular(fullyResolvedAlias)) {
-        fullyResolvedAlias
+        listOf(fullyResolvedAlias)
     } else {
-        null
+        emptyList()
     }
 }
 

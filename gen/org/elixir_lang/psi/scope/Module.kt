@@ -8,7 +8,6 @@ import com.intellij.psi.impl.source.tree.CompositeElement
 import com.intellij.psi.scope.PsiScopeProcessor
 import com.intellij.psi.util.siblings
 import org.elixir_lang.psi.*
-import org.elixir_lang.psi.Use.modular
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.Named
 

@@ -1,13 +1,10 @@
 package org.elixir_lang.psi.scope.call_definition_clause
 
-import com.intellij.openapi.fileTypes.FileTypeManager
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiElementResolveResult
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.ResolveState
 import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.psi.CallDefinitionClause.nameArityRange
-import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.psi.Modular
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.Named
@@ -15,7 +12,7 @@ import org.elixir_lang.psi.call.Named
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.call.keywordArgument
-import org.elixir_lang.psi.impl.maybeModularNameToModular
+import org.elixir_lang.psi.impl.maybeModularNameToModulars
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.putInitialVisitedElement
 import org.elixir_lang.psi.putVisitedElement
@@ -41,43 +38,50 @@ private constructor(private val name: String,
             }
         } ?: true
 
-    override fun executeOnDelegation(element: Call, state: ResolveState): Boolean =
-            element.finalArguments()?.takeIf { it.size == 2 }?.let { arguments ->
-                val head = arguments[0]
+    override fun executeOnDelegation(element: Call, state: ResolveState): Boolean {
+        element.finalArguments()?.takeIf { it.size == 2 }?.let { arguments ->
+            val head = arguments[0]
 
-                CallDefinitionHead.nameArityRange(head)?.let { headNameArityRange ->
-                    val headName = headNameArityRange.name
-                    val name = element.keywordArgument("as")?.stripAccessExpression()?.let { it as? Call }?.functionName() ?: headName
+            CallDefinitionHead.nameArityRange(head)?.let { headNameArityRange ->
+                val headName = headNameArityRange.name
+                val name = element.keywordArgument("as")?.stripAccessExpression()?.let { it as? Call }?.functionName()
+                        ?: headName
 
-                    if (name.startsWith(this.name)) {
-                        element.keywordArgument("to")?.let { definingModuleName ->
-                            definingModuleName.maybeModularNameToModular(element.containingFile, useCall = null)?.let { modular ->
-                                val delegationState = state.put(DEFDELEGATE_CALL, element).putVisitedElement(element)
+                if (name.startsWith(this.name)) {
+                    element.keywordArgument("to")?.let { definingModuleName ->
+                        val modulars = definingModuleName.maybeModularNameToModulars(element.containingFile, useCall = null, incompleteCode = incompleteCode)
 
-                                Modular.callDefinitionClauseCallWhile(modular, delegationState) { callDefinitionClauseCall, state ->
-                                    org.elixir_lang.psi.CallDefinitionClause.nameArityRange(callDefinitionClauseCall)?.let { callNameArityRange ->
-                                        val callName = callNameArityRange.name
+                        for (modular in modulars) {
+                            val delegationState = state.put(DEFDELEGATE_CALL, element).putVisitedElement(element)
 
-                                        if (callName.startsWith(headName)) {
-                                            val validResult = (resolvedFinalArity in callNameArityRange.arityRange) && name == this.name
+                            val keepProcessing = Modular.callDefinitionClauseCallWhile(modular, delegationState) { callDefinitionClauseCall, state ->
+                                org.elixir_lang.psi.CallDefinitionClause.nameArityRange(callDefinitionClauseCall)?.let { callNameArityRange ->
+                                    val callName = callNameArityRange.name
 
-                                            addToResolveResults(element, validResult, state)
+                                    if (callName.startsWith(headName)) {
+                                        val validResult = (resolvedFinalArity in callNameArityRange.arityRange) && name == this.name
 
-                                        } else {
-                                            null
-                                        }
+                                        addToResolveResults(element, validResult, state)
+
+                                    } else {
+                                        null
                                     }
-
-                                    keepProcessing()
                                 }
+
+                                keepProcessing()
+                            }
+
+                            if (!keepProcessing()) {
+                                break
                             }
                         }
-                    } else {
-                        null
                     }
                 }
             }
-                    ?: keepProcessing()
+        }
+
+        return keepProcessing()
+    }
 
     override fun keepProcessing(): Boolean = resolveResultOrderedSet.keepProcessing(incompleteCode)
     fun resolveResults(): Array<ResolveResult> = resolveResultOrderedSet.toTypedArray()

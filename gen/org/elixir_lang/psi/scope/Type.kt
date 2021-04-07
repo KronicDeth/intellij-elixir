@@ -6,16 +6,12 @@ import com.intellij.psi.impl.source.tree.CompositeElement
 import com.intellij.psi.scope.PsiScopeProcessor
 import com.intellij.psi.util.isAncestor
 import com.intellij.psi.util.siblings
-import com.intellij.util.xml.Resolve
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
-import org.elixir_lang.psi.impl.ElixirPsiImplUtil.functionName
-import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.call.macroChildCalls
 import org.elixir_lang.psi.impl.identifierName
 import org.elixir_lang.psi.operation.Type
-import org.elixir_lang.psi.stub.type.UnmatchedUnqualifiedNoArgumentsCall
 import org.elixir_lang.reference.ModuleAttribute
 import org.elixir_lang.reference.ModuleAttribute.Companion.isCallbackName
 import org.elixir_lang.reference.ModuleAttribute.Companion.isSpecificationName
@@ -25,11 +21,13 @@ import org.elixir_lang.structure_view.element.modular.Module
 abstract class Type : PsiScopeProcessor {
     override fun execute(element: PsiElement, state: ResolveState): Boolean =
             when (element) {
+                // typing a module attribute on line above a pre-existing one
+                is AtNonNumericOperation -> execute(element, state)
                 is Call -> execute(element, state)
                 // Anonymous function type siganture
                 is ElixirStabNoParenthesesSignature -> execute(element, state)
                 is ElixirNoParenthesesOneArgument, is ElixirAccessExpression -> executeOnChildren(element, state)
-                is ElixirFile, is ElixirList -> false
+                is ElixirFile, is ElixirList, is ElixirTuple -> false
                 else -> {
                     TODO("Not yet implemented")
                 }
@@ -39,6 +37,9 @@ abstract class Type : PsiScopeProcessor {
     protected abstract fun executeOnType(definition: AtUnqualifiedNoParenthesesCall<*>, state: ResolveState): Boolean
     protected abstract fun executeOnParameter(parameter: UnqualifiedNoArgumentsCall<*>, state: ResolveState): Boolean
     protected abstract fun keepProcessing(): Boolean
+
+    private fun execute(atNonNumericOperation: AtNonNumericOperation, state: ResolveState): Boolean =
+        execute(atNonNumericOperation.children.last(), state)
 
     private fun execute(call: Call, state: ResolveState): Boolean =
             when (call) {

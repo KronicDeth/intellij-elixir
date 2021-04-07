@@ -1,5 +1,7 @@
 package org.elixir_lang.psi.impl
 
+import com.intellij.psi.PsiElementResolveResult
+import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.PsiReference
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager.getCachedValue
@@ -12,13 +14,16 @@ private fun ElixirAtom.computeReference(): PsiReference = org.elixir_lang.refere
 fun getReference(atom: ElixirAtom): PsiReference? =
         getCachedValue(atom) { CachedValueProvider.Result.create(atom.computeReference(), atom) }
 
-fun ElixirAtom.maybeModularNameToModular(): Call? =
-    reference?.let { reference ->
-        (reference.resolve() as? Call)?.let { resolved ->
-            if (org.elixir_lang.psi.stub.type.call.Stub.isModular(resolved)) {
-                resolved
-            } else {
-                null
-            }
-        }
+fun ElixirAtom.maybeModularNameToModulars(incompleteCode: Boolean): List<Call> =
+    reference?.maybeModularNameToModulars(incompleteCode) ?: emptyList()
+
+fun PsiReference.maybeModularNameToModulars(incompleteCode: Boolean): List<Call> {
+    val resolveResults = when (this) {
+        is PsiPolyVariantReference -> multiResolve(incompleteCode)
+        else -> resolve()
+                ?.let { arrayOf(PsiElementResolveResult(it, true)) }
+                ?: emptyArray()
     }
+
+    return resolveResults.mapNotNull { resolveResult -> resolveResult.element as? Call  }
+}

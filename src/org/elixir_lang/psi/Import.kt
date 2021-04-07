@@ -18,7 +18,7 @@ import org.elixir_lang.psi.call.name.Function.IMPORT
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.hasKeywordKey
-import org.elixir_lang.psi.impl.maybeModularNameToModular
+import org.elixir_lang.psi.impl.maybeModularNameToModulars
 import org.elixir_lang.psi.impl.stripAccessExpression
 
 /**
@@ -36,19 +36,33 @@ object Import {
      * matching names in `:except` list.
      */
     @JvmStatic
-    fun callDefinitionClauseCallWhile(importCall: Call, resolveState: ResolveState, function: (Call, ResolveState) -> Boolean): Boolean =
-        try {
-            modular(importCall)
+    fun callDefinitionClauseCallWhile(importCall: Call, resolveState: ResolveState, function: (Call, ResolveState) -> Boolean): Boolean {
+        val modulars = try {
+            modulars(importCall)
         } catch (stackOverflowError: StackOverflowError) {
             Logger.error(Import::class.java, "StackoverflowError while finding modular for import", importCall)
-            null
+            emptyList<Call>()
         }
-                ?.let { modularCall ->
-                    val optionsFilter = callDefinitionClauseCallFilter(importCall)
 
-                    Modular.callDefinitionClauseCallWhile(modularCall, resolveState) { call, accResolveState -> !optionsFilter(call) || function(call, accResolveState) }
+        return if (modulars.isNotEmpty()) {
+            val optionsFilter = callDefinitionClauseCallFilter(importCall)
+            var keepProcessing = true
+
+            for (modular in modulars) {
+                keepProcessing = Modular.callDefinitionClauseCallWhile(modular, resolveState) { call, accResolveState ->
+                    !optionsFilter(call) || function(call, accResolveState)
                 }
-                ?: true
+
+                if (!keepProcessing) {
+                    break
+                }
+            }
+
+            keepProcessing
+        } else {
+            true
+        }
+    }
 
     fun elementDescription(call: Call, location: ElementDescriptionLocation): String? =
             when {
@@ -146,11 +160,12 @@ object Import {
      * @return `defmodule`, `defimpl`, or `defprotocol` imported by `importCall`.  It can be
      * `null` if Alias passed to `importCall` cannot be resolved.
      */
-    private fun modular(importCall: Call): Call? =
+    private fun modulars(importCall: Call): List<Call> =
             importCall
                     .finalArguments()
                     ?.firstOrNull()
-                    ?.maybeModularNameToModular(maxScope = importCall.parent, useCall = null)
+                    ?.maybeModularNameToModulars(maxScope = importCall.parent, useCall = null, incompleteCode = false)
+                    ?: emptyList()
 
     /**
      * A [Function] that returns `true` for call definition clauses that are imported by `importCall`

@@ -10,7 +10,7 @@ import org.elixir_lang.psi.call.name.Function.*
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.call.macroChildCallSequence
-import org.elixir_lang.psi.impl.maybeModularNameToModular
+import org.elixir_lang.psi.impl.maybeModularNameToModulars
 import org.elixir_lang.psi.impl.stripAccessExpression
 
 object Using {
@@ -48,7 +48,11 @@ object Using {
                         // TODO pipelines to apply/3
                         if (arguments.size == 3) {
                             arguments[0].let { maybeModularName ->
-                                maybeModularName.maybeModularNameToModular(maxScope = maybeModularName.containingFile, useCall = useCall)?.let { modular ->
+                                val modulars = maybeModularName.maybeModularNameToModulars(maxScope = maybeModularName.containingFile, useCall = useCall, incompleteCode = false)
+
+                                var accumlatedKeepProcessing = true
+
+                                for (modular in modulars) {
                                     val modularResolveState = resolveState.putVisitedElement(modular)
 
                                     val name = useCall?.finalArguments()?.let { arguments ->
@@ -66,7 +70,7 @@ object Using {
                                         }
                                     }
 
-                                    if (name != null) {
+                                    accumlatedKeepProcessing = if (name != null) {
                                         Modular.callDefinitionClauseCallFoldWhile(modular, name, modularResolveState) { callDefinitionClauseCall, _, arityRange, accResolveState ->
                                             val finalContinue = treeWalkUp(callDefinitionClauseCall, useCall, accResolveState, keepProcessing)
                                             AccumulatorContinue(accResolveState, finalContinue)
@@ -81,6 +85,8 @@ object Using {
                                         }
                                     }
                                 }
+
+                                accumlatedKeepProcessing
                             }
                         } else {
                             true

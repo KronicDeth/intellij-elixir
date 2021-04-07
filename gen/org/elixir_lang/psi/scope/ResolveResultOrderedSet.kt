@@ -66,12 +66,13 @@ class ResolveResultOrderedSet {
 
    fun keepProcessing(incompleteCode: Boolean): Boolean = incompleteCode || !hasValidResult()
 
-   fun toTypedArray(): Array<ResolveResult> =
+   fun toTypedArray(): Array<ResolveResult> = toList().toTypedArray()
+           
+   fun toList(): List<ResolveResult> =
            nameOrder
                    .flatMap { name ->
                       decompiledPsiElementResolveResultListByName[name]!!.psiElementResolveResultList
                    }
-                   .toTypedArray()
 
    private val psiElementSet = mutableSetOf<PsiElement>()
    private val decompiledPsiElementResolveResultListByName = mutableMapOf<String, DecompiledPsiElemetResolveResultList>()

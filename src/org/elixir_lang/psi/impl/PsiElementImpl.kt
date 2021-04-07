@@ -14,7 +14,7 @@ import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.ALIAS
 import org.elixir_lang.psi.call.name.Function.CREATE
 import org.elixir_lang.psi.call.name.Module.KERNEL
-import org.elixir_lang.psi.impl.call.maybeModularNameToModular
+import org.elixir_lang.psi.impl.call.maybeModularNameToModulars
 import org.elixir_lang.psi.operation.Match
 import org.elixir_lang.psi.operation.Pipe
 import org.jetbrains.annotations.Contract
@@ -162,14 +162,14 @@ fun PsiElement.macroChildCallList(): MutableList<Call> {
  * `maybeAlias` after it is resolved through any `alias`es or `use`.
  */
 @Contract(pure = true)
-fun PsiElement.maybeModularNameToModular(maxScope: PsiElement, useCall: Call?): Call? {
+fun PsiElement.maybeModularNameToModulars(maxScope: PsiElement, useCall: Call?, incompleteCode: Boolean): List<Call> {
     val strippedMaybeModuleName = stripAccessExpression()
 
     return when (strippedMaybeModuleName) {
-        is ElixirAtom -> strippedMaybeModuleName.maybeModularNameToModular()
-        is QualifiableAlias -> strippedMaybeModuleName.maybeModularNameToModular(maxScope)
-        is Call -> strippedMaybeModuleName.maybeModularNameToModular(useCall)
-        else -> null
+        is ElixirAtom -> strippedMaybeModuleName.maybeModularNameToModulars(incompleteCode)
+        is QualifiableAlias -> strippedMaybeModuleName.maybeModularNameToModulars(maxScope)
+        is Call -> strippedMaybeModuleName.maybeModularNameToModulars(useCall)
+        else -> emptyList()
     }
 }
 

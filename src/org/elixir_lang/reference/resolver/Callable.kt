@@ -9,7 +9,7 @@ import org.elixir_lang.psi.Modular
 import org.elixir_lang.psi.UnqualifiedNoArgumentsCall
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.qualification.Qualified
-import org.elixir_lang.psi.impl.call.qualification.qualifiedToModular
+import org.elixir_lang.psi.impl.call.qualification.qualifiedToModulars
 
 object Callable : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Callable> {
     override fun resolve(callable: org.elixir_lang.reference.Callable, incompleteCode: Boolean): Array<ResolveResult> {
@@ -62,7 +62,7 @@ object Callable : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Cal
             } ?: emptyList()
 
     private fun resolveElement(element: Qualified): List<ResolveResult> =
-            element.qualifiedToModular()?.let { modular ->
+            element.qualifiedToModulars().flatMap { modular ->
                 element.functionName()?.let { name ->
                     val resolvedFinalArity = element.resolvedFinalArity()
 
@@ -74,6 +74,6 @@ object Callable : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Cal
                         acc.add(PsiElementResolveResult(callDefinitionClauseCall, arityRange.contains(resolvedFinalArity)))
                         AccumulatorContinue(acc, true)
                     }.accumulator
-                }
-            } ?: emptyList()
+                } ?: emptyList<ResolveResult>()
+            }
 }

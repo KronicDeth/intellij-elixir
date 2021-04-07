@@ -6,7 +6,7 @@ import com.intellij.psi.impl.source.resolve.ResolveCache
 import org.elixir_lang.psi.AccumulatorContinue
 import org.elixir_lang.psi.Modular
 import org.elixir_lang.psi.call.qualification.Qualified
-import org.elixir_lang.psi.impl.call.qualification.qualifiedToModular
+import org.elixir_lang.psi.impl.call.qualification.qualifiedToModulars
 import org.elixir_lang.psi.scope.call_definition_clause.MultiResolve
 import org.elixir_lang.reference.CaptureNameArity
 
@@ -18,7 +18,7 @@ object CaptureNameArity : ResolveCache.PolyVariantResolver<CaptureNameArity> {
             val arity = reference.arity
 
             if (nameElement is Qualified) {
-                nameElement.qualifiedToModular()?.let { modular ->
+                nameElement.qualifiedToModulars().flatMap { modular ->
                     Modular.callDefinitionClauseCallFoldWhile(
                             modular,
                             name,
@@ -27,8 +27,8 @@ object CaptureNameArity : ResolveCache.PolyVariantResolver<CaptureNameArity> {
                         acc.add(PsiElementResolveResult(callDefinitionClauseCall, arityRange.contains(arity)))
 
                         AccumulatorContinue(acc, true)
-                    }.accumulator.toTypedArray()
-                }
+                    }.accumulator
+                }.toTypedArray()
             } else {
                 MultiResolve.resolveResults(name, arity, incompleteCode, reference.element)
             }

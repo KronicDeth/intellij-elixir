@@ -12,7 +12,7 @@ import org.elixir_lang.psi.CallDefinitionClause.nameArityRange
 import org.elixir_lang.psi.ElixirTypes
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.call.macroChildCalls
-import org.elixir_lang.psi.impl.maybeModularNameToModular
+import org.elixir_lang.psi.impl.maybeModularNameToModulars
 
 class CallDefinitionClause : CompletionProvider<CompletionParameters>() {
     private fun callDefinitionClauseLookupElements(scope: Call): Iterable<LookupElement> {
@@ -70,12 +70,16 @@ class CallDefinitionClause : CompletionProvider<CompletionParameters>() {
                                 resultSet: CompletionResultSet) {
         maybeModularName(parameters)?.let { maybeModularName ->
             maybeModularName.containingFile?.let { containingFile ->
-                maybeModularName.maybeModularNameToModular(maxScope = containingFile, useCall = null)?.let { modular ->
-                    if (resultSet.prefixMatcher.prefix.endsWith(".")) {
-                        resultSet.withPrefixMatcher("")
-                    } else {
-                        resultSet
-                    }.addAllElements(
+                val modulars = maybeModularName.maybeModularNameToModulars(maxScope = containingFile, useCall = null, incompleteCode = true)
+
+                val modularsResultSet = if (resultSet.prefixMatcher.prefix.endsWith(".")) {
+                    resultSet.withPrefixMatcher("")
+                } else {
+                    resultSet
+                }
+
+                for (modular in modulars) {
+                    modularsResultSet.addAllElements(
                             callDefinitionClauseLookupElements(modular)
                     )
                 }

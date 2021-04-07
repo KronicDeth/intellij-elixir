@@ -315,20 +315,13 @@ fun Call.macroDefinitionClauseForArgument(): Call? {
     return macroDefinitionClause
 }
 
-fun Call.maybeModularNameToModular(useCall: Call?): Call? =
+fun Call.maybeModularNameToModulars(useCall: Call?): List<Call> =
     if (isCalling(KERNEL, __MODULE__, 0)) {
         org.elixir_lang.psi.__MODULE__
                 .reference(__MODULE__Call = this, useCall = useCall)
-                .resolve()
-                ?.let { it as Call? }?.let { resolved ->
-                    if (org.elixir_lang.psi.stub.type.call.Stub.isModular(resolved)) {
-                        resolved
-                    } else {
-                        null
-                    }
-                }
+                .maybeModularNameToModulars(incompleteCode = false)
     } else {
-        null
+        emptyList()
     }
 
 object CallImpl {

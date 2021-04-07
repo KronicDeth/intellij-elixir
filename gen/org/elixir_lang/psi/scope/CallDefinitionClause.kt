@@ -5,18 +5,13 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import com.intellij.psi.scope.PsiScopeProcessor
 import com.intellij.psi.util.isAncestor
-import com.intellij.util.castSafelyTo
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.call.name.Module.KERNEL_SPECIAL_FORMS
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
-import org.elixir_lang.psi.impl.call.finalArguments
-import org.elixir_lang.psi.impl.call.keywordArgument
 import org.elixir_lang.psi.impl.call.macroChildCalls
-import org.elixir_lang.psi.impl.maybeModularNameToModular
-import org.elixir_lang.structure_view.element.CallDefinitionHead
 import org.elixir_lang.structure_view.element.Delegation
 import org.elixir_lang.structure_view.element.modular.Module
 

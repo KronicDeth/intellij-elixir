@@ -8,7 +8,7 @@ import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.USE
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.call.finalArguments
-import org.elixir_lang.psi.impl.maybeModularNameToModular
+import org.elixir_lang.psi.impl.maybeModularNameToModulars
 
 /**
  * A `use` call
@@ -19,27 +19,28 @@ object Use {
      * macro called by `useCall` while `keepProcessing` returns `true`.  Stops the first time `keepProcessing`
      * returns `false`.
      */
-    fun treeWalkUp(useCall: Call, resolveState: ResolveState, keepProcessing: (PsiElement, ResolveState) -> Boolean): Boolean =
-            modular(useCall)?.let { modularCall ->
-                var accumulatedKeepProcessing = true
+    fun treeWalkUp(useCall: Call, resolveState: ResolveState, keepProcessing: (PsiElement, ResolveState) -> Boolean): Boolean {
+        var accumulatedKeepProcessing = true
 
-                for (definer in Using.definers(modularCall)) {
-                    val childResolveState = resolveState.putVisitedElement(definer)
+        outer@ for (modular in modulars(useCall)) {
+            for (definer in Using.definers(modular)) {
+                val childResolveState = resolveState.putVisitedElement(definer)
 
-                    accumulatedKeepProcessing = Using.treeWalkUp(
-                            usingCall = definer,
-                            useCall = useCall,
-                            resolveState = childResolveState,
-                            keepProcessing = keepProcessing
-                    )
+                accumulatedKeepProcessing = Using.treeWalkUp(
+                        usingCall = definer,
+                        useCall = useCall,
+                        resolveState = childResolveState,
+                        keepProcessing = keepProcessing
+                )
 
-                    if (!accumulatedKeepProcessing) {
-                        break
-                    }
+                if (!accumulatedKeepProcessing) {
+                    break@outer
                 }
+            }
+        }
 
-                accumulatedKeepProcessing
-            } ?: true
+        return accumulatedKeepProcessing
+    }
 
     fun elementDescription(@Suppress("UNUSED_PARAMETER") call: Call, location: ElementDescriptionLocation): String? {
         var elementDescription: String? = null
@@ -65,9 +66,10 @@ object Use {
      * @return `defmodule`, `defimpl`, or `defprotocol` used by `useCall`.  It can be `null` if Alias passed to
      *    `useCall` cannot be resolved.
      */
-    fun modular(useCall: Call): Call? =
+    fun modulars(useCall: Call): List<Call> =
             useCall
                     .finalArguments()
                     ?.firstOrNull()
-                    ?.maybeModularNameToModular(maxScope = useCall.parent, useCall = useCall)
+                    ?.maybeModularNameToModulars(maxScope = useCall.parent, useCall = useCall, incompleteCode = false)
+                    ?: emptyList()
 }
