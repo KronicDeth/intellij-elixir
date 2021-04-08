@@ -89,7 +89,7 @@ class Delegation(private val modular: Modular, call: Call) : Element<Call?>(call
 
     companion object {
         @JvmStatic
-        fun callDefinitionHeadCallList(defdelegateCall: Call): List<Call>? {
+        fun callDefinitionHeadCallList(defdelegateCall: Call): List<Call> {
             var callDefinitionHeadCallList: List<Call>? = null
             val finalArguments = defdelegateCall.finalArguments()!!
             val firstFinalArgument = finalArguments[0]
