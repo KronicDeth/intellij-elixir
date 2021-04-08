@@ -28,10 +28,10 @@ object CaptureNameArity : ResolveCache.PolyVariantResolver<CaptureNameArity> {
 
                         AccumulatorContinue(acc, true)
                     }.accumulator
-                }.toTypedArray()
+                }
             } else {
                 MultiResolve.resolveResults(name, arity, incompleteCode, reference.element)
-            }
+            }.toTypedArray()
         } ?: emptyArray()
     }
 }

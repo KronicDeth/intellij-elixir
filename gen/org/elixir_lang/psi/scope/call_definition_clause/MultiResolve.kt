@@ -54,7 +54,7 @@ private constructor(private val name: String,
                         for (modular in modulars) {
                             val delegationState = state.put(DEFDELEGATE_CALL, element).putVisitedElement(element)
 
-                            val keepProcessing = Modular.callDefinitionClauseCallWhile(modular, delegationState) { callDefinitionClauseCall, state ->
+                            Modular.callDefinitionClauseCallWhile(modular, delegationState) { callDefinitionClauseCall, state ->
                                 org.elixir_lang.psi.CallDefinitionClause.nameArityRange(callDefinitionClauseCall)?.let { callNameArityRange ->
                                     val callName = callNameArityRange.name
 
@@ -84,7 +84,7 @@ private constructor(private val name: String,
     }
 
     override fun keepProcessing(): Boolean = resolveResultOrderedSet.keepProcessing(incompleteCode)
-    fun resolveResults(): Array<ResolveResult> = resolveResultOrderedSet.toTypedArray()
+    fun resolveResults(): List<ResolveResult> = resolveResultOrderedSet.toList()
 
     private val resolveResultOrderedSet = ResolveResultOrderedSet()
 
@@ -116,7 +116,7 @@ private constructor(private val name: String,
                            resolvedFinalArity: Int,
                            incompleteCode: Boolean,
                            entrance: PsiElement,
-                           resolveState: ResolveState = ResolveState.initial()): Array<ResolveResult> {
+                           resolveState: ResolveState = ResolveState.initial()): List<ResolveResult> {
             val multiResolve = MultiResolve(name, resolvedFinalArity, incompleteCode)
             val maxScope = maxScope(entrance)
 
