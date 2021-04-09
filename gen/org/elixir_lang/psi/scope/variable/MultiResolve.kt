@@ -3,10 +3,7 @@ package org.elixir_lang.psi.scope.variable
 import com.intellij.openapi.util.Key
 import com.intellij.psi.*
 import com.intellij.psi.util.PsiTreeUtil
-import org.elixir_lang.psi.Arguments
-import org.elixir_lang.psi.ElixirDoBlock
-import org.elixir_lang.psi.ElixirStab
-import org.elixir_lang.psi.ElixirStabBody
+import org.elixir_lang.psi.*
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.previousSiblingExpression
@@ -35,7 +32,7 @@ class MultiResolve(private val name: String, private val incompleteCode: Boolean
 
     private fun addToResolveResultList(element: PsiElement, state: ResolveState, validResult: Boolean) {
         val declaringScope = state.get<Boolean>(DECLARING_SCOPE)
-        
+
         if (declaringScope == null || declaringScope) {
             val lastBinding = state.get(LAST_BINDING_KEY)
             var added = false
@@ -96,7 +93,9 @@ class MultiResolve(private val name: String, private val incompleteCode: Boolean
             if (name == Callable.IGNORED) {
                 listOf<ResolveResult>(PsiElementResolveResult(entrance))
             } else {
-                resolveResultList(name, incompleteCode, entrance, ResolveState.initial())
+                val resolveState = ResolveState.initial().putInitialVisitedElement(entrance)
+
+                resolveResultList(name, incompleteCode, entrance, resolveState)
             }
 
         fun resolveResultList(name: String,

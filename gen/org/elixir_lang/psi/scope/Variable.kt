@@ -232,6 +232,12 @@ abstract class Variable : PsiScopeProcessor {
                         }
                     }
                 }
+                // The variable is used as compile-time in the body of a defmodule, but declared in a `use`, such
+                // `if code_reloading? do` in `MyApp.Endpoint`, which is declared in `use Phoenix.Endpoint, ...` at
+                // the top of `MyApp.Endpoint`
+                Use.`is`(match) -> {
+                    Use.treeWalkUp(match, state, ::execute)
+                }
                 else -> {
                     // unquote(var) can't declare var, only use it
                     if (!match.isCalling(Module.KERNEL, Function.UNQUOTE, 1)) {
