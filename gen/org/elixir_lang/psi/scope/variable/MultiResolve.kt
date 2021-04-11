@@ -55,6 +55,7 @@ class MultiResolve(private val name: String, private val incompleteCode: Boolean
                                         ResolveState
                                                 .initial()
                                                 .put(ElixirPsiImplUtil.ENTRANCE, matchAncestor)
+                                                .putInitialVisitedElement(matchAncestor)
                                                 .put(LAST_BINDING_KEY, element)
                                 )
 
@@ -93,7 +94,7 @@ class MultiResolve(private val name: String, private val incompleteCode: Boolean
             if (name == Callable.IGNORED) {
                 listOf<ResolveResult>(PsiElementResolveResult(entrance))
             } else {
-                val resolveState = ResolveState.initial().putInitialVisitedElement(entrance)
+                val resolveState = ResolveState.initial().put(ENTRANCE, entrance).putInitialVisitedElement(entrance)
 
                 resolveResultList(name, incompleteCode, entrance, resolveState)
             }
