@@ -8,6 +8,7 @@ import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.UNQUOTE
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.call.finalArguments
+import org.elixir_lang.psi.scope.WhileIn.whileIn
 
 object Unquote {
     fun treeWalkUp(unquoteCall: Call, resolveState: ResolveState, keepProcessing: (PsiElement, ResolveState) -> Boolean): Boolean =
@@ -20,22 +21,14 @@ object Unquote {
                     ?.let { reference ->
                         reference
                                 .multiResolve(false)
-                                ?.filter(ResolveResult::isValidResult)
-                                ?.mapNotNull(ResolveResult::getElement)
-                                ?.filterIsInstance<Call>()
-                                ?.filter { CallDefinitionClause.`is`(it) }
-                                ?.let { unquotedFunctionDefinitionList ->
-                                    var accumulatorKeepProcessing = true
-
-                                    for (unquotedFunctionDefinition in unquotedFunctionDefinitionList) {
-                                        accumulatorKeepProcessing = Using.treeWalkUp(unquotedFunctionDefinition, null, resolveState, keepProcessing)
-
-                                        if (!accumulatorKeepProcessing) {
-                                            break
-                                        }
+                                .filter(ResolveResult::isValidResult)
+                                .mapNotNull(ResolveResult::getElement)
+                                .filterIsInstance<Call>()
+                                .filter { CallDefinitionClause.`is`(it) }
+                                .let { unquotedFunctionDefinitionList ->
+                                    whileIn(unquotedFunctionDefinitionList) {
+                                        Using.treeWalkUp(it, null, resolveState, keepProcessing)
                                     }
-
-                                    accumulatorKeepProcessing
                                 }
                     }
                     ?: true
