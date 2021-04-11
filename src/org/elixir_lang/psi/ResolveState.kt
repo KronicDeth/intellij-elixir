@@ -1,5 +1,6 @@
 package org.elixir_lang.psi
 
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
@@ -19,7 +20,11 @@ fun ResolveState.putInitialVisitedElement(visitedElement: PsiElement): ResolveSt
 }
 
 fun ResolveState.putVisitedElement(visitedElement: PsiElement): ResolveState {
-    val visitedElementSet = this.get(VISITED_ELEMENT_SET)
+    val visitedElementSet = this.get(VISITED_ELEMENT_SET) ?: emptySet()
+
+    if (this.get(VISITED_ELEMENT_SET) == null) {
+       Logger.getInstance(ResolveState::class.java).error("VISITED_ELEMENT_SET is null.  putInitialVisitedElement was not called")
+    }
 
     return this.put(VISITED_ELEMENT_SET, visitedElementSet + setOf(visitedElement))
 }
