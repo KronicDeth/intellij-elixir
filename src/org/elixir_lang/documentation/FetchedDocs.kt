@@ -1,6 +1,12 @@
 package org.elixir_lang.documentation
 
+import com.ericsson.otp.erlang.OtpErlangBinary
+import com.ericsson.otp.erlang.OtpErlangObject
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.psi.PsiElement
+import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.Doc
+import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.MarkdownByLanguage
+import org.elixir_lang.beam.term.inspect
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.ElixirStringLine
@@ -13,16 +19,16 @@ import org.elixir_lang.psi.impl.stripAccessExpression
 
 sealed class FetchedDocs(open val module: String) {
     data class FunctionOrMacroDocumentation(override val module: String,
-                                            val deprecated: String?,
-                                            val doc: String?,
+                                            val deprecated: OtpErlangObject?,
+                                            val doc: Doc?,
                                             val impls: List<String>,
                                             val specs: List<String>,
                                             val heads: List<String>) : FetchedDocs(module) {
         fun merge(other: FunctionOrMacroDocumentation): FunctionOrMacroDocumentation {
             assert(module == other.module)
 
-            val deprecated = listOfNotNull(this.deprecated, other.deprecated).takeIf(List<*>::isEmpty)?.joinToString("")
-            val doc = listOfNotNull(this.doc, other.doc).takeIf(List<*>::isEmpty)?.joinToString("")
+            val deprecated = mergeDeprecated(this.deprecated, other.deprecated)
+            val doc = Doc.merge(this.doc, other.doc)
             val impls = this.impls + other.impls
             val specs = this.specs + other.specs
             val heads = this.heads + other.heads
@@ -38,16 +44,31 @@ sealed class FetchedDocs(open val module: String) {
         }
 
         companion object {
+            private val logger = Logger.getInstance(FunctionOrMacroDocumentation::class.java)
+
             fun fromCallDefinitionClauseCall(module: String, call: Call, head: PsiElement): FunctionOrMacroDocumentation {
                 val callDefinitionAttributeListByName = callDefinitionAttributeListByName(call)
-                val deprecated = callDefinitionAttributeListByName[DEPRECATED]?.joinModuleAttributeQuoteText()
-                val doc = callDefinitionAttributeListByName[DOC]?.joinModuleAttributeQuoteText()
+                val deprecated = callDefinitionAttributeListByName[DEPRECATED]?.joinModuleAttributeQuoteText()?.let { OtpErlangBinary(it.toByteArray()) }
+                val doc = callDefinitionAttributeListByName[DOC]?.joinModuleAttributeQuoteText()?.let { MarkdownByLanguage.english(it) }
                 val impls = callDefinitionAttributeListByName[IMPL].moduleAttributeValueTextList()
                 val specs = callDefinitionAttributeListByName[SPEC].moduleAttributeValueTextList()
                 val heads = listOf(head.text)
 
                 return FunctionOrMacroDocumentation(module, deprecated, doc, impls, specs, heads)
             }
+
+            private fun mergeDeprecated(first: OtpErlangObject?, second: OtpErlangObject?): OtpErlangObject? =
+                if (first != null) {
+                    if (second != null) {
+                        logger.error("Don't know how to merge deprecated metadata (${inspect(first)}) and ${inspect(second)})")
+
+                        null
+                    } else {
+                        first
+                    }
+                } else {
+                    second
+                }
         }
     }
 

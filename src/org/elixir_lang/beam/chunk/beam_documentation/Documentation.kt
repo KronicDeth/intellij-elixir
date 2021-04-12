@@ -16,7 +16,7 @@ class Documentation(private val docsList: OtpErlangList) {
     val format: String? by lazy { (docsList.elementAt(3) as? OtpErlangBinary)?.let{ String(it.binaryValue())} }
 
     /**  List of documentation for other entities (such as functions and types) in the module.*/
-    val docs: Docs? by lazy { (docsList.elementAt(6) as? OtpErlangList)?.let { Docs(it)} }
+    val docs: Docs? by lazy { (docsList.elementAt(6) as? OtpErlangList)?.let { Docs.from(it)} }
 
     val moduleDocs: ModuleDocs? by lazy { (docsList.elementAt(4) as? OtpErlangMap)?. let { ModuleDocs(it) } }
 

@@ -1,5 +1,6 @@
 package org.elixir_lang.beam
 
+import com.ericsson.otp.erlang.OtpErlangBinary
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileTypes.BinaryFileDecompiler
 import com.intellij.openapi.vfs.VirtualFile
@@ -8,7 +9,11 @@ import org.elixir_lang.beam.chunk.Atoms
 import org.elixir_lang.beam.chunk.CallDefinitions
 import org.elixir_lang.beam.chunk.Chunk.TypeID
 import org.elixir_lang.beam.chunk.beam_documentation.Documentation
+import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.Hidden
+import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.MarkdownByLanguage
+import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.None
 import org.elixir_lang.beam.decompiler.*
+import org.elixir_lang.beam.term.inspect
 import org.elixir_lang.psi.call.name.Function
 import org.elixir_lang.psi.call.name.Module
 import org.elixir_lang.reference.resolver.Type.BUILTIN_ARITY_BY_NAME
@@ -19,6 +24,7 @@ class Decompiler : BinaryFileDecompiler {
     override fun decompile(virtualFile: VirtualFile): CharSequence = decompiled(from(virtualFile))
 
     companion object {
+        private val logger = Logger.getInstance(Decompiler::class.java)
         private val HEADER_NAME_BY_MACRO: Map<String, String> = mapOf(Function.DEFMACRO to "Macros", Function.DEFMACROP to "Private Macros", Function.DEF to "Functions", Function.DEFP to "Private Functions")
         private val MACRO_NAME_ARITY_DECOMPILER_LIST: List<org.elixir_lang.beam.decompiler.MacroNameArity> = listOf(
                 InfixOperator.INSTANCE,
@@ -52,7 +58,7 @@ class Decompiler : BinaryFileDecompiler {
                             }
                         }
 
-                        appendTypes(decompiled, moduleName)
+                        appendTypes(decompiled, moduleName, documentation)
                         appendCallDefinitions(decompiled, beam, atoms, documentation)
                         decompiled.append("end\n")
                     } else {
@@ -74,7 +80,7 @@ class Decompiler : BinaryFileDecompiler {
             }
         }
 
-        private fun appendTypes(decompiled: StringBuilder, moduleName: String) {
+        private fun appendTypes(decompiled: StringBuilder, moduleName: String, documentation: Documentation?) {
             // fake built-in types being defined in `erlang`, so that built-in type resolution can point to a single location
             if (moduleName == "erlang") {
                 decompiled
@@ -107,6 +113,49 @@ class Decompiler : BinaryFileDecompiler {
                     }
                 }
             }
+
+            documentation?.docs?.typeDocumentedByArityByName()?.let { documentedByArityByName ->
+                if (documentedByArityByName.isNotEmpty()) {
+                    decompiled
+                            .append('\n')
+                            .append("  # Types")
+                            .append('\n')
+                }
+
+                for ((name, documentedByArity) in documentedByArityByName) {
+                    for ((arity, documented) in documentedByArity) {
+                        documented.doc?.let { doc ->
+                            when (doc) {
+                                is None -> Unit
+                                is Hidden -> appendDocumentation(decompiled, "typedoc", false)
+                                is MarkdownByLanguage -> {
+                                    for ((_language, formatted) in doc.formattedByLanguage) {
+                                        appendDocumentation(decompiled, "typedoc", formatted)
+                                    }
+                                }
+                            }
+                        }
+
+                        val signatures = documented.signatures
+
+                        if (signatures.isNotEmpty()) {
+                            TODO()
+                        } else {
+                            decompiled.append("  @type ").append(name).append('(')
+
+                            for (i in 1..arity) {
+                                if (i > 1) {
+                                    decompiled.append(", ")
+                                }
+
+                                decompiled.append("type").append(i)
+                            }
+
+                            decompiled.append(") :: ... \n")
+                        }
+                    }
+                }
+            }
         }
 
         private fun appendCallDefinitions(decompiled: StringBuilder,
@@ -129,20 +178,36 @@ class Decompiler : BinaryFileDecompiler {
                     appendHeader(decompiled, macroToHeaderName(macro))
                 }
                 decompiled.append("\n")
+
                 if (documentation != null) {
-                    val functionMetadata = if (documentation.docs != null) documentation.docs!!.getFunctionMetadataOrSimilar(macroNameArity.name, macroNameArity.arity) else null
-                    functionMetadata?.stream()?.filter { (name) -> name == "deprecated" }?.forEach { (_, value) ->
-                        if (value != null) {
-                            decompiled.append("\n  @deprecated \"\"\"\n")
-                                    .append("  ")
-                                    .append(value)
-                                    .append("\n  \"\"\"\n\n")
-                        } else {
-                            decompiled.append("\n  @deprecated\n")
+                    documentation.docs?.let { docs ->
+                        docs.deprecated(macroNameArity)?.let { deprecated ->
+                            when (deprecated) {
+                                is OtpErlangBinary ->
+                                    decompiled.append("\n  @deprecated \"\"\"\n")
+                                            .append("  ")
+                                            .append(String(deprecated.binaryValue()))
+                                            .append("\n  \"\"\"\n\n")
+                                else -> {
+                                    logger.error("Don't know how to decompiled @deprecated value (${inspect(deprecated)})")
+                                }
+                            }
+                        }
+
+                        docs.doc(macroNameArity)?.let { doc ->
+                            when (doc) {
+                                is None -> Unit
+                                is Hidden -> appendDocumentation(decompiled, "doc", false)
+                                is MarkdownByLanguage -> {
+                                    for ((_language, formatted) in doc.formattedByLanguage) {
+                                        appendDocumentation(decompiled, "doc", formatted)
+                                    }
+                                }
+                            }
                         }
                     }
-                    val functionDocs = if (documentation.docs != null) documentation.docs!!.getFunctionDocs(macroNameArity.name, macroNameArity.arity) else null
-                    functionDocs?.forEach(Consumer { (_, documentationText) -> appendDocumentation(decompiled, "doc", documentationText) })
+
+
                 }
                 appendMacroNameArity(decompiled, macroNameArity, documentation)
                 lastMacroNameArity = macroNameArity
@@ -155,6 +220,10 @@ class Decompiler : BinaryFileDecompiler {
                     .append("  # ")
                     .append(name)
                     .append("\n")
+        }
+
+        private fun appendDocumentation(decompiled: StringBuilder, moduleAttribute: String, shown: Boolean) {
+            decompiled.append("  @").append(moduleAttribute).append(' ').append(shown).append('\n')
         }
 
         private fun appendDocumentation(decompiled: StringBuilder, moduleAttribute: String, text: String) {
@@ -224,13 +293,14 @@ class Decompiler : BinaryFileDecompiler {
                 // The signature while easier for users to read are not proper code for those that need to use unquote, so
                 // only allow signatures for default decompiler
                 if (decompiler === Default.INSTANCE) {
-                    val signaturesFromDocs = if (documentation != null && documentation.beamLanguage == "elixir") documentation.docs!!.getSignatures(macroNameArity.name, macroNameArity.arity) else null
+                    val signatures =  documentation?.takeIf { it.beamLanguage == "elixir" }?.docs?.signatures(macroNameArity)
 
-                    if (signaturesFromDocs != null && signaturesFromDocs.isNotEmpty()) {
-                        decompiled.append("  ").append(macroNameArity.macro).append(' ')
-                        val optional = signaturesFromDocs.stream().findFirst()
-                        decompiled.append(optional.get())
-                        decompiled.append(" do\n    # body not decompiled\n  end\n")
+                    if (signatures != null && signatures.isNotEmpty()) {
+                        for (signature in signatures) {
+                            decompiled.append("  ").append(macroNameArity.macro).append(' ')
+                            decompiled.append(signature)
+                            decompiled.append(" do\n    # body not decompiled\n  end\n")
+                        }
                     } else {
                         decompiler.append(decompiled, macroNameArity)
                     }
@@ -258,7 +328,6 @@ class Decompiler : BinaryFileDecompiler {
         }
 
         private fun error(macroNameArity: MacroNameArity) {
-            val logger = Logger.getInstance(Decompiler::class.java)
             val message = "No decompiler for MacroNameArity ($macroNameArity)"
             logger.error(message)
         }

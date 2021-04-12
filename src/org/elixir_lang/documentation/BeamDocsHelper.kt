@@ -21,24 +21,17 @@ object BeamDocsHelper {
                                 val arity = element.exportedArity()
 
                                 beam.documentation()?.docs?.let { docs ->
-                                    docs.docsForOrSimilar(name, arity)?.let { functionInfo ->
-                                        val signatures = functionInfo.signatures
+                                    docs.documented("function", name, arity)?.let { documented ->
 
-                                        val deprecated = docs
-                                                .getFunctionMetadataOrSimilar(name, arity)
-                                                .firstOrNull { it.name == "deprecated" }
-                                                ?.let { it.value.orEmpty() }
+                                        val signatures = documented.signatures
+                                        val deprecated = documented.deprecated()
+                                        val doc = documented.doc
 
-                                        val functionDoc = docs
-                                                .getFunctionDocsOrSimilar(name, arity)
-                                                .firstOrNull()
-                                                ?.documentationText
-
-                                        if (deprecated != null || functionDoc != null) {
+                                        if (deprecated != null || doc != null) {
                                             FetchedDocs.FunctionOrMacroDocumentation(
                                                     module,
                                                     deprecated,
-                                                    functionDoc,
+                                                    doc,
                                                     impls = emptyList(),
                                                     specs = emptyList(),
                                                     heads = signatures

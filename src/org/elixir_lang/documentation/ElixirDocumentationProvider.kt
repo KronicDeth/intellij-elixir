@@ -8,6 +8,9 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.impl.source.tree.LeafPsiElement
+import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.Hidden
+import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.MarkdownByLanguage
+import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.None
 import org.elixir_lang.beam.psi.BeamFileImpl
 import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.ElixirIdentifier
@@ -90,10 +93,21 @@ class ElixirDocumentationProvider : DocumentationProvider {
             }
             is FetchedDocs.FunctionOrMacroDocumentation -> {
                 fetchedDocs.doc?.let { doc ->
-                    documentationHtml
-                            .append(DocumentationMarkup.CONTENT_START)
-                            .append(html(doc))
-                            .append(DocumentationMarkup.CONTENT_END)
+                    when (doc) {
+                        is None -> Unit
+                        is Hidden ->
+                            documentationHtml
+                                    .append(DocumentationMarkup.CONTENT_START)
+                                    .append(false)
+                                    .append(DocumentationMarkup.CONTENT_END)
+                        is MarkdownByLanguage ->
+                            doc.formattedByLanguage.map { (_language, formatted) ->
+                                documentationHtml
+                                        .append(DocumentationMarkup.CONTENT_START)
+                                        .append(html(formatted))
+                                        .append(DocumentationMarkup.CONTENT_END)
+                            }
+                    }
                 }
 
                 val deprecated = fetchedDocs.deprecated
@@ -106,12 +120,14 @@ class ElixirDocumentationProvider : DocumentationProvider {
                     documentationHtml.append(DocumentationMarkup.SECTIONS_START)
 
                     if (deprecated != null) {
-                        documentationHtml
-                                .append(DocumentationMarkup.SECTION_HEADER_START)
-                                .append("Deprecated")
-                                .append(DocumentationMarkup.SECTION_SEPARATOR)
-                                .append(html(deprecated))
-                                .append(DocumentationMarkup.SECTION_END)
+                        TODO()
+
+//                        documentationHtml
+//                                .append(DocumentationMarkup.SECTION_HEADER_START)
+//                                .append("Deprecated")
+//                                .append(DocumentationMarkup.SECTION_SEPARATOR)
+//                                .append(html(deprecated))
+//                                .append(DocumentationMarkup.SECTION_END)
                     }
 
                     if (implsIsNotEmpty) {
