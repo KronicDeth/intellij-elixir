@@ -5,8 +5,12 @@ import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.ResolveState
 import com.intellij.psi.impl.source.tree.CompositeElement
 import com.intellij.psi.scope.PsiScopeProcessor
+import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.util.isAncestor
 import com.intellij.psi.util.siblings
+import com.intellij.util.xml.Resolve
+import org.elixir_lang.beam.psi.impl.ModuleImpl
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
@@ -18,6 +22,7 @@ import org.elixir_lang.psi.impl.call.macroChildCalls
 import org.elixir_lang.psi.impl.identifierName
 import org.elixir_lang.psi.operation.Type
 import org.elixir_lang.psi.scope.WhileIn.whileIn
+import org.elixir_lang.psi.stub.index.ModularName
 import org.elixir_lang.psi.stub.type.call.Stub.isModular
 import org.elixir_lang.reference.ModuleAttribute
 import org.elixir_lang.reference.ModuleAttribute.Companion.isCallbackName
@@ -60,13 +65,15 @@ abstract class Type : PsiScopeProcessor {
                     }
 
                     // specialization
-                    val defprotocolKeepProcessing = if (childCallsKeepProcessing && Protocol.`is`(call)) {
-                        executeOnDefprotocolCall(call, state)
+                    if (childCallsKeepProcessing && Protocol.`is`(call)) {
+                        // favor the decompiled, specific module for this protocol so that only this module's `t` will
+                        // be used for Find Usages instead of for all protocols as happens with the source for
+                        // `defprotocol`.
+                        executeOnDecompiledProtocol(call, state) &&
+                          executeOnDefprotocolCall(call, state)
                     } else {
                         childCallsKeepProcessing
                     }
-
-                    keepProcessing()
                 } else if (Use.`is`(call)) {
                     val useState = state.put(CallDefinitionClause.USE_CALL, call).putVisitedElement(call)
 
@@ -98,6 +105,23 @@ abstract class Type : PsiScopeProcessor {
                     .takeWhile { it }
                     .lastOrNull()
                     ?: true
+
+    private fun executeOnDecompiledProtocol(call: Call, state: ResolveState): Boolean {
+        val project = call.project
+
+        return call.name?.let { name ->
+            StubIndex.getInstance().processElements(ModularName.KEY, name, project, GlobalSearchScope.allScope(project), NamedElement::class.java) { modular ->
+                // use `ModuleImpl` to only use decompiled
+                if (modular is ModuleImpl<*>) {
+                    val decompiled = modular.navigationElement
+                    // reset the resolve state as only `defmodule` that is an ancestor of entrance will be walked
+                    execute(decompiled, ResolveState.initial().put(ENTRANCE, decompiled).putInitialVisitedElement(decompiled))
+                } else {
+                    true
+                }
+            }
+        } ?: true
+    }
 
     private fun executeOnDefprotocolCall(call: Call, state: ResolveState): Boolean =
             call.reference?.let { reference ->
