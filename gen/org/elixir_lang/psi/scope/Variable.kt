@@ -337,10 +337,7 @@ abstract class Variable : PsiScopeProcessor {
         val operatorText = operator.text
         var keepProcessing = true
         if (operatorText == ElixirPsiImplUtil.DEFAULT_OPERATOR) {
-            val defaulted: PsiElement? = match.leftOperand()
-            if (defaulted is PsiNamedElement) {
-                keepProcessing = executeOnVariable(defaulted, state)
-            }
+            executeLeftOperand(match, state)
         } else if (operatorText == "<-") {
             val entrance = state.get(ElixirPsiImplUtil.ENTRANCE)
             val rightOperand: PsiElement? = match.rightOperand()
