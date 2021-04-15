@@ -124,6 +124,6 @@ class Delegation(private val modular: Modular, call: Call) : Element<Call?>(call
         fun `is`(call: Call): Boolean = call.isCalling(Module.KERNEL, Function.DEFDELEGATE, 2)
 
         fun nameIdentifier(call: Call): PsiElement? =
-            call.keywordArgument("as") ?: call.finalArguments()?.get(0)?.let { it as? Call }?.functionNameElement()
+            call.finalArguments()?.get(0)?.let { it as? Call }?.functionNameElement()
     }
 }
