@@ -5,10 +5,14 @@ import com.intellij.psi.ResolveResult
 import com.intellij.psi.impl.source.resolve.ResolveCache
 import org.elixir_lang.Arity
 import org.elixir_lang.Name
+import org.elixir_lang.NameArityRange
 import org.elixir_lang.psi.call.Call
+import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.call.macroChildCalls
 import org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.enclosingModularMacroCall
+import org.elixir_lang.structure_view.element.CallDefinitionHead
 import org.elixir_lang.structure_view.element.CallDefinitionSpecification.Companion.typeNameArity
+import org.elixir_lang.structure_view.element.Delegation
 
 object CallDefinitionClause : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.CallDefinitionClause> {
     override fun resolve(callDefinitionClause: org.elixir_lang.reference.CallDefinitionClause,
@@ -20,7 +24,6 @@ object CallDefinitionClause : ResolveCache.PolyVariantResolver<org.elixir_lang.r
                     val arity = nameArity.arity
 
                     siblings
-                            .filter { org.elixir_lang.psi.CallDefinitionClause.`is`(it) }
                             .mapNotNull { call -> callToResolveResult(call, name, arity) }
                             .toTypedArray()
                 } else {
@@ -29,17 +32,31 @@ object CallDefinitionClause : ResolveCache.PolyVariantResolver<org.elixir_lang.r
             } ?: emptyArray()
 
     private fun callToResolveResult(call: Call, name: Name, arity: Arity): ResolveResult? =
-            org.elixir_lang.psi.CallDefinitionClause.nameArityRange(call)
-                    ?.let { callNameArityRange ->
-                        val callName = callNameArityRange.name
+            definerToNameArityRange(call)?.let { definerNameArityRange ->
+                val definerName = definerNameArityRange.name
 
-                        if (callName.startsWith(name)) {
-                            val callArityRange = callNameArityRange.arityRange
-                            val validResult = (arity in callArityRange) && (callName == name)
+                if (definerName.startsWith(name)) {
+                    val definerArityRange = definerNameArityRange.arityRange
+                    val validResult = (arity in definerArityRange) && (definerName == name)
 
-                            PsiElementResolveResult(call, validResult)
-                        } else {
-                            null
-                        }
+                    PsiElementResolveResult(call, validResult)
+                } else {
+                    null
+                }
+            }
+
+    private fun definerToNameArityRange(call: Call): NameArityRange? =
+            when {
+                org.elixir_lang.psi.CallDefinitionClause.`is`(call) -> {
+                    org.elixir_lang.psi.CallDefinitionClause.nameArityRange(call)
+                }
+                Delegation.`is`(call) -> {
+                    call.finalArguments()?.takeIf { it.size == 2 }?.let { arguments ->
+                        val head = arguments[0]
+
+                        CallDefinitionHead.nameArityRange(head)
                     }
+                }
+                else -> null
+            }
 }
