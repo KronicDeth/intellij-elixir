@@ -92,8 +92,6 @@ private constructor(private val name: String,
             (call as? Named)?.nameIdentifier?.let { nameIdentifier ->
                 if (PsiTreeUtil.isAncestor(state.get(ENTRANCE), nameIdentifier, false)) {
                     resolveResultOrderedSet.add(call, name, validResult)
-
-                    false
                 } else {
                     resolveResultOrderedSet.add(call, name, validResult)
 
@@ -104,9 +102,9 @@ private constructor(private val name: String,
                     state.get<Call>(IMPORT_CALL)?.let { importCall ->
                         resolveResultOrderedSet.add(importCall, importCall.text, validResult)
                     }
-
-                    null
                 }
+
+                keepProcessing()
             } ?: true
 
     companion object {
