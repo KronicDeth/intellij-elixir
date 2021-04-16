@@ -35,7 +35,7 @@ object QuotableKeywordPairImpl {
 
         assert(children.size >= 2)
 
-        return children[1] as Quotable
+        return children[1].stripAccessExpression() as Quotable
     }
 
     @JvmStatic
@@ -44,6 +44,6 @@ object QuotableKeywordPairImpl {
 
         assert(children.size >= 2)
 
-        return children[1] as Quotable
+        return children[1].stripAccessExpression() as Quotable
     }
 }
