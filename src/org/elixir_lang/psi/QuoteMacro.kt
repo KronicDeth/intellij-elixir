@@ -32,7 +32,7 @@ object QuoteMacro {
 
                     Use.treeWalkUp(childCall, childResolveState, keepProcessing)
                 }
-                childCall.isCalling(KERNEL, "unless") -> {
+                childCall.isCalling(KERNEL, "if") || childCall.isCalling(KERNEL, "unless") -> {
                     childCall.doBlock?.let { doBlock ->
                         doBlock.stab?.stabBody?.firstChild?.siblings()?.filter { it.node is CompositeElement }?.let { unlessExpressions ->
                             whileIn(unlessExpressions) { unlessExpression ->
