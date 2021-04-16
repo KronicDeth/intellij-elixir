@@ -5,6 +5,7 @@ import com.intellij.psi.ResolveResult
 import com.intellij.psi.ResolveState
 import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.psi.CallDefinitionClause.nameArityRange
+import org.elixir_lang.psi.ElixirAtom
 import org.elixir_lang.psi.Modular
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.Named
@@ -44,35 +45,35 @@ private constructor(private val name: String,
 
             CallDefinitionHead.nameArityRange(head)?.let { headNameArityRange ->
                 val headName = headNameArityRange.name
-                val name = element.keywordArgument("as")?.stripAccessExpression()?.let { it as? Call }?.functionName()
-                        ?: headName
 
-                if (name.startsWith(this.name)) {
+                if (headName.startsWith(this.name)) {
+                    val headValidResult = (resolvedFinalArity in headNameArityRange.arityRange) && (headName == this.name)
+
+                    // the defdelegate is valid or invalid regardless of whether the `to:` (and `:as` resolves as
+                    // `defdelegate` still defines a function in the module with the head's name and arity even if it
+                    // will fail at runtime to call the delegated function
+                    addToResolveResults(element, headValidResult, state)
+
                     element.keywordArgument("to")?.let { definingModuleName ->
                         val modulars = definingModuleName.maybeModularNameToModulars(element.containingFile, useCall = null, incompleteCode = incompleteCode)
 
-                        for (modular in modulars) {
-                            val delegationState = state.put(DEFDELEGATE_CALL, element).putVisitedElement(element)
+                        if (modulars.isNotEmpty()) {
+                            val nameInDefiningModule = element.keywordArgument("as")?.let { it as? ElixirAtom }?.node?.lastChildNode?.text
+                                    ?: headName
 
-                            Modular.callDefinitionClauseCallWhile(modular, delegationState) { callDefinitionClauseCall, state ->
-                                org.elixir_lang.psi.CallDefinitionClause.nameArityRange(callDefinitionClauseCall)?.let { callNameArityRange ->
-                                    val callName = callNameArityRange.name
+                            for (modular in modulars) {
+                                // Call recursively to get all the proper `for` and `use` handling.
+                                val modularResolveResults = resolveResults(nameInDefiningModule, resolvedFinalArity, incompleteCode, modular)
 
-                                    if (callName.startsWith(headName)) {
-                                        val validResult = (resolvedFinalArity in callNameArityRange.arityRange) && name == this.name
-
-                                        addToResolveResults(element, validResult, state)
-
-                                    } else {
-                                        null
+                                for (modularResultResult in modularResolveResults) {
+                                    modularResultResult.element?.let { it as Call }?.let { call ->
+                                        addToResolveResults(call, modularResultResult.isValidResult, state)
                                     }
                                 }
 
-                                keepProcessing()
-                            }
-
-                            if (!keepProcessing()) {
-                                break
+                                if (!keepProcessing()) {
+                                    break
+                                }
                             }
                         }
                     }
@@ -94,10 +95,6 @@ private constructor(private val name: String,
                     resolveResultOrderedSet.add(call, name, validResult)
                 } else {
                     resolveResultOrderedSet.add(call, name, validResult)
-
-                    state.get<Call>(DEFDELEGATE_CALL)?.let{ defdelegateCall ->
-                        resolveResultOrderedSet.add(defdelegateCall, defdelegateCall.text, validResult)
-                    }
 
                     state.get<Call>(IMPORT_CALL)?.let { importCall ->
                         resolveResultOrderedSet.add(importCall, importCall.text, validResult)
