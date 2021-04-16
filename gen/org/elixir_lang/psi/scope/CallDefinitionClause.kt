@@ -67,47 +67,49 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
      */
 
     private fun execute(element: Call, state: ResolveState): Boolean =
-            if (org.elixir_lang.psi.CallDefinitionClause.`is`(element)) {
-                executeOnCallDefinitionClause(element, state)
-            } else if (Delegation.`is`(element)) {
-                executeOnDelegation(element, state)
-            } else if (Import.`is`(element)) {
-                val importState = state.put(IMPORT_CALL, element).putVisitedElement(element)
+            when {
+                org.elixir_lang.psi.CallDefinitionClause.`is`(element) -> executeOnCallDefinitionClause(element, state)
+                Delegation.`is`(element) -> executeOnDelegation(element, state)
+                For.`is`(element) -> For.treeWalkDown(element, state, ::execute)
+                Import.`is`(element) -> {
+                    val importState = state.put(IMPORT_CALL, element).putVisitedElement(element)
 
-                try {
-                    Import.callDefinitionClauseCallWhile(element, importState) { callDefinitionClause, accResolveState ->
-                        executeOnCallDefinitionClause(callDefinitionClause, accResolveState)
+                    try {
+                        Import.callDefinitionClauseCallWhile(element, importState) { callDefinitionClause, accResolveState ->
+                            executeOnCallDefinitionClause(callDefinitionClause, accResolveState)
+                        }
+                    } catch (stackOverflowError: StackOverflowError) {
+                        Logger.error(
+                                CallDefinitionClause::class.java,
+                                "StackOverflowError while processing import",
+                                element
+                        )
                     }
-                } catch (stackOverflowError: StackOverflowError) {
-                    Logger.error(
-                            CallDefinitionClause::class.java,
-                            "StackOverflowError while processing import",
-                            element
-                    )
+
+                    true
                 }
+                Module.`is`(element) && moduleContainsEntrance(element, state) -> {
+                    val childCalls = element.macroChildCalls()
 
-                true
-            } else if (Module.`is`(element) && moduleContainsEntrance(element, state)) {
-                val childCalls = element.macroChildCalls()
-
-                for (childCall in childCalls) {
-                    if (!execute(childCall, state)) {
-                        break
+                    for (childCall in childCalls) {
+                        if (!execute(childCall, state)) {
+                            break
+                        }
                     }
+
+                    // Only check MultiResolve.keepProcessing at the end of a Module to all multiple arities
+                    keepProcessing() &&
+                            // the implicit `import Kernel` and `import Kernel.SpecialForms`
+                            implicitImports(element, state)
                 }
+                Use.`is`(element) -> {
+                    val useState = state.put(USE_CALL, element).putVisitedElement(element)
 
-                // Only check MultiResolve.keepProcessing at the end of a Module to all multiple arities
-                keepProcessing() &&
-                        // the implicit `import Kernel` and `import Kernel.SpecialForms`
-                        implicitImports(element, state)
-            } else if (Use.`is`(element)) {
-                val useState = state.put(USE_CALL, element).putVisitedElement(element)
+                    Use.treeWalkUp(element, useState, ::execute)
 
-                Use.treeWalkUp(element, useState, ::execute)
-
-                true
-            } else {
-                true
+                    true
+                }
+                else -> true
             }
 
     private fun execute(element: ElixirFile, state: ResolveState): Boolean =

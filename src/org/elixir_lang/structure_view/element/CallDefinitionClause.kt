@@ -13,6 +13,7 @@ import org.elixir_lang.psi.CallDefinitionClause.isPrivateFunction
 import org.elixir_lang.psi.CallDefinitionClause.isPrivateMacro
 import org.elixir_lang.psi.CallDefinitionClause.isPublicFunction
 import org.elixir_lang.psi.CallDefinitionClause.isPublicMacro
+import org.elixir_lang.psi.For
 import org.elixir_lang.psi.QuoteMacro
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.ALIAS
@@ -122,7 +123,7 @@ class CallDefinitionClause(val callDefinition: CallDefinition, call: Call) :
             while (true) {
                 enclosingMacroCall = enclosedCall.enclosingMacroCall()
 
-                if (enclosingMacroCall != null && (enclosingMacroCall.isCalling(KERNEL, ALIAS) || enclosingMacroCall.isCallingMacro(KERNEL, FOR, 2))) {
+                if (enclosingMacroCall != null && (enclosingMacroCall.isCalling(KERNEL, ALIAS) || For.`is`(enclosingMacroCall))) {
                     enclosedCall = enclosingMacroCall
                 } else {
                     break
