@@ -3,6 +3,7 @@ package org.elixir_lang.psi.impl
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.PsiReference
+import com.intellij.psi.ResolveResult
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
 import com.intellij.refactoring.suggested.endOffset
@@ -41,87 +42,6 @@ fun QualifiableAlias.getReference(): PsiPolyVariantReference? =
             CachedValueProvider.Result.create(computeReference(), this)
         }
 
-fun QualifiableAlias.fullyResolve(startingReference: PsiReference?): PsiElement {
-    val fullyResolved: PsiElement
-    var currentResolved: PsiElement = this
-    var reference = startingReference
-
-    do {
-        if (reference == null) {
-            reference = currentResolved.reference
-        }
-
-        if (reference != null) {
-            if (reference is PsiPolyVariantReference) {
-                val resolveResults = reference.multiResolve(false)
-                val resolveResultCount = resolveResults.size
-
-                if (resolveResultCount == 0) {
-                    fullyResolved = currentResolved
-
-                    break
-                } else if (resolveResultCount == 1) {
-                    val resolveResult = resolveResults[0]
-
-                    val nextResolved = resolveResult.element
-
-                    if (nextResolved != null && nextResolved is Call && isModular(nextResolved)) {
-                        fullyResolved = nextResolved
-                        break
-                    }
-
-                    if (nextResolved == null || nextResolved.isEquivalentTo(currentResolved)) {
-                        fullyResolved = currentResolved
-                        break
-                    } else {
-                        currentResolved = nextResolved
-                    }
-                } else {
-                    var nextResolved: PsiElement? = null
-
-                    for (resolveResult in resolveResults) {
-                        val resolveResultElement = resolveResult.element
-
-                        if (resolveResultElement != null &&
-                                resolveResultElement is Call &&
-                                isModular(resolveResultElement)) {
-                            nextResolved = resolveResultElement
-
-                            break
-                        }
-                    }
-
-                    fullyResolved = if (nextResolved == null) {
-                        currentResolved
-                    } else {
-                        nextResolved
-                    }
-
-                    break
-                }
-            } else {
-                val nextResolved = reference.resolve()
-
-                if (nextResolved == null || nextResolved.isEquivalentTo(currentResolved)) {
-                    fullyResolved = currentResolved
-                    break
-                } else {
-                    currentResolved = nextResolved
-                }
-            }
-        } else {
-            fullyResolved = currentResolved
-
-            break
-        }
-
-        reference = null
-    } while (true)
-
-    return fullyResolved
-}
-
-
 @Contract(pure = true)
 fun QualifiableAlias.isOutermostQualifiableAlias(): Boolean {
     val parent = parent
@@ -145,26 +65,42 @@ fun QualifiableAlias.maybeModularNameToModulars(maxScope: PsiElement): List<Call
     if (!recursiveKernelImport(maxScope)) {
         /* need to construct reference directly as qualified aliases don't return a reference except for the
            outermost */
-        reference?.let { toModulars(it) } ?: emptyList()
+        reference?.toModulars()
     } else {
-        emptyList()
-    }
-
+        null
+    } ?: emptyList()
 
 @Contract(pure = true)
 private fun QualifiableAlias.recursiveKernelImport(maxScope: PsiElement): Boolean =
         maxScope is ElixirFile && maxScope.name == "kernel.ex" && name == KERNEL
 
-@Contract(pure = true)
-fun QualifiableAlias.toModulars(startingReference: PsiReference): List<Call> {
-    val fullyResolvedAlias = fullyResolve(startingReference)
+private fun PsiReference.toModulars(): List<Call> =
+        when (this) {
+            is PsiPolyVariantReference -> {
+                multiResolve(false).flatMap { resolveResult ->
+                    resolveResult
+                            .takeIf(ResolveResult::isValidResult)
+                            ?.element
+                            ?.let { resolved -> toModulars(resolved) }
+                            ?: emptyList()
+                }
+            }
+            else -> {
+                resolve()
+                        ?.let { resolved -> toModulars(resolved) }
+                        ?: emptyList()
+            }
+        }
 
-    return if (fullyResolvedAlias is Call && isModular(fullyResolvedAlias)) {
-        listOf(fullyResolvedAlias)
-    } else {
+private fun PsiReference.toModulars(resolved: PsiElement): List<Call> =
+    if (resolved is Call && isModular(resolved)) {
+        listOf(resolved)
+    } else if  (resolved.isEquivalentTo(element)) {
+        // resolved to self, but not a modular, so stop looking
         emptyList()
+    } else {
+        resolved.reference?.toModulars() ?: emptyList()
     }
-}
 
 object QualifiableAliasImpl {
     @Contract(pure = true)
