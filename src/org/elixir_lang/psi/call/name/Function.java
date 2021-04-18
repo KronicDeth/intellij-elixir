@@ -9,6 +9,8 @@ public class Function {
     public static final String DEF = "def";
     public static final String DEFDELEGATE = "defdelegate";
     public static final String DEFEXCEPTION = "defexception";
+    public static final String DEFGUARD = "defguard";
+    public static final String DEFGUARDP = "defguardp";
     public static final String DEFIMPL = "defimpl";
     public static final String DEFMACRO = "defmacro";
     public static final String DEFMACROP = "defmacrop";

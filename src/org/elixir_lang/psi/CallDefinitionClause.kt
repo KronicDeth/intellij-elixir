@@ -35,7 +35,7 @@ object CallDefinitionClause {
     fun head(call: Call): PsiElement? = call.primaryArguments()?.firstOrNull()
 
     @JvmStatic
-    fun `is`(call: Call): Boolean = isFunction(call) || isMacro(call)
+    fun `is`(call: Call): Boolean = isFunction(call) || isMacro(call) || isGuard(call)
 
     @JvmStatic
     fun isFunction(call: Call): Boolean = isPrivateFunction(call) || isPublicFunction(call)
@@ -49,7 +49,11 @@ object CallDefinitionClause {
     fun isPublicMacro(call: Call): Boolean = isCallingKernelMacroOrHead(call, DEFMACRO)
     fun isPrivateMacro(call: Call): Boolean = isCallingKernelMacroOrHead(call, DEFMACROP)
 
-    fun isPublic(call: Call): Boolean = isPublicFunction(call) || isPublicMacro(call)
+    fun isGuard(call: Call): Boolean = isPrivateGuard(call) || isPublicGuard(call)
+    fun isPublicGuard(call: Call): Boolean = isCallingKernelMacroOrHead(call, DEFGUARD)
+    fun isPrivateGuard(call: Call): Boolean = isCallingKernelMacroOrHead(call, DEFGUARDP)
+
+    fun isPublic(call: Call): Boolean = isPublicFunction(call) || isPublicMacro(call) || isPublicGuard(call)
 
     /**
      * The name and arity range of the call definition this clause belongs to.
