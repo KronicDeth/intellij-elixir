@@ -34,7 +34,14 @@ fun QualifiableAlias.computeReference(): PsiPolyVariantReference? =
                 // If the parent ends at the same offset, then the parent should supply the reference
                 null
             }
-        else -> Module(this)
+        else ->
+            // There is no one module that defines the `Elixir` module.  It is only defined implicitly as the common
+            // namespace to all Aliases.
+            if (this.fullyQualifiedName() != "Elixir") {
+                Module(this)
+            } else {
+                null
+            }
     }
 
 fun QualifiableAlias.getReference(): PsiPolyVariantReference? =
