@@ -4,6 +4,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.ResolveState
 import com.intellij.psi.impl.source.tree.CompositeElement
+import com.intellij.psi.util.contextOfType
 import com.intellij.psi.util.isAncestor
 import com.intellij.psi.util.siblings
 import org.elixir_lang.NameArityRange
@@ -179,6 +180,18 @@ object Query {
                 true
             }
         }
+
+    /**
+     * Whether `call` is an `assoc/2` call inside of a `join` statement
+     */
+    fun isAssoc(call: Call): Boolean =
+        call is UnqualifiedParenthesesCall<*> && call.functionName() == "assoc" && call.resolvedFinalArity() == 2 &&
+            call.parent?.let { it as? In }?.contextOfType<Call>()?.let { isJoin(it, ResolveState.initial().put(ENTRANCE, call).putInitialVisitedElement(call)) } == true
+
+    private fun isJoin(call: Call, state: ResolveState): Boolean =
+        call.functionName() == JOIN_NAME_ARITY_RANGE.name &&
+                call.resolvedFinalArity() in JOIN_NAME_ARITY_RANGE.arityRange &&
+                resolvesToEctoQuery(call, state)
 
     private val FROM_NAME_ARITY_RANGE = NameArityRange("from", 1..2)
     private val JOIN_NAME_ARITY_RANGE = NameArityRange("join", 3..5)

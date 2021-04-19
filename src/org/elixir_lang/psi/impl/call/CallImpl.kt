@@ -38,7 +38,9 @@ fun Call.computeReference(): PsiReference? =
            and instead let {@link #getReference(AtNonNumericOperation) handle it */
     if (!this.isModuleAttributeNameElement() &&
             // if a bitstring segment option then the option is a pseudo-function
-            !isBitStreamSegmentOption(this) && !this.isSlashInCaptureNameSlashArity()) {
+            !isBitStreamSegmentOption(this) &&
+            !this.isSlashInCaptureNameSlashArity() &&
+            !org.elixir_lang.ecto.Query.isAssoc(this)) {
         val parent = parent
 
         when {
