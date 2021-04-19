@@ -62,37 +62,41 @@ object ProcessDeclarationsImpl {
                             processor: PsiScopeProcessor,
                             state: ResolveState,
                             lastParent: PsiElement?,
-                            place: PsiElement): Boolean {
-        var keepProcessing = true
-
-        // need to check if call is place because lastParent is set to place at start of treeWalkUp
-        if (!call.isEquivalentTo(lastParent) || call.isEquivalentTo(place)) {
-            when {
-                call.isCalling(KERNEL, ALIAS) -> keepProcessing = processor.execute(call, state)
-                CallDefinitionClause.`is`(call) || // call parameters
-                        Delegation.`is`(call) || // delegation call parameters
-                        Module.`is`(call) || // module Alias
-                        call.isCalling(KERNEL, DESTRUCTURE) || // left operand
-                        call.isCallingMacro(KERNEL, IF) || // match in condition
-                        call.isCallingMacro(KERNEL, Function.FOR) || // comprehension match variable
-                        call.isCallingMacro(KERNEL, UNLESS) || // match in condition
-                        call.isCallingMacro(KERNEL, "with") // <- or = variable
-                -> keepProcessing = processor.execute(call, state)
-                QuoteMacro.`is`(call) -> { // quote :bind_quoted keys{
-                    val bindQuoted = call.keywordArgument("bind_quoted")
-                    /* the bind_quoted keys declare variable only valid inside the do block, so any place in the
-                       bindQuoted already must be the bind_quoted values that must be declared before the quote */
-                    if (bindQuoted != null && !PsiTreeUtil.isAncestor(bindQuoted, place, false)) {
-                        keepProcessing = processor.execute(call, state)
+                            place: PsiElement): Boolean =
+            // need to check if call is place because lastParent is set to place at start of treeWalkUp
+            if (!call.isEquivalentTo(lastParent) || call.isEquivalentTo(place)) {
+                when {
+                    call.isCalling(KERNEL, ALIAS) -> processor.execute(call, state)
+                    CallDefinitionClause.`is`(call) || // call parameters
+                            Delegation.`is`(call) || // delegation call parameters
+                            Module.`is`(call) || // module Alias
+                            call.isCalling(KERNEL, DESTRUCTURE) || // left operand
+                            call.isCallingMacro(KERNEL, IF) || // match in condition
+                            call.isCallingMacro(KERNEL, Function.FOR) || // comprehension match variable
+                            call.isCallingMacro(KERNEL, UNLESS) || // match in condition
+                            call.isCallingMacro(KERNEL, "with") // <- or = variable
+                    -> processor.execute(call, state)
+                    QuoteMacro.`is`(call) -> { // quote :bind_quoted keys{
+                        val bindQuoted = call.keywordArgument("bind_quoted")
+                        /* the bind_quoted keys declare variable only valid inside the do block, so any place in the
+                           bindQuoted already must be the bind_quoted values that must be declared before the quote */
+                        if (bindQuoted != null && !PsiTreeUtil.isAncestor(bindQuoted, place, false)) {
+                            processor.execute(call, state)
+                        } else {
+                            true
+                        }
                     }
+                    hasDoBlockOrKeyword(call) ->
+                        // unknown macros that take do blocks often allow variables to be declared in their arguments
+                        processor.execute(call, state)
+                    org.elixir_lang.ecto.Query.isDeclaringMacro(call, state) -> {
+                        processor.execute(call, state)
+                    }
+                    else -> true
                 }
-                hasDoBlockOrKeyword(call) -> // unknown macros that take do blocks often allow variables to be declared in their arguments
-                    keepProcessing = processor.execute(call, state)
+            } else {
+                true
             }
-        }
-
-        return keepProcessing
-    }
 
     @JvmStatic
     fun processDeclarations(alias: ElixirAlias,
