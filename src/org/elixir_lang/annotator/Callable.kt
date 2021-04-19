@@ -10,7 +10,6 @@ import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.*
 import org.elixir_lang.ElixirSyntaxHighlighter
-import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.AtNonNumericOperation
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.CallDefinitionClause
@@ -20,6 +19,7 @@ import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.call.name.Module.KERNEL_SPECIAL_FORMS
 import org.elixir_lang.reference.Callable.Companion.BIT_STRING_TYPES
 import org.elixir_lang.reference.Callable.Companion.isBitStreamSegmentOption
+import org.elixir_lang.safeMultiResolve
 import java.util.*
 
 /**
@@ -94,14 +94,9 @@ class Callable : Annotator, DumbAware {
                         if (reference != null) {
                             val resolvedCollection =
                                     if (reference is PsiPolyVariantReference) {
-                                        val resolveResults: Array<ResolveResult> = try {
-                                            reference.multiResolve(false)
-                                        } catch (stackOverflowError: StackOverflowError) {
-                                            Logger.error(Callable::class.java, "StackOverflowError when annotating Call", call)
-                                            emptyArray()
-                                        }
-
-                                        resolveResults.filter { it.isValidResult }.map { (it as PsiElementResolveResult).element }
+                                        safeMultiResolve(reference, false)
+                                                .filter { it.isValidResult }
+                                                .mapNotNull(ResolveResult::getElement)
                                     } else {
                                         reference.resolve()?.let { resolved ->
                                             setOf(resolved)
