@@ -59,9 +59,18 @@ class MultiResolve(private val name: String, private val incompleteCode: Boolean
                                                 .put(LAST_BINDING_KEY, element)
                                 )
 
-                                if (preboundResolveResultList.isNotEmpty()) {
-                                    resolveResultList.addAll(preboundResolveResultList)
-                                    added = true
+                                if (!preboundResolveResultList.isNotEmpty()) {
+                                    if (!incompleteCode && validResult) {
+                                        val validPreboundResolveResultList =  preboundResolveResultList.filter { it.isValidResult }
+
+                                        if (validPreboundResolveResultList.isNotEmpty()) {
+                                            resolveResultList.addAll(validPreboundResolveResultList)
+                                            added = true
+                                        }
+                                    } else {
+                                        resolveResultList.addAll(preboundResolveResultList)
+                                        added = true
+                                    }
                                 }
                             }
                         }
