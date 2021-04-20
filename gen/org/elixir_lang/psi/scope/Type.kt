@@ -9,13 +9,10 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.util.isAncestor
 import com.intellij.psi.util.siblings
-import com.intellij.util.xml.Resolve
 import org.elixir_lang.beam.psi.impl.ModuleImpl
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
-import org.elixir_lang.psi.call.name.Function.DEFMODULE
-import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.call.qualification.Qualified
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.call.macroChildCalls
@@ -25,9 +22,7 @@ import org.elixir_lang.psi.scope.WhileIn.whileIn
 import org.elixir_lang.psi.stub.index.ModularName
 import org.elixir_lang.psi.stub.type.call.Stub.isModular
 import org.elixir_lang.reference.ModuleAttribute
-import org.elixir_lang.reference.ModuleAttribute.Companion.isCallbackName
-import org.elixir_lang.reference.ModuleAttribute.Companion.isSpecificationName
-import org.elixir_lang.reference.ModuleAttribute.Companion.isTypeName
+import org.elixir_lang.reference.ModuleAttribute.Companion.isTypeSpecName
 import org.elixir_lang.structure_view.element.modular.Module
 import org.elixir_lang.structure_view.element.modular.Protocol
 
@@ -39,6 +34,8 @@ abstract class Type : PsiScopeProcessor {
                 is Call -> execute(element, state)
                 // Anonymous function type siganture
                 is ElixirStabNoParenthesesSignature -> execute(element, state)
+                // type variable in a `when key: type`
+                is ElixirKeywordKey -> executeOnParameter(element, state)
                 is ElixirNoParenthesesOneArgument, is ElixirAccessExpression -> executeOnChildren(element, state)
                 is ElixirFile, is ElixirList, is ElixirTuple -> false
                 else -> {
@@ -48,7 +45,7 @@ abstract class Type : PsiScopeProcessor {
 
 
     protected abstract fun executeOnType(definition: AtUnqualifiedNoParenthesesCall<*>, state: ResolveState): Boolean
-    protected abstract fun executeOnParameter(parameter: UnqualifiedNoArgumentsCall<*>, state: ResolveState): Boolean
+    protected abstract fun executeOnParameter(parameter: PsiElement, state: ResolveState): Boolean
     protected abstract fun keepProcessing(): Boolean
 
     private fun execute(atNonNumericOperation: AtNonNumericOperation, state: ResolveState): Boolean =
@@ -86,7 +83,7 @@ abstract class Type : PsiScopeProcessor {
     private fun execute(atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>, state: ResolveState): Boolean {
         val identifierName = atUnqualifiedNoParenthesesCall.atIdentifier.identifierName()
 
-        return if (isCallbackName(identifierName) || isTypeName(identifierName) || isSpecificationName(identifierName)) {
+        return if (isTypeSpecName(identifierName)) {
             executeOnType(atUnqualifiedNoParenthesesCall, state)
         } else {
             true
@@ -203,7 +200,7 @@ internal tailrec fun PsiElement.ancestorTypeSpec(): AtUnqualifiedNoParenthesesCa
             is AtUnqualifiedNoParenthesesCall<*> -> {
                 val identifierName = this.atIdentifier.identifierName()
 
-                if (ModuleAttribute.isCallbackName(identifierName) || isTypeName(identifierName) || isSpecificationName(identifierName)) {
+                if (ModuleAttribute.isTypeSpecName(identifierName)) {
                     this
                 } else {
                     null

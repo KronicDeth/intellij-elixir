@@ -138,6 +138,9 @@ class ModuleAttribute(psiElement: PsiElement) : PsiPolyVariantReferenceBase<PsiE
                     addAll(TYPE_NAME_SET)
                 }.toSet()
 
+        fun isTypeSpecName(name: String): Boolean =
+                isCallbackName(name) || isSpecificationName(name) ||  isTypeName(name)
+
         /**
          * Whether the module attribute is used to declare function or macro callbacks for behaviours
          *

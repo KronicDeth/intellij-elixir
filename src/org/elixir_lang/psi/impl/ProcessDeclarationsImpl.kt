@@ -9,21 +9,22 @@ import com.intellij.psi.impl.source.tree.CompositeElement
 import com.intellij.psi.scope.PsiScopeProcessor
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.siblings
+import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function
 import org.elixir_lang.psi.call.name.Function.*
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.call.CallImpl.hasDoBlockOrKeyword
+import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.call.keywordArgument
 import org.elixir_lang.psi.impl.declarations.UseScopeImpl
 import org.elixir_lang.psi.impl.declarations.UseScopeImpl.selector
-import org.elixir_lang.psi.operation.And
-import org.elixir_lang.psi.operation.Match
-import org.elixir_lang.psi.operation.Normalized
-import org.elixir_lang.psi.operation.Type
+import org.elixir_lang.psi.operation.*
 import org.elixir_lang.psi.operation.infix.Position
 import org.elixir_lang.psi.operation.infix.Triple
+import org.elixir_lang.psi.scope.WhileIn.whileIn
+import org.elixir_lang.reference.ModuleAttribute
 import org.elixir_lang.structure_view.element.Delegation
 import org.elixir_lang.structure_view.element.modular.Module
 
@@ -52,6 +53,44 @@ object ProcessDeclarationsImpl {
         }
 
         return keepProcessing
+    }
+
+    @JvmStatic
+    fun  processDeclarations(atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>,
+                            processor: PsiScopeProcessor,
+                            state: ResolveState,
+                            lastParent: PsiElement?,
+                            place: PsiElement): Boolean {
+        val identifierName = atUnqualifiedNoParenthesesCall.atIdentifier.identifierName()
+
+        return if (ModuleAttribute.isTypeSpecName(identifierName)) {
+            atUnqualifiedNoParenthesesCall.finalArguments()?.singleOrNull()?.let { argument ->
+                when (argument) {
+                    // `Type` are gotten going up, don't need to go down here
+                    is Type -> true
+                    is When -> {
+                        argument.rightOperand()?.let { typeVariableRestrictions ->
+                            when (typeVariableRestrictions) {
+                                is QuotableKeywordList ->
+                                    whileIn(typeVariableRestrictions.quotableKeywordPairList()) { keywordPair ->
+                                        processor.execute(keywordPair.keywordKey, state)
+                                    }
+                                else -> {
+                                    Logger.error(typeVariableRestrictions::class.java,
+                                            "Don't know how find type variable restrictions",
+                                            typeVariableRestrictions)
+
+                                    null
+                                }
+                            }
+                        }
+                    }
+                    else -> null
+                }
+            } ?: true
+        } else {
+            true
+        }
     }
 
     /**

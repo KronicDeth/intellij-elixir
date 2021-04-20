@@ -4,7 +4,9 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.ResolveState
 import com.intellij.psi.util.PsiTreeUtil
+import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
+import org.elixir_lang.psi.ElixirKeywordKey
 import org.elixir_lang.psi.UnqualifiedNoArgumentsCall
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil
 import org.elixir_lang.psi.putInitialVisitedElement
@@ -33,14 +35,26 @@ private constructor(private val name: String,
                 }
                 ?: true
 
-    override fun executeOnParameter(parameter: UnqualifiedNoArgumentsCall<*>, state: ResolveState): Boolean =
+    override fun executeOnParameter(parameter: PsiElement, state: ResolveState): Boolean =
         if (this.arity == 0) {
-            parameter.name?.takeIf { name.startsWith(this.name) }?.let { name ->
-                    val validResult = name == this.name
+            val name = when (parameter) {
+                is UnqualifiedNoArgumentsCall<*> -> parameter.name
+                is ElixirKeywordKey -> parameter.text
+                else -> {
+                    Logger.error(MultiResolve::class.java, "DOn't know how to get name of parameter", parameter)
 
-                    resolveResultOrderedSet.add(parameter, name, validResult)
+                    null
+                }
+            }
 
-                    keepProcessing()
+            if (name != null && name.startsWith(this.name)) {
+                val validResult = name == this.name
+
+                resolveResultOrderedSet.add(parameter, name, validResult)
+
+                keepProcessing()
+            } else {
+                null
             }
         } else {
             null
