@@ -150,10 +150,18 @@ abstract class Module : PsiScopeProcessor {
                                            state: ResolveState): Boolean {
         val children = qualifiedMultipleAliases.children
         val operatorIndex = org.elixir_lang.psi.operation.Normalized.operatorIndex(children)
+        val qualifier = org.elixir_lang.psi.operation.infix.Normalized.leftOperand(children, operatorIndex)
+                ?.stripAccessExpression()?.let { it as? PsiNamedElement }
         val unqualified = org.elixir_lang.psi.operation.infix.Normalized.rightOperand(children, operatorIndex)
 
         return if (unqualified is ElixirMultipleAliases) {
-            executeOnAliasCallArgument(unqualified, state)
+            val unqualifiedState = if (qualifier != null) {
+                state.put(MULTIPLE_ALIASES_QUALIFIER, qualifier)
+            } else {
+                state
+            }
+
+            executeOnAliasCallArgument(unqualified, unqualifiedState)
         } else {
             true
         }
@@ -221,5 +229,6 @@ abstract class Module : PsiScopeProcessor {
     companion object {
         @JvmStatic
         val ALIAS_CALL = Key<Call>("ALIAS_CALL")
+        val MULTIPLE_ALIASES_QUALIFIER = Key<PsiNamedElement>("MULTIPLE_ALIASES_QUALIFIER")
     }
 }
