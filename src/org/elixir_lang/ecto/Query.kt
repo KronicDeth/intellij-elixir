@@ -24,8 +24,12 @@ object Query {
     fun isDeclaringMacro(call: Call, state: ResolveState): Boolean =
         call.functionName()?.let { functionName ->
             when (functionName) {
-                JOIN_NAME_ARITY_RANGE.name -> call.resolvedFinalArity() in JOIN_NAME_ARITY_RANGE.arityRange && resolvesToEctoQuery(call, state)
-                FROM_NAME_ARITY_RANGE.name -> call.resolvedFinalArity() in FROM_NAME_ARITY_RANGE.arityRange && resolvesToEctoQuery(call, state)
+                FROM_NAME_ARITY_RANGE.name ->
+                    call.resolvedFinalArity() in FROM_NAME_ARITY_RANGE.arityRange && resolvesToEctoQuery(call, state)
+                JOIN_NAME_ARITY_RANGE.name ->
+                    call.resolvedFinalArity() in JOIN_NAME_ARITY_RANGE.arityRange && resolvesToEctoQuery(call, state)
+                SELECT_NAME_ARITY_RANGE.name ->
+                    call.resolvedFinalArity() in SELECT_NAME_ARITY_RANGE.arityRange && resolvesToEctoQuery(call, state)
                 else -> false
             }
         } ?: false
@@ -70,6 +74,12 @@ object Query {
                     JOIN_NAME_ARITY_RANGE.name ->
                         if (call.resolvedFinalArity() in JOIN_NAME_ARITY_RANGE.arityRange) {
                             executeOnJoin(call, state, keepProcessing)
+                        } else {
+                            true
+                        }
+                    SELECT_NAME_ARITY_RANGE.name ->
+                        if (call.resolvedFinalArity() in SELECT_NAME_ARITY_RANGE.arityRange) {
+                            executeOnSelect(call, state, keepProcessing)
                         } else {
                             true
                         }
@@ -136,7 +146,7 @@ object Query {
 
     fun executeOnJoin(call: Call,
                       state: ResolveState,
-                      keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean? =
+                      keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
         call.finalArguments()?.let { arguments ->
             // `join(query, qual, binding \\ [], expr, opts \\ [])`
             when (call.resolvedFinalArity()) {
@@ -150,10 +160,10 @@ object Query {
                         executeOnIn(arguments[arguments.lastIndex - 1], state, keepProcessing)
                 else -> {
                     Logger.error(logger, "join arity outside of range (3..5)", call)
-                    true
+                    null
                 }
             }
-        }
+        } ?: true
 
     private tailrec fun executeOnBinding(
             element: PsiElement,
@@ -188,6 +198,22 @@ object Query {
         call is UnqualifiedParenthesesCall<*> && call.functionName() == "assoc" && call.resolvedFinalArity() == 2 &&
             call.parent?.let { it as? In }?.contextOfType<Call>()?.let { isJoin(it, ResolveState.initial().put(ENTRANCE, call).putInitialVisitedElement(call)) } == true
 
+    private fun executeOnSelect(call: Call, state: ResolveState, keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
+            call.finalArguments()?.let { arguments ->
+                // `select(query, binding \\ [], expr)`
+                when (call.resolvedFinalArity()) {
+                    // `select(query, expr)` or `|> select(expr)`
+                    2 -> true
+                    // `select(query, binding, expr)` or `|> select(binding, expr)`
+                    3 -> executeOnBinding(arguments[arguments.lastIndex - 1], state, keepProcessing)
+                    else -> {
+                        Logger.error(logger, "select arity outside of range (2..3)", call)
+
+                        null
+                    }
+                }
+            } ?: true
+
     private fun isJoin(call: Call, state: ResolveState): Boolean =
         call.functionName() == JOIN_NAME_ARITY_RANGE.name &&
                 call.resolvedFinalArity() in JOIN_NAME_ARITY_RANGE.arityRange &&
@@ -195,6 +221,7 @@ object Query {
 
     private val FROM_NAME_ARITY_RANGE = NameArityRange("from", 1..2)
     private val JOIN_NAME_ARITY_RANGE = NameArityRange("join", 3..5)
+    private val SELECT_NAME_ARITY_RANGE = NameArityRange("select", 2..3)
 
     private val logger by lazy { com.intellij.openapi.diagnostic.Logger.getInstance(Query::class.java) }
 }
