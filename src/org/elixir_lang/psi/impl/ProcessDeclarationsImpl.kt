@@ -1,14 +1,10 @@
 package org.elixir_lang.psi.impl
 
 import com.intellij.openapi.util.Key
-import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.ResolveState
-import com.intellij.psi.impl.source.tree.CompositeElement
 import com.intellij.psi.scope.PsiScopeProcessor
 import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.psi.util.siblings
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
@@ -199,8 +195,7 @@ object ProcessDeclarationsImpl {
             processDeclarationsInPreviousSibling(scope, processor, state, lastParent)
         } else {
             scope
-                    .lastChild
-                    .siblings(forward = false)
+                    .childExpressions(forward = false)
                     .let { processDeclarations(it, processor, state) }
         }
 
@@ -358,7 +353,7 @@ object ProcessDeclarationsImpl {
                                                      lastParent: PsiElement): Boolean =
         if (scope.isEquivalentTo(lastParent.parent)) {
             lastParent
-                    .siblings(forward = false, withSelf = false)
+                    .siblingExpressions(forward = false, withSelf = false)
                     .let { processDeclarations(it, processor, state) }
         } else {
             if (lastParent !is ElixirFile) {
@@ -374,8 +369,6 @@ object ProcessDeclarationsImpl {
 
     private fun processDeclarations(sequence: Sequence<PsiElement>, processor: PsiScopeProcessor, state: ResolveState): Boolean =
             sequence
-                    .filter { it.node is CompositeElement }
-                    .filter { !(it is ElixirEndOfExpression || it is PsiComment || it is PsiWhiteSpace) }
                     .filter { !createsNewScope(it) }
                     .map { processor.execute(it, state) }
                     .takeWhile { it }

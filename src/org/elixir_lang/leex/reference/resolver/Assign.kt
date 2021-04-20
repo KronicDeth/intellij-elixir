@@ -4,17 +4,16 @@ import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.roots.impl.LibraryScopeCache
 import com.intellij.psi.*
 import com.intellij.psi.impl.source.resolve.ResolveCache
-import com.intellij.psi.impl.source.tree.CompositeElement
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.searches.ReferencesSearch
 import com.intellij.psi.stubs.StubIndex
-import com.intellij.psi.util.siblings
 import org.elixir_lang.leex.reference.Assign
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.Modular.callDefinitionClauseCallFoldWhile
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.StubBased
 import org.elixir_lang.psi.impl.call.finalArguments
+import org.elixir_lang.psi.impl.childExpressionsFoldWhile
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.operation.*
 import org.elixir_lang.psi.stub.index.AllName
@@ -65,12 +64,10 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
     private tailrec fun resolveInCallDefinitionClauseExpression(assign: Assign, incompleteCode: Boolean, expression: PsiElement, initial: List<ResolveResult>): AccumulatorContinue<List<ResolveResult>> =
             when (expression) {
                 is ElixirAccessExpression, is ElixirStabBody, is ElixirTuple -> {
-                    val children = expression
-                            .lastChild
-                            .siblings(forward = false, withSelf = true)
-                            .filter { it.node is CompositeElement }
-
-                    AccumulatorContinue.foldWhile(children, initial) { child, accumulator ->
+                    expression.childExpressionsFoldWhile(
+                            forward = false,
+                            initial = initial
+                    ) { child, accumulator ->
                         resolveInCallDefinitionClauseExpression(assign, incompleteCode, child, accumulator)
                     }
                 }
@@ -496,12 +493,7 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
     private tailrec fun resolveInToRendered(assign: Assign, incompleteCode: Boolean, expression: PsiElement, initial: List<ResolveResult>): AccumulatorContinue<List<ResolveResult>> =
         when (expression) {
             is ElixirStabBody -> {
-                val children = expression
-                        .lastChild
-                        .siblings(forward = false, withSelf = true)
-                        .filter { it.node is CompositeElement }
-
-                AccumulatorContinue.foldWhile(children, initial) { child, accumulator ->
+                expression.childExpressionsFoldWhile(forward = false, initial = initial) { child, accumulator ->
                     resolveInToRendered(assign, incompleteCode, child, accumulator)
                 }
             }
@@ -628,12 +620,7 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
     private tailrec fun resolveMyself(assign: Assign, incompleteCode: Boolean, expression: PsiElement, initial: List<ResolveResult>): AccumulatorContinue<List<ResolveResult>> =
             when (expression) {
                 is ElixirAccessExpression, is ElixirList, is ElixirStabBody, is ElixirTuple -> {
-                    val children = expression
-                            .lastChild
-                            .siblings(forward = false, withSelf = true)
-                            .filter { it.node is CompositeElement }
-
-                    AccumulatorContinue.foldWhile(children, initial) { child, accumulator ->
+                    expression.childExpressionsFoldWhile(forward = false, initial = initial) { child, accumulator ->
                         resolveMyself(assign, incompleteCode, child, accumulator)
                     }
                 }
@@ -647,7 +634,7 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
                         AccumulatorContinue(initial, true)
                     }
                 }
-                is Arrow, is AtNonNumericOperation, is ElixirAtomKeyword, is ElixirEndOfExpression, is Pipe, is Two -> AccumulatorContinue(initial, true)
+                is Arrow, is AtNonNumericOperation, is ElixirAtomKeyword, is Pipe, is Two -> AccumulatorContinue(initial, true)
                 is Operation -> {
                     TODO()
                 }

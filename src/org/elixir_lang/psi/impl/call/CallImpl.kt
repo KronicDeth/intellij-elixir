@@ -24,6 +24,7 @@ import org.elixir_lang.psi.impl.ElixirPsiImplUtil.*
 import org.elixir_lang.psi.operation.*
 import org.elixir_lang.psi.qualification.Qualified
 import org.elixir_lang.psi.qualification.Unqualified
+import org.elixir_lang.psi.scope.WhileIn.whileIn
 import org.elixir_lang.psi.scope.ancestorTypeSpec
 import org.elixir_lang.psi.scope.hasMapFieldOptionalityName
 import org.elixir_lang.psi.stub.call.Stub
@@ -325,6 +326,18 @@ fun Call.maybeModularNameToModulars(useCall: Call?): List<Call> =
     } else {
         emptyList()
     }
+
+fun Call.whileInStabBodyChildExpressions(forward: Boolean = true,
+                                         keepProcessing: (childExpression: PsiElement) -> Boolean): Boolean =
+    stabBodyChildExpressions(forward)
+            ?.let { whileIn(it, keepProcessing) }
+            ?: true
+
+fun Call.stabBodyChildExpressions(forward: Boolean = true): Sequence<PsiElement>? =
+        doBlock
+                ?.stab
+                ?.stabBody
+                ?.childExpressions(forward)
 
 object CallImpl {
     @Contract(pure = true)

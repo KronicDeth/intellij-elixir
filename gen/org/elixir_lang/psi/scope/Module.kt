@@ -16,7 +16,10 @@ import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.call.keywordArgument
+import org.elixir_lang.psi.impl.childExpressions
 import org.elixir_lang.psi.impl.stripAccessExpression
+import org.elixir_lang.psi.impl.whileInChildExpressions
+import org.elixir_lang.psi.scope.WhileIn.whileIn
 import org.elixir_lang.psi.stub.type.call.Stub.isModular
 
 abstract class Module : PsiScopeProcessor {
@@ -207,21 +210,8 @@ abstract class Module : PsiScopeProcessor {
     private fun executeOnViewModularExpression(expression: PsiElement, state: ResolveState): Boolean =
             when (expression) {
                 is ElixirStabBody -> expression
-                        .lastChild
-                        .siblings(forward = false, withSelf = true)
-                        .filter { it.node is CompositeElement }
-                        .let { childSequence ->
-                            var keepProcessing = true
-
-                            for (child in childSequence) {
-                                keepProcessing = executeOnViewModularExpression(child, state)
-
-                                if (!keepProcessing) {
-                                    break
-                                }
-                            }
-
-                            keepProcessing
+                        .whileInChildExpressions(forward = false) { child ->
+                            executeOnViewModularExpression(child, state)
                         }
                 else -> execute(expression, state)
             }

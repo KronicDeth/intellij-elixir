@@ -1,14 +1,23 @@
 package org.elixir_lang.psi
 
+import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import org.elixir_lang.ArityRange
 import org.elixir_lang.Name
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.call.macroChildCallSequence
 import org.elixir_lang.psi.impl.call.macroChildCalls
+import org.elixir_lang.psi.impl.childExpressions
 
 data class AccumulatorContinue<out R>(val accumulator: R, val `continue`: Boolean) {
     companion object {
+        fun <R> childExpressionsFoldWhile(
+                parent: PsiElement,
+                forward: Boolean,
+                initial: R,
+                folder: (element: PsiElement, accumulator: R) -> AccumulatorContinue<R>): AccumulatorContinue<R> =
+            parent.childExpressions(forward).let { foldWhile(it, initial, folder) }
+
         fun <T, R>foldWhile(array: Array<out T>, initial: R, folder: (element: T, accumulator: R) -> AccumulatorContinue<R>): AccumulatorContinue<R> =
                 foldWhile(array.asIterable(), initial, folder)
 

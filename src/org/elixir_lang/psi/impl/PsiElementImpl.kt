@@ -6,9 +6,11 @@ import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiWhiteSpace
+import com.intellij.psi.impl.source.tree.CompositeElement
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.util.siblings
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.ALIAS
@@ -17,6 +19,7 @@ import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.call.maybeModularNameToModulars
 import org.elixir_lang.psi.operation.Match
 import org.elixir_lang.psi.operation.Pipe
+import org.elixir_lang.psi.scope.WhileIn.whileIn
 import org.jetbrains.annotations.Contract
 import java.util.*
 
@@ -185,6 +188,34 @@ fun PsiElement.moduleWithDependentsScope(): GlobalSearchScope =
                 ?: GlobalSearchScope.allScope(project)
 
 fun PsiElement.prevSiblingSequence() = generateSequence(this) { it.prevSibling }
+
+fun PsiElement.whileInChildExpressions(forward: Boolean = true,
+                                       keepProcessing: (element: PsiElement) -> Boolean): Boolean =
+    childExpressions(forward)
+            .let { whileIn(it, keepProcessing) }
+
+fun <R> PsiElement.childExpressionsFoldWhile(
+        forward: Boolean,
+        initial: R,
+        folder: (element: PsiElement, accumulator: R
+        ) -> AccumulatorContinue<R>): AccumulatorContinue<R> =
+        AccumulatorContinue.childExpressionsFoldWhile(parent, forward, initial, folder)
+
+fun PsiElement.childExpressions(forward: Boolean = true): Sequence<PsiElement> =
+    if (forward) {
+        firstChild.siblingExpressions(forward, false)
+    } else {
+        lastChild.siblingExpressions(forward, false)
+    }
+
+fun PsiElement.siblingExpressions(forward: Boolean = true, withSelf: Boolean = true): Sequence<PsiElement> =
+        siblings(forward, withSelf).filter(PsiElement::isExpression)
+
+fun PsiElement.isExpression(): Boolean =
+        when (this) {
+            is ElixirEndOfExpression, is PsiComment, is PsiWhiteSpace -> false
+            else -> node is CompositeElement
+        }
 
 @Contract(pure = true)
 fun PsiElement.siblingExpression(function: (PsiElement) -> PsiElement): PsiElement? {

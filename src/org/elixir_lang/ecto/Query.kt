@@ -3,10 +3,8 @@ package org.elixir_lang.ecto
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.ResolveState
-import com.intellij.psi.impl.source.tree.CompositeElement
 import com.intellij.psi.util.contextOfType
 import com.intellij.psi.util.isAncestor
-import com.intellij.psi.util.siblings
 import org.elixir_lang.NameArityRange
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
@@ -15,6 +13,7 @@ import org.elixir_lang.psi.call.qualification.Qualified
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.stripAccessExpression
+import org.elixir_lang.psi.impl.whileInChildExpressions
 import org.elixir_lang.psi.operation.In
 import org.elixir_lang.psi.scope.WhileIn.whileIn
 import org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.enclosingModularMacroCall
@@ -172,9 +171,9 @@ object Query {
         when (element) {
             is ElixirAccessExpression -> executeOnBinding(element.stripAccessExpression(), state, keepProcessing)
             is ElixirList -> {
-                val elements = element.lastChild.siblings(forward = false).filter { it.node is CompositeElement }
-
-                whileIn(elements) { executeOnBinding(it, state, keepProcessing) }
+                element.whileInChildExpressions(forward = false) {
+                    executeOnBinding(it, state, keepProcessing)
+                }
             }
             is QuotableKeywordList -> {
                 val keywordValues = element.quotableKeywordPairList().mapNotNull(QuotableKeywordPair::getKeywordValue)

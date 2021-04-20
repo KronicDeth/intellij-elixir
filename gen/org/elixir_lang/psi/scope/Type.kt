@@ -16,7 +16,10 @@ import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.qualification.Qualified
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.call.macroChildCalls
+import org.elixir_lang.psi.impl.call.whileInStabBodyChildExpressions
+import org.elixir_lang.psi.impl.childExpressions
 import org.elixir_lang.psi.impl.identifierName
+import org.elixir_lang.psi.impl.whileInChildExpressions
 import org.elixir_lang.psi.operation.Type
 import org.elixir_lang.psi.scope.WhileIn.whileIn
 import org.elixir_lang.psi.stub.index.ModularName
@@ -94,14 +97,9 @@ abstract class Type : PsiScopeProcessor {
         executeOnChildren(stabNoParenthesesSignature .noParenthesesArguments, state)
 
     private fun executeOnChildren(parent: PsiElement, state: ResolveState): Boolean =
-            parent
-                    .firstChild
-                    .siblings()
-                    .filter { it.node is CompositeElement }
-                    .map { execute(it, state) }
-                    .takeWhile { it }
-                    .lastOrNull()
-                    ?: true
+            parent.whileInChildExpressions() {
+                execute(it, state)
+            }
 
     private fun executeOnDecompiledProtocol(call: Call, state: ResolveState): Boolean {
         val project = call.project
@@ -138,23 +136,8 @@ abstract class Type : PsiScopeProcessor {
 
     private fun executeOnDefprotocolDefinition(descendant: PsiElement, state: ResolveState): Boolean =
         when (descendant) {
-            is Call -> {
-                val doBlock = descendant.doBlock
-
-                if (doBlock != null) {
-                    doBlock
-                            .stab
-                            ?.stabBody
-                            ?.firstChild
-                            ?.siblings()
-                            ?.filter { it.node is CompositeElement }
-                            ?.map { executeOnDefprotocolDefinitionExpression(it, state) }
-                            ?.takeWhile { it }
-                            ?.lastOrNull()
-                            ?: true
-                } else {
-                    true
-                }
+            is Call -> descendant.whileInStabBodyChildExpressions {
+                executeOnDefprotocolDefinitionExpression(it, state)
             }
             else -> {
                 true
