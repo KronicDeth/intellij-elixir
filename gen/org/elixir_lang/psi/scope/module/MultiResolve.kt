@@ -89,7 +89,17 @@ class MultiResolve internal constructor(private val name: String, private val in
 
             // alias Foo.SSH, then SSH.Key is name
             if (aliasedName == firstNamePart) {
-                resolveResultOrderedSet.add(match, "aliased ${match.text}",true)
+                val multipleAliasesQualifier = state.get(MULTIPLE_ALIASES_QUALIFIER)
+                val suffix = match.name
+
+                if (multipleAliasesQualifier == null) {
+                    resolveResultOrderedSet.add(match, "${name} -> alias ${suffix}", true)
+                } else {
+                    // `alias Foo.{SSH, ...}` then `SSH.Key` is name
+                    val prefix = multipleAliasesQualifier.name
+
+                    resolveResultOrderedSet.add(match, "${name} -> alias ${prefix}.{$suffix}", true)
+                }
 
                 addUnaliasedNamedElementsToResolveResultList(match, namePartList)
             } else if (aliasedName.startsWith(name)) {
