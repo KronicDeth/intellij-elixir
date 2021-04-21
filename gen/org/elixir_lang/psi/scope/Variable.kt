@@ -83,7 +83,10 @@ abstract class Variable : PsiScopeProcessor {
                                     element is ElixirCharToken ||
                                     element is ElixirDecimalFloat ||
                                     element is ElixirEmptyParentheses ||
-                                    element is ElixirEndOfExpression ||  // noParenthesesManyStrictNoParenthesesExpression exists only to be marked as an error
+                                    element is ElixirEndOfExpression ||
+                                    // type variable in a type restriction guard
+                                    element is ElixirKeywordKey ||
+                                    // noParenthesesManyStrictNoParenthesesExpression exists only to be marked as an error
                                     element is ElixirNoParenthesesManyStrictNoParenthesesExpression ||
                                     element is LeafPsiElement ||
                                     element is Line ||
