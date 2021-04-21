@@ -201,12 +201,15 @@ fun <R> PsiElement.childExpressionsFoldWhile(
         ) -> AccumulatorContinue<R>): AccumulatorContinue<R> =
         AccumulatorContinue.childExpressionsFoldWhile(parent, forward, initial, folder)
 
-fun PsiElement.childExpressions(forward: Boolean = true): Sequence<PsiElement> =
-    if (forward) {
-        firstChild.siblingExpressions(forward, false)
+fun PsiElement.childExpressions(forward: Boolean = true): Sequence<PsiElement> {
+    val seed = if (forward) {
+        firstChild
     } else {
-        lastChild.siblingExpressions(forward, false)
+        lastChild
     }
+
+    return seed.siblingExpressions(forward, withSelf = true)
+}
 
 fun PsiElement.siblingExpressions(forward: Boolean = true, withSelf: Boolean = true): Sequence<PsiElement> =
         siblings(forward, withSelf).filter(PsiElement::isExpression)
