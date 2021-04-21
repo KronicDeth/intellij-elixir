@@ -37,6 +37,8 @@ class References : LocalInspectionTool() {
                 when (qualifiedNoArgumentsCall.qualifier()) {
                     // Can't resolve keys or fields of a module attribute or assign
                     is AtNonNumericOperation,
+                    // Can't resolve key or fields of a capture
+                    is ElixirCaptureNumericOperation,
                     // Can't resolve keys or fields of a variable
                     is UnqualifiedNoArgumentsCall<*>,
                     // Can't resolve a chain of keys or fields
