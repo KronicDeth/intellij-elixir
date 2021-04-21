@@ -66,10 +66,10 @@ object Use {
      * @return `defmodule`, `defimpl`, or `defprotocol` used by `useCall`.  It can be `null` if Alias passed to
      *    `useCall` cannot be resolved.
      */
-    fun modulars(useCall: Call): List<Call> =
+    fun modulars(useCall: Call): Set<Call> =
             useCall
                     .finalArguments()
                     ?.firstOrNull()
                     ?.maybeModularNameToModulars(maxScope = useCall.parent, useCall = useCall, incompleteCode = false)
-                    ?: emptyList()
+                    ?: emptySet()
 }

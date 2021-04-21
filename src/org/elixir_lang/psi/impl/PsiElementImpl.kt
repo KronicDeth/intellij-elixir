@@ -165,14 +165,14 @@ fun PsiElement.macroChildCallList(): MutableList<Call> {
  * `maybeAlias` after it is resolved through any `alias`es or `use`.
  */
 @Contract(pure = true)
-fun PsiElement.maybeModularNameToModulars(maxScope: PsiElement, useCall: Call?, incompleteCode: Boolean): List<Call> {
+fun PsiElement.maybeModularNameToModulars(maxScope: PsiElement, useCall: Call?, incompleteCode: Boolean): Set<Call> {
     val strippedMaybeModuleName = stripAccessExpression()
 
     return when (strippedMaybeModuleName) {
         is ElixirAtom -> strippedMaybeModuleName.maybeModularNameToModulars(incompleteCode)
         is QualifiableAlias -> strippedMaybeModuleName.maybeModularNameToModulars(maxScope)
         is Call -> strippedMaybeModuleName.maybeModularNameToModulars(useCall)
-        else -> emptyList()
+        else -> emptySet()
     }
 }
 

@@ -67,20 +67,20 @@ fun QualifiableAlias.isOutermostQualifiableAlias(): Boolean {
     return outermost
 }
 
-fun QualifiableAlias.maybeModularNameToModulars(maxScope: PsiElement): List<Call> =
+fun QualifiableAlias.maybeModularNameToModulars(maxScope: PsiElement): Set<Call> =
     if (!recursiveKernelImport(maxScope)) {
         /* need to construct reference directly as qualified aliases don't return a reference except for the
            outermost */
         reference?.toModulars()
     } else {
         null
-    } ?: emptyList()
+    } ?: emptySet()
 
 @Contract(pure = true)
 private fun QualifiableAlias.recursiveKernelImport(maxScope: PsiElement): Boolean =
         maxScope is ElixirFile && maxScope.name == "kernel.ex" && name == KERNEL
 
-private fun PsiReference.toModulars(): List<Call> =
+private fun PsiReference.toModulars(): Set<Call> =
         when (this) {
             is PsiPolyVariantReference -> {
                 multiResolve(false).flatMap { resolveResult ->
@@ -88,24 +88,24 @@ private fun PsiReference.toModulars(): List<Call> =
                             .takeIf(ResolveResult::isValidResult)
                             ?.element
                             ?.let { resolved -> toModulars(resolved) }
-                            ?: emptyList()
-                }
+                            ?: emptySet()
+                }.toSet()
             }
             else -> {
                 resolve()
                         ?.let { resolved -> toModulars(resolved) }
-                        ?: emptyList()
+                        ?: emptySet()
             }
         }
 
-private fun PsiReference.toModulars(resolved: PsiElement): List<Call> =
+private fun PsiReference.toModulars(resolved: PsiElement): Set<Call> =
     if (resolved is Call && isModular(resolved)) {
-        listOf(resolved)
+        setOf(resolved)
     } else if  (resolved.isEquivalentTo(element)) {
         // resolved to self, but not a modular, so stop looking
-        emptyList()
+        emptySet()
     } else {
-        resolved.reference?.toModulars() ?: emptyList()
+        resolved.reference?.toModulars() ?: emptySet()
     }
 
 object QualifiableAliasImpl {

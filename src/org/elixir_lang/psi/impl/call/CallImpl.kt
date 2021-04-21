@@ -318,13 +318,13 @@ fun Call.macroDefinitionClauseForArgument(): Call? {
     return macroDefinitionClause
 }
 
-fun Call.maybeModularNameToModulars(useCall: Call?): List<Call> =
+fun Call.maybeModularNameToModulars(useCall: Call?): Set<Call> =
     if (isCalling(KERNEL, __MODULE__, 0)) {
         org.elixir_lang.psi.__MODULE__
                 .reference(__MODULE__Call = this, useCall = useCall)
                 .maybeModularNameToModulars(incompleteCode = false)
     } else {
-        emptyList()
+        emptySet()
     }
 
 fun Call.whileInStabBodyChildExpressions(forward: Boolean = true,

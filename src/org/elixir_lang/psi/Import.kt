@@ -160,12 +160,12 @@ object Import {
      * @return `defmodule`, `defimpl`, or `defprotocol` imported by `importCall`.  It can be
      * `null` if Alias passed to `importCall` cannot be resolved.
      */
-    private fun modulars(importCall: Call): List<Call> =
+    private fun modulars(importCall: Call): Set<Call> =
             importCall
                     .finalArguments()
                     ?.firstOrNull()
                     ?.maybeModularNameToModulars(maxScope = importCall.parent, useCall = null, incompleteCode = false)
-                    ?: emptyList()
+                    ?: emptySet()
 
     /**
      * A [Function] that returns `true` for call definition clauses that are imported by `importCall`

@@ -14,10 +14,10 @@ private fun ElixirAtom.computeReference(): PsiReference = org.elixir_lang.refere
 fun getReference(atom: ElixirAtom): PsiReference? =
         getCachedValue(atom) { CachedValueProvider.Result.create(atom.computeReference(), atom) }
 
-fun ElixirAtom.maybeModularNameToModulars(incompleteCode: Boolean): List<Call> =
-    reference?.maybeModularNameToModulars(incompleteCode) ?: emptyList()
+fun ElixirAtom.maybeModularNameToModulars(incompleteCode: Boolean): Set<Call> =
+    reference?.maybeModularNameToModulars(incompleteCode) ?: emptySet()
 
-fun PsiReference.maybeModularNameToModulars(incompleteCode: Boolean): List<Call> {
+fun PsiReference.maybeModularNameToModulars(incompleteCode: Boolean): Set<Call> {
     val resolveResults = when (this) {
         is PsiPolyVariantReference -> multiResolve(incompleteCode)
         else -> resolve()
@@ -25,5 +25,5 @@ fun PsiReference.maybeModularNameToModulars(incompleteCode: Boolean): List<Call>
                 ?: emptyArray()
     }
 
-    return resolveResults.mapNotNull { resolveResult -> resolveResult.element as? Call  }
+    return resolveResults.mapNotNull { resolveResult -> resolveResult.element as? Call  }.toSet()
 }
