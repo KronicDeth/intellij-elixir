@@ -6,18 +6,17 @@ import com.intellij.psi.PsiReference
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
+import com.intellij.psi.util.isAncestor
 import com.intellij.refactoring.suggested.endOffset
-import org.elixir_lang.Module.concat
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
-import org.elixir_lang.psi.call.StubBased
-import org.elixir_lang.psi.call.name.Function.__MODULE__
 import org.elixir_lang.psi.call.name.Module.KERNEL
-import org.elixir_lang.psi.operation.Normalized
+import org.elixir_lang.psi.call.qualification.Qualified
+import org.elixir_lang.psi.operation.Normalized.operatorIndex
+import org.elixir_lang.psi.operation.Operation
 import org.elixir_lang.psi.stub.type.call.Stub.isModular
 import org.elixir_lang.reference.Module
-import org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.enclosingModularMacroCall
 import org.jetbrains.annotations.Contract
 
 fun QualifiableAlias.computeReference(): PsiPolyVariantReference? =
@@ -112,73 +111,46 @@ private fun PsiReference.toModulars(resolved: PsiElement): List<Call> =
 object QualifiableAliasImpl {
     @Contract(pure = true)
     @JvmStatic
-    fun fullyQualifiedName(alias: ElixirAlias): String = fullyQualifiedName(alias.parent, alias, listOf(alias.name))
-
-    @Contract(pure = true)
-    @JvmStatic
     fun fullyQualifiedName(qualifiableAlias: QualifiableAlias): String =
-            fullyQualifiedName(qualifiableAlias, listOf())
+            prependQualifiers(qualifiableAlias.parent, qualifiableAlias, qualifiableAlias.name ?: "?")
 
-    private tailrec fun fullyQualifiedName(currentAncestor: PsiElement?, previousAncestor: PsiElement, nameTail: List<String>): String =
-        when (currentAncestor) {
-            is ElixirAccessExpression, is ElixirMultipleAliases -> fullyQualifiedName(currentAncestor.parent, currentAncestor, nameTail)
-            is QualifiedAlias, is QualifiedMultipleAliases -> {
-                val children = currentAncestor.children
-                val operatorIndex = Normalized.operatorIndex(children)
-                val previousAncestorIndex = children.indexOf(previousAncestor)
-                // if `previousAncestor` was the left operand, then the `accNameList` is complete
-                if (previousAncestorIndex < operatorIndex) {
-                    concat(nameTail)
-                // if the `previousAncestor` was the right operand, then the `accNameList` needs to
-                } else {
-                    val leftOperand = org.elixir_lang.psi.operation.infix.Normalized.leftOperand(children, operatorIndex)!!
-                    fullyQualifiedName(leftOperand, nameTail)
-                }
-            }
-            else -> concat(nameTail)
-        }
+    private fun prependQualifiers(ancestor: PsiElement, previousAncestor: PsiElement, accumulator: String): String =
+        when (ancestor) {
+            // being inside arguments to a call end qualifiers
+            is Arguments,
+            is Operation,
+            is QuotableKeywordPair,
+            // containers
+            is ElixirList, is ElixirStructOperation, is ElixirTuple -> accumulator
+            is ElixirAccessExpression, is ElixirMultipleAliases ->
+                prependQualifiers(ancestor.parent, ancestor, accumulator)
+            is QualifiedAlias, is Qualified, is QualifiedMultipleAliases -> {
+                val children = ancestor.children
+                val operatorIndex = operatorIndex(children)
+                val qualifier = org.elixir_lang.psi.operation.infix.Normalized.leftOperand(children, operatorIndex)
 
-    private tailrec fun fullyQualifiedName(leftElement: PsiElement, rightNames: List<String>): String = when (leftElement) {
-        is ElixirAccessExpression -> fullyQualifiedName(leftElement.stripAccessExpression(), rightNames)
-        is ElixirAlias -> concat(listOf(leftElement.name) + rightNames)
-        is QualifiedAlias -> {
-            val children = leftElement.children
-            val operatorIndex = org.elixir_lang.psi.operation.Normalized.operatorIndex(children)
-
-            val qualifier = org.elixir_lang.psi.operation.infix.Normalized.leftOperand(children, operatorIndex)
-
-            if (qualifier != null) {
-                val relativeName = org.elixir_lang.psi.operation.infix.Normalized.rightOperand(children, operatorIndex)?.let { relative ->
-                    when (relative) {
-                        is ElixirAlias -> relative.name
-                        else -> {
-                            Logger.error(this.javaClass, "Don't know how to calculate relative name", relative)
-
-                            null
+                if (qualifier != null) {
+                    if (qualifier.isAncestor(previousAncestor)) {
+                        // ancestor was qualifier, so it is only the qualifier's name
+                        accumulator
+                    } else {
+                        val qualifiedName = when (val strippedQualifier = qualifier.stripAccessExpression()) {
+                            is QualifiableAlias -> strippedQualifier.name
+                            else -> {
+                                TODO()
+                            }
                         }
-                    }
-                } ?: "?"
 
-                fullyQualifiedName(qualifier, listOf(relativeName) + rightNames)
-            } else {
-                concat(listOf("?") + rightNames)
+                        "${qualifiedName}.${accumulator}"
+                    }
+                } else {
+                    TODO()
+                }
+            }
+            else -> {
+                Logger.error(QualifiableAlias::class.java, "Don't know how to prepend qualifier", ancestor)
+
+                "?.${accumulator}"
             }
         }
-        is Call -> {
-            val qualifierName = if (leftElement.isCalling(KERNEL, __MODULE__, 0)) {
-                val enclosingCall = enclosingModularMacroCall(leftElement)
-
-                if (enclosingCall != null && enclosingCall is StubBased<*>) {
-                    enclosingCall.canonicalName()
-                } else {
-                    null
-                }
-            } else {
-                null
-            } ?: "?"
-
-            concat(listOf(qualifierName) + rightNames)
-        }
-        else -> concat(rightNames)
-    }
 }

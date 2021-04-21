@@ -11,7 +11,6 @@ import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.call.maybeModularNameToModulars
 import org.elixir_lang.psi.impl.hasKeywordKey
-import org.elixir_lang.psi.impl.stripAccessExpression
 
 object UnaliasedName {
     fun unaliasedName(namedElement: PsiNamedElement): String? =
@@ -79,11 +78,12 @@ object UnaliasedName {
                 is QualifiedMultipleAliases ->
                     up(element, entrance)
                 is ElixirAccessExpression,
-                is ElixirMultipleAliases,
                 is ElixirNoParenthesesOneArgument,
                 is QuotableArguments,
                 is QuotableKeywordList ->
                     up(element.parent, entrance)
+                is ElixirMultipleAliases ->
+                    entrance.fullyQualifiedName()
                 is QuotableKeywordPair ->
                     up(element, entrance)
                 else ->
@@ -96,20 +96,4 @@ object UnaliasedName {
             } else {
                 null
             }
-
-    private fun up(element: QualifiedMultipleAliases, entrance: QualifiableAlias): String? {
-        val children = element.children
-        val operatorIndex = org.elixir_lang.psi.operation.Normalized.operatorIndex(children)
-        val qualifier = org.elixir_lang.psi.operation.infix.Normalized.leftOperand(children, operatorIndex)
-                ?.stripAccessExpression()
-
-        return when (qualifier) {
-            is QualifiableAlias -> "${qualifier.fullyQualifiedName()}.${entrance.fullyQualifiedName()}"
-            else -> {
-                Logger.error(UnaliasedName::class.java, "Don't know how to find name of qualifier", qualifier)
-
-                null
-            }
-        }
-    }
 }
