@@ -18,14 +18,8 @@ import org.elixir_lang.resolvesToModularName
 object Query {
     fun isDeclaringMacro(call: Call, state: ResolveState): Boolean =
         call.functionName()?.let { functionName ->
-            when (functionName) {
-                FROM_NAME_ARITY_RANGE.name ->
-                    call.resolvedFinalArity() in FROM_NAME_ARITY_RANGE.arityRange && resolvesToEctoQuery(call, state)
-                JOIN_NAME_ARITY_RANGE.name ->
-                    call.resolvedFinalArity() in JOIN_NAME_ARITY_RANGE.arityRange && resolvesToEctoQuery(call, state)
-                SELECT_NAME_ARITY_RANGE.name ->
-                    call.resolvedFinalArity() in SELECT_NAME_ARITY_RANGE.arityRange && resolvesToEctoQuery(call, state)
-                else -> false
+            DECLARING_MACRO_ARITY_RANGES_BY_NAME[functionName]?.let { arityRange ->
+                call.resolvedFinalArity() in arityRange && resolvesToEctoQuery(call, state)
             }
         } ?: false
 
@@ -50,6 +44,12 @@ object Query {
                     SELECT_NAME_ARITY_RANGE.name ->
                         if (call.resolvedFinalArity() in SELECT_NAME_ARITY_RANGE.arityRange) {
                             executeOnSelect(call, state, keepProcessing)
+                        } else {
+                            true
+                        }
+                    WHERE_NAME_ARITY_RANGE.name ->
+                        if (call.resolvedFinalArity() in WHERE_NAME_ARITY_RANGE.arityRange) {
+                            executeOnWhere(call, state, keepProcessing)
                         } else {
                             true
                         }
@@ -153,6 +153,22 @@ object Query {
                     executeOnBinding(it, state, keepProcessing)
                 }
             }
+            // `{^assoc, a}` inside of `[{^assoc, a}]`
+            is ElixirTuple -> {
+                val elements = element.children
+
+                if (elements.size == 2) {
+                    executeOnBinding(elements[1], state, keepProcessing)
+                } else {
+                    Logger.error(
+                            logger,
+                            "Don't know how to find reference variables in binding tuple when arity is not 2",
+                            element
+                    )
+
+                    true
+                }
+            }
             is UnqualifiedNoArgumentsCall<*> -> element.resolvedFinalArity() != 0 || keepProcessing(element, state)
             else -> {
                 Logger.error(logger, "Don't know how to find reference variables in binding", element)
@@ -184,6 +200,24 @@ object Query {
                 }
             } ?: true
 
+    private fun executeOnWhere(call: Call,
+                               state: ResolveState,
+                               keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
+            call.finalArguments()?.let { arguments ->
+                // where(query, binding \\ [], expr)
+                when (call.resolvedFinalArity()) {
+                    // `where(query, expr)` or `|> where(expr)`
+                    2 -> true
+                    // `where(query, binding, expr)` or `|> where(binding, expr)`
+                    3 -> executeOnBinding(arguments[arguments.lastIndex - 1], state, keepProcessing)
+                    else -> {
+                        Logger.error(logger, "where arity outside of range (2..3)", call)
+
+                        null
+                    }
+                }
+            } ?: true
+
     private fun isJoin(call: Call, state: ResolveState): Boolean =
         call.functionName() == JOIN_NAME_ARITY_RANGE.name &&
                 call.resolvedFinalArity() in JOIN_NAME_ARITY_RANGE.arityRange &&
@@ -192,6 +226,9 @@ object Query {
     private val FROM_NAME_ARITY_RANGE = NameArityRange("from", 1..2)
     private val JOIN_NAME_ARITY_RANGE = NameArityRange("join", 3..5)
     private val SELECT_NAME_ARITY_RANGE = NameArityRange("select", 2..3)
+    private val WHERE_NAME_ARITY_RANGE = NameArityRange("where", 2..3)
+    private val DECLARING_MACRO_NAME_ARITY_RANGES = arrayOf(FROM_NAME_ARITY_RANGE, JOIN_NAME_ARITY_RANGE, SELECT_NAME_ARITY_RANGE, WHERE_NAME_ARITY_RANGE)
+    private val DECLARING_MACRO_ARITY_RANGES_BY_NAME = DECLARING_MACRO_NAME_ARITY_RANGES.map { it.name to it.arityRange }.toMap()
 
     private val logger by lazy { com.intellij.openapi.diagnostic.Logger.getInstance(Query::class.java) }
 }
