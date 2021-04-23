@@ -109,6 +109,9 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
 
                     true
                 }
+                org.elixir_lang.ecto.Schema.`is`(element, state) -> {
+                    org.elixir_lang.ecto.Schema.treeWalkUp(element, state, ::execute)
+                }
                 else -> true
             }
 

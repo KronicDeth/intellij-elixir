@@ -1,23 +1,19 @@
 package org.elixir_lang.ecto
 
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.ResolveState
 import com.intellij.psi.util.contextOfType
-import com.intellij.psi.util.isAncestor
 import org.elixir_lang.NameArityRange
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
-import org.elixir_lang.psi.call.qualification.Qualified
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.impl.whileInChildExpressions
 import org.elixir_lang.psi.operation.In
 import org.elixir_lang.psi.scope.WhileIn.whileIn
-import org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.enclosingModularMacroCall
-import org.elixir_lang.safeMultiResolve
+import org.elixir_lang.resolvesToModularName
 
 object Query {
     fun isDeclaringMacro(call: Call, state: ResolveState): Boolean =
@@ -34,32 +30,7 @@ object Query {
         } ?: false
 
     private fun resolvesToEctoQuery(call: Call, state: ResolveState): Boolean =
-        // it is not safe to call `multiResolve` on the call's reference if that `call` is currently being resolved.
-        if (!isBeingResolved(call, state)) {
-            val reference = call.reference as PsiPolyVariantReference
-
-            safeMultiResolve(reference, false).any { resolveResult ->
-                if (resolveResult.isValidResult) {
-                    resolveResult.element?.let { it as? Call }?.let { resolved ->
-                        CallDefinitionClause.isMacro(resolved) && enclosingModularMacroCall(resolved)?.name  == "Ecto.Query"
-                    } ?: false
-                } else {
-                    false
-                }
-            }
-        } else {
-            false
-        }
-
-    private fun isBeingResolved(call: Call, state: ResolveState): Boolean =
-        call.isEquivalentTo(state.get(ENTRANCE)) || qualifierIsBeingResolved(call, state)
-
-    private fun qualifierIsBeingResolved(call: Call, state: ResolveState): Boolean =
-        if (call is Qualified) {
-            call.qualifier().isAncestor(state.get(ENTRANCE), strict = false)
-        } else {
-            false
-        }
+            resolvesToModularName(call, state, "Ecto.Query")
 
     fun treeWalkUp(call: Call, state: ResolveState, keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
             call.functionName()?.let { functionName ->

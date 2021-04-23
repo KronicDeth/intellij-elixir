@@ -30,7 +30,9 @@ object QuoteMacro {
 
                     Use.treeWalkUp(childCall, childResolveState, keepProcessing)
                 }
-                childCall.isCalling(KERNEL, "if") || childCall.isCalling(KERNEL, "unless") -> {
+                childCall.isCalling(KERNEL, "if") ||
+                        childCall.isCalling(KERNEL, "unless") ||
+                        childCall.isCalling(KERNEL, "try") -> {
                     childCall.whileInStabBodyChildExpressions { grandChildExpression ->
                         keepProcessing(grandChildExpression, resolveState)
                     }

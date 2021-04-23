@@ -244,6 +244,9 @@ abstract class Variable : PsiScopeProcessor {
                 org.elixir_lang.ecto.Query.isDeclaringMacro(match, state) -> {
                     org.elixir_lang.ecto.Query.treeWalkUp(match, state, ::execute)
                 }
+                org.elixir_lang.ecto.Schema.`is`(match, state) -> {
+                    org.elixir_lang.ecto.Schema.treeWalkUp(match, state, ::execute)
+                }
                 else -> {
                     // unquote(var) can't declare var, only use it
                     if (!match.isCalling(Module.KERNEL, Function.UNQUOTE, 1)) {

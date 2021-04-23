@@ -3,30 +3,24 @@ package org.elixir_lang.psi
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.ResolveState
-import com.intellij.psi.util.siblings
 import org.elixir_lang.psi.CallDefinitionClause.nameArityRange
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.*
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.call.macroChildCallSequence
+import org.elixir_lang.psi.impl.call.stabBodyChildExpressions
 import org.elixir_lang.psi.impl.maybeModularNameToModulars
 import org.elixir_lang.psi.impl.stripAccessExpression
 
 object Using {
     fun treeWalkUp(usingCall: Call, useCall: Call?, resolveState: ResolveState, keepProcessing: (PsiElement, ResolveState) -> Boolean): Boolean =
             usingCall
-                    .doBlock
-                    ?.stab
-                    ?.stabBody
-                    ?.lastChild
-                    ?.let { lastChild ->
-                        lastChild
-                                .siblings(forward = false, withSelf = true)
-                                .filterIsInstance<Call>()
-                                .lastOrNull()
-                    }
-                    ?.takeUnlessHasNotBeenVisited(resolveState)
+                    .stabBodyChildExpressions(forward = false)
+                    ?.filterIsInstance<Call>()
+                    // Because `forward = false`, `firstOrNull` gets the last Call in the `do` block
+                    ?.firstOrNull()
+                    ?.takeUnlessHasBeenVisited(resolveState)
                     ?.let { lastChildCall -> treeWalkUpFromLastChildCall(lastChildCall, useCall, resolveState, keepProcessing) }
                     ?:
                     true

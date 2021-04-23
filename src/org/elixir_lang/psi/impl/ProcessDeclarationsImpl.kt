@@ -121,6 +121,9 @@ object ProcessDeclarationsImpl {
                             true
                         }
                     }
+                    org.elixir_lang.ecto.Schema.`is`(call, state) -> {
+                        processor.execute(call, state)
+                    }
                     hasDoBlockOrKeyword(call) ->
                         // unknown macros that take do blocks often allow variables to be declared in their arguments
                         processor.execute(call, state)

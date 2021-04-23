@@ -7,7 +7,7 @@ import com.intellij.psi.ResolveState
 
 private val VISITED_ELEMENT_SET = Key<Set<PsiElement>>("VISITED_ELEMENTS")
 
-fun <T : PsiElement> T.takeUnlessHasNotBeenVisited(state: ResolveState): T? = takeUnless { state.hasBeenVisited(it) }
+fun <T : PsiElement> T.takeUnlessHasBeenVisited(state: ResolveState): T? = takeUnless { state.hasBeenVisited(it) }
 
 fun ResolveState.hasBeenVisited(element: PsiElement): Boolean = this.get(VISITED_ELEMENT_SET).contains(element)
 
