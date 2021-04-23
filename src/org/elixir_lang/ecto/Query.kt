@@ -2,7 +2,6 @@ package org.elixir_lang.ecto
 
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
-import com.intellij.psi.util.contextOfType
 import org.elixir_lang.NameArityRange
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
@@ -182,7 +181,9 @@ object Query {
      */
     fun isAssoc(call: Call): Boolean =
         call is UnqualifiedParenthesesCall<*> && call.functionName() == "assoc" && call.resolvedFinalArity() == 2 &&
-            call.parent?.let { it as? In }?.contextOfType<Call>()?.let { isJoin(it, ResolveState.initial().put(ENTRANCE, call).putInitialVisitedElement(call)) } == true
+            call.parent?.let { it as? In }
+                    ?.let { isJoin(it.parent, ResolveState().put(ENTRANCE, call).putInitialVisitedElement(call)) }
+                ?: true
 
     private fun executeOnSelect(call: Call, state: ResolveState, keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
             call.finalArguments()?.let { arguments ->
@@ -218,6 +219,27 @@ object Query {
                 }
             } ?: true
 
+    /**
+     * Whether the `parent` is a `join(...)` macro call or `join: ...` keyword in a from
+     */
+    private tailrec fun isJoin(ancestor: PsiElement, state: ResolveState): Boolean =
+            when (ancestor) {
+                is ElixirKeywordPair -> {
+                    when (ancestor.keywordKey.text) {
+                        "cross_join", "full_join", "inner_join", "inner_lateral_join", "join", "left_join",
+                        "left_lateral_join", "right_join" -> true
+                        else -> false
+                    }
+                }
+                is ElixirParenthesesArguments,
+                is ElixirMatchedParenthesesArguments -> isJoin(ancestor.parent, state)
+                is Call -> isJoin(ancestor, state)
+                else -> false
+            }
+
+    /**
+     * Whether the `call` is a `join(...)` macro call
+     */
     private fun isJoin(call: Call, state: ResolveState): Boolean =
         call.functionName() == JOIN_NAME_ARITY_RANGE.name &&
                 call.resolvedFinalArity() in JOIN_NAME_ARITY_RANGE.arityRange &&
