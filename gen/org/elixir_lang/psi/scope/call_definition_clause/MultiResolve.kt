@@ -4,9 +4,10 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.ResolveState
 import com.intellij.psi.util.PsiTreeUtil
+import org.elixir_lang.EEx.FUNCTION_FROM_FILE_ARITY_RANGE
+import org.elixir_lang.EEx.FUNCTION_FROM_STRING_ARITY_RANGE
+import org.elixir_lang.psi.*
 import org.elixir_lang.psi.CallDefinitionClause.nameArityRange
-import org.elixir_lang.psi.ElixirAtom
-import org.elixir_lang.psi.Modular
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.Named
 
@@ -15,8 +16,6 @@ import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.call.keywordArgument
 import org.elixir_lang.psi.impl.maybeModularNameToModulars
 import org.elixir_lang.psi.impl.stripAccessExpression
-import org.elixir_lang.psi.putInitialVisitedElement
-import org.elixir_lang.psi.putVisitedElement
 import org.elixir_lang.psi.scope.ResolveResultOrderedSet
 import org.elixir_lang.psi.scope.maxScope
 import org.elixir_lang.structure_view.element.CallDefinitionHead
@@ -83,6 +82,34 @@ private constructor(private val name: String,
 
         return keepProcessing()
     }
+
+    override fun executeOnEExFunctionFrom(element: Call, state: ResolveState): Boolean =
+            element.finalArguments()?.let { arguments ->
+                when (element.functionName()) {
+                    FUNCTION_FROM_FILE_ARITY_RANGE.name -> {
+                        arguments[1].stripAccessExpression().let { it as? ElixirAtom }?.node?.lastChildNode?.text?.let { name ->
+                            if (name.startsWith(this.name)) {
+                                val arity = if (arguments.size >= 4) {
+                                    // function_from_file(kind, name, file, args)
+                                    // function_from_file(kind, name, file, args, options)
+                                    arguments[3].stripAccessExpression().let { it as? ElixirList }?.children?.size
+                                } else {
+                                    // function_from_file(kind, name, file) where args defaults to `[]`
+                                    0
+                                }
+
+                                val validResult = (resolvedFinalArity == arity) && (name == this.name)
+
+                                addToResolveResults(element, validResult, state)
+                            } else {
+                                true
+                            }
+                        } ?: true
+                    }
+                    FUNCTION_FROM_STRING_ARITY_RANGE.name -> TODO()
+                    else -> true
+                }
+            } ?: true
 
     override fun keepProcessing(): Boolean = resolveResultOrderedSet.keepProcessing(incompleteCode)
     fun resolveResults(): List<ResolveResult> = resolveResultOrderedSet.toList()

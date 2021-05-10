@@ -5,6 +5,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import com.intellij.psi.scope.PsiScopeProcessor
 import com.intellij.psi.util.isAncestor
+import org.elixir_lang.EEx
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
@@ -54,6 +55,13 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
      * @return `true` to keep searching up tree; `false` to stop searching.
      */
     protected abstract fun executeOnDelegation(element: Call, state: ResolveState): Boolean
+
+    /**
+     * Called on every [Call] where [org.elixir_lang.EEx.isFunctionFrom] is `true`.
+     *
+     * @return `true` to keep searching up tree; `false` to stop searching.
+     */
+    protected abstract fun executeOnEExFunctionFrom(element: Call, state: ResolveState): Boolean
 
     /**
      * Whether to continue searching after each Module's children have been searched.
@@ -112,6 +120,7 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
                 org.elixir_lang.ecto.Schema.`is`(element, state) -> {
                     org.elixir_lang.ecto.Schema.treeWalkUp(element, state, ::execute)
                 }
+                EEx.isFunctionFrom(element, state) -> executeOnEExFunctionFrom(element, state)
                 else -> true
             }
 

@@ -51,6 +51,10 @@ class Variants : CallDefinitionClause() {
         TODO()
     }
 
+    override fun executeOnEExFunctionFrom(element: Call, state: ResolveState): Boolean {
+        TODO()
+    }
+
     /**
      * Whether to continue searching after each Module's children have been searched.
      *
