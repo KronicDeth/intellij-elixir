@@ -68,10 +68,50 @@ sealed class Doc {
 
         fun merge(first: Doc?, second: Doc?): Doc? =
             if (first != null) {
-                if (second != null) {
-                    logger.error("Don't know how to merge Docs (${first} and ${second})")
+                if (second != null && second != first) {
+                    when (first) {
+                        is None -> when (second) {
+                            is None -> first
+                            is Hidden, is MarkdownByLanguage -> second
+                        }
+                        is Hidden -> when (second) {
+                            is Hidden -> first
+                            is None, is MarkdownByLanguage -> second
+                        }
+                        is MarkdownByLanguage -> when (second) {
+                            is None, is Hidden -> second
+                            is MarkdownByLanguage -> {
+                                val firstFormattedByLanguage = first.formattedByLanguage
+                                val secondFormattedByLanguage = second.formattedByLanguage
+                                val languageSet = firstFormattedByLanguage.keys + secondFormattedByLanguage.keys
 
-                    null
+                                val mergedFormattedByLanguage = languageSet.map { language ->
+                                    val firstFormatted = firstFormattedByLanguage[language]
+                                    val secondFormatted = secondFormattedByLanguage[language]
+
+                                    val mergedFormatted: String = if (firstFormatted != null) {
+                                        if (secondFormatted != null && secondFormatted != firstFormatted) {
+                                            val (earlier, later) = if (firstFormatted < secondFormatted) {
+                                                firstFormatted to secondFormatted
+                                            } else {
+                                                secondFormatted to firstFormatted
+                                            }
+
+                                            "${earlier}\n\n___\n\n${later}"
+                                        } else {
+                                            firstFormatted
+                                        }
+                                    } else {
+                                        secondFormatted!!
+                                    }
+
+                                    language to mergedFormatted
+                                }.toMap()
+
+                                MarkdownByLanguage(mergedFormattedByLanguage)
+                            }
+                        }
+                    }
                 } else {
                     first
                 }
