@@ -101,6 +101,10 @@ private fun PsiReference.toModulars(): Set<Call> =
 private fun PsiReference.toModulars(resolved: PsiElement): Set<Call> =
     if (resolved is Call && isModular(resolved)) {
         setOf(resolved)
+    } else if (resolved is org.elixir_lang.beam.psi.impl.ModuleImpl<*>) {
+        val decompiled = resolved.navigationElement as Call
+
+        setOf(decompiled)
     } else if  (resolved.isEquivalentTo(element)) {
         // resolved to self, but not a modular, so stop looking
         emptySet()
