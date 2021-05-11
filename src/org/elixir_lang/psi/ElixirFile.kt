@@ -39,9 +39,18 @@ class ElixirFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvider, Eli
             when (virtualFile?.fileType) {
                 org.elixir_lang.eex.file.Type.INSTANCE -> {
                     containingFile.parent?.let { directory ->
-                        val files = directory.files
+                        directory.parentDirectory?.let { directoryDirectory ->
+                            if (directoryDirectory.name == "templates") {
+                                val viewFile = directoryDirectory
+                                        .parentDirectory
+                                        ?.findSubdirectory("views")
+                                        ?.findFile("${directory.name}_view.ex") as? ElixirFile
 
-                        findUsesEExFile(files)
+                                viewFile
+                            } else {
+                                null
+                            }
+                        } ?: findUsesEExFile(directory.files)
                     }
                 }
                 org.elixir_lang.leex.file.Type.INSTANCE -> {
