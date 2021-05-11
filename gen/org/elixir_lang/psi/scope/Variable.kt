@@ -399,7 +399,7 @@ abstract class Variable : PsiScopeProcessor {
         val operatorText = operator.text
 
         // pinned expressions cannot be declared at pin site
-        return operatorText != "^" && execute(match as Call, state)
+        return operatorText == "^" || execute(match as Call, state)
     }
 
     private fun executeLeftOperand(match: Infix, state: ResolveState): Boolean =
