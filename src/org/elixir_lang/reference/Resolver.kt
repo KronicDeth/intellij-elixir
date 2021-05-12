@@ -15,7 +15,7 @@ object Resolver {
         val validResolveResultList = preferIsValidResult(incompleteCode, resolveResultList)
         val sameModuleResolveResultList = preferUnderSameModule(element, validResolveResultList)
 
-        return preferSource(sameModuleResolveResultList)
+        return sameModuleResolveResultList
     }
 
     fun <T : ResolveResult> preferIsValidResult(incompleteCode: Boolean, resolveResultList: List<T>): List<T> = if (incompleteCode) {
@@ -35,7 +35,7 @@ object Resolver {
                     .takeIf(List<T>::isNotEmpty)
                     ?: resolveResultList
 
-    private fun <T : ResolveResult> preferSource(resolveResultList: List<T>): List<T> =
+    fun <T : ResolveResult> preferSource(resolveResultList: List<T>): List<T> =
             filterSource(resolveResultList).takeIf(List<T>::isNotEmpty) ?: resolveResultList
 
     private fun <T : ResolveResult> filterIsValidResult(resolveResultList: List<T>): List<T> =
