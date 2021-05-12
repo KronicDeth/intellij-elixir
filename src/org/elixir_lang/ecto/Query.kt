@@ -1,5 +1,6 @@
 package org.elixir_lang.ecto
 
+import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import org.elixir_lang.NameArityRange
@@ -15,6 +16,8 @@ import org.elixir_lang.psi.scope.WhileIn.whileIn
 import org.elixir_lang.resolvesToModularName
 
 object Query {
+    val CALL: Key<Call> = Key.create("Ecto.Query")
+
     fun isDeclaringMacro(call: Call, state: ResolveState): Boolean =
         call.functionName()?.let { functionName ->
             DECLARING_MACRO_ARITY_RANGES_BY_NAME[functionName]?.let { arityRange ->
@@ -98,7 +101,7 @@ object Query {
                     "cross_join", "full_join", "inner_join", "inner_lateral_join", "join", "left_join",
                     "left_lateral_join", "right_join" -> executeOnIn(fromKeywords.keywordValue, state, keepProcessing)
                     // Cannot declare a reference variable
-                    "as", "distinct", "group_by", "on", "order_by", "select", "where" -> true
+                    "as", "distinct", "group_by", "on", "order_by", "select", "update", "where" -> true
                     else -> {
                         Logger.error(logger, "Don't know how to find reference variables for keyword key $keywordKeyText", fromKeywords)
 
@@ -208,9 +211,13 @@ object Query {
                 // where(query, binding \\ [], expr)
                 when (call.resolvedFinalArity()) {
                     // `where(query, expr)` or `|> where(expr)`
-                    2 -> true
+                    2 ->
+                        // Check for Ecto.Query.API when resolving calls
+                        keepProcessing(arguments[arguments.lastIndex], state)
                     // `where(query, binding, expr)` or `|> where(binding, expr)`
-                    3 -> executeOnBinding(arguments[arguments.lastIndex - 1], state, keepProcessing)
+                    3 -> executeOnBinding(arguments[arguments.lastIndex - 1], state, keepProcessing) &&
+                            // Check for Ecto.Query.API when resolving calls
+                            keepProcessing(arguments[arguments.lastIndex], state.put(CALL, call))
                     else -> {
                         Logger.error(logger, "where arity outside of range (2..3)", call)
 
