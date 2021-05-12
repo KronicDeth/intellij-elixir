@@ -125,7 +125,9 @@ object QualifiableAliasImpl {
             is Operation,
             is QuotableKeywordPair,
             // containers
-            is ElixirList, is ElixirStructOperation, is ElixirTuple -> accumulator
+            is ElixirList, is ElixirStructOperation, is ElixirTuple,
+            // Typing an alias on a new line in the body of function
+            is ElixirStabBody -> accumulator
             is ElixirAccessExpression, is ElixirMultipleAliases ->
                 prependQualifiers(ancestor.parent, ancestor, accumulator)
             is QualifiedAlias, is Qualified, is QualifiedMultipleAliases -> {
