@@ -5,13 +5,13 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
-import org.elixir_lang.navigation.isDecompiled
 import org.elixir_lang.psi.NamedElement
 import org.elixir_lang.psi.call.Call
+import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.call.whileInStabBodyChildExpressions
 import org.elixir_lang.psi.scope.WhileIn.whileIn
 import org.elixir_lang.psi.stub.index.ModularName
-import org.elixir_lang.psi.stub.type.call.Stub.isModular
+import org.elixir_lang.reference.Resolver
 
 // `Ecto.Query.API` in Elixir
 object API {
@@ -25,16 +25,35 @@ object API {
     fun treeWalkUp(call: Call,
                    state: ResolveState,
                    keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean {
-        val modulars = ectoQueryAPIModulars(call.project)
+        val modulars = ectoQueryAPIModulars(call)
 
-        return whileIn(modulars) { modular ->
+        val checkArguments = whileIn(modulars) { modular ->
             modular.whileInStabBodyChildExpressions { childExpression ->
                 keepProcessing(childExpression, state)
             }
         }
+
+        return checkArguments && walkArguments(call, state, keepProcessing)
     }
 
-    private fun ectoQueryAPIModulars(project: Project): List<Call> {
+    fun walkArguments(call: Call,
+                      state: ResolveState,
+                      keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
+            call.finalArguments()?.let { walk(it, state, keepProcessing) } ?: true
+
+    private fun walk(arguments: Array<PsiElement>,
+                     state: ResolveState,
+                     keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
+            whileIn(arguments) { argument ->
+                if (argument is Call && `is`(argument, state)) {
+                    treeWalkUp(argument, state, keepProcessing)
+                } else {
+                    true
+                }
+            }
+
+    private fun ectoQueryAPIModulars(call: Call): List<Call> {
+        val project = call.project
         val globalSearchScope = GlobalSearchScope.allScope(project)
         val modulars = mutableListOf<Call>()
 
@@ -46,14 +65,14 @@ object API {
                         project,
                         globalSearchScope,
                         NamedElement::class.java) { namedElement ->
-                    if (namedElement is Call && isModular(namedElement) && !namedElement.isDecompiled()) {
+                    if (namedElement is Call) {
                         modulars.add(namedElement)
                     }
 
                     true
                 }
 
-        return modulars
+        return Resolver.preferUnderSameModule(call, modulars).let { Resolver.preferSource(it) }
     }
 
     private val ARITY_RANGES_BY_NAME = mapOf(

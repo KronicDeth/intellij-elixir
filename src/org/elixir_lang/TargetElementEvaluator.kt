@@ -34,9 +34,8 @@ class TargetElementEvaluator : TargetElementEvaluatorEx2() {
             is Module -> {
                 reference
                         .multiResolve(false)
-                        .toList()
-                        .let { Resolver.preferSource(it) }
                         .mapNotNull(ResolveResult::getElement)
+                        .let { Resolver.preferSource(it) }
                         .toMutableList()
             }
             else -> super.getTargetCandidates(reference)

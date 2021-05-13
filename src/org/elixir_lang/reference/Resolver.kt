@@ -13,12 +13,13 @@ import org.elixir_lang.navigation.isDecompiled
 object Resolver {
     fun <T : ResolveResult> preferred(element: PsiElement, incompleteCode: Boolean, resolveResultList: List<T>): List<T> {
         val validResolveResultList = preferIsValidResult(incompleteCode, resolveResultList)
-        val sameModuleResolveResultList = preferUnderSameModule(element, validResolveResultList)
+        val sameModuleResolveResultList = preferElementUnderSameModule(element, validResolveResultList)
 
         return sameModuleResolveResultList
     }
 
-    fun <T : ResolveResult> preferIsValidResult(incompleteCode: Boolean, resolveResultList: List<T>): List<T> = if (incompleteCode) {
+    private fun <T : ResolveResult> preferIsValidResult(incompleteCode: Boolean,
+                                                        resolveResultList: List<T>): List<T> = if (incompleteCode) {
         resolveResultList
     } else {
         preferIsValidResult(resolveResultList)
@@ -27,26 +28,41 @@ object Resolver {
     fun <T : ResolveResult> preferIsValidResult(resolveResultList: List<T>): List<T> =
             filterIsValidResult(resolveResultList).takeIf(List<T>::isNotEmpty) ?: resolveResultList
 
-    fun <T : ResolveResult> preferUnderModule(module: com.intellij.openapi.module.Module, resolveResultList: List<T>): List<T> =
-            filterUnderModule(module, resolveResultList).takeIf(List<T>::isNotEmpty) ?: resolveResultList
+    fun <T : ResolveResult> preferElementUnderSameModule(element: PsiElement, resolveResultList: List<T>): List<T> =
+            preferUnderSameModule(element, resolveResultList, ResolveResult::getElement)
 
-    fun <T : ResolveResult> preferUnderSameModule(element: PsiElement, resolveResultList: List<T>): List<T> =
-            filterUnderSameModule(element, resolveResultList)
-                    .takeIf(List<T>::isNotEmpty)
-                    ?: resolveResultList
+    fun <T: PsiElement> preferUnderSameModule(elementInModule: PsiElement, elementList: List<T>): List<T> =
+            preferUnderSameModule(elementInModule, elementList) { it }
 
-    fun <T : ResolveResult> preferSource(resolveResultList: List<T>): List<T> =
-            filterSource(resolveResultList).takeIf(List<T>::isNotEmpty) ?: resolveResultList
+    private fun <T, U: PsiElement> preferUnderSameModule(elementInModule: PsiElement,
+                                                 list: List<T>,
+                                                 listElementToPsiElement: (listElement: T) -> U?): List<T> =
+        filterUnderSameModule(elementInModule, list, listElementToPsiElement)
+                .takeIf(List<T>::isNotEmpty)
+                ?: list
+
+    fun <T : ResolveResult> preferSourceElement(resolveResultList: List<T>): List<T> =
+            preferSource(resolveResultList, ResolveResult::getElement)
+
+    fun <T: PsiElement> preferSource(elementList: List<T>): List<T> =
+            preferSource(elementList) { it }
+
+    private fun <T, U: PsiElement> preferSource(list: List<T>, listElementToPsiElement: (listElement: T) -> U?): List<T> =
+            filterSource(list, listElementToPsiElement).takeIf(List<T>::isNotEmpty) ?: list
 
     private fun <T : ResolveResult> filterIsValidResult(resolveResultList: List<T>): List<T> =
             resolveResultList.filter(ResolveResult::isValidResult)
 
-    private fun <T : ResolveResult> filterUnderSameModule(element: PsiElement, resolveResultList: List<T>): List<T> = if (resolveResultList.isNotEmpty()) {
-        moduleForSourceOrLibrary(element)
-                ?.let { module -> filterUnderModule(module, resolveResultList) }
+    private fun <T, U: PsiElement> filterUnderSameModule(
+            elementInModule: PsiElement,
+            list: List<T>,
+            listElementToPsiElement: (listElement: T) -> U?
+    ): List<T> = if (list.isNotEmpty()) {
+        moduleForSourceOrLibrary(elementInModule)
+                ?.let { module -> filterUnderModule(module, list, listElementToPsiElement) }
                 ?: emptyList()
     } else {
-        resolveResultList
+        list
     }
 
     // `ModuleUtil.findModuleForPsiElement` returns `null` for library source, so need to find module a different way if a library
@@ -92,27 +108,28 @@ object Resolver {
             null
         }
 
-    private fun <T : ResolveResult> filterUnderModule(module: com.intellij.openapi.module.Module, resolveResultList: List<T>): List<T> = if (resolveResultList.isNotEmpty()) {
+    private fun <T, U: PsiElement> filterUnderModule(
+            module: com.intellij.openapi.module.Module,
+            list: List<T>,
+            listElementToPsiElement: (listElement: T) -> U?): List<T> = if (list.isNotEmpty()) {
         val contentRootSet = ModuleRootManager.getInstance(module).contentRoots.toSet()
-        resolveResultList.filter { resolveResult ->
-            // The `Module` of a Library source will be `null`, so have to check for a library in `deps` of module
-            // using path instead.
-            resolveResult
-                    .element
-                    ?.containingFile
-                    ?.virtualFile
-                    ?.let { virtualFile -> VfsUtilCore.isUnder(virtualFile, contentRootSet) }
+        list.filter { listElement ->
+            listElementToPsiElement(listElement)
+                    ?.let { isUnder(it, contentRootSet) }
                     ?: false
         }
     } else {
         emptyList()
     }
 
-    private fun <T : ResolveResult> filterSource(resolveResultList: List<T>): List<T> =
-            resolveResultList.filter { resolveResult ->
-                resolveResult
-                        .element
-                        ?.let { element -> !element.isDecompiled() }
+    private fun <T: PsiElement, V: VirtualFile> isUnder(element: T, roots: Set<V>): Boolean =
+        element.containingFile?.virtualFile?.let { VfsUtilCore.isUnder(it, roots) } ?: false
+
+    private fun <T, U: PsiElement> filterSource(list: List<T>,
+                                                listElementToPsiElement: (listElement: T) -> U?): List<T> =
+            list.filter { listElement ->
+                listElementToPsiElement(listElement)
+                        ?.let { !it.isDecompiled() }
                         ?: false
             }
 }

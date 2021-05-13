@@ -59,16 +59,18 @@ object Query {
                 }
             } ?: true
 
-    fun executeOnFrom(call: Call, state: ResolveState, keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
-        call.finalArguments()?.let { finalArguments ->
-            executeOnIn(finalArguments[0], state, keepProcessing) &&
-                    ((finalArguments.size < 2) ||
-                            executeOnFromKeywords(finalArguments[1], state, keepProcessing))
-        } ?: true
+    private fun executeOnFrom(call: Call,
+                              state: ResolveState,
+                              keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
+            call.finalArguments()?.let { finalArguments ->
+                executeOnIn(finalArguments[0], state, keepProcessing) &&
+                        ((finalArguments.size < 2) ||
+                                executeOnFromKeywords(finalArguments[1], state.put(CALL, call), keepProcessing))
+            } ?: true
 
-    fun executeOnIn(fromIn: PsiElement,
-                    state: ResolveState,
-                    keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
+    private fun executeOnIn(fromIn: PsiElement,
+                            state: ResolveState,
+                            keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
         //  If the query needs a reference to the data source in any other part of the expression, then an in must be
         //  used to create a reference variable.
         fromIn.let { it as? In }?.leftOperand()?.let { executeOnInReference(it, state, keepProcessing) } ?: true
@@ -100,8 +102,10 @@ object Query {
                 when (val keywordKeyText = fromKeywords.keywordKey.text) {
                     "cross_join", "full_join", "inner_join", "inner_lateral_join", "join", "left_join",
                     "left_lateral_join", "right_join" -> executeOnIn(fromKeywords.keywordValue, state, keepProcessing)
+                    // Can call Ecto.Query.API
+                    "select" -> executeOnFromSelect(fromKeywords.keywordValue, state, keepProcessing)
                     // Cannot declare a reference variable
-                    "as", "distinct", "group_by", "on", "order_by", "select", "update", "where" -> true
+                    "as", "distinct", "group_by", "on", "order_by", "update", "where" -> true
                     else -> {
                         Logger.error(logger, "Don't know how to find reference variables for keyword key $keywordKeyText", fromKeywords)
 
@@ -116,9 +120,9 @@ object Query {
             }
         }
 
-    fun executeOnJoin(call: Call,
-                      state: ResolveState,
-                      keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
+    private fun executeOnJoin(call: Call,
+                              state: ResolveState,
+                              keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
         call.finalArguments()?.let { arguments ->
             // `join(query, qual, binding \\ [], expr, opts \\ [])`
             when (call.resolvedFinalArity()) {
@@ -188,6 +192,36 @@ object Query {
                     ?.let { isJoin(it.parent, ResolveState().put(ENTRANCE, call).putInitialVisitedElement(call)) }
                 ?: true
 
+    private tailrec fun executeOnFromSelect(
+            element: PsiElement,
+            state: ResolveState,
+            keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
+            when (element) {
+                is ElixirMapOperation -> executeOnFromSelect(element.mapArguments, state, keepProcessing)
+                is ElixirMapArguments -> {
+                    val arguments = element.mapUpdateArguments ?: element.mapConstructionArguments
+
+                    if (arguments != null) {
+                        executeOnFromSelect(arguments, state, keepProcessing)
+                    } else {
+                        true
+                    }
+                }
+                is ElixirMapConstructionArguments -> element.whileInChildExpressions {
+                    executeOnFromSelect(it, state, keepProcessing)
+                }
+                is QuotableKeywordList -> whileIn(element.quotableKeywordPairList()) {
+                    executeOnFromSelect(it, state, keepProcessing)
+                }
+                is ElixirKeywordPair -> executeOnFromSelect(element.keywordValue, state, keepProcessing)
+                is Call -> {
+                    keepProcessing(element, state)
+                }
+                else -> {
+                    true
+                }
+            }
+
     private fun executeOnSelect(call: Call, state: ResolveState, keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
             call.finalArguments()?.let { arguments ->
                 // `select(query, binding \\ [], expr)`
@@ -213,7 +247,7 @@ object Query {
                     // `where(query, expr)` or `|> where(expr)`
                     2 ->
                         // Check for Ecto.Query.API when resolving calls
-                        keepProcessing(arguments[arguments.lastIndex], state)
+                        keepProcessing(arguments[arguments.lastIndex], state.put(CALL, call))
                     // `where(query, binding, expr)` or `|> where(binding, expr)`
                     3 -> executeOnBinding(arguments[arguments.lastIndex - 1], state, keepProcessing) &&
                             // Check for Ecto.Query.API when resolving calls
