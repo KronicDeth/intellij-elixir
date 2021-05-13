@@ -241,5 +241,10 @@ internal tailrec fun PsiElement.ancestorTypeSpec(): AtUnqualifiedNoParenthesesCa
 
 val OPTIONALITIES = arrayOf("optional", "required")
 
+fun Call.isTypeSpecPseudoFunction(): Boolean = hasMapFieldOptionalityName() || hasListRepetitionName()
+
 fun Call.hasMapFieldOptionalityName(): Boolean =
     parent is ElixirContainerAssociationOperation && functionName() in OPTIONALITIES && resolvedFinalArity() == 1
+
+fun Call.hasListRepetitionName(): Boolean =
+        parent is ElixirList && functionName() == "..."

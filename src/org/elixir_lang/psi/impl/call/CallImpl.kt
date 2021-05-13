@@ -26,7 +26,7 @@ import org.elixir_lang.psi.qualification.Qualified
 import org.elixir_lang.psi.qualification.Unqualified
 import org.elixir_lang.psi.scope.WhileIn.whileIn
 import org.elixir_lang.psi.scope.ancestorTypeSpec
-import org.elixir_lang.psi.scope.hasMapFieldOptionalityName
+import org.elixir_lang.psi.scope.isTypeSpecPseudoFunction
 import org.elixir_lang.psi.stub.call.Stub
 import org.elixir_lang.reference.Callable
 import org.elixir_lang.reference.Callable.Companion.isBitStreamSegmentOption
@@ -122,7 +122,7 @@ private fun Call.computeCallableReference(): PsiReference? =
             val ancestorTypeSpec = this.ancestorTypeSpec()
 
             if (ancestorTypeSpec != null) {
-                if (this.hasMapFieldOptionalityName()) {
+                if (this.isTypeSpecPseudoFunction()) {
                     null
                 } else {
                     org.elixir_lang.reference.Type(ancestorTypeSpec, this)
