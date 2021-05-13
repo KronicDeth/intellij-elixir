@@ -104,8 +104,10 @@ object Query {
                     "left_lateral_join", "right_join" -> executeOnIn(fromKeywords.keywordValue, state, keepProcessing)
                     // Can call Ecto.Query.API
                     "select" -> executeOnFromSelect(fromKeywords.keywordValue, state, keepProcessing)
+                    // Can call Ecto.Query.API
+                    "where" -> executeOnWhereSelect(fromKeywords.keywordValue, state, keepProcessing)
                     // Cannot declare a reference variable
-                    "as", "distinct", "group_by", "on", "order_by", "update", "where" -> true
+                    "as", "distinct", "group_by", "on", "order_by", "update" -> true
                     else -> {
                         Logger.error(logger, "Don't know how to find reference variables for keyword key $keywordKeyText", fromKeywords)
 
@@ -214,12 +216,16 @@ object Query {
                     executeOnFromSelect(it, state, keepProcessing)
                 }
                 is ElixirKeywordPair -> executeOnFromSelect(element.keywordValue, state, keepProcessing)
-                is Call -> {
-                    keepProcessing(element, state)
-                }
-                else -> {
-                    true
-                }
+                is Call -> keepProcessing(element, state)
+                else -> true
+            }
+
+    private fun executeOnWhereSelect(element: PsiElement,
+                                     state: ResolveState,
+                                     keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
+            when (element) {
+                is Call -> keepProcessing(element, state)
+                else -> true
             }
 
     private fun executeOnSelect(call: Call, state: ResolveState, keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
