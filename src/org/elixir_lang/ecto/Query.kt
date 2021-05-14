@@ -37,6 +37,12 @@ object Query {
                         } else {
                             true
                         }
+                    GROUP_BY_NAME_ARITY_RANGE.name ->
+                        if (call.resolvedFinalArity() in GROUP_BY_NAME_ARITY_RANGE.arityRange) {
+                            executeOnGroupBy(call, state, keepProcessing)
+                        } else {
+                            true
+                        }
                     JOIN_NAME_ARITY_RANGE.name ->
                         if (call.resolvedFinalArity() in JOIN_NAME_ARITY_RANGE.arityRange) {
                             executeOnJoin(call, state, keepProcessing)
@@ -121,6 +127,26 @@ object Query {
                 true
             }
         }
+
+    private fun executeOnGroupBy(call: Call,
+                                 state: ResolveState,
+                                 keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
+            call.finalArguments()?.let { arguments ->
+                // group_by(query, binding \\ [], expr)
+                when (call.resolvedFinalArity()) {
+                    // `group_by(query, expr)` or `|> group_by(expr)`
+                    2 -> executeOnSelectExpression(arguments[arguments.lastIndex], state, keepProcessing)
+                    // `group_by(query, binding, expr)` or `|> group_by(binding, expr)`
+                    3 ->
+                        executeOnBinding(arguments[arguments.lastIndex - 1], state, keepProcessing) &&
+                                executeOnSelectExpression(arguments[arguments.lastIndex], state, keepProcessing)
+                    else -> {
+                        Logger.error(logger, "group_by arity outside of range (${GROUP_BY_NAME_ARITY_RANGE.arityRange})", call)
+
+                        null
+                    }
+                }
+            } ?: true
 
     private fun executeOnJoin(call: Call,
                               state: ResolveState,
@@ -299,10 +325,11 @@ object Query {
                 resolvesToEctoQuery(call, state)
 
     private val FROM_NAME_ARITY_RANGE = NameArityRange("from", 1..2)
+    private val GROUP_BY_NAME_ARITY_RANGE = NameArityRange("group_by", 2..3)
     private val JOIN_NAME_ARITY_RANGE = NameArityRange("join", 3..5)
     private val SELECT_NAME_ARITY_RANGE = NameArityRange("select", 2..3)
     private val WHERE_NAME_ARITY_RANGE = NameArityRange("where", 2..3)
-    private val DECLARING_MACRO_NAME_ARITY_RANGES = arrayOf(FROM_NAME_ARITY_RANGE, JOIN_NAME_ARITY_RANGE, SELECT_NAME_ARITY_RANGE, WHERE_NAME_ARITY_RANGE)
+    private val DECLARING_MACRO_NAME_ARITY_RANGES = arrayOf(FROM_NAME_ARITY_RANGE, GROUP_BY_NAME_ARITY_RANGE, JOIN_NAME_ARITY_RANGE, SELECT_NAME_ARITY_RANGE, WHERE_NAME_ARITY_RANGE)
     private val DECLARING_MACRO_ARITY_RANGES_BY_NAME = DECLARING_MACRO_NAME_ARITY_RANGES.map { it.name to it.arityRange }.toMap()
 
     private val logger by lazy { com.intellij.openapi.diagnostic.Logger.getInstance(Query::class.java) }
