@@ -142,15 +142,19 @@ private constructor(private val name: String,
             val multiResolve = MultiResolve(name, resolvedFinalArity, incompleteCode)
             val maxScope = maxScope(entrance)
 
+            val entranceResolveState = resolveState
+                    .put(ENTRANCE, entrance)
+                    .putInitialVisitedElement(entrance)
+                    .putAncestorUnquote(entrance)
+
             PsiTreeUtil.treeWalkUp(
                     multiResolve,
                     entrance,
                     maxScope,
-                    resolveState.put(ENTRANCE, entrance).putInitialVisitedElement(entrance)
+                    entranceResolveState
             )
 
             return multiResolve.resolveResults()
         }
-
     }
 }

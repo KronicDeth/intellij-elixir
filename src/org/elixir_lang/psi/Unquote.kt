@@ -26,6 +26,9 @@ object Unquote {
 
     fun `is`(call: Call): Boolean = call.isCalling(KERNEL, UNQUOTE)
 
+    fun ancestorUnquote(descendent: PsiElement): Call? =
+        descendent.parent?.parent?.parent?.let { it as? Call }?.takeIf { `is`(it) }
+
     private fun treeWalkUp(reference: PsiPolyVariantReference,
                            resolveState: ResolveState,
                            keepProcessing: (PsiElement, ResolveState) -> Boolean): Boolean =

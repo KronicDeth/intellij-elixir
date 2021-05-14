@@ -4,6 +4,8 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
+import com.intellij.psi.util.isAncestor
+import org.elixir_lang.psi.call.Call
 
 private val VISITED_ELEMENT_SET = Key<Set<PsiElement>>("VISITED_ELEMENTS")
 
@@ -28,3 +30,15 @@ fun ResolveState.putVisitedElement(visitedElement: PsiElement): ResolveState {
 
     return this.put(VISITED_ELEMENT_SET, visitedElementSet + setOf(visitedElement))
 }
+
+private val ANCESTOR_UNQUOTE = Key<Call>("ANCESTOR_UNQUOTE")
+
+fun ResolveState.putAncestorUnquote(descendent: PsiElement): ResolveState =
+    Unquote.ancestorUnquote(descendent)
+            ?.let { put(ANCESTOR_UNQUOTE, it) }
+            ?: this
+
+fun ResolveState.containsAncestorUnquote(ancestor: PsiElement): Boolean =
+        get(ANCESTOR_UNQUOTE)
+                ?.let { ancestor.isAncestor(it) }
+                ?: false
