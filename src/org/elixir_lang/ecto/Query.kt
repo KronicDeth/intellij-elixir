@@ -103,7 +103,7 @@ object Query {
                     "cross_join", "full_join", "inner_join", "inner_lateral_join", "join", "left_join",
                     "left_lateral_join", "right_join" -> executeOnIn(fromKeywords.keywordValue, state, keepProcessing)
                     // Can call Ecto.Query.API
-                    "select" -> executeOnFromSelect(fromKeywords.keywordValue, state, keepProcessing)
+                    "select" -> executeOnSelectExpression(fromKeywords.keywordValue, state, keepProcessing)
                     // Can call Ecto.Query.API
                     "where" -> executeOnWhereSelect(fromKeywords.keywordValue, state, keepProcessing)
                     // Cannot declare a reference variable
@@ -194,28 +194,30 @@ object Query {
                     ?.let { isJoin(it.parent, ResolveState().put(ENTRANCE, call).putInitialVisitedElement(call)) }
                 ?: true
 
-    private tailrec fun executeOnFromSelect(
+    private tailrec fun executeOnSelectExpression(
             element: PsiElement,
             state: ResolveState,
             keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
             when (element) {
-                is ElixirMapOperation -> executeOnFromSelect(element.mapArguments, state, keepProcessing)
+                is ElixirAccessExpression ->
+                    executeOnSelectExpression(element.stripAccessExpression(), state, keepProcessing)
+                is ElixirMapOperation -> executeOnSelectExpression(element.mapArguments, state, keepProcessing)
                 is ElixirMapArguments -> {
                     val arguments = element.mapUpdateArguments ?: element.mapConstructionArguments
 
                     if (arguments != null) {
-                        executeOnFromSelect(arguments, state, keepProcessing)
+                        executeOnSelectExpression(arguments, state, keepProcessing)
                     } else {
                         true
                     }
                 }
-                is ElixirMapConstructionArguments -> element.whileInChildExpressions {
-                    executeOnFromSelect(it, state, keepProcessing)
+                is ElixirMapConstructionArguments, is ElixirMapUpdateArguments -> element.whileInChildExpressions {
+                    executeOnSelectExpression(it, state, keepProcessing)
                 }
                 is QuotableKeywordList -> whileIn(element.quotableKeywordPairList()) {
-                    executeOnFromSelect(it, state, keepProcessing)
+                    executeOnSelectExpression(it, state, keepProcessing)
                 }
-                is ElixirKeywordPair -> executeOnFromSelect(element.keywordValue, state, keepProcessing)
+                is ElixirKeywordPair -> executeOnSelectExpression(element.keywordValue, state, keepProcessing)
                 is Call -> keepProcessing(element, state)
                 else -> true
             }
@@ -233,9 +235,13 @@ object Query {
                 // `select(query, binding \\ [], expr)`
                 when (call.resolvedFinalArity()) {
                     // `select(query, expr)` or `|> select(expr)`
-                    2 -> true
+                    2 ->
+                        // Check for Ecto.Query.API when resolving calls
+                        executeOnSelectExpression(arguments[arguments.lastIndex], state.put(CALL, call), keepProcessing)
                     // `select(query, binding, expr)` or `|> select(binding, expr)`
-                    3 -> executeOnBinding(arguments[arguments.lastIndex - 1], state, keepProcessing)
+                    3 -> executeOnBinding(arguments[arguments.lastIndex - 1], state, keepProcessing) &&
+                            // Check for Ecto.Query.API when resolving calls
+                            executeOnSelectExpression(arguments[arguments.lastIndex], state.put(CALL, call), keepProcessing)
                     else -> {
                         Logger.error(logger, "select arity outside of range (2..3)", call)
 
