@@ -12,7 +12,7 @@ import org.elixir_lang.psi.call.Call
 object __MODULE__ {
     val KEY: Key<ParameterizedCachedValue<PsiReference, Call?>> = Key.create("__MODULE__REFERENCE")
 
-    fun reference(__MODULE__Call: Call, useCall: Call?): PsiReference =
+    fun reference(__MODULE__Call: Call, useCall: Call? = null): PsiReference =
         CachedValuesManager
                 .getManager(__MODULE__Call.project)
                 .getParameterizedCachedValue(__MODULE__Call, KEY, Provider(__MODULE__Call), false, useCall)

@@ -118,6 +118,8 @@ private fun PsiElement.isSlashInCaptureNameSlashArity(): Boolean =
 private fun Call.computeCallableReference(): PsiReference? =
         if (Callable.isDefiner(this)) {
             Callable.definer(this)
+        } else if (isCalling(KERNEL, __MODULE__, 0)) {
+            org.elixir_lang.psi.__MODULE__.reference(this)
         } else {
             val ancestorTypeSpec = this.ancestorTypeSpec()
 
