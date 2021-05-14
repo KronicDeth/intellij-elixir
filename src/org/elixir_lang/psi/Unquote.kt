@@ -18,6 +18,7 @@ object Unquote {
                     .finalArguments()
                     ?.singleOrNull()
                     ?.let { it as Call }
+                    ?.takeUnlessHasBeenVisited(resolveState)
                     ?.reference
                     ?.let { it as PsiPolyVariantReference }
                     ?.let { reference -> treeWalkUp(reference, resolveState, keepProcessing) }

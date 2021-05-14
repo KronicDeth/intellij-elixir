@@ -109,18 +109,9 @@ object ProcessDeclarationsImpl {
                             call.isCallingMacro(KERNEL, IF) || // match in condition
                             call.isCallingMacro(KERNEL, Function.FOR) || // comprehension match variable
                             call.isCallingMacro(KERNEL, UNLESS) || // match in condition
-                            call.isCallingMacro(KERNEL, "with") // <- or = variable
+                            call.isCallingMacro(KERNEL, "with") || // <- or = variable
+                        QuoteMacro.`is`(call) // quote :bind_quoted keys for Variable resolver OR call definitions for Callable resolver
                     -> processor.execute(call, state)
-                    QuoteMacro.`is`(call) -> { // quote :bind_quoted keys{
-                        val bindQuoted = call.keywordArgument("bind_quoted")
-                        /* the bind_quoted keys declare variable only valid inside the do block, so any place in the
-                           bindQuoted already must be the bind_quoted values that must be declared before the quote */
-                        if (bindQuoted != null && !PsiTreeUtil.isAncestor(bindQuoted, place, false)) {
-                            processor.execute(call, state)
-                        } else {
-                            true
-                        }
-                    }
                     org.elixir_lang.ecto.Schema.`is`(call, state) -> {
                         processor.execute(call, state)
                     }

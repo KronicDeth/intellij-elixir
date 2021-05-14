@@ -110,6 +110,11 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
                             // the implicit `import Kernel` and `import Kernel.SpecialForms`
                             implicitImports(element, state)
                 }
+                QuoteMacro.`is`(element) -> if (!state.hasBeenVisited(element)) {
+                   QuoteMacro.treeWalkUp(element, state.putVisitedElement(element), ::execute)
+                } else {
+                    true
+                }
                 Use.`is`(element) -> {
                     val useState = state.put(USE_CALL, element).putVisitedElement(element)
 
