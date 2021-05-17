@@ -22,7 +22,7 @@ import org.elixir_lang.structure_view.element.CallDefinitionHead
 
 class MultiResolve
 private constructor(private val name: String,
-                    private val resolvedFinalArity: Int,
+                    private val resolvedPrimaryArity: Int,
                     private val incompleteCode: Boolean) : org.elixir_lang.psi.scope.CallDefinitionClause() {
     override fun executeOnCallDefinitionClause(element: Call, state: ResolveState): Boolean =
         nameArityRange(element)?.let { nameArityRange ->
@@ -30,7 +30,7 @@ private constructor(private val name: String,
 
             if (name.startsWith(this.name)) {
                 val arityInterval = ArityInterval.arityInterval(nameArityRange, state)
-                val validResult = (resolvedFinalArity in arityInterval) && name == this.name
+                val validResult = (resolvedPrimaryArity in arityInterval) && name == this.name
 
                 addToResolveResults(element, validResult, state)
             } else {
@@ -46,7 +46,7 @@ private constructor(private val name: String,
                 val headName = headNameArityRange.name
 
                 if (headName.startsWith(this.name)) {
-                    val headValidResult = (resolvedFinalArity in headNameArityRange.arityRange) && (headName == this.name)
+                    val headValidResult = (resolvedPrimaryArity in headNameArityRange.arityRange) && (headName == this.name)
 
                     // the defdelegate is valid or invalid regardless of whether the `to:` (and `:as` resolves as
                     // `defdelegate` still defines a function in the module with the head's name and arity even if it
@@ -62,7 +62,7 @@ private constructor(private val name: String,
 
                             for (modular in modulars) {
                                 // Call recursively to get all the proper `for` and `use` handling.
-                                val modularResolveResults = resolveResults(nameInDefiningModule, resolvedFinalArity, incompleteCode, modular)
+                                val modularResolveResults = resolveResults(nameInDefiningModule, resolvedPrimaryArity, incompleteCode, modular)
 
                                 for (modularResultResult in modularResolveResults) {
                                     modularResultResult.element?.let { it as Call }?.let { call ->
@@ -98,7 +98,7 @@ private constructor(private val name: String,
                                     0
                                 }
 
-                                val validResult = (resolvedFinalArity == arity) && (name == this.name)
+                                val validResult = (resolvedPrimaryArity == arity) && (name == this.name)
 
                                 addToResolveResults(element, validResult, state)
                             } else {

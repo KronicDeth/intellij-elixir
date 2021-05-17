@@ -12,7 +12,6 @@ import org.elixir_lang.psi.NamedElement
 import org.elixir_lang.psi.UnqualifiedNoArgumentsCall
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.qualification.Qualified
-import org.elixir_lang.psi.impl.ElixirPsiImplUtil
 import org.elixir_lang.psi.impl.call.qualification.qualifiedToModulars
 import org.elixir_lang.psi.stub.index.AllName
 
@@ -56,12 +55,12 @@ object Callable : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Cal
         }
 
     private fun resolveUnqualified(element: Call, name: String, incompleteCode: Boolean): List<ResolveResult> {
-        val resolvedFinalArity = element.resolvedFinalArity()
+        val resolvedPrimaryArity = element.resolvedPrimaryArity() ?: 0
         val resolveResultList = mutableListOf<ResolveResult>()
 
         // UnqualifiedNoArgumentsCall prevents `foo()` from being treated as a variable.
         // resolvedFinalArity prevents `|> foo` from being counted as 0-arity
-        if (element is UnqualifiedNoArgumentsCall<*> && resolvedFinalArity == 0) {
+        if (element is UnqualifiedNoArgumentsCall<*> && resolvedPrimaryArity == 0) {
             val variableResolveList = org.elixir_lang.psi.scope.variable.MultiResolve.resolveResultList(
                     name,
                     incompleteCode,
@@ -73,7 +72,7 @@ object Callable : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Cal
 
         val callDefinitionClauseResolveResultList = org.elixir_lang.psi.scope.call_definition_clause.MultiResolve.resolveResults(
                 name,
-                resolvedFinalArity,
+                resolvedPrimaryArity,
                 incompleteCode,
                 element
         )
