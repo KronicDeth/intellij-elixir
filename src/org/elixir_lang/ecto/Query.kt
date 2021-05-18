@@ -34,6 +34,12 @@ object Query {
     fun treeWalkUp(call: Call, state: ResolveState, keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
             call.functionName()?.let { functionName ->
                 when (functionName) {
+                    DISTINCT_NAME_ARITY_RANGE.name ->
+                        if (call.resolvedFinalArity() in DISTINCT_NAME_ARITY_RANGE.arityRange) {
+                            executeOnDistinct(call, state, keepProcessing)
+                        } else {
+                            true
+                        }
                     FROM_NAME_ARITY_RANGE.name ->
                         if (call.resolvedFinalArity() in FROM_NAME_ARITY_RANGE.arityRange) {
                             executeOnFrom(call, state, keepProcessing)
@@ -83,6 +89,32 @@ object Query {
                             true
                         }
                     else -> true
+                }
+            } ?: true
+
+    private fun executeOnDistinct(call: Call,
+                                  state: ResolveState,
+                                  keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
+            call.finalArguments()?.let { arguments ->
+                // distinct(query, binding \\ [], expr)
+                when (call.resolvedFinalArity()) {
+                    // `distinct(query, expr)` or `|> distinct(expr)`
+                    2 ->
+                        // Check for Ecto.Query.API when resolving calls
+                        executeOnSelectExpression(arguments[arguments.lastIndex], state.put(CALL, call), keepProcessing)
+                    // `distinct(query, binding, expr)` or `|> distinct(binding, expr)`
+                    3 -> executeOnBinding(arguments[arguments.lastIndex - 1], state, keepProcessing) &&
+                            // Check for Ecto.Query.API when resolving calls
+                            executeOnSelectExpression(arguments[arguments.lastIndex], state.put(CALL, call), keepProcessing)
+                    else -> {
+                        Logger.error(
+                                logger,
+                                "distinct arity outside of range (${DISTINCT_NAME_ARITY_RANGE.arityRange})",
+                                call
+                        )
+
+                        null
+                    }
                 }
             } ?: true
 
@@ -413,6 +445,7 @@ object Query {
                 call.resolvedFinalArity() in JOIN_NAME_ARITY_RANGE.arityRange &&
                 resolvesToEctoQuery(call, state)
 
+    private val DISTINCT_NAME_ARITY_RANGE = NameArityRange("distinct", 2..3)
     private val FROM_NAME_ARITY_RANGE = NameArityRange("from", 1..2)
     private val GROUP_BY_NAME_ARITY_RANGE = NameArityRange("group_by", 2..3)
     private val HAVING_NAME_ARITY_RANGE = NameArityRange("having", 2..3)
@@ -422,6 +455,7 @@ object Query {
     private val ORDER_BY_NAME_ARITY_RANGE = NameArityRange("order_by", 2..3)
     private val WHERE_NAME_ARITY_RANGE = NameArityRange("where", 2..3)
     private val DECLARING_MACRO_NAME_ARITY_RANGES = arrayOf(
+            DISTINCT_NAME_ARITY_RANGE,
             FROM_NAME_ARITY_RANGE,
             GROUP_BY_NAME_ARITY_RANGE,
             HAVING_NAME_ARITY_RANGE,
