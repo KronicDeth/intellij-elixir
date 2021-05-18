@@ -168,11 +168,11 @@ object Query {
                     "cross_join", "full_join", "inner_join", "inner_lateral_join", "join", "left_join",
                     "left_lateral_join", "right_join" -> executeOnIn(fromKeywords.keywordValue, state, keepProcessing)
                     // Can call Ecto.Query.API
-                    "select" -> executeOnSelectExpression(fromKeywords.keywordValue, state, keepProcessing)
+                    "select", "order_by" -> executeOnSelectExpression(fromKeywords.keywordValue, state, keepProcessing)
                     // Can call Ecto.Query.API
                     "where" -> executeOnWhereSelect(fromKeywords.keywordValue, state, keepProcessing)
                     // Cannot declare a reference variable
-                    "as", "distinct", "group_by", "on", "order_by", "update" -> true
+                    "as", "distinct", "group_by", "on", "update" -> true
                     else -> {
                         Logger.error(logger, "Don't know how to find reference variables for keyword key $keywordKeyText", fromKeywords)
 
@@ -310,6 +310,9 @@ object Query {
             when (element) {
                 is ElixirAccessExpression ->
                     executeOnSelectExpression(element.stripAccessExpression(), state, keepProcessing)
+                is ElixirList -> element.whileInChildExpressions() { childExpression ->
+                    executeOnSelectExpression(childExpression, state, keepProcessing)
+                }
                 is ElixirMapOperation -> executeOnSelectExpression(element.mapArguments, state, keepProcessing)
                 is ElixirMapArguments -> {
                     val arguments = element.mapUpdateArguments ?: element.mapConstructionArguments
