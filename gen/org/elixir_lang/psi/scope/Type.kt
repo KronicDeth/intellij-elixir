@@ -201,7 +201,7 @@ internal tailrec fun PsiElement.ancestorTypeSpec(): AtUnqualifiedNoParenthesesCa
             is ElixirNoParenthesesKeywordPair,
             is ElixirNoParenthesesManyStrictNoParenthesesExpression,
                 // For function type
-            is ElixirParentheticalStab, is ElixirStab, is ElixirStabOperation, is ElixirStabNoParenthesesSignature,
+            is ElixirParentheticalStab, is ElixirStab, is ElixirStabBody, is ElixirStabOperation, is ElixirStabNoParenthesesSignature,
                 // containers
             is ElixirList, is ElixirTuple,
                 // maps
@@ -228,8 +228,6 @@ internal tailrec fun PsiElement.ancestorTypeSpec(): AtUnqualifiedNoParenthesesCa
             is ElixirMatchedAtOperation,
                 // types can't be defined at the file level and must be inside modules.
             is ElixirFile,
-                // Any stab body has to be parent of a type
-            is ElixirStabBody,
             // __MODULE__.* does not matter that it is in a type
             is QualifiableAlias -> null
             else -> {
