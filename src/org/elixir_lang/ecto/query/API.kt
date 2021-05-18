@@ -1,6 +1,5 @@
 package org.elixir_lang.ecto.query
 
-import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import com.intellij.psi.search.GlobalSearchScope
@@ -9,36 +8,51 @@ import org.elixir_lang.psi.NamedElement
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.call.whileInStabBodyChildExpressions
+import org.elixir_lang.psi.scope.CallDefinitionClause.Companion.MODULAR_CANONICAL_NAME
 import org.elixir_lang.psi.scope.WhileIn.whileIn
 import org.elixir_lang.psi.stub.index.ModularName
 import org.elixir_lang.reference.Resolver
 
 // `Ecto.Query.API` in Elixir
 object API {
+    const val ECTO_QUERY_API = "Ecto.Query.API"
+
     fun `is`(call: Call, state: ResolveState): Boolean =
-            call.functionName()?.let { functionName ->
-                ARITY_RANGES_BY_NAME[functionName]?.let { arityRange ->
-                    call.resolvedFinalArity() in arityRange && state.get(org.elixir_lang.ecto.Query.CALL) != null
-                }
-            } ?: false
+            hasNameArity(call) && state.get(org.elixir_lang.ecto.Query.CALL) != null
+
+    private fun hasNameArity(call: Call): Boolean =
+            call.functionName()
+                    ?.let { functionName ->
+                        (functionName == FRAGMENT) ||
+                                (ARITY_RANGES_BY_NAME[functionName]?.let { arityRange ->
+                                    call.resolvedFinalArity() in arityRange
+                                } == true)
+                    }
+                    ?: false
 
     fun treeWalkUp(call: Call,
                    state: ResolveState,
                    keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean {
+        val childState = if (call.functionName() == FRAGMENT) {
+            state.put(MODULAR_CANONICAL_NAME, ECTO_QUERY_API)
+        } else {
+            state
+        }
+
         val modulars = ectoQueryAPIModulars(call)
 
         val checkArguments = whileIn(modulars) { modular ->
             modular.whileInStabBodyChildExpressions { childExpression ->
-                keepProcessing(childExpression, state)
+                keepProcessing(childExpression, childState)
             }
         }
 
         return checkArguments && walkArguments(call, state, keepProcessing)
     }
 
-    fun walkArguments(call: Call,
-                      state: ResolveState,
-                      keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
+    private fun walkArguments(call: Call,
+                              state: ResolveState,
+                              keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
             call.finalArguments()?.let { walk(it, state, keepProcessing) } ?: true
 
     private fun walk(arguments: Array<PsiElement>,
@@ -61,7 +75,7 @@ object API {
                 .getInstance()
                 .processElements(
                         ModularName.KEY,
-                        "Ecto.Query.API",
+                        ECTO_QUERY_API,
                         project,
                         globalSearchScope,
                         NamedElement::class.java) { namedElement ->
@@ -99,7 +113,6 @@ object API {
             "exists" to 1..1,
             "field" to 2..2,
             "filter" to 2..2,
-            "fragment" to 1..1,
             "from_now" to 2..2,
             "ilike" to 2..2,
             "in" to 2..2,
@@ -117,4 +130,6 @@ object API {
             "sum" to 1..1,
             "type" to 2..2
             )
+
+    private const val FRAGMENT = "fragment"
 }
