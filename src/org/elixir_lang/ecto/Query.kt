@@ -43,6 +43,12 @@ object Query {
                         } else {
                             true
                         }
+                    HAVING_NAME_ARITY_RANGE.name ->
+                        if (call.resolvedFinalArity() in HAVING_NAME_ARITY_RANGE.arityRange) {
+                            executeOnHaving(call, state, keepProcessing)
+                        } else {
+                            true
+                        }
                     JOIN_NAME_ARITY_RANGE.name ->
                         if (call.resolvedFinalArity() in JOIN_NAME_ARITY_RANGE.arityRange) {
                             executeOnJoin(call, state, keepProcessing)
@@ -153,6 +159,30 @@ object Query {
                     }
                 }
             } ?: true
+
+    private fun executeOnHaving(call: Call,
+                                 state: ResolveState,
+                                 keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
+            call.finalArguments()?.let { arguments ->
+                // having(query, binding \\ [], expr)
+                when (call.resolvedFinalArity()) {
+                    // `having(query, expr)` or `|> having(expr)`
+                    2 ->
+                        // Check for Ecto.Query.API when resolving calls
+                        keepProcessing(arguments[arguments.lastIndex], state.put(CALL, call))
+                    // `having(query, binding, expr)` or `|> having(binding, expr)`
+                    3 ->
+                        executeOnBinding(arguments[arguments.lastIndex - 1], state, keepProcessing) &&
+                                // Check for Ecto.Query.API when resolving calls
+                                keepProcessing(arguments[arguments.lastIndex], state.put(CALL, call))
+                    else -> {
+                        Logger.error(logger, "having arity outside of range (${HAVING_NAME_ARITY_RANGE.arityRange})", call)
+
+                        null
+                    }
+                }
+            } ?: true
+
 
     private fun executeOnJoin(call: Call,
                               state: ResolveState,
@@ -349,6 +379,7 @@ object Query {
 
     private val FROM_NAME_ARITY_RANGE = NameArityRange("from", 1..2)
     private val GROUP_BY_NAME_ARITY_RANGE = NameArityRange("group_by", 2..3)
+    private val HAVING_NAME_ARITY_RANGE = NameArityRange("having", 2..3)
     private val JOIN_NAME_ARITY_RANGE = NameArityRange("join", 3..5)
     private val SELECT_NAME_ARITY_RANGE = NameArityRange("select", 2..3)
     private val ORDER_BY_NAME_ARITY_RANGE = NameArityRange("order_by", 2..3)
@@ -356,6 +387,7 @@ object Query {
     private val DECLARING_MACRO_NAME_ARITY_RANGES = arrayOf(
             FROM_NAME_ARITY_RANGE,
             GROUP_BY_NAME_ARITY_RANGE,
+            HAVING_NAME_ARITY_RANGE,
             JOIN_NAME_ARITY_RANGE,
             SELECT_NAME_ARITY_RANGE,
             ORDER_BY_NAME_ARITY_RANGE,
