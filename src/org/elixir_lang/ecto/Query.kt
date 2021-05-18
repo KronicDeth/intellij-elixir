@@ -310,7 +310,7 @@ object Query {
             when (element) {
                 is ElixirAccessExpression ->
                     executeOnSelectExpression(element.stripAccessExpression(), state, keepProcessing)
-                is ElixirList -> element.whileInChildExpressions() { childExpression ->
+                is ElixirList, is ElixirTuple -> element.whileInChildExpressions { childExpression ->
                     executeOnSelectExpression(childExpression, state, keepProcessing)
                 }
                 is ElixirMapOperation -> executeOnSelectExpression(element.mapArguments, state, keepProcessing)
