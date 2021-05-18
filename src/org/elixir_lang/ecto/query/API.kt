@@ -33,13 +33,16 @@ object API {
     fun treeWalkUp(call: Call,
                    state: ResolveState,
                    keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean {
-        val childState = if (call.functionName() == FRAGMENT) {
-            state.put(MODULAR_CANONICAL_NAME, ECTO_QUERY_API)
-        } else {
-            state
-        }
-
         val modulars = ectoQueryAPIModulars(call)
+
+        return treeWalkUp(modulars, call, state, keepProcessing)
+    }
+
+    private fun treeWalkUp(modulars: List<Call>,
+                           call: Call,
+                           state: ResolveState,
+                           keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean {
+        val childState = state.put(MODULAR_CANONICAL_NAME, ECTO_QUERY_API)
 
         val checkArguments = whileIn(modulars) { modular ->
             modular.whileInStabBodyChildExpressions { childExpression ->
@@ -47,20 +50,22 @@ object API {
             }
         }
 
-        return checkArguments && walkArguments(call, state, keepProcessing)
+        return checkArguments && walkArguments(modulars, call, state, keepProcessing)
     }
 
-    private fun walkArguments(call: Call,
+    private fun walkArguments(modulars: List<Call>,
+                              call: Call,
                               state: ResolveState,
                               keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
-            call.finalArguments()?.let { walk(it, state, keepProcessing) } ?: true
+            call.finalArguments()?.let { arguments -> walk(modulars, arguments, state, keepProcessing) } ?: true
 
-    private fun walk(arguments: Array<PsiElement>,
+    private fun walk(modulars: List<Call>,
+                     arguments: Array<PsiElement>,
                      state: ResolveState,
                      keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
             whileIn(arguments) { argument ->
                 if (argument is Call && `is`(argument, state)) {
-                    treeWalkUp(argument, state, keepProcessing)
+                    treeWalkUp(modulars, argument, state, keepProcessing)
                 } else {
                     true
                 }
