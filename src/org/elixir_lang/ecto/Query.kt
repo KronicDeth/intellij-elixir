@@ -67,6 +67,12 @@ object Query {
                         } else {
                             true
                         }
+                    SELECT_MERGE_NAME_ARITY_RANGE.name ->
+                        if (call.resolvedFinalArity() in SELECT_MERGE_NAME_ARITY_RANGE.arityRange) {
+                            executeOnSelectMerge(call, state, keepProcessing)
+                        } else {
+                            true
+                        }
                     WHERE_NAME_ARITY_RANGE.name ->
                         if (call.resolvedFinalArity() in WHERE_NAME_ARITY_RANGE.arityRange) {
                             executeOnWhere(call, state, keepProcessing)
@@ -329,6 +335,27 @@ object Query {
                 }
             } ?: true
 
+
+    private fun executeOnSelectMerge(call: Call, state: ResolveState, keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
+            call.finalArguments()?.let { arguments ->
+                // `select_merge(query, binding \\ [], expr)`
+                when (call.resolvedFinalArity()) {
+                    // `select_merge(query, expr)` or `|> select_merge(expr)`
+                    2 ->
+                        // Check for Ecto.Query.API when resolving calls
+                        executeOnSelectExpression(arguments[arguments.lastIndex], state.put(CALL, call), keepProcessing)
+                    // `select_merge(query, binding, expr)` or `|> select_merge(binding, expr)`
+                    3 -> executeOnBinding(arguments[arguments.lastIndex - 1], state, keepProcessing) &&
+                            // Check for Ecto.Query.API when resolving calls
+                            executeOnSelectExpression(arguments[arguments.lastIndex], state.put(CALL, call), keepProcessing)
+                    else -> {
+                        Logger.error(logger, "select_merge arity outside of range (2..3)", call)
+
+                        null
+                    }
+                }
+            } ?: true
+
     private fun executeOnWhere(call: Call,
                                state: ResolveState,
                                keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
@@ -382,6 +409,7 @@ object Query {
     private val HAVING_NAME_ARITY_RANGE = NameArityRange("having", 2..3)
     private val JOIN_NAME_ARITY_RANGE = NameArityRange("join", 3..5)
     private val SELECT_NAME_ARITY_RANGE = NameArityRange("select", 2..3)
+    private val SELECT_MERGE_NAME_ARITY_RANGE = NameArityRange("select_merge", 2..3)
     private val ORDER_BY_NAME_ARITY_RANGE = NameArityRange("order_by", 2..3)
     private val WHERE_NAME_ARITY_RANGE = NameArityRange("where", 2..3)
     private val DECLARING_MACRO_NAME_ARITY_RANGES = arrayOf(
@@ -390,6 +418,7 @@ object Query {
             HAVING_NAME_ARITY_RANGE,
             JOIN_NAME_ARITY_RANGE,
             SELECT_NAME_ARITY_RANGE,
+            SELECT_MERGE_NAME_ARITY_RANGE,
             ORDER_BY_NAME_ARITY_RANGE,
             WHERE_NAME_ARITY_RANGE
     )
