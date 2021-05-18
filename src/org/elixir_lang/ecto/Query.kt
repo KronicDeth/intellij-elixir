@@ -12,6 +12,9 @@ import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.impl.whileInChildExpressions
 import org.elixir_lang.psi.operation.In
+import org.elixir_lang.psi.operation.Normalized.operatorIndex
+import org.elixir_lang.psi.operation.infix.Normalized.leftOperand
+import org.elixir_lang.psi.operation.infix.Normalized.rightOperand
 import org.elixir_lang.psi.scope.WhileIn.whileIn
 import org.elixir_lang.resolvesToModularName
 
@@ -97,7 +100,13 @@ object Query {
                             keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
         //  If the query needs a reference to the data source in any other part of the expression, then an in must be
         //  used to create a reference variable.
-        fromIn.let { it as? In }?.leftOperand()?.let { executeOnInReference(it, state, keepProcessing) } ?: true
+        fromIn.let { it as? In }?.let{ operation ->
+            val children = operation.children
+            val operatorIndex = operatorIndex(children)
+
+            (leftOperand(children, operatorIndex)?.let { executeOnInReference(it, state, keepProcessing) } == true) &&
+                    (rightOperand(children, operatorIndex)?.let { keepProcessing(it, state) } == true)
+        } ?: true
 
     private fun executeOnInReference(
             inReference: PsiElement,
@@ -203,7 +212,7 @@ object Query {
                         executeOnIn(arguments[arguments.lastIndex], state, keepProcessing)
                 // `join(query, qual, binding, expr, opts)` or `|> join(qual, binding, expr, opts)`
                 5 -> executeOnBinding(arguments[arguments.lastIndex - 2], state, keepProcessing) &&
-                        executeOnIn(arguments[arguments.lastIndex - 1], state, keepProcessing)
+                        executeOnIn(arguments[arguments.lastIndex - 1], state.put(CALL, call), keepProcessing)
                 else -> {
                     Logger.error(logger, "join arity outside of range (3..5)", call)
                     null
