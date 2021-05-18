@@ -2,6 +2,7 @@ package org.elixir_lang.psi.scope
 
 import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiNameIdentifierOwner
 import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.ResolveState
 import com.intellij.psi.impl.source.tree.CompositeElement
@@ -9,13 +10,16 @@ import com.intellij.psi.scope.PsiScopeProcessor
 import com.intellij.psi.util.siblings
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
+import org.elixir_lang.psi.call.CanonicallyNamed
 import org.elixir_lang.psi.call.Named
+import org.elixir_lang.psi.call.name.Function
 
 import org.elixir_lang.psi.call.name.Function.ALIAS
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.call.keywordArgument
+import org.elixir_lang.psi.impl.call.maybeModularNameToModulars
 import org.elixir_lang.psi.impl.childExpressions
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.impl.whileInChildExpressions
@@ -98,11 +102,30 @@ abstract class Module : PsiScopeProcessor {
 
     protected fun executeOnAliasCallArgument(element: PsiElement?, state: ResolveState): Boolean =
             when (element) {
+                // __MODULE__
+                is Call -> executeOnAliasCallArgument(element, state)
                 is ElixirAccessExpression -> executeOnAliasCallArgument(element, state)
                 is QualifiableAlias -> executeOnAliasCallArgument(element, state)
                 is QualifiedMultipleAliases -> executeOnAliasCallArgument(element, state)
                 else -> true
             }
+
+    private fun executeOnAliasCallArgument(call: Call, state: ResolveState): Boolean =
+        if (call is PsiNamedElement) {
+            val modulars = call.maybeModularNameToModulars()
+
+            whileIn(modulars) { modular ->
+                modular
+                        .let{ it as? PsiNameIdentifierOwner }
+                        ?.nameIdentifier
+                        ?.let { it as QualifiableAlias }
+                        ?.let { aliasedName(it) }
+                        ?.let { aliasedName -> executeOnAliasedName(call as PsiNamedElement, aliasedName, state) }
+                        ?: true
+            }
+        } else {
+            true
+        }
 
     private fun executeOnAliasCallArgument(children: Array<PsiElement>, state: ResolveState): Boolean {
         var keepProcessing = true

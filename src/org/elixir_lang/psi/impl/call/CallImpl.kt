@@ -320,7 +320,7 @@ fun Call.macroDefinitionClauseForArgument(): Call? {
     return macroDefinitionClause
 }
 
-fun Call.maybeModularNameToModulars(useCall: Call?): Set<Call> =
+fun Call.maybeModularNameToModulars(useCall: Call? = null): Set<Call> =
     if (isCalling(KERNEL, __MODULE__, 0)) {
         org.elixir_lang.psi.__MODULE__
                 .reference(__MODULE__Call = this, useCall = useCall)
