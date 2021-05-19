@@ -123,7 +123,7 @@ private fun Call.computeCallableReference(): PsiReference? =
         } else {
             val ancestorTypeSpec = this.ancestorTypeSpec()
 
-            if (ancestorTypeSpec != null) {
+            if (ancestorTypeSpec != null && !Unquote.`is`(this)) {
                 if (this.isTypeSpecPseudoFunction()) {
                     null
                 } else {
