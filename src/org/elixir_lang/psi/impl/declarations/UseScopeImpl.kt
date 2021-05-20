@@ -130,9 +130,8 @@ object UseScopeImpl {
         var useScopeSelector = UseScopeSelector.PARENT
 
         if (element is AtUnqualifiedNoParenthesesCall<*>) {
-            /* Module Attribute declarations can't declare variables, so this is a variable usage without declaration,
-               so limit to SELF */
-            useScopeSelector = UseScopeSelector.SELF
+            /* Module Attribute declarations */
+            useScopeSelector = UseScopeSelector.SELF_AND_FOLLOWING_SIBLINGS
         } else if (element is ElixirAnonymousFunction) {
             useScopeSelector = UseScopeSelector.SELF
         } else if (element is Call) {

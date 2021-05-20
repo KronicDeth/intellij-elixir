@@ -13,7 +13,6 @@ import org.elixir_lang.psi.call.name.Function.*
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.call.CallImpl.hasDoBlockOrKeyword
 import org.elixir_lang.psi.impl.call.finalArguments
-import org.elixir_lang.psi.impl.call.keywordArgument
 import org.elixir_lang.psi.impl.declarations.UseScopeImpl
 import org.elixir_lang.psi.impl.declarations.UseScopeImpl.selector
 import org.elixir_lang.psi.operation.*
@@ -53,10 +52,10 @@ object ProcessDeclarationsImpl {
 
     @JvmStatic
     fun  processDeclarations(atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>,
-                            processor: PsiScopeProcessor,
-                            state: ResolveState,
-                            lastParent: PsiElement?,
-                            place: PsiElement): Boolean {
+                             processor: PsiScopeProcessor,
+                             state: ResolveState,
+                             @Suppress("UNUSED_PARAMETER") lastParent: PsiElement?,
+                             @Suppress("UNUSED_PARAMETER") place: PsiElement): Boolean {
         val identifierName = atUnqualifiedNoParenthesesCall.atIdentifier.identifierName()
 
         return if (ModuleAttribute.isTypeSpecName(identifierName)) {
@@ -85,7 +84,7 @@ object ProcessDeclarationsImpl {
                 }
             } ?: true
         } else {
-            true
+            processor.execute(atUnqualifiedNoParenthesesCall, state)
         }
     }
 
@@ -105,6 +104,7 @@ object ProcessDeclarationsImpl {
                     CallDefinitionClause.`is`(call) || // call parameters
                             Delegation.`is`(call) || // delegation call parameters
                             Module.`is`(call) || // module Alias
+                            Use.`is`(call) ||
                             call.isCalling(KERNEL, DESTRUCTURE) || // left operand
                             call.isCallingMacro(KERNEL, IF) || // match in condition
                             call.isCallingMacro(KERNEL, Function.FOR) || // comprehension match variable
@@ -146,8 +146,8 @@ object ProcessDeclarationsImpl {
                             processor: PsiScopeProcessor,
                             state: ResolveState,
                             lastParent: PsiElement,
-                            @Suppress("UNUSED_PARAMETER") place: PsiElement): Boolean {
-        val keepProcessing = processDeclarationsInPreviousSibling(file, processor, state, lastParent)
+                            place: PsiElement): Boolean {
+        val keepProcessing = processDeclarationsInPreviousSibling(file, processor, state, lastParent, place)
 
         if (keepProcessing) {
             processor.execute(file, state)
@@ -176,8 +176,8 @@ object ProcessDeclarationsImpl {
                             processor: PsiScopeProcessor,
                             state: ResolveState,
                             lastParent: PsiElement,
-                            @Suppress("UNUSED_PARAMETER") place: PsiElement): Boolean =
-            processDeclarationsInPreviousSibling(scope, processor, state, lastParent)
+                            place: PsiElement): Boolean =
+            processDeclarationsInPreviousSibling(scope, processor, state, lastParent, place)
 
     @JvmStatic
     fun processDeclarations(scope: ElixirEexTag,
@@ -186,11 +186,11 @@ object ProcessDeclarationsImpl {
                             lastParent: PsiElement,
                             place: PsiElement): Boolean =
         if (scope.isEquivalentTo(lastParent.parent)) {
-            processDeclarationsInPreviousSibling(scope, processor, state, lastParent)
+            processDeclarationsInPreviousSibling(scope, processor, state, lastParent, place)
         } else {
             scope
                     .childExpressions(forward = false)
-                    .let { processDeclarations(it, processor, state) }
+                    .let { processDeclarations(it, processor, state, lastParent, place) }
         }
 
     @JvmStatic
@@ -198,8 +198,8 @@ object ProcessDeclarationsImpl {
                             processor: PsiScopeProcessor,
                             state: ResolveState,
                             lastParent: PsiElement,
-                            @Suppress("UNUSED_PARAMETER") place: PsiElement): Boolean =
-            processDeclarationsInPreviousSibling(scope, processor, state, lastParent)
+                            place: PsiElement): Boolean =
+            processDeclarationsInPreviousSibling(scope, processor, state, lastParent, place)
 
     @JvmStatic
     fun processDeclarations(stabOperation: ElixirStabOperation,
@@ -248,7 +248,7 @@ object ProcessDeclarationsImpl {
                     checkRight = true
                 }
             }
-        } else if (PsiTreeUtil.isAncestor(match, lastParent, false)) {
+        } else {
             checkLeft = true
             checkRight = true
         }
@@ -264,12 +264,6 @@ object ProcessDeclarationsImpl {
             if (checkLeft && leftOperand != null && keepProcessing) {
                 keepProcessing = processor.execute(leftOperand, state)
             }
-        } else {
-            org.elixir_lang.errorreport.Logger.error(
-                    Match::class.java,
-                    "Could not determine whether to check left operand, right operand, or both of match, " + "so checking none when processing declarations",
-                    match
-            )
         }
 
         return keepProcessing
@@ -344,11 +338,12 @@ object ProcessDeclarationsImpl {
     private fun processDeclarationsInPreviousSibling(scope: PsiElement,
                                                      processor: PsiScopeProcessor,
                                                      state: ResolveState,
-                                                     lastParent: PsiElement): Boolean =
+                                                     lastParent: PsiElement,
+                                                     place: PsiElement): Boolean =
         if (scope.isEquivalentTo(lastParent.parent)) {
             lastParent
                     .siblingExpressions(forward = false, withSelf = false)
-                    .let { processDeclarations(it, processor, state) }
+                    .let { processDeclarations(it, processor, state, lastParent, place) }
         } else {
             if (lastParent !is ElixirFile) {
                 org.elixir_lang.errorreport.Logger.error(
@@ -361,10 +356,14 @@ object ProcessDeclarationsImpl {
             true
         }
 
-    private fun processDeclarations(sequence: Sequence<PsiElement>, processor: PsiScopeProcessor, state: ResolveState): Boolean =
+    private fun processDeclarations(sequence: Sequence<PsiElement>,
+                                    processor: PsiScopeProcessor,
+                                    state: ResolveState,
+                                    lastParent: PsiElement,
+                                    place: PsiElement): Boolean =
             sequence
                     .filter { !createsNewScope(it) }
-                    .map { processor.execute(it, state) }
+                    .map { it.processDeclarations(processor, state, lastParent, place) }
                     .takeWhile { it }
                     .lastOrNull()
                     ?: true

@@ -3,10 +3,12 @@ package org.elixir_lang.psi
 import com.intellij.psi.ElementDescriptionLocation
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
+import com.intellij.psi.util.isAncestor
 import com.intellij.usageView.UsageViewTypeLocation
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.USE
 import org.elixir_lang.psi.call.name.Module.KERNEL
+import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.maybeModularNameToModulars
 
@@ -22,19 +24,22 @@ object Use {
     fun treeWalkUp(useCall: Call, resolveState: ResolveState, keepProcessing: (PsiElement, ResolveState) -> Boolean): Boolean {
         var accumulatedKeepProcessing = true
 
-        outer@ for (modular in modulars(useCall)) {
-            for (definer in Using.definers(modular)) {
-                val childResolveState = resolveState.putVisitedElement(definer)
+        // don't descend back into `use` when the entrance is the alias to the `use` like `MyAlias` in `use MyAlias`.
+        if (!useCall.isAncestor(resolveState.get(ENTRANCE))) {
+            outer@ for (modular in modulars(useCall)) {
+                for (definer in Using.definers(modular)) {
+                    val childResolveState = resolveState.putVisitedElement(definer)
 
-                accumulatedKeepProcessing = Using.treeWalkUp(
-                        usingCall = definer,
-                        useCall = useCall,
-                        resolveState = childResolveState,
-                        keepProcessing = keepProcessing
-                )
+                    accumulatedKeepProcessing = Using.treeWalkUp(
+                            usingCall = definer,
+                            useCall = useCall,
+                            resolveState = childResolveState,
+                            keepProcessing = keepProcessing
+                    )
 
-                if (!accumulatedKeepProcessing) {
-                    break@outer
+                    if (!accumulatedKeepProcessing) {
+                        break@outer
+                    }
                 }
             }
         }
