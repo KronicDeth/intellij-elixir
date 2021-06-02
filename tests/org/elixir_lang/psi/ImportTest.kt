@@ -2,7 +2,6 @@ package org.elixir_lang.psi
 
 import com.intellij.psi.ResolveState
 import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase
-import com.intellij.util.containers.ContainerUtil
 import org.elixir_lang.NameArityRange
 import org.elixir_lang.psi.call.Call
 
@@ -10,7 +9,6 @@ import java.util.ArrayList
 import java.util.Arrays
 
 import org.elixir_lang.psi.CallDefinitionClause.nameArityRange
-import org.elixir_lang.psi.scope.putInitialVisitedElement
 
 class ImportTest : LightPlatformCodeInsightFixtureTestCase() {
     /*
