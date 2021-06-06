@@ -100,9 +100,7 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
                     val childCalls = element.macroChildCalls()
 
                     for (childCall in childCalls) {
-                        if (!execute(childCall, state)) {
-                            break
-                        }
+                        execute(childCall, state)
                     }
 
                     // Only check MultiResolve.keepProcessing at the end of a Module to all multiple arities
