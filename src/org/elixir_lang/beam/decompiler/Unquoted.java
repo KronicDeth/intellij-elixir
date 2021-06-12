@@ -21,9 +21,17 @@ public class Unquoted extends MacroNameArity {
 
     static {
         Stream<String> keywordStream = Stream.of(
+                // When not `and/2`
+                "and",
                 "do",
                 "end",
-                "nil"
+                "false",
+                // When not `in/2`
+                "in",
+                "nil",
+                // When not `or/2`
+                "or",
+                "true"
         );
         Stream<String> specialFormStream = Stream.of(
                 "!",

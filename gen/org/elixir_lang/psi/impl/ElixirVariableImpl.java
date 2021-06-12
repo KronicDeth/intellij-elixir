@@ -22,32 +22,29 @@ public class ElixirVariableImpl extends ASTWrapperPsiElement implements ElixirVa
     visitor.visitVariable(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
   }
 
   @Override
-  @Nullable
-  public String getName() {
+  public @Nullable String getName() {
     return ElixirPsiImplUtil.getName(this);
   }
 
   @Override
-  @NotNull
-  public PsiElement getNameIdentifier() {
+  public @NotNull PsiElement getNameIdentifier() {
     return ElixirPsiImplUtil.getNameIdentifier(this);
   }
 
   @Override
-  @NotNull
-  public OtpErlangObject quote() {
+  public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }
 
   @Override
-  @NotNull
-  public PsiElement setName(@NotNull String newName) {
+  public @NotNull PsiElement setName(@NotNull String newName) {
     return ElixirPsiImplUtil.setName(this, newName);
   }
 

@@ -2,54 +2,51 @@ package org.elixir_lang.documentation
 
 import com.intellij.psi.PsiElement
 import org.elixir_lang.beam.Beam
-import org.elixir_lang.psi.ElixirUnmatchedUnqualifiedNoParenthesesCall
-import org.elixir_lang.psi.call.Call
-import org.elixir_lang.psi.impl.getModuleName
+import org.elixir_lang.beam.psi.Module
+import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
+import org.elixir_lang.psi.call.MaybeExported
+import org.elixir_lang.utils.ElixirModulesUtil.erlangModuleNameToElixir
 
 object BeamDocsHelper {
-    fun fetchDocs(element: PsiElement, resolved: PsiElement, ignoreDefiner: Boolean) : FetchedDocs? {
-        val beam = Beam.from(resolved.containingFile.originalFile.virtualFile)
-                ?: Beam.from(element.containingFile.originalFile.virtualFile)
-                ?: return null
+    fun fetchDocs(element: PsiElement): FetchedDocs? = Beam
+            .from(element.containingFile.originalFile.virtualFile)
+            ?.let { beam ->
+                beam.atoms()?.moduleName()?.let { erlangModuleNameToElixir(it) }?.let { module ->
+                    when (element) {
+                        is Module -> beam.documentation()?.moduleDocs?.englishDocs?.let { moduleDoc ->
+                            FetchedDocs.ModuleDocumentation(module, moduleDoc)
+                        }
+                        is MaybeExported -> {
+                            element.exportedName()?.let { name ->
+                                val arity = element.exportedArity()
 
-        if (resolved.firstChild.text == "defmodule"){
-            val moduleDocumentation = beam.documentation()?.moduleDocs?.englishDocs
-            return moduleDocumentation?.let { FetchedDocs.ModuleDocumentation(resolved.getModuleName().orEmpty(), it) }
-        } else if (element is Call){
-            val functionName = if (ignoreDefiner) element.name.orEmpty() else element.functionName().orEmpty()
-            val arityRange = element.primaryArity()
+                                beam.documentation()?.docs?.let { docs ->
+                                    docs.documented("function", name, arity)?.let { documented ->
 
-            val moduleName = beam.atoms()?.moduleName().orEmpty()
+                                        val signatures = documented.signatures
+                                        val deprecated = documented.deprecated()
+                                        val doc = documented.doc
 
-            val docs = beam.documentation()?.docs
-                    ?.docsForOrSimilar(functionName, arityRange ?: 0) ?: return null
-
-            val kind = docs.kind
-
-            val signature = docs.signatures.first()
-            val arguments = signature.removePrefix(functionName)
-                    .removePrefix("(")
-                    .removeSuffix(")")
-                    .split(",")
-                    .map { it.trim() }
-
-            val metadata = beam.documentation()?.docs?.getFunctionMetadataOrSimilar(functionName, arityRange ?: 0)
-            val deprecatedMetadata = metadata?.firstOrNull{it.name == "deprecated"}
-
-            val deprecatedText: String? = when (deprecatedMetadata){
-                null -> null
-                else -> deprecatedMetadata.value.orEmpty()
+                                        if (deprecated != null || doc != null) {
+                                            FetchedDocs.FunctionOrMacroDocumentation(
+                                                    module,
+                                                    deprecated,
+                                                    doc,
+                                                    impls = emptyList(),
+                                                    specs = emptyList(),
+                                                    heads = signatures
+                                            )
+                                        } else {
+                                            null
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        // types are only generated for builtins, so no docs
+                        is AtUnqualifiedNoParenthesesCall<*> -> null
+                        else -> TODO()
+                    }
+                }
             }
-
-            val functionDocs =
-                    beam.documentation()?.docs?.getFunctionDocsOrSimilar(functionName, arityRange ?: 0)
-
-            val docsText = functionDocs?.firstOrNull()?.documentationText
-            if (docsText != null || deprecatedMetadata != null)
-                return FetchedDocs.FunctionOrMacroDocumentation(moduleName, docsText.orEmpty(), kind,
-                        functionName, deprecatedText, arguments)
-        }
-
-        return null
-    }
 }

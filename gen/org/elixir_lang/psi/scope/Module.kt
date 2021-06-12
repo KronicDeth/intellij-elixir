@@ -2,27 +2,45 @@ package org.elixir_lang.psi.scope
 
 import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiNameIdentifierOwner
 import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.ResolveState
+import com.intellij.psi.impl.source.tree.CompositeElement
 import com.intellij.psi.scope.PsiScopeProcessor
+import com.intellij.psi.util.siblings
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
+import org.elixir_lang.psi.call.CanonicallyNamed
 import org.elixir_lang.psi.call.Named
+import org.elixir_lang.psi.call.name.Function
 
 import org.elixir_lang.psi.call.name.Function.ALIAS
 import org.elixir_lang.psi.call.name.Module.KERNEL
+import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.call.keywordArgument
+import org.elixir_lang.psi.impl.call.maybeModularNameToModulars
+import org.elixir_lang.psi.impl.call.whileInStabBodyChildExpressions
+import org.elixir_lang.psi.impl.childExpressions
 import org.elixir_lang.psi.impl.stripAccessExpression
+import org.elixir_lang.psi.impl.whileInChildExpressions
+import org.elixir_lang.psi.scope.WhileIn.whileIn
 import org.elixir_lang.psi.stub.type.call.Stub.isModular
 
 abstract class Module : PsiScopeProcessor {
     override fun <T> getHint(hintKey: Key<T>): T? = null
     override fun handleEvent(event: PsiScopeProcessor.Event, associated: Any?) {}
 
+    override fun execute(match: PsiElement, state: ResolveState): Boolean =
+            if (match is Named) {
+                execute(match, state)
+            } else {
+                true
+            }
+
     /**
      * Decides whether `match` matches the criteria being searched for.  All other [.execute] methods
-     * eventually end here.
+     * eventually end here or [.executeOnModularName]
      *
      * @return `true` to keep processing; `false` to stop processing.
      */
@@ -30,9 +48,18 @@ abstract class Module : PsiScopeProcessor {
                                                 aliasedName: String,
                                                 state: ResolveState): Boolean
 
+    /**
+     * Decides whether `match` matches the criteria being searched for.  All other [.execute] methods
+     * eventually end here or [.executeOnAliasedName]
+     *
+     * @return `true` to keep processing; `false` to stop processing.
+     */
+    protected abstract fun executeOnModularName(modular: Named, modularName: String, state: ResolveState): Boolean
+
     protected fun execute(match: Named, state: ResolveState): Boolean =
             when {
-                isModular(match) -> executeOnMaybeAliasedName(match, match.name, state)
+                isModular(match) -> executeOnModular(match, state)
+                Use.`is`(match) -> Use.treeWalkUp(match, state, ::execute)
                 match.isCalling(KERNEL, ALIAS) -> executeOnAliasCall(match, state)
                 else -> true
             }
@@ -83,11 +110,30 @@ abstract class Module : PsiScopeProcessor {
 
     protected fun executeOnAliasCallArgument(element: PsiElement?, state: ResolveState): Boolean =
             when (element) {
+                // __MODULE__
+                is Call -> executeOnAliasCallArgument(element, state)
                 is ElixirAccessExpression -> executeOnAliasCallArgument(element, state)
                 is QualifiableAlias -> executeOnAliasCallArgument(element, state)
                 is QualifiedMultipleAliases -> executeOnAliasCallArgument(element, state)
                 else -> true
             }
+
+    private fun executeOnAliasCallArgument(call: Call, state: ResolveState): Boolean =
+        if (call is PsiNamedElement) {
+            val modulars = call.maybeModularNameToModulars()
+
+            whileIn(modulars) { modular ->
+                modular
+                        .let{ it as? PsiNameIdentifierOwner }
+                        ?.nameIdentifier
+                        ?.let { it as QualifiableAlias }
+                        ?.let { aliasedName(it) }
+                        ?.let { aliasedName -> executeOnAliasedName(call as PsiNamedElement, aliasedName, state) }
+                        ?: true
+            }
+        } else {
+            true
+        }
 
     private fun executeOnAliasCallArgument(children: Array<PsiElement>, state: ResolveState): Boolean {
         var keepProcessing = true
@@ -104,7 +150,7 @@ abstract class Module : PsiScopeProcessor {
     }
 
     private fun executeOnMultipleAliasChild(child: ElixirAccessExpression, state: ResolveState): Boolean =
-        child.children.let { executeOnMultipleAliasChild(it, state) }
+        child.children.let { executeOnMultipleAliasChildren(it, state) }
 
     private fun executeOnMultipleAliasChild(child: PsiElement, state: ResolveState): Boolean =
             when (child) {
@@ -112,20 +158,6 @@ abstract class Module : PsiScopeProcessor {
                 is QualifiableAlias -> executeOnMultipleAliasChild(child, state)
                 else -> true
             }
-
-    private fun executeOnMultipleAliasChild(elements: Array<PsiElement>, state: ResolveState): Boolean {
-        var keepProcessing = true
-
-        for (element in elements) {
-            keepProcessing = executeOnMultipleAliasChild(element, state)
-
-            if (!keepProcessing) {
-                break
-            }
-        }
-
-        return keepProcessing
-    }
 
     private fun executeOnMultipleAliasChild(element: QualifiableAlias, state: ResolveState): Boolean =
             executeOnMaybeAliasedName(element, aliasedName(element), state)
@@ -152,10 +184,18 @@ abstract class Module : PsiScopeProcessor {
                                            state: ResolveState): Boolean {
         val children = qualifiedMultipleAliases.children
         val operatorIndex = org.elixir_lang.psi.operation.Normalized.operatorIndex(children)
+        val qualifier = org.elixir_lang.psi.operation.infix.Normalized.leftOperand(children, operatorIndex)
+                ?.stripAccessExpression()?.let { it as? PsiNamedElement }
         val unqualified = org.elixir_lang.psi.operation.infix.Normalized.rightOperand(children, operatorIndex)
 
         return if (unqualified is ElixirMultipleAliases) {
-            executeOnAliasCallArgument(unqualified, state)
+            val unqualifiedState = if (qualifier != null) {
+                state.put(MULTIPLE_ALIASES_QUALIFIER, qualifier)
+            } else {
+                state
+            }
+
+            executeOnAliasCallArgument(unqualified, unqualifiedState)
         } else {
             true
         }
@@ -180,8 +220,41 @@ abstract class Module : PsiScopeProcessor {
                 true
             }
 
+
+    private fun executeOnModular(match: Named, state: ResolveState): Boolean =
+            if (state.get(ENTRANCE).containingFile.context == match) {
+                executeOnViewModular(match, state)
+            } else {
+                val keepProcessing = match.name?.let {
+                    executeOnModularName(match, it, state)
+                } ?: true
+
+                // descend in modular to check for nested modulars in case their relative name is being used
+                keepProcessing && match.whileInStabBodyChildExpressions { childExpression ->
+                    execute(childExpression, state)
+                }
+            }
+
+    private fun executeOnViewModular(match: Named, state: ResolveState): Boolean =
+        match
+                .doBlock
+                ?.stab
+                ?.stabBody
+                ?.let { executeOnViewModularExpression(it, state) }
+                ?: true
+
+    private fun executeOnViewModularExpression(expression: PsiElement, state: ResolveState): Boolean =
+            when (expression) {
+                is ElixirStabBody -> expression
+                        .whileInChildExpressions(forward = false) { child ->
+                            executeOnViewModularExpression(child, state)
+                        }
+                else -> execute(expression, state)
+            }
+
     companion object {
         @JvmStatic
         val ALIAS_CALL = Key<Call>("ALIAS_CALL")
+        val MULTIPLE_ALIASES_QUALIFIER = Key<PsiNamedElement>("MULTIPLE_ALIASES_QUALIFIER")
     }
 }

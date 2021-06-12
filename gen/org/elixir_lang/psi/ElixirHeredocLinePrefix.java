@@ -9,7 +9,6 @@ import com.intellij.psi.tree.IElementType;
 
 public interface ElixirHeredocLinePrefix extends PsiElement {
 
-  @Nullable
-  ASTNode excessWhitespace(@NotNull IElementType type, int prefixLength);
+  @Nullable ASTNode excessWhitespace(@NotNull IElementType type, int prefixLength);
 
 }

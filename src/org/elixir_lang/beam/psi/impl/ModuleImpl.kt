@@ -1,8 +1,9 @@
 package org.elixir_lang.beam.psi.impl
 
+import com.intellij.lang.ASTNode
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
-import org.elixir_lang.psi.scope.putInitialVisitedElement
+import org.elixir_lang.psi.putInitialVisitedElement
 import org.elixir_lang.psi.Modular.callDefinitionClauseCallWhile
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.StubBasedPsiElement
@@ -17,6 +18,7 @@ import com.intellij.psi.impl.source.tree.TreeElement
 import org.elixir_lang.beam.psi.Module
 import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.call.Call
+import org.elixir_lang.psi.impl.getModuleName
 import org.jetbrains.annotations.Contract
 import org.jetbrains.annotations.NonNls
 import java.lang.StringBuilder
@@ -62,12 +64,16 @@ class ModuleImpl<T : StubElement<*>?>(private val stub: T) : ModuleElementImpl()
                 if (callDefinitionClause != null) {
                     (callDefinitionStub as ModuleElementImpl).setMirror(SourceTreeToPsiMap.psiToTreeNotNull(callDefinitionClause))
                 } else {
-                    LOGGER.error("No decompiled source function with name/arity (${name}/${arity})")
+                    LOGGER.error("No decompiled source function with name/arity (${moduleName(element)}.${name}/${arity})")
                 }
             } else {
-                LOGGER.error("No decompiled source function with name ($name)")
+                LOGGER.error("No decompiled source function with name (${moduleName(element)}.$name)")
             }
         }
+    }
+
+    private fun moduleName(element: TreeElement): String {
+        return element.psi.let { it as? Call}?.getModuleName() ?: "<unknown module>"
     }
 
     private fun callDefinitions(): Array<MaybeExported> =
@@ -104,7 +110,11 @@ class ModuleImpl<T : StubElement<*>?>(private val stub: T) : ModuleElementImpl()
 
     override fun getNavigationElement(): PsiElement = mirror
 
-    override fun getProject(): Project = mirror.project
+    override fun getNode(): ASTNode? = null
+
+    override fun getProject(): Project {
+        return parent.project
+    }
 
     companion object {
         private val LOGGER = Logger.getInstance(ModuleImpl::class.java)

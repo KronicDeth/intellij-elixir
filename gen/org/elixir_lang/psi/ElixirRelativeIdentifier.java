@@ -17,7 +17,6 @@ public interface ElixirRelativeIdentifier extends Quotable {
   @Nullable
   ElixirStringLine getStringLine();
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
 }

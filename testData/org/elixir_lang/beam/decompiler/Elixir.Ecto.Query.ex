@@ -365,7 +365,13 @@ defmodule Ecto.Query do
     3. Then it falls back to the query prefix
 
   The prefixes set in the query will be preserved when loading data.
+
   """
+
+  # Types
+
+  @type dynamic() :: ... 
+  @type t() :: ... 
 
   # Macros
 
@@ -409,6 +415,8 @@ defmodule Ecto.Query do
       Post
       |> distinct(true)
       |> order_by([p], [p.category, p.author])
+
+
   """
   defmacro distinct(query, binding \\ [], expr) do
     # body not decompiled
@@ -525,6 +533,7 @@ defmodule Ecto.Query do
       ]
 
       from query, update: ^updates
+
   """
   defmacro dynamic(binding \\ [], expr) do
     # body not decompiled
@@ -554,6 +563,7 @@ defmodule Ecto.Query do
 
       supplier_query = Supplier |> select([s], s.city)
       Customer |> select([c], c.city) |> except(^supplier_query)
+
   """
   defmacro except(query, other_query) do
     # body not decompiled
@@ -578,6 +588,7 @@ defmodule Ecto.Query do
 
       supplier_query = Supplier |> select([s], s.city)
       Customer |> select([c], c.city) |> except_all(^supplier_query)
+
   """
   defmacro except_all(query, other_query) do
     # body not decompiled
@@ -641,6 +652,7 @@ defmodule Ecto.Query do
 
   Note the variables `p` and `o` can be named whatever you like
   as they have no importance in the query sent to the database.
+
   """
   defmacro from(expr, kw \\ []) do
     # body not decompiled
@@ -681,6 +693,8 @@ defmodule Ecto.Query do
   ## Expressions example
 
       Post |> group_by([p], p.category) |> select([p], count(p.id))
+
+
   """
   defmacro group_by(query, binding \\ [], expr) do
     # body not decompiled
@@ -713,6 +727,7 @@ defmodule Ecto.Query do
       |> group_by([p], p.category)
       |> having([p], avg(p.num_comments) > 10)
       |> select([p], count(p.id))
+
   """
   defmacro having(query, binding \\ [], expr) do
     # body not decompiled
@@ -742,6 +757,7 @@ defmodule Ecto.Query do
 
       supplier_query = Supplier |> select([s], s.city)
       Customer |> select([c], c.city) |> intersect(^supplier_query)
+
   """
   defmacro intersect(query, other_query) do
     # body not decompiled
@@ -766,6 +782,7 @@ defmodule Ecto.Query do
 
       supplier_query = Supplier |> select([s], s.city)
       Customer |> select([c], c.city) |> intersect_all(^supplier_query)
+
   """
   defmacro intersect_all(query, other_query) do
     # body not decompiled
@@ -913,6 +930,7 @@ defmodule Ecto.Query do
 
   Keep in mind you want to use hints rarely, so don't forget to read the database
   disclaimers about such functionality.
+
   """
   defmacro join(query, qual, binding \\ [], expr, opts \\ []) do
     # body not decompiled
@@ -937,6 +955,8 @@ defmodule Ecto.Query do
   ## Expressions example
 
       User |> where([u], u.id == ^current_user) |> limit(1)
+
+
   """
   defmacro limit(query, binding \\ [], expr) do
     # body not decompiled
@@ -968,6 +988,8 @@ defmodule Ecto.Query do
   ## Expressions example
 
       User |> where(u.id == ^current_user) |> lock("FOR SHARE NOWAIT")
+
+
   """
   defmacro lock(query, binding \\ [], expr) do
     # body not decompiled
@@ -993,6 +1015,8 @@ defmodule Ecto.Query do
   ## Expressions example
 
       Post |> limit(10) |> offset(30)
+
+
   """
   defmacro offset(query, binding \\ [], expr) do
     # body not decompiled
@@ -1018,6 +1042,8 @@ defmodule Ecto.Query do
 
       # Augment a previous group_by with a having condition.
       Post |> or_having([p], avg(p.num_comments) > 10)
+
+
   """
   defmacro or_having(query, binding \\ [], expr) do
     # body not decompiled
@@ -1070,6 +1096,8 @@ defmodule Ecto.Query do
   ## Expressions example
 
       City |> where([c], c.country == "Sweden") |> or_where([c], c.country == "Brazil")
+
+
   """
   defmacro or_where(query, binding \\ [], expr) do
     # body not decompiled
@@ -1130,6 +1158,8 @@ defmodule Ecto.Query do
 
       City |> order_by([c], asc: c.name, desc: c.population)
       City |> order_by(asc: :name) # Sorts by the cities name
+
+
   """
   defmacro order_by(query, binding \\ [], expr) do
     # body not decompiled
@@ -1286,6 +1316,8 @@ defmodule Ecto.Query do
       |> join(:left, [p], c in assoc(p, :comments))
       |> preload([p, c], [:user, comments: c])
       |> select([p], p)
+
+
   """
   defmacro preload(query, bindings \\ [], expr) do
     # body not decompiled
@@ -1349,6 +1381,8 @@ defmodule Ecto.Query do
       City |> select([:name])
       City |> select([c], struct(c, [:name]))
       City |> select([c], map(c, [:name]))
+
+
   """
   defmacro select(query, binding \\ [], expr) do
     # body not decompiled
@@ -1411,6 +1445,7 @@ defmodule Ecto.Query do
 
   `select_merge` cannot be used to set fields in associations, as
   associations are always loaded later, overriding any previous value.
+
   """
   defmacro select_merge(query, binding \\ [], expr) do
     # body not decompiled
@@ -1439,6 +1474,8 @@ defmodule Ecto.Query do
 
       supplier_query = Supplier |> select([s], s.city)
       Customer |> select([c], c.city) |> union(^supplier_query)
+
+
   """
   defmacro union(query, other_query) do
     # body not decompiled
@@ -1462,6 +1499,7 @@ defmodule Ecto.Query do
 
       supplier_query = Supplier |> select([s], s.city)
       Customer |> select([c], c.city) |> union_all(^supplier_query)
+
   """
   defmacro union_all(query, other_query) do
     # body not decompiled
@@ -1513,6 +1551,8 @@ defmodule Ecto.Query do
     * `pull` - pulls (removes) the given value from the array field
 
           from(u in User, update: [pull: [tags: "not cool"]])
+
+
   """
   defmacro update(query, binding \\ [], expr) do
     # body not decompiled
@@ -1548,6 +1588,8 @@ defmodule Ecto.Query do
 
       City |> where([c], c.country == "Sweden")
       City |> where(country: "Sweden")
+
+
   """
   defmacro where(query, binding \\ [], expr) do
     # body not decompiled
@@ -1608,6 +1650,8 @@ defmodule Ecto.Query do
       from p in Payroll,
         select: {p.empno, p.date, p.salary, over(avg(p.salary), :prev_months)},
         windows: [prev_months: [partition_by: p.empno, order_by: p.date, frame: fragment("ROWS 3 PRECEDING EXCLUDE CURRENT ROW")]]
+
+
   """
   defmacro windows(query, binding \\ [], expr) do
     # body not decompiled
@@ -1708,6 +1752,7 @@ defmodule Ecto.Query do
   At the moment, using a schema with source fields in CTE may emit
   invalid queries. If you are running into such scenarios, your best
   option is to use a fragment as your CTE.
+
   '''
   defmacro with_cte(query, name, list) do
     # body not decompiled
@@ -1764,6 +1809,7 @@ defmodule Ecto.Query do
   However, keep in mind that if a join is removed and its bindings
   were referenced elsewhere, the bindings won't be removed, leading
   to a query that won't compile.
+
   """
   def exclude(query, field) do
     # body not decompiled
@@ -1784,6 +1830,7 @@ defmodule Ecto.Query do
 
       Post |> first |> Repo.one
       query |> first(:inserted_at) |> Repo.one
+
   """
   def first(queryable, order_by \\ nil) do
     # body not decompiled
@@ -1793,6 +1840,7 @@ defmodule Ecto.Query do
   Returns `true` if query has binding with a given name, otherwise `false`.
 
   For more information on named bindings see "Named bindings" in this module doc.
+
   """
   def has_named_binding?(queryable, key) do
     # body not decompiled
@@ -1814,6 +1862,7 @@ defmodule Ecto.Query do
 
       Post |> last |> Repo.one
       query |> last(:inserted_at) |> Repo.one
+
   """
   def last(queryable, order_by \\ nil) do
     # body not decompiled
@@ -1829,6 +1878,7 @@ defmodule Ecto.Query do
 
   @doc ~S"""
   Puts the given prefix in a query.
+
   """
   def put_query_prefix(query, prefix) do
     # body not decompiled
@@ -1840,6 +1890,7 @@ defmodule Ecto.Query do
   According to the SQL standard it affects all CTEs in the query, not individual ones.
 
   See `with_cte/3` on example of how to build a query with a recursive CTE.
+
   """
   def recursive_ctes(query, value) do
     # body not decompiled
@@ -1855,6 +1906,7 @@ defmodule Ecto.Query do
 
       query |> reverse_order |> Repo.one
       Post |> order(asc: :id) |> reverse_order == Post |> order(desc: :id)
+
   """
   def reverse_order(query) do
     # body not decompiled
@@ -1916,6 +1968,7 @@ defmodule Ecto.Query do
         from(p in Post, where: p.id in subquery(subset)),
         set: [sync_started_at: NaiveDateTime.utc_now()]
       )
+
   """
   def subquery(query, opts \\ []) do
     # body not decompiled

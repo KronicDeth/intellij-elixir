@@ -14,7 +14,6 @@ import org.elixir_lang.psi.call.name.Function.ALIAS
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.hasKeywordKey
 import org.elixir_lang.reference.Callable
-import org.elixir_lang.reference.module.ResolvableName.resolvableName
 import org.elixir_lang.structure_view.element.*
 import org.elixir_lang.structure_view.element.modular.Implementation
 import org.elixir_lang.structure_view.element.modular.Module
@@ -74,6 +73,9 @@ class ElementDescriptionProvider : com.intellij.psi.ElementDescriptionProvider {
 
     private fun getElementDescription(keywordKey: ElixirKeywordKey,
                                       location: ElementDescriptionLocation): String? {
+        if (location == UsageViewNodeTextLocation.INSTANCE) {
+            "test"
+        }
         var elementDescription: String? = keywordKey
                 .parent.let { it as? ElixirKeywordPair }
                 ?.parent?.let { it as? ElixirKeywords }
@@ -108,16 +110,12 @@ class ElementDescriptionProvider : com.intellij.psi.ElementDescriptionProvider {
                                       location: ElementDescriptionLocation): String? {
         var elementDescription: String? = if (maybeModuleName is QualifiableAlias) {
             if (location === UsageViewShortNameLocation.INSTANCE) {
-                if (isAliasCallAs(maybeModuleName)) {
-                    val resolvableName = resolvableName(maybeModuleName)
+                val fullyQualifiedName = maybeModuleName.fullyQualifiedName()
 
-                    if (resolvableName != null) {
-                        "as: $resolvableName"
-                    } else {
-                        null
-                    }
+                if (isAliasCallAs(maybeModuleName)) {
+                    "as: $fullyQualifiedName"
                 } else {
-                    resolvableName(maybeModuleName)
+                    fullyQualifiedName
                 }
             } else {
                 null

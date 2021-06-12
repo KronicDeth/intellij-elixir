@@ -11,7 +11,6 @@ public interface ElixirAssociations extends Quotable {
   @NotNull
   ElixirAssociationsBase getAssociationsBase();
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
 }

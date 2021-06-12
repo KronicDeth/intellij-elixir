@@ -14,7 +14,6 @@ public interface ElixirMapArguments extends Quotable {
   @Nullable
   ElixirMapUpdateArguments getMapUpdateArguments();
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
 }

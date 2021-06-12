@@ -23,7 +23,6 @@ public interface ElixirNoParenthesesArguments extends QuotableArguments {
   @Nullable
   ElixirNoParenthesesOneArgument getNoParenthesesOneArgument();
 
-  @NotNull
-  OtpErlangObject[] quoteArguments();
+  @NotNull OtpErlangObject[] quoteArguments();
 
 }

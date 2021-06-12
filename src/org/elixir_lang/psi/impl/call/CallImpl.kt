@@ -19,14 +19,14 @@ import org.elixir_lang.psi.call.arguments.star.Parentheses
 import org.elixir_lang.psi.call.name.Function.__MODULE__
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.call.name.Module.stripElixirPrefix
-import org.elixir_lang.psi.impl.ElixirPsiImplUtil
+import org.elixir_lang.psi.impl.*
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.*
-import org.elixir_lang.psi.impl.foldChildrenWhile
-import org.elixir_lang.psi.impl.keywordValue
-import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.operation.*
 import org.elixir_lang.psi.qualification.Qualified
 import org.elixir_lang.psi.qualification.Unqualified
+import org.elixir_lang.psi.scope.WhileIn.whileIn
+import org.elixir_lang.psi.scope.ancestorTypeSpec
+import org.elixir_lang.psi.scope.isTypeSpecPseudoFunction
 import org.elixir_lang.psi.stub.call.Stub
 import org.elixir_lang.reference.Callable
 import org.elixir_lang.reference.Callable.Companion.isBitStreamSegmentOption
@@ -37,32 +37,41 @@ import org.elixir_lang.psi.impl.macroChildCallList as psiElementToMacroChildCall
 fun Call.computeReference(): PsiReference? =
     /* if the call is just the identifier for a module attribute reference, then don't return a Callable reference,
            and instead let {@link #getReference(AtNonNumericOperation) handle it */
-    if (!(this is UnqualifiedNoArgumentsCall<*> && parent is AtNonNumericOperation) &&
+    if (!this.isModuleAttributeNameElement() &&
             // if a bitstring segment option then the option is a pseudo-function
-            !isBitStreamSegmentOption(this) && !this.isSlashInCaptureNameSlashArity()) {
+            !isBitStreamSegmentOption(this) &&
+            !this.isSlashInCaptureNameSlashArity() &&
+            !org.elixir_lang.ecto.Query.isAssoc(this)) {
         val parent = parent
 
         when {
             parent is Type -> {
-                val grandParent = parent.parent
+                parent.leftOperand()?.let { parentLeftOperand ->
+                    if (parentLeftOperand.isEquivalentTo(this)) {
+                        val grandParent = parent.parent
 
-                val maybeArgument = if (grandParent is When) {
-                    grandParent.parent
-                } else {
-                    grandParent
-                }
-
-                (maybeArgument as? ElixirNoParenthesesOneArgument)?.let { argument ->
-                    (argument.parent as? AtUnqualifiedNoParenthesesCall<*>)?.let { moduleAttribute ->
-                        val name = moduleAttributeName(moduleAttribute)
-
-                        if (name == "@spec") {
-                            org.elixir_lang.reference.CallDefinitionClause(this, moduleAttribute)
+                        val maybeArgument = if (grandParent is When) {
+                            grandParent.parent
                         } else {
-                            null
+                            grandParent
                         }
+
+                        (maybeArgument as? ElixirNoParenthesesOneArgument)?.let { argument ->
+                            (argument.parent as? AtUnqualifiedNoParenthesesCall<*>)?.let { moduleAttribute ->
+                                val name = moduleAttributeName(moduleAttribute)
+
+                                if (name == "@spec") {
+                                    org.elixir_lang.reference.CallDefinitionClause(this, moduleAttribute)
+                                } else {
+                                    null
+                                }
+                            }
+                        }
+                    } else {
+                        null
                     }
-                }  ?: computeCallableReference()
+                }
+                ?: computeCallableReference()
             }
             parent.isSlashInCaptureNameSlashArity() -> null
             else -> computeCallableReference()
@@ -106,11 +115,23 @@ private fun PsiElement.isSlashInCaptureNameSlashArity(): Boolean =
         }
 
 
-private fun Call.computeCallableReference(): PsiReference =
+private fun Call.computeCallableReference(): PsiReference? =
         if (Callable.isDefiner(this)) {
             Callable.definer(this)
+        } else if (isCalling(KERNEL, __MODULE__, 0)) {
+            org.elixir_lang.psi.__MODULE__.reference(this)
         } else {
-            Callable(this)
+            val ancestorTypeSpec = this.ancestorTypeSpec()
+
+            if (ancestorTypeSpec != null && !Unquote.`is`(this)) {
+                if (this.isTypeSpecPseudoFunction()) {
+                    null
+                } else {
+                    org.elixir_lang.reference.Type(ancestorTypeSpec, this)
+                }
+            } else {
+                Callable(this)
+            }
         }
 
 /**
@@ -299,21 +320,26 @@ fun Call.macroDefinitionClauseForArgument(): Call? {
     return macroDefinitionClause
 }
 
-fun Call.maybeModularNameToModular(useCall: Call?): Call? =
+fun Call.maybeModularNameToModulars(useCall: Call? = null): Set<Call> =
     if (isCalling(KERNEL, __MODULE__, 0)) {
         org.elixir_lang.psi.__MODULE__
                 .reference(__MODULE__Call = this, useCall = useCall)
-                .resolve()
-                ?.let { it as Call? }?.let { resolved ->
-                    if (org.elixir_lang.psi.stub.type.call.Stub.isModular(resolved)) {
-                        resolved
-                    } else {
-                        null
-                    }
-                }
+                .maybeModularNameToModulars(incompleteCode = false)
     } else {
-        null
+        emptySet()
     }
+
+fun Call.whileInStabBodyChildExpressions(forward: Boolean = true,
+                                         keepProcessing: (childExpression: PsiElement) -> Boolean): Boolean =
+    stabBodyChildExpressions(forward)
+            ?.let { whileIn(it, keepProcessing) }
+            ?: true
+
+fun Call.stabBodyChildExpressions(forward: Boolean = true): Sequence<PsiElement>? =
+        doBlock
+                ?.stab
+                ?.stabBody
+                ?.childExpressions(forward)
 
 object CallImpl {
     @Contract(pure = true)
@@ -687,12 +713,7 @@ object CallImpl {
            are no secondary. */
         if (call.secondaryArity() == null) {
             if (call.doBlock != null) {
-                if (primaryArity == null) {
-                    resolvedPrimaryArity = 1
-                } else {
-                    resolvedPrimaryArity!!
-                    resolvedPrimaryArity += 1
-                }
+                resolvedPrimaryArity = (resolvedPrimaryArity ?: 0) + 1
             }
 
             val parent = computeReadAction(Computable<PsiElement> { call.parent })
@@ -704,12 +725,7 @@ object CallImpl {
                 /* only the right operand has its arity increased because it is the operand that has the output of the
                    left operand prepended to its arguments */
                 if (pipedInto != null && call.isEquivalentTo(pipedInto)) {
-                    if (primaryArity == null) {
-                        resolvedPrimaryArity = 1
-                    } else {
-                        resolvedPrimaryArity!!
-                        resolvedPrimaryArity += 1
-                    }
+                    resolvedPrimaryArity = (resolvedPrimaryArity ?: 0) + 1
                 }
             }
         }

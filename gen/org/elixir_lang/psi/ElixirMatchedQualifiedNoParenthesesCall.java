@@ -28,34 +28,25 @@ public interface ElixirMatchedQualifiedNoParenthesesCall extends ElixirMatchedEx
   @NotNull
   ElixirRelativeIdentifier getRelativeIdentifier();
 
-  @Nullable
-  String canonicalName();
+  @Nullable String canonicalName();
 
-  @NotNull
-  Set<String> canonicalNameSet();
+  @NotNull Set<String> canonicalNameSet();
 
-  @Nullable
-  String functionName();
+  @Nullable String functionName();
 
-  @NotNull
-  PsiElement functionNameElement();
+  @NotNull PsiElement functionNameElement();
 
-  @Nullable
-  ElixirDoBlock getDoBlock();
+  @Nullable ElixirDoBlock getDoBlock();
 
   boolean hasDoBlockOrKeyword();
 
-  @Nullable
-  String getName();
+  @Nullable String getName();
 
-  @Nullable
-  PsiElement getNameIdentifier();
+  @Nullable PsiElement getNameIdentifier();
 
-  @NotNull
-  ItemPresentation getPresentation();
+  @NotNull ItemPresentation getPresentation();
 
-  @Nullable
-  PsiReference getReference();
+  @Nullable PsiReference getReference();
 
   //WARNING: getStub(...) is skipped
   //matching getStub(ElixirMatchedQualifiedNoParenthesesCall, ...)
@@ -73,44 +64,32 @@ public interface ElixirMatchedQualifiedNoParenthesesCall extends ElixirMatchedEx
 
   boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity);
 
-  @NotNull
-  String moduleName();
+  @NotNull String moduleName();
 
-  @NotNull
-  PsiElement[] primaryArguments();
+  @NotNull PsiElement[] primaryArguments();
 
-  @Nullable
-  Integer primaryArity();
+  @Nullable Integer primaryArity();
 
   boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place);
 
-  @NotNull
-  PsiElement qualifier();
+  @NotNull PsiElement qualifier();
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
   int resolvedFinalArity();
 
-  @NotNull
-  IntRange resolvedFinalArityRange();
+  @NotNull IntRange resolvedFinalArityRange();
 
-  @NotNull
-  String resolvedModuleName();
+  @NotNull String resolvedModuleName();
 
-  @Nullable
-  Integer resolvedPrimaryArity();
+  @Nullable Integer resolvedPrimaryArity();
 
-  @Nullable
-  Integer resolvedSecondaryArity();
+  @Nullable Integer resolvedSecondaryArity();
 
-  @Nullable
-  PsiElement[] secondaryArguments();
+  @Nullable PsiElement[] secondaryArguments();
 
-  @Nullable
-  Integer secondaryArity();
+  @Nullable Integer secondaryArity();
 
-  @NotNull
-  PsiElement setName(@NotNull String newName);
+  @NotNull PsiElement setName(@NotNull String newName);
 
 }

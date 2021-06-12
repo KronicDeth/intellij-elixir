@@ -24,26 +24,24 @@ public class ElixirIdentifierImpl extends ASTWrapperPsiElement implements Elixir
     visitor.visitIdentifier(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
   }
 
   @Override
-  @Nullable
-  public ItemPresentation getPresentation() {
+  public @Nullable ItemPresentation getPresentation() {
     return ElixirPsiImplUtil.getPresentation(this);
   }
 
   @Override
-  @Nullable
-  public PsiReference getReference() {
+  public @Nullable PsiReference getReference() {
     return ElixirPsiImplUtil.getReference(this);
   }
 
   @Override
-  @NotNull
-  public OtpErlangObject quote() {
+  public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }
 

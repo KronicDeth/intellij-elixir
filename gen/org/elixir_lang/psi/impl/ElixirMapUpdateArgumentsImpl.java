@@ -22,6 +22,7 @@ public class ElixirMapUpdateArgumentsImpl extends ASTWrapperPsiElement implement
     visitor.visitMapUpdateArguments(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
@@ -58,8 +59,7 @@ public class ElixirMapUpdateArgumentsImpl extends ASTWrapperPsiElement implement
   }
 
   @Override
-  @NotNull
-  public OtpErlangObject quote() {
+  public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }
 

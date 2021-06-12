@@ -26,10 +26,11 @@ class PsiScopeProcessor(val call: Call, val useCall: Call?) : PsiScopeProcessor 
             when {
                 QuoteMacro.`is`(call) -> {
                     useCall
-                            ?.let { Use.modular(it) }
+                            ?.let { Use.modulars(it) }
                             ?.run {
-                                PsiElementResolveResult(this)
-                                        .let { resolveResultList.add(it) }
+                                for (modular in this) {
+                                    resolveResultList.add(PsiElementResolveResult(modular))
+                                }
                             }
 
                     false

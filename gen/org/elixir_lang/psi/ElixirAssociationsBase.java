@@ -23,7 +23,6 @@ public interface ElixirAssociationsBase extends Quotable {
   @NotNull
   List<ElixirVariable> getVariableList();
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
 }

@@ -42,15 +42,10 @@ public class MultipleAliasTest extends BasePlatformTestCase {
         myFixture.configureByFiles("completion_inside_curlies.ex", "multiple_alias_aye.ex", "multiple_alias_bee.ex");
         myFixture.complete(CompletionType.BASIC, 1);
         List<String> strings = myFixture.getLookupElementStrings();
-        assertTrue(
-                strings.containsAll(
-                        Arrays.asList(
-                                "MultipleAliasAye",
-                                "MultipleAliasBee"
-                        )
-                )
-        );
+        assertNotNull(strings);
         assertEquals(2, strings.size());
+        assertEquals("MultipleAliasAye", strings.get(0));
+        assertEquals("MultipleAliasBee", strings.get(1));
     }
 
     public void testReference() {

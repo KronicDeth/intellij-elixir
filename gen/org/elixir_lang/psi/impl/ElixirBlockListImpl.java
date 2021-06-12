@@ -22,6 +22,7 @@ public class ElixirBlockListImpl extends ASTWrapperPsiElement implements ElixirB
     visitor.visitBlockList(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
@@ -34,8 +35,7 @@ public class ElixirBlockListImpl extends ASTWrapperPsiElement implements ElixirB
   }
 
   @Override
-  @NotNull
-  public OtpErlangObject[] quoteArguments() {
+  public @NotNull OtpErlangObject[] quoteArguments() {
     return ElixirPsiImplUtil.quoteArguments(this);
   }
 

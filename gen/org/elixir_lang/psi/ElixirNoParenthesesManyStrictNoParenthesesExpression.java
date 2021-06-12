@@ -11,7 +11,6 @@ public interface ElixirNoParenthesesManyStrictNoParenthesesExpression extends Qu
   @NotNull
   ElixirUnqualifiedNoParenthesesManyArgumentsCall getUnqualifiedNoParenthesesManyArgumentsCall();
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
 }

@@ -13,10 +13,8 @@ public interface ElixirHexadecimalDigits extends Digits {
 
   boolean inBase();
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
-  @NotNull
-  IElementType validElementType();
+  @NotNull IElementType validElementType();
 
 }

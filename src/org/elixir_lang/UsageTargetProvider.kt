@@ -25,15 +25,10 @@ class UsageTargetProvider : com.intellij.usages.UsageTargetProvider {
 
     override fun getTargets(psiElement: PsiElement): Array<UsageTarget>? =
         when (psiElement) {
-            is AtNonNumericOperation, is Call, is ModuleImpl<*> ->
+            is AtNonNumericOperation, is Call, is ModuleImpl<*>, is QualifiableAlias ->
                 PsiElement2UsageTargetAdapter(psiElement).let { arrayOf<UsageTarget>(it) }
-            is QualifiableAlias ->
-                getTargets(psiElement)
             else ->
                 null
         }
-
-    private fun getTargets(qualifiableAlias: QualifiableAlias): Array<UsageTarget> =
-        qualifiableAlias.outerMostQualifiableAlias().let { PsiElement2UsageTargetAdapter(it) }.let { arrayOf(it) }
 }
 

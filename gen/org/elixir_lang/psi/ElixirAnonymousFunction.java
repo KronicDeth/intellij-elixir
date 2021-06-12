@@ -15,7 +15,6 @@ public interface ElixirAnonymousFunction extends NavigatablePsiElement, Quotable
   @NotNull
   ElixirStab getStab();
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
 }

@@ -22,14 +22,11 @@ public interface ElixirMatchedNotInOperation extends ElixirMatchedExpression, Ca
   @NotNull
   ElixirNotInfixOperator getNotInfixOperator();
 
-  @Nullable
-  String functionName();
+  @Nullable String functionName();
 
-  @Nullable
-  PsiElement functionNameElement();
+  @Nullable PsiElement functionNameElement();
 
-  @Nullable
-  ElixirDoBlock getDoBlock();
+  @Nullable ElixirDoBlock getDoBlock();
 
   //WARNING: getName(...) is skipped
   //matching getName(ElixirMatchedNotInOperation, ...)
@@ -49,51 +46,38 @@ public interface ElixirMatchedNotInOperation extends ElixirMatchedExpression, Ca
 
   boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity);
 
-  @Nullable
-  Quotable leftOperand();
+  @Nullable Quotable leftOperand();
 
-  @Nullable
-  String moduleName();
+  @Nullable String moduleName();
 
   //WARNING: operator(...) is skipped
   //matching operator(ElixirMatchedNotInOperation, ...)
   //methods are not found in ElixirPsiImplUtil
 
-  @NotNull
-  PsiElement[] primaryArguments();
+  @NotNull PsiElement[] primaryArguments();
 
-  @Nullable
-  Integer primaryArity();
+  @Nullable Integer primaryArity();
 
   boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place);
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
   int resolvedFinalArity();
 
-  @NotNull
-  IntRange resolvedFinalArityRange();
+  @NotNull IntRange resolvedFinalArityRange();
 
-  @NotNull
-  String resolvedModuleName();
+  @NotNull String resolvedModuleName();
 
-  @Nullable
-  Integer resolvedPrimaryArity();
+  @Nullable Integer resolvedPrimaryArity();
 
-  @Nullable
-  Integer resolvedSecondaryArity();
+  @Nullable Integer resolvedSecondaryArity();
 
-  @Nullable
-  Quotable rightOperand();
+  @Nullable Quotable rightOperand();
 
-  @Nullable
-  PsiElement[] secondaryArguments();
+  @Nullable PsiElement[] secondaryArguments();
 
-  @Nullable
-  Integer secondaryArity();
+  @Nullable Integer secondaryArity();
 
-  @NotNull
-  PsiElement setName(@NotNull String newName);
+  @NotNull PsiElement setName(@NotNull String newName);
 
 }

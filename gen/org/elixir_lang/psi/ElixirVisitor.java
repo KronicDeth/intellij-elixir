@@ -466,8 +466,8 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitLiteralSigilLine(@NotNull ElixirLiteralSigilLine o) {
-    visitLiteralSigilLine(o);
-    // visitSigilFragmented(o);
+    visitLiteralSigilLineBody(o.getLiteralSigilLineBody());
+    visitSigilModifiers(o.getSigilModifiers());
   }
 
   public void visitLiteralSigilLineBody(@NotNull ElixirLiteralSigilLineBody o) {
@@ -561,8 +561,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitMatchedAtNonNumericOperation(@NotNull ElixirMatchedAtNonNumericOperation o) {
-    visitMatchedExpression(o);
-    // visitAtNonNumericOperation(o);
+     visitAtNonNumericOperation(o);
   }
 
   public void visitMatchedAtNumericBracketOperation(@NotNull ElixirMatchedAtNumericBracketOperation o) {
@@ -571,8 +570,11 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitMatchedAtOperation(@NotNull ElixirMatchedAtOperation o) {
-    visitMatchedExpression(o);
-    // visitAtNonNumericOperation(o);
+     visitAtNonNumericOperation(o);
+  }
+
+  public void visitAtNonNumericOperation(@NotNull AtNonNumericOperation o) {
+    visitElement(o);
   }
 
   public void visitMatchedAtUnqualifiedBracketOperation(@NotNull ElixirMatchedAtUnqualifiedBracketOperation o) {
@@ -955,8 +957,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitUnmatchedAtNonNumericOperation(@NotNull ElixirUnmatchedAtNonNumericOperation o) {
-    visitUnmatchedExpression(o);
-    // visitAtNonNumericOperation(o);
+     visitAtNonNumericOperation(o);
   }
 
   public void visitUnmatchedAtNumericBracketOperation(@NotNull ElixirUnmatchedAtNumericBracketOperation o) {
@@ -965,8 +966,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitUnmatchedAtOperation(@NotNull ElixirUnmatchedAtOperation o) {
-    visitUnmatchedExpression(o);
-    // visitAtNonNumericOperation(o);
+     visitAtNonNumericOperation(o);
   }
 
   public void visitUnmatchedAtUnqualifiedBracketOperation(@NotNull ElixirUnmatchedAtUnqualifiedBracketOperation o) {
@@ -1160,6 +1160,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitOperator(o);
   }
 
+  public void visitNavigatablePsiElement(@NotNull NavigatablePsiElement o) {
+    visitElement(o);
+  }
+
   public void visitArguments(@NotNull Arguments o) {
     visitElement(o);
   }
@@ -1204,15 +1208,7 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitElement(o);
   }
 
-  public void visitNamed(@NotNull Named o) {
-    visitElement(o);
-  }
-
   public void visitNamedElement(@NotNull NamedElement o) {
-    visitElement(o);
-  }
-
-  public void visitNavigatablePsiElement(@NotNull NavigatablePsiElement o) {
     visitElement(o);
   }
 
@@ -1257,6 +1253,10 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitWordsFragmented(@NotNull WordsFragmented o) {
+    visitElement(o);
+  }
+
+  public void visitNamed(@NotNull Named o) {
     visitElement(o);
   }
 

@@ -22,6 +22,7 @@ public class ElixirKeywordPairImpl extends ASTWrapperPsiElement implements Elixi
     visitor.visitKeywordPair(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
@@ -46,14 +47,12 @@ public class ElixirKeywordPairImpl extends ASTWrapperPsiElement implements Elixi
   }
 
   @Override
-  @NotNull
-  public Quotable getKeywordValue() {
+  public @NotNull Quotable getKeywordValue() {
     return ElixirPsiImplUtil.getKeywordValue(this);
   }
 
   @Override
-  @NotNull
-  public OtpErlangObject quote() {
+  public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }
 

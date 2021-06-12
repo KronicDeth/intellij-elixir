@@ -20,10 +20,8 @@ public interface ElixirUnmatchedQualifiedBracketOperation extends ElixirUnmatche
   @NotNull
   ElixirUnmatchedExpression getUnmatchedExpression();
 
-  @NotNull
-  PsiElement qualifier();
+  @NotNull PsiElement qualifier();
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
 }

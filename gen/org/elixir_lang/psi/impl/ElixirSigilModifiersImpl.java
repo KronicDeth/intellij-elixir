@@ -22,14 +22,14 @@ public class ElixirSigilModifiersImpl extends ASTWrapperPsiElement implements El
     visitor.visitSigilModifiers(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
   }
 
   @Override
-  @NotNull
-  public OtpErlangObject quote() {
+  public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }
 

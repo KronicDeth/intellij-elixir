@@ -23,7 +23,6 @@ public interface ElixirMapUpdateArguments extends Quotable {
   @NotNull
   ElixirPipeInfixOperator getPipeInfixOperator();
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
 }

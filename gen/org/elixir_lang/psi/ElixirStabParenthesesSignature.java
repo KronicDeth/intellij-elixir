@@ -28,16 +28,12 @@ public interface ElixirStabParenthesesSignature extends Quotable, When {
   //matching getNameIdentifier(ElixirStabParenthesesSignature, ...)
   //methods are not found in ElixirPsiImplUtil
 
-  @Nullable
-  Quotable leftOperand();
+  @Nullable Quotable leftOperand();
 
-  @NotNull
-  Operator operator();
+  @NotNull Operator operator();
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
-  @Nullable
-  Quotable rightOperand();
+  @Nullable Quotable rightOperand();
 
 }

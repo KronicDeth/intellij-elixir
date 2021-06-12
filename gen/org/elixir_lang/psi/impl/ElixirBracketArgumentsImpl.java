@@ -22,6 +22,7 @@ public class ElixirBracketArgumentsImpl extends ASTWrapperPsiElement implements 
     visitor.visitBracketArguments(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
@@ -46,8 +47,7 @@ public class ElixirBracketArgumentsImpl extends ASTWrapperPsiElement implements 
   }
 
   @Override
-  @NotNull
-  public OtpErlangObject quote() {
+  public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }
 

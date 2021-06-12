@@ -17,10 +17,8 @@ public interface ElixirMapConstructionArguments extends QuotableArguments {
   @Nullable
   ElixirKeywords getKeywords();
 
-  @NotNull
-  PsiElement[] arguments();
+  @NotNull PsiElement[] arguments();
 
-  @NotNull
-  OtpErlangObject[] quoteArguments();
+  @NotNull OtpErlangObject[] quoteArguments();
 
 }

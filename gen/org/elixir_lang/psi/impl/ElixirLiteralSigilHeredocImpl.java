@@ -24,6 +24,7 @@ public class ElixirLiteralSigilHeredocImpl extends ASTWrapperPsiElement implemen
     visitor.visitLiteralSigilHeredoc(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
@@ -48,27 +49,23 @@ public class ElixirLiteralSigilHeredocImpl extends ASTWrapperPsiElement implemen
   }
 
   @Override
-  @NotNull
-  public List<Integer> addEscapedCharacterCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode node) {
-    return ElixirPsiImplUtil.addEscapedCharacterCodePoints(this, codePointList, node);
+  public @NotNull List<Integer> addEscapedCharacterCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode child) {
+    return ElixirPsiImplUtil.addEscapedCharacterCodePoints(this, codePointList, child);
   }
 
   @Override
-  @NotNull
-  public List<Integer> addEscapedEOL(@Nullable List<Integer> maybeCodePointList, @NotNull ASTNode node) {
-    return ElixirPsiImplUtil.addEscapedEOL(this, maybeCodePointList, node);
+  public @NotNull List<Integer> addEscapedEOL(@Nullable List<Integer> maybeCodePointList, @NotNull ASTNode child) {
+    return ElixirPsiImplUtil.addEscapedEOL(this, maybeCodePointList, child);
   }
 
   @Override
-  @NotNull
-  public List<Integer> addFragmentCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode node) {
-    return ElixirPsiImplUtil.addFragmentCodePoints(this, codePointList, node);
+  public @NotNull List<Integer> addFragmentCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode child) {
+    return ElixirPsiImplUtil.addFragmentCodePoints(this, codePointList, child);
   }
 
   @Override
-  @NotNull
-  public List<Integer> addHexadecimalEscapeSequenceCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode node) {
-    return ElixirPsiImplUtil.addHexadecimalEscapeSequenceCodePoints(this, codePointList, node);
+  public @NotNull List<Integer> addHexadecimalEscapeSequenceCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode child) {
+    return ElixirPsiImplUtil.addHexadecimalEscapeSequenceCodePoints(this, codePointList, child);
   }
 
   @Override
@@ -77,56 +74,47 @@ public class ElixirLiteralSigilHeredocImpl extends ASTWrapperPsiElement implemen
   }
 
   @Override
-  @NotNull
-  public List<HeredocLine> getHeredocLineList() {
+  public @NotNull List<HeredocLine> getHeredocLineList() {
     return ElixirPsiImplUtil.getHeredocLineList(this);
   }
 
   @Override
-  @NotNull
-  public Integer indentation() {
+  public @NotNull Integer indentation() {
     return ElixirPsiImplUtil.indentation(this);
   }
 
   @Override
-  @NotNull
-  public OtpErlangObject quote() {
+  public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }
 
   @Override
-  @NotNull
-  public OtpErlangObject quote(@NotNull OtpErlangObject quotedContent) {
+  public @NotNull OtpErlangObject quote(@NotNull OtpErlangObject quotedContent) {
     return ElixirPsiImplUtil.quote(this, quotedContent);
   }
 
   @Override
-  @NotNull
-  public OtpErlangObject quoteBinary(OtpErlangList metadata, List<OtpErlangObject> argumentList) {
+  public @NotNull OtpErlangObject quoteBinary(OtpErlangList metadata, List<OtpErlangObject> argumentList) {
     return ElixirPsiImplUtil.quoteBinary(this, metadata, argumentList);
   }
 
   @Override
-  @NotNull
-  public OtpErlangObject quoteEmpty() {
+  public @NotNull OtpErlangObject quoteEmpty() {
     return ElixirPsiImplUtil.quoteEmpty(this);
   }
 
   @Override
-  @NotNull
-  public OtpErlangObject quoteInterpolation(ElixirInterpolation interpolation) {
+  public @NotNull OtpErlangObject quoteInterpolation(ElixirInterpolation interpolation) {
     return ElixirPsiImplUtil.quoteInterpolation(this, interpolation);
   }
 
   @Override
-  @NotNull
-  public OtpErlangObject quoteLiteral(List<Integer> codePointList) {
+  public @NotNull OtpErlangObject quoteLiteral(List<Integer> codePointList) {
     return ElixirPsiImplUtil.quoteLiteral(this, codePointList);
   }
 
   @Override
-  @NotNull
-  public String sigilDelimiter() {
+  public @NotNull String sigilDelimiter() {
     return ElixirPsiImplUtil.sigilDelimiter(this);
   }
 

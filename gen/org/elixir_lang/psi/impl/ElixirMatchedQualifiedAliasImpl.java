@@ -21,10 +21,12 @@ public class ElixirMatchedQualifiedAliasImpl extends ElixirMatchedExpressionImpl
     super(node);
   }
 
+  @Override
   public void accept(@NotNull ElixirVisitor visitor) {
     visitor.visitMatchedQualifiedAlias(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
@@ -49,32 +51,27 @@ public class ElixirMatchedQualifiedAliasImpl extends ElixirMatchedExpressionImpl
   }
 
   @Override
-  @Nullable
-  public String fullyQualifiedName() {
+  public @Nullable String fullyQualifiedName() {
     return ElixirPsiImplUtil.fullyQualifiedName(this);
   }
 
   @Override
-  @NotNull
-  public String getName() {
+  public @NotNull String getName() {
     return ElixirPsiImplUtil.getName((QualifiedAlias) this);
   }
 
   @Override
-  @Nullable
-  public PsiElement getNameIdentifier() {
+  public @Nullable PsiElement getNameIdentifier() {
     return ElixirPsiImplUtil.getNameIdentifier(this);
   }
 
   @Override
-  @Nullable
-  public ItemPresentation getPresentation() {
+  public @Nullable ItemPresentation getPresentation() {
     return ElixirPsiImplUtil.getPresentation(this);
   }
 
   @Override
-  @Nullable
-  public PsiPolyVariantReference getReference() {
+  public @Nullable PsiPolyVariantReference getReference() {
     return ElixirPsiImplUtil.getReference(this);
   }
 
@@ -89,14 +86,12 @@ public class ElixirMatchedQualifiedAliasImpl extends ElixirMatchedExpressionImpl
   }
 
   @Override
-  @NotNull
-  public OtpErlangObject quote() {
+  public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }
 
   @Override
-  @NotNull
-  public PsiElement setName(@NotNull String newName) {
+  public @NotNull PsiElement setName(@NotNull String newName) {
     return ElixirPsiImplUtil.setName(this, newName);
   }
 

@@ -15,19 +15,14 @@ public interface ElixirMatchedAtNonNumericOperation extends ElixirMatchedExpress
   @Nullable
   ElixirMatchedExpression getMatchedExpression();
 
-  @Nullable
-  PsiReference getReference();
+  @Nullable PsiReference getReference();
 
-  @NotNull
-  String moduleAttributeName();
+  @NotNull String moduleAttributeName();
 
-  @Nullable
-  Quotable operand();
+  @Nullable Quotable operand();
 
-  @NotNull
-  Operator operator();
+  @NotNull Operator operator();
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
 }

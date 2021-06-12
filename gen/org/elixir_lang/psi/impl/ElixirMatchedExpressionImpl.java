@@ -21,6 +21,7 @@ public abstract class ElixirMatchedExpressionImpl extends ASTWrapperPsiElement i
     visitor.visitMatchedExpression(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);

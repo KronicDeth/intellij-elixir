@@ -81,16 +81,6 @@ public abstract class ModuleElementImpl extends PsiElementBase implements PsiCom
         return text;
     }
 
-    /**
-     * Returns the AST node corresponding to the element.
-     *
-     * @return the AST node instance.
-     */
-    @Override
-    public ASTNode getNode() {
-        return null;
-    }
-
     public abstract void appendMirrorText(@NotNull StringBuilder buffer, int indentLevel);
 
     /**

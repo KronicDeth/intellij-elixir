@@ -4,17 +4,16 @@ import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import com.intellij.psi.scope.PsiScopeProcessor
-import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.util.isAncestor
+import org.elixir_lang.EEx
 import org.elixir_lang.errorreport.Logger
-import org.elixir_lang.psi.ElixirFile
-import org.elixir_lang.psi.Import
-import org.elixir_lang.psi.Modular
-import org.elixir_lang.psi.Use
+import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.call.name.Module.KERNEL_SPECIAL_FORMS
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.call.macroChildCalls
+import org.elixir_lang.structure_view.element.Delegation
 import org.elixir_lang.structure_view.element.modular.Module
 
 abstract class CallDefinitionClause : PsiScopeProcessor {
@@ -30,7 +29,7 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
     override fun execute(element: PsiElement, state: ResolveState): Boolean =
             when (element) {
                 is Call -> execute(element, state)
-                is ElixirFile -> implicitImports(element, state)
+                is ElixirFile -> execute(element, state)
                 else -> true
             }
 
@@ -50,6 +49,21 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
     protected abstract fun executeOnCallDefinitionClause(element: Call, state: ResolveState): Boolean
 
     /**
+     * Called on every [Call] where [org.elixir_lang.structure_view.element.Delegation.is] is `true` when checking tree
+     * with [.execute]].
+     *
+     * @return `true` to keep searching up tree; `false` to stop searching.
+     */
+    protected abstract fun executeOnDelegation(element: Call, state: ResolveState): Boolean
+
+    /**
+     * Called on every [Call] where [org.elixir_lang.EEx.isFunctionFrom] is `true`.
+     *
+     * @return `true` to keep searching up tree; `false` to stop searching.
+     */
+    protected abstract fun executeOnEExFunctionFrom(element: Call, state: ResolveState): Boolean
+
+    /**
      * Whether to continue searching after each Module's children have been searched.
      *
      * @return `true` to keep searching up the PSI tree; `false` to stop searching.
@@ -61,51 +75,87 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
      */
 
     private fun execute(element: Call, state: ResolveState): Boolean =
-            if (org.elixir_lang.psi.CallDefinitionClause.`is`(element)) {
-                executeOnCallDefinitionClause(element, state)
-            } else if (Import.`is`(element)) {
-                val importState = state.put(IMPORT_CALL, element).putVisitedElement(element)
+            when {
+                org.elixir_lang.psi.CallDefinitionClause.`is`(element) -> executeOnCallDefinitionClause(element, state)
+                Delegation.`is`(element) -> executeOnDelegation(element, state)
+                For.`is`(element) -> For.treeWalkDown(element, state, ::execute)
+                Import.`is`(element) -> {
+                    val importState = state.put(IMPORT_CALL, element).putVisitedElement(element)
 
-                try {
-                    Import.callDefinitionClauseCallWhile(element, importState) { callDefinitionClause, accResolveState ->
-                        executeOnCallDefinitionClause(callDefinitionClause, accResolveState)
+                    try {
+                        Import.callDefinitionClauseCallWhile(element, importState) { callDefinitionClause, accResolveState ->
+                            executeOnCallDefinitionClause(callDefinitionClause, accResolveState)
+                        }
+                    } catch (stackOverflowError: StackOverflowError) {
+                        Logger.error(
+                                CallDefinitionClause::class.java,
+                                "StackOverflowError while processing import",
+                                element
+                        )
                     }
-                } catch (stackOverflowError: StackOverflowError) {
-                    Logger.error(
-                            CallDefinitionClause::class.java,
-                            "StackOverflowError while processing import",
-                            element
-                    )
+
+                    true
                 }
+                Module.`is`(element) && moduleContainsEntrance(element, state) -> {
+                    val childCalls = element.macroChildCalls()
 
-                true
-            } else if (Module.`is`(element) &&
-                    /* Only allow scanning back down in outer nested modules for siblings.  Prevents scanning in sibling
-                       nested modules in https://github.com/KronicDeth/intellij-elixir/issues/1270 */
-                    state.get(ENTRANCE)?.let { entrance -> PsiTreeUtil.isAncestor(element, entrance, false) } == true) {
-                val childCalls = element.macroChildCalls()
-
-                for (childCall in childCalls) {
-                    if (!execute(childCall, state)) {
-                        break
+                    for (childCall in childCalls) {
+                        execute(childCall, state)
                     }
+
+                    // Only check MultiResolve.keepProcessing at the end of a Module to all multiple arities
+                    keepProcessing() &&
+                            // the implicit `import Kernel` and `import Kernel.SpecialForms`
+                            implicitImports(element, state)
                 }
-
-                // Only check MultiResolve.keepProcessing at the end of a Module to all multiple arities
-                keepProcessing() &&
-                        // the implicit `import Kernel` and `import Kernel.SpecialForms`
-                        implicitImports(element, state)
-            } else if (Use.`is`(element)) {
-                val useState = state.put(USE_CALL, element).putVisitedElement(element)
-
-                Use.callDefinitionClauseCallWhile(element, useState) { callDefinitionClause, accResolveState ->
-                    executeOnCallDefinitionClause(callDefinitionClause, accResolveState)
+                QuoteMacro.`is`(element) -> if (!state.hasBeenVisited(element)) {
+                   QuoteMacro.treeWalkUp(element, state.putVisitedElement(element), ::execute)
+                } else {
+                    true
                 }
+                Use.`is`(element) -> {
+                    val useState = state.put(USE_CALL, element).putVisitedElement(element)
 
-                true
-            } else {
+                    Use.treeWalkUp(element, useState, ::execute)
+
+                    true
+                }
+                org.elixir_lang.ecto.Schema.`is`(element, state) -> {
+                    org.elixir_lang.ecto.Schema.treeWalkUp(element, state, ::execute)
+                }
+                // doesn't declare calls, but if this is the scope, then `Ecto.Query.API` is resolvable
+                org.elixir_lang.ecto.Query.isDeclaringMacro(element, state) -> {
+                    org.elixir_lang.ecto.Query.treeWalkUp(element, state, ::execute)
+                }
+                org.elixir_lang.ecto.query.API.`is`(element, state) -> {
+                    org.elixir_lang.ecto.query.API.treeWalkUp(element, state, ::execute)
+                }
+                EEx.isFunctionFrom(element, state) -> executeOnEExFunctionFrom(element, state)
+                else -> true
+            }
+
+    private fun execute(element: ElixirFile, state: ResolveState): Boolean =
+            if (element.viewFile() == null) {
+                implicitImports(element, state)
+            }
+            // if there is a view file then it will have implicit imports, not this template
+            else {
                 true
             }
+
+
+    private fun moduleContainsEntrance(call: Call, state: ResolveState): Boolean = state.get(ENTRANCE)?.let { entrance ->
+        val callFile = call.containingFile
+
+        if (callFile == entrance.containingFile) {
+            /* Only allow scanning back down in outer nested modules for siblings.  Prevents scanning in sibling
+               nested modules in https://github.com/KronicDeth/intellij-elixir/issues/1270 */
+            call.isAncestor(entrance, false)
+        } else {
+            // done by injection or viewFile
+            true
+        }
+    } ?: false
 
     private fun implicitImports(element: PsiElement, state: ResolveState): Boolean {
         val project = element.project
@@ -158,6 +208,7 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
     }
 
     companion object {
+        val DEFDELEGATE_CALL = Key<Call>("DEFDELEGATE_CALL")
         @JvmStatic
         val IMPORT_CALL = Key<Call>("IMPORT_CALL")
         @JvmStatic
@@ -166,23 +217,4 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
     }
 }
 
-private val VISITED_ELEMENT_SET = Key<Set<PsiElement>>("VISITED_ELEMENTS")
-
-fun ResolveState.hasBeenVisited(element: PsiElement): Boolean {
-    return this.get(VISITED_ELEMENT_SET).contains(element)
-}
-
-fun ResolveState.putInitialVisitedElement(visitedElement: PsiElement): ResolveState {
-    assert(this.get(VISITED_ELEMENT_SET) == null) {
-        "VISITED_ELEMENT_SET already populated"
-    }
-
-    return this.put(VISITED_ELEMENT_SET, setOf(visitedElement))
-}
-
-fun ResolveState.putVisitedElement(visitedElement: PsiElement): ResolveState {
-    val visitedElementSet = this.get(VISITED_ELEMENT_SET)
-
-    return this.put(VISITED_ELEMENT_SET, visitedElementSet + setOf(visitedElement))
-}
 

@@ -4,6 +4,7 @@ import com.intellij.psi.ResolveState
 import org.elixir_lang.Arity
 import org.elixir_lang.ArityRange
 import org.elixir_lang.NameArityRange
+import org.elixir_lang.ecto.query.API.ECTO_QUERY_API
 import org.elixir_lang.psi.call.name.Module.KERNEL_SPECIAL_FORMS
 import org.elixir_lang.psi.scope.CallDefinitionClause.Companion.MODULAR_CANONICAL_NAME
 
@@ -58,24 +59,31 @@ internal class ArityInterval {
         private val ZERO = ArityInterval(0)
         private val ONE = ArityInterval(1)
         private val ONE_TWO = ArityInterval(1, 2)
-        private val KERNEL_SPECIAL_FORM_ARITY_INTERVAL_BY_NAME = mapOf(
-                "__aliases__" to ONE,
-                "__block__" to ONE,
-                "alias" to ONE_TWO,
-                "for" to ONE,
-                "import" to ONE_TWO,
-                "quote" to ONE_TWO,
-                "require" to ONE_TWO,
-                "super" to ZERO,
-                "with" to ONE
-        )
+        private val ARITY_INTERVAL_BY_NAME_BY_MODULAR_CANONICAL_NAME =
+                mapOf(
+                        ECTO_QUERY_API to mapOf(
+                                "fragment" to ZERO
+                        ),
+                        KERNEL_SPECIAL_FORMS to
+                                mapOf(
+                                        "__aliases__" to ONE,
+                                        "__block__" to ONE,
+                                        "alias" to ONE_TWO,
+                                        "for" to ONE,
+                                        "import" to ONE_TWO,
+                                        "quote" to ONE_TWO,
+                                        "require" to ONE_TWO,
+                                        "super" to ZERO,
+                                        "with" to ONE
+                                )
+                )
 
         @JvmStatic
         fun arityInterval(nameArityRange: NameArityRange, resolveState: ResolveState): ArityInterval =
-                if (resolveState.get(MODULAR_CANONICAL_NAME) == KERNEL_SPECIAL_FORMS) {
-                    KERNEL_SPECIAL_FORM_ARITY_INTERVAL_BY_NAME[nameArityRange.name]
-                } else {
-                    null
-                } ?: ArityInterval(nameArityRange.arityRange)
+                resolveState.get(MODULAR_CANONICAL_NAME)
+                        ?.let { modularCanonicalName ->
+                            ARITY_INTERVAL_BY_NAME_BY_MODULAR_CANONICAL_NAME[modularCanonicalName]!![nameArityRange.name]
+                        }
+                        ?: ArityInterval(nameArityRange.arityRange)
     }
 }

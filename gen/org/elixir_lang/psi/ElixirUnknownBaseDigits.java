@@ -13,10 +13,8 @@ public interface ElixirUnknownBaseDigits extends Digits {
 
   boolean inBase();
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
-  @Nullable
-  IElementType validElementType();
+  @Nullable IElementType validElementType();
 
 }

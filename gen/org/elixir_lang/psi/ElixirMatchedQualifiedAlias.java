@@ -21,29 +21,22 @@ public interface ElixirMatchedQualifiedAlias extends ElixirMatchedExpression, Na
   @NotNull
   ElixirMatchedExpression getMatchedExpression();
 
-  @Nullable
-  String fullyQualifiedName();
+  @Nullable String fullyQualifiedName();
 
-  @NotNull
-  String getName();
+  @NotNull String getName();
 
-  @Nullable
-  PsiElement getNameIdentifier();
+  @Nullable PsiElement getNameIdentifier();
 
-  @Nullable
-  ItemPresentation getPresentation();
+  @Nullable ItemPresentation getPresentation();
 
-  @Nullable
-  PsiPolyVariantReference getReference();
+  @Nullable PsiPolyVariantReference getReference();
 
   boolean isModuleName();
 
   boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place);
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
-  @NotNull
-  PsiElement setName(@NotNull String newName);
+  @NotNull PsiElement setName(@NotNull String newName);
 
 }

@@ -13,7 +13,7 @@ jobs:
         with:
           java-version: 11
       - name: Set up Elixir
-        uses: actions/setup-elixir@v1
+        uses: erlef/setup-beam@v1
         with:
           otp-version: 23.1
           elixir-version: 1.11.2

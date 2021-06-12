@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.elixir_lang.psi.impl.PsiElementImplKt.siblingExpression;
+import static org.elixir_lang.psi.impl.PsiElementImplKt.stripAccessExpression;
 
 public class ElixirPsiImplUtil {
     public static final String DEFAULT_OPERATOR = "\\\\";
@@ -564,6 +565,14 @@ public class ElixirPsiImplUtil {
         return ProcessDeclarationsImpl.processDeclarations(and, processor, state, lastParent, place);
     }
 
+    public static boolean processDeclarations(@NotNull final ElixirUnmatchedAtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall,
+                                              @NotNull PsiScopeProcessor processor,
+                                              @NotNull ResolveState state,
+                                              PsiElement lastParent,
+                                              @NotNull PsiElement place) {
+        return ProcessDeclarationsImpl.processDeclarations(atUnqualifiedNoParenthesesCall, processor, state, lastParent, place);
+    }
+
     public static boolean processDeclarations(@NotNull final Call call,
                                               @NotNull PsiScopeProcessor processor,
                                               @NotNull ResolveState state,
@@ -588,6 +597,22 @@ public class ElixirPsiImplUtil {
         return ProcessDeclarationsImpl.processDeclarations(multipleAliases, processor, state, lastParent, entrance);
     }
 
+    public static boolean processDeclarations(@NotNull final ElixirEex scope,
+                                              @NotNull PsiScopeProcessor processor,
+                                              @NotNull ResolveState state,
+                                              PsiElement lastParent,
+                                              @NotNull PsiElement place) {
+        return ProcessDeclarationsImpl.processDeclarations(scope, processor, state, lastParent, place);
+    }
+
+    public static boolean processDeclarations(@NotNull final ElixirEexTag scope,
+                                              @NotNull PsiScopeProcessor processor,
+                                              @NotNull ResolveState state,
+                                              PsiElement lastParent,
+                                              @NotNull PsiElement place) {
+        return ProcessDeclarationsImpl.processDeclarations(scope, processor, state, lastParent, place);
+    }
+
     public static boolean processDeclarations(@NotNull final ElixirStabBody scope,
                                               @NotNull PsiScopeProcessor processor,
                                               @NotNull ResolveState state,
@@ -610,6 +635,14 @@ public class ElixirPsiImplUtil {
                                               PsiElement lastParent,
                                               @NotNull PsiElement place) {
         return ProcessDeclarationsImpl.processDeclarations(match, processor, state, lastParent, place);
+    }
+
+    public static boolean processDeclarations(@NotNull final Type type,
+                                              @NotNull PsiScopeProcessor processor,
+                                              @NotNull ResolveState state,
+                                              PsiElement lastParent,
+                                              @NotNull PsiElement place) {
+        return ProcessDeclarationsImpl.processDeclarations(type, processor, state, lastParent, place);
     }
 
     public static boolean processDeclarations(@NotNull final QualifiedAlias qualifiedAlias,
@@ -1086,6 +1119,12 @@ public class ElixirPsiImplUtil {
         return PresentationImpl.getPresentation(identifier);
     }
 
+    @Contract(pure = true)
+    @NotNull
+    public static ItemPresentation getPresentation(@NotNull final ElixirKeywordKey keywordKey) {
+        return PresentationImpl.getPresentation(keywordKey);
+    }
+
     @Nullable
     public static ItemPresentation getPresentation(@NotNull final QualifiableAlias qualifiableAlias) {
         return PresentationImpl.getPresentation(qualifiableAlias);
@@ -1094,6 +1133,12 @@ public class ElixirPsiImplUtil {
     @Nullable
     public static PsiReference getReference(@NotNull AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
         return AtUnqualifiedNoParenthesesCallImplKt.getReference(atUnqualifiedNoParenthesesCall);
+    }
+
+    @Nullable
+    public static PsiReference getReference(@NotNull DotCall dotCall) {
+        // DotCalls do not reference something, instead the expression before the `.` would have the reference.
+        return null;
     }
 
     @Nullable
@@ -1143,7 +1188,7 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static PsiElement qualifier(@NotNull final Qualified qualified) {
-        return qualified.getFirstChild();
+        return stripAccessExpression(qualified.getFirstChild());
     }
 
     public static List<QuotableKeywordPair> quotableKeywordPairList(ElixirKeywords keywords) {

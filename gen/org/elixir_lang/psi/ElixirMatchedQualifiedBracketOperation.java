@@ -20,10 +20,8 @@ public interface ElixirMatchedQualifiedBracketOperation extends ElixirMatchedExp
   @NotNull
   ElixirRelativeIdentifier getRelativeIdentifier();
 
-  @NotNull
-  PsiElement qualifier();
+  @NotNull PsiElement qualifier();
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
 }

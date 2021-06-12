@@ -21,6 +21,7 @@ public class ElixirInterpolatedCharListSigilLineBodyImpl extends ASTWrapperPsiEl
     visitor.visitInterpolatedCharListSigilLineBody(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);

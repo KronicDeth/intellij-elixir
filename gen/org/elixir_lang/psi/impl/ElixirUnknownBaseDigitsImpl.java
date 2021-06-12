@@ -23,6 +23,7 @@ public class ElixirUnknownBaseDigitsImpl extends ASTWrapperPsiElement implements
     visitor.visitUnknownBaseDigits(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
@@ -39,14 +40,12 @@ public class ElixirUnknownBaseDigitsImpl extends ASTWrapperPsiElement implements
   }
 
   @Override
-  @NotNull
-  public OtpErlangObject quote() {
+  public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }
 
   @Override
-  @Nullable
-  public IElementType validElementType() {
+  public @Nullable IElementType validElementType() {
     return ElixirPsiImplUtil.validElementType(this);
   }
 

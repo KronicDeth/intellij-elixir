@@ -6,17 +6,20 @@ import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiWhiteSpace
+import com.intellij.psi.impl.source.tree.CompositeElement
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.util.siblings
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.ALIAS
 import org.elixir_lang.psi.call.name.Function.CREATE
 import org.elixir_lang.psi.call.name.Module.KERNEL
-import org.elixir_lang.psi.impl.call.maybeModularNameToModular
+import org.elixir_lang.psi.impl.call.maybeModularNameToModulars
 import org.elixir_lang.psi.operation.Match
 import org.elixir_lang.psi.operation.Pipe
+import org.elixir_lang.psi.scope.WhileIn.whileIn
 import org.jetbrains.annotations.Contract
 import java.util.*
 
@@ -162,34 +165,60 @@ fun PsiElement.macroChildCallList(): MutableList<Call> {
  * `maybeAlias` after it is resolved through any `alias`es or `use`.
  */
 @Contract(pure = true)
-fun PsiElement.maybeModularNameToModular(maxScope: PsiElement, useCall: Call?): Call? {
+fun PsiElement.maybeModularNameToModulars(maxScope: PsiElement, useCall: Call?, incompleteCode: Boolean): Set<Call> {
     val strippedMaybeModuleName = stripAccessExpression()
 
     return when (strippedMaybeModuleName) {
-        is ElixirAtom -> strippedMaybeModuleName.maybeModularNameToModular()
-        is QualifiableAlias -> strippedMaybeModuleName.maybeModularNameToModular(maxScope)
-        is Call -> strippedMaybeModuleName.maybeModularNameToModular(useCall)
-        else -> null
+        is ElixirAtom -> strippedMaybeModuleName.maybeModularNameToModulars(incompleteCode)
+        is QualifiableAlias -> strippedMaybeModuleName.maybeModularNameToModulars(maxScope)
+        is Call -> strippedMaybeModuleName.maybeModularNameToModulars(useCall)
+        else -> emptySet()
     }
 }
 
-fun PsiElement.moduleWithDependentsScope(): GlobalSearchScope {
-    val virtualFile = containingFile.virtualFile
-    val project = project
-    val module = ModuleUtilCore.findModuleForFile(
-            virtualFile,
-            project
-    )
-
-    // module can be null for scratch files
-    return if (module != null) {
-        GlobalSearchScope.moduleWithDependentsScope(module)
-    } else {
-        GlobalSearchScope.allScope(project)
-    }
-}
+fun PsiElement.moduleWithDependentsScope(): GlobalSearchScope =
+        containingFile
+                .virtualFile
+                ?.let { virtualFile ->
+                    ModuleUtilCore
+                            .findModuleForFile(virtualFile, project)
+                            // module can be null for scratch files
+                            ?.let { GlobalSearchScope.moduleWithDependentsScope(it) }
+                }
+                ?: GlobalSearchScope.allScope(project)
 
 fun PsiElement.prevSiblingSequence() = generateSequence(this) { it.prevSibling }
+
+fun PsiElement.whileInChildExpressions(forward: Boolean = true,
+                                       keepProcessing: (element: PsiElement) -> Boolean): Boolean =
+    childExpressions(forward)
+            .let { whileIn(it, keepProcessing) }
+
+fun <R> PsiElement.childExpressionsFoldWhile(
+        forward: Boolean,
+        initial: R,
+        folder: (element: PsiElement, accumulator: R
+        ) -> AccumulatorContinue<R>): AccumulatorContinue<R> =
+        AccumulatorContinue.childExpressionsFoldWhile(parent, forward, initial, folder)
+
+fun PsiElement.childExpressions(forward: Boolean = true): Sequence<PsiElement> {
+    val seed = if (forward) {
+        firstChild
+    } else {
+        lastChild
+    }
+
+    return seed.siblingExpressions(forward, withSelf = true)
+}
+
+fun PsiElement.siblingExpressions(forward: Boolean = true, withSelf: Boolean = true): Sequence<PsiElement> =
+        siblings(forward, withSelf).filter(PsiElement::isExpression)
+
+fun PsiElement.isExpression(): Boolean =
+        when (this) {
+            is ElixirEndOfExpression, is PsiComment, is PsiWhiteSpace -> false
+            else -> node is CompositeElement
+        }
 
 @Contract(pure = true)
 fun PsiElement.siblingExpression(function: (PsiElement) -> PsiElement): PsiElement? {

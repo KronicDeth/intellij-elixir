@@ -10,7 +10,8 @@ public class AllName extends StringStubIndexExtension<NamedElement> {
     // 4 - adds defp and defmacrop to decompiled beam files
     /* 5 - fix bug in Module.is (https://github.com/KronicDeth/intellij-elixir/issues/1301) that caused defmodule macro
            redefinition to count as actual module */
-    public static final int VERSION = 5;
+    // 6 - Remove non-canonical names from being index
+    public static final int VERSION = 6;
 
     @Override
     public int getVersion() {

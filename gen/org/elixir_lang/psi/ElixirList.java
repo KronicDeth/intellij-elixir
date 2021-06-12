@@ -17,7 +17,6 @@ public interface ElixirList extends Quotable {
   @NotNull
   List<ElixirUnmatchedExpression> getUnmatchedExpressionList();
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
 }

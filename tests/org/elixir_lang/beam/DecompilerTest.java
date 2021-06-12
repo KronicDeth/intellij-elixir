@@ -75,10 +75,12 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "      true\n" +
                         "\n" +
                         "  All functions in this module are inlined by the compiler.\n" +
+                        "\n" +
                         "  \"\"\"\n" +
                         "\n" +
                         "  # Macros\n" +
                         "\n" +
+                        "  @doc false\n" +
                         "  defmacro __using__(options) do\n" +
                         "    # body not decompiled\n" +
                         "  end\n" +
@@ -96,6 +98,8 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "\n" +
                         "      iex> 9 &&& 3\n" +
                         "      1\n" +
+                        "\n" +
+                        "\n" +
                         "  \"\"\"\n" +
                         "  def left &&& right do\n" +
                         "    # body not decompiled\n" +
@@ -121,6 +125,8 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "\n" +
                         "      iex> -1 <<< -2\n" +
                         "      -1\n" +
+                        "\n" +
+                        "\n" +
                         "  \"\"\"\n" +
                         "  def left <<< right do\n" +
                         "    # body not decompiled\n" +
@@ -146,6 +152,8 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "\n" +
                         "      iex> -1 >>> -2\n" +
                         "      -4\n" +
+                        "\n" +
+                        "\n" +
                         "  \"\"\"\n" +
                         "  def left >>> right do\n" +
                         "    # body not decompiled\n" +
@@ -162,6 +170,8 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "\n" +
                         "      iex> 9 ^^^ 3\n" +
                         "      10\n" +
+                        "\n" +
+                        "\n" +
                         "  \"\"\"\n" +
                         "  def left ^^^ right do\n" +
                         "    # body not decompiled\n" +
@@ -180,6 +190,8 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "\n" +
                         "      iex> band(9, 3)\n" +
                         "      1\n" +
+                        "\n" +
+                        "\n" +
                         "  \"\"\"\n" +
                         "  def band(left, right) do\n" +
                         "    # body not decompiled\n" +
@@ -197,6 +209,8 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "\n" +
                         "      iex> bnot(2) &&& 3\n" +
                         "      1\n" +
+                        "\n" +
+                        "\n" +
                         "  \"\"\"\n" +
                         "  def bnot(expr) do\n" +
                         "    # body not decompiled\n" +
@@ -211,6 +225,8 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "\n" +
                         "      iex> bor(9, 3)\n" +
                         "      11\n" +
+                        "\n" +
+                        "\n" +
                         "  \"\"\"\n" +
                         "  def bor(left, right) do\n" +
                         "    # body not decompiled\n" +
@@ -234,6 +250,8 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "\n" +
                         "      iex> bsl(-1, -2)\n" +
                         "      -1\n" +
+                        "\n" +
+                        "\n" +
                         "  \"\"\"\n" +
                         "  def bsl(left, right) do\n" +
                         "    # body not decompiled\n" +
@@ -257,6 +275,8 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "\n" +
                         "      iex> bsr(-1, -2)\n" +
                         "      -4\n" +
+                        "\n" +
+                        "\n" +
                         "  \"\"\"\n" +
                         "  def bsr(left, right) do\n" +
                         "    # body not decompiled\n" +
@@ -271,6 +291,8 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "\n" +
                         "      iex> bxor(9, 3)\n" +
                         "      10\n" +
+                        "\n" +
+                        "\n" +
                         "  \"\"\"\n" +
                         "  def bxor(left, right) do\n" +
                         "    # body not decompiled\n" +
@@ -295,6 +317,8 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "\n" +
                         "      iex> 9 ||| 3\n" +
                         "      11\n" +
+                        "\n" +
+                        "\n" +
                         "  \"\"\"\n" +
                         "  def left ||| right do\n" +
                         "    # body not decompiled\n" +
@@ -314,6 +338,8 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                         "\n" +
                         "      iex> ~~~2 &&& 3\n" +
                         "      1\n" +
+                        "\n" +
+                        "\n" +
                         "  \"\"\"\n" +
                         "  def ~~~expr do\n" +
                         "    # body not decompiled\n" +

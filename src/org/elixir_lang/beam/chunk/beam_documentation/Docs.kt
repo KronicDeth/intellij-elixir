@@ -1,86 +1,57 @@
 package org.elixir_lang.beam.chunk.beam_documentation
 
-import com.ericsson.otp.erlang.*
+import com.ericsson.otp.erlang.OtpErlangList
+import com.ericsson.otp.erlang.OtpErlangObject
+import com.intellij.openapi.diagnostic.Logger
+import org.elixir_lang.beam.MacroNameArity
+import org.elixir_lang.beam.chunk.beam_documentation.docs.Documented
+import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.Doc
+import java.util.*
 
-data class FunctionInfo(val kind: String,
-                        val name: String,
-                        val arity: Int,
-                        val signatures: List<String>,
-                        val docs: List<Doc>,
-                        val metadata: List<FunctionMetadata>)
+class Docs(private val documentedByArityByNameByKind: MutableMap<String, TreeMap<String, TreeMap<Int, Documented>>>) {
+    fun deprecated(macroNameArity: MacroNameArity): OtpErlangObject? = documented(macroNameArity)?.deprecated()
 
-data class FunctionMetadata(val name: String, val value: String?)
+    fun doc(macroNameArity: MacroNameArity): Doc? = documented(macroNameArity)?.doc
 
-data class Doc(val language: String,
-               val documentationText: String)
+    private fun documented(macroNameArity: MacroNameArity): Documented? =
+            kind(macroNameArity)?.let { kind ->
+                documented(kind, macroNameArity.name, macroNameArity.arity)
+            }
 
+    fun documented(kind: String, name: String, arity: Int): Documented? =
+            documentedByArityByNameByKind[kind]?.get(name)?.get(arity)
 
-class Docs(val docsList: OtpErlangList){
-    private val functionDocs: List<FunctionInfo> by lazy { getDocs() }
+    fun signatures(macroNameArity: MacroNameArity): List<String>? = documented(macroNameArity)?.signatures
+    fun typeDocumentedByArityByName(): Map<String, Map<Int, Documented>> =
+            documentedByArityByNameByKind["type"] ?: emptyMap()
 
-    fun docsForOrSimilar(functionName: String, arity: Int) : FunctionInfo? {
-        return functionDocs
-                .filter { it.name == functionName }
-                .maxBy { it.arity == arity }
-    }
+    companion object {
+        val logger = Logger.getInstance(Docs::class.java)
 
-    fun getSignatures(functionName: String, arity: Int) : List<String>{
-        return functionDocs
-                .filter { it.name == functionName }
-                .singleOrNull { it.arity == arity }
-                ?.signatures ?: listOf()
-    }
+        fun from(list: OtpErlangList): Docs {
+            val documentedByArityByNameByKind = mutableMapOf<String, TreeMap<String, TreeMap<Int, Documented>>>()
 
-    fun getFunctionDocs(name: String, arity: Int): List<Doc> {
-        return functionDocs
-                .filter { it.name == name }
-                .filter { it.arity == arity }
-                .flatMap { it.docs }
-    }
+            for (element in list) {
+                Documented.from(element)?.let { documented ->
+                    documentedByArityByNameByKind
+                            .computeIfAbsent(documented.kind) { TreeMap() }
+                            .computeIfAbsent(documented.name) { TreeMap() }
+                            .put(documented.arity, documented)
+                }
+            }
 
-    fun getFunctionDocsOrSimilar(name: String, arity: Int = 0): List<Doc> {
-        return functionDocs
-                .filter { it.name == name }
-                .sortedByDescending { it.arity == arity }
-                .flatMap { it.docs }
-    }
+            return Docs(documentedByArityByNameByKind)
+        }
 
-    fun getFunctionMetadataOrSimilar(name: String, arity: Int = 0): List<FunctionMetadata> {
-        return functionDocs
-                .filter { it.name == name }
-                .sortedByDescending { it.arity == arity }
-                .flatMap { it.metadata }
-    }
+        private fun kind(macroNameArity: MacroNameArity): String? =
+                when (val macro = macroNameArity.macro) {
+                    "def", "defp" -> "function"
+                    "defmacro", "defmacrop" -> "macro"
+                    else -> {
+                        logger.error("Don't know how to convert macro (${macro}) to kind")
 
-    private fun getDocs(): List<FunctionInfo> {
-        return docsList.elements()
-                .filterIsInstance<OtpErlangTuple>()
-                .map { element ->
-                    val firstTuple = element.elementAt(0) as OtpErlangTuple
-                    val kind = ((firstTuple).elementAt(0) as OtpErlangAtom).atomValue()
-                    val name = ((firstTuple).elementAt(1) as OtpErlangAtom).atomValue()
-                    val arity = ((firstTuple).elementAt(2) as OtpErlangLong).uIntValue()
-
-                    val signatures = (element.elementAt(2) as OtpErlangList)
-                            .filterIsInstance<OtpErlangBinary>()
-                            .map { String(it.binaryValue()) }
-                            .toList()
-                    val docs = (element.elementAt(3) as? OtpErlangMap)
-                            ?.entrySet()
-                            ?.map {
-                                Doc(it.key.getBinaryValueString(),
-                                        it.value.getBinaryValueString()) }
-                            ?.toList() ?: listOf()
-
-                    val metadata = (element.elementAt(4)) as OtpErlangMap
-                    val metadataList = metadata.entrySet().map { FunctionMetadata((it.key as OtpErlangAtom).atomValue(), ((it.value as? OtpErlangBinary)?.getBinaryValueString())) }
-
-                    return@map FunctionInfo(kind, name, arity, signatures, docs, metadataList)
+                        null
+                    }
                 }
     }
-
-    private fun OtpErlangObject.getBinaryValueString(): String {
-        return String((this as OtpErlangBinary).binaryValue())
-    }
-
 }

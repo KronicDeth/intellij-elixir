@@ -1,34 +1,28 @@
 package org.elixir_lang.psi.scope.module
 
 import com.intellij.openapi.project.DumbService
-import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiElementResolveResult
-import com.intellij.psi.PsiNamedElement
-import com.intellij.psi.ResolveState
+import com.intellij.psi.*
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.Module.concat
 import org.elixir_lang.Module.split
+import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.psi.NamedElement
 import org.elixir_lang.psi.call.Named
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.stripAccessExpression
+import org.elixir_lang.psi.putInitialVisitedElement
 import org.elixir_lang.psi.scope.Module
 import org.elixir_lang.psi.scope.ResolveResultOrderedSet
+import org.elixir_lang.psi.scope.maxScope
 import org.elixir_lang.psi.stub.index.AllName
+import org.elixir_lang.psi.stub.index.ModularName
 import org.elixir_lang.reference.module.UnaliasedName
 import java.util.*
 
 class MultiResolve internal constructor(private val name: String, private val incompleteCode: Boolean) : Module() {
-    override fun execute(match: PsiElement, state: ResolveState): Boolean =
-            if (match is Named) {
-                execute(match, state)
-            } else {
-                true
-            }
-
     /**
      * Decides whether `match` matches the criteria being searched for.  All other [.execute] methods
      * eventually end here.
@@ -44,9 +38,20 @@ class MultiResolve internal constructor(private val name: String, private val in
         if (aliasedName == targetName) {
             val namePartList = split(targetName)
 
-            // adds `Foo.SSH` in `alias Foo.SSH` or `FSSH` in `alias Foo.SSH, as: FSSH`
-            resolveResultOrderedSet.add(match, true)
+            val multipleAliasesQualifier = state.get(MULTIPLE_ALIASES_QUALIFIER)
+            val suffix = match.name
 
+            if (multipleAliasesQualifier == null) {
+                // adds `Foo.SSH` in `alias Foo.SSH` or `FSSH` in `alias Foo.SSH, as: FSSH`
+                resolveResultOrderedSet.add(match, "alias ${suffix}", true)
+            } else {
+                val prefix = multipleAliasesQualifier.name
+
+                // Adds `SSH` in `alias Foo.{SSH, ...}` or `alias Foo.{Bar.SSH, ...}`
+                resolveResultOrderedSet.add(match, "alias ${prefix}.{$suffix}", true)
+            }
+
+            // ALIAS_CALL is only set for `as:` usages
             val aliasCall = state.get(ALIAS_CALL)
 
             if (aliasCall == null) {
@@ -77,61 +82,79 @@ class MultiResolve internal constructor(private val name: String, private val in
 
             // alias Foo.SSH, then SSH.Key is name
             if (aliasedName == firstNamePart) {
-                resolveResultOrderedSet.add(match, true)
+                val multipleAliasesQualifier = state.get(MULTIPLE_ALIASES_QUALIFIER)
+                val suffix = match.name
+
+                if (multipleAliasesQualifier == null) {
+                    resolveResultOrderedSet.add(match, "${name} -> alias ${suffix}", true)
+                } else {
+                    // `alias Foo.{SSH, ...}` then `SSH.Key` is name
+                    val prefix = multipleAliasesQualifier.name
+
+                    resolveResultOrderedSet.add(match, "${name} -> alias ${prefix}.{$suffix}", true)
+                }
 
                 addUnaliasedNamedElementsToResolveResultList(match, namePartList)
             } else if (aliasedName.startsWith(name)) {
-                resolveResultOrderedSet.add(match, false)
+                resolveResultOrderedSet.add(match, "alias ${match.text}", false)
             }
         }
 
         return resolveResultOrderedSet.keepProcessing(incompleteCode)
     }
 
-    fun resolveResults(): Array<PsiElementResolveResult> = resolveResultOrderedSet.toTypedArray()
+    override fun executeOnModularName(modular: Named, modularName: String, state: ResolveState): Boolean {
+        if (modularName.startsWith(name)) {
+            val validResult = modularName == name
+            resolveResultOrderedSet.add(modular, modularName, validResult)
+        }
+
+        return resolveResultOrderedSet.keepProcessing(incompleteCode)
+    }
+
+    fun resolveResults(): Array<ResolveResult> = resolveResultOrderedSet.toTypedArray()
 
     private val resolveResultOrderedSet = ResolveResultOrderedSet()
 
     private fun addUnaliasedNamedElementsToResolveResultList(match: PsiNamedElement, namePartList: List<String>) {
-        unaliasedName(match, namePartList)
-                .let { indexedNamedElements(match, it) }
-                .map(PsiElement::getNavigationElement)
-                .forEach { resolveResultOrderedSet.add(it, true) }
+        val unaliasedName = unaliasedName(match, namePartList)
+
+        val project = match.project
+
+        if (!DumbService.isDumb(project)) {
+            StubIndex
+                    .getInstance()
+                    .processElements(
+                            ModularName.KEY,
+                            unaliasedName,
+                            project,
+                            GlobalSearchScope.allScope(project),
+                            NamedElement::class.java) {
+                resolveResultOrderedSet.add(it, unaliasedName, true)
+
+                true
+            }
+        }
     }
 
     companion object {
         fun resolveResults(name: String,
                            incompleteCode: Boolean,
-                           entrance: PsiElement): Array<PsiElementResolveResult> =
+                           entrance: PsiElement): Array<ResolveResult> =
                 resolveResults(name, incompleteCode, entrance, ResolveState.initial())
-
-        private fun indexedNamedElements(match: PsiNamedElement, unaliasedName: String): Collection<NamedElement> {
-            val project = match.project
-
-            return if (DumbService.isDumb(project)) {
-                emptyList()
-            } else {
-                StubIndex.getElements(
-                        AllName.KEY,
-                        unaliasedName,
-                        project,
-                        GlobalSearchScope.allScope(project),
-                        NamedElement::class.java
-                )
-            }
-        }
 
         private fun resolveResults(name: String,
                                    incompleteCode: Boolean,
                                    entrance: PsiElement,
-                                   state: ResolveState): Array<PsiElementResolveResult> {
+                                   state: ResolveState): Array<ResolveResult> {
             val multiResolve = MultiResolve(name, incompleteCode)
+            val maxScope = maxScope(entrance)
 
             PsiTreeUtil.treeWalkUp(
                     multiResolve,
                     entrance,
-                    entrance.containingFile,
-                    state.put(ENTRANCE, entrance)
+                    maxScope,
+                    state.put(ENTRANCE, entrance).putInitialVisitedElement(entrance)
             )
 
             return multiResolve.resolveResults()

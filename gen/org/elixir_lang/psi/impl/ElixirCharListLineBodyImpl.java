@@ -21,6 +21,7 @@ public class ElixirCharListLineBodyImpl extends ASTWrapperPsiElement implements 
     visitor.visitCharListLineBody(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);

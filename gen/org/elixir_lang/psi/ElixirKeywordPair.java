@@ -21,10 +21,8 @@ public interface ElixirKeywordPair extends QuotableKeywordPair {
   //matching getKeywordKey(ElixirKeywordPair, ...)
   //methods are not found in ElixirPsiImplUtil
 
-  @NotNull
-  Quotable getKeywordValue();
+  @NotNull Quotable getKeywordValue();
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
 }

@@ -11,7 +11,6 @@ public interface ElixirBlockList extends QuotableArguments {
   @NotNull
   List<ElixirBlockItem> getBlockItemList();
 
-  @NotNull
-  OtpErlangObject[] quoteArguments();
+  @NotNull OtpErlangObject[] quoteArguments();
 
 }

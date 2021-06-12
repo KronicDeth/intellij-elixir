@@ -22,6 +22,7 @@ public class ElixirInterpolatedWordsHeredocLineImpl extends ASTWrapperPsiElement
     visitor.visitInterpolatedWordsHeredocLine(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
@@ -51,8 +52,7 @@ public class ElixirInterpolatedWordsHeredocLineImpl extends ASTWrapperPsiElement
   }
 
   @Override
-  @NotNull
-  public OtpErlangObject quote(@NotNull Heredoc heredoc, int prefixLength) {
+  public @NotNull OtpErlangObject quote(@NotNull Heredoc heredoc, int prefixLength) {
     return ElixirPsiImplUtil.quote(this, heredoc, prefixLength);
   }
 

@@ -11,7 +11,6 @@ public interface ElixirStabNoParenthesesSignature extends Quotable {
   @NotNull
   ElixirNoParenthesesArguments getNoParenthesesArguments();
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
 }

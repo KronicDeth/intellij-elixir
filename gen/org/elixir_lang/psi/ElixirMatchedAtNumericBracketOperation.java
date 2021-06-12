@@ -35,7 +35,6 @@ public interface ElixirMatchedAtNumericBracketOperation extends ElixirMatchedExp
   @Nullable
   ElixirUnknownBaseWholeNumber getUnknownBaseWholeNumber();
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
 }

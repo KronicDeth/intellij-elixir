@@ -25,17 +25,20 @@ class Protocol(private val validResult: Boolean) : PsiScopeProcessor {
         if (org.elixir_lang.structure_view.element.modular.Implementation.`is`(call)) {
             val protocolNameElement = org.elixir_lang.structure_view.element.modular.Implementation.protocolNameElement(call)
             val element: PsiElement
+            val name: String
             val validResult: Boolean
 
             if (protocolNameElement != null) {
                 element = protocolNameElement
+                name = protocolNameElement.text
                 validResult = this.validResult
             } else {
                 element = call
+                name = "impl"
                 validResult = false
             }
 
-            resolveResultOrderedSet.add(element, validResult)
+            resolveResultOrderedSet.add(element, name, validResult)
 
             false
         } else {

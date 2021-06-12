@@ -3,79 +3,128 @@ package org.elixir_lang.reference.resolver
 import com.intellij.psi.PsiElementResolveResult
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.impl.source.resolve.ResolveCache
+import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.psi.stubs.StubIndex
 import org.elixir_lang.errorreport.Logger
-import org.elixir_lang.psi.AccumulatorContinue
-import org.elixir_lang.psi.Modular
+import org.elixir_lang.psi.CallDefinitionClause
+import org.elixir_lang.psi.CallDefinitionClause.nameArityRange
+import org.elixir_lang.psi.NamedElement
 import org.elixir_lang.psi.UnqualifiedNoArgumentsCall
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.qualification.Qualified
-import org.elixir_lang.psi.impl.call.qualification.qualifiedToModular
+import org.elixir_lang.psi.impl.call.qualification.qualifiedToModulars
+import org.elixir_lang.psi.stub.index.AllName
 
 object Callable : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Callable> {
     override fun resolve(callable: org.elixir_lang.reference.Callable, incompleteCode: Boolean): Array<ResolveResult> {
         val element = callable.element
 
-        return try {
-            if (element is org.elixir_lang.psi.call.qualification.Qualified) {
-                resolveElement(element)
+        return resolvePreferred(element, incompleteCode).toTypedArray()
+    }
+
+    private fun resolvePreferred(element: Call, incompleteCode: Boolean): List<ResolveResult> {
+        val all = resolveAll(element, incompleteCode)
+
+        return org.elixir_lang.reference.Resolver.preferred(element, incompleteCode, all)
+    }
+
+    private fun resolveAll(element: Call, incompleteCode: Boolean) =
+            /* DO NOT use `getName()` as it will return the NameIdentifier's text, which for `defmodule` is the Alias,
+               not `defmodule` */
+            element
+                    .functionName()
+                    ?.let { name -> resolve(element, name, incompleteCode) }
+                    ?: emptyList()
+
+    private fun resolve(element: Call, name: String, incompleteCode: Boolean) =
+        resolveInScope(element, name, incompleteCode)
+                .takeIf(Collection<ResolveResult>::isNotEmpty)
+                ?: nameArityInAnyModule(element, name, incompleteCode)
+
+    private fun resolveInScope(element: Call, name: String, incompleteCode: Boolean): List<ResolveResult> =
+        try {
+            if (element is Qualified) {
+                resolveQualified(element, name, incompleteCode)
             } else {
-                resolveElement(element, incompleteCode)
-            }.toTypedArray()
+                resolveUnqualified(element, name, incompleteCode)
+            }
         } catch (stackOverflowError: StackOverflowError) {
             Logger.error(Callable::class.java, "StackOverflowError when annotating Call", element)
 
-            emptyArray()
+            emptyList()
         }
-    }
 
-    private fun resolveElement(element: Call, incompleteCode: Boolean): List<ResolveResult> =
-        /* DO NOT use `getName()` as it will return the NameIdentifier's text, which for `defmodule` is the Alias, not
-          `defmodule` */
-        element.functionName()?.let { name ->
-            val resolvedFinalArity = element.resolvedFinalArity()
-            val resolveResultList = mutableListOf<ResolveResult>()
+    private fun resolveUnqualified(element: Call, name: String, incompleteCode: Boolean): List<ResolveResult> {
+        val resolvedPrimaryArity = element.resolvedPrimaryArity() ?: 0
+        val resolveResultList = mutableListOf<ResolveResult>()
 
-            // UnqualifiedNorArgumentsCall prevents `foo()` from being treated as a variable.
-            // resolvedFinalArity prevents `|> foo` from being counted as 0-arity
-            if (element is UnqualifiedNoArgumentsCall<*> && resolvedFinalArity == 0) {
-                val variableResolveList = org.elixir_lang.psi.scope.variable.MultiResolve.resolveResultList(
-                        name,
-                        incompleteCode,
-                        element
-                )
-
-                if (variableResolveList != null) {
-                    resolveResultList.addAll(variableResolveList)
-                }
-            }
-
-            val callDefinitionClauseResolveResultList = org.elixir_lang.psi.scope.call_definition_clause.MultiResolve.resolveResults(
+        // UnqualifiedNoArgumentsCall prevents `foo()` from being treated as a variable.
+        // resolvedFinalArity prevents `|> foo` from being counted as 0-arity
+        if (element is UnqualifiedNoArgumentsCall<*> && resolvedPrimaryArity == 0) {
+            val variableResolveList = org.elixir_lang.psi.scope.variable.MultiResolve.resolveResultList(
                     name,
-                    resolvedFinalArity,
                     incompleteCode,
                     element
             )
 
-            resolveResultList.addAll(callDefinitionClauseResolveResultList)
+            resolveResultList.addAll(variableResolveList)
+        }
 
-            resolveResultList
-        } ?:
-        emptyList()
+        val callDefinitionClauseResolveResultList = org.elixir_lang.psi.scope.call_definition_clause.MultiResolve.resolveResults(
+                name,
+                resolvedPrimaryArity,
+                incompleteCode,
+                element
+        )
 
-    private fun resolveElement(element: Qualified): List<ResolveResult> =
-        element.qualifiedToModular()?.let { modular ->
-            element.functionName()?.let { name ->
+        resolveResultList.addAll(callDefinitionClauseResolveResultList)
+
+        return resolveResultList
+    }
+
+    private fun resolveQualified(element: Qualified, name: String, incompleteCode: Boolean): List<ResolveResult> =
+            element.qualifiedToModulars().flatMap { modular ->
                 val resolvedFinalArity = element.resolvedFinalArity()
 
-                Modular.callDefinitionClauseCallFoldWhile(
-                        modular,
+                org.elixir_lang.psi.scope.call_definition_clause.MultiResolve.resolveResults(
                         name,
-                        mutableListOf<ResolveResult>()
-                ) { callDefinitionClauseCall, _, arityRange, acc ->
-                    acc.add(PsiElementResolveResult(callDefinitionClauseCall, arityRange.contains(resolvedFinalArity)))
-                    AccumulatorContinue(acc, true)
-                }.accumulator
+                        resolvedFinalArity,
+                        incompleteCode,
+                        modular
+                )
             }
-        } ?:
-        emptyList()
+
+    private fun nameArityInAnyModule(element: Call, name: String, incompleteCode: Boolean): List<ResolveResult> {
+        val project = element.project
+        val keys = mutableListOf<String>()
+        val stubIndex = StubIndex.getInstance()
+
+        stubIndex.processAllKeys(AllName.KEY, project) { key ->
+            if ((incompleteCode && key.startsWith(name)) || key == name) {
+                keys.add(key)
+            }
+
+            true
+        }
+
+        val scope = GlobalSearchScope.allScope(project)
+        val arity = element.resolvedFinalArity()
+        val resolveResults = mutableListOf<ResolveResult>()
+        // results are never valid because the qualifier is unknown
+        val validResult = false
+
+        for (key in keys) {
+            stubIndex
+                    .processElements(AllName.KEY, key, project, scope, NamedElement::class.java) { namedElement ->
+                if (namedElement is Call && CallDefinitionClause.`is`(namedElement) &&
+                        (incompleteCode || nameArityRange(namedElement)?.arityRange?.contains(arity) == true)) {
+                    resolveResults.add(PsiElementResolveResult(namedElement, validResult))
+                }
+
+                true
+            }
+        }
+
+        return resolveResults
+    }
 }

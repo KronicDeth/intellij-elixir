@@ -22,6 +22,7 @@ public class ElixirContainerAssociationOperationImpl extends ASTWrapperPsiElemen
     visitor.visitContainerAssociationOperation(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
@@ -40,8 +41,7 @@ public class ElixirContainerAssociationOperationImpl extends ASTWrapperPsiElemen
   }
 
   @Override
-  @NotNull
-  public OtpErlangObject quote() {
+  public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }
 

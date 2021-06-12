@@ -16,10 +16,8 @@ public interface ElixirAtom extends NavigatablePsiElement, Quotable {
   @Nullable
   ElixirStringLine getStringLine();
 
-  @Nullable
-  PsiReference getReference();
+  @Nullable PsiReference getReference();
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
 }

@@ -17,7 +17,6 @@ public interface ElixirDoBlock extends QuotableArguments {
   @Nullable
   ElixirStab getStab();
 
-  @NotNull
-  OtpErlangObject[] quoteArguments();
+  @NotNull OtpErlangObject[] quoteArguments();
 
 }

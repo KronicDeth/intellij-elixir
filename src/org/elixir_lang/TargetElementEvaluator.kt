@@ -1,47 +1,43 @@
 package org.elixir_lang
 
 import com.intellij.codeInsight.TargetElementEvaluatorEx2
-import com.intellij.openapi.editor.Editor
-import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiReference
-import org.elixir_lang.psi.CallDefinitionClause
-import org.elixir_lang.psi.QualifiedAlias
+import com.intellij.psi.*
+import org.elixir_lang.psi.AtNonNumericOperation
+import org.elixir_lang.psi.UnqualifiedNoArgumentsCall
 import org.elixir_lang.psi.call.Call
+import org.elixir_lang.psi.scope.ancestorTypeSpec
+import org.elixir_lang.psi.scope.hasMapFieldOptionalityName
+import org.elixir_lang.reference.Module
+import org.elixir_lang.reference.Resolver
 
 class TargetElementEvaluator : TargetElementEvaluatorEx2() {
-    override fun adjustTargetElement(editor: Editor?, offset: Int, flags: Int, targetElement: PsiElement): PsiElement? =
-            when (targetElement) {
-                /* to prevent Goto To Declaration becoming Find Usages as happens when there is only one element
-                   https://github.com/JetBrains/intellij-community/blob/5600f7c843e77b8b02fd41568ff1ea1b99e69d34/platform/lang-impl/src/com/intellij/codeInsight/navigation/actions/GotoDeclarationAction.java#L116-L119 */
-                is Call -> null
-                else -> super.adjustTargetElement(editor, offset, flags, targetElement)
-            }
-
-    override fun getElementByReference(reference: PsiReference, flags: Int): PsiElement? =
-        reference.resolve().let { resolved ->
-            /* DO NOT let references to definers resolve as targets as it causes the definer to be the target, which
-               then has a reference to the definer's macro */
-            if (resolved != null &&
-                    resolved is Call &&
-                    CallDefinitionClause.`is`(resolved)) {
-                reference.element
+    override fun isAcceptableNamedParent(parent: PsiElement): Boolean = when (parent) {
+        // Don't allow the identifier of a module attribute or assign usage be a named parent.
+        is UnqualifiedNoArgumentsCall<*> -> when (parent.parent) {
+            is AtNonNumericOperation -> false
+            else -> super.isAcceptableNamedParent(parent)
+        }
+        is Call -> {
+            if (parent.hasMapFieldOptionalityName() && parent.ancestorTypeSpec() != null) {
+                false
             } else {
-                resolved
+                super.isAcceptableNamedParent(parent)
             }
         }
+        else -> super.isAcceptableNamedParent(parent)
+    }
 
-    override fun getGotoDeclarationTarget(element: PsiElement, navElement: PsiElement?): PsiElement? =
-        when (element) {
-            is QualifiedAlias -> {
-                element
-                        .references
-                        .asSequence()
-                        .flatMap {
-                            it.resolve()?.let { sequenceOf(it) } ?:
-                            emptySequence()
-                        }
-                        .singleOrNull()
+    override fun getTargetCandidates(reference: PsiReference): MutableCollection<PsiElement>? =
+        when (reference) {
+            // Module references need to resolve to decompiled element in case a call is only defined in the decompiled
+            // code and not the source, but users prefer source for the actual Alias Go To Declaration.
+            is Module -> {
+                reference
+                        .multiResolve(false)
+                        .mapNotNull(ResolveResult::getElement)
+                        .let { Resolver.preferSource(it) }
+                        .toMutableList()
             }
-            else -> super.getGotoDeclarationTarget(element, navElement)
+            else -> super.getTargetCandidates(reference)
         }
 }

@@ -21,6 +21,7 @@ public class ElixirInterpolatedRegexLineBodyImpl extends ASTWrapperPsiElement im
     visitor.visitInterpolatedRegexLineBody(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);

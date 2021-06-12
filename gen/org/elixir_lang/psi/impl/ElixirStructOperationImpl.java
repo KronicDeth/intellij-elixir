@@ -22,6 +22,7 @@ public class ElixirStructOperationImpl extends ASTWrapperPsiElement implements E
     visitor.visitStructOperation(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
@@ -64,8 +65,7 @@ public class ElixirStructOperationImpl extends ASTWrapperPsiElement implements E
   }
 
   @Override
-  @NotNull
-  public OtpErlangObject quote() {
+  public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }
 

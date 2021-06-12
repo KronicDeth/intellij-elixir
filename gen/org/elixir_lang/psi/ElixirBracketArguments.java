@@ -17,7 +17,6 @@ public interface ElixirBracketArguments extends Quotable {
   @Nullable
   ElixirUnmatchedExpression getUnmatchedExpression();
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
 }

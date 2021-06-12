@@ -1,36 +1,47 @@
 package org.elixir_lang.psi
 
+import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.QUOTE
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.call.macroChildCallSequence
-import org.elixir_lang.psi.scope.hasBeenVisited
-import org.elixir_lang.psi.scope.putVisitedElement
+import org.elixir_lang.psi.impl.call.whileInStabBodyChildExpressions
+import org.elixir_lang.psi.scope.CallDefinitionClause
 
 object QuoteMacro {
-    fun callDefinitionClauseCallWhile(quoteCall: Call, resolveState: ResolveState, keepProcessing: (Call, ResolveState) -> Boolean): Boolean {
+    fun treeWalkUp(quoteCall: Call, resolveState: ResolveState, keepProcessing: (PsiElement, ResolveState) -> Boolean): Boolean {
         var accumulatorKeepProcessing = true
 
-        for (childCall in quoteCall.macroChildCallSequence()) {
-            if (!resolveState.hasBeenVisited(childCall)) {
+        if (!resolveState.containsAncestorUnquote(quoteCall)) {
+            for (childCall in quoteCall.macroChildCallSequence().filter { !resolveState.hasBeenVisited(it) }) {
                 accumulatorKeepProcessing = when {
-                    CallDefinitionClause.`is`(childCall) -> {
-                        val childResolveState = resolveState.putVisitedElement(childCall)
-
-                        keepProcessing(childCall, childResolveState)
-                    }
                     Import.`is`(childCall) -> {
-                        val childResolveState = resolveState.putVisitedElement(childCall)
+                        val childResolveState =
+                                resolveState
+                                        .put(CallDefinitionClause.IMPORT_CALL, childCall)
+                                        .putVisitedElement(childCall)
 
                         Import.callDefinitionClauseCallWhile(childCall, childResolveState, keepProcessing)
+                    }
+                    Unquote.`is`(childCall) -> {
+                        val childResolveState = resolveState.putVisitedElement(childCall)
+
+                        Unquote.treeWalkUp(childCall, childResolveState, keepProcessing)
                     }
                     Use.`is`(childCall) -> {
                         val childResolveState = resolveState.putVisitedElement(childCall)
 
-                        Use.callDefinitionClauseCallWhile(childCall, childResolveState, keepProcessing)
+                        Use.treeWalkUp(childCall, childResolveState, keepProcessing)
                     }
-                    else -> true
+                    childCall.isCalling(KERNEL, "if") ||
+                            childCall.isCalling(KERNEL, "unless") ||
+                            childCall.isCalling(KERNEL, "try") -> {
+                        childCall.whileInStabBodyChildExpressions { grandChildExpression ->
+                            keepProcessing(grandChildExpression, resolveState)
+                        }
+                    }
+                    else -> keepProcessing(childCall, resolveState)
                 }
 
                 if (!accumulatorKeepProcessing) {

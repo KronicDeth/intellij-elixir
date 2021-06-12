@@ -20,10 +20,8 @@ public interface ElixirNoParenthesesStrict extends Arguments, QuotableArguments 
   @NotNull
   List<ElixirNoParenthesesManyStrictNoParenthesesExpression> getNoParenthesesManyStrictNoParenthesesExpressionList();
 
-  @NotNull
-  PsiElement[] arguments();
+  @NotNull PsiElement[] arguments();
 
-  @NotNull
-  OtpErlangObject[] quoteArguments();
+  @NotNull OtpErlangObject[] quoteArguments();
 
 }

@@ -20,10 +20,8 @@ public interface ElixirParenthesesArguments extends Arguments, QuotableArguments
   @Nullable
   ElixirUnqualifiedNoParenthesesManyArgumentsCall getUnqualifiedNoParenthesesManyArgumentsCall();
 
-  @NotNull
-  PsiElement[] arguments();
+  @NotNull PsiElement[] arguments();
 
-  @NotNull
-  OtpErlangObject[] quoteArguments();
+  @NotNull OtpErlangObject[] quoteArguments();
 
 }

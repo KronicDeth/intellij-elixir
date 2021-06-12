@@ -17,45 +17,33 @@ public interface ElixirLiteralStringSigilLine extends StringFragmented, LiteralS
   @Nullable
   ElixirSigilModifiers getSigilModifiers();
 
-  @NotNull
-  List<Integer> addEscapedCharacterCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode node);
+  @NotNull List<Integer> addEscapedCharacterCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode child);
 
-  @NotNull
-  List<Integer> addEscapedEOL(@Nullable List<Integer> maybeCodePointList, @NotNull ASTNode node);
+  @NotNull List<Integer> addEscapedEOL(@Nullable List<Integer> maybeCodePointList, @NotNull ASTNode child);
 
-  @NotNull
-  List<Integer> addFragmentCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode node);
+  @NotNull List<Integer> addFragmentCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode child);
 
-  @NotNull
-  List<Integer> addHexadecimalEscapeSequenceCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode node);
+  @NotNull List<Integer> addHexadecimalEscapeSequenceCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode child);
 
   Body getBody();
 
   IElementType getFragmentType();
 
-  @Nullable
-  Integer indentation();
+  @Nullable Integer indentation();
 
-  @NotNull
-  OtpErlangObject quote();
+  @NotNull OtpErlangObject quote();
 
-  @NotNull
-  OtpErlangObject quote(@NotNull OtpErlangObject quotedContent);
+  @NotNull OtpErlangObject quote(@NotNull OtpErlangObject quotedContent);
 
-  @NotNull
-  OtpErlangObject quoteBinary(OtpErlangList metadata, List<OtpErlangObject> argumentList);
+  @NotNull OtpErlangObject quoteBinary(OtpErlangList metadata, List<OtpErlangObject> argumentList);
 
-  @NotNull
-  OtpErlangObject quoteEmpty();
+  @NotNull OtpErlangObject quoteEmpty();
 
-  @NotNull
-  OtpErlangObject quoteInterpolation(ElixirInterpolation interpolation);
+  @NotNull OtpErlangObject quoteInterpolation(ElixirInterpolation interpolation);
 
-  @NotNull
-  OtpErlangObject quoteLiteral(List<Integer> codePointList);
+  @NotNull OtpErlangObject quoteLiteral(List<Integer> codePointList);
 
-  @NotNull
-  String sigilDelimiter();
+  @NotNull String sigilDelimiter();
 
   char sigilName();
 

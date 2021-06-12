@@ -49,7 +49,6 @@ object MultiResolve {
      * @return `false` if [.hasValidResult] or `incompleteCode` is `false`, so only one
      * valid result is allowed.
      */
-    fun keepProcessing(incompleteCode: Boolean, resolveResultList: List<ResolveResult>?): Boolean {
-        return incompleteCode || !hasValidResult(resolveResultList)
-    }
+    fun keepProcessing(incompleteCode: Boolean, resolveResultList: List<ResolveResult>?): Boolean =
+        incompleteCode || !hasValidResult(resolveResultList)
 }

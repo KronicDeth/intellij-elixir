@@ -26,8 +26,7 @@ public interface ElixirNoParenthesesOneArgument extends Arguments, MaybeModuleNa
   @Nullable
   ElixirUnqualifiedNoParenthesesManyArgumentsCall getUnqualifiedNoParenthesesManyArgumentsCall();
 
-  @NotNull
-  PsiElement[] arguments();
+  @NotNull PsiElement[] arguments();
 
   boolean isModuleName();
 
@@ -35,7 +34,6 @@ public interface ElixirNoParenthesesOneArgument extends Arguments, MaybeModuleNa
   //matching processDeclarations(ElixirNoParenthesesOneArgument, ...)
   //methods are not found in ElixirPsiImplUtil
 
-  @NotNull
-  OtpErlangObject[] quoteArguments();
+  @NotNull OtpErlangObject[] quoteArguments();
 
 }

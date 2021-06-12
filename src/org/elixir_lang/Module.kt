@@ -2,12 +2,13 @@ package org.elixir_lang
 
 import com.intellij.openapi.util.Condition
 import org.jetbrains.annotations.Contract
+import kotlin.collections.List
 
 object Module {
     private const val SEPARATOR = "."
 
     class IsNestedUnder (moduleName: String) : Condition<String> {
-        private val splitModuleName: kotlin.collections.List<String> = split(moduleName)
+        private val splitModuleName: List<String> = split(moduleName)
 
         override fun value(maybeStartsWithModuleName: String): Boolean {
             val splitMaybeStartsWithModuleName = split(maybeStartsWithModuleName)
@@ -41,5 +42,23 @@ object Module {
      */
     @Contract(pure = true)
     @JvmStatic
-    fun split(name: String): kotlin.collections.List<String> = name.split(SEPARATOR)
+    fun split(name: String): List<String> = name.split(SEPARATOR)
+
+    fun prefix(name: String): List<String> = split(name).dropLast(1)
+
+    fun isRelative(ancestors: List<String>, descendant: String): Boolean = relative(ancestors, descendant).isNotEmpty()
+
+    fun relative(ancestors: List<String>, descendant: String): List<String> {
+        val descendants = split(descendant)
+        return relative(ancestors, descendants)
+    }
+
+    fun relative(ancestors: List<String>, descendants: List<String>): List<String> {
+        return if (ancestors.size < descendants.size &&
+                ancestors.zip(descendants).all { (ancestor, descendent) -> ancestor == descendent }) {
+            descendants.subList(ancestors.size, descendants.size)
+        } else {
+            emptyList()
+        }
+    }
 }
