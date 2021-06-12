@@ -26,17 +26,9 @@ public class NestedTest extends BasePlatformTestCase {
         myFixture.configureByFiles("completion.ex", "multiple_alias_aye.ex", "multiple_alias_bee.ex", "nested.ex");
         myFixture.complete(CompletionType.BASIC, 1);
         List<String> strings = myFixture.getLookupElementStrings();
-        assertTrue(
-                strings.containsAll(
-                        Arrays.asList(
-                                // unaliased names
-                                "Prefix.MultipleAliasAye.Nested",
-                                // aliased name
-                                "MultipleAliasAye.Nested"
-                        )
-                )
-        );
-        assertEquals(2, strings.size());
+        assertNotNull(strings);
+        assertEquals(1, strings.size());
+        assertEquals("Nested", strings.get(0));
     }
 
     public void testReference() {

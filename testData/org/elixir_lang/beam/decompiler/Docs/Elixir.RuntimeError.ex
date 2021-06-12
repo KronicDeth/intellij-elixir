@@ -15,10 +15,12 @@ defmodule RuntimeError do
     # body not decompiled
   end
 
+  @doc false
   def exception(msg) do
     # body not decompiled
   end
 
+  @doc false
   def message(exception) do
     # body not decompiled
   end

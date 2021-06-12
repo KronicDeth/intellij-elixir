@@ -60,9 +60,8 @@ public class CallDefinitionClauseTest extends LightPlatformCodeInsightFixtureTes
         assertCompletion("private_macro", strings);
         assertCompletion("public_function", strings);
         assertCompletion("private_function", strings);
-        assertCompletion("MixedDeclaration.Nested", strings);
-        assertCompletion("Prefix.MixedDeclaration.Nested", strings);
-        assertEquals("Wrong number of completions", 6, strings.size());
+        assertCompletion("Nested", strings);
+        assertEquals("Wrong number of completions", 5, strings.size());
     }
 
     /*

@@ -23,17 +23,10 @@ public class NestedTest extends BasePlatformTestCase {
         myFixture.configureByFiles("completion.ex", "suffix.ex", "nested.ex");
         myFixture.complete(CompletionType.BASIC, 1);
         List<String> strings = myFixture.getLookupElementStrings();
-        assertTrue(
-                strings.containsAll(
-                        Arrays.asList(
-                                // nested unaliased name
-                                "Prefix.Suffix.Nested",
-                                // nested aliased name
-                                "Suffix.Nested"
-                        )
-                )
-        );
-        assertEquals(2, strings.size());
+
+        assertNotNull(strings);
+        assertEquals(1, strings.size());
+        assertEquals("Nested", strings.get(0));
     }
 
     public void testReference() {

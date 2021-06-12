@@ -35,7 +35,7 @@ public class ImportTest extends BasePlatformTestCase {
 
         ResolveResult[] resolveResults = polyVariantReference.multiResolve(false);
 
-        assertEquals(3, resolveResults.length);
+        assertEquals(2, resolveResults.length);
 
         ResolveResult firstResolveResult = resolveResults[0];
 
@@ -54,16 +54,6 @@ public class ImportTest extends BasePlatformTestCase {
         PsiElement secondResolved = secondResolveResult.getElement();
 
         assertEquals("import Imported", secondResolved.getText());
-
-        ResolveResult thirdResolveResult = resolveResults[2];
-
-        assertFalse(thirdResolveResult.isValidResult());
-
-        PsiElement thirdResolved = thirdResolveResult.getElement();
-
-        assertEquals("defp imported(1) do\n" +
-                "    :ok\n" +
-                "  end", thirdResolved.getText());
     }
 
     public void testImportModuleExceptNameArity() {
@@ -89,7 +79,7 @@ public class ImportTest extends BasePlatformTestCase {
 
         ResolveResult[] resolveResults = polyVariantReference.multiResolve(false);
 
-        assertEquals(3, resolveResults.length);
+        assertEquals(2, resolveResults.length);
 
         ResolveResult firstResolveResult = resolveResults[0];
 
@@ -108,16 +98,6 @@ public class ImportTest extends BasePlatformTestCase {
         PsiElement secondResolved = secondResolveResult.getElement();
 
         assertEquals("import Imported, except: [unimported: 0]", secondResolved.getText());
-
-        ResolveResult thirdResolveResult = resolveResults[2];
-
-        assertFalse(thirdResolveResult.isValidResult());
-
-        PsiElement thirdResolved = thirdResolveResult.getElement();
-
-        assertEquals("defp imported(1) do\n" +
-                "    :ok\n" +
-                "  end", thirdResolved.getText());
     }
 
     public void testImportModuleOnlyNameArity() {

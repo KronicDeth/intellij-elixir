@@ -23,13 +23,6 @@ import org.elixir_lang.reference.module.UnaliasedName
 import java.util.*
 
 class MultiResolve internal constructor(private val name: String, private val incompleteCode: Boolean) : Module() {
-    override fun execute(match: PsiElement, state: ResolveState): Boolean =
-            if (match is Named) {
-                execute(match, state)
-            } else {
-                true
-            }
-
     /**
      * Decides whether `match` matches the criteria being searched for.  All other [.execute] methods
      * eventually end here.

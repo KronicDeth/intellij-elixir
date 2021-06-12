@@ -38,15 +38,15 @@ class FindUsagesTest : BasePlatformTestCase() {
 
         val primaryElements = findUsagesHandler.primaryElements
 
-        assertEquals(1, primaryElements.size)
+        assertEquals(2, primaryElements.size)
 
         val secondaryElements = findUsagesHandler.secondaryElements
 
-        assertEquals(1, secondaryElements.size)
+        assertEquals(0, secondaryElements.size)
 
         val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
 
-        assertEquals(4, usages.size)
+        assertEquals(3, usages.size)
 
         val firstElement = usages[0].element!!
 
@@ -93,22 +93,6 @@ class FindUsagesTest : BasePlatformTestCase() {
         assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(thirdElement))
 
         assertEquals(UsageTypeProvider.CALL, getUsageType(thirdElement, usageTargets))
-
-        val fourthElement = usages[3].element!!
-
-        assertEquals(
-                "do\n" +
-                        "    function(t, [h | acc])\n" +
-                        "  end",
-                fourthElement.parent.parent.parent.text
-        )
-        assertEquals(93, fourthElement.textOffset)
-
-        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(fourthElement))
-        assertFalse(readWriteAccessDetector.isReadWriteAccessible(fourthElement))
-        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(fourthElement))
-
-        assertEquals(UsageTypeProvider.CALL, getUsageType(fourthElement, usageTargets))
     }
 
     fun testFunctionRecursiveUsage() {
@@ -138,7 +122,7 @@ class FindUsagesTest : BasePlatformTestCase() {
 
         val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
 
-        assertEquals(4, usages.size)
+        assertEquals(3, usages.size)
 
         val firstElement = usages[0].element!!
         val readWriteAccessDetector = readWriteAccessDetector(firstElement)!!
@@ -186,22 +170,6 @@ class FindUsagesTest : BasePlatformTestCase() {
         assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(thirdElement))
 
         assertEquals(UsageType.READ, getUsageType(thirdElement, usageTargets))
-
-        val fourthElement = usages[3].element!!
-
-        assertEquals(
-                "do\n" +
-                        "    function(t, [h | acc])\n" +
-                        "  end",
-                thirdElement.parent.parent.parent.text
-        )
-        assertEquals(93, fourthElement.textOffset)
-
-        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(fourthElement))
-        assertFalse(readWriteAccessDetector.isReadWriteAccessible(fourthElement))
-        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(fourthElement))
-
-        assertEquals(UsageType.READ, getUsageType(fourthElement, usageTargets))
     }
 
     fun testFunctionSingleClauseUnused() {
@@ -262,11 +230,11 @@ class FindUsagesTest : BasePlatformTestCase() {
 
         val primaryElements = findUsagesHandler.primaryElements
 
-        assertEquals(1, primaryElements.size)
+        assertEquals(2, primaryElements.size)
 
         val secondaryElements = findUsagesHandler.secondaryElements
 
-        assertEquals(1, secondaryElements.size)
+        assertEquals(0, secondaryElements.size)
 
         val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
 
@@ -556,7 +524,7 @@ class FindUsagesTest : BasePlatformTestCase() {
 
         val primaryElements = findUsagesHandler.primaryElements
 
-        assertEquals(1, primaryElements.size)
+        assertEquals(2, primaryElements.size)
 
         val secondaryElements = findUsagesHandler.secondaryElements
 
@@ -564,7 +532,7 @@ class FindUsagesTest : BasePlatformTestCase() {
 
         val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
 
-        assertEquals(2, usages.size)
+        assertEquals(3, usages.size)
 
         val firstElement = usages[0].element!!
 
@@ -577,6 +545,12 @@ class FindUsagesTest : BasePlatformTestCase() {
         assertEquals(33, secondElement.textOffset)
         assertNull(readWriteAccessDetector(secondElement))
         assertEquals(UsageTypeProvider.ALIAS, getUsageType(secondElement, usageTargets))
+
+        val thirdElement = usages[2].element!!
+
+        assertEquals(33, thirdElement.textOffset)
+        assertNull(readWriteAccessDetector(thirdElement))
+        assertEquals(UsageTypeProvider.ALIAS, getUsageType(thirdElement, usageTargets))
     }
 
     fun testModuleRecursiveUsage() {

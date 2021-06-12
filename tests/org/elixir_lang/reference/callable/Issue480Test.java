@@ -40,7 +40,7 @@ public class Issue480Test extends BasePlatformTestCase {
 
     public void testDoubleAliasesModuleQualifier() {
         myFixture.configureByFiles("double_aliased_module_qualifier.ex", "referenced.ex");
-        assertUnresolvableReferenceNameArityRange("changeset", 1);
+        assertReferenceAndResolvedNameArityRange("changeset", 1);
     }
 
     public void testMapAccessQualifier() {
@@ -50,7 +50,7 @@ public class Issue480Test extends BasePlatformTestCase {
 
     public void testUnresolvedAliasQualifier() {
         myFixture.configureByFiles("unresolved_alias_qualifier.ex", "referenced.ex");
-        assertUnresolvableReferenceNameArityRange("changeset", 1);
+        assertReferenceAndResolvedNameArityRange("changeset", 1);
     }
 
     /*

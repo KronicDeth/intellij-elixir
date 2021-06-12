@@ -506,45 +506,25 @@ defmodule Module do
     * `@compile {:no_warn_undefined, Mod}` or
       `@compile {:no_warn_undefined, {Mod, fun, arity}}` - does not warn if
       the given module or the given `Mod.fun/arity` are not defined
+
+
   '''
 
   # Functions
 
+  @doc false
   def __get_attribute__(module, key, line) do
     # body not decompiled
   end
 
-  @doc ~S"""
-  Provides runtime information about functions, macros, and other information
-  defined by the module.
-
-  Each module gets an `__info__/1` function when it's compiled. The function
-  takes one of the following items:
-
-    * `:attributes` - a keyword list with all persisted attributes
-
-    * `:compile` - a list with compiler metadata
-
-    * `:functions` - a keyword list of public functions and their arities
-
-    * `:macros` - a keyword list of public macros and their arities
-
-    * `:md5` - the MD5 of the module
-
-    * `:module` - the module atom name
-  """
   def __info__(p0) do
     # body not decompiled
   end
 
+  @doc false
   def __put_attribute__(module, key, value, line) do
     # body not decompiled
   end
-
-
-  @deprecated """
-  Use @doc instead
-  """
 
   def add_doc(p0, p1, p2, p3, p4) do
     # body not decompiled
@@ -555,6 +535,7 @@ defmodule Module do
   Use @doc instead
   """
 
+  @doc false
   def add_doc(module, line, kind, arg, signature \\ [], doc) do
     # body not decompiled
   end
@@ -563,10 +544,12 @@ defmodule Module do
     # body not decompiled
   end
 
+  @doc false
   def check_behaviours_and_impls(env, set, bag, all_definitions) do
     # body not decompiled
   end
 
+  @doc false
   def compile_definition_attributes(env, kind, name, args, guards, body) do
     # body not decompiled
   end
@@ -581,6 +564,8 @@ defmodule Module do
 
       iex> Module.concat([Foo, "Bar"])
       Foo.Bar
+
+
   """
   def concat(list) do
     # body not decompiled
@@ -596,6 +581,8 @@ defmodule Module do
 
       iex> Module.concat(Foo, "Bar")
       Foo.Bar
+
+
   """
   def concat(left, right) do
     # body not decompiled
@@ -641,6 +628,7 @@ defmodule Module do
   allows you to control the environment variables used
   when defining the module, while `Kernel.defmodule/2`
   automatically uses the environment it is invoked at.
+
   """
   def create(module, quoted, opts) do
     # body not decompiled
@@ -667,6 +655,8 @@ defmodule Module do
         def version, do: 1
         Module.defines?(__MODULE__, {:version, 0}) #=> true
       end
+
+
   """
   def defines?(module, tuple) do
     # body not decompiled
@@ -689,6 +679,8 @@ defmodule Module do
         def version, do: 1
         Module.defines?(__MODULE__, {:version, 0}, :def) #=> true
       end
+
+
   """
   def defines?(module, tuple, def_kind) do
     # body not decompiled
@@ -698,6 +690,7 @@ defmodule Module do
   Checks if the current module defines the given type (private, opaque or not).
 
   This function is only available for modules being compiled.
+
   """
   def defines_type?(module, definition) do
     # body not decompiled
@@ -720,6 +713,8 @@ defmodule Module do
         defmacrop test(arg), do: arg
         Module.definitions_in(__MODULE__) #=> [{:version, 0}, {:test, 1}]
       end
+
+
   """
   def definitions_in(module) do
     # body not decompiled
@@ -740,6 +735,8 @@ defmodule Module do
         Module.definitions_in(__MODULE__, :def)  #=> [{:version, 0}]
         Module.definitions_in(__MODULE__, :defp) #=> []
       end
+
+
   """
   def definitions_in(module, kind) do
     # body not decompiled
@@ -756,6 +753,8 @@ defmodule Module do
         Module.put_attribute(__MODULE__, :custom_threshold_for_lib, 10)
         Module.delete_attribute(__MODULE__, :custom_threshold_for_lib)
       end
+
+
   """
   def delete_attribute(module, key) do
     # body not decompiled
@@ -811,6 +810,7 @@ defmodule Module do
   Note that if you pass a `Macro.Env` struct as first argument
   while also passing `opts`, they will be merged with `opts`
   having precedence.
+
   """
   def eval_quoted(module_or_env, quoted, binding \\ [], opts \\ []) do
     # body not decompiled
@@ -855,6 +855,8 @@ defmodule Module do
         Module.put_attribute(__MODULE__, :value, 1)
         Module.get_attribute(__MODULE__, :value) #=> [1]
       end
+
+
   """
   def get_attribute(module, key, default \\ nil) do
     # body not decompiled
@@ -885,6 +887,8 @@ defmodule Module do
         Module.delete_attribute(__MODULE__, :value)
         Module.has_attribute?(__MODULE__, :value) #=> false
       end
+
+
   """
   def has_attribute?(module, key) do
     # body not decompiled
@@ -901,6 +905,7 @@ defmodule Module do
   no longer be listed under `definitions_in/1` or return true
   when given to `defines?/2` until another implementation is
   given.
+
   """
   def make_overridable(module, tuples) do
     # body not decompiled
@@ -919,6 +924,7 @@ defmodule Module do
 
   A module is "open" if it is currently being defined and its attributes and
   functions can be modified.
+
   """
   def open?(module) do
     # body not decompiled
@@ -926,6 +932,7 @@ defmodule Module do
 
   @doc ~S"""
   Returns `true` if `tuple` in `module` is marked as overridable.
+
   """
   def overridable?(module, tuple) do
     # body not decompiled
@@ -939,6 +946,8 @@ defmodule Module do
       defmodule MyModule do
         Module.put_attribute(__MODULE__, :custom_threshold_for_lib, 10)
       end
+
+
   """
   def put_attribute(module, key, value) do
     # body not decompiled
@@ -972,6 +981,8 @@ defmodule Module do
         @custom_threshold_for_lib 20
         @custom_threshold_for_lib #=> [20, 10]
       end
+
+
   """
   def register_attribute(module, attribute, options) do
     # body not decompiled
@@ -991,6 +1002,8 @@ defmodule Module do
 
       iex> Module.safe_concat([List, Chars])
       List.Chars
+
+
   """
   def safe_concat(list) do
     # body not decompiled
@@ -1010,6 +1023,8 @@ defmodule Module do
 
       iex> Module.safe_concat(List, Chars)
       List.Chars
+
+
   """
   def safe_concat(left, right) do
     # body not decompiled
@@ -1021,6 +1036,7 @@ defmodule Module do
   Returns `true` if there is such a spec and it was copied as a callback.
   If the function associated to the spec has documentation defined prior to
   invoking this function, the docs are copied too.
+
   """
   def spec_to_callback(module, definition) do
     # body not decompiled
@@ -1041,6 +1057,8 @@ defmodule Module do
       ["Very", "Long", "Module", "Name", "And", "Even", "Longer"]
       iex> Module.split("Elixir.String.Chars")
       ["String", "Chars"]
+
+
   """
   def split(module) do
     # body not decompiled

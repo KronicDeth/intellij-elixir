@@ -2,6 +2,9 @@ package org.elixir_lang.psi
 
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNameIdentifierOwner
+import org.elixir_lang.psi.impl.stripAccessExpression
+import org.elixir_lang.psi.operation.Infix
+import org.elixir_lang.psi.operation.infix.Normalized
 
 /**
  * An alias that may or may not be qualified.

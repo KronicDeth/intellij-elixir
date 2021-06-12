@@ -22,13 +22,9 @@ public class NestedTest extends LightPlatformCodeInsightFixtureTestCase {
         myFixture.configureByFiles("completion.ex", "suffix.ex", "nested.ex");
         myFixture.complete(CompletionType.BASIC, 1);
         List<String> strings = myFixture.getLookupElementStrings();
-        assertNull("Completion lookup shown", strings);
-        PsiElement autoInsertedLeafElement = myFixture.getFile().findElementAt(myFixture.getCaretOffset() - 1);
-        assertNotNull(autoInsertedLeafElement);
-        assertInstanceOf(autoInsertedLeafElement, LeafPsiElement.class);
-        PsiElement autoInsertedCompositeElement = autoInsertedLeafElement.getParent();
-        assertInstanceOf(autoInsertedCompositeElement, ElixirAlias.class);
-        assertEquals(autoInsertedCompositeElement.getText(), "Nested");
+        assertNotNull("Completion lookup shown", strings);
+        assertEquals(1, strings.size());
+        assertEquals("Nested", strings.get(0));
     }
 
     public void testReference() {

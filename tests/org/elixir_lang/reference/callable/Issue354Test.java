@@ -1,13 +1,17 @@
 package org.elixir_lang.reference.callable;
 
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiPolyVariantReference;
 import com.intellij.psi.PsiReference;
+import com.intellij.psi.ResolveResult;
+import com.intellij.psi.impl.source.resolve.reference.impl.PsiMultiReference;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import org.elixir_lang.psi.CallDefinitionClause;
 import org.elixir_lang.psi.ElixirIdentifier;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.operation.Match;
+import org.jetbrains.annotations.NotNull;
 
 public class Issue354Test extends BasePlatformTestCase {
     /*
@@ -36,40 +40,31 @@ public class Issue354Test extends BasePlatformTestCase {
 
         assertNotNull(reference);
 
-        PsiElement resolved = reference.resolve();
+        assertInstanceOf(reference, PsiPolyVariantReference.class);
 
-        assertNotNull(resolved);
-        assertInstanceOf(resolved, Call.class);
+        PsiPolyVariantReference psiPolyVariantReference = (PsiPolyVariantReference) reference;
 
-        PsiElement resolvedParent = resolved.getParent();
+        ResolveResult[] resolveResults = psiPolyVariantReference.multiResolve(true);
 
-        assertNotNull(resolvedParent);
-        assertInstanceOf(resolvedParent, Match.class);
+        assertEquals(resolveResults.length, 2);
 
-        PsiElement resolvedGrandParent = resolvedParent.getParent();
+        ResolveResult firstResolveResult = resolveResults[0];
 
-        assertNotNull(resolvedGrandParent);
+        assertTrue(firstResolveResult.isValidResult());
 
-        PsiElement resolvedGreatGrandParent = resolvedGrandParent.getParent();
+        PsiElement firstElement = firstResolveResult.getElement();
 
-        assertNotNull(resolvedGreatGrandParent);
+        assertNotNull(firstElement);
+        assertEquals("%{line: line, port: port} = context", firstElement.getParent().getText());
 
-        PsiElement resolvedGreatGreatGrandParent = resolvedGreatGrandParent.getParent();
+        ResolveResult secondResolveResult = resolveResults[1];
 
-        assertNotNull(resolvedGreatGreatGrandParent);
+        assertTrue(secondResolveResult.isValidResult());
 
-        PsiElement resolvedGreatGreatGreatGrandParent = resolvedGreatGreatGrandParent.getParent();
+        PsiElement secondElement = secondResolveResult.getElement();
 
-        assertNotNull(resolvedGreatGreatGreatGrandParent);
-
-        PsiElement resolvedGreatGreatGreatGreatGrandParent = resolvedGreatGreatGreatGrandParent.getParent();
-
-        assertNotNull(resolvedGreatGreatGreatGreatGrandParent);
-        assertInstanceOf(resolvedGreatGreatGreatGreatGrandParent, Call.class);
-
-        Call resolvedGreatGreatGreatGreatGrandParentCall = (Call) resolvedGreatGreatGreatGreatGrandParent;
-
-        assertTrue(CallDefinitionClause.is(resolvedGreatGreatGreatGreatGrandParentCall));
+        assertNotNull(secondElement);
+        assertEquals("context = %{backend: true}", secondElement.getParent().getText());
     }
 
     /*

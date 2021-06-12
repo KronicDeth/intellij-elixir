@@ -204,6 +204,8 @@ defmodule Kernel do
       false
       iex> !!nil
       false
+
+
   """
 
   # Macros
@@ -223,6 +225,8 @@ defmodule Kernel do
 
       iex> !List.first([])
       true
+
+
   """
   defmacro unquote(:!)(p0) do
     # body not decompiled
@@ -254,6 +258,7 @@ defmodule Kernel do
 
   Note that, unlike `and/2`, this operator accepts any expression
   as the first argument, not only booleans.
+
   """
   defmacro left && right do
     # body not decompiled
@@ -280,6 +285,8 @@ defmodule Kernel do
 
       iex> 3 in 1..3
       true
+
+
   """
   defmacro left .. right do
     # body not decompiled
@@ -301,6 +308,8 @@ defmodule Kernel do
       "bar"
 
   `x <> "bar" = "foobar"` would have resulted in a `CompileError` exception.
+
+
   """
   defmacro left <> right do
     # body not decompiled
@@ -350,6 +359,7 @@ defmodule Kernel do
   its current value. In other words, the value is read at compilation
   time and not at runtime. Check the `Module` module for other functions
   to manipulate module attributes.
+
   """
   defmacro unquote(:@)(p0) do
     # body not decompiled
@@ -361,6 +371,7 @@ defmodule Kernel do
   the macro is expanded.
 
   Check `Kernel.SpecialForms.quote/2` for more information.
+
   """
   defmacro alias!(alias) do
     # body not decompiled
@@ -386,6 +397,8 @@ defmodule Kernel do
 
       iex> "yay!" and true
       ** (BadBooleanError) expected a boolean on left-side of "and", got: "yay!"
+
+
   """
   defmacro left and right do
     # body not decompiled
@@ -419,6 +432,8 @@ defmodule Kernel do
       1
       iex> binding(:foo)
       [x: 1]
+
+
   """
   defmacro binding(context \\ nil) do
     # body not decompiled
@@ -534,6 +549,8 @@ defmodule Kernel do
       rescue
         e in ArgumentError -> {:error, e.message}
       end
+
+
   """
   defmacro def(call, expr \\ nil) do
     # body not decompiled
@@ -573,6 +590,8 @@ defmodule Kernel do
 
       MyList.other_reverse([1, 2, 3])
       #=> [3, 2, 1]
+
+
   """
   defmacro defdelegate(funs, opts) do
     # body not decompiled
@@ -629,6 +648,7 @@ defmodule Kernel do
 
   The example above shows the preferred strategy for customizing
   exception messages.
+
   """
   defmacro defexception(fields) do
     # body not decompiled
@@ -672,6 +692,8 @@ defmodule Kernel do
           step(3 * n + 1, step_count + 1)
         end
       end
+
+
   """
   defmacro defguard(guard) do
     # body not decompiled
@@ -686,6 +708,7 @@ defmodule Kernel do
 
   Similar to `defmacrop/2`, `defguardp/1` must be defined before its use
   in the current module.
+
   """
   defmacro defguardp(guard) do
     # body not decompiled
@@ -699,6 +722,7 @@ defmodule Kernel do
   Defines an implementation for the given protocol.
 
   See the `Protocol` module for more information.
+
   """
   defmacro defimpl(name, opts, do_block \\ []) do
     # body not decompiled
@@ -730,6 +754,8 @@ defmodule Kernel do
       MyLogic.unless false do
         IO.puts("It works")
       end
+
+
   """
   defmacro defmacro(call, expr \\ nil) do
     # body not decompiled
@@ -749,6 +775,8 @@ defmodule Kernel do
 
   Check `defmacro/2` for more information, and check `def/2` for rules on
   naming and default arguments.
+
+
   """
   defmacro defmacrop(call, expr \\ nil) do
     # body not decompiled
@@ -838,6 +866,7 @@ defmodule Kernel do
 
   Elixir reserves the following module names: `Elixir`, `Any`, `BitString`,
   `PID`, and `Reference`.
+
   """
   defmacro defmodule(alias, do_block) do
     # body not decompiled
@@ -907,6 +936,8 @@ defmodule Kernel do
           "Overridden"
         end
       end
+
+
   """
   defmacro defoverridable(keywords_or_behaviour) do
     # body not decompiled
@@ -940,6 +971,8 @@ defmodule Kernel do
 
       Foo.sum(1, 2)
       ** (UndefinedFunctionError) undefined function Foo.sum/2
+
+
   """
   defmacro defp(call, expr \\ nil) do
     # body not decompiled
@@ -949,6 +982,7 @@ defmodule Kernel do
   Defines a protocol.
 
   See the `Protocol` module for more information.
+
   """
   defmacro defprotocol(name, do_block) do
     # body not decompiled
@@ -1067,6 +1101,7 @@ defmodule Kernel do
   matching them or directly accessing their fields should not be allowed) should
   use the `@opaque` attribute. Structs whose internal structure is public should
   use `@type`.
+
   """
   defmacro defstruct(fields) do
     # body not decompiled
@@ -1103,6 +1138,7 @@ defmodule Kernel do
   The example above will only work if `x` matches the first value in the right
   list. Otherwise, it will raise a `MatchError` (like the `=` operator would
   do).
+
   """
   defmacro destructure(left, right) do
     # body not decompiled
@@ -1159,6 +1195,8 @@ defmodule Kernel do
 
       # Does not access any key or field
       users
+
+
   """
   defmacro get_and_update_in(path, fun) do
     # body not decompiled
@@ -1201,6 +1239,7 @@ defmodule Kernel do
       end
 
   In order to compare more than two clauses, the `cond/1` macro has to be used.
+
   """
   defmacro if(condition, clauses) do
     # body not decompiled
@@ -1260,6 +1299,7 @@ defmodule Kernel do
 
   Additionally, `Macro.to_string/2` will translate all occurrences of
   this AST to `left not in right`.
+
   """
   defmacro left in right do
     # body not decompiled
@@ -1277,6 +1317,8 @@ defmodule Kernel do
 
       iex> is_exception(%{})
       false
+
+
   """
   defmacro is_exception(term) do
     # body not decompiled
@@ -1294,6 +1336,8 @@ defmodule Kernel do
 
       iex> is_exception(%RuntimeError{}, Macro.Env)
       false
+
+
   """
   defmacro is_exception(term, name) do
     # body not decompiled
@@ -1311,6 +1355,8 @@ defmodule Kernel do
 
       iex> is_nil(nil)
       true
+
+
   """
   defmacro is_nil(term) do
     # body not decompiled
@@ -1328,6 +1374,8 @@ defmodule Kernel do
 
       iex> is_struct(%{})
       false
+
+
   """
   defmacro is_struct(term) do
     # body not decompiled
@@ -1345,6 +1393,8 @@ defmodule Kernel do
 
       iex> is_struct(URI.parse("/"), Macro.Env)
       false
+
+
   """
   defmacro is_struct(term, name) do
     # body not decompiled
@@ -1390,6 +1440,8 @@ defmodule Kernel do
       true
       iex> binding()
       []
+
+
   """
   defmacro match?(pattern, expr) do
     # body not decompiled
@@ -1416,6 +1468,8 @@ defmodule Kernel do
 
       iex> 42 or false
       ** (BadBooleanError) expected a boolean on left-side of "or", got: 42
+
+
   """
   defmacro left or right do
     # body not decompiled
@@ -1449,6 +1503,7 @@ defmodule Kernel do
 
   In case any entry returns `nil`, its key will be removed
   and the deletion will be considered a success.
+
   """
   defmacro pop_in(path) do
     # body not decompiled
@@ -1484,6 +1539,8 @@ defmodule Kernel do
       iex> users = %{"john" => %{age: 27}, "meg" => %{age: 23}}
       iex> put_in(users["john"].age, 28)
       %{"john" => %{age: 28}, "meg" => %{age: 23}}
+
+
   """
   defmacro put_in(path, value) do
     # body not decompiled
@@ -1515,6 +1572,8 @@ defmodule Kernel do
           IO.puts("that was expected")
           raise x
       end
+
+
   """
   defmacro raise(message) do
     # body not decompiled
@@ -1535,6 +1594,8 @@ defmodule Kernel do
 
       iex> raise(ArgumentError, "Sample")
       ** (ArgumentError) Sample
+
+
   """
   defmacro raise(exception, attributes) do
     # body not decompiled
@@ -1556,6 +1617,8 @@ defmodule Kernel do
         exception ->
           reraise exception, __STACKTRACE__
       end
+
+
   """
   defmacro reraise(message, stacktrace) do
     # body not decompiled
@@ -1575,6 +1638,8 @@ defmodule Kernel do
         exception ->
           reraise WrapperError, [exception: exception], __STACKTRACE__
       end
+
+
   """
   defmacro reraise(exception, attributes, stacktrace) do
     # body not decompiled
@@ -1594,6 +1659,8 @@ defmodule Kernel do
 
       iex> ~C(f#{o}o)
       'f\#{o}o'
+
+
   """
   defmacro sigil_C(term, modifiers) do
     # body not decompiled
@@ -1626,6 +1693,8 @@ defmodule Kernel do
 
       iex> ~D[2015-01-13]
       ~D[2015-01-13]
+
+
   """
   defmacro sigil_D(date_string, modifiers) do
     # body not decompiled
@@ -1664,6 +1733,8 @@ defmodule Kernel do
       ~N[2015-01-13 13:00:07]
       iex> ~N[2015-01-13T13:00:07.001]
       ~N[2015-01-13 13:00:07.001]
+
+
   """
   defmacro sigil_N(naive_datetime_string, modifiers) do
     # body not decompiled
@@ -1683,6 +1754,8 @@ defmodule Kernel do
 
       iex> Regex.match?(~R(f#{1,3}o), "f#o")
       true
+
+
   """
   defmacro sigil_R(term, modifiers) do
     # body not decompiled
@@ -1709,6 +1782,8 @@ defmodule Kernel do
 
       iex> ~S((\))
       "()"
+
+
   """
   defmacro sigil_S(term, modifiers) do
     # body not decompiled
@@ -1745,6 +1820,8 @@ defmodule Kernel do
       ~T[13:00:07]
       iex> ~T[13:00:07.001]
       ~T[13:00:07.001]
+
+
   """
   defmacro sigil_T(time_string, modifiers) do
     # body not decompiled
@@ -1785,6 +1862,8 @@ defmodule Kernel do
       ~U[2015-01-13 13:00:07Z]
       iex> ~U[2015-01-13T13:00:07.001+00:00]
       ~U[2015-01-13 13:00:07.001Z]
+
+
   """
   defmacro sigil_U(datetime_string, modifiers) do
     # body not decompiled
@@ -1807,6 +1886,8 @@ defmodule Kernel do
 
       iex> ~W(foo #{bar} baz)
       ["foo", "\#{bar}", "baz"]
+
+
   """
   defmacro sigil_W(term, modifiers) do
     # body not decompiled
@@ -1828,6 +1909,8 @@ defmodule Kernel do
 
       iex> ~c(f\#{:o}o)
       'f\#{:o}o'
+
+
   """
   defmacro sigil_c(term, modifiers) do
     # body not decompiled
@@ -1848,6 +1931,8 @@ defmodule Kernel do
 
       iex> Regex.match?(~r/abc/, "abc")
       true
+
+
   """
   defmacro sigil_r(term, modifiers) do
     # body not decompiled
@@ -1869,6 +1954,8 @@ defmodule Kernel do
 
       iex> ~s(f\#{:o}o)
       "f\#{:o}o"
+
+
   """
   defmacro sigil_s(term, modifiers) do
     # body not decompiled
@@ -1899,11 +1986,14 @@ defmodule Kernel do
 
       iex> ~w(foo bar baz)a
       [:foo, :bar, :baz]
+
+
   """
   defmacro sigil_w(term, modifiers) do
     # body not decompiled
   end
 
+  @doc false
   defmacro to_char_list(arg) do
     # body not decompiled
   end
@@ -1915,6 +2005,8 @@ defmodule Kernel do
 
       iex> to_charlist(:foo)
       'foo'
+
+
   """
   defmacro to_charlist(term) do
     # body not decompiled
@@ -1930,6 +2022,8 @@ defmodule Kernel do
 
       iex> to_string(:foo)
       "foo"
+
+
   """
   defmacro to_string(term) do
     # body not decompiled
@@ -1958,6 +2052,8 @@ defmodule Kernel do
       ...>   "Math is broken"
       ...> end
       "Math still works"
+
+
   """
   defmacro unless(condition, clauses) do
     # body not decompiled
@@ -1993,6 +2089,8 @@ defmodule Kernel do
       iex> users = %{"john" => %{age: 27}, "meg" => %{age: 23}}
       iex> update_in(users["john"].age, &(&1 + 1))
       %{"john" => %{age: 28}, "meg" => %{age: 23}}
+
+
   """
   defmacro update_in(path, fun) do
     # body not decompiled
@@ -2100,6 +2198,7 @@ defmodule Kernel do
   `ExUnit.Case` doesn't define the `test/3` macro in the module that calls
   `use ExUnit.Case`, but it defines `ExUnit.Case.test/3` and just imports that
   into the caller when used.
+
   """
   defmacro use(module, opts \\ []) do
     # body not decompiled
@@ -2123,6 +2222,8 @@ defmodule Kernel do
       1
       iex> Kernel.var!(example)
       1
+
+
   """
   defmacro var!(var, context \\ nil) do
     # body not decompiled
@@ -2204,6 +2305,7 @@ defmodule Kernel do
   As you can see, the `|>` operator retains the same semantics
   as when the pipe is not used since both require the `fun.(...)`
   notation.
+
   """
   defmacro left |> right do
     # body not decompiled
@@ -2234,6 +2336,7 @@ defmodule Kernel do
 
   Note that, unlike `or/2`, this operator accepts any expression
   as the first argument, not only booleans.
+
   """
   defmacro left || right do
     # body not decompiled
@@ -2260,6 +2363,8 @@ defmodule Kernel do
 
       iex> 1 != 1.0
       false
+
+
   """
   def left != right do
     # body not decompiled
@@ -2282,6 +2387,8 @@ defmodule Kernel do
 
       iex> 1 !== 1.0
       true
+
+
   """
   def left !== right do
     # body not decompiled
@@ -2296,6 +2403,8 @@ defmodule Kernel do
 
       iex> 1 * 2
       2
+
+
   """
   def left * right do
     # body not decompiled
@@ -2310,6 +2419,8 @@ defmodule Kernel do
 
       iex> +1
       1
+
+
   """
   def (+value) do
     # body not decompiled
@@ -2324,6 +2435,8 @@ defmodule Kernel do
 
       iex> 1 + 2
       3
+
+
   """
   def left + right do
     # body not decompiled
@@ -2360,6 +2473,8 @@ defmodule Kernel do
       # improper list on the right will return an improper list
       iex> [1] ++ [2 | 3]
       [1, 2 | 3]
+
+
   """
   def left ++ right do
     # body not decompiled
@@ -2374,6 +2489,8 @@ defmodule Kernel do
 
       iex> -2
       -2
+
+
   """
   def (-value) do
     # body not decompiled
@@ -2388,6 +2505,8 @@ defmodule Kernel do
 
       iex> 1 - 2
       -1
+
+
   """
   def left - right do
     # body not decompiled
@@ -2427,6 +2546,8 @@ defmodule Kernel do
 
       iex> [1, 2, 3] -- ([2] -- [3])
       [1, 3]
+
+
   """
   def left -- right do
     # body not decompiled
@@ -2455,6 +2576,8 @@ defmodule Kernel do
 
       7 / 0
       ** (ArithmeticError) bad argument in arithmetic expression
+
+
   """
   def left / right do
     # body not decompiled
@@ -2473,6 +2596,8 @@ defmodule Kernel do
 
       iex> 1 < 2
       true
+
+
   """
   def left < right do
     # body not decompiled
@@ -2491,6 +2616,8 @@ defmodule Kernel do
 
       iex> 1 <= 2
       true
+
+
   """
   def left <= right do
     # body not decompiled
@@ -2513,6 +2640,8 @@ defmodule Kernel do
 
       iex> 1 == 1.0
       true
+
+
   """
   def left == right do
     # body not decompiled
@@ -2539,6 +2668,8 @@ defmodule Kernel do
 
       iex> 1 === 1.0
       false
+
+
   """
   def left === right do
     # body not decompiled
@@ -2574,6 +2705,8 @@ defmodule Kernel do
 
       iex> "abcd" =~ ""
       true
+
+
   """
   def left =~ right do
     # body not decompiled
@@ -2592,6 +2725,8 @@ defmodule Kernel do
 
       iex> 1 > 2
       false
+
+
   """
   def left > right do
     # body not decompiled
@@ -2610,6 +2745,8 @@ defmodule Kernel do
 
       iex> 1 >= 2
       false
+
+
   """
   def left >= right do
     # body not decompiled
@@ -2631,6 +2768,8 @@ defmodule Kernel do
 
       iex> abs(-3)
       3
+
+
   """
   def abs(number) do
     # body not decompiled
@@ -2646,6 +2785,8 @@ defmodule Kernel do
 
       iex> apply(fn x -> x * 2 end, [2])
       4
+
+
   """
   def apply(fun, args) do
     # body not decompiled
@@ -2665,6 +2806,8 @@ defmodule Kernel do
 
       iex> apply(Enum, :reverse, [[1, 2, 3]])
       [3, 2, 1]
+
+
   """
   def apply(module, function_name, args) do
     # body not decompiled
@@ -2689,6 +2832,8 @@ defmodule Kernel do
 
       iex> binary_part("Hello", 5, -3)
       "llo"
+
+
   """
   def binary_part(binary, start, length) do
     # body not decompiled
@@ -2706,6 +2851,8 @@ defmodule Kernel do
 
       iex> bit_size(<<1, 2, 3>>)
       24
+
+
   """
   def bit_size(bitstring) do
     # body not decompiled
@@ -2727,6 +2874,8 @@ defmodule Kernel do
 
       iex> byte_size(<<1, 2, 3>>)
       3
+
+
   """
   def byte_size(bitstring) do
     # body not decompiled
@@ -2739,6 +2888,7 @@ defmodule Kernel do
   use `Float.ceil/2` instead.
 
   Allowed in guard tests. Inlined by the compiler.
+
   """
   def ceil(number) do
     # body not decompiled
@@ -2771,6 +2921,8 @@ defmodule Kernel do
 
       div(100, 0)
       ** (ArithmeticError) bad argument in arithmetic expression
+
+
   """
   def div(dividend, divisor) do
     # body not decompiled
@@ -2794,6 +2946,8 @@ defmodule Kernel do
 
       elem({:foo, :bar}, 2)
       ** (ArgumentError) argument error
+
+
   """
   def elem(tuple, index) do
     # body not decompiled
@@ -2859,6 +3013,7 @@ defmodule Kernel do
 
   Any other exit reason will cause the operating system process to exit with
   status `1` and linked Erlang processes to crash.
+
   """
   def exit(reason) do
     # body not decompiled
@@ -2871,6 +3026,7 @@ defmodule Kernel do
   use `Float.floor/2` instead.
 
   Allowed in guard tests. Inlined by the compiler.
+
   """
   def floor(number) do
     # body not decompiled
@@ -2896,6 +3052,7 @@ defmodule Kernel do
 
       iex> function_exported?(List, :to_string, 1)
       true
+
   """
   def function_exported?(module, function, arity) do
     # body not decompiled
@@ -2963,6 +3120,7 @@ defmodule Kernel do
   The `Access` module ships with many convenience accessor functions,
   like the `all` anonymous function defined above. See `Access.all/0`,
   `Access.key/2`, and others as examples.
+
   """
   def get_and_update_in(data, keys, fun) do
     # body not decompiled
@@ -3012,6 +3170,7 @@ defmodule Kernel do
   The `Access` module ships with many convenience accessor functions,
   like the `all` anonymous function defined above. See `Access.all/0`,
   `Access.key/2`, and others as examples.
+
   """
   def get_in(data, keys) do
     # body not decompiled
@@ -3034,6 +3193,8 @@ defmodule Kernel do
 
       hd([1 | 2])
       #=> 1
+
+
   """
   def hd(list) do
     # body not decompiled
@@ -3097,6 +3258,7 @@ defmodule Kernel do
   from structs, so they don't show up in logs, inspects and similar.
   See the "Deriving" section of the documentation of the `Inspect`
   protocol for more information.
+
   """
   def inspect(term, opts \\ []) do
     # body not decompiled
@@ -3106,6 +3268,7 @@ defmodule Kernel do
   Returns `true` if `term` is an atom; otherwise returns `false`.
 
   Allowed in guard tests. Inlined by the compiler.
+
   """
   def is_atom(term) do
     # body not decompiled
@@ -3124,6 +3287,8 @@ defmodule Kernel do
       true
       iex> is_binary(<<1::3>>)
       false
+
+
   """
   def is_binary(term) do
     # body not decompiled
@@ -3140,6 +3305,8 @@ defmodule Kernel do
       true
       iex> is_bitstring(<<1::3>>)
       true
+
+
   """
   def is_bitstring(term) do
     # body not decompiled
@@ -3150,6 +3317,7 @@ defmodule Kernel do
   a boolean); otherwise returns `false`.
 
   Allowed in guard tests. Inlined by the compiler.
+
   """
   def is_boolean(term) do
     # body not decompiled
@@ -3159,6 +3327,7 @@ defmodule Kernel do
   Returns `true` if `term` is a floating-point number; otherwise returns `false`.
 
   Allowed in guard tests. Inlined by the compiler.
+
   """
   def is_float(term) do
     # body not decompiled
@@ -3168,6 +3337,7 @@ defmodule Kernel do
   Returns `true` if `term` is a function; otherwise returns `false`.
 
   Allowed in guard tests. Inlined by the compiler.
+
   """
   def is_function(term) do
     # body not decompiled
@@ -3185,6 +3355,8 @@ defmodule Kernel do
       true
       iex> is_function(fn x -> x * 2 end, 2)
       false
+
+
   """
   def is_function(term, arity) do
     # body not decompiled
@@ -3194,6 +3366,7 @@ defmodule Kernel do
   Returns `true` if `term` is an integer; otherwise returns `false`.
 
   Allowed in guard tests. Inlined by the compiler.
+
   """
   def is_integer(term) do
     # body not decompiled
@@ -3203,6 +3376,7 @@ defmodule Kernel do
   Returns `true` if `term` is a list with zero or more elements; otherwise returns `false`.
 
   Allowed in guard tests. Inlined by the compiler.
+
   """
   def is_list(term) do
     # body not decompiled
@@ -3212,6 +3386,7 @@ defmodule Kernel do
   Returns `true` if `term` is a map; otherwise returns `false`.
 
   Allowed in guard tests. Inlined by the compiler.
+
   """
   def is_map(term) do
     # body not decompiled
@@ -3223,6 +3398,7 @@ defmodule Kernel do
   It raises `BadMapError` if the first element is not a map.
 
   Allowed in guard tests. Inlined by the compiler.
+
   """
   def is_map_key(map, key) do
     # body not decompiled
@@ -3233,6 +3409,7 @@ defmodule Kernel do
   otherwise returns `false`.
 
   Allowed in guard tests. Inlined by the compiler.
+
   """
   def is_number(term) do
     # body not decompiled
@@ -3242,6 +3419,7 @@ defmodule Kernel do
   Returns `true` if `term` is a PID (process identifier); otherwise returns `false`.
 
   Allowed in guard tests. Inlined by the compiler.
+
   """
   def is_pid(term) do
     # body not decompiled
@@ -3251,6 +3429,7 @@ defmodule Kernel do
   Returns `true` if `term` is a port identifier; otherwise returns `false`.
 
   Allowed in guard tests. Inlined by the compiler.
+
   """
   def is_port(term) do
     # body not decompiled
@@ -3260,6 +3439,7 @@ defmodule Kernel do
   Returns `true` if `term` is a reference; otherwise returns `false`.
 
   Allowed in guard tests. Inlined by the compiler.
+
   """
   def is_reference(term) do
     # body not decompiled
@@ -3269,6 +3449,7 @@ defmodule Kernel do
   Returns `true` if `term` is a tuple; otherwise returns `false`.
 
   Allowed in guard tests. Inlined by the compiler.
+
   """
   def is_tuple(term) do
     # body not decompiled
@@ -3283,6 +3464,8 @@ defmodule Kernel do
 
       iex> length([1, 2, 3, 4, 5, 6, 7, 8, 9])
       9
+
+
   """
   def length(list) do
     # body not decompiled
@@ -3306,6 +3489,8 @@ defmodule Kernel do
 
       iex> macro_exported?(:erlang, :abs, 1)
       false
+
+
   """
   def macro_exported?(module, macro, arity) do
     # body not decompiled
@@ -3323,6 +3508,8 @@ defmodule Kernel do
 
       make_ref()
       #=> #Reference<0.0.0.135>
+
+
   """
   def make_ref() do
     # body not decompiled
@@ -3341,6 +3528,8 @@ defmodule Kernel do
 
       iex> map_size(%{a: "foo", b: "bar"})
       2
+
+
   """
   def map_size(map) do
     # body not decompiled
@@ -3371,6 +3560,7 @@ defmodule Kernel do
   because the structural comparison compares the day before the year. In
   such cases it is common for modules to provide functions such as
   `Date.compare/2` that perform semantic comparison.
+
   """
   def max(first, second) do
     # body not decompiled
@@ -3401,6 +3591,7 @@ defmodule Kernel do
   because the structural comparison compares the day before the year. In
   such cases it is common for modules to provide functions such as
   `Date.compare/2` that perform semantic comparison.
+
   """
   def min(first, second) do
     # body not decompiled
@@ -3419,6 +3610,7 @@ defmodule Kernel do
   If the node is not alive, `:nonode@nohost` is returned instead.
 
   Allowed in guard tests. Inlined by the compiler.
+
   """
   def node() do
     # body not decompiled
@@ -3430,6 +3622,7 @@ defmodule Kernel do
   If the local node is not alive, `:nonode@nohost` is returned.
 
   Allowed in guard tests. Inlined by the compiler.
+
   """
   def node(arg) do
     # body not decompiled
@@ -3446,6 +3639,8 @@ defmodule Kernel do
 
       iex> not false
       true
+
+
   """
   def not(value) do
     # body not decompiled
@@ -3471,6 +3666,8 @@ defmodule Kernel do
       iex> users = %{"john" => %{age: 27}, "meg" => %{age: 23}}
       iex> pop_in(users, ["jane", :age])
       {nil, %{"john" => %{age: 27}, "meg" => %{age: 23}}}
+
+
   """
   def pop_in(data, keys) do
     # body not decompiled
@@ -3486,6 +3683,8 @@ defmodule Kernel do
       iex> tuple = {:foo, :bar, 3}
       iex> put_elem(tuple, 0, :baz)
       {:baz, :bar, 3}
+
+
   """
   def put_elem(tuple, index, value) do
     # body not decompiled
@@ -3507,6 +3706,7 @@ defmodule Kernel do
 
   In case any of the entries in the middle returns `nil`,
   an error will be raised when trying to access it next.
+
   """
   def put_in(data, keys, value) do
     # body not decompiled
@@ -3529,6 +3729,8 @@ defmodule Kernel do
       1
       iex> rem(6, -4)
       2
+
+
   """
   def rem(dividend, divisor) do
     # body not decompiled
@@ -3560,6 +3762,8 @@ defmodule Kernel do
 
       iex> round(-2.5)
       -3
+
+
   """
   def round(number) do
     # body not decompiled
@@ -3569,6 +3773,7 @@ defmodule Kernel do
   Returns the PID (process identifier) of the calling process.
 
   Allowed in guard clauses. Inlined by the compiler.
+
   """
   def self() do
     # body not decompiled
@@ -3587,6 +3792,8 @@ defmodule Kernel do
 
       iex> send(self(), :hello)
       :hello
+
+
   """
   def send(dest, message) do
     # body not decompiled
@@ -3614,6 +3821,8 @@ defmodule Kernel do
       receive do
         {^child, 3} -> IO.puts("Received 3 back")
       end
+
+
   """
   def spawn(fun) do
     # body not decompiled
@@ -3635,6 +3844,8 @@ defmodule Kernel do
   ## Examples
 
       spawn(SomeModule, :function, [1, 2, 3])
+
+
   """
   def spawn(module, fun, args) do
     # body not decompiled
@@ -3663,6 +3874,8 @@ defmodule Kernel do
       receive do
         {^child, 3} -> IO.puts("Received 3 back")
       end
+
+
   """
   def spawn_link(fun) do
     # body not decompiled
@@ -3685,6 +3898,8 @@ defmodule Kernel do
   ## Examples
 
       spawn_link(SomeModule, :function, [1, 2, 3])
+
+
   """
   def spawn_link(module, fun, args) do
     # body not decompiled
@@ -3709,6 +3924,8 @@ defmodule Kernel do
 
       current = self()
       spawn_monitor(fn -> send(current, {self(), 1 + 2}) end)
+
+
   """
   def spawn_monitor(fun) do
     # body not decompiled
@@ -3730,6 +3947,8 @@ defmodule Kernel do
   ## Examples
 
       spawn_monitor(SomeModule, :function, [1, 2, 3])
+
+
   """
   def spawn_monitor(module, fun, args) do
     # body not decompiled
@@ -3778,6 +3997,8 @@ defmodule Kernel do
       # String keys are ignored
       struct(User, %{"name" => "meg"})
       #=> %User{name: "john"}
+
+
   """
   def struct(struct, fields \\ []) do
     # body not decompiled
@@ -3804,6 +4025,8 @@ defmodule Kernel do
       function will check if every given key-value belongs to the struct.
       However, updating structs does not enforce keys, as keys are enforced
       only when building;
+
+
   """
   def struct!(struct, fields \\ []) do
     # body not decompiled
@@ -3815,6 +4038,7 @@ defmodule Kernel do
   Check `Kernel.SpecialForms.try/1` for more information.
 
   Inlined by the compiler.
+
   """
   def throw(term) do
     # body not decompiled
@@ -3843,6 +4067,8 @@ defmodule Kernel do
 
       tl([:a | %{b: 1}])
       #=> %{b: 1}
+
+
   """
   def tl(list) do
     # body not decompiled
@@ -3863,6 +4089,8 @@ defmodule Kernel do
 
       iex> trunc(-5)
       -5
+
+
   """
   def trunc(number) do
     # body not decompiled
@@ -3879,6 +4107,8 @@ defmodule Kernel do
 
       iex> tuple_size({:a, :b, :c})
       3
+
+
   """
   def tuple_size(tuple) do
     # body not decompiled
@@ -3906,6 +4136,7 @@ defmodule Kernel do
 
   In case any of the entries in the middle returns `nil`,
   an error will be raised when trying to access it next.
+
   """
   def update_in(data, keys, fun) do
     # body not decompiled

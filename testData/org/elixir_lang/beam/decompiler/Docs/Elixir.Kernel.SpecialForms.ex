@@ -22,6 +22,7 @@ defmodule Kernel.SpecialForms do
   `__aliases__/1`, which are not intended to be called directly by the
   developer but they appear in quoted contents since they are essential
   in Elixir's constructs.
+
   """
 
   # Macros
@@ -94,6 +95,8 @@ defmodule Kernel.SpecialForms do
   its name:
 
       %_{} = user
+
+
   """
   defmacro unquote(:%)(p0, p1) do
     # body not decompiled
@@ -115,6 +118,8 @@ defmodule Kernel.SpecialForms do
       ...>   %{"a" => :b, c: :d}
       ...> end
       {:%{}, [], [{"a", :b}, {:c, :d}]}
+
+
   """
   defmacro unquote(:%{})(p0) do
     # body not decompiled
@@ -194,6 +199,8 @@ defmodule Kernel.SpecialForms do
 
       # Block expression, fails to compile.
       &(&1; &2)
+
+
   """
   defmacro unquote(:&)(p0) do
     # body not decompiled
@@ -317,6 +324,8 @@ defmodule Kernel.SpecialForms do
       ...> end
       {{:., [], [{:__aliases__, [alias: false], [:Module]}, :concat]}, [],
        [{:__aliases__, [alias: false], [:String]}, Sample]}
+
+
   """
   defmacro unquote(:.)(p0, p1) do
     # body not decompiled
@@ -340,6 +349,7 @@ defmodule Kernel.SpecialForms do
   Read the documentation on the `Typespec` page and
   `<<>>/1` for more information on typespecs and
   bitstrings respectively.
+
   """
   defmacro left :: right do
     # body not decompiled
@@ -559,6 +569,7 @@ defmodule Kernel.SpecialForms do
   To learn more about specific optimizations and performance considerations,
   check out
   [Erlang's Efficiency Guide on handling binaries](http://www.erlang.org/doc/efficiency_guide/binaryhandling.html).
+
   """
   defmacro unquote(:<<>>)(p0) do
     # body not decompiled
@@ -566,6 +577,7 @@ defmodule Kernel.SpecialForms do
 
   @doc ~S"""
   Match operator. Matches the value on the right against the pattern on the left.
+
   """
   defmacro left = right do
     # body not decompiled
@@ -599,6 +611,8 @@ defmodule Kernel.SpecialForms do
       iex> {x, ^x} = {1, 0}
       iex> x
       1
+
+
   """
   defmacro unquote(:"^")(p0) do
     # body not decompiled
@@ -609,6 +623,7 @@ defmodule Kernel.SpecialForms do
 
   In the environment you can access the filename, line numbers,
   set up aliases, the function and others.
+
   """
   defmacro __CALLER__ do
     # body not decompiled
@@ -619,6 +634,7 @@ defmodule Kernel.SpecialForms do
 
   Although the directory can be accessed as `Path.dirname(__ENV__.file)`,
   this macro is a convenient shortcut.
+
   """
   defmacro __DIR__ do
     # body not decompiled
@@ -629,6 +645,7 @@ defmodule Kernel.SpecialForms do
 
   In the environment you can access the current filename,
   line numbers, set up aliases, the current function and others.
+
   """
   defmacro __ENV__ do
     # body not decompiled
@@ -639,6 +656,7 @@ defmodule Kernel.SpecialForms do
 
   Although the module can be accessed in the `__ENV__/0`, this macro
   is a convenient shortcut.
+
   """
   defmacro __MODULE__ do
     # body not decompiled
@@ -652,6 +670,7 @@ defmodule Kernel.SpecialForms do
 
   To retrieve the stacktrace of the current process, use
   `Process.info(self(), :current_stacktrace)` instead.
+
   """
   defmacro __STACKTRACE__ do
     # body not decompiled
@@ -687,6 +706,8 @@ defmodule Kernel.SpecialForms do
     2. The tail elements of aliases are guaranteed to always be atoms.
 
     3. When the head element of aliases is the atom `:Elixir`, no expansion happens.
+
+
   """
   defmacro __aliases__(args) do
     # body not decompiled
@@ -705,6 +726,8 @@ defmodule Kernel.SpecialForms do
       ...>   3
       ...> end
       {:__block__, [], [1, 2, 3]}
+
+
   """
   defmacro __block__(args) do
     # body not decompiled
@@ -767,6 +790,8 @@ defmodule Kernel.SpecialForms do
 
   Both warning behaviours could be changed by explicitly
   setting the `:warn` option to `true` or `false`.
+
+
   """
   defmacro alias(module, opts) do
     # body not decompiled
@@ -841,6 +866,8 @@ defmodule Kernel.SpecialForms do
         _ -> "Will match"
       end
       #=> "Will match"
+
+
   """
   defmacro case(condition, clauses) do
     # body not decompiled
@@ -871,6 +898,8 @@ defmodule Kernel.SpecialForms do
           "This will"
       end
       #=> "This will"
+
+
   """
   defmacro cond(clauses) do
     # body not decompiled
@@ -896,6 +925,8 @@ defmodule Kernel.SpecialForms do
       ...> end
       iex> negate.(false)
       true
+
+
   """
   defmacro unquote(:fn)(p0) do
     # body not decompiled
@@ -1018,6 +1049,7 @@ defmodule Kernel.SpecialForms do
   expression on the right side must return the new accumulator value. Once there are no more
   elements, the final accumulated value is returned. If there are no elements
   at all, then the initial accumulator value is returned.
+
   """
   defmacro for(args) do
     # body not decompiled
@@ -1120,6 +1152,7 @@ defmodule Kernel.SpecialForms do
   a `foo` function with an arity of `1`, an error is only emitted
   if an ambiguous call to `foo/1` is actually made; that is, the
   errors are emitted lazily, not eagerly.
+
   """
   defmacro import(module, opts) do
     # body not decompiled
@@ -1624,6 +1657,7 @@ defmodule Kernel.SpecialForms do
 
   In fact, the `:bind_quoted` option is recommended every time
   one desires to inject a value into the quote.
+
   """
   defmacro quote(opts, block) do
     # body not decompiled
@@ -1680,6 +1714,7 @@ defmodule Kernel.SpecialForms do
 
   The `receive/1` special form handles variables exactly as the `case/2`
   special macro. For more information, check the docs for `case/2`.
+
   """
   defmacro receive(args) do
     # body not decompiled
@@ -1708,6 +1743,8 @@ defmodule Kernel.SpecialForms do
 
   `require/2` also accepts `:as` as an option so it automatically sets
   up an alias. Please check `alias/2` for more information.
+
+
   """
   defmacro require(module, opts) do
     # body not decompiled
@@ -1717,6 +1754,7 @@ defmodule Kernel.SpecialForms do
   Calls the overridden function when overriding it with `Kernel.defoverridable/1`.
 
   See `Kernel.defoverridable/1` for more information and documentation.
+
   """
   defmacro super(args) do
     # body not decompiled
@@ -2008,6 +2046,8 @@ defmodule Kernel.SpecialForms do
         catch
           _, _ -> :failed
         end
+
+
   """
   defmacro try(args) do
     # body not decompiled
@@ -2062,6 +2102,7 @@ defmodule Kernel.SpecialForms do
 
   If you forget to escape it, Elixir will raise an error
   when compiling the code.
+
   """
   defmacro unquote(:unquote)(p0) do
     # body not decompiled
@@ -2079,6 +2120,8 @@ defmodule Kernel.SpecialForms do
       ...>   sum(1, unquote_splicing(values), 5)
       ...> end
       {:sum, [], [1, 2, 3, 4, 5]}
+
+
   """
   defmacro unquote(:unquote_splicing)(p0) do
     # body not decompiled
@@ -2165,6 +2208,7 @@ defmodule Kernel.SpecialForms do
 
   If an `else` block is used and there are no matching clauses, a `WithClauseError`
   exception is raised.
+
   """
   defmacro with(args) do
     # body not decompiled
@@ -2193,6 +2237,8 @@ defmodule Kernel.SpecialForms do
       ...>   {1, 2, 3}
       ...> end
       {:{}, [], [1, 2, 3]}
+
+
   """
   defmacro unquote(:{})(p0) do
     # body not decompiled

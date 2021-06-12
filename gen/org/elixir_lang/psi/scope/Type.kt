@@ -36,11 +36,14 @@ abstract class Type : PsiScopeProcessor {
                 is AtNonNumericOperation -> execute(element, state)
                 is Call -> execute(element, state)
                 // Anonymous function type siganture
+                is ElixirStabParenthesesSignature -> execute(element, state)
+                // Anonymous function type siganture
                 is ElixirStabNoParenthesesSignature -> execute(element, state)
                 // type variable in a `when key: type`
                 is ElixirKeywordKey -> executeOnParameter(element, state)
                 is ElixirNoParenthesesOneArgument, is ElixirAccessExpression -> executeOnChildren(element, state)
-                is ElixirFile, is ElixirList, is ElixirTuple -> false
+                is ElixirAtom, is ElixirFile, is ElixirList, is ElixirParentheticalStab, is ElixirTuple,
+                is WholeNumber -> false
                 else -> {
                     TODO("Not yet implemented")
                 }
@@ -93,8 +96,11 @@ abstract class Type : PsiScopeProcessor {
         }
     }
 
+    private fun execute(stabParenthesesSignature: ElixirStabParenthesesSignature, state: ResolveState): Boolean =
+            executeOnChildren(stabParenthesesSignature.parenthesesArguments, state)
+
     private fun execute(stabNoParenthesesSignature: ElixirStabNoParenthesesSignature, state: ResolveState): Boolean =
-        executeOnChildren(stabNoParenthesesSignature .noParenthesesArguments, state)
+        executeOnChildren(stabNoParenthesesSignature.noParenthesesArguments, state)
 
     private fun executeOnChildren(parent: PsiElement, state: ResolveState): Boolean =
             parent.whileInChildExpressions() {

@@ -60,33 +60,53 @@ object ProcessDeclarationsImpl {
 
         return if (ModuleAttribute.isTypeSpecName(identifierName)) {
             atUnqualifiedNoParenthesesCall.finalArguments()?.singleOrNull()?.let { argument ->
-                when (argument) {
-                    // `Type` are gotten going up, don't need to go down here
-                    is Type -> true
-                    is When -> {
-                        argument.rightOperand()?.let { typeVariableRestrictions ->
-                            when (typeVariableRestrictions) {
-                                is QuotableKeywordList ->
-                                    whileIn(typeVariableRestrictions.quotableKeywordPairList()) { keywordPair ->
-                                        processor.execute(keywordPair.keywordKey, state)
-                                    }
-                                else -> {
-                                    Logger.error(typeVariableRestrictions::class.java,
-                                            "Don't know how find type variable restrictions",
-                                            typeVariableRestrictions)
-
-                                    null
-                                }
-                            }
-                        }
-                    }
-                    else -> null
-                }
+                processDeclarationInTypeSpecArgument(argument, processor, state)
             } ?: true
         } else {
             processor.execute(atUnqualifiedNoParenthesesCall, state)
         }
     }
+
+    private fun processDeclarationInTypeSpecArgument(argument: PsiElement,
+                                                     processor: PsiScopeProcessor,
+                                                     state: ResolveState): Boolean =
+        when (argument) {
+            // `Type` are gotten going up, don't need to go down here
+            is Type -> true
+            is When -> processDeclarationInTypeSpecArgument(argument, processor, state)
+            else -> true
+        }
+
+    private fun processDeclarationInTypeSpecArgument(argument: When,
+                                                     processor: PsiScopeProcessor,
+                                                     state: ResolveState): Boolean =
+        argument.rightOperand()?.stripAccessExpression()?.let {
+            processDeclarationInTypeSpecRestrictions(it, processor, state)
+        } ?: true
+
+    private fun processDeclarationInTypeSpecRestrictions(restrictions: PsiElement, processor: PsiScopeProcessor, state: ResolveState): Boolean =
+            when (restrictions) {
+                is ElixirList -> restrictions.whileInChildExpressions {
+                    processDeclarationInTypeSpecRestrictions(it, processor, state)
+                }
+                is QuotableKeywordList -> whileIn(restrictions.quotableKeywordPairList()) {
+                    processDeclarationInTypeSpecRestrictions(it, processor, state)
+                }
+                is QuotableKeywordPair -> processor.execute(restrictions.keywordKey, state)
+                is Type -> restrictions.leftOperand()?.let {
+                    processor.execute(it, state)
+                } ?: true
+                // The `when` isn't finished being type, so its argument is the `def` like:
+                // `@spec foo(bar) :: term() when\ndef foo(`
+                is Call -> true
+                else -> {
+                    Logger.error(restrictions::class.java,
+                            "Don't know how find type variable restrictions",
+                            restrictions)
+
+                    true
+                }
+            }
 
     /**
      * `def(macro)?p?`, `for`, or `with` can declare variables

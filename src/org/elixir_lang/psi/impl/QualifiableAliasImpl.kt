@@ -122,6 +122,9 @@ object QualifiableAliasImpl {
         when (ancestor) {
             // being inside arguments to a call end qualifiers
             is Arguments,
+            // Typing a qualified call before the function name is written
+            // `Alias.(arg1)` when the full line is `Alias.f(arg1)
+            is DotCall<*>,
             is Operation,
             is QuotableKeywordPair,
             // containers

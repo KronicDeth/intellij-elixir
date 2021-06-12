@@ -3,6 +3,7 @@ package org.elixir_lang.psi.__module__
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Computable
+import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.PsiReferenceBase
@@ -11,6 +12,8 @@ import com.intellij.psi.impl.source.resolve.ResolveCache
 import org.elixir_lang.psi.call.Call
 
 class Reference(call: Call, val useCall: Call?) : PsiReferenceBase<Call>(call), PsiPolyVariantReference {
+    override fun calculateDefaultRangeInElement(): TextRange = TextRange.create(0, element.textOffset)
+
     override fun getVariants(): Array<Any> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }

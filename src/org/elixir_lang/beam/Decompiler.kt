@@ -118,7 +118,7 @@ class Decompiler : BinaryFileDecompiler {
                 if (documentedByArityByName.isNotEmpty()) {
                     decompiled
                             .append('\n')
-                            .append("  # Types")
+                            .append("  # Types\n")
                             .append('\n')
                 }
 

@@ -20,6 +20,7 @@ import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.call.keywordArgument
 import org.elixir_lang.psi.impl.call.maybeModularNameToModulars
+import org.elixir_lang.psi.impl.call.whileInStabBodyChildExpressions
 import org.elixir_lang.psi.impl.childExpressions
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.impl.whileInChildExpressions
@@ -29,6 +30,13 @@ import org.elixir_lang.psi.stub.type.call.Stub.isModular
 abstract class Module : PsiScopeProcessor {
     override fun <T> getHint(hintKey: Key<T>): T? = null
     override fun handleEvent(event: PsiScopeProcessor.Event, associated: Any?) {}
+
+    override fun execute(match: PsiElement, state: ResolveState): Boolean =
+            if (match is Named) {
+                execute(match, state)
+            } else {
+                true
+            }
 
     /**
      * Decides whether `match` matches the criteria being searched for.  All other [.execute] methods
@@ -217,9 +225,14 @@ abstract class Module : PsiScopeProcessor {
             if (state.get(ENTRANCE).containingFile.context == match) {
                 executeOnViewModular(match, state)
             } else {
-                match.name?.let {
+                val keepProcessing = match.name?.let {
                     executeOnModularName(match, it, state)
                 } ?: true
+
+                // descend in modular to check for nested modulars in case their relative name is being used
+                keepProcessing && match.whileInStabBodyChildExpressions { childExpression ->
+                    execute(childExpression, state)
+                }
             }
 
     private fun executeOnViewModular(match: Named, state: ResolveState): Boolean =
