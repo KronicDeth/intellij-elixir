@@ -37,7 +37,7 @@ class Submitter : ErrorReportSubmitter() {
     override fun submit(events: Array<IdeaLoggingEvent>,
                         additionalInfo: String?,
                         parentComponent: Component,
-                        consumer: Consumer<SubmittedReportInfo>): Boolean {
+                        consumer: Consumer<in SubmittedReportInfo>): Boolean {
         val project = project(parentComponent)
         val throwableList = events.mapNotNull { event -> event.throwable }
         val attachmentList = events.map { event -> event.data }.filterIsInstance<AbstractMessage>().flatMap { it.includedAttachments }
@@ -97,7 +97,7 @@ class Submitter : ErrorReportSubmitter() {
 
         private fun successCallback(
                 project: Project?,
-                consumer: Consumer<SubmittedReportInfo>
+                consumer: Consumer<in SubmittedReportInfo>
         ): Consumer<Boolean> {
             return Consumer {
                 val url: String? = null

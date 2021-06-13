@@ -51,7 +51,9 @@ allprojects {
   intellij {
     def intellij_erlang_version
 
-    if (ideaVersion.startsWith("2020.2")) {
+    if (ideaVersion.startsWith("2021.1.2")) {
+      intellij_erlang_version = "0.11.1108"
+    } else if (ideaVersion.startsWith("2020.2")) {
       intellij_erlang_version = "0.11.1068"
     } else if (ideaVersion.startsWith("2020.1")) {
       intellij_erlang_version = "0.11.1059"

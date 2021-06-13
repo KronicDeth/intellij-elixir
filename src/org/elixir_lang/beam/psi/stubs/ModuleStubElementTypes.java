@@ -22,7 +22,7 @@ import static org.elixir_lang.psi.stub.call.Deserialized.writeGuarded;
 
 // See com.intellij.psi.impl.java.stubs.JavaStubElementTypes
 public interface ModuleStubElementTypes {
-    ModuleElementType CALL_DEFINITION = new ModuleElementType<CallDefinitionStub, CallDefinition>("CallDefinition") {
+    ModuleElementType<CallDefinitionStub<?>, CallDefinition> CALL_DEFINITION = new ModuleElementType<CallDefinitionStub<?>, CallDefinition>("CallDefinition") {
         @NotNull
         @Override
         public ASTNode createCompositeNode() {
@@ -31,17 +31,17 @@ public interface ModuleStubElementTypes {
 
         @Override
         public CallDefinition createPsi(@NotNull CallDefinitionStub stub) {
-            return new CallDefinitionImpl(stub);
+            return new CallDefinitionImpl<>(stub);
         }
 
         @NotNull
         @Override
-        public CallDefinitionStub deserialize(@NotNull StubInputStream stubInputStream,
-                                              @NotNull StubElement parentStub) throws IOException {
+        public CallDefinitionStub<?> deserialize(@NotNull StubInputStream stubInputStream,
+                                                 @NotNull StubElement parentStub) throws IOException {
             Deserialized deserialized = Deserialized.deserialize(stubInputStream);
             int callDefinitionClauseArity = deserializeCallDefinitionClauseArity(stubInputStream);
 
-            return new CallDefinitionStubImpl((ModuleStub) parentStub, deserialized, callDefinitionClauseArity);
+            return new CallDefinitionStubImpl((ModuleStub<?>) parentStub, deserialized, callDefinitionClauseArity);
         }
 
         int deserializeCallDefinitionClauseArity(@NotNull StubInputStream stubInputStream) throws IOException {
@@ -62,7 +62,7 @@ public interface ModuleStubElementTypes {
     /**
      * See {@link com.intellij.psi.impl.java.stubs.JavaStubElementTypes#CLASS}
      */
-    ModuleElementType MODULE = new ModuleElementType<ModuleStub, Module>("Module") {
+    ModuleElementType<ModuleStub<?>, Module> MODULE = new ModuleElementType<ModuleStub<?>, Module>("Module") {
         @NotNull
         @Override
         public ASTNode createCompositeNode() {
@@ -76,8 +76,8 @@ public interface ModuleStubElementTypes {
 
         @NotNull
         @Override
-        public ModuleStub deserialize(@NotNull StubInputStream stubInputStream,
-                                      @NotNull StubElement parentStub) throws IOException {
+        public ModuleStub<?> deserialize(@NotNull StubInputStream stubInputStream,
+                                         @NotNull StubElement parentStub) throws IOException {
             Deserialized deserialized = Deserialized.deserialize(stubInputStream);
 
             return new ModuleStubImpl(parentStub, deserialized);
