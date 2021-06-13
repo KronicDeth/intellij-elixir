@@ -88,7 +88,6 @@ allprojects {
     pluginName 'intellij-elixir'
     version ideaVersion
     downloadSources Boolean.valueOf(sources)
-    updateSinceUntilBuild = false
   }
 
   patchPluginXml {
