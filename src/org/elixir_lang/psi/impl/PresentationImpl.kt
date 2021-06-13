@@ -116,6 +116,3 @@ private fun VirtualFile.locationString(project: Project): String {
         path
     }
 }
-
-private fun root(project: Project, module: Module?): String =
-    module?.moduleFilePath?.let { File(it).parent } ?: project.basePath!!
