@@ -105,6 +105,10 @@ allprojects {
     token System.getenv("JET_BRAINS_MARKETPLACE_TOKEN")
     channels publishChannels
   }
+
+  runPluginVerifier {
+    ideVersions = ["2021.1.2"]
+  }
 }
 
 apply plugin: "kotlin"
