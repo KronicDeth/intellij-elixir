@@ -6,7 +6,9 @@ import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.module.Module
+import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.module.ModuleUtilCore
+import com.intellij.openapi.module.impl.ModuleManagerEx
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectBundle
 import com.intellij.openapi.projectRoots.*
@@ -497,8 +499,19 @@ ELIXIR_SDK_HOME
            ProjectFileIndex.SERVICE.getInstance(Project) returns {@code null}, so check that the ProjectFileIndex is
            available first */
             return if (ProjectFileIndex.SERVICE.getInstance(project) != null) {
-                ModuleUtilCore.findModuleForPsiElement(psiElement)?.let { module -> mostSpecificSdk(module) }
-                        ?: mostSpecificSdk(project)
+                val manager = ModuleManager.getInstance(project)
+
+                val module = if (manager !is ModuleManagerEx || manager.areModulesLoaded()) {
+                    ModuleUtilCore.findModuleForPsiElement(psiElement)
+                } else {
+                    null
+                }
+
+                if (module != null) {
+                    mostSpecificSdk(module)
+                } else {
+                    mostSpecificSdk(project)
+                }
             } else {
                 mostSpecificSdk(project)
             }
