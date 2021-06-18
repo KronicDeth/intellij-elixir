@@ -520,6 +520,22 @@ end
       <li>
         <p>Resolve uses of aliased name produced by <code>alias __MODULE__</code></p>
       </li>
+      <li>Updates
+        <ul>
+          <li>IntelliJ IDEA build version to 2021.1.2
+            <ul>
+              <li>Update <code>ParsingTestCase</code> to latest APIs.</li>
+            </ul>
+          </li>
+          <li>Gradle plugins
+            <ul>
+              <li>intellij 1.0</li>
+              <li>kotlin.jvm 1.5.10</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>Configure <code>runPluginVerifier</code></li>
     </ul>
   </li>
   <li>
@@ -962,6 +978,9 @@ end
           the <code>quote</code> block.
         </p>
       </li>
+      <li><code>updateSinceUntilBuild</code> to prevent breaking in future IDEs.</li>
+      <li>Check if modules loaded before using <code>findModuleForPsiElement</code>.</li>
+      <li>Use <code>BasePlatformTestCase</code> instead of <code>LightCodeInsightTestCase</code> because <code>LightCodeInsightTestCase</code> is deprecated.</li>
     </ul>
   </li>
 </ul>

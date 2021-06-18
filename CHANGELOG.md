@@ -437,6 +437,14 @@
   * Walk `quote` macros for sibling call definitions
   * Always fallback to name/arity in any module if callable not resolved in scope
   * Resolve uses of aliased name produced by `alias __MODULE__`
+* [#1967](https://github.com/KronicDeth/intellij-elixir/pull/1967) - [@KronicDeth](https://github.com/KronicDeth)
+  * Updates
+    * IntelliJ IDEA build version to 2021.1.2
+      * Update `ParsingTestCase` to latest APIs.
+    * Gradle plugins
+      * intellij 1.0
+      * kotlin.jvm 1.5.10 
+  * Configure `runPluginVerifier`
 
 ### Bug Fixes
 * [#1948](https://github.com/KronicDeth/intellij-elixir/pull/1948) - [@KronicDeth](https://github.com/KronicDeth)
@@ -590,6 +598,10 @@
     Elements in libraries don't have a `Module` from `ModuleUtil.findModuleForPsiElement`, so scan the element's project's module's content roots for the closest `Module` for libraries.
   * `prependQualifiers` when typing an alias on a new line in the body of a function.
   * Don't descend into `quote` blocks if the call being resolved is given to an `unquote` in the `quote` block.
+* [#1967](https://github.com/KronicDeth/intellij-elixir/pull/1967) - [@KronicDeth](https://github.com/KronicDeth)
+  * `updateSinceUntilBuild` to prevent breaking in future IDEs.
+  * Check if modules loaded before using `findModuleForPsiElement`.
+  * Use `BasePlatformTestCase` instead of `LightCodeInsightTestCase` because `LightCodeInsightTestCase` is deprecated.
 
 ## v11.10.0
 
