@@ -5,19 +5,19 @@ import com.google.common.io.Files;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess;
-import com.intellij.testFramework.LightCodeInsightTestCase;
+import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 
 import java.io.File;
 import java.io.IOException;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class DecompilerTest extends LightCodeInsightTestCase {
+public class DecompilerTest extends BasePlatformTestCase {
     /*
      * Tests
      */
 
-    public void testIssue575() throws IOException, OtpErlangDecodeException {
+    public void testIssue575() {
         String ebinDirectory = ebinDirectory();
 
         VfsRootAccess.allowRootAccess(ebinDirectory);

@@ -2,232 +2,606 @@
 
 ## Table of Contents
 
+* [v11.11.0](#v11110)
+   * [Enhancements](#enhancements)
+   * [Bug Fixes](#bug-fixes)
 * [v11.10.0](#v11100)
-  * [Enhancements](#enhancements)
-  * [Bug Fixes](#bug-fixes)
+   * [Enhancements](#enhancements-1)
+   * [Bug Fixes](#bug-fixes-1)
 * [v11.9.2](#v1192)
-  * [Bug Fixes](#bug-fixes-1)
+   * [Bug Fixes](#bug-fixes-2)
 * [v11.9.1](#v1191)
-  * [Bug Fixes](#bug-fixes-2)
+   * [Bug Fixes](#bug-fixes-3)
 * [v11.9.0](#v1190)
-  * [Enhancements](#enhancements-1)
-  * [Bug Fixes](#bug-fixes-3)
+   * [Enhancements](#enhancements-2)
+   * [Bug Fixes](#bug-fixes-4)
 * [v11.8.1](#v1181)
-  * [Bug Fixes](#bug-fixes-4)
+   * [Bug Fixes](#bug-fixes-5)
 * [v11.8.0](#v1180)
-  * [Enhancements](#enhancements-2)
-  * [Bug Fixes](#bug-fixes-5)
+   * [Enhancements](#enhancements-3)
+   * [Bug Fixes](#bug-fixes-6)
 * [v11.7.0](#v1170)
-  * [Enhancements](#enhancements-3)
-  * [Bug Fixes](#bug-fixes-6)
+   * [Enhancements](#enhancements-4)
+   * [Bug Fixes](#bug-fixes-7)
 * [v11.6.1](#v1161)
-  * [Bug Fixes](#bug-fixes-7)
+   * [Bug Fixes](#bug-fixes-8)
 * [v11.6.0](#v1160)
-  * [Enhancements](#enhancements-4)
-  * [Bug Fixes](#bug-fixes-8)
+   * [Enhancements](#enhancements-5)
+   * [Bug Fixes](#bug-fixes-9)
 * [v11.5.0](#v1150)
-  * [Enhancements](#enhancements-5)
-  * [Bug Fixes](#bug-fixes-9)
+   * [Enhancements](#enhancements-6)
+   * [Bug Fixes](#bug-fixes-10)
 * [v11.4.0](#v1140)
-  * [Enhancements](#enhancements-6)
+   * [Enhancements](#enhancements-7)
 * [v11.3.0](#v1130)
-  * [Enhancements](#enhancements-7)
-  * [Bug Fixes](#bug-fixes-10)
+   * [Enhancements](#enhancements-8)
+   * [Bug Fixes](#bug-fixes-11)
 * [v11.2.0](#v1120)
-  * [Enhancements](#enhancements-8)
-  * [Bug Fixes](#bug-fixes-11)
+   * [Enhancements](#enhancements-9)
+   * [Bug Fixes](#bug-fixes-12)
 * [v11.1.0](#v1110)
-  * [Enhancements](#enhancements-9)
-  * [Bug Fixes](#bug-fixes-12)
+   * [Enhancements](#enhancements-10)
+   * [Bug Fixes](#bug-fixes-13)
 * [v11.0.1](#v1101)
-  * [Bug Fixes](#bug-fixes-13)
+   * [Bug Fixes](#bug-fixes-14)
 * [v11.0.0](#v1100)
-  * [Enhancements](#enhancements-10)
-  * [Bug Fixes](#bug-fixes-14)
-  * [Incompatible Changes](#incompatible-changes)
+   * [Enhancements](#enhancements-11)
+   * [Bug Fixes](#bug-fixes-15)
+   * [Incompatible Changes](#incompatible-changes)
 * [v10.6.0](#v1060)
-  * [Enhancements](#enhancements-11)
-  * [Bug Fixes](#bug-fixes-15)
+   * [Enhancements](#enhancements-12)
+   * [Bug Fixes](#bug-fixes-16)
 * [v10.5.1](#v1051)
-  * [Bug Fixes](#bug-fixes-16)
+   * [Bug Fixes](#bug-fixes-17)
 * [v10.5.0](#v1050)
-  * [Enhancements](#enhancements-12)
-  * [Bug Fixes](#bug-fixes-17)
+   * [Enhancements](#enhancements-13)
+   * [Bug Fixes](#bug-fixes-18)
 * [v10.4.0](#v1040)
-  * [Enhancements](#enhancements-13)
-  * [Bug Fixes](#bug-fixes-18)
+   * [Enhancements](#enhancements-14)
+   * [Bug Fixes](#bug-fixes-19)
 * [v10.3.0](#v1030)
-  * [Enhancements](#enhancements-14)
-  * [Bug Fixes](#bug-fixes-19)
+   * [Enhancements](#enhancements-15)
+   * [Bug Fixes](#bug-fixes-20)
 * [v10.2.0](#v1020)
-  * [Enhancements](#enhancements-15)
-  * [Bug Fixes](#bug-fixes-20)
+   * [Enhancements](#enhancements-16)
+   * [Bug Fixes](#bug-fixes-21)
 * [v10.1.0](#v1010)
-  * [Enhancements](#enhancements-16)
-  * [Bug Fixes](#bug-fixes-21)
+   * [Enhancements](#enhancements-17)
+   * [Bug Fixes](#bug-fixes-22)
 * [v10.0.1](#v1001)
-  * [Bug Fixes](#bug-fixes-22)
+   * [Bug Fixes](#bug-fixes-23)
 * [v10.0.0](#v1000)
-  * [Enhancements](#enhancements-17)
-  * [Bug Fixes](#bug-fixes-23)
-  * [Incompatible Changes](#incompatible-changes-1)
+   * [Enhancements](#enhancements-18)
+   * [Bug Fixes](#bug-fixes-24)
+   * [Incompatible Changes](#incompatible-changes-1)
 * [v9.0.0](#v900)
-  * [Enhancements](#enhancements-18)
-  * [Bug Fixes](#bug-fixes-24)
-  * [Incompatible Changs](#incompatible-changs)
+   * [Enhancements](#enhancements-19)
+   * [Bug Fixes](#bug-fixes-25)
+   * [Incompatible Changs](#incompatible-changs)
 * [v8.1.0](#v810)
-  * [Enhancements](#enhancements-19)
-  * [Bug Fixes](#bug-fixes-25)
+   * [Enhancements](#enhancements-20)
+   * [Bug Fixes](#bug-fixes-26)
 * [v8.0.0](#v800)
-  * [Enhancements](#enhancements-20)
-  * [Bug Fixes](#bug-fixes-26)
-  * [Incompatible Changes](#incompatible-changes-2)
+   * [Enhancements](#enhancements-21)
+   * [Bug Fixes](#bug-fixes-27)
+   * [Incompatible Changes](#incompatible-changes-2)
 * [v7.5.0](#v750)
-  * [Enhancements](#enhancements-21)
-  * [Bug Fixes](#bug-fixes-27)
+   * [Enhancements](#enhancements-22)
+   * [Bug Fixes](#bug-fixes-28)
 * [v7.4.0](#v740)
-  * [Enhancements](#enhancements-22)
-  * [Bug Fixes](#bug-fixes-28)
+   * [Enhancements](#enhancements-23)
+   * [Bug Fixes](#bug-fixes-29)
 * [v7.3.0](#v730)
-  * [Enhancements](#enhancements-23)
-  * [Bug Fixes](#bug-fixes-29)
+   * [Enhancements](#enhancements-24)
+   * [Bug Fixes](#bug-fixes-30)
 * [v7.2.1](#v721)
-  * [Bug Fixes](#bug-fixes-30)
+   * [Bug Fixes](#bug-fixes-31)
 * [v7.2.0](#v720)
-  * [Enhancements](#enhancements-24)
-  * [Bug Fixes](#bug-fixes-31)
+   * [Enhancements](#enhancements-25)
+   * [Bug Fixes](#bug-fixes-32)
 * [v7.1.0](#v710)
-  * [Enhancements](#enhancements-25)
-  * [Bug Fixes](#bug-fixes-32)
+   * [Enhancements](#enhancements-26)
+   * [Bug Fixes](#bug-fixes-33)
 * [v7.0.0](#v700)
-  * [Enhancements](#enhancements-26)
-  * [Bug Fixes](#bug-fixes-33)
+   * [Enhancements](#enhancements-27)
+   * [Bug Fixes](#bug-fixes-34)
 * [Incompatible Changes](#incompatible-changes-3)
 * [v6.7.0](#v670)
-  * [Enhancements](#enhancements-27)
-  * [Bug Fixes](#bug-fixes-34)
+   * [Enhancements](#enhancements-28)
+   * [Bug Fixes](#bug-fixes-35)
 * [v6.6.0](#v660)
-  * [Enhancements](#enhancements-28)
-  * [Bug Fixes](#bug-fixes-35)
+   * [Enhancements](#enhancements-29)
+   * [Bug Fixes](#bug-fixes-36)
 * [v6.5.1](#v651)
-  * [Bug Fixes](#bug-fixes-36)
+   * [Bug Fixes](#bug-fixes-37)
 * [v6.5.0](#v650)
-  * [Enhancements](#enhancements-29)
-  * [Bug Fixes](#bug-fixes-37)
+   * [Enhancements](#enhancements-30)
+   * [Bug Fixes](#bug-fixes-38)
 * [v6.4.0](#v640)
-  * [Enhancements](#enhancements-30)
-  * [Bug Fixes](#bug-fixes-38)
+   * [Enhancements](#enhancements-31)
+   * [Bug Fixes](#bug-fixes-39)
 * [v6.3.0](#v630)
-  * [Enhancements](#enhancements-31)
-  * [Bug Fixes](#bug-fixes-39)
+   * [Enhancements](#enhancements-32)
+   * [Bug Fixes](#bug-fixes-40)
 * [v6.2.0](#v620)
-  * [Enhancements](#enhancements-32)
-  * [Bug Fixes](#bug-fixes-40)
+   * [Enhancements](#enhancements-33)
+   * [Bug Fixes](#bug-fixes-41)
 * [v6.1.1](#v611)
-  * [Bug Fixes](#bug-fixes-41)
+   * [Bug Fixes](#bug-fixes-42)
 * [v6.1.0](#v610)
-  * [Enhancements](#enhancements-33)
-  * [Bug Fixes](#bug-fixes-42)
+   * [Enhancements](#enhancements-34)
+   * [Bug Fixes](#bug-fixes-43)
 * [v6.0.0](#v600)
-  * [Enhancements](#enhancements-34)
-  * [Bug Fixes](#bug-fixes-43)
-  * [Incompatible Changes](#incompatible-changes-4)
+   * [Enhancements](#enhancements-35)
+   * [Bug Fixes](#bug-fixes-44)
+   * [Incompatible Changes](#incompatible-changes-4)
 * [v5.1.0](#v510)
-  * [Enhancements](#enhancements-35)
-  * [Bug Fixes](#bug-fixes-44)
+   * [Enhancements](#enhancements-36)
+   * [Bug Fixes](#bug-fixes-45)
 * [v5.0.0](#v500)
-  * [Enhancements](#enhancements-36)
-  * [Bug Fixes](#bug-fixes-45)
-  * [Incompatible Changes](#incompatible-changes-5)
+   * [Enhancements](#enhancements-37)
+   * [Bug Fixes](#bug-fixes-46)
+   * [Incompatible Changes](#incompatible-changes-5)
 * [v4.7.0](#v470)
-  * [Enhancements](#enhancements-37)
-  * [Bug Fixes](#bug-fixes-46)
+   * [Enhancements](#enhancements-38)
+   * [Bug Fixes](#bug-fixes-47)
 * [v4.6.0](#v460)
-  * [Enhancements](#enhancements-38)
-  * [Bug Fixes](#bug-fixes-47)
+   * [Enhancements](#enhancements-39)
+   * [Bug Fixes](#bug-fixes-48)
 * [v4.5.0](#v450)
-  * [Enhancements](#enhancements-39)
+   * [Enhancements](#enhancements-40)
 * [v4.4.0](#v440)
-  * [Enhancements](#enhancements-40)
-  * [Bug Fixes](#bug-fixes-48)
+   * [Enhancements](#enhancements-41)
+   * [Bug Fixes](#bug-fixes-49)
 * [v4.3.0](#v430)
-  * [Enhancements](#enhancements-41)
-  * [Bug Fixes](#bug-fixes-49)
+   * [Enhancements](#enhancements-42)
+   * [Bug Fixes](#bug-fixes-50)
 * [v4.2.0](#v420)
-  * [Enhancements](#enhancements-42)
-  * [Bug Fixes](#bug-fixes-50)
+   * [Enhancements](#enhancements-43)
+   * [Bug Fixes](#bug-fixes-51)
 * [v4.1.0](#v410)
-  * [Enhancements](#enhancements-43)
-  * [Bug Fixes](#bug-fixes-51)
+   * [Enhancements](#enhancements-44)
+   * [Bug Fixes](#bug-fixes-52)
 * [v4.0.0](#v400)
-  * [Enhancements](#enhancements-44)
-  * [Bug Fixes](#bug-fixes-52)
-  * [Incompatible Changes](#incompatible-changes-6)
+   * [Enhancements](#enhancements-45)
+   * [Bug Fixes](#bug-fixes-53)
+   * [Incompatible Changes](#incompatible-changes-6)
 * [v3.0.1](#v301)
-  * [Bug Fixes](#bug-fixes-53)
+   * [Bug Fixes](#bug-fixes-54)
 * [v3.0.0](#v300)
-  * [Enhancements](#enhancements-45)
-  * [Bug Fixes](#bug-fixes-54)
-  * [Incompatible Changes](#incompatible-changes-7)
+   * [Enhancements](#enhancements-46)
+   * [Bug Fixes](#bug-fixes-55)
+   * [Incompatible Changes](#incompatible-changes-7)
 * [v2.2.0](#v220)
-  * [Enhancement](#enhancement)
-  * [Bug Fixes](#bug-fixes-55)
+   * [Enhancement](#enhancement)
+   * [Bug Fixes](#bug-fixes-56)
 * [v2.1.0](#v210)
-  * [Enhancement](#enhancement-1)
-  * [Bug Fixes](#bug-fixes-56)
+   * [Enhancement](#enhancement-1)
+   * [Bug Fixes](#bug-fixes-57)
 * [v2.0.0](#v200)
-  * [Enhancements](#enhancements-46)
-  * [Bug Fixes](#bug-fixes-57)
-  * [Incompatible Changes](#incompatible-changes-8)
+   * [Enhancements](#enhancements-47)
+   * [Bug Fixes](#bug-fixes-58)
+   * [Incompatible Changes](#incompatible-changes-8)
 * [v1.2.1](#v121)
-  * [Enhancements](#enhancements-47)
-  * [Bug Fixes](#bug-fixes-58)
+   * [Enhancements](#enhancements-48)
+   * [Bug Fixes](#bug-fixes-59)
 * [v1.2.0](#v120)
-  * [Enhancements](#enhancements-48)
-  * [Bug Fixes](#bug-fixes-59)
+   * [Enhancements](#enhancements-49)
+   * [Bug Fixes](#bug-fixes-60)
 * [v1.1.0](#v110)
-  * [Enhancements](#enhancements-49)
+   * [Enhancements](#enhancements-50)
 * [v1.0.0](#v100)
-  * [Enhancements](#enhancements-50)
-  * [Bug Fixes](#bug-fixes-60)
-  * [Incompatible Fixes](#incompatible-fixes)
+   * [Enhancements](#enhancements-51)
+   * [Bug Fixes](#bug-fixes-61)
+   * [Incompatible Fixes](#incompatible-fixes)
 * [v0.3.5](#v035)
-  * [Enhancements](#enhancements-51)
-  * [Bug Fixes](#bug-fixes-61)
+   * [Enhancements](#enhancements-52)
+   * [Bug Fixes](#bug-fixes-62)
 * [v0.3.4](#v034)
-  * [Enhancements](#enhancements-52)
+   * [Enhancements](#enhancements-53)
 * [v0.3.3](#v033)
-  * [Enhancements](#enhancements-53)
+   * [Enhancements](#enhancements-54)
 * [v0.3.2](#v032)
-  * [Bug Fixes](#bug-fixes-62)
+   * [Bug Fixes](#bug-fixes-63)
 * [v0.3.1](#v031)
-  * [Enhancements](#enhancements-54)
+   * [Enhancements](#enhancements-55)
 * [v0.3.0](#v030)
-  * [Enhancements](#enhancements-55)
-  * [Incompatible Changes](#incompatible-changes-9)
+   * [Enhancements](#enhancements-56)
+   * [Incompatible Changes](#incompatible-changes-9)
 * [v0.2.1](#v021)
-  * [Enhancements](#enhancements-56)
-  * [Bug Fixes](#bug-fixes-63)
+   * [Enhancements](#enhancements-57)
+   * [Bug Fixes](#bug-fixes-64)
 * [v0.2.0](#v020)
-  * [Enhancements](#enhancements-57)
-  * [Incompatible Changes](#incompatible-changes-10)
+   * [Enhancements](#enhancements-58)
+   * [Incompatible Changes](#incompatible-changes-10)
 * [v0.1.4](#v014)
-  * [Enhancements](#enhancements-58)
-  * [Bug Fixes](#bug-fixes-64)
+   * [Enhancements](#enhancements-59)
+   * [Bug Fixes](#bug-fixes-65)
 * [v0.1.3](#v013)
-  * [Bug Fixes](#bug-fixes-65)
+   * [Bug Fixes](#bug-fixes-66)
 * [v0.1.2](#v012)
-  * [Enhancements](#enhancements-59)
+   * [Enhancements](#enhancements-60)
 * [v0.1.1](#v011)
-  * [Bug Fixes](#bug-fixes-66)
+   * [Bug Fixes](#bug-fixes-67)
 * [v0.1.0](#v010)
-  * [Enhancements](#enhancements-60)
-  * [Bug Fixes](#bug-fixes-67)
+   * [Enhancements](#enhancements-61)
+   * [Bug Fixes](#bug-fixes-68)
 * [v0.0.3](#v003)
-  * [Enhancements](#enhancements-61)
+   * [Enhancements](#enhancements-62)
 * [v0.0.2](#v002)
-  * [Enhancements](#enhancements-62)
-  * [Bug Fixes](#bug-fixes-68)
+   * [Enhancements](#enhancements-63)
+   * [Bug Fixes](#bug-fixes-69)
+
+## v11.11.0
+
+### Enhancements
+* [#1948](https://github.com/KronicDeth/intellij-elixir/pull/1948) - [@KronicDeth](https://github.com/KronicDeth)
+  * Reference Resolution
+    * Allow any Alias in a chain to have references.
+      This allows going to the declaration of `Phoenix`, `Phoenix.LiveView`, or `Phoenix.LiveView.Socket` depending on whether you're on the `Phoenix`, `LiveView`, or `Socket` Alias, respectively, in the chain.
+      * Allow any Alias in Qualified Alias to be resolved
+        This allows going to the declaration of Phoenix, Phoenix.LiveView, or Phoenix.LiveView.Socket depending on whether you're
+        on the Phoenix, LiveView, or Socket Alias, respectively, in the chain.
+      * Update DocumentationProvider to work with improved Alias resolution
+  
+        Without these changes the DocumentationProvider double-resolves and so ends up showing the docs for `def` and `defmodule`, instead of the call definition clause or module, respectively.
+    * Reimplement Module references
+      Instead of references for only the outermost QualifiableAlias, there is a reference for each right-most Alias at a given position, so instead of there only be a reference to `App.Context.Schema` in `App.Context.Schema`, there is now a reference to `App` in the `App` prefix, a reference to `App.Context` in `Context` in `App.Context`, and a reference to `App.Context.Schema` in `Schema` in `App.Context.Schema`.  Not only is this more useful, being able to jump to parent namespaces, but it fixed some of the capability issues with Go To Definition in the 2020 line of IDEs.  This approach of using `getRangeInElement` to target the range of the right-most Alias, while the element was still the parent that contained, but did not go beyond the Alias, was tried after having references only on `Alias`es and not `QualifiedAlias`es did not fix completion issues.  It was the while debugging Go To Declaration actions and noticing they were sensitive to the range in element AND the [docs for PsiReference#getRangeInElement](https://github.com/JetBrains/intellij-community/blob/f66e9644fa683fba22f4ce9e30c037720f745989/platform/core-api/src/com/intellij/psi/PsiReference.java#L49-L62) that I realized that the Go To Declaration and Completion has a hidden requirement that References for things that behave like namespaces have to work this way.
+      * Use `ModularName` index for Module Variants
+        Have a smaller index to iterate and remove need for the `isAlias` check.
+    * Limit Elixir Module resolution to same JetBrains Project Module
+      * Change the `GlobalSearchScope` from `allProject` to `moduleWithDependenciesAndLibrariesScope` for faster searching on multi-module projects.
+        * Set `includeTests` based whether the referring element is in a test directory.
+      * Use `StubIndex#processElements` instead of home grown `forEachNavigationElement` as `processElements` is more efficient.
+    * Favor Module `ResolveResults` under same `Module` content roots
+      This should favor deps sources in the same module.
+    * Iterate `function` body in `unquote(function())` when iterating call definition clauses in `quote`
+      Treats it `function` body the same as a `__using__` body.
+    * Standardized preferred `ResolveResult` filters between Callables and Modules
+  
+      1. Prefer valid results as long as it doesn't leave no results.
+      2. Prefer results in the same module as long as it doesn't leave no results.
+  
+      In Go To Declaration also:
+  
+      3. Prefer results in source (that aren't decompiled) as long as it doesn't leave no results.
+    * Use the second argument to `use` to determine which function is called with apply/3
+  
+      This pattern is used in Phoenix `__using__`, so this lets to differentiate whether `Plug.Conn.assign/3` or `Phoenix.LiveSocket.assign/3` is resolved in a Controller, LiveComponent, or LiveView.
+    * In LEEx Templates
+      * Resolve function calls in `*.html.leex` templates to functions defined in the corresponding LiveComponent/View module.
+      * Assigns
+        * Resolve assigns in LEEx templates to the keyword key in `assign/3` calls in `update/2` in the LiveComponent or LiveView
+          Had to add back in a `TargetElementEvaluator`, so that the `UnqualifiedNoArgumentCall` (`name`) that is the identifier in an assign (`@name`) was not counted as valid target for Find Usages / Go To Declaration by itself.
+        * Search for assigns in all call definitions in view module
+          Expand from just `update` to any call definition to cover helper functions and other callbacks. Don't stop on the first valid match because with helper functions and multiple callbacks, the last write isn't obvious.
+        * Resolve assigns set with `assign/3`
+        * Look for `assign` calls in `|>` pipelines
+        * Resolve assigns set with `assign_new/3`
+        * Resolve @live_action to where it is assigned Phoenix.LiveView.Channel.assign_action/2
+        * Find assigns in maps for assign/2
+          Since assign/2 accepts either a keyword list or a map, check in both types.
+        * Resolve @myself to where it is set in `render_pending_components`
+        * Resolve assigns in macros with do blocks like `case` and `if`
+        * Find assigns in `live_component` calls
+          If an assign can't be found in the body of a LiveComponent module, then it maybe passed through from the `live_component` call itself, so look for any references to the view module (the LiveComponent) and if it is a `live_component` call, then look at those assigns to try to resolve the assign name.
+        * Resolve assigns to `live_modal` calls
+          `live_modal` is not built into `phoenix_live_view`, but it is generated by `phx.gen.live`, so most projects will have it.  This allows `return_to`, which is used use in `live_modal`, to be resolved.
+        * Resolve `@socket` to last socket variable or call in view module.
+        * Resolve `@flash` to `put_flash/3` calls.
+        * Resolve `@inner_content` to `Phoenix.LiveView.Utils.to_rendered/2` setting the assign with `put_in`
+      * Resolve aliases in `.leex` templates
+        Generalize the `.leex` and `use` walking from call definition clauses to any scope processor lambda, so it can be used to resolve uses of `Routes` in `.leex` templates.
+    * Resolve Types
+      * Have separate references specifically for Types.
+      * Resolve to both types declared with `@type`, `@typep`, or `@opaque`; and named type parameters.
+      * Process declarations for `@type`, `@typep`, and `@opaque`.
+      * Count `@callback` as declaring a Type
+      * Resolve type `t` for `defprotocol` to where it is defined in `Protocol.__protocol__`
+        Unfortunately, this ties all protocol's `t` to the same element, so Find Usage finds all protocol's types instead of just a specific module's type, but this works for projects that have source, but not yet compiled.
+        * Favor protocol-specific decompiled `@type t` when available.
+      * Resolve type variable to the keyword key in guards.
+      * `__MODULE__`
+    * Favor source over decompiled per name instead of overall for `ResolveResultOrderedSet`
+      This allows the `Routes` alias to be resolved to the both the `MyAppWeb.Router.Helpers` in `alias MyAppWeb.Router.Helpers, as: Routes` in the source of `MyAppWeb`, but also the decompiled `MyAppWeb.Router.Helpers`, which is necessary as `MyAppWeb.Router.Helpers` is produced on compile from `router.ex`.
+    * Resolve references through `defdelegate` calls.
+    * Resolve `code_reloading?` in MyApp.Endpoint
+  
+      The generated `MyApp.Endpoint` for `mix phx.new` has a section to enable code-reloading at compile time:
+  
+      ```elixir
+      # Code reloading can be explicitly enabled under the
+      # :code_reloader configuration of your endpoint.
+      if code_reloading? do
+        socket("/phoenix/live_reload/socket", Phoenix.LiveReloader.Socket)
+        plug(Phoenix.LiveReloader)
+        plug(Phoenix.CodeReloader)
+      end
+      ```
+  
+      Previously, `code_reloading?` variable would not resolve because psi.scope.Variable ignored `use` calls, not `use` calls are entered and the `var!(code_reloading?)` is found in `Phoenix.Endpoint.config/1` by way of the `unquote(config(opts))` call in the `quote` block in `__using__(opts)`.
+    * Resolve qualified calls with unknown resolvable qualifier using only relative identifier and arity.
+    * `@spec`
+      * Resolve `@spec` to `defdelegate` calls.
+      * Resolve @specs to the definitions if the definitions are in a for comprehension
+    * `Ecto`
+      * `Query`
+        * Resolve reference variables in `Ecto.Query`
+          * Reference variables are introduced in as the left operand of `in` passed to `from/2` and the `join:` keyword in `from/2`.
+          * `join/3-5`
+          * Resolve bindings in `select/2-3`.
+          * Resolve reference variables in `where/2,3` binding.
+            Also add support for resolving `a` in `[{^assoc, a}]` binding.
+          * Resolve `bindings` in `group_by/2-3`.
+          * Resolve `bindings` and `expressions` in `order_by/2-3`.
+          * Resolve `bindings` in `having/2-3`.
+          * Add `select_merge` to declaring `Ecto.Query` macros.
+          * Add `distinct/2-3` as a declaring `Ecto.Query` macro.
+        * Resolve `field` calls in Ecto `schema` blocks
+  
+          How `field` works in `schema` for `Ecto.Schema`
+          1. `use Ecto.Schema`
+          2. `Ecto.Schema.__using__`
+          3. `import Ecto.Schema, only: [schema: 2, embedded_schema: 1]``
+  
+          Note that only the outer DSLs, schema and embedded_schema are available even though field/2 is defined in Ecto.Schema.
+  
+          So when you call `schema ... do`
+          1. `defmacro schema(source, [do: block])`
+          2. `schema(__CALLER__, source, true, :id, block)`
+          3. `defp schema(caller, source, meta?, type, block)`
+          4. There's a big `prelude = quote do` quote block
+  
+          At the end of prelude there is
+  
+          ```elixir
+          try do
+            import Ecto.Schema
+            unquote(block)
+          after
+            :ok
+          end
+          ```
+  
+          Hey! An `import Ecto.Schema`, but `prelude` is just floating as a variable.  At the end of  `defp schema(caller, source, meta?, type, block)` is
+  
+          ```elixir
+          quote do
+            unquote(prelude)
+            unquote(postlude)
+          end
+          ```
+  
+          So to statically analyze an `Ecto.Schema` module.
+  
+          1. Resolve `schema/2` to `defmacro schema` by walking the `use`, `__using__`, `quote`, and `import`.
+          2. Inside the `schema/2` (or macros in general if you want to get fancy 💅 and support more DSLs),
+          3. Go into the body of the macro.  If there's a call, resolve it
+          4. Go into the called function
+          5. Look for a `quote` block at the end (the same as my current `__using__` support)
+          6. If there's a `Call` inside an `unquote` see if you can resolve it to a variable in addition to a call definition (which is already supported for Phoenix).
+          7. If it's a variable, check it's value.  If it's a `quote`, use the quote block handling
+          8. In the quote block handling add support for `try`
+          9. Walk the `try` and see the `import`, walk the `import` to find `Ecto.Schema.field/2`
+        * `API`
+          *  Resolve `Ecto.Query.API` functions in `Ecto.Query`
+            * `from(order_by: ...)`
+            * `from(select: ...)`
+              * `from(select: tuple())`
+            * `from(where: ...)`
+            * `group_by/2-3`
+            * `having/2-3`
+            * `select/2-3` `expr` argument
+            * `where`
+          * Resolve `Ecto.Query.API.fragment` to arity interval `0..`.
+          * Resolve `fragment` nested in other `Ecto.Query.API` call like `type`.
+          * Walk `rightOperand` of `join(..., ... in ..., ...)` for `Ecto.Query.API` usages like `fragment`.
+    * Resolve module attributes defined in `use` `__using__` `quote` block
+      * Change `org.elixir_lang.reference.resolver.ModuleAttribute` to use `PsiScopeProcessor` for non-`@for` and non-`@protocol` instead of custom logic.
+      * Don't descend into a `use` if the `ENTRANCE` is an ancestor since that means the `Alias` on the `use` is probably being resolved.
+      * `AtUnqualifiedNoParenthesesCall.processDeclarations` will call `processor.execute` when it isn't a type spec.
+      * The `UseScopeSelector` for `AtUnqualifiedNoParenthesesCallImpl` has been changed to `SELF_AND_FOLLOWING_SIBLINGS` since the module attribute is used that way.  The previous `SELF` value was when the `UseScopeSelector` only applied to variables.
+  * "Elixir References" inspection for finding unresolved or invalid references.
+    * `visitAtNonNumericOperation`
+      Helps "Elixir References" find unresolved assigns.
+  * Strip `AccessExpression`s from `Qualified` qualifiers automatically
+  * Documentation
+    * Show `deprecated`, `impl`, and `spec`, and actual heads in documentation for source functions
+    * Merge `Documentation` across multiple arities when arity of lookup is ambiguous.
+  * Find variables defined in EEx element
+    Finds variables defined in EEx PsiElement by creating them the same as a StabBody, which means that the siblings are checked backwards from the last parent.  This fixes resolving the `f` from `f = form_for ...` in `*input f ...` in LiveView FormComponent templates.
+  * Highlight named parameters in types.
+  * Decompilation
+    * Fake built-in types by decompiling in `:erlang.beam`
+      For type reference resolution of built-in types to work, they need to be defined somewhere.  IntelliJ Erlang does this by looping usages back on themselves, but this leads to Find Usages not working for built-in types since each usage is a distinct declaration.  By instead defining the types in decompiled `:erlang.beam` (even though they aren't actually defined there), there is a shared location for all reference to point to and then check for Find Usages.
+    * Decompile types from EEP-48 documentation.
+  * Descend into body of `unless` in `quote` for `treeWalkUp`.
+  * Descend into `for` when looking for call definition clauses.
+  * `QuoteMacro.treeWalkUp` into `if`
+    `unless` was already walked, but not `if`.  Fixes resolving `Repo.preload/2`, which is defined inside an `if` in `use Ecto.Repo`'s `__using__`.
+  * Add `defguard` and `defguardp` to CallDefinitionClause.`is`.
+  * Don't generate a reference for `Elixir`
+    `Elixir` is not declared anywhere. It is the namespace of all Aliases.
+  * Refactor how sibling sequences are walked
+    Port filtering out comments, white space and end of expressions from `siblingExpression`.
+  * Reimplement `fullyQualifiedName`
+  
+    Eliminate the specialization for `ElixirAlias` AND `QualifiableAlias` as which was picked as based on the static casted type. `fullyQualifiedName` will include the following:
+    * Convert `__MODULE__` to the enclosing modular canonical name
+    * Combine an ElixirAlias with its qualifier
+      * If in a `ElixirMultipleAliases` will combine the qualifier (`qualifier.{...}`) outside the `{}` with the relative name inside `...{relative, ...}`.
+  * EEx
+    * `viewFile` for `.eex` files used in same directory as `.ex` using `EEx.function_from_file`.
+    * Resolve function calls to those defined by `EEx.function_from_file/3-5`.
+    * Find view modules for templates under the `templates` directory.
+  * Walk `quote` macros for sibling call definitions
+  * Always fallback to name/arity in any module if callable not resolved in scope
+  * Resolve uses of aliased name produced by `alias __MODULE__`
+* [#1967](https://github.com/KronicDeth/intellij-elixir/pull/1967) - [@KronicDeth](https://github.com/KronicDeth)
+  * Updates
+    * IntelliJ IDEA build version to 2021.1.2
+      * Update `ParsingTestCase` to latest APIs.
+    * Gradle plugins
+      * intellij 1.0
+      * kotlin.jvm 1.5.10 
+  * Configure `runPluginVerifier`
+
+### Bug Fixes
+* [#1948](https://github.com/KronicDeth/intellij-elixir/pull/1948) - [@KronicDeth](https://github.com/KronicDeth)
+  * Fix Ctrl+Click/Cmd+B/Go To Declaration for Aliases.
+  * Don't index non-canonical names.
+    The non-canonical name for a nested `defmodule` is the Alias given to that `defmodule` call.  While that name should be resolvable within the parent modular, it should not be indexed because the index is for the global scope.
+  
+    Prevents `defmodule Enum` in
+  
+    ```elixir
+    defmodule ExJsonSchema.Validator.Error do
+      ...
+      defmodule Enum do
+        ...
+      end
+      ...
+    end
+    ```
+  
+    from being indexed as `Enum`, which hides the decompiled version from the standard library because source references are favored over decompiled versions when resolving references.
+  * Reference Resolution
+    * Only favor same file Module resolutions if they are valid
+      Invalid same file results can occur for prefix matches, but if only prefix matches are available, then a whole project search should occur instead of only when there are no same file `ResolveResult` of either validity.
+    * Include library sources in `Module#multiResolveProject` `GlobalSearchScope`
+       Ensures that library sources can be returned, which are favored over decompiled libraries, so that `__using__` macros can be followed.
+    * Protect from `Module` reference element not having a `VirtualFile` when checking if a test file.
+    * Fix `QualifiableAliasImpl#fullyQualifiedName`
+      * Include qualifier of `MultipleAliases`
+        In an `alias` line like `alias Myapp.MyContext.{Schema1, Schema2}`, `Schema1` would think its `fullyQualifiedName` was only `Schema1`, when it should included the `fullyQualifiedName` of the qualifier, `MyApp.MyContext` too. This leads to the correct `Schema1` fully-qualified name of `MyApp.MyContext.Schema1`.  This fix makes references to `Schema1` resolve to both the `alias` and the `defmodule`.
+      * Include qualifier of `MultipleAliases` for deep aliases
+        In an `alias` line like `alias Myapp.MyContext.{NestedContext1.Schema1, NestedContext2.Schema2}`, `Schema1` would think its `fullyQualifiedName` was only `NestedContext1.Schema1`, when it should included the `fullyQualifiedName` of the qualifier, `MyApp.MyContext` too.  This leads to the correct `Schema1` fully-qualified name of `MyApp.MyContext.NestedContext.Schema1`.  This fix makes references to `Schema1` resolve to both the `alias` and the `defmodule`.
+    * In LEEx Templates
+      * Don't check for implicit imports at top of template file if there is a view file
+        The implicit imports should come last, after the view file has been processed.
+      * Ignore call definition clauses expressions that can't contain an assign
+        * Atom keywords (`false`, `true`, `nil`)
+        * Maps
+        * Structs
+        * Keyword lists
+        * Strings and charlists
+      * Don't follow variables for assigns
+        For now, don't follow variables to look for assigns.
+      * Fix finding assigns in `|> case do ... end`
+        `None` calls were ignored, but when `case` is used in a pipeline it is a `None` since it has no literal arguments and only resolved arguments, so it was being ignored.
+      * Ignore Lists and Aliases when resolving assigns
+      * Fix resolve assigns in `if`s
+        Only looked in `stab` of the `doBlock`, but the `else` is in the `blockList`.
+    * Don't use the same path for actual aliases and defmodules when resolving aliases
+      Prevents a case of an exact match and its namespace both being marked as valid (exact matches).
+    * Types
+      * Don't generate references for map key optionality (`required/1` and `optional/1`)
+      * Don't create a reference to `...` in lists in type specs.
+      * Look above `ElixirStabBody` for `ancestorTypeSpec`.
+      * Generate `Callable` reference for `unquote` in typespec instead of `Type` reference.
+    * Allow modular names to resolve to multiple modulars
+      Fix `:systemd.ready()` not resolving because `:systemd` only exists as a decompiled file from source because it is Erlang and there is no preference given to different MIX_ENVs.  All MIX_ENV `defmodule :systemd` are returned for the `:systemd` and all of them are checked for `ready/0`.
+    * Fix resolving qualified calls that are defined through use
+  
+      Resolving qualified calls only used `Modular.callDefinitionClauseCallFoldWhile`, which ignores all non call definition, which means it ignored the `use`, but switching to use `org.elixir_lang.psi.scope.call_definition_clause.MultiResolve` `PsiScopeProcessor` used for unqualified calls, but starting on the modular call of the qualifier, all the `use` handling that works for unqualified calls also works for qualified calls now.
+  
+      This fixes resolving `MyAppWeb.Endpoint.config_change(changed, removed)` in `MyApp.Application.config_change/3` because `use Phoenix.Endpoint, otp_app: :my_app` in `MyAppWeb.Endpoint` is now walked for qualified calls.
+    * Fix resolving variables to parameters that are both pattern matched and defaulted
+  
+      In functions like
+  
+      ```elixir
+      def f(%Struct{} = s \\ %Struct{}) do
+        s
+      end
+      ```
+  
+      `s` in the body would not resolve to the `s` parameter because the default parameter had to be `PsiNamedElement`, that is a variable directly. Instead, recurse on any operand before the `\\` to support pattern matching too.
+    * Use `keepProcessing()` in `MultiResolve.addToResolveResults` instead of specific return values
+  
+      Fixes `def` in `def default_host_flag, do: "--host` resolving as an invalid match to `default_host_flag` instead of search the implicit imports for `defmacro def`.
+    * The `nameIdentifier` for a `defdelegate` is the first argument, not the `as:`
+      The `as:` is the name in the `to:` module only.
+    * Fix `defdelegate` `MultiResolve`
+      1. I had flipped the head name and `as` name for checking for a name match
+      2. I only counted the `defdelegate` as matching if the `as` name as found in `to` module, but if the head alone is prefixed by the name then the head should be a ResolveResult element even if the `to` or `as` can't be found
+      3. Inside the `to`, I only checked if the children were call definition clauses, but this meant that all the `for` handling was ignored, so start a new `resolveResults()` for each modular.
+    * Fix `toModulars` not returning all modulars
+      `fullyResolve` only touched the first modular.
+    * Favor complete valid results over incomplete invalid earlier bindings for variables.
+    * Ecto
+      * Don't generate reference for `assoc/2` pseudo-function in `join(..., _ in assoc(_, _))`
+    * Fix unaliasing multiple aliases
+      `UnaliasName` still assumed that `fullyQualifiedName` included the qualifier, but it is just the lexical qualifier now.
+    * Check for `MULTIPLE_ALIASES_QUALIFIER` in `ResolveState` for prefix matches.
+      Fixes resolving `SSH.Key` to `Foo.SSH.Key` when the alias is `alias Foo.{SSH, ...}`.
+    * Ignore type variables in type restrictions when resolving normal variables.
+    * Fix `withSelf` for `childExpressions` `siblingExpressions` call
+      While refactoring the walk, I copied the call for siblings, which shouldn't included self.  Children should include self, or the first expression is missed which showed up as `Repo.transaction` not being found because `transaction` is the first `def` inside an `if` in `Ecto.Repo.__using__`'s `quote` block.
+    * Don't try to resolve keys/fields of a capture.
+    * Don't generate reference for `assoc` in `*join*: .. in assoc(..., ...)`.
+      Already worked for `join/3` calls, extend to keyword syntax too.
+    * Fix resolving references to `Modulars` when resolved is in BEAM file
+      The check to see if the resolved was a modular only worked for source elements because it checked if it was a `Call`, but decompiled modules in BEAM files are `ModuleImpls`.
+    * Fix logic error when ignored pinned variables as declaration sites
+  
+      The logic was supposed to be that
+  
+      * If it is pinned, keep searching
+      * If it is not pinned, check the operation as a Call
+  
+      ... but, the code was `operatorText != "^" && execute(match as Call, state)` which meant that if the `operatorText` was `"^"`, then the whole expression was `false`, which meant `keepProcessing` was `false`, so any pin stopped the processing for other unpinned parameters after the pin in addition to processing in the outer scope of the pin.
+    * Prefer source only for target candidates for Go To Declaration and not all ResolveResults.
+      Ensures that functions only defined in decompiled Modules can be found because the Module's ResolveResults include the decompiled Module in addition to the source ones.
+    * Don't prefer source over decompiled in `ResolveResultOrderedSet`
+      Preference is now handled in `Resolver`, so that source preference only happens on Go To Declaration and not for `multiResolve` because that needs decompiled Modulars for compile-time `for` loops that are too complex to infer.
+    * Use primary arity instead of final for resolving Callables
+  
+      Fixes `unquote` in `def unquote(...)() do` not resolving.
+  * Filter out decompiled private functions from completions
+    If they are only available as decompiled functions, it is unlikely we have the source available to make them public, which was the reasoning to allow private functions at all.
+  * Decompiling
+    * Include module name for "No decompiled source function" errors
+    * Unquote `and` when not and/2
+      Fixes decompiling `:hipe_arm_encode`.
+    * `unquote` `false` when decompiling.
+      Fixes decompiling `:thrift_json_parser`. Add `true` to the `Unquote` list too since it would have the same issue.
+    * Unquote `in` when not `in/2`
+      Fix decompiling `:digraph_utils`
+    * Use `containingFile.originalFile` for `resolve.Module.multiResolveProject`
+      Ensures `VirtualFile` is available for decompiled files.
+  * Performance
+    * Don't use `.navigationElement` for `Variants`
+  
+      Using `navigationElement` forces parsing of the decompiled source, which isn't necessary whe only showing the lookup string.
+    * Remove `ModuleOwner` interface
+      * `BeamFileImpl` is known to have only 1 module in it, so it makes the code more complicated to make it act like source files.
+      * Don't use `getChildrenByType`, as it causes the decompiled source to be parsed, which is slow and unnecessary since all the metadata for modules is available from the binary format.
+    * Get project from parent in decompiled Module and CallDefinition
+      Not doing this causes an unnecessary parsing of the decompiled source.
+  * Fix infinite recursion in `ElixirVisitor#visitLiteralSigilLine`
+  * Show more scope for keyword key Go To Definition
+    * Always show the keyword pair, instead of just the keyword key, so that the value being assigned to the key can be seen before Go To.
+    * Show the location at the path relative to the content root and the line number as `live_modal` may be used more than once in the same file.
+  * Put `entrance` as initial visited in `module.Variants`.
+  * Check if `PsiElement` has been visited before walking `quote` and `__using__`
+  * Don't mark qualified calls as unresolved in "Elixir References" inspection
+    I don't have a good approach for resolving struct fields or map keys for now, don't mark them as unresolved as it clutters finding unresolved calls I expect to work.
+  * Don't assume `PsiFile#virtualFile` is `NotNull` in `PsiElement.moduleWithDependentsScope`.
+  * Don't assume `PsiFile#virtualFile` is `NotNull` in `AtNonNumericOperation.computeReference()`.
+  * `putInitialVisitedElement` in `variable.MultiResolve`
+    Fixes resolving variables through `use` statements for variables in the body of `defmodule` blocks.
+  * Log when `VISITED_ELEMENT_SET` is `null` instead of erroring.
+  * Fix `resolvePrimaryArity` for `|> case do`
+    `resolvedPrimaryArity` did not add both the doBlock's arity and the arity from the `|>` at the same time.  If the pipe was there, the `do` was ignored because the pre-existing `resolvePrimaryArity` was not used if the normal primary arity of the call was zero, which is the case for `|> case do`.
+  * Find module for elements in libraries
+    Elements in libraries don't have a `Module` from `ModuleUtil.findModuleForPsiElement`, so scan the element's project's module's content roots for the closest `Module` for libraries.
+  * `prependQualifiers` when typing an alias on a new line in the body of a function.
+  * Don't descend into `quote` blocks if the call being resolved is given to an `unquote` in the `quote` block.
+* [#1967](https://github.com/KronicDeth/intellij-elixir/pull/1967) - [@KronicDeth](https://github.com/KronicDeth)
+  * `updateSinceUntilBuild` to prevent breaking in future IDEs.
+  * Check if modules loaded before using `findModuleForPsiElement`.
+  * Use `BasePlatformTestCase` instead of `LightCodeInsightTestCase` because `LightCodeInsightTestCase` is deprecated.
 
 ## v11.10.0
 

@@ -10,9 +10,8 @@ import com.intellij.openapi.editor.impl.EditorFactoryImpl;
 import com.intellij.openapi.extensions.DefaultPluginDescriptor;
 import com.intellij.openapi.extensions.ExtensionPoint;
 import com.intellij.openapi.extensions.ExtensionsArea;
+import com.intellij.openapi.extensions.ProjectExtensionPointName;
 import com.intellij.openapi.extensions.impl.ExtensionsAreaImpl;
-import com.intellij.openapi.fileTypes.FileTypeRegistry;
-import com.intellij.openapi.fileTypes.MockFileTypeManager;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.impl.ProgressManagerImpl;
@@ -226,12 +225,11 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
     private void registerProjectFileIndex(MessageBus messageBus)
             throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException,
             InvocationTargetException {
-        DirectoryIndex directoryIndex = registerDirectoryIndex(messageBus);
-        FileTypeRegistry fileTypeRegistry = new MockFileTypeManager();
+        registerDirectoryIndex(messageBus);
 
         myProject.registerService(
                 ProjectFileIndex.class,
-                new ProjectFileIndexImpl(myProject, directoryIndex, fileTypeRegistry)
+                new ProjectFileIndexImpl(myProject)
         );
     }
 
@@ -351,7 +349,11 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
 
         ExtensionsArea area = myProject.getExtensionArea();
         //noinspection UnstableApiUsage
-        registerExtensionPoint((ExtensionsAreaImpl) area, ProjectExtension.EP_NAME, ProjectExtension.class);
+        registerExtensionPoint(
+                (ExtensionsAreaImpl) area,
+                new ProjectExtensionPointName<>("com.intellij.projectExtension"),
+                ProjectExtension.class
+        );
 
         //noinspection UnstableApiUsage
         applicationExtensionArea.registerPoint(FilePropertyPusher.EP_NAME.getName(), FilePropertyPusher.class, new DefaultPluginDescriptor(getClass().getName() + "." + getName()));

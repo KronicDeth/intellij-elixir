@@ -101,7 +101,7 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
             val projectManager = ProjectManagerEx.getInstanceEx()
 
             projectManager.newProject(otpApp.name, otpApp.root.path, false, false)?.let { project ->
-                ProjectBaseDirectory.getInstance(project).baseDir = otpApp.root
+                ProjectBaseDirectory.getInstance(project).setBaseDir(otpApp.root)
                 runDirectoryProjectConfigurators(Paths.get(otpApp.root.path), project, false)
 
                 saveSettings(project)

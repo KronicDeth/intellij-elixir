@@ -10,6 +10,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.module.ModuleUtilCore;
+import com.intellij.openapi.module.impl.ModuleManagerEx;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.DumbModeTask;
 import com.intellij.openapi.project.DumbService;
@@ -139,7 +140,12 @@ public class LevelPropertyPusher implements FilePropertyPusher<Level> {
         if (virtualFile == null) {
             level = level(project);
         } else {
-            Module module = ModuleUtilCore.findModuleForFile(virtualFile, project);
+            ModuleManager manager = ModuleManager.getInstance(project);
+            Module module = null;
+
+            if (!(manager instanceof ModuleManagerEx) || ((ModuleManagerEx)manager).areModulesLoaded()) {
+                module = ModuleUtilCore.findModuleForFile(virtualFile, project);
+            }
 
             if (module != null) {
                 level = level(module);

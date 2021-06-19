@@ -78,7 +78,7 @@ class BeamFileImpl private constructor(private val fileViewProvider: FileViewPro
      */
     override fun setName(@NonNls name: String): PsiElement = throw IncorrectOperationException(CAN_NOT_MODIFY_MESSAGE)
 
-    override fun processChildren(processor: PsiElementProcessor<PsiFileSystemItem>): Boolean = true
+    override fun processChildren(processor: PsiElementProcessor<in PsiFileSystemItem>): Boolean = true
 
     /**
      * Returns the directory containing the file.

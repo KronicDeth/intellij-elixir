@@ -20,7 +20,7 @@ import static org.elixir_lang.psi.stub.type.Named.indexStubbic;
  *   {@link org.elixir_lang.beam.psi.BeamFileImpl#buildFileStub(byte[], String)}.
  * @param <P> The PSI element that should be returned by {@link #createPsi(StubElement)} in subclasses
  */
-public abstract class ModuleElementType<S extends StubElement & Stubbic, P extends PsiElement>
+public abstract class ModuleElementType<S extends StubElement<?> & Stubbic, P extends PsiElement>
         extends ModuleStubElementType<S, P> {
     /**
      * @throws IllegalArgumentException stubs should never be created from {@link LighterAST} and
