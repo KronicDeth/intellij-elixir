@@ -61,9 +61,18 @@ To create release notes for the new tag
    ```
 4. Add Donate link
    ```
-   [Donate](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=Kronic%2eDeth%40gmail%2ecom&lc=US&item_name=Elixir%20plugin%20for%20IntelliJ%20IDEA&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted) (Lowest/Median/Mean/Record is $1/14.19/26.34/200.00 USD.)
+   [Donate](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=Kronic%2eDeth%40gmail%2ecom&lc=US&item_name=Elixir%20plugin%20for%20IntelliJ%20IDEA&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted)
+   
+   Historical One-time/Monthly Donations:
+   
+   | Stat    | Amount  |
+   |:--------|--------:|
+   | Minimum |   $1.00 |
+   | Median  |   $6.25 |
+   | Mean    |  $12.52 |
+   | Maximum | $200.00 |
    ```
-5. Paste Release Notes from Github in message body
+5. Paste Release Notes from GitHub in message body
 6. Add Installation Instructions link
    ```
    [Installation Instructions](https://github.com/KronicDeth/intellij-elixir/blob/VERSION/README.md#installation)
