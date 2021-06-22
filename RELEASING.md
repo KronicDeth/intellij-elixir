@@ -59,9 +59,9 @@ To create release notes for the new tag
    ```
    # Version VERSION
    ```
-4. Add Donate link
+4. Add Sponsor link
    ```
-   [Donate](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=Kronic%2eDeth%40gmail%2ecom&lc=US&item_name=Elixir%20plugin%20for%20IntelliJ%20IDEA&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted)
+   [❤️ Sponsor](https://github.com/sponsors/KronicDeth)
    
    Historical One-time/Monthly Donations:
    
