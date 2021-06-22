@@ -5738,12 +5738,28 @@ This project exists thanks to all the people who contribute. [[Contribute](CONTR
 
 ## Donations
 
+Donating through GitHub will get the most money to the project as GitHub currently takes no fees, while Patreon and PayPal take about 5%.
+
+
+
 | Name    | Service        | Button                                                                                                                                                                                                                                                                                                                                                        |
 |:--------|:---------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Donor   | PayPal         | [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=Kronic%2eDeth%40gmail%2ecom&lc=US&item_name=Elixir%20plugin%20for%20IntelliJ%20IDEA&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted) (Lowest/Median/Mean/Record is $1/14.19/26.34/200.00 USD.) |
+| Sponsor | GitHub         | [:heart: Sponsor](https://github.com/sponsors/KronicDeth)
+| Donor   | PayPal         | [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=Kronic%2eDeth%40gmail%2ecom&lc=US&item_name=Elixir%20plugin%20for%20IntelliJ%20IDEA&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted)  |
 | Patron  | Patreon        | <a href="https://www.patreon.com/bePatron?u=4678158" data-patreon-widget-type="become-patron-button">Become a Patron!</a>                                                                                                                                                                                                                                     |
 | Backer  | OpenCollective | [[Become a backer](https://opencollective.com/intellij-elixir#backer)]                                                                                                                                                                                                                                                                                        |
 | Sponsor | OpenCollective | [[Become a sponsor](https://opencollective.com/intellij-elixir#sponsor)]                                                                                                                                                                                                                                                                                      |
+
+## Historical Statistics
+
+These stats are for one time donations or monthly contributions for scheduled donations.
+
+| Stat    | Amount  |
+|:--------|--------:|
+| Minimum |   $1.00 |
+| Median  |   $6.25 |
+| Mean    |  $12.52 |
+| Maximum | $200.00 |   
 
 ### Work Time
 
@@ -5753,94 +5769,137 @@ If you're a developer of open source libraries or tools for the [Ember](https://
 
 ### Donors
 
-I'd like to thank those who have donated to help support this project.
+I'd like to thank those who have donated to help support this project as GitHub Sponsors, PayPal Donors, Patreon Patrons, and OpenCollective Backers or Sponsors.
 
+(Ordered by cumulative donations to date: greatest to least)
+
+![](https://github.com/joshuataylor.png?size=40)
+![](https://github.com/seanjensengrey.png?size=40)
 ![](https://github.com/thomas.png?size=40)
 ![](https://github.com/kreba.png?size=40)
-![](https://github.com/joshuataylor.png?size=40)
+![](https://github.com/danielzfranklin.png?size=40)
+![](https://github.com/carlodicelico.png?size=40)
+![](https://github.com/sorentwo.png?size=40)
+![](https://github.com/economysizegeek.png?size=40)
+![](https://github.com/achedeuzot.png?size=40)
+![](https://github.com/floriank.png?size=40)
+![](https://github.com/kvakvs.png?size=40)
 ![](https://github.com/brandonmenc.png?size=40)
 ![](https://github.com/smeevil.png?size=40)
-![](https://github.com/seanjensengrey.png?size=40)
+![](https://github.com/Cervajz.png?size=40)
+![](https://github.com/jeffperrin.png?size=40)
+![](https://github.com/angelikatyborska.png?size=40)
+![](https://github.com/udoschneider.png?size=40)
 ![](https://github.com/christiannelson.png?size=40)
-![](https://github.com/economysizegeek.png?size=40)
+![](https://github.com/clifton-mcintosh.png?size=40)
+![](https://github.com/mirrec.png?size=40)
 ![](https://github.com/robinhillard.png?size=40)
 ![](https://github.com/jfcloutier.png?size=40)
 ![](https://github.com/dmt.png?size=40)
 ![](https://github.com/mdbergmann.png?size=40)
-![](https://github.com/achedeuzot.png?size=40)
+![](https://github.com/bigtom.png?size=40)
+![](https://github.com/adam-phillips.png?size=40)
+![](https://github.com/seanwash.png?size=40)
+![](https://github.com/benkimpel.png?size=40)
+![](https://github.com/zoltanmaric.png?size=40)
 ![](https://github.com/gtarcea.png?size=40)
 ![](https://github.com/matteosb.png?size=40)
-![](https://github.com/mirrec.png?size=40)
 ![](https://github.com/olivierpichon.png?size=40)
 ![](https://github.com/trvbueno.png?size=40)
 ![](https://github.com/elvanja.png?size=40)
 ![](https://github.com/yuthstyle88.png?size=40)
 ![](https://github.com/nathancyam.png?size=40)
-![](https://github.com/cliftonmcintosh?size.png=40)
-![](https://github.com/clifton-mcintosh.png?size=40)
+![](https://github.com/Meldanor.png?size=40)
 ![](https://github.com/drl123.png?size=40)
 ![](https://github.com/thirdshift.png?size=40)
+![](https://github.com/BaseCase.png?size=40)
+![](https://github.com/seeekr.png?size=40)
+![](https://github.com/CrystalJewell.png?size=40)
 ![](https://github.com/fireproofsocks.png?size=40)
 ![](https://github.com/jejacks0n.png?size=40)
 ![](https://github.com/Havvy.png?size=40)
 ![](https://github.com/rvazquezglez.png?size=40)
-![]([@szymon-jez](https://github.com/szymon-jez))
+![](https://github.com/szymon-jez.png?size=40)
 ![](https://github.com/zoltanmaric.png?size=40)
+![](https://github.com/blakedietz.png?size=40)
 ![](https://github.com/agnaldo4j.png?size=40)
 ![](https://github.com/IljaN.png?size=40)
+![](https://github.com/resterle.png?size=40)
 ![](https://github.com/mjaric.png?size=40)
+![](https://github.com/sbouaked.png?size=40)
 ![](https://github.com/nitingupta910.png?size=40)
 ![](https://github.com/ciroque.png?size=40)
 ![](https://github.com/adri.png?size=40)
 ![](https://github.com/williamgueiros.png?size=40)
-![](https://github.com/angelikatyborska.png?size=40)
 ![](https://github.com/cesarslzr.png?size=40)
 ![](https://github.com/magynhard.png?size=40)
-![]([@m-koepke](https://github.com/m-koepke))
+![](https://github.com/m-koepke.png?size=40)
 ![](https://github.com/bichinger.png?size=40)
-![]([@pedro-stanaka](https://github.com/pedro-stanaka))
+![](https://github.com/pedro-stanaka.png?size=40)
+![](https://github.com/silas.png?size=40)
 ![](https://github.com/notriddle.png?size=40)
+![](https://github.com/fundimmo.png?size=40)
 ![](https://github.com/fitblip.png?size=40)
+![](https://github.com/stoyle.png?size=40)
 ![](https://github.com/ArtemGordinsky.png?size=40)
-![](https://github.com/seeekr.png?size=40)
-![](https://github.com/kvakvs.png?size=40)
 ![](https://github.com/Koziolek.png?size=40)
 ![](https://github.com/ZWood15.png?size=40)
 ![](https://github.com/pgrunwald.png?size=40)
 
+* Josh Taylor ([@joshuataylor](https://github.com/joshuataylor))
+* Sean Jensen-Grey ([@seanjensengrey](https://github.com/seanjensengrey))
 * Thomas Meeks ([@thomas](https://github.com/thomas))
 * Raffael Krebs ([@kreba](https://github.com/kreba))
-* Josh Taylor ([@joshuataylor](https://github.com/joshuataylor))
+* Daniel Franklin ([@danielzfranklin](https://github.com/danielzfranklin))
+* Carlo DiCelico ([@carlodicelico](https://github.com/carlodicelico)))
+* Parker Selbert ([@sorentwo](https://github.com/sorentwo))
+* Dirk Elmendorf ([@economysizegeek](https://github.com/economysizegeek))
+* Klemen Sever ([@achedeuzot](https://github.com/achedeuzot))
+* Florian Kraft ([@floriank](https://github.com/floriank))
+* Dmytro Lytovchenko ([@kvakvs](https://github.com/kvakvs))
 * Brandon Menc ([@brandonmenc](https://github.com/brandonmenc))
 * Jake Becker ([@JakeBecker](https://github.com/JakeBecker))
 * Gerard de Brieder ([@smeevil](https://github.com/smeevil)) of [govannon.nl](http://govannon.nl)
 * Tynes Consulting
-* Sean Jensen-Grey ([@seanjensengrey](https://github.com/seanjensengrey))
+* Jaromír Červenka ([@Cervajz](https://github.com/Cervajz))
+* Jeff Perrin ([@jeffperrin](https://github.com/jeffperrin))
+* Angelika Tyborska ([@angelikatyborska](https://github.com/angelikatyborska))
+* Udo Schneider ([@udoschneider](https://github.com/udoschneider))
 * Christian Nelson ([@christiannelson](https://github.com/christiannelson))
-* Dirk Elmendorf ([@economysizegeek](https://github.com/economysizegeek))
+* Clifton McIntosh  ([@cliftonmcintosh](https://github.com/cliftonmcintosh), [@clifton-mcintosh](https://github.com/clifton-mcintosh))
+* Miroslav Hetteš ([@mirrec](https://github.com/mirrec))
 * Robin Hillard ([@robinhillard](https://github.com/robinhillard)) of [rocketboots.com](http://www.rocketboots.com)
+* Kamil Shersheyev ([@sharpfun](https://github.com/sharpfun))
 * Jean-Francois Cloutier ([@jfcloutier](https://github.com/jfcloutier))
 * McHughson Chambers ([@GrayBeamTechnology](https://github.com/GrayBeamTechnology))
 * Nathan Modrzewski
 * Daniel Temme ([@dmt](https://github.com/dmt))
 * Manfred Bergmann ([@mdbergmann](https://github.com/mdbergmann))
-* Klemen Sever ([@achedeuzot](https://github.com/achedeuzot))
+* Tom Ayerst ([@bigtom](https://github.com/bigtom))
+* Tater Salad
 * Bjorgvin Reynisson
+* Adam Phillips ([@adam-phillips](https://github.com/adam-phillips))
 * Yaroslav Rerikh
+* Sean Washington ([@seanwash](https://github.com/seanwash))
+* Ben Kimpel ([@benkimpel](https://github.com/benkimpel))
+* Zoltán Marić ([@zoltanmaric](https://github.com/zoltanmaric))
 * Glenn Tarcea ([@gtarcea](https://github.com/gtarcea))
 * Matteo Banerjee ([@matteosb](https://github.com/matteosb))
-* Miroslav Hetteš ([@mirrec](https://github.com/mirrec))
 * Ovilier Pichon ([@olivierpichon](https://github.com/olivierpichon))
 * Théo Bueno ([@trvbueno](https://github.com/trvbueno))
 * Vanja Radovanović ([@elvanja](https://github.com/elvanja))
 * Yongyut Jantaboot ([@yuthstyle88](https://github.com/yuthstyle88))
 * Nathan Yam ([@nathancyam](https://github.com/nathancyam))
+* Shaun Collins
 * Purelogic Apps
-* Clifton McIntosh  ([@cliftonmcintosh](https://github.com/cliftonmcintosh), [@clifton-mcintosh](https://github.com/clifton-mcintosh))
+* Kilian Gärtner ([@Meldanor](https://github.com/Meldanor))
 * Donald Lettrich ([@drl123](https://github.com/drl123))
 * Garrett Hart ([@thirdshift](https://github.com/thirdshift))
 * LeafStone Enterprises Limited
 * Mateusz Jadczak
+* Casey Brant ([@BaseCase](https://github.com/BaseCase))
+* Denis Andrejew ([@seeekr](https://github.com/seeekr))
+* Crystal Adkins ([@CrystalJewell](https://github.com/CrystalJewell))
 * Fireproof Socks, Inc ([@fireproofsocks](https://github.com/fireproofsocks))
 * Jeremy Jackson ([@jejacks0n](https://github.com/jejacks0n))
 * Ryan Scheel ([@Havvy](https://github.com/Havvy))
@@ -5849,17 +5908,20 @@ I'd like to thank those who have donated to help support this project.
 * Szymon Jeż ([@szymon-jez](https://github.com/szymon-jez))
 * Виктор Иванов
 * Zvonimir-Zoltan Maric ([@zoltanmaric](https://github.com/zoltanmaric))
+* Blake Dietz ([@blakedietz](https://github.com/blakedietz))
 * Agnaldo Oliveira ([@agnaldo4j](https://github.com/agnaldo4j))
 * Ilja Neumann ([@IljaN](https://github.com/IljaN))
+* Raphael Esterle ([@resterle](https://github.com/resterle))  
 * Milan Jaric ([@mjaric](https://github.com/mjaric))
+* Samir Bouaked ([@sbouaked](https://github.com/sbouaked))
 * Nitin Gupta ([@nitingupta910](https://github.com/nitingupta910))
 * Steve Wagner ([@ciroque](https://github.com/ciroque))
 * Adrian Philipp ([@adri](https://github.com/adri))
 * William De Melo Gueiros ([@williamgueiros](https://github.com/williamgueiros))
-* Angelika Tyborska ([@angelikatyborska](https://github.com/angelikatyborska))
 * César Salazar Hernández ([@cesarslzr](https://github.com/cesarslzr))
 * Dimitrios Fragkos
 * Dmitry Stropaloff
+* Erik Mocný
 * Håvar Stavseth
 * Lionel Cocatrix
 * Matthäus Beyrle ([@magynhard](https://github.com/magynhard))
@@ -5868,47 +5930,29 @@ I'd like to thank those who have donated to help support this project.
 * Tanaka Pedro ([@pedro-stanaka](https://github.com/pedro-stanaka))
 * Дмитрий Цыденов
 * 童童 张
+* Silas Sewell ([@silas](https://github.com/silas))
 * Michael Howell ([@notriddle](https://github.com/notriddle))
 * IS-Soft Michał Zalewski
+* Fundimmo ([@fundimmo](https://github.com/fundimmo))  
 * Ryan Sears ([@fitblip](https://github.com/fitblip))
+* Alf Kristian Støyle ([@stoyle](https://github.com/stoyle))
 * Artem Gordinsky ([@ArtemGordinsky](https://github.com/ArtemGordinsky))
 * Maximilian Buschner
-* Denis Andrejew ([@seeekr](https://github.com/seeekr))
-* Dmytro Lytovchenko ([@kvakvs](https://github.com/kvakvs))
 * Johannes Eifert
 * Bartłomiej Kuczyński ([@Koziolek](https://github.com/Koziolek))
 * Zachary Woodard ([@ZWood15](https://github.com/ZWood15))
 * Percy Grunwald ([@pgrunwald](https://github.com/pgrunwald))
 * Nguyen Le
 
-### Patrons
+### Open Collective
 
-Thank you to all my patrons. <a href="https://www.patreon.com/bePatron?u=4678158" data-patreon-widget-type="become-patron-button">Become a Patron!</a>
-
-![](https://github.com/kvakvs.png?size=40)
-![](https://github.com/jeffperrin.png?size=40)
-![](https://github.com/seanwash.png?size=40)
-![](https://github.com/angelikatyborska.png?size=40)
-![](https://github.com/BaseCase.png?size=40)
-![](https://github.com/seeekr.png?size=40)
-![]()
-
-* Dmytro Lytovchenko ([@kvakvs](https://github.com/kvakvs))
-* Jeff Perrin ([@jeffperrin](https://github.com/jeffperrin))
-* Sean Washington ([@seanwash](https://github.com/seanwash))
-* Angelika Tyborska ([@angelikatyborska](https://github.com/angelikatyborska))
-* Casey Brant ([@BaseCase](https://github.com/BaseCase))
-* Tater Salad
-* Denis Andrejew ([@seeekr](https://github.com/seeekr))
-* Anonymous
-
-### Backers
+#### Backers
 
 Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com/intellij-elixir#backer)]
 
 <a href="https://opencollective.com/intellij-elixir#backers" target="_blank"><img src="https://opencollective.com/intellij-elixir/backers.svg?width=890"></a>
 
-### Sponsors
+#### Sponsors
 
 Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](https://opencollective.com/intellij-elixir#sponsor)]
 
