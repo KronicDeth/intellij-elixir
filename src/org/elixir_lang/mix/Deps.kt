@@ -61,16 +61,18 @@ object Deps {
             Dep.from(tuple)?.let { sequenceOf(it) }.orEmpty()
 
     private fun fromIf(`if`: Call): Sequence<Dep> {
-        val branchSequences = `if`.doBlock?.let { doBlock ->
-            val trueBranch = doBlock.stab
-                    ?.stabBody
-                    ?.childExpressions()
-                    .orEmpty()
-            val falseBranch = doBlock.blockList?.blockItemList?.asSequence()?.map { it as PsiElement }.orEmpty()
+        val branchStabSequences = `if`.doBlock?.let { doBlock ->
+            val trueStab = doBlock.stab
+            val falseStab = doBlock
+                    .blockList
+                    ?.blockItemList?.singleOrNull { it.blockIdentifier.text == "else" }
+                    ?.stab
 
-            trueBranch + falseBranch
+            sequenceOf(trueStab, falseStab).filterNotNull()
         } ?: emptySequence()
 
-        return branchSequences.flatMap { fromChildExpression(it) }
+        return branchStabSequences
+                .flatMap { stab -> stab.stabBody?.childExpressions().orEmpty() }
+                .flatMap { fromChildExpression(it) }
     }
 }
