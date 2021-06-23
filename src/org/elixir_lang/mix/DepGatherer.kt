@@ -138,4 +138,4 @@ private fun QuotableKeywordList.depsNameArity(): NameArity? =
                 }
 
 private fun ElixirList.deps(): List<Dep> =
-    children.map { it.stripAccessExpression() }.mapNotNull { Dep.from(it) }
+    children.map { it.stripAccessExpression() }.asSequence().flatMap { Deps.from(it) }.toList()

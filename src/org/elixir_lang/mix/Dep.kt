@@ -29,12 +29,6 @@ data class Dep(val application: String, val path: String, val type: Type = Type.
     }
 
     companion object {
-        fun from(depsListElement: PsiElement): Dep? =
-                when (depsListElement) {
-                    is ElixirTuple -> from(depsListElement)
-                    else -> null
-                }
-
         fun from(depsListElement: ElixirTuple): Dep? {
             val stripped = depsListElement.children.stripAccessExpressions()
 
