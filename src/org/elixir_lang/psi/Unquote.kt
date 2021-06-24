@@ -77,9 +77,9 @@ object Unquote {
                 }
                 // ...: variable
                 is ElixirKeywordPair -> if (parent.keywordKey.name == "do") {
-                       // `do: variable`, such as `do: block` in macro parameters
-                        true
-                    } else {
+                    // `do: variable`, such as `do: block` in macro parameters
+                    true
+                } else {
                     Logger.error(
                             Unquote::class.java,
                             "Don't know how to walk unquoted variable parent",
@@ -87,7 +87,9 @@ object Unquote {
                     )
 
                     true
-                    }
+                }
+                // (..., parameter)
+                is ElixirParenthesesArguments -> true
                 else -> {
                     Logger.error(
                             Unquote::class.java,
