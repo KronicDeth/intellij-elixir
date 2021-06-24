@@ -40,8 +40,10 @@ object CallDefinitionClause {
     @JvmStatic
     fun isFunction(call: Call): Boolean = isPrivateFunction(call) || isPublicFunction(call)
     @JvmStatic
-    fun isPublicFunction(call: Call): Boolean = isCallingKernelMacroOrHead(call, DEF)
-    fun isPrivateFunction(call: Call): Boolean = isCallingKernelMacroOrHead(call, DEFP)
+    fun isPublicFunction(call: Call): Boolean =
+            isCallingKernelMacroOrHead(call, DEF) || isCallingKernelMacroOrHead(call, DEFMEMO)
+    fun isPrivateFunction(call: Call): Boolean =
+            isCallingKernelMacroOrHead(call, DEFP) || isCallingKernelMacroOrHead(call, DEFMEMOP)
 
     @JvmStatic
     fun isMacro(call: Call): Boolean = isPrivateMacro(call) || isPublicMacro(call)

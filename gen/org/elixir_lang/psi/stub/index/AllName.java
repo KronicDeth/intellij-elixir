@@ -11,7 +11,8 @@ public class AllName extends StringStubIndexExtension<NamedElement> {
     /* 5 - fix bug in Module.is (https://github.com/KronicDeth/intellij-elixir/issues/1301) that caused defmodule macro
            redefinition to count as actual module */
     // 6 - Remove non-canonical names from being index
-    public static final int VERSION = 6;
+    // 7 - `defmemo` and `defmemop`
+    public static final int VERSION = 7;
 
     @Override
     public int getVersion() {
