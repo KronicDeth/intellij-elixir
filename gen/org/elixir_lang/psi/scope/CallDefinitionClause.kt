@@ -64,6 +64,13 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
     protected abstract fun executeOnEExFunctionFrom(element: Call, state: ResolveState): Boolean
 
     /**
+     * Called on every [Call] where [org.elixir_lang.psi.Exception.is] is `true`.
+     *
+     * @return true to keep searching up tree; `false` to stop searching.
+     */
+    protected abstract fun executeOnException(element: Call, state: ResolveState): Boolean
+
+    /**
      * Whether to continue searching after each Module's children have been searched.
      *
      * @return `true` to keep searching up the PSI tree; `false` to stop searching.
@@ -78,6 +85,7 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
             when {
                 org.elixir_lang.psi.CallDefinitionClause.`is`(element) -> executeOnCallDefinitionClause(element, state)
                 Delegation.`is`(element) -> executeOnDelegation(element, state)
+                Exception.`is`(element) -> executeOnException(element, state)
                 For.`is`(element) -> For.treeWalkDown(element, state, ::execute)
                 Import.`is`(element) -> {
                     val importState = state.put(IMPORT_CALL, element).putVisitedElement(element)

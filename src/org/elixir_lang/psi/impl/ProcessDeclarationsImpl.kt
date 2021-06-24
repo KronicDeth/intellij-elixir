@@ -123,6 +123,7 @@ object ProcessDeclarationsImpl {
                     call.isCalling(KERNEL, ALIAS) -> processor.execute(call, state)
                     CallDefinitionClause.`is`(call) || // call parameters
                             Delegation.`is`(call) || // delegation call parameters
+                            Exception.`is`(call) ||
                             Module.`is`(call) || // module Alias
                             Use.`is`(call) ||
                             call.isCalling(KERNEL, DESTRUCTURE) || // left operand

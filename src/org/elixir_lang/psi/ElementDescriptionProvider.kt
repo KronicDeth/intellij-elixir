@@ -141,7 +141,7 @@ class ElementDescriptionProvider : com.intellij.psi.ElementDescriptionProvider {
                 CallDefinitionSpecification.`is`(call) -> CallDefinitionSpecification.elementDescription(call, location)
                 Callback.`is`(call) -> Callback.elementDescription(call, location)
                 Delegation.`is`(call) -> Delegation.elementDescription(call, location)
-                org.elixir_lang.structure_view.element.Exception.`is`(call) -> org.elixir_lang.structure_view.element.Exception.elementDescription(call, location)
+                Exception.`is`(call) -> org.elixir_lang.structure_view.element.Exception.elementDescription(call, location)
                 Implementation.`is`(call) -> Implementation.elementDescription(location)
                 Import.`is`(call) -> Import.elementDescription(call, location)
                 Module.`is`(call) -> Module.elementDescription(call, location)

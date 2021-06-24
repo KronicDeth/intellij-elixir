@@ -49,7 +49,7 @@ public class Model extends TextEditorBasedStructureViewModel implements Structur
                 CallDefinitionSpecification.Companion.is(call) ||
                 Callback.Companion.is(call) ||
                 Delegation.is(call) ||
-                Exception.is(call) ||
+                org.elixir_lang.psi.Exception.is(call) ||
                 Implementation.is(call) ||
                 Module.Companion.is(call) ||
                 Overridable.is(call) ||

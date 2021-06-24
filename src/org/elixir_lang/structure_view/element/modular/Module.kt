@@ -149,7 +149,7 @@ open class Module(protected val parent: Modular?, call: Call) : Element<Call>(ca
                         childCall is Or -> childCallQueue.addAll(orChildCallList(childCall as Or))
                         Callback.`is`(childCall) -> treeElementList.add(Callback(modular, childCall))
                         Delegation.`is`(childCall) -> functionByNameArity.addDelegationToTreeElementList(childCall)
-                        Exception.`is`(childCall) -> functionByNameArity.exception = Exception(modular, childCall)
+                        org.elixir_lang.psi.Exception.`is`(childCall) -> functionByNameArity.exception = Exception(modular, childCall)
                         org.elixir_lang.psi.CallDefinitionClause.isFunction(childCall) -> functionByNameArity.addClausesToCallDefinition(childCall)
                         CallDefinitionSpecification.`is`(childCall) -> functionByNameArity.addSpecificationToCallDefinition(childCall)
                         Implementation.`is`(childCall) -> treeElementList.add(Implementation(modular, childCall))

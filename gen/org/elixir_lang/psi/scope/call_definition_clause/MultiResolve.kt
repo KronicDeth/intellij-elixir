@@ -17,6 +17,7 @@ import org.elixir_lang.psi.impl.call.keywordArgument
 import org.elixir_lang.psi.impl.maybeModularNameToModulars
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.scope.ResolveResultOrderedSet
+import org.elixir_lang.psi.scope.WhileIn.whileIn
 import org.elixir_lang.psi.scope.maxScope
 import org.elixir_lang.structure_view.element.CallDefinitionHead
 
@@ -110,6 +111,17 @@ private constructor(private val name: String,
                     else -> true
                 }
             } ?: true
+
+    override fun executeOnException(element: Call, state: ResolveState): Boolean =
+        whileIn(Exception.NAME_ARITY_LIST) { nameArity ->
+            if (nameArity.name.startsWith(name)) {
+                val validResult = resolvedPrimaryArity == nameArity.arity && name == nameArity.name
+
+                addToResolveResults(element, validResult, state)
+            } else {
+                true
+            }
+        }
 
     override fun keepProcessing(): Boolean = resolveResultOrderedSet.keepProcessing(incompleteCode)
     fun resolveResults(): List<ResolveResult> = resolveResultOrderedSet.toList()

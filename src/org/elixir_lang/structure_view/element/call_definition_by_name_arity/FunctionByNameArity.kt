@@ -33,7 +33,7 @@ class FunctionByNameArity(size: Int, treeElementList: MutableList<TreeElement>, 
     override fun addToTreeElementList(callDefinition: CallDefinition) {
         val exception = this.exception
 
-        if (exception != null && Exception.isCallback(pair(callDefinition.name(), callDefinition.arity))) {
+        if (exception != null && org.elixir_lang.psi.Exception.isCallback(pair(callDefinition.name(), callDefinition.arity))) {
             exception.callback(callDefinition)
         } else {
             super.addToTreeElementList(callDefinition)
