@@ -6,6 +6,7 @@ import com.intellij.psi.impl.source.resolve.ResolveCache
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import org.elixir_lang.errorreport.Logger
+import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.CallDefinitionClause.nameArityRange
 import org.elixir_lang.psi.NamedElement
@@ -14,6 +15,8 @@ import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.qualification.Qualified
 import org.elixir_lang.psi.impl.call.qualification.qualifiedToModulars
 import org.elixir_lang.psi.stub.index.AllName
+import org.elixir_lang.structure_view.element.CallDefinitionHead
+import org.elixir_lang.structure_view.element.Callback
 
 object Callable : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Callable> {
     override fun resolve(callable: org.elixir_lang.reference.Callable, incompleteCode: Boolean): Array<ResolveResult> {
@@ -116,10 +119,22 @@ object Callable : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Cal
         for (key in keys) {
             stubIndex
                     .processElements(AllName.KEY, key, project, scope, NamedElement::class.java) { namedElement ->
-                if (namedElement is Call && CallDefinitionClause.`is`(namedElement) &&
-                        (incompleteCode || nameArityRange(namedElement)?.arityRange?.contains(arity) == true)) {
-                    resolveResults.add(PsiElementResolveResult(namedElement, validResult))
-                }
+                        if (namedElement is Call) {
+                            if (CallDefinitionClause.`is`(namedElement)) {
+                                if (incompleteCode ||
+                                        nameArityRange(namedElement)?.arityRange?.contains(arity) == true) {
+                                    resolveResults.add(PsiElementResolveResult(namedElement, validResult))
+                                }
+                            } else if (Callback.`is`(namedElement)) {
+                                if (incompleteCode ||
+                                        Callback
+                                                .headCall(namedElement as AtUnqualifiedNoParenthesesCall<*>)
+                                                ?.let { CallDefinitionHead.nameArityRange(it) }
+                                                ?.arityRange?.contains(arity) == true) {
+                                    resolveResults.add(PsiElementResolveResult(namedElement, validResult))
+                                }
+                            }
+                        }
 
                 true
             }

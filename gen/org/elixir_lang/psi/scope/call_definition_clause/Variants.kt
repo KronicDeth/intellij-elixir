@@ -7,6 +7,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.annotator.Parameter
+import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.ElixirIdentifier
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.Named
@@ -45,6 +46,10 @@ class Variants : CallDefinitionClause() {
         }
 
         return true
+    }
+
+    override fun executeOnCallback(element: AtUnqualifiedNoParenthesesCall<*>, state: ResolveState): Boolean {
+        TODO()
     }
 
     override fun executeOnDelegation(element: Call, state: ResolveState): Boolean {

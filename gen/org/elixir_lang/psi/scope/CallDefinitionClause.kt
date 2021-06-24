@@ -13,6 +13,7 @@ import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.call.name.Module.KERNEL_SPECIAL_FORMS
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.call.macroChildCalls
+import org.elixir_lang.structure_view.element.Callback
 import org.elixir_lang.structure_view.element.Delegation
 import org.elixir_lang.structure_view.element.modular.Module
 
@@ -47,6 +48,13 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
      * @return `true` to keep searching up tree; `false` to stop searching.
      */
     protected abstract fun executeOnCallDefinitionClause(element: Call, state: ResolveState): Boolean
+
+    /**
+     * Called on every [Call] where [org.elixir_lang.structure_view.element.Callback.is] is `true`
+     *
+     * @return `true` to keep searching up tree; `false` to stop searching.
+     */
+    protected abstract  fun executeOnCallback(element: AtUnqualifiedNoParenthesesCall<*>, state: ResolveState): Boolean
 
     /**
      * Called on every [Call] where [org.elixir_lang.structure_view.element.Delegation.is] is `true` when checking tree
@@ -84,6 +92,7 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
     private fun execute(element: Call, state: ResolveState): Boolean =
             when {
                 org.elixir_lang.psi.CallDefinitionClause.`is`(element) -> executeOnCallDefinitionClause(element, state)
+                Callback.`is`(element) -> executeOnCallback(element as AtUnqualifiedNoParenthesesCall<*>, state)
                 Delegation.`is`(element) -> executeOnDelegation(element, state)
                 Exception.`is`(element) -> executeOnException(element, state)
                 For.`is`(element) -> For.treeWalkDown(element, state, ::execute)

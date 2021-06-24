@@ -20,6 +20,7 @@ import org.elixir_lang.psi.scope.ResolveResultOrderedSet
 import org.elixir_lang.psi.scope.WhileIn.whileIn
 import org.elixir_lang.psi.scope.maxScope
 import org.elixir_lang.structure_view.element.CallDefinitionHead
+import org.elixir_lang.structure_view.element.Callback
 
 class MultiResolve
 private constructor(private val name: String,
@@ -36,6 +37,17 @@ private constructor(private val name: String,
                 addToResolveResults(element, validResult, state)
             } else {
                 null
+            }
+        } ?: true
+
+    override fun executeOnCallback(element: AtUnqualifiedNoParenthesesCall<*>, state: ResolveState): Boolean =
+        Callback.headCall(element)?.let { CallDefinitionHead.nameArityRange(it) }?.let { nameArityRange ->
+            if (nameArityRange.name.startsWith(name)) {
+                val validResult = (resolvedPrimaryArity in nameArityRange.arityRange) && name == nameArityRange.name
+
+                addToResolveResults(element, validResult, state)
+            } else {
+                true
             }
         } ?: true
 
