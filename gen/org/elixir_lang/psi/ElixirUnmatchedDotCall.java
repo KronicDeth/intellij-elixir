@@ -78,7 +78,7 @@ public interface ElixirUnmatchedDotCall extends ElixirUnmatchedExpression, DotCa
 
   int resolvedFinalArity();
 
-  @NotNull IntRange resolvedFinalArityRange();
+  @NotNull ArityInterval resolvedFinalArityInterval();
 
   @Nullable String resolvedModuleName();
 

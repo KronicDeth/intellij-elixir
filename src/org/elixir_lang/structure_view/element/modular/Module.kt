@@ -13,6 +13,7 @@ import com.intellij.usageView.UsageViewTypeLocation
 import org.elixir_lang.NameArity
 import org.elixir_lang.navigation.item_presentation.Parent
 import org.elixir_lang.psi.Arguments
+import org.elixir_lang.psi.ArityInterval
 import org.elixir_lang.psi.CallDefinitionClause.isMacro
 import org.elixir_lang.psi.QuoteMacro
 import org.elixir_lang.psi.call.Call
@@ -61,13 +62,13 @@ open class Module(protected val parent: Modular?, call: Call) : Element<Call>(ca
         fun addClausesToCallDefinition(
                 call: Call,
                 name: String,
-                arityRange: kotlin.ranges.IntRange,
+                arityInterval: ArityInterval,
                 callDefinitionByNameArity: MutableMap<NameArity, CallDefinition>,
                 modular: Modular,
                 time: Timed.Time,
                 callDefinitionInserter: (CallDefinition) -> Unit
         ) {
-            for (arity in arityRange) {
+            for (arity in arityInterval.closed()) {
                 val nameArity = NameArity(name, arity)
 
                 callDefinitionByNameArity.computeIfAbsent(nameArity) { (name, arity) ->

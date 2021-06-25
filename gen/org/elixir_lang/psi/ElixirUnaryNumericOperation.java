@@ -73,7 +73,7 @@ public interface ElixirUnaryNumericOperation extends Named, Prefix {
 
   int resolvedFinalArity();
 
-  @NotNull IntRange resolvedFinalArityRange();
+  @NotNull ArityInterval resolvedFinalArityInterval();
 
   @NotNull String resolvedModuleName();
 

@@ -59,7 +59,7 @@ public interface ElixirMatchedInOperation extends ElixirMatchedExpression, Call,
 
   int resolvedFinalArity();
 
-  @NotNull IntRange resolvedFinalArityRange();
+  @NotNull ArityInterval resolvedFinalArityInterval();
 
   @NotNull String resolvedModuleName();
 

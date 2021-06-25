@@ -1,6 +1,8 @@
 package org.elixir_lang.psi.call;
 
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.ResolveState;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -17,8 +19,7 @@ public interface MaybeExported extends PsiElement {
      *   source code and the {@link org.elixir_lang.structure_view.element.CallDefinitionClause#nameArityRange(Call)}
      *   has an actual range for the arity range.
      */
-    int exportedArity();
-
+    int exportedArity(@NotNull ResolveState state);
 
     /**
      * The name that was exported into the compiled .beam file OR the name of {@code def} or {@code defmacro} in the

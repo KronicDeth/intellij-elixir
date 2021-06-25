@@ -3,7 +3,7 @@ package org.elixir_lang.psi
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.ResolveState
-import org.elixir_lang.psi.CallDefinitionClause.nameArityRange
+import org.elixir_lang.psi.CallDefinitionClause.nameArityInterval
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.*
 import org.elixir_lang.psi.call.name.Module.KERNEL
@@ -141,8 +141,8 @@ object Using {
 
     private fun isDefiner(call: Call): Boolean =
             call.isCalling(KERNEL, DEFMACRO) &&
-                    nameArityRange(call)?.let { nameArityRange ->
-                        nameArityRange.name == USING && nameArityRange.arityRange.contains(ARITY)
+                    nameArityInterval(call, ResolveState.initial())?.let { nameArityRange ->
+                        nameArityRange.name == USING && nameArityRange.arityInterval.contains(ARITY)
                     }
                     ?: false
 }

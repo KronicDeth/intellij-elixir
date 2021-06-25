@@ -744,13 +744,8 @@ object CallImpl {
 
     @Contract(pure = true)
     @JvmStatic
-    fun resolvedFinalArityRange(call: Call): IntRange =
-            call.finalArguments()?.let { finalArguments ->
-                val defaultCount = finalArguments.defaultArgumentCount()
-                val maximum = finalArguments.size
-                val minimum = maximum - defaultCount
-                IntRange(minimum, maximum)
-            } ?: IntRange(0, 0)
+    fun resolvedFinalArityInterval(call: Call): ArityInterval =
+            call.finalArguments().let { ArityInterval.fromArguments(it) }
 
     @Contract(pure = true)
     @JvmStatic
@@ -764,33 +759,6 @@ object CallImpl {
         }
 
     // Private Functions
-
-    /**
-     * The number of arguments that have defaults.
-     *
-     * @param this@defaultArgumentCount arguments to a definition call
-     */
-    private fun Array<PsiElement>.defaultArgumentCount(): Int = count { it.isDefaultArgument() }
-
-    /**
-     * Whether the given element presents a default argument (with `\\` in it.
-     *
-     * @param this@isDefaultArgument an argument to a [Call]
-     * @return `true` if in match operation with `\\` operator; otherwise, `false`.
-     */
-    private fun PsiElement.isDefaultArgument(): Boolean {
-        var defaultArgument = false
-
-        if (this is InMatch) {
-            val operation = this as Operation
-
-            if (operation.operator().text.trim { it <= ' ' } == DEFAULT_OPERATOR) {
-                defaultArgument = true
-            }
-        }
-
-        return defaultArgument
-    }
 
     /**
      * Whether the `arrow` is a pipe operation.

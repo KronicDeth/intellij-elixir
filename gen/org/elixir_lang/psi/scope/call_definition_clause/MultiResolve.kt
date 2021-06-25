@@ -7,7 +7,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.EEx.FUNCTION_FROM_FILE_ARITY_RANGE
 import org.elixir_lang.EEx.FUNCTION_FROM_STRING_ARITY_RANGE
 import org.elixir_lang.psi.*
-import org.elixir_lang.psi.CallDefinitionClause.nameArityRange
+import org.elixir_lang.psi.CallDefinitionClause.nameArityInterval
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.Named
 
@@ -27,12 +27,11 @@ private constructor(private val name: String,
                     private val resolvedPrimaryArity: Int,
                     private val incompleteCode: Boolean) : org.elixir_lang.psi.scope.CallDefinitionClause() {
     override fun executeOnCallDefinitionClause(element: Call, state: ResolveState): Boolean =
-        nameArityRange(element)?.let { nameArityRange ->
-            val name = nameArityRange.name
+        nameArityInterval(element, state)?.let { nameArityInterval ->
+            val name = nameArityInterval.name
 
             if (name.startsWith(this.name)) {
-                val arityInterval = ArityInterval.arityInterval(nameArityRange, state)
-                val validResult = (resolvedPrimaryArity in arityInterval) && name == this.name
+                val validResult = (resolvedPrimaryArity in nameArityInterval.arityInterval) && name == this.name
 
                 addToResolveResults(element, validResult, state)
             } else {
@@ -41,9 +40,9 @@ private constructor(private val name: String,
         } ?: true
 
     override fun executeOnCallback(element: AtUnqualifiedNoParenthesesCall<*>, state: ResolveState): Boolean =
-        Callback.headCall(element)?.let { CallDefinitionHead.nameArityRange(it) }?.let { nameArityRange ->
-            if (nameArityRange.name.startsWith(name)) {
-                val validResult = (resolvedPrimaryArity in nameArityRange.arityRange) && name == nameArityRange.name
+        Callback.headCall(element)?.let { CallDefinitionHead.nameArityInterval(it, state) }?.let { nameArityInterval ->
+            if (nameArityInterval.name.startsWith(name)) {
+                val validResult = (resolvedPrimaryArity in nameArityInterval.arityInterval) && name == nameArityInterval.name
 
                 addToResolveResults(element, validResult, state)
             } else {
@@ -55,11 +54,11 @@ private constructor(private val name: String,
         element.finalArguments()?.takeIf { it.size == 2 }?.let { arguments ->
             val head = arguments[0]
 
-            CallDefinitionHead.nameArityRange(head)?.let { headNameArityRange ->
-                val headName = headNameArityRange.name
+            CallDefinitionHead.nameArityInterval(head, state)?.let { headNameArityInterval ->
+                val headName = headNameArityInterval.name
 
                 if (headName.startsWith(this.name)) {
-                    val headValidResult = (resolvedPrimaryArity in headNameArityRange.arityRange) && (headName == this.name)
+                    val headValidResult = (resolvedPrimaryArity in headNameArityInterval.arityInterval) && (headName == this.name)
 
                     // the defdelegate is valid or invalid regardless of whether the `to:` (and `:as` resolves as
                     // `defdelegate` still defines a function in the module with the head's name and arity even if it

@@ -159,8 +159,8 @@ public class ElixirUnmatchedAtUnqualifiedNoParenthesesCallImpl extends NamedStub
   }
 
   @Override
-  public @NotNull IntRange resolvedFinalArityRange() {
-    return ElixirPsiImplUtil.resolvedFinalArityRange(this);
+  public @NotNull ArityInterval resolvedFinalArityInterval() {
+    return ElixirPsiImplUtil.resolvedFinalArityInterval(this);
   }
 
   @Override

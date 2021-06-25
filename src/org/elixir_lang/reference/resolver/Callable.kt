@@ -2,13 +2,14 @@ package org.elixir_lang.reference.resolver
 
 import com.intellij.psi.PsiElementResolveResult
 import com.intellij.psi.ResolveResult
+import com.intellij.psi.ResolveState
 import com.intellij.psi.impl.source.resolve.ResolveCache
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.CallDefinitionClause
-import org.elixir_lang.psi.CallDefinitionClause.nameArityRange
+import org.elixir_lang.psi.CallDefinitionClause.nameArityInterval
 import org.elixir_lang.psi.NamedElement
 import org.elixir_lang.psi.UnqualifiedNoArgumentsCall
 import org.elixir_lang.psi.call.Call
@@ -120,17 +121,20 @@ object Callable : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Cal
             stubIndex
                     .processElements(AllName.KEY, key, project, scope, NamedElement::class.java) { namedElement ->
                         if (namedElement is Call) {
+                            val state = ResolveState.initial()
+
                             if (CallDefinitionClause.`is`(namedElement)) {
                                 if (incompleteCode ||
-                                        nameArityRange(namedElement)?.arityRange?.contains(arity) == true) {
+                                        nameArityInterval(namedElement, state)
+                                                ?.arityInterval?.contains(arity) == true) {
                                     resolveResults.add(PsiElementResolveResult(namedElement, validResult))
                                 }
                             } else if (Callback.`is`(namedElement)) {
                                 if (incompleteCode ||
                                         Callback
                                                 .headCall(namedElement as AtUnqualifiedNoParenthesesCall<*>)
-                                                ?.let { CallDefinitionHead.nameArityRange(it) }
-                                                ?.arityRange?.contains(arity) == true) {
+                                                ?.let { CallDefinitionHead.nameArityInterval(it, state) }
+                                                ?.arityInterval?.contains(arity) == true) {
                                     resolveResults.add(PsiElementResolveResult(namedElement, validResult))
                                 }
                             }

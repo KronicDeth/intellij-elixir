@@ -2,13 +2,13 @@ package org.elixir_lang.psi
 
 import com.intellij.psi.ResolveState
 import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase
+import org.elixir_lang.NameArityInterval
 import org.elixir_lang.NameArityRange
 import org.elixir_lang.psi.call.Call
 
 import java.util.ArrayList
-import java.util.Arrays
 
-import org.elixir_lang.psi.CallDefinitionClause.nameArityRange
+import org.elixir_lang.psi.CallDefinitionClause.nameArityInterval
 
 class ImportTest : LightPlatformCodeInsightFixtureTestCase() {
     /*
@@ -62,14 +62,16 @@ class ImportTest : LightPlatformCodeInsightFixtureTestCase() {
 
         assertEquals(2, importedCallList.size)
 
-        val nameArityRangeList = importedCallList.map(CallDefinitionClause::nameArityRange)
+        val nameArityIntervalList = importedCallList.map { importedCall ->
+            nameArityInterval(importedCall, ResolveState.initial())
+        }
 
         assertContainsElements(
-                Arrays.asList(
-                        NameArityRange("imported", IntRange(1, 1)),
-                        NameArityRange("imported", IntRange(0, 0))
+                listOf(
+                        NameArityInterval("imported", ArityInterval(1, 1)),
+                        NameArityInterval("imported", ArityInterval(0, 0))
                 ),
-                nameArityRangeList
+                nameArityIntervalList
         )
     }
 
@@ -98,7 +100,10 @@ class ImportTest : LightPlatformCodeInsightFixtureTestCase() {
 
         val importedCall = importedCallList[0]
 
-        assertEquals(NameArityRange("imported", IntRange(0, 0)), nameArityRange(importedCall))
+        assertEquals(
+                NameArityInterval("imported", ArityInterval(0, 0)),
+                nameArityInterval(importedCall, ResolveState.initial())
+        )
     }
 
     /*

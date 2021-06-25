@@ -4,6 +4,7 @@ import com.intellij.navigation.ChooseByNameContributor
 import com.intellij.navigation.NavigationItem
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
+import com.intellij.psi.ResolveState
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.stubs.StubIndexKey
@@ -105,7 +106,7 @@ open class ChooseByNameContributor(private val stubIndexKey: StubIndexKey<String
             callDefinitionByTuple: MutableMap<CallDefinition.Tuple, CallDefinition>,
             call: Call
     ) {
-        org.elixir_lang.psi.CallDefinitionClause.nameArityRange(call)?.let { (name, arityRange) ->
+        org.elixir_lang.psi.CallDefinitionClause.nameArityInterval(call, ResolveState.initial())?.let { (name, arityInterval) ->
             val time = CallDefinitionClause.time(call)
             val modular = enclosingModularByCall.putNew(call)
 
@@ -115,7 +116,7 @@ open class ChooseByNameContributor(private val stubIndexKey: StubIndexKey<String
                     error("Cannot find enclosing Modular", call)
                 }
             } else {
-                for (arity in arityRange) {
+                for (arity in arityInterval.closed()) {
                     val tuple = CallDefinition.Tuple(modular, time, name, arity)
                     callDefinitionByTuple.computeIfAbsent(tuple) { (modular, time, name, arity) ->
                         CallDefinition(modular, time, name, arity)

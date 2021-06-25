@@ -68,8 +68,8 @@ public class ElixirUnmatchedUnqualifiedNoParenthesesCallImpl extends NamedStubbe
   }
 
   @Override
-  public int exportedArity() {
-    return ElixirPsiImplUtil.exportedArity(this);
+  public int exportedArity(@NotNull ResolveState state) {
+    return ElixirPsiImplUtil.exportedArity(this, state);
   }
 
   @Override
@@ -168,8 +168,8 @@ public class ElixirUnmatchedUnqualifiedNoParenthesesCallImpl extends NamedStubbe
   }
 
   @Override
-  public @NotNull IntRange resolvedFinalArityRange() {
-    return ElixirPsiImplUtil.resolvedFinalArityRange(this);
+  public @NotNull ArityInterval resolvedFinalArityInterval() {
+    return ElixirPsiImplUtil.resolvedFinalArityInterval(this);
   }
 
   @Override

@@ -64,7 +64,7 @@ public interface ElixirMatchedNotInOperation extends ElixirMatchedExpression, Ca
 
   int resolvedFinalArity();
 
-  @NotNull IntRange resolvedFinalArityRange();
+  @NotNull ArityInterval resolvedFinalArityInterval();
 
   @NotNull String resolvedModuleName();
 

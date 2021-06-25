@@ -1,6 +1,5 @@
 package org.elixir_lang.code_insight.line_marker_provider
 
-import com.intellij.codeHighlighting.Pass
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzerSettings
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProvider
@@ -10,10 +9,11 @@ import com.intellij.openapi.editor.markup.GutterIconRenderer
 import com.intellij.openapi.editor.markup.SeparatorPlacement
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiPolyVariantReference
+import com.intellij.psi.ResolveState
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.CallDefinitionClause
-import org.elixir_lang.psi.CallDefinitionClause.nameArityRange
+import org.elixir_lang.psi.CallDefinitionClause.nameArityInterval
 import org.elixir_lang.psi.ElixirTypes
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.*
@@ -80,10 +80,10 @@ class CallDefinition : LineMarkerProvider {
                                 if (previousModuleAttributeName == "@spec") {
                                     moduleAttributeNameArity(previousModuleAttribute)?.let { moduleAttributeNameArity ->
                                         siblingCallDefinitionClause(atUnqualifiedNoParenthesesCall, NEXT_SIBLING)?.let { nextSiblingCallDefinitionClause ->
-                                            nameArityRange(nextSiblingCallDefinitionClause)?.let { nameArityRange ->
-                                                val arityRange = nameArityRange.arityRange
+                                            nameArityInterval(nextSiblingCallDefinitionClause, ResolveState.initial())?.let { nameArityInterval ->
+                                                val arityInterval = nameArityInterval.arityInterval
 
-                                                if (moduleAttributeNameArity.arity in arityRange) {
+                                                if (moduleAttributeNameArity.arity in arityInterval) {
                                                     // the previous spec is part of the group
                                                     false
                                                 } else {
@@ -149,7 +149,7 @@ class CallDefinition : LineMarkerProvider {
 
                                         if (resolvedList != null && resolvedList.isNotEmpty()) {
                                             firstInGroup = resolvedList.filterIsInstance<Call>().none { resolved ->
-                                                nameArityRange(resolved)?.let { (_, resolvedArityRange) ->
+                                                nameArityInterval(resolved, ResolveState.initial())?.let { (_, resolvedArityRange) ->
                                                     // the current @spec and the previous @spec apply to the same call definition clause
                                                     moduleAttributeArity in resolvedArityRange && previousModuleAttributeArity in resolvedArityRange
                                                 } ?: false
@@ -188,14 +188,15 @@ class CallDefinition : LineMarkerProvider {
         if (CallDefinitionClause.`is`(call)) {
             val previousCallDefinitionClause = siblingCallDefinitionClause(call, PREVIOUS_SIBLING)
             var firstClause: Boolean
+            val state = ResolveState.initial()
 
             firstClause = if (previousCallDefinitionClause == null) {
                 true
             } else {
-                val callNameArityRange = nameArityRange(call)
+                val callNameArityRange = nameArityInterval(call, state)
 
                 if (callNameArityRange != null) {
-                    val previousNameArityRange = nameArityRange(previousCallDefinitionClause)
+                    val previousNameArityRange = nameArityInterval(previousCallDefinitionClause, state)
 
                     previousNameArityRange == null || previousNameArityRange != callNameArityRange
                 } else {
@@ -213,16 +214,16 @@ class CallDefinition : LineMarkerProvider {
                     if (moduleAttributeName == "@doc") {
                         firstClause = false
                     } else if (moduleAttributeName == "@spec") {
-                        val callNameArityRange = nameArityRange(call)
+                        val callNameArityRange = nameArityInterval(call, state)
 
                         if (callNameArityRange != null) {
                             val specNameArity = moduleAttributeNameArity(previousModuleAttributeDefinition)
 
                             if (specNameArity != null) {
                                 val specArity = specNameArity.arity
-                                val callArityRange = callNameArityRange.arityRange
+                                val callArityInterval = callNameArityRange.arityInterval
 
-                                firstClause = specArity !in callArityRange
+                                firstClause = specArity !in callArityInterval
                             }
                         }
                     }

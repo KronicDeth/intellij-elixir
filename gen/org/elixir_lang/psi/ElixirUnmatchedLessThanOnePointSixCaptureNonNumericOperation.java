@@ -58,7 +58,7 @@ public interface ElixirUnmatchedLessThanOnePointSixCaptureNonNumericOperation ex
 
   int resolvedFinalArity();
 
-  @NotNull IntRange resolvedFinalArityRange();
+  @NotNull ArityInterval resolvedFinalArityInterval();
 
   @NotNull String resolvedModuleName();
 

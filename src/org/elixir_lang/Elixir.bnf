@@ -35,7 +35,7 @@
     processDeclarations
     quote
     resolvedFinalArity
-    resolvedFinalArityRange
+    resolvedFinalArityInterval
     resolvedModuleName
     resolvedPrimaryArity
     resolvedSecondaryArity
@@ -67,7 +67,7 @@
     qualifier
     quote
     resolvedFinalArity
-    resolvedFinalArityRange
+    resolvedFinalArityInterval
     resolvedModuleName
     resolvedPrimaryArity
     resolvedSecondaryArity
@@ -105,7 +105,7 @@
     processDeclarations
     quote
     resolvedFinalArity
-    resolvedFinalArityRange
+    resolvedFinalArityInterval
     resolvedModuleName
     resolvedPrimaryArity
     resolvedSecondaryArity
@@ -139,7 +139,7 @@
     processDeclarations
     quote
     resolvedFinalArity
-    resolvedFinalArityRange
+    resolvedFinalArityInterval
     resolvedModuleName
     resolvedPrimaryArity
     resolvedSecondaryArity
@@ -247,7 +247,7 @@
     secondaryArguments
     secondaryArity
     resolvedFinalArity
-    resolvedFinalArityRange
+    resolvedFinalArityInterval
     resolvedModuleName
     resolvedPrimaryArity
     resolvedSecondaryArity
@@ -290,7 +290,7 @@
     secondaryArguments
     secondaryArity
     resolvedFinalArity
-    resolvedFinalArityRange
+    resolvedFinalArityInterval
     resolvedModuleName
     resolvedPrimaryArity
     resolvedSecondaryArity
@@ -1817,7 +1817,7 @@ matchedUnqualifiedNoParenthesesCall ::= identifier noParenthesesOneArgument
                                             processDeclarations
                                             quote
                                             resolvedFinalArity
-                                            resolvedFinalArityRange
+                                            resolvedFinalArityInterval
                                             resolvedModuleName
                                             resolvedPrimaryArity
                                             resolvedSecondaryArity
@@ -2663,7 +2663,7 @@ unmatchedUnqualifiedNoParenthesesCall ::= identifier noParenthesesOneArgument do
                                               processDeclarations
                                               quote
                                               resolvedFinalArity
-                                              resolvedFinalArityRange
+                                              resolvedFinalArityInterval
                                               resolvedModuleName
                                               resolvedPrimaryArity
                                               resolvedSecondaryArity

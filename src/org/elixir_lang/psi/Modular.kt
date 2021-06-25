@@ -102,16 +102,19 @@ object Modular {
             modular: Call,
             functionName: Name,
             initial: R,
-            foldWhile: (Call, Name, ArityRange,  R) -> AccumulatorContinue<R>
+            foldWhile: (Call, Name, ArityInterval, R) -> AccumulatorContinue<R>
     ): AccumulatorContinue<R> =
             callDefinitionClauseCallFoldWhile(modular, initial) { callDefinitionClauseCall, acc ->
-                CallDefinitionClause.nameArityRange(callDefinitionClauseCall)?.let { (name, arityRange) ->
-                    if (name == functionName) {
-                            foldWhile(callDefinitionClauseCall, name, arityRange, acc)
-                    } else {
-                        null
-                    }
-                } ?:
-                AccumulatorContinue(acc, true)
+                CallDefinitionClause
+                        .nameArityInterval(callDefinitionClauseCall, ResolveState.initial())
+                        ?.let { (name, arityInterval) ->
+                            if (name == functionName) {
+                                foldWhile(callDefinitionClauseCall, name, arityInterval, acc)
+                            } else {
+                                null
+                            }
+                        }
+                        ?:
+                        AccumulatorContinue(acc, true)
             }
 }

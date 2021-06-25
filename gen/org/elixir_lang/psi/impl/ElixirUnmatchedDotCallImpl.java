@@ -159,8 +159,8 @@ public class ElixirUnmatchedDotCallImpl extends NamedStubbedPsiElementBase<Unmat
   }
 
   @Override
-  public @NotNull IntRange resolvedFinalArityRange() {
-    return ElixirPsiImplUtil.resolvedFinalArityRange(this);
+  public @NotNull ArityInterval resolvedFinalArityInterval() {
+    return ElixirPsiImplUtil.resolvedFinalArityInterval(this);
   }
 
   @Override

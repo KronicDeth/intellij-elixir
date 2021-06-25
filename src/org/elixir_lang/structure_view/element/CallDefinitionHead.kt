@@ -4,8 +4,9 @@ import com.intellij.ide.util.treeView.smartTree.TreeElement
 import com.intellij.navigation.ItemPresentation
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiErrorElement
+import com.intellij.psi.ResolveState
 import org.elixir_lang.ArityRange
-import org.elixir_lang.NameArityRange
+import org.elixir_lang.NameArityInterval
 import org.elixir_lang.Visibility
 import org.elixir_lang.navigation.item_presentation.NameArity
 import org.elixir_lang.psi.*
@@ -91,20 +92,21 @@ class CallDefinitionHead(val callDefinition: CallDefinition, private val visibil
                     }
                 }
 
-        fun nameArityRange(head: PsiElement): NameArityRange? =
+        fun nameArityInterval(head: PsiElement, state: ResolveState): NameArityInterval? =
             if (head is ElixirMatchedAtNonNumericOperation) {
                 val name = head.operator().text.trim { it <= ' ' }
-                val arityRange = ArityRange(1, 1)
+                val arityInterval = ArityInterval(1, 1)
 
-                NameArityRange(name, arityRange)
+                NameArityInterval(name, arityInterval)
             } else {
                 (strip(head) as? Call)?.let { stripped ->
                     val functionName = stripped.functionName()
 
                     if (functionName != null) {
                         val name = unquoteName(stripped, functionName)
-                        val arityRange = stripped.resolvedFinalArityRange()
-                        NameArityRange(name, arityRange)
+                        val arityInterval = stripped.resolvedFinalArityInterval()
+
+                        NameArityInterval(name, arityInterval).adjusted(state)
                     } else {
                         null
                     }

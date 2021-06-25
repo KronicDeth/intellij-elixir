@@ -55,7 +55,7 @@ public interface ElixirMatchedThreeOperation extends ElixirMatchedExpression, Na
 
   int resolvedFinalArity();
 
-  @NotNull IntRange resolvedFinalArityRange();
+  @NotNull ArityInterval resolvedFinalArityInterval();
 
   @NotNull String resolvedModuleName();
 

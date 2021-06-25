@@ -770,8 +770,9 @@ public class ElixirPsiImplUtil {
     }
 
     @Contract(pure = true)
-    public static int exportedArity(@NotNull final UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
-        return UnqualifiedNoParenthesesCallImplKt.exportedArity(unqualifiedNoParenthesesCall);
+    public static int exportedArity(@NotNull final UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall,
+                                    @NotNull ResolveState state) {
+        return UnqualifiedNoParenthesesCallImplKt.exportedArity(unqualifiedNoParenthesesCall, state);
     }
 
     @Contract(pure = true)
@@ -1646,8 +1647,8 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static IntRange resolvedFinalArityRange(@NotNull Call call) {
-        return CallImpl.resolvedFinalArityRange(call);
+    public static ArityInterval resolvedFinalArityInterval(@NotNull Call call) {
+        return CallImpl.resolvedFinalArityInterval(call);
     }
 
     @Contract(pure = true, value = "_ -> null")

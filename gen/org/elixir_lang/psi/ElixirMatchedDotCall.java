@@ -73,7 +73,7 @@ public interface ElixirMatchedDotCall extends ElixirMatchedExpression, DotCall<M
 
   int resolvedFinalArity();
 
-  @NotNull IntRange resolvedFinalArityRange();
+  @NotNull ArityInterval resolvedFinalArityInterval();
 
   @Nullable String resolvedModuleName();
 

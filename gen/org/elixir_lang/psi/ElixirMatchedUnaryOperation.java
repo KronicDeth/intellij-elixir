@@ -53,7 +53,7 @@ public interface ElixirMatchedUnaryOperation extends ElixirMatchedExpression, Un
 
   int resolvedFinalArity();
 
-  @NotNull IntRange resolvedFinalArityRange();
+  @NotNull ArityInterval resolvedFinalArityInterval();
 
   @NotNull String resolvedModuleName();
 

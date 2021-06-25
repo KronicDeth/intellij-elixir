@@ -3,6 +3,7 @@ package org.elixir_lang.beam.psi.impl
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
+import com.intellij.psi.ResolveState
 import com.intellij.psi.StubBasedPsiElement
 import com.intellij.psi.impl.source.tree.TreeElement
 import com.intellij.psi.stubs.IStubElementType
@@ -74,7 +75,7 @@ class CallDefinitionImpl<T : CallDefinitionStub<*>>(private val stub: T) : Modul
     /**
      * The arity of the function or macro that was exported into the compiled .beam file
      */
-    override fun exportedArity(): Int = stub.callDefinitionClauseHeadArity()
+    override fun exportedArity(state: ResolveState): Int = stub.callDefinitionClauseHeadArity()
 
     /**
      * The name that was exported into the compiled .beam file

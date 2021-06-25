@@ -6,7 +6,7 @@ import com.intellij.psi.ResolveState
 import com.intellij.psi.impl.source.resolve.ResolveCache
 import org.elixir_lang.Arity
 import org.elixir_lang.Name
-import org.elixir_lang.NameArityRange
+import org.elixir_lang.NameArityInterval
 import org.elixir_lang.psi.For
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.call.finalArguments
@@ -36,8 +36,8 @@ object CallDefinitionClause : ResolveCache.PolyVariantResolver<org.elixir_lang.r
     private fun callToResolveResults(call: Call, name: Name, arity: Arity): List<ResolveResult> =
             when {
                 org.elixir_lang.psi.CallDefinitionClause.`is`(call) -> {
-                    org.elixir_lang.psi.CallDefinitionClause.nameArityRange(call)
-                            ?.let { nameArityRange -> nameArityRangeToResolveResult(call, name, arity, nameArityRange) }
+                    org.elixir_lang.psi.CallDefinitionClause.nameArityInterval(call, ResolveState.initial())
+                            ?.let { nameArityInterval -> nameArityIntervalToResolveResult(call, name, arity, nameArityInterval) }
                             ?.let { listOf(it) }
                             .orEmpty()
                 }
@@ -45,8 +45,8 @@ object CallDefinitionClause : ResolveCache.PolyVariantResolver<org.elixir_lang.r
                     call
                             .finalArguments()
                             ?.takeIf { it.size == 2 }
-                            ?.let { CallDefinitionHead.nameArityRange(it[0]) }
-                            ?.let { nameArityRange -> nameArityRangeToResolveResult(call, name, arity, nameArityRange) }
+                            ?.let { CallDefinitionHead.nameArityInterval(it[0], ResolveState.initial()) }
+                            ?.let { nameArityRange -> nameArityIntervalToResolveResult(call, name, arity, nameArityRange) }
                             ?.let { listOf(it) }
                             .orEmpty()
                 }
@@ -66,12 +66,15 @@ object CallDefinitionClause : ResolveCache.PolyVariantResolver<org.elixir_lang.r
                 else -> emptyList()
             }
 
-    private fun nameArityRangeToResolveResult(call: Call, name: Name, arity: Arity, nameArityRange: NameArityRange): PsiElementResolveResult? {
-        val definerName = nameArityRange.name
+    private fun nameArityIntervalToResolveResult(call: Call,
+                                                 name: Name,
+                                                 arity: Arity,
+                                                 nameArityInterval: NameArityInterval): PsiElementResolveResult? {
+        val definerName = nameArityInterval.name
 
         return if (definerName.startsWith(name)) {
-            val definerArityRange = nameArityRange.arityRange
-            val validResult = (arity in definerArityRange) && (definerName == name)
+            val definerArityInterval = nameArityInterval.arityInterval
+            val validResult = (arity in definerArityInterval) && (definerName == name)
 
             PsiElementResolveResult(call, validResult)
         } else {

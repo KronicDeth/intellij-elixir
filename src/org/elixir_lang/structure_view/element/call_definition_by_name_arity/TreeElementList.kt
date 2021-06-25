@@ -1,9 +1,11 @@
 package org.elixir_lang.structure_view.element.call_definition_by_name_arity
 
 import com.intellij.ide.util.treeView.smartTree.TreeElement
+import com.intellij.psi.ResolveState
 import org.elixir_lang.ArityRange
 import org.elixir_lang.Name
 import org.elixir_lang.NameArity
+import org.elixir_lang.psi.ArityInterval
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.structure_view.element.CallDefinition
 import org.elixir_lang.structure_view.element.Timed
@@ -21,13 +23,14 @@ open class TreeElementList(
         private val time: Timed.Time
 ) : HashMap<NameArity, CallDefinition>(size), CallDefinitionByNameArity {
     fun addClausesToCallDefinition(call: Call) {
-        org.elixir_lang.psi.CallDefinitionClause.nameArityRange(call)?.let { (name, arityRange) ->
-            addClausesToCallDefinition(call, name, arityRange)
-        }
+        org.elixir_lang.psi.CallDefinitionClause.nameArityInterval(call, ResolveState.initial())
+                ?.let { (name, arityInterval) ->
+                    addClausesToCallDefinition(call, name, arityInterval)
+                }
     }
 
-    private fun addClausesToCallDefinition(call: Call, name: Name, arityRange: ArityRange) {
-        for (arity in arityRange) {
+    private fun addClausesToCallDefinition(call: Call, name: Name, arityInterval: ArityInterval) {
+        for (arity in arityInterval.closed()) {
             NameArity(name, arity).let { putNew(it) }.clause(call)
         }
     }

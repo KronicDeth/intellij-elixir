@@ -83,7 +83,7 @@ public interface ElixirUnmatchedQualifiedNoParenthesesCall extends ElixirUnmatch
 
   int resolvedFinalArity();
 
-  @NotNull IntRange resolvedFinalArityRange();
+  @NotNull ArityInterval resolvedFinalArityInterval();
 
   @NotNull String resolvedModuleName();
 

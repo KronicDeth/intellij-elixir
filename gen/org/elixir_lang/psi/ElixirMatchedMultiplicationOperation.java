@@ -55,7 +55,7 @@ public interface ElixirMatchedMultiplicationOperation extends ElixirMatchedExpre
 
   int resolvedFinalArity();
 
-  @NotNull IntRange resolvedFinalArityRange();
+  @NotNull ArityInterval resolvedFinalArityInterval();
 
   @NotNull String resolvedModuleName();
 

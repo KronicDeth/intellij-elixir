@@ -5,6 +5,7 @@ import com.intellij.ide.util.treeView.smartTree.TreeElement
 import com.intellij.navigation.ItemPresentation
 import com.intellij.navigation.NavigationItem
 import com.intellij.psi.PsiElement
+import com.intellij.psi.ResolveState
 import org.elixir_lang.Visibility
 import org.elixir_lang.navigation.item_presentation.NameArity
 import org.elixir_lang.navigation.item_presentation.Parent
@@ -48,10 +49,10 @@ class CallDefinition(val modular: Modular, private val time: Timed.Time, private
      * @param clause the new clause for the macro
      */
     fun clause(clause: Call): CallDefinitionClause {
-        val nameArityRange = org.elixir_lang.psi.CallDefinitionClause.nameArityRange(clause)!!
+        val nameArityInterval = org.elixir_lang.psi.CallDefinitionClause.nameArityInterval(clause, ResolveState.initial())!!
 
-        assert(nameArityRange.name == name)
-        assert(arity in nameArityRange.arityRange)
+        assert(nameArityInterval.name == name)
+        assert(arity in nameArityInterval.arityInterval)
 
         val callDefinitionClause = CallDefinitionClause(this, clause)
         childList.add(callDefinitionClause)
@@ -121,10 +122,10 @@ class CallDefinition(val modular: Modular, private val time: Timed.Time, private
      * @param call
      */
     fun head(head: Call) {
-        val nameArityRange = CallDefinitionHead.nameArityRange(head)!!
+        val nameArityInterval = CallDefinitionHead.nameArityInterval(head, ResolveState.initial())!!
 
-        assert(nameArityRange.name == name)
-        assert(arity in nameArityRange.arityRange)
+        assert(nameArityInterval.name == name)
+        assert(arity in nameArityInterval.arityInterval)
 
         val callDefinitionHead = CallDefinitionHead(this, Visibility.PUBLIC, head)
         childList.add(callDefinitionHead)
@@ -233,15 +234,16 @@ class CallDefinition(val modular: Modular, private val time: Timed.Time, private
          */
         fun fromCall(call: Call): CallDefinition? =
                 CallDefinitionClause.enclosingModular(call)?.let { modular ->
-                    org.elixir_lang.psi.CallDefinitionClause.nameArityRange(call)?.let { nameArityRange ->
-                        val name = nameArityRange.name
-                        /* arity is assumed to be max arity in the range because that's how {@code h} and ExDoc treat
-                           functions with defaults. */
-                        val arity = nameArityRange.arityRange.endInclusive
-                        val time = CallDefinitionClause.time(call)
+                    org.elixir_lang.psi.CallDefinitionClause.nameArityInterval(call, ResolveState.initial())
+                            ?.let { nameArityInterval ->
+                                val name = nameArityInterval.name
+                                /* arity is assumed to be max arity in the range because that's how {@code h} and
+                                   ExDoc treat functions with defaults. */
+                                val arity = nameArityInterval.arityInterval.closed().last
+                                val time = CallDefinitionClause.time(call)
 
-                        CallDefinition(modular, time, name, arity)
-                    }
+                                CallDefinition(modular, time, name, arity)
+                            }
                 }
     }
 

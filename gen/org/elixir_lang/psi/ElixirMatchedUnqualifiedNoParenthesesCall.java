@@ -26,7 +26,7 @@ public interface ElixirMatchedUnqualifiedNoParenthesesCall extends ElixirMatched
 
   @NotNull Set<String> canonicalNameSet();
 
-  int exportedArity();
+  int exportedArity(ResolveState state);
 
   @Nullable String exportedName();
 
@@ -76,7 +76,7 @@ public interface ElixirMatchedUnqualifiedNoParenthesesCall extends ElixirMatched
 
   int resolvedFinalArity();
 
-  @NotNull IntRange resolvedFinalArityRange();
+  @NotNull ArityInterval resolvedFinalArityInterval();
 
   @NotNull String resolvedModuleName();
 
