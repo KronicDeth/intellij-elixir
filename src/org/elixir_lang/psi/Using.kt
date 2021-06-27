@@ -87,6 +87,11 @@ object Using {
                         }
                     } ?: true
                 }
+                resolvedModuleName == KERNEL && functionName == CASE -> {
+                    val lastChildCallResolveState = resolveState.putVisitedElement(lastChildCall)
+
+                    Case.treeWalkUp(lastChildCall, lastChildCallResolveState, keepProcessing)
+                }
                 else -> {
                     var accumulatedKeepProcessing = true
 
