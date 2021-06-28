@@ -379,7 +379,7 @@ object ProcessDeclarationsImpl {
             true
         }
 
-    private fun processDeclarations(sequence: Sequence<PsiElement>,
+    fun processDeclarations(sequence: Sequence<PsiElement>,
                                     processor: PsiScopeProcessor,
                                     state: ResolveState,
                                     lastParent: PsiElement,

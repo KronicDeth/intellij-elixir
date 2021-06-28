@@ -10,43 +10,53 @@ import org.elixir_lang.psi.impl.call.whileInStabBodyChildExpressions
 import org.elixir_lang.psi.scope.CallDefinitionClause
 
 object QuoteMacro {
-    fun treeWalkUp(quoteCall: Call, resolveState: ResolveState, keepProcessing: (PsiElement, ResolveState) -> Boolean): Boolean {
+    fun treeWalkUp(quoteCall: Call, resolveState: ResolveState, keepProcessing: (PsiElement, ResolveState) -> Boolean): Boolean =
+            if (!resolveState.containsAncestorUnquote(quoteCall)) {
+                quoteCall
+                        .macroChildCallSequence()
+                        .filter { !resolveState.hasBeenVisited(it) }
+                        .let { treeWalkUp(it, resolveState, keepProcessing) }
+            } else {
+                true
+            }
+
+    fun treeWalkUp(childCallSequence: Sequence<Call>,
+                   resolveState: ResolveState,
+                   keepProcessing: (PsiElement, ResolveState) -> Boolean): Boolean {
         var accumulatorKeepProcessing = true
 
-        if (!resolveState.containsAncestorUnquote(quoteCall)) {
-            for (childCall in quoteCall.macroChildCallSequence().filter { !resolveState.hasBeenVisited(it) }) {
-                accumulatorKeepProcessing = when {
-                    Import.`is`(childCall) -> {
-                        val childResolveState =
-                                resolveState
-                                        .put(CallDefinitionClause.IMPORT_CALL, childCall)
-                                        .putVisitedElement(childCall)
+        for (childCall in childCallSequence) {
+            accumulatorKeepProcessing = when {
+                Import.`is`(childCall) -> {
+                    val childResolveState =
+                            resolveState
+                                    .put(CallDefinitionClause.IMPORT_CALL, childCall)
+                                    .putVisitedElement(childCall)
 
-                        Import.callDefinitionClauseCallWhile(childCall, childResolveState, keepProcessing)
-                    }
-                    Unquote.`is`(childCall) -> {
-                        val childResolveState = resolveState.putVisitedElement(childCall)
-
-                        Unquote.treeWalkUp(childCall, childResolveState, keepProcessing)
-                    }
-                    Use.`is`(childCall) -> {
-                        val childResolveState = resolveState.putVisitedElement(childCall)
-
-                        Use.treeWalkUp(childCall, childResolveState, keepProcessing)
-                    }
-                    childCall.isCalling(KERNEL, "if") ||
-                            childCall.isCalling(KERNEL, "unless") ||
-                            childCall.isCalling(KERNEL, "try") -> {
-                        childCall.whileInStabBodyChildExpressions { grandChildExpression ->
-                            keepProcessing(grandChildExpression, resolveState)
-                        }
-                    }
-                    else -> keepProcessing(childCall, resolveState)
+                    Import.callDefinitionClauseCallWhile(childCall, childResolveState, keepProcessing)
                 }
+                Unquote.`is`(childCall) -> {
+                    val childResolveState = resolveState.putVisitedElement(childCall)
 
-                if (!accumulatorKeepProcessing) {
-                    break
+                    Unquote.treeWalkUp(childCall, childResolveState, keepProcessing)
                 }
+                Use.`is`(childCall) -> {
+                    val childResolveState = resolveState.putVisitedElement(childCall)
+
+                    Use.treeWalkUp(childCall, childResolveState, keepProcessing)
+                }
+                childCall.isCalling(KERNEL, "if") ||
+                        childCall.isCalling(KERNEL, "unless") ||
+                        childCall.isCalling(KERNEL, "try") -> {
+                    childCall.whileInStabBodyChildExpressions { grandChildExpression ->
+                        keepProcessing(grandChildExpression, resolveState)
+                    }
+                }
+                else -> keepProcessing(childCall, resolveState)
+            }
+
+            if (!accumulatorKeepProcessing) {
+                break
             }
         }
 
