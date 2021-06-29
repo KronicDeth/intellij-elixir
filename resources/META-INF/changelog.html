@@ -1,5 +1,77 @@
 <html>
 <body>
+<h1>v11.11.1</h1>
+<ul>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>
+        <p>Find <code>Dep</code>s in function calls in the <code>deps()</code> list.</p>
+      </li>
+      <li>
+        <p><code>Dep.putPath</code> from a variable.</p>
+      </li>
+      <li>
+        <p>Treat <code>Memoize</code> <code>defmemo</code> as <code>def</code> and <code>defmemop</code> as <code>defp</code>.</p>
+      </li>
+      <li>
+        <p>Resolve <code>exception/1</code> and <code>message/1</code> to <code>defexception</code>.</p>
+      </li>
+      <li>
+        <p>Resolve to callbacks when searching in any module.</p>
+      </li>
+      <li>
+        <p>Support arity intervals for unquote_splicing in parameters</p>
+        <p>Functions defined with unquote_splicing, such as <code>Ecto.Schema.__schema/2</code>:</p>
+        <div class="highlight highlight-source-elixir position-relative"><pre><span class="pl-k">for</span> clauses <span class="pl-k">&lt;-</span> <span class="pl-en">Ecto</span>.<span class="pl-en">Schema</span>.<span class="pl-en">__schema__</span>(fields, field_sources, assocs, embeds),
+    {args, body} <span class="pl-k">&lt;-</span> clauses <span class="pl-k">do</span>
+  <span class="pl-k">def</span> <span class="pl-en">__schema__</span>(<span class="pl-en">unquote_splicing</span>(args)), <span class="pl-c1">do:</span> <span class="pl-en">unquote</span>(body)
+<span class="pl-k">end</span></pre><div class="zeroclipboard-container position-absolute right-0 top-0">
+          <clipboard-copy aria-label="Copy" class="ClipboardButton btn js-clipboard-copy m-2 p-0 tooltipped-no-delay" data-copy-feedback="Copied!" data-tooltip-direction="w" value="for clauses <- Ecto.Schema.__schema__(fields, field_sources, assocs, embeds),
+    {args, body} <- clauses do
+  def __schema__(unquote_splicing(args)), do: unquote(body)
+end
+" tabindex="0" role="button">
+            <svg aria-hidden="true" viewBox="0 0 16 16" version="1.1" data-view-component="true" height="16" width="16" class="octicon octicon-clippy js-clipboard-clippy-icon m-2">
+              <path fill-rule="evenodd" d="M5.75 1a.75.75 0 00-.75.75v3c0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75v-3a.75.75 0 00-.75-.75h-4.5zm.75 3V2.5h3V4h-3zm-2.874-.467a.75.75 0 00-.752-1.298A1.75 1.75 0 002 3.75v9.5c0 .966.784 1.75 1.75 1.75h8.5A1.75 1.75 0 0014 13.25v-9.5a1.75 1.75 0 00-.874-1.515.75.75 0 10-.752 1.298.25.25 0 01.126.217v9.5a.25.25 0 01-.25.25h-8.5a.25.25 0 01-.25-.25v-9.5a.25.25 0 01.126-.217z"></path>
+            </svg>
+            <svg aria-hidden="true" viewBox="0 0 16 16" version="1.1" data-view-component="true" height="16" width="16" class="octicon octicon-check js-clipboard-check-icon color-text-success d-none m-2">
+              <path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path>
+            </svg>
+          </clipboard-copy>
+        </div></div>
+        <p>Need to have their arity not be the number of PsiElements in the parentheses.  Any call to <code>unquote_splicing(...)</code> can end up have 0 to infinite parameters, so it means when one is saw, the range of <code>minimum...maximum</code> should change to an open interval of <code>minimum...</code>.  This required changing <code>IntRange resolvedFinalArityChange()</code> to <code>ArityInterval resolvedFinalArityInterval()</code> on all <code>Call</code>s, which was a large change.  It also meant changing a lot of ArityRange types to ArityInterval, and NameArityRange to NameArityInterval, which influenced the variable names.</p>
+        <p>Since all Calls support ArityIntervals now and not just special forms and Ecto DSLs, exportArity is changed to always state the ResolveState, so that the special form changes can be integrated for all callers.</p>
+        <p>The actual implementation of CallImpl.resolvedFinalArityRange is changes to fold over the ArityInterval:</p>
+        <ul>
+          <li>Normal arguments increase the minimum and maximum.</li>
+          <li>Default arguments increase only the maximum.</li>
+          <li>unquote_splicing changes the maximum to null to indicate the interval is half open.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>Only descend into modular children of modular for Module scope.  Prevents recursion loops on use calls.</li>
+      <li>Don't search for unquoted variable value variable is value for <code>do:</code>.</li>
+      <li>Protect from <code>IndexNotReady</code> in <code>resolver.Module.multiResolveProject</code>.</li>
+      <li>Stop walking unquoted variable that resolves to a parameter.</li>
+      <li>
+        Walk case in <code>__using__</code> to find quote in any clause.  Fixes resolving test macro from
+        <code>use PowerAssert</code>
+      </li>
+      <li>
+        Resolve functions declared in <code>quote</code>'s scope when <code>block</code> injected with
+        <code>unquote(block)</code>.<br>
+        Fixes resolving <code>field</code>, <code>timestamps</code>, and <code>index</code> in <code>schema</code> for
+        <code>use Yacto.Schema</code> as it makes the <code>block</code> see the <code>import Yacto.Schema</code> above
+        <code>unquote(block)</code> in the <code>quote</code> in <code>schema(..., do: block)</code>.
+      </li>
+    </ul>
+  </li>
+</ul>
 <h1>v11.11.0</h1>
 <ul>
   <li>

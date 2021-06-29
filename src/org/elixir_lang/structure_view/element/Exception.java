@@ -55,13 +55,6 @@ public class Exception extends Element<Call> {
         return elementDescription;
     }
 
-    public static boolean is(Call call) {
-        return call.isCalling(KERNEL, DEFEXCEPTION, 1);
-    }
-
-    public static boolean isCallback(Pair<String, Integer> nameArity) {
-      return nameArity.second == 1 && (nameArity.first.equals("exception") || nameArity.first.equals("message"));
-    }
 
     /*
      * Constructors

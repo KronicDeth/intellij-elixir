@@ -7,7 +7,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.EEx.FUNCTION_FROM_FILE_ARITY_RANGE
 import org.elixir_lang.EEx.FUNCTION_FROM_STRING_ARITY_RANGE
 import org.elixir_lang.psi.*
-import org.elixir_lang.psi.CallDefinitionClause.nameArityRange
+import org.elixir_lang.psi.CallDefinitionClause.nameArityInterval
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.Named
 
@@ -17,20 +17,21 @@ import org.elixir_lang.psi.impl.call.keywordArgument
 import org.elixir_lang.psi.impl.maybeModularNameToModulars
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.scope.ResolveResultOrderedSet
+import org.elixir_lang.psi.scope.WhileIn.whileIn
 import org.elixir_lang.psi.scope.maxScope
 import org.elixir_lang.structure_view.element.CallDefinitionHead
+import org.elixir_lang.structure_view.element.Callback
 
 class MultiResolve
 private constructor(private val name: String,
                     private val resolvedPrimaryArity: Int,
                     private val incompleteCode: Boolean) : org.elixir_lang.psi.scope.CallDefinitionClause() {
     override fun executeOnCallDefinitionClause(element: Call, state: ResolveState): Boolean =
-        nameArityRange(element)?.let { nameArityRange ->
-            val name = nameArityRange.name
+        nameArityInterval(element, state)?.let { nameArityInterval ->
+            val name = nameArityInterval.name
 
             if (name.startsWith(this.name)) {
-                val arityInterval = ArityInterval.arityInterval(nameArityRange, state)
-                val validResult = (resolvedPrimaryArity in arityInterval) && name == this.name
+                val validResult = (resolvedPrimaryArity in nameArityInterval.arityInterval) && name == this.name
 
                 addToResolveResults(element, validResult, state)
             } else {
@@ -38,15 +39,26 @@ private constructor(private val name: String,
             }
         } ?: true
 
+    override fun executeOnCallback(element: AtUnqualifiedNoParenthesesCall<*>, state: ResolveState): Boolean =
+        Callback.headCall(element)?.let { CallDefinitionHead.nameArityInterval(it, state) }?.let { nameArityInterval ->
+            if (nameArityInterval.name.startsWith(name)) {
+                val validResult = (resolvedPrimaryArity in nameArityInterval.arityInterval) && name == nameArityInterval.name
+
+                addToResolveResults(element, validResult, state)
+            } else {
+                true
+            }
+        } ?: true
+
     override fun executeOnDelegation(element: Call, state: ResolveState): Boolean {
         element.finalArguments()?.takeIf { it.size == 2 }?.let { arguments ->
             val head = arguments[0]
 
-            CallDefinitionHead.nameArityRange(head)?.let { headNameArityRange ->
-                val headName = headNameArityRange.name
+            CallDefinitionHead.nameArityInterval(head, state)?.let { headNameArityInterval ->
+                val headName = headNameArityInterval.name
 
                 if (headName.startsWith(this.name)) {
-                    val headValidResult = (resolvedPrimaryArity in headNameArityRange.arityRange) && (headName == this.name)
+                    val headValidResult = (resolvedPrimaryArity in headNameArityInterval.arityInterval) && (headName == this.name)
 
                     // the defdelegate is valid or invalid regardless of whether the `to:` (and `:as` resolves as
                     // `defdelegate` still defines a function in the module with the head's name and arity even if it
@@ -110,6 +122,17 @@ private constructor(private val name: String,
                     else -> true
                 }
             } ?: true
+
+    override fun executeOnException(element: Call, state: ResolveState): Boolean =
+        whileIn(Exception.NAME_ARITY_LIST) { nameArity ->
+            if (nameArity.name.startsWith(name)) {
+                val validResult = resolvedPrimaryArity == nameArity.arity && name == nameArity.name
+
+                addToResolveResults(element, validResult, state)
+            } else {
+                true
+            }
+        }
 
     override fun keepProcessing(): Boolean = resolveResultOrderedSet.keepProcessing(incompleteCode)
     fun resolveResults(): List<ResolveResult> = resolveResultOrderedSet.toList()

@@ -12,7 +12,7 @@ import com.intellij.util.Function
 import org.elixir_lang.Arity
 import org.elixir_lang.Name
 import org.elixir_lang.errorreport.Logger
-import org.elixir_lang.psi.CallDefinitionClause.nameArityRange
+import org.elixir_lang.psi.CallDefinitionClause.nameArityInterval
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.IMPORT
 import org.elixir_lang.psi.call.name.Module.KERNEL
@@ -146,7 +146,7 @@ object Import {
         val aritiesByName = aritiesByNameFromNameByArityKeywordList(element)
 
         return { call ->
-            nameArityRange(call)?.let { (callName, callArityRange) ->
+            nameArityInterval(call, ResolveState.initial())?.let { (callName, callArityRange) ->
                 aritiesByName[callName]?.let { arities ->
                     arities.any { callArityRange.contains(it) }
                 }

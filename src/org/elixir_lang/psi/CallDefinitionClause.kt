@@ -2,8 +2,9 @@ package org.elixir_lang.psi
 
 import com.intellij.psi.ElementDescriptionLocation
 import com.intellij.psi.PsiElement
+import com.intellij.psi.ResolveState
 import com.intellij.usageView.UsageViewTypeLocation
-import org.elixir_lang.NameArityRange
+import org.elixir_lang.NameArityInterval
 import org.elixir_lang.find_usages.Provider
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.*
@@ -40,8 +41,10 @@ object CallDefinitionClause {
     @JvmStatic
     fun isFunction(call: Call): Boolean = isPrivateFunction(call) || isPublicFunction(call)
     @JvmStatic
-    fun isPublicFunction(call: Call): Boolean = isCallingKernelMacroOrHead(call, DEF)
-    fun isPrivateFunction(call: Call): Boolean = isCallingKernelMacroOrHead(call, DEFP)
+    fun isPublicFunction(call: Call): Boolean =
+            isCallingKernelMacroOrHead(call, DEF) || isCallingKernelMacroOrHead(call, DEFMEMO)
+    fun isPrivateFunction(call: Call): Boolean =
+            isCallingKernelMacroOrHead(call, DEFP) || isCallingKernelMacroOrHead(call, DEFMEMOP)
 
     @JvmStatic
     fun isMacro(call: Call): Boolean = isPrivateMacro(call) || isPublicMacro(call)
@@ -61,10 +64,11 @@ object CallDefinitionClause {
      * @param call
      * @return The name and arities of the [CallDefinition] this clause belongs.  Multiple arities occur when
      * default arguments are used, which produces an arity for each default argument that is turned on and off.
-     * @see Call.resolvedFinalArityRange
+     * @see Call.resolvedFinalArityInterval
      */
     @JvmStatic
-    fun nameArityRange(call: Call): NameArityRange? = head(call)?.let { CallDefinitionHead.nameArityRange(it) }
+    fun nameArityInterval(call: Call, state: ResolveState): NameArityInterval? =
+            head(call)?.let { CallDefinitionHead.nameArityInterval(it, state) }
 
     fun nameIdentifier(call: Call): PsiElement? = head(call)?.let { CallDefinitionHead.nameIdentifier(it) }
 

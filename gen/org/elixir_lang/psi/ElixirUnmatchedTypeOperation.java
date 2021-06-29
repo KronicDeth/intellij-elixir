@@ -55,7 +55,7 @@ public interface ElixirUnmatchedTypeOperation extends ElixirUnmatchedExpression,
 
   int resolvedFinalArity();
 
-  @NotNull IntRange resolvedFinalArityRange();
+  @NotNull ArityInterval resolvedFinalArityInterval();
 
   @NotNull String resolvedModuleName();
 

@@ -69,7 +69,7 @@ public interface ElixirMatchedAtUnqualifiedNoParenthesesCall extends ElixirMatch
 
   int resolvedFinalArity();
 
-  @NotNull IntRange resolvedFinalArityRange();
+  @NotNull ArityInterval resolvedFinalArityInterval();
 
   @Nullable String resolvedModuleName();
 

@@ -2,11 +2,12 @@ package org.elixir_lang.find_usages.handler
 
 import com.intellij.find.findUsages.FindUsagesHandler
 import com.intellij.psi.PsiElement
+import com.intellij.psi.ResolveState
 import org.elixir_lang.ArityRange
 import org.elixir_lang.find_usages.toPsiElementList
-import org.elixir_lang.overlaps
+import org.elixir_lang.psi.ArityInterval
 import org.elixir_lang.psi.CallDefinitionClause
-import org.elixir_lang.psi.CallDefinitionClause.nameArityRange
+import org.elixir_lang.psi.CallDefinitionClause.nameArityInterval
 import org.elixir_lang.psi.Modular
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.enclosingModularMacroCall
@@ -25,7 +26,7 @@ class Call(call: Call) : FindUsagesHandler(call) {
     private val _secondaryElements by lazy {
         _primaryElements
                 .toCallDefinitionCallSet()
-                .withNameArityRange()
+                .withNameArityInterval()
                 .withEnclosingModularMacroCall()
                 .toSecondaryElements()
                 .filterNot { _primaryElements.contains(it) }
@@ -44,26 +45,26 @@ class Call(call: Call) : FindUsagesHandler(call) {
 
 }
 
-private data class CallNameArityRange(val call: Call, val name: String, val arityRange: ArityRange) {
-    fun toEnclosingCallEnclosedCallNameArityRange(): EnclosingCallEnclosedCallNameArityRange? =
+private data class CallNameArityInterval(val call: Call, val name: String, val arityInterval: ArityInterval) {
+    fun toEnclosingCallEnclosedCallNameArityRange(): EnclosingCallEnclosedCallNameArityInterval? =
             enclosingModularMacroCall(call)?.let { enclosingCall ->
-                EnclosingCallEnclosedCallNameArityRange(enclosingCall, this.call, this.name, this.arityRange)
+                EnclosingCallEnclosedCallNameArityInterval(enclosingCall, this.call, this.name, this.arityInterval)
             }
 }
 
-private data class EnclosingCallEnclosedCallNameArityRange(
+private data class EnclosingCallEnclosedCallNameArityInterval(
         val enclosingCall: Call,
         val enclosedCall: Call,
         val name: String,
-        val arityRange: ArityRange
+        val arityInterval: ArityInterval
 ) {
     fun toSecondaryElements(): Iterable<Call> =
         Modular.callDefinitionClauseCallSequence(enclosingCall)
-                .map { it to nameArityRange(it) }
-                .filter { (_, nameArityRange) ->
-                    nameArityRange != null &&
-                            nameArityRange.name == name &&
-                            nameArityRange.arityRange.overlaps(arityRange)
+                .map { it to nameArityInterval(it, ResolveState.initial()) }
+                .filter { (_, nameArityInterval) ->
+                    nameArityInterval != null &&
+                            nameArityInterval.name == name &&
+                            nameArityInterval.arityInterval.overlaps(arityInterval)
                 }.map { (call, _) -> call }
                 .asIterable()
 }
@@ -74,17 +75,17 @@ private fun Array<PsiElement>.toCallDefinitionCallSet(): Set<Call> =
                 .filter { CallDefinitionClause.`is`(it) }
                 .toSet()
 
-private fun Call.toCallNameArityRange(): CallNameArityRange? =
-        nameArityRange(this)?.let { (name, arityRange) ->
-            CallNameArityRange(this, name, arityRange)
+private fun Call.toCallNameArityInterval(): CallNameArityInterval? =
+        nameArityInterval(this, ResolveState.initial())?.let { (name, arityInterval) ->
+            CallNameArityInterval(this, name, arityInterval)
         }
 
-private fun Iterable<Call>.withNameArityRange(): Iterable<CallNameArityRange> =
-    this.mapNotNull { it.toCallNameArityRange() }
+private fun Iterable<Call>.withNameArityInterval(): Iterable<CallNameArityInterval> =
+    this.mapNotNull { it.toCallNameArityInterval() }
 
-private fun Iterable<CallNameArityRange>.withEnclosingModularMacroCall():
-        Iterable<EnclosingCallEnclosedCallNameArityRange> =
+private fun Iterable<CallNameArityInterval>.withEnclosingModularMacroCall():
+        Iterable<EnclosingCallEnclosedCallNameArityInterval> =
         this.mapNotNull { it.toEnclosingCallEnclosedCallNameArityRange() }
 
-private fun Iterable<EnclosingCallEnclosedCallNameArityRange>.toSecondaryElements(): List<PsiElement> =
+private fun Iterable<EnclosingCallEnclosedCallNameArityInterval>.toSecondaryElements(): List<PsiElement> =
         this.flatMap { it.toSecondaryElements() }

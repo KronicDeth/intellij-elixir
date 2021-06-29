@@ -2,8 +2,8 @@ package org.elixir_lang.psi.call;
 
 import com.intellij.psi.NavigatablePsiElement;
 import com.intellij.psi.PsiElement;
-import kotlin.ranges.IntRange;
 import org.elixir_lang.psi.ElixirDoBlock;
+import org.elixir_lang.psi.ArityInterval;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -173,7 +173,7 @@ public interface Call extends NavigatablePsiElement {
      * @return the minimum arity with all defaults active to the maximum arity with all defaults overridden
      */
     @NotNull
-    IntRange resolvedFinalArityRange();
+    ArityInterval resolvedFinalArityInterval();
 
     /**
      * The total number of primary arguments for the final expanded function call.

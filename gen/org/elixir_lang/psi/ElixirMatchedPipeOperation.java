@@ -55,7 +55,7 @@ public interface ElixirMatchedPipeOperation extends ElixirMatchedExpression, Nam
 
   int resolvedFinalArity();
 
-  @NotNull IntRange resolvedFinalArityRange();
+  @NotNull ArityInterval resolvedFinalArityInterval();
 
   @NotNull String resolvedModuleName();
 

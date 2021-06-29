@@ -7,6 +7,7 @@ import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.ResolveState
 import com.intellij.psi.impl.source.tree.CompositeElement
 import com.intellij.psi.scope.PsiScopeProcessor
+import com.intellij.psi.util.isAncestor
 import com.intellij.psi.util.siblings
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
@@ -231,7 +232,11 @@ abstract class Module : PsiScopeProcessor {
 
                 // descend in modular to check for nested modulars in case their relative name is being used
                 keepProcessing && match.whileInStabBodyChildExpressions { childExpression ->
-                    execute(childExpression, state)
+                    if (childExpression is Call && isModular(childExpression)) {
+                        execute(childExpression, state)
+                    } else {
+                        true
+                    }
                 }
             }
 

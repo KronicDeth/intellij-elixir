@@ -9,6 +9,7 @@ import com.intellij.ide.util.treeView.smartTree.TreeElement
 import com.intellij.openapi.actionSystem.Shortcut
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
+import com.intellij.psi.ResolveState
 import com.intellij.util.IncorrectOperationException
 import org.elixir_lang.NameArity
 import org.elixir_lang.psi.ElixirAccessExpression
@@ -108,17 +109,18 @@ class Used : FileStructureNodeProvider<TreeElement>, ActionShortcutProvider {
                                                 /* portion of {@link org.elixir_lang.structure_view.element.enclosingModular.Module#childCallTreeElements}
                                                    dealing with macros, restricted to __using__/1 */
                                                 if (org.elixir_lang.psi.CallDefinitionClause.isMacro(childCall)) {
-                                                    val nameArityRange = org.elixir_lang.psi.CallDefinitionClause.nameArityRange(childCall)
+                                                    val nameArityInterval =
+                                                            org.elixir_lang.psi.CallDefinitionClause.nameArityInterval(childCall, ResolveState.initial())
 
-                                                    if (nameArityRange != null) {
-                                                        val name = nameArityRange.name
-                                                        val arityRange = nameArityRange.arityRange
+                                                    if (nameArityInterval != null) {
+                                                        val name = nameArityInterval.name
+                                                        val arityInterval = nameArityInterval.arityInterval
 
-                                                        if (name == USING && arityRange.contains(1)) {
+                                                        if (name == USING && arityInterval.contains(1)) {
                                                             addClausesToCallDefinition(
                                                                     childCall,
                                                                     name,
-                                                                    arityRange,
+                                                                    arityInterval,
                                                                     macroByNameArity,
                                                                     module,
                                                                     Timed.Time.COMPILE

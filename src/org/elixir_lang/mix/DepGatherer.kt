@@ -3,12 +3,13 @@ package org.elixir_lang.mix
 import com.intellij.openapi.application.runReadAction
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
+import com.intellij.psi.ResolveState
 import org.elixir_lang.NameArity
 import org.elixir_lang.package_manager.DepGatherer
 import org.elixir_lang.psi.AccumulatorContinue
 import org.elixir_lang.psi.CallDefinitionClause.isFunction
 import org.elixir_lang.psi.CallDefinitionClause.isPublicFunction
-import org.elixir_lang.psi.CallDefinitionClause.nameArityRange
+import org.elixir_lang.psi.CallDefinitionClause.nameArityInterval
 import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.psi.ElixirList
 import org.elixir_lang.psi.QuotableKeywordList
@@ -91,8 +92,9 @@ private fun Array<Call>.depsNameArity(): NameArity? {
 
 private fun isDefining(call: Call, nameArity: NameArity): Boolean =
         if (isFunction(call)) {
-            nameArityRange(call)?.let { definedNameArityRange ->
-                if (definedNameArityRange.name == nameArity.name && definedNameArityRange.arityRange.contains(nameArity.arity)) {
+            nameArityInterval(call, ResolveState.initial())?.let { definedNameArityInterval ->
+                if (definedNameArityInterval.name == nameArity.name &&
+                        definedNameArityInterval.arityInterval.contains(nameArity.arity)) {
                     true
                 } else {
                     null
@@ -104,8 +106,8 @@ private fun isDefining(call: Call, nameArity: NameArity): Boolean =
 
 private fun isDefiningProject(call: Call): Boolean =
         if (isPublicFunction(call)) {
-            nameArityRange(call)?.let { nameArityRange ->
-                if (nameArityRange.name == "project" && nameArityRange.arityRange.contains(0)) {
+            nameArityInterval(call, ResolveState.initial())?.let { nameArityRange ->
+                if (nameArityRange.name == "project" && nameArityRange.arityInterval.contains(0)) {
                     true
                 } else {
                     null
@@ -138,4 +140,4 @@ private fun QuotableKeywordList.depsNameArity(): NameArity? =
                 }
 
 private fun ElixirList.deps(): List<Dep> =
-    children.map { it.stripAccessExpression() }.mapNotNull { Dep.from(it) }
+    children.map { it.stripAccessExpression() }.asSequence().flatMap { Deps.from(it) }.toList()

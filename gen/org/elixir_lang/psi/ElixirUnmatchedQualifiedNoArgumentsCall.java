@@ -80,7 +80,7 @@ public interface ElixirUnmatchedQualifiedNoArgumentsCall extends ElixirUnmatched
 
   int resolvedFinalArity();
 
-  @NotNull IntRange resolvedFinalArityRange();
+  @NotNull ArityInterval resolvedFinalArityInterval();
 
   @NotNull String resolvedModuleName();
 

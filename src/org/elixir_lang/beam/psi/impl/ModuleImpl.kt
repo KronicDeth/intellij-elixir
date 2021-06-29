@@ -22,7 +22,6 @@ import org.elixir_lang.psi.impl.getModuleName
 import org.jetbrains.annotations.Contract
 import org.jetbrains.annotations.NonNls
 import java.lang.StringBuilder
-import java.util.ArrayList
 
 // See com.intellij.psi.impl.compiled.ClsClassImpl
 class ModuleImpl<T : StubElement<*>?>(private val stub: T) : ModuleElementImpl(), Module, StubBasedPsiElement<T> {
@@ -52,13 +51,14 @@ class ModuleImpl<T : StubElement<*>?>(private val stub: T) : ModuleElementImpl()
         setMirrorCheckingType(element, null)
 
         val callDefinitionClauseByArityByName = callDefinitionClauseByArityByName(element)
+        val state = ResolveState.initial()
 
         for (callDefinitionStub in callDefinitions()) {
             val name = callDefinitionStub.exportedName()
             val callDefinitionClauseByArity = callDefinitionClauseByArityByName[name]
 
             if (callDefinitionClauseByArity != null) {
-                val arity = callDefinitionStub.exportedArity()
+                val arity = callDefinitionStub.exportedArity(state)
                 val callDefinitionClause = callDefinitionClauseByArity[arity]
 
                 if (callDefinitionClause != null) {
@@ -127,13 +127,15 @@ class ModuleImpl<T : StubElement<*>?>(private val stub: T) : ModuleElementImpl()
                 val initialResolveState = ResolveState.initial().putInitialVisitedElement(mirrorPsi)
                 val callDefinitionByArityByName = mutableMapOf<String, MutableMap<Int, Call>>()
 
-                callDefinitionClauseCallWhile(mirrorPsi, initialResolveState) { call: Call, accResolvedState: ResolveState? ->
-                    CallDefinitionClause.nameArityRange(call)?.let { nameArityRange ->
-                        val callDefinitionByArity = callDefinitionByArityByName.getOrPut(nameArityRange.name) {
+                callDefinitionClauseCallWhile(mirrorPsi, initialResolveState) { call: Call, accResolvedState: ResolveState ->
+                    CallDefinitionClause.nameArityInterval(call, accResolvedState)?.let { nameArityInterval ->
+                        val callDefinitionByArity = callDefinitionByArityByName.getOrPut(nameArityInterval.name) {
                             mutableMapOf()
                         }
 
-                        nameArityRange.arityRange.forEach { arity -> callDefinitionByArity[arity] = call }
+                        nameArityInterval.arityInterval.closed().forEach { arity ->
+                            callDefinitionByArity[arity] = call
+                        }
                     }
 
                     true

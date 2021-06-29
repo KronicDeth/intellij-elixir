@@ -55,7 +55,7 @@ public interface ElixirUnmatchedArrowOperation extends ElixirUnmatchedExpression
 
   int resolvedFinalArity();
 
-  @NotNull IntRange resolvedFinalArityRange();
+  @NotNull ArityInterval resolvedFinalArityInterval();
 
   @NotNull String resolvedModuleName();
 

@@ -6,9 +6,10 @@ import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiWhiteSpace
+import com.intellij.psi.ResolveState
 import com.intellij.util.ProcessingContext
 import org.elixir_lang.navigation.isDecompiled
-import org.elixir_lang.psi.CallDefinitionClause.nameArityRange
+import org.elixir_lang.psi.CallDefinitionClause.nameArityInterval
 import org.elixir_lang.psi.ElixirTypes
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.call.macroChildCalls
@@ -29,7 +30,7 @@ class CallDefinitionClause : CompletionProvider<CompletionParameters>() {
 
         return callable
                 .mapNotNull {
-                    nameArityRange(it)?.let { (name, _) ->
+                    nameArityInterval(it, ResolveState.initial())?.let { (name, _) ->
                         org.elixir_lang.code_insight.lookup.element.CallDefinitionClause.createWithSmartPointer(
                                 name,
                                 it

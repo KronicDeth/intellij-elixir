@@ -4,6 +4,7 @@ import com.intellij.ide.util.treeView.smartTree.TreeElement
 import com.intellij.navigation.ItemPresentation
 import com.intellij.psi.ElementDescriptionLocation
 import com.intellij.psi.PsiElement
+import com.intellij.psi.ResolveState
 import com.intellij.usageView.UsageViewTypeLocation
 import org.elixir_lang.Visibility
 import org.elixir_lang.navigation.item_presentation.NameArity
@@ -45,9 +46,9 @@ class Callback(private val modular: Modular, navigationItem: Call) :
         var arity = -1
 
         headCall(navigationItem)?.let { headCall ->
-            CallDefinitionHead.nameArityRange(headCall)?.let { nameArityRange ->
-                name = nameArityRange.name
-                arity = nameArityRange.arityRange.singleOrNull() ?: arity
+            CallDefinitionHead.nameArityInterval(headCall, ResolveState.initial())?.let { nameArityInterval ->
+                name = nameArityInterval.name
+                arity = nameArityInterval.arityInterval.singleOrNull() ?: arity
             }
         }
 

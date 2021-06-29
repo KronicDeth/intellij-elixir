@@ -14,6 +14,10 @@ public class Function {
     public static final String DEFIMPL = "defimpl";
     public static final String DEFMACRO = "defmacro";
     public static final String DEFMACROP = "defmacrop";
+    // https://hexdocs.pm/memoize/Memoize.html#defmemo/2
+    public static final String DEFMEMO = "defmemo";
+    // https://hexdocs.pm/memoize/Memoize.html#defmemop/3
+    public static final String DEFMEMOP = "defmemop";
     public static final String DEFMODULE = "defmodule";
     public static final String DEFOVERRIDABLE = "defoverridable";
     public static final String DEFP = "defp";

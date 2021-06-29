@@ -1,6 +1,7 @@
 package org.elixir_lang.documentation
 
 import com.intellij.psi.PsiElement
+import com.intellij.psi.ResolveState
 import org.elixir_lang.beam.Beam
 import org.elixir_lang.beam.psi.Module
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
@@ -18,7 +19,7 @@ object BeamDocsHelper {
                         }
                         is MaybeExported -> {
                             element.exportedName()?.let { name ->
-                                val arity = element.exportedArity()
+                                val arity = element.exportedArity(ResolveState.initial())
 
                                 beam.documentation()?.docs?.let { docs ->
                                     docs.documented("function", name, arity)?.let { documented ->

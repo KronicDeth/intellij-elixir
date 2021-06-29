@@ -1,7 +1,7 @@
 package org.elixir_lang.documentation
 
 import com.intellij.psi.PsiElement
-import org.elixir_lang.overlaps
+import com.intellij.psi.ResolveState
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.CanonicallyNamed
@@ -38,7 +38,9 @@ object SourceFileDocsHelper {
             }
         }
         CallDefinitionClause.`is`(call) -> {
-            CallDefinitionClause.nameArityRange(call)?.let { nameArityRange ->
+            val state = ResolveState.initial()
+
+            CallDefinitionClause.nameArityInterval(call, state)?.let { nameArityRange ->
                 enclosingModularMacroCall(call)?.let { modular ->
                     val module = (modular as? CanonicallyNamed)?.canonicalName().orEmpty()
 
@@ -50,10 +52,10 @@ object SourceFileDocsHelper {
                                             .head(sibling)
                                             ?.let { siblingHead ->
                                                 CallDefinitionHead
-                                                        .nameArityRange(siblingHead)
-                                                        ?.let { siblingNameArityRange ->
-                                                            if ((siblingNameArityRange.name == nameArityRange.name) &&
-                                                                    siblingNameArityRange.arityRange.overlaps(nameArityRange.arityRange)) {
+                                                        .nameArityInterval(siblingHead, state)
+                                                        ?.let { siblingNameArityInterval ->
+                                                            if ((siblingNameArityInterval.name == nameArityRange.name) &&
+                                                                    siblingNameArityInterval.arityInterval.overlaps(nameArityRange.arityInterval)) {
                                                                 FetchedDocs
                                                                         .FunctionOrMacroDocumentation
                                                                         .fromCallDefinitionClauseCall(module, sibling, siblingHead)

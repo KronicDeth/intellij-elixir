@@ -2,6 +2,8 @@ package org.elixir_lang.psi.scope
 
 import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiPolyVariantReference
+import com.intellij.psi.ResolveResult
 import com.intellij.psi.ResolveState
 import com.intellij.psi.scope.PsiScopeProcessor
 import com.intellij.psi.util.isAncestor
@@ -9,10 +11,19 @@ import org.elixir_lang.EEx
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
+import org.elixir_lang.psi.call.name.Function.*
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.call.name.Module.KERNEL_SPECIAL_FORMS
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
+import org.elixir_lang.psi.impl.ElixirPsiImplUtil.hasDoBlockOrKeyword
+import org.elixir_lang.psi.impl.ProcessDeclarationsImpl.processDeclarations
+import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.call.macroChildCalls
+import org.elixir_lang.psi.impl.call.stabBodyChildExpressions
+import org.elixir_lang.psi.impl.keywordValue
+import org.elixir_lang.psi.impl.siblingExpressions
+import org.elixir_lang.psi.scope.WhileIn.whileIn
+import org.elixir_lang.structure_view.element.Callback
 import org.elixir_lang.structure_view.element.Delegation
 import org.elixir_lang.structure_view.element.modular.Module
 
@@ -49,6 +60,13 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
     protected abstract fun executeOnCallDefinitionClause(element: Call, state: ResolveState): Boolean
 
     /**
+     * Called on every [Call] where [org.elixir_lang.structure_view.element.Callback.is] is `true`
+     *
+     * @return `true` to keep searching up tree; `false` to stop searching.
+     */
+    protected abstract  fun executeOnCallback(element: AtUnqualifiedNoParenthesesCall<*>, state: ResolveState): Boolean
+
+    /**
      * Called on every [Call] where [org.elixir_lang.structure_view.element.Delegation.is] is `true` when checking tree
      * with [.execute]].
      *
@@ -64,6 +82,13 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
     protected abstract fun executeOnEExFunctionFrom(element: Call, state: ResolveState): Boolean
 
     /**
+     * Called on every [Call] where [org.elixir_lang.psi.Exception.is] is `true`.
+     *
+     * @return true to keep searching up tree; `false` to stop searching.
+     */
+    protected abstract fun executeOnException(element: Call, state: ResolveState): Boolean
+
+    /**
      * Whether to continue searching after each Module's children have been searched.
      *
      * @return `true` to keep searching up the PSI tree; `false` to stop searching.
@@ -77,7 +102,9 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
     private fun execute(element: Call, state: ResolveState): Boolean =
             when {
                 org.elixir_lang.psi.CallDefinitionClause.`is`(element) -> executeOnCallDefinitionClause(element, state)
+                Callback.`is`(element) -> executeOnCallback(element as AtUnqualifiedNoParenthesesCall<*>, state)
                 Delegation.`is`(element) -> executeOnDelegation(element, state)
+                Exception.`is`(element) -> executeOnException(element, state)
                 For.`is`(element) -> For.treeWalkDown(element, state, ::execute)
                 Import.`is`(element) -> {
                     val importState = state.put(IMPORT_CALL, element).putVisitedElement(element)
@@ -131,6 +158,7 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
                     org.elixir_lang.ecto.query.API.treeWalkUp(element, state, ::execute)
                 }
                 EEx.isFunctionFrom(element, state) -> executeOnEExFunctionFrom(element, state)
+                hasDoBlockOrKeyword(element) -> executeOnUnknownMacroCall(element, state)
                 else -> true
             }
 
@@ -143,6 +171,38 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
                 true
             }
 
+    private fun executeOnUnknownMacroCall(macroCall: Call, state: ResolveState): Boolean =
+            if (macroCall.isAncestor(state.get(ENTRANCE), strict = true)) {
+                macroCall
+                        .reference?.let { it as PsiPolyVariantReference }
+                        ?.multiResolve(false)?.asSequence()
+                        ?.filter(ResolveResult::isValidResult)
+                        ?.mapNotNull(ResolveResult::getElement)
+                        ?.filterIsInstance<Call>()
+                        ?.filter { org.elixir_lang.psi.CallDefinitionClause.isMacro(it) }
+                        ?.let { macroDefinitions ->
+                            whileIn(macroDefinitions) { macroDefinition ->
+                                executeOnUnknownMacroDefinition(macroDefinition, macroCall, state)
+                            }
+                        }
+                        ?: true
+            } else {
+                true
+            }
+
+    private fun executeOnUnknownMacroDefinition(macroDefinition: Call, macroCall: Call, state: ResolveState): Boolean =
+            org.elixir_lang.psi.CallDefinitionClause.head(macroDefinition)?.let { it as? Call }?.finalArguments()?.lastOrNull()?.let { it as? QuotableKeywordList }?.let { keywords ->
+                keywords.keywordValue("do")?.let { block ->
+                    macroDefinition.stabBodyChildExpressions(forward = false)?.filterIsInstance<Call>()?.firstOrNull()?.takeIf { QuoteMacro.`is`(it) }?.let { quote ->
+                        quote.stabBodyChildExpressions()?.filterIsInstance<Call>()?.filter { Unquote.`is`(it) }?.singleOrNull { unquote -> unquote.textMatches("unquote(${block.text})") }?.let { unquoteBlock ->
+                            unquoteBlock
+                                    .siblingExpressions(forward = false, withSelf = false)
+                                    .filterIsInstance<Call>()
+                                    .let { QuoteMacro.treeWalkUp(it, state, ::execute) }
+                        }
+                    }
+                }
+            } ?: true
 
     private fun moduleContainsEntrance(call: Call, state: ResolveState): Boolean = state.get(ENTRANCE)?.let { entrance ->
         val callFile = call.containingFile

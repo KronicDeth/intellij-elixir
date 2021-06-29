@@ -59,7 +59,7 @@ public interface ElixirUnmatchedInOperation extends ElixirUnmatchedExpression, C
 
   int resolvedFinalArity();
 
-  @NotNull IntRange resolvedFinalArityRange();
+  @NotNull ArityInterval resolvedFinalArityInterval();
 
   @NotNull String resolvedModuleName();
 

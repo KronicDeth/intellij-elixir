@@ -20,6 +20,7 @@ import org.elixir_lang.psi.operation.infix.Position
 import org.elixir_lang.psi.operation.infix.Triple
 import org.elixir_lang.psi.scope.WhileIn.whileIn
 import org.elixir_lang.reference.ModuleAttribute
+import org.elixir_lang.structure_view.element.Callback
 import org.elixir_lang.structure_view.element.Delegation
 import org.elixir_lang.structure_view.element.modular.Module
 
@@ -122,7 +123,9 @@ object ProcessDeclarationsImpl {
                 when {
                     call.isCalling(KERNEL, ALIAS) -> processor.execute(call, state)
                     CallDefinitionClause.`is`(call) || // call parameters
+                            Callback.`is`(call) ||
                             Delegation.`is`(call) || // delegation call parameters
+                            Exception.`is`(call) ||
                             Module.`is`(call) || // module Alias
                             Use.`is`(call) ||
                             call.isCalling(KERNEL, DESTRUCTURE) || // left operand
@@ -376,7 +379,7 @@ object ProcessDeclarationsImpl {
             true
         }
 
-    private fun processDeclarations(sequence: Sequence<PsiElement>,
+    fun processDeclarations(sequence: Sequence<PsiElement>,
                                     processor: PsiScopeProcessor,
                                     state: ResolveState,
                                     lastParent: PsiElement,
