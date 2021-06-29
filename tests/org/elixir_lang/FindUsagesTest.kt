@@ -524,7 +524,7 @@ class FindUsagesTest : BasePlatformTestCase() {
 
         val primaryElements = findUsagesHandler.primaryElements
 
-        assertEquals(2, primaryElements.size)
+        assertEquals(1, primaryElements.size)
 
         val secondaryElements = findUsagesHandler.secondaryElements
 
@@ -532,7 +532,7 @@ class FindUsagesTest : BasePlatformTestCase() {
 
         val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
 
-        assertEquals(3, usages.size)
+        assertEquals(2, usages.size)
 
         val firstElement = usages[0].element!!
 
@@ -545,12 +545,6 @@ class FindUsagesTest : BasePlatformTestCase() {
         assertEquals(33, secondElement.textOffset)
         assertNull(readWriteAccessDetector(secondElement))
         assertEquals(UsageTypeProvider.ALIAS, getUsageType(secondElement, usageTargets))
-
-        val thirdElement = usages[2].element!!
-
-        assertEquals(33, thirdElement.textOffset)
-        assertNull(readWriteAccessDetector(thirdElement))
-        assertEquals(UsageTypeProvider.ALIAS, getUsageType(thirdElement, usageTargets))
     }
 
     fun testModuleRecursiveUsage() {
