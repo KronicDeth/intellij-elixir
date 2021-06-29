@@ -1,4 +1,4 @@
-package org.elixir_lang.inspection
+package org.elixir_lang.notification.setup_sdk
 
 import com.intellij.ide.actions.ShowSettingsUtilImpl
 import com.intellij.openapi.fileEditor.FileEditor
@@ -22,7 +22,7 @@ import org.elixir_lang.sdk.elixir.Type
 /**
  * https://github.com/ignatov/intellij-erlang/blob/master/src/org/intellij/erlang/inspection/SetupSDKNotificationProvider.java
  */
-class SetupSDKNotificationProvider : EditorNotifications.Provider<EditorNotificationPanel>() {
+class Provider : EditorNotifications.Provider<EditorNotificationPanel>() {
     override fun getKey(): Key<EditorNotificationPanel> = KEY
 
     override fun createNotificationPanel(virtualFile: VirtualFile, fileEditor: FileEditor, project: Project): EditorNotificationPanel? =

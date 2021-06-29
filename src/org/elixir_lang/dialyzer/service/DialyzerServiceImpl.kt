@@ -9,6 +9,7 @@ import com.intellij.openapi.module.Module
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.util.Key
 import org.elixir_lang.Mix
+import org.elixir_lang.notification.setup_sdk.Notifier
 import org.elixir_lang.run.ensureWorkingDirectory
 import org.elixir_lang.sdk.elixir.Type.Companion.mostSpecificSdk
 
@@ -32,6 +33,13 @@ class DialyzerServiceImpl : DialyzerService {
         return if (sdk != null) {
             dialyzerWarnings(workingDirectory, sdk)
         } else {
+            val project = module.project
+            Notifier.error(
+                    module,
+                    "Missing module Elixir SDK",
+                    "There is no configured Elixir SDK for the module ${module.name} or its project ${project.name}"
+            )
+
             emptyList()
         }
     }

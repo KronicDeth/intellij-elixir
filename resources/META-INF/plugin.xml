@@ -34,7 +34,8 @@
 
     <moduleConfigurationEditorProvider implementation="org.elixir_lang.module.DefaultModuleEditorsProvider" order="first"/>
 
-    <editorNotificationProvider implementation="org.elixir_lang.inspection.SetupSDKNotificationProvider"/>
+    <editorNotificationProvider implementation="org.elixir_lang.notification.setup_sdk.Provider"/>
+    <notificationGroup displayType="BALLOON" id="Elixir"/>
 
     <!-- Distillery -->
     <configurationType implementation="org.elixir_lang.distillery.configuration.Type"/>
