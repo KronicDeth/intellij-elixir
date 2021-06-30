@@ -1,6 +1,7 @@
 package org.elixir_lang.psi.impl
 
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.util.Computable
 import com.intellij.psi.PsiElement
 import org.elixir_lang.Name
@@ -17,9 +18,7 @@ object PsiNamedElementImpl {
     }
 
     @JvmStatic
-    fun getName(qualifiedAlias: QualifiedAlias): String {
-        return qualifiedAlias.text
-    }
+    fun getName(qualifiedAlias: QualifiedAlias): String = runReadAction { qualifiedAlias.text }
 
     @Contract(pure = true)
     @JvmStatic
