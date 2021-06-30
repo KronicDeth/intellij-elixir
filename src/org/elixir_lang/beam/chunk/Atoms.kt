@@ -1,7 +1,7 @@
 package org.elixir_lang.beam.chunk
 
-import org.elixir_lang.beam.chunk.Chunk.unsignedByte
-import org.elixir_lang.beam.chunk.Chunk.unsignedInt
+import org.elixir_lang.beam.chunk.Chunk.Companion.unsignedByte
+import org.elixir_lang.beam.chunk.Chunk.Companion.unsignedInt
 import org.elixir_lang.beam.chunk.atoms.Atom
 import java.nio.charset.Charset
 import java.util.*

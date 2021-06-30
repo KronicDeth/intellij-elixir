@@ -3,7 +3,7 @@ package org.elixir_lang.beam.chunk.code
 import com.intellij.openapi.util.component1
 import com.intellij.openapi.util.component2
 import org.elixir_lang.beam.Cache
-import org.elixir_lang.beam.chunk.Chunk.unsignedByte
+import org.elixir_lang.beam.chunk.Chunk.Companion.unsignedByte
 import org.elixir_lang.beam.chunk.code.operation.Code
 import org.elixir_lang.beam.chunk.code.operation.code.Argument
 import org.elixir_lang.beam.chunk.code.operation.code.reference

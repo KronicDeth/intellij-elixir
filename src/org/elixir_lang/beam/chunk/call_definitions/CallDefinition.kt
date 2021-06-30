@@ -4,7 +4,7 @@ import com.intellij.openapi.util.component1
 import com.intellij.openapi.util.component2
 import org.elixir_lang.beam.chunk.Atoms
 import org.elixir_lang.beam.chunk.Chunk
-import org.elixir_lang.beam.chunk.Chunk.unsignedInt
+import org.elixir_lang.beam.chunk.Chunk.Companion.unsignedInt
 import org.elixir_lang.beam.term.unsignedIntToInt
 
 // atomIndex is 1-based
