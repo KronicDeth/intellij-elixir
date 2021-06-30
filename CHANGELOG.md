@@ -238,39 +238,43 @@
 ## v11.11.1
 
 ### Bug Fixes
-* Only descend into modular children of modular for Module scope.  Prevents recursion loops on use calls.
-* Don't search for unquoted variable value variable is value for `do:`.
-* Protect from `IndexNotReady` in `resolver.Module.multiResolveProject`.
-* Stop walking unquoted variable that resolves to a parameter.
-* Walk case in `__using__` to find quote in any clause.  Fixes resolving test macro from `use PowerAssert`
-* Resolve functions declared in `quote`'s scope when `block` injected with `unquote(block)`.
-  Fixes resolving `field`, `timestamps`, and `index` in `schema` for `use Yacto.Schema` as it makes the `block` see the `import Yacto.Schema` above `unquote(block)` in the `quote` in `schema(..., do: block)`.
+* [#1990](https://github.com/KronicDeth/intellij-elixir/pull/1990) - [@KronicDeth](https://github.com/KronicDeth)
+  * Convert MissingSDK errors for Dialyzer into Notifications.
+* [#1988](https://github.com/KronicDeth/intellij-elixir/pull/1988) - [@KronicDeth](https://github.com/KronicDeth)
+  * Only descend into modular children of modular for Module scope.  Prevents recursion loops on use calls.
+  * Don't search for unquoted variable value variable is value for `do:`.
+  * Protect from `IndexNotReady` in `resolver.Module.multiResolveProject`.
+  * Stop walking unquoted variable that resolves to a parameter.
+  * Walk case in `__using__` to find quote in any clause.  Fixes resolving test macro from `use PowerAssert`
+  * Resolve functions declared in `quote`'s scope when `block` injected with `unquote(block)`.
+    Fixes resolving `field`, `timestamps`, and `index` in `schema` for `use Yacto.Schema` as it makes the `block` see the `import Yacto.Schema` above `unquote(block)` in the `quote` in `schema(..., do: block)`.
 
 ### Enhancements
-* Find `Dep`s in function calls in the `deps()` list.
-* `Dep.putPath` from a variable.
-* Treat `Memoize` `defmemo` as `def` and `defmemop` as `defp`.
-* Resolve `exception/1` and `message/1` to `defexception`.
-* Resolve to callbacks when searching in any module.
-* Support arity intervals for unquote_splicing in parameters
-
-  Functions defined with unquote_splicing, such as `Ecto.Schema.__schema/2`:
-
-  ```elixir
-  for clauses <- Ecto.Schema.__schema__(fields, field_sources, assocs, embeds),
-      {args, body} <- clauses do
-    def __schema__(unquote_splicing(args)), do: unquote(body)
-  end
-  ```
-
-  Need to have their arity not be the number of PsiElements in the parentheses.  Any call to `unquote_splicing(...)` can end up have 0 to infinite parameters, so it means when one is saw, the range of `minimum...maximum` should change to an open interval of `minimum...`.  This required changing `IntRange resolvedFinalArityChange()` to `ArityInterval resolvedFinalArityInterval()` on all `Call`s, which was a large change.  It also meant changing a lot of ArityRange types to ArityInterval, and NameArityRange to NameArityInterval, which influenced the variable names.
-
-  Since all Calls support ArityIntervals now and not just special forms and Ecto DSLs, exportArity is changed to always state the ResolveState, so that the special form changes can be integrated for all callers.
-
-  The actual implementation of CallImpl.resolvedFinalArityRange is changes to fold over the ArityInterval:
-  * Normal arguments increase the minimum and maximum.
-  * Default arguments increase only the maximum.
-  * unquote_splicing changes the maximum to null to indicate the interval is half open.
+* [#1988](https://github.com/KronicDeth/intellij-elixir/pull/1988) - [@KronicDeth](https://github.com/KronicDeth)
+  * Find `Dep`s in function calls in the `deps()` list.
+  * `Dep.putPath` from a variable.
+  * Treat `Memoize` `defmemo` as `def` and `defmemop` as `defp`.
+  * Resolve `exception/1` and `message/1` to `defexception`.
+  * Resolve to callbacks when searching in any module.
+  * Support arity intervals for unquote_splicing in parameters
+  
+    Functions defined with unquote_splicing, such as `Ecto.Schema.__schema/2`:
+  
+    ```elixir
+    for clauses <- Ecto.Schema.__schema__(fields, field_sources, assocs, embeds),
+        {args, body} <- clauses do
+      def __schema__(unquote_splicing(args)), do: unquote(body)
+    end
+    ```
+  
+    Need to have their arity not be the number of PsiElements in the parentheses.  Any call to `unquote_splicing(...)` can end up have 0 to infinite parameters, so it means when one is saw, the range of `minimum...maximum` should change to an open interval of `minimum...`.  This required changing `IntRange resolvedFinalArityChange()` to `ArityInterval resolvedFinalArityInterval()` on all `Call`s, which was a large change.  It also meant changing a lot of ArityRange types to ArityInterval, and NameArityRange to NameArityInterval, which influenced the variable names.
+  
+    Since all Calls support ArityIntervals now and not just special forms and Ecto DSLs, exportArity is changed to always state the ResolveState, so that the special form changes can be integrated for all callers.
+  
+    The actual implementation of CallImpl.resolvedFinalArityRange is changes to fold over the ArityInterval:
+    * Normal arguments increase the minimum and maximum.
+    * Default arguments increase only the maximum.
+    * unquote_splicing changes the maximum to null to indicate the interval is half open.
 
 ## v11.11.0
 

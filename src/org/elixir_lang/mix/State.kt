@@ -17,7 +17,8 @@ import com.intellij.openapi.module.Module
 import com.intellij.openapi.projectRoots.Sdk
 import org.elixir_lang.console.ElixirConsoleUtil
 import org.elixir_lang.sdk.elixir.Type.Companion.mostSpecificSdk
-import org.elixir_lang.utils.SetupElixirSDKNotificationListener
+import org.elixir_lang.notification.setup_sdk.Listener
+import org.elixir_lang.notification.setup_sdk.Notifier
 
 fun ensureMostSpecificSdk(module: Module): Sdk = mostSpecificSdk(module) ?: throw MissingSdk(module)
 
@@ -46,23 +47,7 @@ class State(environment: ExecutionEnvironment, private val configuration: Config
         try {
             return ColoredProcessHandler(commandLine.createProcess(), commandLine.commandLineString)
         } catch (e: ExecutionException) {
-            val message = e.message
-            val isEmpty = "Executable is not specified" == message
-            val notCorrect = message?.startsWith("Cannot run program") ?: false
-
-            if (isEmpty || notCorrect) {
-                Notifications.Bus.notify(
-                        Notification(
-                                "Mix run configuration",
-                                "Mix settings",
-                                "Mix executable path, elixir executable path, or erl executable path is " +
-                                        (if (isEmpty) "empty" else "not specified correctly") +
-                                        "<br><a href='configure'>Configure</a></br>",
-                                NotificationType.ERROR,
-                                SetupElixirSDKNotificationListener(configuration.project, commandLine.workDirectory)
-                        )
-                )
-            }
+            Notifier.mixSettings(configuration.ensureModule(), e)
 
             throw e
         }

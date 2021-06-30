@@ -9,8 +9,9 @@ import com.intellij.openapi.module.Module
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.util.Key
 import org.elixir_lang.Mix
-import org.elixir_lang.mix.ensureMostSpecificSdk
+import org.elixir_lang.notification.setup_sdk.Notifier
 import org.elixir_lang.run.ensureWorkingDirectory
+import org.elixir_lang.sdk.elixir.Type.Companion.mostSpecificSdk
 
 data class DialyzerWarn(val fileName: String, val line: Int, val message: String = "", val successfulTyping: String = "")
 class DialyzerException(message: String?, inner: Throwable?) : Exception(message, inner)
@@ -26,9 +27,21 @@ class DialyzerServiceImpl : DialyzerService {
 
     override fun dialyzerWarnings(module: Module): List<DialyzerWarn> {
         val workingDirectory = ensureWorkingDirectory(module)
-        val sdk = ensureMostSpecificSdk(module)
 
-        return dialyzerWarnings(workingDirectory, sdk)
+        val sdk = mostSpecificSdk(module)
+
+        return if (sdk != null) {
+            dialyzerWarnings(workingDirectory, sdk)
+        } else {
+            val project = module.project
+            Notifier.error(
+                    module,
+                    "Missing module Elixir SDK",
+                    "There is no configured Elixir SDK for the module ${module.name} or its project ${project.name}"
+            )
+
+            emptyList()
+        }
     }
 
     private fun dialyzerWarnings(workingDirectory: String, elixirSdk: Sdk) : List<DialyzerWarn> = try {
