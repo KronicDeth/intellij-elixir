@@ -50,6 +50,11 @@ end
         </ul>
       </li>
       <li>Convert MissingSDK errors for Dialyzer into Notifications.</li>
+      <li>
+        Log element in psi.scope.Type instead of using <code>TODO()</code><br>
+        Error will still be reported, but there will be enough information to triage and since <code>true</code> is
+        returned now it won't stop the type resolving from working.
+      </li>
     </ul>
   </li>
   <li>
