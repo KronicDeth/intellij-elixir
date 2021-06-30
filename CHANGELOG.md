@@ -238,8 +238,6 @@
 ## v11.11.1
 
 ### Bug Fixes
-* [#1990](https://github.com/KronicDeth/intellij-elixir/pull/1990) - [@KronicDeth](https://github.com/KronicDeth)
-  * Convert MissingSDK errors for Dialyzer into Notifications.
 * [#1988](https://github.com/KronicDeth/intellij-elixir/pull/1988) - [@KronicDeth](https://github.com/KronicDeth)
   * Only descend into modular children of modular for Module scope.  Prevents recursion loops on use calls.
   * Don't search for unquoted variable value variable is value for `do:`.
@@ -248,6 +246,11 @@
   * Walk case in `__using__` to find quote in any clause.  Fixes resolving test macro from `use PowerAssert`
   * Resolve functions declared in `quote`'s scope when `block` injected with `unquote(block)`.
     Fixes resolving `field`, `timestamps`, and `index` in `schema` for `use Yacto.Schema` as it makes the `block` see the `import Yacto.Schema` above `unquote(block)` in the `quote` in `schema(..., do: block)`.
+* [#1990](https://github.com/KronicDeth/intellij-elixir/pull/1990) - [@KronicDeth](https://github.com/KronicDeth)
+  * Convert MissingSDK errors for Dialyzer into Notifications.
+* [#1993](https://github.com/KronicDeth/intellij-elixir/pull/1993) - [@KronicDeth](https://github.com/KronicDeth)
+  * Log element in psi.scope.Type instead of using `TODO()`
+    Error will still be reported, but there will be enough information to triage and since `true` is returned now it won't stop the type resolving from working.
 
 ### Enhancements
 * [#1988](https://github.com/KronicDeth/intellij-elixir/pull/1988) - [@KronicDeth](https://github.com/KronicDeth)

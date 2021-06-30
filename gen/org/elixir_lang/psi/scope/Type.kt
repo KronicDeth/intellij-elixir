@@ -10,6 +10,7 @@ import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.util.isAncestor
 import com.intellij.psi.util.siblings
 import org.elixir_lang.beam.psi.impl.ModuleImpl
+import org.elixir_lang.debugger.node.ok_error.OKError
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
@@ -45,7 +46,9 @@ abstract class Type : PsiScopeProcessor {
                 is ElixirAtom, is ElixirFile, is ElixirList, is ElixirParentheticalStab, is ElixirTuple,
                 is WholeNumber -> false
                 else -> {
-                    TODO("Not yet implemented")
+                    error("Don't know how process element as type", element)
+
+                    true
                 }
             }
 
@@ -182,6 +185,12 @@ abstract class Type : PsiScopeProcessor {
                 true
             }
         } ?: true
+
+    companion object {
+        fun error(title: String, element: PsiElement) {
+            Logger.error(Type::class.java, title, element)
+        }
+    }
 }
 
 internal tailrec fun PsiElement.ancestorTypeSpec(): AtUnqualifiedNoParenthesesCall<*>? =
