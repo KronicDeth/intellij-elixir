@@ -5801,6 +5801,7 @@ I'd like to thank those who have donated to help support this project as GitHub 
 ![](https://github.com/adam-phillips.png?size=40)
 ![](https://github.com/seanwash.png?size=40)
 ![](https://github.com/benkimpel.png?size=40)
+![](https://github.com/Meldanor.png?size=40)
 ![](https://github.com/zoltanmaric.png?size=40)
 ![](https://github.com/gtarcea.png?size=40)
 ![](https://github.com/matteosb.png?size=40)
@@ -5809,7 +5810,6 @@ I'd like to thank those who have donated to help support this project as GitHub 
 ![](https://github.com/elvanja.png?size=40)
 ![](https://github.com/yuthstyle88.png?size=40)
 ![](https://github.com/nathancyam.png?size=40)
-![](https://github.com/Meldanor.png?size=40)
 ![](https://github.com/drl123.png?size=40)
 ![](https://github.com/thirdshift.png?size=40)
 ![](https://github.com/BaseCase.png?size=40)
@@ -5826,6 +5826,7 @@ I'd like to thank those who have donated to help support this project as GitHub 
 ![](https://github.com/IljaN.png?size=40)
 ![](https://github.com/resterle.png?size=40)
 ![](https://github.com/mjaric.png?size=40)
+![]((https://github.com/RGENT.png?size=40))
 ![](https://github.com/sbouaked.png?size=40)
 ![](https://github.com/nitingupta910.png?size=40)
 ![](https://github.com/ciroque.png?size=40)
@@ -5839,11 +5840,13 @@ I'd like to thank those who have donated to help support this project as GitHub 
 ![](https://github.com/silas.png?size=40)
 ![](https://github.com/notriddle.png?size=40)
 ![](https://github.com/fundimmo.png?size=40)
+![](https://github.com/ui-tsing.png?size=40)
 ![](https://github.com/fitblip.png?size=40)
 ![](https://github.com/stoyle.png?size=40)
 ![](https://github.com/ArtemGordinsky.png?size=40)
 ![](https://github.com/Koziolek.png?size=40)
 ![](https://github.com/ZWood15.png?size=40)
+![](https://github.com/odk211.png?size=40)
 ![](https://github.com/pgrunwald.png?size=40)
 
 * Josh Taylor ([@joshuataylor](https://github.com/joshuataylor))
@@ -5882,6 +5885,7 @@ I'd like to thank those who have donated to help support this project as GitHub 
 * Yaroslav Rerikh
 * Sean Washington ([@seanwash](https://github.com/seanwash))
 * Ben Kimpel ([@benkimpel](https://github.com/benkimpel))
+* Kilian Gärtner ([@Meldanor](https://github.com/Meldanor))
 * Zoltán Marić ([@zoltanmaric](https://github.com/zoltanmaric))
 * Glenn Tarcea ([@gtarcea](https://github.com/gtarcea))
 * Matteo Banerjee ([@matteosb](https://github.com/matteosb))
@@ -5892,7 +5896,6 @@ I'd like to thank those who have donated to help support this project as GitHub 
 * Nathan Yam ([@nathancyam](https://github.com/nathancyam))
 * Shaun Collins
 * Purelogic Apps
-* Kilian Gärtner ([@Meldanor](https://github.com/Meldanor))
 * Donald Lettrich ([@drl123](https://github.com/drl123))
 * Garrett Hart ([@thirdshift](https://github.com/thirdshift))
 * LeafStone Enterprises Limited
@@ -5913,6 +5916,7 @@ I'd like to thank those who have donated to help support this project as GitHub 
 * Ilja Neumann ([@IljaN](https://github.com/IljaN))
 * Raphael Esterle ([@resterle](https://github.com/resterle))  
 * Milan Jaric ([@mjaric](https://github.com/mjaric))
+* Richard Giraud ([@RGENT](https://github.com/RGENT))  
 * Samir Bouaked ([@sbouaked](https://github.com/sbouaked))
 * Nitin Gupta ([@nitingupta910](https://github.com/nitingupta910))
 * Steve Wagner ([@ciroque](https://github.com/ciroque))
@@ -5933,7 +5937,8 @@ I'd like to thank those who have donated to help support this project as GitHub 
 * Silas Sewell ([@silas](https://github.com/silas))
 * Michael Howell ([@notriddle](https://github.com/notriddle))
 * IS-Soft Michał Zalewski
-* Fundimmo ([@fundimmo](https://github.com/fundimmo))  
+* Fundimmo ([@fundimmo](https://github.com/fundimmo))
+* Ui-tsing Lau ([@ui-tsing](https://github.com/ui-tsing))
 * Ryan Sears ([@fitblip](https://github.com/fitblip))
 * Alf Kristian Støyle ([@stoyle](https://github.com/stoyle))
 * Artem Gordinsky ([@ArtemGordinsky](https://github.com/ArtemGordinsky))
@@ -5941,6 +5946,7 @@ I'd like to thank those who have donated to help support this project as GitHub 
 * Johannes Eifert
 * Bartłomiej Kuczyński ([@Koziolek](https://github.com/Koziolek))
 * Zachary Woodard ([@ZWood15](https://github.com/ZWood15))
+* Tomoki Odaka ([@odk211](https://github.com/odk211))  
 * Percy Grunwald ([@pgrunwald](https://github.com/pgrunwald))
 * Nguyen Le
 
