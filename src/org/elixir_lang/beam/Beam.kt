@@ -7,9 +7,9 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.indexing.FileContent
 import org.elixir_lang.beam.chunk.*
+import org.elixir_lang.beam.chunk.Chunk.Companion.length
+import org.elixir_lang.beam.chunk.Chunk.Companion.typeID
 import org.elixir_lang.beam.chunk.Chunk.TypeID.*
-import org.elixir_lang.beam.chunk.Chunk.length
-import org.elixir_lang.beam.chunk.Chunk.typeID
 import org.elixir_lang.beam.chunk.beam_documentation.Documentation
 import org.elixir_lang.beam.term.ByteCount
 import java.io.*
@@ -105,9 +105,9 @@ class Beam private constructor(chunkCollection: Collection<Chunk>) {
             val header: String?
 
             try {
-                header = typeID(dataInputStream, path)
+                header = typeID(dataInputStream)
             } catch (ioException: IOException) {
-                LOGGER.error("Could not read header from BEAM DataInputStream from " + path, ioException)
+                LOGGER.error("Could not read header from BEAM DataInputStream from $path", ioException)
                 return null
             }
 
@@ -125,22 +125,22 @@ class Beam private constructor(chunkCollection: Collection<Chunk>) {
             try {
                 length(dataInputStream)
             } catch (ioException: IOException) {
-                LOGGER.error("Could not read length from BEAM DataInputStream from " + path, ioException)
+                LOGGER.error("Could not read length from BEAM DataInputStream from $path", ioException)
                 return null
             }
 
             val section: String?
 
             try {
-                section = typeID(dataInputStream, path)
+                section = typeID(dataInputStream)
             } catch (ioException: IOException) {
-                LOGGER.error("Could not read section header from BEAM DataInputStream from " + path, ioException)
+                LOGGER.error("Could not read section header from BEAM DataInputStream from $path", ioException)
                 return null
             }
 
 
             if ("BEAM" != section) {
-                LOGGER.error("Section header is not BEAM in " + path)
+                LOGGER.error("Section header is not BEAM in $path")
                 return null
             }
 
@@ -151,11 +151,10 @@ class Beam private constructor(chunkCollection: Collection<Chunk>) {
                 val chunk: Chunk?
 
                 try {
-                    chunk = Chunk.from(dataInputStream, path)
+                    chunk = Chunk.from(dataInputStream)
                 } catch (ioException: IOException) {
                     LOGGER.error(
-                            "Could not read chunk number " + i + " from BEAM DataInputStream from " + path +
-                                    ".  Returning truncated Beam object",
+                            "Could not read chunk number $i from BEAM DataInputStream from $path.  Returning truncated Beam object",
                             ioException
                     )
                     break

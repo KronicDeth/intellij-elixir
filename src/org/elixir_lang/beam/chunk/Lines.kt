@@ -3,8 +3,8 @@ package org.elixir_lang.beam.chunk
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.util.component1
 import com.intellij.openapi.util.component2
-import org.elixir_lang.beam.chunk.Chunk.unsignedInt
-import org.elixir_lang.beam.chunk.Chunk.unsignedShort
+import org.elixir_lang.beam.chunk.Chunk.Companion.unsignedInt
+import org.elixir_lang.beam.chunk.Chunk.Companion.unsignedShort
 import org.elixir_lang.beam.chunk.lines.LineReference
 import org.elixir_lang.beam.term.Atom
 import org.elixir_lang.beam.term.Integer

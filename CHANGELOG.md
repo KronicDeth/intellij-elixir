@@ -262,8 +262,11 @@
 * [#1995](https://github.com/KronicDeth/intellij-elixir/pull/1995) - [@hurricup](https://github.com/hurricup)]
   * Fix incorrect `OuterElementType` in `eex.lexer.TemplateData`.
     The `EEX` `IElementType` needs to use `OuterLanguageElementType` instead of the direct `eex.psi.TokenType`.
-* [#1995](https://github.com/KronicDeth/intellij-elixir/pull/1995) - [@KronicDeth](https://github.com/KronicDeth)
+* [#1996](https://github.com/KronicDeth/intellij-elixir/pull/1996) - [@KronicDeth](https://github.com/KronicDeth)
   * Run `QualifiedAlias#text` in `runReadAction` for `QualifiedAlias#name`
+* [#1997](https://github.com/KronicDeth/intellij-elixir/pull/1997) - [@KronicDeth](https://github.com/KronicDeth)
+  * Return `null` `Chunk` instead of throwing `IOException` when read incomplete.
+    Incomplete reads happen often due to incomplete writes to the file system being read in. As such, they shouldn't generate error reports and instead should be silently ignored.
 
 ### Enhancements
 * [#1988](https://github.com/KronicDeth/intellij-elixir/pull/1988) - [@KronicDeth](https://github.com/KronicDeth)

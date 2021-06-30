@@ -74,6 +74,11 @@ end
       <li>
         Run <code>QualifiedAlias#text</code> in <code>runReadAction</code> for <code>QualifiedAlias#name</code>
       </li>
+      <li>
+        Return <code>null</code> <code>Chunk</code> instead of throwing <code>IOException</code> when read incomplete.<br>
+        Incomplete reads happen often due to incomplete writes to the file system being read in. As such, they shouldn't
+        generate error reports and instead should be silently ignored.
+      </li>
     </ul>
   </li>
   <li>

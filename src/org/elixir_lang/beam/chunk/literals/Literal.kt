@@ -4,7 +4,7 @@ import com.ericsson.otp.erlang.OtpErlangObject
 import com.intellij.openapi.util.component1
 import com.intellij.openapi.util.component2
 import org.elixir_lang.beam.binaryToTerm
-import org.elixir_lang.beam.chunk.Chunk.unsignedInt
+import org.elixir_lang.beam.chunk.Chunk.Companion.unsignedInt
 import org.elixir_lang.beam.term.ByteCount
 import org.elixir_lang.beam.term.unsignedIntToInt
 
