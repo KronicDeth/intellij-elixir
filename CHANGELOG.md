@@ -251,6 +251,14 @@
 * [#1993](https://github.com/KronicDeth/intellij-elixir/pull/1993) - [@KronicDeth](https://github.com/KronicDeth)
   * Log element in psi.scope.Type instead of using `TODO()`
     Error will still be reported, but there will be enough information to triage and since `true` is returned now it won't stop the type resolving from working.
+* [#1994](https://github.com/KronicDeth/intellij-elixir/pull/1994) - [@KronicDeth](https://github.com/KronicDeth)    
+  * Add missing mix deps options to non-path influencing list:
+    * env
+    * manager
+    * repo
+    * sparse
+    * submodules
+    * system_env
 
 ### Enhancements
 * [#1988](https://github.com/KronicDeth/intellij-elixir/pull/1988) - [@KronicDeth](https://github.com/KronicDeth)

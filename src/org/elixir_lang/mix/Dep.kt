@@ -46,7 +46,9 @@ data class Dep(val application: String, val path: String, val type: Type = Type.
                                 val key = keywordPair.keywordKey.text
 
                                 when (key) {
-                                    "app", "branch", "commit", "compile", "git", "github", "hex", "only", "optional", "organization", "override", "ref", "runtime", GUARDIAN_RUNTIME_TYPO, "tag", "targets" -> acc
+                                    "app", "branch", "commit", "compile", "env", "git", "github", "hex", "manager",
+                                    "only", "optional", "organization", "override", "ref", "repo", "runtime",
+                                    GUARDIAN_RUNTIME_TYPO, "sparse", "submodules", "system_env", "tag", "targets" -> acc
                                     "in_umbrella" -> acc.copy(path = "apps/$name", type = Type.MODULE)
                                     "path" -> putPath(acc, keywordPair.keywordValue)
                                     else -> {
