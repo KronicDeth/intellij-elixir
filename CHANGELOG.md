@@ -259,6 +259,9 @@
     * sparse
     * submodules
     * system_env
+* [#1995](https://github.com/KronicDeth/intellij-elixir/pull/1995) - [@hurricup](https://github.com/hurricup)]
+  * Fix incorrect `OuterElementType` in `eex.lexer.TemplateData`.
+    The `EEX` `IElementType` needs to use `OuterLanguageElementType` instead of the direct `eex.psi.TokenType`.
 
 ### Enhancements
 * [#1988](https://github.com/KronicDeth/intellij-elixir/pull/1988) - [@KronicDeth](https://github.com/KronicDeth)
