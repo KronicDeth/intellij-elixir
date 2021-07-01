@@ -274,6 +274,8 @@
 * [#2000](https://github.com/KronicDeth/intellij-elixir/pull/2000) - [@KronicDeth](https://github.com/KronicDeth)
   * Don't require Alias qualifier to be a `PsiNamedElement`.
     It can be an `ElixirAtom` and getting the reference will still work.
+* [#2001](https://github.com/KronicDeth/intellij-elixir/pull/2000) - [@KronicDeth](https://github.com/KronicDeth)
+  * `Any.isDecompiled` for `CallDefinitionHead`.
 
 ### Enhancements
 * [#1988](https://github.com/KronicDeth/intellij-elixir/pull/1988) - [@KronicDeth](https://github.com/KronicDeth)

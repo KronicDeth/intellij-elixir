@@ -184,6 +184,7 @@ private fun Any.isDecompiled(): Boolean =
     when (this) {
         is CallDefinition -> isDecompiled()
         is CallDefinitionClause -> isDecompiled()
+        is CallDefinitionHead -> isDecompiled()
         is Module -> isDecompiled()
         is PsiElement -> isDecompiled()
         is PsiElementResolveResult -> isDecompiled()
@@ -192,6 +193,7 @@ private fun Any.isDecompiled(): Boolean =
 
 private fun CallDefinition.isDecompiled(): Boolean = modular.isDecompiled()
 private fun CallDefinitionClause.isDecompiled(): Boolean = callDefinition.isDecompiled()
+private fun CallDefinitionHead.isDecompiled(): Boolean = callDefinition.isDecompiled()
 
 private fun Modular.isDecompiled(): Boolean =
         when (this) {
