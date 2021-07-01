@@ -79,6 +79,16 @@ end
         Incomplete reads happen often due to incomplete writes to the file system being read in. As such, they shouldn't
         generate error reports and instead should be silently ignored.
       </li>
+      <li>
+        Implement <code>beam.FileEditor#getFile</code> to fix <code>DeprecatedMethodException</code> as the default
+        implementation is now deprecated and requires an explicit implementation.
+      </li>
+      <li>
+        Use <code>TabbedPaneWrapper.AsJBTabs</code> instead of <code>JBTabbedPane</code> for "BEAM Chunks" tabs.<br>
+        I'm not sure why <code>JBTabbedPane</code> stopped showing its labels sometime in the 2020.X IDE version series,
+        but by debugging when "BEAM Chunks" name was retrieved I found that the bottom tabs used
+        <code>TabbedPaneWrapper.asJBTabs</code>.  Using that, the labels reappeared.
+      </li>
     </ul>
   </li>
   <li>

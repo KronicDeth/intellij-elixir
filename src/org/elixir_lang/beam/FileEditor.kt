@@ -1,6 +1,7 @@
 package org.elixir_lang.beam
 
 import com.intellij.codeHighlighting.BackgroundEditorHighlighter
+import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.fileEditor.FileEditor
 import com.intellij.openapi.fileEditor.FileEditorLocation
 import com.intellij.openapi.fileEditor.FileEditorState
@@ -8,16 +9,14 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.UserDataHolderBase
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.ui.PrevNextActionsDescriptor
+import com.intellij.ui.TabbedPaneWrapper
 import com.intellij.ui.components.JBScrollPane
-import com.intellij.ui.components.JBTabbedPane
 import org.elixir_lang.beam.chunk.Chunk
 import org.elixir_lang.beam.chunk.Table
 import org.elixir_lang.beam.chunk.lines.TabbedPane
 import java.beans.PropertyChangeListener
-import javax.swing.Icon
-import javax.swing.JComponent
-import javax.swing.JPanel
-import javax.swing.JTabbedPane
+import javax.swing.*
 
 class FileEditor(
         private val virtualFile: VirtualFile,
@@ -26,13 +25,14 @@ class FileEditor(
     private var isActive: Boolean = false
 
     // GUI
-    private lateinit var rootTabbedPane: JBTabbedPane
+    private lateinit var rootTabbedPane: TabbedPaneWrapper
     override fun addPropertyChangeListener(listener: PropertyChangeListener) {}
     override fun removePropertyChangeListener(listener: PropertyChangeListener) {}
 
     override fun getBackgroundHighlighter(): BackgroundEditorHighlighter? = null
     override fun getComponent(): JComponent {
-        rootTabbedPane = JBTabbedPane(JTabbedPane.TOP, JTabbedPane.SCROLL_TAB_LAYOUT)
+        val descriptor = PrevNextActionsDescriptor(IdeActions.ACTION_NEXT_EDITOR_TAB, IdeActions.ACTION_PREVIOUS_EDITOR_TAB)
+        rootTabbedPane = TabbedPaneWrapper.AsJBTabs(project, SwingConstants.TOP, descriptor, this)
 
         Cache.from(virtualFile)?.let { cache ->
             cache.chunkCollection().forEach { chunk ->
@@ -40,12 +40,13 @@ class FileEditor(
             }
         }
 
-        return rootTabbedPane
+        return rootTabbedPane.component
     }
 
     override fun getCurrentLocation(): FileEditorLocation? = null
+    override fun getFile(): VirtualFile = virtualFile
     override fun getName(): String = "BEAM Chunks"
-    override fun getPreferredFocusedComponent(): JComponent? = rootTabbedPane
+    override fun getPreferredFocusedComponent(): JComponent? = rootTabbedPane.component
     override fun isModified(): Boolean = false
     override fun isValid() = true
 
@@ -67,12 +68,8 @@ class FileEditor(
 
     override fun setState(state: FileEditorState) {}
 
-    private fun addTab(tabbedPane: JBTabbedPane, cache: Cache, chunk: Chunk) {
+    private fun addTab(tabbedPaneWrapper: TabbedPaneWrapper, cache: Cache, chunk: Chunk) {
         val typeID = chunk.typeID
-        val icon: Icon? = when (typeID) {
-            Chunk.TypeID.CODE.toString() -> org.elixir_lang.beam.assembly.Icons.LANGUAGE
-            else -> null
-        }
         val component: JComponent = when (typeID) {
             Chunk.TypeID.ATOM.toString(), Chunk.TypeID.ATU8.toString() ->
                 JBScrollPane(Table(org.elixir_lang.beam.chunk.atoms.Model(cache.atoms)))
@@ -81,15 +78,15 @@ class FileEditor(
             Chunk.TypeID.CINF.toString() ->
                 JBScrollPane(Table(org.elixir_lang.beam.chunk.keyword.Model(cache.compileInfo)))
             Chunk.TypeID.CODE.toString() ->
-                org.elixir_lang.beam.chunk.code.Component(cache, project, tabbedPane)
+                org.elixir_lang.beam.chunk.code.Component(cache, project, tabbedPaneWrapper)
             Chunk.TypeID.DBGI.toString() ->
-                org.elixir_lang.beam.chunk.debug_info.term.component(cache.debugInfo, project, tabbedPane)
+                org.elixir_lang.beam.chunk.debug_info.term.component(cache.debugInfo, project, tabbedPaneWrapper)
             Chunk.TypeID.EXDC.toString() ->
                 org.elixir_lang.beam.chunk.elixir_documentation.component(
                         cache.elixirDocumentation,
                         project,
                         cache.atoms?.moduleName(),
-                        tabbedPane
+                        tabbedPaneWrapper
                 )
             Chunk.TypeID.EXPT.toString() ->
                 JBScrollPane(Table(org.elixir_lang.beam.chunk.call_definitions.Model(cache.exports)))
@@ -109,6 +106,6 @@ class FileEditor(
                 JBScrollPane(JPanel())
         }
 
-        tabbedPane.addTab(typeID, icon, component)
+        tabbedPaneWrapper.addTab(typeID, component)
     }
 }

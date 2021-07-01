@@ -3,7 +3,8 @@ package org.elixir_lang.beam.chunk.code
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.project.Project
-import com.intellij.ui.components.JBTabbedPane
+import com.intellij.ui.TabbedPaneWrapper
+import com.intellij.ui.tabs.impl.JBEditorTabs
 import com.intellij.util.ui.components.BorderLayoutPanel
 import org.elixir_lang.beam.Cache
 import org.elixir_lang.beam.assembly.Controls
@@ -12,14 +13,14 @@ import javax.swing.JComponent
 import javax.swing.event.ChangeEvent
 import javax.swing.event.ChangeListener
 
-class Component(private val cache: Cache, private val project: Project, tabbedPane: JBTabbedPane) :
+class Component(private val cache: Cache, private val project: Project, tabbedPane: TabbedPaneWrapper) :
         BorderLayoutPanel(), ChangeListener {
     init {
         tabbedPane.addChangeListener(this)
     }
 
     override fun stateChanged(changeEvent: ChangeEvent) {
-        if (changeEvent.source.let { it as JBTabbedPane }.selectedComponent == this) {
+        if (changeEvent.source.let { it as JBEditorTabs }.selectedInfo?.component == parent) {
             ensureChildrenAdded()
         }
     }
