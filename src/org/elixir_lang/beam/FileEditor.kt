@@ -44,6 +44,7 @@ class FileEditor(
     }
 
     override fun getCurrentLocation(): FileEditorLocation? = null
+    override fun getFile(): VirtualFile = virtualFile
     override fun getName(): String = "BEAM Chunks"
     override fun getPreferredFocusedComponent(): JComponent? = rootTabbedPane
     override fun isModified(): Boolean = false
