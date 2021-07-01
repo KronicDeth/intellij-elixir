@@ -271,6 +271,9 @@
   * Implement `beam.FileEditor#getFile` to fix `DeprecatedMethodException` as the default implementation is now deprecated and requires an explicit implementation.
   * Use `TabbedPaneWrapper.AsJBTabs` instead of `JBTabbedPane` for "BEAM Chunks" tabs.
     I'm not sure why `JBTabbedPane` stopped showing its labels sometime in the 2020.X IDE version series, but by debugging when "BEAM Chunks" name was retrieved I found that the bottom tabs used `TabbedPaneWrapper.asJBTabs`.  Using that, the labels reappeared.
+* [#2000](https://github.com/KronicDeth/intellij-elixir/pull/2000) - [@KronicDeth](https://github.com/KronicDeth)
+  * Don't require Alias qualifier to be a `PsiNamedElement`.
+    It can be an `ElixirAtom` and getting the reference will still work.
 
 ### Enhancements
 * [#1988](https://github.com/KronicDeth/intellij-elixir/pull/1988) - [@KronicDeth](https://github.com/KronicDeth)

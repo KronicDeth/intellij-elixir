@@ -89,6 +89,10 @@ end
         but by debugging when "BEAM Chunks" name was retrieved I found that the bottom tabs used
         <code>TabbedPaneWrapper.asJBTabs</code>.  Using that, the labels reappeared.
       </li>
+      <li>
+        Don't require Alias qualifier to be a <code>PsiNamedElement</code><br>
+        It can be an <code>ElixirAtom</code> and getting the reference will still work.
+      </li>
     </ul>
   </li>
   <li>
