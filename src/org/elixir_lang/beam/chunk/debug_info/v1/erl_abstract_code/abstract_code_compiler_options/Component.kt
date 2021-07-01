@@ -1,7 +1,8 @@
 package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options
 
 import com.intellij.openapi.project.Project
-import com.intellij.ui.components.JBTabbedPane
+import com.intellij.ui.TabbedPaneWrapper
+import com.intellij.ui.tabs.impl.JBEditorTabs
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.AbstractCodeCompileOptions
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Splitter
 import javax.swing.JPanel
@@ -12,7 +13,7 @@ import javax.swing.event.ChangeListener
 class Component(
         private val debugInfo: AbstractCodeCompileOptions,
         private val project: Project,
-        tabbedPane: JBTabbedPane
+        tabbedPane: TabbedPaneWrapper
 ):
         JTabbedPane(JTabbedPane.TOP, JTabbedPane.WRAP_TAB_LAYOUT), ChangeListener {
 
@@ -21,7 +22,7 @@ class Component(
     }
 
     override fun stateChanged(changeEvent: ChangeEvent) {
-        if (changeEvent.source.let { it as JBTabbedPane }.selectedComponent == this) {
+        if (changeEvent.source.let { it as JBEditorTabs }.selectedInfo?.component == parent) {
             ensureChildrenAdded()
         }
     }
