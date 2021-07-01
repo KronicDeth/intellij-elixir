@@ -101,9 +101,7 @@ class Variants(private val entrance: PsiElement) : Module() {
                                 .qualifier()
                                 // if there is a qualifier, then it is only modules nested under `qualifier`'s alias or it's fully
                                 // qualified name if unaliased that are valid variants because the completions are after a `.`
-                                ?.let { qualifier ->
-                                    filteredLookupElements(qualifier as PsiNamedElement)
-                                }
+                                ?.let { qualifier -> filteredLookupElements(qualifier) }
                         ?:
                         // if there is no qualifier then all aliases in the file and all project names are valid
                         unfilteredLookupElements(entrance)
@@ -174,7 +172,7 @@ class Variants(private val entrance: PsiElement) : Module() {
         /**
          * Any modules nested under `qualifier`
          */
-        private fun filteredLookupElements(qualifier: PsiNamedElement): Collection<LookupElement> =
+        private fun filteredLookupElements(qualifier: PsiElement): Collection<LookupElement> =
                 qualifier
                         .reference
                         ?.let { qualifierReference ->
