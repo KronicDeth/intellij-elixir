@@ -2,7 +2,7 @@
 
 ## Table of Contents
 
-* [v11.11.1](#v11111)
+* [v11.12.0](#v11120)
   * [Bug Fixes](#bug-fixes)
   * [Enhancements](#enhancements)
 * [v11.11.0](#v11110)
@@ -235,7 +235,7 @@
   * [Enhancements](#enhancements-64)
   * [Bug Fixes](#bug-fixes-70)
 
-## v11.11.1
+## v11.12.0
 
 ### Bug Fixes
 * [#1988](https://github.com/KronicDeth/intellij-elixir/pull/1988) - [@KronicDeth](https://github.com/KronicDeth)
@@ -267,6 +267,10 @@
 * [#1997](https://github.com/KronicDeth/intellij-elixir/pull/1997) - [@KronicDeth](https://github.com/KronicDeth)
   * Return `null` `Chunk` instead of throwing `IOException` when read incomplete.
     Incomplete reads happen often due to incomplete writes to the file system being read in. As such, they shouldn't generate error reports and instead should be silently ignored.
+* [#1999](https://github.com/KronicDeth/intellij-elixir/pull/1999) - [@KronicDeth](https://github.com/KronicDeth)
+  * Implement `beam.FileEditor#getFile` to fix `DeprecatedMethodException` as the default implementation is now deprecated and requires an explicit implementation.
+  * Use `TabbedPaneWrapper.AsJBTabs` instead of `JBTabbedPane` for "BEAM Chunks" tabs.
+    I'm not sure why `JBTabbedPane` stopped showing its labels sometime in the 2020.X IDE version series, but by debugging when "BEAM Chunks" name was retrieved I found that the bottom tabs used `TabbedPaneWrapper.asJBTabs`.  Using that, the labels reappeared.
 
 ### Enhancements
 * [#1988](https://github.com/KronicDeth/intellij-elixir/pull/1988) - [@KronicDeth](https://github.com/KronicDeth)
