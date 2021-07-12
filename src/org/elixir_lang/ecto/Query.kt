@@ -263,6 +263,16 @@ object Query {
                     executeOnBinding(it, state, keepProcessing)
                 }
             }
+            // `left in right` like `left in subquery(...)`
+            is In -> {
+                val leftOperand = element.leftOperand()
+
+                if (leftOperand != null) {
+                    executeOnBinding(leftOperand, state, keepProcessing)
+                } else {
+                    true
+                }
+            }
             is QuotableKeywordList -> {
                 val keywordValues = element.quotableKeywordPairList().mapNotNull(QuotableKeywordPair::getKeywordValue)
 
