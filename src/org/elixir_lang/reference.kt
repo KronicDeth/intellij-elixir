@@ -28,6 +28,8 @@ fun resolvesToModularName(call: Call, state: ResolveState, modularName: String):
                 if (resolveResult.isValidResult) {
                     resolveResult.element?.let { it as? Call }?.let { resolved ->
                         CallDefinitionClause.isMacro(resolved) &&
+                                // don't treat the signature as a call of the function
+                                !resolved.isAncestor(call) &&
                                 org.elixir_lang.structure_view.element.CallDefinitionClause.enclosingModularMacroCall(resolved)?.name  == modularName
                     } ?: false
                 } else {
