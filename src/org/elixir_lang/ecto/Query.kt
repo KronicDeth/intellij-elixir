@@ -180,7 +180,7 @@ object Query {
                     // Can call Ecto.Query.API
                     "having", "where" -> executeOnHavingOrWhereSelect(fromKeywords.keywordValue, state, keepProcessing)
                     // Cannot declare a reference variable
-                    "as", "distinct", "group_by", "limit", "on", "union_all", "update", "windows" -> true
+                    "as", "distinct", "group_by", "limit", "offset", "on", "union_all", "update", "windows" -> true
                     else -> {
                         Logger.error(logger, "Don't know how to find reference variables for keyword key $keywordKeyText", fromKeywords)
 
