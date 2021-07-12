@@ -125,6 +125,8 @@ object QualifiableAliasImpl {
             // Typing a qualified call before the function name is written
             // `Alias.(arg1)` when the full line is `Alias.f(arg1)
             is DotCall<*>,
+            // function call with no parentheses like `raise ArgumentError, ...`
+            is ElixirUnqualifiedNoParenthesesManyArgumentsCall,
             is Operation,
             is QuotableKeywordPair,
             // containers
