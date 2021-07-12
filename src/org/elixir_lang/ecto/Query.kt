@@ -168,7 +168,8 @@ object Query {
                     "cross_join", "full_join", "inner_join", "inner_lateral_join", "join", "left_join",
                     "left_lateral_join", "right_join" -> executeOnIn(fromKeywords.keywordValue, state, keepProcessing)
                     // Can call Ecto.Query.API
-                    "select", "order_by" -> executeOnSelectExpression(fromKeywords.keywordValue, state, keepProcessing)
+                    "select", "select_merge", "order_by" ->
+                        executeOnSelectExpression(fromKeywords.keywordValue, state, keepProcessing)
                     // Can call Ecto.Query.API
                     "where" -> executeOnWhereSelect(fromKeywords.keywordValue, state, keepProcessing)
                     // Cannot declare a reference variable
