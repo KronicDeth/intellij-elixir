@@ -178,7 +178,7 @@ object Query {
                     "select", "select_merge", "order_by" ->
                         executeOnSelectExpression(fromKeywords.keywordValue, state, keepProcessing)
                     // Can call Ecto.Query.API
-                    "having", "or_where", "where" ->
+                    "having", "or_having", "or_where", "where" ->
                         executeOnHavingOrWhereSelect(fromKeywords.keywordValue, state, keepProcessing)
                     // Cannot declare a reference variable
                     "as", "distinct", "except", "except_all", "group_by", "intersect", "intersect_all", "limit", "lock",
