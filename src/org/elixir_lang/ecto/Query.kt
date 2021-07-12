@@ -9,6 +9,7 @@ import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.call.finalArguments
+import org.elixir_lang.psi.impl.childExpressions
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.impl.whileInChildExpressions
 import org.elixir_lang.psi.operation.In
@@ -154,10 +155,16 @@ object Query {
             }
         }
 
-    fun executeOnFromKeywords(fromKeywords: PsiElement,
+    tailrec fun executeOnFromKeywords(fromKeywords: PsiElement,
                               state: ResolveState,
                               keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
         when (fromKeywords) {
+            is ElixirAccessExpression -> executeOnFromKeywords(fromKeywords.stripAccessExpression(), state, keepProcessing)
+            is ElixirList -> {
+                whileIn(fromKeywords.childExpressions()) { child ->
+                    executeOnFromKeywords(child, state, keepProcessing)
+                }
+            }
             is QuotableKeywordList -> {
                 whileIn(fromKeywords.quotableKeywordPairList()) { quotableKeywordPair ->
                     executeOnFromKeywords(quotableKeywordPair, state, keepProcessing)
