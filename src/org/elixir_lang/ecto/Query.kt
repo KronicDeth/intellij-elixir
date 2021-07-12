@@ -178,7 +178,7 @@ object Query {
                     "select", "select_merge", "order_by" ->
                         executeOnSelectExpression(fromKeywords.keywordValue, state, keepProcessing)
                     // Can call Ecto.Query.API
-                    "where" -> executeOnWhereSelect(fromKeywords.keywordValue, state, keepProcessing)
+                    "having", "where" -> executeOnHavingOrWhereSelect(fromKeywords.keywordValue, state, keepProcessing)
                     // Cannot declare a reference variable
                     "as", "distinct", "group_by", "limit", "on", "union_all", "update", "windows" -> true
                     else -> {
@@ -352,9 +352,9 @@ object Query {
                 else -> true
             }
 
-    private fun executeOnWhereSelect(element: PsiElement,
-                                     state: ResolveState,
-                                     keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
+    private fun executeOnHavingOrWhereSelect(element: PsiElement,
+                                             state: ResolveState,
+                                             keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
             when (element) {
                 is Call -> keepProcessing(element, state)
                 else -> true
