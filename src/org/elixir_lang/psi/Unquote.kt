@@ -53,9 +53,9 @@ object Unquote {
                 }
             }
 
-    private fun treeWalkUpUnquotedVariable(unquoted: Call,
-                                           resolveState: ResolveState,
-                                           keepProcessing: (PsiElement, ResolveState) -> Boolean): Boolean =
+    private tailrec fun treeWalkUpUnquotedVariable(unquoted: PsiElement,
+                                                   resolveState: ResolveState,
+                                                   keepProcessing: (PsiElement, ResolveState) -> Boolean): Boolean =
             when (val parent = unquoted.parent) {
                 is Match -> {
                     // variable = ...
@@ -90,6 +90,8 @@ object Unquote {
                 }
                 // (..., parameter)
                 is ElixirParenthesesArguments -> true
+                is ElixirTuple,
+                is ElixirAccessExpression -> treeWalkUpUnquotedVariable(parent, resolveState, keepProcessing)
                 else -> {
                     Logger.error(
                             Unquote::class.java,
