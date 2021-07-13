@@ -146,6 +146,10 @@ object Query {
             state: ResolveState,
             keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
         when (inReference) {
+            is ElixirAccessExpression -> executeOnInReference(inReference.children.single(), state, keepProcessing)
+            is ElixirList -> whileIn(inReference.childExpressions()) {
+                executeOnInReference(it, state, keepProcessing)
+            }
             is UnqualifiedNoArgumentsCall<*> ->
                 inReference.resolvedFinalArity() != 0 || keepProcessing(inReference, state)
             else -> {
