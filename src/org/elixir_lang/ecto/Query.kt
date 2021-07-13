@@ -267,12 +267,12 @@ object Query {
             }
         } ?: true
 
-    private tailrec fun executeOnBinding(
+    private fun executeOnBinding(
             element: PsiElement,
             state: ResolveState,
             keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
         when (element) {
-            is ElixirAccessExpression -> executeOnBinding(element.stripAccessExpression(), state, keepProcessing)
+            is ElixirAccessExpression -> executeOnBinding(element.children.single(), state, keepProcessing)
             is ElixirList -> {
                 element.whileInChildExpressions(forward = false) {
                     executeOnBinding(it, state, keepProcessing)
