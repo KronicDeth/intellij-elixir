@@ -319,7 +319,8 @@ abstract class Variable : PsiScopeProcessor {
             execute(match.parenthesesArguments, state)
 
     private fun execute(match: ElixirStructOperation, state: ResolveState): Boolean =
-            execute(match.mapArguments, state)
+            (match.variable?.let { execute(it, state) } ?: true) &&
+                    execute(match.mapArguments, state)
 
     /**
      * `in` can declare variable for `rescue` clauses like `rescue e in RuntimeException ->`
