@@ -283,7 +283,9 @@ object Query {
             //     plan(query)
             //   end
             // end
-            is ElixirAtom -> true
+            is ElixirAtom,
+            // `{p, 1}`
+            is ElixirDecimalWholeNumber -> true
             is ElixirList -> {
                 element.whileInChildExpressions(forward = false) {
                     executeOnBinding(it, state, keepProcessing)
