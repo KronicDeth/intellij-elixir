@@ -273,6 +273,17 @@ object Query {
             keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
         when (element) {
             is ElixirAccessExpression -> executeOnBinding(element.children.single(), state, keepProcessing)
+            // Invalid binding test `:foo`
+            // test "plan: raises on invalid binding index in join" do
+            //   query =
+            //     from(p in Post, as: :posts)
+            //     |> join(:left, [{p, :foo}], assoc(p, :comments))
+            //
+            //   assert_raise ArgumentError, ~r/invalid binding index/, fn ->
+            //     plan(query)
+            //   end
+            // end
+            is ElixirAtom -> true
             is ElixirList -> {
                 element.whileInChildExpressions(forward = false) {
                     executeOnBinding(it, state, keepProcessing)
