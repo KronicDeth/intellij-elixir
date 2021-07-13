@@ -121,9 +121,8 @@ object Unquote {
                                 resolveState: ResolveState,
                                 keepProcessing: (PsiElement, ResolveState) -> Boolean): Boolean =
         when {
-            QuoteMacro.`is`(value) -> {
-                QuoteMacro.treeWalkUp(value, resolveState, keepProcessing)
-            }
+            QuoteMacro.`is`(value) -> QuoteMacro.treeWalkUp(value, resolveState, keepProcessing)
+            Case.`is`(value) -> Case.treeWalkUp(value, resolveState, keepProcessing)
             else -> {
                 Logger.error(Unquote::class.java, "Don't know how to walk unquoted variable value", value)
 
