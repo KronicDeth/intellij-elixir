@@ -8,17 +8,20 @@ import org.elixir_lang.beam.Beam.Companion.from
 import org.elixir_lang.beam.chunk.Atoms
 import org.elixir_lang.beam.chunk.CallDefinitions
 import org.elixir_lang.beam.chunk.Chunk.TypeID
+import org.elixir_lang.beam.chunk.DebugInfo
 import org.elixir_lang.beam.chunk.beam_documentation.Documentation
+import org.elixir_lang.beam.chunk.beam_documentation.docs.Documented
 import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.Hidden
 import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.MarkdownByLanguage
 import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.None
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.AbstractCodeCompileOptions
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.attribute.Type
 import org.elixir_lang.beam.decompiler.*
 import org.elixir_lang.beam.term.inspect
 import org.elixir_lang.psi.call.name.Function
 import org.elixir_lang.psi.call.name.Module
 import org.elixir_lang.reference.resolver.Type.BUILTIN_ARITY_BY_NAME
 import java.util.*
-import java.util.function.Consumer
 
 class Decompiler : BinaryFileDecompiler {
     override fun decompile(virtualFile: VirtualFile): CharSequence = decompiled(from(virtualFile))
@@ -58,7 +61,7 @@ class Decompiler : BinaryFileDecompiler {
                             }
                         }
 
-                        appendTypes(decompiled, moduleName, documentation)
+                        appendTypes(decompiled, beam, moduleName, documentation)
                         appendCallDefinitions(decompiled, beam, atoms, documentation)
                         decompiled.append("end\n")
                     } else {
@@ -80,7 +83,7 @@ class Decompiler : BinaryFileDecompiler {
             }
         }
 
-        private fun appendTypes(decompiled: StringBuilder, moduleName: String, documentation: Documentation?) {
+        private fun appendTypes(decompiled: StringBuilder, beam: Beam, moduleName: String, documentation: Documentation?) {
             // fake built-in types being defined in `erlang`, so that built-in type resolution can point to a single location
             if (moduleName == "erlang") {
                 decompiled
@@ -114,46 +117,80 @@ class Decompiler : BinaryFileDecompiler {
                 }
             }
 
-            documentation?.docs?.typeDocumentedByArityByName()?.let { documentedByArityByName ->
-                if (documentedByArityByName.isNotEmpty()) {
-                    decompiled
-                            .append('\n')
-                            .append("  # Types\n")
-                            .append('\n')
-                }
+            documentation?.docs?.typeDocumentedByArityByName()?.let { appendTypes(decompiled, it) } ?:
+            beam.debugInfo()?.let { appendTypes(decompiled, it) }
+        }
 
-                for ((name, documentedByArity) in documentedByArityByName) {
-                    for ((arity, documented) in documentedByArity) {
-                        documented.doc?.let { doc ->
-                            when (doc) {
-                                is None -> Unit
-                                is Hidden -> appendDocumentation(decompiled, "typedoc", false)
-                                is MarkdownByLanguage -> {
-                                    for ((_language, formatted) in doc.formattedByLanguage) {
-                                        appendDocumentation(decompiled, "typedoc", formatted)
-                                    }
+        private fun appendTypes(decompiled: StringBuilder, documentedByArityByName: Map<String, Map<Int, Documented>>) {
+            if (documentedByArityByName.isNotEmpty()) {
+                decompiled
+                        .append('\n')
+                        .append("  # Types\n")
+                        .append('\n')
+            }
+
+            for ((name, documentedByArity) in documentedByArityByName) {
+                for ((arity, documented) in documentedByArity) {
+                    documented.doc?.let { doc ->
+                        when (doc) {
+                            is None -> Unit
+                            is Hidden -> appendDocumentation(decompiled, "typedoc", false)
+                            is MarkdownByLanguage -> {
+                                for ((_language, formatted) in doc.formattedByLanguage) {
+                                    appendDocumentation(decompiled, "typedoc", formatted)
                                 }
                             }
-                        }
-
-                        val signatures = documented.signatures
-
-                        if (signatures.isNotEmpty()) {
-                            TODO()
-                        } else {
-                            decompiled.append("  @type ").append(name).append('(')
-
-                            for (i in 1..arity) {
-                                if (i > 1) {
-                                    decompiled.append(", ")
-                                }
-
-                                decompiled.append("type").append(i)
-                            }
-
-                            decompiled.append(") :: ... \n")
                         }
                     }
+
+                    val signatures = documented.signatures
+
+                    if (signatures.isNotEmpty()) {
+                        TODO()
+                    } else {
+                        decompiled.append("  @type ").append(name).append('(')
+
+                        for (i in 1..arity) {
+                            if (i > 1) {
+                                decompiled.append(", ")
+                            }
+
+                            decompiled.append("type").append(i)
+                        }
+
+                        decompiled.append(") :: ... \n")
+                    }
+                }
+            }
+        }
+
+        private fun appendTypes(decompiled: StringBuilder, debugInfo: DebugInfo) {
+            when (debugInfo) {
+                is AbstractCodeCompileOptions -> appendTypes(decompiled, debugInfo)
+                else -> Unit
+            }
+        }
+
+        private fun appendTypes(decompiled: StringBuilder, abstractCodeCompileOptions: AbstractCodeCompileOptions) {
+            val macroStringAttributesByElixirAttributeName = abstractCodeCompileOptions.attributes.macroStringAttributes.filterIsInstance<Type>().groupBy { it.elixirAttributeName }
+
+            appendTypes(decompiled, macroStringAttributesByElixirAttributeName, "type", "Types")
+            appendTypes(decompiled, macroStringAttributesByElixirAttributeName, "typep", "Private Types")
+        }
+
+        private fun appendTypes(decompiled: StringBuilder,
+                                macroStringAttributesByElixirAttributeName: Map<String, List<Type>>,
+                                elixirAttributeName: String,
+                                title: String) {
+            val macroStringAttributes = macroStringAttributesByElixirAttributeName[elixirAttributeName]
+
+            if (!macroStringAttributes.isNullOrEmpty()) {
+                appendHeader(decompiled, title)
+
+                for (macroStringAttribute in macroStringAttributes.sortedBy { it.name }) {
+                    decompiled
+                            .append('\n')
+                            .append("  ").append(macroStringAttribute.toMacroString()).append('\n')
                 }
             }
         }
