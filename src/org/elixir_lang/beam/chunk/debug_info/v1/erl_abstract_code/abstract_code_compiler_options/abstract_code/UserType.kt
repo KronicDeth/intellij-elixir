@@ -14,7 +14,7 @@ object UserType {
 
     private fun argumentsMacroString(userType: OtpErlangTuple) =
             toArguments(userType)
-                    .let { Sequence.toMacroStringDeclaredScope(it, Scope.EMPTY, ", ") }
+                    .let { Sequence.toMacroStringDeclaredScope(it, Scope.EMPTY, "", ", ", "") }
                     .macroString
 
     private fun nameMacroString(userType: OtpErlangTuple) =

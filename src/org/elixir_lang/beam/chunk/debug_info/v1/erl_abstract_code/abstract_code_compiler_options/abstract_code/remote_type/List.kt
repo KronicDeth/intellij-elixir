@@ -22,7 +22,7 @@ object List {
                     ?: "unknown_arguments"
 
     private fun argumentsToMacroString(arguments: OtpErlangObject) =
-            Sequence.toMacroStringDeclaredScope(arguments, Scope.EMPTY, ", ").macroString
+            Sequence.toMacroStringDeclaredScope(arguments, Scope.EMPTY, "", ", ", "").macroString
 
     private fun moduleMacroString(list: OtpErlangList) =
             toModule(list)

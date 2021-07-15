@@ -14,7 +14,7 @@ object Union {
 
     private fun toMacroString(type: OtpErlangTuple) =
         toOperands(type)
-                .let { Sequence.toMacroStringDeclaredScope(it, Scope.EMPTY, " | ") }
+                .let { Sequence.toMacroStringDeclaredScope(it, Scope.EMPTY, "(", " | ", ")") }
                 .macroString
 
     private fun toOperands(type: OtpErlangTuple): OtpErlangObject? = type.elementAt(3)
