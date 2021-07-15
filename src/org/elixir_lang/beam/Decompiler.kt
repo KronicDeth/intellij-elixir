@@ -350,8 +350,7 @@ class Decompiler : BinaryFileDecompiler {
                                 it.arity == macroNameArity.arity.toBigInteger()
                     }
                     ?.let { spec ->
-                        decompiled
-                                .append("  ").append(spec.toMacroString()).append('\n')
+                        decompiled.append(spec.toMacroString().prependIndent("  ")).append('\n')
                     }
         }
 
