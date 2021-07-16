@@ -1,6 +1,7 @@
 package org.elixir_lang.beam;
 
 import gnu.trove.THashMap;
+import org.elixir_lang.NameArity;
 import org.elixir_lang.Visibility;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -113,5 +114,10 @@ public class MacroNameArity implements Comparable<MacroNameArity> {
     @Contract(pure = true)
     private int compareNameTo(@NotNull String otherName) {
         return name.compareTo(otherName);
+    }
+
+    @NotNull
+    public NameArity toNameArity() {
+        return new NameArity(name, arity);
     }
 }

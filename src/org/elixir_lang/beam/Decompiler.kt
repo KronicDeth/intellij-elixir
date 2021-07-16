@@ -20,6 +20,7 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_
 import org.elixir_lang.beam.decompiler.*
 import org.elixir_lang.beam.term.inspect
 import org.elixir_lang.psi.call.name.Function
+import org.elixir_lang.psi.call.name.Function.DEF
 import org.elixir_lang.psi.call.name.Module
 import org.elixir_lang.reference.resolver.Type.BUILTIN_ARITY_BY_NAME
 import java.util.*
@@ -255,7 +256,7 @@ class Decompiler : BinaryFileDecompiler {
                     }
                 }
                 appendSpec(decompiled, macroNameArity, debugInfo)
-                appendMacroNameArity(decompiled, macroNameArity, documentation)
+                appendMacroNameArity(decompiled, macroNameArity, debugInfo, documentation)
                 lastMacroNameArity = macroNameArity
             }
         }
@@ -355,9 +356,42 @@ class Decompiler : BinaryFileDecompiler {
         }
 
         private fun appendMacroNameArity(decompiled: StringBuilder,
-                                         macroNameArity: MacroNameArity, documentation: Documentation?) {
+                                         macroNameArity: MacroNameArity,
+                                         debugInfo: DebugInfo?,
+                                         documentation: Documentation?) =
+            appendMacroNameArity(decompiled, macroNameArity, debugInfo) || appendMacroNameArity(decompiled, macroNameArity, documentation)
+
+        private fun appendMacroNameArity(decompiled: StringBuilder,
+                                         macroNameArity: MacroNameArity,
+                                         debugInfo: DebugInfo?): Boolean =
+                when (debugInfo) {
+                    is AbstractCodeCompileOptions -> appendMacroNameArity(decompiled, macroNameArity, debugInfo)
+                    else -> false
+                }
+
+        private fun appendMacroNameArity(decompiled: StringBuilder,
+                                         macroNameArity: MacroNameArity,
+                                         debugInfo: AbstractCodeCompileOptions): Boolean =
+            if (macroNameArity.macro == DEF) {
+                val function = debugInfo.functions.byNameArity[macroNameArity.toNameArity()]
+
+                if (function != null) {
+                    decompiled.append(function.toMacroString().prependIndent("  ")).append('\n')
+
+                    true
+                } else {
+                    false
+                }
+            } else {
+                false
+            }
+
+        private fun appendMacroNameArity(decompiled: StringBuilder,
+                                         macroNameArity: MacroNameArity,
+                                         documentation: Documentation?): Boolean {
             val decompiler = decompiler(macroNameArity)
-            if (decompiler != null) {
+
+            return if (decompiler != null) {
                 // The signature while easier for users to read are not proper code for those that need to use unquote, so
                 // only allow signatures for default decompiler
                 if (decompiler === Default.INSTANCE) {
@@ -375,6 +409,10 @@ class Decompiler : BinaryFileDecompiler {
                 } else {
                     decompiler.append(decompiled, macroNameArity)
                 }
+
+                true
+            } else {
+                false
             }
         }
 
