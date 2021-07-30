@@ -356,7 +356,12 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
         );
 
         //noinspection UnstableApiUsage
-        applicationExtensionArea.registerPoint(FilePropertyPusher.EP_NAME.getName(), FilePropertyPusher.class, new DefaultPluginDescriptor(getClass().getName() + "." + getName()));
+        applicationExtensionArea.registerPoint(
+                FilePropertyPusher.EP_NAME.getName(),
+                FilePropertyPusher.class,
+                new DefaultPluginDescriptor(getClass().getName() + "." + getName()),
+                true
+        );
 
         myProject.addComponent(PushedFilePropertiesUpdater.class, new PushedFilePropertiesUpdaterImpl(myProject));
 
