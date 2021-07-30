@@ -13,9 +13,6 @@ import com.intellij.openapi.extensions.ExtensionsArea;
 import com.intellij.openapi.extensions.ProjectExtensionPointName;
 import com.intellij.openapi.extensions.impl.ExtensionsAreaImpl;
 import com.intellij.openapi.module.ModuleManager;
-import com.intellij.openapi.progress.ProgressManager;
-import com.intellij.openapi.progress.impl.ProgressManagerImpl;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.ProjectJdkTable;
 import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.projectRoots.impl.ProjectJdkTableImpl;
@@ -29,6 +26,10 @@ import com.intellij.openapi.vfs.impl.VirtualFileManagerImpl;
 import com.intellij.openapi.vfs.pointers.VirtualFilePointerManager;
 import com.intellij.psi.*;
 import com.intellij.util.messages.MessageBus;
+import com.intellij.workspaceModel.ide.WorkspaceModel;
+import com.intellij.workspaceModel.ide.WorkspaceModelTopics;
+import com.intellij.workspaceModel.ide.impl.WorkspaceModelImpl;
+import com.intellij.workspaceModel.ide.impl.legacyBridge.module.ModuleManagerComponentBridge;
 import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.ElixirParserDefinition;
 import org.elixir_lang.intellij_elixir.Quoter;
@@ -38,7 +39,6 @@ import org.jetbrains.annotations.NotNull;
 import org.picocontainer.MutablePicoContainer;
 
 import java.io.File;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -203,12 +203,12 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
     }
 
     @NotNull
-    private DirectoryIndex registerDirectoryIndex(MessageBus messageBus)
+    private DirectoryIndex registerDirectoryIndex()
             throws ClassNotFoundException, InvocationTargetException, InstantiationException, NoSuchMethodException,
             IllegalAccessException {
         /* MUST be registered before DirectoryIndex because DirectoryIndexImpl.markContentRootsForRefresh calls
             ModuleManager.getInstance(this.myProject).getModules();  */
-        registerModuleManager(messageBus);
+        registerModuleManager();
 
         DirectoryIndex directoryIndex = new DirectoryIndexImpl(myProject);
         myProject.registerService(DirectoryIndex.class, directoryIndex);
@@ -225,50 +225,28 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
     private void registerProjectFileIndex(MessageBus messageBus)
             throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException,
             InvocationTargetException {
-        registerDirectoryIndex(messageBus);
+        registerDirectoryIndex();
 
+        //noinspection UnstableApiUsage
         myProject.registerService(
                 ProjectFileIndex.class,
                 new ProjectFileIndexImpl(myProject)
         );
     }
 
-    private void registerModuleManager(MessageBus messageBus)
-            throws ClassNotFoundException, IllegalAccessException, InvocationTargetException, InstantiationException,
-            NoSuchMethodException {
-        Class<?> moduleManagerComponentClass = Class.forName("com.intellij.openapi.module.impl.ModuleManagerComponent");
-        Constructor<?> moduleManagerComponentConstructor;
-        ModuleManager moduleManager = null;
+    private void registerModuleManager() {
+        registerWorkspaceModelTopics();
+        registerWorkspaceModel();
+        myProject.registerService(ModuleManager.class, new ModuleManagerComponentBridge(myProject));
+    }
 
-        try {
-            // IntelliJ > 2016.3
-            moduleManagerComponentConstructor = moduleManagerComponentClass.getConstructor(
-                    Project.class
-            );
-            moduleManager = (ModuleManager) moduleManagerComponentConstructor.newInstance(myProject);
-        } catch (NoSuchMethodException e1) {
-            try {
-                // IntelliJ 2016.3
-                moduleManagerComponentConstructor = moduleManagerComponentClass.getConstructor(
-                        Project.class,
-                        MessageBus.class
-                );
-                moduleManager = (ModuleManager) moduleManagerComponentConstructor.newInstance(myProject, messageBus);
-            } catch (NoSuchMethodException e2) {
-                moduleManagerComponentConstructor = moduleManagerComponentClass.getConstructor(
-                        Project.class,
-                        ProgressManager.class,
-                        MessageBus.class
-                );
-                moduleManager = (ModuleManager) moduleManagerComponentConstructor.newInstance(
-                        myProject,
-                        new ProgressManagerImpl(),
-                        messageBus
-                );
-            }
-        }
+    private void registerWorkspaceModelTopics() {
+        //noinspection UnstableApiUsage
+        myProject.registerService(WorkspaceModelTopics.class, new WorkspaceModelTopics());
+    }
 
-        myProject.registerService(ModuleManager.class, moduleManager);
+    private void registerWorkspaceModel() {
+        myProject.registerService(WorkspaceModel.class, new WorkspaceModelImpl(myProject));
     }
 
     @NotNull
