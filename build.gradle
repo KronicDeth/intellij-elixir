@@ -125,19 +125,19 @@ repositories {
 }
 
 dependencies {
-  compile project('jps-builder')
-  compile project('jps-shared')
-  compile files('lib/OtpErlang.jar')
-  compile group: 'commons-io', name: 'commons-io', version: '2.5'
+  implementation project('jps-builder')
+  implementation project('jps-shared')
+  implementation files('lib/OtpErlang.jar')
+  implementation group: 'commons-io', name: 'commons-io', version: '2.5'
   implementation 'org.jetbrains:markdown:0.1.45'
 
-  testCompile group: 'org.mockito', name: 'mockito-core', version: '2.2.9'
-  testCompile group: 'org.objenesis', name: 'objenesis', version: '2.4'
+  testImplementation group: 'org.mockito', name: 'mockito-core', version: '2.2.9'
+  testImplementation group: 'org.objenesis', name: 'objenesis', version: '2.4'
 }
 
 project(':jps-builder') {
   dependencies {
-    compile project(':jps-shared')
+    implementation project(':jps-shared')
   }
 }
 
