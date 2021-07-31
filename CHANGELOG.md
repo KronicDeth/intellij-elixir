@@ -242,12 +242,14 @@
 
 ### Bug Fixes
 * [#2035](https://github.com/KronicDeth/intellij-elixir/pull/2035) - [@theqp](https://github.com/theqp)
-  * Remove bintray repositories
+  * Remove bintray repositories.
 
 ### Enhancements
 * [#2035](https://github.com/KronicDeth/intellij-elixir/pull/2035) - [@theqp](https://github.com/theqp)
-  * Update build to IntelliJ IDEA 2021.3.
-  * Upgrade to Gradle 7.1.1
+  * Update build to IntelliJ IDEA 2021.2.
+  * Upgrade to Gradle 7.1.1.
+* [#2036](https://github.com/KronicDeth/intellij-elixir/pull/2036) - [@KronicDeth](https://github.com/KronicDeth)
+  * Expand compatibility range to 2021.1.2-2021.2. 
 
 ## v11.12.0
 
