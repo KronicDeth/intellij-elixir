@@ -280,7 +280,7 @@ object Macro {
                         assert(argumentList.arity() == 2)
 
                         val (left, right) = argumentList
-                        val leftString = commaJoinOrEmptyParentheses(left as OtpErlangList, false)
+                        val leftString = commaJoinOrEmptyParentheses(left.toOtpErlangList(), false)
 
                         "$leftString->\n  ${adjustNewLines(blockToString(right), "\n  ")}"
                     }
@@ -416,7 +416,11 @@ object Macro {
             ifErlangElementRewriteTo(term) { toString(it) } ?:
                     ifErlangRewriteTo(term) { toString(it) } ?:
                     ifMapsIsKeyRewriteTo(term) { toString(it) } ?:
-                    ifMapsMergeRewriteTo(term) { toString(it) }
+                    ifMapsMergeRewriteTo(term) { toString(it) } ?:
+                    ifSymbolicAndRewriteTo(term) {
+
+                        toString(it)
+                    }
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex?utf8=%E2%9C%93#L681-L687
     private fun otherCallToString(tuple: OtpErlangTuple): String? {
@@ -1097,6 +1101,19 @@ object Macro {
     fun adjustNewLines(textWithNewLines: String, newLineReplacement: String): String =
         Regex(Regex.escape("\n")).replace(textWithNewLines, Regex.escapeReplacement(newLineReplacement))
 
+    private fun isCallingIsFalsy(term: OtpErlangObject, variable: OtpErlangObject): Boolean =
+            ifCallConvertArgumentsTo(term, "erlang", "orelse") { orelseArguments ->
+                orelseArguments.arity() == 2 &&
+                        isCallingWithArguments(orelseArguments.elementAt(0), "erlang", "=:=", variable, OtpErlangAtom("false"))
+                        &&
+                        isCallingWithArguments(orelseArguments.elementAt(1), "erlang", "=:=", variable, OtpErlangAtom("nil"))
+            } ?: false
+
+    private fun isCallingWithArguments(term: OtpErlangObject, module: String, name: String, vararg expected: OtpErlangObject): Boolean =
+            ifCallConvertArgumentsTo(term, module, name) { actual ->
+                actual.elements()!!.contentEquals(expected)
+            } ?: false
+
     private inline fun <T> ifCallConvertArgumentsTo(
             term: OtpErlangObject,
             module: String,
@@ -1118,6 +1135,7 @@ object Macro {
                     }
                 }
             }
+
 
     private inline fun <T> ifErlangElementCallConvertArgumentsTo(
             term: OtpErlangObject,
@@ -1220,6 +1238,97 @@ object Macro {
                 null
             }
         }
+
+    private inline fun <T> ifSymbolicAndRewriteTo(term: OtpErlangObject, crossinline  transformer: (OtpErlangObject) -> T): T? =
+            ifTagged3TupleTo(term, "case") { tuple ->
+                (tuple.elementAt(2) as? OtpErlangList)?.let { arguments ->
+                    if (arguments.arity() == 2) {
+                        (arguments.elementAt(1) as? OtpErlangList)?.let { blockListItems ->
+                            if (blockListItems.arity() == 1) {
+                                (blockListItems.elementAt(0) as? OtpErlangTuple)?.let { keywordPair ->
+                                    if (keywordPair.arity() == 2 && keywordPair.elementAt(0) == OtpErlangAtom("do")) {
+                                        (keywordPair.elementAt(1) as? OtpErlangList)?.let { clauses ->
+                                            if (clauses.arity() == 2 && isReturnFalsyClause(clauses.elementAt(0))) {
+                                                ifDefaultClauseReturn(clauses.elementAt(1))?.let { secondary ->
+                                                    val primary = arguments.elementAt(0)
+
+                                                    transformer(OtpErlangTuple(
+                                                            arrayOf(
+                                                                    OtpErlangAtom("&&"),
+                                                                    OtpErlangList(),
+                                                                    OtpErlangList(arrayOf(primary, secondary))
+                                                            )
+                                                    )
+                                                    )
+                                                }
+                                            } else {
+                                                null
+                                            }
+                                        }
+                                    } else {
+                                        null
+                                    }
+                                }
+                            } else {
+                                null
+                            }
+                        }
+                    } else {
+                        null
+                    }
+                }
+            }
+
+    private fun isReturnFalsyClause(term: OtpErlangObject): Boolean =
+            ifTagged3TupleTo(term, "->") { clause ->
+                (clause.elementAt(2) as? OtpErlangList)?.let { inputOutput ->
+                    if (inputOutput.arity() == 2) {
+                        inputOutput.elementAt(1).let { it as? OtpErlangTuple }?.let { output ->
+                            if (output.arity() == 3) {
+                                output.elementAt(0)?.let { it as? OtpErlangAtom }?.let { variable ->
+                                    inputOutput.elementAt(0).let { it as? OtpErlangList }?.let { input ->
+                                        if (input.arity() == 1) {
+                                            ifTagged3TupleTo(input.elementAt(0), "when") { `when` ->
+                                                `when`.elementAt(2).let { it as? OtpErlangList }?.let { patternGuard ->
+                                                    patternGuard.arity() == 2 && patternGuard.elementAt(0) == output && isCallingIsFalsy(patternGuard.elementAt(1), output)
+                                                }
+                                            }
+                                        } else {
+                                            null
+                                        }
+                                    }
+                                }
+                            } else {
+                                null
+                            }
+                        }
+                    } else {
+                        null
+                    }
+                }
+            } ?: false
+
+    private fun ifDefaultClauseReturn(term: OtpErlangObject): OtpErlangObject? =
+        ifTagged3TupleTo(term, "->") { clause ->
+            (clause.elementAt(2) as? OtpErlangList)?.let { inputOutput ->
+                if (inputOutput.arity() == 2 && isDefaultPattern(inputOutput.elementAt(0))) {
+                    inputOutput.elementAt(1)
+                } else {
+                    null
+                }
+            }
+        }
+
+    private fun isDefaultPattern(term: OtpErlangObject): Boolean =
+            (term as? OtpErlangList)?.let { list ->
+                if (list.arity() == 1) {
+                    ifTagged3TupleTo(list.elementAt(0), "_") {
+                        true
+                    }
+                } else {
+                    null
+                }
+            } ?: false
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/exception.ex#L310-L311
     private inline fun <T> ifErlangRewriteTo(term: OtpErlangObject,
@@ -1412,14 +1521,42 @@ object Macro {
                 var forEachAcc = acc
 
                 // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex?utf8=%E2%9C%93#L275-L280
-                val mappedArguments = (arguments as OtpErlangList).map { element ->
-                    val (preElement, preAcc) = pre(element, forEachAcc)
-                    val (traverseTailElement, traverseTailAcc) = traverseTail(preElement, preAcc, pre, post)
+                val mappedArguments = when (arguments) {
+                    is OtpErlangList ->
+                        arguments
+                                .map { element ->
+                                    val (preElement, preAcc) = pre(element, forEachAcc)
+                                    val (traverseTailElement, traverseTailAcc) = traverseTail(preElement, preAcc, pre, post)
 
-                    forEachAcc = traverseTailAcc
+                                    forEachAcc = traverseTailAcc
 
-                    traverseTailElement
-                }.toTypedArray().let(::OtpErlangList)
+                                    traverseTailElement
+                                }
+                                .toTypedArray()
+                                .let(::OtpErlangList)
+                    is OtpErlangString ->
+                        arguments
+                                .stringValue()
+                                .let { string ->
+                                    val codePoints = OtpErlangString.stringToCodePoints(string)
+
+                                    codePoints.map { codePoint ->
+                                        val element = OtpErlangInt(codePoint)
+
+                                        val (preElement, preAcc) = pre(element, forEachAcc)
+                                        val (traverseTailElement, traverseTailAcc) = traverseTail(preElement, preAcc, pre, post)
+
+                                        forEachAcc = traverseTailAcc
+
+                                        traverseTailElement
+                                    }
+                                }
+                                .toTypedArray()
+                                .let(::OtpErlangList)
+                    else -> {
+                        TODO("Don't know how traverseArguments for ${arguments.javaClass}")
+                    }
+                }
 
                 Pair(mappedArguments, forEachAcc)
             }
@@ -1473,6 +1610,13 @@ object Macro {
                     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex?utf8=%E2%9C%93#L267-L269
                     post(macro, acc)
 }
+
+private fun OtpErlangObject.toOtpErlangList(): OtpErlangList =
+    when (this) {
+        is OtpErlangList -> this
+        is OtpErlangString -> this.stringValue().let(::OtpErlangList)
+        else -> TODO("Don't know how to turn ${this.javaClass} into an OtpErlangList")
+    }
 
 private operator fun OtpErlangList.component1(): OtpErlangObject = this.elementAt(0)
 private operator fun OtpErlangList.component2(): OtpErlangObject = this.elementAt(1)
