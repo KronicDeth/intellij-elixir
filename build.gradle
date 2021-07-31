@@ -1,3 +1,4 @@
+
 plugins {
   id 'org.jetbrains.intellij' version "1.0"
   id "org.jetbrains.kotlin.jvm" version "1.5.10"
@@ -68,6 +69,8 @@ allprojects {
 
     changeNotes.set(bodyInnerHTML("resources/META-INF/changelog.html"))
     pluginDescription.set(bodyInnerHTML("resources/META-INF/description.html"))
+
+    sinceBuild = "211.7442"
   }
 
   publishPlugin {
@@ -81,7 +84,7 @@ allprojects {
   }
 
   runPluginVerifier {
-    ideVersions = ["2021.2"]
+    ideVersions = ["2021.1.3", "2021.2"]
   }
 }
 
