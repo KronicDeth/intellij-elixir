@@ -417,10 +417,8 @@ object Macro {
                     ifErlangRewriteTo(term) { toString(it) } ?:
                     ifMapsIsKeyRewriteTo(term) { toString(it) } ?:
                     ifMapsMergeRewriteTo(term) { toString(it) } ?:
-                    ifSymbolicAndRewriteTo(term) {
-
-                        toString(it)
-                    }
+                    ifSymbolicAndRewriteTo(term) { toString(it) } ?:
+                    ifIfRewriteTo(term) { toString(it) }
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex?utf8=%E2%9C%93#L681-L687
     private fun otherCallToString(tuple: OtpErlangTuple): String? {
@@ -1239,7 +1237,105 @@ object Macro {
             }
         }
 
-    private inline fun <T> ifSymbolicAndRewriteTo(term: OtpErlangObject, crossinline  transformer: (OtpErlangObject) -> T): T? =
+    private inline fun <T> ifSymbolicAndRewriteTo(term: OtpErlangObject,
+                                                  crossinline  transformer: (OtpErlangObject) -> T): T? =
+            ifCaseTo(term) { argument, clauses ->
+                if (clauses.arity() == 2 && isReturnFalsyClause(clauses.elementAt(0))) {
+                    ifDefaultClauseReturn(clauses.elementAt(1))?.let { secondary ->
+                        transformer(
+                                OtpErlangTuple(
+                                        arrayOf(
+                                                OtpErlangAtom("&&"),
+                                                OtpErlangList(),
+                                                OtpErlangList(arrayOf(argument, secondary))
+                                        )
+                                )
+                        )
+                    }
+                } else {
+                    null
+                }
+            }
+
+    private fun isReturnFalsyClause(term: OtpErlangObject): Boolean =
+            ifFalsyCaseClauseTo(term) { inputPattern, output ->
+                inputPattern == output
+            } ?: false
+
+    private inline fun <T> ifFalsyCaseClauseTo(term: OtpErlangObject,
+                                               crossinline transformer: (inputPattern: OtpErlangTuple, output: OtpErlangObject) -> T): T? =
+            ifCaseClauseTo(term) { input, output ->
+                if (input is OtpErlangList && input.arity() == 1) {
+                    ifTagged3TupleTo(input.elementAt(0), "when") { `when` ->
+                        `when`.elementAt(2).let { it as? OtpErlangList }?.let { patternGuard ->
+                            if (patternGuard.arity() == 2) {
+                                val pattern = patternGuard.elementAt(0)
+
+                                if (pattern is OtpErlangTuple &&
+                                        pattern.arity() == 3 &&
+                                        pattern.elementAt(0) is OtpErlangAtom &&
+                                        isCallingIsFalsy(patternGuard.elementAt(1), pattern)) {
+                                    transformer(pattern, output)
+                                } else {
+                                    null
+                                }
+                            } else {
+                                null
+                            }
+                        }
+                    }
+                } else {
+                    null
+                }
+            }
+
+    private fun ifDefaultClauseReturn(term: OtpErlangObject): OtpErlangObject? =
+            ifCaseClauseTo(term) { input, output ->
+                if (isDefaultPattern(input)) {
+                    output
+                } else {
+                    null
+                }
+            }
+
+    private fun isDefaultPattern(term: OtpErlangObject): Boolean =
+            (term as? OtpErlangList)?.let { list ->
+                if (list.arity() == 1) {
+                    ifTagged3TupleTo(list.elementAt(0), "_") {
+                        true
+                    }
+                } else {
+                    null
+                }
+            } ?: false
+
+    private inline fun <T> ifIfRewriteTo(term: OtpErlangObject, crossinline transformer: (OtpErlangObject) -> T?): T? =
+           ifCaseTo(term) { condition, clauses ->
+               if (clauses.arity() == 2) {
+                   ifFalsyCaseClauseTo(clauses.elementAt(0)) { _, trueBranch ->
+                       ifDefaultClauseReturn(clauses.elementAt(1))?.let { falseBranch ->
+                           transformer(
+                                   otpErlangTuple(
+                                           OtpErlangAtom("if"),
+                                           OtpErlangList(),
+                                           otpErlangList(
+                                                   condition,
+                                                   otpErlangList(
+                                                           otpErlangTuple(OtpErlangAtom("do"), trueBranch),
+                                                           otpErlangTuple(OtpErlangAtom("else"), falseBranch)
+                                                   )
+                                           )
+                                   )
+                           )
+                       }
+                   }
+               } else {
+                   null
+               }
+           }
+
+    private inline fun <T> ifCaseTo(term: OtpErlangObject,
+                                    crossinline transformer: (argument: OtpErlangObject, clauses: OtpErlangList) -> T): T? =
             ifTagged3TupleTo(term, "case") { tuple ->
                 (tuple.elementAt(2) as? OtpErlangList)?.let { arguments ->
                     if (arguments.arity() == 2) {
@@ -1248,22 +1344,7 @@ object Macro {
                                 (blockListItems.elementAt(0) as? OtpErlangTuple)?.let { keywordPair ->
                                     if (keywordPair.arity() == 2 && keywordPair.elementAt(0) == OtpErlangAtom("do")) {
                                         (keywordPair.elementAt(1) as? OtpErlangList)?.let { clauses ->
-                                            if (clauses.arity() == 2 && isReturnFalsyClause(clauses.elementAt(0))) {
-                                                ifDefaultClauseReturn(clauses.elementAt(1))?.let { secondary ->
-                                                    val primary = arguments.elementAt(0)
-
-                                                    transformer(OtpErlangTuple(
-                                                            arrayOf(
-                                                                    OtpErlangAtom("&&"),
-                                                                    OtpErlangList(),
-                                                                    OtpErlangList(arrayOf(primary, secondary))
-                                                            )
-                                                    )
-                                                    )
-                                                }
-                                            } else {
-                                                null
-                                            }
+                                            transformer(arguments.elementAt(0), clauses)
                                         }
                                     } else {
                                         null
@@ -1279,56 +1360,13 @@ object Macro {
                 }
             }
 
-    private fun isReturnFalsyClause(term: OtpErlangObject): Boolean =
+    private inline fun <T> ifCaseClauseTo(term: OtpErlangObject,
+                                        crossinline transformer: (input: OtpErlangObject, output: OtpErlangObject) -> T?): T? =
             ifTagged3TupleTo(term, "->") { clause ->
-                (clause.elementAt(2) as? OtpErlangList)?.let { inputOutput ->
-                    if (inputOutput.arity() == 2) {
-                        inputOutput.elementAt(1).let { it as? OtpErlangTuple }?.let { output ->
-                            if (output.arity() == 3) {
-                                output.elementAt(0)?.let { it as? OtpErlangAtom }?.let { variable ->
-                                    inputOutput.elementAt(0).let { it as? OtpErlangList }?.let { input ->
-                                        if (input.arity() == 1) {
-                                            ifTagged3TupleTo(input.elementAt(0), "when") { `when` ->
-                                                `when`.elementAt(2).let { it as? OtpErlangList }?.let { patternGuard ->
-                                                    patternGuard.arity() == 2 && patternGuard.elementAt(0) == output && isCallingIsFalsy(patternGuard.elementAt(1), output)
-                                                }
-                                            }
-                                        } else {
-                                            null
-                                        }
-                                    }
-                                }
-                            } else {
-                                null
-                            }
-                        }
-                    } else {
-                        null
-                    }
-                }
-            } ?: false
-
-    private fun ifDefaultClauseReturn(term: OtpErlangObject): OtpErlangObject? =
-        ifTagged3TupleTo(term, "->") { clause ->
-            (clause.elementAt(2) as? OtpErlangList)?.let { inputOutput ->
-                if (inputOutput.arity() == 2 && isDefaultPattern(inputOutput.elementAt(0))) {
-                    inputOutput.elementAt(1)
-                } else {
-                    null
+                clause.elementAt(2)?.let { it as? OtpErlangList }?.takeIf { it.arity() == 2 }?.let { inputOutput ->
+                    transformer(inputOutput.elementAt(0), inputOutput.elementAt(1))
                 }
             }
-        }
-
-    private fun isDefaultPattern(term: OtpErlangObject): Boolean =
-            (term as? OtpErlangList)?.let { list ->
-                if (list.arity() == 1) {
-                    ifTagged3TupleTo(list.elementAt(0), "_") {
-                        true
-                    }
-                } else {
-                    null
-                }
-            } ?: false
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/exception.ex#L310-L311
     private inline fun <T> ifErlangRewriteTo(term: OtpErlangObject,
