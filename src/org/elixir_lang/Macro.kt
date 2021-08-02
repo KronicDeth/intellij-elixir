@@ -316,13 +316,13 @@ object Macro {
                                                     is OtpErlangTuple -> {
                                                         val (rewrittenModule, rewrittenFunction) = rewrittenFunction.elementAt(2) as OtpErlangList
 
-                                                        "&${toString(rewrittenModule)}.${atomToString(rewrittenFunction as OtpErlangAtom)}/${toString(arity)}"
+                                                        "&${toString(rewrittenModule)}.${(rewrittenFunction as OtpErlangAtom).atomValue()}/${toString(arity)}"
                                                     }
                                                     else -> TODO("Don' know how to convert $rewrittenFunction to capture string")
                                                 }
 
                                             } else {
-                                                "&${toString(module)}.${atomToString(function)}/${toString(arity)}"
+                                                "&${toString(module)}.${function.atomValue()}/${toString(arity)}"
                                             }
                                         } else {
                                             null
