@@ -414,11 +414,12 @@ object Macro {
 
     private fun ifDeinlineToString(term: OtpErlangTuple): String? =
             ifErlangElementRewriteTo(term) { toString(it) } ?:
-                    ifErlangRewriteTo(term) { toString(it) } ?:
-                    ifMapsIsKeyRewriteTo(term) { toString(it) } ?:
-                    ifMapsMergeRewriteTo(term) { toString(it) } ?:
-                    ifSymbolicAndRewriteTo(term) { toString(it) } ?:
-                    ifIfRewriteTo(term) { toString(it) }
+            ifErlangErrorRewriteTo(term) { toString(it) } ?:
+            ifErlangRewriteTo(term) { toString(it) } ?:
+            ifMapsIsKeyRewriteTo(term) { toString(it) } ?:
+            ifMapsMergeRewriteTo(term) { toString(it) } ?:
+            ifSymbolicAndRewriteTo(term) { toString(it) } ?:
+            ifIfRewriteTo(term) { toString(it) }
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex?utf8=%E2%9C%93#L681-L687
     private fun otherCallToString(tuple: OtpErlangTuple): String? {
@@ -1115,17 +1116,31 @@ object Macro {
     private inline fun <T> ifCallConvertArgumentsTo(
             term: OtpErlangObject,
             module: String,
-            name: String,
+            function: String,
             crossinline argumentsTo: (OtpErlangList) -> T?
     ): T? =
-            ifTupleTo(term, 3) { tuple ->
-                ifTagged3TupleTo(tuple.elementAt(0), ".") { function ->
-                    (function.elementAt(2) as? OtpErlangList)?.let { functionArguments ->
-                        if (functionArguments.arity() == 2 &&
-                                functionArguments.elementAt(0) == OtpErlangAtom(module) &&
-                                functionArguments.elementAt(1) == OtpErlangAtom(name)) {
-                            (tuple.elementAt(2) as? OtpErlangList)?.let { arguments ->
-                                argumentsTo(arguments)
+            ifCallConvertTo(term) { actualModule, actualFunction, arguments ->
+                if (actualModule.atomValue() == module && actualFunction.atomValue() == function) {
+                    argumentsTo(arguments)
+                } else {
+                    null
+                }
+            }
+
+    private inline fun <T> ifCallConvertTo(term: OtpErlangObject,
+                                           crossinline transformer: (module: OtpErlangAtom,
+                                                                     function: OtpErlangAtom,
+                                                                     arguments: OtpErlangList) -> T?): T? =
+            ifTupleTo(term, 3) { call ->
+                ifTagged3TupleTo(call.elementAt(0), ".") { dot ->
+                    (dot.elementAt(2) as? OtpErlangList)?.let { dotArguments ->
+                        if (dotArguments.arity() == 2) {
+                            dotArguments.elementAt(0).let { it as? OtpErlangAtom }?.let { module ->
+                                dotArguments.elementAt(1).let { it as? OtpErlangAtom }?.let { function ->
+                                    call.elementAt(2).let { it as? OtpErlangList }?.let { arguments ->
+                                        transformer(module, function, arguments)
+                                    }
+                                }
                             }
                         } else {
                             null
@@ -1133,7 +1148,6 @@ object Macro {
                     }
                 }
             }
-
 
     private inline fun <T> ifErlangElementCallConvertArgumentsTo(
             term: OtpErlangObject,
@@ -1176,6 +1190,29 @@ object Macro {
                                                     plusArguments.elementAt(0)
                                             ))
                                     ))
+                            )
+                        } else {
+                            null
+                        }
+                    }
+                }
+            }
+
+    private inline fun <T> ifErlangErrorRewriteTo(macro: OtpErlangObject,
+                                                  crossinline transformer: (OtpErlangObject) -> T): T? =
+            ifCallConvertArgumentsTo(macro, "erlang", "error") { errorArguments ->
+                errorArguments.singleOrNull()?.let { errorArgument ->
+                    ifCallConvertTo(errorArgument) { exceptionModule, exceptionFunction, exceptionArguments ->
+                        if (exceptionFunction == OtpErlangAtom("exception") && exceptionArguments.arity() == 1) {
+                            transformer(
+                                    otpErlangTuple(
+                                            OtpErlangAtom("raise"),
+                                            OtpErlangList(),
+                                            otpErlangList(
+                                                    exceptionModule,
+                                                    exceptionArguments.elementAt(0)
+                                            )
+                                    )
                             )
                         } else {
                             null
