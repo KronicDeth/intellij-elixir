@@ -304,21 +304,28 @@ object Macro {
                         ifTagged3TupleTo(arguments.elementAt(0), "/") { slashTuple ->
                             (slashTuple.elementAt(2) as? OtpErlangList)?.let { slashArguments ->
                                 if (slashArguments.arity() == 2) {
-                                    val (moduleDotName, arity) = slashArguments
+                                    val (call, arity) = slashArguments
 
-                                    ifTagged3TupleTo(moduleDotName, ".") { moduleDotNameTuple ->
-                                        (moduleDotNameTuple.elementAt(2) as? OtpErlangList)?.let { moduleName ->
-                                            if (moduleName.arity() == 2) {
-                                                val (module, name) = moduleName
+                                    ifCallConvertTo(call) { module, function, arguments ->
+                                        if (arguments.arity() == 0 && arity is OtpErlangLong) {
+                                            if (module.atomValue() == "erlang") {
+                                                val rewrittenFunction = rewriteGuardCall(function)
 
-                                                if (name is OtpErlangAtom && arity is OtpErlangLong) {
-                                                    "&${toString(module)}.${atomToString(name)}/${toString(arity)}"
-                                                } else {
-                                                    null
+                                                when (rewrittenFunction) {
+                                                    is OtpErlangAtom -> "&${rewrittenFunction.atomValue()}/${toString(arity)}"
+                                                    is OtpErlangTuple -> {
+                                                        val (rewrittenModule, rewrittenFunction) = rewrittenFunction.elementAt(2) as OtpErlangList
+
+                                                        "&${toString(rewrittenModule)}.${atomToString(rewrittenFunction as OtpErlangAtom)}/${toString(arity)}"
+                                                    }
+                                                    else -> TODO("Don' know how to convert $rewrittenFunction to capture string")
                                                 }
+
                                             } else {
-                                                null
+                                                "&${toString(module)}.${atomToString(function)}/${toString(arity)}"
                                             }
+                                        } else {
+                                            null
                                         }
                                     }
                                 } else {
