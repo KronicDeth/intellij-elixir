@@ -1371,12 +1371,20 @@ object Macro {
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/exception.ex#L310-L311
     private inline fun <T> ifErlangRewriteTo(term: OtpErlangObject,
                                              crossinline transformer: (OtpErlangObject) -> T): T? =
-            Macro.ifTagged3TupleTo(term, ".") { tuple ->
-                (tuple.elementAt(2) as? OtpErlangList)?.let { arguments ->
-                    if (arguments.arity() == 2 && arguments.elementAt(0) == OtpErlangAtom("erlang")) {
-                        transformer(rewriteGuardCall(arguments.elementAt(1)))
-                    } else {
-                        null
+            ifTupleTo(term, 3) { call ->
+                ifTagged3TupleTo(call.elementAt(0), ".") { qualified ->
+                    (qualified.elementAt(2) as? OtpErlangList)?.let { arguments ->
+                        if (arguments.arity() == 2 && arguments.elementAt(0) == OtpErlangAtom("erlang")) {
+                            transformer(
+                                    otpErlangTuple(
+                                            rewriteGuardCall(arguments.elementAt(1)),
+                                            call.elementAt(1),
+                                            call.elementAt(2)
+                                    )
+                            )
+                        } else {
+                            null
+                        }
                     }
                 }
             }
