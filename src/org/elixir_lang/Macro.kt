@@ -419,6 +419,7 @@ object Macro {
             ifMapsIsKeyRewriteTo(term) { toString(it) } ?:
             ifMapsMergeRewriteTo(term) { toString(it) } ?:
             ifSymbolicAndRewriteTo(term) { toString(it) } ?:
+            ifWordAndRewriteTo(term) { toString(it) } ?:
             ifIfRewriteTo(term) { toString(it) }
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex?utf8=%E2%9C%93#L681-L687
@@ -1288,6 +1289,36 @@ object Macro {
                                         )
                                 )
                         )
+                    }
+                } else {
+                    null
+                }
+            }
+
+    private inline fun <T> ifWordAndRewriteTo(term: OtpErlangObject, crossinline transformer: (OtpErlangObject) -> T): T? =
+            ifCaseTo(term) { arguments, clauses ->
+                if (clauses.arity() == 2) {
+                    ifCaseClauseTo(clauses.elementAt(0)) { falseInput, falseOutput ->
+                        if (falseInput.let { it as? OtpErlangList }?.singleOrNull() == OtpErlangAtom("false") && falseOutput == OtpErlangAtom("false")) {
+                            ifCaseClauseTo(clauses.elementAt(1)) { trueInput, trueOutput ->
+                                if (trueInput.let { it as? OtpErlangList }?.singleOrNull() == OtpErlangAtom("true")) {
+                                    transformer(
+                                            otpErlangTuple(
+                                                    OtpErlangAtom("and"),
+                                                    OtpErlangList(),
+                                                    otpErlangList(
+                                                            arguments,
+                                                            trueOutput
+                                                    )
+                                            )
+                                    )
+                                } else {
+                                    null
+                                }
+                            }
+                        } else {
+                            null
+                        }
                     }
                 } else {
                     null
