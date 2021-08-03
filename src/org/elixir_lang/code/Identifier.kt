@@ -73,6 +73,8 @@ object Identifier {
                     Classification.ALIAS
                 isIdentifier(atomValue) ->
                     Classification.CALLABLE_LOCAL
+                atomValue.startsWith("..") ->
+                    Classification.OTHER
                 "@" !in atomValue ->
                     Classification.NOT_CALLABLE
                 else ->
