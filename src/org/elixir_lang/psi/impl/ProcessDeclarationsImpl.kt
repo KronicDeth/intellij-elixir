@@ -126,6 +126,7 @@ object ProcessDeclarationsImpl {
                             Callback.`is`(call) ||
                             Delegation.`is`(call) || // delegation call parameters
                             Exception.`is`(call) ||
+                            Import.`is`(call) ||
                             Module.`is`(call) || // module Alias
                             Use.`is`(call) ||
                             call.isCalling(KERNEL, DESTRUCTURE) || // left operand
