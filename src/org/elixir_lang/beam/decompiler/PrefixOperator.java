@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
-public class PrefixOperator extends MacroNameArity {
+public class PrefixOperator extends Default {
     /*
      * CONSTANTS
      */
@@ -47,26 +47,18 @@ public class PrefixOperator extends MacroNameArity {
         return arity != null && arity == 1 && isPrefixOperator(macroNameArity.name);
     }
 
-    /**
-     * Append the decompiled source for {@code macroNameArity} to {@code decompiled}.
-     *
-     * @param decompiled     the decompiled source so far
-     * @param macroNameArity
-     */
     @Override
-    public void append(@NotNull StringBuilder decompiled, @NotNull org.elixir_lang.beam.MacroNameArity macroNameArity) {
-        decompiled
-                .append("  ")
-                .append(macroNameArity.macro)
-                .append(" (");
-
-        appendName(decompiled, macroNameArity.name);
-        decompiled.append("value)");
-        appendBody(decompiled);
+    protected String[] parameters(@NotNull org.elixir_lang.beam.MacroNameArity macroNameArity) {
+        return new String[]{"value"};
     }
 
     @Override
-    public void appendName(@NotNull StringBuilder decompiled, @NotNull String name) {
-        decompiled.append(name);
+    public void appendSignature(@NotNull StringBuilder decompiled,
+                                @NotNull org.elixir_lang.beam.MacroNameArity macroNameArity,
+                                @NotNull String name,
+                                @NotNull String[] parameters) {
+        decompiled.append('(');
+        appendName(decompiled, macroNameArity.name);
+        decompiled.append(parameters[0]).append(')');
     }
 }

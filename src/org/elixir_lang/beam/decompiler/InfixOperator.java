@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
-public class InfixOperator extends MacroNameArity {
+public class InfixOperator extends Default {
     /*
      * CONSTANTS
      */
@@ -89,25 +89,23 @@ public class InfixOperator extends MacroNameArity {
         return arity != null && arity == 2 && isInfixOperator(macroNameArity.name);
     }
 
-    /**
-     * Append the decompiled source for {@code macroNameArity} to {@code decompiled}.
-     *
-     * @param decompiled     the decompiled source so far
-     */
     @Override
-    public void append(@NotNull StringBuilder decompiled, @NotNull org.elixir_lang.beam.MacroNameArity macroNameArity) {
-        decompiled
-                .append("  ")
-                .append(macroNameArity.macro)
-                .append(" left ");
+    protected String[] parameters(@NotNull org.elixir_lang.beam.MacroNameArity macroNameArity) {
+        return new String[]{"left", "right"};
+    }
 
+    @Override
+    public void appendSignature(@NotNull StringBuilder decompiled,
+                                @NotNull org.elixir_lang.beam.MacroNameArity macroNameArity,
+                                @NotNull String name,
+                                @NotNull String[] parameters) {
+        decompiled.append(parameters[0]);
         appendName(decompiled, macroNameArity.name);
-        decompiled.append(" right");
-        appendBody(decompiled);
+        decompiled.append(parameters[1]);
     }
 
     @Override
     public void appendName(@NotNull StringBuilder decompiled, @NotNull String name) {
-        decompiled.append(name);
+        decompiled.append(' ').append(name).append(' ');
     }
 }

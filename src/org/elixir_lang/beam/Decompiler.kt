@@ -366,6 +366,7 @@ class Decompiler : BinaryFileDecompiler {
                                          debugInfo: DebugInfo?): Boolean =
                 when (debugInfo) {
                     is AbstractCodeCompileOptions -> appendMacroNameArity(decompiled, macroNameArity, debugInfo)
+                    is org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.V1 -> appendMacroNameArity(decompiled, macroNameArity, debugInfo)
                     else -> false
                 }
 
@@ -385,6 +386,15 @@ class Decompiler : BinaryFileDecompiler {
             } else {
                 false
             }
+
+        private fun appendMacroNameArity(decompiled: StringBuilder,
+                                         macroNameArity: MacroNameArity,
+                                         debugInfo: org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.V1): Boolean =
+                debugInfo.definitions?.get(macroNameArity)?.toMacroString()?.let { macroString ->
+                    decompiled.append(macroString.prependIndent("  ")).append('\n')
+
+                    true
+                } ?: false
 
         private fun appendMacroNameArity(decompiled: StringBuilder,
                                          macroNameArity: MacroNameArity,

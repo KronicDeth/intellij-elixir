@@ -10,28 +10,6 @@ public class Default extends MacroNameArity {
 
     public static final MacroNameArity INSTANCE = new Default();
 
-    /*
-     * Static Methods
-     */
-
-    static void appendParameters(@NotNull StringBuilder decompiled,
-                                 @NotNull org.elixir_lang.beam.MacroNameArity macroNameArity) {
-        decompiled.append("(");
-
-        @Nullable Integer arity = macroNameArity.arity;
-
-        if (arity != null) {
-            for (int i = 0; i < arity; i++) {
-                if (i != 0) {
-                    decompiled.append(", ");
-                }
-
-                decompiled.append("p").append(i);
-            }
-        }
-
-        decompiled.append(")");
-    }
 
     /**
      * Whether the decompiler accepts the {@code macroNameArity}
@@ -50,18 +28,55 @@ public class Default extends MacroNameArity {
      */
     @Override
     public void append(@NotNull StringBuilder decompiled, @NotNull org.elixir_lang.beam.MacroNameArity macroNameArity) {
+        appendMacro(decompiled, macroNameArity);
+
+        String[] parameters = parameters(macroNameArity);
+        appendSignature(decompiled, macroNameArity, macroNameArity.name, parameters);
+
+        appendBody(decompiled);
+    }
+
+    void appendMacro(@NotNull StringBuilder decompiled, @NotNull org.elixir_lang.beam.MacroNameArity macroNameArity) {
         decompiled
                 .append("  ")
                 .append(macroNameArity.macro)
                 .append(" ");
+    }
 
+    protected String[] parameters(@NotNull org.elixir_lang.beam.MacroNameArity macroNameArity) {
+        int arity = macroNameArity.arity;
+        String[] arguments = new String[arity];
+
+        for (int i = 0; i < arity; i++) {
+            arguments[i] = "p" + i;
+        }
+
+        return arguments;
+    }
+
+    @Override
+    public void appendSignature(@NotNull StringBuilder decompiled,
+                                @NotNull org.elixir_lang.beam.MacroNameArity macroNameArity,
+                                @NotNull String name,
+                                @NotNull String[] parameters) {
         appendName(decompiled, macroNameArity.name);
-        appendParameters(decompiled, macroNameArity);
-        appendBody(decompiled);
+
+        decompiled.append('(');
+
+        for (int i = 0; i < parameters.length; i++) {
+            if (i != 0) {
+                decompiled.append(", ");
+            }
+
+            decompiled.append(parameters[i]);
+        }
+
+        decompiled.append(')');
     }
 
     @Override
     public void appendName(@NotNull StringBuilder decompiled, @NotNull String name) {
         decompiled.append(name);
     }
+
 }

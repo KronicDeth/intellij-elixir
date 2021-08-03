@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.elixir_lang.Visibility.PRIVATE;
 import static org.elixir_lang.Visibility.PUBLIC;
@@ -70,6 +71,12 @@ public class MacroNameArity implements Comparable<MacroNameArity> {
      * Constructors
      */
 
+    public MacroNameArity(@NotNull String macro, @NotNull String name, int arity) {
+        this.macro = macro;
+        this.name = name;
+        this.arity = arity;
+    }
+
     public MacroNameArity(@NotNull Visibility visibility, @NotNull String exportName, int exportArity) {
         if (exportName.startsWith(MACRO_EXPORT_PREFIX)) {
             macro = MACRO_MACRO_BY_VISIBILITY.get(visibility);
@@ -119,5 +126,18 @@ public class MacroNameArity implements Comparable<MacroNameArity> {
     @NotNull
     public NameArity toNameArity() {
         return new NameArity(name, arity);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof MacroNameArity)) return false;
+        MacroNameArity that = (MacroNameArity) o;
+        return macro.equals(that.macro) && name.equals(that.name) && arity.equals(that.arity);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(macro, name, arity);
     }
 }

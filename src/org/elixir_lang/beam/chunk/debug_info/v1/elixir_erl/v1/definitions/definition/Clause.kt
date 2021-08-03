@@ -5,10 +5,12 @@ import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
 import org.elixir_lang.Macro
 import org.elixir_lang.Macro.rewriteGuard
+import org.elixir_lang.beam.Decompiler.Companion.decompiler
 import org.elixir_lang.beam.chunk.Keyword
 import org.elixir_lang.beam.chunk.debug_info.logger
 import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.definitions.Definition
 import org.elixir_lang.beam.term.inspect
+import java.lang.StringBuilder
 
 
 class Clause(
@@ -21,9 +23,22 @@ class Clause(
     val metadata: Keyword? = org.elixir_lang.beam.chunk.from(metadata)
     val arguments: OtpErlangList? = arguments as? OtpErlangList
     private val guards: OtpErlangList? = guards as? OtpErlangList
-    val head by lazy {
-        "${definition.name}(${argumentsToString(this.arguments)})${guardsToString(this.guards)}"
+    val signature: String by lazy {
+        definition.macroNameArity?.let { macroNameArity ->
+            decompiler(macroNameArity)?.let { decompiler ->
+                val decompiled = StringBuilder()
+                val argumentStrings = this.arguments?.map { Macro.toString(it) }.orEmpty().toTypedArray()
+                decompiler.appendSignature(decompiled, macroNameArity, macroNameArity.name, argumentStrings)
+
+                decompiled.toString()
+            }
+        } ?: "${definition.name}(${argumentsToString(this.arguments)})${guardsToString(this.guards)}"
     }
+
+    fun toMacroString(): String? =
+        definition.macro?.let { macro ->
+            "$macro $signature do\n${Macro.toString(block).prependIndent("  ")}\nend"
+        }
 
     companion object {
         fun from(term: OtpErlangObject, definition: Definition): Clause? =
@@ -73,12 +88,13 @@ class Clause(
 
         private fun guardsToString(guards: OtpErlangList?): String =
                 if (guards != null) {
-                    if (guards.arity() == 0) {
-                        ""
-                    } else {
-                        assert(guards.arity() == 1)
-
-                        " when ${Macro.toString(rewriteGuard(guards.elementAt(0)))}"
+                    when (guards.arity()) {
+                        0 -> ""
+                        else -> {
+                            guards.joinToString(" or ", " when ", transform = { guard ->
+                                Macro.toString(rewriteGuard(guard))
+                            })
+                        }
                     }
                 } else {
                     " when ?"

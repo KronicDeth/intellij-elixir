@@ -38,6 +38,11 @@ public abstract class MacroNameArity {
     public abstract void append(@NotNull StringBuilder decompiled,
                                 @NotNull org.elixir_lang.beam.MacroNameArity macroNameArity);
 
+    public abstract void appendSignature(@NotNull StringBuilder decompiled,
+                                         @NotNull org.elixir_lang.beam.MacroNameArity macroNameArity,
+                                         @NotNull String name,
+                                         @NotNull String[] parameters);
+
     /**
      * Append the decompiled name for {@code macroNameArity} to {@code decompiled}.
      *

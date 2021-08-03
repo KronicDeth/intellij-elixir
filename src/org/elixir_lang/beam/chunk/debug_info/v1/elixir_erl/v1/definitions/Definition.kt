@@ -5,6 +5,7 @@ import org.elixir_lang.beam.chunk.Keyword
 import org.elixir_lang.beam.chunk.debug_info.logger
 import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.V1
 import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.definitions.definition.Clause
+import org.elixir_lang.beam.decompiler.MacroNameArity
 import org.elixir_lang.beam.term.inspect
 
 class Definition(
@@ -31,6 +32,19 @@ class Definition(
             nameArityToArity(it)
         }
     }
+
+    val macroNameArity: org.elixir_lang.beam.MacroNameArity? by lazy {
+        this.macro?.let { macro ->
+            this.name?.let { name ->
+                this.arity?.let { arity ->
+                    org.elixir_lang.beam.MacroNameArity(macro, name, arity)
+                }
+            }
+        }
+    }
+
+    fun toMacroString(): String? =
+            clauses?.mapNotNull(Clause::toMacroString)?.takeIf(List<String>::isNotEmpty)?.joinToString("\n\n")
 
     companion object {
         fun from(term: OtpErlangObject, debugInfo: V1): Definition? =
