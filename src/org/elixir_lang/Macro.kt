@@ -426,6 +426,7 @@ object Macro {
             ifMapsIsKeyRewriteTo(term) { toString(it) } ?:
             ifMapsMergeRewriteTo(term) { toString(it) } ?:
             ifSymbolicAndRewriteTo(term) { toString(it) } ?:
+            ifSymbolicOrRewriteTo(term) { toString(it) } ?:
             ifWordAndRewriteTo(term) { toString(it) } ?:
             ifWordOrRewriteTo(term) { toString(it) } ?:
             ifIfRewriteTo(term) { toString(it) } ?:
@@ -1298,6 +1299,33 @@ object Macro {
                                         )
                                 )
                         )
+                    }
+                } else {
+                    null
+                }
+            }
+
+    private inline fun <T> ifSymbolicOrRewriteTo(term: OtpErlangObject,
+                                                  crossinline  transformer: (OtpErlangObject) -> T): T? =
+            ifCaseTo(term) { argument, clauses ->
+                if (clauses.arity() == 2) {
+                    ifFalsyCaseClauseTo(clauses.elementAt(0)) { _, falsyOutput ->
+                        ifCaseClauseTo(clauses.elementAt(1)) { passThroughInput, passThroughOutput ->
+                            if (passThroughInput is OtpErlangList && passThroughInput.arity() == 1 && passThroughInput.elementAt(0) == passThroughOutput) {
+                                transformer(
+                                        otpErlangTuple(
+                                                OtpErlangAtom("||"),
+                                                OtpErlangList(""),
+                                                otpErlangList(
+                                                       argument,
+                                                       passThroughOutput
+                                                )
+                                        )
+                                )
+                            } else {
+                                null
+                            }
+                        }
                     }
                 } else {
                     null
