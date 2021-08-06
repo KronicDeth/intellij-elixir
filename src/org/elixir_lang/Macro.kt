@@ -318,6 +318,7 @@ object Macro {
 
                                                         "&${toString(rewrittenModule)}.${(rewrittenFunction as OtpErlangAtom).atomValue()}/${toString(arity)}"
                                                     }
+                                                    null -> "&:erlang.${function.atomValue()}/${toString(arity)}"
                                                     else -> TODO("Don' know how to convert $rewrittenFunction to capture string")
                                                 }
 
@@ -1550,21 +1551,19 @@ object Macro {
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/exception.ex#L310-L311
     private inline fun <T> ifErlangRewriteTo(term: OtpErlangObject,
                                              crossinline transformer: (OtpErlangObject) -> T): T? =
-            ifTupleTo(term, 3) { call ->
-                ifTagged3TupleTo(call.elementAt(0), ".") { qualified ->
-                    (qualified.elementAt(2) as? OtpErlangList)?.let { arguments ->
-                        if (arguments.arity() == 2 && arguments.elementAt(0) == OtpErlangAtom("erlang")) {
-                            transformer(
-                                    otpErlangTuple(
-                                            rewriteGuardCall(arguments.elementAt(1)),
-                                            call.elementAt(1),
-                                            call.elementAt(2)
-                                    )
-                            )
-                        } else {
-                            null
-                        }
+            ifCallConvertTo(term) { module, function, arguments ->
+                if (module.atomValue() == "erlang" && arguments.arity() == 2) {
+                    rewriteGuardCall(function)?.let { rewritten ->
+                        transformer(
+                                otpErlangTuple(
+                                        rewritten,
+                                        OtpErlangList(),
+                                        arguments
+                                )
+                        )
                     }
+                } else {
+                    null
                 }
             }
 
@@ -1577,7 +1576,7 @@ object Macro {
             }
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/exception.ex#L318-L329
-    private fun rewriteGuardCall(operator: OtpErlangAtom): OtpErlangObject =
+    private fun rewriteGuardCall(operator: OtpErlangAtom): OtpErlangObject? =
             when (operator.atomValue()) {
                 "orelse" -> OtpErlangAtom("or")
                 "andalso" -> OtpErlangAtom("and")
@@ -1593,21 +1592,7 @@ object Macro {
                                     OtpErlangAtom("Elixir.Bitwise"), operator
                             ))
                     ))
-                "xor", "element", "size" ->
-                    OtpErlangTuple(arrayOf(
-                            OtpErlangAtom("."),
-                            OtpErlangList(),
-                            OtpErlangList(arrayOf(
-                                    OtpErlangAtom("erlang"), operator
-                            ))
-                    ))
-                else -> operator
-            }
-
-    fun rewriteGuardCall(guardCall: OtpErlangObject): OtpErlangObject =
-            when (guardCall) {
-                is OtpErlangAtom -> rewriteGuardCall(guardCall)
-                else -> guardCall
+                else -> null
             }
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex#L873-L882
