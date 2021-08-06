@@ -428,7 +428,8 @@ object Macro {
             ifSymbolicAndRewriteTo(term) { toString(it) } ?:
             ifWordAndRewriteTo(term) { toString(it) } ?:
             ifWordOrRewriteTo(term) { toString(it) } ?:
-            ifIfRewriteTo(term) { toString(it) }
+            ifIfRewriteTo(term) { toString(it) } ?:
+            ifMatchQuestionRewriteTo(term) { toString(it) }
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex?utf8=%E2%9C%93#L681-L687
     private fun otherCallToString(tuple: OtpErlangTuple): String? {
@@ -1451,6 +1452,38 @@ object Macro {
                    null
                }
            }
+
+    private inline fun <T> ifMatchQuestionRewriteTo(term: OtpErlangObject,
+                                                    crossinline transformer: (OtpErlangObject) -> T): T? =
+            ifCaseTo(term) { argument, clauses ->
+                if (clauses.arity() == 2) {
+                    ifCaseClauseTo(clauses.elementAt(0)) { trueInput, trueOutput ->
+                        if (trueInput is OtpErlangList && trueInput.arity() == 1 &&
+                                trueOutput is OtpErlangAtom && trueOutput.atomValue() == "true") {
+                            ifDefaultClauseReturn(clauses.elementAt(1))?.let { defaultReturn ->
+                                if (defaultReturn is OtpErlangAtom && defaultReturn.atomValue() == "false") {
+                                    transformer(
+                                            otpErlangTuple(
+                                                    OtpErlangAtom("match?"),
+                                                    OtpErlangList(),
+                                                    otpErlangList(
+                                                            trueInput.elementAt(0),
+                                                            argument
+                                                    )
+                                            )
+                                    )
+                                } else {
+                                    null
+                                }
+                            }
+                        } else {
+                            null
+                        }
+                    }
+                } else {
+                    null
+                }
+            }
 
     private inline fun <T> ifCaseTo(term: OtpErlangObject,
                                     crossinline transformer: (argument: OtpErlangObject, clauses: OtpErlangList) -> T): T? =
