@@ -1422,19 +1422,29 @@ object Macro {
                if (clauses.arity() == 2) {
                    ifFalsyCaseClauseTo(clauses.elementAt(0)) { _, trueBranch ->
                        ifDefaultClauseReturn(clauses.elementAt(1))?.let { falseBranch ->
-                           transformer(
-                                   otpErlangTuple(
-                                           OtpErlangAtom("if"),
-                                           OtpErlangList(),
-                                           otpErlangList(
-                                                   condition,
-                                                   otpErlangList(
-                                                           otpErlangTuple(OtpErlangAtom("do"), trueBranch),
-                                                           otpErlangTuple(OtpErlangAtom("else"), falseBranch)
-                                                   )
-                                           )
-                                   )
-                           )
+                           if (trueBranch == OtpErlangAtom("true") && falseBranch == OtpErlangAtom("false")) {
+                               transformer(
+                                       otpErlangTuple(
+                                               OtpErlangAtom("!"),
+                                               OtpErlangList(),
+                                               otpErlangList(condition)
+                                       )
+                               )
+                           } else {
+                               transformer(
+                                       otpErlangTuple(
+                                               OtpErlangAtom("if"),
+                                               OtpErlangList(),
+                                               otpErlangList(
+                                                       condition,
+                                                       otpErlangList(
+                                                               otpErlangTuple(OtpErlangAtom("do"), trueBranch),
+                                                               otpErlangTuple(OtpErlangAtom("else"), falseBranch)
+                                                       )
+                                               )
+                                       )
+                               )
+                           }
                        }
                    }
                } else {
