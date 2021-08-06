@@ -1581,6 +1581,7 @@ object Macro {
                 "orelse" -> OtpErlangAtom("or")
                 "andalso" -> OtpErlangAtom("and")
                 "=<" -> OtpErlangAtom("<=")
+                "==" -> operator
                 "/=" -> OtpErlangAtom("!=")
                 "=:=" -> OtpErlangAtom("===")
                 "=/=" -> OtpErlangAtom("!==")
