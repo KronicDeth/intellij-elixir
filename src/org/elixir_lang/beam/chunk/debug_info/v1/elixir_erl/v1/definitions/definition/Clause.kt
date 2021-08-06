@@ -37,7 +37,13 @@ class Clause(
 
     fun toMacroString(): String? =
         definition.macro?.let { macro ->
-            "$macro $signature do\n${Macro.toString(block).prependIndent("  ")}\nend"
+            val blockMacroString = try {
+                Macro.toString(block)
+            } catch (stackOverflowError: StackOverflowError) {
+                "# Body not decompiled due to stack overflow in Macro."
+            }
+
+            "$macro $signature do\n${blockMacroString.prependIndent("  ")}\nend"
         }
 
     companion object {
