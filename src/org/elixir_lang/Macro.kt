@@ -1603,7 +1603,7 @@ object Macro {
                 ifTagged3TupleTo(call, ".") { tuple ->
                     (tuple.elementAt(2) as? OtpErlangList)?.let { arguments ->
                         if (arguments.arity() == 1) {
-                            moduleToString(arguments.elementAt(0))
+                            "${moduleToString(arguments.elementAt(0))}."
                         } else {
                             null
                         }
