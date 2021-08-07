@@ -309,7 +309,7 @@ object Macro {
                                     ifCallConvertTo(call) { module, function, arguments ->
                                         if (arguments.arity() == 0 && arity is OtpErlangLong) {
                                             if (module.atomValue() == "erlang") {
-                                                val rewrittenFunction = rewriteGuardCall(function)
+                                                val rewrittenFunction = ifModuleFunctionRewriteTo(module, function, arity.intValue())
 
                                                 when (rewrittenFunction) {
                                                     is OtpErlangAtom -> "&${rewrittenFunction.atomValue()}/${toString(arity)}"
@@ -421,8 +421,15 @@ object Macro {
             }
 
     private fun ifDeinlineToString(term: OtpErlangTuple): String? =
+            ifErlangAtomToBinaryRewriteTo(term) { toString(it) } ?:
+            ifErlangBinaryToAtomRewriteTo(term) { toString(it) } ?:
             ifErlangElementRewriteTo(term) { toString(it) } ?:
             ifErlangErrorRewriteTo(term) { toString(it) } ?:
+            ifErlangGroupLeaderRewriteTo(term) { toString(it) } ?:
+            ifErlangIntegerToBinaryRewriteTo(term) { toString(it) } ?:
+            ifErlangMonitorProcessRewriteTo(term) { toString(it) } ?:
+            ifErlangSendAfterRewriteTo(term) { toString(it) } ?:
+            ifErlangSetElementRewriteTo(term) { toString(it) } ?:
             ifErlangRewriteTo(term) { toString(it) } ?:
             ifMapsIsKeyRewriteTo(term) { toString(it) } ?:
             ifMapsMergeRewriteTo(term) { toString(it) } ?:
@@ -1172,6 +1179,55 @@ object Macro {
                 null
             }
         }
+    private inline fun <T> ifErlangAtomToBinaryRewriteTo(macro: OtpErlangObject,
+                                                         crossinline  transformer: (OtpErlangObject) -> T): T? =
+            ifCallConvertArgumentsTo(macro, "erlang", "atom_to_binary") { arguments ->
+                if (arguments.arity() == 2 && arguments.elementAt(1) == OtpErlangAtom("utf8")) {
+                    transformer(
+                            otpErlangTuple(
+                                    otpErlangTuple(
+                                            OtpErlangAtom("."),
+                                            OtpErlangList(),
+                                            otpErlangList(
+                                                    OtpErlangAtom("Elixir.Atom"),
+                                                    OtpErlangAtom("to_string")
+                                            )
+                                    ),
+                                    OtpErlangList(),
+                                    otpErlangList(
+                                            arguments.elementAt(0)
+                                    )
+                            )
+                    )
+                } else {
+                    null
+                }
+            }
+
+    private inline fun <T> ifErlangBinaryToAtomRewriteTo(macro: OtpErlangObject,
+                                                         crossinline  transformer: (OtpErlangObject) -> T): T? =
+            ifCallConvertArgumentsTo(macro, "erlang", "binary_to_atom") { arguments ->
+                if (arguments.arity() == 2 && arguments.elementAt(1) == OtpErlangAtom("utf8")) {
+                    transformer(
+                            otpErlangTuple(
+                                    otpErlangTuple(
+                                            OtpErlangAtom("."),
+                                            OtpErlangList(),
+                                            otpErlangList(
+                                                    OtpErlangAtom("Elixir.String"),
+                                                    OtpErlangAtom("to_atom")
+                                            )
+                                    ),
+                                    OtpErlangList(),
+                                    otpErlangList(
+                                            arguments.elementAt(0)
+                                    )
+                            )
+                    )
+                } else {
+                    null
+                }
+            }
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/exception.ex#L304-L308
     private inline fun <T> ifErlangElementRewriteTo(macro: OtpErlangObject,
@@ -1206,7 +1262,24 @@ object Macro {
                         } else {
                             null
                         }
-                    }
+                    } ?:
+                    transformer(
+                            otpErlangTuple(
+                                    OtpErlangAtom("elem"),
+                                    OtpErlangList(),
+                                    otpErlangList(
+                                            second,
+                                            otpErlangTuple(
+                                                    OtpErlangAtom("-"),
+                                                    OtpErlangList(),
+                                                    otpErlangList(
+                                                            first,
+                                                            OtpErlangLong(1)
+                                                    )
+                                            )
+                                    )
+                            )
+                    )
                 }
             }
 
@@ -1230,6 +1303,160 @@ object Macro {
                             null
                         }
                     }
+                }
+            }
+    private inline fun <T> ifErlangGroupLeaderRewriteTo(macro: OtpErlangObject,
+                                                        crossinline transformer: (OtpErlangObject) -> T): T? =
+            ifCallConvertArgumentsTo(macro, "erlang", "group_leader") { arguments ->
+                val reorderedArguments = when (arguments.arity()) {
+                    0 -> arguments
+                    2 -> {
+                        val (leader, pid) = arguments
+
+                        otpErlangList(pid, leader)
+                    }
+                    else -> null
+                }
+
+                if (reorderedArguments != null) {
+                    transformer(
+                            otpErlangTuple(
+                                    otpErlangTuple(
+                                            OtpErlangAtom("."),
+                                            OtpErlangList(),
+                                            otpErlangList(
+                                                    OtpErlangAtom("Elixir.Process"),
+                                                    OtpErlangAtom("group_leader")
+                                            )
+                                    ),
+                                    OtpErlangList(),
+                                    reorderedArguments
+                            )
+                    )
+                } else {
+                    null
+                }
+            }
+
+    private inline fun <T> ifErlangIntegerToBinaryRewriteTo(macro: OtpErlangObject,
+                                                            crossinline transformer: (OtpErlangObject) -> T): T? =
+            ifCallConvertArgumentsTo(macro, "erlang", "integer_to_binary") { arguments ->
+                when (arguments.arity()) {
+                    1, 2 -> transformer(
+                            otpErlangTuple(
+                                    otpErlangTuple(
+                                            OtpErlangAtom("."),
+                                            OtpErlangList(),
+                                            otpErlangList(
+                                                    OtpErlangAtom("Elixir.Integer"),
+                                                    OtpErlangAtom("to_string")
+                                            )
+                                    ),
+                                    OtpErlangList(),
+                                    arguments
+                            )
+                    )
+                    else -> null
+                }
+            }
+
+    private inline fun <T> ifErlangMonitorProcessRewriteTo(macro: OtpErlangObject,
+                                                           crossinline transformer: (OtpErlangObject) -> T): T? =
+            ifCallConvertArgumentsTo(macro, "erlang", "monitor") { arguments ->
+                if (arguments.arity() == 2 && arguments.elementAt(0) == OtpErlangAtom("process")) {
+                    transformer(
+                            otpErlangTuple(
+                                    otpErlangTuple(
+                                            OtpErlangAtom("."),
+                                            OtpErlangList(),
+                                            otpErlangList(
+                                                    OtpErlangAtom("Elixir.Process"),
+                                                    OtpErlangAtom("monitor")
+                                            )
+                                    ),
+                                    OtpErlangList(),
+                                    otpErlangList(
+                                            arguments.elementAt(1)
+                                    )
+                            )
+                    )
+                } else {
+                    null
+                }
+            }
+
+    private inline fun <T> ifErlangSendAfterRewriteTo(macro: OtpErlangObject,
+                                                      crossinline transformer: (OtpErlangObject) -> T): T? =
+            ifCallConvertArgumentsTo(macro, "erlang", "send_after") { arguments ->
+                val reorderedArguments = when (arguments.arity()) {
+                    3 -> {
+                        val (time, destination, message) = arguments
+
+                        otpErlangList(
+                                destination,
+                                message,
+                                time
+                        )
+                    }
+                        4 -> {
+                            val (time, destination, message, opts) = arguments
+
+                            otpErlangList(
+                                    destination,
+                                    message,
+                                    time,
+                                    opts
+                            )
+                        }
+                        else -> null
+                }
+
+                if (reorderedArguments != null) {
+                    transformer(
+                            otpErlangTuple(
+                                    otpErlangTuple(
+                                            OtpErlangAtom("."),
+                                            OtpErlangList(),
+                                            otpErlangList(
+                                                    OtpErlangAtom("Elixir.Process"),
+                                                    OtpErlangAtom("send_after")
+                                            )
+                                    ),
+                                    OtpErlangList(),
+                                    reorderedArguments
+                            )
+                    )
+                } else {
+                    null
+                }
+            }
+
+    private inline fun <T> ifErlangSetElementRewriteTo(macro: OtpErlangObject,
+                                                       crossinline transformer: (OtpErlangObject) -> T): T? =
+            ifCallConvertArgumentsTo(macro, "erlang", "setelement") { arguments ->
+                if (arguments.arity() == 3) {
+                    val (index, tuple, value) = arguments
+
+                    transformer(
+                            otpErlangTuple(
+                                    OtpErlangAtom("put_elem"),
+                                    OtpErlangList(),
+                                    otpErlangList(
+                                            tuple,
+                                            otpErlangTuple(
+                                                    OtpErlangAtom("-"),
+                                                    OtpErlangList(),
+                                                    otpErlangList(
+                                                            index,
+                                                            OtpErlangLong(1)
+                                                    )
+                                            ),
+                                            value
+                                    )
+                            )
+                    )
+                } else {
+                    null
                 }
             }
 
@@ -1552,18 +1779,14 @@ object Macro {
     private inline fun <T> ifErlangRewriteTo(term: OtpErlangObject,
                                              crossinline transformer: (OtpErlangObject) -> T): T? =
             ifCallConvertTo(term) { module, function, arguments ->
-                if (module.atomValue() == "erlang" && arguments.arity() == 2) {
-                    rewriteGuardCall(function)?.let { rewritten ->
-                        transformer(
-                                otpErlangTuple(
-                                        rewritten,
-                                        OtpErlangList(),
-                                        arguments
-                                )
-                        )
-                    }
-                } else {
-                    null
+                ifModuleFunctionRewriteTo(module, function, arguments.arity())?.let { rewritten ->
+                    transformer(
+                            otpErlangTuple(
+                                    rewritten,
+                                    OtpErlangList(),
+                                    arguments
+                            )
+                    )
                 }
             }
 
@@ -1576,23 +1799,124 @@ object Macro {
             }
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/exception.ex#L318-L329
-    private fun rewriteGuardCall(operator: OtpErlangAtom): OtpErlangObject? =
-            when (operator.atomValue()) {
-                "orelse" -> OtpErlangAtom("or")
-                "andalso" -> OtpErlangAtom("and")
-                "=<" -> OtpErlangAtom("<=")
-                "==" -> operator
-                "/=" -> OtpErlangAtom("!=")
-                "=:=" -> OtpErlangAtom("===")
-                "=/=" -> OtpErlangAtom("!==")
-                "band", "bor", "bnot", "bsl", "bsr", "bxor" ->
-                    OtpErlangTuple(arrayOf(
-                            OtpErlangAtom("."),
-                            OtpErlangList(),
-                            OtpErlangList(arrayOf(
-                                    OtpErlangAtom("Elixir.Bitwise"), operator
-                            ))
-                    ))
+    private fun ifModuleFunctionRewriteTo(module: OtpErlangAtom,
+                                          function: OtpErlangAtom,
+                                          arity: Int): OtpErlangObject? =
+            when (module.atomValue()) {
+                "erlang" -> when (function.atomValue()) {
+                    "self" -> when (arity) {
+                        0 -> function
+                        else -> null
+                    }
+                    "byte_size", "is_atom", "is_binary", "is_integer", "is_list", "is_pid", "is_map", "is_tuple",
+                    "length", "map_size", "node", "not" -> when (arity) {
+                        1 -> function
+                        else -> null
+                    }
+                    "+", "++", "-", "--", "<", "==", ">=", ">", "div", "min", "rem", "send" -> when (arity) {
+                        2 -> function
+                        else -> null
+                    }
+                    "process_flag" -> when (arity) {
+                        2, 3 -> otpErlangTuple(
+                                OtpErlangAtom("."),
+                                OtpErlangList(),
+                                otpErlangList(
+                                        OtpErlangAtom("Elixir.Process"),
+                                        OtpErlangAtom("flag")
+                                )
+                        )
+                        else -> null
+                    }
+                    "apply" -> when (arity) {
+                        2, 3 -> function
+                        else -> null
+                    }
+                    "binary_part" -> when (arity) {
+                        3 -> function
+                        else -> null
+                    }
+                    "fun_info" -> when (arity) {
+                        1, 2 -> otpErlangTuple(
+                                OtpErlangAtom("."),
+                                OtpErlangList(),
+                                otpErlangList(
+                                        OtpErlangAtom("Elixir.Function"),
+                                        OtpErlangAtom("info")
+                                )
+                        )
+                        else -> null
+                    }
+                    "=<" -> when (arity) {
+                        2 -> OtpErlangAtom("<=")
+                        else -> null
+                    }
+                    "/=" -> when (arity) {
+                        2 -> OtpErlangAtom("!=")
+                        else -> null
+                    }
+                    "=:=" -> when (arity) {
+                        2 -> OtpErlangAtom("===")
+                        else -> null
+                    }
+                    "=/=" -> when (arity) {
+                        2 -> OtpErlangAtom("!==")
+                        else -> null
+                    }
+                    "andalso" -> when (arity) {
+                        2 -> OtpErlangAtom("and")
+                        else -> null
+                    }
+                    "atom_to_list" -> when (arity) {
+                        1 -> otpErlangTuple(
+                                OtpErlangAtom("."),
+                                OtpErlangList(),
+                                otpErlangList(
+                                        OtpErlangAtom("Elixir.Atom"),
+                                        OtpErlangAtom("to_charlist")
+                                )
+                        )
+                        else -> null
+                    }
+                    "demonitor" -> when (arity) {
+                        2 -> otpErlangTuple(
+                                OtpErlangAtom("."),
+                                OtpErlangList(),
+                                otpErlangList(
+                                        OtpErlangAtom("Elixir.Process"),
+                                        function
+                                )
+                        )
+                        else -> null
+                    }
+                    "node" -> when(arity) {
+                        0 -> otpErlangTuple(
+                                OtpErlangAtom("."),
+                                OtpErlangList(),
+                                otpErlangList(
+                                        OtpErlangAtom("Elixir.Node"),
+                                        OtpErlangAtom("self")
+                                )
+                        )
+                        else -> null
+                    }
+                    "orelse" -> when (arity) {
+                        2 -> OtpErlangAtom("or")
+                        else -> null
+                    }
+                    "band", "bor", "bnot", "bsl", "bsr", "bxor" -> when (arity) {
+                        2 -> otpErlangTuple(
+                                OtpErlangAtom("."),
+                                OtpErlangList(),
+                                otpErlangList(
+                                        OtpErlangAtom("Elixir.Bitwise"),
+                                        function
+                                )
+                        )
+                        else -> null
+                    }
+                    else -> null
+                }
                 else -> null
             }
 
@@ -1831,3 +2155,5 @@ private fun OtpErlangObject.toOtpErlangList(): OtpErlangList =
 
 private operator fun OtpErlangList.component1(): OtpErlangObject = this.elementAt(0)
 private operator fun OtpErlangList.component2(): OtpErlangObject = this.elementAt(1)
+private operator fun OtpErlangList.component3(): OtpErlangObject = this.elementAt(2)
+private operator fun OtpErlangList.component4(): OtpErlangObject = this.elementAt(3)
