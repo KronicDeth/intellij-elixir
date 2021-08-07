@@ -808,7 +808,7 @@ object Macro {
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex#L578-L582
     private fun ifTupleContainerToString(macro: OtpErlangObject): String? =
             ifTagged3TupleTo(macro, "{}") { tuple ->
-                "{${(tuple.elementAt(2) as OtpErlangList).joinToString(", ") { toString(it) }}}"
+                "{${tuple.elementAt(2).toOtpErlangList().joinToString(", ") { toString(it) }}}"
             }
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex#L616-L626
