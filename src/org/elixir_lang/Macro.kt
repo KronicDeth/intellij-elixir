@@ -410,7 +410,7 @@ object Macro {
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex#L676-L693
     private fun ifCallToString(macro: OtpErlangObject): String? =
             ifTupleTo(macro, 3) { tuple: OtpErlangTuple ->
-                (tuple.elementAt(2) as? OtpErlangList)?.let {
+                tuple.elementAt(2).toOtpErlangList().let {
                     ifModuleAttributeDefinitionToString(tuple) ?:
                     ifUnaryCallToString(tuple) ?:
                     ifBinaryCallToString(tuple) ?:
@@ -441,8 +441,8 @@ object Macro {
             ifMatchQuestionRewriteTo(term) { toString(it) }
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex?utf8=%E2%9C%93#L681-L687
-    private fun otherCallToString(tuple: OtpErlangTuple): String? {
-        val arguments = tuple.elementAt(2) as OtpErlangList
+    private fun otherCallToString(tuple: OtpErlangTuple): String {
+        val arguments = tuple.elementAt(2).toOtpErlangList()
         val (list, last) = splitLast(arguments)
 
         return if (isKeywordBlocks(last)) {
