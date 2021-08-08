@@ -1585,22 +1585,29 @@ object Macro {
 
     private inline fun <T> ifWordAndRewriteTo(term: OtpErlangObject, crossinline transformer: (OtpErlangObject) -> T): T? =
             ifCaseTo(term) { arguments, clauses ->
-                if (clauses.arity() == 2) {
+                val clauseCount = clauses.arity()
+
+                if (clauseCount in 2..3) {
                     ifCaseClauseTo(clauses.elementAt(0)) { falseInput, falseOutput ->
                         if (falseInput.let { it as? OtpErlangList }?.singleOrNull() == OtpErlangAtom("false") &&
                                 falseOutput == OtpErlangAtom("false")) {
                             ifCaseClauseTo(clauses.elementAt(1)) { trueInput, trueOutput ->
                                 if (trueInput.let { it as? OtpErlangList }?.singleOrNull() == OtpErlangAtom("true")) {
-                                    transformer(
-                                            otpErlangTuple(
-                                                    OtpErlangAtom("and"),
-                                                    OtpErlangList(),
-                                                    otpErlangList(
-                                                            arguments,
-                                                            trueOutput
-                                                    )
-                                            )
-                                    )
+                                    if (clauseCount == 2 ||
+                                            (clauseCount == 3 && isBadBoolClause(clauses.elementAt(2)))) {
+                                        transformer(
+                                                otpErlangTuple(
+                                                        OtpErlangAtom("and"),
+                                                        OtpErlangList(),
+                                                        otpErlangList(
+                                                                arguments,
+                                                                trueOutput
+                                                        )
+                                                )
+                                        )
+                                    } else {
+                                        null
+                                    }
                                 } else {
                                     null
                                 }
@@ -1613,6 +1620,29 @@ object Macro {
                     null
                 }
             }
+
+    private fun isBadBoolClause(macro: OtpErlangObject): Boolean =
+        ifCaseClauseTo(macro) { otherInput, otherOutput ->
+            otherInput is OtpErlangList && otherInput.arity() == 1 && otherInput.elementAt(0).let { variable ->
+                isVariable(variable) && isErrorBadBool(otherOutput, variable)
+            }
+        } ?: false
+
+    private fun isErrorBadBool(macro: OtpErlangObject, variable: OtpErlangObject): Boolean =
+            ifCallConvertArgumentsTo(macro, "erlang", "error") { arguments ->
+                if (arguments.arity() == 1) {
+                    ifTupleTo(arguments.elementAt(0), 3) { tuple ->
+                        tuple.elementAt(2).let { it as? OtpErlangList }?.let { elements ->
+                            (elements.elementAt(0).let { it as? OtpErlangAtom }?.atomValue() == "badbool") &&
+                                    (elements.elementAt(1).let { it as? OtpErlangAtom }?.atomValue() == "and") &&
+                                    elements.elementAt(2) == variable
+                        }
+
+                    }
+                } else {
+                    null
+                }
+            } ?: false
 
     private inline fun <T> ifWordOrRewriteTo(term: OtpErlangObject, crossinline transformer: (OtpErlangObject) -> T): T? =
             ifCaseTo(term) { arguments, clauses ->
