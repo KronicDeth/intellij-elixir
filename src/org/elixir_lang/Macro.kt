@@ -2169,7 +2169,7 @@ object Macro {
                     post(macro, acc)
 }
 
-private fun OtpErlangObject.toOtpErlangList(): OtpErlangList =
+fun OtpErlangObject.toOtpErlangList(): OtpErlangList =
     when (this) {
         is OtpErlangList -> this
         is OtpErlangString -> this.stringValue().let(::OtpErlangList)

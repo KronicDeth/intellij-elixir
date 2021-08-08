@@ -10,6 +10,7 @@ import org.elixir_lang.beam.chunk.Keyword
 import org.elixir_lang.beam.chunk.debug_info.logger
 import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.definitions.Definition
 import org.elixir_lang.beam.term.inspect
+import org.elixir_lang.toOtpErlangList
 import java.lang.StringBuilder
 
 
@@ -21,7 +22,7 @@ class Clause(
         val block: OtpErlangObject
 ) {
     val metadata: Keyword? = org.elixir_lang.beam.chunk.from(metadata)
-    val arguments: OtpErlangList? = arguments as? OtpErlangList
+    val arguments: OtpErlangList = arguments.toOtpErlangList()
     private val guards: OtpErlangList? = guards as? OtpErlangList
     val signature: String by lazy {
         definition.macroNameArity?.let { macroNameArity ->
