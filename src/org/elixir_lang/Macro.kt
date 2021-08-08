@@ -724,8 +724,31 @@ object Macro {
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex#L585-L588
     private fun ifMapContainerToString(macro: OtpErlangObject): String? =
             ifTagged3TupleTo(macro, "%{}") { tuple ->
-                "%{${mapToString(tuple.elementAt(2) as OtpErlangList)}}"
+                val pairs = tuple.elementAt(2) as OtpErlangList
+                val (structName, fields) = structNameAndFields(pairs)
+
+                "%${structName}{${mapToString(fields)}}"
             }
+
+    private fun structNameAndFields(pairs: OtpErlangList): Pair<String, OtpErlangList> {
+        val (structPairs, fieldPairs) = pairs
+                .partition { pair ->
+                    pair is OtpErlangTuple && pair.arity() == 2 &&
+                            pair.elementAt(0).let { it as? OtpErlangAtom }?.atomValue() == "__struct__" &&
+                            pair.elementAt(1) is OtpErlangAtom
+                }
+
+        val structPair = structPairs.singleOrNull()
+
+        return if (structPair != null) {
+            val structNameAtom = structPair.let { it as OtpErlangTuple }.elementAt(1).let { it as OtpErlangAtom }
+            val structName = toString(structNameAtom)
+
+            Pair(structName, OtpErlangList(fieldPairs.toTypedArray()))
+        } else {
+            Pair("", pairs)
+        }
+    }
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex#L657-L660
     private fun ifNotInToString(macro: OtpErlangObject): String? =
