@@ -19,6 +19,7 @@ object Char {
         val codePoint = term.intValue()
 
         when (codePoint) {
+            '\\'.toInt() -> macroStringBuilder.append("\\\\")
             '\n'.toInt() -> macroStringBuilder.append("\\n")
             '\r'.toInt() -> macroStringBuilder.append("\\r")
             ' '.toInt() -> macroStringBuilder.append("\\s")
