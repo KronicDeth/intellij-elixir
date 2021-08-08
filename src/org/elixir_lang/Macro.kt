@@ -1866,7 +1866,7 @@ object Macro {
                         1 -> function
                         else -> null
                     }
-                    "*", "+", "++", "-", "--", "<", "==", ">=", ">", "div", "min", "rem", "send" -> when (arity) {
+                    "*", "/", "+", "++", "-", "--", "<", "==", ">=", ">", "div", "min", "rem", "send" -> when (arity) {
                         2 -> function
                         else -> null
                     }
