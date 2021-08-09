@@ -280,7 +280,17 @@ object Macro {
                         assert(argumentList.arity() == 2)
 
                         val (left, right) = argumentList
-                        val leftString = commaJoinOrEmptyParentheses(left.toOtpErlangList(), false)
+                        val leftList = left.toOtpErlangList()
+
+                        val leftCommaJoined = commaJoinOrEmptyParentheses(leftList, false)
+
+                        val leftString = if (leftList.arity() == 1) {
+                            ifCaseTo(leftList.elementAt(0)) { _, _ ->
+                                "($leftCommaJoined)"
+                            } ?: leftCommaJoined
+                        } else {
+                            leftCommaJoined
+                        }
 
                         "$leftString->\n  ${adjustNewLines(blockToString(right), "\n  ")}"
                     }
