@@ -182,11 +182,11 @@ object Query {
                     "select", "select_merge", "order_by" ->
                         executeOnSelectExpression(fromKeywords.keywordValue, state, keepProcessing)
                     // Can call Ecto.Query.API
-                    "having", "or_having", "or_where", "where" ->
-                        executeOnHavingOrWhereSelect(fromKeywords.keywordValue, state, keepProcessing)
+                    "having", "or_having", "or_where", "where", "on" ->
+                        executeOnHavingOrOnOrWhere(fromKeywords.keywordValue, state, keepProcessing)
                     // Cannot declare a reference variable
                     "as", "distinct", "except", "except_all", "hints", "group_by", "intersect", "intersect_all",
-                    "limit", "lock", "offset", "on", "prefix", "preload", "union", "union_all", "update",
+                    "limit", "lock", "offset", "prefix", "preload", "union", "union_all", "update",
                     "windows" -> true
                     else -> {
                         Logger.error(logger, "Don't know how to find reference variables for keyword key $keywordKeyText", fromKeywords)
@@ -259,7 +259,8 @@ object Query {
                         executeOnIn(arguments[arguments.lastIndex], state, keepProcessing)
                 // `join(query, qual, binding, expr, opts)` or `|> join(qual, binding, expr, opts)`
                 5 -> executeOnBinding(arguments[arguments.lastIndex - 2], state, keepProcessing) &&
-                        executeOnIn(arguments[arguments.lastIndex - 1], state.put(CALL, call), keepProcessing)
+                        executeOnIn(arguments[arguments.lastIndex - 1], state.put(CALL, call), keepProcessing) &&
+                        executeOnJoinOptions(arguments[arguments.lastIndex], state.put(CALL, call), keepProcessing)
                 else -> {
                     Logger.error(logger, "join arity outside of range (3..5)", call)
                     null
@@ -335,6 +336,27 @@ object Query {
             }
         }
 
+    private fun executeOnJoinOptions(options: PsiElement,
+                                     state: ResolveState,
+                                     keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
+            when (options) {
+                is QuotableKeywordList -> whileIn(options.quotableKeywordPairList()) {
+                    executeOnJoinOption(it, state, keepProcessing)
+                }
+                else -> true
+            }
+
+    private fun executeOnJoinOption(option: PsiElement,
+                                    state: ResolveState,
+                                    keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
+            when (option) {
+                is QuotableKeywordPair -> when (option.keywordKey.text) {
+                    "on" -> executeOnHavingOrOnOrWhere(option.keywordValue, state, keepProcessing)
+                    else -> true
+                }
+                else -> true
+            }
+
     /**
      * Whether `call` is an `assoc/2` call inside of a `join` statement
      */
@@ -375,9 +397,9 @@ object Query {
                 else -> true
             }
 
-    private fun executeOnHavingOrWhereSelect(element: PsiElement,
-                                             state: ResolveState,
-                                             keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
+    private fun executeOnHavingOrOnOrWhere(element: PsiElement,
+                                           state: ResolveState,
+                                           keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
             when (element) {
                 is Call -> keepProcessing(element, state)
                 else -> true
