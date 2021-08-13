@@ -313,7 +313,10 @@ object Query {
                 val elements = element.children
 
                 if (elements.size == 2) {
-                    executeOnBinding(elements[1], state, keepProcessing)
+                    // `src` in `{src, counter}`
+                    executeOnBinding(elements[0], state, keepProcessing)
+                            // `a` in `{^assoc, a}`
+                            && executeOnBinding(elements[1], state, keepProcessing)
                 } else {
                     Logger.error(
                             logger,
