@@ -11,12 +11,10 @@ import org.elixir_lang.EEx
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
-import org.elixir_lang.psi.call.name.Function.*
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.call.name.Module.KERNEL_SPECIAL_FORMS
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.hasDoBlockOrKeyword
-import org.elixir_lang.psi.impl.ProcessDeclarationsImpl.processDeclarations
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.call.macroChildCalls
 import org.elixir_lang.psi.impl.call.stabBodyChildExpressions
@@ -25,6 +23,7 @@ import org.elixir_lang.psi.impl.siblingExpressions
 import org.elixir_lang.psi.scope.WhileIn.whileIn
 import org.elixir_lang.structure_view.element.Callback
 import org.elixir_lang.structure_view.element.Delegation
+import org.elixir_lang.structure_view.element.modular.Implementation
 import org.elixir_lang.structure_view.element.modular.Module
 
 abstract class CallDefinitionClause : PsiScopeProcessor {
@@ -123,7 +122,7 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
 
                     true
                 }
-                Module.`is`(element) && moduleContainsEntrance(element, state) -> {
+                (Module.`is`(element) || Implementation.`is`(element)) && modularContainsEntrance(element, state) -> {
                     val childCalls = element.macroChildCalls()
 
                     for (childCall in childCalls) {
@@ -204,7 +203,7 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
                 }
             } ?: true
 
-    private fun moduleContainsEntrance(call: Call, state: ResolveState): Boolean = state.get(ENTRANCE)?.let { entrance ->
+    private fun modularContainsEntrance(call: Call, state: ResolveState): Boolean = state.get(ENTRANCE)?.let { entrance ->
         val callFile = call.containingFile
 
         if (callFile == entrance.containingFile) {

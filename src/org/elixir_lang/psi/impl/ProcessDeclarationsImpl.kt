@@ -22,6 +22,7 @@ import org.elixir_lang.psi.scope.WhileIn.whileIn
 import org.elixir_lang.reference.ModuleAttribute
 import org.elixir_lang.structure_view.element.Callback
 import org.elixir_lang.structure_view.element.Delegation
+import org.elixir_lang.structure_view.element.modular.Implementation
 import org.elixir_lang.structure_view.element.modular.Module
 
 object ProcessDeclarationsImpl {
@@ -128,6 +129,7 @@ object ProcessDeclarationsImpl {
                             Exception.`is`(call) ||
                             Import.`is`(call) ||
                             Module.`is`(call) || // module Alias
+                            Implementation.`is`(call) ||
                             Use.`is`(call) ||
                             call.isCalling(KERNEL, DESTRUCTURE) || // left operand
                             call.isCallingMacro(KERNEL, IF) || // match in condition
