@@ -40,6 +40,11 @@ object QuoteMacro {
 
                     Import.callDefinitionClauseCallWhile(childCall, childResolveState, keepProcessing)
                 }
+                Unless.`is`(childCall) -> {
+                    val childResolveState = resolveState.putVisitedElement(childCall)
+
+                    Unless.treeWalkUp(childCall, childResolveState, keepProcessing)
+                }
                 Unquote.`is`(childCall) -> {
                     val childResolveState = resolveState.putVisitedElement(childCall)
 
@@ -50,7 +55,7 @@ object QuoteMacro {
 
                     Use.treeWalkUp(childCall, childResolveState, keepProcessing)
                 }
-                childCall.isCalling(KERNEL, UNLESS) || childCall.isCalling(KERNEL, TRY) -> {
+                childCall.isCalling(KERNEL, TRY) -> {
                     childCall.whileInStabBodyChildExpressions { grandChildExpression ->
                         keepProcessing(grandChildExpression, resolveState)
                     }

@@ -149,8 +149,8 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
 
                     true
                 }
-                element.isCalling(KERNEL, UNLESS) ||
-                        element.isCalling(KERNEL, TRY) -> {
+                Unless.`is`(element) -> Unless.treeWalkUp(element, state, ::execute)
+                element.isCalling(KERNEL, TRY) -> {
                     element.whileInStabBodyChildExpressions { childExpression ->
                         execute(childExpression, state)
                     }
