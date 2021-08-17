@@ -11,6 +11,7 @@ import org.elixir_lang.EEx
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
+import org.elixir_lang.psi.call.name.Function.*
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.call.name.Module.KERNEL_SPECIAL_FORMS
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
@@ -18,6 +19,7 @@ import org.elixir_lang.psi.impl.ElixirPsiImplUtil.hasDoBlockOrKeyword
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.call.macroChildCalls
 import org.elixir_lang.psi.impl.call.stabBodyChildExpressions
+import org.elixir_lang.psi.impl.call.whileInStabBodyChildExpressions
 import org.elixir_lang.psi.impl.keywordValue
 import org.elixir_lang.psi.impl.siblingExpressions
 import org.elixir_lang.psi.scope.WhileIn.whileIn
@@ -105,6 +107,7 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
                 Delegation.`is`(element) -> executeOnDelegation(element, state)
                 Exception.`is`(element) -> executeOnException(element, state)
                 For.`is`(element) -> For.treeWalkDown(element, state, ::execute)
+                If.`is`(element) -> If.treeWalkUp(element, state, ::execute)
                 Import.`is`(element) -> {
                     val importState = state.put(IMPORT_CALL, element).putVisitedElement(element)
 
@@ -145,6 +148,12 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
                     Use.treeWalkUp(element, useState, ::execute)
 
                     true
+                }
+                element.isCalling(KERNEL, UNLESS) ||
+                        element.isCalling(KERNEL, TRY) -> {
+                    element.whileInStabBodyChildExpressions { childExpression ->
+                        execute(childExpression, state)
+                    }
                 }
                 org.elixir_lang.ecto.Schema.`is`(element, state) -> {
                     org.elixir_lang.ecto.Schema.treeWalkUp(element, state, ::execute)

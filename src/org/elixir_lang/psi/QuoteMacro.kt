@@ -3,7 +3,7 @@ package org.elixir_lang.psi
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import org.elixir_lang.psi.call.Call
-import org.elixir_lang.psi.call.name.Function.QUOTE
+import org.elixir_lang.psi.call.name.Function.*
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.call.macroChildCallSequence
 import org.elixir_lang.psi.impl.call.whileInStabBodyChildExpressions
@@ -27,6 +27,11 @@ object QuoteMacro {
 
         for (childCall in childCallSequence) {
             accumulatorKeepProcessing = when {
+                If.`is`(childCall) -> {
+                    val childResolveState = resolveState.putVisitedElement(childCall)
+
+                    If.treeWalkUp(childCall, childResolveState, keepProcessing)
+                }
                 Import.`is`(childCall) -> {
                     val childResolveState =
                             resolveState
@@ -45,9 +50,7 @@ object QuoteMacro {
 
                     Use.treeWalkUp(childCall, childResolveState, keepProcessing)
                 }
-                childCall.isCalling(KERNEL, "if") ||
-                        childCall.isCalling(KERNEL, "unless") ||
-                        childCall.isCalling(KERNEL, "try") -> {
+                childCall.isCalling(KERNEL, UNLESS) || childCall.isCalling(KERNEL, TRY) -> {
                     childCall.whileInStabBodyChildExpressions { grandChildExpression ->
                         keepProcessing(grandChildExpression, resolveState)
                     }

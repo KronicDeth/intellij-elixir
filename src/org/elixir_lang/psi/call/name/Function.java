@@ -30,6 +30,7 @@ public class Function {
     public static final String QUOTE = Quote.FUNCTION;
     public static final String RECEIVE = "receive";
     public static final String REQUIRE = "require";
+    public static final String TRY = "try";
     public static final String UNLESS = "unless";
     public static final String UNQUOTE = "unquote";
     public static final String USE = "use";
