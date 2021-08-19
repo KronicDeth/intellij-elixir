@@ -49,9 +49,21 @@ object CanonicallyNamedImpl {
                     stubBased
                             .let { Implementation.forNameElement(it) }
                             ?.let { forNameCollection(it) }
-                            ?.map { "$prefix${it}" }
+                            ?.map { "$prefix$it" }
                             ?.toSet()
-                            ?: setOf("$prefix?")
+                            ?:
+                            enclosingModularMacroCall(stubBased)
+                                    ?.let { enclosingModularMacroCall ->
+                                        if (enclosingModularMacroCall is StubBased<*> && Module.`is`(enclosingModularMacroCall)) {
+                                            canonicalNameSet(enclosingModularMacroCall as StubBased<*>)
+                                        } else {
+                                            null
+                                        }
+                                    }
+                                    ?.map { "$prefix$it" }
+                                    ?.toSet()
+                            ?:
+                            setOf("$prefix?")
                 } else if (Module.`is`(stubBased)) {
                     setOf(org.elixir_lang.navigation.item_presentation.modular.Module.name(stubBased))
                 } else if (Protocol.`is`(stubBased)) {
