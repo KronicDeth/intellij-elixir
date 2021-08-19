@@ -46,7 +46,12 @@ fun definition(resolvedModuleName: String?, functionName: String?, resolvedFinal
         }
 
 fun definition(functionName: String?, resolvedFinalArity: Int, hasDoBlockOrKeyword: Boolean) =
-        if (resolvedFinalArity == 2 && hasDoBlockOrKeyword) {
+        if (resolvedFinalArity == 3 && hasDoBlockOrKeyword) {
+            when (functionName) {
+                DEFIMPL -> Definition.IMPLEMENTATION
+                else -> null
+            }
+        } else if (resolvedFinalArity == 2 && hasDoBlockOrKeyword) {
             when (functionName) {
                 DEF -> Definition.PUBLIC_FUNCTION
                 DEFP -> Definition.PRIVATE_FUNCTION
