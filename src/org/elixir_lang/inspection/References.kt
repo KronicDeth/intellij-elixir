@@ -29,6 +29,14 @@ class References : LocalInspectionTool() {
             override fun visitMatchedQualifiedNoArgumentsCall(qualifiedNoArgumentsCall: ElixirMatchedQualifiedNoArgumentsCall) =
                 visitQualifiedNoArgumentsCall(qualifiedNoArgumentsCall)
 
+            override fun visitMatchedQualifiedParenthesesCall(qualifiedParenthesesCall: ElixirMatchedQualifiedParenthesesCall) {
+                visitQualifiedParenthesesCall(qualifiedParenthesesCall)
+            }
+
+            override fun visitUnmatchedQualifiedParenthesesCall(qualifiedParenthesesCall: ElixirUnmatchedQualifiedParenthesesCall) {
+                visitQualifiedParenthesesCall(qualifiedParenthesesCall)
+            }
+
             private fun visitCall(call: Call) {
                 call.reference?.let { reference -> registerProblem(call, reference) }
             }
@@ -46,6 +54,14 @@ class References : LocalInspectionTool() {
                     // Can't resolve keys or fields on the output of a function call
                     is QualifiedParenthesesCall<*> -> Unit
                     else -> visitCall(qualifiedNoArgumentsCall)
+                }
+            }
+
+            private fun visitQualifiedParenthesesCall(qualifiedParenthesesCall: QualifiedParenthesesCall<*>) {
+                when (qualifiedParenthesesCall.qualifier()) {
+                    // Can't resolve function calls except for invalid results on a variable
+                    is UnqualifiedNoArgumentsCall<*> -> Unit
+                    else -> visitCall(qualifiedParenthesesCall)
                 }
             }
 
