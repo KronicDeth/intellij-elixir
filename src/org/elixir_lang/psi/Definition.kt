@@ -10,6 +10,8 @@ enum class Definition(val type: Type) {
     PROTOCOL(Type.MODULAR),
     PUBLIC_FUNCTION(Type.CALLABLE),
     PRIVATE_FUNCTION(Type.CALLABLE),
+    PUBLIC_GUARD(Type.CALLABLE),
+    PRIVATE_GUARD(Type.CALLABLE),
     PUBLIC_MACRO(Type.CALLABLE),
     PRIVATE_MACRO(Type.CALLABLE);
 
@@ -59,6 +61,8 @@ fun definition(functionName: String?, resolvedFinalArity: Int, hasDoBlockOrKeywo
             when (functionName) {
                 DEF -> Definition.PUBLIC_FUNCTION
                 DEFP -> Definition.PRIVATE_FUNCTION
+                DEFGUARD -> Definition.PUBLIC_GUARD
+                DEFGUARDP -> Definition.PRIVATE_GUARD
                 DEFMACRO -> Definition.PUBLIC_MACRO
                 DEFMACROP -> Definition.PRIVATE_MACRO
                 else -> null
