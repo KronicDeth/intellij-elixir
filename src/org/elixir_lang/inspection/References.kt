@@ -29,6 +29,14 @@ class References : LocalInspectionTool() {
             override fun visitMatchedQualifiedNoArgumentsCall(qualifiedNoArgumentsCall: ElixirMatchedQualifiedNoArgumentsCall) =
                 visitQualifiedNoArgumentsCall(qualifiedNoArgumentsCall)
 
+            override fun visitMatchedQualifiedNoParenthesesCall(qualifiedNoParenthesesCall: ElixirMatchedQualifiedNoParenthesesCall) {
+                visitQualifiedNoParenthesesCall(qualifiedNoParenthesesCall)
+            }
+
+            override fun visitUnmatchedQualifiedNoParenthesesCall(qualifiedNoParenthesesCall: ElixirUnmatchedQualifiedNoParenthesesCall) {
+                visitQualifiedNoParenthesesCall(qualifiedNoParenthesesCall)
+            }
+
             override fun visitMatchedQualifiedParenthesesCall(qualifiedParenthesesCall: ElixirMatchedQualifiedParenthesesCall) {
                 visitQualifiedParenthesesCall(qualifiedParenthesesCall)
             }
@@ -56,6 +64,14 @@ class References : LocalInspectionTool() {
                     // Can't resolve keys or fields on the output of a function call
                     is QualifiedParenthesesCall<*> -> Unit
                     else -> visitCall(qualifiedNoArgumentsCall)
+                }
+            }
+
+            private fun visitQualifiedNoParenthesesCall(qualifiedNoParenthesesCall: QualifiedNoParenthesesCall<*>) {
+                when (qualifiedNoParenthesesCall.qualifier()) {
+                    // Can't resolve function chained of another call.
+                    is QualifiedParenthesesCall<*> -> Unit
+                    else -> visitCall(qualifiedNoParenthesesCall)
                 }
             }
 
