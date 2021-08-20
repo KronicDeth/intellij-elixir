@@ -60,7 +60,9 @@ class References : LocalInspectionTool() {
             private fun visitQualifiedParenthesesCall(qualifiedParenthesesCall: QualifiedParenthesesCall<*>) {
                 when (qualifiedParenthesesCall.qualifier()) {
                     // Can't resolve function calls except for invalid results on a variable
-                    is UnqualifiedNoArgumentsCall<*> -> Unit
+                    is UnqualifiedNoArgumentsCall<*>,
+                    // Can't resolve function calls except for invalid results on key or field
+                    is QualifiedNoArgumentsCall<*> -> Unit
                     else -> visitCall(qualifiedParenthesesCall)
                 }
             }
