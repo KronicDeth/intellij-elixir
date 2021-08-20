@@ -49,6 +49,8 @@ class References : LocalInspectionTool() {
                     is ElixirCaptureNumericOperation,
                     // Can't resolve keys or fields of a variable
                     is UnqualifiedNoArgumentsCall<*>,
+                    // Can't resolve keys or fields of a call output
+                    is UnqualifiedParenthesesCall<*>,
                     // Can't resolve a chain of keys or fields
                     is QualifiedNoArgumentsCall<*>,
                     // Can't resolve keys or fields on the output of a function call
