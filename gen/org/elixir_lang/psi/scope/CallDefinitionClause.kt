@@ -27,6 +27,7 @@ import org.elixir_lang.structure_view.element.Callback
 import org.elixir_lang.structure_view.element.Delegation
 import org.elixir_lang.structure_view.element.modular.Implementation
 import org.elixir_lang.structure_view.element.modular.Module
+import org.elixir_lang.structure_view.element.modular.Protocol
 
 abstract class CallDefinitionClause : PsiScopeProcessor {
     /*
@@ -125,7 +126,7 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
 
                     true
                 }
-                (Module.`is`(element) || Implementation.`is`(element)) && modularContainsEntrance(element, state) -> {
+                (Module.`is`(element) || Implementation.`is`(element) || Protocol.`is`(element)) && modularContainsEntrance(element, state) -> {
                     val childCalls = element.macroChildCalls()
 
                     for (childCall in childCalls) {
