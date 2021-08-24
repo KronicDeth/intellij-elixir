@@ -43,6 +43,7 @@ defmodule TeamCityExUnitFormatting do
     state
   end
 
+  def put_event(state = %__MODULE__{}, {:suite_finished, _opts}), do: state
   def put_event(state = %__MODULE__{}, {:suite_finished, _run_us, _load_us}), do: state
 
   def put_event(state = %__MODULE__{}, {:suite_started, opts}) do
