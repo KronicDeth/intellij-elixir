@@ -99,7 +99,7 @@ class Used : FileStructureNodeProvider<TreeElement>, ActionShortcutProvider {
                                     if (ancestor is Call) {
                                         val call = ancestor
 
-                                        if (Module.`is`(call)) {
+                                        if (org.elixir_lang.psi.Module.`is`(call)) {
                                             val module = Module(call)
                                             val childCalls = call.macroChildCalls()
 

@@ -26,7 +26,8 @@ public class MatchedDotCall extends Stub<ElixirMatchedDotCall> {
             int resolvedFinalArity,
             boolean hasDoBlockOrKeyword,
             @NotNull String name,
-            @NotNull Set<String> canonicalNameSet
+            @NotNull Set<String> canonicalNameSet,
+            @Nullable String implementedProtocolName
     ) {
         super(
                 parent,
@@ -36,7 +37,8 @@ public class MatchedDotCall extends Stub<ElixirMatchedDotCall> {
                 resolvedFinalArity,
                 hasDoBlockOrKeyword,
                 name,
-                canonicalNameSet
+                canonicalNameSet,
+                implementedProtocolName
         );
     }
 }

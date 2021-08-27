@@ -33,6 +33,7 @@
     primaryArguments
     primaryArity
     processDeclarations
+    protocolName
     quote
     resolvedFinalArity
     resolvedFinalArityInterval
@@ -64,6 +65,7 @@
     primaryArguments
     primaryArity
     processDeclarations
+    protocolName
     qualifier
     quote
     resolvedFinalArity
@@ -1815,6 +1817,7 @@ matchedUnqualifiedNoParenthesesCall ::= identifier noParenthesesOneArgument
                                             primaryArguments
                                             primaryArity
                                             processDeclarations
+                                            implementedProtocolName
                                             quote
                                             resolvedFinalArity
                                             resolvedFinalArityInterval
@@ -2661,6 +2664,7 @@ unmatchedUnqualifiedNoParenthesesCall ::= identifier noParenthesesOneArgument do
                                               primaryArguments
                                               primaryArity
                                               processDeclarations
+                                              implementedProtocolName
                                               quote
                                               resolvedFinalArity
                                               resolvedFinalArityInterval

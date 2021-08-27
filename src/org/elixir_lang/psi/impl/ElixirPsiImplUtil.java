@@ -1131,6 +1131,18 @@ public class ElixirPsiImplUtil {
         return PresentationImpl.getPresentation(qualifiableAlias);
     }
 
+    public static @Nullable String implementedProtocolName(@NotNull final Call call) {
+        String protocolName;
+
+        if (Implementation.is(call)) {
+            protocolName = Implementation.protocolName(call);
+        } else {
+            protocolName = null;
+        }
+
+        return protocolName;
+    }
+
     @Nullable
     public static PsiReference getReference(@NotNull AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
         return AtUnqualifiedNoParenthesesCallImplKt.getReference(atUnqualifiedNoParenthesesCall);

@@ -1,12 +1,12 @@
 package org.elixir_lang.psi.impl.call
 
+import org.elixir_lang.psi.Implementation
+import org.elixir_lang.psi.Implementation.forNameCollection
+import org.elixir_lang.psi.Module
+import org.elixir_lang.psi.Protocol
 import org.elixir_lang.psi.call.StubBased
 import org.elixir_lang.psi.stub.type.call.Stub.isModular
 import org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.enclosingModularMacroCall
-import org.elixir_lang.structure_view.element.modular.Implementation
-import org.elixir_lang.structure_view.element.modular.Implementation.Companion.forNameCollection
-import org.elixir_lang.structure_view.element.modular.Module
-import org.elixir_lang.structure_view.element.modular.Protocol
 
 object CanonicallyNamedImpl {
     fun canonicalName(stubBased: StubBased<*>): String? =
@@ -18,10 +18,8 @@ object CanonicallyNamedImpl {
 
                     "${protocolName ?: '?'}.${forName ?: '?'}"
                 }
-                Module.`is`(stubBased) ->
-                    org.elixir_lang.navigation.item_presentation.modular.Module.name(stubBased)
-                Protocol.`is`(stubBased) ->
-                    org.elixir_lang.navigation.item_presentation.modular.Module.name(stubBased)
+                Module.`is`(stubBased) -> Module.name(stubBased)
+                Protocol.`is`(stubBased) -> Module.name(stubBased)
                 else -> null
             }
 
@@ -65,9 +63,9 @@ object CanonicallyNamedImpl {
                             ?:
                             setOf("$prefix?")
                 } else if (Module.`is`(stubBased)) {
-                    setOf(org.elixir_lang.navigation.item_presentation.modular.Module.name(stubBased))
+                    setOf(Module.name(stubBased))
                 } else if (Protocol.`is`(stubBased)) {
-                    setOf(org.elixir_lang.navigation.item_presentation.modular.Module.name(stubBased))
+                    setOf(Module.name(stubBased))
                 } else {
                     setOf("?")
                 }

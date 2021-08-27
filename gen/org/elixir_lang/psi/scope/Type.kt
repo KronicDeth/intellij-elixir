@@ -13,6 +13,7 @@ import org.elixir_lang.beam.psi.impl.ModuleImpl
 import org.elixir_lang.debugger.node.ok_error.OKError
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
+import org.elixir_lang.psi.Module
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.qualification.Qualified
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
@@ -27,8 +28,6 @@ import org.elixir_lang.psi.stub.index.ModularName
 import org.elixir_lang.psi.stub.type.call.Stub.isModular
 import org.elixir_lang.reference.ModuleAttribute
 import org.elixir_lang.reference.ModuleAttribute.Companion.isTypeSpecName
-import org.elixir_lang.structure_view.element.modular.Module
-import org.elixir_lang.structure_view.element.modular.Protocol
 
 abstract class Type : PsiScopeProcessor {
     override fun execute(element: PsiElement, state: ResolveState): Boolean =

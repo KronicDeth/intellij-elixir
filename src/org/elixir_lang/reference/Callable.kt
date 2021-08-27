@@ -32,8 +32,6 @@ import org.elixir_lang.psi.operation.Type
 import org.elixir_lang.psi.qualification.Unqualified
 import org.elixir_lang.psi.scope.variable.Variants
 import org.elixir_lang.structure_view.element.Delegation
-import org.elixir_lang.structure_view.element.modular.Implementation
-import org.elixir_lang.structure_view.element.modular.Protocol
 import org.jetbrains.annotations.Contract
 import java.util.*
 
@@ -259,7 +257,7 @@ class Callable : PsiReferenceBase<Call>, PsiPolyVariantReference {
                 org.elixir_lang.psi.CallDefinitionClause.`is`(call) ||
                         Delegation.`is`(call) ||
                         Implementation.`is`(call) ||
-                        org.elixir_lang.structure_view.element.modular.Module.`is`(call) ||
+                        org.elixir_lang.psi.Module.`is`(call) ||
                         Protocol.`is`(call)
 
         @JvmStatic

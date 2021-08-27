@@ -72,6 +72,8 @@ public interface ElixirMatchedQualifiedParenthesesCall extends ElixirMatchedExpr
 
   boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place);
 
+  @Nullable String implementedProtocolName();
+
   @NotNull PsiElement qualifier();
 
   @NotNull OtpErlangObject quote();

@@ -8,16 +8,12 @@ import com.intellij.psi.PsiPolyVariantReferenceBase
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.impl.source.resolve.ResolveCache
 import org.apache.commons.lang.NotImplementedException
-import org.elixir_lang.psi.AtNonNumericOperation
-import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
-import org.elixir_lang.psi.ElementFactory
-import org.elixir_lang.psi.ElixirAtIdentifier
+import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil
 import org.elixir_lang.psi.impl.ancestorSequence
 import org.elixir_lang.psi.impl.prevSiblingSequence
 import org.elixir_lang.reference.resolver.ModuleAttribute
-import org.elixir_lang.structure_view.element.modular.Implementation
 
 class ModuleAttribute(psiElement: PsiElement) : PsiPolyVariantReferenceBase<PsiElement>(psiElement) {
     /**

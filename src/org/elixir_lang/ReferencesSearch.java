@@ -6,10 +6,10 @@ import com.intellij.psi.PsiPolyVariantReference;
 import com.intellij.psi.search.searches.ReferencesSearch.SearchParameters;
 import com.intellij.util.Processor;
 import kotlin.collections.CollectionsKt;
+import org.elixir_lang.psi.Implementation;
+import org.elixir_lang.psi.Module;
+import org.elixir_lang.psi.Protocol;
 import org.elixir_lang.psi.call.Named;
-import org.elixir_lang.structure_view.element.modular.Implementation;
-import org.elixir_lang.structure_view.element.modular.Module;
-import org.elixir_lang.structure_view.element.modular.Protocol;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;

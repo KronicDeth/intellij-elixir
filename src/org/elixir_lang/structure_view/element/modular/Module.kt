@@ -110,22 +110,6 @@ open class Module(protected val parent: Modular?, call: Call) : Element<Call>(ca
                     else -> null
                 }
 
-        @JvmStatic
-        fun `is`(call: Call): Boolean =
-                (call.isCallingMacro(KERNEL, DEFMODULE, 2) &&
-                        /**
-                         * See https://github.com/KronicDeth/intellij-elixir/issues/1301
-                         *
-                         * Check that the this is not the redefinition of defmodule in distillery
-                         */
-                        ApplicationManager
-                                .getApplication()
-                                .runReadAction(Computable {
-                                    call
-                                            .parent.let { it  as? Arguments }
-                                            ?.parent?.let { it as? Call }?.let { isMacro(it) }
-                                }) != true) ||
-                        call.isCalling(MODULE, CREATE, 3)
 
         @JvmStatic
         fun nameIdentifier(call: Call): PsiElement? = call.primaryArguments()?.firstOrNull()?.stripAccessExpression()
@@ -153,15 +137,15 @@ open class Module(protected val parent: Modular?, call: Call) : Element<Call>(ca
                         org.elixir_lang.psi.Exception.`is`(childCall) -> functionByNameArity.exception = Exception(modular, childCall)
                         org.elixir_lang.psi.CallDefinitionClause.isFunction(childCall) -> functionByNameArity.addClausesToCallDefinition(childCall)
                         CallDefinitionSpecification.`is`(childCall) -> functionByNameArity.addSpecificationToCallDefinition(childCall)
-                        Implementation.`is`(childCall) -> treeElementList.add(Implementation(modular, childCall))
+                        org.elixir_lang.psi.Implementation.`is`(childCall) -> treeElementList.add(Implementation(modular, childCall))
                         org.elixir_lang.psi.CallDefinitionClause.isMacro(childCall) -> macroByNameArity.addClausesToCallDefinition(childCall)
-                        Module.`is`(childCall) -> treeElementList.add(Module(modular, childCall))
+                        org.elixir_lang.psi. Module.`is`(childCall) -> treeElementList.add(Module(modular, childCall))
                         Overridable.`is`(childCall) -> {
                             val overridable = Overridable(modular, childCall)
                             overridableSet.add(overridable)
                             treeElementList.add(overridable)
                         }
-                        Protocol.`is`(childCall) -> treeElementList.add(Protocol(modular, childCall))
+                        org.elixir_lang.psi.Protocol.`is`(childCall) -> treeElementList.add(Protocol(modular, childCall))
                         QuoteMacro.`is`(childCall) -> treeElementList.add(Quote(modular, childCall))
                         Structure.`is`(childCall) -> treeElementList.add(Structure(modular, childCall))
                         Type.`is`(childCall) -> treeElementList.add(Type.fromCall(modular, childCall))

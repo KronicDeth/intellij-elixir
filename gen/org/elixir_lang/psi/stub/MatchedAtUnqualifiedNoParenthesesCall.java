@@ -19,7 +19,8 @@ public class MatchedAtUnqualifiedNoParenthesesCall extends Stub<ElixirMatchedAtU
             int resolvedFinalArity,
             boolean hasDoBlockOrKeyword,
             @NotNull String name,
-            @NotNull Set<String> canonicalNameSet
+            @NotNull Set<String> canonicalNameSet,
+            @Nullable String implementedProtocolName
     ) {
         super(
                 parent,
@@ -29,7 +30,8 @@ public class MatchedAtUnqualifiedNoParenthesesCall extends Stub<ElixirMatchedAtU
                 resolvedFinalArity,
                 hasDoBlockOrKeyword,
                 name,
-                canonicalNameSet
+                canonicalNameSet,
+                implementedProtocolName
         );
     }
 

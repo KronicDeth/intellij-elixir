@@ -12,9 +12,9 @@ import org.elixir_lang.psi.QuoteMacro;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.call.StubBased;
 import org.elixir_lang.psi.stub.index.AllName;
-import org.elixir_lang.structure_view.element.modular.Implementation;
-import org.elixir_lang.structure_view.element.modular.Module;
-import org.elixir_lang.structure_view.element.modular.Protocol;
+import org.elixir_lang.psi.Implementation;
+import org.elixir_lang.psi.Module;
+import org.elixir_lang.psi.Protocol;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -71,7 +71,7 @@ public class TestFinder implements com.intellij.testIntegration.TestFinder {
     }
 
     private static boolean isModular(@NotNull Call call) {
-        return Implementation.is(call) || Module.Companion.is(call) || Protocol.is(call) || QuoteMacro.is(call);
+        return Implementation.is(call) || Module.is(call) || Protocol.is(call) || QuoteMacro.is(call);
     }
 
     @Nullable
@@ -124,7 +124,7 @@ public class TestFinder implements com.intellij.testIntegration.TestFinder {
         return corresponding(
                 element,
                 canonicalName -> canonicalName + TEST_SUFFIX,
-                Module.Companion::is
+                Module::is
         );
     }
 

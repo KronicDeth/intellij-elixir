@@ -41,7 +41,8 @@ public class MatchedDotCall extends Stub<org.elixir_lang.psi.stub.MatchedDotCall
                 psi.resolvedFinalArity(),
                 psi.hasDoBlockOrKeyword(),
                 StringUtil.notNullize(psi.getName(), "?"),
-                psi.canonicalNameSet()
+                psi.canonicalNameSet(),
+                psi.implementedProtocolName()
         );
     }
 

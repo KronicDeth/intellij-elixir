@@ -41,11 +41,11 @@ public class File extends Element<ElixirFile> {
             List<TreeElement> treeElementList = new ArrayList<TreeElement>(calls.length);
 
             for (Call call : calls) {
-                if (Implementation.is(call)) {
+                if (org.elixir_lang.psi.Implementation.is(call)) {
                     treeElementList.add(new Implementation(call));
-                } else if (Module.Companion.is(call)) {
+                } else if (org.elixir_lang.psi.Module.is(call)) {
                     treeElementList.add(new Module(call));
-                } else if (Protocol.is(call)) {
+                } else if (org.elixir_lang.psi.Protocol.is(call)) {
                     treeElementList.add(new Protocol(call));
                 } else if (QuoteMacro.is(call)) {
                     treeElementList.add(new Quote(call));

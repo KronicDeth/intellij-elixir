@@ -82,6 +82,8 @@ class CallDefinitionStubImpl<T : CallDefinition> : StubbicBase<T>, CallDefinitio
      */
     override fun resolvedModuleName(): String = RESOLVED_MODULE_NAME
 
+    override val implementedProtocolName: String? = null
+
     /*
      * Fields
      */

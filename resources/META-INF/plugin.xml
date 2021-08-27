@@ -159,6 +159,11 @@
     <usageTargetProvider implementation="org.elixir_lang.UsageTargetProvider"/>
     <usageTypeProvider implementation="org.elixir_lang.UsageTypeProvider"/>
 
+    <!-- Go To Implementations -->
+
+    <stubIndex implementation="org.elixir_lang.psi.stub.index.ImplementedProtocolName"/>
+    <definitionsScopedSearch implementation="org.elixir_lang.DefinitionsScopedSearch"/>
+
     <!-- folding -->
     <applicationService serviceInterface="org.elixir_lang.folding.ElixirFoldingSettings"
                         serviceImplementation="org.elixir_lang.folding.ElixirFoldingSettings"/>

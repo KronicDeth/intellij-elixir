@@ -40,7 +40,8 @@ public class UnqualifiedNoParenthesesManyArgumentsCall extends Stub<org.elixir_l
                 psi.resolvedFinalArity(),
                 psi.hasDoBlockOrKeyword(),
                 StringUtil.notNullize(psi.getName(), "?"),
-                psi.canonicalNameSet()
+                psi.canonicalNameSet(),
+                psi.implementedProtocolName()
         );
     }
 

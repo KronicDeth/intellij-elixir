@@ -6,13 +6,10 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.ResolveState
 import org.elixir_lang.NameArity
 import org.elixir_lang.package_manager.DepGatherer
-import org.elixir_lang.psi.AccumulatorContinue
+import org.elixir_lang.psi.*
 import org.elixir_lang.psi.CallDefinitionClause.isFunction
 import org.elixir_lang.psi.CallDefinitionClause.isPublicFunction
 import org.elixir_lang.psi.CallDefinitionClause.nameArityInterval
-import org.elixir_lang.psi.ElixirFile
-import org.elixir_lang.psi.ElixirList
-import org.elixir_lang.psi.QuotableKeywordList
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.call.foldChildrenWhile
 import org.elixir_lang.psi.impl.call.macroChildCalls
@@ -29,7 +26,7 @@ class DepGatherer : DepGatherer() {
     }
 
     override fun visitElement(element: PsiElement) {
-        if (element is Call && org.elixir_lang.structure_view.element.modular.Module.`is`(element)) {
+        if (element is Call && Module.`is`(element)) {
             val childCalls = element.macroChildCalls()
 
             childCalls

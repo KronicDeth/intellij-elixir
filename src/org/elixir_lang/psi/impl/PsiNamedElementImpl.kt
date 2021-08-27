@@ -8,7 +8,6 @@ import org.elixir_lang.Name
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.UNQUOTE
-import org.elixir_lang.structure_view.element.modular.Implementation
 import org.jetbrains.annotations.Contract
 
 object PsiNamedElementImpl {

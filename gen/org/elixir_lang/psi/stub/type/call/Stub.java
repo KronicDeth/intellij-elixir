@@ -3,15 +3,15 @@ package org.elixir_lang.psi.stub.type.call;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.StubOutputStream;
 import org.elixir_lang.psi.CallDefinitionClause;
+import org.elixir_lang.psi.Implementation;
+import org.elixir_lang.psi.Module;
+import org.elixir_lang.psi.Protocol;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.call.StubBased;
 import org.elixir_lang.psi.stub.call.Deserialized;
 import org.elixir_lang.structure_view.element.CallDefinitionHead;
 import org.elixir_lang.structure_view.element.CallDefinitionSpecification;
 import org.elixir_lang.structure_view.element.Callback;
-import org.elixir_lang.structure_view.element.modular.Implementation;
-import org.elixir_lang.structure_view.element.modular.Module;
-import org.elixir_lang.structure_view.element.modular.Protocol;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -27,7 +27,7 @@ public abstract class Stub<Stub extends org.elixir_lang.psi.stub.call.Stub<Psi>,
     }
 
     public static boolean isModular(Call call) {
-        return Implementation.is(call) || Module.Companion.is(call) || Protocol.is(call);
+        return Implementation.is(call) || Module.is(call) || Protocol.is(call);
     }
 
     private boolean hasCanonicalNames(Call call) {

@@ -15,9 +15,7 @@ import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.hasKeywordKey
 import org.elixir_lang.reference.Callable
 import org.elixir_lang.structure_view.element.*
-import org.elixir_lang.structure_view.element.modular.Implementation
 import org.elixir_lang.structure_view.element.modular.Module
-import org.elixir_lang.structure_view.element.modular.Protocol
 import org.elixir_lang.structure_view.element.structure.Structure
 
 /**
@@ -144,7 +142,7 @@ class ElementDescriptionProvider : com.intellij.psi.ElementDescriptionProvider {
                 Exception.`is`(call) -> org.elixir_lang.structure_view.element.Exception.elementDescription(call, location)
                 Implementation.`is`(call) -> Implementation.elementDescription(location)
                 Import.`is`(call) -> Import.elementDescription(call, location)
-                Module.`is`(call) -> Module.elementDescription(call, location)
+                org.elixir_lang.psi.Module.`is`(call) -> Module.elementDescription(call, location)
                 Overridable.`is`(call) -> Overridable.elementDescription(call, location)
                 Protocol.`is`(call) -> Module.elementDescription(call, location)
                 QuoteMacro.`is`(call) -> org.elixir_lang.structure_view.element.Quote.elementDescription(call, location)

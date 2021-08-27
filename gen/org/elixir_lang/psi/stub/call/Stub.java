@@ -49,6 +49,8 @@ public class Stub<T extends org.elixir_lang.psi.call.StubBased> extends NamedStu
     private final StringRef resolvedModuleName;
     @Nullable
     private final Definition definition;
+    @Nullable
+    private final StringRef implementedProtocolName;
 
     /*
      * Constructors
@@ -61,7 +63,8 @@ public class Stub<T extends org.elixir_lang.psi.call.StubBased> extends NamedStu
                 int resolvedFinalArity,
                 boolean hasDoBlockOrKeyword,
                 @NotNull String name,
-                @NotNull Set<String> canonicalNameSet) {
+                @NotNull Set<String> canonicalNameSet,
+                @Nullable String implementedProtocolName) {
         this(
                 parent,
                 elementType,
@@ -70,7 +73,8 @@ public class Stub<T extends org.elixir_lang.psi.call.StubBased> extends NamedStu
                 resolvedFinalArity,
                 hasDoBlockOrKeyword,
                 StringRef.fromString(name),
-                setStringToSetStringRef(canonicalNameSet)
+                setStringToSetStringRef(canonicalNameSet),
+                StringRef.fromString(implementedProtocolName)
         );
     }
 
@@ -85,18 +89,20 @@ public class Stub<T extends org.elixir_lang.psi.call.StubBased> extends NamedStu
                 deserialized.resolvedFinalArity,
                 deserialized.hasDoBlockOrKeyword,
                 deserialized.name,
-                deserialized.canonicalNameSet
+                deserialized.canonicalNameSet,
+                deserialized.implementedProtocolName
         );
     }
 
     private Stub(StubElement parent,
-                @NotNull IStubElementType elementType,
-                @Nullable StringRef resolvedModuleName,
-                @Nullable StringRef resolvedFunctionName,
-                int resolvedFinalArity,
-                boolean hasDoBlockOrKeyword,
-                @NotNull StringRef name,
-                @NotNull Set<StringRef> canonicalNameSet) {
+                 @NotNull IStubElementType elementType,
+                 @Nullable StringRef resolvedModuleName,
+                 @Nullable StringRef resolvedFunctionName,
+                 int resolvedFinalArity,
+                 boolean hasDoBlockOrKeyword,
+                 @NotNull StringRef name,
+                 @NotNull Set<StringRef> canonicalNameSet,
+                 @Nullable StringRef implementedProtocolName) {
         super(parent, elementType, name);
         this.canonicalNameSet = canonicalNameSet;
         this.hasDoBlockOrKeyword = hasDoBlockOrKeyword;
@@ -104,6 +110,7 @@ public class Stub<T extends org.elixir_lang.psi.call.StubBased> extends NamedStu
         this.resolvedFunctionName = resolvedFunctionName;
         this.resolvedModuleName = resolvedModuleName;
         this.definition = definition(this.resolvedModuleName(), this.resolvedFunctionName(), resolvedFinalArity, hasDoBlockOrKeyword);
+        this.implementedProtocolName = implementedProtocolName;
     }
 
     /*
@@ -165,5 +172,11 @@ public class Stub<T extends org.elixir_lang.psi.call.StubBased> extends NamedStu
     @Override
     public Definition getDefinition() {
         return definition;
+    }
+
+    @Nullable
+    @Override
+    public String getImplementedProtocolName() {
+        return StringRef.toString(implementedProtocolName);
     }
 }

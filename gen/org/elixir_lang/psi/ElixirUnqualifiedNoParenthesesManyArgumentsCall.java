@@ -81,6 +81,8 @@ public interface ElixirUnqualifiedNoParenthesesManyArgumentsCall extends PsiElem
 
   boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place);
 
+  @Nullable String implementedProtocolName();
+
   @NotNull OtpErlangObject quote();
 
   int resolvedFinalArity();

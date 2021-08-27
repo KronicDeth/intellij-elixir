@@ -4,11 +4,13 @@ import com.intellij.psi.PsiNameIdentifierOwner
 import com.intellij.psi.stubs.IndexSink
 import com.intellij.psi.stubs.NamedStubBase
 import org.elixir_lang.psi.Definition
+import org.elixir_lang.psi.Implementation.protocolName
 import org.elixir_lang.psi.NamedElement
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.definition
 import org.elixir_lang.psi.stub.call.Stubbic
 import org.elixir_lang.psi.stub.index.AllName
+import org.elixir_lang.psi.stub.index.ImplementedProtocolName
 import org.elixir_lang.psi.stub.index.ModularName
 import org.jetbrains.annotations.NonNls
 
@@ -22,8 +24,18 @@ abstract class Named<S : NamedStubBase<T>, T : PsiNameIdentifierOwner>(@NonNls d
             if (name != null) {
                 sink.occurrence<NamedElement, String>(AllName.KEY, name)
 
-                if (stub is Call && definition(stub)?.type == Definition.Type.MODULAR) {
-                    sink.occurrence<NamedElement, String>(ModularName.KEY, name)
+                if (stub is Call) {
+                    definition(stub)?.let { definition ->
+                        if (definition.type == Definition.Type.MODULAR) {
+                            sink.occurrence<NamedElement, String>(ModularName.KEY, name)
+
+                            if (definition == Definition.IMPLEMENTATION) {
+                                protocolName(stub)?.let { implementedProtocolName ->
+                                    sink.occurrence<NamedElement, String>(ImplementedProtocolName.KEY, implementedProtocolName)
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -40,11 +52,21 @@ abstract class Named<S : NamedStubBase<T>, T : PsiNameIdentifierOwner>(@NonNls d
                 sink.occurrence<NamedElement, String>(AllName.KEY, name)
             }
 
-            if (stubbic.definition?.type == Definition.Type.MODULAR) {
-                nameSet.forEach { name ->
-                    sink.occurrence<NamedElement, String>(ModularName.KEY, name)
+            stubbic.definition?.let { definition ->
+                if (definition.type == Definition.Type.MODULAR) {
+                    nameSet.forEach { name ->
+                        sink.occurrence<NamedElement, String>(ModularName.KEY, name)
+                    }
+
+                    if (definition == Definition.IMPLEMENTATION) {
+                        stubbic.implementedProtocolName?.let { implementedProtocolName ->
+                            sink.occurrence<NamedElement, String>(ImplementedProtocolName.KEY, implementedProtocolName)
+                        }
+                    }
                 }
             }
+
+
         }
     }
 }

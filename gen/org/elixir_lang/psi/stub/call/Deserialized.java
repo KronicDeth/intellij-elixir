@@ -49,19 +49,23 @@ public class Deserialized {
     public final StringRef resolvedFunctionName;
     @Nullable
     public final StringRef resolvedModuleName;
+    @Nullable
+    public final StringRef implementedProtocolName;
 
     public Deserialized(@Nullable StringRef resolvedModuleName,
                         @Nullable StringRef resolvedFunctionName,
                         int resolvedFinalArity,
                         boolean hasDoBlockOrKeyword,
                         @NotNull StringRef name,
-                        @NotNull Set<StringRef> canonicalNameSet) {
+                        @NotNull Set<StringRef> canonicalNameSet,
+                        @Nullable StringRef implementedProtocolName) {
         this.resolvedModuleName = resolvedModuleName;
         this.resolvedFunctionName = resolvedFunctionName;
         this.resolvedFinalArity = resolvedFinalArity;
         this.hasDoBlockOrKeyword = hasDoBlockOrKeyword;
         this.name = name;
         this.canonicalNameSet = canonicalNameSet;
+        this.implementedProtocolName = implementedProtocolName;
     }
 
     public <T extends Stubbic> Deserialized(@NotNull T stubbic) {
@@ -71,7 +75,8 @@ public class Deserialized {
                 stubbic.resolvedFinalArity(),
                 stubbic.hasDoBlockOrKeyword(),
                 StringRef.fromNullableString(stubbic.getName()),
-                stringRefSet(stubbic.canonicalNameSet())
+                stringRefSet(stubbic.canonicalNameSet()),
+                StringRef.fromNullableString(stubbic.getImplementedProtocolName())
         );
     }
 
@@ -98,6 +103,7 @@ public class Deserialized {
         boolean hasDoBlockOrKeyword = deserializeHasDoBlockOrKeyword(stubInputStream);
         StringRef name = deserializeName(stubInputStream);
         Set<StringRef> canonicalNameSet = deserializeCanonicalNameSet(stubInputStream);
+        StringRef iplementedProtocolName = deserializeName(stubInputStream);
 
         assertGuard(stubInputStream, END);
 
@@ -107,7 +113,8 @@ public class Deserialized {
                 resolvedFinalArity,
                 hasDoBlockOrKeyword,
                 name,
-                canonicalNameSet
+                canonicalNameSet,
+                iplementedProtocolName
         );
     }
 
@@ -272,6 +279,7 @@ public class Deserialized {
                     serializeHasDoBlockOrKeyword(guardedStubOutputStream);
                     serializeName(guardedStubOutputStream);
                     serializeCanonicalNameSet(guardedStubOutputStream);
+                    serializeImplementedProtocolName(guardedStubOutputStream);
                 }
         );
     }
@@ -307,6 +315,10 @@ public class Deserialized {
 
     private void serializeResolvedModuleName(@NotNull StubOutputStream stubOutputStream) throws IOException {
         writeGuardedName(stubOutputStream, resolvedModuleName);
+    }
+
+    private void serializeImplementedProtocolName(@NotNull StubOutputStream stubOutputStream) throws IOException {
+        writeGuardedName(stubOutputStream, implementedProtocolName);
     }
 
     private void writeNameSet(@NotNull StubOutputStream stubOutputStream, @NotNull Set<StringRef> nameSet) throws IOException {
