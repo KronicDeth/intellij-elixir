@@ -131,6 +131,8 @@ object QualifiableAliasImpl {
             is QuotableKeywordPair,
             // containers
             is ElixirList, is ElixirStructOperation, is ElixirTuple,
+            // Top of file
+            is ElixirFile,
             // Typing an alias on a new line in the body of function
             is ElixirStabBody -> accumulator
             is ElixirAccessExpression, is ElixirMultipleAliases ->
