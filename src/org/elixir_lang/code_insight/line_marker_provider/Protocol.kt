@@ -12,13 +12,12 @@ import com.intellij.navigation.NavigationItem
 import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.NotNullLazyValue
 import com.intellij.openapi.util.text.StringUtil
-import com.intellij.psi.NavigatablePsiElement
-import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiFile
-import com.intellij.psi.SmartPsiElementPointer
+import com.intellij.psi.*
 import org.elixir_lang.Icons.PROTOCOL
+import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.Protocol
 import org.elixir_lang.psi.call.Call
+import org.elixir_lang.psi.impl.call.macroChildCallList
 import java.awt.event.MouseEvent
 import java.util.*
 import javax.swing.Icon
@@ -45,6 +44,40 @@ class Protocol : LineMarkerProvider {
                 ImplsGutterIconBuilder()
                         .setTargets(targets)
                         .createLineMarkerInfo(call)
+            } else if (CallDefinitionClause.`is`(call)) {
+                org.elixir_lang.structure_view.element.CallDefinitionClause.enclosingModularMacroCall(call)?.let { modularCall ->
+                    CallDefinitionClause.nameArityInterval(call, ResolveState.initial())?.let { protocolNameArityInterval ->
+                        if (Protocol.`is`(modularCall)) {
+                            val targets: NotNullLazyValue<Collection<PsiElement>> = NotNullLazyValue.createValue {
+                                val implementations = mutableListOf<PsiElement>()
+
+                                Protocol.processImplementations(modularCall) { defimpl ->
+                                    for (defimplChild in (defimpl as Call).macroChildCallList()) {
+                                        if (CallDefinitionClause.`is`(defimplChild)) {
+                                            CallDefinitionClause.nameArityInterval(defimplChild, ResolveState.initial())?.let { implNameArityInterval ->
+                                                if (implNameArityInterval.name == protocolNameArityInterval.name &&
+                                                        implNameArityInterval.arityInterval.overlaps(protocolNameArityInterval.arityInterval)) {
+                                                    implementations.add(defimplChild)
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    true
+                                }
+
+                                implementations
+                            }
+
+
+                            ImplsGutterIconBuilder()
+                                    .setTargets(targets)
+                                    .createLineMarkerInfo(call)
+                        } else {
+                            null
+                        }
+                    }
+                }
             } else {
                 null
             }
