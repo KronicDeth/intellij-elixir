@@ -163,6 +163,7 @@
 
     <stubIndex implementation="org.elixir_lang.psi.stub.index.ImplementedProtocolName"/>
     <definitionsScopedSearch implementation="org.elixir_lang.DefinitionsScopedSearch"/>
+    <codeInsight.lineMarkerProvider language="Elixir" implementationClass="org.elixir_lang.code_insight.line_marker_provider.Protocol"/>
 
     <!-- folding -->
     <applicationService serviceInterface="org.elixir_lang.folding.ElixirFoldingSettings"
