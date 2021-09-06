@@ -7,10 +7,10 @@ import org.elixir_lang.ArityRange
 import org.elixir_lang.find_usages.toPsiElementList
 import org.elixir_lang.psi.ArityInterval
 import org.elixir_lang.psi.CallDefinitionClause
+import org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall
 import org.elixir_lang.psi.CallDefinitionClause.nameArityInterval
 import org.elixir_lang.psi.Modular
 import org.elixir_lang.psi.call.Call
-import org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.enclosingModularMacroCall
 
 class Call(call: Call) : FindUsagesHandler(call) {
     private val _primaryElements by lazy {

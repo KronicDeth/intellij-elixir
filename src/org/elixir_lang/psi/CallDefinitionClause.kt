@@ -9,9 +9,34 @@ import org.elixir_lang.find_usages.Provider
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.*
 import org.elixir_lang.psi.call.name.Module.KERNEL
+import org.elixir_lang.psi.impl.enclosingMacroCall
 import org.elixir_lang.structure_view.element.CallDefinitionHead
 
 object CallDefinitionClause {
+    /**
+     * The enclosing macro call that acts as the modular scope of `call`.  Ignores enclosing `for` calls that
+     * [org.elixir_lang.psi.impl.PsiElementImplKt.enclosingMacroCall] doesn't.
+     *
+     * @param call a def(macro)?p?
+     */
+    @JvmStatic
+    fun enclosingModularMacroCall(call: Call): Call? {
+        var enclosedCall = call
+        var enclosingMacroCall: Call?
+
+        while (true) {
+            enclosingMacroCall = enclosedCall.enclosingMacroCall()
+
+            if (enclosingMacroCall != null && (enclosingMacroCall.isCalling(KERNEL, ALIAS) || For.`is`(enclosingMacroCall))) {
+                enclosedCall = enclosingMacroCall
+            } else {
+                break
+            }
+        }
+
+        return enclosingMacroCall
+    }
+
     /**
      * Description of element used in [Provider].
      *

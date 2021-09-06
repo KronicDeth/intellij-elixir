@@ -3,12 +3,16 @@ package org.elixir_lang.psi
 import com.intellij.psi.ElementDescriptionLocation
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNamedElement
+import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.psi.stubs.StubIndex
 import com.intellij.usageView.UsageViewTypeLocation
+import com.intellij.util.Processor
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.keywordValue
 import org.elixir_lang.psi.impl.stripAccessExpression
+import org.elixir_lang.psi.stub.index.ModularName
 import org.elixir_lang.structure_view.element.CallDefinitionClause
 import org.elixir_lang.structure_view.element.modular.Modular
 
@@ -82,6 +86,23 @@ object Implementation {
 
     fun forNameElement(call: Call): PsiElement? =
             call.finalArguments()?.lastOrNull()?.let { it as? QuotableKeywordList }?.keywordValue(Function.FOR)
+
+    fun processProtocols(defimpl: Call, consumer: Processor<in PsiElement>) {
+        protocolName(defimpl)?.let { protocolName ->
+            val project = defimpl.project
+
+            StubIndex
+                    .getInstance()
+                    .processElements(
+                            ModularName.KEY,
+                            protocolName,
+                            project,
+                            GlobalSearchScope.everythingScope(project),
+                            NamedElement::class.java,
+                            consumer
+                    )
+        }
+    }
 
     @JvmStatic
     fun protocolName(call: Call): String? = protocolNameElement(call)?.let { protocolName(it)  }

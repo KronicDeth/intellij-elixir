@@ -6,6 +6,7 @@ import com.intellij.psi.PsiElement
 import org.elixir_lang.Visibility
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.navigation.item_presentation.NameArity
+import org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall
 import org.elixir_lang.psi.CallDefinitionClause.head
 import org.elixir_lang.psi.CallDefinitionClause.isFunction
 import org.elixir_lang.psi.CallDefinitionClause.isMacro
@@ -107,30 +108,6 @@ class CallDefinitionClause(val callDefinition: CallDefinition, call: Call) :
                 enclosingModularMacroCall(call)?.let {
                     modular(it)
                 }
-
-        /**
-         * The enclosing macro call that acts as the modular scope of `call`.  Ignores enclosing `for` calls that
-         * [org.elixir_lang.psi.impl.PsiElementImplKt.enclosingMacroCall] doesn't.
-         *
-         * @param call a def(macro)?p?
-         */
-        @JvmStatic
-        fun enclosingModularMacroCall(call: Call): Call? {
-            var enclosedCall = call
-            var enclosingMacroCall: Call?
-
-            while (true) {
-                enclosingMacroCall = enclosedCall.enclosingMacroCall()
-
-                if (enclosingMacroCall != null && (enclosingMacroCall.isCalling(KERNEL, ALIAS) || For.`is`(enclosingMacroCall))) {
-                    enclosedCall = enclosingMacroCall
-                } else {
-                    break
-                }
-            }
-
-            return enclosingMacroCall
-        }
 
         @Contract(pure = true)
         fun modular(enclosingMacroCall: Call): Modular? {

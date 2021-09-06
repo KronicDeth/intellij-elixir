@@ -14,6 +14,17 @@ object Protocol {
             call.isCallingMacro(org.elixir_lang.psi.call.name.Module.KERNEL, Function.DEFPROTOCOL, 2)
 
     fun processImplementations(defprotocol: Call, consumer: Processor<in PsiElement>) {
-        StubIndex.getInstance().processElements(ImplementedProtocolName.KEY, Module.name(defprotocol), defprotocol.project, GlobalSearchScope.everythingScope(defprotocol.project), NamedElement::class.java, consumer)
+        val project = defprotocol.project
+
+        StubIndex
+                .getInstance()
+                .processElements(
+                        ImplementedProtocolName.KEY,
+                        Module.name(defprotocol),
+                        project,
+                        GlobalSearchScope.everythingScope(project),
+                        NamedElement::class.java,
+                        consumer
+                )
     }
 }

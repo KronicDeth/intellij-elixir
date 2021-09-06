@@ -6,10 +6,10 @@ import com.intellij.psi.ResolveState
 import com.intellij.util.Processor
 import com.intellij.psi.search.searches.DefinitionsScopedSearch
 import org.elixir_lang.psi.*
+import org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.call.macroChildCallList
 import org.elixir_lang.psi.impl.maybeModularNameToModulars
-import org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.enclosingModularMacroCall
 
 class DefinitionsScopedSearch : QueryExecutorBase<PsiElement, DefinitionsScopedSearch.SearchParameters>(/* readAction = */ true) {
     override fun processQuery(queryParameters: DefinitionsScopedSearch.SearchParameters, consumer: Processor<in PsiElement>) {

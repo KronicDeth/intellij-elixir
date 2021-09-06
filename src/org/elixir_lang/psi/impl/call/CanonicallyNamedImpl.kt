@@ -1,12 +1,12 @@
 package org.elixir_lang.psi.impl.call
 
+import org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall
 import org.elixir_lang.psi.Implementation
 import org.elixir_lang.psi.Implementation.forNameCollection
 import org.elixir_lang.psi.Module
 import org.elixir_lang.psi.Protocol
 import org.elixir_lang.psi.call.StubBased
 import org.elixir_lang.psi.stub.type.call.Stub.isModular
-import org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.enclosingModularMacroCall
 
 object CanonicallyNamedImpl {
     fun canonicalName(stubBased: StubBased<*>): String? =

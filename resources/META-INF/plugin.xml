@@ -165,6 +165,9 @@
     <definitionsScopedSearch implementation="org.elixir_lang.DefinitionsScopedSearch"/>
     <codeInsight.lineMarkerProvider language="Elixir" implementationClass="org.elixir_lang.code_insight.line_marker_provider.Protocol"/>
 
+    <!-- Go To Super Methods -->
+    <codeInsight.gotoSuper language="Elixir" implementationClass="org.elixir_lang.code_insight.GotoSuper"/>
+
     <!-- folding -->
     <applicationService serviceInterface="org.elixir_lang.folding.ElixirFoldingSettings"
                         serviceImplementation="org.elixir_lang.folding.ElixirFoldingSettings"/>

@@ -5,6 +5,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import com.intellij.psi.scope.PsiScopeProcessor
 import com.intellij.psi.util.PsiTreeUtil
+import org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall
 import org.elixir_lang.psi.Implementation
 import org.elixir_lang.psi.Implementation.forNameElement
 import org.elixir_lang.psi.call.Call
@@ -12,7 +13,6 @@ import org.elixir_lang.psi.call.name.Function.DEFMODULE
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.scope.ResolveResultOrderedSet
-import org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.enclosingModularMacroCall
 import org.elixir_lang.structure_view.element.modular.Module
 
 class For(private val validResult: Boolean) : PsiScopeProcessor {

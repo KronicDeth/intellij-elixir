@@ -6,6 +6,7 @@ import com.intellij.psi.ResolveState
 import com.intellij.psi.util.isAncestor
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.CallDefinitionClause
+import org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.qualification.Qualified
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil
@@ -30,7 +31,7 @@ fun resolvesToModularName(call: Call, state: ResolveState, modularName: String):
                         CallDefinitionClause.isMacro(resolved) &&
                                 // don't treat the signature as a call of the function
                                 !resolved.isAncestor(call) &&
-                                org.elixir_lang.structure_view.element.CallDefinitionClause.enclosingModularMacroCall(resolved)?.name  == modularName
+                                enclosingModularMacroCall(resolved)?.name  == modularName
                     } ?: false
                 } else {
                     false

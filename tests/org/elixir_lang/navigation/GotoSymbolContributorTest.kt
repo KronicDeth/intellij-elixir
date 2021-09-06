@@ -2,6 +2,7 @@ package org.elixir_lang.navigation
 
 import com.intellij.navigation.ChooseByNameRegistry
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
+import org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.structure_view.element.CallDefinitionClause
 
@@ -55,7 +56,7 @@ class GotoSymbolContributorTest : BasePlatformTestCase() {
 
         val call = elementAtCaret!!.parent.parent.parent.parent as Call
 
-        val enclosingModularMacroCall = CallDefinitionClause.enclosingModularMacroCall(call)
+        val enclosingModularMacroCall = enclosingModularMacroCall(call)
         assertNotNull(enclosingModularMacroCall)
 
         val modular = CallDefinitionClause.enclosingModular(call)
@@ -68,7 +69,7 @@ class GotoSymbolContributorTest : BasePlatformTestCase() {
 
         val call = elementAtCaret!!.parent.parent.parent as Call
 
-        val enclosingModularMacroCall = CallDefinitionClause.enclosingModularMacroCall(call)
+        val enclosingModularMacroCall = enclosingModularMacroCall(call)
         assertNotNull(enclosingModularMacroCall)
 
         val modular = CallDefinitionClause.enclosingModular(call)
@@ -81,7 +82,7 @@ class GotoSymbolContributorTest : BasePlatformTestCase() {
 
         val call = elementAtCaret!!.parent.parent.parent.parent as Call
 
-        val enclosingModularMacroCall = CallDefinitionClause.enclosingModularMacroCall(call)
+        val enclosingModularMacroCall = enclosingModularMacroCall(call)
         assertNotNull(enclosingModularMacroCall)
 
         val modular = CallDefinitionClause.enclosingModular(call)
@@ -94,7 +95,7 @@ class GotoSymbolContributorTest : BasePlatformTestCase() {
 
         val call = elementAtCaret!!.parent.parent.parent.parent as Call
 
-        val enclosingModularMacroCall = CallDefinitionClause.enclosingModularMacroCall(call)
+        val enclosingModularMacroCall = enclosingModularMacroCall(call)
         assertNotNull(enclosingModularMacroCall)
 
         val modular = CallDefinitionClause.enclosingModular(call)

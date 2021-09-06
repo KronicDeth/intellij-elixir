@@ -15,6 +15,7 @@ import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.*
 import org.elixir_lang.Icons.PROTOCOL
 import org.elixir_lang.psi.CallDefinitionClause
+import org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall
 import org.elixir_lang.psi.Protocol
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.call.macroChildCallList
@@ -45,7 +46,7 @@ class Protocol : LineMarkerProvider {
                         .setTargets(targets)
                         .createLineMarkerInfo(call)
             } else if (CallDefinitionClause.`is`(call)) {
-                org.elixir_lang.structure_view.element.CallDefinitionClause.enclosingModularMacroCall(call)?.let { modularCall ->
+                enclosingModularMacroCall(call)?.let { modularCall ->
                     CallDefinitionClause.nameArityInterval(call, ResolveState.initial())?.let { protocolNameArityInterval ->
                         if (Protocol.`is`(modularCall)) {
                             val targets: NotNullLazyValue<Collection<PsiElement>> = NotNullLazyValue.createValue {
