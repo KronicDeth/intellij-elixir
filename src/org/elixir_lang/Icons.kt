@@ -86,8 +86,6 @@ object Icons {
     @JvmField
     val FILE = IconLoader.getIcon("/icons/file/elixir.svg")
 
-    @JvmField
-    val IMPLEMENTATION: Icon = RowIconFactory.create(PlatformIcons.ANONYMOUS_CLASS_ICON, AllIcons.General.OverridingMethod)
 
     @JvmField
     val MIX_MODULE_CONFLICT = AllIcons.Actions.Cancel
@@ -101,8 +99,17 @@ object Icons {
     @JvmField
     val PARAMETER = AllIcons.Nodes.Parameter
 
-    @JvmField
-    val PROTOCOL: Icon = RowIconFactory.create(PlatformIcons.ANONYMOUS_CLASS_ICON, AllIcons.General.OverridenMethod)
+    object Protocol {
+        val Structure = IconLoader.getIcon("/icons/protocol.svg")
+        val GoToImplementations: Icon =AllIcons.Gutter.ImplementedMethod
+    }
+
+    object Implementation {
+        @JvmField
+        val Structure: Icon = AllIcons.Nodes.Interface
+        @JvmField
+        val GoToProtocols: Icon = IconLoader.getIcon("/icons/go_to_protocols.svg")
+    }
 
     @JvmField
     val STRUCTURE = AllIcons.Toolwindows.ToolWindowStructure

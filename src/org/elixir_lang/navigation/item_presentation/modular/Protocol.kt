@@ -12,7 +12,7 @@ class Protocol(location: String?, call: Call) : Module(location, call) {
     /**
      * The protocol icon
      */
-    override fun getIcon(unused: Boolean): Icon = Icons.PROTOCOL
+    override fun getIcon(unused: Boolean): Icon = Icons.Protocol.Structure
 
     override fun definer(): String = "defprotocol"
 }

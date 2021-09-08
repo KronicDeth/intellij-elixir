@@ -13,7 +13,7 @@ import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.NotNullLazyValue
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.*
-import org.elixir_lang.Icons.PROTOCOL
+import org.elixir_lang.Icons
 import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall
 import org.elixir_lang.psi.Protocol
@@ -83,7 +83,11 @@ class Protocol : LineMarkerProvider {
                 null
             }
     private class ImplsGutterIconBuilder() :
-            NavigationGutterIconBuilder<PsiElement>(PROTOCOL, DEFAULT_PSI_CONVERTOR, PSI_GOTO_RELATED_ITEM_PROVIDER) {
+            NavigationGutterIconBuilder<PsiElement>(
+                    Icons.Protocol.GoToImplementations,
+                    DEFAULT_PSI_CONVERTOR,
+                    PSI_GOTO_RELATED_ITEM_PROVIDER
+            ) {
 
         override fun createGutterIconRenderer(
                 pointers: NotNullLazyValue<List<SmartPsiElementPointer<*>>>,
