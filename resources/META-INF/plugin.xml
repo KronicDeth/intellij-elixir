@@ -167,6 +167,7 @@
 
     <!-- Go To Super Methods -->
     <codeInsight.gotoSuper language="Elixir" implementationClass="org.elixir_lang.code_insight.GotoSuper"/>
+    <codeInsight.lineMarkerProvider language="Elixir" implementationClass="org.elixir_lang.code_insight.line_marker_provider.Implementation"/>
 
     <!-- folding -->
     <applicationService serviceInterface="org.elixir_lang.folding.ElixirFoldingSettings"
