@@ -1,7 +1,13 @@
 package org.elixir_lang.inspection
 
-import com.intellij.codeInspection.*
-import com.intellij.psi.*
+import com.intellij.codeInspection.LocalInspectionTool
+import com.intellij.codeInspection.LocalInspectionToolSession
+import com.intellij.codeInspection.ProblemHighlightType
+import com.intellij.codeInspection.ProblemsHolder
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiElementVisitor
+import com.intellij.psi.PsiPolyVariantReference
+import com.intellij.psi.PsiReference
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 
@@ -24,10 +30,10 @@ class References : LocalInspectionTool() {
             }
 
             override fun visitUnmatchedQualifiedNoArgumentsCall(qualifiedNoArgumentsCall: ElixirUnmatchedQualifiedNoArgumentsCall) =
-                visitQualifiedNoArgumentsCall(qualifiedNoArgumentsCall)
+                    visitQualifiedNoArgumentsCall(qualifiedNoArgumentsCall)
 
             override fun visitMatchedQualifiedNoArgumentsCall(qualifiedNoArgumentsCall: ElixirMatchedQualifiedNoArgumentsCall) =
-                visitQualifiedNoArgumentsCall(qualifiedNoArgumentsCall)
+                    visitQualifiedNoArgumentsCall(qualifiedNoArgumentsCall)
 
             override fun visitMatchedQualifiedNoParenthesesCall(qualifiedNoParenthesesCall: ElixirMatchedQualifiedNoParenthesesCall) {
                 visitQualifiedNoParenthesesCall(qualifiedNoParenthesesCall)
@@ -35,14 +41,6 @@ class References : LocalInspectionTool() {
 
             override fun visitUnmatchedQualifiedNoParenthesesCall(qualifiedNoParenthesesCall: ElixirUnmatchedQualifiedNoParenthesesCall) {
                 visitQualifiedNoParenthesesCall(qualifiedNoParenthesesCall)
-            }
-
-            override fun visitMatchedQualifiedParenthesesCall(qualifiedParenthesesCall: ElixirMatchedQualifiedParenthesesCall) {
-                visitQualifiedParenthesesCall(qualifiedParenthesesCall)
-            }
-
-            override fun visitUnmatchedQualifiedParenthesesCall(qualifiedParenthesesCall: ElixirUnmatchedQualifiedParenthesesCall) {
-                visitQualifiedParenthesesCall(qualifiedParenthesesCall)
             }
 
             private fun visitCall(call: Call) {
@@ -53,15 +51,15 @@ class References : LocalInspectionTool() {
                 when (qualifiedNoArgumentsCall.qualifier()) {
                     // Can't resolve keys or fields of a module attribute or assign
                     is AtNonNumericOperation,
-                    // Can't resolve key or fields of a capture
+                        // Can't resolve key or fields of a capture
                     is ElixirCaptureNumericOperation,
-                    // Can't resolve keys or fields of a variable
+                        // Can't resolve keys or fields of a variable
                     is UnqualifiedNoArgumentsCall<*>,
-                    // Can't resolve keys or fields of a call output
+                        // Can't resolve keys or fields of a call output
                     is UnqualifiedParenthesesCall<*>,
-                    // Can't resolve a chain of keys or fields
+                        // Can't resolve a chain of keys or fields
                     is QualifiedNoArgumentsCall<*>,
-                    // Can't resolve keys or fields on the output of a function call
+                        // Can't resolve keys or fields on the output of a function call
                     is QualifiedParenthesesCall<*> -> Unit
                     else -> visitCall(qualifiedNoArgumentsCall)
                 }
@@ -72,16 +70,6 @@ class References : LocalInspectionTool() {
                     // Can't resolve function chained of another call.
                     is QualifiedParenthesesCall<*> -> Unit
                     else -> visitCall(qualifiedNoParenthesesCall)
-                }
-            }
-
-            private fun visitQualifiedParenthesesCall(qualifiedParenthesesCall: QualifiedParenthesesCall<*>) {
-                when (qualifiedParenthesesCall.qualifier()) {
-                    // Can't resolve function calls except for invalid results on a variable
-                    is UnqualifiedNoArgumentsCall<*>,
-                    // Can't resolve function calls except for invalid results on key or field
-                    is QualifiedNoArgumentsCall<*> -> Unit
-                    else -> visitCall(qualifiedParenthesesCall)
                 }
             }
 
@@ -102,10 +90,27 @@ class References : LocalInspectionTool() {
 
                 if (resolveResults.isEmpty()) {
                     holder.registerProblem(element, "Does not resolve to anything", ProblemHighlightType.ERROR)
-                } else if (!resolveResults.any { it.isValidResult }) {
+                } else if (!resolveResults.any { it.isValidResult } && !expectOnlyInvalid(element)) {
                     holder.registerProblem(element, "Only resolves to invalid results", ProblemHighlightType.ERROR)
                 }
             }
+
+            private fun expectOnlyInvalid(element: PsiElement): Boolean =
+                    when (element) {
+                        is QualifiedParenthesesCall<*> -> expectOnlyInvalid(element)
+                        else -> false
+                    }
+
+            private fun expectOnlyInvalid(qualifiedParenthesesCall: QualifiedParenthesesCall<*>): Boolean =
+                    when (qualifiedParenthesesCall.qualifier()) {
+                        // Variable
+                        is UnqualifiedNoArgumentsCall<*>,
+                            // Key or field
+                        is QualifiedNoArgumentsCall<*>,
+                            // Call
+                        is QualifiedParenthesesCall<*> -> true
+                        else -> false
+                    }
         }
     }
 }
