@@ -108,6 +108,8 @@ class References : LocalInspectionTool() {
                             // Key or field
                         is QualifiedNoArgumentsCall<*>,
                             // Call
+                        is UnqualifiedParenthesesCall<*>,
+                            // Call
                         is QualifiedParenthesesCall<*> -> true
                         else -> false
                     }
