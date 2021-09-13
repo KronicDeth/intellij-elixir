@@ -6,13 +6,14 @@ import com.intellij.psi.ResolveState
 import com.intellij.psi.impl.source.resolve.ResolveCache
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
+import org.elixir_lang.Arity
 import org.elixir_lang.errorreport.Logger
-import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
+import org.elixir_lang.psi.*
 import org.elixir_lang.psi.CallDefinitionClause
+import org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall
 import org.elixir_lang.psi.CallDefinitionClause.nameArityInterval
-import org.elixir_lang.psi.NamedElement
-import org.elixir_lang.psi.UnqualifiedNoArgumentsCall
 import org.elixir_lang.psi.call.Call
+import org.elixir_lang.psi.call.name.Function.UNQUOTE
 import org.elixir_lang.psi.call.qualification.Qualified
 import org.elixir_lang.psi.impl.call.qualification.qualifiedToModulars
 import org.elixir_lang.psi.stub.index.AllName
@@ -92,9 +93,17 @@ object Callable : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Cal
         return if (modulars.isNotEmpty()) {
             val resolvedFinalArity = element.resolvedFinalArity()
 
+            val resolvableName = if (name == UNQUOTE &&
+                    element.resolvedPrimaryArity() == 1 &&
+                    enclosingModularMacroCall(element)?.let { QuoteMacro.`is`(it) } == true) {
+                null
+            } else {
+                name
+            }
+
             modulars.flatMap { modular ->
                 org.elixir_lang.psi.scope.call_definition_clause.MultiResolve.resolveResults(
-                        name,
+                        resolvableName,
                         resolvedFinalArity,
                         incompleteCode,
                         modular
@@ -103,6 +112,14 @@ object Callable : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Cal
         } else {
             emptyList()
         }
+    }
+
+    private fun arityInModulars(arity: Arity, modulars: Set<Call>): List<ResolveResult> =
+       modulars.flatMap { modular -> arityInModular(arity, modular) }
+
+    private fun arityInModular(arity: Arity, modular: Call): List<ResolveResult> {
+
+        TODO("Not yet implemented")
     }
 
     private fun nameArityInAnyModule(element: Call, name: String, incompleteCode: Boolean): List<ResolveResult> {
