@@ -92,14 +92,7 @@ object Callable : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Cal
 
         return if (modulars.isNotEmpty()) {
             val resolvedFinalArity = element.resolvedFinalArity()
-
-            val resolvableName = if (name == UNQUOTE &&
-                    element.resolvedPrimaryArity() == 1 &&
-                    enclosingModularMacroCall(element)?.let { QuoteMacro.`is`(it) } == true) {
-                null
-            } else {
-                name
-            }
+            val resolvableName = name.takeUnless { Unquote.isQualified(element, it) }
 
             modulars.flatMap { modular ->
                 org.elixir_lang.psi.scope.call_definition_clause.MultiResolve.resolveResults(

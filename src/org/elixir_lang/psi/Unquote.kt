@@ -8,6 +8,7 @@ import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.UNQUOTE
 import org.elixir_lang.psi.call.name.Module.KERNEL
+import org.elixir_lang.psi.call.qualification.Qualified
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.operation.Match
 import org.elixir_lang.psi.scope.WhileIn.whileIn
@@ -26,8 +27,16 @@ object Unquote {
 
     fun `is`(call: Call): Boolean = call.isCalling(KERNEL, UNQUOTE)
 
+    fun isQualified(qualified: Qualified): Boolean =
+            isQualified(qualified, qualified.functionName())
+
+    fun isQualified(qualified: Qualified, name: String?): Boolean =
+            name == UNQUOTE &&
+                    qualified.resolvedPrimaryArity() == 1 &&
+                    CallDefinitionClause.enclosingModularMacroCall(qualified)?.let { QuoteMacro.`is`(it) } == true
+
     fun ancestorUnquote(descendent: PsiElement): Call? =
-        descendent.parent?.parent?.parent?.let { it as? Call }?.takeIf { `is`(it) }
+            descendent.parent?.parent?.parent?.let { it as? Call }?.takeIf { `is`(it) }
 
     private fun treeWalkUp(reference: PsiPolyVariantReference,
                            resolveState: ResolveState,
@@ -122,13 +131,13 @@ object Unquote {
     private fun treeWalkUpValue(value: Call,
                                 resolveState: ResolveState,
                                 keepProcessing: (PsiElement, ResolveState) -> Boolean): Boolean =
-        when {
-            QuoteMacro.`is`(value) -> QuoteMacro.treeWalkUp(value, resolveState, keepProcessing)
-            Case.`is`(value) -> Case.treeWalkUp(value, resolveState, keepProcessing)
-            else -> {
-                Logger.error(Unquote::class.java, "Don't know how to walk unquoted variable value", value)
+            when {
+                QuoteMacro.`is`(value) -> QuoteMacro.treeWalkUp(value, resolveState, keepProcessing)
+                Case.`is`(value) -> Case.treeWalkUp(value, resolveState, keepProcessing)
+                else -> {
+                    Logger.error(Unquote::class.java, "Don't know how to walk unquoted variable value", value)
 
-                true
+                    true
+                }
             }
-        }
 }

@@ -111,7 +111,7 @@ class References : LocalInspectionTool() {
                         is UnqualifiedParenthesesCall<*>,
                             // Call
                         is QualifiedParenthesesCall<*> -> true
-                        else -> false
+                        else -> Unquote.isQualified(qualifiedParenthesesCall)
                     }
         }
     }
