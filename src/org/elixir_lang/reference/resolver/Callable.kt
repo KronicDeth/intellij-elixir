@@ -86,10 +86,13 @@ object Callable : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Cal
         return resolveResultList
     }
 
-    private fun resolveQualified(element: Qualified, name: String, incompleteCode: Boolean): List<ResolveResult> =
-            element.qualifiedToModulars().flatMap { modular ->
-                val resolvedFinalArity = element.resolvedFinalArity()
+    private fun resolveQualified(element: Qualified, name: String, incompleteCode: Boolean): List<ResolveResult> {
+        val modulars = element.qualifiedToModulars()
 
+        return if (modulars.isNotEmpty()) {
+            val resolvedFinalArity = element.resolvedFinalArity()
+
+            modulars.flatMap { modular ->
                 org.elixir_lang.psi.scope.call_definition_clause.MultiResolve.resolveResults(
                         name,
                         resolvedFinalArity,
@@ -97,6 +100,10 @@ object Callable : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Cal
                         modular
                 )
             }
+        } else {
+            emptyList()
+        }
+    }
 
     private fun nameArityInAnyModule(element: Call, name: String, incompleteCode: Boolean): List<ResolveResult> {
         val project = element.project
