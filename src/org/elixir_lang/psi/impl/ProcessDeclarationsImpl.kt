@@ -132,6 +132,7 @@ object ProcessDeclarationsImpl {
                             call.isCalling(KERNEL, DESTRUCTURE) || // left operand
                             call.isCallingMacro(KERNEL, IF) || // match in condition
                             call.isCallingMacro(KERNEL, Function.FOR) || // comprehension match variable
+                            call.isCalling(KERNEL, MATCH_QUESTION_MARK) ||
                             call.isCallingMacro(KERNEL, UNLESS) || // match in condition
                             call.isCallingMacro(KERNEL, "with") || // <- or = variable
                         QuoteMacro.`is`(call) // quote :bind_quoted keys for Variable resolver OR call definitions for Callable resolver

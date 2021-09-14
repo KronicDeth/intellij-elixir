@@ -213,6 +213,22 @@ abstract class Variable : PsiScopeProcessor {
                         )
                     }
                 }
+                match.isCalling(Module.KERNEL, Function.MATCH_QUESTION_MARK, 2) -> {
+                    match.finalArguments()?.first()?.let { pattern ->
+                        val declaringScope = when (pattern) {
+                            is When -> {
+                                pattern.leftOperand()
+                            }
+                            else -> pattern
+                        }
+
+                        if (declaringScope != null) {
+                            execute(declaringScope, state.put(DECLARING_SCOPE, true))
+                        } else {
+                            true
+                        }
+                    }
+                }
                 QuoteMacro.`is`(match) -> {
                     match
                             .keywordArgument("bind_quoted")?.let { it as? ElixirAccessExpression }
