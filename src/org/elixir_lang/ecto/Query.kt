@@ -329,6 +329,14 @@ object Query {
                 }
             }
             is UnqualifiedNoArgumentsCall<*> -> element.resolvedFinalArity() != 0 || keepProcessing(element, state)
+            is ElixirUnmatchedUnaryOperation -> {
+                // pinned variable, not a reference binding
+                if (element.unaryPrefixOperator.text != "^") {
+                    Logger.error(logger, "Don't know how to find reference variables in binding", element)
+                }
+
+                true
+            }
             else -> {
                 Logger.error(logger, "Don't know how to find reference variables in binding", element)
 
