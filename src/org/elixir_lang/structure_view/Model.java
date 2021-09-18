@@ -7,6 +7,7 @@ import com.intellij.ide.util.treeView.smartTree.NodeProvider;
 import com.intellij.ide.util.treeView.smartTree.Sorter;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.ResolveState;
 import org.elixir_lang.psi.ElixirAtom;
 import org.elixir_lang.psi.ElixirFile;
 import org.elixir_lang.psi.QuotableKeywordPair;
@@ -58,6 +59,7 @@ public class Model extends TextEditorBasedStructureViewModel implements Structur
                 Structure.is(call) ||
                 Type.is(call) ||
                 org.elixir_lang.psi.Use.is(call) ||
+                org.elixir_lang.psi.ex_unit.kase.Describe.is(call, ResolveState.initial()) ||
                 Unknown.is(call);
     }
 

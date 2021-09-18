@@ -2,25 +2,18 @@ package org.elixir_lang.structure_view.element.modular
 
 import com.intellij.ide.util.treeView.smartTree.TreeElement
 import com.intellij.navigation.ItemPresentation
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.util.Computable
 import com.intellij.psi.ElementDescriptionLocation
 import com.intellij.psi.ElementDescriptionUtil
 import com.intellij.psi.PsiElement
+import com.intellij.psi.ResolveState
 import com.intellij.usageView.UsageViewLongNameLocation
 import com.intellij.usageView.UsageViewShortNameLocation
 import com.intellij.usageView.UsageViewTypeLocation
 import org.elixir_lang.NameArity
 import org.elixir_lang.navigation.item_presentation.Parent
-import org.elixir_lang.psi.Arguments
 import org.elixir_lang.psi.ArityInterval
-import org.elixir_lang.psi.CallDefinitionClause.isMacro
 import org.elixir_lang.psi.QuoteMacro
 import org.elixir_lang.psi.call.Call
-import org.elixir_lang.psi.call.name.Function.CREATE
-import org.elixir_lang.psi.call.name.Function.DEFMODULE
-import org.elixir_lang.psi.call.name.Module.KERNEL
-import org.elixir_lang.psi.call.name.Module.MODULE
 import org.elixir_lang.psi.impl.call.macroChildCalls
 import org.elixir_lang.psi.impl.enclosingMacroCall
 import org.elixir_lang.psi.impl.locationString
@@ -30,6 +23,7 @@ import org.elixir_lang.structure_view.element.*
 import org.elixir_lang.structure_view.element.Quote
 import org.elixir_lang.structure_view.element.call_definition_by_name_arity.FunctionByNameArity
 import org.elixir_lang.structure_view.element.call_definition_by_name_arity.MacroByNameArity
+import org.elixir_lang.structure_view.element.ex_unit.case.Describe
 import org.elixir_lang.structure_view.element.structure.Structure
 import org.elixir_lang.structure_view.node_provider.Used
 import org.jetbrains.annotations.Contract
@@ -154,6 +148,8 @@ open class Module(protected val parent: Modular?, call: Call) : Element<Call>(ca
                             useSet.add(use)
                             treeElementList.add(use)
                         }
+                        org.elixir_lang.psi.ex_unit.kase.Describe.`is`(childCall, ResolveState.initial()) ->
+                            treeElementList.add(Describe(childCall))
                         Unknown.`is`(childCall) -> // Should always be last since it will match all macro calls
                             treeElementList.add(Unknown(modular, childCall))
                     }

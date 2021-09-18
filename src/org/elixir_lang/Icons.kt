@@ -75,6 +75,9 @@ object Icons {
     val CALL_DEFINITION_CLAUSE: Icon = RowIconFactory.create(CALL_DEFINITION, PlatformIcons.PACKAGE_LOCAL_ICON)
 
     @JvmField
+    val DESCRIBE = AllIcons.Nodes.TestGroup
+
+    @JvmField
     val DELEGATION: Icon = RowIconFactory.create(AllIcons.RunConfigurations.TestState.Run, PlatformIcons.PACKAGE_LOCAL_ICON)
 
     @JvmField
