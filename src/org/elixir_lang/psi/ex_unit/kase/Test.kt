@@ -5,12 +5,12 @@ import org.elixir_lang.ArityRange
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.ex_unit.Case.resolvesTo
 
-object Describe {
+object Test {
     @JvmStatic
     fun `is`(call: Call, state: ResolveState): Boolean =
             call.functionName() == NAME &&
                     call.resolvedFinalArity() in ARITY_RANGE && resolvesTo(call, state)
 
-    private const val NAME: String = "describe"
+    private const val NAME: String = "test"
     private val ARITY_RANGE: ArityRange = 1..2
 }

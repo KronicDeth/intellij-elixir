@@ -117,6 +117,9 @@ object Icons {
     @JvmField
     val STRUCTURE = AllIcons.Toolwindows.ToolWindowStructure
 
+    @JvmField
+    val TEST = AllIcons.Nodes.Test
+
     // same icon as intellij-erlang to match their look and feel
     @JvmField
     val TYPE = IconLoader.getIcon("/icons/type.png")
