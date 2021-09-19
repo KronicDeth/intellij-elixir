@@ -34,9 +34,14 @@ fun QualifiableAlias.computeReference(): PsiPolyVariantReference? =
                 null
             }
         else ->
-            // There is no one module that defines the `Elixir` module.  It is only defined implicitly as the common
-            // namespace to all Aliases.
-            if (this.fullyQualifiedName() != "Elixir") {
+
+            if (this.fullyQualifiedName() !in arrayOf(
+                            // `BitString` is used for `defimpl ..., for: BitString` to define protocols on bitstrings
+                            // (`<<...>>`)
+                            "BitString",
+                            // There is no one module that defines the `Elixir` module.  It is only defined implicitly as the common
+                            // namespace to all Aliases.
+                            "Elixir")) {
                 Module(this)
             } else {
                 null
