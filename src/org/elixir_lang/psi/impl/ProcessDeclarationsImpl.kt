@@ -388,7 +388,9 @@ object ProcessDeclarationsImpl {
                                     place: PsiElement): Boolean =
             sequence
                     .filter { !createsNewScope(it) }
-                    .map { it.processDeclarations(processor, state, lastParent, place) }
+                    .map {
+                        it.processDeclarations(processor, state, lastParent, place)
+                    }
                     .takeWhile { it }
                     .lastOrNull()
                     ?: true

@@ -38,7 +38,7 @@ object QuoteMacro {
                                     .put(CallDefinitionClause.IMPORT_CALL, childCall)
                                     .putVisitedElement(childCall)
 
-                    Import.callDefinitionClauseCallWhile(childCall, childResolveState, keepProcessing)
+                    Import.treeWalkUp(childCall,childResolveState, keepProcessing)
                 }
                 Unless.`is`(childCall) -> {
                     val childResolveState = resolveState.putVisitedElement(childCall)

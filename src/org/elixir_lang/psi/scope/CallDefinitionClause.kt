@@ -111,8 +111,8 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
                     val importState = state.put(IMPORT_CALL, element).putVisitedElement(element)
 
                     try {
-                        Import.callDefinitionClauseCallWhile(element, importState) { callDefinitionClause, accResolveState ->
-                            executeOnCallDefinitionClause(callDefinitionClause, accResolveState)
+                        Import.treeWalkUp(element, importState) { call, accResolveState ->
+                            execute(call, accResolveState)
                         }
                     } catch (stackOverflowError: StackOverflowError) {
                         Logger.error(

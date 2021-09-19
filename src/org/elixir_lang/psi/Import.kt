@@ -6,63 +6,109 @@ import com.ericsson.otp.erlang.OtpErlangRangeException
 import com.intellij.psi.ElementDescriptionLocation
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
+import com.intellij.psi.util.isAncestor
 import com.intellij.usageView.UsageViewNodeTextLocation
 import com.intellij.usageView.UsageViewTypeLocation
 import com.intellij.util.Function
 import org.elixir_lang.Arity
 import org.elixir_lang.Name
+import org.elixir_lang.NameArityInterval
 import org.elixir_lang.errorreport.Logger
-import org.elixir_lang.psi.CallDefinitionClause.nameArityInterval
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.IMPORT
 import org.elixir_lang.psi.call.name.Module.KERNEL
+import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.call.finalArguments
+import org.elixir_lang.psi.impl.call.stabBodyChildExpressions
 import org.elixir_lang.psi.impl.hasKeywordKey
 import org.elixir_lang.psi.impl.maybeModularNameToModulars
 import org.elixir_lang.psi.impl.stripAccessExpression
+import org.elixir_lang.structure_view.element.CallDefinitionHead
+import org.elixir_lang.structure_view.element.Delegation
 
 /**
  * An `import` call
  */
 object Import {
     /**
-     * Calls `function` on each call definition clause imported by `importCall` while `function`
-     * returns `true`.  Stops the first time `function` returns `false`
-     *
-     * @param importCall an `import` [Call] (should have already been checked with [.is].
-     * @param function For `import Module`, called on all call definition clauses in `Module`; for
-     * `import Module, only: [...]` called on only the call definition clauses matching names in
-     * `:only` list; for `import Module, except: [...]` called on all call definition clauses expect those
-     * matching names in `:except` list.
+     * Whether `call` is an `import Module` or `import Module, opts` call
      */
     @JvmStatic
-    fun callDefinitionClauseCallWhile(importCall: Call, resolveState: ResolveState, function: (Call, ResolveState) -> Boolean): Boolean {
-        val modulars = try {
-            modulars(importCall)
-        } catch (stackOverflowError: StackOverflowError) {
-            Logger.error(Import::class.java, "StackoverflowError while finding modular for import", importCall)
-            emptyList<Call>()
-        }
+    fun `is`(call: Call): Boolean = call.isCalling(KERNEL, IMPORT) && call.resolvedFinalArity() in 1..2
 
-        return if (modulars.isNotEmpty()) {
-            val optionsFilter = callDefinitionClauseCallFilter(importCall)
-            var keepProcessing = true
+    @JvmStatic
+    fun treeWalkUp(importCall: Call,
+                   resolveState: ResolveState,
+                   keepProcessing: (Call, ResolveState) -> Boolean): Boolean {
+        var accumulatedKeepProcessing = true
 
-            for (modular in modulars) {
-                keepProcessing = Modular.callDefinitionClauseCallWhile(modular, resolveState) { call, accResolveState ->
-                    !optionsFilter(call) || function(call, accResolveState)
-                }
+        // don't descend back into `import` when the entrance is the alis to the `import` like `MyAlias` in
+        // `import MyAlias`.
+        if (!importCall.isAncestor(resolveState.get(ENTRANCE))) {
+            val modulars = modulars(importCall)
 
-                if (!keepProcessing) {
-                    break
+            if (modulars.isNotEmpty()) {
+                val filter = importCallFilter(importCall)
+
+                for (modular in modulars) {
+                    val childResolveState = resolveState.putVisitedElement(modular)
+
+                    accumulatedKeepProcessing = treeWalkUpImportedModular(modular, filter, childResolveState, keepProcessing)
+
+                    if (!accumulatedKeepProcessing) {
+                        break
+                    }
                 }
             }
-
-            keepProcessing
-        } else {
-            true
         }
+
+        return accumulatedKeepProcessing
     }
+
+    private fun treeWalkUpImportedModular(importedModular: Call,
+                                          filter: (NameArityInterval) -> Boolean,
+                                          resolveState: ResolveState,
+                                          keepProcessing: (Call, ResolveState) -> Boolean): Boolean =
+            importedModular
+                    .stabBodyChildExpressions()
+                    ?.filterIsInstance<Call>()
+                    ?.filter { !resolveState.hasBeenVisited(it) }
+                    ?.map { treeWalkUpImportedModularChildExpression(filter, it, resolveState, keepProcessing) }
+                    ?.takeWhile { it }
+                    ?.lastOrNull()
+                    ?: true
+
+    private fun treeWalkUpImportedModularChildExpression(
+            filter: (NameArityInterval) -> Boolean,
+            importedCall: Call,
+            resolveState: ResolveState,
+            keepProcessing: (Call, ResolveState) -> Boolean): Boolean =
+        when {
+            CallDefinitionClause.`is`(importedCall) -> {
+                CallDefinitionClause.nameArityInterval(importedCall, resolveState)?.let { nameArityInterval ->
+                     if (filter(nameArityInterval)) {
+                         keepProcessing(importedCall, resolveState)
+                     } else {
+                         true
+                     }
+                }
+            }
+            Delegation.`is`(importedCall) -> {
+                importedCall.finalArguments()?.takeIf { it.size == 2 }?.let { arguments ->
+                    val head = arguments[0]
+
+                    CallDefinitionHead.nameArityInterval(head, resolveState)?.let { headNameArityInterval ->
+                        if (filter(headNameArityInterval)) {
+                            keepProcessing(importedCall, resolveState)
+                        } else {
+                            true
+                        }
+                    }
+                }
+            }
+            else -> null
+        }
+                ?: true
 
     fun elementDescription(call: Call, location: ElementDescriptionLocation): String? =
             when {
@@ -71,13 +117,6 @@ object Import {
                 else -> null
             }
 
-    /**
-     * Whether `call` is an `import Module` or `import Module, opts` call
-     */
-    @JvmStatic
-    fun `is`(call: Call): Boolean = call.isCalling(KERNEL, IMPORT) && call.resolvedFinalArity() in 1..2
-
-    private val TRUE: (Call) -> Boolean = { true }
 
     private fun aritiesByNameFromNameByArityKeywordList(list: ElixirList): Map<Name, List<Arity>> {
         val aritiesByName = mutableMapOf<Name, MutableList<Int>>()
@@ -101,55 +140,77 @@ object Import {
     }
 
     private fun aritiesByNameFromNameByArityKeywordList(element: PsiElement): Map<String, List<Int>> =
-        (element.stripAccessExpression() as? ElixirList)?.let {
-            aritiesByNameFromNameByArityKeywordList(it)
-        } ?:
-        emptyMap()
+            (element.stripAccessExpression() as? ElixirList)?.let {
+                aritiesByNameFromNameByArityKeywordList(it)
+            } ?: emptyMap()
 
     /**
-     * A function that returns `true` for call definition clauses that are imported by `importCall`
+     * A function that returns `true` for name arity intervals that are imported by `importCall`
      *
      * @param importCall `import` call
      */
-    private fun callDefinitionClauseCallFilter(importCall: Call): (Call) -> Boolean {
+    private fun importCallFilter(importCall: Call): (NameArityInterval) -> Boolean {
         val finalArguments = importCall.finalArguments()
 
         return if (finalArguments != null && finalArguments.size >= 2) {
-            optionsCallDefinitionClauseCallFilter(finalArguments[1])
+            optionsNameArityIntervalFilter(finalArguments[1])
         } else {
             TRUE
         }
     }
 
-    private fun exceptCallDefinitionClauseCallFilter(element: PsiElement): (Call) -> Boolean {
-        val only = onlyCallDefinitionClauseCallFilter(element)
-        return { call -> !only(call) }
+    private val TRUE: (NameArityInterval) -> Boolean = { true }
+
+    /**
+     * A [Function] that returns `true` for call definition clauses that are imported by `importCall`
+     *
+     * @param options options (second argument) to an `import Module, ...` call.
+     */
+    private fun optionsNameArityIntervalFilter(options: PsiElement?): (NameArityInterval) -> Boolean {
+        var filter = TRUE
+
+        if (options != null && options is QuotableKeywordList) {
+            for (quotableKeywordPair in options.quotableKeywordPairList()) {
+                /* although using both `except` and `only` is invalid semantically, support it to handle transient code
+                   and take the final option as the filter in that state */
+                if (quotableKeywordPair.hasKeywordKey("except")) {
+                    filter = exceptNameArityIntervalFilter(quotableKeywordPair.keywordValue)
+                } else if (quotableKeywordPair.hasKeywordKey("only")) {
+                    filter = onlyNameArityIntervalFilter(quotableKeywordPair.keywordValue)
+                }
+            }
+        }
+
+        return filter
+    }
+
+    private fun exceptNameArityIntervalFilter(element: PsiElement): (NameArityInterval) -> Boolean {
+        val only = onlyNameArityIntervalFilter(element)
+        return { nameArityInterval -> !only(nameArityInterval) }
     }
 
     private fun keywordKeyToName(keywordKey: Quotable): String? = (keywordKey.quote() as? OtpErlangAtom)?.atomValue()
 
     private fun keywordValueToArity(keywordValue: Quotable): Int? =
-        (keywordValue.quote() as? OtpErlangLong)?.let { quotedKeywordValue ->
-            try {
-                quotedKeywordValue.intValue()
-            } catch (e: OtpErlangRangeException) {
-                Logger.error(
-                        Import::class.java,
-                        "Arity in OtpErlangLong could not be downcast to an int",
-                        keywordValue
-                )
-                null
+            (keywordValue.quote() as? OtpErlangLong)?.let { quotedKeywordValue ->
+                try {
+                    quotedKeywordValue.intValue()
+                } catch (e: OtpErlangRangeException) {
+                    Logger.error(
+                            Import::class.java,
+                            "Arity in OtpErlangLong could not be downcast to an int",
+                            keywordValue
+                    )
+                    null
+                }
             }
-        }
 
-    private fun onlyCallDefinitionClauseCallFilter(element: PsiElement): (Call) -> Boolean {
+    private fun onlyNameArityIntervalFilter(element: PsiElement): (NameArityInterval) -> Boolean {
         val aritiesByName = aritiesByNameFromNameByArityKeywordList(element)
 
-        return { call ->
-            nameArityInterval(call, ResolveState.initial())?.let { (callName, callArityRange) ->
-                aritiesByName[callName]?.let { arities ->
-                    arities.any { callArityRange.contains(it) }
-                }
+        return { nameArityInterval ->
+            aritiesByName[nameArityInterval.name]?.let { arities ->
+                arities.any { arity -> nameArityInterval.arityInterval.contains(arity) }
             } ?: false
         }
     }
@@ -167,26 +228,5 @@ object Import {
                     ?.maybeModularNameToModulars(maxScope = importCall.parent, useCall = null, incompleteCode = false)
                     ?: emptySet()
 
-    /**
-     * A [Function] that returns `true` for call definition clauses that are imported by `importCall`
-     *
-     * @param options options (second argument) to an `import Module, ...` call.
-     */
-    private fun optionsCallDefinitionClauseCallFilter(options: PsiElement?): (Call) -> Boolean {
-        var filter = TRUE
 
-        if (options != null && options is QuotableKeywordList) {
-            for (quotableKeywordPair in options.quotableKeywordPairList()) {
-                /* although using both `except` and `only` is invalid semantically, support it to handle transient code
-                   and take the final option as the filter in that state */
-                if (quotableKeywordPair.hasKeywordKey("except")) {
-                    filter = exceptCallDefinitionClauseCallFilter(quotableKeywordPair.keywordValue)
-                } else if (quotableKeywordPair.hasKeywordKey("only")) {
-                    filter = onlyCallDefinitionClauseCallFilter(quotableKeywordPair.keywordValue)
-                }
-            }
-        }
-
-        return filter
-    }
 }
