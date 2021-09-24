@@ -142,9 +142,7 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
                     true
                 }
                 Use.`is`(element) -> {
-                    val useState = state.put(USE_CALL, element).putVisitedElement(element)
-
-                    Use.treeWalkUp(element, useState, ::execute)
+                    Use.treeWalkUp(element, state, ::execute)
 
                     true
                 }
@@ -278,8 +276,6 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
         val DEFDELEGATE_CALL = Key<Call>("DEFDELEGATE_CALL")
         @JvmStatic
         val IMPORT_CALL = Key<Call>("IMPORT_CALL")
-        @JvmStatic
-        val USE_CALL = Key<Call>("USE_CALL")
         val MODULAR_CANONICAL_NAME = Key<String>("MODULAR_CANONICAL_NAME")
     }
 }

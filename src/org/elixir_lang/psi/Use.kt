@@ -26,9 +26,11 @@ object Use {
 
         // don't descend back into `use` when the entrance is the alias to the `use` like `MyAlias` in `use MyAlias`.
         if (!useCall.isAncestor(resolveState.get(ENTRANCE))) {
+            val useCallResolveState = resolveState.putVisitedElement(useCall)
+
             outer@ for (modular in modulars(useCall)) {
                 for (definer in Using.definers(modular)) {
-                    val childResolveState = resolveState.putVisitedElement(definer)
+                    val childResolveState = useCallResolveState.putVisitedElement(definer)
 
                     accumulatedKeepProcessing = Using.treeWalkUp(
                             usingCall = definer,

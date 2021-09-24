@@ -80,9 +80,7 @@ abstract class Type : PsiScopeProcessor {
                         childCallsKeepProcessing
                     }
                 } else if (Use.`is`(call)) {
-                    val useState = state.put(CallDefinitionClause.USE_CALL, call).putVisitedElement(call)
-
-                    Use.treeWalkUp(call, useState, ::execute)
+                    Use.treeWalkUp(call, state, ::execute)
                 } else {
                     true
                 }

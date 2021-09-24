@@ -51,9 +51,7 @@ object QuoteMacro {
                     Unquote.treeWalkUp(childCall, childResolveState, keepProcessing)
                 }
                 Use.`is`(childCall) -> {
-                    val childResolveState = resolveState.putVisitedElement(childCall)
-
-                    Use.treeWalkUp(childCall, childResolveState, keepProcessing)
+                    Use.treeWalkUp(childCall, resolveState, keepProcessing)
                 }
                 childCall.isCalling(KERNEL, TRY) -> {
                     childCall.whileInStabBodyChildExpressions { grandChildExpression ->
