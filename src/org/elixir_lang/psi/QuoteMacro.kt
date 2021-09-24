@@ -27,14 +27,8 @@ object QuoteMacro {
 
         for (childCall in childCallSequence) {
             accumulatorKeepProcessing = when {
-                If.`is`(childCall) -> {
-                    val childResolveState = resolveState.putVisitedElement(childCall)
-
-                    If.treeWalkUp(childCall, childResolveState, keepProcessing)
-                }
-                Import.`is`(childCall) -> {
-                    Import.treeWalkUp(childCall, resolveState, keepProcessing)
-                }
+                If.`is`(childCall) -> If.treeWalkUp(childCall, resolveState, keepProcessing)
+                Import.`is`(childCall) -> Import.treeWalkUp(childCall, resolveState, keepProcessing)
                 Unless.`is`(childCall) -> {
                     val childResolveState = resolveState.putVisitedElement(childCall)
 
@@ -45,9 +39,7 @@ object QuoteMacro {
 
                     Unquote.treeWalkUp(childCall, childResolveState, keepProcessing)
                 }
-                Use.`is`(childCall) -> {
-                    Use.treeWalkUp(childCall, resolveState, keepProcessing)
-                }
+                Use.`is`(childCall) -> Use.treeWalkUp(childCall, resolveState, keepProcessing)
                 childCall.isCalling(KERNEL, TRY) -> {
                     childCall.whileInStabBodyChildExpressions { grandChildExpression ->
                         keepProcessing(grandChildExpression, resolveState)

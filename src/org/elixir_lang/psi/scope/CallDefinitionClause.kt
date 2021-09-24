@@ -89,6 +89,13 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
     protected abstract fun executeOnException(element: Call, state: ResolveState): Boolean
 
     /**
+     * Called on every [Call] where [org.elixir_lang.mix.Generator.isEmbed] is `true`.
+     *
+     * @return `true` to keep searching up tree; `false` to stop searching.
+     */
+    protected abstract fun executeOnMixGeneratorEmbed(element: Call, state: ResolveState): Boolean
+
+    /**
      * Whether to continue searching after each Module's children have been searched.
      *
      * @return `true` to keep searching up the PSI tree; `false` to stop searching.
@@ -161,6 +168,7 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
                     org.elixir_lang.ecto.query.API.treeWalkUp(element, state, ::execute)
                 }
                 EEx.isFunctionFrom(element, state) -> executeOnEExFunctionFrom(element, state)
+                org.elixir_lang.psi.mix.Generator.isEmbed(element, state) -> executeOnMixGeneratorEmbed(element, state)
                 hasDoBlockOrKeyword(element) -> executeOnUnknownMacroCall(element, state)
                 else -> true
             }
