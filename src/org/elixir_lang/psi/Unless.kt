@@ -27,10 +27,12 @@ object Unless {
     fun treeWalkUp(unlessCall: Call,
                    resolveState: ResolveState,
                    keepProcessing: (PsiElement, ResolveState) -> Boolean): Boolean {
+        val unlessCallResolveState = resolveState.putVisitedElement(unlessCall)
+
         // because this doesn't actually check which branch would be called based on the condition both
         // branches are ALWAYS walked
-        val foundInFalseBranch = treeWalkUpFalseBranch(unlessCall, resolveState, keepProcessing)
-        val foundInTrueBranch = treeWalkUpTrueBranch(unlessCall, resolveState, keepProcessing)
+        val foundInFalseBranch = treeWalkUpFalseBranch(unlessCall, unlessCallResolveState, keepProcessing)
+        val foundInTrueBranch = treeWalkUpTrueBranch(unlessCall, unlessCallResolveState, keepProcessing)
 
         return foundInFalseBranch || foundInTrueBranch
     }

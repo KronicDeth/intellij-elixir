@@ -29,11 +29,7 @@ object QuoteMacro {
             accumulatorKeepProcessing = when {
                 If.`is`(childCall) -> If.treeWalkUp(childCall, resolveState, keepProcessing)
                 Import.`is`(childCall) -> Import.treeWalkUp(childCall, resolveState, keepProcessing)
-                Unless.`is`(childCall) -> {
-                    val childResolveState = resolveState.putVisitedElement(childCall)
-
-                    Unless.treeWalkUp(childCall, childResolveState, keepProcessing)
-                }
+                Unless.`is`(childCall) -> Unless.treeWalkUp(childCall, resolveState, keepProcessing)
                 Unquote.`is`(childCall) -> {
                     val childResolveState = resolveState.putVisitedElement(childCall)
 

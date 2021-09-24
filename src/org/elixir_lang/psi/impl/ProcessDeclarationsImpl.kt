@@ -120,14 +120,18 @@ object ProcessDeclarationsImpl {
             // need to check if call is place because lastParent is set to place at start of treeWalkUp
             if (!call.isEquivalentTo(lastParent) || call.isEquivalentTo(place)) {
                 when {
-                    call.isCalling(KERNEL, ALIAS) -> processor.execute(call, state)
+                    // modulars don't descend back into their bodies if their `do` block was the `lastParent`.
+                    Module.`is`(call) || Implementation.`is`(call) || Protocol.`is`(call) -> if (lastParent != call.doBlock) {
+                        processor.execute(call, state)
+                    } else {
+                        true
+                    }
+                    call.isCalling(KERNEL, ALIAS) ||
                     CallDefinitionClause.`is`(call) || // call parameters
                             Callback.`is`(call) ||
                             Delegation.`is`(call) || // delegation call parameters
                             Exception.`is`(call) ||
                             Import.`is`(call) ||
-                            Module.`is`(call) || // module Alias
-                            Implementation.`is`(call) ||
                             Use.`is`(call) ||
                             call.isCalling(KERNEL, DESTRUCTURE) || // left operand
                             call.isCallingMacro(KERNEL, IF) || // match in condition
@@ -135,7 +139,8 @@ object ProcessDeclarationsImpl {
                             call.isCalling(KERNEL, MATCH_QUESTION_MARK) ||
                             call.isCallingMacro(KERNEL, UNLESS) || // match in condition
                             call.isCallingMacro(KERNEL, "with") || // <- or = variable
-                        QuoteMacro.`is`(call) // quote :bind_quoted keys for Variable resolver OR call definitions for Callable resolver
+                        QuoteMacro.`is`(call) || // quote :bind_quoted keys for Variable resolver OR call definitions for Callable resolver
+                        org.elixir_lang.psi.mix.Generator.isEmbed(call, state)
                     -> processor.execute(call, state)
                     org.elixir_lang.ecto.Schema.`is`(call, state) -> {
                         processor.execute(call, state)
