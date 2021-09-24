@@ -161,10 +161,6 @@ private constructor(
                     resolveResultOrderedSet.add(call, name, validResult)
                 } else {
                     resolveResultOrderedSet.add(call, name, validResult)
-
-                    state.get<Call>(IMPORT_CALL)?.let { importCall ->
-                        resolveResultOrderedSet.add(importCall, importCall.text, validResult)
-                    }
                 }
 
                 keepProcessing()

@@ -108,10 +108,8 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
                 For.`is`(element) -> For.treeWalkDown(element, state, ::execute)
                 If.`is`(element) -> If.treeWalkUp(element, state, ::execute)
                 Import.`is`(element) -> {
-                    val importState = state.put(IMPORT_CALL, element).putVisitedElement(element)
-
                     try {
-                        Import.treeWalkUp(element, importState) { call, accResolveState ->
+                        Import.treeWalkUp(element, state) { call, accResolveState ->
                             execute(call, accResolveState)
                         }
                     } catch (stackOverflowError: StackOverflowError) {
@@ -274,8 +272,6 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
 
     companion object {
         val DEFDELEGATE_CALL = Key<Call>("DEFDELEGATE_CALL")
-        @JvmStatic
-        val IMPORT_CALL = Key<Call>("IMPORT_CALL")
         val MODULAR_CANONICAL_NAME = Key<String>("MODULAR_CANONICAL_NAME")
     }
 }

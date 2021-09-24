@@ -48,10 +48,11 @@ object Import {
             val modulars = modulars(importCall)
 
             if (modulars.isNotEmpty()) {
+                val importCallResolveState = resolveState.putVisitedElement(importCall)
                 val filter = importCallFilter(importCall)
 
                 for (modular in modulars) {
-                    val childResolveState = resolveState.putVisitedElement(modular)
+                    val childResolveState = importCallResolveState.putVisitedElement(modular)
 
                     accumulatedKeepProcessing = treeWalkUpImportedModular(modular, filter, childResolveState, keepProcessing)
 
