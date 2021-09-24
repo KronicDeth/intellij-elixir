@@ -14,16 +14,19 @@ import org.elixir_lang.psi.operation.Match
 import org.elixir_lang.psi.scope.WhileIn.whileIn
 
 object Unquote {
-    fun treeWalkUp(unquoteCall: Call, resolveState: ResolveState, keepProcessing: (PsiElement, ResolveState) -> Boolean): Boolean =
-            unquoteCall
-                    .finalArguments()
-                    ?.singleOrNull()
-                    ?.let { it as Call }
-                    ?.takeUnlessHasBeenVisited(resolveState)
-                    ?.reference
-                    ?.let { it as PsiPolyVariantReference }
-                    ?.let { reference -> treeWalkUp(reference, resolveState, keepProcessing) }
-                    ?: true
+    fun treeWalkUp(unquoteCall: Call, resolveState: ResolveState, keepProcessing: (PsiElement, ResolveState) -> Boolean): Boolean {
+        val unquoteCallResolveState = resolveState.putVisitedElement(unquoteCall)
+
+        return unquoteCall
+                .finalArguments()
+                ?.singleOrNull()
+                ?.let { it as Call }
+                ?.takeUnlessHasBeenVisited(unquoteCallResolveState)
+                ?.reference
+                ?.let { it as PsiPolyVariantReference }
+                ?.let { reference -> treeWalkUp(reference, unquoteCallResolveState, keepProcessing) }
+                ?: true
+    }
 
     fun `is`(call: Call): Boolean = call.isCalling(KERNEL, UNQUOTE)
 

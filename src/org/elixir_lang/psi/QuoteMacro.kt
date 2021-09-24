@@ -30,11 +30,7 @@ object QuoteMacro {
                 If.`is`(childCall) -> If.treeWalkUp(childCall, resolveState, keepProcessing)
                 Import.`is`(childCall) -> Import.treeWalkUp(childCall, resolveState, keepProcessing)
                 Unless.`is`(childCall) -> Unless.treeWalkUp(childCall, resolveState, keepProcessing)
-                Unquote.`is`(childCall) -> {
-                    val childResolveState = resolveState.putVisitedElement(childCall)
-
-                    Unquote.treeWalkUp(childCall, childResolveState, keepProcessing)
-                }
+                Unquote.`is`(childCall) -> Unquote.treeWalkUp(childCall, resolveState, keepProcessing)
                 Use.`is`(childCall) -> Use.treeWalkUp(childCall, resolveState, keepProcessing)
                 childCall.isCalling(KERNEL, TRY) -> {
                     childCall.whileInStabBodyChildExpressions { grandChildExpression ->
