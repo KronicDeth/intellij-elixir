@@ -142,7 +142,7 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
                             implicitImports(element, state)
                 }
                 QuoteMacro.`is`(element) -> if (!state.hasBeenVisited(element)) {
-                   QuoteMacro.treeWalkUp(element, state.putVisitedElement(element), ::execute)
+                   QuoteMacro.treeWalkUp(element, state, ::execute)
                 } else {
                     true
                 }

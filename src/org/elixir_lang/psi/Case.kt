@@ -43,9 +43,7 @@ object Case {
         return if (resolveModuleName != null && functionName != null) {
             when {
                 resolveModuleName == KERNEL && functionName == QUOTE -> {
-                    val lastChildCallResolveState = state.putVisitedElement(lastChildCall)
-
-                    QuoteMacro.treeWalkUp(lastChildCall, lastChildCallResolveState, keepProcessing)
+                    QuoteMacro.treeWalkUp(lastChildCall, state, keepProcessing)
                 }
                 else -> true
             }

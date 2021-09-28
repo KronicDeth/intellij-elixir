@@ -15,7 +15,7 @@ object QuoteMacro {
                 quoteCall
                         .macroChildCallSequence()
                         .filter { !resolveState.hasBeenVisited(it) }
-                        .let { treeWalkUp(it, resolveState, keepProcessing) }
+                        .let { treeWalkUp(it, resolveState.putVisitedElement(quoteCall), keepProcessing) }
             } else {
                 true
             }
