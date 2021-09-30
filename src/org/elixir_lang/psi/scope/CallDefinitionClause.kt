@@ -17,10 +17,7 @@ import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.call.name.Module.KERNEL_SPECIAL_FORMS
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.hasDoBlockOrKeyword
-import org.elixir_lang.psi.impl.call.finalArguments
-import org.elixir_lang.psi.impl.call.macroChildCalls
-import org.elixir_lang.psi.impl.call.stabBodyChildExpressions
-import org.elixir_lang.psi.impl.call.whileInStabBodyChildExpressions
+import org.elixir_lang.psi.impl.call.*
 import org.elixir_lang.psi.impl.keywordValue
 import org.elixir_lang.psi.impl.siblingExpressions
 import org.elixir_lang.psi.scope.WhileIn.whileIn
@@ -130,9 +127,16 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
                     true
                 }
                 (Module.`is`(element) || Implementation.`is`(element) || Protocol.`is`(element)) && modularContainsEntrance(element, state) -> {
-                    val childCalls = element.macroChildCalls()
+                    val childCalls = element.macroChildCallSequence()
+                    val entranceAndFollowingSiblings = childCalls.dropWhile { !it.isAncestor(state.get(ENTRANCE)) }.toList()
 
-                    for (childCall in childCalls) {
+                    val unvisitedChildCalls = if (entranceAndFollowingSiblings.isNotEmpty()) {
+                        entranceAndFollowingSiblings.asSequence().drop(1)
+                    } else {
+                        childCalls
+                    }
+
+                    for (childCall in unvisitedChildCalls) {
                         execute(childCall, state)
                     }
 

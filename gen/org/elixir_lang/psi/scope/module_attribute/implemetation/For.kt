@@ -13,6 +13,7 @@ import org.elixir_lang.psi.call.name.Function.DEFMODULE
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.scope.ResolveResultOrderedSet
+import org.elixir_lang.psi.visitedElementSet
 import org.elixir_lang.structure_view.element.modular.Module
 
 class For(private val validResult: Boolean) : PsiScopeProcessor {
@@ -20,14 +21,14 @@ class For(private val validResult: Boolean) : PsiScopeProcessor {
 
     override fun execute(element: PsiElement, state: ResolveState): Boolean =
             when (element) {
-                is Call -> execute(element)
+                is Call -> execute(element, state)
                 else -> true
             }
 
     override fun <T> getHint(hintKey: Key<T>): T? = null
     override fun handleEvent(event: PsiScopeProcessor.Event, associated: Any?) {}
 
-    private fun execute(call: Call): Boolean =
+    private fun execute(call: Call, state: ResolveState): Boolean =
             if (Implementation.`is`(call)) {
                 val forNameElement = forNameElement(call)
                 val element: PsiElement
@@ -58,7 +59,7 @@ class For(private val validResult: Boolean) : PsiScopeProcessor {
                     }
                 }
 
-                resolveResultOrderedSet.add(element, name, validResult)
+                resolveResultOrderedSet.add(element, name, validResult, state.visitedElementSet())
 
                 false
             } else {

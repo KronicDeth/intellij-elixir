@@ -120,18 +120,15 @@ object ProcessDeclarationsImpl {
             // need to check if call is place because lastParent is set to place at start of treeWalkUp
             if (!call.isEquivalentTo(lastParent) || call.isEquivalentTo(place)) {
                 when {
-                    // modulars don't descend back into their bodies if their `do` block was the `lastParent`.
-                    Module.`is`(call) || Implementation.`is`(call) || Protocol.`is`(call) -> if (lastParent != call.doBlock) {
-                        processor.execute(call, state)
-                    } else {
-                        true
-                    }
                     call.isCalling(KERNEL, ALIAS) ||
                     CallDefinitionClause.`is`(call) || // call parameters
                             Callback.`is`(call) ||
                             Delegation.`is`(call) || // delegation call parameters
                             Exception.`is`(call) ||
+                            Implementation.`is`(call) ||
                             Import.`is`(call) ||
+                            Module.`is`(call) ||
+                            Protocol.`is`(call) ||
                             Use.`is`(call) ||
                             call.isCalling(KERNEL, DESTRUCTURE) || // left operand
                             call.isCallingMacro(KERNEL, IF) || // match in condition

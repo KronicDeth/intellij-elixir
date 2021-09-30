@@ -13,11 +13,13 @@ import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.Named
 
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
+import org.elixir_lang.psi.impl.ProcessDeclarationsImpl
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.call.keywordArgument
 import org.elixir_lang.psi.impl.maybeModularNameToModulars
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.scope.ResolveResultOrderedSet
+import org.elixir_lang.psi.scope.VisitedElementSetResolveResult
 import org.elixir_lang.psi.scope.WhileIn.whileIn
 import org.elixir_lang.psi.scope.maxScope
 import org.elixir_lang.structure_view.element.CallDefinitionHead
@@ -131,6 +133,25 @@ private constructor(
                 addIfNameOrArityToResolveResults(element, name, validArity, state)
             }
 
+    override fun executeOnMixGeneratorEmbed(element: Call, state: ResolveState): Boolean =
+            element.finalArguments()?.first()?.stripAccessExpression()?.let { it as? ElixirAtom }?.node?.lastChildNode?.text?.let { prefix ->
+                val suffix = element.functionName()!!.removePrefix("embed_")
+                val name = "${prefix}_${suffix}"
+                val arityRange = when (suffix) {
+                    "template" -> 0..1
+                    "text" -> 0..0
+                    else -> TODO("Unknown suffix $suffix")
+                }
+
+                if (this.name != null && name.startsWith(this.name)) {
+                    val validResult = (resolvedPrimaryArity in arityRange) && (name == this.name)
+
+                    addToResolveResults(element, name, validResult, state)
+                } else {
+                    true
+                }
+            } ?: true
+
     private fun addIfNameOrArityToResolveResults(call: Call,
                                                  nameArityInterval: NameArityInterval,
                                                  state: ResolveState): Boolean {
@@ -151,16 +172,16 @@ private constructor(
             }
 
     override fun keepProcessing(): Boolean = resolveResultOrderedSet.keepProcessing(incompleteCode)
-    fun resolveResults(): List<ResolveResult> = resolveResultOrderedSet.toList()
+    fun resolveResults(): List<VisitedElementSetResolveResult> = resolveResultOrderedSet.toList()
 
     private val resolveResultOrderedSet = ResolveResultOrderedSet()
 
     private fun addToResolveResults(call: Call, name: String, validResult: Boolean, state: ResolveState): Boolean =
             (call as? Named)?.nameIdentifier?.let { nameIdentifier ->
                 if (PsiTreeUtil.isAncestor(state.get(ENTRANCE), nameIdentifier, false)) {
-                    resolveResultOrderedSet.add(call, name, validResult)
+                    resolveResultOrderedSet.add(call, name, validResult, emptySet())
                 } else {
-                    resolveResultOrderedSet.add(call, name, validResult)
+                    resolveResultOrderedSet.add(call, name, validResult, state.visitedElementSet())
                 }
 
                 keepProcessing()
@@ -173,7 +194,7 @@ private constructor(
                            resolvedFinalArity: Int,
                            incompleteCode: Boolean,
                            entrance: PsiElement,
-                           resolveState: ResolveState = ResolveState.initial()): List<ResolveResult> {
+                           resolveState: ResolveState = ResolveState.initial()): List<VisitedElementSetResolveResult> {
             val multiResolve = MultiResolve(name, resolvedFinalArity, incompleteCode)
             val maxScope = maxScope(entrance)
 

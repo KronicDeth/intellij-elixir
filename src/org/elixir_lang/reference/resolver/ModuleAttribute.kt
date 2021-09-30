@@ -38,7 +38,7 @@ object ModuleAttribute : ResolveCache.PolyVariantResolver<ModuleAttribute> {
             }
         }
 
-        return resolveResultOrderedSet.toTypedArray()
+        return resolveResultOrderedSet.toList().toTypedArray()
     }
 
     private fun validResult(moduleAttribute: ModuleAttribute,

@@ -7,18 +7,19 @@ import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.Module.concat
 import org.elixir_lang.Module.split
-import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.psi.NamedElement
 import org.elixir_lang.psi.call.Named
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.putInitialVisitedElement
+import org.elixir_lang.psi.putVisitedElement
 import org.elixir_lang.psi.scope.Module
 import org.elixir_lang.psi.scope.ResolveResultOrderedSet
+import org.elixir_lang.psi.scope.VisitedElementSetResolveResult
 import org.elixir_lang.psi.scope.maxScope
-import org.elixir_lang.psi.stub.index.AllName
 import org.elixir_lang.psi.stub.index.ModularName
+import org.elixir_lang.psi.visitedElementSet
 import org.elixir_lang.reference.module.UnaliasedName
 import java.util.*
 
@@ -35,28 +36,17 @@ class MultiResolve internal constructor(private val name: String, private val in
         executeOnAliasedName(match, aliasedName, name, state)
 
     private fun executeOnAliasedName(match: PsiNamedElement, aliasedName: String, targetName: String, state: ResolveState): Boolean {
+        val aliasedNameState = state.putVisitedElement(match)
+
         if (aliasedName == targetName) {
             val namePartList = split(targetName)
-
-            val multipleAliasesQualifier = state.get(MULTIPLE_ALIASES_QUALIFIER)
-            val suffix = match.name
-
-            if (multipleAliasesQualifier == null) {
-                // adds `Foo.SSH` in `alias Foo.SSH` or `FSSH` in `alias Foo.SSH, as: FSSH`
-                resolveResultOrderedSet.add(match, "alias ${suffix}", true)
-            } else {
-                val prefix = multipleAliasesQualifier.name
-
-                // Adds `SSH` in `alias Foo.{SSH, ...}` or `alias Foo.{Bar.SSH, ...}`
-                resolveResultOrderedSet.add(match, "alias ${prefix}.{$suffix}", true)
-            }
 
             // ALIAS_CALL is only set for `as:` usages
             val aliasCall = state.get(ALIAS_CALL)
 
             if (aliasCall == null) {
                 // adds `defmodule Foo.SSH` for `alias Foo.SSH`
-                addUnaliasedNamedElementsToResolveResultList(match, namePartList)
+                addUnaliasedNamedElementsToResolveResultList(match, namePartList, aliasedNameState.visitedElementSet())
             } else {
                 // adds `Foo.SSH` and `defmodule Foo.SSH` for `alias Foo.SSH, as FSSH`
                 aliasCall
@@ -71,7 +61,7 @@ class MultiResolve internal constructor(private val name: String, private val in
                                         first,
                                         aliasedNameWithoutAs,
                                         aliasedNameWithoutAs,
-                                        state.put(ALIAS_CALL, null)
+                                        aliasedNameState.put(ALIAS_CALL, null)
                                 )
                             }
                         }
@@ -85,18 +75,9 @@ class MultiResolve internal constructor(private val name: String, private val in
                 val multipleAliasesQualifier = state.get(MULTIPLE_ALIASES_QUALIFIER)
                 val suffix = match.name
 
-                if (multipleAliasesQualifier == null) {
-                    resolveResultOrderedSet.add(match, "${name} -> alias ${suffix}", true)
-                } else {
-                    // `alias Foo.{SSH, ...}` then `SSH.Key` is name
-                    val prefix = multipleAliasesQualifier.name
-
-                    resolveResultOrderedSet.add(match, "${name} -> alias ${prefix}.{$suffix}", true)
-                }
-
-                addUnaliasedNamedElementsToResolveResultList(match, namePartList)
+                addUnaliasedNamedElementsToResolveResultList(match, namePartList, aliasedNameState.visitedElementSet())
             } else if (aliasedName.startsWith(name)) {
-                resolveResultOrderedSet.add(match, "alias ${match.text}", false)
+                resolveResultOrderedSet.add(match, "alias ${match.text}", false, state.visitedElementSet())
             }
         }
 
@@ -106,17 +87,19 @@ class MultiResolve internal constructor(private val name: String, private val in
     override fun executeOnModularName(modular: Named, modularName: String, state: ResolveState): Boolean {
         if (modularName.startsWith(name)) {
             val validResult = modularName == name
-            resolveResultOrderedSet.add(modular, modularName, validResult)
+            resolveResultOrderedSet.add(modular, modularName, validResult, state.visitedElementSet())
         }
 
         return resolveResultOrderedSet.keepProcessing(incompleteCode)
     }
 
-    fun resolveResults(): Array<ResolveResult> = resolveResultOrderedSet.toTypedArray()
+    fun resolveResults(): Array<VisitedElementSetResolveResult> = resolveResultOrderedSet.toList().toTypedArray()
 
     private val resolveResultOrderedSet = ResolveResultOrderedSet()
 
-    private fun addUnaliasedNamedElementsToResolveResultList(match: PsiNamedElement, namePartList: List<String>) {
+    private fun addUnaliasedNamedElementsToResolveResultList(match: PsiNamedElement,
+                                                             namePartList: List<String>,
+                                                             visitedElementSet: Set<PsiElement>) {
         val unaliasedName = unaliasedName(match, namePartList)
 
         val project = match.project
@@ -130,7 +113,7 @@ class MultiResolve internal constructor(private val name: String, private val in
                             project,
                             GlobalSearchScope.allScope(project),
                             NamedElement::class.java) {
-                resolveResultOrderedSet.add(it, unaliasedName, true)
+                resolveResultOrderedSet.add(it, unaliasedName, true, visitedElementSet)
 
                 true
             }
@@ -140,13 +123,13 @@ class MultiResolve internal constructor(private val name: String, private val in
     companion object {
         fun resolveResults(name: String,
                            incompleteCode: Boolean,
-                           entrance: PsiElement): Array<ResolveResult> =
+                           entrance: PsiElement): Array<VisitedElementSetResolveResult> =
                 resolveResults(name, incompleteCode, entrance, ResolveState.initial())
 
         private fun resolveResults(name: String,
                                    incompleteCode: Boolean,
                                    entrance: PsiElement,
-                                   state: ResolveState): Array<ResolveResult> {
+                                   state: ResolveState): Array<VisitedElementSetResolveResult> {
             val multiResolve = MultiResolve(name, incompleteCode)
             val maxScope = maxScope(entrance)
 

@@ -1,52 +1,53 @@
 package org.elixir_lang.psi.scope
 
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiElementResolveResult
 import com.intellij.psi.ResolveResult
-import org.elixir_lang.navigation.isDecompiled
 
 class ResolveResultOrderedSet {
-   fun add(element: PsiElement, name: String, validResult: Boolean) {
-      if (element !in psiElementSet) {
-         psiElementSet.add(element)
-         val psiElementResolveResult = PsiElementResolveResult(element, validResult)
-         val existingDecompiledPsiElementResolveResultList = psiElementResolveResultListByName[name]
+    fun add(element: PsiElement, name: String, validResult: Boolean, visitedElementSet: Set<PsiElement>) {
+        if (element !in psiElementSet) {
+            psiElementSet.add(element)
+            val visitedElementSetResolveResult = VisitedElementSetResolveResult(element, validResult, visitedElementSet)
+            val existingVisitedElementSetResolveResultList = visitedElementSetResolveResultListByName[name]
 
-         if (existingDecompiledPsiElementResolveResultList != null) {
-            existingDecompiledPsiElementResolveResultList.add(psiElementResolveResult)
-         } else {
-            nameOrder.add(name)
+            if (existingVisitedElementSetResolveResultList != null) {
+                existingVisitedElementSetResolveResultList.add(visitedElementSetResolveResult)
+            } else {
+                nameOrder.add(name)
 
-            val psiElementResolveResultList = mutableListOf(psiElementResolveResult)
-            psiElementResolveResultListByName[name] = psiElementResolveResultList
-         }
-      }
-   }
+                val visitedElementSetResolveResultList = mutableListOf(visitedElementSetResolveResult)
+                visitedElementSetResolveResultListByName[name] = visitedElementSetResolveResultList
+            }
+        }
+    }
 
-   fun addAll(other: ResolveResultOrderedSet) {
-      other.nameOrder.forEach { name ->
-         other.psiElementResolveResultListByName[name]!!.forEach { psiElementResolveResult ->
-            add(psiElementResolveResult.element, name, psiElementResolveResult.isValidResult)
-         }
-      }
-   }
+    fun addAll(other: ResolveResultOrderedSet) {
+        other.nameOrder.forEach { name ->
+            other.visitedElementSetResolveResultListByName[name]!!.forEach { visitedElementSetResolveResult ->
+                add(
+                        visitedElementSetResolveResult.element,
+                        name,
+                        visitedElementSetResolveResult.isValidResult,
+                        visitedElementSetResolveResult.visitedElementSet
+                )
+            }
+        }
+    }
 
-   fun keepProcessing(incompleteCode: Boolean): Boolean = incompleteCode || !hasValidResult()
+    fun keepProcessing(incompleteCode: Boolean): Boolean = incompleteCode || !hasValidResult()
 
-   fun toTypedArray(): Array<ResolveResult> = toList().toTypedArray()
+    fun toList(): List<VisitedElementSetResolveResult> =
+            nameOrder
+                    .flatMap { name ->
+                        visitedElementSetResolveResultListByName[name]!!
+                    }
 
-   fun toList(): List<ResolveResult> =
-           nameOrder
-                   .flatMap { name ->
-                      psiElementResolveResultListByName[name]!!
-                   }
+    private val psiElementSet = mutableSetOf<PsiElement>()
+    private val visitedElementSetResolveResultListByName = mutableMapOf<String, MutableList<VisitedElementSetResolveResult>>()
+    private val nameOrder = mutableListOf<String>()
 
-   private val psiElementSet = mutableSetOf<PsiElement>()
-   private val psiElementResolveResultListByName = mutableMapOf<String, MutableList<PsiElementResolveResult>>()
-   private val nameOrder = mutableListOf<String>()
-
-   private fun hasValidResult() =
-           psiElementResolveResultListByName.values.any {
-              it.any { it.isValidResult }
-           }
+    private fun hasValidResult() =
+            visitedElementSetResolveResultListByName.values.any {
+                it.any { it.isValidResult }
+            }
 }

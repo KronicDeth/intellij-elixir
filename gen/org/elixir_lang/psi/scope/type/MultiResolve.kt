@@ -5,11 +5,8 @@ import com.intellij.psi.ResolveResult
 import com.intellij.psi.ResolveState
 import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.errorreport.Logger
-import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
-import org.elixir_lang.psi.ElixirKeywordKey
-import org.elixir_lang.psi.UnqualifiedNoArgumentsCall
+import org.elixir_lang.psi.*
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil
-import org.elixir_lang.psi.putInitialVisitedElement
 import org.elixir_lang.psi.scope.ResolveResultOrderedSet
 import org.elixir_lang.reference.Type.Companion.typeHead
 
@@ -25,7 +22,7 @@ private constructor(private val name: String,
                             val arity = typeHead.resolvedFinalArity()
                             val validResult = name == this.name && arity == this.arity
 
-                            resolveResultOrderedSet.add(definition, typeHead.text, validResult)
+                            resolveResultOrderedSet.add(definition, typeHead.text, validResult, state.visitedElementSet())
 
                             keepProcessing()
                         } else {
@@ -50,7 +47,7 @@ private constructor(private val name: String,
             if (name != null && name.startsWith(this.name)) {
                 val validResult = name == this.name
 
-                resolveResultOrderedSet.add(parameter, name, validResult)
+                resolveResultOrderedSet.add(parameter, name, validResult, state.visitedElementSet())
 
                 keepProcessing()
             } else {

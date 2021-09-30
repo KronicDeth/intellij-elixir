@@ -11,12 +11,13 @@ import org.elixir_lang.psi.impl.ProcessDeclarationsImpl.DECLARING_SCOPE
 import org.elixir_lang.psi.operation.Match
 import org.elixir_lang.psi.scope.MultiResolve.keepProcessing
 import org.elixir_lang.psi.scope.Variable
+import org.elixir_lang.psi.scope.VisitedElementSetResolveResult
 import org.elixir_lang.reference.Callable
 import org.jetbrains.annotations.Contract
 import java.util.*
 
 class MultiResolve(private val name: String, private val incompleteCode: Boolean) : Variable() {
-    private val resolveResultList = mutableListOf<ResolveResult>()
+    private val resolveResultList = mutableListOf<VisitedElementSetResolveResult>()
 
     /**
      * Decides whether `match` matches the criteria being searched for.  All other [.executeOnVariable] methods
@@ -80,7 +81,7 @@ class MultiResolve(private val name: String, private val incompleteCode: Boolean
 
             // either non-right match declaration or recursive call didn't find a rebinding
             if (!added) {
-                resolveResultList.add(PsiElementResolveResult(element, validResult))
+                resolveResultList.add(VisitedElementSetResolveResult(element, validResult, state.visitedElementSet()))
             }
         }
     }
@@ -99,9 +100,9 @@ class MultiResolve(private val name: String, private val incompleteCode: Boolean
 
         fun resolveResultList(name: String,
                               incompleteCode: Boolean,
-                              entrance: PsiElement): List<ResolveResult> =
+                              entrance: PsiElement): List<VisitedElementSetResolveResult> =
             if (name == Callable.IGNORED) {
-                listOf<ResolveResult>(PsiElementResolveResult(entrance))
+                listOf<VisitedElementSetResolveResult>(VisitedElementSetResolveResult(entrance, true, emptySet()))
             } else {
                 val resolveState = ResolveState.initial().put(ENTRANCE, entrance).putInitialVisitedElement(entrance)
 
@@ -111,7 +112,7 @@ class MultiResolve(private val name: String, private val incompleteCode: Boolean
         fun resolveResultList(name: String,
                               incompleteCode: Boolean,
                               entrance: PsiElement,
-                              resolveState: ResolveState): List<ResolveResult> {
+                              resolveState: ResolveState): List<VisitedElementSetResolveResult> {
             val multiResolve = MultiResolve(name, incompleteCode)
 
             val treeWalkUpResolveState = if (resolveState.get(ENTRANCE) == null) {

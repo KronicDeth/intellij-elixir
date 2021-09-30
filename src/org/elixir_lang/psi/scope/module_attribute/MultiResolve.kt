@@ -8,6 +8,7 @@ import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.putInitialVisitedElement
 import org.elixir_lang.psi.scope.ModuleAttribute
 import org.elixir_lang.psi.scope.ResolveResultOrderedSet
+import org.elixir_lang.psi.visitedElementSet
 
 class MultiResolve(private val name: String) : ModuleAttribute() {
     override fun executeOnDeclaration(declaration: AtUnqualifiedNoParenthesesCall<*>, state: ResolveState): Boolean {
@@ -15,7 +16,7 @@ class MultiResolve(private val name: String) : ModuleAttribute() {
             if (declaredName.startsWith(name)) {
                 val validResult = declaredName == name
 
-                resolveResultOrderedSet.add(declaration, declaration.text, validResult)
+                resolveResultOrderedSet.add(declaration, declaration.text, validResult, state.visitedElementSet())
             }
         }
 

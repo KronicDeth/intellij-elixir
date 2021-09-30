@@ -11,6 +11,7 @@ import com.intellij.psi.impl.source.resolve.ResolveCache
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import org.elixir_lang.psi.NamedElement
+import org.elixir_lang.psi.scope.VisitedElementSetResolveResult
 import org.elixir_lang.psi.scope.module.MultiResolve
 import org.elixir_lang.psi.stub.index.ModularName
 import org.elixir_lang.reference.Resolver
@@ -20,7 +21,7 @@ object Module : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Modul
     override fun resolve(
             module: org.elixir_lang.reference.Module,
             incompleteCode: Boolean
-    ): Array<ResolveResult> =
+    ): Array<VisitedElementSetResolveResult> =
             module.element.let { element ->
                 element.fullyQualifiedName().let { name ->
                     val sameFileResolveResults =
@@ -38,8 +39,8 @@ object Module : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Modul
             }
 
     private fun multiResolveProject(entrance: PsiElement,
-                                    name: String): Array<ResolveResult> {
-        val resolveResultList = mutableListOf<PsiElementResolveResult>()
+                                    name: String): Array<VisitedElementSetResolveResult> {
+        val resolveResultList = mutableListOf<VisitedElementSetResolveResult>()
         val project = entrance.project
 
         if (!DumbService.isDumb(project)) {
@@ -73,7 +74,7 @@ object Module : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Modul
                     .processElements(ModularName.KEY, name, project, globalSearchScope, null, NamedElement::class.java) { namedElement ->
                         /* The namedElement may be a ModuleImpl from a .beam.  Using #getNaviationElement() ensures a source
                        (either true source or decompiled) is used. */
-                        resolveResultList.add(PsiElementResolveResult(namedElement.navigationElement))
+                        resolveResultList.add(VisitedElementSetResolveResult(namedElement.navigationElement))
                     }
         }
 
