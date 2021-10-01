@@ -11,7 +11,7 @@ object Generator {
         } ?: false
 
     private fun resolvesTo(call: Call, state: ResolveState): Boolean =
-            true //resolvesToModularName(call, state, "Mix.Generator")
+            resolvesToModularName(call, state, "Mix.Generator")
 
     private val NAMES = arrayOf("embed_template", "embed_text")
     private const val ARITY = 2

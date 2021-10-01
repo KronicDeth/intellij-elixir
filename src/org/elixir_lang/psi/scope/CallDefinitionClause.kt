@@ -128,16 +128,21 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
                 }
                 (Module.`is`(element) || Implementation.`is`(element) || Protocol.`is`(element)) && modularContainsEntrance(element, state) -> {
                     val childCalls = element.macroChildCallSequence()
-                    val entranceAndFollowingSiblings = childCalls.dropWhile { !it.isAncestor(state.get(ENTRANCE)) }.toList()
 
-                    val unvisitedChildCalls = if (entranceAndFollowingSiblings.isNotEmpty()) {
-                        entranceAndFollowingSiblings.asSequence().drop(1)
-                    } else {
-                        childCalls
-                    }
+                    // If the entrance is at level of `childCalls`, then only previous siblings could possibly define
+                    // this call and those will be handled by ElixirStabBody's processDeclarations.
+                    if (!childCalls.any { it.isEquivalentTo(state.get(ENTRANCE)) }) {
+                        val entranceAndFollowingSiblings = childCalls.dropWhile { !it.isAncestor(state.get(ENTRANCE), true) }.toList()
 
-                    for (childCall in unvisitedChildCalls) {
-                        execute(childCall, state)
+                        val unvisitedChildCalls = if (entranceAndFollowingSiblings.isNotEmpty()) {
+                            entranceAndFollowingSiblings.asSequence().drop(1)
+                        } else {
+                            childCalls
+                        }
+
+                        for (childCall in unvisitedChildCalls) {
+                            execute(childCall, state)
+                        }
                     }
 
                     // Only check MultiResolve.keepProcessing at the end of a Module to all multiple arities
