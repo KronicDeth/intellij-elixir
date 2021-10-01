@@ -347,16 +347,12 @@ abstract class Variable : PsiScopeProcessor {
     /**
      * Infix operations where either side can declare a variable in a match
      */
-    private fun execute(match: Infix, state: ResolveState): Boolean {
-        var keepProcessing = executeLeftOperand(match, state)
-        if (keepProcessing) {
-            val rightOperand: PsiElement? = match.rightOperand()
-            if (rightOperand != null) {
-                keepProcessing = execute(rightOperand, state)
-            }
-        }
-        return keepProcessing
-    }
+    private fun execute(match: Infix, state: ResolveState): Boolean =
+            state.hasBeenVisited(match) ||
+                    state.putVisitedElement(match).let { matchState ->
+                        executeLeftOperand(match, matchState) &&
+                                match.rightOperand()?.let { execute(it, matchState) } ?: true
+                    }
 
     private fun execute(match: InMatch, state: ResolveState): Boolean {
         val operator = match.operator()

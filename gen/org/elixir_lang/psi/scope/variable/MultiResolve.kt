@@ -57,6 +57,7 @@ class MultiResolve(private val name: String, private val incompleteCode: Boolean
                                                 .initial()
                                                 .put(ElixirPsiImplUtil.ENTRANCE, matchAncestor)
                                                 .putInitialVisitedElement(matchAncestor)
+                                                .putVisitedElements(state)
                                                 .put(LAST_BINDING_KEY, element)
                                 )
 

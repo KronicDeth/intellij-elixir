@@ -23,6 +23,15 @@ fun ResolveState.putInitialVisitedElement(visitedElement: PsiElement): ResolveSt
     return this.put(VISITED_ELEMENT_SET, setOf(visitedElement))
 }
 
+
+fun ResolveState.putVisitedElements(other: ResolveState): ResolveState =
+        putVisitedElements(other.visitedElementSet())
+
+fun ResolveState.putVisitedElements(visitedElements: Iterable<PsiElement>): ResolveState =
+    visitedElements.fold(this) { acc, visitedElement ->
+        acc.putVisitedElement(visitedElement)
+    }
+
 fun ResolveState.putVisitedElement(visitedElement: PsiElement): ResolveState {
     val visitedElementSet = this.get(VISITED_ELEMENT_SET) ?: emptySet()
 
