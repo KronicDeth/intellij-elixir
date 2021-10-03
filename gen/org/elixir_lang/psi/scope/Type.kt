@@ -22,6 +22,7 @@ import org.elixir_lang.psi.impl.call.whileInStabBodyChildExpressions
 import org.elixir_lang.psi.impl.childExpressions
 import org.elixir_lang.psi.impl.identifierName
 import org.elixir_lang.psi.impl.whileInChildExpressions
+import org.elixir_lang.psi.operation.Pipe
 import org.elixir_lang.psi.operation.Type
 import org.elixir_lang.psi.scope.WhileIn.whileIn
 import org.elixir_lang.psi.stub.index.ModularName
@@ -190,7 +191,7 @@ abstract class Type : PsiScopeProcessor {
     }
 }
 
-internal tailrec fun PsiElement.ancestorTypeSpec(): AtUnqualifiedNoParenthesesCall<*>? =
+internal fun PsiElement.ancestorTypeSpec(): AtUnqualifiedNoParenthesesCall<*>? =
         when (this) {
             is AtUnqualifiedNoParenthesesCall<*> -> {
                 val identifierName = this.atIdentifier.identifierName()
@@ -206,6 +207,7 @@ internal tailrec fun PsiElement.ancestorTypeSpec(): AtUnqualifiedNoParenthesesCa
             is ElixirKeywords,
             is ElixirKeywordPair,
             is ElixirMatchedParenthesesArguments,
+            is Pipe,
             is ElixirStructOperation,
             is ElixirNoParenthesesOneArgument,
             is ElixirNoParenthesesArguments,
@@ -213,7 +215,7 @@ internal tailrec fun PsiElement.ancestorTypeSpec(): AtUnqualifiedNoParenthesesCa
             is ElixirNoParenthesesKeywordPair,
             is ElixirNoParenthesesManyStrictNoParenthesesExpression,
                 // For function type
-            is ElixirParentheticalStab, is ElixirStab, is ElixirStabBody, is ElixirStabOperation, is ElixirStabNoParenthesesSignature,
+            is ElixirParenthesesArguments, is ElixirParentheticalStab, is ElixirStab, is ElixirStabBody, is ElixirStabOperation, is ElixirStabNoParenthesesSignature, is ElixirStabParenthesesSignature,
                 // containers
             is ElixirList, is ElixirTuple,
                 // maps
@@ -222,7 +224,7 @@ internal tailrec fun PsiElement.ancestorTypeSpec(): AtUnqualifiedNoParenthesesCa
                 // types
             is Type, is Call -> parent.ancestorTypeSpec()
             // `fn` anonymous function type just uses parentheses and `->`, like `(type1, type2 -> type3)`
-            is ElixirAnonymousFunction, is ElixirStabParenthesesSignature,
+            is ElixirAnonymousFunction,
                 // BitStrings use `::` like types, but cannot contain type parameters or declarations
             is ElixirBitString,
                 // Types can't be declared inside of bracket operations where they would be used as keys
