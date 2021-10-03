@@ -59,6 +59,7 @@ object ProcessDeclarationsImpl {
         val identifierName = atUnqualifiedNoParenthesesCall.atIdentifier.identifierName()
 
         return if (ModuleAttribute.isTypeSpecName(identifierName)) {
+            processor.execute(atUnqualifiedNoParenthesesCall, state) &&
             atUnqualifiedNoParenthesesCall.finalArguments()?.singleOrNull()?.let { argument ->
                 processDeclarationInTypeSpecArgument(argument, processor, state)
             } ?: true
