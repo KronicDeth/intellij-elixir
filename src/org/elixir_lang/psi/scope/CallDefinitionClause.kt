@@ -132,15 +132,7 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
                     // If the entrance is at level of `childCalls`, then only previous siblings could possibly define
                     // this call and those will be handled by ElixirStabBody's processDeclarations.
                     if (!childCalls.any { it.isEquivalentTo(state.get(ENTRANCE)) }) {
-                        val entranceAndFollowingSiblings = childCalls.dropWhile { !it.isAncestor(state.get(ENTRANCE), true) }.toList()
-
-                        val unvisitedChildCalls = if (entranceAndFollowingSiblings.isNotEmpty()) {
-                            entranceAndFollowingSiblings.asSequence().drop(1)
-                        } else {
-                            childCalls
-                        }
-
-                        for (childCall in unvisitedChildCalls) {
+                        for (childCall in childCalls) {
                             execute(childCall, state)
                         }
                     }
