@@ -43,8 +43,12 @@ class Definition(
         }
     }
 
-    fun toMacroString(): String? =
-            clauses?.mapNotNull(Clause::toMacroString)?.takeIf(List<String>::isNotEmpty)?.joinToString("\n\n")
+    fun toMacroString(clauseLimit: Int): String? =
+            clauses
+                    ?.takeIf { it.size < clauseLimit }
+                    ?.mapNotNull(Clause::toMacroString)
+                    ?.takeIf(List<String>::isNotEmpty)
+                    ?.joinToString("\n\n")
 
     companion object {
         fun from(term: OtpErlangObject, debugInfo: V1): Definition? =

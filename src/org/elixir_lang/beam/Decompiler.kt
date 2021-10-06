@@ -390,7 +390,7 @@ class Decompiler : BinaryFileDecompiler {
         private fun appendMacroNameArity(decompiled: StringBuilder,
                                          macroNameArity: MacroNameArity,
                                          debugInfo: org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.V1): Boolean =
-                debugInfo.definitions?.get(macroNameArity)?.toMacroString()?.let { macroString ->
+                debugInfo.definitions?.get(macroNameArity)?.toMacroString(10)?.let { macroString ->
                     decompiled.append(macroString.prependIndent("  ")).append('\n')
 
                     true
