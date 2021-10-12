@@ -41,6 +41,12 @@ object Query {
                         } else {
                             true
                         }
+                    DYNAMIC_NAME_ARITY_RANGE.name ->
+                        if (call.resolvedFinalArity() in DYNAMIC_NAME_ARITY_RANGE.arityRange) {
+                            executeOnDynamic(call, state, keepProcessing)
+                        } else {
+                            true
+                        }
                     FROM_NAME_ARITY_RANGE.name ->
                         if (call.resolvedFinalArity() in FROM_NAME_ARITY_RANGE.arityRange) {
                             executeOnFrom(call, state, keepProcessing)
@@ -111,6 +117,29 @@ object Query {
                         Logger.error(
                                 logger,
                                 "distinct arity outside of range (${DISTINCT_NAME_ARITY_RANGE.arityRange})",
+                                call
+                        )
+
+                        null
+                    }
+                }
+            } ?: true
+
+    private fun executeOnDynamic(call: Call,
+                                 state: ResolveState,
+                                 keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
+            call.finalArguments()?.let { arguments ->
+                // dynamic(binding \\ [], expr)
+                when (call.resolvedFinalArity()) {
+                    // `dynamic(expr)`
+                    1 -> executeOnSelectExpression(arguments[arguments.lastIndex], state.put(CALL, call), keepProcessing)
+                    // `dynamic(binding, expr)
+                    2 -> executeOnBinding(arguments[arguments.lastIndex - 1], state, keepProcessing) &&
+                            executeOnSelectExpression(arguments[arguments.lastIndex], state.put(CALL, call), keepProcessing)
+                    else ->  {
+                        Logger.error(
+                                logger,
+                                "dynamic arity outside of range (${DYNAMIC_NAME_ARITY_RANGE.arityRange})",
                                 call
                         )
 
@@ -520,6 +549,7 @@ object Query {
                 resolvesToEctoQuery(call, state)
 
     private val DISTINCT_NAME_ARITY_RANGE = NameArityRange("distinct", 2..3)
+    private val DYNAMIC_NAME_ARITY_RANGE = NameArityRange("dynamic", 1..2)
     private val FROM_NAME_ARITY_RANGE = NameArityRange("from", 1..2)
     private val GROUP_BY_NAME_ARITY_RANGE = NameArityRange("group_by", 2..3)
     private val HAVING_NAME_ARITY_RANGE = NameArityRange("having", 2..3)
@@ -530,6 +560,7 @@ object Query {
     private val WHERE_NAME_ARITY_RANGE = NameArityRange("where", 2..3)
     private val DECLARING_MACRO_NAME_ARITY_RANGES = arrayOf(
             DISTINCT_NAME_ARITY_RANGE,
+            DYNAMIC_NAME_ARITY_RANGE,
             FROM_NAME_ARITY_RANGE,
             GROUP_BY_NAME_ARITY_RANGE,
             HAVING_NAME_ARITY_RANGE,
