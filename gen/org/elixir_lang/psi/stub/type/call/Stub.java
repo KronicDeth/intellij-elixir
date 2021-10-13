@@ -5,7 +5,9 @@ import com.intellij.psi.stubs.StubOutputStream;
 import org.elixir_lang.psi.CallDefinitionClause;
 import org.elixir_lang.psi.Implementation;
 import org.elixir_lang.psi.Module;
+import org.elixir_lang.psi.ModuleAttribute;
 import org.elixir_lang.psi.Protocol;
+import org.elixir_lang.psi.QuoteMacro;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.call.StubBased;
 import org.elixir_lang.psi.stub.call.Deserialized;
@@ -15,6 +17,8 @@ import org.elixir_lang.structure_view.element.Callback;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+
+import static org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall;
 
 public abstract class Stub<Stub extends org.elixir_lang.psi.stub.call.Stub<Psi>,
         Psi extends org.elixir_lang.psi.call.StubBased> extends org.elixir_lang.psi.stub.type.Named<Stub, Psi> {
@@ -64,7 +68,25 @@ public abstract class Stub<Stub extends org.elixir_lang.psi.stub.call.Stub<Psi>,
     }
 
     private boolean isNameable(Call call) {
-        return isEnclosableByModular(call) || isDelegationCallDefinitionHead(call) || isModular(call);
+        return isEnclosableByModular(call) || isDelegationCallDefinitionHead(call) || isModular(call) || isQuoted(call);
+    }
+
+    private boolean isQuoted(Call call) {
+        boolean isQuoted;
+
+        if (ModuleAttribute.isDeclaration(call)) {
+            Call enclosingModularMacroCall = enclosingModularMacroCall(call);
+
+            if (enclosingModularMacroCall != null) {
+                isQuoted = QuoteMacro.is(enclosingModularMacroCall);
+            } else {
+                isQuoted = false;
+            }
+        } else {
+            isQuoted = false;
+        }
+
+        return isQuoted;
     }
 
     @Override

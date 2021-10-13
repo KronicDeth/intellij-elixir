@@ -7,6 +7,7 @@ import org.elixir_lang.psi.call.name.Module.KERNEL
 enum class Definition(val type: Type) {
     IMPLEMENTATION(Type.MODULAR),
     MODULE(Type.MODULAR),
+    MODULE_ATTRIBUTE(Type.CALLABLE),
     PROTOCOL(Type.MODULAR),
     PUBLIC_FUNCTION(Type.CALLABLE),
     PRIVATE_FUNCTION(Type.CALLABLE),

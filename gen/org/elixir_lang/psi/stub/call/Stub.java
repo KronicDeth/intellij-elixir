@@ -79,6 +79,30 @@ public class Stub<T extends org.elixir_lang.psi.call.StubBased> extends NamedStu
     }
 
     public Stub(StubElement parent,
+                 @NotNull IStubElementType elementType,
+                 @Nullable String resolvedModuleName,
+                 @Nullable String resolvedFunctionName,
+                 int resolvedFinalArity,
+                 boolean hasDoBlockOrKeyword,
+                 @NotNull String name,
+                 @NotNull Set<String> canonicalNameSet,
+                 @Nullable Definition definition,
+                 @Nullable String implementedProtocolName) {
+        this(
+                parent,
+                elementType,
+                StringRef.fromString(resolvedModuleName),
+                StringRef.fromString(resolvedFunctionName),
+                resolvedFinalArity,
+                hasDoBlockOrKeyword,
+                StringRef.fromString(name),
+                setStringToSetStringRef(canonicalNameSet),
+                definition,
+                StringRef.fromString(implementedProtocolName)
+        );
+    }
+
+    public Stub(StubElement parent,
                 @NotNull IStubElementType elementType,
                 @NotNull Deserialized deserialized) {
         this(
@@ -103,13 +127,42 @@ public class Stub<T extends org.elixir_lang.psi.call.StubBased> extends NamedStu
                  @NotNull StringRef name,
                  @NotNull Set<StringRef> canonicalNameSet,
                  @Nullable StringRef implementedProtocolName) {
+        this(
+                parent,
+                elementType,
+                resolvedModuleName,
+                resolvedFunctionName,
+                resolvedFinalArity,
+                hasDoBlockOrKeyword,
+                name,
+                canonicalNameSet,
+                definition(
+                        StringRef.toString(resolvedModuleName),
+                        StringRef.toString(resolvedFunctionName),
+                        resolvedFinalArity,
+                        hasDoBlockOrKeyword
+                ),
+                implementedProtocolName
+        );
+    }
+
+    private Stub(StubElement parent,
+                 @NotNull IStubElementType elementType,
+                 @Nullable StringRef resolvedModuleName,
+                 @Nullable StringRef resolvedFunctionName,
+                 int resolvedFinalArity,
+                 boolean hasDoBlockOrKeyword,
+                 @NotNull StringRef name,
+                 @NotNull Set<StringRef> canonicalNameSet,
+                 @Nullable Definition definition,
+                 @Nullable StringRef implementedProtocolName) {
         super(parent, elementType, name);
         this.canonicalNameSet = canonicalNameSet;
         this.hasDoBlockOrKeyword = hasDoBlockOrKeyword;
         this.resolvedFinalArity = resolvedFinalArity;
         this.resolvedFunctionName = resolvedFunctionName;
         this.resolvedModuleName = resolvedModuleName;
-        this.definition = definition(this.resolvedModuleName(), this.resolvedFunctionName(), resolvedFinalArity, hasDoBlockOrKeyword);
+        this.definition = definition;
         this.implementedProtocolName = implementedProtocolName;
     }
 

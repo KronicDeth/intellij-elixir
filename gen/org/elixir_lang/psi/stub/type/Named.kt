@@ -12,6 +12,7 @@ import org.elixir_lang.psi.stub.call.Stubbic
 import org.elixir_lang.psi.stub.index.AllName
 import org.elixir_lang.psi.stub.index.ImplementedProtocolName
 import org.elixir_lang.psi.stub.index.ModularName
+import org.elixir_lang.psi.stub.index.QuoteModuleAttributeName
 import org.jetbrains.annotations.NonNls
 
 abstract class Named<S : NamedStubBase<T>, T : PsiNameIdentifierOwner>(@NonNls debugName: String) : Element<S, T>(debugName) {
@@ -63,10 +64,12 @@ abstract class Named<S : NamedStubBase<T>, T : PsiNameIdentifierOwner>(@NonNls d
                             sink.occurrence<NamedElement, String>(ImplementedProtocolName.KEY, implementedProtocolName)
                         }
                     }
+                } else if (definition == Definition.MODULE_ATTRIBUTE) {
+                    nameSet.forEach { name ->
+                        sink.occurrence<NamedElement, String>(QuoteModuleAttributeName.KEY,  name)
+                    }
                 }
             }
-
-
         }
     }
 }

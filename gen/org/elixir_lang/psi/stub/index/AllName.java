@@ -13,7 +13,8 @@ public class AllName extends StringStubIndexExtension<NamedElement> {
     // 6 - Remove non-canonical names from being index
     // 7 - `defmemo` and `defmemop`
     // 8 - `implementedProtocolName` added to `Deserialized`
-    public static final int VERSION = 8;
+    // 9 - `Definition.MODULE_ATTRIBUTE` added
+    public static final int VERSION = 9;
 
     @Override
     public int getVersion() {
