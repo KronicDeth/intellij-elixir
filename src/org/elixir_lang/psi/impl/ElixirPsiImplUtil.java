@@ -1071,6 +1071,11 @@ public class ElixirPsiImplUtil {
         return PsiNamedElementImpl.getName(qualifiedAlias);
     }
 
+    @Nullable
+    public static String getName(@NotNull ElixirAtom atom) {
+        return PsiNamedElementImpl.getName(atom);
+    }
+
     @Contract(pure = true)
     @Nullable
     public static String getName(@NotNull NamedElement namedElement) {

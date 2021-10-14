@@ -1,6 +1,7 @@
 package org.elixir_lang.psi.impl
 
 import com.intellij.psi.PsiElement
+import org.elixir_lang.module.RegisterAttribute
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.operation.Operation
 import org.elixir_lang.structure_view.element.CallDefinitionSpecification
@@ -69,8 +70,11 @@ object PsiNameIdentifierOwnerImpl {
                 org.elixir_lang.psi.Module.`is`(named) -> Module.nameIdentifier(named)
                 Protocol.`is`(named) -> Module.nameIdentifier(named)
                 Type.`is`(named) -> Type.nameIdentifier(named)
-                // module attribute
+
+                // module attributes
+                RegisterAttribute.`is`(named) -> RegisterAttribute.nameIdentifier(named)
                 named is AtUnqualifiedNoParenthesesCall<*> ->  named.atIdentifier
+
                 else -> named.functionNameElement()
             }
 

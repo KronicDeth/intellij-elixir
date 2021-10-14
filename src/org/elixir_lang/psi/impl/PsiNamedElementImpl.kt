@@ -5,6 +5,7 @@ import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.util.Computable
 import com.intellij.psi.PsiElement
 import org.elixir_lang.Name
+import org.elixir_lang.module.RegisterAttribute
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.UNQUOTE
@@ -19,33 +20,45 @@ object PsiNamedElementImpl {
     @JvmStatic
     fun getName(qualifiedAlias: QualifiedAlias): String = runReadAction { qualifiedAlias.text }
 
-    @Contract(pure = true)
     @JvmStatic
-    fun getName(namedElement: NamedElement): String? {
-        val nameIdentifier = namedElement.nameIdentifier
-        var name: String? = null
-
-        if (nameIdentifier != null) {
-            val text = ApplicationManager.getApplication().runReadAction(Computable { nameIdentifier.text })
-            name = unquoteName(namedElement, text)
+    fun getName(atom: ElixirAtom): String? =
+        if (atom.charListLine == null && atom.stringLine == null) {
+            atom.node.lastChildNode.text
         } else {
-            if (namedElement is Call) {
-                val call = namedElement as Call
-
-                /* The name of the module defined by {@code defimpl PROTOCOL[ for: MODULE]} is derived by combining the
-                   PROTOCOL and MODULE name into PROTOCOL.MODULE.  Neither piece is really the "name" or
-                   "nameIdentifier" element of the implementation because changing the PROTOCOL make the implementation
-                   just for that different Protocol and changing the MODULE makes the implementation for a different
-                   MODULE.  If `for:` isn't given, it's really the enclosing {@code defmodule MODULE} whose name should
-                   be changed. */
-                if (Implementation.`is`(call)) {
-                    name = Implementation.name(call)
-                }
-            }
+            null
         }
 
-        return name
-    }
+    @Contract(pure = true)
+    @JvmStatic
+    fun getName(namedElement: NamedElement): String? =
+            if (namedElement is Call && RegisterAttribute.`is`(namedElement)) {
+                RegisterAttribute.name(namedElement)
+            } else {
+                val nameIdentifier = namedElement.nameIdentifier
+
+                if (nameIdentifier != null) {
+                    val text = ApplicationManager.getApplication().runReadAction(Computable { nameIdentifier.text })
+                    unquoteName(namedElement, text)
+                } else {
+                    if (namedElement is Call) {
+                        val call = namedElement as Call
+
+                        /* The name of the module defined by {@code defimpl PROTOCOL[ for: MODULE]} is derived by combining the
+                       PROTOCOL and MODULE name into PROTOCOL.MODULE.  Neither piece is really the "name" or
+                       "nameIdentifier" element of the implementation because changing the PROTOCOL make the implementation
+                       just for that different Protocol and changing the MODULE makes the implementation for a different
+                       MODULE.  If `for:` isn't given, it's really the enclosing {@code defmodule MODULE} whose name should
+                       be changed. */
+                        if (Implementation.`is`(call)) {
+                            Implementation.name(call)
+                        } else {
+                            null
+                        }
+                    } else {
+                        null
+                    }
+                }
+            }
 
     @JvmStatic
     fun setName(@Suppress("UNUSED_PARAMETER") element: PsiElement, @Suppress("UNUSED_PARAMETER") newName: String): PsiElement {

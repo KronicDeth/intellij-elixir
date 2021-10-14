@@ -3,6 +3,7 @@ package org.elixir_lang.psi
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.*
 import org.elixir_lang.psi.call.name.Module.KERNEL
+import org.elixir_lang.psi.call.name.Module.MODULE
 
 enum class Definition(val type: Type) {
     IMPLEMENTATION(Type.MODULAR),
@@ -26,53 +27,43 @@ enum class Definition(val type: Type) {
  * What kind of definition is defined by the [call]
  */
 fun definition(call: Call): Definition? =
-    call.resolvedModuleName()?.let { resolvedModuleName ->
-        call.functionName()?.let { functionName ->
-            if (resolvedModuleName == KERNEL) {
-                val resolvedFinalArity = call.resolvedFinalArity()
-                val hasDoBlockOrKeyword= call.hasDoBlockOrKeyword()
+        definition(call.resolvedModuleName(), call.functionName(), call.resolvedFinalArity(), call.hasDoBlockOrKeyword())
 
-                definition(functionName, resolvedFinalArity, hasDoBlockOrKeyword)
+fun definition(resolvedModuleName: String?, functionName: String?, resolvedFinalArity: Int, hasDoBlockOrKeyword: Boolean) =
+        when (resolvedModuleName) {
+            KERNEL -> if (resolvedFinalArity == 3 && hasDoBlockOrKeyword) {
+                when (functionName) {
+                    DEFIMPL -> Definition.IMPLEMENTATION
+                    else -> null
+                }
+            } else if (resolvedFinalArity == 2 && hasDoBlockOrKeyword) {
+                when (functionName) {
+                    DEF -> Definition.PUBLIC_FUNCTION
+                    DEFP -> Definition.PRIVATE_FUNCTION
+                    DEFMACRO -> Definition.PUBLIC_MACRO
+                    DEFMACROP -> Definition.PRIVATE_MACRO
+                    DEFMODULE -> Definition.MODULE
+                    DEFIMPL -> Definition.IMPLEMENTATION
+                    DEFPROTOCOL -> Definition.PROTOCOL
+                    else -> null
+                }
+            } else if (resolvedFinalArity == 1) {
+                when (functionName) {
+                    DEF -> Definition.PUBLIC_FUNCTION
+                    DEFP -> Definition.PRIVATE_FUNCTION
+                    DEFGUARD -> Definition.PUBLIC_GUARD
+                    DEFGUARDP -> Definition.PRIVATE_GUARD
+                    DEFMACRO -> Definition.PUBLIC_MACRO
+                    DEFMACROP -> Definition.PRIVATE_MACRO
+                    else -> null
+                }
             } else {
                 null
             }
-        }
-    }
-
-fun definition(resolvedModuleName: String?, functionName: String?, resolvedFinalArity: Int, hasDoBlockOrKeyword: Boolean) =
-        if (resolvedModuleName == KERNEL) {
-            definition(functionName, resolvedFinalArity, hasDoBlockOrKeyword)
-        } else {
-            null
-        }
-
-fun definition(functionName: String?, resolvedFinalArity: Int, hasDoBlockOrKeyword: Boolean) =
-        if (resolvedFinalArity == 3 && hasDoBlockOrKeyword) {
-            when (functionName) {
-                DEFIMPL -> Definition.IMPLEMENTATION
-                else -> null
+            MODULE -> if (functionName == "register_attribute" && resolvedFinalArity == 3 && !hasDoBlockOrKeyword) {
+                Definition.MODULE_ATTRIBUTE
+            } else {
+                null
             }
-        } else if (resolvedFinalArity == 2 && hasDoBlockOrKeyword) {
-            when (functionName) {
-                DEF -> Definition.PUBLIC_FUNCTION
-                DEFP -> Definition.PRIVATE_FUNCTION
-                DEFMACRO -> Definition.PUBLIC_MACRO
-                DEFMACROP -> Definition.PRIVATE_MACRO
-                DEFMODULE -> Definition.MODULE
-                DEFIMPL -> Definition.IMPLEMENTATION
-                DEFPROTOCOL -> Definition.PROTOCOL
-                else -> null
-            }
-        } else if (resolvedFinalArity == 1) {
-            when (functionName) {
-                DEF -> Definition.PUBLIC_FUNCTION
-                DEFP -> Definition.PRIVATE_FUNCTION
-                DEFGUARD -> Definition.PUBLIC_GUARD
-                DEFGUARDP -> Definition.PRIVATE_GUARD
-                DEFMACRO -> Definition.PUBLIC_MACRO
-                DEFMACROP -> Definition.PRIVATE_MACRO
-                else -> null
-            }
-        } else {
-            null
+            else -> null
         }

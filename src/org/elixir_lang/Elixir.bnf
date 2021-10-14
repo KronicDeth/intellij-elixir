@@ -3014,6 +3014,7 @@ atom ::= COLON (ATOM_FRAGMENT | quote)
          {
            implements = [
              "com.intellij.psi.NavigatablePsiElement"
+             "com.intellij.psi.PsiNamedElement"
              "org.elixir_lang.psi.Quotable"
            ]
            methods = [
