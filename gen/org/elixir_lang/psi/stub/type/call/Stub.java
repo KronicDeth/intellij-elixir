@@ -3,6 +3,7 @@ package org.elixir_lang.psi.stub.type.call;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.stubs.StubOutputStream;
+import org.elixir_lang.module.PutAttribute;
 import org.elixir_lang.module.RegisterAttribute;
 import org.elixir_lang.psi.CallDefinitionClause;
 import org.elixir_lang.psi.Implementation;
@@ -76,7 +77,7 @@ public abstract class Stub<Stub extends org.elixir_lang.psi.stub.call.Stub<Psi>,
     private boolean isQuoted(Call call) {
         boolean isQuoted;
 
-        if (ModuleAttribute.isDeclaration(call) || RegisterAttribute.is(call)) {
+        if (ModuleAttribute.isDeclaration(call) || RegisterAttribute.is(call) || PutAttribute.is(call)) {
             Call enclosingModularMacroCall = enclosingModularMacroCall(call);
 
             if (enclosingModularMacroCall != null) {

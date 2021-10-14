@@ -1,6 +1,7 @@
 package org.elixir_lang.psi.impl
 
 import com.intellij.psi.PsiElement
+import org.elixir_lang.module.PutAttribute
 import org.elixir_lang.module.RegisterAttribute
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.operation.Operation
@@ -73,6 +74,7 @@ object PsiNameIdentifierOwnerImpl {
 
                 // module attributes
                 RegisterAttribute.`is`(named) -> RegisterAttribute.nameIdentifier(named)
+                PutAttribute.`is`(named) -> PutAttribute.nameIdentifier(named)
                 named is AtUnqualifiedNoParenthesesCall<*> ->  named.atIdentifier
 
                 else -> named.functionNameElement()

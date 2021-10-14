@@ -60,7 +60,8 @@ fun definition(resolvedModuleName: String?, functionName: String?, resolvedFinal
             } else {
                 null
             }
-            MODULE -> if (functionName == "register_attribute" && resolvedFinalArity == 3 && !hasDoBlockOrKeyword) {
+            MODULE -> if (resolvedFinalArity == 3 && !hasDoBlockOrKeyword &&
+                    (functionName == "put_attribute" || functionName == "register_attribute")) {
                 Definition.MODULE_ATTRIBUTE
             } else {
                 null

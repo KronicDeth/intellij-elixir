@@ -5,6 +5,7 @@ import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.util.Computable
 import com.intellij.psi.PsiElement
 import org.elixir_lang.Name
+import org.elixir_lang.module.PutAttribute
 import org.elixir_lang.module.RegisterAttribute
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
@@ -33,6 +34,8 @@ object PsiNamedElementImpl {
     fun getName(namedElement: NamedElement): String? =
             if (namedElement is Call && RegisterAttribute.`is`(namedElement)) {
                 RegisterAttribute.name(namedElement)
+            } else if (namedElement is Call && PutAttribute.`is`(namedElement)) {
+                PutAttribute.name(namedElement)
             } else {
                 val nameIdentifier = namedElement.nameIdentifier
 
