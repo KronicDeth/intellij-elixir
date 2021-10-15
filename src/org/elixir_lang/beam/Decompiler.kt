@@ -21,6 +21,7 @@ import org.elixir_lang.beam.decompiler.*
 import org.elixir_lang.beam.term.inspect
 import org.elixir_lang.psi.call.name.Function
 import org.elixir_lang.psi.call.name.Function.DEF
+import org.elixir_lang.psi.call.name.Function.DEFP
 import org.elixir_lang.psi.call.name.Module
 import org.elixir_lang.reference.resolver.Type.BUILTIN_ARITY_BY_NAME
 import java.util.*
@@ -373,19 +374,20 @@ class Decompiler : BinaryFileDecompiler {
         private fun appendMacroNameArity(decompiled: StringBuilder,
                                          macroNameArity: MacroNameArity,
                                          debugInfo: AbstractCodeCompileOptions): Boolean =
-            if (macroNameArity.macro == DEF) {
-                val function = debugInfo.functions.byNameArity[macroNameArity.toNameArity()]
+                when (macroNameArity.macro) {
+                    DEF, DEFP -> {
+                        val function = debugInfo.functions.byNameArity[macroNameArity.toNameArity()]
 
-                if (function != null) {
-                    decompiled.append(function.toMacroString().prependIndent("  ")).append('\n')
+                        if (function != null) {
+                            decompiled.append(function.toMacroString().prependIndent("  ")).append('\n')
 
-                    true
-                } else {
-                    false
+                            true
+                        } else {
+                            false
+                        }
+                    }
+                    else -> false
                 }
-            } else {
-                false
-            }
 
         private fun appendMacroNameArity(decompiled: StringBuilder,
                                          macroNameArity: MacroNameArity,
