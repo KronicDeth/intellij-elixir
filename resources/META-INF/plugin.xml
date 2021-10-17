@@ -229,6 +229,7 @@
 
     <!-- `quote` blocks -->
     <stubIndex implementation="org.elixir_lang.psi.stub.index.QuoteModuleAttributeName"/>
+    <stubIndex implementation="org.elixir_lang.psi.stub.index.QuoteVariableName"/>
 
     <!-- debug -->
     <fileBasedIndex implementation="org.elixir_lang.beam.chunk.lines.file_names.Index"/>

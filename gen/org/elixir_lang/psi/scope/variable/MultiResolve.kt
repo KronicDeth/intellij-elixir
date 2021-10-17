@@ -1,7 +1,10 @@
 package org.elixir_lang.psi.scope.variable
 
+import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.util.Key
 import com.intellij.psi.*
+import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil
@@ -12,6 +15,7 @@ import org.elixir_lang.psi.operation.Match
 import org.elixir_lang.psi.scope.MultiResolve.keepProcessing
 import org.elixir_lang.psi.scope.Variable
 import org.elixir_lang.psi.scope.VisitedElementSetResolveResult
+import org.elixir_lang.psi.stub.index.QuoteVariableName
 import org.elixir_lang.reference.Callable
 import org.jetbrains.annotations.Contract
 import java.util.*
@@ -49,7 +53,7 @@ class MultiResolve(private val name: String, private val incompleteCode: Boolean
                         if (PsiTreeUtil.isAncestor(rightOperand, element, false)) {
                             // previous sibling or parent to search for earlier binding
                             previousExpression(matchAncestor)?.let { expression ->
-                                val preboundResolveResultList = resolveResultList(
+                                val preboundResolveResultList = resolveInScope(
                                         name,
                                         incompleteCode,
                                         expression,
@@ -107,13 +111,15 @@ class MultiResolve(private val name: String, private val incompleteCode: Boolean
             } else {
                 val resolveState = ResolveState.initial().put(ENTRANCE, entrance).putInitialVisitedElement(entrance)
 
-                resolveResultList(name, incompleteCode, entrance, resolveState)
+                resolveInScope(name, incompleteCode, entrance, resolveState)
+                        .takeIf(Collection<ResolveResult>::isNotEmpty)
+                        ?: nameInAnyQuote(entrance, name, incompleteCode)
             }
 
-        fun resolveResultList(name: String,
-                              incompleteCode: Boolean,
-                              entrance: PsiElement,
-                              resolveState: ResolveState): List<VisitedElementSetResolveResult> {
+        fun resolveInScope(name: String,
+                           incompleteCode: Boolean,
+                           entrance: PsiElement,
+                           resolveState: ResolveState): List<VisitedElementSetResolveResult> {
             val multiResolve = MultiResolve(name, incompleteCode)
 
             val treeWalkUpResolveState = if (resolveState.get(ENTRANCE) == null) {
@@ -130,6 +136,41 @@ class MultiResolve(private val name: String, private val incompleteCode: Boolean
             )
 
             return multiResolve.resolveResultList
+        }
+
+        private fun nameInAnyQuote(entrance: PsiElement,
+                                   name: String,
+                                   incompleteCode: Boolean): List<VisitedElementSetResolveResult> {
+            val project = entrance.project
+            val resolveResults = mutableListOf<VisitedElementSetResolveResult>()
+
+            if (!DumbService.isDumb(project)) {
+                val stubIndex = StubIndex.getInstance()
+                val keys = mutableListOf<String>()
+
+                stubIndex.processAllKeys(QuoteVariableName.KEY, project) { key ->
+                    if ((incompleteCode && key.startsWith(name)) || key == name) {
+                        keys.add(key)
+                    }
+
+                    true
+                }
+
+                val scope = GlobalSearchScope.allScope(project)
+                // results are never valid because the qualifier is unknown
+                val validResult = false
+
+                for (key in keys) {
+                    stubIndex
+                            .processElements(QuoteVariableName.KEY, key, project, scope, NamedElement::class.java) { namedElement ->
+                                resolveResults.add(VisitedElementSetResolveResult(namedElement, validResult, emptySet()))
+
+                                true
+                            }
+                }
+            }
+
+            return resolveResults
         }
 
         @Contract(pure = true)

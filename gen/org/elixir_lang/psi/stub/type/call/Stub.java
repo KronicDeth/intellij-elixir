@@ -11,6 +11,7 @@ import org.elixir_lang.psi.Module;
 import org.elixir_lang.psi.ModuleAttribute;
 import org.elixir_lang.psi.Protocol;
 import org.elixir_lang.psi.QuoteMacro;
+import org.elixir_lang.psi.Variable;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.call.StubBased;
 import org.elixir_lang.psi.stub.call.Deserialized;
@@ -77,7 +78,8 @@ public abstract class Stub<Stub extends org.elixir_lang.psi.stub.call.Stub<Psi>,
     private boolean isQuoted(Call call) {
         boolean isQuoted;
 
-        if (ModuleAttribute.isDeclaration(call) || RegisterAttribute.is(call) || PutAttribute.is(call)) {
+        if (ModuleAttribute.isDeclaration(call) || RegisterAttribute.is(call) || PutAttribute.is(call) ||
+                Variable.isDeclaration(call)) {
             Call enclosingModularMacroCall = enclosingModularMacroCall(call);
 
             if (enclosingModularMacroCall != null) {

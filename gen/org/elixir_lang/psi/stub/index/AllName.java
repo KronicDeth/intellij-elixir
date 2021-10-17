@@ -14,6 +14,7 @@ public class AllName extends StringStubIndexExtension<NamedElement> {
     // 7 - `defmemo` and `defmemop`
     // 8 - `implementedProtocolName` added to `Deserialized`
     // 9 - `Definition.MODULE_ATTRIBUTE` added
+    // 10 - `Definition.VARIABLE` added
     public static final int VERSION = 9;
 
     @Override

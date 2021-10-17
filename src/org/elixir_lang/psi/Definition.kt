@@ -15,7 +15,8 @@ enum class Definition(val type: Type) {
     PUBLIC_GUARD(Type.CALLABLE),
     PRIVATE_GUARD(Type.CALLABLE),
     PUBLIC_MACRO(Type.CALLABLE),
-    PRIVATE_MACRO(Type.CALLABLE);
+    PRIVATE_MACRO(Type.CALLABLE),
+    VARIABLE(Type.CALLABLE);
 
     enum class Type {
         CALLABLE,
