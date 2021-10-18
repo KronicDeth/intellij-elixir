@@ -11,27 +11,6 @@ import org.elixir_lang.psi.scope.call_definition_clause.MultiResolve
 import org.elixir_lang.reference.CaptureNameArity
 
 object CaptureNameArity : ResolveCache.PolyVariantResolver<CaptureNameArity> {
-    override fun resolve(reference: CaptureNameArity, incompleteCode: Boolean): Array<out ResolveResult> {
-        val nameElement  = reference.nameElement
-
-        return nameElement.functionName()?.let { name ->
-            val arity = reference.arity
-
-            if (nameElement is Qualified) {
-                nameElement.qualifiedToModulars().flatMap { modular ->
-                    Modular.callDefinitionClauseCallFoldWhile(
-                            modular,
-                            name,
-                            mutableListOf<ResolveResult>()
-                    ) { callDefinitionClauseCall, _, arityRange, acc ->
-                        acc.add(PsiElementResolveResult(callDefinitionClauseCall, arityRange.contains(arity)))
-
-                        AccumulatorContinue(acc, true)
-                    }.accumulator
-                }
-            } else {
-                MultiResolve.resolveResults(name, arity, incompleteCode, reference.element)
-            }.toTypedArray()
-        } ?: emptyArray()
-    }
+    override fun resolve(reference: CaptureNameArity, incompleteCode: Boolean): Array<ResolveResult> =
+            Callable.resolve(reference.nameElement, reference.arity, incompleteCode)
 }
