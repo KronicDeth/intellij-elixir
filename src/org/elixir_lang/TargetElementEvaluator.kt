@@ -16,8 +16,13 @@ import org.elixir_lang.reference.Resolver
 class TargetElementEvaluator : TargetElementEvaluatorEx2() {
     override fun isAcceptableNamedParent(parent: PsiElement): Boolean = when (parent) {
         // Don't allow the identifier of a module attribute or assign usage be a named parent.
-        is UnqualifiedNoArgumentsCall<*> -> when (parent.parent) {
+        is UnqualifiedNoArgumentsCall<*> -> when (val grandParent = parent.parent) {
             is AtNonNumericOperation -> false
+            // Don't allow `name` in `&name/arity` to be named parent. The capture needs to be the parent.
+            is Multiplication -> when (grandParent.parent) {
+                is NonNumeric -> false
+                else -> super.isAcceptableNamedParent(parent)
+            }
             else -> super.isAcceptableNamedParent(parent)
         }
         // Don't allow `Mod.name` in `&Mod.name/arity` to be named parent.  The capture needs to be the parent.
