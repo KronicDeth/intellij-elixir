@@ -155,14 +155,18 @@ object QualifiableAliasImpl {
                         val qualifiedName = when (val strippedQualifier = qualifier.stripAccessExpression()) {
                             is QualifiableAlias -> strippedQualifier.name
                             else -> {
-                                TODO()
+                                Logger.error(QualifiableAlias::class.java, "Don't know how to prepend qualifier", ancestor)
+
+                                "?.${accumulator}"
                             }
                         }
 
                         "${qualifiedName}.${accumulator}"
                     }
                 } else {
-                    TODO()
+                    Logger.error(QualifiableAlias::class.java, "Don't know how to prepend qualifier", ancestor)
+
+                    "?.${accumulator}"
                 }
             }
             else -> {
