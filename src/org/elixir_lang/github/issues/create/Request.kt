@@ -28,7 +28,9 @@ class Request private constructor(val title: String, val body: String) {
         }
 
         private fun additionalInfo(stringBuilder: StringBuilder, level: Int, additionalInfo: String?) {
-            textSection(stringBuilder, level, "What I was doing", additionalInfo ?: "I don't know what I was doing")
+            if (additionalInfo != null) {
+                textSection(stringBuilder, level, "What I was doing", additionalInfo)
+            }
         }
 
         private fun exceptions(stringBuilder: StringBuilder, level: Int, throwableList: List<Throwable>) {
