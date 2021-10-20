@@ -13,6 +13,7 @@ import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.call.qualification.Qualified
+import org.elixir_lang.psi.impl.call.maybeModularNameToModulars
 import org.elixir_lang.psi.operation.Normalized.operatorIndex
 import org.elixir_lang.psi.operation.Operation
 import org.elixir_lang.psi.stub.type.call.Stub.isModular
@@ -154,6 +155,23 @@ object QualifiableAliasImpl {
                     } else {
                         val qualifiedName = when (val strippedQualifier = qualifier.stripAccessExpression()) {
                             is QualifiableAlias -> strippedQualifier.name
+                            is Call -> {
+                                val modularSet = strippedQualifier.maybeModularNameToModulars()
+
+                                when (modularSet.size) {
+                                    0 -> {
+                                        Logger.error(QualifiableAlias::class.java, "Don't know how to prepend qualifier when call resolves to no modulars", ancestor)
+
+                                        "?.${accumulator}"
+                                    }
+                                    1 -> "${modularSet.single().name}.${accumulator}"
+                                    else -> {
+                                        Logger.error(QualifiableAlias::class.java, "Don't know how to prepend qualifier when call resolves to more than one modular", ancestor)
+
+                                        "?.${accumulator}"
+                                    }
+                                }
+                            }
                             else -> {
                                 Logger.error(QualifiableAlias::class.java, "Don't know how to prepend qualifier", ancestor)
 
