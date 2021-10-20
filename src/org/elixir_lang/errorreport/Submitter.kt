@@ -39,11 +39,9 @@ class Submitter : ErrorReportSubmitter() {
                         parentComponent: Component,
                         consumer: Consumer<in SubmittedReportInfo>): Boolean {
         val project = project(parentComponent)
-        val throwableList = events.mapNotNull { event -> event.throwable }
-        val attachmentList = events.map { event -> event.data }.filterIsInstance<AbstractMessage>().flatMap { it.includedAttachments }
         val successCallback = successCallback(project, consumer)
         val errorCallback = errorCallback(project)
-        val task = Task(project, additionalInfo, throwableList, attachmentList, successCallback, errorCallback)
+        val task = Task(project, additionalInfo, events, successCallback, errorCallback)
         run(task, project == null)
         return true
     }

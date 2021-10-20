@@ -1,23 +1,35 @@
 package org.elixir_lang.github.issues.create
 
+import com.intellij.diagnostic.AbstractMessage
 import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.openapi.diagnostic.Attachment
+import com.intellij.openapi.diagnostic.IdeaLoggingEvent
 import com.intellij.openapi.extensions.PluginId
 import com.intellij.util.ExceptionUtil
 
 class Request private constructor(val title: String, val body: String) {
-    constructor(additionalInfo: String?, throwableList: List<Throwable>, attachmentList: List<Attachment>) : this(TITLE, body(additionalInfo, throwableList, attachmentList))
+    constructor(additionalInfo: String?, events: Array<IdeaLoggingEvent>) : this(title(additionalInfo, events), body(additionalInfo, events))
 
     companion object {
-        private const val TITLE = "[auto-generated]"
+        private fun title(additionalInfo: String?, events: Array<IdeaLoggingEvent>): String =
+                additionalInfo?.lineSequence()?.first() ?: title(events)
 
-        private fun body(additionalInfo: String?, throwableList: List<Throwable>, attachmentList: List<Attachment>): String {
+        private fun title(events: Array<IdeaLoggingEvent>): String = title(events.first())
+        private fun title(event: IdeaLoggingEvent): String = title(event.throwable)
+        private fun title(throwable: Throwable): String {
+            val lines = ExceptionUtil.getThrowableText(throwable).lineSequence()
+            val message = lines.takeWhile { !it.startsWith("\tat ") }.joinToString()
+            val location = lines.filter { it.startsWith("\tat ") }.filter { !it.startsWith("\tat org.elixir_lang.errorreport.Logger")}.first()
+
+            return "$message $location"
+        }
+
+        private fun body(additionalInfo: String?, events: Array<IdeaLoggingEvent>): String {
             val stringBuilder = StringBuilder()
             val level = 0
             version(stringBuilder)
             additionalInfo(stringBuilder, level + 1, additionalInfo)
-            exceptions(stringBuilder, level + 1, throwableList)
-            attachments(stringBuilder, level + 1, attachmentList)
+            events(stringBuilder, level + 1, events)
             return stringBuilder.toString()
         }
 
@@ -33,18 +45,46 @@ class Request private constructor(val title: String, val body: String) {
             }
         }
 
-        private fun exceptions(stringBuilder: StringBuilder, level: Int, throwableList: List<Throwable>) {
-            header(stringBuilder, level, "Exceptions")
-            throwableList.forEachIndexed { index, throwable ->
-                exception(stringBuilder, level + 1, index, throwable)
+        private fun events(stringBuilder: StringBuilder, level: Int, events: Array<IdeaLoggingEvent>) {
+            if (events.size == 1) {
+                val event = events.single()
+                header(stringBuilder, level, "Event")
+                message(stringBuilder, level + 1, event.message)
+                exception(stringBuilder, level + 1, event)
+                attachments(stringBuilder, level + 1, event)
+            } else {
+                events.forEachIndexed { index, event ->
+                    header(stringBuilder, level, "Event $index")
+                    message(stringBuilder, level + 1, event.message)
+                    exception(stringBuilder, level + 1, event)
+                    attachments(stringBuilder, level + 1, event)
+                }
             }
-
         }
 
-        private fun exception(stringBuilder: StringBuilder, level: Int, index: Int, throwable: Throwable) {
-            header(stringBuilder, level, "Exception $index")
+        private fun exception(stringBuilder: StringBuilder, level: Int, event: IdeaLoggingEvent) {
+            event.throwable?.let { throwable ->
+                exception(stringBuilder, level, throwable)
+            }
+        }
+
+        private fun exception(stringBuilder: StringBuilder, level: Int, throwable: Throwable) {
+            header(stringBuilder, level, "Exception")
             message(stringBuilder, level + 1, throwable.message)
             stacktrace(stringBuilder, level + 1, throwable)
+        }
+
+        private fun attachments(stringBuilder: StringBuilder, level: Int, event: IdeaLoggingEvent) {
+            event.data?.let { it as? AbstractMessage}?.includedAttachments.takeUnless { it.isNullOrEmpty() }?.let { attachments ->
+                attachments(stringBuilder, level, attachments)
+            }
+        }
+
+        private fun attachments(stringBuilder: StringBuilder, level: Int, attachmentList: List<Attachment>) {
+            header(stringBuilder, level, "Attachments")
+            for (attachment in attachmentList) {
+                attachment(stringBuilder, level + 1, attachment)
+            }
         }
 
         private fun attachment(stringBuilder: StringBuilder, level: Int, attachment: Attachment) {
@@ -57,22 +97,6 @@ class Request private constructor(val title: String, val body: String) {
             )
         }
 
-        private fun attachments(stringBuilder: StringBuilder, level: Int, attachmentList: List<Attachment>) {
-            if (!attachmentList.isEmpty()) {
-                header(stringBuilder, level, "Attachments")
-                for (attachment in attachmentList) {
-                    attachment(stringBuilder, level + 1, attachment)
-                }
-            }
-        }
-
-        private fun codeBlock(stringBuilder: StringBuilder, code: String) {
-            codeFence(stringBuilder)
-            stringBuilder.append(code)
-            stringBuilder.append('\n')
-            codeFence(stringBuilder)
-        }
-
         private fun codeBlockSection(stringBuilder: StringBuilder,
                                      level: Int,
                                      name: String,
@@ -81,6 +105,13 @@ class Request private constructor(val title: String, val body: String) {
                 header(stringBuilder, level, name)
                 codeBlock(stringBuilder, code)
             }
+        }
+
+        private fun codeBlock(stringBuilder: StringBuilder, code: String) {
+            codeFence(stringBuilder)
+            stringBuilder.append(code)
+            stringBuilder.append('\n')
+            codeFence(stringBuilder)
         }
 
         private fun codeFence(stringBuilder: StringBuilder) {
@@ -102,11 +133,15 @@ class Request private constructor(val title: String, val body: String) {
         }
 
         private fun stacktrace(stringBuilder: StringBuilder, level: Int, throwable: Throwable) {
-            stacktrace(stringBuilder, level, ExceptionUtil.getThrowableText(throwable))
-        }
+            header(stringBuilder, level, "Stacktrace")
 
-        private fun stacktrace(stringBuilder: StringBuilder, level: Int, stacktrace: String) {
-            codeBlockSection(stringBuilder, level, "Stacktrace", stacktrace)
+            codeFence(stringBuilder)
+
+            val lines = ExceptionUtil.getThrowableText(throwable).lineSequence()
+            val lastPluginLine = lines.indexOfLast { it.contains("at org.elixir_lang.") }
+            lines.take(lastPluginLine + 1).forEach { stringBuilder.append(it).append('\n') }
+
+            codeFence(stringBuilder)
         }
 
         private fun textSection(stringBuilder: StringBuilder,
