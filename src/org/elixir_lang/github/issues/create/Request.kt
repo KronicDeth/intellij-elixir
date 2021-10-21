@@ -19,7 +19,12 @@ class Request private constructor(val title: String, val body: String) {
         private fun title(throwable: Throwable): String {
             val lines = ExceptionUtil.getThrowableText(throwable).lineSequence()
             val message = lines.takeWhile { !it.startsWith("\tat ") }.joinToString()
-            val location = lines.filter { it.startsWith("\tat ") }.filter { !it.startsWith("\tat org.elixir_lang.errorreport.Logger")}.first()
+            val location =
+                    lines
+                            .filter { it.startsWith("\tat ") }
+                            .filter { !it.startsWith("\tat org.elixir_lang.errorreport.Logger") }
+                            .filter { !it.startsWith("\tat com.intellij.openapi.diagnostic.Logger") }
+                            .first()
 
             return "$message $location"
         }
@@ -75,7 +80,7 @@ class Request private constructor(val title: String, val body: String) {
         }
 
         private fun attachments(stringBuilder: StringBuilder, level: Int, event: IdeaLoggingEvent) {
-            event.data?.let { it as? AbstractMessage}?.includedAttachments.takeUnless { it.isNullOrEmpty() }?.let { attachments ->
+            event.data?.let { it as? AbstractMessage }?.includedAttachments.takeUnless { it.isNullOrEmpty() }?.let { attachments ->
                 attachments(stringBuilder, level, attachments)
             }
         }
