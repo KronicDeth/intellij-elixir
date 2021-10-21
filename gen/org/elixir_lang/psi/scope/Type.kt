@@ -3,14 +3,11 @@ package org.elixir_lang.psi.scope
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.ResolveState
-import com.intellij.psi.impl.source.tree.CompositeElement
 import com.intellij.psi.scope.PsiScopeProcessor
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.util.isAncestor
-import com.intellij.psi.util.siblings
 import org.elixir_lang.beam.psi.impl.ModuleImpl
-import org.elixir_lang.debugger.node.ok_error.OKError
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.Module
@@ -19,11 +16,11 @@ import org.elixir_lang.psi.call.qualification.Qualified
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.call.macroChildCalls
 import org.elixir_lang.psi.impl.call.whileInStabBodyChildExpressions
-import org.elixir_lang.psi.impl.childExpressions
 import org.elixir_lang.psi.impl.identifierName
 import org.elixir_lang.psi.impl.whileInChildExpressions
 import org.elixir_lang.psi.operation.Pipe
 import org.elixir_lang.psi.operation.Type
+import org.elixir_lang.psi.operation.When
 import org.elixir_lang.psi.scope.WhileIn.whileIn
 import org.elixir_lang.psi.stub.index.ModularName
 import org.elixir_lang.psi.stub.type.call.Stub.isModular
@@ -253,10 +250,22 @@ internal fun PsiElement.ancestorTypeSpec(): AtUnqualifiedNoParenthesesCall<*>? =
 
 val OPTIONALITIES = arrayOf("optional", "required")
 
-fun Call.isTypeSpecPseudoFunction(): Boolean = hasMapFieldOptionalityName() || hasListRepetitionName()
+fun Call.isTypeSpecPseudoFunction(): Boolean = hasMapFieldOptionalityName() || hasListRepetitionName() || isNoTypeRestriction()
 
 fun Call.hasMapFieldOptionalityName(): Boolean =
     parent is ElixirContainerAssociationOperation && functionName() in OPTIONALITIES && resolvedFinalArity() == 1
 
 fun Call.hasListRepetitionName(): Boolean =
         parent is ElixirList && functionName() == "..."
+
+fun Call.isNoTypeRestriction(): Boolean =
+         functionName() == "var" && parent.isTypeRestriction()
+
+fun PsiElement.isTypeRestriction(): Boolean =
+        this is QuotableKeywordPair && parent.isTypeRestrictions()
+
+fun PsiElement.isTypeRestrictions(): Boolean =
+        this is QuotableKeywordList && parent.isTypeGuard()
+
+fun PsiElement.isTypeGuard(): Boolean =
+        this is When
