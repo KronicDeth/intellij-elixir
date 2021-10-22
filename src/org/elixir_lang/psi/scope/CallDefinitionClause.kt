@@ -15,6 +15,7 @@ import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.*
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.call.name.Module.KERNEL_SPECIAL_FORMS
+import org.elixir_lang.psi.ex_unit.kase.Describe
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.hasDoBlockOrKeyword
 import org.elixir_lang.psi.impl.call.*
@@ -126,7 +127,11 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
 
                     true
                 }
-                (Module.`is`(element) || Implementation.`is`(element) || Protocol.`is`(element)) && modularContainsEntrance(element, state) -> {
+                (Module.`is`(element) ||
+                        Implementation.`is`(element) ||
+                        Protocol.`is`(element) ||
+                        Describe.`is`(element, state))
+                        && modularContainsEntrance(element, state) -> {
                     val childCalls = element.macroChildCallSequence()
 
                     // If the entrance is at level of `childCalls`, then only previous siblings could possibly define
