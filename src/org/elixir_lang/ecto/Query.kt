@@ -596,7 +596,7 @@ object Query {
      */
     private tailrec fun isJoin(ancestor: PsiElement, state: ResolveState): Boolean =
             when (ancestor) {
-                is ElixirKeywordPair -> {
+                is QuotableKeywordPair -> {
                     when (ancestor.keywordKey.text) {
                         "cross_join", "full_join", "inner_join", "inner_lateral_join", "join", "left_join",
                         "left_lateral_join", "right_join" -> true
