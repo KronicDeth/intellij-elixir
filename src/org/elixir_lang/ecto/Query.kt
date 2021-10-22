@@ -89,6 +89,12 @@ object Query {
                         } else {
                             true
                         }
+                    UPDATE_NAME_ARITY_RANGE.name ->
+                        if (call.resolvedFinalArity() in UPDATE_NAME_ARITY_RANGE.arityRange) {
+                            executeOnUpdate(call, state, keepProcessing)
+                        } else {
+                            true
+                        }
                     WHERE_NAME_ARITY_RANGE.name ->
                         if (call.resolvedFinalArity() in WHERE_NAME_ARITY_RANGE.arityRange) {
                             executeOnWhere(call, state, keepProcessing)
@@ -506,6 +512,29 @@ object Query {
                 }
             } ?: true
 
+    private fun executeOnUpdate(call: Call,
+                                state: ResolveState,
+                                keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
+            call.finalArguments()?.let { arguments ->
+                // update(query, binding \\ [], expr)
+                when (call.resolvedFinalArity()) {
+                    // `update(query, expr)` or `|> update(expr)`
+                    2 -> keepProcessing(arguments[arguments.lastIndex], state.put(CALL, call))
+                    // `update(query, binding, expr)` or `|> update(binding, expr)`
+                    3 -> executeOnBinding(arguments[arguments.lastIndex - 1], state, keepProcessing) &&
+                            keepProcessing(arguments[arguments.lastIndex], state.put(CALL, call))
+                    else -> {
+                        Logger.error(
+                                logger,
+                                "update arity outside of range (${UPDATE_NAME_ARITY_RANGE.arityRange})",
+                                call
+                        )
+
+                        null
+                    }
+                }
+            } ?: true
+
     private fun executeOnWhere(call: Call,
                                state: ResolveState,
                                keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
@@ -597,6 +626,7 @@ object Query {
     private val SELECT_NAME_ARITY_RANGE = NameArityRange("select", 2..3)
     private val SELECT_MERGE_NAME_ARITY_RANGE = NameArityRange("select_merge", 2..3)
     private val ORDER_BY_NAME_ARITY_RANGE = NameArityRange("order_by", 2..3)
+    private val UPDATE_NAME_ARITY_RANGE = NameArityRange("update", 2..3)
     private val WHERE_NAME_ARITY_RANGE = NameArityRange("where", 3..3)
     private val WITH_CTE_NAME_ARITY_RANGE = NameArityRange("with_cte", 2..3)
     private val DECLARING_MACRO_NAME_ARITY_RANGES = arrayOf(
@@ -609,6 +639,7 @@ object Query {
             SELECT_NAME_ARITY_RANGE,
             SELECT_MERGE_NAME_ARITY_RANGE,
             ORDER_BY_NAME_ARITY_RANGE,
+            UPDATE_NAME_ARITY_RANGE,
             WHERE_NAME_ARITY_RANGE,
             WITH_CTE_NAME_ARITY_RANGE
     )
