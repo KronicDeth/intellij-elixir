@@ -137,8 +137,9 @@ object ProcessDeclarationsImpl {
                             call.isCalling(KERNEL, MATCH_QUESTION_MARK) ||
                             call.isCallingMacro(KERNEL, UNLESS) || // match in condition
                             call.isCallingMacro(KERNEL, "with") || // <- or = variable
-                        QuoteMacro.`is`(call) || // quote :bind_quoted keys for Variable resolver OR call definitions for Callable resolver
-                        org.elixir_lang.psi.mix.Generator.isEmbed(call, state)
+                            QuoteMacro.`is`(call) || // quote :bind_quoted keys for Variable resolver OR call definitions for Callable resolver
+                            org.elixir_lang.psi.mix.Generator.isEmbed(call, state) ||
+                            org.elixir_lang.exunit.assertions.Assert.`is`(call, state)
                     -> processor.execute(call, state)
                     org.elixir_lang.ecto.Schema.`is`(call, state) -> {
                         processor.execute(call, state)
