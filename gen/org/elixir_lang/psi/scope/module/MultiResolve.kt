@@ -43,11 +43,13 @@ class MultiResolve internal constructor(private val name: String, private val in
 
             // ALIAS_CALL is only set for `as:` usages
             val aliasCall = state.get(ALIAS_CALL)
+            // REQUIRE_CALL is only set for `as:` usages
+            val requireCall = state.get(REQUIRE_CALL)
 
-            if (aliasCall == null) {
+            if (aliasCall == null && requireCall == null) {
                 // adds `defmodule Foo.SSH` for `alias Foo.SSH`
                 addUnaliasedNamedElementsToResolveResultList(match, namePartList, aliasedNameState.visitedElementSet())
-            } else {
+            } else if (aliasCall != null) {
                 // adds `Foo.SSH` and `defmodule Foo.SSH` for `alias Foo.SSH, as FSSH`
                 aliasCall
                         .finalArguments()!!
@@ -65,6 +67,8 @@ class MultiResolve internal constructor(private val name: String, private val in
                                 )
                             }
                         }
+            } else if (requireCall != null) {
+                resolveResultOrderedSet.add(match, requireCall.text, true, state.visitedElementSet())
             }
         } else {
             val namePartList = split(name)
@@ -72,9 +76,6 @@ class MultiResolve internal constructor(private val name: String, private val in
 
             // alias Foo.SSH, then SSH.Key is name
             if (aliasedName == firstNamePart) {
-                val multipleAliasesQualifier = state.get(MULTIPLE_ALIASES_QUALIFIER)
-                val suffix = match.name
-
                 addUnaliasedNamedElementsToResolveResultList(match, namePartList, aliasedNameState.visitedElementSet())
             } else if (aliasedName.startsWith(name)) {
                 resolveResultOrderedSet.add(match, "alias ${match.text}", false, state.visitedElementSet())

@@ -16,6 +16,7 @@ import org.elixir_lang.psi.call.Named
 import org.elixir_lang.psi.call.name.Function
 
 import org.elixir_lang.psi.call.name.Function.ALIAS
+import org.elixir_lang.psi.call.name.Function.REQUIRE
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.ex_unit.kase.Describe
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
@@ -63,6 +64,7 @@ abstract class Module : PsiScopeProcessor {
                 isModular(match) -> executeOnModular(match, state)
                 Use.`is`(match) -> Use.treeWalkUp(match, state, ::execute)
                 match.isCalling(KERNEL, ALIAS) -> executeOnAliasCall(match, state)
+                match.isCalling(KERNEL, REQUIRE) -> executeOnRequireCall(match, state)
                 Describe.`is`(match, state) -> executeOnNestedModulars(match, state)
                 else -> true
             }
@@ -204,6 +206,11 @@ abstract class Module : PsiScopeProcessor {
         }
     }
 
+    private fun executeOnRequireCall(require: Call, state: ResolveState): Boolean =
+        require.keywordArgument("as")?.stripAccessExpression()?.let {
+            executeOnAs(it, state.put(REQUIRE_CALL, require))
+        } ?: true
+
     private fun executeOnAs(asKeywordValue: PsiElement, state: ResolveState): Boolean =
             when (asKeywordValue) {
                 is PsiNamedElement -> executeOnMaybeAliasedName(
@@ -266,5 +273,6 @@ abstract class Module : PsiScopeProcessor {
         @JvmStatic
         val ALIAS_CALL = Key<Call>("ALIAS_CALL")
         val MULTIPLE_ALIASES_QUALIFIER = Key<PsiNamedElement>("MULTIPLE_ALIASES_QUALIFIER")
+        val REQUIRE_CALL = Key<Call>("REQUIRE_CALL")
     }
 }

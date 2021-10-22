@@ -27,7 +27,10 @@ object CallDefinitionClause {
         while (true) {
             enclosingMacroCall = enclosedCall.enclosingMacroCall()
 
-            if (enclosingMacroCall != null && (enclosingMacroCall.isCalling(KERNEL, ALIAS) || For.`is`(enclosingMacroCall))) {
+            if (enclosingMacroCall != null &&
+                    (enclosingMacroCall.isCalling(KERNEL, ALIAS) ||
+                            enclosingMacroCall.isCalling(KERNEL, REQUIRE) ||
+                            For.`is`(enclosingMacroCall))) {
                 enclosedCall = enclosingMacroCall
             } else {
                 break
