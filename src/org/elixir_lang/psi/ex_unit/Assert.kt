@@ -1,9 +1,8 @@
-package org.elixir_lang.exunit.assertions
+package org.elixir_lang.psi.ex_unit
 
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import org.elixir_lang.errorreport.Logger
-import org.elixir_lang.exunit.Assertions
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.call.finalArguments
 
@@ -31,7 +30,7 @@ object Assert {
                         else -> null
                     }
                     else -> {
-                        Logger.error(logger, "assert arity outside of range (${ARITY_RANGE})", call)
+                        Logger.error(logger, "assert arity outside of range ($ARITY_RANGE)", call)
 
                         null
                     }

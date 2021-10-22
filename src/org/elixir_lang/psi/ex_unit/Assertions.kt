@@ -1,4 +1,4 @@
-package org.elixir_lang.exunit
+package org.elixir_lang.psi.ex_unit
 
 import com.intellij.psi.ResolveState
 import org.elixir_lang.psi.call.Call

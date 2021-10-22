@@ -6,7 +6,7 @@ import com.intellij.psi.*
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.util.PsiTreeUtil
-import org.elixir_lang.exunit.assertions.Assert
+import org.elixir_lang.psi.ex_unit.Assert
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil

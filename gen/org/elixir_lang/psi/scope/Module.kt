@@ -17,6 +17,7 @@ import org.elixir_lang.psi.call.name.Function
 
 import org.elixir_lang.psi.call.name.Function.ALIAS
 import org.elixir_lang.psi.call.name.Module.KERNEL
+import org.elixir_lang.psi.ex_unit.kase.Describe
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.call.keywordArgument
@@ -62,6 +63,7 @@ abstract class Module : PsiScopeProcessor {
                 isModular(match) -> executeOnModular(match, state)
                 Use.`is`(match) -> Use.treeWalkUp(match, state, ::execute)
                 match.isCalling(KERNEL, ALIAS) -> executeOnAliasCall(match, state)
+                Describe.`is`(match, state) -> executeOnNestedModulars(match, state)
                 else -> true
             }
 
@@ -231,12 +233,15 @@ abstract class Module : PsiScopeProcessor {
                 } ?: true
 
                 // descend in modular to check for nested modulars in case their relative name is being used
-                keepProcessing && match.whileInStabBodyChildExpressions { childExpression ->
-                    if (childExpression is Call && isModular(childExpression)) {
-                        execute(childExpression, state)
-                    } else {
-                        true
-                    }
+                keepProcessing && executeOnNestedModulars(match, state)
+            }
+
+    private fun executeOnNestedModulars(match: Named, state: ResolveState): Boolean =
+            match.whileInStabBodyChildExpressions { childExpression ->
+                if (childExpression is Call && isModular(childExpression)) {
+                    execute(childExpression, state)
+                } else {
+                    true
                 }
             }
 
