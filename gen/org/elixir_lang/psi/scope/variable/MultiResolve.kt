@@ -6,7 +6,9 @@ import com.intellij.psi.*
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.util.PsiTreeUtil
+import org.elixir_lang.exunit.assertions.Assert
 import org.elixir_lang.psi.*
+import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.previousSiblingExpression
@@ -52,7 +54,7 @@ class MultiResolve(private val name: String, private val incompleteCode: Boolean
                            resolve further up to try to find if {@code element} is already bound */
                         if (PsiTreeUtil.isAncestor(rightOperand, element, false)) {
                             // previous sibling or parent to search for earlier binding
-                            previousExpression(matchAncestor)?.let { expression ->
+                            previousExpression(matchAncestor, state)?.let { expression ->
                                 val preboundResolveResultList = resolveInScope(
                                         name,
                                         incompleteCode,
@@ -174,18 +176,18 @@ class MultiResolve(private val name: String, private val incompleteCode: Boolean
         }
 
         @Contract(pure = true)
-        private fun previousExpression(element: PsiElement): PsiElement? =
-            previousSiblingExpression(element) ?: previousParentExpression(element)
+        private fun previousExpression(element: PsiElement, state: ResolveState): PsiElement? =
+            previousSiblingExpression(element) ?: previousParentExpression(element, state)
 
         @Contract(pure = true)
-        private fun previousParentExpression(element: PsiElement): PsiElement? {
+        private fun previousParentExpression(element: PsiElement, state: ResolveState): PsiElement? {
             var expression = element
             do {
                 expression = expression.parent
             } while (expression is Arguments ||
                     expression is ElixirDoBlock ||
                     expression is ElixirStab ||
-                    expression is ElixirStabBody)
+                    expression is ElixirStabBody || (expression is Call && Assert.`is`(expression, state)))
             return expression
         }
     }
