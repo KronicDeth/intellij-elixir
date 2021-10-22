@@ -6,9 +6,9 @@ import com.intellij.psi.*
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.util.PsiTreeUtil
-import org.elixir_lang.psi.ex_unit.Assert
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
+import org.elixir_lang.psi.ex_unit.Assertions
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.previousSiblingExpression
@@ -187,7 +187,7 @@ class MultiResolve(private val name: String, private val incompleteCode: Boolean
             } while (expression is Arguments ||
                     expression is ElixirDoBlock ||
                     expression is ElixirStab ||
-                    expression is ElixirStabBody || (expression is Call && Assert.`is`(expression, state)))
+                    expression is ElixirStabBody || (expression is Call && Assertions.isDeclaringMacro(expression, state)))
             return expression
         }
     }

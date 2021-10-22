@@ -13,7 +13,7 @@ import org.elixir_lang.psi.CallDefinitionClause.head
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function
 import org.elixir_lang.psi.call.name.Module
-import org.elixir_lang.psi.ex_unit.Assert
+import org.elixir_lang.psi.ex_unit.Assertions
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil
 import org.elixir_lang.psi.impl.ProcessDeclarationsImpl.DECLARING_SCOPE
 import org.elixir_lang.psi.impl.ProcessDeclarationsImpl.isDeclaringScope
@@ -264,8 +264,8 @@ abstract class Variable : PsiScopeProcessor {
                 org.elixir_lang.ecto.Schema.`is`(match, state) -> {
                     org.elixir_lang.ecto.Schema.treeWalkUp(match, state, ::execute)
                 }
-                Assert.`is`(match, state) -> {
-                    Assert.treeWalkUp(match, state, ::execute)
+                Assertions.isDeclaringMacro(match, state) -> {
+                    Assertions.treeWalkUp(match, state, ::execute)
                 }
                 else -> {
                     // unquote(var) can't declare var, only use it

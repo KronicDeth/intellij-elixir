@@ -11,7 +11,7 @@ import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function
 import org.elixir_lang.psi.call.name.Function.*
 import org.elixir_lang.psi.call.name.Module.KERNEL
-import org.elixir_lang.psi.ex_unit.Assert
+import org.elixir_lang.psi.ex_unit.Assertions
 import org.elixir_lang.psi.ex_unit.kase.Describe
 import org.elixir_lang.psi.impl.call.CallImpl.hasDoBlockOrKeyword
 import org.elixir_lang.psi.impl.call.finalArguments
@@ -142,7 +142,7 @@ object ProcessDeclarationsImpl {
                             call.isCallingMacro(KERNEL, "with") || // <- or = variable
                             QuoteMacro.`is`(call) || // quote :bind_quoted keys for Variable resolver OR call definitions for Callable resolver
                             org.elixir_lang.psi.mix.Generator.isEmbed(call, state) ||
-                            Assert.`is`(call, state)
+                            Assertions.isDeclaringMacro(call, state)
                     -> processor.execute(call, state)
                     org.elixir_lang.ecto.Schema.`is`(call, state) -> {
                         processor.execute(call, state)
