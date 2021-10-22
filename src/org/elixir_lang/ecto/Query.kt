@@ -95,6 +95,12 @@ object Query {
                         } else {
                             true
                         }
+                    WITH_CTE_NAME_ARITY_RANGE.name ->
+                        if (call.resolvedFinalArity() in WITH_CTE_NAME_ARITY_RANGE.arityRange) {
+                            executeOnWithCTE(call, state, keepProcessing)
+                        } else {
+                            true
+                        }
                     else -> true
                 }
             } ?: true
@@ -522,6 +528,40 @@ object Query {
                 }
             } ?: true
 
+    private fun executeOnWithCTE(call: Call,
+                                 state: ResolveState,
+                                 keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
+            call.finalArguments()?.let { arguments ->
+                // with_cte(query, name, list)
+                when (call.resolvedFinalArity()) {
+                    // `with_cte(query, name, list)` or `|> with_cte(name, list)`
+                    3 -> executeOnWithCTEList(arguments[arguments.lastIndex], state.put(CALL, call), keepProcessing)
+                    else -> {
+                        Logger.error(logger, "with_cte arity not 3", call)
+
+                        null
+                    }
+                }
+            } ?: true
+
+    private fun executeOnWithCTEList(list: PsiElement,
+                                     state: ResolveState,
+                                     keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
+            when (list) {
+                is QuotableKeywordList -> whileIn(list.quotableKeywordPairList()) {
+                    executeOnWithCTEList(it, state, keepProcessing)
+                }
+                is QuotableKeywordPair -> when (list.keywordKey.text) {
+                    "as" -> keepProcessing(list.keywordValue, state)
+                    else -> true
+                }
+                else -> {
+                    Logger.error(logger, "Don't know how to walk with_cte list", list)
+
+                    true
+                }
+            }
+
     /**
      * Whether the `parent` is a `join(...)` macro call or `join: ...` keyword in a from
      */
@@ -557,7 +597,8 @@ object Query {
     private val SELECT_NAME_ARITY_RANGE = NameArityRange("select", 2..3)
     private val SELECT_MERGE_NAME_ARITY_RANGE = NameArityRange("select_merge", 2..3)
     private val ORDER_BY_NAME_ARITY_RANGE = NameArityRange("order_by", 2..3)
-    private val WHERE_NAME_ARITY_RANGE = NameArityRange("where", 2..3)
+    private val WHERE_NAME_ARITY_RANGE = NameArityRange("where", 3..3)
+    private val WITH_CTE_NAME_ARITY_RANGE = NameArityRange("with_cte", 2..3)
     private val DECLARING_MACRO_NAME_ARITY_RANGES = arrayOf(
             DISTINCT_NAME_ARITY_RANGE,
             DYNAMIC_NAME_ARITY_RANGE,
@@ -568,7 +609,8 @@ object Query {
             SELECT_NAME_ARITY_RANGE,
             SELECT_MERGE_NAME_ARITY_RANGE,
             ORDER_BY_NAME_ARITY_RANGE,
-            WHERE_NAME_ARITY_RANGE
+            WHERE_NAME_ARITY_RANGE,
+            WITH_CTE_NAME_ARITY_RANGE
     )
     private val DECLARING_MACRO_ARITY_RANGES_BY_NAME =
             DECLARING_MACRO_NAME_ARITY_RANGES.map { it.name to it.arityRange }.toMap()
