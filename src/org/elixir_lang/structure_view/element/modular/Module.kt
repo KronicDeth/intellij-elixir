@@ -148,7 +148,7 @@ open class Module(protected val parent: Modular?, call: Call) : Element<Call>(ca
                             useSet.add(use)
                             treeElementList.add(use)
                         }
-                        org.elixir_lang.psi.ex_unit.kase.Describe.`is`(childCall, ResolveState.initial()) ->
+                        org.elixir_lang.psi.ex_unit.Case.isDescribe(childCall, ResolveState.initial()) ->
                             treeElementList.add(Describe(childCall))
                         Unknown.`is`(childCall) -> // Should always be last since it will match all macro calls
                             treeElementList.add(Unknown(modular, childCall))

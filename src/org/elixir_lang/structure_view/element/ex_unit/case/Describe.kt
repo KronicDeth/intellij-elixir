@@ -16,7 +16,7 @@ class Describe(call: Call) : Element<Call>(call) {
                 .stabBodyChildExpressions()
                 .orEmpty()
                 .filterIsInstance<Call>()
-                .filter { org.elixir_lang.psi.ex_unit.kase.Test.`is`(it, ResolveState.initial()) }
+                .filter { org.elixir_lang.psi.ex_unit.Case.isTest(it, ResolveState.initial()) }
                 .map { call ->
                     Test(call)
                 }

@@ -1,100 +1,40 @@
-package org.elixir_lang.structure_view;
+package org.elixir_lang.structure_view
 
-import com.intellij.ide.structureView.StructureViewModel;
-import com.intellij.ide.structureView.StructureViewTreeElement;
-import com.intellij.ide.structureView.TextEditorBasedStructureViewModel;
-import com.intellij.ide.util.treeView.smartTree.NodeProvider;
-import com.intellij.ide.util.treeView.smartTree.Sorter;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.ResolveState;
-import org.elixir_lang.psi.ElixirAtom;
-import org.elixir_lang.psi.ElixirFile;
-import org.elixir_lang.psi.QuotableKeywordPair;
-import org.elixir_lang.psi.QuoteMacro;
-import org.elixir_lang.psi.call.Call;
-import org.elixir_lang.structure_view.element.*;
-import org.elixir_lang.structure_view.element.Exception;
-import org.elixir_lang.structure_view.element.modular.Implementation;
-import org.elixir_lang.structure_view.element.modular.Module;
-import org.elixir_lang.structure_view.element.modular.Protocol;
-import org.elixir_lang.structure_view.element.modular.Unknown;
-import org.elixir_lang.structure_view.element.structure.Field;
-import org.elixir_lang.structure_view.element.structure.FieldWithDefaultValue;
-import org.elixir_lang.structure_view.element.structure.Structure;
-import org.elixir_lang.structure_view.node_provider.Used;
-import org.elixir_lang.structure_view.sorter.Time;
-import org.elixir_lang.structure_view.sorter.Visibility;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.elixir_lang.psi.CallDefinitionClause.isFunction
+import org.elixir_lang.psi.CallDefinitionClause.isMacro
+import com.intellij.ide.structureView.TextEditorBasedStructureViewModel
+import com.intellij.ide.structureView.StructureViewModel.ElementInfoProvider
+import com.intellij.ide.util.treeView.smartTree.NodeProvider
+import com.intellij.ide.structureView.StructureViewTreeElement
+import com.intellij.ide.util.treeView.smartTree.Sorter
+import com.intellij.openapi.editor.Editor
+import com.intellij.psi.PsiElement
+import org.elixir_lang.structure_view.element.structure.FieldWithDefaultValue
+import org.elixir_lang.structure_view.node_provider.Used
+import com.intellij.psi.ResolveState
+import org.elixir_lang.psi.*
+import org.elixir_lang.psi.Exception
+import org.elixir_lang.psi.Use
+import org.elixir_lang.psi.call.Call
+import org.elixir_lang.psi.ex_unit.Case
+import org.elixir_lang.structure_view.element.*
+import org.elixir_lang.structure_view.element.modular.Unknown
+import org.elixir_lang.structure_view.element.structure.Field
+import org.elixir_lang.structure_view.element.structure.Structure
+import org.elixir_lang.structure_view.sorter.Time
+import org.elixir_lang.structure_view.sorter.Visibility
+import java.util.*
 
-import java.util.Arrays;
-import java.util.Collection;
+class Model(elixirFile: ElixirFile, editor: Editor?) : TextEditorBasedStructureViewModel(editor, elixirFile), ElementInfoProvider {
+    override fun getNodeProviders(): Collection<NodeProvider<*>> = NODE_PROVIDERS
 
-public class Model extends TextEditorBasedStructureViewModel implements StructureViewModel.ElementInfoProvider {
-    /*
-     * Static Fields
-     */
+    public override fun getPsiFile(): ElixirFile = super.getPsiFile() as ElixirFile
 
-    private static final Collection<NodeProvider> NODE_PROVIDERS = Arrays.<NodeProvider>asList(new Used());
-
-    /*
-     * Static Methods
-     */
-
-    public static boolean isSuitable(Call call) {
-        // everything in {@link Module#childCallTreeElements}
-        return org.elixir_lang.psi.CallDefinitionClause.isFunction(call) ||
-                org.elixir_lang.psi.CallDefinitionClause.isMacro(call) ||
-                CallDefinitionHead.Companion.is(call) ||
-                CallDefinitionSpecification.Companion.is(call) ||
-                Callback.Companion.is(call) ||
-                Delegation.is(call) ||
-                org.elixir_lang.psi.Exception.is(call) ||
-                org.elixir_lang.psi.Implementation.is(call) ||
-                org.elixir_lang.psi.Module.is(call) ||
-                Overridable.is(call) ||
-                org.elixir_lang.psi.Protocol.is(call) ||
-                QuoteMacro.is(call) ||
-                Structure.is(call) ||
-                Type.is(call) ||
-                org.elixir_lang.psi.Use.is(call) ||
-                org.elixir_lang.psi.ex_unit.kase.Describe.is(call, ResolveState.initial()) ||
-                Unknown.is(call);
-    }
-
-    /*
-     * Constructors
-     */
-
-    public Model(@NotNull ElixirFile elixirFile, @Nullable Editor editor) {
-        super(editor, elixirFile);
-    }
-
-    /*
-     * Public Instance Methods
-     */
-
-    @NotNull
-    @Override
-    public Collection<NodeProvider> getNodeProviders() {
-        return NODE_PROVIDERS;
-    }
-
-    @Override
-    public ElixirFile getPsiFile() {
-        return (ElixirFile) super.getPsiFile();
-    }
-
-    @NotNull
-    @Override
-    public Sorter[] getSorters() {
-       return new Sorter[] {
-                Time.INSTANCE,
-                Visibility.INSTANCE,
-                Sorter.ALPHA_SORTER,
-        };
-    }
+    override fun getSorters(): Array<Sorter> = arrayOf(
+            Time.INSTANCE,
+            Visibility.INSTANCE,
+            Sorter.ALPHA_SORTER
+    )
 
     /**
      * Returns the list of PSI element classes which are shown as structure view elements.
@@ -103,46 +43,25 @@ public class Model extends TextEditorBasedStructureViewModel implements Structur
      *
      * @return the list of classes
      */
-    @NotNull
-    @Override
-    protected Class[] getSuitableClasses() {
-        return new Class[]{
-                Call.class,
-                ElixirAtom.class,
-                QuotableKeywordPair.class
-        };
-    }
+    override fun getSuitableClasses(): Array<Class<*>> = arrayOf(
+            Call::class.java,
+            ElixirAtom::class.java,
+            QuotableKeywordPair::class.java
+    )
 
-    @Override
-    public boolean isAlwaysShowsPlus(StructureViewTreeElement element) {
-        return false;
-    }
+    override fun isAlwaysShowsPlus(element: StructureViewTreeElement): Boolean = false
+    override fun isAlwaysLeaf(element: StructureViewTreeElement): Boolean = false
 
-    @Override
-    public boolean isAlwaysLeaf(StructureViewTreeElement element) {
-        return false;
-    }
-
-    @Override
-    protected boolean isSuitable(PsiElement element) {
-        boolean suitable = false;
-
-        // checks if the class is good
-        if (super.isSuitable(element)) {
-            // calls can be nested in calls, so need to check for sure
-            if (element instanceof Call) {
-                Call call = (Call) element;
-                suitable = isSuitable(call);
-            } else if (element instanceof ElixirAtom) {
-                ElixirAtom atom = (ElixirAtom) element;
-                suitable = Field.is(atom);
-            } else if (element instanceof QuotableKeywordPair) {
-                QuotableKeywordPair quotableKeywordPair = (QuotableKeywordPair) element;
-                suitable = FieldWithDefaultValue.is(quotableKeywordPair);
-            }
+    override fun isSuitable(element: PsiElement): Boolean = if (super.isSuitable(element)) {
+        // calls can be nested in calls, so need to check for sure
+        when (element) {
+            is Call -> Companion.isSuitable(element)
+            is ElixirAtom -> Field.`is`(element)
+            is QuotableKeywordPair -> FieldWithDefaultValue.`is`(element)
+            else -> false
         }
-
-        return suitable;
+    } else {
+        false
     }
 
     /**
@@ -150,9 +69,30 @@ public class Model extends TextEditorBasedStructureViewModel implements Structur
      *
      * @return the structure view root.
      */
-    @NotNull
-    @Override
-    public StructureViewTreeElement getRoot() {
-        return new File(getPsiFile());
+    override fun getRoot(): StructureViewTreeElement = File(psiFile)
+
+    companion object {
+        private val NODE_PROVIDERS: Collection<NodeProvider<*>> = Arrays.asList<NodeProvider<*>>(Used())
+
+        fun isSuitable(call: Call?): Boolean {
+            // everything in {@link Module#childCallTreeElements}
+            return isFunction(call!!) ||
+                    isMacro(call) ||
+                    CallDefinitionHead.`is`(call) ||
+                    CallDefinitionSpecification.`is`(call) ||
+                    Callback.`is`(call) ||
+                    Delegation.`is`(call) ||
+                    Exception.`is`(call) ||
+                    Implementation.`is`(call) ||
+                    Module.`is`(call) ||
+                    Overridable.`is`(call) ||
+                    Protocol.`is`(call) ||
+                    QuoteMacro.`is`(call) ||
+                    Structure.`is`(call) ||
+                    Type.`is`(call) ||
+                    Use.`is`(call) ||
+                    Case.isChild(call, ResolveState.initial()) ||
+                    Unknown.`is`(call)
+        }
     }
 }

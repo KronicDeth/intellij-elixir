@@ -12,7 +12,7 @@ import org.elixir_lang.psi.call.name.Function
 import org.elixir_lang.psi.call.name.Function.*
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.ex_unit.Assertions
-import org.elixir_lang.psi.ex_unit.kase.Describe
+import org.elixir_lang.psi.ex_unit.Case
 import org.elixir_lang.psi.impl.call.CallImpl.hasDoBlockOrKeyword
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.declarations.UseScopeImpl
@@ -126,8 +126,8 @@ object ProcessDeclarationsImpl {
                     call.isCalling(KERNEL, ALIAS) ||
                     CallDefinitionClause.`is`(call) || // call parameters
                             Callback.`is`(call) ||
+                            Case.isChild(call, state) ||
                             Delegation.`is`(call) || // delegation call parameters
-                            Describe.`is`(call, state) ||
                             Exception.`is`(call) ||
                             Implementation.`is`(call) ||
                             Import.`is`(call) ||

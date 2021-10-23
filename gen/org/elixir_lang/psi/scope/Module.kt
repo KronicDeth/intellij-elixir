@@ -18,7 +18,7 @@ import org.elixir_lang.psi.call.name.Function
 import org.elixir_lang.psi.call.name.Function.ALIAS
 import org.elixir_lang.psi.call.name.Function.REQUIRE
 import org.elixir_lang.psi.call.name.Module.KERNEL
-import org.elixir_lang.psi.ex_unit.kase.Describe
+import org.elixir_lang.psi.ex_unit.Case
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.call.keywordArgument
@@ -65,7 +65,7 @@ abstract class Module : PsiScopeProcessor {
                 Use.`is`(match) -> Use.treeWalkUp(match, state, ::execute)
                 match.isCalling(KERNEL, ALIAS) -> executeOnAliasCall(match, state)
                 match.isCalling(KERNEL, REQUIRE) -> executeOnRequireCall(match, state)
-                Describe.`is`(match, state) -> executeOnNestedModulars(match, state)
+                Case.isChild(match, state) -> executeOnNestedModulars(match, state)
                 else -> true
             }
 
