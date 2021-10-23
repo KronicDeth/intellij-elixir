@@ -77,6 +77,12 @@ object Query {
                         } else {
                             true
                         }
+                    PRELOAD_NAME_ARITY_RANGE.name ->
+                        if (call.resolvedFinalArity() in PRELOAD_NAME_ARITY_RANGE.arityRange) {
+                            executeOnPreload(call, state, keepProcessing)
+                        } else {
+                            true
+                        }
                     SELECT_NAME_ARITY_RANGE.name ->
                         if (call.resolvedFinalArity() in SELECT_NAME_ARITY_RANGE.arityRange) {
                             executeOnSelect(call, state, keepProcessing)
@@ -471,6 +477,28 @@ object Query {
                 }
             } ?: true
 
+    private fun executeOnPreload(call: Call,
+                                 state: ResolveState,
+                                 keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
+            call.finalArguments()?.let { arguments ->
+                // `preload(query, bindings \\ [], expr)`
+                when (call.resolvedFinalArity()) {
+                    // `preload(query, expr)` or `|> preload(expr)`
+                    2 -> executeOnSelectExpression(arguments[arguments.lastIndex], state.put(CALL, call), keepProcessing)
+                    3 -> executeOnBinding(arguments[arguments.lastIndex - 1], state, keepProcessing) &&
+                            executeOnSelectExpression(arguments[arguments.lastIndex], state.put(CALL, call), keepProcessing)
+                    else -> {
+                        Logger.error(
+                                logger,
+                                "preload arity outside of range (${PRELOAD_NAME_ARITY_RANGE.arityRange})",
+                                call
+                        )
+
+                        null
+                    }
+                }
+            } ?: true
+
     private fun executeOnSelect(call: Call, state: ResolveState, keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
             call.finalArguments()?.let { arguments ->
                 // `select(query, binding \\ [], expr)`
@@ -623,6 +651,7 @@ object Query {
     private val GROUP_BY_NAME_ARITY_RANGE = NameArityRange("group_by", 2..3)
     private val HAVING_NAME_ARITY_RANGE = NameArityRange("having", 2..3)
     private val JOIN_NAME_ARITY_RANGE = NameArityRange("join", 3..5)
+    private val PRELOAD_NAME_ARITY_RANGE = NameArityRange("preload", 2..3)
     private val SELECT_NAME_ARITY_RANGE = NameArityRange("select", 2..3)
     private val SELECT_MERGE_NAME_ARITY_RANGE = NameArityRange("select_merge", 2..3)
     private val ORDER_BY_NAME_ARITY_RANGE = NameArityRange("order_by", 2..3)
@@ -636,6 +665,7 @@ object Query {
             GROUP_BY_NAME_ARITY_RANGE,
             HAVING_NAME_ARITY_RANGE,
             JOIN_NAME_ARITY_RANGE,
+            PRELOAD_NAME_ARITY_RANGE,
             SELECT_NAME_ARITY_RANGE,
             SELECT_MERGE_NAME_ARITY_RANGE,
             ORDER_BY_NAME_ARITY_RANGE,
