@@ -143,15 +143,15 @@ object ProcessDeclarationsImpl {
                             call.isCallingMacro(KERNEL, "with") || // <- or = variable
                             QuoteMacro.`is`(call) || // quote :bind_quoted keys for Variable resolver OR call definitions for Callable resolver
                             org.elixir_lang.psi.mix.Generator.isEmbed(call, state) ||
-                            Assertions.isDeclaringMacro(call, state)
+                            Assertions.isChild(call, state)
                     -> processor.execute(call, state)
-                    org.elixir_lang.ecto.Schema.`is`(call, state) -> {
+                    org.elixir_lang.ecto.Schema.isChild(call, state) -> {
                         processor.execute(call, state)
                     }
                     hasDoBlockOrKeyword(call) ->
                         // unknown macros that take do blocks often allow variables to be declared in their arguments
                         processor.execute(call, state)
-                    org.elixir_lang.ecto.Query.isDeclaringMacro(call, state) -> {
+                    org.elixir_lang.ecto.Query.isChild(call, state) -> {
                         processor.execute(call, state)
                     }
                     else -> true

@@ -187,7 +187,7 @@ class MultiResolve(private val name: String, private val incompleteCode: Boolean
             } while (expression is Arguments ||
                     expression is ElixirDoBlock ||
                     expression is ElixirStab ||
-                    expression is ElixirStabBody || (expression is Call && Assertions.isDeclaringMacro(expression, state)))
+                    expression is ElixirStabBody || (expression is Call && Assertions.isChild(expression, state)))
             return expression
         }
     }

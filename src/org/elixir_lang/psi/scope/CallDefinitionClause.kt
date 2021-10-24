@@ -163,12 +163,12 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
                         execute(childExpression, state)
                     }
                 }
-                org.elixir_lang.ecto.Schema.`is`(element, state) -> {
-                    org.elixir_lang.ecto.Schema.treeWalkUp(element, state, ::execute)
+                org.elixir_lang.ecto.Schema.isChild(element, state) -> {
+                    org.elixir_lang.ecto.Schema.walkChild(element, state, ::execute)
                 }
                 // doesn't declare calls, but if this is the scope, then `Ecto.Query.API` is resolvable
-                org.elixir_lang.ecto.Query.isDeclaringMacro(element, state) -> {
-                    org.elixir_lang.ecto.Query.treeWalkUp(element, state, ::execute)
+                org.elixir_lang.ecto.Query.isChild(element, state) -> {
+                    org.elixir_lang.ecto.Query.walkChild(element, state, ::execute)
                 }
                 org.elixir_lang.ecto.query.API.`is`(element, state) -> {
                     org.elixir_lang.ecto.query.API.treeWalkUp(element, state, ::execute)

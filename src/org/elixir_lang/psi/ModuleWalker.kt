@@ -17,7 +17,7 @@ open class ModuleWalker(val name: String, vararg nameArityRangeWalkers: NameArit
     protected fun resolvesTo(call: Call, state: ResolveState) =
             resolvesToModularName(call, state, name)
 
-    fun walkChild(call: Call, state: ResolveState, keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
+    open fun walkChild(call: Call, state: ResolveState, keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
             walkerWithName(call)?.let { nameArityRangeWalkerByName ->
                 if (nameArityRangeWalkerByName.hasArity(call)) {
                     nameArityRangeWalkerByName.walk(call, state, keepProcessing)
