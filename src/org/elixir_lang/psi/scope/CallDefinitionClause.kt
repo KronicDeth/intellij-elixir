@@ -1,10 +1,7 @@
 package org.elixir_lang.psi.scope
 
 import com.intellij.openapi.util.Key
-import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiPolyVariantReference
-import com.intellij.psi.ResolveResult
-import com.intellij.psi.ResolveState
+import com.intellij.psi.*
 import com.intellij.psi.scope.PsiScopeProcessor
 import com.intellij.psi.util.isAncestor
 import org.elixir_lang.EEx
@@ -134,9 +131,9 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
                         && modularContainsEntrance(element, state) -> {
                     val childCalls = element.macroChildCallSequence()
 
-                    // If the entrance is at level of `childCalls`, then only previous siblings could possibly define
+                    // If the entrance is at compile time level of `childCalls`, then only previous siblings could possibly define
                     // this call and those will be handled by ElixirStabBody's processDeclarations.
-                    if (!childCalls.any { it.isEquivalentTo(state.get(ENTRANCE)) }) {
+                    if (!containsCompileTimeEntranceAncestorOrSelf(childCalls, state)) {
                         for (childCall in childCalls) {
                             execute(childCall, state)
                         }
@@ -287,7 +284,39 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
     companion object {
         val DEFDELEGATE_CALL = Key<Call>("DEFDELEGATE_CALL")
         val MODULAR_CANONICAL_NAME = Key<String>("MODULAR_CANONICAL_NAME")
+
+        /**
+         * The `state.get(ENTRANCE)` is one of the `childCalls` OR any calls in the way are compile-time conditional
+         * logic like `if`s
+         */
+        private fun containsCompileTimeEntranceAncestorOrSelf(childCalls: Sequence<Call>, state: ResolveState): Boolean =
+                state.get(ENTRANCE).let { entrance ->
+                    containsCompileTimeAncestorOrSelf(childCalls, entrance)
+                }
+
+        private fun containsCompileTimeAncestorOrSelf(childCalls: Sequence<Call>, entrance: PsiElement): Boolean =
+            childCalls.any { isCompileTimeAncestorOrSelf(it, entrance) }
+
+        private fun isCompileTimeAncestorOrSelf(call: Call, entrance: PsiElement): Boolean =
+                call.isEquivalentTo(entrance) || isCompileTimeAncestor(call, entrance.parent)
+
+        private fun isCompileTimeAncestor(stop: Call,  ancestor: PsiElement?): Boolean =
+                when (ancestor) {
+                    is ElixirDoBlock,
+                    is ElixirBlockList, is ElixirBlockItem,
+                    is ElixirStab, is ElixirStabBody ->
+                        isCompileTimeAncestor(stop, ancestor.parent)
+                    is Call -> when {
+                        If.`is`(ancestor) || Unless.`is`(ancestor) ->
+                            // the `stop` is an `if` or `unless`
+                            ancestor.isEquivalentTo(stop) ||
+                                    // there is an `if` or `unless` wrapping the original `ancestor`, but need to
+                                    // confirm all levels above are also `if` or `unless` until `stop`.
+                                    isCompileTimeAncestor(stop, ancestor.parent)
+                        else -> false
+                    }
+                    else -> false
+                }
+
     }
 }
-
-
