@@ -7,7 +7,7 @@ import org.elixir_lang.psi.call.name.Function.*
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.call.macroChildCallSequence
 import org.elixir_lang.psi.impl.call.whileInStabBodyChildExpressions
-import org.elixir_lang.psi.scope.CallDefinitionClause
+import org.elixir_lang.psi.scope.WhileIn.whileIn
 
 object QuoteMacro {
     fun treeWalkUp(quoteCall: Call, resolveState: ResolveState, keepProcessing: (PsiElement, ResolveState) -> Boolean): Boolean =
@@ -27,9 +27,20 @@ object QuoteMacro {
 
         for (childCall in childCallSequence) {
             accumulatorKeepProcessing = when {
-                If.`is`(childCall) -> If.treeWalkUp(childCall, resolveState, keepProcessing)
+                If.`is`(childCall) || Unless.`is`(childCall) -> {
+                    val branches = Branches(childCall)
+
+                    val primaryKeepProcessing = whileIn(branches.primaryChildExpressions) {
+                        keepProcessing(it, resolveState)
+                    }
+
+                    val alternativeKeepProcessing = whileIn(branches.alternativeChildExpressions) {
+                        keepProcessing(it, resolveState)
+                    }
+
+                    primaryKeepProcessing && alternativeKeepProcessing
+                }
                 Import.`is`(childCall) -> Import.treeWalkUp(childCall, resolveState, keepProcessing)
-                Unless.`is`(childCall) -> Unless.treeWalkUp(childCall, resolveState, keepProcessing)
                 Unquote.`is`(childCall) -> Unquote.treeWalkUp(childCall, resolveState, keepProcessing)
                 Use.`is`(childCall) -> Use.treeWalkUp(childCall, resolveState, keepProcessing)
                 childCall.isCalling(KERNEL, TRY) -> {

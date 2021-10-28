@@ -108,7 +108,27 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
                 Delegation.`is`(element) -> executeOnDelegation(element, state)
                 Exception.`is`(element) -> executeOnException(element, state)
                 For.`is`(element) -> For.treeWalkDown(element, state, ::execute)
-                If.`is`(element) -> If.treeWalkUp(element, state, ::execute)
+                If.`is`(element) || Unless.`is`(element) -> {
+                    // If the entrance os at compile time level of `childCalls`, then only previous siblings could
+                    // possibly define this call and those will be handled by ElixirStabBody's processDeclarations
+                    val branches = Branches(element)
+
+                    val primaryChildCalls = branches.primaryChildExpressions.filterIsInstance<Call>()
+                    val walkPrimary = !containsCompileTimeEntranceAncestorOrSelf(primaryChildCalls, state)
+
+                    val alternativeChildCalls = branches.alternativeChildExpressions.filterIsInstance<Call>()
+                    val walkAlternative = !containsCompileTimeEntranceAncestorOrSelf(alternativeChildCalls, state)
+
+                    if (walkPrimary && walkAlternative) {
+                        val childCalls = primaryChildCalls + alternativeChildCalls
+
+                        for (childCall in childCalls) {
+                            execute(childCall, state)
+                        }
+                    }
+
+                    keepProcessing()
+                }
                 Import.`is`(element) -> {
                     try {
                         Import.treeWalkUp(element, state) { call, accResolveState ->
@@ -154,7 +174,6 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
 
                     true
                 }
-                Unless.`is`(element) -> Unless.treeWalkUp(element, state, ::execute)
                 element.isCalling(KERNEL, TRY) -> {
                     element.whileInStabBodyChildExpressions { childExpression ->
                         execute(childExpression, state)
