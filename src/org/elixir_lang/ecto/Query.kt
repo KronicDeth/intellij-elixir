@@ -11,7 +11,9 @@ import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.childExpressions
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.impl.whileInChildExpressions
+import org.elixir_lang.psi.operation.Arrow
 import org.elixir_lang.psi.operation.In
+import org.elixir_lang.psi.operation.Normalized.operator
 import org.elixir_lang.psi.operation.Normalized.operatorIndex
 import org.elixir_lang.psi.operation.infix.Normalized.leftOperand
 import org.elixir_lang.psi.operation.infix.Normalized.rightOperand
@@ -316,6 +318,23 @@ object Query: ModuleWalker("Ecto.Query", Distinct, Dynamic, From, GroupBy, Havin
                     executeOnSelectExpression(it, state, keepProcessing)
                 }
                 is ElixirKeywordPair -> executeOnSelectExpression(element.keywordValue, state, keepProcessing)
+                is Arrow -> {
+                    val children = element.children
+                    val operatorIndex = operatorIndex(children)
+                    val operator = operator(children, operatorIndex)
+
+                    if (operator.text == "|>") {
+                        (leftOperand(children, operatorIndex)?.let { leftOperand ->
+                            executeOnSelectExpression(leftOperand, state, keepProcessing)
+                        } ?: true)
+                                &&
+                                (rightOperand(children, operatorIndex)?.let { rightOperand ->
+                                    executeOnSelectExpression(rightOperand, state, keepProcessing)
+                                } ?: true)
+                    } else {
+                        keepProcessing(element, state)
+                    }
+                }
                 is Call -> keepProcessing(element, state)
                 else -> true
             }
