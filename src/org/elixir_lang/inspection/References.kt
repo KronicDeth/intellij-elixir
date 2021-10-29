@@ -53,6 +53,8 @@ class References : LocalInspectionTool() {
                     is AtNonNumericOperation,
                         // Can't resolve key or fields of a capture
                     is ElixirCaptureNumericOperation,
+                        // Can't resolve field or key on a parenthetical expression
+                    is ElixirParentheticalStab,
                         // Can't resolve field directly off a struct like `%User{}.name`
                     is ElixirStructOperation,
                         // Can't resolve keys or fields of a variable
