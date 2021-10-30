@@ -5,6 +5,7 @@ import com.intellij.psi.*
 import com.intellij.psi.scope.PsiScopeProcessor
 import com.intellij.psi.util.isAncestor
 import org.elixir_lang.EEx
+import org.elixir_lang.ecto.query.WindowAPI
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.Module
@@ -188,6 +189,9 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
                 }
                 org.elixir_lang.ecto.query.API.`is`(element, state) -> {
                     org.elixir_lang.ecto.query.API.treeWalkUp(element, state, ::execute)
+                }
+                WindowAPI.`is`(element, state) -> {
+                    WindowAPI.treeWalkUp(element, state, ::execute)
                 }
                 EEx.isFunctionFrom(element, state) -> executeOnEExFunctionFrom(element, state)
                 org.elixir_lang.psi.mix.Generator.isEmbed(element, state) -> executeOnMixGeneratorEmbed(element, state)

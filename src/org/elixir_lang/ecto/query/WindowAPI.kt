@@ -13,9 +13,9 @@ import org.elixir_lang.psi.scope.WhileIn.whileIn
 import org.elixir_lang.psi.stub.index.ModularName
 import org.elixir_lang.reference.Resolver
 
-// `Ecto.Query.API` in Elixir
-object API {
-    const val ECTO_QUERY_API = "Ecto.Query.API"
+// `Ecto.Query.WindowAPI` in Elixir
+object WindowAPI {
+    const val ECTO_QUERY_WINDOW_API = "Ecto.Query.WindowAPI"
 
     fun `is`(call: Call, state: ResolveState): Boolean =
             hasNameArity(call) && state.get(org.elixir_lang.ecto.Query.CALL) != null
@@ -33,7 +33,7 @@ object API {
     fun treeWalkUp(call: Call,
                    state: ResolveState,
                    keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean {
-        val modulars = ectoQueryAPIModulars(call)
+        val modulars = ectoQueryWindowAPIModulars(call)
 
         return treeWalkUp(modulars, call, state, keepProcessing)
     }
@@ -42,7 +42,7 @@ object API {
                            call: Call,
                            state: ResolveState,
                            keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean {
-        val childState = state.put(MODULAR_CANONICAL_NAME, ECTO_QUERY_API)
+        val childState = state.put(MODULAR_CANONICAL_NAME, ECTO_QUERY_WINDOW_API)
 
         val checkArguments = whileIn(modulars) { modular ->
             modular.whileInStabBodyChildExpressions { childExpression ->
@@ -67,8 +67,8 @@ object API {
                 if (argument is Call) {
                     if (`is`(argument, state)) {
                         treeWalkUp(modulars, argument, state, keepProcessing)
-                    } else if (WindowAPI.`is`(argument, state)) {
-                        WindowAPI.treeWalkUp(argument, state, keepProcessing)
+                    } else if (API.`is`(argument, state)) {
+                        API.treeWalkUp(argument, state, keepProcessing)
                     } else {
                         true
                     }
@@ -77,7 +77,7 @@ object API {
                 }
             }
 
-    private fun ectoQueryAPIModulars(call: Call): List<Call> {
+    private fun ectoQueryWindowAPIModulars(call: Call): List<Call> {
         val project = call.project
         val globalSearchScope = GlobalSearchScope.allScope(project)
         val modulars = mutableListOf<Call>()
@@ -86,7 +86,7 @@ object API {
                 .getInstance()
                 .processElements(
                         ModularName.KEY,
-                        ECTO_QUERY_API,
+                        ECTO_QUERY_WINDOW_API,
                         project,
                         globalSearchScope,
                         NamedElement::class.java) { namedElement ->
@@ -101,45 +101,24 @@ object API {
     }
 
     private val ARITY_RANGES_BY_NAME = mapOf(
-            "!=" to 2..2,
-            "*" to 2..2,
-            "+" to 2..2,
-            "-" to 2..2,
-            "/" to 2..2,
-            "<" to 2..2,
-            "<=" to 2..2,
-            "==" to 2..2,
-            ">" to 2..2,
-            ">=" to 2..2,
-            "ago" to 2..2,
-            "all" to 2..2,
-            "and" to 2..2,
-            "any" to 2..2,
-            "as" to 1..1,
             "avg" to 1..1,
-            "coalesce" to 2..2,
-            "count" to 0..2,
-            "date_add" to 3..3,
-            "datetime_add" to 3..3,
-            "exists" to 1..1,
-            "field" to 2..2,
+            "count" to 0..1,
+            "cume_dist" to 0..0,
+            "dense_rank" to 0..0,
             "filter" to 2..2,
-            "from_now" to 2..2,
-            "ilike" to 2..2,
-            "in" to 2..2,
-            "is_nil" to 1..1,
-            "json_extract_path" to 2..2,
-            "like" to 2..2,
-            "map" to 2..2,
+            "first_value" to 1..1,
+            "lag" to 1..3,
+            "last_value" to 1..1,
+            "lead" to 1..3,
             "max" to 1..1,
-            "merge" to 2..2,
             "min" to 1..1,
-            "not" to 1..1,
-            "or" to 2..2,
-            "parent_as" to 1..1,
-            "struct" to 2..2,
-            "sum" to 1..1,
-            "type" to 2..2
+            "nth_value" to 2..2,
+            "ntile" to 1..1,
+            "over" to 1..2,
+            "percent_rank" to 0..0,
+            "rank" to 0..0,
+            "row_number" to 0..0,
+            "sum" to 1..1
             )
 
     private const val FRAGMENT = "fragment"
