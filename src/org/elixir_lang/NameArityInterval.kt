@@ -2,8 +2,7 @@ package org.elixir_lang
 
 import com.intellij.psi.ResolveState
 import org.elixir_lang.ecto.query.API
-import org.elixir_lang.ecto.query.API.ECTO_QUERY_API
-import org.elixir_lang.ecto.query.WindowAPI.ECTO_QUERY_WINDOW_API
+import org.elixir_lang.ecto.query.WindowAPI
 import org.elixir_lang.psi.ArityInterval
 import org.elixir_lang.psi.call.name.Module
 import org.elixir_lang.psi.scope.CallDefinitionClause
@@ -24,10 +23,10 @@ data class NameArityInterval(val name: Name, val arityInterval: ArityInterval) {
         private val ONE_TWO = ArityInterval(1, 2)
         private val ARITY_INTERVAL_BY_NAME_BY_MODULAR_CANONICAL_NAME =
                 mapOf(
-                        ECTO_QUERY_API to mapOf(
+                        API.name to mapOf(
                                 "fragment" to ZERO
                         ),
-                        ECTO_QUERY_WINDOW_API to mapOf(
+                        WindowAPI.name to mapOf(
                                 "over" to ONE_TWO
                         ),
                         Module.KERNEL_SPECIAL_FORMS to

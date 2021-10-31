@@ -5,7 +5,6 @@ import com.intellij.psi.ResolveState
 import org.elixir_lang.Arity
 import org.elixir_lang.ArityRange
 import org.elixir_lang.NameArityRange
-import org.elixir_lang.ecto.query.API.ECTO_QUERY_API
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Module
 import org.elixir_lang.psi.call.name.Module.KERNEL_SPECIAL_FORMS
