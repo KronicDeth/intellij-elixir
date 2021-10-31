@@ -145,6 +145,7 @@ private object Join: NameArityRangeWalker("join", 3..5) {
             }
 }
 
+private object Lock: QueryBindingExpr("lock")
 private object OrderBy: QueryBindingExpr("order_by")
 private object Preload: QueryBindingExpr("preload")
 private object Select: QueryBindingExpr("select")
@@ -181,7 +182,7 @@ private object WithCTE: NameArityRangeWalker("with_cte", 3..3) {
             }
 }
 
-object Query: ModuleWalker("Ecto.Query", Distinct, Dynamic, From, GroupBy, Having, Join, OrderBy, Preload, Select, SelectMerge, Update, Where, Windows, WithCTE) {
+object Query: ModuleWalker("Ecto.Query", Distinct, Dynamic, From, GroupBy, Having, Join, Lock, OrderBy, Preload, Select, SelectMerge, Update, Where, Windows, WithCTE) {
     val CALL: Key<Call> = Key.create("Ecto.Query")
 
     internal fun executeOnIn(fromIn: PsiElement,
