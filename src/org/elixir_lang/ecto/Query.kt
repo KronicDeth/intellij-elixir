@@ -151,6 +151,7 @@ private object Select: QueryBindingExpr("select")
 private object SelectMerge: QueryBindingExpr("select_merge")
 private object Update: QueryBindingExpr("update")
 private object Where: QueryBindingExpr("where")
+private object Windows: QueryBindingExpr("windows")
 
 private object WithCTE: NameArityRangeWalker("with_cte", 3..3) {
     override fun walk(call: Call, arguments: Array<PsiElement>, resolvedFinalArity: Arity, state: ResolveState, keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
@@ -180,7 +181,7 @@ private object WithCTE: NameArityRangeWalker("with_cte", 3..3) {
             }
 }
 
-object Query: ModuleWalker("Ecto.Query", Distinct, Dynamic, From, GroupBy, Having, Join, OrderBy, Preload, Select, SelectMerge, Update, Where, WithCTE) {
+object Query: ModuleWalker("Ecto.Query", Distinct, Dynamic, From, GroupBy, Having, Join, OrderBy, Preload, Select, SelectMerge, Update, Where, Windows, WithCTE) {
     val CALL: Key<Call> = Key.create("Ecto.Query")
 
     internal fun executeOnIn(fromIn: PsiElement,
