@@ -112,10 +112,10 @@ private object Join: NameArityRangeWalker("join", 3..5) {
             // `join(query, qual, binding \\ [], expr, opts \\ [])`
             when (resolvedFinalArity) {
                 // `join(query, qual, expr)` or `|> join(qual, expr)`
-                3 -> Query.executeOnIn(arguments[arguments.lastIndex], state, keepProcessing)
+                3 -> Query.executeOnIn(arguments[arguments.lastIndex], state.put(Query.CALL, call), keepProcessing)
                 // `join(query, qual, binding, expr)` or `|> join(qual, binding, expr)`
                 4 -> Query.executeOnBinding(arguments[arguments.lastIndex - 1], state, keepProcessing) &&
-                        Query.executeOnIn(arguments[arguments.lastIndex], state, keepProcessing)
+                        Query.executeOnIn(arguments[arguments.lastIndex], state.put(Query.CALL, call), keepProcessing)
                 // `join(query, qual, binding, expr, opts)` or `|> join(qual, binding, expr, opts)`
                 5 -> Query.executeOnBinding(arguments[arguments.lastIndex - 2], state, keepProcessing) &&
                         Query.executeOnIn(arguments[arguments.lastIndex - 1], state.put(Query.CALL, call), keepProcessing) &&
