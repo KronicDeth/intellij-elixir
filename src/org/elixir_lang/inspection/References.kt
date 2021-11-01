@@ -63,6 +63,8 @@ class References : LocalInspectionTool() {
                     is UnqualifiedParenthesesCall<*>,
                         // Can't resolve a chain of keys or fields
                     is QualifiedNoArgumentsCall<*>,
+                        // Can't resolve a field or key coming out of an access lookup
+                    is QualifiedBracketOperation,
                         // Can't resolve keys or fields on the output of a function call
                     is QualifiedParenthesesCall<*> -> Unit
                     else -> visitCall(qualifiedNoArgumentsCall)
