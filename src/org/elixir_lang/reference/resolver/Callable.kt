@@ -7,15 +7,19 @@ import com.intellij.psi.impl.source.resolve.ResolveCache
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import org.elixir_lang.Arity
+import org.elixir_lang.NameArityInterval
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall
 import org.elixir_lang.psi.CallDefinitionClause.nameArityInterval
+import org.elixir_lang.psi.Module
 import org.elixir_lang.psi.call.Call
+import org.elixir_lang.psi.call.CanonicallyNamed
 import org.elixir_lang.psi.call.name.Function.UNQUOTE
 import org.elixir_lang.psi.call.qualification.Qualified
 import org.elixir_lang.psi.impl.call.qualification.qualifiedToModulars
+import org.elixir_lang.psi.scope.CallDefinitionClause.Companion.MODULAR_CANONICAL_NAME
 import org.elixir_lang.psi.scope.VisitedElementSetResolveResult
 import org.elixir_lang.psi.stub.index.AllName
 import org.elixir_lang.structure_view.element.CallDefinitionHead
@@ -177,11 +181,9 @@ object Callable : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Cal
             stubIndex
                     .processElements(AllName.KEY, key, project, scope, NamedElement::class.java) { namedElement ->
                         if (namedElement is Call) {
-                            val state = ResolveState.initial()
-
                             if (CallDefinitionClause.`is`(namedElement)) {
                                 if (incompleteCode ||
-                                        nameArityInterval(namedElement, state)
+                                        nameArityInterval(namedElement, resolveState(namedElement, key))
                                                 ?.arityInterval?.contains(arity) == true) {
                                     resolveResults.add(VisitedElementSetResolveResult(namedElement, validResult, emptySet()))
                                 }
@@ -189,7 +191,7 @@ object Callable : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Cal
                                 if (incompleteCode ||
                                         Callback
                                                 .headCall(namedElement as AtUnqualifiedNoParenthesesCall<*>)
-                                                ?.let { CallDefinitionHead.nameArityInterval(it, state) }
+                                                ?.let { CallDefinitionHead.nameArityInterval(it, resolveState(namedElement, key)) }
                                                 ?.arityInterval?.contains(arity) == true) {
                                     resolveResults.add(VisitedElementSetResolveResult(namedElement, validResult, emptySet()))
                                 }
@@ -201,5 +203,23 @@ object Callable : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Cal
         }
 
         return resolveResults
+    }
+
+    private fun resolveState(call: Call, name: String): ResolveState {
+        val initial = ResolveState.initial()
+
+        return if (NameArityInterval.nameIsAdjusted(name)) {
+            enclosingModularMacroCall(call)?.let { modular ->
+                if (Module.`is`(modular)) {
+                    modular.let { it as CanonicallyNamed }.canonicalName()?.let { modularCanonicalName ->
+                        initial.put(MODULAR_CANONICAL_NAME, modularCanonicalName)
+                    }
+                } else {
+                    null
+                }
+            } ?: initial
+        } else {
+            initial
+        }
     }
 }
