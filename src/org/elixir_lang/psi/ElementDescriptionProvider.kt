@@ -31,6 +31,7 @@ class ElementDescriptionProvider : com.intellij.psi.ElementDescriptionProvider {
             when (element) {
                 is AtNonNumericOperation -> getElementDescription(element, location)
                 is Call -> getElementDescription(element, location)
+                is ElixirAtom -> getElementDescription(element, location)
                 is ElixirIdentifier -> getElementDescription(element, location)
                 is ElixirKeywordKey -> getElementDescription(element, location)
                 is ElixirVariable -> getElementDescription(element, location)
@@ -47,6 +48,13 @@ class ElementDescriptionProvider : com.intellij.psi.ElementDescriptionProvider {
             when (location) {
                 UsageViewNodeTextLocation.INSTANCE -> atNonNumericOperation.text
                 UsageViewTypeLocation.INSTANCE -> "module attribute"
+                else -> null
+            }
+
+    private fun getElementDescription(atom: ElixirAtom, location: ElementDescriptionLocation): String? =
+            when (location) {
+                UsageViewNodeTextLocation.INSTANCE, UsageViewShortNameLocation.INSTANCE -> atom.text
+                UsageViewTypeLocation.INSTANCE -> "atom"
                 else -> null
             }
 
