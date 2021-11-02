@@ -6,6 +6,7 @@ import com.intellij.psi.stubs.StubInputStream;
 import org.elixir_lang.psi.Definition;
 import org.elixir_lang.psi.ElixirUnmatchedUnqualifiedNoArgumentsCall;
 import org.elixir_lang.psi.QuoteMacro;
+import org.elixir_lang.psi.Variable;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirUnmatchedUnqualifiedNoArgumentsCallImpl;
 import org.elixir_lang.psi.operation.Match;
@@ -65,7 +66,7 @@ public class UnmatchedUnqualifiedNoArgumentsCall extends Stub<org.elixir_lang.ps
     private @Nullable Definition definition(@NotNull ElixirUnmatchedUnqualifiedNoArgumentsCall psi) {
         Definition definition = null;
 
-        if (psi.getParent() instanceof Match) {
+        if (Variable.isDeclaration(psi)) {
             Call enclosingModularMacroCall = enclosingModularMacroCall(psi);
 
             if (enclosingModularMacroCall != null && QuoteMacro.is(enclosingModularMacroCall)) {

@@ -230,19 +230,7 @@ abstract class Variable : PsiScopeProcessor {
                         }
                     }
                 }
-                QuoteMacro.`is`(match) -> {
-                    match
-                            .keywordArgument("bind_quoted")?.let { it as? ElixirAccessExpression }
-                            ?.stripAccessExpression()
-                            ?.let { it as? ElixirList }
-                            ?.children?.singleOrNull()
-                            ?.let { it as? ElixirKeywords }
-                            ?.keywordPairList?.let { keywordPairList ->
-                                whileIn(keywordPairList) { keywordPair ->
-                                    executeOnVariable(keywordPair.keywordKey, state)
-                                }
-                            }
-                }
+                QuoteMacro.`is`(match) -> executeOnBindQuoted(match, state) && executeOnOnlyChild(match, state)
                 ElixirPsiImplUtil.hasDoBlockOrKeyword(match) -> {
                     match.finalArguments()?.let { finalArguments ->
                         val macroArgumentsState = state.put(DECLARING_SCOPE, true)
@@ -446,6 +434,26 @@ abstract class Variable : PsiScopeProcessor {
                 execute(finalArguments, state.put(DECLARING_SCOPE, true))
             } ?: true
 
+    private fun executeOnBindQuoted(quote: Call, state: ResolveState): Boolean =
+            quote
+                    .keywordArgument("bind_quoted")?.let { it as? ElixirAccessExpression }
+                    ?.stripAccessExpression()
+                    ?.let { it as? ElixirList }
+                    ?.children?.singleOrNull()
+                    ?.let { it as? ElixirKeywords }
+                    ?.keywordPairList?.let { keywordPairList ->
+                        whileIn(keywordPairList) { keywordPair ->
+                            executeOnVariable(keywordPair.keywordKey, state)
+                        }
+                    } ?: true
+
+    private fun executeOnOnlyChild(quote: Call, state: ResolveState): Boolean =
+            quote
+                    .keywordArgument("do")
+                    ?.let { it as? PsiNamedElement}
+                    ?.takeIf { org.elixir_lang.psi.Variable.isDeclaration(it) }
+                    ?.let { executeOnVariable(it, state) }
+                    ?: true
 
     private fun maybeMacro(call: Call, state: ResolveState): Boolean =
             !ElixirPsiImplUtil.hasDoBlockOrKeyword(call) && isInDeclaringScope(call, state)
