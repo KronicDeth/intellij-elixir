@@ -11,6 +11,7 @@ import org.elixir_lang.psi.call.qualification.Qualified
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.stripAccessExpression
+import org.elixir_lang.psi.operation.InMatch
 import org.elixir_lang.psi.operation.Pipe
 import org.elixir_lang.psi.operation.Type
 import org.elixir_lang.psi.scope.ResolveResultOrderedSet
@@ -82,6 +83,16 @@ private constructor(private val name: String,
                 is ElixirKeywordKey -> executeOnParameter(parameter, parameter.text, state)
                 is Pipe -> (parameter.leftOperand()?.let { executeOnParameter(it, state) } ?: true)
                         && (parameter.rightOperand()?.let { executeOnParameter(it, state) } ?: true)
+                // putting defaults in type specs isn't valid, but it can occur when copying the def to write the type
+                is InMatch -> {
+                    val nameElement = parameter.leftOperand()
+
+                    if (nameElement != null) {
+                        executeOnParameter(nameElement, state)
+                    } else {
+                        true
+                    }
+                }
                 is Type -> {
                     val nameElement = parameter.leftOperand()
 
