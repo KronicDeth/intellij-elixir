@@ -9,7 +9,7 @@ class Functions(val functions: List<Function>) {
                 .mapNotNull { function ->
                     function.name?.let { name ->
                         function.arity?.let { arity ->
-                            NameArity(name.atomValue(), arity.toArity()) to function
+                            NameArity(name.atomValue(), arity) to function
                         }
                     }
                 }

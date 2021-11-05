@@ -43,5 +43,5 @@ object Clause {
 
     private fun toBody(clause: OtpErlangTuple): OtpErlangObject? = clause.elementAt(4)
     private fun toGuardSequence(clause: OtpErlangTuple): OtpErlangObject? = clause.elementAt(3)
-    private fun toPatternSequence(clause: OtpErlangTuple): OtpErlangObject? = clause.elementAt(2)
+    fun toPatternSequence(clause: OtpErlangTuple): OtpErlangObject? = clause.elementAt(2)
 }

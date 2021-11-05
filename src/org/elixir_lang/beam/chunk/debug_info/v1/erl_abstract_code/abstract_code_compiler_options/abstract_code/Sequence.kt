@@ -8,20 +8,26 @@ object Sequence {
     fun toMacroStringDeclaredScope(term: OtpErlangList,
                                    scope: Scope,
                                    open: String, separator: String, close: String): MacroStringDeclaredScope =
+            toMacroStringDeclaredScope(term, scope) { macroStringList ->
+                val separatedMacroString = macroStringList.joinToString(separator)
+
+                if (macroStringList.size > 1) {
+                    "$open$separatedMacroString$close"
+                } else {
+                    separatedMacroString
+                }
+            }
+
+    fun toMacroStringDeclaredScope(term: OtpErlangList,
+                                   scope: Scope,
+                                   joiner: (List<MacroString>) -> MacroString): MacroStringDeclaredScope =
             term.fold(Pair(mutableListOf<MacroString>(), scope)) { (accMacroStringList, accScope), qualifier ->
                 val (qualifierMacroString, qualifierDeclaredScope) = Qualifier.toMacroStringDeclaredScope(qualifier, accScope)
                 accMacroStringList.add(qualifierMacroString)
 
                 Pair(accMacroStringList, accScope.union(qualifierDeclaredScope))
             }.let { (macroStringList, declaredScope) ->
-                val separatedMacroString = macroStringList.joinToString(separator)
-
-
-                val macroString = if (macroStringList.size > 1) {
-                    "$open$separatedMacroString$close"
-                } else {
-                    separatedMacroString
-                }
+                val macroString = joiner(macroStringList)
 
                 MacroStringDeclaredScope(macroString, declaredScope)
             }
