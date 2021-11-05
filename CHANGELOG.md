@@ -2,241 +2,524 @@
 
 ## Table of Contents
 
-* [v11.13.0](#v11130)
-  * [Bug Fixes](#bug-fixes)
+<details>
+
+* [v12.0.0](#v1200)
+  * [Breaking Changes](#breaking-changes)
   * [Enhancements](#enhancements)
-* [v11.12.0](#v11120)
+  * [Bug Fixes](#bug-fixes)
+* [v11.13.0](#v11130)
   * [Bug Fixes](#bug-fixes-1)
   * [Enhancements](#enhancements-1)
-* [v11.11.0](#v11110)
-  * [Enhancements](#enhancements-2)
+* [v11.12.0](#v11120)
   * [Bug Fixes](#bug-fixes-2)
-* [v11.10.0](#v11100)
+  * [Enhancements](#enhancements-2)
+* [v11.11.0](#v11110)
   * [Enhancements](#enhancements-3)
   * [Bug Fixes](#bug-fixes-3)
-* [v11.9.2](#v1192)
-  * [Bug Fixes](#bug-fixes-4)
-* [v11.9.1](#v1191)
-  * [Bug Fixes](#bug-fixes-5)
-* [v11.9.0](#v1190)
+* [v11.10.0](#v11100)
   * [Enhancements](#enhancements-4)
+  * [Bug Fixes](#bug-fixes-4)
+* [v11.9.2](#v1192)
+  * [Bug Fixes](#bug-fixes-5)
+* [v11.9.1](#v1191)
   * [Bug Fixes](#bug-fixes-6)
-* [v11.8.1](#v1181)
-  * [Bug Fixes](#bug-fixes-7)
-* [v11.8.0](#v1180)
+* [v11.9.0](#v1190)
   * [Enhancements](#enhancements-5)
+  * [Bug Fixes](#bug-fixes-7)
+* [v11.8.1](#v1181)
   * [Bug Fixes](#bug-fixes-8)
-* [v11.7.0](#v1170)
+* [v11.8.0](#v1180)
   * [Enhancements](#enhancements-6)
   * [Bug Fixes](#bug-fixes-9)
-* [v11.6.1](#v1161)
-  * [Bug Fixes](#bug-fixes-10)
-* [v11.6.0](#v1160)
+* [v11.7.0](#v1170)
   * [Enhancements](#enhancements-7)
+  * [Bug Fixes](#bug-fixes-10)
+* [v11.6.1](#v1161)
   * [Bug Fixes](#bug-fixes-11)
-* [v11.5.0](#v1150)
+* [v11.6.0](#v1160)
   * [Enhancements](#enhancements-8)
   * [Bug Fixes](#bug-fixes-12)
-* [v11.4.0](#v1140)
+* [v11.5.0](#v1150)
   * [Enhancements](#enhancements-9)
-* [v11.3.0](#v1130)
-  * [Enhancements](#enhancements-10)
   * [Bug Fixes](#bug-fixes-13)
-* [v11.2.0](#v1120)
+* [v11.4.0](#v1140)
+  * [Enhancements](#enhancements-10)
+* [v11.3.0](#v1130)
   * [Enhancements](#enhancements-11)
   * [Bug Fixes](#bug-fixes-14)
-* [v11.1.0](#v1110)
+* [v11.2.0](#v1120)
   * [Enhancements](#enhancements-12)
   * [Bug Fixes](#bug-fixes-15)
-* [v11.0.1](#v1101)
-  * [Bug Fixes](#bug-fixes-16)
-* [v11.0.0](#v1100)
+* [v11.1.0](#v1110)
   * [Enhancements](#enhancements-13)
+  * [Bug Fixes](#bug-fixes-16)
+* [v11.0.1](#v1101)
   * [Bug Fixes](#bug-fixes-17)
-  * [Incompatible Changes](#incompatible-changes)
-* [v10.6.0](#v1060)
+* [v11.0.0](#v1100)
   * [Enhancements](#enhancements-14)
   * [Bug Fixes](#bug-fixes-18)
-* [v10.5.1](#v1051)
-  * [Bug Fixes](#bug-fixes-19)
-* [v10.5.0](#v1050)
+  * [Incompatible Changes](#incompatible-changes)
+* [v10.6.0](#v1060)
   * [Enhancements](#enhancements-15)
+  * [Bug Fixes](#bug-fixes-19)
+* [v10.5.1](#v1051)
   * [Bug Fixes](#bug-fixes-20)
-* [v10.4.0](#v1040)
+* [v10.5.0](#v1050)
   * [Enhancements](#enhancements-16)
   * [Bug Fixes](#bug-fixes-21)
-* [v10.3.0](#v1030)
+* [v10.4.0](#v1040)
   * [Enhancements](#enhancements-17)
   * [Bug Fixes](#bug-fixes-22)
-* [v10.2.0](#v1020)
+* [v10.3.0](#v1030)
   * [Enhancements](#enhancements-18)
   * [Bug Fixes](#bug-fixes-23)
-* [v10.1.0](#v1010)
+* [v10.2.0](#v1020)
   * [Enhancements](#enhancements-19)
   * [Bug Fixes](#bug-fixes-24)
-* [v10.0.1](#v1001)
-  * [Bug Fixes](#bug-fixes-25)
-* [v10.0.0](#v1000)
+* [v10.1.0](#v1010)
   * [Enhancements](#enhancements-20)
+  * [Bug Fixes](#bug-fixes-25)
+* [v10.0.1](#v1001)
   * [Bug Fixes](#bug-fixes-26)
-  * [Incompatible Changes](#incompatible-changes-1)
-* [v9.0.0](#v900)
+* [v10.0.0](#v1000)
   * [Enhancements](#enhancements-21)
   * [Bug Fixes](#bug-fixes-27)
-  * [Incompatible Changs](#incompatible-changs)
-* [v8.1.0](#v810)
+  * [Incompatible Changes](#incompatible-changes-1)
+* [v9.0.0](#v900)
   * [Enhancements](#enhancements-22)
   * [Bug Fixes](#bug-fixes-28)
-* [v8.0.0](#v800)
+  * [Incompatible Changs](#incompatible-changs)
+* [v8.1.0](#v810)
   * [Enhancements](#enhancements-23)
   * [Bug Fixes](#bug-fixes-29)
-  * [Incompatible Changes](#incompatible-changes-2)
-* [v7.5.0](#v750)
+* [v8.0.0](#v800)
   * [Enhancements](#enhancements-24)
   * [Bug Fixes](#bug-fixes-30)
-* [v7.4.0](#v740)
+  * [Incompatible Changes](#incompatible-changes-2)
+* [v7.5.0](#v750)
   * [Enhancements](#enhancements-25)
   * [Bug Fixes](#bug-fixes-31)
-* [v7.3.0](#v730)
+* [v7.4.0](#v740)
   * [Enhancements](#enhancements-26)
   * [Bug Fixes](#bug-fixes-32)
-* [v7.2.1](#v721)
-  * [Bug Fixes](#bug-fixes-33)
-* [v7.2.0](#v720)
+* [v7.3.0](#v730)
   * [Enhancements](#enhancements-27)
+  * [Bug Fixes](#bug-fixes-33)
+* [v7.2.1](#v721)
   * [Bug Fixes](#bug-fixes-34)
-* [v7.1.0](#v710)
+* [v7.2.0](#v720)
   * [Enhancements](#enhancements-28)
   * [Bug Fixes](#bug-fixes-35)
-* [v7.0.0](#v700)
+* [v7.1.0](#v710)
   * [Enhancements](#enhancements-29)
   * [Bug Fixes](#bug-fixes-36)
-* [Incompatible Changes](#incompatible-changes-3)
-* [v6.7.0](#v670)
+* [v7.0.0](#v700)
   * [Enhancements](#enhancements-30)
   * [Bug Fixes](#bug-fixes-37)
-* [v6.6.0](#v660)
+* [Incompatible Changes](#incompatible-changes-3)
+* [v6.7.0](#v670)
   * [Enhancements](#enhancements-31)
   * [Bug Fixes](#bug-fixes-38)
-* [v6.5.1](#v651)
-  * [Bug Fixes](#bug-fixes-39)
-* [v6.5.0](#v650)
+* [v6.6.0](#v660)
   * [Enhancements](#enhancements-32)
+  * [Bug Fixes](#bug-fixes-39)
+* [v6.5.1](#v651)
   * [Bug Fixes](#bug-fixes-40)
-* [v6.4.0](#v640)
+* [v6.5.0](#v650)
   * [Enhancements](#enhancements-33)
   * [Bug Fixes](#bug-fixes-41)
-* [v6.3.0](#v630)
+* [v6.4.0](#v640)
   * [Enhancements](#enhancements-34)
   * [Bug Fixes](#bug-fixes-42)
-* [v6.2.0](#v620)
+* [v6.3.0](#v630)
   * [Enhancements](#enhancements-35)
   * [Bug Fixes](#bug-fixes-43)
-* [v6.1.1](#v611)
-  * [Bug Fixes](#bug-fixes-44)
-* [v6.1.0](#v610)
+* [v6.2.0](#v620)
   * [Enhancements](#enhancements-36)
+  * [Bug Fixes](#bug-fixes-44)
+* [v6.1.1](#v611)
   * [Bug Fixes](#bug-fixes-45)
-* [v6.0.0](#v600)
+* [v6.1.0](#v610)
   * [Enhancements](#enhancements-37)
   * [Bug Fixes](#bug-fixes-46)
-  * [Incompatible Changes](#incompatible-changes-4)
-* [v5.1.0](#v510)
+* [v6.0.0](#v600)
   * [Enhancements](#enhancements-38)
   * [Bug Fixes](#bug-fixes-47)
-* [v5.0.0](#v500)
+  * [Incompatible Changes](#incompatible-changes-4)
+* [v5.1.0](#v510)
   * [Enhancements](#enhancements-39)
   * [Bug Fixes](#bug-fixes-48)
-  * [Incompatible Changes](#incompatible-changes-5)
-* [v4.7.0](#v470)
+* [v5.0.0](#v500)
   * [Enhancements](#enhancements-40)
   * [Bug Fixes](#bug-fixes-49)
-* [v4.6.0](#v460)
+  * [Incompatible Changes](#incompatible-changes-5)
+* [v4.7.0](#v470)
   * [Enhancements](#enhancements-41)
   * [Bug Fixes](#bug-fixes-50)
-* [v4.5.0](#v450)
+* [v4.6.0](#v460)
   * [Enhancements](#enhancements-42)
-* [v4.4.0](#v440)
-  * [Enhancements](#enhancements-43)
   * [Bug Fixes](#bug-fixes-51)
-* [v4.3.0](#v430)
+* [v4.5.0](#v450)
+  * [Enhancements](#enhancements-43)
+* [v4.4.0](#v440)
   * [Enhancements](#enhancements-44)
   * [Bug Fixes](#bug-fixes-52)
-* [v4.2.0](#v420)
+* [v4.3.0](#v430)
   * [Enhancements](#enhancements-45)
   * [Bug Fixes](#bug-fixes-53)
-* [v4.1.0](#v410)
+* [v4.2.0](#v420)
   * [Enhancements](#enhancements-46)
   * [Bug Fixes](#bug-fixes-54)
-* [v4.0.0](#v400)
+* [v4.1.0](#v410)
   * [Enhancements](#enhancements-47)
   * [Bug Fixes](#bug-fixes-55)
+* [v4.0.0](#v400)
+  * [Enhancements](#enhancements-48)
+  * [Bug Fixes](#bug-fixes-56)
   * [Incompatible Changes](#incompatible-changes-6)
 * [v3.0.1](#v301)
-  * [Bug Fixes](#bug-fixes-56)
-* [v3.0.0](#v300)
-  * [Enhancements](#enhancements-48)
   * [Bug Fixes](#bug-fixes-57)
+* [v3.0.0](#v300)
+  * [Enhancements](#enhancements-49)
+  * [Bug Fixes](#bug-fixes-58)
   * [Incompatible Changes](#incompatible-changes-7)
 * [v2.2.0](#v220)
   * [Enhancement](#enhancement)
-  * [Bug Fixes](#bug-fixes-58)
+  * [Bug Fixes](#bug-fixes-59)
 * [v2.1.0](#v210)
   * [Enhancement](#enhancement-1)
-  * [Bug Fixes](#bug-fixes-59)
-* [v2.0.0](#v200)
-  * [Enhancements](#enhancements-49)
   * [Bug Fixes](#bug-fixes-60)
-  * [Incompatible Changes](#incompatible-changes-8)
-* [v1.2.1](#v121)
+* [v2.0.0](#v200)
   * [Enhancements](#enhancements-50)
   * [Bug Fixes](#bug-fixes-61)
-* [v1.2.0](#v120)
+  * [Incompatible Changes](#incompatible-changes-8)
+* [v1.2.1](#v121)
   * [Enhancements](#enhancements-51)
   * [Bug Fixes](#bug-fixes-62)
-* [v1.1.0](#v110)
+* [v1.2.0](#v120)
   * [Enhancements](#enhancements-52)
-* [v1.0.0](#v100)
-  * [Enhancements](#enhancements-53)
   * [Bug Fixes](#bug-fixes-63)
-  * [Incompatible Fixes](#incompatible-fixes)
-* [v0.3.5](#v035)
+* [v1.1.0](#v110)
+  * [Enhancements](#enhancements-53)
+* [v1.0.0](#v100)
   * [Enhancements](#enhancements-54)
   * [Bug Fixes](#bug-fixes-64)
-* [v0.3.4](#v034)
+  * [Incompatible Fixes](#incompatible-fixes)
+* [v0.3.5](#v035)
   * [Enhancements](#enhancements-55)
-* [v0.3.3](#v033)
-  * [Enhancements](#enhancements-56)
-* [v0.3.2](#v032)
   * [Bug Fixes](#bug-fixes-65)
-* [v0.3.1](#v031)
+* [v0.3.4](#v034)
+  * [Enhancements](#enhancements-56)
+* [v0.3.3](#v033)
   * [Enhancements](#enhancements-57)
-* [v0.3.0](#v030)
+* [v0.3.2](#v032)
+  * [Bug Fixes](#bug-fixes-66)
+* [v0.3.1](#v031)
   * [Enhancements](#enhancements-58)
+* [v0.3.0](#v030)
+  * [Enhancements](#enhancements-59)
   * [Incompatible Changes](#incompatible-changes-9)
 * [v0.2.1](#v021)
-  * [Enhancements](#enhancements-59)
-  * [Bug Fixes](#bug-fixes-66)
-* [v0.2.0](#v020)
   * [Enhancements](#enhancements-60)
+  * [Bug Fixes](#bug-fixes-67)
+* [v0.2.0](#v020)
+  * [Enhancements](#enhancements-61)
   * [Incompatible Changes](#incompatible-changes-10)
 * [v0.1.4](#v014)
-  * [Enhancements](#enhancements-61)
-  * [Bug Fixes](#bug-fixes-67)
-* [v0.1.3](#v013)
-  * [Bug Fixes](#bug-fixes-68)
-* [v0.1.2](#v012)
   * [Enhancements](#enhancements-62)
-* [v0.1.1](#v011)
+  * [Bug Fixes](#bug-fixes-68)
+* [v0.1.3](#v013)
   * [Bug Fixes](#bug-fixes-69)
-* [v0.1.0](#v010)
+* [v0.1.2](#v012)
   * [Enhancements](#enhancements-63)
+* [v0.1.1](#v011)
   * [Bug Fixes](#bug-fixes-70)
-* [v0.0.3](#v003)
+* [v0.1.0](#v010)
   * [Enhancements](#enhancements-64)
-* [v0.0.2](#v002)
-  * [Enhancements](#enhancements-65)
   * [Bug Fixes](#bug-fixes-71)
+* [v0.0.3](#v003)
+  * [Enhancements](#enhancements-65)
+* [v0.0.2](#v002)
+  * [Enhancements](#enhancements-66)
+  * [Bug Fixes](#bug-fixes-72)
+
+</details>
+
+## v12.0.0
+
+### Breaking Changes
+* [#2179](https://github.com/KronicDeth/intellij-elixir/pull/2179) - [@KronicDeth](https://github.com/KronicDeth)
+  * Drop support for Elixir <= 1.6.
+    Continuing support for Elixir <= 1.6 required special handling of the language level to support differences in precedence and operators.  Removing the language level tracking allows dropping the `Level` and `FilePropertyPusher` classes and all their usages, including in the parser grammar and the special `ifVersion` external rule.  It also eliminates the need for tests to setup the SDK since it was only needed to get the appropriate Level.  This makes the tests run in 45 seconds instead of 7 minutes.
+
+### Enhancements
+* [#2179](https://github.com/KronicDeth/intellij-elixir/pull/2179) - [@KronicDeth](https://github.com/KronicDeth)
+  * Resolve more calls and bindings in `Ecto.Query` calls
+    * Resolve bindings in `Ecto.Query.lock/3`
+    * Resolve bindings in `Ecto.Query.windows/3`
+    * Walk `preload` binding and expression
+    * Resolve in `update` for Ecto.Query
+    * Resolve `fragment` in `with_cte`
+    * Resolve `binding` and `expr` in `Ecto.Query.dynamic/1-2`
+    * Resolve `field` in `join(..., on: field(..., ...) ...)`
+      For `join/5`, descend into the options to look for `on: value` and then walk `value` the same as the value to `having` or `where` in selects since they're all boolean conditions.
+    * Extract `ecto.query.Nested`
+    * Resolve `Ecto.Query.WindowAPI` functions
+    * Resolve reference variable src in `join(query, ..., [{src, counter}], ..., ...)`
+      Tuple lists in join have two forms:
+      1. `{^assoc, a}`
+      2.  `{src, counter}`
+
+      The pinned association form was already handled because the second element was checked for a declaration, but the first element was not, so `src` in (2) could not be resolved.
+    * `from([..] in ...)`
+    * Treat `or_having` the same as `having`
+    * Treat `or_where` the same as `where`
+    * Treat `having:` the same as `where:` in `from`
+    * Treat `select_merge` the same as `select` for resolving `Ecto.Query.API`.
+    * `from(..., [elements])`
+    * Resolve Ecto reference variables in `left in ...`
+  * `ModuleWalker` and `NameArityRangeWalker`
+    Reduce code by abstracting common pattern for walking library APIs.
+  * `ExUnit`
+    * Find modules declared in `test`s.
+    * Resolve call definitions inside `describe` blocks.
+    * Resolve variables in `assert_receive` and `assert_received`.
+    * Resolve `alias` to modules defined inside the enclosing `describe` block.
+    * Walk `assert` expression for variable declarations
+      * Check for earlier bindings of variables in right operand of `=` in `assert`.
+  * Resolve `require` `as:` arguments as Aliases
+  * Decompiler
+    * Erlang
+      * Decompile private Erlang functions
+      * Decompile specs from Erlang DbgI
+      * Decompile function bodies from Erlang DbgI
+        * Escape "in" when an Erlang Var in type
+      * Decompile types from Erlang DbgI
+        Fixes #2017
+    * Decompile Elixir function bodies using DbgI
+      * :erlang./(a, b) -> a / b
+      * :erlang.*(a, b) -> a * b
+      * Convert :erlang.==(a,b) to a == b
+      * Rewrite case to `and` when there is a badbool error too
+      * Decompile %{__struct__: name, ...} as %name{...}
+      * Rewrite more :erlang functions to Elixir
+      * Rewrite case to ||
+      * Rewrite `case expr1 do pat1 -> true; _ -> false; end` to `match?(pat1, expr1)`
+      * Rewrite `if var do false else true` to `!var`
+      * Rewrite case to or
+      * Rewrite case to and
+      * Rewrite :erlang.error(E.exception(M)) to raise E, M
+      * Rewrite case statements to if
+      * Rewrite case statements to &&
+      * Indent all lines of spec macro string in case it is multiple @spec
+  * Resolve module attributes defined outside the immediate modular lexical scope
+    * Resolve module attributes registered in `elixir_module.erl` to decompiled source
+      * after_compile
+      * before_compile
+      * behaviour
+      * compile
+      * derive
+      * dialyzer
+      * external_resource
+      * on_definition
+    * Index module attributes
+      Use the index to resolve module attributes when it can't be found directly by tree walking.
+
+      * Defined with `Module.put_attribute/3`
+      * Defined with `Module.register_attribute/3`
+      * Defined in `quote` blocks
+  * Resolve variables to variables in any `quote` blocks
+    If a variable can't be resolved in the scope, try resolving it to any variable declared at the top-level of a `quote` block.  This helps with certain patterns of `quote` blocks used in Ecto where a variable's declaration and usage are not in the same `quote` block.
+  * Simplify CallDefinitionClause resolver for modulars
+    Due to the addition of skipping if the entrance is a child call, the check for only following siblings is no longer needed.  Additionally, that check caused a bug because the `ElixirStabBody` skipped call definitions because they were new scopes.
+  * Resolve functions declared with `Mix.Generator.embed_template` and `embed_text`.
+    Also, new system for tracking resolves paths - `import`s, `defdelegate`, and `use` calls are added to the resolve results after the preferred elements are chosen for source in the same module.  This prevents only the `import` showing because the actual declaration is in another module or the SDK.
+  * Record a call as visited in its `treeWalkUp` instead of requiring the caller to do it in the pass `ResolveState`
+    * Record `quoteCall` as visited in `QuoteMacro.treeWalkUp`
+    * Record `unquoteCall` as visited in `Unquote.treeWalkUp`
+    * Record `unlessCall` as visited in `Unless.treeWalkUp`
+    * Record `ifCall` as visited in `If.treeWalkUp`
+    * Record `importCall` as visited in `Import.treeWalkUp`
+    * Record `useCall` as visited in `Use.treeWalkUp`
+  * More macro specialized in Structure View
+    * `test`
+    * `describe`
+  * Resolve `Qualifer.unquote(variable)(...)` to any definition with correct arity in `Qualifier`.
+  * Only calculate `element.resolvedFinalArity` once in `resolvedQualified`
+  * Implementations and Protocols
+    * Redo icons
+    * Implementations Go To Protocol line markers
+    * Go to Super for calls to `defimpl` function/macro
+      Goes to corresponding name/arity in the `defprotocol` that the `defimpl` implements.
+    * Go to implementations line marker from defprotocol def
+    * Go to implementations line marker from defprotocol
+    * Go To Implementation from individual functions in defimpl
+    * Go To Implementation from defimpl Alias
+    * Resolve protocol function to `def` in defprotocol
+    * Resolve defp inside of defimpl
+      Process declarations inside of implementation the same as modules.
+  * Stop `prependQualifiers` at top of file
+  * Walk the false and true (else) branch of unless in Modules or Quote
+  * Walk the true and false (else) branch of if in Modules or Quote
+  * Port `preferred` and `expand` system from `Callables` to `Modules`.
+  * Update CI build dependencies
+
+### Bug Fixes
+* [#2179](https://github.com/KronicDeth/intellij-elixir/pull/2179) - [@KronicDeth](https://github.com/KronicDeth)
+  * StackOverflow fixes
+    * getElementDescription(ElixirAtom, ElementDescriptionLocation)
+      Override getElementDescription for atoms to prevent StackOverflow while looking for a provider.
+    * Don't descend into either branch of `if` or `unless` if entrance in either branch when resolving calls.
+      If the definition were in one of the branch, it would already have been found on processing previous siblings in the `ElixirStabBody`.
+    * Treat child of modulars as being at the same level if nested in `if` or `unless`
+      Prevents `test` in `if` in `supervisor_test.exs` in `ecto` from stack overflowing.
+    * Fix StackOverflow when looking for earlier bindings in parameters.
+    * Don't check following siblings of modulars if entrance is a direct child
+
+      Prevent StackOverflow when trying to resolve embed_template when more than one appears in the same module.
+
+      In general, if the entrance is a child of modular then it can only be defined by a previous sibling, usually an `import` or `use`, but if the entrance is descendant of a child, then it child then it may be a call to a function or macro defined in the modular to following siblings of the entrance ancestor child needs to be checked if the entrance is a forward-call to a later declared function or macro.
+    * Fix StackOverflowError in ifErlangRewriteTo
+      Don't rewriter :erlang.* to a different :erlang.*
+  * Adjust nameArityInterval in nameArityInAnyModule
+    Ensures that `fragment/1..` used in a `quote` can resolve to one in `Ecto.Query.API`.
+  * Resolve variable that are the only child of `quote`
+    Ecto loves doing `quote do: query` or other variable names in the code and tests, so record those as declarations to resolve as invalid results.
+  * Find enclosing macro call when keyword `do:` is surrounded by parentheses
+    Previously, only `quote do: variable` would work, but now `quote(do: variable)` also works to find the `quote` call.
+  * Don't mark fields and keys that are not expected to be resolvable yet as unresolvable in Elixir References inspection.
+    * `QualifiedBracketOperation` qualifier
+    * `StructOperation` qualifier
+    * Expect qualified `unquote` to only have invalid results.
+    * Don't mark invalid only results for first chained function call.
+      Don't report `unquote(schema).__schema__(:source)`
+    * Don't mark invalid only results for chained function calls.
+      Don't report `Mix.shell().yes?("Are you sure you want to drop the database for repo #{inspect repo}?") `
+    * Don't mark invalid resolved function of call output
+    * Don't mark invalid resolved keys or fields of call output
+    * Don't mark invalid resolved function call on keys or fields
+    * Don't mark parentheses calls on variables if the call does not resolve.
+      Can't find exact valid resolves on variables yet.
+    * Don't mark keys or fields on the output of a function call.
+  * Fix some bugs with `Ecto.Query` calls.
+    * Add missing `state.put(Query.Call, call)` for `join/3-4` `executeOnIn`.
+    * Walk the operands of `|>` in `select` expressions.
+    * Resolve pinned variables as normal instead of as reference variables for Ecto.Query calls.
+    * Don't walk keywords that cannot declare reference variables.
+      * `hints`
+      * `lock`
+      * `intersect`
+      * `intersect_all`
+      * `except`
+      * `except_all`
+      * `union`
+      * `union_all`
+      * `prefix`
+      * `preload`
+      * `offset`
+      * `windows`
+      * `limit`
+    * Don't treat signature for call definition as use of Ecto macro
+  * Don't generate references to aliases, functions, or types that don't have declarations
+    * `assoc/2` in `join: .. in assoc(_, _)` in a no parentheses `from` call
+    * `var` in type restrictions
+      Related to elixir-ecto/ecto#3756
+    * `BitString`
+      `BitString` is recognized in `defimpl ..., for: BitString` to define protocol implementations for `<<..>>`, but the `BitString` module itself does not exist, so can't be resolved.
+  * Error reporting
+    * Ignore `at com.intellij.openapi.diagnostic.Logger` when calculating location for error report titles
+    * Improve error report format sent to GitHub
+    * Fix the `event` `message` not being included, which meant that the excerpt wasn't included, so no reproducibility or element class was available.
+    * Filter stacktrace to stop at last line from the plugin to limit their size and improve chance of URL being short enough for GitHub.
+    * Don't include "What I was doing" section unless user actually fills in the additional information in the UI form.
+      I'm sick of seeing the issue tracker full of "I don't know what I was doing", which is the default text when no additional info is given in the UI form.
+    * Set title to the message at start of exception and first `at` that isn't from the `errorreport.Logger` instead of `[auto-generated]` as this is the pattern I follow when renaming manually.
+  * Handle `alias __MODULE__.{...}` in prependQualifier
+    Fixes #2153
+  * Log error, but don't fail with TODO() for unknown strippedQualifier or null qualifier
+    Fixes #2153
+  * Go To Declaration for captures
+    * Don't allow name to be acceptable named parent in `&name/arity`.
+      Resolves #488
+      Allows Go To Declaration on `name` and not just on `/arity`.
+    * Don't allow `Mod.name` to be acceptable named parent in `&Mod.name/arity`.
+      Resolves #488
+      Fixes #2101
+
+      Allows Go To Declaration on `name` and not just on `/arity`.
+    * Resolve `&name/arity` and `&Mod.name/arity` using same code as callables.
+      Fixes resolving &Mod.name.arity and ensures that special handling for weird definitions for callables also apply to captures.
+  * Resolve `__MODULE__` in `quote` to `defmacro __MODULE__` in `Kernel.SpecialForms`
+  * Performance
+    * Fix String.Unicode decompiled being PlainText instead of Elixir
+      `String.Unicode` when decompiled using all information from `DbgI` was 161,171 lines long, which made the JetBrains API treat it as plain text instead of Elixir.  Being that long also made it freeze the UI while being decompiled.
+
+      Now, don't even attempt to use the `DbgI` if the function has more than 10 clauses.
+    * Don't decompile private macros and functions if > 500 definitions in one module.
+    * If body cannot be decompiled, decompile as one-liner with `...` body
+    * Don't decompile Abst clause bodies that exceed 1024 bytes.
+    * Decompile Erlang one clauses as Elixir one-liners
+  * Fix resolving type specs
+    * Find `ancestorTypeSpec` for qualified type used in parentheses in anonymous function type in an alternation
+
+      ```
+      @type run :: ((Ecto.Repo.t, changes) -> {:ok | :error, any}) | {module, atom, [any]}
+      ```
+    * Resolve type parameters used in inline anonymous function types
+    * Resolve callback heads to themselves when they have type restrictions using when
+    * Ignore literal parameters
+      * Decimals
+      * Aliases
+    * Check left operand of `\\` for type parameters as they could appear when copying def with defaults.
+  * putInitialVisitedElement in variable.Variants
+    Fixes #2002
+  * Walk `defdelegate`s when walking `import`s
+    Fixes resolving `config` from `use Mix.Config` as it delegates to `Config`
+  * Resolve variables used in `match?` guards to pattern declaration
+    Resolves `on_delete` in `match?(%{on_delete: on_delete} when on_delete != :nothing, reflection)`
+  * Implementations and Protocols
+    * Fix calculating definition for stubs of defimpl with `for:`
+      There was no clause for defimpl being arity 3, which is the case when there is the (1) protocol (2) `for:` and (3) `do` block.  Not having a definition meant that the `defimpl protocol, for: struct do` would be in AllName index, but not ModularName.
+    * Get name of enclosing modular for defimpl without `for:`
+  * Store if stubs are guards
+  * Decompiler
+    * Surround `case` statements with parentheses when used in `cond` clause conditions
+    * Convert OtpErlangString to OtpErlangList for tuple and call argument lists
+    * Escape ESC character as \e
+    * Handle Clause arguments being OtpErlangString
+    * Handle tuple elements being an OtpErlangString
+    * Add missing `.` after callee when it is a module or fn
+    * Protect from `Macro.toString(macro)` StackOverflowError when decompiling body of function clauses
+    * Don't print function names as atoms in captures
+    * Escape `\x` to `\\x` in OtpErlangStr
+    * Fix rewrite of :erlang calls
+    * Surround type unions with parentheses
+      Prevents parsing problems with unions in guard (when) clauses
+    * Don't use `prependIndent` because it indents blank lines too.
+      This doesn't match `mix format` or the IntelliJ Elixir formatting.
+    * Erlang
+      * Escape fn Erlang variable
+      * Escape Erlang char \ as \\
+      * Don't append lines for clauses or `after` in Erlang `receive` when decompiling if empty.
+      * Use `Infix`, `Prefix`, and `Unquote` decompolers for Erlang Abst chunk in addition to DbgI chunk
+        * functions
+        * typesepcs
+      * Use `function.macroNameArityMacro.macro` when decompiling Erlang Abst clauses.
+        Don't use `def` anymore when unexported and therefore private; use `defp` instead.
+      * Remove space after `...` in decompiled private types.
+  * Process imports for calls
+    Imports were previously only processed inside of Modules and not in general, which means that imports in the file were not processed, which is needed for `association.ex` in Ecto.
+  * Classify ..// as OTHER instead of NOT_CALLABLE, so that it is escaped as a key.
+  * Fix Macro.ifCaptureModuleNameArity
+  * Resolve variable to parameter in `%parameter{}` patterns for struct names
+  * `Unquote.treeWalkUpUnquoted` through tuples
+  * `Quote.treeWalkUp` through `case`
+  * Stop searching on numerical index in binding
+  * Stop searching if atom in wrong place in binding
+    Stops invalid binding test from erroring when resolving it.
+  * Turn off `tailrec` because it doesn't work correctly for `ElixirAccessExpression`
+  * Stop searching for qualifier when `ElixirUnqualifiedNoParenthesesManyArgumentsCall`.
 
 ## v11.13.0
 

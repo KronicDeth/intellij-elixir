@@ -1,5 +1,372 @@
 <html>
 <body>
+<h1>v11.14.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul>
+      <li>Resolve more calls and bindings in <code>Ecto.Query</code> calls
+        <ul>
+          <li>Resolve bindings in <code>Ecto.Query.lock/3</code></li>
+          <li>Resolve bindings in <code>Ecto.Query.windows/3</code></li>
+          <li>Walk <code>preload</code> binding and expression</li>
+          <li>Resolve in <code>update</code> for Ecto.Query</li>
+          <li>Resolve <code>fragment</code> in <code>with_cte</code></li>
+          <li>Resolve <code>binding</code> and <code>expr</code> in <code>Ecto.Query.dynamic/1-2</code></li>
+          <li>
+            Resolve <code>field</code> in <code>join(..., on: field(..., ...) ...)</code><br>
+            For <code>join/5</code>, descend into the options to look for <code>on: value</code> and then walk
+            <code>value</code> the same as the value to <code>having</code> or <code>where</code> in selects since
+            they're all boolean conditions.
+          </li>
+          <li>Extract <code>ecto.query.Nested</code></li>
+          <li>Resolve <code>Ecto.Query.WindowAPI</code> functions</li>
+          <li>
+            <p>Resolve reference variable src in <code>join(query, ..., [{src, counter}], ..., ...)</code><br>
+              Tuple lists in join have two forms:</p>
+            <ol>
+              <li><code>{^assoc, a}</code></li>
+              <li><code>{src, counter}</code></li>
+            </ol>
+            <p>
+              The pinned association form was already handled because the second element was checked for a declaration,
+              but the first element was not, so <code>src</code> in (2) could not be resolved.
+            </p>
+          </li>
+          <li><code>from([..] in ...)</code></li>
+          <li>Treat <code>or_having</code> the same as <code>having</code></li>
+          <li>Treat <code>or_where</code> the same as <code>where</code></li>
+          <li>Treat <code>having:</code> the same as <code>where:</code> in <code>from</code></li>
+          <li>
+            Treat <code>select_merge</code> the same as <code>select</code> for resolving <code>Ecto.Query.API</code>.
+          </li>
+          <li><code>from(..., [elements])</code></li>
+          <li>Resolve Ecto reference variables in <code>left in ...</code></li>
+        </ul>
+      </li>
+      <li><code>ModuleWalker</code> and <code>NameArityRangeWalker</code><br>
+        Reduce code by abstracting common pattern for walking library APIs.</li>
+      <li><code>ExUnit</code>
+        <ul>
+          <li>Find modules declared in <code>test</code>s.</li>
+          <li>Resolve call definitions inside <code>describe</code> blocks.</li>
+          <li>Resolve variables in <code>assert_receive</code> and <code>assert_received</code>.</li>
+          <li>Resolve <code>alias</code> to modules defined inside the enclosing <code>describe</code> block.</li>
+          <li>Walk <code>assert</code> expression for variable declarations
+            <ul>
+              <li>Check for earlier bindings of variables in right operand of <code>=</code> in <code>assert</code>.</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>Resolve <code>require</code> <code>as:</code> arguments as Aliases</li>
+      <li>Decompiler
+        <ul>
+          <li>Erlang
+            <ul>
+              <li>Decompile private Erlang functions</li>
+              <li>Decompile specs from Erlang DbgI</li>
+              <li>Decompile function bodies from Erlang DbgI
+                <ul>
+                  <li>Escape "in" when an Erlang Var in type</li>
+                </ul>
+              </li>
+              <li>Decompile types from Erlang DbgI<br>
+                Fixes #2017</li>
+            </ul>
+          </li>
+          <li>Decompile Elixir function bodies using DbgI
+            <ul>
+              <li>:erlang./(a, b) -&gt; a / b</li>
+              <li>:erlang.*(a, b) -&gt; a * b</li>
+              <li>Convert :erlang.==(a,b) to a == b</li>
+              <li>Rewrite case to <code>and</code> when there is a badbool error too</li>
+              <li>Decompile %{<strong>struct</strong>: name, ...} as %name{...}</li>
+              <li>Rewrite more :erlang functions to Elixir</li>
+              <li>Rewrite case to ||</li>
+              <li>Rewrite <code>case expr1 do pat1 -&gt; true; _ -&gt; false; end</code> to <code>match?(pat1, expr1)</code></li>
+              <li>Rewrite <code>if var do false else true</code> to <code>!var</code></li>
+              <li>Rewrite case to or</li>
+              <li>Rewrite case to and</li>
+              <li>Rewrite :erlang.error(E.exception(M)) to raise E, M</li>
+              <li>Rewrite case statements to if</li>
+              <li>Rewrite case statements to &amp;&amp;</li>
+              <li>Indent all lines of spec macro string in case it is multiple <a class="user-mention" data-hovercard-type="organization" data-hovercard-url="/orgs/SPEC/hovercard" href="https://github.com/SPEC">@SPEC</a></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>Resolve module attributes defined outside the immediate modular lexical scope
+        <ul>
+          <li>
+            <p>Resolve module attributes registered in <code>elixir_module.erl</code> to decompiled source</p>
+            <ul>
+              <li>after_compile</li>
+              <li>before_compile</li>
+              <li>behaviour</li>
+              <li>compile</li>
+              <li>derive</li>
+              <li>dialyzer</li>
+              <li>external_resource</li>
+              <li>on_definition</li>
+            </ul>
+          </li>
+          <li>
+            <p>Index module attributes<br>
+              Use the index to resolve module attributes when it can't be found directly by tree walking.</p>
+            <ul>
+              <li>Defined with <code>Module.put_attribute/3</code></li>
+              <li>Defined with <code>Module.register_attribute/3</code></li>
+              <li>Defined in <code>quote</code> blocks</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>Resolve variables to variables in any <code>quote</code> blocks<br>
+        If a variable can't be resolved in the scope, try resolving it to any variable declared at the top-level of a <code>quote</code> block.  This helps with certain patterns of <code>quote</code> blocks used in Ecto where a variable's declaration and usage are not in the same <code>quote</code> block.</li>
+      <li>Simplify CallDefinitionClause resolver for modulars<br>
+        Due to the addition of skipping if the entrance is a child call, the check for only following siblings is no longer needed.  Additionally, that check caused a bug because the <code>ElixirStabBody</code> skipped call definitions because they were new scopes.</li>
+      <li>Resolve functions declared with <code>Mix.Generator.embed_template</code> and <code>embed_text</code>.<br>
+        Also, new system for tracking resolves paths - <code>import</code>s, <code>defdelegate</code>, and <code>use</code> calls are added to the resolve results after the preferred elements are chosen for source in the same module.  This prevents only the <code>import</code> showing because the actual declaration is in another module or the SDK.</li>
+      <li>Record a call as visited in its <code>treeWalkUp</code> instead of requiring the caller to do it in the pass <code>ResolveState</code>
+        <ul>
+          <li>Record <code>quoteCall</code> as visited in <code>QuoteMacro.treeWalkUp</code></li>
+          <li>Record <code>unquoteCall</code> as visited in <code>Unquote.treeWalkUp</code></li>
+          <li>Record <code>unlessCall</code> as visited in <code>Unless.treeWalkUp</code></li>
+          <li>Record <code>ifCall</code> as visited in <code>If.treeWalkUp</code></li>
+          <li>Record <code>importCall</code> as visited in <code>Import.treeWalkUp</code></li>
+          <li>Record <code>useCall</code> as visited in <code>Use.treeWalkUp</code></li>
+        </ul>
+      </li>
+      <li>More macro specialized in Structure View
+        <ul>
+          <li><code>test</code></li>
+          <li><code>describe</code></li>
+        </ul>
+      </li>
+      <li>Resolve <code>Qualifer.unquote(variable)(...)</code> to any definition with correct arity in <code>Qualifier</code>.</li>
+      <li>Only calculate <code>element.resolvedFinalArity</code> once in <code>resolvedQualified</code></li>
+      <li>Implementations and Protocols
+        <ul>
+          <li>Redo icons</li>
+          <li>Implementations Go To Protocol line markers</li>
+          <li>Go to Super for calls to <code>defimpl</code> function/macro<br>
+            Goes to corresponding name/arity in the <code>defprotocol</code> that the <code>defimpl</code> implements.</li>
+          <li>Go to implementations line marker from defprotocol def</li>
+          <li>Go to implementations line marker from defprotocol</li>
+          <li>Go To Implementation from individual functions in defimpl</li>
+          <li>Go To Implementation from defimpl Alias</li>
+          <li>Resolve protocol function to <code>def</code> in defprotocol</li>
+          <li>Resolve defp inside of defimpl<br>
+            Process declarations inside of implementation the same as modules.</li>
+        </ul>
+      </li>
+      <li>Stop <code>prependQualifiers</code> at top of file</li>
+      <li>Walk the false and true (else) branch of unless in Modules or Quote</li>
+      <li>Walk the true and false (else) branch of if in Modules or Quote</li>
+    </ul>
+  </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>StackOverflow fixes
+        <ul>
+          <li>
+            getElementDescription(ElixirAtom, ElementDescriptionLocation)<br>
+            Override getElementDescription for atoms to prevent StackOverflow while looking for a provider.
+          </li>
+          <li>
+            Don't descend into either branch of <code>if</code> or <code>unless</code> if entrance in either branch when resolving calls.<br>
+            If the definition were in one of the branch, it would already have been found on processing previous siblings in the <code>ElixirStabBody</code>.
+          </li>
+          <li>
+            Treat child of modulars as being at the same level if nested in <code>if</code> or <code>unless</code><br>
+            Prevents <code>test</code> in <code>if</code> in <code>supervisor_test.exs</code> in <code>ecto</code> from stack overflowing.
+          </li>
+          <li>
+            Fix StackOverflow when looking for earlier bindings in parameters.
+          </li>
+          <li>
+            <p>Don't check following siblings of modulars if entrance is a direct child</p>
+            <p>Prevent StackOverflow when trying to resolve embed_template when more than one appears in the same module.</p>
+            <p>In general, if the entrance is a child of modular then it can only be defined by a previous sibling, usually an <code>import</code> or <code>use</code>, but if the entrance is descendant of a child, then it child then it may be a call to a function or macro defined in the modular to following siblings of the entrance ancestor child needs to be checked if the entrance is a forward-call to a later declared function or macro.</p>
+          </li>
+          <li>
+            Fix StackOverflowError in ifErlangRewriteTo<br>
+            Don't rewriter :erlang.* to a different :erlang.*
+          </li>
+        </ul>
+      </li>
+      <li>Adjust nameArityInterval in nameArityInAnyModule<br>
+        Ensures that <code>fragment/1..</code> used in a <code>quote</code> can resolve to one in <code>Ecto.Query.API</code>.</li>
+      <li>Resolve variable that are the only child of <code>quote</code><br>
+        Ecto loves doing <code>quote do: query</code> or other variable names in the code and tests, so record those as declarations to resolve as invalid results.</li>
+      <li>Find enclosing macro call when keyword <code>do:</code> is surrounded by parentheses<br>
+        Previously, only <code>quote do: variable</code> would work, but now <code>quote(do: variable)</code> also works to find the <code>quote</code> call.</li>
+      <li>Don't mark fields and keys that are not expected to be resolvable yet as unresolvable in Elixir References inspection.
+        <ul>
+          <li><code>QualifiedBracketOperation</code> qualifier</li>
+          <li><code>StructOperation</code> qualifier</li>
+          <li>Expect qualified <code>unquote</code> to only have invalid results.</li>
+          <li>Don't mark invalid only results for first chained function call.<br>
+            Don't report <code>unquote(schema).__schema__(:source)</code></li>
+          <li>Don't mark invalid only results for chained function calls.<br>
+            Don't report <code>Mix.shell().yes?("Are you sure you want to drop the database for repo #{inspect repo}?") </code></li>
+          <li>Don't mark invalid resolved function of call output</li>
+          <li>Don't mark invalid resolved keys or fields of call output</li>
+          <li>Don't mark invalid resolved function call on keys or fields</li>
+          <li>Don't mark parentheses calls on variables if the call does not resolve.<br>
+            Can't find exact valid resolves on variables yet.</li>
+          <li>Don't mark keys or fields on the output of a function call.</li>
+        </ul>
+      </li>
+      <li>Fix some bugs with <code>Ecto.Query</code> calls.
+        <ul>
+          <li>Add missing <code>state.put(Query.Call, call)</code> for <code>join/3-4</code> <code>executeOnIn</code>.</li>
+          <li>Walk the operands of <code>|&gt;</code> in <code>select</code> expressions.</li>
+          <li>Resolve pinned variables as normal instead of as reference variables for Ecto.Query calls.</li>
+          <li>Don't walk keywords that cannot declare reference variables.
+            <ul>
+              <li><code>hints</code></li>
+              <li><code>lock</code></li>
+              <li><code>intersect</code></li>
+              <li><code>intersect_all</code></li>
+              <li><code>except</code></li>
+              <li><code>except_all</code></li>
+              <li><code>union</code></li>
+              <li><code>union_all</code></li>
+              <li><code>prefix</code></li>
+              <li><code>preload</code></li>
+              <li><code>offset</code></li>
+              <li><code>windows</code></li>
+              <li><code>limit</code></li>
+            </ul>
+          </li>
+          <li>Don't treat signature for call definition as use of Ecto macro</li>
+        </ul>
+      </li>
+      <li>Don't generate references to aliases, functions, or types that don't have declarations
+        <ul>
+          <li><code>assoc/2</code> in <code>join: .. in assoc(_, _)</code> in a no parentheses <code>from</code> call</li>
+          <li><code>var</code> in type restrictions<br>
+            Related to <span class="reference"><svg class="octicon octicon-issue-closed closed mr-1" title="Closed" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M11.28 6.78a.75.75 0 00-1.06-1.06L7.25 8.69 5.78 7.22a.75.75 0 00-1.06 1.06l2 2a.75.75 0 001.06 0l3.5-3.5z"></path><path fill-rule="evenodd" d="M16 8A8 8 0 110 8a8 8 0 0116 0zm-1.5 0a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z"></path></svg><a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="1014241137" data-permission-text="Title is private" data-url="https://github.com/elixir-ecto/ecto/issues/3756" data-hovercard-type="issue" data-hovercard-url="/elixir-ecto/ecto/issues/3756/hovercard" href="https://github.com/elixir-ecto/ecto/issues/3756">Can't find type for var used in c:Ecto.Adapter.checkout/3<span class="issue-shorthand">&nbsp;elixir-ecto/ecto#3756</span></a></span></li>
+          <li><code>BitString</code><br>
+            <code>BitString</code> is recognized in <code>defimpl ..., for: BitString</code> to define protocol implementations for <code>&lt;&lt;..&gt;&gt;</code>, but the <code>BitString</code> module itself does not exist, so can't be resolved.</li>
+        </ul>
+      </li>
+      <li>Error reporting
+        <ul>
+          <li>Ignore <code>at com.intellij.openapi.diagnostic.Logger</code> when calculating location for error report titles</li>
+          <li>Improve error report format sent to GitHub</li>
+          <li>Fix the <code>event</code> <code>message</code> not being included, which meant that the excerpt wasn't included, so no reproducibility or element class was available.</li>
+          <li>Filter stacktrace to stop at last line from the plugin to limit their size and improve chance of URL being short enough for GitHub.</li>
+          <li>Don't include "What I was doing" section unless user actually fills in the additional information in the UI form.<br>
+            I'm sick of seeing the issue tracker full of "I don't know what I was doing", which is the default text when no additional info is given in the UI form.</li>
+          <li>Set title to the message at start of exception and first <code>at</code> that isn't from the <code>errorreport.Logger</code> instead of <code>[auto-generated]</code> as this is the pattern I follow when renaming manually.</li>
+        </ul>
+      </li>
+      <li>Handle <code>alias __MODULE__.{...}</code> in prependQualifier<br>
+        Fixes <span class="reference"><svg class="octicon octicon-issue-opened open mr-1" title="Open" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 9.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"></path><path fill-rule="evenodd" d="M8 0a8 8 0 100 16A8 8 0 008 0zM1.5 8a6.5 6.5 0 1113 0 6.5 6.5 0 01-13 0z"></path></svg><a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="1028941524" data-permission-text="Title is private" data-url="https://github.com/KronicDeth/intellij-elixir/issues/2153" data-hovercard-type="issue" data-hovercard-url="/KronicDeth/intellij-elixir/issues/2153/hovercard" href="https://github.com/KronicDeth/intellij-elixir/issues/2153">Unable to move files if the file contains <code>alias __MODULE__.{Something}</code><span class="issue-shorthand">&nbsp;#2153</span></a></span></li>
+      <li>Log error, but don't fail with TODO() for unknown strippedQualifier or null qualifier<br>
+        Fixes <span class="reference"><svg class="octicon octicon-issue-opened open mr-1" title="Open" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 9.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"></path><path fill-rule="evenodd" d="M8 0a8 8 0 100 16A8 8 0 008 0zM1.5 8a6.5 6.5 0 1113 0 6.5 6.5 0 01-13 0z"></path></svg><a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="1028941524" data-permission-text="Title is private" data-url="https://github.com/KronicDeth/intellij-elixir/issues/2153" data-hovercard-type="issue" data-hovercard-url="/KronicDeth/intellij-elixir/issues/2153/hovercard" href="https://github.com/KronicDeth/intellij-elixir/issues/2153">Unable to move files if the file contains <code>alias __MODULE__.{Something}</code><span class="issue-shorthand">&nbsp;#2153</span></a></span></li>
+      <li>Go To Declaration for captures
+        <ul>
+          <li>
+            <p>Don't allow name to be acceptable named parent in <code>&amp;name/arity</code>.<br>
+              Resolves <span class="reference"><svg class="octicon octicon-issue-opened open mr-1" title="Open" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 9.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"></path><path fill-rule="evenodd" d="M8 0a8 8 0 100 16A8 8 0 008 0zM1.5 8a6.5 6.5 0 1113 0 6.5 6.5 0 01-13 0z"></path></svg><a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="186325149" data-permission-text="Title is private" data-url="https://github.com/KronicDeth/intellij-elixir/issues/488" data-hovercard-type="issue" data-hovercard-url="/KronicDeth/intellij-elixir/issues/488/hovercard" href="https://github.com/KronicDeth/intellij-elixir/issues/488">Go To Declaration for name/arity captures<span class="issue-shorthand">&nbsp;#488</span></a></span><br>
+              Allows Go To Declaration on <code>name</code> and not just on <code>/arity</code>.</p>
+          </li>
+          <li>
+            <p>Don't allow <code>Mod.name</code> to be acceptable named parent in <code>&amp;Mod.name/arity</code>.<br>
+              Resolves <span class="reference"><svg class="octicon octicon-issue-opened open mr-1" title="Open" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 9.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"></path><path fill-rule="evenodd" d="M8 0a8 8 0 100 16A8 8 0 008 0zM1.5 8a6.5 6.5 0 1113 0 6.5 6.5 0 01-13 0z"></path></svg><a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="186325149" data-permission-text="Title is private" data-url="https://github.com/KronicDeth/intellij-elixir/issues/488" data-hovercard-type="issue" data-hovercard-url="/KronicDeth/intellij-elixir/issues/488/hovercard" href="https://github.com/KronicDeth/intellij-elixir/issues/488">Go To Declaration for name/arity captures<span class="issue-shorthand">&nbsp;#488</span></a></span><br>
+              Fixes <span class="reference"><svg class="octicon octicon-issue-opened open mr-1" title="Open" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 9.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"></path><path fill-rule="evenodd" d="M8 0a8 8 0 100 16A8 8 0 008 0zM1.5 8a6.5 6.5 0 1113 0 6.5 6.5 0 01-13 0z"></path></svg><a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="1005022918" data-permission-text="Title is private" data-url="https://github.com/KronicDeth/intellij-elixir/issues/2101" data-hovercard-type="issue" data-hovercard-url="/KronicDeth/intellij-elixir/issues/2101/hovercard" href="https://github.com/KronicDeth/intellij-elixir/issues/2101">Go to declaration do not work in <code>&amp;function_name/arity</code> anonymous functions.<span class="issue-shorthand">&nbsp;#2101</span></a></span></p>
+            <p>Allows Go To Declaration on <code>name</code> and not just on <code>/arity</code>.</p>
+          </li>
+          <li>
+            <p>Resolve <code>&amp;name/arity</code> and <code>&amp;Mod.name/arity</code> using same code as callables.<br>
+              Fixes resolving &amp;Mod.name.arity and ensures that special handling for weird definitions for callables also apply to captures.</p>
+          </li>
+        </ul>
+      </li>
+      <li>Resolve <code>__MODULE__</code> in <code>quote</code> to <code>defmacro __MODULE__</code> in <code>Kernel.SpecialForms</code></li>
+      <li>Performance
+        <ul>
+          <li>
+            <p>Fix String.Unicode decompiled being PlainText instead of Elixir<br>
+              <code>String.Unicode</code> when decompiled using all information from <code>DbgI</code> was 161,171 lines long, which made the JetBrains API treat it as plain text instead of Elixir.  Being that long also made it freeze the UI while being decompiled.</p>
+            <p>Now, don't even attempt to use the <code>DbgI</code> if the function has more than 10 clauses.</p>
+          </li>
+        </ul>
+      </li>
+      <li>Fix resolving type specs
+        <ul>
+          <li>
+            <p>Find <code>ancestorTypeSpec</code> for qualified type used in parentheses in anonymous function type in an alternation</p>
+            <div class="snippet-clipboard-content position-relative overflow-auto"><pre><code>@type run :: ((Ecto.Repo.t, changes) -&gt; {:ok | :error, any}) | {module, atom, [any]}
+</code></pre><div class="zeroclipboard-container position-absolute right-0 top-0">
+              <clipboard-copy aria-label="Copy" class="ClipboardButton btn js-clipboard-copy m-2 p-0 tooltipped-no-delay" data-copy-feedback="Copied!" data-tooltip-direction="w" value="@type run :: ((Ecto.Repo.t, changes) -> {:ok | :error, any}) | {module, atom, [any]}
+" tabindex="0" role="button">
+                <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-copy js-clipboard-copy-icon m-2">
+                  <path fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path><path fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
+                </svg>
+                <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-check js-clipboard-check-icon color-text-success d-none m-2">
+                  <path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path>
+                </svg>
+              </clipboard-copy>
+            </div></div>
+          </li>
+          <li>
+            <p>Resolve type parameters used in inline anonymous function types</p>
+          </li>
+          <li>
+            <p>Resolve callback heads to themselves when they have type restrictions using when</p>
+          </li>
+        </ul>
+      </li>
+      <li>putInitialVisitedElement in variable.Variants<br>
+        Fixes <span class="reference"><svg class="octicon octicon-issue-opened open mr-1" title="Open" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 9.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"></path><path fill-rule="evenodd" d="M8 0a8 8 0 100 16A8 8 0 008 0zM1.5 8a6.5 6.5 0 1113 0 6.5 6.5 0 01-13 0z"></path></svg><a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="935316300" data-permission-text="Title is private" data-url="https://github.com/KronicDeth/intellij-elixir/issues/2002" data-hovercard-type="issue" data-hovercard-url="/KronicDeth/intellij-elixir/issues/2002/hovercard" href="https://github.com/KronicDeth/intellij-elixir/issues/2002">java.lang.Throwable: VISITED_ELEMENT_SET is null.  putInitialVisitedElement was not called<span class="issue-shorthand">&nbsp;#2002</span></a></span></li>
+      <li>Walk <code>defdelegate</code>s when walking <code>import</code>s<br>
+        Fixes resolving <code>config</code> from <code>use Mix.Config</code> as it delegates to <code>Config</code></li>
+      <li>Resolve variables used in <code>match?</code> guards to pattern declaration<br>
+        Resolves <code>on_delete</code> in <code>match?(%{on_delete: on_delete} when on_delete != :nothing, reflection)</code></li>
+      <li>Implementations and Protocols
+        <ul>
+          <li>Fix calculating definition for stubs of defimpl with <code>for:</code><br>
+            There was no clause for defimpl being arity 3, which is the case when there is the (1) protocol (2) <code>for:</code> and (3) <code>do</code> block.  Not having a definition meant that the <code>defimpl protocol, for: struct do</code> would be in AllName index, but not ModularName.</li>
+          <li>Get name of enclosing modular for defimpl without <code>for:</code></li>
+        </ul>
+      </li>
+      <li>Store if stubs are guards</li>
+      <li>Decompiler</li>
+      <li>Surround <code>case</code> statements with parentheses when used in <code>cond</code> clause conditions</li>
+      <li>Convert OtpErlangString to OtpErlangList for tuple and call argument lists</li>
+      <li>Escape ESC character as \e</li>
+      <li>Handle Clause arguments being OtpErlangString</li>
+      <li>Escape Erlang char \ as \</li>
+      <li>Escape fn Erlang variable</li>
+      <li>Handle tuple elements being an OtpErlangString</li>
+      <li>Add missing <code>.</code> after callee when it is a module or fn</li>
+      <li>Protect from Macro.toString(macro) StackOverflowError when decompiling body of function clauses</li>
+      <li>Don't print function names as atoms in captures</li>
+      <li>Escape <code>\x</code> to <code>\\x</code> in OtpErlangStr</li>
+      <li>Fix rewrite of :erlang calls</li>
+      <li>Surround type unions with parentheses<br>
+        Prevents parsing problems with unions in guard (when) clauses</li>
+      <li>Process imports for calls<br>
+        Imports were previously only processed inside of Modules and not in general, which means that imports in the file were not processed, which is needed for <code>association.ex</code> in Ecto.</li>
+      <li>Classify ..// as OTHER instead of NOT_CALLABLE, so that it is escaped as a key.</li>
+      <li>Fix Macro.ifCaptureModuleNameArity</li>
+      <li>Resolve variable to parameter in <code>%parameter{}</code> patterns for struct names</li>
+      <li><code>Unquote.treeWalkUpUnquoted</code> through tuples</li>
+      <li><code>Quote.treeWalkUp</code> through <code>case</code></li>
+      <li>Stop searching on numerical index in binding</li>
+      <li>Stop searching if atom in wrong place in binding<br>
+        Stops invalid binding test from erroring when resolving it.</li>
+      <li>Turn off <code>tailrec</code> because it doesn't work correctly for <code>ElixirAccessExpression</code></li>
+      <li>Stop searching for qualifier when <code>ElixirUnqualifiedNoParenthesesManyArgumentsCall</code>.</li>
+    </ul>
+  </li>
+</ul>
 <h1>v11.13.0</h1>
 <ul>
   <li>
@@ -131,990 +498,6 @@ end
         <code>use Yacto.Schema</code> as it makes the <code>block</code> see the <code>import Yacto.Schema</code> above
         <code>unquote(block)</code> in the <code>quote</code> in <code>schema(..., do: block)</code>.
       </li>
-    </ul>
-  </li>
-</ul>
-<h1>v11.11.0</h1>
-<ul>
-  <li>
-    <p>Enhancements</p>
-    <ul>
-      <li>
-        <p>Reference Resolution</p>
-        <ul>
-          <li>
-            <p>
-              Allow any Alias in a chain to have references.<br>
-              This allows going to the declaration of <code>Phoenix</code>, <code>Phoenix.LiveView</code>, or
-              <code>Phoenix.LiveView.Socket</code> depending on whether you're on the <code>Phoenix</code>,
-              <code>LiveView</code>, or <code>Socket</code> Alias, respectively, in the chain.
-            </p>
-            <ul>
-              <li>
-                <p>
-                  Allow any Alias in Qualified Alias to be resolved<br>
-                  This allows going to the declaration of Phoenix, Phoenix.LiveView, or Phoenix.LiveView.Socket
-                  depending on whether you're<br>
-                  on the Phoenix, LiveView, or Socket Alias, respectively, in the chain.
-                </p>
-              </li>
-              <li>
-                <p>Update DocumentationProvider to work with improved Alias resolution</p>
-                <p>
-                  Without these changes the DocumentationProvider double-resolves and so ends up showing the docs for
-                  <code>def</code> and <code>defmodule</code>, instead of the call definition clause or module,
-                  respectively.
-                </p>
-              </li>
-            </ul>
-          </li>
-          <li>
-            <p>
-              Reimplement Module references<br>
-              Instead of references for only the outermost QualifiableAlias, there is a reference for each right-most
-              Alias at a given position, so instead of there only be a reference to <code>App.Context.Schema</code> in
-              <code>App.Context.Schema</code>, there is now a reference to <code>App</code> in the <code>App</code>
-              prefix, a reference to <code>App.Context</code> in <code>Context</code> in <code>App.Context</code>, and a
-              reference to <code>App.Context.Schema</code> in <code>Schema</code> in <code>App.Context.Schema</code>.
-              Not only is this more useful, being able to jump to parent namespaces, but it fixed some of the capability
-              issues with Go To Definition in the 2020 line of IDEs.  This approach of using
-              <code>getRangeInElement</code> to target the range of the right-most Alias, while the element was still
-              the parent that contained, but did not go beyond the Alias, was tried after having references only on
-              <code>Alias</code>es and not <code>QualifiedAlias</code>es did not fix completion issues.  It was the
-              while debugging Go To Declaration actions and noticing they were sensitive to the range in element AND the
-              <a href="https://github.com/JetBrains/intellij-community/blob/f66e9644fa683fba22f4ce9e30c037720f745989/platform/core-api/src/com/intellij/psi/PsiReference.java#L49-L62">
-                docs for PsiReference#getRangeInElement
-              </a> that I realized that the Go To Declaration and Completion has a hidden requirement that References
-              for things that behave like namespaces have to work this way.
-            </p>
-            <ul>
-              <li>Use <code>ModularName</code> index for Module Variants<br>
-                Have a smaller index to iterate and remove need for the <code>isAlias</code> check.</li>
-            </ul>
-          </li>
-          <li>
-            <p>Limit Elixir Module resolution to same JetBrains Project Module</p>
-            <ul>
-              <li>
-                Change the <code>GlobalSearchScope</code> from <code>allProject</code> to
-                <code>moduleWithDependenciesAndLibrariesScope</code> for faster searching on multi-module projects.
-                <ul>
-                  <li>Set <code>includeTests</code> based whether the referring element is in a test directory.</li>
-                </ul>
-              </li>
-              <li>
-                Use <code>StubIndex#processElements</code> instead of home grown <code>forEachNavigationElement</code> as
-                <code>processElements</code> is more efficient.
-              </li>
-            </ul>
-          </li>
-          <li>
-            <p>Favor Module <code>ResolveResults</code> under same <code>Module</code> content roots<br>
-              This should favor deps sources in the same module.</p>
-          </li>
-          <li>
-            <p>
-              Iterate <code>function</code> body in <code>unquote(function())</code> when iterating call definition
-              clauses in <code>quote</code><br>
-              Treats it <code>function</code> body the same as a <code>__using__</code> body.
-            </p>
-          </li>
-          <li>
-            <p>Standardized preferred <code>ResolveResult</code> filters between Callables and Modules</p>
-            <ol>
-              <li>Prefer valid results as long as it doesn't leave no results.</li>
-              <li>Prefer results in the same module as long as it doesn't leave no results.</li>
-            </ol>
-            <p>In Go To Declaration also:</p>
-            <ol start="3">
-              <li>Prefer results in source (that aren't decompiled) as long as it doesn't leave no results.</li>
-            </ol>
-          </li>
-          <li>
-            <p>Use the second argument to <code>use</code> to determine which function is called with apply/3</p>
-            <p>
-              This pattern is used in Phoenix <code>__using__</code>, so this lets to differentiate whether
-              <code>Plug.Conn.assign/3</code> or <code>Phoenix.LiveSocket.assign/3</code> is resolved in a Controller,
-              LiveComponent, or LiveView.
-            </p>
-          </li>
-          <li>
-            <p>In LEEx Templates</p>
-            <ul>
-              <li>
-                Resolve function calls in <code>*.html.leex</code> templates to functions defined in the corresponding
-                LiveComponent/View module.
-              </li>
-              <li>Assigns
-                <ul>
-                  <li>
-                    Resolve assigns in LEEx templates to the keyword key in <code>assign/3</code> calls in
-                    <code>update/2</code> in the LiveComponent or LiveView<br>
-                    Had to add back in a <code>TargetElementEvaluator</code>, so that the
-                    <code>UnqualifiedNoArgumentCall</code> (<code>name</code>) that is the identifier in an assign
-                    (<code>@name</code>) was not counted as valid target for Find Usages / Go To Declaration by itself.
-                  </li>
-                  <li>
-                    Search for assigns in all call definitions in view module<br>
-                    Expand from just <code>update</code> to any call definition to cover helper functions and other
-                    callbacks. Don't stop on the first valid match because with helper functions and multiple callbacks,
-                    the last write isn't obvious.
-                  </li>
-                  <li>Resolve assigns set with <code>assign/3</code></li>
-                  <li>Look for <code>assign</code> calls in <code>|&gt;</code> pipelines</li>
-                  <li>Resolve assigns set with <code>assign_new/3</code></li>
-                  <li>Resolve @live_action to where it is assigned Phoenix.LiveView.Channel.assign_action/2</li>
-                  <li>Find assigns in maps for assign/2<br>
-                    Since assign/2 accepts either a keyword list or a map, check in both types.</li>
-                  <li>Resolve <code>@myself</code> to where it is set in <code>render_pending_components</code></li>
-                  <li>Resolve assigns in macros with do blocks like <code>case</code> and <code>if</code></li>
-                  <li>
-                    Find assigns in <code>live_component</code> calls<br>
-                    If an assign can't be found in the body of a LiveComponent module, then it maybe passed through from
-                    the <code>live_component</code> call itself, so look for any references to the view module
-                    (the LiveComponent) and if it is a <code>live_component</code> call, then look at those assigns to
-                    try to resolve the assign name.
-                  </li>
-                  <li>
-                    Resolve assigns to <code>live_modal</code> calls<br>
-                    <code>live_modal</code> is not built into <code>phoenix_live_view</code>, but it is generated by
-                    <code>phx.gen.live</code>, so most projects will have it.&nbsp; This allows <code>return_to</code>,
-                    which is used use in <code>live_modal</code>, to be resolved.
-                  </li>
-                  <li>Resolve <code>@socket</code> to last socket variable or call in view module.</li>
-                  <li>Resolve <code>@flash</code> to <code>put_flash/3</code> calls.</li>
-                  <li>
-                    Resolve <code>@inner_content</code> to <code>Phoenix.LiveView.Utils.to_rendered/2</code> setting the
-                    assign with <code>put_in</code>
-                  </li>
-                </ul>
-              </li>
-              <li>
-                Resolve aliases in <code>.leex</code> templates<br>
-                Generalize the <code>.leex</code> and <code>use</code> walking from call definition clauses to any scope
-                processor lambda, so it can be used to resolve uses of <code>Routes</code> in <code>.leex</code>
-                templates.
-              </li>
-            </ul>
-          </li>
-          <li>
-            <p>Resolve Types</p>
-            <ul>
-              <li>Have separate references specifically for Types.</li>
-              <li>
-                Resolve to both types declared with <code>@type</code>, <code>@typep</code>, or <code>@opaque</code>;
-                and named type parameters.
-              </li>
-              <li>Process declarations for <code>@type</code>, <code>@typep</code>, and <code>@opaque</code>.</li>
-              <li>Count <code>@callback</code> as declaring a Type</li>
-              <li>
-                Resolve type <code>t</code> for <code>defprotocol</code> to where it is defined in
-                <code>Protocol.__protocol__</code><br>
-                Unfortunately, this ties all protocol's <code>t</code> to the same element, so Find Usage finds all
-                protocol's types instead of just a specific module's type, but this works for projects that have source,
-                but not yet compiled.
-                <ul>
-                  <li>Favor protocol-specific decompiled <code>@type t</code> when available.</li>
-                </ul>
-              </li>
-              <li>Resolve type variable to the keyword key in guards.</li>
-              <li><code>__MODULE__</code></li>
-            </ul>
-          </li>
-          <li>
-            <p>
-              Favor source over decompiled per name instead of overall for <code>ResolveResultOrderedSet</code><br>
-              This allows the <code>Routes</code> alias to be resolved to the both the
-              <code>MyAppWeb.Router.Helpers</code> in <code>alias MyAppWeb.Router.Helpers, as: Routes</code> in the
-              source of <code>MyAppWeb</code>, but also the decompiled <code>MyAppWeb.Router.Helpers</code>, which is
-              necessary as <code>MyAppWeb.Router.Helpers</code> is produced on compile from <code>router.ex</code>.
-            </p>
-          </li>
-          <li>
-            <p>Resolve references through <code>defdelegate</code> calls.</p>
-          </li>
-          <li>
-            <p>Resolve <code>code_reloading?</code> in MyApp.Endpoint</p>
-            <p>The generated <code>MyApp.Endpoint</code> for <code>mix phx.new</code> has a section to enable code-reloading at compile time:</p>
-            <div class="highlight highlight-source-elixir position-relative"><pre><span class="pl-c"><span class="pl-c">#</span> Code reloading can be explicitly enabled under the</span>
-<span class="pl-c"><span class="pl-c">#</span> :code_reloader configuration of your endpoint.</span>
-<span class="pl-k">if</span> code_reloading? <span class="pl-k">do</span>
-  <span class="pl-en">socket</span>(<span class="pl-s"><span class="pl-pds">"</span>/phoenix/live_reload/socket<span class="pl-pds">"</span></span>, <span class="pl-en">Phoenix</span>.<span class="pl-en">LiveReloader</span>.<span class="pl-en">Socket</span>)
-  <span class="pl-en">plug</span>(<span class="pl-en">Phoenix</span>.<span class="pl-en">LiveReloader</span>)
-  <span class="pl-en">plug</span>(<span class="pl-en">Phoenix</span>.<span class="pl-en">CodeReloader</span>)
-<span class="pl-k">end</span></pre><div class="zeroclipboard-container position-absolute right-0 top-0">
-              <clipboard-copy aria-label="Copy" class="ClipboardButton btn js-clipboard-copy m-2 p-0 tooltipped-no-delay" data-copy-feedback="Copied!" data-tooltip-direction="w" value="# Code reloading can be explicitly enabled under the
-# :code_reloader configuration of your endpoint.
-if code_reloading? do
-  socket(&quot;/phoenix/live_reload/socket&quot;, Phoenix.LiveReloader.Socket)
-  plug(Phoenix.LiveReloader)
-  plug(Phoenix.CodeReloader)
-end
-" tabindex="0" role="button">
-                <svg aria-hidden="true" viewBox="0 0 16 16" version="1.1" data-view-component="true" height="16" width="16" class="octicon octicon-clippy js-clipboard-clippy-icon m-2">
-                  <path fill-rule="evenodd" d="M5.75 1a.75.75 0 00-.75.75v3c0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75v-3a.75.75 0 00-.75-.75h-4.5zm.75 3V2.5h3V4h-3zm-2.874-.467a.75.75 0 00-.752-1.298A1.75 1.75 0 002 3.75v9.5c0 .966.784 1.75 1.75 1.75h8.5A1.75 1.75 0 0014 13.25v-9.5a1.75 1.75 0 00-.874-1.515.75.75 0 10-.752 1.298.25.25 0 01.126.217v9.5a.25.25 0 01-.25.25h-8.5a.25.25 0 01-.25-.25v-9.5a.25.25 0 01.126-.217z"></path>
-                </svg>
-                <svg aria-hidden="true" viewBox="0 0 16 16" version="1.1" data-view-component="true" height="16" width="16" class="octicon octicon-check js-clipboard-check-icon color-text-success d-none m-2">
-                  <path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path>
-                </svg>
-              </clipboard-copy>
-            </div></div>
-            <p>
-              Previously, <code>code_reloading?</code> variable would not resolve because psi.scope.Variable ignored
-              <code>use</code> calls, not <code>use</code> calls are entered and the <code>var!(code_reloading?)</code>
-              is found in <code>Phoenix.Endpoint.config/1</code> by way of the <code>unquote(config(opts))</code> call
-              in the <code>quote</code> block in <code>__using__(opts)</code>.
-            </p>
-          </li>
-          <li>
-            <p>Resolve qualified calls with unknown resolvable qualifier using only relative identifier and arity.</p>
-          </li>
-          <li>
-            <p><code>@spec</code></p>
-            <ul>
-              <li>Resolve <code>@spec</code> to <code>defdelegate</code> calls.</li>
-              <li>Resolve <code>@specs</code> to the definitions if the definitions are in a for comprehension</li>
-            </ul>
-          </li>
-          <li>
-            <p><code>Ecto</code></p>
-            <ul>
-              <li><code>Query</code>
-                <ul>
-                  <li>
-                    <p>Resolve reference variables in <code>Ecto.Query</code></p>
-                    <ul>
-                      <li>
-                        Reference variables are introduced in as the left operand of <code>in</code> passed to
-                        <code>from/2</code> and the <code>join:</code> keyword in <code>from/2</code>.
-                      </li>
-                      <li><code>join/3-5</code></li>
-                      <li>Resolve bindings in <code>select/2-3</code>.</li>
-                      <li>Resolve reference variables in <code>where/2,3</code> binding.<br>
-                        Also add support for resolving <code>a</code> in <code>[{^assoc, a}]</code> binding.</li>
-                      <li>Resolve <code>bindings</code> in <code>group_by/2-3</code>.</li>
-                      <li>Resolve <code>bindings</code> and <code>expressions</code> in <code>order_by/2-3</code>.</li>
-                      <li>Resolve <code>bindings</code> in <code>having/2-3</code>.</li>
-                      <li>Add <code>select_merge</code> to declaring <code>Ecto.Query</code> macros.</li>
-                      <li>Add <code>distinct/2-3</code> as a declaring <code>Ecto.Query</code> macro.</li>
-                    </ul>
-                  </li>
-                  <li>
-                    <p>Resolve <code>field</code> calls in Ecto <code>schema</code> blocks</p>
-                    <p>How <code>field</code> works in <code>schema</code> for <code>Ecto.Schema</code></p>
-                    <ol>
-                      <li><code>use Ecto.Schema</code></li>
-                      <li><code>Ecto.Schema.__using__</code></li>
-                      <li><code>import Ecto.Schema, only: [schema: 2, embedded_schema: 1]</code>`</li>
-                    </ol>
-                    <p>
-                      Note that only the outer DSLs, schema and embedded_schema are available even though field/2 is
-                      defined in Ecto.Schema.
-                    </p>
-                    <p>So when you call <code>schema ... do</code></p>
-                    <ol>
-                      <li><code>defmacro schema(source, [do: block])</code></li>
-                      <li><code>schema(__CALLER__, source, true, :id, block)</code></li>
-                      <li><code>defp schema(caller, source, meta?, type, block)</code></li>
-                      <li>There's a big <code>prelude = quote do</code> quote block</li>
-                    </ol>
-                    <p>At the end of prelude there is</p>
-                    <div class="highlight highlight-source-elixir position-relative"><pre><span class="pl-k">try</span> <span class="pl-k">do</span>
-  <span class="pl-k">import</span> <span class="pl-en">Ecto</span>.<span class="pl-en">Schema</span>
-  <span class="pl-en">unquote</span>(block)
-<span class="pl-k">after</span>
-  <span class="pl-c1">:ok</span>
-<span class="pl-k">end</span></pre><div class="zeroclipboard-container position-absolute right-0 top-0">
-                      <clipboard-copy aria-label="Copy" class="ClipboardButton btn js-clipboard-copy m-2 p-0 tooltipped-no-delay" data-copy-feedback="Copied!" data-tooltip-direction="w" value="try do
-  import Ecto.Schema
-  unquote(block)
-after
-  :ok
-end
-" tabindex="0" role="button">
-                        <svg aria-hidden="true" viewBox="0 0 16 16" version="1.1" data-view-component="true" height="16" width="16" class="octicon octicon-clippy js-clipboard-clippy-icon m-2">
-                          <path fill-rule="evenodd" d="M5.75 1a.75.75 0 00-.75.75v3c0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75v-3a.75.75 0 00-.75-.75h-4.5zm.75 3V2.5h3V4h-3zm-2.874-.467a.75.75 0 00-.752-1.298A1.75 1.75 0 002 3.75v9.5c0 .966.784 1.75 1.75 1.75h8.5A1.75 1.75 0 0014 13.25v-9.5a1.75 1.75 0 00-.874-1.515.75.75 0 10-.752 1.298.25.25 0 01.126.217v9.5a.25.25 0 01-.25.25h-8.5a.25.25 0 01-.25-.25v-9.5a.25.25 0 01.126-.217z"></path>
-                        </svg>
-                        <svg aria-hidden="true" viewBox="0 0 16 16" version="1.1" data-view-component="true" height="16" width="16" class="octicon octicon-check js-clipboard-check-icon color-text-success d-none m-2">
-                          <path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path>
-                        </svg>
-                      </clipboard-copy>
-                    </div></div>
-                    <p>
-                      Hey! An <code>import Ecto.Schema</code>, but <code>prelude</code> is just floating as a variable.&nbsp;
-                      At the end of&nbsp; <code>defp schema(caller, source, meta?, type, block)</code> is
-                    </p>
-                    <div class="highlight highlight-source-elixir position-relative"><pre><span class="pl-k">quote</span> <span class="pl-k">do</span>
-  <span class="pl-en">unquote</span>(prelude)
-  <span class="pl-en">unquote</span>(postlude)
-<span class="pl-k">end</span></pre><div class="zeroclipboard-container position-absolute right-0 top-0">
-                      <clipboard-copy aria-label="Copy" class="ClipboardButton btn js-clipboard-copy m-2 p-0 tooltipped-no-delay" data-copy-feedback="Copied!" data-tooltip-direction="w" value="quote do
-  unquote(prelude)
-  unquote(postlude)
-end
-" tabindex="0" role="button">
-                        <svg aria-hidden="true" viewBox="0 0 16 16" version="1.1" data-view-component="true" height="16" width="16" class="octicon octicon-clippy js-clipboard-clippy-icon m-2">
-                          <path fill-rule="evenodd" d="M5.75 1a.75.75 0 00-.75.75v3c0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75v-3a.75.75 0 00-.75-.75h-4.5zm.75 3V2.5h3V4h-3zm-2.874-.467a.75.75 0 00-.752-1.298A1.75 1.75 0 002 3.75v9.5c0 .966.784 1.75 1.75 1.75h8.5A1.75 1.75 0 0014 13.25v-9.5a1.75 1.75 0 00-.874-1.515.75.75 0 10-.752 1.298.25.25 0 01.126.217v9.5a.25.25 0 01-.25.25h-8.5a.25.25 0 01-.25-.25v-9.5a.25.25 0 01.126-.217z"></path>
-                        </svg>
-                        <svg aria-hidden="true" viewBox="0 0 16 16" version="1.1" data-view-component="true" height="16" width="16" class="octicon octicon-check js-clipboard-check-icon color-text-success d-none m-2">
-                          <path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path>
-                        </svg>
-                      </clipboard-copy>
-                    </div></div>
-                    <p>So to statically analyze an <code>Ecto.Schema</code> module.</p>
-                    <ol>
-                      <li>
-                        Resolve <code>schema/2</code> to <code>defmacro schema</code> by walking the <code>use</code>,
-                        <code>__using__</code>, <code>quote</code>, and <code>import</code>.
-                      </li>
-                      <li>
-                        Inside the <code>schema/2</code> (or macros in general if you want to get fancy 💅 and support
-                        more DSLs),
-                      </li>
-                      <li>Go into the body of the macro.&nbsp; If there's a call, resolve it</li>
-                      <li>Go into the called function</li>
-                      <li>
-                        Look for a <code>quote</code> block at the end (the same as my current <code>__using__</code>
-                        support)
-                      </li>
-                      <li>
-                        If there's a <code>Call</code> inside an <code>unquote</code> see if you can resolve it to a
-                        variable in addition to a call definition (which is already supported for Phoenix).
-                      </li>
-                      <li>
-                        If it's a variable, check it's value.&nbsp; If it's a <code>quote</code>, use the quote block
-                        handling
-                      </li>
-                      <li>In the quote block handling add support for <code>try</code></li>
-                      <li>
-                        Walk the <code>try</code> and see the <code>import</code>, walk the <code>import</code> to find
-                        <code>Ecto.Schema.field/2</code>
-                      </li>
-                    </ol>
-                  </li>
-                  <li>
-                    <p><code>API</code></p>
-                    <ul>
-                      <li>Resolve <code>Ecto.Query.API</code> functions in <code>Ecto.Query</code></li>
-                      <li><code>from(order_by: ...)</code></li>
-                      <li><code>from(select: ...)</code>
-                        <ul>
-                          <li><code>from(select: tuple())</code></li>
-                        </ul>
-                      </li>
-                      <li><code>from(where: ...)</code></li>
-                      <li><code>group_by/2-3</code></li>
-                      <li><code>having/2-3</code></li>
-                      <li><code>select/2-3</code> <code>expr</code> argument</li>
-                      <li><code>where</code></li>
-                      <li>Resolve <code>Ecto.Query.API.fragment</code> to arity interval <code>0..</code>.</li>
-                      <li>
-                        Resolve <code>fragment</code> nested in other <code>Ecto.Query.API</code> call like
-                        <code>type</code>.
-                      </li>
-                      <li>
-                        Walk <code>rightOperand</code> of <code>join(..., ... in ..., ...)</code> for
-                        <code>Ecto.Query.API</code> usages like <code>fragment</code>.
-                      </li>
-                    </ul>
-                  </li>
-                </ul>
-              </li>
-            </ul>
-          </li>
-          <li>
-            <p>Resolve module attributes defined in <code>use</code> <code>__using__</code> <code>quote</code> block</p>
-            <ul>
-              <li>
-                Change <code>org.elixir_lang.reference.resolver.ModuleAttribute</code> to use
-                <code>PsiScopeProcessor</code> for non-<code>@for</code> and non-<code>@protocol</code> instead of
-                custom logic.
-              </li>
-              <li>
-                Don't descend into a <code>use</code> if the <code>ENTRANCE</code> is an ancestor since that means the
-                <code>Alias</code> on the <code>use</code> is probably being resolved.
-              </li>
-              <li>
-                <code>AtUnqualifiedNoParenthesesCall.processDeclarations</code> will call <code>processor.execute</code>
-                when it isn't a type spec.
-              </li>
-              <li>
-                The <code>UseScopeSelector</code> for <code>AtUnqualifiedNoParenthesesCallImpl</code> has been changed
-                to <code>SELF_AND_FOLLOWING_SIBLINGS</code> since the module attribute is used that way.&nbsp; The previous
-                <code>SELF</code> value was when the <code>UseScopeSelector</code> only applied to variables.
-              </li>
-            </ul>
-          </li>
-        </ul>
-      </li>
-      <li>
-        <p>"Elixir References" inspection for finding unresolved or invalid references.</p>
-        <ul>
-          <li><code>visitAtNonNumericOperation</code><br>
-            Helps "Elixir References" find unresolved assigns.</li>
-        </ul>
-      </li>
-      <li>
-        <p>Strip <code>AccessExpression</code>s from <code>Qualified</code> qualifiers automatically</p>
-      </li>
-      <li>
-        <p>Documentation</p>
-        <ul>
-          <li>
-            Show <code>deprecated</code>, <code>impl</code>, and <code>spec</code>, and actual heads in documentation
-            for source functions
-          </li>
-          <li>Merge <code>Documentation</code> across multiple arities when arity of lookup is ambiguous.</li>
-        </ul>
-      </li>
-      <li>
-        <p>
-          Find variables defined in EEx element<br>
-          Finds variables defined in EEx PsiElement by creating them the same as a StabBody, which means that the
-          siblings are checked backwards from the last parent.&nbsp; This fixes resolving the <code>f</code> from
-          <code>f = form_for ...</code> in <code>*input f ...</code> in LiveView FormComponent templates.
-        </p>
-      </li>
-      <li>
-        <p>Highlight named parameters in types.</p>
-      </li>
-      <li>
-        <p>Decompilation</p>
-        <ul>
-          <li>
-            Fake built-in types by decompiling in <code>:erlang.beam</code><br>
-            For type reference resolution of built-in types to work, they need to be defined somewhere.&nbsp; IntelliJ Erlang
-            does this by looping usages back on themselves, but this leads to Find Usages not working for built-in types
-            since each usage is a distinct declaration.&nbsp; By instead defining the types in decompiled
-            <code>:erlang.beam</code> (even though they aren't actually defined there), there is a shared location for
-            all reference to point to and then check for Find Usages.
-          </li>
-          <li>Decompile types from EEP-48 documentation.</li>
-        </ul>
-      </li>
-      <li>
-        <p>Descend into body of <code>unless</code> in <code>quote</code> for <code>treeWalkUp</code>.</p>
-      </li>
-      <li>
-        <p>Descend into <code>for</code> when looking for call definition clauses.</p>
-      </li>
-      <li>
-        <p>
-          <code>QuoteMacro.treeWalkUp</code> into <code>if</code><br>
-          <code>unless</code> was already walked, but not <code>if</code>.&nbsp; Fixes resolving <code>Repo.preload/2</code>,
-          which is defined inside an <code>if</code> in <code>use Ecto.Repo</code>'s <code>__using__</code>.
-        </p>
-      </li>
-      <li>
-        <p>Add <code>defguard</code> and <code>defguardp</code> to CallDefinitionClause.<code>is</code>.</p>
-      </li>
-      <li>
-        <p>Don't generate a reference for <code>Elixir</code><br>
-          <code>Elixir</code> is not declared anywhere. It is the namespace of all Aliases.</p>
-      </li>
-      <li>
-        <p>Refactor how sibling sequences are walked<br>
-          Port filtering out comments, white space and end of expressions from <code>siblingExpression</code>.</p>
-      </li>
-      <li>
-        <p>Reimplement <code>fullyQualifiedName</code></p>
-        <p>
-          Eliminate the specialization for <code>ElixirAlias</code> AND <code>QualifiableAlias</code> as which was
-          picked as based on the static casted type. <code>fullyQualifiedName</code> will include the following:
-        </p>
-        <ul>
-          <li>Convert <code>__MODULE__</code> to the enclosing modular canonical name</li>
-          <li>Combine an ElixirAlias with its qualifier
-            <ul>
-              <li>
-                If in a <code>ElixirMultipleAliases</code> will combine the qualifier (<code>qualifier.{...}</code>)
-                outside the <code>{}</code> with the relative name inside <code>...{relative, ...}</code>.
-              </li>
-            </ul>
-          </li>
-        </ul>
-      </li>
-      <li>
-        <p>EEx</p>
-        <ul>
-          <li>
-            <code>viewFile</code> for <code>.eex</code> files used in same directory as <code>.ex</code> using
-            <code>EEx.function_from_file</code>.
-          </li>
-          <li>Resolve function calls to those defined by <code>EEx.function_from_file/3-5</code>.</li>
-          <li>Find view modules for templates under the <code>templates</code> directory.</li>
-        </ul>
-      </li>
-      <li>
-        <p>Walk <code>quote</code> macros for sibling call definitions</p>
-      </li>
-      <li>
-        <p>Always fallback to name/arity in any module if callable not resolved in scope</p>
-      </li>
-      <li>
-        <p>Resolve uses of aliased name produced by <code>alias __MODULE__</code></p>
-      </li>
-      <li>Updates
-        <ul>
-          <li>IntelliJ IDEA build version to 2021.1.2
-            <ul>
-              <li>Update <code>ParsingTestCase</code> to latest APIs.</li>
-            </ul>
-          </li>
-          <li>Gradle plugins
-            <ul>
-              <li>intellij 1.0</li>
-              <li>kotlin.jvm 1.5.10</li>
-            </ul>
-          </li>
-        </ul>
-      </li>
-      <li>Configure <code>runPluginVerifier</code></li>
-    </ul>
-  </li>
-  <li>
-    <p>Bug Fixes</p>
-    <ul>
-      <li>
-        <p>Fix Ctrl+Click/Cmd+B/Go To Declaration for Aliases.</p>
-      </li>
-      <li>
-        <p>Don't index non-canonical names.<br>
-          The non-canonical name for a nested <code>defmodule</code> is the Alias given to that <code>defmodule</code> call.  While that name should be resolvable within the parent modular, it should not be indexed because the index is for the global scope.</p>
-        <p>Prevents <code>defmodule Enum</code> in</p>
-        <div class="highlight highlight-source-elixir position-relative"><pre><span class="pl-k">defmodule</span> <span class="pl-e">ExJsonSchema</span>.<span class="pl-e">Validator</span>.<span class="pl-en">Error</span> <span class="pl-k">do</span>
-  <span class="pl-k">..</span>.
-  <span class="pl-k">defmodule</span> <span class="pl-en">Enum</span> <span class="pl-k">do</span>
-    <span class="pl-k">..</span>.
-  <span class="pl-k">end</span>
-  <span class="pl-k">..</span>.
-<span class="pl-k">end</span></pre><div class="zeroclipboard-container position-absolute right-0 top-0">
-          <clipboard-copy aria-label="Copy" class="ClipboardButton btn js-clipboard-copy m-2 p-0 tooltipped-no-delay" data-copy-feedback="Copied!" data-tooltip-direction="w" value="defmodule ExJsonSchema.Validator.Error do
-  ...
-  defmodule Enum do
-    ...
-  end
-  ...
-end
-" tabindex="0" role="button">
-            <svg aria-hidden="true" viewBox="0 0 16 16" version="1.1" data-view-component="true" height="16" width="16" class="octicon octicon-clippy js-clipboard-clippy-icon m-2">
-              <path fill-rule="evenodd" d="M5.75 1a.75.75 0 00-.75.75v3c0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75v-3a.75.75 0 00-.75-.75h-4.5zm.75 3V2.5h3V4h-3zm-2.874-.467a.75.75 0 00-.752-1.298A1.75 1.75 0 002 3.75v9.5c0 .966.784 1.75 1.75 1.75h8.5A1.75 1.75 0 0014 13.25v-9.5a1.75 1.75 0 00-.874-1.515.75.75 0 10-.752 1.298.25.25 0 01.126.217v9.5a.25.25 0 01-.25.25h-8.5a.25.25 0 01-.25-.25v-9.5a.25.25 0 01.126-.217z"></path>
-            </svg>
-            <svg aria-hidden="true" viewBox="0 0 16 16" version="1.1" data-view-component="true" height="16" width="16" class="octicon octicon-check js-clipboard-check-icon color-text-success d-none m-2">
-              <path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path>
-            </svg>
-          </clipboard-copy>
-        </div></div>
-        <p>
-          from being indexed as <code>Enum</code>, which hides the decompiled version from the standard library because
-          source references are favored over decompiled versions when resolving references.
-        </p>
-      </li>
-      <li>
-        <p>Reference Resolution</p>
-        <ul>
-          <li>
-            <p>
-              Only favor same file Module resolutions if they are valid<br>
-              Invalid same file results can occur for prefix matches, but if only prefix matches are available, then a
-              whole project search should occur instead of only when there are no same file <code>ResolveResult</code>
-              of either validity.
-            </p>
-          </li>
-          <li>
-            <p>
-              Include library sources in <code>Module#multiResolveProject</code> <code>GlobalSearchScope</code><br>
-              Ensures that library sources can be returned, which are favored over decompiled libraries, so that
-              <code>__using__</code> macros can be followed.
-            </p>
-          </li>
-          <li>
-            <p>
-              Protect from <code>Module</code> reference element not having a <code>VirtualFile</code> when checking if
-              a test file.
-            </p>
-          </li>
-          <li>
-            <p>Fix <code>QualifiableAliasImpl#fullyQualifiedName</code></p>
-            <ul>
-              <li>
-                Include qualifier of <code>MultipleAliases</code><br>
-                In an <code>alias</code> line like <code>alias Myapp.MyContext.{Schema1, Schema2}</code>,
-                <code>Schema1</code> would think its <code>fullyQualifiedName</code> was only <code>Schema1</code>, when
-                it should included the <code>fullyQualifiedName</code> of the qualifier, <code>MyApp.MyContext</code>
-                too. This leads to the correct <code>Schema1</code> fully-qualified name of
-                <code>MyApp.MyContext.Schema1</code>.&nbsp; This fix makes references to <code>Schema1</code> resolve to
-                both the <code>alias</code> and the <code>defmodule</code>.
-              </li>
-              <li>
-                Include qualifier of <code>MultipleAliases</code> for deep aliases<br>
-                In an <code>alias</code> line like
-                <code>alias Myapp.MyContext.{NestedContext1.Schema1, NestedContext2.Schema2}</code>,
-                <code>Schema1</code> would think its <code>fullyQualifiedName</code> was only
-                <code>NestedContext1.Schema1</code>, when it should included the <code>fullyQualifiedName</code> of the
-                qualifier, <code>MyApp.MyContext</code> too.&nbsp; This leads to the correct <code>Schema1</code>
-                fully-qualified name of <code>MyApp.MyContext.NestedContext.Schema1</code>.&nbsp; This fix makes
-                references to <code>Schema1</code> resolve to both the <code>alias</code> and the
-                <code>defmodule</code>.
-              </li>
-            </ul>
-          </li>
-          <li>
-            <p>In LEEx Templates</p>
-            <ul>
-              <li>Don't check for implicit imports at top of template file if there is a view file<br>
-                The implicit imports should come last, after the view file has been processed.</li>
-              <li>Ignore call definition clauses expressions that can't contain an assign
-                <ul>
-                  <li>Atom keywords (<code>false</code>, <code>true</code>, <code>nil</code>)</li>
-                  <li>Maps</li>
-                  <li>Structs</li>
-                  <li>Keyword lists</li>
-                  <li>Strings and charlists</li>
-                </ul>
-              </li>
-              <li>Don't follow variables for assigns<br>
-                For now, don't follow variables to look for assigns.</li>
-              <li>
-                Fix finding assigns in <code>|&gt; case do ... end</code><br>
-                <code>None</code> calls were ignored, but when <code>case</code> is used in a pipeline it is a
-                <code>None</code> since it has no literal arguments and only resolved arguments, so it was being
-                ignored.
-              </li>
-              <li>Ignore Lists and Aliases when resolving assigns</li>
-              <li>
-                Fix resolve assigns in <code>if</code>s<br>
-                Only looked in <code>stab</code> of the <code>doBlock</code>, but the <code>else</code> is in the
-                <code>blockList</code>.
-              </li>
-            </ul>
-          </li>
-          <li>
-            <p>Don't use the same path for actual aliases and defmodules when resolving aliases<br>
-              Prevents a case of an exact match and its namespace both being marked as valid (exact matches).</p>
-          </li>
-          <li>
-            <p>Types</p>
-            <ul>
-              <li>
-                Don't generate references for map key optionality (<code>required/1</code> and <code>optional/1</code>)
-              </li>
-              <li>Don't create a reference to <code>...</code> in lists in type specs.</li>
-              <li>Look above <code>ElixirStabBody</code> for <code>ancestorTypeSpec</code>.</li>
-              <li>
-                Generate <code>Callable</code> reference for <code>unquote</code> in typespec instead of
-                <code>Type</code> reference.
-              </li>
-            </ul>
-          </li>
-          <li>
-            <p>
-              Allow modular names to resolve to multiple modulars<br>
-              Fix <code>:systemd.ready()</code> not resolving because <code>:systemd</code> only exists as a decompiled
-              file from source because it is Erlang and there is no preference given to different MIX_ENVs.&nbsp; All
-              MIX_ENV <code>defmodule :systemd</code> are returned for the <code>:systemd</code> and all of them are
-              checked for <code>ready/0</code>.
-            </p>
-          </li>
-          <li>
-            <p>Fix resolving qualified calls that are defined through use</p>
-            <p>
-              Resolving qualified calls only used <code>Modular.callDefinitionClauseCallFoldWhile</code>, which ignores
-              all non call definition, which means it ignored the <code>use</code>, but switching to use
-              <code>org.elixir_lang.psi.scope.call_definition_clause.MultiResolve</code> <code>PsiScopeProcessor</code>
-              used for unqualified calls, but starting on the modular call of the qualifier, all the <code>use</code>
-              handling that works for unqualified calls also works for qualified calls now.
-            </p>
-            <p>
-              This fixes resolving <code>MyAppWeb.Endpoint.config_change(changed, removed)</code> in
-              <code>MyApp.Application.config_change/3</code> because
-              <code>use Phoenix.Endpoint, otp_app: :my_app</code> in <code>MyAppWeb.Endpoint</code> is now walked for
-              qualified calls.
-            </p>
-          </li>
-          <li>
-            <p>Fix resolving variables to parameters that are both pattern matched and defaulted</p>
-            <p>In functions like</p>
-            <div class="highlight highlight-source-elixir position-relative"><pre><span class="pl-k">def</span> <span class="pl-en">f</span>(%<span class="pl-en">Struct</span>{} <span class="pl-k">=</span> s <span class="pl-k">\\</span> %<span class="pl-en">Struct</span>{}) <span class="pl-k">do</span>
-  s
-<span class="pl-k">end</span></pre><div class="zeroclipboard-container position-absolute right-0 top-0">
-              <clipboard-copy aria-label="Copy" class="ClipboardButton btn js-clipboard-copy m-2 p-0 tooltipped-no-delay" data-copy-feedback="Copied!" data-tooltip-direction="w" value="def f(%Struct{} = s \\ %Struct{}) do
-  s
-end
-" tabindex="0" role="button">
-                <svg aria-hidden="true" viewBox="0 0 16 16" version="1.1" data-view-component="true" height="16" width="16" class="octicon octicon-clippy js-clipboard-clippy-icon m-2">
-                  <path fill-rule="evenodd" d="M5.75 1a.75.75 0 00-.75.75v3c0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75v-3a.75.75 0 00-.75-.75h-4.5zm.75 3V2.5h3V4h-3zm-2.874-.467a.75.75 0 00-.752-1.298A1.75 1.75 0 002 3.75v9.5c0 .966.784 1.75 1.75 1.75h8.5A1.75 1.75 0 0014 13.25v-9.5a1.75 1.75 0 00-.874-1.515.75.75 0 10-.752 1.298.25.25 0 01.126.217v9.5a.25.25 0 01-.25.25h-8.5a.25.25 0 01-.25-.25v-9.5a.25.25 0 01.126-.217z"></path>
-                </svg>
-                <svg aria-hidden="true" viewBox="0 0 16 16" version="1.1" data-view-component="true" height="16" width="16" class="octicon octicon-check js-clipboard-check-icon color-text-success d-none m-2">
-                  <path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path>
-                </svg>
-              </clipboard-copy>
-            </div></div>
-            <p>
-              <code>s</code> in the body would not resolve to the <code>s</code> parameter because the default
-              parameter had to be <code>PsiNamedElement</code>, that is a variable directly. Instead, recurse on any
-              operand before the <code>\\</code> to support pattern matching too.
-            </p>
-          </li>
-          <li>
-            <p>
-              Use <code>keepProcessing()</code> in <code>MultiResolve.addToResolveResults</code> instead of specific
-              return values
-            </p>
-            <p>
-              Fixes <code>def</code> in <code>def default_host_flag, do: "--host</code> resolving as an invalid match to
-              <code>default_host_flag</code> instead of search the implicit imports for <code>defmacro def</code>.
-            </p>
-          </li>
-          <li>
-            <p>
-              The <code>nameIdentifier</code> for a <code>defdelegate</code> is the first argument, not the
-              <code>as:</code><br>
-              The <code>as:</code> is the name in the <code>to:</code> module only.
-            </p>
-          </li>
-          <li>
-            <p>Fix <code>defdelegate</code> <code>MultiResolve</code></p>
-            <ol>
-              <li>I had flipped the head name and <code>as</code> name for checking for a name match</li>
-              <li>
-                I only counted the <code>defdelegate</code> as matching if the <code>as</code> name as found in
-                <code>to</code> module, but if the head alone is prefixed by the name then the head should be a
-                ResolveResult element even if the <code>to</code> or <code>as</code> can't be found
-              </li>
-              <li>
-                Inside the <code>to</code>, I only checked if the children were call definition clauses, but this meant
-                that all the <code>for</code> handling was ignored, so start a new <code>resolveResults()</code> for
-                each modular.
-              </li>
-            </ol>
-          </li>
-          <li>
-            <p>Fix <code>toModulars</code> not returning all modulars<br>
-              <code>fullyResolve</code> only touched the first modular.</p>
-          </li>
-          <li>
-            <p>Favor complete valid results over incomplete invalid earlier bindings for variables.</p>
-          </li>
-          <li>
-            <p>Ecto</p>
-            <ul>
-              <li>
-                Don't generate reference for <code>assoc/2</code> pseudo-function in
-                <code>join(..., _ in assoc(_, _))</code>
-              </li>
-            </ul>
-          </li>
-          <li>
-            <p>
-              Fix unaliasing multiple aliases<br>
-              <code>UnaliasName</code> still assumed that <code>fullyQualifiedName</code> included the qualifier, but it
-              is just the lexical qualifier now.
-            </p>
-          </li>
-          <li>
-            <p>
-              Check for <code>MULTIPLE_ALIASES_QUALIFIER</code> in <code>ResolveState</code> for prefix matches.<br>
-              Fixes resolving <code>SSH.Key</code> to <code>Foo.SSH.Key</code> when the alias is
-              <code>alias Foo.{SSH, ...}</code>.
-            </p>
-          </li>
-          <li>
-            <p>Ignore type variables in type restrictions when resolving normal variables.</p>
-          </li>
-          <li>
-            <p>
-              Fix <code>withSelf</code> for <code>childExpressions</code> <code>siblingExpressions</code> call<br>
-              While refactoring the walk, I copied the call for siblings, which shouldn't included self.&nbsp; Children
-              should include self, or the first expression is missed which showed up as <code>Repo.transaction</code>
-              not being found because <code>transaction</code> is the first <code>def</code> inside an <code>if</code>
-              in <code>Ecto.Repo.__using__</code>'s <code>quote</code> block.
-            </p>
-          </li>
-          <li>
-            <p>Don't try to resolve keys/fields of a capture.</p>
-          </li>
-          <li>
-            <p>Don't generate reference for <code>assoc</code> in <code>*join*: .. in assoc(..., ...)</code>.<br>
-              Already worked for <code>join/3</code> calls, extend to keyword syntax too.</p>
-          </li>
-          <li>
-            <p>
-              Fix resolving references to <code>Modulars</code> when resolved is in BEAM file<br>
-              The check to see if the resolved was a modular only worked for source elements because it checked if it
-              was a <code>Call</code>, but decompiled modules in BEAM files are <code>ModuleImpls</code>.
-            </p>
-          </li>
-          <li>
-            <p>Fix logic error when ignored pinned variables as declaration sites</p>
-            <p>The logic was supposed to be that</p>
-            <ul>
-              <li>If it is pinned, keep searching</li>
-              <li>If it is not pinned, check the operation as a Call</li>
-            </ul>
-            <p>
-              ... but, the code was <code>operatorText != "^" &amp;&amp; execute(match as Call, state)</code> which
-              meant that if the <code>operatorText</code> was <code>"^"</code>, then the whole expression was
-              <code>false</code>, which meant <code>keepProcessing</code> was <code>false</code>, so any pin stopped the
-              processing for other unpinned parameters after the pin in addition to processing in the outer scope of the
-              pin.
-            </p>
-          </li>
-          <li>
-            <p>
-              Prefer source only for target candidates for Go To Declaration and not all ResolveResults.<br>
-              Ensures that functions only defined in decompiled Modules can be found because the Module's ResolveResults
-              include the decompiled Module in addition to the source ones.
-            </p>
-          </li>
-          <li>
-            <p>
-              Don't prefer source over decompiled in <code>ResolveResultOrderedSet</code><br>
-              Preference is now handled in <code>Resolver</code>, so that source preference only happens on
-              Go To Declaration and not for <code>multiResolve</code> because that needs decompiled Modulars for
-              compile-time <code>for</code> loops that are too complex to infer.
-            </p>
-          </li>
-          <li>
-            <p>Use primary arity instead of final for resolving Callables</p>
-            <p>Fixes <code>unquote</code> in <code>def unquote(...)() do</code> not resolving.</p>
-          </li>
-        </ul>
-      </li>
-      <li>
-        <p>
-          Filter out decompiled private functions from completions<br>
-          If they are only available as decompiled functions, it is unlikely we have the source available to make them
-          public, which was the reasoning to allow private functions at all.
-        </p>
-      </li>
-      <li>
-        <p>Decompiling</p>
-        <ul>
-          <li>Include module name for "No decompiled source function" errors</li>
-          <li>Unquote <code>and</code> when not and/2<br>
-            Fixes decompiling <code>:hipe_arm_encode</code>.</li>
-          <li>
-            <code>unquote</code> <code>false</code> when decompiling.<br>
-            Fixes decompiling <code>:thrift_json_parser</code>. Add <code>true</code> to the <code>Unquote</code> list
-            too since it would have the same issue.
-          </li>
-          <li>Unquote <code>in</code> when not <code>in/2</code><br>
-            Fix decompiling <code>:digraph_utils</code></li>
-          <li>Use <code>containingFile.originalFile</code> for <code>resolve.Module.multiResolveProject</code><br>
-            Ensures <code>VirtualFile</code> is available for decompiled files.</li>
-        </ul>
-      </li>
-      <li>
-        <p>Performance</p>
-        <ul>
-          <li>
-            <p>Don't use <code>.navigationElement</code> for <code>Variants</code></p>
-            <p>
-              Using <code>navigationElement</code> forces parsing of the decompiled source, which isn't necessary whe
-              only showing the lookup string.
-            </p>
-          </li>
-          <li>
-            <p>Remove <code>ModuleOwner</code> interface</p>
-            <ul>
-              <li>
-                <code>BeamFileImpl</code> is known to have only 1 module in it, so it makes the code more complicated to
-                make it act like source files.
-              </li>
-              <li>
-                Don't use <code>getChildrenByType</code>, as it causes the decompiled source to be parsed, which is slow
-                and unnecessary since all the metadata for modules is available from the binary format.
-              </li>
-            </ul>
-          </li>
-          <li>
-            <p>Get project from parent in decompiled Module and CallDefinition<br>
-              Not doing this causes an unnecessary parsing of the decompiled source.</p>
-          </li>
-        </ul>
-      </li>
-      <li>
-        <p>Fix infinite recursion in <code>ElixirVisitor#visitLiteralSigilLine</code></p>
-      </li>
-      <li>
-        <p>Show more scope for keyword key Go To Definition</p>
-        <ul>
-          <li>
-            Always show the keyword pair, instead of just the keyword key, so that the value being assigned to the key
-            can be seen before Go To.
-          </li>
-          <li>
-            Show the location at the path relative to the content root and the line number as <code>live_modal</code>
-            may be used more than once in the same file.
-          </li>
-        </ul>
-      </li>
-      <li>
-        <p>Put <code>entrance</code> as initial visited in <code>module.Variants</code>.</p>
-      </li>
-      <li>
-        <p>
-          Check if <code>PsiElement</code> has been visited before walking <code>quote</code> and <code>__using__</code>
-        </p>
-      </li>
-      <li>
-        <p>
-          Don't mark qualified calls as unresolved in "Elixir References" inspection<br>
-          I don't have a good approach for resolving struct fields or map keys for now, don't mark them as unresolved as
-          it clutters finding unresolved calls I expect to work.
-        </p>
-      </li>
-      <li>
-        <p>
-          Don't assume <code>PsiFile#virtualFile</code> is <code>NotNull</code> in
-          <code>PsiElement.moduleWithDependentsScope</code>.
-        </p>
-      </li>
-      <li>
-        <p>
-          Don't assume <code>PsiFile#virtualFile</code> is <code>NotNull</code> in
-          <code>AtNonNumericOperation.computeReference()</code>.
-        </p>
-      </li>
-      <li>
-        <p>
-          <code>putInitialVisitedElement</code> in <code>variable.MultiResolve</code><br>
-          Fixes resolving variables through <code>use</code> statements for variables in the body of
-          <code>defmodule</code> blocks.
-        </p>
-      </li>
-      <li>
-        <p>Log when <code>VISITED_ELEMENT_SET</code> is <code>null</code> instead of erroring.</p>
-      </li>
-      <li>
-        <p>
-          Fix <code>resolvePrimaryArity</code> for <code>|&gt; case do</code><br>
-          <code>resolvedPrimaryArity</code> did not add both the doBlock's arity and the arity from the
-          <code>|&gt;</code> at the same time.&nbsp; If the pipe was there, the <code>do</code> was ignored because the
-          pre-existing <code>resolvePrimaryArity</code> was not used if the normal primary arity of the call was zero,
-          which is the case for <code>|&gt; case do</code>.
-        </p>
-      </li>
-      <li>
-        <p>
-          Find module for elements in libraries<br>
-          Elements in libraries don't have a <code>Module</code> from <code>ModuleUtil.findModuleForPsiElement</code>,
-          so scan the element's project's module's content roots for the closest <code>Module</code> for libraries.
-        </p>
-      </li>
-      <li>
-        <p><code>prependQualifiers</code> when typing an alias on a new line in the body of a function.</p>
-      </li>
-      <li>
-        <p>
-          Don't descend into <code>quote</code> blocks if the call being resolved is given to an <code>unquote</code> in
-          the <code>quote</code> block.
-        </p>
-      </li>
-      <li><code>updateSinceUntilBuild</code> to prevent breaking in future IDEs.</li>
-      <li>Check if modules loaded before using <code>findModuleForPsiElement</code>.</li>
-      <li>Use <code>BasePlatformTestCase</code> instead of <code>LightCodeInsightTestCase</code> because <code>LightCodeInsightTestCase</code> is deprecated.</li>
     </ul>
   </li>
 </ul>
