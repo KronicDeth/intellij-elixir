@@ -352,7 +352,7 @@ class Decompiler : BinaryFileDecompiler {
                                 it.arity == macroNameArity.arity.toBigInteger()
                     }
                     ?.let { spec ->
-                        decompiled.append(spec.toMacroString().prependIndent("  ")).append('\n')
+                        decompiled.append(spec.toMacroString().prependIndentToNonBlank()).append('\n')
                     }
         }
 
@@ -379,7 +379,7 @@ class Decompiler : BinaryFileDecompiler {
                         val function = debugInfo.functions.byNameArity[macroNameArity.toNameArity()]
 
                         if (function != null) {
-                            decompiled.append(function.toMacroString().prependIndent("  ")).append('\n')
+                            decompiled.append(function.toMacroString().prependIndentToNonBlank()).append('\n')
 
                             true
                         } else {
@@ -393,7 +393,7 @@ class Decompiler : BinaryFileDecompiler {
                                          macroNameArity: MacroNameArity,
                                          debugInfo: org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.V1): Boolean =
                 debugInfo.definitions?.get(macroNameArity)?.toMacroString(10)?.let { macroString ->
-                    decompiled.append(macroString.prependIndent("  ")).append('\n')
+                    decompiled.append(macroString.prependIndentToNonBlank()).append('\n')
 
                     true
                 } ?: false
@@ -463,3 +463,13 @@ class Decompiler : BinaryFileDecompiler {
         }
     }
 }
+
+fun String.prependIndentToNonBlank(indent: String = "  "): String =
+        lineSequence()
+                .map {
+                    when {
+                        it.isBlank() -> it
+                        else -> indent + it
+                    }
+                }
+                .joinToString("\n")
