@@ -366,6 +366,8 @@
   * Update CI build dependencies
 
 ### Bug Fixes
+* [#2074](https://github.com/KronicDeth/intellij-elixir/pull/2074) - [@Thau](https://github.com/Thau)
+  * Alternative function clause for `put_event` with `suite_finished`
 * [#2179](https://github.com/KronicDeth/intellij-elixir/pull/2179) - [@KronicDeth](https://github.com/KronicDeth)
   * StackOverflow fixes
     * getElementDescription(ElixirAtom, ElementDescriptionLocation)
