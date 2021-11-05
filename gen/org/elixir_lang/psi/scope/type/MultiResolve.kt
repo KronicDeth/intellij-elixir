@@ -75,6 +75,7 @@ private constructor(private val name: String,
                 // Literals
                 is ElixirAtom,
                 is ElixirAtomKeyword,
+                is ElixirDecimalWholeNumber,
                 is ElixirList,
                 is ElixirMapOperation,
                 is ElixirTuple -> true
