@@ -74,6 +74,7 @@ private constructor(private val name: String,
                 // Parenthetical calls must be a usage instead of a declaration.
                 is UnqualifiedParenthesesCall<*>,
                 // Literals
+                is ElixirAlias,
                 is ElixirAtom,
                 is ElixirAtomKeyword,
                 is ElixirDecimalWholeNumber,
