@@ -3,6 +3,7 @@ package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code
 import com.ericsson.otp.erlang.OtpErlangList
 import com.ericsson.otp.erlang.OtpErlangObject
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.comprehension.Qualifier
+import org.elixir_lang.beam.decompiler.MacroNameArity
 
 object Sequence {
     fun toMacroStringDeclaredScope(term: OtpErlangList,
@@ -17,6 +18,26 @@ object Sequence {
                     separatedMacroString
                 }
             }
+
+    fun toMacroStringDeclaredScope(term: OtpErlangObject, decompiler: MacroNameArity, macroNameArity: org.elixir_lang.beam.MacroNameArity): MacroStringDeclaredScope =
+            toMacroStringDeclaredScope(term, Scope.EMPTY.copy(pinning = true)) { macroStringList ->
+                val macroStringBuilder = StringBuilder()
+
+                decompiler.appendSignature(macroStringBuilder, macroNameArity, macroNameArity.name, macroStringList.toTypedArray())
+
+                macroStringBuilder.toString()
+            }
+
+    fun toMacroStringDeclaredScope(term: OtpErlangObject,
+                                   scope: Scope,
+                                   joiner: (List<MacroString>) -> MacroString): MacroStringDeclaredScope =
+            when (term) {
+                is OtpErlangList -> toMacroStringDeclaredScope(term, scope, joiner)
+                else -> unknown(scope)
+            }
+
+    fun unknown() = unknown(Scope.EMPTY)
+    fun unknown(scope: Scope) = MacroStringDeclaredScope("unknown_sequence", scope)
 
     fun toMacroStringDeclaredScope(term: OtpErlangList,
                                    scope: Scope,

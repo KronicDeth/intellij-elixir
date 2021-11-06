@@ -8,7 +8,7 @@ public class Default extends MacroNameArity {
      * CONSTANTS
      */
 
-    public static final MacroNameArity INSTANCE = new Default();
+    public static final Default INSTANCE = new Default();
 
 
     /**
@@ -43,7 +43,7 @@ public class Default extends MacroNameArity {
                 .append(" ");
     }
 
-    protected String[] parameters(@NotNull org.elixir_lang.beam.MacroNameArity macroNameArity) {
+    public String[] parameters(@NotNull org.elixir_lang.beam.MacroNameArity macroNameArity) {
         int arity = macroNameArity.arity;
         String[] arguments = new String[arity];
 

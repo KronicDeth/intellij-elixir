@@ -6,6 +6,7 @@ import com.ericsson.otp.erlang.OtpErlangTuple
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.MacroString
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Type.ifSubtypeTo
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.type.bounded_fun.FunBound
+import org.elixir_lang.beam.decompiler.MacroNameArity
 
 object BoundedFun {
     fun funBound(definition: OtpErlangTuple): OtpErlangObject? = definition.elementAt(3)
@@ -13,8 +14,10 @@ object BoundedFun {
     fun <T> ifTo(type: OtpErlangTuple, ifTrue: (OtpErlangTuple) -> T): T? = ifSubtypeTo(type, SUBTYPE, ifTrue)
     fun ifToMacroString(type: OtpErlangTuple): MacroString? = ifTo(type) { toMacroString(type) }
 
-    fun ifToMacroString(type: OtpErlangTuple, nameMacroString: MacroString): MacroString? =
-            ifTo(type) { toMacroString(type, nameMacroString) }
+    fun ifToMacroString(type: OtpErlangTuple,
+                        decompiler: MacroNameArity,
+                        macroNameArity: org.elixir_lang.beam.MacroNameArity): MacroString? =
+            ifTo(type) { toMacroString(type, decompiler, macroNameArity) }
 
     private const val SUBTYPE = "bounded_fun"
 
@@ -22,12 +25,11 @@ object BoundedFun {
         TODO()
     }
 
-    private fun toMacroString(type: OtpErlangTuple, nameMacroString: MacroString): MacroString {
-        val funBound = BoundedFun.funBound(type)
-
-        return when (funBound) {
-            is OtpErlangList -> FunBound.toMacroString(funBound, nameMacroString)
-            else -> "unknown_fun_bound"
-        }
-    }
+    private fun toMacroString(type: OtpErlangTuple,
+                              decompiler: MacroNameArity,
+                              macroNameArity: org.elixir_lang.beam.MacroNameArity): MacroString =
+            when (val funBound = funBound(type)) {
+                is OtpErlangList -> FunBound.toMacroString(funBound, decompiler, macroNameArity)
+                else -> "unknown_fun_bound"
+            }
 }

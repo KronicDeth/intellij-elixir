@@ -245,89 +245,89 @@ defmodule Kernel do
 
   # Functions
 
-  @spec !=(term(), term()) :: boolean()
+  @spec term() != term() :: boolean()
   def left@1 != right@1 do
     left@1 != right@1
   end
 
-  @spec !==(term(), term()) :: boolean()
+  @spec term() !== term() :: boolean()
   def left@1 !== right@1 do
     left@1 !== right@1
   end
 
-  @spec *(unknown_type, integer()) :: unknown_type
-  @spec *(integer(), unknown_type) :: unknown_type
-  @spec *(unknown_type, unknown_type) :: unknown_type
-  @spec *(integer(), integer()) :: integer()
+  @spec unknown_type * integer() :: unknown_type
+  @spec integer() * unknown_type :: unknown_type
+  @spec unknown_type * unknown_type :: unknown_type
+  @spec integer() * integer() :: integer()
   def left@1 * right@1 do
     left@1 * right@1
   end
 
-  @spec +(value) :: value when value: number()
+  @spec (+value) :: value when value: number()
   def (+value@1) do
     +value@1
   end
 
-  @spec +(unknown_type, integer()) :: unknown_type
-  @spec +(integer(), unknown_type) :: unknown_type
-  @spec +(unknown_type, unknown_type) :: unknown_type
-  @spec +(integer(), integer()) :: integer()
+  @spec unknown_type + integer() :: unknown_type
+  @spec integer() + unknown_type :: unknown_type
+  @spec unknown_type + unknown_type :: unknown_type
+  @spec integer() + integer() :: integer()
   def left@1 + right@1 do
     left@1 + right@1
   end
 
-  @spec ++([], term()) :: maybe_improper_list()
+  @spec [] ++ term() :: maybe_improper_list()
   def left@1 ++ right@1 do
     left@1 ++ right@1
   end
 
-  @spec -(unknown_type) :: unknown_type
-  @spec -(neg_integer()) :: pos_integer()
-  @spec -(pos_integer()) :: neg_integer()
-  @spec -(0) :: 0
+  @spec (-unknown_type) :: unknown_type
+  @spec (-neg_integer()) :: pos_integer()
+  @spec (-pos_integer()) :: neg_integer()
+  @spec (-0) :: 0
   def (-value@1) do
     -value@1
   end
 
-  @spec -(unknown_type, integer()) :: unknown_type
-  @spec -(integer(), unknown_type) :: unknown_type
-  @spec -(unknown_type, unknown_type) :: unknown_type
-  @spec -(integer(), integer()) :: integer()
+  @spec unknown_type - integer() :: unknown_type
+  @spec integer() - unknown_type :: unknown_type
+  @spec unknown_type - unknown_type :: unknown_type
+  @spec integer() - integer() :: integer()
   def left@1 - right@1 do
     left@1 - right@1
   end
 
-  @spec --([], []) :: []
+  @spec [] -- [] :: []
   def left@1 -- right@1 do
     left@1 -- right@1
   end
 
-  @spec /(number(), number()) :: unknown_type
+  @spec number() / number() :: unknown_type
   def left@1 / right@1 do
     left@1 / right@1
   end
 
-  @spec <(term(), term()) :: boolean()
+  @spec term() < term() :: boolean()
   def left@1 < right@1 do
     left@1 < right@1
   end
 
-  @spec <=(term(), term()) :: boolean()
+  @spec term() <= term() :: boolean()
   def left@1 <= right@1 do
     left@1 <= right@1
   end
 
-  @spec ==(term(), term()) :: boolean()
+  @spec term() == term() :: boolean()
   def left@1 == right@1 do
     left@1 == right@1
   end
 
-  @spec ===(term(), term()) :: boolean()
+  @spec term() === term() :: boolean()
   def left@1 === right@1 do
     left@1 === right@1
   end
 
-  @spec =~(String.t(), (String.t() | Regex.t())) :: boolean()
+  @spec String.t() =~ (String.t() | Regex.t()) :: boolean()
   def left@1 =~ <<>> when :erlang.is_binary(left@1) do
     true
   end
@@ -340,12 +340,12 @@ defmodule Kernel do
     Regex.match?(right@1, left@1)
   end
 
-  @spec >(term(), term()) :: boolean()
+  @spec term() > term() :: boolean()
   def left@1 > right@1 do
     left@1 > right@1
   end
 
-  @spec >=(term(), term()) :: boolean()
+  @spec term() >= term() :: boolean()
   def left@1 >= right@1 do
     left@1 >= right@1
   end

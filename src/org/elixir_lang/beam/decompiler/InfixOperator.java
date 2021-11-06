@@ -90,7 +90,7 @@ public class InfixOperator extends Default {
     }
 
     @Override
-    protected String[] parameters(@NotNull org.elixir_lang.beam.MacroNameArity macroNameArity) {
+    public String[] parameters(@NotNull org.elixir_lang.beam.MacroNameArity macroNameArity) {
         return new String[]{"left", "right"};
     }
 

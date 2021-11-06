@@ -31,20 +31,9 @@ class Clause(val attributes: Attributes, val function: Function, val term: OtpEr
             org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Clause.guardSequenceMacroString(term)
 
     private fun patternSequenceMacroStringDeclaredScope() =
-        when (val patternSequence = toPatternSequence(term)) {
-            is OtpErlangList -> patternSequenceMacroStringDeclaredScope(patternSequence)
-            else -> MacroStringDeclaredScope("unknown_sequence", Scope.EMPTY)
-        }
-
-    private fun patternSequenceMacroStringDeclaredScope(term: OtpErlangList): MacroStringDeclaredScope =
-            Sequence.toMacroStringDeclaredScope(term, Scope.EMPTY.copy(pinning = true)) { macroStringList ->
-                val macroStringBuilder = StringBuilder()
-                val macroNameArity = function.macroNameArity
-
-                function.decompiler.appendSignature(macroStringBuilder, macroNameArity, macroNameArity.name, macroStringList.toTypedArray())
-
-                macroStringBuilder.toString()
-            }
+            toPatternSequence(term)
+                    ?.let { Sequence.toMacroStringDeclaredScope(it, function.decompiler, function.macroNameArity) }
+                    ?: Sequence.unknown()
 
     companion object {
         fun from(term: OtpErlangObject, attributes: Attributes, function: Function): Clause? =
