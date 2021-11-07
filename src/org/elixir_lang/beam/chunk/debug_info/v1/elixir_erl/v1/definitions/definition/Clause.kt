@@ -9,6 +9,7 @@ import org.elixir_lang.beam.Decompiler.Companion.decompiler
 import org.elixir_lang.beam.chunk.Keyword
 import org.elixir_lang.beam.chunk.debug_info.logger
 import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.definitions.Definition
+import org.elixir_lang.beam.decompiler.Options
 import org.elixir_lang.beam.term.inspect
 import org.elixir_lang.toOtpErlangList
 import java.lang.StringBuilder
@@ -28,7 +29,7 @@ class Clause(
         definition.macroNameArity?.let { macroNameArity ->
             decompiler(macroNameArity)?.let { decompiler ->
                 val decompiled = StringBuilder()
-                val argumentStrings = this.arguments?.map { Macro.toString(it) }.orEmpty().toTypedArray()
+                val argumentStrings = this.arguments.map { Macro.toString(it) }.orEmpty().toTypedArray()
                 decompiler.appendSignature(decompiled, macroNameArity, macroNameArity.name, argumentStrings)
 
                 decompiled.toString()
@@ -36,15 +37,20 @@ class Clause(
         } ?: "${definition.name}(${argumentsToString(this.arguments)})${guardsToString(this.guards)}"
     }
 
-    fun toMacroString(): String? =
+    fun toMacroString(options: Options): String? =
         definition.macro?.let { macro ->
-            val blockMacroString = try {
+            "$macro $signature do\n${blockMacroString(options).prependIndent("  ")}\nend"
+        }
+
+    private fun blockMacroString(options: Options): String =
+        if (options.decompileBodies) {
+            try {
                 Macro.toString(block)
             } catch (stackOverflowError: StackOverflowError) {
                 "# Body not decompiled due to stack overflow in Macro."
             }
-
-            "$macro $signature do\n${blockMacroString.prependIndent("  ")}\nend"
+        } else {
+            "# Body not decompiled due to too many definitions in module"
         }
 
     companion object {

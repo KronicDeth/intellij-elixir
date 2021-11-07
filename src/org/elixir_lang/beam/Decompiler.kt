@@ -126,7 +126,7 @@ class Decompiler : BinaryFileDecompiler {
             }
 
             documentation?.docs?.typeDocumentedByArityByName()?.let { appendTypes(decompiled, it) } ?:
-            debugInfo?.let { appendTypes(decompiled, it) }
+            debugInfo?.let { appendTypes(decompiled, it, Options()) }
         }
 
         private fun appendTypes(decompiled: StringBuilder, documentedByArityByName: Map<String, Map<Int, Documented>>) {
@@ -172,24 +172,25 @@ class Decompiler : BinaryFileDecompiler {
             }
         }
 
-        private fun appendTypes(decompiled: StringBuilder, debugInfo: DebugInfo) {
+        private fun appendTypes(decompiled: StringBuilder, debugInfo: DebugInfo, options: Options) {
             when (debugInfo) {
-                is AbstractCodeCompileOptions -> appendTypes(decompiled, debugInfo)
+                is AbstractCodeCompileOptions -> appendTypes(decompiled, debugInfo, options)
                 else -> Unit
             }
         }
 
-        private fun appendTypes(decompiled: StringBuilder, abstractCodeCompileOptions: AbstractCodeCompileOptions) {
+        private fun appendTypes(decompiled: StringBuilder, abstractCodeCompileOptions: AbstractCodeCompileOptions, decompilerOptions: Options) {
             val macroStringAttributesByElixirAttributeName = abstractCodeCompileOptions.attributes.macroStringAttributes.filterIsInstance<Type>().groupBy { it.elixirAttributeName }
 
-            appendTypes(decompiled, macroStringAttributesByElixirAttributeName, "type", "Types")
-            appendTypes(decompiled, macroStringAttributesByElixirAttributeName, "typep", "Private Types")
+            appendTypes(decompiled, macroStringAttributesByElixirAttributeName, "type", "Types", decompilerOptions)
+            appendTypes(decompiled, macroStringAttributesByElixirAttributeName, "typep", "Private Types", decompilerOptions)
         }
 
         private fun appendTypes(decompiled: StringBuilder,
                                 macroStringAttributesByElixirAttributeName: Map<String, List<Type>>,
                                 elixirAttributeName: String,
-                                title: String) {
+                                title: String,
+                                options: Options) {
             val macroStringAttributes = macroStringAttributesByElixirAttributeName[elixirAttributeName]
 
             if (!macroStringAttributes.isNullOrEmpty()) {
@@ -198,7 +199,7 @@ class Decompiler : BinaryFileDecompiler {
                 for (macroStringAttribute in macroStringAttributes.sortedBy { it.name }) {
                     decompiled
                             .append('\n')
-                            .append("  ").append(macroStringAttribute.toMacroString()).append('\n')
+                            .append("  ").append(macroStringAttribute.toMacroString(options)).append('\n')
                 }
             }
         }
@@ -219,6 +220,7 @@ class Decompiler : BinaryFileDecompiler {
                                           debugInfo: DebugInfo?,
                                           documentation: Documentation?) {
             var lastMacroNameArity: MacroNameArity? = null
+            val options = options(macroNameAritySortedSet)
             for (macroNameArity in macroNameAritySortedSet) {
                 val macro = macroNameArity.macro
                 if (lastMacroNameArity == null) {
@@ -256,11 +258,14 @@ class Decompiler : BinaryFileDecompiler {
                         }
                     }
                 }
-                appendSpec(decompiled, macroNameArity, debugInfo)
-                appendMacroNameArity(decompiled, macroNameArity, debugInfo, documentation)
+                appendSpec(decompiled, macroNameArity, debugInfo, options)
+                appendMacroNameArity(decompiled, macroNameArity, debugInfo, documentation, options)
                 lastMacroNameArity = macroNameArity
             }
         }
+
+        private fun options(macroNameAritySortedSet: SortedSet<MacroNameArity>) =
+                Options(decompileBodies = macroNameAritySortedSet.size < 500)
 
         private fun appendHeader(decompiled: StringBuilder, name: String) {
             decompiled
@@ -334,16 +339,20 @@ class Decompiler : BinaryFileDecompiler {
             }
         }
 
-        private fun appendSpec(decompiled: StringBuilder, macroNameArity: MacroNameArity, debugInfo: DebugInfo?) {
+        private fun appendSpec(decompiled: StringBuilder,
+                               macroNameArity: MacroNameArity,
+                               debugInfo: DebugInfo?,
+                               options: Options) {
             when (debugInfo) {
-                is AbstractCodeCompileOptions -> appendSpec(decompiled, macroNameArity, debugInfo)
+                is AbstractCodeCompileOptions -> appendSpec(decompiled, macroNameArity, debugInfo, options)
                 else -> Unit
             }
         }
 
         private fun appendSpec(decompiled: StringBuilder,
                                macroNameArity: MacroNameArity,
-                               debugInfo: AbstractCodeCompileOptions) {
+                               debugInfo: AbstractCodeCompileOptions,
+                               options: Options) {
             debugInfo
                     .attributes.macroStringAttributes
                     .find {
@@ -352,34 +361,40 @@ class Decompiler : BinaryFileDecompiler {
                                 it.arity == macroNameArity.arity.toBigInteger()
                     }
                     ?.let { spec ->
-                        decompiled.append(spec.toMacroString().prependIndentToNonBlank()).append('\n')
+                        decompiled.append(spec.toMacroString(options).prependIndentToNonBlank()).append('\n')
                     }
         }
 
         private fun appendMacroNameArity(decompiled: StringBuilder,
                                          macroNameArity: MacroNameArity,
                                          debugInfo: DebugInfo?,
-                                         documentation: Documentation?) =
-            appendMacroNameArity(decompiled, macroNameArity, debugInfo) || appendMacroNameArity(decompiled, macroNameArity, documentation)
+                                         documentation: Documentation?,
+                                         options: Options) =
+            appendMacroNameArity(decompiled, macroNameArity, debugInfo, options) ||
+                    appendMacroNameArity(decompiled, macroNameArity, documentation)
 
         private fun appendMacroNameArity(decompiled: StringBuilder,
                                          macroNameArity: MacroNameArity,
-                                         debugInfo: DebugInfo?): Boolean =
+                                         debugInfo: DebugInfo?,
+                                         options: Options): Boolean =
                 when (debugInfo) {
-                    is AbstractCodeCompileOptions -> appendMacroNameArity(decompiled, macroNameArity, debugInfo)
-                    is org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.V1 -> appendMacroNameArity(decompiled, macroNameArity, debugInfo)
+                    is AbstractCodeCompileOptions ->
+                        appendMacroNameArity(decompiled, macroNameArity, debugInfo, options)
+                    is org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.V1 ->
+                        appendMacroNameArity(decompiled, macroNameArity, debugInfo, options)
                     else -> false
                 }
 
         private fun appendMacroNameArity(decompiled: StringBuilder,
                                          macroNameArity: MacroNameArity,
-                                         debugInfo: AbstractCodeCompileOptions): Boolean =
+                                         debugInfo: AbstractCodeCompileOptions,
+                                         options: Options): Boolean =
                 when (macroNameArity.macro) {
                     DEF, DEFP -> {
                         val function = debugInfo.functions.byNameArity[macroNameArity.toNameArity()]
 
                         if (function != null) {
-                            decompiled.append(function.toMacroString().prependIndentToNonBlank()).append('\n')
+                            decompiled.append(function.toMacroString(options).prependIndentToNonBlank()).append('\n')
 
                             true
                         } else {
@@ -391,8 +406,9 @@ class Decompiler : BinaryFileDecompiler {
 
         private fun appendMacroNameArity(decompiled: StringBuilder,
                                          macroNameArity: MacroNameArity,
-                                         debugInfo: org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.V1): Boolean =
-                debugInfo.definitions?.get(macroNameArity)?.toMacroString(10)?.let { macroString ->
+                                         debugInfo: org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.V1,
+                                         options: Options): Boolean =
+                debugInfo.definitions?.get(macroNameArity)?.toMacroString(options)?.let { macroString ->
                     decompiled.append(macroString.prependIndentToNonBlank()).append('\n')
 
                     true

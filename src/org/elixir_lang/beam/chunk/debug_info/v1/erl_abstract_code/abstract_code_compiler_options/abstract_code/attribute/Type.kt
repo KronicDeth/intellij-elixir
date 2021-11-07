@@ -8,6 +8,7 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Attribute
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Attributes
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Scope
+import org.elixir_lang.beam.decompiler.Options
 
 private const val ATTRIBUTE_NAME = "type"
 
@@ -16,7 +17,7 @@ class Type(val attributes: Attributes, attribute: Attribute): MacroString(attrib
     val name by lazy { ((attribute.value as? OtpErlangTuple)?.elementAt(0) as? OtpErlangAtom)?.atomValue() }
     val value by lazy { ((attribute.value as? OtpErlangTuple)?.elementAt(1) as? OtpErlangTuple) }
 
-    override fun toMacroString(): String {
+    override fun toMacroString(options: Options): String {
         val elixirAttributeName = elixirAttributeName()
         val subtypeMacroString = subtypeMacroString()
 

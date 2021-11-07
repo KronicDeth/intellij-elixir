@@ -5,6 +5,7 @@ import org.elixir_lang.beam.Decompiler
 import org.elixir_lang.beam.MacroNameArity
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.function.Clause
 import org.elixir_lang.beam.decompiler.Default
+import org.elixir_lang.beam.decompiler.Options
 import org.elixir_lang.psi.call.name.Function.DEF
 
 private const val TAG = "function"
@@ -29,7 +30,8 @@ class Function(term: OtpErlangTuple, attributes: Attributes): Node(term) {
     }
     val decompiler by lazy { Decompiler.decompiler(macroNameArity) ?: Default.INSTANCE }
 
-    override fun toMacroString(): String = clauses.joinToString("\n\n", transform = Clause::toMacroString)
+    override fun toMacroString(options: Options): String =
+            clauses.joinToString("\n\n") { it.toMacroString(options) }
 
     companion object {
         fun from(term: OtpErlangObject, attributes: Attributes): Function? =

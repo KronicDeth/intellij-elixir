@@ -6,15 +6,20 @@ import com.ericsson.otp.erlang.OtpErlangTuple
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.*
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Clause.toPatternSequence
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Function
+import org.elixir_lang.beam.decompiler.Options
 
 private const val TAG = "clause"
 
 class Clause(val attributes: Attributes, val function: Function, val term: OtpErlangTuple) : Node(term) {
     val head by lazy { headMacroStringDeclaredScope.macroString }
 
-    override fun toMacroString(): String {
+    override fun toMacroString(options: Options): String {
         val (headMacroString, headDeclaredScope) = headMacroStringDeclaredScope
-        val indentedBody = org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Clause.bodyMacroString(term, headDeclaredScope)
+        val indentedBody = if (options.decompileBodies) {
+            org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Clause.bodyMacroString(term, headDeclaredScope)
+        } else {
+            "# Body not decompiled due to too many definitions in module"
+        }
 
         return "def $headMacroString do\n" +
                 "  $indentedBody\n" +

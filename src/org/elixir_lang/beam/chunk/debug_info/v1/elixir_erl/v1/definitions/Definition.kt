@@ -5,7 +5,7 @@ import org.elixir_lang.beam.chunk.Keyword
 import org.elixir_lang.beam.chunk.debug_info.logger
 import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.V1
 import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.definitions.definition.Clause
-import org.elixir_lang.beam.decompiler.MacroNameArity
+import org.elixir_lang.beam.decompiler.Options
 import org.elixir_lang.beam.term.inspect
 
 class Definition(
@@ -43,10 +43,10 @@ class Definition(
         }
     }
 
-    fun toMacroString(clauseLimit: Int): String? =
+    fun toMacroString(options: Options): String? =
             clauses
-                    ?.takeIf { it.size < clauseLimit }
-                    ?.mapNotNull(Clause::toMacroString)
+                    ?.takeIf { it.size < options.clauseLimit }
+                    ?.mapNotNull {  it.toMacroString(options) }
                     ?.takeIf(List<String>::isNotEmpty)
                     ?.joinToString("\n\n")
 
