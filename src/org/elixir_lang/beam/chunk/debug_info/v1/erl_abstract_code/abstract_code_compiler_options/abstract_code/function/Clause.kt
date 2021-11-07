@@ -14,15 +14,17 @@ class Clause(val attributes: Attributes, val function: Function, val term: OtpEr
 
     override fun toMacroString(options: Options): String {
         val (headMacroString, headDeclaredScope) = headMacroStringDeclaredScope
-        val indentedBody = if (options.decompileBodies) {
-            org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Clause.bodyMacroString(term, headDeclaredScope)
-        } else {
-            "# Body not decompiled due to too many definitions in module"
-        }
+        val prefix = "${function.macroNameArity.macro} $headMacroString"
 
-        return "${function.macroNameArity.macro} $headMacroString do\n" +
-                "  $indentedBody\n" +
-                "end"
+        return if (options.decompileBodies) {
+            val indentedBody = org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Clause.bodyMacroString(term, headDeclaredScope)
+
+            "$prefix do\n" +
+            "  $indentedBody\n" +
+            "end"
+        } else {
+            "$prefix, do: ..."
+        }
     }
 
     private val headMacroStringDeclaredScope by lazy {

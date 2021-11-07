@@ -39,18 +39,17 @@ class Clause(
 
     fun toMacroString(options: Options): String? =
         definition.macro?.let { macro ->
-            "$macro $signature do\n${blockMacroString(options).prependIndent("  ")}\nend"
-        }
+            val prefix = "$macro $signature"
 
-    private fun blockMacroString(options: Options): String =
-        if (options.decompileBodies) {
-            try {
-                Macro.toString(block)
-            } catch (stackOverflowError: StackOverflowError) {
-                "# Body not decompiled due to stack overflow in Macro."
+            if (options.decompileBodies) {
+                try {
+                    "$prefix do\n${Macro.toString(block).prependIndent("  ")}\nend"
+                } catch (stackOverflowError: StackOverflowError) {
+                    "$prefix, do: ..."
+                }
+            } else {
+                "$prefix, do: ..."
             }
-        } else {
-            "# Body not decompiled due to too many definitions in module"
         }
 
     companion object {
