@@ -42,7 +42,7 @@ public class BeamTest {
 
         assertTrue("There are no callDefinitions", callDefinitionCount > 0);
 
-        SortedSet<MacroNameArity> macroNameAritySortedSet = CallDefinitions.macroNameAritySortedSet(beam, atoms);
+        SortedSet<MacroNameArity> macroNameAritySortedSet = CallDefinitions.macroNameAritySortedSetByMacro(beam, atoms);
 
         assertEquals("There are nameless callDefinitions", callDefinitionCount, macroNameAritySortedSet.size());
 
@@ -74,7 +74,7 @@ public class BeamTest {
 
         assertTrue("There are no callDefinitions", callDefinitionCount > 0);
 
-        SortedSet<MacroNameArity> macroNameAritySortedSet = CallDefinitions.macroNameAritySortedSet(beam, atoms);
+        SortedSet<MacroNameArity> macroNameAritySortedSet = CallDefinitions.macroNameAritySortedSetByMacro(beam, atoms);
 
         assertEquals("There are nameless callDefinitions", callDefinitionCount, macroNameAritySortedSet.size());
 

@@ -5,6 +5,7 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileTypes.BinaryFileDecompiler
 import com.intellij.openapi.vfs.VirtualFile
 import org.elixir_lang.beam.Beam.Companion.from
+import org.elixir_lang.beam.MacroNameArity.MACRO_ORDER
 import org.elixir_lang.beam.chunk.Atoms
 import org.elixir_lang.beam.chunk.CallDefinitions
 import org.elixir_lang.beam.chunk.Chunk.TypeID
@@ -20,8 +21,7 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_
 import org.elixir_lang.beam.decompiler.*
 import org.elixir_lang.beam.term.inspect
 import org.elixir_lang.psi.call.name.Function
-import org.elixir_lang.psi.call.name.Function.DEF
-import org.elixir_lang.psi.call.name.Function.DEFP
+import org.elixir_lang.psi.call.name.Function.*
 import org.elixir_lang.psi.call.name.Module
 import org.elixir_lang.reference.resolver.Type.BUILTIN_ARITY_BY_NAME
 import java.util.*
@@ -209,63 +209,84 @@ class Decompiler : BinaryFileDecompiler {
                                           atoms: Atoms,
                                           debugInfo: DebugInfo?,
                                           documentation: Documentation?) {
-            val macroNameAritySortedSet = CallDefinitions.macroNameAritySortedSet(beam, atoms)
-            appendCallDefinitions(decompiled, macroNameAritySortedSet, debugInfo, documentation)
+            val macroNameAritySortedSetByMacro = CallDefinitions.macroNameAritySortedSetByMacro(beam, atoms)
+            appendCallDefinitions(decompiled, macroNameAritySortedSetByMacro, debugInfo, documentation)
         }
 
         private fun macroToHeaderName(macro: String): String = HEADER_NAME_BY_MACRO[macro]!!
 
         private fun appendCallDefinitions(decompiled: StringBuilder,
-                                          macroNameAritySortedSet: SortedSet<MacroNameArity>,
+                                          macroNameAritySortedSetByMacro: Map<String, SortedSet<MacroNameArity>>,
                                           debugInfo: DebugInfo?,
                                           documentation: Documentation?) {
-            var lastMacroNameArity: MacroNameArity? = null
-            val options = options(macroNameAritySortedSet)
-            for (macroNameArity in macroNameAritySortedSet) {
-                val macro = macroNameArity.macro
-                if (lastMacroNameArity == null) {
-                    appendHeader(decompiled, macroToHeaderName(macro))
-                } else if (lastMacroNameArity.macro != macro) {
-                    appendHeader(decompiled, macroToHeaderName(macro))
-                }
-                decompiled.append("\n")
+            val options = options(macroNameAritySortedSetByMacro)
 
-                if (documentation != null) {
-                    documentation.docs?.let { docs ->
-                        docs.deprecated(macroNameArity)?.let { deprecated ->
-                            when (deprecated) {
-                                is OtpErlangBinary ->
-                                    decompiled.append("\n  @deprecated \"\"\"\n")
-                                            .append("  ")
-                                            .append(String(deprecated.binaryValue()))
-                                            .append("\n  \"\"\"\n\n")
-                                else -> {
-                                    logger.error("Don't know how to decompiled @deprecated value (${inspect(deprecated)})")
-                                }
-                            }
+            for (macro in MACRO_ORDER) {
+                val macroNameAritySortedSet = macroNameAritySortedSetByMacro[macro]
+
+                if (macroNameAritySortedSet != null && options.decompileMacro(macro)) {
+                    for ((index, macroNameArity) in macroNameAritySortedSet.withIndex()) {
+                        if (index == 0) {
+                            appendHeader(decompiled, macroToHeaderName(macro))
                         }
+                        decompiled.append("\n")
 
-                        docs.doc(macroNameArity)?.let { doc ->
-                            when (doc) {
-                                is None -> Unit
-                                is Hidden -> appendDocumentation(decompiled, "doc", false)
-                                is MarkdownByLanguage -> {
-                                    for ((_language, formatted) in doc.formattedByLanguage) {
-                                        appendDocumentation(decompiled, "doc", formatted)
+                        if (documentation != null) {
+                            documentation.docs?.let { docs ->
+                                docs.deprecated(macroNameArity)?.let { deprecated ->
+                                    when (deprecated) {
+                                        is OtpErlangBinary ->
+                                            decompiled.append("\n  @deprecated \"\"\"\n")
+                                                    .append("  ")
+                                                    .append(String(deprecated.binaryValue()))
+                                                    .append("\n  \"\"\"\n\n")
+                                        else -> {
+                                            logger.error("Don't know how to decompiled @deprecated value (${inspect(deprecated)})")
+                                        }
+                                    }
+                                }
+
+                                docs.doc(macroNameArity)?.let { doc ->
+                                    when (doc) {
+                                        is None -> Unit
+                                        is Hidden -> appendDocumentation(decompiled, "doc", false)
+                                        is MarkdownByLanguage -> {
+                                            for ((_language, formatted) in doc.formattedByLanguage) {
+                                                appendDocumentation(decompiled, "doc", formatted)
+                                            }
+                                        }
                                     }
                                 }
                             }
                         }
+                        appendSpec(decompiled, macroNameArity, debugInfo, options)
+                        appendMacroNameArity(decompiled, macroNameArity, debugInfo, documentation, options)
                     }
                 }
-                appendSpec(decompiled, macroNameArity, debugInfo, options)
-                appendMacroNameArity(decompiled, macroNameArity, debugInfo, documentation, options)
-                lastMacroNameArity = macroNameArity
             }
         }
 
-        private fun options(macroNameAritySortedSet: SortedSet<MacroNameArity>) =
-                Options(decompileBodies = macroNameAritySortedSet.size < 500)
+        private const val definitionLimit = 500
+
+        private fun options(macroNameAritySortedSet: Map<String, SortedSet<MacroNameArity>>): Options {
+            val defmacroCount = macroNameAritySortedSet[DEFMACRO]?.size ?: 0
+            val defCount = macroNameAritySortedSet[DEF]?.size ?: 0
+            val publicCount = defmacroCount + defCount
+
+            return if (publicCount > definitionLimit) {
+               Options(decompileBodies = false, decompileMacros = setOf(DEFMACRO, DEF))
+            } else {
+                val defmacropCount = macroNameAritySortedSet[DEFMACROP]?.size ?: 0
+                val defpCount = macroNameAritySortedSet[DEFP]?.size ?: 0
+                val privateCount = defmacropCount + defpCount
+
+                if (publicCount + privateCount > definitionLimit) {
+                    Options(decompileBodies = false, decompileMacros = setOf(DEFMACRO, DEF))
+                } else {
+                    Options(decompileBodies = true, decompileMacros = setOf(DEFMACRO, DEFMACROP, DEF, DEFP))
+                }
+            }
+        }
 
         private fun appendHeader(decompiled: StringBuilder, name: String) {
             decompiled

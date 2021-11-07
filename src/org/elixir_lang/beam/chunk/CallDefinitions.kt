@@ -1,128 +1,75 @@
-package org.elixir_lang.beam.chunk;
+package org.elixir_lang.beam.chunk
 
-import com.intellij.openapi.util.Pair;
-import gnu.trove.THashMap;
-import gnu.trove.THashSet;
-import org.elixir_lang.Visibility;
-import org.elixir_lang.beam.Beam;
-import org.elixir_lang.beam.MacroNameArity;
-import org.elixir_lang.beam.chunk.call_definitions.CallDefinition;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import gnu.trove.THashSet
+import org.elixir_lang.Visibility
+import org.elixir_lang.beam.Beam
+import org.elixir_lang.beam.chunk.Chunk.Companion.unsignedInt
+import org.elixir_lang.beam.chunk.call_definitions.CallDefinition.Companion.from
+import org.elixir_lang.beam.chunk.Chunk.TypeID
+import org.elixir_lang.beam.MacroNameArity
+import org.elixir_lang.beam.chunk.call_definitions.CallDefinition
+import java.util.*
 
-import java.util.*;
-
-import static org.elixir_lang.beam.chunk.Chunk.unsignedInt;
-
-public class CallDefinitions {
-    /*
-     * CONSTANTS
-     */
-
-    private static final Map<Chunk.TypeID, Visibility> VISIBILITY_BY_TYPE_ID = new THashMap<>();
-
-    static {
-        VISIBILITY_BY_TYPE_ID.put(Chunk.TypeID.EXPT, Visibility.PUBLIC);
-        VISIBILITY_BY_TYPE_ID.put(Chunk.TypeID.LOCT, Visibility.PRIVATE);
-    }
-
-    /*
-     * Fields
-     */
-
-    @NotNull
-    public Collection<CallDefinition> callDefinitionCollection;
-    @NotNull
-    private final Chunk.TypeID typeID;
-
-    /*
-     * Constructors
-     */
-
-    public CallDefinitions(@NotNull Chunk.TypeID typeID, @NotNull Collection<CallDefinition> callDefinitionCollection) {
-        this.typeID = typeID;
-        this.callDefinitionCollection = callDefinitionCollection;
-    }
-
-    /*
-     * Static Methods
-     */
-
-    @Nullable
-    public static CallDefinitions from(@NotNull Chunk chunk, @NotNull Chunk.TypeID typeID, @Nullable Atoms atoms) {
-        CallDefinitions callDefinitions = null;
-
-        if (chunk.typeID.equals(typeID.toString()) && chunk.data.length >= 4) {
-            Collection<CallDefinition> callDefinitionCollection = new THashSet<CallDefinition>();
-
-            int offset = 0;
-
-            Pair<Long, Integer> exportCountByteCount = unsignedInt(chunk.data, 0);
-            long exportCount = exportCountByteCount.first;
-            offset += exportCountByteCount.second;
-
-            for (long i = 0; i < exportCount; i++) {
-                kotlin.Pair<CallDefinition, Integer> callDefinitionByteCount =
-                        CallDefinition.Companion.from(chunk, offset, atoms);
-
-                callDefinitionCollection.add(callDefinitionByteCount.getFirst());
-                offset += callDefinitionByteCount.getSecond();
-            }
-
-            callDefinitions = new CallDefinitions(typeID, callDefinitionCollection);
-        }
-
-        return callDefinitions;
-    }
-
-    @NotNull
-    public static SortedSet<MacroNameArity> macroNameAritySortedSet(@NotNull Beam beam, @Nullable Atoms atoms) {
-        return macroNameAritySortedSet(beam.callDefinitionsList(atoms));
-    }
-
-    @NotNull
-    public static SortedSet<MacroNameArity> macroNameAritySortedSet(
-            @NotNull List<CallDefinitions> callDefinitionsList
-    ) {
-        return callDefinitionsList.stream()
-                .map(CallDefinitions::macroNameAritySortedSet)
-                .collect(TreeSet::new, TreeSet::addAll, TreeSet::addAll);
-    }
-
+class CallDefinitions(private val typeID: TypeID, var callDefinitionCollection: Collection<CallDefinition>) {
     /**
-     * Set of {@link MacroNameArity} sorted as
-     * 1. {@link MacroNameArity#macro}, so that {@code defmacro} is before {@code def}
-     * 2. {@link MacroNameArity#name} is sorted alphabetically
-     * 3. {@link MacroNameArity#arity} is sorted ascending
+     * Map of sets of [MacroNameArity] sorted as
+     * 1. [MacroNameArity.name] is sorted alphabetically
+     * 2. [MacroNameArity.arity] is sorted ascending
      *
-     * @return The sorted set will be the same size as {@link #callDefinitionCollection} unless
-     *   {@link CallDefinition#getName()} returns {@code null} for some {@link CallDefinition}s.
+     * @return The sorted sets collectively will be the same size as [.callDefinitionCollection] unless
+     * [CallDefinition.name] returns `null` for some [CallDefinition]s.
      */
-    @NotNull
-    public SortedSet<MacroNameArity> macroNameAritySortedSet() {
-        SortedSet<MacroNameArity> macroNameAritySortedSet = new TreeSet<MacroNameArity>();
-
-        for (CallDefinition callDefinition : callDefinitionCollection) {
-            String exportName = callDefinition.getName();
-
+    fun macroNameAritySortedSetByMacro(): Map<String, SortedSet<MacroNameArity>> =
+        callDefinitionCollection.fold(mutableMapOf()) { acc, callDefinition ->
+            val exportName = callDefinition.name
             if (exportName != null) {
-                MacroNameArity macroNameArity = new MacroNameArity(visibility(), exportName, (int) callDefinition.getArity());
-                macroNameAritySortedSet.add(macroNameArity);
+                val macroNameArity = MacroNameArity(visibility(), exportName, callDefinition.arity.toInt())
+                val macro = macroNameArity.macro
+                val macroNameAritySortedSet = acc.computeIfAbsent(macro) { TreeSet() }
+                macroNameAritySortedSet.add(macroNameArity)
             }
+
+            acc
         }
 
-        return macroNameAritySortedSet;
-    }
-
-    @NotNull
-    private Visibility visibility() {
-        return VISIBILITY_BY_TYPE_ID.get(typeID);
-    }
+    private fun visibility(): Visibility = VISIBILITY_BY_TYPE_ID[typeID]!!
 
     /**
      * The number of call_definitions
      */
-    public int size() {
-        return callDefinitionCollection.size();
+    fun size(): Int = callDefinitionCollection.size
+
+    companion object {
+        private val VISIBILITY_BY_TYPE_ID: Map<TypeID, Visibility> = mapOf(TypeID.EXPT to Visibility.PUBLIC, TypeID.LOCT to Visibility.PRIVATE)
+
+        fun from(chunk: Chunk, typeID: TypeID, atoms: Atoms?): CallDefinitions? =
+            if (chunk.typeID == typeID.toString() && chunk.data.size >= 4) {
+                val callDefinitionCollection: MutableCollection<CallDefinition> = THashSet()
+                var offset = 0
+                val exportCountByteCount = unsignedInt(chunk.data, 0)
+                val exportCount = exportCountByteCount.first
+                offset += exportCountByteCount.second
+                for (i in 0 until exportCount) {
+                    val (first, second) = from(chunk, offset, atoms)
+                    callDefinitionCollection.add(first)
+                    offset += second
+                }
+                CallDefinitions(typeID, callDefinitionCollection)
+            } else {
+                null
+            }
+
+        fun macroNameAritySortedSetByMacro(beam: Beam, atoms: Atoms): Map<String, SortedSet<MacroNameArity>> =
+            beam.callDefinitionsList(atoms).fold(mutableMapOf()) { acc, callDefinitions ->
+                val macroNameAritySortedSetByMacro = callDefinitions.macroNameAritySortedSetByMacro()
+
+                for ((macro, macroNameAritySortedSet) in macroNameAritySortedSetByMacro) {
+                    val accMacroNameAritySortedSet = acc.computeIfAbsent(macro) { TreeSet() }
+
+                    accMacroNameAritySortedSet.addAll(macroNameAritySortedSet)
+                }
+
+                acc
+            }
     }
 }
