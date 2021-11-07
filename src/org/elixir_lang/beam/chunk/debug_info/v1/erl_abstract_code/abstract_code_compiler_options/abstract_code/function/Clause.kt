@@ -1,6 +1,5 @@
 package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.function
 
-import com.ericsson.otp.erlang.OtpErlangList
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.*
@@ -21,7 +20,7 @@ class Clause(val attributes: Attributes, val function: Function, val term: OtpEr
             "# Body not decompiled due to too many definitions in module"
         }
 
-        return "def $headMacroString do\n" +
+        return "${function.macroNameArity.macro} $headMacroString do\n" +
                 "  $indentedBody\n" +
                 "end"
     }
