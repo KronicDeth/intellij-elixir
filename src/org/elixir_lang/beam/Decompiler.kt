@@ -166,7 +166,7 @@ class Decompiler : BinaryFileDecompiler {
                             decompiled.append("type").append(i)
                         }
 
-                        decompiled.append(") :: ... \n")
+                        decompiled.append(") :: ...\n")
                     }
                 }
             }
