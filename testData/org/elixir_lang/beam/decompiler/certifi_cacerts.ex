@@ -3,9 +3,7 @@ defmodule :certifi_cacerts do
 
   # Functions
 
-  def ders() do
-    # body not decompiled
-  end
+  def ders(), do: ...
 
   def module_info() do
     # body not decompiled

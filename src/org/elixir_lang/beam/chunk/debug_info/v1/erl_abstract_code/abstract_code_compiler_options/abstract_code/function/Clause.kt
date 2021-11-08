@@ -19,9 +19,13 @@ class Clause(val attributes: Attributes, val function: Function, val term: OtpEr
         return if (options.decompileBodies) {
             val indentedBody = org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Clause.bodyMacroString(term, headDeclaredScope)
 
-            "$prefix do\n" +
-            "  $indentedBody\n" +
-            "end"
+            if (options.truncateDecompiledBody(indentedBody)) {
+                "$prefix, do: ..."
+            } else {
+                "$prefix do\n" +
+                        "  $indentedBody\n" +
+                        "end"
+            }
         } else {
             "$prefix, do: ..."
         }
