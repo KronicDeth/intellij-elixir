@@ -22,9 +22,13 @@ class Clause(val attributes: Attributes, val function: Function, val term: OtpEr
             if (options.truncateDecompiledBody(indentedBody)) {
                 "$prefix, do: ..."
             } else {
-                "$prefix do\n" +
-                        "  $indentedBody\n" +
-                        "end"
+                if (indentedBody.contains("\n")) {
+                    "$prefix do\n" +
+                            "  $indentedBody\n" +
+                            "end"
+                } else {
+                    "$prefix, do: ${indentedBody.trimIndent()}"
+                }
             }
         } else {
             "$prefix, do: ..."
