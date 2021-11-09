@@ -370,13 +370,13 @@ defmodule Ecto.Query do
 
   # Types
 
-  @type dynamic() :: ... 
-  @type t() :: ... 
+  @type dynamic() :: ...
+  @type t() :: ...
 
   # Macros
 
-  defmacro distinct(p0, p1) do
-    # body not decompiled
+  defmacro distinct(x0, x1) do
+    super(x0, [], x1)
   end
 
   @doc ~S"""
@@ -418,12 +418,12 @@ defmodule Ecto.Query do
 
 
   """
-  defmacro distinct(query, binding \\ [], expr) do
-    # body not decompiled
+  defmacro distinct(query, binding, expr) do
+    Ecto.Query.Builder.Distinct.build(query, binding, expr, __CALLER__)
   end
 
-  defmacro dynamic(p0) do
-    # body not decompiled
+  defmacro dynamic(x0) do
+    super([], x0)
   end
 
   @doc ~S"""
@@ -535,8 +535,8 @@ defmodule Ecto.Query do
       from query, update: ^updates
 
   """
-  defmacro dynamic(binding \\ [], expr) do
-    # body not decompiled
+  defmacro dynamic(binding, expr) do
+    Ecto.Query.Builder.Dynamic.build(binding, expr, __CALLER__)
   end
 
   @doc ~S"""
@@ -566,7 +566,7 @@ defmodule Ecto.Query do
 
   """
   defmacro except(query, other_query) do
-    # body not decompiled
+    Ecto.Query.Builder.Combination.build(:except, query, other_query, __CALLER__)
   end
 
   @doc ~S"""
@@ -591,11 +591,11 @@ defmodule Ecto.Query do
 
   """
   defmacro except_all(query, other_query) do
-    # body not decompiled
+    Ecto.Query.Builder.Combination.build(:except_all, query, other_query, __CALLER__)
   end
 
-  defmacro from(p0) do
-    # body not decompiled
+  defmacro from(x0) do
+    super(x0, [])
   end
 
   @doc ~S"""
@@ -654,12 +654,21 @@ defmodule Ecto.Query do
   as they have no importance in the query sent to the database.
 
   """
-  defmacro from(expr, kw \\ []) do
-    # body not decompiled
+  defmacro from(expr, kw) do
+    (
+      if(Keyword.keyword?(kw)) do
+        raise(ArgumentError, "second argument to `from` must be a compile time keyword list")
+      else
+        nil
+      end
+      {kw, as, prefix, hints} = collect_as_and_prefix_and_hints(kw, nil, nil, nil)
+      {quoted, binds, count_bind} = Ecto.Query.Builder.From.build(expr, __CALLER__, as, prefix, hints)
+      from(kw, __CALLER__, count_bind, quoted, to_query_binds(binds))
+    )
   end
 
-  defmacro group_by(p0, p1) do
-    # body not decompiled
+  defmacro group_by(x0, x1) do
+    super(x0, [], x1)
   end
 
   @doc ~S"""
@@ -696,12 +705,12 @@ defmodule Ecto.Query do
 
 
   """
-  defmacro group_by(query, binding \\ [], expr) do
-    # body not decompiled
+  defmacro group_by(query, binding, expr) do
+    Ecto.Query.Builder.GroupBy.build(query, binding, expr, __CALLER__)
   end
 
-  defmacro having(p0, p1) do
-    # body not decompiled
+  defmacro having(x0, x1) do
+    super(x0, [], x1)
   end
 
   @doc ~S"""
@@ -729,8 +738,8 @@ defmodule Ecto.Query do
       |> select([p], count(p.id))
 
   """
-  defmacro having(query, binding \\ [], expr) do
-    # body not decompiled
+  defmacro having(query, binding, expr) do
+    Ecto.Query.Builder.Filter.build(:having, :and, query, binding, expr, __CALLER__)
   end
 
   @doc ~S"""
@@ -760,7 +769,7 @@ defmodule Ecto.Query do
 
   """
   defmacro intersect(query, other_query) do
-    # body not decompiled
+    Ecto.Query.Builder.Combination.build(:intersect, query, other_query, __CALLER__)
   end
 
   @doc ~S"""
@@ -785,15 +794,15 @@ defmodule Ecto.Query do
 
   """
   defmacro intersect_all(query, other_query) do
-    # body not decompiled
+    Ecto.Query.Builder.Combination.build(:intersect_all, query, other_query, __CALLER__)
   end
 
-  defmacro join(p0, p1, p2) do
-    # body not decompiled
+  defmacro join(x0, x1, x2) do
+    super(x0, x1, [], x2, [])
   end
 
-  defmacro join(p0, p1, p2, p3) do
-    # body not decompiled
+  defmacro join(x0, x1, x2, x3) do
+    super(x0, x1, x2, x3, [])
   end
 
   @doc ~S"""
@@ -932,12 +941,22 @@ defmodule Ecto.Query do
   disclaimers about such functionality.
 
   """
-  defmacro join(query, qual, binding \\ [], expr, opts \\ []) do
-    # body not decompiled
+  defmacro join(query, qual, binding, expr, opts) do
+    (
+      {t, on, as, prefix, hints} = collect_on(opts, nil, nil, nil, nil)
+      with([{key, _} | _] <- t) do
+        raise(ArgumentError, <<"invalid option `"::binary(), String.Chars.to_string(key)::binary(), "` passed to Ecto.Query.join/5, "::binary(), "valid options are: "::binary(), Kernel.inspect([:on, :as, :prefix, :hints])::binary()>>)
+      end
+      elem(Ecto.Query.Builder.Join.build(query, qual, binding, expr, nil, on, as, prefix, hints, __CALLER__), 0)
+    )
   end
 
-  defmacro limit(p0, p1) do
-    # body not decompiled
+  defmacro join(_query, _qual, binding, _expr, opts) do
+    raise(ArgumentError, <<"invalid binding passed to Ecto.Query.join/5, should be "::binary(), "list of variables, got: "::binary(), Macro.to_string(binding)::binary()>>)
+  end
+
+  defmacro limit(x0, x1) do
+    super(x0, [], x1)
   end
 
   @doc ~S"""
@@ -958,12 +977,12 @@ defmodule Ecto.Query do
 
 
   """
-  defmacro limit(query, binding \\ [], expr) do
-    # body not decompiled
+  defmacro limit(query, binding, expr) do
+    Ecto.Query.Builder.LimitOffset.build(:limit, query, binding, expr, __CALLER__)
   end
 
-  defmacro lock(p0, p1) do
-    # body not decompiled
+  defmacro lock(x0, x1) do
+    super(x0, [], x1)
   end
 
   @doc ~S"""
@@ -991,12 +1010,12 @@ defmodule Ecto.Query do
 
 
   """
-  defmacro lock(query, binding \\ [], expr) do
-    # body not decompiled
+  defmacro lock(query, binding, expr) do
+    Ecto.Query.Builder.Lock.build(query, binding, expr, __CALLER__)
   end
 
-  defmacro offset(p0, p1) do
-    # body not decompiled
+  defmacro offset(x0, x1) do
+    super(x0, [], x1)
   end
 
   @doc ~S"""
@@ -1018,12 +1037,12 @@ defmodule Ecto.Query do
 
 
   """
-  defmacro offset(query, binding \\ [], expr) do
-    # body not decompiled
+  defmacro offset(query, binding, expr) do
+    Ecto.Query.Builder.LimitOffset.build(:offset, query, binding, expr, __CALLER__)
   end
 
-  defmacro or_having(p0, p1) do
-    # body not decompiled
+  defmacro or_having(x0, x1) do
+    super(x0, [], x1)
   end
 
   @doc ~S"""
@@ -1045,12 +1064,12 @@ defmodule Ecto.Query do
 
 
   """
-  defmacro or_having(query, binding \\ [], expr) do
-    # body not decompiled
+  defmacro or_having(query, binding, expr) do
+    Ecto.Query.Builder.Filter.build(:having, :or, query, binding, expr, __CALLER__)
   end
 
-  defmacro or_where(p0, p1) do
-    # body not decompiled
+  defmacro or_where(x0, x1) do
+    super(x0, [], x1)
   end
 
   @doc ~S"""
@@ -1099,12 +1118,12 @@ defmodule Ecto.Query do
 
 
   """
-  defmacro or_where(query, binding \\ [], expr) do
-    # body not decompiled
+  defmacro or_where(query, binding, expr) do
+    Ecto.Query.Builder.Filter.build(:where, :or, query, binding, expr, __CALLER__)
   end
 
-  defmacro order_by(p0, p1) do
-    # body not decompiled
+  defmacro order_by(x0, x1) do
+    super(x0, [], x1)
   end
 
   @doc ~S"""
@@ -1161,12 +1180,12 @@ defmodule Ecto.Query do
 
 
   """
-  defmacro order_by(query, binding \\ [], expr) do
-    # body not decompiled
+  defmacro order_by(query, binding, expr) do
+    Ecto.Query.Builder.OrderBy.build(query, binding, expr, __CALLER__)
   end
 
-  defmacro preload(p0, p1) do
-    # body not decompiled
+  defmacro preload(x0, x1) do
+    super(x0, [], x1)
   end
 
   @doc ~S"""
@@ -1319,12 +1338,12 @@ defmodule Ecto.Query do
 
 
   """
-  defmacro preload(query, bindings \\ [], expr) do
-    # body not decompiled
+  defmacro preload(query, bindings, expr) do
+    Ecto.Query.Builder.Preload.build(query, bindings, expr, __CALLER__)
   end
 
-  defmacro select(p0, p1) do
-    # body not decompiled
+  defmacro select(x0, x1) do
+    super(x0, [], x1)
   end
 
   @doc ~S"""
@@ -1384,12 +1403,12 @@ defmodule Ecto.Query do
 
 
   """
-  defmacro select(query, binding \\ [], expr) do
-    # body not decompiled
+  defmacro select(query, binding, expr) do
+    Ecto.Query.Builder.Select.build(:select, query, binding, expr, __CALLER__)
   end
 
-  defmacro select_merge(p0, p1) do
-    # body not decompiled
+  defmacro select_merge(x0, x1) do
+    super(x0, [], x1)
   end
 
   @doc ~S"""
@@ -1447,8 +1466,8 @@ defmodule Ecto.Query do
   associations are always loaded later, overriding any previous value.
 
   """
-  defmacro select_merge(query, binding \\ [], expr) do
-    # body not decompiled
+  defmacro select_merge(query, binding, expr) do
+    Ecto.Query.Builder.Select.build(:merge, query, binding, expr, __CALLER__)
   end
 
   @doc ~S"""
@@ -1478,7 +1497,7 @@ defmodule Ecto.Query do
 
   """
   defmacro union(query, other_query) do
-    # body not decompiled
+    Ecto.Query.Builder.Combination.build(:union, query, other_query, __CALLER__)
   end
 
   @doc ~S"""
@@ -1502,11 +1521,11 @@ defmodule Ecto.Query do
 
   """
   defmacro union_all(query, other_query) do
-    # body not decompiled
+    Ecto.Query.Builder.Combination.build(:union_all, query, other_query, __CALLER__)
   end
 
-  defmacro update(p0, p1) do
-    # body not decompiled
+  defmacro update(x0, x1) do
+    super(x0, [], x1)
   end
 
   @doc ~S"""
@@ -1554,12 +1573,12 @@ defmodule Ecto.Query do
 
 
   """
-  defmacro update(query, binding \\ [], expr) do
-    # body not decompiled
+  defmacro update(query, binding, expr) do
+    Ecto.Query.Builder.Update.build(query, binding, expr, __CALLER__)
   end
 
-  defmacro where(p0, p1) do
-    # body not decompiled
+  defmacro where(x0, x1) do
+    super(x0, [], x1)
   end
 
   @doc ~S"""
@@ -1591,12 +1610,12 @@ defmodule Ecto.Query do
 
 
   """
-  defmacro where(query, binding \\ [], expr) do
-    # body not decompiled
+  defmacro where(query, binding, expr) do
+    Ecto.Query.Builder.Filter.build(:where, :and, query, binding, expr, __CALLER__)
   end
 
-  defmacro windows(p0, p1) do
-    # body not decompiled
+  defmacro windows(x0, x1) do
+    super(x0, [], x1)
   end
 
   @doc ~S"""
@@ -1653,8 +1672,8 @@ defmodule Ecto.Query do
 
 
   """
-  defmacro windows(query, binding \\ [], expr) do
-    # body not decompiled
+  defmacro windows(query, binding, expr) do
+    Ecto.Query.Builder.Windows.build(query, binding, expr, __CALLER__)
   end
 
   @doc ~S'''
@@ -1754,8 +1773,8 @@ defmodule Ecto.Query do
   option is to use a fragment as your CTE.
 
   '''
-  defmacro with_cte(query, name, list) do
-    # body not decompiled
+  defmacro with_cte(query, name, [as: with_query]) do
+    Ecto.Query.Builder.CTE.build(query, name, with_query, __CALLER__)
   end
 
   # Functions
@@ -1765,11 +1784,11 @@ defmodule Ecto.Query do
   end
 
   def __struct__() do
-    # body not decompiled
+    %Ecto.Query{aliases: %{}, assocs: [], combinations: [], distinct: nil, from: nil, group_bys: [], havings: [], joins: [], limit: nil, lock: nil, offset: nil, order_bys: [], prefix: nil, preloads: [], select: nil, sources: nil, updates: [], wheres: [], windows: [], with_ctes: nil}
   end
 
   def __struct__(kv) do
-    # body not decompiled
+    Enum.reduce(kv, %Ecto.Query{aliases: %{}, assocs: [], combinations: [], distinct: nil, from: nil, group_bys: [], havings: [], joins: [], limit: nil, lock: nil, offset: nil, order_bys: [], prefix: nil, preloads: [], select: nil, sources: nil, updates: [], wheres: [], windows: [], with_ctes: nil}, fn {key, val}, map -> :maps.update(key, val, map) end)
   end
 
   @doc ~S"""
@@ -1811,12 +1830,16 @@ defmodule Ecto.Query do
   to a query that won't compile.
 
   """
-  def exclude(query, field) do
-    # body not decompiled
+  def exclude(%Ecto.Query{} = query, field) do
+    do_exclude(query, field)
   end
 
-  def first(p0) do
-    # body not decompiled
+  def exclude(query, field) do
+    do_exclude(Ecto.Queryable.to_query(query), field)
+  end
+
+  def first(x0) do
+    super(x0, nil)
   end
 
   @doc ~S"""
@@ -1832,8 +1855,24 @@ defmodule Ecto.Query do
       query |> first(:inserted_at) |> Repo.one
 
   """
-  def first(queryable, order_by \\ nil) do
-    # body not decompiled
+  def first(%Ecto.Query{} = query, nil) do
+    (
+      query = %{query | limit: limit()}
+      case(query) do
+        %{order_bys: []} ->
+          %{query | order_bys: [order_by_pk(query, :asc)]}
+        %{} ->
+          query
+      end
+    )
+  end
+
+  def first(queryable, nil) do
+    first(Ecto.Queryable.to_query(queryable), nil)
+  end
+
+  def first(queryable, key) do
+    first(Ecto.Query.Builder.OrderBy.order_by!(queryable, key, "/Users/luke.imhoff/github.pie.apple.com/check-engine/check_engine/check_engine_ui/deps/ecto/lib/ecto/query.ex", 2018), nil)
   end
 
   @doc ~S"""
@@ -1842,12 +1881,20 @@ defmodule Ecto.Query do
   For more information on named bindings see "Named bindings" in this module doc.
 
   """
-  def has_named_binding?(queryable, key) do
-    # body not decompiled
+  def has_named_binding?(%Ecto.Query{aliases: aliases}, key) do
+    Map.has_key?(aliases, key)
   end
 
-  def last(p0) do
-    # body not decompiled
+  def has_named_binding?(queryable, _key) do
+    false
+  end
+
+  def has_named_binding?(queryable, key) do
+    has_named_binding?(Ecto.Queryable.to_query(queryable), key)
+  end
+
+  def last(x0) do
+    super(x0, nil)
   end
 
   @doc ~S"""
@@ -1864,8 +1911,12 @@ defmodule Ecto.Query do
       query |> last(:inserted_at) |> Repo.one
 
   """
-  def last(queryable, order_by \\ nil) do
-    # body not decompiled
+  def last(queryable, nil) do
+    %{reverse_order(queryable) | limit: limit()}
+  end
+
+  def last(queryable, key) do
+    last(Ecto.Query.Builder.OrderBy.order_by!(queryable, key, "/Users/luke.imhoff/github.pie.apple.com/check-engine/check_engine/check_engine_ui/deps/ecto/lib/ecto/query.ex", 2035), nil)
   end
 
   def module_info() do
@@ -1880,8 +1931,12 @@ defmodule Ecto.Query do
   Puts the given prefix in a query.
 
   """
-  def put_query_prefix(query, prefix) do
-    # body not decompiled
+  def put_query_prefix(%Ecto.Query{} = query, prefix) do
+    %{query | prefix: prefix}
+  end
+
+  def put_query_prefix(other, prefix) do
+    put_query_prefix(Ecto.Queryable.to_query(other), prefix)
   end
 
   @doc ~S"""
@@ -1892,8 +1947,16 @@ defmodule Ecto.Query do
   See `with_cte/3` on example of how to build a query with a recursive CTE.
 
   """
-  def recursive_ctes(query, value) do
-    # body not decompiled
+  def recursive_ctes(%Ecto.Query{with_ctes: with_expr} = query, value) do
+    (
+      with_expr = with_expr || x
+      with_expr = %{with_expr | recursive: value}
+      %{query | with_ctes: with_expr}
+    )
+  end
+
+  def recursive_ctes(queryable, value) do
+    recursive_ctes(Ecto.Queryable.to_query(queryable), value)
   end
 
   @doc ~S"""
@@ -1908,12 +1971,21 @@ defmodule Ecto.Query do
       Post |> order(asc: :id) |> reverse_order == Post |> order(desc: :id)
 
   """
-  def reverse_order(query) do
-    # body not decompiled
+  def reverse_order(%Ecto.Query{} = query) do
+    Map.update!(query, :order_bys, fn
+     [] ->
+        [order_by_pk(query, :desc)]
+      order_bys ->
+        Enum.map(order_bys, &:reverse_order_by/1)
+    end)
   end
 
-  def subquery(p0) do
-    # body not decompiled
+  def reverse_order(queryable) do
+    reverse_order(Ecto.Queryable.to_query(queryable))
+  end
+
+  def subquery(x0) do
+    super(x0, [])
   end
 
   @doc ~S"""
@@ -1970,8 +2042,16 @@ defmodule Ecto.Query do
       )
 
   """
-  def subquery(query, opts \\ []) do
-    # body not decompiled
+  def subquery(query, opts) do
+    (
+      subquery = wrap_in_subquery(query)
+      case(Keyword.fetch(opts, :prefix)) do
+        {:ok, prefix} when is_binary(prefix) or is_nil(prefix) ->
+          Map.update!(subquery, :query, fn x -> Map.update!(x, :prefix, fn _ -> prefix end) end)
+        :error ->
+          subquery
+      end
+    )
   end
 
   # Private Functions
@@ -2020,51 +2100,191 @@ defmodule Ecto.Query do
     # body not decompiled
   end
 
-  defp assert_schema!(p0) do
-    # body not decompiled
+  defp assert_schema!(%{from: %Ecto.Query.FromExpr{source: {_source, schema}}}) do
+    schema
   end
 
-  defp collect_as_and_prefix_and_hints(p0, p1, p2, p3) do
-    # body not decompiled
+  defp assert_schema!(query) do
+    raise(Ecto.QueryError, query: query, message: "expected a from expression with a schema")
   end
 
-  defp collect_on(p0, p1, p2, p3, p4) do
-    # body not decompiled
+  defp collect_as_and_prefix_and_hints([{:as, as} | t], nil, prefix, hints) do
+    collect_as_and_prefix_and_hints(t, as, prefix, hints)
+  end
+
+  defp collect_as_and_prefix_and_hints([{:as, _} | _], _, _, _) do
+    Ecto.Query.Builder.error!("`as` keyword was given more than once to the same from/join")
+  end
+
+  defp collect_as_and_prefix_and_hints([{:prefix, prefix} | t], as, nil, hints) do
+    collect_as_and_prefix_and_hints(t, as, {:ok, prefix}, hints)
+  end
+
+  defp collect_as_and_prefix_and_hints([{:prefix, _} | _], _, _, _) do
+    Ecto.Query.Builder.error!("`prefix` keyword was given more than once to the same from/join")
+  end
+
+  defp collect_as_and_prefix_and_hints([{:hints, hints} | t], as, prefix, nil) do
+    collect_as_and_prefix_and_hints(t, as, prefix, hints)
+  end
+
+  defp collect_as_and_prefix_and_hints([{:hints, _} | _], _, _, _) do
+    Ecto.Query.Builder.error!("`hints` keyword was given more than once to the same from/join")
+  end
+
+  defp collect_as_and_prefix_and_hints(t, as, prefix, hints) do
+    {t, as, prefix, hints}
+  end
+
+  defp collect_on([{key, _} | _] = t, on, as, prefix, hints) do
+    (
+      {t, as, prefix, hints} = collect_as_and_prefix_and_hints(t, as, prefix, hints)
+      collect_on(t, on, as, prefix, hints)
+    )
+  end
+
+  defp collect_on([{:on, on} | t], nil, as, prefix, hints) do
+    collect_on(t, on, as, prefix, hints)
+  end
+
+  defp collect_on([{:on, expr} | t], on, as, prefix, hints) do
+    collect_on(t, {:and, [], [on, expr]}, as, prefix, hints)
+  end
+
+  defp collect_on(t, on, as, prefix, hints) do
+    {t, on, as, prefix, hints}
   end
 
   defp do_exclude(p0, p1) do
     # body not decompiled
   end
 
-  defp field(p0, p1) do
-    # body not decompiled
+  defp field(ix, field) do
+    {{:".", [], [{:&, [], [ix]}, field]}, [], []}
   end
 
-  defp from(p0, p1, p2, p3, p4) do
-    # body not decompiled
+  defp from([{type, expr} | t], env, count_bind, quoted, binds) do
+    (
+      quoted = if(Enum.all?(binds, fn {_, value} -> is_integer(value) end)) do
+        {:__block__, [], [{:=, [], [{:query, [], Ecto.Query}, quoted]}, :elixir_quote.dot([], {:__aliases__, [alias: false], [:"Ecto", :"Query"]}, type, [{:query, [], Ecto.Query}, binds, expr], Ecto.Query)]}
+      else
+        :elixir_quote.dot([], {:__aliases__, [alias: false], [:"Ecto", :"Query"]}, type, [quoted, binds, expr], Ecto.Query)
+      end
+      from(t, env, count_bind, quoted, binds)
+    )
   end
 
-  defp join_qual(p0) do
-    # body not decompiled
+  defp from([{type, expr} | t], env, count_bind, quoted, binds) do
+    (
+      quoted = :elixir_quote.dot([], {:__aliases__, [alias: false], [:"Ecto", :"Query"]}, type, [quoted, expr], Ecto.Query)
+      from(t, env, count_bind, quoted, binds)
+    )
+  end
+
+  defp from([{join, expr} | t], env, count_bind, quoted, binds) do
+    (
+      qual = join_qual(join)
+      {t, on, as, prefix, hints} = collect_on(t, nil, nil, nil, nil)
+      {quoted, binds, count_bind} = Ecto.Query.Builder.Join.build(quoted, qual, binds, expr, count_bind, on, as, prefix, hints, env)
+      from(t, env, count_bind, quoted, to_query_binds(binds))
+    )
+  end
+
+  defp from([{:on, _value} | _], _env, _count_bind, _quoted, _binds) do
+    Ecto.Query.Builder.error!("`on` keyword must immediately follow a join")
+  end
+
+  defp from([{key, _value} | _], _env, _count_bind, _quoted, _binds) do
+    Ecto.Query.Builder.error!(<<"`"::binary(), String.Chars.to_string(key)::binary(), "` keyword must immediately follow a from/join"::binary()>>)
+  end
+
+  defp from([{key, _value} | _], _env, _count_bind, _quoted, _binds) do
+    Ecto.Query.Builder.error!(<<"unsupported "::binary(), Kernel.inspect(key)::binary(), " in keyword query expression"::binary()>>)
+  end
+
+  defp from([], _env, _count_bind, quoted, _binds) do
+    quoted
+  end
+
+  defp join_qual(:join) do
+    :inner
+  end
+
+  defp join_qual(:full_join) do
+    :full
+  end
+
+  defp join_qual(:left_join) do
+    :left
+  end
+
+  defp join_qual(:right_join) do
+    :right
+  end
+
+  defp join_qual(:inner_join) do
+    :inner
+  end
+
+  defp join_qual(:cross_join) do
+    :cross
+  end
+
+  defp join_qual(:left_lateral_join) do
+    :left_lateral
+  end
+
+  defp join_qual(:inner_lateral_join) do
+    :inner_lateral
   end
 
   defp limit() do
-    # body not decompiled
+    %Ecto.Query.QueryExpr{expr: 1, params: [], file: "/Users/luke.imhoff/github.pie.apple.com/check-engine/check_engine/check_engine_ui/deps/ecto/lib/ecto/query.ex", line: 2038}
   end
 
-  defp order_by_pk(p0, p1) do
-    # body not decompiled
+  defp order_by_pk(query, dir) do
+    (
+      schema = assert_schema!(query)
+      pks = schema.__schema__(:primary_key)
+      expr = for(pk <- pks) do
+        {dir, field(0, pk)}
+      end
+      %Ecto.Query.QueryExpr{params: [], expr: expr, file: "/Users/luke.imhoff/github.pie.apple.com/check-engine/check_engine/check_engine_ui/deps/ecto/lib/ecto/query.ex", line: 2049}
+    )
   end
 
-  defp reverse_order_by(p0) do
-    # body not decompiled
+  defp reverse_order_by(%{expr: expr} = order_by) do
+    %{order_by | expr: Enum.map(expr, fn
+     {:desc, ast} ->
+        {:asc, ast}
+      {:desc_nulls_last, ast} ->
+        {:asc_nulls_first, ast}
+      {:desc_nulls_first, ast} ->
+        {:asc_nulls_last, ast}
+      {:asc, ast} ->
+        {:desc, ast}
+      {:asc_nulls_last, ast} ->
+        {:desc_nulls_first, ast}
+      {:asc_nulls_first, ast} ->
+        {:desc_nulls_last, ast}
+    end)}
   end
 
-  defp to_query_binds(p0) do
-    # body not decompiled
+  defp to_query_binds(binds) do
+    for({k, v} <- binds) do
+      {{k, [], nil}, v}
+    end
   end
 
-  defp wrap_in_subquery(p0) do
-    # body not decompiled
+  defp wrap_in_subquery(%Ecto.SubQuery{} = subquery) do
+    subquery
+  end
+
+  defp wrap_in_subquery(%Ecto.Query{} = query) do
+    %Ecto.SubQuery{cache: nil, params: nil, select: nil, query: query}
+  end
+
+  defp wrap_in_subquery(queryable) do
+    %Ecto.SubQuery{cache: nil, params: nil, select: nil, query: Ecto.Queryable.to_query(queryable)}
   end
 end

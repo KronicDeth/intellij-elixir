@@ -98,8 +98,12 @@ defmodule Kernel.SpecialForms do
 
 
   """
-  defmacro unquote(:%)(p0, p1) do
-    # body not decompiled
+  defmacro unquote(:%)(struct, map) do
+    (
+      _ = [struct, map]
+      message = "Elixir's special forms are expanded by the compiler and must not be invoked directly"
+      raise(RuntimeError, message)
+    )
   end
 
   @doc ~S"""
@@ -121,8 +125,12 @@ defmodule Kernel.SpecialForms do
 
 
   """
-  defmacro unquote(:%{})(p0) do
-    # body not decompiled
+  defmacro unquote(:%{})(args) do
+    (
+      _ = [args]
+      message = "Elixir's special forms are expanded by the compiler and must not be invoked directly"
+      raise(RuntimeError, message)
+    )
   end
 
   @doc ~S"""
@@ -202,8 +210,12 @@ defmodule Kernel.SpecialForms do
 
 
   """
-  defmacro unquote(:&)(p0) do
-    # body not decompiled
+  defmacro unquote(:&)(expr) do
+    (
+      _ = [expr]
+      message = "Elixir's special forms are expanded by the compiler and must not be invoked directly"
+      raise(RuntimeError, message)
+    )
   end
 
   @doc ~S"""
@@ -327,8 +339,12 @@ defmodule Kernel.SpecialForms do
 
 
   """
-  defmacro unquote(:.)(p0, p1) do
-    # body not decompiled
+  defmacro unquote(:.)(left, right) do
+    (
+      _ = [left, right]
+      message = "Elixir's special forms are expanded by the compiler and must not be invoked directly"
+      raise(RuntimeError, message)
+    )
   end
 
   @doc ~S"""
@@ -352,7 +368,11 @@ defmodule Kernel.SpecialForms do
 
   """
   defmacro left :: right do
-    # body not decompiled
+    (
+      _ = [left, right]
+      message = "Elixir's special forms are expanded by the compiler and must not be invoked directly"
+      raise(RuntimeError, message)
+    )
   end
 
   @doc ~S"""
@@ -571,8 +591,12 @@ defmodule Kernel.SpecialForms do
   [Erlang's Efficiency Guide on handling binaries](http://www.erlang.org/doc/efficiency_guide/binaryhandling.html).
 
   """
-  defmacro unquote(:<<>>)(p0) do
-    # body not decompiled
+  defmacro unquote(:<<>>)(args) do
+    (
+      _ = [args]
+      message = "Elixir's special forms are expanded by the compiler and must not be invoked directly"
+      raise(RuntimeError, message)
+    )
   end
 
   @doc ~S"""
@@ -580,7 +604,11 @@ defmodule Kernel.SpecialForms do
 
   """
   defmacro left = right do
-    # body not decompiled
+    (
+      _ = [left, right]
+      message = "Elixir's special forms are expanded by the compiler and must not be invoked directly"
+      raise(RuntimeError, message)
+    )
   end
 
   @doc ~S"""
@@ -614,8 +642,12 @@ defmodule Kernel.SpecialForms do
 
 
   """
-  defmacro unquote(:"^")(p0) do
-    # body not decompiled
+  defmacro unquote(:"^")(var) do
+    (
+      _ = [var]
+      message = "Elixir's special forms are expanded by the compiler and must not be invoked directly"
+      raise(RuntimeError, message)
+    )
   end
 
   @doc ~S"""
@@ -625,8 +657,12 @@ defmodule Kernel.SpecialForms do
   set up aliases, the function and others.
 
   """
-  defmacro __CALLER__ do
-    # body not decompiled
+  defmacro __CALLER__() do
+    (
+      _ = []
+      message = "Elixir's special forms are expanded by the compiler and must not be invoked directly"
+      raise(RuntimeError, message)
+    )
   end
 
   @doc ~S"""
@@ -636,8 +672,12 @@ defmodule Kernel.SpecialForms do
   this macro is a convenient shortcut.
 
   """
-  defmacro __DIR__ do
-    # body not decompiled
+  defmacro __DIR__() do
+    (
+      _ = []
+      message = "Elixir's special forms are expanded by the compiler and must not be invoked directly"
+      raise(RuntimeError, message)
+    )
   end
 
   @doc ~S"""
@@ -647,8 +687,12 @@ defmodule Kernel.SpecialForms do
   line numbers, set up aliases, the current function and others.
 
   """
-  defmacro __ENV__ do
-    # body not decompiled
+  defmacro __ENV__() do
+    (
+      _ = []
+      message = "Elixir's special forms are expanded by the compiler and must not be invoked directly"
+      raise(RuntimeError, message)
+    )
   end
 
   @doc ~S"""
@@ -658,8 +702,12 @@ defmodule Kernel.SpecialForms do
   is a convenient shortcut.
 
   """
-  defmacro __MODULE__ do
-    # body not decompiled
+  defmacro __MODULE__() do
+    (
+      _ = []
+      message = "Elixir's special forms are expanded by the compiler and must not be invoked directly"
+      raise(RuntimeError, message)
+    )
   end
 
   @doc ~S"""
@@ -672,8 +720,12 @@ defmodule Kernel.SpecialForms do
   `Process.info(self(), :current_stacktrace)` instead.
 
   """
-  defmacro __STACKTRACE__ do
-    # body not decompiled
+  defmacro __STACKTRACE__() do
+    (
+      _ = []
+      message = "Elixir's special forms are expanded by the compiler and must not be invoked directly"
+      raise(RuntimeError, message)
+    )
   end
 
   @doc ~S"""
@@ -710,7 +762,11 @@ defmodule Kernel.SpecialForms do
 
   """
   defmacro __aliases__(args) do
-    # body not decompiled
+    (
+      _ = [args]
+      message = "Elixir's special forms are expanded by the compiler and must not be invoked directly"
+      raise(RuntimeError, message)
+    )
   end
 
   @doc ~S"""
@@ -730,7 +786,11 @@ defmodule Kernel.SpecialForms do
 
   """
   defmacro __block__(args) do
-    # body not decompiled
+    (
+      _ = [args]
+      message = "Elixir's special forms are expanded by the compiler and must not be invoked directly"
+      raise(RuntimeError, message)
+    )
   end
 
   @doc ~S"""
@@ -794,7 +854,11 @@ defmodule Kernel.SpecialForms do
 
   """
   defmacro alias(module, opts) do
-    # body not decompiled
+    (
+      _ = [module, opts]
+      message = "Elixir's special forms are expanded by the compiler and must not be invoked directly"
+      raise(RuntimeError, message)
+    )
   end
 
   @doc ~S"""
@@ -870,7 +934,11 @@ defmodule Kernel.SpecialForms do
 
   """
   defmacro case(condition, clauses) do
-    # body not decompiled
+    (
+      _ = [condition, clauses]
+      message = "Elixir's special forms are expanded by the compiler and must not be invoked directly"
+      raise(RuntimeError, message)
+    )
   end
 
   @doc ~S"""
@@ -902,7 +970,11 @@ defmodule Kernel.SpecialForms do
 
   """
   defmacro cond(clauses) do
-    # body not decompiled
+    (
+      _ = [clauses]
+      message = "Elixir's special forms are expanded by the compiler and must not be invoked directly"
+      raise(RuntimeError, message)
+    )
   end
 
   @doc ~S"""
@@ -928,8 +1000,12 @@ defmodule Kernel.SpecialForms do
 
 
   """
-  defmacro unquote(:fn)(p0) do
-    # body not decompiled
+  defmacro unquote(:fn)(clauses) do
+    (
+      _ = [clauses]
+      message = "Elixir's special forms are expanded by the compiler and must not be invoked directly"
+      raise(RuntimeError, message)
+    )
   end
 
   @doc ~S"""
@@ -1052,7 +1128,11 @@ defmodule Kernel.SpecialForms do
 
   """
   defmacro for(args) do
-    # body not decompiled
+    (
+      _ = [args]
+      message = "Elixir's special forms are expanded by the compiler and must not be invoked directly"
+      raise(RuntimeError, message)
+    )
   end
 
   @doc ~S"""
@@ -1155,7 +1235,11 @@ defmodule Kernel.SpecialForms do
 
   """
   defmacro import(module, opts) do
-    # body not decompiled
+    (
+      _ = [module, opts]
+      message = "Elixir's special forms are expanded by the compiler and must not be invoked directly"
+      raise(RuntimeError, message)
+    )
   end
 
   @doc ~S"""
@@ -1660,7 +1744,11 @@ defmodule Kernel.SpecialForms do
 
   """
   defmacro quote(opts, block) do
-    # body not decompiled
+    (
+      _ = [opts, block]
+      message = "Elixir's special forms are expanded by the compiler and must not be invoked directly"
+      raise(RuntimeError, message)
+    )
   end
 
   @doc ~S"""
@@ -1717,7 +1805,11 @@ defmodule Kernel.SpecialForms do
 
   """
   defmacro receive(args) do
-    # body not decompiled
+    (
+      _ = [args]
+      message = "Elixir's special forms are expanded by the compiler and must not be invoked directly"
+      raise(RuntimeError, message)
+    )
   end
 
   @doc ~S"""
@@ -1747,7 +1839,11 @@ defmodule Kernel.SpecialForms do
 
   """
   defmacro require(module, opts) do
-    # body not decompiled
+    (
+      _ = [module, opts]
+      message = "Elixir's special forms are expanded by the compiler and must not be invoked directly"
+      raise(RuntimeError, message)
+    )
   end
 
   @doc ~S"""
@@ -1757,7 +1853,11 @@ defmodule Kernel.SpecialForms do
 
   """
   defmacro super(args) do
-    # body not decompiled
+    (
+      _ = [args]
+      message = "Elixir's special forms are expanded by the compiler and must not be invoked directly"
+      raise(RuntimeError, message)
+    )
   end
 
   @doc ~S"""
@@ -2050,7 +2150,11 @@ defmodule Kernel.SpecialForms do
 
   """
   defmacro try(args) do
-    # body not decompiled
+    (
+      _ = [args]
+      message = "Elixir's special forms are expanded by the compiler and must not be invoked directly"
+      raise(RuntimeError, message)
+    )
   end
 
   @doc ~S"""
@@ -2104,8 +2208,12 @@ defmodule Kernel.SpecialForms do
   when compiling the code.
 
   """
-  defmacro unquote(:unquote)(p0) do
-    # body not decompiled
+  defmacro unquote(:unquote)(expr) do
+    (
+      _ = [expr]
+      message = "Elixir's special forms are expanded by the compiler and must not be invoked directly"
+      raise(RuntimeError, message)
+    )
   end
 
   @doc ~S"""
@@ -2123,8 +2231,12 @@ defmodule Kernel.SpecialForms do
 
 
   """
-  defmacro unquote(:unquote_splicing)(p0) do
-    # body not decompiled
+  defmacro unquote(:unquote_splicing)(expr) do
+    (
+      _ = [expr]
+      message = "Elixir's special forms are expanded by the compiler and must not be invoked directly"
+      raise(RuntimeError, message)
+    )
   end
 
   @doc ~S"""
@@ -2211,7 +2323,11 @@ defmodule Kernel.SpecialForms do
 
   """
   defmacro with(args) do
-    # body not decompiled
+    (
+      _ = [args]
+      message = "Elixir's special forms are expanded by the compiler and must not be invoked directly"
+      raise(RuntimeError, message)
+    )
   end
 
   @doc ~S"""
@@ -2240,8 +2356,12 @@ defmodule Kernel.SpecialForms do
 
 
   """
-  defmacro unquote(:{})(p0) do
-    # body not decompiled
+  defmacro unquote(:{})(args) do
+    (
+      _ = [args]
+      message = "Elixir's special forms are expanded by the compiler and must not be invoked directly"
+      raise(RuntimeError, message)
+    )
   end
 
   # Functions

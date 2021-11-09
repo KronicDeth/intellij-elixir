@@ -138,271 +138,151 @@ defmodule :erlang do
 
   # Functions
 
-  def unquote(:!)(_Dst, _Msg) do
-    :erlang.nif_error(:undefined)
-  end
+  def unquote(:!)(_Dst, _Msg), do: :erlang.nif_error(:undefined)
 
-  def unquote(:"*")(_A, _B) do
-    :erlang.nif_error(:undefined)
-  end
+  def _A * _B, do: :erlang.nif_error(:undefined)
 
-  def unquote(:"+")(_A) do
-    :erlang.nif_error(:undefined)
-  end
+  def (+_A), do: :erlang.nif_error(:undefined)
 
-  def unquote(:"+")(_A, _B) do
-    :erlang.nif_error(:undefined)
-  end
+  def _A + _B, do: :erlang.nif_error(:undefined)
 
-  def unquote(:"++")(_A, _B) do
-    :erlang.nif_error(:undefined)
-  end
+  def _A ++ _B, do: :erlang.nif_error(:undefined)
 
-  def unquote(:"-")(_A) do
-    :erlang.nif_error(:undefined)
-  end
+  def (-_A), do: :erlang.nif_error(:undefined)
 
-  def unquote(:"-")(_A, _B) do
-    :erlang.nif_error(:undefined)
-  end
+  def _A - _B, do: :erlang.nif_error(:undefined)
 
-  def unquote(:"--")(_A, _B) do
-    :erlang.nif_error(:undefined)
-  end
+  def _A -- _B, do: :erlang.nif_error(:undefined)
 
-  def unquote(:"/")(_A, _B) do
-    :erlang.nif_error(:undefined)
-  end
+  def _A / _B, do: :erlang.nif_error(:undefined)
 
-  def unquote(:"/=")(_A, _B) do
-    :erlang.nif_error(:undefined)
-  end
+  def unquote(:"/=")(_A, _B), do: :erlang.nif_error(:undefined)
 
-  def unquote(:"<")(_A, _B) do
-    :erlang.nif_error(:undefined)
-  end
+  def _A < _B, do: :erlang.nif_error(:undefined)
 
-  def unquote(:"=/=")(_A, _B) do
-    :erlang.nif_error(:undefined)
-  end
+  def unquote(:"=/=")(_A, _B), do: :erlang.nif_error(:undefined)
 
-  def unquote(:"=:=")(_A, _B) do
-    :erlang.nif_error(:undefined)
-  end
+  def unquote(:"=:=")(_A, _B), do: :erlang.nif_error(:undefined)
 
-  def unquote(:"=<")(_A, _B) do
-    :erlang.nif_error(:undefined)
-  end
+  def unquote(:"=<")(_A, _B), do: :erlang.nif_error(:undefined)
 
-  def unquote(:"==")(_A, _B) do
-    :erlang.nif_error(:undefined)
-  end
+  def _A == _B, do: :erlang.nif_error(:undefined)
 
-  def unquote(:">")(_A, _B) do
-    :erlang.nif_error(:undefined)
-  end
+  def _A > _B, do: :erlang.nif_error(:undefined)
 
-  def unquote(:">=")(_A, _B) do
-    :erlang.nif_error(:undefined)
-  end
+  def _A >= _B, do: :erlang.nif_error(:undefined)
 
   @spec abs(float) :: unknown_type when float: unknown_type
   @spec abs(int) :: non_neg_integer() when int: integer()
-  def abs(_Number) do
-    :erlang.nif_error(:undefined)
-  end
+  def abs(_Number), do: :erlang.nif_error(:undefined)
 
-  def adler32(_Data) do
-    :erlang.nif_error(:undefined)
-  end
+  def adler32(_Data), do: :erlang.nif_error(:undefined)
 
-  def adler32(_OldAdler, _Data) do
-    :erlang.nif_error(:undefined)
-  end
+  def adler32(_OldAdler, _Data), do: :erlang.nif_error(:undefined)
 
-  def adler32_combine(_FirstAdler, _SecondAdler, _SecondSize) do
-    :erlang.nif_error(:undefined)
-  end
+  def adler32_combine(_FirstAdler, _SecondAdler, _SecondSize), do: :erlang.nif_error(:undefined)
 
-  def alloc_info(allocs) do
-    get_alloc_info(:allocator, allocs)
-  end
+  def alloc_info(allocs), do: get_alloc_info(:allocator, allocs)
 
-  def alloc_sizes(allocs) do
-    get_alloc_info(:allocator_sizes, allocs)
-  end
+  def alloc_sizes(allocs), do: get_alloc_info(:allocator_sizes, allocs)
 
-  def unquote(:and)(_A, _B) do
-    :erlang.nif_error(:undefined)
-  end
+  def _A and _B, do: :erlang.nif_error(:undefined)
 
-  def append(_List, _Tail) do
-    :erlang.nif_error(:undefined)
-  end
+  def append(_List, _Tail), do: :erlang.nif_error(:undefined)
 
-  def append_element(_Tuple1, _Term) do
-    :erlang.nif_error(:undefined)
-  end
+  def append_element(_Tuple1, _Term), do: :erlang.nif_error(:undefined)
 
   @spec apply(fun, args) :: term() when fun: function(), args: [term()]
-  def apply(fun, args) do
-    :erlang.apply(fun, args)
-  end
+  def apply(fun, args), do: :erlang.apply(fun, args)
 
   @spec apply(module, function, args) :: term() when module: module(), function: atom(), args: [term()]
-  def apply(mod, name, args) do
-    :erlang.apply(mod, name, args)
-  end
+  def apply(mod, name, args), do: :erlang.apply(mod, name, args)
 
   @spec atom_to_binary(atom) :: binary() when atom: atom()
-  def atom_to_binary(atom) do
-    :erlang.atom_to_binary(atom, :utf8)
-  end
+  def atom_to_binary(atom), do: :erlang.atom_to_binary(atom, :utf8)
 
   @spec atom_to_binary(atom, encoding) :: binary() when atom: atom(), encoding: (:latin1 | :unicode | :utf8)
-  def atom_to_binary(_Atom, _Encoding) do
-    :erlang.nif_error(:undefined)
-  end
+  def atom_to_binary(_Atom, _Encoding), do: :erlang.nif_error(:undefined)
 
   @spec atom_to_list(atom) :: charlist() when atom: atom()
-  def atom_to_list(_Atom) do
-    :erlang.nif_error(:undefined)
-  end
+  def atom_to_list(_Atom), do: :erlang.nif_error(:undefined)
 
-  def band(_A, _B) do
-    :erlang.nif_error(:undefined)
-  end
+  def band(_A, _B), do: :erlang.nif_error(:undefined)
 
   @spec binary_part(subject, posLen) :: binary() when subject: binary(), posLen: {start :: non_neg_integer(), length :: integer()}
-  def binary_part(_Subject, _PosLen) do
-    :erlang.nif_error(:undefined)
-  end
+  def binary_part(_Subject, _PosLen), do: :erlang.nif_error(:undefined)
 
   @spec binary_part(subject, start, length) :: binary() when subject: binary(), start: non_neg_integer(), length: integer()
-  def binary_part(_Subject, _Start, _Length) do
-    :erlang.nif_error(:undefined)
-  end
+  def binary_part(_Subject, _Start, _Length), do: :erlang.nif_error(:undefined)
 
   @spec binary_to_atom(binary) :: atom() when binary: binary()
-  def binary_to_atom(binary) do
-    :erlang.binary_to_atom(binary, :utf8)
-  end
+  def binary_to_atom(binary), do: :erlang.binary_to_atom(binary, :utf8)
 
   @spec binary_to_atom(binary, encoding) :: atom() when binary: binary(), encoding: (:latin1 | :unicode | :utf8)
-  def binary_to_atom(_Binary, _Encoding) do
-    :erlang.nif_error(:undefined)
-  end
+  def binary_to_atom(_Binary, _Encoding), do: :erlang.nif_error(:undefined)
 
   @spec binary_to_existing_atom(binary) :: atom() when binary: binary()
-  def binary_to_existing_atom(binary) do
-    :erlang.binary_to_existing_atom(binary, :utf8)
-  end
+  def binary_to_existing_atom(binary), do: :erlang.binary_to_existing_atom(binary, :utf8)
 
   @spec binary_to_existing_atom(binary, encoding) :: atom() when binary: binary(), encoding: (:latin1 | :unicode | :utf8)
-  def binary_to_existing_atom(_Binary, _Encoding) do
-    :erlang.nif_error(:undefined)
-  end
+  def binary_to_existing_atom(_Binary, _Encoding), do: :erlang.nif_error(:undefined)
 
   @spec binary_to_float(binary) :: unknown_type when binary: binary()
-  def binary_to_float(_Binary) do
-    :erlang.nif_error(:undefined)
-  end
+  def binary_to_float(_Binary), do: :erlang.nif_error(:undefined)
 
   @spec binary_to_integer(binary) :: integer() when binary: binary()
-  def binary_to_integer(_Binary) do
-    :erlang.nif_error(:undefined)
-  end
+  def binary_to_integer(_Binary), do: :erlang.nif_error(:undefined)
 
   @spec binary_to_integer(binary, base) :: integer() when binary: binary(), base: 2..36
-  def binary_to_integer(_Binary, _Base) do
-    :erlang.nif_error(:undefined)
-  end
+  def binary_to_integer(_Binary, _Base), do: :erlang.nif_error(:undefined)
 
   @spec binary_to_list(binary) :: [byte()] when binary: binary()
-  def binary_to_list(_Binary) do
-    :erlang.nif_error(:undefined)
-  end
+  def binary_to_list(_Binary), do: :erlang.nif_error(:undefined)
 
   @spec binary_to_list(binary, start, stop) :: [byte()] when binary: binary(), start: pos_integer(), stop: pos_integer()
-  def binary_to_list(_Binary, _Start, _Stop) do
-    :erlang.nif_error(:undefined)
-  end
+  def binary_to_list(_Binary, _Start, _Stop), do: :erlang.nif_error(:undefined)
 
   @spec binary_to_term(binary) :: term() when binary: ext_binary()
-  def binary_to_term(_Binary) do
-    :erlang.nif_error(:undefined)
-  end
+  def binary_to_term(_Binary), do: :erlang.nif_error(:undefined)
 
   @spec binary_to_term(binary, opts) :: (term() | {term(), used}) when binary: ext_binary(), opt: (:safe | :used), opts: [opt], used: pos_integer()
-  def binary_to_term(_Binary, _Opts) do
-    :erlang.nif_error(:undefined)
-  end
+  def binary_to_term(_Binary, _Opts), do: :erlang.nif_error(:undefined)
 
   @spec bit_size(bitstring) :: non_neg_integer() when bitstring: unknown_type
-  def bit_size(_Bitstring) do
-    :erlang.nif_error(:undefined)
-  end
+  def bit_size(_Bitstring), do: :erlang.nif_error(:undefined)
 
   @spec bitsize(p1) :: non_neg_integer() when p1: unknown_type
-  def bitsize(_P1) do
-    :erlang.nif_error(:undefined)
-  end
+  def bitsize(_P1), do: :erlang.nif_error(:undefined)
 
   @spec bitstring_to_list(bitstring) :: [(byte() | unknown_type)] when bitstring: unknown_type
-  def bitstring_to_list(_Bitstring) do
-    :erlang.nif_error(:undefined)
-  end
+  def bitstring_to_list(_Bitstring), do: :erlang.nif_error(:undefined)
 
-  def bnot(_A) do
-    :erlang.nif_error(:undefined)
-  end
+  def bnot(_A), do: :erlang.nif_error(:undefined)
 
-  def bor(_A, _B) do
-    :erlang.nif_error(:undefined)
-  end
+  def bor(_A, _B), do: :erlang.nif_error(:undefined)
 
-  def bsl(_A, _B) do
-    :erlang.nif_error(:undefined)
-  end
+  def bsl(_A, _B), do: :erlang.nif_error(:undefined)
 
-  def bsr(_A, _B) do
-    :erlang.nif_error(:undefined)
-  end
+  def bsr(_A, _B), do: :erlang.nif_error(:undefined)
 
-  def bump_reductions(_Reductions) do
-    :erlang.nif_error(:undefined)
-  end
+  def bump_reductions(_Reductions), do: :erlang.nif_error(:undefined)
 
-  def bxor(_A, _B) do
-    :erlang.nif_error(:undefined)
-  end
+  def bxor(_A, _B), do: :erlang.nif_error(:undefined)
 
   @spec byte_size(bitstring) :: non_neg_integer() when bitstring: unknown_type
-  def byte_size(_Bitstring) do
-    :erlang.nif_error(:undefined)
-  end
+  def byte_size(_Bitstring), do: :erlang.nif_error(:undefined)
 
-  def call_on_load_function(_P1) do
-    :erlang.nif_error(:undefined)
-  end
+  def call_on_load_function(_P1), do: :erlang.nif_error(:undefined)
 
-  def cancel_timer(_TimerRef) do
-    :erlang.nif_error(:undefined)
-  end
+  def cancel_timer(_TimerRef), do: :erlang.nif_error(:undefined)
 
-  def cancel_timer(_TimerRef, _Options) do
-    :erlang.nif_error(:undefined)
-  end
+  def cancel_timer(_TimerRef, _Options), do: :erlang.nif_error(:undefined)
 
   @spec ceil(number) :: integer() when number: number()
-  def ceil(_) do
-    :erlang.nif_error(:undef)
-  end
+  def ceil(_), do: :erlang.nif_error(:undef)
 
   @spec check_old_code(module) :: boolean() when module: module()
-  def check_old_code(_Module) do
-    :erlang.nif_error(:undefined)
-  end
+  def check_old_code(_Module), do: :erlang.nif_error(:undefined)
 
   @spec check_process_code(pid, module) :: checkResult when pid: pid(), module: module(), checkResult: boolean()
   def check_process_code(pid, module) do
@@ -424,88 +304,18 @@ defmodule :erlang do
     end
   end
 
-  def convert_time_unit(time, fromUnit, toUnit) do
-    try do
-      fU = case fromUnit do
-      :native ->
-        :erts_internal.time_unit()
-      :perf_counter ->
-        :erts_internal.perf_counter_unit()
-      :nanosecond ->
-        1000 * 1000 * 1000
-      :microsecond ->
-        1000 * 1000
-      :millisecond ->
-        1000
-      :second ->
-        1
-      :nano_seconds ->
-        1000 * 1000 * 1000
-      :micro_seconds ->
-        1000 * 1000
-      :milli_seconds ->
-        1000
-      :seconds ->
-        1
-      _ when fromUnit > 0 ->
-        fromUnit
-    end
-    tU = case toUnit do
-      :native ->
-        :erts_internal.time_unit()
-      :perf_counter ->
-        :erts_internal.perf_counter_unit()
-      :nanosecond ->
-        1000 * 1000 * 1000
-      :microsecond ->
-        1000 * 1000
-      :millisecond ->
-        1000
-      :second ->
-        1
-      :nano_seconds ->
-        1000 * 1000 * 1000
-      :micro_seconds ->
-        1000 * 1000
-      :milli_seconds ->
-        1000
-      :seconds ->
-        1
-      _ when toUnit > 0 ->
-        toUnit
-    end
-    div(case time < 0 do
-      true ->
-        tU * time - fU - 1
-      false ->
-        tU * time
-    end, fU)
-    catch
-      {_, _, _} ->
-        :erlang.error(:badarg, [time, fromUnit, toUnit])
-    end
-  end
+  def convert_time_unit(time, fromUnit, toUnit), do: ...
 
-  def crc32(_Data) do
-    :erlang.nif_error(:undefined)
-  end
+  def crc32(_Data), do: :erlang.nif_error(:undefined)
 
-  def crc32(_OldCrc, _Data) do
-    :erlang.nif_error(:undefined)
-  end
+  def crc32(_OldCrc, _Data), do: :erlang.nif_error(:undefined)
 
-  def crc32_combine(_FirstCrc, _SecondCrc, _SecondSize) do
-    :erlang.nif_error(:undefined)
-  end
+  def crc32_combine(_FirstCrc, _SecondCrc, _SecondSize), do: :erlang.nif_error(:undefined)
 
   @spec date() :: date when date: :calendar.date()
-  def date() do
-    :erlang.nif_error(:undefined)
-  end
+  def date(), do: :erlang.nif_error(:undefined)
 
-  def decode_packet(_Type, _Bin, _Options) do
-    :erlang.nif_error(:undefined)
-  end
+  def decode_packet(_Type, _Bin, _Options), do: :erlang.nif_error(:undefined)
 
   def delay_trap(result, 0) do
     :erlang.yield()
@@ -520,73 +330,41 @@ defmodule :erlang do
     end
   end
 
-  def delete_element(_Index, _Tuple1) do
-    :erlang.nif_error(:undefined)
-  end
+  def delete_element(_Index, _Tuple1), do: :erlang.nif_error(:undefined)
 
   @spec delete_module(module) :: (true | :undefined) when module: module()
-  def delete_module(_Module) do
-    :erlang.nif_error(:undefined)
-  end
+  def delete_module(_Module), do: :erlang.nif_error(:undefined)
 
   @spec demonitor(monitorRef) :: true when monitorRef: reference()
-  def demonitor(_MonitorRef) do
-    :erlang.nif_error(:undefined)
-  end
+  def demonitor(_MonitorRef), do: :erlang.nif_error(:undefined)
 
   @spec demonitor(monitorRef, optionList) :: boolean() when monitorRef: reference(), optionList: [option], option: (:flush | :info)
-  def demonitor(_MonitorRef, _OptionList) do
-    :erlang.nif_error(:undefined)
-  end
+  def demonitor(_MonitorRef, _OptionList), do: :erlang.nif_error(:undefined)
 
   @spec disconnect_node(node) :: (boolean() | :ignored) when node: node()
-  def disconnect_node(node) do
-    :net_kernel.disconnect(node)
-  end
+  def disconnect_node(node), do: :net_kernel.disconnect(node)
 
-  def display(_Term) do
-    :erlang.nif_error(:undefined)
-  end
+  def display(_Term), do: :erlang.nif_error(:undefined)
 
-  def display_nl() do
-    :erlang.nif_error(:undefined)
-  end
+  def display_nl(), do: :erlang.nif_error(:undefined)
 
-  def display_string(_P1) do
-    :erlang.nif_error(:undefined)
-  end
+  def display_string(_P1), do: :erlang.nif_error(:undefined)
 
-  def dist_ctrl_get_data(_DHandle) do
-    :erlang.nif_error(:undefined)
-  end
+  def dist_ctrl_get_data(_DHandle), do: :erlang.nif_error(:undefined)
 
-  def dist_ctrl_get_data_notification(_DHandle) do
-    :erlang.nif_error(:undefined)
-  end
+  def dist_ctrl_get_data_notification(_DHandle), do: :erlang.nif_error(:undefined)
 
-  def dist_ctrl_get_opt(_DHandle, _Opt) do
-    :erlang.nif_error(:undefined)
-  end
+  def dist_ctrl_get_opt(_DHandle, _Opt), do: :erlang.nif_error(:undefined)
 
-  def dist_ctrl_input_handler(_DHandle, _InputHandler) do
-    :erlang.nif_error(:undefined)
-  end
+  def dist_ctrl_input_handler(_DHandle, _InputHandler), do: :erlang.nif_error(:undefined)
 
-  def dist_ctrl_put_data(_DHandle, _Data) do
-    :erlang.nif_error(:undefined)
-  end
+  def dist_ctrl_put_data(_DHandle, _Data), do: :erlang.nif_error(:undefined)
 
-  def dist_ctrl_set_opt(_DHandle, _Opt, _Val) do
-    :erlang.nif_error(:undefined)
-  end
+  def dist_ctrl_set_opt(_DHandle, _Opt, _Val), do: :erlang.nif_error(:undefined)
 
-  def dist_get_stat(_DHandle) do
-    :erlang.nif_error(:undefined)
-  end
+  def dist_get_stat(_DHandle), do: :erlang.nif_error(:undefined)
 
-  def div(_A, _B) do
-    :erlang.nif_error(:undefined)
-  end
+  def div(_A, _B), do: :erlang.nif_error(:undefined)
 
   def dmonitor_node(node, _Flag, []) do
     send(:erlang.self(), {:nodedown, node})
@@ -608,118 +386,68 @@ defmodule :erlang do
     end
   end
 
-  def dt_append_vm_tag_data(_IoData) do
-    :erlang.nif_error(:undefined)
-  end
+  def dt_append_vm_tag_data(_IoData), do: :erlang.nif_error(:undefined)
 
-  def dt_get_tag() do
-    :erlang.nif_error(:undefined)
-  end
+  def dt_get_tag(), do: :erlang.nif_error(:undefined)
 
-  def dt_get_tag_data() do
-    :erlang.nif_error(:undefined)
-  end
+  def dt_get_tag_data(), do: :erlang.nif_error(:undefined)
 
-  def dt_prepend_vm_tag_data(_IoData) do
-    :erlang.nif_error(:undefined)
-  end
+  def dt_prepend_vm_tag_data(_IoData), do: :erlang.nif_error(:undefined)
 
-  def dt_put_tag(_IoData) do
-    :erlang.nif_error(:undefined)
-  end
+  def dt_put_tag(_IoData), do: :erlang.nif_error(:undefined)
 
-  def dt_restore_tag(_TagData) do
-    :erlang.nif_error(:undefined)
-  end
+  def dt_restore_tag(_TagData), do: :erlang.nif_error(:undefined)
 
-  def dt_spread_tag(_Bool) do
-    :erlang.nif_error(:undefined)
-  end
+  def dt_spread_tag(_Bool), do: :erlang.nif_error(:undefined)
 
   @spec element(n, tuple) :: term() when n: pos_integer(), tuple: tuple()
-  def element(_N, _Tuple) do
-    :erlang.nif_error(:undefined)
-  end
+  def element(_N, _Tuple), do: :erlang.nif_error(:undefined)
 
   @spec erase() :: [{key, val}] when key: term(), val: term()
-  def erase() do
-    :erlang.nif_error(:undefined)
-  end
+  def erase(), do: :erlang.nif_error(:undefined)
 
   @spec erase(key) :: (val | :undefined) when key: term(), val: term()
-  def erase(_Key) do
-    :erlang.nif_error(:undefined)
-  end
+  def erase(_Key), do: :erlang.nif_error(:undefined)
 
   @spec error(reason) :: no_return() when reason: term()
-  def error(_Reason) do
-    :erlang.nif_error(:undefined)
-  end
+  def error(_Reason), do: :erlang.nif_error(:undefined)
 
   @spec error(reason, args) :: no_return() when reason: term(), args: [term()]
-  def error(_Reason, _Args) do
-    :erlang.nif_error(:undefined)
-  end
+  def error(_Reason, _Args), do: :erlang.nif_error(:undefined)
 
   @spec exit(reason) :: no_return() when reason: term()
-  def exit(_Reason) do
-    :erlang.nif_error(:undefined)
-  end
+  def exit(_Reason), do: :erlang.nif_error(:undefined)
 
   @spec exit(pid, reason) :: true when pid: (pid() | port()), reason: term()
-  def exit(_Pid, _Reason) do
-    :erlang.nif_error(:undefined)
-  end
+  def exit(_Pid, _Reason), do: :erlang.nif_error(:undefined)
 
-  def exit_signal(_Pid, _Reason) do
-    :erlang.nif_error(:undefined)
-  end
+  def exit_signal(_Pid, _Reason), do: :erlang.nif_error(:undefined)
 
-  def external_size(_Term) do
-    :erlang.nif_error(:undefined)
-  end
+  def external_size(_Term), do: :erlang.nif_error(:undefined)
 
-  def external_size(_Term, _Options) do
-    :erlang.nif_error(:undefined)
-  end
+  def external_size(_Term, _Options), do: :erlang.nif_error(:undefined)
 
-  def finish_after_on_load(_P1, _P2) do
-    :erlang.nif_error(:undefined)
-  end
+  def finish_after_on_load(_P1, _P2), do: :erlang.nif_error(:undefined)
 
-  def finish_loading(_List) do
-    :erlang.nif_error(:undefined)
-  end
+  def finish_loading(_List), do: :erlang.nif_error(:undefined)
 
   @spec float(number) :: unknown_type when number: number()
-  def float(_Number) do
-    :erlang.nif_error(:undefined)
-  end
+  def float(_Number), do: :erlang.nif_error(:undefined)
 
   @spec float_to_binary(float) :: binary() when float: unknown_type
-  def float_to_binary(_Float) do
-    :erlang.nif_error(:undefined)
-  end
+  def float_to_binary(_Float), do: :erlang.nif_error(:undefined)
 
   @spec float_to_binary(float, options) :: binary() when float: unknown_type, options: [option], option: ({:decimals, decimals :: 0..253} | {:scientific, decimals :: 0..249} | :compact)
-  def float_to_binary(_Float, _Options) do
-    :erlang.nif_error(:undefined)
-  end
+  def float_to_binary(_Float, _Options), do: :erlang.nif_error(:undefined)
 
   @spec float_to_list(float) :: charlist() when float: unknown_type
-  def float_to_list(_Float) do
-    :erlang.nif_error(:undefined)
-  end
+  def float_to_list(_Float), do: :erlang.nif_error(:undefined)
 
   @spec float_to_list(float, options) :: charlist() when float: unknown_type, options: [option], option: ({:decimals, decimals :: 0..253} | {:scientific, decimals :: 0..249} | :compact)
-  def float_to_list(_Float, _Options) do
-    :erlang.nif_error(:undefined)
-  end
+  def float_to_list(_Float, _Options), do: :erlang.nif_error(:undefined)
 
   @spec floor(number) :: integer() when number: number()
-  def floor(_) do
-    :erlang.nif_error(:undef)
-  end
+  def floor(_), do: :erlang.nif_error(:undef)
 
   def format_cpu_topology(internalCpuTopology) do
     try do
@@ -735,26 +463,16 @@ defmodule :erlang do
     fun_info_1(keys, fun, [])
   end
 
-  def fun_info(_Fun, _Item) do
-    :erlang.nif_error(:undefined)
-  end
+  def fun_info(_Fun, _Item), do: :erlang.nif_error(:undefined)
 
-  def fun_info_mfa(_Fun) do
-    :erlang.nif_error(:undefined)
-  end
+  def fun_info_mfa(_Fun), do: :erlang.nif_error(:undefined)
 
-  def fun_to_list(_Fun) do
-    :erlang.nif_error(:undefined)
-  end
+  def fun_to_list(_Fun), do: :erlang.nif_error(:undefined)
 
-  def function_exported(_Module, _Function, _Arity) do
-    :erlang.nif_error(:undefined)
-  end
+  def function_exported(_Module, _Function, _Arity), do: :erlang.nif_error(:undefined)
 
   @spec garbage_collect() :: true
-  def garbage_collect() do
-    :erts_internal.garbage_collect(:major)
-  end
+  def garbage_collect(), do: :erts_internal.garbage_collect(:major)
 
   @spec garbage_collect(pid) :: gCResult when pid: pid(), gCResult: boolean()
   def garbage_collect(pid) do
@@ -795,54 +513,32 @@ defmodule :erlang do
     end
   end
 
-  def garbage_collect_message_area() do
-    :erlang.nif_error(:undefined)
-  end
+  def garbage_collect_message_area(), do: :erlang.nif_error(:undefined)
 
-  def gather_gc_info_result(ref) when :erlang.is_reference(ref) do
-    gc_info(ref, :erlang.system_info(:schedulers), {0, 0})
-  end
+  def gather_gc_info_result(ref) when :erlang.is_reference(ref), do: gc_info(ref, :erlang.system_info(:schedulers), {0, 0})
 
   @spec get() :: [{key, val}] when key: term(), val: term()
-  def get() do
-    :erlang.nif_error(:undefined)
-  end
+  def get(), do: :erlang.nif_error(:undefined)
 
   @spec get(key) :: (val | :undefined) when key: term(), val: term()
-  def get(_Key) do
-    :erlang.nif_error(:undefined)
-  end
+  def get(_Key), do: :erlang.nif_error(:undefined)
 
-  def get_cookie() do
-    :auth.get_cookie()
-  end
+  def get_cookie(), do: :auth.get_cookie()
 
   @spec get_keys() :: [key] when key: term()
-  def get_keys() do
-    :erlang.nif_error(:undefined)
-  end
+  def get_keys(), do: :erlang.nif_error(:undefined)
 
   @spec get_keys(val) :: [key] when val: term(), key: term()
-  def get_keys(_Val) do
-    :erlang.nif_error(:undefined)
-  end
+  def get_keys(_Val), do: :erlang.nif_error(:undefined)
 
-  def get_module_info(_Module) do
-    :erlang.nif_error(:undefined)
-  end
+  def get_module_info(_Module), do: :erlang.nif_error(:undefined)
 
-  def get_module_info(_Module, _Item) do
-    :erlang.nif_error(:undefined)
-  end
+  def get_module_info(_Module, _Item), do: :erlang.nif_error(:undefined)
 
-  def get_stacktrace() do
-    :erlang.nif_error(:undefined)
-  end
+  def get_stacktrace(), do: :erlang.nif_error(:undefined)
 
   @spec group_leader() :: pid()
-  def group_leader() do
-    :erlang.nif_error(:undefined)
-  end
+  def group_leader(), do: :erlang.nif_error(:undefined)
 
   @spec group_leader(groupLeader, pid) :: true when groupLeader: pid(), pid: pid()
   def group_leader(groupLeader, pid) do
@@ -866,239 +562,143 @@ defmodule :erlang do
   end
 
   @spec halt() :: no_return()
-  def halt() do
-    :erlang.halt(0, [])
-  end
+  def halt(), do: :erlang.halt(0, [])
 
   @spec halt(status) :: no_return() when status: (non_neg_integer() | :abort | charlist())
-  def halt(status) do
-    :erlang.halt(status, [])
-  end
+  def halt(status), do: :erlang.halt(status, [])
 
   @spec halt(status, options) :: no_return() when status: (non_neg_integer() | :abort | charlist()), options: [option], option: {:flush, boolean()}
-  def halt(_Status, _Options) do
-    :erlang.nif_error(:undefined)
-  end
+  def halt(_Status, _Options), do: :erlang.nif_error(:undefined)
 
-  def has_prepared_code_on_load(_PreparedCode) do
-    :erlang.nif_error(:undefined)
-  end
+  def has_prepared_code_on_load(_PreparedCode), do: :erlang.nif_error(:undefined)
 
   @spec hd(list) :: term() when list: [term(), ...]
-  def hd(_List) do
-    :erlang.nif_error(:undefined)
-  end
+  def hd(_List), do: :erlang.nif_error(:undefined)
 
-  def hibernate(_Module, _Function, _Args) do
-    :erlang.nif_error(:undefined)
-  end
+  def hibernate(_Module, _Function, _Args), do: :erlang.nif_error(:undefined)
 
-  def insert_element(_Index, _Tuple1, _Term) do
-    :erlang.nif_error(:undefined)
-  end
+  def insert_element(_Index, _Tuple1, _Term), do: :erlang.nif_error(:undefined)
 
   @spec integer_to_binary(integer) :: binary() when integer: integer()
-  def integer_to_binary(_Integer) do
-    :erlang.nif_error(:undefined)
-  end
+  def integer_to_binary(_Integer), do: :erlang.nif_error(:undefined)
 
   @spec integer_to_binary(integer, base) :: binary() when integer: integer(), base: 2..36
-  def integer_to_binary(_I, _Base) do
-    :erlang.nif_error(:undefined)
-  end
+  def integer_to_binary(_I, _Base), do: :erlang.nif_error(:undefined)
 
   @spec integer_to_list(integer) :: charlist() when integer: integer()
-  def integer_to_list(_Integer) do
-    :erlang.nif_error(:undefined)
-  end
+  def integer_to_list(_Integer), do: :erlang.nif_error(:undefined)
 
   @spec integer_to_list(integer, base) :: charlist() when integer: integer(), base: 2..36
-  def integer_to_list(_I, _Base) do
-    :erlang.nif_error(:undefined)
-  end
+  def integer_to_list(_I, _Base), do: :erlang.nif_error(:undefined)
 
   @spec iolist_size(item) :: non_neg_integer() when item: (iolist() | binary())
-  def iolist_size(_Item) do
-    :erlang.nif_error(:undefined)
-  end
+  def iolist_size(_Item), do: :erlang.nif_error(:undefined)
 
   @spec iolist_to_binary(ioListOrBinary) :: binary() when ioListOrBinary: (iolist() | binary())
-  def iolist_to_binary(_IoListOrBinary) do
-    :erlang.nif_error(:undefined)
-  end
+  def iolist_to_binary(_IoListOrBinary), do: :erlang.nif_error(:undefined)
 
-  def iolist_to_iovec(_IoListOrBinary) do
-    :erlang.nif_error(:undefined)
-  end
+  def iolist_to_iovec(_IoListOrBinary), do: :erlang.nif_error(:undefined)
 
   @spec is_alive() :: boolean()
-  def is_alive() do
-    :erlang.nif_error(:undefined)
-  end
+  def is_alive(), do: :erlang.nif_error(:undefined)
 
   @spec is_atom(term) :: boolean() when term: term()
-  def is_atom(_Term) do
-    :erlang.nif_error(:undefined)
-  end
+  def is_atom(_Term), do: :erlang.nif_error(:undefined)
 
   @spec is_binary(term) :: boolean() when term: term()
-  def is_binary(_Term) do
-    :erlang.nif_error(:undefined)
-  end
+  def is_binary(_Term), do: :erlang.nif_error(:undefined)
 
   @spec is_bitstring(term) :: boolean() when term: term()
-  def is_bitstring(_Term) do
-    :erlang.nif_error(:undefined)
-  end
+  def is_bitstring(_Term), do: :erlang.nif_error(:undefined)
 
   @spec is_boolean(term) :: boolean() when term: term()
-  def is_boolean(_Term) do
-    :erlang.nif_error(:undefined)
-  end
+  def is_boolean(_Term), do: :erlang.nif_error(:undefined)
 
-  def is_builtin(_Module, _Function, _Arity) do
-    :erlang.nif_error(:undefined)
-  end
+  def is_builtin(_Module, _Function, _Arity), do: :erlang.nif_error(:undefined)
 
   @spec is_float(term) :: boolean() when term: term()
-  def is_float(_Term) do
-    :erlang.nif_error(:undefined)
-  end
+  def is_float(_Term), do: :erlang.nif_error(:undefined)
 
   @spec is_function(term) :: boolean() when term: term()
-  def is_function(_Term) do
-    :erlang.nif_error(:undefined)
-  end
+  def is_function(_Term), do: :erlang.nif_error(:undefined)
 
   @spec is_function(term, arity) :: boolean() when term: term(), arity: arity()
-  def is_function(_Term, _Arity) do
-    :erlang.nif_error(:undefined)
-  end
+  def is_function(_Term, _Arity), do: :erlang.nif_error(:undefined)
 
   @spec is_integer(term) :: boolean() when term: term()
-  def is_integer(_Term) do
-    :erlang.nif_error(:undefined)
-  end
+  def is_integer(_Term), do: :erlang.nif_error(:undefined)
 
   @spec is_list(term) :: boolean() when term: term()
-  def is_list(_Term) do
-    :erlang.nif_error(:undefined)
-  end
+  def is_list(_Term), do: :erlang.nif_error(:undefined)
 
   @spec is_map(term) :: boolean() when term: term()
-  def is_map(_Term) do
-    :erlang.nif_error(:undefined)
-  end
+  def is_map(_Term), do: :erlang.nif_error(:undefined)
 
   @spec is_map_key(key, map) :: boolean() when key: term(), map: map()
-  def is_map_key(_, _) do
-    :erlang.nif_error(:undef)
-  end
+  def is_map_key(_, _), do: :erlang.nif_error(:undef)
 
   @spec is_number(term) :: boolean() when term: term()
-  def is_number(_Term) do
-    :erlang.nif_error(:undefined)
-  end
+  def is_number(_Term), do: :erlang.nif_error(:undefined)
 
   @spec is_pid(term) :: boolean() when term: term()
-  def is_pid(_Term) do
-    :erlang.nif_error(:undefined)
-  end
+  def is_pid(_Term), do: :erlang.nif_error(:undefined)
 
   @spec is_port(term) :: boolean() when term: term()
-  def is_port(_Term) do
-    :erlang.nif_error(:undefined)
-  end
+  def is_port(_Term), do: :erlang.nif_error(:undefined)
 
   @spec is_process_alive(pid) :: boolean() when pid: pid()
-  def is_process_alive(_Pid) do
-    :erlang.nif_error(:undefined)
-  end
+  def is_process_alive(_Pid), do: :erlang.nif_error(:undefined)
 
   @spec is_record(term, recordTag) :: boolean() when term: term(), recordTag: atom()
-  def is_record(_Term, _RecordTag) do
-    :erlang.nif_error(:undefined)
-  end
+  def is_record(_Term, _RecordTag), do: :erlang.nif_error(:undefined)
 
   @spec is_record(term, recordTag, size) :: boolean() when term: term(), recordTag: atom(), size: non_neg_integer()
-  def is_record(_Term, _RecordTag, _Size) do
-    :erlang.nif_error(:undefined)
-  end
+  def is_record(_Term, _RecordTag, _Size), do: :erlang.nif_error(:undefined)
 
   @spec is_reference(term) :: boolean() when term: term()
-  def is_reference(_Term) do
-    :erlang.nif_error(:undefined)
-  end
+  def is_reference(_Term), do: :erlang.nif_error(:undefined)
 
   @spec is_tuple(term) :: boolean() when term: term()
-  def is_tuple(_Term) do
-    :erlang.nif_error(:undefined)
-  end
+  def is_tuple(_Term), do: :erlang.nif_error(:undefined)
 
   @spec length(list) :: non_neg_integer() when list: [term()]
-  def length(_List) do
-    :erlang.nif_error(:undefined)
-  end
+  def length(_List), do: :erlang.nif_error(:undefined)
 
   @spec link(pidOrPort) :: true when pidOrPort: (pid() | port())
-  def link(_PidOrPort) do
-    :erlang.nif_error(:undefined)
-  end
+  def link(_PidOrPort), do: :erlang.nif_error(:undefined)
 
   @spec list_to_atom(string) :: atom() when string: charlist()
-  def list_to_atom(_String) do
-    :erlang.nif_error(:undefined)
-  end
+  def list_to_atom(_String), do: :erlang.nif_error(:undefined)
 
   @spec list_to_binary(ioList) :: binary() when ioList: iolist()
-  def list_to_binary(_IoList) do
-    :erlang.nif_error(:undefined)
-  end
+  def list_to_binary(_IoList), do: :erlang.nif_error(:undefined)
 
   @spec list_to_bitstring(bitstringList) :: unknown_type when bitstringList: bitstring_list()
-  def list_to_bitstring(_BitstringList) do
-    :erlang.nif_error(:undefined)
-  end
+  def list_to_bitstring(_BitstringList), do: :erlang.nif_error(:undefined)
 
   @spec list_to_existing_atom(string) :: atom() when string: charlist()
-  def list_to_existing_atom(_String) do
-    :erlang.nif_error(:undefined)
-  end
+  def list_to_existing_atom(_String), do: :erlang.nif_error(:undefined)
 
   @spec list_to_float(string) :: unknown_type when string: charlist()
-  def list_to_float(_String) do
-    :erlang.nif_error(:undefined)
-  end
+  def list_to_float(_String), do: :erlang.nif_error(:undefined)
 
   @spec list_to_integer(string) :: integer() when string: charlist()
-  def list_to_integer(_String) do
-    :erlang.nif_error(:undefined)
-  end
+  def list_to_integer(_String), do: :erlang.nif_error(:undefined)
 
   @spec list_to_integer(string, base) :: integer() when string: charlist(), base: 2..36
-  def list_to_integer(_String, _Base) do
-    :erlang.nif_error(:undefined)
-  end
+  def list_to_integer(_String, _Base), do: :erlang.nif_error(:undefined)
 
   @spec list_to_pid(string) :: pid() when string: charlist()
-  def list_to_pid(_String) do
-    :erlang.nif_error(:undefined)
-  end
+  def list_to_pid(_String), do: :erlang.nif_error(:undefined)
 
   @spec list_to_port(string) :: port() when string: charlist()
-  def list_to_port(_String) do
-    :erlang.nif_error(:undefined)
-  end
+  def list_to_port(_String), do: :erlang.nif_error(:undefined)
 
   @spec list_to_ref(string) :: reference() when string: charlist()
-  def list_to_ref(_String) do
-    :erlang.nif_error(:undefined)
-  end
+  def list_to_ref(_String), do: :erlang.nif_error(:undefined)
 
   @spec list_to_tuple(list) :: tuple() when list: [term()]
-  def list_to_tuple(_List) do
-    :erlang.nif_error(:undefined)
-  end
+  def list_to_tuple(_List), do: :erlang.nif_error(:undefined)
 
   @spec load_module(module, binary) :: ({:module, module} | {:error, reason}) when module: module(), binary: binary(), reason: (:badfile | :not_purged | :on_load)
   def load_module(mod, code) do
@@ -1115,81 +715,45 @@ defmodule :erlang do
     end
   end
 
-  def load_nif(_Path, _LoadInfo) do
-    :erlang.nif_error(:undefined)
-  end
+  def load_nif(_Path, _LoadInfo), do: :erlang.nif_error(:undefined)
 
-  def loaded() do
-    :erlang.nif_error(:undefined)
-  end
+  def loaded(), do: :erlang.nif_error(:undefined)
 
-  def localtime() do
-    :erlang.nif_error(:undefined)
-  end
+  def localtime(), do: :erlang.nif_error(:undefined)
 
-  def localtime_to_universaltime(localtime) do
-    :erlang.localtime_to_universaltime(localtime, :undefined)
-  end
+  def localtime_to_universaltime(localtime), do: :erlang.localtime_to_universaltime(localtime, :undefined)
 
-  def localtime_to_universaltime(_Localtime, _IsDst) do
-    :erlang.nif_error(:undefined)
-  end
+  def localtime_to_universaltime(_Localtime, _IsDst), do: :erlang.nif_error(:undefined)
 
-  def make_fun(_Module, _Function, _Arity) do
-    :erlang.nif_error(:undefined)
-  end
+  def make_fun(_Module, _Function, _Arity), do: :erlang.nif_error(:undefined)
 
   @spec make_ref() :: reference()
-  def make_ref() do
-    :erlang.nif_error(:undefined)
-  end
+  def make_ref(), do: :erlang.nif_error(:undefined)
 
-  def make_tuple(_Arity, _InitialValue) do
-    :erlang.nif_error(:undefined)
-  end
+  def make_tuple(_Arity, _InitialValue), do: :erlang.nif_error(:undefined)
 
-  def make_tuple(_Arity, _DefaultValue, _InitList) do
-    :erlang.nif_error(:undefined)
-  end
+  def make_tuple(_Arity, _DefaultValue, _InitList), do: :erlang.nif_error(:undefined)
 
   @spec map_get(key, map) :: value when map: map(), key: any(), value: any()
-  def map_get(_Key, _Map) do
-    :erlang.nif_error(:undefined)
-  end
+  def map_get(_Key, _Map), do: :erlang.nif_error(:undefined)
 
   @spec map_size(map) :: non_neg_integer() when map: map()
-  def map_size(_Map) do
-    :erlang.nif_error(:undefined)
-  end
+  def map_size(_Map), do: :erlang.nif_error(:undefined)
 
-  def match_spec_test(_P1, _P2, _P3) do
-    :erlang.nif_error(:undefined)
-  end
+  def match_spec_test(_P1, _P2, _P3), do: :erlang.nif_error(:undefined)
 
   @spec max(term1, term2) :: maximum when term1: term(), term2: term(), maximum: term()
-  def max(a, b) when a < b do
-    b
-  end
+  def max(a, b) when a < b, do: b
 
-  def max(a, _) do
-    a
-  end
+  def max(a, _), do: a
 
-  def md5(_Data) do
-    :erlang.nif_error(:undefined)
-  end
+  def md5(_Data), do: :erlang.nif_error(:undefined)
 
-  def md5_final(_Context) do
-    :erlang.nif_error(:undefined)
-  end
+  def md5_final(_Context), do: :erlang.nif_error(:undefined)
 
-  def md5_init() do
-    :erlang.nif_error(:undefined)
-  end
+  def md5_init(), do: :erlang.nif_error(:undefined)
 
-  def md5_update(_Context, _Data) do
-    :erlang.nif_error(:undefined)
-  end
+  def md5_update(_Context, _Data), do: :erlang.nif_error(:undefined)
 
   def memory() do
     case aa_mem_data(au_mem_data(:erlang.system_info(:alloc_util_allocators) -- [:mseg_alloc])) do
@@ -1229,13 +793,9 @@ defmodule :erlang do
   end
 
   @spec min(term1, term2) :: minimum when term1: term(), term2: term(), minimum: term()
-  def min(a, b) when a > b do
-    b
-  end
+  def min(a, b) when a > b, do: b
 
-  def min(a, _) do
-    a
-  end
+  def min(a, _), do: a
 
   def module_info() do
     # body not decompiled
@@ -1246,70 +806,42 @@ defmodule :erlang do
   end
 
   @spec module_loaded(module) :: boolean() when module: module()
-  def module_loaded(_Module) do
-    :erlang.nif_error(:undefined)
-  end
+  def module_loaded(_Module), do: :erlang.nif_error(:undefined)
 
   @spec monitor(:process, monitor_process_identifier()) :: monitorRef when monitorRef: reference()
   @spec monitor(:port, monitor_port_identifier()) :: monitorRef when monitorRef: reference()
   @spec monitor(:time_offset, :clock_service) :: monitorRef when monitorRef: reference()
-  def monitor(_Type, _Item) do
-    :erlang.nif_error(:undefined)
-  end
+  def monitor(_Type, _Item), do: :erlang.nif_error(:undefined)
 
   @spec monitor_node(node, flag) :: true when node: node(), flag: boolean()
-  def monitor_node(_Node, _Flag) do
-    :erlang.nif_error(:undefined)
-  end
+  def monitor_node(_Node, _Flag), do: :erlang.nif_error(:undefined)
 
-  def monitor_node(_Node, _Flag, _Options) do
-    :erlang.nif_error(:undefined)
-  end
+  def monitor_node(_Node, _Flag, _Options), do: :erlang.nif_error(:undefined)
 
-  def monotonic_time() do
-    :erlang.nif_error(:undefined)
-  end
+  def monotonic_time(), do: :erlang.nif_error(:undefined)
 
-  def monotonic_time(_Unit) do
-    :erlang.nif_error(:undefined)
-  end
+  def monotonic_time(_Unit), do: :erlang.nif_error(:undefined)
 
-  def nif_error(_Reason) do
-    :erlang.nif_error(:undefined)
-  end
+  def nif_error(_Reason), do: :erlang.nif_error(:undefined)
 
-  def nif_error(_Reason, _Args) do
-    :erlang.nif_error(:undefined)
-  end
+  def nif_error(_Reason, _Args), do: :erlang.nif_error(:undefined)
 
   @spec node() :: node when node: node()
-  def node() do
-    :erlang.nif_error(:undefined)
-  end
+  def node(), do: :erlang.nif_error(:undefined)
 
   @spec node(arg) :: node when arg: (pid() | port() | reference()), node: node()
-  def node(_Arg) do
-    :erlang.nif_error(:undefined)
-  end
+  def node(_Arg), do: :erlang.nif_error(:undefined)
 
   @spec nodes() :: nodes when nodes: [node()]
-  def nodes() do
-    :erlang.nodes(:visible)
-  end
+  def nodes(), do: :erlang.nodes(:visible)
 
   @spec nodes(arg) :: nodes when arg: (nodeType | [nodeType]), nodeType: (:visible | :hidden | :connected | :this | :known), nodes: [node()]
-  def nodes(_Arg) do
-    :erlang.nif_error(:undefined)
-  end
+  def nodes(_Arg), do: :erlang.nif_error(:undefined)
 
-  def not(_A) do
-    :erlang.nif_error(:undefined)
-  end
+  def not(_A), do: :erlang.nif_error(:undefined)
 
   @spec now() :: timestamp when timestamp: timestamp()
-  def now() do
-    :erlang.nif_error(:undefined)
-  end
+  def now(), do: :erlang.nif_error(:undefined)
 
   @spec open_port(portName, portSettings) :: port() when portName: ({:spawn, command :: (charlist() | binary())} | {:spawn_driver, command :: (charlist() | binary())} | {:spawn_executable, fileName :: :file.name_all()} | {:fd, erlangVariableIn :: non_neg_integer(), out :: non_neg_integer()}), portSettings: [opt], opt: ({:packet, n :: (1 | 2 | 4)} | :stream | {:line, l :: non_neg_integer()} | {:cd, dir :: (charlist() | binary())} | {:env, env :: [{name :: :os.env_var_name(), val :: (:os.env_var_value() | false)}]} | {:args, [(charlist() | binary())]} | {:arg0, (charlist() | binary())} | :exit_status | :use_stdio | :nouse_stdio | :stderr_to_stdout | :in | :out | :binary | :eof | {:parallelism, boolean :: boolean()} | :hide | {:busy_limits_port, ({non_neg_integer(), non_neg_integer()} | :disabled)} | {:busy_limits_msgq, ({non_neg_integer(), non_neg_integer()} | :disabled)})
   def open_port(portName, portSettings) do
@@ -1330,26 +862,16 @@ defmodule :erlang do
     end
   end
 
-  def unquote(:or)(_A, _B) do
-    :erlang.nif_error(:undefined)
-  end
+  def _A or _B, do: :erlang.nif_error(:undefined)
 
-  def phash(_Term, _Range) do
-    :erlang.nif_error(:undefined)
-  end
+  def phash(_Term, _Range), do: :erlang.nif_error(:undefined)
 
-  def phash2(_Term) do
-    :erlang.nif_error(:undefined)
-  end
+  def phash2(_Term), do: :erlang.nif_error(:undefined)
 
-  def phash2(_Term, _Range) do
-    :erlang.nif_error(:undefined)
-  end
+  def phash2(_Term, _Range), do: :erlang.nif_error(:undefined)
 
   @spec pid_to_list(pid) :: charlist() when pid: pid()
-  def pid_to_list(_Pid) do
-    :erlang.nif_error(:undefined)
-  end
+  def pid_to_list(_Pid), do: :erlang.nif_error(:undefined)
 
   def port_call(port, data) do
     case :erts_internal.port_call(port, 0, data) do
@@ -1482,9 +1004,7 @@ defmodule :erlang do
     end
   end
 
-  def port_get_data(_Port) do
-    :erlang.nif_error(:undefined)
-  end
+  def port_get_data(_Port), do: :erlang.nif_error(:undefined)
 
   def port_info(port) do
     case :erts_internal.port_info(port) do
@@ -1522,31 +1042,19 @@ defmodule :erlang do
     end
   end
 
-  def port_set_data(_Port, _Data) do
-    :erlang.nif_error(:undefined)
-  end
+  def port_set_data(_Port, _Data), do: :erlang.nif_error(:undefined)
 
   @spec port_to_list(port) :: charlist() when port: port()
-  def port_to_list(_Port) do
-    :erlang.nif_error(:undefined)
-  end
+  def port_to_list(_Port), do: :erlang.nif_error(:undefined)
 
-  def ports() do
-    :erlang.nif_error(:undefined)
-  end
+  def ports(), do: :erlang.nif_error(:undefined)
 
-  def posixtime_to_universaltime(_P1) do
-    :erlang.nif_error(:undefined)
-  end
+  def posixtime_to_universaltime(_P1), do: :erlang.nif_error(:undefined)
 
   @spec pre_loaded() :: [module()]
-  def pre_loaded() do
-    :erlang.nif_error(:undefined)
-  end
+  def pre_loaded(), do: :erlang.nif_error(:undefined)
 
-  def prepare_loading(_Module, _Code) do
-    :erlang.nif_error(:undefined)
-  end
+  def prepare_loading(_Module, _Code), do: :erlang.nif_error(:undefined)
 
   def process_display(pid, type) do
     case :erts_internal.process_display(pid, type) do
@@ -1577,9 +1085,7 @@ defmodule :erlang do
   @spec process_flag(:sensitive, boolean) :: oldBoolean when boolean: boolean(), oldBoolean: boolean()
   @spec process_flag({:monitor_nodes, term()}, term()) :: term()
   @spec process_flag(:monitor_nodes, term()) :: term()
-  def process_flag(_Flag, _Value) do
-    :erlang.nif_error(:undefined)
-  end
+  def process_flag(_Flag, _Value), do: :erlang.nif_error(:undefined)
 
   @spec process_flag(pid, flag, value) :: oldValue when pid: pid(), flag: :save_calls, value: non_neg_integer(), oldValue: non_neg_integer()
   def process_flag(pid, flag, value) do
@@ -1601,20 +1107,14 @@ defmodule :erlang do
   end
 
   @spec process_info(pid) :: info when pid: pid(), info: ([infoTuple] | :undefined), infoTuple: process_info_result_item()
-  def process_info(_Pid) do
-    :erlang.nif_error(:undefined)
-  end
+  def process_info(_Pid), do: :erlang.nif_error(:undefined)
 
   @spec process_info(pid, item) :: (infoTuple | [] | :undefined) when pid: pid(), item: process_info_item(), infoTuple: process_info_result_item()
   @spec process_info(pid, itemList) :: (infoTupleList | [] | :undefined) when pid: pid(), itemList: [item], item: process_info_item(), infoTupleList: [infoTuple], infoTuple: process_info_result_item()
-  def process_info(_Pid, _ItemSpec) do
-    :erlang.nif_error(:undefined)
-  end
+  def process_info(_Pid, _ItemSpec), do: :erlang.nif_error(:undefined)
 
   @spec processes() :: [pid()]
-  def processes() do
-    :erlang.nif_error(:undefined)
-  end
+  def processes(), do: :erlang.nif_error(:undefined)
 
   @spec purge_module(module) :: true when module: atom()
   def purge_module(module) when :erlang.is_atom(module) do
@@ -1626,79 +1126,45 @@ defmodule :erlang do
     end
   end
 
-  def purge_module(arg) do
-    :erlang.error(:badarg, [arg])
-  end
+  def purge_module(arg), do: :erlang.error(:badarg, [arg])
 
   @spec put(key, val) :: term() when key: term(), val: term()
-  def put(_Key, _Val) do
-    :erlang.nif_error(:undefined)
-  end
+  def put(_Key, _Val), do: :erlang.nif_error(:undefined)
 
-  def raise(_Class, _Reason, _Stacktrace) do
-    :erlang.nif_error(:undefined)
-  end
+  def raise(_Class, _Reason, _Stacktrace), do: :erlang.nif_error(:undefined)
 
-  def read_timer(_TimerRef) do
-    :erlang.nif_error(:undefined)
-  end
+  def read_timer(_TimerRef), do: :erlang.nif_error(:undefined)
 
-  def read_timer(_TimerRef, _Options) do
-    :erlang.nif_error(:undefined)
-  end
+  def read_timer(_TimerRef, _Options), do: :erlang.nif_error(:undefined)
 
   @spec ref_to_list(ref) :: charlist() when ref: reference()
-  def ref_to_list(_Ref) do
-    :erlang.nif_error(:undefined)
-  end
+  def ref_to_list(_Ref), do: :erlang.nif_error(:undefined)
 
   @spec register(regName, pidOrPort) :: true when regName: atom(), pidOrPort: (port() | pid())
-  def register(_RegName, _PidOrPort) do
-    :erlang.nif_error(:undefined)
-  end
+  def register(_RegName, _PidOrPort), do: :erlang.nif_error(:undefined)
 
   @spec registered() :: [regName] when regName: atom()
-  def registered() do
-    :erlang.nif_error(:undefined)
-  end
+  def registered(), do: :erlang.nif_error(:undefined)
 
-  def rem(_A, _B) do
-    :erlang.nif_error(:undefined)
-  end
+  def rem(_A, _B), do: :erlang.nif_error(:undefined)
 
-  def resume_process(_Suspendee) do
-    :erlang.nif_error(:undefined)
-  end
+  def resume_process(_Suspendee), do: :erlang.nif_error(:undefined)
 
   @spec round(number) :: integer() when number: number()
-  def round(_Number) do
-    :erlang.nif_error(:undefined)
-  end
+  def round(_Number), do: :erlang.nif_error(:undefined)
 
   @spec self() :: pid()
-  def self() do
-    :erlang.nif_error(:undefined)
-  end
+  def self(), do: :erlang.nif_error(:undefined)
 
-  def send(_Dest, _Msg) do
-    :erlang.nif_error(:undefined)
-  end
+  def send(_Dest, _Msg), do: :erlang.nif_error(:undefined)
 
-  def send(_Dest, _Msg, _Options) do
-    :erlang.nif_error(:undefined)
-  end
+  def send(_Dest, _Msg, _Options), do: :erlang.nif_error(:undefined)
 
-  def send_after(_Time, _Dest, _Msg) do
-    :erlang.nif_error(:undefined)
-  end
+  def send_after(_Time, _Dest, _Msg), do: :erlang.nif_error(:undefined)
 
-  def send_after(_Time, _Dest, _Msg, _Options) do
-    :erlang.nif_error(:undefined)
-  end
+  def send_after(_Time, _Dest, _Msg, _Options), do: :erlang.nif_error(:undefined)
 
-  def send_nosuspend(pid, msg) do
-    send_nosuspend(pid, msg, [])
-  end
+  def send_nosuspend(pid, msg), do: send_nosuspend(pid, msg, [])
 
   def send_nosuspend(pid, msg, opts) do
     case :erlang.send(pid, msg, [:nosuspend | opts]) do
@@ -1709,21 +1175,13 @@ defmodule :erlang do
     end
   end
 
-  def seq_trace(_P1, _P2) do
-    :erlang.nif_error(:undefined)
-  end
+  def seq_trace(_P1, _P2), do: :erlang.nif_error(:undefined)
 
-  def seq_trace_info(_What) do
-    :erlang.nif_error(:undefined)
-  end
+  def seq_trace_info(_What), do: :erlang.nif_error(:undefined)
 
-  def seq_trace_print(_P1) do
-    :erlang.nif_error(:undefined)
-  end
+  def seq_trace_print(_P1), do: :erlang.nif_error(:undefined)
 
-  def seq_trace_print(_P1, _P2) do
-    :erlang.nif_error(:undefined)
-  end
+  def seq_trace_print(_P1, _P2), do: :erlang.nif_error(:undefined)
 
   def set_cookie(node, c) when node !== :"nonode@nohost" and :erlang.is_atom(node) do
     case :erlang.is_atom(c) do
@@ -1744,13 +1202,9 @@ defmodule :erlang do
   end
 
   @spec setelement(index, tuple1, value) :: tuple2 when index: pos_integer(), tuple1: tuple(), tuple2: tuple(), value: term()
-  def setelement(_Index, _Tuple1, _Value) do
-    :erlang.nif_error(:undefined)
-  end
+  def setelement(_Index, _Tuple1, _Value), do: :erlang.nif_error(:undefined)
 
-  def setnode(_P1, _P2) do
-    :erlang.nif_error(:undefined)
-  end
+  def setnode(_P1, _P2), do: :erlang.nif_error(:undefined)
 
   def setnode(node, distCtrlr, {_Flags, _Ver, _Creation} = opts) do
     case :erts_internal.create_dist_channel(node, distCtrlr, opts) do
@@ -1772,54 +1226,32 @@ defmodule :erlang do
     end
   end
 
-  def setnode(node, distCtrlr, opts) do
-    :erlang.error(:badarg, [node, distCtrlr, opts])
-  end
+  def setnode(node, distCtrlr, opts), do: :erlang.error(:badarg, [node, distCtrlr, opts])
 
   @spec size(item) :: non_neg_integer() when item: (tuple() | binary())
-  def size(_Item) do
-    :erlang.nif_error(:undefined)
-  end
+  def size(_Item), do: :erlang.nif_error(:undefined)
 
   @spec spawn(fun) :: pid() when fun: function()
-  def spawn(f) when :erlang.is_function(f) do
-    :erlang.spawn(:erlang, :apply, [f, []])
-  end
+  def spawn(f) when :erlang.is_function(f), do: :erlang.spawn(:erlang, :apply, [f, []])
 
-  def spawn({m, f} = mF) when :erlang.is_atom(m) and :erlang.is_atom(f) do
-    :erlang.spawn(:erlang, :apply, [mF, []])
-  end
+  def spawn({m, f} = mF) when :erlang.is_atom(m) and :erlang.is_atom(f), do: :erlang.spawn(:erlang, :apply, [mF, []])
 
-  def spawn(f) do
-    :erlang.error(:badarg, [f])
-  end
+  def spawn(f), do: :erlang.error(:badarg, [f])
 
   @spec spawn(node, fun) :: pid() when node: node(), fun: function()
-  def spawn(n, f) when n === :erlang.node() do
-    :erlang.spawn(f)
-  end
+  def spawn(n, f) when n === :erlang.node(), do: :erlang.spawn(f)
 
-  def spawn(n, f) when :erlang.is_function(f) do
-    :erlang.spawn(n, :erlang, :apply, [f, []])
-  end
+  def spawn(n, f) when :erlang.is_function(f), do: :erlang.spawn(n, :erlang, :apply, [f, []])
 
-  def spawn(n, {m, f} = mF) when :erlang.is_atom(m) and :erlang.is_atom(f) do
-    :erlang.spawn(n, :erlang, :apply, [mF, []])
-  end
+  def spawn(n, {m, f} = mF) when :erlang.is_atom(m) and :erlang.is_atom(f), do: :erlang.spawn(n, :erlang, :apply, [mF, []])
 
-  def spawn(n, f) do
-    :erlang.error(:badarg, [n, f])
-  end
+  def spawn(n, f), do: :erlang.error(:badarg, [n, f])
 
   @spec spawn(module, function, args) :: pid() when module: module(), function: atom(), args: [term()]
-  def spawn(_Module, _Function, _Args) do
-    :erlang.nif_error(:undefined)
-  end
+  def spawn(_Module, _Function, _Args), do: :erlang.nif_error(:undefined)
 
   @spec spawn(node, module, function, args) :: pid() when node: node(), module: module(), function: atom(), args: [term()]
-  def spawn(n, m, f, a) when n === :erlang.node() and :erlang.is_atom(m) and :erlang.is_atom(f) and :erlang.is_list(a) do
-    :erlang.spawn(m, f, a)
-  end
+  def spawn(n, m, f, a) when n === :erlang.node() and :erlang.is_atom(m) and :erlang.is_atom(f) and :erlang.is_list(a), do: :erlang.spawn(m, f, a)
 
   def spawn(n, m, f, a) when :erlang.is_atom(n) and :erlang.is_atom(m) and :erlang.is_atom(f) do
     try do
@@ -1830,49 +1262,29 @@ defmodule :erlang do
     end
   end
 
-  def spawn(n, m, f, a) do
-    :erlang.error(:badarg, [n, m, f, a])
-  end
+  def spawn(n, m, f, a), do: :erlang.error(:badarg, [n, m, f, a])
 
   @spec spawn_link(fun) :: pid() when fun: function()
-  def spawn_link(f) when :erlang.is_function(f) do
-    :erlang.spawn_link(:erlang, :apply, [f, []])
-  end
+  def spawn_link(f) when :erlang.is_function(f), do: :erlang.spawn_link(:erlang, :apply, [f, []])
 
-  def spawn_link({m, f} = mF) when :erlang.is_atom(m) and :erlang.is_atom(f) do
-    :erlang.spawn_link(:erlang, :apply, [mF, []])
-  end
+  def spawn_link({m, f} = mF) when :erlang.is_atom(m) and :erlang.is_atom(f), do: :erlang.spawn_link(:erlang, :apply, [mF, []])
 
-  def spawn_link(f) do
-    :erlang.error(:badarg, [f])
-  end
+  def spawn_link(f), do: :erlang.error(:badarg, [f])
 
   @spec spawn_link(node, fun) :: pid() when node: node(), fun: function()
-  def spawn_link(n, f) when n === :erlang.node() do
-    spawn_link(f)
-  end
+  def spawn_link(n, f) when n === :erlang.node(), do: spawn_link(f)
 
-  def spawn_link(n, f) when :erlang.is_function(f) do
-    spawn_link(n, :erlang, :apply, [f, []])
-  end
+  def spawn_link(n, f) when :erlang.is_function(f), do: spawn_link(n, :erlang, :apply, [f, []])
 
-  def spawn_link(n, {m, f} = mF) when :erlang.is_atom(m) and :erlang.is_atom(f) do
-    spawn_link(n, :erlang, :apply, [mF, []])
-  end
+  def spawn_link(n, {m, f} = mF) when :erlang.is_atom(m) and :erlang.is_atom(f), do: spawn_link(n, :erlang, :apply, [mF, []])
 
-  def spawn_link(n, f) do
-    :erlang.error(:badarg, [n, f])
-  end
+  def spawn_link(n, f), do: :erlang.error(:badarg, [n, f])
 
   @spec spawn_link(module, function, args) :: pid() when module: module(), function: atom(), args: [term()]
-  def spawn_link(_Module, _Function, _Args) do
-    :erlang.nif_error(:undefined)
-  end
+  def spawn_link(_Module, _Function, _Args), do: :erlang.nif_error(:undefined)
 
   @spec spawn_link(node, module, function, args) :: pid() when node: node(), module: module(), function: atom(), args: [term()]
-  def spawn_link(n, m, f, a) when n === :erlang.node() and :erlang.is_atom(m) and :erlang.is_atom(f) and :erlang.is_list(a) do
-    :erlang.spawn_link(m, f, a)
-  end
+  def spawn_link(n, m, f, a) when n === :erlang.node() and :erlang.is_atom(m) and :erlang.is_atom(f) and :erlang.is_list(a), do: :erlang.spawn_link(m, f, a)
 
   def spawn_link(n, m, f, a) when :erlang.is_atom(n) and :erlang.is_atom(m) and :erlang.is_atom(f) do
     try do
@@ -1883,18 +1295,12 @@ defmodule :erlang do
     end
   end
 
-  def spawn_link(n, m, f, a) do
-    :erlang.error(:badarg, [n, m, f, a])
-  end
+  def spawn_link(n, m, f, a), do: :erlang.error(:badarg, [n, m, f, a])
 
   @spec spawn_monitor(fun) :: {pid(), reference()} when fun: function()
-  def spawn_monitor(f) when :erlang.is_function(f, 0) do
-    :erlang.spawn_opt(:erlang, :apply, [f, []], [:monitor])
-  end
+  def spawn_monitor(f) when :erlang.is_function(f, 0), do: :erlang.spawn_opt(:erlang, :apply, [f, []], [:monitor])
 
-  def spawn_monitor(f) do
-    :erlang.error(:badarg, [f])
-  end
+  def spawn_monitor(f), do: :erlang.error(:badarg, [f])
 
   @spec spawn_monitor(node, fun) :: {pid(), reference()} when node: node(), fun: function()
   def spawn_monitor(node, f) when :erlang.is_atom(node) and :erlang.is_function(f, 0) do
@@ -1906,18 +1312,12 @@ defmodule :erlang do
     end
   end
 
-  def spawn_monitor(node, f) do
-    :erlang.error(:badarg, [node, f])
-  end
+  def spawn_monitor(node, f), do: :erlang.error(:badarg, [node, f])
 
   @spec spawn_monitor(module, function, args) :: {pid(), reference()} when module: module(), function: atom(), args: [term()]
-  def spawn_monitor(m, f, a) when :erlang.is_atom(m) and :erlang.is_atom(f) and :erlang.is_list(a) do
-    :erlang.spawn_opt(m, f, a, [:monitor])
-  end
+  def spawn_monitor(m, f, a) when :erlang.is_atom(m) and :erlang.is_atom(f) and :erlang.is_list(a), do: :erlang.spawn_opt(m, f, a, [:monitor])
 
-  def spawn_monitor(m, f, a) do
-    :erlang.error(:badarg, [m, f, a])
-  end
+  def spawn_monitor(m, f, a), do: :erlang.error(:badarg, [m, f, a])
 
   @spec spawn_monitor(node, module, function, args) :: {pid(), reference()} when node: node(), module: module(), function: atom(), args: [term()]
   def spawn_monitor(n, m, f, a) when n === :erlang.node() and :erlang.is_atom(m) and :erlang.is_atom(f) and :erlang.is_list(a) do
@@ -1953,89 +1353,33 @@ defmodule :erlang do
     end
   end
 
-  def spawn_monitor(n, m, f, a) do
-    :erlang.error(:badarg, [n, m, f, a])
-  end
+  def spawn_monitor(n, m, f, a), do: :erlang.error(:badarg, [n, m, f, a])
 
   @spec spawn_opt(fun, options) :: (pid() | {pid(), reference()}) when fun: function(), options: [spawn_opt_option()]
-  def spawn_opt(f, o) when :erlang.is_function(f) do
-    :erlang.spawn_opt(:erlang, :apply, [f, []], o)
-  end
+  def spawn_opt(f, o) when :erlang.is_function(f), do: :erlang.spawn_opt(:erlang, :apply, [f, []], o)
 
-  def spawn_opt({m, f} = mF, o) when :erlang.is_atom(m) and :erlang.is_atom(f) do
-    :erlang.spawn_opt(:erlang, :apply, [mF, []], o)
-  end
+  def spawn_opt({m, f} = mF, o) when :erlang.is_atom(m) and :erlang.is_atom(f), do: :erlang.spawn_opt(:erlang, :apply, [mF, []], o)
 
-  def spawn_opt(f, o) do
-    :erlang.error(:badarg, [f, o])
-  end
+  def spawn_opt(f, o), do: :erlang.error(:badarg, [f, o])
 
   @spec spawn_opt(node, fun, options) :: (pid() | {pid(), reference()}) when node: node(), fun: function(), options: [(:monitor | :link | otherOption)], otherOption: term()
-  def spawn_opt(n, f, o) when n === :erlang.node() do
-    :erlang.spawn_opt(f, o)
-  end
+  def spawn_opt(n, f, o) when n === :erlang.node(), do: :erlang.spawn_opt(f, o)
 
-  def spawn_opt(n, f, o) when :erlang.is_function(f, 0) do
-    :erlang.spawn_opt(n, :erlang, :apply, [f, []], o)
-  end
+  def spawn_opt(n, f, o) when :erlang.is_function(f, 0), do: :erlang.spawn_opt(n, :erlang, :apply, [f, []], o)
 
-  def spawn_opt(n, {m, f} = mF, o) when :erlang.is_atom(m) and :erlang.is_atom(f) do
-    :erlang.spawn_opt(n, :erlang, :apply, [mF, []], o)
-  end
+  def spawn_opt(n, {m, f} = mF, o) when :erlang.is_atom(m) and :erlang.is_atom(f), do: :erlang.spawn_opt(n, :erlang, :apply, [mF, []], o)
 
-  def spawn_opt(n, f, o) do
-    :erlang.error(:badarg, [n, f, o])
-  end
+  def spawn_opt(n, f, o), do: :erlang.error(:badarg, [n, f, o])
 
   @spec spawn_opt(module, function, args, options) :: (pid() | {pid(), reference()}) when module: module(), function: atom(), args: [term()], options: [spawn_opt_option()]
-  def spawn_opt(_Module, _Function, _Args, _Options) do
-    :erlang.nif_error(:undefined)
-  end
+  def spawn_opt(_Module, _Function, _Args, _Options), do: :erlang.nif_error(:undefined)
 
   @spec spawn_opt(node, module, function, args, options) :: (pid() | {pid(), reference()}) when node: node(), module: module(), function: atom(), args: [term()], options: [(:monitor | :link | otherOption)], otherOption: term()
-  def spawn_opt(n, m, f, a, o) when n === :erlang.node() and :erlang.is_atom(m) and :erlang.is_atom(f) and :erlang.is_list(a) and :erlang.is_list(o) do
-    :erlang.spawn_opt(m, f, a, o)
-  end
+  def spawn_opt(n, m, f, a, o) when n === :erlang.node() and :erlang.is_atom(m) and :erlang.is_atom(f) and :erlang.is_list(a) and :erlang.is_list(o), do: :erlang.spawn_opt(m, f, a, o)
 
-  def spawn_opt(n, m, f, a, o) when :erlang.is_atom(n) and :erlang.is_atom(m) and :erlang.is_atom(f) do
-    {ref, monOpt} = case :erts_internal.dist_spawn_request(n, {m, f, a}, o, :spawn_opt) do
-      {r, mO} when :erlang.is_reference(r) ->
-        {r, mO}
-      :badarg ->
-        :erlang.error(:badarg, [n, m, f, a, o])
-    end
-    receive do
-    {:spawn_reply, ^ref, :ok, pid} when :erlang.is_pid(pid) ->
-        case monOpt do
-          true ->
-            {pid, ref}
-          false ->
-            pid
-        end
-      {:spawn_reply, ^ref, :error, :badopt} ->
-        :erlang.error(:badarg, [n, m, f, a, o])
-      {:spawn_reply, ^ref, :error, :noconnection} ->
-        try do
-          :erlang.spawn_opt(:erts_internal, :crasher, [n, m, f, a, o, :noconnection], o)
-        catch
-          {_, err1, _} ->
-            :erlang.error(err1, [n, m, f, a, o])
-        end
-      {:spawn_reply, ^ref, :error, :notsup} ->
-        case old_remote_spawn_opt(n, m, f, a, o) do
-          pid when :erlang.is_pid(pid) ->
-            pid
-          err2 ->
-            :erlang.error(err2, [n, m, f, a, o])
-        end
-      {:spawn_reply, ^ref, :error, err3} ->
-        :erlang.error(err3, [n, m, f, a, o])
-    end
-  end
+  def spawn_opt(n, m, f, a, o) when :erlang.is_atom(n) and :erlang.is_atom(m) and :erlang.is_atom(f), do: ...
 
-  def spawn_opt(n, m, f, a, o) do
-    :erlang.error(:badarg, [n, m, f, a, o])
-  end
+  def spawn_opt(n, m, f, a, o), do: :erlang.error(:badarg, [n, m, f, a, o])
 
   @spec spawn_request(fun) :: reqId when fun: function(), reqId: reference()
   def spawn_request(f) when :erlang.is_function(f, 0) do
@@ -2047,9 +1391,7 @@ defmodule :erlang do
     end
   end
 
-  def spawn_request(f) do
-    :erlang.error(:badarg, [f])
-  end
+  def spawn_request(f), do: :erlang.error(:badarg, [f])
 
   @spec spawn_request(fun, options) :: reqId when fun: function(), option: ({:reply_tag, replyTag} | {:reply, reply} | spawn_opt_option()), replyTag: term(), reply: (:yes | :no | :error_only | :success_only), options: [option], reqId: reference()
   @spec spawn_request(node, fun) :: reqId when node: node(), fun: function(), reqId: reference()
@@ -2071,9 +1413,7 @@ defmodule :erlang do
     end
   end
 
-  def spawn_request(a1, a2) do
-    :erlang.error(:badarg, [a1, a2])
-  end
+  def spawn_request(a1, a2), do: :erlang.error(:badarg, [a1, a2])
 
   @spec spawn_request(node, fun, options) :: reqId when node: node(), fun: function(), options: [option], option: (:monitor | :link | {:reply_tag, replyTag} | {:reply, reply} | otherOption), replyTag: term(), reply: (:yes | :no | :error_only | :success_only), otherOption: term(), reqId: reference()
   @spec spawn_request(module, function, args) :: reqId when module: module(), function: atom(), args: [term()], reqId: reference()
@@ -2135,22 +1475,14 @@ defmodule :erlang do
   end
 
   @spec spawn_request_abandon(reqId :: reference()) :: boolean()
-  def spawn_request_abandon(_ReqId) do
-    :erlang.nif_error(:undefined)
-  end
+  def spawn_request_abandon(_ReqId), do: :erlang.nif_error(:undefined)
 
   @spec split_binary(bin, pos) :: {binary(), binary()} when bin: binary(), pos: non_neg_integer()
-  def split_binary(_Bin, _Pos) do
-    :erlang.nif_error(:undefined)
-  end
+  def split_binary(_Bin, _Pos), do: :erlang.nif_error(:undefined)
 
-  def start_timer(_Time, _Dest, _Msg) do
-    :erlang.nif_error(:undefined)
-  end
+  def start_timer(_Time, _Dest, _Msg), do: :erlang.nif_error(:undefined)
 
-  def start_timer(_Time, _Dest, _Msg, _Options) do
-    :erlang.nif_error(:undefined)
-  end
+  def start_timer(_Time, _Dest, _Msg, _Options), do: :erlang.nif_error(:undefined)
 
   @spec statistics(:active_tasks) :: [activeTasks] when activeTasks: non_neg_integer()
   @spec statistics(:active_tasks_all) :: [activeTasks] when activeTasks: non_neg_integer()
@@ -2171,13 +1503,9 @@ defmodule :erlang do
   @spec statistics(:total_run_queue_lengths) :: totalRunQueueLengths when totalRunQueueLengths: non_neg_integer()
   @spec statistics(:total_run_queue_lengths_all) :: totalRunQueueLengths when totalRunQueueLengths: non_neg_integer()
   @spec statistics(:wall_clock) :: {total_Wallclock_Time, wallclock_Time_Since_Last_Call} when total_Wallclock_Time: non_neg_integer(), wallclock_Time_Since_Last_Call: non_neg_integer()
-  def statistics(_Item) do
-    :erlang.nif_error(:undefined)
-  end
+  def statistics(_Item), do: :erlang.nif_error(:undefined)
 
-  def subtract(_, _) do
-    :erlang.nif_error(:undefined)
-  end
+  def subtract(_, _), do: :erlang.nif_error(:undefined)
 
   def suspend_process(suspendee) do
     case :erts_internal.suspend_process(suspendee, []) do
@@ -2219,88 +1547,50 @@ defmodule :erlang do
     end
   end
 
-  def system_flag(_Flag, _Value) do
-    :erlang.nif_error(:undefined)
-  end
+  def system_flag(_Flag, _Value), do: :erlang.nif_error(:undefined)
 
-  def system_info(_Item) do
-    :erlang.nif_error(:undefined)
-  end
+  def system_info(_Item), do: :erlang.nif_error(:undefined)
 
-  def system_monitor() do
-    :erlang.nif_error(:undefined)
-  end
+  def system_monitor(), do: :erlang.nif_error(:undefined)
 
-  def system_monitor(_Arg) do
-    :erlang.nif_error(:undefined)
-  end
+  def system_monitor(_Arg), do: :erlang.nif_error(:undefined)
 
-  def system_monitor(_MonitorPid, _Options) do
-    :erlang.nif_error(:undefined)
-  end
+  def system_monitor(_MonitorPid, _Options), do: :erlang.nif_error(:undefined)
 
-  def system_profile() do
-    :erlang.nif_error(:undefined)
-  end
+  def system_profile(), do: :erlang.nif_error(:undefined)
 
-  def system_profile(_ProfilerPid, _Options) do
-    :erlang.nif_error(:undefined)
-  end
+  def system_profile(_ProfilerPid, _Options), do: :erlang.nif_error(:undefined)
 
-  def system_time() do
-    :erlang.nif_error(:undefined)
-  end
+  def system_time(), do: :erlang.nif_error(:undefined)
 
-  def system_time(_Unit) do
-    :erlang.nif_error(:undefined)
-  end
+  def system_time(_Unit), do: :erlang.nif_error(:undefined)
 
   @spec term_to_binary(term) :: ext_binary() when term: term()
-  def term_to_binary(_Term) do
-    :erlang.nif_error(:undefined)
-  end
+  def term_to_binary(_Term), do: :erlang.nif_error(:undefined)
 
   @spec term_to_binary(term, options) :: ext_binary() when term: term(), options: [(:compressed | {:compressed, level :: 0..9} | {:minor_version, version :: 0..2})]
-  def term_to_binary(_Term, _Options) do
-    :erlang.nif_error(:undefined)
-  end
+  def term_to_binary(_Term, _Options), do: :erlang.nif_error(:undefined)
 
   @spec term_to_iovec(term) :: ext_iovec() when term: term()
-  def term_to_iovec(_Term) do
-    :erlang.nif_error(:undefined)
-  end
+  def term_to_iovec(_Term), do: :erlang.nif_error(:undefined)
 
   @spec term_to_iovec(term, options) :: ext_iovec() when term: term(), options: [(:compressed | {:compressed, level :: 0..9} | {:minor_version, version :: 0..2})]
-  def term_to_iovec(_Term, _Options) do
-    :erlang.nif_error(:undefined)
-  end
+  def term_to_iovec(_Term, _Options), do: :erlang.nif_error(:undefined)
 
   @spec throw(any) :: no_return() when any: term()
-  def throw(_Any) do
-    :erlang.nif_error(:undefined)
-  end
+  def throw(_Any), do: :erlang.nif_error(:undefined)
 
   @spec time() :: time when time: :calendar.time()
-  def time() do
-    :erlang.nif_error(:undefined)
-  end
+  def time(), do: :erlang.nif_error(:undefined)
 
-  def time_offset() do
-    :erlang.nif_error(:undefined)
-  end
+  def time_offset(), do: :erlang.nif_error(:undefined)
 
-  def time_offset(_Unit) do
-    :erlang.nif_error(:undefined)
-  end
+  def time_offset(_Unit), do: :erlang.nif_error(:undefined)
 
-  def timestamp() do
-    :erlang.nif_error(:undefined)
-  end
+  def timestamp(), do: :erlang.nif_error(:undefined)
 
   @spec tl(list) :: term() when list: [term(), ...]
-  def tl(_List) do
-    :erlang.nif_error(:undefined)
-  end
+  def tl(_List), do: :erlang.nif_error(:undefined)
 
   def trace(pidPortSpec, how, flagList) do
     case :lists.keyfind(:tracer, 1, flagList) do
@@ -2326,13 +1616,9 @@ defmodule :erlang do
     end
   end
 
-  def trace_delivered(_Tracee) do
-    :erlang.nif_error(:undefined)
-  end
+  def trace_delivered(_Tracee), do: :erlang.nif_error(:undefined)
 
-  def trace_info(_PidPortFuncEvent, _Item) do
-    :erlang.nif_error(:undefined)
-  end
+  def trace_info(_PidPortFuncEvent, _Item), do: :erlang.nif_error(:undefined)
 
   def trace_pattern(mFA, matchSpec) do
     try do
@@ -2372,62 +1658,36 @@ defmodule :erlang do
   end
 
   @spec trunc(number) :: integer() when number: number()
-  def trunc(_Number) do
-    :erlang.nif_error(:undefined)
-  end
+  def trunc(_Number), do: :erlang.nif_error(:undefined)
 
   @spec tuple_size(tuple) :: non_neg_integer() when tuple: tuple()
-  def tuple_size(_Tuple) do
-    :erlang.nif_error(:undefined)
-  end
+  def tuple_size(_Tuple), do: :erlang.nif_error(:undefined)
 
   @spec tuple_to_list(tuple) :: [term()] when tuple: tuple()
-  def tuple_to_list(_Tuple) do
-    :erlang.nif_error(:undefined)
-  end
+  def tuple_to_list(_Tuple), do: :erlang.nif_error(:undefined)
 
-  def unique_integer() do
-    :erlang.nif_error(:undefined)
-  end
+  def unique_integer(), do: :erlang.nif_error(:undefined)
 
-  def unique_integer(_ModifierList) do
-    :erlang.nif_error(:undefined)
-  end
+  def unique_integer(_ModifierList), do: :erlang.nif_error(:undefined)
 
-  def universaltime() do
-    :erlang.nif_error(:undefined)
-  end
+  def universaltime(), do: :erlang.nif_error(:undefined)
 
-  def universaltime_to_localtime(_Universaltime) do
-    :erlang.nif_error(:undefined)
-  end
+  def universaltime_to_localtime(_Universaltime), do: :erlang.nif_error(:undefined)
 
-  def universaltime_to_posixtime(_P1) do
-    :erlang.nif_error(:undefined)
-  end
+  def universaltime_to_posixtime(_P1), do: :erlang.nif_error(:undefined)
 
   @spec unlink(id) :: true when id: (pid() | port())
-  def unlink(_Id) do
-    :erlang.nif_error(:undefined)
-  end
+  def unlink(_Id), do: :erlang.nif_error(:undefined)
 
   @spec unregister(regName) :: true when regName: atom()
-  def unregister(_RegName) do
-    :erlang.nif_error(:undefined)
-  end
+  def unregister(_RegName), do: :erlang.nif_error(:undefined)
 
   @spec whereis(regName) :: (pid() | port() | :undefined) when regName: atom()
-  def whereis(_RegName) do
-    :erlang.nif_error(:undefined)
-  end
+  def whereis(_RegName), do: :erlang.nif_error(:undefined)
 
-  def xor(_A, _B) do
-    :erlang.nif_error(:undefined)
-  end
+  def xor(_A, _B), do: :erlang.nif_error(:undefined)
 
-  def yield() do
-    :erlang.yield()
-  end
+  def yield(), do: :erlang.yield()
 
   # Private Functions
 
@@ -2435,65 +1695,35 @@ defmodule :erlang do
     # body not decompiled
   end
 
-  def aa_mem_data(:notsup) do
-    :notsup
-  end
+  def aa_mem_data(:notsup), do: :notsup
 
-  def aa_mem_data(eMD) do
-    aa_mem_data(eMD, :erlang.system_info(:allocated_areas))
-  end
+  def aa_mem_data(eMD), do: aa_mem_data(eMD, :erlang.system_info(:allocated_areas))
 
-  def aa_mem_data(memory() = mem, [{:total, tot} | rest]) do
-    aa_mem_data(memory(mem, total: tot, system: 0), rest)
-  end
+  def aa_mem_data(memory() = mem, [{:total, tot} | rest]), do: aa_mem_data(memory(mem, total: tot, system: 0), rest)
 
-  def aa_mem_data(memory(atom: atom, atom_used: atomU) = mem, [{:atom_space, alloced, used} | rest]) do
-    aa_mem_data(memory(mem, atom: atom + alloced, atom_used: atomU + used), rest)
-  end
+  def aa_mem_data(memory(atom: atom, atom_used: atomU) = mem, [{:atom_space, alloced, used} | rest]), do: aa_mem_data(memory(mem, atom: atom + alloced, atom_used: atomU + used), rest)
 
-  def aa_mem_data(memory(atom: atom, atom_used: atomU) = mem, [{:atom_table, sz} | rest]) do
-    aa_mem_data(memory(mem, atom: atom + sz, atom_used: atomU + sz), rest)
-  end
+  def aa_mem_data(memory(atom: atom, atom_used: atomU) = mem, [{:atom_table, sz} | rest]), do: aa_mem_data(memory(mem, atom: atom + sz, atom_used: atomU + sz), rest)
 
-  def aa_mem_data(memory(ets: ets) = mem, [{:ets_misc, sz} | rest]) do
-    aa_mem_data(memory(mem, ets: ets + sz), rest)
-  end
+  def aa_mem_data(memory(ets: ets) = mem, [{:ets_misc, sz} | rest]), do: aa_mem_data(memory(mem, ets: ets + sz), rest)
 
-  def aa_mem_data(memory(processes: proc, processes_used: procU, system: sys) = mem, [{procData, sz} | rest]) when procData == :bif_timer or procData == :process_table do
-    aa_mem_data(memory(mem, processes: proc + sz, processes_used: procU + sz, system: sys - sz), rest)
-  end
+  def aa_mem_data(memory(processes: proc, processes_used: procU, system: sys) = mem, [{procData, sz} | rest]) when procData == :bif_timer or procData == :process_table, do: aa_mem_data(memory(mem, processes: proc + sz, processes_used: procU + sz, system: sys - sz), rest)
 
-  def aa_mem_data(memory(code: code) = mem, [{codeData, sz} | rest]) when codeData == :module_table or codeData == :export_table or codeData == :export_list or codeData == :fun_table or codeData == :module_refs or codeData == :loaded_code do
-    aa_mem_data(memory(mem, code: code + sz), rest)
-  end
+  def aa_mem_data(memory(code: code) = mem, [{codeData, sz} | rest]) when codeData == :module_table or codeData == :export_table or codeData == :export_list or codeData == :fun_table or codeData == :module_refs or codeData == :loaded_code, do: aa_mem_data(memory(mem, code: code + sz), rest)
 
-  def aa_mem_data(eMD, [{_, _} | rest]) do
-    aa_mem_data(eMD, rest)
-  end
+  def aa_mem_data(eMD, [{_, _} | rest]), do: aa_mem_data(eMD, rest)
 
-  def aa_mem_data(memory(total: tot, processes: proc, system: sys) = mem, []) when sys <= 0 do
-    memory(mem, system: tot - proc)
-  end
+  def aa_mem_data(memory(total: tot, processes: proc, system: sys) = mem, []) when sys <= 0, do: memory(mem, system: tot - proc)
 
-  def aa_mem_data(eMD, []) do
-    eMD
-  end
+  def aa_mem_data(eMD, []), do: eMD
 
-  def acc_blocks_size([{:size, sz, _, _} | rest], acc) do
-    acc_blocks_size(rest, acc + sz)
-  end
+  def acc_blocks_size([{:size, sz, _, _} | rest], acc), do: acc_blocks_size(rest, acc + sz)
 
-  def acc_blocks_size([{:size, sz} | rest], acc) do
-    acc_blocks_size(rest, acc + sz)
-  end
+  def acc_blocks_size([{:size, sz} | rest], acc), do: acc_blocks_size(rest, acc + sz)
 
-  def acc_blocks_size([_ | rest], acc) do
-    acc_blocks_size(rest, acc)
-  end
+  def acc_blocks_size([_ | rest], acc), do: acc_blocks_size(rest, acc)
 
-  def acc_blocks_size([], acc) do
-    acc
-  end
+  def acc_blocks_size([], acc), do: acc
 
   def au_mem_acc(memory(total: tot, processes: proc, processes_used: procU) = mem, :eheap_alloc, data) do
     sz = acc_blocks_size(data, 0)
@@ -2520,41 +1750,23 @@ defmodule :erlang do
     au_mem_blocks(rest, mem)
   end
 
-  def au_mem_blocks([_ | rest], mem) do
-    au_mem_blocks(rest, mem)
-  end
+  def au_mem_blocks([_ | rest], mem), do: au_mem_blocks(rest, mem)
 
-  def au_mem_blocks([], mem) do
-    mem
-  end
+  def au_mem_blocks([], mem), do: mem
 
-  def au_mem_blocks_1([{type, sizeList} | rest], mem) do
-    au_mem_blocks_1(rest, au_mem_acc(mem, type, sizeList))
-  end
+  def au_mem_blocks_1([{type, sizeList} | rest], mem), do: au_mem_blocks_1(rest, au_mem_acc(mem, type, sizeList))
 
-  def au_mem_blocks_1([], mem) do
-    mem
-  end
+  def au_mem_blocks_1([], mem), do: mem
 
-  def au_mem_current(mem, type, [{:mbcs_pool, stats} | rest]) do
-    au_mem_current(au_mem_blocks(stats, mem), type, rest)
-  end
+  def au_mem_current(mem, type, [{:mbcs_pool, stats} | rest]), do: au_mem_current(au_mem_blocks(stats, mem), type, rest)
 
-  def au_mem_current(mem, type, [{:mbcs, stats} | rest]) do
-    au_mem_current(au_mem_blocks(stats, mem), type, rest)
-  end
+  def au_mem_current(mem, type, [{:mbcs, stats} | rest]), do: au_mem_current(au_mem_blocks(stats, mem), type, rest)
 
-  def au_mem_current(mem, type, [{:sbcs, stats} | rest]) do
-    au_mem_current(au_mem_blocks(stats, mem), type, rest)
-  end
+  def au_mem_current(mem, type, [{:sbcs, stats} | rest]), do: au_mem_current(au_mem_blocks(stats, mem), type, rest)
 
-  def au_mem_current(mem, type, [_ | rest]) do
-    au_mem_current(mem, type, rest)
-  end
+  def au_mem_current(mem, type, [_ | rest]), do: au_mem_current(mem, type, rest)
 
-  def au_mem_current(mem, _Type, []) do
-    mem
-  end
+  def au_mem_current(mem, _Type, []), do: mem
 
   def au_mem_data(allocs) do
     ref = :erlang.make_ref()
@@ -2562,26 +1774,18 @@ defmodule :erlang do
     receive_emd(ref)
   end
 
-  def au_mem_data(:notsup, _) do
-    :notsup
-  end
+  def au_mem_data(:notsup, _), do: :notsup
 
-  def au_mem_data(_, [{_, false} | _]) do
-    :notsup
-  end
+  def au_mem_data(_, [{_, false} | _]), do: :notsup
 
   def au_mem_data(memory() = mem0, [{:fix_alloc, _, data} | rest]) do
     mem = au_mem_fix(mem0, data)
     au_mem_data(au_mem_current(mem, :fix_alloc, data), rest)
   end
 
-  def au_mem_data(memory() = mem, [{type, _, data} | rest]) do
-    au_mem_data(au_mem_current(mem, type, data), rest)
-  end
+  def au_mem_data(memory() = mem, [{type, _, data} | rest]), do: au_mem_data(au_mem_current(mem, type, data), rest)
 
-  def au_mem_data(eMD, []) do
-    eMD
-  end
+  def au_mem_data(eMD, []), do: eMD
 
   def au_mem_fix(memory(processes: proc, processes_used: procU, system: sys) = mem, data) do
     case fix_proc(data, {0, 0}) do
@@ -2592,17 +1796,11 @@ defmodule :erlang do
     end
   end
 
-  def cput_e2i(:undefined) do
-    :undefined
-  end
+  def cput_e2i(:undefined), do: :undefined
 
-  def cput_e2i(e) do
-    rvrs(cput_e2i(e, -1, -1, cpu(), 0, cput_e2i_clvl(e, 0), []))
-  end
+  def cput_e2i(e), do: rvrs(cput_e2i(e, -1, -1, cpu(), 0, cput_e2i_clvl(e, 0), []))
 
-  def cput_e2i([], _NId, _PId, _IS, _PLvl, _Lvl, res) do
-    res
-  end
+  def cput_e2i([], _NId, _PId, _IS, _PLvl, _Lvl, res), do: res
 
   def cput_e2i([e | es], nId0, pId, iS, pLvl, lvl, res0) do
     case cput_e2i(e, nId0, pId, iS, pLvl, lvl, res0) do
@@ -2619,9 +1817,7 @@ defmodule :erlang do
     end
   end
 
-  def cput_e2i({tag, [], tagList}, nid, pId, cPU, pLvl, lvl, res) do
-    cput_e2i({tag, tagList}, nid, pId, cPU, pLvl, lvl, res)
-  end
+  def cput_e2i({tag, [], tagList}, nid, pId, cPU, pLvl, lvl, res), do: cput_e2i({tag, tagList}, nid, pId, cPU, pLvl, lvl, res)
 
   def cput_e2i({:node, nL}, nid0, pId, _CPU, 0, cpu(:node), res) do
     nid1 = nid0 + 1
@@ -2676,9 +1872,7 @@ defmodule :erlang do
     end, logical: iD) | res]
   end
 
-  def cput_e2i_clvl({:logical, _}, _PLvl) do
-    cpu(:logical)
-  end
+  def cput_e2i_clvl({:logical, _}, _PLvl), do: cpu(:logical)
 
   def cput_e2i_clvl([e | _], pLvl) do
     case :erlang.element(1, e) do
@@ -2703,45 +1897,25 @@ defmodule :erlang do
     end
   end
 
-  def cput_i2e(:undefined) do
-    :undefined
-  end
+  def cput_i2e(:undefined), do: :undefined
 
-  def cput_i2e(is) do
-    cput_i2e(is, true, cpu(:node), cput_i2e_tag_map())
-  end
+  def cput_i2e(is), do: cput_i2e(is, true, cpu(:node), cput_i2e_tag_map())
 
-  def cput_i2e([], _Frst, _Lvl, _TM) do
-    []
-  end
+  def cput_i2e([], _Frst, _Lvl, _TM), do: []
 
-  def cput_i2e([cpu(logical: lID) | _], _Frst, lvl, _TM) when lvl == cpu(:logical) do
-    {:logical, lID}
-  end
+  def cput_i2e([cpu(logical: lID) | _], _Frst, lvl, _TM) when lvl == cpu(:logical), do: {:logical, lID}
 
-  def cput_i2e([cpu() = i | is], frst, lvl, tM) do
-    cput_i2e(:erlang.element(lvl, i), frst, is, [i], lvl, tM)
-  end
+  def cput_i2e([cpu() = i | is], frst, lvl, tM), do: cput_i2e(:erlang.element(lvl, i), frst, is, [i], lvl, tM)
 
-  def cput_i2e(v, frst, [i | is], sameV, lvl, tM) when v === :erlang.element(lvl, i) do
-    cput_i2e(v, frst, is, [i | sameV], lvl, tM)
-  end
+  def cput_i2e(v, frst, [i | is], sameV, lvl, tM) when v === :erlang.element(lvl, i), do: cput_i2e(v, frst, is, [i | sameV], lvl, tM)
 
-  def cput_i2e(-1, true, [], sameV, lvl, tM) do
-    cput_i2e(rvrs(sameV), true, lvl + 1, tM)
-  end
+  def cput_i2e(-1, true, [], sameV, lvl, tM), do: cput_i2e(rvrs(sameV), true, lvl + 1, tM)
 
-  def cput_i2e(_V, true, [], sameV, lvl, tM) when lvl !== cpu(:processor) and lvl !== cpu(:processor_node) do
-    cput_i2e(rvrs(sameV), true, lvl + 1, tM)
-  end
+  def cput_i2e(_V, true, [], sameV, lvl, tM) when lvl !== cpu(:processor) and lvl !== cpu(:processor_node), do: cput_i2e(rvrs(sameV), true, lvl + 1, tM)
 
-  def cput_i2e(-1, _Frst, is, sameV, cpu(:node), tM) do
-    cput_i2e(rvrs(sameV), true, cpu(:processor), tM) ++ cput_i2e(is, false, cpu(:node), tM)
-  end
+  def cput_i2e(-1, _Frst, is, sameV, cpu(:node), tM), do: cput_i2e(rvrs(sameV), true, cpu(:processor), tM) ++ cput_i2e(is, false, cpu(:node), tM)
 
-  def cput_i2e(_V, _Frst, is, sameV, lvl, tM) do
-    [{cput_i2e_tag(lvl, tM), cput_i2e(rvrs(sameV), true, lvl + 1, tM)} | cput_i2e(is, false, lvl, tM)]
-  end
+  def cput_i2e(_V, _Frst, is, sameV, lvl, tM), do: [{cput_i2e_tag(lvl, tM), cput_i2e(rvrs(sameV), true, lvl + 1, tM)} | cput_i2e(is, false, lvl, tM)]
 
   def cput_i2e_tag(lvl, tM) do
     case :erlang.element(lvl, tM) do
@@ -2752,26 +1926,18 @@ defmodule :erlang do
     end
   end
 
-  def cput_i2e_tag_map() do
-    :erlang.list_to_tuple([:cpu | record_info(:fields, :cpu)])
-  end
+  def cput_i2e_tag_map(), do: :erlang.list_to_tuple([:cpu | record_info(:fields, :cpu)])
 
-  def fix_proc([{:fix_types, sizeList} | _Rest], acc) do
-    get_fix_proc(sizeList, acc)
-  end
+  def fix_proc([{:fix_types, sizeList} | _Rest], acc), do: get_fix_proc(sizeList, acc)
 
   def fix_proc([{:fix_types, mask, sizeList} | _Rest], acc) do
     {a, u} = get_fix_proc(sizeList, acc)
     {mask, a, u}
   end
 
-  def fix_proc([_ | rest], acc) do
-    fix_proc(rest, acc)
-  end
+  def fix_proc([_ | rest], acc), do: fix_proc(rest, acc)
 
-  def fix_proc([], acc) do
-    acc
-  end
+  def fix_proc([], acc), do: acc
 
   def fun_info_1([k | ks], fun, a) do
     case :erlang.fun_info(fun, k) do
@@ -2782,13 +1948,9 @@ defmodule :erlang do
     end
   end
 
-  def fun_info_1([], _, a) do
-    a
-  end
+  def fun_info_1([], _, a), do: a
 
-  def gc_info(_Ref, 0, {colls, recl}) do
-    {colls, recl, 0}
-  end
+  def gc_info(_Ref, 0, {colls, recl}), do: {colls, recl, 0}
 
   def gc_info(ref, n, {origColls, origRecl}) do
     receive do
@@ -2808,121 +1970,63 @@ defmodule :erlang do
     receive_allocator(ref, :erlang.system_info(:schedulers), mk_res_list(aList))
   end
 
-  def get_fix_proc([{procType, a1, u1} | rest], {a0, u0}) when procType == :proc or procType == :monitor or procType == :link or procType == :msg_ref or procType == :ll_ptimer or procType == :hl_ptimer or procType == :bif_timer or procType == :accessor_bif_timer do
-    get_fix_proc(rest, {a0 + a1, u0 + u1})
-  end
+  def get_fix_proc([{procType, a1, u1} | rest], {a0, u0}) when procType == :proc or procType == :monitor or procType == :link or procType == :msg_ref or procType == :ll_ptimer or procType == :hl_ptimer or procType == :bif_timer or procType == :accessor_bif_timer, do: get_fix_proc(rest, {a0 + a1, u0 + u1})
 
-  def get_fix_proc([_ | rest], acc) do
-    get_fix_proc(rest, acc)
-  end
+  def get_fix_proc([_ | rest], acc), do: get_fix_proc(rest, acc)
 
-  def get_fix_proc([], acc) do
-    acc
-  end
+  def get_fix_proc([], acc), do: acc
 
-  def get_gc_opts([{:async, _ReqId} = asyncTuple | options], gcOpt = gcopt()) do
-    get_gc_opts(options, gcopt(gcOpt, async: asyncTuple))
-  end
+  def get_gc_opts([{:async, _ReqId} = asyncTuple | options], gcOpt = gcopt()), do: get_gc_opts(options, gcopt(gcOpt, async: asyncTuple))
 
-  def get_gc_opts([{:type, t} | options], gcOpt = gcopt()) do
-    get_gc_opts(options, gcopt(gcOpt, type: t))
-  end
+  def get_gc_opts([{:type, t} | options], gcOpt = gcopt()), do: get_gc_opts(options, gcopt(gcOpt, type: t))
 
-  def get_gc_opts([], gcOpt) do
-    gcOpt
-  end
+  def get_gc_opts([], gcOpt), do: gcOpt
 
-  def get_memval(:total, memory(total: v)) do
-    v
-  end
+  def get_memval(:total, memory(total: v)), do: v
 
-  def get_memval(:processes, memory(processes: v)) do
-    v
-  end
+  def get_memval(:processes, memory(processes: v)), do: v
 
-  def get_memval(:processes_used, memory(processes_used: v)) do
-    v
-  end
+  def get_memval(:processes_used, memory(processes_used: v)), do: v
 
-  def get_memval(:system, memory(system: v)) do
-    v
-  end
+  def get_memval(:system, memory(system: v)), do: v
 
-  def get_memval(:atom, memory(atom: v)) do
-    v
-  end
+  def get_memval(:atom, memory(atom: v)), do: v
 
-  def get_memval(:atom_used, memory(atom_used: v)) do
-    v
-  end
+  def get_memval(:atom_used, memory(atom_used: v)), do: v
 
-  def get_memval(:binary, memory(binary: v)) do
-    v
-  end
+  def get_memval(:binary, memory(binary: v)), do: v
 
-  def get_memval(:code, memory(code: v)) do
-    v
-  end
+  def get_memval(:code, memory(code: v)), do: v
 
-  def get_memval(:ets, memory(ets: v)) do
-    v
-  end
+  def get_memval(:ets, memory(ets: v)), do: v
 
-  def get_memval(_, memory()) do
-    :erlang.error(:badarg)
-  end
+  def get_memval(_, memory()), do: :erlang.error(:badarg)
 
-  def insert_info([], ys) do
-    ys
-  end
+  def insert_info([], ys), do: ys
 
-  def insert_info([{a, false} | xs], [{^a, _IList} | ys]) do
-    insert_info(xs, [{a, false} | ys])
-  end
+  def insert_info([{a, false} | xs], [{^a, _IList} | ys]), do: insert_info(xs, [{a, false} | ys])
 
-  def insert_info([{a, n, i} | xs], [{^a, iList} | ys]) do
-    insert_info(xs, [{a, insert_instance(i, n, iList)} | ys])
-  end
+  def insert_info([{a, n, i} | xs], [{^a, iList} | ys]), do: insert_info(xs, [{a, insert_instance(i, n, iList)} | ys])
 
-  def insert_info([{a1, _} | _] = xs, [{a2, _} = y | ys]) when a1 != a2 do
-    [y | insert_info(xs, ys)]
-  end
+  def insert_info([{a1, _} | _] = xs, [{a2, _} = y | ys]) when a1 != a2, do: [y | insert_info(xs, ys)]
 
-  def insert_info([{a1, _, _} | _] = xs, [{a2, _} = y | ys]) when a1 != a2 do
-    [y | insert_info(xs, ys)]
-  end
+  def insert_info([{a1, _, _} | _] = xs, [{a2, _} = y | ys]) when a1 != a2, do: [y | insert_info(xs, ys)]
 
-  def insert_instance(i, n, rest) when :erlang.is_atom(n) do
-    [{n, i} | rest]
-  end
+  def insert_instance(i, n, rest) when :erlang.is_atom(n), do: [{n, i} | rest]
 
-  def insert_instance(i, n, []) do
-    [{:instance, n, i}]
-  end
+  def insert_instance(i, n, []), do: [{:instance, n, i}]
 
-  def insert_instance(i, n, [{:instance, m, _} | _] = rest) when n < m do
-    [{:instance, n, i} | rest]
-  end
+  def insert_instance(i, n, [{:instance, m, _} | _] = rest) when n < m, do: [{:instance, n, i} | rest]
 
-  def insert_instance(i, n, [prev | rest]) do
-    [prev | insert_instance(i, n, rest)]
-  end
+  def insert_instance(i, n, [prev | rest]), do: [prev | insert_instance(i, n, rest)]
 
-  def memory_1([type | types], mem) do
-    [{type, get_memval(type, mem)} | memory_1(types, mem)]
-  end
+  def memory_1([type | types], mem), do: [{type, get_memval(type, mem)} | memory_1(types, mem)]
 
-  def memory_1([], _Mem) do
-    []
-  end
+  def memory_1([], _Mem), do: []
 
-  def mk_res_list([]) do
-    []
-  end
+  def mk_res_list([]), do: []
 
-  def mk_res_list([alloc | rest]) do
-    [{alloc, []} | mk_res_list(rest)]
-  end
+  def mk_res_list([alloc | rest]), do: [{alloc, []} | mk_res_list(rest)]
 
   def old_remote_spawn_opt(n, m, f, a, o) do
     case :lists.member(:monitor, o) do
@@ -2953,9 +2057,7 @@ defmodule :erlang do
     end
   end
 
-  def receive_allocator(_Ref, 0, acc) do
-    acc
-  end
+  def receive_allocator(_Ref, 0, acc), do: acc
 
   def receive_allocator(ref, n, acc) do
     receive do
@@ -2964,13 +2066,9 @@ defmodule :erlang do
     end
   end
 
-  def receive_emd(ref) do
-    receive_emd(ref, memory(), :erlang.system_info(:schedulers))
-  end
+  def receive_emd(ref), do: receive_emd(ref, memory(), :erlang.system_info(:schedulers))
 
-  def receive_emd(_Ref, eMD, 0) do
-    eMD
-  end
+  def receive_emd(_Ref, eMD, 0), do: eMD
 
   def receive_emd(ref, eMD, n) do
     receive do
@@ -2989,31 +2087,17 @@ defmodule :erlang do
     :erlang.spawn_opt(:erts_internal, :crasher, [n, m, f, a, opts, :noconnection], lL)
   end
 
-  def remote_spawn_error({:"EXIT", {reason, _}}, _) do
-    {:fault, reason}
-  end
+  def remote_spawn_error({:"EXIT", {reason, _}}, _), do: {:fault, reason}
 
-  def remote_spawn_error({:"EXIT", reason}, _) do
-    {:fault, reason}
-  end
+  def remote_spawn_error({:"EXIT", reason}, _), do: {:fault, reason}
 
-  def remote_spawn_error(other, _) do
-    {:fault, other}
-  end
+  def remote_spawn_error(other, _), do: {:fault, other}
 
-  def rvrs([_] = l) do
-    l
-  end
+  def rvrs([_] = l), do: l
 
-  def rvrs(xs) do
-    rvrs(xs, [])
-  end
+  def rvrs(xs), do: rvrs(xs, [])
 
-  def rvrs([], ys) do
-    ys
-  end
+  def rvrs([], ys), do: ys
 
-  def rvrs([x | xs], ys) do
-    rvrs(xs, [x | ys])
-  end
+  def rvrs([x | xs], ys), do: rvrs(xs, [x | ys])
 end

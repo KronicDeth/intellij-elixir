@@ -8,21 +8,35 @@ defmodule RuntimeError do
   end
 
   def __struct__() do
-    # body not decompiled
+    %RuntimeError{__exception__: true, message: "runtime error"}
   end
 
   def __struct__(kv) do
-    # body not decompiled
+    Enum.reduce(kv, %RuntimeError{__exception__: true, message: "runtime error"}, fn {key, val}, map -> :maps.update(key, val, map) end)
   end
 
   @doc false
   def exception(msg) do
-    # body not decompiled
+    exception(message: msg)
+  end
+
+  def exception(args) do
+    (
+      struct = __struct__()
+      {valid, invalid} = Enum.split_with(args, fn {k, _} -> Map.has_key?(struct, k) end)
+      case(invalid) do
+        [] ->
+          :ok
+        _ ->
+          IO.warn(<<"the following fields are unknown when raising "::binary(), Kernel.inspect(RuntimeError)::binary(), ": "::binary(), Kernel.inspect(invalid)::binary(), ". "::binary(), "Please make sure to only give known fields when raising "::binary(), "or redefine "::binary(), Kernel.inspect(RuntimeError)::binary(), ".exception/1 to "::binary(), "discard unknown fields. Future Elixir versions will raise on "::binary(), "unknown fields given to raise/2"::binary()>>)
+      end
+      Kernel.struct!(struct, valid)
+    )
   end
 
   @doc false
   def message(exception) do
-    # body not decompiled
+    exception.message()
   end
 
   def module_info() do
