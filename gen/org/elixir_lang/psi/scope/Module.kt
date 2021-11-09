@@ -63,8 +63,8 @@ abstract class Module : PsiScopeProcessor {
             when {
                 isModular(match) -> executeOnModular(match, state)
                 Use.`is`(match) -> Use.treeWalkUp(match, state, ::execute)
-                match.isCalling(KERNEL, ALIAS) -> executeOnAliasCall(match, state)
-                match.isCalling(KERNEL, REQUIRE) -> executeOnRequireCall(match, state)
+                Alias.`is`(match) -> executeOnAliasCall(match, state)
+                Require.`is`(match) -> executeOnRequireCall(match, state)
                 Case.isChild(match, state) -> executeOnNestedModulars(match, state)
                 else -> true
             }
@@ -87,17 +87,18 @@ abstract class Module : PsiScopeProcessor {
     }
 
     private fun executeOnAliasCall(aliasCall: Named, state: ResolveState): Boolean {
+        val aliasCallState = state.putVisitedElement(aliasCall)
         val asKeywordValue = aliasCall.keywordArgument("as")
 
         return if (asKeywordValue != null) {
             asKeywordValue
                     .stripAccessExpression()
-                    .let { executeOnAs(it, state.put(ALIAS_CALL, aliasCall)) }
+                    .let { executeOnAs(it, aliasCallState.put(ALIAS_CALL, aliasCall)) }
         } else {
             val finalArguments = aliasCall.finalArguments()
 
             if (finalArguments != null && finalArguments.isNotEmpty()) {
-                executeOnAliasCallArgument(finalArguments[0], state)
+                executeOnAliasCallArgument(finalArguments[0], aliasCallState)
             } else {
                 true
             }
@@ -208,7 +209,7 @@ abstract class Module : PsiScopeProcessor {
 
     private fun executeOnRequireCall(require: Call, state: ResolveState): Boolean =
         require.keywordArgument("as")?.stripAccessExpression()?.let {
-            executeOnAs(it, state.put(REQUIRE_CALL, require))
+            executeOnAs(it, state.putVisitedElement(require).put(REQUIRE_CALL, require))
         } ?: true
 
     private fun executeOnAs(asKeywordValue: PsiElement, state: ResolveState): Boolean =

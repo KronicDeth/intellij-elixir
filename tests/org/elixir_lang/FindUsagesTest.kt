@@ -574,7 +574,7 @@ class FindUsagesTest : BasePlatformTestCase() {
 
         val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
 
-        assertEquals(3, usages.size)
+        assertEquals(2, usages.size)
 
         val firstElement = usages[0].element!!
 
@@ -587,12 +587,6 @@ class FindUsagesTest : BasePlatformTestCase() {
         assertEquals(33, secondElement.textOffset)
         assertNull(readWriteAccessDetector(secondElement))
         assertEquals(UsageTypeProvider.ALIAS, getUsageType(secondElement, usageTargets))
-
-        val thirdElement = usages[2].element!!
-
-        assertEquals(33, thirdElement.textOffset)
-        assertNull(readWriteAccessDetector(thirdElement))
-        assertEquals(UsageTypeProvider.ALIAS, getUsageType(thirdElement, usageTargets))
     }
 
     fun testModuleNestedRecursiveDeclaration() {
@@ -743,9 +737,9 @@ class FindUsagesTest : BasePlatformTestCase() {
 
         assertEquals(
                 "alias Declaration",
-                secondPrimaryElement.parent.parent.parent.text
+                secondPrimaryElement.text
         )
-        assertEquals(27, secondPrimaryElement.textOffset)
+        assertEquals(21, secondPrimaryElement.textOffset)
 
         val secondaryElements = findUsagesHandler.secondaryElements
 
@@ -753,7 +747,7 @@ class FindUsagesTest : BasePlatformTestCase() {
 
         val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
 
-        assertEquals(3, usages.size)
+        assertEquals(2, usages.size)
 
         val firstElement = usages[0].element!!
 
@@ -775,16 +769,6 @@ class FindUsagesTest : BasePlatformTestCase() {
         assertEquals(27, secondElement.textOffset)
         assertNull(readWriteAccessDetector(secondElement))
         assertEquals(UsageTypeProvider.ALIAS, getUsageType(secondElement, usageTargets))
-
-        val thirdElement = usages[2].element!!
-
-        assertEquals(
-                "alias Declaration",
-                thirdElement.parent.parent.parent.text
-        )
-        assertEquals(27, thirdElement.textOffset)
-        assertNull(readWriteAccessDetector(thirdElement))
-        assertEquals(UsageTypeProvider.ALIAS, getUsageType(thirdElement, usageTargets))
     }
 
     fun testParameterUnused() {

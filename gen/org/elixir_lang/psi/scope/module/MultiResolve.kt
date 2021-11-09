@@ -94,7 +94,7 @@ class MultiResolve internal constructor(private val name: String, private val in
         return resolveResultOrderedSet.keepProcessing(incompleteCode)
     }
 
-    fun resolveResults(): Array<VisitedElementSetResolveResult> = resolveResultOrderedSet.toList().toTypedArray()
+    fun resolveResults(): List<VisitedElementSetResolveResult> = resolveResultOrderedSet.toList()
 
     private val resolveResultOrderedSet = ResolveResultOrderedSet()
 
@@ -124,13 +124,13 @@ class MultiResolve internal constructor(private val name: String, private val in
     companion object {
         fun resolveResults(name: String,
                            incompleteCode: Boolean,
-                           entrance: PsiElement): Array<VisitedElementSetResolveResult> =
+                           entrance: PsiElement): List<VisitedElementSetResolveResult> =
                 resolveResults(name, incompleteCode, entrance, ResolveState.initial())
 
         private fun resolveResults(name: String,
                                    incompleteCode: Boolean,
                                    entrance: PsiElement,
-                                   state: ResolveState): Array<VisitedElementSetResolveResult> {
+                                   state: ResolveState): List<VisitedElementSetResolveResult> {
             val multiResolve = MultiResolve(name, incompleteCode)
             val maxScope = maxScope(entrance)
 

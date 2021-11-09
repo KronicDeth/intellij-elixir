@@ -48,13 +48,13 @@ public class NestedTest extends BasePlatformTestCase {
 
         assertEquals(2, resolveResults.length);
 
+        // defmodule
+        assertEquals("defmodule Prefix.MultipleAliasAye.Nested do\nend", resolveResults[0].getElement().getText());
         // alias
         assertEquals(
                 "alias Prefix.{MultipleAliasAye, MultipleAliasBee}",
-                resolveResults[0].getElement().getParent().getParent().getParent().getParent().getParent().getText()
+                resolveResults[1].getElement().getText()
         );
-        // defmodule
-        assertEquals("defmodule Prefix.MultipleAliasAye.Nested do\nend", resolveResults[1].getElement().getText());
     }
 
     /*

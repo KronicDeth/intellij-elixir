@@ -9,6 +9,8 @@ import org.elixir_lang.psi.call.Call
 import java.util.ArrayList
 
 import org.elixir_lang.psi.CallDefinitionClause.nameArityInterval
+import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
+import org.elixir_lang.psi.impl.enclosingMacroCall
 
 class ImportTest : LightPlatformCodeInsightFixtureTestCase() {
     /*
@@ -29,7 +31,7 @@ class ImportTest : LightPlatformCodeInsightFixtureTestCase() {
         assertTrue(Import.`is`(call))
 
         val importedCallList = ArrayList<Call>()
-        val resolveState = ResolveState.initial().putInitialVisitedElement(call)
+        val resolveState = ResolveState.initial().put(ENTRANCE, call.enclosingMacroCall()).putInitialVisitedElement(call)
 
         Import.treeWalkUp(call, resolveState) { call1, _ ->
             importedCallList.add(call1)
@@ -53,7 +55,7 @@ class ImportTest : LightPlatformCodeInsightFixtureTestCase() {
         assertTrue(Import.`is`(call))
 
         val importedCallList = ArrayList<Call>()
-        val resolveState = ResolveState.initial().putInitialVisitedElement(call)
+        val resolveState = ResolveState.initial().put(ENTRANCE, call.enclosingMacroCall()).putInitialVisitedElement(call)
 
         Import.treeWalkUp(call, resolveState) { call1, _ ->
             importedCallList.add(call1)
@@ -89,7 +91,7 @@ class ImportTest : LightPlatformCodeInsightFixtureTestCase() {
         assertTrue(Import.`is`(call))
 
         val importedCallList = ArrayList<Call>()
-        val resolveState = ResolveState.initial().putInitialVisitedElement(call)
+        val resolveState = ResolveState.initial().put(ENTRANCE, call.enclosingMacroCall()).putInitialVisitedElement(call)
 
         Import.treeWalkUp(call, resolveState) { call1, _ ->
             importedCallList.add(call1)

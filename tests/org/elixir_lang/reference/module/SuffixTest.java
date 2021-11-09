@@ -54,10 +54,10 @@ public class SuffixTest extends BasePlatformTestCase {
 
         assertEquals(resolveResults.length, 2);
 
-        // alias
-        assertEquals("alias Prefix.Suffix", resolveResults[0].getElement().getParent().getParent().getText());
         // defmodule
-        assertEquals("defmodule Prefix.Suffix do\nend", resolveResults[1].getElement().getText());
+        assertEquals("defmodule Prefix.Suffix do\nend", resolveResults[0].getElement().getText());
+        // alias
+        assertEquals("alias Prefix.Suffix", resolveResults[1].getElement().getText());
     }
 
     /*

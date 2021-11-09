@@ -46,10 +46,10 @@ public class NestedTest extends BasePlatformTestCase {
 
         assertEquals(2, resolveResults.length);
 
-        // alias
-        assertEquals("alias Prefix.Suffix", resolveResults[0].getElement().getParent().getParent().getText());
         // defmodule
-        assertEquals("defmodule Prefix.Suffix.Nested do\nend", resolveResults[1].getElement().getText());
+        assertEquals("defmodule Prefix.Suffix.Nested do\nend", resolveResults[0].getElement().getText());
+        // alias
+        assertEquals("alias Prefix.Suffix", resolveResults[1].getElement().getText());
     }
 
     /*
