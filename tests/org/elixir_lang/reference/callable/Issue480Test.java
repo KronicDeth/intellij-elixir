@@ -1,10 +1,8 @@
 package org.elixir_lang.reference.callable;
 
 import com.intellij.psi.*;
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
-import kotlin.ranges.IntRange;
 import org.elixir_lang.NameArityInterval;
-import org.elixir_lang.NameArityRange;
+import org.elixir_lang.PlatformTestCase;
 import org.elixir_lang.psi.ArityInterval;
 import org.elixir_lang.psi.CallDefinitionClause;
 import org.elixir_lang.psi.call.Call;
@@ -12,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 import static org.elixir_lang.psi.CallDefinitionClause.nameArityInterval;
 
-public class Issue480Test extends BasePlatformTestCase {
+public class Issue480Test extends PlatformTestCase {
     /*
      * Tests
      */

@@ -1,12 +1,12 @@
 package org.elixir_lang.reference.callable;
 
 import com.intellij.psi.PsiElement;
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
+import org.elixir_lang.PlatformTestCase;
 import org.elixir_lang.psi.UnqualifiedNoArgumentsCall;
 
 import static org.elixir_lang.reference.Callable.isParameter;
 
-public class Issue431Test extends BasePlatformTestCase {
+public class Issue431Test extends PlatformTestCase {
     /*
      * Tests
      */

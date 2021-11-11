@@ -1,9 +1,9 @@
 package org.elixir_lang.annotator;
 
 
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
+import org.elixir_lang.PlatformTestCase;
 
-public class ModuleAttributeTest extends BasePlatformTestCase {
+public class ModuleAttributeTest extends PlatformTestCase {
     /*
      * Tests
      */

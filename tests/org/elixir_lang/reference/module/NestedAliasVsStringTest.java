@@ -1,22 +1,13 @@
 package org.elixir_lang.reference.module;
 
-import com.intellij.codeInsight.completion.CompletionType;
-import com.intellij.codeInsight.lookup.LookupEx;
-import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiPolyVariantReference;
-import com.intellij.psi.ResolveResult;
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
-import org.elixir_lang.psi.QualifiedAlias;
-import org.jetbrains.annotations.NotNull;
+import org.elixir_lang.PlatformTestCase;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
  * Checks that nested module resolution is doing substitution at alias separator ("."), instead of name.
  */
-public class NestedAliasVsStringTest extends BasePlatformTestCase {
+public class NestedAliasVsStringTest extends PlatformTestCase {
     /*
      * Tests
      */

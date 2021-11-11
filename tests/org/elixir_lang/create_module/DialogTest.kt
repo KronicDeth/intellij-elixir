@@ -1,14 +1,14 @@
 package org.elixir_lang.create_module
 
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.testFramework.fixtures.BasePlatformTestCase
+import org.elixir_lang.PlatformTestCase
 
 import java.io.IOException
 
 /**
  * @see [https://confluence.jetbrains.com/display/IntelliJIDEA/Completion+Test"](https://confluence.jetbrains.com/display/IntelliJIDEA/Completion+Test)
  */
-class DialogTest : BasePlatformTestCase() {
+class DialogTest : PlatformTestCase() {
     // TODO fix extra blank lines added by formatter
     @Throws(IOException::class)
     fun testCamelCaseAliasIsLowerCaseUnderscored() {

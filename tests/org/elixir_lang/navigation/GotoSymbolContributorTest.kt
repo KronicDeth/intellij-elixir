@@ -1,12 +1,12 @@
 package org.elixir_lang.navigation
 
 import com.intellij.navigation.ChooseByNameRegistry
-import com.intellij.testFramework.fixtures.BasePlatformTestCase
+import org.elixir_lang.PlatformTestCase
 import org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.structure_view.element.CallDefinitionClause
 
-class GotoSymbolContributorTest : BasePlatformTestCase() {
+class GotoSymbolContributorTest : PlatformTestCase() {
     private fun gotoSymbolContributor(): GotoSymbolContributor {
         val symbolModelContributors = ChooseByNameRegistry
                 .getInstance()

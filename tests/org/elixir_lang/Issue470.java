@@ -1,8 +1,6 @@
 package org.elixir_lang;
 
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
-
-public class Issue470 extends BasePlatformTestCase {
+public class Issue470 extends PlatformTestCase {
     /*
      * Tests
      */

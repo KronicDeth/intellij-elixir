@@ -5,15 +5,13 @@ import com.intellij.find.FindManager
 import com.intellij.find.findUsages.PsiElement2UsageTargetAdapter
 import com.intellij.find.impl.FindManagerImpl
 import com.intellij.lang.findUsages.LanguageFindUsages
-import com.intellij.openapi.extensions.Extensions
 import com.intellij.psi.PsiElement
-import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import com.intellij.usages.UsageTarget
 import com.intellij.usages.UsageTargetUtil
 import com.intellij.usages.impl.rules.UsageType
 import com.intellij.usages.impl.rules.UsageTypeProviderEx
 
-class FindUsagesTest : BasePlatformTestCase() {
+class FindUsagesTest : PlatformTestCase() {
     override fun getTestDataPath(): String {
         return "testData/org/elixir_lang/find_usages"
     }

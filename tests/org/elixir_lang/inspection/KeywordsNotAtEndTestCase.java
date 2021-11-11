@@ -1,11 +1,11 @@
 package org.elixir_lang.inspection;
 
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
+import org.elixir_lang.PlatformTestCase;
 
 /**
  * Created by luke.imhoff on 12/5/14.
  */
-public class KeywordsNotAtEndTestCase extends BasePlatformTestCase {
+public class KeywordsNotAtEndTestCase extends PlatformTestCase {
     public void testBug195() {
         myFixture.configureByFiles("Bug195.ex");
         myFixture.enableInspections(KeywordsNotAtEnd.class);

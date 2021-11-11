@@ -23,6 +23,7 @@ import com.intellij.openapi.vfs.encoding.EncodingManager;
 import com.intellij.openapi.vfs.encoding.EncodingManagerImpl;
 import com.intellij.openapi.vfs.impl.CoreVirtualFilePointerManager;
 import com.intellij.openapi.vfs.impl.VirtualFileManagerImpl;
+import com.intellij.openapi.vfs.local.CoreLocalFileSystem;
 import com.intellij.openapi.vfs.pointers.VirtualFilePointerManager;
 import com.intellij.psi.*;
 import com.intellij.util.messages.MessageBus;
@@ -167,6 +168,14 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
         super.setUp();
 
         setProjectSdkFromEbinDirectory();
+    }
+
+
+    @Override
+    protected void tearDown() throws Exception {
+        getApplication().getPicoContainer().unregisterComponent(VirtualFileManager.class.getName());
+
+        super.tearDown();
     }
 
     @Override
