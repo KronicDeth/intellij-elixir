@@ -634,7 +634,7 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
                         AccumulatorContinue(initial, true)
                     }
                 }
-                is Arrow, is AtNonNumericOperation, is ElixirAtomKeyword, is Pipe, is Two -> AccumulatorContinue(initial, true)
+                is Arrow, is AtOperation, is ElixirAtomKeyword, is Pipe, is Two -> AccumulatorContinue(initial, true)
                 is Operation -> {
                     TODO()
                 }

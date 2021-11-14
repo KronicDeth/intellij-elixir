@@ -7,7 +7,7 @@ import com.intellij.psi.PsiElement;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.PsiReference;
 
-public interface ElixirUnmatchedAtOperation extends ElixirUnmatchedExpression, AtNonNumericOperation {
+public interface ElixirUnmatchedAtOperation extends ElixirUnmatchedExpression, AtOperation {
 
   @NotNull
   ElixirAtPrefixOperator getAtPrefixOperator();

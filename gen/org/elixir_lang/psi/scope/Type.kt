@@ -31,7 +31,7 @@ abstract class Type : PsiScopeProcessor {
     override fun execute(element: PsiElement, state: ResolveState): Boolean =
             when (element) {
                 // typing a module attribute on line above a pre-existing one
-                is AtNonNumericOperation -> execute(element, state)
+                is AtOperation -> execute(element, state)
                 is Call -> execute(element, state)
                 // Anonymous function type siganture
                 is ElixirStabParenthesesSignature -> execute(element, state)
@@ -54,7 +54,7 @@ abstract class Type : PsiScopeProcessor {
     protected abstract fun executeOnParameter(parameter: PsiElement, state: ResolveState): Boolean
     protected abstract fun keepProcessing(): Boolean
 
-    private fun execute(atNonNumericOperation: AtNonNumericOperation, state: ResolveState): Boolean =
+    private fun execute(atNonNumericOperation: AtOperation, state: ResolveState): Boolean =
         execute(atNonNumericOperation.children.last(), state)
 
     private fun execute(call: Call, state: ResolveState): Boolean =

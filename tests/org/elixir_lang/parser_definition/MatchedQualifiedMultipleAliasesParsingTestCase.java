@@ -201,11 +201,7 @@ public class MatchedQualifiedMultipleAliasesParsingTestCase extends ParsingTestC
     }
 
     private void assertParsedAndQuotedCorrectlyInOneThree(boolean checkResult) {
-        if (elixirSdkRelease().level().supportsMultipleAliases) {
-            assertParsedAndQuotedCorrectly(checkResult);
-        } else {
-            assertParsedAndQuotedAroundError(checkResult);
-        }
+        assertParsedAndQuotedCorrectly(checkResult);
     }
 
     /*

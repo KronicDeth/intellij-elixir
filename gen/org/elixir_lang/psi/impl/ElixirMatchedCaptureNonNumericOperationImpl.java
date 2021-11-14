@@ -13,17 +13,16 @@ import static org.elixir_lang.psi.ElixirTypes.*;
 import org.elixir_lang.psi.*;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.PsiReference;
-import kotlin.ranges.IntRange;
 
-public class ElixirUnmatchedGreaterThanOrEqualToOnePointSixCaptureNonNumericOperationImpl extends ElixirUnmatchedExpressionImpl implements ElixirUnmatchedGreaterThanOrEqualToOnePointSixCaptureNonNumericOperation {
+public class ElixirMatchedCaptureNonNumericOperationImpl extends ElixirMatchedExpressionImpl implements ElixirMatchedCaptureNonNumericOperation {
 
-  public ElixirUnmatchedGreaterThanOrEqualToOnePointSixCaptureNonNumericOperationImpl(@NotNull ASTNode node) {
+  public ElixirMatchedCaptureNonNumericOperationImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   @Override
   public void accept(@NotNull ElixirVisitor visitor) {
-    visitor.visitUnmatchedGreaterThanOrEqualToOnePointSixCaptureNonNumericOperation(this);
+    visitor.visitMatchedCaptureNonNumericOperation(this);
   }
 
   @Override
@@ -40,8 +39,8 @@ public class ElixirUnmatchedGreaterThanOrEqualToOnePointSixCaptureNonNumericOper
 
   @Override
   @Nullable
-  public ElixirUnmatchedExpression getUnmatchedExpression() {
-    return PsiTreeUtil.getChildOfType(this, ElixirUnmatchedExpression.class);
+  public ElixirMatchedExpression getMatchedExpression() {
+    return PsiTreeUtil.getChildOfType(this, ElixirMatchedExpression.class);
   }
 
   @Override

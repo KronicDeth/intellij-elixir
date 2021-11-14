@@ -1,10 +1,6 @@
 package org.elixir_lang.parser_definition;
 
 
-import static org.elixir_lang.Level.V_1_4;
-import static org.elixir_lang.Level.V_1_5;
-import static org.elixir_lang.test.ElixirVersion.elixirSdkLevel;
-
 /**
  * Created by luke.imhoff on 9/17/14.
  */
@@ -81,17 +77,6 @@ public class BracketOperationParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly(false);
     }
 
-    public void testStructOperator() {
-        int compareToV_1_4 = elixirSdkLevel().compareTo(V_1_4);
-
-        if (compareToV_1_4 < 0) {
-            assertParsedAndQuotedCorrectly(false);
-        } else {
-            //noinspection ConstantConditions
-            assertTrue(compareToV_1_4 >= 0);
-        }
-    }
-
     public void testTwoOperator() {
         assertParsedAndQuotedCorrectly();
     }
@@ -138,17 +123,6 @@ public class BracketOperationParsingTestCase extends ParsingTestCase {
 
     public void testCaptureNumericOperation() {
         assertParsedAndQuotedCorrectly();
-    }
-
-    public void testUnaryNumericOperation() {
-        int compareToV_1_5 = elixirSdkLevel().compareTo(V_1_5);
-
-        if (compareToV_1_5 < 0) {
-            assertParsedAndQuotedCorrectly(false);
-        } else {
-            //noinspection ConstantConditions
-            assertTrue(compareToV_1_5 >= 0);
-        }
     }
 
     public void testList() {

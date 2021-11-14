@@ -12,7 +12,6 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import java.util.Set;
-import kotlin.ranges.IntRange;
 
 public interface ElixirMatchedUnqualifiedNoParenthesesCall extends ElixirMatchedExpression, MatchedCall, UnqualifiedNoParenthesesCall<MatchedUnqualifiedNoParenthesesCall>, StubBasedPsiElement<MatchedUnqualifiedNoParenthesesCall> {
 
@@ -26,7 +25,7 @@ public interface ElixirMatchedUnqualifiedNoParenthesesCall extends ElixirMatched
 
   @NotNull Set<String> canonicalNameSet();
 
-  int exportedArity(ResolveState state);
+  int exportedArity(@NotNull ResolveState state);
 
   @Nullable String exportedName();
 
@@ -98,6 +97,10 @@ public interface ElixirMatchedUnqualifiedNoParenthesesCall extends ElixirMatched
 
   //WARNING: getUseScope(...) is skipped
   //matching getUseScope(ElixirMatchedUnqualifiedNoParenthesesCall, ...)
+  //methods are not found in ElixirPsiImplUtil
+
+  //WARNING: protocolName(...) is skipped
+  //matching protocolName(ElixirMatchedUnqualifiedNoParenthesesCall, ...)
   //methods are not found in ElixirPsiImplUtil
 
 }

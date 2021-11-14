@@ -17,7 +17,7 @@ class UsageTypeProvider : com.intellij.usages.impl.rules.UsageTypeProviderEx {
     override fun getUsageType(element: PsiElement?, targets: Array<out UsageTarget>): UsageType? =
             when (element) {
                 is AtUnqualifiedNoParenthesesCall<*> -> MODULE_ATTRIBUTE_ACCUMULATE_OR_OVERRIDE
-                is AtNonNumericOperation -> MODULE_ATTRIBUTE_READ
+                is AtOperation -> MODULE_ATTRIBUTE_READ
                 is QualifiableAlias -> qualifiableAliasUsageType(element, entrance = element)
                 is Call -> getUsageType(element, targets)
                 else -> null

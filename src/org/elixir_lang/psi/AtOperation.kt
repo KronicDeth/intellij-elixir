@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Contract
 /**
  * `atPrefixOperator !numeric ...`
  */
-interface AtNonNumericOperation : ModuleAttributeNameable, Prefix {
+interface AtOperation : ModuleAttributeNameable, Prefix {
     @Contract(pure = true)
     override fun getReference(): PsiReference?
 }
@@ -17,4 +17,4 @@ fun Call.isModuleAttributeNameElement(): Boolean =
         this is UnqualifiedNoArgumentsCall<*> && this.isModuleAttributeNameElement()
 
 fun UnqualifiedNoArgumentsCall<*>.isModuleAttributeNameElement(): Boolean =
-        parent is AtNonNumericOperation
+        parent is AtOperation

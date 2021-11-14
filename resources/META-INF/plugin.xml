@@ -76,7 +76,6 @@
     <colorSettingsPage implementation="org.elixir_lang.ElixirColorSettingsPage"/>
     <fileType name="Elixir" implementationClass="org.elixir_lang.ElixirFileType" fieldName="INSTANCE" language="Elixir" extensions="ex"/>
     <fileType name="Elixir Script" implementationClass="org.elixir_lang.ElixirScriptFileType" fieldName="INSTANCE" language="Elixir" extensions="exs"/>
-    <filePropertyPusher implementation="org.elixir_lang.file.LevelPropertyPusher"/>
 
     <!-- Facet -->
     <applicationConfigurable id="language.elixir.sdks.elixir"

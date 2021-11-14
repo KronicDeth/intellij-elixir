@@ -3,9 +3,9 @@ package org.elixir_lang.find_usages.handler
 import com.intellij.find.findUsages.FindUsagesHandler
 import com.intellij.psi.PsiElement
 import org.elixir_lang.find_usages.toPsiElementList
-import org.elixir_lang.psi.AtNonNumericOperation
+import org.elixir_lang.psi.AtOperation
 
-class AtNonNumericOperation(atNonNumericOperation: AtNonNumericOperation) : FindUsagesHandler(atNonNumericOperation) {
+class AtNonNumericOperation(atOperation: AtOperation) : FindUsagesHandler(atOperation) {
     private val _primaryElements by lazy {
         val resolvedElements = resolvedElements()
 

@@ -3,11 +3,11 @@ package org.elixir_lang.psi.impl
 import com.intellij.psi.PsiReference
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager.getCachedValue
-import org.elixir_lang.psi.AtNonNumericOperation
+import org.elixir_lang.psi.AtOperation
 import org.elixir_lang.reference.ModuleAttribute
 import org.elixir_lang.reference.ModuleAttribute.Companion.isNonReferencing
 
-private fun AtNonNumericOperation.computeReference(): PsiReference? =
+private fun AtOperation.computeReference(): PsiReference? =
         if (!isNonReferencing(this)) {
             when (containingFile.virtualFile?.fileType) {
                 org.elixir_lang.leex.file.Type.INSTANCE -> org.elixir_lang.leex.reference.Assign(this)
@@ -17,6 +17,6 @@ private fun AtNonNumericOperation.computeReference(): PsiReference? =
             null
         }
 
-fun AtNonNumericOperation.getReference(): PsiReference? =
+fun AtOperation.getReference(): PsiReference? =
         getCachedValue(this) { CachedValueProvider.Result.create(computeReference(), this) }
 

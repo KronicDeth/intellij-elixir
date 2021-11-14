@@ -360,7 +360,7 @@ class Callable : PsiReferenceBase<Call>, PsiPolyVariantReference {
                         isVariable(ancestor)
                     else -> {
                         if (!(ancestor is AtUnqualifiedBracketOperation ||
-                                        ancestor is AtNonNumericOperation ||
+                                        ancestor is AtOperation ||
                                         ancestor is BracketOperation ||
                                         ancestor is PsiFile ||
                                         ancestor is QualifiedMultipleAliases)) {

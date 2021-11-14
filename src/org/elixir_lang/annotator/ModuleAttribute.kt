@@ -55,7 +55,7 @@ class ModuleAttribute : Annotator, DumbAware {
                          * Public Instance Methods
                          */
                         override fun visitElement(element: PsiElement) {
-                            if (element is AtNonNumericOperation) {
+                            if (element is AtOperation) {
                                 visitMaybeUsage(element)
                             } else if (element is AtUnqualifiedNoParenthesesCall<*>) {
                                 visitDeclaration(element)
@@ -93,7 +93,7 @@ class ModuleAttribute : Annotator, DumbAware {
                             }
                         }
 
-                        private fun visitMaybeUsage(element: AtNonNumericOperation) {
+                        private fun visitMaybeUsage(element: AtOperation) {
                             element.operand()?.let { operand ->
                                 if (operand !is ElixirAccessExpression) {
                                     visitUsage(element)
@@ -101,7 +101,7 @@ class ModuleAttribute : Annotator, DumbAware {
                             }
                         }
 
-                        private fun visitUsage(atNonNumericOperation: AtNonNumericOperation) {
+                        private fun visitUsage(atNonNumericOperation: AtOperation) {
                             Highlighter.highlight(holder,
                                     atNonNumericOperation.textRange,
                                     ElixirSyntaxHighlighter.MODULE_ATTRIBUTE
@@ -1042,7 +1042,6 @@ class ModuleAttribute : Annotator, DumbAware {
                                 psiElement is ElixirDecimalWholeNumber ||
                                 psiElement is ElixirKeywordKey ||  /* happens when :: is typed in `@spec` above function clause that uses `do:` */
                                 psiElement is ElixirNoParenthesesKeywords ||
-                                psiElement is ElixirUnaryNumericOperation ||
                                 psiElement is ElixirMatchedUnaryOperation ||
                                 psiElement is ElixirVariable ||
                                 psiElement is ElixirUnmatchedUnaryOperation ||

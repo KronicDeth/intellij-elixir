@@ -15,9 +15,6 @@ public interface ElixirAccessExpression extends MaybeModuleName, Quotable {
   ElixirAnonymousFunction getAnonymousFunction();
 
   @Nullable
-  ElixirAtNumericOperation getAtNumericOperation();
-
-  @Nullable
   ElixirAtom getAtom();
 
   @Nullable
@@ -133,9 +130,6 @@ public interface ElixirAccessExpression extends MaybeModuleName, Quotable {
 
   @Nullable
   ElixirTuple getTuple();
-
-  @Nullable
-  ElixirUnaryNumericOperation getUnaryNumericOperation();
 
   @Nullable
   ElixirUnknownBaseWholeNumber getUnknownBaseWholeNumber();

@@ -14,7 +14,6 @@ import org.elixir_lang.psi.*;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
-import kotlin.ranges.IntRange;
 
 public class ElixirMatchedMatchOperationImpl extends ElixirMatchedExpressionImpl implements ElixirMatchedMatchOperation {
 

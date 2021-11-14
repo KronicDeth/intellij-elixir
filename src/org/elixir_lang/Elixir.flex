@@ -4,8 +4,6 @@ import com.intellij.lexer.FlexLexer;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
-import org.elixir_lang.Level;
-import org.elixir_lang.file.LevelPropertyPusher;
 import org.elixir_lang.lexer.group.*;
 import org.elixir_lang.psi.ElixirTypes;
 import org.jetbrains.annotations.NotNull;
@@ -24,8 +22,6 @@ import org.jetbrains.annotations.Nullable;
 %eof}
 
 %{
-  @Nullable
-  private Level level = null;
   @Nullable
   private Project project = null;
   private org.elixir_lang.lexer.Stack stack = new org.elixir_lang.lexer.Stack();
@@ -145,28 +141,6 @@ import org.jetbrains.annotations.Nullable;
 
   private IElementType terminatorType() {
     return stack.terminatorType();
-  }
-
-  @NotNull
-  public Level getLevel() {
-    if (this.level == null) {
-      Project project = this.project;
-      Level level;
-
-      if (project != null) {
-        level = LevelPropertyPusher.level(project);
-      } else {
-        level = Level.MAXIMUM;
-      }
-
-      this.level = level;
-    }
-
-    return this.level;
-  }
-
-  public void setLevel(@Nullable Level level) {
-    this.level = level;
   }
 
   @Nullable
@@ -1083,13 +1057,8 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                                                       return ElixirTypes.RESCUE; }
   {STAB_OPERATOR}                                   {
                                                       yybegin(CALL_MAYBE);
-
-                                                      if (getLevel().compareTo(Level.V_1_6) < 0) {
-                                                        return ElixirTypes.STAB_OPERATOR;
-                                                      } else {
-                                                        yypushback(1);
-                                                        return ElixirTypes.MINUS_OPERATOR;
-                                                      }
+                                                      yypushback(1);
+                                                      return ElixirTypes.MINUS_OPERATOR;
                                                     }
   {STRUCT_OPERATOR}                                 { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.STRUCT_OPERATOR; }

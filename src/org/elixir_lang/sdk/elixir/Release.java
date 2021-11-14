@@ -1,6 +1,5 @@
 package org.elixir_lang.sdk.elixir;
 
-import org.elixir_lang.Level;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -112,8 +111,6 @@ public final class Release implements Comparable<Release> {
   private final String patch;
   @Nullable
   private final String pre;
-  @NotNull
-  private final Level level;
 
   /*
    * Constructors
@@ -124,15 +121,6 @@ public final class Release implements Comparable<Release> {
                  @Nullable String patch,
                  @Nullable String pre,
                  @Nullable String build) {
-    this(major, minor, patch, pre, build, null);
-  }
-
-  public Release(@NotNull String major,
-                 @Nullable String minor,
-                 @Nullable String patch,
-                 @Nullable String pre,
-                 @Nullable String build,
-                 @Nullable Level level) {
     this.major = major;
     this.minor = minor;
     this.patch = patch;
@@ -141,12 +129,6 @@ public final class Release implements Comparable<Release> {
 
     if (minor == null && patch != null) {
       throw new IllegalArgumentException("patch MUST be null if minor is null");
-    }
-
-    if (level != null) {
-      this.level = level;
-    } else {
-      this.level = Level.fromRelease(this);
     }
   }
 
@@ -171,12 +153,6 @@ public final class Release implements Comparable<Release> {
     }
 
     return comparison;
-  }
-
-  @Contract(pure = true)
-  @NotNull
-  public Level level() {
-    return level;
   }
 
   @Override

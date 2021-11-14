@@ -4,16 +4,18 @@ package org.elixir_lang.psi;
 import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
+import org.elixir_lang.psi.call.Named;
+import org.elixir_lang.psi.operation.capture.NonNumeric;
 import com.ericsson.otp.erlang.OtpErlangObject;
-import kotlin.ranges.IntRange;
+import com.intellij.psi.PsiReference;
 
-public interface ElixirMatchedUnaryNonNumericOperation extends ElixirMatchedExpression, UnaryNonNumericOperation {
-
-  @Nullable
-  ElixirMatchedExpression getMatchedExpression();
+public interface ElixirUnmatchedCaptureNonNumericOperation extends ElixirUnmatchedExpression, Named, NonNumeric {
 
   @NotNull
-  ElixirUnaryPrefixOperator getUnaryPrefixOperator();
+  ElixirCapturePrefixOperator getCapturePrefixOperator();
+
+  @Nullable
+  ElixirUnmatchedExpression getUnmatchedExpression();
 
   @Nullable String functionName();
 
@@ -24,6 +26,8 @@ public interface ElixirMatchedUnaryNonNumericOperation extends ElixirMatchedExpr
   @Nullable String getName();
 
   @Nullable PsiElement getNameIdentifier();
+
+  @Nullable PsiReference getReference();
 
   boolean hasDoBlockOrKeyword();
 

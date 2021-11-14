@@ -60,7 +60,7 @@ abstract class Variable : PsiScopeProcessor {
                 is Match -> execute(element, state)
                 is Pipe, is Two -> execute(element as Infix, state)
                 is Type -> execute(element, state)
-                is UnaryNonNumericOperation -> execute(element, state)
+                is UnaryOperation -> execute(element, state)
                 is UnqualifiedNoArgumentsCall<*> -> executeOnMaybeVariable(element, state)
                 is Call -> execute(element, state)
                 /* Occurs when qualified call occurs over a line with assignment to a tuple, such as
@@ -72,7 +72,7 @@ abstract class Variable : PsiScopeProcessor {
                    bindQuoted */
                 is QuotableKeywordList -> execute(element, state)
                 else -> {
-                    if (!(element is AtNonNumericOperation ||  // a module attribute reference
+                    if (!(element is AtOperation ||  // a module attribute reference
                                     element is AtUnqualifiedBracketOperation ||  // a module attribute reference with access
                                     element is Heredoc ||
                                     element is BracketOperation ||  /* an anonymous function is a new scope, so it can't be used to declare a variable.  This won't ever
@@ -153,7 +153,7 @@ abstract class Variable : PsiScopeProcessor {
                         val stripped = strip(head)
 
                         when (stripped) {
-                            is AtNonNumericOperation -> {
+                            is AtOperation -> {
                                 stripped
                                         .operand()
                                         .let { it as? ElixirAccessExpression }
@@ -399,7 +399,7 @@ abstract class Variable : PsiScopeProcessor {
     private fun execute(match: Type, state: ResolveState): Boolean =
             executeLeftOperand(match, state)
 
-    private fun execute(match: UnaryNonNumericOperation, state: ResolveState): Boolean {
+    private fun execute(match: UnaryOperation, state: ResolveState): Boolean {
         val operator = match.operator()
         val operatorText = operator.text
 

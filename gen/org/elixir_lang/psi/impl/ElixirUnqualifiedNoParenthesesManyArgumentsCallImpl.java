@@ -7,6 +7,7 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
+import static org.elixir_lang.psi.ElixirTypes.*;
 import org.elixir_lang.psi.stub.UnqualifiedNoParenthesesManyArgumentsCall;
 import org.elixir_lang.psi.*;
 import com.ericsson.otp.erlang.OtpErlangObject;
@@ -15,7 +16,6 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import java.util.Set;
-
 import com.intellij.psi.stubs.IStubElementType;
 
 public class ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl extends NamedStubbedPsiElementBase<UnqualifiedNoParenthesesManyArgumentsCall> implements ElixirUnqualifiedNoParenthesesManyArgumentsCall {

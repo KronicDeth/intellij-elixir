@@ -12,7 +12,6 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import java.util.Set;
-import kotlin.ranges.IntRange;
 
 public interface ElixirUnmatchedQualifiedNoArgumentsCall extends ElixirUnmatchedExpression, QualifiedNoArgumentsCall<UnmatchedQualifiedNoArgumentsCall>, StubBasedPsiElement<UnmatchedQualifiedNoArgumentsCall> {
 

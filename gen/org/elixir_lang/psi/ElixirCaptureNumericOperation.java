@@ -7,7 +7,6 @@ import com.intellij.psi.PsiElement;
 import org.elixir_lang.psi.call.Named;
 import org.elixir_lang.psi.operation.Prefix;
 import com.ericsson.otp.erlang.OtpErlangObject;
-import kotlin.ranges.IntRange;
 
 public interface ElixirCaptureNumericOperation extends Named, Prefix {
 

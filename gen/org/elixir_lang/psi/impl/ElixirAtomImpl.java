@@ -33,17 +33,6 @@ public class ElixirAtomImpl extends ASTWrapperPsiElement implements ElixirAtom {
   }
 
   @Override
-  public String getName() {
-    return ElixirPsiImplUtil.getName(this);
-  }
-
-  @Override
-  public PsiElement setName(@NlsSafe @NotNull String name) throws IncorrectOperationException {
-    throw new IncorrectOperationException();
-  }
-
-
-  @Override
   @Nullable
   public ElixirCharListLine getCharListLine() {
     return PsiTreeUtil.getChildOfType(this, ElixirCharListLine.class);
@@ -65,4 +54,8 @@ public class ElixirAtomImpl extends ASTWrapperPsiElement implements ElixirAtom {
     return ElixirPsiImplUtil.quote(this);
   }
 
+  @Override
+  public PsiElement setName(@NlsSafe @NotNull String name) throws IncorrectOperationException {
+    throw new IncorrectOperationException();
+  }
 }

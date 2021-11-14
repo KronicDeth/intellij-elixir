@@ -1,6 +1,0 @@
-Elixir File(0,72)
-  PsiComment(#)('# Comment')(0,9)
-  PsiWhiteSpace('\n  ')(9,12)
-  PsiComment(#)('# Indented Comment')(12,30)
-  PsiWhiteSpace('\n\n')(30,32)
-  PsiComment(#)('# Comment after blank line after comment')(32,72)

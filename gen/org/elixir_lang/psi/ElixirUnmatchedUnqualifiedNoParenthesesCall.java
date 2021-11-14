@@ -12,7 +12,6 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import java.util.Set;
-import kotlin.ranges.IntRange;
 
 public interface ElixirUnmatchedUnqualifiedNoParenthesesCall extends ElixirUnmatchedExpression, UnqualifiedNoParenthesesCall<UnmatchedUnqualifiedNoParenthesesCall>, StubBasedPsiElement<UnmatchedUnqualifiedNoParenthesesCall> {
 
@@ -107,6 +106,10 @@ public interface ElixirUnmatchedUnqualifiedNoParenthesesCall extends ElixirUnmat
 
   //WARNING: getUseScope(...) is skipped
   //matching getUseScope(ElixirUnmatchedUnqualifiedNoParenthesesCall, ...)
+  //methods are not found in ElixirPsiImplUtil
+
+  //WARNING: protocolName(...) is skipped
+  //matching protocolName(ElixirUnmatchedUnqualifiedNoParenthesesCall, ...)
   //methods are not found in ElixirPsiImplUtil
 
 }

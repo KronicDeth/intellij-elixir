@@ -29,7 +29,7 @@ import org.elixir_lang.structure_view.element.structure.Structure
 class ElementDescriptionProvider : com.intellij.psi.ElementDescriptionProvider {
     override tailrec fun getElementDescription(element: PsiElement, location: ElementDescriptionLocation): String? =
             when (element) {
-                is AtNonNumericOperation -> getElementDescription(element, location)
+                is AtOperation -> getElementDescription(element, location)
                 is Call -> getElementDescription(element, location)
                 is ElixirAtom -> getElementDescription(element, location)
                 is ElixirIdentifier -> getElementDescription(element, location)
@@ -44,9 +44,9 @@ class ElementDescriptionProvider : com.intellij.psi.ElementDescriptionProvider {
      * Private Instance Methods
      */
 
-    private fun getElementDescription(atNonNumericOperation: AtNonNumericOperation, location: ElementDescriptionLocation): String? =
+    private fun getElementDescription(atOperation: AtOperation, location: ElementDescriptionLocation): String? =
             when (location) {
-                UsageViewNodeTextLocation.INSTANCE -> atNonNumericOperation.text
+                UsageViewNodeTextLocation.INSTANCE -> atOperation.text
                 UsageViewTypeLocation.INSTANCE -> "module attribute"
                 else -> null
             }

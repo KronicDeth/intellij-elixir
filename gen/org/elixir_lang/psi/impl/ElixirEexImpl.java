@@ -39,4 +39,5 @@ public class ElixirEexImpl extends ASTWrapperPsiElement implements ElixirEex {
   public boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place) {
     return ElixirPsiImplUtil.processDeclarations(this, processor, state, lastParent, place);
   }
+
 }

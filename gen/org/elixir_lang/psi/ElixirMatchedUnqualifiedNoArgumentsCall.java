@@ -13,7 +13,6 @@ import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.search.SearchScope;
 import java.util.Set;
-import kotlin.ranges.IntRange;
 
 public interface ElixirMatchedUnqualifiedNoArgumentsCall extends ElixirMatchedExpression, MatchedCall, UnqualifiedNoArgumentsCall<MatchedUnqualifiedNoArgumentsCall>, StubBasedPsiElement<MatchedUnqualifiedNoArgumentsCall> {
 

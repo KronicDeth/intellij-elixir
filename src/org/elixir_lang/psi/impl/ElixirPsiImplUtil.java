@@ -293,7 +293,7 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static String moduleAttributeName(@NotNull final AtNonNumericOperation atNonNumericOperation) {
+    public static String moduleAttributeName(@NotNull final AtOperation atNonNumericOperation) {
         return atNonNumericOperation.getText();
     }
 
@@ -1191,7 +1191,7 @@ public class ElixirPsiImplUtil {
     }
 
     @Nullable
-    public static PsiReference getReference(@NotNull final AtNonNumericOperation atNonNumericOperation) {
+    public static PsiReference getReference(@NotNull final AtOperation atNonNumericOperation) {
         return AtNonNumericOperationImplKt.getReference(atNonNumericOperation);
     }
 

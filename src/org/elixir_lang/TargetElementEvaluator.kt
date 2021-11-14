@@ -2,7 +2,7 @@ package org.elixir_lang
 
 import com.intellij.codeInsight.TargetElementEvaluatorEx2
 import com.intellij.psi.*
-import org.elixir_lang.psi.AtNonNumericOperation
+import org.elixir_lang.psi.AtOperation
 import org.elixir_lang.psi.QualifiedNoArgumentsCall
 import org.elixir_lang.psi.UnqualifiedNoArgumentsCall
 import org.elixir_lang.psi.call.Call
@@ -17,7 +17,7 @@ class TargetElementEvaluator : TargetElementEvaluatorEx2() {
     override fun isAcceptableNamedParent(parent: PsiElement): Boolean = when (parent) {
         // Don't allow the identifier of a module attribute or assign usage be a named parent.
         is UnqualifiedNoArgumentsCall<*> -> when (val grandParent = parent.parent) {
-            is AtNonNumericOperation -> false
+            is AtOperation -> false
             // Don't allow `name` in `&name/arity` to be named parent. The capture needs to be the parent.
             is Multiplication -> when (grandParent.parent) {
                 is NonNumeric -> false

@@ -8,9 +8,8 @@ import org.elixir_lang.psi.call.Named;
 import org.elixir_lang.psi.operation.capture.NonNumeric;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.PsiReference;
-import kotlin.ranges.IntRange;
 
-public interface ElixirMatchedGreaterThanOrEqualToOnePointSixCaptureNonNumericOperation extends ElixirMatchedExpression, Named, NonNumeric {
+public interface ElixirMatchedCaptureNonNumericOperation extends ElixirMatchedExpression, Named, NonNumeric {
 
   @NotNull
   ElixirCapturePrefixOperator getCapturePrefixOperator();

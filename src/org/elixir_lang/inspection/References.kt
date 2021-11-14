@@ -25,8 +25,8 @@ class References : LocalInspectionTool() {
                 alias.reference?.let { reference -> registerProblem(alias, reference) }
             }
 
-            override fun visitAtNonNumericOperation(atNonNumericOperation: AtNonNumericOperation) {
-                atNonNumericOperation.reference?.let { reference -> registerProblem(atNonNumericOperation, reference) }
+            override fun visitAtOperation(atOperation: AtOperation) {
+                atOperation.reference?.let { reference -> registerProblem(atOperation, reference) }
             }
 
             override fun visitUnmatchedQualifiedNoArgumentsCall(qualifiedNoArgumentsCall: ElixirUnmatchedQualifiedNoArgumentsCall) =
@@ -50,7 +50,7 @@ class References : LocalInspectionTool() {
             private fun visitQualifiedNoArgumentsCall(qualifiedNoArgumentsCall: QualifiedNoArgumentsCall<*>) {
                 when (qualifiedNoArgumentsCall.qualifier()) {
                     // Can't resolve keys or fields of a module attribute or assign
-                    is AtNonNumericOperation,
+                    is AtOperation,
                         // Can't resolve key or fields of a capture
                     is ElixirCaptureNumericOperation,
                         // Can't resolve field or key on a parenthetical expression

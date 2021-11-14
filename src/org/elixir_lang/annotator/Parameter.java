@@ -134,7 +134,7 @@ public class Parameter {
             parameterizedParameter = putParameterized(parameter, parent);
         } else if (parent instanceof Call) {
             parameterizedParameter = putParameterized(parameter, (Call) parent);
-        } else if (parent instanceof AtNonNumericOperation ||
+        } else if (parent instanceof AtOperation ||
                 parent instanceof ElixirAccessExpression ||
                 parent instanceof ElixirAssociations ||
                 parent instanceof ElixirAssociationsBase ||

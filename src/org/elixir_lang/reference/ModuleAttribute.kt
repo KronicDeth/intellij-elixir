@@ -29,7 +29,7 @@ class ModuleAttribute(psiElement: PsiElement) : PsiPolyVariantReferenceBase<PsiE
 
     override fun handleElementRename(newModuleAttributeName: String): PsiElement =
             when (myElement) {
-                is AtNonNumericOperation -> {
+                is AtOperation -> {
                     val moduleAttributeUsage = ElementFactory.createModuleAttributeUsage(
                             myElement.getProject(),
                             newModuleAttributeName
@@ -159,7 +159,7 @@ class ModuleAttribute(psiElement: PsiElement) : PsiPolyVariantReferenceBase<PsiE
          * @return `true` if the module attribute should have a `null` reference because it is used for
          * library control instead of constant definition; otherwise, `false`.
          */
-        fun isNonReferencing(moduleAttribute: AtNonNumericOperation): Boolean =
+        fun isNonReferencing(moduleAttribute: AtOperation): Boolean =
                 moduleAttribute.text.substring(1).let { name -> isNonReferencingName(name) }
 
         /**
