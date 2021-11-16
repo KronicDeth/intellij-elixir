@@ -10,36 +10,76 @@ import com.intellij.psi.ResolveResult
 import com.intellij.psi.impl.source.resolve.ResolveCache
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
-import org.elixir_lang.psi.NamedElement
+import org.elixir_lang.psi.*
+import org.elixir_lang.psi.call.Call
+import org.elixir_lang.psi.scope.VisitedElementSetResolveResult
 import org.elixir_lang.psi.scope.module.MultiResolve
 import org.elixir_lang.psi.stub.index.ModularName
 import org.elixir_lang.reference.Resolver
+import org.elixir_lang.structure_view.element.Delegation
 
 
 object Module : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Module> {
     override fun resolve(
             module: org.elixir_lang.reference.Module,
             incompleteCode: Boolean
-    ): Array<ResolveResult> =
-            module.element.let { element ->
-                element.fullyQualifiedName().let { name ->
-                    val sameFileResolveResults =
-                            MultiResolve.resolveResults(name, incompleteCode, element)
+    ): Array<ResolveResult> {
+        val element = module.element
+        val name = element.fullyQualifiedName()
 
-                    if (sameFileResolveResults.any(ResolveResult::isValidResult)) {
-                        sameFileResolveResults
-                    } else {
-                        multiResolveProject(
-                                element,
-                                name
+        return resolve(element, name, incompleteCode)
+    }
+
+    fun resolve(element: PsiElement, name: String, incompleteCode: Boolean): Array<ResolveResult> {
+        val preferred = resolvePreferred(element, name, incompleteCode)
+        val expanded = expand(preferred)
+
+        return expanded.toTypedArray()
+    }
+
+    private fun expand(visitedElementSetResolveResultList: List<VisitedElementSetResolveResult>): List<PsiElementResolveResult> =
+            visitedElementSetResolveResultList
+                    .flatMap { visitedElementSetResolveResult ->
+                        val visitedElementSet = visitedElementSetResolveResult.visitedElementSet
+                        val validResult = visitedElementSetResolveResult.isValidResult
+
+                        val pathResolveResultList =
+                                visitedElementSet
+                                        .filter { visitedElement ->
+                                            visitedElement.let { it as? Call }?.let { visitedCall ->
+                                                Alias.`is`(visitedCall) || Require.`is`(visitedCall) || Use.`is`(visitedCall)
+                                            } ?: false
+                                        }
+                                        .map { PsiElementResolveResult(it, validResult) }
+
+                        val terminalResolveResult = PsiElementResolveResult(
+                                visitedElementSetResolveResult.element,
+                                visitedElementSetResolveResult.isValidResult
                         )
+
+                        listOf(terminalResolveResult) + pathResolveResultList
                     }
-                }
-            }
+                    // deduplicate shared `defdelegate`, `import`, or `use`
+                    .groupBy { it.element }
+                    .map { (_element, resolveResults) -> resolveResults.first() }
+
+    private fun resolvePreferred(element: PsiElement, name: String, incompleteCode: Boolean): List<VisitedElementSetResolveResult> {
+        val all = resolveAll(element, name, incompleteCode)
+
+        return org.elixir_lang.reference.Resolver.preferred(element, incompleteCode, all)
+    }
+
+    private fun resolveAll(element: PsiElement, name: String, incompleteCode: Boolean) =
+            resolveInScope(element, name, incompleteCode)
+                    .takeIf(Collection<ResolveResult>::isNotEmpty)
+                    ?: multiResolveProject(element, name)
+
+    private fun resolveInScope(element: PsiElement, name: String, incompleteCode: Boolean) =
+       MultiResolve.resolveResults(name, incompleteCode, element)
 
     private fun multiResolveProject(entrance: PsiElement,
-                                    name: String): Array<ResolveResult> {
-        val resolveResultList = mutableListOf<PsiElementResolveResult>()
+                                    name: String): List<VisitedElementSetResolveResult> {
+        val resolveResultList = mutableListOf<VisitedElementSetResolveResult>()
         val project = entrance.project
 
         if (!DumbService.isDumb(project)) {
@@ -73,10 +113,10 @@ object Module : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Modul
                     .processElements(ModularName.KEY, name, project, globalSearchScope, null, NamedElement::class.java) { namedElement ->
                         /* The namedElement may be a ModuleImpl from a .beam.  Using #getNaviationElement() ensures a source
                        (either true source or decompiled) is used. */
-                        resolveResultList.add(PsiElementResolveResult(namedElement.navigationElement))
+                        resolveResultList.add(VisitedElementSetResolveResult(namedElement.navigationElement))
                     }
         }
 
-        return Resolver.preferred(entrance, incompleteCode = false, resolveResultList = resolveResultList).toTypedArray()
+        return resolveResultList
     }
 }

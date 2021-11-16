@@ -514,7 +514,25 @@ defmodule Module do
 
   @doc false
   def __get_attribute__(module, key, line) do
-    # body not decompiled
+    (
+      assert_not_compiled!({:get_attribute, 2}, module, "Use the Module.__info__/1 callback or Code.fetch_docs/1 instead")
+      {set, bag} = data_tables_for(module)
+      case(:ets.lookup(set, key)) do
+        [{_, _, :accumulate}] ->
+          :lists.reverse(bag_lookup_element(bag, {:accumulate, key}, 2))
+        [{_, val, line}] when is_integer(line) ->
+          :ets.update_element(set, key, {3, :used})
+          val
+        [{_, val, _}] ->
+          val
+        [] when is_integer(line) ->
+          error_message = <<"undefined module attribute @"::binary(), String.Chars.to_string(key)::binary(), ", "::binary(), "please remove access to @"::binary(), String.Chars.to_string(key)::binary(), " or explicitly set it before access"::binary()>>
+          IO.warn(error_message, attribute_stack(module, line))
+          nil
+        [] ->
+          nil
+      end
+    )
   end
 
   def __info__(p0) do
@@ -523,11 +541,17 @@ defmodule Module do
 
   @doc false
   def __put_attribute__(module, key, value, line) do
-    # body not decompiled
+    (
+      assert_not_readonly!({:__put_attribute__, 4}, module)
+      {set, bag} = data_tables_for(module)
+      value = preprocess_attribute(key, value)
+      put_attribute(module, key, value, line, set, bag)
+      :ok
+    )
   end
 
-  def add_doc(p0, p1, p2, p3, p4) do
-    # body not decompiled
+  def add_doc(x0, x1, x2, x3, x4) do
+    super(x0, x1, x2, x3, [], x4)
   end
 
 
@@ -536,8 +560,22 @@ defmodule Module do
   """
 
   @doc false
-  def add_doc(module, line, kind, arg, signature \\ [], doc) do
-    # body not decompiled
+  def add_doc(module, line, kind, {name, arity}, signature, doc) do
+    (
+      assert_not_compiled!({:add_doc, 6}, module)
+      case(kind === :defp or kind === :defmacrop or kind === :typep) do
+        false ->
+          {set, _bag} = data_tables_for(module)
+          compile_doc(set, nil, line, kind, name, arity, signature, nil, doc, %{}, %Macro.Env{aliases: [], context: nil, context_modules: [Module], contextual_vars: [], current_vars: {%{{:_bag, nil} => 8, {:arity, nil} => 4, {:doc, nil} => 6, {:kind, nil} => 2, {:line, nil} => 1, {:module, nil} => 0, {:name, nil} => 3, {:set, nil} => 7, {:signature, nil} => 5}, %{{:_bag, nil} => 8, {:arity, nil} => 4, {:doc, nil} => 6, {:kind, nil} => 2, {:line, nil} => 1, {:module, nil} => 0, {:name, nil} => 3, {:set, nil} => 7, {:signature, nil} => 5}}, file: "/private/tmp/elixir-20201103-80297-pfqt4c/elixir-1.11.2/lib/elixir/lib/module.ex", function: {:add_doc, 6}, functions: [{Kernel, [!=: 2, !==: 2, *: 2, +: 1, +: 2, ++: 2, -: 1, -: 2, --: 2, /: 2, <: 2, <=: 2, ==: 2, ===: 2, =~: 2, >: 2, >=: 2, abs: 1, apply: 2, apply: 3, binary_part: 3, bit_size: 1, byte_size: 1, ceil: 1, div: 2, elem: 2, exit: 1, floor: 1, function_exported?: 3, get_and_update_in: 3, get_in: 2, hd: 1, inspect: 1, inspect: 2, is_atom: 1, is_binary: 1, is_bitstring: 1, is_boolean: 1, is_float: 1, is_function: 1, is_function: 2, is_integer: 1, is_list: 1, is_map: 1, is_map_key: 2, is_number: 1, is_pid: 1, is_port: 1, is_reference: 1, is_tuple: 1, length: 1, macro_exported?: 3, make_ref: 0, map_size: 1, max: 2, min: 2, node: 0, node: 1, not: 1, pop_in: 2, put_elem: 3, put_in: 3, rem: 2, round: 1, self: 0, send: 2, spawn: 1, spawn: 3, spawn_link: 1, spawn_link: 3, spawn_monitor: 1, spawn_monitor: 3, struct: 1, struct: 2, struct!: 1, struct!: 2, throw: 1, tl: 1, trunc: 1, tuple_size: 1, update_in: 3]}], lexical_tracker: nil, line: 1405, macro_aliases: [], macros: [{Kernel, [!: 1, &&: 2, ..: 2, <>: 2, @: 1, alias!: 1, and: 2, binding: 0, binding: 1, def: 1, def: 2, defdelegate: 2, defexception: 1, defguard: 1, defguardp: 1, defimpl: 2, defimpl: 3, defmacro: 1, defmacro: 2, defmacrop: 1, defmacrop: 2, defmodule: 2, defoverridable: 1, defp: 1, defp: 2, defprotocol: 2, defstruct: 1, destructure: 2, get_and_update_in: 2, if: 2, in: 2, is_exception: 1, is_exception: 2, is_nil: 1, is_struct: 1, is_struct: 2, match?: 2, or: 2, pop_in: 1, put_in: 2, raise: 1, raise: 2, reraise: 2, reraise: 3, sigil_C: 2, sigil_D: 2, sigil_N: 2, sigil_R: 2, sigil_S: 2, sigil_T: 2, sigil_U: 2, sigil_W: 2, sigil_c: 2, sigil_r: 2, sigil_s: 2, sigil_w: 2, to_char_list: 1, to_charlist: 1, to_string: 1, unless: 2, update_in: 2, use: 1, use: 2, var!: 1, var!: 2, |>: 2, ||: 2]}], module: Module, prematch_vars: :warn, requires: [Application, Kernel, Kernel.Typespec], tracers: [], unused_vars: {%{{:_bag, 8} => 1404, {:arity, 4} => false, {:doc, 6} => false, {:kind, 2} => false, {:line, 1} => false, {:module, 0} => false, {:name, 3} => false, {:set, 7} => false, {:signature, 5} => false}, 9}, vars: [arity: nil, doc: nil, kind: nil, line: nil, module: nil, name: nil, signature: nil]}, false)
+          :ok
+        true ->
+          if(doc) do
+            :ok
+          else
+            {:error, :private_doc}
+          end
+      end
+    )
   end
 
   def behaviour_info(p0) do
@@ -545,13 +583,37 @@ defmodule Module do
   end
 
   @doc false
-  def check_behaviours_and_impls(env, set, bag, all_definitions) do
-    # body not decompiled
+  def check_behaviours_and_impls(env, _set, bag, all_definitions) do
+    (
+      behaviours = bag_lookup_element(bag, {:accumulate, :behaviour}, 2)
+      impls = bag_lookup_element(bag, :impls, 2)
+      callbacks = check_behaviours(env, behaviours)
+      pending_callbacks = case(impls != []) do
+        false ->
+          callbacks
+        true ->
+          {non_implemented_callbacks, contexts} = check_impls(env, behaviours, callbacks, impls)
+          warn_missing_impls(env, non_implemented_callbacks, contexts, all_definitions)
+          non_implemented_callbacks
+      end
+      check_callbacks(env, pending_callbacks, all_definitions)
+      :ok
+    )
   end
 
   @doc false
-  def compile_definition_attributes(env, kind, name, args, guards, body) do
-    # body not decompiled
+  def compile_definition_attributes(env, kind, name, args, _guards, body) do
+    (
+      %{module: module} = env
+      {set, bag} = data_tables_for(module)
+      {arity, defaults} = args_count(args, 0, 0)
+      context = Keyword.get(:ets.lookup_element(set, {:def, {name, arity}}, 3), :context)
+      impl = compile_impl(set, bag, context, name, env, kind, arity, defaults)
+      doc_meta = compile_doc_meta(set, bag, name, arity, defaults)
+      {line, doc} = get_doc_info(set, env)
+      compile_doc(set, context, line, kind, name, arity, args, body, doc, doc_meta, env, impl)
+      :ok
+    )
   end
 
   @doc ~S"""
@@ -568,7 +630,7 @@ defmodule Module do
 
   """
   def concat(list) do
-    # body not decompiled
+    :elixir_aliases.concat(list)
   end
 
   @doc ~S"""
@@ -585,7 +647,7 @@ defmodule Module do
 
   """
   def concat(left, right) do
-    # body not decompiled
+    :elixir_aliases.concat([left, right])
   end
 
   @doc ~S"""
@@ -630,8 +692,22 @@ defmodule Module do
   automatically uses the environment it is invoked at.
 
   """
+  def create(module, quoted, %Macro.Env{} = env) do
+    create(module, quoted, :maps.to_list(env))
+  end
+
   def create(module, quoted, opts) do
-    # body not decompiled
+    (
+      if(Keyword.has_key?(opts, :file)) do
+        raise(ArgumentError, "expected :file to be given as option")
+      else
+        nil
+      end
+      next = :elixir_module.next_counter(nil)
+      line = Keyword.get(opts, :line, 0)
+      quoted = :elixir_quote.linify_with_context_counter(line, {module, next}, quoted)
+      :elixir_module.compile(module, quoted, [], :elixir.env_for_eval(opts))
+    )
   end
 
   @doc ~S"""
@@ -658,8 +734,12 @@ defmodule Module do
 
 
   """
-  def defines?(module, tuple) do
-    # body not decompiled
+  def defines?(module, {name, arity} = tuple) do
+    (
+      assert_not_compiled!({:defines?, 2}, module, "Use Kernel.function_exported?/3 and Kernel.macro_exported?/3 to check for public functions and macros instead")
+      {set, _bag} = data_tables_for(module)
+      :ets.member(set, {:def, tuple})
+    )
   end
 
   @doc ~S"""
@@ -682,8 +762,12 @@ defmodule Module do
 
 
   """
-  def defines?(module, tuple, def_kind) do
-    # body not decompiled
+  def defines?(module, {name, arity} = tuple, def_kind) do
+    (
+      assert_not_compiled!({:defines?, 3}, module, "Use Kernel.function_exported?/3 and Kernel.macro_exported?/3 to check for public functions and macros instead")
+      {set, _bag} = data_tables_for(module)
+      match?([{_, ^def_kind, _, _, _, _}], :ets.lookup(set, {:def, tuple}))
+    )
   end
 
   @doc ~S"""
@@ -693,7 +777,7 @@ defmodule Module do
 
   """
   def defines_type?(module, definition) do
-    # body not decompiled
+    Kernel.Typespec.defines_type?(module, definition)
   end
 
   @doc ~S"""
@@ -717,7 +801,11 @@ defmodule Module do
 
   """
   def definitions_in(module) do
-    # body not decompiled
+    (
+      assert_not_compiled!({:definitions_in, 1}, module, "Use the Module.__info__/1 callback to get public functions and macros instead")
+      {_, bag} = data_tables_for(module)
+      bag_lookup_element(bag, :defs, 2)
+    )
   end
 
   @doc ~S"""
@@ -739,7 +827,11 @@ defmodule Module do
 
   """
   def definitions_in(module, kind) do
-    # body not decompiled
+    (
+      assert_not_compiled!({:definitions_in, 2}, module, "Use the Module.__info__/1 callback to get public functions and macros instead")
+      {set, _} = data_tables_for(module)
+      :ets.select(set, [{{{:def, :"$1"}, kind, :_, :_, :_, :_}, [], [:"$1"]}])
+    )
   end
 
   @doc ~S"""
@@ -757,15 +849,27 @@ defmodule Module do
 
   """
   def delete_attribute(module, key) do
-    # body not decompiled
+    (
+      assert_not_readonly!({:delete_attribute, 2}, module)
+      {set, bag} = data_tables_for(module)
+      case(:ets.lookup(set, key)) do
+        [{_, _, :accumulate}] ->
+          reverse_values(:ets.take(bag, {:accumulate, key}), [])
+        [{_, value, _}] ->
+          :ets.delete(set, key)
+          value
+        [] ->
+          nil
+      end
+    )
   end
 
-  def eval_quoted(p0, p1) do
-    # body not decompiled
+  def eval_quoted(x0, x1) do
+    super(x0, x1, [], [])
   end
 
-  def eval_quoted(p0, p1, p2) do
-    # body not decompiled
+  def eval_quoted(x0, x1, x2) do
+    super(x0, x1, x2, [])
   end
 
   @doc ~S"""
@@ -812,12 +916,25 @@ defmodule Module do
   having precedence.
 
   """
-  def eval_quoted(module_or_env, quoted, binding \\ [], opts \\ []) do
-    # body not decompiled
+  def eval_quoted(%Macro.Env{} = env, quoted, binding, opts) do
+    eval_quoted(env.module(), quoted, binding, Keyword.merge(:maps.to_list(env), opts))
   end
 
-  def get_attribute(p0, p1) do
-    # body not decompiled
+  def eval_quoted(module, quoted, binding, %Macro.Env{} = env) do
+    eval_quoted(module, quoted, binding, :maps.to_list(env))
+  end
+
+  def eval_quoted(module, quoted, binding, opts) do
+    (
+      assert_not_compiled!({:eval_quoted, 4}, module)
+      :elixir_def.reset_last(module)
+      {value, binding, _env} = :elixir.eval_quoted(quoted, binding, Keyword.put(opts, :module, module))
+      {value, binding}
+    )
+  end
+
+  def get_attribute(x0, x1) do
+    super(x0, x1, nil)
   end
 
   @doc ~S"""
@@ -858,8 +975,13 @@ defmodule Module do
 
 
   """
-  def get_attribute(module, key, default \\ nil) do
-    # body not decompiled
+  def get_attribute(module, key, default) do
+    case(__get_attribute__(module, key, nil)) do
+      nil ->
+        default
+      value ->
+        value
+    end
   end
 
   @doc ~S"""
@@ -891,7 +1013,11 @@ defmodule Module do
 
   """
   def has_attribute?(module, key) do
-    # body not decompiled
+    (
+      assert_not_compiled!({:has_attribute?, 2}, module)
+      {set, _bag} = data_tables_for(module)
+      :ets.member(set, key)
+    )
   end
 
   @doc ~S"""
@@ -908,7 +1034,41 @@ defmodule Module do
 
   """
   def make_overridable(module, tuples) do
-    # body not decompiled
+    (
+      assert_not_readonly!({:make_overridable, 2}, module)
+      func = fn
+       {function_name, arity} = tuple when is_atom(function_name) and is_integer(arity) and arity >= 0 and arity <= 255 ->
+          case(:elixir_def.take_definition(module, tuple)) do
+            false ->
+              raise(ArgumentError, <<"cannot make function "::binary(), String.Chars.to_string(function_name)::binary(), "/"::binary(), String.Chars.to_string(arity)::binary(), " "::binary(), "overridable because it was not defined"::binary()>>)
+            clause ->
+              neighbours = :elixir_locals.yank(tuple, module)
+              :elixir_overridable.record_overridable(module, tuple, clause, neighbours)
+          end
+        other ->
+          raise(ArgumentError, <<"each element in tuple list has to be a "::binary(), "{function_name :: atom, arity :: 0..255} tuple, got: "::binary(), Kernel.inspect(other)::binary()>>)
+      end
+      :lists.foreach(func, tuples)
+    )
+  end
+
+  def make_overridable(module, behaviour) do
+    (
+      case(check_module_for_overridable(module, behaviour)) do
+        :ok ->
+          :ok
+        {:error, error_explanation} ->
+          raise(ArgumentError, <<"cannot pass module "::binary(), Kernel.inspect(behaviour)::binary(), " as argument "::binary(), "to defoverridable/1 because "::binary(), String.Chars.to_string(error_explanation)::binary()>>)
+      end
+      behaviour_callbacks = for(callback <- behaviour_info(behaviour, :callbacks)) do
+        {pair, _kind} = normalize_macro_or_function_callback(callback)
+        pair
+      end
+      tuples = for(definition <- definitions_in(module), Enum.member?(behaviour_callbacks, definition)) do
+        definition
+      end
+      make_overridable(module, tuples)
+    )
   end
 
   def module_info() do
@@ -927,15 +1087,15 @@ defmodule Module do
 
   """
   def open?(module) do
-    # body not decompiled
+    :elixir_module.is_open(module)
   end
 
   @doc ~S"""
   Returns `true` if `tuple` in `module` is marked as overridable.
 
   """
-  def overridable?(module, tuple) do
-    # body not decompiled
+  def overridable?(module, {function_name, arity} = tuple) do
+    :elixir_overridable.overridable_for(module, tuple) != :not_overridable
   end
 
   @doc ~S"""
@@ -950,7 +1110,7 @@ defmodule Module do
 
   """
   def put_attribute(module, key, value) do
-    # body not decompiled
+    __put_attribute__(module, key, value, nil)
   end
 
   @doc ~S"""
@@ -985,7 +1145,22 @@ defmodule Module do
 
   """
   def register_attribute(module, attribute, options) do
-    # body not decompiled
+    (
+      assert_not_readonly!({:register_attribute, 3}, module)
+      {set, bag} = data_tables_for(module)
+      if(Keyword.get(options, :persist)) do
+        nil
+      else
+        :ets.insert(bag, {:persisted_attributes, attribute})
+      end
+      if(Keyword.get(options, :accumulate)) do
+        :ets.insert_new(bag, {:warn_attributes, attribute})
+        :ets.insert_new(set, {attribute, nil, :unset})
+      else
+        :ets.insert_new(set, {attribute, [], :accumulate}) || x
+      end
+      :ok
+    )
   end
 
   @doc ~S"""
@@ -1006,7 +1181,7 @@ defmodule Module do
 
   """
   def safe_concat(list) do
-    # body not decompiled
+    :elixir_aliases.safe_concat(list)
   end
 
   @doc ~S"""
@@ -1027,7 +1202,7 @@ defmodule Module do
 
   """
   def safe_concat(left, right) do
-    # body not decompiled
+    :elixir_aliases.safe_concat([left, right])
   end
 
   @doc ~S"""
@@ -1039,7 +1214,7 @@ defmodule Module do
 
   """
   def spec_to_callback(module, definition) do
-    # body not decompiled
+    Kernel.Typespec.spec_to_callback(module, definition)
   end
 
   @doc ~S"""
@@ -1061,7 +1236,11 @@ defmodule Module do
 
   """
   def split(module) do
-    # body not decompiled
+    split(Atom.to_string(module), _original = module)
+  end
+
+  def split(module) do
+    split(module, _original = module)
   end
 
   # Private Functions
@@ -1118,215 +1297,714 @@ defmodule Module do
     # body not decompiled
   end
 
-  defp add_callback(p0, p1, p2, p3, p4) do
-    # body not decompiled
+  defp add_callback(original, behaviour, env, optional_callbacks, acc) do
+    (
+      {callback, kind} = normalize_macro_or_function_callback(original)
+      case(acc) do
+        %{^callback => {_kind, conflict, _optional?}} ->
+          message = case(conflict == behaviour) do
+            false ->
+              <<"conflicting behaviours found. "::binary(), String.Chars.to_string(format_definition(kind, callback))::binary(), " is required by "::binary(), Kernel.inspect(conflict)::binary(), " and "::binary(), Kernel.inspect(behaviour)::binary(), " (in module "::binary(), Kernel.inspect(env.module())::binary(), ")"::binary()>>
+            true ->
+              <<"the behavior "::binary(), Kernel.inspect(conflict)::binary(), " has been declared twice "::binary(), "(conflict in "::binary(), String.Chars.to_string(format_definition(kind, callback))::binary(), " in module "::binary(), Kernel.inspect(env.module())::binary(), ")"::binary()>>
+          end
+          IO.warn(message, Macro.Env.stacktrace(env))
+        %{} ->
+          :ok
+      end
+      :maps.put(callback, {kind, behaviour, Enum.member?(optional_callbacks, original)}, acc)
+    )
   end
 
-  defp add_defaults_count(p0, p1) do
-    # body not decompiled
+  defp add_defaults_count(doc_meta, 0) do
+    doc_meta
   end
 
-  defp args_count(p0, p1, p2) do
-    # body not decompiled
+  defp add_defaults_count(doc_meta, n) do
+    :maps.put(:defaults, n, doc_meta)
   end
 
-  defp assert_not_compiled!(p0, p1) do
-    # body not decompiled
+  defp args_count([{:\\, _, _} | tail], total, defaults) do
+    args_count(tail, total + 1, defaults + 1)
   end
 
-  defp assert_not_compiled!(p0, p1, p2) do
-    # body not decompiled
+  defp args_count([_head | tail], total, defaults) do
+    args_count(tail, total + 1, defaults)
   end
 
-  defp assert_not_compiled_message(p0, p1, p2) do
-    # body not decompiled
+  defp args_count([], total, defaults) do
+    {total, defaults}
   end
 
-  defp assert_not_readonly!(p0, p1) do
-    # body not decompiled
+  defp assert_not_compiled!(x0, x1) do
+    super(x0, x1, "")
   end
 
-  defp attribute_stack(p0, p1) do
-    # body not decompiled
+  defp assert_not_compiled!(function_name_arity, module, extra_msg) do
+    open?(module) || x
   end
 
-  defp autogenerated_key(p0, p1) do
-    # body not decompiled
+  defp assert_not_compiled_message({function_name, arity}, module, extra_msg) do
+    (
+      mfa = <<"Module."::binary(), String.Chars.to_string(function_name)::binary(), "/"::binary(), String.Chars.to_string(arity)::binary()>>
+      <<"could not call "::binary(), String.Chars.to_string(mfa)::binary(), " because the module "::binary(), Kernel.inspect(module)::binary(), " is already compiled"::binary(), case(extra_msg) do
+        "" ->
+          ""
+        _ ->
+          <<". "::binary(), extra_msg::binary()>>
+      end::binary()>>
+    )
   end
 
-  defp bag_lookup_element(p0, p1, p2) do
-    # body not decompiled
+  defp assert_not_readonly!({function_name, arity}, module) do
+    case(:elixir_module.mode(module)) do
+      :all ->
+        :ok
+      :readonly ->
+        raise(ArgumentError, <<"could not call Module."::binary(), String.Chars.to_string(function_name)::binary(), "/"::binary(), String.Chars.to_string(arity)::binary(), " because the module "::binary(), Kernel.inspect(module)::binary(), " is in read-only mode (@after_compile)"::binary()>>)
+      :closed ->
+        raise(ArgumentError, assert_not_compiled_message({function_name, arity}, module, ""))
+    end
   end
 
-  defp behaviour_callbacks_for_impls(p0, p1, p2) do
-    # body not decompiled
+  defp attribute_stack(module, line) do
+    (
+      file = String.to_charlist(Path.relative_to_cwd(:elixir_module.file(module)))
+      [{module, :__MODULE__, 0, [file: file, line: line]}]
+    )
   end
 
-  defp behaviour_info(p0, p1) do
-    # body not decompiled
+  defp autogenerated_key(counters, key) do
+    case(counters) do
+      %{^key => :once} ->
+        {key, :maps.put(key, 2, counters)}
+      %{^key => value} ->
+        {key, :maps.put(key, value + 1, counters)}
+      %{} ->
+        {key, :maps.put(key, :once, counters)}
+    end
   end
 
-  defp build_signature(p0, p1) do
-    # body not decompiled
+  defp bag_lookup_element(table, key, pos) do
+    try() do
+      :ets.lookup_element(table, key, pos)
+    catch
+      :error, :badarg ->
+        []
+    end
   end
 
-  defp callbacks_for_impls(p0, p1) do
-    # body not decompiled
+  defp behaviour_callbacks_for_impls([], _behaviour, _callbacks) do
+    []
   end
 
-  defp check_behaviours(p0, p1) do
-    # body not decompiled
+  defp behaviour_callbacks_for_impls([fa | tail], behaviour, callbacks) do
+    case(callbacks[fa]) do
+      {_, ^behaviour, _} ->
+        [{fa, behaviour} | behaviour_callbacks_for_impls(tail, behaviour, callbacks)]
+      _ ->
+        behaviour_callbacks_for_impls(tail, behaviour, callbacks)
+    end
   end
 
-  defp check_callbacks(p0, p1, p2) do
-    # body not decompiled
+  defp behaviour_info(module, key) do
+    case(module.behaviour_info(key)) do
+      list when is_list(list) ->
+        list
+      :undefined ->
+        []
+    end
   end
 
-  defp check_impls(p0, p1, p2, p3) do
-    # body not decompiled
+  defp build_signature(args, env) do
+    (
+      {reverse_args, counters} = simplify_args(args, %{}, [], env)
+      expand_keys(reverse_args, counters, [])
+    )
   end
 
-  defp check_module_for_overridable(p0, p1) do
-    # body not decompiled
+  defp callbacks_for_impls([], _) do
+    []
   end
 
-  defp compile_deprecated(p0, p1, p2, p3, p4, p5) do
-    # body not decompiled
+  defp callbacks_for_impls([fa | tail], callbacks) do
+    case(callbacks[fa]) do
+      {_, behaviour, _} ->
+        [{fa, behaviour} | callbacks_for_impls(tail, callbacks)]
+      nil ->
+        callbacks_for_impls(tail, callbacks)
+    end
   end
 
-  defp compile_doc(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11) do
-    # body not decompiled
+  defp check_behaviours(env, behaviours) do
+    Enum.reduce(behaviours, %{}, fn behaviour, acc -> cond() do
+      not(is_atom(behaviour)) ->
+        message = <<"@behaviour "::binary(), Kernel.inspect(behaviour)::binary(), " must be an atom (in module "::binary(), Kernel.inspect(env.module())::binary(), ")"::binary()>>
+        IO.warn(message, Macro.Env.stacktrace(env))
+        acc
+      Code.ensure_compiled(behaviour) != {:module, behaviour} ->
+        message = <<"@behaviour "::binary(), Kernel.inspect(behaviour)::binary(), " does not exist (in module "::binary(), Kernel.inspect(env.module())::binary(), ")"::binary()>>
+        IO.warn(message, Macro.Env.stacktrace(env))
+        acc
+      not(:erlang.function_exported(behaviour, :behaviour_info, 1)) ->
+        message = <<"module "::binary(), Kernel.inspect(behaviour)::binary(), " is not a behaviour (in module "::binary(), Kernel.inspect(env.module())::binary(), ")"::binary()>>
+        IO.warn(message, Macro.Env.stacktrace(env))
+        acc
+      true ->
+        :elixir_env.trace({:require, [], behaviour, []}, env)
+        optional_callbacks = behaviour_info(behaviour, :optional_callbacks)
+        callbacks = behaviour_info(behaviour, :callbacks)
+        Enum.reduce(callbacks, acc, fn x1, x2 -> add_callback(x1, behaviour, env, optional_callbacks, x2) end)
+    end end)
   end
 
-  defp compile_doc_meta(p0, p1, p2, p3, p4) do
-    # body not decompiled
+  defp check_callbacks(env, callbacks, all_definitions) do
+    (
+      for({callback, {kind, behaviour, optional?}} <- callbacks) do
+        case(:lists.keyfind(callback, 1, all_definitions)) do
+          false when not(optional?) ->
+            message = <<format_callback(callback, kind, behaviour)::binary(), " is not implemented (in module "::binary(), Kernel.inspect(env.module())::binary(), ")"::binary()>>
+            IO.warn(message, Macro.Env.stacktrace(env))
+          {_, wrong_kind, _, _} when kind != wrong_kind ->
+            message = <<format_callback(callback, kind, behaviour)::binary(), " was implemented as \""::binary(), String.Chars.to_string(wrong_kind)::binary(), "\" but should have been \""::binary(), String.Chars.to_string(kind)::binary(), "\" "::binary(), "(in module "::binary(), Kernel.inspect(env.module())::binary(), ")"::binary()>>
+            IO.warn(message, Macro.Env.stacktrace(env))
+          _ ->
+            :ok
+        end
+      end
+      :ok
+    )
   end
 
-  defp compile_impl(p0, p1, p2, p3, p4, p5, p6, p7) do
-    # body not decompiled
+  defp check_impls(env, behaviours, callbacks, impls) do
+    (
+      acc = {callbacks, %{}}
+      Enum.reduce(impls, acc, fn {fa, context, defaults, kind, line, file, value}, acc -> case(impl_behaviours(fa, defaults, kind, value, behaviours, callbacks)) do
+        {:ok, impl_behaviours} ->
+          Enum.reduce(impl_behaviours, acc, fn {fa, behaviour}, {callbacks, contexts} ->
+            callbacks = :maps.remove(fa, callbacks)
+            contexts = Map.update(contexts, behaviour, [context], fn x1 -> [context | x1] end)
+            {callbacks, contexts}
+          end)
+        {:error, message} ->
+          formatted = format_impl_warning(fa, kind, message)
+          IO.warn(formatted, Macro.Env.stacktrace(%{env | line: line, file: file}))
+          acc
+      end end)
+    )
   end
 
-  defp data_tables_for(p0) do
-    # body not decompiled
+  defp check_module_for_overridable(module, behaviour) do
+    (
+      {_, bag} = data_tables_for(module)
+      behaviour_definitions = bag_lookup_element(bag, {:accumulate, :behaviour}, 2)
+      cond() do
+        Code.ensure_compiled(behaviour) != {:module, behaviour} ->
+          {:error, "it was not defined"}
+        not(:erlang.function_exported(behaviour, :behaviour_info, 1)) ->
+          {:error, "it does not define any callbacks"}
+        not(Enum.member?(behaviour_definitions, behaviour)) ->
+          error_message = <<"its corresponding behaviour is missing. Did you forget to "::binary(), "add @behaviour "::binary(), Kernel.inspect(behaviour)::binary(), "?"::binary()>>
+          {:error, error_message}
+        true ->
+          :ok
+      end
+    )
   end
 
-  defp deprecated_reason(p0, p1, p2) do
-    # body not decompiled
+  defp compile_deprecated(doc_meta, set, bag, name, arity, defaults) do
+    case(:ets.take(set, :deprecated)) do
+      [{:deprecated, reason, _}] when is_binary(reason) ->
+        :ets.insert(bag, deprecated_reasons(defaults, name, arity, reason))
+        :maps.put(:deprecated, reason, doc_meta)
+      _ ->
+        doc_meta
+    end
   end
 
-  defp deprecated_reasons(p0, p1, p2, p3) do
-    # body not decompiled
+  defp compile_doc(_table, _ctx, line, kind, name, arity, _args, _body, doc, _meta, env, _impl) do
+    if(doc) do
+      nil
+    else
+      message = <<String.Chars.to_string(kind)::binary(), " "::binary(), String.Chars.to_string(name)::binary(), "/"::binary(), String.Chars.to_string(arity)::binary(), " is private, "::binary(), "@doc attribute is always discarded for private functions/macros/types"::binary()>>
+      IO.warn(message, Macro.Env.stacktrace(%{env | line: line}))
+    end
   end
 
-  defp doc_key(p0) do
-    # body not decompiled
+  defp compile_doc(table, ctx, line, kind, name, arity, args, body, doc, doc_meta, env, impl) do
+    (
+      key = {doc_key(kind), name, arity}
+      signature = build_signature(args, env)
+      case(:ets.lookup(table, key)) do
+        [] ->
+          doc = if(is_nil(doc) && impl) do
+            doc
+          else
+            false
+          end
+          :ets.insert(table, {key, ctx, line, signature, doc, doc_meta})
+        [{_, current_ctx, current_line, current_sign, current_doc, current_doc_meta}] ->
+          case(is_binary(current_doc) and is_binary(doc) and body != nil and is_nil(current_ctx)) do
+            false ->
+              nil
+            true ->
+              message = <<"redefining @doc attribute previously set at line "::binary(), String.Chars.to_string(current_line)::binary(), ".\n\nPlease remove the duplicate docs. If instead you want to override a previously defined @doc, attach the @doc attribute to a function head:\n\n    @doc \"\"\"\n    new docs\n    \"\"\"\n    def "::binary(), String.Chars.to_string(name)::binary(), "(...)\n"::binary()>>
+              IO.warn(message, Macro.Env.stacktrace(%{env | line: line}))
+          end
+          signature = merge_signatures(current_sign, signature, 1)
+          doc = case(is_nil(doc)) do
+            false ->
+              doc
+            true ->
+              current_doc
+          end
+          doc = if(is_nil(doc) && impl) do
+            doc
+          else
+            false
+          end
+          doc_meta = Map.merge(current_doc_meta, doc_meta)
+          :ets.insert(table, {key, ctx, current_line, signature, doc, doc_meta})
+      end
+    )
   end
 
-  defp expand_key(p0, p1) do
-    # body not decompiled
+  defp compile_doc_meta(set, bag, name, arity, defaults) do
+    (
+      doc_meta = compile_deprecated(%{}, set, bag, name, arity, defaults)
+      doc_meta = get_doc_meta(doc_meta, set)
+      add_defaults_count(doc_meta, defaults)
+    )
   end
 
-  defp expand_keys(p0, p1, p2) do
-    # body not decompiled
+  defp compile_impl(set, bag, context, name, env, kind, arity, defaults) do
+    (
+      %{line: line, file: file} = env
+      case(:ets.take(set, :impl)) do
+        [{:impl, value, _}] ->
+          impl = {{name, arity}, context, defaults, kind, line, file, value}
+          :ets.insert(bag, {:impls, impl})
+          value
+        [] ->
+          false
+      end
+    )
   end
 
-  defp format_callback(p0, p1, p2) do
-    # body not decompiled
+  defp data_tables_for(module) do
+    :elixir_module.data_tables(module)
   end
 
-  defp format_definition(p0) do
-    # body not decompiled
+  defp deprecated_reason(name, arity, reason) do
+    {:deprecated, {{name, arity}, reason}}
   end
 
-  defp format_definition(p0, p1) do
-    # body not decompiled
+  defp deprecated_reasons(0, name, arity, reason) do
+    [deprecated_reason(name, arity, reason)]
   end
 
-  defp format_impl_warning(p0, p1, p2) do
-    # body not decompiled
+  defp deprecated_reasons(defaults, name, arity, reason) do
+    [deprecated_reason(name, arity - defaults, reason) | deprecated_reasons(defaults - 1, name, arity, reason)]
   end
 
-  defp get_doc_info(p0, p1) do
-    # body not decompiled
+  defp doc_key(:def) do
+    :function
   end
 
-  defp get_doc_meta(p0, p1) do
-    # body not decompiled
+  defp doc_key(:defmacro) do
+    :macro
   end
 
-  defp impl_behaviours(p0, p1, p2, p3, p4) do
-    # body not decompiled
+  defp expand_key(key, counters) do
+    case(counters) do
+      %{^key => count} when is_integer(count) and count >= 1 ->
+        {{String.to_atom(<<String.Chars.to_string(key)::binary(), String.Chars.to_string(count)::binary()>>), [], :"Elixir"}, :maps.put(key, count - 1, counters)}
+      _ ->
+        {{key, [], :"Elixir"}, counters}
+    end
   end
 
-  defp impl_behaviours(p0, p1, p2, p3, p4, p5) do
-    # body not decompiled
+  defp expand_keys([{:\\, meta, [key, default]} | keys], counters, acc) do
+    (
+      {var, counters} = expand_key(key, counters)
+      expand_keys(keys, counters, [{:\\, meta, [var, default]} | acc])
+    )
   end
 
-  defp known_callbacks(p0) do
-    # body not decompiled
+  defp expand_keys([key | keys], counters, acc) do
+    (
+      {var, counters} = expand_key(key, counters)
+      expand_keys(keys, counters, [var | acc])
+    )
   end
 
-  defp merge_signature(p0, p1, p2) do
-    # body not decompiled
+  defp expand_keys([arg | args], counters, acc) do
+    expand_keys(args, counters, [arg | acc])
   end
 
-  defp merge_signatures(p0, p1, p2) do
-    # body not decompiled
+  defp expand_keys([], _counters, acc) do
+    acc
   end
 
-  defp missing_impl_in_context?(p0, p1, p2) do
-    # body not decompiled
+  defp format_callback(callback, kind, module) do
+    (
+      protocol_or_behaviour = if(protocol?(module)) do
+        "behaviour "
+      else
+        "protocol "
+      end
+      <<format_definition(kind, callback)::binary(), " required by "::binary(), protocol_or_behaviour::binary(), Kernel.inspect(module)::binary()>>
+    )
   end
 
-  defp normalize_macro_or_function_callback(p0) do
-    # body not decompiled
+  defp format_definition(:defmacro) do
+    "macro"
+  end
+
+  defp format_definition(:defmacrop) do
+    "macro"
+  end
+
+  defp format_definition(:def) do
+    "function"
+  end
+
+  defp format_definition(:defp) do
+    "function"
+  end
+
+  defp format_definition(kind, {name, arity}) do
+    <<format_definition(kind)::binary(), " "::binary(), String.Chars.to_string(name)::binary(), "/"::binary(), String.Chars.to_string(arity)::binary()>>
+  end
+
+  defp format_impl_warning(fa, kind, :private_function) do
+    <<String.Chars.to_string(format_definition(kind, fa))::binary(), " is private, @impl attribute is always discarded for private functions/macros"::binary()>>
+  end
+
+  defp format_impl_warning(fa, kind, {:no_behaviours, value}) do
+    <<"got \"@impl "::binary(), Kernel.inspect(value)::binary(), "\" for "::binary(), String.Chars.to_string(format_definition(kind, fa))::binary(), " but no behaviour was declared"::binary()>>
+  end
+
+  defp format_impl_warning(_, kind, {:impl_not_defined, {fa, behaviour}}) do
+    <<"got \"@impl false\" for "::binary(), String.Chars.to_string(format_definition(kind, fa))::binary(), " "::binary(), "but it is a callback specified in "::binary(), Kernel.inspect(behaviour)::binary()>>
+  end
+
+  defp format_impl_warning(fa, kind, {:impl_defined, callbacks}) do
+    <<"got \"@impl true\" for "::binary(), String.Chars.to_string(format_definition(kind, fa))::binary(), " "::binary(), "but no behaviour specifies such callback"::binary(), String.Chars.to_string(known_callbacks(callbacks))::binary()>>
+  end
+
+  defp format_impl_warning(fa, kind, {:behaviour_not_declared, behaviour}) do
+    <<"got \"@impl "::binary(), Kernel.inspect(behaviour)::binary(), "\" for "::binary(), String.Chars.to_string(format_definition(kind, fa))::binary(), " "::binary(), "but this behaviour was not declared with @behaviour"::binary()>>
+  end
+
+  defp format_impl_warning(fa, kind, {:behaviour_not_defined, behaviour, callbacks}) do
+    <<"got \"@impl "::binary(), Kernel.inspect(behaviour)::binary(), "\" for "::binary(), String.Chars.to_string(format_definition(kind, fa))::binary(), " "::binary(), "but this behaviour does not specify such callback"::binary(), String.Chars.to_string(known_callbacks(callbacks))::binary()>>
+  end
+
+  defp get_doc_info(table, env) do
+    case(:ets.take(table, :doc)) do
+      [{:doc, {_, _} = pair, _}] ->
+        pair
+      [] ->
+        {env.line(), nil}
+    end
+  end
+
+  defp get_doc_meta(existing_meta, set) do
+    case(:ets.take(set, {:doc, :meta})) do
+      [{{:doc, :meta}, metadata, _}] ->
+        Map.merge(existing_meta, metadata)
+      [] ->
+        existing_meta
+    end
+  end
+
+  defp impl_behaviours(_, kind, _, _, _) do
+    {:error, :private_function}
+  end
+
+  defp impl_behaviours(_, _, value, [], _) do
+    {:error, {:no_behaviours, value}}
+  end
+
+  defp impl_behaviours(impls, _, false, _, callbacks) do
+    case(callbacks_for_impls(impls, callbacks)) do
+      [] ->
+        {:ok, []}
+      [impl | _] ->
+        {:error, {:impl_not_defined, impl}}
+    end
+  end
+
+  defp impl_behaviours(impls, _, true, _, callbacks) do
+    case(callbacks_for_impls(impls, callbacks)) do
+      [] ->
+        {:error, {:impl_defined, callbacks}}
+      impls ->
+        {:ok, impls}
+    end
+  end
+
+  defp impl_behaviours(impls, _, behaviour, behaviours, callbacks) do
+    (
+      filtered = behaviour_callbacks_for_impls(impls, behaviour, callbacks)
+      cond() do
+        filtered != [] ->
+          {:ok, filtered}
+        not(Enum.member?(behaviours, behaviour)) ->
+          {:error, {:behaviour_not_declared, behaviour}}
+        true ->
+          {:error, {:behaviour_not_defined, behaviour, callbacks}}
+      end
+    )
+  end
+
+  defp impl_behaviours({function, arity}, defaults, kind, value, behaviours, callbacks) do
+    (
+      impls = for(n <- Range.new(arity, arity - defaults)) do
+        {function, n}
+      end
+      impl_behaviours(impls, kind, value, behaviours, callbacks)
+    )
+  end
+
+  defp known_callbacks(callbacks) do
+    <<". There are no known callbacks, please specify the proper @behaviour "::binary(), "and make sure it defines callbacks"::binary()>>
+  end
+
+  defp known_callbacks(callbacks) do
+    (
+      formatted_callbacks = for({{name, arity}, {kind, module, _}} <- callbacks) do
+        <<"\n  * "::binary(), Exception.format_mfa(module, name, arity)::binary(), " ("::binary(), String.Chars.to_string(format_definition(kind))::binary(), ")"::binary()>>
+      end
+      <<". The known callbacks are:\n"::binary(), String.Chars.to_string(formatted_callbacks)::binary(), "\n"::binary()>>
+    )
+  end
+
+  defp merge_signature({:\\, meta, [left, right]}, newer, i) do
+    {:\\, meta, [merge_signature(left, newer, i), right]}
+  end
+
+  defp merge_signature(older, {:\\, _, [left, _]}, i) do
+    merge_signature(older, left, i)
+  end
+
+  defp merge_signature({_, _, nil} = older, _newer, _) do
+    older
+  end
+
+  defp merge_signature(_older, {_, _, nil} = newer, _) do
+    newer
+  end
+
+  defp merge_signature({var, _, _} = older, {var, _, _}, _) do
+    older
+  end
+
+  defp merge_signature({_, meta, _}, _newer, i) do
+    {String.to_atom(<<"arg"::binary(), String.Chars.to_string(i)::binary()>>), meta, :"Elixir"}
+  end
+
+  defp merge_signatures([h1 | t1], [h2 | t2], i) do
+    [merge_signature(h1, h2, i) | merge_signatures(t1, t2, i + 1)]
+  end
+
+  defp merge_signatures([], [], _) do
+    []
+  end
+
+  defp missing_impl_in_context?(meta, behaviour, contexts) do
+    case(contexts) do
+      %{^behaviour => known} ->
+        Enum.member?(known, Keyword.get(meta, :context))
+      %{} ->
+        not(Keyword.has_key?(meta, :context))
+    end
+  end
+
+  defp normalize_macro_or_function_callback({function_name, arity}) do
+    case(Atom.to_charlist(function_name)) do
+      [77, 65, 67, 82, 79, 45 | tail] ->
+        {{:erlang.list_to_atom(tail), arity - 1}, :defmacro}
+      _ ->
+        {{function_name, arity}, :def}
+    end
   end
 
   defp preprocess_attribute(p0, p1) do
     # body not decompiled
   end
 
-  defp preprocess_doc_meta(p0, p1, p2, p3) do
-    # body not decompiled
+  defp preprocess_doc_meta([], _module, _line, map) do
+    map
   end
 
-  defp protocol?(p0) do
-    # body not decompiled
+  defp preprocess_doc_meta([{key, _} | tail], module, line, map) do
+    (
+      message = <<"ignoring reserved documentation metadata key: "::binary(), Kernel.inspect(key)::binary()>>
+      IO.warn(message, attribute_stack(module, line))
+      preprocess_doc_meta(tail, module, line, map)
+    )
   end
 
-  defp put_attribute(p0, p1, p2, p3, p4, p5) do
-    # body not decompiled
+  defp preprocess_doc_meta([{key, value} | tail], module, line, map) do
+    (
+      validate_doc_meta(key, value)
+      preprocess_doc_meta(tail, module, line, :maps.put(key, value, map))
+    )
   end
 
-  defp reverse_values(p0, p1) do
-    # body not decompiled
+  defp protocol?(module) do
+    Code.ensure_loaded?(module) and :erlang.function_exported(module, :__protocol__, 1) and module.__protocol__(:module) == module
+  end
+
+  defp put_attribute(module, key, {_, metadata}, line, set, _bag) do
+    (
+      metadata_map = preprocess_doc_meta(metadata, module, line, %{})
+      case(:ets.insert_new(set, {{key, :meta}, metadata_map, line})) do
+        true ->
+          :ok
+        false ->
+          current_metadata = :ets.lookup_element(set, {key, :meta}, 2)
+          :ets.update_element(set, {key, :meta}, {2, Map.merge(current_metadata, metadata_map)})
+      end
+    )
+  end
+
+  defp put_attribute(module, key, value, line, set, _bag) do
+    (
+      try() do
+        :ets.lookup_element(set, key, 3)
+      catch
+        :error, :badarg ->
+          :ok
+      else
+        unread_line when is_integer(line) and is_integer(unread_line) ->
+          message = <<"redefining @"::binary(), String.Chars.to_string(key)::binary(), " attribute previously set at line "::binary(), String.Chars.to_string(unread_line)::binary()>>
+          IO.warn(message, attribute_stack(module, line))
+        _ ->
+          :ok
+      end
+      :ets.insert(set, {key, value, line})
+    )
+  end
+
+  defp put_attribute(_module, :on_load, value, line, set, bag) do
+    try() do
+      :ets.lookup_element(set, :on_load, 3)
+    catch
+      :error, :badarg ->
+        :ets.insert(set, {:on_load, value, line})
+        :ets.insert(bag, {:warn_attributes, :on_load})
+    else
+      _ ->
+        raise(ArgumentError, "the @on_load attribute can only be set once per module")
+    end
+  end
+
+  defp put_attribute(_module, key, value, line, set, bag) do
+    try() do
+      :ets.lookup_element(set, key, 3)
+    catch
+      :error, :badarg ->
+        :ets.insert(set, {key, value, line})
+        :ets.insert(bag, {:warn_attributes, key})
+    else
+      :accumulate ->
+        :ets.insert(bag, {{:accumulate, key}, value})
+      _ ->
+        :ets.insert(set, {key, value, line})
+    end
+  end
+
+  defp reverse_values([{_, value} | tail], acc) do
+    reverse_values(tail, [value | acc])
+  end
+
+  defp reverse_values([], acc) do
+    acc
   end
 
   defp simplify_arg(p0, p1, p2) do
     # body not decompiled
   end
 
-  defp simplify_args(p0, p1, p2, p3) do
-    # body not decompiled
+  defp simplify_args([arg | args], counters, acc, env) do
+    (
+      {arg, counters} = simplify_arg(arg, counters, env)
+      simplify_args(args, counters, [arg | acc], env)
+    )
   end
 
-  defp simplify_module_name(p0) do
-    # body not decompiled
+  defp simplify_args([], counters, reverse_args, _env) do
+    {reverse_args, counters}
   end
 
-  defp simplify_var(p0, p1) do
-    # body not decompiled
+  defp simplify_module_name(module) do
+    try() do
+      split(module)
+    rescue
+      _ in [ArgumentError] ->
+        module
+    else
+      module_name ->
+        String.to_atom(Macro.underscore(List.last(module_name)))
+    end
   end
 
-  defp split(p0, p1) do
-    # body not decompiled
+  defp simplify_var(var, guess_priority) do
+    case(Atom.to_string(var)) do
+      "_" ->
+        {:_, [], guess_priority}
+      <<"_"::binary(), rest::binary()>> ->
+        {String.to_atom(rest), [], guess_priority}
+      _ ->
+        {var, [], nil}
+    end
   end
 
-  defp validate_doc_meta(p0, p1) do
-    # body not decompiled
+  defp split(<<"Elixir."::binary(), name::binary()>>, _original) do
+    String.split(name, ".")
   end
 
-  defp warn_missing_impls(p0, p1, p2, p3) do
-    # body not decompiled
+  defp split(_module, original) do
+    raise(ArgumentError, <<"expected an Elixir module, got: "::binary(), Kernel.inspect(original)::binary()>>)
+  end
+
+  defp validate_doc_meta(:since, value) do
+    raise(ArgumentError, <<":since is a built-in documentation metadata key. It should be a string representing "::binary(), "the version in which the documented entity was added, got: "::binary(), Kernel.inspect(value)::binary()>>)
+  end
+
+  defp validate_doc_meta(:deprecated, value) do
+    raise(ArgumentError, <<":deprecated is a built-in documentation metadata key. It should be a string "::binary(), "representing the replacement for the deprecated entity, got: "::binary(), Kernel.inspect(value)::binary()>>)
+  end
+
+  defp validate_doc_meta(:delegate_to, value) do
+    case(value) do
+      {m, f, a} when is_atom(m) and is_atom(f) and is_integer(a) and a >= 0 ->
+        :ok
+      _ ->
+        raise(ArgumentError, <<":delegate_to is a built-in documentation metadata key. It should be a three-element "::binary(), "tuple in the form of {module, function, arity}, got: "::binary(), Kernel.inspect(value)::binary()>>)
+    end
+  end
+
+  defp validate_doc_meta(_, _) do
+    :ok
+  end
+
+  defp warn_missing_impls(_env, callbacks, _contexts, _defs) do
+    :ok
+  end
+
+  defp warn_missing_impls(env, non_implemented_callbacks, contexts, defs) do
+    (
+      for({pair, kind, meta, _clauses} <- defs, kind === :def or kind === :defmacro) do
+        with({:ok, {_, behaviour, _}} <- :maps.find(pair, non_implemented_callbacks), true <- missing_impl_in_context?(meta, behaviour, contexts)) do
+          message = <<"module attribute @impl was not set for "::binary(), String.Chars.to_string(format_definition(kind, pair))::binary(), " "::binary(), "callback (specified in "::binary(), Kernel.inspect(behaviour)::binary(), "). "::binary(), "This either means you forgot to add the \"@impl true\" annotation before the "::binary(), "definition or that you are accidentally overriding this callback"::binary()>>
+          IO.warn(message, Macro.Env.stacktrace(%{env | line: :elixir_utils.get_line(meta)}))
+        end
+      end
+      :ok
+    )
   end
 end

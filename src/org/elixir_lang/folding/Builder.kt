@@ -43,7 +43,7 @@ class Builder : FoldingBuilderEx() {
 
                     override fun execute(element: PsiElement): Boolean =
                             when (element) {
-                                is AtNonNumericOperation -> {
+                                is AtOperation -> {
                                     execute(element)
                                 }
                                 is AtUnqualifiedNoParenthesesCall<*> -> {
@@ -67,7 +67,7 @@ class Builder : FoldingBuilderEx() {
                      * Private Instance Methods
                      */
 
-                    private fun execute(atNonNumericOperation: AtNonNumericOperation): Boolean =
+                    private fun execute(atNonNumericOperation: AtOperation): Boolean =
                             if (!quick) {
                                 slowExecute(atNonNumericOperation)
                             } else {
@@ -177,14 +177,14 @@ class Builder : FoldingBuilderEx() {
                         return last
                     }
 
-                    private fun slowExecute(atNonNumericOperation: AtNonNumericOperation): Boolean =
+                    private fun slowExecute(atNonNumericOperation: AtOperation): Boolean =
                             atNonNumericOperation
                                     .reference
                                     ?.let { slowExecute(atNonNumericOperation, it) }
                                     ?: true
 
                     private fun slowExecute(
-                            atNonNumericOperation: AtNonNumericOperation,
+                            atNonNumericOperation: AtOperation,
                             atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>
                     ): Boolean = slowExecute(
                             atNonNumericOperation,
@@ -192,7 +192,7 @@ class Builder : FoldingBuilderEx() {
                             atUnqualifiedNoParenthesesCall.noParenthesesOneArgument.text
                     )
 
-                    private fun slowExecute(atNonNumericOperation: AtNonNumericOperation,
+                    private fun slowExecute(atNonNumericOperation: AtOperation,
                                             target: PsiElement): Boolean =
                             when (target) {
                                 is AtUnqualifiedNoParenthesesCall<*> -> {
@@ -212,18 +212,18 @@ class Builder : FoldingBuilderEx() {
                                 }
                             }
 
-                    private fun slowExecute(atNonNumericOperation: AtNonNumericOperation,
+                    private fun slowExecute(atNonNumericOperation: AtOperation,
                                             reference: PsiReference): Boolean =
                             reference
                                     .resolve()
                                     ?.let { slowExecute(atNonNumericOperation, it) }
                                     ?: true
 
-                    private fun slowExecute(atNonNumericOperation: AtNonNumericOperation,
+                    private fun slowExecute(atNonNumericOperation: AtOperation,
                                             qualifiableAlias: QualifiableAlias): Boolean =
                             slowExecute(atNonNumericOperation, qualifiableAlias, qualifiableAlias.name)
 
-                    private fun slowExecute(atNonNumericOperation: AtNonNumericOperation,
+                    private fun slowExecute(atNonNumericOperation: AtOperation,
                                             element: PsiElement,
                                             placeHolderText: String?): Boolean {
                         val moduleAttributeName = atNonNumericOperation.moduleAttributeName()
@@ -273,7 +273,7 @@ class Builder : FoldingBuilderEx() {
      */
     override fun isCollapsedByDefault(node: ASTNode): Boolean {
         val element = node.psi
-        return if (element is AtNonNumericOperation) {
+        return if (element is AtOperation) {
             ElixirFoldingSettings.getInstance().isReplaceModuleAttributesWithValues
         } else {
             element.children.filterIsInstance<Call>().any { child ->

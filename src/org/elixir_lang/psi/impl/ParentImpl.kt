@@ -2,12 +2,10 @@ package org.elixir_lang.psi.impl
 
 import com.ericsson.otp.erlang.*
 import com.intellij.lang.ASTNode
-import org.elixir_lang.Level
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.name.Module
 import org.elixir_lang.psi.impl.QuotableImpl.metadata
 import org.elixir_lang.psi.impl.QuotableImpl.quotedFunctionCall
-import org.elixir_lang.sdk.elixir.Type.Companion.getNonNullRelease
 import org.jetbrains.annotations.Contract
 import java.nio.charset.Charset
 
@@ -71,9 +69,7 @@ object ParentImpl {
         val childText = child.text
 
         // Not sure, why, but \ gets stripped in front of # when quoting using Quoter prior to 1.6
-        val string = if (childText == "\\#" && getNonNullRelease(parent).level() < Level.V_1_6) {
-            "#"
-        } else if (parent is SigilLine) {
+        val string = if (parent is SigilLine) {
             val terminator = parent.terminator()
 
             if (childText == "\\" + terminator) {
@@ -130,7 +126,7 @@ object ParentImpl {
     fun quoteBinary(interpolatedCharList: InterpolatedCharList, metadata: OtpErlangList, argumentList: List<OtpErlangObject>): OtpErlangObject =
             quotedFunctionCall(
                     "Elixir.List",
-                    quoteBinaryFunctionIdentifier(interpolatedCharList),
+                    "to_charlist",
                     metadata(interpolatedCharList),
                     OtpErlangList(argumentList.toTypedArray())
             )
@@ -160,8 +156,7 @@ object ParentImpl {
     // See https://github.com/elixir-lang/elixir/commit/e89e9d874bf803379d729a3bae185052a5323a85
     @JvmStatic
     fun quoteInterpolation(interpolatedCharList: InterpolatedCharList, interpolation: ElixirInterpolation): OtpErlangObject {
-        val level = getNonNullRelease(interpolation).level()
-        val quotedChildren = QuotableImpl.quote(interpolation.children, level)
+        val quotedChildren = QuotableImpl.quote(interpolation.children)
         val interpolationMetadata = metadata(interpolation)
 
         return quotedFunctionCall(
@@ -178,8 +173,7 @@ object ParentImpl {
      */
     @JvmStatic
     fun quoteInterpolation(interpolatedString: InterpolatedString, interpolation: ElixirInterpolation): OtpErlangObject {
-        val level = getNonNullRelease(interpolation).level()
-        val quotedChildren = QuotableImpl.quote(interpolation.children, level)
+        val quotedChildren = QuotableImpl.quote(interpolation.children)
         val interpolationMetadata = metadata(interpolation)
 
         val quotedKernelToStringCall = quotedFunctionCall(
@@ -207,8 +201,7 @@ object ParentImpl {
      */
     @JvmStatic
     fun quoteInterpolation(sigil: Sigil, interpolation: ElixirInterpolation): OtpErlangObject {
-        val level = getNonNullRelease(interpolation).level()
-        val quotedChildren = QuotableImpl.quote(interpolation.children, level)
+        val quotedChildren = QuotableImpl.quote(interpolation.children)
         val interpolationMetadata = metadata(interpolation)
 
         val quotedKernelToStringCall = quotedFunctionCall(
@@ -317,15 +310,4 @@ object ParentImpl {
 
     @Contract(pure = true)
     private fun isErlangPrintable(codePoint: Int): Boolean = codePoint in 0..255
-
-    /**
-     * Elixir 1.3 changed from `to_char_list` to `to_charlist`
-     * (https://github.com/elixir-lang/elixir/blob/v1.3/CHANGELOG.md)
-     *
-     * @return `"to_charlist` by default;  `"to_char_list"`
-     */
-    @Contract(pure = true)
-    private fun quoteBinaryFunctionIdentifier(interpolatedCharList: InterpolatedCharList): String =
-            getNonNullRelease(interpolatedCharList).level().quoteBinaryFunctionIdentifier
-
 }

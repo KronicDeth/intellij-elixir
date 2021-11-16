@@ -10,7 +10,7 @@ import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.*
 import org.elixir_lang.ElixirSyntaxHighlighter
-import org.elixir_lang.psi.AtNonNumericOperation
+import org.elixir_lang.psi.AtOperation
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.UnqualifiedBracketOperation
@@ -43,7 +43,7 @@ class Callable : Annotator, DumbAware {
                      */
 
                     private fun visitCall(call: Call) {
-                        if (!(call is AtNonNumericOperation || call is AtUnqualifiedNoParenthesesCall<*>)) {
+                        if (!(call is AtOperation || call is AtUnqualifiedNoParenthesesCall<*>)) {
                             visitNonModuleAttributeCall(call)
                         }
                     }

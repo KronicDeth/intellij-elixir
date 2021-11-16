@@ -4,12 +4,11 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiPolyVariantReference;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.ResolveResult;
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
-import com.intellij.util.xml.Resolve;
+import org.elixir_lang.PlatformTestCase;
 import org.elixir_lang.psi.CallDefinitionClause;
 import org.elixir_lang.psi.call.Call;
 
-public class Issue463Test extends BasePlatformTestCase {
+public class Issue463Test extends PlatformTestCase {
     /*
      * Tests
      */

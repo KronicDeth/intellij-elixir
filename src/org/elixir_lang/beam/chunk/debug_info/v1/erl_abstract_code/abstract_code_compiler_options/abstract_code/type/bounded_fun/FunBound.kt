@@ -7,10 +7,11 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Scope
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Type
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.type.Fun
+import org.elixir_lang.beam.decompiler.MacroNameArity
 
 object FunBound {
-    fun toMacroString(funBound: OtpErlangList, nameMacroString: MacroString): MacroString {
-        val funMacroString = funMacroString(funBound, nameMacroString)
+    fun toMacroString(funBound: OtpErlangList, decompiler: MacroNameArity, macroNameArity: org.elixir_lang.beam.MacroNameArity): MacroString {
+        val funMacroString = funMacroString(funBound, decompiler, macroNameArity)
         val boundMacroString = boundMacroString(funBound)
 
         return "$funMacroString when $boundMacroString"
@@ -32,14 +33,18 @@ object FunBound {
                 else -> "unknown_bound"
             }
 
-    private fun funMacroString(funBound: OtpErlangList, nameMacroString: MacroString) =
+    private fun funMacroString(funBound: OtpErlangList,
+                               decompiler: MacroNameArity,
+                               macroNameArity: org.elixir_lang.beam.MacroNameArity) =
             toFun(funBound)
-                    ?.let { funToMacroString(it, nameMacroString) }
+                    ?.let { funToMacroString(it, decompiler, macroNameArity) }
                     ?: "missing_fun"
 
-    private fun funToMacroString(`fun`: OtpErlangObject, nameMacroString: MacroString) =
+    private fun funToMacroString(`fun`: OtpErlangObject,
+                                 decompiler: MacroNameArity,
+                                 macroNameArity: org.elixir_lang.beam.MacroNameArity) =
         Type.ifTo(`fun`) {
-            Fun.ifToMacroString(it, nameMacroString)
+            Fun.ifToMacroString(it, decompiler, macroNameArity)
             ?: "unknown_fun"
         } ?: "unknown_fun"
 

@@ -11,6 +11,8 @@ import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function
 import org.elixir_lang.psi.call.name.Function.*
 import org.elixir_lang.psi.call.name.Module.KERNEL
+import org.elixir_lang.psi.ex_unit.Assertions
+import org.elixir_lang.psi.ex_unit.Case
 import org.elixir_lang.psi.impl.call.CallImpl.hasDoBlockOrKeyword
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.declarations.UseScopeImpl
@@ -22,7 +24,6 @@ import org.elixir_lang.psi.scope.WhileIn.whileIn
 import org.elixir_lang.reference.ModuleAttribute
 import org.elixir_lang.structure_view.element.Callback
 import org.elixir_lang.structure_view.element.Delegation
-import org.elixir_lang.structure_view.element.modular.Module
 
 object ProcessDeclarationsImpl {
     @JvmField
@@ -60,6 +61,7 @@ object ProcessDeclarationsImpl {
         val identifierName = atUnqualifiedNoParenthesesCall.atIdentifier.identifierName()
 
         return if (ModuleAttribute.isTypeSpecName(identifierName)) {
+            processor.execute(atUnqualifiedNoParenthesesCall, state) &&
             atUnqualifiedNoParenthesesCall.finalArguments()?.singleOrNull()?.let { argument ->
                 processDeclarationInTypeSpecArgument(argument, processor, state)
             } ?: true
@@ -121,27 +123,35 @@ object ProcessDeclarationsImpl {
             // need to check if call is place because lastParent is set to place at start of treeWalkUp
             if (!call.isEquivalentTo(lastParent) || call.isEquivalentTo(place)) {
                 when {
-                    call.isCalling(KERNEL, ALIAS) -> processor.execute(call, state)
+                    call.isCalling(KERNEL, ALIAS) ||
                     CallDefinitionClause.`is`(call) || // call parameters
                             Callback.`is`(call) ||
+                            Case.isChild(call, state) ||
                             Delegation.`is`(call) || // delegation call parameters
                             Exception.`is`(call) ||
-                            Module.`is`(call) || // module Alias
+                            Implementation.`is`(call) ||
+                            Import.`is`(call) ||
+                            Module.`is`(call) ||
+                            Protocol.`is`(call) ||
                             Use.`is`(call) ||
                             call.isCalling(KERNEL, DESTRUCTURE) || // left operand
                             call.isCallingMacro(KERNEL, IF) || // match in condition
                             call.isCallingMacro(KERNEL, Function.FOR) || // comprehension match variable
+                            call.isCalling(KERNEL, MATCH_QUESTION_MARK) ||
+                            call.isCalling(KERNEL, REQUIRE) ||
                             call.isCallingMacro(KERNEL, UNLESS) || // match in condition
                             call.isCallingMacro(KERNEL, "with") || // <- or = variable
-                        QuoteMacro.`is`(call) // quote :bind_quoted keys for Variable resolver OR call definitions for Callable resolver
+                            QuoteMacro.`is`(call) || // quote :bind_quoted keys for Variable resolver OR call definitions for Callable resolver
+                            org.elixir_lang.psi.mix.Generator.isEmbed(call, state) ||
+                            Assertions.isChild(call, state)
                     -> processor.execute(call, state)
-                    org.elixir_lang.ecto.Schema.`is`(call, state) -> {
+                    org.elixir_lang.ecto.Schema.isChild(call, state) -> {
                         processor.execute(call, state)
                     }
                     hasDoBlockOrKeyword(call) ->
                         // unknown macros that take do blocks often allow variables to be declared in their arguments
                         processor.execute(call, state)
-                    org.elixir_lang.ecto.Query.isDeclaringMacro(call, state) -> {
+                    org.elixir_lang.ecto.Query.isChild(call, state) -> {
                         processor.execute(call, state)
                     }
                     else -> true
@@ -386,7 +396,9 @@ object ProcessDeclarationsImpl {
                                     place: PsiElement): Boolean =
             sequence
                     .filter { !createsNewScope(it) }
-                    .map { it.processDeclarations(processor, state, lastParent, place) }
+                    .map {
+                        it.processDeclarations(processor, state, lastParent, place)
+                    }
                     .takeWhile { it }
                     .lastOrNull()
                     ?: true

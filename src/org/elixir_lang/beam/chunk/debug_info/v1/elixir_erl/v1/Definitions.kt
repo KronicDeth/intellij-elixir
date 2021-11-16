@@ -2,13 +2,30 @@ package org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1
 
 import com.ericsson.otp.erlang.OtpErlangList
 import com.ericsson.otp.erlang.OtpErlangObject
+import org.elixir_lang.beam.MacroNameArity
 import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.V1
 import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.definitions.Definition
 
-class Definitions(private val definitionList: List<Definition>) {
-    operator fun get(index: Int) = definitionList.get(index)
+class Definitions(val definitionList: List<Definition>) {
+    operator fun get(index: Int): Definition = definitionList[index]
+    operator fun get(macroNameArity: MacroNameArity): Definition? = definitionByMacroNameArity[macroNameArity]
+
     fun indexOf(definition: Definition): Int = definitionList.indexOf(definition)
     fun size() = definitionList.size
+
+    val definitionByMacroNameArity by lazy {
+        definitionList
+                .mapNotNull { definition ->
+                    definition.macro?.let { macro ->
+                        definition.name?.let { name ->
+                            definition.arity?.let { arity ->
+                                MacroNameArity(macro, name, arity) to definition
+                            }
+                        }
+                    }
+                }
+                .toMap()
+    }
 
     companion object {
         fun from(term: OtpErlangObject?, debugInfo: V1): Definitions? =

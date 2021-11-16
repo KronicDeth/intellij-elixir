@@ -6,18 +6,33 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Type
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.type.BoundedFun
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.type.Fun
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.type.`fun`.ParameterReturn
+import org.elixir_lang.beam.decompiler.MacroNameArity
 
 object Definition {
-    fun toMacroString(definition: OtpErlangObject, nameMacroString: MacroString): MacroString =
+    fun toMacroString(definition: OtpErlangObject,
+                      decompiler: MacroNameArity,
+                      macroNameArity: org.elixir_lang.beam.MacroNameArity): MacroString =
         when (definition) {
-            is OtpErlangTuple -> toMacroString(definition, nameMacroString)
-            else -> "$nameMacroString() :: unknown_definition"
+            is OtpErlangTuple -> toMacroString(definition, decompiler, macroNameArity)
+            else -> "unknown_type() :: unknown_definition"
         }
 
-    private fun toMacroString(definition: OtpErlangTuple, nameMacroString: MacroString) =
+    private fun toMacroString(definition: OtpErlangTuple,
+                              decompiler: MacroNameArity,
+                              macroNameArity: org.elixir_lang.beam.MacroNameArity) =
             Type.ifTo(definition) {
-                BoundedFun.ifToMacroString(definition, nameMacroString) ?:
-                Fun.ifToMacroString(definition, nameMacroString) ?:
-                "$nameMacroString() :: unknown_subtype"
-            } ?: "$nameMacroString() :: unknown_definition"
+                BoundedFun.ifToMacroString(definition, decompiler, macroNameArity) ?:
+                Fun.ifToMacroString(definition, decompiler, macroNameArity) ?:
+                fallback(decompiler, macroNameArity, "unknown_subtype")
+            } ?: fallback(decompiler, macroNameArity, "unknown_definition")
+
+    private fun fallback(decompiler: MacroNameArity,
+                         macroNameArity: org.elixir_lang.beam.MacroNameArity,
+                         definitionString: String): String =
+        StringBuilder()
+                .let { ParameterReturn.fallback(it, decompiler, macroNameArity) }
+                .append(" :: ")
+                .append(definitionString)
+                .toString()
 }

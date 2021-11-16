@@ -5,12 +5,15 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import com.intellij.psi.scope.PsiScopeProcessor
 import com.intellij.psi.util.PsiTreeUtil
+import org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall
+import org.elixir_lang.psi.Implementation
+import org.elixir_lang.psi.Implementation.forNameElement
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.DEFMODULE
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.scope.ResolveResultOrderedSet
-import org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.enclosingModularMacroCall
+import org.elixir_lang.psi.visitedElementSet
 import org.elixir_lang.structure_view.element.modular.Module
 
 class For(private val validResult: Boolean) : PsiScopeProcessor {
@@ -18,16 +21,16 @@ class For(private val validResult: Boolean) : PsiScopeProcessor {
 
     override fun execute(element: PsiElement, state: ResolveState): Boolean =
             when (element) {
-                is Call -> execute(element)
+                is Call -> execute(element, state)
                 else -> true
             }
 
     override fun <T> getHint(hintKey: Key<T>): T? = null
     override fun handleEvent(event: PsiScopeProcessor.Event, associated: Any?) {}
 
-    private fun execute(call: Call): Boolean =
-            if (org.elixir_lang.structure_view.element.modular.Implementation.`is`(call)) {
-                val forNameElement = org.elixir_lang.structure_view.element.modular.Implementation.forNameElement(call)
+    private fun execute(call: Call, state: ResolveState): Boolean =
+            if (Implementation.`is`(call)) {
+                val forNameElement = forNameElement(call)
                 val element: PsiElement
                 val name: String
                 val validResult: Boolean
@@ -56,7 +59,7 @@ class For(private val validResult: Boolean) : PsiScopeProcessor {
                     }
                 }
 
-                resolveResultOrderedSet.add(element, name, validResult)
+                resolveResultOrderedSet.add(element, name, validResult, state.visitedElementSet())
 
                 false
             } else {

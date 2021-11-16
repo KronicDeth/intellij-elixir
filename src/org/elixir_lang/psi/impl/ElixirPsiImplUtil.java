@@ -293,7 +293,7 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static String moduleAttributeName(@NotNull final AtNonNumericOperation atNonNumericOperation) {
+    public static String moduleAttributeName(@NotNull final AtOperation atNonNumericOperation) {
         return atNonNumericOperation.getText();
     }
 
@@ -1071,6 +1071,11 @@ public class ElixirPsiImplUtil {
         return PsiNamedElementImpl.getName(qualifiedAlias);
     }
 
+    @Nullable
+    public static String getName(@NotNull ElixirAtom atom) {
+        return PsiNamedElementImpl.getName(atom);
+    }
+
     @Contract(pure = true)
     @Nullable
     public static String getName(@NotNull NamedElement namedElement) {
@@ -1131,6 +1136,18 @@ public class ElixirPsiImplUtil {
         return PresentationImpl.getPresentation(qualifiableAlias);
     }
 
+    public static @Nullable String implementedProtocolName(@NotNull final Call call) {
+        String protocolName;
+
+        if (Implementation.is(call)) {
+            protocolName = Implementation.protocolName(call);
+        } else {
+            protocolName = null;
+        }
+
+        return protocolName;
+    }
+
     @Nullable
     public static PsiReference getReference(@NotNull AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
         return AtUnqualifiedNoParenthesesCallImplKt.getReference(atUnqualifiedNoParenthesesCall);
@@ -1174,7 +1191,7 @@ public class ElixirPsiImplUtil {
     }
 
     @Nullable
-    public static PsiReference getReference(@NotNull final AtNonNumericOperation atNonNumericOperation) {
+    public static PsiReference getReference(@NotNull final AtOperation atNonNumericOperation) {
         return AtNonNumericOperationImplKt.getReference(atNonNumericOperation);
     }
 

@@ -13,6 +13,8 @@ fun <T : PsiElement> T.takeUnlessHasBeenVisited(state: ResolveState): T? = takeU
 
 fun ResolveState.hasBeenVisited(element: PsiElement): Boolean = this.get(VISITED_ELEMENT_SET).contains(element)
 
+fun ResolveState.visitedElementSet(): Set<PsiElement> = this.get(VISITED_ELEMENT_SET).orEmpty()
+
 fun ResolveState.putInitialVisitedElement(visitedElement: PsiElement): ResolveState {
     assert(this.get(VISITED_ELEMENT_SET) == null) {
         "VISITED_ELEMENT_SET already populated"
@@ -20,6 +22,15 @@ fun ResolveState.putInitialVisitedElement(visitedElement: PsiElement): ResolveSt
 
     return this.put(VISITED_ELEMENT_SET, setOf(visitedElement))
 }
+
+
+fun ResolveState.putVisitedElements(other: ResolveState): ResolveState =
+        putVisitedElements(other.visitedElementSet())
+
+fun ResolveState.putVisitedElements(visitedElements: Iterable<PsiElement>): ResolveState =
+    visitedElements.fold(this) { acc, visitedElement ->
+        acc.putVisitedElement(visitedElement)
+    }
 
 fun ResolveState.putVisitedElement(visitedElement: PsiElement): ResolveState {
     val visitedElementSet = this.get(VISITED_ELEMENT_SET) ?: emptySet()

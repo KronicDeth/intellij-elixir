@@ -75,6 +75,9 @@ object Icons {
     val CALL_DEFINITION_CLAUSE: Icon = RowIconFactory.create(CALL_DEFINITION, PlatformIcons.PACKAGE_LOCAL_ICON)
 
     @JvmField
+    val DESCRIBE = AllIcons.Nodes.TestGroup
+
+    @JvmField
     val DELEGATION: Icon = RowIconFactory.create(AllIcons.RunConfigurations.TestState.Run, PlatformIcons.PACKAGE_LOCAL_ICON)
 
     @JvmField
@@ -86,8 +89,6 @@ object Icons {
     @JvmField
     val FILE = IconLoader.getIcon("/icons/file/elixir.svg")
 
-    @JvmField
-    val IMPLEMENTATION: Icon = RowIconFactory.create(PlatformIcons.ANONYMOUS_CLASS_ICON, AllIcons.General.OverridingMethod)
 
     @JvmField
     val MIX_MODULE_CONFLICT = AllIcons.Actions.Cancel
@@ -101,11 +102,23 @@ object Icons {
     @JvmField
     val PARAMETER = AllIcons.Nodes.Parameter
 
-    @JvmField
-    val PROTOCOL: Icon = RowIconFactory.create(PlatformIcons.ANONYMOUS_CLASS_ICON, AllIcons.General.OverridenMethod)
+    object Protocol {
+        val Structure = IconLoader.getIcon("/icons/protocol.svg")
+        val GoToImplementations: Icon =AllIcons.Gutter.ImplementedMethod
+    }
+
+    object Implementation {
+        @JvmField
+        val Structure: Icon = AllIcons.Nodes.Interface
+        @JvmField
+        val GoToProtocols: Icon = IconLoader.getIcon("/icons/go_to_protocols.svg")
+    }
 
     @JvmField
     val STRUCTURE = AllIcons.Toolwindows.ToolWindowStructure
+
+    @JvmField
+    val TEST = AllIcons.Nodes.Test
 
     // same icon as intellij-erlang to match their look and feel
     @JvmField

@@ -42,12 +42,6 @@ public class ElixirAccessExpressionImpl extends ASTWrapperPsiElement implements 
 
   @Override
   @Nullable
-  public ElixirAtNumericOperation getAtNumericOperation() {
-    return PsiTreeUtil.getChildOfType(this, ElixirAtNumericOperation.class);
-  }
-
-  @Override
-  @Nullable
   public ElixirAtom getAtom() {
     return PsiTreeUtil.getChildOfType(this, ElixirAtom.class);
   }
@@ -278,12 +272,6 @@ public class ElixirAccessExpressionImpl extends ASTWrapperPsiElement implements 
   @Nullable
   public ElixirTuple getTuple() {
     return PsiTreeUtil.getChildOfType(this, ElixirTuple.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirUnaryNumericOperation getUnaryNumericOperation() {
-    return PsiTreeUtil.getChildOfType(this, ElixirUnaryNumericOperation.class);
   }
 
   @Override

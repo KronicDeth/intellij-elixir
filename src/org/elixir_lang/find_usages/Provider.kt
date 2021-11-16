@@ -68,7 +68,7 @@ class Provider : com.intellij.lang.findUsages.FindUsagesProvider {
      */
     override fun canFindUsagesFor(psiElement: PsiElement): Boolean =
             when (psiElement) {
-                is AtNonNumericOperation, is ModuleImpl<*> -> true
+                is AtOperation, is ModuleImpl<*> -> true
                 is Call ->
                     /* On a definer, the position of the caret is important to determine whether the thing being defined
                        or the definer macro's usage should be found */

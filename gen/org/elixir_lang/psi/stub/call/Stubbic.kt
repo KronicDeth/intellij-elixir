@@ -9,6 +9,11 @@ interface Stubbic {
     val name: String?
 
     /**
+     * If [definition] is [Definition.IMPLEMENTATION], this is the name of the implemented protocol.
+     */
+    val implementedProtocolName: String?
+
+    /**
      * These names do not depend on aliases or nested modules.
      *
      * @return the canonical texts of the reference

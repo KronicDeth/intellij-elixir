@@ -9,13 +9,15 @@ import org.elixir_lang.psi.call.Call
 import java.util.ArrayList
 
 import org.elixir_lang.psi.CallDefinitionClause.nameArityInterval
+import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
+import org.elixir_lang.psi.impl.enclosingMacroCall
 
 class ImportTest : LightPlatformCodeInsightFixtureTestCase() {
     /*
      * Tests
      */
 
-    fun testCallDefinitionClauseCallWhileImportModule() {
+    fun testTreeWalkUpImportModule() {
         myFixture.configureByFiles("import_module.ex", "imported.ex")
         val elementAtCaret = myFixture.file.findElementAt(myFixture.caretOffset)
 
@@ -29,9 +31,9 @@ class ImportTest : LightPlatformCodeInsightFixtureTestCase() {
         assertTrue(Import.`is`(call))
 
         val importedCallList = ArrayList<Call>()
-        val resolveState = ResolveState.initial().putInitialVisitedElement(call)
+        val resolveState = ResolveState.initial().put(ENTRANCE, call.enclosingMacroCall()).putInitialVisitedElement(call)
 
-        Import.callDefinitionClauseCallWhile(call, resolveState) { call1, _ ->
+        Import.treeWalkUp(call, resolveState) { call1, _ ->
             importedCallList.add(call1)
             true
         }
@@ -39,7 +41,7 @@ class ImportTest : LightPlatformCodeInsightFixtureTestCase() {
         assertEquals(3, importedCallList.size)
     }
 
-    fun testCallDefinitionClauseCallWhileImportModuleExceptNameArity() {
+    fun testTreeWalkUpImportModuleExceptNameArity() {
         myFixture.configureByFiles("import_module_except_name_arity.ex", "imported.ex")
         val elementAtCaret = myFixture.file.findElementAt(myFixture.caretOffset)
 
@@ -53,9 +55,9 @@ class ImportTest : LightPlatformCodeInsightFixtureTestCase() {
         assertTrue(Import.`is`(call))
 
         val importedCallList = ArrayList<Call>()
-        val resolveState = ResolveState.initial().putInitialVisitedElement(call)
+        val resolveState = ResolveState.initial().put(ENTRANCE, call.enclosingMacroCall()).putInitialVisitedElement(call)
 
-        Import.callDefinitionClauseCallWhile(call, resolveState) { call1, _ ->
+        Import.treeWalkUp(call, resolveState) { call1, _ ->
             importedCallList.add(call1)
             true
         }
@@ -75,7 +77,7 @@ class ImportTest : LightPlatformCodeInsightFixtureTestCase() {
         )
     }
 
-    fun testCallDefinitionClauseCallWhileImportModuleOnlyNameArity() {
+    fun testTreeWalkUpImportModuleOnlyNameArity() {
         myFixture.configureByFiles("import_module_only_name_arity.ex", "imported.ex")
         val elementAtCaret = myFixture.file.findElementAt(myFixture.caretOffset)
 
@@ -89,9 +91,9 @@ class ImportTest : LightPlatformCodeInsightFixtureTestCase() {
         assertTrue(Import.`is`(call))
 
         val importedCallList = ArrayList<Call>()
-        val resolveState = ResolveState.initial().putInitialVisitedElement(call)
+        val resolveState = ResolveState.initial().put(ENTRANCE, call.enclosingMacroCall()).putInitialVisitedElement(call)
 
-        Import.callDefinitionClauseCallWhile(call, resolveState) { call1, _ ->
+        Import.treeWalkUp(call, resolveState) { call1, _ ->
             importedCallList.add(call1)
             true
         }

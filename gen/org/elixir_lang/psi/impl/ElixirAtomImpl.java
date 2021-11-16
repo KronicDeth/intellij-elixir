@@ -2,6 +2,9 @@
 package org.elixir_lang.psi.impl;
 
 import java.util.List;
+
+import com.intellij.openapi.util.NlsSafe;
+import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.*;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
@@ -51,4 +54,8 @@ public class ElixirAtomImpl extends ASTWrapperPsiElement implements ElixirAtom {
     return ElixirPsiImplUtil.quote(this);
   }
 
+  @Override
+  public PsiElement setName(@NlsSafe @NotNull String name) throws IncorrectOperationException {
+    throw new IncorrectOperationException();
+  }
 }

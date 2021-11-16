@@ -3,11 +3,11 @@ package org.elixir_lang.reference.callable;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
+import org.elixir_lang.PlatformTestCase;
 import org.elixir_lang.psi.ElixirIdentifier;
 import org.elixir_lang.psi.call.Call;
 
-public class Issue692Test extends BasePlatformTestCase {
+public class Issue692Test extends PlatformTestCase {
     /*
      * Tests
      */

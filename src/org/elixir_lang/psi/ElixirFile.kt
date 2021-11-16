@@ -14,9 +14,6 @@ import org.elixir_lang.psi.call.qualification.Qualified
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.call.stabBodyChildExpressions
 import org.elixir_lang.psi.impl.childExpressions
-import org.elixir_lang.structure_view.element.modular.Implementation
-import org.elixir_lang.structure_view.element.modular.Module
-import org.elixir_lang.structure_view.element.modular.Protocol
 import java.util.ArrayList
 
 class ElixirFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvider, ElixirLanguage) {

@@ -76,7 +76,6 @@
     <colorSettingsPage implementation="org.elixir_lang.ElixirColorSettingsPage"/>
     <fileType name="Elixir" implementationClass="org.elixir_lang.ElixirFileType" fieldName="INSTANCE" language="Elixir" extensions="ex"/>
     <fileType name="Elixir Script" implementationClass="org.elixir_lang.ElixirScriptFileType" fieldName="INSTANCE" language="Elixir" extensions="exs"/>
-    <filePropertyPusher implementation="org.elixir_lang.file.LevelPropertyPusher"/>
 
     <!-- Facet -->
     <applicationConfigurable id="language.elixir.sdks.elixir"
@@ -159,6 +158,16 @@
     <usageTargetProvider implementation="org.elixir_lang.UsageTargetProvider"/>
     <usageTypeProvider implementation="org.elixir_lang.UsageTypeProvider"/>
 
+    <!-- Go To Implementations -->
+
+    <stubIndex implementation="org.elixir_lang.psi.stub.index.ImplementedProtocolName"/>
+    <definitionsScopedSearch implementation="org.elixir_lang.DefinitionsScopedSearch"/>
+    <codeInsight.lineMarkerProvider language="Elixir" implementationClass="org.elixir_lang.code_insight.line_marker_provider.Protocol"/>
+
+    <!-- Go To Super Methods -->
+    <codeInsight.gotoSuper language="Elixir" implementationClass="org.elixir_lang.code_insight.GotoSuper"/>
+    <codeInsight.lineMarkerProvider language="Elixir" implementationClass="org.elixir_lang.code_insight.line_marker_provider.Implementation"/>
+
     <!-- folding -->
     <applicationService serviceInterface="org.elixir_lang.folding.ElixirFoldingSettings"
                         serviceImplementation="org.elixir_lang.folding.ElixirFoldingSettings"/>
@@ -216,6 +225,10 @@
 
     <stubIndex implementation="org.elixir_lang.psi.stub.index.ModularName"/>
     <gotoClassContributor implementation="org.elixir_lang.navigation.GotoClassContributor"/>
+
+    <!-- `quote` blocks -->
+    <stubIndex implementation="org.elixir_lang.psi.stub.index.QuoteModuleAttributeName"/>
+    <stubIndex implementation="org.elixir_lang.psi.stub.index.QuoteVariableName"/>
 
     <!-- debug -->
     <fileBasedIndex implementation="org.elixir_lang.beam.chunk.lines.file_names.Index"/>

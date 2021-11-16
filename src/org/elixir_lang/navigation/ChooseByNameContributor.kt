@@ -12,6 +12,7 @@ import com.intellij.util.ArrayUtil
 import org.elixir_lang.Visibility
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
+import org.elixir_lang.psi.Implementation.forNameCollection
 import org.elixir_lang.psi.NamedElement
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.structure_view.element.*
@@ -83,9 +84,9 @@ open class ChooseByNameContributor(private val stubIndexKey: StubIndexKey<String
             org.elixir_lang.psi.CallDefinitionClause.`is`(call) -> getItemsFromCallDefinitionClause(items, enclosingModularByCall, callDefinitionByTuple, call)
             CallDefinitionSpecification.`is`(call) -> getItemsFromCallDefinitionSpecification(items, enclosingModularByCall, call)
             Callback.`is`(call) -> getItemsFromCallback(items, enclosingModularByCall, call)
-            Implementation.`is`(call) -> getItemsFromImplementation(name, items, enclosingModularByCall, call)
-            Module.`is`(call) -> getItemsFromModule(items, enclosingModularByCall, call)
-            Protocol.`is`(call) -> getItemsFromProtocol(items, enclosingModularByCall, call)
+            org.elixir_lang.psi.Implementation.`is`(call) -> getItemsFromImplementation(name, items, enclosingModularByCall, call)
+            org.elixir_lang.psi. Module.`is`(call) -> getItemsFromModule(items, enclosingModularByCall, call)
+            org.elixir_lang.psi.Protocol.`is`(call) -> getItemsFromProtocol(items, enclosingModularByCall, call)
             // MUST be after modular definition one-liners don't count as call definition heads
             CallDefinitionHead.`is`(call) -> getItemsFromCallDefinitionHead(items, enclosingModularByCall, callDefinitionByTuple, call)
         }
@@ -199,7 +200,7 @@ open class ChooseByNameContributor(private val stubIndexKey: StubIndexKey<String
                                            call: Call) {
         val modular = enclosingModularByCall.putNew(call)
 
-        val forNameCollection = Implementation.forNameCollection(modular, call)
+        val forNameCollection = forNameCollection(modular, call)
 
         if (forNameCollection != null) {
             for (forName in forNameCollection) {

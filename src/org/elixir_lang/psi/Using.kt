@@ -32,9 +32,7 @@ object Using {
         return if (resolvedModuleName != null && functionName != null) {
             when {
                 resolvedModuleName == KERNEL && functionName == QUOTE -> {
-                    val lastChildCallResolveState = resolveState.putVisitedElement(lastChildCall)
-
-                    QuoteMacro.treeWalkUp(lastChildCall, lastChildCallResolveState, keepProcessing)
+                    QuoteMacro.treeWalkUp(lastChildCall, resolveState, keepProcessing)
                 }
 
                 resolvedModuleName == KERNEL && functionName == APPLY -> {

@@ -3,3621 +3,2547 @@ defmodule :"OTP-PUB-KEY" do
 
   # Functions
 
-  def unquote(:"ansi-X9-62")() do
-    # body not decompiled
-  end
-
-  def anyExtendedKeyUsage() do
-    # body not decompiled
-  end
-
-  def anyPolicy() do
-    # body not decompiled
-  end
-
-  def bit_string_format() do
-    # body not decompiled
-  end
-
-  def brainpoolP160r1() do
-    # body not decompiled
-  end
-
-  def brainpoolP160t1() do
-    # body not decompiled
-  end
-
-  def brainpoolP192r1() do
-    # body not decompiled
-  end
-
-  def brainpoolP192t1() do
-    # body not decompiled
-  end
-
-  def brainpoolP224r1() do
-    # body not decompiled
-  end
-
-  def brainpoolP224t1() do
-    # body not decompiled
-  end
-
-  def brainpoolP256r1() do
-    # body not decompiled
-  end
-
-  def brainpoolP256t1() do
-    # body not decompiled
-  end
-
-  def brainpoolP320r1() do
-    # body not decompiled
-  end
-
-  def brainpoolP320t1() do
-    # body not decompiled
-  end
-
-  def brainpoolP384r1() do
-    # body not decompiled
-  end
-
-  def brainpoolP384t1() do
-    # body not decompiled
-  end
-
-  def brainpoolP512r1() do
-    # body not decompiled
-  end
-
-  def brainpoolP512t1() do
-    # body not decompiled
-  end
-
-  def unquote(:"certicom-arc")() do
-    # body not decompiled
-  end
-
-  def unquote(:"characteristic-two-field")() do
-    # body not decompiled
-  end
-
-  def unquote(:"common-name")() do
-    # body not decompiled
-  end
-
-  def data() do
-    # body not decompiled
-  end
-
-  def dec_AAControls(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_ACClearAttrs(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_AccessDescription(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_AdministrationDomainName(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_Algorithm(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_AlgorithmIdentifier(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_AlgorithmNull(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_AnotherName(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_Any(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_AttCertIssuer(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_AttCertValidityPeriod(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_AttCertVersion(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_AttrSpec(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_Attribute(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_AttributeCertificate(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_AttributeCertificateInfo(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_AttributeType(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_AttributeTypeAndValue(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_AttributeValue(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_AuthorityInfoAccessSyntax(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_AuthorityKeyIdentifier(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_BaseCRLNumber(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_BaseDistance(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_BasicConstraints(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_Boolean(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_BuiltInDomainDefinedAttribute(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_BuiltInDomainDefinedAttributes(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_BuiltInStandardAttributes(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_CPSuri(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_CRLDistributionPoints(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_CRLNumber(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_CRLReason(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_CRLSequence(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_CertPolicyId(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_Certificate(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_CertificateIssuer(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_CertificateList(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_CertificatePolicies(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_CertificateRevocationLists(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_CertificateSerialNumber(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_Certificates(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_CertificationRequest(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_CertificationRequestInfo(p0, p1) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_Characteristic-two")(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_ClassList(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_Clearance(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_CommonName(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_ContentEncryptionAlgorithmIdentifier(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_ContentInfo(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_ContentType(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_CountryName(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_Curve(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_DHParameter(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_DHPublicKey(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_DSAParams(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_DSAPrivateKey(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_DSAPublicKey(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_Data(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_Digest(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_DigestAlgorithmIdentifier(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_DigestAlgorithmIdentifiers(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_DigestEncryptionAlgorithmIdentifier(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_DigestInfoNull(p0, p1) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_DigestInfoPKCS-1")(p0, p1) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_DigestInfoPKCS-7")(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_DigestedData(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_DirectoryString(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_DisplayText(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_DistinguishedName(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_DistributionPoint(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_DistributionPointName(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_DomainComponent(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_DomainParameters(p0, p1) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_Dss-Parms")(p0, p1) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_Dss-Sig-Value")(p0, p1) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_ECDSA-Sig-Value")(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_ECPVer(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_ECParameters(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_ECPoint(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_ECPrivateKey(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_EDIPartyName(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_EcpkParameters(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_EmailAddress(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_EncryptedContent(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_EncryptedContentInfo(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_EncryptedData(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_EncryptedDigest(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_EncryptedKey(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_EnvelopedData(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_ExtKeyUsageSyntax(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_ExtendedCertificate(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_ExtendedCertificateOrCertificate(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_ExtendedCertificatesAndCertificates(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_ExtendedNetworkAddress(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_Extension(p0, p1) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_Extension-Any")(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_ExtensionAttribute(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_ExtensionAttributes(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_ExtensionORAddressComponents(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_ExtensionPhysicalDeliveryAddressComponents(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_ExtensionRequest(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_Extensions(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_FieldElement(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_FieldID(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_FreshestCRL(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_GeneralName(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_GeneralNames(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_GeneralSubtree(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_GeneralSubtrees(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_HoldInstructionCode(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_Holder(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_IetfAttrSyntax(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_InhibitAnyPolicy(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_InvalidityDate(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_IssuerAltName(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_IssuerAndSerialNumber(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_IssuerSerial(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_IssuingDistributionPoint(p0, p1) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_KEA-Parms-Id")(p0, p1) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_KEA-PublicKey")(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_KeyEncryptionAlgorithmIdentifier(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_KeyIdentifier(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_KeyPurposeId(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_KeyUsage(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_LocalPostalAttributes(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_MessageDigest(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_Name(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_NameConstraints(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_NetworkAddress(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_NoticeReference(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_NumericUserIdentifier(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_ORAddress(p0, p1) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_OTP-X520countryname")(p0, p1) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_OTP-emailAddress")(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_OTPAttributeTypeAndValue(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_OTPCertificate(p0, p1) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_OTPCharacteristic-two")(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_OTPExtension(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_OTPExtensionAttribute(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_OTPExtensionAttributes(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_OTPExtensions(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_OTPFieldID(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_OTPOLDSubjectPublicKeyInfo(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_OTPSubjectPublicKeyInfo(p0, p1) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_OTPSubjectPublicKeyInfo-Any")(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_OTPTBSCertificate(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_ObjId(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_ObjectDigestInfo(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_OrganizationName(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_OrganizationalUnitName(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_OrganizationalUnitNames(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_OtherPrimeInfo(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_OtherPrimeInfos(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_PDSName(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_PDSParameter(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_Pentanomial(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_PersonalName(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_PhysicalDeliveryCountryName(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_PhysicalDeliveryOfficeName(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_PhysicalDeliveryOfficeNumber(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_PhysicalDeliveryOrganizationName(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_PhysicalDeliveryPersonalName(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_PolicyConstraints(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_PolicyInformation(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_PolicyMappings(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_PolicyQualifierId(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_PolicyQualifierInfo(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_PostOfficeBoxAddress(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_PostalCode(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_PosteRestanteAddress(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_PresentationAddress(p0, p1) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_Prime-p")(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_PrivateDomainName(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_PrivateKeyUsagePeriod(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_ProxyInfo(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_PublicKeyAlgorithm(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_RDNSequence(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_RSAPrivateKey(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_RSAPublicKey(p0, p1) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_RSASSA-PSS-params")(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_ReasonFlags(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_RecipientInfo(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_RecipientInfos(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_RelativeDistinguishedName(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_RoleSyntax(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_SecurityCategory(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_SignatureAlgorithm(p0, p1) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_SignatureAlgorithm-Any")(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_SignedAndEnvelopedData(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_SignedData(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_SignerInfo(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_SignerInfoAuthenticatedAttributes(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_SignerInfos(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_SigningTime(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_SkipCerts(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_StreetAddress(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_SubjectAltName(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_SubjectDirectoryAttributes(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_SubjectInfoAccessSyntax(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_SubjectKeyIdentifier(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_SubjectPublicKeyInfo(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_SvceAuthInfo(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_TBSCertList(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_TBSCertificate(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_Target(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_TargetCert(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_Targets(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_TeletexCommonName(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_TeletexDomainDefinedAttribute(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_TeletexDomainDefinedAttributes(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_TeletexOrganizationName(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_TeletexOrganizationalUnitName(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_TeletexOrganizationalUnitNames(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_TeletexPersonalName(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_TerminalIdentifier(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_TerminalType(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_Time(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_TrailerField(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_Trinomial(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_UnformattedPostalAddress(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_UniqueIdentifier(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_UniquePostalName(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_UserNotice(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_V2Form(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_ValidationParms(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_Validity(p0, p1) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_VersionPKCS-1")(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_VersionPKIX1Explicit88(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_X121Address(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_X520CommonName(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_X520LocalityName(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_X520OrganizationName(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_X520OrganizationalUnitName(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_X520Pseudonym(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_X520SerialNumber(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_X520StateOrProvinceName(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_X520Title(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_X520countryName(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_X520dnQualifier(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_X520name(p0, p1) do
-    # body not decompiled
-  end
-
-  def dec_authorityInfoAccess(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_authorityKeyIdentifier(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_basicConstraints(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_cRLDistributionPoints(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_cRLNumber(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_cRLReasons(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_certificateIssuer(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_certificatePolicies(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_challengePassword(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_commonName(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_contentType(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_counterSignature(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_countryName(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_deltaCRLIndicator(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_dh(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_dnQualifier(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_domainComponent(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_dsa(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_dsa-with-sha1")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_dsaWithSHA1(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_ec-public-key")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_ecdsa-with-sha1")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_ecdsa-with-sha224")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_ecdsa-with-sha256")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_ecdsa-with-sha384")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_ecdsa-with-sha512")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_emailAddress(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_extKeyUsage(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_extensionRequest(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_failInfo(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_field-characteristic-two")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_field-prime-field")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_freshestCRL(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_generationQualifier(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_givenName(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_gn-basis")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_holdInstructionCode(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_inhibitAnyPolicy(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_initials(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_invalidityDate(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_issuerAltName(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_issuingDistributionPoint(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_kea(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_keyUsage(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_localityName(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_md2-with-rsa-encryption")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_md5-with-rsa-encryption")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_messageDigest(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_messageType(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_name(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_nameConstraints(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_organizationName(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_organizationalUnitName(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_pkiStatus(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_policyConstraints(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_policyMappings(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_pp-basis")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_privateKeyUsagePeriod(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_pseudonym(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_recipientNonce(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_rsa-encryption")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_senderNonce(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_serialNumber(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_sha-1with-rsa-encryption")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_sha1-with-rsa-encryption")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_sha224-with-rsa-encryption")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_sha256-with-rsa-encryption")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_sha384-with-rsa-encryption")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_sha512-with-rsa-encryption")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_signingTime(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_stateOrProvinceName(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_subjectAltName(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_subjectDirectoryAttributes(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_subjectInfoAccess(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_subjectKeyIdentifier(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_surname(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_title(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_tp-basis")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def dec_transactionID(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_x400-common-name")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_x400-extended-network-address")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_x400-extension-OR-address-components")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_x400-extension-physical-delivery-address-components")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_x400-local-postal-attributes")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_x400-pds-name")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_x400-physical-delivery-country-name")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_x400-physical-delivery-office-name")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_x400-physical-delivery-office-number")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_x400-physical-delivery-organization-name")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_x400-physical-delivery-personal-name")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_x400-post-office-box-address")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_x400-postal-code")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_x400-poste-restante-address")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_x400-street-address")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_x400-teletex-common-name")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_x400-teletex-domain-defined-attributes")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_x400-teletex-personal-name")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_x400-terminal-type")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_x400-unformatted-postal-address")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"dec_x400-unique-postal-name")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def decode(p0, p1) do
-    # body not decompiled
-  end
-
-  def decode_TBSCertList_exclusive(p0) do
-    # body not decompiled
-  end
-
-  def decode_TBSCert_exclusive(p0) do
-    # body not decompiled
-  end
-
-  def decode_part(p0, p1) do
-    # body not decompiled
-  end
-
-  def dhKeyAgreement() do
-    # body not decompiled
-  end
-
-  def dhpublicnumber() do
-    # body not decompiled
-  end
-
-  def unquote(:"dialyzer-suppressions")(p0) do
-    # body not decompiled
-  end
-
-  def digestedData() do
-    # body not decompiled
-  end
-
-  def ecStdCurvesAndGeneration() do
-    # body not decompiled
-  end
-
-  def unquote(:"ecdsa-with-SHA1")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ecdsa-with-SHA2")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ecdsa-with-SHA224")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ecdsa-with-SHA256")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ecdsa-with-SHA384")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ecdsa-with-SHA512")() do
-    # body not decompiled
-  end
-
-  def ellipticCurve() do
-    # body not decompiled
-  end
-
-  def ellipticCurveRFC5639() do
-    # body not decompiled
-  end
-
-  def enc_AAControls(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_ACClearAttrs(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_AccessDescription(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_AdministrationDomainName(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_Algorithm(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_AlgorithmIdentifier(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_AlgorithmNull(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_AnotherName(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_Any(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_AttCertIssuer(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_AttCertValidityPeriod(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_AttCertVersion(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_AttrSpec(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_Attribute(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_AttributeCertificate(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_AttributeCertificateInfo(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_AttributeType(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_AttributeTypeAndValue(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_AttributeValue(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_AuthorityInfoAccessSyntax(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_AuthorityKeyIdentifier(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_BaseCRLNumber(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_BaseDistance(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_BasicConstraints(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_Boolean(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_BuiltInDomainDefinedAttribute(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_BuiltInDomainDefinedAttributes(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_BuiltInStandardAttributes(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_CPSuri(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_CRLDistributionPoints(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_CRLNumber(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_CRLReason(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_CRLSequence(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_CertPolicyId(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_Certificate(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_CertificateIssuer(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_CertificateList(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_CertificatePolicies(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_CertificateRevocationLists(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_CertificateSerialNumber(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_Certificates(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_CertificationRequest(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_CertificationRequestInfo(p0, p1) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_Characteristic-two")(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_ClassList(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_Clearance(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_CommonName(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_ContentEncryptionAlgorithmIdentifier(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_ContentInfo(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_ContentType(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_CountryName(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_Curve(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_DHParameter(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_DHPublicKey(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_DSAParams(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_DSAPrivateKey(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_DSAPublicKey(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_Data(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_Digest(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_DigestAlgorithmIdentifier(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_DigestAlgorithmIdentifiers(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_DigestEncryptionAlgorithmIdentifier(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_DigestInfoNull(p0, p1) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_DigestInfoPKCS-1")(p0, p1) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_DigestInfoPKCS-7")(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_DigestedData(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_DirectoryString(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_DisplayText(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_DistinguishedName(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_DistributionPoint(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_DistributionPointName(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_DomainComponent(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_DomainParameters(p0, p1) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_Dss-Parms")(p0, p1) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_Dss-Sig-Value")(p0, p1) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_ECDSA-Sig-Value")(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_ECPVer(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_ECParameters(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_ECPoint(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_ECPrivateKey(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_EDIPartyName(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_EcpkParameters(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_EmailAddress(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_EncryptedContent(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_EncryptedContentInfo(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_EncryptedData(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_EncryptedDigest(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_EncryptedKey(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_EnvelopedData(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_ExtKeyUsageSyntax(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_ExtendedCertificate(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_ExtendedCertificateOrCertificate(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_ExtendedCertificatesAndCertificates(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_ExtendedNetworkAddress(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_Extension(p0, p1) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_Extension-Any")(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_ExtensionAttribute(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_ExtensionAttributes(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_ExtensionORAddressComponents(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_ExtensionPhysicalDeliveryAddressComponents(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_ExtensionRequest(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_Extensions(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_FieldElement(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_FieldID(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_FreshestCRL(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_GeneralName(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_GeneralNames(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_GeneralSubtree(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_GeneralSubtrees(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_HoldInstructionCode(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_Holder(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_IetfAttrSyntax(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_InhibitAnyPolicy(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_InvalidityDate(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_IssuerAltName(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_IssuerAndSerialNumber(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_IssuerSerial(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_IssuingDistributionPoint(p0, p1) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_KEA-Parms-Id")(p0, p1) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_KEA-PublicKey")(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_KeyEncryptionAlgorithmIdentifier(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_KeyIdentifier(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_KeyPurposeId(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_KeyUsage(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_LocalPostalAttributes(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_MessageDigest(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_Name(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_NameConstraints(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_NetworkAddress(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_NoticeReference(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_NumericUserIdentifier(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_ORAddress(p0, p1) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_OTP-X520countryname")(p0, p1) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_OTP-emailAddress")(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_OTPAttributeTypeAndValue(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_OTPCertificate(p0, p1) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_OTPCharacteristic-two")(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_OTPExtension(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_OTPExtensionAttribute(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_OTPExtensionAttributes(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_OTPExtensions(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_OTPFieldID(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_OTPOLDSubjectPublicKeyInfo(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_OTPSubjectPublicKeyInfo(p0, p1) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_OTPSubjectPublicKeyInfo-Any")(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_OTPTBSCertificate(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_ObjId(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_ObjectDigestInfo(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_OrganizationName(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_OrganizationalUnitName(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_OrganizationalUnitNames(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_OtherPrimeInfo(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_OtherPrimeInfos(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_PDSName(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_PDSParameter(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_Pentanomial(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_PersonalName(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_PhysicalDeliveryCountryName(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_PhysicalDeliveryOfficeName(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_PhysicalDeliveryOfficeNumber(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_PhysicalDeliveryOrganizationName(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_PhysicalDeliveryPersonalName(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_PolicyConstraints(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_PolicyInformation(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_PolicyMappings(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_PolicyQualifierId(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_PolicyQualifierInfo(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_PostOfficeBoxAddress(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_PostalCode(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_PosteRestanteAddress(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_PresentationAddress(p0, p1) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_Prime-p")(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_PrivateDomainName(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_PrivateKeyUsagePeriod(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_ProxyInfo(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_PublicKeyAlgorithm(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_RDNSequence(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_RSAPrivateKey(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_RSAPublicKey(p0, p1) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_RSASSA-PSS-params")(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_ReasonFlags(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_RecipientInfo(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_RecipientInfos(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_RelativeDistinguishedName(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_RoleSyntax(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_SecurityCategory(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_SignatureAlgorithm(p0, p1) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_SignatureAlgorithm-Any")(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_SignedAndEnvelopedData(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_SignedData(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_SignerInfo(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_SignerInfoAuthenticatedAttributes(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_SignerInfos(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_SigningTime(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_SkipCerts(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_StreetAddress(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_SubjectAltName(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_SubjectDirectoryAttributes(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_SubjectInfoAccessSyntax(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_SubjectKeyIdentifier(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_SubjectPublicKeyInfo(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_SvceAuthInfo(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_TBSCertList(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_TBSCertificate(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_Target(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_TargetCert(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_Targets(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_TeletexCommonName(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_TeletexDomainDefinedAttribute(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_TeletexDomainDefinedAttributes(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_TeletexOrganizationName(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_TeletexOrganizationalUnitName(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_TeletexOrganizationalUnitNames(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_TeletexPersonalName(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_TerminalIdentifier(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_TerminalType(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_Time(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_TrailerField(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_Trinomial(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_UnformattedPostalAddress(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_UniqueIdentifier(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_UniquePostalName(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_UserNotice(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_V2Form(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_ValidationParms(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_Validity(p0, p1) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_VersionPKCS-1")(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_VersionPKIX1Explicit88(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_X121Address(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_X520CommonName(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_X520LocalityName(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_X520OrganizationName(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_X520OrganizationalUnitName(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_X520Pseudonym(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_X520SerialNumber(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_X520StateOrProvinceName(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_X520Title(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_X520countryName(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_X520dnQualifier(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_X520name(p0, p1) do
-    # body not decompiled
-  end
-
-  def enc_authorityInfoAccess(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_authorityKeyIdentifier(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_basicConstraints(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_cRLDistributionPoints(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_cRLNumber(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_cRLReasons(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_certificateIssuer(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_certificatePolicies(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_challengePassword(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_commonName(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_contentType(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_counterSignature(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_countryName(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_deltaCRLIndicator(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_dh(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_dnQualifier(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_domainComponent(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_dsa(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_dsa-with-sha1")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_dsaWithSHA1(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_ec-public-key")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_ecdsa-with-sha1")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_ecdsa-with-sha224")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_ecdsa-with-sha256")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_ecdsa-with-sha384")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_ecdsa-with-sha512")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_emailAddress(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_extKeyUsage(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_extensionRequest(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_failInfo(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_field-characteristic-two")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_field-prime-field")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_freshestCRL(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_generationQualifier(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_givenName(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_gn-basis")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_holdInstructionCode(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_inhibitAnyPolicy(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_initials(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_invalidityDate(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_issuerAltName(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_issuingDistributionPoint(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_kea(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_keyUsage(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_localityName(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_md2-with-rsa-encryption")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_md5-with-rsa-encryption")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_messageDigest(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_messageType(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_name(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_nameConstraints(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_organizationName(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_organizationalUnitName(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_pkiStatus(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_policyConstraints(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_policyMappings(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_pp-basis")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_privateKeyUsagePeriod(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_pseudonym(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_recipientNonce(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_rsa-encryption")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_senderNonce(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_serialNumber(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_sha-1with-rsa-encryption")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_sha1-with-rsa-encryption")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_sha224-with-rsa-encryption")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_sha256-with-rsa-encryption")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_sha384-with-rsa-encryption")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_sha512-with-rsa-encryption")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_signingTime(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_stateOrProvinceName(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_subjectAltName(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_subjectDirectoryAttributes(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_subjectInfoAccess(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_subjectKeyIdentifier(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_surname(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_title(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_tp-basis")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def enc_transactionID(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_x400-common-name")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_x400-extended-network-address")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_x400-extension-OR-address-components")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_x400-extension-physical-delivery-address-components")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_x400-local-postal-attributes")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_x400-pds-name")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_x400-physical-delivery-country-name")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_x400-physical-delivery-office-name")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_x400-physical-delivery-office-number")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_x400-physical-delivery-organization-name")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_x400-physical-delivery-personal-name")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_x400-post-office-box-address")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_x400-postal-code")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_x400-poste-restante-address")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_x400-street-address")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_x400-teletex-common-name")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_x400-teletex-domain-defined-attributes")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_x400-teletex-personal-name")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_x400-terminal-type")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_x400-unformatted-postal-address")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def unquote(:"enc_x400-unique-postal-name")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def encode(p0, p1) do
-    # body not decompiled
-  end
-
-  def encoding_rule() do
-    # body not decompiled
-  end
-
-  def encryptedData() do
-    # body not decompiled
-  end
-
-  def envelopedData() do
-    # body not decompiled
-  end
-
-  def unquote(:"extended-network-address")() do
-    # body not decompiled
-  end
-
-  def unquote(:"extension-OR-address-components")() do
-    # body not decompiled
-  end
-
-  def unquote(:"extension-physical-delivery-address-components")() do
-    # body not decompiled
-  end
-
-  def getdec_Authenticated(p0) do
-    # body not decompiled
-  end
-
-  def getdec_CRIAttributes(p0) do
-    # body not decompiled
-  end
-
-  def getdec_ContentEncryptionAlgorithms(p0) do
-    # body not decompiled
-  end
-
-  def getdec_Contents(p0) do
-    # body not decompiled
-  end
-
-  def getdec_DigestAlgorithms(p0) do
-    # body not decompiled
-  end
-
-  def getdec_DigestEncryptionAlgorithms(p0) do
-    # body not decompiled
-  end
-
-  def getdec_KeyEncryptionAlgorithms(p0) do
-    # body not decompiled
-  end
-
-  def getdec_PKInfoAlgorithms(p0) do
-    # body not decompiled
-  end
-
-  def getdec_SignatureAlgorithms(p0) do
-    # body not decompiled
-  end
-
-  def getdec_SupportedAttributeTypeAndValues(p0) do
-    # body not decompiled
-  end
-
-  def getdec_SupportedCharacteristicTwos(p0) do
-    # body not decompiled
-  end
-
-  def getdec_SupportedExtensionAttributes(p0) do
-    # body not decompiled
-  end
-
-  def getdec_SupportedExtensions(p0) do
-    # body not decompiled
-  end
-
-  def getdec_SupportedFieldIds(p0) do
-    # body not decompiled
-  end
-
-  def getdec_SupportedPublicKeyAlgorithms(p0) do
-    # body not decompiled
-  end
-
-  def getdec_SupportedSignatureAlgorithms(p0) do
-    # body not decompiled
-  end
-
-  def getdec_Unauthenticated(p0) do
-    # body not decompiled
-  end
-
-  def getdec_internal_object_set_argument_1(p0) do
-    # body not decompiled
-  end
-
-  def getdec_internal_object_set_argument_10(p0) do
-    # body not decompiled
-  end
-
-  def getdec_internal_object_set_argument_11(p0) do
-    # body not decompiled
-  end
-
-  def getdec_internal_object_set_argument_12(p0) do
-    # body not decompiled
-  end
-
-  def getdec_internal_object_set_argument_13(p0) do
-    # body not decompiled
-  end
-
-  def getdec_internal_object_set_argument_2(p0) do
-    # body not decompiled
-  end
-
-  def getdec_internal_object_set_argument_3(p0) do
-    # body not decompiled
-  end
-
-  def getdec_internal_object_set_argument_4(p0) do
-    # body not decompiled
-  end
-
-  def getdec_internal_object_set_argument_5(p0) do
-    # body not decompiled
-  end
-
-  def getdec_internal_object_set_argument_6(p0) do
-    # body not decompiled
-  end
-
-  def getdec_internal_object_set_argument_7(p0) do
-    # body not decompiled
-  end
-
-  def getdec_internal_object_set_argument_8(p0) do
-    # body not decompiled
-  end
-
-  def getdec_internal_object_set_argument_9(p0) do
-    # body not decompiled
-  end
-
-  def getenc_Authenticated(p0) do
-    # body not decompiled
-  end
-
-  def getenc_CRIAttributes(p0) do
-    # body not decompiled
-  end
-
-  def getenc_ContentEncryptionAlgorithms(p0) do
-    # body not decompiled
-  end
-
-  def getenc_Contents(p0) do
-    # body not decompiled
-  end
-
-  def getenc_DigestAlgorithms(p0) do
-    # body not decompiled
-  end
-
-  def getenc_DigestEncryptionAlgorithms(p0) do
-    # body not decompiled
-  end
-
-  def getenc_KeyEncryptionAlgorithms(p0) do
-    # body not decompiled
-  end
-
-  def getenc_PKInfoAlgorithms(p0) do
-    # body not decompiled
-  end
-
-  def getenc_SignatureAlgorithms(p0) do
-    # body not decompiled
-  end
-
-  def getenc_SupportedAttributeTypeAndValues(p0) do
-    # body not decompiled
-  end
-
-  def getenc_SupportedCharacteristicTwos(p0) do
-    # body not decompiled
-  end
-
-  def getenc_SupportedExtensionAttributes(p0) do
-    # body not decompiled
-  end
-
-  def getenc_SupportedExtensions(p0) do
-    # body not decompiled
-  end
-
-  def getenc_SupportedFieldIds(p0) do
-    # body not decompiled
-  end
-
-  def getenc_SupportedPublicKeyAlgorithms(p0) do
-    # body not decompiled
-  end
-
-  def getenc_SupportedSignatureAlgorithms(p0) do
-    # body not decompiled
-  end
-
-  def getenc_Unauthenticated(p0) do
-    # body not decompiled
-  end
-
-  def getenc_internal_object_set_argument_1(p0) do
-    # body not decompiled
-  end
-
-  def getenc_internal_object_set_argument_10(p0) do
-    # body not decompiled
-  end
-
-  def getenc_internal_object_set_argument_11(p0) do
-    # body not decompiled
-  end
-
-  def getenc_internal_object_set_argument_12(p0) do
-    # body not decompiled
-  end
-
-  def getenc_internal_object_set_argument_13(p0) do
-    # body not decompiled
-  end
-
-  def getenc_internal_object_set_argument_2(p0) do
-    # body not decompiled
-  end
-
-  def getenc_internal_object_set_argument_3(p0) do
-    # body not decompiled
-  end
-
-  def getenc_internal_object_set_argument_4(p0) do
-    # body not decompiled
-  end
-
-  def getenc_internal_object_set_argument_5(p0) do
-    # body not decompiled
-  end
-
-  def getenc_internal_object_set_argument_6(p0) do
-    # body not decompiled
-  end
-
-  def getenc_internal_object_set_argument_7(p0) do
-    # body not decompiled
-  end
-
-  def getenc_internal_object_set_argument_8(p0) do
-    # body not decompiled
-  end
-
-  def getenc_internal_object_set_argument_9(p0) do
-    # body not decompiled
-  end
-
-  def gnBasis() do
-    # body not decompiled
-  end
-
-  def holdInstruction() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-RSAES-OAEP")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-RSASSA-PSS")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-VeriSign")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-aca")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-aca-accessIdentity")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-aca-authenticationInfo")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-aca-chargingIdentity")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-aca-encAttrs")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-aca-group")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-ad")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-ad-caIssuers")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-ad-caRepository")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-ad-ocsp")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-ad-timeStamping")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-at")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-at-clearance")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-at-commonName")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-at-countryName")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-at-dnQualifier")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-at-generationQualifier")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-at-givenName")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-at-initials")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-at-localityName")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-at-name")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-at-organizationName")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-at-organizationalUnitName")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-at-pseudonym")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-at-role")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-at-serialNumber")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-at-stateOrProvinceName")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-at-surname")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-at-title")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-attributes")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-ce")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-ce-authorityKeyIdentifier")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-ce-basicConstraints")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-ce-cRLDistributionPoints")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-ce-cRLNumber")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-ce-cRLReasons")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-ce-certificateIssuer")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-ce-certificatePolicies")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-ce-deltaCRLIndicator")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-ce-extKeyUsage")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-ce-freshestCRL")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-ce-holdInstructionCode")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-ce-inhibitAnyPolicy")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-ce-invalidityDate")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-ce-issuerAltName")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-ce-issuingDistributionPoint")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-ce-keyUsage")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-ce-nameConstraints")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-ce-policyConstraints")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-ce-policyMappings")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-ce-privateKeyUsagePeriod")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-ce-subjectAltName")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-ce-subjectDirectoryAttributes")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-ce-subjectKeyIdentifier")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-ce-targetInformation")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-characteristic-two-basis")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-domainComponent")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-dsa")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-dsa-with-sha1")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-dsaWithSHA1")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-ecPublicKey")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-ecSigType")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-emailAddress")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-extensionReq")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-failInfo")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-fieldType")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-hmacWithSHA224")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-hmacWithSHA256")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-hmacWithSHA384")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-hmacWithSHA512")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-holdinstruction-callissuer")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-holdinstruction-none")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-holdinstruction-reject")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-keyExchangeAlgorithm")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-kp")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-kp-OCSPSigning")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-kp-clientAuth")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-kp-codeSigning")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-kp-emailProtection")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-kp-serverAuth")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-kp-timeStamping")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-md2")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-md5")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-messageType")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-mgf1")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-pSpecified")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-pe")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-pe-aaControls")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-pe-ac-auditIdentity")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-pe-ac-proxying")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-pe-authorityInfoAccess")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-pe-subjectInfoAccess")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-pki")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-pkiStatus")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-pkix")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-publicKeyType")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-qt")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-qt-cps")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-qt-unotice")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-recipientNonce")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-senderNonce")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-sha1")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-sha224")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-sha256")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-sha384")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-sha512")() do
-    # body not decompiled
-  end
-
-  def unquote(:"id-transId")() do
-    # body not decompiled
-  end
-
-  def info() do
-    # body not decompiled
-  end
-
-  def legacy_erlang_types() do
-    # body not decompiled
-  end
-
-  def unquote(:"local-postal-attributes")() do
-    # body not decompiled
-  end
-
-  def maps() do
-    # body not decompiled
-  end
-
-  def md2WithRSAEncryption() do
-    # body not decompiled
-  end
-
-  def md5WithRSAEncryption() do
-    # body not decompiled
-  end
+  def unquote(:"ansi-X9-62")(), do: ...
+
+  def anyExtendedKeyUsage(), do: ...
+
+  def anyPolicy(), do: ...
+
+  def bit_string_format(), do: ...
+
+  def brainpoolP160r1(), do: ...
+
+  def brainpoolP160t1(), do: ...
+
+  def brainpoolP192r1(), do: ...
+
+  def brainpoolP192t1(), do: ...
+
+  def brainpoolP224r1(), do: ...
+
+  def brainpoolP224t1(), do: ...
+
+  def brainpoolP256r1(), do: ...
+
+  def brainpoolP256t1(), do: ...
+
+  def brainpoolP320r1(), do: ...
+
+  def brainpoolP320t1(), do: ...
+
+  def brainpoolP384r1(), do: ...
+
+  def brainpoolP384t1(), do: ...
+
+  def brainpoolP512r1(), do: ...
+
+  def brainpoolP512t1(), do: ...
+
+  def unquote(:"certicom-arc")(), do: ...
+
+  def unquote(:"characteristic-two-field")(), do: ...
+
+  def unquote(:"common-name")(), do: ...
+
+  def data(), do: ...
+
+  def dec_AAControls(tlv, tagIn), do: ...
+
+  def dec_ACClearAttrs(tlv, tagIn), do: ...
+
+  def dec_AccessDescription(tlv, tagIn), do: ...
+
+  def dec_AdministrationDomainName(tlv, tagIn), do: ...
+
+  def dec_Algorithm(tlv, tagIn), do: ...
+
+  def dec_AlgorithmIdentifier(tlv, tagIn), do: ...
+
+  def dec_AlgorithmNull(tlv, tagIn), do: ...
+
+  def dec_AnotherName(tlv, tagIn), do: ...
+
+  def dec_Any(tlv, tagIn), do: ...
+
+  def dec_AttCertIssuer(tlv, tagIn), do: ...
+
+  def dec_AttCertValidityPeriod(tlv, tagIn), do: ...
+
+  def dec_AttCertVersion(tlv, tagIn), do: ...
+
+  def dec_AttrSpec(tlv, tagIn), do: ...
+
+  def dec_Attribute(tlv, tagIn), do: ...
+
+  def dec_AttributeCertificate(tlv, tagIn), do: ...
+
+  def dec_AttributeCertificateInfo(tlv, tagIn), do: ...
+
+  def dec_AttributeType(tlv, tagIn), do: ...
+
+  def dec_AttributeTypeAndValue(tlv, tagIn), do: ...
+
+  def dec_AttributeValue(tlv, tagIn), do: ...
+
+  def dec_AuthorityInfoAccessSyntax(tlv, tagIn), do: ...
+
+  def dec_AuthorityKeyIdentifier(tlv, tagIn), do: ...
+
+  def dec_BaseCRLNumber(tlv, tagIn), do: ...
+
+  def dec_BaseDistance(tlv, tagIn), do: ...
+
+  def dec_BasicConstraints(tlv, tagIn), do: ...
+
+  def dec_Boolean(tlv, tagIn), do: ...
+
+  def dec_BuiltInDomainDefinedAttribute(tlv, tagIn), do: ...
+
+  def dec_BuiltInDomainDefinedAttributes(tlv, tagIn), do: ...
+
+  def dec_BuiltInStandardAttributes(tlv, tagIn), do: ...
+
+  def dec_CPSuri(tlv, tagIn), do: ...
+
+  def dec_CRLDistributionPoints(tlv, tagIn), do: ...
+
+  def dec_CRLNumber(tlv, tagIn), do: ...
+
+  def dec_CRLReason(tlv, tagIn), do: ...
+
+  def dec_CRLSequence(tlv, tagIn), do: ...
+
+  def dec_CertPolicyId(tlv, tagIn), do: ...
+
+  def dec_Certificate(tlv, tagIn), do: ...
+
+  def dec_CertificateIssuer(tlv, tagIn), do: ...
+
+  def dec_CertificateList(tlv, tagIn), do: ...
+
+  def dec_CertificatePolicies(tlv, tagIn), do: ...
+
+  def dec_CertificateRevocationLists(tlv, tagIn), do: ...
+
+  def dec_CertificateSerialNumber(tlv, tagIn), do: ...
+
+  def dec_Certificates(tlv, tagIn), do: ...
+
+  def dec_CertificationRequest(tlv, tagIn), do: ...
+
+  def dec_CertificationRequestInfo(tlv, tagIn), do: ...
+
+  def unquote(:"dec_Characteristic-two")(tlv, tagIn), do: ...
+
+  def dec_ClassList(tlv, tagIn), do: ...
+
+  def dec_Clearance(tlv, tagIn), do: ...
+
+  def dec_CommonName(tlv, tagIn), do: ...
+
+  def dec_ContentEncryptionAlgorithmIdentifier(tlv, tagIn), do: ...
+
+  def dec_ContentInfo(tlv, tagIn), do: ...
+
+  def dec_ContentType(tlv, tagIn), do: ...
+
+  def dec_CountryName(tlv, tagIn), do: ...
+
+  def dec_Curve(tlv, tagIn), do: ...
+
+  def dec_DHParameter(tlv, tagIn), do: ...
+
+  def dec_DHPublicKey(tlv, tagIn), do: ...
+
+  def dec_DSAParams(tlv, tagIn), do: ...
+
+  def dec_DSAPrivateKey(tlv, tagIn), do: ...
+
+  def dec_DSAPublicKey(tlv, tagIn), do: ...
+
+  def dec_Data(tlv, tagIn), do: ...
+
+  def dec_Digest(tlv, tagIn), do: ...
+
+  def dec_DigestAlgorithmIdentifier(tlv, tagIn), do: ...
+
+  def dec_DigestAlgorithmIdentifiers(tlv, tagIn), do: ...
+
+  def dec_DigestEncryptionAlgorithmIdentifier(tlv, tagIn), do: ...
+
+  def dec_DigestInfoNull(tlv, tagIn), do: ...
+
+  def unquote(:"dec_DigestInfoPKCS-1")(tlv, tagIn), do: ...
+
+  def unquote(:"dec_DigestInfoPKCS-7")(tlv, tagIn), do: ...
+
+  def dec_DigestedData(tlv, tagIn), do: ...
+
+  def dec_DirectoryString(tlv, tagIn), do: ...
+
+  def dec_DisplayText(tlv, tagIn), do: ...
+
+  def dec_DistinguishedName(tlv, tagIn), do: ...
+
+  def dec_DistributionPoint(tlv, tagIn), do: ...
+
+  def dec_DistributionPointName(tlv, tagIn), do: ...
+
+  def dec_DomainComponent(tlv, tagIn), do: ...
+
+  def dec_DomainParameters(tlv, tagIn), do: ...
+
+  def unquote(:"dec_Dss-Parms")(tlv, tagIn), do: ...
+
+  def unquote(:"dec_Dss-Sig-Value")(tlv, tagIn), do: ...
+
+  def unquote(:"dec_ECDSA-Sig-Value")(tlv, tagIn), do: ...
+
+  def dec_ECPVer(tlv, tagIn), do: ...
+
+  def dec_ECParameters(tlv, tagIn), do: ...
+
+  def dec_ECPoint(tlv, tagIn), do: ...
+
+  def dec_ECPrivateKey(tlv, tagIn), do: ...
+
+  def dec_EDIPartyName(tlv, tagIn), do: ...
+
+  def dec_EcpkParameters(tlv, tagIn), do: ...
+
+  def dec_EmailAddress(tlv, tagIn), do: ...
+
+  def dec_EncryptedContent(tlv, tagIn), do: ...
+
+  def dec_EncryptedContentInfo(tlv, tagIn), do: ...
+
+  def dec_EncryptedData(tlv, tagIn), do: ...
+
+  def dec_EncryptedDigest(tlv, tagIn), do: ...
+
+  def dec_EncryptedKey(tlv, tagIn), do: ...
+
+  def dec_EnvelopedData(tlv, tagIn), do: ...
+
+  def dec_ExtKeyUsageSyntax(tlv, tagIn), do: ...
+
+  def dec_ExtendedCertificate(tlv, tagIn), do: ...
+
+  def dec_ExtendedCertificateOrCertificate(tlv, tagIn), do: ...
+
+  def dec_ExtendedCertificatesAndCertificates(tlv, tagIn), do: ...
+
+  def dec_ExtendedNetworkAddress(tlv, tagIn), do: ...
+
+  def dec_Extension(tlv, tagIn), do: ...
+
+  def unquote(:"dec_Extension-Any")(tlv, tagIn), do: ...
+
+  def dec_ExtensionAttribute(tlv, tagIn), do: ...
+
+  def dec_ExtensionAttributes(tlv, tagIn), do: ...
+
+  def dec_ExtensionORAddressComponents(tlv, tagIn), do: ...
+
+  def dec_ExtensionPhysicalDeliveryAddressComponents(tlv, tagIn), do: ...
+
+  def dec_ExtensionRequest(tlv, tagIn), do: ...
+
+  def dec_Extensions(tlv, tagIn), do: ...
+
+  def dec_FieldElement(tlv, tagIn), do: ...
+
+  def dec_FieldID(tlv, tagIn), do: ...
+
+  def dec_FreshestCRL(tlv, tagIn), do: ...
+
+  def dec_GeneralName(tlv, tagIn), do: ...
+
+  def dec_GeneralNames(tlv, tagIn), do: ...
+
+  def dec_GeneralSubtree(tlv, tagIn), do: ...
+
+  def dec_GeneralSubtrees(tlv, tagIn), do: ...
+
+  def dec_HoldInstructionCode(tlv, tagIn), do: ...
+
+  def dec_Holder(tlv, tagIn), do: ...
+
+  def dec_IetfAttrSyntax(tlv, tagIn), do: ...
+
+  def dec_InhibitAnyPolicy(tlv, tagIn), do: ...
+
+  def dec_InvalidityDate(tlv, tagIn), do: ...
+
+  def dec_IssuerAltName(tlv, tagIn), do: ...
+
+  def dec_IssuerAndSerialNumber(tlv, tagIn), do: ...
+
+  def dec_IssuerSerial(tlv, tagIn), do: ...
+
+  def dec_IssuingDistributionPoint(tlv, tagIn), do: ...
+
+  def unquote(:"dec_KEA-Parms-Id")(tlv, tagIn), do: ...
+
+  def unquote(:"dec_KEA-PublicKey")(tlv, tagIn), do: ...
+
+  def dec_KeyEncryptionAlgorithmIdentifier(tlv, tagIn), do: ...
+
+  def dec_KeyIdentifier(tlv, tagIn), do: ...
+
+  def dec_KeyPurposeId(tlv, tagIn), do: ...
+
+  def dec_KeyUsage(tlv, tagIn), do: ...
+
+  def dec_LocalPostalAttributes(tlv, tagIn), do: ...
+
+  def dec_MessageDigest(tlv, tagIn), do: ...
+
+  def dec_Name(tlv, tagIn), do: ...
+
+  def dec_NameConstraints(tlv, tagIn), do: ...
+
+  def dec_NetworkAddress(tlv, tagIn), do: ...
+
+  def dec_NoticeReference(tlv, tagIn), do: ...
+
+  def dec_NumericUserIdentifier(tlv, tagIn), do: ...
+
+  def dec_ORAddress(tlv, tagIn), do: ...
+
+  def unquote(:"dec_OTP-X520countryname")(tlv, tagIn), do: ...
+
+  def unquote(:"dec_OTP-emailAddress")(tlv, tagIn), do: ...
+
+  def dec_OTPAttributeTypeAndValue(tlv, tagIn), do: ...
+
+  def dec_OTPCertificate(tlv, tagIn), do: ...
+
+  def unquote(:"dec_OTPCharacteristic-two")(tlv, tagIn), do: ...
+
+  def dec_OTPExtension(tlv, tagIn), do: ...
+
+  def dec_OTPExtensionAttribute(tlv, tagIn), do: ...
+
+  def dec_OTPExtensionAttributes(tlv, tagIn), do: ...
+
+  def dec_OTPExtensions(tlv, tagIn), do: ...
+
+  def dec_OTPFieldID(tlv, tagIn), do: ...
+
+  def dec_OTPOLDSubjectPublicKeyInfo(tlv, tagIn), do: ...
+
+  def dec_OTPSubjectPublicKeyInfo(tlv, tagIn), do: ...
+
+  def unquote(:"dec_OTPSubjectPublicKeyInfo-Any")(tlv, tagIn), do: ...
+
+  def dec_OTPTBSCertificate(tlv, tagIn), do: ...
+
+  def dec_ObjId(tlv, tagIn), do: ...
+
+  def dec_ObjectDigestInfo(tlv, tagIn), do: ...
+
+  def dec_OrganizationName(tlv, tagIn), do: ...
+
+  def dec_OrganizationalUnitName(tlv, tagIn), do: ...
+
+  def dec_OrganizationalUnitNames(tlv, tagIn), do: ...
+
+  def dec_OtherPrimeInfo(tlv, tagIn), do: ...
+
+  def dec_OtherPrimeInfos(tlv, tagIn), do: ...
+
+  def dec_PDSName(tlv, tagIn), do: ...
+
+  def dec_PDSParameter(tlv, tagIn), do: ...
+
+  def dec_Pentanomial(tlv, tagIn), do: ...
+
+  def dec_PersonalName(tlv, tagIn), do: ...
+
+  def dec_PhysicalDeliveryCountryName(tlv, tagIn), do: ...
+
+  def dec_PhysicalDeliveryOfficeName(tlv, tagIn), do: ...
+
+  def dec_PhysicalDeliveryOfficeNumber(tlv, tagIn), do: ...
+
+  def dec_PhysicalDeliveryOrganizationName(tlv, tagIn), do: ...
+
+  def dec_PhysicalDeliveryPersonalName(tlv, tagIn), do: ...
+
+  def dec_PolicyConstraints(tlv, tagIn), do: ...
+
+  def dec_PolicyInformation(tlv, tagIn), do: ...
+
+  def dec_PolicyMappings(tlv, tagIn), do: ...
+
+  def dec_PolicyQualifierId(tlv, tagIn), do: ...
+
+  def dec_PolicyQualifierInfo(tlv, tagIn), do: ...
+
+  def dec_PostOfficeBoxAddress(tlv, tagIn), do: ...
+
+  def dec_PostalCode(tlv, tagIn), do: ...
+
+  def dec_PosteRestanteAddress(tlv, tagIn), do: ...
+
+  def dec_PresentationAddress(tlv, tagIn), do: ...
+
+  def unquote(:"dec_Prime-p")(tlv, tagIn), do: ...
+
+  def dec_PrivateDomainName(tlv, tagIn), do: ...
+
+  def dec_PrivateKeyUsagePeriod(tlv, tagIn), do: ...
+
+  def dec_ProxyInfo(tlv, tagIn), do: ...
+
+  def dec_PublicKeyAlgorithm(tlv, tagIn), do: ...
+
+  def dec_RDNSequence(tlv, tagIn), do: ...
+
+  def dec_RSAPrivateKey(tlv, tagIn), do: ...
+
+  def dec_RSAPublicKey(tlv, tagIn), do: ...
+
+  def unquote(:"dec_RSASSA-PSS-params")(tlv, tagIn), do: ...
+
+  def dec_ReasonFlags(tlv, tagIn), do: ...
+
+  def dec_RecipientInfo(tlv, tagIn), do: ...
+
+  def dec_RecipientInfos(tlv, tagIn), do: ...
+
+  def dec_RelativeDistinguishedName(tlv, tagIn), do: ...
+
+  def dec_RoleSyntax(tlv, tagIn), do: ...
+
+  def dec_SecurityCategory(tlv, tagIn), do: ...
+
+  def dec_SignatureAlgorithm(tlv, tagIn), do: ...
+
+  def unquote(:"dec_SignatureAlgorithm-Any")(tlv, tagIn), do: ...
+
+  def dec_SignedAndEnvelopedData(tlv, tagIn), do: ...
+
+  def dec_SignedData(tlv, tagIn), do: ...
+
+  def dec_SignerInfo(tlv, tagIn), do: ...
+
+  def dec_SignerInfoAuthenticatedAttributes(tlv, tagIn), do: ...
+
+  def dec_SignerInfos(tlv, tagIn), do: ...
+
+  def dec_SigningTime(tlv, tagIn), do: ...
+
+  def dec_SkipCerts(tlv, tagIn), do: ...
+
+  def dec_StreetAddress(tlv, tagIn), do: ...
+
+  def dec_SubjectAltName(tlv, tagIn), do: ...
+
+  def dec_SubjectDirectoryAttributes(tlv, tagIn), do: ...
+
+  def dec_SubjectInfoAccessSyntax(tlv, tagIn), do: ...
+
+  def dec_SubjectKeyIdentifier(tlv, tagIn), do: ...
+
+  def dec_SubjectPublicKeyInfo(tlv, tagIn), do: ...
+
+  def dec_SvceAuthInfo(tlv, tagIn), do: ...
+
+  def dec_TBSCertList(tlv, tagIn), do: ...
+
+  def dec_TBSCertificate(tlv, tagIn), do: ...
+
+  def dec_Target(tlv, tagIn), do: ...
+
+  def dec_TargetCert(tlv, tagIn), do: ...
+
+  def dec_Targets(tlv, tagIn), do: ...
+
+  def dec_TeletexCommonName(tlv, tagIn), do: ...
+
+  def dec_TeletexDomainDefinedAttribute(tlv, tagIn), do: ...
+
+  def dec_TeletexDomainDefinedAttributes(tlv, tagIn), do: ...
+
+  def dec_TeletexOrganizationName(tlv, tagIn), do: ...
+
+  def dec_TeletexOrganizationalUnitName(tlv, tagIn), do: ...
+
+  def dec_TeletexOrganizationalUnitNames(tlv, tagIn), do: ...
+
+  def dec_TeletexPersonalName(tlv, tagIn), do: ...
+
+  def dec_TerminalIdentifier(tlv, tagIn), do: ...
+
+  def dec_TerminalType(tlv, tagIn), do: ...
+
+  def dec_Time(tlv, tagIn), do: ...
+
+  def dec_TrailerField(tlv, tagIn), do: ...
+
+  def dec_Trinomial(tlv, tagIn), do: ...
+
+  def dec_UnformattedPostalAddress(tlv, tagIn), do: ...
+
+  def dec_UniqueIdentifier(tlv, tagIn), do: ...
+
+  def dec_UniquePostalName(tlv, tagIn), do: ...
+
+  def dec_UserNotice(tlv, tagIn), do: ...
+
+  def dec_V2Form(tlv, tagIn), do: ...
+
+  def dec_ValidationParms(tlv, tagIn), do: ...
+
+  def dec_Validity(tlv, tagIn), do: ...
+
+  def unquote(:"dec_VersionPKCS-1")(tlv, tagIn), do: ...
+
+  def dec_VersionPKIX1Explicit88(tlv, tagIn), do: ...
+
+  def dec_X121Address(tlv, tagIn), do: ...
+
+  def dec_X520CommonName(tlv, tagIn), do: ...
+
+  def dec_X520LocalityName(tlv, tagIn), do: ...
+
+  def dec_X520OrganizationName(tlv, tagIn), do: ...
+
+  def dec_X520OrganizationalUnitName(tlv, tagIn), do: ...
+
+  def dec_X520Pseudonym(tlv, tagIn), do: ...
+
+  def dec_X520SerialNumber(tlv, tagIn), do: ...
+
+  def dec_X520StateOrProvinceName(tlv, tagIn), do: ...
+
+  def dec_X520Title(tlv, tagIn), do: ...
+
+  def dec_X520countryName(tlv, tagIn), do: ...
+
+  def dec_X520dnQualifier(tlv, tagIn), do: ...
+
+  def dec_X520name(tlv, tagIn), do: ...
+
+  def dec_authorityInfoAccess(:"Type", bytes, _), do: ...
+
+  def dec_authorityKeyIdentifier(:"Type", bytes, _), do: ...
+
+  def dec_basicConstraints(:"Type", bytes, _), do: ...
+
+  def dec_cRLDistributionPoints(:"Type", bytes, _), do: ...
+
+  def dec_cRLNumber(:"Type", bytes, _), do: ...
+
+  def dec_cRLReasons(:"Type", bytes, _), do: ...
+
+  def dec_certificateIssuer(:"Type", bytes, _), do: ...
+
+  def dec_certificatePolicies(:"Type", bytes, _), do: ...
+
+  def dec_challengePassword(:derivation, _, _), do: ...
+
+  def dec_challengePassword(:"Type", bytes, _), do: ...
+
+  def dec_challengePassword(:"equality-match", _, _), do: ...
+
+  def dec_challengePassword(:"ordering-match", _, _), do: ...
+
+  def dec_challengePassword(:"substrings-match", _, _), do: ...
+
+  def dec_commonName(:"Type", bytes, _), do: ...
+
+  def dec_contentType(:derivation, _, _), do: ...
+
+  def dec_contentType(:"Type", bytes, _), do: ...
+
+  def dec_contentType(:"equality-match", _, _), do: ...
+
+  def dec_contentType(:"ordering-match", _, _), do: ...
+
+  def dec_contentType(:"substrings-match", _, _), do: ...
+
+  def dec_counterSignature(:derivation, _, _), do: ...
+
+  def dec_counterSignature(:"Type", bytes, _), do: ...
+
+  def dec_counterSignature(:"equality-match", _, _), do: ...
+
+  def dec_counterSignature(:"ordering-match", _, _), do: ...
+
+  def dec_counterSignature(:"substrings-match", _, _), do: ...
+
+  def dec_countryName(:"Type", bytes, _), do: ...
+
+  def dec_deltaCRLIndicator(:"Type", bytes, _), do: ...
+
+  def dec_dh(:"Type", bytes, _), do: ...
+
+  def dec_dh(:"PublicKeyType", bytes, _), do: ...
+
+  def dec_dnQualifier(:"Type", bytes, _), do: ...
+
+  def dec_domainComponent(:"Type", bytes, _), do: ...
+
+  def dec_dsa(:"Type", bytes, _), do: ...
+
+  def dec_dsa(:"PublicKeyType", bytes, _), do: ...
+
+  def unquote(:"dec_dsa-with-sha1")(:"Type", bytes, _), do: ...
+
+  def dec_dsaWithSHA1(:"Type", bytes, _), do: ...
+
+  def unquote(:"dec_ec-public-key")(:"Type", bytes, _), do: ...
+
+  def unquote(:"dec_ec-public-key")(:"PublicKeyType", bytes, _), do: ...
+
+  def unquote(:"dec_ecdsa-with-sha1")(:"Type", bytes, _), do: ...
+
+  def unquote(:"dec_ecdsa-with-sha224")(:"Type", bytes, _), do: ...
+
+  def unquote(:"dec_ecdsa-with-sha256")(:"Type", bytes, _), do: ...
+
+  def unquote(:"dec_ecdsa-with-sha384")(:"Type", bytes, _), do: ...
+
+  def unquote(:"dec_ecdsa-with-sha512")(:"Type", bytes, _), do: ...
+
+  def dec_emailAddress(:"Type", bytes, _), do: ...
+
+  def dec_extKeyUsage(:"Type", bytes, _), do: ...
+
+  def dec_extensionRequest(:derivation, _, _), do: ...
+
+  def dec_extensionRequest(:"Type", bytes, _), do: ...
+
+  def dec_extensionRequest(:"equality-match", _, _), do: ...
+
+  def dec_extensionRequest(:"ordering-match", _, _), do: ...
+
+  def dec_extensionRequest(:"substrings-match", _, _), do: ...
+
+  def dec_failInfo(:derivation, _, _), do: ...
+
+  def dec_failInfo(:"Type", bytes, _), do: ...
+
+  def dec_failInfo(:"equality-match", _, _), do: ...
+
+  def dec_failInfo(:"ordering-match", _, _), do: ...
+
+  def dec_failInfo(:"substrings-match", _, _), do: ...
+
+  def unquote(:"dec_field-characteristic-two")(:"Type", bytes, _), do: ...
+
+  def unquote(:"dec_field-prime-field")(:"Type", bytes, _), do: ...
+
+  def dec_freshestCRL(:"Type", bytes, _), do: ...
+
+  def dec_generationQualifier(:"Type", bytes, _), do: ...
+
+  def dec_givenName(:"Type", bytes, _), do: ...
+
+  def unquote(:"dec_gn-basis")(:"Type", bytes, _), do: ...
+
+  def dec_holdInstructionCode(:"Type", bytes, _), do: ...
+
+  def dec_inhibitAnyPolicy(:"Type", bytes, _), do: ...
+
+  def dec_initials(:"Type", bytes, _), do: ...
+
+  def dec_invalidityDate(:"Type", bytes, _), do: ...
+
+  def dec_issuerAltName(:"Type", bytes, _), do: ...
+
+  def dec_issuingDistributionPoint(:"Type", bytes, _), do: ...
+
+  def dec_kea(:"Type", bytes, _), do: ...
+
+  def dec_kea(:"PublicKeyType", bytes, _), do: ...
+
+  def dec_keyUsage(:"Type", bytes, _), do: ...
+
+  def dec_localityName(:"Type", bytes, _), do: ...
+
+  def unquote(:"dec_md2-with-rsa-encryption")(:"Type", bytes, _), do: ...
+
+  def unquote(:"dec_md5-with-rsa-encryption")(:"Type", bytes, _), do: ...
+
+  def dec_messageDigest(:derivation, _, _), do: ...
+
+  def dec_messageDigest(:"Type", bytes, _), do: ...
+
+  def dec_messageDigest(:"equality-match", _, _), do: ...
+
+  def dec_messageDigest(:"ordering-match", _, _), do: ...
+
+  def dec_messageDigest(:"substrings-match", _, _), do: ...
+
+  def dec_messageType(:derivation, _, _), do: ...
+
+  def dec_messageType(:"Type", bytes, _), do: ...
+
+  def dec_messageType(:"equality-match", _, _), do: ...
+
+  def dec_messageType(:"ordering-match", _, _), do: ...
+
+  def dec_messageType(:"substrings-match", _, _), do: ...
+
+  def dec_name(:"Type", bytes, _), do: ...
+
+  def dec_nameConstraints(:"Type", bytes, _), do: ...
+
+  def dec_organizationName(:"Type", bytes, _), do: ...
+
+  def dec_organizationalUnitName(:"Type", bytes, _), do: ...
+
+  def dec_pkiStatus(:derivation, _, _), do: ...
+
+  def dec_pkiStatus(:"Type", bytes, _), do: ...
+
+  def dec_pkiStatus(:"equality-match", _, _), do: ...
+
+  def dec_pkiStatus(:"ordering-match", _, _), do: ...
+
+  def dec_pkiStatus(:"substrings-match", _, _), do: ...
+
+  def dec_policyConstraints(:"Type", bytes, _), do: ...
+
+  def dec_policyMappings(:"Type", bytes, _), do: ...
+
+  def unquote(:"dec_pp-basis")(:"Type", bytes, _), do: ...
+
+  def dec_privateKeyUsagePeriod(:"Type", bytes, _), do: ...
+
+  def dec_pseudonym(:"Type", bytes, _), do: ...
+
+  def dec_recipientNonce(:derivation, _, _), do: ...
+
+  def dec_recipientNonce(:"Type", bytes, _), do: ...
+
+  def dec_recipientNonce(:"equality-match", _, _), do: ...
+
+  def dec_recipientNonce(:"ordering-match", _, _), do: ...
+
+  def dec_recipientNonce(:"substrings-match", _, _), do: ...
+
+  def unquote(:"dec_rsa-encryption")(:"Type", bytes, _), do: ...
+
+  def unquote(:"dec_rsa-encryption")(:"PublicKeyType", bytes, _), do: ...
+
+  def dec_senderNonce(:derivation, _, _), do: ...
+
+  def dec_senderNonce(:"Type", bytes, _), do: ...
+
+  def dec_senderNonce(:"equality-match", _, _), do: ...
+
+  def dec_senderNonce(:"ordering-match", _, _), do: ...
+
+  def dec_senderNonce(:"substrings-match", _, _), do: ...
+
+  def dec_serialNumber(:"Type", bytes, _), do: ...
+
+  def unquote(:"dec_sha-1with-rsa-encryption")(:"Type", bytes, _), do: ...
+
+  def unquote(:"dec_sha1-with-rsa-encryption")(:"Type", bytes, _), do: ...
+
+  def unquote(:"dec_sha224-with-rsa-encryption")(:"Type", bytes, _), do: ...
+
+  def unquote(:"dec_sha256-with-rsa-encryption")(:"Type", bytes, _), do: ...
+
+  def unquote(:"dec_sha384-with-rsa-encryption")(:"Type", bytes, _), do: ...
+
+  def unquote(:"dec_sha512-with-rsa-encryption")(:"Type", bytes, _), do: ...
+
+  def dec_signingTime(:derivation, _, _), do: ...
+
+  def dec_signingTime(:"Type", bytes, _), do: ...
+
+  def dec_signingTime(:"equality-match", _, _), do: ...
+
+  def dec_signingTime(:"ordering-match", _, _), do: ...
+
+  def dec_signingTime(:"substrings-match", _, _), do: ...
+
+  def dec_stateOrProvinceName(:"Type", bytes, _), do: ...
+
+  def dec_subjectAltName(:"Type", bytes, _), do: ...
+
+  def dec_subjectDirectoryAttributes(:"Type", bytes, _), do: ...
+
+  def dec_subjectInfoAccess(:"Type", bytes, _), do: ...
+
+  def dec_subjectKeyIdentifier(:"Type", bytes, _), do: ...
+
+  def dec_surname(:"Type", bytes, _), do: ...
+
+  def dec_title(:"Type", bytes, _), do: ...
+
+  def unquote(:"dec_tp-basis")(:"Type", bytes, _), do: ...
+
+  def dec_transactionID(:derivation, _, _), do: ...
+
+  def dec_transactionID(:"Type", bytes, _), do: ...
+
+  def dec_transactionID(:"equality-match", _, _), do: ...
+
+  def dec_transactionID(:"ordering-match", _, _), do: ...
+
+  def dec_transactionID(:"substrings-match", _, _), do: ...
+
+  def unquote(:"dec_x400-common-name")(:"Type", bytes, _), do: ...
+
+  def unquote(:"dec_x400-extended-network-address")(:"Type", bytes, _), do: ...
+
+  def unquote(:"dec_x400-extension-OR-address-components")(:"Type", bytes, _), do: ...
+
+  def unquote(:"dec_x400-extension-physical-delivery-address-components")(:"Type", bytes, _), do: ...
+
+  def unquote(:"dec_x400-local-postal-attributes")(:"Type", bytes, _), do: ...
+
+  def unquote(:"dec_x400-pds-name")(:"Type", bytes, _), do: ...
+
+  def unquote(:"dec_x400-physical-delivery-country-name")(:"Type", bytes, _), do: ...
+
+  def unquote(:"dec_x400-physical-delivery-office-name")(:"Type", bytes, _), do: ...
+
+  def unquote(:"dec_x400-physical-delivery-office-number")(:"Type", bytes, _), do: ...
+
+  def unquote(:"dec_x400-physical-delivery-organization-name")(:"Type", bytes, _), do: ...
+
+  def unquote(:"dec_x400-physical-delivery-personal-name")(:"Type", bytes, _), do: ...
+
+  def unquote(:"dec_x400-post-office-box-address")(:"Type", bytes, _), do: ...
+
+  def unquote(:"dec_x400-postal-code")(:"Type", bytes, _), do: ...
+
+  def unquote(:"dec_x400-poste-restante-address")(:"Type", bytes, _), do: ...
+
+  def unquote(:"dec_x400-street-address")(:"Type", bytes, _), do: ...
+
+  def unquote(:"dec_x400-teletex-common-name")(:"Type", bytes, _), do: ...
+
+  def unquote(:"dec_x400-teletex-domain-defined-attributes")(:"Type", bytes, _), do: ...
+
+  def unquote(:"dec_x400-teletex-personal-name")(:"Type", bytes, _), do: ...
+
+  def unquote(:"dec_x400-terminal-type")(:"Type", bytes, _), do: ...
+
+  def unquote(:"dec_x400-unformatted-postal-address")(:"Type", bytes, _), do: ...
+
+  def unquote(:"dec_x400-unique-postal-name")(:"Type", bytes, _), do: ...
+
+  def decode(type, data), do: ...
+
+  def decode_TBSCertList_exclusive(bytes), do: ...
+
+  def decode_TBSCert_exclusive(bytes), do: ...
+
+  def decode_part(type, data0) when is_binary(data0), do: ...
+
+  def decode_part(type, data0), do: ...
+
+  def dhKeyAgreement(), do: ...
+
+  def dhpublicnumber(), do: ...
+
+  def unquote(:"dialyzer-suppressions")(arg), do: ...
+
+  def digestedData(), do: ...
+
+  def ecStdCurvesAndGeneration(), do: ...
+
+  def unquote(:"ecdsa-with-SHA1")(), do: ...
+
+  def unquote(:"ecdsa-with-SHA2")(), do: ...
+
+  def unquote(:"ecdsa-with-SHA224")(), do: ...
+
+  def unquote(:"ecdsa-with-SHA256")(), do: ...
+
+  def unquote(:"ecdsa-with-SHA384")(), do: ...
+
+  def unquote(:"ecdsa-with-SHA512")(), do: ...
+
+  def ellipticCurve(), do: ...
+
+  def ellipticCurveRFC5639(), do: ...
+
+  def enc_AAControls(val, tagIn), do: ...
+
+  def enc_ACClearAttrs(val, tagIn), do: ...
+
+  def enc_AccessDescription(val, tagIn), do: ...
+
+  def enc_AdministrationDomainName(val, tagIn), do: ...
+
+  def enc_Algorithm(val, tagIn), do: ...
+
+  def enc_AlgorithmIdentifier(val, tagIn), do: ...
+
+  def enc_AlgorithmNull(val, tagIn), do: ...
+
+  def enc_AnotherName(val, tagIn), do: ...
+
+  def enc_Any(val, tagIn), do: ...
+
+  def enc_AttCertIssuer(val, tagIn), do: ...
+
+  def enc_AttCertValidityPeriod(val, tagIn), do: ...
+
+  def enc_AttCertVersion(val, tagIn), do: ...
+
+  def enc_AttrSpec(val, tagIn), do: ...
+
+  def enc_Attribute(val, tagIn), do: ...
+
+  def enc_AttributeCertificate(val, tagIn), do: ...
+
+  def enc_AttributeCertificateInfo(val, tagIn), do: ...
+
+  def enc_AttributeType(val, tagIn), do: ...
+
+  def enc_AttributeTypeAndValue(val, tagIn), do: ...
+
+  def enc_AttributeValue(val, tagIn), do: ...
+
+  def enc_AuthorityInfoAccessSyntax(val, tagIn), do: ...
+
+  def enc_AuthorityKeyIdentifier(val, tagIn), do: ...
+
+  def enc_BaseCRLNumber(val, tagIn), do: ...
+
+  def enc_BaseDistance(val, tagIn), do: ...
+
+  def enc_BasicConstraints(val, tagIn), do: ...
+
+  def enc_Boolean(val, tagIn), do: ...
+
+  def enc_BuiltInDomainDefinedAttribute(val, tagIn), do: ...
+
+  def enc_BuiltInDomainDefinedAttributes(val, tagIn), do: ...
+
+  def enc_BuiltInStandardAttributes(val, tagIn), do: ...
+
+  def enc_CPSuri(val, tagIn), do: ...
+
+  def enc_CRLDistributionPoints(val, tagIn), do: ...
+
+  def enc_CRLNumber(val, tagIn), do: ...
+
+  def enc_CRLReason(val, tagIn), do: ...
+
+  def enc_CRLSequence(val, tagIn), do: ...
+
+  def enc_CertPolicyId(val, tagIn), do: ...
+
+  def enc_Certificate(val, tagIn), do: ...
+
+  def enc_CertificateIssuer(val, tagIn), do: ...
+
+  def enc_CertificateList(val, tagIn), do: ...
+
+  def enc_CertificatePolicies(val, tagIn), do: ...
+
+  def enc_CertificateRevocationLists(val, tagIn), do: ...
+
+  def enc_CertificateSerialNumber(val, tagIn), do: ...
+
+  def enc_Certificates(val, tagIn), do: ...
+
+  def enc_CertificationRequest(val, tagIn), do: ...
+
+  def enc_CertificationRequestInfo(val, tagIn), do: ...
+
+  def unquote(:"enc_Characteristic-two")(val, tagIn), do: ...
+
+  def enc_ClassList(val, tagIn), do: ...
+
+  def enc_Clearance(val, tagIn), do: ...
+
+  def enc_CommonName(val, tagIn), do: ...
+
+  def enc_ContentEncryptionAlgorithmIdentifier(val, tagIn), do: ...
+
+  def enc_ContentInfo(val, tagIn), do: ...
+
+  def enc_ContentType(val, tagIn), do: ...
+
+  def enc_CountryName(val, tagIn), do: ...
+
+  def enc_Curve(val, tagIn), do: ...
+
+  def enc_DHParameter(val, tagIn), do: ...
+
+  def enc_DHPublicKey(val, tagIn), do: ...
+
+  def enc_DSAParams(val, tagIn), do: ...
+
+  def enc_DSAPrivateKey(val, tagIn), do: ...
+
+  def enc_DSAPublicKey(val, tagIn), do: ...
+
+  def enc_Data(val, tagIn), do: ...
+
+  def enc_Digest(val, tagIn), do: ...
+
+  def enc_DigestAlgorithmIdentifier(val, tagIn), do: ...
+
+  def enc_DigestAlgorithmIdentifiers(val, tagIn), do: ...
+
+  def enc_DigestEncryptionAlgorithmIdentifier(val, tagIn), do: ...
+
+  def enc_DigestInfoNull(val, tagIn), do: ...
+
+  def unquote(:"enc_DigestInfoPKCS-1")(val, tagIn), do: ...
+
+  def unquote(:"enc_DigestInfoPKCS-7")(val, tagIn), do: ...
+
+  def enc_DigestedData(val, tagIn), do: ...
+
+  def enc_DirectoryString(val, tagIn), do: ...
+
+  def enc_DisplayText(val, tagIn), do: ...
+
+  def enc_DistinguishedName(val, tagIn), do: ...
+
+  def enc_DistributionPoint(val, tagIn), do: ...
+
+  def enc_DistributionPointName(val, tagIn), do: ...
+
+  def enc_DomainComponent(val, tagIn), do: ...
+
+  def enc_DomainParameters(val, tagIn), do: ...
+
+  def unquote(:"enc_Dss-Parms")(val, tagIn), do: ...
+
+  def unquote(:"enc_Dss-Sig-Value")(val, tagIn), do: ...
+
+  def unquote(:"enc_ECDSA-Sig-Value")(val, tagIn), do: ...
+
+  def enc_ECPVer(val, tagIn), do: ...
+
+  def enc_ECParameters(val, tagIn), do: ...
+
+  def enc_ECPoint(val, tagIn), do: ...
+
+  def enc_ECPrivateKey(val, tagIn), do: ...
+
+  def enc_EDIPartyName(val, tagIn), do: ...
+
+  def enc_EcpkParameters(val, tagIn), do: ...
+
+  def enc_EmailAddress(val, tagIn), do: ...
+
+  def enc_EncryptedContent(val, tagIn), do: ...
+
+  def enc_EncryptedContentInfo(val, tagIn), do: ...
+
+  def enc_EncryptedData(val, tagIn), do: ...
+
+  def enc_EncryptedDigest(val, tagIn), do: ...
+
+  def enc_EncryptedKey(val, tagIn), do: ...
+
+  def enc_EnvelopedData(val, tagIn), do: ...
+
+  def enc_ExtKeyUsageSyntax(val, tagIn), do: ...
+
+  def enc_ExtendedCertificate(val, tagIn), do: ...
+
+  def enc_ExtendedCertificateOrCertificate(val, tagIn), do: ...
+
+  def enc_ExtendedCertificatesAndCertificates(val, tagIn), do: ...
+
+  def enc_ExtendedNetworkAddress(val, tagIn), do: ...
+
+  def enc_Extension(val, tagIn), do: ...
+
+  def unquote(:"enc_Extension-Any")(val, tagIn), do: ...
+
+  def enc_ExtensionAttribute(val, tagIn), do: ...
+
+  def enc_ExtensionAttributes(val, tagIn), do: ...
+
+  def enc_ExtensionORAddressComponents(val, tagIn), do: ...
+
+  def enc_ExtensionPhysicalDeliveryAddressComponents(val, tagIn), do: ...
+
+  def enc_ExtensionRequest(val, tagIn), do: ...
+
+  def enc_Extensions(val, tagIn), do: ...
+
+  def enc_FieldElement(val, tagIn), do: ...
+
+  def enc_FieldID(val, tagIn), do: ...
+
+  def enc_FreshestCRL(val, tagIn), do: ...
+
+  def enc_GeneralName(val, tagIn), do: ...
+
+  def enc_GeneralNames(val, tagIn), do: ...
+
+  def enc_GeneralSubtree(val, tagIn), do: ...
+
+  def enc_GeneralSubtrees(val, tagIn), do: ...
+
+  def enc_HoldInstructionCode(val, tagIn), do: ...
+
+  def enc_Holder(val, tagIn), do: ...
+
+  def enc_IetfAttrSyntax(val, tagIn), do: ...
+
+  def enc_InhibitAnyPolicy(val, tagIn), do: ...
+
+  def enc_InvalidityDate(val, tagIn), do: ...
+
+  def enc_IssuerAltName(val, tagIn), do: ...
+
+  def enc_IssuerAndSerialNumber(val, tagIn), do: ...
+
+  def enc_IssuerSerial(val, tagIn), do: ...
+
+  def enc_IssuingDistributionPoint(val, tagIn), do: ...
+
+  def unquote(:"enc_KEA-Parms-Id")(val, tagIn), do: ...
+
+  def unquote(:"enc_KEA-PublicKey")(val, tagIn), do: ...
+
+  def enc_KeyEncryptionAlgorithmIdentifier(val, tagIn), do: ...
+
+  def enc_KeyIdentifier(val, tagIn), do: ...
+
+  def enc_KeyPurposeId(val, tagIn), do: ...
+
+  def enc_KeyUsage(val, tagIn), do: ...
+
+  def enc_LocalPostalAttributes(val, tagIn), do: ...
+
+  def enc_MessageDigest(val, tagIn), do: ...
+
+  def enc_Name(val, tagIn), do: ...
+
+  def enc_NameConstraints(val, tagIn), do: ...
+
+  def enc_NetworkAddress(val, tagIn), do: ...
+
+  def enc_NoticeReference(val, tagIn), do: ...
+
+  def enc_NumericUserIdentifier(val, tagIn), do: ...
+
+  def enc_ORAddress(val, tagIn), do: ...
+
+  def unquote(:"enc_OTP-X520countryname")(val, tagIn), do: ...
+
+  def unquote(:"enc_OTP-emailAddress")(val, tagIn), do: ...
+
+  def enc_OTPAttributeTypeAndValue(val, tagIn), do: ...
+
+  def enc_OTPCertificate(val, tagIn), do: ...
+
+  def unquote(:"enc_OTPCharacteristic-two")(val, tagIn), do: ...
+
+  def enc_OTPExtension(val, tagIn), do: ...
+
+  def enc_OTPExtensionAttribute(val, tagIn), do: ...
+
+  def enc_OTPExtensionAttributes(val, tagIn), do: ...
+
+  def enc_OTPExtensions(val, tagIn), do: ...
+
+  def enc_OTPFieldID(val, tagIn), do: ...
+
+  def enc_OTPOLDSubjectPublicKeyInfo(val, tagIn), do: ...
+
+  def enc_OTPSubjectPublicKeyInfo(val, tagIn), do: ...
+
+  def unquote(:"enc_OTPSubjectPublicKeyInfo-Any")(val, tagIn), do: ...
+
+  def enc_OTPTBSCertificate(val, tagIn), do: ...
+
+  def enc_ObjId(val, tagIn), do: ...
+
+  def enc_ObjectDigestInfo(val, tagIn), do: ...
+
+  def enc_OrganizationName(val, tagIn), do: ...
+
+  def enc_OrganizationalUnitName(val, tagIn), do: ...
+
+  def enc_OrganizationalUnitNames(val, tagIn), do: ...
+
+  def enc_OtherPrimeInfo(val, tagIn), do: ...
+
+  def enc_OtherPrimeInfos(val, tagIn), do: ...
+
+  def enc_PDSName(val, tagIn), do: ...
+
+  def enc_PDSParameter(val, tagIn), do: ...
+
+  def enc_Pentanomial(val, tagIn), do: ...
+
+  def enc_PersonalName(val, tagIn), do: ...
+
+  def enc_PhysicalDeliveryCountryName(val, tagIn), do: ...
+
+  def enc_PhysicalDeliveryOfficeName(val, tagIn), do: ...
+
+  def enc_PhysicalDeliveryOfficeNumber(val, tagIn), do: ...
+
+  def enc_PhysicalDeliveryOrganizationName(val, tagIn), do: ...
+
+  def enc_PhysicalDeliveryPersonalName(val, tagIn), do: ...
+
+  def enc_PolicyConstraints(val, tagIn), do: ...
+
+  def enc_PolicyInformation(val, tagIn), do: ...
+
+  def enc_PolicyMappings(val, tagIn), do: ...
+
+  def enc_PolicyQualifierId(val, tagIn), do: ...
+
+  def enc_PolicyQualifierInfo(val, tagIn), do: ...
+
+  def enc_PostOfficeBoxAddress(val, tagIn), do: ...
+
+  def enc_PostalCode(val, tagIn), do: ...
+
+  def enc_PosteRestanteAddress(val, tagIn), do: ...
+
+  def enc_PresentationAddress(val, tagIn), do: ...
+
+  def unquote(:"enc_Prime-p")(val, tagIn), do: ...
+
+  def enc_PrivateDomainName(val, tagIn), do: ...
+
+  def enc_PrivateKeyUsagePeriod(val, tagIn), do: ...
+
+  def enc_ProxyInfo(val, tagIn), do: ...
+
+  def enc_PublicKeyAlgorithm(val, tagIn), do: ...
+
+  def enc_RDNSequence(val, tagIn), do: ...
+
+  def enc_RSAPrivateKey(val, tagIn), do: ...
+
+  def enc_RSAPublicKey(val, tagIn), do: ...
+
+  def unquote(:"enc_RSASSA-PSS-params")(val, tagIn), do: ...
+
+  def enc_ReasonFlags(val, tagIn), do: ...
+
+  def enc_RecipientInfo(val, tagIn), do: ...
+
+  def enc_RecipientInfos(val, tagIn), do: ...
+
+  def enc_RelativeDistinguishedName(val, tagIn), do: ...
+
+  def enc_RoleSyntax(val, tagIn), do: ...
+
+  def enc_SecurityCategory(val, tagIn), do: ...
+
+  def enc_SignatureAlgorithm(val, tagIn), do: ...
+
+  def unquote(:"enc_SignatureAlgorithm-Any")(val, tagIn), do: ...
+
+  def enc_SignedAndEnvelopedData(val, tagIn), do: ...
+
+  def enc_SignedData(val, tagIn), do: ...
+
+  def enc_SignerInfo(val, tagIn), do: ...
+
+  def enc_SignerInfoAuthenticatedAttributes(val, tagIn), do: ...
+
+  def enc_SignerInfos(val, tagIn), do: ...
+
+  def enc_SigningTime(val, tagIn), do: ...
+
+  def enc_SkipCerts(val, tagIn), do: ...
+
+  def enc_StreetAddress(val, tagIn), do: ...
+
+  def enc_SubjectAltName(val, tagIn), do: ...
+
+  def enc_SubjectDirectoryAttributes(val, tagIn), do: ...
+
+  def enc_SubjectInfoAccessSyntax(val, tagIn), do: ...
+
+  def enc_SubjectKeyIdentifier(val, tagIn), do: ...
+
+  def enc_SubjectPublicKeyInfo(val, tagIn), do: ...
+
+  def enc_SvceAuthInfo(val, tagIn), do: ...
+
+  def enc_TBSCertList(val, tagIn), do: ...
+
+  def enc_TBSCertificate(val, tagIn), do: ...
+
+  def enc_Target(val, tagIn), do: ...
+
+  def enc_TargetCert(val, tagIn), do: ...
+
+  def enc_Targets(val, tagIn), do: ...
+
+  def enc_TeletexCommonName(val, tagIn), do: ...
+
+  def enc_TeletexDomainDefinedAttribute(val, tagIn), do: ...
+
+  def enc_TeletexDomainDefinedAttributes(val, tagIn), do: ...
+
+  def enc_TeletexOrganizationName(val, tagIn), do: ...
+
+  def enc_TeletexOrganizationalUnitName(val, tagIn), do: ...
+
+  def enc_TeletexOrganizationalUnitNames(val, tagIn), do: ...
+
+  def enc_TeletexPersonalName(val, tagIn), do: ...
+
+  def enc_TerminalIdentifier(val, tagIn), do: ...
+
+  def enc_TerminalType(val, tagIn), do: ...
+
+  def enc_Time(val, tagIn), do: ...
+
+  def enc_TrailerField(val, tagIn), do: ...
+
+  def enc_Trinomial(val, tagIn), do: ...
+
+  def enc_UnformattedPostalAddress(val, tagIn), do: ...
+
+  def enc_UniqueIdentifier(val, tagIn), do: ...
+
+  def enc_UniquePostalName(val, tagIn), do: ...
+
+  def enc_UserNotice(val, tagIn), do: ...
+
+  def enc_V2Form(val, tagIn), do: ...
+
+  def enc_ValidationParms(val, tagIn), do: ...
+
+  def enc_Validity(val, tagIn), do: ...
+
+  def unquote(:"enc_VersionPKCS-1")(val, tagIn), do: ...
+
+  def enc_VersionPKIX1Explicit88(val, tagIn), do: ...
+
+  def enc_X121Address(val, tagIn), do: ...
+
+  def enc_X520CommonName(val, tagIn), do: ...
+
+  def enc_X520LocalityName(val, tagIn), do: ...
+
+  def enc_X520OrganizationName(val, tagIn), do: ...
+
+  def enc_X520OrganizationalUnitName(val, tagIn), do: ...
+
+  def enc_X520Pseudonym(val, tagIn), do: ...
+
+  def enc_X520SerialNumber(val, tagIn), do: ...
+
+  def enc_X520StateOrProvinceName(val, tagIn), do: ...
+
+  def enc_X520Title(val, tagIn), do: ...
+
+  def enc_X520countryName(val, tagIn), do: ...
+
+  def enc_X520dnQualifier(val, tagIn), do: ...
+
+  def enc_X520name(val, tagIn), do: ...
+
+  def enc_authorityInfoAccess(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_authorityKeyIdentifier(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_basicConstraints(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_cRLDistributionPoints(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_cRLNumber(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_cRLReasons(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_certificateIssuer(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_certificatePolicies(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_challengePassword(:derivation, _, _), do: ...
+
+  def enc_challengePassword(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_challengePassword(:"equality-match", _, _), do: ...
+
+  def enc_challengePassword(:"ordering-match", _, _), do: ...
+
+  def enc_challengePassword(:"substrings-match", _, _), do: ...
+
+  def enc_commonName(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_contentType(:derivation, _, _), do: ...
+
+  def enc_contentType(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_contentType(:"equality-match", _, _), do: ...
+
+  def enc_contentType(:"ordering-match", _, _), do: ...
+
+  def enc_contentType(:"substrings-match", _, _), do: ...
+
+  def enc_counterSignature(:derivation, _, _), do: ...
+
+  def enc_counterSignature(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_counterSignature(:"equality-match", _, _), do: ...
+
+  def enc_counterSignature(:"ordering-match", _, _), do: ...
+
+  def enc_counterSignature(:"substrings-match", _, _), do: ...
+
+  def enc_countryName(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_deltaCRLIndicator(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_dh(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_dh(:"PublicKeyType", val, _RestPrimFieldName), do: ...
+
+  def enc_dnQualifier(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_domainComponent(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_dsa(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_dsa(:"PublicKeyType", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_dsa-with-sha1")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_dsaWithSHA1(:"Type", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_ec-public-key")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_ec-public-key")(:"PublicKeyType", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_ecdsa-with-sha1")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_ecdsa-with-sha224")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_ecdsa-with-sha256")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_ecdsa-with-sha384")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_ecdsa-with-sha512")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_emailAddress(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_extKeyUsage(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_extensionRequest(:derivation, _, _), do: ...
+
+  def enc_extensionRequest(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_extensionRequest(:"equality-match", _, _), do: ...
+
+  def enc_extensionRequest(:"ordering-match", _, _), do: ...
+
+  def enc_extensionRequest(:"substrings-match", _, _), do: ...
+
+  def enc_failInfo(:derivation, _, _), do: ...
+
+  def enc_failInfo(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_failInfo(:"equality-match", _, _), do: ...
+
+  def enc_failInfo(:"ordering-match", _, _), do: ...
+
+  def enc_failInfo(:"substrings-match", _, _), do: ...
+
+  def unquote(:"enc_field-characteristic-two")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_field-prime-field")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_freshestCRL(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_generationQualifier(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_givenName(:"Type", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_gn-basis")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_holdInstructionCode(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_inhibitAnyPolicy(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_initials(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_invalidityDate(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_issuerAltName(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_issuingDistributionPoint(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_kea(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_kea(:"PublicKeyType", val, _RestPrimFieldName), do: ...
+
+  def enc_keyUsage(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_localityName(:"Type", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_md2-with-rsa-encryption")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_md5-with-rsa-encryption")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_messageDigest(:derivation, _, _), do: ...
+
+  def enc_messageDigest(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_messageDigest(:"equality-match", _, _), do: ...
+
+  def enc_messageDigest(:"ordering-match", _, _), do: ...
+
+  def enc_messageDigest(:"substrings-match", _, _), do: ...
+
+  def enc_messageType(:derivation, _, _), do: ...
+
+  def enc_messageType(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_messageType(:"equality-match", _, _), do: ...
+
+  def enc_messageType(:"ordering-match", _, _), do: ...
+
+  def enc_messageType(:"substrings-match", _, _), do: ...
+
+  def enc_name(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_nameConstraints(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_organizationName(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_organizationalUnitName(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_pkiStatus(:derivation, _, _), do: ...
+
+  def enc_pkiStatus(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_pkiStatus(:"equality-match", _, _), do: ...
+
+  def enc_pkiStatus(:"ordering-match", _, _), do: ...
+
+  def enc_pkiStatus(:"substrings-match", _, _), do: ...
+
+  def enc_policyConstraints(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_policyMappings(:"Type", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_pp-basis")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_privateKeyUsagePeriod(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_pseudonym(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_recipientNonce(:derivation, _, _), do: ...
+
+  def enc_recipientNonce(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_recipientNonce(:"equality-match", _, _), do: ...
+
+  def enc_recipientNonce(:"ordering-match", _, _), do: ...
+
+  def enc_recipientNonce(:"substrings-match", _, _), do: ...
+
+  def unquote(:"enc_rsa-encryption")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_rsa-encryption")(:"PublicKeyType", val, _RestPrimFieldName), do: ...
+
+  def enc_senderNonce(:derivation, _, _), do: ...
+
+  def enc_senderNonce(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_senderNonce(:"equality-match", _, _), do: ...
+
+  def enc_senderNonce(:"ordering-match", _, _), do: ...
+
+  def enc_senderNonce(:"substrings-match", _, _), do: ...
+
+  def enc_serialNumber(:"Type", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_sha-1with-rsa-encryption")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_sha1-with-rsa-encryption")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_sha224-with-rsa-encryption")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_sha256-with-rsa-encryption")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_sha384-with-rsa-encryption")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_sha512-with-rsa-encryption")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_signingTime(:derivation, _, _), do: ...
+
+  def enc_signingTime(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_signingTime(:"equality-match", _, _), do: ...
+
+  def enc_signingTime(:"ordering-match", _, _), do: ...
+
+  def enc_signingTime(:"substrings-match", _, _), do: ...
+
+  def enc_stateOrProvinceName(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_subjectAltName(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_subjectDirectoryAttributes(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_subjectInfoAccess(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_subjectKeyIdentifier(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_surname(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_title(:"Type", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_tp-basis")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_transactionID(:derivation, _, _), do: ...
+
+  def enc_transactionID(:"Type", val, _RestPrimFieldName), do: ...
+
+  def enc_transactionID(:"equality-match", _, _), do: ...
+
+  def enc_transactionID(:"ordering-match", _, _), do: ...
+
+  def enc_transactionID(:"substrings-match", _, _), do: ...
+
+  def unquote(:"enc_x400-common-name")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_x400-extended-network-address")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_x400-extension-OR-address-components")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_x400-extension-physical-delivery-address-components")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_x400-local-postal-attributes")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_x400-pds-name")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_x400-physical-delivery-country-name")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_x400-physical-delivery-office-name")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_x400-physical-delivery-office-number")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_x400-physical-delivery-organization-name")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_x400-physical-delivery-personal-name")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_x400-post-office-box-address")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_x400-postal-code")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_x400-poste-restante-address")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_x400-street-address")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_x400-teletex-common-name")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_x400-teletex-domain-defined-attributes")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_x400-teletex-personal-name")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_x400-terminal-type")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_x400-unformatted-postal-address")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def unquote(:"enc_x400-unique-postal-name")(:"Type", val, _RestPrimFieldName), do: ...
+
+  def encode(type, data), do: ...
+
+  def encoding_rule(), do: ...
+
+  def encryptedData(), do: ...
+
+  def envelopedData(), do: ...
+
+  def unquote(:"extended-network-address")(), do: ...
+
+  def unquote(:"extension-OR-address-components")(), do: ...
+
+  def unquote(:"extension-physical-delivery-address-components")(), do: ...
+
+  def getdec_Authenticated(id) when id === {1, 2, 840, 113549, 1, 9, 3}, do: ...
+
+  def getdec_Authenticated(id) when id === {1, 2, 840, 113549, 1, 9, 4}, do: ...
+
+  def getdec_Authenticated(id) when id === {1, 2, 840, 113549, 1, 9, 5}, do: ...
+
+  def getdec_Authenticated(id) when id === {2, 16, 840, 1, 113733, 1, 9, 2}, do: ...
+
+  def getdec_Authenticated(id) when id === {2, 16, 840, 1, 113733, 1, 9, 3}, do: ...
+
+  def getdec_Authenticated(id) when id === {2, 16, 840, 1, 113733, 1, 9, 4}, do: ...
+
+  def getdec_Authenticated(id) when id === {2, 16, 840, 1, 113733, 1, 9, 5}, do: ...
+
+  def getdec_Authenticated(id) when id === {2, 16, 840, 1, 113733, 1, 9, 6}, do: ...
+
+  def getdec_Authenticated(id) when id === {2, 16, 840, 1, 113733, 1, 9, 7}, do: ...
+
+  def getdec_Authenticated(_), do: ...
+
+  def getdec_CRIAttributes(_), do: ...
+
+  def getdec_ContentEncryptionAlgorithms(_), do: ...
+
+  def getdec_Contents({1, 2, 840, 113549, 1, 7, 1}), do: ...
+
+  def getdec_Contents({1, 2, 840, 113549, 1, 7, 2}), do: ...
+
+  def getdec_Contents({1, 2, 840, 113549, 1, 7, 3}), do: ...
+
+  def getdec_Contents({1, 2, 840, 113549, 1, 7, 4}), do: ...
+
+  def getdec_Contents({1, 2, 840, 113549, 1, 7, 5}), do: ...
+
+  def getdec_Contents({1, 2, 840, 113549, 1, 7, 6}), do: ...
+
+  def getdec_Contents(_), do: ...
+
+  def getdec_DigestAlgorithms(_), do: ...
+
+  def getdec_DigestEncryptionAlgorithms(_), do: ...
+
+  def getdec_KeyEncryptionAlgorithms(_), do: ...
+
+  def getdec_PKInfoAlgorithms(_), do: ...
+
+  def getdec_SignatureAlgorithms(_), do: ...
+
+  def getdec_SupportedAttributeTypeAndValues(id) when id === {2, 5, 4, 3}, do: ...
+
+  def getdec_SupportedAttributeTypeAndValues(id) when id === {2, 5, 4, 4}, do: ...
+
+  def getdec_SupportedAttributeTypeAndValues(id) when id === {2, 5, 4, 5}, do: ...
+
+  def getdec_SupportedAttributeTypeAndValues(id) when id === {2, 5, 4, 6}, do: ...
+
+  def getdec_SupportedAttributeTypeAndValues(id) when id === {2, 5, 4, 7}, do: ...
+
+  def getdec_SupportedAttributeTypeAndValues(id) when id === {2, 5, 4, 8}, do: ...
+
+  def getdec_SupportedAttributeTypeAndValues(id) when id === {2, 5, 4, 10}, do: ...
+
+  def getdec_SupportedAttributeTypeAndValues(id) when id === {2, 5, 4, 11}, do: ...
+
+  def getdec_SupportedAttributeTypeAndValues(id) when id === {2, 5, 4, 12}, do: ...
+
+  def getdec_SupportedAttributeTypeAndValues(id) when id === {2, 5, 4, 41}, do: ...
+
+  def getdec_SupportedAttributeTypeAndValues(id) when id === {2, 5, 4, 42}, do: ...
+
+  def getdec_SupportedAttributeTypeAndValues(id) when id === {2, 5, 4, 43}, do: ...
+
+  def getdec_SupportedAttributeTypeAndValues(id) when id === {2, 5, 4, 44}, do: ...
+
+  def getdec_SupportedAttributeTypeAndValues(id) when id === {2, 5, 4, 46}, do: ...
+
+  def getdec_SupportedAttributeTypeAndValues(id) when id === {2, 5, 4, 65}, do: ...
+
+  def getdec_SupportedAttributeTypeAndValues(id) when id === {0, 9, 2342, 19200300, 100, 1, 25}, do: ...
+
+  def getdec_SupportedAttributeTypeAndValues(id) when id === {1, 2, 840, 113549, 1, 9, 1}, do: ...
+
+  def getdec_SupportedAttributeTypeAndValues(errV), do: ...
+
+  def getdec_SupportedCharacteristicTwos(id) when id === {1, 2, 840, 10045, 1, 2, 3, 1}, do: ...
+
+  def getdec_SupportedCharacteristicTwos(id) when id === {1, 2, 840, 10045, 1, 2, 3, 2}, do: ...
+
+  def getdec_SupportedCharacteristicTwos(id) when id === {1, 2, 840, 10045, 1, 2, 3, 3}, do: ...
+
+  def getdec_SupportedCharacteristicTwos(errV), do: ...
+
+  def getdec_SupportedExtensionAttributes(id) when id === 1, do: ...
+
+  def getdec_SupportedExtensionAttributes(id) when id === 2, do: ...
+
+  def getdec_SupportedExtensionAttributes(id) when id === 4, do: ...
+
+  def getdec_SupportedExtensionAttributes(id) when id === 6, do: ...
+
+  def getdec_SupportedExtensionAttributes(id) when id === 7, do: ...
+
+  def getdec_SupportedExtensionAttributes(id) when id === 8, do: ...
+
+  def getdec_SupportedExtensionAttributes(id) when id === 9, do: ...
+
+  def getdec_SupportedExtensionAttributes(id) when id === 10, do: ...
+
+  def getdec_SupportedExtensionAttributes(id) when id === 11, do: ...
+
+  def getdec_SupportedExtensionAttributes(id) when id === 12, do: ...
+
+  def getdec_SupportedExtensionAttributes(id) when id === 13, do: ...
+
+  def getdec_SupportedExtensionAttributes(id) when id === 14, do: ...
+
+  def getdec_SupportedExtensionAttributes(id) when id === 15, do: ...
+
+  def getdec_SupportedExtensionAttributes(id) when id === 16, do: ...
+
+  def getdec_SupportedExtensionAttributes(id) when id === 17, do: ...
+
+  def getdec_SupportedExtensionAttributes(id) when id === 18, do: ...
+
+  def getdec_SupportedExtensionAttributes(id) when id === 19, do: ...
+
+  def getdec_SupportedExtensionAttributes(id) when id === 20, do: ...
+
+  def getdec_SupportedExtensionAttributes(id) when id === 21, do: ...
+
+  def getdec_SupportedExtensionAttributes(id) when id === 22, do: ...
+
+  def getdec_SupportedExtensionAttributes(id) when id === 23, do: ...
+
+  def getdec_SupportedExtensionAttributes(errV), do: ...
+
+  def getdec_SupportedExtensions(id) when id === {2, 5, 29, 9}, do: ...
+
+  def getdec_SupportedExtensions(id) when id === {2, 5, 29, 14}, do: ...
+
+  def getdec_SupportedExtensions(id) when id === {2, 5, 29, 15}, do: ...
+
+  def getdec_SupportedExtensions(id) when id === {2, 5, 29, 16}, do: ...
+
+  def getdec_SupportedExtensions(id) when id === {2, 5, 29, 17}, do: ...
+
+  def getdec_SupportedExtensions(id) when id === {2, 5, 29, 18}, do: ...
+
+  def getdec_SupportedExtensions(id) when id === {2, 5, 29, 19}, do: ...
+
+  def getdec_SupportedExtensions(id) when id === {2, 5, 29, 20}, do: ...
+
+  def getdec_SupportedExtensions(id) when id === {2, 5, 29, 21}, do: ...
+
+  def getdec_SupportedExtensions(id) when id === {2, 5, 29, 23}, do: ...
+
+  def getdec_SupportedExtensions(id) when id === {2, 5, 29, 24}, do: ...
+
+  def getdec_SupportedExtensions(id) when id === {2, 5, 29, 27}, do: ...
+
+  def getdec_SupportedExtensions(id) when id === {2, 5, 29, 28}, do: ...
+
+  def getdec_SupportedExtensions(id) when id === {2, 5, 29, 29}, do: ...
+
+  def getdec_SupportedExtensions(id) when id === {2, 5, 29, 30}, do: ...
+
+  def getdec_SupportedExtensions(id) when id === {2, 5, 29, 31}, do: ...
+
+  def getdec_SupportedExtensions(id) when id === {2, 5, 29, 32}, do: ...
+
+  def getdec_SupportedExtensions(id) when id === {2, 5, 29, 33}, do: ...
+
+  def getdec_SupportedExtensions(id) when id === {2, 5, 29, 35}, do: ...
+
+  def getdec_SupportedExtensions(id) when id === {2, 5, 29, 36}, do: ...
+
+  def getdec_SupportedExtensions(id) when id === {2, 5, 29, 37}, do: ...
+
+  def getdec_SupportedExtensions(id) when id === {2, 5, 29, 46}, do: ...
+
+  def getdec_SupportedExtensions(id) when id === {2, 5, 29, 54}, do: ...
+
+  def getdec_SupportedExtensions(id) when id === {1, 3, 6, 1, 5, 5, 7, 1, 1}, do: ...
+
+  def getdec_SupportedExtensions(id) when id === {1, 3, 6, 1, 5, 5, 7, 1, 11}, do: ...
+
+  def getdec_SupportedExtensions(errV), do: ...
+
+  def getdec_SupportedFieldIds(id) when id === {1, 2, 840, 10045, 1, 1}, do: ...
+
+  def getdec_SupportedFieldIds(id) when id === {1, 2, 840, 10045, 1, 2}, do: ...
+
+  def getdec_SupportedFieldIds(errV), do: ...
+
+  def getdec_SupportedPublicKeyAlgorithms(id) when id === {1, 2, 840, 10040, 4, 1}, do: ...
+
+  def getdec_SupportedPublicKeyAlgorithms(id) when id === {1, 2, 840, 10045, 2, 1}, do: ...
+
+  def getdec_SupportedPublicKeyAlgorithms(id) when id === {1, 2, 840, 10046, 2, 1}, do: ...
+
+  def getdec_SupportedPublicKeyAlgorithms(id) when id === {1, 2, 840, 113549, 1, 1, 1}, do: ...
+
+  def getdec_SupportedPublicKeyAlgorithms(id) when id === {2, 16, 840, 1, 101, 2, 1, 1, 22}, do: ...
+
+  def getdec_SupportedPublicKeyAlgorithms(errV), do: ...
+
+  def getdec_SupportedSignatureAlgorithms(id) when id === {1, 2, 840, 10040, 4, 3}, do: ...
+
+  def getdec_SupportedSignatureAlgorithms(id) when id === {1, 2, 840, 10045, 4, 1}, do: ...
+
+  def getdec_SupportedSignatureAlgorithms(id) when id === {1, 3, 14, 3, 2, 27}, do: ...
+
+  def getdec_SupportedSignatureAlgorithms(id) when id === {1, 3, 14, 3, 2, 29}, do: ...
+
+  def getdec_SupportedSignatureAlgorithms(id) when id === {1, 2, 840, 10045, 4, 3, 1}, do: ...
+
+  def getdec_SupportedSignatureAlgorithms(id) when id === {1, 2, 840, 10045, 4, 3, 2}, do: ...
+
+  def getdec_SupportedSignatureAlgorithms(id) when id === {1, 2, 840, 10045, 4, 3, 3}, do: ...
+
+  def getdec_SupportedSignatureAlgorithms(id) when id === {1, 2, 840, 10045, 4, 3, 4}, do: ...
+
+  def getdec_SupportedSignatureAlgorithms(id) when id === {1, 2, 840, 113549, 1, 1, 2}, do: ...
+
+  def getdec_SupportedSignatureAlgorithms(id) when id === {1, 2, 840, 113549, 1, 1, 4}, do: ...
+
+  def getdec_SupportedSignatureAlgorithms(id) when id === {1, 2, 840, 113549, 1, 1, 5}, do: ...
+
+  def getdec_SupportedSignatureAlgorithms(id) when id === {1, 2, 840, 113549, 1, 1, 11}, do: ...
+
+  def getdec_SupportedSignatureAlgorithms(id) when id === {1, 2, 840, 113549, 1, 1, 12}, do: ...
+
+  def getdec_SupportedSignatureAlgorithms(id) when id === {1, 2, 840, 113549, 1, 1, 13}, do: ...
+
+  def getdec_SupportedSignatureAlgorithms(id) when id === {1, 2, 840, 113549, 1, 1, 14}, do: ...
+
+  def getdec_SupportedSignatureAlgorithms(errV), do: ...
+
+  def getdec_Unauthenticated(id) when id === {1, 2, 840, 113549, 1, 9, 3}, do: ...
+
+  def getdec_Unauthenticated(id) when id === {1, 2, 840, 113549, 1, 9, 4}, do: ...
+
+  def getdec_Unauthenticated(id) when id === {1, 2, 840, 113549, 1, 9, 6}, do: ...
+
+  def getdec_Unauthenticated(_), do: ...
+
+  def getdec_internal_object_set_argument_1(_), do: ...
+
+  def getdec_internal_object_set_argument_10(_), do: ...
+
+  def getdec_internal_object_set_argument_11(_), do: ...
+
+  def getdec_internal_object_set_argument_12(_), do: ...
+
+  def getdec_internal_object_set_argument_13(_), do: ...
+
+  def getdec_internal_object_set_argument_2(_), do: ...
+
+  def getdec_internal_object_set_argument_3(_), do: ...
+
+  def getdec_internal_object_set_argument_4(id) when id === {1, 2, 840, 113549, 1, 9, 3}, do: ...
+
+  def getdec_internal_object_set_argument_4(id) when id === {1, 2, 840, 113549, 1, 9, 4}, do: ...
+
+  def getdec_internal_object_set_argument_4(id) when id === {1, 2, 840, 113549, 1, 9, 5}, do: ...
+
+  def getdec_internal_object_set_argument_4(id) when id === {2, 16, 840, 1, 113733, 1, 9, 2}, do: ...
+
+  def getdec_internal_object_set_argument_4(id) when id === {2, 16, 840, 1, 113733, 1, 9, 3}, do: ...
+
+  def getdec_internal_object_set_argument_4(id) when id === {2, 16, 840, 1, 113733, 1, 9, 4}, do: ...
+
+  def getdec_internal_object_set_argument_4(id) when id === {2, 16, 840, 1, 113733, 1, 9, 5}, do: ...
+
+  def getdec_internal_object_set_argument_4(id) when id === {2, 16, 840, 1, 113733, 1, 9, 6}, do: ...
+
+  def getdec_internal_object_set_argument_4(id) when id === {2, 16, 840, 1, 113733, 1, 9, 7}, do: ...
+
+  def getdec_internal_object_set_argument_4(_), do: ...
+
+  def getdec_internal_object_set_argument_5(id) when id === {1, 2, 840, 113549, 1, 9, 3}, do: ...
+
+  def getdec_internal_object_set_argument_5(id) when id === {1, 2, 840, 113549, 1, 9, 4}, do: ...
+
+  def getdec_internal_object_set_argument_5(id) when id === {1, 2, 840, 113549, 1, 9, 5}, do: ...
+
+  def getdec_internal_object_set_argument_5(id) when id === {2, 16, 840, 1, 113733, 1, 9, 2}, do: ...
+
+  def getdec_internal_object_set_argument_5(id) when id === {2, 16, 840, 1, 113733, 1, 9, 3}, do: ...
+
+  def getdec_internal_object_set_argument_5(id) when id === {2, 16, 840, 1, 113733, 1, 9, 4}, do: ...
+
+  def getdec_internal_object_set_argument_5(id) when id === {2, 16, 840, 1, 113733, 1, 9, 5}, do: ...
+
+  def getdec_internal_object_set_argument_5(id) when id === {2, 16, 840, 1, 113733, 1, 9, 6}, do: ...
+
+  def getdec_internal_object_set_argument_5(id) when id === {2, 16, 840, 1, 113733, 1, 9, 7}, do: ...
+
+  def getdec_internal_object_set_argument_5(_), do: ...
+
+  def getdec_internal_object_set_argument_6(_), do: ...
+
+  def getdec_internal_object_set_argument_7(id) when id === {1, 2, 840, 113549, 1, 9, 3}, do: ...
+
+  def getdec_internal_object_set_argument_7(id) when id === {1, 2, 840, 113549, 1, 9, 4}, do: ...
+
+  def getdec_internal_object_set_argument_7(id) when id === {1, 2, 840, 113549, 1, 9, 6}, do: ...
+
+  def getdec_internal_object_set_argument_7(_), do: ...
+
+  def getdec_internal_object_set_argument_8(id) when id === {1, 2, 840, 113549, 1, 9, 3}, do: ...
+
+  def getdec_internal_object_set_argument_8(id) when id === {1, 2, 840, 113549, 1, 9, 4}, do: ...
+
+  def getdec_internal_object_set_argument_8(id) when id === {1, 2, 840, 113549, 1, 9, 6}, do: ...
+
+  def getdec_internal_object_set_argument_8(_), do: ...
+
+  def getdec_internal_object_set_argument_9(_), do: ...
+
+  def getenc_Authenticated(id) when id === {1, 2, 840, 113549, 1, 9, 3}, do: ...
+
+  def getenc_Authenticated(id) when id === {1, 2, 840, 113549, 1, 9, 4}, do: ...
+
+  def getenc_Authenticated(id) when id === {1, 2, 840, 113549, 1, 9, 5}, do: ...
+
+  def getenc_Authenticated(id) when id === {2, 16, 840, 1, 113733, 1, 9, 2}, do: ...
+
+  def getenc_Authenticated(id) when id === {2, 16, 840, 1, 113733, 1, 9, 3}, do: ...
+
+  def getenc_Authenticated(id) when id === {2, 16, 840, 1, 113733, 1, 9, 4}, do: ...
+
+  def getenc_Authenticated(id) when id === {2, 16, 840, 1, 113733, 1, 9, 5}, do: ...
+
+  def getenc_Authenticated(id) when id === {2, 16, 840, 1, 113733, 1, 9, 6}, do: ...
+
+  def getenc_Authenticated(id) when id === {2, 16, 840, 1, 113733, 1, 9, 7}, do: ...
+
+  def getenc_Authenticated(_), do: ...
+
+  def getenc_CRIAttributes(_), do: ...
+
+  def getenc_ContentEncryptionAlgorithms(_), do: ...
+
+  def getenc_Contents({1, 2, 840, 113549, 1, 7, 1}), do: ...
+
+  def getenc_Contents({1, 2, 840, 113549, 1, 7, 2}), do: ...
+
+  def getenc_Contents({1, 2, 840, 113549, 1, 7, 3}), do: ...
+
+  def getenc_Contents({1, 2, 840, 113549, 1, 7, 4}), do: ...
+
+  def getenc_Contents({1, 2, 840, 113549, 1, 7, 5}), do: ...
+
+  def getenc_Contents({1, 2, 840, 113549, 1, 7, 6}), do: ...
+
+  def getenc_Contents(_), do: ...
+
+  def getenc_DigestAlgorithms(_), do: ...
+
+  def getenc_DigestEncryptionAlgorithms(_), do: ...
+
+  def getenc_KeyEncryptionAlgorithms(_), do: ...
+
+  def getenc_PKInfoAlgorithms(_), do: ...
+
+  def getenc_SignatureAlgorithms(_), do: ...
+
+  def getenc_SupportedAttributeTypeAndValues(id) when id === {2, 5, 4, 3}, do: ...
+
+  def getenc_SupportedAttributeTypeAndValues(id) when id === {2, 5, 4, 4}, do: ...
+
+  def getenc_SupportedAttributeTypeAndValues(id) when id === {2, 5, 4, 5}, do: ...
+
+  def getenc_SupportedAttributeTypeAndValues(id) when id === {2, 5, 4, 6}, do: ...
+
+  def getenc_SupportedAttributeTypeAndValues(id) when id === {2, 5, 4, 7}, do: ...
+
+  def getenc_SupportedAttributeTypeAndValues(id) when id === {2, 5, 4, 8}, do: ...
+
+  def getenc_SupportedAttributeTypeAndValues(id) when id === {2, 5, 4, 10}, do: ...
+
+  def getenc_SupportedAttributeTypeAndValues(id) when id === {2, 5, 4, 11}, do: ...
+
+  def getenc_SupportedAttributeTypeAndValues(id) when id === {2, 5, 4, 12}, do: ...
+
+  def getenc_SupportedAttributeTypeAndValues(id) when id === {2, 5, 4, 41}, do: ...
+
+  def getenc_SupportedAttributeTypeAndValues(id) when id === {2, 5, 4, 42}, do: ...
+
+  def getenc_SupportedAttributeTypeAndValues(id) when id === {2, 5, 4, 43}, do: ...
+
+  def getenc_SupportedAttributeTypeAndValues(id) when id === {2, 5, 4, 44}, do: ...
+
+  def getenc_SupportedAttributeTypeAndValues(id) when id === {2, 5, 4, 46}, do: ...
+
+  def getenc_SupportedAttributeTypeAndValues(id) when id === {2, 5, 4, 65}, do: ...
+
+  def getenc_SupportedAttributeTypeAndValues(id) when id === {0, 9, 2342, 19200300, 100, 1, 25}, do: ...
+
+  def getenc_SupportedAttributeTypeAndValues(id) when id === {1, 2, 840, 113549, 1, 9, 1}, do: ...
+
+  def getenc_SupportedAttributeTypeAndValues(errV), do: ...
+
+  def getenc_SupportedCharacteristicTwos(id) when id === {1, 2, 840, 10045, 1, 2, 3, 1}, do: ...
+
+  def getenc_SupportedCharacteristicTwos(id) when id === {1, 2, 840, 10045, 1, 2, 3, 2}, do: ...
+
+  def getenc_SupportedCharacteristicTwos(id) when id === {1, 2, 840, 10045, 1, 2, 3, 3}, do: ...
+
+  def getenc_SupportedCharacteristicTwos(errV), do: ...
+
+  def getenc_SupportedExtensionAttributes(id) when id === 1, do: ...
+
+  def getenc_SupportedExtensionAttributes(id) when id === 2, do: ...
+
+  def getenc_SupportedExtensionAttributes(id) when id === 4, do: ...
+
+  def getenc_SupportedExtensionAttributes(id) when id === 6, do: ...
+
+  def getenc_SupportedExtensionAttributes(id) when id === 7, do: ...
+
+  def getenc_SupportedExtensionAttributes(id) when id === 8, do: ...
+
+  def getenc_SupportedExtensionAttributes(id) when id === 9, do: ...
+
+  def getenc_SupportedExtensionAttributes(id) when id === 10, do: ...
+
+  def getenc_SupportedExtensionAttributes(id) when id === 11, do: ...
+
+  def getenc_SupportedExtensionAttributes(id) when id === 12, do: ...
+
+  def getenc_SupportedExtensionAttributes(id) when id === 13, do: ...
+
+  def getenc_SupportedExtensionAttributes(id) when id === 14, do: ...
+
+  def getenc_SupportedExtensionAttributes(id) when id === 15, do: ...
+
+  def getenc_SupportedExtensionAttributes(id) when id === 16, do: ...
+
+  def getenc_SupportedExtensionAttributes(id) when id === 17, do: ...
+
+  def getenc_SupportedExtensionAttributes(id) when id === 18, do: ...
+
+  def getenc_SupportedExtensionAttributes(id) when id === 19, do: ...
+
+  def getenc_SupportedExtensionAttributes(id) when id === 20, do: ...
+
+  def getenc_SupportedExtensionAttributes(id) when id === 21, do: ...
+
+  def getenc_SupportedExtensionAttributes(id) when id === 22, do: ...
+
+  def getenc_SupportedExtensionAttributes(id) when id === 23, do: ...
+
+  def getenc_SupportedExtensionAttributes(errV), do: ...
+
+  def getenc_SupportedExtensions(id) when id === {2, 5, 29, 9}, do: ...
+
+  def getenc_SupportedExtensions(id) when id === {2, 5, 29, 14}, do: ...
+
+  def getenc_SupportedExtensions(id) when id === {2, 5, 29, 15}, do: ...
+
+  def getenc_SupportedExtensions(id) when id === {2, 5, 29, 16}, do: ...
+
+  def getenc_SupportedExtensions(id) when id === {2, 5, 29, 17}, do: ...
+
+  def getenc_SupportedExtensions(id) when id === {2, 5, 29, 18}, do: ...
+
+  def getenc_SupportedExtensions(id) when id === {2, 5, 29, 19}, do: ...
+
+  def getenc_SupportedExtensions(id) when id === {2, 5, 29, 20}, do: ...
+
+  def getenc_SupportedExtensions(id) when id === {2, 5, 29, 21}, do: ...
+
+  def getenc_SupportedExtensions(id) when id === {2, 5, 29, 23}, do: ...
+
+  def getenc_SupportedExtensions(id) when id === {2, 5, 29, 24}, do: ...
+
+  def getenc_SupportedExtensions(id) when id === {2, 5, 29, 27}, do: ...
+
+  def getenc_SupportedExtensions(id) when id === {2, 5, 29, 28}, do: ...
+
+  def getenc_SupportedExtensions(id) when id === {2, 5, 29, 29}, do: ...
+
+  def getenc_SupportedExtensions(id) when id === {2, 5, 29, 30}, do: ...
+
+  def getenc_SupportedExtensions(id) when id === {2, 5, 29, 31}, do: ...
+
+  def getenc_SupportedExtensions(id) when id === {2, 5, 29, 32}, do: ...
+
+  def getenc_SupportedExtensions(id) when id === {2, 5, 29, 33}, do: ...
+
+  def getenc_SupportedExtensions(id) when id === {2, 5, 29, 35}, do: ...
+
+  def getenc_SupportedExtensions(id) when id === {2, 5, 29, 36}, do: ...
+
+  def getenc_SupportedExtensions(id) when id === {2, 5, 29, 37}, do: ...
+
+  def getenc_SupportedExtensions(id) when id === {2, 5, 29, 46}, do: ...
+
+  def getenc_SupportedExtensions(id) when id === {2, 5, 29, 54}, do: ...
+
+  def getenc_SupportedExtensions(id) when id === {1, 3, 6, 1, 5, 5, 7, 1, 1}, do: ...
+
+  def getenc_SupportedExtensions(id) when id === {1, 3, 6, 1, 5, 5, 7, 1, 11}, do: ...
+
+  def getenc_SupportedExtensions(errV), do: ...
+
+  def getenc_SupportedFieldIds(id) when id === {1, 2, 840, 10045, 1, 1}, do: ...
+
+  def getenc_SupportedFieldIds(id) when id === {1, 2, 840, 10045, 1, 2}, do: ...
+
+  def getenc_SupportedFieldIds(errV), do: ...
+
+  def getenc_SupportedPublicKeyAlgorithms(id) when id === {1, 2, 840, 10040, 4, 1}, do: ...
+
+  def getenc_SupportedPublicKeyAlgorithms(id) when id === {1, 2, 840, 10045, 2, 1}, do: ...
+
+  def getenc_SupportedPublicKeyAlgorithms(id) when id === {1, 2, 840, 10046, 2, 1}, do: ...
+
+  def getenc_SupportedPublicKeyAlgorithms(id) when id === {1, 2, 840, 113549, 1, 1, 1}, do: ...
+
+  def getenc_SupportedPublicKeyAlgorithms(id) when id === {2, 16, 840, 1, 101, 2, 1, 1, 22}, do: ...
+
+  def getenc_SupportedPublicKeyAlgorithms(errV), do: ...
+
+  def getenc_SupportedSignatureAlgorithms(id) when id === {1, 2, 840, 10040, 4, 3}, do: ...
+
+  def getenc_SupportedSignatureAlgorithms(id) when id === {1, 2, 840, 10045, 4, 1}, do: ...
+
+  def getenc_SupportedSignatureAlgorithms(id) when id === {1, 3, 14, 3, 2, 27}, do: ...
+
+  def getenc_SupportedSignatureAlgorithms(id) when id === {1, 3, 14, 3, 2, 29}, do: ...
+
+  def getenc_SupportedSignatureAlgorithms(id) when id === {1, 2, 840, 10045, 4, 3, 1}, do: ...
+
+  def getenc_SupportedSignatureAlgorithms(id) when id === {1, 2, 840, 10045, 4, 3, 2}, do: ...
+
+  def getenc_SupportedSignatureAlgorithms(id) when id === {1, 2, 840, 10045, 4, 3, 3}, do: ...
+
+  def getenc_SupportedSignatureAlgorithms(id) when id === {1, 2, 840, 10045, 4, 3, 4}, do: ...
+
+  def getenc_SupportedSignatureAlgorithms(id) when id === {1, 2, 840, 113549, 1, 1, 2}, do: ...
+
+  def getenc_SupportedSignatureAlgorithms(id) when id === {1, 2, 840, 113549, 1, 1, 4}, do: ...
+
+  def getenc_SupportedSignatureAlgorithms(id) when id === {1, 2, 840, 113549, 1, 1, 5}, do: ...
+
+  def getenc_SupportedSignatureAlgorithms(id) when id === {1, 2, 840, 113549, 1, 1, 11}, do: ...
+
+  def getenc_SupportedSignatureAlgorithms(id) when id === {1, 2, 840, 113549, 1, 1, 12}, do: ...
+
+  def getenc_SupportedSignatureAlgorithms(id) when id === {1, 2, 840, 113549, 1, 1, 13}, do: ...
+
+  def getenc_SupportedSignatureAlgorithms(id) when id === {1, 2, 840, 113549, 1, 1, 14}, do: ...
+
+  def getenc_SupportedSignatureAlgorithms(errV), do: ...
+
+  def getenc_Unauthenticated(id) when id === {1, 2, 840, 113549, 1, 9, 3}, do: ...
+
+  def getenc_Unauthenticated(id) when id === {1, 2, 840, 113549, 1, 9, 4}, do: ...
+
+  def getenc_Unauthenticated(id) when id === {1, 2, 840, 113549, 1, 9, 6}, do: ...
+
+  def getenc_Unauthenticated(_), do: ...
+
+  def getenc_internal_object_set_argument_1(_), do: ...
+
+  def getenc_internal_object_set_argument_10(_), do: ...
+
+  def getenc_internal_object_set_argument_11(_), do: ...
+
+  def getenc_internal_object_set_argument_12(_), do: ...
+
+  def getenc_internal_object_set_argument_13(_), do: ...
+
+  def getenc_internal_object_set_argument_2(_), do: ...
+
+  def getenc_internal_object_set_argument_3(_), do: ...
+
+  def getenc_internal_object_set_argument_4(id) when id === {1, 2, 840, 113549, 1, 9, 3}, do: ...
+
+  def getenc_internal_object_set_argument_4(id) when id === {1, 2, 840, 113549, 1, 9, 4}, do: ...
+
+  def getenc_internal_object_set_argument_4(id) when id === {1, 2, 840, 113549, 1, 9, 5}, do: ...
+
+  def getenc_internal_object_set_argument_4(id) when id === {2, 16, 840, 1, 113733, 1, 9, 2}, do: ...
+
+  def getenc_internal_object_set_argument_4(id) when id === {2, 16, 840, 1, 113733, 1, 9, 3}, do: ...
+
+  def getenc_internal_object_set_argument_4(id) when id === {2, 16, 840, 1, 113733, 1, 9, 4}, do: ...
+
+  def getenc_internal_object_set_argument_4(id) when id === {2, 16, 840, 1, 113733, 1, 9, 5}, do: ...
+
+  def getenc_internal_object_set_argument_4(id) when id === {2, 16, 840, 1, 113733, 1, 9, 6}, do: ...
+
+  def getenc_internal_object_set_argument_4(id) when id === {2, 16, 840, 1, 113733, 1, 9, 7}, do: ...
+
+  def getenc_internal_object_set_argument_4(_), do: ...
+
+  def getenc_internal_object_set_argument_5(id) when id === {1, 2, 840, 113549, 1, 9, 3}, do: ...
+
+  def getenc_internal_object_set_argument_5(id) when id === {1, 2, 840, 113549, 1, 9, 4}, do: ...
+
+  def getenc_internal_object_set_argument_5(id) when id === {1, 2, 840, 113549, 1, 9, 5}, do: ...
+
+  def getenc_internal_object_set_argument_5(id) when id === {2, 16, 840, 1, 113733, 1, 9, 2}, do: ...
+
+  def getenc_internal_object_set_argument_5(id) when id === {2, 16, 840, 1, 113733, 1, 9, 3}, do: ...
+
+  def getenc_internal_object_set_argument_5(id) when id === {2, 16, 840, 1, 113733, 1, 9, 4}, do: ...
+
+  def getenc_internal_object_set_argument_5(id) when id === {2, 16, 840, 1, 113733, 1, 9, 5}, do: ...
+
+  def getenc_internal_object_set_argument_5(id) when id === {2, 16, 840, 1, 113733, 1, 9, 6}, do: ...
+
+  def getenc_internal_object_set_argument_5(id) when id === {2, 16, 840, 1, 113733, 1, 9, 7}, do: ...
+
+  def getenc_internal_object_set_argument_5(_), do: ...
+
+  def getenc_internal_object_set_argument_6(_), do: ...
+
+  def getenc_internal_object_set_argument_7(id) when id === {1, 2, 840, 113549, 1, 9, 3}, do: ...
+
+  def getenc_internal_object_set_argument_7(id) when id === {1, 2, 840, 113549, 1, 9, 4}, do: ...
+
+  def getenc_internal_object_set_argument_7(id) when id === {1, 2, 840, 113549, 1, 9, 6}, do: ...
+
+  def getenc_internal_object_set_argument_7(_), do: ...
+
+  def getenc_internal_object_set_argument_8(id) when id === {1, 2, 840, 113549, 1, 9, 3}, do: ...
+
+  def getenc_internal_object_set_argument_8(id) when id === {1, 2, 840, 113549, 1, 9, 4}, do: ...
+
+  def getenc_internal_object_set_argument_8(id) when id === {1, 2, 840, 113549, 1, 9, 6}, do: ...
+
+  def getenc_internal_object_set_argument_8(_), do: ...
+
+  def getenc_internal_object_set_argument_9(_), do: ...
+
+  def gnBasis(), do: ...
+
+  def holdInstruction(), do: ...
+
+  def unquote(:"id-RSAES-OAEP")(), do: ...
+
+  def unquote(:"id-RSASSA-PSS")(), do: ...
+
+  def unquote(:"id-VeriSign")(), do: ...
+
+  def unquote(:"id-aca")(), do: ...
+
+  def unquote(:"id-aca-accessIdentity")(), do: ...
+
+  def unquote(:"id-aca-authenticationInfo")(), do: ...
+
+  def unquote(:"id-aca-chargingIdentity")(), do: ...
+
+  def unquote(:"id-aca-encAttrs")(), do: ...
+
+  def unquote(:"id-aca-group")(), do: ...
+
+  def unquote(:"id-ad")(), do: ...
+
+  def unquote(:"id-ad-caIssuers")(), do: ...
+
+  def unquote(:"id-ad-caRepository")(), do: ...
+
+  def unquote(:"id-ad-ocsp")(), do: ...
+
+  def unquote(:"id-ad-timeStamping")(), do: ...
+
+  def unquote(:"id-at")(), do: ...
+
+  def unquote(:"id-at-clearance")(), do: ...
+
+  def unquote(:"id-at-commonName")(), do: ...
+
+  def unquote(:"id-at-countryName")(), do: ...
+
+  def unquote(:"id-at-dnQualifier")(), do: ...
+
+  def unquote(:"id-at-generationQualifier")(), do: ...
+
+  def unquote(:"id-at-givenName")(), do: ...
+
+  def unquote(:"id-at-initials")(), do: ...
+
+  def unquote(:"id-at-localityName")(), do: ...
+
+  def unquote(:"id-at-name")(), do: ...
+
+  def unquote(:"id-at-organizationName")(), do: ...
+
+  def unquote(:"id-at-organizationalUnitName")(), do: ...
+
+  def unquote(:"id-at-pseudonym")(), do: ...
+
+  def unquote(:"id-at-role")(), do: ...
+
+  def unquote(:"id-at-serialNumber")(), do: ...
+
+  def unquote(:"id-at-stateOrProvinceName")(), do: ...
+
+  def unquote(:"id-at-surname")(), do: ...
+
+  def unquote(:"id-at-title")(), do: ...
+
+  def unquote(:"id-attributes")(), do: ...
+
+  def unquote(:"id-ce")(), do: ...
+
+  def unquote(:"id-ce-authorityKeyIdentifier")(), do: ...
+
+  def unquote(:"id-ce-basicConstraints")(), do: ...
+
+  def unquote(:"id-ce-cRLDistributionPoints")(), do: ...
+
+  def unquote(:"id-ce-cRLNumber")(), do: ...
+
+  def unquote(:"id-ce-cRLReasons")(), do: ...
+
+  def unquote(:"id-ce-certificateIssuer")(), do: ...
+
+  def unquote(:"id-ce-certificatePolicies")(), do: ...
+
+  def unquote(:"id-ce-deltaCRLIndicator")(), do: ...
+
+  def unquote(:"id-ce-extKeyUsage")(), do: ...
+
+  def unquote(:"id-ce-freshestCRL")(), do: ...
+
+  def unquote(:"id-ce-holdInstructionCode")(), do: ...
+
+  def unquote(:"id-ce-inhibitAnyPolicy")(), do: ...
+
+  def unquote(:"id-ce-invalidityDate")(), do: ...
+
+  def unquote(:"id-ce-issuerAltName")(), do: ...
+
+  def unquote(:"id-ce-issuingDistributionPoint")(), do: ...
+
+  def unquote(:"id-ce-keyUsage")(), do: ...
+
+  def unquote(:"id-ce-nameConstraints")(), do: ...
+
+  def unquote(:"id-ce-policyConstraints")(), do: ...
+
+  def unquote(:"id-ce-policyMappings")(), do: ...
+
+  def unquote(:"id-ce-privateKeyUsagePeriod")(), do: ...
+
+  def unquote(:"id-ce-subjectAltName")(), do: ...
+
+  def unquote(:"id-ce-subjectDirectoryAttributes")(), do: ...
+
+  def unquote(:"id-ce-subjectKeyIdentifier")(), do: ...
+
+  def unquote(:"id-ce-targetInformation")(), do: ...
+
+  def unquote(:"id-characteristic-two-basis")(), do: ...
+
+  def unquote(:"id-domainComponent")(), do: ...
+
+  def unquote(:"id-dsa")(), do: ...
+
+  def unquote(:"id-dsa-with-sha1")(), do: ...
+
+  def unquote(:"id-dsaWithSHA1")(), do: ...
+
+  def unquote(:"id-ecPublicKey")(), do: ...
+
+  def unquote(:"id-ecSigType")(), do: ...
+
+  def unquote(:"id-emailAddress")(), do: ...
+
+  def unquote(:"id-extensionReq")(), do: ...
+
+  def unquote(:"id-failInfo")(), do: ...
+
+  def unquote(:"id-fieldType")(), do: ...
+
+  def unquote(:"id-hmacWithSHA224")(), do: ...
+
+  def unquote(:"id-hmacWithSHA256")(), do: ...
+
+  def unquote(:"id-hmacWithSHA384")(), do: ...
+
+  def unquote(:"id-hmacWithSHA512")(), do: ...
+
+  def unquote(:"id-holdinstruction-callissuer")(), do: ...
+
+  def unquote(:"id-holdinstruction-none")(), do: ...
+
+  def unquote(:"id-holdinstruction-reject")(), do: ...
+
+  def unquote(:"id-keyExchangeAlgorithm")(), do: ...
+
+  def unquote(:"id-kp")(), do: ...
+
+  def unquote(:"id-kp-OCSPSigning")(), do: ...
+
+  def unquote(:"id-kp-clientAuth")(), do: ...
+
+  def unquote(:"id-kp-codeSigning")(), do: ...
+
+  def unquote(:"id-kp-emailProtection")(), do: ...
+
+  def unquote(:"id-kp-serverAuth")(), do: ...
+
+  def unquote(:"id-kp-timeStamping")(), do: ...
+
+  def unquote(:"id-md2")(), do: ...
+
+  def unquote(:"id-md5")(), do: ...
+
+  def unquote(:"id-messageType")(), do: ...
+
+  def unquote(:"id-mgf1")(), do: ...
+
+  def unquote(:"id-pSpecified")(), do: ...
+
+  def unquote(:"id-pe")(), do: ...
+
+  def unquote(:"id-pe-aaControls")(), do: ...
+
+  def unquote(:"id-pe-ac-auditIdentity")(), do: ...
+
+  def unquote(:"id-pe-ac-proxying")(), do: ...
+
+  def unquote(:"id-pe-authorityInfoAccess")(), do: ...
+
+  def unquote(:"id-pe-subjectInfoAccess")(), do: ...
+
+  def unquote(:"id-pki")(), do: ...
+
+  def unquote(:"id-pkiStatus")(), do: ...
+
+  def unquote(:"id-pkix")(), do: ...
+
+  def unquote(:"id-publicKeyType")(), do: ...
+
+  def unquote(:"id-qt")(), do: ...
+
+  def unquote(:"id-qt-cps")(), do: ...
+
+  def unquote(:"id-qt-unotice")(), do: ...
+
+  def unquote(:"id-recipientNonce")(), do: ...
+
+  def unquote(:"id-senderNonce")(), do: ...
+
+  def unquote(:"id-sha1")(), do: ...
+
+  def unquote(:"id-sha224")(), do: ...
+
+  def unquote(:"id-sha256")(), do: ...
+
+  def unquote(:"id-sha384")(), do: ...
+
+  def unquote(:"id-sha512")(), do: ...
+
+  def unquote(:"id-transId")(), do: ...
+
+  def info(), do: ...
+
+  def legacy_erlang_types(), do: ...
+
+  def unquote(:"local-postal-attributes")(), do: ...
+
+  def maps(), do: ...
+
+  def md2WithRSAEncryption(), do: ...
+
+  def md5WithRSAEncryption(), do: ...
 
   def module_info() do
     # body not decompiled
@@ -3627,4989 +2553,271 @@ defmodule :"OTP-PUB-KEY" do
     # body not decompiled
   end
 
-  def unquote(:"pds-name")() do
-    # body not decompiled
-  end
-
-  def unquote(:"physical-delivery-country-name")() do
-    # body not decompiled
-  end
-
-  def unquote(:"physical-delivery-office-name")() do
-    # body not decompiled
-  end
-
-  def unquote(:"physical-delivery-office-number")() do
-    # body not decompiled
-  end
-
-  def unquote(:"physical-delivery-organization-name")() do
-    # body not decompiled
-  end
-
-  def unquote(:"physical-delivery-personal-name")() do
-    # body not decompiled
-  end
-
-  def unquote(:"pkcs-1")() do
-    # body not decompiled
-  end
-
-  def unquote(:"pkcs-3")() do
-    # body not decompiled
-  end
-
-  def unquote(:"pkcs-7")() do
-    # body not decompiled
-  end
-
-  def unquote(:"pkcs-9")() do
-    # body not decompiled
-  end
-
-  def unquote(:"pkcs-9-at-challengePassword")() do
-    # body not decompiled
-  end
-
-  def unquote(:"pkcs-9-at-contentType")() do
-    # body not decompiled
-  end
-
-  def unquote(:"pkcs-9-at-counterSignature")() do
-    # body not decompiled
-  end
-
-  def unquote(:"pkcs-9-at-extensionRequest")() do
-    # body not decompiled
-  end
-
-  def unquote(:"pkcs-9-at-messageDigest")() do
-    # body not decompiled
-  end
-
-  def unquote(:"pkcs-9-at-signingTime")() do
-    # body not decompiled
-  end
-
-  def unquote(:"post-office-box-address")() do
-    # body not decompiled
-  end
-
-  def unquote(:"postal-code")() do
-    # body not decompiled
-  end
-
-  def unquote(:"poste-restante-address")() do
-    # body not decompiled
-  end
-
-  def ppBasis() do
-    # body not decompiled
-  end
-
-  def unquote(:"prime-field")() do
-    # body not decompiled
-  end
-
-  def rsaEncryption() do
-    # body not decompiled
-  end
-
-  def secp112r1() do
-    # body not decompiled
-  end
-
-  def secp112r2() do
-    # body not decompiled
-  end
-
-  def secp128r1() do
-    # body not decompiled
-  end
-
-  def secp128r2() do
-    # body not decompiled
-  end
-
-  def secp160k1() do
-    # body not decompiled
-  end
-
-  def secp160r1() do
-    # body not decompiled
-  end
-
-  def secp160r2() do
-    # body not decompiled
-  end
-
-  def secp192k1() do
-    # body not decompiled
-  end
-
-  def secp192r1() do
-    # body not decompiled
-  end
-
-  def secp224k1() do
-    # body not decompiled
-  end
-
-  def secp224r1() do
-    # body not decompiled
-  end
-
-  def secp256k1() do
-    # body not decompiled
-  end
-
-  def secp256r1() do
-    # body not decompiled
-  end
-
-  def secp384r1() do
-    # body not decompiled
-  end
-
-  def secp521r1() do
-    # body not decompiled
-  end
-
-  def sect113r1() do
-    # body not decompiled
-  end
-
-  def sect113r2() do
-    # body not decompiled
-  end
-
-  def sect131r1() do
-    # body not decompiled
-  end
-
-  def sect131r2() do
-    # body not decompiled
-  end
-
-  def sect163k1() do
-    # body not decompiled
-  end
-
-  def sect163r1() do
-    # body not decompiled
-  end
-
-  def sect163r2() do
-    # body not decompiled
-  end
-
-  def sect193r1() do
-    # body not decompiled
-  end
-
-  def sect193r2() do
-    # body not decompiled
-  end
-
-  def sect233k1() do
-    # body not decompiled
-  end
-
-  def sect233r1() do
-    # body not decompiled
-  end
-
-  def sect239k1() do
-    # body not decompiled
-  end
-
-  def sect283k1() do
-    # body not decompiled
-  end
-
-  def sect283r1() do
-    # body not decompiled
-  end
-
-  def sect409k1() do
-    # body not decompiled
-  end
-
-  def sect409r1() do
-    # body not decompiled
-  end
-
-  def sect571k1() do
-    # body not decompiled
-  end
-
-  def sect571r1() do
-    # body not decompiled
-  end
-
-  def unquote(:"sha-1WithRSAEncryption")() do
-    # body not decompiled
-  end
-
-  def sha1WithRSAEncryption() do
-    # body not decompiled
-  end
-
-  def sha224WithRSAEncryption() do
-    # body not decompiled
-  end
-
-  def sha256WithRSAEncryption() do
-    # body not decompiled
-  end
-
-  def sha384WithRSAEncryption() do
-    # body not decompiled
-  end
-
-  def sha512WithRSAEncryption() do
-    # body not decompiled
-  end
-
-  def signedAndEnvelopedData() do
-    # body not decompiled
-  end
-
-  def signedData() do
-    # body not decompiled
-  end
-
-  def unquote(:"street-address")() do
-    # body not decompiled
-  end
-
-  def unquote(:"teletex-common-name")() do
-    # body not decompiled
-  end
-
-  def unquote(:"teletex-domain-defined-attributes")() do
-    # body not decompiled
-  end
-
-  def unquote(:"teletex-organization-name")() do
-    # body not decompiled
-  end
-
-  def unquote(:"teletex-organizational-unit-names")() do
-    # body not decompiled
-  end
-
-  def unquote(:"teletex-personal-name")() do
-    # body not decompiled
-  end
-
-  def unquote(:"terminal-type")() do
-    # body not decompiled
-  end
-
-  def tpBasis() do
-    # body not decompiled
-  end
-
-  def unquote(:"ub-common-name")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ub-common-name-printable")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ub-common-name-teletex")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ub-common-name-universal")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ub-common-name-utf8")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ub-country-name-alpha-length")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ub-country-name-numeric-length")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ub-domain-defined-attribute-type-length")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ub-domain-defined-attribute-value-length")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ub-domain-defined-attributes")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ub-domain-name-length")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ub-e163-4-number-length")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ub-e163-4-sub-address-length")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ub-emailaddress-length")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ub-extension-attributes")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ub-generation-qualifier-length")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ub-given-name-length")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ub-initials-length")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ub-integer-options")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ub-locality-name")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ub-locality-name-universal")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ub-locality-name-utf8")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ub-match")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ub-name")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ub-name-printable")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ub-name-teletex")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ub-name-universal")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ub-name-utf8")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ub-numeric-user-id-length")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ub-organization-name")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ub-organization-name-printable")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ub-organization-name-teletex")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ub-organization-name-universal")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ub-organization-name-utf8")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ub-organizational-unit-name")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ub-organizational-unit-name-printable")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ub-organizational-unit-name-teletex")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ub-organizational-unit-name-universal")() do
-    # body not decompiled
-  end
-
-  def unquote(:"ub-organizational-unit-name-utf8")() do
-    # body not decompiled
-  end
+  def unquote(:"pds-name")(), do: ...
 
-  def unquote(:"ub-organizational-units")() do
-    # body not decompiled
-  end
+  def unquote(:"physical-delivery-country-name")(), do: ...
 
-  def unquote(:"ub-pds-name-length")() do
-    # body not decompiled
-  end
+  def unquote(:"physical-delivery-office-name")(), do: ...
 
-  def unquote(:"ub-pds-parameter-length")() do
-    # body not decompiled
-  end
+  def unquote(:"physical-delivery-office-number")(), do: ...
 
-  def unquote(:"ub-pds-physical-address-lines")() do
-    # body not decompiled
-  end
+  def unquote(:"physical-delivery-organization-name")(), do: ...
 
-  def unquote(:"ub-postal-code-length")() do
-    # body not decompiled
-  end
+  def unquote(:"physical-delivery-personal-name")(), do: ...
 
-  def unquote(:"ub-pseudonym")() do
-    # body not decompiled
-  end
+  def unquote(:"pkcs-1")(), do: ...
 
-  def unquote(:"ub-pseudonym-universal")() do
-    # body not decompiled
-  end
+  def unquote(:"pkcs-3")(), do: ...
 
-  def unquote(:"ub-pseudonym-utf8")() do
-    # body not decompiled
-  end
+  def unquote(:"pkcs-7")(), do: ...
 
-  def unquote(:"ub-serial-number")() do
-    # body not decompiled
-  end
+  def unquote(:"pkcs-9")(), do: ...
 
-  def unquote(:"ub-state-name")() do
-    # body not decompiled
-  end
+  def unquote(:"pkcs-9-at-challengePassword")(), do: ...
 
-  def unquote(:"ub-state-name-universal")() do
-    # body not decompiled
-  end
+  def unquote(:"pkcs-9-at-contentType")(), do: ...
 
-  def unquote(:"ub-state-name-utf8")() do
-    # body not decompiled
-  end
+  def unquote(:"pkcs-9-at-counterSignature")(), do: ...
 
-  def unquote(:"ub-surname-length")() do
-    # body not decompiled
-  end
+  def unquote(:"pkcs-9-at-extensionRequest")(), do: ...
 
-  def unquote(:"ub-terminal-id-length")() do
-    # body not decompiled
-  end
+  def unquote(:"pkcs-9-at-messageDigest")(), do: ...
 
-  def unquote(:"ub-title")() do
-    # body not decompiled
-  end
+  def unquote(:"pkcs-9-at-signingTime")(), do: ...
 
-  def unquote(:"ub-title-printable")() do
-    # body not decompiled
-  end
+  def unquote(:"post-office-box-address")(), do: ...
 
-  def unquote(:"ub-title-teletex")() do
-    # body not decompiled
-  end
+  def unquote(:"postal-code")(), do: ...
 
-  def unquote(:"ub-title-universal")() do
-    # body not decompiled
-  end
+  def unquote(:"poste-restante-address")(), do: ...
 
-  def unquote(:"ub-title-utf8")() do
-    # body not decompiled
-  end
+  def ppBasis(), do: ...
 
-  def unquote(:"ub-unformatted-address-length")() do
-    # body not decompiled
-  end
+  def unquote(:"prime-field")(), do: ...
 
-  def unquote(:"ub-x121-address-length")() do
-    # body not decompiled
-  end
+  def rsaEncryption(), do: ...
 
-  def unquote(:"unformatted-postal-address")() do
-    # body not decompiled
-  end
+  def secp112r1(), do: ...
 
-  def unquote(:"unique-postal-name")() do
-    # body not decompiled
-  end
+  def secp112r2(), do: ...
 
-  def versionOne() do
-    # body not decompiled
-  end
+  def secp128r1(), do: ...
 
-  # Private Functions
-
-  defp unquote(:"-dec_ACClearAttrs_attrs/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_AttrSpec/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_AttributeCertificateInfo_attributes/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_Attribute_values/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_AuthorityInfoAccessSyntax/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_BuiltInDomainDefinedAttributes/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_CRLDistributionPoints/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_CRLSequence/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_CertificatePolicies/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_CertificateRevocationLists/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_Certificates/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_CertificationRequestInfo_attributes/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_CertificationRequestInfo_attributes_AttributePKCS-10_values/3-lc$^0/1-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_Clearance_securityCategories/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_DigestAlgorithmIdentifiers_daSequence/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_DigestAlgorithmIdentifiers_daSet/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_ExtKeyUsageSyntax/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_ExtendedCertificatesAndCertificates/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_ExtensionAttributes/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_Extensions/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_GeneralNames/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_GeneralSubtrees/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_IetfAttrSyntax_values/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_NoticeReference_noticeNumbers/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_OTPExtensionAttributes/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_OTPExtensions/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_OrganizationalUnitNames/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_OtherPrimeInfos/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_PDSParameter/2-fun-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_PDSParameter/2-lc$^1/1-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_PDSParameter/2-lc$^2/1-1-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_PersonalName/2-fun-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_PersonalName/2-lc$^1/1-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_PersonalName/2-lc$^2/1-1-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_PolicyInformation_policyQualifiers/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_PolicyMappings/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_PresentationAddress_nAddresses/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_ProxyInfo/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_RDNSequence/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_RecipientInfos_riSequence/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_RecipientInfos_riSet/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_RelativeDistinguishedName/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_SignerInfoAuthenticatedAttributes_aaSequence/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_SignerInfoAuthenticatedAttributes_aaSequence_AttributePKCS-7_values/3-lc$^0/1-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_SignerInfoAuthenticatedAttributes_aaSet/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_SignerInfoAuthenticatedAttributes_aaSet_AttributePKCS-7_values/3-lc$^0/1-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_SignerInfo_unauthenticatedAttributes_uaSequence/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_SignerInfo_unauthenticatedAttributes_uaSequence_AttributePKCS-7_values/3-lc$^0/1-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_SignerInfo_unauthenticatedAttributes_uaSet/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_SignerInfo_unauthenticatedAttributes_uaSet_AttributePKCS-7_values/3-lc$^0/1-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_SignerInfos_siSequence/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_SignerInfos_siSet/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_SubjectDirectoryAttributes/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_SubjectInfoAccessSyntax/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_TBSCertList_revokedCertificates/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_Targets/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_TeletexDomainDefinedAttributes/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_TeletexOrganizationalUnitNames/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_TeletexPersonalName/2-fun-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_TeletexPersonalName/2-lc$^1/1-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_TeletexPersonalName/2-lc$^2/1-1-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_UnformattedPostalAddress/2-fun-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_UnformattedPostalAddress/2-lc$^1/1-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_UnformattedPostalAddress/2-lc$^2/1-1-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dec_UnformattedPostalAddress_printable-address/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-dynamicsort_SETOF/1-fun-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-e_object_identifier/1-fun-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_Authenticated/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_Authenticated/1-fun-1-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_Authenticated/1-fun-2-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_Authenticated/1-fun-3-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_Authenticated/1-fun-4-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_Authenticated/1-fun-5-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_Authenticated/1-fun-6-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_Authenticated/1-fun-7-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_Authenticated/1-fun-8-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_Authenticated/1-fun-9-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_CRIAttributes/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_ContentEncryptionAlgorithms/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_Contents/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_Contents/1-fun-1-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_Contents/1-fun-2-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_Contents/1-fun-3-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_Contents/1-fun-4-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_Contents/1-fun-5-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_Contents/1-fun-6-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_DigestAlgorithms/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_DigestEncryptionAlgorithms/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_KeyEncryptionAlgorithms/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_PKInfoAlgorithms/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SignatureAlgorithms/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedAttributeTypeAndValues/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedAttributeTypeAndValues/1-fun-1-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedAttributeTypeAndValues/1-fun-10-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedAttributeTypeAndValues/1-fun-11-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedAttributeTypeAndValues/1-fun-12-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedAttributeTypeAndValues/1-fun-13-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedAttributeTypeAndValues/1-fun-14-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedAttributeTypeAndValues/1-fun-15-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedAttributeTypeAndValues/1-fun-16-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedAttributeTypeAndValues/1-fun-17-")(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedAttributeTypeAndValues/1-fun-2-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedAttributeTypeAndValues/1-fun-3-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedAttributeTypeAndValues/1-fun-4-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedAttributeTypeAndValues/1-fun-5-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedAttributeTypeAndValues/1-fun-6-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedAttributeTypeAndValues/1-fun-7-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedAttributeTypeAndValues/1-fun-8-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedAttributeTypeAndValues/1-fun-9-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedCharacteristicTwos/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedCharacteristicTwos/1-fun-1-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedCharacteristicTwos/1-fun-2-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedCharacteristicTwos/1-fun-3-")(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-1-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-10-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-11-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-12-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-13-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-14-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-15-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-16-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-17-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-18-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-19-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-2-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-20-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-21-")(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-3-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-4-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-5-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-6-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-7-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-8-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensionAttributes/1-fun-9-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensions/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensions/1-fun-1-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensions/1-fun-10-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensions/1-fun-11-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensions/1-fun-12-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensions/1-fun-13-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensions/1-fun-14-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensions/1-fun-15-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensions/1-fun-16-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensions/1-fun-17-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensions/1-fun-18-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensions/1-fun-19-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensions/1-fun-2-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensions/1-fun-20-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensions/1-fun-21-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensions/1-fun-22-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensions/1-fun-23-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensions/1-fun-24-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensions/1-fun-25-")(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensions/1-fun-3-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensions/1-fun-4-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensions/1-fun-5-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensions/1-fun-6-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensions/1-fun-7-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensions/1-fun-8-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedExtensions/1-fun-9-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedFieldIds/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedFieldIds/1-fun-1-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedFieldIds/1-fun-2-")(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedPublicKeyAlgorithms/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedPublicKeyAlgorithms/1-fun-1-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedPublicKeyAlgorithms/1-fun-2-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedPublicKeyAlgorithms/1-fun-3-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedPublicKeyAlgorithms/1-fun-4-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedPublicKeyAlgorithms/1-fun-5-")(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedSignatureAlgorithms/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedSignatureAlgorithms/1-fun-1-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedSignatureAlgorithms/1-fun-10-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedSignatureAlgorithms/1-fun-11-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedSignatureAlgorithms/1-fun-12-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedSignatureAlgorithms/1-fun-13-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedSignatureAlgorithms/1-fun-14-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedSignatureAlgorithms/1-fun-15-")(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedSignatureAlgorithms/1-fun-2-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedSignatureAlgorithms/1-fun-3-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedSignatureAlgorithms/1-fun-4-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedSignatureAlgorithms/1-fun-5-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedSignatureAlgorithms/1-fun-6-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedSignatureAlgorithms/1-fun-7-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedSignatureAlgorithms/1-fun-8-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_SupportedSignatureAlgorithms/1-fun-9-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_Unauthenticated/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_Unauthenticated/1-fun-1-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_Unauthenticated/1-fun-2-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_Unauthenticated/1-fun-3-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_internal_object_set_argument_1/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_internal_object_set_argument_10/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_internal_object_set_argument_11/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_internal_object_set_argument_12/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_internal_object_set_argument_13/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_internal_object_set_argument_2/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_internal_object_set_argument_3/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_internal_object_set_argument_4/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_internal_object_set_argument_4/1-fun-1-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_internal_object_set_argument_4/1-fun-2-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_internal_object_set_argument_4/1-fun-3-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_internal_object_set_argument_4/1-fun-4-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_internal_object_set_argument_4/1-fun-5-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_internal_object_set_argument_4/1-fun-6-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_internal_object_set_argument_4/1-fun-7-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_internal_object_set_argument_4/1-fun-8-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_internal_object_set_argument_4/1-fun-9-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_internal_object_set_argument_5/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_internal_object_set_argument_5/1-fun-1-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_internal_object_set_argument_5/1-fun-2-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_internal_object_set_argument_5/1-fun-3-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_internal_object_set_argument_5/1-fun-4-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_internal_object_set_argument_5/1-fun-5-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_internal_object_set_argument_5/1-fun-6-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_internal_object_set_argument_5/1-fun-7-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_internal_object_set_argument_5/1-fun-8-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_internal_object_set_argument_5/1-fun-9-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_internal_object_set_argument_6/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_internal_object_set_argument_7/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_internal_object_set_argument_7/1-fun-1-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_internal_object_set_argument_7/1-fun-2-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_internal_object_set_argument_7/1-fun-3-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_internal_object_set_argument_8/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_internal_object_set_argument_8/1-fun-1-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_internal_object_set_argument_8/1-fun-2-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_internal_object_set_argument_8/1-fun-3-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getdec_internal_object_set_argument_9/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_Authenticated/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_Authenticated/1-fun-1-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_Authenticated/1-fun-2-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_Authenticated/1-fun-3-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_Authenticated/1-fun-4-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_Authenticated/1-fun-5-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_Authenticated/1-fun-6-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_Authenticated/1-fun-7-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_Authenticated/1-fun-8-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_Authenticated/1-fun-9-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_CRIAttributes/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_ContentEncryptionAlgorithms/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_Contents/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_Contents/1-fun-1-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_Contents/1-fun-2-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_Contents/1-fun-3-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_Contents/1-fun-4-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_Contents/1-fun-5-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_Contents/1-fun-6-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_DigestAlgorithms/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_DigestEncryptionAlgorithms/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_KeyEncryptionAlgorithms/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_PKInfoAlgorithms/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SignatureAlgorithms/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedAttributeTypeAndValues/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedAttributeTypeAndValues/1-fun-1-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedAttributeTypeAndValues/1-fun-10-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedAttributeTypeAndValues/1-fun-11-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedAttributeTypeAndValues/1-fun-12-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedAttributeTypeAndValues/1-fun-13-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedAttributeTypeAndValues/1-fun-14-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedAttributeTypeAndValues/1-fun-15-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedAttributeTypeAndValues/1-fun-16-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedAttributeTypeAndValues/1-fun-17-")(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedAttributeTypeAndValues/1-fun-2-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedAttributeTypeAndValues/1-fun-3-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedAttributeTypeAndValues/1-fun-4-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedAttributeTypeAndValues/1-fun-5-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedAttributeTypeAndValues/1-fun-6-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedAttributeTypeAndValues/1-fun-7-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedAttributeTypeAndValues/1-fun-8-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedAttributeTypeAndValues/1-fun-9-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedCharacteristicTwos/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedCharacteristicTwos/1-fun-1-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedCharacteristicTwos/1-fun-2-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedCharacteristicTwos/1-fun-3-")(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-1-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-10-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-11-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-12-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-13-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-14-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-15-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-16-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-17-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-18-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-19-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-2-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-20-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-21-")(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-3-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-4-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-5-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-6-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-7-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-8-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensionAttributes/1-fun-9-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensions/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensions/1-fun-1-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensions/1-fun-10-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensions/1-fun-11-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensions/1-fun-12-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensions/1-fun-13-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensions/1-fun-14-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensions/1-fun-15-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensions/1-fun-16-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensions/1-fun-17-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensions/1-fun-18-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensions/1-fun-19-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensions/1-fun-2-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensions/1-fun-20-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensions/1-fun-21-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensions/1-fun-22-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensions/1-fun-23-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensions/1-fun-24-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensions/1-fun-25-")(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensions/1-fun-3-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensions/1-fun-4-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensions/1-fun-5-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensions/1-fun-6-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensions/1-fun-7-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensions/1-fun-8-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedExtensions/1-fun-9-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedFieldIds/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedFieldIds/1-fun-1-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedFieldIds/1-fun-2-")(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedPublicKeyAlgorithms/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedPublicKeyAlgorithms/1-fun-1-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedPublicKeyAlgorithms/1-fun-2-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedPublicKeyAlgorithms/1-fun-3-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedPublicKeyAlgorithms/1-fun-4-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedPublicKeyAlgorithms/1-fun-5-")(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedSignatureAlgorithms/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedSignatureAlgorithms/1-fun-1-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedSignatureAlgorithms/1-fun-10-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedSignatureAlgorithms/1-fun-11-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedSignatureAlgorithms/1-fun-12-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedSignatureAlgorithms/1-fun-13-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedSignatureAlgorithms/1-fun-14-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedSignatureAlgorithms/1-fun-15-")(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedSignatureAlgorithms/1-fun-2-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedSignatureAlgorithms/1-fun-3-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedSignatureAlgorithms/1-fun-4-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedSignatureAlgorithms/1-fun-5-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedSignatureAlgorithms/1-fun-6-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedSignatureAlgorithms/1-fun-7-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedSignatureAlgorithms/1-fun-8-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_SupportedSignatureAlgorithms/1-fun-9-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_Unauthenticated/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_Unauthenticated/1-fun-1-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_Unauthenticated/1-fun-2-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_Unauthenticated/1-fun-3-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_internal_object_set_argument_1/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_internal_object_set_argument_10/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_internal_object_set_argument_11/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_internal_object_set_argument_12/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_internal_object_set_argument_13/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_internal_object_set_argument_2/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_internal_object_set_argument_3/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_internal_object_set_argument_4/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_internal_object_set_argument_4/1-fun-1-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_internal_object_set_argument_4/1-fun-2-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_internal_object_set_argument_4/1-fun-3-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_internal_object_set_argument_4/1-fun-4-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_internal_object_set_argument_4/1-fun-5-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_internal_object_set_argument_4/1-fun-6-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_internal_object_set_argument_4/1-fun-7-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_internal_object_set_argument_4/1-fun-8-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_internal_object_set_argument_4/1-fun-9-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_internal_object_set_argument_5/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_internal_object_set_argument_5/1-fun-1-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_internal_object_set_argument_5/1-fun-2-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_internal_object_set_argument_5/1-fun-3-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_internal_object_set_argument_5/1-fun-4-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_internal_object_set_argument_5/1-fun-5-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_internal_object_set_argument_5/1-fun-6-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_internal_object_set_argument_5/1-fun-7-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_internal_object_set_argument_5/1-fun-8-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_internal_object_set_argument_5/1-fun-9-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_internal_object_set_argument_6/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_internal_object_set_argument_7/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_internal_object_set_argument_7/1-fun-1-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_internal_object_set_argument_7/1-fun-2-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_internal_object_set_argument_7/1-fun-3-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_internal_object_set_argument_8/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_internal_object_set_argument_8/1-fun-1-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_internal_object_set_argument_8/1-fun-2-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_internal_object_set_argument_8/1-fun-3-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getenc_internal_object_set_argument_9/1-fun-0-")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp ber_decode_nif(p0) do
-    # body not decompiled
-  end
-
-  defp ber_encode(p0) do
-    # body not decompiled
-  end
-
-  defp check_int(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp check_named_bitstring(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  defp collect_parts(p0) do
-    # body not decompiled
-  end
-
-  defp collect_parts(p0, p1) do
-    # body not decompiled
-  end
-
-  defp collect_parts_bit(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"dec-inc-Certificate")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"dec-inc-Certificate")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"dec-inc-CertificateList")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"dec-inc-CertificateList")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp dec_AAControls(p0) do
-    # body not decompiled
-  end
-
-  defp dec_ACClearAttrs(p0) do
-    # body not decompiled
-  end
-
-  defp dec_ACClearAttrs_attrs(p0, p1) do
-    # body not decompiled
-  end
-
-  defp dec_AccessDescription(p0) do
-    # body not decompiled
-  end
-
-  defp dec_AdministrationDomainName(p0) do
-    # body not decompiled
-  end
-
-  defp dec_Algorithm(p0) do
-    # body not decompiled
-  end
-
-  defp dec_AlgorithmIdentifier(p0) do
-    # body not decompiled
-  end
-
-  defp dec_AlgorithmNull(p0) do
-    # body not decompiled
-  end
-
-  defp dec_AnotherName(p0) do
-    # body not decompiled
-  end
-
-  defp dec_Any(p0) do
-    # body not decompiled
-  end
-
-  defp dec_AttCertIssuer(p0) do
-    # body not decompiled
-  end
-
-  defp dec_AttCertValidityPeriod(p0) do
-    # body not decompiled
-  end
-
-  defp dec_AttCertVersion(p0) do
-    # body not decompiled
-  end
-
-  defp dec_AttrSpec(p0) do
-    # body not decompiled
-  end
-
-  defp dec_Attribute(p0) do
-    # body not decompiled
-  end
-
-  defp dec_AttributeCertificate(p0) do
-    # body not decompiled
-  end
-
-  defp dec_AttributeCertificateInfo(p0) do
-    # body not decompiled
-  end
-
-  defp dec_AttributeCertificateInfo_attributes(p0, p1) do
-    # body not decompiled
-  end
-
-  defp dec_AttributeType(p0) do
-    # body not decompiled
-  end
-
-  defp dec_AttributeTypeAndValue(p0) do
-    # body not decompiled
-  end
-
-  defp dec_AttributeValue(p0) do
-    # body not decompiled
-  end
-
-  defp dec_Attribute_values(p0, p1) do
-    # body not decompiled
-  end
-
-  defp dec_AuthorityInfoAccessSyntax(p0) do
-    # body not decompiled
-  end
-
-  defp dec_AuthorityKeyIdentifier(p0) do
-    # body not decompiled
-  end
-
-  defp dec_BaseCRLNumber(p0) do
-    # body not decompiled
-  end
-
-  defp dec_BaseDistance(p0) do
-    # body not decompiled
-  end
-
-  defp dec_BasicConstraints(p0) do
-    # body not decompiled
-  end
-
-  defp dec_Boolean(p0) do
-    # body not decompiled
-  end
-
-  defp dec_BuiltInDomainDefinedAttribute(p0) do
-    # body not decompiled
-  end
-
-  defp dec_BuiltInDomainDefinedAttributes(p0) do
-    # body not decompiled
-  end
-
-  defp dec_BuiltInStandardAttributes(p0) do
-    # body not decompiled
-  end
-
-  defp dec_CPSuri(p0) do
-    # body not decompiled
-  end
-
-  defp dec_CRLDistributionPoints(p0) do
-    # body not decompiled
-  end
-
-  defp dec_CRLNumber(p0) do
-    # body not decompiled
-  end
-
-  defp dec_CRLReason(p0) do
-    # body not decompiled
-  end
-
-  defp dec_CRLSequence(p0) do
-    # body not decompiled
-  end
-
-  defp dec_CertPolicyId(p0) do
-    # body not decompiled
-  end
-
-  defp dec_Certificate(p0) do
-    # body not decompiled
-  end
-
-  defp dec_CertificateIssuer(p0) do
-    # body not decompiled
-  end
-
-  defp dec_CertificateList(p0) do
-    # body not decompiled
-  end
-
-  defp dec_CertificatePolicies(p0) do
-    # body not decompiled
-  end
-
-  defp dec_CertificateRevocationLists(p0) do
-    # body not decompiled
-  end
-
-  defp dec_CertificateSerialNumber(p0) do
-    # body not decompiled
-  end
-
-  defp dec_Certificates(p0) do
-    # body not decompiled
-  end
-
-  defp dec_CertificationRequest(p0) do
-    # body not decompiled
-  end
-
-  defp dec_CertificationRequestInfo(p0) do
-    # body not decompiled
-  end
-
-  defp dec_CertificationRequestInfo_attributes(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"dec_CertificationRequestInfo_attributes_AttributePKCS-10")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"dec_CertificationRequestInfo_attributes_AttributePKCS-10_values")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp dec_CertificationRequestInfo_subjectPKInfo(p0, p1) do
-    # body not decompiled
-  end
-
-  defp dec_CertificationRequestInfo_subjectPKInfo_algorithm(p0, p1) do
-    # body not decompiled
-  end
-
-  defp dec_CertificationRequest_signatureAlgorithm(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"dec_Characteristic-two")(p0) do
-    # body not decompiled
-  end
-
-  defp dec_ClassList(p0) do
-    # body not decompiled
-  end
-
-  defp dec_Clearance(p0) do
-    # body not decompiled
-  end
-
-  defp dec_Clearance_securityCategories(p0, p1) do
-    # body not decompiled
-  end
-
-  defp dec_CommonName(p0) do
-    # body not decompiled
-  end
-
-  defp dec_ContentEncryptionAlgorithmIdentifier(p0) do
-    # body not decompiled
-  end
-
-  defp dec_ContentInfo(p0) do
-    # body not decompiled
-  end
-
-  defp dec_ContentType(p0) do
-    # body not decompiled
-  end
-
-  defp dec_CountryName(p0) do
-    # body not decompiled
-  end
-
-  defp dec_Curve(p0) do
-    # body not decompiled
-  end
-
-  defp dec_DHParameter(p0) do
-    # body not decompiled
-  end
-
-  defp dec_DHPublicKey(p0) do
-    # body not decompiled
-  end
-
-  defp dec_DSAParams(p0) do
-    # body not decompiled
-  end
-
-  defp dec_DSAPrivateKey(p0) do
-    # body not decompiled
-  end
-
-  defp dec_DSAPublicKey(p0) do
-    # body not decompiled
-  end
-
-  defp dec_Data(p0) do
-    # body not decompiled
-  end
-
-  defp dec_Digest(p0) do
-    # body not decompiled
-  end
-
-  defp dec_DigestAlgorithmIdentifier(p0) do
-    # body not decompiled
-  end
-
-  defp dec_DigestAlgorithmIdentifiers(p0) do
-    # body not decompiled
-  end
-
-  defp dec_DigestAlgorithmIdentifiers_daSequence(p0, p1) do
-    # body not decompiled
-  end
-
-  defp dec_DigestAlgorithmIdentifiers_daSet(p0, p1) do
-    # body not decompiled
-  end
-
-  defp dec_DigestEncryptionAlgorithmIdentifier(p0) do
-    # body not decompiled
-  end
-
-  defp dec_DigestInfoNull(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"dec_DigestInfoPKCS-1")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"dec_DigestInfoPKCS-7")(p0) do
-    # body not decompiled
-  end
-
-  defp dec_DigestedData(p0) do
-    # body not decompiled
-  end
-
-  defp dec_DirectoryString(p0) do
-    # body not decompiled
-  end
-
-  defp dec_DisplayText(p0) do
-    # body not decompiled
-  end
-
-  defp dec_DistinguishedName(p0) do
-    # body not decompiled
-  end
-
-  defp dec_DistributionPoint(p0) do
-    # body not decompiled
-  end
-
-  defp dec_DistributionPointName(p0) do
-    # body not decompiled
-  end
-
-  defp dec_DomainComponent(p0) do
-    # body not decompiled
-  end
-
-  defp dec_DomainParameters(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"dec_Dss-Parms")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"dec_Dss-Sig-Value")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"dec_ECDSA-Sig-Value")(p0) do
-    # body not decompiled
-  end
-
-  defp dec_ECPVer(p0) do
-    # body not decompiled
-  end
-
-  defp dec_ECParameters(p0) do
-    # body not decompiled
-  end
-
-  defp dec_ECPoint(p0) do
-    # body not decompiled
-  end
-
-  defp dec_ECPrivateKey(p0) do
-    # body not decompiled
-  end
-
-  defp dec_EDIPartyName(p0) do
-    # body not decompiled
-  end
-
-  defp dec_EcpkParameters(p0) do
-    # body not decompiled
-  end
-
-  defp dec_EmailAddress(p0) do
-    # body not decompiled
-  end
-
-  defp dec_EncryptedContent(p0) do
-    # body not decompiled
-  end
-
-  defp dec_EncryptedContentInfo(p0) do
-    # body not decompiled
-  end
-
-  defp dec_EncryptedData(p0) do
-    # body not decompiled
-  end
-
-  defp dec_EncryptedDigest(p0) do
-    # body not decompiled
-  end
-
-  defp dec_EncryptedKey(p0) do
-    # body not decompiled
-  end
-
-  defp dec_EnvelopedData(p0) do
-    # body not decompiled
-  end
-
-  defp dec_ExtKeyUsageSyntax(p0) do
-    # body not decompiled
-  end
-
-  defp dec_ExtendedCertificate(p0) do
-    # body not decompiled
-  end
-
-  defp dec_ExtendedCertificateOrCertificate(p0) do
-    # body not decompiled
-  end
-
-  defp dec_ExtendedCertificatesAndCertificates(p0) do
-    # body not decompiled
-  end
-
-  defp dec_ExtendedNetworkAddress(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"dec_ExtendedNetworkAddress_e163-4-address")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp dec_Extension(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"dec_Extension-Any")(p0) do
-    # body not decompiled
-  end
-
-  defp dec_ExtensionAttribute(p0) do
-    # body not decompiled
-  end
-
-  defp dec_ExtensionAttributes(p0) do
-    # body not decompiled
-  end
-
-  defp dec_ExtensionORAddressComponents(p0) do
-    # body not decompiled
-  end
-
-  defp dec_ExtensionPhysicalDeliveryAddressComponents(p0) do
-    # body not decompiled
-  end
-
-  defp dec_ExtensionRequest(p0) do
-    # body not decompiled
-  end
-
-  defp dec_Extensions(p0) do
-    # body not decompiled
-  end
-
-  defp dec_FieldElement(p0) do
-    # body not decompiled
-  end
-
-  defp dec_FieldID(p0) do
-    # body not decompiled
-  end
-
-  defp dec_FreshestCRL(p0) do
-    # body not decompiled
-  end
-
-  defp dec_GeneralName(p0) do
-    # body not decompiled
-  end
-
-  defp dec_GeneralNames(p0) do
-    # body not decompiled
-  end
-
-  defp dec_GeneralSubtree(p0) do
-    # body not decompiled
-  end
-
-  defp dec_GeneralSubtrees(p0) do
-    # body not decompiled
-  end
-
-  defp dec_HoldInstructionCode(p0) do
-    # body not decompiled
-  end
-
-  defp dec_Holder(p0) do
-    # body not decompiled
-  end
-
-  defp dec_IetfAttrSyntax(p0) do
-    # body not decompiled
-  end
-
-  defp dec_IetfAttrSyntax_values(p0, p1) do
-    # body not decompiled
-  end
-
-  defp dec_IetfAttrSyntax_values_SEQOF(p0, p1) do
-    # body not decompiled
-  end
-
-  defp dec_InhibitAnyPolicy(p0) do
-    # body not decompiled
-  end
-
-  defp dec_InvalidityDate(p0) do
-    # body not decompiled
-  end
-
-  defp dec_IssuerAltName(p0) do
-    # body not decompiled
-  end
-
-  defp dec_IssuerAndSerialNumber(p0) do
-    # body not decompiled
-  end
-
-  defp dec_IssuerSerial(p0) do
-    # body not decompiled
-  end
-
-  defp dec_IssuingDistributionPoint(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"dec_KEA-Parms-Id")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"dec_KEA-PublicKey")(p0) do
-    # body not decompiled
-  end
-
-  defp dec_KeyEncryptionAlgorithmIdentifier(p0) do
-    # body not decompiled
-  end
-
-  defp dec_KeyIdentifier(p0) do
-    # body not decompiled
-  end
-
-  defp dec_KeyPurposeId(p0) do
-    # body not decompiled
-  end
-
-  defp dec_KeyUsage(p0) do
-    # body not decompiled
-  end
-
-  defp dec_LocalPostalAttributes(p0) do
-    # body not decompiled
-  end
-
-  defp dec_MessageDigest(p0) do
-    # body not decompiled
-  end
-
-  defp dec_Name(p0) do
-    # body not decompiled
-  end
-
-  defp dec_NameConstraints(p0) do
-    # body not decompiled
-  end
-
-  defp dec_NetworkAddress(p0) do
-    # body not decompiled
-  end
-
-  defp dec_NoticeReference(p0) do
-    # body not decompiled
-  end
-
-  defp dec_NoticeReference_noticeNumbers(p0, p1) do
-    # body not decompiled
-  end
-
-  defp dec_NumericUserIdentifier(p0) do
-    # body not decompiled
-  end
-
-  defp dec_ORAddress(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"dec_OTP-X520countryname")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"dec_OTP-emailAddress")(p0) do
-    # body not decompiled
-  end
-
-  defp dec_OTPAttributeTypeAndValue(p0) do
-    # body not decompiled
-  end
-
-  defp dec_OTPCertificate(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"dec_OTPCharacteristic-two")(p0) do
-    # body not decompiled
-  end
-
-  defp dec_OTPExtension(p0) do
-    # body not decompiled
-  end
-
-  defp dec_OTPExtensionAttribute(p0) do
-    # body not decompiled
-  end
-
-  defp dec_OTPExtensionAttributes(p0) do
-    # body not decompiled
-  end
-
-  defp dec_OTPExtensions(p0) do
-    # body not decompiled
-  end
-
-  defp dec_OTPFieldID(p0) do
-    # body not decompiled
-  end
-
-  defp dec_OTPOLDSubjectPublicKeyInfo(p0) do
-    # body not decompiled
-  end
-
-  defp dec_OTPOLDSubjectPublicKeyInfo_algorithm(p0, p1) do
-    # body not decompiled
-  end
-
-  defp dec_OTPSubjectPublicKeyInfo(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"dec_OTPSubjectPublicKeyInfo-Any")(p0) do
-    # body not decompiled
-  end
-
-  defp dec_OTPTBSCertificate(p0) do
-    # body not decompiled
-  end
-
-  defp dec_ObjId(p0) do
-    # body not decompiled
-  end
-
-  defp dec_ObjectDigestInfo(p0) do
-    # body not decompiled
-  end
-
-  defp dec_OrganizationName(p0) do
-    # body not decompiled
-  end
-
-  defp dec_OrganizationalUnitName(p0) do
-    # body not decompiled
-  end
-
-  defp dec_OrganizationalUnitNames(p0) do
-    # body not decompiled
-  end
-
-  defp dec_OtherPrimeInfo(p0) do
-    # body not decompiled
-  end
-
-  defp dec_OtherPrimeInfos(p0) do
-    # body not decompiled
-  end
-
-  defp dec_PDSName(p0) do
-    # body not decompiled
-  end
-
-  defp dec_PDSParameter(p0) do
-    # body not decompiled
-  end
-
-  defp dec_Pentanomial(p0) do
-    # body not decompiled
-  end
-
-  defp dec_PersonalName(p0) do
-    # body not decompiled
-  end
-
-  defp dec_PhysicalDeliveryCountryName(p0) do
-    # body not decompiled
-  end
-
-  defp dec_PhysicalDeliveryOfficeName(p0) do
-    # body not decompiled
-  end
-
-  defp dec_PhysicalDeliveryOfficeNumber(p0) do
-    # body not decompiled
-  end
-
-  defp dec_PhysicalDeliveryOrganizationName(p0) do
-    # body not decompiled
-  end
-
-  defp dec_PhysicalDeliveryPersonalName(p0) do
-    # body not decompiled
-  end
-
-  defp dec_PolicyConstraints(p0) do
-    # body not decompiled
-  end
-
-  defp dec_PolicyInformation(p0) do
-    # body not decompiled
-  end
-
-  defp dec_PolicyInformation_policyQualifiers(p0, p1) do
-    # body not decompiled
-  end
-
-  defp dec_PolicyMappings(p0) do
-    # body not decompiled
-  end
-
-  defp dec_PolicyMappings_SEQOF(p0, p1) do
-    # body not decompiled
-  end
-
-  defp dec_PolicyQualifierId(p0) do
-    # body not decompiled
-  end
-
-  defp dec_PolicyQualifierInfo(p0) do
-    # body not decompiled
-  end
-
-  defp dec_PostOfficeBoxAddress(p0) do
-    # body not decompiled
-  end
-
-  defp dec_PostalCode(p0) do
-    # body not decompiled
-  end
-
-  defp dec_PosteRestanteAddress(p0) do
-    # body not decompiled
-  end
-
-  defp dec_PresentationAddress(p0) do
-    # body not decompiled
-  end
-
-  defp dec_PresentationAddress_nAddresses(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"dec_Prime-p")(p0) do
-    # body not decompiled
-  end
-
-  defp dec_PrivateDomainName(p0) do
-    # body not decompiled
-  end
-
-  defp dec_PrivateKeyUsagePeriod(p0) do
-    # body not decompiled
-  end
-
-  defp dec_ProxyInfo(p0) do
-    # body not decompiled
-  end
-
-  defp dec_PublicKeyAlgorithm(p0) do
-    # body not decompiled
-  end
-
-  defp dec_RDNSequence(p0) do
-    # body not decompiled
-  end
-
-  defp dec_RSAPrivateKey(p0) do
-    # body not decompiled
-  end
-
-  defp dec_RSAPublicKey(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"dec_RSASSA-PSS-params")(p0) do
-    # body not decompiled
-  end
-
-  defp dec_ReasonFlags(p0) do
-    # body not decompiled
-  end
-
-  defp dec_RecipientInfo(p0) do
-    # body not decompiled
-  end
-
-  defp dec_RecipientInfos(p0) do
-    # body not decompiled
-  end
-
-  defp dec_RecipientInfos_riSequence(p0, p1) do
-    # body not decompiled
-  end
-
-  defp dec_RecipientInfos_riSet(p0, p1) do
-    # body not decompiled
-  end
-
-  defp dec_RelativeDistinguishedName(p0) do
-    # body not decompiled
-  end
-
-  defp dec_RoleSyntax(p0) do
-    # body not decompiled
-  end
-
-  defp dec_SecurityCategory(p0) do
-    # body not decompiled
-  end
-
-  defp dec_SignatureAlgorithm(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"dec_SignatureAlgorithm-Any")(p0) do
-    # body not decompiled
-  end
-
-  defp dec_SignedAndEnvelopedData(p0) do
-    # body not decompiled
-  end
-
-  defp dec_SignedAndEnvelopedData_certificates(p0, p1) do
-    # body not decompiled
-  end
-
-  defp dec_SignedAndEnvelopedData_crls(p0, p1) do
-    # body not decompiled
-  end
-
-  defp dec_SignedData(p0) do
-    # body not decompiled
-  end
-
-  defp dec_SignedData_certificates(p0, p1) do
-    # body not decompiled
-  end
-
-  defp dec_SignedData_crls(p0, p1) do
-    # body not decompiled
-  end
-
-  defp dec_SignerInfo(p0) do
-    # body not decompiled
-  end
-
-  defp dec_SignerInfoAuthenticatedAttributes(p0) do
-    # body not decompiled
-  end
-
-  defp dec_SignerInfoAuthenticatedAttributes_aaSequence(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"dec_SignerInfoAuthenticatedAttributes_aaSequence_AttributePKCS-7")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"dec_SignerInfoAuthenticatedAttributes_aaSequence_AttributePKCS-7_values")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp dec_SignerInfoAuthenticatedAttributes_aaSet(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"dec_SignerInfoAuthenticatedAttributes_aaSet_AttributePKCS-7")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"dec_SignerInfoAuthenticatedAttributes_aaSet_AttributePKCS-7_values")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp dec_SignerInfo_unauthenticatedAttributes(p0, p1) do
-    # body not decompiled
-  end
-
-  defp dec_SignerInfo_unauthenticatedAttributes_uaSequence(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"dec_SignerInfo_unauthenticatedAttributes_uaSequence_AttributePKCS-7")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"dec_SignerInfo_unauthenticatedAttributes_uaSequence_AttributePKCS-7_values")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp dec_SignerInfo_unauthenticatedAttributes_uaSet(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"dec_SignerInfo_unauthenticatedAttributes_uaSet_AttributePKCS-7")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"dec_SignerInfo_unauthenticatedAttributes_uaSet_AttributePKCS-7_values")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp dec_SignerInfos(p0) do
-    # body not decompiled
-  end
-
-  defp dec_SignerInfos_siSequence(p0, p1) do
-    # body not decompiled
-  end
-
-  defp dec_SignerInfos_siSet(p0, p1) do
-    # body not decompiled
-  end
-
-  defp dec_SigningTime(p0) do
-    # body not decompiled
-  end
-
-  defp dec_SkipCerts(p0) do
-    # body not decompiled
-  end
-
-  defp dec_StreetAddress(p0) do
-    # body not decompiled
-  end
-
-  defp dec_SubjectAltName(p0) do
-    # body not decompiled
-  end
-
-  defp dec_SubjectDirectoryAttributes(p0) do
-    # body not decompiled
-  end
-
-  defp dec_SubjectInfoAccessSyntax(p0) do
-    # body not decompiled
-  end
-
-  defp dec_SubjectKeyIdentifier(p0) do
-    # body not decompiled
-  end
-
-  defp dec_SubjectPublicKeyInfo(p0) do
-    # body not decompiled
-  end
-
-  defp dec_SvceAuthInfo(p0) do
-    # body not decompiled
-  end
-
-  defp dec_TBSCertList(p0) do
-    # body not decompiled
-  end
-
-  defp dec_TBSCertList_revokedCertificates(p0, p1) do
-    # body not decompiled
-  end
-
-  defp dec_TBSCertList_revokedCertificates_SEQOF(p0, p1) do
-    # body not decompiled
-  end
-
-  defp dec_TBSCertificate(p0) do
-    # body not decompiled
-  end
-
-  defp dec_Target(p0) do
-    # body not decompiled
-  end
-
-  defp dec_TargetCert(p0) do
-    # body not decompiled
-  end
-
-  defp dec_Targets(p0) do
-    # body not decompiled
-  end
-
-  defp dec_TeletexCommonName(p0) do
-    # body not decompiled
-  end
-
-  defp dec_TeletexDomainDefinedAttribute(p0) do
-    # body not decompiled
-  end
-
-  defp dec_TeletexDomainDefinedAttributes(p0) do
-    # body not decompiled
-  end
-
-  defp dec_TeletexOrganizationName(p0) do
-    # body not decompiled
-  end
-
-  defp dec_TeletexOrganizationalUnitName(p0) do
-    # body not decompiled
-  end
-
-  defp dec_TeletexOrganizationalUnitNames(p0) do
-    # body not decompiled
-  end
-
-  defp dec_TeletexPersonalName(p0) do
-    # body not decompiled
-  end
-
-  defp dec_TerminalIdentifier(p0) do
-    # body not decompiled
-  end
-
-  defp dec_TerminalType(p0) do
-    # body not decompiled
-  end
-
-  defp dec_Time(p0) do
-    # body not decompiled
-  end
-
-  defp dec_TrailerField(p0) do
-    # body not decompiled
-  end
-
-  defp dec_Trinomial(p0) do
-    # body not decompiled
-  end
-
-  defp dec_UnformattedPostalAddress(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"dec_UnformattedPostalAddress_printable-address")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp dec_UniqueIdentifier(p0) do
-    # body not decompiled
-  end
-
-  defp dec_UniquePostalName(p0) do
-    # body not decompiled
-  end
-
-  defp dec_UserNotice(p0) do
-    # body not decompiled
-  end
-
-  defp dec_V2Form(p0) do
-    # body not decompiled
-  end
-
-  defp dec_ValidationParms(p0) do
-    # body not decompiled
-  end
-
-  defp dec_Validity(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"dec_VersionPKCS-1")(p0) do
-    # body not decompiled
-  end
-
-  defp dec_VersionPKIX1Explicit88(p0) do
-    # body not decompiled
-  end
-
-  defp dec_X121Address(p0) do
-    # body not decompiled
-  end
-
-  defp dec_X520CommonName(p0) do
-    # body not decompiled
-  end
-
-  defp dec_X520LocalityName(p0) do
-    # body not decompiled
-  end
-
-  defp dec_X520OrganizationName(p0) do
-    # body not decompiled
-  end
-
-  defp dec_X520OrganizationalUnitName(p0) do
-    # body not decompiled
-  end
-
-  defp dec_X520Pseudonym(p0) do
-    # body not decompiled
-  end
-
-  defp dec_X520SerialNumber(p0) do
-    # body not decompiled
-  end
-
-  defp dec_X520StateOrProvinceName(p0) do
-    # body not decompiled
-  end
-
-  defp dec_X520Title(p0) do
-    # body not decompiled
-  end
-
-  defp dec_X520countryName(p0) do
-    # body not decompiled
-  end
-
-  defp dec_X520dnQualifier(p0) do
-    # body not decompiled
-  end
-
-  defp dec_X520name(p0) do
-    # body not decompiled
-  end
-
-  defp dec_subidentifiers(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp decode_BMP_string(p0, p1) do
-    # body not decompiled
-  end
-
-  defp decode_UTF8_string(p0, p1) do
-    # body not decompiled
-  end
-
-  defp decode_bitstring2(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp decode_bitstring_NNL(p0, p1) do
-    # body not decompiled
-  end
-
-  defp decode_bitstring_NNL(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  defp decode_boolean(p0, p1) do
-    # body not decompiled
-  end
-
-  defp decode_constr_indef_incomplete(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp decode_constructed(p0) do
-    # body not decompiled
-  end
-
-  defp decode_constructed_incomplete(p0, p1) do
-    # body not decompiled
-  end
-
-  defp decode_constructed_indefinite(p0, p1) do
-    # body not decompiled
-  end
-
-  defp decode_disp(p0, p1) do
-    # body not decompiled
-  end
-
-  defp decode_inc_disp(p0, p1) do
-    # body not decompiled
-  end
-
-  defp decode_incomplete2(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  defp decode_incomplete_bin(p0) do
-    # body not decompiled
-  end
-
-  defp decode_integer(p0, p1) do
-    # body not decompiled
-  end
-
-  defp decode_length(p0) do
-    # body not decompiled
-  end
-
-  defp decode_named_bit_string(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp decode_native_bit_string(p0, p1) do
-    # body not decompiled
-  end
-
-  defp decode_null(p0, p1) do
-    # body not decompiled
-  end
-
-  defp decode_object_identifier(p0, p1) do
-    # body not decompiled
-  end
-
-  defp decode_octet_string(p0, p1) do
-    # body not decompiled
-  end
-
-  defp decode_open_type(p0, p1) do
-    # body not decompiled
-  end
-
-  defp decode_open_type_as_binary(p0, p1) do
-    # body not decompiled
-  end
-
-  defp decode_partial_inc_disp(p0, p1) do
-    # body not decompiled
-  end
-
-  defp decode_partial_incomplete(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp decode_parts_incomplete(p0) do
-    # body not decompiled
-  end
-
-  defp decode_primitive(p0) do
-    # body not decompiled
-  end
-
-  defp decode_primitive_incomplete(p0, p1) do
-    # body not decompiled
-  end
-
-  defp decode_restricted_string(p0, p1) do
-    # body not decompiled
-  end
-
-  defp decode_tag(p0, p1) do
-    # body not decompiled
-  end
-
-  defp decode_tag_and_length(p0) do
-    # body not decompiled
-  end
-
-  defp decode_universal_string(p0, p1) do
-    # body not decompiled
-  end
-
-  defp do_encode_named_bit_string(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp dynamicsort_SETOF(p0) do
-    # body not decompiled
-  end
-
-  defp e_object_identifier(p0) do
-    # body not decompiled
-  end
-
-  defp enc_AAControls(p0) do
-    # body not decompiled
-  end
-
-  defp enc_ACClearAttrs(p0) do
-    # body not decompiled
-  end
-
-  defp enc_ACClearAttrs_attrs(p0, p1) do
-    # body not decompiled
-  end
-
-  defp enc_ACClearAttrs_attrs_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_AccessDescription(p0) do
-    # body not decompiled
-  end
-
-  defp enc_AdministrationDomainName(p0) do
-    # body not decompiled
-  end
-
-  defp enc_Algorithm(p0) do
-    # body not decompiled
-  end
-
-  defp enc_AlgorithmIdentifier(p0) do
-    # body not decompiled
-  end
-
-  defp enc_AlgorithmNull(p0) do
-    # body not decompiled
-  end
-
-  defp enc_AnotherName(p0) do
-    # body not decompiled
-  end
-
-  defp enc_Any(p0) do
-    # body not decompiled
-  end
-
-  defp enc_AttCertIssuer(p0) do
-    # body not decompiled
-  end
-
-  defp enc_AttCertValidityPeriod(p0) do
-    # body not decompiled
-  end
-
-  defp enc_AttCertVersion(p0) do
-    # body not decompiled
-  end
-
-  defp enc_AttrSpec(p0) do
-    # body not decompiled
-  end
-
-  defp enc_AttrSpec_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_Attribute(p0) do
-    # body not decompiled
-  end
-
-  defp enc_AttributeCertificate(p0) do
-    # body not decompiled
-  end
-
-  defp enc_AttributeCertificateInfo(p0) do
-    # body not decompiled
-  end
-
-  defp enc_AttributeCertificateInfo_attributes(p0, p1) do
-    # body not decompiled
-  end
-
-  defp enc_AttributeCertificateInfo_attributes_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_AttributeType(p0) do
-    # body not decompiled
-  end
-
-  defp enc_AttributeTypeAndValue(p0) do
-    # body not decompiled
-  end
-
-  defp enc_AttributeValue(p0) do
-    # body not decompiled
-  end
-
-  defp enc_Attribute_values(p0, p1) do
-    # body not decompiled
-  end
-
-  defp enc_Attribute_values_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_AuthorityInfoAccessSyntax(p0) do
-    # body not decompiled
-  end
-
-  defp enc_AuthorityInfoAccessSyntax_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_AuthorityKeyIdentifier(p0) do
-    # body not decompiled
-  end
-
-  defp enc_BaseCRLNumber(p0) do
-    # body not decompiled
-  end
-
-  defp enc_BaseDistance(p0) do
-    # body not decompiled
-  end
-
-  defp enc_BasicConstraints(p0) do
-    # body not decompiled
-  end
-
-  defp enc_Boolean(p0) do
-    # body not decompiled
-  end
-
-  defp enc_BuiltInDomainDefinedAttribute(p0) do
-    # body not decompiled
-  end
-
-  defp enc_BuiltInDomainDefinedAttributes(p0) do
-    # body not decompiled
-  end
-
-  defp enc_BuiltInDomainDefinedAttributes_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_BuiltInStandardAttributes(p0) do
-    # body not decompiled
-  end
-
-  defp enc_CPSuri(p0) do
-    # body not decompiled
-  end
-
-  defp enc_CRLDistributionPoints(p0) do
-    # body not decompiled
-  end
-
-  defp enc_CRLDistributionPoints_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_CRLNumber(p0) do
-    # body not decompiled
-  end
-
-  defp enc_CRLReason(p0) do
-    # body not decompiled
-  end
-
-  defp enc_CRLSequence(p0) do
-    # body not decompiled
-  end
-
-  defp enc_CRLSequence_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_CertPolicyId(p0) do
-    # body not decompiled
-  end
-
-  defp enc_Certificate(p0) do
-    # body not decompiled
-  end
-
-  defp enc_CertificateIssuer(p0) do
-    # body not decompiled
-  end
-
-  defp enc_CertificateList(p0) do
-    # body not decompiled
-  end
-
-  defp enc_CertificatePolicies(p0) do
-    # body not decompiled
-  end
-
-  defp enc_CertificatePolicies_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_CertificateRevocationLists(p0) do
-    # body not decompiled
-  end
-
-  defp enc_CertificateRevocationLists_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_CertificateSerialNumber(p0) do
-    # body not decompiled
-  end
-
-  defp enc_Certificates(p0) do
-    # body not decompiled
-  end
-
-  defp enc_Certificates_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_CertificationRequest(p0) do
-    # body not decompiled
-  end
-
-  defp enc_CertificationRequestInfo(p0) do
-    # body not decompiled
-  end
-
-  defp enc_CertificationRequestInfo_attributes(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"enc_CertificationRequestInfo_attributes_AttributePKCS-10")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"enc_CertificationRequestInfo_attributes_AttributePKCS-10_values")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"enc_CertificationRequestInfo_attributes_AttributePKCS-10_values_components")(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  defp enc_CertificationRequestInfo_attributes_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_CertificationRequestInfo_subjectPKInfo(p0, p1) do
-    # body not decompiled
-  end
-
-  defp enc_CertificationRequestInfo_subjectPKInfo_algorithm(p0, p1) do
-    # body not decompiled
-  end
-
-  defp enc_CertificationRequest_signatureAlgorithm(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"enc_Characteristic-two")(p0) do
-    # body not decompiled
-  end
-
-  defp enc_ClassList(p0) do
-    # body not decompiled
-  end
-
-  defp enc_Clearance(p0) do
-    # body not decompiled
-  end
-
-  defp enc_Clearance_securityCategories(p0, p1) do
-    # body not decompiled
-  end
-
-  defp enc_Clearance_securityCategories_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_CommonName(p0) do
-    # body not decompiled
-  end
-
-  defp enc_ContentEncryptionAlgorithmIdentifier(p0) do
-    # body not decompiled
-  end
-
-  defp enc_ContentInfo(p0) do
-    # body not decompiled
-  end
-
-  defp enc_ContentType(p0) do
-    # body not decompiled
-  end
-
-  defp enc_CountryName(p0) do
-    # body not decompiled
-  end
-
-  defp enc_Curve(p0) do
-    # body not decompiled
-  end
-
-  defp enc_DHParameter(p0) do
-    # body not decompiled
-  end
-
-  defp enc_DHPublicKey(p0) do
-    # body not decompiled
-  end
-
-  defp enc_DSAParams(p0) do
-    # body not decompiled
-  end
-
-  defp enc_DSAPrivateKey(p0) do
-    # body not decompiled
-  end
-
-  defp enc_DSAPublicKey(p0) do
-    # body not decompiled
-  end
-
-  defp enc_Data(p0) do
-    # body not decompiled
-  end
-
-  defp enc_Digest(p0) do
-    # body not decompiled
-  end
-
-  defp enc_DigestAlgorithmIdentifier(p0) do
-    # body not decompiled
-  end
-
-  defp enc_DigestAlgorithmIdentifiers(p0) do
-    # body not decompiled
-  end
-
-  defp enc_DigestAlgorithmIdentifiers_daSequence(p0, p1) do
-    # body not decompiled
-  end
-
-  defp enc_DigestAlgorithmIdentifiers_daSequence_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_DigestAlgorithmIdentifiers_daSet(p0, p1) do
-    # body not decompiled
-  end
-
-  defp enc_DigestAlgorithmIdentifiers_daSet_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_DigestEncryptionAlgorithmIdentifier(p0) do
-    # body not decompiled
-  end
-
-  defp enc_DigestInfoNull(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"enc_DigestInfoPKCS-1")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"enc_DigestInfoPKCS-7")(p0) do
-    # body not decompiled
-  end
-
-  defp enc_DigestedData(p0) do
-    # body not decompiled
-  end
-
-  defp enc_DirectoryString(p0) do
-    # body not decompiled
-  end
-
-  defp enc_DisplayText(p0) do
-    # body not decompiled
-  end
-
-  defp enc_DistinguishedName(p0) do
-    # body not decompiled
-  end
-
-  defp enc_DistributionPoint(p0) do
-    # body not decompiled
-  end
-
-  defp enc_DistributionPointName(p0) do
-    # body not decompiled
-  end
-
-  defp enc_DomainComponent(p0) do
-    # body not decompiled
-  end
-
-  defp enc_DomainParameters(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"enc_Dss-Parms")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"enc_Dss-Sig-Value")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"enc_ECDSA-Sig-Value")(p0) do
-    # body not decompiled
-  end
-
-  defp enc_ECPVer(p0) do
-    # body not decompiled
-  end
-
-  defp enc_ECParameters(p0) do
-    # body not decompiled
-  end
-
-  defp enc_ECPoint(p0) do
-    # body not decompiled
-  end
-
-  defp enc_ECPrivateKey(p0) do
-    # body not decompiled
-  end
-
-  defp enc_EDIPartyName(p0) do
-    # body not decompiled
-  end
-
-  defp enc_EcpkParameters(p0) do
-    # body not decompiled
-  end
-
-  defp enc_EmailAddress(p0) do
-    # body not decompiled
-  end
-
-  defp enc_EncryptedContent(p0) do
-    # body not decompiled
-  end
-
-  defp enc_EncryptedContentInfo(p0) do
-    # body not decompiled
-  end
-
-  defp enc_EncryptedData(p0) do
-    # body not decompiled
-  end
-
-  defp enc_EncryptedDigest(p0) do
-    # body not decompiled
-  end
-
-  defp enc_EncryptedKey(p0) do
-    # body not decompiled
-  end
-
-  defp enc_EnvelopedData(p0) do
-    # body not decompiled
-  end
-
-  defp enc_ExtKeyUsageSyntax(p0) do
-    # body not decompiled
-  end
-
-  defp enc_ExtKeyUsageSyntax_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_ExtendedCertificate(p0) do
-    # body not decompiled
-  end
-
-  defp enc_ExtendedCertificateOrCertificate(p0) do
-    # body not decompiled
-  end
-
-  defp enc_ExtendedCertificatesAndCertificates(p0) do
-    # body not decompiled
-  end
-
-  defp enc_ExtendedCertificatesAndCertificates_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_ExtendedNetworkAddress(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"enc_ExtendedNetworkAddress_e163-4-address")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp enc_Extension(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"enc_Extension-Any")(p0) do
-    # body not decompiled
-  end
-
-  defp enc_ExtensionAttribute(p0) do
-    # body not decompiled
-  end
-
-  defp enc_ExtensionAttributes(p0) do
-    # body not decompiled
-  end
-
-  defp enc_ExtensionAttributes_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_ExtensionORAddressComponents(p0) do
-    # body not decompiled
-  end
-
-  defp enc_ExtensionPhysicalDeliveryAddressComponents(p0) do
-    # body not decompiled
-  end
-
-  defp enc_ExtensionRequest(p0) do
-    # body not decompiled
-  end
-
-  defp enc_Extensions(p0) do
-    # body not decompiled
-  end
-
-  defp enc_Extensions_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_FieldElement(p0) do
-    # body not decompiled
-  end
-
-  defp enc_FieldID(p0) do
-    # body not decompiled
-  end
-
-  defp enc_FreshestCRL(p0) do
-    # body not decompiled
-  end
-
-  defp enc_GeneralName(p0) do
-    # body not decompiled
-  end
-
-  defp enc_GeneralNames(p0) do
-    # body not decompiled
-  end
-
-  defp enc_GeneralNames_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_GeneralSubtree(p0) do
-    # body not decompiled
-  end
-
-  defp enc_GeneralSubtrees(p0) do
-    # body not decompiled
-  end
-
-  defp enc_GeneralSubtrees_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_HoldInstructionCode(p0) do
-    # body not decompiled
-  end
-
-  defp enc_Holder(p0) do
-    # body not decompiled
-  end
-
-  defp enc_IetfAttrSyntax(p0) do
-    # body not decompiled
-  end
-
-  defp enc_IetfAttrSyntax_values(p0, p1) do
-    # body not decompiled
-  end
-
-  defp enc_IetfAttrSyntax_values_SEQOF(p0, p1) do
-    # body not decompiled
-  end
-
-  defp enc_IetfAttrSyntax_values_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_InhibitAnyPolicy(p0) do
-    # body not decompiled
-  end
-
-  defp enc_InvalidityDate(p0) do
-    # body not decompiled
-  end
-
-  defp enc_IssuerAltName(p0) do
-    # body not decompiled
-  end
-
-  defp enc_IssuerAndSerialNumber(p0) do
-    # body not decompiled
-  end
-
-  defp enc_IssuerSerial(p0) do
-    # body not decompiled
-  end
-
-  defp enc_IssuingDistributionPoint(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"enc_KEA-Parms-Id")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"enc_KEA-PublicKey")(p0) do
-    # body not decompiled
-  end
-
-  defp enc_KeyEncryptionAlgorithmIdentifier(p0) do
-    # body not decompiled
-  end
-
-  defp enc_KeyIdentifier(p0) do
-    # body not decompiled
-  end
-
-  defp enc_KeyPurposeId(p0) do
-    # body not decompiled
-  end
-
-  defp enc_KeyUsage(p0) do
-    # body not decompiled
-  end
-
-  defp enc_LocalPostalAttributes(p0) do
-    # body not decompiled
-  end
-
-  defp enc_MessageDigest(p0) do
-    # body not decompiled
-  end
-
-  defp enc_Name(p0) do
-    # body not decompiled
-  end
-
-  defp enc_NameConstraints(p0) do
-    # body not decompiled
-  end
-
-  defp enc_NetworkAddress(p0) do
-    # body not decompiled
-  end
-
-  defp enc_NoticeReference(p0) do
-    # body not decompiled
-  end
-
-  defp enc_NoticeReference_noticeNumbers(p0, p1) do
-    # body not decompiled
-  end
-
-  defp enc_NoticeReference_noticeNumbers_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_NumericUserIdentifier(p0) do
-    # body not decompiled
-  end
-
-  defp enc_ORAddress(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"enc_OTP-X520countryname")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"enc_OTP-emailAddress")(p0) do
-    # body not decompiled
-  end
-
-  defp enc_OTPAttributeTypeAndValue(p0) do
-    # body not decompiled
-  end
-
-  defp enc_OTPCertificate(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"enc_OTPCharacteristic-two")(p0) do
-    # body not decompiled
-  end
-
-  defp enc_OTPExtension(p0) do
-    # body not decompiled
-  end
-
-  defp enc_OTPExtensionAttribute(p0) do
-    # body not decompiled
-  end
-
-  defp enc_OTPExtensionAttributes(p0) do
-    # body not decompiled
-  end
-
-  defp enc_OTPExtensionAttributes_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_OTPExtensions(p0) do
-    # body not decompiled
-  end
-
-  defp enc_OTPExtensions_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_OTPFieldID(p0) do
-    # body not decompiled
-  end
-
-  defp enc_OTPOLDSubjectPublicKeyInfo(p0) do
-    # body not decompiled
-  end
-
-  defp enc_OTPOLDSubjectPublicKeyInfo_algorithm(p0, p1) do
-    # body not decompiled
-  end
-
-  defp enc_OTPSubjectPublicKeyInfo(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"enc_OTPSubjectPublicKeyInfo-Any")(p0) do
-    # body not decompiled
-  end
-
-  defp enc_OTPTBSCertificate(p0) do
-    # body not decompiled
-  end
-
-  defp enc_ObjId(p0) do
-    # body not decompiled
-  end
-
-  defp enc_ObjectDigestInfo(p0) do
-    # body not decompiled
-  end
-
-  defp enc_OrganizationName(p0) do
-    # body not decompiled
-  end
-
-  defp enc_OrganizationalUnitName(p0) do
-    # body not decompiled
-  end
-
-  defp enc_OrganizationalUnitNames(p0) do
-    # body not decompiled
-  end
-
-  defp enc_OrganizationalUnitNames_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_OtherPrimeInfo(p0) do
-    # body not decompiled
-  end
-
-  defp enc_OtherPrimeInfos(p0) do
-    # body not decompiled
-  end
-
-  defp enc_OtherPrimeInfos_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_PDSName(p0) do
-    # body not decompiled
-  end
-
-  defp enc_PDSParameter(p0) do
-    # body not decompiled
-  end
-
-  defp enc_Pentanomial(p0) do
-    # body not decompiled
-  end
-
-  defp enc_PersonalName(p0) do
-    # body not decompiled
-  end
-
-  defp enc_PhysicalDeliveryCountryName(p0) do
-    # body not decompiled
-  end
-
-  defp enc_PhysicalDeliveryOfficeName(p0) do
-    # body not decompiled
-  end
-
-  defp enc_PhysicalDeliveryOfficeNumber(p0) do
-    # body not decompiled
-  end
-
-  defp enc_PhysicalDeliveryOrganizationName(p0) do
-    # body not decompiled
-  end
-
-  defp enc_PhysicalDeliveryPersonalName(p0) do
-    # body not decompiled
-  end
-
-  defp enc_PolicyConstraints(p0) do
-    # body not decompiled
-  end
-
-  defp enc_PolicyInformation(p0) do
-    # body not decompiled
-  end
-
-  defp enc_PolicyInformation_policyQualifiers(p0, p1) do
-    # body not decompiled
-  end
-
-  defp enc_PolicyInformation_policyQualifiers_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_PolicyMappings(p0) do
-    # body not decompiled
-  end
-
-  defp enc_PolicyMappings_SEQOF(p0, p1) do
-    # body not decompiled
-  end
-
-  defp enc_PolicyMappings_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_PolicyQualifierId(p0) do
-    # body not decompiled
-  end
-
-  defp enc_PolicyQualifierInfo(p0) do
-    # body not decompiled
-  end
-
-  defp enc_PostOfficeBoxAddress(p0) do
-    # body not decompiled
-  end
-
-  defp enc_PostalCode(p0) do
-    # body not decompiled
-  end
-
-  defp enc_PosteRestanteAddress(p0) do
-    # body not decompiled
-  end
-
-  defp enc_PresentationAddress(p0) do
-    # body not decompiled
-  end
-
-  defp enc_PresentationAddress_nAddresses(p0, p1) do
-    # body not decompiled
-  end
-
-  defp enc_PresentationAddress_nAddresses_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"enc_Prime-p")(p0) do
-    # body not decompiled
-  end
-
-  defp enc_PrivateDomainName(p0) do
-    # body not decompiled
-  end
-
-  defp enc_PrivateKeyUsagePeriod(p0) do
-    # body not decompiled
-  end
-
-  defp enc_ProxyInfo(p0) do
-    # body not decompiled
-  end
-
-  defp enc_ProxyInfo_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_PublicKeyAlgorithm(p0) do
-    # body not decompiled
-  end
-
-  defp enc_RDNSequence(p0) do
-    # body not decompiled
-  end
-
-  defp enc_RDNSequence_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_RSAPrivateKey(p0) do
-    # body not decompiled
-  end
-
-  defp enc_RSAPublicKey(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"enc_RSASSA-PSS-params")(p0) do
-    # body not decompiled
-  end
-
-  defp enc_ReasonFlags(p0) do
-    # body not decompiled
-  end
-
-  defp enc_RecipientInfo(p0) do
-    # body not decompiled
-  end
-
-  defp enc_RecipientInfos(p0) do
-    # body not decompiled
-  end
-
-  defp enc_RecipientInfos_riSequence(p0, p1) do
-    # body not decompiled
-  end
-
-  defp enc_RecipientInfos_riSequence_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_RecipientInfos_riSet(p0, p1) do
-    # body not decompiled
-  end
-
-  defp enc_RecipientInfos_riSet_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_RelativeDistinguishedName(p0) do
-    # body not decompiled
-  end
-
-  defp enc_RelativeDistinguishedName_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_RoleSyntax(p0) do
-    # body not decompiled
-  end
-
-  defp enc_SecurityCategory(p0) do
-    # body not decompiled
-  end
-
-  defp enc_SignatureAlgorithm(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"enc_SignatureAlgorithm-Any")(p0) do
-    # body not decompiled
-  end
-
-  defp enc_SignedAndEnvelopedData(p0) do
-    # body not decompiled
-  end
-
-  defp enc_SignedAndEnvelopedData_certificates(p0, p1) do
-    # body not decompiled
-  end
-
-  defp enc_SignedAndEnvelopedData_crls(p0, p1) do
-    # body not decompiled
-  end
-
-  defp enc_SignedData(p0) do
-    # body not decompiled
-  end
-
-  defp enc_SignedData_certificates(p0, p1) do
-    # body not decompiled
-  end
-
-  defp enc_SignedData_crls(p0, p1) do
-    # body not decompiled
-  end
-
-  defp enc_SignerInfo(p0) do
-    # body not decompiled
-  end
-
-  defp enc_SignerInfoAuthenticatedAttributes(p0) do
-    # body not decompiled
-  end
-
-  defp enc_SignerInfoAuthenticatedAttributes_aaSequence(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"enc_SignerInfoAuthenticatedAttributes_aaSequence_AttributePKCS-7")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"enc_SignerInfoAuthenticatedAttributes_aaSequence_AttributePKCS-7_values")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"enc_SignerInfoAuthenticatedAttributes_aaSequence_AttributePKCS-7_values_components")(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  defp enc_SignerInfoAuthenticatedAttributes_aaSequence_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_SignerInfoAuthenticatedAttributes_aaSet(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"enc_SignerInfoAuthenticatedAttributes_aaSet_AttributePKCS-7")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"enc_SignerInfoAuthenticatedAttributes_aaSet_AttributePKCS-7_values")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"enc_SignerInfoAuthenticatedAttributes_aaSet_AttributePKCS-7_values_components")(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  defp enc_SignerInfoAuthenticatedAttributes_aaSet_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_SignerInfo_unauthenticatedAttributes(p0, p1) do
-    # body not decompiled
-  end
-
-  defp enc_SignerInfo_unauthenticatedAttributes_uaSequence(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"enc_SignerInfo_unauthenticatedAttributes_uaSequence_AttributePKCS-7")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"enc_SignerInfo_unauthenticatedAttributes_uaSequence_AttributePKCS-7_values")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"enc_SignerInfo_unauthenticatedAttributes_uaSequence_AttributePKCS-7_values_components")(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  defp enc_SignerInfo_unauthenticatedAttributes_uaSequence_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_SignerInfo_unauthenticatedAttributes_uaSet(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"enc_SignerInfo_unauthenticatedAttributes_uaSet_AttributePKCS-7")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"enc_SignerInfo_unauthenticatedAttributes_uaSet_AttributePKCS-7_values")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp unquote(:"enc_SignerInfo_unauthenticatedAttributes_uaSet_AttributePKCS-7_values_components")(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  defp enc_SignerInfo_unauthenticatedAttributes_uaSet_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_SignerInfos(p0) do
-    # body not decompiled
-  end
-
-  defp enc_SignerInfos_siSequence(p0, p1) do
-    # body not decompiled
-  end
-
-  defp enc_SignerInfos_siSequence_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_SignerInfos_siSet(p0, p1) do
-    # body not decompiled
-  end
-
-  defp enc_SignerInfos_siSet_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_SigningTime(p0) do
-    # body not decompiled
-  end
-
-  defp enc_SkipCerts(p0) do
-    # body not decompiled
-  end
-
-  defp enc_StreetAddress(p0) do
-    # body not decompiled
-  end
-
-  defp enc_SubjectAltName(p0) do
-    # body not decompiled
-  end
-
-  defp enc_SubjectDirectoryAttributes(p0) do
-    # body not decompiled
-  end
-
-  defp enc_SubjectDirectoryAttributes_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_SubjectInfoAccessSyntax(p0) do
-    # body not decompiled
-  end
-
-  defp enc_SubjectInfoAccessSyntax_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_SubjectKeyIdentifier(p0) do
-    # body not decompiled
-  end
-
-  defp enc_SubjectPublicKeyInfo(p0) do
-    # body not decompiled
-  end
-
-  defp enc_SvceAuthInfo(p0) do
-    # body not decompiled
-  end
-
-  defp enc_TBSCertList(p0) do
-    # body not decompiled
-  end
-
-  defp enc_TBSCertList_revokedCertificates(p0, p1) do
-    # body not decompiled
-  end
-
-  defp enc_TBSCertList_revokedCertificates_SEQOF(p0, p1) do
-    # body not decompiled
-  end
-
-  defp enc_TBSCertList_revokedCertificates_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_TBSCertificate(p0) do
-    # body not decompiled
-  end
-
-  defp enc_Target(p0) do
-    # body not decompiled
-  end
-
-  defp enc_TargetCert(p0) do
-    # body not decompiled
-  end
-
-  defp enc_Targets(p0) do
-    # body not decompiled
-  end
-
-  defp enc_Targets_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_TeletexCommonName(p0) do
-    # body not decompiled
-  end
-
-  defp enc_TeletexDomainDefinedAttribute(p0) do
-    # body not decompiled
-  end
-
-  defp enc_TeletexDomainDefinedAttributes(p0) do
-    # body not decompiled
-  end
-
-  defp enc_TeletexDomainDefinedAttributes_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_TeletexOrganizationName(p0) do
-    # body not decompiled
-  end
-
-  defp enc_TeletexOrganizationalUnitName(p0) do
-    # body not decompiled
-  end
-
-  defp enc_TeletexOrganizationalUnitNames(p0) do
-    # body not decompiled
-  end
-
-  defp enc_TeletexOrganizationalUnitNames_components(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_TeletexPersonalName(p0) do
-    # body not decompiled
-  end
-
-  defp enc_TerminalIdentifier(p0) do
-    # body not decompiled
-  end
-
-  defp enc_TerminalType(p0) do
-    # body not decompiled
-  end
-
-  defp enc_Time(p0) do
-    # body not decompiled
-  end
-
-  defp enc_TrailerField(p0) do
-    # body not decompiled
-  end
-
-  defp enc_Trinomial(p0) do
-    # body not decompiled
-  end
-
-  defp enc_UnformattedPostalAddress(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"enc_UnformattedPostalAddress_printable-address")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"enc_UnformattedPostalAddress_printable-address_components")(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp enc_UniqueIdentifier(p0) do
-    # body not decompiled
-  end
-
-  defp enc_UniquePostalName(p0) do
-    # body not decompiled
-  end
-
-  defp enc_UserNotice(p0) do
-    # body not decompiled
-  end
-
-  defp enc_V2Form(p0) do
-    # body not decompiled
-  end
-
-  defp enc_ValidationParms(p0) do
-    # body not decompiled
-  end
-
-  defp enc_Validity(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"enc_VersionPKCS-1")(p0) do
-    # body not decompiled
-  end
-
-  defp enc_VersionPKIX1Explicit88(p0) do
-    # body not decompiled
-  end
-
-  defp enc_X121Address(p0) do
-    # body not decompiled
-  end
-
-  defp enc_X520CommonName(p0) do
-    # body not decompiled
-  end
-
-  defp enc_X520LocalityName(p0) do
-    # body not decompiled
-  end
-
-  defp enc_X520OrganizationName(p0) do
-    # body not decompiled
-  end
-
-  defp enc_X520OrganizationalUnitName(p0) do
-    # body not decompiled
-  end
-
-  defp enc_X520Pseudonym(p0) do
-    # body not decompiled
-  end
-
-  defp enc_X520SerialNumber(p0) do
-    # body not decompiled
-  end
-
-  defp enc_X520StateOrProvinceName(p0) do
-    # body not decompiled
-  end
-
-  defp enc_X520Title(p0) do
-    # body not decompiled
-  end
-
-  defp enc_X520countryName(p0) do
-    # body not decompiled
-  end
-
-  defp enc_X520dnQualifier(p0) do
-    # body not decompiled
-  end
-
-  defp enc_X520name(p0) do
-    # body not decompiled
-  end
-
-  defp enc_obj_id_tail(p0, p1) do
-    # body not decompiled
-  end
-
-  defp encode_BMP_string(p0, p1) do
-    # body not decompiled
-  end
-
-  defp encode_UTF8_string(p0, p1) do
-    # body not decompiled
-  end
-
-  defp encode_bitstring(p0) do
-    # body not decompiled
-  end
-
-  defp encode_bitstring(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp encode_boolean(p0, p1) do
-    # body not decompiled
-  end
-
-  defp encode_disp(p0, p1) do
-    # body not decompiled
-  end
-
-  defp encode_integer(p0) do
-    # body not decompiled
-  end
-
-  defp encode_integer(p0, p1) do
-    # body not decompiled
-  end
-
-  defp encode_integer(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp encode_integer_neg(p0, p1) do
-    # body not decompiled
-  end
-
-  defp encode_integer_pos(p0, p1) do
-    # body not decompiled
-  end
-
-  defp encode_length(p0) do
-    # body not decompiled
-  end
-
-  defp encode_named_bit_string(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp encode_null(p0, p1) do
-    # body not decompiled
-  end
-
-  defp encode_object_identifier(p0, p1) do
-    # body not decompiled
-  end
-
-  defp encode_open_type(p0, p1) do
-    # body not decompiled
-  end
-
-  defp encode_restricted_string(p0, p1) do
-    # body not decompiled
-  end
-
-  defp encode_tags(p0, p1) do
-    # body not decompiled
-  end
-
-  defp encode_tags(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp encode_universal_string(p0, p1) do
-    # body not decompiled
-  end
-
-  defp encode_unnamed_bit_string(p0, p1) do
-    # body not decompiled
-  end
-
-  defp get_all_bitposes(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp incomplete_choice_alt(p0, p1) do
-    # body not decompiled
-  end
-
-  defp is_default_1(p0) do
-    # body not decompiled
-  end
-
-  defp is_default_10(p0) do
-    # body not decompiled
-  end
-
-  defp is_default_11(p0) do
-    # body not decompiled
-  end
-
-  defp is_default_2(p0) do
-    # body not decompiled
-  end
-
-  defp is_default_3(p0) do
-    # body not decompiled
-  end
-
-  defp is_default_4(p0) do
-    # body not decompiled
-  end
-
-  defp is_default_5(p0) do
-    # body not decompiled
-  end
-
-  defp is_default_6(p0) do
-    # body not decompiled
-  end
-
-  defp is_default_7(p0) do
-    # body not decompiled
-  end
-
-  defp is_default_8(p0) do
-    # body not decompiled
-  end
-
-  defp is_default_9(p0) do
-    # body not decompiled
-  end
-
-  defp make_and_set_list(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp match_and_collect(p0, p1) do
-    # body not decompiled
-  end
-
-  defp match_tags(p0, p1) do
-    # body not decompiled
-  end
-
-  defp minimum_octets(p0) do
-    # body not decompiled
-  end
-
-  defp minimum_octets(p0, p1) do
-    # body not decompiled
-  end
-
-  defp mk_BMP_list(p0) do
-    # body not decompiled
-  end
-
-  defp mk_BMP_list(p0, p1) do
-    # body not decompiled
-  end
-
-  defp mk_BMP_string(p0) do
-    # body not decompiled
-  end
-
-  defp mk_BMP_string(p0, p1) do
-    # body not decompiled
-  end
-
-  defp mk_object_val(p0) do
-    # body not decompiled
-  end
-
-  defp mk_object_val(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  defp mk_uni_list(p0) do
-    # body not decompiled
-  end
-
-  defp mk_uni_list(p0, p1) do
-    # body not decompiled
-  end
-
-  defp mk_universal_string(p0) do
-    # body not decompiled
-  end
-
-  defp mk_universal_string(p0, p1) do
-    # body not decompiled
-  end
-
-  defp number2name(p0, p1) do
-    # body not decompiled
-  end
-
-  defp skip_indefinite_value(p0) do
-    # body not decompiled
-  end
-
-  defp skip_length_and_value(p0) do
-    # body not decompiled
-  end
-
-  defp skip_long_tag(p0) do
-    # body not decompiled
-  end
-
-  defp skip_tag(p0) do
-    # body not decompiled
-  end
-
-  defp tlv_format(p0) do
-    # body not decompiled
-  end
-
-  defp unused_bitlist(p0, p1, p2) do
-    # body not decompiled
-  end
+  def secp128r2(), do: ...
+
+  def secp160k1(), do: ...
+
+  def secp160r1(), do: ...
+
+  def secp160r2(), do: ...
+
+  def secp192k1(), do: ...
+
+  def secp192r1(), do: ...
+
+  def secp224k1(), do: ...
+
+  def secp224r1(), do: ...
+
+  def secp256k1(), do: ...
+
+  def secp256r1(), do: ...
+
+  def secp384r1(), do: ...
+
+  def secp521r1(), do: ...
+
+  def sect113r1(), do: ...
+
+  def sect113r2(), do: ...
+
+  def sect131r1(), do: ...
+
+  def sect131r2(), do: ...
+
+  def sect163k1(), do: ...
+
+  def sect163r1(), do: ...
+
+  def sect163r2(), do: ...
+
+  def sect193r1(), do: ...
+
+  def sect193r2(), do: ...
+
+  def sect233k1(), do: ...
+
+  def sect233r1(), do: ...
+
+  def sect239k1(), do: ...
+
+  def sect283k1(), do: ...
+
+  def sect283r1(), do: ...
+
+  def sect409k1(), do: ...
+
+  def sect409r1(), do: ...
+
+  def sect571k1(), do: ...
+
+  def sect571r1(), do: ...
+
+  def unquote(:"sha-1WithRSAEncryption")(), do: ...
+
+  def sha1WithRSAEncryption(), do: ...
+
+  def sha224WithRSAEncryption(), do: ...
+
+  def sha256WithRSAEncryption(), do: ...
+
+  def sha384WithRSAEncryption(), do: ...
+
+  def sha512WithRSAEncryption(), do: ...
+
+  def signedAndEnvelopedData(), do: ...
+
+  def signedData(), do: ...
+
+  def unquote(:"street-address")(), do: ...
+
+  def unquote(:"teletex-common-name")(), do: ...
+
+  def unquote(:"teletex-domain-defined-attributes")(), do: ...
+
+  def unquote(:"teletex-organization-name")(), do: ...
+
+  def unquote(:"teletex-organizational-unit-names")(), do: ...
+
+  def unquote(:"teletex-personal-name")(), do: ...
+
+  def unquote(:"terminal-type")(), do: ...
+
+  def tpBasis(), do: ...
+
+  def unquote(:"ub-common-name")(), do: ...
+
+  def unquote(:"ub-common-name-printable")(), do: ...
+
+  def unquote(:"ub-common-name-teletex")(), do: ...
+
+  def unquote(:"ub-common-name-universal")(), do: ...
+
+  def unquote(:"ub-common-name-utf8")(), do: ...
+
+  def unquote(:"ub-country-name-alpha-length")(), do: ...
+
+  def unquote(:"ub-country-name-numeric-length")(), do: ...
+
+  def unquote(:"ub-domain-defined-attribute-type-length")(), do: ...
+
+  def unquote(:"ub-domain-defined-attribute-value-length")(), do: ...
+
+  def unquote(:"ub-domain-defined-attributes")(), do: ...
+
+  def unquote(:"ub-domain-name-length")(), do: ...
+
+  def unquote(:"ub-e163-4-number-length")(), do: ...
+
+  def unquote(:"ub-e163-4-sub-address-length")(), do: ...
+
+  def unquote(:"ub-emailaddress-length")(), do: ...
+
+  def unquote(:"ub-extension-attributes")(), do: ...
+
+  def unquote(:"ub-generation-qualifier-length")(), do: ...
+
+  def unquote(:"ub-given-name-length")(), do: ...
+
+  def unquote(:"ub-initials-length")(), do: ...
+
+  def unquote(:"ub-integer-options")(), do: ...
+
+  def unquote(:"ub-locality-name")(), do: ...
+
+  def unquote(:"ub-locality-name-universal")(), do: ...
+
+  def unquote(:"ub-locality-name-utf8")(), do: ...
+
+  def unquote(:"ub-match")(), do: ...
+
+  def unquote(:"ub-name")(), do: ...
+
+  def unquote(:"ub-name-printable")(), do: ...
+
+  def unquote(:"ub-name-teletex")(), do: ...
+
+  def unquote(:"ub-name-universal")(), do: ...
+
+  def unquote(:"ub-name-utf8")(), do: ...
+
+  def unquote(:"ub-numeric-user-id-length")(), do: ...
+
+  def unquote(:"ub-organization-name")(), do: ...
+
+  def unquote(:"ub-organization-name-printable")(), do: ...
+
+  def unquote(:"ub-organization-name-teletex")(), do: ...
+
+  def unquote(:"ub-organization-name-universal")(), do: ...
+
+  def unquote(:"ub-organization-name-utf8")(), do: ...
+
+  def unquote(:"ub-organizational-unit-name")(), do: ...
+
+  def unquote(:"ub-organizational-unit-name-printable")(), do: ...
+
+  def unquote(:"ub-organizational-unit-name-teletex")(), do: ...
+
+  def unquote(:"ub-organizational-unit-name-universal")(), do: ...
+
+  def unquote(:"ub-organizational-unit-name-utf8")(), do: ...
+
+  def unquote(:"ub-organizational-units")(), do: ...
+
+  def unquote(:"ub-pds-name-length")(), do: ...
+
+  def unquote(:"ub-pds-parameter-length")(), do: ...
+
+  def unquote(:"ub-pds-physical-address-lines")(), do: ...
+
+  def unquote(:"ub-postal-code-length")(), do: ...
+
+  def unquote(:"ub-pseudonym")(), do: ...
+
+  def unquote(:"ub-pseudonym-universal")(), do: ...
+
+  def unquote(:"ub-pseudonym-utf8")(), do: ...
+
+  def unquote(:"ub-serial-number")(), do: ...
+
+  def unquote(:"ub-state-name")(), do: ...
+
+  def unquote(:"ub-state-name-universal")(), do: ...
+
+  def unquote(:"ub-state-name-utf8")(), do: ...
+
+  def unquote(:"ub-surname-length")(), do: ...
+
+  def unquote(:"ub-terminal-id-length")(), do: ...
+
+  def unquote(:"ub-title")(), do: ...
+
+  def unquote(:"ub-title-printable")(), do: ...
+
+  def unquote(:"ub-title-teletex")(), do: ...
+
+  def unquote(:"ub-title-universal")(), do: ...
+
+  def unquote(:"ub-title-utf8")(), do: ...
+
+  def unquote(:"ub-unformatted-address-length")(), do: ...
+
+  def unquote(:"ub-x121-address-length")(), do: ...
+
+  def unquote(:"unformatted-postal-address")(), do: ...
+
+  def unquote(:"unique-postal-name")(), do: ...
+
+  def versionOne(), do: ...
 end

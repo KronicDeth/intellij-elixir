@@ -3,12 +3,15 @@ package org.elixir_lang.psi
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import org.elixir_lang.psi.call.Call
+import org.elixir_lang.psi.call.name.Function.CASE
 import org.elixir_lang.psi.call.name.Function.QUOTE
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.childExpressions
 import org.elixir_lang.psi.scope.WhileIn.whileIn
 
 object Case {
+    fun `is`(call: Call) = call.isCallingMacro(KERNEL, CASE, 2)
+
     fun treeWalkUp(caseCall: Call,
                    state: ResolveState,
                    keepProcessing: (PsiElement, ResolveState) -> Boolean): Boolean {
@@ -40,9 +43,7 @@ object Case {
         return if (resolveModuleName != null && functionName != null) {
             when {
                 resolveModuleName == KERNEL && functionName == QUOTE -> {
-                    val lastChildCallResolveState = state.putVisitedElement(lastChildCall)
-
-                    QuoteMacro.treeWalkUp(lastChildCall, lastChildCallResolveState, keepProcessing)
+                    QuoteMacro.treeWalkUp(lastChildCall, state, keepProcessing)
                 }
                 else -> true
             }

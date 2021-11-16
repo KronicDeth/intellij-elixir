@@ -2,6 +2,7 @@ package org.elixir_lang.psi.stub;
 
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.stubs.StubElement;
+import org.elixir_lang.psi.Definition;
 import org.elixir_lang.psi.ElixirUnmatchedAtUnqualifiedNoParenthesesCall;
 import org.elixir_lang.psi.stub.call.Deserialized;
 import org.elixir_lang.psi.stub.call.Stub;
@@ -25,7 +26,8 @@ public class UnmatchedAtUnqualifiedNoParenthesesCall extends Stub<ElixirUnmatche
             int resolvedFinalArity,
             boolean hasDoBlockOrKeyword,
             @NotNull String name,
-            @NotNull Set<String> canonicalNameSet
+            @NotNull Set<String> canonicalNameSet,
+            @Nullable String implementedProtocolName
     ) {
         super(
                 parent,
@@ -35,7 +37,9 @@ public class UnmatchedAtUnqualifiedNoParenthesesCall extends Stub<ElixirUnmatche
                 resolvedFinalArity,
                 hasDoBlockOrKeyword,
                 name,
-                canonicalNameSet
+                canonicalNameSet,
+                Definition.MODULE_ATTRIBUTE,
+                implementedProtocolName
         );
     }
 }

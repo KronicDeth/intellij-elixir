@@ -13,6 +13,7 @@ import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.call.qualification.Qualified
+import org.elixir_lang.psi.impl.call.maybeModularNameToModulars
 import org.elixir_lang.psi.operation.Normalized.operatorIndex
 import org.elixir_lang.psi.operation.Operation
 import org.elixir_lang.psi.stub.type.call.Stub.isModular
@@ -34,9 +35,14 @@ fun QualifiableAlias.computeReference(): PsiPolyVariantReference? =
                 null
             }
         else ->
-            // There is no one module that defines the `Elixir` module.  It is only defined implicitly as the common
-            // namespace to all Aliases.
-            if (this.fullyQualifiedName() != "Elixir") {
+
+            if (this.fullyQualifiedName() !in arrayOf(
+                            // `BitString` is used for `defimpl ..., for: BitString` to define protocols on bitstrings
+                            // (`<<...>>`)
+                            "BitString",
+                            // There is no one module that defines the `Elixir` module.  It is only defined implicitly as the common
+                            // namespace to all Aliases.
+                            "Elixir")) {
                 Module(this)
             } else {
                 null
@@ -125,10 +131,14 @@ object QualifiableAliasImpl {
             // Typing a qualified call before the function name is written
             // `Alias.(arg1)` when the full line is `Alias.f(arg1)
             is DotCall<*>,
+            // function call with no parentheses like `raise ArgumentError, ...`
+            is ElixirUnqualifiedNoParenthesesManyArgumentsCall,
             is Operation,
             is QuotableKeywordPair,
             // containers
             is ElixirList, is ElixirStructOperation, is ElixirTuple,
+            // Top of file
+            is ElixirFile,
             // Typing an alias on a new line in the body of function
             is ElixirStabBody -> accumulator
             is ElixirAccessExpression, is ElixirMultipleAliases ->
@@ -145,15 +155,36 @@ object QualifiableAliasImpl {
                     } else {
                         val qualifiedName = when (val strippedQualifier = qualifier.stripAccessExpression()) {
                             is QualifiableAlias -> strippedQualifier.name
+                            is Call -> {
+                                val modularSet = strippedQualifier.maybeModularNameToModulars()
+
+                                when (modularSet.size) {
+                                    0 -> {
+                                        Logger.error(QualifiableAlias::class.java, "Don't know how to prepend qualifier when call resolves to no modulars", ancestor)
+
+                                        "?.${accumulator}"
+                                    }
+                                    1 -> "${modularSet.single().name}.${accumulator}"
+                                    else -> {
+                                        Logger.error(QualifiableAlias::class.java, "Don't know how to prepend qualifier when call resolves to more than one modular", ancestor)
+
+                                        "?.${accumulator}"
+                                    }
+                                }
+                            }
                             else -> {
-                                TODO()
+                                Logger.error(QualifiableAlias::class.java, "Don't know how to prepend qualifier", ancestor)
+
+                                "?.${accumulator}"
                             }
                         }
 
                         "${qualifiedName}.${accumulator}"
                     }
                 } else {
-                    TODO()
+                    Logger.error(QualifiableAlias::class.java, "Don't know how to prepend qualifier", ancestor)
+
+                    "?.${accumulator}"
                 }
             }
             else -> {

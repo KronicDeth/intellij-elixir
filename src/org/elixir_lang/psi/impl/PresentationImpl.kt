@@ -42,7 +42,7 @@ object PresentationImpl {
                         callDefinitionClause.presentation
                     }
                 }
-                org.elixir_lang.structure_view.element.modular.Module.`is`(call) -> {
+                org.elixir_lang.psi.Module.`is`(call) -> {
                     val modular = CallDefinitionClause.enclosingModular(call)
                     org.elixir_lang.structure_view.element.modular.Module(modular, call).presentation
                 }

@@ -2,13 +2,12 @@ package org.elixir_lang.reference.callable
 
 import com.intellij.codeInsight.completion.CompletionType
 import com.intellij.codeInsight.lookup.LookupElementBuilder
-import com.intellij.testFramework.fixtures.BasePlatformTestCase
-import junit.framework.TestCase
+import org.elixir_lang.PlatformTestCase
 
 /**
  * https://github.com/KronicDeth/intellij-elixir/issues/1270
  */
-class Issue1270Test : BasePlatformTestCase() {
+class Issue1270Test : PlatformTestCase() {
     /**
      * Does not complete functions from nested module when bare word is used
      */

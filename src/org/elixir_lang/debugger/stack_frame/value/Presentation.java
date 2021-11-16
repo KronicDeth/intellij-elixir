@@ -178,6 +178,7 @@ public class Presentation extends com.intellij.xdebugger.frame.presentation.XVal
       renderer.renderValue(
               str
                       .stringValue()
+                      .replace("\\x", "\\\\x")
                       .replace("'", "\\'")
       );
       renderer.renderSpecialSymbol("'");

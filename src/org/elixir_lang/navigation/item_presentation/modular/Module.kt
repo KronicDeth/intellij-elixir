@@ -3,6 +3,7 @@ package org.elixir_lang.navigation.item_presentation.modular
 import com.intellij.navigation.ItemPresentation
 import org.elixir_lang.Icons
 import org.elixir_lang.navigation.item_presentation.Parent
+import org.elixir_lang.psi.Module.name
 import org.elixir_lang.psi.call.Call
 import org.jetbrains.annotations.Contract
 import javax.swing.Icon
@@ -46,9 +47,6 @@ open class Module(private val location: String?, protected val call: Call) : Ite
     protected open fun definer(): String = "defmodule"
 
     companion object {
-        @Contract(pure = true)
-        fun name(call: Call): String = call.primaryArguments()!!.first()!!.text
-
         @Contract(pure = true)
         fun presentableText(definer: String, call: Call): String = "$definer ${name(call)}"
     }

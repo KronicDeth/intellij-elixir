@@ -11,12 +11,6 @@ class ElixirLexer(private val elixirFlexLexerAdapter: ElixirFlexLexerAdapter) :
     constructor(project: Project?): this(ElixirFlexLexerAdapter(project))
     constructor(): this(null)
 
-    var level: Level?
-      get() = elixirFlexLexerAdapter.level
-      set(value) {
-          elixirFlexLexerAdapter.level = value
-      }
-
     fun stackSize(): Int = elixirFlexLexerAdapter.stackSize()
 
     companion object {

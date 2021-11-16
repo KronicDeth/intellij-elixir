@@ -83,4 +83,10 @@ public class ModuleStubImpl<T extends Module> extends StubbicBase<T> implements 
     public Definition getDefinition() {
         return Definition.MODULE;
     }
+
+    @Nullable
+    @Override
+    public String getImplementedProtocolName() {
+        return null;
+    }
 }

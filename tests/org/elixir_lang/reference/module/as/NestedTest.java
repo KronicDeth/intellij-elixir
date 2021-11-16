@@ -44,13 +44,10 @@ public class NestedTest extends LightPlatformCodeInsightFixtureTestCase {
 
         assertEquals(2, resolveResults.length);
 
-        // alias
-        assertEquals(
-                "alias Prefix.Suffix, as: As",
-                resolveResults[0].getElement().getParent().getParent().getParent().getParent().getParent().getText()
-        );
         // defmodule
-        assertEquals("defmodule Prefix.Suffix.Nested do\nend", resolveResults[1].getElement().getText());
+        assertEquals("defmodule Prefix.Suffix.Nested do\nend", resolveResults[0].getElement().getText());
+        // alias
+        assertEquals("alias Prefix.Suffix, as: As", resolveResults[1].getElement().getText());
     }
 
     /*

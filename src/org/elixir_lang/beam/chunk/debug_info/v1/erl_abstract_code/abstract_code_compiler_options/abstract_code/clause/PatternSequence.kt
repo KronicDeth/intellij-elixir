@@ -7,5 +7,5 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_
 
 object PatternSequence {
     fun toMacroStringDeclaredScope(term: OtpErlangObject?, scope: Scope): MacroStringDeclaredScope =
-            Sequence.toMacroStringDeclaredScope(term, scope.copy(pinning = true), ", ")
+            Sequence.toMacroStringDeclaredScope(term, scope.copy(pinning = true), "", ", ", "")
 }

@@ -12,7 +12,10 @@ public class AllName extends StringStubIndexExtension<NamedElement> {
            redefinition to count as actual module */
     // 6 - Remove non-canonical names from being index
     // 7 - `defmemo` and `defmemop`
-    public static final int VERSION = 7;
+    // 8 - `implementedProtocolName` added to `Deserialized`
+    // 9 - `Definition.MODULE_ATTRIBUTE` added
+    // 10 - `Definition.VARIABLE` added
+    public static final int VERSION = 9;
 
     @Override
     public int getVersion() {

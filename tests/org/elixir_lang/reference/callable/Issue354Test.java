@@ -4,16 +4,12 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiPolyVariantReference;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.ResolveResult;
-import com.intellij.psi.impl.source.resolve.reference.impl.PsiMultiReference;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
-import org.elixir_lang.psi.CallDefinitionClause;
+import org.elixir_lang.PlatformTestCase;
 import org.elixir_lang.psi.ElixirIdentifier;
 import org.elixir_lang.psi.call.Call;
-import org.elixir_lang.psi.operation.Match;
-import org.jetbrains.annotations.NotNull;
 
-public class Issue354Test extends BasePlatformTestCase {
+public class Issue354Test extends PlatformTestCase {
     /*
      * Tests
      */

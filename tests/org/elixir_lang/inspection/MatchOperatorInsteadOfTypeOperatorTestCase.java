@@ -1,8 +1,8 @@
 package org.elixir_lang.inspection;
 
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
+import org.elixir_lang.PlatformTestCase;
 
-public class MatchOperatorInsteadOfTypeOperatorTestCase extends BasePlatformTestCase {
+public class MatchOperatorInsteadOfTypeOperatorTestCase extends PlatformTestCase {
     public void testMatchOperator() {
         myFixture.configureByFiles("match_operator.ex");
         myFixture.enableInspections(MatchOperatorInsteadOfTypeOperator.class);

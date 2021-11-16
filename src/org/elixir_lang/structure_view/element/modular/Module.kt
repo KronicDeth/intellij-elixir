@@ -2,25 +2,18 @@ package org.elixir_lang.structure_view.element.modular
 
 import com.intellij.ide.util.treeView.smartTree.TreeElement
 import com.intellij.navigation.ItemPresentation
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.util.Computable
 import com.intellij.psi.ElementDescriptionLocation
 import com.intellij.psi.ElementDescriptionUtil
 import com.intellij.psi.PsiElement
+import com.intellij.psi.ResolveState
 import com.intellij.usageView.UsageViewLongNameLocation
 import com.intellij.usageView.UsageViewShortNameLocation
 import com.intellij.usageView.UsageViewTypeLocation
 import org.elixir_lang.NameArity
 import org.elixir_lang.navigation.item_presentation.Parent
-import org.elixir_lang.psi.Arguments
 import org.elixir_lang.psi.ArityInterval
-import org.elixir_lang.psi.CallDefinitionClause.isMacro
 import org.elixir_lang.psi.QuoteMacro
 import org.elixir_lang.psi.call.Call
-import org.elixir_lang.psi.call.name.Function.CREATE
-import org.elixir_lang.psi.call.name.Function.DEFMODULE
-import org.elixir_lang.psi.call.name.Module.KERNEL
-import org.elixir_lang.psi.call.name.Module.MODULE
 import org.elixir_lang.psi.impl.call.macroChildCalls
 import org.elixir_lang.psi.impl.enclosingMacroCall
 import org.elixir_lang.psi.impl.locationString
@@ -30,6 +23,7 @@ import org.elixir_lang.structure_view.element.*
 import org.elixir_lang.structure_view.element.Quote
 import org.elixir_lang.structure_view.element.call_definition_by_name_arity.FunctionByNameArity
 import org.elixir_lang.structure_view.element.call_definition_by_name_arity.MacroByNameArity
+import org.elixir_lang.structure_view.element.ex_unit.case.Describe
 import org.elixir_lang.structure_view.element.structure.Structure
 import org.elixir_lang.structure_view.node_provider.Used
 import org.jetbrains.annotations.Contract
@@ -110,22 +104,6 @@ open class Module(protected val parent: Modular?, call: Call) : Element<Call>(ca
                     else -> null
                 }
 
-        @JvmStatic
-        fun `is`(call: Call): Boolean =
-                (call.isCallingMacro(KERNEL, DEFMODULE, 2) &&
-                        /**
-                         * See https://github.com/KronicDeth/intellij-elixir/issues/1301
-                         *
-                         * Check that the this is not the redefinition of defmodule in distillery
-                         */
-                        ApplicationManager
-                                .getApplication()
-                                .runReadAction(Computable {
-                                    call
-                                            .parent.let { it  as? Arguments }
-                                            ?.parent?.let { it as? Call }?.let { isMacro(it) }
-                                }) != true) ||
-                        call.isCalling(MODULE, CREATE, 3)
 
         @JvmStatic
         fun nameIdentifier(call: Call): PsiElement? = call.primaryArguments()?.firstOrNull()?.stripAccessExpression()
@@ -153,15 +131,15 @@ open class Module(protected val parent: Modular?, call: Call) : Element<Call>(ca
                         org.elixir_lang.psi.Exception.`is`(childCall) -> functionByNameArity.exception = Exception(modular, childCall)
                         org.elixir_lang.psi.CallDefinitionClause.isFunction(childCall) -> functionByNameArity.addClausesToCallDefinition(childCall)
                         CallDefinitionSpecification.`is`(childCall) -> functionByNameArity.addSpecificationToCallDefinition(childCall)
-                        Implementation.`is`(childCall) -> treeElementList.add(Implementation(modular, childCall))
+                        org.elixir_lang.psi.Implementation.`is`(childCall) -> treeElementList.add(Implementation(modular, childCall))
                         org.elixir_lang.psi.CallDefinitionClause.isMacro(childCall) -> macroByNameArity.addClausesToCallDefinition(childCall)
-                        Module.`is`(childCall) -> treeElementList.add(Module(modular, childCall))
+                        org.elixir_lang.psi. Module.`is`(childCall) -> treeElementList.add(Module(modular, childCall))
                         Overridable.`is`(childCall) -> {
                             val overridable = Overridable(modular, childCall)
                             overridableSet.add(overridable)
                             treeElementList.add(overridable)
                         }
-                        Protocol.`is`(childCall) -> treeElementList.add(Protocol(modular, childCall))
+                        org.elixir_lang.psi.Protocol.`is`(childCall) -> treeElementList.add(Protocol(modular, childCall))
                         QuoteMacro.`is`(childCall) -> treeElementList.add(Quote(modular, childCall))
                         Structure.`is`(childCall) -> treeElementList.add(Structure(modular, childCall))
                         Type.`is`(childCall) -> treeElementList.add(Type.fromCall(modular, childCall))
@@ -170,6 +148,8 @@ open class Module(protected val parent: Modular?, call: Call) : Element<Call>(ca
                             useSet.add(use)
                             treeElementList.add(use)
                         }
+                        org.elixir_lang.psi.ex_unit.Case.isDescribe(childCall, ResolveState.initial()) ->
+                            treeElementList.add(Describe(childCall))
                         Unknown.`is`(childCall) -> // Should always be last since it will match all macro calls
                             treeElementList.add(Unknown(modular, childCall))
                     }

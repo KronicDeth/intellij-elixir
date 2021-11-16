@@ -40,7 +40,8 @@ public class UnmatchedAtUnqualifiedNoParenthesesCall extends Stub<org.elixir_lan
                 psi.resolvedFinalArity(),
                 psi.hasDoBlockOrKeyword(),
                 StringUtil.notNullize(psi.getName(), "?"),
-                psi.canonicalNameSet()
+                psi.canonicalNameSet(),
+                psi.implementedProtocolName()
         );
     }
 

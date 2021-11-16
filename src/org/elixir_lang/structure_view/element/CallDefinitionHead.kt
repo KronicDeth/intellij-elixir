@@ -5,7 +5,6 @@ import com.intellij.navigation.ItemPresentation
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiErrorElement
 import com.intellij.psi.ResolveState
-import org.elixir_lang.ArityRange
 import org.elixir_lang.NameArityInterval
 import org.elixir_lang.Visibility
 import org.elixir_lang.navigation.item_presentation.NameArity
@@ -79,9 +78,8 @@ class CallDefinitionHead(val callDefinition: CallDefinition, private val visibil
         fun `is`(call: Call): Boolean = call is UnqualifiedParenthesesCall<*>
 
         fun nameIdentifier(head: PsiElement): PsiElement? =
-                if (head is ElixirMatchedAtNonNumericOperation) {
-                    val atNonNumericOperation = head as AtNonNumericOperation
-                    atNonNumericOperation.operator()
+                if (head is ElixirMatchedAtOperation) {
+                    head.operator()
                 } else {
                     val stripped = strip(head)
 
@@ -93,7 +91,7 @@ class CallDefinitionHead(val callDefinition: CallDefinition, private val visibil
                 }
 
         fun nameArityInterval(head: PsiElement, state: ResolveState): NameArityInterval? =
-            if (head is ElixirMatchedAtNonNumericOperation) {
+            if (head is ElixirMatchedAtOperation) {
                 val name = head.operator().text.trim { it <= ' ' }
                 val arityInterval = ArityInterval(1, 1)
 

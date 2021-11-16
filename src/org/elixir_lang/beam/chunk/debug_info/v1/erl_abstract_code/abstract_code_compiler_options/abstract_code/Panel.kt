@@ -14,6 +14,7 @@ import org.elixir_lang.Macro.adjustNewLines
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.AbstractCodeCompileOptions
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.attribute.MacroString
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.function.Clause
+import org.elixir_lang.beam.decompiler.Options
 import java.awt.GridLayout
 import java.lang.ref.WeakReference
 import javax.swing.JPanel
@@ -58,7 +59,7 @@ class Panel(private val formsTree: Tree, project: Project): JPanel(GridLayout(1,
 
     private fun attribute(attribute: ToMacroString): String =
         attributeByToMacroString.computeIfAbsent(attribute) { key ->
-            key.toMacroString()
+            key.toMacroString(OPTIONS)
         }
 
     private fun attributeModule(debugInfo: AbstractCodeCompileOptions, attribute: ToMacroString): String =
@@ -97,7 +98,7 @@ class Panel(private val formsTree: Tree, project: Project): JPanel(GridLayout(1,
 
     private fun clause(clause: Clause): String =
             clauseByClause.computeIfAbsent(clause) { key ->
-                key.toMacroString()
+                key.toMacroString(OPTIONS)
             }
 
     private fun clauseModule(debugInfo: AbstractCodeCompileOptions, clause: Clause): String =
@@ -109,7 +110,7 @@ class Panel(private val formsTree: Tree, project: Project): JPanel(GridLayout(1,
 
     private fun function(function: Function): String =
             functionByFunction.computeIfAbsent(function) { key ->
-                key.toMacroString()
+                key.toMacroString(OPTIONS)
             }
 
     private fun functionModule(debugInfo: AbstractCodeCompileOptions, function: Function): String =
@@ -206,5 +207,9 @@ class Panel(private val formsTree: Tree, project: Project): JPanel(GridLayout(1,
         ApplicationManager.getApplication().runWriteAction {
             document.setText(text)
         }
+    }
+
+    companion object {
+        private val OPTIONS = Options(decompileBodies = true, clauseLimit = 100)
     }
 }

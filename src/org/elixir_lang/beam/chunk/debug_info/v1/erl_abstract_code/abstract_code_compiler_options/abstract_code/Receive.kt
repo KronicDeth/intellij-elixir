@@ -63,12 +63,23 @@ object Receive {
     private fun toClauses(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
 
     private fun toMacroString(term: OtpErlangTuple, scope: Scope): String {
+        val macroStringBuilder = StringBuilder()
+
+        macroStringBuilder.append("receive do\n")
+
         val clausesMacroString = clausesMacroString(term, scope)
+        if (clausesMacroString.isNotEmpty()) {
+            macroStringBuilder.append(clausesMacroString).append('\n')
+        }
+
         val afterMacroString = afterMacroString(term, scope)
 
-        return "receive do\n" +
-                "  $clausesMacroString\n" +
-                "$afterMacroString\n" +
-                "end"
+        if (afterMacroString.isNotEmpty()) {
+            macroStringBuilder.append(afterMacroString).append('\n')
+        }
+
+        macroStringBuilder.append("end")
+
+        return macroStringBuilder.toString()
     }
 }

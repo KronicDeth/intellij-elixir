@@ -6,7 +6,7 @@ import java.lang.StringBuilder
  * For macro/name/arity that don't need be handled by [Unquoted], but won't map to Code correctly if the signature
  * in the `Docs` chunk is used.
  */
-class SignatureOverride : MacroNameArity() {
+class SignatureOverride : Default() {
     /**
      * Whether the decompiler accepts the `macroNameArity`
      *
@@ -24,18 +24,25 @@ class SignatureOverride : MacroNameArity() {
     override fun append(decompiled: StringBuilder, macroNameArity: org.elixir_lang.beam.MacroNameArity) {
         when (macroNameArity.arity) {
             1 -> {
-                decompiled
-                        .append("  ")
-                        .append(macroNameArity.macro)
-                        .append(" __struct__(kv)")
+                appendSignature(decompiled, macroNameArity, "__struct__", arrayOf("kv"))
                 appendBody(decompiled)
             }
-            else -> Default.INSTANCE.append(decompiled, macroNameArity)
+            else -> super.append(decompiled, macroNameArity)
         }
     }
 
-    override fun appendName(decompiled: StringBuilder, name: String) {
-        decompiled.append(name)
+    override fun appendSignature(decompiled: StringBuilder,
+                                 macroNameArity: org.elixir_lang.beam.MacroNameArity,
+                                 name: String,
+                                 parameters: Array<out String>) {
+        val (nameOverride, argumentsOverride) = when (macroNameArity.arity) {
+            1 -> {
+                Pair("__struct__", arrayOf("kv"))
+            }
+            else -> Pair(name, parameters)
+        }
+
+        super.appendSignature(decompiled, macroNameArity, nameOverride, argumentsOverride)
     }
 
     companion object {

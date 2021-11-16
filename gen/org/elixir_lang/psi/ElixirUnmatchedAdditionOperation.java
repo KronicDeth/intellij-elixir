@@ -9,7 +9,6 @@ import org.elixir_lang.psi.operation.Addition;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
-import kotlin.ranges.IntRange;
 
 public interface ElixirUnmatchedAdditionOperation extends ElixirUnmatchedExpression, Named, Addition {
 

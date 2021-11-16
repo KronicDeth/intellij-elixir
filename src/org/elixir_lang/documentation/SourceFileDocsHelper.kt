@@ -3,12 +3,12 @@ package org.elixir_lang.documentation
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import org.elixir_lang.psi.*
+import org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.CanonicallyNamed
 import org.elixir_lang.psi.impl.ElixirUnmatchedUnqualifiedNoParenthesesCallImpl
 import org.elixir_lang.psi.impl.call.macroChildCallList
 import org.elixir_lang.psi.stub.type.call.Stub
-import org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.enclosingModularMacroCall
 import org.elixir_lang.structure_view.element.CallDefinitionHead
 
 object SourceFileDocsHelper {

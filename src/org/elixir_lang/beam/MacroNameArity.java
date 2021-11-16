@@ -1,6 +1,7 @@
 package org.elixir_lang.beam;
 
 import gnu.trove.THashMap;
+import org.elixir_lang.NameArity;
 import org.elixir_lang.Visibility;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -8,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.elixir_lang.Visibility.PRIVATE;
 import static org.elixir_lang.Visibility.PUBLIC;
@@ -21,10 +23,10 @@ public class MacroNameArity implements Comparable<MacroNameArity> {
      * CONSTANTS
      */
 
-    private static final Map<Visibility, String> FUNCTION_MACRO_BY_VISIBILITY = new THashMap<>();
+    public static final Map<Visibility, String> FUNCTION_MACRO_BY_VISIBILITY = new THashMap<>();
     private static final String MACRO_EXPORT_PREFIX = "MACRO-";
     private static final Map<Visibility, String> MACRO_MACRO_BY_VISIBILITY = new THashMap<>();
-    private static final List<String> MACRO_ORDER = Arrays.asList(DEFMACRO, DEFMACROP, DEF, DEFP);
+    public static final List<String> MACRO_ORDER = Arrays.asList(DEFMACRO, DEFMACROP, DEF, DEFP);
     private static final Map<String, Integer> ORDER_BY_MACRO = new THashMap<>();
 
     static {
@@ -68,6 +70,12 @@ public class MacroNameArity implements Comparable<MacroNameArity> {
     /*
      * Constructors
      */
+
+    public MacroNameArity(@NotNull String macro, @NotNull String name, int arity) {
+        this.macro = macro;
+        this.name = name;
+        this.arity = arity;
+    }
 
     public MacroNameArity(@NotNull Visibility visibility, @NotNull String exportName, int exportArity) {
         if (exportName.startsWith(MACRO_EXPORT_PREFIX)) {
@@ -113,5 +121,23 @@ public class MacroNameArity implements Comparable<MacroNameArity> {
     @Contract(pure = true)
     private int compareNameTo(@NotNull String otherName) {
         return name.compareTo(otherName);
+    }
+
+    @NotNull
+    public NameArity toNameArity() {
+        return new NameArity(name, arity);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof MacroNameArity)) return false;
+        MacroNameArity that = (MacroNameArity) o;
+        return macro.equals(that.macro) && name.equals(that.name) && arity.equals(that.arity);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(macro, name, arity);
     }
 }

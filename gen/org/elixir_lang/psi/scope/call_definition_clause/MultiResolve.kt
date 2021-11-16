@@ -6,49 +6,49 @@ import com.intellij.psi.ResolveState
 import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.EEx.FUNCTION_FROM_FILE_ARITY_RANGE
 import org.elixir_lang.EEx.FUNCTION_FROM_STRING_ARITY_RANGE
+import org.elixir_lang.NameArityInterval
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.CallDefinitionClause.nameArityInterval
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.Named
 
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
+import org.elixir_lang.psi.impl.ProcessDeclarationsImpl
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.call.keywordArgument
 import org.elixir_lang.psi.impl.maybeModularNameToModulars
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.scope.ResolveResultOrderedSet
+import org.elixir_lang.psi.scope.VisitedElementSetResolveResult
 import org.elixir_lang.psi.scope.WhileIn.whileIn
 import org.elixir_lang.psi.scope.maxScope
 import org.elixir_lang.structure_view.element.CallDefinitionHead
 import org.elixir_lang.structure_view.element.Callback
 
 class MultiResolve
-private constructor(private val name: String,
-                    private val resolvedPrimaryArity: Int,
-                    private val incompleteCode: Boolean) : org.elixir_lang.psi.scope.CallDefinitionClause() {
+private constructor(
+        /**
+         * Can be `null` when `Qualifier.unquote(variable)(...)` is used because although scope can be limited to
+         * `Qualifier`, no `name` can be inferred, so all public call definition clauses in `Qualifier` should resolve,
+         * but as invalid.
+         */
+        private val name: String?,
+        /**
+         * If `name` is `null`, then `resolvedPrimaryArity` must be valid or `incompleteCode` `true` or no match will be
+         * found at all.
+         */
+        private val resolvedPrimaryArity: Int,
+        private val incompleteCode: Boolean) : org.elixir_lang.psi.scope.CallDefinitionClause() {
     override fun executeOnCallDefinitionClause(element: Call, state: ResolveState): Boolean =
-        nameArityInterval(element, state)?.let { nameArityInterval ->
-            val name = nameArityInterval.name
-
-            if (name.startsWith(this.name)) {
-                val validResult = (resolvedPrimaryArity in nameArityInterval.arityInterval) && name == this.name
-
-                addToResolveResults(element, validResult, state)
-            } else {
-                null
-            }
-        } ?: true
+            nameArityInterval(element, state)
+                    ?.let { addIfNameOrArityToResolveResults(element, it, state) }
+                    ?: true
 
     override fun executeOnCallback(element: AtUnqualifiedNoParenthesesCall<*>, state: ResolveState): Boolean =
-        Callback.headCall(element)?.let { CallDefinitionHead.nameArityInterval(it, state) }?.let { nameArityInterval ->
-            if (nameArityInterval.name.startsWith(name)) {
-                val validResult = (resolvedPrimaryArity in nameArityInterval.arityInterval) && name == nameArityInterval.name
-
-                addToResolveResults(element, validResult, state)
-            } else {
-                true
-            }
-        } ?: true
+            Callback.headCall(element)
+                    ?.let { CallDefinitionHead.nameArityInterval(it, state) }
+                    ?.let { addIfNameOrArityToResolveResults(element, it, state) }
+                    ?: true
 
     override fun executeOnDelegation(element: Call, state: ResolveState): Boolean {
         element.finalArguments()?.takeIf { it.size == 2 }?.let { arguments ->
@@ -56,14 +56,16 @@ private constructor(private val name: String,
 
             CallDefinitionHead.nameArityInterval(head, state)?.let { headNameArityInterval ->
                 val headName = headNameArityInterval.name
+                val validArity = resolvedPrimaryArity in headNameArityInterval.arityInterval
 
-                if (headName.startsWith(this.name)) {
-                    val headValidResult = (resolvedPrimaryArity in headNameArityInterval.arityInterval) && (headName == this.name)
+                if ((this.name == null && (incompleteCode || validArity)) ||
+                        (this.name != null && headName.startsWith(this.name))) {
+                    val headValidResult = validArity && headName == this.name
 
                     // the defdelegate is valid or invalid regardless of whether the `to:` (and `:as` resolves as
                     // `defdelegate` still defines a function in the module with the head's name and arity even if it
                     // will fail at runtime to call the delegated function
-                    addToResolveResults(element, headValidResult, state)
+                    addToResolveResults(element, headName, headValidResult, state)
 
                     element.keywordArgument("to")?.let { definingModuleName ->
                         val modulars = definingModuleName.maybeModularNameToModulars(element.containingFile, useCall = null, incompleteCode = incompleteCode)
@@ -78,7 +80,7 @@ private constructor(private val name: String,
 
                                 for (modularResultResult in modularResolveResults) {
                                     modularResultResult.element?.let { it as Call }?.let { call ->
-                                        addToResolveResults(call, modularResultResult.isValidResult, state)
+                                        addToResolveResults(call, nameInDefiningModule, modularResultResult.isValidResult, state)
                                     }
                                 }
 
@@ -100,7 +102,7 @@ private constructor(private val name: String,
                 when (element.functionName()) {
                     FUNCTION_FROM_FILE_ARITY_RANGE.name -> {
                         arguments[1].stripAccessExpression().let { it as? ElixirAtom }?.node?.lastChildNode?.text?.let { name ->
-                            if (name.startsWith(this.name)) {
+                            if (this.name != null && name.startsWith(this.name)) {
                                 val arity = if (arguments.size >= 4) {
                                     // function_from_file(kind, name, file, args)
                                     // function_from_file(kind, name, file, args, options)
@@ -112,7 +114,7 @@ private constructor(private val name: String,
 
                                 val validResult = (resolvedPrimaryArity == arity) && (name == this.name)
 
-                                addToResolveResults(element, validResult, state)
+                                addToResolveResults(element, name, validResult, state)
                             } else {
                                 true
                             }
@@ -124,31 +126,62 @@ private constructor(private val name: String,
             } ?: true
 
     override fun executeOnException(element: Call, state: ResolveState): Boolean =
-        whileIn(Exception.NAME_ARITY_LIST) { nameArity ->
-            if (nameArity.name.startsWith(name)) {
-                val validResult = resolvedPrimaryArity == nameArity.arity && name == nameArity.name
+            whileIn(Exception.NAME_ARITY_LIST) { nameArity ->
+                val name = nameArity.name
+                val validArity = resolvedPrimaryArity == nameArity.arity
 
-                addToResolveResults(element, validResult, state)
+                addIfNameOrArityToResolveResults(element, name, validArity, state)
+            }
+
+    override fun executeOnMixGeneratorEmbed(element: Call, state: ResolveState): Boolean =
+            element.finalArguments()?.first()?.stripAccessExpression()?.let { it as? ElixirAtom }?.node?.lastChildNode?.text?.let { prefix ->
+                val suffix = element.functionName()!!.removePrefix("embed_")
+                val name = "${prefix}_${suffix}"
+                val arityRange = when (suffix) {
+                    "template" -> 0..1
+                    "text" -> 0..0
+                    else -> TODO("Unknown suffix $suffix")
+                }
+
+                if (this.name != null && name.startsWith(this.name)) {
+                    val validResult = (resolvedPrimaryArity in arityRange) && (name == this.name)
+
+                    addToResolveResults(element, name, validResult, state)
+                } else {
+                    true
+                }
+            } ?: true
+
+    private fun addIfNameOrArityToResolveResults(call: Call,
+                                                 nameArityInterval: NameArityInterval,
+                                                 state: ResolveState): Boolean {
+        val name = nameArityInterval.name
+        val validArity = resolvedPrimaryArity in nameArityInterval.arityInterval
+
+        return addIfNameOrArityToResolveResults(call, name, validArity, state)
+    }
+
+    private fun addIfNameOrArityToResolveResults(call: Call, name: String, validArity: Boolean, state: ResolveState): Boolean =
+            if ((this.name == null && (incompleteCode || validArity)) ||
+                    (this.name != null && name.startsWith(this.name))) {
+                val validResult = validArity && name == this.name
+
+                addToResolveResults(call, name, validResult, state)
             } else {
                 true
             }
-        }
 
     override fun keepProcessing(): Boolean = resolveResultOrderedSet.keepProcessing(incompleteCode)
-    fun resolveResults(): List<ResolveResult> = resolveResultOrderedSet.toList()
+    fun resolveResults(): List<VisitedElementSetResolveResult> = resolveResultOrderedSet.toList()
 
     private val resolveResultOrderedSet = ResolveResultOrderedSet()
 
-    private fun addToResolveResults(call: Call, validResult: Boolean, state: ResolveState): Boolean =
+    private fun addToResolveResults(call: Call, name: String, validResult: Boolean, state: ResolveState): Boolean =
             (call as? Named)?.nameIdentifier?.let { nameIdentifier ->
                 if (PsiTreeUtil.isAncestor(state.get(ENTRANCE), nameIdentifier, false)) {
-                    resolveResultOrderedSet.add(call, name, validResult)
+                    resolveResultOrderedSet.add(call, name, validResult, emptySet())
                 } else {
-                    resolveResultOrderedSet.add(call, name, validResult)
-
-                    state.get<Call>(IMPORT_CALL)?.let { importCall ->
-                        resolveResultOrderedSet.add(importCall, importCall.text, validResult)
-                    }
+                    resolveResultOrderedSet.add(call, name, validResult, state.visitedElementSet())
                 }
 
                 keepProcessing()
@@ -157,11 +190,11 @@ private constructor(private val name: String,
     companion object {
         @JvmOverloads
         @JvmStatic
-        fun resolveResults(name: String,
+        fun resolveResults(name: String?,
                            resolvedFinalArity: Int,
                            incompleteCode: Boolean,
                            entrance: PsiElement,
-                           resolveState: ResolveState = ResolveState.initial()): List<ResolveResult> {
+                           resolveState: ResolveState = ResolveState.initial()): List<VisitedElementSetResolveResult> {
             val multiResolve = MultiResolve(name, resolvedFinalArity, incompleteCode)
             val maxScope = maxScope(entrance)
 

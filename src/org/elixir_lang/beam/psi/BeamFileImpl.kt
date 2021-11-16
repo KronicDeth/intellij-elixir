@@ -448,7 +448,11 @@ class BeamFileImpl private constructor(private val fileViewProvider: FileViewPro
                 }
 
         private fun buildCallDefinitions(parentStub: ModuleStub<*>, beam: Beam, atoms: Atoms) {
-            CallDefinitions.macroNameAritySortedSet(beam, atoms).forEach(Consumer { macroNameArity: MacroNameArity -> buildCallDefinition(parentStub, macroNameArity) })
+            CallDefinitions.macroNameAritySortedSetByMacro(beam, atoms).forEach { (_, macroNameAritySortedSet) ->
+                macroNameAritySortedSet.forEach { macroNameArity ->
+                    buildCallDefinition(parentStub, macroNameArity)
+                }
+            }
         }
 
         private fun buildCallDefinition(parentStub: ModuleStub<*>,

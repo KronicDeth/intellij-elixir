@@ -11,6 +11,8 @@ import org.elixir_lang.beam.term.unsignedIntToInt
 typealias Name = String
 typealias Arity = Int
 
+fun Long.toArity(): Arity = toInt()
+
 data class NameArity(val name: Name, val arity: Arity) {
     companion object {
         private val logger = Logger.getInstance(NameArity::class.java)

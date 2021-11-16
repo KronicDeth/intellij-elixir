@@ -1,14 +1,12 @@
 package org.elixir_lang.reference.callable;
 
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.search.LocalSearchScope;
-import com.intellij.psi.search.SearchScope;
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
+import org.elixir_lang.PlatformTestCase;
 import org.elixir_lang.psi.call.Call;
 
 import static org.elixir_lang.reference.Callable.isVariable;
 
-public class Issue422Test extends BasePlatformTestCase {
+public class Issue422Test extends PlatformTestCase {
     /*
      * Tests
      */

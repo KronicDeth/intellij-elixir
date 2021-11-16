@@ -69,7 +69,7 @@ object Call {
             Atom.ifTo(term) {
                 Atom.toAtom(it)?.let { atom ->
                     if (atom is OtpErlangAtom) {
-                        inspectAsFunction(atom)
+                        inspectAsFunction(atom, local = true)
                     } else {
                         null
                     }

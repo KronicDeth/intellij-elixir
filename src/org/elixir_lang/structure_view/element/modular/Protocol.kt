@@ -28,10 +28,4 @@ class Protocol : Module {
      * @return the element presentation.
      */
     override fun getPresentation(): ItemPresentation = Protocol(location(), navigationItem)
-
-    companion object {
-        @JvmStatic
-        fun `is`(call: Call): Boolean =
-                call.isCallingMacro(org.elixir_lang.psi.call.name.Module.KERNEL, Function.DEFPROTOCOL, 2)
-    }
 }

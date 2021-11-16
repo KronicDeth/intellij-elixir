@@ -73,6 +73,8 @@ object Identifier {
                     Classification.ALIAS
                 isIdentifier(atomValue) ->
                     Classification.CALLABLE_LOCAL
+                atomValue.startsWith("..") ->
+                    Classification.OTHER
                 "@" !in atomValue ->
                     Classification.NOT_CALLABLE
                 else ->
@@ -80,9 +82,10 @@ object Identifier {
             }
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/code/identifier.ex#L168-L188
-    fun inspectAsFunction(atom: OtpErlangAtom): String = inspectAsFunction(atom.atomValue())
+    fun inspectAsFunction(atom: OtpErlangAtom, local: Boolean = false): String =
+            inspectAsFunction(atom.atomValue(), local)
 
-    fun inspectAsFunction(string: String): String {
+    fun inspectAsFunction(string: String, local: Boolean = false): String {
         val classification = classify(string)
 
         return if (classification in arrayOf(Classification.CALLABLE_LOCAL, Classification.CALLABLE_OPERATOR)) {
@@ -94,7 +97,13 @@ object Identifier {
                string.replace("\"", "\\\"")
            }
 
-           "\"$escaped\""
+           val quoted = "\"$escaped\""
+
+            if (local) {
+                "unquote(:${quoted})"
+            } else {
+                quoted
+            }
         }
     }
 

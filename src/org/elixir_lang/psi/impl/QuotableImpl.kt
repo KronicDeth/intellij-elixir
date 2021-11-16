@@ -11,11 +11,10 @@ import com.intellij.psi.impl.source.tree.Factory
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
 import org.elixir_lang.ElixirLanguage
-import org.elixir_lang.Level
-import org.elixir_lang.Level.V_1_3
-import org.elixir_lang.Level.V_1_6
 import org.elixir_lang.Macro
 import org.elixir_lang.mix.project.computeReadAction
+import org.elixir_lang.otpErlangList
+import org.elixir_lang.otpErlangTuple
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.IDENTIFIER_TOKEN_SET
 import org.elixir_lang.psi.impl.ParentImpl.addChildTextCodePoints
@@ -25,7 +24,6 @@ import org.elixir_lang.psi.operation.In
 import org.elixir_lang.psi.operation.Infix
 import org.elixir_lang.psi.operation.NotIn
 import org.elixir_lang.psi.operation.Prefix
-import org.elixir_lang.sdk.elixir.Type.Companion.getNonNullRelease
 import org.jetbrains.annotations.Contract
 import java.lang.Double
 import java.lang.Long
@@ -167,7 +165,7 @@ object QuotableImpl {
     @JvmStatic
     fun quote(blockItem: ElixirBlockItem): OtpErlangObject {
         val blockIdentifier = blockItem.blockIdentifier
-        val quotedValue = blockItem.stab?.quote() ?: emptyBlock(getNonNullRelease(blockItem).level())
+        val quotedValue = blockItem.stab?.quote() ?: emptyBlock()
 
         return OtpErlangTuple(
                 arrayOf(blockIdentifier.quote(), quotedValue)
@@ -216,7 +214,7 @@ object QuotableImpl {
     fun quote(alias: ElixirAlias): OtpErlangObject =
             quotedFunctionCall(
                     ALIASES,
-                    metadata(alias, 0),
+                    metadata(alias),
                     OtpErlangAtom(alias.text)
             )
 
@@ -990,15 +988,7 @@ object QuotableImpl {
                 arrayOf(BLOCK, emptyMetadata(parentheticalStab), OtpErlangList())
         )
 
-    private fun emptyMetadata(parentheticalStab: ElixirParentheticalStab): OtpErlangList {
-        val level = getNonNullRelease(parentheticalStab).level()
-
-        return if (level < V_1_6) {
-            OtpErlangList()
-        } else {
-            metadata(parentheticalStab)
-        }
-    }
+    private fun emptyMetadata(parentheticalStab: ElixirParentheticalStab): OtpErlangList = metadata(parentheticalStab)
 
     /* @note quotedFunctionCall cannot be used here because in the 3-tuple for function calls, the elements are
        {name, metadata, arguments}, while for an ambiguous call or variable, the elements are
@@ -1033,10 +1023,10 @@ object QuotableImpl {
 
     @Contract(pure = true)
     @JvmStatic
-    fun quote(children: Array<PsiElement>, level: Level): OtpErlangObject =
+    fun quote(children: Array<PsiElement>): OtpErlangObject =
         children.asSequence().filter { it !is Unquoted }.map {
             it as? Quotable ?: throw TODO("Child, $it, must be Quotable or Unquoted")
-        }.toList().toTypedArray().let { quote(it, level) }
+        }.toList().toTypedArray().let { quote(it) }
 
     @Contract(pure = true)
     @JvmStatic
@@ -1340,9 +1330,7 @@ object QuotableImpl {
 
     @JvmStatic
     fun quote(@Suppress("UNUSED_PARAMETER") emptyParentheses: ElixirEmptyParentheses): OtpErlangObject =
-        getNonNullRelease(emptyParentheses)
-                .level()
-                .let { emptyBlock(it) }
+         emptyBlock()
 
     @JvmStatic
     fun quote(file: ElixirFile): OtpErlangObject {
@@ -1360,17 +1348,15 @@ object QuotableImpl {
                         super.visitElement(element)
                     }
 
-                    internal fun visitQuotable(child: Quotable) {
+                    fun visitQuotable(child: Quotable) {
                         val quotedChild = child.quote()
                         quotedChildren.add(quotedChild)
                     }
                 }
         )
 
-        val level = getNonNullRelease(file).level()
-
         // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L76-L79
-        return toBlock(quotedChildren, level)
+        return toBlock(quotedChildren)
     }
 
     @Contract(pure = true)
@@ -1487,9 +1473,9 @@ object QuotableImpl {
             )
 
     @Contract(pure = true)
-    private fun quote(children: Array<Quotable>, level: Level) =
+    private fun quote(children: Array<Quotable>) =
         // Uses toBlock because this is for inside interpolation, which functions the same as an embedded file
-        children.map(Quotable::quote).let { toBlock(it, level) }
+        children.map(Quotable::quote).let { toBlock(it) }
 
     @JvmStatic
     fun quotedFunctionCall(
@@ -1501,25 +1487,11 @@ object QuotableImpl {
     )
 
     @JvmStatic
-    fun metadata(node: ASTNode): OtpErlangList = OtpErlangList(arrayOf<OtpErlangObject>(lineNumberKeywordTuple(node)))
+    fun metadata(node: ASTNode): OtpErlangList = otpErlangList(lineNumberKeywordTuple(node))
     @JvmStatic
     fun metadata(operator: Operator): OtpErlangList = metadata(operator.operatorTokenNode())
     @JvmStatic
     fun metadata(element: PsiElement): OtpErlangList = metadata(element.node)
-
-    @JvmStatic
-    fun metadata(element: PsiElement, counter: Int): OtpErlangList {
-        val level = getNonNullRelease(element).level()
-        val lineNumberKeywordTuple = lineNumberKeywordTuple(element.node)
-
-        return if (level < V_1_6) {
-            /* QuotableKeywordList should be compared by sorting keys, but Elixir does counter first, so it's simpler to just use
-               same order than detect a OtpErlangList is a QuotableKeywordList */
-            arrayOf<OtpErlangObject>(keywordTuple("counter", counter), lineNumberKeywordTuple)
-        } else {
-            arrayOf<OtpErlangObject>(lineNumberKeywordTuple)
-        }.let(::OtpErlangList)
-    }
 
     @JvmStatic
     fun quotedFunctionCall(
@@ -1782,25 +1754,17 @@ object QuotableImpl {
      * See https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L724-L725
      */
     @Contract(pure = true)
-    private fun toBlock(quotedChildren: List<OtpErlangObject>, level: Level): OtpErlangObject =
+    private fun toBlock(quotedChildren: List<OtpErlangObject>): OtpErlangObject =
             when (quotedChildren.size) {
-                0 -> emptyBlock(level)
-                1 ->  if (level < V_1_6) {
-                    quotedChildren.first()
-                } else {
-                    buildBlock(quotedChildren, OtpErlangList())
-                }
+                0 -> emptyBlock()
+                1 -> buildBlock(quotedChildren, OtpErlangList())
                 else -> blockFunctionCall(quotedChildren, OtpErlangList())
             }
 
-    private fun emptyBlock(level: Level) =
-            if (level < V_1_6)  {
-                NIL
-            } else {
-                OtpErlangTuple(
-                        arrayOf(BLOCK, OtpErlangList(), OtpErlangList())
-                )
-            }
+    private fun emptyBlock() =
+             otpErlangTuple(
+                     BLOCK, OtpErlangList(), OtpErlangList()
+             )
 
     @Contract(pure = true)
     private fun blockFunctionCall(quotedChildren: List<OtpErlangObject>, metadata: OtpErlangList): OtpErlangTuple =

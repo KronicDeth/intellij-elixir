@@ -3,19 +3,16 @@ package org.elixir_lang.reference.module;
 import com.intellij.codeInsight.completion.CompletionType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
-import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiPolyVariantReference;
 import com.intellij.psi.ResolveResult;
-import com.intellij.psi.stubs.StubIndex;
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
+import org.elixir_lang.PlatformTestCase;
 import org.elixir_lang.psi.ElixirAlias;
-import org.elixir_lang.psi.stub.index.AllName;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class MultipleAliasTest extends BasePlatformTestCase {
+public class MultipleAliasTest extends PlatformTestCase {
 
     /*
      * Tests
@@ -66,13 +63,13 @@ public class MultipleAliasTest extends BasePlatformTestCase {
 
         assertEquals(2, resolveResults.length);
 
+        // defmodule
+        assertEquals("defmodule Prefix.MultipleAliasAye do\nend", resolveResults[0].getElement().getText());
         // alias
         assertEquals(
                 "alias Prefix.{MultipleAliasAye, MultipleAliasBee}",
-                resolveResults[0].getElement().getParent().getParent().getParent().getParent().getParent().getText()
+                resolveResults[1].getElement().getText()
         );
-        // defmodule
-        assertEquals("defmodule Prefix.MultipleAliasAye do\nend", resolveResults[1].getElement().getText());
     }
 
     /*

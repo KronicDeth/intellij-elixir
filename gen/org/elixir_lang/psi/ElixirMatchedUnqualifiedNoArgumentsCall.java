@@ -13,7 +13,6 @@ import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.search.SearchScope;
 import java.util.Set;
-import kotlin.ranges.IntRange;
 
 public interface ElixirMatchedUnqualifiedNoArgumentsCall extends ElixirMatchedExpression, MatchedCall, UnqualifiedNoArgumentsCall<MatchedUnqualifiedNoArgumentsCall>, StubBasedPsiElement<MatchedUnqualifiedNoArgumentsCall> {
 
@@ -61,6 +60,8 @@ public interface ElixirMatchedUnqualifiedNoArgumentsCall extends ElixirMatchedEx
   @Nullable Integer primaryArity();
 
   boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place);
+
+  @Nullable String implementedProtocolName();
 
   @NotNull OtpErlangObject quote();
 

@@ -3,49 +3,15 @@ package org.elixir_lang.parser_definition;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.Language;
 import com.intellij.lang.ParserDefinition;
-import com.intellij.mock.MockApplication;
-import com.intellij.mock.MockLocalFileSystem;
-import com.intellij.openapi.editor.EditorFactory;
-import com.intellij.openapi.editor.impl.EditorFactoryImpl;
-import com.intellij.openapi.extensions.DefaultPluginDescriptor;
-import com.intellij.openapi.extensions.ExtensionPoint;
-import com.intellij.openapi.extensions.ExtensionsArea;
-import com.intellij.openapi.extensions.ProjectExtensionPointName;
-import com.intellij.openapi.extensions.impl.ExtensionsAreaImpl;
-import com.intellij.openapi.module.ModuleManager;
-import com.intellij.openapi.projectRoots.ProjectJdkTable;
-import com.intellij.openapi.projectRoots.Sdk;
-import com.intellij.openapi.projectRoots.impl.ProjectJdkTableImpl;
-import com.intellij.openapi.roots.*;
-import com.intellij.openapi.roots.impl.*;
-import com.intellij.openapi.vfs.VirtualFileManager;
-import com.intellij.openapi.vfs.encoding.EncodingManager;
-import com.intellij.openapi.vfs.encoding.EncodingManagerImpl;
-import com.intellij.openapi.vfs.impl.CoreVirtualFilePointerManager;
-import com.intellij.openapi.vfs.impl.VirtualFileManagerImpl;
-import com.intellij.openapi.vfs.pointers.VirtualFilePointerManager;
 import com.intellij.psi.*;
-import com.intellij.util.messages.MessageBus;
-import com.intellij.workspaceModel.ide.WorkspaceModel;
-import com.intellij.workspaceModel.ide.WorkspaceModelTopics;
-import com.intellij.workspaceModel.ide.impl.WorkspaceModelImpl;
-import com.intellij.workspaceModel.ide.impl.legacyBridge.module.ModuleManagerComponentBridge;
 import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.ElixirParserDefinition;
 import org.elixir_lang.intellij_elixir.Quoter;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
-import org.elixir_lang.sdk.elixir.Type;
 import org.jetbrains.annotations.NotNull;
-import org.picocontainer.MutablePicoContainer;
 
-import java.io.File;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-
-import static com.intellij.concurrency.IdeaForkJoinWorkerThreadFactory.setupForkJoinCommonPool;
-import static org.elixir_lang.test.ElixirVersion.elixirSdkRelease;
 
 /**
  * Created by luke.imhoff on 8/7/14.
@@ -58,11 +24,6 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
 
     protected ParsingTestCase(String extension, ParserDefinition... parserDefinitions) {
         super("", extension, parserDefinitions);
-    }
-
-    @NotNull
-    protected static MessageBus messageBus(@NotNull MutablePicoContainer appContainer) {
-        return (MessageBus) appContainer.getComponentInstanceOfType(MessageBus.class);
     }
 
     protected void assertParsedAndQuotedAroundError() {
@@ -87,13 +48,6 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
         doTest(checkResult);
         assertWithoutLocalError();
         assertQuotedCorrectly();
-    }
-
-    protected void assertParsedWithLocalErrorAndRemoteExit() {
-        doTest(true);
-
-        assertWithLocalError();
-        Quoter.assertExit(myFile);
     }
 
     protected void assertParsedWithErrors() {
@@ -163,13 +117,6 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
     }
 
     @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-
-        setProjectSdkFromEbinDirectory();
-    }
-
-    @Override
     protected String getTestDataPath() {
         return "testData/org/elixir_lang/parser_definition";
     }
@@ -195,187 +142,4 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
         return true;
     }
 
-    @NotNull
-    protected MessageBus messageBus() {
-        final MutablePicoContainer appContainer = getApplication().getPicoContainer();
-
-        return ParsingTestCase.messageBus(appContainer);
-    }
-
-    @NotNull
-    private DirectoryIndex registerDirectoryIndex()
-            throws ClassNotFoundException, InvocationTargetException, InstantiationException, NoSuchMethodException,
-            IllegalAccessException {
-        /* MUST be registered before DirectoryIndex because DirectoryIndexImpl.markContentRootsForRefresh calls
-            ModuleManager.getInstance(this.myProject).getModules();  */
-        registerModuleManager();
-
-        DirectoryIndex directoryIndex = new DirectoryIndexImpl(myProject);
-        myProject.registerService(DirectoryIndex.class, directoryIndex);
-
-        return directoryIndex;
-    }
-
-    protected void registerProjectFileIndex()
-            throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException,
-            IllegalAccessException {
-        registerProjectFileIndex(messageBus());
-    }
-
-    private void registerProjectFileIndex(MessageBus messageBus)
-            throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException,
-            InvocationTargetException {
-        registerDirectoryIndex();
-
-        //noinspection UnstableApiUsage
-        myProject.registerService(
-                ProjectFileIndex.class,
-                new ProjectFileIndexImpl(myProject)
-        );
-    }
-
-    private void registerModuleManager() {
-        registerWorkspaceModelTopics();
-        registerWorkspaceModel();
-        myProject.registerService(ModuleManager.class, new ModuleManagerComponentBridge(myProject));
-    }
-
-    private void registerWorkspaceModelTopics() {
-        //noinspection UnstableApiUsage
-        myProject.registerService(WorkspaceModelTopics.class, new WorkspaceModelTopics());
-    }
-
-    private void registerWorkspaceModel() {
-        myProject.registerService(WorkspaceModel.class, new WorkspaceModelImpl(myProject));
-    }
-
-    @NotNull
-    protected ProjectRootManager registerProjectRootManager() {
-        ProjectRootManager projectRootManager = new ProjectRootManagerImpl(myProject);
-        myProject.registerService(ProjectRootManager.class, projectRootManager);
-
-        return projectRootManager;
-    }
-
-    @NotNull
-    protected Type registerElixirSdkType() {
-        registerExtensionPoint(
-                com.intellij.openapi.projectRoots.SdkType.EP_NAME,
-                com.intellij.openapi.projectRoots.SdkType.class
-        );
-        registerExtension(com.intellij.openapi.projectRoots.SdkType.EP_NAME, new Type());
-        Type elixirSdkType = Type.getInstance();
-
-        assertNotNull(elixirSdkType);
-
-        return elixirSdkType;
-    }
-
-    protected void setProjectSdkFromEbinDirectory()
-            throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException,
-            InvocationTargetException {
-        setProjectSdkFromSdkHome(sdkHomeFromEbinDirectory());
-    }
-
-    private void setProjectSdkFromSdkHome(@NotNull String sdkHome)
-            throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException,
-            IllegalAccessException {
-        ProjectRootManager projectRootManager = registerProjectRootManager();
-        MessageBus messageBus = messageBus();
-        registerProjectFileIndex(messageBus);
-
-        assertTrue(pathIsValidSdkHome(sdkHome));
-
-        registerExtensionPoint(OrderRootType.EP_NAME, OrderRootType.class);
-        registerExtension(OrderRootType.EP_NAME, new JavadocOrderRootType());
-        MockApplication application = getApplication();
-
-        ExtensionsAreaImpl applicationExtensionArea = application.getExtensionArea();
-
-        applicationExtensionArea.registerExtensionPoint("com.intellij.virtualFileManagerListener", "VirtualFileManagerListener", ExtensionPoint.Kind.INTERFACE);
-        application.registerService(
-                VirtualFileManager.class,
-                new VirtualFileManagerImpl(
-                        Collections.singletonList(
-                                new MockLocalFileSystem()
-                        ),
-                        messageBus
-                )
-        );
-        application.registerService(VirtualFilePointerManager.class, new CoreVirtualFilePointerManager());
-
-        registerExtensionPoint(
-                com.intellij.openapi.projectRoots.SdkType.EP_NAME,
-                com.intellij.openapi.projectRoots.SdkType.class
-        );
-        ProjectJdkTable projectJdkTable = new ProjectJdkTableImpl();
-        application.registerService(ProjectJdkTable.class, projectJdkTable);
-
-        registerExtension(com.intellij.openapi.projectRoots.SdkType.EP_NAME, new Type());
-        registerExtension(com.intellij.openapi.projectRoots.SdkType.EP_NAME, new org.elixir_lang.sdk.erlang.Type());
-
-        setupForkJoinCommonPool(true);
-
-        EditorFactory editorFactory = new EditorFactoryImpl();
-        application.registerService(EditorFactory.class, editorFactory);
-
-        EncodingManager encodingManager = new EncodingManagerImpl();
-        application.registerService(EncodingManager.class, encodingManager);
-
-        Sdk sdk = Type.createMockSdk(sdkHome, elixirSdkRelease());
-        projectJdkTable.addJdk(sdk);
-
-        ExtensionsArea area = myProject.getExtensionArea();
-        //noinspection UnstableApiUsage
-        registerExtensionPoint(
-                (ExtensionsAreaImpl) area,
-                new ProjectExtensionPointName<>("com.intellij.projectExtension"),
-                ProjectExtension.class
-        );
-
-        //noinspection UnstableApiUsage
-        applicationExtensionArea.registerPoint(
-                FilePropertyPusher.EP_NAME.getName(),
-                FilePropertyPusher.class,
-                new DefaultPluginDescriptor(getClass().getName() + "." + getName()),
-                true
-        );
-
-        myProject.addComponent(PushedFilePropertiesUpdater.class, new PushedFilePropertiesUpdaterImpl(myProject));
-
-        projectRootManager.setProjectSdk(sdk);
-    }
-
-    @NotNull
-    protected static String ebinDirectory() {
-        String ebinDirectory = System.getenv("ELIXIR_EBIN_DIRECTORY");
-
-        assertNotNull("ELIXIR_EBIN_DIRECTORY is not set", ebinDirectory);
-
-        return ebinDirectory;
-    }
-
-    public static boolean pathIsValidSdkHome(String path) {
-        File bin = new File(path, "bin").getAbsoluteFile();
-        File elixir = new File(bin, "elixir");
-        File elixirc = new File(bin, "elixirc");
-        File iex = new File(bin, "iex");
-        File mix = new File(bin, "mix");
-
-        return elixir.canExecute() && elixirc.canExecute() && iex.canExecute() && mix.canExecute();
-    }
-
-    @NotNull
-    protected static String sdkHomeFromEbinDirectory() {
-      return sdkHomeFromEbinDirectory(ebinDirectory()) ;
-    }
-
-    @NotNull
-    protected static String sdkHomeFromEbinDirectory(@NotNull String ebinDirectory) {
-        return new File(ebinDirectory)
-                .getParentFile()
-                .getParentFile()
-                .getParentFile()
-                .toString();
-    }
 }

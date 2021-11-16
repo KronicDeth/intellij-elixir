@@ -49,11 +49,11 @@ public class ElementFactory {
 
     @Contract(pure = true)
     @NotNull
-    public static AtNonNumericOperation createModuleAttributeUsage(Project project, String name) {
+    public static AtOperation createModuleAttributeUsage(Project project, String name) {
         String text = "defmodule Dummy do\n" +
                       "  " + name + "\n" +
                       "end";
-        return onlyElementOfType(project, text, AtNonNumericOperation.class);
+        return onlyElementOfType(project, text, AtOperation.class);
     }
 
     public static UnqualifiedNoArgumentsCall createUnqualifiedNoArgumentsCall(Project project, String name) {

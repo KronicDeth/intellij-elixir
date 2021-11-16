@@ -1,1799 +1,1435 @@
 # Source code recreated from a .beam file by IntelliJ Elixir
 defmodule :gl do
 
+  # Private Types
+
+  @typep clamp :: unknown_type
+
+  @typep enum :: non_neg_integer()
+
+  @typep matrix :: (matrix12() | matrix16())
+
+  @typep matrix12 :: {unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}
+
+  @typep matrix16 :: {unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}
+
+  @typep mem :: (binary() | tuple())
+
+  @typep offset :: non_neg_integer()
+
   # Functions
 
-  def accum(p0, p1) do
-    # body not decompiled
-  end
-
-  def activeShaderProgram(p0, p1) do
-    # body not decompiled
-  end
-
-  def activeTexture(p0) do
-    # body not decompiled
-  end
-
-  def alphaFunc(p0, p1) do
-    # body not decompiled
-  end
-
-  def areTexturesResident(p0) do
-    # body not decompiled
-  end
-
-  def arrayElement(p0) do
-    # body not decompiled
-  end
-
-  def attachObjectARB(p0, p1) do
-    # body not decompiled
-  end
-
-  def attachShader(p0, p1) do
-    # body not decompiled
-  end
-
-  def begin(p0) do
-    # body not decompiled
-  end
-
-  def beginConditionalRender(p0, p1) do
-    # body not decompiled
-  end
-
-  def beginQuery(p0, p1) do
-    # body not decompiled
-  end
-
-  def beginQueryIndexed(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def beginTransformFeedback(p0) do
-    # body not decompiled
-  end
-
-  def bindAttribLocation(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def bindAttribLocationARB(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def bindBuffer(p0, p1) do
-    # body not decompiled
-  end
-
-  def bindBufferBase(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def bindBufferRange(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def bindFragDataLocation(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def bindFragDataLocationIndexed(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def bindFramebuffer(p0, p1) do
-    # body not decompiled
-  end
-
-  def bindImageTexture(p0, p1, p2, p3, p4, p5, p6) do
-    # body not decompiled
-  end
-
-  def bindProgramARB(p0, p1) do
-    # body not decompiled
-  end
-
-  def bindProgramPipeline(p0) do
-    # body not decompiled
-  end
-
-  def bindRenderbuffer(p0, p1) do
-    # body not decompiled
-  end
-
-  def bindSampler(p0, p1) do
-    # body not decompiled
-  end
-
-  def bindTexture(p0, p1) do
-    # body not decompiled
-  end
-
-  def bindTransformFeedback(p0, p1) do
-    # body not decompiled
-  end
-
-  def bindVertexArray(p0) do
-    # body not decompiled
-  end
-
-  def bitmap(p0, p1, p2, p3, p4, p5, p6) do
-    # body not decompiled
-  end
-
-  def blendColor(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def blendEquation(p0) do
-    # body not decompiled
-  end
-
-  def blendEquationSeparate(p0, p1) do
-    # body not decompiled
-  end
-
-  def blendEquationSeparatei(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def blendEquationi(p0, p1) do
-    # body not decompiled
-  end
-
-  def blendFunc(p0, p1) do
-    # body not decompiled
-  end
-
-  def blendFuncSeparate(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def blendFuncSeparatei(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def blendFunci(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def blitFramebuffer(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9) do
-    # body not decompiled
-  end
-
-  def bufferData(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def bufferSubData(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def call(p0, p1) do
-    # body not decompiled
-  end
-
-  def callList(p0) do
-    # body not decompiled
-  end
-
-  def callLists(p0) do
-    # body not decompiled
-  end
-
-  def cast(p0, p1) do
-    # body not decompiled
-  end
-
-  def checkFramebufferStatus(p0) do
-    # body not decompiled
-  end
-
-  def clampColor(p0, p1) do
-    # body not decompiled
-  end
-
-  def clear(p0) do
-    # body not decompiled
-  end
-
-  def clearAccum(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def clearBufferfi(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def clearBufferfv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def clearBufferiv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def clearBufferuiv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def clearColor(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def clearDepth(p0) do
-    # body not decompiled
-  end
-
-  def clearDepthf(p0) do
-    # body not decompiled
-  end
-
-  def clearIndex(p0) do
-    # body not decompiled
-  end
-
-  def clearStencil(p0) do
-    # body not decompiled
-  end
-
-  def clientActiveTexture(p0) do
-    # body not decompiled
-  end
-
-  def clientWaitSync(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def clipPlane(p0, p1) do
-    # body not decompiled
-  end
-
-  def color3b(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def color3bv(p0) do
-    # body not decompiled
-  end
-
-  def color3d(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def color3dv(p0) do
-    # body not decompiled
-  end
-
-  def color3f(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def color3fv(p0) do
-    # body not decompiled
-  end
-
-  def color3i(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def color3iv(p0) do
-    # body not decompiled
-  end
-
-  def color3s(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def color3sv(p0) do
-    # body not decompiled
-  end
-
-  def color3ub(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def color3ubv(p0) do
-    # body not decompiled
-  end
-
-  def color3ui(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def color3uiv(p0) do
-    # body not decompiled
-  end
-
-  def color3us(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def color3usv(p0) do
-    # body not decompiled
-  end
-
-  def color4b(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def color4bv(p0) do
-    # body not decompiled
-  end
-
-  def color4d(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def color4dv(p0) do
-    # body not decompiled
-  end
-
-  def color4f(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def color4fv(p0) do
-    # body not decompiled
-  end
-
-  def color4i(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def color4iv(p0) do
-    # body not decompiled
-  end
-
-  def color4s(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def color4sv(p0) do
-    # body not decompiled
-  end
-
-  def color4ub(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def color4ubv(p0) do
-    # body not decompiled
-  end
-
-  def color4ui(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def color4uiv(p0) do
-    # body not decompiled
-  end
-
-  def color4us(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def color4usv(p0) do
-    # body not decompiled
-  end
-
-  def colorMask(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def colorMaski(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def colorMaterial(p0, p1) do
-    # body not decompiled
-  end
-
-  def colorPointer(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def colorSubTable(p0, p1, p2, p3, p4, p5) do
-    # body not decompiled
-  end
-
-  def colorTable(p0, p1, p2, p3, p4, p5) do
-    # body not decompiled
-  end
-
-  def colorTableParameterfv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def colorTableParameteriv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def compileShader(p0) do
-    # body not decompiled
-  end
-
-  def compileShaderARB(p0) do
-    # body not decompiled
-  end
-
-  def compileShaderIncludeARB(p0, p1) do
-    # body not decompiled
-  end
-
-  def compressedTexImage1D(p0, p1, p2, p3, p4, p5, p6) do
-    # body not decompiled
-  end
-
-  def compressedTexImage2D(p0, p1, p2, p3, p4, p5, p6, p7) do
-    # body not decompiled
-  end
-
-  def compressedTexImage3D(p0, p1, p2, p3, p4, p5, p6, p7, p8) do
-    # body not decompiled
-  end
-
-  def compressedTexSubImage1D(p0, p1, p2, p3, p4, p5, p6) do
-    # body not decompiled
-  end
-
-  def compressedTexSubImage2D(p0, p1, p2, p3, p4, p5, p6, p7, p8) do
-    # body not decompiled
-  end
-
-  def compressedTexSubImage3D(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10) do
-    # body not decompiled
-  end
-
-  def convolutionFilter1D(p0, p1, p2, p3, p4, p5) do
-    # body not decompiled
-  end
-
-  def convolutionFilter2D(p0, p1, p2, p3, p4, p5, p6) do
-    # body not decompiled
-  end
-
-  def convolutionParameterf(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def convolutionParameterfv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def convolutionParameteri(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def convolutionParameteriv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def copyBufferSubData(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def copyColorSubTable(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def copyColorTable(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def copyConvolutionFilter1D(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def copyConvolutionFilter2D(p0, p1, p2, p3, p4, p5) do
-    # body not decompiled
-  end
-
-  def copyPixels(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def copyTexImage1D(p0, p1, p2, p3, p4, p5, p6) do
-    # body not decompiled
-  end
-
-  def copyTexImage2D(p0, p1, p2, p3, p4, p5, p6, p7) do
-    # body not decompiled
-  end
-
-  def copyTexSubImage1D(p0, p1, p2, p3, p4, p5) do
-    # body not decompiled
-  end
-
-  def copyTexSubImage2D(p0, p1, p2, p3, p4, p5, p6, p7) do
-    # body not decompiled
-  end
-
-  def copyTexSubImage3D(p0, p1, p2, p3, p4, p5, p6, p7, p8) do
-    # body not decompiled
-  end
-
-  def createProgram() do
-    # body not decompiled
-  end
-
-  def createProgramObjectARB() do
-    # body not decompiled
-  end
-
-  def createShader(p0) do
-    # body not decompiled
-  end
-
-  def createShaderObjectARB(p0) do
-    # body not decompiled
-  end
-
-  def createShaderProgramv(p0, p1) do
-    # body not decompiled
-  end
-
-  def cullFace(p0) do
-    # body not decompiled
-  end
-
-  def currentPaletteMatrixARB(p0) do
-    # body not decompiled
-  end
-
-  def debugMessageControlARB(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def debugMessageInsertARB(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def deleteBuffers(p0) do
-    # body not decompiled
-  end
-
-  def deleteFramebuffers(p0) do
-    # body not decompiled
-  end
-
-  def deleteLists(p0, p1) do
-    # body not decompiled
-  end
-
-  def deleteNamedStringARB(p0) do
-    # body not decompiled
-  end
-
-  def deleteObjectARB(p0) do
-    # body not decompiled
-  end
-
-  def deleteProgram(p0) do
-    # body not decompiled
-  end
-
-  def deleteProgramPipelines(p0) do
-    # body not decompiled
-  end
-
-  def deleteProgramsARB(p0) do
-    # body not decompiled
-  end
-
-  def deleteQueries(p0) do
-    # body not decompiled
-  end
-
-  def deleteRenderbuffers(p0) do
-    # body not decompiled
-  end
-
-  def deleteSamplers(p0) do
-    # body not decompiled
-  end
-
-  def deleteShader(p0) do
-    # body not decompiled
-  end
-
-  def deleteSync(p0) do
-    # body not decompiled
-  end
-
-  def deleteTextures(p0) do
-    # body not decompiled
-  end
-
-  def deleteTransformFeedbacks(p0) do
-    # body not decompiled
-  end
-
-  def deleteVertexArrays(p0) do
-    # body not decompiled
-  end
-
-  def depthBoundsEXT(p0, p1) do
-    # body not decompiled
-  end
-
-  def depthFunc(p0) do
-    # body not decompiled
-  end
-
-  def depthMask(p0) do
-    # body not decompiled
-  end
-
-  def depthRange(p0, p1) do
-    # body not decompiled
-  end
-
-  def depthRangeArrayv(p0, p1) do
-    # body not decompiled
-  end
-
-  def depthRangeIndexed(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def depthRangef(p0, p1) do
-    # body not decompiled
-  end
-
-  def detachObjectARB(p0, p1) do
-    # body not decompiled
-  end
-
-  def detachShader(p0, p1) do
-    # body not decompiled
-  end
-
-  def disable(p0) do
-    # body not decompiled
-  end
-
-  def disableClientState(p0) do
-    # body not decompiled
-  end
-
-  def disableVertexAttribArray(p0) do
-    # body not decompiled
-  end
-
-  def disablei(p0, p1) do
-    # body not decompiled
-  end
-
-  def drawArrays(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def drawArraysIndirect(p0, p1) do
-    # body not decompiled
-  end
-
-  def drawArraysInstanced(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def drawArraysInstancedBaseInstance(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def drawBuffer(p0) do
-    # body not decompiled
-  end
-
-  def drawBuffers(p0) do
-    # body not decompiled
-  end
-
-  def drawElements(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def drawElementsBaseVertex(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def drawElementsIndirect(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def drawElementsInstanced(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def drawElementsInstancedBaseInstance(p0, p1, p2, p3, p4, p5) do
-    # body not decompiled
-  end
-
-  def drawElementsInstancedBaseVertex(p0, p1, p2, p3, p4, p5) do
-    # body not decompiled
-  end
-
-  def drawElementsInstancedBaseVertexBaseInstance(p0, p1, p2, p3, p4, p5, p6) do
-    # body not decompiled
-  end
-
-  def drawPixels(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def drawRangeElements(p0, p1, p2, p3, p4, p5) do
-    # body not decompiled
-  end
-
-  def drawRangeElementsBaseVertex(p0, p1, p2, p3, p4, p5, p6) do
-    # body not decompiled
-  end
-
-  def drawTransformFeedback(p0, p1) do
-    # body not decompiled
-  end
-
-  def drawTransformFeedbackInstanced(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def drawTransformFeedbackStream(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def drawTransformFeedbackStreamInstanced(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def edgeFlag(p0) do
-    # body not decompiled
-  end
-
-  def edgeFlagPointer(p0, p1) do
-    # body not decompiled
-  end
-
-  def edgeFlagv(p0) do
-    # body not decompiled
-  end
-
-  def enable(p0) do
-    # body not decompiled
-  end
-
-  def enableClientState(p0) do
-    # body not decompiled
-  end
-
-  def enableVertexAttribArray(p0) do
-    # body not decompiled
-  end
-
-  def enablei(p0, p1) do
-    # body not decompiled
-  end
-
-  def unquote(:end)() do
-    # body not decompiled
-  end
-
-  def endConditionalRender() do
-    # body not decompiled
-  end
-
-  def endList() do
-    # body not decompiled
-  end
-
-  def endQuery(p0) do
-    # body not decompiled
-  end
-
-  def endQueryIndexed(p0, p1) do
-    # body not decompiled
-  end
-
-  def endTransformFeedback() do
-    # body not decompiled
-  end
-
-  def evalCoord1d(p0) do
-    # body not decompiled
-  end
-
-  def evalCoord1dv(p0) do
-    # body not decompiled
-  end
-
-  def evalCoord1f(p0) do
-    # body not decompiled
-  end
-
-  def evalCoord1fv(p0) do
-    # body not decompiled
-  end
-
-  def evalCoord2d(p0, p1) do
-    # body not decompiled
-  end
-
-  def evalCoord2dv(p0) do
-    # body not decompiled
-  end
-
-  def evalCoord2f(p0, p1) do
-    # body not decompiled
-  end
-
-  def evalCoord2fv(p0) do
-    # body not decompiled
-  end
-
-  def evalMesh1(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def evalMesh2(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def evalPoint1(p0) do
-    # body not decompiled
-  end
-
-  def evalPoint2(p0, p1) do
-    # body not decompiled
-  end
-
-  def feedbackBuffer(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def fenceSync(p0, p1) do
-    # body not decompiled
-  end
-
-  def finish() do
-    # body not decompiled
-  end
-
-  def flush() do
-    # body not decompiled
-  end
-
-  def flushMappedBufferRange(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def fogCoordPointer(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def fogCoordd(p0) do
-    # body not decompiled
-  end
-
-  def fogCoorddv(p0) do
-    # body not decompiled
-  end
-
-  def fogCoordf(p0) do
-    # body not decompiled
-  end
-
-  def fogCoordfv(p0) do
-    # body not decompiled
-  end
-
-  def fogf(p0, p1) do
-    # body not decompiled
-  end
-
-  def fogfv(p0, p1) do
-    # body not decompiled
-  end
-
-  def fogi(p0, p1) do
-    # body not decompiled
-  end
-
-  def fogiv(p0, p1) do
-    # body not decompiled
-  end
-
-  def framebufferRenderbuffer(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def framebufferTexture(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def framebufferTexture1D(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def framebufferTexture2D(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def framebufferTexture3D(p0, p1, p2, p3, p4, p5) do
-    # body not decompiled
-  end
-
-  def framebufferTextureFaceARB(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def framebufferTextureLayer(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def frontFace(p0) do
-    # body not decompiled
-  end
-
-  def frustum(p0, p1, p2, p3, p4, p5) do
-    # body not decompiled
-  end
-
-  def genBuffers(p0) do
-    # body not decompiled
-  end
-
-  def genFramebuffers(p0) do
-    # body not decompiled
-  end
-
-  def genLists(p0) do
-    # body not decompiled
-  end
-
-  def genProgramPipelines(p0) do
-    # body not decompiled
-  end
-
-  def genProgramsARB(p0) do
-    # body not decompiled
-  end
-
-  def genQueries(p0) do
-    # body not decompiled
-  end
-
-  def genRenderbuffers(p0) do
-    # body not decompiled
-  end
-
-  def genSamplers(p0) do
-    # body not decompiled
-  end
-
-  def genTextures(p0) do
-    # body not decompiled
-  end
-
-  def genTransformFeedbacks(p0) do
-    # body not decompiled
-  end
-
-  def genVertexArrays(p0) do
-    # body not decompiled
-  end
-
-  def generateMipmap(p0) do
-    # body not decompiled
-  end
-
-  def getActiveAttrib(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def getActiveAttribARB(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def getActiveSubroutineName(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def getActiveSubroutineUniformName(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def getActiveUniform(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def getActiveUniformARB(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def getActiveUniformBlockName(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def getActiveUniformBlockiv(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def getActiveUniformName(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def getActiveUniformsiv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def getAttachedObjectsARB(p0, p1) do
-    # body not decompiled
-  end
-
-  def getAttachedShaders(p0, p1) do
-    # body not decompiled
-  end
-
-  def getAttribLocation(p0, p1) do
-    # body not decompiled
-  end
-
-  def getAttribLocationARB(p0, p1) do
-    # body not decompiled
-  end
-
-  def getBooleani_v(p0, p1) do
-    # body not decompiled
-  end
-
-  def getBooleanv(p0) do
-    # body not decompiled
-  end
-
-  def getBufferParameteri64v(p0, p1) do
-    # body not decompiled
-  end
-
-  def getBufferParameteriv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getBufferParameterivARB(p0, p1) do
-    # body not decompiled
-  end
-
-  def getBufferSubData(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def getClipPlane(p0) do
-    # body not decompiled
-  end
-
-  def getColorTable(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def getColorTableParameterfv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getColorTableParameteriv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getCompressedTexImage(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def getConvolutionFilter(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def getConvolutionParameterfv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getConvolutionParameteriv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getDebugMessageLogARB(p0, p1) do
-    # body not decompiled
-  end
-
-  def getDoublei_v(p0, p1) do
-    # body not decompiled
-  end
-
-  def getDoublev(p0) do
-    # body not decompiled
-  end
-
-  def getError() do
-    # body not decompiled
-  end
-
-  def getFloati_v(p0, p1) do
-    # body not decompiled
-  end
-
-  def getFloatv(p0) do
-    # body not decompiled
-  end
-
-  def getFragDataIndex(p0, p1) do
-    # body not decompiled
-  end
-
-  def getFragDataLocation(p0, p1) do
-    # body not decompiled
-  end
-
-  def getFramebufferAttachmentParameteriv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def getGraphicsResetStatusARB() do
-    # body not decompiled
-  end
-
-  def getHandleARB(p0) do
-    # body not decompiled
-  end
-
-  def getHistogram(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def getHistogramParameterfv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getHistogramParameteriv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getInfoLogARB(p0, p1) do
-    # body not decompiled
-  end
-
-  def getInteger64i_v(p0, p1) do
-    # body not decompiled
-  end
-
-  def getInteger64v(p0) do
-    # body not decompiled
-  end
-
-  def getIntegeri_v(p0, p1) do
-    # body not decompiled
-  end
-
-  def getIntegerv(p0) do
-    # body not decompiled
-  end
-
-  def getInternalformativ(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def getLightfv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getLightiv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getMapdv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def getMapfv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def getMapiv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def getMaterialfv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getMaterialiv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getMinmax(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def getMinmaxParameterfv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getMinmaxParameteriv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getMultisamplefv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getNamedStringARB(p0, p1) do
-    # body not decompiled
-  end
-
-  def getNamedStringivARB(p0, p1) do
-    # body not decompiled
-  end
-
-  def getObjectParameterfvARB(p0, p1) do
-    # body not decompiled
-  end
-
-  def getObjectParameterivARB(p0, p1) do
-    # body not decompiled
-  end
-
-  def getPixelMapfv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getPixelMapuiv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getPixelMapusv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getPolygonStipple() do
-    # body not decompiled
-  end
-
-  def getProgramBinary(p0, p1) do
-    # body not decompiled
-  end
-
-  def getProgramEnvParameterdvARB(p0, p1) do
-    # body not decompiled
-  end
-
-  def getProgramEnvParameterfvARB(p0, p1) do
-    # body not decompiled
-  end
-
-  def getProgramInfoLog(p0, p1) do
-    # body not decompiled
-  end
-
-  def getProgramLocalParameterdvARB(p0, p1) do
-    # body not decompiled
-  end
-
-  def getProgramLocalParameterfvARB(p0, p1) do
-    # body not decompiled
-  end
-
-  def getProgramPipelineInfoLog(p0, p1) do
-    # body not decompiled
-  end
-
-  def getProgramPipelineiv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getProgramStageiv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def getProgramStringARB(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def getProgramiv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getQueryIndexediv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def getQueryObjecti64v(p0, p1) do
-    # body not decompiled
-  end
-
-  def getQueryObjectiv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getQueryObjectui64v(p0, p1) do
-    # body not decompiled
-  end
-
-  def getQueryObjectuiv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getQueryiv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getRenderbufferParameteriv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getSamplerParameterIiv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getSamplerParameterIuiv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getSamplerParameterfv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getSamplerParameteriv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getShaderInfoLog(p0, p1) do
-    # body not decompiled
-  end
-
-  def getShaderPrecisionFormat(p0, p1) do
-    # body not decompiled
-  end
-
-  def getShaderSource(p0, p1) do
-    # body not decompiled
-  end
-
-  def getShaderSourceARB(p0, p1) do
-    # body not decompiled
-  end
-
-  def getShaderiv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getString(p0) do
-    # body not decompiled
-  end
-
-  def getStringi(p0, p1) do
-    # body not decompiled
-  end
-
-  def getSubroutineIndex(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def getSubroutineUniformLocation(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def getSynciv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def getTexEnvfv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getTexEnviv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getTexGendv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getTexGenfv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getTexGeniv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getTexImage(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def getTexLevelParameterfv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def getTexLevelParameteriv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def getTexParameterIiv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getTexParameterIuiv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getTexParameterfv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getTexParameteriv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getTransformFeedbackVarying(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def getUniformBlockIndex(p0, p1) do
-    # body not decompiled
-  end
-
-  def getUniformIndices(p0, p1) do
-    # body not decompiled
-  end
-
-  def getUniformLocation(p0, p1) do
-    # body not decompiled
-  end
-
-  def getUniformLocationARB(p0, p1) do
-    # body not decompiled
-  end
-
-  def getUniformSubroutineuiv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getUniformdv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getUniformfv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getUniformfvARB(p0, p1) do
-    # body not decompiled
-  end
-
-  def getUniformiv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getUniformivARB(p0, p1) do
-    # body not decompiled
-  end
-
-  def getUniformuiv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getVertexAttribIiv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getVertexAttribIuiv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getVertexAttribLdv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getVertexAttribdv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getVertexAttribfv(p0, p1) do
-    # body not decompiled
-  end
-
-  def getVertexAttribiv(p0, p1) do
-    # body not decompiled
-  end
-
-  def hint(p0, p1) do
-    # body not decompiled
-  end
-
-  def histogram(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def indexMask(p0) do
-    # body not decompiled
-  end
-
-  def indexPointer(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def indexd(p0) do
-    # body not decompiled
-  end
-
-  def indexdv(p0) do
-    # body not decompiled
-  end
-
-  def indexf(p0) do
-    # body not decompiled
-  end
-
-  def indexfv(p0) do
-    # body not decompiled
-  end
-
-  def indexi(p0) do
-    # body not decompiled
-  end
-
-  def indexiv(p0) do
-    # body not decompiled
-  end
-
-  def indexs(p0) do
-    # body not decompiled
-  end
-
-  def indexsv(p0) do
-    # body not decompiled
-  end
-
-  def indexub(p0) do
-    # body not decompiled
-  end
-
-  def indexubv(p0) do
-    # body not decompiled
-  end
-
-  def initNames() do
-    # body not decompiled
-  end
-
-  def interleavedArrays(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def isBuffer(p0) do
-    # body not decompiled
-  end
-
-  def isEnabled(p0) do
-    # body not decompiled
-  end
-
-  def isEnabledi(p0, p1) do
-    # body not decompiled
-  end
-
-  def isFramebuffer(p0) do
-    # body not decompiled
-  end
-
-  def isList(p0) do
-    # body not decompiled
-  end
-
-  def isNamedStringARB(p0) do
-    # body not decompiled
-  end
-
-  def isProgram(p0) do
-    # body not decompiled
-  end
-
-  def isProgramPipeline(p0) do
-    # body not decompiled
-  end
-
-  def isQuery(p0) do
-    # body not decompiled
-  end
-
-  def isRenderbuffer(p0) do
-    # body not decompiled
-  end
-
-  def isSampler(p0) do
-    # body not decompiled
-  end
-
-  def isShader(p0) do
-    # body not decompiled
-  end
-
-  def isSync(p0) do
-    # body not decompiled
-  end
-
-  def isTexture(p0) do
-    # body not decompiled
-  end
-
-  def isTransformFeedback(p0) do
-    # body not decompiled
-  end
-
-  def isVertexArray(p0) do
-    # body not decompiled
-  end
-
-  def lightModelf(p0, p1) do
-    # body not decompiled
-  end
-
-  def lightModelfv(p0, p1) do
-    # body not decompiled
-  end
-
-  def lightModeli(p0, p1) do
-    # body not decompiled
-  end
-
-  def lightModeliv(p0, p1) do
-    # body not decompiled
-  end
-
-  def lightf(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def lightfv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def lighti(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def lightiv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def lineStipple(p0, p1) do
-    # body not decompiled
-  end
-
-  def lineWidth(p0) do
-    # body not decompiled
-  end
-
-  def linkProgram(p0) do
-    # body not decompiled
-  end
-
-  def linkProgramARB(p0) do
-    # body not decompiled
-  end
-
-  def listBase(p0) do
-    # body not decompiled
-  end
-
-  def loadIdentity() do
-    # body not decompiled
-  end
-
-  def loadMatrixd(p0) do
-    # body not decompiled
-  end
-
-  def loadMatrixf(p0) do
-    # body not decompiled
-  end
-
-  def loadName(p0) do
-    # body not decompiled
-  end
-
-  def loadTransposeMatrixd(p0) do
-    # body not decompiled
-  end
-
-  def loadTransposeMatrixdARB(p0) do
-    # body not decompiled
-  end
-
-  def loadTransposeMatrixf(p0) do
-    # body not decompiled
-  end
-
-  def loadTransposeMatrixfARB(p0) do
-    # body not decompiled
-  end
-
-  def logicOp(p0) do
-    # body not decompiled
-  end
-
-  def map1d(p0, p1, p2, p3, p4, p5) do
-    # body not decompiled
-  end
-
-  def map1f(p0, p1, p2, p3, p4, p5) do
-    # body not decompiled
-  end
-
-  def map2d(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9) do
-    # body not decompiled
-  end
-
-  def map2f(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9) do
-    # body not decompiled
-  end
-
-  def mapGrid1d(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def mapGrid1f(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def mapGrid2d(p0, p1, p2, p3, p4, p5) do
-    # body not decompiled
-  end
-
-  def mapGrid2f(p0, p1, p2, p3, p4, p5) do
-    # body not decompiled
-  end
-
-  def materialf(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def materialfv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def materiali(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def materialiv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def matrixIndexubvARB(p0) do
-    # body not decompiled
-  end
-
-  def matrixIndexuivARB(p0) do
-    # body not decompiled
-  end
-
-  def matrixIndexusvARB(p0) do
-    # body not decompiled
-  end
-
-  def matrixMode(p0) do
-    # body not decompiled
-  end
-
-  def memoryBarrier(p0) do
-    # body not decompiled
-  end
-
-  def minSampleShading(p0) do
-    # body not decompiled
-  end
-
-  def minmax(p0, p1, p2) do
-    # body not decompiled
-  end
+  @spec accum(op, value) :: :ok when op: enum(), value: unknown_type
+  def accum(op, value), do: ...
+
+  @spec activeShaderProgram(pipeline, program) :: :ok when pipeline: integer(), program: integer()
+  def activeShaderProgram(pipeline, program), do: ...
+
+  @spec activeTexture(texture) :: :ok when texture: enum()
+  def activeTexture(texture), do: ...
+
+  @spec alphaFunc(func, ref) :: :ok when func: enum(), ref: clamp()
+  def alphaFunc(func, ref), do: ...
+
+  @spec areTexturesResident(textures) :: {(0 | 1), residences :: [(0 | 1)]} when textures: [integer()]
+  def areTexturesResident(textures), do: ...
+
+  @spec arrayElement(i) :: :ok when i: integer()
+  def arrayElement(i), do: ...
+
+  @spec attachObjectARB(containerObj, obj) :: :ok when containerObj: integer(), obj: integer()
+  def attachObjectARB(containerObj, obj), do: ...
+
+  @spec attachShader(program, shader) :: :ok when program: integer(), shader: integer()
+  def attachShader(program, shader), do: ...
+
+  @spec begin(mode) :: :ok when mode: enum()
+  def begin(mode), do: ...
+
+  @spec beginConditionalRender(id, mode) :: :ok when id: integer(), mode: enum()
+  def beginConditionalRender(id, mode), do: ...
+
+  @spec beginQuery(target, id) :: :ok when target: enum(), id: integer()
+  def beginQuery(target, id), do: ...
+
+  @spec beginQueryIndexed(target, index, id) :: :ok when target: enum(), index: integer(), id: integer()
+  def beginQueryIndexed(target, index, id), do: ...
+
+  @spec beginTransformFeedback(primitiveMode) :: :ok when primitiveMode: enum()
+  def beginTransformFeedback(primitiveMode), do: ...
+
+  @spec bindAttribLocation(program, index, name) :: :ok when program: integer(), index: integer(), name: charlist()
+  def bindAttribLocation(program, index, name), do: ...
+
+  @spec bindAttribLocationARB(programObj, index, name) :: :ok when programObj: integer(), index: integer(), name: charlist()
+  def bindAttribLocationARB(programObj, index, name), do: ...
+
+  @spec bindBuffer(target, buffer) :: :ok when target: enum(), buffer: integer()
+  def bindBuffer(target, buffer), do: ...
+
+  @spec bindBufferBase(target, index, buffer) :: :ok when target: enum(), index: integer(), buffer: integer()
+  def bindBufferBase(target, index, buffer), do: ...
+
+  @spec bindBufferRange(target, index, buffer, offset, size) :: :ok when target: enum(), index: integer(), buffer: integer(), offset: integer(), size: integer()
+  def bindBufferRange(target, index, buffer, offset, size), do: ...
+
+  @spec bindFragDataLocation(program, color, name) :: :ok when program: integer(), color: integer(), name: charlist()
+  def bindFragDataLocation(program, color, name), do: ...
+
+  @spec bindFragDataLocationIndexed(program, colorNumber, index, name) :: :ok when program: integer(), colorNumber: integer(), index: integer(), name: charlist()
+  def bindFragDataLocationIndexed(program, colorNumber, index, name), do: ...
+
+  @spec bindFramebuffer(target, framebuffer) :: :ok when target: enum(), framebuffer: integer()
+  def bindFramebuffer(target, framebuffer), do: ...
+
+  @spec bindImageTexture(unit, texture, level, layered, layer, access, format) :: :ok when unit: integer(), texture: integer(), level: integer(), layered: (0 | 1), layer: integer(), access: enum(), format: enum()
+  def bindImageTexture(unit, texture, level, layered, layer, access, format), do: ...
+
+  @spec bindProgramARB(target, program) :: :ok when target: enum(), program: integer()
+  def bindProgramARB(target, program), do: ...
+
+  @spec bindProgramPipeline(pipeline) :: :ok when pipeline: integer()
+  def bindProgramPipeline(pipeline), do: ...
+
+  @spec bindRenderbuffer(target, renderbuffer) :: :ok when target: enum(), renderbuffer: integer()
+  def bindRenderbuffer(target, renderbuffer), do: ...
+
+  @spec bindSampler(unit, sampler) :: :ok when unit: integer(), sampler: integer()
+  def bindSampler(unit, sampler), do: ...
+
+  @spec bindTexture(target, texture) :: :ok when target: enum(), texture: integer()
+  def bindTexture(target, texture), do: ...
+
+  @spec bindTransformFeedback(target, id) :: :ok when target: enum(), id: integer()
+  def bindTransformFeedback(target, id), do: ...
+
+  @spec bindVertexArray(array) :: :ok when array: integer()
+  def bindVertexArray(array), do: ...
+
+  @spec bitmap(width, height, xorig, yorig, xmove, ymove, bitmap) :: :ok when width: integer(), height: integer(), xorig: unknown_type, yorig: unknown_type, xmove: unknown_type, ymove: unknown_type, bitmap: (offset() | mem())
+  def bitmap(width, height, xorig, yorig, xmove, ymove, bitmap) when is_integer(bitmap), do: ...
+
+  def bitmap(width, height, xorig, yorig, xmove, ymove, bitmap), do: ...
+
+  @spec blendColor(red, green, blue, alpha) :: :ok when red: clamp(), green: clamp(), blue: clamp(), alpha: clamp()
+  def blendColor(red, green, blue, alpha), do: ...
+
+  @spec blendEquation(mode) :: :ok when mode: enum()
+  def blendEquation(mode), do: ...
+
+  @spec blendEquationSeparate(modeRGB, modeAlpha) :: :ok when modeRGB: enum(), modeAlpha: enum()
+  def blendEquationSeparate(modeRGB, modeAlpha), do: ...
+
+  @spec blendEquationSeparatei(buf, modeRGB, modeAlpha) :: :ok when buf: integer(), modeRGB: enum(), modeAlpha: enum()
+  def blendEquationSeparatei(buf, modeRGB, modeAlpha), do: ...
+
+  @spec blendEquationi(buf, mode) :: :ok when buf: integer(), mode: enum()
+  def blendEquationi(buf, mode), do: ...
+
+  @spec blendFunc(sfactor, dfactor) :: :ok when sfactor: enum(), dfactor: enum()
+  def blendFunc(sfactor, dfactor), do: ...
+
+  @spec blendFuncSeparate(sfactorRGB, dfactorRGB, sfactorAlpha, dfactorAlpha) :: :ok when sfactorRGB: enum(), dfactorRGB: enum(), sfactorAlpha: enum(), dfactorAlpha: enum()
+  def blendFuncSeparate(sfactorRGB, dfactorRGB, sfactorAlpha, dfactorAlpha), do: ...
+
+  @spec blendFuncSeparatei(buf, srcRGB, dstRGB, srcAlpha, dstAlpha) :: :ok when buf: integer(), srcRGB: enum(), dstRGB: enum(), srcAlpha: enum(), dstAlpha: enum()
+  def blendFuncSeparatei(buf, srcRGB, dstRGB, srcAlpha, dstAlpha), do: ...
+
+  @spec blendFunci(buf, src, dst) :: :ok when buf: integer(), src: enum(), dst: enum()
+  def blendFunci(buf, src, dst), do: ...
+
+  @spec blitFramebuffer(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter) :: :ok when srcX0: integer(), srcY0: integer(), srcX1: integer(), srcY1: integer(), dstX0: integer(), dstY0: integer(), dstX1: integer(), dstY1: integer(), mask: integer(), filter: enum()
+  def blitFramebuffer(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter), do: ...
+
+  @spec bufferData(target, size, data, usage) :: :ok when target: enum(), size: integer(), data: (offset() | mem()), usage: enum()
+  def bufferData(target, size, data, usage) when is_integer(data), do: ...
+
+  def bufferData(target, size, data, usage), do: ...
+
+  @spec bufferSubData(target, offset, size, data) :: :ok when target: enum(), offset: integer(), size: integer(), data: (offset() | mem())
+  def bufferSubData(target, offset, size, data) when is_integer(data), do: ...
+
+  def bufferSubData(target, offset, size, data), do: ...
+
+  def call(op, args), do: ...
+
+  @spec callList(list) :: :ok when list: integer()
+  def callList(list), do: ...
+
+  @spec callLists(lists) :: :ok when lists: [integer()]
+  def callLists(lists), do: ...
+
+  def cast(op, args), do: ...
+
+  @spec checkFramebufferStatus(target) :: enum() when target: enum()
+  def checkFramebufferStatus(target), do: ...
+
+  @spec clampColor(target, clamp) :: :ok when target: enum(), clamp: enum()
+  def clampColor(target, clamp), do: ...
+
+  @spec clear(mask) :: :ok when mask: integer()
+  def clear(mask), do: ...
+
+  @spec clearAccum(red, green, blue, alpha) :: :ok when red: unknown_type, green: unknown_type, blue: unknown_type, alpha: unknown_type
+  def clearAccum(red, green, blue, alpha), do: ...
+
+  @spec clearBufferfi(buffer, drawbuffer, depth, stencil) :: :ok when buffer: enum(), drawbuffer: integer(), depth: unknown_type, stencil: integer()
+  def clearBufferfi(buffer, drawbuffer, depth, stencil), do: ...
+
+  @spec clearBufferfv(buffer, drawbuffer, value) :: :ok when buffer: enum(), drawbuffer: integer(), value: tuple()
+  def clearBufferfv(buffer, drawbuffer, value), do: ...
+
+  @spec clearBufferiv(buffer, drawbuffer, value) :: :ok when buffer: enum(), drawbuffer: integer(), value: tuple()
+  def clearBufferiv(buffer, drawbuffer, value), do: ...
+
+  @spec clearBufferuiv(buffer, drawbuffer, value) :: :ok when buffer: enum(), drawbuffer: integer(), value: tuple()
+  def clearBufferuiv(buffer, drawbuffer, value), do: ...
+
+  @spec clearColor(red, green, blue, alpha) :: :ok when red: clamp(), green: clamp(), blue: clamp(), alpha: clamp()
+  def clearColor(red, green, blue, alpha), do: ...
+
+  @spec clearDepth(depth) :: :ok when depth: clamp()
+  def clearDepth(depth), do: ...
+
+  @spec clearDepthf(d) :: :ok when d: clamp()
+  def clearDepthf(d), do: ...
+
+  @spec clearIndex(c) :: :ok when c: unknown_type
+  def clearIndex(c), do: ...
+
+  @spec clearStencil(s) :: :ok when s: integer()
+  def clearStencil(s), do: ...
+
+  @spec clientActiveTexture(texture) :: :ok when texture: enum()
+  def clientActiveTexture(texture), do: ...
+
+  @spec clientWaitSync(sync, flags, timeout) :: enum() when sync: integer(), flags: integer(), timeout: integer()
+  def clientWaitSync(sync, flags, timeout), do: ...
+
+  @spec clipPlane(plane, equation) :: :ok when plane: enum(), equation: {unknown_type, unknown_type, unknown_type, unknown_type}
+  def clipPlane(plane, {e1, e2, e3, e4}), do: ...
+
+  @spec color3b(red, green, blue) :: :ok when red: integer(), green: integer(), blue: integer()
+  def color3b(red, green, blue), do: ...
+
+  @spec color3bv(v) :: :ok when v: {red :: integer(), green :: integer(), blue :: integer()}
+  def color3bv({red, green, blue}), do: ...
+
+  @spec color3d(red, green, blue) :: :ok when red: unknown_type, green: unknown_type, blue: unknown_type
+  def color3d(red, green, blue), do: ...
+
+  @spec color3dv(v) :: :ok when v: {red :: unknown_type, green :: unknown_type, blue :: unknown_type}
+  def color3dv({red, green, blue}), do: ...
+
+  @spec color3f(red, green, blue) :: :ok when red: unknown_type, green: unknown_type, blue: unknown_type
+  def color3f(red, green, blue), do: ...
+
+  @spec color3fv(v) :: :ok when v: {red :: unknown_type, green :: unknown_type, blue :: unknown_type}
+  def color3fv({red, green, blue}), do: ...
+
+  @spec color3i(red, green, blue) :: :ok when red: integer(), green: integer(), blue: integer()
+  def color3i(red, green, blue), do: ...
+
+  @spec color3iv(v) :: :ok when v: {red :: integer(), green :: integer(), blue :: integer()}
+  def color3iv({red, green, blue}), do: ...
+
+  @spec color3s(red, green, blue) :: :ok when red: integer(), green: integer(), blue: integer()
+  def color3s(red, green, blue), do: ...
+
+  @spec color3sv(v) :: :ok when v: {red :: integer(), green :: integer(), blue :: integer()}
+  def color3sv({red, green, blue}), do: ...
+
+  @spec color3ub(red, green, blue) :: :ok when red: integer(), green: integer(), blue: integer()
+  def color3ub(red, green, blue), do: ...
+
+  @spec color3ubv(v) :: :ok when v: {red :: integer(), green :: integer(), blue :: integer()}
+  def color3ubv({red, green, blue}), do: ...
+
+  @spec color3ui(red, green, blue) :: :ok when red: integer(), green: integer(), blue: integer()
+  def color3ui(red, green, blue), do: ...
+
+  @spec color3uiv(v) :: :ok when v: {red :: integer(), green :: integer(), blue :: integer()}
+  def color3uiv({red, green, blue}), do: ...
+
+  @spec color3us(red, green, blue) :: :ok when red: integer(), green: integer(), blue: integer()
+  def color3us(red, green, blue), do: ...
+
+  @spec color3usv(v) :: :ok when v: {red :: integer(), green :: integer(), blue :: integer()}
+  def color3usv({red, green, blue}), do: ...
+
+  @spec color4b(red, green, blue, alpha) :: :ok when red: integer(), green: integer(), blue: integer(), alpha: integer()
+  def color4b(red, green, blue, alpha), do: ...
+
+  @spec color4bv(v) :: :ok when v: {red :: integer(), green :: integer(), blue :: integer(), alpha :: integer()}
+  def color4bv({red, green, blue, alpha}), do: ...
+
+  @spec color4d(red, green, blue, alpha) :: :ok when red: unknown_type, green: unknown_type, blue: unknown_type, alpha: unknown_type
+  def color4d(red, green, blue, alpha), do: ...
+
+  @spec color4dv(v) :: :ok when v: {red :: unknown_type, green :: unknown_type, blue :: unknown_type, alpha :: unknown_type}
+  def color4dv({red, green, blue, alpha}), do: ...
+
+  @spec color4f(red, green, blue, alpha) :: :ok when red: unknown_type, green: unknown_type, blue: unknown_type, alpha: unknown_type
+  def color4f(red, green, blue, alpha), do: ...
+
+  @spec color4fv(v) :: :ok when v: {red :: unknown_type, green :: unknown_type, blue :: unknown_type, alpha :: unknown_type}
+  def color4fv({red, green, blue, alpha}), do: ...
+
+  @spec color4i(red, green, blue, alpha) :: :ok when red: integer(), green: integer(), blue: integer(), alpha: integer()
+  def color4i(red, green, blue, alpha), do: ...
+
+  @spec color4iv(v) :: :ok when v: {red :: integer(), green :: integer(), blue :: integer(), alpha :: integer()}
+  def color4iv({red, green, blue, alpha}), do: ...
+
+  @spec color4s(red, green, blue, alpha) :: :ok when red: integer(), green: integer(), blue: integer(), alpha: integer()
+  def color4s(red, green, blue, alpha), do: ...
+
+  @spec color4sv(v) :: :ok when v: {red :: integer(), green :: integer(), blue :: integer(), alpha :: integer()}
+  def color4sv({red, green, blue, alpha}), do: ...
+
+  @spec color4ub(red, green, blue, alpha) :: :ok when red: integer(), green: integer(), blue: integer(), alpha: integer()
+  def color4ub(red, green, blue, alpha), do: ...
+
+  @spec color4ubv(v) :: :ok when v: {red :: integer(), green :: integer(), blue :: integer(), alpha :: integer()}
+  def color4ubv({red, green, blue, alpha}), do: ...
+
+  @spec color4ui(red, green, blue, alpha) :: :ok when red: integer(), green: integer(), blue: integer(), alpha: integer()
+  def color4ui(red, green, blue, alpha), do: ...
+
+  @spec color4uiv(v) :: :ok when v: {red :: integer(), green :: integer(), blue :: integer(), alpha :: integer()}
+  def color4uiv({red, green, blue, alpha}), do: ...
+
+  @spec color4us(red, green, blue, alpha) :: :ok when red: integer(), green: integer(), blue: integer(), alpha: integer()
+  def color4us(red, green, blue, alpha), do: ...
+
+  @spec color4usv(v) :: :ok when v: {red :: integer(), green :: integer(), blue :: integer(), alpha :: integer()}
+  def color4usv({red, green, blue, alpha}), do: ...
+
+  @spec colorMask(red, green, blue, alpha) :: :ok when red: (0 | 1), green: (0 | 1), blue: (0 | 1), alpha: (0 | 1)
+  def colorMask(red, green, blue, alpha), do: ...
+
+  @spec colorMaski(index, r, g, b, a) :: :ok when index: integer(), r: (0 | 1), g: (0 | 1), b: (0 | 1), a: (0 | 1)
+  def colorMaski(index, r, g, b, a), do: ...
+
+  @spec colorMaterial(face, mode) :: :ok when face: enum(), mode: enum()
+  def colorMaterial(face, mode), do: ...
+
+  @spec colorPointer(size, type, stride, ptr) :: :ok when size: integer(), type: enum(), stride: integer(), ptr: (offset() | mem())
+  def colorPointer(size, type, stride, ptr) when is_integer(ptr), do: ...
+
+  def colorPointer(size, type, stride, ptr), do: ...
+
+  @spec colorSubTable(target, start, count, format, type, data) :: :ok when target: enum(), start: integer(), count: integer(), format: enum(), type: enum(), data: (offset() | mem())
+  def colorSubTable(target, start, count, format, type, data) when is_integer(data), do: ...
+
+  def colorSubTable(target, start, count, format, type, data), do: ...
+
+  @spec colorTable(target, internalformat, width, format, type, table) :: :ok when target: enum(), internalformat: enum(), width: integer(), format: enum(), type: enum(), table: (offset() | mem())
+  def colorTable(target, internalformat, width, format, type, table) when is_integer(table), do: ...
+
+  def colorTable(target, internalformat, width, format, type, table), do: ...
+
+  @spec colorTableParameterfv(target, pname, params) :: :ok when target: enum(), pname: enum(), params: {unknown_type, unknown_type, unknown_type, unknown_type}
+  def colorTableParameterfv(target, pname, {p1, p2, p3, p4}), do: ...
+
+  @spec colorTableParameteriv(target, pname, params) :: :ok when target: enum(), pname: enum(), params: {integer(), integer(), integer(), integer()}
+  def colorTableParameteriv(target, pname, {p1, p2, p3, p4}), do: ...
+
+  @spec compileShader(shader) :: :ok when shader: integer()
+  def compileShader(shader), do: ...
+
+  @spec compileShaderARB(shaderObj) :: :ok when shaderObj: integer()
+  def compileShaderARB(shaderObj), do: ...
+
+  @spec compileShaderIncludeARB(shader, path) :: :ok when shader: integer(), path: iolist()
+  def compileShaderIncludeARB(shader, path), do: ...
+
+  @spec compressedTexImage1D(target, level, internalformat, width, border, imageSize, data) :: :ok when target: enum(), level: integer(), internalformat: enum(), width: integer(), border: integer(), imageSize: integer(), data: (offset() | mem())
+  def compressedTexImage1D(target, level, internalformat, width, border, imageSize, data) when is_integer(data), do: ...
+
+  def compressedTexImage1D(target, level, internalformat, width, border, imageSize, data), do: ...
+
+  @spec compressedTexImage2D(target, level, internalformat, width, height, border, imageSize, data) :: :ok when target: enum(), level: integer(), internalformat: enum(), width: integer(), height: integer(), border: integer(), imageSize: integer(), data: (offset() | mem())
+  def compressedTexImage2D(target, level, internalformat, width, height, border, imageSize, data) when is_integer(data), do: ...
+
+  def compressedTexImage2D(target, level, internalformat, width, height, border, imageSize, data), do: ...
+
+  @spec compressedTexImage3D(target, level, internalformat, width, height, depth, border, imageSize, data) :: :ok when target: enum(), level: integer(), internalformat: enum(), width: integer(), height: integer(), depth: integer(), border: integer(), imageSize: integer(), data: (offset() | mem())
+  def compressedTexImage3D(target, level, internalformat, width, height, depth, border, imageSize, data) when is_integer(data), do: ...
+
+  def compressedTexImage3D(target, level, internalformat, width, height, depth, border, imageSize, data), do: ...
+
+  @spec compressedTexSubImage1D(target, level, xoffset, width, format, imageSize, data) :: :ok when target: enum(), level: integer(), xoffset: integer(), width: integer(), format: enum(), imageSize: integer(), data: (offset() | mem())
+  def compressedTexSubImage1D(target, level, xoffset, width, format, imageSize, data) when is_integer(data), do: ...
+
+  def compressedTexSubImage1D(target, level, xoffset, width, format, imageSize, data), do: ...
+
+  @spec compressedTexSubImage2D(target, level, xoffset, yoffset, width, height, format, imageSize, data) :: :ok when target: enum(), level: integer(), xoffset: integer(), yoffset: integer(), width: integer(), height: integer(), format: enum(), imageSize: integer(), data: (offset() | mem())
+  def compressedTexSubImage2D(target, level, xoffset, yoffset, width, height, format, imageSize, data) when is_integer(data), do: ...
+
+  def compressedTexSubImage2D(target, level, xoffset, yoffset, width, height, format, imageSize, data), do: ...
+
+  @spec compressedTexSubImage3D(target, level, xoffset, yoffset, zoffset, width, height, depth, format, imageSize, data) :: :ok when target: enum(), level: integer(), xoffset: integer(), yoffset: integer(), zoffset: integer(), width: integer(), height: integer(), depth: integer(), format: enum(), imageSize: integer(), data: (offset() | mem())
+  def compressedTexSubImage3D(target, level, xoffset, yoffset, zoffset, width, height, depth, format, imageSize, data) when is_integer(data), do: ...
+
+  def compressedTexSubImage3D(target, level, xoffset, yoffset, zoffset, width, height, depth, format, imageSize, data), do: ...
+
+  @spec convolutionFilter1D(target, internalformat, width, format, type, image) :: :ok when target: enum(), internalformat: enum(), width: integer(), format: enum(), type: enum(), image: (offset() | mem())
+  def convolutionFilter1D(target, internalformat, width, format, type, image) when is_integer(image), do: ...
+
+  def convolutionFilter1D(target, internalformat, width, format, type, image), do: ...
+
+  @spec convolutionFilter2D(target, internalformat, width, height, format, type, image) :: :ok when target: enum(), internalformat: enum(), width: integer(), height: integer(), format: enum(), type: enum(), image: (offset() | mem())
+  def convolutionFilter2D(target, internalformat, width, height, format, type, image) when is_integer(image), do: ...
+
+  def convolutionFilter2D(target, internalformat, width, height, format, type, image), do: ...
+
+  @spec convolutionParameterf(target, pname, params) :: :ok when target: enum(), pname: enum(), params: tuple()
+  def convolutionParameterf(target, pname, params), do: ...
+
+  @spec convolutionParameterfv(target :: enum(), pname :: enum(), params) :: :ok when params: {params :: tuple()}
+  def convolutionParameterfv(target, pname, {params}), do: ...
+
+  @spec convolutionParameteri(target, pname, params) :: :ok when target: enum(), pname: enum(), params: tuple()
+  def convolutionParameteri(target, pname, params), do: ...
+
+  @spec convolutionParameteriv(target :: enum(), pname :: enum(), params) :: :ok when params: {params :: tuple()}
+  def convolutionParameteriv(target, pname, {params}), do: ...
+
+  @spec copyBufferSubData(readTarget, writeTarget, readOffset, writeOffset, size) :: :ok when readTarget: enum(), writeTarget: enum(), readOffset: integer(), writeOffset: integer(), size: integer()
+  def copyBufferSubData(readTarget, writeTarget, readOffset, writeOffset, size), do: ...
+
+  @spec copyColorSubTable(target, start, x, y, width) :: :ok when target: enum(), start: integer(), x: integer(), y: integer(), width: integer()
+  def copyColorSubTable(target, start, x, y, width), do: ...
+
+  @spec copyColorTable(target, internalformat, x, y, width) :: :ok when target: enum(), internalformat: enum(), x: integer(), y: integer(), width: integer()
+  def copyColorTable(target, internalformat, x, y, width), do: ...
+
+  @spec copyConvolutionFilter1D(target, internalformat, x, y, width) :: :ok when target: enum(), internalformat: enum(), x: integer(), y: integer(), width: integer()
+  def copyConvolutionFilter1D(target, internalformat, x, y, width), do: ...
+
+  @spec copyConvolutionFilter2D(target, internalformat, x, y, width, height) :: :ok when target: enum(), internalformat: enum(), x: integer(), y: integer(), width: integer(), height: integer()
+  def copyConvolutionFilter2D(target, internalformat, x, y, width, height), do: ...
+
+  @spec copyPixels(x, y, width, height, type) :: :ok when x: integer(), y: integer(), width: integer(), height: integer(), type: enum()
+  def copyPixels(x, y, width, height, type), do: ...
+
+  @spec copyTexImage1D(target, level, internalformat, x, y, width, border) :: :ok when target: enum(), level: integer(), internalformat: enum(), x: integer(), y: integer(), width: integer(), border: integer()
+  def copyTexImage1D(target, level, internalformat, x, y, width, border), do: ...
+
+  @spec copyTexImage2D(target, level, internalformat, x, y, width, height, border) :: :ok when target: enum(), level: integer(), internalformat: enum(), x: integer(), y: integer(), width: integer(), height: integer(), border: integer()
+  def copyTexImage2D(target, level, internalformat, x, y, width, height, border), do: ...
+
+  @spec copyTexSubImage1D(target, level, xoffset, x, y, width) :: :ok when target: enum(), level: integer(), xoffset: integer(), x: integer(), y: integer(), width: integer()
+  def copyTexSubImage1D(target, level, xoffset, x, y, width), do: ...
+
+  @spec copyTexSubImage2D(target, level, xoffset, yoffset, x, y, width, height) :: :ok when target: enum(), level: integer(), xoffset: integer(), yoffset: integer(), x: integer(), y: integer(), width: integer(), height: integer()
+  def copyTexSubImage2D(target, level, xoffset, yoffset, x, y, width, height), do: ...
+
+  @spec copyTexSubImage3D(target, level, xoffset, yoffset, zoffset, x, y, width, height) :: :ok when target: enum(), level: integer(), xoffset: integer(), yoffset: integer(), zoffset: integer(), x: integer(), y: integer(), width: integer(), height: integer()
+  def copyTexSubImage3D(target, level, xoffset, yoffset, zoffset, x, y, width, height), do: ...
+
+  @spec createProgram() :: integer()
+  def createProgram(), do: ...
+
+  @spec createProgramObjectARB() :: integer()
+  def createProgramObjectARB(), do: ...
+
+  @spec createShader(type) :: integer() when type: enum()
+  def createShader(type), do: ...
+
+  @spec createShaderObjectARB(shaderType) :: integer() when shaderType: enum()
+  def createShaderObjectARB(shaderType), do: ...
+
+  @spec createShaderProgramv(type, strings) :: integer() when type: enum(), strings: iolist()
+  def createShaderProgramv(type, strings), do: ...
+
+  @spec cullFace(mode) :: :ok when mode: enum()
+  def cullFace(mode), do: ...
+
+  @spec currentPaletteMatrixARB(index) :: :ok when index: integer()
+  def currentPaletteMatrixARB(index), do: ...
+
+  @spec debugMessageControlARB(source, type, severity, ids, enabled) :: :ok when source: enum(), type: enum(), severity: enum(), ids: [integer()], enabled: (0 | 1)
+  def debugMessageControlARB(source, type, severity, ids, enabled), do: ...
+
+  @spec debugMessageInsertARB(source, type, id, severity, buf) :: :ok when source: enum(), type: enum(), id: integer(), severity: enum(), buf: charlist()
+  def debugMessageInsertARB(source, type, id, severity, buf), do: ...
+
+  @spec deleteBuffers(buffers) :: :ok when buffers: [integer()]
+  def deleteBuffers(buffers), do: ...
+
+  @spec deleteFramebuffers(framebuffers) :: :ok when framebuffers: [integer()]
+  def deleteFramebuffers(framebuffers), do: ...
+
+  @spec deleteLists(list, range) :: :ok when list: integer(), range: integer()
+  def deleteLists(list, range), do: ...
+
+  @spec deleteNamedStringARB(name) :: :ok when name: charlist()
+  def deleteNamedStringARB(name), do: ...
+
+  @spec deleteObjectARB(obj) :: :ok when obj: integer()
+  def deleteObjectARB(obj), do: ...
+
+  @spec deleteProgram(program) :: :ok when program: integer()
+  def deleteProgram(program), do: ...
+
+  @spec deleteProgramPipelines(pipelines) :: :ok when pipelines: [integer()]
+  def deleteProgramPipelines(pipelines), do: ...
+
+  @spec deleteProgramsARB(programs) :: :ok when programs: [integer()]
+  def deleteProgramsARB(programs), do: ...
+
+  @spec deleteQueries(ids) :: :ok when ids: [integer()]
+  def deleteQueries(ids), do: ...
+
+  @spec deleteRenderbuffers(renderbuffers) :: :ok when renderbuffers: [integer()]
+  def deleteRenderbuffers(renderbuffers), do: ...
+
+  @spec deleteSamplers(samplers) :: :ok when samplers: [integer()]
+  def deleteSamplers(samplers), do: ...
+
+  @spec deleteShader(shader) :: :ok when shader: integer()
+  def deleteShader(shader), do: ...
+
+  @spec deleteSync(sync) :: :ok when sync: integer()
+  def deleteSync(sync), do: ...
+
+  @spec deleteTextures(textures) :: :ok when textures: [integer()]
+  def deleteTextures(textures), do: ...
+
+  @spec deleteTransformFeedbacks(ids) :: :ok when ids: [integer()]
+  def deleteTransformFeedbacks(ids), do: ...
+
+  @spec deleteVertexArrays(arrays) :: :ok when arrays: [integer()]
+  def deleteVertexArrays(arrays), do: ...
+
+  @spec depthBoundsEXT(zmin, zmax) :: :ok when zmin: clamp(), zmax: clamp()
+  def depthBoundsEXT(zmin, zmax), do: ...
+
+  @spec depthFunc(func) :: :ok when func: enum()
+  def depthFunc(func), do: ...
+
+  @spec depthMask(flag) :: :ok when flag: (0 | 1)
+  def depthMask(flag), do: ...
+
+  @spec depthRange(near_val, far_val) :: :ok when near_val: clamp(), far_val: clamp()
+  def depthRange(near_val, far_val), do: ...
+
+  @spec depthRangeArrayv(first, v) :: :ok when first: integer(), v: [{clamp(), clamp()}]
+  def depthRangeArrayv(first, v), do: ...
+
+  @spec depthRangeIndexed(index, n, f) :: :ok when index: integer(), n: clamp(), f: clamp()
+  def depthRangeIndexed(index, n, f), do: ...
+
+  @spec depthRangef(n, f) :: :ok when n: clamp(), f: clamp()
+  def depthRangef(n, f), do: ...
+
+  @spec detachObjectARB(containerObj, attachedObj) :: :ok when containerObj: integer(), attachedObj: integer()
+  def detachObjectARB(containerObj, attachedObj), do: ...
+
+  @spec detachShader(program, shader) :: :ok when program: integer(), shader: integer()
+  def detachShader(program, shader), do: ...
+
+  @spec disable(cap) :: :ok when cap: enum()
+  def disable(cap), do: ...
+
+  @spec disableClientState(cap) :: :ok when cap: enum()
+  def disableClientState(cap), do: ...
+
+  @spec disableVertexAttribArray(index) :: :ok when index: integer()
+  def disableVertexAttribArray(index), do: ...
+
+  @spec disablei(target, index) :: :ok when target: enum(), index: integer()
+  def disablei(target, index), do: ...
+
+  @spec drawArrays(mode, first, count) :: :ok when mode: enum(), first: integer(), count: integer()
+  def drawArrays(mode, first, count), do: ...
+
+  @spec drawArraysIndirect(mode, indirect) :: :ok when mode: enum(), indirect: (offset() | mem())
+  def drawArraysIndirect(mode, indirect) when is_integer(indirect), do: ...
+
+  def drawArraysIndirect(mode, indirect), do: ...
+
+  @spec drawArraysInstanced(mode, first, count, primcount) :: :ok when mode: enum(), first: integer(), count: integer(), primcount: integer()
+  def drawArraysInstanced(mode, first, count, primcount), do: ...
+
+  @spec drawArraysInstancedBaseInstance(mode, first, count, primcount, baseinstance) :: :ok when mode: enum(), first: integer(), count: integer(), primcount: integer(), baseinstance: integer()
+  def drawArraysInstancedBaseInstance(mode, first, count, primcount, baseinstance), do: ...
+
+  @spec drawBuffer(mode) :: :ok when mode: enum()
+  def drawBuffer(mode), do: ...
+
+  @spec drawBuffers(bufs) :: :ok when bufs: [enum()]
+  def drawBuffers(bufs), do: ...
+
+  @spec drawElements(mode, count, type, indices) :: :ok when mode: enum(), count: integer(), type: enum(), indices: (offset() | mem())
+  def drawElements(mode, count, type, indices) when is_integer(indices), do: ...
+
+  def drawElements(mode, count, type, indices), do: ...
+
+  @spec drawElementsBaseVertex(mode, count, type, indices, basevertex) :: :ok when mode: enum(), count: integer(), type: enum(), indices: (offset() | mem()), basevertex: integer()
+  def drawElementsBaseVertex(mode, count, type, indices, basevertex) when is_integer(indices), do: ...
+
+  def drawElementsBaseVertex(mode, count, type, indices, basevertex), do: ...
+
+  @spec drawElementsIndirect(mode, type, indirect) :: :ok when mode: enum(), type: enum(), indirect: (offset() | mem())
+  def drawElementsIndirect(mode, type, indirect) when is_integer(indirect), do: ...
+
+  def drawElementsIndirect(mode, type, indirect), do: ...
+
+  @spec drawElementsInstanced(mode, count, type, indices, primcount) :: :ok when mode: enum(), count: integer(), type: enum(), indices: (offset() | mem()), primcount: integer()
+  def drawElementsInstanced(mode, count, type, indices, primcount) when is_integer(indices), do: ...
+
+  def drawElementsInstanced(mode, count, type, indices, primcount), do: ...
+
+  @spec drawElementsInstancedBaseInstance(mode, count, type, indices, primcount, baseinstance) :: :ok when mode: enum(), count: integer(), type: enum(), indices: (offset() | mem()), primcount: integer(), baseinstance: integer()
+  def drawElementsInstancedBaseInstance(mode, count, type, indices, primcount, baseinstance) when is_integer(indices), do: ...
+
+  def drawElementsInstancedBaseInstance(mode, count, type, indices, primcount, baseinstance), do: ...
+
+  @spec drawElementsInstancedBaseVertex(mode, count, type, indices, primcount, basevertex) :: :ok when mode: enum(), count: integer(), type: enum(), indices: (offset() | mem()), primcount: integer(), basevertex: integer()
+  def drawElementsInstancedBaseVertex(mode, count, type, indices, primcount, basevertex) when is_integer(indices), do: ...
+
+  def drawElementsInstancedBaseVertex(mode, count, type, indices, primcount, basevertex), do: ...
+
+  @spec drawElementsInstancedBaseVertexBaseInstance(mode, count, type, indices, primcount, basevertex, baseinstance) :: :ok when mode: enum(), count: integer(), type: enum(), indices: (offset() | mem()), primcount: integer(), basevertex: integer(), baseinstance: integer()
+  def drawElementsInstancedBaseVertexBaseInstance(mode, count, type, indices, primcount, basevertex, baseinstance) when is_integer(indices), do: ...
+
+  def drawElementsInstancedBaseVertexBaseInstance(mode, count, type, indices, primcount, basevertex, baseinstance), do: ...
+
+  @spec drawPixels(width, height, format, type, pixels) :: :ok when width: integer(), height: integer(), format: enum(), type: enum(), pixels: (offset() | mem())
+  def drawPixels(width, height, format, type, pixels) when is_integer(pixels), do: ...
+
+  def drawPixels(width, height, format, type, pixels), do: ...
+
+  @spec drawRangeElements(mode, start, erlangVariableEnd, count, type, indices) :: :ok when mode: enum(), start: integer(), erlangVariableEnd: integer(), count: integer(), type: enum(), indices: (offset() | mem())
+  def drawRangeElements(mode, start, erlangVariableEnd, count, type, indices) when is_integer(indices), do: ...
+
+  def drawRangeElements(mode, start, erlangVariableEnd, count, type, indices), do: ...
+
+  @spec drawRangeElementsBaseVertex(mode, start, erlangVariableEnd, count, type, indices, basevertex) :: :ok when mode: enum(), start: integer(), erlangVariableEnd: integer(), count: integer(), type: enum(), indices: (offset() | mem()), basevertex: integer()
+  def drawRangeElementsBaseVertex(mode, start, erlangVariableEnd, count, type, indices, basevertex) when is_integer(indices), do: ...
+
+  def drawRangeElementsBaseVertex(mode, start, erlangVariableEnd, count, type, indices, basevertex), do: ...
+
+  @spec drawTransformFeedback(mode, id) :: :ok when mode: enum(), id: integer()
+  def drawTransformFeedback(mode, id), do: ...
+
+  @spec drawTransformFeedbackInstanced(mode, id, primcount) :: :ok when mode: enum(), id: integer(), primcount: integer()
+  def drawTransformFeedbackInstanced(mode, id, primcount), do: ...
+
+  @spec drawTransformFeedbackStream(mode, id, stream) :: :ok when mode: enum(), id: integer(), stream: integer()
+  def drawTransformFeedbackStream(mode, id, stream), do: ...
+
+  @spec drawTransformFeedbackStreamInstanced(mode, id, stream, primcount) :: :ok when mode: enum(), id: integer(), stream: integer(), primcount: integer()
+  def drawTransformFeedbackStreamInstanced(mode, id, stream, primcount), do: ...
+
+  @spec edgeFlag(flag) :: :ok when flag: (0 | 1)
+  def edgeFlag(flag), do: ...
+
+  @spec edgeFlagPointer(stride, ptr) :: :ok when stride: integer(), ptr: (offset() | mem())
+  def edgeFlagPointer(stride, ptr) when is_integer(ptr), do: ...
+
+  def edgeFlagPointer(stride, ptr), do: ...
+
+  @spec edgeFlagv(flag) :: :ok when flag: {flag :: (0 | 1)}
+  def edgeFlagv({flag}), do: ...
+
+  @spec enable(cap) :: :ok when cap: enum()
+  def enable(cap), do: ...
+
+  @spec enableClientState(cap) :: :ok when cap: enum()
+  def enableClientState(cap), do: ...
+
+  @spec enableVertexAttribArray(index) :: :ok when index: integer()
+  def enableVertexAttribArray(index), do: ...
+
+  @spec enablei(target, index) :: :ok when target: enum(), index: integer()
+  def enablei(target, index), do: ...
+
+  @spec unquote(:end)() :: :ok
+  def unquote(:end)(), do: ...
+
+  @spec endConditionalRender() :: :ok
+  def endConditionalRender(), do: ...
+
+  @spec endList() :: :ok
+  def endList(), do: ...
+
+  @spec endQuery(target) :: :ok when target: enum()
+  def endQuery(target), do: ...
+
+  @spec endQueryIndexed(target, index) :: :ok when target: enum(), index: integer()
+  def endQueryIndexed(target, index), do: ...
+
+  @spec endTransformFeedback() :: :ok
+  def endTransformFeedback(), do: ...
+
+  @spec evalCoord1d(u) :: :ok when u: unknown_type
+  def evalCoord1d(u), do: ...
+
+  @spec evalCoord1dv(u) :: :ok when u: {u :: unknown_type}
+  def evalCoord1dv({u}), do: ...
+
+  @spec evalCoord1f(u) :: :ok when u: unknown_type
+  def evalCoord1f(u), do: ...
+
+  @spec evalCoord1fv(u) :: :ok when u: {u :: unknown_type}
+  def evalCoord1fv({u}), do: ...
+
+  @spec evalCoord2d(u, v) :: :ok when u: unknown_type, v: unknown_type
+  def evalCoord2d(u, v), do: ...
+
+  @spec evalCoord2dv(u) :: :ok when u: {u :: unknown_type, v :: unknown_type}
+  def evalCoord2dv({u, v}), do: ...
+
+  @spec evalCoord2f(u, v) :: :ok when u: unknown_type, v: unknown_type
+  def evalCoord2f(u, v), do: ...
+
+  @spec evalCoord2fv(u) :: :ok when u: {u :: unknown_type, v :: unknown_type}
+  def evalCoord2fv({u, v}), do: ...
+
+  @spec evalMesh1(mode, i1, i2) :: :ok when mode: enum(), i1: integer(), i2: integer()
+  def evalMesh1(mode, i1, i2), do: ...
+
+  @spec evalMesh2(mode, i1, i2, j1, j2) :: :ok when mode: enum(), i1: integer(), i2: integer(), j1: integer(), j2: integer()
+  def evalMesh2(mode, i1, i2, j1, j2), do: ...
+
+  @spec evalPoint1(i) :: :ok when i: integer()
+  def evalPoint1(i), do: ...
+
+  @spec evalPoint2(i, j) :: :ok when i: integer(), j: integer()
+  def evalPoint2(i, j), do: ...
+
+  @spec feedbackBuffer(size, type, buffer) :: :ok when size: integer(), type: enum(), buffer: mem()
+  def feedbackBuffer(size, type, buffer), do: ...
+
+  @spec fenceSync(condition, flags) :: integer() when condition: enum(), flags: integer()
+  def fenceSync(condition, flags), do: ...
+
+  @spec finish() :: :ok
+  def finish(), do: ...
+
+  @spec flush() :: :ok
+  def flush(), do: ...
+
+  @spec flushMappedBufferRange(target, offset, length) :: :ok when target: enum(), offset: integer(), length: integer()
+  def flushMappedBufferRange(target, offset, length), do: ...
+
+  @spec fogCoordPointer(type, stride, pointer) :: :ok when type: enum(), stride: integer(), pointer: (offset() | mem())
+  def fogCoordPointer(type, stride, pointer) when is_integer(pointer), do: ...
+
+  def fogCoordPointer(type, stride, pointer), do: ...
+
+  @spec fogCoordd(coord) :: :ok when coord: unknown_type
+  def fogCoordd(coord), do: ...
+
+  @spec fogCoorddv(coord) :: :ok when coord: {coord :: unknown_type}
+  def fogCoorddv({coord}), do: ...
+
+  @spec fogCoordf(coord) :: :ok when coord: unknown_type
+  def fogCoordf(coord), do: ...
+
+  @spec fogCoordfv(coord) :: :ok when coord: {coord :: unknown_type}
+  def fogCoordfv({coord}), do: ...
+
+  @spec fogf(pname, param) :: :ok when pname: enum(), param: unknown_type
+  def fogf(pname, param), do: ...
+
+  @spec fogfv(pname, params) :: :ok when pname: enum(), params: tuple()
+  def fogfv(pname, params), do: ...
+
+  @spec fogi(pname, param) :: :ok when pname: enum(), param: integer()
+  def fogi(pname, param), do: ...
+
+  @spec fogiv(pname, params) :: :ok when pname: enum(), params: tuple()
+  def fogiv(pname, params), do: ...
+
+  @spec framebufferRenderbuffer(target, attachment, renderbuffertarget, renderbuffer) :: :ok when target: enum(), attachment: enum(), renderbuffertarget: enum(), renderbuffer: integer()
+  def framebufferRenderbuffer(target, attachment, renderbuffertarget, renderbuffer), do: ...
+
+  @spec framebufferTexture(target, attachment, texture, level) :: :ok when target: enum(), attachment: enum(), texture: integer(), level: integer()
+  def framebufferTexture(target, attachment, texture, level), do: ...
+
+  @spec framebufferTexture1D(target, attachment, textarget, texture, level) :: :ok when target: enum(), attachment: enum(), textarget: enum(), texture: integer(), level: integer()
+  def framebufferTexture1D(target, attachment, textarget, texture, level), do: ...
+
+  @spec framebufferTexture2D(target, attachment, textarget, texture, level) :: :ok when target: enum(), attachment: enum(), textarget: enum(), texture: integer(), level: integer()
+  def framebufferTexture2D(target, attachment, textarget, texture, level), do: ...
+
+  @spec framebufferTexture3D(target, attachment, textarget, texture, level, zoffset) :: :ok when target: enum(), attachment: enum(), textarget: enum(), texture: integer(), level: integer(), zoffset: integer()
+  def framebufferTexture3D(target, attachment, textarget, texture, level, zoffset), do: ...
+
+  @spec framebufferTextureFaceARB(target, attachment, texture, level, face) :: :ok when target: enum(), attachment: enum(), texture: integer(), level: integer(), face: enum()
+  def framebufferTextureFaceARB(target, attachment, texture, level, face), do: ...
+
+  @spec framebufferTextureLayer(target, attachment, texture, level, layer) :: :ok when target: enum(), attachment: enum(), texture: integer(), level: integer(), layer: integer()
+  def framebufferTextureLayer(target, attachment, texture, level, layer), do: ...
+
+  @spec frontFace(mode) :: :ok when mode: enum()
+  def frontFace(mode), do: ...
+
+  @spec frustum(left, right, bottom, top, near_val, far_val) :: :ok when left: unknown_type, right: unknown_type, bottom: unknown_type, top: unknown_type, near_val: unknown_type, far_val: unknown_type
+  def frustum(left, right, bottom, top, near_val, far_val), do: ...
+
+  @spec genBuffers(n) :: [integer()] when n: integer()
+  def genBuffers(n), do: ...
+
+  @spec genFramebuffers(n) :: [integer()] when n: integer()
+  def genFramebuffers(n), do: ...
+
+  @spec genLists(range) :: integer() when range: integer()
+  def genLists(range), do: ...
+
+  @spec genProgramPipelines(n) :: [integer()] when n: integer()
+  def genProgramPipelines(n), do: ...
+
+  @spec genProgramsARB(n) :: [integer()] when n: integer()
+  def genProgramsARB(n), do: ...
+
+  @spec genQueries(n) :: [integer()] when n: integer()
+  def genQueries(n), do: ...
+
+  @spec genRenderbuffers(n) :: [integer()] when n: integer()
+  def genRenderbuffers(n), do: ...
+
+  @spec genSamplers(count) :: [integer()] when count: integer()
+  def genSamplers(count), do: ...
+
+  @spec genTextures(n) :: [integer()] when n: integer()
+  def genTextures(n), do: ...
+
+  @spec genTransformFeedbacks(n) :: [integer()] when n: integer()
+  def genTransformFeedbacks(n), do: ...
+
+  @spec genVertexArrays(n) :: [integer()] when n: integer()
+  def genVertexArrays(n), do: ...
+
+  @spec generateMipmap(target) :: :ok when target: enum()
+  def generateMipmap(target), do: ...
+
+  @spec getActiveAttrib(program, index, bufSize) :: {size :: integer(), type :: enum(), name :: charlist()} when program: integer(), index: integer(), bufSize: integer()
+  def getActiveAttrib(program, index, bufSize), do: ...
+
+  @spec getActiveAttribARB(programObj, index, maxLength) :: {size :: integer(), type :: enum(), name :: charlist()} when programObj: integer(), index: integer(), maxLength: integer()
+  def getActiveAttribARB(programObj, index, maxLength), do: ...
+
+  @spec getActiveSubroutineName(program, shadertype, index, bufsize) :: charlist() when program: integer(), shadertype: enum(), index: integer(), bufsize: integer()
+  def getActiveSubroutineName(program, shadertype, index, bufsize), do: ...
+
+  @spec getActiveSubroutineUniformName(program, shadertype, index, bufsize) :: charlist() when program: integer(), shadertype: enum(), index: integer(), bufsize: integer()
+  def getActiveSubroutineUniformName(program, shadertype, index, bufsize), do: ...
+
+  @spec getActiveUniform(program, index, bufSize) :: {size :: integer(), type :: enum(), name :: charlist()} when program: integer(), index: integer(), bufSize: integer()
+  def getActiveUniform(program, index, bufSize), do: ...
+
+  @spec getActiveUniformARB(programObj, index, maxLength) :: {size :: integer(), type :: enum(), name :: charlist()} when programObj: integer(), index: integer(), maxLength: integer()
+  def getActiveUniformARB(programObj, index, maxLength), do: ...
+
+  @spec getActiveUniformBlockName(program, uniformBlockIndex, bufSize) :: charlist() when program: integer(), uniformBlockIndex: integer(), bufSize: integer()
+  def getActiveUniformBlockName(program, uniformBlockIndex, bufSize), do: ...
+
+  @spec getActiveUniformBlockiv(program, uniformBlockIndex, pname, params) :: :ok when program: integer(), uniformBlockIndex: integer(), pname: enum(), params: mem()
+  def getActiveUniformBlockiv(program, uniformBlockIndex, pname, params), do: ...
+
+  @spec getActiveUniformName(program, uniformIndex, bufSize) :: charlist() when program: integer(), uniformIndex: integer(), bufSize: integer()
+  def getActiveUniformName(program, uniformIndex, bufSize), do: ...
+
+  @spec getActiveUniformsiv(program, uniformIndices, pname) :: [integer()] when program: integer(), uniformIndices: [integer()], pname: enum()
+  def getActiveUniformsiv(program, uniformIndices, pname), do: ...
+
+  @spec getAttachedObjectsARB(containerObj, maxCount) :: [integer()] when containerObj: integer(), maxCount: integer()
+  def getAttachedObjectsARB(containerObj, maxCount), do: ...
+
+  @spec getAttachedShaders(program, maxCount) :: [integer()] when program: integer(), maxCount: integer()
+  def getAttachedShaders(program, maxCount), do: ...
+
+  @spec getAttribLocation(program, name) :: integer() when program: integer(), name: charlist()
+  def getAttribLocation(program, name), do: ...
+
+  @spec getAttribLocationARB(programObj, name) :: integer() when programObj: integer(), name: charlist()
+  def getAttribLocationARB(programObj, name), do: ...
+
+  @spec getBooleani_v(target, index) :: [(0 | 1)] when target: enum(), index: integer()
+  def getBooleani_v(target, index), do: ...
+
+  @spec getBooleanv(pname) :: [(0 | 1)] when pname: enum()
+  def getBooleanv(pname), do: ...
+
+  @spec getBufferParameteri64v(target, pname) :: [integer()] when target: enum(), pname: enum()
+  def getBufferParameteri64v(target, pname), do: ...
+
+  @spec getBufferParameteriv(target, pname) :: integer() when target: enum(), pname: enum()
+  def getBufferParameteriv(target, pname), do: ...
+
+  @spec getBufferParameterivARB(target, pname) :: [integer()] when target: enum(), pname: enum()
+  def getBufferParameterivARB(target, pname), do: ...
+
+  @spec getBufferSubData(target, offset, size, data) :: :ok when target: enum(), offset: integer(), size: integer(), data: mem()
+  def getBufferSubData(target, offset, size, data), do: ...
+
+  @spec getClipPlane(plane) :: {unknown_type, unknown_type, unknown_type, unknown_type} when plane: enum()
+  def getClipPlane(plane), do: ...
+
+  @spec getColorTable(target, format, type, table) :: :ok when target: enum(), format: enum(), type: enum(), table: mem()
+  def getColorTable(target, format, type, table), do: ...
+
+  @spec getColorTableParameterfv(target, pname) :: {unknown_type, unknown_type, unknown_type, unknown_type} when target: enum(), pname: enum()
+  def getColorTableParameterfv(target, pname), do: ...
+
+  @spec getColorTableParameteriv(target, pname) :: {integer(), integer(), integer(), integer()} when target: enum(), pname: enum()
+  def getColorTableParameteriv(target, pname), do: ...
+
+  @spec getCompressedTexImage(target, lod, img) :: :ok when target: enum(), lod: integer(), img: mem()
+  def getCompressedTexImage(target, lod, img), do: ...
+
+  @spec getConvolutionFilter(target, format, type, image) :: :ok when target: enum(), format: enum(), type: enum(), image: mem()
+  def getConvolutionFilter(target, format, type, image), do: ...
+
+  @spec getConvolutionParameterfv(target, pname) :: {unknown_type, unknown_type, unknown_type, unknown_type} when target: enum(), pname: enum()
+  def getConvolutionParameterfv(target, pname), do: ...
+
+  @spec getConvolutionParameteriv(target, pname) :: {integer(), integer(), integer(), integer()} when target: enum(), pname: enum()
+  def getConvolutionParameteriv(target, pname), do: ...
+
+  @spec getDebugMessageLogARB(count, bufsize) :: {integer(), sources :: [enum()], types :: [enum()], ids :: [integer()], severities :: [enum()], messageLog :: [charlist()]} when count: integer(), bufsize: integer()
+  def getDebugMessageLogARB(count, bufsize), do: ...
+
+  @spec getDoublei_v(target, index) :: [unknown_type] when target: enum(), index: integer()
+  def getDoublei_v(target, index), do: ...
+
+  @spec getDoublev(pname) :: [unknown_type] when pname: enum()
+  def getDoublev(pname), do: ...
+
+  @spec getError() :: enum()
+  def getError(), do: ...
+
+  @spec getFloati_v(target, index) :: [unknown_type] when target: enum(), index: integer()
+  def getFloati_v(target, index), do: ...
+
+  @spec getFloatv(pname) :: [unknown_type] when pname: enum()
+  def getFloatv(pname), do: ...
+
+  @spec getFragDataIndex(program, name) :: integer() when program: integer(), name: charlist()
+  def getFragDataIndex(program, name), do: ...
+
+  @spec getFragDataLocation(program, name) :: integer() when program: integer(), name: charlist()
+  def getFragDataLocation(program, name), do: ...
+
+  @spec getFramebufferAttachmentParameteriv(target, attachment, pname) :: integer() when target: enum(), attachment: enum(), pname: enum()
+  def getFramebufferAttachmentParameteriv(target, attachment, pname), do: ...
+
+  @spec getGraphicsResetStatusARB() :: enum()
+  def getGraphicsResetStatusARB(), do: ...
+
+  @spec getHandleARB(pname) :: integer() when pname: enum()
+  def getHandleARB(pname), do: ...
+
+  @spec getHistogram(target, reset, format, type, values) :: :ok when target: enum(), reset: (0 | 1), format: enum(), type: enum(), values: mem()
+  def getHistogram(target, reset, format, type, values), do: ...
+
+  @spec getHistogramParameterfv(target, pname) :: {unknown_type} when target: enum(), pname: enum()
+  def getHistogramParameterfv(target, pname), do: ...
+
+  @spec getHistogramParameteriv(target, pname) :: {integer()} when target: enum(), pname: enum()
+  def getHistogramParameteriv(target, pname), do: ...
+
+  @spec getInfoLogARB(obj, maxLength) :: charlist() when obj: integer(), maxLength: integer()
+  def getInfoLogARB(obj, maxLength), do: ...
+
+  @spec getInteger64i_v(target, index) :: [integer()] when target: enum(), index: integer()
+  def getInteger64i_v(target, index), do: ...
+
+  @spec getInteger64v(pname) :: [integer()] when pname: enum()
+  def getInteger64v(pname), do: ...
+
+  @spec getIntegeri_v(target, index) :: [integer()] when target: enum(), index: integer()
+  def getIntegeri_v(target, index), do: ...
+
+  @spec getIntegerv(pname) :: [integer()] when pname: enum()
+  def getIntegerv(pname), do: ...
+
+  @spec getInternalformativ(target, internalformat, pname, bufSize) :: [integer()] when target: enum(), internalformat: enum(), pname: enum(), bufSize: integer()
+  def getInternalformativ(target, internalformat, pname, bufSize), do: ...
+
+  @spec getLightfv(light, pname) :: {unknown_type, unknown_type, unknown_type, unknown_type} when light: enum(), pname: enum()
+  def getLightfv(light, pname), do: ...
+
+  @spec getLightiv(light, pname) :: {integer(), integer(), integer(), integer()} when light: enum(), pname: enum()
+  def getLightiv(light, pname), do: ...
+
+  @spec getMapdv(target, query, v) :: :ok when target: enum(), query: enum(), v: mem()
+  def getMapdv(target, query, v), do: ...
+
+  @spec getMapfv(target, query, v) :: :ok when target: enum(), query: enum(), v: mem()
+  def getMapfv(target, query, v), do: ...
+
+  @spec getMapiv(target, query, v) :: :ok when target: enum(), query: enum(), v: mem()
+  def getMapiv(target, query, v), do: ...
+
+  @spec getMaterialfv(face, pname) :: {unknown_type, unknown_type, unknown_type, unknown_type} when face: enum(), pname: enum()
+  def getMaterialfv(face, pname), do: ...
+
+  @spec getMaterialiv(face, pname) :: {integer(), integer(), integer(), integer()} when face: enum(), pname: enum()
+  def getMaterialiv(face, pname), do: ...
+
+  @spec getMinmax(target, reset, format, types, values) :: :ok when target: enum(), reset: (0 | 1), format: enum(), types: enum(), values: mem()
+  def getMinmax(target, reset, format, types, values), do: ...
+
+  @spec getMinmaxParameterfv(target, pname) :: {unknown_type} when target: enum(), pname: enum()
+  def getMinmaxParameterfv(target, pname), do: ...
+
+  @spec getMinmaxParameteriv(target, pname) :: {integer()} when target: enum(), pname: enum()
+  def getMinmaxParameteriv(target, pname), do: ...
+
+  @spec getMultisamplefv(pname, index) :: {unknown_type, unknown_type} when pname: enum(), index: integer()
+  def getMultisamplefv(pname, index), do: ...
+
+  @spec getNamedStringARB(name, bufSize) :: charlist() when name: charlist(), bufSize: integer()
+  def getNamedStringARB(name, bufSize), do: ...
+
+  @spec getNamedStringivARB(name, pname) :: integer() when name: charlist(), pname: enum()
+  def getNamedStringivARB(name, pname), do: ...
+
+  @spec getObjectParameterfvARB(obj, pname) :: unknown_type when obj: integer(), pname: enum()
+  def getObjectParameterfvARB(obj, pname), do: ...
+
+  @spec getObjectParameterivARB(obj, pname) :: integer() when obj: integer(), pname: enum()
+  def getObjectParameterivARB(obj, pname), do: ...
+
+  @spec getPixelMapfv(map, values) :: :ok when map: enum(), values: mem()
+  def getPixelMapfv(map, values), do: ...
+
+  @spec getPixelMapuiv(map, values) :: :ok when map: enum(), values: mem()
+  def getPixelMapuiv(map, values), do: ...
+
+  @spec getPixelMapusv(map, values) :: :ok when map: enum(), values: mem()
+  def getPixelMapusv(map, values), do: ...
+
+  @spec getPolygonStipple() :: binary()
+  def getPolygonStipple(), do: ...
+
+  @spec getProgramBinary(program, bufSize) :: {binaryFormat :: enum(), binary :: binary()} when program: integer(), bufSize: integer()
+  def getProgramBinary(program, bufSize), do: ...
+
+  @spec getProgramEnvParameterdvARB(target, index) :: {unknown_type, unknown_type, unknown_type, unknown_type} when target: enum(), index: integer()
+  def getProgramEnvParameterdvARB(target, index), do: ...
+
+  @spec getProgramEnvParameterfvARB(target, index) :: {unknown_type, unknown_type, unknown_type, unknown_type} when target: enum(), index: integer()
+  def getProgramEnvParameterfvARB(target, index), do: ...
+
+  @spec getProgramInfoLog(program, bufSize) :: charlist() when program: integer(), bufSize: integer()
+  def getProgramInfoLog(program, bufSize), do: ...
+
+  @spec getProgramLocalParameterdvARB(target, index) :: {unknown_type, unknown_type, unknown_type, unknown_type} when target: enum(), index: integer()
+  def getProgramLocalParameterdvARB(target, index), do: ...
+
+  @spec getProgramLocalParameterfvARB(target, index) :: {unknown_type, unknown_type, unknown_type, unknown_type} when target: enum(), index: integer()
+  def getProgramLocalParameterfvARB(target, index), do: ...
+
+  @spec getProgramPipelineInfoLog(pipeline, bufSize) :: charlist() when pipeline: integer(), bufSize: integer()
+  def getProgramPipelineInfoLog(pipeline, bufSize), do: ...
+
+  @spec getProgramPipelineiv(pipeline, pname) :: integer() when pipeline: integer(), pname: enum()
+  def getProgramPipelineiv(pipeline, pname), do: ...
+
+  @spec getProgramStageiv(program, shadertype, pname) :: integer() when program: integer(), shadertype: enum(), pname: enum()
+  def getProgramStageiv(program, shadertype, pname), do: ...
+
+  @spec getProgramStringARB(target, pname, string) :: :ok when target: enum(), pname: enum(), string: mem()
+  def getProgramStringARB(target, pname, string), do: ...
+
+  @spec getProgramiv(program, pname) :: integer() when program: integer(), pname: enum()
+  def getProgramiv(program, pname), do: ...
+
+  @spec getQueryIndexediv(target, index, pname) :: integer() when target: enum(), index: integer(), pname: enum()
+  def getQueryIndexediv(target, index, pname), do: ...
+
+  @spec getQueryObjecti64v(id, pname) :: integer() when id: integer(), pname: enum()
+  def getQueryObjecti64v(id, pname), do: ...
+
+  @spec getQueryObjectiv(id, pname) :: integer() when id: integer(), pname: enum()
+  def getQueryObjectiv(id, pname), do: ...
+
+  @spec getQueryObjectui64v(id, pname) :: integer() when id: integer(), pname: enum()
+  def getQueryObjectui64v(id, pname), do: ...
+
+  @spec getQueryObjectuiv(id, pname) :: integer() when id: integer(), pname: enum()
+  def getQueryObjectuiv(id, pname), do: ...
+
+  @spec getQueryiv(target, pname) :: integer() when target: enum(), pname: enum()
+  def getQueryiv(target, pname), do: ...
+
+  @spec getRenderbufferParameteriv(target, pname) :: integer() when target: enum(), pname: enum()
+  def getRenderbufferParameteriv(target, pname), do: ...
+
+  @spec getSamplerParameterIiv(sampler, pname) :: [integer()] when sampler: integer(), pname: enum()
+  def getSamplerParameterIiv(sampler, pname), do: ...
+
+  @spec getSamplerParameterIuiv(sampler, pname) :: [integer()] when sampler: integer(), pname: enum()
+  def getSamplerParameterIuiv(sampler, pname), do: ...
+
+  @spec getSamplerParameterfv(sampler, pname) :: [unknown_type] when sampler: integer(), pname: enum()
+  def getSamplerParameterfv(sampler, pname), do: ...
+
+  @spec getSamplerParameteriv(sampler, pname) :: [integer()] when sampler: integer(), pname: enum()
+  def getSamplerParameteriv(sampler, pname), do: ...
+
+  @spec getShaderInfoLog(shader, bufSize) :: charlist() when shader: integer(), bufSize: integer()
+  def getShaderInfoLog(shader, bufSize), do: ...
+
+  @spec getShaderPrecisionFormat(shadertype, precisiontype) :: {range :: {integer(), integer()}, precision :: integer()} when shadertype: enum(), precisiontype: enum()
+  def getShaderPrecisionFormat(shadertype, precisiontype), do: ...
+
+  @spec getShaderSource(shader, bufSize) :: charlist() when shader: integer(), bufSize: integer()
+  def getShaderSource(shader, bufSize), do: ...
+
+  @spec getShaderSourceARB(obj, maxLength) :: charlist() when obj: integer(), maxLength: integer()
+  def getShaderSourceARB(obj, maxLength), do: ...
+
+  @spec getShaderiv(shader, pname) :: integer() when shader: integer(), pname: enum()
+  def getShaderiv(shader, pname), do: ...
+
+  @spec getString(name) :: charlist() when name: enum()
+  def getString(name), do: ...
+
+  @spec getStringi(name, index) :: charlist() when name: enum(), index: integer()
+  def getStringi(name, index), do: ...
+
+  @spec getSubroutineIndex(program, shadertype, name) :: integer() when program: integer(), shadertype: enum(), name: charlist()
+  def getSubroutineIndex(program, shadertype, name), do: ...
+
+  @spec getSubroutineUniformLocation(program, shadertype, name) :: integer() when program: integer(), shadertype: enum(), name: charlist()
+  def getSubroutineUniformLocation(program, shadertype, name), do: ...
+
+  @spec getSynciv(sync, pname, bufSize) :: [integer()] when sync: integer(), pname: enum(), bufSize: integer()
+  def getSynciv(sync, pname, bufSize), do: ...
+
+  @spec getTexEnvfv(target, pname) :: {unknown_type, unknown_type, unknown_type, unknown_type} when target: enum(), pname: enum()
+  def getTexEnvfv(target, pname), do: ...
+
+  @spec getTexEnviv(target, pname) :: {integer(), integer(), integer(), integer()} when target: enum(), pname: enum()
+  def getTexEnviv(target, pname), do: ...
+
+  @spec getTexGendv(coord, pname) :: {unknown_type, unknown_type, unknown_type, unknown_type} when coord: enum(), pname: enum()
+  def getTexGendv(coord, pname), do: ...
+
+  @spec getTexGenfv(coord, pname) :: {unknown_type, unknown_type, unknown_type, unknown_type} when coord: enum(), pname: enum()
+  def getTexGenfv(coord, pname), do: ...
+
+  @spec getTexGeniv(coord, pname) :: {integer(), integer(), integer(), integer()} when coord: enum(), pname: enum()
+  def getTexGeniv(coord, pname), do: ...
+
+  @spec getTexImage(target, level, format, type, pixels) :: :ok when target: enum(), level: integer(), format: enum(), type: enum(), pixels: mem()
+  def getTexImage(target, level, format, type, pixels), do: ...
+
+  @spec getTexLevelParameterfv(target, level, pname) :: {unknown_type} when target: enum(), level: integer(), pname: enum()
+  def getTexLevelParameterfv(target, level, pname), do: ...
+
+  @spec getTexLevelParameteriv(target, level, pname) :: {integer()} when target: enum(), level: integer(), pname: enum()
+  def getTexLevelParameteriv(target, level, pname), do: ...
+
+  @spec getTexParameterIiv(target, pname) :: {integer(), integer(), integer(), integer()} when target: enum(), pname: enum()
+  def getTexParameterIiv(target, pname), do: ...
+
+  @spec getTexParameterIuiv(target, pname) :: {integer(), integer(), integer(), integer()} when target: enum(), pname: enum()
+  def getTexParameterIuiv(target, pname), do: ...
+
+  @spec getTexParameterfv(target, pname) :: {unknown_type, unknown_type, unknown_type, unknown_type} when target: enum(), pname: enum()
+  def getTexParameterfv(target, pname), do: ...
+
+  @spec getTexParameteriv(target, pname) :: {integer(), integer(), integer(), integer()} when target: enum(), pname: enum()
+  def getTexParameteriv(target, pname), do: ...
+
+  @spec getTransformFeedbackVarying(program, index, bufSize) :: {size :: integer(), type :: enum(), name :: charlist()} when program: integer(), index: integer(), bufSize: integer()
+  def getTransformFeedbackVarying(program, index, bufSize), do: ...
+
+  @spec getUniformBlockIndex(program, uniformBlockName) :: integer() when program: integer(), uniformBlockName: charlist()
+  def getUniformBlockIndex(program, uniformBlockName), do: ...
+
+  @spec getUniformIndices(program, uniformNames) :: [integer()] when program: integer(), uniformNames: iolist()
+  def getUniformIndices(program, uniformNames), do: ...
+
+  @spec getUniformLocation(program, name) :: integer() when program: integer(), name: charlist()
+  def getUniformLocation(program, name), do: ...
+
+  @spec getUniformLocationARB(programObj, name) :: integer() when programObj: integer(), name: charlist()
+  def getUniformLocationARB(programObj, name), do: ...
+
+  @spec getUniformSubroutineuiv(shadertype, location) :: {integer(), integer(), integer(), integer(), integer(), integer(), integer(), integer(), integer(), integer(), integer(), integer(), integer(), integer(), integer(), integer()} when shadertype: enum(), location: integer()
+  def getUniformSubroutineuiv(shadertype, location), do: ...
+
+  @spec getUniformdv(program, location) :: matrix() when program: integer(), location: integer()
+  def getUniformdv(program, location), do: ...
+
+  @spec getUniformfv(program, location) :: matrix() when program: integer(), location: integer()
+  def getUniformfv(program, location), do: ...
+
+  @spec getUniformfvARB(programObj, location) :: matrix() when programObj: integer(), location: integer()
+  def getUniformfvARB(programObj, location), do: ...
+
+  @spec getUniformiv(program, location) :: {integer(), integer(), integer(), integer(), integer(), integer(), integer(), integer(), integer(), integer(), integer(), integer(), integer(), integer(), integer(), integer()} when program: integer(), location: integer()
+  def getUniformiv(program, location), do: ...
+
+  @spec getUniformivARB(programObj, location) :: {integer(), integer(), integer(), integer(), integer(), integer(), integer(), integer(), integer(), integer(), integer(), integer(), integer(), integer(), integer(), integer()} when programObj: integer(), location: integer()
+  def getUniformivARB(programObj, location), do: ...
+
+  @spec getUniformuiv(program, location) :: {integer(), integer(), integer(), integer(), integer(), integer(), integer(), integer(), integer(), integer(), integer(), integer(), integer(), integer(), integer(), integer()} when program: integer(), location: integer()
+  def getUniformuiv(program, location), do: ...
+
+  @spec getVertexAttribIiv(index, pname) :: {integer(), integer(), integer(), integer()} when index: integer(), pname: enum()
+  def getVertexAttribIiv(index, pname), do: ...
+
+  @spec getVertexAttribIuiv(index, pname) :: {integer(), integer(), integer(), integer()} when index: integer(), pname: enum()
+  def getVertexAttribIuiv(index, pname), do: ...
+
+  @spec getVertexAttribLdv(index, pname) :: {unknown_type, unknown_type, unknown_type, unknown_type} when index: integer(), pname: enum()
+  def getVertexAttribLdv(index, pname), do: ...
+
+  @spec getVertexAttribdv(index, pname) :: {unknown_type, unknown_type, unknown_type, unknown_type} when index: integer(), pname: enum()
+  def getVertexAttribdv(index, pname), do: ...
+
+  @spec getVertexAttribfv(index, pname) :: {unknown_type, unknown_type, unknown_type, unknown_type} when index: integer(), pname: enum()
+  def getVertexAttribfv(index, pname), do: ...
+
+  @spec getVertexAttribiv(index, pname) :: {integer(), integer(), integer(), integer()} when index: integer(), pname: enum()
+  def getVertexAttribiv(index, pname), do: ...
+
+  @spec hint(target, mode) :: :ok when target: enum(), mode: enum()
+  def hint(target, mode), do: ...
+
+  @spec histogram(target, width, internalformat, sink) :: :ok when target: enum(), width: integer(), internalformat: enum(), sink: (0 | 1)
+  def histogram(target, width, internalformat, sink), do: ...
+
+  @spec indexMask(mask) :: :ok when mask: integer()
+  def indexMask(mask), do: ...
+
+  @spec indexPointer(type, stride, ptr) :: :ok when type: enum(), stride: integer(), ptr: (offset() | mem())
+  def indexPointer(type, stride, ptr) when is_integer(ptr), do: ...
+
+  def indexPointer(type, stride, ptr), do: ...
+
+  @spec indexd(c) :: :ok when c: unknown_type
+  def indexd(c), do: ...
+
+  @spec indexdv(c) :: :ok when c: {c :: unknown_type}
+  def indexdv({c}), do: ...
+
+  @spec indexf(c) :: :ok when c: unknown_type
+  def indexf(c), do: ...
+
+  @spec indexfv(c) :: :ok when c: {c :: unknown_type}
+  def indexfv({c}), do: ...
+
+  @spec indexi(c) :: :ok when c: integer()
+  def indexi(c), do: ...
+
+  @spec indexiv(c) :: :ok when c: {c :: integer()}
+  def indexiv({c}), do: ...
+
+  @spec indexs(c) :: :ok when c: integer()
+  def indexs(c), do: ...
+
+  @spec indexsv(c) :: :ok when c: {c :: integer()}
+  def indexsv({c}), do: ...
+
+  @spec indexub(c) :: :ok when c: integer()
+  def indexub(c), do: ...
+
+  @spec indexubv(c) :: :ok when c: {c :: integer()}
+  def indexubv({c}), do: ...
+
+  @spec initNames() :: :ok
+  def initNames(), do: ...
+
+  @spec interleavedArrays(format, stride, pointer) :: :ok when format: enum(), stride: integer(), pointer: (offset() | mem())
+  def interleavedArrays(format, stride, pointer) when is_integer(pointer), do: ...
+
+  def interleavedArrays(format, stride, pointer), do: ...
+
+  @spec isBuffer(buffer) :: (0 | 1) when buffer: integer()
+  def isBuffer(buffer), do: ...
+
+  @spec isEnabled(cap) :: (0 | 1) when cap: enum()
+  def isEnabled(cap), do: ...
+
+  @spec isEnabledi(target, index) :: (0 | 1) when target: enum(), index: integer()
+  def isEnabledi(target, index), do: ...
+
+  @spec isFramebuffer(framebuffer) :: (0 | 1) when framebuffer: integer()
+  def isFramebuffer(framebuffer), do: ...
+
+  @spec isList(list) :: (0 | 1) when list: integer()
+  def isList(list), do: ...
+
+  @spec isNamedStringARB(name) :: (0 | 1) when name: charlist()
+  def isNamedStringARB(name), do: ...
+
+  @spec isProgram(program) :: (0 | 1) when program: integer()
+  def isProgram(program), do: ...
+
+  @spec isProgramPipeline(pipeline) :: (0 | 1) when pipeline: integer()
+  def isProgramPipeline(pipeline), do: ...
+
+  @spec isQuery(id) :: (0 | 1) when id: integer()
+  def isQuery(id), do: ...
+
+  @spec isRenderbuffer(renderbuffer) :: (0 | 1) when renderbuffer: integer()
+  def isRenderbuffer(renderbuffer), do: ...
+
+  @spec isSampler(sampler) :: (0 | 1) when sampler: integer()
+  def isSampler(sampler), do: ...
+
+  @spec isShader(shader) :: (0 | 1) when shader: integer()
+  def isShader(shader), do: ...
+
+  @spec isSync(sync) :: (0 | 1) when sync: integer()
+  def isSync(sync), do: ...
+
+  @spec isTexture(texture) :: (0 | 1) when texture: integer()
+  def isTexture(texture), do: ...
+
+  @spec isTransformFeedback(id) :: (0 | 1) when id: integer()
+  def isTransformFeedback(id), do: ...
+
+  @spec isVertexArray(array) :: (0 | 1) when array: integer()
+  def isVertexArray(array), do: ...
+
+  @spec lightModelf(pname, param) :: :ok when pname: enum(), param: unknown_type
+  def lightModelf(pname, param), do: ...
+
+  @spec lightModelfv(pname, params) :: :ok when pname: enum(), params: tuple()
+  def lightModelfv(pname, params), do: ...
+
+  @spec lightModeli(pname, param) :: :ok when pname: enum(), param: integer()
+  def lightModeli(pname, param), do: ...
+
+  @spec lightModeliv(pname, params) :: :ok when pname: enum(), params: tuple()
+  def lightModeliv(pname, params), do: ...
+
+  @spec lightf(light, pname, param) :: :ok when light: enum(), pname: enum(), param: unknown_type
+  def lightf(light, pname, param), do: ...
+
+  @spec lightfv(light, pname, params) :: :ok when light: enum(), pname: enum(), params: tuple()
+  def lightfv(light, pname, params), do: ...
+
+  @spec lighti(light, pname, param) :: :ok when light: enum(), pname: enum(), param: integer()
+  def lighti(light, pname, param), do: ...
+
+  @spec lightiv(light, pname, params) :: :ok when light: enum(), pname: enum(), params: tuple()
+  def lightiv(light, pname, params), do: ...
+
+  @spec lineStipple(factor, pattern) :: :ok when factor: integer(), pattern: integer()
+  def lineStipple(factor, pattern), do: ...
+
+  @spec lineWidth(width) :: :ok when width: unknown_type
+  def lineWidth(width), do: ...
+
+  @spec linkProgram(program) :: :ok when program: integer()
+  def linkProgram(program), do: ...
+
+  @spec linkProgramARB(programObj) :: :ok when programObj: integer()
+  def linkProgramARB(programObj), do: ...
+
+  @spec listBase(base) :: :ok when base: integer()
+  def listBase(base), do: ...
+
+  @spec loadIdentity() :: :ok
+  def loadIdentity(), do: ...
+
+  @spec loadMatrixd(m) :: :ok when m: matrix()
+  def loadMatrixd({m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15, m16}), do: ...
+
+  def loadMatrixd({m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12}), do: ...
+
+  @spec loadMatrixf(m) :: :ok when m: matrix()
+  def loadMatrixf({m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15, m16}), do: ...
+
+  def loadMatrixf({m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12}), do: ...
+
+  @spec loadName(name) :: :ok when name: integer()
+  def loadName(name), do: ...
+
+  @spec loadTransposeMatrixd(m) :: :ok when m: matrix()
+  def loadTransposeMatrixd({m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15, m16}), do: ...
+
+  def loadTransposeMatrixd({m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12}), do: ...
+
+  @spec loadTransposeMatrixdARB(m) :: :ok when m: matrix()
+  def loadTransposeMatrixdARB({m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15, m16}), do: ...
+
+  def loadTransposeMatrixdARB({m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12}), do: ...
+
+  @spec loadTransposeMatrixf(m) :: :ok when m: matrix()
+  def loadTransposeMatrixf({m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15, m16}), do: ...
+
+  def loadTransposeMatrixf({m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12}), do: ...
+
+  @spec loadTransposeMatrixfARB(m) :: :ok when m: matrix()
+  def loadTransposeMatrixfARB({m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15, m16}), do: ...
+
+  def loadTransposeMatrixfARB({m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12}), do: ...
+
+  @spec logicOp(opcode) :: :ok when opcode: enum()
+  def logicOp(opcode), do: ...
+
+  @spec map1d(target, u1, u2, stride, order, points) :: :ok when target: enum(), u1: unknown_type, u2: unknown_type, stride: integer(), order: integer(), points: binary()
+  def map1d(target, u1, u2, stride, order, points), do: ...
+
+  @spec map1f(target, u1, u2, stride, order, points) :: :ok when target: enum(), u1: unknown_type, u2: unknown_type, stride: integer(), order: integer(), points: binary()
+  def map1f(target, u1, u2, stride, order, points), do: ...
+
+  @spec map2d(target, u1, u2, ustride, uorder, v1, v2, vstride, vorder, points) :: :ok when target: enum(), u1: unknown_type, u2: unknown_type, ustride: integer(), uorder: integer(), v1: unknown_type, v2: unknown_type, vstride: integer(), vorder: integer(), points: binary()
+  def map2d(target, u1, u2, ustride, uorder, v1, v2, vstride, vorder, points), do: ...
+
+  @spec map2f(target, u1, u2, ustride, uorder, v1, v2, vstride, vorder, points) :: :ok when target: enum(), u1: unknown_type, u2: unknown_type, ustride: integer(), uorder: integer(), v1: unknown_type, v2: unknown_type, vstride: integer(), vorder: integer(), points: binary()
+  def map2f(target, u1, u2, ustride, uorder, v1, v2, vstride, vorder, points), do: ...
+
+  @spec mapGrid1d(un, u1, u2) :: :ok when un: integer(), u1: unknown_type, u2: unknown_type
+  def mapGrid1d(un, u1, u2), do: ...
+
+  @spec mapGrid1f(un, u1, u2) :: :ok when un: integer(), u1: unknown_type, u2: unknown_type
+  def mapGrid1f(un, u1, u2), do: ...
+
+  @spec mapGrid2d(un, u1, u2, vn, v1, v2) :: :ok when un: integer(), u1: unknown_type, u2: unknown_type, vn: integer(), v1: unknown_type, v2: unknown_type
+  def mapGrid2d(un, u1, u2, vn, v1, v2), do: ...
+
+  @spec mapGrid2f(un, u1, u2, vn, v1, v2) :: :ok when un: integer(), u1: unknown_type, u2: unknown_type, vn: integer(), v1: unknown_type, v2: unknown_type
+  def mapGrid2f(un, u1, u2, vn, v1, v2), do: ...
+
+  @spec materialf(face, pname, param) :: :ok when face: enum(), pname: enum(), param: unknown_type
+  def materialf(face, pname, param), do: ...
+
+  @spec materialfv(face, pname, params) :: :ok when face: enum(), pname: enum(), params: tuple()
+  def materialfv(face, pname, params), do: ...
+
+  @spec materiali(face, pname, param) :: :ok when face: enum(), pname: enum(), param: integer()
+  def materiali(face, pname, param), do: ...
+
+  @spec materialiv(face, pname, params) :: :ok when face: enum(), pname: enum(), params: tuple()
+  def materialiv(face, pname, params), do: ...
+
+  @spec matrixIndexubvARB(indices) :: :ok when indices: [integer()]
+  def matrixIndexubvARB(indices), do: ...
+
+  @spec matrixIndexuivARB(indices) :: :ok when indices: [integer()]
+  def matrixIndexuivARB(indices), do: ...
+
+  @spec matrixIndexusvARB(indices) :: :ok when indices: [integer()]
+  def matrixIndexusvARB(indices), do: ...
+
+  @spec matrixMode(mode) :: :ok when mode: enum()
+  def matrixMode(mode), do: ...
+
+  @spec memoryBarrier(barriers) :: :ok when barriers: integer()
+  def memoryBarrier(barriers), do: ...
+
+  @spec minSampleShading(value) :: :ok when value: clamp()
+  def minSampleShading(value), do: ...
+
+  @spec minmax(target, internalformat, sink) :: :ok when target: enum(), internalformat: enum(), sink: (0 | 1)
+  def minmax(target, internalformat, sink), do: ...
 
   def module_info() do
     # body not decompiled
@@ -1803,2477 +1439,1483 @@ defmodule :gl do
     # body not decompiled
   end
 
-  def multMatrixd(p0) do
-    # body not decompiled
-  end
-
-  def multMatrixf(p0) do
-    # body not decompiled
-  end
-
-  def multTransposeMatrixd(p0) do
-    # body not decompiled
-  end
-
-  def multTransposeMatrixdARB(p0) do
-    # body not decompiled
-  end
-
-  def multTransposeMatrixf(p0) do
-    # body not decompiled
-  end
-
-  def multTransposeMatrixfARB(p0) do
-    # body not decompiled
-  end
-
-  def multiDrawArrays(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def multiTexCoord1d(p0, p1) do
-    # body not decompiled
-  end
-
-  def multiTexCoord1dv(p0, p1) do
-    # body not decompiled
-  end
-
-  def multiTexCoord1f(p0, p1) do
-    # body not decompiled
-  end
-
-  def multiTexCoord1fv(p0, p1) do
-    # body not decompiled
-  end
-
-  def multiTexCoord1i(p0, p1) do
-    # body not decompiled
-  end
-
-  def multiTexCoord1iv(p0, p1) do
-    # body not decompiled
-  end
-
-  def multiTexCoord1s(p0, p1) do
-    # body not decompiled
-  end
-
-  def multiTexCoord1sv(p0, p1) do
-    # body not decompiled
-  end
-
-  def multiTexCoord2d(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def multiTexCoord2dv(p0, p1) do
-    # body not decompiled
-  end
-
-  def multiTexCoord2f(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def multiTexCoord2fv(p0, p1) do
-    # body not decompiled
-  end
-
-  def multiTexCoord2i(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def multiTexCoord2iv(p0, p1) do
-    # body not decompiled
-  end
-
-  def multiTexCoord2s(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def multiTexCoord2sv(p0, p1) do
-    # body not decompiled
-  end
-
-  def multiTexCoord3d(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def multiTexCoord3dv(p0, p1) do
-    # body not decompiled
-  end
-
-  def multiTexCoord3f(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def multiTexCoord3fv(p0, p1) do
-    # body not decompiled
-  end
-
-  def multiTexCoord3i(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def multiTexCoord3iv(p0, p1) do
-    # body not decompiled
-  end
-
-  def multiTexCoord3s(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def multiTexCoord3sv(p0, p1) do
-    # body not decompiled
-  end
-
-  def multiTexCoord4d(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def multiTexCoord4dv(p0, p1) do
-    # body not decompiled
-  end
-
-  def multiTexCoord4f(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def multiTexCoord4fv(p0, p1) do
-    # body not decompiled
-  end
-
-  def multiTexCoord4i(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def multiTexCoord4iv(p0, p1) do
-    # body not decompiled
-  end
-
-  def multiTexCoord4s(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def multiTexCoord4sv(p0, p1) do
-    # body not decompiled
-  end
-
-  def namedStringARB(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def newList(p0, p1) do
-    # body not decompiled
-  end
-
-  def normal3b(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def normal3bv(p0) do
-    # body not decompiled
-  end
-
-  def normal3d(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def normal3dv(p0) do
-    # body not decompiled
-  end
-
-  def normal3f(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def normal3fv(p0) do
-    # body not decompiled
-  end
-
-  def normal3i(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def normal3iv(p0) do
-    # body not decompiled
-  end
-
-  def normal3s(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def normal3sv(p0) do
-    # body not decompiled
-  end
-
-  def normalPointer(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def ortho(p0, p1, p2, p3, p4, p5) do
-    # body not decompiled
-  end
-
-  def passThrough(p0) do
-    # body not decompiled
-  end
-
-  def patchParameterfv(p0, p1) do
-    # body not decompiled
-  end
-
-  def patchParameteri(p0, p1) do
-    # body not decompiled
-  end
-
-  def pauseTransformFeedback() do
-    # body not decompiled
-  end
-
-  def pixelMapfv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def pixelMapuiv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def pixelMapusv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def pixelStoref(p0, p1) do
-    # body not decompiled
-  end
-
-  def pixelStorei(p0, p1) do
-    # body not decompiled
-  end
-
-  def pixelTransferf(p0, p1) do
-    # body not decompiled
-  end
-
-  def pixelTransferi(p0, p1) do
-    # body not decompiled
-  end
-
-  def pixelZoom(p0, p1) do
-    # body not decompiled
-  end
-
-  def pointParameterf(p0, p1) do
-    # body not decompiled
-  end
-
-  def pointParameterfv(p0, p1) do
-    # body not decompiled
-  end
-
-  def pointParameteri(p0, p1) do
-    # body not decompiled
-  end
-
-  def pointParameteriv(p0, p1) do
-    # body not decompiled
-  end
-
-  def pointSize(p0) do
-    # body not decompiled
-  end
-
-  def polygonMode(p0, p1) do
-    # body not decompiled
-  end
-
-  def polygonOffset(p0, p1) do
-    # body not decompiled
-  end
-
-  def polygonStipple(p0) do
-    # body not decompiled
-  end
-
-  def popAttrib() do
-    # body not decompiled
-  end
-
-  def popClientAttrib() do
-    # body not decompiled
-  end
-
-  def popMatrix() do
-    # body not decompiled
-  end
-
-  def popName() do
-    # body not decompiled
-  end
-
-  def primitiveRestartIndex(p0) do
-    # body not decompiled
-  end
-
-  def prioritizeTextures(p0, p1) do
-    # body not decompiled
-  end
-
-  def programBinary(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def programEnvParameter4dARB(p0, p1, p2, p3, p4, p5) do
-    # body not decompiled
-  end
-
-  def programEnvParameter4dvARB(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def programEnvParameter4fARB(p0, p1, p2, p3, p4, p5) do
-    # body not decompiled
-  end
-
-  def programEnvParameter4fvARB(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def programLocalParameter4dARB(p0, p1, p2, p3, p4, p5) do
-    # body not decompiled
-  end
-
-  def programLocalParameter4dvARB(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def programLocalParameter4fARB(p0, p1, p2, p3, p4, p5) do
-    # body not decompiled
-  end
-
-  def programLocalParameter4fvARB(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def programParameteri(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def programStringARB(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def programUniform1d(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def programUniform1dv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def programUniform1f(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def programUniform1fv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def programUniform1i(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def programUniform1iv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def programUniform1ui(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def programUniform1uiv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def programUniform2d(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def programUniform2dv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def programUniform2f(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def programUniform2fv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def programUniform2i(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def programUniform2iv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def programUniform2ui(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def programUniform2uiv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def programUniform3d(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def programUniform3dv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def programUniform3f(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def programUniform3fv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def programUniform3i(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def programUniform3iv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def programUniform3ui(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def programUniform3uiv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def programUniform4d(p0, p1, p2, p3, p4, p5) do
-    # body not decompiled
-  end
-
-  def programUniform4dv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def programUniform4f(p0, p1, p2, p3, p4, p5) do
-    # body not decompiled
-  end
-
-  def programUniform4fv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def programUniform4i(p0, p1, p2, p3, p4, p5) do
-    # body not decompiled
-  end
-
-  def programUniform4iv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def programUniform4ui(p0, p1, p2, p3, p4, p5) do
-    # body not decompiled
-  end
-
-  def programUniform4uiv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def programUniformMatrix2dv(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def programUniformMatrix2fv(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def programUniformMatrix2x3dv(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def programUniformMatrix2x3fv(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def programUniformMatrix2x4dv(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def programUniformMatrix2x4fv(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def programUniformMatrix3dv(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def programUniformMatrix3fv(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def programUniformMatrix3x2dv(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def programUniformMatrix3x2fv(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def programUniformMatrix3x4dv(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def programUniformMatrix3x4fv(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def programUniformMatrix4dv(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def programUniformMatrix4fv(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def programUniformMatrix4x2dv(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def programUniformMatrix4x2fv(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def programUniformMatrix4x3dv(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def programUniformMatrix4x3fv(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def provokingVertex(p0) do
-    # body not decompiled
-  end
-
-  def pushAttrib(p0) do
-    # body not decompiled
-  end
-
-  def pushClientAttrib(p0) do
-    # body not decompiled
-  end
-
-  def pushMatrix() do
-    # body not decompiled
-  end
-
-  def pushName(p0) do
-    # body not decompiled
-  end
-
-  def queryCounter(p0, p1) do
-    # body not decompiled
-  end
-
-  def rasterPos2d(p0, p1) do
-    # body not decompiled
-  end
-
-  def rasterPos2dv(p0) do
-    # body not decompiled
-  end
-
-  def rasterPos2f(p0, p1) do
-    # body not decompiled
-  end
-
-  def rasterPos2fv(p0) do
-    # body not decompiled
-  end
-
-  def rasterPos2i(p0, p1) do
-    # body not decompiled
-  end
-
-  def rasterPos2iv(p0) do
-    # body not decompiled
-  end
-
-  def rasterPos2s(p0, p1) do
-    # body not decompiled
-  end
-
-  def rasterPos2sv(p0) do
-    # body not decompiled
-  end
-
-  def rasterPos3d(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def rasterPos3dv(p0) do
-    # body not decompiled
-  end
-
-  def rasterPos3f(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def rasterPos3fv(p0) do
-    # body not decompiled
-  end
-
-  def rasterPos3i(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def rasterPos3iv(p0) do
-    # body not decompiled
-  end
-
-  def rasterPos3s(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def rasterPos3sv(p0) do
-    # body not decompiled
-  end
-
-  def rasterPos4d(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def rasterPos4dv(p0) do
-    # body not decompiled
-  end
-
-  def rasterPos4f(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def rasterPos4fv(p0) do
-    # body not decompiled
-  end
-
-  def rasterPos4i(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def rasterPos4iv(p0) do
-    # body not decompiled
-  end
-
-  def rasterPos4s(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def rasterPos4sv(p0) do
-    # body not decompiled
-  end
-
-  def readBuffer(p0) do
-    # body not decompiled
-  end
-
-  def readPixels(p0, p1, p2, p3, p4, p5, p6) do
-    # body not decompiled
-  end
-
-  def rectd(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def rectdv(p0, p1) do
-    # body not decompiled
-  end
-
-  def rectf(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def rectfv(p0, p1) do
-    # body not decompiled
-  end
-
-  def recti(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def rectiv(p0, p1) do
-    # body not decompiled
-  end
-
-  def rects(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def rectsv(p0, p1) do
-    # body not decompiled
-  end
-
-  def releaseShaderCompiler() do
-    # body not decompiled
-  end
-
-  def renderMode(p0) do
-    # body not decompiled
-  end
-
-  def renderbufferStorage(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def renderbufferStorageMultisample(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def resetHistogram(p0) do
-    # body not decompiled
-  end
-
-  def resetMinmax(p0) do
-    # body not decompiled
-  end
-
-  def resumeTransformFeedback() do
-    # body not decompiled
-  end
-
-  def rotated(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def rotatef(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def sampleCoverage(p0, p1) do
-    # body not decompiled
-  end
-
-  def sampleMaski(p0, p1) do
-    # body not decompiled
-  end
-
-  def samplerParameterIiv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def samplerParameterIuiv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def samplerParameterf(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def samplerParameterfv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def samplerParameteri(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def samplerParameteriv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def scaled(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def scalef(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def scissor(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def scissorArrayv(p0, p1) do
-    # body not decompiled
-  end
-
-  def scissorIndexed(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def scissorIndexedv(p0, p1) do
-    # body not decompiled
-  end
-
-  def secondaryColor3b(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def secondaryColor3bv(p0) do
-    # body not decompiled
-  end
-
-  def secondaryColor3d(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def secondaryColor3dv(p0) do
-    # body not decompiled
-  end
-
-  def secondaryColor3f(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def secondaryColor3fv(p0) do
-    # body not decompiled
-  end
-
-  def secondaryColor3i(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def secondaryColor3iv(p0) do
-    # body not decompiled
-  end
-
-  def secondaryColor3s(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def secondaryColor3sv(p0) do
-    # body not decompiled
-  end
-
-  def secondaryColor3ub(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def secondaryColor3ubv(p0) do
-    # body not decompiled
-  end
-
-  def secondaryColor3ui(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def secondaryColor3uiv(p0) do
-    # body not decompiled
-  end
-
-  def secondaryColor3us(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def secondaryColor3usv(p0) do
-    # body not decompiled
-  end
-
-  def secondaryColorPointer(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def selectBuffer(p0, p1) do
-    # body not decompiled
-  end
-
-  def send_bin(p0) do
-    # body not decompiled
-  end
-
-  def separableFilter2D(p0, p1, p2, p3, p4, p5, p6, p7) do
-    # body not decompiled
-  end
-
-  def shadeModel(p0) do
-    # body not decompiled
-  end
-
-  def shaderBinary(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def shaderSource(p0, p1) do
-    # body not decompiled
-  end
-
-  def shaderSourceARB(p0, p1) do
-    # body not decompiled
-  end
-
-  def stencilClearTagEXT(p0, p1) do
-    # body not decompiled
-  end
-
-  def stencilFunc(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def stencilFuncSeparate(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def stencilMask(p0) do
-    # body not decompiled
-  end
-
-  def stencilMaskSeparate(p0, p1) do
-    # body not decompiled
-  end
-
-  def stencilOp(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def stencilOpSeparate(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def texBuffer(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def texCoord1d(p0) do
-    # body not decompiled
-  end
-
-  def texCoord1dv(p0) do
-    # body not decompiled
-  end
-
-  def texCoord1f(p0) do
-    # body not decompiled
-  end
-
-  def texCoord1fv(p0) do
-    # body not decompiled
-  end
-
-  def texCoord1i(p0) do
-    # body not decompiled
-  end
-
-  def texCoord1iv(p0) do
-    # body not decompiled
-  end
-
-  def texCoord1s(p0) do
-    # body not decompiled
-  end
-
-  def texCoord1sv(p0) do
-    # body not decompiled
-  end
-
-  def texCoord2d(p0, p1) do
-    # body not decompiled
-  end
-
-  def texCoord2dv(p0) do
-    # body not decompiled
-  end
-
-  def texCoord2f(p0, p1) do
-    # body not decompiled
-  end
-
-  def texCoord2fv(p0) do
-    # body not decompiled
-  end
-
-  def texCoord2i(p0, p1) do
-    # body not decompiled
-  end
-
-  def texCoord2iv(p0) do
-    # body not decompiled
-  end
-
-  def texCoord2s(p0, p1) do
-    # body not decompiled
-  end
-
-  def texCoord2sv(p0) do
-    # body not decompiled
-  end
-
-  def texCoord3d(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def texCoord3dv(p0) do
-    # body not decompiled
-  end
-
-  def texCoord3f(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def texCoord3fv(p0) do
-    # body not decompiled
-  end
-
-  def texCoord3i(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def texCoord3iv(p0) do
-    # body not decompiled
-  end
-
-  def texCoord3s(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def texCoord3sv(p0) do
-    # body not decompiled
-  end
-
-  def texCoord4d(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def texCoord4dv(p0) do
-    # body not decompiled
-  end
-
-  def texCoord4f(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def texCoord4fv(p0) do
-    # body not decompiled
-  end
-
-  def texCoord4i(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def texCoord4iv(p0) do
-    # body not decompiled
-  end
-
-  def texCoord4s(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def texCoord4sv(p0) do
-    # body not decompiled
-  end
-
-  def texCoordPointer(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def texEnvf(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def texEnvfv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def texEnvi(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def texEnviv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def texGend(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def texGendv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def texGenf(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def texGenfv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def texGeni(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def texGeniv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def texImage1D(p0, p1, p2, p3, p4, p5, p6, p7) do
-    # body not decompiled
-  end
-
-  def texImage2D(p0, p1, p2, p3, p4, p5, p6, p7, p8) do
-    # body not decompiled
-  end
-
-  def texImage2DMultisample(p0, p1, p2, p3, p4, p5) do
-    # body not decompiled
-  end
-
-  def texImage3D(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9) do
-    # body not decompiled
-  end
-
-  def texImage3DMultisample(p0, p1, p2, p3, p4, p5, p6) do
-    # body not decompiled
-  end
-
-  def texParameterIiv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def texParameterIuiv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def texParameterf(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def texParameterfv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def texParameteri(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def texParameteriv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def texStorage1D(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def texStorage2D(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def texStorage3D(p0, p1, p2, p3, p4, p5) do
-    # body not decompiled
-  end
-
-  def texSubImage1D(p0, p1, p2, p3, p4, p5, p6) do
-    # body not decompiled
-  end
-
-  def texSubImage2D(p0, p1, p2, p3, p4, p5, p6, p7, p8) do
-    # body not decompiled
-  end
-
-  def texSubImage3D(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10) do
-    # body not decompiled
-  end
-
-  def transformFeedbackVaryings(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def translated(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def translatef(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def uniform1d(p0, p1) do
-    # body not decompiled
-  end
-
-  def uniform1dv(p0, p1) do
-    # body not decompiled
-  end
-
-  def uniform1f(p0, p1) do
-    # body not decompiled
-  end
-
-  def uniform1fv(p0, p1) do
-    # body not decompiled
-  end
-
-  def uniform1i(p0, p1) do
-    # body not decompiled
-  end
-
-  def uniform1iv(p0, p1) do
-    # body not decompiled
-  end
-
-  def uniform1ui(p0, p1) do
-    # body not decompiled
-  end
-
-  def uniform1uiv(p0, p1) do
-    # body not decompiled
-  end
-
-  def uniform2d(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def uniform2dv(p0, p1) do
-    # body not decompiled
-  end
-
-  def uniform2f(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def uniform2fv(p0, p1) do
-    # body not decompiled
-  end
-
-  def uniform2i(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def uniform2iv(p0, p1) do
-    # body not decompiled
-  end
-
-  def uniform2ui(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def uniform2uiv(p0, p1) do
-    # body not decompiled
-  end
-
-  def uniform3d(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def uniform3dv(p0, p1) do
-    # body not decompiled
-  end
-
-  def uniform3f(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def uniform3fv(p0, p1) do
-    # body not decompiled
-  end
-
-  def uniform3i(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def uniform3iv(p0, p1) do
-    # body not decompiled
-  end
-
-  def uniform3ui(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def uniform3uiv(p0, p1) do
-    # body not decompiled
-  end
-
-  def uniform4d(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def uniform4dv(p0, p1) do
-    # body not decompiled
-  end
-
-  def uniform4f(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def uniform4fv(p0, p1) do
-    # body not decompiled
-  end
-
-  def uniform4i(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def uniform4iv(p0, p1) do
-    # body not decompiled
-  end
-
-  def uniform4ui(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def uniform4uiv(p0, p1) do
-    # body not decompiled
-  end
-
-  def uniformBlockBinding(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def uniformMatrix2dv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def uniformMatrix2fv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def uniformMatrix2x3dv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def uniformMatrix2x3fv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def uniformMatrix2x4dv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def uniformMatrix2x4fv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def uniformMatrix3dv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def uniformMatrix3fv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def uniformMatrix3x2dv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def uniformMatrix3x2fv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def uniformMatrix3x4dv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def uniformMatrix3x4fv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def uniformMatrix4dv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def uniformMatrix4fv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def uniformMatrix4x2dv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def uniformMatrix4x2fv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def uniformMatrix4x3dv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def uniformMatrix4x3fv(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def uniformSubroutinesuiv(p0, p1) do
-    # body not decompiled
-  end
-
-  def useProgram(p0) do
-    # body not decompiled
-  end
-
-  def useProgramObjectARB(p0) do
-    # body not decompiled
-  end
-
-  def useProgramStages(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def validateProgram(p0) do
-    # body not decompiled
-  end
-
-  def validateProgramARB(p0) do
-    # body not decompiled
-  end
-
-  def validateProgramPipeline(p0) do
-    # body not decompiled
-  end
-
-  def vertex2d(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertex2dv(p0) do
-    # body not decompiled
-  end
-
-  def vertex2f(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertex2fv(p0) do
-    # body not decompiled
-  end
-
-  def vertex2i(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertex2iv(p0) do
-    # body not decompiled
-  end
-
-  def vertex2s(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertex2sv(p0) do
-    # body not decompiled
-  end
-
-  def vertex3d(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def vertex3dv(p0) do
-    # body not decompiled
-  end
-
-  def vertex3f(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def vertex3fv(p0) do
-    # body not decompiled
-  end
-
-  def vertex3i(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def vertex3iv(p0) do
-    # body not decompiled
-  end
-
-  def vertex3s(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def vertex3sv(p0) do
-    # body not decompiled
-  end
-
-  def vertex4d(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def vertex4dv(p0) do
-    # body not decompiled
-  end
-
-  def vertex4f(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def vertex4fv(p0) do
-    # body not decompiled
-  end
-
-  def vertex4i(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def vertex4iv(p0) do
-    # body not decompiled
-  end
-
-  def vertex4s(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def vertex4sv(p0) do
-    # body not decompiled
-  end
-
-  def vertexAttrib1d(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttrib1dv(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttrib1f(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttrib1fv(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttrib1s(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttrib1sv(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttrib2d(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def vertexAttrib2dv(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttrib2f(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def vertexAttrib2fv(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttrib2s(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def vertexAttrib2sv(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttrib3d(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def vertexAttrib3dv(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttrib3f(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def vertexAttrib3fv(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttrib3s(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def vertexAttrib3sv(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttrib4Nbv(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttrib4Niv(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttrib4Nsv(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttrib4Nub(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def vertexAttrib4Nubv(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttrib4Nuiv(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttrib4Nusv(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttrib4bv(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttrib4d(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def vertexAttrib4dv(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttrib4f(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def vertexAttrib4fv(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttrib4iv(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttrib4s(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def vertexAttrib4sv(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttrib4ubv(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttrib4uiv(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttrib4usv(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttribDivisor(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttribI1i(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttribI1iv(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttribI1ui(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttribI1uiv(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttribI2i(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def vertexAttribI2iv(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttribI2ui(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def vertexAttribI2uiv(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttribI3i(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def vertexAttribI3iv(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttribI3ui(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def vertexAttribI3uiv(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttribI4bv(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttribI4i(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def vertexAttribI4iv(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttribI4sv(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttribI4ubv(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttribI4ui(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def vertexAttribI4uiv(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttribI4usv(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttribIPointer(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def vertexAttribL1d(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttribL1dv(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttribL2d(p0, p1, p2) do
-    # body not decompiled
-  end
-
-  def vertexAttribL2dv(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttribL3d(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def vertexAttribL3dv(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttribL4d(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def vertexAttribL4dv(p0, p1) do
-    # body not decompiled
-  end
-
-  def vertexAttribLPointer(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def vertexAttribPointer(p0, p1, p2, p3, p4, p5) do
-    # body not decompiled
-  end
-
-  def vertexBlendARB(p0) do
-    # body not decompiled
-  end
-
-  def vertexPointer(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def viewport(p0, p1, p2, p3) do
-    # body not decompiled
-  end
-
-  def viewportArrayv(p0, p1) do
-    # body not decompiled
-  end
-
-  def viewportIndexedf(p0, p1, p2, p3, p4) do
-    # body not decompiled
-  end
-
-  def viewportIndexedfv(p0, p1) do
-    # body not decompiled
-  end
-
-  def waitSync(p0, p1, p2) do
-    # body not decompiled
-  end
+  @spec multMatrixd(m) :: :ok when m: matrix()
+  def multMatrixd({m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15, m16}), do: ...
 
-  def weightbvARB(p0) do
-    # body not decompiled
-  end
+  def multMatrixd({m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12}), do: ...
 
-  def weightdvARB(p0) do
-    # body not decompiled
-  end
+  @spec multMatrixf(m) :: :ok when m: matrix()
+  def multMatrixf({m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15, m16}), do: ...
 
-  def weightfvARB(p0) do
-    # body not decompiled
-  end
+  def multMatrixf({m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12}), do: ...
 
-  def weightivARB(p0) do
-    # body not decompiled
-  end
+  @spec multTransposeMatrixd(m) :: :ok when m: matrix()
+  def multTransposeMatrixd({m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15, m16}), do: ...
 
-  def weightsvARB(p0) do
-    # body not decompiled
-  end
+  def multTransposeMatrixd({m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12}), do: ...
 
-  def weightubvARB(p0) do
-    # body not decompiled
-  end
+  @spec multTransposeMatrixdARB(m) :: :ok when m: matrix()
+  def multTransposeMatrixdARB({m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15, m16}), do: ...
 
-  def weightuivARB(p0) do
-    # body not decompiled
-  end
+  def multTransposeMatrixdARB({m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12}), do: ...
 
-  def weightusvARB(p0) do
-    # body not decompiled
-  end
+  @spec multTransposeMatrixf(m) :: :ok when m: matrix()
+  def multTransposeMatrixf({m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15, m16}), do: ...
 
-  def windowPos2d(p0, p1) do
-    # body not decompiled
-  end
+  def multTransposeMatrixf({m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12}), do: ...
 
-  def windowPos2dv(p0) do
-    # body not decompiled
-  end
+  @spec multTransposeMatrixfARB(m) :: :ok when m: matrix()
+  def multTransposeMatrixfARB({m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15, m16}), do: ...
 
-  def windowPos2f(p0, p1) do
-    # body not decompiled
-  end
+  def multTransposeMatrixfARB({m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12}), do: ...
 
-  def windowPos2fv(p0) do
-    # body not decompiled
-  end
+  @spec multiDrawArrays(mode, first, count) :: :ok when mode: enum(), first: ([integer()] | mem()), count: ([integer()] | mem())
+  def multiDrawArrays(mode, first, count) when is_list(first) and is_list(count), do: ...
 
-  def windowPos2i(p0, p1) do
-    # body not decompiled
-  end
+  def multiDrawArrays(mode, first, count), do: ...
 
-  def windowPos2iv(p0) do
-    # body not decompiled
-  end
+  @spec multiTexCoord1d(target, s) :: :ok when target: enum(), s: unknown_type
+  def multiTexCoord1d(target, s), do: ...
 
-  def windowPos2s(p0, p1) do
-    # body not decompiled
-  end
+  @spec multiTexCoord1dv(target :: enum(), v) :: :ok when v: {s :: unknown_type}
+  def multiTexCoord1dv(target, {s}), do: ...
 
-  def windowPos2sv(p0) do
-    # body not decompiled
-  end
+  @spec multiTexCoord1f(target, s) :: :ok when target: enum(), s: unknown_type
+  def multiTexCoord1f(target, s), do: ...
 
-  def windowPos3d(p0, p1, p2) do
-    # body not decompiled
-  end
+  @spec multiTexCoord1fv(target :: enum(), v) :: :ok when v: {s :: unknown_type}
+  def multiTexCoord1fv(target, {s}), do: ...
 
-  def windowPos3dv(p0) do
-    # body not decompiled
-  end
+  @spec multiTexCoord1i(target, s) :: :ok when target: enum(), s: integer()
+  def multiTexCoord1i(target, s), do: ...
 
-  def windowPos3f(p0, p1, p2) do
-    # body not decompiled
-  end
+  @spec multiTexCoord1iv(target :: enum(), v) :: :ok when v: {s :: integer()}
+  def multiTexCoord1iv(target, {s}), do: ...
 
-  def windowPos3fv(p0) do
-    # body not decompiled
-  end
+  @spec multiTexCoord1s(target, s) :: :ok when target: enum(), s: integer()
+  def multiTexCoord1s(target, s), do: ...
 
-  def windowPos3i(p0, p1, p2) do
-    # body not decompiled
-  end
+  @spec multiTexCoord1sv(target :: enum(), v) :: :ok when v: {s :: integer()}
+  def multiTexCoord1sv(target, {s}), do: ...
 
-  def windowPos3iv(p0) do
-    # body not decompiled
-  end
+  @spec multiTexCoord2d(target, s, t) :: :ok when target: enum(), s: unknown_type, t: unknown_type
+  def multiTexCoord2d(target, s, t), do: ...
 
-  def windowPos3s(p0, p1, p2) do
-    # body not decompiled
-  end
+  @spec multiTexCoord2dv(target :: enum(), v) :: :ok when v: {s :: unknown_type, t :: unknown_type}
+  def multiTexCoord2dv(target, {s, t}), do: ...
 
-  def windowPos3sv(p0) do
-    # body not decompiled
-  end
+  @spec multiTexCoord2f(target, s, t) :: :ok when target: enum(), s: unknown_type, t: unknown_type
+  def multiTexCoord2f(target, s, t), do: ...
 
-  # Private Functions
-
-  defp unquote(:"-areTexturesResident/1-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-callLists/1-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-clearBufferfv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-clearBufferiv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-clearBufferuiv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-compileShaderIncludeARB/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-convolutionParameterf/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-convolutionParameteri/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-createShaderProgramv/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-debugMessageControlARB/5-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-deleteBuffers/1-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-deleteFramebuffers/1-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-deleteProgramPipelines/1-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-deleteProgramsARB/1-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-deleteQueries/1-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-deleteRenderbuffers/1-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-deleteSamplers/1-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-deleteTextures/1-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-deleteTransformFeedbacks/1-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-deleteVertexArrays/1-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-depthRangeArrayv/2-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-drawBuffers/1-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-fogfv/2-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-fogiv/2-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getActiveUniformsiv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-getUniformIndices/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-lightModelfv/2-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-lightModeliv/2-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-lightfv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-lightiv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-materialfv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-materialiv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-matrixIndexubvARB/1-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-matrixIndexuivARB/1-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-matrixIndexusvARB/1-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-multiDrawArrays/3-lbc$^0/2-1-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-multiDrawArrays/3-lbc$^1/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-patchParameterfv/2-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-pointParameterfv/2-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-pointParameteriv/2-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-prioritizeTextures/2-lbc$^0/2-1-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-prioritizeTextures/2-lbc$^1/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-programUniform1dv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-programUniform1fv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-programUniform1iv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-programUniform1uiv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-programUniform2dv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-programUniform2fv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-programUniform2iv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-programUniform2uiv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-programUniform3dv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-programUniform3fv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-programUniform3iv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-programUniform3uiv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-programUniform4dv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-programUniform4fv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-programUniform4iv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-programUniform4uiv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-programUniformMatrix2dv/4-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-programUniformMatrix2fv/4-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-programUniformMatrix2x3dv/4-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-programUniformMatrix2x3fv/4-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-programUniformMatrix2x4dv/4-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-programUniformMatrix2x4fv/4-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-programUniformMatrix3dv/4-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-programUniformMatrix3fv/4-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-programUniformMatrix3x2dv/4-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-programUniformMatrix3x2fv/4-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-programUniformMatrix3x4dv/4-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-programUniformMatrix3x4fv/4-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-programUniformMatrix4dv/4-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-programUniformMatrix4fv/4-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-programUniformMatrix4x2dv/4-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-programUniformMatrix4x2fv/4-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-programUniformMatrix4x3dv/4-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-programUniformMatrix4x3fv/4-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-samplerParameterIiv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-samplerParameterIuiv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-samplerParameterfv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-samplerParameteriv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-scissorArrayv/2-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-shaderBinary/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-shaderSource/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-shaderSourceARB/2-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-texEnvfv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-texEnviv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-texGendv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-texGenfv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-texGeniv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-texParameterIiv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-texParameterIuiv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-texParameterfv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-texParameteriv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-transformFeedbackVaryings/3-lc$^0/1-0-")(p0) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-uniform1dv/2-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-uniform1fv/2-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-uniform1iv/2-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-uniform1uiv/2-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-uniform2dv/2-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-uniform2fv/2-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-uniform2iv/2-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-uniform2uiv/2-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-uniform3dv/2-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-uniform3fv/2-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-uniform3iv/2-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-uniform3uiv/2-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-uniform4dv/2-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-uniform4fv/2-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-uniform4iv/2-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-uniform4uiv/2-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-uniformMatrix2dv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-uniformMatrix2fv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-uniformMatrix2x3dv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-uniformMatrix2x3fv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-uniformMatrix2x4dv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-uniformMatrix2x4fv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-uniformMatrix3dv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-uniformMatrix3fv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-uniformMatrix3x2dv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-uniformMatrix3x2fv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-uniformMatrix3x4dv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-uniformMatrix3x4fv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-uniformMatrix4dv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-uniformMatrix4fv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-uniformMatrix4x2dv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-uniformMatrix4x2fv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-uniformMatrix4x3dv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-uniformMatrix4x3fv/3-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-uniformSubroutinesuiv/2-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-viewportArrayv/2-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-weightbvARB/1-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-weightdvARB/1-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-weightfvARB/1-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-weightivARB/1-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-weightsvARB/1-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-weightubvARB/1-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-weightuivARB/1-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp unquote(:"-weightusvARB/1-lbc$^0/2-0-")(p0, p1) do
-    # body not decompiled
-  end
-
-  defp rec(p0) do
-    # body not decompiled
-  end
+  @spec multiTexCoord2fv(target :: enum(), v) :: :ok when v: {s :: unknown_type, t :: unknown_type}
+  def multiTexCoord2fv(target, {s, t}), do: ...
+
+  @spec multiTexCoord2i(target, s, t) :: :ok when target: enum(), s: integer(), t: integer()
+  def multiTexCoord2i(target, s, t), do: ...
+
+  @spec multiTexCoord2iv(target :: enum(), v) :: :ok when v: {s :: integer(), t :: integer()}
+  def multiTexCoord2iv(target, {s, t}), do: ...
+
+  @spec multiTexCoord2s(target, s, t) :: :ok when target: enum(), s: integer(), t: integer()
+  def multiTexCoord2s(target, s, t), do: ...
+
+  @spec multiTexCoord2sv(target :: enum(), v) :: :ok when v: {s :: integer(), t :: integer()}
+  def multiTexCoord2sv(target, {s, t}), do: ...
+
+  @spec multiTexCoord3d(target, s, t, r) :: :ok when target: enum(), s: unknown_type, t: unknown_type, r: unknown_type
+  def multiTexCoord3d(target, s, t, r), do: ...
+
+  @spec multiTexCoord3dv(target :: enum(), v) :: :ok when v: {s :: unknown_type, t :: unknown_type, r :: unknown_type}
+  def multiTexCoord3dv(target, {s, t, r}), do: ...
+
+  @spec multiTexCoord3f(target, s, t, r) :: :ok when target: enum(), s: unknown_type, t: unknown_type, r: unknown_type
+  def multiTexCoord3f(target, s, t, r), do: ...
+
+  @spec multiTexCoord3fv(target :: enum(), v) :: :ok when v: {s :: unknown_type, t :: unknown_type, r :: unknown_type}
+  def multiTexCoord3fv(target, {s, t, r}), do: ...
+
+  @spec multiTexCoord3i(target, s, t, r) :: :ok when target: enum(), s: integer(), t: integer(), r: integer()
+  def multiTexCoord3i(target, s, t, r), do: ...
+
+  @spec multiTexCoord3iv(target :: enum(), v) :: :ok when v: {s :: integer(), t :: integer(), r :: integer()}
+  def multiTexCoord3iv(target, {s, t, r}), do: ...
+
+  @spec multiTexCoord3s(target, s, t, r) :: :ok when target: enum(), s: integer(), t: integer(), r: integer()
+  def multiTexCoord3s(target, s, t, r), do: ...
+
+  @spec multiTexCoord3sv(target :: enum(), v) :: :ok when v: {s :: integer(), t :: integer(), r :: integer()}
+  def multiTexCoord3sv(target, {s, t, r}), do: ...
+
+  @spec multiTexCoord4d(target, s, t, r, q) :: :ok when target: enum(), s: unknown_type, t: unknown_type, r: unknown_type, q: unknown_type
+  def multiTexCoord4d(target, s, t, r, q), do: ...
+
+  @spec multiTexCoord4dv(target :: enum(), v) :: :ok when v: {s :: unknown_type, t :: unknown_type, r :: unknown_type, q :: unknown_type}
+  def multiTexCoord4dv(target, {s, t, r, q}), do: ...
+
+  @spec multiTexCoord4f(target, s, t, r, q) :: :ok when target: enum(), s: unknown_type, t: unknown_type, r: unknown_type, q: unknown_type
+  def multiTexCoord4f(target, s, t, r, q), do: ...
+
+  @spec multiTexCoord4fv(target :: enum(), v) :: :ok when v: {s :: unknown_type, t :: unknown_type, r :: unknown_type, q :: unknown_type}
+  def multiTexCoord4fv(target, {s, t, r, q}), do: ...
+
+  @spec multiTexCoord4i(target, s, t, r, q) :: :ok when target: enum(), s: integer(), t: integer(), r: integer(), q: integer()
+  def multiTexCoord4i(target, s, t, r, q), do: ...
+
+  @spec multiTexCoord4iv(target :: enum(), v) :: :ok when v: {s :: integer(), t :: integer(), r :: integer(), q :: integer()}
+  def multiTexCoord4iv(target, {s, t, r, q}), do: ...
+
+  @spec multiTexCoord4s(target, s, t, r, q) :: :ok when target: enum(), s: integer(), t: integer(), r: integer(), q: integer()
+  def multiTexCoord4s(target, s, t, r, q), do: ...
+
+  @spec multiTexCoord4sv(target :: enum(), v) :: :ok when v: {s :: integer(), t :: integer(), r :: integer(), q :: integer()}
+  def multiTexCoord4sv(target, {s, t, r, q}), do: ...
+
+  @spec namedStringARB(type, name, string) :: :ok when type: enum(), name: charlist(), string: charlist()
+  def namedStringARB(type, name, string), do: ...
+
+  @spec newList(list, mode) :: :ok when list: integer(), mode: enum()
+  def newList(list, mode), do: ...
+
+  @spec normal3b(nx, ny, nz) :: :ok when nx: integer(), ny: integer(), nz: integer()
+  def normal3b(nx, ny, nz), do: ...
+
+  @spec normal3bv(v) :: :ok when v: {nx :: integer(), ny :: integer(), nz :: integer()}
+  def normal3bv({nx, ny, nz}), do: ...
+
+  @spec normal3d(nx, ny, nz) :: :ok when nx: unknown_type, ny: unknown_type, nz: unknown_type
+  def normal3d(nx, ny, nz), do: ...
+
+  @spec normal3dv(v) :: :ok when v: {nx :: unknown_type, ny :: unknown_type, nz :: unknown_type}
+  def normal3dv({nx, ny, nz}), do: ...
+
+  @spec normal3f(nx, ny, nz) :: :ok when nx: unknown_type, ny: unknown_type, nz: unknown_type
+  def normal3f(nx, ny, nz), do: ...
+
+  @spec normal3fv(v) :: :ok when v: {nx :: unknown_type, ny :: unknown_type, nz :: unknown_type}
+  def normal3fv({nx, ny, nz}), do: ...
+
+  @spec normal3i(nx, ny, nz) :: :ok when nx: integer(), ny: integer(), nz: integer()
+  def normal3i(nx, ny, nz), do: ...
+
+  @spec normal3iv(v) :: :ok when v: {nx :: integer(), ny :: integer(), nz :: integer()}
+  def normal3iv({nx, ny, nz}), do: ...
+
+  @spec normal3s(nx, ny, nz) :: :ok when nx: integer(), ny: integer(), nz: integer()
+  def normal3s(nx, ny, nz), do: ...
+
+  @spec normal3sv(v) :: :ok when v: {nx :: integer(), ny :: integer(), nz :: integer()}
+  def normal3sv({nx, ny, nz}), do: ...
+
+  @spec normalPointer(type, stride, ptr) :: :ok when type: enum(), stride: integer(), ptr: (offset() | mem())
+  def normalPointer(type, stride, ptr) when is_integer(ptr), do: ...
+
+  def normalPointer(type, stride, ptr), do: ...
+
+  @spec ortho(left, right, bottom, top, near_val, far_val) :: :ok when left: unknown_type, right: unknown_type, bottom: unknown_type, top: unknown_type, near_val: unknown_type, far_val: unknown_type
+  def ortho(left, right, bottom, top, near_val, far_val), do: ...
+
+  @spec passThrough(token) :: :ok when token: unknown_type
+  def passThrough(token), do: ...
+
+  @spec patchParameterfv(pname, values) :: :ok when pname: enum(), values: [unknown_type]
+  def patchParameterfv(pname, values), do: ...
+
+  @spec patchParameteri(pname, value) :: :ok when pname: enum(), value: integer()
+  def patchParameteri(pname, value), do: ...
+
+  @spec pauseTransformFeedback() :: :ok
+  def pauseTransformFeedback(), do: ...
+
+  @spec pixelMapfv(map, mapsize, values) :: :ok when map: enum(), mapsize: integer(), values: binary()
+  def pixelMapfv(map, mapsize, values), do: ...
+
+  @spec pixelMapuiv(map, mapsize, values) :: :ok when map: enum(), mapsize: integer(), values: binary()
+  def pixelMapuiv(map, mapsize, values), do: ...
+
+  @spec pixelMapusv(map, mapsize, values) :: :ok when map: enum(), mapsize: integer(), values: binary()
+  def pixelMapusv(map, mapsize, values), do: ...
+
+  @spec pixelStoref(pname, param) :: :ok when pname: enum(), param: unknown_type
+  def pixelStoref(pname, param), do: ...
+
+  @spec pixelStorei(pname, param) :: :ok when pname: enum(), param: integer()
+  def pixelStorei(pname, param), do: ...
+
+  @spec pixelTransferf(pname, param) :: :ok when pname: enum(), param: unknown_type
+  def pixelTransferf(pname, param), do: ...
+
+  @spec pixelTransferi(pname, param) :: :ok when pname: enum(), param: integer()
+  def pixelTransferi(pname, param), do: ...
+
+  @spec pixelZoom(xfactor, yfactor) :: :ok when xfactor: unknown_type, yfactor: unknown_type
+  def pixelZoom(xfactor, yfactor), do: ...
+
+  @spec pointParameterf(pname, param) :: :ok when pname: enum(), param: unknown_type
+  def pointParameterf(pname, param), do: ...
+
+  @spec pointParameterfv(pname, params) :: :ok when pname: enum(), params: tuple()
+  def pointParameterfv(pname, params), do: ...
+
+  @spec pointParameteri(pname, param) :: :ok when pname: enum(), param: integer()
+  def pointParameteri(pname, param), do: ...
+
+  @spec pointParameteriv(pname, params) :: :ok when pname: enum(), params: tuple()
+  def pointParameteriv(pname, params), do: ...
+
+  @spec pointSize(size) :: :ok when size: unknown_type
+  def pointSize(size), do: ...
+
+  @spec polygonMode(face, mode) :: :ok when face: enum(), mode: enum()
+  def polygonMode(face, mode), do: ...
+
+  @spec polygonOffset(factor, units) :: :ok when factor: unknown_type, units: unknown_type
+  def polygonOffset(factor, units), do: ...
+
+  @spec polygonStipple(mask) :: :ok when mask: binary()
+  def polygonStipple(mask), do: ...
+
+  @spec popAttrib() :: :ok
+  def popAttrib(), do: ...
+
+  @spec popClientAttrib() :: :ok
+  def popClientAttrib(), do: ...
+
+  @spec popMatrix() :: :ok
+  def popMatrix(), do: ...
+
+  @spec popName() :: :ok
+  def popName(), do: ...
+
+  @spec primitiveRestartIndex(index) :: :ok when index: integer()
+  def primitiveRestartIndex(index), do: ...
+
+  @spec prioritizeTextures(textures, priorities) :: :ok when textures: [integer()], priorities: [clamp()]
+  def prioritizeTextures(textures, priorities), do: ...
+
+  @spec programBinary(program, binaryFormat, binary) :: :ok when program: integer(), binaryFormat: enum(), binary: binary()
+  def programBinary(program, binaryFormat, binary), do: ...
+
+  @spec programEnvParameter4dARB(target, index, x, y, z, w) :: :ok when target: enum(), index: integer(), x: unknown_type, y: unknown_type, z: unknown_type, w: unknown_type
+  def programEnvParameter4dARB(target, index, x, y, z, w), do: ...
+
+  @spec programEnvParameter4dvARB(target, index, params) :: :ok when target: enum(), index: integer(), params: {unknown_type, unknown_type, unknown_type, unknown_type}
+  def programEnvParameter4dvARB(target, index, {p1, p2, p3, p4}), do: ...
+
+  @spec programEnvParameter4fARB(target, index, x, y, z, w) :: :ok when target: enum(), index: integer(), x: unknown_type, y: unknown_type, z: unknown_type, w: unknown_type
+  def programEnvParameter4fARB(target, index, x, y, z, w), do: ...
+
+  @spec programEnvParameter4fvARB(target, index, params) :: :ok when target: enum(), index: integer(), params: {unknown_type, unknown_type, unknown_type, unknown_type}
+  def programEnvParameter4fvARB(target, index, {p1, p2, p3, p4}), do: ...
+
+  @spec programLocalParameter4dARB(target, index, x, y, z, w) :: :ok when target: enum(), index: integer(), x: unknown_type, y: unknown_type, z: unknown_type, w: unknown_type
+  def programLocalParameter4dARB(target, index, x, y, z, w), do: ...
+
+  @spec programLocalParameter4dvARB(target, index, params) :: :ok when target: enum(), index: integer(), params: {unknown_type, unknown_type, unknown_type, unknown_type}
+  def programLocalParameter4dvARB(target, index, {p1, p2, p3, p4}), do: ...
+
+  @spec programLocalParameter4fARB(target, index, x, y, z, w) :: :ok when target: enum(), index: integer(), x: unknown_type, y: unknown_type, z: unknown_type, w: unknown_type
+  def programLocalParameter4fARB(target, index, x, y, z, w), do: ...
+
+  @spec programLocalParameter4fvARB(target, index, params) :: :ok when target: enum(), index: integer(), params: {unknown_type, unknown_type, unknown_type, unknown_type}
+  def programLocalParameter4fvARB(target, index, {p1, p2, p3, p4}), do: ...
+
+  @spec programParameteri(program, pname, value) :: :ok when program: integer(), pname: enum(), value: integer()
+  def programParameteri(program, pname, value), do: ...
+
+  @spec programStringARB(target, format, string) :: :ok when target: enum(), format: enum(), string: charlist()
+  def programStringARB(target, format, string), do: ...
+
+  @spec programUniform1d(program, location, v0) :: :ok when program: integer(), location: integer(), v0: unknown_type
+  def programUniform1d(program, location, v0), do: ...
+
+  @spec programUniform1dv(program, location, value) :: :ok when program: integer(), location: integer(), value: [unknown_type]
+  def programUniform1dv(program, location, value), do: ...
+
+  @spec programUniform1f(program, location, v0) :: :ok when program: integer(), location: integer(), v0: unknown_type
+  def programUniform1f(program, location, v0), do: ...
+
+  @spec programUniform1fv(program, location, value) :: :ok when program: integer(), location: integer(), value: [unknown_type]
+  def programUniform1fv(program, location, value), do: ...
+
+  @spec programUniform1i(program, location, v0) :: :ok when program: integer(), location: integer(), v0: integer()
+  def programUniform1i(program, location, v0), do: ...
+
+  @spec programUniform1iv(program, location, value) :: :ok when program: integer(), location: integer(), value: [integer()]
+  def programUniform1iv(program, location, value), do: ...
+
+  @spec programUniform1ui(program, location, v0) :: :ok when program: integer(), location: integer(), v0: integer()
+  def programUniform1ui(program, location, v0), do: ...
+
+  @spec programUniform1uiv(program, location, value) :: :ok when program: integer(), location: integer(), value: [integer()]
+  def programUniform1uiv(program, location, value), do: ...
+
+  @spec programUniform2d(program, location, v0, v1) :: :ok when program: integer(), location: integer(), v0: unknown_type, v1: unknown_type
+  def programUniform2d(program, location, v0, v1), do: ...
+
+  @spec programUniform2dv(program, location, value) :: :ok when program: integer(), location: integer(), value: [{unknown_type, unknown_type}]
+  def programUniform2dv(program, location, value), do: ...
+
+  @spec programUniform2f(program, location, v0, v1) :: :ok when program: integer(), location: integer(), v0: unknown_type, v1: unknown_type
+  def programUniform2f(program, location, v0, v1), do: ...
+
+  @spec programUniform2fv(program, location, value) :: :ok when program: integer(), location: integer(), value: [{unknown_type, unknown_type}]
+  def programUniform2fv(program, location, value), do: ...
+
+  @spec programUniform2i(program, location, v0, v1) :: :ok when program: integer(), location: integer(), v0: integer(), v1: integer()
+  def programUniform2i(program, location, v0, v1), do: ...
+
+  @spec programUniform2iv(program, location, value) :: :ok when program: integer(), location: integer(), value: [{integer(), integer()}]
+  def programUniform2iv(program, location, value), do: ...
+
+  @spec programUniform2ui(program, location, v0, v1) :: :ok when program: integer(), location: integer(), v0: integer(), v1: integer()
+  def programUniform2ui(program, location, v0, v1), do: ...
+
+  @spec programUniform2uiv(program, location, value) :: :ok when program: integer(), location: integer(), value: [{integer(), integer()}]
+  def programUniform2uiv(program, location, value), do: ...
+
+  @spec programUniform3d(program, location, v0, v1, v2) :: :ok when program: integer(), location: integer(), v0: unknown_type, v1: unknown_type, v2: unknown_type
+  def programUniform3d(program, location, v0, v1, v2), do: ...
+
+  @spec programUniform3dv(program, location, value) :: :ok when program: integer(), location: integer(), value: [{unknown_type, unknown_type, unknown_type}]
+  def programUniform3dv(program, location, value), do: ...
+
+  @spec programUniform3f(program, location, v0, v1, v2) :: :ok when program: integer(), location: integer(), v0: unknown_type, v1: unknown_type, v2: unknown_type
+  def programUniform3f(program, location, v0, v1, v2), do: ...
+
+  @spec programUniform3fv(program, location, value) :: :ok when program: integer(), location: integer(), value: [{unknown_type, unknown_type, unknown_type}]
+  def programUniform3fv(program, location, value), do: ...
+
+  @spec programUniform3i(program, location, v0, v1, v2) :: :ok when program: integer(), location: integer(), v0: integer(), v1: integer(), v2: integer()
+  def programUniform3i(program, location, v0, v1, v2), do: ...
+
+  @spec programUniform3iv(program, location, value) :: :ok when program: integer(), location: integer(), value: [{integer(), integer(), integer()}]
+  def programUniform3iv(program, location, value), do: ...
+
+  @spec programUniform3ui(program, location, v0, v1, v2) :: :ok when program: integer(), location: integer(), v0: integer(), v1: integer(), v2: integer()
+  def programUniform3ui(program, location, v0, v1, v2), do: ...
+
+  @spec programUniform3uiv(program, location, value) :: :ok when program: integer(), location: integer(), value: [{integer(), integer(), integer()}]
+  def programUniform3uiv(program, location, value), do: ...
+
+  @spec programUniform4d(program, location, v0, v1, v2, v3) :: :ok when program: integer(), location: integer(), v0: unknown_type, v1: unknown_type, v2: unknown_type, v3: unknown_type
+  def programUniform4d(program, location, v0, v1, v2, v3), do: ...
+
+  @spec programUniform4dv(program, location, value) :: :ok when program: integer(), location: integer(), value: [{unknown_type, unknown_type, unknown_type, unknown_type}]
+  def programUniform4dv(program, location, value), do: ...
+
+  @spec programUniform4f(program, location, v0, v1, v2, v3) :: :ok when program: integer(), location: integer(), v0: unknown_type, v1: unknown_type, v2: unknown_type, v3: unknown_type
+  def programUniform4f(program, location, v0, v1, v2, v3), do: ...
+
+  @spec programUniform4fv(program, location, value) :: :ok when program: integer(), location: integer(), value: [{unknown_type, unknown_type, unknown_type, unknown_type}]
+  def programUniform4fv(program, location, value), do: ...
+
+  @spec programUniform4i(program, location, v0, v1, v2, v3) :: :ok when program: integer(), location: integer(), v0: integer(), v1: integer(), v2: integer(), v3: integer()
+  def programUniform4i(program, location, v0, v1, v2, v3), do: ...
+
+  @spec programUniform4iv(program, location, value) :: :ok when program: integer(), location: integer(), value: [{integer(), integer(), integer(), integer()}]
+  def programUniform4iv(program, location, value), do: ...
+
+  @spec programUniform4ui(program, location, v0, v1, v2, v3) :: :ok when program: integer(), location: integer(), v0: integer(), v1: integer(), v2: integer(), v3: integer()
+  def programUniform4ui(program, location, v0, v1, v2, v3), do: ...
+
+  @spec programUniform4uiv(program, location, value) :: :ok when program: integer(), location: integer(), value: [{integer(), integer(), integer(), integer()}]
+  def programUniform4uiv(program, location, value), do: ...
+
+  @spec programUniformMatrix2dv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type}]
+  def programUniformMatrix2dv(program, location, transpose, value), do: ...
+
+  @spec programUniformMatrix2fv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type}]
+  def programUniformMatrix2fv(program, location, transpose, value), do: ...
+
+  @spec programUniformMatrix2x3dv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  def programUniformMatrix2x3dv(program, location, transpose, value), do: ...
+
+  @spec programUniformMatrix2x3fv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  def programUniformMatrix2x3fv(program, location, transpose, value), do: ...
+
+  @spec programUniformMatrix2x4dv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  def programUniformMatrix2x4dv(program, location, transpose, value), do: ...
+
+  @spec programUniformMatrix2x4fv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  def programUniformMatrix2x4fv(program, location, transpose, value), do: ...
+
+  @spec programUniformMatrix3dv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  def programUniformMatrix3dv(program, location, transpose, value), do: ...
+
+  @spec programUniformMatrix3fv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  def programUniformMatrix3fv(program, location, transpose, value), do: ...
+
+  @spec programUniformMatrix3x2dv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  def programUniformMatrix3x2dv(program, location, transpose, value), do: ...
+
+  @spec programUniformMatrix3x2fv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  def programUniformMatrix3x2fv(program, location, transpose, value), do: ...
+
+  @spec programUniformMatrix3x4dv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  def programUniformMatrix3x4dv(program, location, transpose, value), do: ...
+
+  @spec programUniformMatrix3x4fv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  def programUniformMatrix3x4fv(program, location, transpose, value), do: ...
+
+  @spec programUniformMatrix4dv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  def programUniformMatrix4dv(program, location, transpose, value), do: ...
+
+  @spec programUniformMatrix4fv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  def programUniformMatrix4fv(program, location, transpose, value), do: ...
+
+  @spec programUniformMatrix4x2dv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  def programUniformMatrix4x2dv(program, location, transpose, value), do: ...
+
+  @spec programUniformMatrix4x2fv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  def programUniformMatrix4x2fv(program, location, transpose, value), do: ...
+
+  @spec programUniformMatrix4x3dv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  def programUniformMatrix4x3dv(program, location, transpose, value), do: ...
+
+  @spec programUniformMatrix4x3fv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  def programUniformMatrix4x3fv(program, location, transpose, value), do: ...
+
+  @spec provokingVertex(mode) :: :ok when mode: enum()
+  def provokingVertex(mode), do: ...
+
+  @spec pushAttrib(mask) :: :ok when mask: integer()
+  def pushAttrib(mask), do: ...
+
+  @spec pushClientAttrib(mask) :: :ok when mask: integer()
+  def pushClientAttrib(mask), do: ...
+
+  @spec pushMatrix() :: :ok
+  def pushMatrix(), do: ...
+
+  @spec pushName(name) :: :ok when name: integer()
+  def pushName(name), do: ...
+
+  @spec queryCounter(id, target) :: :ok when id: integer(), target: enum()
+  def queryCounter(id, target), do: ...
+
+  @spec rasterPos2d(x, y) :: :ok when x: unknown_type, y: unknown_type
+  def rasterPos2d(x, y), do: ...
+
+  @spec rasterPos2dv(v) :: :ok when v: {x :: unknown_type, y :: unknown_type}
+  def rasterPos2dv({x, y}), do: ...
+
+  @spec rasterPos2f(x, y) :: :ok when x: unknown_type, y: unknown_type
+  def rasterPos2f(x, y), do: ...
+
+  @spec rasterPos2fv(v) :: :ok when v: {x :: unknown_type, y :: unknown_type}
+  def rasterPos2fv({x, y}), do: ...
+
+  @spec rasterPos2i(x, y) :: :ok when x: integer(), y: integer()
+  def rasterPos2i(x, y), do: ...
+
+  @spec rasterPos2iv(v) :: :ok when v: {x :: integer(), y :: integer()}
+  def rasterPos2iv({x, y}), do: ...
+
+  @spec rasterPos2s(x, y) :: :ok when x: integer(), y: integer()
+  def rasterPos2s(x, y), do: ...
+
+  @spec rasterPos2sv(v) :: :ok when v: {x :: integer(), y :: integer()}
+  def rasterPos2sv({x, y}), do: ...
+
+  @spec rasterPos3d(x, y, z) :: :ok when x: unknown_type, y: unknown_type, z: unknown_type
+  def rasterPos3d(x, y, z), do: ...
+
+  @spec rasterPos3dv(v) :: :ok when v: {x :: unknown_type, y :: unknown_type, z :: unknown_type}
+  def rasterPos3dv({x, y, z}), do: ...
+
+  @spec rasterPos3f(x, y, z) :: :ok when x: unknown_type, y: unknown_type, z: unknown_type
+  def rasterPos3f(x, y, z), do: ...
+
+  @spec rasterPos3fv(v) :: :ok when v: {x :: unknown_type, y :: unknown_type, z :: unknown_type}
+  def rasterPos3fv({x, y, z}), do: ...
+
+  @spec rasterPos3i(x, y, z) :: :ok when x: integer(), y: integer(), z: integer()
+  def rasterPos3i(x, y, z), do: ...
+
+  @spec rasterPos3iv(v) :: :ok when v: {x :: integer(), y :: integer(), z :: integer()}
+  def rasterPos3iv({x, y, z}), do: ...
+
+  @spec rasterPos3s(x, y, z) :: :ok when x: integer(), y: integer(), z: integer()
+  def rasterPos3s(x, y, z), do: ...
+
+  @spec rasterPos3sv(v) :: :ok when v: {x :: integer(), y :: integer(), z :: integer()}
+  def rasterPos3sv({x, y, z}), do: ...
+
+  @spec rasterPos4d(x, y, z, w) :: :ok when x: unknown_type, y: unknown_type, z: unknown_type, w: unknown_type
+  def rasterPos4d(x, y, z, w), do: ...
+
+  @spec rasterPos4dv(v) :: :ok when v: {x :: unknown_type, y :: unknown_type, z :: unknown_type, w :: unknown_type}
+  def rasterPos4dv({x, y, z, w}), do: ...
+
+  @spec rasterPos4f(x, y, z, w) :: :ok when x: unknown_type, y: unknown_type, z: unknown_type, w: unknown_type
+  def rasterPos4f(x, y, z, w), do: ...
+
+  @spec rasterPos4fv(v) :: :ok when v: {x :: unknown_type, y :: unknown_type, z :: unknown_type, w :: unknown_type}
+  def rasterPos4fv({x, y, z, w}), do: ...
+
+  @spec rasterPos4i(x, y, z, w) :: :ok when x: integer(), y: integer(), z: integer(), w: integer()
+  def rasterPos4i(x, y, z, w), do: ...
+
+  @spec rasterPos4iv(v) :: :ok when v: {x :: integer(), y :: integer(), z :: integer(), w :: integer()}
+  def rasterPos4iv({x, y, z, w}), do: ...
+
+  @spec rasterPos4s(x, y, z, w) :: :ok when x: integer(), y: integer(), z: integer(), w: integer()
+  def rasterPos4s(x, y, z, w), do: ...
+
+  @spec rasterPos4sv(v) :: :ok when v: {x :: integer(), y :: integer(), z :: integer(), w :: integer()}
+  def rasterPos4sv({x, y, z, w}), do: ...
+
+  @spec readBuffer(mode) :: :ok when mode: enum()
+  def readBuffer(mode), do: ...
+
+  @spec readPixels(x, y, width, height, format, type, pixels) :: :ok when x: integer(), y: integer(), width: integer(), height: integer(), format: enum(), type: enum(), pixels: mem()
+  def readPixels(x, y, width, height, format, type, pixels), do: ...
+
+  @spec rectd(x1, y1, x2, y2) :: :ok when x1: unknown_type, y1: unknown_type, x2: unknown_type, y2: unknown_type
+  def rectd(x1, y1, x2, y2), do: ...
+
+  @spec rectdv(v1, v2) :: :ok when v1: {unknown_type, unknown_type}, v2: {unknown_type, unknown_type}
+  def rectdv({v1, v2}, {^v1, ^v2}), do: ...
+
+  @spec rectf(x1, y1, x2, y2) :: :ok when x1: unknown_type, y1: unknown_type, x2: unknown_type, y2: unknown_type
+  def rectf(x1, y1, x2, y2), do: ...
+
+  @spec rectfv(v1, v2) :: :ok when v1: {unknown_type, unknown_type}, v2: {unknown_type, unknown_type}
+  def rectfv({v1, v2}, {^v1, ^v2}), do: ...
+
+  @spec recti(x1, y1, x2, y2) :: :ok when x1: integer(), y1: integer(), x2: integer(), y2: integer()
+  def recti(x1, y1, x2, y2), do: ...
+
+  @spec rectiv(v1, v2) :: :ok when v1: {integer(), integer()}, v2: {integer(), integer()}
+  def rectiv({v1, v2}, {^v1, ^v2}), do: ...
+
+  @spec rects(x1, y1, x2, y2) :: :ok when x1: integer(), y1: integer(), x2: integer(), y2: integer()
+  def rects(x1, y1, x2, y2), do: ...
+
+  @spec rectsv(v1, v2) :: :ok when v1: {integer(), integer()}, v2: {integer(), integer()}
+  def rectsv({v1, v2}, {^v1, ^v2}), do: ...
+
+  @spec releaseShaderCompiler() :: :ok
+  def releaseShaderCompiler(), do: ...
+
+  @spec renderMode(mode) :: integer() when mode: enum()
+  def renderMode(mode), do: ...
+
+  @spec renderbufferStorage(target, internalformat, width, height) :: :ok when target: enum(), internalformat: enum(), width: integer(), height: integer()
+  def renderbufferStorage(target, internalformat, width, height), do: ...
+
+  @spec renderbufferStorageMultisample(target, samples, internalformat, width, height) :: :ok when target: enum(), samples: integer(), internalformat: enum(), width: integer(), height: integer()
+  def renderbufferStorageMultisample(target, samples, internalformat, width, height), do: ...
+
+  @spec resetHistogram(target) :: :ok when target: enum()
+  def resetHistogram(target), do: ...
+
+  @spec resetMinmax(target) :: :ok when target: enum()
+  def resetMinmax(target), do: ...
+
+  @spec resumeTransformFeedback() :: :ok
+  def resumeTransformFeedback(), do: ...
+
+  @spec rotated(angle, x, y, z) :: :ok when angle: unknown_type, x: unknown_type, y: unknown_type, z: unknown_type
+  def rotated(angle, x, y, z), do: ...
+
+  @spec rotatef(angle, x, y, z) :: :ok when angle: unknown_type, x: unknown_type, y: unknown_type, z: unknown_type
+  def rotatef(angle, x, y, z), do: ...
+
+  @spec sampleCoverage(value, invert) :: :ok when value: clamp(), invert: (0 | 1)
+  def sampleCoverage(value, invert), do: ...
+
+  @spec sampleMaski(index, mask) :: :ok when index: integer(), mask: integer()
+  def sampleMaski(index, mask), do: ...
+
+  @spec samplerParameterIiv(sampler, pname, param) :: :ok when sampler: integer(), pname: enum(), param: [integer()]
+  def samplerParameterIiv(sampler, pname, param), do: ...
+
+  @spec samplerParameterIuiv(sampler, pname, param) :: :ok when sampler: integer(), pname: enum(), param: [integer()]
+  def samplerParameterIuiv(sampler, pname, param), do: ...
+
+  @spec samplerParameterf(sampler, pname, param) :: :ok when sampler: integer(), pname: enum(), param: unknown_type
+  def samplerParameterf(sampler, pname, param), do: ...
+
+  @spec samplerParameterfv(sampler, pname, param) :: :ok when sampler: integer(), pname: enum(), param: [unknown_type]
+  def samplerParameterfv(sampler, pname, param), do: ...
+
+  @spec samplerParameteri(sampler, pname, param) :: :ok when sampler: integer(), pname: enum(), param: integer()
+  def samplerParameteri(sampler, pname, param), do: ...
+
+  @spec samplerParameteriv(sampler, pname, param) :: :ok when sampler: integer(), pname: enum(), param: [integer()]
+  def samplerParameteriv(sampler, pname, param), do: ...
+
+  @spec scaled(x, y, z) :: :ok when x: unknown_type, y: unknown_type, z: unknown_type
+  def scaled(x, y, z), do: ...
+
+  @spec scalef(x, y, z) :: :ok when x: unknown_type, y: unknown_type, z: unknown_type
+  def scalef(x, y, z), do: ...
+
+  @spec scissor(x, y, width, height) :: :ok when x: integer(), y: integer(), width: integer(), height: integer()
+  def scissor(x, y, width, height), do: ...
+
+  @spec scissorArrayv(first, v) :: :ok when first: integer(), v: [{integer(), integer(), integer(), integer()}]
+  def scissorArrayv(first, v), do: ...
+
+  @spec scissorIndexed(index, left, bottom, width, height) :: :ok when index: integer(), left: integer(), bottom: integer(), width: integer(), height: integer()
+  def scissorIndexed(index, left, bottom, width, height), do: ...
+
+  @spec scissorIndexedv(index, v) :: :ok when index: integer(), v: {integer(), integer(), integer(), integer()}
+  def scissorIndexedv(index, {v1, v2, v3, v4}), do: ...
+
+  @spec secondaryColor3b(red, green, blue) :: :ok when red: integer(), green: integer(), blue: integer()
+  def secondaryColor3b(red, green, blue), do: ...
+
+  @spec secondaryColor3bv(v) :: :ok when v: {red :: integer(), green :: integer(), blue :: integer()}
+  def secondaryColor3bv({red, green, blue}), do: ...
+
+  @spec secondaryColor3d(red, green, blue) :: :ok when red: unknown_type, green: unknown_type, blue: unknown_type
+  def secondaryColor3d(red, green, blue), do: ...
+
+  @spec secondaryColor3dv(v) :: :ok when v: {red :: unknown_type, green :: unknown_type, blue :: unknown_type}
+  def secondaryColor3dv({red, green, blue}), do: ...
+
+  @spec secondaryColor3f(red, green, blue) :: :ok when red: unknown_type, green: unknown_type, blue: unknown_type
+  def secondaryColor3f(red, green, blue), do: ...
+
+  @spec secondaryColor3fv(v) :: :ok when v: {red :: unknown_type, green :: unknown_type, blue :: unknown_type}
+  def secondaryColor3fv({red, green, blue}), do: ...
+
+  @spec secondaryColor3i(red, green, blue) :: :ok when red: integer(), green: integer(), blue: integer()
+  def secondaryColor3i(red, green, blue), do: ...
+
+  @spec secondaryColor3iv(v) :: :ok when v: {red :: integer(), green :: integer(), blue :: integer()}
+  def secondaryColor3iv({red, green, blue}), do: ...
+
+  @spec secondaryColor3s(red, green, blue) :: :ok when red: integer(), green: integer(), blue: integer()
+  def secondaryColor3s(red, green, blue), do: ...
+
+  @spec secondaryColor3sv(v) :: :ok when v: {red :: integer(), green :: integer(), blue :: integer()}
+  def secondaryColor3sv({red, green, blue}), do: ...
+
+  @spec secondaryColor3ub(red, green, blue) :: :ok when red: integer(), green: integer(), blue: integer()
+  def secondaryColor3ub(red, green, blue), do: ...
+
+  @spec secondaryColor3ubv(v) :: :ok when v: {red :: integer(), green :: integer(), blue :: integer()}
+  def secondaryColor3ubv({red, green, blue}), do: ...
+
+  @spec secondaryColor3ui(red, green, blue) :: :ok when red: integer(), green: integer(), blue: integer()
+  def secondaryColor3ui(red, green, blue), do: ...
+
+  @spec secondaryColor3uiv(v) :: :ok when v: {red :: integer(), green :: integer(), blue :: integer()}
+  def secondaryColor3uiv({red, green, blue}), do: ...
+
+  @spec secondaryColor3us(red, green, blue) :: :ok when red: integer(), green: integer(), blue: integer()
+  def secondaryColor3us(red, green, blue), do: ...
+
+  @spec secondaryColor3usv(v) :: :ok when v: {red :: integer(), green :: integer(), blue :: integer()}
+  def secondaryColor3usv({red, green, blue}), do: ...
+
+  @spec secondaryColorPointer(size, type, stride, pointer) :: :ok when size: integer(), type: enum(), stride: integer(), pointer: (offset() | mem())
+  def secondaryColorPointer(size, type, stride, pointer) when is_integer(pointer), do: ...
+
+  def secondaryColorPointer(size, type, stride, pointer), do: ...
+
+  @spec selectBuffer(size, buffer) :: :ok when size: integer(), buffer: mem()
+  def selectBuffer(size, buffer), do: ...
+
+  def send_bin(bin) when is_binary(bin), do: ...
+
+  def send_bin(tuple) when is_tuple(tuple), do: ...
+
+  @spec separableFilter2D(target, internalformat, width, height, format, type, row, column) :: :ok when target: enum(), internalformat: enum(), width: integer(), height: integer(), format: enum(), type: enum(), row: (offset() | mem()), column: (offset() | mem())
+  def separableFilter2D(target, internalformat, width, height, format, type, row, column) when is_integer(row) and is_integer(column), do: ...
+
+  def separableFilter2D(target, internalformat, width, height, format, type, row, column), do: ...
+
+  @spec shadeModel(mode) :: :ok when mode: enum()
+  def shadeModel(mode), do: ...
+
+  @spec shaderBinary(shaders, binaryformat, binary) :: :ok when shaders: [integer()], binaryformat: enum(), binary: binary()
+  def shaderBinary(shaders, binaryformat, binary), do: ...
+
+  @spec shaderSource(shader, string) :: :ok when shader: integer(), string: iolist()
+  def shaderSource(shader, string), do: ...
+
+  @spec shaderSourceARB(shaderObj, string) :: :ok when shaderObj: integer(), string: iolist()
+  def shaderSourceARB(shaderObj, string), do: ...
+
+  @spec stencilClearTagEXT(stencilTagBits, stencilClearTag) :: :ok when stencilTagBits: integer(), stencilClearTag: integer()
+  def stencilClearTagEXT(stencilTagBits, stencilClearTag), do: ...
+
+  @spec stencilFunc(func, ref, mask) :: :ok when func: enum(), ref: integer(), mask: integer()
+  def stencilFunc(func, ref, mask), do: ...
+
+  @spec stencilFuncSeparate(face, func, ref, mask) :: :ok when face: enum(), func: enum(), ref: integer(), mask: integer()
+  def stencilFuncSeparate(face, func, ref, mask), do: ...
+
+  @spec stencilMask(mask) :: :ok when mask: integer()
+  def stencilMask(mask), do: ...
+
+  @spec stencilMaskSeparate(face, mask) :: :ok when face: enum(), mask: integer()
+  def stencilMaskSeparate(face, mask), do: ...
+
+  @spec stencilOp(fail, zfail, zpass) :: :ok when fail: enum(), zfail: enum(), zpass: enum()
+  def stencilOp(fail, zfail, zpass), do: ...
+
+  @spec stencilOpSeparate(face, sfail, dpfail, dppass) :: :ok when face: enum(), sfail: enum(), dpfail: enum(), dppass: enum()
+  def stencilOpSeparate(face, sfail, dpfail, dppass), do: ...
+
+  @spec texBuffer(target, internalformat, buffer) :: :ok when target: enum(), internalformat: enum(), buffer: integer()
+  def texBuffer(target, internalformat, buffer), do: ...
+
+  @spec texCoord1d(s) :: :ok when s: unknown_type
+  def texCoord1d(s), do: ...
+
+  @spec texCoord1dv(v) :: :ok when v: {s :: unknown_type}
+  def texCoord1dv({s}), do: ...
+
+  @spec texCoord1f(s) :: :ok when s: unknown_type
+  def texCoord1f(s), do: ...
+
+  @spec texCoord1fv(v) :: :ok when v: {s :: unknown_type}
+  def texCoord1fv({s}), do: ...
+
+  @spec texCoord1i(s) :: :ok when s: integer()
+  def texCoord1i(s), do: ...
+
+  @spec texCoord1iv(v) :: :ok when v: {s :: integer()}
+  def texCoord1iv({s}), do: ...
+
+  @spec texCoord1s(s) :: :ok when s: integer()
+  def texCoord1s(s), do: ...
+
+  @spec texCoord1sv(v) :: :ok when v: {s :: integer()}
+  def texCoord1sv({s}), do: ...
+
+  @spec texCoord2d(s, t) :: :ok when s: unknown_type, t: unknown_type
+  def texCoord2d(s, t), do: ...
+
+  @spec texCoord2dv(v) :: :ok when v: {s :: unknown_type, t :: unknown_type}
+  def texCoord2dv({s, t}), do: ...
+
+  @spec texCoord2f(s, t) :: :ok when s: unknown_type, t: unknown_type
+  def texCoord2f(s, t), do: ...
+
+  @spec texCoord2fv(v) :: :ok when v: {s :: unknown_type, t :: unknown_type}
+  def texCoord2fv({s, t}), do: ...
+
+  @spec texCoord2i(s, t) :: :ok when s: integer(), t: integer()
+  def texCoord2i(s, t), do: ...
+
+  @spec texCoord2iv(v) :: :ok when v: {s :: integer(), t :: integer()}
+  def texCoord2iv({s, t}), do: ...
+
+  @spec texCoord2s(s, t) :: :ok when s: integer(), t: integer()
+  def texCoord2s(s, t), do: ...
+
+  @spec texCoord2sv(v) :: :ok when v: {s :: integer(), t :: integer()}
+  def texCoord2sv({s, t}), do: ...
+
+  @spec texCoord3d(s, t, r) :: :ok when s: unknown_type, t: unknown_type, r: unknown_type
+  def texCoord3d(s, t, r), do: ...
+
+  @spec texCoord3dv(v) :: :ok when v: {s :: unknown_type, t :: unknown_type, r :: unknown_type}
+  def texCoord3dv({s, t, r}), do: ...
+
+  @spec texCoord3f(s, t, r) :: :ok when s: unknown_type, t: unknown_type, r: unknown_type
+  def texCoord3f(s, t, r), do: ...
+
+  @spec texCoord3fv(v) :: :ok when v: {s :: unknown_type, t :: unknown_type, r :: unknown_type}
+  def texCoord3fv({s, t, r}), do: ...
+
+  @spec texCoord3i(s, t, r) :: :ok when s: integer(), t: integer(), r: integer()
+  def texCoord3i(s, t, r), do: ...
+
+  @spec texCoord3iv(v) :: :ok when v: {s :: integer(), t :: integer(), r :: integer()}
+  def texCoord3iv({s, t, r}), do: ...
+
+  @spec texCoord3s(s, t, r) :: :ok when s: integer(), t: integer(), r: integer()
+  def texCoord3s(s, t, r), do: ...
+
+  @spec texCoord3sv(v) :: :ok when v: {s :: integer(), t :: integer(), r :: integer()}
+  def texCoord3sv({s, t, r}), do: ...
+
+  @spec texCoord4d(s, t, r, q) :: :ok when s: unknown_type, t: unknown_type, r: unknown_type, q: unknown_type
+  def texCoord4d(s, t, r, q), do: ...
+
+  @spec texCoord4dv(v) :: :ok when v: {s :: unknown_type, t :: unknown_type, r :: unknown_type, q :: unknown_type}
+  def texCoord4dv({s, t, r, q}), do: ...
+
+  @spec texCoord4f(s, t, r, q) :: :ok when s: unknown_type, t: unknown_type, r: unknown_type, q: unknown_type
+  def texCoord4f(s, t, r, q), do: ...
+
+  @spec texCoord4fv(v) :: :ok when v: {s :: unknown_type, t :: unknown_type, r :: unknown_type, q :: unknown_type}
+  def texCoord4fv({s, t, r, q}), do: ...
+
+  @spec texCoord4i(s, t, r, q) :: :ok when s: integer(), t: integer(), r: integer(), q: integer()
+  def texCoord4i(s, t, r, q), do: ...
+
+  @spec texCoord4iv(v) :: :ok when v: {s :: integer(), t :: integer(), r :: integer(), q :: integer()}
+  def texCoord4iv({s, t, r, q}), do: ...
+
+  @spec texCoord4s(s, t, r, q) :: :ok when s: integer(), t: integer(), r: integer(), q: integer()
+  def texCoord4s(s, t, r, q), do: ...
+
+  @spec texCoord4sv(v) :: :ok when v: {s :: integer(), t :: integer(), r :: integer(), q :: integer()}
+  def texCoord4sv({s, t, r, q}), do: ...
+
+  @spec texCoordPointer(size, type, stride, ptr) :: :ok when size: integer(), type: enum(), stride: integer(), ptr: (offset() | mem())
+  def texCoordPointer(size, type, stride, ptr) when is_integer(ptr), do: ...
+
+  def texCoordPointer(size, type, stride, ptr), do: ...
+
+  @spec texEnvf(target, pname, param) :: :ok when target: enum(), pname: enum(), param: unknown_type
+  def texEnvf(target, pname, param), do: ...
+
+  @spec texEnvfv(target, pname, params) :: :ok when target: enum(), pname: enum(), params: tuple()
+  def texEnvfv(target, pname, params), do: ...
+
+  @spec texEnvi(target, pname, param) :: :ok when target: enum(), pname: enum(), param: integer()
+  def texEnvi(target, pname, param), do: ...
+
+  @spec texEnviv(target, pname, params) :: :ok when target: enum(), pname: enum(), params: tuple()
+  def texEnviv(target, pname, params), do: ...
+
+  @spec texGend(coord, pname, param) :: :ok when coord: enum(), pname: enum(), param: unknown_type
+  def texGend(coord, pname, param), do: ...
+
+  @spec texGendv(coord, pname, params) :: :ok when coord: enum(), pname: enum(), params: tuple()
+  def texGendv(coord, pname, params), do: ...
+
+  @spec texGenf(coord, pname, param) :: :ok when coord: enum(), pname: enum(), param: unknown_type
+  def texGenf(coord, pname, param), do: ...
+
+  @spec texGenfv(coord, pname, params) :: :ok when coord: enum(), pname: enum(), params: tuple()
+  def texGenfv(coord, pname, params), do: ...
+
+  @spec texGeni(coord, pname, param) :: :ok when coord: enum(), pname: enum(), param: integer()
+  def texGeni(coord, pname, param), do: ...
+
+  @spec texGeniv(coord, pname, params) :: :ok when coord: enum(), pname: enum(), params: tuple()
+  def texGeniv(coord, pname, params), do: ...
+
+  @spec texImage1D(target, level, internalFormat, width, border, format, type, pixels) :: :ok when target: enum(), level: integer(), internalFormat: integer(), width: integer(), border: integer(), format: enum(), type: enum(), pixels: (offset() | mem())
+  def texImage1D(target, level, internalFormat, width, border, format, type, pixels) when is_integer(pixels), do: ...
+
+  def texImage1D(target, level, internalFormat, width, border, format, type, pixels), do: ...
+
+  @spec texImage2D(target, level, internalFormat, width, height, border, format, type, pixels) :: :ok when target: enum(), level: integer(), internalFormat: integer(), width: integer(), height: integer(), border: integer(), format: enum(), type: enum(), pixels: (offset() | mem())
+  def texImage2D(target, level, internalFormat, width, height, border, format, type, pixels) when is_integer(pixels), do: ...
+
+  def texImage2D(target, level, internalFormat, width, height, border, format, type, pixels), do: ...
+
+  @spec texImage2DMultisample(target, samples, internalformat, width, height, fixedsamplelocations) :: :ok when target: enum(), samples: integer(), internalformat: integer(), width: integer(), height: integer(), fixedsamplelocations: (0 | 1)
+  def texImage2DMultisample(target, samples, internalformat, width, height, fixedsamplelocations), do: ...
+
+  @spec texImage3D(target, level, internalFormat, width, height, depth, border, format, type, pixels) :: :ok when target: enum(), level: integer(), internalFormat: integer(), width: integer(), height: integer(), depth: integer(), border: integer(), format: enum(), type: enum(), pixels: (offset() | mem())
+  def texImage3D(target, level, internalFormat, width, height, depth, border, format, type, pixels) when is_integer(pixels), do: ...
+
+  def texImage3D(target, level, internalFormat, width, height, depth, border, format, type, pixels), do: ...
+
+  @spec texImage3DMultisample(target, samples, internalformat, width, height, depth, fixedsamplelocations) :: :ok when target: enum(), samples: integer(), internalformat: integer(), width: integer(), height: integer(), depth: integer(), fixedsamplelocations: (0 | 1)
+  def texImage3DMultisample(target, samples, internalformat, width, height, depth, fixedsamplelocations), do: ...
+
+  @spec texParameterIiv(target, pname, params) :: :ok when target: enum(), pname: enum(), params: tuple()
+  def texParameterIiv(target, pname, params), do: ...
+
+  @spec texParameterIuiv(target, pname, params) :: :ok when target: enum(), pname: enum(), params: tuple()
+  def texParameterIuiv(target, pname, params), do: ...
+
+  @spec texParameterf(target, pname, param) :: :ok when target: enum(), pname: enum(), param: unknown_type
+  def texParameterf(target, pname, param), do: ...
+
+  @spec texParameterfv(target, pname, params) :: :ok when target: enum(), pname: enum(), params: tuple()
+  def texParameterfv(target, pname, params), do: ...
+
+  @spec texParameteri(target, pname, param) :: :ok when target: enum(), pname: enum(), param: integer()
+  def texParameteri(target, pname, param), do: ...
+
+  @spec texParameteriv(target, pname, params) :: :ok when target: enum(), pname: enum(), params: tuple()
+  def texParameteriv(target, pname, params), do: ...
+
+  @spec texStorage1D(target, levels, internalformat, width) :: :ok when target: enum(), levels: integer(), internalformat: enum(), width: integer()
+  def texStorage1D(target, levels, internalformat, width), do: ...
+
+  @spec texStorage2D(target, levels, internalformat, width, height) :: :ok when target: enum(), levels: integer(), internalformat: enum(), width: integer(), height: integer()
+  def texStorage2D(target, levels, internalformat, width, height), do: ...
+
+  @spec texStorage3D(target, levels, internalformat, width, height, depth) :: :ok when target: enum(), levels: integer(), internalformat: enum(), width: integer(), height: integer(), depth: integer()
+  def texStorage3D(target, levels, internalformat, width, height, depth), do: ...
+
+  @spec texSubImage1D(target, level, xoffset, width, format, type, pixels) :: :ok when target: enum(), level: integer(), xoffset: integer(), width: integer(), format: enum(), type: enum(), pixels: (offset() | mem())
+  def texSubImage1D(target, level, xoffset, width, format, type, pixels) when is_integer(pixels), do: ...
+
+  def texSubImage1D(target, level, xoffset, width, format, type, pixels), do: ...
+
+  @spec texSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels) :: :ok when target: enum(), level: integer(), xoffset: integer(), yoffset: integer(), width: integer(), height: integer(), format: enum(), type: enum(), pixels: (offset() | mem())
+  def texSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels) when is_integer(pixels), do: ...
+
+  def texSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels), do: ...
+
+  @spec texSubImage3D(target, level, xoffset, yoffset, zoffset, width, height, depth, format, type, pixels) :: :ok when target: enum(), level: integer(), xoffset: integer(), yoffset: integer(), zoffset: integer(), width: integer(), height: integer(), depth: integer(), format: enum(), type: enum(), pixels: (offset() | mem())
+  def texSubImage3D(target, level, xoffset, yoffset, zoffset, width, height, depth, format, type, pixels) when is_integer(pixels), do: ...
+
+  def texSubImage3D(target, level, xoffset, yoffset, zoffset, width, height, depth, format, type, pixels), do: ...
+
+  @spec transformFeedbackVaryings(program, varyings, bufferMode) :: :ok when program: integer(), varyings: iolist(), bufferMode: enum()
+  def transformFeedbackVaryings(program, varyings, bufferMode), do: ...
+
+  @spec translated(x, y, z) :: :ok when x: unknown_type, y: unknown_type, z: unknown_type
+  def translated(x, y, z), do: ...
+
+  @spec translatef(x, y, z) :: :ok when x: unknown_type, y: unknown_type, z: unknown_type
+  def translatef(x, y, z), do: ...
+
+  @spec uniform1d(location, x) :: :ok when location: integer(), x: unknown_type
+  def uniform1d(location, x), do: ...
+
+  @spec uniform1dv(location, value) :: :ok when location: integer(), value: [unknown_type]
+  def uniform1dv(location, value), do: ...
+
+  @spec uniform1f(location, v0) :: :ok when location: integer(), v0: unknown_type
+  def uniform1f(location, v0), do: ...
+
+  @spec uniform1fv(location, value) :: :ok when location: integer(), value: [unknown_type]
+  def uniform1fv(location, value), do: ...
+
+  @spec uniform1i(location, v0) :: :ok when location: integer(), v0: integer()
+  def uniform1i(location, v0), do: ...
+
+  @spec uniform1iv(location, value) :: :ok when location: integer(), value: [integer()]
+  def uniform1iv(location, value), do: ...
+
+  @spec uniform1ui(location, v0) :: :ok when location: integer(), v0: integer()
+  def uniform1ui(location, v0), do: ...
+
+  @spec uniform1uiv(location, value) :: :ok when location: integer(), value: [integer()]
+  def uniform1uiv(location, value), do: ...
+
+  @spec uniform2d(location, x, y) :: :ok when location: integer(), x: unknown_type, y: unknown_type
+  def uniform2d(location, x, y), do: ...
+
+  @spec uniform2dv(location, value) :: :ok when location: integer(), value: [{unknown_type, unknown_type}]
+  def uniform2dv(location, value), do: ...
+
+  @spec uniform2f(location, v0, v1) :: :ok when location: integer(), v0: unknown_type, v1: unknown_type
+  def uniform2f(location, v0, v1), do: ...
+
+  @spec uniform2fv(location, value) :: :ok when location: integer(), value: [{unknown_type, unknown_type}]
+  def uniform2fv(location, value), do: ...
+
+  @spec uniform2i(location, v0, v1) :: :ok when location: integer(), v0: integer(), v1: integer()
+  def uniform2i(location, v0, v1), do: ...
+
+  @spec uniform2iv(location, value) :: :ok when location: integer(), value: [{integer(), integer()}]
+  def uniform2iv(location, value), do: ...
+
+  @spec uniform2ui(location, v0, v1) :: :ok when location: integer(), v0: integer(), v1: integer()
+  def uniform2ui(location, v0, v1), do: ...
+
+  @spec uniform2uiv(location, value) :: :ok when location: integer(), value: [{integer(), integer()}]
+  def uniform2uiv(location, value), do: ...
+
+  @spec uniform3d(location, x, y, z) :: :ok when location: integer(), x: unknown_type, y: unknown_type, z: unknown_type
+  def uniform3d(location, x, y, z), do: ...
+
+  @spec uniform3dv(location, value) :: :ok when location: integer(), value: [{unknown_type, unknown_type, unknown_type}]
+  def uniform3dv(location, value), do: ...
+
+  @spec uniform3f(location, v0, v1, v2) :: :ok when location: integer(), v0: unknown_type, v1: unknown_type, v2: unknown_type
+  def uniform3f(location, v0, v1, v2), do: ...
+
+  @spec uniform3fv(location, value) :: :ok when location: integer(), value: [{unknown_type, unknown_type, unknown_type}]
+  def uniform3fv(location, value), do: ...
+
+  @spec uniform3i(location, v0, v1, v2) :: :ok when location: integer(), v0: integer(), v1: integer(), v2: integer()
+  def uniform3i(location, v0, v1, v2), do: ...
+
+  @spec uniform3iv(location, value) :: :ok when location: integer(), value: [{integer(), integer(), integer()}]
+  def uniform3iv(location, value), do: ...
+
+  @spec uniform3ui(location, v0, v1, v2) :: :ok when location: integer(), v0: integer(), v1: integer(), v2: integer()
+  def uniform3ui(location, v0, v1, v2), do: ...
+
+  @spec uniform3uiv(location, value) :: :ok when location: integer(), value: [{integer(), integer(), integer()}]
+  def uniform3uiv(location, value), do: ...
+
+  @spec uniform4d(location, x, y, z, w) :: :ok when location: integer(), x: unknown_type, y: unknown_type, z: unknown_type, w: unknown_type
+  def uniform4d(location, x, y, z, w), do: ...
+
+  @spec uniform4dv(location, value) :: :ok when location: integer(), value: [{unknown_type, unknown_type, unknown_type, unknown_type}]
+  def uniform4dv(location, value), do: ...
+
+  @spec uniform4f(location, v0, v1, v2, v3) :: :ok when location: integer(), v0: unknown_type, v1: unknown_type, v2: unknown_type, v3: unknown_type
+  def uniform4f(location, v0, v1, v2, v3), do: ...
+
+  @spec uniform4fv(location, value) :: :ok when location: integer(), value: [{unknown_type, unknown_type, unknown_type, unknown_type}]
+  def uniform4fv(location, value), do: ...
+
+  @spec uniform4i(location, v0, v1, v2, v3) :: :ok when location: integer(), v0: integer(), v1: integer(), v2: integer(), v3: integer()
+  def uniform4i(location, v0, v1, v2, v3), do: ...
+
+  @spec uniform4iv(location, value) :: :ok when location: integer(), value: [{integer(), integer(), integer(), integer()}]
+  def uniform4iv(location, value), do: ...
+
+  @spec uniform4ui(location, v0, v1, v2, v3) :: :ok when location: integer(), v0: integer(), v1: integer(), v2: integer(), v3: integer()
+  def uniform4ui(location, v0, v1, v2, v3), do: ...
+
+  @spec uniform4uiv(location, value) :: :ok when location: integer(), value: [{integer(), integer(), integer(), integer()}]
+  def uniform4uiv(location, value), do: ...
+
+  @spec uniformBlockBinding(program, uniformBlockIndex, uniformBlockBinding) :: :ok when program: integer(), uniformBlockIndex: integer(), uniformBlockBinding: integer()
+  def uniformBlockBinding(program, uniformBlockIndex, uniformBlockBinding), do: ...
+
+  @spec uniformMatrix2dv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type}]
+  def uniformMatrix2dv(location, transpose, value), do: ...
+
+  @spec uniformMatrix2fv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type}]
+  def uniformMatrix2fv(location, transpose, value), do: ...
+
+  @spec uniformMatrix2x3dv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  def uniformMatrix2x3dv(location, transpose, value), do: ...
+
+  @spec uniformMatrix2x3fv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  def uniformMatrix2x3fv(location, transpose, value), do: ...
+
+  @spec uniformMatrix2x4dv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  def uniformMatrix2x4dv(location, transpose, value), do: ...
+
+  @spec uniformMatrix2x4fv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  def uniformMatrix2x4fv(location, transpose, value), do: ...
+
+  @spec uniformMatrix3dv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  def uniformMatrix3dv(location, transpose, value), do: ...
+
+  @spec uniformMatrix3fv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  def uniformMatrix3fv(location, transpose, value), do: ...
+
+  @spec uniformMatrix3x2dv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  def uniformMatrix3x2dv(location, transpose, value), do: ...
+
+  @spec uniformMatrix3x2fv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  def uniformMatrix3x2fv(location, transpose, value), do: ...
+
+  @spec uniformMatrix3x4dv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  def uniformMatrix3x4dv(location, transpose, value), do: ...
+
+  @spec uniformMatrix3x4fv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  def uniformMatrix3x4fv(location, transpose, value), do: ...
+
+  @spec uniformMatrix4dv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  def uniformMatrix4dv(location, transpose, value), do: ...
+
+  @spec uniformMatrix4fv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  def uniformMatrix4fv(location, transpose, value), do: ...
+
+  @spec uniformMatrix4x2dv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  def uniformMatrix4x2dv(location, transpose, value), do: ...
+
+  @spec uniformMatrix4x2fv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  def uniformMatrix4x2fv(location, transpose, value), do: ...
+
+  @spec uniformMatrix4x3dv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  def uniformMatrix4x3dv(location, transpose, value), do: ...
+
+  @spec uniformMatrix4x3fv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  def uniformMatrix4x3fv(location, transpose, value), do: ...
+
+  @spec uniformSubroutinesuiv(shadertype, indices) :: :ok when shadertype: enum(), indices: [integer()]
+  def uniformSubroutinesuiv(shadertype, indices), do: ...
+
+  @spec useProgram(program) :: :ok when program: integer()
+  def useProgram(program), do: ...
+
+  @spec useProgramObjectARB(programObj) :: :ok when programObj: integer()
+  def useProgramObjectARB(programObj), do: ...
+
+  @spec useProgramStages(pipeline, stages, program) :: :ok when pipeline: integer(), stages: integer(), program: integer()
+  def useProgramStages(pipeline, stages, program), do: ...
+
+  @spec validateProgram(program) :: :ok when program: integer()
+  def validateProgram(program), do: ...
+
+  @spec validateProgramARB(programObj) :: :ok when programObj: integer()
+  def validateProgramARB(programObj), do: ...
+
+  @spec validateProgramPipeline(pipeline) :: :ok when pipeline: integer()
+  def validateProgramPipeline(pipeline), do: ...
+
+  @spec vertex2d(x, y) :: :ok when x: unknown_type, y: unknown_type
+  def vertex2d(x, y), do: ...
+
+  @spec vertex2dv(v) :: :ok when v: {x :: unknown_type, y :: unknown_type}
+  def vertex2dv({x, y}), do: ...
+
+  @spec vertex2f(x, y) :: :ok when x: unknown_type, y: unknown_type
+  def vertex2f(x, y), do: ...
+
+  @spec vertex2fv(v) :: :ok when v: {x :: unknown_type, y :: unknown_type}
+  def vertex2fv({x, y}), do: ...
+
+  @spec vertex2i(x, y) :: :ok when x: integer(), y: integer()
+  def vertex2i(x, y), do: ...
+
+  @spec vertex2iv(v) :: :ok when v: {x :: integer(), y :: integer()}
+  def vertex2iv({x, y}), do: ...
+
+  @spec vertex2s(x, y) :: :ok when x: integer(), y: integer()
+  def vertex2s(x, y), do: ...
+
+  @spec vertex2sv(v) :: :ok when v: {x :: integer(), y :: integer()}
+  def vertex2sv({x, y}), do: ...
+
+  @spec vertex3d(x, y, z) :: :ok when x: unknown_type, y: unknown_type, z: unknown_type
+  def vertex3d(x, y, z), do: ...
+
+  @spec vertex3dv(v) :: :ok when v: {x :: unknown_type, y :: unknown_type, z :: unknown_type}
+  def vertex3dv({x, y, z}), do: ...
+
+  @spec vertex3f(x, y, z) :: :ok when x: unknown_type, y: unknown_type, z: unknown_type
+  def vertex3f(x, y, z), do: ...
+
+  @spec vertex3fv(v) :: :ok when v: {x :: unknown_type, y :: unknown_type, z :: unknown_type}
+  def vertex3fv({x, y, z}), do: ...
+
+  @spec vertex3i(x, y, z) :: :ok when x: integer(), y: integer(), z: integer()
+  def vertex3i(x, y, z), do: ...
+
+  @spec vertex3iv(v) :: :ok when v: {x :: integer(), y :: integer(), z :: integer()}
+  def vertex3iv({x, y, z}), do: ...
+
+  @spec vertex3s(x, y, z) :: :ok when x: integer(), y: integer(), z: integer()
+  def vertex3s(x, y, z), do: ...
+
+  @spec vertex3sv(v) :: :ok when v: {x :: integer(), y :: integer(), z :: integer()}
+  def vertex3sv({x, y, z}), do: ...
+
+  @spec vertex4d(x, y, z, w) :: :ok when x: unknown_type, y: unknown_type, z: unknown_type, w: unknown_type
+  def vertex4d(x, y, z, w), do: ...
+
+  @spec vertex4dv(v) :: :ok when v: {x :: unknown_type, y :: unknown_type, z :: unknown_type, w :: unknown_type}
+  def vertex4dv({x, y, z, w}), do: ...
+
+  @spec vertex4f(x, y, z, w) :: :ok when x: unknown_type, y: unknown_type, z: unknown_type, w: unknown_type
+  def vertex4f(x, y, z, w), do: ...
+
+  @spec vertex4fv(v) :: :ok when v: {x :: unknown_type, y :: unknown_type, z :: unknown_type, w :: unknown_type}
+  def vertex4fv({x, y, z, w}), do: ...
+
+  @spec vertex4i(x, y, z, w) :: :ok when x: integer(), y: integer(), z: integer(), w: integer()
+  def vertex4i(x, y, z, w), do: ...
+
+  @spec vertex4iv(v) :: :ok when v: {x :: integer(), y :: integer(), z :: integer(), w :: integer()}
+  def vertex4iv({x, y, z, w}), do: ...
+
+  @spec vertex4s(x, y, z, w) :: :ok when x: integer(), y: integer(), z: integer(), w: integer()
+  def vertex4s(x, y, z, w), do: ...
+
+  @spec vertex4sv(v) :: :ok when v: {x :: integer(), y :: integer(), z :: integer(), w :: integer()}
+  def vertex4sv({x, y, z, w}), do: ...
+
+  @spec vertexAttrib1d(index, x) :: :ok when index: integer(), x: unknown_type
+  def vertexAttrib1d(index, x), do: ...
+
+  @spec vertexAttrib1dv(index :: integer(), v) :: :ok when v: {x :: unknown_type}
+  def vertexAttrib1dv(index, {x}), do: ...
+
+  @spec vertexAttrib1f(index, x) :: :ok when index: integer(), x: unknown_type
+  def vertexAttrib1f(index, x), do: ...
+
+  @spec vertexAttrib1fv(index :: integer(), v) :: :ok when v: {x :: unknown_type}
+  def vertexAttrib1fv(index, {x}), do: ...
+
+  @spec vertexAttrib1s(index, x) :: :ok when index: integer(), x: integer()
+  def vertexAttrib1s(index, x), do: ...
+
+  @spec vertexAttrib1sv(index :: integer(), v) :: :ok when v: {x :: integer()}
+  def vertexAttrib1sv(index, {x}), do: ...
+
+  @spec vertexAttrib2d(index, x, y) :: :ok when index: integer(), x: unknown_type, y: unknown_type
+  def vertexAttrib2d(index, x, y), do: ...
+
+  @spec vertexAttrib2dv(index :: integer(), v) :: :ok when v: {x :: unknown_type, y :: unknown_type}
+  def vertexAttrib2dv(index, {x, y}), do: ...
+
+  @spec vertexAttrib2f(index, x, y) :: :ok when index: integer(), x: unknown_type, y: unknown_type
+  def vertexAttrib2f(index, x, y), do: ...
+
+  @spec vertexAttrib2fv(index :: integer(), v) :: :ok when v: {x :: unknown_type, y :: unknown_type}
+  def vertexAttrib2fv(index, {x, y}), do: ...
+
+  @spec vertexAttrib2s(index, x, y) :: :ok when index: integer(), x: integer(), y: integer()
+  def vertexAttrib2s(index, x, y), do: ...
+
+  @spec vertexAttrib2sv(index :: integer(), v) :: :ok when v: {x :: integer(), y :: integer()}
+  def vertexAttrib2sv(index, {x, y}), do: ...
+
+  @spec vertexAttrib3d(index, x, y, z) :: :ok when index: integer(), x: unknown_type, y: unknown_type, z: unknown_type
+  def vertexAttrib3d(index, x, y, z), do: ...
+
+  @spec vertexAttrib3dv(index :: integer(), v) :: :ok when v: {x :: unknown_type, y :: unknown_type, z :: unknown_type}
+  def vertexAttrib3dv(index, {x, y, z}), do: ...
+
+  @spec vertexAttrib3f(index, x, y, z) :: :ok when index: integer(), x: unknown_type, y: unknown_type, z: unknown_type
+  def vertexAttrib3f(index, x, y, z), do: ...
+
+  @spec vertexAttrib3fv(index :: integer(), v) :: :ok when v: {x :: unknown_type, y :: unknown_type, z :: unknown_type}
+  def vertexAttrib3fv(index, {x, y, z}), do: ...
+
+  @spec vertexAttrib3s(index, x, y, z) :: :ok when index: integer(), x: integer(), y: integer(), z: integer()
+  def vertexAttrib3s(index, x, y, z), do: ...
+
+  @spec vertexAttrib3sv(index :: integer(), v) :: :ok when v: {x :: integer(), y :: integer(), z :: integer()}
+  def vertexAttrib3sv(index, {x, y, z}), do: ...
+
+  @spec vertexAttrib4Nbv(index, v) :: :ok when index: integer(), v: {integer(), integer(), integer(), integer()}
+  def vertexAttrib4Nbv(index, {v1, v2, v3, v4}), do: ...
+
+  @spec vertexAttrib4Niv(index, v) :: :ok when index: integer(), v: {integer(), integer(), integer(), integer()}
+  def vertexAttrib4Niv(index, {v1, v2, v3, v4}), do: ...
+
+  @spec vertexAttrib4Nsv(index, v) :: :ok when index: integer(), v: {integer(), integer(), integer(), integer()}
+  def vertexAttrib4Nsv(index, {v1, v2, v3, v4}), do: ...
+
+  @spec vertexAttrib4Nub(index, x, y, z, w) :: :ok when index: integer(), x: integer(), y: integer(), z: integer(), w: integer()
+  def vertexAttrib4Nub(index, x, y, z, w), do: ...
+
+  @spec vertexAttrib4Nubv(index :: integer(), v) :: :ok when v: {x :: integer(), y :: integer(), z :: integer(), w :: integer()}
+  def vertexAttrib4Nubv(index, {x, y, z, w}), do: ...
+
+  @spec vertexAttrib4Nuiv(index, v) :: :ok when index: integer(), v: {integer(), integer(), integer(), integer()}
+  def vertexAttrib4Nuiv(index, {v1, v2, v3, v4}), do: ...
+
+  @spec vertexAttrib4Nusv(index, v) :: :ok when index: integer(), v: {integer(), integer(), integer(), integer()}
+  def vertexAttrib4Nusv(index, {v1, v2, v3, v4}), do: ...
+
+  @spec vertexAttrib4bv(index, v) :: :ok when index: integer(), v: {integer(), integer(), integer(), integer()}
+  def vertexAttrib4bv(index, {v1, v2, v3, v4}), do: ...
+
+  @spec vertexAttrib4d(index, x, y, z, w) :: :ok when index: integer(), x: unknown_type, y: unknown_type, z: unknown_type, w: unknown_type
+  def vertexAttrib4d(index, x, y, z, w), do: ...
+
+  @spec vertexAttrib4dv(index :: integer(), v) :: :ok when v: {x :: unknown_type, y :: unknown_type, z :: unknown_type, w :: unknown_type}
+  def vertexAttrib4dv(index, {x, y, z, w}), do: ...
+
+  @spec vertexAttrib4f(index, x, y, z, w) :: :ok when index: integer(), x: unknown_type, y: unknown_type, z: unknown_type, w: unknown_type
+  def vertexAttrib4f(index, x, y, z, w), do: ...
+
+  @spec vertexAttrib4fv(index :: integer(), v) :: :ok when v: {x :: unknown_type, y :: unknown_type, z :: unknown_type, w :: unknown_type}
+  def vertexAttrib4fv(index, {x, y, z, w}), do: ...
+
+  @spec vertexAttrib4iv(index, v) :: :ok when index: integer(), v: {integer(), integer(), integer(), integer()}
+  def vertexAttrib4iv(index, {v1, v2, v3, v4}), do: ...
+
+  @spec vertexAttrib4s(index, x, y, z, w) :: :ok when index: integer(), x: integer(), y: integer(), z: integer(), w: integer()
+  def vertexAttrib4s(index, x, y, z, w), do: ...
+
+  @spec vertexAttrib4sv(index :: integer(), v) :: :ok when v: {x :: integer(), y :: integer(), z :: integer(), w :: integer()}
+  def vertexAttrib4sv(index, {x, y, z, w}), do: ...
+
+  @spec vertexAttrib4ubv(index, v) :: :ok when index: integer(), v: {integer(), integer(), integer(), integer()}
+  def vertexAttrib4ubv(index, {v1, v2, v3, v4}), do: ...
+
+  @spec vertexAttrib4uiv(index, v) :: :ok when index: integer(), v: {integer(), integer(), integer(), integer()}
+  def vertexAttrib4uiv(index, {v1, v2, v3, v4}), do: ...
+
+  @spec vertexAttrib4usv(index, v) :: :ok when index: integer(), v: {integer(), integer(), integer(), integer()}
+  def vertexAttrib4usv(index, {v1, v2, v3, v4}), do: ...
+
+  @spec vertexAttribDivisor(index, divisor) :: :ok when index: integer(), divisor: integer()
+  def vertexAttribDivisor(index, divisor), do: ...
+
+  @spec vertexAttribI1i(index, x) :: :ok when index: integer(), x: integer()
+  def vertexAttribI1i(index, x), do: ...
+
+  @spec vertexAttribI1iv(index :: integer(), v) :: :ok when v: {x :: integer()}
+  def vertexAttribI1iv(index, {x}), do: ...
+
+  @spec vertexAttribI1ui(index, x) :: :ok when index: integer(), x: integer()
+  def vertexAttribI1ui(index, x), do: ...
+
+  @spec vertexAttribI1uiv(index :: integer(), v) :: :ok when v: {x :: integer()}
+  def vertexAttribI1uiv(index, {x}), do: ...
+
+  @spec vertexAttribI2i(index, x, y) :: :ok when index: integer(), x: integer(), y: integer()
+  def vertexAttribI2i(index, x, y), do: ...
+
+  @spec vertexAttribI2iv(index :: integer(), v) :: :ok when v: {x :: integer(), y :: integer()}
+  def vertexAttribI2iv(index, {x, y}), do: ...
+
+  @spec vertexAttribI2ui(index, x, y) :: :ok when index: integer(), x: integer(), y: integer()
+  def vertexAttribI2ui(index, x, y), do: ...
+
+  @spec vertexAttribI2uiv(index :: integer(), v) :: :ok when v: {x :: integer(), y :: integer()}
+  def vertexAttribI2uiv(index, {x, y}), do: ...
+
+  @spec vertexAttribI3i(index, x, y, z) :: :ok when index: integer(), x: integer(), y: integer(), z: integer()
+  def vertexAttribI3i(index, x, y, z), do: ...
+
+  @spec vertexAttribI3iv(index :: integer(), v) :: :ok when v: {x :: integer(), y :: integer(), z :: integer()}
+  def vertexAttribI3iv(index, {x, y, z}), do: ...
+
+  @spec vertexAttribI3ui(index, x, y, z) :: :ok when index: integer(), x: integer(), y: integer(), z: integer()
+  def vertexAttribI3ui(index, x, y, z), do: ...
+
+  @spec vertexAttribI3uiv(index :: integer(), v) :: :ok when v: {x :: integer(), y :: integer(), z :: integer()}
+  def vertexAttribI3uiv(index, {x, y, z}), do: ...
+
+  @spec vertexAttribI4bv(index, v) :: :ok when index: integer(), v: {integer(), integer(), integer(), integer()}
+  def vertexAttribI4bv(index, {v1, v2, v3, v4}), do: ...
+
+  @spec vertexAttribI4i(index, x, y, z, w) :: :ok when index: integer(), x: integer(), y: integer(), z: integer(), w: integer()
+  def vertexAttribI4i(index, x, y, z, w), do: ...
+
+  @spec vertexAttribI4iv(index :: integer(), v) :: :ok when v: {x :: integer(), y :: integer(), z :: integer(), w :: integer()}
+  def vertexAttribI4iv(index, {x, y, z, w}), do: ...
+
+  @spec vertexAttribI4sv(index, v) :: :ok when index: integer(), v: {integer(), integer(), integer(), integer()}
+  def vertexAttribI4sv(index, {v1, v2, v3, v4}), do: ...
+
+  @spec vertexAttribI4ubv(index, v) :: :ok when index: integer(), v: {integer(), integer(), integer(), integer()}
+  def vertexAttribI4ubv(index, {v1, v2, v3, v4}), do: ...
+
+  @spec vertexAttribI4ui(index, x, y, z, w) :: :ok when index: integer(), x: integer(), y: integer(), z: integer(), w: integer()
+  def vertexAttribI4ui(index, x, y, z, w), do: ...
+
+  @spec vertexAttribI4uiv(index :: integer(), v) :: :ok when v: {x :: integer(), y :: integer(), z :: integer(), w :: integer()}
+  def vertexAttribI4uiv(index, {x, y, z, w}), do: ...
+
+  @spec vertexAttribI4usv(index, v) :: :ok when index: integer(), v: {integer(), integer(), integer(), integer()}
+  def vertexAttribI4usv(index, {v1, v2, v3, v4}), do: ...
+
+  @spec vertexAttribIPointer(index, size, type, stride, pointer) :: :ok when index: integer(), size: integer(), type: enum(), stride: integer(), pointer: (offset() | mem())
+  def vertexAttribIPointer(index, size, type, stride, pointer) when is_integer(pointer), do: ...
+
+  def vertexAttribIPointer(index, size, type, stride, pointer), do: ...
+
+  @spec vertexAttribL1d(index, x) :: :ok when index: integer(), x: unknown_type
+  def vertexAttribL1d(index, x), do: ...
+
+  @spec vertexAttribL1dv(index :: integer(), v) :: :ok when v: {x :: unknown_type}
+  def vertexAttribL1dv(index, {x}), do: ...
+
+  @spec vertexAttribL2d(index, x, y) :: :ok when index: integer(), x: unknown_type, y: unknown_type
+  def vertexAttribL2d(index, x, y), do: ...
+
+  @spec vertexAttribL2dv(index :: integer(), v) :: :ok when v: {x :: unknown_type, y :: unknown_type}
+  def vertexAttribL2dv(index, {x, y}), do: ...
+
+  @spec vertexAttribL3d(index, x, y, z) :: :ok when index: integer(), x: unknown_type, y: unknown_type, z: unknown_type
+  def vertexAttribL3d(index, x, y, z), do: ...
+
+  @spec vertexAttribL3dv(index :: integer(), v) :: :ok when v: {x :: unknown_type, y :: unknown_type, z :: unknown_type}
+  def vertexAttribL3dv(index, {x, y, z}), do: ...
+
+  @spec vertexAttribL4d(index, x, y, z, w) :: :ok when index: integer(), x: unknown_type, y: unknown_type, z: unknown_type, w: unknown_type
+  def vertexAttribL4d(index, x, y, z, w), do: ...
+
+  @spec vertexAttribL4dv(index :: integer(), v) :: :ok when v: {x :: unknown_type, y :: unknown_type, z :: unknown_type, w :: unknown_type}
+  def vertexAttribL4dv(index, {x, y, z, w}), do: ...
+
+  @spec vertexAttribLPointer(index, size, type, stride, pointer) :: :ok when index: integer(), size: integer(), type: enum(), stride: integer(), pointer: (offset() | mem())
+  def vertexAttribLPointer(index, size, type, stride, pointer) when is_integer(pointer), do: ...
+
+  def vertexAttribLPointer(index, size, type, stride, pointer), do: ...
+
+  @spec vertexAttribPointer(index, size, type, normalized, stride, pointer) :: :ok when index: integer(), size: integer(), type: enum(), normalized: (0 | 1), stride: integer(), pointer: (offset() | mem())
+  def vertexAttribPointer(index, size, type, normalized, stride, pointer) when is_integer(pointer), do: ...
+
+  def vertexAttribPointer(index, size, type, normalized, stride, pointer), do: ...
+
+  @spec vertexBlendARB(count) :: :ok when count: integer()
+  def vertexBlendARB(count), do: ...
+
+  @spec vertexPointer(size, type, stride, ptr) :: :ok when size: integer(), type: enum(), stride: integer(), ptr: (offset() | mem())
+  def vertexPointer(size, type, stride, ptr) when is_integer(ptr), do: ...
+
+  def vertexPointer(size, type, stride, ptr), do: ...
+
+  @spec viewport(x, y, width, height) :: :ok when x: integer(), y: integer(), width: integer(), height: integer()
+  def viewport(x, y, width, height), do: ...
+
+  @spec viewportArrayv(first, v) :: :ok when first: integer(), v: [{unknown_type, unknown_type, unknown_type, unknown_type}]
+  def viewportArrayv(first, v), do: ...
+
+  @spec viewportIndexedf(index, x, y, w, h) :: :ok when index: integer(), x: unknown_type, y: unknown_type, w: unknown_type, h: unknown_type
+  def viewportIndexedf(index, x, y, w, h), do: ...
+
+  @spec viewportIndexedfv(index, v) :: :ok when index: integer(), v: {unknown_type, unknown_type, unknown_type, unknown_type}
+  def viewportIndexedfv(index, {v1, v2, v3, v4}), do: ...
+
+  @spec waitSync(sync, flags, timeout) :: :ok when sync: integer(), flags: integer(), timeout: integer()
+  def waitSync(sync, flags, timeout), do: ...
+
+  @spec weightbvARB(weights) :: :ok when weights: [integer()]
+  def weightbvARB(weights), do: ...
+
+  @spec weightdvARB(weights) :: :ok when weights: [unknown_type]
+  def weightdvARB(weights), do: ...
+
+  @spec weightfvARB(weights) :: :ok when weights: [unknown_type]
+  def weightfvARB(weights), do: ...
+
+  @spec weightivARB(weights) :: :ok when weights: [integer()]
+  def weightivARB(weights), do: ...
+
+  @spec weightsvARB(weights) :: :ok when weights: [integer()]
+  def weightsvARB(weights), do: ...
+
+  @spec weightubvARB(weights) :: :ok when weights: [integer()]
+  def weightubvARB(weights), do: ...
+
+  @spec weightuivARB(weights) :: :ok when weights: [integer()]
+  def weightuivARB(weights), do: ...
+
+  @spec weightusvARB(weights) :: :ok when weights: [integer()]
+  def weightusvARB(weights), do: ...
+
+  @spec windowPos2d(x, y) :: :ok when x: unknown_type, y: unknown_type
+  def windowPos2d(x, y), do: ...
+
+  @spec windowPos2dv(v) :: :ok when v: {x :: unknown_type, y :: unknown_type}
+  def windowPos2dv({x, y}), do: ...
+
+  @spec windowPos2f(x, y) :: :ok when x: unknown_type, y: unknown_type
+  def windowPos2f(x, y), do: ...
+
+  @spec windowPos2fv(v) :: :ok when v: {x :: unknown_type, y :: unknown_type}
+  def windowPos2fv({x, y}), do: ...
+
+  @spec windowPos2i(x, y) :: :ok when x: integer(), y: integer()
+  def windowPos2i(x, y), do: ...
+
+  @spec windowPos2iv(v) :: :ok when v: {x :: integer(), y :: integer()}
+  def windowPos2iv({x, y}), do: ...
+
+  @spec windowPos2s(x, y) :: :ok when x: integer(), y: integer()
+  def windowPos2s(x, y), do: ...
+
+  @spec windowPos2sv(v) :: :ok when v: {x :: integer(), y :: integer()}
+  def windowPos2sv({x, y}), do: ...
+
+  @spec windowPos3d(x, y, z) :: :ok when x: unknown_type, y: unknown_type, z: unknown_type
+  def windowPos3d(x, y, z), do: ...
+
+  @spec windowPos3dv(v) :: :ok when v: {x :: unknown_type, y :: unknown_type, z :: unknown_type}
+  def windowPos3dv({x, y, z}), do: ...
+
+  @spec windowPos3f(x, y, z) :: :ok when x: unknown_type, y: unknown_type, z: unknown_type
+  def windowPos3f(x, y, z), do: ...
+
+  @spec windowPos3fv(v) :: :ok when v: {x :: unknown_type, y :: unknown_type, z :: unknown_type}
+  def windowPos3fv({x, y, z}), do: ...
+
+  @spec windowPos3i(x, y, z) :: :ok when x: integer(), y: integer(), z: integer()
+  def windowPos3i(x, y, z), do: ...
+
+  @spec windowPos3iv(v) :: :ok when v: {x :: integer(), y :: integer(), z :: integer()}
+  def windowPos3iv({x, y, z}), do: ...
+
+  @spec windowPos3s(x, y, z) :: :ok when x: integer(), y: integer(), z: integer()
+  def windowPos3s(x, y, z), do: ...
+
+  @spec windowPos3sv(v) :: :ok when v: {x :: integer(), y :: integer(), z :: integer()}
+  def windowPos3sv({x, y, z}), do: ...
 end

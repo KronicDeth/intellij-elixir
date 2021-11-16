@@ -22,7 +22,7 @@ class Tree(model: TreeModel): JTree(model) {
         when (value) {
             is V1 -> value.inspectedModule ?: "?"
             is Definition -> "${value.name ?: '?'}/${value.arity ?: '?'}"
-            is Clause -> value.head
+            is Clause -> value.signature
             else -> super.convertValueToText(value, selected, expanded, leaf, row, hasFocus)
         }
 }

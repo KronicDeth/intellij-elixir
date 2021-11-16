@@ -5,25 +5,27 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import com.intellij.psi.scope.PsiScopeProcessor
 import com.intellij.psi.util.PsiTreeUtil
+import org.elixir_lang.psi.Implementation
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.scope.ResolveResultOrderedSet
+import org.elixir_lang.psi.visitedElementSet
 
 class Protocol(private val validResult: Boolean) : PsiScopeProcessor {
     val resolveResultOrderedSet = ResolveResultOrderedSet()
 
     override fun execute(element: PsiElement, state: ResolveState): Boolean =
             when (element) {
-                is Call -> execute(element)
+                is Call -> execute(element, state)
                 else -> true
             }
 
     override fun <T> getHint(hintKey: Key<T>): T? = null
     override fun handleEvent(event: PsiScopeProcessor.Event, associated: Any?) {}
 
-    private fun execute(call: Call): Boolean =
-        if (org.elixir_lang.structure_view.element.modular.Implementation.`is`(call)) {
-            val protocolNameElement = org.elixir_lang.structure_view.element.modular.Implementation.protocolNameElement(call)
+    private fun execute(call: Call, state: ResolveState): Boolean =
+        if (Implementation.`is`(call)) {
+            val protocolNameElement = Implementation.protocolNameElement(call)
             val element: PsiElement
             val name: String
             val validResult: Boolean
@@ -38,7 +40,7 @@ class Protocol(private val validResult: Boolean) : PsiScopeProcessor {
                 validResult = false
             }
 
-            resolveResultOrderedSet.add(element, name, validResult)
+            resolveResultOrderedSet.add(element, name, validResult, state.visitedElementSet())
 
             false
         } else {

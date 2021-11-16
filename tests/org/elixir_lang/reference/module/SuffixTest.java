@@ -1,19 +1,16 @@
 package org.elixir_lang.reference.module;
 
 import com.intellij.codeInsight.completion.CompletionType;
-import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiPolyVariantReference;
-import com.intellij.psi.PsiReference;
 import com.intellij.psi.ResolveResult;
-import com.intellij.psi.stubs.StubIndex;
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
+import org.elixir_lang.PlatformTestCase;
 import org.elixir_lang.psi.ElixirAlias;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class SuffixTest extends BasePlatformTestCase {
+public class SuffixTest extends PlatformTestCase {
 
     /*
      * Tests
@@ -54,10 +51,10 @@ public class SuffixTest extends BasePlatformTestCase {
 
         assertEquals(resolveResults.length, 2);
 
-        // alias
-        assertEquals("alias Prefix.Suffix", resolveResults[0].getElement().getParent().getParent().getText());
         // defmodule
-        assertEquals("defmodule Prefix.Suffix do\nend", resolveResults[1].getElement().getText());
+        assertEquals("defmodule Prefix.Suffix do\nend", resolveResults[0].getElement().getText());
+        // alias
+        assertEquals("alias Prefix.Suffix", resolveResults[1].getElement().getText());
     }
 
     /*

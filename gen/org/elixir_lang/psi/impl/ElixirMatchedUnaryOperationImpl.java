@@ -10,7 +10,6 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
 import org.elixir_lang.psi.*;
 import com.ericsson.otp.erlang.OtpErlangObject;
-import kotlin.ranges.IntRange;
 
 public class ElixirMatchedUnaryOperationImpl extends ElixirMatchedExpressionImpl implements ElixirMatchedUnaryOperation {
 

@@ -38,7 +38,7 @@ public class Implementation implements ItemPresentation, Parent {
     @Nullable
     @Override
     public Icon getIcon(boolean unused) {
-        return Icons.IMPLEMENTATION;
+        return Icons.Implementation.Structure;
     }
 
     /**

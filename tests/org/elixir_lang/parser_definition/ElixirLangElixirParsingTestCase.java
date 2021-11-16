@@ -10,9 +10,6 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
-import static org.elixir_lang.Level.*;
-import static org.elixir_lang.test.ElixirVersion.elixirSdkLevel;
-
 public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     private enum Parse {
         ERROR("with local and remote error"),

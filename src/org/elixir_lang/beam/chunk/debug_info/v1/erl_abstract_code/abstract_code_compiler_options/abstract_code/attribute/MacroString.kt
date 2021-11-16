@@ -3,9 +3,10 @@ package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Attribute
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Attributes
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.ToMacroString
+import org.elixir_lang.beam.decompiler.Options
 
 abstract class MacroString(val attribute: Attribute): ToMacroString {
-    abstract override fun toMacroString(): String
+    abstract override fun toMacroString(options: Options): String
 
     companion object {
         fun from(attributes: Attributes, attribute: Attribute): MacroString? =

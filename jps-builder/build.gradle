@@ -1,4 +1,4 @@
-jar.archiveName = "jps-builder.jar"
+jar.archiveFileName = "jps-builder.jar"
 
 repositories {
     mavenCentral()

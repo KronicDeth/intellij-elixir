@@ -17,7 +17,6 @@ import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.search.SearchScope;
 import java.util.Set;
-import kotlin.ranges.IntRange;
 import com.intellij.psi.stubs.IStubElementType;
 
 public class ElixirMatchedUnqualifiedNoArgumentsCallImpl extends NamedStubbedPsiElementBase<MatchedUnqualifiedNoArgumentsCall> implements ElixirMatchedUnqualifiedNoArgumentsCall {
@@ -139,6 +138,11 @@ public class ElixirMatchedUnqualifiedNoArgumentsCallImpl extends NamedStubbedPsi
   @Override
   public boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place) {
     return ElixirPsiImplUtil.processDeclarations(this, processor, state, lastParent, place);
+  }
+
+  @Override
+  public @Nullable String implementedProtocolName() {
+    return ElixirPsiImplUtil.implementedProtocolName(this);
   }
 
   @Override

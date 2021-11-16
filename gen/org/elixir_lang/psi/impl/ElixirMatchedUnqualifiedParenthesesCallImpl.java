@@ -16,7 +16,6 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import java.util.Set;
-import kotlin.ranges.IntRange;
 import com.intellij.psi.stubs.IStubElementType;
 
 public class ElixirMatchedUnqualifiedParenthesesCallImpl extends NamedStubbedPsiElementBase<MatchedUnqualifiedParenthesesCall> implements ElixirMatchedUnqualifiedParenthesesCall {
@@ -139,6 +138,11 @@ public class ElixirMatchedUnqualifiedParenthesesCallImpl extends NamedStubbedPsi
   @Override
   public boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place) {
     return ElixirPsiImplUtil.processDeclarations(this, processor, state, lastParent, place);
+  }
+
+  @Override
+  public @Nullable String implementedProtocolName() {
+    return ElixirPsiImplUtil.implementedProtocolName(this);
   }
 
   @Override

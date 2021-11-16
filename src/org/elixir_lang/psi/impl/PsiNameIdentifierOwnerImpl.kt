@@ -1,15 +1,15 @@
 package org.elixir_lang.psi.impl
 
 import com.intellij.psi.PsiElement
+import org.elixir_lang.module.PutAttribute
+import org.elixir_lang.module.RegisterAttribute
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.operation.Operation
 import org.elixir_lang.structure_view.element.CallDefinitionSpecification
 import org.elixir_lang.structure_view.element.Callback
 import org.elixir_lang.structure_view.element.Delegation
 import org.elixir_lang.structure_view.element.Type
-import org.elixir_lang.structure_view.element.modular.Implementation
 import org.elixir_lang.structure_view.element.modular.Module
-import org.elixir_lang.structure_view.element.modular.Protocol
 
 object PsiNameIdentifierOwnerImpl {
     @JvmStatic
@@ -68,11 +68,15 @@ object PsiNameIdentifierOwnerImpl {
                 /* have to set to null so that {@code else} clause doesn't return the {@code defimpl} element as the
                    name identifier */
                 Implementation.`is`(named) -> null
-                Module.`is`(named) -> Module.nameIdentifier(named)
+                org.elixir_lang.psi.Module.`is`(named) -> Module.nameIdentifier(named)
                 Protocol.`is`(named) -> Module.nameIdentifier(named)
                 Type.`is`(named) -> Type.nameIdentifier(named)
-                // module attribute
+
+                // module attributes
+                RegisterAttribute.`is`(named) -> RegisterAttribute.nameIdentifier(named)
+                PutAttribute.`is`(named) -> PutAttribute.nameIdentifier(named)
                 named is AtUnqualifiedNoParenthesesCall<*> ->  named.atIdentifier
+
                 else -> named.functionNameElement()
             }
 

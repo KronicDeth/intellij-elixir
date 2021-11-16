@@ -112,7 +112,7 @@ class Panel(private val definitionsTree: Tree, project: Project): JPanel(GridLay
     }
 
     private fun headContext(clause: Clause, body: () -> String): String =
-            "def ${clause.head} do\n  ${adjustNewLines(body(), "\n  ")}\nend"
+            "def ${clause.signature} do\n  ${adjustNewLines(body(), "\n  ")}\nend"
 
     private fun moduleContext(clause: Clause, inner: () -> String): String = moduleContext(clause.definition, inner)
 

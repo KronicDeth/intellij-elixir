@@ -82,10 +82,8 @@ fun Call.computeReference(): PsiReference? =
 
 private fun PsiElement.isCaptureNonNumericOperation(): Boolean =
         when (this) {
-            is ElixirMatchedLessThanOnePointSixCaptureNonNumericOperation,
-            is ElixirMatchedGreaterThanOrEqualToOnePointSixCaptureNonNumericOperation,
-            is ElixirUnmatchedLessThanOnePointSixCaptureNonNumericOperation,
-            is ElixirUnmatchedGreaterThanOrEqualToOnePointSixCaptureNonNumericOperation ->
+            is ElixirMatchedCaptureNonNumericOperation,
+            is ElixirUnmatchedCaptureNonNumericOperation ->
                 true
             else ->
                 false

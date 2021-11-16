@@ -6,6 +6,7 @@ import com.intellij.psi.PsiElement
 import org.elixir_lang.Visibility
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.navigation.item_presentation.NameArity
+import org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall
 import org.elixir_lang.psi.CallDefinitionClause.head
 import org.elixir_lang.psi.CallDefinitionClause.isFunction
 import org.elixir_lang.psi.CallDefinitionClause.isMacro
@@ -17,7 +18,6 @@ import org.elixir_lang.psi.For
 import org.elixir_lang.psi.QuoteMacro
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.ALIAS
-import org.elixir_lang.psi.call.name.Function.FOR
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.call.macroChildCalls
 import org.elixir_lang.psi.impl.enclosingMacroCall
@@ -66,8 +66,8 @@ class CallDefinitionClause(val callDefinition: CallDefinition, call: Call) :
 
     private fun addChildCall(treeElementList: MutableList<TreeElement>, childCall: Call) {
         when {
-            Implementation.`is`(childCall) -> Implementation(callDefinition.modular, childCall)
-            Module.`is`(childCall) -> Module(callDefinition.modular, childCall)
+            org.elixir_lang.psi.Implementation.`is`(childCall) -> Implementation(callDefinition.modular, childCall)
+            org.elixir_lang.psi.Module.`is`(childCall) -> Module(callDefinition.modular, childCall)
             QuoteMacro.`is`(childCall) -> Quote(this, childCall)
             else -> null
         }?.run {
@@ -109,42 +109,18 @@ class CallDefinitionClause(val callDefinition: CallDefinition, call: Call) :
                     modular(it)
                 }
 
-        /**
-         * The enclosing macro call that acts as the modular scope of `call`.  Ignores enclosing `for` calls that
-         * [org.elixir_lang.psi.impl.PsiElementImplKt.enclosingMacroCall] doesn't.
-         *
-         * @param call a def(macro)?p?
-         */
-        @JvmStatic
-        fun enclosingModularMacroCall(call: Call): Call? {
-            var enclosedCall = call
-            var enclosingMacroCall: Call?
-
-            while (true) {
-                enclosingMacroCall = enclosedCall.enclosingMacroCall()
-
-                if (enclosingMacroCall != null && (enclosingMacroCall.isCalling(KERNEL, ALIAS) || For.`is`(enclosingMacroCall))) {
-                    enclosedCall = enclosingMacroCall
-                } else {
-                    break
-                }
-            }
-
-            return enclosingMacroCall
-        }
-
         @Contract(pure = true)
         fun modular(enclosingMacroCall: Call): Modular? {
             var modular: Modular? = null
 
             // All classes under {@link org.elixir_lang.structure_view.element.Modular}
-            if (Implementation.`is`(enclosingMacroCall)) {
+            if (org.elixir_lang.psi.Implementation.`is`(enclosingMacroCall)) {
                 val grandScope = enclosingModular(enclosingMacroCall)
                 modular = Implementation(grandScope, enclosingMacroCall)
-            } else if (Module.`is`(enclosingMacroCall)) {
+            } else if (org.elixir_lang.psi.Module.`is`(enclosingMacroCall)) {
                 val grandScope = enclosingModular(enclosingMacroCall)
                 modular = Module(grandScope, enclosingMacroCall)
-            } else if (Protocol.`is`(enclosingMacroCall)) {
+            } else if (org.elixir_lang.psi.Protocol.`is`(enclosingMacroCall)) {
                 val grandScope = enclosingModular(enclosingMacroCall)
                 modular = Protocol(grandScope, enclosingMacroCall)
             } else if (QuoteMacro.`is`(enclosingMacroCall)) {

@@ -5,14 +5,14 @@ import com.google.common.io.Files;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess;
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
+import org.elixir_lang.PlatformTestCase;
 
 import java.io.File;
 import java.io.IOException;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class DecompilerTest extends BasePlatformTestCase {
+public class DecompilerTest extends PlatformTestCase {
     /*
      * Tests
      */
@@ -82,7 +82,17 @@ public class DecompilerTest extends BasePlatformTestCase {
                         "\n" +
                         "  @doc false\n" +
                         "  defmacro __using__(options) do\n" +
-                        "    # body not decompiled\n" +
+                        "    (\n" +
+                        "      except = cond() do\n" +
+                        "        Keyword.get(options, :only_operators) ->\n" +
+                        "          [bnot: 1, band: 2, bor: 2, bxor: 2, bsl: 2, bsr: 2]\n" +
+                        "        Keyword.get(options, :skip_operators) ->\n" +
+                        "          [~~~: 1, &&&: 2, |||: 2, ^^^: 2, <<<: 2, >>>: 2]\n" +
+                        "        true ->\n" +
+                        "          []\n" +
+                        "      end\n" +
+                        "      {:import, [context: Bitwise], [{:__aliases__, [alias: false], [:\"Bitwise\"]}, [except: except]]}\n" +
+                        "    )\n" +
                         "  end\n" +
                         "\n" +
                         "  # Functions\n" +
@@ -102,7 +112,7 @@ public class DecompilerTest extends BasePlatformTestCase {
                         "\n" +
                         "  \"\"\"\n" +
                         "  def left &&& right do\n" +
-                        "    # body not decompiled\n" +
+                        "    Bitwise.band(left, right)\n" +
                         "  end\n" +
                         "\n" +
                         "  @doc ~S\"\"\"\n" +
@@ -129,7 +139,7 @@ public class DecompilerTest extends BasePlatformTestCase {
                         "\n" +
                         "  \"\"\"\n" +
                         "  def left <<< right do\n" +
-                        "    # body not decompiled\n" +
+                        "    Bitwise.bsl(left, right)\n" +
                         "  end\n" +
                         "\n" +
                         "  @doc ~S\"\"\"\n" +
@@ -156,7 +166,7 @@ public class DecompilerTest extends BasePlatformTestCase {
                         "\n" +
                         "  \"\"\"\n" +
                         "  def left >>> right do\n" +
-                        "    # body not decompiled\n" +
+                        "    Bitwise.bsr(left, right)\n" +
                         "  end\n" +
                         "\n" +
                         "  @doc ~S\"\"\"\n" +
@@ -174,7 +184,7 @@ public class DecompilerTest extends BasePlatformTestCase {
                         "\n" +
                         "  \"\"\"\n" +
                         "  def left ^^^ right do\n" +
-                        "    # body not decompiled\n" +
+                        "    Bitwise.bxor(left, right)\n" +
                         "  end\n" +
                         "\n" +
                         "  def __info__(p0) do\n" +
@@ -194,7 +204,7 @@ public class DecompilerTest extends BasePlatformTestCase {
                         "\n" +
                         "  \"\"\"\n" +
                         "  def band(left, right) do\n" +
-                        "    # body not decompiled\n" +
+                        "    Bitwise.band(left, right)\n" +
                         "  end\n" +
                         "\n" +
                         "  @doc ~S\"\"\"\n" +
@@ -213,7 +223,7 @@ public class DecompilerTest extends BasePlatformTestCase {
                         "\n" +
                         "  \"\"\"\n" +
                         "  def bnot(expr) do\n" +
-                        "    # body not decompiled\n" +
+                        "    :erlang.bnot(expr)\n" +
                         "  end\n" +
                         "\n" +
                         "  @doc ~S\"\"\"\n" +
@@ -229,7 +239,7 @@ public class DecompilerTest extends BasePlatformTestCase {
                         "\n" +
                         "  \"\"\"\n" +
                         "  def bor(left, right) do\n" +
-                        "    # body not decompiled\n" +
+                        "    Bitwise.bor(left, right)\n" +
                         "  end\n" +
                         "\n" +
                         "  @doc ~S\"\"\"\n" +
@@ -254,7 +264,7 @@ public class DecompilerTest extends BasePlatformTestCase {
                         "\n" +
                         "  \"\"\"\n" +
                         "  def bsl(left, right) do\n" +
-                        "    # body not decompiled\n" +
+                        "    Bitwise.bsl(left, right)\n" +
                         "  end\n" +
                         "\n" +
                         "  @doc ~S\"\"\"\n" +
@@ -279,7 +289,7 @@ public class DecompilerTest extends BasePlatformTestCase {
                         "\n" +
                         "  \"\"\"\n" +
                         "  def bsr(left, right) do\n" +
-                        "    # body not decompiled\n" +
+                        "    Bitwise.bsr(left, right)\n" +
                         "  end\n" +
                         "\n" +
                         "  @doc ~S\"\"\"\n" +
@@ -295,7 +305,7 @@ public class DecompilerTest extends BasePlatformTestCase {
                         "\n" +
                         "  \"\"\"\n" +
                         "  def bxor(left, right) do\n" +
-                        "    # body not decompiled\n" +
+                        "    Bitwise.bxor(left, right)\n" +
                         "  end\n" +
                         "\n" +
                         "  def module_info() do\n" +
@@ -321,7 +331,7 @@ public class DecompilerTest extends BasePlatformTestCase {
                         "\n" +
                         "  \"\"\"\n" +
                         "  def left ||| right do\n" +
-                        "    # body not decompiled\n" +
+                        "    Bitwise.bor(left, right)\n" +
                         "  end\n" +
                         "\n" +
                         "  @doc ~S\"\"\"\n" +
@@ -341,8 +351,8 @@ public class DecompilerTest extends BasePlatformTestCase {
                         "\n" +
                         "\n" +
                         "  \"\"\"\n" +
-                        "  def ~~~expr do\n" +
-                        "    # body not decompiled\n" +
+                        "  def ~~~(expr) do\n" +
+                        "    :erlang.bnot(expr)\n" +
                         "  end\n" +
                         "end\n",
                 decompiled.toString()
@@ -361,7 +371,7 @@ public class DecompilerTest extends BasePlatformTestCase {
         assertDecompiled("Elixir.LDAPEx.ELDAPv3");
     }
 
-    public void testIssue722() throws IOException, OtpErlangDecodeException {
+    public void testIssue772() throws IOException, OtpErlangDecodeException {
         assertDecompiled("OTP20/Elixir.Kernel");
     }
 

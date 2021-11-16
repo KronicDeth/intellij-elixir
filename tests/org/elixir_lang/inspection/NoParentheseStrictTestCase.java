@@ -1,11 +1,11 @@
 package org.elixir_lang.inspection;
 
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
+import org.elixir_lang.PlatformTestCase;
 
 /**
  * Created by luke.imhoff on 12/6/14.
  */
-public class NoParentheseStrictTestCase extends BasePlatformTestCase {
+public class NoParentheseStrictTestCase extends PlatformTestCase {
     public void testFunctionSpaceEmptyParentheses() {
         myFixture.configureByFiles("FunctionSpaceEmptyParentheses.ex");
         myFixture.enableInspections(NoParenthesesStrict.class);

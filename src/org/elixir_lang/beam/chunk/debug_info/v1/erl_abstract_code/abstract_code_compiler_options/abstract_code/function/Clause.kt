@@ -3,33 +3,51 @@ package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.*
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Clause.toPatternSequence
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Function
+import org.elixir_lang.beam.decompiler.Options
 
 private const val TAG = "clause"
 
-class Clause(val attributes: Attributes, val function: Function, val term: OtpErlangTuple): Node(term) {
+class Clause(val attributes: Attributes, val function: Function, val term: OtpErlangTuple) : Node(term) {
     val head by lazy { headMacroStringDeclaredScope.macroString }
 
-    override fun toMacroString(): String {
+    override fun toMacroString(options: Options): String {
         val (headMacroString, headDeclaredScope) = headMacroStringDeclaredScope
-        val indentedBody = org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Clause.bodyMacroString(term, headDeclaredScope)
+        val prefix = "${function.macroNameArity.macro} $headMacroString"
 
-        return "def $headMacroString do\n" +
-                "  $indentedBody\n" +
-                "end"
+        return if (options.decompileBodies) {
+            val indentedBody = org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Clause.bodyMacroString(term, headDeclaredScope)
+
+            if (options.truncateDecompiledBody(indentedBody)) {
+                "$prefix, do: ..."
+            } else {
+                if (indentedBody.contains("\n")) {
+                    "$prefix do\n" +
+                            "  $indentedBody\n" +
+                            "end"
+                } else {
+                    "$prefix, do: ${indentedBody.trimIndent()}"
+                }
+            }
+        } else {
+            "$prefix, do: ..."
+        }
     }
 
     private val headMacroStringDeclaredScope by lazy {
         val (patternSequenceMacroString, patternSequenceDeclaredScope) = patternSequenceMacroStringDeclaredScope()
 
-        MacroStringDeclaredScope("${function.callDefinitionName}($patternSequenceMacroString)${guardSequenceMacroString()}", patternSequenceDeclaredScope)
+        MacroStringDeclaredScope("${patternSequenceMacroString}${guardSequenceMacroString()}", patternSequenceDeclaredScope)
     }
 
     private fun guardSequenceMacroString() =
             org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Clause.guardSequenceMacroString(term)
 
     private fun patternSequenceMacroStringDeclaredScope() =
-            org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Clause.patternSequenceMacroStringDeclaredScope(term, Scope.EMPTY)
+            toPatternSequence(term)
+                    ?.let { Sequence.toMacroStringDeclaredScope(it, function.decompiler, function.macroNameArity) }
+                    ?: Sequence.unknown()
 
     companion object {
         fun from(term: OtpErlangObject, attributes: Attributes, function: Function): Clause? =

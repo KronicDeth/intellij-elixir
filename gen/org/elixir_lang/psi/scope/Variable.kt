@@ -13,6 +13,7 @@ import org.elixir_lang.psi.CallDefinitionClause.head
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function
 import org.elixir_lang.psi.call.name.Module
+import org.elixir_lang.psi.ex_unit.Assertions
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil
 import org.elixir_lang.psi.impl.ProcessDeclarationsImpl.DECLARING_SCOPE
 import org.elixir_lang.psi.impl.ProcessDeclarationsImpl.isDeclaringScope
@@ -59,7 +60,7 @@ abstract class Variable : PsiScopeProcessor {
                 is Match -> execute(element, state)
                 is Pipe, is Two -> execute(element as Infix, state)
                 is Type -> execute(element, state)
-                is UnaryNonNumericOperation -> execute(element, state)
+                is UnaryOperation -> execute(element, state)
                 is UnqualifiedNoArgumentsCall<*> -> executeOnMaybeVariable(element, state)
                 is Call -> execute(element, state)
                 /* Occurs when qualified call occurs over a line with assignment to a tuple, such as
@@ -71,7 +72,7 @@ abstract class Variable : PsiScopeProcessor {
                    bindQuoted */
                 is QuotableKeywordList -> execute(element, state)
                 else -> {
-                    if (!(element is AtNonNumericOperation ||  // a module attribute reference
+                    if (!(element is AtOperation ||  // a module attribute reference
                                     element is AtUnqualifiedBracketOperation ||  // a module attribute reference with access
                                     element is Heredoc ||
                                     element is BracketOperation ||  /* an anonymous function is a new scope, so it can't be used to declare a variable.  This won't ever
@@ -152,7 +153,7 @@ abstract class Variable : PsiScopeProcessor {
                         val stripped = strip(head)
 
                         when (stripped) {
-                            is AtNonNumericOperation -> {
+                            is AtOperation -> {
                                 stripped
                                         .operand()
                                         .let { it as? ElixirAccessExpression }
@@ -213,19 +214,23 @@ abstract class Variable : PsiScopeProcessor {
                         )
                     }
                 }
-                QuoteMacro.`is`(match) -> {
-                    match
-                            .keywordArgument("bind_quoted")?.let { it as? ElixirAccessExpression }
-                            ?.stripAccessExpression()
-                            ?.let { it as? ElixirList }
-                            ?.children?.singleOrNull()
-                            ?.let { it as? ElixirKeywords }
-                            ?.keywordPairList?.let { keywordPairList ->
-                                whileIn(keywordPairList) { keywordPair ->
-                                    executeOnVariable(keywordPair.keywordKey, state)
-                                }
+                match.isCalling(Module.KERNEL, Function.MATCH_QUESTION_MARK, 2) -> {
+                    match.finalArguments()?.first()?.let { pattern ->
+                        val declaringScope = when (pattern) {
+                            is When -> {
+                                pattern.leftOperand()
                             }
+                            else -> pattern
+                        }
+
+                        if (declaringScope != null) {
+                            execute(declaringScope, state.put(DECLARING_SCOPE, true))
+                        } else {
+                            true
+                        }
+                    }
                 }
+                QuoteMacro.`is`(match) -> executeOnBindQuoted(match, state) && executeOnOnlyChild(match, state)
                 ElixirPsiImplUtil.hasDoBlockOrKeyword(match) -> {
                     match.finalArguments()?.let { finalArguments ->
                         val macroArgumentsState = state.put(DECLARING_SCOPE, true)
@@ -241,11 +246,14 @@ abstract class Variable : PsiScopeProcessor {
                 Use.`is`(match) -> {
                     Use.treeWalkUp(match, state, ::execute)
                 }
-                org.elixir_lang.ecto.Query.isDeclaringMacro(match, state) -> {
-                    org.elixir_lang.ecto.Query.treeWalkUp(match, state, ::execute)
+                org.elixir_lang.ecto.Query.isChild(match, state) -> {
+                    org.elixir_lang.ecto.Query.walkChild(match, state, ::execute)
                 }
-                org.elixir_lang.ecto.Schema.`is`(match, state) -> {
-                    org.elixir_lang.ecto.Schema.treeWalkUp(match, state, ::execute)
+                org.elixir_lang.ecto.Schema.isChild(match, state) -> {
+                    org.elixir_lang.ecto.Schema.walkChild(match, state, ::execute)
+                }
+                Assertions.isChild(match, state) -> {
+                    Assertions.walkChild(match, state, ::execute)
                 }
                 else -> {
                     // unquote(var) can't declare var, only use it
@@ -319,7 +327,8 @@ abstract class Variable : PsiScopeProcessor {
             execute(match.parenthesesArguments, state)
 
     private fun execute(match: ElixirStructOperation, state: ResolveState): Boolean =
-            execute(match.mapArguments, state)
+            (match.variable?.let { execute(it, state) } ?: true) &&
+                    execute(match.mapArguments, state)
 
     /**
      * `in` can declare variable for `rescue` clauses like `rescue e in RuntimeException ->`
@@ -330,16 +339,12 @@ abstract class Variable : PsiScopeProcessor {
     /**
      * Infix operations where either side can declare a variable in a match
      */
-    private fun execute(match: Infix, state: ResolveState): Boolean {
-        var keepProcessing = executeLeftOperand(match, state)
-        if (keepProcessing) {
-            val rightOperand: PsiElement? = match.rightOperand()
-            if (rightOperand != null) {
-                keepProcessing = execute(rightOperand, state)
-            }
-        }
-        return keepProcessing
-    }
+    private fun execute(match: Infix, state: ResolveState): Boolean =
+            state.hasBeenVisited(match) ||
+                    state.putVisitedElement(match).let { matchState ->
+                        executeLeftOperand(match, matchState) &&
+                                match.rightOperand()?.let { execute(it, matchState) } ?: true
+                    }
 
     private fun execute(match: InMatch, state: ResolveState): Boolean {
         val operator = match.operator()
@@ -394,7 +399,7 @@ abstract class Variable : PsiScopeProcessor {
     private fun execute(match: Type, state: ResolveState): Boolean =
             executeLeftOperand(match, state)
 
-    private fun execute(match: UnaryNonNumericOperation, state: ResolveState): Boolean {
+    private fun execute(match: UnaryOperation, state: ResolveState): Boolean {
         val operator = match.operator()
         val operatorText = operator.text
 
@@ -429,6 +434,26 @@ abstract class Variable : PsiScopeProcessor {
                 execute(finalArguments, state.put(DECLARING_SCOPE, true))
             } ?: true
 
+    private fun executeOnBindQuoted(quote: Call, state: ResolveState): Boolean =
+            quote
+                    .keywordArgument("bind_quoted")?.let { it as? ElixirAccessExpression }
+                    ?.stripAccessExpression()
+                    ?.let { it as? ElixirList }
+                    ?.children?.singleOrNull()
+                    ?.let { it as? ElixirKeywords }
+                    ?.keywordPairList?.let { keywordPairList ->
+                        whileIn(keywordPairList) { keywordPair ->
+                            executeOnVariable(keywordPair.keywordKey, state)
+                        }
+                    } ?: true
+
+    private fun executeOnOnlyChild(quote: Call, state: ResolveState): Boolean =
+            quote
+                    .keywordArgument("do")
+                    ?.let { it as? PsiNamedElement}
+                    ?.takeIf { org.elixir_lang.psi.Variable.isDeclaration(it) }
+                    ?.let { executeOnVariable(it, state) }
+                    ?: true
 
     private fun maybeMacro(call: Call, state: ResolveState): Boolean =
             !ElixirPsiImplUtil.hasDoBlockOrKeyword(call) && isInDeclaringScope(call, state)

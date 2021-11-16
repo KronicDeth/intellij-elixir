@@ -7,11 +7,11 @@ import com.intellij.psi.impl.source.resolve.ResolveCache
 import org.elixir_lang.Arity
 import org.elixir_lang.Name
 import org.elixir_lang.NameArityInterval
+import org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall
 import org.elixir_lang.psi.For
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.call.macroChildCalls
-import org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.enclosingModularMacroCall
 import org.elixir_lang.structure_view.element.CallDefinitionHead
 import org.elixir_lang.structure_view.element.CallDefinitionSpecification.Companion.typeNameArity
 import org.elixir_lang.structure_view.element.Delegation

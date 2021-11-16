@@ -7,7 +7,7 @@ import com.intellij.psi.PsiElement;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.PsiReference;
 
-public interface ElixirMatchedAtOperation extends ElixirMatchedExpression, AtNonNumericOperation {
+public interface ElixirMatchedAtOperation extends ElixirMatchedExpression, AtOperation {
 
   @NotNull
   ElixirAtPrefixOperator getAtPrefixOperator();

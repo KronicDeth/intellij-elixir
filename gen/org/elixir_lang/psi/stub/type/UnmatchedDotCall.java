@@ -40,7 +40,8 @@ public class UnmatchedDotCall extends Stub<org.elixir_lang.psi.stub.UnmatchedDot
                 psi.resolvedFinalArity(),
                 psi.hasDoBlockOrKeyword(),
                 StringUtil.notNullize(psi.getName(), "?"),
-                psi.canonicalNameSet()
+                psi.canonicalNameSet(),
+                psi.implementedProtocolName()
         );
     }
 

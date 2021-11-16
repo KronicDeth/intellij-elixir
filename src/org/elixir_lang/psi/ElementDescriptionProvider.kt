@@ -15,9 +15,7 @@ import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.hasKeywordKey
 import org.elixir_lang.reference.Callable
 import org.elixir_lang.structure_view.element.*
-import org.elixir_lang.structure_view.element.modular.Implementation
 import org.elixir_lang.structure_view.element.modular.Module
-import org.elixir_lang.structure_view.element.modular.Protocol
 import org.elixir_lang.structure_view.element.structure.Structure
 
 /**
@@ -31,8 +29,9 @@ import org.elixir_lang.structure_view.element.structure.Structure
 class ElementDescriptionProvider : com.intellij.psi.ElementDescriptionProvider {
     override tailrec fun getElementDescription(element: PsiElement, location: ElementDescriptionLocation): String? =
             when (element) {
-                is AtNonNumericOperation -> getElementDescription(element, location)
+                is AtOperation -> getElementDescription(element, location)
                 is Call -> getElementDescription(element, location)
+                is ElixirAtom -> getElementDescription(element, location)
                 is ElixirIdentifier -> getElementDescription(element, location)
                 is ElixirKeywordKey -> getElementDescription(element, location)
                 is ElixirVariable -> getElementDescription(element, location)
@@ -45,10 +44,17 @@ class ElementDescriptionProvider : com.intellij.psi.ElementDescriptionProvider {
      * Private Instance Methods
      */
 
-    private fun getElementDescription(atNonNumericOperation: AtNonNumericOperation, location: ElementDescriptionLocation): String? =
+    private fun getElementDescription(atOperation: AtOperation, location: ElementDescriptionLocation): String? =
             when (location) {
-                UsageViewNodeTextLocation.INSTANCE -> atNonNumericOperation.text
+                UsageViewNodeTextLocation.INSTANCE -> atOperation.text
                 UsageViewTypeLocation.INSTANCE -> "module attribute"
+                else -> null
+            }
+
+    private fun getElementDescription(atom: ElixirAtom, location: ElementDescriptionLocation): String? =
+            when (location) {
+                UsageViewNodeTextLocation.INSTANCE, UsageViewShortNameLocation.INSTANCE -> atom.text
+                UsageViewTypeLocation.INSTANCE -> "atom"
                 else -> null
             }
 
@@ -144,7 +150,7 @@ class ElementDescriptionProvider : com.intellij.psi.ElementDescriptionProvider {
                 Exception.`is`(call) -> org.elixir_lang.structure_view.element.Exception.elementDescription(call, location)
                 Implementation.`is`(call) -> Implementation.elementDescription(location)
                 Import.`is`(call) -> Import.elementDescription(call, location)
-                Module.`is`(call) -> Module.elementDescription(call, location)
+                org.elixir_lang.psi.Module.`is`(call) -> Module.elementDescription(call, location)
                 Overridable.`is`(call) -> Overridable.elementDescription(call, location)
                 Protocol.`is`(call) -> Module.elementDescription(call, location)
                 QuoteMacro.`is`(call) -> org.elixir_lang.structure_view.element.Quote.elementDescription(call, location)

@@ -2,6 +2,7 @@ package org.elixir_lang.psi.stub;
 
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.stubs.StubElement;
+import org.elixir_lang.psi.Definition;
 import org.elixir_lang.psi.ElixirUnmatchedUnqualifiedNoArgumentsCall;
 import org.elixir_lang.psi.stub.call.Deserialized;
 import org.elixir_lang.psi.stub.call.Stub;
@@ -26,7 +27,9 @@ public class UnmatchedUnqualifiedNoArgumentsCall extends Stub<ElixirUnmatchedUnq
             int resolvedFinalArity,
             boolean hasDoBlockOrKeyword,
             @NotNull String name,
-            @NotNull Set<String> canonicalNameSet
+            @NotNull Set<String> canonicalNameSet,
+            @Nullable Definition definition,
+            @Nullable String implementedProtocolName
     ) {
         super(parent,
                 elementType,
@@ -35,6 +38,8 @@ public class UnmatchedUnqualifiedNoArgumentsCall extends Stub<ElixirUnmatchedUnq
                 resolvedFinalArity,
                 hasDoBlockOrKeyword,
                 name,
-                canonicalNameSet);
+                canonicalNameSet,
+                definition,
+                implementedProtocolName);
     }
 }

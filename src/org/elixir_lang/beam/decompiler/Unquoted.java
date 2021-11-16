@@ -8,9 +8,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.elixir_lang.beam.decompiler.Default.appendParameters;
-
-public class Unquoted extends MacroNameArity {
+public class Unquoted extends Default {
     /*
      * CONSTANTS
      */
@@ -80,23 +78,6 @@ public class Unquoted extends MacroNameArity {
     @Override
     public boolean accept(@NotNull org.elixir_lang.beam.MacroNameArity macroNameArity) {
         return BARE_ATOM_PREDICATE.or(NOT_IDENTIFIER_OR_PREFIX_OPERATOR_PREDICATE).test(macroNameArity.name);
-    }
-
-    /**
-     * Append the decompiled source for {@code macroNameArity} to {@code decompiled}.
-     *
-     * @param decompiled the decompiled source so far
-     */
-    @Override
-    public void append(@NotNull StringBuilder decompiled, @NotNull org.elixir_lang.beam.MacroNameArity macroNameArity) {
-        decompiled
-                .append("  ")
-                .append(macroNameArity.macro)
-                .append(' ');
-
-        appendName(decompiled, macroNameArity.name);
-        appendParameters(decompiled, macroNameArity);
-        appendBody(decompiled);
     }
 
     @Override

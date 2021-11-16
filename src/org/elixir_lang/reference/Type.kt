@@ -1,6 +1,7 @@
 package org.elixir_lang.reference
 
 import com.intellij.openapi.util.TextRange
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiPolyVariantReferenceBase
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.impl.source.resolve.ResolveCache
@@ -23,13 +24,29 @@ class Type(typeSpec: AtUnqualifiedNoParenthesesCall<*>, type: Call) : PsiPolyVar
                     )
 
     companion object {
-        fun typeHead(typeSpec: AtUnqualifiedNoParenthesesCall<*>): Call? =
-            typeSpec
-                    .finalArguments()
-                    ?.singleOrNull()
-                    ?.let { it as? org.elixir_lang.psi.operation.Type }
-                    ?.leftOperand()
-                    ?.let { it as? Call }
+        tailrec fun typeHead(typeSpec: PsiElement): Call? =
+                when (typeSpec) {
+                    is AtUnqualifiedNoParenthesesCall<*> -> {
+                        val finalArgument = typeSpec.finalArguments()?.singleOrNull()
+
+                        if (finalArgument != null) {
+                            typeHead(finalArgument)
+                        } else {
+                            null
+                        }
+                    }
+                    is org.elixir_lang.psi.operation.Type -> typeSpec.leftOperand() as? Call
+                    is org.elixir_lang.psi.operation.When -> {
+                        val leftOperand = typeSpec.leftOperand()
+
+                        if (leftOperand != null) {
+                            typeHead(leftOperand)
+                        } else {
+                            null
+                        }
+                    }
+                    else -> null
+                }
 
         private fun textRange(typeSpec: AtUnqualifiedNoParenthesesCall<*>, type: Call): TextRange =
             if (typeSpec.isEquivalentTo(type)) {

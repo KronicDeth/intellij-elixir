@@ -17,8 +17,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 
-import static org.elixir_lang.file.LevelPropertyPusher.VIRTUAL_FILE;
-
 public class File extends IStubFileElementType<org.elixir_lang.psi.stub.File> {
     public static final int VERSION = 3;
     public static final IStubFileElementType INSTANCE = new File();
@@ -68,7 +66,6 @@ public class File extends IStubFileElementType<org.elixir_lang.psi.stub.File> {
         Language languageForParser = getLanguageForParser(psi);
         PsiBuilder builder = PsiBuilderFactory.getInstance().createBuilder(project, chameleon, null, languageForParser, chameleon.getChars());
         PsiParser parser = LanguageParserDefinitions.INSTANCE.forLanguage(languageForParser).createParser(project);
-        builder.putUserData(VIRTUAL_FILE, psi.getContainingFile().getVirtualFile());
         ASTNode node = parser.parse(this, builder);
         return node.getFirstChildNode();
     }
