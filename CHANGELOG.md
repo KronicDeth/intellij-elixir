@@ -364,6 +364,8 @@
   * Walk the true and false (else) branch of if in Modules or Quote
   * Port `preferred` and `expand` system from `Callables` to `Modules`.
   * Update CI build dependencies
+* [#2199](https://github.com/KronicDeth/intellij-elixir/pull/2199) - [@KronicDeth](https://github.com/KronicDeth)
+  * Regression test for [#2198](https://github.com/KronicDeth/intellij-elixir/issues/2198).
 
 ### Bug Fixes
 * [#2074](https://github.com/KronicDeth/intellij-elixir/pull/2074) - [@Thau](https://github.com/Thau)
@@ -522,6 +524,9 @@
     Stops invalid binding test from erroring when resolving it.
   * Turn off `tailrec` because it doesn't work correctly for `ElixirAccessExpression`
   * Stop searching for qualifier when `ElixirUnqualifiedNoParenthesesManyArgumentsCall`.
+* [#2199](https://github.com/KronicDeth/intellij-elixir/pull/2199) - [@KronicDeth](https://github.com/KronicDeth)
+  * Stop highlighting types when `unquote_splicing/1` is reached.
+    `unquote_splicing` is being used to splat arguments or fields of a struct into the type.  The arguments to `unquote_splicing` are normal calls or variables, not types.
 
 ## v11.13.0
 
