@@ -15,7 +15,9 @@ import org.elixir_lang.psi.*
 import org.elixir_lang.psi.CallDefinitionClause.`is`
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function
+import org.elixir_lang.psi.call.name.Function.UNQUOTE_SPLICING
 import org.elixir_lang.psi.call.name.Module
+import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.identifierName
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.operation.*
@@ -1022,12 +1024,16 @@ class ModuleAttribute : Annotator, DumbAware {
                 )
             }
             psiElement is UnqualifiedParenthesesCall<*> -> {
-                highlightTypesAndTypeParameterUsages(
-                        psiElement,
-                        typeParameterNameSet,
-                        annotationHolder,
-                        typeTextAttributesKey
-                )
+                // `unquote_splicing` is being used to splat arguments or fields of a struct into the type.
+                // The arguments to `unquote_splicing` are normal calls or variables, not types.
+                if (!psiElement.isCalling(KERNEL, UNQUOTE_SPLICING, 1)) {
+                    highlightTypesAndTypeParameterUsages(
+                            psiElement,
+                            typeParameterNameSet,
+                            annotationHolder,
+                            typeTextAttributesKey
+                    )
+                }
             }
             else -> {
                 if (!( /* Occurs in the case of typing a {@code @type name ::} above a {@code @doc <HEREDOC>} and the

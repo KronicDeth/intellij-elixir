@@ -34,6 +34,7 @@ public class Function {
     public static final String TRY = "try";
     public static final String UNLESS = "unless";
     public static final String UNQUOTE = "unquote";
+    public static final String UNQUOTE_SPLICING = "unquote_splicing";
     public static final String USE = "use";
     public static final String VAR_BANG = "var!";
     public static final String __MODULE__ = "__MODULE__";
