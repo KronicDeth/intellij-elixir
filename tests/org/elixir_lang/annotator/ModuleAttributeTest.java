@@ -69,6 +69,11 @@ public class ModuleAttributeTest extends PlatformTestCase {
         myFixture.checkHighlighting(false, false, true);
     }
 
+    public void testIssue2198() {
+        myFixture.configureByFile("issue_2198.ex");
+        myFixture.checkHighlighting(false, false, false);
+    }
+
     public void testMatch() {
         myFixture.configureByFile("match.ex");
         myFixture.checkHighlighting(false, false, true);
