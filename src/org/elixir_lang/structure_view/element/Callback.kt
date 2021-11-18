@@ -14,6 +14,7 @@ import org.elixir_lang.psi.ElixirMatchedWhenOperation
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil
 import org.elixir_lang.psi.operation.Type
+import org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.enclosingModular
 import org.elixir_lang.structure_view.element.modular.Modular
 import org.jetbrains.annotations.Contract
 
@@ -107,6 +108,11 @@ class Callback(private val modular: Modular, navigationItem: Call) :
                     moduleAttributeName == "@callback" || moduleAttributeName == "@macrocallback"
                 } ?:
                 false
+
+        fun fromCall(call: Call): Callback? =
+            enclosingModular(call)?.let { modular ->
+                Callback(modular, call)
+            }
 
         @Contract(pure = true)
         fun nameIdentifier(call: Call): PsiElement? =

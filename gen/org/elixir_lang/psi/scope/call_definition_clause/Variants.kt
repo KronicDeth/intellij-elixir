@@ -15,22 +15,14 @@ import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.scope.CallDefinitionClause
 import org.elixir_lang.psi.putInitialVisitedElement
 import org.elixir_lang.psi.putVisitedElement
+import org.elixir_lang.structure_view.element.Callback
 import java.util.*
 
 class Variants : CallDefinitionClause() {
-
-    /*
-     * Fields
-     */
-
-    private var lookupElementByPsiElement: MutableMap<PsiElement, LookupElement>? = null
+    private var lookupElementByPsiElement: MutableMap<PsiElement, LookupElement> = mutableMapOf()
 
     private val lookupElementCollection: Collection<LookupElement>
-        get() = lookupElementByPsiElement?.values ?: emptySet()
-
-    /*
-     * Protected Instance Methods
-     */
+        get() = lookupElementByPsiElement.values
 
     /**
      * Called on every [Call] where [org.elixir_lang.structure_view.element.CallDefinitionClause. is] is
@@ -41,16 +33,45 @@ class Variants : CallDefinitionClause() {
     override fun executeOnCallDefinitionClause(element: Call, state: ResolveState): Boolean {
         val entranceCallDefinitionClause = state.get(ENTRANCE_CALL_DEFINITION_CLAUSE)
 
-        if (entranceCallDefinitionClause == null || !element.isEquivalentTo(entranceCallDefinitionClause)) {
-            addToLookupElementByPsiElement(element)
+        if ((entranceCallDefinitionClause == null || !element.isEquivalentTo(entranceCallDefinitionClause)) && element is Named) {
+            addCallDefinitionClauseToLookupElementByPsiElement(element)
         }
 
         return true
     }
 
-    override fun executeOnCallback(element: AtUnqualifiedNoParenthesesCall<*>, state: ResolveState): Boolean {
-        TODO()
+    private fun addCallDefinitionClauseToLookupElementByPsiElement(named: Named) {
+        named.name?.let { name ->
+            lookupElementByPsiElement.computeIfAbsent(named) { element ->
+                LookupElementBuilder.createWithSmartPointer(
+                        name,
+                        element
+                ).withRenderer(
+                        org.elixir_lang.code_insight.lookup.element_renderer.CallDefinitionClause(name)
+                )
+            }
+        }
     }
+
+    override fun executeOnCallback(element: AtUnqualifiedNoParenthesesCall<*>, state: ResolveState): Boolean {
+        Callback.headCall(element)
+                ?.let { it as? Named }
+                ?.let { addCallbackToLookupElementByPsiElement(element, it) }
+
+        return true
+    }
+
+    private fun addCallbackToLookupElementByPsiElement(element: AtUnqualifiedNoParenthesesCall<*>, head: Named) =
+            head.name?.let { name ->
+                lookupElementByPsiElement.computeIfAbsent(head) { head ->
+                    LookupElementBuilder.createWithSmartPointer(
+                            name,
+                            element
+                    ).withRenderer(
+                            org.elixir_lang.code_insight.lookup.element_renderer.Callback(name)
+                    )
+                }
+            }
 
     override fun executeOnDelegation(element: Call, state: ResolveState): Boolean {
         TODO()
@@ -75,32 +96,6 @@ class Variants : CallDefinitionClause() {
      */
     override fun keepProcessing(): Boolean = false
 
-    /*
-     * Private Instance Methods
-     */
-
-    private fun addToLookupElementByPsiElement(call: Call) {
-        when (call) {
-            is Named -> addToLookupElementByPsiElement(call)
-        }
-    }
-
-    private fun addToLookupElementByPsiElement(named: Named) {
-        named.name?.let { name ->
-            val lookupElementByPsiElement = lookupElementByPsiElement  ?: mutableMapOf()
-
-            lookupElementByPsiElement.computeIfAbsent(named) { element ->
-                LookupElementBuilder.createWithSmartPointer(
-                        name,
-                        element
-                ).withRenderer(
-                        org.elixir_lang.code_insight.lookup.element_renderer.CallDefinitionClause(name)
-                )
-            }
-
-            this.lookupElementByPsiElement = lookupElementByPsiElement
-        }
-    }
 
     companion object {
         private val ENTRANCE_CALL_DEFINITION_CLAUSE = Key<Call>("ENTRANCE_CALL_DEFINITION_CLAUSE")

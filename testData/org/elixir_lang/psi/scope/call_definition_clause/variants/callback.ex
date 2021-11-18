@@ -1,6 +1,6 @@
 defmodule Behaviour do
-  @callback callback_as_function
-  @macrocallback callback_as_macro
+  @callback function_callback() :: term()
+  @macrocallback macro_callback(term()) :: term()
 
   def helper do
     call<caret>

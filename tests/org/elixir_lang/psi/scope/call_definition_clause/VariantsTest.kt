@@ -2,10 +2,9 @@ package org.elixir_lang.psi.scope.call_definition_clause
 
 import com.intellij.codeInsight.completion.CompletionType
 import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase
-import com.intellij.psi.PsiElement
-import com.intellij.testFramework.UsefulTestCase
-import com.intellij.psi.PsiReference
 import com.intellij.codeInsight.lookup.LookupElement
+import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.codeInsight.lookup.LookupElementPresentation
 import junit.framework.TestCase
 import org.elixir_lang.psi.call.Call
 
@@ -44,7 +43,23 @@ class VariantsTest : LightPlatformCodeInsightFixtureTestCase() {
         myFixture.configureByFile("callback.ex")
         val element = myFixture.file.findElementAt(myFixture.caretOffset - 1)!!.parent.parent
         assertInstanceOf(element, Call::class.java)
-        assertEquals(2, element.reference!!.variants.size)
+        val variants = element.reference!!.variants.filterIsInstance<LookupElementBuilder>()
+
+        val functionCallbackVariant = variants.find { it.lookupString == "function_callback" }
+        assertNotNull(functionCallbackVariant)
+
+        val functionCallbackLookupElementPresentation = LookupElementPresentation()
+        functionCallbackVariant!!.renderElement(functionCallbackLookupElementPresentation)
+        assertEquals("function_callback", functionCallbackLookupElementPresentation.itemText)
+        assertEquals("/0 (/src/callback.ex defmodule Behaviour)", functionCallbackLookupElementPresentation.tailText)
+
+        val macroCallbackVariant = variants.find { it.lookupString == "macro_callback" }
+        assertNotNull(macroCallbackVariant)
+
+        val macroCallbackLookupElementPresentation = LookupElementPresentation()
+        macroCallbackVariant!!.renderElement(macroCallbackLookupElementPresentation)
+        assertEquals("macro_callback", macroCallbackLookupElementPresentation.itemText)
+        assertEquals("/1 (/src/callback.ex defmodule Behaviour)", macroCallbackLookupElementPresentation.tailText)
     }
 
     override fun getTestDataPath(): String = "testData/org/elixir_lang/psi/scope/call_definition_clause/variants"
