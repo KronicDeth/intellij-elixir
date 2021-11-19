@@ -531,6 +531,11 @@
     `unquote_splicing` is being used to splat arguments or fields of a struct into the type.  The arguments to `unquote_splicing` are normal calls or variables, not types.
 * [#2201](https://github.com/KronicDeth/intellij-elixir/pull/2201) - [@KronicDeth](https://github.com/KronicDeth)
   * Implement `call_definition_clause.Variants#executeOnCallback`
+* [#2204](https://github.com/KronicDeth/intellij-elixir/pull/2201) - [@KronicDeth](https://github.com/KronicDeth)
+  * `CallDefinitionClause.time/1`
+    * Mark guards as runtime.
+    * Mark anything unknown as runtime too.
+    * Log unknown calls.
 
 ## v11.13.0
 

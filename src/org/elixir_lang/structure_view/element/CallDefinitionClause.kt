@@ -9,10 +9,13 @@ import org.elixir_lang.navigation.item_presentation.NameArity
 import org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall
 import org.elixir_lang.psi.CallDefinitionClause.head
 import org.elixir_lang.psi.CallDefinitionClause.isFunction
+import org.elixir_lang.psi.CallDefinitionClause.isGuard
 import org.elixir_lang.psi.CallDefinitionClause.isMacro
 import org.elixir_lang.psi.CallDefinitionClause.isPrivateFunction
+import org.elixir_lang.psi.CallDefinitionClause.isPrivateGuard
 import org.elixir_lang.psi.CallDefinitionClause.isPrivateMacro
 import org.elixir_lang.psi.CallDefinitionClause.isPublicFunction
+import org.elixir_lang.psi.CallDefinitionClause.isPublicGuard
 import org.elixir_lang.psi.CallDefinitionClause.isPublicMacro
 import org.elixir_lang.psi.For
 import org.elixir_lang.psi.QuoteMacro
@@ -33,7 +36,7 @@ import java.util.*
  */
 class CallDefinitionClause(val callDefinition: CallDefinition, call: Call) :
         Element<Call>(call), Presentable, Visible {
-    private val visibility: Visibility = visibility(call)!!
+    private val visibility: Visibility = visibility(call)
 
     /*
      * Public Instance Methods
@@ -169,8 +172,13 @@ class CallDefinitionClause(val callDefinition: CallDefinition, call: Call) :
         fun time(call: Call): Timed.Time =
                 when {
                     isFunction(call) -> Timed.Time.RUN
+                    isGuard(call) -> Timed.Time.RUN
                     isMacro(call) -> Timed.Time.COMPILE
-                    else -> TODO("Should not happen")
+                    else -> {
+                        Logger.error(logger, "Don't whether call is at runtime or compile-time", call)
+
+                        Timed.Time.RUN
+                    }
                 }
 
         /**
@@ -178,13 +186,15 @@ class CallDefinitionClause(val callDefinition: CallDefinition, call: Call) :
          * @return `Visible.Visibility.PUBLIC` for `def` or `defmacro`; `Visible.Visibility.PRIVATE`
          * for `defp` and `defmacrop`; `null` only if `call` is unrecognized
          */
-        fun visibility(call: Call): Visibility? =
-                if (isPublicFunction(call) || isPublicMacro(call)) {
+        fun visibility(call: Call): Visibility =
+                if (isPublicFunction(call) || isPublicMacro(call) || isPublicGuard(call)) {
                     Visibility.PUBLIC
-                } else if (isPrivateFunction(call) || isPrivateMacro(call)) {
+                } else if (isPrivateFunction(call) || isPrivateMacro(call) || isPrivateGuard(call)) {
                     Visibility.PRIVATE
                 } else {
-                    null
+                    Logger.error(logger, "Don't know whether call is public or private", call)
+
+                    Visibility.PUBLIC
                 }
 
         /**
@@ -196,6 +206,8 @@ class CallDefinitionClause(val callDefinition: CallDefinition, call: Call) :
                 CallDefinition.fromCall(call)?.let {
                     CallDefinitionClause(it, call)
                 }
+
+        private val logger by lazy { com.intellij.openapi.diagnostic.Logger.getInstance(CallDefinitionClause::class.java) }
     }
 }
 
