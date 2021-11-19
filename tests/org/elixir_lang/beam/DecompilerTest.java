@@ -169,20 +169,7 @@ public class DecompilerTest extends PlatformTestCase {
                         "    Bitwise.bsr(left, right)\n" +
                         "  end\n" +
                         "\n" +
-                        "  @doc ~S\"\"\"\n" +
-                        "  Bitwise XOR operator.\n" +
-                        "\n" +
-                        "  Calculates the bitwise XOR of its arguments.\n" +
-                        "\n" +
-                        "  Allowed in guard tests. Inlined by the compiler.\n" +
-                        "\n" +
-                        "  ## Examples\n" +
-                        "\n" +
-                        "      iex> 9 ^^^ 3\n" +
-                        "      10\n" +
-                        "\n" +
-                        "\n" +
-                        "  \"\"\"\n" +
+                        "  @doc false\n" +
                         "  def left ^^^ right do\n" +
                         "    Bitwise.bxor(left, right)\n" +
                         "  end\n" +
