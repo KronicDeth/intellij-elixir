@@ -366,6 +366,8 @@
   * Update CI build dependencies
 * [#2199](https://github.com/KronicDeth/intellij-elixir/pull/2199) - [@KronicDeth](https://github.com/KronicDeth)
   * Regression test for [#2198](https://github.com/KronicDeth/intellij-elixir/issues/2198).
+* [#2201](https://github.com/KronicDeth/intellij-elixir/pull/2201) - [@KronicDeth](https://github.com/KronicDeth)
+  * Use callbacks as completions for calls.
 
 ### Bug Fixes
 * [#2074](https://github.com/KronicDeth/intellij-elixir/pull/2074) - [@Thau](https://github.com/Thau)
@@ -527,6 +529,8 @@
 * [#2199](https://github.com/KronicDeth/intellij-elixir/pull/2199) - [@KronicDeth](https://github.com/KronicDeth)
   * Stop highlighting types when `unquote_splicing/1` is reached.
     `unquote_splicing` is being used to splat arguments or fields of a struct into the type.  The arguments to `unquote_splicing` are normal calls or variables, not types.
+* [#2201](https://github.com/KronicDeth/intellij-elixir/pull/2201) - [@KronicDeth](https://github.com/KronicDeth)
+  * Implement `call_definition_clause.Variants#executeOnCallback`
 
 ## v11.13.0
 
