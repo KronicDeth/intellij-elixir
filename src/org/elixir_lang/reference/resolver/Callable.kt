@@ -1,5 +1,6 @@
 package org.elixir_lang.reference.resolver
 
+import com.intellij.openapi.project.DumbService
 import com.intellij.psi.PsiElementResolveResult
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.ResolveState
@@ -161,44 +162,47 @@ object Callable : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Cal
                                      arity: Arity,
                                      incompleteCode: Boolean): List<VisitedElementSetResolveResult> {
         val project = element.project
-        val keys = mutableListOf<String>()
-        val stubIndex = StubIndex.getInstance()
-
-        stubIndex.processAllKeys(AllName.KEY, project) { key ->
-            if ((incompleteCode && key.startsWith(name)) || key == name) {
-                keys.add(key)
-            }
-
-            true
-        }
-
-        val scope = GlobalSearchScope.allScope(project)
         val resolveResults = mutableListOf<VisitedElementSetResolveResult>()
-        // results are never valid because the qualifier is unknown
-        val validResult = false
 
-        for (key in keys) {
-            stubIndex
-                    .processElements(AllName.KEY, key, project, scope, NamedElement::class.java) { namedElement ->
-                        if (namedElement is Call) {
-                            if (CallDefinitionClause.`is`(namedElement)) {
-                                if (incompleteCode ||
-                                        nameArityInterval(namedElement, resolveState(namedElement, key))
-                                                ?.arityInterval?.contains(arity) == true) {
-                                    resolveResults.add(VisitedElementSetResolveResult(namedElement, validResult, emptySet()))
-                                }
-                            } else if (Callback.`is`(namedElement)) {
-                                if (incompleteCode ||
-                                        Callback
-                                                .headCall(namedElement as AtUnqualifiedNoParenthesesCall<*>)
-                                                ?.let { CallDefinitionHead.nameArityInterval(it, resolveState(namedElement, key)) }
-                                                ?.arityInterval?.contains(arity) == true) {
-                                    resolveResults.add(VisitedElementSetResolveResult(namedElement, validResult, emptySet()))
-                                }
-                            }
-                        }
+        if (!DumbService.isDumb(project)) {
+            val keys = mutableListOf<String>()
+            val stubIndex = StubIndex.getInstance()
+
+            stubIndex.processAllKeys(AllName.KEY, project) { key ->
+                if ((incompleteCode && key.startsWith(name)) || key == name) {
+                    keys.add(key)
+                }
 
                 true
+            }
+
+            val scope = GlobalSearchScope.allScope(project)
+            // results are never valid because the qualifier is unknown
+            val validResult = false
+
+            for (key in keys) {
+                stubIndex
+                        .processElements(AllName.KEY, key, project, scope, NamedElement::class.java) { namedElement ->
+                            if (namedElement is Call) {
+                                if (CallDefinitionClause.`is`(namedElement)) {
+                                    if (incompleteCode ||
+                                            nameArityInterval(namedElement, resolveState(namedElement, key))
+                                                    ?.arityInterval?.contains(arity) == true) {
+                                        resolveResults.add(VisitedElementSetResolveResult(namedElement, validResult, emptySet()))
+                                    }
+                                } else if (Callback.`is`(namedElement)) {
+                                    if (incompleteCode ||
+                                            Callback
+                                                    .headCall(namedElement as AtUnqualifiedNoParenthesesCall<*>)
+                                                    ?.let { CallDefinitionHead.nameArityInterval(it, resolveState(namedElement, key)) }
+                                                    ?.arityInterval?.contains(arity) == true) {
+                                        resolveResults.add(VisitedElementSetResolveResult(namedElement, validResult, emptySet()))
+                                    }
+                                }
+                            }
+
+                            true
+                        }
             }
         }
 

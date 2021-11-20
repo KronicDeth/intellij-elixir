@@ -538,6 +538,8 @@
     * Log unknown calls.
 * [#2207](https://github.com/KronicDeth/intellij-elixir/pull/2207) - [@KronicDeth](https://github.com/KronicDeth)
   * Check if `Call` `isValid` before using `containingFile` for `locationString`.
+* [#2208](https://github.com/KronicDeth/intellij-elixir/pull/2208) - [@KronicDeth](https://github.com/KronicDeth)
+  * Check if `project` is not dumb in `nameArityInAnyModule`.
 
 ## v11.13.0
 
