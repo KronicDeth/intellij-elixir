@@ -114,7 +114,7 @@ class MultiResolve(private val name: String, private val incompleteCode: Boolean
                 val resolveState = ResolveState.initial().put(ENTRANCE, entrance).putInitialVisitedElement(entrance)
 
                 resolveInScope(name, incompleteCode, entrance, resolveState)
-                        .takeIf(Collection<ResolveResult>::isNotEmpty)
+                        .takeIf { set -> set.any(ResolveResult::isValidResult) }
                         ?: nameInAnyQuote(entrance, name, incompleteCode)
             }
 

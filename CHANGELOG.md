@@ -540,6 +540,9 @@
   * Check if `Call` `isValid` before using `containingFile` for `locationString`.
 * [#2208](https://github.com/KronicDeth/intellij-elixir/pull/2208) - [@KronicDeth](https://github.com/KronicDeth)
   * Check if `project` is not dumb in `nameArityInAnyModule`.
+* [#2209](https://github.com/KronicDeth/intellij-elixir/pull/2209) - [@KronicDeth](https://github.com/KronicDeth)
+  * Take `resolveInScope` only if at least one valid
+    Checking only for an empty collection allowed any prefixes in the scope to override exact matches in anywhere indexed, which meant that `Ecto` in `defmodule Ecto.Adapter do` resolved to itself instead of the exact `defmodule Ecto do`.
 
 ## v11.13.0
 

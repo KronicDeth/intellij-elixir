@@ -397,6 +397,12 @@
         <code>locationString</code>.
       </li>
       <li>Check if <code>project</code> is not dumb in <code>nameArityInAnyModule</code>.</li>
+      <li>
+        Take <code>resolveInScope</code> only if at least one valid<br>
+        Checking only for an empty collection allowed any prefixes in the scope to override exact matches in anywhere
+        indexed, which meant that <code>Ecto</code> in <code>defmodule Ecto.Adapter do</code> resolved to itself instead
+        of the exact <code>defmodule Ecto do</code>.
+      </li>
     </ul>
   </li>
 </ul>

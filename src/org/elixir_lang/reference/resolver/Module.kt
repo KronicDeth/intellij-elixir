@@ -71,7 +71,7 @@ object Module : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Modul
 
     private fun resolveAll(element: PsiElement, name: String, incompleteCode: Boolean) =
             resolveInScope(element, name, incompleteCode)
-                    .takeIf(Collection<ResolveResult>::isNotEmpty)
+                    .takeIf { set -> set.any(ResolveResult::isValidResult) }
                     ?: multiResolveProject(element, name)
 
     private fun resolveInScope(element: PsiElement, name: String, incompleteCode: Boolean) =
