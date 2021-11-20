@@ -93,13 +93,18 @@ object PresentationImpl {
     }
 }
 
-fun Call.locationString(): String = this.containingFile!!.locationString(this.project)
+fun Call.locationString(): String =
+    if (isValid) {
+        containingFile?.locationString(this.project) ?: "?"
+    } else {
+        "?"
+    }
 
 fun PsiFile.locationString(project: Project): String {
     val originalFile = originalFile
 
     return when (originalFile) {
-        is BeamFileImpl -> originalFile.virtualFile?.locationString(project)?.let { "$it.decompiled.ex" }
+        is BeamFileImpl -> originalFile.virtualFile.locationString(project).let { "$it.decompiled.ex" }
         else -> virtualFile?.locationString(project)
     } ?: name
 }

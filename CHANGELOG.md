@@ -536,6 +536,8 @@
     * Mark guards as runtime.
     * Mark anything unknown as runtime too.
     * Log unknown calls.
+* [#2207](https://github.com/KronicDeth/intellij-elixir/pull/2207) - [@KronicDeth](https://github.com/KronicDeth)
+  * Check if `Call` `isValid` before using `containingFile` for `locationString`.
 
 ## v11.13.0
 
