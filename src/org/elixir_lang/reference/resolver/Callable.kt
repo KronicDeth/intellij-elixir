@@ -86,7 +86,7 @@ object Callable : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Cal
 
     private fun resolve(element: Call, name: String, resolvedPrimaryArity: Arity, incompleteCode: Boolean) =
         resolveInScope(element, name, resolvedPrimaryArity, incompleteCode)
-                .takeIf(Collection<ResolveResult>::isNotEmpty)
+                .takeIf { set -> set.any(ResolveResult::isValidResult) }
                 ?: nameArityInAnyModule(element, name, resolvedPrimaryArity, incompleteCode)
 
     private fun resolveInScope(element: Call,
