@@ -543,6 +543,8 @@
 * [#2209](https://github.com/KronicDeth/intellij-elixir/pull/2209) - [@KronicDeth](https://github.com/KronicDeth)
   * Take `resolveInScope` only if at least one valid
     Checking only for an empty collection allowed any prefixes in the scope to override exact matches in anywhere indexed, which meant that `Ecto` in `defmodule Ecto.Adapter do` resolved to itself instead of the exact `defmodule Ecto do`.
+* [#2214](https://github.com/KronicDeth/intellij-elixir/pull/2214) - [@KronicDeth](https://github.com/KronicDeth)
+  * When regenerating the parser, `ElixirVisitor` is also regenerated.  When it was regenerated it lost the bug fix for `#visitLiteralSigileLine` calling itself.  Added a regression test, so that this can't happen again.
 
 ## v11.13.0
 
