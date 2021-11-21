@@ -403,6 +403,11 @@
         indexed, which meant that <code>Ecto</code> in <code>defmodule Ecto.Adapter do</code> resolved to itself instead
         of the exact <code>defmodule Ecto do</code>.
       </li>
+      <li>
+        When regenerating the parser, <code>ElixirVisitor</code> is also regenerated.  When it was regenerated it lost
+        the bug fix for <code>#visitLiteralSigileLine</code> calling itself.  Added a regression test, so that this
+        can't happen again.
+      </li>
     </ul>
   </li>
 </ul>
