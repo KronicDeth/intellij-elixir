@@ -75,7 +75,7 @@ object Identifier {
                     Classification.CALLABLE_LOCAL
                 atomValue.startsWith("..") ->
                     Classification.OTHER
-                "@" !in atomValue ->
+                "@" !in atomValue && "-" !in atomValue ->
                     Classification.NOT_CALLABLE
                 else ->
                     Classification.OTHER
