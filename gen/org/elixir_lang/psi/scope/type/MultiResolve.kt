@@ -107,6 +107,11 @@ private constructor(private val name: String,
                 is Two ->
                     (parameter.leftOperand()?.let { executeOnParameter(it, state) } ?: true) &&
                             (parameter.rightOperand()?.let { executeOnParameter(it, state) } ?: true)
+                is QuotableKeywordList -> {
+                    whileIn(parameter.quotableKeywordPairList()) { keywordPair ->
+                        executeOnParameter(keywordPair.keywordValue, state)
+                    }
+                }
                 else -> {
                     Logger.error(MultiResolve::class.java, "Don't know how to get name of parameter", parameter)
 
