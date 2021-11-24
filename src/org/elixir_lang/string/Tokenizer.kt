@@ -5,11 +5,11 @@ import java.text.Normalizer
 object Tokenizer {
     sealed class Tokenized {
         // https://github.com/elixir-lang/elixir/blob/6289cd6b9685a3c63c9ea445f1672004fc713cb8/lib/elixir/unicode/tokenizer.ex#L181-L209
-        data class Unvalidated(val acc: String, val rest: String, val allAsciiLetters: Boolean, val special: Set<Char>) {
+        data class Unvalidated(val acc: String, val rest: String, val allAscii: Boolean, val special: Set<Char>) {
             companion object {
-                fun fromText(text: String, firstAsciiLetter: Boolean): Unvalidated {
+                fun fromText(text: String, firstAscii: Boolean): Unvalidated {
                     val special = mutableSetOf<Char>()
-                    var allAsciiLetters = firstAsciiLetter
+                    var allAsciiLetters = firstAscii
 
                     for ((i, c) in text.withIndex()) {
                         when {
@@ -41,32 +41,16 @@ object Tokenizer {
                 }
             }
 
-            // https://github.com/elixir-lang/elixir/blob/6289cd6b9685a3c63c9ea445f1672004fc713cb8/lib/elixir/unicode/tokenizer.ex#L181-L209
-            fun `continue`(): Unvalidated {
-                val first = rest.firstOrNull()
-
-                return if (first != null) {
-                    when {
-
-                        // https://github.com/elixir-lang/elixir/blob/6289cd6b9685a3c63c9ea445f1672004fc713cb8/lib/elixir/unicode/tokenizer.ex#L203
-                        else -> this
-                    }
-                } else {
-                    // https://github.com/elixir-lang/elixir/blob/6289cd6b9685a3c63c9ea445f1672004fc713cb8/lib/elixir/unicode/tokenizer.ex#L207-L209
-                    copy(acc = rest, rest = "")
-                }
-            }
-
             // https://github.com/elixir-lang/elixir/blob/6289cd6b9685a3c63c9ea445f1672004fc713cb8/lib/elixir/unicode/tokenizer.ex#L211-L219
             fun validate(kind: Tokenizer.Kind): Tokenized =
-                    if (allAsciiLetters || Normalizer.isNormalized(acc, Normalizer.Form.NFC)) {
-                        Kind(kind, acc, rest, allAsciiLetters, special)
+                    if (allAscii || Normalizer.isNormalized(acc, Normalizer.Form.NFC)) {
+                        Kind(kind, acc, rest, allAscii, special)
                     } else {
                         NotNFC(acc)
                     }
         }
 
-        data class Kind(val kind: Tokenizer.Kind, val acc: String, val rest: String, val allAsciiLetters: Boolean, val special: Set<Char>): Tokenized()
+        data class Kind(val kind: Tokenizer.Kind, val acc: String, val rest: String, val allAscii: Boolean, val special: Set<Char>): Tokenized()
         data class NotNFC(val acc: String) : Tokenized()
         object Empty: Tokenized()
     }
@@ -85,19 +69,19 @@ object Tokenizer {
             when {
                 // https://github.com/elixir-lang/elixir/blob/6289cd6b9685a3c63c9ea445f1672004fc713cb8/lib/elixir/unicode/tokenizer.ex#L160-L161
                 isAsciiUpper(first) -> {
-                    Tokenized.Unvalidated.fromText(text, firstAsciiLetter = true).validate(Kind.ALIAS)
+                    Tokenized.Unvalidated.fromText(text, firstAscii = true).validate(Kind.ALIAS)
                 }
                 // https://github.com/elixir-lang/elixir/blob/6289cd6b9685a3c63c9ea445f1672004fc713cb8/lib/elixir/unicode/tokenizer.ex#L160-L161
                 isAsciiStart(first) -> {
-                    Tokenized.Unvalidated.fromText(text, firstAsciiLetter = true).validate(Kind.IDENTIFIER)
+                    Tokenized.Unvalidated.fromText(text, firstAscii = true).validate(Kind.IDENTIFIER)
                 }
                 // https://github.com/elixir-lang/elixir/blob/6289cd6b9685a3c63c9ea445f1672004fc713cb8/lib/elixir/unicode/tokenizer.ex#L166-L167
                 isUnicodeUpper(first) -> {
-                    Tokenized.Unvalidated.fromText(text, firstAsciiLetter = false).validate(Kind.ATOM)
+                    Tokenized.Unvalidated.fromText(text, firstAscii = false).validate(Kind.ATOM)
                 }
                 // https://github.com/elixir-lang/elixir/blob/6289cd6b9685a3c63c9ea445f1672004fc713cb8/lib/elixir/unicode/tokenizer.ex#L169-L170
                 isUnicodeStart(first) -> {
-                    Tokenized.Unvalidated.fromText(text, firstAsciiLetter = false).validate(Kind.IDENTIFIER)
+                    Tokenized.Unvalidated.fromText(text, firstAscii = false).validate(Kind.IDENTIFIER)
                 }
                 else -> Tokenized.Empty
             }
