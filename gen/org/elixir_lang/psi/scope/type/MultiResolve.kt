@@ -13,6 +13,7 @@ import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.operation.InMatch
 import org.elixir_lang.psi.operation.Pipe
+import org.elixir_lang.psi.operation.Two
 import org.elixir_lang.psi.operation.Type
 import org.elixir_lang.psi.scope.ResolveResultOrderedSet
 import org.elixir_lang.psi.scope.WhileIn.whileIn
@@ -103,6 +104,9 @@ private constructor(private val name: String,
                         true
                     }
                 }
+                is Two ->
+                    (parameter.leftOperand()?.let { executeOnParameter(it, state) } ?: true) &&
+                            (parameter.rightOperand()?.let { executeOnParameter(it, state) } ?: true)
                 else -> {
                     Logger.error(MultiResolve::class.java, "Don't know how to get name of parameter", parameter)
 
