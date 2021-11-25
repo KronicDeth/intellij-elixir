@@ -15,7 +15,7 @@ object Atom {
 
     fun toAtom(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
 
-    fun toElixirAtom(term: OtpErlangObject): OtpErlangAtom? =
+    fun toElixirAtom(term: OtpErlangObject?): OtpErlangAtom? =
             Atom.ifTo(term) {
                 Atom.toAtom(it)?.let { atom ->
                     atom as? OtpErlangAtom

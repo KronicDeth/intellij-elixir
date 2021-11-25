@@ -431,6 +431,10 @@ public class DecompilerTest extends PlatformTestCase {
         assertDecompiled("Elixir.Phoenix.HTML.Tag");
     }
 
+    public void testIssue2221() throws IOException {
+        assertDecompiled("queue");
+    }
+
     /*
      * Instance Methods
      */
