@@ -1,53 +1,52 @@
-package org.elixir_lang.beam.decompiler;
+package org.elixir_lang.beam.decompiler
 
-import org.jetbrains.annotations.NotNull;
+import org.elixir_lang.NameArity
+import org.elixir_lang.beam.MacroNameArity
+import java.lang.StringBuilder
 
 /**
- * Decompiles a {@link org.elixir_lang.beam.MacroNameArity}
+ * Decompiles a [org.elixir_lang.beam.MacroNameArity]
  */
-public abstract class MacroNameArity {
-    /*
-     * Static Methods
+abstract class MacroNameArity {
+    /**
+     * Whether the decompiler accepts the `macroNameArity`
+     *
+     * @param beamLanguage BEAM language, such as `"elixir"` or `"erlang"`.  Matches format used in
+     * [org.elixir_lang.beam.chunk.beam_documentation.Documentation.beamLanguage]
+     * @param nameArity Name and arity of definition to decompile.
+     * @return `true` if [.append] should be called with
+     * `macroNameArity`.
      */
+    abstract fun accept(beamLanguage: String, nameArity: NameArity): Boolean
 
-    static void appendBody(@NotNull StringBuilder decompiled) {
-        decompiled
-                .append(" do\n")
-                .append("    # body not decompiled\n")
-                .append("  end\n");
+    /**
+     * Append the decompiled source for `macroNameArity` to `decompiled`.
+     *
+     * @param decompiled the decompiled source so far
+     */
+    abstract fun append(decompiled: StringBuilder,
+                        macroNameArity: MacroNameArity)
+
+    abstract fun appendSignature(decompiled: StringBuilder,
+                                 macroNameArity: MacroNameArity,
+                                 name: String,
+                                 parameters: Array<String>)
+
+    /**
+     * Append the decompiled name for `macroNameArity` to `decompiled`.
+     *
+     * @param decompiled the decompiled source so far
+     */
+    abstract fun appendName(decompiled: StringBuilder,
+                            name: String)
+
+    companion object {
+        @JvmStatic
+        fun appendBody(decompiled: StringBuilder) {
+            decompiled
+                    .append(" do\n")
+                    .append("    # body not decompiled\n")
+                    .append("  end\n")
+        }
     }
-
-    /*
-     * Instance Methods
-     */
-
-
-    /**
-     * Whether the decompiler accepts the {@code macroNameArity}
-     *
-     * @return {@code true} if {@link #append(StringBuilder, org.elixir_lang.beam.MacroNameArity)} should be called with
-     *   {@code macroNameArity}.
-     */
-    public abstract boolean accept(@NotNull org.elixir_lang.beam.MacroNameArity macroNameArity);
-
-    /**
-     * Append the decompiled source for {@code macroNameArity} to {@code decompiled}.
-     *
-     * @param decompiled the decompiled source so far
-     */
-    public abstract void append(@NotNull StringBuilder decompiled,
-                                @NotNull org.elixir_lang.beam.MacroNameArity macroNameArity);
-
-    public abstract void appendSignature(@NotNull StringBuilder decompiled,
-                                         @NotNull org.elixir_lang.beam.MacroNameArity macroNameArity,
-                                         @NotNull String name,
-                                         @NotNull String[] parameters);
-
-    /**
-     * Append the decompiled name for {@code macroNameArity} to {@code decompiled}.
-     *
-     * @param decompiled the decompiled source so far
-     */
-    public abstract void appendName(@NotNull StringBuilder decompiled,
-                                    @NotNull String name);
 }

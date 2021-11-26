@@ -1,20 +1,17 @@
 package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code
 
-import com.ericsson.otp.erlang.OtpErlangAtom
 import com.ericsson.otp.erlang.OtpErlangList
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
+import org.elixir_lang.NameArity
 import org.elixir_lang.beam.Decompiler
-import org.elixir_lang.beam.MacroNameArity
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode.ifTag
 import org.elixir_lang.beam.decompiler.InfixOperator
 import org.elixir_lang.beam.decompiler.PrefixOperator
 import org.elixir_lang.beam.decompiler.Unquoted
 import org.elixir_lang.code.Identifier.inspectAsFunction
-import org.elixir_lang.psi.ElixirAtom
-import org.elixir_lang.psi.call.name.Function.DEF
-
+import org.elixir_lang.toOtpErlangList
 
 object Call {
     fun ifToMacroStringDeclaredScope(term: OtpErlangObject): MacroStringDeclaredScope? =
@@ -53,26 +50,40 @@ object Call {
             name: OtpErlangObject?,
             arguments: OtpErlangObject?
     ): MacroString =
-            Atom.toElixirAtom(name)?.atomValue()?.let { atomValue ->
-                arguments?.let { it as? OtpErlangList }?.let { argumentList ->
-                    localNamedFunctionCallToMacroString(atomValue, argumentList)
+        if (name != null) {
+            val elixirAtom = Atom.toElixirAtom(name)
+
+            if (elixirAtom != null) {
+                val function = inspectAsFunction(elixirAtom.atomValue(), local = true)
+                val argumentList = arguments?.toOtpErlangList()
+                val argumentsMacroString = argumentsToMacroString(arguments)
+
+                if (argumentList != null) {
+                    val nameArity = NameArity(elixirAtom.atomValue(), argumentList.arity())
+
+                    when (Decompiler.decompiler("erlang", nameArity)) {
+                        is PrefixOperator, is InfixOperator, is Unquoted -> {
+                            "apply(__MODULE__, :${function}, [${argumentsMacroString}])"
+                        }
+                        else -> {
+                            "${function}(${argumentsMacroString})"
+                        }
+                    }
+                } else {
+                    "${function}(${argumentsMacroString})"
                 }
-            } ?: "unknown(unknown_arguments)"
+            } else {
+                val nameMacroString = AbstractCode.toMacroStringDeclaredScope(name, Scope.EMPTY).macroString
+                val argumentMacroString = argumentsToMacroString(arguments)
 
-    private fun localNamedFunctionCallToMacroString(atomValue: String, arguments: OtpErlangList): MacroString {
-        val function = inspectAsFunction(atomValue, local = true)
-        val argumentsMacroString = argumentsToMacroString(arguments)
-        val macroNameArity = MacroNameArity(DEF, atomValue, arguments.arity())
+                "${nameMacroString}(${argumentMacroString})"
+            }
+        } else {
+            val nameMacroString = "unknown_function"
+            val argumentMacroString = argumentsToMacroString(arguments)
 
-        return when (Decompiler.decompiler(macroNameArity)) {
-            is PrefixOperator, is InfixOperator, is Unquoted -> {
-                "apply(__MODULE__, :${function}, ${argumentsMacroString})"
-            }
-            else -> {
-                "${function}(${argumentsMacroString})"
-            }
+            "${nameMacroString}(${argumentMacroString})"
         }
-    }
 
     private fun namedFunctionCallToMacroString(term: OtpErlangTuple): MacroString {
         val name = toName(term)
@@ -82,22 +93,6 @@ object Call {
             remoteNamedFunctionCallToMacroString(remoteName, arguments)
         } ?: localNamedFunctionCallToMacroString(name, arguments)
     }
-
-    private fun nameMacroString(term: OtpErlangTuple): String =
-            toName(term)
-                    ?.let { nameToMacroString(it) }
-                    ?: "missing_name"
-
-    private fun nameToMacroString(term: OtpErlangObject): String =
-            Atom.ifTo(term) {
-                Atom.toAtom(it)?.let { atom ->
-                    if (atom is OtpErlangAtom) {
-                        inspectAsFunction(atom, local = true)
-                    } else {
-                        null
-                    }
-                } ?: "call_unknown_function"
-            } ?: AbstractCode.toMacroStringDeclaredScope(term, Scope.EMPTY).macroString
 
     private fun remoteNamedFunctionCallToMacroString(
             remoteName: OtpErlangTuple,

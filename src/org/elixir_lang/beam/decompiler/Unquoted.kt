@@ -1,103 +1,93 @@
-package org.elixir_lang.beam.decompiler;
+package org.elixir_lang.beam.decompiler
 
-import org.intellij.lang.annotations.Language;
-import org.jetbrains.annotations.NotNull;
+import org.elixir_lang.NameArity
+import org.intellij.lang.annotations.Language
+import java.lang.StringBuilder
+import java.util.function.Predicate
+import java.util.regex.Pattern
+import java.util.stream.Collectors
+import java.util.stream.Stream
 
-import java.util.function.Predicate;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+object Unquoted : Default() {
+    private val keywordStream = Stream.of(
+            // When not `and/2`
+            "and",
+            "do",
+            "end",
+            "false",
+            // When not `in/2`
+            "in",
+            "nil",
+            // When not `or/2`
+            "or",
+            "true"
+    )
+    private val specialFormStream = Stream.of(
+            "!",
+            "%",
+            "%{}",
+            "&",
+            ".",
+            "<<>>",
+            "@",
+            "fn",
+            "unquote",
+            "unquote_splicing",
+            "{}"
+    )
 
-public class Unquoted extends Default {
-    /*
-     * CONSTANTS
-     */
+    private val fixed = Stream
+            .concat(keywordStream, specialFormStream)
+            .map(Pattern::quote)
+            .collect(Collectors.joining("|"))
 
-    public static final MacroNameArity INSTANCE = new Unquoted();
-    private static final Predicate<String> NOT_IDENTIFIER_OR_PREFIX_OPERATOR_PREDICATE;
-    private static final Predicate<String> BARE_ATOM_PREDICATE;
-
-    static {
-        Stream<String> keywordStream = Stream.of(
-                // When not `and/2`
-                "and",
-                "do",
-                "end",
-                "false",
-                // When not `in/2`
-                "in",
-                "nil",
-                // When not `or/2`
-                "or",
-                "true"
-        );
-        Stream<String> specialFormStream = Stream.of(
-                "!",
-                "%",
-                "%{}",
-                "&",
-                ".",
-                "<<>>",
-                "@",
-                "fn",
-                "unquote",
-                "unquote_splicing",
-                "{}"
-        );
-        String fixed = Stream
-                .concat(keywordStream, specialFormStream)
-                .map(Pattern::quote)
-                .collect(Collectors.joining("|"));
-
-        // See Elixir.flex IDENTIFIER_TOKEN_TAIL
-        @Language("RegExp")
-        String identifierTokenTail = "[0-9a-zA-Z_]*[?!]?";
-        // See Elixir.flex ALIAS
-        @Language("RegExp")
-        String alias = "[A-Z]" + identifierTokenTail;
-        BARE_ATOM_PREDICATE = Pattern
-                .compile("^(" + fixed + "|" + alias + ")$")
-                .asPredicate();
-        String prefixOperators = "[@!]|~~~";
-        // See Elixir.flex IDENTIFIER_TOKEN
-        NOT_IDENTIFIER_OR_PREFIX_OPERATOR_PREDICATE = Pattern.compile(
-                "^(" + "[a-z_]" + identifierTokenTail + "|" + prefixOperators + ")$"
-        ).asPredicate().negate();
-    }
-
-    /*
-     * Instance Methods
-     */
+    // See Elixir.flex IDENTIFIER_TOKEN_TAIL
+    @Language("RegExp") val identifierTokenTail = "[0-9a-zA-Z_]*[?!]?"
+    // See Elixir.flex ALIAS
+    @Language("RegExp") val alias = "[A-Z]$identifierTokenTail"
+    private val bareAtomPredicate = Pattern
+            .compile("^($fixed|$alias)$")
+            .asPredicate()
+    private const val prefixOperators = "[@!]|~~~"
+    // See Elixir.flex IDENTIFIER_TOKEN
+    private val notIdentifierOrPrefixOperatorPredicate = Pattern.compile(
+            "^([a-z_]$identifierTokenTail|$prefixOperators)$"
+    ).asPredicate().negate()
 
     /**
-     * Wehther the decompiler accepts the {@code macroNameArity}.
+     * Wehther the decompiler accepts the `macroNameArity`.
      *
-     * @return {@code true} if {@link #append(StringBuilder, org.elixir_lang.beam.MacroNameArity)} should be called with
-     *   {@code macroNameArity}.
+     * @return `true` if [.append] should be called with
+     * `macroNameArity`.
      */
-    @Override
-    public boolean accept(@NotNull org.elixir_lang.beam.MacroNameArity macroNameArity) {
-        return BARE_ATOM_PREDICATE.or(NOT_IDENTIFIER_OR_PREFIX_OPERATOR_PREDICATE).test(macroNameArity.name);
+    override fun accept(beamLanguage: String, nameArity: NameArity): Boolean {
+        val name = nameArity.name
+
+        return when (beamLanguage) {
+            "elixir" ->
+                bareAtomPredicate.or(notIdentifierOrPrefixOperatorPredicate).test(name)
+            else -> {
+                bareAtomPredicate.or(notIdentifierOrPrefixOperatorPredicate).test(name) ||
+                        PrefixOperator.isPrefixOperator(name) ||
+                        InfixOperator.isInfixOperator(name)
+            }
+        }
     }
 
-    @Override
-    public void appendName(@NotNull StringBuilder decompiled, @NotNull String name) {
+    override fun appendName(decompiled: StringBuilder, name: String) {
         decompiled
                 .append("unquote(:")
                 .append(macroNameToAtomName(name))
-                .append(")");
+                .append(")")
     }
 
-    @NotNull
-    private StringBuilder macroNameToAtomName(@NotNull String macroName) {
-        StringBuilder atomName = new StringBuilder();
-
-        if (BARE_ATOM_PREDICATE.test(macroName)) {
-            atomName.append(macroName);
+    private fun macroNameToAtomName(macroName: String): StringBuilder {
+        val atomName = StringBuilder()
+        if (bareAtomPredicate.test(macroName)) {
+            atomName.append(macroName)
         } else {
-            atomName.append('"').append(macroName).append('"');
+            atomName.append('"').append(macroName).append('"')
         }
-
-        return atomName;
+        return atomName
     }
 }

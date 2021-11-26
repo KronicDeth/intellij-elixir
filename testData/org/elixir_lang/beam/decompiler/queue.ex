@@ -91,12 +91,12 @@ defmodule :queue do
 
   def head(q), do: :erlang.error(:badarg, [q])
 
-  @spec item in q1 :: queue(item) :: q2 :: queue(item)
-  def x in {[_] = erlangVariableIn, []}, do: {[x], erlangVariableIn}
+  @spec unquote(:in)(item, q1 :: queue(item)) :: q2 :: queue(item)
+  def unquote(:in)(x, {[_] = erlangVariableIn, []}), do: {[x], erlangVariableIn}
 
-  def x in {erlangVariableIn, out} when is_list(erlangVariableIn) and is_list(out), do: {[x | erlangVariableIn], out}
+  def unquote(:in)(x, {erlangVariableIn, out}) when is_list(erlangVariableIn) and is_list(out), do: {[x | erlangVariableIn], out}
 
-  def x in q, do: :erlang.error(:badarg, [x, q])
+  def unquote(:in)(x, q), do: :erlang.error(:badarg, [x, q])
 
   @spec in_r(item, q1 :: queue(item)) :: q2 :: queue(item)
   def in_r(x, {[], [_] = f}), do: {f, [x]}
@@ -219,7 +219,7 @@ defmodule :queue do
   def reverse(q), do: :erlang.error(:badarg, [q])
 
   @spec snoc(q1 :: queue(item), item) :: q2 :: queue(item)
-  def snoc(q, x), do: apply(__MODULE__, :in, x, q)
+  def snoc(q, x), do: apply(__MODULE__, :in, [x, q])
 
   @spec split(n :: non_neg_integer(), q1 :: queue(item)) :: {q2 :: queue(item), q3 :: queue(item)}
   def split(0, {r, f} = q) when is_list(r) and is_list(f), do: {{[], []}, q}

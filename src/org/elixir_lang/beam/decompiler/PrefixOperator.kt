@@ -1,64 +1,34 @@
-package org.elixir_lang.beam.decompiler;
+package org.elixir_lang.beam.decompiler
 
-import gnu.trove.THashSet;
-import org.jetbrains.annotations.NotNull;
+import org.elixir_lang.NameArity
+import java.lang.StringBuilder
 
-import java.util.Set;
-
-public class PrefixOperator extends Default {
-    /*
-     * CONSTANTS
-     */
-
-    private static final Set<String> PREFIX_OPERATOR_SET;
-    public static final MacroNameArity INSTANCE = new PrefixOperator();
-
-    static {
-        PREFIX_OPERATOR_SET = new THashSet<String>();
-        PREFIX_OPERATOR_SET.add("+");
-        PREFIX_OPERATOR_SET.add("-");
-    }
-
-    /*
-     * Static Methods
-     */
-
+object PrefixOperator : Default() {
     /**
-     * @parma name {@link org.elixir_lang.beam.MacroNameArity#name}
-     */
-    private static boolean isPrefixOperator(@NotNull String name) {
-        return PREFIX_OPERATOR_SET.contains(name);
-    }
-
-    /*
-     * Instance Methods
-     */
-
-    /**
-     * Whether the decompiler accepts the {@code macroNameArity}
+     * Whether the decompiler accepts the `macroNameArity`
      *
-     * @return {@code true} if {@link #append(StringBuilder, org.elixir_lang.beam.MacroNameArity)} should be called with
-     * {@code macroNameArity}.
+     * @return `true` if [.append] should be called with
+     * `macroNameArity`.
      */
-    @Override
-    public boolean accept(@NotNull org.elixir_lang.beam.MacroNameArity macroNameArity) {
-        Integer arity = macroNameArity.arity;
+    override fun accept(beamLanguage: String, nameArity: NameArity): Boolean =
+            nameArity.arity == 1 && isPrefixOperator(nameArity.name)
 
-        return arity != null && arity == 1 && isPrefixOperator(macroNameArity.name);
+    override fun parameters(macroNameArity: org.elixir_lang.beam.MacroNameArity): Array<String> = arrayOf("value")
+
+    override fun appendSignature(decompiled: StringBuilder,
+                                 macroNameArity: org.elixir_lang.beam.MacroNameArity,
+                                 name: String,
+                                 parameters: Array<String>) {
+        decompiled.append('(')
+        appendName(decompiled, macroNameArity.name)
+        decompiled.append(parameters[0]).append(')')
     }
 
-    @Override
-    public String[] parameters(@NotNull org.elixir_lang.beam.MacroNameArity macroNameArity) {
-        return new String[]{"value"};
-    }
+    private val PREFIX_OPERATOR_SET: Set<String> = setOf("+", "-")
 
-    @Override
-    public void appendSignature(@NotNull StringBuilder decompiled,
-                                @NotNull org.elixir_lang.beam.MacroNameArity macroNameArity,
-                                @NotNull String name,
-                                @NotNull String[] parameters) {
-        decompiled.append('(');
-        appendName(decompiled, macroNameArity.name);
-        decompiled.append(parameters[0]).append(')');
-    }
+    /**
+     * @parma name [org.elixir_lang.beam.MacroNameArity.name]
+     */
+    fun isPrefixOperator(name: String): Boolean = PREFIX_OPERATOR_SET.contains(name)
+
 }

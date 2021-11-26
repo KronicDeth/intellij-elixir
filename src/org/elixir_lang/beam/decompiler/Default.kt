@@ -1,82 +1,63 @@
-package org.elixir_lang.beam.decompiler;
+package org.elixir_lang.beam.decompiler
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.elixir_lang.NameArity
+import java.lang.StringBuilder
 
-public class Default extends MacroNameArity {
-    /*
-     * CONSTANTS
-     */
-
-    public static final Default INSTANCE = new Default();
-
-
+open class Default : MacroNameArity() {
     /**
-     * Whether the decompiler accepts the {@code macroNameArity}
+     * Whether the decompiler accepts the `macroNameArity`
      *
-     * @return {@code true}
+     * @return `true`
      */
-    @Override
-    public boolean accept(@NotNull org.elixir_lang.beam.MacroNameArity macroNameArity) {
-        return true;
-    }
+    override fun accept(beamLanguage: String, nameArity: NameArity): Boolean =
+        true
 
     /**
-     * Append the decompiled source for {@code macroNameArity} to {@code decompiled}.
+     * Append the decompiled source for `macroNameArity` to `decompiled`.
      *
      * @param decompiled the decompiled source so far
      */
-    @Override
-    public void append(@NotNull StringBuilder decompiled, @NotNull org.elixir_lang.beam.MacroNameArity macroNameArity) {
-        appendMacro(decompiled, macroNameArity);
-
-        String[] parameters = parameters(macroNameArity);
-        appendSignature(decompiled, macroNameArity, macroNameArity.name, parameters);
-
-        appendBody(decompiled);
+    override fun append(decompiled: StringBuilder, macroNameArity: org.elixir_lang.beam.MacroNameArity) {
+        appendMacro(decompiled, macroNameArity)
+        val parameters = parameters(macroNameArity)
+        appendSignature(decompiled, macroNameArity, macroNameArity.name, parameters)
+        appendBody(decompiled)
     }
 
-    void appendMacro(@NotNull StringBuilder decompiled, @NotNull org.elixir_lang.beam.MacroNameArity macroNameArity) {
+    private fun appendMacro(decompiled: StringBuilder, macroNameArity: org.elixir_lang.beam.MacroNameArity) {
         decompiled
                 .append("  ")
                 .append(macroNameArity.macro)
-                .append(" ");
+                .append(" ")
     }
 
-    public String[] parameters(@NotNull org.elixir_lang.beam.MacroNameArity macroNameArity) {
-        int arity = macroNameArity.arity;
-        String[] arguments = new String[arity];
+    open fun parameters(macroNameArity: org.elixir_lang.beam.MacroNameArity): Array<String> =
+            (0 until  macroNameArity.arity)
+                    .map { i ->
+                        "p${i}"
+                    }
+                    .toTypedArray()
 
-        for (int i = 0; i < arity; i++) {
-            arguments[i] = "p" + i;
-        }
-
-        return arguments;
-    }
-
-    @Override
-    public void appendSignature(@NotNull StringBuilder decompiled,
-                                @NotNull org.elixir_lang.beam.MacroNameArity macroNameArity,
-                                @NotNull String name,
-                                @NotNull String[] parameters) {
-        appendName(decompiled, macroNameArity.name);
-
-        decompiled.append('(');
-
-        for (int i = 0; i < parameters.length; i++) {
+    override fun appendSignature(decompiled: StringBuilder,
+                                 macroNameArity: org.elixir_lang.beam.MacroNameArity,
+                                 name: String,
+                                 parameters: Array<String>) {
+        appendName(decompiled, macroNameArity.name)
+        decompiled.append('(')
+        for (i in parameters.indices) {
             if (i != 0) {
-                decompiled.append(", ");
+                decompiled.append(", ")
             }
-
-            decompiled.append(parameters[i]);
+            decompiled.append(parameters[i])
         }
-
-        decompiled.append(')');
+        decompiled.append(')')
     }
 
-    @Override
-    public void appendName(@NotNull StringBuilder decompiled, @NotNull String name) {
-        decompiled.append(name);
+    override fun appendName(decompiled: StringBuilder, name: String) {
+        decompiled.append(name)
     }
 
+    companion object {
+        val INSTANCE = Default()
+    }
 }
