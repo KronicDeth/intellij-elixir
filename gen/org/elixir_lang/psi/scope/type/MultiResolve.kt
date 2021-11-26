@@ -112,6 +112,14 @@ private constructor(private val name: String,
                         executeOnParameter(keywordPair.keywordValue, state)
                     }
                 }
+                is ElixirStructOperation -> {
+                    whileIn(parameter.children.drop(1)) { child ->
+                        executeOnParameter(child, state)
+                    }
+                }
+                is ElixirMapArguments -> {
+                    parameter.mapConstructionArguments?.let { executeOnParameter(it, state) } ?: true
+                }
                 else -> {
                     Logger.error(MultiResolve::class.java, "Don't know how to get name of parameter", parameter)
 
