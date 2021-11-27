@@ -61,7 +61,7 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
     private const val FLASH = "flash"
     private const val SOCKET = "socket"
 
-    private tailrec fun resolveInCallDefinitionClauseExpression(assign: Assign, incompleteCode: Boolean, expression: PsiElement, initial: List<ResolveResult>): AccumulatorContinue<List<ResolveResult>> =
+    private fun resolveInCallDefinitionClauseExpression(assign: Assign, incompleteCode: Boolean, expression: PsiElement, initial: List<ResolveResult>): AccumulatorContinue<List<ResolveResult>> =
             when (expression) {
                 is ElixirAccessExpression, is ElixirStabBody, is ElixirTuple -> {
                     expression.childExpressionsFoldWhile(

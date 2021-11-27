@@ -3,6 +3,7 @@ package org.elixir_lang.code
 import com.ericsson.otp.erlang.OtpErlangAtom
 import com.ericsson.otp.erlang.OtpErlangObject
 import org.elixir_lang.Atom
+import org.elixir_lang.string.Tokenizer
 
 typealias Precedence = Int
 
@@ -22,6 +23,7 @@ object Identifier {
         CALLABLE_LOCAL,
         CALLABLE_OPERATOR,
         NOT_CALLABLE,
+        IDENTIFIER,
         OTHER
     }
 
@@ -61,9 +63,7 @@ object Identifier {
             else -> null
         }
 
-    fun classify(atom: OtpErlangAtom): Classification = classify(atom.atomValue())
-
-    fun classify(atomValue: String): Classification =
+    private fun classify(atomValue: String): Classification =
             when {
                 atomValue in notCallableAtomValues ->
                     Classification.NOT_CALLABLE
@@ -73,12 +73,21 @@ object Identifier {
                     Classification.ALIAS
                 isIdentifier(atomValue) ->
                     Classification.CALLABLE_LOCAL
-                atomValue.startsWith("..") ->
-                    Classification.OTHER
-                "@" !in atomValue ->
-                    Classification.NOT_CALLABLE
                 else ->
-                    Classification.OTHER
+                    when (val tokenized = Tokenizer.tokenize(atomValue)) {
+                        // https://github.com/elixir-lang/elixir/blob/6289cd6b9685a3c63c9ea445f1672004fc713cb8/lib/elixir/lib/code/identifier.ex#L101-L106
+                        is Tokenizer.Tokenized.Kind -> if (tokenized.rest.isEmpty()) {
+                            if (tokenized.kind == Tokenizer.Kind.IDENTIFIER && !tokenized.special.contains('@')) {
+                                Classification.CALLABLE_LOCAL
+                            } else {
+                                Classification.NOT_CALLABLE
+                            }
+                        } else {
+                            Classification.OTHER
+                        }
+                        // https://github.com/elixir-lang/elixir/blob/6289cd6b9685a3c63c9ea445f1672004fc713cb8/lib/elixir/lib/code/identifier.ex#L108-L109
+                        else -> Classification.OTHER
+                    }
             }
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/code/identifier.ex#L168-L188

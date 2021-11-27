@@ -4,6 +4,7 @@ import com.ericsson.otp.erlang.OtpErlangBinary
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileTypes.BinaryFileDecompiler
 import com.intellij.openapi.vfs.VirtualFile
+import org.elixir_lang.NameArity
 import org.elixir_lang.beam.Beam.Companion.from
 import org.elixir_lang.beam.MacroNameArity.MACRO_ORDER
 import org.elixir_lang.beam.chunk.Atoms
@@ -33,10 +34,10 @@ class Decompiler : BinaryFileDecompiler {
         private val logger = Logger.getInstance(Decompiler::class.java)
         private val HEADER_NAME_BY_MACRO: Map<String, String> = mapOf(Function.DEFMACRO to "Macros", Function.DEFMACROP to "Private Macros", Function.DEF to "Functions", Function.DEFP to "Private Functions")
         private val MACRO_NAME_ARITY_DECOMPILER_LIST: List<org.elixir_lang.beam.decompiler.MacroNameArity> = listOf(
-                InfixOperator.INSTANCE,
-                PrefixOperator.INSTANCE,
-                Unquoted.INSTANCE,
-                SignatureOverride.INSTANCE,
+                InfixOperator,
+                PrefixOperator,
+                Unquoted,
+                SignatureOverride,
                 Default.INSTANCE
         )
 
@@ -438,7 +439,8 @@ class Decompiler : BinaryFileDecompiler {
         private fun appendMacroNameArity(decompiled: StringBuilder,
                                          macroNameArity: MacroNameArity,
                                          documentation: Documentation?): Boolean {
-            val decompiler = decompiler(macroNameArity)
+            val beamLanguage = documentation?.beamLanguage ?: "elixir"
+            val decompiler = decompiler(beamLanguage, macroNameArity.toNameArity())
 
             return if (decompiler != null) {
                 // The signature while easier for users to read are not proper code for those that need to use unquote, so
@@ -465,26 +467,25 @@ class Decompiler : BinaryFileDecompiler {
             }
         }
 
-        fun decompiler(macroNameArity: MacroNameArity): org.elixir_lang.beam.decompiler.MacroNameArity? {
+        fun decompiler(beamLanguage: String, nameArity: NameArity): org.elixir_lang.beam.decompiler.MacroNameArity? {
             var accepted: org.elixir_lang.beam.decompiler.MacroNameArity? = null
 
             for (decompiler in MACRO_NAME_ARITY_DECOMPILER_LIST) {
-                if (decompiler.accept(macroNameArity)) {
+                if (decompiler.accept(beamLanguage, nameArity)) {
                     accepted = decompiler
                     break
                 }
             }
 
             if (accepted == null) {
-                error(macroNameArity)
+                error(nameArity)
             }
 
             return accepted
         }
 
-        private fun error(macroNameArity: MacroNameArity) {
-            val message = "No decompiler for MacroNameArity ($macroNameArity)"
-            logger.error(message)
+        private fun error(nameArity: NameArity) {
+            logger.error("No decompiler for MacroNameArity ($nameArity)")
         }
 
         fun defmoduleArgument(moduleName: String): String = if (moduleName.startsWith(Module.ELIXIR_PREFIX)) {

@@ -17,7 +17,7 @@ defmodule AtU8Test do
 
   def unquote(:"こんにちは世界")() do
     (
-      :"こんにちは世界"
+      :こんにちは世界
       saudação = "Bom dia!"
       saudação
     )

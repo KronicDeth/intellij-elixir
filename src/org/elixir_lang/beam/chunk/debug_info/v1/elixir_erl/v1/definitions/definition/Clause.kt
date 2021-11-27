@@ -27,9 +27,9 @@ class Clause(
     private val guards: OtpErlangList? = guards as? OtpErlangList
     val signature: String by lazy {
         definition.macroNameArity?.let { macroNameArity ->
-            decompiler(macroNameArity)?.let { decompiler ->
+            decompiler("elixir", macroNameArity.toNameArity())?.let { decompiler ->
                 val decompiled = StringBuilder()
-                val argumentStrings = this.arguments.map { Macro.toString(it) }.orEmpty().toTypedArray()
+                val argumentStrings = this.arguments.map { Macro.toString(it) }.toTypedArray()
                 decompiler.appendSignature(decompiled, macroNameArity, macroNameArity.name, argumentStrings)
 
                 decompiled.toString()

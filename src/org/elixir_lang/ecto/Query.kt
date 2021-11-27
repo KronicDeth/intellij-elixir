@@ -207,6 +207,9 @@ object Query: ModuleWalker("Ecto.Query", Distinct, Dynamic, From, GroupBy, Havin
             is ElixirList -> whileIn(inReference.childExpressions()) {
                 executeOnInReference(it, state, keepProcessing)
             }
+            is QuotableKeywordList -> whileIn(inReference.quotableKeywordPairList()) { keywordPair ->
+                executeOnInReference(keywordPair.keywordValue, state, keepProcessing)
+            }
             is UnqualifiedNoArgumentsCall<*> ->
                 inReference.resolvedFinalArity() != 0 || keepProcessing(inReference, state)
             else -> {

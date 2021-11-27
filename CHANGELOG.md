@@ -368,6 +368,10 @@
   * Regression test for [#2198](https://github.com/KronicDeth/intellij-elixir/issues/2198).
 * [#2201](https://github.com/KronicDeth/intellij-elixir/pull/2201) - [@KronicDeth](https://github.com/KronicDeth)
   * Use callbacks as completions for calls.
+* [#2223](https://github.com/KronicDeth/intellij-elixir/pull/2223) - [@KronicDeth](https://github.com/KronicDeth)
+  * Decompiler
+    * Don't require `MacroNameArity` for `accept`, but use `NameArity` only because no decompiler cares about the macro.
+  * Tests for Code.Identifier and String.Tokenizer
 
 ### Bug Fixes
 * [#2074](https://github.com/KronicDeth/intellij-elixir/pull/2074) - [@Thau](https://github.com/Thau)
@@ -545,6 +549,28 @@
     Checking only for an empty collection allowed any prefixes in the scope to override exact matches in anywhere indexed, which meant that `Ecto` in `defmodule Ecto.Adapter do` resolved to itself instead of the exact `defmodule Ecto do`.
 * [#2214](https://github.com/KronicDeth/intellij-elixir/pull/2214) - [@KronicDeth](https://github.com/KronicDeth)
   * When regenerating the parser, `ElixirVisitor` is also regenerated.  When it was regenerated it lost the bug fix for `#visitLiteralSigileLine` calling itself.  Added a regression test, so that this can't happen again.
+* [#2223](https://github.com/KronicDeth/intellij-elixir/pull/2223) - [@KronicDeth](https://github.com/KronicDeth)
+  * Ecto
+    * Walk keyword keys as right operand of `in` in `from`
+  * Resolving type references
+    * Walk struct operations for type parameters
+    * Check keyword values for type parameters
+    * Check operands of two operations for type parameters
+    * Stop looking for type parameters on qualified or unqualified alias
+  * Decompiler
+    * Only unquote `in` when an Erlang function, otherwise, use operators the same as Elixir for defs and calls.
+    * Fix apply Erlang arguments, so that they are inside `[]`.
+    * Quote keyword keys containing `-`
+      Fixes decompiling of `Elixir.Phoenix.HTML.Tag.beam`
+    * Use apply with escaped atom when Erlang function call is an Elixir operator
+  * Port String.Tokenizer.tokenize for use in Identifier.inspectAsKey
+    I was putting off porting all of `Identifer.inspectAsKey` by adding special cases as needed, but the decompiler kept having bugs, so port all of it including `String.Tokenizer.tokenize`.  It will also work for unicode characters now too.
+  * Resolve calls that are unquoted values to search for quote blocks in those functions.
+  * Stop looking for qualifiers to prepend when reaching `=>`
+  * The parent argument to AccumulatorContinue.childExpressionsFoldWhile should be this and not parent
+    When converting to an extension function I left `parent` in place because the argument is called `parent`, but since it is an extension function that value because `this.parent` when it really should have been `this`.  Using `this.parent` meant it would ask for the parent's children and keep looping back to `this`.
+  * Don't use `tailrec` in function with any body-recursion.
+    It causes issues with `ElixirAccessExpression` recursion sometimes.
 
 ## v11.13.0
 

@@ -13,6 +13,7 @@ import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.operation.InMatch
 import org.elixir_lang.psi.operation.Pipe
+import org.elixir_lang.psi.operation.Two
 import org.elixir_lang.psi.operation.Type
 import org.elixir_lang.psi.scope.ResolveResultOrderedSet
 import org.elixir_lang.psi.scope.WhileIn.whileIn
@@ -74,7 +75,7 @@ private constructor(private val name: String,
                 // Parenthetical calls must be a usage instead of a declaration.
                 is UnqualifiedParenthesesCall<*>,
                 // Literals
-                is ElixirAlias,
+                is QualifiableAlias,
                 is ElixirAtom,
                 is ElixirAtomKeyword,
                 is ElixirDecimalWholeNumber,
@@ -102,6 +103,22 @@ private constructor(private val name: String,
                     } else {
                         true
                     }
+                }
+                is Two ->
+                    (parameter.leftOperand()?.let { executeOnParameter(it, state) } ?: true) &&
+                            (parameter.rightOperand()?.let { executeOnParameter(it, state) } ?: true)
+                is QuotableKeywordList -> {
+                    whileIn(parameter.quotableKeywordPairList()) { keywordPair ->
+                        executeOnParameter(keywordPair.keywordValue, state)
+                    }
+                }
+                is ElixirStructOperation -> {
+                    whileIn(parameter.children.drop(1)) { child ->
+                        executeOnParameter(child, state)
+                    }
+                }
+                is ElixirMapArguments -> {
+                    parameter.mapConstructionArguments?.let { executeOnParameter(it, state) } ?: true
                 }
                 else -> {
                     Logger.error(MultiResolve::class.java, "Don't know how to get name of parameter", parameter)

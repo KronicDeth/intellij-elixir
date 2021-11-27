@@ -138,9 +138,9 @@ object Unquote {
                 QuoteMacro.`is`(value) -> QuoteMacro.treeWalkUp(value, resolveState, keepProcessing)
                 Case.`is`(value) -> Case.treeWalkUp(value, resolveState, keepProcessing)
                 else -> {
-                    Logger.error(Unquote::class.java, "Don't know how to walk unquoted variable value", value)
-
-                    true
+                    value.reference?.let { it as PsiPolyVariantReference }?.let { reference ->
+                        treeWalkUp(reference, resolveState.putVisitedElement(value), keepProcessing)
+                    } ?: true
                 }
             }
 }

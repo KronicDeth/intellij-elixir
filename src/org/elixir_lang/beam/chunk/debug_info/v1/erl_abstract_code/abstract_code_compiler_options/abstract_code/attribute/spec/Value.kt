@@ -50,7 +50,7 @@ object Value {
     private fun toMacroStrings(value: OtpErlangTuple) =
             toMacroNameArity(value)
                     ?.let { macroNameArity ->
-                        val decompiler = Decompiler.decompiler(macroNameArity) ?: Default.INSTANCE
+                        val decompiler = Decompiler.decompiler("erlang", macroNameArity.toNameArity()) ?: Default.INSTANCE
 
                         toDefinitions(value)
                                 ?.let { definitionsToMacroStrings(it, decompiler, macroNameArity) }

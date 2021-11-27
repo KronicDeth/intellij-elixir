@@ -427,6 +427,14 @@ public class DecompilerTest extends PlatformTestCase {
         assertDecompiled("Elixir.Module");
     }
 
+    public void testHyphenInKeywordKeys() throws IOException {
+        assertDecompiled("Elixir.Phoenix.HTML.Tag");
+    }
+
+    public void testIssue2221() throws IOException {
+        assertDecompiled("queue");
+    }
+
     /*
      * Instance Methods
      */
