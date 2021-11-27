@@ -178,6 +178,15 @@
       <li>Walk the true and false (else) branch of if in Modules or Quote</li>
       <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/2198">#2198</a></li>
       <li>Use callbacks as completions for calls.</li>
+      <li>Decompiler
+        <ul>
+          <li>
+            Don't require <code>MacroNameArity</code> for <code>accept</code>, but use <code>NameArity</code> only
+            because no decompiler cares about the macro.
+          </li>
+        </ul>
+      </li>
+      <li>Tests for Code.Identifier and String.Tokenizer</li>
     </ul>
   </li>
   <li>
@@ -407,6 +416,50 @@
         When regenerating the parser, <code>ElixirVisitor</code> is also regenerated.  When it was regenerated it lost
         the bug fix for <code>#visitLiteralSigileLine</code> calling itself.  Added a regression test, so that this
         can't happen again.
+      </li>
+      <li>Ecto
+        <ul>
+          <li>Walk keyword keys as right operand of <code>in</code> in <code>from</code></li>
+        </ul>
+      </li>
+      <li>Resolving type references
+        <ul>
+          <li>Walk struct operations for type parameters</li>
+          <li>Check keyword values for type parameters</li>
+          <li>Check operands of two operations for type parameters</li>
+          <li>Stop looking for type parameters on qualified or unqualified alias</li>
+        </ul>
+      </li>
+      <li>Decompiler
+        <ul>
+          <li>
+            Only unquote <code>in</code> when an Erlang function, otherwise, use operators the same as Elixir for defs
+            and calls.
+          </li>
+          <li>Fix apply Erlang arguments, so that they are inside <code>[]</code>.</li>
+          <li>Quote keyword keys containing <code>-</code><br>
+            Fixes decompiling of <code>Elixir.Phoenix.HTML.Tag.beam</code></li>
+          <li>Use apply with escaped atom when Erlang function call is an Elixir operator</li>
+        </ul>
+      </li>
+      <li>
+        Port String.Tokenizer.tokenize for use in Identifier.inspectAsKey<br>
+        I was putting off porting all of <code>Identifer.inspectAsKey</code> by adding special cases as needed, but the
+        decompiler kept having bugs, so port all of it including <code>String.Tokenizer.tokenize</code>.  It will also
+        work for unicode characters now too.
+      </li>
+      <li>Resolve calls that are unquoted values to search for quote blocks in those functions.</li>
+      <li>Stop looking for qualifiers to prepend when reaching <code>=&gt;</code></li>
+      <li>
+        The parent argument to AccumulatorContinue.childExpressionsFoldWhile should be this and not parent<br>
+        When converting to an extension function I left <code>parent</code> in place because the argument is called
+        <code>parent</code>, but since it is an extension function that value because <code>this.parent</code> when it
+        really should have been <code>this</code>.  Using <code>this.parent</code> meant it would ask for the parent's
+        children and keep looping back to <code>this</code>.
+      </li>
+      <li>
+        Don't use <code>tailrec</code> in function with any body-recursion.<br>
+        It causes issues with <code>ElixirAccessExpression</code> recursion sometimes.
       </li>
     </ul>
   </li>
