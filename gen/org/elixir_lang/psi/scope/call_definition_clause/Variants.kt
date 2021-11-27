@@ -12,9 +12,11 @@ import org.elixir_lang.psi.ElixirIdentifier
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.Named
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
+import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.scope.CallDefinitionClause
 import org.elixir_lang.psi.putInitialVisitedElement
 import org.elixir_lang.psi.putVisitedElement
+import org.elixir_lang.structure_view.element.CallDefinitionHead
 import org.elixir_lang.structure_view.element.Callback
 import java.util.*
 
@@ -74,7 +76,24 @@ class Variants : CallDefinitionClause() {
             }
 
     override fun executeOnDelegation(element: Call, state: ResolveState): Boolean {
-        TODO()
+        element.finalArguments()?.takeIf { it.size == 2 }?.let { arguments ->
+            val head = arguments[0]
+
+            CallDefinitionHead.nameArityInterval(head, state)?.let { headNameArityInterval ->
+                val headName = headNameArityInterval.name
+
+                lookupElementByPsiElement.computeIfAbsent(head) { head ->
+                    LookupElementBuilder.createWithSmartPointer(
+                            headName,
+                            element
+                    ).withRenderer(
+                            org.elixir_lang.code_insight.lookup.element_renderer.Delegation(headName)
+                    )
+                }
+            }
+        }
+
+        return true
     }
 
     override fun executeOnEExFunctionFrom(element: Call, state: ResolveState): Boolean {

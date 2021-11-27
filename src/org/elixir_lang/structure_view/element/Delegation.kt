@@ -15,6 +15,7 @@ import org.elixir_lang.psi.call.name.Module
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.call.keywordArgument
 import org.elixir_lang.psi.impl.stripAccessExpression
+import org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.enclosingModular
 import org.elixir_lang.structure_view.element.modular.Modular
 import java.util.*
 
@@ -122,6 +123,11 @@ class Delegation(private val modular: Modular, call: Call) : Element<Call?>(call
 
         @JvmStatic
         fun `is`(call: Call): Boolean = call.isCalling(Module.KERNEL, Function.DEFDELEGATE, 2)
+
+        fun fromCall(call: Call): org.elixir_lang.structure_view.element.Delegation? =
+                enclosingModular(call)?.let { modular ->
+                    Delegation(modular, call)
+                }
 
         fun nameIdentifier(call: Call): PsiElement? =
             call.finalArguments()?.get(0)?.let { it as? Call }?.functionNameElement()

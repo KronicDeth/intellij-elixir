@@ -1,8 +1,11 @@
 package org.elixir_lang.code_insight.completion.contributor;
 
 import com.intellij.codeInsight.completion.CompletionType;
+import com.intellij.codeInsight.lookup.LookupElement;
+import com.intellij.codeInsight.lookup.LookupElementPresentation;
 import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -62,6 +65,35 @@ public class CallDefinitionClauseTest extends LightPlatformCodeInsightFixtureTes
         assertCompletion("private_function", strings);
         assertCompletion("Nested", strings);
         assertEquals("Wrong number of completions", 5, strings.size());
+    }
+
+    public void testIssue2122() {
+        myFixture.configureByFiles("defdelegate.ex", "to.ex");
+        myFixture.complete(CompletionType.BASIC, 1);
+
+        List<String> strings = myFixture.getLookupElementStrings();
+        assertNotNull("Completion lookup not shown", strings);
+        assertCompletion("source", strings);
+        assertCompletion("source_as", strings);
+        assertCompletion("usage", strings);
+        assertEquals("Wrong number of completions", 3, strings.size());
+
+        LookupElement[] lookuoEelements = myFixture.getLookupElements();
+
+        LookupElementPresentation lookupElementPresentation = new LookupElementPresentation();
+        lookuoEelements[0].renderElement(lookupElementPresentation);
+        assertEquals("source", lookupElementPresentation.getItemText());
+        assertEquals(" (defdelegate.ex defmodule Defdelegate)", lookupElementPresentation.getTailText());
+
+        lookupElementPresentation = new LookupElementPresentation();
+        lookuoEelements[1].renderElement(lookupElementPresentation);
+        assertEquals("source_as", lookupElementPresentation.getItemText());
+        assertEquals(" (defdelegate.ex defmodule Defdelegate)", lookupElementPresentation.getTailText());
+
+        lookupElementPresentation = new LookupElementPresentation();
+        lookuoEelements[2].renderElement(lookupElementPresentation);
+        assertEquals("usage", lookupElementPresentation.getItemText());
+        assertEquals(" (defdelegate.ex defmodule Defdelegate)", lookupElementPresentation.getTailText());
     }
 
     /*
