@@ -99,16 +99,17 @@ private constructor(
 
     override fun executeOnEExFunctionFrom(element: Call, state: ResolveState): Boolean =
             element.finalArguments()?.let { arguments ->
-                when (element.functionName()) {
-                    FUNCTION_FROM_FILE_ARITY_RANGE.name -> {
                         arguments[1].stripAccessExpression().let { it as? ElixirAtom }?.node?.lastChildNode?.text?.let { name ->
                             if (this.name != null && name.startsWith(this.name)) {
                                 val arity = if (arguments.size >= 4) {
                                     // function_from_file(kind, name, file, args)
                                     // function_from_file(kind, name, file, args, options)
+                                    // function_from_string(kind, name, template, args)
+                                    // function_from_string(kind, name, template, args, options)
                                     arguments[3].stripAccessExpression().let { it as? ElixirList }?.children?.size
                                 } else {
                                     // function_from_file(kind, name, file) where args defaults to `[]`
+                                    // function_from_string(kind, name, template) where args defaults to `[]`
                                     0
                                 }
 
@@ -119,10 +120,6 @@ private constructor(
                                 true
                             }
                         } ?: true
-                    }
-                    FUNCTION_FROM_STRING_ARITY_RANGE.name -> TODO()
-                    else -> true
-                }
             } ?: true
 
     override fun executeOnException(element: Call, state: ResolveState): Boolean =

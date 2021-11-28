@@ -78,22 +78,45 @@ public class CallDefinitionClauseTest extends LightPlatformCodeInsightFixtureTes
         assertCompletion("usage", strings);
         assertEquals("Wrong number of completions", 3, strings.size());
 
-        LookupElement[] lookuoEelements = myFixture.getLookupElements();
+        LookupElement[] lookupElements = myFixture.getLookupElements();
 
         LookupElementPresentation lookupElementPresentation = new LookupElementPresentation();
-        lookuoEelements[0].renderElement(lookupElementPresentation);
+        lookupElements[0].renderElement(lookupElementPresentation);
         assertEquals("source", lookupElementPresentation.getItemText());
         assertEquals(" (defdelegate.ex defmodule Defdelegate)", lookupElementPresentation.getTailText());
 
         lookupElementPresentation = new LookupElementPresentation();
-        lookuoEelements[1].renderElement(lookupElementPresentation);
+        lookupElements[1].renderElement(lookupElementPresentation);
         assertEquals("source_as", lookupElementPresentation.getItemText());
         assertEquals(" (defdelegate.ex defmodule Defdelegate)", lookupElementPresentation.getTailText());
 
         lookupElementPresentation = new LookupElementPresentation();
-        lookuoEelements[2].renderElement(lookupElementPresentation);
+        lookupElements[2].renderElement(lookupElementPresentation);
         assertEquals("usage", lookupElementPresentation.getItemText());
         assertEquals(" (defdelegate.ex defmodule Defdelegate)", lookupElementPresentation.getTailText());
+    }
+
+    public void testExecuteOnEExFunctionFrom() {
+        myFixture.configureByFiles("eex_function.ex", "eex.ex");
+        myFixture.complete(CompletionType.BASIC, 1);
+
+        List<String> strings = myFixture.getLookupElementStrings();
+        assertNotNull("Completion lookup not shown", strings);
+        assertCompletion("function_from_file_sample", strings);
+        assertCompletion("function_from_string_sample", strings);
+        assertEquals("Wrong number of completions", 2, strings.size());
+
+        LookupElement[] lookupElements = myFixture.getLookupElements();
+
+        LookupElementPresentation lookupElementPresentation = new LookupElementPresentation();
+        lookupElements[0].renderElement(lookupElementPresentation);
+        assertEquals("function_from_file_sample", lookupElementPresentation.getItemText());
+        assertEquals(" (eex_function.ex defmodule EExFunction)", lookupElementPresentation.getTailText());
+
+        lookupElementPresentation = new LookupElementPresentation();
+        lookupElements[1].renderElement(lookupElementPresentation);
+        assertEquals("function_from_string_sample", lookupElementPresentation.getItemText());
+        assertEquals(" (eex_function.ex defmodule EExFunction)", lookupElementPresentation.getTailText());
     }
 
     /*

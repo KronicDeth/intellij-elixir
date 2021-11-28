@@ -14,11 +14,14 @@ import org.elixir_lang.navigation.item_presentation.Parent
 import org.elixir_lang.psi.ArityInterval
 import org.elixir_lang.psi.QuoteMacro
 import org.elixir_lang.psi.call.Call
+import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.call.macroChildCalls
 import org.elixir_lang.psi.impl.enclosingMacroCall
 import org.elixir_lang.psi.impl.locationString
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.operation.Or
+import org.elixir_lang.psi.putInitialVisitedElement
+import org.elixir_lang.psi.putVisitedElement
 import org.elixir_lang.structure_view.element.*
 import org.elixir_lang.structure_view.element.Quote
 import org.elixir_lang.structure_view.element.call_definition_by_name_arity.FunctionByNameArity
@@ -80,7 +83,7 @@ open class Module(protected val parent: Modular?, call: Call) : Element<Call>(ca
 
         fun callChildren(modular: Modular, call: Call): Array<TreeElement> {
             val childCalls = call.macroChildCalls()
-            return childCallTreeElements(modular, childCalls)
+            return childCallTreeElements(modular, childCalls, ResolveState.initial().put(ENTRANCE, call).putInitialVisitedElement(call))
         }
 
         @JvmStatic
@@ -109,7 +112,7 @@ open class Module(protected val parent: Modular?, call: Call) : Element<Call>(ca
         fun nameIdentifier(call: Call): PsiElement? = call.primaryArguments()?.firstOrNull()?.stripAccessExpression()
 
         @Contract(pure = true)
-        private fun childCallTreeElements(modular: Modular, childCalls: Array<Call>?): Array<TreeElement> {
+        private fun childCallTreeElements(modular: Modular, childCalls: Array<Call>?, resolveState: ResolveState): Array<TreeElement> {
             var treeElements: Array<TreeElement>? = null
 
             if (childCalls != null) {
@@ -131,9 +134,10 @@ open class Module(protected val parent: Modular?, call: Call) : Element<Call>(ca
                         org.elixir_lang.psi.Exception.`is`(childCall) -> functionByNameArity.exception = Exception(modular, childCall)
                         org.elixir_lang.psi.CallDefinitionClause.isFunction(childCall) -> functionByNameArity.addClausesToCallDefinition(childCall)
                         CallDefinitionSpecification.`is`(childCall) -> functionByNameArity.addSpecificationToCallDefinition(childCall)
+                        org.elixir_lang.EEx.isFunctionFrom(childCall, resolveState) -> treeElementList.add(EExFunctionFrom(modular, childCall))
                         org.elixir_lang.psi.Implementation.`is`(childCall) -> treeElementList.add(Implementation(modular, childCall))
                         org.elixir_lang.psi.CallDefinitionClause.isMacro(childCall) -> macroByNameArity.addClausesToCallDefinition(childCall)
-                        org.elixir_lang.psi. Module.`is`(childCall) -> treeElementList.add(Module(modular, childCall))
+                        org.elixir_lang.psi.Module.`is`(childCall) -> treeElementList.add(Module(modular, childCall))
                         Overridable.`is`(childCall) -> {
                             val overridable = Overridable(modular, childCall)
                             overridableSet.add(overridable)

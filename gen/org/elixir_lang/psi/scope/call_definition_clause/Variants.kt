@@ -6,16 +6,17 @@ import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import com.intellij.psi.util.PsiTreeUtil
+import org.elixir_lang.EEx
+import org.elixir_lang.EEx.FUNCTION_FROM_FILE_ARITY_RANGE
+import org.elixir_lang.EEx.FUNCTION_FROM_STRING_ARITY_RANGE
 import org.elixir_lang.annotator.Parameter
-import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
-import org.elixir_lang.psi.ElixirIdentifier
+import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.Named
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.call.finalArguments
+import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.scope.CallDefinitionClause
-import org.elixir_lang.psi.putInitialVisitedElement
-import org.elixir_lang.psi.putVisitedElement
 import org.elixir_lang.structure_view.element.CallDefinitionHead
 import org.elixir_lang.structure_view.element.Callback
 import java.util.*
@@ -97,7 +98,20 @@ class Variants : CallDefinitionClause() {
     }
 
     override fun executeOnEExFunctionFrom(element: Call, state: ResolveState): Boolean {
-        TODO()
+        element.finalArguments()?.let { arguments ->
+            arguments[1].stripAccessExpression().let { it as? ElixirAtom }?.node?.lastChildNode?.text?.let { name ->
+                lookupElementByPsiElement.computeIfAbsent(element) { element ->
+                    LookupElementBuilder.createWithSmartPointer(
+                            name,
+                            element
+                    ).withRenderer(
+                            org.elixir_lang.code_insight.lookup.element_renderer.EExFunctionFrom(name)
+                    )
+                }
+            }
+       }
+
+        return true
     }
 
     override fun executeOnException(element: Call, state: ResolveState): Boolean {
