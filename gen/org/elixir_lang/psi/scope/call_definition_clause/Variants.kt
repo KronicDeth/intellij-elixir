@@ -7,6 +7,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.annotator.Parameter
+import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.Named
@@ -129,7 +130,24 @@ class Variants : CallDefinitionClause() {
     }
 
     override fun executeOnMixGeneratorEmbed(element: Call, state: ResolveState): Boolean {
-        TODO()
+        element.finalArguments()?.first()?.stripAccessExpression()?.let { it as? ElixirAtom }?.node?.lastChildNode?.text?.let { prefix ->
+            val suffix = element.functionName()!!.removePrefix("embed_")
+            val name = "${prefix}_${suffix}"
+
+            lookupElementByPsiElementName.computeIfAbsent(element to name) { (element, name) ->
+                val renderer = when (suffix) {
+                    "template" ->  org.elixir_lang.code_insight.lookup.element_renderer.mix.generator.EmbedTemplate(name)
+                    "text" -> org.elixir_lang.code_insight.lookup.element_renderer.mix.generator.EmbedText(name)
+                    else -> TODO()
+                }
+
+                LookupElementBuilder
+                        .createWithSmartPointer(name, element)
+                        .withRenderer(renderer)
+            }
+        }
+
+        return true
     }
 
     /**

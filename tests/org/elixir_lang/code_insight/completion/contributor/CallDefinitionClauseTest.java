@@ -148,6 +148,35 @@ public class CallDefinitionClauseTest extends LightPlatformCodeInsightFixtureTes
         assertEquals("(exception)", lookupElementPresentation.getTailText());
     }
 
+    public void testExecuteOnMixGeneratorEmbed() {
+        myFixture.configureByFiles("mix_generator_embed.ex", "mix_generator.ex");
+        myFixture.complete(CompletionType.BASIC, 1);
+
+        List<String> strings = myFixture.getLookupElementStrings();
+        assertNotNull("Completion lookup not shown", strings);
+        assertCompletion("error_text", strings);
+        assertCompletion("log_template", strings);
+        assertCompletion("usage", strings);
+        assertEquals("Wrong number of completions", 3, strings.size());
+
+        LookupElement[] lookupElements = myFixture.getLookupElements();
+
+        LookupElementPresentation lookupElementPresentation = new LookupElementPresentation();
+        lookupElements[0].renderElement(lookupElementPresentation);
+        assertEquals("error_text", lookupElementPresentation.getItemText());
+        assertEquals("()", lookupElementPresentation.getTailText());
+
+        lookupElementPresentation = new LookupElementPresentation();
+        lookupElements[1].renderElement(lookupElementPresentation);
+        assertEquals("usage", lookupElementPresentation.getItemText());
+        assertEquals(" (mix_generator_embed.ex defmodule MixGeneratorEmbed)", lookupElementPresentation.getTailText());
+
+        lookupElementPresentation = new LookupElementPresentation();
+        lookupElements[2].renderElement(lookupElementPresentation);
+        assertEquals("log_template", lookupElementPresentation.getItemText());
+        assertEquals("(assigns)", lookupElementPresentation.getTailText());
+    }
+
     /*
      * Protected Instance Methods
      */
