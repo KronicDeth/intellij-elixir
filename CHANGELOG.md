@@ -372,6 +372,13 @@
   * Decompiler
     * Don't require `MacroNameArity` for `accept`, but use `NameArity` only because no decompiler cares about the macro.
   * Tests for Code.Identifier and String.Tokenizer
+* [#2226](https://github.com/KronicDeth/intellij-elixir/pull/2226) - [@KronicDeth](https://github.com/KronicDeth)
+  * Structure View for `EEx.function_from_(file|string)`
+  * Variants (completion) for functions declared by special macros.
+    * Functions defined by `EEx.function_from_(file|string)`
+    * `exception/1` and `message/1` defined by `defexception`
+    * `*_text/0` and `*_template(assigns)` functions defined by `Mix.Generator.embed_text` and `Mix.Generator.embed_template`.
+
 
 ### Bug Fixes
 * [#2074](https://github.com/KronicDeth/intellij-elixir/pull/2074) - [@Thau](https://github.com/Thau)
@@ -571,6 +578,10 @@
     When converting to an extension function I left `parent` in place because the argument is called `parent`, but since it is an extension function that value because `this.parent` when it really should have been `this`.  Using `this.parent` meant it would ask for the parent's children and keep looping back to `this`.
   * Don't use `tailrec` in function with any body-recursion.
     It causes issues with `ElixirAccessExpression` recursion sometimes.
+* [#2226](https://github.com/KronicDeth/intellij-elixir/pull/2226) - [@KronicDeth](https://github.com/KronicDeth)
+  * Implement completion for functions declared with `defdelegate`.
+  * Fix `LookupElementPresentation.putItemPresentation` `addTailText`.
+    Only append suffix of `presentableText` if it is prefixed by `itemText`.
 
 ## v11.13.0
 

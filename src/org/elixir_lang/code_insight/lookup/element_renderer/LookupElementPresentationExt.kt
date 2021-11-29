@@ -7,11 +7,8 @@ fun LookupElementPresentation.putItemPresentation(itemPresentation: ItemPresenta
     this.icon = itemPresentation.getIcon(true)
 
     itemPresentation.presentableText?.let { presentableText ->
-        val nameLength = itemText!!.length
-        val presentableTextLength = presentableText.length
-
-        if (nameLength <= presentableTextLength) {
-            appendTailText(presentableText.substring(nameLength), true)
+        if (presentableText.startsWith(itemText!!)) {
+            appendTailText(presentableText.removePrefix(itemText!!), true)
         }
     }
 

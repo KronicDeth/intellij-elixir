@@ -187,6 +187,17 @@
         </ul>
       </li>
       <li>Tests for Code.Identifier and String.Tokenizer</li>
+      <li>Structure View for <code>EEx.function_from_(file|string)</code></li>
+      <li>Variants (completion) for functions declared by special macros.
+        <ul>
+          <li>Functions defined by <code>EEx.function_from_(file|string)</code></li>
+          <li><code>exception/1</code> and <code>message/1</code> defined by <code>defexception</code></li>
+          <li>
+            <code>*_text/0</code> and <code>*_template(assigns)</code> functions defined by
+            <code>Mix.Generator.embed_text</code> and <code>Mix.Generator.embed_template</code>.
+          </li>
+        </ul>
+      </li>
     </ul>
   </li>
   <li>
@@ -461,6 +472,9 @@
         Don't use <code>tailrec</code> in function with any body-recursion.<br>
         It causes issues with <code>ElixirAccessExpression</code> recursion sometimes.
       </li>
+      <li>Implement completion for functions declared with <code>defdelegate</code>.</li>
+      <li>Fix <code>LookupElementPresentation.putItemPresentation</code> <code>addTailText</code>.<br>
+        Only append suffix of <code>presentableText</code> if it is prefixed by <code>itemText</code>.</li>
     </ul>
   </li>
 </ul>
