@@ -119,6 +119,35 @@ public class CallDefinitionClauseTest extends LightPlatformCodeInsightFixtureTes
         assertEquals(" (eex_function.ex defmodule EExFunction)", lookupElementPresentation.getTailText());
     }
 
+    public void testExecuteOnException() {
+        myFixture.configureByFile("exception.ex");
+        myFixture.complete(CompletionType.BASIC, 1);
+
+        List<String> strings = myFixture.getLookupElementStrings();
+        assertNotNull("Completion lookup not shown", strings);
+        assertCompletion("extra", strings);
+        assertCompletion("exception", strings);
+        assertCompletion("message", strings);
+        assertEquals("Wrong number of completions", 3, strings.size());
+
+        LookupElement[] lookupElements = myFixture.getLookupElements();
+
+        LookupElementPresentation lookupElementPresentation = new LookupElementPresentation();
+        lookupElements[0].renderElement(lookupElementPresentation);
+        assertEquals("exception", lookupElementPresentation.getItemText());
+        assertEquals("(message)", lookupElementPresentation.getTailText());
+
+        lookupElementPresentation = new LookupElementPresentation();
+        lookupElements[1].renderElement(lookupElementPresentation);
+        assertEquals("extra", lookupElementPresentation.getItemText());
+        assertEquals(" (exception.ex defmodule MyException)", lookupElementPresentation.getTailText());
+
+        lookupElementPresentation = new LookupElementPresentation();
+        lookupElements[2].renderElement(lookupElementPresentation);
+        assertEquals("message", lookupElementPresentation.getItemText());
+        assertEquals("(exception)", lookupElementPresentation.getTailText());
+    }
+
     /*
      * Protected Instance Methods
      */

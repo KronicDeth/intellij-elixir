@@ -6,9 +6,6 @@ import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import com.intellij.psi.util.PsiTreeUtil
-import org.elixir_lang.EEx
-import org.elixir_lang.EEx.FUNCTION_FROM_FILE_ARITY_RANGE
-import org.elixir_lang.EEx.FUNCTION_FROM_STRING_ARITY_RANGE
 import org.elixir_lang.annotator.Parameter
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
@@ -22,10 +19,10 @@ import org.elixir_lang.structure_view.element.Callback
 import java.util.*
 
 class Variants : CallDefinitionClause() {
-    private var lookupElementByPsiElement: MutableMap<PsiElement, LookupElement> = mutableMapOf()
+    private var lookupElementByPsiElementName: MutableMap<Pair<PsiElement, String>, LookupElement> = mutableMapOf()
 
     private val lookupElementCollection: Collection<LookupElement>
-        get() = lookupElementByPsiElement.values
+        get() = lookupElementByPsiElementName.values
 
     /**
      * Called on every [Call] where [org.elixir_lang.structure_view.element.CallDefinitionClause. is] is
@@ -45,7 +42,7 @@ class Variants : CallDefinitionClause() {
 
     private fun addCallDefinitionClauseToLookupElementByPsiElement(named: Named) {
         named.name?.let { name ->
-            lookupElementByPsiElement.computeIfAbsent(named) { element ->
+            lookupElementByPsiElementName.computeIfAbsent(named to name) { (element, name) ->
                 LookupElementBuilder.createWithSmartPointer(
                         name,
                         element
@@ -66,7 +63,7 @@ class Variants : CallDefinitionClause() {
 
     private fun addCallbackToLookupElementByPsiElement(element: AtUnqualifiedNoParenthesesCall<*>, head: Named) =
             head.name?.let { name ->
-                lookupElementByPsiElement.computeIfAbsent(head) { head ->
+                lookupElementByPsiElementName.computeIfAbsent(head to name) { (_, name) ->
                     LookupElementBuilder.createWithSmartPointer(
                             name,
                             element
@@ -83,7 +80,7 @@ class Variants : CallDefinitionClause() {
             CallDefinitionHead.nameArityInterval(head, state)?.let { headNameArityInterval ->
                 val headName = headNameArityInterval.name
 
-                lookupElementByPsiElement.computeIfAbsent(head) { head ->
+                lookupElementByPsiElementName.computeIfAbsent(head to headName) { (_, headName) ->
                     LookupElementBuilder.createWithSmartPointer(
                             headName,
                             element
@@ -100,7 +97,7 @@ class Variants : CallDefinitionClause() {
     override fun executeOnEExFunctionFrom(element: Call, state: ResolveState): Boolean {
         element.finalArguments()?.let { arguments ->
             arguments[1].stripAccessExpression().let { it as? ElixirAtom }?.node?.lastChildNode?.text?.let { name ->
-                lookupElementByPsiElement.computeIfAbsent(element) { element ->
+                lookupElementByPsiElementName.computeIfAbsent(element to name) { (_, name) ->
                     LookupElementBuilder.createWithSmartPointer(
                             name,
                             element
@@ -115,7 +112,20 @@ class Variants : CallDefinitionClause() {
     }
 
     override fun executeOnException(element: Call, state: ResolveState): Boolean {
-        TODO()
+        Exception.NAME_ARITY_LIST.forEach { nameArity ->
+            val name = nameArity.name
+
+            lookupElementByPsiElementName.computeIfAbsent(element to name) { (element, name) ->
+                LookupElementBuilder.createWithSmartPointer(
+                        name,
+                        element
+                ).withRenderer(
+                        org.elixir_lang.code_insight.lookup.element_renderer.exception.CallDefinitionClause(nameArity)
+                )
+            }
+        }
+
+        return true
     }
 
     override fun executeOnMixGeneratorEmbed(element: Call, state: ResolveState): Boolean {

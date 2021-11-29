@@ -7,9 +7,12 @@ import org.elixir_lang.psi.call.name.Function
 import org.elixir_lang.psi.call.name.Module
 
 object Exception {
+    val EXCEPTION = NameArity("exception", 1)
+    val MESSAGE = NameArity("message", 1)
+
     val NAME_ARITY_LIST = listOf(
-            NameArity("exception", 1),
-            NameArity("message", 1)
+            EXCEPTION,
+            MESSAGE
     )
 
     @JvmStatic
