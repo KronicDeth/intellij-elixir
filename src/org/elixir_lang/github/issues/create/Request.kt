@@ -18,7 +18,10 @@ class Request private constructor(val title: String, val body: String) {
         private fun title(event: IdeaLoggingEvent): String = title(event.throwable)
         private fun title(throwable: Throwable): String {
             val lines = ExceptionUtil.getThrowableText(throwable).lineSequence()
-            val message = lines.takeWhile { !it.startsWith("\tat ") }.joinToString()
+            val message = lines
+                    .takeWhile { !it.startsWith("\tat ") }
+                    .joinToString()
+                    .removePrefix("java.lang.Throwable: ")
             val location =
                     lines
                             .filter { it.startsWith("\tat ") }
