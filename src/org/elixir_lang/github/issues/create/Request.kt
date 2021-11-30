@@ -28,6 +28,7 @@ class Request private constructor(val title: String, val body: String) {
                             .filter { !it.startsWith("\tat org.elixir_lang.errorreport.Logger") }
                             .filter { !it.startsWith("\tat com.intellij.openapi.diagnostic.Logger") }
                             .first()
+                            .removePrefix("\t")
 
             return "$message $location"
         }
