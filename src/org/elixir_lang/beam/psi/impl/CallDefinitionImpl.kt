@@ -70,7 +70,7 @@ class CallDefinitionImpl<T : CallDefinitionStub<*>>(private val stub: T) : Modul
      * @return `true`
      */
     @Contract(pure = true)
-    override fun isExported(): Boolean = true
+    override fun isExported(): Boolean = stub.isExported
 
     /**
      * The arity of the function or macro that was exported into the compiled .beam file

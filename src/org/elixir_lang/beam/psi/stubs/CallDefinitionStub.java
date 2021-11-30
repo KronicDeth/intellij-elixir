@@ -10,4 +10,6 @@ public interface CallDefinitionStub<T extends CallDefinition> extends Stubbic, S
     String getName();
 
     int callDefinitionClauseHeadArity();
+
+    boolean isExported();
 }

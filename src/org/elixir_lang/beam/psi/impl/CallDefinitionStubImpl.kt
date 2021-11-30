@@ -93,6 +93,11 @@ class CallDefinitionStubImpl<T : CallDefinition> : StubbicBase<T>, CallDefinitio
      * Arity of the call definition being defined.  Needed to find source element.
      */
     private val callDefinitionClauseHeadArity: Int
+
+    override fun isExported(): Boolean = when (definition) {
+        Definition.PRIVATE_FUNCTION, Definition.PRIVATE_MACRO, Definition.PRIVATE_GUARD -> false
+        else -> true
+    }
 }
 
 /**
