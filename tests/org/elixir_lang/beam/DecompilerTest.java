@@ -440,6 +440,10 @@ public class DecompilerTest extends PlatformTestCase {
         assertDecompiled("ssh_options");
     }
 
+    public void testIssue2257() throws IOException {
+        assertDecompiled("hipe_icode_call_elim");
+    }
+
     /*
      * Instance Methods
      */
