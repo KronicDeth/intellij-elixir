@@ -435,6 +435,11 @@ public class DecompilerTest extends PlatformTestCase {
         assertDecompiled("queue");
     }
 
+    // Issues 2251 and 2263
+    public void testSSHOptions() throws IOException {
+        assertDecompiled("ssh_options");
+    }
+
     /*
      * Instance Methods
      */

@@ -9,6 +9,7 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Attributes
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Scope
 import org.elixir_lang.beam.decompiler.Options
+import org.elixir_lang.code.Identifier
 
 private const val ATTRIBUTE_NAME = "type"
 
@@ -57,7 +58,7 @@ class Type(val attributes: Attributes, attribute: Attribute): MacroString(attrib
 
         private fun nameToMacroString(name: OtpErlangObject): String =
                 when (name) {
-                    is OtpErlangAtom -> name.atomValue()
+                    is OtpErlangAtom -> Identifier.inspectAsFunction(name, true)
                     else -> "unknown_name"
                 }
 
