@@ -23,20 +23,20 @@ fun safeMultiResolve(reference: PsiPolyVariantReference, incompleteCode: Boolean
 fun resolvesToModularName(call: Call, state: ResolveState, modularName: String): Boolean =
         // it is not safe to call `multiResolve` on the call's reference if that `call` is currently being resolved.
         if (!isBeingResolved(call, state)) {
-            val reference = call.reference as PsiPolyVariantReference
-
-            safeMultiResolve(reference, false).any { resolveResult ->
-                if (resolveResult.isValidResult) {
-                    resolveResult.element?.let { it as? Call }?.let { resolved ->
-                        CallDefinitionClause.isMacro(resolved) &&
-                                // don't treat the signature as a call of the function
-                                !resolved.isAncestor(call) &&
-                                enclosingModularMacroCall(resolved)?.name  == modularName
-                    } ?: false
-                } else {
-                    false
+            call.reference?.let { it as PsiPolyVariantReference }?.let { reference ->
+                safeMultiResolve(reference, false).any { resolveResult ->
+                    if (resolveResult.isValidResult) {
+                        resolveResult.element?.let { it as? Call }?.let { resolved ->
+                            CallDefinitionClause.isMacro(resolved) &&
+                                    // don't treat the signature as a call of the function
+                                    !resolved.isAncestor(call) &&
+                                    enclosingModularMacroCall(resolved)?.name == modularName
+                        } ?: false
+                    } else {
+                        false
+                    }
                 }
-            }
+            } ?: false
         } else {
             false
         }
