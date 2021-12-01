@@ -22,7 +22,7 @@ object UserType {
                     ?.let { nameToMacroString(it) }
                     ?: "missing_name"
 
-    private fun nameToMacroString(name: OtpErlangAtom) = inspectAsFunction(name)
+    private fun nameToMacroString(name: OtpErlangAtom) = inspectAsFunction(name, true)
 
     private fun nameToMacroString(name: OtpErlangObject) =
             when (name) {

@@ -55,7 +55,7 @@ defmodule :ssh_options do
 
   @typep exec_daemon_option :: {:exec, exec_spec()}
 
-  @typep exec_fun :: ("exec_fun/1"() | "exec_fun/2"() | "exec_fun/3"())
+  @typep exec_fun :: (unquote(:"exec_fun/1")() | unquote(:"exec_fun/2")() | unquote(:"exec_fun/3")())
 
   @typep unquote(:"exec_fun/1") :: (cmd :: charlist() -> exec_result())
 
@@ -163,7 +163,7 @@ defmodule :ssh_options do
 
   @typep shell_daemon_option :: {:shell, shell_spec()}
 
-  @typep shell_fun :: ("shell_fun/1"() | "shell_fun/2"())
+  @typep shell_fun :: (unquote(:"shell_fun/1")() | unquote(:"shell_fun/2")())
 
   @typep unquote(:"shell_fun/1") :: (user :: charlist() -> pid())
 
