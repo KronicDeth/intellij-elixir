@@ -7,8 +7,10 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.`fun`.Function
 
 object Fun {
+    fun <T> ifTo(term: OtpErlangObject?, ifTrue: (OtpErlangTuple) -> T?): T? = ifTag(term, TAG, ifTrue)
+
     fun ifToMacroStringDeclaredScope(term: OtpErlangObject, scope: Scope): MacroStringDeclaredScope? =
-            ifTag(term, TAG) { toMacroStringDeclaredScope(it, scope) }
+            ifTo(term) { toMacroStringDeclaredScope(it, scope) }
 
     fun toMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope =
         toMacroString(term, scope)

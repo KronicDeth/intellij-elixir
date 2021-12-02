@@ -444,6 +444,11 @@ public class DecompilerTest extends PlatformTestCase {
         assertDecompiled("hipe_icode_call_elim");
     }
 
+    // Issues 2285 and 2286
+    public void testASN1CT() throws IOException {
+        assertDecompiled("asn1ct");
+    }
+
     /*
      * Instance Methods
      */

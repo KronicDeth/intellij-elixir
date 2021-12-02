@@ -14,11 +14,11 @@ import org.elixir_lang.code.Identifier.inspectAsFunction
 import org.elixir_lang.toOtpErlangList
 
 object Call {
-    fun ifToMacroStringDeclaredScope(term: OtpErlangObject): MacroStringDeclaredScope? =
-            ifTag(term, TAG) { toMacroStringDeclaredScope(it) }
+    fun ifToMacroStringDeclaredScope(term: OtpErlangObject, scope: Scope): MacroStringDeclaredScope? =
+            ifTag(term, TAG) { toMacroStringDeclaredScope(it, scope) }
 
-    fun toMacroStringDeclaredScope(term: OtpErlangTuple): MacroStringDeclaredScope {
-        val macroString = toMacroString(term)
+    fun toMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope {
+        val macroString = toMacroString(term, scope)
 
         return MacroStringDeclaredScope(macroString, Scope.EMPTY)
     }
@@ -30,6 +30,13 @@ object Call {
         val argumentsMacroString = argumentsMacroString(term)
 
         return "$nameMacroString.($argumentsMacroString)"
+    }
+
+    private fun inlineAnonymousFunctionCallToMacroString(name: OtpErlangTuple, term: OtpErlangTuple, scope: Scope): MacroString {
+        val nameMacroString = Fun.toMacroStringDeclaredScope(name, scope).macroString
+        val argumentsMacroString = argumentsMacroString(term)
+
+        return "(${nameMacroString}).($argumentsMacroString)"
     }
 
     private fun argumentsMacroString(term: OtpErlangTuple): String =
@@ -116,14 +123,16 @@ object Call {
 
     private fun toArguments(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(3)
 
-    private fun toMacroString(term: OtpErlangTuple): String {
-        val name = toName(term)
-
-        return when {
-            Var.`is`(name) -> anonymousFunctionCallToMacroString(name as OtpErlangTuple, term)
-            else -> namedFunctionCallToMacroString(term)
+    private fun toMacroString(term: OtpErlangTuple, scope: Scope): String =
+        toName(term).let { name ->
+            Var.ifTo(name) {
+                anonymousFunctionCallToMacroString(it, term)
+            } ?:
+            Fun.ifTo(name) {
+                inlineAnonymousFunctionCallToMacroString(it, term, scope)
+            } ?:
+            namedFunctionCallToMacroString(term)
         }
-    }
 
     private fun toName(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
 }
