@@ -453,6 +453,10 @@ public class DecompilerTest extends PlatformTestCase {
         assertDecompiled("diameter_gen_acct_rfc6733");
     }
 
+    public void testIssue2288() throws IOException {
+        assertDecompiled("diameter_gen_base_accounting");
+    }
+
     /*
      * Instance Methods
      */
