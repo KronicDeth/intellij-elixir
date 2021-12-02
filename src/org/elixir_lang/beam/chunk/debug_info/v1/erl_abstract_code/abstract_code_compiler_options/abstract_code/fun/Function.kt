@@ -1,11 +1,11 @@
 package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.`fun`
 
+import com.ericsson.otp.erlang.OtpErlangAtom
 import com.ericsson.otp.erlang.OtpErlangLong
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode.ifTag
-import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Atom
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.MacroString
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Scope
 import org.elixir_lang.code.Identifier.inspectAsFunction
@@ -53,7 +53,8 @@ object Function {
     }
 
     private fun nameToMacroString(term: OtpErlangObject): String =
-            Atom.toElixirAtom(term)
-                    ?.let { inspectAsFunction(it) }
-                    ?: "fun_unknown_name"
+            when (term) {
+                is OtpErlangAtom -> inspectAsFunction(term, true)
+                else -> "fun_unknown_name"
+            }
 }

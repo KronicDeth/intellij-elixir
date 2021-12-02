@@ -397,7 +397,7 @@ defmodule :diameter_gen_acct_rfc6733 do
 
   def unquote(:"#set-")(_, _), do: :erlang.error(:badarg)
 
-  def unquote(:"#set-diameter_base_accounting_ACA")(vals, rec) when is_list(vals), do: :lists.foldl(&fun_unknown_name/2, rec, vals)
+  def unquote(:"#set-diameter_base_accounting_ACA")(vals, rec) when is_list(vals), do: :lists.foldl(&unquote(:"#set-diameter_base_accounting_ACA")/2, rec, vals)
 
   def unquote(:"#set-diameter_base_accounting_ACA")({:"Session-Id", v}, rec), do: diameter_base_accounting_ACA(rec, "Session-Id": v)
 
@@ -441,7 +441,7 @@ defmodule :diameter_gen_acct_rfc6733 do
 
   def unquote(:"#set-diameter_base_accounting_ACA")({:"AVP", v}, rec), do: diameter_base_accounting_ACA(rec, AVP: v)
 
-  def unquote(:"#set-diameter_base_accounting_ACR")(vals, rec) when is_list(vals), do: :lists.foldl(&fun_unknown_name/2, rec, vals)
+  def unquote(:"#set-diameter_base_accounting_ACR")(vals, rec) when is_list(vals), do: :lists.foldl(&unquote(:"#set-diameter_base_accounting_ACR")/2, rec, vals)
 
   def unquote(:"#set-diameter_base_accounting_ACR")({:"Session-Id", v}, rec), do: diameter_base_accounting_ACR(rec, "Session-Id": v)
 
@@ -483,17 +483,17 @@ defmodule :diameter_gen_acct_rfc6733 do
 
   def unquote(:"#set-diameter_base_accounting_ACR")({:"AVP", v}, rec), do: diameter_base_accounting_ACR(rec, AVP: v)
 
-  def unquote(:"#set-diameter_base_accounting_Experimental-Result")(vals, rec) when is_list(vals), do: :lists.foldl(&fun_unknown_name/2, rec, vals)
+  def unquote(:"#set-diameter_base_accounting_Experimental-Result")(vals, rec) when is_list(vals), do: :lists.foldl(&unquote(:"#set-diameter_base_accounting_Experimental-Result")/2, rec, vals)
 
   def unquote(:"#set-diameter_base_accounting_Experimental-Result")({:"Vendor-Id", v}, rec), do: __MODULE__."diameter_base_accounting_Experimental-Result"(rec, "Vendor-Id": v)
 
   def unquote(:"#set-diameter_base_accounting_Experimental-Result")({:"Experimental-Result-Code", v}, rec), do: __MODULE__."diameter_base_accounting_Experimental-Result"(rec, "Experimental-Result-Code": v)
 
-  def unquote(:"#set-diameter_base_accounting_Failed-AVP")(vals, rec) when is_list(vals), do: :lists.foldl(&fun_unknown_name/2, rec, vals)
+  def unquote(:"#set-diameter_base_accounting_Failed-AVP")(vals, rec) when is_list(vals), do: :lists.foldl(&unquote(:"#set-diameter_base_accounting_Failed-AVP")/2, rec, vals)
 
   def unquote(:"#set-diameter_base_accounting_Failed-AVP")({:"AVP", v}, rec), do: __MODULE__."diameter_base_accounting_Failed-AVP"(rec, AVP: v)
 
-  def unquote(:"#set-diameter_base_accounting_Proxy-Info")(vals, rec) when is_list(vals), do: :lists.foldl(&fun_unknown_name/2, rec, vals)
+  def unquote(:"#set-diameter_base_accounting_Proxy-Info")(vals, rec) when is_list(vals), do: :lists.foldl(&unquote(:"#set-diameter_base_accounting_Proxy-Info")/2, rec, vals)
 
   def unquote(:"#set-diameter_base_accounting_Proxy-Info")({:"Proxy-Host", v}, rec), do: __MODULE__."diameter_base_accounting_Proxy-Info"(rec, "Proxy-Host": v)
 
@@ -501,7 +501,7 @@ defmodule :diameter_gen_acct_rfc6733 do
 
   def unquote(:"#set-diameter_base_accounting_Proxy-Info")({:"AVP", v}, rec), do: __MODULE__."diameter_base_accounting_Proxy-Info"(rec, AVP: v)
 
-  def unquote(:"#set-diameter_base_accounting_Vendor-Specific-Application-Id")(vals, rec) when is_list(vals), do: :lists.foldl(&fun_unknown_name/2, rec, vals)
+  def unquote(:"#set-diameter_base_accounting_Vendor-Specific-Application-Id")(vals, rec) when is_list(vals), do: :lists.foldl(&unquote(:"#set-diameter_base_accounting_Vendor-Specific-Application-Id")/2, rec, vals)
 
   def unquote(:"#set-diameter_base_accounting_Vendor-Specific-Application-Id")({:"Vendor-Id", v}, rec), do: __MODULE__."diameter_base_accounting_Vendor-Specific-Application-Id"(rec, "Vendor-Id": v)
 
