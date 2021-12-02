@@ -33,7 +33,7 @@ object RecordIndex {
 
     private fun nameToMacroString(term: OtpErlangObject): MacroString =
             when (term) {
-                is OtpErlangAtom -> inspectAsFunction(term)
+                is OtpErlangAtom -> inspectAsFunction(term, true)
                 else -> "unknown_name"
             }
 

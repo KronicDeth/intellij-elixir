@@ -289,35 +289,35 @@ defmodule :diameter_gen_acct_rfc6733 do
 
   def unquote(:"#info-diameter_base_accounting_Experimental-Result")(:size), do: record_info(:size, :"diameter_base_accounting_Experimental-Result")
 
-  def unquote(:"#info-diameter_base_accounting_Experimental-Result")({:index, :"Vendor-Id"}), do: "diameter_base_accounting_Experimental-Result"(:"Vendor-Id")
+  def unquote(:"#info-diameter_base_accounting_Experimental-Result")({:index, :"Vendor-Id"}), do: unquote(:"diameter_base_accounting_Experimental-Result")(:"Vendor-Id")
 
-  def unquote(:"#info-diameter_base_accounting_Experimental-Result")({:index, :"Experimental-Result-Code"}), do: "diameter_base_accounting_Experimental-Result"(:"Experimental-Result-Code")
+  def unquote(:"#info-diameter_base_accounting_Experimental-Result")({:index, :"Experimental-Result-Code"}), do: unquote(:"diameter_base_accounting_Experimental-Result")(:"Experimental-Result-Code")
 
   def unquote(:"#info-diameter_base_accounting_Failed-AVP")(:fields), do: record_info(:fields, :"diameter_base_accounting_Failed-AVP")
 
   def unquote(:"#info-diameter_base_accounting_Failed-AVP")(:size), do: record_info(:size, :"diameter_base_accounting_Failed-AVP")
 
-  def unquote(:"#info-diameter_base_accounting_Failed-AVP")({:index, :"AVP"}), do: "diameter_base_accounting_Failed-AVP"(:"AVP")
+  def unquote(:"#info-diameter_base_accounting_Failed-AVP")({:index, :"AVP"}), do: unquote(:"diameter_base_accounting_Failed-AVP")(:"AVP")
 
   def unquote(:"#info-diameter_base_accounting_Proxy-Info")(:fields), do: record_info(:fields, :"diameter_base_accounting_Proxy-Info")
 
   def unquote(:"#info-diameter_base_accounting_Proxy-Info")(:size), do: record_info(:size, :"diameter_base_accounting_Proxy-Info")
 
-  def unquote(:"#info-diameter_base_accounting_Proxy-Info")({:index, :"Proxy-Host"}), do: "diameter_base_accounting_Proxy-Info"(:"Proxy-Host")
+  def unquote(:"#info-diameter_base_accounting_Proxy-Info")({:index, :"Proxy-Host"}), do: unquote(:"diameter_base_accounting_Proxy-Info")(:"Proxy-Host")
 
-  def unquote(:"#info-diameter_base_accounting_Proxy-Info")({:index, :"Proxy-State"}), do: "diameter_base_accounting_Proxy-Info"(:"Proxy-State")
+  def unquote(:"#info-diameter_base_accounting_Proxy-Info")({:index, :"Proxy-State"}), do: unquote(:"diameter_base_accounting_Proxy-Info")(:"Proxy-State")
 
-  def unquote(:"#info-diameter_base_accounting_Proxy-Info")({:index, :"AVP"}), do: "diameter_base_accounting_Proxy-Info"(:"AVP")
+  def unquote(:"#info-diameter_base_accounting_Proxy-Info")({:index, :"AVP"}), do: unquote(:"diameter_base_accounting_Proxy-Info")(:"AVP")
 
   def unquote(:"#info-diameter_base_accounting_Vendor-Specific-Application-Id")(:fields), do: record_info(:fields, :"diameter_base_accounting_Vendor-Specific-Application-Id")
 
   def unquote(:"#info-diameter_base_accounting_Vendor-Specific-Application-Id")(:size), do: record_info(:size, :"diameter_base_accounting_Vendor-Specific-Application-Id")
 
-  def unquote(:"#info-diameter_base_accounting_Vendor-Specific-Application-Id")({:index, :"Vendor-Id"}), do: "diameter_base_accounting_Vendor-Specific-Application-Id"(:"Vendor-Id")
+  def unquote(:"#info-diameter_base_accounting_Vendor-Specific-Application-Id")({:index, :"Vendor-Id"}), do: unquote(:"diameter_base_accounting_Vendor-Specific-Application-Id")(:"Vendor-Id")
 
-  def unquote(:"#info-diameter_base_accounting_Vendor-Specific-Application-Id")({:index, :"Auth-Application-Id"}), do: "diameter_base_accounting_Vendor-Specific-Application-Id"(:"Auth-Application-Id")
+  def unquote(:"#info-diameter_base_accounting_Vendor-Specific-Application-Id")({:index, :"Auth-Application-Id"}), do: unquote(:"diameter_base_accounting_Vendor-Specific-Application-Id")(:"Auth-Application-Id")
 
-  def unquote(:"#info-diameter_base_accounting_Vendor-Specific-Application-Id")({:index, :"Acct-Application-Id"}), do: "diameter_base_accounting_Vendor-Specific-Application-Id"(:"Acct-Application-Id")
+  def unquote(:"#info-diameter_base_accounting_Vendor-Specific-Application-Id")({:index, :"Acct-Application-Id"}), do: unquote(:"diameter_base_accounting_Vendor-Specific-Application-Id")(:"Acct-Application-Id")
 
   def unquote(:"#new-")(:diameter_base_accounting_ACR), do: diameter_base_accounting_ACR()
 
