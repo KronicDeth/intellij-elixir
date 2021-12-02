@@ -925,7 +925,7 @@ defmodule :diameter_gen_acct_rfc6733 do
 
   def avp_name(_, _), do: :"AVP"
 
-  def decode_avps(name, avps, opts), do: :diameter_gen.decode_avps(name, avps, %{unknown_elements})
+  def decode_avps(name, avps, opts), do: :diameter_gen.decode_avps(name, avps, %{opts | :module => :diameter_gen_acct_rfc6733})
 
   def dict(), do: ...
 
@@ -957,7 +957,7 @@ defmodule :diameter_gen_acct_rfc6733 do
 
   def empty_value(name, opts), do: empty(name, opts)
 
-  def encode_avps(name, avps, opts), do: :diameter_gen.encode_avps(name, avps, %{unknown_elements})
+  def encode_avps(name, avps, opts), do: :diameter_gen.encode_avps(name, avps, %{opts | :module => :diameter_gen_acct_rfc6733})
 
   def enumerated_avp(_, _, _), do: :erlang.error(:badarg)
 
@@ -1063,7 +1063,7 @@ defmodule :diameter_gen_acct_rfc6733 do
     # body not decompiled
   end
 
-  def avp(t, data, name, opts, mod), do: mod.avp(t, data, name, %{unknown_elements})
+  def avp(t, data, name, opts, mod), do: mod.avp(t, data, name, %{opts | :module => mod})
 
   def empty(name, opts), do: :diameter_gen.empty(name, opts)
 
