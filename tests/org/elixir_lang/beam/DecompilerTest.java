@@ -457,6 +457,10 @@ public class DecompilerTest extends PlatformTestCase {
         assertDecompiled("diameter_gen_base_accounting");
     }
 
+    public void testIssue2289() throws IOException {
+        assertDecompiled("diameter_gen_relay");
+    }
+
     /*
      * Instance Methods
      */
