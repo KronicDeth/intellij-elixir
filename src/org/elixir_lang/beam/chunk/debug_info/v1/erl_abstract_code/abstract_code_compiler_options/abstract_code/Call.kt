@@ -10,6 +10,7 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_
 import org.elixir_lang.beam.decompiler.InfixOperator
 import org.elixir_lang.beam.decompiler.PrefixOperator
 import org.elixir_lang.beam.decompiler.Unquoted
+import org.elixir_lang.beam.term.inspect
 import org.elixir_lang.code.Identifier.inspectAsFunction
 import org.elixir_lang.toOtpErlangList
 
@@ -61,22 +62,26 @@ object Call {
             val elixirAtom = Atom.toElixirAtom(name)
 
             if (elixirAtom != null) {
-                val function = inspectAsFunction(elixirAtom.atomValue(), local = true)
+                val atomValue = elixirAtom.atomValue()
                 val argumentList = arguments?.toOtpErlangList()
                 val argumentsMacroString = argumentsToMacroString(arguments)
 
                 if (argumentList != null) {
-                    val nameArity = NameArity(elixirAtom.atomValue(), argumentList.arity())
+                    val nameArity = NameArity(atomValue, argumentList.arity())
 
                     when (Decompiler.decompiler("erlang", nameArity)) {
                         is PrefixOperator, is InfixOperator, is Unquoted -> {
-                            "apply(__MODULE__, :${function}, [${argumentsMacroString}])"
+                            val function = inspect(elixirAtom)
+
+                            "apply(__MODULE__, ${function}, [${argumentsMacroString}])"
                         }
                         else -> {
+                            val function = inspectAsFunction(atomValue, local = true)
                             "${function}(${argumentsMacroString})"
                         }
                     }
                 } else {
+                    val function = inspectAsFunction(atomValue, local = true)
                     "${function}(${argumentsMacroString})"
                 }
             } else {
