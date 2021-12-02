@@ -2,6 +2,8 @@ package org.elixir_lang.github.issues.create
 
 import com.intellij.diagnostic.AbstractMessage
 import com.intellij.ide.plugins.PluginManagerCore
+import com.intellij.openapi.application.ApplicationNamesInfo
+import com.intellij.openapi.application.ex.ApplicationInfoEx
 import com.intellij.openapi.diagnostic.Attachment
 import com.intellij.openapi.diagnostic.IdeaLoggingEvent
 import com.intellij.openapi.extensions.PluginId
@@ -36,16 +38,35 @@ class Request private constructor(val title: String, val body: String) {
         private fun body(additionalInfo: String?, events: Array<IdeaLoggingEvent>): String {
             val stringBuilder = StringBuilder()
             val level = 0
-            version(stringBuilder)
+            system(stringBuilder)
             additionalInfo(stringBuilder, level + 1, additionalInfo)
             events(stringBuilder, level + 1, events)
             return stringBuilder.toString()
         }
 
-        private fun version(stringBuilder: StringBuilder) {
-            header(stringBuilder, 1, "Version")
-            stringBuilder.append(PluginManagerCore.getPlugin(PluginId.getId("org.elixir_lang"))!!.version)
-            stringBuilder.append("\n\n")
+        private fun system(stringBuilder: StringBuilder) {
+            header(stringBuilder, 1, "System")
+            pluginVersion(stringBuilder)
+            application(stringBuilder)
+            operatingSystem(stringBuilder)
+            stringBuilder.append('\n')
+        }
+
+        private fun pluginVersion(stringBuilder: StringBuilder) {
+            stringBuilder
+                    .append("Plugin Version: ").append(PluginManagerCore.getPlugin(PluginId.getId("org.elixir_lang"))!!.version).append('\n')
+        }
+
+        private fun application(stringBuilder: StringBuilder) {
+            stringBuilder.append("Application: ")
+                    .append(ApplicationNamesInfo.getInstance().fullProductNameWithEdition)
+                    .append(" (").append(ApplicationInfoEx.getInstance().fullVersion).append(")\n")
+        }
+
+        private fun operatingSystem(stringBuilder: StringBuilder) {
+            stringBuilder.append("Operating System: ")
+                    .append(System.getProperty("os.name"))
+                    .append(" (").append(System.getProperty("os.version")) .append(")\n")
         }
 
         private fun additionalInfo(stringBuilder: StringBuilder, level: Int, additionalInfo: String?) {
