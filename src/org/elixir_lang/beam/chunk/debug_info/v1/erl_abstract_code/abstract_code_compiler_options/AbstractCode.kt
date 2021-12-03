@@ -49,6 +49,7 @@ object AbstractCode {
             Atom.ifToMacroStringDeclaredScope(term) ?:
             Bin.ifToMacroStringDeclaredScope(term, scope) ?:
             BinElement.ifToMacroStringDeclaredScope(term, scope) ?:
+            Block.ifToMacroStringDeclaredScope(term, scope) ?:
             Call.ifToMacroStringDeclaredScope(term, scope) ?:
             Case.ifToMacroStringDeclaredScope(term, scope) ?:
             Catch.ifToMacroStringDeclaredScope(term, scope) ?:

@@ -833,7 +833,7 @@ defmodule :asn1ct do
     outFile = outfile(setBase, "", opts)
     dbFile = outfile(setBase, 'asn1db', opts)
     inputModules = for f0 <- files do
-      unknown_abstract_code
+      (f1 = :filename.basename(f0); f = :filename.rootname(f1); list_to_atom(f))
     end
     st = st(st0, file: setBase, files: files, outfile: outFile, dbfile: dbFile, inputmodules: inputModules)
     passes = set_passes()
