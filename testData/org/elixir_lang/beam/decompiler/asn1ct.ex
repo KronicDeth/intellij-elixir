@@ -792,7 +792,7 @@ defmodule :asn1ct do
     compiler_verbose(file, opts)
     passes = single_passes()
     base = :filename.rootname(:filename.basename(file))
-    outFile = outfile(base, unknown_string, opts)
+    outFile = outfile(base, "", opts)
     dbFile = outfile(base, 'asn1db', opts)
     st1 = st(st0, file: file, outfile: outFile, dbfile: dbFile)
     run_passes(passes, st1)
@@ -830,7 +830,7 @@ defmodule :asn1ct do
 
   def compile_set(setBase, files, st(opts: opts) = st0) do
     compiler_verbose(files, opts)
-    outFile = outfile(setBase, unknown_string, opts)
+    outFile = outfile(setBase, "", opts)
     dbFile = outfile(setBase, 'asn1db', opts)
     inputModules = for f0 <- files do
       unknown_abstract_code
@@ -1432,8 +1432,8 @@ defmodule :asn1ct do
     der = :proplists.get_bool(:der, options)
     jer = :proplists.get_bool(:jer, options) and encodingRule !== :jer
     aligned = encodingRule === :per
-    recPrefix = :proplists.get_value(:record_name_prefix, options, unknown_string)
-    macroPrefix = :proplists.get_value(:macro_name_prefix, options, unknown_string)
+    recPrefix = :proplists.get_value(:record_name_prefix, options, "")
+    macroPrefix = :proplists.get_value(:macro_name_prefix, options, "")
     pack = case :proplists.get_value(:maps, options, false) do
       true ->
         :map
@@ -1569,11 +1569,11 @@ defmodule :asn1ct do
     end, includes)] ++ specific
   end
 
-  def make_suffix({_, {_, 0, _}}), do: unknown_string
+  def make_suffix({_, {_, 0, _}}), do: ""
 
   def make_suffix({_, {_, i, _}}), do: :lists.concat(['_', i])
 
-  def make_suffix(_), do: unknown_string
+  def make_suffix(_), do: ""
 
   def many_tags([:skip]), do: false
 

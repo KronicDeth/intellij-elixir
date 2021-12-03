@@ -1,9 +1,6 @@
 package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code
 
-import com.ericsson.otp.erlang.OtpErlangBinary
-import com.ericsson.otp.erlang.OtpErlangObject
-import com.ericsson.otp.erlang.OtpErlangString
-import com.ericsson.otp.erlang.OtpErlangTuple
+import com.ericsson.otp.erlang.*
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
 import org.elixir_lang.beam.term.inspect
 import java.nio.charset.Charset
@@ -29,22 +26,30 @@ object AbstractCodeString {
             }
 
     fun toMacroStringDeclaredScope(term: OtpErlangTuple): MacroStringDeclaredScope =
-            MacroStringDeclaredScope(stringMacroString(term), Scope.EMPTY)
+            MacroStringDeclaredScope(stringString(term), doBlock = false, Scope.EMPTY)
 
     fun toString(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
 
     private const val TAG = "string"
 
-    private fun stringMacroString(term: OtpErlangTuple) =
+    private fun stringString(term: OtpErlangTuple) =
             toString(term)
-                    ?.let { stringToMacroString(it) }
-                    ?: MacroString("missing_string", doBlock = false)
+                    ?.let { stringToString(it) }
+                    ?: "missing_string"
 
-    private fun stringToMacroString(term: OtpErlangObject): MacroString =
+    private fun stringToString(term: OtpErlangObject): String =
         when (term) {
-            is OtpErlangString -> stringToMacroString(term)
-            else -> MacroString("unknown_string", doBlock = false)
+            is OtpErlangString -> stringToString(term)
+            is OtpErlangList -> stringToString(term)
+            else -> "unknown_string"
         }
 
-    private fun stringToMacroString(term: OtpErlangString): MacroString = MacroString(inspect(term), doBlock = false)
+    private fun stringToString(term: OtpErlangString): String = inspect(term)
+
+    private fun stringToString(term: OtpErlangList): String =
+            if (term.arity() == 0 && term.isProper) {
+                "\"\""
+            } else {
+                "non_empty_list_as_string"
+            }
 }

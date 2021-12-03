@@ -1016,7 +1016,7 @@ defmodule :ssh_options do
   def put_user_value({key, value}, opts), do: %{opts | key => value}
 
   def read_moduli_file(d, i, acc) do
-    case :io.get_line(d, unknown_string) do
+    case :io.get_line(d, "") do
       {:error, error} ->
         {:error, error}
       :eof ->

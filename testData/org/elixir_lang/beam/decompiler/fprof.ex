@@ -117,21 +117,21 @@ defmodule :fprof do
 
   def parsify(term), do: term
 
-  def print_called(dest, []), do: println(dest, ' [', [], ']}.', unknown_string)
+  def print_called(dest, []), do: println(dest, ' [', [], ']}.', "")
 
-  def print_called(dest, [clocks]), do: println(dest, ' [{', clocks, '}]}.', unknown_string)
+  def print_called(dest, [clocks]), do: println(dest, ' [{', clocks, '}]}.', "")
 
   def print_called(dest, [clocks | tail]) do
-    println(dest, ' [{', clocks, '},', unknown_string)
+    println(dest, ' [{', clocks, '},', "")
     print_called_1(dest, tail)
   end
 
-  def print_callers(dest, []), do: println(dest, '{[', [], '],', unknown_string)
+  def print_callers(dest, []), do: println(dest, '{[', [], '],', "")
 
-  def print_callers(dest, [clocks]), do: println(dest, '{[{', clocks, '}],', unknown_string)
+  def print_callers(dest, [clocks]), do: println(dest, '{[{', clocks, '}],', "")
 
   def print_callers(dest, [clocks | tail]) do
-    println(dest, '{[{', clocks, '},', unknown_string)
+    println(dest, '{[{', clocks, '},', "")
     print_callers_1(dest, tail)
   end
 
@@ -1061,17 +1061,17 @@ defmodule :fprof do
 
   def postsort_r([[_ | c] | l], r), do: postsort_r(l, [c | r])
 
-  def print_called_1(dest, [clocks]), do: println(dest, '  {', clocks, '}]}.', unknown_string)
+  def print_called_1(dest, [clocks]), do: println(dest, '  {', clocks, '}]}.', "")
 
   def print_called_1(dest, [clocks | tail]) do
-    println(dest, '  {', clocks, '},', unknown_string)
+    println(dest, '  {', clocks, '},', "")
     print_called_1(dest, tail)
   end
 
-  def print_callers_1(dest, [clocks]), do: println(dest, '  {', clocks, '}],', unknown_string)
+  def print_callers_1(dest, [clocks]), do: println(dest, '  {', clocks, '}],', "")
 
   def print_callers_1(dest, [clocks | tail]) do
-    println(dest, '  {', clocks, '},', unknown_string)
+    println(dest, '  {', clocks, '},', "")
     print_callers_1(dest, tail)
   end
 
@@ -1080,19 +1080,19 @@ defmodule :fprof do
   def print_proc(dest, proc(id: _Pid, parent: parent, spawned_as: spawnedAs, init_log: initLog)) do
     case {parent, spawnedAs, initLog} do
       {:undefined, :undefined, []} ->
-        println(dest, '   ', [], '].', unknown_string)
+        println(dest, '   ', [], '].', "")
       {_, :undefined, []} ->
-        println(dest, ' { ', {:spawned_by, parsify(parent)}, '}].', unknown_string)
+        println(dest, ' { ', {:spawned_by, parsify(parent)}, '}].', "")
       _ ->
-        println(dest, ' { ', {:spawned_by, parsify(parent)}, '},', unknown_string)
+        println(dest, ' { ', {:spawned_by, parsify(parent)}, '},', "")
         case {spawnedAs, initLog} do
           {_, []} ->
-            println(dest, ' { ', {:spawned_as, spawnedAs}, '}].', unknown_string)
+            println(dest, ' { ', {:spawned_as, spawnedAs}, '}].', "")
           {:undefined, _} ->
-            println(dest, ' { ', {:initial_calls, :lists.reverse(initLog)}, '}].', unknown_string)
+            println(dest, ' { ', {:initial_calls, :lists.reverse(initLog)}, '}].', "")
           _ ->
-            println(dest, ' { ', {:spawned_as, spawnedAs}, '},', unknown_string)
-            println(dest, ' { ', {:initial_calls, :lists.reverse(initLog)}, '}].', unknown_string)
+            println(dest, ' { ', {:spawned_as, spawnedAs}, '},', "")
+            println(dest, ' { ', {:initial_calls, :lists.reverse(initLog)}, '}].', "")
         end
     end
   end
