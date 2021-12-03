@@ -15,6 +15,7 @@ object Builtin {
             "arity",
             "atom",
             "binary",
+            "bitstring",
             "boolean",
             "byte",
             "char",

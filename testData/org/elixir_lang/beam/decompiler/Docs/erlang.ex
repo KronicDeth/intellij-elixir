@@ -70,7 +70,7 @@ defmodule :erlang do
 
   # Private Types
 
-  @typep bitstring_list :: maybe_improper_list((byte() | unknown_type | bitstring_list()), (unknown_type | []))
+  @typep bitstring_list :: maybe_improper_list((byte() | bitstring() | bitstring_list()), (bitstring() | []))
 
   @typep cpu_topology :: ([levelEntry :: level_entry()] | :undefined)
 
@@ -248,13 +248,13 @@ defmodule :erlang do
   @spec binary_to_term(binary, opts) :: (term() | {term(), used}) when binary: ext_binary(), opt: (:safe | :used), opts: [opt], used: pos_integer()
   def binary_to_term(_Binary, _Opts), do: :erlang.nif_error(:undefined)
 
-  @spec bit_size(bitstring) :: non_neg_integer() when bitstring: unknown_type
+  @spec bit_size(bitstring) :: non_neg_integer() when bitstring: bitstring()
   def bit_size(_Bitstring), do: :erlang.nif_error(:undefined)
 
-  @spec bitsize(p1) :: non_neg_integer() when p1: unknown_type
+  @spec bitsize(p1) :: non_neg_integer() when p1: bitstring()
   def bitsize(_P1), do: :erlang.nif_error(:undefined)
 
-  @spec bitstring_to_list(bitstring) :: [(byte() | unknown_type)] when bitstring: unknown_type
+  @spec bitstring_to_list(bitstring) :: [(byte() | bitstring())] when bitstring: bitstring()
   def bitstring_to_list(_Bitstring), do: :erlang.nif_error(:undefined)
 
   def bnot(_A), do: :erlang.nif_error(:undefined)
@@ -269,7 +269,7 @@ defmodule :erlang do
 
   def bxor(_A, _B), do: :erlang.nif_error(:undefined)
 
-  @spec byte_size(bitstring) :: non_neg_integer() when bitstring: unknown_type
+  @spec byte_size(bitstring) :: non_neg_integer() when bitstring: bitstring()
   def byte_size(_Bitstring), do: :erlang.nif_error(:undefined)
 
   def call_on_load_function(_P1), do: :erlang.nif_error(:undefined)
@@ -673,7 +673,7 @@ defmodule :erlang do
   @spec list_to_binary(ioList) :: binary() when ioList: iolist()
   def list_to_binary(_IoList), do: :erlang.nif_error(:undefined)
 
-  @spec list_to_bitstring(bitstringList) :: unknown_type when bitstringList: bitstring_list()
+  @spec list_to_bitstring(bitstringList) :: bitstring() when bitstringList: bitstring_list()
   def list_to_bitstring(_BitstringList), do: :erlang.nif_error(:undefined)
 
   @spec list_to_existing_atom(string) :: atom() when string: charlist()

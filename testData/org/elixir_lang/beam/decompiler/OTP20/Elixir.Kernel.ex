@@ -331,10 +331,10 @@ defmodule Kernel do
   @spec binary_part(binary(), pos_integer(), integer()) :: binary()
   def binary_part(binary@1, start@1, length@1), do: :erlang.binary_part(binary@1, start@1, length@1)
 
-  @spec bit_size(unknown_type) :: non_neg_integer()
+  @spec bit_size(bitstring()) :: non_neg_integer()
   def bit_size(bitstring@1), do: :erlang.bit_size(bitstring@1)
 
-  @spec byte_size(unknown_type) :: non_neg_integer()
+  @spec byte_size(bitstring()) :: non_neg_integer()
   def byte_size(bitstring@1), do: :erlang.byte_size(bitstring@1)
 
   @spec div(integer(), (neg_integer() | pos_integer())) :: integer()
