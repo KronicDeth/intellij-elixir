@@ -139,11 +139,11 @@ defmodule :fprof do
 
   def println({:undefined, _}, _Head, _, _Tail, _Comment), do: :ok
 
-  def println({io, [w1, w2, w3, w4]}, head, clocks(id: pid, cnt: cnt, acc: _, own: own), tail, comment) when is_pid(pid), do: :io.put_chars(io, [pad(head, ?\s, 3), flat_format(parsify(pid), ?,, w1), flat_format(cnt, ?,, w2, :right), flat_format(:undefined, ?,, w3, :right), flat_format(own * unknown_abstract_code, [], w4 - 1, :right), pad(tail, ?\s, 4), pad(?\s, comment, 4), :io_lib.nl()])
+  def println({io, [w1, w2, w3, w4]}, head, clocks(id: pid, cnt: cnt, acc: _, own: own), tail, comment) when is_pid(pid), do: :io.put_chars(io, [pad(head, ?\s, 3), flat_format(parsify(pid), ?,, w1), flat_format(cnt, ?,, w2, :right), flat_format(:undefined, ?,, w3, :right), flat_format(own * 0.001, [], w4 - 1, :right), pad(tail, ?\s, 4), pad(?\s, comment, 4), :io_lib.nl()])
 
-  def println({io, [w1, w2, w3, w4]}, head, clocks(id: {_M, _F, _A} = func, cnt: cnt, acc: acc, own: own), tail, comment), do: :io.put_chars(io, [pad(head, ?\s, 3), flat_format(func, ?,, w1), flat_format(cnt, ?,, w2, :right), flat_format(acc * unknown_abstract_code, ?,, w3, :right), flat_format(own * unknown_abstract_code, [], w4 - 1, :right), pad(tail, ?\s, 4), pad(?\s, comment, 4), :io_lib.nl()])
+  def println({io, [w1, w2, w3, w4]}, head, clocks(id: {_M, _F, _A} = func, cnt: cnt, acc: acc, own: own), tail, comment), do: :io.put_chars(io, [pad(head, ?\s, 3), flat_format(func, ?,, w1), flat_format(cnt, ?,, w2, :right), flat_format(acc * 0.001, ?,, w3, :right), flat_format(own * 0.001, [], w4 - 1, :right), pad(tail, ?\s, 4), pad(?\s, comment, 4), :io_lib.nl()])
 
-  def println({io, [w1, w2, w3, w4]}, head, clocks(id: id, cnt: cnt, acc: acc, own: own), tail, comment), do: :io.put_chars(io, [pad(head, ?\s, 3), flat_format(parsify(id), ?,, w1), flat_format(cnt, ?,, w2, :right), flat_format(acc * unknown_abstract_code, ?,, w3, :right), flat_format(own * unknown_abstract_code, [], w4 - 1, :right), pad(tail, ?\s, 4), pad(?\s, comment, 4), :io_lib.nl()])
+  def println({io, [w1, w2, w3, w4]}, head, clocks(id: id, cnt: cnt, acc: acc, own: own), tail, comment), do: :io.put_chars(io, [pad(head, ?\s, 3), flat_format(parsify(id), ?,, w1), flat_format(cnt, ?,, w2, :right), flat_format(acc * 0.001, ?,, w3, :right), flat_format(own * 0.001, [], w4 - 1, :right), pad(tail, ?\s, 4), pad(?\s, comment, 4), :io_lib.nl()])
 
   def println({io, [w1, w2, w3, w4]}, head, :head, tail, comment), do: :io.put_chars(io, [pad(head, ?\s, 3), pad(' ', ?\s, w1), pad(?\s, ' CNT ', w2), pad(?\s, ' ACC ', w3), pad(?\s, ' OWN', w4 - 1), pad(tail, ?\s, 4), pad(?\s, comment, 4), :io_lib.nl()])
 

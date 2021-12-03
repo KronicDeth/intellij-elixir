@@ -5,6 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.*
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Char
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Float
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Map
 
 
@@ -56,6 +57,7 @@ object AbstractCode {
             Char.ifToMacroStringDeclaredScope(term) ?:
             Comprehension.ifToMacroStringDeclaredScope(term, scope) ?:
             Cons.ifToMacroStringDeclaredScope(term, scope) ?:
+            Float.ifToMacroStringDeclaredScope(term) ?:
             Fun.ifToMacroStringDeclaredScope(term, scope) ?:
             If.ifToMacroStringDeclaredScope(term, scope) ?:
             Integer.ifToMacroStringDeclaredScope(term) ?:
