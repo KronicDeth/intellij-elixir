@@ -387,7 +387,7 @@ defmodule Kernel do
 
   def get_in(data@1, [h@1 | t@1]), do: Kernel.get_in(Access.get(data@1, h@1), t@1)
 
-  @spec hd(unknown_type) :: elem when elem: term()
+  @spec hd(nonempty_maybe_improper_list(elem, any())) :: elem when elem: term()
   def hd(list@1), do: :erlang.hd(list@1)
 
   def inspect(x0@1), do: inspect(x0@1, [])
@@ -593,7 +593,7 @@ defmodule Kernel do
   @spec throw(term()) :: no_return()
   def throw(term@1), do: :erlang.throw(term@1)
 
-  @spec tl(unknown_type) :: (maybe_improper_list(elem, tail) | tail) when elem: term(), tail: term()
+  @spec tl(nonempty_maybe_improper_list(elem, tail)) :: (maybe_improper_list(elem, tail) | tail) when elem: term(), tail: term()
   def tl(list@1), do: :erlang.tl(list@1)
 
   @spec trunc(float()) :: integer()
