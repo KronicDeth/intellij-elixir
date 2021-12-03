@@ -645,13 +645,13 @@ defmodule :erl_syntax do
     copy_attrs(node, form_list(fs1))
   end
 
-  @spec float(unknown_type) :: syntaxTree()
+  @spec float(float()) :: syntaxTree()
   def float(value), do: make_float(value)
 
   @spec float_literal(syntaxTree()) :: charlist()
   def float_literal(node), do: float_to_list(float_value(node))
 
-  @spec float_value(syntaxTree()) :: unknown_type
+  @spec float_value(syntaxTree()) :: float()
   def float_value(node) do
     case unwrap(node) do
       {:float, _, value} ->

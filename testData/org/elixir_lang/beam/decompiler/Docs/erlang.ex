@@ -172,7 +172,7 @@ defmodule :erlang do
 
   def _A >= _B, do: :erlang.nif_error(:undefined)
 
-  @spec abs(float) :: unknown_type when float: unknown_type
+  @spec abs(float) :: float() when float: float()
   @spec abs(int) :: non_neg_integer() when int: integer()
   def abs(_Number), do: :erlang.nif_error(:undefined)
 
@@ -227,7 +227,7 @@ defmodule :erlang do
   @spec binary_to_existing_atom(binary, encoding) :: atom() when binary: binary(), encoding: (:latin1 | :unicode | :utf8)
   def binary_to_existing_atom(_Binary, _Encoding), do: :erlang.nif_error(:undefined)
 
-  @spec binary_to_float(binary) :: unknown_type when binary: binary()
+  @spec binary_to_float(binary) :: float() when binary: binary()
   def binary_to_float(_Binary), do: :erlang.nif_error(:undefined)
 
   @spec binary_to_integer(binary) :: integer() when binary: binary()
@@ -431,19 +431,19 @@ defmodule :erlang do
 
   def finish_loading(_List), do: :erlang.nif_error(:undefined)
 
-  @spec float(number) :: unknown_type when number: number()
+  @spec float(number) :: float() when number: number()
   def float(_Number), do: :erlang.nif_error(:undefined)
 
-  @spec float_to_binary(float) :: binary() when float: unknown_type
+  @spec float_to_binary(float) :: binary() when float: float()
   def float_to_binary(_Float), do: :erlang.nif_error(:undefined)
 
-  @spec float_to_binary(float, options) :: binary() when float: unknown_type, options: [option], option: ({:decimals, decimals :: 0..253} | {:scientific, decimals :: 0..249} | :compact)
+  @spec float_to_binary(float, options) :: binary() when float: float(), options: [option], option: ({:decimals, decimals :: 0..253} | {:scientific, decimals :: 0..249} | :compact)
   def float_to_binary(_Float, _Options), do: :erlang.nif_error(:undefined)
 
-  @spec float_to_list(float) :: charlist() when float: unknown_type
+  @spec float_to_list(float) :: charlist() when float: float()
   def float_to_list(_Float), do: :erlang.nif_error(:undefined)
 
-  @spec float_to_list(float, options) :: charlist() when float: unknown_type, options: [option], option: ({:decimals, decimals :: 0..253} | {:scientific, decimals :: 0..249} | :compact)
+  @spec float_to_list(float, options) :: charlist() when float: float(), options: [option], option: ({:decimals, decimals :: 0..253} | {:scientific, decimals :: 0..249} | :compact)
   def float_to_list(_Float, _Options), do: :erlang.nif_error(:undefined)
 
   @spec floor(number) :: integer() when number: number()
@@ -679,7 +679,7 @@ defmodule :erlang do
   @spec list_to_existing_atom(string) :: atom() when string: charlist()
   def list_to_existing_atom(_String), do: :erlang.nif_error(:undefined)
 
-  @spec list_to_float(string) :: unknown_type when string: charlist()
+  @spec list_to_float(string) :: float() when string: charlist()
   def list_to_float(_String), do: :erlang.nif_error(:undefined)
 
   @spec list_to_integer(string) :: integer() when string: charlist()

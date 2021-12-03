@@ -251,40 +251,40 @@ defmodule Kernel do
   @spec term() !== term() :: boolean()
   def left@1 !== right@1, do: left@1 !== right@1
 
-  @spec unknown_type * integer() :: unknown_type
-  @spec integer() * unknown_type :: unknown_type
-  @spec unknown_type * unknown_type :: unknown_type
+  @spec float() * integer() :: float()
+  @spec integer() * float() :: float()
+  @spec float() * float() :: float()
   @spec integer() * integer() :: integer()
   def left@1 * right@1, do: left@1 * right@1
 
   @spec (+value) :: value when value: number()
   def (+value@1), do: +value@1
 
-  @spec unknown_type + integer() :: unknown_type
-  @spec integer() + unknown_type :: unknown_type
-  @spec unknown_type + unknown_type :: unknown_type
+  @spec float() + integer() :: float()
+  @spec integer() + float() :: float()
+  @spec float() + float() :: float()
   @spec integer() + integer() :: integer()
   def left@1 + right@1, do: left@1 + right@1
 
   @spec [] ++ term() :: maybe_improper_list()
   def left@1 ++ right@1, do: left@1 ++ right@1
 
-  @spec (-unknown_type) :: unknown_type
+  @spec (-float()) :: float()
   @spec (-neg_integer()) :: pos_integer()
   @spec (-pos_integer()) :: neg_integer()
   @spec (-0) :: 0
   def (-value@1), do: -value@1
 
-  @spec unknown_type - integer() :: unknown_type
-  @spec integer() - unknown_type :: unknown_type
-  @spec unknown_type - unknown_type :: unknown_type
+  @spec float() - integer() :: float()
+  @spec integer() - float() :: float()
+  @spec float() - float() :: float()
   @spec integer() - integer() :: integer()
   def left@1 - right@1, do: left@1 - right@1
 
   @spec [] -- [] :: []
   def left@1 -- right@1, do: left@1 -- right@1
 
-  @spec number() / number() :: unknown_type
+  @spec number() / number() :: float()
   def left@1 / right@1, do: left@1 / right@1
 
   @spec term() < term() :: boolean()
@@ -528,7 +528,7 @@ defmodule Kernel do
   def rem(dividend@1, divisor@1), do: rem(dividend@1, divisor@1)
 
   @spec round(value) :: value when value: integer()
-  @spec round(unknown_type) :: integer()
+  @spec round(float()) :: integer()
   def round(number@1), do: :erlang.round(number@1)
 
   @spec self() :: pid()
@@ -596,7 +596,7 @@ defmodule Kernel do
   @spec tl(unknown_type) :: (maybe_improper_list(elem, tail) | tail) when elem: term(), tail: term()
   def tl(list@1), do: :erlang.tl(list@1)
 
-  @spec trunc(unknown_type) :: integer()
+  @spec trunc(float()) :: integer()
   @spec trunc(value) :: value when value: integer()
   def trunc(number@1), do: :erlang.trunc(number@1)
 

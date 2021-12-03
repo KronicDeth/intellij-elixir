@@ -3,15 +3,15 @@ defmodule :gl do
 
   # Private Types
 
-  @typep clamp :: unknown_type
+  @typep clamp :: float()
 
   @typep enum :: non_neg_integer()
 
   @typep matrix :: (matrix12() | matrix16())
 
-  @typep matrix12 :: {unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}
+  @typep matrix12 :: {float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float()}
 
-  @typep matrix16 :: {unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}
+  @typep matrix16 :: {float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float()}
 
   @typep mem :: (binary() | tuple())
 
@@ -19,7 +19,7 @@ defmodule :gl do
 
   # Functions
 
-  @spec accum(op, value) :: :ok when op: enum(), value: unknown_type
+  @spec accum(op, value) :: :ok when op: enum(), value: float()
   def accum(op, value), do: ...
 
   @spec activeShaderProgram(pipeline, program) :: :ok when pipeline: integer(), program: integer()
@@ -106,7 +106,7 @@ defmodule :gl do
   @spec bindVertexArray(array) :: :ok when array: integer()
   def bindVertexArray(array), do: ...
 
-  @spec bitmap(width, height, xorig, yorig, xmove, ymove, bitmap) :: :ok when width: integer(), height: integer(), xorig: unknown_type, yorig: unknown_type, xmove: unknown_type, ymove: unknown_type, bitmap: (offset() | mem())
+  @spec bitmap(width, height, xorig, yorig, xmove, ymove, bitmap) :: :ok when width: integer(), height: integer(), xorig: float(), yorig: float(), xmove: float(), ymove: float(), bitmap: (offset() | mem())
   def bitmap(width, height, xorig, yorig, xmove, ymove, bitmap) when is_integer(bitmap), do: ...
 
   def bitmap(width, height, xorig, yorig, xmove, ymove, bitmap), do: ...
@@ -170,10 +170,10 @@ defmodule :gl do
   @spec clear(mask) :: :ok when mask: integer()
   def clear(mask), do: ...
 
-  @spec clearAccum(red, green, blue, alpha) :: :ok when red: unknown_type, green: unknown_type, blue: unknown_type, alpha: unknown_type
+  @spec clearAccum(red, green, blue, alpha) :: :ok when red: float(), green: float(), blue: float(), alpha: float()
   def clearAccum(red, green, blue, alpha), do: ...
 
-  @spec clearBufferfi(buffer, drawbuffer, depth, stencil) :: :ok when buffer: enum(), drawbuffer: integer(), depth: unknown_type, stencil: integer()
+  @spec clearBufferfi(buffer, drawbuffer, depth, stencil) :: :ok when buffer: enum(), drawbuffer: integer(), depth: float(), stencil: integer()
   def clearBufferfi(buffer, drawbuffer, depth, stencil), do: ...
 
   @spec clearBufferfv(buffer, drawbuffer, value) :: :ok when buffer: enum(), drawbuffer: integer(), value: tuple()
@@ -194,7 +194,7 @@ defmodule :gl do
   @spec clearDepthf(d) :: :ok when d: clamp()
   def clearDepthf(d), do: ...
 
-  @spec clearIndex(c) :: :ok when c: unknown_type
+  @spec clearIndex(c) :: :ok when c: float()
   def clearIndex(c), do: ...
 
   @spec clearStencil(s) :: :ok when s: integer()
@@ -206,7 +206,7 @@ defmodule :gl do
   @spec clientWaitSync(sync, flags, timeout) :: enum() when sync: integer(), flags: integer(), timeout: integer()
   def clientWaitSync(sync, flags, timeout), do: ...
 
-  @spec clipPlane(plane, equation) :: :ok when plane: enum(), equation: {unknown_type, unknown_type, unknown_type, unknown_type}
+  @spec clipPlane(plane, equation) :: :ok when plane: enum(), equation: {float(), float(), float(), float()}
   def clipPlane(plane, {e1, e2, e3, e4}), do: ...
 
   @spec color3b(red, green, blue) :: :ok when red: integer(), green: integer(), blue: integer()
@@ -215,16 +215,16 @@ defmodule :gl do
   @spec color3bv(v) :: :ok when v: {red :: integer(), green :: integer(), blue :: integer()}
   def color3bv({red, green, blue}), do: ...
 
-  @spec color3d(red, green, blue) :: :ok when red: unknown_type, green: unknown_type, blue: unknown_type
+  @spec color3d(red, green, blue) :: :ok when red: float(), green: float(), blue: float()
   def color3d(red, green, blue), do: ...
 
-  @spec color3dv(v) :: :ok when v: {red :: unknown_type, green :: unknown_type, blue :: unknown_type}
+  @spec color3dv(v) :: :ok when v: {red :: float(), green :: float(), blue :: float()}
   def color3dv({red, green, blue}), do: ...
 
-  @spec color3f(red, green, blue) :: :ok when red: unknown_type, green: unknown_type, blue: unknown_type
+  @spec color3f(red, green, blue) :: :ok when red: float(), green: float(), blue: float()
   def color3f(red, green, blue), do: ...
 
-  @spec color3fv(v) :: :ok when v: {red :: unknown_type, green :: unknown_type, blue :: unknown_type}
+  @spec color3fv(v) :: :ok when v: {red :: float(), green :: float(), blue :: float()}
   def color3fv({red, green, blue}), do: ...
 
   @spec color3i(red, green, blue) :: :ok when red: integer(), green: integer(), blue: integer()
@@ -263,16 +263,16 @@ defmodule :gl do
   @spec color4bv(v) :: :ok when v: {red :: integer(), green :: integer(), blue :: integer(), alpha :: integer()}
   def color4bv({red, green, blue, alpha}), do: ...
 
-  @spec color4d(red, green, blue, alpha) :: :ok when red: unknown_type, green: unknown_type, blue: unknown_type, alpha: unknown_type
+  @spec color4d(red, green, blue, alpha) :: :ok when red: float(), green: float(), blue: float(), alpha: float()
   def color4d(red, green, blue, alpha), do: ...
 
-  @spec color4dv(v) :: :ok when v: {red :: unknown_type, green :: unknown_type, blue :: unknown_type, alpha :: unknown_type}
+  @spec color4dv(v) :: :ok when v: {red :: float(), green :: float(), blue :: float(), alpha :: float()}
   def color4dv({red, green, blue, alpha}), do: ...
 
-  @spec color4f(red, green, blue, alpha) :: :ok when red: unknown_type, green: unknown_type, blue: unknown_type, alpha: unknown_type
+  @spec color4f(red, green, blue, alpha) :: :ok when red: float(), green: float(), blue: float(), alpha: float()
   def color4f(red, green, blue, alpha), do: ...
 
-  @spec color4fv(v) :: :ok when v: {red :: unknown_type, green :: unknown_type, blue :: unknown_type, alpha :: unknown_type}
+  @spec color4fv(v) :: :ok when v: {red :: float(), green :: float(), blue :: float(), alpha :: float()}
   def color4fv({red, green, blue, alpha}), do: ...
 
   @spec color4i(red, green, blue, alpha) :: :ok when red: integer(), green: integer(), blue: integer(), alpha: integer()
@@ -329,7 +329,7 @@ defmodule :gl do
 
   def colorTable(target, internalformat, width, format, type, table), do: ...
 
-  @spec colorTableParameterfv(target, pname, params) :: :ok when target: enum(), pname: enum(), params: {unknown_type, unknown_type, unknown_type, unknown_type}
+  @spec colorTableParameterfv(target, pname, params) :: :ok when target: enum(), pname: enum(), params: {float(), float(), float(), float()}
   def colorTableParameterfv(target, pname, {p1, p2, p3, p4}), do: ...
 
   @spec colorTableParameteriv(target, pname, params) :: :ok when target: enum(), pname: enum(), params: {integer(), integer(), integer(), integer()}
@@ -666,28 +666,28 @@ defmodule :gl do
   @spec endTransformFeedback() :: :ok
   def endTransformFeedback(), do: ...
 
-  @spec evalCoord1d(u) :: :ok when u: unknown_type
+  @spec evalCoord1d(u) :: :ok when u: float()
   def evalCoord1d(u), do: ...
 
-  @spec evalCoord1dv(u) :: :ok when u: {u :: unknown_type}
+  @spec evalCoord1dv(u) :: :ok when u: {u :: float()}
   def evalCoord1dv({u}), do: ...
 
-  @spec evalCoord1f(u) :: :ok when u: unknown_type
+  @spec evalCoord1f(u) :: :ok when u: float()
   def evalCoord1f(u), do: ...
 
-  @spec evalCoord1fv(u) :: :ok when u: {u :: unknown_type}
+  @spec evalCoord1fv(u) :: :ok when u: {u :: float()}
   def evalCoord1fv({u}), do: ...
 
-  @spec evalCoord2d(u, v) :: :ok when u: unknown_type, v: unknown_type
+  @spec evalCoord2d(u, v) :: :ok when u: float(), v: float()
   def evalCoord2d(u, v), do: ...
 
-  @spec evalCoord2dv(u) :: :ok when u: {u :: unknown_type, v :: unknown_type}
+  @spec evalCoord2dv(u) :: :ok when u: {u :: float(), v :: float()}
   def evalCoord2dv({u, v}), do: ...
 
-  @spec evalCoord2f(u, v) :: :ok when u: unknown_type, v: unknown_type
+  @spec evalCoord2f(u, v) :: :ok when u: float(), v: float()
   def evalCoord2f(u, v), do: ...
 
-  @spec evalCoord2fv(u) :: :ok when u: {u :: unknown_type, v :: unknown_type}
+  @spec evalCoord2fv(u) :: :ok when u: {u :: float(), v :: float()}
   def evalCoord2fv({u, v}), do: ...
 
   @spec evalMesh1(mode, i1, i2) :: :ok when mode: enum(), i1: integer(), i2: integer()
@@ -722,19 +722,19 @@ defmodule :gl do
 
   def fogCoordPointer(type, stride, pointer), do: ...
 
-  @spec fogCoordd(coord) :: :ok when coord: unknown_type
+  @spec fogCoordd(coord) :: :ok when coord: float()
   def fogCoordd(coord), do: ...
 
-  @spec fogCoorddv(coord) :: :ok when coord: {coord :: unknown_type}
+  @spec fogCoorddv(coord) :: :ok when coord: {coord :: float()}
   def fogCoorddv({coord}), do: ...
 
-  @spec fogCoordf(coord) :: :ok when coord: unknown_type
+  @spec fogCoordf(coord) :: :ok when coord: float()
   def fogCoordf(coord), do: ...
 
-  @spec fogCoordfv(coord) :: :ok when coord: {coord :: unknown_type}
+  @spec fogCoordfv(coord) :: :ok when coord: {coord :: float()}
   def fogCoordfv({coord}), do: ...
 
-  @spec fogf(pname, param) :: :ok when pname: enum(), param: unknown_type
+  @spec fogf(pname, param) :: :ok when pname: enum(), param: float()
   def fogf(pname, param), do: ...
 
   @spec fogfv(pname, params) :: :ok when pname: enum(), params: tuple()
@@ -770,7 +770,7 @@ defmodule :gl do
   @spec frontFace(mode) :: :ok when mode: enum()
   def frontFace(mode), do: ...
 
-  @spec frustum(left, right, bottom, top, near_val, far_val) :: :ok when left: unknown_type, right: unknown_type, bottom: unknown_type, top: unknown_type, near_val: unknown_type, far_val: unknown_type
+  @spec frustum(left, right, bottom, top, near_val, far_val) :: :ok when left: float(), right: float(), bottom: float(), top: float(), near_val: float(), far_val: float()
   def frustum(left, right, bottom, top, near_val, far_val), do: ...
 
   @spec genBuffers(n) :: [integer()] when n: integer()
@@ -869,13 +869,13 @@ defmodule :gl do
   @spec getBufferSubData(target, offset, size, data) :: :ok when target: enum(), offset: integer(), size: integer(), data: mem()
   def getBufferSubData(target, offset, size, data), do: ...
 
-  @spec getClipPlane(plane) :: {unknown_type, unknown_type, unknown_type, unknown_type} when plane: enum()
+  @spec getClipPlane(plane) :: {float(), float(), float(), float()} when plane: enum()
   def getClipPlane(plane), do: ...
 
   @spec getColorTable(target, format, type, table) :: :ok when target: enum(), format: enum(), type: enum(), table: mem()
   def getColorTable(target, format, type, table), do: ...
 
-  @spec getColorTableParameterfv(target, pname) :: {unknown_type, unknown_type, unknown_type, unknown_type} when target: enum(), pname: enum()
+  @spec getColorTableParameterfv(target, pname) :: {float(), float(), float(), float()} when target: enum(), pname: enum()
   def getColorTableParameterfv(target, pname), do: ...
 
   @spec getColorTableParameteriv(target, pname) :: {integer(), integer(), integer(), integer()} when target: enum(), pname: enum()
@@ -887,7 +887,7 @@ defmodule :gl do
   @spec getConvolutionFilter(target, format, type, image) :: :ok when target: enum(), format: enum(), type: enum(), image: mem()
   def getConvolutionFilter(target, format, type, image), do: ...
 
-  @spec getConvolutionParameterfv(target, pname) :: {unknown_type, unknown_type, unknown_type, unknown_type} when target: enum(), pname: enum()
+  @spec getConvolutionParameterfv(target, pname) :: {float(), float(), float(), float()} when target: enum(), pname: enum()
   def getConvolutionParameterfv(target, pname), do: ...
 
   @spec getConvolutionParameteriv(target, pname) :: {integer(), integer(), integer(), integer()} when target: enum(), pname: enum()
@@ -896,19 +896,19 @@ defmodule :gl do
   @spec getDebugMessageLogARB(count, bufsize) :: {integer(), sources :: [enum()], types :: [enum()], ids :: [integer()], severities :: [enum()], messageLog :: [charlist()]} when count: integer(), bufsize: integer()
   def getDebugMessageLogARB(count, bufsize), do: ...
 
-  @spec getDoublei_v(target, index) :: [unknown_type] when target: enum(), index: integer()
+  @spec getDoublei_v(target, index) :: [float()] when target: enum(), index: integer()
   def getDoublei_v(target, index), do: ...
 
-  @spec getDoublev(pname) :: [unknown_type] when pname: enum()
+  @spec getDoublev(pname) :: [float()] when pname: enum()
   def getDoublev(pname), do: ...
 
   @spec getError() :: enum()
   def getError(), do: ...
 
-  @spec getFloati_v(target, index) :: [unknown_type] when target: enum(), index: integer()
+  @spec getFloati_v(target, index) :: [float()] when target: enum(), index: integer()
   def getFloati_v(target, index), do: ...
 
-  @spec getFloatv(pname) :: [unknown_type] when pname: enum()
+  @spec getFloatv(pname) :: [float()] when pname: enum()
   def getFloatv(pname), do: ...
 
   @spec getFragDataIndex(program, name) :: integer() when program: integer(), name: charlist()
@@ -929,7 +929,7 @@ defmodule :gl do
   @spec getHistogram(target, reset, format, type, values) :: :ok when target: enum(), reset: (0 | 1), format: enum(), type: enum(), values: mem()
   def getHistogram(target, reset, format, type, values), do: ...
 
-  @spec getHistogramParameterfv(target, pname) :: {unknown_type} when target: enum(), pname: enum()
+  @spec getHistogramParameterfv(target, pname) :: {float()} when target: enum(), pname: enum()
   def getHistogramParameterfv(target, pname), do: ...
 
   @spec getHistogramParameteriv(target, pname) :: {integer()} when target: enum(), pname: enum()
@@ -953,7 +953,7 @@ defmodule :gl do
   @spec getInternalformativ(target, internalformat, pname, bufSize) :: [integer()] when target: enum(), internalformat: enum(), pname: enum(), bufSize: integer()
   def getInternalformativ(target, internalformat, pname, bufSize), do: ...
 
-  @spec getLightfv(light, pname) :: {unknown_type, unknown_type, unknown_type, unknown_type} when light: enum(), pname: enum()
+  @spec getLightfv(light, pname) :: {float(), float(), float(), float()} when light: enum(), pname: enum()
   def getLightfv(light, pname), do: ...
 
   @spec getLightiv(light, pname) :: {integer(), integer(), integer(), integer()} when light: enum(), pname: enum()
@@ -968,7 +968,7 @@ defmodule :gl do
   @spec getMapiv(target, query, v) :: :ok when target: enum(), query: enum(), v: mem()
   def getMapiv(target, query, v), do: ...
 
-  @spec getMaterialfv(face, pname) :: {unknown_type, unknown_type, unknown_type, unknown_type} when face: enum(), pname: enum()
+  @spec getMaterialfv(face, pname) :: {float(), float(), float(), float()} when face: enum(), pname: enum()
   def getMaterialfv(face, pname), do: ...
 
   @spec getMaterialiv(face, pname) :: {integer(), integer(), integer(), integer()} when face: enum(), pname: enum()
@@ -977,13 +977,13 @@ defmodule :gl do
   @spec getMinmax(target, reset, format, types, values) :: :ok when target: enum(), reset: (0 | 1), format: enum(), types: enum(), values: mem()
   def getMinmax(target, reset, format, types, values), do: ...
 
-  @spec getMinmaxParameterfv(target, pname) :: {unknown_type} when target: enum(), pname: enum()
+  @spec getMinmaxParameterfv(target, pname) :: {float()} when target: enum(), pname: enum()
   def getMinmaxParameterfv(target, pname), do: ...
 
   @spec getMinmaxParameteriv(target, pname) :: {integer()} when target: enum(), pname: enum()
   def getMinmaxParameteriv(target, pname), do: ...
 
-  @spec getMultisamplefv(pname, index) :: {unknown_type, unknown_type} when pname: enum(), index: integer()
+  @spec getMultisamplefv(pname, index) :: {float(), float()} when pname: enum(), index: integer()
   def getMultisamplefv(pname, index), do: ...
 
   @spec getNamedStringARB(name, bufSize) :: charlist() when name: charlist(), bufSize: integer()
@@ -992,7 +992,7 @@ defmodule :gl do
   @spec getNamedStringivARB(name, pname) :: integer() when name: charlist(), pname: enum()
   def getNamedStringivARB(name, pname), do: ...
 
-  @spec getObjectParameterfvARB(obj, pname) :: unknown_type when obj: integer(), pname: enum()
+  @spec getObjectParameterfvARB(obj, pname) :: float() when obj: integer(), pname: enum()
   def getObjectParameterfvARB(obj, pname), do: ...
 
   @spec getObjectParameterivARB(obj, pname) :: integer() when obj: integer(), pname: enum()
@@ -1013,19 +1013,19 @@ defmodule :gl do
   @spec getProgramBinary(program, bufSize) :: {binaryFormat :: enum(), binary :: binary()} when program: integer(), bufSize: integer()
   def getProgramBinary(program, bufSize), do: ...
 
-  @spec getProgramEnvParameterdvARB(target, index) :: {unknown_type, unknown_type, unknown_type, unknown_type} when target: enum(), index: integer()
+  @spec getProgramEnvParameterdvARB(target, index) :: {float(), float(), float(), float()} when target: enum(), index: integer()
   def getProgramEnvParameterdvARB(target, index), do: ...
 
-  @spec getProgramEnvParameterfvARB(target, index) :: {unknown_type, unknown_type, unknown_type, unknown_type} when target: enum(), index: integer()
+  @spec getProgramEnvParameterfvARB(target, index) :: {float(), float(), float(), float()} when target: enum(), index: integer()
   def getProgramEnvParameterfvARB(target, index), do: ...
 
   @spec getProgramInfoLog(program, bufSize) :: charlist() when program: integer(), bufSize: integer()
   def getProgramInfoLog(program, bufSize), do: ...
 
-  @spec getProgramLocalParameterdvARB(target, index) :: {unknown_type, unknown_type, unknown_type, unknown_type} when target: enum(), index: integer()
+  @spec getProgramLocalParameterdvARB(target, index) :: {float(), float(), float(), float()} when target: enum(), index: integer()
   def getProgramLocalParameterdvARB(target, index), do: ...
 
-  @spec getProgramLocalParameterfvARB(target, index) :: {unknown_type, unknown_type, unknown_type, unknown_type} when target: enum(), index: integer()
+  @spec getProgramLocalParameterfvARB(target, index) :: {float(), float(), float(), float()} when target: enum(), index: integer()
   def getProgramLocalParameterfvARB(target, index), do: ...
 
   @spec getProgramPipelineInfoLog(pipeline, bufSize) :: charlist() when pipeline: integer(), bufSize: integer()
@@ -1070,7 +1070,7 @@ defmodule :gl do
   @spec getSamplerParameterIuiv(sampler, pname) :: [integer()] when sampler: integer(), pname: enum()
   def getSamplerParameterIuiv(sampler, pname), do: ...
 
-  @spec getSamplerParameterfv(sampler, pname) :: [unknown_type] when sampler: integer(), pname: enum()
+  @spec getSamplerParameterfv(sampler, pname) :: [float()] when sampler: integer(), pname: enum()
   def getSamplerParameterfv(sampler, pname), do: ...
 
   @spec getSamplerParameteriv(sampler, pname) :: [integer()] when sampler: integer(), pname: enum()
@@ -1106,16 +1106,16 @@ defmodule :gl do
   @spec getSynciv(sync, pname, bufSize) :: [integer()] when sync: integer(), pname: enum(), bufSize: integer()
   def getSynciv(sync, pname, bufSize), do: ...
 
-  @spec getTexEnvfv(target, pname) :: {unknown_type, unknown_type, unknown_type, unknown_type} when target: enum(), pname: enum()
+  @spec getTexEnvfv(target, pname) :: {float(), float(), float(), float()} when target: enum(), pname: enum()
   def getTexEnvfv(target, pname), do: ...
 
   @spec getTexEnviv(target, pname) :: {integer(), integer(), integer(), integer()} when target: enum(), pname: enum()
   def getTexEnviv(target, pname), do: ...
 
-  @spec getTexGendv(coord, pname) :: {unknown_type, unknown_type, unknown_type, unknown_type} when coord: enum(), pname: enum()
+  @spec getTexGendv(coord, pname) :: {float(), float(), float(), float()} when coord: enum(), pname: enum()
   def getTexGendv(coord, pname), do: ...
 
-  @spec getTexGenfv(coord, pname) :: {unknown_type, unknown_type, unknown_type, unknown_type} when coord: enum(), pname: enum()
+  @spec getTexGenfv(coord, pname) :: {float(), float(), float(), float()} when coord: enum(), pname: enum()
   def getTexGenfv(coord, pname), do: ...
 
   @spec getTexGeniv(coord, pname) :: {integer(), integer(), integer(), integer()} when coord: enum(), pname: enum()
@@ -1124,7 +1124,7 @@ defmodule :gl do
   @spec getTexImage(target, level, format, type, pixels) :: :ok when target: enum(), level: integer(), format: enum(), type: enum(), pixels: mem()
   def getTexImage(target, level, format, type, pixels), do: ...
 
-  @spec getTexLevelParameterfv(target, level, pname) :: {unknown_type} when target: enum(), level: integer(), pname: enum()
+  @spec getTexLevelParameterfv(target, level, pname) :: {float()} when target: enum(), level: integer(), pname: enum()
   def getTexLevelParameterfv(target, level, pname), do: ...
 
   @spec getTexLevelParameteriv(target, level, pname) :: {integer()} when target: enum(), level: integer(), pname: enum()
@@ -1136,7 +1136,7 @@ defmodule :gl do
   @spec getTexParameterIuiv(target, pname) :: {integer(), integer(), integer(), integer()} when target: enum(), pname: enum()
   def getTexParameterIuiv(target, pname), do: ...
 
-  @spec getTexParameterfv(target, pname) :: {unknown_type, unknown_type, unknown_type, unknown_type} when target: enum(), pname: enum()
+  @spec getTexParameterfv(target, pname) :: {float(), float(), float(), float()} when target: enum(), pname: enum()
   def getTexParameterfv(target, pname), do: ...
 
   @spec getTexParameteriv(target, pname) :: {integer(), integer(), integer(), integer()} when target: enum(), pname: enum()
@@ -1184,13 +1184,13 @@ defmodule :gl do
   @spec getVertexAttribIuiv(index, pname) :: {integer(), integer(), integer(), integer()} when index: integer(), pname: enum()
   def getVertexAttribIuiv(index, pname), do: ...
 
-  @spec getVertexAttribLdv(index, pname) :: {unknown_type, unknown_type, unknown_type, unknown_type} when index: integer(), pname: enum()
+  @spec getVertexAttribLdv(index, pname) :: {float(), float(), float(), float()} when index: integer(), pname: enum()
   def getVertexAttribLdv(index, pname), do: ...
 
-  @spec getVertexAttribdv(index, pname) :: {unknown_type, unknown_type, unknown_type, unknown_type} when index: integer(), pname: enum()
+  @spec getVertexAttribdv(index, pname) :: {float(), float(), float(), float()} when index: integer(), pname: enum()
   def getVertexAttribdv(index, pname), do: ...
 
-  @spec getVertexAttribfv(index, pname) :: {unknown_type, unknown_type, unknown_type, unknown_type} when index: integer(), pname: enum()
+  @spec getVertexAttribfv(index, pname) :: {float(), float(), float(), float()} when index: integer(), pname: enum()
   def getVertexAttribfv(index, pname), do: ...
 
   @spec getVertexAttribiv(index, pname) :: {integer(), integer(), integer(), integer()} when index: integer(), pname: enum()
@@ -1210,16 +1210,16 @@ defmodule :gl do
 
   def indexPointer(type, stride, ptr), do: ...
 
-  @spec indexd(c) :: :ok when c: unknown_type
+  @spec indexd(c) :: :ok when c: float()
   def indexd(c), do: ...
 
-  @spec indexdv(c) :: :ok when c: {c :: unknown_type}
+  @spec indexdv(c) :: :ok when c: {c :: float()}
   def indexdv({c}), do: ...
 
-  @spec indexf(c) :: :ok when c: unknown_type
+  @spec indexf(c) :: :ok when c: float()
   def indexf(c), do: ...
 
-  @spec indexfv(c) :: :ok when c: {c :: unknown_type}
+  @spec indexfv(c) :: :ok when c: {c :: float()}
   def indexfv({c}), do: ...
 
   @spec indexi(c) :: :ok when c: integer()
@@ -1296,7 +1296,7 @@ defmodule :gl do
   @spec isVertexArray(array) :: (0 | 1) when array: integer()
   def isVertexArray(array), do: ...
 
-  @spec lightModelf(pname, param) :: :ok when pname: enum(), param: unknown_type
+  @spec lightModelf(pname, param) :: :ok when pname: enum(), param: float()
   def lightModelf(pname, param), do: ...
 
   @spec lightModelfv(pname, params) :: :ok when pname: enum(), params: tuple()
@@ -1308,7 +1308,7 @@ defmodule :gl do
   @spec lightModeliv(pname, params) :: :ok when pname: enum(), params: tuple()
   def lightModeliv(pname, params), do: ...
 
-  @spec lightf(light, pname, param) :: :ok when light: enum(), pname: enum(), param: unknown_type
+  @spec lightf(light, pname, param) :: :ok when light: enum(), pname: enum(), param: float()
   def lightf(light, pname, param), do: ...
 
   @spec lightfv(light, pname, params) :: :ok when light: enum(), pname: enum(), params: tuple()
@@ -1323,7 +1323,7 @@ defmodule :gl do
   @spec lineStipple(factor, pattern) :: :ok when factor: integer(), pattern: integer()
   def lineStipple(factor, pattern), do: ...
 
-  @spec lineWidth(width) :: :ok when width: unknown_type
+  @spec lineWidth(width) :: :ok when width: float()
   def lineWidth(width), do: ...
 
   @spec linkProgram(program) :: :ok when program: integer()
@@ -1374,31 +1374,31 @@ defmodule :gl do
   @spec logicOp(opcode) :: :ok when opcode: enum()
   def logicOp(opcode), do: ...
 
-  @spec map1d(target, u1, u2, stride, order, points) :: :ok when target: enum(), u1: unknown_type, u2: unknown_type, stride: integer(), order: integer(), points: binary()
+  @spec map1d(target, u1, u2, stride, order, points) :: :ok when target: enum(), u1: float(), u2: float(), stride: integer(), order: integer(), points: binary()
   def map1d(target, u1, u2, stride, order, points), do: ...
 
-  @spec map1f(target, u1, u2, stride, order, points) :: :ok when target: enum(), u1: unknown_type, u2: unknown_type, stride: integer(), order: integer(), points: binary()
+  @spec map1f(target, u1, u2, stride, order, points) :: :ok when target: enum(), u1: float(), u2: float(), stride: integer(), order: integer(), points: binary()
   def map1f(target, u1, u2, stride, order, points), do: ...
 
-  @spec map2d(target, u1, u2, ustride, uorder, v1, v2, vstride, vorder, points) :: :ok when target: enum(), u1: unknown_type, u2: unknown_type, ustride: integer(), uorder: integer(), v1: unknown_type, v2: unknown_type, vstride: integer(), vorder: integer(), points: binary()
+  @spec map2d(target, u1, u2, ustride, uorder, v1, v2, vstride, vorder, points) :: :ok when target: enum(), u1: float(), u2: float(), ustride: integer(), uorder: integer(), v1: float(), v2: float(), vstride: integer(), vorder: integer(), points: binary()
   def map2d(target, u1, u2, ustride, uorder, v1, v2, vstride, vorder, points), do: ...
 
-  @spec map2f(target, u1, u2, ustride, uorder, v1, v2, vstride, vorder, points) :: :ok when target: enum(), u1: unknown_type, u2: unknown_type, ustride: integer(), uorder: integer(), v1: unknown_type, v2: unknown_type, vstride: integer(), vorder: integer(), points: binary()
+  @spec map2f(target, u1, u2, ustride, uorder, v1, v2, vstride, vorder, points) :: :ok when target: enum(), u1: float(), u2: float(), ustride: integer(), uorder: integer(), v1: float(), v2: float(), vstride: integer(), vorder: integer(), points: binary()
   def map2f(target, u1, u2, ustride, uorder, v1, v2, vstride, vorder, points), do: ...
 
-  @spec mapGrid1d(un, u1, u2) :: :ok when un: integer(), u1: unknown_type, u2: unknown_type
+  @spec mapGrid1d(un, u1, u2) :: :ok when un: integer(), u1: float(), u2: float()
   def mapGrid1d(un, u1, u2), do: ...
 
-  @spec mapGrid1f(un, u1, u2) :: :ok when un: integer(), u1: unknown_type, u2: unknown_type
+  @spec mapGrid1f(un, u1, u2) :: :ok when un: integer(), u1: float(), u2: float()
   def mapGrid1f(un, u1, u2), do: ...
 
-  @spec mapGrid2d(un, u1, u2, vn, v1, v2) :: :ok when un: integer(), u1: unknown_type, u2: unknown_type, vn: integer(), v1: unknown_type, v2: unknown_type
+  @spec mapGrid2d(un, u1, u2, vn, v1, v2) :: :ok when un: integer(), u1: float(), u2: float(), vn: integer(), v1: float(), v2: float()
   def mapGrid2d(un, u1, u2, vn, v1, v2), do: ...
 
-  @spec mapGrid2f(un, u1, u2, vn, v1, v2) :: :ok when un: integer(), u1: unknown_type, u2: unknown_type, vn: integer(), v1: unknown_type, v2: unknown_type
+  @spec mapGrid2f(un, u1, u2, vn, v1, v2) :: :ok when un: integer(), u1: float(), u2: float(), vn: integer(), v1: float(), v2: float()
   def mapGrid2f(un, u1, u2, vn, v1, v2), do: ...
 
-  @spec materialf(face, pname, param) :: :ok when face: enum(), pname: enum(), param: unknown_type
+  @spec materialf(face, pname, param) :: :ok when face: enum(), pname: enum(), param: float()
   def materialf(face, pname, param), do: ...
 
   @spec materialfv(face, pname, params) :: :ok when face: enum(), pname: enum(), params: tuple()
@@ -1474,16 +1474,16 @@ defmodule :gl do
 
   def multiDrawArrays(mode, first, count), do: ...
 
-  @spec multiTexCoord1d(target, s) :: :ok when target: enum(), s: unknown_type
+  @spec multiTexCoord1d(target, s) :: :ok when target: enum(), s: float()
   def multiTexCoord1d(target, s), do: ...
 
-  @spec multiTexCoord1dv(target :: enum(), v) :: :ok when v: {s :: unknown_type}
+  @spec multiTexCoord1dv(target :: enum(), v) :: :ok when v: {s :: float()}
   def multiTexCoord1dv(target, {s}), do: ...
 
-  @spec multiTexCoord1f(target, s) :: :ok when target: enum(), s: unknown_type
+  @spec multiTexCoord1f(target, s) :: :ok when target: enum(), s: float()
   def multiTexCoord1f(target, s), do: ...
 
-  @spec multiTexCoord1fv(target :: enum(), v) :: :ok when v: {s :: unknown_type}
+  @spec multiTexCoord1fv(target :: enum(), v) :: :ok when v: {s :: float()}
   def multiTexCoord1fv(target, {s}), do: ...
 
   @spec multiTexCoord1i(target, s) :: :ok when target: enum(), s: integer()
@@ -1498,16 +1498,16 @@ defmodule :gl do
   @spec multiTexCoord1sv(target :: enum(), v) :: :ok when v: {s :: integer()}
   def multiTexCoord1sv(target, {s}), do: ...
 
-  @spec multiTexCoord2d(target, s, t) :: :ok when target: enum(), s: unknown_type, t: unknown_type
+  @spec multiTexCoord2d(target, s, t) :: :ok when target: enum(), s: float(), t: float()
   def multiTexCoord2d(target, s, t), do: ...
 
-  @spec multiTexCoord2dv(target :: enum(), v) :: :ok when v: {s :: unknown_type, t :: unknown_type}
+  @spec multiTexCoord2dv(target :: enum(), v) :: :ok when v: {s :: float(), t :: float()}
   def multiTexCoord2dv(target, {s, t}), do: ...
 
-  @spec multiTexCoord2f(target, s, t) :: :ok when target: enum(), s: unknown_type, t: unknown_type
+  @spec multiTexCoord2f(target, s, t) :: :ok when target: enum(), s: float(), t: float()
   def multiTexCoord2f(target, s, t), do: ...
 
-  @spec multiTexCoord2fv(target :: enum(), v) :: :ok when v: {s :: unknown_type, t :: unknown_type}
+  @spec multiTexCoord2fv(target :: enum(), v) :: :ok when v: {s :: float(), t :: float()}
   def multiTexCoord2fv(target, {s, t}), do: ...
 
   @spec multiTexCoord2i(target, s, t) :: :ok when target: enum(), s: integer(), t: integer()
@@ -1522,16 +1522,16 @@ defmodule :gl do
   @spec multiTexCoord2sv(target :: enum(), v) :: :ok when v: {s :: integer(), t :: integer()}
   def multiTexCoord2sv(target, {s, t}), do: ...
 
-  @spec multiTexCoord3d(target, s, t, r) :: :ok when target: enum(), s: unknown_type, t: unknown_type, r: unknown_type
+  @spec multiTexCoord3d(target, s, t, r) :: :ok when target: enum(), s: float(), t: float(), r: float()
   def multiTexCoord3d(target, s, t, r), do: ...
 
-  @spec multiTexCoord3dv(target :: enum(), v) :: :ok when v: {s :: unknown_type, t :: unknown_type, r :: unknown_type}
+  @spec multiTexCoord3dv(target :: enum(), v) :: :ok when v: {s :: float(), t :: float(), r :: float()}
   def multiTexCoord3dv(target, {s, t, r}), do: ...
 
-  @spec multiTexCoord3f(target, s, t, r) :: :ok when target: enum(), s: unknown_type, t: unknown_type, r: unknown_type
+  @spec multiTexCoord3f(target, s, t, r) :: :ok when target: enum(), s: float(), t: float(), r: float()
   def multiTexCoord3f(target, s, t, r), do: ...
 
-  @spec multiTexCoord3fv(target :: enum(), v) :: :ok when v: {s :: unknown_type, t :: unknown_type, r :: unknown_type}
+  @spec multiTexCoord3fv(target :: enum(), v) :: :ok when v: {s :: float(), t :: float(), r :: float()}
   def multiTexCoord3fv(target, {s, t, r}), do: ...
 
   @spec multiTexCoord3i(target, s, t, r) :: :ok when target: enum(), s: integer(), t: integer(), r: integer()
@@ -1546,16 +1546,16 @@ defmodule :gl do
   @spec multiTexCoord3sv(target :: enum(), v) :: :ok when v: {s :: integer(), t :: integer(), r :: integer()}
   def multiTexCoord3sv(target, {s, t, r}), do: ...
 
-  @spec multiTexCoord4d(target, s, t, r, q) :: :ok when target: enum(), s: unknown_type, t: unknown_type, r: unknown_type, q: unknown_type
+  @spec multiTexCoord4d(target, s, t, r, q) :: :ok when target: enum(), s: float(), t: float(), r: float(), q: float()
   def multiTexCoord4d(target, s, t, r, q), do: ...
 
-  @spec multiTexCoord4dv(target :: enum(), v) :: :ok when v: {s :: unknown_type, t :: unknown_type, r :: unknown_type, q :: unknown_type}
+  @spec multiTexCoord4dv(target :: enum(), v) :: :ok when v: {s :: float(), t :: float(), r :: float(), q :: float()}
   def multiTexCoord4dv(target, {s, t, r, q}), do: ...
 
-  @spec multiTexCoord4f(target, s, t, r, q) :: :ok when target: enum(), s: unknown_type, t: unknown_type, r: unknown_type, q: unknown_type
+  @spec multiTexCoord4f(target, s, t, r, q) :: :ok when target: enum(), s: float(), t: float(), r: float(), q: float()
   def multiTexCoord4f(target, s, t, r, q), do: ...
 
-  @spec multiTexCoord4fv(target :: enum(), v) :: :ok when v: {s :: unknown_type, t :: unknown_type, r :: unknown_type, q :: unknown_type}
+  @spec multiTexCoord4fv(target :: enum(), v) :: :ok when v: {s :: float(), t :: float(), r :: float(), q :: float()}
   def multiTexCoord4fv(target, {s, t, r, q}), do: ...
 
   @spec multiTexCoord4i(target, s, t, r, q) :: :ok when target: enum(), s: integer(), t: integer(), r: integer(), q: integer()
@@ -1582,16 +1582,16 @@ defmodule :gl do
   @spec normal3bv(v) :: :ok when v: {nx :: integer(), ny :: integer(), nz :: integer()}
   def normal3bv({nx, ny, nz}), do: ...
 
-  @spec normal3d(nx, ny, nz) :: :ok when nx: unknown_type, ny: unknown_type, nz: unknown_type
+  @spec normal3d(nx, ny, nz) :: :ok when nx: float(), ny: float(), nz: float()
   def normal3d(nx, ny, nz), do: ...
 
-  @spec normal3dv(v) :: :ok when v: {nx :: unknown_type, ny :: unknown_type, nz :: unknown_type}
+  @spec normal3dv(v) :: :ok when v: {nx :: float(), ny :: float(), nz :: float()}
   def normal3dv({nx, ny, nz}), do: ...
 
-  @spec normal3f(nx, ny, nz) :: :ok when nx: unknown_type, ny: unknown_type, nz: unknown_type
+  @spec normal3f(nx, ny, nz) :: :ok when nx: float(), ny: float(), nz: float()
   def normal3f(nx, ny, nz), do: ...
 
-  @spec normal3fv(v) :: :ok when v: {nx :: unknown_type, ny :: unknown_type, nz :: unknown_type}
+  @spec normal3fv(v) :: :ok when v: {nx :: float(), ny :: float(), nz :: float()}
   def normal3fv({nx, ny, nz}), do: ...
 
   @spec normal3i(nx, ny, nz) :: :ok when nx: integer(), ny: integer(), nz: integer()
@@ -1611,13 +1611,13 @@ defmodule :gl do
 
   def normalPointer(type, stride, ptr), do: ...
 
-  @spec ortho(left, right, bottom, top, near_val, far_val) :: :ok when left: unknown_type, right: unknown_type, bottom: unknown_type, top: unknown_type, near_val: unknown_type, far_val: unknown_type
+  @spec ortho(left, right, bottom, top, near_val, far_val) :: :ok when left: float(), right: float(), bottom: float(), top: float(), near_val: float(), far_val: float()
   def ortho(left, right, bottom, top, near_val, far_val), do: ...
 
-  @spec passThrough(token) :: :ok when token: unknown_type
+  @spec passThrough(token) :: :ok when token: float()
   def passThrough(token), do: ...
 
-  @spec patchParameterfv(pname, values) :: :ok when pname: enum(), values: [unknown_type]
+  @spec patchParameterfv(pname, values) :: :ok when pname: enum(), values: [float()]
   def patchParameterfv(pname, values), do: ...
 
   @spec patchParameteri(pname, value) :: :ok when pname: enum(), value: integer()
@@ -1635,22 +1635,22 @@ defmodule :gl do
   @spec pixelMapusv(map, mapsize, values) :: :ok when map: enum(), mapsize: integer(), values: binary()
   def pixelMapusv(map, mapsize, values), do: ...
 
-  @spec pixelStoref(pname, param) :: :ok when pname: enum(), param: unknown_type
+  @spec pixelStoref(pname, param) :: :ok when pname: enum(), param: float()
   def pixelStoref(pname, param), do: ...
 
   @spec pixelStorei(pname, param) :: :ok when pname: enum(), param: integer()
   def pixelStorei(pname, param), do: ...
 
-  @spec pixelTransferf(pname, param) :: :ok when pname: enum(), param: unknown_type
+  @spec pixelTransferf(pname, param) :: :ok when pname: enum(), param: float()
   def pixelTransferf(pname, param), do: ...
 
   @spec pixelTransferi(pname, param) :: :ok when pname: enum(), param: integer()
   def pixelTransferi(pname, param), do: ...
 
-  @spec pixelZoom(xfactor, yfactor) :: :ok when xfactor: unknown_type, yfactor: unknown_type
+  @spec pixelZoom(xfactor, yfactor) :: :ok when xfactor: float(), yfactor: float()
   def pixelZoom(xfactor, yfactor), do: ...
 
-  @spec pointParameterf(pname, param) :: :ok when pname: enum(), param: unknown_type
+  @spec pointParameterf(pname, param) :: :ok when pname: enum(), param: float()
   def pointParameterf(pname, param), do: ...
 
   @spec pointParameterfv(pname, params) :: :ok when pname: enum(), params: tuple()
@@ -1662,13 +1662,13 @@ defmodule :gl do
   @spec pointParameteriv(pname, params) :: :ok when pname: enum(), params: tuple()
   def pointParameteriv(pname, params), do: ...
 
-  @spec pointSize(size) :: :ok when size: unknown_type
+  @spec pointSize(size) :: :ok when size: float()
   def pointSize(size), do: ...
 
   @spec polygonMode(face, mode) :: :ok when face: enum(), mode: enum()
   def polygonMode(face, mode), do: ...
 
-  @spec polygonOffset(factor, units) :: :ok when factor: unknown_type, units: unknown_type
+  @spec polygonOffset(factor, units) :: :ok when factor: float(), units: float()
   def polygonOffset(factor, units), do: ...
 
   @spec polygonStipple(mask) :: :ok when mask: binary()
@@ -1695,28 +1695,28 @@ defmodule :gl do
   @spec programBinary(program, binaryFormat, binary) :: :ok when program: integer(), binaryFormat: enum(), binary: binary()
   def programBinary(program, binaryFormat, binary), do: ...
 
-  @spec programEnvParameter4dARB(target, index, x, y, z, w) :: :ok when target: enum(), index: integer(), x: unknown_type, y: unknown_type, z: unknown_type, w: unknown_type
+  @spec programEnvParameter4dARB(target, index, x, y, z, w) :: :ok when target: enum(), index: integer(), x: float(), y: float(), z: float(), w: float()
   def programEnvParameter4dARB(target, index, x, y, z, w), do: ...
 
-  @spec programEnvParameter4dvARB(target, index, params) :: :ok when target: enum(), index: integer(), params: {unknown_type, unknown_type, unknown_type, unknown_type}
+  @spec programEnvParameter4dvARB(target, index, params) :: :ok when target: enum(), index: integer(), params: {float(), float(), float(), float()}
   def programEnvParameter4dvARB(target, index, {p1, p2, p3, p4}), do: ...
 
-  @spec programEnvParameter4fARB(target, index, x, y, z, w) :: :ok when target: enum(), index: integer(), x: unknown_type, y: unknown_type, z: unknown_type, w: unknown_type
+  @spec programEnvParameter4fARB(target, index, x, y, z, w) :: :ok when target: enum(), index: integer(), x: float(), y: float(), z: float(), w: float()
   def programEnvParameter4fARB(target, index, x, y, z, w), do: ...
 
-  @spec programEnvParameter4fvARB(target, index, params) :: :ok when target: enum(), index: integer(), params: {unknown_type, unknown_type, unknown_type, unknown_type}
+  @spec programEnvParameter4fvARB(target, index, params) :: :ok when target: enum(), index: integer(), params: {float(), float(), float(), float()}
   def programEnvParameter4fvARB(target, index, {p1, p2, p3, p4}), do: ...
 
-  @spec programLocalParameter4dARB(target, index, x, y, z, w) :: :ok when target: enum(), index: integer(), x: unknown_type, y: unknown_type, z: unknown_type, w: unknown_type
+  @spec programLocalParameter4dARB(target, index, x, y, z, w) :: :ok when target: enum(), index: integer(), x: float(), y: float(), z: float(), w: float()
   def programLocalParameter4dARB(target, index, x, y, z, w), do: ...
 
-  @spec programLocalParameter4dvARB(target, index, params) :: :ok when target: enum(), index: integer(), params: {unknown_type, unknown_type, unknown_type, unknown_type}
+  @spec programLocalParameter4dvARB(target, index, params) :: :ok when target: enum(), index: integer(), params: {float(), float(), float(), float()}
   def programLocalParameter4dvARB(target, index, {p1, p2, p3, p4}), do: ...
 
-  @spec programLocalParameter4fARB(target, index, x, y, z, w) :: :ok when target: enum(), index: integer(), x: unknown_type, y: unknown_type, z: unknown_type, w: unknown_type
+  @spec programLocalParameter4fARB(target, index, x, y, z, w) :: :ok when target: enum(), index: integer(), x: float(), y: float(), z: float(), w: float()
   def programLocalParameter4fARB(target, index, x, y, z, w), do: ...
 
-  @spec programLocalParameter4fvARB(target, index, params) :: :ok when target: enum(), index: integer(), params: {unknown_type, unknown_type, unknown_type, unknown_type}
+  @spec programLocalParameter4fvARB(target, index, params) :: :ok when target: enum(), index: integer(), params: {float(), float(), float(), float()}
   def programLocalParameter4fvARB(target, index, {p1, p2, p3, p4}), do: ...
 
   @spec programParameteri(program, pname, value) :: :ok when program: integer(), pname: enum(), value: integer()
@@ -1725,16 +1725,16 @@ defmodule :gl do
   @spec programStringARB(target, format, string) :: :ok when target: enum(), format: enum(), string: charlist()
   def programStringARB(target, format, string), do: ...
 
-  @spec programUniform1d(program, location, v0) :: :ok when program: integer(), location: integer(), v0: unknown_type
+  @spec programUniform1d(program, location, v0) :: :ok when program: integer(), location: integer(), v0: float()
   def programUniform1d(program, location, v0), do: ...
 
-  @spec programUniform1dv(program, location, value) :: :ok when program: integer(), location: integer(), value: [unknown_type]
+  @spec programUniform1dv(program, location, value) :: :ok when program: integer(), location: integer(), value: [float()]
   def programUniform1dv(program, location, value), do: ...
 
-  @spec programUniform1f(program, location, v0) :: :ok when program: integer(), location: integer(), v0: unknown_type
+  @spec programUniform1f(program, location, v0) :: :ok when program: integer(), location: integer(), v0: float()
   def programUniform1f(program, location, v0), do: ...
 
-  @spec programUniform1fv(program, location, value) :: :ok when program: integer(), location: integer(), value: [unknown_type]
+  @spec programUniform1fv(program, location, value) :: :ok when program: integer(), location: integer(), value: [float()]
   def programUniform1fv(program, location, value), do: ...
 
   @spec programUniform1i(program, location, v0) :: :ok when program: integer(), location: integer(), v0: integer()
@@ -1749,16 +1749,16 @@ defmodule :gl do
   @spec programUniform1uiv(program, location, value) :: :ok when program: integer(), location: integer(), value: [integer()]
   def programUniform1uiv(program, location, value), do: ...
 
-  @spec programUniform2d(program, location, v0, v1) :: :ok when program: integer(), location: integer(), v0: unknown_type, v1: unknown_type
+  @spec programUniform2d(program, location, v0, v1) :: :ok when program: integer(), location: integer(), v0: float(), v1: float()
   def programUniform2d(program, location, v0, v1), do: ...
 
-  @spec programUniform2dv(program, location, value) :: :ok when program: integer(), location: integer(), value: [{unknown_type, unknown_type}]
+  @spec programUniform2dv(program, location, value) :: :ok when program: integer(), location: integer(), value: [{float(), float()}]
   def programUniform2dv(program, location, value), do: ...
 
-  @spec programUniform2f(program, location, v0, v1) :: :ok when program: integer(), location: integer(), v0: unknown_type, v1: unknown_type
+  @spec programUniform2f(program, location, v0, v1) :: :ok when program: integer(), location: integer(), v0: float(), v1: float()
   def programUniform2f(program, location, v0, v1), do: ...
 
-  @spec programUniform2fv(program, location, value) :: :ok when program: integer(), location: integer(), value: [{unknown_type, unknown_type}]
+  @spec programUniform2fv(program, location, value) :: :ok when program: integer(), location: integer(), value: [{float(), float()}]
   def programUniform2fv(program, location, value), do: ...
 
   @spec programUniform2i(program, location, v0, v1) :: :ok when program: integer(), location: integer(), v0: integer(), v1: integer()
@@ -1773,16 +1773,16 @@ defmodule :gl do
   @spec programUniform2uiv(program, location, value) :: :ok when program: integer(), location: integer(), value: [{integer(), integer()}]
   def programUniform2uiv(program, location, value), do: ...
 
-  @spec programUniform3d(program, location, v0, v1, v2) :: :ok when program: integer(), location: integer(), v0: unknown_type, v1: unknown_type, v2: unknown_type
+  @spec programUniform3d(program, location, v0, v1, v2) :: :ok when program: integer(), location: integer(), v0: float(), v1: float(), v2: float()
   def programUniform3d(program, location, v0, v1, v2), do: ...
 
-  @spec programUniform3dv(program, location, value) :: :ok when program: integer(), location: integer(), value: [{unknown_type, unknown_type, unknown_type}]
+  @spec programUniform3dv(program, location, value) :: :ok when program: integer(), location: integer(), value: [{float(), float(), float()}]
   def programUniform3dv(program, location, value), do: ...
 
-  @spec programUniform3f(program, location, v0, v1, v2) :: :ok when program: integer(), location: integer(), v0: unknown_type, v1: unknown_type, v2: unknown_type
+  @spec programUniform3f(program, location, v0, v1, v2) :: :ok when program: integer(), location: integer(), v0: float(), v1: float(), v2: float()
   def programUniform3f(program, location, v0, v1, v2), do: ...
 
-  @spec programUniform3fv(program, location, value) :: :ok when program: integer(), location: integer(), value: [{unknown_type, unknown_type, unknown_type}]
+  @spec programUniform3fv(program, location, value) :: :ok when program: integer(), location: integer(), value: [{float(), float(), float()}]
   def programUniform3fv(program, location, value), do: ...
 
   @spec programUniform3i(program, location, v0, v1, v2) :: :ok when program: integer(), location: integer(), v0: integer(), v1: integer(), v2: integer()
@@ -1797,16 +1797,16 @@ defmodule :gl do
   @spec programUniform3uiv(program, location, value) :: :ok when program: integer(), location: integer(), value: [{integer(), integer(), integer()}]
   def programUniform3uiv(program, location, value), do: ...
 
-  @spec programUniform4d(program, location, v0, v1, v2, v3) :: :ok when program: integer(), location: integer(), v0: unknown_type, v1: unknown_type, v2: unknown_type, v3: unknown_type
+  @spec programUniform4d(program, location, v0, v1, v2, v3) :: :ok when program: integer(), location: integer(), v0: float(), v1: float(), v2: float(), v3: float()
   def programUniform4d(program, location, v0, v1, v2, v3), do: ...
 
-  @spec programUniform4dv(program, location, value) :: :ok when program: integer(), location: integer(), value: [{unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec programUniform4dv(program, location, value) :: :ok when program: integer(), location: integer(), value: [{float(), float(), float(), float()}]
   def programUniform4dv(program, location, value), do: ...
 
-  @spec programUniform4f(program, location, v0, v1, v2, v3) :: :ok when program: integer(), location: integer(), v0: unknown_type, v1: unknown_type, v2: unknown_type, v3: unknown_type
+  @spec programUniform4f(program, location, v0, v1, v2, v3) :: :ok when program: integer(), location: integer(), v0: float(), v1: float(), v2: float(), v3: float()
   def programUniform4f(program, location, v0, v1, v2, v3), do: ...
 
-  @spec programUniform4fv(program, location, value) :: :ok when program: integer(), location: integer(), value: [{unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec programUniform4fv(program, location, value) :: :ok when program: integer(), location: integer(), value: [{float(), float(), float(), float()}]
   def programUniform4fv(program, location, value), do: ...
 
   @spec programUniform4i(program, location, v0, v1, v2, v3) :: :ok when program: integer(), location: integer(), v0: integer(), v1: integer(), v2: integer(), v3: integer()
@@ -1821,58 +1821,58 @@ defmodule :gl do
   @spec programUniform4uiv(program, location, value) :: :ok when program: integer(), location: integer(), value: [{integer(), integer(), integer(), integer()}]
   def programUniform4uiv(program, location, value), do: ...
 
-  @spec programUniformMatrix2dv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec programUniformMatrix2dv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{float(), float(), float(), float()}]
   def programUniformMatrix2dv(program, location, transpose, value), do: ...
 
-  @spec programUniformMatrix2fv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec programUniformMatrix2fv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{float(), float(), float(), float()}]
   def programUniformMatrix2fv(program, location, transpose, value), do: ...
 
-  @spec programUniformMatrix2x3dv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec programUniformMatrix2x3dv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{float(), float(), float(), float(), float(), float()}]
   def programUniformMatrix2x3dv(program, location, transpose, value), do: ...
 
-  @spec programUniformMatrix2x3fv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec programUniformMatrix2x3fv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{float(), float(), float(), float(), float(), float()}]
   def programUniformMatrix2x3fv(program, location, transpose, value), do: ...
 
-  @spec programUniformMatrix2x4dv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec programUniformMatrix2x4dv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{float(), float(), float(), float(), float(), float(), float(), float()}]
   def programUniformMatrix2x4dv(program, location, transpose, value), do: ...
 
-  @spec programUniformMatrix2x4fv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec programUniformMatrix2x4fv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{float(), float(), float(), float(), float(), float(), float(), float()}]
   def programUniformMatrix2x4fv(program, location, transpose, value), do: ...
 
-  @spec programUniformMatrix3dv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec programUniformMatrix3dv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{float(), float(), float(), float(), float(), float(), float(), float(), float()}]
   def programUniformMatrix3dv(program, location, transpose, value), do: ...
 
-  @spec programUniformMatrix3fv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec programUniformMatrix3fv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{float(), float(), float(), float(), float(), float(), float(), float(), float()}]
   def programUniformMatrix3fv(program, location, transpose, value), do: ...
 
-  @spec programUniformMatrix3x2dv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec programUniformMatrix3x2dv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{float(), float(), float(), float(), float(), float()}]
   def programUniformMatrix3x2dv(program, location, transpose, value), do: ...
 
-  @spec programUniformMatrix3x2fv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec programUniformMatrix3x2fv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{float(), float(), float(), float(), float(), float()}]
   def programUniformMatrix3x2fv(program, location, transpose, value), do: ...
 
-  @spec programUniformMatrix3x4dv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec programUniformMatrix3x4dv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float()}]
   def programUniformMatrix3x4dv(program, location, transpose, value), do: ...
 
-  @spec programUniformMatrix3x4fv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec programUniformMatrix3x4fv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float()}]
   def programUniformMatrix3x4fv(program, location, transpose, value), do: ...
 
-  @spec programUniformMatrix4dv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec programUniformMatrix4dv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float()}]
   def programUniformMatrix4dv(program, location, transpose, value), do: ...
 
-  @spec programUniformMatrix4fv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec programUniformMatrix4fv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float()}]
   def programUniformMatrix4fv(program, location, transpose, value), do: ...
 
-  @spec programUniformMatrix4x2dv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec programUniformMatrix4x2dv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{float(), float(), float(), float(), float(), float(), float(), float()}]
   def programUniformMatrix4x2dv(program, location, transpose, value), do: ...
 
-  @spec programUniformMatrix4x2fv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec programUniformMatrix4x2fv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{float(), float(), float(), float(), float(), float(), float(), float()}]
   def programUniformMatrix4x2fv(program, location, transpose, value), do: ...
 
-  @spec programUniformMatrix4x3dv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec programUniformMatrix4x3dv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float()}]
   def programUniformMatrix4x3dv(program, location, transpose, value), do: ...
 
-  @spec programUniformMatrix4x3fv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec programUniformMatrix4x3fv(program, location, transpose, value) :: :ok when program: integer(), location: integer(), transpose: (0 | 1), value: [{float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float()}]
   def programUniformMatrix4x3fv(program, location, transpose, value), do: ...
 
   @spec provokingVertex(mode) :: :ok when mode: enum()
@@ -1893,16 +1893,16 @@ defmodule :gl do
   @spec queryCounter(id, target) :: :ok when id: integer(), target: enum()
   def queryCounter(id, target), do: ...
 
-  @spec rasterPos2d(x, y) :: :ok when x: unknown_type, y: unknown_type
+  @spec rasterPos2d(x, y) :: :ok when x: float(), y: float()
   def rasterPos2d(x, y), do: ...
 
-  @spec rasterPos2dv(v) :: :ok when v: {x :: unknown_type, y :: unknown_type}
+  @spec rasterPos2dv(v) :: :ok when v: {x :: float(), y :: float()}
   def rasterPos2dv({x, y}), do: ...
 
-  @spec rasterPos2f(x, y) :: :ok when x: unknown_type, y: unknown_type
+  @spec rasterPos2f(x, y) :: :ok when x: float(), y: float()
   def rasterPos2f(x, y), do: ...
 
-  @spec rasterPos2fv(v) :: :ok when v: {x :: unknown_type, y :: unknown_type}
+  @spec rasterPos2fv(v) :: :ok when v: {x :: float(), y :: float()}
   def rasterPos2fv({x, y}), do: ...
 
   @spec rasterPos2i(x, y) :: :ok when x: integer(), y: integer()
@@ -1917,16 +1917,16 @@ defmodule :gl do
   @spec rasterPos2sv(v) :: :ok when v: {x :: integer(), y :: integer()}
   def rasterPos2sv({x, y}), do: ...
 
-  @spec rasterPos3d(x, y, z) :: :ok when x: unknown_type, y: unknown_type, z: unknown_type
+  @spec rasterPos3d(x, y, z) :: :ok when x: float(), y: float(), z: float()
   def rasterPos3d(x, y, z), do: ...
 
-  @spec rasterPos3dv(v) :: :ok when v: {x :: unknown_type, y :: unknown_type, z :: unknown_type}
+  @spec rasterPos3dv(v) :: :ok when v: {x :: float(), y :: float(), z :: float()}
   def rasterPos3dv({x, y, z}), do: ...
 
-  @spec rasterPos3f(x, y, z) :: :ok when x: unknown_type, y: unknown_type, z: unknown_type
+  @spec rasterPos3f(x, y, z) :: :ok when x: float(), y: float(), z: float()
   def rasterPos3f(x, y, z), do: ...
 
-  @spec rasterPos3fv(v) :: :ok when v: {x :: unknown_type, y :: unknown_type, z :: unknown_type}
+  @spec rasterPos3fv(v) :: :ok when v: {x :: float(), y :: float(), z :: float()}
   def rasterPos3fv({x, y, z}), do: ...
 
   @spec rasterPos3i(x, y, z) :: :ok when x: integer(), y: integer(), z: integer()
@@ -1941,16 +1941,16 @@ defmodule :gl do
   @spec rasterPos3sv(v) :: :ok when v: {x :: integer(), y :: integer(), z :: integer()}
   def rasterPos3sv({x, y, z}), do: ...
 
-  @spec rasterPos4d(x, y, z, w) :: :ok when x: unknown_type, y: unknown_type, z: unknown_type, w: unknown_type
+  @spec rasterPos4d(x, y, z, w) :: :ok when x: float(), y: float(), z: float(), w: float()
   def rasterPos4d(x, y, z, w), do: ...
 
-  @spec rasterPos4dv(v) :: :ok when v: {x :: unknown_type, y :: unknown_type, z :: unknown_type, w :: unknown_type}
+  @spec rasterPos4dv(v) :: :ok when v: {x :: float(), y :: float(), z :: float(), w :: float()}
   def rasterPos4dv({x, y, z, w}), do: ...
 
-  @spec rasterPos4f(x, y, z, w) :: :ok when x: unknown_type, y: unknown_type, z: unknown_type, w: unknown_type
+  @spec rasterPos4f(x, y, z, w) :: :ok when x: float(), y: float(), z: float(), w: float()
   def rasterPos4f(x, y, z, w), do: ...
 
-  @spec rasterPos4fv(v) :: :ok when v: {x :: unknown_type, y :: unknown_type, z :: unknown_type, w :: unknown_type}
+  @spec rasterPos4fv(v) :: :ok when v: {x :: float(), y :: float(), z :: float(), w :: float()}
   def rasterPos4fv({x, y, z, w}), do: ...
 
   @spec rasterPos4i(x, y, z, w) :: :ok when x: integer(), y: integer(), z: integer(), w: integer()
@@ -1971,16 +1971,16 @@ defmodule :gl do
   @spec readPixels(x, y, width, height, format, type, pixels) :: :ok when x: integer(), y: integer(), width: integer(), height: integer(), format: enum(), type: enum(), pixels: mem()
   def readPixels(x, y, width, height, format, type, pixels), do: ...
 
-  @spec rectd(x1, y1, x2, y2) :: :ok when x1: unknown_type, y1: unknown_type, x2: unknown_type, y2: unknown_type
+  @spec rectd(x1, y1, x2, y2) :: :ok when x1: float(), y1: float(), x2: float(), y2: float()
   def rectd(x1, y1, x2, y2), do: ...
 
-  @spec rectdv(v1, v2) :: :ok when v1: {unknown_type, unknown_type}, v2: {unknown_type, unknown_type}
+  @spec rectdv(v1, v2) :: :ok when v1: {float(), float()}, v2: {float(), float()}
   def rectdv({v1, v2}, {^v1, ^v2}), do: ...
 
-  @spec rectf(x1, y1, x2, y2) :: :ok when x1: unknown_type, y1: unknown_type, x2: unknown_type, y2: unknown_type
+  @spec rectf(x1, y1, x2, y2) :: :ok when x1: float(), y1: float(), x2: float(), y2: float()
   def rectf(x1, y1, x2, y2), do: ...
 
-  @spec rectfv(v1, v2) :: :ok when v1: {unknown_type, unknown_type}, v2: {unknown_type, unknown_type}
+  @spec rectfv(v1, v2) :: :ok when v1: {float(), float()}, v2: {float(), float()}
   def rectfv({v1, v2}, {^v1, ^v2}), do: ...
 
   @spec recti(x1, y1, x2, y2) :: :ok when x1: integer(), y1: integer(), x2: integer(), y2: integer()
@@ -2016,10 +2016,10 @@ defmodule :gl do
   @spec resumeTransformFeedback() :: :ok
   def resumeTransformFeedback(), do: ...
 
-  @spec rotated(angle, x, y, z) :: :ok when angle: unknown_type, x: unknown_type, y: unknown_type, z: unknown_type
+  @spec rotated(angle, x, y, z) :: :ok when angle: float(), x: float(), y: float(), z: float()
   def rotated(angle, x, y, z), do: ...
 
-  @spec rotatef(angle, x, y, z) :: :ok when angle: unknown_type, x: unknown_type, y: unknown_type, z: unknown_type
+  @spec rotatef(angle, x, y, z) :: :ok when angle: float(), x: float(), y: float(), z: float()
   def rotatef(angle, x, y, z), do: ...
 
   @spec sampleCoverage(value, invert) :: :ok when value: clamp(), invert: (0 | 1)
@@ -2034,10 +2034,10 @@ defmodule :gl do
   @spec samplerParameterIuiv(sampler, pname, param) :: :ok when sampler: integer(), pname: enum(), param: [integer()]
   def samplerParameterIuiv(sampler, pname, param), do: ...
 
-  @spec samplerParameterf(sampler, pname, param) :: :ok when sampler: integer(), pname: enum(), param: unknown_type
+  @spec samplerParameterf(sampler, pname, param) :: :ok when sampler: integer(), pname: enum(), param: float()
   def samplerParameterf(sampler, pname, param), do: ...
 
-  @spec samplerParameterfv(sampler, pname, param) :: :ok when sampler: integer(), pname: enum(), param: [unknown_type]
+  @spec samplerParameterfv(sampler, pname, param) :: :ok when sampler: integer(), pname: enum(), param: [float()]
   def samplerParameterfv(sampler, pname, param), do: ...
 
   @spec samplerParameteri(sampler, pname, param) :: :ok when sampler: integer(), pname: enum(), param: integer()
@@ -2046,10 +2046,10 @@ defmodule :gl do
   @spec samplerParameteriv(sampler, pname, param) :: :ok when sampler: integer(), pname: enum(), param: [integer()]
   def samplerParameteriv(sampler, pname, param), do: ...
 
-  @spec scaled(x, y, z) :: :ok when x: unknown_type, y: unknown_type, z: unknown_type
+  @spec scaled(x, y, z) :: :ok when x: float(), y: float(), z: float()
   def scaled(x, y, z), do: ...
 
-  @spec scalef(x, y, z) :: :ok when x: unknown_type, y: unknown_type, z: unknown_type
+  @spec scalef(x, y, z) :: :ok when x: float(), y: float(), z: float()
   def scalef(x, y, z), do: ...
 
   @spec scissor(x, y, width, height) :: :ok when x: integer(), y: integer(), width: integer(), height: integer()
@@ -2070,16 +2070,16 @@ defmodule :gl do
   @spec secondaryColor3bv(v) :: :ok when v: {red :: integer(), green :: integer(), blue :: integer()}
   def secondaryColor3bv({red, green, blue}), do: ...
 
-  @spec secondaryColor3d(red, green, blue) :: :ok when red: unknown_type, green: unknown_type, blue: unknown_type
+  @spec secondaryColor3d(red, green, blue) :: :ok when red: float(), green: float(), blue: float()
   def secondaryColor3d(red, green, blue), do: ...
 
-  @spec secondaryColor3dv(v) :: :ok when v: {red :: unknown_type, green :: unknown_type, blue :: unknown_type}
+  @spec secondaryColor3dv(v) :: :ok when v: {red :: float(), green :: float(), blue :: float()}
   def secondaryColor3dv({red, green, blue}), do: ...
 
-  @spec secondaryColor3f(red, green, blue) :: :ok when red: unknown_type, green: unknown_type, blue: unknown_type
+  @spec secondaryColor3f(red, green, blue) :: :ok when red: float(), green: float(), blue: float()
   def secondaryColor3f(red, green, blue), do: ...
 
-  @spec secondaryColor3fv(v) :: :ok when v: {red :: unknown_type, green :: unknown_type, blue :: unknown_type}
+  @spec secondaryColor3fv(v) :: :ok when v: {red :: float(), green :: float(), blue :: float()}
   def secondaryColor3fv({red, green, blue}), do: ...
 
   @spec secondaryColor3i(red, green, blue) :: :ok when red: integer(), green: integer(), blue: integer()
@@ -2165,16 +2165,16 @@ defmodule :gl do
   @spec texBuffer(target, internalformat, buffer) :: :ok when target: enum(), internalformat: enum(), buffer: integer()
   def texBuffer(target, internalformat, buffer), do: ...
 
-  @spec texCoord1d(s) :: :ok when s: unknown_type
+  @spec texCoord1d(s) :: :ok when s: float()
   def texCoord1d(s), do: ...
 
-  @spec texCoord1dv(v) :: :ok when v: {s :: unknown_type}
+  @spec texCoord1dv(v) :: :ok when v: {s :: float()}
   def texCoord1dv({s}), do: ...
 
-  @spec texCoord1f(s) :: :ok when s: unknown_type
+  @spec texCoord1f(s) :: :ok when s: float()
   def texCoord1f(s), do: ...
 
-  @spec texCoord1fv(v) :: :ok when v: {s :: unknown_type}
+  @spec texCoord1fv(v) :: :ok when v: {s :: float()}
   def texCoord1fv({s}), do: ...
 
   @spec texCoord1i(s) :: :ok when s: integer()
@@ -2189,16 +2189,16 @@ defmodule :gl do
   @spec texCoord1sv(v) :: :ok when v: {s :: integer()}
   def texCoord1sv({s}), do: ...
 
-  @spec texCoord2d(s, t) :: :ok when s: unknown_type, t: unknown_type
+  @spec texCoord2d(s, t) :: :ok when s: float(), t: float()
   def texCoord2d(s, t), do: ...
 
-  @spec texCoord2dv(v) :: :ok when v: {s :: unknown_type, t :: unknown_type}
+  @spec texCoord2dv(v) :: :ok when v: {s :: float(), t :: float()}
   def texCoord2dv({s, t}), do: ...
 
-  @spec texCoord2f(s, t) :: :ok when s: unknown_type, t: unknown_type
+  @spec texCoord2f(s, t) :: :ok when s: float(), t: float()
   def texCoord2f(s, t), do: ...
 
-  @spec texCoord2fv(v) :: :ok when v: {s :: unknown_type, t :: unknown_type}
+  @spec texCoord2fv(v) :: :ok when v: {s :: float(), t :: float()}
   def texCoord2fv({s, t}), do: ...
 
   @spec texCoord2i(s, t) :: :ok when s: integer(), t: integer()
@@ -2213,16 +2213,16 @@ defmodule :gl do
   @spec texCoord2sv(v) :: :ok when v: {s :: integer(), t :: integer()}
   def texCoord2sv({s, t}), do: ...
 
-  @spec texCoord3d(s, t, r) :: :ok when s: unknown_type, t: unknown_type, r: unknown_type
+  @spec texCoord3d(s, t, r) :: :ok when s: float(), t: float(), r: float()
   def texCoord3d(s, t, r), do: ...
 
-  @spec texCoord3dv(v) :: :ok when v: {s :: unknown_type, t :: unknown_type, r :: unknown_type}
+  @spec texCoord3dv(v) :: :ok when v: {s :: float(), t :: float(), r :: float()}
   def texCoord3dv({s, t, r}), do: ...
 
-  @spec texCoord3f(s, t, r) :: :ok when s: unknown_type, t: unknown_type, r: unknown_type
+  @spec texCoord3f(s, t, r) :: :ok when s: float(), t: float(), r: float()
   def texCoord3f(s, t, r), do: ...
 
-  @spec texCoord3fv(v) :: :ok when v: {s :: unknown_type, t :: unknown_type, r :: unknown_type}
+  @spec texCoord3fv(v) :: :ok when v: {s :: float(), t :: float(), r :: float()}
   def texCoord3fv({s, t, r}), do: ...
 
   @spec texCoord3i(s, t, r) :: :ok when s: integer(), t: integer(), r: integer()
@@ -2237,16 +2237,16 @@ defmodule :gl do
   @spec texCoord3sv(v) :: :ok when v: {s :: integer(), t :: integer(), r :: integer()}
   def texCoord3sv({s, t, r}), do: ...
 
-  @spec texCoord4d(s, t, r, q) :: :ok when s: unknown_type, t: unknown_type, r: unknown_type, q: unknown_type
+  @spec texCoord4d(s, t, r, q) :: :ok when s: float(), t: float(), r: float(), q: float()
   def texCoord4d(s, t, r, q), do: ...
 
-  @spec texCoord4dv(v) :: :ok when v: {s :: unknown_type, t :: unknown_type, r :: unknown_type, q :: unknown_type}
+  @spec texCoord4dv(v) :: :ok when v: {s :: float(), t :: float(), r :: float(), q :: float()}
   def texCoord4dv({s, t, r, q}), do: ...
 
-  @spec texCoord4f(s, t, r, q) :: :ok when s: unknown_type, t: unknown_type, r: unknown_type, q: unknown_type
+  @spec texCoord4f(s, t, r, q) :: :ok when s: float(), t: float(), r: float(), q: float()
   def texCoord4f(s, t, r, q), do: ...
 
-  @spec texCoord4fv(v) :: :ok when v: {s :: unknown_type, t :: unknown_type, r :: unknown_type, q :: unknown_type}
+  @spec texCoord4fv(v) :: :ok when v: {s :: float(), t :: float(), r :: float(), q :: float()}
   def texCoord4fv({s, t, r, q}), do: ...
 
   @spec texCoord4i(s, t, r, q) :: :ok when s: integer(), t: integer(), r: integer(), q: integer()
@@ -2266,7 +2266,7 @@ defmodule :gl do
 
   def texCoordPointer(size, type, stride, ptr), do: ...
 
-  @spec texEnvf(target, pname, param) :: :ok when target: enum(), pname: enum(), param: unknown_type
+  @spec texEnvf(target, pname, param) :: :ok when target: enum(), pname: enum(), param: float()
   def texEnvf(target, pname, param), do: ...
 
   @spec texEnvfv(target, pname, params) :: :ok when target: enum(), pname: enum(), params: tuple()
@@ -2278,13 +2278,13 @@ defmodule :gl do
   @spec texEnviv(target, pname, params) :: :ok when target: enum(), pname: enum(), params: tuple()
   def texEnviv(target, pname, params), do: ...
 
-  @spec texGend(coord, pname, param) :: :ok when coord: enum(), pname: enum(), param: unknown_type
+  @spec texGend(coord, pname, param) :: :ok when coord: enum(), pname: enum(), param: float()
   def texGend(coord, pname, param), do: ...
 
   @spec texGendv(coord, pname, params) :: :ok when coord: enum(), pname: enum(), params: tuple()
   def texGendv(coord, pname, params), do: ...
 
-  @spec texGenf(coord, pname, param) :: :ok when coord: enum(), pname: enum(), param: unknown_type
+  @spec texGenf(coord, pname, param) :: :ok when coord: enum(), pname: enum(), param: float()
   def texGenf(coord, pname, param), do: ...
 
   @spec texGenfv(coord, pname, params) :: :ok when coord: enum(), pname: enum(), params: tuple()
@@ -2323,7 +2323,7 @@ defmodule :gl do
   @spec texParameterIuiv(target, pname, params) :: :ok when target: enum(), pname: enum(), params: tuple()
   def texParameterIuiv(target, pname, params), do: ...
 
-  @spec texParameterf(target, pname, param) :: :ok when target: enum(), pname: enum(), param: unknown_type
+  @spec texParameterf(target, pname, param) :: :ok when target: enum(), pname: enum(), param: float()
   def texParameterf(target, pname, param), do: ...
 
   @spec texParameterfv(target, pname, params) :: :ok when target: enum(), pname: enum(), params: tuple()
@@ -2362,22 +2362,22 @@ defmodule :gl do
   @spec transformFeedbackVaryings(program, varyings, bufferMode) :: :ok when program: integer(), varyings: iolist(), bufferMode: enum()
   def transformFeedbackVaryings(program, varyings, bufferMode), do: ...
 
-  @spec translated(x, y, z) :: :ok when x: unknown_type, y: unknown_type, z: unknown_type
+  @spec translated(x, y, z) :: :ok when x: float(), y: float(), z: float()
   def translated(x, y, z), do: ...
 
-  @spec translatef(x, y, z) :: :ok when x: unknown_type, y: unknown_type, z: unknown_type
+  @spec translatef(x, y, z) :: :ok when x: float(), y: float(), z: float()
   def translatef(x, y, z), do: ...
 
-  @spec uniform1d(location, x) :: :ok when location: integer(), x: unknown_type
+  @spec uniform1d(location, x) :: :ok when location: integer(), x: float()
   def uniform1d(location, x), do: ...
 
-  @spec uniform1dv(location, value) :: :ok when location: integer(), value: [unknown_type]
+  @spec uniform1dv(location, value) :: :ok when location: integer(), value: [float()]
   def uniform1dv(location, value), do: ...
 
-  @spec uniform1f(location, v0) :: :ok when location: integer(), v0: unknown_type
+  @spec uniform1f(location, v0) :: :ok when location: integer(), v0: float()
   def uniform1f(location, v0), do: ...
 
-  @spec uniform1fv(location, value) :: :ok when location: integer(), value: [unknown_type]
+  @spec uniform1fv(location, value) :: :ok when location: integer(), value: [float()]
   def uniform1fv(location, value), do: ...
 
   @spec uniform1i(location, v0) :: :ok when location: integer(), v0: integer()
@@ -2392,16 +2392,16 @@ defmodule :gl do
   @spec uniform1uiv(location, value) :: :ok when location: integer(), value: [integer()]
   def uniform1uiv(location, value), do: ...
 
-  @spec uniform2d(location, x, y) :: :ok when location: integer(), x: unknown_type, y: unknown_type
+  @spec uniform2d(location, x, y) :: :ok when location: integer(), x: float(), y: float()
   def uniform2d(location, x, y), do: ...
 
-  @spec uniform2dv(location, value) :: :ok when location: integer(), value: [{unknown_type, unknown_type}]
+  @spec uniform2dv(location, value) :: :ok when location: integer(), value: [{float(), float()}]
   def uniform2dv(location, value), do: ...
 
-  @spec uniform2f(location, v0, v1) :: :ok when location: integer(), v0: unknown_type, v1: unknown_type
+  @spec uniform2f(location, v0, v1) :: :ok when location: integer(), v0: float(), v1: float()
   def uniform2f(location, v0, v1), do: ...
 
-  @spec uniform2fv(location, value) :: :ok when location: integer(), value: [{unknown_type, unknown_type}]
+  @spec uniform2fv(location, value) :: :ok when location: integer(), value: [{float(), float()}]
   def uniform2fv(location, value), do: ...
 
   @spec uniform2i(location, v0, v1) :: :ok when location: integer(), v0: integer(), v1: integer()
@@ -2416,16 +2416,16 @@ defmodule :gl do
   @spec uniform2uiv(location, value) :: :ok when location: integer(), value: [{integer(), integer()}]
   def uniform2uiv(location, value), do: ...
 
-  @spec uniform3d(location, x, y, z) :: :ok when location: integer(), x: unknown_type, y: unknown_type, z: unknown_type
+  @spec uniform3d(location, x, y, z) :: :ok when location: integer(), x: float(), y: float(), z: float()
   def uniform3d(location, x, y, z), do: ...
 
-  @spec uniform3dv(location, value) :: :ok when location: integer(), value: [{unknown_type, unknown_type, unknown_type}]
+  @spec uniform3dv(location, value) :: :ok when location: integer(), value: [{float(), float(), float()}]
   def uniform3dv(location, value), do: ...
 
-  @spec uniform3f(location, v0, v1, v2) :: :ok when location: integer(), v0: unknown_type, v1: unknown_type, v2: unknown_type
+  @spec uniform3f(location, v0, v1, v2) :: :ok when location: integer(), v0: float(), v1: float(), v2: float()
   def uniform3f(location, v0, v1, v2), do: ...
 
-  @spec uniform3fv(location, value) :: :ok when location: integer(), value: [{unknown_type, unknown_type, unknown_type}]
+  @spec uniform3fv(location, value) :: :ok when location: integer(), value: [{float(), float(), float()}]
   def uniform3fv(location, value), do: ...
 
   @spec uniform3i(location, v0, v1, v2) :: :ok when location: integer(), v0: integer(), v1: integer(), v2: integer()
@@ -2440,16 +2440,16 @@ defmodule :gl do
   @spec uniform3uiv(location, value) :: :ok when location: integer(), value: [{integer(), integer(), integer()}]
   def uniform3uiv(location, value), do: ...
 
-  @spec uniform4d(location, x, y, z, w) :: :ok when location: integer(), x: unknown_type, y: unknown_type, z: unknown_type, w: unknown_type
+  @spec uniform4d(location, x, y, z, w) :: :ok when location: integer(), x: float(), y: float(), z: float(), w: float()
   def uniform4d(location, x, y, z, w), do: ...
 
-  @spec uniform4dv(location, value) :: :ok when location: integer(), value: [{unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec uniform4dv(location, value) :: :ok when location: integer(), value: [{float(), float(), float(), float()}]
   def uniform4dv(location, value), do: ...
 
-  @spec uniform4f(location, v0, v1, v2, v3) :: :ok when location: integer(), v0: unknown_type, v1: unknown_type, v2: unknown_type, v3: unknown_type
+  @spec uniform4f(location, v0, v1, v2, v3) :: :ok when location: integer(), v0: float(), v1: float(), v2: float(), v3: float()
   def uniform4f(location, v0, v1, v2, v3), do: ...
 
-  @spec uniform4fv(location, value) :: :ok when location: integer(), value: [{unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec uniform4fv(location, value) :: :ok when location: integer(), value: [{float(), float(), float(), float()}]
   def uniform4fv(location, value), do: ...
 
   @spec uniform4i(location, v0, v1, v2, v3) :: :ok when location: integer(), v0: integer(), v1: integer(), v2: integer(), v3: integer()
@@ -2467,58 +2467,58 @@ defmodule :gl do
   @spec uniformBlockBinding(program, uniformBlockIndex, uniformBlockBinding) :: :ok when program: integer(), uniformBlockIndex: integer(), uniformBlockBinding: integer()
   def uniformBlockBinding(program, uniformBlockIndex, uniformBlockBinding), do: ...
 
-  @spec uniformMatrix2dv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec uniformMatrix2dv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{float(), float(), float(), float()}]
   def uniformMatrix2dv(location, transpose, value), do: ...
 
-  @spec uniformMatrix2fv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec uniformMatrix2fv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{float(), float(), float(), float()}]
   def uniformMatrix2fv(location, transpose, value), do: ...
 
-  @spec uniformMatrix2x3dv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec uniformMatrix2x3dv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{float(), float(), float(), float(), float(), float()}]
   def uniformMatrix2x3dv(location, transpose, value), do: ...
 
-  @spec uniformMatrix2x3fv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec uniformMatrix2x3fv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{float(), float(), float(), float(), float(), float()}]
   def uniformMatrix2x3fv(location, transpose, value), do: ...
 
-  @spec uniformMatrix2x4dv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec uniformMatrix2x4dv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{float(), float(), float(), float(), float(), float(), float(), float()}]
   def uniformMatrix2x4dv(location, transpose, value), do: ...
 
-  @spec uniformMatrix2x4fv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec uniformMatrix2x4fv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{float(), float(), float(), float(), float(), float(), float(), float()}]
   def uniformMatrix2x4fv(location, transpose, value), do: ...
 
-  @spec uniformMatrix3dv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec uniformMatrix3dv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{float(), float(), float(), float(), float(), float(), float(), float(), float()}]
   def uniformMatrix3dv(location, transpose, value), do: ...
 
-  @spec uniformMatrix3fv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec uniformMatrix3fv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{float(), float(), float(), float(), float(), float(), float(), float(), float()}]
   def uniformMatrix3fv(location, transpose, value), do: ...
 
-  @spec uniformMatrix3x2dv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec uniformMatrix3x2dv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{float(), float(), float(), float(), float(), float()}]
   def uniformMatrix3x2dv(location, transpose, value), do: ...
 
-  @spec uniformMatrix3x2fv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec uniformMatrix3x2fv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{float(), float(), float(), float(), float(), float()}]
   def uniformMatrix3x2fv(location, transpose, value), do: ...
 
-  @spec uniformMatrix3x4dv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec uniformMatrix3x4dv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float()}]
   def uniformMatrix3x4dv(location, transpose, value), do: ...
 
-  @spec uniformMatrix3x4fv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec uniformMatrix3x4fv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float()}]
   def uniformMatrix3x4fv(location, transpose, value), do: ...
 
-  @spec uniformMatrix4dv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec uniformMatrix4dv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float()}]
   def uniformMatrix4dv(location, transpose, value), do: ...
 
-  @spec uniformMatrix4fv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec uniformMatrix4fv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float()}]
   def uniformMatrix4fv(location, transpose, value), do: ...
 
-  @spec uniformMatrix4x2dv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec uniformMatrix4x2dv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{float(), float(), float(), float(), float(), float(), float(), float()}]
   def uniformMatrix4x2dv(location, transpose, value), do: ...
 
-  @spec uniformMatrix4x2fv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec uniformMatrix4x2fv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{float(), float(), float(), float(), float(), float(), float(), float()}]
   def uniformMatrix4x2fv(location, transpose, value), do: ...
 
-  @spec uniformMatrix4x3dv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec uniformMatrix4x3dv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float()}]
   def uniformMatrix4x3dv(location, transpose, value), do: ...
 
-  @spec uniformMatrix4x3fv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec uniformMatrix4x3fv(location, transpose, value) :: :ok when location: integer(), transpose: (0 | 1), value: [{float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float(), float()}]
   def uniformMatrix4x3fv(location, transpose, value), do: ...
 
   @spec uniformSubroutinesuiv(shadertype, indices) :: :ok when shadertype: enum(), indices: [integer()]
@@ -2542,16 +2542,16 @@ defmodule :gl do
   @spec validateProgramPipeline(pipeline) :: :ok when pipeline: integer()
   def validateProgramPipeline(pipeline), do: ...
 
-  @spec vertex2d(x, y) :: :ok when x: unknown_type, y: unknown_type
+  @spec vertex2d(x, y) :: :ok when x: float(), y: float()
   def vertex2d(x, y), do: ...
 
-  @spec vertex2dv(v) :: :ok when v: {x :: unknown_type, y :: unknown_type}
+  @spec vertex2dv(v) :: :ok when v: {x :: float(), y :: float()}
   def vertex2dv({x, y}), do: ...
 
-  @spec vertex2f(x, y) :: :ok when x: unknown_type, y: unknown_type
+  @spec vertex2f(x, y) :: :ok when x: float(), y: float()
   def vertex2f(x, y), do: ...
 
-  @spec vertex2fv(v) :: :ok when v: {x :: unknown_type, y :: unknown_type}
+  @spec vertex2fv(v) :: :ok when v: {x :: float(), y :: float()}
   def vertex2fv({x, y}), do: ...
 
   @spec vertex2i(x, y) :: :ok when x: integer(), y: integer()
@@ -2566,16 +2566,16 @@ defmodule :gl do
   @spec vertex2sv(v) :: :ok when v: {x :: integer(), y :: integer()}
   def vertex2sv({x, y}), do: ...
 
-  @spec vertex3d(x, y, z) :: :ok when x: unknown_type, y: unknown_type, z: unknown_type
+  @spec vertex3d(x, y, z) :: :ok when x: float(), y: float(), z: float()
   def vertex3d(x, y, z), do: ...
 
-  @spec vertex3dv(v) :: :ok when v: {x :: unknown_type, y :: unknown_type, z :: unknown_type}
+  @spec vertex3dv(v) :: :ok when v: {x :: float(), y :: float(), z :: float()}
   def vertex3dv({x, y, z}), do: ...
 
-  @spec vertex3f(x, y, z) :: :ok when x: unknown_type, y: unknown_type, z: unknown_type
+  @spec vertex3f(x, y, z) :: :ok when x: float(), y: float(), z: float()
   def vertex3f(x, y, z), do: ...
 
-  @spec vertex3fv(v) :: :ok when v: {x :: unknown_type, y :: unknown_type, z :: unknown_type}
+  @spec vertex3fv(v) :: :ok when v: {x :: float(), y :: float(), z :: float()}
   def vertex3fv({x, y, z}), do: ...
 
   @spec vertex3i(x, y, z) :: :ok when x: integer(), y: integer(), z: integer()
@@ -2590,16 +2590,16 @@ defmodule :gl do
   @spec vertex3sv(v) :: :ok when v: {x :: integer(), y :: integer(), z :: integer()}
   def vertex3sv({x, y, z}), do: ...
 
-  @spec vertex4d(x, y, z, w) :: :ok when x: unknown_type, y: unknown_type, z: unknown_type, w: unknown_type
+  @spec vertex4d(x, y, z, w) :: :ok when x: float(), y: float(), z: float(), w: float()
   def vertex4d(x, y, z, w), do: ...
 
-  @spec vertex4dv(v) :: :ok when v: {x :: unknown_type, y :: unknown_type, z :: unknown_type, w :: unknown_type}
+  @spec vertex4dv(v) :: :ok when v: {x :: float(), y :: float(), z :: float(), w :: float()}
   def vertex4dv({x, y, z, w}), do: ...
 
-  @spec vertex4f(x, y, z, w) :: :ok when x: unknown_type, y: unknown_type, z: unknown_type, w: unknown_type
+  @spec vertex4f(x, y, z, w) :: :ok when x: float(), y: float(), z: float(), w: float()
   def vertex4f(x, y, z, w), do: ...
 
-  @spec vertex4fv(v) :: :ok when v: {x :: unknown_type, y :: unknown_type, z :: unknown_type, w :: unknown_type}
+  @spec vertex4fv(v) :: :ok when v: {x :: float(), y :: float(), z :: float(), w :: float()}
   def vertex4fv({x, y, z, w}), do: ...
 
   @spec vertex4i(x, y, z, w) :: :ok when x: integer(), y: integer(), z: integer(), w: integer()
@@ -2614,16 +2614,16 @@ defmodule :gl do
   @spec vertex4sv(v) :: :ok when v: {x :: integer(), y :: integer(), z :: integer(), w :: integer()}
   def vertex4sv({x, y, z, w}), do: ...
 
-  @spec vertexAttrib1d(index, x) :: :ok when index: integer(), x: unknown_type
+  @spec vertexAttrib1d(index, x) :: :ok when index: integer(), x: float()
   def vertexAttrib1d(index, x), do: ...
 
-  @spec vertexAttrib1dv(index :: integer(), v) :: :ok when v: {x :: unknown_type}
+  @spec vertexAttrib1dv(index :: integer(), v) :: :ok when v: {x :: float()}
   def vertexAttrib1dv(index, {x}), do: ...
 
-  @spec vertexAttrib1f(index, x) :: :ok when index: integer(), x: unknown_type
+  @spec vertexAttrib1f(index, x) :: :ok when index: integer(), x: float()
   def vertexAttrib1f(index, x), do: ...
 
-  @spec vertexAttrib1fv(index :: integer(), v) :: :ok when v: {x :: unknown_type}
+  @spec vertexAttrib1fv(index :: integer(), v) :: :ok when v: {x :: float()}
   def vertexAttrib1fv(index, {x}), do: ...
 
   @spec vertexAttrib1s(index, x) :: :ok when index: integer(), x: integer()
@@ -2632,16 +2632,16 @@ defmodule :gl do
   @spec vertexAttrib1sv(index :: integer(), v) :: :ok when v: {x :: integer()}
   def vertexAttrib1sv(index, {x}), do: ...
 
-  @spec vertexAttrib2d(index, x, y) :: :ok when index: integer(), x: unknown_type, y: unknown_type
+  @spec vertexAttrib2d(index, x, y) :: :ok when index: integer(), x: float(), y: float()
   def vertexAttrib2d(index, x, y), do: ...
 
-  @spec vertexAttrib2dv(index :: integer(), v) :: :ok when v: {x :: unknown_type, y :: unknown_type}
+  @spec vertexAttrib2dv(index :: integer(), v) :: :ok when v: {x :: float(), y :: float()}
   def vertexAttrib2dv(index, {x, y}), do: ...
 
-  @spec vertexAttrib2f(index, x, y) :: :ok when index: integer(), x: unknown_type, y: unknown_type
+  @spec vertexAttrib2f(index, x, y) :: :ok when index: integer(), x: float(), y: float()
   def vertexAttrib2f(index, x, y), do: ...
 
-  @spec vertexAttrib2fv(index :: integer(), v) :: :ok when v: {x :: unknown_type, y :: unknown_type}
+  @spec vertexAttrib2fv(index :: integer(), v) :: :ok when v: {x :: float(), y :: float()}
   def vertexAttrib2fv(index, {x, y}), do: ...
 
   @spec vertexAttrib2s(index, x, y) :: :ok when index: integer(), x: integer(), y: integer()
@@ -2650,16 +2650,16 @@ defmodule :gl do
   @spec vertexAttrib2sv(index :: integer(), v) :: :ok when v: {x :: integer(), y :: integer()}
   def vertexAttrib2sv(index, {x, y}), do: ...
 
-  @spec vertexAttrib3d(index, x, y, z) :: :ok when index: integer(), x: unknown_type, y: unknown_type, z: unknown_type
+  @spec vertexAttrib3d(index, x, y, z) :: :ok when index: integer(), x: float(), y: float(), z: float()
   def vertexAttrib3d(index, x, y, z), do: ...
 
-  @spec vertexAttrib3dv(index :: integer(), v) :: :ok when v: {x :: unknown_type, y :: unknown_type, z :: unknown_type}
+  @spec vertexAttrib3dv(index :: integer(), v) :: :ok when v: {x :: float(), y :: float(), z :: float()}
   def vertexAttrib3dv(index, {x, y, z}), do: ...
 
-  @spec vertexAttrib3f(index, x, y, z) :: :ok when index: integer(), x: unknown_type, y: unknown_type, z: unknown_type
+  @spec vertexAttrib3f(index, x, y, z) :: :ok when index: integer(), x: float(), y: float(), z: float()
   def vertexAttrib3f(index, x, y, z), do: ...
 
-  @spec vertexAttrib3fv(index :: integer(), v) :: :ok when v: {x :: unknown_type, y :: unknown_type, z :: unknown_type}
+  @spec vertexAttrib3fv(index :: integer(), v) :: :ok when v: {x :: float(), y :: float(), z :: float()}
   def vertexAttrib3fv(index, {x, y, z}), do: ...
 
   @spec vertexAttrib3s(index, x, y, z) :: :ok when index: integer(), x: integer(), y: integer(), z: integer()
@@ -2692,16 +2692,16 @@ defmodule :gl do
   @spec vertexAttrib4bv(index, v) :: :ok when index: integer(), v: {integer(), integer(), integer(), integer()}
   def vertexAttrib4bv(index, {v1, v2, v3, v4}), do: ...
 
-  @spec vertexAttrib4d(index, x, y, z, w) :: :ok when index: integer(), x: unknown_type, y: unknown_type, z: unknown_type, w: unknown_type
+  @spec vertexAttrib4d(index, x, y, z, w) :: :ok when index: integer(), x: float(), y: float(), z: float(), w: float()
   def vertexAttrib4d(index, x, y, z, w), do: ...
 
-  @spec vertexAttrib4dv(index :: integer(), v) :: :ok when v: {x :: unknown_type, y :: unknown_type, z :: unknown_type, w :: unknown_type}
+  @spec vertexAttrib4dv(index :: integer(), v) :: :ok when v: {x :: float(), y :: float(), z :: float(), w :: float()}
   def vertexAttrib4dv(index, {x, y, z, w}), do: ...
 
-  @spec vertexAttrib4f(index, x, y, z, w) :: :ok when index: integer(), x: unknown_type, y: unknown_type, z: unknown_type, w: unknown_type
+  @spec vertexAttrib4f(index, x, y, z, w) :: :ok when index: integer(), x: float(), y: float(), z: float(), w: float()
   def vertexAttrib4f(index, x, y, z, w), do: ...
 
-  @spec vertexAttrib4fv(index :: integer(), v) :: :ok when v: {x :: unknown_type, y :: unknown_type, z :: unknown_type, w :: unknown_type}
+  @spec vertexAttrib4fv(index :: integer(), v) :: :ok when v: {x :: float(), y :: float(), z :: float(), w :: float()}
   def vertexAttrib4fv(index, {x, y, z, w}), do: ...
 
   @spec vertexAttrib4iv(index, v) :: :ok when index: integer(), v: {integer(), integer(), integer(), integer()}
@@ -2790,28 +2790,28 @@ defmodule :gl do
 
   def vertexAttribIPointer(index, size, type, stride, pointer), do: ...
 
-  @spec vertexAttribL1d(index, x) :: :ok when index: integer(), x: unknown_type
+  @spec vertexAttribL1d(index, x) :: :ok when index: integer(), x: float()
   def vertexAttribL1d(index, x), do: ...
 
-  @spec vertexAttribL1dv(index :: integer(), v) :: :ok when v: {x :: unknown_type}
+  @spec vertexAttribL1dv(index :: integer(), v) :: :ok when v: {x :: float()}
   def vertexAttribL1dv(index, {x}), do: ...
 
-  @spec vertexAttribL2d(index, x, y) :: :ok when index: integer(), x: unknown_type, y: unknown_type
+  @spec vertexAttribL2d(index, x, y) :: :ok when index: integer(), x: float(), y: float()
   def vertexAttribL2d(index, x, y), do: ...
 
-  @spec vertexAttribL2dv(index :: integer(), v) :: :ok when v: {x :: unknown_type, y :: unknown_type}
+  @spec vertexAttribL2dv(index :: integer(), v) :: :ok when v: {x :: float(), y :: float()}
   def vertexAttribL2dv(index, {x, y}), do: ...
 
-  @spec vertexAttribL3d(index, x, y, z) :: :ok when index: integer(), x: unknown_type, y: unknown_type, z: unknown_type
+  @spec vertexAttribL3d(index, x, y, z) :: :ok when index: integer(), x: float(), y: float(), z: float()
   def vertexAttribL3d(index, x, y, z), do: ...
 
-  @spec vertexAttribL3dv(index :: integer(), v) :: :ok when v: {x :: unknown_type, y :: unknown_type, z :: unknown_type}
+  @spec vertexAttribL3dv(index :: integer(), v) :: :ok when v: {x :: float(), y :: float(), z :: float()}
   def vertexAttribL3dv(index, {x, y, z}), do: ...
 
-  @spec vertexAttribL4d(index, x, y, z, w) :: :ok when index: integer(), x: unknown_type, y: unknown_type, z: unknown_type, w: unknown_type
+  @spec vertexAttribL4d(index, x, y, z, w) :: :ok when index: integer(), x: float(), y: float(), z: float(), w: float()
   def vertexAttribL4d(index, x, y, z, w), do: ...
 
-  @spec vertexAttribL4dv(index :: integer(), v) :: :ok when v: {x :: unknown_type, y :: unknown_type, z :: unknown_type, w :: unknown_type}
+  @spec vertexAttribL4dv(index :: integer(), v) :: :ok when v: {x :: float(), y :: float(), z :: float(), w :: float()}
   def vertexAttribL4dv(index, {x, y, z, w}), do: ...
 
   @spec vertexAttribLPointer(index, size, type, stride, pointer) :: :ok when index: integer(), size: integer(), type: enum(), stride: integer(), pointer: (offset() | mem())
@@ -2835,13 +2835,13 @@ defmodule :gl do
   @spec viewport(x, y, width, height) :: :ok when x: integer(), y: integer(), width: integer(), height: integer()
   def viewport(x, y, width, height), do: ...
 
-  @spec viewportArrayv(first, v) :: :ok when first: integer(), v: [{unknown_type, unknown_type, unknown_type, unknown_type}]
+  @spec viewportArrayv(first, v) :: :ok when first: integer(), v: [{float(), float(), float(), float()}]
   def viewportArrayv(first, v), do: ...
 
-  @spec viewportIndexedf(index, x, y, w, h) :: :ok when index: integer(), x: unknown_type, y: unknown_type, w: unknown_type, h: unknown_type
+  @spec viewportIndexedf(index, x, y, w, h) :: :ok when index: integer(), x: float(), y: float(), w: float(), h: float()
   def viewportIndexedf(index, x, y, w, h), do: ...
 
-  @spec viewportIndexedfv(index, v) :: :ok when index: integer(), v: {unknown_type, unknown_type, unknown_type, unknown_type}
+  @spec viewportIndexedfv(index, v) :: :ok when index: integer(), v: {float(), float(), float(), float()}
   def viewportIndexedfv(index, {v1, v2, v3, v4}), do: ...
 
   @spec waitSync(sync, flags, timeout) :: :ok when sync: integer(), flags: integer(), timeout: integer()
@@ -2850,10 +2850,10 @@ defmodule :gl do
   @spec weightbvARB(weights) :: :ok when weights: [integer()]
   def weightbvARB(weights), do: ...
 
-  @spec weightdvARB(weights) :: :ok when weights: [unknown_type]
+  @spec weightdvARB(weights) :: :ok when weights: [float()]
   def weightdvARB(weights), do: ...
 
-  @spec weightfvARB(weights) :: :ok when weights: [unknown_type]
+  @spec weightfvARB(weights) :: :ok when weights: [float()]
   def weightfvARB(weights), do: ...
 
   @spec weightivARB(weights) :: :ok when weights: [integer()]
@@ -2871,16 +2871,16 @@ defmodule :gl do
   @spec weightusvARB(weights) :: :ok when weights: [integer()]
   def weightusvARB(weights), do: ...
 
-  @spec windowPos2d(x, y) :: :ok when x: unknown_type, y: unknown_type
+  @spec windowPos2d(x, y) :: :ok when x: float(), y: float()
   def windowPos2d(x, y), do: ...
 
-  @spec windowPos2dv(v) :: :ok when v: {x :: unknown_type, y :: unknown_type}
+  @spec windowPos2dv(v) :: :ok when v: {x :: float(), y :: float()}
   def windowPos2dv({x, y}), do: ...
 
-  @spec windowPos2f(x, y) :: :ok when x: unknown_type, y: unknown_type
+  @spec windowPos2f(x, y) :: :ok when x: float(), y: float()
   def windowPos2f(x, y), do: ...
 
-  @spec windowPos2fv(v) :: :ok when v: {x :: unknown_type, y :: unknown_type}
+  @spec windowPos2fv(v) :: :ok when v: {x :: float(), y :: float()}
   def windowPos2fv({x, y}), do: ...
 
   @spec windowPos2i(x, y) :: :ok when x: integer(), y: integer()
@@ -2895,16 +2895,16 @@ defmodule :gl do
   @spec windowPos2sv(v) :: :ok when v: {x :: integer(), y :: integer()}
   def windowPos2sv({x, y}), do: ...
 
-  @spec windowPos3d(x, y, z) :: :ok when x: unknown_type, y: unknown_type, z: unknown_type
+  @spec windowPos3d(x, y, z) :: :ok when x: float(), y: float(), z: float()
   def windowPos3d(x, y, z), do: ...
 
-  @spec windowPos3dv(v) :: :ok when v: {x :: unknown_type, y :: unknown_type, z :: unknown_type}
+  @spec windowPos3dv(v) :: :ok when v: {x :: float(), y :: float(), z :: float()}
   def windowPos3dv({x, y, z}), do: ...
 
-  @spec windowPos3f(x, y, z) :: :ok when x: unknown_type, y: unknown_type, z: unknown_type
+  @spec windowPos3f(x, y, z) :: :ok when x: float(), y: float(), z: float()
   def windowPos3f(x, y, z), do: ...
 
-  @spec windowPos3fv(v) :: :ok when v: {x :: unknown_type, y :: unknown_type, z :: unknown_type}
+  @spec windowPos3fv(v) :: :ok when v: {x :: float(), y :: float(), z :: float()}
   def windowPos3fv({x, y, z}), do: ...
 
   @spec windowPos3i(x, y, z) :: :ok when x: integer(), y: integer(), z: integer()

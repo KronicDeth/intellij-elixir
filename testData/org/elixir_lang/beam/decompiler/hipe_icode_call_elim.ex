@@ -53,7 +53,7 @@ defmodule :hipe_icode_call_elim do
 
   @typep icode_var :: icode_variable(kind :: :var)
 
-  @typep simple_const :: (atom() | [] | integer() | unknown_type)
+  @typep simple_const :: (atom() | [] | integer() | float())
 
   @typep structured_const :: ([] | tuple())
 

@@ -18,6 +18,7 @@ object Builtin {
             "boolean",
             "byte",
             "char",
+            "float",
             "function",
             "integer",
             "iodata",
