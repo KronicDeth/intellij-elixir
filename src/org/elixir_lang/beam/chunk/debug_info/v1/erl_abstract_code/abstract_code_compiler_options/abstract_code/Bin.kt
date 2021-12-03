@@ -12,7 +12,7 @@ object Bin {
         toBinElements(term)?.let { binElements ->
             BinElements.toElixirString(binElements)?.let {
                 inspect(it)
-                        .let { MacroStringDeclaredScope(it, Scope.EMPTY) }
+                        .let { MacroStringDeclaredScope(it, doBlock = false, Scope.EMPTY) }
             } ?:
             BinElements.toMacroStringDeclaredScope(binElements, scope)
         }
@@ -29,7 +29,7 @@ object Bin {
             binElementsElixirStringToMacroStringDeclaredScope(binElements)
                     ?: binElementsToMacroStringDeclaredScope(binElements, scope)
         } else {
-            MacroStringDeclaredScope("missing_bin_elements", Scope.EMPTY)
+            MacroStringDeclaredScope("missing_bin_elements", doBlock = false, Scope.EMPTY)
         }
     }
 
@@ -39,7 +39,7 @@ object Bin {
         BinElements
                 .toMacroStringDeclaredScope(binElements, scope)
                 .let { (binElementsMacroString, binElementsDeclaredScope) ->
-                    MacroStringDeclaredScope("<<$binElementsMacroString>>", binElementsDeclaredScope)
+                    MacroStringDeclaredScope("<<${binElementsMacroString.string}>>", doBlock = false, binElementsDeclaredScope)
                 }
 
     private fun binElementsElixirStringToMacroStringDeclaredScope(binElements: OtpErlangObject) =
@@ -51,7 +51,7 @@ object Bin {
 
     private fun elixirStringToMacroStirngDeclaredScope(elixirString: OtpErlangBinary) =
            inspect(elixirString)
-                   .let { MacroStringDeclaredScope(it, Scope.EMPTY) }
+                   .let { MacroStringDeclaredScope(it, doBlock = false, Scope.EMPTY) }
 
     private fun toBinElements(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
 }

@@ -13,24 +13,25 @@ object Comprehension {
 
     fun toMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope {
         val (qualifiersMacroString, qualifiersDeclaredScope) = qualifiersMacroStringDeclaredScope(term, scope)
-        val expressionMacroString = expressionMacroString(term, qualifiersDeclaredScope)
+        val groupedQualifierString = qualifiersMacroString.group().string
+        val expressionString = expressionString(term, qualifiersDeclaredScope)
 
-        val macroString = "for $qualifiersMacroString do\n" +
-                "  $expressionMacroString\n" +
+        val string = "for $groupedQualifierString do\n" +
+                "  $expressionString\n" +
                 "end"
 
-        return MacroStringDeclaredScope(macroString, Scope.EMPTY)
+        return MacroStringDeclaredScope(string, doBlock = true, Scope.EMPTY)
     }
 
-    private fun expressionMacroString(term: OtpErlangTuple, scope: Scope): String =
+    private fun expressionString(term: OtpErlangTuple, scope: Scope): String =
             toExpression(term)
-                    ?.let { AbstractCode.toMacroStringDeclaredScope(it, scope).macroString }
-                    ?: "missing_expression"
+                    ?.let { AbstractCode.toString(it, scope) }
+                    ?:"missing_expression"
 
     private fun qualifiersMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope =
             toQualifiers(term)
                     ?.let { Qualifiers.toMacroStringDeclaredScope(it, scope) }
-                    ?: MacroStringDeclaredScope("missing_qualifiers", scope)
+                    ?: MacroStringDeclaredScope("missing_qualifiers", doBlock = false, scope)
 
     private fun toExpression(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
     private fun toQualifiers(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(3)

@@ -5,9 +5,9 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Type.ifSubtypeTo
 
 object MapFieldAssociation {
-    fun ifToMacroString(type: OtpErlangTuple): MacroString? = ifSubtypeTo(type, SUBTYPE) { toMacroString(type) }
+    fun ifToString(type: OtpErlangTuple): String? = ifSubtypeTo(type, SUBTYPE) { toString(type) }
 
     private const val SUBTYPE = "map_field_assoc"
 
-    private fun toMacroString(type: OtpErlangTuple) = MapField.toMacroString(type, "optional")
+    private fun toString(type: OtpErlangTuple) = MapField.toString(type, "optional")
 }

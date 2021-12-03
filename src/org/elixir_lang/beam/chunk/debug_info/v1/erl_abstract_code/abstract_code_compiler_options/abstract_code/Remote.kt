@@ -14,31 +14,30 @@ object Remote {
             ifTo(term) { toMacroStringDeclaredScope(it) }
 
     fun toMacroStringDeclaredScope(term: OtpErlangTuple): MacroStringDeclaredScope {
-        val moduleMacroString = moduleMacroString(term)
-        val functionMacroString = functionMacroString(term)
+        val moduleString = moduleString(term)
+        val functionString = functionString(term)
 
-        return MacroStringDeclaredScope("$moduleMacroString.$functionMacroString", Scope.EMPTY)
+        return MacroStringDeclaredScope("$moduleString.$functionString", doBlock = false, Scope.EMPTY)
     }
 
     private const val TAG = "remote"
 
-    private fun functionMacroString(term: OtpErlangTuple): MacroString =
+    private fun functionString(term: OtpErlangTuple): String =
             toFunction(term)
-                    ?.let { functionToMacroString(it) }
+                    ?.let { functionToString(it) }
                     ?: "missing_function"
 
-    private fun functionToMacroString(function: OtpErlangObject): MacroString =
+    private fun functionToString(function: OtpErlangObject): String =
             Atom.toElixirAtom(function)
                     ?.let { inspectAsFunction(it) }
                     ?: "remote_unknown_function"
 
-    internal fun moduleMacroString(term: OtpErlangTuple): MacroString =
+    internal fun moduleString(term: OtpErlangTuple): String =
             toModule(term)
-                    ?.let { moduleToMacroString(it) }
+                    ?.let { moduleToString(it) }
                     ?: ":missing_module"
 
-    private fun moduleToMacroString(module: OtpErlangObject) =
-            AbstractCode.toMacroStringDeclaredScope(module, Scope.EMPTY).macroString
+    private fun moduleToString(module: OtpErlangObject) = AbstractCode.toString(module)
 
     internal fun toFunction(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(3)
     private fun toModule(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)

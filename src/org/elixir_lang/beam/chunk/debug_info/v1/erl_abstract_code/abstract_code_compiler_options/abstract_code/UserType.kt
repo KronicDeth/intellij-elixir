@@ -12,36 +12,37 @@ object UserType {
 
     private const val TAG = "user_type"
 
-    private fun argumentsMacroString(userType: OtpErlangTuple) =
+    private fun argumentsString(userType: OtpErlangTuple) =
             toArguments(userType)
-                    .let { Sequence.toMacroStringDeclaredScope(it, Scope.EMPTY, "", ", ", "") }
+                    .let { Sequence.toMacroStringDeclaredScope(it, Scope.EMPTY, "", COMMA, "") }
                     .macroString
+                    .string
 
-    private fun nameMacroString(userType: OtpErlangTuple) =
+    private fun nameString(userType: OtpErlangTuple) =
             toName(userType)
-                    ?.let { nameToMacroString(it) }
+                    ?.let { nameToString(it) }
                     ?: "missing_name"
 
-    private fun nameToMacroString(name: OtpErlangAtom) = inspectAsFunction(name, true)
+    private fun nameToString(name: OtpErlangAtom) = inspectAsFunction(name, true)
 
-    private fun nameToMacroString(name: OtpErlangObject) =
+    private fun nameToString(name: OtpErlangObject) =
             when (name) {
-                is OtpErlangAtom -> nameToMacroString(name)
+                is OtpErlangAtom -> nameToString(name)
                 else -> "unknown_name"
             }
 
     private fun toArguments(userType: OtpErlangTuple): OtpErlangObject? = userType.elementAt(3)
 
-    private fun toMacroString(userType: OtpErlangTuple): MacroString {
-        val nameMacroString = nameMacroString(userType)
-        val argumentsMacroString = argumentsMacroString(userType)
+    private fun toMacroString(userType: OtpErlangTuple): String {
+        val nameString = nameString(userType)
+        val argumentsString = argumentsString(userType)
 
-        return "$nameMacroString($argumentsMacroString)"
+        return "$nameString($argumentsString)"
     }
 
     private fun toMacroStringDeclaredScope(userType: OtpErlangTuple) =
             toMacroString(userType)
-                    .let { MacroStringDeclaredScope(it, Scope.EMPTY) }
+                    .let { MacroStringDeclaredScope(it, doBlock = false, Scope.EMPTY) }
 
     private fun toName(userType: OtpErlangTuple): OtpErlangObject? = userType.elementAt(2)
 }

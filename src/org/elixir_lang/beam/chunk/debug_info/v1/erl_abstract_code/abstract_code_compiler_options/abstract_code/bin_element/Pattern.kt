@@ -17,7 +17,7 @@ object Pattern {
     fun toMacroStringDeclaredScope(term: OtpErlangObject, scope: Scope): MacroStringDeclaredScope =
             toElixirString(term)
                     ?.let {
-                        inspect(it).let { MacroStringDeclaredScope(it, Scope.EMPTY) }
+                        inspect(it).let { MacroStringDeclaredScope(it, doBlock = false, Scope.EMPTY) }
                     }
                     ?: AbstractCode.toMacroStringDeclaredScope(term, scope)
 }

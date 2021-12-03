@@ -25,15 +25,16 @@ object BinElement {
 
     fun toMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope {
         val (patternMacroString, patternDeclaredScope) = patternMacroStringDeclaredScope(term, scope)
-        val optionsMacroString = ifOptionsMacroString(term)
+        val patternString = patternMacroString.string
+        val optionsString = ifOptionsString(term)
 
-        val macroString = if (optionsMacroString != null) {
-            "$patternMacroString :: $optionsMacroString"
+        val string = if (optionsString != null) {
+            "$patternString :: $optionsString"
         } else {
-            patternMacroString
+            patternString
         }
 
-        return MacroStringDeclaredScope(macroString, patternDeclaredScope)
+        return MacroStringDeclaredScope(string, doBlock = false, patternDeclaredScope)
     }
 
     private const val TAG = "bin_element"
@@ -47,7 +48,7 @@ object BinElement {
                     ?.let { TypeSpecifierList.isDefault(it) }
                     ?: false
 
-    private fun ifOptionsMacroString(term: OtpErlangTuple): String? {
+    private fun ifOptionsString(term: OtpErlangTuple): String? {
         val sizeMacroString = sizeMacroString(term)
         val typeSpecifierListMacroString = typeSpecifierListMacroString(term)
 
@@ -82,13 +83,13 @@ object BinElement {
     private fun patternMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope) =
             toPattern(term)
                     ?.let { Pattern.toMacroStringDeclaredScope(it, scope) }
-                    ?: MacroStringDeclaredScope("unknown_pattern", Scope.EMPTY)
+                    ?: MacroStringDeclaredScope("unknown_pattern", doBlock = false, Scope.EMPTY)
 
     private fun sizeMacroString(term: OtpErlangTuple): String? {
         val size = toSize(term)
 
         return if (size != null) {
-            Size.toMacroString(size)
+            Size.toString(size)
         } else {
             "unknown_size"
         }

@@ -12,24 +12,24 @@ object BoundedFun {
     fun funBound(definition: OtpErlangTuple): OtpErlangObject? = definition.elementAt(3)
 
     fun <T> ifTo(type: OtpErlangTuple, ifTrue: (OtpErlangTuple) -> T): T? = ifSubtypeTo(type, SUBTYPE, ifTrue)
-    fun ifToMacroString(type: OtpErlangTuple): MacroString? = ifTo(type) { toMacroString(type) }
+    fun ifToString(type: OtpErlangTuple): String? = ifTo(type) { toString(type) }
 
-    fun ifToMacroString(type: OtpErlangTuple,
-                        decompiler: MacroNameArity,
-                        macroNameArity: org.elixir_lang.beam.MacroNameArity): MacroString? =
-            ifTo(type) { toMacroString(type, decompiler, macroNameArity) }
+    fun ifToString(type: OtpErlangTuple,
+                   decompiler: MacroNameArity,
+                   macroNameArity: org.elixir_lang.beam.MacroNameArity): String? =
+            ifTo(type) { toString(type, decompiler, macroNameArity) }
 
     private const val SUBTYPE = "bounded_fun"
 
-    private fun toMacroString(@Suppress("UNUSED_PARAMETER") type: OtpErlangTuple): MacroString {
+    private fun toString(@Suppress("UNUSED_PARAMETER") type: OtpErlangTuple): String {
         TODO()
     }
 
-    private fun toMacroString(type: OtpErlangTuple,
-                              decompiler: MacroNameArity,
-                              macroNameArity: org.elixir_lang.beam.MacroNameArity): MacroString =
+    private fun toString(type: OtpErlangTuple,
+                         decompiler: MacroNameArity,
+                         macroNameArity: org.elixir_lang.beam.MacroNameArity): String =
             when (val funBound = funBound(type)) {
-                is OtpErlangList -> FunBound.toMacroString(funBound, decompiler, macroNameArity)
+                is OtpErlangList -> FunBound.toString(funBound, decompiler, macroNameArity)
                 else -> "unknown_fun_bound"
             }
 }

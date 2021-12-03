@@ -40,6 +40,9 @@ object AbstractCode {
                 }
             }
 
+    fun toString(term: OtpErlangObject, scope: Scope = Scope.EMPTY): String =
+            toMacroStringDeclaredScope(term, scope).macroString.string
+
     fun toMacroStringDeclaredScope(term: OtpErlangObject, scope: Scope): MacroStringDeclaredScope =
             AbstractCodeString.ifToMacroStringDeclaredScope(term) ?:
             AnnotatedType.ifToMacroStringDeclaredScope(term) ?:
@@ -71,5 +74,6 @@ object AbstractCode {
             Type.ifToMacroStringDeclaredScope(term) ?:
             UserType.ifToMacroStringDeclaredScope(term) ?:
             Var.ifToMacroStringDeclaredScope(term, scope) ?:
-            MacroStringDeclaredScope("unknown_abstract_code", Scope.EMPTY)
+            MacroStringDeclaredScope("unknown_abstract_code", doBlock = false, Scope.EMPTY)
 }
+

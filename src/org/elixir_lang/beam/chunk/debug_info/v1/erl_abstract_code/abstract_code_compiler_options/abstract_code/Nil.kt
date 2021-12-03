@@ -11,7 +11,7 @@ object Nil {
     fun `is`(term: OtpErlangObject?): Boolean = AbstractCode.ifTag(term, TAG) { true } ?: false
 
     fun toMacroStringDeclaredScope(@Suppress("UNUSED_PARAMETER") term: OtpErlangObject) =
-            MacroStringDeclaredScope("[]", Scope.EMPTY)
+            MacroStringDeclaredScope("[]", doBlock = false, Scope.EMPTY)
 
     private const val TAG = "nil"
 }

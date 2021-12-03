@@ -14,7 +14,7 @@ object Type {
             ifSubtypeTo(type, setOf(subtype), ifTrue)
 
     fun <T> ifSubtypeTo(type: OtpErlangTuple, subtypeSet: Set<String>, ifTrue: (OtpErlangTuple) -> T): T? =
-        if (subtypeSet.contains(subtypeMacroString(type))) {
+        if (subtypeSet.contains(subtypeString(type))) {
             ifTrue(type)
         } else {
             null
@@ -27,38 +27,37 @@ object Type {
     ): MacroStringDeclaredScope? =
             ifTo(term) { toMacroStringDeclaredScope(it) }
 
-    fun subtypeMacroString(type: OtpErlangTuple): MacroString =
+    fun subtypeString(type: OtpErlangTuple): String =
             toSubtype(type)
-                    ?.let { subtypeToMacroString(it) }
+                    ?.let { subtypeToString(it) }
                     ?: "missing_subtype"
-
 
     private const val TAG = "type"
 
-    private fun subtypeToMacroString(subtype: OtpErlangAtom) = subtype.atomValue()
+    private fun subtypeToString(subtype: OtpErlangAtom) = subtype.atomValue()
 
-    private fun subtypeToMacroString(subtype: OtpErlangObject) =
+    private fun subtypeToString(subtype: OtpErlangObject): String =
             when (subtype) {
-                is OtpErlangAtom -> subtypeToMacroString(subtype)
+                is OtpErlangAtom -> subtypeToString(subtype)
                 else -> "unknown_subtype"
             }
 
-    private fun toMacroString(type: OtpErlangTuple) =
-        BoundedFun.ifToMacroString(type) ?:
-        Builtin.ifToMacroString(type) ?:
-        Constraint.ifToMacroString(type) ?:
-        FieldType.ifToMacroString(type) ?:
-        MapFieldAssociation.ifToMacroString(type) ?:
-        MapFieldExact.ifToMacroString(type) ?:
-        Fun.ifToMacroString(type) ?:
-        Product.ifToMacroString(type) ?:
-        Range.ifToMacroString(type) ?:
-        Record.ifToMacroString(type) ?:
-        Union.ifToMacroString(type) ?:
+    private fun toString(type: OtpErlangTuple): String =
+        BoundedFun.ifToString(type) ?:
+        Builtin.ifToString(type) ?:
+        Constraint.ifToString(type) ?:
+        FieldType.ifToString(type) ?:
+        MapFieldAssociation.ifToString(type) ?:
+        MapFieldExact.ifToString(type) ?:
+        Fun.ifToString(type) ?:
+        Product.ifToString(type) ?:
+        Range.ifToString(type) ?:
+        Record.ifToString(type) ?:
+        Union.ifToString(type) ?:
         "unknown_type"
 
     private fun toMacroStringDeclaredScope(type: OtpErlangTuple) =
-            MacroStringDeclaredScope(toMacroString(type), Scope.EMPTY)
+            MacroStringDeclaredScope(toString(type), doBlock = false, Scope.EMPTY)
 
     private fun toSubtype(type: OtpErlangTuple): OtpErlangObject? = type.elementAt(2)
 }

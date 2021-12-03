@@ -16,12 +16,12 @@ object Try {
 
     private const val TAG = "try"
 
-    private fun bodyMacroString(term: OtpErlangTuple, scope: Scope) =
+    private fun bodyString(term: OtpErlangTuple, scope: Scope): String =
             toBody(term)
-                    ?.let { Body.toMacroStringDeclaredScope(it, scope).macroString }
+                    ?.let { Body.toString(it, scope) }
                     ?: "missing_body"
 
-    private fun caseClausesMacroString(term: OtpErlangTuple, scope: Scope): MacroString? {
+    private fun caseClausesString(term: OtpErlangTuple, scope: Scope): String? {
         val caseClauses = toCaseClauses(term)
 
         return if (caseClauses != null) {
@@ -35,7 +35,7 @@ object Try {
             if (caseClauses.arity() > 0) {
                 caseClauses
                         .joinToString("\n") {
-                            Clause.ifToMacroString(it, scope) ?: "unknown_case_clause"
+                            Clause.ifToString(it, scope) ?: "unknown_case_clause"
                         }
                         .let { adjustNewLines(it, "\n  ") }
             } else {
@@ -48,30 +48,30 @@ object Try {
                 else -> "unknown_case_clauses"
             }
 
-    private fun catchClausesMacroString(term: OtpErlangTuple, scope: Scope): MacroString? {
+    private fun catchClausesString(term: OtpErlangTuple, scope: Scope): String? {
         val catchClauses = toCatchClauses(term)
 
         return if (catchClauses != null) {
-            catchClausesToMacroString(catchClauses, scope)
+            catchClausesToString(catchClauses, scope)
         } else {
             "missing_catch_clauses"
         }
     }
 
-    private fun catchClausesToMacroString(catchClauses: OtpErlangList, scope: Scope) =
+    private fun catchClausesToString(catchClauses: OtpErlangList, scope: Scope): String? =
         if (catchClauses.arity() > 0) {
             catchClauses
                     .joinToString("\n") {
-                        Clause.ifToMacroString(it, scope) ?: "unknown_catch_clause"
+                        Clause.ifToString(it, scope) ?: "unknown_catch_clause"
                     }
                     .let { adjustNewLines(it, "\n  ") }
         } else {
             null
         }
 
-    private fun catchClausesToMacroString(catchClauses: OtpErlangObject, scope: Scope) =
+    private fun catchClausesToString(catchClauses: OtpErlangObject, scope: Scope): String? =
             when (catchClauses) {
-                is OtpErlangList -> catchClausesToMacroString(catchClauses, scope)
+                is OtpErlangList -> catchClausesToString(catchClauses, scope)
                 else -> "unknown_catch_clauses"
             }
 
@@ -79,26 +79,26 @@ object Try {
     private fun toCaseClauses(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(3)
     private fun toCatchClauses(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(4)
 
-    private fun toMacroString(term: OtpErlangTuple, scope: Scope): String {
+    private fun toMacroString(term: OtpErlangTuple, scope: Scope): MacroString {
         val macroStringBuilder = StringBuilder("try do\n")
 
-        val bodyMacroString = bodyMacroString(term, scope)
-        macroStringBuilder.append("  ").append(bodyMacroString).append('\n')
+        val bodyString = bodyString(term, scope)
+        macroStringBuilder.append("  ").append(bodyString).append('\n')
 
-        catchClausesMacroString(term, scope)?.let { catchClausesMacroString ->
+        catchClausesString(term, scope)?.let { catchClausesString ->
             macroStringBuilder
                     .append("catch\n")
-                    .append("  ").append(catchClausesMacroString).append('\n')
+                    .append("  ").append(catchClausesString).append('\n')
         }
 
-        caseClausesMacroString(term, scope)?.let { caseClausesMacroString ->
+        caseClausesString(term, scope)?.let { caseClausesString ->
             macroStringBuilder
                     .append("else\n")
-                    .append("  ").append(caseClausesMacroString).append('\n')
+                    .append("  ").append(caseClausesString).append('\n')
         }
 
         macroStringBuilder.append("end")
 
-        return macroStringBuilder.toString()
+        return MacroString(macroStringBuilder.toString(), doBlock = true)
     }
 }

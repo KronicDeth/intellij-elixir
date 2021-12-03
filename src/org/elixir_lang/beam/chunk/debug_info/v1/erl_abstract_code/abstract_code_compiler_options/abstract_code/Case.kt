@@ -12,55 +12,55 @@ object Case {
             ifTag(term, TAG) { toMacroStringDeclaredScope(it, scope) }
 
     fun toMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope {
-        val macroString = toMacroString(term, scope)
+        val string = toString(term, scope)
 
-        return MacroStringDeclaredScope(macroString, scope)
+        return MacroStringDeclaredScope(string, doBlock = true, Scope.EMPTY)
     }
 
     private const val TAG = "case"
 
-    private fun clausesMacroString(term: OtpErlangTuple, scope: Scope): String =
+    private fun clausesString(term: OtpErlangTuple, scope: Scope): String =
             toClauses(term)
-                    ?.let { clausesToMacroString(it, scope) }
+                    ?.let { clausesToString(it, scope) }
                     ?: "missing_clauses"
 
-    private fun clausesToMacroString(clauses: OtpErlangList, scope: Scope): String =
+    private fun clausesToString(clauses: OtpErlangList, scope: Scope): String =
             clauses
                     .joinToString("\n") {
-                        Clause.ifToMacroString(it, scope) ?:
+                        Clause.ifToString(it, scope) ?:
                         "unknown_clause"
                     }
                     .let { adjustNewLines(it, "\n  ") }
 
-    private fun clausesToMacroString(clauses: OtpErlangObject, scope: Scope): String =
+    private fun clausesToString(clauses: OtpErlangObject, scope: Scope): String =
             when (clauses) {
-                is OtpErlangList -> clausesToMacroString(clauses, scope)
+                is OtpErlangList -> clausesToString(clauses, scope)
                 else -> "unknown_clauses"
             }
 
     private fun expressionMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope =
             toExpression(term)
                     ?.let { AbstractCode.toMacroStringDeclaredScope(it, scope) }
-                    ?: MacroStringDeclaredScope("missing_expression", scope)
+                    ?: MacroStringDeclaredScope("missing_expression", doBlock = false, scope)
 
     private fun toClauses(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(3)
     private fun toExpression(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
 
-    private fun toMacroString(term: OtpErlangTuple, scope: Scope): String {
+    private fun toString(term: OtpErlangTuple, scope: Scope): String {
         val (expressionMacroString, expressionDeclaredScope) = expressionMacroStringDeclaredScope(term, scope)
-        val clausesMacroString = clausesMacroString(term, expressionDeclaredScope)
+        val clausesString = clausesString(term, expressionDeclaredScope)
         val macroStringBuilder = StringBuilder()
 
-        if (expressionMacroString.contains(" do\n")) {
+        if (expressionMacroString.doBlock) {
             macroStringBuilder
-                    .append(expressionMacroString).append('\n')
+                    .append(expressionMacroString.string).append('\n')
                     .append("|> case do\n")
         } else {
-            macroStringBuilder.append("case $expressionMacroString do\n")
+            macroStringBuilder.append("case ${expressionMacroString.string} do\n")
         }
 
         macroStringBuilder
-                .append("  $clausesMacroString\n")
+                .append("  $clausesString\n")
                 .append("end")
 
         return macroStringBuilder.toString()

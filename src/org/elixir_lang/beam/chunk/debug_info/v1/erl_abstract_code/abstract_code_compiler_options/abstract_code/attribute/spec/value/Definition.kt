@@ -2,7 +2,6 @@ package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code
 
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
-import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.MacroString
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Type
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.type.BoundedFun
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.type.Fun
@@ -10,20 +9,20 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_
 import org.elixir_lang.beam.decompiler.MacroNameArity
 
 object Definition {
-    fun toMacroString(definition: OtpErlangObject,
-                      decompiler: MacroNameArity,
-                      macroNameArity: org.elixir_lang.beam.MacroNameArity): MacroString =
+    fun toString(definition: OtpErlangObject,
+                 decompiler: MacroNameArity,
+                 macroNameArity: org.elixir_lang.beam.MacroNameArity): String =
         when (definition) {
-            is OtpErlangTuple -> toMacroString(definition, decompiler, macroNameArity)
+            is OtpErlangTuple -> toString(definition, decompiler, macroNameArity)
             else -> "unknown_type() :: unknown_definition"
         }
 
-    private fun toMacroString(definition: OtpErlangTuple,
-                              decompiler: MacroNameArity,
-                              macroNameArity: org.elixir_lang.beam.MacroNameArity) =
+    private fun toString(definition: OtpErlangTuple,
+                         decompiler: MacroNameArity,
+                         macroNameArity: org.elixir_lang.beam.MacroNameArity) =
             Type.ifTo(definition) {
-                BoundedFun.ifToMacroString(definition, decompiler, macroNameArity) ?:
-                Fun.ifToMacroString(definition, decompiler, macroNameArity) ?:
+                BoundedFun.ifToString(definition, decompiler, macroNameArity) ?:
+                Fun.ifToString(definition, decompiler, macroNameArity) ?:
                 fallback(decompiler, macroNameArity, "unknown_subtype")
             } ?: fallback(decompiler, macroNameArity, "unknown_definition")
 

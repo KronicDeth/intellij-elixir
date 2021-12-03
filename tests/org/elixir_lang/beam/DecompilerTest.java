@@ -461,6 +461,10 @@ public class DecompilerTest extends PlatformTestCase {
         assertDecompiled("diameter_gen_relay");
     }
 
+    public void testIssue2306() throws IOException {
+        assertDecompiled("dialyzer_callgraph");
+    }
+
     /*
      * Instance Methods
      */

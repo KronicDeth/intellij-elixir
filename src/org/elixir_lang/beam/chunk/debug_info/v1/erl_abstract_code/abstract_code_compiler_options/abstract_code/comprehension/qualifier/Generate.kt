@@ -15,10 +15,10 @@ object Generate {
         val (expressionMacroString, expressionDeclaredScope) = expressionMacroStringDeclaredScope(term, scope)
         val patternScope = scope.union(expressionDeclaredScope)
         val (patternMacroString, patternDeclaredScope) = patternMacroStringDeclaredScope(term, patternScope)
-        val macroString = "$patternMacroString <- $expressionMacroString"
+        val macroString = "${patternMacroString.string} <- ${expressionMacroString.group().string}"
         val declaredScope = patternScope.union(patternDeclaredScope)
 
-        return MacroStringDeclaredScope(macroString, declaredScope)
+        return MacroStringDeclaredScope(macroString, doBlock = false, declaredScope)
     }
 
     private const val TAG = "generate"
@@ -26,12 +26,12 @@ object Generate {
     private fun expressionMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope) =
             toExpression(term)
                     ?.let { AbstractCode.toMacroStringDeclaredScope(it, scope) }
-                    ?: MacroStringDeclaredScope("missing_expression", Scope.EMPTY)
+                    ?: MacroStringDeclaredScope.error("missing_expression")
 
     private fun patternMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope) =
             toPattern(term)
                     ?.let { AbstractCode.toMacroStringDeclaredScope(it, scope) }
-                    ?: MacroStringDeclaredScope("missing_pattern", Scope.EMPTY)
+                    ?: MacroStringDeclaredScope.error("missing_pattern")
 
     private fun toExpression(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(3)
     private fun toPattern(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)

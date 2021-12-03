@@ -13,11 +13,11 @@ object RemoteType {
 
     private fun toList(remoteType: OtpErlangTuple) = remoteType.elementAt(2)
 
-    private fun toMacroString(remoteType: OtpErlangTuple) =
+    private fun toString(remoteType: OtpErlangTuple): String =
             toList(remoteType)
-                    ?.let { List.toMacroString(it) }
+                    ?.let { List.toString(it) }
                     ?: "missing_remote_type_list"
 
     private fun toMacroStringDeclaredScope(remoteType: OtpErlangTuple) =
-            MacroStringDeclaredScope(toMacroString(remoteType), Scope.EMPTY)
+            MacroStringDeclaredScope(toString(remoteType), doBlock = false, Scope.EMPTY)
 }

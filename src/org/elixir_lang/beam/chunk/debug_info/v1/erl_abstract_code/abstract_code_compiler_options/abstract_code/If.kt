@@ -15,44 +15,45 @@ object If {
 
     private const val TAG = "if"
 
-    private fun clausesMacroString(term: OtpErlangTuple, scope: Scope): String =
+    private fun clausesString(term: OtpErlangTuple, scope: Scope): String =
             toClauses(term)
-                    ?.let { clausesToMacroString(it, scope) }
+                    ?.let { clausesToString(it, scope) }
                     ?: "missing_clauses"
 
-    private fun clausesToMacroString(caseClauses: OtpErlangList, scope: Scope): String =
+    private fun clausesToString(caseClauses: OtpErlangList, scope: Scope): String =
             caseClauses
                     .joinToString("\n") {
                         Clause.ifTo(it) {
-                            clauseToMacroString(it, scope)
+                            clauseToString(it, scope)
                         } ?:
                         "unknown_clause"
                     }
                     .let { Macro.adjustNewLines(it, "\n  ") }
 
-    private fun clausesToMacroString(caseClauses: OtpErlangObject, scope: Scope): String =
+    private fun clausesToString(caseClauses: OtpErlangObject, scope: Scope): String =
             when (caseClauses) {
-                is OtpErlangList -> clausesToMacroString(caseClauses, scope)
+                is OtpErlangList -> clausesToString(caseClauses, scope)
                 else -> "unknown_clauses"
             }
 
     // no patterns since Erlang if can only use guards
-    private fun clauseToMacroString(clause: OtpErlangTuple, scope: Scope): String {
+    private fun clauseToString(clause: OtpErlangTuple, scope: Scope): String {
         // cannot use Clause.guardSequenceMacroString because it adds `when ` prefix
-        val guardsMacroString = Clause.guardsMacroString(clause)
-        val bodyMacroString = Clause.bodyMacroString(clause, scope)
+        val guardsString = Clause.guardsString(clause)
+        val bodyString = Clause.bodyString(clause, scope)
 
-        return "$guardsMacroString ->\n" +
-                "  $bodyMacroString"
+        return "$guardsString ->\n" +
+                "  $bodyString"
     }
 
     private fun toClauses(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
 
-    private fun toMacroString(term: OtpErlangTuple, scope: Scope): String {
-        val clausesMacroString = clausesMacroString(term, scope)
-
-        return "cond do\n" +
-                "  $clausesMacroString\n" +
+    private fun toMacroString(term: OtpErlangTuple, scope: Scope): MacroString {
+        val clausesString = clausesString(term, scope)
+        val string = "cond do\n" +
+                "  $clausesString\n" +
                 "end"
+
+        return MacroString(string, doBlock = true)
     }
 }

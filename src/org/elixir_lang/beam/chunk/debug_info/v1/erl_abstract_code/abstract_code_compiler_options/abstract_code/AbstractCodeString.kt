@@ -38,13 +38,13 @@ object AbstractCodeString {
     private fun stringMacroString(term: OtpErlangTuple) =
             toString(term)
                     ?.let { stringToMacroString(it) }
-                    ?: "missing_string"
+                    ?: MacroString("missing_string", doBlock = false)
 
-    private fun stringToMacroString(term: OtpErlangObject): String =
+    private fun stringToMacroString(term: OtpErlangObject): MacroString =
         when (term) {
             is OtpErlangString -> stringToMacroString(term)
-            else -> "unknown_string"
+            else -> MacroString("unknown_string", doBlock = false)
         }
 
-    private fun stringToMacroString(term: OtpErlangString): String = inspect(term)
+    private fun stringToMacroString(term: OtpErlangString): MacroString = MacroString(inspect(term), doBlock = false)
 }

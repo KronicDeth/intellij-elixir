@@ -7,13 +7,13 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.type.record.NameRecordFields
 
 object Record {
-    fun ifToMacroString(type: OtpErlangTuple): MacroString? = ifSubtypeTo(type, SUBTYPE) { toMacroString(type) }
+    fun ifToString(type: OtpErlangTuple): String? = ifSubtypeTo(type, SUBTYPE) { toString(type) }
 
     private const val SUBTYPE = "record"
 
-    private fun toMacroString(type: OtpErlangTuple) =
+    private fun toString(type: OtpErlangTuple) =
             toNameRecordFields(type)
-                    ?.let { NameRecordFields.toMacroString(it) }
+                    ?.let { NameRecordFields.toString(it) }
                     ?: "missing_name_record_fields"
 
     private fun toNameRecordFields(type: OtpErlangTuple): OtpErlangObject? = type.elementAt(3)

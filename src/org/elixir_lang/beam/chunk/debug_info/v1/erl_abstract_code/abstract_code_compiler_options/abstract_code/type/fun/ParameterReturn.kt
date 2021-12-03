@@ -12,65 +12,60 @@ import org.elixir_lang.beam.decompiler.Default
 import org.elixir_lang.beam.decompiler.MacroNameArity
 
 object ParameterReturn {
-    fun toMacroString(parameterReturn: OtpErlangList): MacroString {
-        val arity = parameterReturn.arity()
-
-        return when (arity) {
-            0 -> "function()"
-            2 -> toMacroString(parameterReturn.elementAt(0), parameterReturn.elementAt(1))
-            else -> "unknown_parameter_return_arity($arity)"
-        }
+    fun toString(parameterReturn: OtpErlangList): String = when (val arity = parameterReturn.arity()) {
+        0 -> "function()"
+        2 -> toString(parameterReturn.elementAt(0), parameterReturn.elementAt(1))
+        else -> "unknown_parameter_return_arity($arity)"
     }
 
-    fun toMacroString(parameterReturn: OtpErlangList,
-                      decompiler: MacroNameArity,
-                      macroNameArity: org.elixir_lang.beam.MacroNameArity): MacroString {
-        val nameParameterString = parameterMacroString(parameterReturn, decompiler, macroNameArity)
-        val returnMacroString = returnMacroString(parameterReturn)
+    fun toString(parameterReturn: OtpErlangList,
+                 decompiler: MacroNameArity,
+                 macroNameArity: org.elixir_lang.beam.MacroNameArity): String {
+        val parameterString = parameterString(parameterReturn, decompiler, macroNameArity)
+        val returnString = returnString(parameterReturn)
 
-        return "$nameParameterString :: $returnMacroString"
+        return "$parameterString :: $returnString"
     }
 
-    fun toMacroString(parameter: OtpErlangObject, `return`: OtpErlangObject): MacroString {
-        val parameterMacroString = parameterToMacroString(parameter)
-        val returnMacroString = returnToMacroString(`return`)
+    fun toString(parameter: OtpErlangObject, `return`: OtpErlangObject): String {
+        val parameterString = parameterToString(parameter)
+        val returnString = returnToString(`return`)
 
-        val fnParameterMacroString = when (parameterMacroString) {
+        val fnParameterString = when (parameterString) {
             "" -> "()"
-            else -> parameterMacroString
+            else -> parameterString
         }
 
-        return "($fnParameterMacroString -> $returnMacroString)"
+        return "($fnParameterString -> $returnString)"
     }
 
-    private fun parameterMacroString(parameterReturn: OtpErlangList,
-                                     decompiler: MacroNameArity,
-                                     macroNameArity: org.elixir_lang.beam.MacroNameArity) =
+    private fun parameterString(parameterReturn: OtpErlangList,
+                                decompiler: MacroNameArity,
+                                macroNameArity: org.elixir_lang.beam.MacroNameArity) =
             toParameter(parameterReturn)
-                    ?.let { parameterToMacroString(it, decompiler, macroNameArity) }
+                    ?.let { parameterToString(it, decompiler, macroNameArity) }
                     ?: "missing_parameter"
 
-    private fun parameterToMacroString(parameter: OtpErlangObject) =
-            AbstractCode.toMacroStringDeclaredScope(parameter, Scope.EMPTY).macroString
+    private fun parameterToString(parameter: OtpErlangObject) = AbstractCode.toString(parameter)
 
-    private fun parameterToMacroString(parameter: OtpErlangObject,
-                                       decompiler: MacroNameArity,
-                                       macroNameArity: org.elixir_lang.beam.MacroNameArity): MacroString =
+    private fun parameterToString(parameter: OtpErlangObject,
+                                  decompiler: MacroNameArity,
+                                  macroNameArity: org.elixir_lang.beam.MacroNameArity): String =
         Type.ifTo(parameter) { type ->
             Product.ifTo(type) {
                 Product.toOperands(type)
                         ?.let { Sequence.toMacroStringDeclaredScope(it, decompiler, macroNameArity) }
                         ?.macroString
+                        ?.string
             }
         } ?: fallback(decompiler, macroNameArity)
 
-    private fun returnMacroString(parameterReturn: OtpErlangList) =
+    private fun returnString(parameterReturn: OtpErlangList) =
             toReturn(parameterReturn)
-                    ?.let { returnToMacroString(it) }
+                    ?.let { returnToString(it) }
                     ?: "missing_return"
 
-    private fun returnToMacroString(return_: OtpErlangObject) =
-            AbstractCode.toMacroStringDeclaredScope(return_, Scope.EMPTY).macroString
+    private fun returnToString(return_: OtpErlangObject): String = AbstractCode.toString(return_)
 
     private fun toParameter(parameterReturn: OtpErlangList): OtpErlangObject? = parameterReturn.elementAt(0)
     private fun toReturn(parameterReturn: OtpErlangList): OtpErlangObject? = parameterReturn.elementAt(1)

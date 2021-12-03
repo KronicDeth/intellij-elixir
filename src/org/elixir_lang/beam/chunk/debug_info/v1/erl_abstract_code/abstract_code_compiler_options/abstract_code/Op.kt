@@ -14,7 +14,7 @@ object Op {
     fun toMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope =
             toOperator(term)
                     ?.let { operationToMacroStringDeclaredScope(it, toOperands(term), scope) }
-                    ?: MacroStringDeclaredScope("missing_operator", Scope.EMPTY)
+                    ?: MacroStringDeclaredScope.error("missing_operator")
 
     private const val TAG = "op"
 
@@ -24,43 +24,41 @@ object Op {
             rightOperand: OtpErlangObject,
             scope: Scope
     ): MacroStringDeclaredScope {
-        val operatorMacroString = binaryOperatorToMacroString(operator)
+        val operatorString = binaryOperatorToString(operator)
         val (leftOperandMacroString, leftOperandDeclaredScope) = AbstractCode.toMacroStringDeclaredScope(leftOperand, scope)
+        val leftOperandString = leftOperandMacroString.group().string
         val (rightOperandMacroString, rightOperandDeclaredScope) = AbstractCode.toMacroStringDeclaredScope(rightOperand, scope)
+        val rightOperandString = rightOperandMacroString.group().string
 
-        val macroString = when (operatorMacroString) {
+        val string = when (operatorString) {
             "div", "rem", "send" ->
-                "$operatorMacroString($leftOperandMacroString, $rightOperandMacroString)"
+                "$operatorString($leftOperandString, $rightOperandString)"
             else ->
-                "$leftOperandMacroString $operatorMacroString $rightOperandMacroString"
+                "$leftOperandString $operatorString $rightOperandString"
         }
 
-        return MacroStringDeclaredScope(macroString, leftOperandDeclaredScope.union(rightOperandDeclaredScope))
+        return MacroStringDeclaredScope(string, doBlock = false, leftOperandDeclaredScope.union(rightOperandDeclaredScope))
     }
 
-    private fun binaryOperatorToMacroString(operator: OtpErlangAtom): String {
-        val name = operator.atomValue()
-
-        return when (name) {
-            "!" -> "send"
-            "/=" -> "!="
-            "=/=" -> "!=="
-            "=:=" -> "==="
-            "=<" -> "<="
-            "andalso" -> "and"
-            "band" -> "&&&"
-            "bor" -> "|||"
-            "bsl" -> "<<<"
-            "bsr" -> ">>>"
-            "bxor" -> "^^^"
-            "orelse" -> "or"
-            else -> name
-        }
+    private fun binaryOperatorToString(operator: OtpErlangAtom): String = when (val name = operator.atomValue()) {
+        "!" -> "send"
+        "/=" -> "!="
+        "=/=" -> "!=="
+        "=:=" -> "==="
+        "=<" -> "<="
+        "andalso" -> "and"
+        "band" -> "&&&"
+        "bor" -> "|||"
+        "bsl" -> "<<<"
+        "bsr" -> ">>>"
+        "bxor" -> "^^^"
+        "orelse" -> "or"
+        else -> name
     }
 
-    private fun binaryOperatorToMacroString(operator: OtpErlangObject): String =
+    private fun binaryOperatorToString(operator: OtpErlangObject): String =
             when (operator) {
-                is OtpErlangAtom -> binaryOperatorToMacroString(operator)
+                is OtpErlangAtom -> binaryOperatorToString(operator)
                 else -> "unknown_binary_operator"
             }
 
@@ -72,7 +70,7 @@ object Op {
         when (operands.size) {
             1 -> unaryOperationToMacroStringDeclaredScope(operator, operands.single(), scope)
             2 -> binaryOperationToMacroStringDeclaredScope(operands.first(), operator, operands.last(), scope)
-            else -> MacroStringDeclaredScope( "unknown_operation_arity", Scope.EMPTY)
+            else -> MacroStringDeclaredScope.error( "unknown_operation_arity")
         }
 
     private fun toOperator(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
@@ -83,32 +81,30 @@ object Op {
             operand: OtpErlangObject,
             scope: Scope
     ): MacroStringDeclaredScope {
-        val operatorMacroString = unaryOperatorToMacroString(operator)
-        val macroStringBuilder = StringBuilder().append(operatorMacroString)
+        val operatorString = unaryOperatorToString(operator)
+        val stringBuilder = StringBuilder().append(operatorString)
 
         val (operandMacroString, operandDeclaredScope) = AbstractCode.toMacroStringDeclaredScope(operand, scope)
+        val operandString = operandMacroString.string
 
-        if (operandMacroString == "not") {
-            macroStringBuilder.append(' ')
+        if (operandString == "not") {
+            stringBuilder.append(' ')
         }
 
-        macroStringBuilder.append(operandMacroString)
+        stringBuilder.append(operandString)
 
-        return MacroStringDeclaredScope(macroStringBuilder.toString(), operandDeclaredScope)
+        return MacroStringDeclaredScope(stringBuilder.toString(), doBlock = false, operandDeclaredScope)
     }
 
-    private fun unaryOperatorToMacroString(operator: OtpErlangAtom): MacroString {
-        val inspectedAsFunction = inspectAsFunction(operator)
+    private fun unaryOperatorToString(operator: OtpErlangAtom): String =
+            when (val inspectedAsFunction = inspectAsFunction(operator)) {
+                "bnot" -> "~~~"
+                else -> inspectedAsFunction
+            }
 
-        return when (inspectedAsFunction) {
-            "bnot" -> "~~~"
-            else -> inspectedAsFunction
-        }
-    }
-
-    private fun unaryOperatorToMacroString(operator: OtpErlangObject) =
+    private fun unaryOperatorToString(operator: OtpErlangObject) =
             when (operator) {
-                is OtpErlangAtom -> unaryOperatorToMacroString(operator)
+                is OtpErlangAtom -> unaryOperatorToString(operator)
                 else -> "unknown_unary_operator"
             }
 }

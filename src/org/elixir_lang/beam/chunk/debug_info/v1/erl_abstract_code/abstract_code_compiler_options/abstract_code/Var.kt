@@ -9,7 +9,7 @@ import org.elixir_lang.code.Identifier.inspectAsKey
 
 object Var {
     fun <T> ifTo(term: OtpErlangObject?, ifTrue: (OtpErlangTuple) -> T): T? = ifTag(term, TAG, ifTrue)
-    fun ifToKey(term: OtpErlangObject?): MacroString? = ifTo(term) { toKey(it) }
+    fun ifToKey(term: OtpErlangObject?): String? = ifTo(term) { toKey(it) }
 
     fun ifToMacroStringDeclaredScope(term: OtpErlangObject?, scope: Scope): MacroStringDeclaredScope? =
             ifTo(term) { toMacroStringDeclaredScope(it, scope) }
@@ -25,9 +25,9 @@ object Var {
     private fun nameMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope) =
             toName(term)
                     ?.let{ nameToMacroStringDeclaredScope(it, scope) }
-                    ?: MacroStringDeclaredScope("name_missing", Scope.EMPTY)
+                    ?: MacroStringDeclaredScope.error("name_missing")
 
-    private fun nameToKey(name: OtpErlangAtom) = name.let { nameToMacroString(it) }.let { inspectAsKey(it) }
+    private fun nameToKey(name: OtpErlangAtom) = name.let { nameToString(it) }.let { inspectAsKey(it) }
 
     private fun nameToKey(name: OtpErlangObject) =
             when (name) {
@@ -35,14 +35,14 @@ object Var {
                 else -> "unknown_name:"
             }
 
-    private fun nameToMacroString(name: OtpErlangAtom) = name.atomValue().decapitalize().escapeElixirKeyword()
+    private fun nameToString(name: OtpErlangAtom) = name.atomValue().decapitalize().escapeElixirKeyword()
 
     private fun nameToMacroStringDeclaredScope(name: OtpErlangAtom, scope: Scope): MacroStringDeclaredScope {
-        val varName = nameToMacroString(name)
+        val varName = nameToString(name)
 
         return when {
             varName == IGNORE ->
-                MacroStringDeclaredScope(varName, Scope(emptySet()))
+                MacroStringDeclaredScope(varName, doBlock = false, Scope.EMPTY)
             scope.varNameSet.contains(varName) -> {
                 val pin = if (scope.pinning) {
                     "^"
@@ -50,17 +50,17 @@ object Var {
                     ""
                 }
 
-                MacroStringDeclaredScope("$pin$varName", Scope.EMPTY)
+                MacroStringDeclaredScope("$pin$varName", doBlock = false, Scope.EMPTY)
             }
             else ->
-                MacroStringDeclaredScope(varName, Scope(setOf(varName)))
+                MacroStringDeclaredScope(varName, doBlock = false, Scope(setOf(varName)))
         }
     }
 
     private fun nameToMacroStringDeclaredScope(name: OtpErlangObject, scope: Scope): MacroStringDeclaredScope =
             when (name) {
                 is OtpErlangAtom -> nameToMacroStringDeclaredScope(name, scope)
-                else -> MacroStringDeclaredScope("unknown_name", Scope.EMPTY)
+                else -> MacroStringDeclaredScope.error("unknown_name")
             }
 
     private fun toKey(term: OtpErlangTuple) =
@@ -73,7 +73,7 @@ object Var {
 
 private val KEYWORD_BLOCK_KEYWORD_SET = Macro.KEYWORD_BLOCK_KEYWORDS.toSet()
 
-private fun String.escapeElixirKeyword(): MacroString =
+private fun String.escapeElixirKeyword(): String =
     if (KEYWORD_BLOCK_KEYWORD_SET.contains(this) || this == "end" || this == "fn" || this == "in" || this == "when") {
         "erlangVariable${this.capitalize()}"
     } else {

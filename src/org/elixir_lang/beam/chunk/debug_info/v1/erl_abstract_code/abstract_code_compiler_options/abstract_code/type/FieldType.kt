@@ -11,49 +11,48 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_
 import org.elixir_lang.code.Identifier
 
 object FieldType {
-    fun ifToMacroString(type: OtpErlangTuple): MacroString? = ifSubtypeTo(type, SUBTYPE) { toMacroString(type) }
+    fun ifToString(type: OtpErlangTuple): String? = ifSubtypeTo(type, SUBTYPE) { toString(type) }
 
     private const val SUBTYPE = "field_type"
 
-    private fun toMacroString(@Suppress("UNUSED_PARAMETER") fieldType: OtpErlangTuple): MacroString =
+    private fun toString(@Suppress("UNUSED_PARAMETER") fieldType: OtpErlangTuple): String =
         toPair(fieldType)
-                ?.let { pairToMacroString(it) }
+                ?.let { pairToString(it) }
                 ?: "missing_pair"
 
     private fun toPair(type: OtpErlangTuple): OtpErlangObject? = type.elementAt(3)
 
-    private fun pairToMacroString(pair: OtpErlangObject): MacroString =
+    private fun pairToString(pair: OtpErlangObject): String =
             when (pair) {
-                is OtpErlangList -> pairToMacroString(pair)
+                is OtpErlangList -> pairToString(pair)
                 else -> "unknown_pair"
             }
 
-    private fun pairToMacroString(pair: OtpErlangList): MacroString {
-        val fieldMacroString = fieldMacroString(pair)
-        val typeMacroString = typeMacroString(pair)
+    private fun pairToString(pair: OtpErlangList): String {
+        val fieldString = fieldString(pair)
+        val typeString = typeString(pair)
 
-        return "$fieldMacroString :: $typeMacroString"
+        return "$fieldString :: $typeString"
     }
 
-    private fun fieldMacroString(pair: OtpErlangList) =
+    private fun fieldString(pair: OtpErlangList) =
             pairToField(pair)
-                    ?.let { fieldToMacroString(it) }
+                    ?.let { fieldToString(it) }
                     ?: "missing_field"
 
     private fun pairToField(pair: OtpErlangList): OtpErlangObject? = pair.elementAt(0)
 
-    private fun fieldToMacroString(field: OtpErlangObject) =
+    private fun fieldToString(field: OtpErlangObject) =
             Atom.toElixirAtom(field)?.let { elixirAtom ->
                 Identifier.inspectAsFunction(elixirAtom, true)
             } ?: "unknown_field"
 
-    private fun typeMacroString(pair: OtpErlangList) =
+    private fun typeString(pair: OtpErlangList) =
             pairToType(pair)
-                    ?.let { typeToMacroString(it) }
+                    ?.let { typeToString(it) }
                     ?: "missing_type"
 
     private fun pairToType(pair: OtpErlangList) = pair.elementAt(1)
 
-    private fun typeToMacroString(type: OtpErlangObject) =
-            AbstractCode.toMacroStringDeclaredScope(type, Scope.EMPTY).macroString
+    private fun typeToString(type: OtpErlangObject) = AbstractCode.toString(type)
 }

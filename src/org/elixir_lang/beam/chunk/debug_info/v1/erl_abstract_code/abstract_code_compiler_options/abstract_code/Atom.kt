@@ -13,11 +13,11 @@ object Atom {
     fun ifToMacroStringDeclaredScope(term: OtpErlangObject?): MacroStringDeclaredScope? =
             ifTo(term) { toMacroStringDeclaredScope(it) }
 
-    fun toAtom(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
+    private fun toAtom(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
 
     fun toElixirAtom(term: OtpErlangObject?): OtpErlangAtom? =
-            Atom.ifTo(term) {
-                Atom.toAtom(it)?.let { atom ->
+            ifTo(term) {
+                toAtom(it)?.let { atom ->
                     atom as? OtpErlangAtom
                 }
             }
@@ -30,8 +30,11 @@ object Atom {
 
     private const val TAG = "atom"
 
-    private fun toMacroString(term: OtpErlangTuple): String =
-            toAtom(term)
-                    ?.let { inspect(it) }
-                    ?: ":unknown_atom"
+    private fun toMacroString(term: OtpErlangTuple): MacroString {
+        val string = toAtom(term)
+                ?.let { inspect(it) }
+                ?: ":unknown_atom"
+
+        return MacroString(string, doBlock = false)
+    }
 }

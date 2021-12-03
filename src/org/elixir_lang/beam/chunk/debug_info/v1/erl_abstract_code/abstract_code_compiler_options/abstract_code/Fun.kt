@@ -24,7 +24,7 @@ object Fun {
     private fun argumentToMacroString(argument: OtpErlangObject, scope: Scope): MacroString =
             Function.ifToMacroString(argument, scope) ?:
             Clauses.ifToMacroString(argument, scope) ?:
-            "unknown_fun_argument"
+            MacroString.error("unknown_fun_argument")
 
     private fun toArgument(term: OtpErlangTuple): OtpErlangObject = term.elementAt(2)
 
@@ -32,7 +32,7 @@ object Fun {
             term.arity().let { arity ->
                 when (arity) {
                     3 -> argumentMacroString(term, scope)
-                    else -> "unknown_function_arity($arity)"
+                    else -> MacroString.error("unknown_function_arity($arity)")
                 }
             }
 }

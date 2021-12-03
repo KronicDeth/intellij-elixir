@@ -51,7 +51,7 @@ class Type(val attributes: Attributes, attribute: Attribute): MacroString(attrib
                     null
                 }
 
-        private fun nameMacroString(term: OtpErlangTuple) =
+        private fun nameString(term: OtpErlangTuple): String =
             toName(term)
                     ?.let { nameToMacroString(it) }
                     ?: "missing_name"
@@ -69,21 +69,20 @@ class Type(val attributes: Attributes, attribute: Attribute): MacroString(attrib
                 }
 
         private fun subtypeMacroString(term: OtpErlangTuple): String {
-            val nameMacroString = nameMacroString(term)
-            val valueMacroString = valueMacroString(term)
+            val nameString = nameString(term)
+            val valueString = valueString(term)
 
-            return "$nameMacroString :: $valueMacroString"
+            return "$nameString :: $valueString"
         }
 
         private fun toName(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(0)
         private fun toValue(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(1)
 
-        private fun valueMacroString(term: OtpErlangTuple) =
+        private fun valueString(term: OtpErlangTuple): String =
                 toValue(term)
-                        ?.let { valueToMacroString(it) }
+                        ?.let { valueToString(it) }
                         ?: "unknown_value"
 
-        private fun valueToMacroString(value: OtpErlangObject) =
-                AbstractCode.toMacroStringDeclaredScope(value, Scope.EMPTY).macroString
+        private fun valueToString(value: OtpErlangObject): String = AbstractCode.toString(value)
     }
 }

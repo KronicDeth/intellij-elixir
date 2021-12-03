@@ -66,7 +66,7 @@ defmodule :hipe_icode_call_elim do
     :lists.foldl(fn lbl, cFG1 ->
         bB1 = :hipe_icode_cfg.bb(cFG1, lbl)
         code1 = :hipe_bb.code(bB1)
-        code2 = :lists.map(&fun_unknown_name/1, code1)
+        code2 = :lists.map(&elim_insn/1, code1)
         bB2 = :hipe_bb.code_update(bB1, code2)
         :hipe_icode_cfg.bb_add(cFG1, lbl, bB2)
     end, icodeSSA, :hipe_icode_cfg.labels(icodeSSA))

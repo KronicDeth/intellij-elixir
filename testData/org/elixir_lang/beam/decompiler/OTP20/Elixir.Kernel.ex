@@ -875,14 +875,14 @@ defmodule Kernel do
   end
 
   def expand_module(_raw@1, module@1, env@1) do
-    :elixir_aliases.concat([case env@1 do
+    :elixir_aliases.concat([(case env@1 do
       %{:module => _@1} ->
         _@1
       _@1 when :erlang.is_map(_@1) ->
         :erlang.error({:badkey, :module, _@1})
       _@1 ->
         _@1.module()
-    end, module@1])
+    end), module@1])
   end
 
   def extract_concatenations({:<>, _, [left@1, right@1]}), do: [wrap_concatenation(left@1) | extract_concatenations(right@1)]
@@ -1041,14 +1041,14 @@ defmodule Kernel do
   end
 
   def struct(struct@1, kv@1, fun@1) when :erlang.is_atom(struct@1) do
-    struct(case struct@1 do
+    struct((case struct@1 do
       %{:__struct__ => _@1} ->
         _@1
       _@1 when :erlang.is_map(_@1) ->
         :erlang.error({:badkey, :__struct__, _@1})
       _@1 ->
         _@1.__struct__()
-    end, kv@1, fun@1)
+    end), kv@1, fun@1)
   end
 
   def struct(%{:__struct__ => _} = struct@1, [], _fun@1), do: struct@1

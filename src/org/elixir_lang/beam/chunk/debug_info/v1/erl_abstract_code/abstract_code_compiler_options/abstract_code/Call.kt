@@ -19,52 +19,51 @@ object Call {
             ifTag(term, TAG) { toMacroStringDeclaredScope(it, scope) }
 
     fun toMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope {
-        val macroString = toMacroString(term, scope)
+        val string = toString(term, scope)
 
-        return MacroStringDeclaredScope(macroString, Scope.EMPTY)
+        return MacroStringDeclaredScope(string, doBlock = false, Scope.EMPTY)
     }
 
     private const val TAG = "call"
 
-    private fun anonymousFunctionCallToMacroString(name: OtpErlangTuple, term: OtpErlangTuple): MacroString {
-        val nameMacroString = Var.toMacroStringDeclaredScope(name, Scope.EMPTY).macroString
-        val argumentsMacroString = argumentsMacroString(term)
+    private fun anonymousFunctionCallToString(name: OtpErlangTuple, term: OtpErlangTuple): String {
+        val nameString = Var.toMacroStringDeclaredScope(name, Scope.EMPTY).macroString.string
+        val argumentsMacroString = argumentsString(term)
 
-        return "$nameMacroString.($argumentsMacroString)"
+        return "${nameString}.($argumentsMacroString)"
     }
 
-    private fun inlineAnonymousFunctionCallToMacroString(name: OtpErlangTuple, term: OtpErlangTuple, scope: Scope): MacroString {
-        val nameMacroString = Fun.toMacroStringDeclaredScope(name, scope).macroString
-        val argumentsMacroString = argumentsMacroString(term)
+    private fun inlineAnonymousFunctionCallToMacroString(name: OtpErlangTuple, term: OtpErlangTuple, scope: Scope): String {
+        val nameString = Fun.toMacroStringDeclaredScope(name, scope).macroString.group().string
+        val argumentsString = argumentsString(term)
 
-        return "(${nameMacroString}).($argumentsMacroString)"
+        return "(${nameString}).($argumentsString)"
     }
 
-    private fun argumentsMacroString(term: OtpErlangTuple): String =
+    private fun argumentsString(term: OtpErlangTuple): String =
             toArguments(term)
-                    ?.let { argumentsToMacroString(it) }
+                    ?.let { argumentsToString(it) }
                     ?: "missing_arguments"
 
-    private fun argumentsToMacroString(term: OtpErlangList): String =
-            term.joinToString(", ") { AbstractCode.toMacroStringDeclaredScope(it, Scope.EMPTY).macroString }
+    private fun argumentsToString(term: OtpErlangList): String = Sequence.toCommaSeparatedString(term)
 
-    private fun argumentsToMacroString(term: OtpErlangObject?): String =
+    private fun argumentsToString(term: OtpErlangObject?): String =
         when (term) {
-            is OtpErlangList -> argumentsToMacroString(term)
+            is OtpErlangList -> argumentsToString(term)
             else -> "unknown_arguments"
         }
 
-    private fun localNamedFunctionCallToMacroString(
+    private fun localNamedFunctionCallToString(
             name: OtpErlangObject?,
             arguments: OtpErlangObject?
-    ): MacroString =
+    ): String =
         if (name != null) {
             val elixirAtom = Atom.toElixirAtom(name)
 
             if (elixirAtom != null) {
                 val atomValue = elixirAtom.atomValue()
                 val argumentList = arguments?.toOtpErlangList()
-                val argumentsMacroString = argumentsToMacroString(arguments)
+                val argumentsMacroString = argumentsToString(arguments)
 
                 if (argumentList != null) {
                     val nameArity = NameArity(atomValue, argumentList.arity())
@@ -85,58 +84,58 @@ object Call {
                     "${function}(${argumentsMacroString})"
                 }
             } else {
-                val nameMacroString = AbstractCode.toMacroStringDeclaredScope(name, Scope.EMPTY).macroString
-                val argumentMacroString = argumentsToMacroString(arguments)
+                val nameString = AbstractCode.toString(name)
+                val argumentMacroString = argumentsToString(arguments)
 
-                "${nameMacroString}(${argumentMacroString})"
+                "${nameString}(${argumentMacroString})"
             }
         } else {
             val nameMacroString = "unknown_function"
-            val argumentMacroString = argumentsToMacroString(arguments)
+            val argumentMacroString = argumentsToString(arguments)
 
             "${nameMacroString}(${argumentMacroString})"
         }
 
-    private fun namedFunctionCallToMacroString(term: OtpErlangTuple): MacroString {
+    private fun namedFunctionCallToString(term: OtpErlangTuple): String {
         val name = toName(term)
         val arguments = toArguments(term)
 
         return Remote.ifTo(name) { remoteName ->
-            remoteNamedFunctionCallToMacroString(remoteName, arguments)
-        } ?: localNamedFunctionCallToMacroString(name, arguments)
+            remoteNamedFunctionCallToString(remoteName, arguments)
+        } ?: localNamedFunctionCallToString(name, arguments)
     }
 
-    private fun remoteNamedFunctionCallToMacroString(
+    private fun remoteNamedFunctionCallToString(
             remoteName: OtpErlangTuple,
             arguments: OtpErlangObject?
-    ): MacroString {
+    ): String {
         val remoteFunction = Remote.toFunction(remoteName)
-        val argumentsMacroString = argumentsToMacroString(arguments)
+        val argumentsString = argumentsToString(arguments)
 
         return if (Var.`is`(remoteFunction)) {
-            val remoteModuleMacroString = Remote.moduleMacroString(remoteName)
+            val remoteModuleString = Remote.moduleString(remoteName)
 
-            val remoteFunctionMacroString =
-                    Var.toMacroStringDeclaredScope(remoteFunction as OtpErlangTuple, Scope.EMPTY).macroString
+            val remoteFunctionString =
+                    Var.toMacroStringDeclaredScope(remoteFunction as OtpErlangTuple, Scope.EMPTY).macroString.string
 
-            "apply($remoteModuleMacroString, $remoteFunctionMacroString, [$argumentsMacroString])"
+            "apply($remoteModuleString, $remoteFunctionString, [$argumentsString])"
         } else {
-            val remoteNameMacroString = Remote.toMacroStringDeclaredScope(remoteName).macroString
-            "$remoteNameMacroString($argumentsMacroString)"
+            val remoteNameString = Remote.toMacroStringDeclaredScope(remoteName).macroString.string
+            "$remoteNameString($argumentsString)"
         }
     }
 
     private fun toArguments(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(3)
 
-    private fun toMacroString(term: OtpErlangTuple, scope: Scope): String =
+    private fun toString(term: OtpErlangTuple, scope: Scope): String =
         toName(term).let { name ->
             Var.ifTo(name) {
-                anonymousFunctionCallToMacroString(it, term)
+                anonymousFunctionCallToString(it, term)
             } ?:
             Fun.ifTo(name) {
                 inlineAnonymousFunctionCallToMacroString(it, term, scope)
             } ?:
-            namedFunctionCallToMacroString(term)
+            namedFunctionCallToString(term)
         }
 
     private fun toName(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)

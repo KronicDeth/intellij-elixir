@@ -14,30 +14,30 @@ object Map {
             when (term.arity()) {
                 3 -> constructionToMacroStringDeclaredScope(term, scope)
                 4 -> updateToMacroStringDeclaredScope(term, scope)
-                else -> MacroStringDeclaredScope( "unknown_map_operation", scope)
+                else -> MacroStringDeclaredScope.error( "unknown_map_operation")
             }
 
     private const val TAG = "map"
 
     private fun constructionToMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope =
             associationsMacroString(term, 2, scope).let { (associationsMacroString, associationsDeclaredScope) ->
-                MacroStringDeclaredScope("%{${associationsMacroString}}", associationsDeclaredScope)
+                MacroStringDeclaredScope("%{${associationsMacroString.string}}", doBlock = false, associationsDeclaredScope)
             }
 
     private fun updateToMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope =
             associationsMacroString(term, 3, scope).let { (associationsMacroString, associationsDeclaredScope) ->
-                val sourceMacroString = sourceMacroString(term, scope)
+                val sourceString = sourceMacroString(term, scope).group().string
 
-                MacroStringDeclaredScope("%{${sourceMacroString} | ${associationsMacroString}}", associationsDeclaredScope)
+                MacroStringDeclaredScope("%{${sourceString} | ${associationsMacroString.string}}", doBlock = false, associationsDeclaredScope)
             }
 
-    private fun sourceMacroString(term: OtpErlangTuple, scope: Scope) =
+    private fun sourceMacroString(term: OtpErlangTuple, scope: Scope): MacroString =
             term.elementAt(2)
                     ?.let { AbstractCode.toMacroStringDeclaredScope(it, scope).macroString }
-                    ?: "unknown_map_update_source"
+                    ?: MacroString.error("unknown_map_update_source")
 
     private fun associationsMacroString(term: OtpErlangTuple, index: Int, scope: Scope): MacroStringDeclaredScope =
             term.elementAt(index)
-                ?.let { Elements.toMacroStringDeclaredScope(it, scope) }
-                ?: MacroStringDeclaredScope("missing_associations", Scope.EMPTY)
+                ?.let { Sequence.toCommaSeparatedMacroStringDeclaredScope(it, scope) }
+                ?: MacroStringDeclaredScope.error("missing_associations")
 }

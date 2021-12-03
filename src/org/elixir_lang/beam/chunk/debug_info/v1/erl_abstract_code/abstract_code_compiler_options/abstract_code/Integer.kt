@@ -10,23 +10,23 @@ object Integer {
             ifTag(term, TAG) { toMacroStringDeclaredScope(it) }
 
     fun toMacroStringDeclaredScope(term: OtpErlangTuple): MacroStringDeclaredScope =
-            toMacroString(term)
-                    .let { MacroStringDeclaredScope(it, Scope.EMPTY) }
+            toString(term)
+                    .let { MacroStringDeclaredScope(it, doBlock = false, Scope.EMPTY) }
 
     private const val TAG = "integer"
 
-    private fun integerToMacroString(term: OtpErlangLong): String = term.bigIntegerValue().toString()
+    private fun integerToString(term: OtpErlangLong): String = term.bigIntegerValue().toString()
 
-    private fun integerToMacroString(term: OtpErlangObject): String =
+    private fun integerToString(term: OtpErlangObject): String =
             when (term) {
-                is OtpErlangLong -> integerToMacroString(term)
+                is OtpErlangLong -> integerToString(term)
                 else -> "unknown_integer"
             }
 
     private fun toInteger(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
 
-    private fun toMacroString(term: OtpErlangTuple): String =
+    private fun toString(term: OtpErlangTuple): String =
             toInteger(term)
-                ?.let { integerToMacroString(it) }
+                ?.let { integerToString(it) }
                 ?: "missing_integer"
 }

@@ -22,15 +22,15 @@ object Elements {
                     .map { AbstractCode.toMacroStringDeclaredScope(it, scope) }
                     .unzip()
                     .let { (macroStrings, declaredScopes) ->
-                        val macroString = macroStrings.joinToString(", ")
+                        val string = macroStrings.joinToString(", ", transform = MacroString::string)
                         val declaredScope = declaredScopes.fold(Scope.EMPTY, Scope::union)
 
-                        MacroStringDeclaredScope(macroString, declaredScope)
+                        MacroStringDeclaredScope(string, doBlock = false, declaredScope)
                     }
 
     fun toMacroStringDeclaredScope(term: OtpErlangObject, scope: Scope) =
             when (term) {
                 is OtpErlangList -> toMacroStringDeclaredScope(term, scope)
-                else -> MacroStringDeclaredScope("unknown_elements", Scope.EMPTY)
+                else -> MacroStringDeclaredScope.error("unknown_elements")
             }
 }

@@ -10,7 +10,7 @@ object Tuple {
 
     fun toMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope =
             elementsMacroStringDeclaredScope(term, scope).let { (elementsMacroString, elementsDeclaredScope) ->
-                MacroStringDeclaredScope("{$elementsMacroString}", elementsDeclaredScope)
+                MacroStringDeclaredScope("{${elementsMacroString.string}}", doBlock = false, elementsDeclaredScope)
             }
 
 
@@ -19,7 +19,7 @@ object Tuple {
     private fun elementsMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope) =
             toElements(term)
                     ?.let { Elements.toMacroStringDeclaredScope(it, scope) }
-                    ?: MacroStringDeclaredScope("missing_elements", Scope.EMPTY)
+                    ?: MacroStringDeclaredScope.error("missing_elements")
 
     private fun toElements(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
 }

@@ -8,17 +8,17 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_
 object Size {
     fun isDefault(term: OtpErlangObject): Boolean = (term as? OtpErlangAtom?)?.atomValue() == default
 
-    fun toMacroString(term: OtpErlangAtom): String? =
+    fun toString(term: OtpErlangAtom): String? =
             if (term.atomValue() == default) {
                 null
             } else {
                 "unknown_size_atom"
             }
 
-    fun toMacroString(term: OtpErlangObject): String? =
+    fun toString(term: OtpErlangObject): String? =
             when (term) {
-                is OtpErlangAtom -> toMacroString(term)
-                else -> AbstractCode.toMacroStringDeclaredScope(term, Scope.EMPTY).macroString
+                is OtpErlangAtom -> toString(term)
+                else -> AbstractCode.toString(term)
             }
 
     private const val default = "default"

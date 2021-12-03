@@ -148,9 +148,9 @@ defmodule :asn1ct do
 
   def get_pos_of_def(pobjectsetdef(pos: pos)), do: pos
 
-  def get_pos_of_def(__MODULE__."Externaltypereference"(pos: pos)), do: pos
+  def get_pos_of_def(unquote(:"Externaltypereference")(pos: pos)), do: pos
 
-  def get_pos_of_def(__MODULE__."Externalvaluereference"(pos: pos)), do: pos
+  def get_pos_of_def(unquote(:"Externalvaluereference")(pos: pos)), do: pos
 
   def get_pos_of_def(_), do: :undefined
 
@@ -312,7 +312,7 @@ defmodule :asn1ct do
 
   def unset_pos_mod(def) when is_record(def, :pobjectsetdef), do: pobjectsetdef(def, pos: :undefined)
 
-  def unset_pos_mod(__MODULE__."ComponentType"() = def), do: __MODULE__."ComponentType"(def, pos: :undefined)
+  def unset_pos_mod(unquote(:"ComponentType")() = def), do: unquote(:"ComponentType")(def, pos: :undefined)
 
   def unset_pos_mod(def), do: def
 
@@ -780,7 +780,7 @@ defmodule :asn1ct do
     {:imports, remove_import_doubles(setExternalImportsList)}
   end
 
-  def common_passes(), do: [{:iff, :parse, {:pass, :parse_listing, &fun_unknown_name/1}}, {:pass, :check, &fun_unknown_name/1}, {:iff, :abs, {:pass, :abs_listing, &fun_unknown_name/1}}, {:pass, :generate, &fun_unknown_name/1}, {:unless, :noobj, {:pass, :compile, &fun_unknown_name/1}}]
+  def common_passes(), do: [{:iff, :parse, {:pass, :parse_listing, &parse_listing/1}}, {:pass, :check, &check_pass/1}, {:iff, :abs, {:pass, :abs_listing, &abs_listing/1}}, {:pass, :generate, &generate_pass/1}, {:unless, :noobj, {:pass, :compile, &compile_pass/1}}]
 
   def compare_defs(d1, d2), do: compare_defs2(unset_pos_mod(d1), unset_pos_mod(d2))
 
@@ -935,12 +935,12 @@ defmodule :asn1ct do
     remove_empty_lists.(acc, [], remove_empty_lists)
   end
 
-  def create_pdec_command(modName, [__MODULE__."ComponentType"(name: c1, typespec: tS) | _Comps], [^c1 | cs], acc) do
+  def create_pdec_command(modName, [unquote(:"ComponentType")(name: c1, typespec: tS) | _Comps], [^c1 | cs], acc) do
     tagCommand = get_tag_command(tS, :choosen)
     create_pdec_command(modName, get_components(type(tS, :def)), cs, concat_tags(tagCommand, acc))
   end
 
-  def create_pdec_command(modName, [__MODULE__."ComponentType"(typespec: tS, prop: prop) | comps], [c2 | cs], acc) do
+  def create_pdec_command(modName, [unquote(:"ComponentType")(typespec: tS, prop: prop) | comps], [c2 | cs], acc) do
     tagCommand = case prop do
       :mandatory ->
         get_tag_command(tS, :skip)
@@ -950,13 +950,13 @@ defmodule :asn1ct do
     create_pdec_command(modName, comps, [c2 | cs], concat_tags(tagCommand, acc))
   end
 
-  def create_pdec_command(modName, {:"CHOICE", [comp = __MODULE__."ComponentType"(name: c1) | _]}, tNL = [c1 | _Cs], acc), do: create_pdec_command(modName, [comp], tNL, acc)
+  def create_pdec_command(modName, {:"CHOICE", [comp = unquote(:"ComponentType")(name: c1) | _]}, tNL = [c1 | _Cs], acc), do: create_pdec_command(modName, [comp], tNL, acc)
 
-  def create_pdec_command(modName, {:"CHOICE", [__MODULE__."ComponentType"() | comps]}, tNL, acc), do: create_pdec_command(modName, {:"CHOICE", comps}, tNL, acc)
+  def create_pdec_command(modName, {:"CHOICE", [unquote(:"ComponentType")() | comps]}, tNL, acc), do: create_pdec_command(modName, {:"CHOICE", comps}, tNL, acc)
 
   def create_pdec_command(modName, {:"CHOICE", {cs1, cs2}}, tNL, acc) when is_list(cs1) and is_list(cs2), do: create_pdec_command(modName, {:"CHOICE", cs1 ++ cs2}, tNL, acc)
 
-  def create_pdec_command(modName, __MODULE__."Externaltypereference"(module: m, type: c1), typeNameList, acc) do
+  def create_pdec_command(modName, unquote(:"Externaltypereference")(module: m, type: c1), typeNameList, acc) do
     type(def: def) = get_referenced_type(m, c1)
     create_pdec_command(modName, get_components(def), typeNameList, acc)
   end
@@ -987,18 +987,18 @@ defmodule :asn1ct do
     :lists.reverse([innerDirectives | acc])
   end
 
-  def create_pdec_inc_command(modName, cList = [__MODULE__."ComponentType"(name: name, typespec: tS, prop: prop) | comps], tNL = [c1 | cs], acc), do: ...
+  def create_pdec_inc_command(modName, cList = [unquote(:"ComponentType")(name: name, typespec: tS, prop: prop) | comps], tNL = [c1 | cs], acc), do: ...
 
-  def create_pdec_inc_command(modName, {:"CHOICE", [__MODULE__."ComponentType"(name: c1, typespec: tS, prop: prop) | comps]}, [{^c1, directive} | rest], acc), do: ...
+  def create_pdec_inc_command(modName, {:"CHOICE", [unquote(:"ComponentType")(name: c1, typespec: tS, prop: prop) | comps]}, [{^c1, directive} | rest], acc), do: ...
 
-  def create_pdec_inc_command(modName, {:"CHOICE", [__MODULE__."ComponentType"(typespec: tS, prop: prop) | comps]}, tNL, acc) do
+  def create_pdec_inc_command(modName, {:"CHOICE", [unquote(:"ComponentType")(typespec: tS, prop: prop) | comps]}, tNL, acc) do
     tagCommand = get_tag_command(tS, :alt, prop)
     create_pdec_inc_command(modName, {:"CHOICE", comps}, tNL, concat_sequential(tagCommand, acc))
   end
 
   def create_pdec_inc_command(m, {:"CHOICE", {cs1, cs2}}, tNL, acc) when is_list(cs1) and is_list(cs2), do: create_pdec_inc_command(m, {:"CHOICE", cs1 ++ cs2}, tNL, acc)
 
-  def create_pdec_inc_command(modName, __MODULE__."Externaltypereference"(module: m, type: name), tNL, acc) do
+  def create_pdec_inc_command(modName, unquote(:"Externaltypereference")(module: m, type: name), tNL, acc) do
     type(def: def) = get_referenced_type(m, name)
     create_pdec_inc_command(modName, get_components(def), tNL, acc)
   end
@@ -1006,17 +1006,17 @@ defmodule :asn1ct do
   def create_pdec_inc_command(_, _, tNL, _), do: throw({:error, {'unexpected error when creating partial decode command', tNL}})
 
   def delete_double_of_symbol([i | is], acc) do
-    symL = __MODULE__."SymbolsFromModule"(i, :symbols)
+    symL = unquote(:"SymbolsFromModule")(i, :symbols)
     newSymL = delete_double_of_symbol1(symL, [])
-    delete_double_of_symbol(is, [__MODULE__."SymbolsFromModule"(i, symbols: newSymL) | acc])
+    delete_double_of_symbol(is, [unquote(:"SymbolsFromModule")(i, symbols: newSymL) | acc])
   end
 
   def delete_double_of_symbol([], acc), do: acc
 
-  def delete_double_of_symbol1([tRef = __MODULE__."Externaltypereference"(type: trefName) | rest], acc) do
+  def delete_double_of_symbol1([tRef = unquote(:"Externaltypereference")(type: trefName) | rest], acc) do
     newRest = :lists.filter(fn s ->
         case s do
-          __MODULE__."Externaltypereference"(type: trefName) ->
+          unquote(:"Externaltypereference")(type: trefName) ->
             false
           _ ->
             true
@@ -1025,10 +1025,10 @@ defmodule :asn1ct do
     delete_double_of_symbol1(newRest, [tRef | acc])
   end
 
-  def delete_double_of_symbol1([vRef = __MODULE__."Externalvaluereference"(value: vName) | rest], acc) do
+  def delete_double_of_symbol1([vRef = unquote(:"Externalvaluereference")(value: vName) | rest], acc) do
     newRest = :lists.filter(fn s ->
         case s do
-          __MODULE__."Externalvaluereference"(value: vName) ->
+          unquote(:"Externalvaluereference")(value: vName) ->
             false
           _ ->
             true
@@ -1037,10 +1037,10 @@ defmodule :asn1ct do
     delete_double_of_symbol1(newRest, [vRef | acc])
   end
 
-  def delete_double_of_symbol1([tRef = {__MODULE__."Externaltypereference"(type: mRef), __MODULE__."Externaltypereference"(type: tRef)} | rest], acc) do
+  def delete_double_of_symbol1([tRef = {unquote(:"Externaltypereference")(type: mRef), unquote(:"Externaltypereference")(type: tRef)} | rest], acc) do
     newRest = :lists.filter(fn s ->
         case s do
-          {__MODULE__."Externaltypereference"(type: mRef), __MODULE__."Externaltypereference"(type: tRef)} ->
+          {unquote(:"Externaltypereference")(type: mRef), unquote(:"Externaltypereference")(type: tRef)} ->
             false
           _ ->
             true
@@ -1151,10 +1151,10 @@ defmodule :asn1ct do
     end, l)
   end
 
-  def generated_functions_filter(m, __MODULE__."Externaltypereference"(module: ^m, type: name), l) do
+  def generated_functions_filter(m, unquote(:"Externaltypereference")(module: ^m, type: name), l) do
     removeTType = fn {n, i, [n, p]} when n == name ->
         {n, i, p}
-      {__MODULE__."Externaltypereference"(module: m1, type: n), i, p} when m1 == m ->
+      {unquote(:"Externaltypereference")(module: m1, type: n), i, p} when m1 == m ->
         {n, i, p}
       p ->
         p
@@ -1165,9 +1165,9 @@ defmodule :asn1ct do
 
   def generated_functions_member(_M, name, [{^name, _, _} | _]), do: true
 
-  def generated_functions_member(m, __MODULE__."Externaltypereference"(module: ^m, type: t), [{__MODULE__."Externaltypereference"(module: ^m, type: ^t), _, _} | _]), do: true
+  def generated_functions_member(m, unquote(:"Externaltypereference")(module: ^m, type: t), [{unquote(:"Externaltypereference")(module: ^m, type: ^t), _, _} | _]), do: true
 
-  def generated_functions_member(m, __MODULE__."Externaltypereference"(module: ^m, type: name), [{^name, _, _} | _]), do: true
+  def generated_functions_member(m, unquote(:"Externaltypereference")(module: ^m, type: name), [{^name, _, _} | _]), do: true
 
   def generated_functions_member(m, name, [_ | t]), do: generated_functions_member(m, name, t)
 
@@ -1188,13 +1188,13 @@ defmodule :asn1ct do
     end
   end
 
-  def get_components(__MODULE__."SEQUENCE"(components: {c1, c2})) when is_list(c1) and is_list(c2), do: c1 ++ c2
+  def get_components(unquote(:"SEQUENCE")(components: {c1, c2})) when is_list(c1) and is_list(c2), do: c1 ++ c2
 
-  def get_components(__MODULE__."SEQUENCE"(components: components)), do: components
+  def get_components(unquote(:"SEQUENCE")(components: components)), do: components
 
-  def get_components(__MODULE__."SET"(components: {c1, c2})) when is_list(c1) and is_list(c2), do: c1 ++ c2
+  def get_components(unquote(:"SET")(components: {c1, c2})) when is_list(c1) and is_list(c2), do: c1 ++ c2
 
-  def get_components(__MODULE__."SET"(components: components)), do: components
+  def get_components(unquote(:"SET")(components: components)), do: components
 
   def get_components({:"SEQUENCE OF", components}), do: components
 
@@ -1296,7 +1296,7 @@ defmodule :asn1ct do
     case :asn1_db.dbget(m, name) do
       typedef(typespec: tS) ->
         case tS do
-          type(def: __MODULE__."Externaltypereference"(module: m2, type: name2)) ->
+          type(def: unquote(:"Externaltypereference")(module: m2, type: name2)) ->
             get_referenced_type(m2, name2)
           type() ->
             tS
@@ -1537,33 +1537,33 @@ defmodule :asn1ct do
     optimize = options(opts, :optimize)
     outputType = options(opts, :output_type)
     cwd = options(opts, :cwd)
-    options = case verbose do
+    options = (case verbose do
       true ->
         [:verbose]
       false ->
         []
-    end ++ case warning do
+    end) ++ (case warning do
       0 ->
         []
       _ ->
         [:warnings]
-    end ++ [] ++ case optimize do
+    end) ++ [] ++ (case optimize do
       1 ->
         [:optimize]
       999 ->
         []
       _ ->
         [{:optimize, optimize}]
-    end ++ :lists.map(fn {name, value} ->
+    end) ++ :lists.map(fn {name, value} ->
         {:d, name, value}
       name ->
         {:d, name}
-    end, defines) ++ case outputType do
+    end, defines) ++ (case outputType do
       :undefined ->
         [:ber]
       _ ->
         [outputType]
-    end
+    end)
     options ++ [:errors, {:cwd, cwd}, {:outdir, outdir} | :lists.map(fn dir ->
         {:i, dir}
     end, includes)] ++ specific
@@ -1593,7 +1593,7 @@ defmodule :asn1ct do
     end
   end
 
-  def maybe_rename_function2(:record, __MODULE__."Externaltypereference"(type: name), suffix), do: :lists.concat([name, suffix])
+  def maybe_rename_function2(:record, unquote(:"Externaltypereference")(type: name), suffix), do: :lists.concat([name, suffix])
 
   def maybe_rename_function2(:list, list, suffix), do: :lists.concat([:asn1ct_gen.list2name(list), suffix])
 
@@ -1629,20 +1629,20 @@ defmodule :asn1ct do
   end
 
   def merge_symbols_from_module([imp | imps], acc) do
-    __MODULE__."Externaltypereference"(type: modName) = __MODULE__."SymbolsFromModule"(imp, :module)
+    unquote(:"Externaltypereference")(type: modName) = unquote(:"SymbolsFromModule")(imp, :module)
     ifromModName = :lists.filter(fn i ->
-        case __MODULE__."SymbolsFromModule"(i, :module) do
-          __MODULE__."Externaltypereference"(type: modName) ->
+        case unquote(:"SymbolsFromModule")(i, :module) do
+          unquote(:"Externaltypereference")(type: modName) ->
             true
-          __MODULE__."Externalvaluereference"(value: modName) ->
+          unquote(:"Externalvaluereference")(value: modName) ->
             true
           _ ->
             false
         end
     end, imps)
     newImps = :lists.subtract(imps, ifromModName)
-    newImp = __MODULE__."SymbolsFromModule"(imp, symbols: :lists.append(:lists.map(fn sL ->
-        __MODULE__."SymbolsFromModule"(sL, :symbols)
+    newImp = unquote(:"SymbolsFromModule")(^imp, symbols: :lists.append(:lists.map(fn sL ->
+        unquote(:"SymbolsFromModule")(sL, :symbols)
     end, [imp | ifromModName])))
     merge_symbols_from_module(newImps, [newImp | acc])
   end
@@ -1682,7 +1682,7 @@ defmodule :asn1ct do
     run_passes(passes, st)
   end
 
-  def parse_and_save_passes(), do: [{:pass, :scan, &fun_unknown_name/1}, {:pass, :parse, &fun_unknown_name/1}, {:pass, :save, &fun_unknown_name/1}]
+  def parse_and_save_passes(), do: [{:pass, :scan, &scan_pass/1}, {:pass, :parse, &parse_pass/1}, {:pass, :save, &save_pass/1}]
 
   def parse_listing(st(code: code, outfile: outFile0) = st) do
     outFile = outFile0 ++ '.parse'
@@ -1786,8 +1786,8 @@ defmodule :asn1ct do
   def remove_in_set_imports([], _, acc), do: :lists.reverse(acc)
 
   def remove_in_set_imports1([i | is], inputMNameL, acc) do
-    case __MODULE__."SymbolsFromModule"(i, :module) do
-      __MODULE__."Externaltypereference"(type: mName) ->
+    case unquote(:"SymbolsFromModule")(i, :module) do
+      unquote(:"Externaltypereference")(type: mName) ->
         case :lists.member(mName, inputMNameL) do
           true ->
             remove_in_set_imports1(is, inputMNameL, acc)
@@ -1803,7 +1803,7 @@ defmodule :asn1ct do
 
   def remove_name_collisions(modules) do
     :asn1ct_table.new(:renamed_defs)
-    :lists.foreach(&fun_unknown_name/1, modules)
+    :lists.foreach(&exit_if_nameduplicate/1, modules)
     remove_name_collisions2(modules, [])
   end
 
@@ -1847,7 +1847,7 @@ defmodule :asn1ct do
             pass.(s)
         end
       true ->
-        &fun_unknown_name/3
+        &run_tc/3
     end
     run_passes_1(passes, st(st, run: run))
   end
@@ -2014,7 +2014,7 @@ defmodule :asn1ct do
     end
   end
 
-  def set_passes(), do: [{:pass, :scan_parse, &fun_unknown_name/1}, {:pass, :merge, &fun_unknown_name/1} | common_passes()]
+  def set_passes(), do: [{:pass, :scan_parse, &set_scan_parse_pass/1}, {:pass, :merge, &merge_pass/1} | common_passes()]
 
   def set_scan_parse_pass(st(files: files) = st) do
     try do
@@ -2076,7 +2076,7 @@ defmodule :asn1ct do
     put(:use_legacy_erlang_types, f)
   end
 
-  def single_passes(), do: [{:pass, :scan, &fun_unknown_name/1}, {:pass, :parse, &fun_unknown_name/1} | common_passes()]
+  def single_passes(), do: [{:pass, :scan, &scan_pass/1}, {:pass, :parse, &parse_pass/1} | common_passes()]
 
   def special_decode_prepare_1(gen(options: options) = gen, m) do
     modName = case :lists.keyfind(:asn1config, 1, options) do
@@ -2288,7 +2288,7 @@ defmodule :asn1ct do
     end
   end
 
-  def type_check(__MODULE__."Externaltypereference"()), do: :record
+  def type_check(unquote(:"Externaltypereference")()), do: :record
 
   def update_gen_state(:active, state, data), do: save_gen_state(gen_state(state, active: data))
 

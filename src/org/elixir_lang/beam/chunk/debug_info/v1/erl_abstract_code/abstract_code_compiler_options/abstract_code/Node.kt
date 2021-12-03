@@ -6,7 +6,7 @@ import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
 import org.elixir_lang.beam.decompiler.Options
 
-fun Node?.toMacroString(options: Options) = this?.toMacroString(options) ?: "?"
+fun Node?.toString(options: Options) = this?.toMacroString(options) ?: "?"
 
 abstract class Node(term: OtpErlangTuple): ToMacroString {
     val line by lazy { (term.elementAt(1) as? OtpErlangLong)?.longValue() }

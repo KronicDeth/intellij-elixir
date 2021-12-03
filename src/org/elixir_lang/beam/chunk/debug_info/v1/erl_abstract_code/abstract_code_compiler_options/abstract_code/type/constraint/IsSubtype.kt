@@ -4,23 +4,22 @@ import com.ericsson.otp.erlang.OtpErlangList
 import com.ericsson.otp.erlang.OtpErlangObject
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Atom
-import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.MacroString
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Scope
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Var
 
 object IsSubtype {
-    fun ifToMacroString(guardArguments: OtpErlangObject): MacroString? = ifTo(guardArguments) { toMacroString(it) }
+    fun ifToString(guardArguments: OtpErlangObject): String? = ifTo(guardArguments) { toString(it) }
 
-    private fun argumentsToMacroString(arguments: OtpErlangList): MacroString {
-        val varMacroString = varMacroString(arguments)
-        val typeMacroString = typeMacroString(arguments)
+    private fun argumentsToString(arguments: OtpErlangList): String {
+        val varString = varString(arguments)
+        val typeString = typeString(arguments)
 
-        return "$varMacroString $typeMacroString"
+        return "$varString $typeString"
     }
 
-    private fun argumentsToMacroString(arguments: OtpErlangObject) =
+    private fun argumentsToString(arguments: OtpErlangObject) =
             when (arguments) {
-                is OtpErlangList -> argumentsToMacroString(arguments)
+                is OtpErlangList -> argumentsToString(arguments)
                 else -> "unknown_arguments_var: unknown_arguments_type"
             }
 
@@ -47,25 +46,24 @@ object IsSubtype {
     private fun toGuard(guardArguments: OtpErlangList): OtpErlangObject? = guardArguments.elementAt(0)
     private fun toArguments(isSubType: OtpErlangList): OtpErlangObject? = isSubType.elementAt(1)
 
-    private fun toMacroString(isSubtype: OtpErlangList) =
+    private fun toString(isSubtype: OtpErlangList) =
             toArguments(isSubtype)
-                    ?.let { argumentsToMacroString(it) }
+                    ?.let { argumentsToString(it) }
                     ?: "is_subtype_missing_arguments_var: is_substype_missing_arguments_type"
 
-    private fun typeMacroString(arguments: OtpErlangList) =
+    private fun typeString(arguments: OtpErlangList) =
             argumentsToType(arguments)
-                    ?.let { typeToMacroString(it) }
+                    ?.let { typeToString(it) }
                     ?: "missing_type"
 
-    private fun typeToMacroString(type: OtpErlangObject) =
-            AbstractCode.toMacroStringDeclaredScope(type, Scope.EMPTY).macroString
+    private fun typeToString(type: OtpErlangObject) = AbstractCode.toString(type)
 
-    private fun varMacroString(arguments: OtpErlangList) =
+    private fun varString(arguments: OtpErlangList) =
             argumentsToVar(arguments)
-                    ?.let { varToMacroString(it) }
+                    ?.let { varToString(it) }
                     ?: "missing_var:"
 
-    private fun varToMacroString(`var`: OtpErlangObject) =
+    private fun varToString(`var`: OtpErlangObject) =
             Var.ifToKey(`var`)
             ?: "unknown_var:"
 }

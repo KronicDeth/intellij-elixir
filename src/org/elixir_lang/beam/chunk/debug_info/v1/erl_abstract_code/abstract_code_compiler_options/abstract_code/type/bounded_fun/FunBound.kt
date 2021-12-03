@@ -2,40 +2,37 @@ package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code
 
 import com.ericsson.otp.erlang.OtpErlangList
 import com.ericsson.otp.erlang.OtpErlangObject
-import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
-import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.MacroString
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.COMMA
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Scope
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Sequence
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Type
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.type.Fun
 import org.elixir_lang.beam.decompiler.MacroNameArity
 
 object FunBound {
-    fun toMacroString(funBound: OtpErlangList, decompiler: MacroNameArity, macroNameArity: org.elixir_lang.beam.MacroNameArity): MacroString {
-        val funMacroString = funMacroString(funBound, decompiler, macroNameArity)
-        val boundMacroString = boundMacroString(funBound)
+    fun toString(funBound: OtpErlangList, decompiler: MacroNameArity, macroNameArity: org.elixir_lang.beam.MacroNameArity): String {
+        val funString = funString(funBound, decompiler, macroNameArity)
+        val boundString = boundString(funBound)
 
-        return "$funMacroString when $boundMacroString"
+        return "$funString when $boundString"
     }
 
-    private fun boundMacroString(funBound: OtpErlangList) =
+    private fun boundString(funBound: OtpErlangList): String =
             toBound(funBound)
-                    ?.let { boundToMacroString(it) }
+                    ?.let { boundToString(it) }
                     ?: "missing_bound"
 
-    private fun boundToMacroString(bound: OtpErlangList) =
-            bound.joinToString(", ") {
-                AbstractCode.toMacroStringDeclaredScope(it, Scope.EMPTY).macroString
-            }
+    private fun boundToString(bound: OtpErlangList) = Sequence.toCommaSeparatedString(bound)
 
-    private fun boundToMacroString(bound: OtpErlangObject) =
+    private fun boundToString(bound: OtpErlangObject): String =
             when (bound) {
-                is OtpErlangList -> boundToMacroString(bound)
+                is OtpErlangList -> boundToString(bound)
                 else -> "unknown_bound"
             }
 
-    private fun funMacroString(funBound: OtpErlangList,
-                               decompiler: MacroNameArity,
-                               macroNameArity: org.elixir_lang.beam.MacroNameArity) =
+    private fun funString(funBound: OtpErlangList,
+                          decompiler: MacroNameArity,
+                          macroNameArity: org.elixir_lang.beam.MacroNameArity): String =
             toFun(funBound)
                     ?.let { funToMacroString(it, decompiler, macroNameArity) }
                     ?: "missing_fun"
@@ -44,7 +41,7 @@ object FunBound {
                                  decompiler: MacroNameArity,
                                  macroNameArity: org.elixir_lang.beam.MacroNameArity) =
         Type.ifTo(`fun`) {
-            Fun.ifToMacroString(it, decompiler, macroNameArity)
+            Fun.ifToString(it, decompiler, macroNameArity)
             ?: "unknown_fun"
         } ?: "unknown_fun"
 

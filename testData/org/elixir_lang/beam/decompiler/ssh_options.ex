@@ -201,9 +201,9 @@ defmodule :ssh_options do
   def check_preferred_algorithms(_), do: error_in_check(:modify_algorithms, 'Bad option value. List expected.')
 
   @spec default((role() | :common)) :: option_declarations()
-  def default(:server), do: %{unknown_elements}
+  def default(:server), do: ...
 
-  def default(:client), do: %{unknown_elements}
+  def default(:client), do: ...
 
   def default(:common), do: ...
 
@@ -211,13 +211,20 @@ defmodule :ssh_options do
   def delete_key(:user_options, key, opts, _CallerMod, _CallerLine) when is_map(opts) do
     cond do
       is_list(key) ->
-        :lists.foldl(&:maps.remove/unknown_arity, opts, key)
+        :lists.foldl(&:maps.fun_unknown_name/2, opts, key)
       true ->
         :maps.remove(key, opts)
     end
   end
 
-  def delete_key(class, key, opts, _CallerMod, _CallerLine) when is_map(opts) and class == :socket_options or class == :internal_options, do: %{unknown_elements}
+  def delete_key(class, key, opts, _CallerMod, _CallerLine) when is_map(opts) and class == :socket_options or class == :internal_options do
+    %{opts | class => (cond do
+      is_list(key) ->
+        :lists.foldl(&:maps.fun_unknown_name/2, :maps.get(class, opts), key)
+      true ->
+        :maps.remove(key, :maps.get(class, opts))
+    end)}
+  end
 
   @spec get_value(option_class(), option_key(), private_options(), atom(), non_neg_integer()) :: (any() | no_return())
   def get_value(class, key, opts, _CallerMod, _CallerLine) when is_map(opts) do
@@ -266,7 +273,7 @@ defmodule :ssh_options do
     :maps.filter(fn key, value ->
         try do
           %{:default => defVal} = :maps.get(key, defs)
-        defVal !== value
+        ^defVal !== ^value
         catch
           {_, _, _} ->
             false
@@ -280,7 +287,7 @@ defmodule :ssh_options do
     :maps.filter(fn key, _Value ->
         try do
           %{:class => class} = :maps.get(key, defs)
-        class == :user_option
+        ^class == :user_option
         catch
           {_, _, _} ->
             false
@@ -303,7 +310,7 @@ defmodule :ssh_options do
     :maps.fold(fn k, _V, acc ->
         case :lists.member(k, sensitive) do
           true ->
-            %{unknown_elements}
+            %{acc | k => :"***"}
           false ->
             acc
         end
@@ -325,12 +332,12 @@ defmodule :ssh_options do
 
   def put_value(:internal_options, keyVal, opts, _CallerMod, _CallerLine) when is_map(opts) do
     internalOpts = :maps.get(:internal_options, opts)
-    %{unknown_elements}
+    %{opts | :internal_options => put_internal_value(keyVal, internalOpts)}
   end
 
   def put_value(:socket_options, keyVal, opts, _CallerMod, _CallerLine) when is_map(opts) do
     socketOpts = :maps.get(:socket_options, opts)
-    %{unknown_elements}
+    %{opts | :socket_options => put_socket_value(keyVal, socketOpts)}
   end
 
   # Private Functions
@@ -751,7 +758,7 @@ defmodule :ssh_options do
     case :ssh_connection_handler.prohibited_sock_option(key) do
       false ->
         %{:chk => fun} = :maps.get(key, defs)
-        fun
+        ^fun
       true ->
         fn _, _ ->
             :forbidden
@@ -848,12 +855,12 @@ defmodule :ssh_options do
   end
 
   def config_val(:modify_algorithms = key, roleCnfs, opts) do
-    v = case :application.get_env(:ssh, key) do
+    v = (case :application.get_env(:ssh, key) do
       {:ok, v0} ->
         v0
       _ ->
         []
-    end ++ :proplists.get_value(key, roleCnfs, []) ++ :proplists.get_value(key, opts, [])
+    end) ++ :proplists.get_value(key, roleCnfs, []) ++ :proplists.get_value(key, opts, [])
     case v do
       [] ->
         :undefined
@@ -913,7 +920,7 @@ defmodule :ssh_options do
 
   def eval_op(:prepend, opt, pref, []) when is_list(opt) and is_list(pref), do: opt ++ pref -- opt
 
-  def eval_ops(prefAlgs, modAlgs), do: :lists.foldl(&fun_unknown_name/2, prefAlgs, modAlgs)
+  def eval_ops(prefAlgs, modAlgs), do: :lists.foldl(&eval_op/2, prefAlgs, modAlgs)
 
   def final_preferred_algorithms(options0) do
     result = case :ssh_options.get_value(:user_options, :modify_algorithms, options0, :ssh_options, 1181) do
@@ -994,9 +1001,9 @@ defmodule :ssh_options do
 
   def normalize_mod_algs([], [x | _], _, _), do: error_in_check(x, 'Bad list element')
 
-  def put_internal_value(l, intOpts) when is_list(l), do: :lists.foldl(&fun_unknown_name/2, intOpts, l)
+  def put_internal_value(l, intOpts) when is_list(l), do: :lists.foldl(&put_internal_value/2, intOpts, l)
 
-  def put_internal_value({key, value}, intOpts), do: %{unknown_elements}
+  def put_internal_value({key, value}, intOpts), do: %{intOpts | key => value}
 
   def put_socket_value(l, sockOpts) when is_list(l), do: l ++ sockOpts
 
@@ -1004,9 +1011,9 @@ defmodule :ssh_options do
 
   def put_socket_value(a, sockOpts) when is_atom(a), do: [a | sockOpts]
 
-  def put_user_value(l, opts) when is_list(l), do: :lists.foldl(&fun_unknown_name/2, opts, l)
+  def put_user_value(l, opts) when is_list(l), do: :lists.foldl(&put_user_value/2, opts, l)
 
-  def put_user_value({key, value}, opts), do: %{unknown_elements}
+  def put_user_value({key, value}, opts), do: %{opts | key => value}
 
   def read_moduli_file(d, i, acc) do
     case :io.get_line(d, unknown_string) do
@@ -1070,23 +1077,23 @@ defmodule :ssh_options do
 
   def save({inet, false}, _Defs, optMap) when inet == :inet or inet == :inet6, do: optMap
 
-  def save({:special_trpt_args, t}, _Defs, optMap) when is_map(optMap), do: %{unknown_elements}
+  def save({:special_trpt_args, t}, _Defs, optMap) when is_map(optMap), do: %{optMap | :socket_options => [t | :maps.get(:socket_options, optMap)]}
 
   def save({key, value}, defs, optMap) when is_map(optMap) do
     try do
       check_fun(key, defs)(value)
     catch
       {:error, {:badkey, :inet}, _} ->
-        %{unknown_elements}
+        %{optMap | :socket_options => [value | :maps.get(:socket_options, optMap)]}
       {:error, {:badkey, ^key}, _} ->
-        %{unknown_elements}
+        %{optMap | :socket_options => [{key, value} | :maps.get(:socket_options, optMap)]}
       {:error, {:check, {badValue, extra}}, _} ->
         error({:eoptions, {key, badValue}, extra})
     else
       true ->
-        %{unknown_elements}
+        %{optMap | key => value}
       {true, modifiedValue} ->
-        %{unknown_elements}
+        %{optMap | key => modifiedValue}
       false ->
         error({:eoptions, {key, value}, 'Bad value'})
       :forbidden ->
@@ -1094,7 +1101,7 @@ defmodule :ssh_options do
     end
   end
 
-  def save(opt, _Defs, optMap) when is_map(optMap), do: %{unknown_elements}
+  def save(opt, _Defs, optMap) when is_map(optMap), do: %{optMap | :socket_options => [opt | :maps.get(:socket_options, optMap)]}
 
   def valid_hash(s), do: valid_hash(s, :proplists.get_value(:hashs, :crypto.supports()))
 

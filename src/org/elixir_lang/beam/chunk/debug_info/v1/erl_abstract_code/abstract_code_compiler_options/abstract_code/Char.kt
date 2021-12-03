@@ -10,11 +10,11 @@ object Char {
             ifTag(term, TAG) { toMacroStringDeclaredScope(it) }
 
     fun toMacroStringDeclaredScope(term: OtpErlangTuple): MacroStringDeclaredScope =
-            toMacroString(term).let { MacroStringDeclaredScope(it, Scope.EMPTY) }
+            toString(term).let { MacroStringDeclaredScope(it, doBlock = false, Scope.EMPTY) }
 
     private const val TAG = "char"
 
-    private fun codePointToMacroString(term: OtpErlangLong): String {
+    private fun codePointToString(term: OtpErlangLong): String {
         val macroStringBuilder = StringBuilder().append('?')
         val codePoint = term.intValue()
 
@@ -30,16 +30,16 @@ object Char {
         return macroStringBuilder.toString()
     }
 
-    private fun codePointToMacroString(term: OtpErlangObject): String =
+    private fun codePointToString(term: OtpErlangObject): String =
             when (term) {
-                is OtpErlangLong -> codePointToMacroString(term)
+                is OtpErlangLong -> codePointToString(term)
                 else -> "unknown_code_point"
             }
 
     private fun toCodePoint(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
 
-    private fun toMacroString(term: OtpErlangTuple): String =
+    private fun toString(term: OtpErlangTuple): String =
             toCodePoint(term)
-                    ?.let { codePointToMacroString(it) }
+                    ?.let { codePointToString(it) }
                     ?: "missing_code_point"
 }

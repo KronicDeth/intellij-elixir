@@ -15,9 +15,10 @@ object Clauses {
 
     fun toMacroString(term: OtpErlangTuple, scope: Scope): MacroString {
         val clausesMacroString = clausesMacroString(term, scope)
-
-        return "fn $clausesMacroString\n" +
+        val string = "fn $clausesMacroString\n" +
                 "end"
+
+        return MacroString(string, doBlock = false)
     }
 
     private const val TAG = "clauses"
@@ -30,7 +31,7 @@ object Clauses {
     private fun clausesToMacroString(clauses: OtpErlangList, scope: Scope): String =
             clauses
                     .joinToString("\n") {
-                        Clause.ifToMacroString(it, scope) ?:
+                        Clause.ifToString(it, scope) ?:
                         "unknown_clause"
                     }
                     .let { Macro.adjustNewLines(it, "\n  ") }

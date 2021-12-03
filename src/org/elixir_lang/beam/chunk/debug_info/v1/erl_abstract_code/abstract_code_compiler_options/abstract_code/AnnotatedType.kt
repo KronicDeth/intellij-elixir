@@ -12,19 +12,19 @@ object AnnotatedType {
 
     private const val TAG = "ann_type"
 
-    private fun annotationTypeToMacroString(annotationType: OtpErlangObject) =
+    private fun annotationTypeToString(annotationType: OtpErlangObject): String =
             when (annotationType) {
-                is OtpErlangList -> AnnotationType.toMacroString(annotationType)
+                is OtpErlangList -> AnnotationType.toString(annotationType)
                 else -> "unknown_annotation_type"
             }
 
-    private fun toMacroString(annotatedType: OtpErlangTuple): MacroString =
+    private fun toString(annotatedType: OtpErlangTuple): String =
             toAnnotationType(annotatedType)
-                    ?.let { annotationTypeToMacroString(it) }
+                    ?.let { annotationTypeToString(it) }
                     ?: "missing_annotation_type"
 
     private fun toMacroStringDeclaredScope(annotatedType: OtpErlangTuple) =
-            MacroStringDeclaredScope(toMacroString(annotatedType), Scope.EMPTY)
+            MacroStringDeclaredScope(toString(annotatedType), doBlock = false, Scope.EMPTY)
 
     private fun toAnnotationType(annotatedType: OtpErlangTuple): OtpErlangObject? = annotatedType.elementAt(2)
 
