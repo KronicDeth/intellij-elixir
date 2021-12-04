@@ -44,15 +44,15 @@ defmodule :erl_syntax do
   def abstract(t) when is_tuple(t), do: tuple(abstract_list(tuple_to_list(t)))
 
   def abstract(t) when is_map(t) do
-    map_expr(for {key, value} <- :maps.to_list(t) do
+    map_expr((for {key, value} <- :maps.to_list(t) do
       map_field_assoc(abstract(key), abstract(value))
-    end)
+    end))
   end
 
   def abstract(t) when is_binary(t) do
-    binary(for b <- binary_to_list(t) do
+    binary((for b <- binary_to_list(t) do
       binary_field(integer(b))
-    end)
+    end))
   end
 
   def abstract(t), do: :erlang.error({:badarg, t})
@@ -2592,11 +2592,11 @@ defmodule :erl_syntax do
   end
 
   def meta_subtrees(gs) do
-    list(for g <- gs do
-      list(for t <- g do
+    list((for g <- gs do
+      list((for t <- g do
       meta(t)
-    end)
-    end)
+    end))
+    end))
   end
 
   def normalize_list_1(es, tail) do

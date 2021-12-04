@@ -198,9 +198,9 @@ defmodule :code do
 
   @spec module_status() :: [{module(), module_status()}]
   def module_status() do
-    module_status(for {m, _} <- all_loaded() do
+    module_status((for {m, _} <- all_loaded() do
       m
-    end)
+    end))
   end
 
   @spec module_status(module :: (module() | [module()])) :: (module_status() | [{module(), module_status()}])

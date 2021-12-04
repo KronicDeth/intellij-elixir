@@ -477,6 +477,10 @@ public class DecompilerTest extends PlatformTestCase {
         assertDecompiled("ex_cursor");
     }
 
+    public void testIssue2331() throws IOException {
+        assertDecompiled("gb_sets");
+    }
+
     /*
      * Instance Methods
      */

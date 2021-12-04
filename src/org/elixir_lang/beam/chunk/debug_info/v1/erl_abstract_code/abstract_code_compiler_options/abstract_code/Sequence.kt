@@ -40,12 +40,8 @@ object Sequence {
                                    scope: Scope,
                                    open: String, separator: Separator, close: String): MacroStringDeclaredScope =
             toMacroStringDeclaredScope(term, scope) { macroStringList ->
-                val separatedString =  when (macroStringList.size) {
-                    0 -> ""
-                    1 -> macroStringList.first().string
-                    else -> macroStringList.joinToString(separator.string) { macroString ->
-                        separator.group(macroString)
-                    }
+                val separatedString =  macroStringList.joinToString(separator.string) { macroString ->
+                    separator.group(macroString)
                 }
 
                 "$open$separatedString$close"

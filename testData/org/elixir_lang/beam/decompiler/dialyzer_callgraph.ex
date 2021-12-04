@@ -165,9 +165,9 @@ defmodule :dialyzer_callgraph do
   @spec module_deps(callgraph()) :: mod_deps()
   def module_deps(callgraph(digraph: dG)) do
     edges = :lists.foldl(&edge_fold/2, :sets.new(), digraph_edges(dG))
-    nodes = :sets.from_list(for {m, _F, _A} <- digraph_vertices(dG) do
+    nodes = :sets.from_list((for {m, _F, _A} <- digraph_vertices(dG) do
       m
-    end)
+    end))
     mDG = :digraph.new()
     digraph_confirm_vertices(:sets.to_list(nodes), mDG)
     foreach = fn {m1, m2} ->
@@ -200,9 +200,9 @@ defmodule :dialyzer_callgraph do
 
   @spec modules(callgraph()) :: [module()]
   def modules(callgraph(digraph: dG)) do
-    :ordsets.from_list(for {m, _F, _A} <- digraph_vertices(dG) do
+    :ordsets.from_list((for {m, _F, _A} <- digraph_vertices(dG) do
       m
-    end)
+    end))
   end
 
   @spec new() :: callgraph()
@@ -675,9 +675,9 @@ defmodule :dialyzer_callgraph do
   @spec module_postorder(callgraph()) :: {[module()], {:d, :digraph.graph()}}
   def module_postorder(callgraph(digraph: dG)) do
     edges = :lists.foldl(&edge_fold/2, :sets.new(), digraph_edges(dG))
-    nodes = :sets.from_list(for {m, _F, _A} <- digraph_vertices(dG) do
+    nodes = :sets.from_list((for {m, _F, _A} <- digraph_vertices(dG) do
       m
-    end)
+    end))
     mDG = :digraph.new([:acyclic])
     digraph_confirm_vertices(:sets.to_list(nodes), mDG)
     foreach = fn {m1, m2} ->
@@ -719,9 +719,9 @@ defmodule :dialyzer_callgraph do
   end
 
   def remove_unconfirmed([], dG, unconfirmed) do
-    badCalls = :lists.append(for v <- unconfirmed do
+    badCalls = :lists.append((for v <- unconfirmed do
       :digraph.in_edges(dG, v)
-    end)
+    end))
     badCallsSorted = :lists.keysort(1, badCalls)
     :digraph.del_vertices(dG, unconfirmed)
     badCallsSorted
