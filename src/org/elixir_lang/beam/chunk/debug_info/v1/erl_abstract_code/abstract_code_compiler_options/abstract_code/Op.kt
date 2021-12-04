@@ -33,6 +33,8 @@ object Op {
         val string = when (operatorString) {
             "div", "rem", "send" ->
                 "$operatorString($leftOperandString, $rightOperandString)"
+            "xor" ->
+                ":erlang.xor($leftOperandString, $rightOperandString)"
             else ->
                 "$leftOperandString $operatorString $rightOperandString"
         }
