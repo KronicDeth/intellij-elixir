@@ -465,6 +465,10 @@ public class DecompilerTest extends PlatformTestCase {
         assertDecompiled("dialyzer_callgraph");
     }
 
+    public void testCode() throws IOException {
+        assertDecompiled("code");
+    }
+
     /*
      * Instance Methods
      */

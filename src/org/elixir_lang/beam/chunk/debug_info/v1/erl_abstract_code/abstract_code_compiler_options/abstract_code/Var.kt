@@ -35,7 +35,7 @@ object Var {
                 else -> "unknown_name:"
             }
 
-    private fun nameToString(name: OtpErlangAtom) = name.atomValue().decapitalize().escapeElixirKeyword()
+    fun nameToString(name: OtpErlangAtom) = name.atomValue().decapitalize().escapeElixirKeyword()
 
     private fun nameToMacroStringDeclaredScope(name: OtpErlangAtom, scope: Scope): MacroStringDeclaredScope {
         val varName = nameToString(name)

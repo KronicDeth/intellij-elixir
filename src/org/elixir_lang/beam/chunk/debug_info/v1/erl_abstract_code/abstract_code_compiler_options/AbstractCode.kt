@@ -64,6 +64,7 @@ object AbstractCode {
             Map.ifToMacroStringDeclaredScope(term, scope) ?:
             MapField.ifToMacroStringDeclaredScope(term, scope) ?:
             Match.ifToMacroStringDeclaredScope(term, scope) ?:
+            NamedFun.ifToMacroStringDeclaredScope(term, scope) ?:
             Nil.ifToMacroStringDeclaredScope(term) ?:
             Op.ifToMacroStringDeclaredScope(term, scope) ?:
             Receive.ifToMacroStringDeclaredScope(term, scope) ?:
