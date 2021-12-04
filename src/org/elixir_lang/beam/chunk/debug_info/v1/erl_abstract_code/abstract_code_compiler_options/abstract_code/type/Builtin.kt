@@ -33,6 +33,7 @@ object Builtin {
             "nil",
             "no_return",
             "node",
+            "nonempty_improper_list",
             "nonempty_maybe_improper_list",
             "non_neg_integer",
             "none",
