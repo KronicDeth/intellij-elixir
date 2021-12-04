@@ -473,6 +473,10 @@ public class DecompilerTest extends PlatformTestCase {
         assertDecompiled("dbg_wx_trace_win");
     }
 
+    public void testIssue2329() throws IOException {
+        assertDecompiled("ex_cursor");
+    }
+
     /*
      * Instance Methods
      */

@@ -1,6 +1,7 @@
 package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code
 
 import com.ericsson.otp.erlang.OtpErlangAtom
+import com.ericsson.otp.erlang.OtpErlangList
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
@@ -67,7 +68,16 @@ object Record {
 
     private fun updateRecordFieldsString(term: OtpErlangTuple, scope: Scope): String =
             toUpdateRecordFields(term)
-                    ?.let {  Sequence.toCommaSeparatedString(it, scope) }
+                    ?.let {  updateRecordFields ->
+                        when (updateRecordFields) {
+                            is OtpErlangList -> if (updateRecordFields.arity() == 0 && updateRecordFields.isProper) {
+                                "[]"
+                            } else {
+                                Sequence.toCommaSeparatedString(updateRecordFields, scope)
+                            }
+                            else -> "unknown_update_record_fields"
+                        }
+                    }
                     ?: "missing_record_fields"
 
     private fun updateToMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope {
