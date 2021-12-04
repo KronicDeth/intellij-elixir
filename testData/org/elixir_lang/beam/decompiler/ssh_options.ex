@@ -211,7 +211,7 @@ defmodule :ssh_options do
   def delete_key(:user_options, key, opts, _CallerMod, _CallerLine) when is_map(opts) do
     cond do
       is_list(key) ->
-        :lists.foldl(&:maps.fun_unknown_name/2, opts, key)
+        :lists.foldl(&:maps.remove/2, opts, key)
       true ->
         :maps.remove(key, opts)
     end
@@ -220,7 +220,7 @@ defmodule :ssh_options do
   def delete_key(class, key, opts, _CallerMod, _CallerLine) when is_map(opts) and class == :socket_options or class == :internal_options do
     %{opts | class => (cond do
       is_list(key) ->
-        :lists.foldl(&:maps.fun_unknown_name/2, :maps.get(class, opts), key)
+        :lists.foldl(&:maps.remove/2, :maps.get(class, opts), key)
       true ->
         :maps.remove(key, :maps.get(class, opts))
     end)}

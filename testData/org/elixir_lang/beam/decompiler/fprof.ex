@@ -442,7 +442,7 @@ defmodule :fprof do
 
   def apply_1(m, f, args, options) do
     arity = length(args)
-    apply_1(&m.fun_unknown_name/arity, args, options)
+    apply_1(&m.f/arity, args, options)
   end
 
   def apply_continue(function, args, procs, options) do

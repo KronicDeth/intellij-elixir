@@ -6,7 +6,7 @@ import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode.ifTag
-import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Integer
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Atom
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.MacroString
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Scope
 import org.elixir_lang.code.Identifier.inspectAsFunction
@@ -17,8 +17,8 @@ object Function {
 
     fun toMacroString(term: OtpErlangTuple, scope: Scope): MacroString {
         val string = when (val arity = term.arity()) {
-            3 -> nameArityToMacroString(term.elementAt(1), term.elementAt(2))
-            4 -> moduleNameArityToMacroString(term.elementAt(1), term.elementAt(2), term.elementAt(3), scope)
+            3 -> nameArityToString(term.elementAt(1), term.elementAt(2), scope)
+            4 -> moduleNameArityToString(term.elementAt(1), term.elementAt(2), term.elementAt(3), scope)
             else -> "fun_function_unknown_arity($arity)"
         }
 
@@ -33,29 +33,31 @@ object Function {
                 else -> AbstractCode.toString(arity)
             }
 
-    private fun moduleNameArityToMacroString(
+    private fun moduleNameArityToString(
             module: OtpErlangObject,
             name: OtpErlangObject,
             arity: OtpErlangObject,
             scope: Scope
     ): String {
         val moduleString = AbstractCode.toString(module, scope)
-        val nameString = nameToString(name)
+        val nameString = nameToString(name, scope)
         val arityString = arityToString(arity)
 
         return "&$moduleString.$nameString/$arityString"
     }
 
-    private fun nameArityToMacroString(name: OtpErlangObject, arity: OtpErlangObject): String {
-        val nameString = nameToString(name)
+    private fun nameArityToString(name: OtpErlangObject, arity: OtpErlangObject, scope: Scope): String {
+        val nameString = nameToString(name, scope)
         val arityString = arityToString(arity)
 
         return "&$nameString/$arityString"
     }
 
-    private fun nameToString(term: OtpErlangObject): String =
+    private fun nameToString(term: OtpErlangObject, scope: Scope): String =
             when (term) {
                 is OtpErlangAtom -> inspectAsFunction(term, true)
-                else -> "fun_unknown_name"
+                else -> Atom.toElixirAtom(term)
+                        ?.let { nameToString(it, scope) }
+                        ?: AbstractCode.toString(term, scope)
             }
 }
