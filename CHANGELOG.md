@@ -252,6 +252,9 @@
 * [#2179](https://github.com/KronicDeth/intellij-elixir/pull/2179) - [@KronicDeth](https://github.com/KronicDeth)
   * Drop support for Elixir <= 1.6.
     Continuing support for Elixir <= 1.6 required special handling of the language level to support differences in precedence and operators.  Removing the language level tracking allows dropping the `Level` and `FilePropertyPusher` classes and all their usages, including in the parser grammar and the special `ifVersion` external rule.  It also eliminates the need for tests to setup the SDK since it was only needed to get the appropriate Level.  This makes the tests run in 45 seconds instead of 7 minutes.
+* [#2339](https://github.com/KronicDeth/intellij-elixir/pull/2339) - [@KronicDeth](https://github.com/KronicDeth)
+  * Remove code dependent on the Erlang plugin
+    [Erlang plugin is not 2021.3 compatible yet](https://github.com/ignatov/intellij-erlang/issues/963#issuecomment-986261646)
 
 ### Enhancements
 * [#2179](https://github.com/KronicDeth/intellij-elixir/pull/2179) - [@KronicDeth](https://github.com/KronicDeth)
@@ -390,6 +393,13 @@
     * Remove tab at start of location for title of issues
     * Don't include "java.lang.Throwable: " in title of issues
       The `Throwable` is necessary to get a stacktrace, but not a real error.
+* [#2339](https://github.com/KronicDeth/intellij-elixir/pull/2339) - [@KronicDeth](https://github.com/KronicDeth)
+  * Build against `2021.3`
+  * `runPluginVerifier` in GitHub Actions
+    * Update IDEA version range supports and verified
+    * Fix reported compatibility warnings
+      * Inline deprecated bundle messages
+      * Don't bundle built-in markdown plugin, depend on it instead
 
 ### Bug Fixes
 * [#2074](https://github.com/KronicDeth/intellij-elixir/pull/2074) - [@Thau](https://github.com/Thau)
@@ -640,6 +650,8 @@
       Used to be hard-coded to return `true`, but this pre-dated decompiling private functions.  Now with decompiling private functions, isExported needs to defer to the `Definition` and count as unexported if a private function, macro, or guard.
 * [#2337](https://github.com/KronicDeth/intellij-elixir/pull/2337) - [@KronicDeth](https://github.com/KronicDeth)
   * Walk map constructin arguments, associatons, and variables when resolving type parameters.
+* [#2339](https://github.com/KronicDeth/intellij-elixir/pull/2339) - [@KronicDeth](https://github.com/KronicDeth)
+  * Don't use `PluginId.findId` that doesn't exist in 2021.1.X
 
 ## v11.13.0
 

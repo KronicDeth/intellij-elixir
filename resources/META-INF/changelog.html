@@ -12,6 +12,8 @@
         <code>ifVersion</code> external rule.  It also eliminates the need for tests to setup the SDK since it was only
         needed to get the appropriate Level.  This makes the tests run in 45 seconds instead of 7 minutes.
       </li>
+      <li>Remove code dependent on the Erlang plugin<br>
+        <a href="https://github.com/ignatov/intellij-erlang/issues/963#issuecomment-986261646" data-hovercard-type="issue" data-hovercard-url="/ignatov/intellij-erlang/issues/963/hovercard">Erlang plugin is not 2021.3 compatible yet</a></li>
     </ul>
   </li>
   <li>
@@ -216,6 +218,18 @@
           <li>Remove tab at start of location for title of issues</li>
           <li>Don't include "java.lang.Throwable: " in title of issues<br>
             The <code>Throwable</code> is necessary to get a stacktrace, but not a real error.</li>
+        </ul>
+      </li>
+      <li>Build against <code>2021.3</code></li>
+      <li><code>runPluginVerifier</code> in GitHub Actions
+        <ul dir="auto">
+          <li>Update IDEA version range supports and verified</li>
+          <li>Fix reported compatibility warnings
+            <ul dir="auto">
+              <li>Inline deprecated bundle messages</li>
+              <li>Don't bundle built-in markdown plugin, depend on it instead</li>
+            </ul>
+          </li>
         </ul>
       </li>
     </ul>
@@ -563,6 +577,7 @@
       <li>
         Walk map constructin arguments, associatons, and variables when resolving type parameters.
       </li>
+      <li>Don't use <code>PluginId.findId</code> that doesn't exist in 2021.1.X</li>
     </ul>
   </li>
 </ul>
