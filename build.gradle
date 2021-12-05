@@ -52,7 +52,7 @@ allprojects {
   intellij {
     plugins = [// needed for jps builder
                "java",
-               "org.jetbrains.erlang:0.11.1112",
+               "org.jetbrains.erlang:0.11.1123",
                // always have IdeaVIM installed in sandbox
                "IdeaVIM:0.67",
                "PsiViewer:3.28.93"]
