@@ -183,7 +183,7 @@ public class GeneralCommandLine implements UserDataHolder {
             checkWorkingDirectory();
 
             if (StringUtil.isEmptyOrSpaces(myExePath)) {
-                throw new ExecutionException(IdeBundle.message("run.configuration.error.executable.not.specified"));
+                throw new ExecutionException("Executable is not specified");
             }
 
             commands = CommandLineUtil.toCommandLine(myExePath, myProgramParams.getList());
@@ -217,11 +217,10 @@ public class GeneralCommandLine implements UserDataHolder {
             return;
         }
         if (!myWorkDirectory.exists()) {
-            throw new ExecutionException(
-                    IdeBundle.message("run.configuration.error.working.directory.does.not.exist", myWorkDirectory.getAbsolutePath()));
+            throw new ExecutionException("Cannot start process, the working directory '" + myWorkDirectory.getAbsolutePath() + "' does not exist");
         }
         if (!myWorkDirectory.isDirectory()) {
-            throw new ExecutionException(IdeBundle.message("run.configuration.error.working.directory.not.directory"));
+            throw new ExecutionException("Cannot start process, the working directory '" + myWorkDirectory.getAbsolutePath() + "' is not a directory");
         }
     }
 

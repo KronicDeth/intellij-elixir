@@ -52,8 +52,7 @@ allprojects {
   intellij {
     plugins = [// needed for jps builder
                "java",
-//               "org.jetbrains.erlang:0.11.1123",
-//                always have IdeaVIM installed in sandbox
+               // always have IdeaVIM installed in sandbox
                "IdeaVIM:1.8.1",
                "PsiViewer:213-SNAPSHOT"]
     pluginName.set('intellij-elixir')

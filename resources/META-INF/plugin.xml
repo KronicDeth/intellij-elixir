@@ -12,7 +12,6 @@
   <!-- Needed for JPS builder -->
   <depends optional="true">com.intellij.modules.java</depends>
   <depends>org.intellij.plugins.markdown</depends>
-  <depends config-file="intellij-erlang-plugin.xml" optional="true">org.jetbrains.erlang</depends>
   <depends config-file="rich-platform-plugin.xml" optional="true">com.intellij.modules.java</depends>
 
   <extensionPoints>
