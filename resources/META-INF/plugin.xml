@@ -268,6 +268,12 @@
       <separator/>
       <add-to-group group-id="HelpMenu" anchor="before" relative-to-action="ProductivityGuide"/>
     </group>
+    <group id="Internal.Elixir" popup="true" internal="true" compact="true" text="Elixir">
+      <action id="BEAM.BulkDecompilation" internal="true" class="BulkDecompilation"
+              text="BEAM Bulk Decompilation"
+              description="Decompiles all .beam files in the project, modules, and SDKs to check that all decompiled code is parsable as valid Elixir"/>
+      <add-to-group group-id="Internal" anchor="first"/>
+    </group>
   </actions>
 
 </idea-plugin>
