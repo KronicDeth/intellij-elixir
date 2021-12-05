@@ -8,11 +8,7 @@ import com.intellij.openapi.extensions.PluginId
 
 class HelpAction : AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
-        val version =
-                PluginId
-                        .findId("org.elixir_lang")!!
-                        .let { PluginManagerCore.getPlugin(it)!! }
-                        .version
+        val version = PluginManagerCore.getPlugin(PluginId.getId("org.elixir_lang"))!!.version
 
         BrowserUtil.browse("https://github.com/KronicDeth/intellij-elixir/blob/v$version/README.md")
     }
