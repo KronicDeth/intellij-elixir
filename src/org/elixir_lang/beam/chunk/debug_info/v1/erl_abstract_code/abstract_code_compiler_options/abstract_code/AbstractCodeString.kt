@@ -2,6 +2,7 @@ package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code
 
 import com.ericsson.otp.erlang.*
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
+import org.elixir_lang.beam.term.elixirEscape
 import org.elixir_lang.beam.term.inspect
 import java.nio.charset.Charset
 
@@ -47,9 +48,5 @@ object AbstractCodeString {
     private fun stringToString(term: OtpErlangString): String = inspect(term)
 
     private fun stringToString(term: OtpErlangList): String =
-            if (term.arity() == 0 && term.isProper) {
-                "\"\""
-            } else {
-                AbstractCode.error("non_empty_list_as_string", "string list is non-empty", term)
-            }
+            "\"${term.stringValue().elixirEscape()}\""
 }

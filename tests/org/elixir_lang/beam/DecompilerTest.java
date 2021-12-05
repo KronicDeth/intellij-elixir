@@ -481,6 +481,10 @@ public class DecompilerTest extends PlatformTestCase {
         assertDecompiled("gb_sets");
     }
 
+    public void testIssue2332() throws IOException {
+        assertDecompiled("idna");
+    }
+
     /*
      * Instance Methods
      */
