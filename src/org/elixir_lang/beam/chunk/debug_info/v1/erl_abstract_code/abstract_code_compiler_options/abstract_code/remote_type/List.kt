@@ -10,13 +10,13 @@ object List {
     fun toString(list: OtpErlangObject): String =
             when (list) {
                 is OtpErlangList -> toString(list)
-                else -> "unknown_remote_type_list"
+                else -> AbstractCode.unknown("remote_type_list", "remote_type list", list)
             }
 
     private fun argumentsString(list: OtpErlangList) =
             toArguments(list)
                     ?.let { argumentsToString(it) }
-                    ?: "unknown_arguments"
+                    ?: AbstractCode.unknown("arguments", "remote_type list arguments", list)
 
     private fun argumentsToString(arguments: OtpErlangObject) =
             Sequence
@@ -27,17 +27,17 @@ object List {
     private fun moduleString(list: OtpErlangList): String =
             toModule(list)
                     ?.let { AbstractCode.toString(it) }
-                    ?: "missing_remote_type_module"
+                    ?: AbstractCode.missing("remote_type_module", "remote_type module", list)
 
     private fun nameString(list: OtpErlangList) =
             toName(list)
                     ?.let { nameToString(it) }
-                    ?: "missing_remote_type_name"
+                    ?: AbstractCode.missing("remote_type_name", "remote_type name", list)
 
     private fun nameToString(name: OtpErlangObject) =
             Atom.toElixirAtom(name)
                     ?.let { inspectAsFunction(it) }
-                    ?: "unknown_remote_type_name"
+                    ?: AbstractCode.unknown("remote_type_name", "remote_type name", name)
 
     private fun toArguments(list: OtpErlangList): OtpErlangObject? = list.elementAt(2)
 

@@ -22,26 +22,26 @@ object Case {
     private fun clausesString(term: OtpErlangTuple, scope: Scope): String =
             toClauses(term)
                     ?.let { clausesToString(it, scope) }
-                    ?: "missing_clauses"
+                    ?: AbstractCode.missing("clauses", "case clauses", term)
 
     private fun clausesToString(clauses: OtpErlangList, scope: Scope): String =
             clauses
                     .joinToString("\n") {
                         Clause.ifToString(it, scope) ?:
-                        "unknown_clause"
+                        AbstractCode.unknown("clause", "case clause", it)
                     }
                     .let { adjustNewLines(it, "\n  ") }
 
     private fun clausesToString(clauses: OtpErlangObject, scope: Scope): String =
             when (clauses) {
                 is OtpErlangList -> clausesToString(clauses, scope)
-                else -> "unknown_clauses"
+                else -> AbstractCode.unknown("clauses", "case clauses", clauses)
             }
 
     private fun expressionMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope =
             toExpression(term)
                     ?.let { AbstractCode.toMacroStringDeclaredScope(it, scope) }
-                    ?: MacroStringDeclaredScope("missing_expression", doBlock = false, scope)
+                    ?: MacroStringDeclaredScope.missing("expression", scope, "case expression", term)
 
     private fun toClauses(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(3)
     private fun toExpression(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)

@@ -2,6 +2,7 @@ package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code
 
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Type
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.type.BoundedFun
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.type.Fun
@@ -14,7 +15,7 @@ object Definition {
                  macroNameArity: org.elixir_lang.beam.MacroNameArity): String =
         when (definition) {
             is OtpErlangTuple -> toString(definition, decompiler, macroNameArity)
-            else -> "unknown_type() :: unknown_definition"
+            else -> AbstractCode.error("unknown_type() :: unknown_definition", "Attribute spec value definition is unknown", definition)
         }
 
     private fun toString(definition: OtpErlangTuple,
@@ -23,15 +24,19 @@ object Definition {
             Type.ifTo(definition) {
                 BoundedFun.ifToString(definition, decompiler, macroNameArity) ?:
                 Fun.ifToString(definition, decompiler, macroNameArity) ?:
-                fallback(decompiler, macroNameArity, "unknown_subtype")
-            } ?: fallback(decompiler, macroNameArity, "unknown_definition")
+                fallback(definition, decompiler, macroNameArity, "subtype")
+            } ?: fallback(definition, decompiler, macroNameArity, "definition")
 
-    private fun fallback(decompiler: MacroNameArity,
+    private fun fallback(definition: OtpErlangObject,
+                         decompiler: MacroNameArity,
                          macroNameArity: org.elixir_lang.beam.MacroNameArity,
-                         definitionString: String): String =
-        StringBuilder()
+                         definitionSuffix: String): String {
+        val definitionString = AbstractCode.unknown(definitionSuffix, "Attribute spec value definition $definitionSuffix", definition)
+
+        return StringBuilder()
                 .let { ParameterReturn.fallback(it, decompiler, macroNameArity) }
                 .append(" :: ")
                 .append(definitionString)
                 .toString()
+    }
 }

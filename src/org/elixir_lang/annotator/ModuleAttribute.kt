@@ -117,11 +117,11 @@ class ModuleAttribute : Annotator, DumbAware {
     /*
      * Private Instance Methods
      */
-    private fun cannotHighlightTypes(element: PsiElement?) {
+    private fun cannotHighlightTypes(element: PsiElement) {
         error("Cannot highlight types", element)
     }
 
-    private fun error(userMessage: String, element: PsiElement?) {
+    private fun error(userMessage: String, element: PsiElement) {
         Logger.error(this.javaClass, userMessage, element)
     }
 
@@ -243,7 +243,9 @@ class ModuleAttribute : Annotator, DumbAware {
                             cannotHighlightTypes(leftOperand)
                         }
                     } else {
-                        cannotHighlightTypes(leftOperand)
+                        if (leftOperand != null) {
+                            cannotHighlightTypes(leftOperand)
+                        }
                     }
 
                     val rightOperand: PsiElement? = infix.rightOperand()
@@ -588,7 +590,9 @@ class ModuleAttribute : Annotator, DumbAware {
                         )
                     }
                     else -> {
-                        cannotHighlightTypes(leftOperand)
+                        if (leftOperand != null) {
+                            cannotHighlightTypes(leftOperand)
+                        }
                     }
                 }
 

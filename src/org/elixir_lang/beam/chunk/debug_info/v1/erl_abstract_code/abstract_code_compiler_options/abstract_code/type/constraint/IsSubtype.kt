@@ -20,7 +20,7 @@ object IsSubtype {
     private fun argumentsToString(arguments: OtpErlangObject) =
             when (arguments) {
                 is OtpErlangList -> argumentsToString(arguments)
-                else -> "unknown_arguments_var: unknown_arguments_type"
+                else -> AbstractCode.error("unknown_arguments_var: unknown_arguments_type", "type constraint subtype arguments", arguments)
             }
 
     private fun argumentsToType(arguments: OtpErlangList): OtpErlangObject? = arguments.elementAt(1)
@@ -49,21 +49,21 @@ object IsSubtype {
     private fun toString(isSubtype: OtpErlangList) =
             toArguments(isSubtype)
                     ?.let { argumentsToString(it) }
-                    ?: "is_subtype_missing_arguments_var: is_substype_missing_arguments_type"
+                    ?: AbstractCode.error("is_subtype_missing_arguments_var: is_substype_missing_arguments_type", "type constraint subtype arguments are missing", isSubtype)
 
     private fun typeString(arguments: OtpErlangList) =
             argumentsToType(arguments)
                     ?.let { typeToString(it) }
-                    ?: "missing_type"
+                    ?: AbstractCode.missing("type", "type constraint subtype type", arguments)
 
     private fun typeToString(type: OtpErlangObject) = AbstractCode.toString(type)
 
     private fun varString(arguments: OtpErlangList) =
             argumentsToVar(arguments)
                     ?.let { varToString(it) }
-                    ?: "missing_var:"
+                    ?: AbstractCode.error("missing_var:", "type constraint subtype var", arguments)
 
     private fun varToString(`var`: OtpErlangObject) =
             Var.ifToKey(`var`)
-            ?: "unknown_var:"
+            ?: AbstractCode.error("unknown_var:", "type constraint subtype var", `var`)
 }

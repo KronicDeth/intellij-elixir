@@ -14,7 +14,7 @@ object Map {
             when (term.arity()) {
                 3 -> constructionToMacroStringDeclaredScope(term, scope)
                 4 -> updateToMacroStringDeclaredScope(term, scope)
-                else -> MacroStringDeclaredScope.error( "unknown_map_operation")
+                else -> MacroStringDeclaredScope.unknown( "map_operation", "map", term)
             }
 
     private const val TAG = "map"
@@ -34,10 +34,10 @@ object Map {
     private fun sourceMacroString(term: OtpErlangTuple, scope: Scope): MacroString =
             term.elementAt(2)
                     ?.let { AbstractCode.toMacroStringDeclaredScope(it, scope).macroString }
-                    ?: MacroString.error("unknown_map_update_source")
+                    ?: MacroString.unknown("map_update_source", "map update source", term)
 
     private fun associationsMacroString(term: OtpErlangTuple, index: Int, scope: Scope): MacroStringDeclaredScope =
             term.elementAt(index)
                 ?.let { Sequence.toCommaSeparatedMacroStringDeclaredScope(it, scope) }
-                ?: MacroStringDeclaredScope.error("missing_associations")
+                ?: MacroStringDeclaredScope.missing("associations", "map associations", term)
 }

@@ -2,6 +2,7 @@ package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code
 
 import com.ericsson.otp.erlang.OtpErlangList
 import com.ericsson.otp.erlang.OtpErlangObject
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.COMMA
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Scope
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Sequence
@@ -20,14 +21,14 @@ object FunBound {
     private fun boundString(funBound: OtpErlangList): String =
             toBound(funBound)
                     ?.let { boundToString(it) }
-                    ?: "missing_bound"
+                    ?: AbstractCode.missing("bound", "bounded_fun fun bound", funBound)
 
     private fun boundToString(bound: OtpErlangList) = Sequence.toCommaSeparatedString(bound)
 
     private fun boundToString(bound: OtpErlangObject): String =
             when (bound) {
                 is OtpErlangList -> boundToString(bound)
-                else -> "unknown_bound"
+                else -> AbstractCode.unknown("bound", "bounded_fun fun bound", bound)
             }
 
     private fun funString(funBound: OtpErlangList,
@@ -35,15 +36,15 @@ object FunBound {
                           macroNameArity: org.elixir_lang.beam.MacroNameArity): String =
             toFun(funBound)
                     ?.let { funToMacroString(it, decompiler, macroNameArity) }
-                    ?: "missing_fun"
+                    ?: AbstractCode.missing("fun", "bounded_fun fun", funBound)
 
     private fun funToMacroString(`fun`: OtpErlangObject,
                                  decompiler: MacroNameArity,
                                  macroNameArity: org.elixir_lang.beam.MacroNameArity) =
         Type.ifTo(`fun`) {
             Fun.ifToString(it, decompiler, macroNameArity)
-            ?: "unknown_fun"
-        } ?: "unknown_fun"
+        } ?:
+        AbstractCode.unknown("fun", "bounded_fun fun", `fun`)
 
     private fun toBound(funBound: OtpErlangList): OtpErlangObject? = funBound.elementAt(1)
     private fun toFun(funBound: OtpErlangList): OtpErlangObject? = funBound.elementAt(0)

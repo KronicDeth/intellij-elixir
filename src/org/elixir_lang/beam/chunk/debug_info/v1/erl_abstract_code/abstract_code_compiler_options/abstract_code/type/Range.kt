@@ -26,23 +26,23 @@ object Range {
     private fun firstLastToString(term: OtpErlangObject) =
             when (term) {
                 is OtpErlangList -> firstLastToString(term)
-                else -> "unknown_first_last"
+                else -> AbstractCode.unknown("first_last", "type ${SUBTYPE} first and last", term)
             }
 
     private fun firstString(firstLast: OtpErlangList): String =
             firstLastToFirst(firstLast)
                     ?.let { AbstractCode.toString(it) }
-                    ?: "missing_first"
+                    ?: AbstractCode.missing("first", "type ${SUBTYPE} first", firstLast)
 
     private fun lastString(firstLast: OtpErlangList): String =
             firstLastToLast(firstLast)
                     ?.let { AbstractCode.toString(it) }
-                    ?: "missing_last"
+                    ?: AbstractCode.missing("last", "type ${SUBTYPE} last", firstLast)
 
     private fun toFirstLast(type: OtpErlangTuple): OtpErlangObject? = type.elementAt(3)
 
     private fun toString(type: OtpErlangTuple) =
             toFirstLast(type)
                     ?.let { firstLastToString(it) }
-                    ?: "missing_first_last"
+                    ?: AbstractCode.missing("first_last", "type ${SUBTYPE} first and last", type)
 }

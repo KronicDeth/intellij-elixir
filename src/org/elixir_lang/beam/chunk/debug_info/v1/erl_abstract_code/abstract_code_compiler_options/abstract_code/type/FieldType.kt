@@ -15,17 +15,17 @@ object FieldType {
 
     private const val SUBTYPE = "field_type"
 
-    private fun toString(@Suppress("UNUSED_PARAMETER") fieldType: OtpErlangTuple): String =
+    private fun toString(fieldType: OtpErlangTuple): String =
         toPair(fieldType)
                 ?.let { pairToString(it) }
-                ?: "missing_pair"
+                ?: AbstractCode.missing("pair", "${SUBTYPE} pair", fieldType)
 
     private fun toPair(type: OtpErlangTuple): OtpErlangObject? = type.elementAt(3)
 
     private fun pairToString(pair: OtpErlangObject): String =
             when (pair) {
                 is OtpErlangList -> pairToString(pair)
-                else -> "unknown_pair"
+                else -> AbstractCode.unknown("pair", "${SUBTYPE} pair", pair)
             }
 
     private fun pairToString(pair: OtpErlangList): String {
@@ -38,19 +38,20 @@ object FieldType {
     private fun fieldString(pair: OtpErlangList) =
             pairToField(pair)
                     ?.let { fieldToString(it) }
-                    ?: "missing_field"
+                    ?: AbstractCode.missing("field", "${SUBTYPE} field", pair)
 
     private fun pairToField(pair: OtpErlangList): OtpErlangObject? = pair.elementAt(0)
 
     private fun fieldToString(field: OtpErlangObject) =
             Atom.toElixirAtom(field)?.let { elixirAtom ->
                 Identifier.inspectAsFunction(elixirAtom, true)
-            } ?: "unknown_field"
+            } ?:
+            AbstractCode.unknown("field", "${SUBTYPE} field", field)
 
     private fun typeString(pair: OtpErlangList) =
             pairToType(pair)
                     ?.let { typeToString(it) }
-                    ?: "missing_type"
+                    ?: AbstractCode.missing("type", "${SUBTYPE} type", pair)
 
     private fun pairToType(pair: OtpErlangList) = pair.elementAt(1)
 

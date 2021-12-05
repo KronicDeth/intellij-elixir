@@ -10,12 +10,12 @@ object MapField {
     fun toString(type: OtpErlangTuple, necessity: String) =
             toPair(type)
                     ?.let { pairToString(it, necessity) }
-                    ?: "missing_pair"
+                    ?: AbstractCode.missing("pair", "type map field pair", type)
 
     private fun keyString(pair: OtpErlangList) =
             pairToKey(pair)
                     ?.let { keyToString(it) }
-                    ?: "missing_key"
+                    ?: AbstractCode.missing("key", "type map field key", pair)
 
     private fun keyToString(key: OtpErlangObject): String = AbstractCode.toString(key)
 
@@ -31,7 +31,7 @@ object MapField {
     private fun pairToString(pair: OtpErlangObject, necessity: String) =
             when (pair) {
                 is OtpErlangList -> pairToString(pair, necessity)
-                else -> "unknown_pair"
+                else -> AbstractCode.unknown("pair", "type map field pair", pair)
             }
 
     private fun pairToValue(pair: OtpErlangList): OtpErlangObject? = pair.elementAt(1)
@@ -40,7 +40,7 @@ object MapField {
     private fun valueString(pair: OtpErlangList): String =
             pairToValue(pair)
                     ?.let { valueToString(it) }
-                    ?: "missing_value"
+                    ?: AbstractCode.missing("value", "type mape field value", pair)
 
     private fun valueToString(key: OtpErlangObject): String = AbstractCode.toString(key)
 }

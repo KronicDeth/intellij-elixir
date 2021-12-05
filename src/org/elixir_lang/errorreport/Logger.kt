@@ -1,112 +1,131 @@
-package org.elixir_lang.errorreport;
+package org.elixir_lang.errorreport
 
-import com.intellij.diagnostic.AttachmentFactory;
-import com.intellij.openapi.diagnostic.Attachment;
-import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.util.TextRange;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.FileViewProvider;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
-import org.jetbrains.annotations.NotNull;
+import com.ericsson.otp.erlang.OtpErlangObject
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiFile
+import com.intellij.diagnostic.AttachmentFactory
+import com.intellij.openapi.diagnostic.Logger
+import java.lang.StringBuilder
 
-public class Logger {
+object Logger {
     /*
      * Public Static Methods
      */
-
     /**
-     * Logs error to the {@code klass}'s {@link com.intellij.openapi.diagnostic.Logger} instance with the given
-     * {@code userMessage} and the text of {@code element} as the details and containing file of {@code element} as an
+     * Logs error to the `klass`'s [com.intellij.openapi.diagnostic.Logger] instance with the given
+     * `userMessage` and the text of `element` as the details and containing file of `element` as an
      * attachment
      *
      * @param klass   Class whose logger to use
-     * @param title   Title of error stored in {@link Throwable}.
+     * @param title   Title of error stored in [Throwable].
      * @param element element responsible for the error
      */
-    public static void error(@NotNull Class klass, @NotNull String title, PsiElement element) {
-        error(com.intellij.openapi.diagnostic.Logger.getInstance(klass), title, element);
+    @JvmStatic
+    fun error(klass: Class<*>, title: String, element: PsiElement) {
+        error(Logger.getInstance(klass), title, element)
+    }
+
+    fun error(klass: Class<*>, title: String, term: OtpErlangObject) {
+        error(Logger.getInstance(klass), title, term)
     }
 
     /**
-     * Logs error {@link com.intellij.openapi.diagnostic.Logger} instance with the given {@code userMessage} and the
-     * text of {@code element} as the details and containing file of {@code element} as an * attachment
+     * Logs error [com.intellij.openapi.diagnostic.Logger] instance with the given `title` and the
+     * text of `element` as the details and containing file of `element` as an * attachment
      *
      * @param logger  logger to which to log an error.
-     * @param title   Title of error stored in {@link Throwable}.
+     * @param title   Title of error stored in [Throwable].
      * @param element element responsible for the error
      */
-    public static void error(@NotNull com.intellij.openapi.diagnostic.Logger logger,
-                             @NotNull String title,
-                             @NotNull PsiElement element) {
-        Throwable throwable = new Throwable(title);
-        PsiFile containingFile = element.getContainingFile();
-        String message = message(containingFile, element);
-
-        VirtualFile virtualFile = containingFile.getVirtualFile();
-
+    fun error(logger: Logger,
+              title: String,
+              element: PsiElement) {
+        val throwable = Throwable(title)
+        val containingFile = element.containingFile
+        val message = message(containingFile, element)
+        val virtualFile = containingFile.virtualFile
         if (virtualFile != null) {
-            Attachment attachment = AttachmentFactory.createAttachment(virtualFile);
-            logger.error(message, throwable, attachment);
+            val attachment = AttachmentFactory.createAttachment(virtualFile)
+            logger.error(message, throwable, attachment)
         } else {
-            logger.error(message, throwable);
+            logger.error(message, throwable)
         }
+    }
+
+    /**
+     * Logs error [com.intellij.openapi.diagnostic.Logger] instance with the given `title` and the
+     * `term`
+     *
+     * @param logger  logger to which to log an error.
+     * @param title   Title of error stored in [Throwable].
+     * @param term responsible for the error
+     */
+    fun error(logger: Logger,
+              title: String,
+              term: OtpErlangObject) {
+        val throwable = Throwable(title)
+        val message = message(term)
+        logger.error(message, throwable)
     }
 
     /*
      * Private Static Methods
      */
-
-    @NotNull
-    private static String className(@NotNull PsiElement element) {
-        return "\n" +
-                "### Element Class Name\n" +
-                '\n' +
-                "```\n" +
-                element.getClass().getName() +
-                '\n' +
-                "```";
+    private fun className(element: PsiElement): String {
+        return """
+             
+             ### Element Class Name
+             
+             ```
+             ${element.javaClass.name}
+             ```
+             """.trimIndent()
     }
 
-    @NotNull
-    private static String excerpt(@NotNull PsiFile containingFile, @NotNull PsiElement element) {
-        StringBuilder excerptBuilder = new StringBuilder();
+    private fun excerpt(containingFile: PsiFile, element: PsiElement): String {
+        val excerptBuilder = StringBuilder()
         excerptBuilder
                 .append('\n')
                 .append("### Excerpt\n")
-                .append('\n');
-
+                .append('\n')
         excerptBuilder
                 .append("```\n")
-                .append(element.getText())
+                .append(element.text)
                 .append('\n')
-                .append("```\n");
-
-        FileViewProvider fileViewProvider = containingFile.getViewProvider();
-        Document document = fileViewProvider.getDocument();
-
+                .append("```\n")
+        val fileViewProvider = containingFile.viewProvider
+        val document = fileViewProvider.document
         if (document != null) {
-            VirtualFile virtualFile = containingFile.getVirtualFile();
-
+            val virtualFile = containingFile.virtualFile
             if (virtualFile != null) {
-                String path = virtualFile.getPath();
-                TextRange textRange = element.getTextRange();
-                int startingLine = document.getLineNumber(textRange.getStartOffset());
-                int endingLine = document.getLineNumber(textRange.getEndOffset());
-
+                val path = virtualFile.path
+                val textRange = element.textRange
+                val startingLine = document.getLineNumber(textRange.startOffset)
+                val endingLine = document.getLineNumber(textRange.endOffset)
                 excerptBuilder
                         .append('\n')
                         .append("From: `").append(path).append(':').append(startingLine).append('`').append('\n')
-                        .append("To: `").append(path).append(':').append(endingLine).append('`');
+                        .append("To: `").append(path).append(':').append(endingLine).append('`')
             }
         }
-
-        return excerptBuilder.toString();
+        return excerptBuilder.toString()
     }
 
-    private static String message(@NotNull PsiFile containingFile,
-                                  @NotNull PsiElement element) {
-        return excerpt(containingFile, element) + "\n" +
-                className(element);
+    private fun message(containingFile: PsiFile,
+                        element: PsiElement): String {
+        return """
+            ${excerpt(containingFile, element)}
+            ${className(element)}
+            """.trimIndent()
+    }
+
+    private fun message(term: OtpErlangObject): String {
+        return """
+            
+            ### Term
+            
+            $term
+            
+            """.trimIndent()
     }
 }

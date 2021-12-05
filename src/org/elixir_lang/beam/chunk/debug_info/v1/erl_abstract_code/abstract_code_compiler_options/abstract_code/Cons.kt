@@ -22,7 +22,7 @@ object Cons {
     private fun headMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope =
             toHead(term)
                     ?.let { headToMacroStringDeclaredScope(it, scope) }
-                    ?: MacroStringDeclaredScope("missing_head", doBlock = false, Scope.EMPTY)
+                    ?: MacroStringDeclaredScope.missing("missing_head", "cons head", term)
 
     private fun headTailMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope) =
         headTailMacroStringDeclaredScope(term, scope, Pair(StringBuilder(), Scope.EMPTY))
@@ -70,7 +70,7 @@ object Cons {
     private fun tailMacroStringDeclaredScope(term: OtpErlangTuple, scope : Scope) =
             toTail(term)
                     ?.let { tailToMacroStringDeclaredScope(it, scope) }
-                    ?: MacroStringDeclaredScope("missing_tail", doBlock = false, Scope.EMPTY)
+                    ?: MacroStringDeclaredScope.missing("tail", "cons tail", term)
 
     private fun tailToMacroStringDeclaredScope(term: OtpErlangObject, scope: Scope) =
             AbstractCode.toMacroStringDeclaredScope(term, scope)

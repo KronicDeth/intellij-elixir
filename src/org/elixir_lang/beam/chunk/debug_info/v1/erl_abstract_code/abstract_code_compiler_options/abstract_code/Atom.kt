@@ -3,6 +3,7 @@ package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code
 import com.ericsson.otp.erlang.OtpErlangAtom
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode.ifTag
 import org.elixir_lang.beam.term.inspect
 
@@ -33,7 +34,7 @@ object Atom {
     private fun toMacroString(term: OtpErlangTuple): MacroString {
         val string = toAtom(term)
                 ?.let { inspect(it) }
-                ?: ":unknown_atom"
+                ?: AbstractCode.error(":unknown_atom", "atom is unknown", term)
 
         return MacroString(string, doBlock = false)
     }

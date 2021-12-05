@@ -12,7 +12,7 @@ object Size {
             if (term.atomValue() == default) {
                 null
             } else {
-                "unknown_size_atom"
+                AbstractCode.unknown("size_atom", "bin element size atom", term)
             }
 
     fun toString(term: OtpErlangObject): String? =

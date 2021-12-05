@@ -5,6 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangList
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
 import org.elixir_lang.Macro
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode.ifTag
 import org.elixir_lang.code.Identifier.inspectAsFunction
 
@@ -35,20 +36,20 @@ object NamedFun {
     private fun nameString(term: OtpErlangTuple): String =
             toName(term)
                     ?.let { nameToString(it) }
-                    ?: "missing_named_fun_name"
+                    ?: AbstractCode.missing("named_fun_name", "${TAG} name", term)
 
     private fun toName(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
 
     private fun nameToString(name: OtpErlangObject) =
             when (name) {
                 is OtpErlangAtom -> Var.nameToString(name)
-                else -> "unknown_named_fun_name"
+                else -> AbstractCode.unknown("${TAG}_name", "${TAG} name", name)
             }
 
     private fun clausesString(term: OtpErlangTuple, scope: Scope): String =
             toClauses(term)
                     ?.let { clausesToString(it, scope) }
-                    ?: "missing_clauses"
+                    ?: AbstractCode.missing("clauses", "${TAG} clauses", term)
 
     private fun toClauses(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(3)
 
@@ -62,7 +63,7 @@ object NamedFun {
             clauses
                     .joinToString("\n") {
                         Clause.ifToString(it, scope) ?:
-                        "unknown_clause"
+                        AbstractCode.unknown("clause", "${TAG} clause", clauses)
                     }
                     .let { Macro.adjustNewLines(it, "\n  ") }
 }

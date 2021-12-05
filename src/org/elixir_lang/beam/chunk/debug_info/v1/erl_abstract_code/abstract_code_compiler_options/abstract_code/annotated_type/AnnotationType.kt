@@ -16,7 +16,7 @@ object AnnotationType {
     private fun annotationString(annotationType: OtpErlangList): String =
             toAnnotation(annotationType)
                     ?.let { annotationToString(it) }
-                    ?: "missing_annotation"
+                    ?: AbstractCode.missing("annotation", "annotation type annotation", annotationType)
 
     private fun annotationToString(annotation: OtpErlangObject): String = AbstractCode.toString(annotation)
 
@@ -26,7 +26,7 @@ object AnnotationType {
     private fun typeString(annotationType: OtpErlangList): String =
             toType(annotationType)
                     ?.let { typeToString(it) }
-                    ?: "missing_type"
+                    ?: AbstractCode.missing("type", "annotation type type", annotationType)
 
     private fun typeToString(type: OtpErlangObject): String = AbstractCode.toString(type)
 }

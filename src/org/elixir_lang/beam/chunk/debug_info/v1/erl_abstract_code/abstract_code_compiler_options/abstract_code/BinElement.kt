@@ -3,6 +3,7 @@ package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code
 import com.ericsson.otp.erlang.OtpErlangBinary
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode.ifTag
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.bin_element.Pattern
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.bin_element.Size
@@ -76,14 +77,14 @@ object BinElement {
         return if (typeSpecifierList != null) {
             TypeSpecifierList.toMacroString(typeSpecifierList)
         } else {
-            "unknown_type_specifier_list"
+            AbstractCode.unknown("type_specifier_list", "Bin element type specifier list", term)
         }
     }
 
     private fun patternMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope) =
             toPattern(term)
                     ?.let { Pattern.toMacroStringDeclaredScope(it, scope) }
-                    ?: MacroStringDeclaredScope("unknown_pattern", doBlock = false, Scope.EMPTY)
+                    ?: MacroStringDeclaredScope.unknown("pattern", "bin element pattern", term)
 
     private fun sizeMacroString(term: OtpErlangTuple): String? {
         val size = toSize(term)
@@ -91,7 +92,7 @@ object BinElement {
         return if (size != null) {
             Size.toString(size)
         } else {
-            "unknown_size"
+            AbstractCode.unknown("size", "bin element size", term)
         }
     }
 

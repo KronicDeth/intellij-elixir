@@ -3,6 +3,7 @@ package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code
 import com.ericsson.otp.erlang.OtpErlangLong
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode.ifTag
 
 object Integer {
@@ -20,7 +21,7 @@ object Integer {
     private fun integerToString(term: OtpErlangObject): String =
             when (term) {
                 is OtpErlangLong -> integerToString(term)
-                else -> "unknown_integer"
+                else -> AbstractCode.unknown("integer", "integer", term)
             }
 
     private fun toInteger(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
@@ -28,5 +29,5 @@ object Integer {
     private fun toString(term: OtpErlangTuple): String =
             toInteger(term)
                 ?.let { integerToString(it) }
-                ?: "missing_integer"
+                ?: AbstractCode.missing("integer", "integer", term)
 }

@@ -7,6 +7,7 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Char
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Float
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Map
+import org.elixir_lang.errorreport.Logger
 
 
 object AbstractCode {
@@ -78,6 +79,23 @@ object AbstractCode {
             Type.ifToMacroStringDeclaredScope(term) ?:
             UserType.ifToMacroStringDeclaredScope(term) ?:
             Var.ifToMacroStringDeclaredScope(term, scope) ?:
-            MacroStringDeclaredScope("unknown_abstract_code", doBlock = false, Scope.EMPTY)
+            MacroStringDeclaredScope.unknown("abstract_code", "", term)
+
+    fun missing(default: String, title: String, term: OtpErlangObject): String =
+            error("missing_$default", "$title is missing", term)
+
+    fun unknown(default: String, title: String, term: OtpErlangObject): String =
+            error("unknown_$default", "$title is unknown", term)
+
+    fun error(default: String, title: String, term: OtpErlangObject): String {
+        Logger.error(logger, "Erlang Abst $title", term)
+
+        return default
+    }
+
+    private val logger by lazy { com.intellij.openapi.diagnostic.Logger.getInstance(AbstractCode::class.java) }
 }
+
+
+
 

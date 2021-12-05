@@ -14,7 +14,7 @@ object Op {
     fun toMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope =
             toOperator(term)
                     ?.let { operationToMacroStringDeclaredScope(it, toOperands(term), scope) }
-                    ?: MacroStringDeclaredScope.error("missing_operator")
+                    ?: MacroStringDeclaredScope.missing("operator", "${TAG} operator", term)
 
     private const val TAG = "op"
 
@@ -107,6 +107,6 @@ object Op {
     private fun unaryOperatorToString(operator: OtpErlangObject) =
             when (operator) {
                 is OtpErlangAtom -> unaryOperatorToString(operator)
-                else -> "unknown_unary_operator"
+                else -> AbstractCode.unknown("unary_operator", "op unary operator", operator)
             }
 }

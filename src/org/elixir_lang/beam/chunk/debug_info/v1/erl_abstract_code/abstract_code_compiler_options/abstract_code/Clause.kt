@@ -3,6 +3,7 @@ package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
 import org.elixir_lang.Macro.adjustNewLines
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode.ifTag
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.clause.Body
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.clause.GuardSequence
@@ -17,7 +18,7 @@ object Clause {
     fun guardsString(clause: OtpErlangTuple): String =
             toGuardSequence(clause)
                     ?.let { GuardSequence.guardsMacroString(it) }
-                    ?: "missing_guard_sequence"
+                    ?: AbstractCode.missing("guard_sequence", "clause guard sequence", clause)
 
     fun guardSequenceString(clause: OtpErlangTuple): String =
             toGuardSequence(clause)

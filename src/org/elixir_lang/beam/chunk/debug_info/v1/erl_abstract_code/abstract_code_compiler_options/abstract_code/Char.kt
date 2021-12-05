@@ -3,6 +3,7 @@ package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code
 import com.ericsson.otp.erlang.OtpErlangLong
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode.ifTag
 
 object Char {
@@ -33,7 +34,7 @@ object Char {
     private fun codePointToString(term: OtpErlangObject): String =
             when (term) {
                 is OtpErlangLong -> codePointToString(term)
-                else -> "unknown_code_point"
+                else -> AbstractCode.unknown("code_point", "char code point", term)
             }
 
     private fun toCodePoint(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
@@ -41,5 +42,5 @@ object Char {
     private fun toString(term: OtpErlangTuple): String =
             toCodePoint(term)
                     ?.let { codePointToString(it) }
-                    ?: "missing_code_point"
+                    ?: AbstractCode.missing("code_point", "char code point", term)
 }

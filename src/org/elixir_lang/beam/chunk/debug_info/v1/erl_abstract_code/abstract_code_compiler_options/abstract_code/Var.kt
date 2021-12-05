@@ -4,6 +4,7 @@ import com.ericsson.otp.erlang.OtpErlangAtom
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
 import org.elixir_lang.Macro
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode.ifTag
 import org.elixir_lang.code.Identifier.inspectAsKey
 
@@ -25,14 +26,14 @@ object Var {
     private fun nameMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope) =
             toName(term)
                     ?.let{ nameToMacroStringDeclaredScope(it, scope) }
-                    ?: MacroStringDeclaredScope.error("name_missing")
+                    ?: MacroStringDeclaredScope.missing("name", "${TAG} name", term)
 
     private fun nameToKey(name: OtpErlangAtom) = name.let { nameToString(it) }.let { inspectAsKey(it) }
 
     private fun nameToKey(name: OtpErlangObject) =
             when (name) {
                 is OtpErlangAtom -> nameToKey(name)
-                else -> "unknown_name:"
+                else -> AbstractCode.error("unknown_name:", "var name is unknown", name)
             }
 
     fun nameToString(name: OtpErlangAtom) = name.atomValue().decapitalize().escapeElixirKeyword()
@@ -60,13 +61,13 @@ object Var {
     private fun nameToMacroStringDeclaredScope(name: OtpErlangObject, scope: Scope): MacroStringDeclaredScope =
             when (name) {
                 is OtpErlangAtom -> nameToMacroStringDeclaredScope(name, scope)
-                else -> MacroStringDeclaredScope.error("unknown_name")
+                else -> MacroStringDeclaredScope.unknown("name", "${TAG} name", name)
             }
 
     private fun toKey(term: OtpErlangTuple) =
             toName(term)
                     ?.let { nameToKey(it) }
-                    ?: "missing_name:"
+                    ?: AbstractCode.error("missing_name:", "${TAG} name", term)
 
     private fun toName(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
 }

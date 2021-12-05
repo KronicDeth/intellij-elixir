@@ -4,6 +4,7 @@ import com.ericsson.otp.erlang.OtpErlangList
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
 import org.elixir_lang.Macro
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode.ifTag
 
 object If {
@@ -18,7 +19,7 @@ object If {
     private fun clausesString(term: OtpErlangTuple, scope: Scope): String =
             toClauses(term)
                     ?.let { clausesToString(it, scope) }
-                    ?: "missing_clauses"
+                    ?: AbstractCode.missing("clauses", "if clauses", term)
 
     private fun clausesToString(caseClauses: OtpErlangList, scope: Scope): String =
             caseClauses
@@ -26,14 +27,14 @@ object If {
                         Clause.ifTo(it) {
                             clauseToString(it, scope)
                         } ?:
-                        "unknown_clause"
+                        AbstractCode.unknown("clause", "if clause", it)
                     }
                     .let { Macro.adjustNewLines(it, "\n  ") }
 
     private fun clausesToString(caseClauses: OtpErlangObject, scope: Scope): String =
             when (caseClauses) {
                 is OtpErlangList -> clausesToString(caseClauses, scope)
-                else -> "unknown_clauses"
+                else -> AbstractCode.unknown("clauses", "if clauses", caseClauses)
             }
 
     // no patterns since Erlang if can only use guards

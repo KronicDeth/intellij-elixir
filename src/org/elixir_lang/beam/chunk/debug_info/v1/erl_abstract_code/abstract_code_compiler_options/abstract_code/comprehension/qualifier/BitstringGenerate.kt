@@ -27,12 +27,12 @@ object BitstringGenerate {
     private fun expressionMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope) =
             toExpression(term)
                     ?.let { AbstractCode.toMacroStringDeclaredScope(it, scope) }
-                    ?: MacroStringDeclaredScope.error("missing_expression")
+                    ?: MacroStringDeclaredScope.missing("expression", scope, "bitstring generate expression", term)
 
     private fun patternMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope) =
             toPattern(term)
                     ?.let { patternToMacroStringDeclaredScope(it, scope) }
-                    ?: MacroStringDeclaredScope.error("missing_pattern")
+                    ?: MacroStringDeclaredScope.missing("pattern", scope, "bitstring generate pattern", term)
 
     private fun patternToMacroStringDeclaredScope(term: OtpErlangObject, scope: Scope) =
             Bin.ifTo(term) {

@@ -2,6 +2,7 @@ package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code
 
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode.ifTag
 
 /**
@@ -28,7 +29,7 @@ object Block {
     fun toString(term: OtpErlangTuple, scope: DeclaredScope): String =
             toExpressions(term)
                     ?.let { expressionsToMacroStringDeclaredScope(it, scope) }
-                    ?: "unknown_block"
+                    ?: AbstractCode.unknown("block", "block", term)
 
     private fun toExpressions(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
 

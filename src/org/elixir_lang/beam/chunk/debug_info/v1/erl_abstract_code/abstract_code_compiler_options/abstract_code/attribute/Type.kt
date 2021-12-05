@@ -54,18 +54,22 @@ class Type(val attributes: Attributes, attribute: Attribute): MacroString(attrib
         private fun nameString(term: OtpErlangTuple): String =
             toName(term)
                     ?.let { nameToMacroString(it) }
-                    ?: "missing_name"
+                    ?: AbstractCode.missing("name", "Attribute type name", term)
 
         private fun nameToMacroString(name: OtpErlangObject): String =
                 when (name) {
                     is OtpErlangAtom -> Identifier.inspectAsFunction(name, true)
-                    else -> "unknown_name"
+                    else -> AbstractCode.unknown("name", "Attribute type name", name)
                 }
 
         private fun subtypeMacroString(term: OtpErlangObject?) =
                 when (term) {
                     is OtpErlangTuple -> subtypeMacroString(term)
-                    else -> "unknown_subtype"
+                    else -> if (term != null) {
+                        AbstractCode.unknown("subtype", "Attribute type subtype", term)
+                    } else {
+                        "missing_subtype"
+                    }
                 }
 
         private fun subtypeMacroString(term: OtpErlangTuple): String {
@@ -81,7 +85,7 @@ class Type(val attributes: Attributes, attribute: Attribute): MacroString(attrib
         private fun valueString(term: OtpErlangTuple): String =
                 toValue(term)
                         ?.let { valueToString(it) }
-                        ?: "unknown_value"
+                        ?: AbstractCode.unknown("value", "Attribute type value", term)
 
         private fun valueToString(value: OtpErlangObject): String = AbstractCode.toString(value)
     }

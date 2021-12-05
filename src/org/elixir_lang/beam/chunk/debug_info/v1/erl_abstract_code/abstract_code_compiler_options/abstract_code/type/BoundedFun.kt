@@ -3,6 +3,7 @@ package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code
 import com.ericsson.otp.erlang.OtpErlangList
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.MacroString
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Type.ifSubtypeTo
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.type.bounded_fun.FunBound
@@ -30,6 +31,6 @@ object BoundedFun {
                          macroNameArity: org.elixir_lang.beam.MacroNameArity): String =
             when (val funBound = funBound(type)) {
                 is OtpErlangList -> FunBound.toString(funBound, decompiler, macroNameArity)
-                else -> "unknown_fun_bound"
+                else -> AbstractCode.unknown("fun_bound", "bounded_fun fun_bound", type)
             }
 }

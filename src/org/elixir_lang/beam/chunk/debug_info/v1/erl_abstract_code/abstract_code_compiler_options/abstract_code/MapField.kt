@@ -14,7 +14,7 @@ object MapField {
     private fun keyMacroStringDeclaredScope(mapFieldAssociation: OtpErlangTuple, scope: Scope) =
             toKey(mapFieldAssociation)
                     ?.let { AbstractCode.toMacroStringDeclaredScope(it, scope) }
-                    ?: MacroStringDeclaredScope.error("missing_key")
+                    ?: MacroStringDeclaredScope.missing("key", "map field key", mapFieldAssociation)
 
     private fun toKey(mapFieldAssociation: OtpErlangTuple): OtpErlangObject? = mapFieldAssociation.elementAt(2)
 
@@ -37,6 +37,6 @@ object MapField {
     private fun valueMacroStringDeclaredScope(mapFieldAssociation: OtpErlangTuple, scope: Scope) =
             toValue(mapFieldAssociation)
                     ?.let { AbstractCode.toMacroStringDeclaredScope(it, scope) }
-                    ?: MacroStringDeclaredScope.error("missing_value")
+                    ?: MacroStringDeclaredScope.missing("value", "map field value", mapFieldAssociation)
 
 }

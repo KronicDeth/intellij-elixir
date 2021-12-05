@@ -26,12 +26,12 @@ object Generate {
     private fun expressionMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope) =
             toExpression(term)
                     ?.let { AbstractCode.toMacroStringDeclaredScope(it, scope) }
-                    ?: MacroStringDeclaredScope.error("missing_expression")
+                    ?: MacroStringDeclaredScope.missing("expression", scope, "generate expression", term)
 
     private fun patternMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope) =
             toPattern(term)
                     ?.let { AbstractCode.toMacroStringDeclaredScope(it, scope) }
-                    ?: MacroStringDeclaredScope.error("missing_pattern")
+                    ?: MacroStringDeclaredScope.missing("pattern", scope, "generate pattern", term)
 
     private fun toExpression(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(3)
     private fun toPattern(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)

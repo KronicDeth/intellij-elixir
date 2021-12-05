@@ -21,19 +21,19 @@ object RecordIndex {
     private fun fieldString(term: OtpErlangTuple): String =
             toField(term)
                     ?.let { fieldToString(it) }
-                    ?: "missing_field"
+                    ?: AbstractCode.missing("field", "${TAG} field", term)
 
     private fun fieldToString(term: OtpErlangObject): String = AbstractCode.toString(term)
 
     private fun nameString(term: OtpErlangTuple): String =
             toName(term)
                     ?.let { nameToString(it) }
-                    ?: "missing_name"
+                    ?: AbstractCode.missing("name", "${TAG} name", term)
 
     private fun nameToString(term: OtpErlangObject): String =
             when (term) {
                 is OtpErlangAtom -> inspectAsFunction(term, true)
-                else -> "unknown_name"
+                else -> AbstractCode.unknown("name", "${TAG} name", term)
             }
 
     private fun toString(term: OtpErlangTuple): String {

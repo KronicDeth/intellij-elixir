@@ -19,7 +19,7 @@ object Function {
         val string = when (val arity = term.arity()) {
             3 -> nameArityToString(term.elementAt(1), term.elementAt(2), scope)
             4 -> moduleNameArityToString(term.elementAt(1), term.elementAt(2), term.elementAt(3), scope)
-            else -> "fun_function_unknown_arity($arity)"
+            else -> AbstractCode.unknown("fun_function_arity($arity)", "fun function arity $arity", term)
         }
 
         return MacroString(string, doBlock = false)

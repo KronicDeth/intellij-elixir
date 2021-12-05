@@ -25,17 +25,17 @@ object Remote {
     private fun functionString(term: OtpErlangTuple): String =
             toFunction(term)
                     ?.let { functionToString(it) }
-                    ?: "missing_function"
+                    ?: AbstractCode.missing("function", "${TAG} function", term)
 
     private fun functionToString(function: OtpErlangObject): String =
             Atom.toElixirAtom(function)
                     ?.let { inspectAsFunction(it) }
-                    ?: "remote_unknown_function"
+                    ?: AbstractCode.unknown("function", "${TAG} function", function)
 
     internal fun moduleString(term: OtpErlangTuple): String =
             toModule(term)
                     ?.let { moduleToString(it) }
-                    ?: ":missing_module"
+                    ?: AbstractCode.error(":missing_module", "${TAG} module", term)
 
     private fun moduleToString(module: OtpErlangObject) = AbstractCode.toString(module)
 

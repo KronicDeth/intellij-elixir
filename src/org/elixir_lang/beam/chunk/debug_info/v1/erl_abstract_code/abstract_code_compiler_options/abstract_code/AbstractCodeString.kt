@@ -35,13 +35,13 @@ object AbstractCodeString {
     private fun stringString(term: OtpErlangTuple) =
             toString(term)
                     ?.let { stringToString(it) }
-                    ?: "missing_string"
+                    ?: AbstractCode.missing("string", "string string", term)
 
     private fun stringToString(term: OtpErlangObject): String =
         when (term) {
             is OtpErlangString -> stringToString(term)
             is OtpErlangList -> stringToString(term)
-            else -> "unknown_string"
+            else -> AbstractCode.unknown("string_string", "string string", term)
         }
 
     private fun stringToString(term: OtpErlangString): String = inspect(term)
@@ -50,6 +50,6 @@ object AbstractCodeString {
             if (term.arity() == 0 && term.isProper) {
                 "\"\""
             } else {
-                "non_empty_list_as_string"
+                AbstractCode.error("non_empty_list_as_string", "string list is non-empty", term)
             }
 }

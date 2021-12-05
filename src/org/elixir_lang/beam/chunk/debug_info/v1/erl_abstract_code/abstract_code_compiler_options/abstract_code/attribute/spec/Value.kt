@@ -3,6 +3,7 @@ package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code
 import com.ericsson.otp.erlang.*
 import org.elixir_lang.Macro.ifTupleTo
 import org.elixir_lang.beam.Decompiler
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.MacroString
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.attribute.spec.value.Definition
 import org.elixir_lang.beam.decompiler.Default
@@ -27,7 +28,7 @@ object Value {
     internal fun nameToString(name: OtpErlangObject): String =
             when (name) {
                 is OtpErlangAtom -> nameToString(name)
-                else -> "unknown_name"
+                else -> AbstractCode.unknown("name", "Attribute value name", name)
             }
 
     private fun toMacroNameArity(value: OtpErlangTuple): org.elixir_lang.beam.MacroNameArity? =

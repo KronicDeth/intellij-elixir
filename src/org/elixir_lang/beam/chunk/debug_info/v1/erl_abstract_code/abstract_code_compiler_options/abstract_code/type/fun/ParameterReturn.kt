@@ -15,7 +15,7 @@ object ParameterReturn {
     fun toString(parameterReturn: OtpErlangList): String = when (val arity = parameterReturn.arity()) {
         0 -> "function()"
         2 -> toString(parameterReturn.elementAt(0), parameterReturn.elementAt(1))
-        else -> "unknown_parameter_return_arity($arity)"
+        else -> AbstractCode.unknown("parameter_return_arity", "fun parameter and return arity $arity", parameterReturn)
     }
 
     fun toString(parameterReturn: OtpErlangList,
@@ -44,7 +44,7 @@ object ParameterReturn {
                                 macroNameArity: org.elixir_lang.beam.MacroNameArity) =
             toParameter(parameterReturn)
                     ?.let { parameterToString(it, decompiler, macroNameArity) }
-                    ?: "missing_parameter"
+                    ?: AbstractCode.missing("parameter", "fun parameter", parameterReturn)
 
     private fun parameterToString(parameter: OtpErlangObject) = AbstractCode.toString(parameter)
 
@@ -63,7 +63,7 @@ object ParameterReturn {
     private fun returnString(parameterReturn: OtpErlangList) =
             toReturn(parameterReturn)
                     ?.let { returnToString(it) }
-                    ?: "missing_return"
+                    ?: AbstractCode.missing("return", "fun return", parameterReturn)
 
     private fun returnToString(return_: OtpErlangObject): String = AbstractCode.toString(return_)
 

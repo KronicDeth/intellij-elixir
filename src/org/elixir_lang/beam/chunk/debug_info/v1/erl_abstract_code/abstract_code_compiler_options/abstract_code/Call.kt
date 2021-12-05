@@ -43,7 +43,7 @@ object Call {
     private fun argumentsString(term: OtpErlangTuple): String =
             toArguments(term)
                     ?.let { argumentsToString(it) }
-                    ?: "missing_arguments"
+                    ?: AbstractCode.missing("arguments", "call arguments", term)
 
     private fun argumentsToString(term: OtpErlangList): String = Sequence.toCommaSeparatedString(term)
 

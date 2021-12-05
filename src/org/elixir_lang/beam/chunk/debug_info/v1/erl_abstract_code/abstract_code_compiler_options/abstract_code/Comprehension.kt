@@ -26,12 +26,12 @@ object Comprehension {
     private fun expressionString(term: OtpErlangTuple, scope: Scope): String =
             toExpression(term)
                     ?.let { AbstractCode.toString(it, scope) }
-                    ?:"missing_expression"
+                    ?: AbstractCode.missing("expression", "comprehension expression", term)
 
     private fun qualifiersMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope =
             toQualifiers(term)
                     ?.let { Qualifiers.toMacroStringDeclaredScope(it, scope) }
-                    ?: MacroStringDeclaredScope("missing_qualifiers", doBlock = false, scope)
+                    ?: MacroStringDeclaredScope.missing("qualifiers", scope, "comprehension qualifiers", term)
 
     private fun toExpression(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
     private fun toQualifiers(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(3)

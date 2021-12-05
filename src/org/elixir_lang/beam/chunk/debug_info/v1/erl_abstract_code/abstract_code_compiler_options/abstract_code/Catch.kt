@@ -19,7 +19,7 @@ object Catch {
     private fun bodyString(term: OtpErlangTuple, scope: Scope): String =
             toBody(term)
                     ?.let { AbstractCode.toString(it, scope) }
-                    ?: "missing_catch_body"
+                    ?: AbstractCode.missing("catch_body", "catch body", term)
 
     private fun toBody(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
 

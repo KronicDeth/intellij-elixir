@@ -3,6 +3,7 @@ package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code
 import com.ericsson.otp.erlang.OtpErlangList
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Type.ifSubtypeTo
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.type.`fun`.ParameterReturn
 import org.elixir_lang.beam.decompiler.MacroNameArity
@@ -31,7 +32,7 @@ object Fun {
             parameterReturnToString: (OtpErlangList) -> String
     ): String = when (val parameterReturn = toParameterReturn(type)) {
         is OtpErlangList -> parameterReturnToString(parameterReturn)
-        else -> "unknown_parameter_return"
+        else -> AbstractCode.unknown("parameter_return", "${SUBTYPE} parameter and return", type)
     }
 
     private fun toParameterReturn(type: OtpErlangTuple): OtpErlangObject? = type.elementAt(3)

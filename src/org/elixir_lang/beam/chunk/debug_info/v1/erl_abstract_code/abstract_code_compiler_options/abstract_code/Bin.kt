@@ -29,7 +29,7 @@ object Bin {
             binElementsElixirStringToMacroStringDeclaredScope(binElements)
                     ?: binElementsToMacroStringDeclaredScope(binElements, scope)
         } else {
-            MacroStringDeclaredScope("missing_bin_elements", doBlock = false, Scope.EMPTY)
+            MacroStringDeclaredScope.missing("bin_elements", "bin elements", term)
         }
     }
 

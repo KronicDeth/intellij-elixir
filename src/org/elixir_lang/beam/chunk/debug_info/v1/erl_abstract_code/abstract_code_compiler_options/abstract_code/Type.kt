@@ -3,6 +3,7 @@ package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code
 import com.ericsson.otp.erlang.OtpErlangAtom
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode.ifTag
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.type.*
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.type.Fun
@@ -30,7 +31,7 @@ object Type {
     fun subtypeString(type: OtpErlangTuple): String =
             toSubtype(type)
                     ?.let { subtypeToString(it) }
-                    ?: "missing_subtype"
+                    ?: AbstractCode.missing("subtype", "${TAG} subtype", type)
 
     private const val TAG = "type"
 
@@ -39,7 +40,7 @@ object Type {
     private fun subtypeToString(subtype: OtpErlangObject): String =
             when (subtype) {
                 is OtpErlangAtom -> subtypeToString(subtype)
-                else -> "unknown_subtype"
+                else -> AbstractCode.unknown("subtype", "${TAG} subtype", subtype)
             }
 
     private fun toString(type: OtpErlangTuple): String =

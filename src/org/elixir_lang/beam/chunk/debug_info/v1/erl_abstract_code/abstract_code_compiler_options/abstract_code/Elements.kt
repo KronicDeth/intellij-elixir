@@ -31,6 +31,6 @@ object Elements {
     fun toMacroStringDeclaredScope(term: OtpErlangObject, scope: Scope) =
             when (term) {
                 is OtpErlangList -> toMacroStringDeclaredScope(term, scope)
-                else -> MacroStringDeclaredScope.error("unknown_elements")
+                else -> MacroStringDeclaredScope.unknown("elements", "elements", term)
             }
 }

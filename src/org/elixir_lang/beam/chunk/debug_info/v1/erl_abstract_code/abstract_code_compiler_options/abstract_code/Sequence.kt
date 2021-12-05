@@ -2,6 +2,7 @@ package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code
 
 import com.ericsson.otp.erlang.OtpErlangList
 import com.ericsson.otp.erlang.OtpErlangObject
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.comprehension.Qualifier
 import org.elixir_lang.beam.decompiler.MacroNameArity
 
@@ -21,7 +22,11 @@ object Sequence {
     fun toCommaSeparatedString(term: OtpErlangObject?, scope: Scope = Scope.EMPTY): String =
             when (term) {
                 is OtpErlangList -> toCommaSeparatedMacroStringDeclaredScope(term, scope).macroString.string
-                else -> "unknown_sequence"
+                else -> if (term != null) {
+                    AbstractCode.unknown("sequence", "sequence", term)
+                } else {
+                    "missing_sequence"
+                }
             }
 
     fun toCommaSeparatedString(term: OtpErlangList, scope: Scope = Scope.EMPTY): String =

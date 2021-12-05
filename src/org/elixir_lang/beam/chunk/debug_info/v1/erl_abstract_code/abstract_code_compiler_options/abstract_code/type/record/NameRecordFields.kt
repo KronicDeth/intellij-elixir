@@ -12,13 +12,13 @@ object NameRecordFields {
     fun toString(term: OtpErlangObject): String =
             when (term) {
                 is OtpErlangList -> toString(term)
-                else -> "unknown_name_record_fields"
+                else -> AbstractCode.unknown("name_record_fields", "type record", term)
             }
 
     private fun nameString(nameRecordFields: OtpErlangList): String =
             toName(nameRecordFields)
                     ?.let { nameToString(it) }
-                    ?: "missing_name"
+                    ?: AbstractCode.missing("name", "type record name", nameRecordFields)
 
     private fun nameToString(name: OtpErlangObject) =
             Atom.toElixirAtom(name)?.let { AbstractCodeRecord.nameToString(it) }

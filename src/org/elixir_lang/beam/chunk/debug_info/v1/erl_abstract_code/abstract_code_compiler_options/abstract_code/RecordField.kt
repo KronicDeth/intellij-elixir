@@ -25,7 +25,7 @@ object RecordField {
     private fun fieldToString(term: OtpErlangObject): String =
             Atom.toElixirAtom(term)
                     ?.let { inspectAsKey(it) }
-                    ?: "unknown_field:"
+                    ?: AbstractCode.error("unknown_field:", "${TAG} field is unknown", term)
 
     private fun getExpressionMacroString(term: OtpErlangTuple): MacroString =
             getToExpression(term).let { AbstractCode.toMacroStringDeclaredScope(it, Scope.EMPTY).macroString }

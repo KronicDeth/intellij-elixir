@@ -22,12 +22,12 @@ object Match {
     private fun leftMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope =
             toLeft(term)
                     ?.let { AbstractCode.toMacroStringDeclaredScope(it, scope.copy(pinning = true)) }
-                    ?: MacroStringDeclaredScope.error("missing_left")
+                    ?: MacroStringDeclaredScope.missing("left", "match left", term)
 
     private fun rightString(term: OtpErlangTuple, scope: Scope): String =
             toRight(term)
                     ?.let { AbstractCode.toString(it, scope) }
-                    ?: "missing_right"
+                    ?: AbstractCode.missing("right", "match right", term)
 
     private fun toLeft(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
     private fun toRight(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(3)

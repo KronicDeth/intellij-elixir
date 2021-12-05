@@ -20,7 +20,7 @@ object Receive {
     private fun afterString(term: OtpErlangTuple, scope: Scope): String = when (val arity = term.arity()) {
         3 -> ""
         5 -> afterToMacroString(term.elementAt(3), term.elementAt(4), scope)
-        else -> "unknown_receive_arity($arity)"
+        else -> AbstractCode.unknown("receive_arity($arity)", "receive arity", term)
     }
 
     private fun afterToMacroString(expression: OtpErlangObject, body: OtpErlangObject, scope: Scope): String {
@@ -39,21 +39,20 @@ object Receive {
     private fun clausesString(term: OtpErlangTuple, scope: Scope): String =
             toClauses(term)
                     ?.let { clausesToString(it, scope) }
-                    ?: "missing_clauses"
-
+                    ?: AbstractCode.missing("clauses", "receive clauses", term)
 
     private fun clausesToString(caseClauses: OtpErlangList, scope: Scope): String =
             caseClauses
                     .joinToString("\n") {
                         Clause.ifToString(it, scope) ?:
-                        "unknown_clause"
+                        AbstractCode.unknown("clause", "receive clause", caseClauses)
                     }
                     .let { adjustNewLines(it, "\n  ") }
 
     private fun clausesToString(caseClauses: OtpErlangObject, scope: Scope): String =
             when (caseClauses) {
                 is OtpErlangList -> clausesToString(caseClauses, scope)
-                else -> "unknown_clauses"
+                else -> AbstractCode.unknown("clauses", "receive clauses", caseClauses)
             }
 
     private fun toClauses(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
