@@ -4,38 +4,38 @@ import com.ericsson.otp.erlang.OtpErlangList
 import com.ericsson.otp.erlang.OtpErlangObject
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Atom
-import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.MacroString
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Scope
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Sequence
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Record as AbstractCodeRecord
 
 object NameRecordFields {
-    fun toMacroString(term: OtpErlangObject): MacroString =
+    fun toString(term: OtpErlangObject): String =
             when (term) {
-                is OtpErlangList -> toMacroString(term)
-                else -> "unknown_name_record_fields"
+                is OtpErlangList -> toString(term)
+                else -> AbstractCode.unknown("name_record_fields", "type record", term)
             }
 
-    private fun nameMacroString(nameRecordFields: OtpErlangList) =
+    private fun nameString(nameRecordFields: OtpErlangList): String =
             toName(nameRecordFields)
-                    ?.let { nameToMacroString(it) }
-                    ?: "missing_name"
+                    ?.let { nameToString(it) }
+                    ?: AbstractCode.missing("name", "type record name", nameRecordFields)
 
-    private fun nameToMacroString(name: OtpErlangObject) =
-            Atom.toElixirAtom(name)?.let { AbstractCodeRecord.nameToMacroString(it) }
+    private fun nameToString(name: OtpErlangObject) =
+            Atom.toElixirAtom(name)?.let { AbstractCodeRecord.nameToString(it) }
 
-    private fun recordFieldsMacroString(nameRecordFields: OtpErlangList) =
-            toRecordFields(nameRecordFields).let { recordFieldsToMacroString(it) }
+    private fun recordFieldsString(nameRecordFields: OtpErlangList) =
+            toRecordFields(nameRecordFields).let { recordFieldsToString(it) }
 
-    private fun recordFieldsToMacroString(recordFields: List<OtpErlangObject>) =
+    private fun recordFieldsToString(recordFields: List<OtpErlangObject>): String =
             recordFields.joinToString(", ") {
-                AbstractCode.toMacroStringDeclaredScope(it, Scope.EMPTY).macroString
+                AbstractCode.toMacroStringDeclaredScope(it, Scope.EMPTY).macroString.group().string
             }
 
-    private fun toMacroString(nameRecordFields: OtpErlangList): MacroString {
-        val nameMacroString = nameMacroString(nameRecordFields)
-        val recordFieldsMacroString = recordFieldsMacroString(nameRecordFields)
+    private fun toString(nameRecordFields: OtpErlangList): String {
+        val nameString = nameString(nameRecordFields)
+        val recordFieldsString = recordFieldsString(nameRecordFields)
 
-        return "$nameMacroString($recordFieldsMacroString)"
+        return "$nameString($recordFieldsString)"
     }
 
     private fun toName(nameRecordFields: OtpErlangList): OtpErlangObject? = nameRecordFields.elementAt(0)

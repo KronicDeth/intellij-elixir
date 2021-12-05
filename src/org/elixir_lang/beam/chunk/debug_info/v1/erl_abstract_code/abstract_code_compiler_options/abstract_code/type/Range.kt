@@ -9,40 +9,40 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Type.ifSubtypeTo
 
 object Range {
-    fun ifToMacroString(type: OtpErlangTuple): MacroString? = ifSubtypeTo(type, SUBTYPE) { toMacroString(type) }
+    fun ifToString(type: OtpErlangTuple): String? = ifSubtypeTo(type, SUBTYPE) { toString(type) }
 
     private const val SUBTYPE = "range"
 
     private fun firstLastToFirst(firstLast: OtpErlangList): OtpErlangObject? = firstLast.elementAt(0)
     private fun firstLastToLast(firstLast: OtpErlangList): OtpErlangObject? = firstLast.elementAt(1)
 
-    private fun firstLastToMacroString(firstLast: OtpErlangList): MacroString {
-        val firstMacroString = firstMacroString(firstLast)
-        val lastMacroString = lastMacroString(firstLast)
+    private fun firstLastToString(firstLast: OtpErlangList): String {
+        val firstString = firstString(firstLast)
+        val lastString = lastString(firstLast)
 
-        return "$firstMacroString..$lastMacroString"
+        return "$firstString..$lastString"
     }
 
-    private fun firstLastToMacroString(term: OtpErlangObject) =
+    private fun firstLastToString(term: OtpErlangObject) =
             when (term) {
-                is OtpErlangList -> firstLastToMacroString(term)
-                else -> "unknown_first_last"
+                is OtpErlangList -> firstLastToString(term)
+                else -> AbstractCode.unknown("first_last", "type ${SUBTYPE} first and last", term)
             }
 
-    private fun firstMacroString(firstLast: OtpErlangList) =
+    private fun firstString(firstLast: OtpErlangList): String =
             firstLastToFirst(firstLast)
-                    ?.let { AbstractCode.toMacroStringDeclaredScope(it, Scope.EMPTY).macroString }
-                    ?: "missing_first"
+                    ?.let { AbstractCode.toString(it) }
+                    ?: AbstractCode.missing("first", "type ${SUBTYPE} first", firstLast)
 
-    private fun lastMacroString(firstLast: OtpErlangList) =
+    private fun lastString(firstLast: OtpErlangList): String =
             firstLastToLast(firstLast)
-                    ?.let { AbstractCode.toMacroStringDeclaredScope(it, Scope.EMPTY).macroString }
-                    ?: "missing_last"
+                    ?.let { AbstractCode.toString(it) }
+                    ?: AbstractCode.missing("last", "type ${SUBTYPE} last", firstLast)
 
     private fun toFirstLast(type: OtpErlangTuple): OtpErlangObject? = type.elementAt(3)
 
-    private fun toMacroString(type: OtpErlangTuple) =
+    private fun toString(type: OtpErlangTuple) =
             toFirstLast(type)
-                    ?.let { firstLastToMacroString(it) }
-                    ?: "missing_first_last"
+                    ?.let { firstLastToString(it) }
+                    ?: AbstractCode.missing("first_last", "type ${SUBTYPE} first and last", type)
 }

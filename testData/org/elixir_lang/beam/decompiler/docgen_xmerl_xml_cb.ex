@@ -91,7 +91,7 @@ defmodule :docgen_xmerl_xml_cb do
 
   def is_url(fileRef) do
     case :filename.extension(fileRef) do
-      unknown_string ->
+      "" ->
         false
       _Ext ->
         true

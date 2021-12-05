@@ -139,6 +139,8 @@ object QualifiableAliasImpl {
             is ElixirContainerAssociationOperation, is ElixirList, is ElixirStructOperation, is ElixirTuple,
             // Top of file
             is ElixirFile,
+            // Top of expression inside of interpolation
+            is ElixirInterpolation,
             // Typing an alias on a new line in the body of function
             is ElixirStabBody -> accumulator
             is ElixirAccessExpression, is ElixirMultipleAliases ->

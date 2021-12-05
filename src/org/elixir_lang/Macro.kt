@@ -1985,48 +1985,47 @@ object Macro {
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex#L873-L882
     private fun callToString(call: OtpErlangObject): String =
-        // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex#L873
-        ifAtomToString(call) ?:
-                // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex#L874
-                ifTagged3TupleTo(call, ".") { tuple ->
-                    (tuple.elementAt(2) as? OtpErlangList)?.let { arguments ->
-                        if (arguments.arity() == 1) {
-                            "${moduleToString(arguments.elementAt(0))}."
-                        } else {
-                            null
-                        }
+            // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex#L873
+            call.let { it as? OtpErlangAtom }?.let {
+                Identifier.inspectAsFunction(it, true)
+            } ?:
+            // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex#L874
+            ifTagged3TupleTo(call, ".") { tuple ->
+                (tuple.elementAt(2) as? OtpErlangList)?.let { arguments ->
+                    if (arguments.arity() == 1) {
+                        "${moduleToString(arguments.elementAt(0))}."
+                    } else {
+                        null
                     }
-                } ?:
-                // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex#L876-L877
-                ifTagged3TupleTo(call, ".") { tuple ->
-                    (tuple.elementAt(2) as? OtpErlangList)?.let { arguments ->
-                        if (arguments.arity() == 2) {
-                            (arguments.elementAt(1) as? OtpErlangAtom)?.let { right ->
-                                val left = arguments.elementAt(0)
+                }
+            } ?:
+            // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex#L876-L877
+            ifTagged3TupleTo(call, ".") { tuple ->
+                (tuple.elementAt(2) as? OtpErlangList)?.let { arguments ->
+                    if (arguments.arity() == 2) {
+                        (arguments.elementAt(1) as? OtpErlangAtom)?.let { right ->
+                            val left = arguments.elementAt(0)
 
-                                moduleToString(left) + "." + callToStringForAtom(right)
-                            }
-                        } else {
-                            null
+                            moduleToString(left) + "." + Identifier.inspectAsFunction(right, false)
                         }
+                    } else {
+                        null
                     }
-                } ?:
-                // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex#L879-L880
-                ifTagged3TupleTo(call, ".") { tuple ->
-                    (tuple.elementAt(2) as? OtpErlangList)?.let { arguments ->
-                        if (arguments.arity() == 2) {
-                            val (left, right) = arguments
+                }
+            } ?:
+            // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex#L879-L880
+            ifTagged3TupleTo(call, ".") { tuple ->
+                (tuple.elementAt(2) as? OtpErlangList)?.let { arguments ->
+                    if (arguments.arity() == 2) {
+                        val (left, right) = arguments
 
-                            moduleToString(left) + "." + callToString(right)
-                        } else {
-                            null
-                        }
+                        moduleToString(left) + "." + callToString(right)
+                    } else {
+                        null
                     }
-                } ?:
-                kernelToString(call)
-
-    // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex#L890-L892
-    private fun callToStringForAtom(atom: OtpErlangAtom): String = Identifier.inspectAsFunction(atom)
+                }
+            } ?:
+            kernelToString(call)
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex?utf8=%E2%9C%93#L783-L805
     private fun moduleToString(module: OtpErlangObject): String =

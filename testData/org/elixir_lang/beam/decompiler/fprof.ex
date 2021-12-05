@@ -117,21 +117,21 @@ defmodule :fprof do
 
   def parsify(term), do: term
 
-  def print_called(dest, []), do: println(dest, ' [', [], ']}.', unknown_string)
+  def print_called(dest, []), do: println(dest, ' [', [], ']}.', "")
 
-  def print_called(dest, [clocks]), do: println(dest, ' [{', clocks, '}]}.', unknown_string)
+  def print_called(dest, [clocks]), do: println(dest, ' [{', clocks, '}]}.', "")
 
   def print_called(dest, [clocks | tail]) do
-    println(dest, ' [{', clocks, '},', unknown_string)
+    println(dest, ' [{', clocks, '},', "")
     print_called_1(dest, tail)
   end
 
-  def print_callers(dest, []), do: println(dest, '{[', [], '],', unknown_string)
+  def print_callers(dest, []), do: println(dest, '{[', [], '],', "")
 
-  def print_callers(dest, [clocks]), do: println(dest, '{[{', clocks, '}],', unknown_string)
+  def print_callers(dest, [clocks]), do: println(dest, '{[{', clocks, '}],', "")
 
   def print_callers(dest, [clocks | tail]) do
-    println(dest, '{[{', clocks, '},', unknown_string)
+    println(dest, '{[{', clocks, '},', "")
     print_callers_1(dest, tail)
   end
 
@@ -139,11 +139,11 @@ defmodule :fprof do
 
   def println({:undefined, _}, _Head, _, _Tail, _Comment), do: :ok
 
-  def println({io, [w1, w2, w3, w4]}, head, clocks(id: pid, cnt: cnt, acc: _, own: own), tail, comment) when is_pid(pid), do: :io.put_chars(io, [pad(head, ?\s, 3), flat_format(parsify(pid), ?,, w1), flat_format(cnt, ?,, w2, :right), flat_format(:undefined, ?,, w3, :right), flat_format(own * unknown_abstract_code, [], w4 - 1, :right), pad(tail, ?\s, 4), pad(?\s, comment, 4), :io_lib.nl()])
+  def println({io, [w1, w2, w3, w4]}, head, clocks(id: pid, cnt: cnt, acc: _, own: own), tail, comment) when is_pid(pid), do: :io.put_chars(io, [pad(head, ?\s, 3), flat_format(parsify(pid), ?,, w1), flat_format(cnt, ?,, w2, :right), flat_format(:undefined, ?,, w3, :right), flat_format(own * 0.001, [], w4 - 1, :right), pad(tail, ?\s, 4), pad(?\s, comment, 4), :io_lib.nl()])
 
-  def println({io, [w1, w2, w3, w4]}, head, clocks(id: {_M, _F, _A} = func, cnt: cnt, acc: acc, own: own), tail, comment), do: :io.put_chars(io, [pad(head, ?\s, 3), flat_format(func, ?,, w1), flat_format(cnt, ?,, w2, :right), flat_format(acc * unknown_abstract_code, ?,, w3, :right), flat_format(own * unknown_abstract_code, [], w4 - 1, :right), pad(tail, ?\s, 4), pad(?\s, comment, 4), :io_lib.nl()])
+  def println({io, [w1, w2, w3, w4]}, head, clocks(id: {_M, _F, _A} = func, cnt: cnt, acc: acc, own: own), tail, comment), do: :io.put_chars(io, [pad(head, ?\s, 3), flat_format(func, ?,, w1), flat_format(cnt, ?,, w2, :right), flat_format(acc * 0.001, ?,, w3, :right), flat_format(own * 0.001, [], w4 - 1, :right), pad(tail, ?\s, 4), pad(?\s, comment, 4), :io_lib.nl()])
 
-  def println({io, [w1, w2, w3, w4]}, head, clocks(id: id, cnt: cnt, acc: acc, own: own), tail, comment), do: :io.put_chars(io, [pad(head, ?\s, 3), flat_format(parsify(id), ?,, w1), flat_format(cnt, ?,, w2, :right), flat_format(acc * unknown_abstract_code, ?,, w3, :right), flat_format(own * unknown_abstract_code, [], w4 - 1, :right), pad(tail, ?\s, 4), pad(?\s, comment, 4), :io_lib.nl()])
+  def println({io, [w1, w2, w3, w4]}, head, clocks(id: id, cnt: cnt, acc: acc, own: own), tail, comment), do: :io.put_chars(io, [pad(head, ?\s, 3), flat_format(parsify(id), ?,, w1), flat_format(cnt, ?,, w2, :right), flat_format(acc * 0.001, ?,, w3, :right), flat_format(own * 0.001, [], w4 - 1, :right), pad(tail, ?\s, 4), pad(?\s, comment, 4), :io_lib.nl()])
 
   def println({io, [w1, w2, w3, w4]}, head, :head, tail, comment), do: :io.put_chars(io, [pad(head, ?\s, 3), pad(' ', ?\s, w1), pad(?\s, ' CNT ', w2), pad(?\s, ' ACC ', w3), pad(?\s, ' OWN', w4 - 1), pad(tail, ?\s, 4), pad(?\s, comment, 4), :io_lib.nl()])
 
@@ -442,7 +442,7 @@ defmodule :fprof do
 
   def apply_1(m, f, args, options) do
     arity = length(args)
-    apply_1(&m.fun_unknown_name/unknown_arity, args, options)
+    apply_1(&m.f/arity, args, options)
   end
 
   def apply_continue(function, args, procs, options) do
@@ -606,18 +606,18 @@ defmodule :fprof do
   def flat_format(term, trailer, width, {:right, filler}), do: pad(filler, flat_format(term, trailer), width)
 
   def funcstat_pd(pid, func1, func0, clocks) do
-    put({pid, func0}, case get({pid, func0}) do
+    put({pid, func0}, (case get({pid, func0}) do
       :undefined ->
         funcstat(callers_sum: clocks(clocks, id: func0), called_sum: clocks(id: func0), callers: [clocks(clocks, id: func1)])
       funcstat(callers_sum: callersSum, callers: callers) = funcstatCallers ->
         funcstat(funcstatCallers, callers_sum: clocks_sum(callersSum, clocks, func0), callers: insert_call(clocks, func1, callers))
-    end)
-    put({pid, func1}, case get({pid, func1}) do
+    end))
+    put({pid, func1}, (case get({pid, func1}) do
       :undefined ->
         funcstat(callers_sum: clocks(id: func1), called_sum: clocks(clocks, id: func1), called: [clocks(clocks, id: func0)])
       funcstat(called_sum: calledSum, called: called) = funcstatCalled ->
         funcstat(funcstatCalled, called_sum: clocks_sum(calledSum, clocks, func1), called: insert_call(clocks, func0, called))
-    end)
+    end))
   end
 
   def funcstat_sort_r(funcstatList, element), do: funcstat_sort_r_1(funcstatList, element, [])
@@ -1061,17 +1061,17 @@ defmodule :fprof do
 
   def postsort_r([[_ | c] | l], r), do: postsort_r(l, [c | r])
 
-  def print_called_1(dest, [clocks]), do: println(dest, '  {', clocks, '}]}.', unknown_string)
+  def print_called_1(dest, [clocks]), do: println(dest, '  {', clocks, '}]}.', "")
 
   def print_called_1(dest, [clocks | tail]) do
-    println(dest, '  {', clocks, '},', unknown_string)
+    println(dest, '  {', clocks, '},', "")
     print_called_1(dest, tail)
   end
 
-  def print_callers_1(dest, [clocks]), do: println(dest, '  {', clocks, '}],', unknown_string)
+  def print_callers_1(dest, [clocks]), do: println(dest, '  {', clocks, '}],', "")
 
   def print_callers_1(dest, [clocks | tail]) do
-    println(dest, '  {', clocks, '},', unknown_string)
+    println(dest, '  {', clocks, '},', "")
     print_callers_1(dest, tail)
   end
 
@@ -1080,19 +1080,19 @@ defmodule :fprof do
   def print_proc(dest, proc(id: _Pid, parent: parent, spawned_as: spawnedAs, init_log: initLog)) do
     case {parent, spawnedAs, initLog} do
       {:undefined, :undefined, []} ->
-        println(dest, '   ', [], '].', unknown_string)
+        println(dest, '   ', [], '].', "")
       {_, :undefined, []} ->
-        println(dest, ' { ', {:spawned_by, parsify(parent)}, '}].', unknown_string)
+        println(dest, ' { ', {:spawned_by, parsify(parent)}, '}].', "")
       _ ->
-        println(dest, ' { ', {:spawned_by, parsify(parent)}, '},', unknown_string)
+        println(dest, ' { ', {:spawned_by, parsify(parent)}, '},', "")
         case {spawnedAs, initLog} do
           {_, []} ->
-            println(dest, ' { ', {:spawned_as, spawnedAs}, '}].', unknown_string)
+            println(dest, ' { ', {:spawned_as, spawnedAs}, '}].', "")
           {:undefined, _} ->
-            println(dest, ' { ', {:initial_calls, :lists.reverse(initLog)}, '}].', unknown_string)
+            println(dest, ' { ', {:initial_calls, :lists.reverse(initLog)}, '}].', "")
           _ ->
-            println(dest, ' { ', {:spawned_as, spawnedAs}, '},', unknown_string)
-            println(dest, ' { ', {:initial_calls, :lists.reverse(initLog)}, '}].', unknown_string)
+            println(dest, ' { ', {:spawned_as, spawnedAs}, '},', "")
+            println(dest, ' { ', {:initial_calls, :lists.reverse(initLog)}, '}].', "")
         end
     end
   end
@@ -1124,7 +1124,7 @@ defmodule :fprof do
   def spawn_link_3step(funPrelude, funAck, funBody), do: spawn_3step(:spawn_link, funPrelude, funAck, funBody)
 
   def spawn_link_dbg_trace_client(file, table, groupLeader, dump) do
-    case :dbg.trace_client(:file, file, {&fun_unknown_name/2, {:init, groupLeader, table, dump}}) do
+    case :dbg.trace_client(:file, file, {&handler/2, {:init, groupLeader, table, dump}}) do
       pid when is_pid(pid) ->
         link(pid)
         pid
@@ -1142,7 +1142,7 @@ defmodule :fprof do
         ack
     end, fn :go ->
         init = {:init, groupLeader, table, dump}
-        tracer_loop(parent, &fun_unknown_name/2, init)
+        tracer_loop(parent, &handler/2, init)
     end)
   end
 
@@ -1218,12 +1218,12 @@ defmodule :fprof do
   def trace_clock_1(table, pid, _, _, caller, :suspend, clocks(:own)), do: clock_add(table, {pid, caller, :suspend}, clocks(:own), 0)
 
   def trace_clock_1(table, pid, t, tS, caller, func, clock) do
-    clock_add(table, {pid, caller, func}, clock, cond do
+    clock_add(table, {pid, caller, func}, clock, (cond do
       is_integer(t) ->
         t
       true ->
         ts_sub(t, tS)
-    end)
+    end))
   end
 
   def trace_exit(table, pid, tS) do
@@ -1480,12 +1480,12 @@ defmodule :fprof do
     dbg(0, 'trace_out(~p, ~p, ~p)~n~p~n', [pid, func, tS, stack])
     case stack do
       [] ->
-        put(pid, trace_call_push(table, pid, :suspend, tS, case func do
+        put(pid, trace_call_push(table, pid, :suspend, tS, (case func do
           :undefined ->
             []
           _ ->
             [[{func, tS}]]
-        end))
+        end)))
       [[{:suspend, _}] | _] ->
         put(pid, [[{:suspend, tS}] | stack])
       [_ | _] ->

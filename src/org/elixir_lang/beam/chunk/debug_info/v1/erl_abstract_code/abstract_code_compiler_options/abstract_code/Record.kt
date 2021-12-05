@@ -1,6 +1,7 @@
 package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code
 
 import com.ericsson.otp.erlang.OtpErlangAtom
+import com.ericsson.otp.erlang.OtpErlangList
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
@@ -11,53 +12,43 @@ object Record {
     fun ifToMacroStringDeclaredScope(term: OtpErlangObject, scope: Scope): MacroStringDeclaredScope? =
             ifTag(term, TAG) { toMacroStringDeclaredScope(it, scope) }
 
-    fun toMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope {
-        val arity = term.arity()
+    fun toMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope =
+            when (term.arity()) {
+                4 -> creationToMacroStringDeclaredScope(term, scope)
+                5 -> updateToMacroStringDeclaredScope(term, scope)
+                else -> MacroStringDeclaredScope.unknown("${TAG}_arity", "${TAG} arity", term)
+            }
 
-        return when (arity) {
-            4 -> creationToMacroStringDeclaredScope(term, scope)
-            5 -> updateToMacroStringDeclaredScope(term, scope)
-            else -> MacroStringDeclaredScope("unknown_record_arity", Scope.EMPTY)
-        }
-    }
+    fun nameToString(name: OtpErlangAtom): String = inspectAsFunction(name, true)
 
-    fun nameToMacroString(name: OtpErlangAtom): MacroString {
-        val inspectedAsFunction = inspectAsFunction(name)
-
-        return if (inspectedAsFunction.startsWith("\"")) {
-            "__MODULE__.$inspectedAsFunction"
-        } else {
-            inspectedAsFunction
-        }
-    }
-
-    internal fun nameToMacroString(term: OtpErlangObject): MacroString =
+    internal fun nameToString(term: OtpErlangObject): String =
             when (term) {
-                is OtpErlangAtom -> nameToMacroString(term)
-                else -> "unknown_record_name"
+                is OtpErlangAtom -> nameToString(term)
+                else -> AbstractCode.unknown("${TAG}_name", "${TAG} name", term)
             }
 
     private const val TAG = "record"
 
-    private fun creationNameMacroString(term: OtpErlangTuple): String =
+    private fun creationNameString(term: OtpErlangTuple): String =
             toCreationName(term)
-                    ?.let { nameToMacroString(it) }
-                    ?: "missing_creation_name"
+                    ?.let { nameToString(it) }
+                    ?: AbstractCode.missing("creation_name", "record creation name", term)
 
     private fun creationToMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope {
-        val nameMacroString = creationNameMacroString(term)
+        val nameString = creationNameString(term)
         val (recordFieldsMacroString, recordFieldsDeclaredScope) = creationRecordFieldsMacroStringDeclaredScope(term, scope)
 
         return MacroStringDeclaredScope(
-                "$nameMacroString($recordFieldsMacroString)",
+                "$nameString(${recordFieldsMacroString.string})",
+                doBlock = false,
                 recordFieldsDeclaredScope
         )
     }
 
     private fun creationRecordFieldsMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope) =
             toCreationRecordFields(term)
-                    ?.let { Elements.toMacroStringDeclaredScope(it, scope) }
-                    ?: MacroStringDeclaredScope("missing_record_fields", Scope.EMPTY)
+                    ?.let { Sequence.toCommaSeparatedMacroStringDeclaredScope(it, scope) }
+                    ?: MacroStringDeclaredScope.missing("record_fields", "record creation record fields", term)
 
     private fun toCreationName(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
     private fun toCreationRecordFields(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(3)
@@ -65,28 +56,38 @@ object Record {
     private fun toUpdateName(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(3)
     private fun toUpdateRecordFields(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(4)
 
-    private fun updatableMacroString(term: OtpErlangTuple, scope: Scope) =
+    private fun updatableString(term: OtpErlangTuple, scope: Scope): String =
             toUpdatable(term)
-                    ?.let { AbstractCode.toMacroStringDeclaredScope(it, scope).macroString }
-                    ?: "unknown_updatable"
+                    ?.let { AbstractCode.toString(it, scope) }
+                    ?: AbstractCode.unknown("updatable", "${TAG} updatable", term)
 
-    private fun updateNameMacroString(term: OtpErlangTuple) =
+    private fun updateNameString(term: OtpErlangTuple): String =
             toUpdateName(term)
-                    ?.let { nameToMacroString(it) }
-                    ?: "missing_update_name"
+                    ?.let { nameToString(it) }
+                    ?: AbstractCode.missing("update_name", "${TAG} update name", term)
 
-    private fun updateRecordFieldsMacroString(term: OtpErlangTuple, scope: Scope) =
+    private fun updateRecordFieldsString(term: OtpErlangTuple, scope: Scope): String =
             toUpdateRecordFields(term)
-                    ?.let { Elements.toMacroStringDeclaredScope(it, scope).macroString }
-                    ?: "missing_record_fields"
+                    ?.let {  updateRecordFields ->
+                        when (updateRecordFields) {
+                            is OtpErlangList -> if (updateRecordFields.arity() == 0 && updateRecordFields.isProper) {
+                                "[]"
+                            } else {
+                                Sequence.toCommaSeparatedString(updateRecordFields, scope)
+                            }
+                            else -> AbstractCode.unknown("update_record_fields", "${TAG} update record fields", updateRecordFields)
+                        }
+                    }
+                    ?: AbstractCode.missing("record_fields", "${TAG} record fields", term)
 
     private fun updateToMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope {
-        val updatableMacroString = updatableMacroString(term, scope)
-        val nameMacroString = updateNameMacroString(term)
-        val recordFieldsMacroString = updateRecordFieldsMacroString(term, scope)
+        val updatableString = updatableString(term, scope)
+        val nameString = updateNameString(term)
+        val recordFieldsString = updateRecordFieldsString(term, scope)
 
         return MacroStringDeclaredScope(
-                "$nameMacroString($updatableMacroString, $recordFieldsMacroString)",
+                "$nameString($updatableString, $recordFieldsString)",
+                doBlock = false,
                 Scope.EMPTY
         )
     }

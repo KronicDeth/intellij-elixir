@@ -14,7 +14,7 @@ object Cons {
 
     fun toMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope =
         headTailMacroStringDeclaredScope(term, scope).let { (headTailMacroString, headTailDeclaredScope) ->
-            MacroStringDeclaredScope("[$headTailMacroString]", headTailDeclaredScope)
+            MacroStringDeclaredScope("[${headTailMacroString.string}]", doBlock = false, headTailDeclaredScope)
         }
 
     private const val TAG = "cons"
@@ -22,7 +22,7 @@ object Cons {
     private fun headMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope =
             toHead(term)
                     ?.let { headToMacroStringDeclaredScope(it, scope) }
-                    ?: MacroStringDeclaredScope("missing_head", Scope.EMPTY)
+                    ?: MacroStringDeclaredScope.missing("missing_head", "cons head", term)
 
     private fun headTailMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope) =
         headTailMacroStringDeclaredScope(term, scope, Pair(StringBuilder(), Scope.EMPTY))
@@ -38,28 +38,28 @@ object Cons {
         return when {
             Nil.`is`(tail) -> {
                 val (macroStringBuilder, accDeclaredScope) = acc
-                macroStringBuilder.append(headMacroString)
+                macroStringBuilder.append(headMacroString.string)
                 val declaredScopeUnion = accDeclaredScope.union(headDeclaredScope)
 
-                MacroStringDeclaredScope(macroStringBuilder.toString(), declaredScopeUnion)
+                MacroStringDeclaredScope(macroStringBuilder.toString(), doBlock = false, declaredScopeUnion)
             }
             Cons.`is`(tail) -> {
                 val (macroStringBuilder, accDeclaredScope) = acc
-                macroStringBuilder.append(headMacroString).append(", ")
+                macroStringBuilder.append(headMacroString.group().string).append(", ")
                 val declaredScopeUnion = accDeclaredScope.union(headDeclaredScope)
 
                 headTailMacroStringDeclaredScope(tail as OtpErlangTuple, scope, Pair(macroStringBuilder, declaredScopeUnion))
             }
             else -> {
                 val (macroStringBuilder, accDeclaredScope) = acc
-                macroStringBuilder.append(headMacroString).append(" | ")
+                macroStringBuilder.append(headMacroString.string).append(" | ")
 
                 val (tailMacroString, tailDeclaredScope) = tailMacroStringDeclaredScope(term, scope)
-                macroStringBuilder.append(tailMacroString)
+                macroStringBuilder.append(tailMacroString.group().string)
 
                 val declaredScopeUnion = accDeclaredScope.union(headDeclaredScope).union(tailDeclaredScope)
 
-                MacroStringDeclaredScope(macroStringBuilder.toString(), declaredScopeUnion)
+                MacroStringDeclaredScope(macroStringBuilder.toString(), doBlock = false, declaredScopeUnion)
             }
         }
     }
@@ -70,7 +70,7 @@ object Cons {
     private fun tailMacroStringDeclaredScope(term: OtpErlangTuple, scope : Scope) =
             toTail(term)
                     ?.let { tailToMacroStringDeclaredScope(it, scope) }
-                    ?: MacroStringDeclaredScope("missing_tail", Scope.EMPTY)
+                    ?: MacroStringDeclaredScope.missing("tail", "cons tail", term)
 
     private fun tailToMacroStringDeclaredScope(term: OtpErlangObject, scope: Scope) =
             AbstractCode.toMacroStringDeclaredScope(term, scope)

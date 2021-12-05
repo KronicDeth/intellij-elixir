@@ -8,7 +8,7 @@ import org.elixir_lang.beam.decompiler.Options
 private const val ATTRIBUTE_NAME = "spec"
 
 class Spec(attribute: Attribute): MacroString(attribute) {
-    val name by lazy { nameArity?.elementAt(0)?.let { Value.nameToMacroString(it) } }
+    val name by lazy { nameArity?.elementAt(0)?.let { Value.nameToString(it) } }
     val arity by lazy { nameArity?.elementAt(1)?.let { Value.arityToBigInteger(it) } }
 
     override fun toMacroString(options: Options): String =
@@ -22,7 +22,7 @@ class Spec(attribute: Attribute): MacroString(attribute) {
 
     private fun valueMacroStrings() =
             attribute.value
-                    ?.let { Value.toMacroStrings(it) }
+                    ?.let { Value.toStrings(it) }
                     ?: emptyList()
 
     companion object {

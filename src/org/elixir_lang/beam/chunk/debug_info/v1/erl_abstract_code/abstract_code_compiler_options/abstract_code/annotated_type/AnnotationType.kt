@@ -3,34 +3,30 @@ package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code
 import com.ericsson.otp.erlang.OtpErlangList
 import com.ericsson.otp.erlang.OtpErlangObject
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
-import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.MacroString
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Scope
 
 object AnnotationType {
-    fun toMacroString(annotationType: OtpErlangList): MacroString {
-        val annotationMacroString = annotationMacroString(annotationType)
-        val typeMacroString = typeMacroString(annotationType)
+    fun toString(annotationType: OtpErlangList): String {
+        val annotationString = annotationString(annotationType)
+        val typeString = typeString(annotationType)
 
-        return "$annotationMacroString :: $typeMacroString"
+        return "$annotationString :: $typeString"
     }
 
-    private fun annotationMacroString(annotationType: OtpErlangList) =
+    private fun annotationString(annotationType: OtpErlangList): String =
             toAnnotation(annotationType)
-                    ?.let { annotationToMacroString(it) }
-                    ?: "missing_annotation"
+                    ?.let { annotationToString(it) }
+                    ?: AbstractCode.missing("annotation", "annotation type annotation", annotationType)
 
-    private fun annotationToMacroString(annotation: OtpErlangObject) =
-            AbstractCode.toMacroStringDeclaredScope(annotation, Scope.EMPTY).macroString
+    private fun annotationToString(annotation: OtpErlangObject): String = AbstractCode.toString(annotation)
 
     private fun toAnnotation(annotationType: OtpErlangList): OtpErlangObject? = annotationType.elementAt(0)
     private fun toType(annotationType: OtpErlangList): OtpErlangObject? = annotationType.elementAt(1)
 
-    private fun typeMacroString(annotationType: OtpErlangList) =
+    private fun typeString(annotationType: OtpErlangList): String =
             toType(annotationType)
-                    ?.let { typeToMacroString(it) }
-                    ?: "missing_type"
+                    ?.let { typeToString(it) }
+                    ?: AbstractCode.missing("type", "annotation type type", annotationType)
 
-    private fun typeToMacroString(type: OtpErlangObject) =
-            AbstractCode.toMacroStringDeclaredScope(type, Scope.EMPTY).macroString
-
+    private fun typeToString(type: OtpErlangObject): String = AbstractCode.toString(type)
 }

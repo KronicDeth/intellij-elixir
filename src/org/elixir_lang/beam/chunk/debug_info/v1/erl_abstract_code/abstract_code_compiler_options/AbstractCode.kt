@@ -5,7 +5,9 @@ import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.*
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Char
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Float
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Map
+import org.elixir_lang.errorreport.Logger
 
 
 object AbstractCode {
@@ -40,24 +42,30 @@ object AbstractCode {
                 }
             }
 
+    fun toString(term: OtpErlangObject, scope: Scope = Scope.EMPTY): String =
+            toMacroStringDeclaredScope(term, scope).macroString.string
+
     fun toMacroStringDeclaredScope(term: OtpErlangObject, scope: Scope): MacroStringDeclaredScope =
             AbstractCodeString.ifToMacroStringDeclaredScope(term) ?:
             AnnotatedType.ifToMacroStringDeclaredScope(term) ?:
             Atom.ifToMacroStringDeclaredScope(term) ?:
             Bin.ifToMacroStringDeclaredScope(term, scope) ?:
             BinElement.ifToMacroStringDeclaredScope(term, scope) ?:
-            Call.ifToMacroStringDeclaredScope(term) ?:
+            Block.ifToMacroStringDeclaredScope(term, scope) ?:
+            Call.ifToMacroStringDeclaredScope(term, scope) ?:
             Case.ifToMacroStringDeclaredScope(term, scope) ?:
             Catch.ifToMacroStringDeclaredScope(term, scope) ?:
             Char.ifToMacroStringDeclaredScope(term) ?:
             Comprehension.ifToMacroStringDeclaredScope(term, scope) ?:
             Cons.ifToMacroStringDeclaredScope(term, scope) ?:
+            Float.ifToMacroStringDeclaredScope(term) ?:
             Fun.ifToMacroStringDeclaredScope(term, scope) ?:
             If.ifToMacroStringDeclaredScope(term, scope) ?:
             Integer.ifToMacroStringDeclaredScope(term) ?:
             Map.ifToMacroStringDeclaredScope(term, scope) ?:
             MapField.ifToMacroStringDeclaredScope(term, scope) ?:
             Match.ifToMacroStringDeclaredScope(term, scope) ?:
+            NamedFun.ifToMacroStringDeclaredScope(term, scope) ?:
             Nil.ifToMacroStringDeclaredScope(term) ?:
             Op.ifToMacroStringDeclaredScope(term, scope) ?:
             Receive.ifToMacroStringDeclaredScope(term, scope) ?:
@@ -71,5 +79,23 @@ object AbstractCode {
             Type.ifToMacroStringDeclaredScope(term) ?:
             UserType.ifToMacroStringDeclaredScope(term) ?:
             Var.ifToMacroStringDeclaredScope(term, scope) ?:
-            MacroStringDeclaredScope("unknown_abstract_code", Scope.EMPTY)
+            MacroStringDeclaredScope.unknown("abstract_code", "", term)
+
+    fun missing(default: String, title: String, term: OtpErlangObject): String =
+            error("missing_$default", "$title is missing", term)
+
+    fun unknown(default: String, title: String, term: OtpErlangObject): String =
+            error("unknown_$default", "$title is unknown", term)
+
+    fun error(default: String, title: String, term: OtpErlangObject): String {
+        Logger.error(logger, "Erlang Abst $title", term)
+
+        return default
+    }
+
+    private val logger by lazy { com.intellij.openapi.diagnostic.Logger.getInstance(AbstractCode::class.java) }
 }
+
+
+
+

@@ -16,20 +16,21 @@ object Catch {
 
     private const val TAG = "catch"
 
-    private fun bodyMacroString(term: OtpErlangTuple, scope: Scope) =
+    private fun bodyString(term: OtpErlangTuple, scope: Scope): String =
             toBody(term)
-                    ?.let { AbstractCode.toMacroStringDeclaredScope(it, scope).macroString }
-                    ?: "missing_catch_body"
+                    ?.let { AbstractCode.toString(it, scope) }
+                    ?: AbstractCode.missing("catch_body", "catch body", term)
 
     private fun toBody(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
 
     private fun toMacroString(term: OtpErlangTuple, scope: Scope): MacroString {
-        val bodyMacroString = bodyMacroString(term, scope)
-
-        return "try do\n" +
-                "  $bodyMacroString\n" +
+        val bodyString = bodyString(term, scope)
+        val string = "try do\n" +
+                "  $bodyString\n" +
                 "catch\n" +
                 "  error -> error\n" +
                 "end"
+
+        return MacroString(string, doBlock = true)
     }
 }

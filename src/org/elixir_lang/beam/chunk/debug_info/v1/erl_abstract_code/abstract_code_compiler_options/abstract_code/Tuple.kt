@@ -10,16 +10,15 @@ object Tuple {
 
     fun toMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope =
             elementsMacroStringDeclaredScope(term, scope).let { (elementsMacroString, elementsDeclaredScope) ->
-                MacroStringDeclaredScope("{$elementsMacroString}", elementsDeclaredScope)
+                MacroStringDeclaredScope("{${elementsMacroString.string}}", doBlock = false, elementsDeclaredScope)
             }
-
 
     private const val TAG = "tuple"
 
     private fun elementsMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope) =
             toElements(term)
                     ?.let { Elements.toMacroStringDeclaredScope(it, scope) }
-                    ?: MacroStringDeclaredScope("missing_elements", Scope.EMPTY)
+                    ?: MacroStringDeclaredScope.missing("elements", "${TAG} elements", term)
 
     private fun toElements(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
 }

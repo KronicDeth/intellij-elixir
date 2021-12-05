@@ -13,35 +13,34 @@ object RecordIndex {
             ifTag(term, TAG) { toMacroStringDeclaredScope(it) }
 
     fun toMacroStringDeclaredScope(term: OtpErlangTuple): MacroStringDeclaredScope =
-            toMacroString(term)
-                    .let { MacroStringDeclaredScope(it, Scope.EMPTY) }
+            toString(term)
+                    .let { MacroStringDeclaredScope(it, doBlock = false, Scope.EMPTY) }
 
     private const val TAG = "record_index"
 
-    private fun fieldMacroString(term: OtpErlangTuple): MacroString =
+    private fun fieldString(term: OtpErlangTuple): String =
             toField(term)
-                    ?.let { fieldToMacroString(it) }
-                    ?: "missing_field"
+                    ?.let { fieldToString(it) }
+                    ?: AbstractCode.missing("field", "${TAG} field", term)
 
-    private fun fieldToMacroString(term: OtpErlangObject): MacroString =
-            AbstractCode.toMacroStringDeclaredScope(term, Scope.EMPTY).macroString
+    private fun fieldToString(term: OtpErlangObject): String = AbstractCode.toString(term)
 
-    private fun nameMacroString(term: OtpErlangTuple): MacroString =
+    private fun nameString(term: OtpErlangTuple): String =
             toName(term)
-                    ?.let { nameToMacroString(it) }
-                    ?: "missing_name"
+                    ?.let { nameToString(it) }
+                    ?: AbstractCode.missing("name", "${TAG} name", term)
 
-    private fun nameToMacroString(term: OtpErlangObject): MacroString =
+    private fun nameToString(term: OtpErlangObject): String =
             when (term) {
-                is OtpErlangAtom -> inspectAsFunction(term)
-                else -> "unknown_name"
+                is OtpErlangAtom -> inspectAsFunction(term, true)
+                else -> AbstractCode.unknown("name", "${TAG} name", term)
             }
 
-    private fun toMacroString(term: OtpErlangTuple): MacroString {
-        val nameMacroString = nameMacroString(term)
-        val fieldMacroString = fieldMacroString(term)
+    private fun toString(term: OtpErlangTuple): String {
+        val nameString = nameString(term)
+        val fieldString = fieldString(term)
 
-        return "$nameMacroString($fieldMacroString)"
+        return "$nameString($fieldString)"
     }
 
     private fun toName(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)

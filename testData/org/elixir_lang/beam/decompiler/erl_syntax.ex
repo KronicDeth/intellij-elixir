@@ -39,20 +39,20 @@ defmodule :erl_syntax do
 
   def abstract(t) when is_float(t), do: make_float(t)
 
-  def abstract([]), do: apply(__MODULE__, :nil, [])
+  def abstract([]), do: apply(__MODULE__, nil, [])
 
   def abstract(t) when is_tuple(t), do: tuple(abstract_list(tuple_to_list(t)))
 
   def abstract(t) when is_map(t) do
-    map_expr(for {key, value} <- :maps.to_list(t) do
+    map_expr((for {key, value} <- :maps.to_list(t) do
       map_field_assoc(abstract(key), abstract(value))
-    end)
+    end))
   end
 
   def abstract(t) when is_binary(t) do
-    binary(for b <- binary_to_list(t) do
+    binary((for b <- binary_to_list(t) do
       binary_field(integer(b))
-    end)
+    end))
   end
 
   def abstract(t), do: :erlang.error({:badarg, t})
@@ -645,13 +645,13 @@ defmodule :erl_syntax do
     copy_attrs(node, form_list(fs1))
   end
 
-  @spec float(unknown_type) :: syntaxTree()
+  @spec float(float()) :: syntaxTree()
   def float(value), do: make_float(value)
 
   @spec float_literal(syntaxTree()) :: charlist()
   def float_literal(node), do: float_to_list(float_value(node))
 
-  @spec float_value(syntaxTree()) :: unknown_type
+  @spec float_value(syntaxTree()) :: float()
   def float_value(node) do
     case unwrap(node) do
       {:float, _, value} ->
@@ -1074,16 +1074,16 @@ defmodule :erl_syntax do
       :list ->
         is_literal(list_head(t)) and is_literal(list_tail(t))
       :tuple ->
-        :lists.all(&fun_unknown_name/1, tuple_elements(t))
+        :lists.all(&is_literal/1, tuple_elements(t))
       :map_expr ->
-        case map_expr_argument(t) do
+        (case map_expr_argument(t) do
           :none ->
             true
           arg ->
             is_literal(arg)
-        end and :lists.all(&fun_unknown_name/1, map_expr_fields(t))
+        end) and :lists.all(&is_literal_map_field/1, map_expr_fields(t))
       :binary ->
-        :lists.all(&fun_unknown_name/1, binary_fields(t))
+        :lists.all(&is_literal_binary_field/1, binary_fields(t))
       _ ->
         false
     end
@@ -1130,7 +1130,7 @@ defmodule :erl_syntax do
   def list(list), do: list(list, :none)
 
   @spec list([syntaxTree()], (:none | syntaxTree())) :: syntaxTree()
-  def list([], :none), do: apply(__MODULE__, :nil, [])
+  def list([], :none), do: apply(__MODULE__, nil, [])
 
   def list(elements, tail) when elements !== [], do: tree(:list, list(prefix: elements, suffix: tail))
 
@@ -1198,7 +1198,7 @@ defmodule :erl_syntax do
       [] ->
         cond do
           tail === :none ->
-            apply(__MODULE__, :nil, [])
+            apply(__MODULE__, nil, [])
           true ->
             tail
         end
@@ -1603,7 +1603,7 @@ defmodule :erl_syntax do
         p = list_prefix(node)
         case list_suffix(node) do
           :none ->
-            copy_attrs(node, normalize_list_1(p, apply(__MODULE__, :nil, [])))
+            copy_attrs(node, normalize_list_1(p, apply(__MODULE__, nil, [])))
           tail ->
             tail1 = normalize_list(tail)
             copy_attrs(node, normalize_list_1(p, tail1))
@@ -2592,11 +2592,11 @@ defmodule :erl_syntax do
   end
 
   def meta_subtrees(gs) do
-    list(for g <- gs do
-      list(for t <- g do
+    list((for g <- gs do
+      list((for t <- g do
       meta(t)
-    end)
-    end)
+    end))
+    end))
   end
 
   def normalize_list_1(es, tail) do
@@ -3005,7 +3005,7 @@ defmodule :erl_syntax do
     p = list_prefix(node)
     s = case list_suffix(node) do
       :none ->
-        revert_nil(set_pos(apply(__MODULE__, :nil, []), pos))
+        revert_nil(set_pos(apply(__MODULE__, nil, []), pos))
       s1 ->
         s1
     end

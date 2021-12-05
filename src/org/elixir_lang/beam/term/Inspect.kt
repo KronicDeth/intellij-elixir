@@ -11,7 +11,7 @@ fun inspect(term: OtpErlangObject): String =
         renderer.getText().elixirEscape()
     }
 
-private fun String.elixirEscape(): String {
+fun String.elixirEscape(): String {
     val elixirEscapedCodePoints = this.codePoints().flatMap {
         it.elixirEscape()
     }

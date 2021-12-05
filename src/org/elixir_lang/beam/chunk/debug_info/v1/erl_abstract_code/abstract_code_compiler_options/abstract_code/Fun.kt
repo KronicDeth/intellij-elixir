@@ -7,8 +7,10 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.`fun`.Function
 
 object Fun {
+    fun <T> ifTo(term: OtpErlangObject?, ifTrue: (OtpErlangTuple) -> T?): T? = ifTag(term, TAG, ifTrue)
+
     fun ifToMacroStringDeclaredScope(term: OtpErlangObject, scope: Scope): MacroStringDeclaredScope? =
-            ifTag(term, TAG) { toMacroStringDeclaredScope(it, scope) }
+            ifTo(term) { toMacroStringDeclaredScope(it, scope) }
 
     fun toMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope =
         toMacroString(term, scope)
@@ -22,7 +24,7 @@ object Fun {
     private fun argumentToMacroString(argument: OtpErlangObject, scope: Scope): MacroString =
             Function.ifToMacroString(argument, scope) ?:
             Clauses.ifToMacroString(argument, scope) ?:
-            "unknown_fun_argument"
+            MacroString.unknown("unknown_fun_argument", "${TAG} argument", argument)
 
     private fun toArgument(term: OtpErlangTuple): OtpErlangObject = term.elementAt(2)
 
@@ -30,7 +32,7 @@ object Fun {
             term.arity().let { arity ->
                 when (arity) {
                     3 -> argumentMacroString(term, scope)
-                    else -> "unknown_function_arity($arity)"
+                    else -> MacroString.unknown("unknown_function_arity($arity)", "Fun unknown arity $arity", term)
                 }
             }
 }

@@ -10,14 +10,14 @@ import org.elixir_lang.beam.decompiler.Options
 private const val TAG = "clause"
 
 class Clause(val attributes: Attributes, val function: Function, val term: OtpErlangTuple) : Node(term) {
-    val head by lazy { headMacroStringDeclaredScope.macroString }
+    val head by lazy { headMacroStringDeclaredScope.macroString.string }
 
     override fun toMacroString(options: Options): String {
         val (headMacroString, headDeclaredScope) = headMacroStringDeclaredScope
-        val prefix = "${function.macroNameArity.macro} $headMacroString"
+        val prefix = "${function.macroNameArity.macro} ${headMacroString.string}"
 
         return if (options.decompileBodies) {
-            val indentedBody = org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Clause.bodyMacroString(term, headDeclaredScope)
+            val indentedBody = org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Clause.bodyString(term, headDeclaredScope)
 
             if (options.truncateDecompiledBody(indentedBody)) {
                 "$prefix, do: ..."
@@ -38,11 +38,11 @@ class Clause(val attributes: Attributes, val function: Function, val term: OtpEr
     private val headMacroStringDeclaredScope by lazy {
         val (patternSequenceMacroString, patternSequenceDeclaredScope) = patternSequenceMacroStringDeclaredScope()
 
-        MacroStringDeclaredScope("${patternSequenceMacroString}${guardSequenceMacroString()}", patternSequenceDeclaredScope)
+        MacroStringDeclaredScope("${patternSequenceMacroString.string}${guardSequenceString()}", doBlock = false, patternSequenceDeclaredScope)
     }
 
-    private fun guardSequenceMacroString() =
-            org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Clause.guardSequenceMacroString(term)
+    private fun guardSequenceString(): String =
+            org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Clause.guardSequenceString(term)
 
     private fun patternSequenceMacroStringDeclaredScope() =
             toPatternSequence(term)

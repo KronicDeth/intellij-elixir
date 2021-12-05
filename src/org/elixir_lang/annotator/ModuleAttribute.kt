@@ -117,11 +117,11 @@ class ModuleAttribute : Annotator, DumbAware {
     /*
      * Private Instance Methods
      */
-    private fun cannotHighlightTypes(element: PsiElement?) {
+    private fun cannotHighlightTypes(element: PsiElement) {
         error("Cannot highlight types", element)
     }
 
-    private fun error(userMessage: String, element: PsiElement?) {
+    private fun error(userMessage: String, element: PsiElement) {
         Logger.error(this.javaClass, userMessage, element)
     }
 
@@ -243,7 +243,9 @@ class ModuleAttribute : Annotator, DumbAware {
                             cannotHighlightTypes(leftOperand)
                         }
                     } else {
-                        cannotHighlightTypes(leftOperand)
+                        if (leftOperand != null) {
+                            cannotHighlightTypes(leftOperand)
+                        }
                     }
 
                     val rightOperand: PsiElement? = infix.rightOperand()
@@ -353,31 +355,23 @@ class ModuleAttribute : Annotator, DumbAware {
 
     private fun highlightTypeLeftOperand(call: ElixirMatchedUnqualifiedParenthesesCall,
                                          annotationHolder: AnnotationHolder): Set<String?> {
-        val primaryArguments = call.primaryArguments()
+        val arguments: Array<PsiElement>? = if (Unquote.`is`(call)) {
+            call.secondaryArguments() as Array<PsiElement>?
+        } else {
+            call.primaryArguments()
+        }
 
-        /* if there are secondaryArguments, then it is the type parameters as in
-           `@type quote(type_name)(param1, param2) :: {param1, param2}` */
-        return call.secondaryArguments()?.map { it!! }?.let { secondaryArguments ->
-            typeTypeParameterNameSet(secondaryArguments).also { typeParameterNameSet ->
-                highlightTypesAndTypeParameterUsages(
-                        primaryArguments, emptySet<String>(),
-                        annotationHolder,
-                        ElixirSyntaxHighlighter.TYPE
-                )
+        return if (arguments != null) {
+            typeTypeParameterNameSet(arguments).also { typeParameterNameSet ->
                 highlightTypesAndTypeTypeParameterDeclarations(
-                        secondaryArguments,
+                        arguments,
                         typeParameterNameSet,
                         annotationHolder,
                         ElixirSyntaxHighlighter.TYPE
                 )
             }
-        } ?: typeTypeParameterNameSet(primaryArguments).also { typeParameterNameSet ->
-            highlightTypesAndTypeTypeParameterDeclarations(
-                    primaryArguments,
-                    typeParameterNameSet,
-                    annotationHolder,
-                    ElixirSyntaxHighlighter.TYPE
-            )
+        } else {
+            emptySet()
         }
     }
 
@@ -596,7 +590,9 @@ class ModuleAttribute : Annotator, DumbAware {
                         )
                     }
                     else -> {
-                        cannotHighlightTypes(leftOperand)
+                        if (leftOperand != null) {
+                            cannotHighlightTypes(leftOperand)
+                        }
                     }
                 }
 

@@ -63,10 +63,10 @@ class ModuleImpl<T : StubElement<*>?>(private val stub: T) : ModuleElementImpl()
 
                 if (callDefinitionClause != null) {
                     (callDefinitionStub as ModuleElementImpl).setMirror(SourceTreeToPsiMap.psiToTreeNotNull(callDefinitionClause))
-                } else {
+                } else if (callDefinitionStub.isExported) {
                     LOGGER.error("No decompiled source function with name/arity (${moduleName(element)}.${name}/${arity})")
                 }
-            } else {
+            } else if (callDefinitionStub.isExported) {
                 LOGGER.error("No decompiled source function with name (${moduleName(element)}.$name)")
             }
         }

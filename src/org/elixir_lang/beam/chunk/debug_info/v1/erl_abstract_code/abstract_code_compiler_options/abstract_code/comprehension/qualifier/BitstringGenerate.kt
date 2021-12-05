@@ -16,10 +16,10 @@ object BitstringGenerate {
         val (expressionMacroString, expressionDeclaredScope) = expressionMacroStringDeclaredScope(term, scope)
         val patternScope = scope.union(expressionDeclaredScope)
         val (patternMacroString, patternDeclaredScope) = patternMacroStringDeclaredScope(term, patternScope)
-        val macroString = "<<$patternMacroString <- $expressionMacroString>>"
+        val string = "<<${patternMacroString.string} <- ${expressionMacroString.group().string}>>"
         val declaredScope = patternScope.union(patternDeclaredScope)
 
-        return MacroStringDeclaredScope(macroString, declaredScope)
+        return MacroStringDeclaredScope(string, doBlock = false, declaredScope)
     }
 
     private const val TAG = "b_generate"
@@ -27,12 +27,12 @@ object BitstringGenerate {
     private fun expressionMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope) =
             toExpression(term)
                     ?.let { AbstractCode.toMacroStringDeclaredScope(it, scope) }
-                    ?: MacroStringDeclaredScope("missing_expression", Scope.EMPTY)
+                    ?: MacroStringDeclaredScope.missing("expression", scope, "bitstring generate expression", term)
 
     private fun patternMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope) =
             toPattern(term)
                     ?.let { patternToMacroStringDeclaredScope(it, scope) }
-                    ?: MacroStringDeclaredScope("missing_pattern", Scope.EMPTY)
+                    ?: MacroStringDeclaredScope.missing("pattern", scope, "bitstring generate pattern", term)
 
     private fun patternToMacroStringDeclaredScope(term: OtpErlangObject, scope: Scope) =
             Bin.ifTo(term) {

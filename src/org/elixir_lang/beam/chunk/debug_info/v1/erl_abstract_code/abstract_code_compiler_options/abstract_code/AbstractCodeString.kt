@@ -1,10 +1,8 @@
 package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code
 
-import com.ericsson.otp.erlang.OtpErlangBinary
-import com.ericsson.otp.erlang.OtpErlangObject
-import com.ericsson.otp.erlang.OtpErlangString
-import com.ericsson.otp.erlang.OtpErlangTuple
+import com.ericsson.otp.erlang.*
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
+import org.elixir_lang.beam.term.elixirEscape
 import org.elixir_lang.beam.term.inspect
 import java.nio.charset.Charset
 
@@ -29,22 +27,26 @@ object AbstractCodeString {
             }
 
     fun toMacroStringDeclaredScope(term: OtpErlangTuple): MacroStringDeclaredScope =
-            MacroStringDeclaredScope(stringMacroString(term), Scope.EMPTY)
+            MacroStringDeclaredScope(stringString(term), doBlock = false, Scope.EMPTY)
 
     fun toString(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
 
     private const val TAG = "string"
 
-    private fun stringMacroString(term: OtpErlangTuple) =
+    private fun stringString(term: OtpErlangTuple) =
             toString(term)
-                    ?.let { stringToMacroString(it) }
-                    ?: "missing_string"
+                    ?.let { stringToString(it) }
+                    ?: AbstractCode.missing("string", "string string", term)
 
-    private fun stringToMacroString(term: OtpErlangObject): String =
+    private fun stringToString(term: OtpErlangObject): String =
         when (term) {
-            is OtpErlangString -> stringToMacroString(term)
-            else -> "unknown_string"
+            is OtpErlangString -> stringToString(term)
+            is OtpErlangList -> stringToString(term)
+            else -> AbstractCode.unknown("string_string", "string string", term)
         }
 
-    private fun stringToMacroString(term: OtpErlangString): String = inspect(term)
+    private fun stringToString(term: OtpErlangString): String = inspect(term)
+
+    private fun stringToString(term: OtpErlangList): String =
+            "\"${term.stringValue().elixirEscape()}\""
 }

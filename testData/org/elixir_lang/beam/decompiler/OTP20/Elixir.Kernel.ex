@@ -251,40 +251,40 @@ defmodule Kernel do
   @spec term() !== term() :: boolean()
   def left@1 !== right@1, do: left@1 !== right@1
 
-  @spec unknown_type * integer() :: unknown_type
-  @spec integer() * unknown_type :: unknown_type
-  @spec unknown_type * unknown_type :: unknown_type
+  @spec float() * integer() :: float()
+  @spec integer() * float() :: float()
+  @spec float() * float() :: float()
   @spec integer() * integer() :: integer()
   def left@1 * right@1, do: left@1 * right@1
 
   @spec (+value) :: value when value: number()
   def (+value@1), do: +value@1
 
-  @spec unknown_type + integer() :: unknown_type
-  @spec integer() + unknown_type :: unknown_type
-  @spec unknown_type + unknown_type :: unknown_type
+  @spec float() + integer() :: float()
+  @spec integer() + float() :: float()
+  @spec float() + float() :: float()
   @spec integer() + integer() :: integer()
   def left@1 + right@1, do: left@1 + right@1
 
   @spec [] ++ term() :: maybe_improper_list()
   def left@1 ++ right@1, do: left@1 ++ right@1
 
-  @spec (-unknown_type) :: unknown_type
+  @spec (-float()) :: float()
   @spec (-neg_integer()) :: pos_integer()
   @spec (-pos_integer()) :: neg_integer()
   @spec (-0) :: 0
   def (-value@1), do: -value@1
 
-  @spec unknown_type - integer() :: unknown_type
-  @spec integer() - unknown_type :: unknown_type
-  @spec unknown_type - unknown_type :: unknown_type
+  @spec float() - integer() :: float()
+  @spec integer() - float() :: float()
+  @spec float() - float() :: float()
   @spec integer() - integer() :: integer()
   def left@1 - right@1, do: left@1 - right@1
 
   @spec [] -- [] :: []
   def left@1 -- right@1, do: left@1 -- right@1
 
-  @spec number() / number() :: unknown_type
+  @spec number() / number() :: float()
   def left@1 / right@1, do: left@1 / right@1
 
   @spec term() < term() :: boolean()
@@ -331,10 +331,10 @@ defmodule Kernel do
   @spec binary_part(binary(), pos_integer(), integer()) :: binary()
   def binary_part(binary@1, start@1, length@1), do: :erlang.binary_part(binary@1, start@1, length@1)
 
-  @spec bit_size(unknown_type) :: non_neg_integer()
+  @spec bit_size(bitstring()) :: non_neg_integer()
   def bit_size(bitstring@1), do: :erlang.bit_size(bitstring@1)
 
-  @spec byte_size(unknown_type) :: non_neg_integer()
+  @spec byte_size(bitstring()) :: non_neg_integer()
   def byte_size(bitstring@1), do: :erlang.byte_size(bitstring@1)
 
   @spec div(integer(), (neg_integer() | pos_integer())) :: integer()
@@ -387,7 +387,7 @@ defmodule Kernel do
 
   def get_in(data@1, [h@1 | t@1]), do: Kernel.get_in(Access.get(data@1, h@1), t@1)
 
-  @spec hd(unknown_type) :: elem when elem: term()
+  @spec hd(nonempty_maybe_improper_list(elem, any())) :: elem when elem: term()
   def hd(list@1), do: :erlang.hd(list@1)
 
   def inspect(x0@1), do: inspect(x0@1, [])
@@ -528,7 +528,7 @@ defmodule Kernel do
   def rem(dividend@1, divisor@1), do: rem(dividend@1, divisor@1)
 
   @spec round(value) :: value when value: integer()
-  @spec round(unknown_type) :: integer()
+  @spec round(float()) :: integer()
   def round(number@1), do: :erlang.round(number@1)
 
   @spec self() :: pid()
@@ -593,10 +593,10 @@ defmodule Kernel do
   @spec throw(term()) :: no_return()
   def throw(term@1), do: :erlang.throw(term@1)
 
-  @spec tl(unknown_type) :: (maybe_improper_list(elem, tail) | tail) when elem: term(), tail: term()
+  @spec tl(nonempty_maybe_improper_list(elem, tail)) :: (maybe_improper_list(elem, tail) | tail) when elem: term(), tail: term()
   def tl(list@1), do: :erlang.tl(list@1)
 
-  @spec trunc(unknown_type) :: integer()
+  @spec trunc(float()) :: integer()
   @spec trunc(value) :: value when value: integer()
   def trunc(number@1), do: :erlang.trunc(number@1)
 
@@ -875,14 +875,14 @@ defmodule Kernel do
   end
 
   def expand_module(_raw@1, module@1, env@1) do
-    :elixir_aliases.concat([case env@1 do
+    :elixir_aliases.concat([(case env@1 do
       %{:module => _@1} ->
         _@1
       _@1 when :erlang.is_map(_@1) ->
         :erlang.error({:badkey, :module, _@1})
       _@1 ->
         _@1.module()
-    end, module@1])
+    end), module@1])
   end
 
   def extract_concatenations({:<>, _, [left@1, right@1]}), do: [wrap_concatenation(left@1) | extract_concatenations(right@1)]
@@ -1041,14 +1041,14 @@ defmodule Kernel do
   end
 
   def struct(struct@1, kv@1, fun@1) when :erlang.is_atom(struct@1) do
-    struct(case struct@1 do
+    struct((case struct@1 do
       %{:__struct__ => _@1} ->
         _@1
       _@1 when :erlang.is_map(_@1) ->
         :erlang.error({:badkey, :__struct__, _@1})
       _@1 ->
         _@1.__struct__()
-    end, kv@1, fun@1)
+    end), kv@1, fun@1)
   end
 
   def struct(%{:__struct__ => _} = struct@1, [], _fun@1), do: struct@1

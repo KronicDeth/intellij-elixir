@@ -9,6 +9,7 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Attributes
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Scope
 import org.elixir_lang.beam.decompiler.Options
+import org.elixir_lang.code.Identifier
 
 private const val ATTRIBUTE_NAME = "type"
 
@@ -50,39 +51,42 @@ class Type(val attributes: Attributes, attribute: Attribute): MacroString(attrib
                     null
                 }
 
-        private fun nameMacroString(term: OtpErlangTuple) =
+        private fun nameString(term: OtpErlangTuple): String =
             toName(term)
                     ?.let { nameToMacroString(it) }
-                    ?: "missing_name"
+                    ?: AbstractCode.missing("name", "Attribute type name", term)
 
         private fun nameToMacroString(name: OtpErlangObject): String =
                 when (name) {
-                    is OtpErlangAtom -> name.atomValue()
-                    else -> "unknown_name"
+                    is OtpErlangAtom -> Identifier.inspectAsFunction(name, true)
+                    else -> AbstractCode.unknown("name", "Attribute type name", name)
                 }
 
         private fun subtypeMacroString(term: OtpErlangObject?) =
                 when (term) {
                     is OtpErlangTuple -> subtypeMacroString(term)
-                    else -> "unknown_subtype"
+                    else -> if (term != null) {
+                        AbstractCode.unknown("subtype", "Attribute type subtype", term)
+                    } else {
+                        "missing_subtype"
+                    }
                 }
 
         private fun subtypeMacroString(term: OtpErlangTuple): String {
-            val nameMacroString = nameMacroString(term)
-            val valueMacroString = valueMacroString(term)
+            val nameString = nameString(term)
+            val valueString = valueString(term)
 
-            return "$nameMacroString :: $valueMacroString"
+            return "$nameString :: $valueString"
         }
 
         private fun toName(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(0)
         private fun toValue(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(1)
 
-        private fun valueMacroString(term: OtpErlangTuple) =
+        private fun valueString(term: OtpErlangTuple): String =
                 toValue(term)
-                        ?.let { valueToMacroString(it) }
-                        ?: "unknown_value"
+                        ?.let { valueToString(it) }
+                        ?: AbstractCode.unknown("value", "Attribute type value", term)
 
-        private fun valueToMacroString(value: OtpErlangObject) =
-                AbstractCode.toMacroStringDeclaredScope(value, Scope.EMPTY).macroString
+        private fun valueToString(value: OtpErlangObject): String = AbstractCode.toString(value)
     }
 }

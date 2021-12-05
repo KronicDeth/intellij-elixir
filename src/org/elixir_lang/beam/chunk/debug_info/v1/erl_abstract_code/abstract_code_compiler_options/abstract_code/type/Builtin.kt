@@ -1,26 +1,26 @@
 package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.type
 
 import com.ericsson.otp.erlang.OtpErlangAtom
-import com.ericsson.otp.erlang.OtpErlangList
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
-import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.MacroString
-import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Scope
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.*
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Type.ifSubtypeTo
-import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Type.subtypeMacroString
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Type.subtypeString
 
 object Builtin {
-    fun ifToMacroString(type: OtpErlangTuple): MacroString? = ifSubtypeTo(type, SUBTYPE_SET) { toMacroString(type) }
+    fun ifToString(type: OtpErlangTuple): String? = ifSubtypeTo(type, SUBTYPE_SET) { toString(type) }
 
     private val SUBTYPE_SET = setOf(
             "any",
             "arity",
             "atom",
             "binary",
+            "bitstring",
             "boolean",
             "byte",
             "char",
+            "float",
             "function",
             "integer",
             "iodata",
@@ -34,6 +34,8 @@ object Builtin {
             "nil",
             "no_return",
             "node",
+            "nonempty_improper_list",
+            "nonempty_maybe_improper_list",
             "non_neg_integer",
             "none",
             "nonempty_list",
@@ -49,48 +51,37 @@ object Builtin {
             "tuple"
     )
 
-    private fun argumentsMaybeToMacroString(arguments: OtpErlangObject?) =
+    private fun argumentsMaybeToString(arguments: OtpErlangObject?): String =
             arguments
-                    ?.let { argumentsToMacroString(it) }
+                    ?.let { argumentsToString(it) }
                     ?: "missing_arguments"
 
-    private fun argumentToMacroString(argument: OtpErlangObject) =
-            AbstractCode.toMacroStringDeclaredScope(argument, Scope.EMPTY).macroString
-
-    private fun argumentsToMacroString(arguments: OtpErlangList) =
-            arguments.joinToString(", ") { argumentToMacroString(it) }
-
-    private fun argumentsToMacroString(arguments: OtpErlangObject) =
-            when (arguments) {
-                is OtpErlangList -> argumentsToMacroString(arguments)
-                else -> "unknown_arguments"
-            }
+    private fun argumentsToString(arguments: OtpErlangObject): String =
+            Sequence.toCommaSeparatedString(arguments, Scope.EMPTY)
 
     private fun toArguments(type: OtpErlangTuple): OtpErlangObject? = type.elementAt(3)
 
-    private fun toMacroString(type: OtpErlangTuple) =
+    private fun toString(type: OtpErlangTuple) =
         toArguments(type).let { arguments ->
             when (arguments) {
-                is OtpErlangAtom -> toMacroString(type, arguments)
-                else -> toMacroString(type, arguments)
+                is OtpErlangAtom -> toString(type, arguments)
+                else -> toString(type, arguments)
             }
         }
 
-    private fun toMacroString(type: OtpErlangTuple, arguments: OtpErlangAtom) =
+    private fun toString(type: OtpErlangTuple, arguments: OtpErlangAtom): String =
         if (arguments.atomValue() == "any") {
-            val subtypeMacroString = subtypeMacroString(type)
-
-            when (subtypeMacroString) {
+            when (val subtypeMacroString = subtypeString(type)) {
                 "string" -> "charlist()"
                 else -> "$subtypeMacroString()"
             }
         } else {
-            "unknown_atom_arguments"
+            AbstractCode.unknown("atom_arguments", "type atom arguments", type)
         }
 
-    private fun toMacroString(type: OtpErlangTuple, arguments: OtpErlangObject?): MacroString {
-        val subtypeMacroString = subtypeMacroString(type)
-        val argumentsMacroString = argumentsMaybeToMacroString(arguments)
+    private fun toString(type: OtpErlangTuple, arguments: OtpErlangObject?): String {
+        val subtypeMacroString = subtypeString(type)
+        val argumentsMacroString = argumentsMaybeToString(arguments)
 
         return when (subtypeMacroString) {
             "list" -> "[$argumentsMacroString]"

@@ -4,6 +4,7 @@ import com.ericsson.otp.erlang.OtpErlangList
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
 import org.elixir_lang.Macro
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode.ifTag
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Clause
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.MacroString
@@ -15,9 +16,10 @@ object Clauses {
 
     fun toMacroString(term: OtpErlangTuple, scope: Scope): MacroString {
         val clausesMacroString = clausesMacroString(term, scope)
-
-        return "fn $clausesMacroString\n" +
+        val string = "fn $clausesMacroString\n" +
                 "end"
+
+        return MacroString(string, doBlock = false)
     }
 
     private const val TAG = "clauses"
@@ -25,20 +27,20 @@ object Clauses {
     private fun clausesMacroString(term: OtpErlangTuple, scope: Scope): String =
             toClauses(term)
                     ?.let { clausesToMacroString(it, scope) }
-                    ?: "missing_clauses"
+                    ?: AbstractCode.missing("clauses", "fun clauses", term)
 
     private fun clausesToMacroString(clauses: OtpErlangList, scope: Scope): String =
             clauses
                     .joinToString("\n") {
-                        Clause.ifToMacroString(it, scope) ?:
-                        "unknown_clause"
+                        Clause.ifToString(it, scope) ?:
+                        AbstractCode.unknown("_clause", "fun clause", it)
                     }
                     .let { Macro.adjustNewLines(it, "\n  ") }
 
     private fun clausesToMacroString(clauses: OtpErlangObject, scope: Scope): String =
             when (clauses) {
                 is OtpErlangList -> clausesToMacroString(clauses, scope)
-                else -> "unknown_clauses"
+                else -> AbstractCode.unknown("clauses", "fun clauses", clauses)
             }
 
     private fun toClauses(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(1)

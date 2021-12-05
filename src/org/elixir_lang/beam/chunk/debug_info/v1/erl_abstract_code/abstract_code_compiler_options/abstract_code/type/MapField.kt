@@ -4,46 +4,43 @@ import com.ericsson.otp.erlang.OtpErlangList
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
-import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.MacroString
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Scope
 
 object MapField {
-    fun toMacroString(type: OtpErlangTuple, necessity: MacroString) =
+    fun toString(type: OtpErlangTuple, necessity: String) =
             toPair(type)
-                    ?.let { pairToMacroString(it, necessity) }
-                    ?: "missing_pair"
+                    ?.let { pairToString(it, necessity) }
+                    ?: AbstractCode.missing("pair", "type map field pair", type)
 
-    private fun keyMacroString(pair: OtpErlangList) =
+    private fun keyString(pair: OtpErlangList) =
             pairToKey(pair)
-                    ?.let { keyToMacroString(it) }
-                    ?: "missing_key"
+                    ?.let { keyToString(it) }
+                    ?: AbstractCode.missing("key", "type map field key", pair)
 
-    private fun keyToMacroString(key: OtpErlangObject) =
-            AbstractCode.toMacroStringDeclaredScope(key, Scope.EMPTY).macroString
+    private fun keyToString(key: OtpErlangObject): String = AbstractCode.toString(key)
 
     private fun pairToKey(pair: OtpErlangList): OtpErlangObject? = pair.elementAt(0)
 
-    private fun pairToMacroString(pair: OtpErlangList, necessity: MacroString): MacroString {
-        val keyMacroString = keyMacroString(pair)
-        val valueMacroString = valueMacroString(pair)
+    private fun pairToString(pair: OtpErlangList, necessity: String): String {
+        val keyString = keyString(pair)
+        val valueString = valueString(pair)
 
-        return "$necessity($keyMacroString) => $valueMacroString"
+        return "$necessity($keyString) => $valueString"
     }
 
-    private fun pairToMacroString(pair: OtpErlangObject, necessity: MacroString) =
+    private fun pairToString(pair: OtpErlangObject, necessity: String) =
             when (pair) {
-                is OtpErlangList -> pairToMacroString(pair, necessity)
-                else -> "unknown_pair"
+                is OtpErlangList -> pairToString(pair, necessity)
+                else -> AbstractCode.unknown("pair", "type map field pair", pair)
             }
 
     private fun pairToValue(pair: OtpErlangList): OtpErlangObject? = pair.elementAt(1)
     private fun toPair(type: OtpErlangTuple): OtpErlangObject? = type.elementAt(3)
 
-    private fun valueMacroString(pair: OtpErlangList) =
+    private fun valueString(pair: OtpErlangList): String =
             pairToValue(pair)
-                    ?.let { valueToMacroString(it) }
-                    ?: "missing_value"
+                    ?.let { valueToString(it) }
+                    ?: AbstractCode.missing("value", "type mape field value", pair)
 
-    private fun valueToMacroString(key: OtpErlangObject) =
-            AbstractCode.toMacroStringDeclaredScope(key, Scope.EMPTY).macroString
+    private fun valueToString(key: OtpErlangObject): String = AbstractCode.toString(key)
 }

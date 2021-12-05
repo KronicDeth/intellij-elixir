@@ -378,7 +378,18 @@
     * Functions defined by `EEx.function_from_(file|string)`
     * `exception/1` and `message/1` defined by `defexception`
     * `*_text/0` and `*_template(assigns)` functions defined by `Mix.Generator.embed_text` and `Mix.Generator.embed_template`.
-
+* [#2334](https://github.com/KronicDeth/intellij-elixir/pull/2334) - [@KronicDeth](https://github.com/KronicDeth)
+  * Internal Tool for BEAM Bulk Decompilation
+    Decompile all .beam files in the project, modules and SDKs to check for errors in the generated Elixir code
+  * Decompiler
+    * Erlang Abst
+      * Log decompilation errors
+  * Error Reports
+    * Include system information in error reports
+      Instead of just including the plugin version, also include the Application name, edition, and version; and the Operation System name and version as these are common follow-up questions I have.
+    * Remove tab at start of location for title of issues
+    * Don't include "java.lang.Throwable: " in title of issues
+      The `Throwable` is necessary to get a stacktrace, but not a real error.
 
 ### Bug Fixes
 * [#2074](https://github.com/KronicDeth/intellij-elixir/pull/2074) - [@Thau](https://github.com/Thau)
@@ -582,6 +593,52 @@
   * Implement completion for functions declared with `defdelegate`.
   * Fix `LookupElementPresentation.putItemPresentation` `addTailText`.
     Only append suffix of `presentableText` if it is prefixed by `itemText`.
+* [#2334](https://github.com/KronicDeth/intellij-elixir/pull/2334) - [@KronicDeth](https://github.com/KronicDeth)
+  * Decompiler
+    * Elixir
+      * Decompile local function calls in Elixir DbgI using inspectAsFunction
+        While remote calls used `inspectAsFunction`, local calls just used the `atomValue`,  which meant names that needed to be unquoted weren't and caused parsing errors.
+    * Erlang Abst
+      * Decompile Erlang Abst string with OtpErlangList as strings with non-ASCII codepoints
+        Fixes unknown string format in `idna.beam`
+      * Always group for comprehensions in sequence even if there is only 1 element
+        Some forms of `for` comprehensions cannot be used as the sole argument of a call unless surrounded by parentheses, so always add those parentheses.
+      * Decompile Erlang Abst record empty record fields as `[]` for updates
+      * Decompile Erlang Abst `left xor right` as `:erlang.xor(left, right)`
+        Elixir does not have a logical xor infix operator, so have to decompile as normal function call
+      * Decompile Erlang Abst named anonymous function as a macro
+        Named anonymous functions are support in Erlang, but not Elixir, so fake it as a macro when decompiling.
+      * Add builtin-types for Erlang Abst
+        * `bitstring`
+        * `float`
+        * `nonempty_improper_list`
+        * `nonempty_maybe_improper_list`
+      * Decompile tagged atoms and other complex expression as function name in Abst capture
+      * Decompile Erlang Abst `float`
+      * Decompile Erlang Abst `begin` blocks as parenthesized groups separated by ;
+      * Decompile empty OtpErlangList as "" in Erlang Abst `string`
+      * Track if decompiled Erlang Abst contains do blocks so that they can be surrounded by parentheses when necessary
+      * Fix decompiling Erlang Abst `record_index` when record name needs to be unquoted
+      * Decompile `map` updates in Erlang Abst
+      * Erlang Abst Function capture names are OtpErlangAtom and not tagged Atoms
+      * Inspect local function names as atoms instead of as functions when apply/3 is used for operations and unquoted in Erlang Abst
+        Stops `:unquote(:"NAME")` from happening
+      * Surround anonymous function definitions that are called immediately with parentheses and call arguments with .( in Erlang Abst
+      * Decompile `field_type` in Erlang Abst
+        Fixes decompiling `hipe_icode_call_elim.beam`
+      * Inspect type name usages as local functions to ensure invalid names are unquoted
+      * Inspect type names as local functions to ensure invalid names are unquoted
+  * References
+    * Stop looking for qualifiers to prepend when exiting interpolation
+    * Don't safeMultiResolve null call.reference in resolvesToModularName
+  * Types
+    * Fix highlighting types declared with unquote and no secondary parentheses
+  * Performance
+    * Don't error if a private function mirror cannot be found
+      Private functions are not decompiled if there are too many public functions.
+    * Fix CallDefinitionImpl.isExported
+      Used to be hard-coded to return `true`, but this pre-dated decompiling private functions.  Now with decompiling private functions, isExported needs to defer to the `Definition` and count as unexported if a private function, macro, or guard.
+  
 
 ## v11.13.0
 

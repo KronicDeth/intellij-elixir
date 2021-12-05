@@ -435,6 +435,56 @@ public class DecompilerTest extends PlatformTestCase {
         assertDecompiled("queue");
     }
 
+    // Issues 2251 and 2263
+    public void testSSHOptions() throws IOException {
+        assertDecompiled("ssh_options");
+    }
+
+    public void testIssue2257() throws IOException {
+        assertDecompiled("hipe_icode_call_elim");
+    }
+
+    // Issues 2285 and 2286
+    public void testASN1CT() throws IOException {
+        assertDecompiled("asn1ct");
+    }
+
+    public void testIssue2287() throws IOException {
+        assertDecompiled("diameter_gen_acct_rfc6733");
+    }
+
+    public void testIssue2288() throws IOException {
+        assertDecompiled("diameter_gen_base_accounting");
+    }
+
+    public void testIssue2289() throws IOException {
+        assertDecompiled("diameter_gen_relay");
+    }
+
+    public void testIssue2306() throws IOException {
+        assertDecompiled("dialyzer_callgraph");
+    }
+
+    public void testCode() throws IOException {
+        assertDecompiled("code");
+    }
+
+    public void testIssue2328() throws IOException {
+        assertDecompiled("dbg_wx_trace_win");
+    }
+
+    public void testIssue2329() throws IOException {
+        assertDecompiled("ex_cursor");
+    }
+
+    public void testIssue2331() throws IOException {
+        assertDecompiled("gb_sets");
+    }
+
+    public void testIssue2332() throws IOException {
+        assertDecompiled("idna");
+    }
+
     /*
      * Instance Methods
      */

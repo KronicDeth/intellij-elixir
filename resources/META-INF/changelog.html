@@ -198,6 +198,26 @@
           </li>
         </ul>
       </li>
+      <li>Internal Tool for BEAM Bulk Decompilation<br>
+        Decompile all .beam files in the project, modules and SDKs to check for errors in the generated Elixir code</li>
+      <li>Decompiler
+        <ul dir="auto">
+          <li>Erlang Abst
+            <ul dir="auto">
+              <li>Log decompilation errors</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>Error Reports
+        <ul dir="auto">
+          <li>Include system information in error reports<br>
+            Instead of just including the plugin version, also include the Application name, edition, and version; and the Operation System name and version as these are common follow-up questions I have.</li>
+          <li>Remove tab at start of location for title of issues</li>
+          <li>Don't include "java.lang.Throwable: " in title of issues<br>
+            The <code>Throwable</code> is necessary to get a stacktrace, but not a real error.</li>
+        </ul>
+      </li>
     </ul>
   </li>
   <li>
@@ -475,6 +495,71 @@
       <li>Implement completion for functions declared with <code>defdelegate</code>.</li>
       <li>Fix <code>LookupElementPresentation.putItemPresentation</code> <code>addTailText</code>.<br>
         Only append suffix of <code>presentableText</code> if it is prefixed by <code>itemText</code>.</li>
+      <li>Decompiler
+        <ul dir="auto">
+          <li>Elixir
+            <ul dir="auto">
+              <li>Decompile local function calls in Elixir DbgI using inspectAsFunction<br>
+                While remote calls used <code>inspectAsFunction</code>, local calls just used the <code>atomValue</code>,  which meant names that needed to be unquoted weren't and caused parsing errors.</li>
+            </ul>
+          </li>
+          <li>Erlang Abst
+            <ul dir="auto">
+              <li>Decompile Erlang Abst string with OtpErlangList as strings with non-ASCII codepoints<br>
+                Fixes unknown string format in <code>idna.beam</code></li>
+              <li>Always group for comprehensions in sequence even if there is only 1 element<br>
+                Some forms of <code>for</code> comprehensions cannot be used as the sole argument of a call unless surrounded by parentheses, so always add those parentheses.</li>
+              <li>Decompile Erlang Abst record empty record fields as <code>[]</code> for updates</li>
+              <li>Decompile Erlang Abst <code>left xor right</code> as <code>:erlang.xor(left, right)</code><br>
+                Elixir does not have a logical xor infix operator, so have to decompile as normal function call</li>
+              <li>Decompile Erlang Abst named anonymous function as a macro<br>
+                Named anonymous functions are support in Erlang, but not Elixir, so fake it as a macro when decompiling.</li>
+              <li>Add builtin-types for Erlang Abst
+                <ul dir="auto">
+                  <li><code>bitstring</code></li>
+                  <li><code>float</code></li>
+                  <li><code>nonempty_improper_list</code></li>
+                  <li><code>nonempty_maybe_improper_list</code></li>
+                </ul>
+              </li>
+              <li>Decompile tagged atoms and other complex expression as function name in Abst capture</li>
+              <li>Decompile Erlang Abst <code>float</code></li>
+              <li>Decompile Erlang Abst <code>begin</code> blocks as parenthesized groups separated by ;</li>
+              <li>Decompile empty OtpErlangList as "" in Erlang Abst <code>string</code></li>
+              <li>Track if decompiled Erlang Abst contains do blocks so that they can be surrounded by parentheses when necessary</li>
+              <li>Fix decompiling Erlang Abst <code>record_index</code> when record name needs to be unquoted</li>
+              <li>Decompile <code>map</code> updates in Erlang Abst</li>
+              <li>Erlang Abst Function capture names are OtpErlangAtom and not tagged Atoms</li>
+              <li>Inspect local function names as atoms instead of as functions when apply/3 is used for operations and unquoted in Erlang Abst<br>
+                Stops <code>:unquote(:"NAME")</code> from happening</li>
+              <li>Surround anonymous function definitions that are called immediately with parentheses and call arguments with .( in Erlang Abst</li>
+              <li>Decompile <code>field_type</code> in Erlang Abst<br>
+                Fixes decompiling <code>hipe_icode_call_elim.beam</code></li>
+              <li>Inspect type name usages as local functions to ensure invalid names are unquoted</li>
+              <li>Inspect type names as local functions to ensure invalid names are unquoted</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>References
+        <ul dir="auto">
+          <li>Stop looking for qualifiers to prepend when exiting interpolation</li>
+          <li>Don't safeMultiResolve null call.reference in resolvesToModularName</li>
+        </ul>
+      </li>
+      <li>Types
+        <ul dir="auto">
+          <li>Fix highlighting types declared with unquote and no secondary parentheses</li>
+        </ul>
+      </li>
+      <li>Performance
+        <ul dir="auto">
+          <li>Don't error if a private function mirror cannot be found<br>
+            Private functions are not decompiled if there are too many public functions.</li>
+          <li>Fix CallDefinitionImpl.isExported<br>
+            Used to be hard-coded to return <code>true</code>, but this pre-dated decompiling private functions.  Now with decompiling private functions, isExported needs to defer to the <code>Definition</code> and count as unexported if a private function, macro, or guard.</li>
+        </ul>
+      </li>
     </ul>
   </li>
 </ul>

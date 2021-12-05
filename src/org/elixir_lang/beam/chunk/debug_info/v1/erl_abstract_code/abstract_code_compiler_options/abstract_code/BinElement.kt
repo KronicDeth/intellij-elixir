@@ -3,6 +3,7 @@ package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code
 import com.ericsson.otp.erlang.OtpErlangBinary
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode.ifTag
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.bin_element.Pattern
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.bin_element.Size
@@ -25,15 +26,16 @@ object BinElement {
 
     fun toMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope {
         val (patternMacroString, patternDeclaredScope) = patternMacroStringDeclaredScope(term, scope)
-        val optionsMacroString = ifOptionsMacroString(term)
+        val patternString = patternMacroString.string
+        val optionsString = ifOptionsString(term)
 
-        val macroString = if (optionsMacroString != null) {
-            "$patternMacroString :: $optionsMacroString"
+        val string = if (optionsString != null) {
+            "$patternString :: $optionsString"
         } else {
-            patternMacroString
+            patternString
         }
 
-        return MacroStringDeclaredScope(macroString, patternDeclaredScope)
+        return MacroStringDeclaredScope(string, doBlock = false, patternDeclaredScope)
     }
 
     private const val TAG = "bin_element"
@@ -47,7 +49,7 @@ object BinElement {
                     ?.let { TypeSpecifierList.isDefault(it) }
                     ?: false
 
-    private fun ifOptionsMacroString(term: OtpErlangTuple): String? {
+    private fun ifOptionsString(term: OtpErlangTuple): String? {
         val sizeMacroString = sizeMacroString(term)
         val typeSpecifierListMacroString = typeSpecifierListMacroString(term)
 
@@ -75,22 +77,22 @@ object BinElement {
         return if (typeSpecifierList != null) {
             TypeSpecifierList.toMacroString(typeSpecifierList)
         } else {
-            "unknown_type_specifier_list"
+            AbstractCode.unknown("type_specifier_list", "Bin element type specifier list", term)
         }
     }
 
     private fun patternMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope) =
             toPattern(term)
                     ?.let { Pattern.toMacroStringDeclaredScope(it, scope) }
-                    ?: MacroStringDeclaredScope("unknown_pattern", Scope.EMPTY)
+                    ?: MacroStringDeclaredScope.unknown("pattern", "bin element pattern", term)
 
     private fun sizeMacroString(term: OtpErlangTuple): String? {
         val size = toSize(term)
 
         return if (size != null) {
-            Size.toMacroString(size)
+            Size.toString(size)
         } else {
-            "unknown_size"
+            AbstractCode.unknown("size", "bin element size", term)
         }
     }
 
