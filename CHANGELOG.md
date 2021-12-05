@@ -638,7 +638,8 @@
       Private functions are not decompiled if there are too many public functions.
     * Fix CallDefinitionImpl.isExported
       Used to be hard-coded to return `true`, but this pre-dated decompiling private functions.  Now with decompiling private functions, isExported needs to defer to the `Definition` and count as unexported if a private function, macro, or guard.
-  
+* [#2337](https://github.com/KronicDeth/intellij-elixir/pull/2337) - [@KronicDeth](https://github.com/KronicDeth)
+  * Walk map constructin arguments, associatons, and variables when resolving type parameters.
 
 ## v11.13.0
 

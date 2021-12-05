@@ -120,6 +120,17 @@ private constructor(private val name: String,
                 is ElixirMapArguments -> {
                     parameter.mapConstructionArguments?.let { executeOnParameter(it, state) } ?: true
                 }
+                is ElixirMapConstructionArguments -> {
+                    whileIn(parameter.children) { child ->
+                        executeOnParameter(child, state)
+                    }
+                }
+                is ElixirAssociations -> {
+                    whileIn(parameter.associationsBase.children) { child ->
+                        executeOnParameter(child, state)
+                    }
+                }
+                is ElixirVariable -> executeOnParameter(parameter, parameter.name, state)
                 else -> {
                     Logger.error(MultiResolve::class.java, "Don't know how to get name of parameter", parameter)
 
