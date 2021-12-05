@@ -117,7 +117,7 @@ class Provider : EditorNotifications.Provider<EditorNotificationPanel>() {
 
         private fun createProjectPanel(project: Project): EditorNotificationPanel {
             return EditorNotificationPanel().apply {
-                text = ProjectBundle.message("project.sdk.not.defined")
+                text = "Project SDK is not defined"
                 createActionLabel(ProjectBundle.message("project.sdk.setup")) {
                     showProjectSettings(project)
                 }

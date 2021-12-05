@@ -66,7 +66,7 @@ class Editor(private val sdkModel: SdkModel, private val history: History, priva
         reset()
     }
 
-    override fun getDisplayName(): String = ProjectBundle.message("sdk.configure.editor.title")
+    override fun getDisplayName(): String = "SDK Editor"
 
     override fun getHelpTopic(): String? = null
 
