@@ -20,7 +20,7 @@ public class DecompilerTest extends PlatformTestCase {
     public void testIssue575() {
         String ebinDirectory = ebinDirectory();
 
-        VfsRootAccess.allowRootAccess(ebinDirectory);
+        VfsRootAccess.allowRootAccess(getTestRootDisposable(), ebinDirectory);
 
         VirtualFile virtualFile = LocalFileSystem
                 .getInstance()
@@ -509,7 +509,7 @@ public class DecompilerTest extends PlatformTestCase {
         File expectedFile = new File(prefix + "ex");
         String expected = Files.toString(expectedFile, UTF_8);
 
-        VfsRootAccess.allowRootAccess(testDataPath);
+        VfsRootAccess.allowRootAccess(getTestRootDisposable(), testDataPath);
 
         VirtualFile virtualFile = LocalFileSystem
                 .getInstance()

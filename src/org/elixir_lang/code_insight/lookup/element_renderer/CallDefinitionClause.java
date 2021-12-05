@@ -1,11 +1,8 @@
 package org.elixir_lang.code_insight.lookup.element_renderer;
 
-import com.google.common.base.Joiner;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementPresentation;
-import com.intellij.diagnostic.LogMessageEx;
 import com.intellij.navigation.ItemPresentation;
-import com.intellij.openapi.diagnostic.Attachment;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.psi.PsiElement;
 import org.elixir_lang.psi.call.Call;

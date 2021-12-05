@@ -1,7 +1,6 @@
 package org.elixir_lang.beam.chunk
 
 import com.intellij.openapi.util.Pair
-import okhttp3.internal.and
 import org.jetbrains.annotations.Contract
 import java.io.DataInputStream
 import java.io.IOException
@@ -62,7 +61,7 @@ class Chunk private constructor(@JvmField val typeID: String, @JvmField val data
                 }
 
         @Contract(pure = true)
-        fun unsignedByte(signedByte: Byte): Pair<Int, Int> = Pair.pair(signedByte and 0xFF, 1)
+        fun unsignedByte(signedByte: Byte): Pair<Int, Int> = Pair.pair(signedByte.toInt() and 0xFF, 1)
 
         @Contract(pure = true)
         fun unsignedInt(bytes: ByteArray): Pair<Long, Int> = unsignedInt(bytes, 0)
