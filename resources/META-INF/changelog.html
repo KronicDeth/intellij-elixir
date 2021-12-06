@@ -1,5 +1,14 @@
 <html>
 <body>
+<h1>v12.0.1</h1>
+<ul>
+  <li>
+    <p>Bug Fixes</p>
+    <ul dir="auto">
+      <li>Override <code>Override org.elixir_lang.*.configuration.Factory.getId</code> to fix deprecation warning about the default implementation being accidentally localizable when it shouldn't be.  The Elixir plugin didn't localize these name using message bundles, so this wasn't an actual risk, but overriding is the only way to silence the error.</li>
+    </ul>
+  </li>
+</ul>
 <h1>v12.0.0</h1>
 <ul>
   <li>

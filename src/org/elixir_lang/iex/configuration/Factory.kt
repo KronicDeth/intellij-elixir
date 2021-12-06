@@ -8,4 +8,7 @@ import org.elixir_lang.iex.Configuration
 object Factory : ConfigurationFactory(Type.getInstance()) {
     override fun createTemplateConfiguration(project: Project): RunConfiguration =
             Configuration("IEx", project, this)
+
+
+    override fun getId(): String = Type.getInstance().displayName
 }
