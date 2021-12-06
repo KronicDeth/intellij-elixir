@@ -17,4 +17,6 @@ object Factory : ConfigurationFactory(Type.INSTANCE) {
 
     override fun createTemplateConfiguration(project: Project): RunConfiguration =
             Configuration(Type.TYPE_NAME, project)
+
+    override fun getId(): String = Type.TYPE_NAME
 }
