@@ -136,7 +136,7 @@ object QualifiableAliasImpl {
             is Operation,
             is QuotableKeywordPair,
             // containers
-            is ElixirContainerAssociationOperation, is ElixirList, is ElixirStructOperation, is ElixirTuple,
+            is ElixirAssociationsBase, is ElixirContainerAssociationOperation, is ElixirList, is ElixirStructOperation, is ElixirTuple,
             // Top of file
             is ElixirFile,
             // Top of expression inside of interpolation
