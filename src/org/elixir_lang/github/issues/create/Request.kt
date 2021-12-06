@@ -127,16 +127,6 @@ class Request private constructor(val title: String, val body: String) {
             )
         }
 
-        private fun codeBlockSection(stringBuilder: StringBuilder,
-                                     level: Int,
-                                     name: String,
-                                     code: String) {
-            if (code.isNotEmpty()) {
-                header(stringBuilder, level, name)
-                codeBlock(stringBuilder, code)
-            }
-        }
-
         private fun codeBlock(stringBuilder: StringBuilder, code: String) {
             codeFence(stringBuilder)
             stringBuilder.append(code)
@@ -169,7 +159,13 @@ class Request private constructor(val title: String, val body: String) {
 
             val lines = ExceptionUtil.getThrowableText(throwable).lineSequence()
             val lastPluginLine = lines.indexOfLast { it.contains("at org.elixir_lang.") }
-            lines.take(lastPluginLine + 1).forEach { stringBuilder.append(it).append('\n') }
+            val filteredLines = if (lastPluginLine != -1) {
+                lines.take(lastPluginLine + 1)
+            } else {
+                lines
+            }
+
+            filteredLines.forEach { stringBuilder.append(it).append('\n') }
 
             codeFence(stringBuilder)
         }
