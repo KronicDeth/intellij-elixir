@@ -8,4 +8,6 @@ import org.elixir_lang.elixir.Configuration
 object Factory : ConfigurationFactory(Type.getInstance()) {
     override fun createTemplateConfiguration(project: Project): RunConfiguration =
             Configuration("Elixir", project, this)
+
+    override fun getId(): String = Type.getInstance().displayName
 }

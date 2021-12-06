@@ -8,4 +8,6 @@ import org.elixir_lang.distillery.Configuration
 object Factory : ConfigurationFactory(Type.getInstance()) {
     override fun createTemplateConfiguration(project: Project): RunConfiguration =
             Configuration("Distillery Release CLI", project, this)
+
+    override fun getId(): String = Type.getInstance().displayName
 }
