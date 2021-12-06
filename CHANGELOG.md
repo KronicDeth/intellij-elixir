@@ -253,6 +253,8 @@
 ### Bug Fixes
 * [#2345](https://github.com/KronicDeth/intellij-elixir/pull/2345) - [@KronicDeth](https://github.com/KronicDeth)
   * Override `Override org.elixir_lang.*.configuration.Factory.getId` to fix deprecation warning about the default implementation being accidentally localizable when it shouldn't be.  The Elixir plugin didn't localize these name using message bundles, so this wasn't an actual risk, but overriding is the only way to silence the error.
+* [#2346](https://github.com/KronicDeth/intellij-elixir/pull/2346) - [@KronicDeth](https://github.com/KronicDeth)
+  * Stop look for qualifier at curly braces for `%{Alias}`.
 
 ## v12.0.0
 

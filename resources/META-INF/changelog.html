@@ -6,6 +6,7 @@
     <p>Bug Fixes</p>
     <ul dir="auto">
       <li>Override <code>Override org.elixir_lang.*.configuration.Factory.getId</code> to fix deprecation warning about the default implementation being accidentally localizable when it shouldn't be.  The Elixir plugin didn't localize these name using message bundles, so this wasn't an actual risk, but overriding is the only way to silence the error.</li>
+      <li>Stop look for qualifier at curly braces for <code>%{Alias}</code></li>
     </ul>
   </li>
 </ul>
