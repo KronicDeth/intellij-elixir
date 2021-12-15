@@ -20,7 +20,7 @@ object Unquote {
         return unquoteCall
                 .finalArguments()
                 ?.singleOrNull()
-                ?.let { it as Call }
+                ?.let { it as? Call }
                 ?.takeUnlessHasBeenVisited(unquoteCallResolveState)
                 ?.reference
                 ?.let { it as PsiPolyVariantReference }
