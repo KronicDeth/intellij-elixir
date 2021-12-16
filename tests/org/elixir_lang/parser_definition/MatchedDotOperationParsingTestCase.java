@@ -1,17 +1,28 @@
 package org.elixir_lang.parser_definition;
 
-/**
- * charListHeredoc or stringHeredoc is invalid to the right of `.`, so unlike in
- * {@link MatchedDotOperationParsingTestcase}, this tests only when charListHeredoc or stringHeredoc is left of `.` and
- * the right operand varies based on the test name.
- */
-public class HeredocDotOperationParsingTestcase extends ParsingTestCase {
+public class MatchedDotOperationParsingTestCase extends ParsingTestCase {
+    public void testAliasDotIdentifier() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testAliasDotIdentifierDotIdentifier() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testIdentifierDotIdentifierDotIdentifier() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testAssociativity() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     /*
      * matchedDotOperand
      */
 
     public void testAtNonNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testMatchedCallOperation() {
@@ -27,7 +38,7 @@ public class HeredocDotOperationParsingTestcase extends ParsingTestCase {
      */
 
     public void testAtNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testCaptureNumericOperation() {
@@ -35,7 +46,7 @@ public class HeredocDotOperationParsingTestcase extends ParsingTestCase {
     }
 
     public void testUnaryNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testList() {
@@ -87,19 +98,27 @@ public class HeredocDotOperationParsingTestcase extends ParsingTestCase {
     }
 
     public void testDecimalWholeNumber() {
-        assertParsedWithErrors();
+        // Parses as just a DecimalFloat
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testStringLine() {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testStringHeredoc() {
+        assertParsedWithErrors();
+    }
+
     public void testCharListLine() {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testCharListHeredoc() {
+        assertParsedWithErrors();
+    }
     @Override
     protected String getTestDataPath() {
-        return super.getTestDataPath() + "/heredoc_dot_operation_parsing_test_case";
+        return super.getTestDataPath() + "/matched_dot_operation_parsing_test_case";
     }
 }

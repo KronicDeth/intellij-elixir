@@ -1,6 +1,6 @@
 package org.elixir_lang.parser_definition;
 
-public class MatchedDotCallOperationParsingTestcase extends ParsingTestCase {
+public class MatchedDotCallOperationParsingTestCase extends ParsingTestCase {
     public void testMatchedCallOperation() {
         assertParsedAndQuotedCorrectly();
     }
