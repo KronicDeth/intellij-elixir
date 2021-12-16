@@ -3,7 +3,7 @@ package org.elixir_lang.parser_definition;
 import org.elixir_lang.sdk.elixir.Release;
 
 /**
- * atom is invalid to the right of `.`, so unlike in {@link MatchedDotOperationParsingTestcase}, this tests only when
+ * atom is invalid to the right of `.`, so unlike in {@link MatchedDotOperationParsingTestCase}, this tests only when
  * atom is left of `.` and the right operand varies based on the test name.
  */
 public class MatchedQualifiedMultipleAliasesParsingTestCase extends ParsingTestCase {

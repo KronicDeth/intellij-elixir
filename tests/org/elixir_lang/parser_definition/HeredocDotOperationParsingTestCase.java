@@ -1,10 +1,11 @@
 package org.elixir_lang.parser_definition;
 
 /**
- * sigil is invalid to the right of `.`, so unlike in {@link MatchedDotOperationParsingTestcase}, this tests only when
- * sigil is left of `.` and the right operand varies based on the test name.
+ * charListHeredoc or stringHeredoc is invalid to the right of `.`, so unlike in
+ * {@link MatchedDotOperationParsingTestCase}, this tests only when charListHeredoc or stringHeredoc is left of `.` and
+ * the right operand varies based on the test name.
  */
-public class SigilDotOperationParsingTestcase extends ParsingTestCase {
+public class HeredocDotOperationParsingTestCase extends ParsingTestCase {
     /*
      * matchedDotOperand
      */
@@ -93,20 +94,12 @@ public class SigilDotOperationParsingTestcase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testStringHeredoc() {
-        assertParsedWithErrors();
-    }
-
     public void testCharListLine() {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testCharListHeredoc() {
-        assertParsedWithErrors();
-    }
-
     @Override
     protected String getTestDataPath() {
-        return super.getTestDataPath() + "/sigil_dot_operation_parsing_test_case";
+        return super.getTestDataPath() + "/heredoc_dot_operation_parsing_test_case";
     }
 }

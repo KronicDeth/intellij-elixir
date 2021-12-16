@@ -1,7 +1,7 @@
 package org.elixir_lang.parser_definition;
 
 /**
- * list is invalid to the right of `.`, so unlike in {@link MatchedDotOperationParsingTestcase}, this tests only when
+ * list is invalid to the right of `.`, so unlike in {@link MatchedDotOperationParsingTestCase}, this tests only when
  * list is left of `.` and the right operand varies based on the test name.
  */
 public class ListDotOperationParsingTestCase extends ParsingTestCase {

@@ -1,5 +1,27 @@
 <html>
 <body>
+<h1>v12.0.2</h1>
+<ul>
+  <li>
+    <p>Bug Fixes</p>
+    <ul dir="auto">
+      <li>
+        <p dir="auto">Restore tests that weren't being run after 2021.3 upgrade.<br>
+          Upgrading to 2021.3 dropped the number of run tests from 3741 to 1452.  This was due to a change in the packaging in 2021.3 that triggered a gradle bug.</p>
+        <ul dir="auto">
+          <li>Fix test broken by missing <code>markdown</code> in plugins list<br>
+            Like the need for the <code>java</code> plugin to handle the <code>com.intellij.modules.java</code> <code>depends</code>in <code>plugin.xml</code>, the <code>org.intellij.plugins.markdown</code> <code>depends</code> needed <code>markdown</code> added to the list to make some of the tests work.  The failed tests weren't being run before after the 2021.3 upgrade.</li>
+          <li>Manually include tests instead of scanning.<br>
+            Work-around <a href="https://github.com/gradle/gradle/issues/18486">gradle/gradle#18486</a> as described in <a href="https://jetbrains-platform.slack.com/archives/C5U8BM1MK/p1637955960051600?thread_ts=1637923961.040000&amp;cid=C5U8BM1MK" rel="nofollow">this JetBrains Platform Slack #intellij-platform channel thread</a> that affects running tests with ideaVersion 2021.3.
+            <ul dir="auto">
+              <li>Rename ParsingTestCases with improper capitalization</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
 <h1>v12.0.1</h1>
 <ul>
   <li>

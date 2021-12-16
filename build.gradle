@@ -52,6 +52,8 @@ allprojects {
   intellij {
     plugins = [// needed for jps builder
                "java",
+               // needed for documentation rendering
+               "markdown",
                // always have IdeaVIM installed in sandbox
                "IdeaVIM:1.8.1",
                "PsiViewer:213-SNAPSHOT"]
@@ -104,6 +106,10 @@ test {
   environment "ELIXIR_LANG_ELIXIR_PATH", elixirPath
   environment "ELIXIR_EBIN_DIRECTORY", "${elixirPath}/lib/elixir/ebin/"
   environment "ELIXIR_VERSION", elixirVersion
+  setScanForTestClasses(false)
+  include("**/Issue*.class")
+  include("**/*Test.class")
+  include("**/*TestCase.class")
   useJUnit {
     exclude compilationPackages
   }

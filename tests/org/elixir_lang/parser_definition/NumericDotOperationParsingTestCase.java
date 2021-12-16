@@ -1,11 +1,11 @@
 package org.elixir_lang.parser_definition;
 
 /**
- * numeric is invalid to the right of `.`, so unlike in {@link MatchedDotOperationParsingTestcase}, this tests only when
+ * numeric is invalid to the right of `.`, so unlike in {@link MatchedDotOperationParsingTestCase}, this tests only when
  * numeric is left of `.` and the right operand varies based on the test name.  NOTE: UnknownBaseWholeNumber is skipped
  * as a left operand completely since it's only an error handling rule in the IDE and never expected to work in Elixir.
  */
-public class NumericDotOperationParsingTestcase extends ParsingTestCase {
+public class NumericDotOperationParsingTestCase extends ParsingTestCase {
     /*
      * matchedDotOperand
      */

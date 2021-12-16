@@ -1,28 +1,16 @@
 package org.elixir_lang.parser_definition;
 
-public class MatchedDotOperationParsingTestcase extends ParsingTestCase {
-    public void testAliasDotIdentifier() {
-        assertParsedAndQuotedCorrectly();
-    }
-
-    public void testAliasDotIdentifierDotIdentifier() {
-        assertParsedAndQuotedCorrectly();
-    }
-
-    public void testIdentifierDotIdentifierDotIdentifier() {
-        assertParsedAndQuotedCorrectly();
-    }
-
-    public void testAssociativity() {
-        assertParsedAndQuotedCorrectly();
-    }
-
+/**
+ * sigil is invalid to the right of `.`, so unlike in {@link MatchedDotOperationParsingTestCase}, this tests only when
+ * sigil is left of `.` and the right operand varies based on the test name.
+ */
+public class SigilDotOperationParsingTestCase extends ParsingTestCase {
     /*
      * matchedDotOperand
      */
 
     public void testAtNonNumericOperation() {
-        assertParsedAndQuotedCorrectly(false);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testMatchedCallOperation() {
@@ -38,7 +26,7 @@ public class MatchedDotOperationParsingTestcase extends ParsingTestCase {
      */
 
     public void testAtNumericOperation() {
-        assertParsedAndQuotedCorrectly(false);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testCaptureNumericOperation() {
@@ -46,7 +34,7 @@ public class MatchedDotOperationParsingTestcase extends ParsingTestCase {
     }
 
     public void testUnaryNumericOperation() {
-        assertParsedAndQuotedCorrectly(false);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testList() {
@@ -98,8 +86,7 @@ public class MatchedDotOperationParsingTestcase extends ParsingTestCase {
     }
 
     public void testDecimalWholeNumber() {
-        // Parses as just a DecimalFloat
-        assertParsedAndQuotedCorrectly();
+        assertParsedWithErrors();
     }
 
     public void testStringLine() {
@@ -117,8 +104,9 @@ public class MatchedDotOperationParsingTestcase extends ParsingTestCase {
     public void testCharListHeredoc() {
         assertParsedWithErrors();
     }
+
     @Override
     protected String getTestDataPath() {
-        return super.getTestDataPath() + "/matched_dot_operation_parsing_test_case";
+        return super.getTestDataPath() + "/sigil_dot_operation_parsing_test_case";
     }
 }
