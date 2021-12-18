@@ -54,6 +54,7 @@ public class BinaryIntegerTest extends TokenTest {
                 { "(", ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE },
                 { ")", ElixirTypes.CLOSING_PARENTHESIS, ElixirFlexLexer.ADDITION_OR_SUBTRACTION_MAYBE },
                 { "*", ElixirTypes.MULTIPLICATION_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE },
+                { "**", ElixirTypes.POWER_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE },
                 { "+", ElixirTypes.ADDITION_OPERATOR, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE },
                 { ",", ElixirTypes.COMMA, ElixirFlexLexer.YYINITIAL },
                 { "-", ElixirTypes.SUBTRACTION_OPERATOR, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE },

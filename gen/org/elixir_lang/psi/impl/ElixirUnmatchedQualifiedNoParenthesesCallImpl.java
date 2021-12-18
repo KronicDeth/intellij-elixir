@@ -114,6 +114,11 @@ public class ElixirUnmatchedQualifiedNoParenthesesCallImpl extends NamedStubbedP
   }
 
   @Override
+  public @Nullable String implementedProtocolName() {
+    return ElixirPsiImplUtil.implementedProtocolName(this);
+  }
+
+  @Override
   public boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName) {
     return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, functionName);
   }
@@ -151,11 +156,6 @@ public class ElixirUnmatchedQualifiedNoParenthesesCallImpl extends NamedStubbedP
   @Override
   public boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place) {
     return ElixirPsiImplUtil.processDeclarations(this, processor, state, lastParent, place);
-  }
-
-  @Override
-  public @Nullable String implementedProtocolName() {
-    return ElixirPsiImplUtil.implementedProtocolName(this);
   }
 
   @Override

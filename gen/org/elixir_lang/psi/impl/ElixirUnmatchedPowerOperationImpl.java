@@ -8,28 +8,20 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
-import org.elixir_lang.psi.stub.UnmatchedDotCall;
 import org.elixir_lang.psi.*;
 import com.ericsson.otp.erlang.OtpErlangObject;
-import com.intellij.navigation.ItemPresentation;
-import com.intellij.psi.PsiReference;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
-import java.util.Set;
-import com.intellij.psi.stubs.IStubElementType;
 
-public class ElixirUnmatchedDotCallImpl extends NamedStubbedPsiElementBase<UnmatchedDotCall> implements ElixirUnmatchedDotCall {
+public class ElixirUnmatchedPowerOperationImpl extends ElixirUnmatchedExpressionImpl implements ElixirUnmatchedPowerOperation {
 
-  public ElixirUnmatchedDotCallImpl(@NotNull UnmatchedDotCall stub, @NotNull IStubElementType type) {
-    super(stub, type);
-  }
-
-  public ElixirUnmatchedDotCallImpl(@NotNull ASTNode node) {
+  public ElixirUnmatchedPowerOperationImpl(@NotNull ASTNode node) {
     super(node);
   }
 
+  @Override
   public void accept(@NotNull ElixirVisitor visitor) {
-    visitor.visitUnmatchedDotCall(this);
+    visitor.visitUnmatchedPowerOperation(this);
   }
 
   @Override
@@ -39,37 +31,15 @@ public class ElixirUnmatchedDotCallImpl extends NamedStubbedPsiElementBase<Unmat
   }
 
   @Override
-  @Nullable
-  public ElixirDoBlock getDoBlock() {
-    return PsiTreeUtil.getChildOfType(this, ElixirDoBlock.class);
+  @NotNull
+  public ElixirPowerInfixOperator getPowerInfixOperator() {
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirPowerInfixOperator.class));
   }
 
   @Override
   @NotNull
-  public ElixirDotInfixOperator getDotInfixOperator() {
-    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirDotInfixOperator.class));
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirParenthesesArguments> getParenthesesArgumentsList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirParenthesesArguments.class);
-  }
-
-  @Override
-  @NotNull
-  public ElixirUnmatchedExpression getUnmatchedExpression() {
-    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirUnmatchedExpression.class));
-  }
-
-  @Override
-  public @Nullable String canonicalName() {
-    return ElixirPsiImplUtil.canonicalName(this);
-  }
-
-  @Override
-  public @NotNull Set<String> canonicalNameSet() {
-    return ElixirPsiImplUtil.canonicalNameSet(this);
+  public List<ElixirUnmatchedExpression> getUnmatchedExpressionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirUnmatchedExpression.class);
   }
 
   @Override
@@ -78,13 +48,13 @@ public class ElixirUnmatchedDotCallImpl extends NamedStubbedPsiElementBase<Unmat
   }
 
   @Override
-  public @Nullable PsiElement functionNameElement() {
+  public @NotNull PsiElement functionNameElement() {
     return ElixirPsiImplUtil.functionNameElement(this);
   }
 
   @Override
-  public boolean hasDoBlockOrKeyword() {
-    return ElixirPsiImplUtil.hasDoBlockOrKeyword(this);
+  public @Nullable ElixirDoBlock getDoBlock() {
+    return ElixirPsiImplUtil.getDoBlock(this);
   }
 
   @Override
@@ -98,13 +68,8 @@ public class ElixirUnmatchedDotCallImpl extends NamedStubbedPsiElementBase<Unmat
   }
 
   @Override
-  public @NotNull ItemPresentation getPresentation() {
-    return ElixirPsiImplUtil.getPresentation(this);
-  }
-
-  @Override
-  public @Nullable PsiReference getReference() {
-    return ElixirPsiImplUtil.getReference(this);
+  public boolean hasDoBlockOrKeyword() {
+    return ElixirPsiImplUtil.hasDoBlockOrKeyword(this);
   }
 
   @Override
@@ -128,13 +93,18 @@ public class ElixirUnmatchedDotCallImpl extends NamedStubbedPsiElementBase<Unmat
   }
 
   @Override
-  public @Nullable String implementedProtocolName() {
-    return ElixirPsiImplUtil.implementedProtocolName(this);
+  public @Nullable Quotable leftOperand() {
+    return ElixirPsiImplUtil.leftOperand(this);
   }
 
   @Override
   public @Nullable String moduleName() {
     return ElixirPsiImplUtil.moduleName(this);
+  }
+
+  @Override
+  public @NotNull Operator operator() {
+    return ElixirPsiImplUtil.operator(this);
   }
 
   @Override
@@ -168,7 +138,7 @@ public class ElixirUnmatchedDotCallImpl extends NamedStubbedPsiElementBase<Unmat
   }
 
   @Override
-  public @Nullable String resolvedModuleName() {
+  public @NotNull String resolvedModuleName() {
     return ElixirPsiImplUtil.resolvedModuleName(this);
   }
 
@@ -180,6 +150,11 @@ public class ElixirUnmatchedDotCallImpl extends NamedStubbedPsiElementBase<Unmat
   @Override
   public @Nullable Integer resolvedSecondaryArity() {
     return ElixirPsiImplUtil.resolvedSecondaryArity(this);
+  }
+
+  @Override
+  public @Nullable Quotable rightOperand() {
+    return ElixirPsiImplUtil.rightOperand(this);
   }
 
   @Override

@@ -211,6 +211,7 @@ TWO_TOKEN_IN_MATCH_OPERATOR = "<-" |
                               "\\\\"
 TWO_TOKEN_OR_WORD_OPERATOR = "or"
 TWO_TOKEN_OR_SYMBOL_OPERATOR = "||"
+TWO_TOKEN_POWER_OPERATOR = "**"
 TWO_TOKEN_RANGE_OPERATOR = ".."
 TWO_TOKEN_RELATIONAL_OPERATOR = "<=" |
                                 ">="
@@ -229,6 +230,7 @@ TWO_TOKEN_OPERATOR = {TWO_TOKEN_AND_SYMBOL_OPERATOR} |
                      {TWO_TOKEN_IN_MATCH_OPERATOR} |
                      {TWO_TOKEN_OR_WORD_OPERATOR} |
                      {TWO_TOKEN_OR_SYMBOL_OPERATOR} |
+                     {TWO_TOKEN_POWER_OPERATOR} |
                      {TWO_TOKEN_RANGE_OPERATOR} |
                      {TWO_TOKEN_RELATIONAL_OPERATOR} |
                      {TWO_TOKEN_STAB_OPERATOR} |
@@ -303,6 +305,7 @@ OR_SYMBOL_OPERATOR = {THREE_TOKEN_OR_SYMBOL_OPERATOR} |
                      {TWO_TOKEN_OR_SYMBOL_OPERATOR}
 PIPE_OPERATOR = {ONE_TOKEN_PIPE_OPERATOR}
 PLUS_OPERATOR = {ONE_TOKEN_PLUS_OPERATOR}
+POWER_OPERATOR = {TWO_TOKEN_POWER_OPERATOR}
 RANGE_OPERATOR = {TWO_TOKEN_RANGE_OPERATOR}
 RELATIONAL_OPERATOR = {TWO_TOKEN_RELATIONAL_OPERATOR} |
                       {ONE_TOKEN_RELATIONAL_OPERATOR}
@@ -631,6 +634,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                   {MATCH_OPERATOR} |
                   {MULTIPLICATION_OPERATOR} |
                   {PIPE_OPERATOR} |
+                  {POWER_OPERATOR} |
                   {RANGE_OPERATOR} |
                   {RELATIONAL_OPERATOR} |
                   {SEMICOLON} |
@@ -829,6 +833,9 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                                                return ElixirTypes.MAP_OPERATOR; }
   {MATCH_OPERATOR}                           { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.MATCH_OPERATOR; }
+  // Must be before MULTIPLICATION_OPERATOR (*) as it is a prefix of POWER_OPERATOR (**)
+  {POWER_OPERATOR}                          { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
+                                              return ElixirTypes.POWER_OPERATOR; }
   {MULTIPLICATION_OPERATOR}                  { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.MULTIPLICATION_OPERATOR; }
   // Must be before NEGATE_OPERATOR (-) or NUMBER_OR_BADARITH_OPERATOR (+)
@@ -1037,6 +1044,9 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                                                       return ElixirTypes.MATCH_OPERATOR; }
   {MINUS_OPERATOR}                                  { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.MINUS_OPERATOR; }
+  // Must be before MULTIPLICATION_OPERATOR (*) as it is a prefix of (**)
+  {POWER_OPERATOR}                                  { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.POWER_OPERATOR; }
   {MULTIPLICATION_OPERATOR}                         { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.MULTIPLICATION_OPERATOR; }
   {NIL}                                             { yybegin(CALL_MAYBE);

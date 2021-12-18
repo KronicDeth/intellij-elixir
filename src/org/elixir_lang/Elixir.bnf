@@ -24,11 +24,11 @@
     getUseScope
     isCalling
     isCallingMacro
+    implementedProtocolName
     moduleName
     primaryArguments
     primaryArity
     processDeclarations
-    protocolName
     quote
     resolvedFinalArity
     resolvedFinalArityInterval
@@ -54,13 +54,13 @@
     getReference
     getStub
     getUseScope
+    implementedProtocolName
     isCalling
     isCallingMacro
     moduleName
     primaryArguments
     primaryArity
     processDeclarations
-    protocolName
     qualifier
     quote
     resolvedFinalArity
@@ -119,7 +119,7 @@
     "org.elixir_lang.psi.call.Named"
     "org.elixir_lang.psi.operation.Infix"
   ]
-  methods(           "(un)?matched(Addition|And|Arrow|Comparison|In|InMatch|Match|Multiplication|Or|Pipe|Relational|Three|Two|Type|When)Operation")=[
+  methods(           "(un)?matched(Addition|And|Arrow|Comparison|In|InMatch|Match|Multiplication|Or|Pipe|Power|Relational|Three|Two|Type|When)Operation")=[
     functionName
     functionNameElement
     getDoBlock
@@ -178,6 +178,12 @@
   implements("(un)?matchedMultiplicationOperation")=[
     "org.elixir_lang.psi.call.Named"
     "org.elixir_lang.psi.operation.Multiplication"
+  ]
+  // methods set by infix operations above
+
+  implements("(un)?matchedPowerOperation")=[
+    "org.elixir_lang.psi.call.Named"
+    "org.elixir_lang.psi.operation.Power"
   ]
   // methods set by infix operations above
 
@@ -498,6 +504,7 @@
     OR_WORD_OPERATOR = "`or`"
     PIPE_OPERATOR = "|"
     PLUS_OPERATOR = "+"
+    POWER_OPERATOR = "**"
     RANGE_OPERATOR = ".."
     REGEX_FRAGMENT = "Regex Fragment"
     REGEX_HEREDOC_PROMOTER = "Regex Heredoc Promoter (\"\"\", ''')"
@@ -1247,6 +1254,7 @@ matchedExpression ::= matchedInMatchOperation |
                       matchedTwoOperation |
                       matchedAdditionOperation |
                       matchedMultiplicationOperation |
+                      matchedPowerOperation |
                       matchedUnaryOperation |
                       matchedDotCall |
                       // NoParentheses before matchedBracketOperation because brackets only make sense after parentheses.
@@ -1582,6 +1590,24 @@ multiplicationInfixOperator ::= DIVISION_OPERATOR | MULTIPLICATION_OPERATOR
 // implements and methods defined by "infix operations" section above
 matchedMultiplicationOperation ::= matchedExpression multiplicationInfixOperator matchedExpression
 
+/*
+ * Power Operation - left-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/f689fa8b59ba82fb6dbe94fa1b05076284affbe2/lib/elixir/src/elixir_parser.yrl#L81
+ */
+
+powerInfixOperator ::= POWER_OPERATOR
+                       {
+                         implements = "org.elixir_lang.psi.Operator"
+                         methods = [
+                           operatorTokenSet
+                           quote
+                         ]
+                         name = "**"
+                       }
+// implements and methods defined by "infix operations" section above
+matchedPowerOperation ::= matchedExpression powerInfixOperator matchedExpression
+
 unaryPrefixOperator ::= (NEGATE_OPERATOR | NUMBER_OR_BADARITH_OPERATOR | UNARY_OPERATOR) eolStar |
                         NOT_OPERATOR !IN_OPERATOR
                         {
@@ -1652,6 +1678,7 @@ relativeIdentifier ::= IDENTIFIER_TOKEN |
                        OR_SYMBOL_OPERATOR |
                        OR_WORD_OPERATOR |
                        PIPE_OPERATOR |
+                       POWER_OPERATOR |
                        RANGE_OPERATOR |
                        RELATIONAL_OPERATOR |
                        RESCUE |
@@ -2537,6 +2564,17 @@ unmatchedAdditionOperation ::= unmatchedExpression additionInfixOperator unmatch
 unmatchedMultiplicationOperation ::= unmatchedExpression multiplicationInfixOperator unmatchedExpression
 
 /*
+ * Power Operation - left-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/f689fa8b59ba82fb6dbe94fa1b05076284affbe2/lib/elixir/src/elixir_parser.yrl#L81
+ *
+ */
+
+// implements and methods defined by "infix operations" section above
+unmatchedPowerOperation ::= unmatchedExpression powerInfixOperator unmatchedExpression
+
+
+/*
  * Unary Operation - non-associative (Elixir >= 1.5.0)
  */
 
@@ -2838,6 +2876,7 @@ unmatchedExpression ::= unmatchedInMatchOperation |
                         unmatchedTwoOperation |
                         unmatchedAdditionOperation |
                         unmatchedMultiplicationOperation |
+                        unmatchedPowerOperation |
                         unmatchedUnaryOperation |
                         unmatchedDotCall |
                         // NoParentheses before unmatchedBracketOperation because brackets only make sense after parentheses.
@@ -2971,6 +3010,7 @@ atom ::= COLON (ATOM_FRAGMENT | quote)
            methods = [
              getReference
              quote
+             setName
            ]
          }
 
@@ -3066,6 +3106,7 @@ keywordKey ::= AFTER |
                OR_WORD_OPERATOR |
                PIPE_OPERATOR |
                PLUS_OPERATOR |
+               POWER_OPERATOR |
                RANGE_OPERATOR |
                RESCUE |
                RELATIONAL_OPERATOR |

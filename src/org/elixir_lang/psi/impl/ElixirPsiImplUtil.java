@@ -455,6 +455,12 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirPowerInfixOperator pipeInfixOperator) {
+        return PIPE_OPERATOR_TOKEN_SET;
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirRelationalInfixOperator relationalInfixOperator) {
         return RELATIONAL_OPERATOR_TOKEN_SET;
     }

@@ -202,6 +202,22 @@ public class InterpolationTest extends Test {
                                 )
                         },
                         {
+                                "*",
+                                Arrays.asList(
+                                        new TokenTypeState(ElixirTypes.MULTIPLICATION_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
+                                        new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
+                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                )
+                        },
+                        {
+                                "**",
+                                Arrays.asList(
+                                        new TokenTypeState(ElixirTypes.POWER_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
+                                        new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
+                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                )
+                        },
+                        {
                                 "->",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.STAB_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),

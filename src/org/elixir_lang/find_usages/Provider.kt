@@ -36,6 +36,7 @@ private val IDENTIFIER_TOKEN_SET = TokenSet.create(
         OR_WORD_OPERATOR,
         PIPE_OPERATOR,
         PLUS_OPERATOR,
+        POWER_OPERATOR,
         RANGE_OPERATOR,
         SIGN_OPERATOR,
         THREE_OPERATOR,

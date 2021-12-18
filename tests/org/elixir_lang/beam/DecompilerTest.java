@@ -485,6 +485,10 @@ public class DecompilerTest extends PlatformTestCase {
         assertDecompiled("idna");
     }
 
+    public void testIssue2401() throws IOException {
+        assertDecompiled("elixir/1.13.0/Elixir.Kernel");
+    }
+
     /*
      * Instance Methods
      */

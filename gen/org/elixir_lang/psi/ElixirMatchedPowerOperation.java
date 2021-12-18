@@ -4,24 +4,19 @@ package org.elixir_lang.psi;
 import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
-import org.elixir_lang.psi.stub.MatchedUnqualifiedNoArgumentsCall;
-import com.intellij.psi.StubBasedPsiElement;
+import org.elixir_lang.psi.call.Named;
+import org.elixir_lang.psi.operation.Power;
 import com.ericsson.otp.erlang.OtpErlangObject;
-import com.intellij.navigation.ItemPresentation;
-import com.intellij.psi.PsiReference;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
-import com.intellij.psi.search.SearchScope;
-import java.util.Set;
 
-public interface ElixirMatchedUnqualifiedNoArgumentsCall extends ElixirMatchedExpression, MatchedCall, UnqualifiedNoArgumentsCall<MatchedUnqualifiedNoArgumentsCall>, StubBasedPsiElement<MatchedUnqualifiedNoArgumentsCall> {
+public interface ElixirMatchedPowerOperation extends ElixirMatchedExpression, Named, Power {
 
   @NotNull
-  ElixirIdentifier getIdentifier();
+  List<ElixirMatchedExpression> getMatchedExpressionList();
 
-  @Nullable String canonicalName();
-
-  @NotNull Set<String> canonicalNameSet();
+  @NotNull
+  ElixirPowerInfixOperator getPowerInfixOperator();
 
   @Nullable String functionName();
 
@@ -29,21 +24,11 @@ public interface ElixirMatchedUnqualifiedNoArgumentsCall extends ElixirMatchedEx
 
   @Nullable ElixirDoBlock getDoBlock();
 
-  boolean hasDoBlockOrKeyword();
-
   @Nullable String getName();
 
   @Nullable PsiElement getNameIdentifier();
 
-  @NotNull ItemPresentation getPresentation();
-
-  @Nullable PsiReference getReference();
-
-  //WARNING: getStub(...) is skipped
-  //matching getStub(ElixirMatchedUnqualifiedNoArgumentsCall, ...)
-  //methods are not found in ElixirPsiImplUtil
-
-  @NotNull SearchScope getUseScope();
+  boolean hasDoBlockOrKeyword();
 
   boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName);
 
@@ -53,11 +38,13 @@ public interface ElixirMatchedUnqualifiedNoArgumentsCall extends ElixirMatchedEx
 
   boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity);
 
-  @Nullable String implementedProtocolName();
+  @Nullable Quotable leftOperand();
 
   @Nullable String moduleName();
 
-  @Nullable PsiElement[] primaryArguments();
+  @NotNull Operator operator();
+
+  @NotNull PsiElement[] primaryArguments();
 
   @Nullable Integer primaryArity();
 
@@ -74,6 +61,8 @@ public interface ElixirMatchedUnqualifiedNoArgumentsCall extends ElixirMatchedEx
   @Nullable Integer resolvedPrimaryArity();
 
   @Nullable Integer resolvedSecondaryArity();
+
+  @Nullable Quotable rightOperand();
 
   @Nullable PsiElement[] secondaryArguments();
 

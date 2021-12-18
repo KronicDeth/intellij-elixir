@@ -11,16 +11,16 @@ import static org.elixir_lang.psi.ElixirTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 import com.ericsson.otp.erlang.OtpErlangObject;
-import com.intellij.psi.PsiReference;
+import com.intellij.psi.tree.TokenSet;
 
-public class ElixirAtomImpl extends ASTWrapperPsiElement implements ElixirAtom {
+public class ElixirPowerInfixOperatorImpl extends ASTWrapperPsiElement implements ElixirPowerInfixOperator {
 
-  public ElixirAtomImpl(@NotNull ASTNode node) {
+  public ElixirPowerInfixOperatorImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull ElixirVisitor visitor) {
-    visitor.visitAtom(this);
+    visitor.visitPowerInfixOperator(this);
   }
 
   @Override
@@ -30,30 +30,13 @@ public class ElixirAtomImpl extends ASTWrapperPsiElement implements ElixirAtom {
   }
 
   @Override
-  @Nullable
-  public ElixirCharListLine getCharListLine() {
-    return PsiTreeUtil.getChildOfType(this, ElixirCharListLine.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirStringLine getStringLine() {
-    return PsiTreeUtil.getChildOfType(this, ElixirStringLine.class);
-  }
-
-  @Override
-  public @Nullable PsiReference getReference() {
-    return ElixirPsiImplUtil.getReference(this);
+  public @NotNull TokenSet operatorTokenSet() {
+    return ElixirPsiImplUtil.operatorTokenSet(this);
   }
 
   @Override
   public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
-  }
-
-  @Override
-  public @NotNull PsiElement setName(@NotNull String newName) {
-    return ElixirPsiImplUtil.setName(this, newName);
   }
 
 }

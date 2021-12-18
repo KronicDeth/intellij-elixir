@@ -62,6 +62,8 @@ public interface ElixirUnmatchedUnqualifiedParenthesesCall extends ElixirUnmatch
 
   boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity);
 
+  @Nullable String implementedProtocolName();
+
   @Nullable String moduleName();
 
   @NotNull PsiElement[] primaryArguments();
@@ -69,8 +71,6 @@ public interface ElixirUnmatchedUnqualifiedParenthesesCall extends ElixirUnmatch
   @Nullable Integer primaryArity();
 
   boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place);
-
-  @Nullable String implementedProtocolName();
 
   @NotNull OtpErlangObject quote();
 

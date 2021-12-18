@@ -99,8 +99,4 @@ public interface ElixirMatchedUnqualifiedNoParenthesesCall extends ElixirMatched
   //matching getUseScope(ElixirMatchedUnqualifiedNoParenthesesCall, ...)
   //methods are not found in ElixirPsiImplUtil
 
-  //WARNING: protocolName(...) is skipped
-  //matching protocolName(ElixirMatchedUnqualifiedNoParenthesesCall, ...)
-  //methods are not found in ElixirPsiImplUtil
-
 }
