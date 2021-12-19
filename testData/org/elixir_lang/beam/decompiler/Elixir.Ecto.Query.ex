@@ -941,7 +941,7 @@ defmodule Ecto.Query do
   disclaimers about such functionality.
 
   """
-  defmacro join(query, qual, binding, expr, opts) do
+  defmacro join(query, qual, binding, expr, opts) when is_list(binding) and is_list(opts) do
     (
       {t, on, as, prefix, hints} = collect_on(opts, nil, nil, nil, nil)
       with([{key, _} | _] <- t) do
@@ -951,7 +951,7 @@ defmodule Ecto.Query do
     )
   end
 
-  defmacro join(_query, _qual, binding, _expr, opts) do
+  defmacro join(_query, _qual, binding, _expr, opts) when is_list(opts) do
     raise(ArgumentError, <<"invalid binding passed to Ecto.Query.join/5, should be "::binary(), "list of variables, got: "::binary(), Macro.to_string(binding)::binary()>>)
   end
 
@@ -1885,7 +1885,7 @@ defmodule Ecto.Query do
     Map.has_key?(aliases, key)
   end
 
-  def has_named_binding?(queryable, _key) do
+  def has_named_binding?(queryable, _key) when is_atom(queryable) or is_binary(queryable) or is_tuple(queryable) do
     false
   end
 
@@ -1931,7 +1931,7 @@ defmodule Ecto.Query do
   Puts the given prefix in a query.
 
   """
-  def put_query_prefix(%Ecto.Query{} = query, prefix) do
+  def put_query_prefix(%Ecto.Query{} = query, prefix) when is_binary(prefix) do
     %{query | prefix: prefix}
   end
 
@@ -1947,7 +1947,7 @@ defmodule Ecto.Query do
   See `with_cte/3` on example of how to build a query with a recursive CTE.
 
   """
-  def recursive_ctes(%Ecto.Query{with_ctes: with_expr} = query, value) do
+  def recursive_ctes(%Ecto.Query{with_ctes: with_expr} = query, value) when :erlang.is_boolean(value) do
     (
       with_expr = with_expr || x
       with_expr = %{with_expr | recursive: value}
@@ -2100,7 +2100,7 @@ defmodule Ecto.Query do
     # body not decompiled
   end
 
-  defp assert_schema!(%{from: %Ecto.Query.FromExpr{source: {_source, schema}}}) do
+  defp assert_schema!(%{from: %Ecto.Query.FromExpr{source: {_source, schema}}}) when schema != nil do
     schema
   end
 
@@ -2136,7 +2136,7 @@ defmodule Ecto.Query do
     {t, as, prefix, hints}
   end
 
-  defp collect_on([{key, _} | _] = t, on, as, prefix, hints) do
+  defp collect_on([{key, _} | _] = t, on, as, prefix, hints) when key === :as or key === :prefix or key === :hints do
     (
       {t, as, prefix, hints} = collect_as_and_prefix_and_hints(t, as, prefix, hints)
       collect_on(t, on, as, prefix, hints)
@@ -2159,11 +2159,11 @@ defmodule Ecto.Query do
     # body not decompiled
   end
 
-  defp field(ix, field) do
+  defp field(ix, field) when is_integer(ix) and is_atom(field) do
     {{:".", [], [{:&, [], [ix]}, field]}, [], []}
   end
 
-  defp from([{type, expr} | t], env, count_bind, quoted, binds) do
+  defp from([{type, expr} | t], env, count_bind, quoted, binds) when type === :lock or type === :where or type === :or_where or type === :select or type === :distinct or type === :order_by or type === :group_by or type === :windows or type === :having or type === :or_having or type === :limit or type === :offset or type === :preload or type === :update or type === :select_merge or type === :with_ctes do
     (
       quoted = if(Enum.all?(binds, fn {_, value} -> is_integer(value) end)) do
         {:__block__, [], [{:=, [], [{:query, [], Ecto.Query}, quoted]}, :elixir_quote.dot([], {:__aliases__, [alias: false], [:"Ecto", :"Query"]}, type, [{:query, [], Ecto.Query}, binds, expr], Ecto.Query)]}
@@ -2174,14 +2174,14 @@ defmodule Ecto.Query do
     )
   end
 
-  defp from([{type, expr} | t], env, count_bind, quoted, binds) do
+  defp from([{type, expr} | t], env, count_bind, quoted, binds) when type === :union or type === :union_all or type === :except or type === :except_all or type === :intersect or type === :intersect_all do
     (
       quoted = :elixir_quote.dot([], {:__aliases__, [alias: false], [:"Ecto", :"Query"]}, type, [quoted, expr], Ecto.Query)
       from(t, env, count_bind, quoted, binds)
     )
   end
 
-  defp from([{join, expr} | t], env, count_bind, quoted, binds) do
+  defp from([{join, expr} | t], env, count_bind, quoted, binds) when join === :join or join === :inner_join or join === :cross_join or join === :left_join or join === :right_join or join === :full_join or join === :inner_lateral_join or join === :left_lateral_join do
     (
       qual = join_qual(join)
       {t, on, as, prefix, hints} = collect_on(t, nil, nil, nil, nil)
@@ -2194,7 +2194,7 @@ defmodule Ecto.Query do
     Ecto.Query.Builder.error!("`on` keyword must immediately follow a join")
   end
 
-  defp from([{key, _value} | _], _env, _count_bind, _quoted, _binds) do
+  defp from([{key, _value} | _], _env, _count_bind, _quoted, _binds) when key === :as or key === :prefix or key === :hints do
     Ecto.Query.Builder.error!(<<"`"::binary(), String.Chars.to_string(key)::binary(), "` keyword must immediately follow a from/join"::binary()>>)
   end
 

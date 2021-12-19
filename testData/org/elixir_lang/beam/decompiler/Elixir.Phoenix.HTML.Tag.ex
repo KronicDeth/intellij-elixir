@@ -43,11 +43,11 @@ defmodule Phoenix.HTML.Tag do
     content_tag(name, content, [])
   end
 
-  def content_tag(name, attrs, [do: block]) do
+  def content_tag(name, attrs, [do: block]) when is_list(attrs) do
     content_tag(name, block, attrs)
   end
 
-  def content_tag(name, content, attrs) do
+  def content_tag(name, content, attrs) when is_list(attrs) do
     (
       name = String.Chars.to_string(name)
       {:safe, escaped} = Phoenix.HTML.html_escape(content)
@@ -115,7 +115,7 @@ defmodule Phoenix.HTML.Tag do
     end
   end
 
-  def form_tag(action, opts) do
+  def form_tag(action, opts) when is_list(opts) do
     (
       {:safe, method} = Phoenix.HTML.html_escape(Keyword.get(opts, :method, "post"))
       {extra, opts} = case(method) do
@@ -243,7 +243,7 @@ defmodule Phoenix.HTML.Tag do
     tag(name, [])
   end
 
-  def tag(name, attrs) do
+  def tag(name, attrs) when is_list(attrs) do
     {:safe, [60, String.Chars.to_string(name), build_attrs(name, attrs), 62]}
   end
 
@@ -269,7 +269,7 @@ defmodule Phoenix.HTML.Tag do
     []
   end
 
-  defp attr_escape(other) do
+  defp attr_escape(other) when is_binary(other) do
     Plug.HTML.html_escape_to_iodata(other)
   end
 
@@ -289,7 +289,7 @@ defmodule Phoenix.HTML.Tag do
     tag_attrs(Enum.sort(acc))
   end
 
-  defp build_attrs(tag, [{k, v} | t], acc) do
+  defp build_attrs(tag, [{k, v} | t], acc) when (k === :aria or k === :data) and is_list(v) do
     build_attrs(tag, t, nested_attrs(dasherize(k), v, acc))
   end
 
@@ -321,11 +321,11 @@ defmodule Phoenix.HTML.Tag do
     end
   end
 
-  defp dasherize(value) do
+  defp dasherize(value) when is_atom(value) do
     dasherize(Atom.to_string(value))
   end
 
-  defp dasherize(value) do
+  defp dasherize(value) when is_binary(value) do
     String.replace(value, "_", "-")
   end
 
@@ -341,7 +341,7 @@ defmodule Phoenix.HTML.Tag do
     end)
   end
 
-  defp stringify_srcset(srcset) do
+  defp stringify_srcset(srcset) when is_map(srcset) or is_list(srcset) do
     Enum.map_join(srcset, ", ", fn
      {src, descriptor} ->
         <<String.Chars.to_string(src)::binary(), " "::binary(), String.Chars.to_string(descriptor)::binary()>>
@@ -350,7 +350,7 @@ defmodule Phoenix.HTML.Tag do
     end)
   end
 
-  defp stringify_srcset(srcset) do
+  defp stringify_srcset(srcset) when is_binary(srcset) do
     srcset
   end
 

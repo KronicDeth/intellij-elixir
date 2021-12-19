@@ -16,11 +16,11 @@ defmodule RuntimeError do
   end
 
   @doc false
-  def exception(msg) do
+  def exception(msg) when is_binary(msg) do
     exception(message: msg)
   end
 
-  def exception(args) do
+  def exception(args) when is_list(args) do
     (
       struct = __struct__()
       {valid, invalid} = Enum.split_with(args, fn {k, _} -> Map.has_key?(struct, k) end)
