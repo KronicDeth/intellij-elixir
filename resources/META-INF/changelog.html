@@ -1,7 +1,16 @@
 <html>
 <body>
-<h1>v12.0.2</h1>
+<h1>v12.1.0</h1>
 <ul>
+  <li>
+    <p>Enhancements</p>
+    <ul dir="auto">
+      <li>Update build to elixir 1.13.0</li>
+      <li>Add support for ** operator to lexer and parser<br>
+        Port <a href="https://github.com/elixir-lang/elixir/pull/11241">Add power operator</a>
+      </li>
+    </ul>
+  </li>
   <li>
     <p>Bug Fixes</p>
     <ul dir="auto">
@@ -19,6 +28,11 @@
           </li>
         </ul>
       </li>
+      <li>Decompile <code>{:|, ..., ...}</code> as cons operator in Elixir Dbgi.</li>
+      <li>Fix missing guards when decompiling Elixr DbgI clauses using special decompiler<br>
+        Guards where missing because only <code>decompiler.appendSignature</code> was used.</li>
+      <li>Fix <strong>module</strong>.Reference.calculateDefaultRangeInElement<br>
+        <code>element.textOffset</code> instead of <code>element.textLength</code> was used for end of range.</li>
     </ul>
   </li>
 </ul>
