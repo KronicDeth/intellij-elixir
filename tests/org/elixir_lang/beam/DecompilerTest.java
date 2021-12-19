@@ -489,6 +489,10 @@ public class DecompilerTest extends PlatformTestCase {
         assertDecompiled("elixir/1.13.0/Elixir.Kernel");
     }
 
+    public void testIssue2403() throws IOException {
+        assertDecompiled("Elixir.EExTestWeb.PageController");
+    }
+
     /*
      * Instance Methods
      */

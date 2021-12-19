@@ -901,10 +901,21 @@ object Macro {
                     ifNotInToString(macro) ?:
                     ifAccessToString(macro) ?:
                     ifDotTupleToString(macro) ?:
+                    ifConsToString(macro) ?:
                     ifCallToString(macro) ?:
                     if2TupleToString(macro) ?:
                     ifListToString(macro) ?:
                     otherToString(macro)
+
+    private fun ifConsToString(macro: OtpErlangObject): String? =
+            ifTagged3TupleTo(macro, "|") { tuple ->
+                val arguments = tuple.elementAt(2).toOtpErlangList()
+
+                val headString = toString(arguments.elementAt(0))
+                val tailString = toString(arguments.elementAt(1))
+
+                "$headString | $tailString"
+            }
 
     private fun ifListToString(macro: OtpErlangObject): String? =
         (macro as? OtpErlangList)?.let { list ->
