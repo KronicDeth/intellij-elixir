@@ -11,7 +11,6 @@
 %@1.Two{}
 %&1.Two{}
 %fn -> end.Two{}
-%(->).Two{}
 %?1.Two{}
 %0b10.Two{}
 %0x1.Two{}

@@ -15,8 +15,8 @@ jobs:
       - name: Set up Elixir
         uses: erlef/setup-beam@v1
         with:
-          otp-version: 23.1
-          elixir-version: 1.11.2
+          otp-version: 24.1.6
+          elixir-version: 1.13.0
       - name: Export OTP_RELEASE
         run: echo "OTP_RELEASE=23.1" >> $GITHUB_ENV
       - name: Export ERLANG_SDK_HOME

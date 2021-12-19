@@ -4,7 +4,6 @@
 %@1.two{}
 %&1.two{}
 %fn -> end.two{}
-%(->).two{}
 %?1.two{}
 %0b10.two{}
 %0x1.two{}

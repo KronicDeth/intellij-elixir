@@ -29,7 +29,7 @@ public class InterpolatedStringSigilHeredocParsingTestCase extends ParsingTestCa
     }
 
     public void testWhitespaceEndPrefix() {
-        assertParsedAndQuotedAroundError();
+        assertParsedAndQuotedCorrectly();
     }
 
     @Override

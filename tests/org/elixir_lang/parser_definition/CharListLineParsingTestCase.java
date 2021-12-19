@@ -9,7 +9,7 @@ public class CharListLineParsingTestCase extends ParsingTestCase {
     }
 
     public void testEmptyUnicodeEscapeSequence() {
-        assertParsedAndQuotedAroundExit();
+        assertParsedAndQuotedAroundError();
     }
 
     public void testEscapeSequences() {
