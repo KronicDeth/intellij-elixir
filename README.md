@@ -4557,6 +4557,24 @@ When configuring an SDK, if you don't want to use the suggested SDK home path, y
     <tr>
       <td>Erlang for Elixir SDK</td>
     </tr>
+    <tr>
+      <td rowspan="3">
+        <a href="https://www.macports.org/">MacPorts</a>
+      </td>
+      <td>Elixir SDK</td>
+      <td>
+        <code>/opt/local/lib/elixir</code>
+      </td>
+    </tr>
+    <tr>
+      <td>Erlang SDK</td>
+      <td rowspan="2">
+        <code>/opt/local/lib/erlang</code>
+      </td>
+    </tr>
+    <tr>
+      <td>Erlang for Elixir SDK</td>
+    </tr>
   </tbody>
 </table>
 
