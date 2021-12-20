@@ -1576,6 +1576,10 @@ object QuotableImpl {
                         codePointList = null
                     }
 
+                    if (parent is Heredoc  &&  quotedParentList.isEmpty()) {
+                        quotedParentList.add(elixirString(""))
+                    }
+
                     val childElement = child.psi as ElixirInterpolation
                     quotedParentList.add(parent.quoteInterpolation(childElement))
                 } else if (elementType === ElixirTypes.QUOTE_HEXADECIMAL_ESCAPE_SEQUENCE || elementType === ElixirTypes.SIGIL_HEXADECIMAL_ESCAPE_SEQUENCE) {
