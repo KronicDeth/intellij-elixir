@@ -34,13 +34,7 @@ class ElixirParserDefinition : ParserDefinition {
 
     companion object {
         val COMMENTS = TokenSet.create(ElixirTypes.COMMENT)
-        val STRING_LITERALS = TokenSet.create(
-                ElixirTypes.CHAR_LIST_FRAGMENT,
-                ElixirTypes.REGEX_FRAGMENT,
-                ElixirTypes.SIGIL_FRAGMENT,
-                ElixirTypes.STRING_FRAGMENT,
-                ElixirTypes.WORDS_FRAGMENT
-        )
+        val STRING_LITERALS = TokenSet.create(ElixirTypes.FRAGMENT)
         val WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE)
     }
 }

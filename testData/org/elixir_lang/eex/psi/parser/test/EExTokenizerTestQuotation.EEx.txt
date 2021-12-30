@@ -1,4 +1,0 @@
-Embedded Elixir File(0,15)
-  PsiElement(Data)('foo ')(0,4)
-  PsiElement(<%%)('<%%')(4,7)
-  PsiElement(Data)(' true %>')(7,15)

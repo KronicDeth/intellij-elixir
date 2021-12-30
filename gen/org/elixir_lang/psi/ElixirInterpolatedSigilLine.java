@@ -7,9 +7,8 @@ import com.intellij.psi.PsiElement;
 import com.ericsson.otp.erlang.OtpErlangList;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.tree.IElementType;
 
-public interface ElixirInterpolatedSigilLine extends SigilFragmented, InterpolatedSigilLine {
+public interface ElixirInterpolatedSigilLine extends Interpolated, SigilLine {
 
   @Nullable
   ElixirInterpolatedSigilLineBody getInterpolatedSigilLineBody();
@@ -21,13 +20,13 @@ public interface ElixirInterpolatedSigilLine extends SigilFragmented, Interpolat
 
   @NotNull List<Integer> addEscapedEOL(@Nullable List<Integer> maybeCodePointList, @NotNull ASTNode child);
 
+  @NotNull List<Integer> addEscapedTerminator(@Nullable List<Integer> maybeCodePointList, @NotNull ASTNode child);
+
   @NotNull List<Integer> addFragmentCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode child);
 
   @NotNull List<Integer> addHexadecimalEscapeSequenceCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode child);
 
   Body getBody();
-
-  IElementType getFragmentType();
 
   @Nullable Integer indentation();
 

@@ -50,7 +50,7 @@ object Using {
                                     val name = useCall?.finalArguments()?.let { arguments ->
                                         if (arguments.size == 2) {
                                             when (val which = arguments[1].stripAccessExpression()) {
-                                                is ElixirAtom -> if (which.charListLine == null && which.stringLine == null) {
+                                                is ElixirAtom -> if (which.line == null) {
                                                     which.lastChild.text
                                                 } else {
                                                     null

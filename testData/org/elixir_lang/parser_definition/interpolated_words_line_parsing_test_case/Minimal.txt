@@ -1,11 +1,11 @@
 Elixir File(0,4)
   ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(0,4)
-    ElixirInterpolatedWordsLineImpl(INTERPOLATED_WORDS_LINE)(0,4)
+    ElixirInterpolatedSigilLineImpl(INTERPOLATED_SIGIL_LINE)(0,4)
       PsiElement(~)('~')(0,1)
-      PsiElement(w)('w')(1,2)
-      PsiElement(Words Promoter ({, [, <, ", /, (, |, '))('{')(2,3)
-      ElixirInterpolatedWordsLineBodyImpl(INTERPOLATED_WORDS_LINE_BODY)(3,3)
+      PsiElement(a-z)('w')(1,2)
+      PsiElement({, [, <, ", /, (, |, ')('{')(2,3)
+      ElixirInterpolatedSigilLineBodyImpl(INTERPOLATED_SIGIL_LINE_BODY)(3,3)
         <empty list>
-      PsiElement(Words Terminator ({, [, <, ", /, (, |, '))('}')(3,4)
+      PsiElement(}, ], >, ", /, ), |, ')('}')(3,4)
       ElixirSigilModifiersImpl(SIGIL_MODIFIERS)(4,4)
         <empty list>

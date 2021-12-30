@@ -16,11 +16,7 @@ class ElixirLexer(private val elixirFlexLexerAdapter: ElixirFlexLexerAdapter) :
     companion object {
         val FRAGMENTS = TokenSet.create(
                 ElixirTypes.ATOM_FRAGMENT,
-                ElixirTypes.CHAR_LIST_FRAGMENT,
-                ElixirTypes.REGEX_FRAGMENT,
-                ElixirTypes.SIGIL_FRAGMENT,
-                ElixirTypes.STRING_FRAGMENT,
-                ElixirTypes.WORDS_FRAGMENT
+                ElixirTypes.FRAGMENT
         )
     }
 }

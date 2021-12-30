@@ -47,7 +47,7 @@ public class ClosingBraceTest extends Test {
                                 { "]", FRAGMENT_TYPE, LEXICAL_STATE },
                                 { "a", FRAGMENT_TYPE, LEXICAL_STATE },
                                 { "|", FRAGMENT_TYPE, LEXICAL_STATE },
-                                { "}", ElixirTypes.SIGIL_TERMINATOR, ElixirFlexLexer.SIGIL_MODIFIERS }
+                                { "}", ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.SIGIL_MODIFIERS }
                         }
                 )
         );

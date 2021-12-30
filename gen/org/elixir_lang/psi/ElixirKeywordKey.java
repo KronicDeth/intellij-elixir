@@ -10,10 +10,7 @@ import com.intellij.navigation.ItemPresentation;
 public interface ElixirKeywordKey extends NamedElement, Quotable {
 
   @Nullable
-  ElixirCharListLine getCharListLine();
-
-  @Nullable
-  ElixirStringLine getStringLine();
+  ElixirLine getLine();
 
   @Nullable String getName();
 

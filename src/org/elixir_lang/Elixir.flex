@@ -4,9 +4,7 @@ import com.intellij.lexer.FlexLexer;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
-import org.elixir_lang.lexer.group.*;
 import org.elixir_lang.psi.ElixirTypes;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 %%
@@ -34,15 +32,11 @@ import org.jetbrains.annotations.Nullable;
     String quotePromoter = quotePromoterCharSequence.toString();
     stack.push(quotePromoter, yystate());
 
-    if (Base.isHeredocPromoter(quotePromoter)) {
+    if (quotePromoter.equals("\"\"\"") || quotePromoter.equals("'''")) {
       yybegin(GROUP_HEREDOC_START);
     } else {
       yybegin(GROUP);
     }
-  }
-
-  private IElementType fragmentType() {
-    return stack.fragmentType();
   }
 
   private void handleInLastState() {
@@ -71,24 +65,16 @@ import org.jetbrains.annotations.Nullable;
     pushAndBegin(LAST_EOL);
   }
 
+  private boolean isGroup() {
+      return stack.isGroup();
+  }
+
   private boolean isTerminator(CharSequence terminator) {
     return stack.terminator().equals(terminator.toString());
   }
 
   private boolean isInterpolating() {
     return stack.isInterpolating();
-  }
-
-  private boolean isInterpolatingSigil(CharSequence sigilName) {
-    if (sigilName.length() != 1) {
-      throw new IllegalArgumentException("sigil names can only be 1 character long");
-    }
-
-    return isInterpolatingSigil(sigilName.charAt(0));
-  }
-
-  private boolean isInterpolatingSigil(char sigilName) {
-    return (sigilName >= 'a' && sigilName <= 'z');
   }
 
   private boolean isSigil() {
@@ -101,18 +87,6 @@ import org.jetbrains.annotations.Nullable;
 
   private org.elixir_lang.lexer.StackFrame pop() {
     return stack.pop();
-  }
-
-  private org.elixir_lang.lexer.group.Quote promotedQuote(CharSequence promoterCharSequence) {
-    // CharSequences don't look up correctly, so convert to String, which do.
-    String promoter = promoterCharSequence.toString();
-    org.elixir_lang.lexer.group.Quote quote = org.elixir_lang.lexer.group.Quote.fetch(promoter);
-
-    return quote;
-  }
-
-  private IElementType promoterType() {
-    return stack.promoterType();
   }
 
   private void setPromoter(CharSequence promoter) {
@@ -137,10 +111,6 @@ import org.jetbrains.annotations.Nullable;
     }
 
     yybegin(lexicalState);
-  }
-
-  private IElementType terminatorType() {
-    return stack.terminatorType();
   }
 
   @Nullable
@@ -874,7 +844,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                                                return ElixirTypes.VALID_DECIMAL_DIGITS; }
   {QUOTE_HEREDOC_PROMOTER}                   { pushAndBegin(ADDITION_OR_SUBTRACTION_MAYBE);
                                                startQuote(yytext());
-                                               return promoterType(); }
+                                               return ElixirTypes.HEREDOC_PROMOTER; }
   /* MUST be after {QUOTE_HEREDOC_PROMOTER} for <BODY, INTERPOLATION> as {QUOTE_HEREDOC_PROMOTER} is prefixed by
      {QUOTE_PROMOTER} */
   {QUOTE_PROMOTER}                           { /* return to KEYWORD_PAIR_MAYBE so that COLON after quote can be parsed
@@ -882,7 +852,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                                                   and invalid `<quote><space><colon>`. */
                                                pushAndBegin(ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE);
                                                startQuote(yytext());
-                                               return promoterType(); }
+                                               return ElixirTypes.LINE_PROMOTER; }
 }
 
 <ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE, ADDITION_OR_SUBTRACTION_MAYBE, ADDITION_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE, CALL_MAYBE> {
@@ -941,7 +911,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                          this, EOL and WHITESPACE won't be handled correctly */
                       yybegin(ADDITION_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE);
                       startQuote(yytext());
-                      return promoterType(); }
+                      return ElixirTypes.LINE_PROMOTER; }
 }
 
 <BASE_WHOLE_NUMBER_BASE> {
@@ -970,7 +940,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
   {ESCAPE} { yybegin(ESCAPE_SEQUENCE);
              return ElixirTypes.ESCAPE; }
   {ANY}    { popAndBegin();
-             return ElixirTypes.CHAR_LIST_FRAGMENT; }
+             return ElixirTypes.FRAGMENT; }
 }
 
 <DECIMAL_EXPONENT_SIGN> {
@@ -1108,7 +1078,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                                                          parenthetical or list argument. */
                                                       yybegin(CALL_MAYBE);
                                                       startQuote(yytext());
-                                                      return promoterType(); }
+                                                      return ElixirTypes.LINE_PROMOTER; }
 
   .                                                 { handleInLastState(); }
 }
@@ -1120,13 +1090,32 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
         }
   .     {
           yybegin(GROUP);
-          return fragmentType();
+          return ElixirTypes.FRAGMENT;
         }
 }
 
 <ESCAPE_SEQUENCE> {
   {EOL}                           { popAndBegin();
                                     return ElixirTypes.EOL; }
+ {GROUP_HEREDOC_TERMINATOR}       {
+                                     popAndBegin();
+
+                                     if (isGroup() && isTerminator(yytext())) {
+                                         return ElixirTypes.HEREDOC_TERMINATOR;
+                                     } else {
+                                         yypushback(yylength() - 1);
+                                         return ElixirTypes.ESCAPED_CHARACTER_TOKEN;
+                                     }
+                                   }
+  {GROUP_TERMINATOR}              {
+                                    popAndBegin();
+
+                                    if (isGroup() && isTerminator(yytext())) {
+                                        return ElixirTypes.LINE_TERMINATOR;
+                                    } else {
+                                        return ElixirTypes.ESCAPED_CHARACTER_TOKEN;
+                                    }
+                                  }
   {HEXADECIMAL_WHOLE_NUMBER_BASE} { yybegin(HEXADECIMAL_ESCAPE_SEQUENCE);
                                     return ElixirTypes.HEXADECIMAL_WHOLE_NUMBER_BASE; }
   {UNICODE_ESCAPE_CHARACTER}      { yybegin(UNICODE_ESCAPE_SEQUENCE);
@@ -1149,7 +1138,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                            pushAndBegin(INTERPOLATION);
                            return ElixirTypes.INTERPOLATION_START;
                           } else {
-                           return fragmentType();
+                           return ElixirTypes.FRAGMENT;
                           }
                         }
 }
@@ -1171,7 +1160,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                                } else {
                                  // matches non-interpolating behavior from `{ESCAPE}` rule below
                                  yybegin(ESCAPE_IN_LITERAL_GROUP);
-                                 return fragmentType();
+                                 return ElixirTypes.FRAGMENT;
                                }
                              }
   {ESCAPE} / {EOL}           {
@@ -1189,24 +1178,23 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                                  return ElixirTypes.ESCAPE;
                                } else {
                                  yybegin(ESCAPE_IN_LITERAL_GROUP);
-                                 return fragmentType();
+                                 return ElixirTypes.FRAGMENT;
                                }
                              }
   {GROUP_TERMINATOR}         {
                                if (isTerminator(yytext())) {
                                  if (isSigil()) {
                                    yybegin(SIGIL_MODIFIERS);
-                                   return terminatorType();
+                                   return ElixirTypes.LINE_TERMINATOR;
                                  } else {
-                                   org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                                   yybegin(stackFrame.getLastLexicalState());
-                                   return stackFrame.terminatorType();
+                                   popAndBegin();
+                                   return ElixirTypes.LINE_TERMINATOR;
                                  }
                                } else {
-                                 return fragmentType();
+                                 return ElixirTypes.FRAGMENT;
                                }
                              }
-  {ANY}                      { return fragmentType(); }
+  {ANY}                      { return ElixirTypes.FRAGMENT; }
 }
 
 <GROUP_HEREDOC_END> {
@@ -1214,11 +1202,10 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                                    if (isTerminator(yytext())) {
                                       if (isSigil()) {
                                         yybegin(SIGIL_MODIFIERS);
-                                        return terminatorType();
+                                        return ElixirTypes.HEREDOC_TERMINATOR;
                                       } else {
-                                        org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                                        yybegin(stackFrame.getLastLexicalState());
-                                        return stackFrame.terminatorType();
+                                        popAndBegin();;
+                                        return ElixirTypes.HEREDOC_TERMINATOR;
                                       }
                                    } else {
                                       handleInState(GROUP_HEREDOC_LINE_BODY);
@@ -1234,18 +1221,14 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                      return ElixirTypes.ESCAPE;
                    }
   {ESCAPE}         {
-                     if (isInterpolating()) {
-                       pushAndBegin(ESCAPE_SEQUENCE);
-                       return ElixirTypes.ESCAPE;
-                     } else {
-                       return fragmentType();
-                     }
+                     pushAndBegin(ESCAPE_SEQUENCE);
+                     return ElixirTypes.ESCAPE;
                    }
   {EOL}            {
                      yybegin(GROUP_HEREDOC_LINE_START);
                      return ElixirTypes.EOL;
                    }
-  .                { return fragmentType(); }
+  .                { return ElixirTypes.FRAGMENT; }
 }
 
 // See https://github.com/elixir-lang/elixir/pull/4341
@@ -1286,11 +1269,10 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                                if (isTerminator(yytext())) {
                                  if (isSigil()) {
                                    yybegin(SIGIL_MODIFIERS);
-                                   return terminatorType();
+                                   return ElixirTypes.HEREDOC_TERMINATOR;
                                  } else {
-                                   org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                                   yybegin(stackFrame.getLastLexicalState());
-                                   return stackFrame.terminatorType();
+                                   popAndBegin();
+                                   return ElixirTypes.HEREDOC_TERMINATOR;
                                  }
                                } else {
                                  /* ...returns BAD_CHARACTER instead of going to GROUP_HEREDOC_LINE_BODY when the wrong
@@ -1358,10 +1340,10 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
 <NAMED_SIGIL> {
   {SIGIL_HEREDOC_PROMOTER} { setPromoter(yytext());
                              yybegin(GROUP_HEREDOC_START);
-                             return promoterType(); }
+                             return ElixirTypes.HEREDOC_PROMOTER; }
   {SIGIL_PROMOTER}         { setPromoter(yytext());
                              yybegin(GROUP);
-                             return promoterType(); }
+                             return ElixirTypes.LINE_PROMOTER; }
   {EOL}                    { return TokenType.BAD_CHARACTER; }
 }
 

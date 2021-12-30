@@ -19,43 +19,9 @@ public class QuoteHandler implements MultiCharQuoteHandler {
      * CONSTANTS
      */
 
-    private final static Map<IElementType, IElementType> CLOSING_QUOTE_BY_OPENING_QUOTE = ImmutableMap
-            .<IElementType, IElementType>builder()
-            .put(ElixirTypes.CHAR_LIST_HEREDOC_PROMOTER, ElixirTypes.CHAR_LIST_HEREDOC_TERMINATOR)
-            .put(ElixirTypes.CHAR_LIST_SIGIL_HEREDOC_PROMOTER, ElixirTypes.CHAR_LIST_SIGIL_HEREDOC_TERMINATOR)
-            .put(ElixirTypes.CHAR_LIST_SIGIL_PROMOTER, ElixirTypes.CHAR_LIST_SIGIL_TERMINATOR)
-            .put(ElixirTypes.CHAR_LIST_PROMOTER, ElixirTypes.CHAR_LIST_PROMOTER)
-            .put(ElixirTypes.REGEX_HEREDOC_PROMOTER, ElixirTypes.REGEX_HEREDOC_TERMINATOR)
-            .put(ElixirTypes.REGEX_PROMOTER, ElixirTypes.REGEX_TERMINATOR)
-            .put(ElixirTypes.SIGIL_HEREDOC_PROMOTER, ElixirTypes.SIGIL_HEREDOC_TERMINATOR)
-            .put(ElixirTypes.SIGIL_PROMOTER, ElixirTypes.SIGIL_TERMINATOR)
-            .put(ElixirTypes.STRING_HEREDOC_PROMOTER, ElixirTypes.STRING_HEREDOC_TERMINATOR)
-            .put(ElixirTypes.STRING_SIGIL_HEREDOC_PROMOTER, ElixirTypes.STRING_SIGIL_HEREDOC_TERMINATOR)
-            .put(ElixirTypes.STRING_SIGIL_PROMOTER, ElixirTypes.STRING_SIGIL_TERMINATOR)
-            .put(ElixirTypes.STRING_PROMOTER, ElixirTypes.STRING_TERMINATOR)
-            .put(ElixirTypes.WORDS_HEREDOC_PROMOTER, ElixirTypes.WORDS_HEREDOC_TERMINATOR)
-            .put(ElixirTypes.WORDS_PROMOTER, ElixirTypes.WORDS_TERMINATOR)
-            .build();
-
-    private final static TokenSet CLOSING_QUOTES = TokenSet.create(
-            CLOSING_QUOTE_BY_OPENING_QUOTE
-                    .values()
-                    .toArray(new IElementType[0])
-    );
-
     private final static TokenSet LITERALS = TokenSet.create(
             ElixirTypes.ATOM_FRAGMENT,
-            ElixirTypes.CHAR_LIST_FRAGMENT,
-            ElixirTypes.REGEX_FRAGMENT,
-            ElixirTypes.SIGIL_FRAGMENT,
-            ElixirTypes.STRING_FRAGMENT,
-            ElixirTypes.WORDS_FRAGMENT
-    );
-
-    private final static TokenSet OPENING_QUOTES = TokenSet.create(
-            CLOSING_QUOTE_BY_OPENING_QUOTE
-                    .keySet()
-                    .toArray(new IElementType[0])
+            ElixirTypes.FRAGMENT
     );
 
     /*
@@ -73,7 +39,7 @@ public class QuoteHandler implements MultiCharQuoteHandler {
             try {
                 IElementType tokenType = highlighterIterator.getTokenType();
 
-                if (CLOSING_QUOTE_BY_OPENING_QUOTE.get(tokenType) != null) {
+                if (tokenType == ElixirTypes.HEREDOC_PROMOTER || tokenType == ElixirTypes.LINE_PROMOTER) {
                     Document document = highlighterIterator.getDocument();
 
                     if (document != null) {
@@ -120,8 +86,8 @@ public class QuoteHandler implements MultiCharQuoteHandler {
      *
      * @param highlighterIterator
      * @param offset the current offset in the file of the {@code highlighterIterator}
-     * @return {@code true} if {@link HighlighterIterator#getTokenType()} is one of {@link #CLOSING_QUOTES} and
-     *   {@code offset} is {@link HighlighterIterator#getStart()}
+     * @return {@code true} if {@link HighlighterIterator#getTokenType()} is {@link ElixirTypes#HEREDOC_TERMINATOR} or
+     *    {@link ElixirTypes#LINE_TERMINATOR} and {@code offset} is {@link HighlighterIterator#getStart()}
      */
     @Override
     public boolean isClosingQuote(HighlighterIterator highlighterIterator, int offset) {
@@ -135,7 +101,7 @@ public class QuoteHandler implements MultiCharQuoteHandler {
 
         boolean isClosingQuote;
 
-        if (CLOSING_QUOTES.contains(tokenType)) {
+        if (tokenType == ElixirTypes.HEREDOC_TERMINATOR || tokenType == ElixirTypes.LINE_TERMINATOR) {
             int start = highlighterIterator.getStart();
             int end = highlighterIterator.getEnd();
             isClosingQuote = end - start >= 1 && offset == end - 1;
@@ -163,7 +129,7 @@ public class QuoteHandler implements MultiCharQuoteHandler {
 
         boolean isOpeningQuote;
 
-        if (OPENING_QUOTES.contains(tokenType)){
+        if (tokenType == ElixirTypes.HEREDOC_PROMOTER || tokenType == ElixirTypes.LINE_PROMOTER) {
             int start = highlighterIterator.getStart();
             isOpeningQuote = offset == start;
         } else {

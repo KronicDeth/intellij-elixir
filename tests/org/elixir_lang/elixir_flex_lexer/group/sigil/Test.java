@@ -20,7 +20,7 @@ public abstract class Test extends org.elixir_lang.elixir_flex_lexer.group.Test 
      * CONSTANTS
      */
 
-    public static final IElementType FRAGMENT_TYPE = ElixirTypes.SIGIL_FRAGMENT;
+    public static final IElementType FRAGMENT_TYPE = ElixirTypes.FRAGMENT;
     public static final int LEXICAL_STATE = ElixirFlexLexer.GROUP;
     public static final Collection<Object[]> QUOTE_DATA = Arrays.asList(
             new Object[][]{

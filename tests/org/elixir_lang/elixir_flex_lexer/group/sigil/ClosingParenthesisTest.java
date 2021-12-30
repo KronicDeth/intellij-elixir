@@ -37,7 +37,7 @@ public class ClosingParenthesisTest extends Test {
         return Test.generateData(
                 Arrays.asList(
                         new Object[][] {
-                                { ")", ElixirTypes.SIGIL_TERMINATOR, ElixirFlexLexer.SIGIL_MODIFIERS },
+                                { ")", ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.SIGIL_MODIFIERS },
                                 { "/", FRAGMENT_TYPE, LEXICAL_STATE },
                                 { ";", FRAGMENT_TYPE, LEXICAL_STATE },
                                 { ">", FRAGMENT_TYPE, LEXICAL_STATE },

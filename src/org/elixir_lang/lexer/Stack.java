@@ -1,7 +1,6 @@
 package org.elixir_lang.lexer;
 
 import com.intellij.psi.tree.IElementType;
-import org.elixir_lang.lexer.group.Quote;
 
 /**
  * Created by luke.imhoff on 8/19/14.
@@ -27,12 +26,7 @@ public class Stack {
     }
 
     public void push(String quotePromoter, int currentLexicalState) {
-        org.elixir_lang.lexer.group.Quote quote = org.elixir_lang.lexer.group.Quote.fetch(quotePromoter);
-        push(quote, quotePromoter, currentLexicalState);
-    }
-
-    public void push(Quote quote, String quotePromoter, int currentLexicalState) {
-        StackFrame stackFrame = new StackFrame(quote, quotePromoter, currentLexicalState);
+        StackFrame stackFrame = new StackFrame(quotePromoter, currentLexicalState);
         push(stackFrame);
     }
 
@@ -48,8 +42,8 @@ public class Stack {
         return stack.pop();
     }
 
-    public IElementType fragmentType() {
-        return stack.peek().fragmentType();
+    public boolean isGroup() {
+        return stack.peek().isGroup();
     }
 
     public boolean isInterpolating() {
@@ -64,10 +58,6 @@ public class Stack {
         stack.peek().nameSigil(sigilName);
     }
 
-    public IElementType promoterType() {
-        return stack.peek().promoterType();
-    }
-
     public void setPromoter(String promoter) {
         stack.peek().setPromoter(promoter);
     }
@@ -78,9 +68,5 @@ public class Stack {
 
     public String terminator() {
         return stack.peek().getTerminator();
-    }
-
-    public IElementType terminatorType() {
-        return stack.peek().terminatorType();
     }
 }

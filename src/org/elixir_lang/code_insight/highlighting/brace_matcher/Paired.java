@@ -23,24 +23,12 @@ class Paired implements PairedBraceMatcher {
     private final static BracePair[] BRACE_PAIRS = new BracePair[]{
             DO_END,
             FN_END,
-            new BracePair(ElixirTypes.CHAR_LIST_HEREDOC_PROMOTER,       ElixirTypes.CHAR_LIST_HEREDOC_TERMINATOR,       false),
-            new BracePair(ElixirTypes.CHAR_LIST_SIGIL_HEREDOC_PROMOTER, ElixirTypes.CHAR_LIST_SIGIL_HEREDOC_TERMINATOR, false),
-            new BracePair(ElixirTypes.CHAR_LIST_SIGIL_PROMOTER,         ElixirTypes.CHAR_LIST_SIGIL_TERMINATOR,         false),
-            new BracePair(ElixirTypes.CHAR_LIST_PROMOTER,               ElixirTypes.CHAR_LIST_PROMOTER,                 false),
-            new BracePair(ElixirTypes.REGEX_HEREDOC_PROMOTER,           ElixirTypes.REGEX_HEREDOC_TERMINATOR,           false),
-            new BracePair(ElixirTypes.REGEX_PROMOTER,                   ElixirTypes.REGEX_TERMINATOR,                   false),
-            new BracePair(ElixirTypes.SIGIL_HEREDOC_PROMOTER,           ElixirTypes.SIGIL_HEREDOC_TERMINATOR,           false),
-            new BracePair(ElixirTypes.SIGIL_PROMOTER,                   ElixirTypes.SIGIL_TERMINATOR,                   false),
-            new BracePair(ElixirTypes.STRING_HEREDOC_PROMOTER,          ElixirTypes.STRING_HEREDOC_TERMINATOR,          false),
-            new BracePair(ElixirTypes.STRING_SIGIL_HEREDOC_PROMOTER,    ElixirTypes.STRING_SIGIL_HEREDOC_TERMINATOR,    false),
-            new BracePair(ElixirTypes.STRING_SIGIL_PROMOTER,            ElixirTypes.STRING_SIGIL_TERMINATOR,            false),
-            new BracePair(ElixirTypes.STRING_PROMOTER,                  ElixirTypes.STRING_TERMINATOR,                  false),
-            new BracePair(ElixirTypes.WORDS_HEREDOC_PROMOTER,           ElixirTypes.WORDS_HEREDOC_TERMINATOR,           false),
-            new BracePair(ElixirTypes.WORDS_PROMOTER,                   ElixirTypes.WORDS_TERMINATOR,                   false),
-            new BracePair(ElixirTypes.OPENING_BIT,                      ElixirTypes.CLOSING_BIT,                        false),
-            new BracePair(ElixirTypes.OPENING_BRACKET,                  ElixirTypes.CLOSING_BRACKET,                    false),
-            new BracePair(ElixirTypes.OPENING_CURLY,                    ElixirTypes.CLOSING_CURLY,                      false),
-            new BracePair(ElixirTypes.OPENING_PARENTHESIS,              ElixirTypes.CLOSING_PARENTHESIS,                false)
+            new BracePair(ElixirTypes.HEREDOC_PROMOTER,    ElixirTypes.HEREDOC_TERMINATOR,  false),
+            new BracePair(ElixirTypes.LINE_PROMOTER,       ElixirTypes.LINE_TERMINATOR,    false),
+            new BracePair(ElixirTypes.OPENING_BIT,         ElixirTypes.CLOSING_BIT,        false),
+            new BracePair(ElixirTypes.OPENING_BRACKET,     ElixirTypes.CLOSING_BRACKET,    false),
+            new BracePair(ElixirTypes.OPENING_CURLY,       ElixirTypes.CLOSING_CURLY,      false),
+            new BracePair(ElixirTypes.OPENING_PARENTHESIS, ElixirTypes.CLOSING_PARENTHESIS, false)
     };
     public final static PairedBraceMatcher INSTANCE = new Paired();
 

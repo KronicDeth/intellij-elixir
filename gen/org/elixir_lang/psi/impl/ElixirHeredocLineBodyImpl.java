@@ -1,0 +1,54 @@
+// This is a generated file. Not intended for manual editing.
+package org.elixir_lang.psi.impl;
+
+import java.util.List;
+import org.jetbrains.annotations.*;
+import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
+import static org.elixir_lang.psi.ElixirTypes.*;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import org.elixir_lang.psi.*;
+
+public class ElixirHeredocLineBodyImpl extends ASTWrapperPsiElement implements ElixirHeredocLineBody {
+
+  public ElixirHeredocLineBodyImpl(@NotNull ASTNode node) {
+    super(node);
+  }
+
+  public void accept(@NotNull ElixirVisitor visitor) {
+    visitor.visitHeredocLineBody(this);
+  }
+
+  @Override
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
+    else super.accept(visitor);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirEscapedCharacter> getEscapedCharacterList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEscapedCharacter.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirEscapedHeredocTerminator> getEscapedHeredocTerminatorList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEscapedHeredocTerminator.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirInterpolation> getInterpolationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolation.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirQuoteHexadecimalEscapeSequence> getQuoteHexadecimalEscapeSequenceList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirQuoteHexadecimalEscapeSequence.class);
+  }
+
+}

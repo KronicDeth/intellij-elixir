@@ -72,18 +72,6 @@ public class ElixirAccessExpressionImpl extends ASTWrapperPsiElement implements 
 
   @Override
   @Nullable
-  public ElixirCharListHeredoc getCharListHeredoc() {
-    return PsiTreeUtil.getChildOfType(this, ElixirCharListHeredoc.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirCharListLine getCharListLine() {
-    return PsiTreeUtil.getChildOfType(this, ElixirCharListLine.class);
-  }
-
-  @Override
-  @Nullable
   public ElixirCharToken getCharToken() {
     return PsiTreeUtil.getChildOfType(this, ElixirCharToken.class);
   }
@@ -102,32 +90,14 @@ public class ElixirAccessExpressionImpl extends ASTWrapperPsiElement implements 
 
   @Override
   @Nullable
+  public ElixirHeredoc getHeredoc() {
+    return PsiTreeUtil.getChildOfType(this, ElixirHeredoc.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirHexadecimalWholeNumber getHexadecimalWholeNumber() {
     return PsiTreeUtil.getChildOfType(this, ElixirHexadecimalWholeNumber.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirInterpolatedCharListSigilHeredoc getInterpolatedCharListSigilHeredoc() {
-    return PsiTreeUtil.getChildOfType(this, ElixirInterpolatedCharListSigilHeredoc.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirInterpolatedCharListSigilLine getInterpolatedCharListSigilLine() {
-    return PsiTreeUtil.getChildOfType(this, ElixirInterpolatedCharListSigilLine.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirInterpolatedRegexHeredoc getInterpolatedRegexHeredoc() {
-    return PsiTreeUtil.getChildOfType(this, ElixirInterpolatedRegexHeredoc.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirInterpolatedRegexLine getInterpolatedRegexLine() {
-    return PsiTreeUtil.getChildOfType(this, ElixirInterpolatedRegexLine.class);
   }
 
   @Override
@@ -144,56 +114,14 @@ public class ElixirAccessExpressionImpl extends ASTWrapperPsiElement implements 
 
   @Override
   @Nullable
-  public ElixirInterpolatedStringSigilHeredoc getInterpolatedStringSigilHeredoc() {
-    return PsiTreeUtil.getChildOfType(this, ElixirInterpolatedStringSigilHeredoc.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirInterpolatedStringSigilLine getInterpolatedStringSigilLine() {
-    return PsiTreeUtil.getChildOfType(this, ElixirInterpolatedStringSigilLine.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirInterpolatedWordsHeredoc getInterpolatedWordsHeredoc() {
-    return PsiTreeUtil.getChildOfType(this, ElixirInterpolatedWordsHeredoc.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirInterpolatedWordsLine getInterpolatedWordsLine() {
-    return PsiTreeUtil.getChildOfType(this, ElixirInterpolatedWordsLine.class);
+  public ElixirLine getLine() {
+    return PsiTreeUtil.getChildOfType(this, ElixirLine.class);
   }
 
   @Override
   @Nullable
   public ElixirList getList() {
     return PsiTreeUtil.getChildOfType(this, ElixirList.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirLiteralCharListSigilHeredoc getLiteralCharListSigilHeredoc() {
-    return PsiTreeUtil.getChildOfType(this, ElixirLiteralCharListSigilHeredoc.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirLiteralCharListSigilLine getLiteralCharListSigilLine() {
-    return PsiTreeUtil.getChildOfType(this, ElixirLiteralCharListSigilLine.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirLiteralRegexHeredoc getLiteralRegexHeredoc() {
-    return PsiTreeUtil.getChildOfType(this, ElixirLiteralRegexHeredoc.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirLiteralRegexLine getLiteralRegexLine() {
-    return PsiTreeUtil.getChildOfType(this, ElixirLiteralRegexLine.class);
   }
 
   @Override
@@ -206,30 +134,6 @@ public class ElixirAccessExpressionImpl extends ASTWrapperPsiElement implements 
   @Nullable
   public ElixirLiteralSigilLine getLiteralSigilLine() {
     return PsiTreeUtil.getChildOfType(this, ElixirLiteralSigilLine.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirLiteralStringSigilHeredoc getLiteralStringSigilHeredoc() {
-    return PsiTreeUtil.getChildOfType(this, ElixirLiteralStringSigilHeredoc.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirLiteralStringSigilLine getLiteralStringSigilLine() {
-    return PsiTreeUtil.getChildOfType(this, ElixirLiteralStringSigilLine.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirLiteralWordsHeredoc getLiteralWordsHeredoc() {
-    return PsiTreeUtil.getChildOfType(this, ElixirLiteralWordsHeredoc.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirLiteralWordsLine getLiteralWordsLine() {
-    return PsiTreeUtil.getChildOfType(this, ElixirLiteralWordsLine.class);
   }
 
   @Override
@@ -248,18 +152,6 @@ public class ElixirAccessExpressionImpl extends ASTWrapperPsiElement implements 
   @Nullable
   public ElixirParentheticalStab getParentheticalStab() {
     return PsiTreeUtil.getChildOfType(this, ElixirParentheticalStab.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirStringHeredoc getStringHeredoc() {
-    return PsiTreeUtil.getChildOfType(this, ElixirStringHeredoc.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirStringLine getStringLine() {
-    return PsiTreeUtil.getChildOfType(this, ElixirStringLine.class);
   }
 
   @Override

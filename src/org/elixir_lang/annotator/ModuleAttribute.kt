@@ -162,7 +162,6 @@ class ModuleAttribute : Annotator, DumbAware {
                         for (bodied in heredocLineList) {
                             val body = bodied.body
                             highlightFragments(
-                                    greatGrandChild,
                                     body,
                                     holder
                             )
@@ -171,7 +170,6 @@ class ModuleAttribute : Annotator, DumbAware {
                     is Line -> {
                         val body = greatGrandChild.body
                         highlightFragments(
-                                greatGrandChild,
                                 body,
                                 holder
                         )
@@ -184,16 +182,14 @@ class ModuleAttribute : Annotator, DumbAware {
     /**
      * Highlights fragment ASTNodes under `body` that have fragment type from `fragmented.getFragmentType()`.
      *
-     * @param fragmented        supplies fragment type
      * @param body              contains fragments
      * @param annotationHolder  the container which receives annotations created by the plugin.
      */
-    private fun highlightFragments(fragmented: Fragmented,
-                                   body: Body,
+    private fun highlightFragments(body: Body,
                                    annotationHolder: AnnotationHolder) {
         val bodyNode = body.node
         val fragmentNodes = bodyNode.getChildren(
-                TokenSet.create(fragmented.fragmentType)
+                TokenSet.create(ElixirTypes.FRAGMENT)
         )
         for (fragmentNode in fragmentNodes) {
             Highlighter.highlight(annotationHolder,
@@ -968,8 +964,8 @@ class ModuleAttribute : Annotator, DumbAware {
                         typeTextAttributesKey
                 )
             }
-            psiElement is InterpolatedString -> {
-                highlightTypeError(psiElement, "Strings aren't allowed in types", annotationHolder)
+            psiElement is ElixirLine || psiElement is ElixirHeredoc -> {
+                highlightTypeError(psiElement, "Char Lists and Strings aren't allowed in types", annotationHolder)
             }
             psiElement is Infix && psiElement !is When -> {
                 highlightTypesAndTypeParameterUsages(
@@ -1039,7 +1035,7 @@ class ModuleAttribute : Annotator, DumbAware {
                                 psiElement is ElixirAtom ||
                                 psiElement is ElixirAtomKeyword ||
                                 psiElement is ElixirBitString ||
-                                psiElement is ElixirCharListLine ||
+                                psiElement is ElixirLine ||
                                 psiElement is ElixirCharToken ||
                                 psiElement is ElixirDecimalWholeNumber ||
                                 psiElement is ElixirKeywordKey ||  /* happens when :: is typed in `@spec` above function clause that uses `do:` */

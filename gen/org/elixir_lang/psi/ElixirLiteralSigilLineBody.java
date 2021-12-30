@@ -14,6 +14,9 @@ public interface ElixirLiteralSigilLineBody extends Body {
   List<ElixirEscapedEOL> getEscapedEOLList();
 
   @NotNull
+  List<ElixirEscapedLineTerminator> getEscapedLineTerminatorList();
+
+  @NotNull
   List<ElixirHexadecimalEscapePrefix> getHexadecimalEscapePrefixList();
 
   @NotNull

@@ -173,7 +173,7 @@ public class Parameter {
         } else if (parent instanceof ElixirAnonymousFunction) {
             parameterizedParameter = putParameterized(parameter, (ElixirAnonymousFunction) parent);
         } else if (parent instanceof InMatch) {
-            parameterizedParameter = putParameterized(parameter, (InMatch) parent);
+            parameterizedParameter = putParameterized(parameter, parent);
         } else if (parent instanceof AtUnqualifiedBracketOperation ||
                 parent instanceof BracketOperation ||
                 parent instanceof ElixirBlockItem ||
@@ -181,8 +181,8 @@ public class Parameter {
                 parent instanceof ElixirInterpolation ||
                 parent instanceof ElixirMapUpdateArguments ||
                 parent instanceof ElixirMultipleAliases ||
-                parent instanceof ElixirStringHeredocLineBody ||
-                parent instanceof ElixirStringLineBody ||
+                parent instanceof ElixirHeredocLineBody ||
+                parent instanceof ElixirLineBody ||
                 parent instanceof PsiFile ||
                 parent instanceof QualifiedAlias ||
                 parent instanceof QualifiedMultipleAliases) {

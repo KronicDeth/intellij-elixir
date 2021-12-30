@@ -1,6 +1,7 @@
 package org.elixir_lang.elixir_flex_lexer.group_heredoc_end.sigil.custom;
 
 import com.intellij.psi.tree.IElementType;
+import org.elixir_lang.Elixir;
 import org.elixir_lang.ElixirFlexLexer;
 import org.elixir_lang.psi.ElixirTypes;
 import org.junit.runner.RunWith;
@@ -14,13 +15,6 @@ import java.util.Collection;
  */
 @RunWith(Parameterized.class)
 public class TripleDoubleQuotesTest extends Test {
-    /*
-     * Constants
-     */
-
-    public static final IElementType FRAGMENT_TYPE = ElixirTypes.STRING_FRAGMENT;
-    public static final IElementType TERMINATOR_TYPE = ElixirTypes.STRING_HEREDOC_TERMINATOR;
-
     /*
      * Constructors
      */
@@ -40,8 +34,8 @@ public class TripleDoubleQuotesTest extends Test {
     public static Collection<Object[]> generateData() {
         return Arrays.asList(
                 new Object[][]{
-                        {"'''", FRAGMENT_TYPE, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY, true},
-                        {"\"\"\"", TERMINATOR_TYPE, ElixirFlexLexer.ADDITION_OR_SUBTRACTION_MAYBE, true}
+                        {"'''", ElixirTypes.FRAGMENT, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY, true},
+                        {"\"\"\"", ElixirTypes.HEREDOC_TERMINATOR, ElixirFlexLexer.ADDITION_OR_SUBTRACTION_MAYBE, true}
                 }
         );
     }

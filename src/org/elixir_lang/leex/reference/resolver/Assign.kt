@@ -285,7 +285,7 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
         when (expression) {
             is ElixirAccessExpression -> resolveInAssign2Argument(assign, incompleteCode, expression.stripAccessExpression(), initial)
             is ElixirKeywordKey -> {
-                if (expression.charListLine == null && expression.stringLine == null) {
+                if (expression.line == null) {
                     val resolvedName = expression.text
                     val assignName = assign.name
 
@@ -326,7 +326,7 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
     private fun resolveInAtomArgument(assign: Assign, incompleteCode: Boolean, expression: PsiElement, initial: List<ResolveResult>): List<ResolveResult> =
             when (expression) {
                 is ElixirAccessExpression -> resolveInAtomArgument(assign, incompleteCode, expression.stripAccessExpression(), initial)
-                is ElixirAtom -> if (expression.charListLine == null && expression.stringLine == null) {
+                is ElixirAtom -> if (expression.line == null) {
                     val resolvedName = expression.node.lastChildNode.text
                     val assignName = assign.name
 
@@ -388,7 +388,7 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
                 }
             is QuotableKeywordPair -> resolveInLiveComponentAssigns(assign, incompleteCode, assigns.keywordKey)
             is ElixirKeywordKey -> {
-                if (assigns.charListLine == null && assigns.stringLine == null) {
+                if (assigns.line == null) {
                     val resolvedName = assigns.text
                     val assignName = assign.name
 
@@ -702,7 +702,7 @@ object Assign: ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.A
                     }
                 is QuotableKeywordPair -> resolveMyself(assign, incompleteCode, expression.keywordKey, initial)
                 is ElixirKeywordKey -> {
-                    if (expression.charListLine == null && expression.stringLine == null) {
+                    if (expression.line == null) {
                         val resolvedName = expression.text
                         val assignName = assign.name
 

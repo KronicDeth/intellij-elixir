@@ -20,7 +20,7 @@ public class DoubleQuotesTest extends Test {
      * Constants
      */
 
-    public static final IElementType FRAGMENT_TYPE = ElixirTypes.STRING_FRAGMENT;
+    public static final IElementType FRAGMENT_TYPE = ElixirTypes.FRAGMENT;
 
     /*
      * Constructors
@@ -44,7 +44,7 @@ public class DoubleQuotesTest extends Test {
                Arrays.asList(
                        new Object[][] {
                                { "'", FRAGMENT_TYPE, LEXICAL_STATE },
-                               { "\"", ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE }
+                               { "\"", ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE }
                        }
                )
        );

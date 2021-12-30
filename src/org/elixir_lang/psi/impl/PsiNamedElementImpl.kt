@@ -23,7 +23,7 @@ object PsiNamedElementImpl {
 
     @JvmStatic
     fun getName(atom: ElixirAtom): String? =
-        if (atom.charListLine == null && atom.stringLine == null) {
+        if (atom.line == null) {
             atom.node.lastChildNode.text
         } else {
             null
@@ -123,7 +123,7 @@ object PsiNamedElementImpl {
                     ?.singleOrNull()
                     ?.let { it as? ElixirAtom }
                     ?.let { atom ->
-                        val body = atom.charListLine?.body ?: atom.stringLine?.body
+                        val body = atom.line?.body
 
                         if (body != null) {
                             if (body.children.isEmpty()) {

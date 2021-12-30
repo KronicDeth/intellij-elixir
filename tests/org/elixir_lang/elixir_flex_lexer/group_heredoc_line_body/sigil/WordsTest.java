@@ -28,7 +28,7 @@ public class WordsTest extends PromoterTest {
             name = "\"{0}\" parses as {1} token and advances to state {2}"
     )
     public static Collection<Object[]> generateData() {
-        return PromoterTest.generateData(ElixirTypes.WORDS_FRAGMENT);
+        return PromoterTest.generateData(ElixirTypes.FRAGMENT);
     }
 
     @Override
