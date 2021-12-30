@@ -9,7 +9,7 @@ public class CharListHeredocParsingTestCase extends ParsingTestCase {
     }
 
     public void testEmptyUnicodeEscapeSequence() {
-        assertParsedAndQuotedAroundExit();
+        assertParsedAndQuotedAroundError();
     }
 
     public void testEscapeSequences() {
@@ -25,7 +25,7 @@ public class CharListHeredocParsingTestCase extends ParsingTestCase {
     }
 
     public void testWhitespaceEndPrefix() {
-        assertParsedAndQuotedAroundError();
+        assertParsedAndQuotedCorrectly();
     }
 
     @Override

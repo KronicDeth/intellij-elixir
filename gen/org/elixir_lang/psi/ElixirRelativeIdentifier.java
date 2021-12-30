@@ -12,10 +12,7 @@ public interface ElixirRelativeIdentifier extends Quotable {
   ElixirAtomKeyword getAtomKeyword();
 
   @Nullable
-  ElixirCharListLine getCharListLine();
-
-  @Nullable
-  ElixirStringLine getStringLine();
+  ElixirLine getLine();
 
   @NotNull OtpErlangObject quote();
 

@@ -12,7 +12,6 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 import com.ericsson.otp.erlang.OtpErlangList;
 import com.ericsson.otp.erlang.OtpErlangObject;
-import com.intellij.psi.tree.IElementType;
 
 public class ElixirLiteralSigilLineImpl extends ASTWrapperPsiElement implements ElixirLiteralSigilLine {
 
@@ -53,6 +52,11 @@ public class ElixirLiteralSigilLineImpl extends ASTWrapperPsiElement implements 
   }
 
   @Override
+  public @NotNull List<Integer> addEscapedTerminator(@Nullable List<Integer> maybeCodePointList, @NotNull ASTNode child) {
+    return ElixirPsiImplUtil.addEscapedTerminator(this, maybeCodePointList, child);
+  }
+
+  @Override
   public @NotNull List<Integer> addFragmentCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode child) {
     return ElixirPsiImplUtil.addFragmentCodePoints(this, codePointList, child);
   }
@@ -65,11 +69,6 @@ public class ElixirLiteralSigilLineImpl extends ASTWrapperPsiElement implements 
   @Override
   public Body getBody() {
     return ElixirPsiImplUtil.getBody(this);
-  }
-
-  @Override
-  public IElementType getFragmentType() {
-    return ElixirPsiImplUtil.getFragmentType(this);
   }
 
   @Override

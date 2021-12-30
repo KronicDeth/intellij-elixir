@@ -47,9 +47,9 @@ public class KeywordPairTest extends Test {
                         {
                                 "\"key\": 1",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.STRING_PROMOTER, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_FRAGMENT, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE),
+                                        new TokenTypeState(ElixirTypes.LINE_PROMOTER, ElixirFlexLexer.GROUP),
+                                        new TokenTypeState(ElixirTypes.FRAGMENT, ElixirFlexLexer.GROUP),
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.KEYWORD_PAIR_COLON, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(TokenType.WHITE_SPACE, ElixirFlexLexer.YYINITIAL),
                                         new TokenTypeState(ElixirTypes.VALID_DECIMAL_DIGITS, ElixirFlexLexer.DECIMAL_WHOLE_NUMBER)

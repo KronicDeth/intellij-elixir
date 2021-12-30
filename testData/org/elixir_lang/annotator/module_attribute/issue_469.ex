@@ -31,7 +31,7 @@ defmodule Interpreter.Resources do
   """
   @callback changeset(params) :: Ecto.Changeset.
 
-  @doc <error descr="Strings aren't allowed in types">"""
+  @doc <error descr="Char Lists and Strings aren't allowed in types">"""
   Deletes a single `struct`
 
   # Returns

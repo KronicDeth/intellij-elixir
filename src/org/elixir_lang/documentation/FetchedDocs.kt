@@ -9,7 +9,7 @@ import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.MarkdownByL
 import org.elixir_lang.beam.term.inspect
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.CallDefinitionClause
-import org.elixir_lang.psi.ElixirStringLine
+import org.elixir_lang.psi.ElixirLine
 import org.elixir_lang.psi.Heredoc
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.call.finalArguments
@@ -99,7 +99,7 @@ private fun List<AtUnqualifiedNoParenthesesCall<*>>.joinModuleAttributeQuoteText
                             ?.let { quote ->
                                 when (quote) {
                                     is Heredoc -> quote.children.asSequence().map(PsiElement::getText)
-                                    is ElixirStringLine -> quote.body?.text?.let { text -> sequenceOf(text) }
+                                    is ElixirLine -> quote.body?.text?.let { text -> sequenceOf(text) }
                                     else -> null
                                 }
                             }

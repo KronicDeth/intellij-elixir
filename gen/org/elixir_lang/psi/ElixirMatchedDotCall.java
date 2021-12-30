@@ -60,6 +60,8 @@ public interface ElixirMatchedDotCall extends ElixirMatchedExpression, DotCall<M
 
   boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity);
 
+  @Nullable String implementedProtocolName();
+
   @Nullable String moduleName();
 
   @NotNull PsiElement[] primaryArguments();
@@ -67,8 +69,6 @@ public interface ElixirMatchedDotCall extends ElixirMatchedExpression, DotCall<M
   @Nullable Integer primaryArity();
 
   boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place);
-
-  @Nullable String implementedProtocolName();
 
   @NotNull OtpErlangObject quote();
 

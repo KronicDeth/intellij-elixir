@@ -43,17 +43,17 @@ public class SigilTest extends TokenTest {
     public static Collection<Object[]> generateData() {
         return Arrays.asList(new Object[][]{
                         { ";", TokenType.BAD_CHARACTER, ElixirFlexLexer.SIGIL },
-                        { "C", ElixirTypes.LITERAL_CHAR_LIST_SIGIL_NAME, ElixirFlexLexer.NAMED_SIGIL },
-                        { "R", ElixirTypes.LITERAL_REGEX_SIGIL_NAME, ElixirFlexLexer.NAMED_SIGIL },
-                        { "S", ElixirTypes.LITERAL_STRING_SIGIL_NAME, ElixirFlexLexer.NAMED_SIGIL },
-                        { "W", ElixirTypes.LITERAL_WORDS_SIGIL_NAME, ElixirFlexLexer.NAMED_SIGIL },
+                        { "C", ElixirTypes.LITERAL_SIGIL_NAME, ElixirFlexLexer.NAMED_SIGIL },
+                        { "R", ElixirTypes.LITERAL_SIGIL_NAME, ElixirFlexLexer.NAMED_SIGIL },
+                        { "S", ElixirTypes.LITERAL_SIGIL_NAME, ElixirFlexLexer.NAMED_SIGIL },
+                        { "W", ElixirTypes.LITERAL_SIGIL_NAME, ElixirFlexLexer.NAMED_SIGIL },
                         { "X", ElixirTypes.LITERAL_SIGIL_NAME, ElixirFlexLexer.NAMED_SIGIL },
                         { "\n", TokenType.BAD_CHARACTER, ElixirFlexLexer.SIGIL },
                         { "\r\n", TokenType.BAD_CHARACTER, ElixirFlexLexer.SIGIL },
-                        { "c", ElixirTypes.INTERPOLATING_CHAR_LIST_SIGIL_NAME, ElixirFlexLexer.NAMED_SIGIL },
-                        { "r", ElixirTypes.INTERPOLATING_REGEX_SIGIL_NAME, ElixirFlexLexer.NAMED_SIGIL },
-                        { "s", ElixirTypes.INTERPOLATING_STRING_SIGIL_NAME, ElixirFlexLexer.NAMED_SIGIL },
-                        { "w", ElixirTypes.INTERPOLATING_WORDS_SIGIL_NAME, ElixirFlexLexer.NAMED_SIGIL },
+                        { "c", ElixirTypes.INTERPOLATING_SIGIL_NAME, ElixirFlexLexer.NAMED_SIGIL },
+                        { "r", ElixirTypes.INTERPOLATING_SIGIL_NAME, ElixirFlexLexer.NAMED_SIGIL },
+                        { "s", ElixirTypes.INTERPOLATING_SIGIL_NAME, ElixirFlexLexer.NAMED_SIGIL },
+                        { "w", ElixirTypes.INTERPOLATING_SIGIL_NAME, ElixirFlexLexer.NAMED_SIGIL },
                         { "x", ElixirTypes.INTERPOLATING_SIGIL_NAME, ElixirFlexLexer.NAMED_SIGIL }
                 }
         );

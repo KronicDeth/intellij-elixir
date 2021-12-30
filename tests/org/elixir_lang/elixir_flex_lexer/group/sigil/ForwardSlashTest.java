@@ -40,7 +40,7 @@ public class ForwardSlashTest extends Test {
                 Arrays.asList(
                         new Object[][] {
                                 { ")", FRAGMENT_TYPE, LEXICAL_STATE },
-                                { "/", ElixirTypes.SIGIL_TERMINATOR, ElixirFlexLexer.SIGIL_MODIFIERS },
+                                { "/", ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.SIGIL_MODIFIERS },
                                 { ";", FRAGMENT_TYPE, LEXICAL_STATE },
                                 { ">", FRAGMENT_TYPE, LEXICAL_STATE },
                                 { "\n", FRAGMENT_TYPE, LEXICAL_STATE },

@@ -15,6 +15,9 @@ public interface ElixirCharToken extends Quotable {
   ElixirEscapedEOL getEscapedEOL();
 
   @Nullable
+  ElixirEscapedLineTerminator getEscapedLineTerminator();
+
+  @Nullable
   ElixirQuoteHexadecimalEscapeSequence getQuoteHexadecimalEscapeSequence();
 
   @NotNull OtpErlangObject quote();

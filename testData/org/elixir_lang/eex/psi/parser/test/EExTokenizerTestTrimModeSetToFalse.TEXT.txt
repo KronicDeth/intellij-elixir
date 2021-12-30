@@ -1,3 +1,0 @@
-PsiFile(plain text):EExTokenizerTestTrimModeSetToFalse.eex(0,9)
-  PsiElement(EEx)('<%= 12 %>')(0,9)
-  PsiElement(PLAIN_TEXT)('')(9,9)

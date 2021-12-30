@@ -26,24 +26,18 @@ import static org.elixir_lang.psi.impl.QuotableImpl.childNodes;
 public abstract class Resolvable {
     @NotNull
     public static Resolvable resolvable(@NotNull ElixirAtom atom) {
-        ElixirCharListLine charListLine = atom.getCharListLine();
+        ElixirLine line = atom.getLine();
         Resolvable resolvable;
 
-        if (charListLine != null) {
-            resolvable = resolvable(charListLine);
+        if (line != null) {
+            resolvable = resolvable(line);
         } else {
-            ElixirStringLine stringLine = atom.getStringLine();
+            ASTNode atomNode = atom.getNode();
+            ASTNode atomFragmentNode = atomNode.getLastChildNode();
 
-            if (stringLine != null) {
-                resolvable = resolvable(stringLine);
-            } else {
-                ASTNode atomNode = atom.getNode();
-                ASTNode atomFragmentNode = atomNode.getLastChildNode();
+            assert atomFragmentNode.getElementType() == ElixirTypes.ATOM_FRAGMENT;
 
-                assert atomFragmentNode.getElementType() == ElixirTypes.ATOM_FRAGMENT;
-
-                resolvable = new Exact(":" + atomFragmentNode.getText());
-            }
+            resolvable = new Exact(":" + atomFragmentNode.getText());
         }
 
         return resolvable;
@@ -69,7 +63,7 @@ public abstract class Resolvable {
             for (ASTNode child : children) {
                 IElementType elementType = child.getElementType();
 
-                if (elementType == parent.getFragmentType()) {
+                if (elementType == ElixirTypes.FRAGMENT) {
                     codePointList = parent.addFragmentCodePoints(codePointList, child);
                 } else if (elementType == ElixirTypes.ESCAPED_CHARACTER) {
                     codePointList = parent.addEscapedCharacterCodePoints(codePointList, child);

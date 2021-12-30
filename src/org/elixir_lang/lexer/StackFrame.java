@@ -1,9 +1,6 @@
 package org.elixir_lang.lexer;
 
 import com.intellij.psi.tree.IElementType;
-import org.elixir_lang.lexer.group.Base;
-import org.elixir_lang.lexer.group.Quote;
-import org.elixir_lang.lexer.group.Sigil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -17,7 +14,7 @@ public class StackFrame {
      * Static
      */
 
-    public static final Map<String, String> TERMINATOR_BY_PROMOTER = new HashMap<String, String>();
+    public static final Map<String, String> TERMINATOR_BY_PROMOTER = new HashMap<>();
 
     static {
         TERMINATOR_BY_PROMOTER.put("'", "'");
@@ -36,9 +33,8 @@ public class StackFrame {
      * Instance
      */
 
-    private Base group = null;
     private Boolean interpolation = null;
-    private Integer lastLexicalState = null;
+    private Integer lastLexicalState;
     private String promoter = null;
     private Character sigilName = null;
 
@@ -46,44 +42,19 @@ public class StackFrame {
         this.lastLexicalState = lastLexicalState;
     }
 
-    public StackFrame(Quote group, String promoter, int lastLexicalState) {
-        this.group = group;
+    public StackFrame(String promoter, int lastLexicalState) {
         this.interpolation = true;
         this.lastLexicalState = lastLexicalState;
         this.promoter = promoter;
     }
 
-    private Base getGroup() {
-        if (this.group == null) {
-            throw new IllegalStateException("Group not set.");
-        }
-
-        return this.group;
-    }
-
-    // private because Quote groups should be set from constructors and Sigil groups should be set from nameSigil
-    private void setGroup(Base group) {
-        if (this.group != null) {
-            throw new IllegalStateException(
-                    "Group already set to " + this.group + ".  " +
-                            "It is illegal to set group more than once in any StackFrame."
-            );
-        }
-
-        this.group = group;
+    public boolean isGroup() {
+        return this.promoter != null;
     }
 
     public void nameSigil(char sigilName) {
-        Sigil group = Sigil.fetch(sigilName);
-        setGroup(group);
-
         setSigilName(sigilName);
         setInterpolation(SigilName.isInterpolating(sigilName));
-    }
-
-    public void setQuotePromoter(String quotePromoter) {
-        setInterpolation(true);
-        this.group = Quote.fetch(quotePromoter);
     }
 
     private char getSigilName() {
@@ -123,7 +94,7 @@ public class StackFrame {
             throw new IllegalStateException("Parent not set.");
         }
 
-        return this.interpolation.booleanValue();
+        return this.interpolation;
     }
 
     public int getLastLexicalState() {
@@ -131,7 +102,7 @@ public class StackFrame {
             throw new IllegalStateException("LastLexicalState not set");
         }
 
-        return lastLexicalState.intValue();
+        return lastLexicalState;
     }
 
     public void setLastLexicalState(int lastLexicalState) {
@@ -162,44 +133,12 @@ public class StackFrame {
         this.promoter = promoter;
     }
 
-    public IElementType promoterType() {
-        String promoter = getPromoter();
-        Base group = getGroup();
-        IElementType promoterType;
-
-        if (Base.isHeredocPromoter(promoter)) {
-            promoterType = group.heredocPromoterType;
-        } else {
-            promoterType = group.promoterType;
-        }
-
-        return promoterType;
-    }
-
-    public IElementType fragmentType() {
-        return getGroup().fragmentType;
-    }
-
     public boolean isSigil() {
-        return getGroup() instanceof Sigil;
+        return sigilName != null;
     }
 
     public IElementType sigilNameType() {
         return SigilName.elementType(getSigilName());
-    }
-
-    public IElementType terminatorType() {
-        String promoter = getPromoter();
-        Base group = getGroup();
-        IElementType terminatorType;
-
-        if (Base.isHeredocPromoter(promoter)) {
-            terminatorType = group.heredocTerminatorType;
-        } else {
-            terminatorType = group.terminatorType;
-        }
-
-        return terminatorType;
     }
 
     public String getTerminator() {

@@ -12,13 +12,12 @@ import com.intellij.psi.PsiReference;
 public interface ElixirAtom extends NavigatablePsiElement, PsiNamedElement, Quotable {
 
   @Nullable
-  ElixirCharListLine getCharListLine();
-
-  @Nullable
-  ElixirStringLine getStringLine();
+  ElixirLine getLine();
 
   @Nullable PsiReference getReference();
 
   @NotNull OtpErlangObject quote();
+
+  @NotNull PsiElement setName(@NotNull String newName);
 
 }

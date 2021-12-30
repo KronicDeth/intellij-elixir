@@ -2,9 +2,6 @@
 package org.elixir_lang.psi.impl;
 
 import java.util.List;
-
-import com.intellij.openapi.util.NlsSafe;
-import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.*;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
@@ -34,14 +31,8 @@ public class ElixirAtomImpl extends ASTWrapperPsiElement implements ElixirAtom {
 
   @Override
   @Nullable
-  public ElixirCharListLine getCharListLine() {
-    return PsiTreeUtil.getChildOfType(this, ElixirCharListLine.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirStringLine getStringLine() {
-    return PsiTreeUtil.getChildOfType(this, ElixirStringLine.class);
+  public ElixirLine getLine() {
+    return PsiTreeUtil.getChildOfType(this, ElixirLine.class);
   }
 
   @Override
@@ -55,7 +46,8 @@ public class ElixirAtomImpl extends ASTWrapperPsiElement implements ElixirAtom {
   }
 
   @Override
-  public PsiElement setName(@NlsSafe @NotNull String name) throws IncorrectOperationException {
-    throw new IncorrectOperationException();
+  public @NotNull PsiElement setName(@NotNull String newName) {
+    return ElixirPsiImplUtil.setName(this, newName);
   }
+
 }

@@ -15,13 +15,6 @@ import java.util.Collection;
 @RunWith(Parameterized.class)
 public class TripleSingleQuotesTest extends Test {
     /*
-     * Constants
-     */
-
-    public static final IElementType FRAGMENT_TYPE = ElixirTypes.CHAR_LIST_FRAGMENT;
-    public static final IElementType TERMINATOR_TYPE = ElixirTypes.CHAR_LIST_HEREDOC_TERMINATOR;
-
-    /*
      * Constructors
      */
 
@@ -39,8 +32,8 @@ public class TripleSingleQuotesTest extends Test {
     public static Collection<Object[]> generateData() {
         return Arrays.asList(
                 new Object[][]{
-                        {"'''", TERMINATOR_TYPE, ElixirFlexLexer.ADDITION_OR_SUBTRACTION_MAYBE, true },
-                        {"\"\"\"", FRAGMENT_TYPE, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY, true }
+                        {"'''", ElixirTypes.HEREDOC_TERMINATOR, ElixirFlexLexer.ADDITION_OR_SUBTRACTION_MAYBE, true },
+                        {"\"\"\"", ElixirTypes.FRAGMENT, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY, true }
                 }
         );
     }

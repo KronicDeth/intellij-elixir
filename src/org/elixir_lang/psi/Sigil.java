@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Created by luke.imhoff on 2/16/15.
  */
-public interface Sigil extends Fragmented, Parent, PsiElement, Quotable {
+public interface Sigil extends Parent, PsiElement, Quotable {
     @Nullable
     Integer indentation();
     @NotNull

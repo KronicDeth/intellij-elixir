@@ -29,7 +29,7 @@ public class InterpolatedWordsHeredocParsingTestCase extends ParsingTestCase {
     }
 
     public void testWhitespaceEndPrefix() {
-        assertParsedAndQuotedAroundError();
+        assertParsedAndQuotedCorrectly();
     }
 
     @Override

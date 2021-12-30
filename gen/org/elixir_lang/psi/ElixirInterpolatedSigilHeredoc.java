@@ -7,15 +7,14 @@ import com.intellij.psi.PsiElement;
 import com.ericsson.otp.erlang.OtpErlangList;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.tree.IElementType;
 
-public interface ElixirInterpolatedSigilHeredoc extends InterpolatedSigilHeredoc, SigilFragmented {
+public interface ElixirInterpolatedSigilHeredoc extends SigilHeredoc {
 
   @Nullable
   ElixirHeredocPrefix getHeredocPrefix();
 
   @NotNull
-  List<ElixirInterpolatedSigilHeredocLine> getInterpolatedSigilHeredocLineList();
+  List<ElixirInterpolatedHeredocLine> getInterpolatedHeredocLineList();
 
   @Nullable
   ElixirSigilModifiers getSigilModifiers();
@@ -24,13 +23,13 @@ public interface ElixirInterpolatedSigilHeredoc extends InterpolatedSigilHeredoc
 
   @NotNull List<Integer> addEscapedEOL(@Nullable List<Integer> maybeCodePointList, @NotNull ASTNode child);
 
+  @NotNull List<Integer> addEscapedTerminator(@Nullable List<Integer> maybeCodePointList, @NotNull ASTNode child);
+
   @NotNull List<Integer> addFragmentCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode child);
 
   @NotNull List<Integer> addHexadecimalEscapeSequenceCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode child);
 
-  IElementType getFragmentType();
-
-  @NotNull List<HeredocLine> getHeredocLineList();
+  @NotNull List<? extends HeredocLine> getHeredocLineList();
 
   @NotNull Integer indentation();
 

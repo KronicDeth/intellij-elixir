@@ -41,6 +41,12 @@ public class ElixirLiteralSigilLineBodyImpl extends ASTWrapperPsiElement impleme
 
   @Override
   @NotNull
+  public List<ElixirEscapedLineTerminator> getEscapedLineTerminatorList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEscapedLineTerminator.class);
+  }
+
+  @Override
+  @NotNull
   public List<ElixirHexadecimalEscapePrefix> getHexadecimalEscapePrefixList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirHexadecimalEscapePrefix.class);
   }

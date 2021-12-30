@@ -29,7 +29,7 @@ public class LiteralRegexHeredocParsingTestCase extends ParsingTestCase {
     }
 
     public void testWhitespaceEndPrefix() {
-        assertParsedAndQuotedAroundError();
+        assertParsedAndQuotedCorrectly();
     }
 
     @Override

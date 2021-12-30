@@ -46,7 +46,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(TokenType.WHITE_SPACE, ElixirFlexLexer.INTERPOLATION),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -54,7 +54,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.UNARY_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -62,7 +62,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.COMPARISON_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -70,7 +70,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.COMPARISON_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -85,7 +85,7 @@ public class InterpolationTest extends Test {
                                         new TokenTypeState(ElixirTypes.COMMENT, ElixirFlexLexer.INTERPOLATION),
                                         new TokenTypeState(TokenType.WHITE_SPACE, ElixirFlexLexer.INTERPOLATION),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -93,7 +93,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.STRUCT_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -103,7 +103,7 @@ public class InterpolationTest extends Test {
                                         new TokenTypeState(ElixirTypes.OPENING_CURLY, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.CLOSING_CURLY, ElixirFlexLexer.ADDITION_OR_SUBTRACTION_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -111,7 +111,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.CAPTURE_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -119,7 +119,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.AND_SYMBOL_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -127,20 +127,20 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.AND_SYMBOL_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
                                 "'",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.CHAR_LIST_PROMOTER, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.CHAR_LIST_FRAGMENT, ElixirFlexLexer.GROUP)
+                                        new TokenTypeState(ElixirTypes.LINE_PROMOTER, ElixirFlexLexer.GROUP),
+                                        new TokenTypeState(ElixirTypes.FRAGMENT, ElixirFlexLexer.GROUP)
                                 )
                         },
                         {
                                 "'''",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.CHAR_LIST_HEREDOC_PROMOTER, ElixirFlexLexer.GROUP_HEREDOC_START),
+                                        new TokenTypeState(ElixirTypes.HEREDOC_PROMOTER, ElixirFlexLexer.GROUP_HEREDOC_START),
                                         new TokenTypeState(TokenType.BAD_CHARACTER, ElixirFlexLexer.GROUP_HEREDOC_START),
                                         new TokenTypeState(TokenType.BAD_CHARACTER, ElixirFlexLexer.GROUP_HEREDOC_START)
                                 )
@@ -150,7 +150,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -158,7 +158,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.CLOSING_PARENTHESIS, ElixirFlexLexer.ADDITION_OR_SUBTRACTION_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -166,7 +166,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.NUMBER_OR_BADARITH_OPERATOR, ElixirFlexLexer.INTERPOLATION),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -174,7 +174,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.TWO_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -182,7 +182,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.COMMA, ElixirFlexLexer.INTERPOLATION),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -190,7 +190,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.NEGATE_OPERATOR, ElixirFlexLexer.INTERPOLATION),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -198,7 +198,23 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.TWO_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                )
+                        },
+                        {
+                                "*",
+                                Arrays.asList(
+                                        new TokenTypeState(ElixirTypes.MULTIPLICATION_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
+                                        new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                )
+                        },
+                        {
+                                "**",
+                                Arrays.asList(
+                                        new TokenTypeState(ElixirTypes.POWER_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
+                                        new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -206,7 +222,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.STAB_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -214,7 +230,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.DOT_OPERATOR, ElixirFlexLexer.DOT_OPERATION),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -222,7 +238,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.RANGE_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -230,7 +246,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.AFTER_UNQUALIFIED_IDENTIFIER),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -238,7 +254,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.VALID_DECIMAL_DIGITS, ElixirFlexLexer.DECIMAL_WHOLE_NUMBER),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -248,7 +264,7 @@ public class InterpolationTest extends Test {
                                         new TokenTypeState(ElixirTypes.OBSOLETE_BINARY_WHOLE_NUMBER_BASE, ElixirFlexLexer.BINARY_WHOLE_NUMBER),
                                         new TokenTypeState(ElixirTypes.VALID_BINARY_DIGITS, ElixirFlexLexer.BINARY_WHOLE_NUMBER),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -258,7 +274,7 @@ public class InterpolationTest extends Test {
                                         new TokenTypeState(ElixirTypes.OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE, ElixirFlexLexer.HEXADECIMAL_WHOLE_NUMBER),
                                         new TokenTypeState(ElixirTypes.VALID_HEXADECIMAL_DIGITS, ElixirFlexLexer.HEXADECIMAL_WHOLE_NUMBER),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -268,7 +284,7 @@ public class InterpolationTest extends Test {
                                         new TokenTypeState(ElixirTypes.BINARY_WHOLE_NUMBER_BASE, ElixirFlexLexer.BINARY_WHOLE_NUMBER),
                                         new TokenTypeState(ElixirTypes.VALID_BINARY_DIGITS, ElixirFlexLexer.BINARY_WHOLE_NUMBER),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -278,7 +294,7 @@ public class InterpolationTest extends Test {
                                         new TokenTypeState(ElixirTypes.OCTAL_WHOLE_NUMBER_BASE, ElixirFlexLexer.OCTAL_WHOLE_NUMBER),
                                         new TokenTypeState(ElixirTypes.VALID_OCTAL_DIGITS, ElixirFlexLexer.OCTAL_WHOLE_NUMBER),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -288,7 +304,7 @@ public class InterpolationTest extends Test {
                                         new TokenTypeState(ElixirTypes.HEXADECIMAL_WHOLE_NUMBER_BASE, ElixirFlexLexer.HEXADECIMAL_WHOLE_NUMBER),
                                         new TokenTypeState(ElixirTypes.VALID_HEXADECIMAL_DIGITS, ElixirFlexLexer.HEXADECIMAL_WHOLE_NUMBER),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -297,7 +313,7 @@ public class InterpolationTest extends Test {
                                         new TokenTypeState(ElixirTypes.VALID_DECIMAL_DIGITS, ElixirFlexLexer.DECIMAL_WHOLE_NUMBER),
                                         new TokenTypeState(ElixirTypes.DOT_OPERATOR, ElixirFlexLexer.DOT_OPERATION),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -307,7 +323,7 @@ public class InterpolationTest extends Test {
                                         new TokenTypeState(ElixirTypes.DECIMAL_MARK, ElixirFlexLexer.DECIMAL_FRACTION),
                                         new TokenTypeState(ElixirTypes.VALID_DECIMAL_DIGITS, ElixirFlexLexer.DECIMAL_FRACTION),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -320,7 +336,7 @@ public class InterpolationTest extends Test {
                                         new TokenTypeState(ElixirTypes.SIGN_OPERATOR, ElixirFlexLexer.DECIMAL_EXPONENT),
                                         new TokenTypeState(ElixirTypes.VALID_DECIMAL_DIGITS, ElixirFlexLexer.DECIMAL_EXPONENT),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -333,7 +349,7 @@ public class InterpolationTest extends Test {
                                         new TokenTypeState(ElixirTypes.SIGN_OPERATOR, ElixirFlexLexer.DECIMAL_EXPONENT),
                                         new TokenTypeState(ElixirTypes.VALID_DECIMAL_DIGITS, ElixirFlexLexer.DECIMAL_EXPONENT),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -345,7 +361,7 @@ public class InterpolationTest extends Test {
                                         new TokenTypeState(ElixirTypes.EXPONENT_MARK, ElixirFlexLexer.DECIMAL_EXPONENT_SIGN),
                                         new TokenTypeState(ElixirTypes.VALID_DECIMAL_DIGITS, ElixirFlexLexer.DECIMAL_EXPONENT),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -353,7 +369,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.VALID_DECIMAL_DIGITS, ElixirFlexLexer.DECIMAL_WHOLE_NUMBER),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -362,7 +378,7 @@ public class InterpolationTest extends Test {
                                         new TokenTypeState(ElixirTypes.VALID_DECIMAL_DIGITS, ElixirFlexLexer.DECIMAL_WHOLE_NUMBER),
                                         new TokenTypeState(ElixirTypes.NUMBER_SEPARATOR, ElixirFlexLexer.DECIMAL_WHOLE_NUMBER),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -388,7 +404,7 @@ public class InterpolationTest extends Test {
                                         new TokenTypeState(ElixirTypes.NUMBER_SEPARATOR, ElixirFlexLexer.DECIMAL_WHOLE_NUMBER),
                                         new TokenTypeState(ElixirTypes.VALID_DECIMAL_DIGITS, ElixirFlexLexer.DECIMAL_WHOLE_NUMBER),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -397,7 +413,7 @@ public class InterpolationTest extends Test {
                                         new TokenTypeState(ElixirTypes.COLON, ElixirFlexLexer.INTERPOLATION),
                                         new TokenTypeState(TokenType.WHITE_SPACE, ElixirFlexLexer.INTERPOLATION),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -405,7 +421,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.COLON, ElixirFlexLexer.ATOM_START),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -413,7 +429,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.TYPE_OPERATOR, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -422,7 +438,7 @@ public class InterpolationTest extends Test {
                                         new TokenTypeState(ElixirTypes.COLON, ElixirFlexLexer.INTERPOLATION),
                                         new TokenTypeState(TokenType.WHITE_SPACE, ElixirFlexLexer.INTERPOLATION),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -431,7 +447,7 @@ public class InterpolationTest extends Test {
                                         new TokenTypeState(ElixirTypes.COLON, ElixirFlexLexer.INTERPOLATION),
                                         new TokenTypeState(TokenType.WHITE_SPACE, ElixirFlexLexer.INTERPOLATION),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -440,7 +456,7 @@ public class InterpolationTest extends Test {
                                         new TokenTypeState(ElixirTypes.COLON, ElixirFlexLexer.INTERPOLATION),
                                         new TokenTypeState(TokenType.WHITE_SPACE, ElixirFlexLexer.INTERPOLATION),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -448,7 +464,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.CLOSING_BRACKET, ElixirFlexLexer.ADDITION_OR_SUBTRACTION_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -456,7 +472,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.SEMICOLON, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -464,7 +480,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.RELATIONAL_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -472,7 +488,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.IN_MATCH_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -480,7 +496,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.OPENING_BIT, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -488,7 +504,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.ARROW_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -497,7 +513,7 @@ public class InterpolationTest extends Test {
                                         new TokenTypeState(ElixirTypes.OPENING_BIT, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.CLOSING_BIT, ElixirFlexLexer.ADDITION_OR_SUBTRACTION_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -505,7 +521,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.ARROW_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -513,7 +529,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.RELATIONAL_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -521,7 +537,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.TWO_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -529,7 +545,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.ARROW_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -537,7 +553,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.ARROW_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -545,7 +561,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.ARROW_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -553,7 +569,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.MATCH_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -561,7 +577,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.COMPARISON_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -569,7 +585,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.COMPARISON_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -577,7 +593,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.ASSOCIATION_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -585,7 +601,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.COMPARISON_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -593,7 +609,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.RELATIONAL_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -601,7 +617,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.RELATIONAL_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -609,7 +625,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.CLOSING_BIT, ElixirFlexLexer.ADDITION_OR_SUBTRACTION_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -617,15 +633,15 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.ARROW_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
                                 "?",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.CHAR_TOKENIZER, ElixirFlexLexer.CHAR_TOKENIZATION),
-                                        new TokenTypeState(ElixirTypes.CHAR_LIST_FRAGMENT, ElixirFlexLexer.ADDITION_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE),
-                                        new TokenTypeState(ElixirTypes.STRING_PROMOTER, ElixirFlexLexer.GROUP)
+                                        new TokenTypeState(ElixirTypes.FRAGMENT, ElixirFlexLexer.ADDITION_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE),
+                                        new TokenTypeState(ElixirTypes.LINE_PROMOTER, ElixirFlexLexer.GROUP)
                                 )
                         },
                         {
@@ -633,7 +649,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.AT_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -641,7 +657,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.ALIAS_TOKEN, ElixirFlexLexer.ADDITION_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -649,21 +665,21 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.OPENING_BRACKET, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
                                 "\"",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.STRING_PROMOTER, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_FRAGMENT, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_PROMOTER, ElixirFlexLexer.GROUP),
+                                        new TokenTypeState(ElixirTypes.FRAGMENT, ElixirFlexLexer.GROUP),
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
                                 "\"\"\"",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.STRING_HEREDOC_PROMOTER, ElixirFlexLexer.GROUP_HEREDOC_START),
+                                        new TokenTypeState(ElixirTypes.HEREDOC_PROMOTER, ElixirFlexLexer.GROUP_HEREDOC_START),
                                         new TokenTypeState(TokenType.BAD_CHARACTER, ElixirFlexLexer.GROUP_HEREDOC_START),
                                         new TokenTypeState(TokenType.BAD_CHARACTER, ElixirFlexLexer.GROUP_HEREDOC_START)
                                 )
@@ -674,7 +690,7 @@ public class InterpolationTest extends Test {
                                         new TokenTypeState(TokenType.BAD_CHARACTER, ElixirFlexLexer.INTERPOLATION),
                                         new TokenTypeState(ElixirTypes.SEMICOLON, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -682,7 +698,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.IN_MATCH_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -690,7 +706,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(TokenType.WHITE_SPACE, ElixirFlexLexer.INTERPOLATION),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -698,7 +714,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(TokenType.WHITE_SPACE, ElixirFlexLexer.INTERPOLATION),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -706,7 +722,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(TokenType.WHITE_SPACE, ElixirFlexLexer.INTERPOLATION),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -714,7 +730,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(TokenType.WHITE_SPACE, ElixirFlexLexer.INTERPOLATION),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -722,7 +738,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(TokenType.WHITE_SPACE, ElixirFlexLexer.INTERPOLATION),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -730,7 +746,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(TokenType.WHITE_SPACE, ElixirFlexLexer.INTERPOLATION),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -738,7 +754,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.UNARY_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -746,7 +762,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.AFTER_UNQUALIFIED_IDENTIFIER),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -754,7 +770,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.AFTER, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -762,7 +778,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.AFTER_UNQUALIFIED_IDENTIFIER),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -770,7 +786,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.AND_WORD_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -778,7 +794,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.AFTER_UNQUALIFIED_IDENTIFIER),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -786,7 +802,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.CATCH, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -794,7 +810,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.AFTER_UNQUALIFIED_IDENTIFIER),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -802,7 +818,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.AFTER_UNQUALIFIED_IDENTIFIER),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -810,7 +826,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.DO, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -818,7 +834,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.AFTER_UNQUALIFIED_IDENTIFIER),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -826,7 +842,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.ELSE, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -834,7 +850,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.AFTER_UNQUALIFIED_IDENTIFIER),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -842,7 +858,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.END, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -850,7 +866,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.AFTER_UNQUALIFIED_IDENTIFIER),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -858,7 +874,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.FALSE, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -866,7 +882,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.AFTER_UNQUALIFIED_IDENTIFIER),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -874,7 +890,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.FN, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -882,7 +898,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.AFTER_UNQUALIFIED_IDENTIFIER),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -890,7 +906,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.AFTER_UNQUALIFIED_IDENTIFIER),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -898,7 +914,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.AFTER_UNQUALIFIED_IDENTIFIER),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -906,7 +922,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.AFTER_UNQUALIFIED_IDENTIFIER),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -914,7 +930,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.AFTER_UNQUALIFIED_IDENTIFIER),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -922,7 +938,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.IN_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -930,7 +946,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.AFTER_UNQUALIFIED_IDENTIFIER),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -938,7 +954,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.NIL, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -946,7 +962,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.AFTER_UNQUALIFIED_IDENTIFIER),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -954,7 +970,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.NOT_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -962,7 +978,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.AFTER_UNQUALIFIED_IDENTIFIER),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -970,7 +986,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.OR_WORD_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -978,7 +994,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.AFTER_UNQUALIFIED_IDENTIFIER),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -986,7 +1002,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.RESCUE, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -994,7 +1010,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.AFTER_UNQUALIFIED_IDENTIFIER),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -1002,7 +1018,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.TRUE, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -1010,7 +1026,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.AFTER_UNQUALIFIED_IDENTIFIER),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -1018,7 +1034,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.WHEN_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -1026,7 +1042,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.AFTER_UNQUALIFIED_IDENTIFIER),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -1035,7 +1051,7 @@ public class InterpolationTest extends Test {
                                         new TokenTypeState(ElixirTypes.OPENING_CURLY, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.CLOSING_CURLY, ElixirFlexLexer.ADDITION_OR_SUBTRACTION_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -1043,7 +1059,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.PIPE_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -1051,7 +1067,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.ARROW_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -1059,7 +1075,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.OR_SYMBOL_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -1067,7 +1083,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.OR_SYMBOL_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -1083,7 +1099,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.ARROW_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -1091,7 +1107,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.ARROW_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         },
                         {
@@ -1099,7 +1115,7 @@ public class InterpolationTest extends Test {
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.UNARY_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
-                                        new TokenTypeState(ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
+                                        new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )
                         }
                 }
@@ -1110,7 +1126,7 @@ public class InterpolationTest extends Test {
     public void identifierCall() {
         start(charSequence);
 
-        assertEquals(ElixirTypes.STRING_PROMOTER, lexer.getTokenType());
+        assertEquals(ElixirTypes.LINE_PROMOTER, lexer.getTokenType());
         lexer.advance();
         assertEquals(ElixirFlexLexer.GROUP, lexer.getState());
 

@@ -108,8 +108,4 @@ public interface ElixirUnmatchedUnqualifiedNoParenthesesCall extends ElixirUnmat
   //matching getUseScope(ElixirUnmatchedUnqualifiedNoParenthesesCall, ...)
   //methods are not found in ElixirPsiImplUtil
 
-  //WARNING: protocolName(...) is skipped
-  //matching protocolName(ElixirUnmatchedUnqualifiedNoParenthesesCall, ...)
-  //methods are not found in ElixirPsiImplUtil
-
 }

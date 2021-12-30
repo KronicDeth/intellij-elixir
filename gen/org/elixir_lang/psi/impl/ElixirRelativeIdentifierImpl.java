@@ -36,14 +36,8 @@ public class ElixirRelativeIdentifierImpl extends ASTWrapperPsiElement implement
 
   @Override
   @Nullable
-  public ElixirCharListLine getCharListLine() {
-    return PsiTreeUtil.getChildOfType(this, ElixirCharListLine.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirStringLine getStringLine() {
-    return PsiTreeUtil.getChildOfType(this, ElixirStringLine.class);
+  public ElixirLine getLine() {
+    return PsiTreeUtil.getChildOfType(this, ElixirLine.class);
   }
 
   @Override

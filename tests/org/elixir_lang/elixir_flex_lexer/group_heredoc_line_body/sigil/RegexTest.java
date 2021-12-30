@@ -28,7 +28,7 @@ public class RegexTest extends PromoterTest {
             name = "\"{0}\" parses as {1} token and advances to state {2}"
     )
     public static Collection<Object[]> generateData() {
-        return PromoterTest.generateData(ElixirTypes.REGEX_FRAGMENT);
+        return PromoterTest.generateData(ElixirTypes.FRAGMENT);
     }
 
     @Override

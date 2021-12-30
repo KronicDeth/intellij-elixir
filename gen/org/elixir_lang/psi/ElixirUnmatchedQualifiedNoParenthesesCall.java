@@ -60,6 +60,8 @@ public interface ElixirUnmatchedQualifiedNoParenthesesCall extends ElixirUnmatch
   //matching getUseScope(ElixirUnmatchedQualifiedNoParenthesesCall, ...)
   //methods are not found in ElixirPsiImplUtil
 
+  @Nullable String implementedProtocolName();
+
   boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName);
 
   boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity);
@@ -75,8 +77,6 @@ public interface ElixirUnmatchedQualifiedNoParenthesesCall extends ElixirUnmatch
   @Nullable Integer primaryArity();
 
   boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place);
-
-  @Nullable String implementedProtocolName();
 
   @NotNull PsiElement qualifier();
 

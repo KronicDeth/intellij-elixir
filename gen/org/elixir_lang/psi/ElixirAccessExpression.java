@@ -30,12 +30,6 @@ public interface ElixirAccessExpression extends MaybeModuleName, Quotable {
   ElixirCaptureNumericOperation getCaptureNumericOperation();
 
   @Nullable
-  ElixirCharListHeredoc getCharListHeredoc();
-
-  @Nullable
-  ElixirCharListLine getCharListLine();
-
-  @Nullable
   ElixirCharToken getCharToken();
 
   @Nullable
@@ -45,19 +39,10 @@ public interface ElixirAccessExpression extends MaybeModuleName, Quotable {
   ElixirDecimalWholeNumber getDecimalWholeNumber();
 
   @Nullable
+  ElixirHeredoc getHeredoc();
+
+  @Nullable
   ElixirHexadecimalWholeNumber getHexadecimalWholeNumber();
-
-  @Nullable
-  ElixirInterpolatedCharListSigilHeredoc getInterpolatedCharListSigilHeredoc();
-
-  @Nullable
-  ElixirInterpolatedCharListSigilLine getInterpolatedCharListSigilLine();
-
-  @Nullable
-  ElixirInterpolatedRegexHeredoc getInterpolatedRegexHeredoc();
-
-  @Nullable
-  ElixirInterpolatedRegexLine getInterpolatedRegexLine();
 
   @Nullable
   ElixirInterpolatedSigilHeredoc getInterpolatedSigilHeredoc();
@@ -66,49 +51,16 @@ public interface ElixirAccessExpression extends MaybeModuleName, Quotable {
   ElixirInterpolatedSigilLine getInterpolatedSigilLine();
 
   @Nullable
-  ElixirInterpolatedStringSigilHeredoc getInterpolatedStringSigilHeredoc();
-
-  @Nullable
-  ElixirInterpolatedStringSigilLine getInterpolatedStringSigilLine();
-
-  @Nullable
-  ElixirInterpolatedWordsHeredoc getInterpolatedWordsHeredoc();
-
-  @Nullable
-  ElixirInterpolatedWordsLine getInterpolatedWordsLine();
+  ElixirLine getLine();
 
   @Nullable
   ElixirList getList();
-
-  @Nullable
-  ElixirLiteralCharListSigilHeredoc getLiteralCharListSigilHeredoc();
-
-  @Nullable
-  ElixirLiteralCharListSigilLine getLiteralCharListSigilLine();
-
-  @Nullable
-  ElixirLiteralRegexHeredoc getLiteralRegexHeredoc();
-
-  @Nullable
-  ElixirLiteralRegexLine getLiteralRegexLine();
 
   @Nullable
   ElixirLiteralSigilHeredoc getLiteralSigilHeredoc();
 
   @Nullable
   ElixirLiteralSigilLine getLiteralSigilLine();
-
-  @Nullable
-  ElixirLiteralStringSigilHeredoc getLiteralStringSigilHeredoc();
-
-  @Nullable
-  ElixirLiteralStringSigilLine getLiteralStringSigilLine();
-
-  @Nullable
-  ElixirLiteralWordsHeredoc getLiteralWordsHeredoc();
-
-  @Nullable
-  ElixirLiteralWordsLine getLiteralWordsLine();
 
   @Nullable
   ElixirMapOperation getMapOperation();
@@ -118,12 +70,6 @@ public interface ElixirAccessExpression extends MaybeModuleName, Quotable {
 
   @Nullable
   ElixirParentheticalStab getParentheticalStab();
-
-  @Nullable
-  ElixirStringHeredoc getStringHeredoc();
-
-  @Nullable
-  ElixirStringLine getStringLine();
 
   @Nullable
   ElixirStructOperation getStructOperation();

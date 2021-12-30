@@ -42,6 +42,12 @@ public class ElixirCharTokenImpl extends ASTWrapperPsiElement implements ElixirC
 
   @Override
   @Nullable
+  public ElixirEscapedLineTerminator getEscapedLineTerminator() {
+    return PsiTreeUtil.getChildOfType(this, ElixirEscapedLineTerminator.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirQuoteHexadecimalEscapeSequence getQuoteHexadecimalEscapeSequence() {
     return PsiTreeUtil.getChildOfType(this, ElixirQuoteHexadecimalEscapeSequence.class);
   }

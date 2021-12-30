@@ -22,8 +22,8 @@ public class ParenthesesCallTest extends Test {
      * Fields
      */
 
-    private CharSequence identifierCharSequence;
-    private List<TokenTypeState> tokenTypeStates;
+    private final CharSequence identifierCharSequence;
+    private final List<TokenTypeState> tokenTypeStates;
 
     /*
      * Constructors
@@ -499,6 +499,13 @@ public class ParenthesesCallTest extends Test {
                                 )
                         },
                         {
+                                "**",
+                                Arrays.asList(
+                                        new TokenTypeState(ElixirTypes.POWER_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE)
+                                )
+                        },
+                        {
                                 "..",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.RANGE_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
@@ -524,7 +531,7 @@ public class ParenthesesCallTest extends Test {
     public void identifierCall() {
         start(identifierCharSequence);
 
-        for (TokenTypeState tokenTypeState: tokenTypeStates) {
+        for (TokenTypeState tokenTypeState : tokenTypeStates) {
             assertEquals(tokenTypeState.tokenType, lexer.getTokenType());
 
             lexer.advance();

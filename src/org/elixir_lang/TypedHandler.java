@@ -8,24 +8,13 @@ import com.intellij.openapi.editor.highlighter.HighlighterIterator;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.tree.IElementType;
-import com.intellij.psi.tree.TokenSet;
 import org.elixir_lang.psi.ElixirFile;
 import org.elixir_lang.psi.ElixirTypes;
 import org.jetbrains.annotations.NotNull;
 
+import static org.elixir_lang.psi.ElixirTypes.LINE_PROMOTER;
+
 public class TypedHandler extends TypedHandlerDelegate {
-    /*
-     * CONSTANTS
-     */
-
-    private static final TokenSet SIGIL_PROMOTERS = TokenSet.create(
-            ElixirTypes.CHAR_LIST_SIGIL_PROMOTER,
-            ElixirTypes.REGEX_PROMOTER,
-            ElixirTypes.SIGIL_PROMOTER,
-            ElixirTypes.STRING_SIGIL_PROMOTER,
-            ElixirTypes.WORDS_PROMOTER
-    );
-
     /*
      * Instance Methods
      */
@@ -64,7 +53,7 @@ public class TypedHandler extends TypedHandlerDelegate {
                     HighlighterIterator iterator = highlighter.createIterator(caret - 1);
                     IElementType tokenType = iterator.getTokenType();
 
-                    if (SIGIL_PROMOTERS.contains(tokenType)) {
+                    if (tokenType == LINE_PROMOTER) {
                         editor.getDocument().insertString(caret, ">");
                         result = Result.STOP;
                     }
@@ -87,7 +76,7 @@ public class TypedHandler extends TypedHandlerDelegate {
                     HighlighterIterator iterator = highlighter.createIterator(caret - 1);
                     IElementType tokenType = iterator.getTokenType();
 
-                    if (SIGIL_PROMOTERS.contains(tokenType)) {
+                    if (tokenType == LINE_PROMOTER) {
                         editor.getDocument().insertString(caret, String.valueOf(charTyped));
                         result = Result.STOP;
                     }

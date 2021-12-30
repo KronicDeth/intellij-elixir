@@ -12,7 +12,6 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 import com.ericsson.otp.erlang.OtpErlangList;
 import com.ericsson.otp.erlang.OtpErlangObject;
-import com.intellij.psi.tree.IElementType;
 
 public class ElixirLiteralSigilHeredocImpl extends ASTWrapperPsiElement implements ElixirLiteralSigilHeredoc {
 
@@ -38,8 +37,8 @@ public class ElixirLiteralSigilHeredocImpl extends ASTWrapperPsiElement implemen
 
   @Override
   @NotNull
-  public List<ElixirLiteralSigilHeredocLine> getLiteralSigilHeredocLineList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirLiteralSigilHeredocLine.class);
+  public List<ElixirLiteralHeredocLine> getLiteralHeredocLineList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirLiteralHeredocLine.class);
   }
 
   @Override
@@ -59,6 +58,11 @@ public class ElixirLiteralSigilHeredocImpl extends ASTWrapperPsiElement implemen
   }
 
   @Override
+  public @NotNull List<Integer> addEscapedTerminator(@Nullable List<Integer> maybeCodePointList, @NotNull ASTNode child) {
+    return ElixirPsiImplUtil.addEscapedTerminator(this, maybeCodePointList, child);
+  }
+
+  @Override
   public @NotNull List<Integer> addFragmentCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode child) {
     return ElixirPsiImplUtil.addFragmentCodePoints(this, codePointList, child);
   }
@@ -69,12 +73,7 @@ public class ElixirLiteralSigilHeredocImpl extends ASTWrapperPsiElement implemen
   }
 
   @Override
-  public IElementType getFragmentType() {
-    return ElixirPsiImplUtil.getFragmentType(this);
-  }
-
-  @Override
-  public @NotNull List<HeredocLine> getHeredocLineList() {
+  public @NotNull List<? extends HeredocLine> getHeredocLineList() {
     return ElixirPsiImplUtil.getHeredocLineList(this);
   }
 

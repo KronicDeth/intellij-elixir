@@ -1,13 +1,13 @@
 Elixir File(0,8)
   ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(0,8)
-    ElixirInterpolatedCharListSigilHeredocImpl(INTERPOLATED_CHAR_LIST_SIGIL_HEREDOC)(0,8)
+    ElixirInterpolatedSigilHeredocImpl(INTERPOLATED_SIGIL_HEREDOC)(0,8)
       PsiElement(~)('~')(0,1)
-      PsiElement(c)('c')(1,2)
-      PsiElement(Char List Sigil Heredoc Promoter (""", '''))(''''')(2,5)
+      PsiElement(a-z)('c')(1,2)
+      PsiElement(Heredoc Promoter (""", '''))(''''')(2,5)
       PsiErrorElement:'\\n, \\r\\n' expected, got '''''(5,5)
         <empty list>
       ElixirHeredocPrefixImpl(HEREDOC_PREFIX)(5,5)
         <empty list>
-      PsiElement(Char List Sigil Heredoc Terminator (""", '''))(''''')(5,8)
+      PsiElement(Heredoc Terminator (""", '''))(''''')(5,8)
       ElixirSigilModifiersImpl(SIGIL_MODIFIERS)(8,8)
         <empty list>

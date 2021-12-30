@@ -420,7 +420,7 @@ defmodule Kernel do
   Check `Kernel.SpecialForms.quote/2` for more information.
 
   """
-  defmacro alias!(alias) do
+  defmacro alias!(alias) when is_atom(alias) do
     alias
   end
 
@@ -1255,7 +1255,7 @@ defmodule Kernel do
   do).
 
   """
-  defmacro destructure(left, right) do
+  defmacro destructure(left, right) when is_list(left) do
     {:=, [], [left, {{:".", [], [{:__aliases__, [alias: false], [:"Kernel", :"Utils"]}, :destructure]}, [], [right, length(left)]}]}
   end
 
@@ -1887,7 +1887,7 @@ defmodule Kernel do
 
 
   """
-  defmacro sigil_C({:"<<>>", _meta, [string]}, []) do
+  defmacro sigil_C({:"<<>>", _meta, [string]}, []) when is_binary(string) do
     String.to_charlist(string)
   end
 
@@ -1988,7 +1988,7 @@ defmodule Kernel do
 
 
   """
-  defmacro sigil_R({:"<<>>", _meta, [string]}, options) do
+  defmacro sigil_R({:"<<>>", _meta, [string]}, options) when is_binary(string) do
     (
       regex = Regex.compile!(string, :binary.list_to_bin(options))
       Macro.escape(regex)
@@ -2019,7 +2019,7 @@ defmodule Kernel do
 
 
   """
-  defmacro sigil_S({:"<<>>", _, [binary]}, []) do
+  defmacro sigil_S({:"<<>>", _, [binary]}, []) when is_binary(binary) do
     binary
   end
 
@@ -2135,7 +2135,7 @@ defmodule Kernel do
 
 
   """
-  defmacro sigil_W({:"<<>>", _meta, [string]}, modifiers) do
+  defmacro sigil_W({:"<<>>", _meta, [string]}, modifiers) when is_binary(string) do
     split_words(string, modifiers, __CALLER__)
   end
 
@@ -2158,7 +2158,7 @@ defmodule Kernel do
 
 
   """
-  defmacro sigil_c({:"<<>>", _meta, [string]}, []) do
+  defmacro sigil_c({:"<<>>", _meta, [string]}, []) when is_binary(string) do
     String.to_charlist(:elixir_interpolation.unescape_chars(string))
   end
 
@@ -2184,7 +2184,7 @@ defmodule Kernel do
 
 
   """
-  defmacro sigil_r({:"<<>>", _meta, [string]}, options) do
+  defmacro sigil_r({:"<<>>", _meta, [string]}, options) when is_binary(string) do
     (
       binary = :elixir_interpolation.unescape_chars(string, &Regex.unescape_map/1)
       regex = Regex.compile!(binary, :binary.list_to_bin(options))
@@ -2218,7 +2218,7 @@ defmodule Kernel do
 
 
   """
-  defmacro sigil_s({:"<<>>", _, [piece]}, []) do
+  defmacro sigil_s({:"<<>>", _, [piece]}, []) when is_binary(piece) do
     :elixir_interpolation.unescape_chars(piece)
   end
 
@@ -2254,7 +2254,7 @@ defmodule Kernel do
 
 
   """
-  defmacro sigil_w({:"<<>>", _meta, [string]}, modifiers) do
+  defmacro sigil_w({:"<<>>", _meta, [string]}, modifiers) when is_binary(string) do
     split_words(:elixir_interpolation.unescape_chars(string), modifiers, __CALLER__)
   end
 
@@ -2514,7 +2514,7 @@ defmodule Kernel do
 
 
   """
-  defmacro var!({name, meta, atom}, context) do
+  defmacro var!({name, meta, atom}, context) when is_atom(name) and is_atom(atom) do
     (
       meta = :lists.keydelete(:counter, 1, meta)
       meta = :lists.keystore(:var, 1, meta, {:var, true})
@@ -3017,15 +3017,15 @@ defmodule Kernel do
 
 
   """
-  def left =~ "" do
+  def left =~ "" when is_binary(left) do
     true
   end
 
-  def left =~ right do
+  def left =~ right when is_binary(left) and is_binary(right) do
     :binary.match(left, right) != :nomatch
   end
 
-  def left =~ right do
+  def left =~ right when is_binary(left) do
     Regex.match?(right, left)
   end
 
@@ -3439,19 +3439,19 @@ defmodule Kernel do
   `Access.key/2`, and others as examples.
 
   """
-  def get_and_update_in(data, [head], fun) do
+  def get_and_update_in(data, [head], fun) when :erlang.is_function(head, 3) do
     head.(:get_and_update, data, fun)
   end
 
-  def get_and_update_in(data, [head | tail], fun) do
+  def get_and_update_in(data, [head | tail], fun) when :erlang.is_function(head, 3) do
     head.(:get_and_update, data, fn x1 -> Kernel.get_and_update_in(x1, tail, fun) end)
   end
 
-  def get_and_update_in(data, [head], fun) do
+  def get_and_update_in(data, [head], fun) when :erlang.is_function(fun, 1) do
     Access.get_and_update(data, head, fun)
   end
 
-  def get_and_update_in(data, [head | tail], fun) do
+  def get_and_update_in(data, [head | tail], fun) when :erlang.is_function(fun, 1) do
     Access.get_and_update(data, head, fn x1 -> Kernel.get_and_update_in(x1, tail, fun) end)
   end
 
@@ -3501,11 +3501,11 @@ defmodule Kernel do
   `Access.key/2`, and others as examples.
 
   """
-  def get_in(data, [h]) do
+  def get_in(data, [h]) when :erlang.is_function(h) do
     h.(:get, data, fn x1 -> x1 end)
   end
 
-  def get_in(data, [h | t]) do
+  def get_in(data, [h | t]) when :erlang.is_function(h) do
     h.(:get, data, fn x1 -> Kernel.get_in(x1, t) end)
   end
 
@@ -3609,7 +3609,7 @@ defmodule Kernel do
   protocol for more information.
 
   """
-  def inspect(term, opts) do
+  def inspect(term, opts) when is_list(opts) do
     (
       opts = Kernel.struct(Inspect.Opts, opts)
       limit = case(opts.pretty()) do
@@ -3851,7 +3851,7 @@ defmodule Kernel do
 
 
   """
-  def macro_exported?(module, macro, arity) do
+  def macro_exported?(module, macro, arity) when is_atom(module) and is_atom(macro) and is_integer(arity) and (arity >= 0 and arity <= 255) do
     :erlang.function_exported(module, :__info__, 1) and :lists.member({macro, arity}, module.__info__(:macros))
   end
 
@@ -4401,11 +4401,11 @@ defmodule Kernel do
 
 
   """
-  def struct!(struct, fields) do
+  def struct!(struct, fields) when is_atom(struct) do
     validate_struct!(struct.__struct__(fields), struct, 1)
   end
 
-  def struct!(struct, fields) do
+  def struct!(struct, fields) when is_map(struct) do
     struct(struct, fields, fn
      {:__struct__, _}, acc ->
         acc
@@ -4520,7 +4520,7 @@ defmodule Kernel do
   an error will be raised when trying to access it next.
 
   """
-  def update_in(data, [_ | _] = keys, fun) do
+  def update_in(data, [_ | _] = keys, fun) when :erlang.is_function(fun) do
     elem(Kernel.get_and_update_in(data, keys, fn x -> {nil, fun.(x)} end), 1)
   end
 
@@ -4797,7 +4797,7 @@ defmodule Kernel do
     )
   end
 
-  defp do_at(args, _meta, name, function?, env) do
+  defp do_at(args, _meta, name, function?, env) when is_atom(args) or args == [] do
     (
       line = env.line()
       doc_attr? = :lists.member(name, [:moduledoc, :typedoc, :doc])
@@ -4841,7 +4841,7 @@ defmodule Kernel do
     )
   end
 
-  defp ensure_evaled_element(elem, acc) do
+  defp ensure_evaled_element(elem, acc) when :erlang.is_number(elem) or is_atom(elem) or is_binary(elem) do
     {elem, acc}
   end
 
@@ -4849,7 +4849,7 @@ defmodule Kernel do
     ensure_evaled_var(elem, acc)
   end
 
-  defp ensure_evaled_tail(elem, acc, expand) do
+  defp ensure_evaled_tail(elem, acc, expand) when is_list(elem) do
     ensure_evaled(elem, acc, expand)
   end
 
@@ -4913,7 +4913,7 @@ defmodule Kernel do
     {module, module, nil}
   end
 
-  defp expand_module({:__aliases__, _, [h | t]}, _module, env) do
+  defp expand_module({:__aliases__, _, [h | t]}, _module, env) when is_atom(h) do
     (
       module = :elixir_aliases.concat([env.module(), h])
       alias = String.to_atom(<<"Elixir."::binary(), Atom.to_string(h)::binary()>>)
@@ -4967,7 +4967,7 @@ defmodule Kernel do
     {{:".", [], [:erlang, :"=:="]}, [], [left, first]}
   end
 
-  defp in_range_literal(left, first, last) do
+  defp in_range_literal(left, first, last) when first < last do
     {{:".", [], [:erlang, :andalso]}, [], [{{:".", [], [:erlang, :is_integer]}, [], [left]}, increasing_compare(left, first, last)]}
   end
 
@@ -4979,7 +4979,7 @@ defmodule Kernel do
     fun.(ast)
   end
 
-  defp in_var(true, {atom, _, context} = var, fun) do
+  defp in_var(true, {atom, _, context} = var, fun) when is_atom(atom) and is_atom(context) do
     fun.(var)
   end
 
@@ -4999,7 +4999,7 @@ defmodule Kernel do
     raise(ArgumentError, <<"invalid expression in match, "::binary(), String.Chars.to_string(exp)::binary(), " is not allowed in patterns "::binary(), "such as function clauses, case clauses or on the left side of the = operator"::binary()>>)
   end
 
-  defp maybe_atomize_calendar(<<alias::integer(), _::binary()>> = last_part, string) do
+  defp maybe_atomize_calendar(<<alias::integer(), _::binary()>> = last_part, string) when alias >= 65 and alias <= 90 do
     (
       string = binary_part(string, 0, byte_size(string) - byte_size(last_part) - 1)
       {String.to_atom(<<"Elixir."::binary(), last_part::binary()>>), string}
@@ -5018,7 +5018,7 @@ defmodule Kernel do
     other
   end
 
-  defp module_var({name, kind}) do
+  defp module_var({name, kind}) when is_atom(kind) do
     {name, [generated: true], kind}
   end
 
@@ -5094,11 +5094,11 @@ defmodule Kernel do
     :pop
   end
 
-  defp pop_in_data(data, [fun]) do
+  defp pop_in_data(data, [fun]) when :erlang.is_function(fun) do
     fun.(:get_and_update, data, fn _ -> :pop end)
   end
 
-  defp pop_in_data(data, [fun | tail]) do
+  defp pop_in_data(data, [fun | tail]) when :erlang.is_function(fun) do
     fun.(:get_and_update, data, fn x1 -> pop_in_data(x1, tail) end)
   end
 
@@ -5110,11 +5110,11 @@ defmodule Kernel do
     Access.get_and_update(data, key, fn x1 -> pop_in_data(x1, tail) end)
   end
 
-  defp proper_start?({{:".", _, [expr, _]}, _, _args}) do
+  defp proper_start?({{:".", _, [expr, _]}, _, _args}) when is_atom(expr) or elem(expr, 0) == :__aliases__ or elem(expr, 0) == :__MODULE__ do
     true
   end
 
-  defp proper_start?({atom, _, _args}) do
+  defp proper_start?({atom, _, _args}) when is_atom(atom) do
     true
   end
 
@@ -5126,11 +5126,11 @@ defmodule Kernel do
     raise(ArgumentError, <<"invalid right argument for operator \"in\", it expects a compile-time proper list "::binary(), "or compile-time range on the right side when used in guard expressions, got: "::binary(), Macro.to_string(right)::binary()>>)
   end
 
-  defp range(_context, first, last) do
+  defp range(_context, first, last) when is_integer(first) and is_integer(last) do
     {:"%{}", [], [__struct__: Range, first: first, last: last]}
   end
 
-  defp range(_context, first, last) do
+  defp range(_context, first, last) when :erlang.is_float(first) or :erlang.is_float(last) or is_atom(first) or is_atom(last) or is_binary(first) or is_binary(last) or is_list(first) or is_list(last) do
     raise(ArgumentError, <<"ranges (first..last) expect both sides to be integers, "::binary(), "got: "::binary(), Macro.to_string({:"..", [], [first, last]})::binary()>>)
   end
 
@@ -5146,7 +5146,7 @@ defmodule Kernel do
     split_words(string, 's', caller)
   end
 
-  defp split_words(string, [mod], caller) do
+  defp split_words(string, [mod], caller) when mod == 115 or mod == 97 or mod == 99 do
     case(is_binary(string)) do
       true ->
         parts = String.split(string)
@@ -5183,11 +5183,11 @@ defmodule Kernel do
     raise(ArgumentError, "modifier must be one of: s, a, c")
   end
 
-  defp struct(struct, [], _fun) do
+  defp struct(struct, [], _fun) when is_atom(struct) do
     validate_struct!(struct.__struct__(), struct, 0)
   end
 
-  defp struct(struct, fields, fun) do
+  defp struct(struct, fields, fun) when is_atom(struct) do
     struct(validate_struct!(struct.__struct__(), struct, 0), fields, fun)
   end
 
@@ -5265,7 +5265,7 @@ defmodule Kernel do
     unnest(expr, [{:access, key} | acc], false, kind)
   end
 
-  defp unnest({{:".", _, [expr, key]}, _, []}, acc, all_map?, kind) do
+  defp unnest({{:".", _, [expr, key]}, _, []}, acc, all_map?, kind) when is_tuple(expr) and elem(expr, 0) != :__aliases__ and elem(expr, 0) != :__MODULE__ do
     unnest(expr, [{:map, key} | acc], all_map?, kind)
   end
 
@@ -5286,7 +5286,7 @@ defmodule Kernel do
     struct
   end
 
-  defp validate_struct!(%{__struct__: struct_name}, module, arity) do
+  defp validate_struct!(%{__struct__: struct_name}, module, arity) when is_atom(struct_name) do
     (
       error_message = <<"expected struct name returned by "::binary(), Kernel.inspect(module)::binary(), ".__struct__/"::binary(), String.Chars.to_string(arity)::binary(), " to be "::binary(), Kernel.inspect(module)::binary(), ", got: "::binary(), Kernel.inspect(struct_name)::binary()>>
       raise(ArgumentError, error_message)
@@ -5319,11 +5319,11 @@ defmodule Kernel do
     var
   end
 
-  defp wrap_concatenation(binary, _side, _caller) do
+  defp wrap_concatenation(binary, _side, _caller) when is_binary(binary) do
     binary
   end
 
-  defp wrap_concatenation(literal, _side, _caller) do
+  defp wrap_concatenation(literal, _side, _caller) when is_list(literal) or is_atom(literal) or is_integer(literal) or :erlang.is_float(literal) do
     raise(ArgumentError, <<"expected binary argument in <> operator but got: "::binary(), Macro.to_string(literal)::binary()>>)
   end
 

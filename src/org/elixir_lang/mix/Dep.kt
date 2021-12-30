@@ -76,18 +76,11 @@ data class Dep(val application: String, val path: String, val type: Type = Type.
                 }
 
         private fun name(atom: ElixirAtom): String? =
-                atom.charListLine?.let { name(it) }
-                        ?: atom.stringLine?.let { name(it) }
+                atom.line?.let { name(it) }
                         ?: atom.node.lastChildNode.text
 
-        private fun name(charListLine: ElixirCharListLine): String? {
-            Logger.error(logger, "Don't know how to convert ${charListLine.text} to dep name", charListLine.parent)
-
-            return null
-        }
-
-        private fun name(stringLine: ElixirStringLine): String? {
-            Logger.error(logger, "Don't know how to convert ${stringLine.text} to dep name", stringLine.parent)
+        private fun name(line: ElixirLine): String? {
+            Logger.error(logger, "Don't know how to convert ${line.text} to dep name", line.parent)
 
             return null
         }
@@ -96,7 +89,7 @@ data class Dep(val application: String, val path: String, val type: Type = Type.
             val strippedKeywordValue = keywordValue.stripAccessExpression()
 
             return when (strippedKeywordValue) {
-                is ElixirStringLine -> putPath(dep, strippedKeywordValue)
+                is ElixirLine -> putPath(dep, strippedKeywordValue)
                 is Call -> putPath(dep, strippedKeywordValue)
                 else -> {
                     Logger.error(logger, "Don't know how to convert ${keywordValue.text} to path", keywordValue.parent)
@@ -106,7 +99,7 @@ data class Dep(val application: String, val path: String, val type: Type = Type.
             }
         }
 
-        private fun putPath(dep: Dep, stringLine: ElixirStringLine): Dep = dep.copy(path = stringLine.body.text)
+        private fun putPath(dep: Dep, stringLine: ElixirLine): Dep = dep.copy(path = stringLine.body!!.text)
 
         private fun putPath(dep: Dep, call: Call): Dep =
                 call

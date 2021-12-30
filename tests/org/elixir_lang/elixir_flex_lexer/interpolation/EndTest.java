@@ -34,7 +34,7 @@ public class EndTest extends TokenTest {
 
         lexer.advance();
 
-        assertEquals(ElixirTypes.STRING_TERMINATOR, lexer.getTokenType());
+        assertEquals(ElixirTypes.LINE_TERMINATOR, lexer.getTokenType());
         assertEquals(ElixirFlexLexer.GROUP, lexer.getState());
     }
 }

@@ -242,7 +242,7 @@ object QuotableImpl {
     @Contract(pure = true)
     @JvmStatic
     fun quote(atom: ElixirAtom): OtpErlangObject =
-            atom.charListLine?.quoteAsAtom() ?: atom.stringLine?.quoteAsAtom() ?: atom.node.let { atomNode ->
+            atom.line?.quoteAsAtom() ?: atom.node.let { atomNode ->
                 val atomFragmentNode = atomNode.lastChildNode
 
                 assert(atomFragmentNode.elementType === ElixirTypes.ATOM_FRAGMENT)
@@ -256,8 +256,8 @@ object QuotableImpl {
 
     @Contract(pure = true)
     @JvmStatic
-    fun quote(charListLine: ElixirCharListLine): OtpErlangObject =
-            quotedChildNodes(charListLine, *childNodes(charListLine.charListLineBody!!))
+    fun quote(line: ElixirLine): OtpErlangObject =
+            quotedChildNodes(line, *childNodes(line.lineBody!!))
 
     @Contract(pure = true)
     @JvmStatic
@@ -271,7 +271,7 @@ object QuotableImpl {
         val tokenized = children[1]
         val tokenizedElementType = tokenized.elementType
 
-        val codePoint = if (tokenizedElementType === ElixirTypes.CHAR_LIST_FRAGMENT) {
+        val codePoint = if (tokenizedElementType === ElixirTypes.FRAGMENT) {
             if (tokenized.textLength != 1) {
                 throw TODO("Tokenized character expected to only be one character long")
             }
@@ -428,8 +428,8 @@ object QuotableImpl {
     @Contract(pure = true)
     @JvmStatic
     fun quote(keywordKey: ElixirKeywordKey): OtpErlangObject =
-            keywordKey.charListLine?.quoteAsAtom() ?: keywordKey.stringLine?.quoteAsAtom()
-            ?: OtpErlangAtom(computeReadAction<String>(Computable { keywordKey.text }))
+            keywordKey.line?.quoteAsAtom()
+            ?: OtpErlangAtom(computeReadAction<String> { keywordKey.text })
 
     @Contract(pure = true)
     @JvmStatic
@@ -1069,7 +1069,7 @@ object QuotableImpl {
     @Contract(pure = true)
     @JvmStatic
     fun quote(heredocLine: HeredocLine, heredoc: Heredoc, prefixLength: Int): OtpErlangObject {
-        val excessWhitespace = heredocLine.heredocLinePrefix.excessWhitespace(heredoc.fragmentType, prefixLength)
+        val excessWhitespace = heredocLine.heredocLinePrefix.excessWhitespace(ElixirTypes.FRAGMENT, prefixLength)
         val directChildNodes = childNodes(heredocLine.body)
 
         val accumulatedChildNodes = if (excessWhitespace != null) {
@@ -1091,15 +1091,14 @@ object QuotableImpl {
         val prefixLength = heredoc.heredocPrefix.textLength
         val alignedNodeQueue = LinkedList<ASTNode>()
         val heredocLineList = heredoc.heredocLineList
-        val fragmentType = heredoc.fragmentType
 
         for (line in heredocLineList) {
-            queueChildNodes(line, fragmentType, prefixLength, alignedNodeQueue)
+            queueChildNodes(line, ElixirTypes.FRAGMENT, prefixLength, alignedNodeQueue)
         }
 
         val mergedNodeQueue = mergeFragments(
                 alignedNodeQueue,
-                heredoc.fragmentType,
+                ElixirTypes.FRAGMENT,
                 heredoc.manager
         )
 
@@ -1149,11 +1148,6 @@ object QuotableImpl {
                 quotedMapArguments
         )
     }
-
-    @Contract(pure = true)
-    @JvmStatic
-    fun quote(stringLine: ElixirStringLine): OtpErlangObject =
-            quotedChildNodes(stringLine, *childNodes(stringLine.stringLineBody!!))
 
     @Contract(pure = true)
     @JvmStatic
@@ -1562,18 +1556,24 @@ object QuotableImpl {
             for (child in children) {
                 val elementType = child.elementType
 
-                if ((elementType === parent.fragmentType) || (elementType === ElixirTypes.EOL)) {
+                if ((elementType === ElixirTypes.FRAGMENT) || (elementType === ElixirTypes.EOL)) {
                     codePointList = parent.addFragmentCodePoints(codePointList, child)
                 } else if (elementType === ElixirTypes.ESCAPED_CHARACTER) {
                     codePointList = parent.addEscapedCharacterCodePoints(codePointList, child)
                 } else if (elementType === ElixirTypes.ESCAPED_EOL) {
                     codePointList = parent.addEscapedEOL(codePointList, child)
+                } else if (elementType === ElixirTypes.ESCAPED_HEREDOC_TERMINATOR || elementType === ElixirTypes.ESCAPED_LINE_TERMINATOR) {
+                    codePointList = parent.addEscapedTerminator(codePointList, child)
                 } else if (elementType === ElixirTypes.HEXADECIMAL_ESCAPE_PREFIX) {
                     codePointList = addChildTextCodePoints(codePointList, child)
                 } else if (elementType === ElixirTypes.INTERPOLATION) {
                     if (codePointList != null) {
                         quotedParentList.add(elixirString(codePointList))
                         codePointList = null
+                    }
+
+                    if (parent is Heredoc  &&  quotedParentList.isEmpty()) {
+                        quotedParentList.add(elixirString(""))
                     }
 
                     val childElement = child.psi as ElixirInterpolation

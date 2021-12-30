@@ -5,39 +5,38 @@ import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiElement;
 import org.elixir_lang.psi.stub.UnmatchedQualifiedNoParenthesesCall;
+import org.elixir_lang.psi.call.Call;
+import org.elixir_lang.psi.operation.In;
 import org.elixir_lang.psi.call.Named;
+import org.elixir_lang.psi.operation.Addition;
 import org.elixir_lang.psi.operation.InMatch;
 import org.elixir_lang.psi.stub.UnmatchedUnqualifiedNoArgumentsCall;
+import org.elixir_lang.psi.stub.UnmatchedUnqualifiedParenthesesCall;
+import org.elixir_lang.psi.operation.And;
 import org.elixir_lang.psi.operation.When;
 import org.elixir_lang.psi.stub.MatchedQualifiedNoArgumentsCall;
-import org.elixir_lang.psi.operation.And;
-import org.elixir_lang.psi.operation.Infix;
-import org.elixir_lang.psi.stub.MatchedDotCall;
 import org.elixir_lang.psi.operation.Match;
+import org.elixir_lang.psi.operation.Infix;
+import org.elixir_lang.psi.operation.Arrow;
+import org.elixir_lang.psi.operation.Pipe;
+import org.elixir_lang.psi.stub.MatchedDotCall;
+import org.elixir_lang.psi.stub.UnmatchedUnqualifiedNoParenthesesCall;
 import org.elixir_lang.psi.stub.MatchedQualifiedParenthesesCall;
 import org.elixir_lang.psi.operation.Or;
 import org.elixir_lang.psi.stub.MatchedQualifiedNoParenthesesCall;
-import org.elixir_lang.psi.stub.UnmatchedAtUnqualifiedNoParenthesesCall;
-import org.elixir_lang.psi.call.Call;
-import org.elixir_lang.psi.operation.NotIn;
-import org.elixir_lang.psi.operation.Three;
-import org.elixir_lang.psi.operation.capture.NonNumeric;
-import org.elixir_lang.psi.stub.MatchedAtUnqualifiedNoParenthesesCall;
-import org.elixir_lang.psi.operation.Two;
-import org.elixir_lang.psi.operation.Type;
-import org.elixir_lang.psi.operation.Multiplication;
-import org.elixir_lang.psi.stub.MatchedUnqualifiedParenthesesCall;
-import org.elixir_lang.psi.stub.UnmatchedQualifiedParenthesesCall;
-import org.elixir_lang.psi.operation.In;
-import org.elixir_lang.psi.operation.Addition;
-import org.elixir_lang.psi.stub.UnmatchedUnqualifiedParenthesesCall;
-import org.elixir_lang.psi.operation.Arrow;
-import org.elixir_lang.psi.operation.Pipe;
-import org.elixir_lang.psi.stub.UnmatchedUnqualifiedNoParenthesesCall;
 import com.intellij.psi.NavigatablePsiElement;
 import com.intellij.psi.PsiNamedElement;
 import org.elixir_lang.psi.stub.MatchedUnqualifiedNoParenthesesCall;
+import org.elixir_lang.psi.stub.UnmatchedAtUnqualifiedNoParenthesesCall;
+import org.elixir_lang.psi.operation.Power;
 import org.elixir_lang.psi.stub.UnmatchedDotCall;
+import org.elixir_lang.psi.operation.NotIn;
+import org.elixir_lang.psi.operation.capture.NonNumeric;
+import org.elixir_lang.psi.operation.Three;
+import org.elixir_lang.psi.stub.MatchedAtUnqualifiedNoParenthesesCall;
+import org.elixir_lang.psi.operation.Type;
+import org.elixir_lang.psi.operation.Two;
+import org.elixir_lang.psi.operation.Multiplication;
 import org.elixir_lang.psi.stub.UnmatchedQualifiedNoArgumentsCall;
 import org.elixir_lang.psi.stub.MatchedUnqualifiedNoArgumentsCall;
 import org.elixir_lang.psi.operation.Prefix;
@@ -45,6 +44,8 @@ import org.elixir_lang.psi.call.StubBased;
 import org.elixir_lang.psi.stub.UnqualifiedNoParenthesesManyArgumentsCall;
 import org.elixir_lang.psi.call.arguments.star.NoParentheses;
 import org.elixir_lang.psi.qualification.Unqualified;
+import org.elixir_lang.psi.stub.MatchedUnqualifiedParenthesesCall;
+import org.elixir_lang.psi.stub.UnmatchedQualifiedParenthesesCall;
 
 public class ElixirVisitor extends PsiElementVisitor {
 
@@ -139,31 +140,6 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitOperator(o);
   }
 
-  public void visitCharListHeredoc(@NotNull ElixirCharListHeredoc o) {
-    visitHeredoc(o);
-    // visitInterpolatedCharList(o);
-    // visitQuote(o);
-  }
-
-  public void visitCharListHeredocLine(@NotNull ElixirCharListHeredocLine o) {
-    visitHeredocLine(o);
-  }
-
-  public void visitCharListHeredocLineBody(@NotNull ElixirCharListHeredocLineBody o) {
-    visitBody(o);
-  }
-
-  public void visitCharListLine(@NotNull ElixirCharListLine o) {
-    visitAtomable(o);
-    // visitInterpolatedCharList(o);
-    // visitLine(o);
-    // visitQuotable(o);
-  }
-
-  public void visitCharListLineBody(@NotNull ElixirCharListLineBody o) {
-    visitBody(o);
-  }
-
   public void visitCharToken(@NotNull ElixirCharToken o) {
     visitQuotable(o);
   }
@@ -240,6 +216,35 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitEscapeSequence(o);
   }
 
+  public void visitEscapedHeredocTerminator(@NotNull ElixirEscapedHeredocTerminator o) {
+    visitPsiElement(o);
+  }
+
+  public void visitEscapedLineTerminator(@NotNull ElixirEscapedLineTerminator o) {
+    visitPsiElement(o);
+  }
+
+  public void visitHeredoc(@NotNull ElixirHeredoc o) {
+    visitHeredoc((Heredoc) o);
+    // visitQuote(o);
+  }
+
+  public void visitHeredoc(@NotNull Heredoc o) {
+    visitElement(o);
+  }
+
+  public void visitHeredocLine(@NotNull ElixirHeredocLine o) {
+    visitHeredocLine((HeredocLine) o);
+  }
+
+  public void visitHeredocLine(@NotNull HeredocLine o) {
+    visitElement(o);
+  }
+
+  public void visitHeredocLineBody(@NotNull ElixirHeredocLineBody o) {
+    visitBody(o);
+  }
+
   public void visitHeredocLinePrefix(@NotNull ElixirHeredocLinePrefix o) {
     visitPsiElement(o);
   }
@@ -272,115 +277,24 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitOperator(o);
   }
 
-  public void visitInterpolatedCharListHeredocLine(@NotNull ElixirInterpolatedCharListHeredocLine o) {
+  public void visitInterpolatedHeredocLine(@NotNull ElixirInterpolatedHeredocLine o) {
     visitHeredocLine(o);
   }
 
-  public void visitInterpolatedCharListHeredocLineBody(@NotNull ElixirInterpolatedCharListHeredocLineBody o) {
-    visitBody(o);
-  }
-
-  public void visitInterpolatedCharListSigilHeredoc(@NotNull ElixirInterpolatedCharListSigilHeredoc o) {
-    visitCharListFragmented(o);
-    // visitInterpolatedCharListHeredocLined(o);
-    // visitInterpolatedSigilHeredoc(o);
-  }
-
-  public void visitInterpolatedCharListSigilLine(@NotNull ElixirInterpolatedCharListSigilLine o) {
-    visitCharListFragmented(o);
-    // visitInterpolatedSigilLine(o);
-  }
-
-  public void visitInterpolatedCharListSigilLineBody(@NotNull ElixirInterpolatedCharListSigilLineBody o) {
-    visitBody(o);
-  }
-
-  public void visitInterpolatedRegexHeredoc(@NotNull ElixirInterpolatedRegexHeredoc o) {
-    visitRegexFragmented(o);
-    // visitInterpolatedSigilHeredoc(o);
-  }
-
-  public void visitInterpolatedRegexHeredocLine(@NotNull ElixirInterpolatedRegexHeredocLine o) {
-    visitHeredocLine(o);
-  }
-
-  public void visitInterpolatedRegexHeredocLineBody(@NotNull ElixirInterpolatedRegexHeredocLineBody o) {
-    visitBody(o);
-  }
-
-  public void visitInterpolatedRegexLine(@NotNull ElixirInterpolatedRegexLine o) {
-    visitRegexFragmented(o);
-    // visitInterpolatedSigilLine(o);
-  }
-
-  public void visitInterpolatedRegexLineBody(@NotNull ElixirInterpolatedRegexLineBody o) {
+  public void visitInterpolatedHeredocLineBody(@NotNull ElixirInterpolatedHeredocLineBody o) {
     visitBody(o);
   }
 
   public void visitInterpolatedSigilHeredoc(@NotNull ElixirInterpolatedSigilHeredoc o) {
-    visitInterpolatedSigilHeredoc(o);
-    // visitSigilFragmented(o);
-  }
-
-  public void visitInterpolatedSigilHeredocLine(@NotNull ElixirInterpolatedSigilHeredocLine o) {
-    visitHeredocLine(o);
-  }
-
-  public void visitInterpolatedSigilHeredocLineBody(@NotNull ElixirInterpolatedSigilHeredocLineBody o) {
-    visitBody(o);
+    visitSigilHeredoc(o);
   }
 
   public void visitInterpolatedSigilLine(@NotNull ElixirInterpolatedSigilLine o) {
-    visitSigilFragmented(o);
-    // visitInterpolatedSigilLine(o);
+    visitInterpolated(o);
+    // visitSigilLine(o);
   }
 
   public void visitInterpolatedSigilLineBody(@NotNull ElixirInterpolatedSigilLineBody o) {
-    visitBody(o);
-  }
-
-  public void visitInterpolatedStringHeredocLine(@NotNull ElixirInterpolatedStringHeredocLine o) {
-    visitHeredocLine(o);
-  }
-
-  public void visitInterpolatedStringHeredocLineBody(@NotNull ElixirInterpolatedStringHeredocLineBody o) {
-    visitBody(o);
-  }
-
-  public void visitInterpolatedStringSigilHeredoc(@NotNull ElixirInterpolatedStringSigilHeredoc o) {
-    visitStringFragmented(o);
-    // visitInterpolatedSigilHeredoc(o);
-    // visitInterpolatedStringHeredocLined(o);
-  }
-
-  public void visitInterpolatedStringSigilLine(@NotNull ElixirInterpolatedStringSigilLine o) {
-    visitStringFragmented(o);
-    // visitInterpolatedSigilLine(o);
-  }
-
-  public void visitInterpolatedStringSigilLineBody(@NotNull ElixirInterpolatedStringSigilLineBody o) {
-    visitBody(o);
-  }
-
-  public void visitInterpolatedWordsHeredoc(@NotNull ElixirInterpolatedWordsHeredoc o) {
-    visitWordsFragmented(o);
-    // visitInterpolatedSigilHeredoc(o);
-  }
-
-  public void visitInterpolatedWordsHeredocLine(@NotNull ElixirInterpolatedWordsHeredocLine o) {
-    visitHeredocLine(o);
-  }
-
-  public void visitInterpolatedWordsHeredocLineBody(@NotNull ElixirInterpolatedWordsHeredocLineBody o) {
-    visitBody(o);
-  }
-
-  public void visitInterpolatedWordsLine(@NotNull ElixirInterpolatedWordsLine o) {
-    visitWordsFragmented(o);
-    // visitInterpolatedSigilLine(o);
-  }
-
-  public void visitInterpolatedWordsLineBody(@NotNull ElixirInterpolatedWordsLineBody o) {
     visitBody(o);
   }
 
@@ -401,117 +315,41 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitQuotableKeywordList(o);
   }
 
+  public void visitLine(@NotNull ElixirLine o) {
+    visitAtomable(o);
+    // visitInterpolated(o);
+    // visitLine(o);
+    // visitQuotable(o);
+    // visitQuote(o);
+  }
+
+  public void visitLineBody(@NotNull ElixirLineBody o) {
+    visitBody(o);
+  }
+
   public void visitList(@NotNull ElixirList o) {
     visitQuotable(o);
   }
 
-  public void visitLiteralCharListHeredocLine(@NotNull ElixirLiteralCharListHeredocLine o) {
+  public void visitLiteralHeredocLine(@NotNull ElixirLiteralHeredocLine o) {
     visitHeredocLine(o);
   }
 
-  public void visitLiteralCharListHeredocLineBody(@NotNull ElixirLiteralCharListHeredocLineBody o) {
-    visitBody(o);
-  }
-
-  public void visitLiteralCharListSigilHeredoc(@NotNull ElixirLiteralCharListSigilHeredoc o) {
-    visitCharListFragmented(o);
-    // visitLiteralSigilHeredoc(o);
-  }
-
-  public void visitLiteralCharListSigilLine(@NotNull ElixirLiteralCharListSigilLine o) {
-    visitCharListFragmented(o);
-    // visitLiteralSigilLine(o);
-  }
-
-  public void visitLiteralCharListSigilLineBody(@NotNull ElixirLiteralCharListSigilLineBody o) {
-    visitBody(o);
-  }
-
-  public void visitLiteralRegexHeredoc(@NotNull ElixirLiteralRegexHeredoc o) {
-    visitRegexFragmented(o);
-    // visitLiteralSigilHeredoc(o);
-  }
-
-  public void visitLiteralRegexHeredocLine(@NotNull ElixirLiteralRegexHeredocLine o) {
-    visitHeredocLine(o);
-  }
-
-  public void visitLiteralRegexHeredocLineBody(@NotNull ElixirLiteralRegexHeredocLineBody o) {
-    visitBody(o);
-  }
-
-  public void visitLiteralRegexLine(@NotNull ElixirLiteralRegexLine o) {
-    visitRegexFragmented(o);
-    // visitLiteralSigilLine(o);
-  }
-
-  public void visitLiteralRegexLineBody(@NotNull ElixirLiteralRegexLineBody o) {
+  public void visitLiteralHeredocLineBody(@NotNull ElixirLiteralHeredocLineBody o) {
     visitBody(o);
   }
 
   public void visitLiteralSigilHeredoc(@NotNull ElixirLiteralSigilHeredoc o) {
-    visitSigilFragmented(o);
-    // visitLiteralSigilHeredoc(o);
-  }
-
-  public void visitLiteralSigilHeredocLine(@NotNull ElixirLiteralSigilHeredocLine o) {
-    visitHeredocLine(o);
-  }
-
-  public void visitLiteralSigilHeredocLineBody(@NotNull ElixirLiteralSigilHeredocLineBody o) {
-    visitBody(o);
+    visitLiteral(o);
+    // visitSigilHeredoc(o);
   }
 
   public void visitLiteralSigilLine(@NotNull ElixirLiteralSigilLine o) {
-    visitLiteralSigilLineBody(o.getLiteralSigilLineBody());
-    visitSigilModifiers(o.getSigilModifiers());
+    visitLiteral(o);
+    // visitSigilLine(o);
   }
 
   public void visitLiteralSigilLineBody(@NotNull ElixirLiteralSigilLineBody o) {
-    visitBody(o);
-  }
-
-  public void visitLiteralStringHeredocLine(@NotNull ElixirLiteralStringHeredocLine o) {
-    visitHeredocLine(o);
-  }
-
-  public void visitLiteralStringHeredocLineBody(@NotNull ElixirLiteralStringHeredocLineBody o) {
-    visitBody(o);
-  }
-
-  public void visitLiteralStringSigilHeredoc(@NotNull ElixirLiteralStringSigilHeredoc o) {
-    visitStringFragmented(o);
-    // visitLiteralSigilHeredoc(o);
-  }
-
-  public void visitLiteralStringSigilLine(@NotNull ElixirLiteralStringSigilLine o) {
-    visitStringFragmented(o);
-    // visitLiteralSigilLine(o);
-  }
-
-  public void visitLiteralStringSigilLineBody(@NotNull ElixirLiteralStringSigilLineBody o) {
-    visitBody(o);
-  }
-
-  public void visitLiteralWordsHeredoc(@NotNull ElixirLiteralWordsHeredoc o) {
-    visitWordsFragmented(o);
-    // visitLiteralSigilHeredoc(o);
-  }
-
-  public void visitLiteralWordsHeredocLine(@NotNull ElixirLiteralWordsHeredocLine o) {
-    visitHeredocLine(o);
-  }
-
-  public void visitLiteralWordsHeredocLineBody(@NotNull ElixirLiteralWordsHeredocLineBody o) {
-    visitBody(o);
-  }
-
-  public void visitLiteralWordsLine(@NotNull ElixirLiteralWordsLine o) {
-    visitWordsFragmented(o);
-    // visitLiteralSigilLine(o);
-  }
-
-  public void visitLiteralWordsLineBody(@NotNull ElixirLiteralWordsLineBody o) {
     visitBody(o);
   }
 
@@ -570,7 +408,7 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitElement(o);
   }
 
-    public void visitMatchedAtUnqualifiedBracketOperation(@NotNull ElixirMatchedAtUnqualifiedBracketOperation o) {
+  public void visitMatchedAtUnqualifiedBracketOperation(@NotNull ElixirMatchedAtUnqualifiedBracketOperation o) {
     visitMatchedExpression(o);
     // visitAtUnqualifiedBracketOperation(o);
   }
@@ -654,6 +492,12 @@ public class ElixirVisitor extends PsiElementVisitor {
     // visitPipe(o);
   }
 
+  public void visitMatchedPowerOperation(@NotNull ElixirMatchedPowerOperation o) {
+    visitMatchedExpression(o);
+    // visitNamed(o);
+    // visitPower(o);
+  }
+
   public void visitMatchedQualifiedAlias(@NotNull ElixirMatchedQualifiedAlias o) {
     visitMatchedExpression(o);
     // visitNamedElement(o);
@@ -714,7 +558,7 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitMatchedUnaryOperation(@NotNull ElixirMatchedUnaryOperation o) {
     visitMatchedExpression(o);
-    // visitUnaryNonNumericOperation(o);
+    // visitUnaryOperation(o);
   }
 
   public void visitMatchedUnqualifiedBracketOperation(@NotNull ElixirMatchedUnqualifiedBracketOperation o) {
@@ -814,6 +658,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitOperator(o);
   }
 
+  public void visitPowerInfixOperator(@NotNull ElixirPowerInfixOperator o) {
+    visitOperator(o);
+  }
+
   public void visitQuoteHexadecimalEscapeSequence(@NotNull ElixirQuoteHexadecimalEscapeSequence o) {
     visitEscapeSequence(o);
   }
@@ -857,30 +705,6 @@ public class ElixirVisitor extends PsiElementVisitor {
   public void visitStabParenthesesSignature(@NotNull ElixirStabParenthesesSignature o) {
     visitQuotable(o);
     // visitWhen(o);
-  }
-
-  public void visitStringHeredoc(@NotNull ElixirStringHeredoc o) {
-    visitHeredoc(o);
-    // visitInterpolatedString(o);
-  }
-
-  public void visitStringHeredocLine(@NotNull ElixirStringHeredocLine o) {
-    visitHeredocLine(o);
-  }
-
-  public void visitStringHeredocLineBody(@NotNull ElixirStringHeredocLineBody o) {
-    visitBody(o);
-  }
-
-  public void visitStringLine(@NotNull ElixirStringLine o) {
-    visitAtomable(o);
-    // visitInterpolatedString(o);
-    // visitLine(o);
-    // visitQuotable(o);
-  }
-
-  public void visitStringLineBody(@NotNull ElixirStringLineBody o) {
-    visitBody(o);
   }
 
   public void visitStructOperation(@NotNull ElixirStructOperation o) {
@@ -1020,6 +844,12 @@ public class ElixirVisitor extends PsiElementVisitor {
     // visitPipe(o);
   }
 
+  public void visitUnmatchedPowerOperation(@NotNull ElixirUnmatchedPowerOperation o) {
+    visitUnmatchedExpression(o);
+    // visitNamed(o);
+    // visitPower(o);
+  }
+
   public void visitUnmatchedQualifiedAlias(@NotNull ElixirUnmatchedQualifiedAlias o) {
     visitUnmatchedExpression(o);
     // visitQualifiedAlias(o);
@@ -1076,7 +906,7 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitUnmatchedUnaryOperation(@NotNull ElixirUnmatchedUnaryOperation o) {
     visitUnmatchedExpression(o);
-    // visitUnaryNonNumericOperation(o);
+    // visitUnaryOperation(o);
   }
 
   public void visitUnmatchedUnqualifiedBracketOperation(@NotNull ElixirUnmatchedUnqualifiedBracketOperation o) {
@@ -1142,10 +972,6 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitElement(o);
   }
 
-  public void visitCharListFragmented(@NotNull CharListFragmented o) {
-    visitElement(o);
-  }
-
   public void visitDigits(@NotNull Digits o) {
     visitElement(o);
   }
@@ -1158,11 +984,11 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitElement(o);
   }
 
-  public void visitHeredoc(@NotNull Heredoc o) {
+  public void visitInterpolated(@NotNull Interpolated o) {
     visitElement(o);
   }
 
-  public void visitHeredocLine(@NotNull HeredocLine o) {
+  public void visitLiteral(@NotNull Literal o) {
     visitElement(o);
   }
 
@@ -1194,15 +1020,7 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitElement(o);
   }
 
-  public void visitRegexFragmented(@NotNull RegexFragmented o) {
-    visitElement(o);
-  }
-
-  public void visitSigilFragmented(@NotNull SigilFragmented o) {
-    visitElement(o);
-  }
-
-  public void visitStringFragmented(@NotNull StringFragmented o) {
+  public void visitSigilHeredoc(@NotNull SigilHeredoc o) {
     visitElement(o);
   }
 
@@ -1211,10 +1029,6 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitWholeNumber(@NotNull WholeNumber o) {
-    visitElement(o);
-  }
-
-  public void visitWordsFragmented(@NotNull WordsFragmented o) {
     visitElement(o);
   }
 

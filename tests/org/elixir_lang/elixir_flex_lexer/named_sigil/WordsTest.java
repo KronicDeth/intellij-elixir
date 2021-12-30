@@ -12,26 +12,10 @@ import java.util.Collection;
  */
 @RunWith(Parameterized.class)
 public class WordsTest extends Test {
-    /*
-     * Constants
-     */
-
-    public static final Sigil sigil = new Sigil() {
-        @Override
-        public IElementType heredocPromoterType() {
-            return ElixirTypes.WORDS_HEREDOC_PROMOTER;
-        }
-
-        @Override
-        public IElementType promoterType() {
-            return ElixirTypes.WORDS_PROMOTER;
-        }
-
-        @Override
-        public char name() {
-            return 'w';
-        }
-    };
+    @Override
+    public char name() {
+        return 'w';
+    }
 
     /*
      * Constructors
@@ -41,19 +25,10 @@ public class WordsTest extends Test {
         super(charSequence, tokenType, lexicalState);
     }
 
-    /*
-     * Methods
-     */
-
-    @Override
-    protected Sigil instanceSigil() {
-        return sigil;
-    }
-
     @Parameterized.Parameters(
             name = "\"{0}\" parses as {1} token and advances to state {2}"
     )
     public static Collection<Object[]> generateData() {
-        return Test.generateData(sigil);
+        return Test.generateData();
     }
 }

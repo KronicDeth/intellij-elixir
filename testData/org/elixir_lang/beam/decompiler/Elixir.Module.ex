@@ -513,7 +513,7 @@ defmodule Module do
   # Functions
 
   @doc false
-  def __get_attribute__(module, key, line) do
+  def __get_attribute__(module, key, line) when is_atom(key) do
     (
       assert_not_compiled!({:get_attribute, 2}, module, "Use the Module.__info__/1 callback or Code.fetch_docs/1 instead")
       {set, bag} = data_tables_for(module)
@@ -540,7 +540,7 @@ defmodule Module do
   end
 
   @doc false
-  def __put_attribute__(module, key, value, line) do
+  def __put_attribute__(module, key, value, line) when is_atom(key) do
     (
       assert_not_readonly!({:__put_attribute__, 4}, module)
       {set, bag} = data_tables_for(module)
@@ -629,7 +629,7 @@ defmodule Module do
 
 
   """
-  def concat(list) do
+  def concat(list) when is_list(list) do
     :elixir_aliases.concat(list)
   end
 
@@ -646,7 +646,7 @@ defmodule Module do
 
 
   """
-  def concat(left, right) do
+  def concat(left, right) when (is_binary(left) or is_atom(left)) and (is_binary(right) or is_atom(right)) do
     :elixir_aliases.concat([left, right])
   end
 
@@ -692,11 +692,11 @@ defmodule Module do
   automatically uses the environment it is invoked at.
 
   """
-  def create(module, quoted, %Macro.Env{} = env) do
+  def create(module, quoted, %Macro.Env{} = env) when is_atom(module) do
     create(module, quoted, :maps.to_list(env))
   end
 
-  def create(module, quoted, opts) do
+  def create(module, quoted, opts) when is_atom(module) and is_list(opts) do
     (
       if(Keyword.has_key?(opts, :file)) do
         raise(ArgumentError, "expected :file to be given as option")
@@ -734,7 +734,7 @@ defmodule Module do
 
 
   """
-  def defines?(module, {name, arity} = tuple) do
+  def defines?(module, {name, arity} = tuple) when is_atom(module) and is_atom(name) and is_integer(arity) and arity >= 0 and arity <= 255 do
     (
       assert_not_compiled!({:defines?, 2}, module, "Use Kernel.function_exported?/3 and Kernel.macro_exported?/3 to check for public functions and macros instead")
       {set, _bag} = data_tables_for(module)
@@ -762,7 +762,7 @@ defmodule Module do
 
 
   """
-  def defines?(module, {name, arity} = tuple, def_kind) do
+  def defines?(module, {name, arity} = tuple, def_kind) when is_atom(module) and is_atom(name) and is_integer(arity) and arity >= 0 and arity <= 255 and (def_kind === :def or def_kind === :defp or def_kind === :defmacro or def_kind === :defmacrop) do
     (
       assert_not_compiled!({:defines?, 3}, module, "Use Kernel.function_exported?/3 and Kernel.macro_exported?/3 to check for public functions and macros instead")
       {set, _bag} = data_tables_for(module)
@@ -800,7 +800,7 @@ defmodule Module do
 
 
   """
-  def definitions_in(module) do
+  def definitions_in(module) when is_atom(module) do
     (
       assert_not_compiled!({:definitions_in, 1}, module, "Use the Module.__info__/1 callback to get public functions and macros instead")
       {_, bag} = data_tables_for(module)
@@ -826,7 +826,7 @@ defmodule Module do
 
 
   """
-  def definitions_in(module, kind) do
+  def definitions_in(module, kind) when is_atom(module) and (kind === :def or kind === :defp or kind === :defmacro or kind === :defmacrop) do
     (
       assert_not_compiled!({:definitions_in, 2}, module, "Use the Module.__info__/1 callback to get public functions and macros instead")
       {set, _} = data_tables_for(module)
@@ -848,7 +848,7 @@ defmodule Module do
 
 
   """
-  def delete_attribute(module, key) do
+  def delete_attribute(module, key) when is_atom(module) and is_atom(key) do
     (
       assert_not_readonly!({:delete_attribute, 2}, module)
       {set, bag} = data_tables_for(module)
@@ -916,15 +916,15 @@ defmodule Module do
   having precedence.
 
   """
-  def eval_quoted(%Macro.Env{} = env, quoted, binding, opts) do
+  def eval_quoted(%Macro.Env{} = env, quoted, binding, opts) when is_list(binding) and is_list(opts) do
     eval_quoted(env.module(), quoted, binding, Keyword.merge(:maps.to_list(env), opts))
   end
 
-  def eval_quoted(module, quoted, binding, %Macro.Env{} = env) do
+  def eval_quoted(module, quoted, binding, %Macro.Env{} = env) when is_atom(module) and is_list(binding) do
     eval_quoted(module, quoted, binding, :maps.to_list(env))
   end
 
-  def eval_quoted(module, quoted, binding, opts) do
+  def eval_quoted(module, quoted, binding, opts) when is_atom(module) and is_list(binding) and is_list(opts) do
     (
       assert_not_compiled!({:eval_quoted, 4}, module)
       :elixir_def.reset_last(module)
@@ -975,7 +975,7 @@ defmodule Module do
 
 
   """
-  def get_attribute(module, key, default) do
+  def get_attribute(module, key, default) when is_atom(module) and is_atom(key) do
     case(__get_attribute__(module, key, nil)) do
       nil ->
         default
@@ -1012,7 +1012,7 @@ defmodule Module do
 
 
   """
-  def has_attribute?(module, key) do
+  def has_attribute?(module, key) when is_atom(module) and is_atom(key) do
     (
       assert_not_compiled!({:has_attribute?, 2}, module)
       {set, _bag} = data_tables_for(module)
@@ -1033,7 +1033,7 @@ defmodule Module do
   given.
 
   """
-  def make_overridable(module, tuples) do
+  def make_overridable(module, tuples) when is_atom(module) and is_list(tuples) do
     (
       assert_not_readonly!({:make_overridable, 2}, module)
       func = fn
@@ -1052,7 +1052,7 @@ defmodule Module do
     )
   end
 
-  def make_overridable(module, behaviour) do
+  def make_overridable(module, behaviour) when is_atom(module) and is_atom(behaviour) do
     (
       case(check_module_for_overridable(module, behaviour)) do
         :ok ->
@@ -1086,7 +1086,7 @@ defmodule Module do
   functions can be modified.
 
   """
-  def open?(module) do
+  def open?(module) when is_atom(module) do
     :elixir_module.is_open(module)
   end
 
@@ -1094,7 +1094,7 @@ defmodule Module do
   Returns `true` if `tuple` in `module` is marked as overridable.
 
   """
-  def overridable?(module, {function_name, arity} = tuple) do
+  def overridable?(module, {function_name, arity} = tuple) when is_atom(function_name) and is_integer(arity) and arity >= 0 and arity <= 255 do
     :elixir_overridable.overridable_for(module, tuple) != :not_overridable
   end
 
@@ -1109,7 +1109,7 @@ defmodule Module do
 
 
   """
-  def put_attribute(module, key, value) do
+  def put_attribute(module, key, value) when is_atom(module) and is_atom(key) do
     __put_attribute__(module, key, value, nil)
   end
 
@@ -1144,7 +1144,7 @@ defmodule Module do
 
 
   """
-  def register_attribute(module, attribute, options) do
+  def register_attribute(module, attribute, options) when is_atom(module) and is_atom(attribute) and is_list(options) do
     (
       assert_not_readonly!({:register_attribute, 3}, module)
       {set, bag} = data_tables_for(module)
@@ -1180,7 +1180,7 @@ defmodule Module do
 
 
   """
-  def safe_concat(list) do
+  def safe_concat(list) when is_list(list) do
     :elixir_aliases.safe_concat(list)
   end
 
@@ -1201,7 +1201,7 @@ defmodule Module do
 
 
   """
-  def safe_concat(left, right) do
+  def safe_concat(left, right) when (is_binary(left) or is_atom(left)) and (is_binary(right) or is_atom(right)) do
     :elixir_aliases.safe_concat([left, right])
   end
 
@@ -1235,11 +1235,11 @@ defmodule Module do
 
 
   """
-  def split(module) do
+  def split(module) when is_atom(module) do
     split(Atom.to_string(module), _original = module)
   end
 
-  def split(module) do
+  def split(module) when is_binary(module) do
     split(module, _original = module)
   end
 
@@ -1522,7 +1522,7 @@ defmodule Module do
     end
   end
 
-  defp compile_doc(_table, _ctx, line, kind, name, arity, _args, _body, doc, _meta, env, _impl) do
+  defp compile_doc(_table, _ctx, line, kind, name, arity, _args, _body, doc, _meta, env, _impl) when kind === :defp or kind === :defmacrop do
     if(doc) do
       nil
     else
@@ -1624,14 +1624,14 @@ defmodule Module do
     end
   end
 
-  defp expand_keys([{:\\, meta, [key, default]} | keys], counters, acc) do
+  defp expand_keys([{:\\, meta, [key, default]} | keys], counters, acc) when is_atom(key) do
     (
       {var, counters} = expand_key(key, counters)
       expand_keys(keys, counters, [{:\\, meta, [var, default]} | acc])
     )
   end
 
-  defp expand_keys([key | keys], counters, acc) do
+  defp expand_keys([key | keys], counters, acc) when is_atom(key) do
     (
       {var, counters} = expand_key(key, counters)
       expand_keys(keys, counters, [var | acc])
@@ -1719,7 +1719,7 @@ defmodule Module do
     end
   end
 
-  defp impl_behaviours(_, kind, _, _, _) do
+  defp impl_behaviours(_, kind, _, _, _) when kind === :defp or kind === :defmacrop do
     {:error, :private_function}
   end
 
@@ -1768,7 +1768,7 @@ defmodule Module do
     )
   end
 
-  defp known_callbacks(callbacks) do
+  defp known_callbacks(callbacks) when map_size(callbacks) == 0 do
     <<". There are no known callbacks, please specify the proper @behaviour "::binary(), "and make sure it defines callbacks"::binary()>>
   end
 
@@ -1839,7 +1839,7 @@ defmodule Module do
     map
   end
 
-  defp preprocess_doc_meta([{key, _} | tail], module, line, map) do
+  defp preprocess_doc_meta([{key, _} | tail], module, line, map) when key === :opaque or key === :defaults do
     (
       message = <<"ignoring reserved documentation metadata key: "::binary(), Kernel.inspect(key)::binary()>>
       IO.warn(message, attribute_stack(module, line))
@@ -1847,7 +1847,7 @@ defmodule Module do
     )
   end
 
-  defp preprocess_doc_meta([{key, value} | tail], module, line, map) do
+  defp preprocess_doc_meta([{key, value} | tail], module, line, map) when is_atom(key) do
     (
       validate_doc_meta(key, value)
       preprocess_doc_meta(tail, module, line, :maps.put(key, value, map))
@@ -1858,7 +1858,7 @@ defmodule Module do
     Code.ensure_loaded?(module) and :erlang.function_exported(module, :__protocol__, 1) and module.__protocol__(:module) == module
   end
 
-  defp put_attribute(module, key, {_, metadata}, line, set, _bag) do
+  defp put_attribute(module, key, {_, metadata}, line, set, _bag) when (key === :doc or key === :typedoc or key === :moduledoc) and is_list(metadata) do
     (
       metadata_map = preprocess_doc_meta(metadata, module, line, %{})
       case(:ets.insert_new(set, {{key, :meta}, metadata_map, line})) do
@@ -1871,7 +1871,7 @@ defmodule Module do
     )
   end
 
-  defp put_attribute(module, key, value, line, set, _bag) do
+  defp put_attribute(module, key, value, line, set, _bag) when key === :doc or key === :typedoc or key === :moduledoc or key === :impl or key === :deprecated do
     (
       try() do
         :ets.lookup_element(set, key, 3)
@@ -1940,7 +1940,7 @@ defmodule Module do
     {reverse_args, counters}
   end
 
-  defp simplify_module_name(module) do
+  defp simplify_module_name(module) when is_atom(module) do
     try() do
       split(module)
     rescue
@@ -1971,11 +1971,11 @@ defmodule Module do
     raise(ArgumentError, <<"expected an Elixir module, got: "::binary(), Kernel.inspect(original)::binary()>>)
   end
 
-  defp validate_doc_meta(:since, value) do
+  defp validate_doc_meta(:since, value) when not(is_binary(value)) do
     raise(ArgumentError, <<":since is a built-in documentation metadata key. It should be a string representing "::binary(), "the version in which the documented entity was added, got: "::binary(), Kernel.inspect(value)::binary()>>)
   end
 
-  defp validate_doc_meta(:deprecated, value) do
+  defp validate_doc_meta(:deprecated, value) when not(is_binary(value)) do
     raise(ArgumentError, <<":deprecated is a built-in documentation metadata key. It should be a string "::binary(), "representing the replacement for the deprecated entity, got: "::binary(), Kernel.inspect(value)::binary()>>)
   end
 
@@ -1992,7 +1992,7 @@ defmodule Module do
     :ok
   end
 
-  defp warn_missing_impls(_env, callbacks, _contexts, _defs) do
+  defp warn_missing_impls(_env, callbacks, _contexts, _defs) when map_size(callbacks) == 0 do
     :ok
   end
 

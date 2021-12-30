@@ -38,15 +38,10 @@ object PsiNameIdentifierOwnerImpl {
 
     @JvmStatic
     fun getNameIdentifier(keywordKey: ElixirKeywordKey): PsiElement? =
-            if (keywordKey.charListLine != null) {
+            if (keywordKey.line != null) {
                 null
             } else {
-
-                if (keywordKey.stringLine != null) {
-                    null
-                } else {
-                    keywordKey
-                }
+                keywordKey
             }
 
     @JvmStatic

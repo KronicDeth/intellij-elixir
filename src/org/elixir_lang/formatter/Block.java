@@ -45,30 +45,10 @@ public class Block extends AbstractBlock implements BlockEx {
             UNMATCHED_ARROW_OPERATION
     );
     private static final TokenSet BODY_TOKEN_SET = TokenSet.create(
-            CHAR_LIST_HEREDOC_LINE_BODY,
-            CHAR_LIST_LINE_BODY,
-            INTERPOLATED_CHAR_LIST_HEREDOC_LINE_BODY,
-            INTERPOLATED_CHAR_LIST_SIGIL_LINE_BODY,
-            INTERPOLATED_REGEX_HEREDOC_LINE_BODY,
-            INTERPOLATED_REGEX_LINE_BODY,
-            INTERPOLATED_SIGIL_HEREDOC_LINE_BODY,
+            HEREDOC_LINE_BODY,
+            LINE_BODY,
             INTERPOLATED_SIGIL_LINE_BODY,
-            INTERPOLATED_STRING_HEREDOC_LINE_BODY,
-            INTERPOLATED_STRING_SIGIL_LINE_BODY,
-            INTERPOLATED_WORDS_HEREDOC_LINE_BODY,
-            INTERPOLATED_WORDS_LINE_BODY,
-            LITERAL_CHAR_LIST_HEREDOC_LINE_BODY,
-            LITERAL_CHAR_LIST_SIGIL_LINE_BODY,
-            LITERAL_REGEX_HEREDOC_LINE_BODY,
-            LITERAL_REGEX_LINE_BODY,
-            LITERAL_SIGIL_HEREDOC_LINE_BODY,
-            LITERAL_SIGIL_LINE_BODY,
-            LITERAL_STRING_HEREDOC_LINE_BODY,
-            LITERAL_STRING_SIGIL_LINE_BODY,
-            LITERAL_WORDS_HEREDOC_LINE_BODY,
-            LITERAL_WORDS_LINE_BODY,
-            STRING_HEREDOC_LINE_BODY,
-            STRING_LINE_BODY
+            LITERAL_SIGIL_LINE_BODY
     );
     private static final TokenSet BOOLEAN_WORD_OPERATOR_TOKEN_SET = TokenSet.create(
             AND_WORD_OPERATOR,
@@ -83,50 +63,23 @@ public class Block extends AbstractBlock implements BlockEx {
             UNMATCHED_COMPARISON_OPERATION
     );
     private static final TokenSet HEREDOC_LINE_TOKEN_SET = TokenSet.create(
-            CHAR_LIST_HEREDOC_LINE,
-            INTERPOLATED_CHAR_LIST_HEREDOC_LINE,
-            INTERPOLATED_REGEX_HEREDOC_LINE,
-            INTERPOLATED_SIGIL_HEREDOC_LINE,
-            INTERPOLATED_STRING_HEREDOC_LINE,
-            INTERPOLATED_WORDS_HEREDOC_LINE,
-            LITERAL_CHAR_LIST_HEREDOC_LINE,
-            LITERAL_REGEX_HEREDOC_LINE,
-            LITERAL_SIGIL_HEREDOC_LINE,
-            LITERAL_STRING_HEREDOC_LINE,
-            LITERAL_WORDS_HEREDOC_LINE,
-            STRING_HEREDOC_LINE
+            HEREDOC_LINE,
+            INTERPOLATED_HEREDOC_LINE,
+            LITERAL_HEREDOC_LINE
     );
     private static final TokenSet HEREDOC_TOKEN_SET = TokenSet.create(
-            CHAR_LIST_HEREDOC,
-            INTERPOLATED_CHAR_LIST_SIGIL_HEREDOC,
-            INTERPOLATED_REGEX_HEREDOC,
+            HEREDOC,
             INTERPOLATED_SIGIL_HEREDOC,
-            INTERPOLATED_STRING_SIGIL_HEREDOC,
-            INTERPOLATED_WORDS_HEREDOC,
-            LITERAL_CHAR_LIST_SIGIL_HEREDOC,
-            LITERAL_REGEX_HEREDOC,
-            LITERAL_SIGIL_HEREDOC,
-            LITERAL_STRING_SIGIL_HEREDOC,
-            LITERAL_WORDS_HEREDOC,
-            STRING_HEREDOC
+            LITERAL_SIGIL_HEREDOC
     );
     private static final TokenSet KEYWORD_PAIR_TOKEN_SET = TokenSet.create(
             KEYWORD_PAIR,
             NO_PARENTHESES_KEYWORD_PAIR
     );
     private static final TokenSet LINE_TOKEN_SET = TokenSet.create(
-            CHAR_LIST_LINE,
-            INTERPOLATED_CHAR_LIST_SIGIL_LINE,
-            INTERPOLATED_REGEX_LINE,
+            LINE,
             INTERPOLATED_SIGIL_LINE,
-            INTERPOLATED_STRING_SIGIL_LINE,
-            INTERPOLATED_WORDS_LINE,
-            LITERAL_CHAR_LIST_SIGIL_LINE,
-            LITERAL_REGEX_LINE,
-            LITERAL_SIGIL_LINE,
-            LITERAL_STRING_SIGIL_LINE,
-            LITERAL_WORDS_LINE,
-            STRING_LINE
+            LITERAL_SIGIL_LINE
     );
     private static final TokenSet MAP_ARGUMENTS_CHILD_TOKEN_SET = TokenSet.create(
             MAP_CONSTRUCTION_ARGUMENTS,

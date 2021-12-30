@@ -33,7 +33,7 @@ public class LiteralStringSigilHeredocParsingTestCase extends ParsingTestCase {
     }
 
     public void testWhitespaceEndPrefix() {
-        assertParsedAndQuotedAroundError();
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testEmbeddedStringHeredoc() {

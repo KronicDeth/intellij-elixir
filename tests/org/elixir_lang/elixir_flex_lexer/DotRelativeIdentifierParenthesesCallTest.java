@@ -551,6 +551,14 @@ public class DotRelativeIdentifierParenthesesCallTest extends Test {
                                         new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE)
                                 )
                         },
+                        {
+                                "**",
+                                Arrays.asList(
+                                        new TokenTypeState(ElixirTypes.POWER_OPERATOR, ElixirFlexLexer.CALL_MAYBE),
+                                        new TokenTypeState(ElixirTypes.CALL, ElixirFlexLexer.YYINITIAL),
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE)
+                                )
+                        },
                         /* "." would actually be parsed as ".." with the leading "." in reset */
                         {
                                 "<>",

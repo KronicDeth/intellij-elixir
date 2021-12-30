@@ -276,19 +276,6 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             ElixirTypes.OPENING_BRACKET,
             ElixirTypes.CLOSING_BRACKET
     );
-    private static final TokenSet CHAR_LISTS = TokenSet.create(
-            ElixirTypes.CHAR_LIST_FRAGMENT,
-            ElixirTypes.CHAR_LIST_HEREDOC_PROMOTER,
-            ElixirTypes.CHAR_LIST_HEREDOC_TERMINATOR,
-            ElixirTypes.CHAR_LIST_PROMOTER,
-            ElixirTypes.CHAR_LIST_SIGIL_HEREDOC_PROMOTER,
-            ElixirTypes.CHAR_LIST_SIGIL_HEREDOC_TERMINATOR,
-            ElixirTypes.CHAR_LIST_SIGIL_PROMOTER,
-            ElixirTypes.CHAR_LIST_SIGIL_TERMINATOR,
-            ElixirTypes.CHAR_LIST_TERMINATOR,
-            ElixirTypes.INTERPOLATING_CHAR_LIST_SIGIL_NAME,
-            ElixirTypes.LITERAL_CHAR_LIST_SIGIL_NAME
-    );
     private static final TokenSet DECIMAL_TOKEN_SET = TokenSet.create(
             ElixirTypes.DECIMAL_MARK,
             ElixirTypes.NUMBER_SEPARATOR,
@@ -338,6 +325,7 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             ElixirTypes.OR_WORD_OPERATOR,
             ElixirTypes.PIPE_OPERATOR,
             ElixirTypes.PLUS_OPERATOR,
+            ElixirTypes.POWER_OPERATOR,
             ElixirTypes.RANGE_OPERATOR,
             ElixirTypes.RELATIONAL_OPERATOR,
             ElixirTypes.STAB_OPERATOR,
@@ -352,42 +340,10 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     );
     // @todo Highlight each type of sigil separately and group char list and string with non-sigil versions
     private static final TokenSet SIGILS = TokenSet.create(
-            ElixirTypes.INTERPOLATING_REGEX_SIGIL_NAME,
             ElixirTypes.INTERPOLATING_SIGIL_NAME,
-            ElixirTypes.INTERPOLATING_WORDS_SIGIL_NAME,
-            ElixirTypes.LITERAL_REGEX_SIGIL_NAME,
             ElixirTypes.LITERAL_SIGIL_NAME,
-            ElixirTypes.LITERAL_WORDS_SIGIL_NAME,
-            ElixirTypes.REGEX_FRAGMENT,
-            ElixirTypes.REGEX_HEREDOC_PROMOTER,
-            ElixirTypes.REGEX_HEREDOC_TERMINATOR,
-            ElixirTypes.REGEX_PROMOTER,
-            ElixirTypes.REGEX_TERMINATOR,
-            ElixirTypes.SIGIL_FRAGMENT,
-            ElixirTypes.SIGIL_HEREDOC_PROMOTER,
-            ElixirTypes.SIGIL_HEREDOC_TERMINATOR,
             ElixirTypes.SIGIL_MODIFIER,
-            ElixirTypes.SIGIL_PROMOTER,
-            ElixirTypes.SIGIL_TERMINATOR,
-            ElixirTypes.TILDE,
-            ElixirTypes.WORDS_FRAGMENT,
-            ElixirTypes.WORDS_HEREDOC_PROMOTER,
-            ElixirTypes.WORDS_HEREDOC_TERMINATOR,
-            ElixirTypes.WORDS_PROMOTER,
-            ElixirTypes.WORDS_TERMINATOR
-    );
-    private static final TokenSet STRINGS = TokenSet.create(
-            ElixirTypes.INTERPOLATING_STRING_SIGIL_NAME,
-            ElixirTypes.LITERAL_STRING_SIGIL_NAME,
-            ElixirTypes.STRING_FRAGMENT,
-            ElixirTypes.STRING_HEREDOC_PROMOTER,
-            ElixirTypes.STRING_HEREDOC_TERMINATOR,
-            ElixirTypes.STRING_PROMOTER,
-            ElixirTypes.STRING_SIGIL_HEREDOC_PROMOTER,
-            ElixirTypes.STRING_SIGIL_HEREDOC_TERMINATOR,
-            ElixirTypes.STRING_SIGIL_PROMOTER,
-            ElixirTypes.STRING_SIGIL_TERMINATOR,
-            ElixirTypes.STRING_TERMINATOR
+            ElixirTypes.TILDE
     );
     private static final TokenSet VALID_DIGITS_TOKEN_SET = TokenSet.create(
             ElixirTypes.VALID_BINARY_DIGITS,
@@ -425,8 +381,6 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             return BRACES_KEYS;
         } else if (BRACKETS_TOKEN_SET.contains(tokenType)) {
             return BRACKETS_KEYS;
-        } else if (CHAR_LISTS.contains(tokenType)) {
-            return CHAR_LIST_KEYS;
         } else if (tokenType == ElixirTypes.CHAR_TOKENIZER) {
             return CHAR_TOKEN_KEYS;
         } else if (tokenType.equals(ElixirTypes.COMMA)) {
@@ -455,8 +409,6 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             return SEMICOLON_KEYS;
         } else if (SIGILS.contains(tokenType)) {
             return SIGIL_KEYS;
-        } else if (STRINGS.contains(tokenType)) {
-            return STRING_KEYS;
         } else if (VALID_DIGITS_TOKEN_SET.contains(tokenType)) {
             return VALID_DIGITS_KEYS;
         } else if (WHOLE_NUMBER_BASE_TOKEN_SET.contains(tokenType)) {
