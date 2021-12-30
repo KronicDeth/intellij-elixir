@@ -255,6 +255,8 @@
 ## v12.1.0
 
 ### Enhancements
+* [#2405](https://github.com/KronicDeth/intellij-elixir/pull/2405) - [@osbre](https://github.com/osbre)
+    * Add MacPorts SDK locations to README.
 * [#2404](https://github.com/KronicDeth/intellij-elixir/pull/2404) - [@KronicDeth](https://github.com/KronicDeth)
   * Update build to elixir 1.13.0
   * Add support for ** operator to lexer and parser
