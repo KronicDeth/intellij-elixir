@@ -10,6 +10,7 @@
       <li>Add support for ** operator to lexer and parser<br>
         Port <a href="https://github.com/elixir-lang/elixir/pull/11241">Add power operator</a>
       </li>
+      <li>Color settings for each sigil name.  Both the interpolating (lower case) and literal (upper case) name use the same settings.</li>
     </ul>
   </li>
   <li>
@@ -34,6 +35,7 @@
         Guards where missing because only <code>decompiler.appendSignature</code> was used.</li>
       <li>Fix <strong>module</strong>.Reference.calculateDefaultRangeInElement<br>
         <code>element.textOffset</code> instead of <code>element.textLength</code> was used for end of range.</li>
+      <li>Restore colors for char lists and strings lost with the PSI changes in <a href="https://github.com/KronicDeth/intellij-elixir/commit/e71b247aacaff389358ca5441c32512cdafd6af9">e71b247</a>.</li>
     </ul>
   </li>
 </ul>

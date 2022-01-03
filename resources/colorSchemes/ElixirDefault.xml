@@ -107,6 +107,266 @@
             <option name="FOREGROUND" value="996c18" />
         </value>
     </option>
+        <option name="ELIXIR_SIGIL_LOWER_A">
+        <value>
+            <option name="FOREGROUND" value="182E99" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_UPPER_A">
+        <value>
+            <option name="FOREGROUND" value="182E99" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_LOWER_B">
+        <value>
+            <option name="FOREGROUND" value="1E1899" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_UPPER_B">
+        <value>
+            <option name="FOREGROUND" value="1E1899" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_LOWER_C">
+        <value>
+            <option name="FOREGROUND" value="3A1899" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_UPPER_C">
+        <value>
+            <option name="FOREGROUND" value="3A1899" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_LOWER_D">
+        <value>
+            <option name="FOREGROUND" value="561899" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_UPPER_D">
+        <value>
+            <option name="FOREGROUND" value="561899" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_LOWER_E">
+        <value>
+            <option name="FOREGROUND" value="721899" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_UPPER_E">
+        <value>
+            <option name="FOREGROUND" value="721899" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_LOWER_F">
+        <value>
+            <option name="FOREGROUND" value="8E1899" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_UPPER_F">
+        <value>
+            <option name="FOREGROUND" value="8E1899" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_LOWER_G">
+        <value>
+            <option name="FOREGROUND" value="991888" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_UPPER_G">
+        <value>
+            <option name="FOREGROUND" value="991888" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_LOWER_H">
+        <value>
+            <option name="FOREGROUND" value="99186C" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_UPPER_H">
+        <value>
+            <option name="FOREGROUND" value="99186C" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_LOWER_I">
+        <value>
+            <option name="FOREGROUND" value="991850" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_UPPER_I">
+        <value>
+            <option name="FOREGROUND" value="991850" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_LOWER_J">
+        <value>
+            <option name="FOREGROUND" value="991834" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_UPPER_J">
+        <value>
+            <option name="FOREGROUND" value="991834" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_LOWER_K">
+        <value>
+            <option name="FOREGROUND" value="991818" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_UPPER_K">
+        <value>
+            <option name="FOREGROUND" value="991818" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_LOWER_L">
+        <value>
+            <option name="FOREGROUND" value="993418" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_UPPER_L">
+        <value>
+            <option name="FOREGROUND" value="993418" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_LOWER_M">
+        <value>
+            <option name="FOREGROUND" value="995018" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_UPPER_M">
+        <value>
+            <option name="FOREGROUND" value="995018" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_LOWER_N">
+        <value>
+            <option name="FOREGROUND" value="996C18" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_UPPER_N">
+        <value>
+            <option name="FOREGROUND" value="996C18" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_LOWER_O">
+        <value>
+            <option name="FOREGROUND" value="998818" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_UPPER_O">
+        <value>
+            <option name="FOREGROUND" value="998818" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_LOWER_P">
+        <value>
+            <option name="FOREGROUND" value="8E9918" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_UPPER_P">
+        <value>
+            <option name="FOREGROUND" value="8E9918" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_LOWER_Q">
+        <value>
+            <option name="FOREGROUND" value="729918" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_UPPER_Q">
+        <value>
+            <option name="FOREGROUND" value="729918" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_LOWER_R">
+        <value>
+            <option name="FOREGROUND" value="569918" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_UPPER_R">
+        <value>
+            <option name="FOREGROUND" value="569918" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_LOWER_S">
+        <value>
+            <option name="FOREGROUND" value="3A9918" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_UPPER_S">
+        <value>
+            <option name="FOREGROUND" value="3A9918" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_LOWER_T">
+        <value>
+            <option name="FOREGROUND" value="1E9918" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_UPPER_T">
+        <value>
+            <option name="FOREGROUND" value="1E9918" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_LOWER_U">
+        <value>
+            <option name="FOREGROUND" value="18992E" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_UPPER_U">
+        <value>
+            <option name="FOREGROUND" value="18992E" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_LOWER_V">
+        <value>
+            <option name="FOREGROUND" value="189949" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_UPPER_V">
+        <value>
+            <option name="FOREGROUND" value="189949" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_LOWER_W">
+        <value>
+            <option name="FOREGROUND" value="189965" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_UPPER_W">
+        <value>
+            <option name="FOREGROUND" value="189965" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_LOWER_X">
+        <value>
+            <option name="FOREGROUND" value="189981" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_UPPER_X">
+        <value>
+            <option name="FOREGROUND" value="189981" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_LOWER_Y">
+        <value>
+            <option name="FOREGROUND" value="189599" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_UPPER_Y">
+        <value>
+            <option name="FOREGROUND" value="189599" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_LOWER_Z">
+        <value>
+            <option name="FOREGROUND" value="187999" />
+        </value>
+    </option>
+    <option name="ELIXIR_SIGIL_UPPER_Z">
+        <value>
+            <option name="FOREGROUND" value="187999" />
+        </value>
+    </option>
     <option name="ELIXIR_SPECIFICATION">
         <value>
             <option name="FOREGROUND" value="b72c51" />
