@@ -8,6 +8,7 @@ import org.elixir_lang.psi.stub.UnmatchedQualifiedNoParenthesesCall;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.operation.In;
 import org.elixir_lang.psi.call.Named;
+import org.elixir_lang.psi.operation.Ternary;
 import org.elixir_lang.psi.operation.Addition;
 import org.elixir_lang.psi.operation.InMatch;
 import org.elixir_lang.psi.stub.UnmatchedUnqualifiedNoArgumentsCall;
@@ -534,6 +535,12 @@ public class ElixirVisitor extends PsiElementVisitor {
     // visitInfix(o);
   }
 
+  public void visitMatchedTernaryOperation(@NotNull ElixirMatchedTernaryOperation o) {
+    visitMatchedExpression(o);
+    // visitNamed(o);
+    // visitTernary(o);
+  }
+
   public void visitMatchedThreeOperation(@NotNull ElixirMatchedThreeOperation o) {
     visitMatchedExpression(o);
     // visitNamed(o);
@@ -705,6 +712,10 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitStructOperation(@NotNull ElixirStructOperation o) {
     visitQuotable(o);
+  }
+
+  public void visitTernaryInfixOperator(@NotNull ElixirTernaryInfixOperator o) {
+    visitOperator(o);
   }
 
   public void visitThreeInfixOperator(@NotNull ElixirThreeInfixOperator o) {
@@ -880,6 +891,12 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitUnmatchedExpression(o);
     // visitNamed(o);
     // visitInfix(o);
+  }
+
+  public void visitUnmatchedTernaryOperation(@NotNull ElixirUnmatchedTernaryOperation o) {
+    visitUnmatchedExpression(o);
+    // visitNamed(o);
+    // visitTernary(o);
   }
 
   public void visitUnmatchedThreeOperation(@NotNull ElixirUnmatchedThreeOperation o) {

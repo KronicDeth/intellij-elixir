@@ -112,6 +112,7 @@ public interface ElixirTypes {
   IElementType MATCHED_QUALIFIED_NO_PARENTHESES_CALL = ElementTypeFactory.factory("MATCHED_QUALIFIED_NO_PARENTHESES_CALL");
   IElementType MATCHED_QUALIFIED_PARENTHESES_CALL = ElementTypeFactory.factory("MATCHED_QUALIFIED_PARENTHESES_CALL");
   IElementType MATCHED_RELATIONAL_OPERATION = new ElixirElementType("MATCHED_RELATIONAL_OPERATION");
+  IElementType MATCHED_TERNARY_OPERATION = new ElixirElementType("MATCHED_TERNARY_OPERATION");
   IElementType MATCHED_THREE_OPERATION = new ElixirElementType("MATCHED_THREE_OPERATION");
   IElementType MATCHED_TWO_OPERATION = new ElixirElementType("MATCHED_TWO_OPERATION");
   IElementType MATCHED_TYPE_OPERATION = new ElixirElementType("MATCHED_TYPE_OPERATION");
@@ -151,6 +152,7 @@ public interface ElixirTypes {
   IElementType STAB_OPERATION = new ElixirElementType("STAB_OPERATION");
   IElementType STAB_PARENTHESES_SIGNATURE = new ElixirElementType("STAB_PARENTHESES_SIGNATURE");
   IElementType STRUCT_OPERATION = new ElixirElementType("STRUCT_OPERATION");
+  IElementType TERNARY_INFIX_OPERATOR = new ElixirElementType("TERNARY_INFIX_OPERATOR");
   IElementType THREE_INFIX_OPERATOR = new ElixirElementType("THREE_INFIX_OPERATOR");
   IElementType TUPLE = new ElixirElementType("TUPLE");
   IElementType TWO_INFIX_OPERATOR = new ElixirElementType("TWO_INFIX_OPERATOR");
@@ -185,6 +187,7 @@ public interface ElixirTypes {
   IElementType UNMATCHED_QUALIFIED_NO_PARENTHESES_CALL = ElementTypeFactory.factory("UNMATCHED_QUALIFIED_NO_PARENTHESES_CALL");
   IElementType UNMATCHED_QUALIFIED_PARENTHESES_CALL = ElementTypeFactory.factory("UNMATCHED_QUALIFIED_PARENTHESES_CALL");
   IElementType UNMATCHED_RELATIONAL_OPERATION = new ElixirElementType("UNMATCHED_RELATIONAL_OPERATION");
+  IElementType UNMATCHED_TERNARY_OPERATION = new ElixirElementType("UNMATCHED_TERNARY_OPERATION");
   IElementType UNMATCHED_THREE_OPERATION = new ElixirElementType("UNMATCHED_THREE_OPERATION");
   IElementType UNMATCHED_TWO_OPERATION = new ElixirElementType("UNMATCHED_TWO_OPERATION");
   IElementType UNMATCHED_TYPE_OPERATION = new ElixirElementType("UNMATCHED_TYPE_OPERATION");
@@ -295,6 +298,7 @@ public interface ElixirTypes {
   IElementType STAB_OPERATOR = new ElixirTokenType("->");
   IElementType STRUCT_OPERATOR = new ElixirTokenType("%");
   IElementType SUBTRACTION_OPERATOR = new ElixirTokenType("-");
+  IElementType TERNARY_OPERATOR = new ElixirTokenType("//");
   IElementType THREE_OPERATOR = new ElixirTokenType("^^^");
   IElementType TILDE = new ElixirTokenType("~");
   IElementType TRUE = new ElixirTokenType("true");
@@ -619,6 +623,9 @@ public interface ElixirTypes {
       else if (type == MATCHED_RELATIONAL_OPERATION) {
         return new ElixirMatchedRelationalOperationImpl(node);
       }
+      else if (type == MATCHED_TERNARY_OPERATION) {
+        return new ElixirMatchedTernaryOperationImpl(node);
+      }
       else if (type == MATCHED_THREE_OPERATION) {
         return new ElixirMatchedThreeOperationImpl(node);
       }
@@ -736,6 +743,9 @@ public interface ElixirTypes {
       else if (type == STRUCT_OPERATION) {
         return new ElixirStructOperationImpl(node);
       }
+      else if (type == TERNARY_INFIX_OPERATOR) {
+        return new ElixirTernaryInfixOperatorImpl(node);
+      }
       else if (type == THREE_INFIX_OPERATOR) {
         return new ElixirThreeInfixOperatorImpl(node);
       }
@@ -834,6 +844,9 @@ public interface ElixirTypes {
       }
       else if (type == UNMATCHED_RELATIONAL_OPERATION) {
         return new ElixirUnmatchedRelationalOperationImpl(node);
+      }
+      else if (type == UNMATCHED_TERNARY_OPERATION) {
+        return new ElixirUnmatchedTernaryOperationImpl(node);
       }
       else if (type == UNMATCHED_THREE_OPERATION) {
         return new ElixirUnmatchedThreeOperationImpl(node);

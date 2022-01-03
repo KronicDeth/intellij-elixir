@@ -119,7 +119,7 @@
     "org.elixir_lang.psi.call.Named"
     "org.elixir_lang.psi.operation.Infix"
   ]
-  methods(           "(un)?matched(Addition|And|Arrow|Comparison|In|InMatch|Match|Multiplication|Or|Pipe|Power|Relational|Three|Two|Type|When)Operation")=[
+  methods(           "(un)?matched(Addition|And|Arrow|Comparison|In|InMatch|Match|Multiplication|Or|Pipe|Power|Relational|Ternary|Three|Two|Type|When)Operation")=[
     functionName
     functionNameElement
     getDoBlock
@@ -202,6 +202,12 @@
   implements("(un)?matchedThreeOperation")=[
     "org.elixir_lang.psi.call.Named"
     "org.elixir_lang.psi.operation.Three"
+  ]
+  // methods set by infix operations above
+
+  implements("(un)?matchedTernaryOperation")=[
+    "org.elixir_lang.psi.call.Named"
+    "org.elixir_lang.psi.operation.Ternary"
   ]
   // methods set by infix operations above
 
@@ -470,6 +476,8 @@
     SIGIL_MODIFIER = "Sigil Modifier (A-Z, a-z)"
     SIGN_OPERATOR = "Sign Operator (+, -)"
     STAB_OPERATOR = "->"
+    // https://github.com/elixir-lang/elixir/pull/10810
+    TERNARY_OPERATOR = "//"
     // TODO remove once containers are available for `{}` after alias for empty structs
     STRUCT_OPERATOR = "%"
     SUBTRACTION_OPERATOR = "-"
@@ -892,6 +900,7 @@ matchedExpression ::= matchedInMatchOperation |
                       matchedInOperation |
                       matchedNotInOperation |
                       matchedThreeOperation |
+                      matchedTernaryOperation |
                       matchedTwoOperation |
                       matchedAdditionOperation |
                       matchedMultiplicationOperation |
@@ -1171,6 +1180,25 @@ threeInfixOperator ::= THREE_OPERATOR
                        }
 // implements and methods defined by "infix operations" section above
 matchedThreeOperation ::= matchedExpression threeInfixOperator matchedExpression
+
+/*
+ * Ternary Operation - right-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/pull/10810
+ */
+
+ternaryInfixOperator ::= TERNARY_OPERATOR
+                         {
+                           implements = "org.elixir_lang.psi.Operator"
+                           methods = [
+                             operatorTokenSet
+                             quote
+                          ]
+                          name = "//"
+                        }
+// implements and methods defined by "infix operations" section above
+matchedTernaryOperation ::= matchedExpression ternaryInfixOperator matchedExpression
+                            { rightAssociative = true }
 
 /*
  * Two Operation - right-associative
@@ -2156,6 +2184,16 @@ unmatchedNotInOperation ::= unmatchedExpression notInfixOperator inInfixOperator
 unmatchedThreeOperation ::= unmatchedExpression threeInfixOperator unmatchedExpression
 
 /*
+ * Ternary Operation - right-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/pull/10810
+ */
+
+// implements and methods defined by "infix operations" section above
+unmatchedTernaryOperation ::= unmatchedExpression ternaryInfixOperator unmatchedExpression
+                              { rightAssociative = true }
+
+/*
  * Two Operation - right-associative
  *
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L63
@@ -2495,6 +2533,7 @@ unmatchedExpression ::= unmatchedInMatchOperation |
                         unmatchedInOperation |
                         unmatchedNotInOperation |
                         unmatchedThreeOperation |
+                        unmatchedTernaryOperation |
                         unmatchedTwoOperation |
                         unmatchedAdditionOperation |
                         unmatchedMultiplicationOperation |

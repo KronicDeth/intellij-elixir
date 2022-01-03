@@ -62,6 +62,7 @@ public class ElixirPsiImplUtil {
     public static final TokenSet STAB_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.STAB_OPERATOR);
     public static final TokenSet STRUCT_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.STRUCT_OPERATOR);
     public static final TokenSet THREE_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.THREE_OPERATOR);
+    public static final TokenSet TERNARY_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.TERNARY_OPERATOR);
     public static final TokenSet TWO_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.RANGE_OPERATOR, ElixirTypes.TWO_OPERATOR);
     public static final TokenSet TYPE_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.TYPE_OPERATOR);
     public static final TokenSet UNARY_OPERATOR_TOKEN_SET = TokenSet.create(
@@ -479,6 +480,12 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirTernaryInfixOperator ternaryInfixOperator) {
+        return TERNARY_OPERATOR_TOKEN_SET;
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirThreeInfixOperator threeInfixOperator) {
         return THREE_OPERATOR_TOKEN_SET;
     }
@@ -681,6 +688,13 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static OtpErlangObject quote(@NotNull NotIn notIn) {
         return QuotableImpl.quote(notIn);
+    }
+
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull Ternary ternary) {
+        return QuotableImpl.quote(ternary);
     }
 
     @Contract(pure = true)

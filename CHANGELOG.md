@@ -263,6 +263,13 @@
     Port elixir-lang/elixir#11241
 * [#2436](https://github.com/KronicDeth/intellij-elixir/pull/2436) - [@KronicDeth](https://github.com/KronicDeth)
   * Color settings for each sigil name. Both the interpolating (lower case) and literal (upper case) name use the same settings.
+* [#2202](https://github.com/KronicDeth/intellij-elixir/pull/2202) - [@KronicDeth](https://github.com/KronicDeth)
+  * Add support for stepped ranges
+    Port elixir-lang/elixir#10810
+    * Regression test for #2200
+  * Update CI
+    * Update to Elixir 1.12.3
+    * Update to Erlang 24.1.6
 
 ### Bug Fixes
 * [#2397](https://github.com/KronicDeth/intellij-elixir/pull/2397) - [@KronicDeth](https://github.com/KronicDeth)
