@@ -17,16 +17,10 @@
  */
 package org.elixir_lang.debugger.stack_frame.value
 
+import com.ericsson.otp.erlang.*
 import org.elixir_lang.utils.ElixirModulesUtil.erlangModuleNameToElixir
 import com.intellij.xdebugger.frame.presentation.XValuePresentation
-import com.ericsson.otp.erlang.OtpErlangMap
-import com.ericsson.otp.erlang.OtpErlangAtom
-import com.ericsson.otp.erlang.OtpErlangTuple
-import com.ericsson.otp.erlang.OtpErlangList
-import com.ericsson.otp.erlang.OtpErlangBitstr
-import com.ericsson.otp.erlang.OtpErlangString
-import com.ericsson.otp.erlang.OtpErlangDouble
-import com.ericsson.otp.erlang.OtpErlangLong
+import org.elixir_lang.code.Identifier
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 import java.nio.charset.CharacterCodingException
@@ -41,6 +35,7 @@ class Presentation(private val myValue: Any) : XValuePresentation() {
                 is OtpErlangAtom -> renderAtom(o, renderer)
                 is OtpErlangBitstr -> renderBitstr(o, renderer)
                 is OtpErlangDouble, is OtpErlangLong -> renderer.renderNumericValue(o.toString())
+                is OtpErlangExternalFun -> renderExternalFun(o, renderer)
                 is OtpErlangList -> renderList(o, renderer)
                 is OtpErlangMap -> renderMap(o, renderer)
                 is OtpErlangString -> renderErlangString(o, renderer)
@@ -142,6 +137,29 @@ class Presentation(private val myValue: Any) : XValuePresentation() {
             }
         }
 
+        private fun renderExternalFun(externalFun: OtpErlangExternalFun, renderer: XValueTextRenderer) {
+            renderer.renderSpecialSymbol("&")
+
+            val moduleField = externalFun.javaClass.getDeclaredField("module")
+            moduleField.isAccessible = true
+            val module = moduleField.get(externalFun) as String
+            renderer.renderKeywordValue(erlangModuleNameToElixir(module))
+
+            renderer.renderSpecialSymbol(".")
+
+            val functionField = externalFun.javaClass.getDeclaredField("function")
+            functionField.isAccessible = true
+            val function = functionField.get(externalFun) as String
+            renderer.renderKeywordValue(Identifier.inspectAsFunction(function))
+
+            renderer.renderSpecialSymbol("/")
+
+            val arityField = externalFun.javaClass.getDeclaredField("arity")
+            arityField.isAccessible = true
+            val arity = arityField.get(externalFun) as Int
+            renderer.renderNumericValue(arity.toString())
+        }
+
         fun isPrintable(s: OtpErlangString): Boolean =
             s.toString().all { isPrintable(it) }
 
@@ -165,6 +183,7 @@ class Presentation(private val myValue: Any) : XValuePresentation() {
             }
         }
 
+        @JvmStatic
         fun toUtf8String(bitstr: OtpErlangBitstr): String? = if (bitstr.pad_bits() > 0) null else try {
             Charset.availableCharsets()["UTF-8"]!!.newDecoder().decode(ByteBuffer.wrap(bitstr.binaryValue())).toString()
         } catch (e: CharacterCodingException) {
