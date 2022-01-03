@@ -289,7 +289,9 @@
     `element.textOffset` instead of `element.textLength` was used for end of range.
 * [#2436](https://github.com/KronicDeth/intellij-elixir/pull/2436) - [@KronicDeth](https://github.com/KronicDeth)
   * Restore colors for char lists and strings lost with the PSI changes in e71b247.
-
+* [#2441](https://github.com/KronicDeth/intellij-elixir/pull/2441) - [@KronicDeth](https://github.com/KronicDeth)
+  * Render `OtpErlangExternalFun` correctly as remote captures (`&Mod.fun/arity`).
+    Fixes decompiling `Ecto.Changeset.validate_number`.
 
 ## v12.0.1
 
