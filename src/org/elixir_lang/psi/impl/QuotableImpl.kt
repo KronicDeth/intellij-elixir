@@ -20,10 +20,7 @@ import org.elixir_lang.psi.impl.ElixirPsiImplUtil.IDENTIFIER_TOKEN_SET
 import org.elixir_lang.psi.impl.ParentImpl.addChildTextCodePoints
 import org.elixir_lang.psi.impl.ParentImpl.elixirCharList
 import org.elixir_lang.psi.impl.ParentImpl.elixirString
-import org.elixir_lang.psi.operation.In
-import org.elixir_lang.psi.operation.Infix
-import org.elixir_lang.psi.operation.NotIn
-import org.elixir_lang.psi.operation.Prefix
+import org.elixir_lang.psi.operation.*
 import org.jetbrains.annotations.Contract
 import java.lang.Double
 import java.lang.Long
@@ -139,6 +136,30 @@ object QuotableImpl {
                         quotedRightOperand
                 )
         )
+    }
+
+    @Contract(pure = true)
+    @JvmStatic
+    fun quote(ternary: Ternary): OtpErlangObject = when (val leftOperand = ternary.leftOperand()) {
+        is Two -> {
+            val quotedRangeFirst = leftOperand.leftOperand()!!.quote()
+            val quotedRangeLast = leftOperand.rightOperand()?.quote() ?: NIL
+
+            val operator = ternary.operator()
+            val quotedOperator = OtpErlangAtom("..//")
+
+            val quotedRangeStep = ternary.rightOperand()?.quote() ?: NIL
+
+            quotedFunctionCall(
+                    quotedOperator,
+                    metadata(operator),
+                    quotedRangeFirst,
+                    quotedRangeLast,
+                    quotedRangeStep
+            )
+        }
+        // invalid for Elixir native
+        else -> quote(ternary as Infix)
     }
 
     @Contract(pure = true)

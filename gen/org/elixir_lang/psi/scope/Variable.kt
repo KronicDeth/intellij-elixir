@@ -58,7 +58,7 @@ abstract class Variable : PsiScopeProcessor {
                 // MUST be before Call as InMatch is a Call
                 is InMatch -> execute(element, state)
                 is Match -> execute(element, state)
-                is Pipe, is Two -> execute(element as Infix, state)
+                is Pipe, is Ternary, is Two -> execute(element as Infix, state)
                 is Type -> execute(element, state)
                 is UnaryOperation -> execute(element, state)
                 is UnqualifiedNoArgumentsCall<*> -> executeOnMaybeVariable(element, state)

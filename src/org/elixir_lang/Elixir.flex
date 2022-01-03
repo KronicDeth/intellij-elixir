@@ -186,9 +186,9 @@ TWO_TOKEN_RANGE_OPERATOR = ".."
 TWO_TOKEN_RELATIONAL_OPERATOR = "<=" |
                                 ">="
 TWO_TOKEN_STAB_OPERATOR = "->"
+TWO_TOKEN_TERNARY_OPERATOR = "//"
 TWO_TOKEN_TUPLE_OPERATOR = {OPENING_CURLY} {CLOSING_CURLY}
 TWO_TOKEN_TWO_OPERATOR = "++" |
-                         "--" |
                          "--" |
                          "<>"
 TWO_TOKEN_TYPE_OPERATOR = "::"
@@ -204,6 +204,7 @@ TWO_TOKEN_OPERATOR = {TWO_TOKEN_AND_SYMBOL_OPERATOR} |
                      {TWO_TOKEN_RANGE_OPERATOR} |
                      {TWO_TOKEN_RELATIONAL_OPERATOR} |
                      {TWO_TOKEN_STAB_OPERATOR} |
+                     {TWO_TOKEN_TERNARY_OPERATOR} |
                      {TWO_TOKEN_TUPLE_OPERATOR} |
                      {TWO_TOKEN_TWO_OPERATOR} |
                      {TWO_TOKEN_TYPE_OPERATOR}
@@ -281,6 +282,7 @@ RELATIONAL_OPERATOR = {TWO_TOKEN_RELATIONAL_OPERATOR} |
                       {ONE_TOKEN_RELATIONAL_OPERATOR}
 SIGN_OPERATOR = {ONE_TOKEN_SIGN_OPERATOR}
 STAB_OPERATOR = {TWO_TOKEN_STAB_OPERATOR}
+TERNARY_OPERATOR = {TWO_TOKEN_TERNARY_OPERATOR}
 STRUCT_OPERATOR = {ONE_TOKEN_STRUCT_OPERATOR}
 SUBTRACTION_OPERATOR = {ONE_TOKEN_SUBTRACTION_OPERATOR}
 // https://github.com/elixir-lang/elixir/commit/3487d00ddb5e90c7cf0e65d03717903b9b27eafd
@@ -609,6 +611,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                   {RELATIONAL_OPERATOR} |
                   {SEMICOLON} |
                   {STAB_OPERATOR} |
+                  {TERNARY_OPERATOR} |
                   {THREE_OPERATOR} |
                   {TWO_OPERATOR} |
                   {TYPE_OPERATOR} |
@@ -669,6 +672,10 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
 <YYINITIAL, INTERPOLATION, INTERPOLATION_CURLY> {
   {AFTER}                                    { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.AFTER; }
+  // Must be before {DIVISION_OPERATOR} as it is a prefix of {STEP_OPERATOR}
+  // Must be before `{REFERENCABLE_OPERATOR} / {REFERENCE_INFIX_OPERATOR}` because a reference to division will be `//2`, which is no longer valid in Elixir 1.13
+  {TERNARY_OPERATOR}                         { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
+                                               return ElixirTypes.TERNARY_OPERATOR; }
   // Must be before any single operator's match
   {REFERENCABLE_OPERATOR} / {REFERENCE_INFIX_OPERATOR} { pushAndBegin(REFERENCE_OPERATION);
                                                          return ElixirTypes.IDENTIFIER_TOKEN; }
@@ -748,6 +755,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                                                return ElixirTypes.OPENING_BIT; }
   {COMPARISON_OPERATOR}                      { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.COMPARISON_OPERATOR; }
+
   {DIVISION_OPERATOR}                        { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.DIVISION_OPERATOR; }
   // DOT_OPERATOR is not a valid keywordKey, so no need to go to KEYWORD_PAIR_MAYBE

@@ -185,6 +185,7 @@ public class Block extends AbstractBlock implements BlockEx {
             RELATIONAL_OPERATOR_TOKEN_SET,
             STAB_OPERATOR_TOKEN_SET,
             STRUCT_OPERATOR_TOKEN_SET,
+            TERNARY_OPERATOR_TOKEN_SET,
             THREE_OPERATOR_TOKEN_SET,
             TYPE_OPERATOR_TOKEN_SET,
             TWO_OPERATOR_TOKEN_SET,

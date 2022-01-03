@@ -11,10 +11,7 @@ import org.elixir_lang.psi.call.qualification.Qualified
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.stripAccessExpression
-import org.elixir_lang.psi.operation.InMatch
-import org.elixir_lang.psi.operation.Pipe
-import org.elixir_lang.psi.operation.Two
-import org.elixir_lang.psi.operation.Type
+import org.elixir_lang.psi.operation.*
 import org.elixir_lang.psi.scope.ResolveResultOrderedSet
 import org.elixir_lang.psi.scope.WhileIn.whileIn
 import org.elixir_lang.reference.Type.Companion.typeHead
@@ -95,6 +92,9 @@ private constructor(private val name: String,
                         true
                     }
                 }
+                is Ternary ->
+                    (parameter.leftOperand()?.let { executeOnParameter(it, state) } ?: true) &&
+                            (parameter.rightOperand()?.let { executeOnParameter(it, state) } ?: true)
                 is Type -> {
                     val nameElement = parameter.leftOperand()
 
