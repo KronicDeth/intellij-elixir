@@ -259,8 +259,10 @@
     * Add MacPorts SDK locations to README.
 * [#2404](https://github.com/KronicDeth/intellij-elixir/pull/2404) - [@KronicDeth](https://github.com/KronicDeth)
   * Update build to elixir 1.13.0
-  * Add support for ** operator to lexer and parser
+  * Add support for `**` operator to lexer and parser.
     Port elixir-lang/elixir#11241
+* [#2436](https://github.com/KronicDeth/intellij-elixir/pull/2436) - [@KronicDeth](https://github.com/KronicDeth)
+  * Color settings for each sigil name. Both the interpolating (lower case) and literal (upper case) name use the same settings.
 
 ### Bug Fixes
 * [#2397](https://github.com/KronicDeth/intellij-elixir/pull/2397) - [@KronicDeth](https://github.com/KronicDeth)
@@ -278,6 +280,8 @@
     Guards where missing because only `decompiler.appendSignature` was used.
   * Fix __module__.Reference.calculateDefaultRangeInElement
     `element.textOffset` instead of `element.textLength` was used for end of range.
+* [#2436](https://github.com/KronicDeth/intellij-elixir/pull/2436) - [@KronicDeth](https://github.com/KronicDeth)
+  * Restore colors for char lists and strings lost with the PSI changes in e71b247.
 
 
 ## v12.0.1

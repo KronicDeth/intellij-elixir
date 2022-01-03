@@ -114,6 +114,7 @@
     <annotator implementationClass="org.elixir_lang.annotator.EscapeSequence" language="Elixir"/>
     <annotator implementationClass="org.elixir_lang.annotator.Map" language="Elixir"/>
     <annotator implementationClass="org.elixir_lang.annotator.ModuleAttribute" language="Elixir"/>
+    <annotator implementationClass="org.elixir_lang.annotator.Textual" language="Elixir"/>
 
     <!-- credo -->
     <externalAnnotator implementationClass="org.elixir_lang.credo.Annotator" language="Elixir"/>

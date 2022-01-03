@@ -225,12 +225,11 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitHeredoc(@NotNull ElixirHeredoc o) {
-    visitHeredoc((Heredoc) o);
-    // visitQuote(o);
+    visitQuote(o);
   }
 
-  public void visitHeredoc(@NotNull Heredoc o) {
-    visitElement(o);
+  public void visitQuote(@NotNull Quote quote) {
+    visitElement(quote);
   }
 
   public void visitHeredocLine(@NotNull ElixirHeredocLine o) {
@@ -286,12 +285,15 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitInterpolatedSigilHeredoc(@NotNull ElixirInterpolatedSigilHeredoc o) {
-    visitSigilHeredoc(o);
+    visitSigil(o);
   }
 
   public void visitInterpolatedSigilLine(@NotNull ElixirInterpolatedSigilLine o) {
-    visitInterpolated(o);
-    // visitSigilLine(o);
+    visitSigil(o);
+  }
+
+  public void visitSigil(@NotNull Sigil sigil) {
+    visitElement(sigil);
   }
 
   public void visitInterpolatedSigilLineBody(@NotNull ElixirInterpolatedSigilLineBody o) {
@@ -316,11 +318,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitLine(@NotNull ElixirLine o) {
-    visitAtomable(o);
-    // visitInterpolated(o);
-    // visitLine(o);
-    // visitQuotable(o);
-    // visitQuote(o);
+    visitQuote(o);
   }
 
   public void visitLineBody(@NotNull ElixirLineBody o) {
@@ -340,13 +338,11 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitLiteralSigilHeredoc(@NotNull ElixirLiteralSigilHeredoc o) {
-    visitLiteral(o);
-    // visitSigilHeredoc(o);
+    visitSigil(o);
   }
 
   public void visitLiteralSigilLine(@NotNull ElixirLiteralSigilLine o) {
-    visitLiteral(o);
-    // visitSigilLine(o);
+    visitSigil(o);
   }
 
   public void visitLiteralSigilLineBody(@NotNull ElixirLiteralSigilLineBody o) {
