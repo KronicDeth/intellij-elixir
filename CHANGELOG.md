@@ -292,6 +292,8 @@
 * [#2441](https://github.com/KronicDeth/intellij-elixir/pull/2441) - [@KronicDeth](https://github.com/KronicDeth)
   * Render `OtpErlangExternalFun` correctly as remote captures (`&Mod.fun/arity`).
     Fixes decompiling `Ecto.Changeset.validate_number`.
+* [#2445](https://github.com/KronicDeth/intellij-elixir/pull/2445) - [@KronicDeth](https://github.com/KronicDeth)
+  * Protect ExUnit configuration `Producer` from `ElixirFile` without `VirtualFile`.
 
 ## v12.0.1
 
