@@ -6,6 +6,7 @@ import com.intellij.find.findUsages.PsiElement2UsageTargetAdapter
 import com.intellij.find.impl.FindManagerImpl
 import com.intellij.lang.findUsages.LanguageFindUsages
 import com.intellij.psi.PsiElement
+import com.intellij.usages.UsageInfo2UsageAdapter
 import com.intellij.usages.UsageTarget
 import com.intellij.usages.UsageTargetUtil
 import com.intellij.usages.impl.rules.UsageType
@@ -1036,6 +1037,30 @@ class FindUsagesTest : PlatformTestCase() {
         assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(secondElement))
 
         assertEquals(UsageTypeProvider.MODULE_ATTRIBUTE_READ, getUsageType(secondElement, usageTargets))
+    }
+
+    fun testIssue2374() {
+        val usages = myFixture.testFindUsagesUsingAction("issue_2374.ex").map { it as UsageInfo2UsageAdapter }
+
+        assertEquals(3, usages.size)
+
+        usages.map { it.element!!.textOffset }.sorted()
+
+        assertContainsElements( usages.map { it.element!!.textOffset }, listOf(23, 53, 53))
+
+        val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
+
+        assertEquals("""<root> (3)
+ Usages in (3)
+  Call definition clause (3)
+   light_idea_test_case (3)
+     (3)
+     issue_2374.ex (3)
+      2def foo, do: "foo"
+      3def bar, do: foo()
+      4def baz, do: foo()
+""",
+                usageViewTreeTextRepresentation)
     }
 
     private val findUsagesProvider by lazy { LanguageFindUsages.INSTANCE.forLanguage(ElixirLanguage) }
