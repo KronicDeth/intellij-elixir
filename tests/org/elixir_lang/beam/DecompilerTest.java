@@ -480,6 +480,10 @@ public class DecompilerTest extends PlatformTestCase {
         assertDecompiled("Elixir.EExTestWeb.PageController");
     }
 
+    public void testIssue2410() throws IOException {
+        assertDecompiled("Elixir.Ecto.Changeset");
+    }
+
     /*
      * Instance Methods
      */

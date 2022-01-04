@@ -49,6 +49,8 @@
       <li>Fix <strong>module</strong>.Reference.calculateDefaultRangeInElement<br>
         <code>element.textOffset</code> instead of <code>element.textLength</code> was used for end of range.</li>
       <li>Restore colors for char lists and strings lost with the PSI changes in <a href="https://github.com/KronicDeth/intellij-elixir/commit/e71b247aacaff389358ca5441c32512cdafd6af9">e71b247</a>.</li>
+      <li>Render <code>OtpErlangExternalFun</code> correctly as remote captures (<code>&amp;Mod.fun/arity</code>).<br>
+        Fixes decompiling <code>Ecto.Changeset.validate_number</code>.</li>
     </ul>
   </li>
 </ul>

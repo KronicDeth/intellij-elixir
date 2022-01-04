@@ -3,7 +3,7 @@ package org.elixir_lang.debugger.node
 import com.ericsson.otp.erlang.*
 import com.intellij.openapi.diagnostic.Logger
 import org.elixir_lang.beam.term.inspect
-import org.elixir_lang.debugger.stack_frame.value.Presentation.toUtf8String
+import org.elixir_lang.debugger.stack_frame.value.Presentation.Companion.toUtf8String
 
 class FileLine(val file: String, val line: Int) {
     operator fun component1(): String = file
