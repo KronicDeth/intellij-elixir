@@ -306,6 +306,9 @@
     * Don't resolve primary Find Usages element.
       The primary element passed to `FindUsageHandler` is now already resolved, so resolving it again for call definitions finds usages of `def`, `defmacro`, etc.
     * Since the element passed to `FindUsagesProvider#canFindUsageFor`, definers can no longer be excluded, so remove that check.
+* [#2449](https://github.com/KronicDeth/intellij-elixir/pull/2449) - [@KronicDeth](https://github.com/KronicDeth)
+  * Don't highlight `Quote` or `Sigil` as normal text if part of documentation.
+    Since the annotators will run in arbitrary order, the `Textual` annotator has to avoid annotating the same nodes as the `ModuleAttribute` annotator or the colors can get interleaved.
 
 ## v12.0.1
 

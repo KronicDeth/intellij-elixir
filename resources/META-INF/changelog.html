@@ -65,6 +65,8 @@
           <li>Since the element passed to <code>FindUsagesProvider#canFindUsageFor</code>, definers can no longer be excluded, so remove that check.</li>
         </ul>
       </li>
+      <li>Don't highlight <code>Quote</code> or <code>Sigil</code> as normal text if part of documentation.<br>
+        Since the annotators will run in arbitrary order, the <code>Textual</code> annotator has to avoid annotating the same nodes as the <code>ModuleAttribute</code> annotator or the colors can get interleaved.</li>
     </ul>
   </li>
 </ul>
