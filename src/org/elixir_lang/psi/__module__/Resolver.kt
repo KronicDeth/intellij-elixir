@@ -5,6 +5,8 @@ import com.intellij.psi.ResolveState
 import com.intellij.psi.impl.source.resolve.ResolveCache
 import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.psi.call.Call
+import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
+import org.elixir_lang.psi.putInitialVisitedElement
 
 object Resolver : ResolveCache.PolyVariantResolver<Reference> {
     override fun resolve(reference: Reference, incompleteCode: Boolean): Array<ResolveResult> =
@@ -17,7 +19,7 @@ object Resolver : ResolveCache.PolyVariantResolver<Reference> {
                 processor,
                 call,
                 call.containingFile,
-                ResolveState.initial()
+                ResolveState.initial().put(ENTRANCE, call).putInitialVisitedElement(call)
         )
 
         return processor.resolveResults

@@ -309,6 +309,8 @@
 * [#2449](https://github.com/KronicDeth/intellij-elixir/pull/2449) - [@KronicDeth](https://github.com/KronicDeth)
   * Don't highlight `Quote` or `Sigil` as normal text if part of documentation.
     Since the annotators will run in arbitrary order, the `Textual` annotator has to avoid annotating the same nodes as the `ModuleAttribute` annotator or the colors can get interleaved.
+* [#2450](https://github.com/KronicDeth/intellij-elixir/pull/2450) - [@KronicDeth](https://github.com/KronicDeth)
+  * Put `ENTRANCE` and Initial Visited Element in `__module__.Resolver`.
 
 ## v12.0.1
 
