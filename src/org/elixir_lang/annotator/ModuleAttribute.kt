@@ -156,46 +156,12 @@ class ModuleAttribute : Annotator, DumbAware {
                                     .create()
                         }
                     }
-                    is Heredoc -> {
-                        val heredocLineList = greatGrandChild.heredocLineList
-
-                        for (bodied in heredocLineList) {
-                            val body = bodied.body
-                            highlightFragments(
-                                    body,
-                                    holder
-                            )
-                        }
-                    }
-                    is Line -> {
-                        val body = greatGrandChild.body
-                        highlightFragments(
-                                body,
-                                holder
-                        )
-                    }
+                    is Quote ->
+                        Textual.highlightQuote(holder, greatGrandChild, ElixirSyntaxHighlighter.DOCUMENTATION_TEXT)
+                    is Sigil ->
+                        Textual.highlightSigil(holder, greatGrandChild, ElixirSyntaxHighlighter.DOCUMENTATION_TEXT)
                 }
             }
-        }
-    }
-
-    /**
-     * Highlights fragment ASTNodes under `body` that have fragment type from `fragmented.getFragmentType()`.
-     *
-     * @param body              contains fragments
-     * @param annotationHolder  the container which receives annotations created by the plugin.
-     */
-    private fun highlightFragments(body: Body,
-                                   annotationHolder: AnnotationHolder) {
-        val bodyNode = body.node
-        val fragmentNodes = bodyNode.getChildren(
-                TokenSet.create(ElixirTypes.FRAGMENT)
-        )
-        for (fragmentNode in fragmentNodes) {
-            Highlighter.highlight(annotationHolder,
-                    fragmentNode.textRange,
-                    ElixirSyntaxHighlighter.DOCUMENTATION_TEXT
-            )
         }
     }
 
