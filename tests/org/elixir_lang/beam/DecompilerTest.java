@@ -484,6 +484,10 @@ public class DecompilerTest extends PlatformTestCase {
         assertDecompiled("Elixir.Ecto.Changeset");
     }
 
+    public void testIssue2386() throws IOException {
+        assertDecompiled("Elixir.RabbitMq.Handler");
+    }
+
     /*
      * Instance Methods
      */
