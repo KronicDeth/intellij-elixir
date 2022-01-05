@@ -24,6 +24,8 @@
           <li>Update to Erlang 24.1.6</li>
         </ul>
       </li>
+      <li>Use <code>getUsageViewTreeTextRepresentation</code> to check find usages.</li>
+      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/2374">#2374</a>.</li>
     </ul>
   </li>
   <li>
@@ -52,6 +54,14 @@
       <li>Render <code>OtpErlangExternalFun</code> correctly as remote captures (<code>&amp;Mod.fun/arity</code>).<br>
         Fixes decompiling <code>Ecto.Changeset.validate_number</code>.</li>
       <li>Protect ExUnit configuration <code>Producer</code> from <code>ElixirFile</code> without <code>VirtualFile</code>.</li>
+      <li><code>Unquote.treeWalkUp</code> no longer assumes that the final argument to <code>unquote</code> is a <code>Call</code>.</li>
+      <li>Fix Find Usages for call definitions
+        <ul dir="auto">
+          <li>Don't resolve primary Find Usages element.<br>
+            The primary element passed to <code>FindUsageHandler</code> is now already resolved, so resolving it again for call definitions finds usages of <code>def</code>, <code>defmacro</code>, etc.</li>
+          <li>Since the element passed to <code>FindUsagesProvider#canFindUsageFor</code>, definers can no longer be excluded, so remove that check.</li>
+        </ul>
+      </li>
     </ul>
   </li>
 </ul>
