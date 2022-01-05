@@ -270,6 +270,9 @@
   * Update CI
     * Update to Elixir 1.12.3
     * Update to Erlang 24.1.6
+* [#2447](https://github.com/KronicDeth/intellij-elixir/pull/2447) - [@KronicDeth](https://github.com/KronicDeth)
+  * Use `getUsageViewTreeTextRepresentation` to check find usages.
+  * Regression test for #2374.
 
 ### Bug Fixes
 * [#2397](https://github.com/KronicDeth/intellij-elixir/pull/2397) - [@KronicDeth](https://github.com/KronicDeth)
@@ -294,6 +297,12 @@
     Fixes decompiling `Ecto.Changeset.validate_number`.
 * [#2445](https://github.com/KronicDeth/intellij-elixir/pull/2445) - [@KronicDeth](https://github.com/KronicDeth)
   * Protect ExUnit configuration `Producer` from `ElixirFile` without `VirtualFile`.
+* [#2447](https://github.com/KronicDeth/intellij-elixir/pull/2447) - [@KronicDeth](https://github.com/KronicDeth)
+  * `Unquote.treeWalkUp` no longer assumes that the final argument to `unquote` is a `Call`.
+  * Fix Find Usages for call definitions
+    * Don't resolve primary Find Usages element.
+      The primary element passed to `FindUsageHandler` is now already resolved, so resolving it again for call definitions finds usages of `def`, `defmacro`, etc.
+    * Since the element passed to `FindUsagesProvider#canFindUsageFor`, definers can no longer be excluded, so remove that check.
 
 ## v12.0.1
 

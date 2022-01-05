@@ -71,12 +71,9 @@ class Provider : com.intellij.lang.findUsages.FindUsagesProvider {
             when (psiElement) {
                 is AtOperation, is ModuleImpl<*> -> true
                 is Call ->
-                    /* On a definer, the position of the caret is important to determine whether the thing being defined
-                       or the definer macro's usage should be found */
-                    !(Callable.isDefiner(psiElement)  ||
-                            // Don't find usage for the `name` in `@name`.  `AtNonNumericOperation` above will instead
-                            // be used for all of `@name.
-                            psiElement.isModuleAttributeNameElement())
+                    // Don't find usage for the `name` in `@name`.  `AtNonNumericOperation` above will instead
+                    // be used for all of `@name.
+                    !psiElement.isModuleAttributeNameElement()
                 is QualifiableAlias -> psiElement.isOutermostQualifiableAlias()
                 else -> false
             }

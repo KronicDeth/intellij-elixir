@@ -1,15 +1,7 @@
 package org.elixir_lang
 
-import com.intellij.codeInsight.highlighting.ReadWriteAccessDetector
-import com.intellij.find.FindManager
-import com.intellij.find.findUsages.PsiElement2UsageTargetAdapter
-import com.intellij.find.impl.FindManagerImpl
-import com.intellij.lang.findUsages.LanguageFindUsages
-import com.intellij.psi.PsiElement
-import com.intellij.usages.UsageTarget
-import com.intellij.usages.UsageTargetUtil
-import com.intellij.usages.impl.rules.UsageType
-import com.intellij.usages.impl.rules.UsageTypeProviderEx
+import com.intellij.psi.PsiPolyVariantReference
+import com.intellij.usages.UsageInfo2UsageAdapter
 
 class FindUsagesTest : PlatformTestCase() {
     override fun getTestDataPath(): String {
@@ -17,1047 +9,536 @@ class FindUsagesTest : PlatformTestCase() {
     }
 
     fun testFunctionRecursiveDeclaration() {
-        myFixture.configureByFiles("function_recursive_declaration.ex")
-
-        val usageTargets = UsageTargetUtil.findUsageTargets(myFixture.editor, myFixture.file)
-
-        assertEquals(1, usageTargets.size)
-
-        val usageTarget = usageTargets[0]
-
-        assertInstanceOf(usageTarget, PsiElement2UsageTargetAdapter::class.java)
-
-        val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
-
-        assertEquals("function", findUsagesProvider.getType(target))
-
-        val readWriteAccessDetector = readWriteAccessDetector(target)!!
-        val findUsagesHandler = findUsagesHandler(target)
-
-        val primaryElements = findUsagesHandler.primaryElements
-
-        assertEquals(2, primaryElements.size)
-
-        val secondaryElements = findUsagesHandler.secondaryElements
-
-        assertEquals(0, secondaryElements.size)
-
-        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
+        val usages = myFixture.testFindUsagesUsingAction("function_recursive_declaration.ex").map { it as UsageInfo2UsageAdapter }
 
         assertEquals(3, usages.size)
+        assertContainsElements( usages.map { it.element!!.textOffset }, listOf(63, 93))
 
-        val firstElement = usages[0].element!!
+        val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
-        assertEquals(
-                "def function([], acc), do: acc",
-                firstElement.parent.parent.text
-        )
-        assertEquals(29, firstElement.textOffset)
-
-        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(firstElement))
-        assertTrue(readWriteAccessDetector.isReadWriteAccessible(firstElement))
-        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(firstElement))
-
-        assertEquals(UsageTypeProvider.CALL_DEFINITION_CLAUSE, getUsageType(firstElement, usageTargets))
-
-        val secondElement = usages[1].element!!
-
-        assertEquals(
-                "def function([h | t], acc) do\n" +
-                        "    function(t, [h | acc])\n" +
-                        "  end",
-                secondElement.parent.parent.text
-        )
-        assertEquals(63, secondElement.textOffset)
-
-        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(secondElement))
-        assertTrue(readWriteAccessDetector.isReadWriteAccessible(secondElement))
-        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(secondElement))
-
-        assertEquals(UsageTypeProvider.CALL_DEFINITION_CLAUSE, getUsageType(secondElement, usageTargets))
-
-        val thirdElement = usages[2].element!!
-
-        assertEquals(
-                "do\n" +
-                        "    function(t, [h | acc])\n" +
-                        "  end",
-                thirdElement.parent.parent.parent.text
-        )
-        assertEquals(93, thirdElement.textOffset)
-
-        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(thirdElement))
-        assertFalse(readWriteAccessDetector.isReadWriteAccessible(thirdElement))
-        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(thirdElement))
-
-        assertEquals(UsageTypeProvider.CALL, getUsageType(thirdElement, usageTargets))
+        assertEquals("""<root> (3)
+ Usages in (3)
+  Call definition clause (2)
+   light_idea_test_case (2)
+     (2)
+     function_recursive_declaration.ex (2)
+      2def function([], acc), do: acc
+      4def function([h | t], acc) do
+  Value read (1)
+   light_idea_test_case (1)
+     (1)
+     function_recursive_declaration.ex (1)
+      5function(t, [h | acc])
+""",
+                usageViewTreeTextRepresentation)
     }
 
     fun testFunctionRecursiveUsage() {
-        myFixture.configureByFiles("function_recursive_usage.ex")
-
-        val usageTargets = UsageTargetUtil.findUsageTargets(myFixture.editor, myFixture.file)
-
-        assertEquals(1, usageTargets.size)
-
-        val usageTarget = usageTargets[0]
-
-        assertInstanceOf(usageTarget, PsiElement2UsageTargetAdapter::class.java)
-
-        val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
-
-        assertEquals("call", findUsagesProvider.getType(target))
-
-        val findUsagesHandler = findUsagesHandler(target)
-
-        val primaryElements = findUsagesHandler.primaryElements
-
-        assertEquals(2, primaryElements.size)
-
-        val secondaryElements = findUsagesHandler.secondaryElements
-
-        assertEquals(0, secondaryElements.size)
-
-        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
+        val usages = myFixture.testFindUsagesUsingAction("function_recursive_usage.ex").map { it as UsageInfo2UsageAdapter }
 
         assertEquals(3, usages.size)
+        assertContainsElements( usages.map { it.element!!.textOffset }, listOf(63, 93))
 
-        val firstElement = usages[0].element!!
-        val readWriteAccessDetector = readWriteAccessDetector(firstElement)!!
+        val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
-        assertEquals(
-                "def function([], acc), do: acc",
-                firstElement.parent.parent.text
-        )
-        assertEquals(29, firstElement.textOffset)
-
-        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(firstElement))
-        assertTrue(readWriteAccessDetector.isReadWriteAccessible(firstElement))
-        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(firstElement))
-
-        assertEquals(UsageTypeProvider.CALL_DEFINITION_CLAUSE, getUsageType(firstElement, usageTargets))
-
-        val secondElement = usages[1].element!!
-
-        assertEquals(
-                "def function([h | t], acc) do\n" +
-                        "    function(t, [h | acc])\n" +
-                        "  end",
-                secondElement.parent.parent.text
-        )
-        assertEquals(63, secondElement.textOffset)
-
-        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(secondElement))
-        assertTrue(readWriteAccessDetector.isReadWriteAccessible(secondElement))
-        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(secondElement))
-
-        assertEquals(UsageTypeProvider.CALL_DEFINITION_CLAUSE, getUsageType(secondElement, usageTargets))
-
-        val thirdElement = usages[2].element!!
-
-        assertEquals(
-                "do\n" +
-                        "    function(t, [h | acc])\n" +
-                        "  end",
-                thirdElement.parent.parent.parent.text
-        )
-        assertEquals(93, thirdElement.textOffset)
-
-        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(thirdElement))
-        assertFalse(readWriteAccessDetector.isReadWriteAccessible(thirdElement))
-        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(thirdElement))
-
-        assertEquals(UsageType.READ, getUsageType(thirdElement, usageTargets))
+        assertEquals("""<root> (3)
+ Usages in (3)
+  Call definition clause (2)
+   light_idea_test_case (2)
+     (2)
+     function_recursive_usage.ex (2)
+      2def function([], acc), do: acc
+      4def function([h | t], acc) do
+  Value read (1)
+   light_idea_test_case (1)
+     (1)
+     function_recursive_usage.ex (1)
+      5function(t, [h | acc])
+""",
+                usageViewTreeTextRepresentation)
     }
 
     fun testFunctionSingleClauseUnused() {
-        myFixture.configureByFiles("function_single_clause_unused.ex")
-
-        val usageTargets = UsageTargetUtil.findUsageTargets(myFixture.editor, myFixture.file)
-
-        assertEquals(1, usageTargets.size)
-
-        val usageTarget = usageTargets[0]
-
-        assertInstanceOf(usageTarget, PsiElement2UsageTargetAdapter::class.java)
-
-        val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
-
-        assertEquals("function", findUsagesProvider.getType(target))
-
-        val readWriteAccessDetector = readWriteAccessDetector(target)!!
-        val findUsagesHandler = findUsagesHandler(target)
-
-        val primaryElements = findUsagesHandler.primaryElements
-
-        assertEquals(1, primaryElements.size)
-
-        val secondaryElements = findUsagesHandler.secondaryElements
-
-        assertEquals(0, secondaryElements.size)
-
-        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
+        val usages = myFixture.testFindUsagesUsingAction("function_single_clause_unused.ex").map { it as UsageInfo2UsageAdapter }
 
         assertEquals(1, usages.size)
+        assertContainsElements( usages.map { it.element!!.textOffset }, listOf(26))
 
-        val firstElement = usages[0].element!!
+        val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
-        assertEquals(26, firstElement.textOffset)
-
-        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(firstElement))
-        assertTrue(readWriteAccessDetector.isReadWriteAccessible(firstElement))
-        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(firstElement))
-
-        assertEquals(UsageTypeProvider.CALL_DEFINITION_CLAUSE, getUsageType(firstElement, usageTargets))
+        assertEquals("""<root> (1)
+ Usages in (1)
+  Call definition clause (1)
+   light_idea_test_case (1)
+     (1)
+     function_single_clause_unused.ex (1)
+      2def function, do: :ok
+""",
+                usageViewTreeTextRepresentation)
     }
 
     fun testFunctionMultipleClausesUnused() {
-        myFixture.configureByFiles("function_multiple_clauses_unused.ex")
-
-        val usageTargets = UsageTargetUtil.findUsageTargets(myFixture.editor, myFixture.file)
-
-        assertEquals(1, usageTargets.size)
-
-        val usageTarget = usageTargets[0]
-
-        assertInstanceOf(usageTarget, PsiElement2UsageTargetAdapter::class.java)
-
-        val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
-        val readWriteAccessDetector = readWriteAccessDetector(target)!!
-        val findUsagesHandler = findUsagesHandler(target)
-
-        val primaryElements = findUsagesHandler.primaryElements
-
-        assertEquals(2, primaryElements.size)
-
-        val secondaryElements = findUsagesHandler.secondaryElements
-
-        assertEquals(0, secondaryElements.size)
-
-        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
+        val usages = myFixture.testFindUsagesUsingAction("function_multiple_clauses_unused.ex").map { it as UsageInfo2UsageAdapter }
 
         assertEquals(2, usages.size)
+        assertContainsElements( usages.map { it.element!!.textOffset }, listOf(26))
 
-        val firstElement = usages[0].element!!
+        val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
-        assertEquals(26, firstElement.textOffset)
-
-        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(firstElement))
-        assertTrue(readWriteAccessDetector.isReadWriteAccessible(firstElement))
-        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(firstElement))
-
-        assertEquals(UsageTypeProvider.CALL_DEFINITION_CLAUSE, getUsageType(firstElement, usageTargets))
-
-        val secondElement = usages[1].element!!
-
-        assertEquals(74, secondElement.textOffset)
-
-        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(secondElement))
-        assertTrue(readWriteAccessDetector.isReadWriteAccessible(secondElement))
-        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(secondElement))
-
-        assertEquals(UsageTypeProvider.CALL_DEFINITION_CLAUSE, getUsageType(secondElement, usageTargets))
+        assertEquals("""<root> (2)
+ Usages in (2)
+  Call definition clause (2)
+   light_idea_test_case (2)
+     (2)
+     function_multiple_clauses_unused.ex (2)
+      2def function(list) when is_list(list), do: []
+      3def function(map) when is_map(map), do: %{}
+""",
+                usageViewTreeTextRepresentation)
     }
 
     fun testFunctionMultipleModulesDeclaration() {
-        myFixture.configureByFiles("function_multiple_modules_declaration_target.ex", "function_multiple_modules_declaration_usage.ex")
-
-        val usageTargets = UsageTargetUtil.findUsageTargets(myFixture.editor, myFixture.file)
-
-        assertEquals(1, usageTargets.size)
-
-        val usageTarget = usageTargets[0]
-
-        assertInstanceOf(usageTarget, PsiElement2UsageTargetAdapter::class.java)
-
-        val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
-        val findUsagesHandler = findUsagesHandler(target)
-        val readWriteAccessDetector = readWriteAccessDetector(target)!!
-
-        val primaryElements = findUsagesHandler.primaryElements
-
-        assertEquals(1, primaryElements.size)
-
-        val secondaryElements = findUsagesHandler.secondaryElements
-
-        assertEquals(0, secondaryElements.size)
-
-        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
+        val usages = myFixture.testFindUsagesUsingAction("function_multiple_modules_declaration_target.ex", "function_multiple_modules_declaration_usage.ex").map { it as UsageInfo2UsageAdapter }
 
         assertEquals(2, usages.size)
+        assertContainsElements( usages.map { it.element!!.textOffset }, listOf(31, 50))
 
-        val firstElement = usages[0].element!!
-        val secondElement = usages[1].element!!
+        val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
-        assertEquals(31, firstElement.textOffset)
-
-        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(firstElement))
-        assertTrue(readWriteAccessDetector.isReadWriteAccessible(firstElement))
-        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(firstElement))
-
-        assertEquals(UsageTypeProvider.CALL_DEFINITION_CLAUSE, getUsageType(firstElement, usageTargets))
-
-        assertEquals(50, secondElement.textOffset)
-
-        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(secondElement))
-        assertFalse(readWriteAccessDetector.isReadWriteAccessible(secondElement))
-        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(secondElement))
-
-        assertEquals(UsageTypeProvider.CALL, getUsageType(secondElement, usageTargets))
+        assertEquals("""<root> (2)
+ Usages in (2)
+  Call definition clause (1)
+   light_idea_test_case (1)
+     (1)
+     function_multiple_modules_declaration_target.ex (1)
+      2def declaration, do: :ok
+  Value read (1)
+   light_idea_test_case (1)
+     (1)
+     function_multiple_modules_declaration_usage.ex (1)
+      3Declaration.declaration()
+""",
+                usageViewTreeTextRepresentation)
     }
 
     fun testFunctionMultipleModulesUsage() {
-        myFixture.configureByFiles("function_multiple_modules_usage_target.ex", "function_multiple_modules_usage_declaration.ex")
-
-        val usageTargets = UsageTargetUtil.findUsageTargets(myFixture.editor, myFixture.file)
-
-        assertEquals(1, usageTargets.size)
-
-        val usageTarget = usageTargets[0]
-
-        assertInstanceOf(usageTarget, PsiElement2UsageTargetAdapter::class.java)
-
-        val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
-        val findUsagesHandler = findUsagesHandler(target)
-
-        val primaryElements = findUsagesHandler.primaryElements
-
-        assertEquals(1, primaryElements.size)
-
-        val secondaryElements = findUsagesHandler.secondaryElements
-
-        assertEquals(0, secondaryElements.size)
-
-        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
+        val usages = myFixture.testFindUsagesUsingAction("function_multiple_modules_usage_target.ex", "function_multiple_modules_usage_declaration.ex").map { it as UsageInfo2UsageAdapter }
 
         assertEquals(2, usages.size)
+        assertContainsElements( usages.map { it.element!!.textOffset }, listOf(31, 50))
 
-        val firstElement = usages[0].element!!
+        val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
-        assertEquals(31, firstElement.textOffset)
-
-        val readWriteAccessDetector = readWriteAccessDetector(firstElement)!!
-        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(firstElement))
-        assertTrue(readWriteAccessDetector.isReadWriteAccessible(firstElement))
-        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(firstElement))
-
-        assertEquals(UsageTypeProvider.CALL_DEFINITION_CLAUSE, getUsageType(firstElement, usageTargets))
-
-        val secondElement = usages[1].element!!
-
-        assertEquals(50, secondElement.textOffset)
-
-        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(secondElement))
-        assertFalse(readWriteAccessDetector.isReadWriteAccessible(secondElement))
-        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(secondElement))
-
-        assertEquals(UsageType.READ, getUsageType(secondElement, usageTargets))
+        assertEquals("""<root> (2)
+ Usages in (2)
+  Call definition clause (1)
+   light_idea_test_case (1)
+     (1)
+     function_multiple_modules_usage_declaration.ex (1)
+      2def declaration, do: :ok
+  Value read (1)
+   light_idea_test_case (1)
+     (1)
+     function_multiple_modules_usage_target.ex (1)
+      3Declaration.declaration()
+""",
+                usageViewTreeTextRepresentation)
     }
 
     fun testFunctionImportDeclaration() {
-        myFixture.configureByFiles("function_import_declaration_target.ex", "function_import_declaration_usage.ex")
-
-        val usageTargets = UsageTargetUtil.findUsageTargets(myFixture.editor, myFixture.file)
-
-        assertEquals(1, usageTargets.size)
-
-        val usageTarget = usageTargets[0]
-
-        assertInstanceOf(usageTarget, PsiElement2UsageTargetAdapter::class.java)
-
-        val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
-        val findUsagesHandler = findUsagesHandler(target)
-        val readWriteAccessDetector = readWriteAccessDetector(target)!!
-
-        val primaryElements = findUsagesHandler.primaryElements
-
-        assertEquals(1, primaryElements.size)
-
-        val secondaryElements = findUsagesHandler.secondaryElements
-
-        assertEquals(0, secondaryElements.size)
-
-        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
+        val usages = myFixture.testFindUsagesUsingAction("function_import_declaration_target.ex", "function_import_declaration_usage.ex").map { it as UsageInfo2UsageAdapter }
 
         assertEquals(2, usages.size)
+        assertContainsElements( usages.map { it.element!!.textOffset }, listOf(31, 60))
 
-        val firstElement = usages[0].element!!
-        val secondElement = usages[1].element!!
+        val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
-        assertEquals(
-                "def declaration, do: :ok",
-                firstElement.parent.parent.text
-        )
-        assertEquals(31, firstElement.textOffset)
-
-        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(firstElement))
-        assertTrue(readWriteAccessDetector.isReadWriteAccessible(firstElement))
-        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(firstElement))
-
-        assertEquals(UsageTypeProvider.CALL_DEFINITION_CLAUSE, getUsageType(firstElement, usageTargets))
-
-        assertEquals(60, secondElement.textOffset)
-
-        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(secondElement))
-        assertFalse(readWriteAccessDetector.isReadWriteAccessible(secondElement))
-        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(secondElement))
-
-        assertEquals(UsageTypeProvider.CALL, getUsageType(secondElement, usageTargets))
+        assertEquals("""<root> (2)
+ Usages in (2)
+  Call definition clause (1)
+   light_idea_test_case (1)
+     (1)
+     function_import_declaration_target.ex (1)
+      2def declaration, do: :ok
+  Value read (1)
+   light_idea_test_case (1)
+     (1)
+     function_import_declaration_usage.ex (1)
+      5declaration()
+""",
+                usageViewTreeTextRepresentation)
     }
 
     fun testFunctionImportUsage() {
         myFixture.configureByFiles("function_import_usage_target.ex", "function_import_usage_declaration.ex")
 
-        val usageTargets = UsageTargetUtil.findUsageTargets(myFixture.editor, myFixture.file)
+        val reference = myFixture.getReferenceAtCaretPositionWithAssertion() as PsiPolyVariantReference
+        assertNotNull(reference)
 
-        assertEquals(1, usageTargets.size)
+        val resolved = reference.multiResolve(false)
+        assertEquals(2, resolved.size)
 
-        val usageTarget = usageTargets[0]
+        val usageInfos = myFixture.findUsages(resolved[0].element!!)
+        assertEquals(2, usageInfos.size)
+        assertContainsElements( usageInfos.map { it.element!!.textOffset }, listOf(31, 60))
 
-        assertInstanceOf(usageTarget, PsiElement2UsageTargetAdapter::class.java)
+        val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usageInfos)
 
-        val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
-        val findUsagesHandler = findUsagesHandler(target)
-
-        val primaryElements = findUsagesHandler.primaryElements
-
-        assertEquals(2, primaryElements.size)
-
-        val secondaryElements = findUsagesHandler.secondaryElements
-
-        assertEquals(0, secondaryElements.size)
-
-        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
-
-        assertEquals(2, usages.size)
-
-        val firstElement = usages[0].element!!
-        val secondElement = usages[1].element!!
-        val readWriteAccessDetector = readWriteAccessDetector(firstElement)!!
-
-        assertEquals(
-                "def declaration, do: :ok",
-                firstElement.parent.parent.text
-        )
-        assertEquals(31, firstElement.textOffset)
-
-        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(firstElement))
-        assertTrue(readWriteAccessDetector.isReadWriteAccessible(firstElement))
-        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(firstElement))
-
-        assertEquals(UsageTypeProvider.CALL_DEFINITION_CLAUSE, getUsageType(firstElement, usageTargets))
-
-        assertEquals(
-                "do\n" +
-                "    declaration()\n" +
-                "  end",
-                secondElement.parent.parent.parent.text
-        )
-        assertEquals(60, secondElement.textOffset)
-
-        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(secondElement))
-        assertFalse(readWriteAccessDetector.isReadWriteAccessible(secondElement))
-        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(secondElement))
-
-        assertEquals(UsageType.READ, getUsageType(secondElement, usageTargets))
+        assertEquals("""<root> (2)
+ Usages in (2)
+  Call definition clause (1)
+   light_idea_test_case (1)
+     (1)
+     function_import_usage_declaration.ex (1)
+      2def declaration, do: :ok
+  Value read (1)
+   light_idea_test_case (1)
+     (1)
+     function_import_usage_target.ex (1)
+      5declaration()
+""",
+                usageViewTreeTextRepresentation)
     }
 
     fun testParameterDeclaration() {
-        myFixture.configureByFiles("parameter_declaration.ex")
-
-        val usageTargets = UsageTargetUtil.findUsageTargets(myFixture.editor, myFixture.file)
-
-        assertEquals(1, usageTargets.size)
-
-        val usageTarget = usageTargets[0]
-
-        assertInstanceOf(usageTarget, PsiElement2UsageTargetAdapter::class.java)
-
-        val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
-        val readWriteAccessDetector = readWriteAccessDetector(target)!!
-
-        assertEquals("parameter", findUsagesProvider.getType(target))
-
-        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
+        val usages = myFixture.testFindUsagesUsingAction("parameter_declaration.ex").map { it as UsageInfo2UsageAdapter }
 
         assertEquals(2, usages.size)
+        assertContainsElements( usages.map { it.element!!.textOffset }, listOf(39, 70))
 
-        val firstElement = usages[0].element!!
+        val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
-        assertEquals(39, firstElement.textOffset)
-
-        assertTrue(readWriteAccessDetector.isDeclarationWriteAccess(firstElement))
-        assertTrue(readWriteAccessDetector.isReadWriteAccessible(firstElement))
-        assertEquals(ReadWriteAccessDetector.Access.Write, readWriteAccessDetector.getExpressionAccess(firstElement))
-
-        assertEquals(UsageTypeProvider.FUNCTION_PARAMETER, getUsageType(firstElement, usageTargets))
-
-        val secondElement = usages[1].element!!
-
-        assertEquals(70, secondElement.textOffset)
-
-        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(secondElement))
-        assertFalse(readWriteAccessDetector.isReadWriteAccessible(secondElement))
-        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(secondElement))
-
-        assertEquals(UsageType.READ, getUsageType(secondElement, usageTargets))
+        assertEquals("""<root> (2)
+ Usages in (2)
+  Parameter declaration (1)
+   light_idea_test_case (1)
+     (1)
+     parameter_declaration.ex (1)
+      2defp function(parameter) do
+  Value read (1)
+   light_idea_test_case (1)
+     (1)
+     parameter_declaration.ex (1)
+      3%{parameter: parameter}
+""",
+                usageViewTreeTextRepresentation)
     }
 
     fun testModuleRecursiveDeclaration() {
-        myFixture.configureByFiles("module_recursive_declaration.ex")
-
-        val usageTargets = UsageTargetUtil.findUsageTargets(myFixture.editor, myFixture.file)
-
-        assertEquals(1, usageTargets.size)
-
-        val usageTarget = usageTargets[0]
-
-        assertInstanceOf(usageTarget, PsiElement2UsageTargetAdapter::class.java)
-
-        val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
-
-        assertEquals("module", findUsagesProvider.getType(target))
-
-        val findUsagesHandler = findUsagesHandler(target)
-
-        val primaryElements = findUsagesHandler.primaryElements
-
-        assertEquals(1, primaryElements.size)
-
-        val secondaryElements = findUsagesHandler.secondaryElements
-
-        assertEquals(0, secondaryElements.size)
-
-        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
+        val usages = myFixture.testFindUsagesUsingAction("module_recursive_declaration.ex").map { it as UsageInfo2UsageAdapter }
 
         assertEquals(2, usages.size)
+        assertContainsElements( usages.map { it.element!!.textOffset }, listOf(10, 33))
 
-        val firstElement = usages[0].element!!
+        val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
-        assertEquals(10, firstElement.textOffset)
-        assertNull(readWriteAccessDetector(firstElement))
-        assertEquals(UsageTypeProvider.MODULE_DEFINITION, getUsageType(firstElement, usageTargets))
-
-        val secondElement = usages[1].element!!
-
-        assertEquals(33, secondElement.textOffset)
-        assertNull(readWriteAccessDetector(secondElement))
-        assertEquals(UsageTypeProvider.ALIAS, getUsageType(secondElement, usageTargets))
+        assertEquals("""<root> (2)
+ Usages in (2)
+  Alias (1)
+   light_idea_test_case (1)
+     (1)
+     module_recursive_declaration.ex (1)
+      2alias Declaration
+  Module definition (1)
+   light_idea_test_case (1)
+     (1)
+     module_recursive_declaration.ex (1)
+      1defmodule Declaration do
+""",
+                usageViewTreeTextRepresentation)
     }
 
     fun testModuleRecursiveUsage() {
-        myFixture.configureByFiles("module_recursive_usage.ex")
+        myFixture.configureByFile("module_recursive_usage.ex")
 
-        val usageTargets = UsageTargetUtil.findUsageTargets(myFixture.editor, myFixture.file)
+        val reference = myFixture.getReferenceAtCaretPositionWithAssertion() as PsiPolyVariantReference
+        assertNotNull(reference)
 
-        assertEquals(1, usageTargets.size)
+        val resolved = reference.multiResolve(false)
+        assertEquals(2, resolved.size)
 
-        val usageTarget = usageTargets[0]
+        val usageInfos = myFixture.findUsages(resolved[0].element!!)
+        assertEquals(2, usageInfos.size)
+        assertContainsElements( usageInfos.map { it.element!!.textOffset }, listOf(10, 33))
 
-        assertInstanceOf(usageTarget, PsiElement2UsageTargetAdapter::class.java)
+        val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usageInfos)
 
-        val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
-
-        assertEquals("alias", findUsagesProvider.getType(target))
-
-        val findUsagesHandler = findUsagesHandler(target)
-
-        val primaryElements = findUsagesHandler.primaryElements
-
-        assertEquals(2, primaryElements.size)
-
-        val secondaryElements = findUsagesHandler.secondaryElements
-
-        assertEquals(0, secondaryElements.size)
-
-        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
-
-        assertEquals(2, usages.size)
-
-        val firstElement = usages[0].element!!
-
-        assertEquals(10, firstElement.textOffset)
-        assertNull(readWriteAccessDetector(firstElement))
-        assertEquals(UsageTypeProvider.MODULE_DEFINITION, getUsageType(firstElement, usageTargets))
-
-        val secondElement = usages[1].element!!
-
-        assertEquals(33, secondElement.textOffset)
-        assertNull(readWriteAccessDetector(secondElement))
-        assertEquals(UsageTypeProvider.ALIAS, getUsageType(secondElement, usageTargets))
+        assertEquals("""<root> (2)
+ Usages in (2)
+  Alias (1)
+   light_idea_test_case (1)
+     (1)
+     module_recursive_usage.ex (1)
+      2alias Declaration
+  Module definition (1)
+   light_idea_test_case (1)
+     (1)
+     module_recursive_usage.ex (1)
+      1defmodule Declaration do
+""",
+                usageViewTreeTextRepresentation)
     }
 
     fun testModuleNestedRecursiveDeclaration() {
-        myFixture.configureByFiles("module_nested_recursive_declaration.ex")
-
-        val usageTargets = UsageTargetUtil.findUsageTargets(myFixture.editor, myFixture.file)
-
-        assertEquals(1, usageTargets.size)
-
-        val usageTarget = usageTargets[0]
-
-        assertInstanceOf(usageTarget, PsiElement2UsageTargetAdapter::class.java)
-
-        val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
-
-        assertEquals("module", findUsagesProvider.getType(target))
-
-        val findUsagesHandler = findUsagesHandler(target)
-
-        val primaryElements = findUsagesHandler.primaryElements
-
-        assertEquals(1, primaryElements.size)
-
-        val secondaryElements = findUsagesHandler.secondaryElements
-
-        assertEquals(0, secondaryElements.size)
-
-        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
+        val usages = myFixture.testFindUsagesUsingAction("module_nested_recursive_declaration.ex").map { it as UsageInfo2UsageAdapter }
 
         assertEquals(3, usages.size)
+        assertContainsElements( usages.map { it.element!!.textOffset }, listOf(10, 40, 75))
 
-        val firstElement = usages[0].element!!
+        val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
-        assertEquals(
-                "defmodule Parent.Declaration do\n" +
-                        "  alias Parent.Declaration\n" +
-                        "  alias Parent.{Declaration}\n" +
-                        "end",
-                firstElement.parent.parent.text
-        )
-        assertEquals(10, firstElement.textOffset)
-        assertNull(readWriteAccessDetector(firstElement))
-        assertEquals(UsageTypeProvider.MODULE_DEFINITION, getUsageType(firstElement, usageTargets))
-
-        val secondElement = usages[1].element!!
-
-        assertEquals(
-                "alias Parent.Declaration",
-                secondElement.parent.parent.text
-        )
-        assertEquals(40, secondElement.textOffset)
-        assertNull(readWriteAccessDetector(secondElement))
-        assertEquals(UsageTypeProvider.ALIAS, getUsageType(secondElement, usageTargets))
-
-        val thirdElement = usages[2].element!!
-
-        assertEquals(
-                "alias Parent.{Declaration}",
-                thirdElement.parent.parent.parent.parent.parent.text
-        )
-        assertEquals(75, thirdElement.textOffset)
-        assertNull(readWriteAccessDetector(thirdElement))
-        assertEquals(UsageTypeProvider.ALIAS, getUsageType(thirdElement, usageTargets))
+        assertEquals("""<root> (3)
+ Usages in (3)
+  Alias (2)
+   light_idea_test_case (2)
+     (2)
+     module_nested_recursive_declaration.ex (2)
+      2alias Parent.Declaration
+      3alias Parent.{Declaration}
+  Module definition (1)
+   light_idea_test_case (1)
+     (1)
+     module_nested_recursive_declaration.ex (1)
+      1defmodule Parent.Declaration do
+""",
+                usageViewTreeTextRepresentation)
     }
 
     fun testModuleMultipleModulesDeclaration() {
-        myFixture.configureByFiles("module_multiple_modules_declaration_target.ex", "module_multiple_modules_declaration_usage.ex")
-
-        val usageTargets = UsageTargetUtil.findUsageTargets(myFixture.editor, myFixture.file)
-
-        assertEquals(1, usageTargets.size)
-
-        val usageTarget = usageTargets[0]
-
-        assertInstanceOf(usageTarget, PsiElement2UsageTargetAdapter::class.java)
-
-        val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
-
-        assertEquals("module", findUsagesProvider.getType(target))
-
-        val findUsagesHandler = findUsagesHandler(target)
-
-        val primaryElements = findUsagesHandler.primaryElements
-
-        assertEquals(1, primaryElements.size)
-
-        val secondaryElements = findUsagesHandler.secondaryElements
-
-        assertEquals(0, secondaryElements.size)
-
-        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
+        val usages = myFixture.testFindUsagesUsingAction("module_multiple_modules_declaration_target.ex", "module_multiple_modules_declaration_usage.ex").map { it as UsageInfo2UsageAdapter }
 
         assertEquals(2, usages.size)
+        assertContainsElements( usages.map { it.element!!.textOffset }, listOf(10, 27))
 
-        val firstElement = usages[0].element!!
+        val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
-        assertEquals(
-                "defmodule Declaration do\n" +
-                        "end",
-                firstElement.parent.parent.parent.text
-        )
-        assertEquals(10, firstElement.textOffset)
-        assertNull(readWriteAccessDetector(firstElement))
-        assertEquals(UsageTypeProvider.MODULE_DEFINITION, getUsageType(firstElement, usageTargets))
-
-        val secondElement = usages[1].element!!
-
-        assertEquals(
-                "alias Declaration",
-                secondElement.parent.parent.parent.text
-        )
-        assertEquals(27, secondElement.textOffset)
-        assertNull(readWriteAccessDetector(secondElement))
-        assertEquals(UsageTypeProvider.ALIAS, getUsageType(secondElement, usageTargets))
+        assertEquals("""<root> (2)
+ Usages in (2)
+  Alias (1)
+   light_idea_test_case (1)
+     (1)
+     module_multiple_modules_declaration_usage.ex (1)
+      2alias Declaration
+  Module definition (1)
+   light_idea_test_case (1)
+     (1)
+     module_multiple_modules_declaration_target.ex (1)
+      1defmodule Declaration do
+""",
+                usageViewTreeTextRepresentation)
     }
 
     fun testModuleMultipleModulesUsage() {
         myFixture.configureByFiles("module_multiple_modules_usage_target.ex", "module_multiple_modules_usage_declaration.ex")
 
-        val usageTargets = UsageTargetUtil.findUsageTargets(myFixture.editor, myFixture.file)
+        val reference = myFixture.getReferenceAtCaretPositionWithAssertion() as PsiPolyVariantReference
+        assertNotNull(reference)
 
-        assertEquals(1, usageTargets.size)
+        val resolved = reference.multiResolve(false)
+        assertEquals(2, resolved.size)
 
-        val usageTarget = usageTargets[0]
+        val usageInfos = myFixture.findUsages(resolved[0].element!!)
+        assertEquals(2, usageInfos.size)
+        assertContainsElements( usageInfos.map { it.element!!.textOffset }, listOf(10, 27))
 
-        assertInstanceOf(usageTarget, PsiElement2UsageTargetAdapter::class.java)
+        val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usageInfos)
 
-        val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
-
-        assertEquals("alias", findUsagesProvider.getType(target))
-
-        val findUsagesHandler = findUsagesHandler(target)
-
-        val primaryElements = findUsagesHandler.primaryElements.sortedBy { it.textOffset }
-
-        assertEquals(2, primaryElements.size)
-
-        val firstPrimaryElement = primaryElements[0]
-
-        assertEquals(
-                "defmodule Declaration do\n" +
-                        "end",
-                firstPrimaryElement.text
-        )
-        assertEquals(10, firstPrimaryElement.textOffset)
-
-        val secondPrimaryElement = primaryElements[1]
-
-        assertEquals(
-                "alias Declaration",
-                secondPrimaryElement.text
-        )
-        assertEquals(21, secondPrimaryElement.textOffset)
-
-        val secondaryElements = findUsagesHandler.secondaryElements
-
-        assertEquals(0, secondaryElements.size)
-
-        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
-
-        assertEquals(2, usages.size)
-
-        val firstElement = usages[0].element!!
-
-        assertEquals(
-                "defmodule Declaration do\n" +
-                        "end",
-                firstElement.parent.parent.parent.text
-        )
-        assertEquals(10, firstElement.textOffset)
-        assertNull(readWriteAccessDetector(firstElement))
-        assertEquals(UsageTypeProvider.MODULE_DEFINITION, getUsageType(firstElement, usageTargets))
-
-        val secondElement = usages[1].element!!
-
-        assertEquals(
-                "alias Declaration",
-                secondElement.parent.parent.parent.text
-        )
-        assertEquals(27, secondElement.textOffset)
-        assertNull(readWriteAccessDetector(secondElement))
-        assertEquals(UsageTypeProvider.ALIAS, getUsageType(secondElement, usageTargets))
+        assertEquals("""<root> (2)
+ Usages in (2)
+  Alias (1)
+   light_idea_test_case (1)
+     (1)
+     module_multiple_modules_usage_target.ex (1)
+      2alias Declaration
+  Module definition (1)
+   light_idea_test_case (1)
+     (1)
+     module_multiple_modules_usage_declaration.ex (1)
+      1defmodule Declaration do
+""",
+                usageViewTreeTextRepresentation)
     }
 
     fun testParameterUnused() {
-        myFixture.configureByFiles("parameter_unused.ex")
-
-        val usageTargets = UsageTargetUtil.findUsageTargets(myFixture.editor, myFixture.file)
-
-        val usageTarget = usageTargets[0]
-
-        assertInstanceOf(usageTarget, PsiElement2UsageTargetAdapter::class.java)
-
-        val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
-        val readWriteAccessDetector = readWriteAccessDetector(target)!!
-
-        assertEquals("parameter", findUsagesProvider.getType(target))
-
-        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
+        val usages = myFixture.testFindUsagesUsingAction("parameter_unused.ex").map { it as UsageInfo2UsageAdapter }
 
         assertEquals(1, usages.size)
+        assertContainsElements( usages.map { it.element!!.textOffset }, listOf(39))
 
-        val element = usages[0].element!!
+        val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
-        assertEquals(39, element.textOffset)
-
-        assertTrue(readWriteAccessDetector.isDeclarationWriteAccess(element))
-        assertTrue(readWriteAccessDetector.isReadWriteAccessible(element))
-        assertEquals(ReadWriteAccessDetector.Access.Write, readWriteAccessDetector.getExpressionAccess(element))
-
-        assertEquals(UsageTypeProvider.FUNCTION_PARAMETER, getUsageType(element, usageTargets))
+        assertEquals("""<root> (1)
+ Usages in (1)
+  Parameter declaration (1)
+   light_idea_test_case (1)
+     (1)
+     parameter_unused.ex (1)
+      2defp function(_parameter) do
+""",
+                usageViewTreeTextRepresentation)
     }
 
     fun testParameterUsage() {
-        myFixture.configureByFiles("parameter_usage.ex")
-
-        val usageTargets = UsageTargetUtil.findUsageTargets(myFixture.editor, myFixture.file)
-
-        assertEquals(1, usageTargets.size)
-
-        val usageTarget = usageTargets[0]
-
-        assertInstanceOf(usageTarget, PsiElement2UsageTargetAdapter::class.java)
-
-        val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
-
-        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
+        val usages = myFixture.testFindUsagesUsingAction("parameter_usage.ex").map { it as UsageInfo2UsageAdapter }
 
         assertEquals(2, usages.size)
+        assertContainsElements( usages.map { it.element!!.textOffset }, listOf(39))
 
-        val firstElement = usages[0].element!!
+        val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
-        assertEquals(39, firstElement.textOffset)
-
-        val readWriteAccessDetector = readWriteAccessDetector(firstElement)!!
-        assertTrue(readWriteAccessDetector.isDeclarationWriteAccess(firstElement))
-        assertTrue(readWriteAccessDetector.isReadWriteAccessible(firstElement))
-        assertEquals(ReadWriteAccessDetector.Access.Write, readWriteAccessDetector.getExpressionAccess(firstElement))
-
-        assertEquals(UsageTypeProvider.FUNCTION_PARAMETER, getUsageType(firstElement, usageTargets))
-
-        val secondElement = usages[1].element!!
-
-        assertEquals(70, secondElement.textOffset)
-
-        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(secondElement))
-        assertFalse(readWriteAccessDetector.isReadWriteAccessible(secondElement))
-        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(secondElement))
-
-        assertEquals(UsageType.READ, getUsageType(secondElement, usageTargets))
+        assertEquals("""<root> (2)
+ Usages in (2)
+  Parameter declaration (1)
+   light_idea_test_case (1)
+     (1)
+     parameter_usage.ex (1)
+      2defp function(parameter) do
+  Value read (1)
+   light_idea_test_case (1)
+     (1)
+     parameter_usage.ex (1)
+      3%{parameter: parameter}
+""",
+                usageViewTreeTextRepresentation)
     }
 
     fun testVariableDeclaration() {
-        myFixture.configureByFiles("variable_declaration.ex")
-
-        val usageTargets = UsageTargetUtil.findUsageTargets(myFixture.editor, myFixture.file)
-
-        assertEquals(1, usageTargets.size)
-
-        val usageTarget = usageTargets[0]
-
-        assertInstanceOf(usageTarget, PsiElement2UsageTargetAdapter::class.java)
-
-        val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
-        val readWriteAccessDetector = readWriteAccessDetector(target)!!
-
-        assertEquals("variable", findUsagesProvider.getType(target))
-
-        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
+        val usages = myFixture.testFindUsagesUsingAction("variable_declaration.ex").map { it as UsageInfo2UsageAdapter }
 
         assertEquals(2, usages.size)
+        assertContainsElements( usages.map { it.element!!.textOffset }, listOf(46, 99))
 
-        val firstElement = usages[0].element!!
+        val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
-        assertEquals(46, firstElement.textOffset)
-
-        assertTrue(readWriteAccessDetector.isDeclarationWriteAccess(firstElement))
-        assertTrue(readWriteAccessDetector.isReadWriteAccessible(firstElement))
-        assertEquals(ReadWriteAccessDetector.Access.Write, readWriteAccessDetector.getExpressionAccess(firstElement))
-
-        assertEquals(UsageType.WRITE, getUsageType(firstElement, usageTargets))
-
-        val secondElement = usages[1].element!!
-
-        assertEquals(99, secondElement.textOffset)
-
-        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(secondElement))
-        assertFalse(readWriteAccessDetector.isReadWriteAccessible(secondElement))
-        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(secondElement))
-
-        assertEquals(UsageType.READ, getUsageType(secondElement, usageTargets))
+        assertEquals("""<root> (2)
+ Usages in (2)
+  Value read (1)
+   light_idea_test_case (1)
+     (1)
+     variable_declaration.ex (1)
+      5variable
+  Value write (1)
+   light_idea_test_case (1)
+     (1)
+     variable_declaration.ex (1)
+      3variable = Application.get_env(:variable, :key)
+""",
+                usageViewTreeTextRepresentation)
     }
 
     fun testVariableUnused() {
-        myFixture.configureByFiles("variable_unused.ex")
-
-        val usageTargets = UsageTargetUtil.findUsageTargets(myFixture.editor, myFixture.file)
-
-        assertEquals(1, usageTargets.size)
-
-        val usageTarget = usageTargets[0]
-
-        assertInstanceOf(usageTarget, PsiElement2UsageTargetAdapter::class.java)
-
-        val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
-        val readWriteAccessDetector = readWriteAccessDetector(target)!!
-
-        assertEquals("variable", findUsagesProvider.getType(target))
-
-        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
+        val usages = myFixture.testFindUsagesUsingAction("variable_unused.ex").map { it as UsageInfo2UsageAdapter }
 
         assertEquals(1, usages.size)
 
-        val firstElement = usages[0].element!!
+        assertContainsElements( usages.map { it.element!!.textOffset }, listOf(46))
 
-        assertEquals(46, firstElement.textOffset)
+        val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
-        assertTrue(readWriteAccessDetector.isDeclarationWriteAccess(firstElement))
-        assertTrue(readWriteAccessDetector.isReadWriteAccessible(firstElement))
-        assertEquals(ReadWriteAccessDetector.Access.Write, readWriteAccessDetector.getExpressionAccess(firstElement))
-
-        assertEquals(UsageType.WRITE, getUsageType(firstElement, usageTargets))
+        assertEquals("""<root> (1)
+ Usages in (1)
+  Value write (1)
+   light_idea_test_case (1)
+     (1)
+     variable_unused.ex (1)
+      3variable = Application.get_env(:variable, :key)
+""",
+                usageViewTreeTextRepresentation)
     }
 
     fun testVariableUsage() {
-        myFixture.configureByFiles("variable_usage.ex")
-
-        val usageTargets = UsageTargetUtil.findUsageTargets(myFixture.editor, myFixture.file)
-
-        assertEquals(1, usageTargets.size)
-
-        val usageTarget = usageTargets[0]
-
-        assertInstanceOf(usageTarget, PsiElement2UsageTargetAdapter::class.java)
-
-        val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
-
-        assertEquals("call", findUsagesProvider.getType(target))
-
-        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
+        val usages = myFixture.testFindUsagesUsingAction("variable_usage.ex").map { it as UsageInfo2UsageAdapter }
 
         assertEquals(2, usages.size)
+        assertContainsElements( usages.map { it.element!!.textOffset }, listOf(46))
 
-        val firstElement = usages[0].element!!
+        val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
-        assertEquals(46, firstElement.textOffset)
-
-        val readWriteAccessDetector = readWriteAccessDetector(firstElement)!!
-        assertTrue(readWriteAccessDetector.isDeclarationWriteAccess(firstElement))
-        assertTrue(readWriteAccessDetector.isReadWriteAccessible(firstElement))
-        assertEquals(ReadWriteAccessDetector.Access.Write, readWriteAccessDetector.getExpressionAccess(firstElement))
-
-        assertEquals(UsageType.WRITE, getUsageType(firstElement, usageTargets))
-
-        val secondElement = usages[1].element!!
-
-        assertEquals(99, secondElement.textOffset)
-
-        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(secondElement))
-        assertFalse(readWriteAccessDetector.isReadWriteAccessible(secondElement))
-        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(secondElement))
-
-        assertEquals(UsageType.READ, getUsageType(secondElement, usageTargets))
+        assertEquals("""<root> (2)
+ Usages in (2)
+  Value read (1)
+   light_idea_test_case (1)
+     (1)
+     variable_usage.ex (1)
+      5variable
+  Value write (1)
+   light_idea_test_case (1)
+     (1)
+     variable_usage.ex (1)
+      3variable = Application.get_env(:variable, :key)
+""",
+                usageViewTreeTextRepresentation)
     }
 
     fun testModuleAttributeDeclaration() {
-        myFixture.configureByFiles("module_attribute_declaration.ex")
-
-        val usageTargets = UsageTargetUtil.findUsageTargets(myFixture.editor, myFixture.file)
-
-        assertEquals(1, usageTargets.size)
-
-        val usageTarget = usageTargets[0]
-
-        assertInstanceOf(usageTarget, PsiElement2UsageTargetAdapter::class.java)
-
-        val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
-        val readWriteAccessDetector = readWriteAccessDetector(target)!!
-
-        assertEquals("module attribute", findUsagesProvider.getType(target))
-
-        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
+        val usages = myFixture.testFindUsagesUsingAction("module_attribute_declaration.ex").map { it as UsageInfo2UsageAdapter }
 
         assertEquals(2, usages.size)
+        assertContainsElements( usages.map { it.element!!.textOffset }, listOf(31, 69))
 
-        val firstElement = usages[0].element!!
+        val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
-        assertEquals(31, firstElement.textOffset)
-
-        assertTrue(readWriteAccessDetector.isDeclarationWriteAccess(firstElement))
-        assertTrue(readWriteAccessDetector.isReadWriteAccessible(firstElement))
-        assertEquals(ReadWriteAccessDetector.Access.Write, readWriteAccessDetector.getExpressionAccess(firstElement))
-
-        assertEquals(
-                UsageTypeProvider.MODULE_ATTRIBUTE_ACCUMULATE_OR_OVERRIDE,
-                getUsageType(firstElement, usageTargets)
-        )
-
-        val secondElement = usages[1].element!!
-
-        assertEquals(69, secondElement.textOffset)
-
-        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(secondElement))
-        assertTrue(readWriteAccessDetector.isReadWriteAccessible(secondElement))
-        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(secondElement))
-
-        assertEquals(UsageTypeProvider.MODULE_ATTRIBUTE_READ, getUsageType(secondElement, usageTargets))
+        assertEquals("""<root> (2)
+ Usages in (2)
+  Module attribute accumulate or override (1)
+   light_idea_test_case (1)
+     (1)
+     module_attribute_declaration.ex (1)
+      2@module_attribute 1
+  Module attribute read (1)
+   light_idea_test_case (1)
+     (1)
+     module_attribute_declaration.ex (1)
+      4def usage, do: @module_attribute
+""",
+                usageViewTreeTextRepresentation)
     }
 
     fun testModuleAttributeUsage() {
-        myFixture.configureByFiles("module_attribute_usage.ex")
-
-        val usageTargets = UsageTargetUtil.findUsageTargets(myFixture.editor, myFixture.file)
-
-        assertEquals(1, usageTargets.size)
-
-        val usageTarget = usageTargets[0]
-
-        assertInstanceOf(usageTarget, PsiElement2UsageTargetAdapter::class.java)
-
-        val target = (usageTarget as PsiElement2UsageTargetAdapter).element!!
-        val readWriteAccessDetector = readWriteAccessDetector(target)!!
-
-        assertEquals("module attribute", findUsagesProvider.getType(target))
-
-        val usages = myFixture.findUsages(target).sortedBy { it.element!!.textOffset }
+        val usages = myFixture.testFindUsagesUsingAction("module_attribute_usage.ex").map { it as UsageInfo2UsageAdapter }
 
         assertEquals(2, usages.size)
+        assertContainsElements( usages.map { it.element!!.textOffset }, listOf(31, 69))
 
-        val firstElement = usages[0].element!!
+        val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
-        assertEquals(31, firstElement.textOffset)
-
-        assertTrue(readWriteAccessDetector.isDeclarationWriteAccess(firstElement))
-        assertTrue(readWriteAccessDetector.isReadWriteAccessible(firstElement))
-        assertEquals(ReadWriteAccessDetector.Access.Write, readWriteAccessDetector.getExpressionAccess(firstElement))
-
-        assertEquals(
-                UsageTypeProvider.MODULE_ATTRIBUTE_ACCUMULATE_OR_OVERRIDE,
-                getUsageType(firstElement, usageTargets)
-        )
-
-        val secondElement = usages[1].element!!
-
-        assertEquals(69, secondElement.textOffset)
-
-        assertFalse(readWriteAccessDetector.isDeclarationWriteAccess(secondElement))
-        assertTrue(readWriteAccessDetector.isReadWriteAccessible(secondElement))
-        assertEquals(ReadWriteAccessDetector.Access.Read, readWriteAccessDetector.getExpressionAccess(secondElement))
-
-        assertEquals(UsageTypeProvider.MODULE_ATTRIBUTE_READ, getUsageType(secondElement, usageTargets))
+        assertEquals("""<root> (2)
+ Usages in (2)
+  Module attribute accumulate or override (1)
+   light_idea_test_case (1)
+     (1)
+     module_attribute_usage.ex (1)
+      2@module_attribute 1
+  Module attribute read (1)
+   light_idea_test_case (1)
+     (1)
+     module_attribute_usage.ex (1)
+      4def usage, do: @module_attribute
+""",
+                usageViewTreeTextRepresentation)
     }
 
-    private val findUsagesProvider by lazy { LanguageFindUsages.INSTANCE.forLanguage(ElixirLanguage) }
+    fun testIssue2374() {
+        val usages = myFixture.testFindUsagesUsingAction("issue_2374.ex").map { it as UsageInfo2UsageAdapter }
 
-    private fun findUsagesHandler(element: PsiElement) =
-        FindManager
-                .getInstance(project)
-                .let { it as FindManagerImpl }
-                .findUsagesManager
-                .getFindUsagesHandler(element, false)!!
+        assertEquals(3, usages.size)
 
-    private fun readWriteAccessDetector(element: PsiElement) =
-            com.intellij.codeInsight.highlighting.ReadWriteAccessDetector.findDetector(element)
+        usages.map { it.element!!.textOffset }.sorted()
 
-    private fun getUsageType(element: PsiElement, targets: Array<UsageTarget>): UsageType? =
-            com.intellij.usages.impl.rules.UsageTypeProvider.EP_NAME
-                    .extensionList
-                    .mapNotNull { usageTypeProvider ->
-                        when (usageTypeProvider) {
-                            is UsageTypeProviderEx -> usageTypeProvider.getUsageType(element, targets)
-                            else -> usageTypeProvider.getUsageType(element)
-                        }
-                    }
-                    .firstOrNull()
+        assertContainsElements( usages.map { it.element!!.textOffset }, listOf(23, 53, 53))
+
+        val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
+
+        assertEquals("""<root> (3)
+ Usages in (3)
+  Call definition clause (3)
+   light_idea_test_case (3)
+     (3)
+     issue_2374.ex (3)
+      2def foo, do: "foo"
+      3def bar, do: foo()
+      4def baz, do: foo()
+""",
+                usageViewTreeTextRepresentation)
+    }
 }

@@ -1,44 +1,34 @@
-package org.elixir_lang.reference.module;
+package org.elixir_lang.reference.module
 
-import org.elixir_lang.PlatformTestCase;
-
-import java.util.List;
+import org.elixir_lang.PlatformTestCase
 
 /**
  * Checks that nested module resolution is doing substitution at alias separator ("."), instead of name.
  */
-public class NestedAliasVsStringTest extends PlatformTestCase {
+class NestedAliasVsStringTest : PlatformTestCase() {
     /*
      * Tests
      */
-
-    public void testCompletion() {
-        List<String> completionVariants = myFixture.getCompletionVariants(
+    fun testCompletion() {
+        val completionVariants = myFixture.getCompletionVariants(
                 "completion.ex",
                 "nested.ex",
                 "nested_suffix.ex",
                 "nested_under.ex"
-        );
+        )
         assertFalse(
                 "Lookup contains string suffixed module name.  Nesting substitution is not breaking on '.'",
-                completionVariants.contains("ABCDSuffix")
-        );
+                completionVariants!!.contains("ABCDSuffix")
+        )
         assertTrue(
                 "Completion on `alias as:` does not complete as: aliased name",
                 completionVariants.contains("ABCD")
-        );
+        )
         assertTrue(
                 "Completion on `alias as:` does not complete module nested under as: aliased name",
                 completionVariants.contains("ABCD.Nested")
-        );
+        )
     }
 
-    /*
-     * Protected Instance Methods
-     */
-
-    @Override
-    protected String getTestDataPath() {
-        return "testData/org/elixir_lang/reference/module/nested_alias_vs_string";
-    }
+    override fun getTestDataPath(): String = "testData/org/elixir_lang/reference/module/nested_alias_vs_string"
 }
