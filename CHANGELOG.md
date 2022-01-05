@@ -273,6 +273,9 @@
 * [#2447](https://github.com/KronicDeth/intellij-elixir/pull/2447) - [@KronicDeth](https://github.com/KronicDeth)
   * Use `getUsageViewTreeTextRepresentation` to check find usages.
   * Regression test for #2374.
+* [#2448](https://github.com/KronicDeth/intellij-elixir/pull/2448) - [@KronicDeth](https://github.com/KronicDeth)
+  * Regression test for #2386
+    Issue #2386 had the same root cause (OtpExternalFun not being decompiled correctly) as Issue #2410, so Issue #2386 was fixed by Pull Request #2441, but since @alexxero was nice enough to upload the `.beam` file for Issue #2386, I might as well add it as a regression test too.
 
 ### Bug Fixes
 * [#2397](https://github.com/KronicDeth/intellij-elixir/pull/2397) - [@KronicDeth](https://github.com/KronicDeth)
