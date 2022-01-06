@@ -16,6 +16,8 @@ object UnaliasedName {
     fun unaliasedName(namedElement: PsiNamedElement): String? =
             if (namedElement is QualifiableAlias) {
                 unaliasedName(namedElement)
+            } else if (namedElement is ElixirAtom) {
+                ":${namedElement.name}"
             } else if (namedElement is Call && namedElement.isCalling(KERNEL, Function.__MODULE__, 0)) {
                 __MODULE__
                         .reference(namedElement, useCall = null)
@@ -37,10 +39,11 @@ object UnaliasedName {
                 is ElixirAccessExpression -> {
                     val children = element.children
 
-                    assert(children.size >= 1)
+                    assert(children.isNotEmpty())
 
                     down(children[0])
                 }
+                is ElixirAtom -> ":${element.name}"
                 is QualifiableAlias -> element.name
                 else -> {
                     Logger.error(

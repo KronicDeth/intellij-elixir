@@ -2671,6 +2671,7 @@ atom ::= COLON (ATOM_FRAGMENT | line)
            methods = [
              getReference
              quote
+             getName
              setName
            ]
          }

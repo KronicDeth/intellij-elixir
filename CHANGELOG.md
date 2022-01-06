@@ -276,6 +276,8 @@
 * [#2448](https://github.com/KronicDeth/intellij-elixir/pull/2448) - [@KronicDeth](https://github.com/KronicDeth)
   * Regression test for #2386
     Issue #2386 had the same root cause (OtpExternalFun not being decompiled correctly) as Issue #2410, so Issue #2386 was fixed by Pull Request #2441, but since @alexxero was nice enough to upload the `.beam` file for Issue #2386, I might as well add it as a regression test too.
+* [#2453](https://github.com/KronicDeth/intellij-elixir/pull/2453) - [@KronicDeth](https://github.com/KronicDeth)
+  * Regression test for #2446
 
 ### Bug Fixes
 * [#2397](https://github.com/KronicDeth/intellij-elixir/pull/2397) - [@KronicDeth](https://github.com/KronicDeth)
@@ -313,6 +315,10 @@
   * Put `ENTRANCE` and Initial Visited Element in `__module__.Resolver`.
 * [#2452](https://github.com/KronicDeth/intellij-elixir/pull/2452) - [@KronicDeth](https://github.com/KronicDeth)
   * Keep searching when resolving type parameters if bitstring is encountered. 
+* [#2453](https://github.com/KronicDeth/intellij-elixir/pull/2453) - [@KronicDeth](https://github.com/KronicDeth)
+  * Fix `UnaliasedName.unaliasedName` for atoms.
+  * Restore `ElixirAtom#getName`
+    Lost when parser was regenerated when Elixir <= 1.6 support was dropped in [679a9689cfe097018b9baa4e894d4550a84d7aac](https://github.com/KronicDeth/intellij-elixir/commit/679a9689cfe097018b9baa4e894d4550a84d7aac).
 
 ## v12.0.1
 

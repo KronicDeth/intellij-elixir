@@ -46,6 +46,11 @@ public class ElixirAtomImpl extends ASTWrapperPsiElement implements ElixirAtom {
   }
 
   @Override
+  public @Nullable String getName() {
+    return ElixirPsiImplUtil.getName(this);
+  }
+
+  @Override
   public @NotNull PsiElement setName(@NotNull String newName) {
     return ElixirPsiImplUtil.setName(this, newName);
   }
