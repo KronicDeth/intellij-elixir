@@ -18,6 +18,8 @@ public interface ElixirAtom extends NavigatablePsiElement, PsiNamedElement, Quot
 
   @NotNull OtpErlangObject quote();
 
+  @Nullable String getName();
+
   @NotNull PsiElement setName(@NotNull String newName);
 
 }
