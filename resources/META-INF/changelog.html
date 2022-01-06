@@ -29,6 +29,7 @@
       <li>Regression test for<a href="https://github.com/KronicDeth/intellij-elixir/issues/2386">#2386</a><br>
         Issue <a href="https://github.com/KronicDeth/intellij-elixir/issues/2386">#2386</a> had the same root cause (OtpExternalFun not being decompiled correctly) as Issue <a href="https://github.com/KronicDeth/intellij-elixir/issues/2410">#2410</a>, so Issue <a href="https://github.com/KronicDeth/intellij-elixir/issues/2386">#2386</a>
         was fixed by Pull Request <a href="https://github.com/KronicDeth/intellij-elixir/pull/2441">#2441</a>, but since <a href="https://github.com/alexxero">@alexxero</a> was nice enough to upload the <code>.beam</code> file for Issue <a href="https://github.com/KronicDeth/intellij-elixir/issues/2386">#2386</a>, I might as well add it as a regression test too.</li>
+      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/2446">#2446</a></li>
     </ul>
   </li>
   <li>
@@ -69,6 +70,9 @@
         Since the annotators will run in arbitrary order, the <code>Textual</code> annotator has to avoid annotating the same nodes as the <code>ModuleAttribute</code> annotator or the colors can get interleaved.</li>
       <li>Put <code>ENTRANCE</code> and Initial Visited Element in <code>__module__.Resolver</code>.</li>
       <li>Keep searching when resolving type parameters if bitstring is encountered.</li>
+      <li>Fix <code>UnaliasedName.unaliasedName</code> for atoms.</li>
+      <li>Restore <code>ElixirAtom#getName</code><br>
+        Lost when parser was regenerated when Elixir &lt;= 1.6 support was dropped in <a href="https://github.com/KronicDeth/intellij-elixir/commit/679a9689cfe097018b9baa4e894d4550a84d7aac">679a968</a>.</li>
     </ul>
   </li>
 </ul>
