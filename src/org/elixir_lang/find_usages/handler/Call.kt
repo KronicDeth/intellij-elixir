@@ -3,6 +3,7 @@ package org.elixir_lang.find_usages.handler
 import com.intellij.find.findUsages.FindUsagesHandler
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
+import org.elixir_lang.find_usages.toPsiElementList
 import org.elixir_lang.psi.ArityInterval
 import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall
@@ -11,6 +12,16 @@ import org.elixir_lang.psi.Modular
 import org.elixir_lang.psi.call.Call
 
 class Call(call: Call) : FindUsagesHandler(call) {
+    private val _primaryElements by lazy {
+        val resolvedElements = resolvedElements()
+
+        if (resolvedElements.isNotEmpty()) {
+            resolvedElements
+        } else {
+            super.getPrimaryElements()
+        }
+    }
+
     private val _secondaryElements by lazy {
         val primaryElements = this.primaryElements
 
@@ -23,7 +34,15 @@ class Call(call: Call) : FindUsagesHandler(call) {
                 .toTypedArray()
     }
 
+    override fun getPrimaryElements(): Array<PsiElement> = _primaryElements
     override fun getSecondaryElements(): Array<PsiElement> = _secondaryElements
+
+    private fun resolvedElements() =
+            super
+                    .getPrimaryElements()
+                    .flatMap { it.references.toList() }
+                    .flatMap { it.toPsiElementList() }
+                    .toTypedArray()
 }
 
 private data class CallNameArityInterval(val call: Call, val name: String, val arityInterval: ArityInterval) {
