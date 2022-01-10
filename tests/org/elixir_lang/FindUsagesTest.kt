@@ -1,5 +1,6 @@
 package org.elixir_lang
 
+import com.intellij.openapi.application.ex.ApplicationInfoEx
 import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.usages.UsageInfo2UsageAdapter
 
@@ -17,7 +18,7 @@ class FindUsagesTest : PlatformTestCase() {
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
         assertEquals("""<root> (3)
- Usages in (3)
+ ${usages()} (3)
   Call definition clause (2)
    light_idea_test_case (2)
      (2)
@@ -42,7 +43,7 @@ class FindUsagesTest : PlatformTestCase() {
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
         assertEquals("""<root> (3)
- Usages in (3)
+ ${usages()} (3)
   Call definition clause (2)
    light_idea_test_case (2)
      (2)
@@ -67,7 +68,7 @@ class FindUsagesTest : PlatformTestCase() {
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
         assertEquals("""<root> (1)
- Usages in (1)
+ ${usages()} (1)
   Call definition clause (1)
    light_idea_test_case (1)
      (1)
@@ -86,7 +87,7 @@ class FindUsagesTest : PlatformTestCase() {
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
         assertEquals("""<root> (2)
- Usages in (2)
+ ${usages()} (2)
   Call definition clause (2)
    light_idea_test_case (2)
      (2)
@@ -106,7 +107,7 @@ class FindUsagesTest : PlatformTestCase() {
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
         assertEquals("""<root> (2)
- Usages in (2)
+ ${usages()} (2)
   Call definition clause (1)
    light_idea_test_case (1)
      (1)
@@ -130,7 +131,7 @@ class FindUsagesTest : PlatformTestCase() {
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
         assertEquals("""<root> (2)
- Usages in (2)
+ ${usages()} (2)
   Call definition clause (1)
    light_idea_test_case (1)
      (1)
@@ -154,7 +155,7 @@ class FindUsagesTest : PlatformTestCase() {
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
         assertEquals("""<root> (2)
- Usages in (2)
+ ${usages()} (2)
   Call definition clause (1)
    light_idea_test_case (1)
      (1)
@@ -185,7 +186,7 @@ class FindUsagesTest : PlatformTestCase() {
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usageInfos)
 
         assertEquals("""<root> (2)
- Usages in (2)
+ ${usages()} (2)
   Call definition clause (1)
    light_idea_test_case (1)
      (1)
@@ -209,7 +210,7 @@ class FindUsagesTest : PlatformTestCase() {
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
         assertEquals("""<root> (2)
- Usages in (2)
+ ${usages()} (2)
   Parameter declaration (1)
    light_idea_test_case (1)
      (1)
@@ -233,7 +234,7 @@ class FindUsagesTest : PlatformTestCase() {
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
         assertEquals("""<root> (2)
- Usages in (2)
+ ${usages()} (2)
   Alias (1)
    light_idea_test_case (1)
      (1)
@@ -264,7 +265,7 @@ class FindUsagesTest : PlatformTestCase() {
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usageInfos)
 
         assertEquals("""<root> (2)
- Usages in (2)
+ ${usages()} (2)
   Alias (1)
    light_idea_test_case (1)
      (1)
@@ -288,7 +289,7 @@ class FindUsagesTest : PlatformTestCase() {
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
         assertEquals("""<root> (3)
- Usages in (3)
+ ${usages()} (3)
   Alias (2)
    light_idea_test_case (2)
      (2)
@@ -313,7 +314,7 @@ class FindUsagesTest : PlatformTestCase() {
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
         assertEquals("""<root> (2)
- Usages in (2)
+ ${usages()} (2)
   Alias (1)
    light_idea_test_case (1)
      (1)
@@ -344,7 +345,7 @@ class FindUsagesTest : PlatformTestCase() {
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usageInfos)
 
         assertEquals("""<root> (2)
- Usages in (2)
+ ${usages()} (2)
   Alias (1)
    light_idea_test_case (1)
      (1)
@@ -368,7 +369,7 @@ class FindUsagesTest : PlatformTestCase() {
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
         assertEquals("""<root> (1)
- Usages in (1)
+ ${usages()} (1)
   Parameter declaration (1)
    light_idea_test_case (1)
      (1)
@@ -387,7 +388,7 @@ class FindUsagesTest : PlatformTestCase() {
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
         assertEquals("""<root> (2)
- Usages in (2)
+ ${usages()} (2)
   Parameter declaration (1)
    light_idea_test_case (1)
      (1)
@@ -411,7 +412,7 @@ class FindUsagesTest : PlatformTestCase() {
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
         assertEquals("""<root> (2)
- Usages in (2)
+ ${usages()} (2)
   Value read (1)
    light_idea_test_case (1)
      (1)
@@ -436,7 +437,7 @@ class FindUsagesTest : PlatformTestCase() {
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
         assertEquals("""<root> (1)
- Usages in (1)
+ ${usages()} (1)
   Value write (1)
    light_idea_test_case (1)
      (1)
@@ -455,7 +456,7 @@ class FindUsagesTest : PlatformTestCase() {
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
         assertEquals("""<root> (2)
- Usages in (2)
+ ${usages()} (2)
   Value read (1)
    light_idea_test_case (1)
      (1)
@@ -479,7 +480,7 @@ class FindUsagesTest : PlatformTestCase() {
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
         assertEquals("""<root> (2)
- Usages in (2)
+ ${usages()} (2)
   Module attribute accumulate or override (1)
    light_idea_test_case (1)
      (1)
@@ -503,7 +504,7 @@ class FindUsagesTest : PlatformTestCase() {
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
         assertEquals("""<root> (2)
- Usages in (2)
+ ${usages()} (2)
   Module attribute accumulate or override (1)
    light_idea_test_case (1)
      (1)
@@ -530,7 +531,7 @@ class FindUsagesTest : PlatformTestCase() {
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
         assertEquals("""<root> (3)
- Usages in (3)
+ ${usages()} (3)
   Call definition clause (3)
    light_idea_test_case (3)
      (3)
@@ -541,4 +542,11 @@ class FindUsagesTest : PlatformTestCase() {
 """,
                 usageViewTreeTextRepresentation)
     }
+
+    private fun usages(): String =
+        if (ApplicationInfoEx.getInstance().fullVersion == "2021.1.3") {
+            "Found usages"
+        } else {
+            "Usages in"
+        }
 }
