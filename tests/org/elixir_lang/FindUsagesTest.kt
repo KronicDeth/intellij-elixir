@@ -3,6 +3,7 @@ package org.elixir_lang
 import com.intellij.openapi.application.ex.ApplicationInfoEx
 import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.usages.UsageInfo2UsageAdapter
+import org.elixir_lang.find_usages.handler.AlreadyResolved
 
 class FindUsagesTest : PlatformTestCase() {
     override fun getTestDataPath(): String {
@@ -171,17 +172,22 @@ class FindUsagesTest : PlatformTestCase() {
     }
 
     fun testFunctionImportUsage() {
-        myFixture.configureByFiles("function_import_usage_target.ex", "function_import_usage_declaration.ex", "kernel.ex")
+        val usageInfos = if (AlreadyResolved.alreadyResolved) {
+            myFixture.configureByFiles("function_import_usage_target.ex", "function_import_usage_declaration.ex", "kernel.ex")
 
-        val reference = myFixture.getReferenceAtCaretPositionWithAssertion() as PsiPolyVariantReference
-        assertNotNull(reference)
+            val reference = myFixture.getReferenceAtCaretPositionWithAssertion() as PsiPolyVariantReference
+            assertNotNull(reference)
 
-        val resolved = reference.multiResolve(false)
-        assertEquals(2, resolved.size)
+            val resolved = reference.multiResolve(false)
+            assertEquals(2, resolved.size)
 
-        val usageInfos = myFixture.findUsages(resolved[0].element!!)
+            myFixture.findUsages(resolved[0].element!!)
+        } else {
+            myFixture.testFindUsagesUsingAction("function_import_usage_target.ex", "function_import_usage_declaration.ex", "kernel.ex").map { it.let { it as UsageInfo2UsageAdapter }.usageInfo }
+        }
+
         assertEquals(2, usageInfos.size)
-        assertContainsElements( usageInfos.map { it.element!!.textOffset }, listOf(31, 60))
+        assertContainsElements(usageInfos.map { it.element!!.textOffset }, listOf(31, 60))
 
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usageInfos)
 
@@ -250,15 +256,22 @@ class FindUsagesTest : PlatformTestCase() {
     }
 
     fun testModuleRecursiveUsage() {
-        myFixture.configureByFiles("module_recursive_usage.ex", "kernel.ex")
+        val fileNames = arrayOf("module_recursive_usage.ex", "kernel.ex")
 
-        val reference = myFixture.getReferenceAtCaretPositionWithAssertion() as PsiPolyVariantReference
-        assertNotNull(reference)
+        val usageInfos = if (AlreadyResolved.alreadyResolved) {
+            myFixture.configureByFiles(*fileNames)
 
-        val resolved = reference.multiResolve(false)
-        assertEquals(2, resolved.size)
+            val reference = myFixture.getReferenceAtCaretPositionWithAssertion() as PsiPolyVariantReference
+            assertNotNull(reference)
 
-        val usageInfos = myFixture.findUsages(resolved[0].element!!)
+            val resolved = reference.multiResolve(false)
+            assertEquals(2, resolved.size)
+
+             myFixture.findUsages(resolved[0].element!!)
+        } else {
+            myFixture.testFindUsagesUsingAction(*fileNames).map { it.let { it as UsageInfo2UsageAdapter }.usageInfo }
+        }
+
         assertEquals(2, usageInfos.size)
         assertContainsElements( usageInfos.map { it.element!!.textOffset }, listOf(10, 33))
 
@@ -330,15 +343,22 @@ class FindUsagesTest : PlatformTestCase() {
     }
 
     fun testModuleMultipleModulesUsage() {
-        myFixture.configureByFiles("module_multiple_modules_usage_target.ex", "module_multiple_modules_usage_declaration.ex", "kernel.ex")
+        val fileNames = arrayOf("module_multiple_modules_usage_target.ex", "module_multiple_modules_usage_declaration.ex", "kernel.ex")
 
-        val reference = myFixture.getReferenceAtCaretPositionWithAssertion() as PsiPolyVariantReference
-        assertNotNull(reference)
+        val usageInfos = if (AlreadyResolved.alreadyResolved) {
+            myFixture.configureByFiles(*fileNames)
 
-        val resolved = reference.multiResolve(false)
-        assertEquals(2, resolved.size)
+            val reference = myFixture.getReferenceAtCaretPositionWithAssertion() as PsiPolyVariantReference
+            assertNotNull(reference)
 
-        val usageInfos = myFixture.findUsages(resolved[0].element!!)
+            val resolved = reference.multiResolve(false)
+            assertEquals(2, resolved.size)
+
+            myFixture.findUsages(resolved[0].element!!)
+        } else {
+            myFixture.testFindUsagesUsingAction(*fileNames).map { it.let { it as UsageInfo2UsageAdapter }.usageInfo }
+        }
+
         assertEquals(2, usageInfos.size)
         assertContainsElements( usageInfos.map { it.element!!.textOffset }, listOf(10, 27))
 
