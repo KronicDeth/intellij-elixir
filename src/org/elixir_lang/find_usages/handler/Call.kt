@@ -1,6 +1,8 @@
 package org.elixir_lang.find_usages.handler
 
 import com.intellij.find.findUsages.FindUsagesHandler
+import com.intellij.openapi.application.ex.ApplicationInfoEx
+import com.intellij.openapi.util.BuildNumber
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import org.elixir_lang.find_usages.toPsiElementList
@@ -8,8 +10,20 @@ import org.elixir_lang.psi.ArityInterval
 import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall
 import org.elixir_lang.psi.CallDefinitionClause.nameArityInterval
+import org.elixir_lang.psi.Import
 import org.elixir_lang.psi.Modular
 import org.elixir_lang.psi.call.Call
+
+object AlreadyResolved {
+    private val START = BuildNumber("", 213)
+    private val END = BuildNumber("", 213, 6461)
+
+    val alreadyResolved by lazy {
+        val build = ApplicationInfoEx.getInstance().build
+
+        START < build && build < END
+    }
+}
 
 class Call(call: Call) : FindUsagesHandler(call) {
     private val _primaryElements by lazy {
@@ -34,15 +48,20 @@ class Call(call: Call) : FindUsagesHandler(call) {
                 .toTypedArray()
     }
 
-    override fun getPrimaryElements(): Array<PsiElement> = _primaryElements
+     override fun getPrimaryElements(): Array<PsiElement> = _primaryElements
     override fun getSecondaryElements(): Array<PsiElement> = _secondaryElements
 
     private fun resolvedElements() =
-            super
-                    .getPrimaryElements()
-                    .flatMap { it.references.toList() }
-                    .flatMap { it.toPsiElementList() }
-                    .toTypedArray()
+            if (AlreadyResolved.alreadyResolved) {
+                super.getPrimaryElements()
+            } else {
+                super
+                        .getPrimaryElements()
+                        .flatMap { it.references.toList() }
+                        .flatMap { it.toPsiElementList() }
+                        .filter { it !is Call || !Import.`is`(it) }
+                        .toTypedArray()
+            }
 }
 
 private data class CallNameArityInterval(val call: Call, val name: String, val arityInterval: ArityInterval) {
