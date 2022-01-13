@@ -1,5 +1,36 @@
 <html>
 <body>
+<h1>v12.2.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul dir="auto">
+      <li>Test against support IDEA versions in CI to prevent another Find Usage regression
+        <ul dir="auto">
+          <li>2021.2.3 FindUsageTests differ from manual testings, so don't test 2021.2.3</li>
+          <li>Make FindUsagesTest UsageViewTreeText work for both 2021.1.3 and other versions</li>
+          <li>Add kernel.ex to all Find Usage Tests to ensure it doesn't work because it can't resolve primary element</li>
+        </ul>
+      </li>
+      <li>Add find usages for def test</li>
+    </ul>
+  </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul dir="auto">
+      <li>Work-around Find Usage bug due to temporary change in JetBrains API only in versions that have that change.
+        <ul dir="auto">
+          <li>Restore old find_usages.handler.Call</li>
+          <li>
+            Determine whether to resolve <code>FindUsageHandler</code> primary element based on application build number<br>
+            Assume that are 213.* builds have the already resolved call. This excludes 2021.3, but not 2021.3.1, which
+            includes the fix to restore the 2021.1.3 behaviour.
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
 <h1>v12.1.0</h1>
 <ul>
   <li>
