@@ -270,6 +270,9 @@
     * Restore old find_usages.handler.Call
     * Determine whether to resolve `FindUsageHandler` primary element based on application build number
       Assume that are 213.* builds have the already resolved call. This excludes 2021.3, but not 2021.3.1, which includes the fix to restore the 2021.1.3 behaviour.
+* [#2466](https://github.com/KronicDeth/intellij-elixir/pull/2466) - [@KronicDeth](https://github.com/KronicDeth)
+  * Fix HTML errors in `description.html`.
+  * Add card one-liner.
 
 ## v12.1.0
 
