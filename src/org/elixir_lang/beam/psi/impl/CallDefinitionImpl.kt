@@ -8,12 +8,16 @@ import com.intellij.psi.StubBasedPsiElement
 import com.intellij.psi.impl.source.tree.TreeElement
 import com.intellij.psi.stubs.IStubElementType
 import com.intellij.util.IncorrectOperationException
+import org.elixir_lang.NameArityInterval
 import org.elixir_lang.beam.psi.CallDefinition
 import org.elixir_lang.beam.psi.stubs.CallDefinitionStub
+import org.elixir_lang.psi.ArityInterval
+import org.elixir_lang.structure_view.element.Timed
 import org.jetbrains.annotations.Contract
 import org.jetbrains.annotations.NonNls
 
-class CallDefinitionImpl<T : CallDefinitionStub<*>>(private val stub: T) : ModuleElementImpl(), CallDefinition, StubBasedPsiElement<T> {
+class CallDefinitionImpl<T : CallDefinitionStub<*>>(private val stub: T) : ModuleElementImpl(), CallDefinition,
+                                                                           StubBasedPsiElement<T> {
     override fun getProject(): Project = parent.project
 
     /**
@@ -29,7 +33,7 @@ class CallDefinitionImpl<T : CallDefinitionStub<*>>(private val stub: T) : Modul
      *
      * @return the parent of the element, or null if the element has no parent.
      */
-    override fun getParent(): PsiElement = stub.parentStub.psi
+    override fun getParent(): ModuleImpl<*> = stub.parentStub.psi as ModuleImpl<*>
 
     override fun getElementType(): IStubElementType<*, *> = stub.stubType
 
@@ -60,7 +64,7 @@ class CallDefinitionImpl<T : CallDefinitionStub<*>>(private val stub: T) : Modul
      * @throws IncorrectOperationException if the modification is not supported or not possible for some reason.
      */
     override fun setName(@NonNls name: String): PsiElement =
-            throw IncorrectOperationException("Cannot modify module name in Beam files")
+        throw IncorrectOperationException("Cannot modify module name in Beam files")
 
     override fun getNavigationElement(): PsiElement = mirror
 
@@ -81,4 +85,12 @@ class CallDefinitionImpl<T : CallDefinitionStub<*>>(private val stub: T) : Modul
      * The name that was exported into the compiled .beam file
      */
     override fun exportedName(): String = stub.name
+
+    override val time: Timed.Time
+        get() = TODO("Not yet implemented")
+    override val nameArityInterval: NameArityInterval by lazy {
+        val arity = stub.callDefinitionClauseHeadArity()
+
+        NameArityInterval(stub.name, ArityInterval(arity, arity))
+    }
 }

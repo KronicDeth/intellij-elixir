@@ -154,12 +154,12 @@ abstract class Type : PsiScopeProcessor {
                 if (expression.isCalling("Protocol", "__protocol__", 2)) {
                     expression.reference?.let { it as PsiPolyVariantReference }?.multiResolve(false)?.let { resolveResults ->
                         whileIn(resolveResults) { resolveResult ->
-                            resolveResult.element?.let { it as? Call }?.let { __protocol__ ->
+                            resolveResult.element?.let { __protocol__ ->
                                 Using.treeWalkUp(
-                                        __protocol__,
-                                        useCall = null,
-                                        resolveState = state,
-                                        keepProcessing = ::executeOn__protocol__DefinitionExpression
+                                    __protocol__,
+                                    use = null,
+                                    resolveState = state,
+                                    keepProcessing = ::executeOn__protocol__DefinitionExpression
                                 )
                             } ?: true
                         }

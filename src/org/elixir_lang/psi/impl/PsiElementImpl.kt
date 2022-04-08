@@ -31,68 +31,62 @@ fun PsiElement.document(): Document? = containingFile.viewProvider.let { viewPro
 }
 
 tailrec fun PsiElement.selfOrEnclosingMacroCall(): Call? =
-        when (this) {
-            is ElixirDoBlock ->
-                parent.let { it as? Call }
-            is ElixirAnonymousFunction -> {
-                parent.let { it as? ElixirAccessExpression }?.
-                        parent.let { it as? Arguments }?.
-                        parent.let { it as? ElixirMatchedParenthesesArguments }?.
-                        parent.let { it as?  Call }?.
-                        let { call ->
-                            if (call.resolvedModuleName() == "Enum" &&
-                                    call.functionName() in arrayOf("each", "map", "reduce")) {
-                                call
-                            } else {
-                                null
-                            }
-                        }?.
-                        parent?.
-                        selfOrEnclosingMacroCall()
-            }
-            is Arguments,
-            is AtUnqualifiedNoParenthesesCall<*>,
-            is ElixirAccessExpression,
-            is ElixirBlockItem,
-            is ElixirBlockList,
-            is ElixirList,
-            is ElixirMatchedParenthesesArguments,
-            is ElixirMatchedWhenOperation,
-            is ElixirNoParenthesesManyStrictNoParenthesesExpression,
-            is ElixirParentheticalStab,
-            is ElixirStab,
-            is ElixirStabBody,
-            is ElixirStabOperation,
-            is ElixirTuple,
-            is Match,
-            is Pipe,
-            is QualifiedAlias,
-            is QualifiedMultipleAliases ->
-                parent.selfOrEnclosingMacroCall()
-            is Call ->
-                when {
-                    isCalling(KERNEL, ALIAS) -> this
-                    isCalling(org.elixir_lang.psi.call.name.Module.MODULE, CREATE, 3) -> this
-                    else -> null
-                }
-            is QuotableKeywordPair ->
-                if (this.hasKeywordKey("do")) {
-                    parent.let { it as? QuotableKeywordList }?.
-                    parent.let { keywordListParent ->
-                        when (keywordListParent) {
-                            is ElixirNoParenthesesOneArgument -> keywordListParent
-                            is ElixirParenthesesArguments -> {
-                                keywordListParent.parent.let { it as? ElixirMatchedParenthesesArguments }
-                            }
-                            else -> null
-                        }
-                    }?.
-                    parent.let { it as? Call }
-                } else {
-                    null
-                }
-            else -> null
+    when (this) {
+        is ElixirDoBlock ->
+            parent.let { it as? Call }
+        is ElixirAnonymousFunction -> {
+            parent.let { it as? ElixirAccessExpression }?.parent.let { it as? Arguments }?.parent.let { it as? ElixirMatchedParenthesesArguments }?.parent
+                .let { it as? Call }?.let { call ->
+                    if (call.resolvedModuleName() == "Enum" &&
+                        call.functionName() in arrayOf("each", "map", "reduce")
+                    ) {
+                        call
+                    } else {
+                        null
+                    }
+                }?.parent?.selfOrEnclosingMacroCall()
         }
+        is Arguments,
+        is AtUnqualifiedNoParenthesesCall<*>,
+        is ElixirAccessExpression,
+        is ElixirBlockItem,
+        is ElixirBlockList,
+        is ElixirList,
+        is ElixirMatchedParenthesesArguments,
+        is ElixirMatchedWhenOperation,
+        is ElixirNoParenthesesManyStrictNoParenthesesExpression,
+        is ElixirParentheticalStab,
+        is ElixirStab,
+        is ElixirStabBody,
+        is ElixirStabOperation,
+        is ElixirTuple,
+        is Match,
+        is Pipe,
+        is QualifiedAlias,
+        is QualifiedMultipleAliases ->
+            parent.selfOrEnclosingMacroCall()
+        is Call ->
+            when {
+                isCalling(KERNEL, ALIAS) -> this
+                isCalling(org.elixir_lang.psi.call.name.Module.MODULE, CREATE, 3) -> this
+                else -> null
+            }
+        is QuotableKeywordPair ->
+            if (this.hasKeywordKey("do")) {
+                parent.let { it as? QuotableKeywordList }?.parent.let { keywordListParent ->
+                    when (keywordListParent) {
+                        is ElixirNoParenthesesOneArgument -> keywordListParent
+                        is ElixirParenthesesArguments -> {
+                            keywordListParent.parent.let { it as? ElixirMatchedParenthesesArguments }
+                        }
+                        else -> null
+                    }
+                }?.parent.let { it as? Call }
+            } else {
+                null
+            }
+        else -> null
+    }
 
 /**
  *
@@ -116,33 +110,36 @@ fun PsiElement.getModuleName(): String? {
     }
 }
 
-fun <R> PsiElement.foldChildrenWhile(initial: R, operation: (PsiElement, acc: R) -> AccumulatorContinue<R>): AccumulatorContinue<R> =
-        when (this) {
-            is ElixirAccessExpression ->
-                operation(firstChild, initial)
-            is ElixirList, is ElixirStabBody -> {
-                var child: PsiElement? = firstChild
-                var final = AccumulatorContinue(initial, true)
+fun <R> PsiElement.foldChildrenWhile(
+    initial: R,
+    operation: (PsiElement, acc: R) -> AccumulatorContinue<R>
+): AccumulatorContinue<R> =
+    when (this) {
+        is ElixirAccessExpression ->
+            operation(firstChild, initial)
+        is ElixirList, is ElixirStabBody -> {
+            var child: PsiElement? = firstChild
+            var final = AccumulatorContinue(initial, true)
 
-                while (child != null) {
-                    final = if (child is ElixirAccessExpression) {
-                        child.foldChildrenWhile(initial, operation)
-                    } else {
-                        operation(child, final.accumulator)
-                    }
-
-                    if (!final.`continue`) {
-                        break
-                    } else {
-                        child = child.nextSibling
-                    }
+            while (child != null) {
+                final = if (child is ElixirAccessExpression) {
+                    child.foldChildrenWhile(initial, operation)
+                } else {
+                    operation(child, final.accumulator)
                 }
 
-                final
+                if (!final.`continue`) {
+                    break
+                } else {
+                    child = child.nextSibling
+                }
             }
-            else ->
-                AccumulatorContinue(initial, true)
+
+            final
         }
+        else ->
+            AccumulatorContinue(initial, true)
+    }
 
 fun PsiElement.macroChildCallList(): MutableList<Call> {
     val callList: MutableList<Call>
@@ -173,41 +170,45 @@ fun PsiElement.macroChildCallList(): MutableList<Call> {
  * `maybeAlias` after it is resolved through any `alias`es or `use`.
  */
 @Contract(pure = true)
-fun PsiElement.maybeModularNameToModulars(maxScope: PsiElement, useCall: Call?, incompleteCode: Boolean): Set<Call> {
-    val strippedMaybeModuleName = stripAccessExpression()
-
-    return when (strippedMaybeModuleName) {
-        is ElixirAtom -> strippedMaybeModuleName.maybeModularNameToModulars(incompleteCode)
-        is QualifiableAlias -> strippedMaybeModuleName.maybeModularNameToModulars(maxScope)
-        is Call -> strippedMaybeModuleName.maybeModularNameToModulars(useCall)
-        else -> emptySet()
-    }
+fun PsiElement.maybeModularNameToModulars(
+    maxScope: PsiElement,
+    useCall: Call?,
+    incompleteCode: Boolean
+): Set<PsiElement> = when (val strippedMaybeModuleName = stripAccessExpression()) {
+    is ElixirAtom -> strippedMaybeModuleName.maybeModularNameToModulars(incompleteCode)
+    is QualifiableAlias -> strippedMaybeModuleName.maybeModularNameToModulars(maxScope)
+    is Call -> strippedMaybeModuleName.maybeModularNameToModulars(useCall)
+    else -> emptySet()
 }
 
 fun PsiElement.moduleWithDependentsScope(): GlobalSearchScope =
-        containingFile
-                .virtualFile
-                ?.let { virtualFile ->
-                    ModuleUtilCore
-                            .findModuleForFile(virtualFile, project)
-                            // module can be null for scratch files
-                            ?.let { GlobalSearchScope.moduleWithDependentsScope(it) }
-                }
-                ?: GlobalSearchScope.allScope(project)
+    containingFile
+        .virtualFile
+        ?.let { virtualFile ->
+            ModuleUtilCore
+                .findModuleForFile(virtualFile, project)
+                // module can be null for scratch files
+                ?.let { GlobalSearchScope.moduleWithDependentsScope(it) }
+        }
+        ?: GlobalSearchScope.allScope(project)
 
 fun PsiElement.prevSiblingSequence() = generateSequence(this) { it.prevSibling }
 
-fun PsiElement.whileInChildExpressions(forward: Boolean = true,
-                                       keepProcessing: (element: PsiElement) -> Boolean): Boolean =
+fun PsiElement.whileInChildExpressions(
+    forward: Boolean = true,
+    keepProcessing: (element: PsiElement) -> Boolean
+): Boolean =
     childExpressions(forward)
-            .let { whileIn(it, keepProcessing) }
+        .let { whileIn(it, keepProcessing) }
 
 fun <R> PsiElement.childExpressionsFoldWhile(
-        forward: Boolean,
-        initial: R,
-        folder: (element: PsiElement, accumulator: R
-        ) -> AccumulatorContinue<R>): AccumulatorContinue<R> =
-        AccumulatorContinue.childExpressionsFoldWhile(this, forward, initial, folder)
+    forward: Boolean,
+    initial: R,
+    folder: (
+        element: PsiElement, accumulator: R
+    ) -> AccumulatorContinue<R>
+): AccumulatorContinue<R> =
+    AccumulatorContinue.childExpressionsFoldWhile(this, forward, initial, folder)
 
 fun PsiElement.childExpressions(forward: Boolean = true): Sequence<PsiElement> {
     val seed = if (forward) {
@@ -220,13 +221,13 @@ fun PsiElement.childExpressions(forward: Boolean = true): Sequence<PsiElement> {
 }
 
 fun PsiElement.siblingExpressions(forward: Boolean = true, withSelf: Boolean = true): Sequence<PsiElement> =
-        siblings(forward, withSelf).filter(PsiElement::isExpression)
+    siblings(forward, withSelf).filter(PsiElement::isExpression)
 
 fun PsiElement.isExpression(): Boolean =
-        when (this) {
-            is ElixirEndOfExpression, is PsiComment, is PsiWhiteSpace -> false
-            else -> node is CompositeElement
-        }
+    when (this) {
+        is ElixirEndOfExpression, is PsiComment, is PsiWhiteSpace -> false
+        else -> node is CompositeElement
+    }
 
 @Contract(pure = true)
 fun PsiElement.siblingExpression(function: (PsiElement) -> PsiElement): PsiElement? {
@@ -235,9 +236,10 @@ fun PsiElement.siblingExpression(function: (PsiElement) -> PsiElement): PsiEleme
     do {
         expression = function(expression)
     } while (expression is ElixirEndOfExpression ||
-            expression is LeafPsiElement ||
-            expression is PsiComment ||
-            expression is PsiWhiteSpace)
+        expression is LeafPsiElement ||
+        expression is PsiComment ||
+        expression is PsiWhiteSpace
+    )
 
     return expression
 }

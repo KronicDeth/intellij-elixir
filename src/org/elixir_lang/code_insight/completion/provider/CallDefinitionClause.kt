@@ -8,6 +8,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.ResolveState
 import com.intellij.util.ProcessingContext
+import org.elixir_lang.beam.psi.impl.ModuleImpl
 import org.elixir_lang.navigation.isDecompiled
 import org.elixir_lang.psi.CallDefinitionClause.nameArityInterval
 import org.elixir_lang.psi.ElixirTypes
@@ -16,10 +17,16 @@ import org.elixir_lang.psi.impl.call.macroChildCalls
 import org.elixir_lang.psi.impl.maybeModularNameToModulars
 
 class CallDefinitionClause : CompletionProvider<CompletionParameters>() {
+    private fun callDefinitionClauseLookupElements(scope: PsiElement): Iterable<LookupElement> = when (scope) {
+        is Call -> callDefinitionClauseLookupElements(scope)
+        is ModuleImpl<*> -> callDefinitionClauseLookupElements(scope)
+        else -> emptyList()
+    }
+
     private fun callDefinitionClauseLookupElements(scope: Call): Iterable<LookupElement> {
         val callDefinitionClauseList = scope
-                .macroChildCalls()
-                .filter { org.elixir_lang.psi.CallDefinitionClause.`is`(it) }
+            .macroChildCalls()
+            .filter { org.elixir_lang.psi.CallDefinitionClause.`is`(it) }
 
         // decompiled private functions can't be made public, so exclude them
         val callable = if (scope.isDecompiled()) {
@@ -29,14 +36,18 @@ class CallDefinitionClause : CompletionProvider<CompletionParameters>() {
         }
 
         return callable
-                .mapNotNull {
-                    nameArityInterval(it, ResolveState.initial())?.let { (name, _) ->
-                        org.elixir_lang.code_insight.lookup.element.CallDefinitionClause.createWithSmartPointer(
-                                name,
-                                it
-                        )
-                    }
+            .mapNotNull {
+                nameArityInterval(it, ResolveState.initial())?.let { (name, _) ->
+                    org.elixir_lang.code_insight.lookup.element.CallDefinitionClause.createWithSmartPointer(
+                        name,
+                        it
+                    )
                 }
+            }
+    }
+
+    private fun callDefinitionClauseLookupElements(moduleImpl: ModuleImpl<*>): Iterable<LookupElement> {
+        TODO()
     }
 
     private fun maybeModularName(parameters: CompletionParameters): PsiElement? =
@@ -66,12 +77,18 @@ class CallDefinitionClause : CompletionProvider<CompletionParameters>() {
             }
         }
 
-    override fun addCompletions(parameters: CompletionParameters,
-                                context: ProcessingContext,
-                                resultSet: CompletionResultSet) {
+    override fun addCompletions(
+        parameters: CompletionParameters,
+        context: ProcessingContext,
+        resultSet: CompletionResultSet
+    ) {
         maybeModularName(parameters)?.let { maybeModularName ->
             maybeModularName.containingFile?.let { containingFile ->
-                val modulars = maybeModularName.maybeModularNameToModulars(maxScope = containingFile, useCall = null, incompleteCode = true)
+                val modulars = maybeModularName.maybeModularNameToModulars(
+                    maxScope = containingFile,
+                    useCall = null,
+                    incompleteCode = true
+                )
 
                 val modularsResultSet = if (resultSet.prefixMatcher.prefix.endsWith(".")) {
                     resultSet.withPrefixMatcher("")
@@ -81,7 +98,7 @@ class CallDefinitionClause : CompletionProvider<CompletionParameters>() {
 
                 for (modular in modulars) {
                     modularsResultSet.addAllElements(
-                            callDefinitionClauseLookupElements(modular)
+                        callDefinitionClauseLookupElements(modular)
                     )
                 }
             }
