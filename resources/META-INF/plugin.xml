@@ -69,6 +69,7 @@
         <configurationType implementation="org.elixir_lang.mix.configuration.Type"/>
 
         <library.type implementation="org.elixir_lang.mix.library.Type"/>
+        <externalFormatProcessor implementation="org.elixir_lang.formatter.MixFormatExternalFormatProcessor"/>
 
         <!-- Testing -->
         <configurationType implementation="org.elixir_lang.espec.configuration.Type"/>

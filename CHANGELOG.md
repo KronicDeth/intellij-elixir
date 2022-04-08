@@ -286,6 +286,9 @@
     * `--module`
     * `--sup`
     * `--umbrella`     
+* [#2578](https://github.com/KronicDeth/intellij-elixir/pull/2578) - [@yordis](https://github.com/yordis)
+  * Add `mix format` external formatter.
+    Requires project or module SDK be set in order to run.  If the SDK is not available, only the internal formatter will be used.  The internal formatter is still used for file subsection formatting and new line indenting as `mix format` works at the file-level.
 
 ### Bug Fixes
 

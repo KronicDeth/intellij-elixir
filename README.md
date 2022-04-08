@@ -4177,7 +4177,13 @@ If you hold `Cmd` and hover over the variable before clicking, it will say `para
 
 ### Formatting
 
-IntelliJ Elixir can reformat code to follow a consistent style.
+IntelliJ Elixir both has an internal formatter used to format new linees and parts of files, but also can use `mix format` to format entire files. 
+
+#### Formatters
+
+##### Internal
+
+IntelliJ Elixir's internal formatter can reformat code to follow a consistent style.
 
 * `do` block lines are indented
 * `do` blocks `end` as the last argument of a no parentheses call unindents to the start of the call
@@ -4244,9 +4250,36 @@ IntelliJ Elixir can reformat code to follow a consistent style.
 * Key exclusivity: if an association operation or keyword key is already on a line, the container value automatically has it's elements wrapped if there is nested associations or keyword pairs, so that two levels of keys are not on the same line.
 * Indent bit string (`<< >>`) elements when wrapped
 
-#### Directory
+##### External (`mix format`)
 
-All files in a directory can be reformatted.
+IntelliJ Elixir will run `mix format -` on the text of the file.  As `mix format` works on entire files, only whole
+file, multiple file, or directory formatting is supported using this external formatter.  Formatting subsections and
+new lines use the internal formatter until the next full file format uses `mix format`.
+
+**NOTE: The module or project SDK *MUST* be set in order to run `mix format`.  If the SDK is not set, only the internal formatter will be run.**
+
+#### Format on Save
+
+To tun on format on save:
+
+1. Preferences
+2. Tools > Actions on Save.
+3. Check "Reformat code".
+4. Make sure "All file types" is set or at least "Files: Elixir" is set.
+
+##### Autosave
+
+[JetBrains IDEs have autosave](https://www.jetbrains.com/help/idea/saving-and-reverting-changes.html) turned on by default when you click away from the editor window, but you can adjust the settings:
+
+1. Preferences
+2. Appearance & Behavior > System Settings.
+3. Check or uncheck the settings in the Autosave section.
+
+#### Formattables
+
+##### Directory
+
+All files in a directory can be reformatted using the External Formatter (`mix format`)
 
 Using context menu:
 
@@ -4264,11 +4297,11 @@ Using keyboard shortcuts:
 4. Set the desired options in the Reformat Code dialog
 5. Click Run
 
-#### File
+##### File
 
-##### Other File
+###### Other File
 
-All lines in a file can be reformatted.
+All lines in a file can be reformatted with the External Formatter (`mix format`).
 
 Using context menu:
 
@@ -4286,18 +4319,17 @@ Using keyboard shortcuts:
 4. Set the desired options in the Reformat Code dialog
 5. Click OK
 
-##### Current File
+###### Current File
 
-All the lines in the current editor tab file can be reformatted with the
-current settings.
+All the lines in the current editor tab file can be reformatted with External Formatter (`mix format`).
 
 * Code > Reformat
 * `Alt+Cmd+L`
   * `Alt+Shift+Cmd+L` to get the Reformat Code dialog.
 
-#### Selection
+##### Selection
 
-A subset of a file can be reformatted.
+A subset of a file can be reformatted using the Internal Formatter
 
 1. Highlight the selection
 2. Use the Reformat Code action
