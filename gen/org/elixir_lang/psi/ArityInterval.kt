@@ -21,7 +21,7 @@ import org.elixir_lang.psi.scope.CallDefinitionClause.Companion.MODULAR_CANONICA
  *
  * Open intervals are also where `unquote_splicing(args)` is used as the length of `args` is unknown.
  */
-data class ArityInterval(val minimum: Arity, val maximum: Arity?) {
+data class ArityInterval(val minimum: Arity, val maximum: Arity?): Comparable<ArityInterval> {
     /**
      * Unlike [org.apache.commons.lang.math.IntRange.IntRange]}, where the argument becomes the minimum AND
      * the maximum, here the argument is ONLY the minimum and the interval has an infinite maximum.
@@ -69,9 +69,11 @@ data class ArityInterval(val minimum: Arity, val maximum: Arity?) {
                 (minimum..minimum)
             }
 
-    operator fun contains(candidate: Arity): Boolean {
-        return minimum <= candidate && (maximum == null || candidate <= maximum)
-    }
+    operator fun contains(candidate: Arity): Boolean =
+        minimum <= candidate && (maximum == null || candidate <= maximum)
+
+    operator fun contains(candidate: ArityInterval): Boolean =
+        minimum <= candidate.minimum && (maximum == null || (candidate.maximum != null && candidate.maximum <= maximum))
 
     fun overlaps(other: ArityInterval): Boolean =
             // https://stackoverflow.com/questions/325933/determine-whether-two-date-ranges-overlap/325964#325964
@@ -87,6 +89,9 @@ data class ArityInterval(val minimum: Arity, val maximum: Arity?) {
             } else {
                 null
             }
+
+    override fun compareTo(other: ArityInterval): Int =
+            compareValuesBy(this, other, ArityInterval::minimum, ArityInterval::maximum)
 
     override fun toString(): String {
         val stringBuilder = StringBuilder("ArityInterval(").append(minimum)

@@ -4,19 +4,16 @@ import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementPresentation
 import com.intellij.codeInsight.lookup.LookupElementRenderer
 import org.elixir_lang.NameArity
-import org.elixir_lang.Visibility
-import org.elixir_lang.code_insight.lookup.element_renderer.putItemPresentation
-import org.elixir_lang.psi.CallDefinitionClause
-import org.elixir_lang.psi.Exception.EXCEPTION
-import org.elixir_lang.psi.Exception.MESSAGE
+import org.elixir_lang.semantic.Exception.Companion.EXCEPTION
+import org.elixir_lang.semantic.Exception.Companion.MESSAGE
 
 class CallDefinitionClause(val nameArity: NameArity) : LookupElementRenderer<LookupElement>() {
     override fun renderElement(element: LookupElement, lookupElementPresentation: LookupElementPresentation) {
         lookupElementPresentation.itemText = nameArity.name
 
-        when (nameArity) {
-            EXCEPTION -> lookupElementPresentation.appendTailText("(message)", true)
-            MESSAGE -> lookupElementPresentation.appendTailText("(exception)", true)
+        when {
+            EXCEPTION.contains(nameArity) -> lookupElementPresentation.appendTailText("(message)", true)
+            MESSAGE.contains(nameArity) -> lookupElementPresentation.appendTailText("(exception)", true)
             else -> Unit
         }
     }

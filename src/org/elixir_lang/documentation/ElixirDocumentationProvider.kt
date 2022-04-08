@@ -12,11 +12,13 @@ import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.Hidden
 import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.MarkdownByLanguage
 import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.None
 import org.elixir_lang.beam.psi.BeamFileImpl
-import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.ElixirIdentifier
 import org.elixir_lang.psi.QualifiableAlias
 import org.elixir_lang.psi.call.Call
-import org.elixir_lang.psi.stub.type.call.Stub
+import org.elixir_lang.semantic.Modular
+import org.elixir_lang.semantic.Semantic
+import org.elixir_lang.semantic.call.definition.Clause
+import org.elixir_lang.semantic.semantic
 import org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor
 import org.intellij.markdown.html.HtmlGenerator
 import org.intellij.markdown.parser.MarkdownParser
@@ -24,12 +26,17 @@ import org.intellij.markdown.parser.MarkdownParser
 
 class ElixirDocumentationProvider : DocumentationProvider {
     override fun generateDoc(element: PsiElement, originalElement: PsiElement?): String? =
-            fetchDocs(element)?.let { formatDocs(it) }
+        fetchDocs(element)?.let { formatDocs(it) }
 
     override fun generateHoverDoc(element: PsiElement, originalElement: PsiElement?): String? =
-            generateDoc(element, originalElement)
+        generateDoc(element, originalElement)
 
-    override fun getCustomDocumentationElement(editor: Editor, file: PsiFile, contextElement: PsiElement?, targetOffset: Int): PsiElement? {
+    override fun getCustomDocumentationElement(
+        editor: Editor,
+        file: PsiFile,
+        contextElement: PsiElement?,
+        targetOffset: Int
+    ): PsiElement? {
         return contextElement?.let(::getCustomDocumentationElement)
     }
 
@@ -37,28 +44,29 @@ class ElixirDocumentationProvider : DocumentationProvider {
         is LeafPsiElement, is ElixirIdentifier -> getCustomDocumentationElement(contextElement.parent)
         is Call -> {
             contextElement
-                    .getReference()
-                    ?.let { it as PsiPolyVariantReference }
-                    ?.let { reference ->
-                        reference
-                                .multiResolve(false)
-                                .filter(ResolveResult::isValidResult)
-                                .mapNotNull(ResolveResult::getElement)
-                                .filterIsInstance<Call>()
-                                .singleOrNull { CallDefinitionClause.`is`(it) }
-                    }
+                .getReference()
+                ?.let { it as PsiPolyVariantReference }
+                ?.multiResolve(false)
+                ?.filter(ResolveResult::isValidResult)
+                ?.mapNotNull(ResolveResult::getElement)
+                ?.mapNotNull(PsiElement::semantic)
+                ?.filterIsInstance<Clause>()
+                ?.mapNotNull(Clause::psiElement)
+                ?.singleOrNull()
         }
         is QualifiableAlias -> {
             val reference = contextElement.getReference()
 
             if (reference != null) {
                 reference
-                        .let { it as PsiPolyVariantReference }
-                        .multiResolve(false)
-                        .filter(ResolveResult::isValidResult)
-                        .mapNotNull(ResolveResult::getElement)
-                        .filterIsInstance<Call>()
-                        .singleOrNull { Stub.isModular(it) }
+                    .let { it as PsiPolyVariantReference }
+                    .multiResolve(false)
+                    .filter(ResolveResult::isValidResult)
+                    .mapNotNull(ResolveResult::getElement)
+                    .mapNotNull(PsiElement::semantic)
+                    .filterIsInstance<Modular>()
+                    .mapNotNull(Semantic::psiElement)
+                    .singleOrNull()
             } else {
                 getCustomDocumentationElement(contextElement.parent)
             }
@@ -86,9 +94,9 @@ class ElixirDocumentationProvider : DocumentationProvider {
             is FetchedDocs.ModuleDocumentation -> {
                 fetchedDocs.moduledoc?.let { moduledoc ->
                     documentationHtml
-                            .append(DocumentationMarkup.CONTENT_START)
-                            .append(html(moduledoc))
-                            .append(DocumentationMarkup.CONTENT_END)
+                        .append(DocumentationMarkup.CONTENT_START)
+                        .append(html(moduledoc))
+                        .append(DocumentationMarkup.CONTENT_END)
                 }
             }
             is FetchedDocs.FunctionOrMacroDocumentation -> {
@@ -97,15 +105,15 @@ class ElixirDocumentationProvider : DocumentationProvider {
                         is None -> Unit
                         is Hidden ->
                             documentationHtml
-                                    .append(DocumentationMarkup.CONTENT_START)
-                                    .append(false)
-                                    .append(DocumentationMarkup.CONTENT_END)
+                                .append(DocumentationMarkup.CONTENT_START)
+                                .append(false)
+                                .append(DocumentationMarkup.CONTENT_END)
                         is MarkdownByLanguage ->
                             doc.formattedByLanguage.map { (_language, formatted) ->
                                 documentationHtml
-                                        .append(DocumentationMarkup.CONTENT_START)
-                                        .append(html(formatted))
-                                        .append(DocumentationMarkup.CONTENT_END)
+                                    .append(DocumentationMarkup.CONTENT_START)
+                                    .append(html(formatted))
+                                    .append(DocumentationMarkup.CONTENT_END)
                             }
                     }
                 }
@@ -132,28 +140,28 @@ class ElixirDocumentationProvider : DocumentationProvider {
 
                     if (implsIsNotEmpty) {
                         documentationHtml
-                                .append(DocumentationMarkup.SECTION_HEADER_START)
-                                .append("Behaviors Implemented")
-                                .append(DocumentationMarkup.SECTION_SEPARATOR)
-                                .append("<ul>")
+                            .append(DocumentationMarkup.SECTION_HEADER_START)
+                            .append("Behaviors Implemented")
+                            .append(DocumentationMarkup.SECTION_SEPARATOR)
+                            .append("<ul>")
 
                         for (impl in impls) {
                             documentationHtml
-                                    .append("<pre>")
-                                    .append(impl)
-                                    .append("</pre>")
+                                .append("<pre>")
+                                .append(impl)
+                                .append("</pre>")
                         }
 
                         documentationHtml
-                                .append("</ul>")
-                                .append(DocumentationMarkup.SECTION_END)
+                            .append("</ul>")
+                            .append(DocumentationMarkup.SECTION_END)
                     }
 
                     if (specsIsNotEmpty) {
                         documentationHtml
-                                .append(DocumentationMarkup.SECTION_HEADER_START)
-                                .append("Specifications")
-                                .append(DocumentationMarkup.SECTION_SEPARATOR)
+                            .append(DocumentationMarkup.SECTION_HEADER_START)
+                            .append("Specifications")
+                            .append(DocumentationMarkup.SECTION_SEPARATOR)
 
                         for (spec in specs) {
                             documentationHtml.append(spec).append("<br />\n")
@@ -176,14 +184,14 @@ class ElixirDocumentationProvider : DocumentationProvider {
         val parsedTree = MarkdownParser(flavour).buildMarkdownTreeFromString(markdownText)
 
         return HtmlGenerator(markdownText, parsedTree, flavour, false)
-                .generateHtml()
+            .generateHtml()
     }
 
     private fun fetchDocs(element: PsiElement): FetchedDocs? =
-            // If resolves to .beam file then fetch docs from the decompiled docs
-            if (element.containingFile.originalFile is BeamFileImpl){
-                BeamDocsHelper.fetchDocs(element)
-            } else {
-                SourceFileDocsHelper.fetchDocs(element)
-            }
+        // If resolves to .beam file then fetch docs from the decompiled docs
+        if (element.containingFile.originalFile is BeamFileImpl) {
+            BeamDocsHelper.fetchDocs(element)
+        } else {
+            SourceFileDocsHelper.fetchDocs(element)
+        }
 }

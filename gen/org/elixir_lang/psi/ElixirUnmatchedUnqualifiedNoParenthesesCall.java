@@ -24,13 +24,9 @@ public interface ElixirUnmatchedUnqualifiedNoParenthesesCall extends ElixirUnmat
   @NotNull
   ElixirNoParenthesesOneArgument getNoParenthesesOneArgument();
 
-  @Nullable String canonicalName();
+  @Nullable String getCanonicalName();
 
-  @NotNull Set<String> canonicalNameSet();
-
-  int exportedArity(@NotNull ResolveState state);
-
-  @Nullable String exportedName();
+  @NotNull Set<String> getCanonicalNameSet();
 
   @Nullable String functionName();
 
@@ -41,8 +37,6 @@ public interface ElixirUnmatchedUnqualifiedNoParenthesesCall extends ElixirUnmat
   //methods are not found in ElixirPsiImplUtil
 
   boolean hasDoBlockOrKeyword();
-
-  boolean isExported();
 
   @Nullable String getName();
 

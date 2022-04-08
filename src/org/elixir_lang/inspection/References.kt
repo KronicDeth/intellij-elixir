@@ -10,9 +10,14 @@ import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.PsiReference
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
+import org.elixir_lang.semantic.Unquote
 
 class References : LocalInspectionTool() {
-    override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean, session: LocalInspectionToolSession): PsiElementVisitor {
+    override fun buildVisitor(
+        holder: ProblemsHolder,
+        isOnTheFly: Boolean,
+        session: LocalInspectionToolSession
+    ): PsiElementVisitor {
         return object : ElixirVisitor() {
             override fun visitElement(element: PsiElement) {
                 when (element) {
@@ -30,10 +35,10 @@ class References : LocalInspectionTool() {
             }
 
             override fun visitUnmatchedQualifiedNoArgumentsCall(qualifiedNoArgumentsCall: ElixirUnmatchedQualifiedNoArgumentsCall) =
-                    visitQualifiedNoArgumentsCall(qualifiedNoArgumentsCall)
+                visitQualifiedNoArgumentsCall(qualifiedNoArgumentsCall)
 
             override fun visitMatchedQualifiedNoArgumentsCall(qualifiedNoArgumentsCall: ElixirMatchedQualifiedNoArgumentsCall) =
-                    visitQualifiedNoArgumentsCall(qualifiedNoArgumentsCall)
+                visitQualifiedNoArgumentsCall(qualifiedNoArgumentsCall)
 
             override fun visitMatchedQualifiedNoParenthesesCall(qualifiedNoParenthesesCall: ElixirMatchedQualifiedNoParenthesesCall) {
                 visitQualifiedNoParenthesesCall(qualifiedNoParenthesesCall)
@@ -102,23 +107,23 @@ class References : LocalInspectionTool() {
             }
 
             private fun expectOnlyInvalid(element: PsiElement): Boolean =
-                    when (element) {
-                        is QualifiedParenthesesCall<*> -> expectOnlyInvalid(element)
-                        else -> false
-                    }
+                when (element) {
+                    is QualifiedParenthesesCall<*> -> expectOnlyInvalid(element)
+                    else -> false
+                }
 
             private fun expectOnlyInvalid(qualifiedParenthesesCall: QualifiedParenthesesCall<*>): Boolean =
-                    when (qualifiedParenthesesCall.qualifier()) {
-                        // Variable
-                        is UnqualifiedNoArgumentsCall<*>,
-                            // Key or field
-                        is QualifiedNoArgumentsCall<*>,
-                            // Call
-                        is UnqualifiedParenthesesCall<*>,
-                            // Call
-                        is QualifiedParenthesesCall<*> -> true
-                        else -> Unquote.isQualified(qualifiedParenthesesCall)
-                    }
+                when (qualifiedParenthesesCall.qualifier()) {
+                    // Variable
+                    is UnqualifiedNoArgumentsCall<*>,
+                        // Key or field
+                    is QualifiedNoArgumentsCall<*>,
+                        // Call
+                    is UnqualifiedParenthesesCall<*>,
+                        // Call
+                    is QualifiedParenthesesCall<*> -> true
+                    else -> Unquote.isQualified(qualifiedParenthesesCall)
+                }
         }
     }
 }

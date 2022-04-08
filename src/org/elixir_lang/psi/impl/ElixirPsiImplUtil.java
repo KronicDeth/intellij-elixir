@@ -29,6 +29,8 @@ import org.elixir_lang.psi.operation.capture.NonNumeric;
 import org.elixir_lang.psi.qualification.Qualified;
 import org.elixir_lang.psi.qualification.Unqualified;
 import org.elixir_lang.psi.stub.call.Stub;
+import org.elixir_lang.semantic.Semantic;
+import org.elixir_lang.semantic.SemanticKt;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -73,7 +75,7 @@ public class ElixirPsiImplUtil {
             ElixirTypes.UNARY_OPERATOR
     );
     public static final TokenSet IDENTIFIER_TOKEN_SET = TokenSet.create(ElixirTypes.IDENTIFIER_TOKEN);
-    public static final Function1<? super PsiElement, ? extends PsiElement>  NEXT_SIBLING =
+    public static final Function1<? super PsiElement, ? extends PsiElement> NEXT_SIBLING =
             (Function1<PsiElement, PsiElement>) PsiElement::getNextSibling;
     public static final Function1<? super PsiElement, ? extends PsiElement> PREVIOUS_SIBLING =
             (Function1<PsiElement, PsiElement>) PsiElement::getPrevSibling;
@@ -161,13 +163,13 @@ public class ElixirPsiImplUtil {
     }
 
     @Nullable
-    public static String canonicalName(@NotNull StubBased stubBased) {
-       return CanonicallyNamedImpl.INSTANCE.canonicalName(stubBased);
+    public static String getCanonicalName(@NotNull StubBased stubBased) {
+        return CanonicallyNamedImpl.INSTANCE.getCanonicalName(stubBased);
     }
 
     @NotNull
-    public static Set<String> canonicalNameSet(@NotNull StubBased stubBased) {
-        return CanonicallyNamedImpl.INSTANCE.canonicalNameSet(stubBased);
+    public static Set<String> getCanonicalNameSet(@NotNull StubBased stubBased) {
+        return CanonicallyNamedImpl.INSTANCE.getCanonicalNameSet(stubBased);
     }
 
     // @return -1 if codePoint cannot be parsed.
@@ -204,7 +206,8 @@ public class ElixirPsiImplUtil {
         return WholeNumberImpl.digitsList(decimalWholeNumber);
     }
 
-    @NotNull static List<Digits> digitsList(@NotNull ElixirHexadecimalWholeNumber hexadecimalWholeNumber) {
+    @NotNull
+    static List<Digits> digitsList(@NotNull ElixirHexadecimalWholeNumber hexadecimalWholeNumber) {
         return WholeNumberImpl.digitsList(hexadecimalWholeNumber);
     }
 
@@ -244,7 +247,7 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     public static boolean isCallingMacro(@NotNull final Call call,
                                          @NotNull final String resolvedModuleName,
-                                         @NotNull final  String functionName,
+                                         @NotNull final String functionName,
                                          final int resolvedFinalArity) {
         return CallImpl.isCallingMacro(call, resolvedModuleName, functionName, resolvedFinalArity);
     }
@@ -255,11 +258,6 @@ public class ElixirPsiImplUtil {
 
     public static boolean isCharList(ElixirHeredoc elixirHeredoc) {
         return elixirHeredoc.getNode().getFirstChildNode().getText().equals("'''");
-    }
-
-    public static boolean isExported(@NotNull final UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
-        return CallDefinitionClause.isPublicFunction(unqualifiedNoParenthesesCall) ||
-                CallDefinitionClause.isPublicMacro(unqualifiedNoParenthesesCall);
     }
 
     public static boolean isModuleName(@NotNull final ElixirAccessExpression accessExpression) {
@@ -796,18 +794,6 @@ public class ElixirPsiImplUtil {
     }
 
     @Contract(pure = true)
-    public static int exportedArity(@NotNull final UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall,
-                                    @NotNull ResolveState state) {
-        return UnqualifiedNoParenthesesCallImplKt.exportedArity(unqualifiedNoParenthesesCall, state);
-    }
-
-    @Contract(pure = true)
-    @Nullable
-    public static String exportedName(@NotNull final UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
-        return UnqualifiedNoParenthesesCallImplKt.exportedName(unqualifiedNoParenthesesCall);
-    }
-
-    @Contract(pure = true)
     @NotNull
     public static String fullyQualifiedName(@NotNull final ElixirAlias alias) {
         return QualifiableAliasImpl.fullyQualifiedName(alias);
@@ -914,13 +900,13 @@ public class ElixirPsiImplUtil {
     }
 
     @NotNull
-    @Contract(pure=true)
+    @Contract(pure = true)
     static SearchScope getUseScope(@NotNull AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
         return UseScopeImpl.get(atUnqualifiedNoParenthesesCall);
     }
 
     @NotNull
-    @Contract(pure=true)
+    @Contract(pure = true)
     static SearchScope getUseScope(@NotNull UnqualifiedNoArgumentsCall unqualifiedNoArgumentsCall) {
         return UseScopeImpl.get(unqualifiedNoArgumentsCall);
     }
@@ -1020,11 +1006,14 @@ public class ElixirPsiImplUtil {
         return PresentationImpl.getPresentation(qualifiableAlias);
     }
 
-    public static @Nullable String implementedProtocolName(@NotNull final Call call) {
+    public static @Nullable
+    String implementedProtocolName(@NotNull final Call call) {
+        Semantic semantic = SemanticKt.getSemantic(call);
         String protocolName;
 
-        if (Implementation.is(call)) {
-            protocolName = Implementation.protocolName(call);
+        if (semantic instanceof org.elixir_lang.semantic.Implementation) {
+            org.elixir_lang.semantic.Implementation implementation = (org.elixir_lang.semantic.Implementation) semantic;
+            protocolName = implementation.getProtocolName();
         } else {
             protocolName = null;
         }
@@ -1103,7 +1092,7 @@ public class ElixirPsiImplUtil {
 
     @NotNull
     public static OtpErlangObject quote(@NotNull ElixirDecimalFloat decimalFloat) {
-       return QuotableImpl.quote(decimalFloat);
+        return QuotableImpl.quote(decimalFloat);
     }
 
     @Contract(pure = true)

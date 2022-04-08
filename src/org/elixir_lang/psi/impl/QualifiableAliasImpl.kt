@@ -16,8 +16,9 @@ import org.elixir_lang.psi.call.qualification.Qualified
 import org.elixir_lang.psi.impl.call.maybeModularNameToModulars
 import org.elixir_lang.psi.operation.Normalized.operatorIndex
 import org.elixir_lang.psi.operation.Operation
-import org.elixir_lang.psi.stub.type.call.Stub.isModular
 import org.elixir_lang.reference.Module
+import org.elixir_lang.semantic.Modular
+import org.elixir_lang.semantic.semantic
 import org.jetbrains.annotations.Contract
 
 fun QualifiableAlias.computeReference(): PsiPolyVariantReference? =
@@ -37,12 +38,14 @@ fun QualifiableAlias.computeReference(): PsiPolyVariantReference? =
         else ->
 
             if (this.fullyQualifiedName() !in arrayOf(
-                            // `BitString` is used for `defimpl ..., for: BitString` to define protocols on bitstrings
-                            // (`<<...>>`)
-                            "BitString",
-                            // There is no one module that defines the `Elixir` module.  It is only defined implicitly as the common
-                            // namespace to all Aliases.
-                            "Elixir")) {
+                    // `BitString` is used for `defimpl ..., for: BitString` to define protocols on bitstrings
+                    // (`<<...>>`)
+                    "BitString",
+                    // There is no one module that defines the `Elixir` module.  It is only defined implicitly as the common
+                    // namespace to all Aliases.
+                    "Elixir"
+                )
+            ) {
                 Module(this)
             } else {
                 null
@@ -50,9 +53,9 @@ fun QualifiableAlias.computeReference(): PsiPolyVariantReference? =
     }
 
 fun QualifiableAlias.getReference(): PsiPolyVariantReference? =
-        CachedValuesManager.getCachedValue(this) {
-            CachedValueProvider.Result.create(computeReference(), this)
-        }
+    CachedValuesManager.getCachedValue(this) {
+        CachedValueProvider.Result.create(computeReference(), this)
+    }
 
 @Contract(pure = true)
 fun QualifiableAlias.isOutermostQualifiableAlias(): Boolean {
@@ -73,7 +76,7 @@ fun QualifiableAlias.isOutermostQualifiableAlias(): Boolean {
     return outermost
 }
 
-fun QualifiableAlias.maybeModularNameToModulars(maxScope: PsiElement): Set<Call> =
+fun QualifiableAlias.maybeModularNameToModulars(maxScope: PsiElement): Set<Modular> =
     if (!recursiveKernelImport(maxScope)) {
         /* need to construct reference directly as qualified aliases don't return a reference except for the
            outermost */
@@ -84,34 +87,28 @@ fun QualifiableAlias.maybeModularNameToModulars(maxScope: PsiElement): Set<Call>
 
 @Contract(pure = true)
 private fun QualifiableAlias.recursiveKernelImport(maxScope: PsiElement): Boolean =
-        maxScope is ElixirFile && maxScope.name == "kernel.ex" && name == KERNEL
+    maxScope is ElixirFile && maxScope.name == "kernel.ex" && name == KERNEL
 
-private fun PsiReference.toModulars(): Set<Call> =
-        when (this) {
-            is PsiPolyVariantReference -> {
-                multiResolve(false).flatMap { resolveResult ->
-                    resolveResult
-                            .takeIf(ResolveResult::isValidResult)
-                            ?.element
-                            ?.let { resolved -> toModulars(resolved) }
-                            ?: emptySet()
-                }.toSet()
-            }
-            else -> {
-                resolve()
-                        ?.let { resolved -> toModulars(resolved) }
-                        ?: emptySet()
-            }
+private fun PsiReference.toModulars(): Set<Modular> =
+    when (this) {
+        is PsiPolyVariantReference -> {
+            multiResolve(false).flatMap { resolveResult ->
+                resolveResult
+                    .takeIf(ResolveResult::isValidResult)
+                    ?.element
+                    ?.let { resolved -> toModulars(resolved) }
+                    ?: emptySet()
+            }.toSet()
         }
+        else -> {
+            resolve()
+                ?.let { resolved -> toModulars(resolved) }
+                ?: emptySet()
+        }
+    }
 
-private fun PsiReference.toModulars(resolved: PsiElement): Set<Call> =
-    if (resolved is Call && isModular(resolved)) {
-        setOf(resolved)
-    } else if (resolved is org.elixir_lang.beam.psi.impl.ModuleImpl<*>) {
-        val decompiled = resolved.navigationElement as Call
-
-        setOf(decompiled)
-    } else if  (resolved.isEquivalentTo(element)) {
+private fun PsiReference.toModulars(resolved: PsiElement): Set<Modular> =
+    resolved.semantic?.let { it as? Modular }?.let { setOf(it) } ?: if (resolved.isEquivalentTo(element)) {
         // resolved to self, but not a modular, so stop looking
         emptySet()
     } else {
@@ -122,26 +119,26 @@ object QualifiableAliasImpl {
     @Contract(pure = true)
     @JvmStatic
     fun fullyQualifiedName(qualifiableAlias: QualifiableAlias): String =
-            prependQualifiers(qualifiableAlias.parent, qualifiableAlias, qualifiableAlias.name ?: "?")
+        prependQualifiers(qualifiableAlias.parent, qualifiableAlias, qualifiableAlias.name ?: "?")
 
     private fun prependQualifiers(ancestor: PsiElement, previousAncestor: PsiElement, accumulator: String): String =
         when (ancestor) {
             // being inside arguments to a call end qualifiers
             is Arguments,
-            // Typing a qualified call before the function name is written
-            // `Alias.(arg1)` when the full line is `Alias.f(arg1)
+                // Typing a qualified call before the function name is written
+                // `Alias.(arg1)` when the full line is `Alias.f(arg1)
             is DotCall<*>,
-            // function call with no parentheses like `raise ArgumentError, ...`
+                // function call with no parentheses like `raise ArgumentError, ...`
             is ElixirUnqualifiedNoParenthesesManyArgumentsCall,
             is Operation,
             is QuotableKeywordPair,
-            // containers
+                // containers
             is ElixirAssociationsBase, is ElixirContainerAssociationOperation, is ElixirList, is ElixirStructOperation, is ElixirTuple,
-            // Top of file
+                // Top of file
             is ElixirFile,
-            // Top of expression inside of interpolation
+                // Top of expression inside of interpolation
             is ElixirInterpolation,
-            // Typing an alias on a new line in the body of function
+                // Typing an alias on a new line in the body of function
             is ElixirStabBody -> accumulator
             is ElixirAccessExpression, is ElixirMultipleAliases ->
                 prependQualifiers(ancestor.parent, ancestor, accumulator)
@@ -162,20 +159,32 @@ object QualifiableAliasImpl {
 
                                 when (modularSet.size) {
                                     0 -> {
-                                        Logger.error(QualifiableAlias::class.java, "Don't know how to prepend qualifier when call resolves to no modulars", ancestor)
+                                        Logger.error(
+                                            QualifiableAlias::class.java,
+                                            "Don't know how to prepend qualifier when call resolves to no modulars",
+                                            ancestor
+                                        )
 
                                         "?.${accumulator}"
                                     }
-                                    1 -> "${modularSet.single().name}.${accumulator}"
+                                    1 -> "${modularSet.single().canonicalName}.${accumulator}"
                                     else -> {
-                                        Logger.error(QualifiableAlias::class.java, "Don't know how to prepend qualifier when call resolves to more than one modular", ancestor)
+                                        Logger.error(
+                                            QualifiableAlias::class.java,
+                                            "Don't know how to prepend qualifier when call resolves to more than one modular",
+                                            ancestor
+                                        )
 
                                         "?.${accumulator}"
                                     }
                                 }
                             }
                             else -> {
-                                Logger.error(QualifiableAlias::class.java, "Don't know how to prepend qualifier", ancestor)
+                                Logger.error(
+                                    QualifiableAlias::class.java,
+                                    "Don't know how to prepend qualifier",
+                                    ancestor
+                                )
 
                                 "?.${accumulator}"
                             }

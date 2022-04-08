@@ -11,7 +11,7 @@
   elementTypeFactory("((un)?matched((((At)?Unq)|Q)ualified(No)?(Argument|Parenthese)s|Dot)|unqualifiedNoParenthesesManyArguments)Call")="org.elixir_lang.ElementTypeFactory.factory"
   methods(           "((un)?matched((At)?Unqualified(No)?(Argument|Parenthese)s|Dot)|unqualifiedNoParenthesesManyArguments)Call")=[
     canonicalName
-    canonicalNameSet
+    getCanonicalNameSet
     functionName
     functionNameElement
     getDoBlock
@@ -43,7 +43,7 @@
   // qualified calls that need to implement #qualifier()
   methods("(un)?matchedQualified(No)?(Argument|Parenthese)sCall")=[
     canonicalName
-    canonicalNameSet
+    getCanonicalNameSet
     functionName
     functionNameElement
     getDoBlock
@@ -1481,14 +1481,11 @@ matchedUnqualifiedNoParenthesesCall ::= identifier noParenthesesOneArgument
                                           ]
                                           methods = [
                                             canonicalName
-                                            canonicalNameSet
-                                            exportedArity
-                                            exportedName
+                                            getCanonicalNameSet
                                             functionName
                                             functionNameElement
                                             getDoBlock
                                             hasDoBlockOrKeyword
-                                            isExported
                                             getName
                                             getNameIdentifier
                                             getPresentation
@@ -2306,9 +2303,7 @@ unmatchedUnqualifiedNoParenthesesCall ::= identifier noParenthesesOneArgument do
                                             implements = "org.elixir_lang.psi.UnqualifiedNoParenthesesCall<org.elixir_lang.psi.stub.UnmatchedUnqualifiedNoParenthesesCall>"
                                             methods = [
                                               canonicalName
-                                              canonicalNameSet
-                                              exportedArity
-                                              exportedName
+                                              getCanonicalNameSet
                                               functionName
                                               functionNameElement
                                               getDoBlock

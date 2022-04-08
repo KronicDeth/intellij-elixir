@@ -12,12 +12,11 @@ import com.intellij.usageView.UsageViewNodeTextLocation
 import com.intellij.usageView.UsageViewTypeLocation
 import org.elixir_lang.ElixirLexer
 import org.elixir_lang.ElixirParserDefinition
-import org.elixir_lang.beam.psi.impl.ModuleImpl
+import org.elixir_lang.beam.psi.impl.ModuleDefinitionImpl
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.ElixirTypes.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.isOutermostQualifiableAlias
-import org.elixir_lang.reference.Callable
 
 private val IDENTIFIER_TOKEN_SET = TokenSet.create(
         ALIAS_TOKEN,
@@ -69,7 +68,7 @@ class Provider : com.intellij.lang.findUsages.FindUsagesProvider {
      */
     override fun canFindUsagesFor(psiElement: PsiElement): Boolean =
             when (psiElement) {
-                is AtOperation, is ModuleImpl<*> -> true
+                is AtOperation, is ModuleDefinitionImpl -> true
                 is Call ->
                     // Don't find usage for the `name` in `@name`.  `AtNonNumericOperation` above will instead
                     // be used for all of `@name.

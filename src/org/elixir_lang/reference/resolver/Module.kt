@@ -11,12 +11,13 @@ import com.intellij.psi.impl.source.resolve.ResolveCache
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import org.elixir_lang.psi.*
-import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.scope.VisitedElementSetResolveResult
 import org.elixir_lang.psi.scope.module.MultiResolve
 import org.elixir_lang.psi.stub.index.ModularName
-import org.elixir_lang.reference.Resolver
-import org.elixir_lang.structure_view.element.Delegation
+import org.elixir_lang.semantic.Aliasing
+import org.elixir_lang.semantic.Require
+import org.elixir_lang.semantic.Use
+import org.elixir_lang.semantic.semantic
 
 
 object Module : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Module> {
@@ -46,9 +47,10 @@ object Module : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Modul
                         val pathResolveResultList =
                                 visitedElementSet
                                         .filter { visitedElement ->
-                                            visitedElement.let { it as? Call }?.let { visitedCall ->
-                                                Alias.`is`(visitedCall) || Require.`is`(visitedCall) || Use.`is`(visitedCall)
-                                            } ?: false
+                                            when (visitedElement.semantic) {
+                                                is Aliasing, is Require, is Use -> true
+                                                else -> false
+                                            }
                                         }
                                         .map { PsiElementResolveResult(it, validResult) }
 
@@ -111,9 +113,7 @@ object Module : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Modul
             StubIndex
                     .getInstance()
                     .processElements(ModularName.KEY, name, project, globalSearchScope, null, NamedElement::class.java) { namedElement ->
-                        /* The namedElement may be a ModuleImpl from a .beam.  Using #getNaviationElement() ensures a source
-                       (either true source or decompiled) is used. */
-                        resolveResultList.add(VisitedElementSetResolveResult(namedElement.navigationElement))
+                        resolveResultList.add(VisitedElementSetResolveResult(namedElement))
                     }
         }
 

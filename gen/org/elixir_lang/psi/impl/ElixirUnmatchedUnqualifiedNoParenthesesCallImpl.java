@@ -57,23 +57,13 @@ public class ElixirUnmatchedUnqualifiedNoParenthesesCallImpl extends NamedStubbe
   }
 
   @Override
-  public @Nullable String canonicalName() {
-    return ElixirPsiImplUtil.canonicalName(this);
+  public @Nullable String getCanonicalName() {
+    return ElixirPsiImplUtil.getCanonicalName(this);
   }
 
   @Override
-  public @NotNull Set<String> canonicalNameSet() {
-    return ElixirPsiImplUtil.canonicalNameSet(this);
-  }
-
-  @Override
-  public int exportedArity(@NotNull ResolveState state) {
-    return ElixirPsiImplUtil.exportedArity(this, state);
-  }
-
-  @Override
-  public @Nullable String exportedName() {
-    return ElixirPsiImplUtil.exportedName(this);
+  public @NotNull Set<String> getCanonicalNameSet() {
+    return ElixirPsiImplUtil.getCanonicalNameSet(this);
   }
 
   @Override
@@ -89,11 +79,6 @@ public class ElixirUnmatchedUnqualifiedNoParenthesesCallImpl extends NamedStubbe
   @Override
   public boolean hasDoBlockOrKeyword() {
     return ElixirPsiImplUtil.hasDoBlockOrKeyword(this);
-  }
-
-  @Override
-  public boolean isExported() {
-    return ElixirPsiImplUtil.isExported(this);
   }
 
   @Override

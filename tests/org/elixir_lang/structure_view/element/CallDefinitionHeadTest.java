@@ -3,6 +3,8 @@ package org.elixir_lang.structure_view.element;
 import com.intellij.psi.PsiElement;
 import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase;
 import org.elixir_lang.psi.call.Call;
+import org.elixir_lang.semantic.call.definition.Clause;
+import org.elixir_lang.structure_view.element.call.definition.delegation.Head;
 
 public class CallDefinitionHeadTest extends LightPlatformCodeInsightFixtureTestCase {
     /*
@@ -49,14 +51,14 @@ public class CallDefinitionHeadTest extends LightPlatformCodeInsightFixtureTestC
 
         Call call = (Call) element;
 
-        assertTrue("Call at caret is not a call definition clause", org.elixir_lang.psi.CallDefinitionClause.is(call));
-        PsiElement head = org.elixir_lang.psi.CallDefinitionClause.head(call);
+        assertTrue("Call at caret is not a call definition clause", Clause.is(call));
+        PsiElement head = Clause.head(call);
 
         assertNotNull("Call definition has a null head", head);
 
         assertEquals(
                 "create(state = %__MODULE__{ecto_schema_module: ecto_schema_module, view: view}, params)",
-                CallDefinitionHead.Companion.stripGuard(head).getText()
+                Head.Companion.stripGuard(head).getText()
         );
     }
 }

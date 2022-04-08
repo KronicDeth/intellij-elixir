@@ -13,90 +13,92 @@ import org.elixir_lang.psi.impl.call.maybeModularNameToModulars
 import org.elixir_lang.psi.impl.hasKeywordKey
 
 object UnaliasedName {
-    fun unaliasedName(namedElement: PsiNamedElement): String? =
-            if (namedElement is QualifiableAlias) {
-                unaliasedName(namedElement)
-            } else if (namedElement is ElixirAtom) {
-                ":${namedElement.name}"
-            } else if (namedElement is Call && namedElement.isCalling(KERNEL, Function.__MODULE__, 0)) {
-                __MODULE__
-                        .reference(namedElement, useCall = null)
-                        .resolve()
-                        ?.let { it as? PsiNamedElement }
-                        ?.name
-            } else {
-                namedElement.name
-            }
+    fun unaliasedName(namedElement: PsiElement): String? =
+        if (namedElement is QualifiableAlias) {
+            unaliasedName(namedElement)
+        } else if (namedElement is ElixirAtom) {
+            ":${namedElement.name}"
+        } else if (namedElement is Call && namedElement.isCalling(KERNEL, Function.__MODULE__, 0)) {
+            __MODULE__
+                .reference(namedElement, useCall = null)
+                .resolve()
+                ?.let { it as? PsiNamedElement }
+                ?.name
+        } else if (namedElement is PsiNamedElement) {
+            namedElement.name
+        } else {
+            null
+        }
 
     private tailrec fun down(element: PsiElement): String? =
-            when (element) {
-                is Call ->
-                    element
-                            .maybeModularNameToModulars(null)
-                            .mapNotNull { it.name }
-                            .toSet()
-                            .singleOrNull()
-                is ElixirAccessExpression -> {
-                    val children = element.children
+        when (element) {
+            is Call ->
+                element
+                    .maybeModularNameToModulars(null)
+                    .mapNotNull { it.canonicalName }
+                    .toSet()
+                    .singleOrNull()
+            is ElixirAccessExpression -> {
+                val children = element.children
 
-                    assert(children.isNotEmpty())
+                assert(children.isNotEmpty())
 
-                    down(children[0])
-                }
-                is ElixirAtom -> ":${element.name}"
-                is QualifiableAlias -> element.name
-                else -> {
-                    Logger.error(
-                            javaClass,
-                            "Don't know how to search down below ${element.javaClass} for unaliased name",
-                            element
-                    )
-
-                    "?"
-                }
+                down(children[0])
             }
+            is ElixirAtom -> ":${element.name}"
+            is QualifiableAlias -> element.name
+            else -> {
+                Logger.error(
+                    javaClass,
+                    "Don't know how to search down below ${element.javaClass} for unaliased name",
+                    element
+                )
+
+                "?"
+            }
+        }
 
     private fun unaliasedName(qualifiableAlias: QualifiableAlias): String? =
-            up(qualifiableAlias.parent, qualifiableAlias)
+        up(qualifiableAlias.parent, qualifiableAlias)
 
     private fun up(call: Call, entrance: QualifiableAlias): String? =
-            if (call.isCalling(KERNEL, ALIAS)) {
-                val finalArguments = call.finalArguments()
+        if (call.isCalling(KERNEL, ALIAS)) {
+            val finalArguments = call.finalArguments()
 
-                if (finalArguments != null && finalArguments.isNotEmpty()) {
-                    val firstArgument = finalArguments[0]
+            if (finalArguments != null && finalArguments.isNotEmpty()) {
+                val firstArgument = finalArguments[0]
 
-                    down(firstArgument)
-                } else {
-                    null
-                }
-            } else {
-                entrance.name
-            }
-
-    private tailrec fun up(element: PsiElement?, entrance: QualifiableAlias): String? =
-            when (element) {
-                is Call ->
-                    up(element, entrance)
-                is QualifiedMultipleAliases ->
-                    up(element, entrance)
-                is ElixirAccessExpression,
-                is ElixirNoParenthesesOneArgument,
-                is QuotableArguments,
-                is QuotableKeywordList ->
-                    up(element.parent, entrance)
-                is ElixirMultipleAliases ->
-                    entrance.fullyQualifiedName()
-                is QuotableKeywordPair ->
-                    up(element, entrance)
-                else ->
-                    null
-            }
-
-    private fun up(element: QuotableKeywordPair, entrance: QualifiableAlias): String? =
-            if (element.hasKeywordKey("as")) {
-                up(element.parent, entrance)
+                down(firstArgument)
             } else {
                 null
             }
+        } else {
+            entrance.name
+        }
+
+    private tailrec fun up(element: PsiElement?, entrance: QualifiableAlias): String? =
+        when (element) {
+            is Call ->
+                up(element, entrance)
+            is QualifiedMultipleAliases ->
+                up(element, entrance)
+            is ElixirAccessExpression,
+            is ElixirNoParenthesesOneArgument,
+            is QuotableArguments,
+            is QuotableKeywordList ->
+                up(element.parent, entrance)
+            is ElixirMultipleAliases ->
+                entrance.fullyQualifiedName()
+            is QuotableKeywordPair ->
+                up(element, entrance)
+            else ->
+                null
+        }
+
+    private fun up(element: QuotableKeywordPair, entrance: QualifiableAlias): String? =
+        if (element.hasKeywordKey("as")) {
+            up(element.parent, entrance)
+        } else {
+            null
+        }
 }

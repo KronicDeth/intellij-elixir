@@ -28,20 +28,25 @@ import com.intellij.psi.scope.PsiScopeProcessor
 import com.intellij.psi.stubs.*
 import com.intellij.reference.SoftReference
 import com.intellij.util.ArrayUtil
+import org.elixir_lang.NameArity
 import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.beam.Beam
 import org.elixir_lang.beam.Decompiler
 import org.elixir_lang.beam.MacroNameArity
 import java.io.IOException
-import org.elixir_lang.beam.psi.stubs.ModuleStub
+import org.elixir_lang.beam.psi.stubs.ModuleDefinitionStub
 import org.elixir_lang.beam.chunk.Atoms
 import org.elixir_lang.beam.chunk.CallDefinitions
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.AbstractCodeCompileOptions
 import org.elixir_lang.beam.psi.impl.*
 import org.elixir_lang.beam.psi.stubs.CallDefinitionStub
+import org.elixir_lang.psi.call.name.Function.*
+import org.elixir_lang.semantic.call.definition.clause.Time
+import org.elixir_lang.semantic.type.definition.Builtin
+import org.elixir_lang.semantic.type.Visibility
 import org.jetbrains.annotations.NonNls
 import java.lang.StringBuilder
 import java.util.*
-import java.util.function.Consumer
 
 // See com.intellij.psi.impl.compiled.ClsFileImpl
 class BeamFileImpl private constructor(private val fileViewProvider: FileViewProvider, private val isForDecompiling: Boolean) : ModuleElementImpl(), PsiCompiledFile, PsiFileWithStubSupport {
@@ -106,8 +111,8 @@ class BeamFileImpl private constructor(private val fileViewProvider: FileViewPro
      */
     override fun getChildren(): Array<PsiElement> = arrayOf(module())
 
-    private fun module(): Module = moduleStub().psi
-    private fun moduleStub(): ModuleStub<Module> = getStub().childrenStubs.single() as ModuleStub<Module>
+    private fun module(): ModuleDefinition = moduleStub().psi
+    private fun moduleStub(): ModuleDefinitionStub<ModuleDefinition, TypeDefinition, CallDefinition> = getStub().childrenStubs.single() as ModuleDefinitionStub<ModuleDefinition, TypeDefinition, CallDefinition>
 
     private fun getStub(): PsiFileStub<*> = stubTree.root
 
@@ -432,22 +437,62 @@ class BeamFileImpl private constructor(private val fileViewProvider: FileViewPro
             null
         }
 
-        private fun buildModuleStub(beam: Beam): ModuleStub<*>? = beam
-                .atoms()
-                ?.let { atoms ->
-                    atoms
-                            .moduleName()
-                            ?.let { moduleName ->
-                                val name = Decompiler.defmoduleArgument(moduleName)
-                                val parentStub = ElixirFileStubImpl()
-                                val moduleStub: ModuleStub<*> = ModuleStubImpl<ModuleImpl<*>>(parentStub, name)
-                                buildCallDefinitions(moduleStub, beam, atoms)
+        private fun buildModuleStub(beam: Beam): ModuleDefinitionStub<ModuleDefinition, TypeDefinition, CallDefinition>? =
+                beam
+                        .atoms()
+                        ?.let { atoms ->
+                            atoms
+                                    .moduleName()
+                                    ?.let { moduleName ->
+                                        val name = Decompiler.defmoduleArgument(moduleName)
+                                        val parentStub = ElixirFileStubImpl()
+                                        val moduleDefinitionStub = ModuleDefinitionStubImpl<ModuleDefinition, TypeDefinition, CallDefinition>(parentStub, name)
+                                        buildTypeDefinitions(moduleDefinitionStub, beam, atoms)
+                                        buildCallDefinitions(moduleDefinitionStub, beam, atoms)
 
-                                moduleStub
-                            }
+                                        moduleDefinitionStub
+                                    }
+                        }
+
+        private fun buildTypeDefinitions(parentStub: ModuleDefinitionStub<ModuleDefinition, TypeDefinition, CallDefinition>,
+                                         beam: Beam,
+                                         atoms: Atoms) {
+            if (atoms.moduleName() == "erlang") {
+                for (nameArity in Builtin.SORTED_NAME_ARITIES) {
+                    TypeDefinitionStubImpl(parentStub, org.elixir_lang.semantic.type.Visibility.PUBLIC, nameArity)
                 }
+            }
 
-        private fun buildCallDefinitions(parentStub: ModuleStub<*>, beam: Beam, atoms: Atoms) {
+            when (val debugInfo = beam.debugInfo()) {
+                is AbstractCodeCompileOptions -> buildTypeDefinitions(parentStub, debugInfo)
+                is org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.V1 -> buildTypeDefinitions(parentStub, debugInfo)
+                else -> Unit
+            }
+        }
+
+        private fun buildTypeDefinitions(
+                parentStub: ModuleDefinitionStub<ModuleDefinition, TypeDefinition, CallDefinition>,
+                debugInfo: AbstractCodeCompileOptions
+        ) {
+            debugInfo.attributes.exportTypeNameAritySet.forEach { nameArity ->
+                TypeDefinitionStubImpl(parentStub, Visibility.PUBLIC, nameArity)
+            }
+        }
+
+        private fun buildTypeDefinitions(
+                parentStub: ModuleDefinitionStub<ModuleDefinition, TypeDefinition, CallDefinition>,
+                debugInfo: org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.V1
+        ) {
+            debugInfo.typeSpecifications?.types?.forEach { type ->
+                TypeDefinitionStubImpl(parentStub, type.visibility, type.nameArity)
+            }
+        }
+
+        private fun buildCallDefinitions(
+                parentStub: ModuleDefinitionStub<ModuleDefinition, TypeDefinition, CallDefinition>,
+                beam: Beam,
+                atoms: Atoms
+        ) {
             CallDefinitions.macroNameAritySortedSetByMacro(beam, atoms).forEach { (_, macroNameAritySortedSet) ->
                 macroNameAritySortedSet.forEach { macroNameArity ->
                     buildCallDefinition(parentStub, macroNameArity)
@@ -455,14 +500,31 @@ class BeamFileImpl private constructor(private val fileViewProvider: FileViewPro
             }
         }
 
-        private fun buildCallDefinition(parentStub: ModuleStub<*>,
-                                        macroNameArity: MacroNameArity): CallDefinitionStub<*> =
+        private fun buildCallDefinition(
+                parentStub: ModuleDefinitionStub<ModuleDefinition, TypeDefinition, CallDefinition>,
+                macroNameArity: MacroNameArity
+        ): CallDefinitionStub<CallDefinition> =
                 buildCallDefinition(parentStub, macroNameArity.macro, macroNameArity.name, macroNameArity.arity)
 
-        private fun buildCallDefinition(parentStub: ModuleStub<*>,
+        private fun buildCallDefinition(
+                parentStub: ModuleDefinitionStub<ModuleDefinition, TypeDefinition, CallDefinition>,
                                         macro: String,
                                         name: String,
-                                        arity: Int): CallDefinitionStub<*> =
-                CallDefinitionStubImpl<CallDefinitionImpl<*>>(parentStub, macro, name, arity)
+                                        arity: Int
+        ): CallDefinitionStub<CallDefinition> {
+            val visibility = when (macro) {
+                DEF, DEFMACRO -> org.elixir_lang.semantic.call.definition.clause.Visibility.PUBLIC
+                DEFP, DEFMACROP -> org.elixir_lang.semantic.call.definition.clause.Visibility.PRIVATE
+                else -> org.elixir_lang.semantic.call.definition.clause.Visibility.PUBLIC
+            }
+            val time = when (macro) {
+                DEFMACRO, DEFMACROP -> Time.COMPILE
+                DEF, DEFP -> Time.RUN
+                else -> Time.RUN
+            }
+            val nameArity = NameArity(name, arity)
+
+            return CallDefinitionStubImpl(parentStub, visibility, time, nameArity)
+        }
     }
 }

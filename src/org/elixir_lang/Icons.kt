@@ -4,7 +4,6 @@ import com.intellij.icons.AllIcons
 import com.intellij.openapi.util.IconLoader
 import com.intellij.ui.RowIcon
 import com.intellij.util.PlatformIcons
-import org.elixir_lang.structure_view.element.Timed
 import javax.swing.Icon
 
 // RowIcon on travis-ci does not have RowIcon(Icon...) constructor, so fake it
@@ -29,14 +28,18 @@ object Icons {
         val COMPILE = AllIcons.Actions.Compile
 
         @JvmField
+        val GUARD = AllIcons.Actions.Compile
+
+        @JvmField
         val RUN = AllIcons.RunConfigurations.TestState.Run
 
         @JvmStatic
-        fun from(time: Timed.Time): Icon =
-                when (time) {
-                    Timed.Time.COMPILE -> COMPILE
-                    Timed.Time.RUN -> RUN
-                }
+        fun from(time: org.elixir_lang.semantic.call.definition.clause.Time): Icon =
+            when (time) {
+                org.elixir_lang.semantic.call.definition.clause.Time.COMPILE -> COMPILE
+                org.elixir_lang.semantic.call.definition.clause.Time.GUARD -> GUARD
+                org.elixir_lang.semantic.call.definition.clause.Time.RUN -> RUN
+            }
     }
 
     object Visibility {
@@ -47,13 +50,29 @@ object Icons {
         val PUBLIC = PlatformIcons.PUBLIC_ICON
 
         @JvmStatic
-        fun from(visibility: org.elixir_lang.Visibility?): Icon {
+        fun from(type: org.elixir_lang.semantic.type.Definition): Icon =
+            when (type) {
+                is org.elixir_lang.semantic.type.definition.source.Callback,
+                is org.elixir_lang.semantic.type.definition.source.Specification -> PUBLIC
+                is org.elixir_lang.semantic.type.definition.source.ModuleAttribute -> from(type.visibility)
+                is org.elixir_lang.semantic.type.definition.Binary -> from(type.typeDefinition.visibility)
+                else -> UNKNOWN
+            }
+
+        fun from(visibility: org.elixir_lang.semantic.type.Visibility): Icon = when (visibility) {
+            org.elixir_lang.semantic.type.Visibility.PUBLIC -> PUBLIC
+            org.elixir_lang.semantic.type.Visibility.OPAQUE -> PUBLIC
+            org.elixir_lang.semantic.type.Visibility.PRIVATE -> PRIVATE
+        }
+
+        @JvmStatic
+        fun from(visibility: org.elixir_lang.semantic.call.definition.clause.Visibility?): Icon {
             var icon: Icon? = null
 
             if (visibility != null) {
-                when (visibility) {
-                    org.elixir_lang.Visibility.PRIVATE -> icon = PRIVATE
-                    org.elixir_lang.Visibility.PUBLIC -> icon = PUBLIC
+                icon = when (visibility) {
+                    org.elixir_lang.semantic.call.definition.clause.Visibility.PRIVATE -> PRIVATE
+                    org.elixir_lang.semantic.call.definition.clause.Visibility.PUBLIC -> PUBLIC
                 }
 
                 assert(icon != null)
@@ -78,7 +97,8 @@ object Icons {
     val DESCRIBE = AllIcons.Nodes.TestGroup
 
     @JvmField
-    val DELEGATION: Icon = RowIconFactory.create(AllIcons.RunConfigurations.TestState.Run, PlatformIcons.PACKAGE_LOCAL_ICON)
+    val DELEGATION: Icon =
+        RowIconFactory.create(AllIcons.RunConfigurations.TestState.Run, PlatformIcons.PACKAGE_LOCAL_ICON)
 
     @JvmField
     val EXCEPTION = PlatformIcons.EXCEPTION_CLASS_ICON
@@ -104,12 +124,13 @@ object Icons {
 
     object Protocol {
         val Structure = IconLoader.getIcon("/icons/protocol.svg")
-        val GoToImplementations: Icon =AllIcons.Gutter.ImplementedMethod
+        val GoToImplementations: Icon = AllIcons.Gutter.ImplementedMethod
     }
 
     object Implementation {
         @JvmField
         val Structure: Icon = AllIcons.Nodes.Interface
+
         @JvmField
         val GoToProtocols: Icon = IconLoader.getIcon("/icons/go_to_protocols.svg")
     }

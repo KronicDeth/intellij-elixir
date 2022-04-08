@@ -3,17 +3,19 @@ package org.elixir_lang.navigation.item_presentation.modular
 import com.intellij.navigation.ItemPresentation
 import org.elixir_lang.Icons
 import org.elixir_lang.navigation.item_presentation.Parent
-import org.elixir_lang.psi.Module.name
-import org.elixir_lang.psi.call.Call
+import org.elixir_lang.semantic.Modular
 import org.jetbrains.annotations.Contract
 import javax.swing.Icon
 
 /**
  *
  * @param location the parent name of the Module that scopes `call`; `null` when scope is `quote`.
- * @param call a `Kernel.defmodule/2` call nested in `parent`.
+ * @param semantic a `Kernel.defmodule/2` call nested in `parent`.
  */
-open class Module(private val location: String?, protected val call: Call) : ItemPresentation, Parent {
+open class Module(
+    private val location: String?,
+    protected val semantic: Modular
+) : ItemPresentation, Parent {
     /**
      * The module icon.
      *
@@ -37,17 +39,18 @@ open class Module(private val location: String?, protected val call: Call) : Ite
      * @return the location description, or null if none is applicable.
      */
     override fun getLocationString(): String? = location
+
     /**
      * Returns the name of the object to be presented in most renderers across the program.
      *
      * @return the function name.
      */
-    override fun getPresentableText(): String = presentableText(definer = definer(), call = call)
+    override fun getPresentableText(): String = presentableText(definer = definer(), semantic = semantic)
 
     protected open fun definer(): String = "defmodule"
 
     companion object {
         @Contract(pure = true)
-        fun presentableText(definer: String, call: Call): String = "$definer ${name(call)}"
+        fun presentableText(definer: String, semantic: Modular): String = "$definer ${semantic.canonicalName}"
     }
 }

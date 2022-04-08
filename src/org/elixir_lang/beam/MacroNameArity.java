@@ -2,7 +2,7 @@ package org.elixir_lang.beam;
 
 import gnu.trove.THashMap;
 import org.elixir_lang.NameArity;
-import org.elixir_lang.Visibility;
+import org.elixir_lang.semantic.call.definition.clause.Visibility;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static org.elixir_lang.Visibility.PRIVATE;
-import static org.elixir_lang.Visibility.PUBLIC;
+import static org.elixir_lang.semantic.call.definition.clause.Visibility.PRIVATE;
+import static org.elixir_lang.semantic.call.definition.clause.Visibility.PUBLIC;
 import static org.elixir_lang.psi.call.name.Function.*;
 
 /**

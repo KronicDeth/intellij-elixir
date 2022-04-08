@@ -3,7 +3,6 @@ package org.elixir_lang.psi.scope.module_attribute
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import com.intellij.psi.util.PsiTreeUtil
-import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.putInitialVisitedElement
 import org.elixir_lang.psi.scope.ModuleAttribute
@@ -11,12 +10,16 @@ import org.elixir_lang.psi.scope.ResolveResultOrderedSet
 import org.elixir_lang.psi.visitedElementSet
 
 class MultiResolve(private val name: String) : ModuleAttribute() {
-    override fun executeOnDeclaration(declaration: AtUnqualifiedNoParenthesesCall<*>, state: ResolveState): Boolean {
-        declaration.name?.let { declaredName ->
+    override fun execute(
+        semantic: org.elixir_lang.semantic.module_attribute.definition.Literal,
+        state: ResolveState
+    ): Boolean {
+        semantic.moduleAttributeName?.let { declaredName ->
             if (declaredName.startsWith(name)) {
                 val validResult = declaredName == name
+                val psiElement = semantic.psiElement
 
-                resolveResultOrderedSet.add(declaration, declaration.text, validResult, state.visitedElementSet())
+                resolveResultOrderedSet.add(psiElement, psiElement.text, validResult, state.visitedElementSet())
             }
         }
 

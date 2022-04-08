@@ -39,8 +39,8 @@ public class Visibility implements Sorter {
             @Override
             public int compare(Object o1, Object o2) {
                 int comparison = 2;
-                org.elixir_lang.Visibility visibility1 = null;
-                org.elixir_lang.Visibility visibility2 = null;
+                org.elixir_lang.semantic.call.definition.clause.Visibility visibility1 = null;
+                org.elixir_lang.semantic.call.definition.clause.Visibility visibility2 = null;
 
                 if (o1 instanceof Visible) {
                     Visible visible1 = (Visible) o1;
@@ -54,15 +54,15 @@ public class Visibility implements Sorter {
 
                 if (visibility1 == visibility2) {
                     comparison = 0;
-                } else if (visibility1 == org.elixir_lang.Visibility.PUBLIC) {
+                } else if (visibility1 == org.elixir_lang.semantic.call.definition.clause.Visibility.PUBLIC) {
                     comparison = -1;
                 } else if (visibility1 == null) {
-                    if (visibility2 == org.elixir_lang.Visibility.PUBLIC) {
+                    if (visibility2 == org.elixir_lang.semantic.call.definition.clause.Visibility.PUBLIC) {
                         comparison = 1;
-                    } else if (visibility2 == org.elixir_lang.Visibility.PRIVATE) {
+                    } else if (visibility2 == org.elixir_lang.semantic.call.definition.clause.Visibility.PRIVATE) {
                         comparison = -1;
                     }
-                } else if (visibility1 == org.elixir_lang.Visibility.PRIVATE) {
+                } else if (visibility1 == org.elixir_lang.semantic.call.definition.clause.Visibility.PRIVATE) {
                     comparison = 1;
                 }
 

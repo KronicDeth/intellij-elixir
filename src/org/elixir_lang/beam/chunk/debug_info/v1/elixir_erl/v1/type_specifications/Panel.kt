@@ -153,7 +153,7 @@ class Panel(private val typeSpecificationTree: Tree, project: Project) : JPanel(
 
     private fun typeString(type: Type, typeSpecifications: TypeSpecifications): String =
             typeStringByType.computeIfAbsent(type) { key ->
-                key.toString(typeSpecifications)
+                key.toString()
             }
 
     private fun opaquesModuleString(opaques: Opaques, debugInfo: V1): String {

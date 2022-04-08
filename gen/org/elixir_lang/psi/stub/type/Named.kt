@@ -1,15 +1,16 @@
 package org.elixir_lang.psi.stub.type
 
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNameIdentifierOwner
 import com.intellij.psi.stubs.IndexSink
 import com.intellij.psi.stubs.NamedStubBase
 import org.elixir_lang.psi.Definition
-import org.elixir_lang.psi.Implementation.protocolName
 import org.elixir_lang.psi.NamedElement
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.definition
 import org.elixir_lang.psi.stub.call.Stubbic
 import org.elixir_lang.psi.stub.index.*
+import org.elixir_lang.semantic.semantic
 import org.jetbrains.annotations.NonNls
 
 abstract class Named<S : NamedStubBase<T>, T : PsiNameIdentifierOwner>(@NonNls debugName: String) : Element<S, T>(debugName) {
@@ -22,15 +23,14 @@ abstract class Named<S : NamedStubBase<T>, T : PsiNameIdentifierOwner>(@NonNls d
             if (name != null) {
                 sink.occurrence<NamedElement, String>(AllName.KEY, name)
 
-                if (stub is Call) {
-                    definition(stub)?.let { definition ->
-                        if (definition.type == Definition.Type.MODULAR) {
-                            sink.occurrence<NamedElement, String>(ModularName.KEY, name)
+                when (val semantic = stub.let { it as? PsiElement }?.semantic) {
+                    is org.elixir_lang.semantic.Modular -> {
+                        sink.occurrence<NamedElement, String>(ModularName.KEY, name)
 
-                            if (definition == Definition.IMPLEMENTATION) {
-                                protocolName(stub)?.let { implementedProtocolName ->
-                                    sink.occurrence<NamedElement, String>(ImplementedProtocolName.KEY, implementedProtocolName)
-                                }
+                        when (semantic) {
+                            is org.elixir_lang.semantic.Implementation -> {
+                                sink
+                                    .occurrence<NamedElement, String>(ImplementedProtocolName.KEY, semantic.protocolName)
                             }
                         }
                     }

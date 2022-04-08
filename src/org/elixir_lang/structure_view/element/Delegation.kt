@@ -2,24 +2,24 @@ package org.elixir_lang.structure_view.element
 
 import com.intellij.ide.util.treeView.smartTree.TreeElement
 import com.intellij.navigation.ItemPresentation
-import com.intellij.psi.ElementDescriptionLocation
 import com.intellij.psi.PsiElement
-import com.intellij.usageView.UsageViewTypeLocation
 import org.elixir_lang.navigation.item_presentation.Delegation
 import org.elixir_lang.navigation.item_presentation.Parent
 import org.elixir_lang.psi.ElixirAccessExpression
 import org.elixir_lang.psi.ElixirList
 import org.elixir_lang.psi.call.Call
-import org.elixir_lang.psi.call.name.Function
-import org.elixir_lang.psi.call.name.Module
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.call.keywordArgument
 import org.elixir_lang.psi.impl.stripAccessExpression
-import org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.enclosingModular
+import org.elixir_lang.structure_view.element.call.Definition
+import org.elixir_lang.structure_view.element.call.definition.delegation.Head
 import org.elixir_lang.structure_view.element.modular.Modular
-import java.util.*
 
-class Delegation(private val modular: Modular, call: Call) : Element<Call?>(call) {
+class Delegation(private val modular: Modular, semantic: org.elixir_lang.semantic.call.definition.Delegation) :
+    Element<Call>(semantic.call) {
+    constructor(semantic: org.elixir_lang.semantic.call.definition.Delegation) :
+            this(semantic.enclosingModular.structureViewTreeElement, semantic)
+
     private val childList: MutableList<TreeElement> = ArrayList()
 
     /**
@@ -40,14 +40,14 @@ class Delegation(private val modular: Modular, call: Call) : Element<Call?>(call
      */
     fun `as`(): String? = keywordArgumentText("as")
 
-    fun callDefinitionHeadCallList(): List<Call> = callDefinitionHeadCallList(navigationItem!!)!!
+    fun callDefinitionHeadCallList(): List<Call> = callDefinitionHeadCallList(navigationItem!!)
 
-    fun definition(callDefinition: CallDefinition) = childList.add(callDefinition)
+    fun definition(callDefinition: Definition) = childList.add(callDefinition)
 
     /**
      * The calls defined by this delegation
      *
-     * @return the list of [CallDefinition] elements;
+     * @return the list of [Definition] elements;
      */
     override fun getChildren(): Array<TreeElement> = childList.toTypedArray()
 
@@ -61,10 +61,10 @@ class Delegation(private val modular: Modular, call: Call) : Element<Call?>(call
         val location = parent.locatedPresentableText
 
         return Delegation(
-                location,
-                to(),
-                `as`(),
-                appendFirst()
+            location,
+            to(),
+            `as`(),
+            appendFirst()
         )
     }
 
@@ -86,7 +86,7 @@ class Delegation(private val modular: Modular, call: Call) : Element<Call?>(call
      * [Element.navigationItem]; `null` if the keyword argument does not exist.
      */
     private fun keywordArgumentText(keywordValueText: String): String? =
-            navigationItem!!.keywordArgument(keywordValueText)?.text
+        navigationItem!!.keywordArgument(keywordValueText)?.text
 
     companion object {
         @JvmStatic
@@ -98,7 +98,7 @@ class Delegation(private val modular: Modular, call: Call) : Element<Call?>(call
                 val accessExpressionChild = firstFinalArgument.stripAccessExpression()
 
                 callDefinitionHeadCallList = if (accessExpressionChild is ElixirList) {
-                    accessExpressionChild.children.filterIsInstance<Call>().filter { CallDefinitionHead.`is`(it) }
+                    accessExpressionChild.children.filterIsInstance<Call>().filter { Head.`is`(it) }
                 } else {
                     null
                 }
@@ -112,22 +112,7 @@ class Delegation(private val modular: Modular, call: Call) : Element<Call?>(call
         }
 
         fun filterCallDefinitionHeadCallList(vararg calls: Call): List<Call> =
-            calls.filter { CallDefinitionHead.`is`(it) }
-
-        fun elementDescription(call: Call?, location: ElementDescriptionLocation): String? =
-                if (location === UsageViewTypeLocation.INSTANCE) {
-                    "delegation"
-                } else {
-                    null
-                }
-
-        @JvmStatic
-        fun `is`(call: Call): Boolean = call.isCalling(Module.KERNEL, Function.DEFDELEGATE, 2)
-
-        fun fromCall(call: Call): org.elixir_lang.structure_view.element.Delegation? =
-                enclosingModular(call)?.let { modular ->
-                    Delegation(modular, call)
-                }
+            calls.filter { Head.`is`(it) }
 
         fun nameIdentifier(call: Call): PsiElement? =
             call.finalArguments()?.get(0)?.let { it as? Call }?.functionNameElement()

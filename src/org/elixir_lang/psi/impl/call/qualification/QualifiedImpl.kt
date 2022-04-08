@@ -1,6 +1,6 @@
 package org.elixir_lang.psi.impl.call.qualification
 
-import org.elixir_lang.psi.call.Call
+import org.elixir_lang.semantic.Modular
 import org.elixir_lang.psi.call.qualification.Qualified
 import org.elixir_lang.psi.impl.maybeModularNameToModulars
 import org.jetbrains.annotations.Contract
@@ -15,5 +15,5 @@ import org.jetbrains.annotations.Contract
  * unparsed module like `Kernel` or `Enum` OR if the qualified isn't an Alias.
  */
 @Contract(pure = true)
-fun Qualified.qualifiedToModulars(): Set<Call> =
+fun Qualified.qualifiedToModulars(): Set<Modular> =
         qualifier().maybeModularNameToModulars(maxScope = containingFile, useCall = null, incompleteCode = false)

@@ -5,21 +5,13 @@ import com.intellij.codeInsight.daemon.impl.PsiElementListNavigator
 import com.intellij.ide.util.DefaultPsiElementCellRenderer
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
-import com.intellij.psi.PsiFile
-import com.intellij.psi.PsiPolyVariantReference
-import com.intellij.psi.ResolveResult
-import com.intellij.psi.ResolveState
-import com.intellij.psi.search.GlobalSearchScope
-import com.intellij.psi.stubs.StubIndex
+import com.intellij.psi.*
 import com.intellij.psi.util.PsiTreeUtil
-import org.elixir_lang.psi.CallDefinitionClause
-import org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall
-import org.elixir_lang.psi.CallDefinitionClause.nameArityInterval
-import org.elixir_lang.psi.Implementation
-import org.elixir_lang.psi.NamedElement
+import org.elixir_lang.semantic.call.definition.Clause
+import org.elixir_lang.semantic.Implementation
 import org.elixir_lang.psi.call.Call
-import org.elixir_lang.psi.impl.call.macroChildCallList
-import org.elixir_lang.psi.stub.index.ModularName
+import org.elixir_lang.semantic.call.Definition
+import org.elixir_lang.semantic.semantic
 
 
 class GotoSuper : CodeInsightActionHandler {
@@ -29,60 +21,42 @@ class GotoSuper : CodeInsightActionHandler {
         file
                 .findElementAt(editor.caretModel.offset)
                 ?.let { focusedElement -> PsiTreeUtil.getNonStrictParentOfType(focusedElement, Call::class.java) }
-                ?.let { invoke(project, editor, it) }
+                ?.let { invoke(editor, it) }
     }
 
-    fun invoke(project: Project, editor: Editor, call: Call) {
-        val enclosingModularMacroCallSet = call
+    fun invoke(editor: Editor, call: Call) {
+        val name = call.functionName()
+        val arity = call.resolvedFinalArity()
+
+        val targets = call
                 .reference
                 ?.let { it as PsiPolyVariantReference }
                 ?.multiResolve(false)
                 ?.asSequence()
                 .orEmpty()
                 .mapNotNull(ResolveResult::getElement)
-                .filterIsInstance<Call>()
-                .filter { CallDefinitionClause.`is`(it) }
-                .mapNotNull(::enclosingModularMacroCall)
+                .mapNotNull(PsiElement::semantic)
+                .filterIsInstance<Clause>()
+                .map(Clause::definition)
+                .map(Definition::enclosingModular)
+                .filterIsInstance<Implementation>()
+                .flatMap { it.protocols.asSequence() }
+                .flatMap { it.exportedCallDefinitions.asSequence() }
+                .filter { definition ->
+                    definition.nameArityInterval?.let { nameArityInterval ->
+                        nameArityInterval.name == name && nameArityInterval.arityInterval.contains(arity)
+                    } ?: false
+                }
+                .flatMap { definition ->
+                    definition.clauses.asSequence()
+                }
+                .map(Clause::psiElement)
+                .map(PsiElement::getNavigationElement)
+                .filterIsInstance<NavigatablePsiElement>()
                 .toSet()
+                .toTypedArray()
 
-        val protocolNameSet = enclosingModularMacroCallSet
-                .asSequence()
-                .filter(Implementation::`is`)
-                .mapNotNull(Implementation::protocolName)
-                .toSet()
-
-        if (protocolNameSet.isNotEmpty()) {
-            val globalSearchScope = GlobalSearchScope.everythingScope(project)
-
-            val targets = protocolNameSet
-                    .asSequence()
-                    .flatMap { protocolName ->
-                        StubIndex
-                                .getElements(
-                                        ModularName.KEY,
-                                        protocolName,
-                                        project,
-                                        globalSearchScope,
-                                        NamedElement::class.java
-                                )
-                                .asSequence()
-                                .filterIsInstance<Call>()
-                    }
-                    .flatMap { defprotocol ->
-                        defprotocol.macroChildCallList().asSequence()
-                    }
-                    .filter(CallDefinitionClause::`is`)
-                    .filter { protocolCallDefinitionClause ->
-                        nameArityInterval(protocolCallDefinitionClause, ResolveState.initial())
-                                ?.let { protocolNameArityInterval ->
-                                    protocolNameArityInterval.name == call.functionName() &&
-                                            protocolNameArityInterval.arityInterval.contains(call.resolvedFinalArity())
-                                }
-                                ?: false
-                    }
-                    .toList()
-                    .toTypedArray()
-
+        if (targets.isNotEmpty()) {
             PsiElementListNavigator.openTargets(
                     editor,
                     targets,

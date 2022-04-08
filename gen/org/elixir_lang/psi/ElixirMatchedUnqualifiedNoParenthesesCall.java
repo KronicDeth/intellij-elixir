@@ -21,13 +21,9 @@ public interface ElixirMatchedUnqualifiedNoParenthesesCall extends ElixirMatched
   @NotNull
   ElixirNoParenthesesOneArgument getNoParenthesesOneArgument();
 
-  @Nullable String canonicalName();
+  @Nullable String getCanonicalName();
 
-  @NotNull Set<String> canonicalNameSet();
-
-  int exportedArity(@NotNull ResolveState state);
-
-  @Nullable String exportedName();
+  @NotNull Set<String> getCanonicalNameSet();
 
   @Nullable String functionName();
 
@@ -36,8 +32,6 @@ public interface ElixirMatchedUnqualifiedNoParenthesesCall extends ElixirMatched
   @Nullable ElixirDoBlock getDoBlock();
 
   boolean hasDoBlockOrKeyword();
-
-  boolean isExported();
 
   @Nullable String getName();
 

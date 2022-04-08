@@ -39,7 +39,7 @@ public class MatchedQualifiedParenthesesCall extends Stub<org.elixir_lang.psi.st
                 psi.resolvedFinalArity(),
                 psi.hasDoBlockOrKeyword(),
                 StringUtil.notNullize(psi.getName(), "?"),
-                psi.canonicalNameSet(),
+                psi.getCanonicalNameSet(),
                 psi.implementedProtocolName()
         );
     }

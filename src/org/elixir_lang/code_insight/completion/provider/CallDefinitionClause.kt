@@ -6,36 +6,35 @@ import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiWhiteSpace
-import com.intellij.psi.ResolveState
 import com.intellij.util.ProcessingContext
-import org.elixir_lang.navigation.isDecompiled
-import org.elixir_lang.psi.CallDefinitionClause.nameArityInterval
+import org.elixir_lang.semantic.call.definition.clause.Visibility
 import org.elixir_lang.psi.ElixirTypes
-import org.elixir_lang.psi.call.Call
-import org.elixir_lang.psi.impl.call.macroChildCalls
+import org.elixir_lang.semantic.Modular
 import org.elixir_lang.psi.impl.maybeModularNameToModulars
 
 class CallDefinitionClause : CompletionProvider<CompletionParameters>() {
-    private fun callDefinitionClauseLookupElements(scope: Call): Iterable<LookupElement> {
-        val callDefinitionClauseList = scope
-                .macroChildCalls()
-                .filter { org.elixir_lang.psi.CallDefinitionClause.`is`(it) }
+    private fun callDefinitionClauseLookupElements(scope: Modular): Sequence<LookupElement> {
+        val callDefinitions = scope.exportedCallDefinitions.asSequence()
 
         // decompiled private functions can't be made public, so exclude them
-        val callable = if (scope.isDecompiled()) {
-            callDefinitionClauseList.filter { org.elixir_lang.psi.CallDefinitionClause.isPublic(it) }
+        val callable = if (scope.isDecompiled) {
+            callDefinitions.filter { it.visibility == Visibility.PUBLIC }
         } else {
-            callDefinitionClauseList
+            callDefinitions
         }
 
         return callable
-                .mapNotNull {
-                    nameArityInterval(it, ResolveState.initial())?.let { (name, _) ->
-                        org.elixir_lang.code_insight.lookup.element.CallDefinitionClause.createWithSmartPointer(
-                                name,
-                                it
-                        )
-                    }
+                .flatMap { callDefinition ->
+                    callDefinition
+                            .nameArityInterval?.let { (name, _) ->
+                                callDefinition.clauses.asSequence().map { clause ->
+                                    org.elixir_lang.code_insight.lookup.element.CallDefinitionClause.createWithSmartPointer(
+                                            name,
+                                            clause.psiElement
+                                    )
+                                }
+                            }
+                            .orEmpty()
                 }
     }
 
@@ -81,7 +80,7 @@ class CallDefinitionClause : CompletionProvider<CompletionParameters>() {
 
                 for (modular in modulars) {
                     modularsResultSet.addAllElements(
-                            callDefinitionClauseLookupElements(modular)
+                            callDefinitionClauseLookupElements(modular).asIterable()
                     )
                 }
             }

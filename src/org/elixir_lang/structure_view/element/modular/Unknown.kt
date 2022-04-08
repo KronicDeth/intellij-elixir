@@ -1,25 +1,22 @@
 package org.elixir_lang.structure_view.element.modular
 
+import com.intellij.ide.util.treeView.smartTree.TreeElement
 import com.intellij.navigation.ItemPresentation
 import org.elixir_lang.navigation.item_presentation.modular.Unknown
 import org.elixir_lang.psi.call.Call
+import org.elixir_lang.psi.impl.locationString
+import org.elixir_lang.structure_view.element.Element
 
-class Unknown : Module {
-    constructor(call: Call) : super(call)
+class Unknown(private val parent: Modular?, val call: Call) : Element<Call>(call) {
+    override fun getPresentation(): ItemPresentation = Unknown(location, navigationItem)
 
-    /**
-     * @param parent the parent [Module] or [org.elixir_lang.structure_view.element.Quote] that scopes
-     * `call`.
-     * @param call   the `<module>.def<suffix>/2` call nested in `parent`.
-     */
-    constructor(parent: Modular?, call: Call) : super(parent, call)
+    val location: String by lazy {
+        Module.location(parent) ?: call.locationString()
+    }
 
-    /**
-     * Returns the presentation of the tree element.
-     *
-     * @return the element presentation.
-     */
-    override fun getPresentation(): ItemPresentation = Unknown(location(), navigationItem)
+    override fun getChildren(): Array<TreeElement> {
+        TODO()
+    }
 
     companion object {
         @JvmStatic

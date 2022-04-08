@@ -10,7 +10,6 @@ import com.intellij.psi.util.contextOfType
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.CanonicallyNamed
-import org.elixir_lang.psi.call.Named
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil
 import org.elixir_lang.psi.impl.maybeModularNameToModulars
 import org.elixir_lang.psi.impl.stripAccessExpression
@@ -21,18 +20,12 @@ import org.elixir_lang.psi.stub.index.AllName
 import org.elixir_lang.psi.stub.index.ModularName
 import org.elixir_lang.psi.stub.type.call.Stub
 import org.elixir_lang.reference.module.UnaliasedName
+import org.elixir_lang.semantic.Alias
+import org.elixir_lang.semantic.Modular
+import org.elixir_lang.semantic.semantic
 
 class Variants(private val entrance: PsiElement) : Module() {
-    /**
-     * Decides whether `match` matches the criteria being searched for.  All other [.execute] methods
-     * eventually end here.
-     *
-     * @param match
-     * @param aliasedName
-     * @param state
-     * @return `true` to keep processing; `false` to stop processing.
-     */
-    override fun executeOnAliasedName(match: PsiNamedElement, aliasedName: String, state: ResolveState): Boolean {
+    override fun executeOnAliasedName(match: PsiElement, aliasedName: String, state: ResolveState): Boolean {
         lookupElementByLookupName.put(aliasedName, match)
 
         val splitPrefix = org.elixir_lang.Module.split(aliasedName)
@@ -41,7 +34,11 @@ class Variants(private val entrance: PsiElement) : Module() {
         return true
     }
 
-    override fun executeOnModularName(modular: Named, modularName: String, state: ResolveState): Boolean =
+    override fun execute(alias: Alias, state: ResolveState): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override fun executeOnModularName(modular: PsiElement, modularName: String, state: ResolveState): Boolean =
         executeOnAliasedName(modular, modularName, state)
 
     private val lookupElementByLookupName: LookupElementByLookupName = LookupElementByLookupName()
@@ -112,7 +109,7 @@ class Variants(private val entrance: PsiElement) : Module() {
         private fun relativeLookupElements(qualifier: QualifiableAlias): Collection<LookupElement> =
                 qualifier
                         .maybeModularNameToModulars(qualifier.containingFile, useCall = null, incompleteCode = false)
-                        .takeIf(Set<Call>::isNotEmpty)
+                        .takeIf(Set<Modular>::isNotEmpty)
                         ?.let { modularsRelativeLookupElements(qualifier.project, it) }
                         ?:
                         // The qualifier is an Alias to namespace that is shared, but never declared in an explicit modular
@@ -121,11 +118,11 @@ class Variants(private val entrance: PsiElement) : Module() {
         /**
          * Any modules under `modulars` with each `modular` stripped off the final names for the respective nested one
          */
-        private fun modularsRelativeLookupElements(project: Project, modulars: Set<Call>): Collection<LookupElement> =
+        private fun modularsRelativeLookupElements(project: Project, modulars: Set<Modular>): Collection<LookupElement> =
                 modulars
                         .asSequence()
                         .filterIsInstance<CanonicallyNamed>()
-                        .flatMap { it.canonicalNameSet().asSequence() }
+                        .flatMap { it.canonicalNameSet.asSequence() }
                         .toSet()
                         .let { namespacesRelativeLookupElements(project, it) }
 
@@ -185,7 +182,7 @@ class Variants(private val entrance: PsiElement) : Module() {
                                             .filter(ResolveResult::isValidResult)
                                             .mapNotNull(ResolveResult::getElement)
 
-                                    val resolvedModulars = resolvedElements.filterIsInstance<Call>().filter { Stub.isModular(it) }
+                                    val resolvedModulars = resolvedElements.filter { it.semantic is org.elixir_lang .semantic.Modular }
 
                                     val resolveds = if (resolvedModulars.isNotEmpty()) {
                                         resolvedModulars
@@ -215,7 +212,7 @@ class Variants(private val entrance: PsiElement) : Module() {
 
         }
 
-        private fun putNestedAliased(lookupElementByLookupName: LookupElementByLookupName, splitPrefix: List<String>, aliasedElement: PsiNamedElement) {
+        private fun putNestedAliased(lookupElementByLookupName: LookupElementByLookupName, splitPrefix: List<String>, aliasedElement: PsiElement) {
             UnaliasedName.unaliasedName(aliasedElement)?.let { unaliasedName ->
                 val splitUnaliasedName = org.elixir_lang.Module.split(unaliasedName)
                 val project = aliasedElement.project

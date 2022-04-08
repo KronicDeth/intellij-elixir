@@ -27,9 +27,9 @@ public interface ElixirUnmatchedQualifiedNoArgumentsCall extends ElixirUnmatched
   @NotNull
   ElixirUnmatchedExpression getUnmatchedExpression();
 
-  @Nullable String canonicalName();
+  @Nullable String getCanonicalName();
 
-  @NotNull Set<String> canonicalNameSet();
+  @NotNull Set<String> getCanonicalNameSet();
 
   @Nullable String functionName();
 

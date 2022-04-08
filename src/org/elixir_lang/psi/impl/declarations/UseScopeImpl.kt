@@ -8,21 +8,18 @@ import com.intellij.psi.search.SearchScope
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
-import org.elixir_lang.psi.call.name.Function.*
-import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.call.CallImpl.hasDoBlockOrKeyword
 import org.elixir_lang.psi.impl.call.macroDefinitionClauseForArgument
 import org.elixir_lang.psi.impl.moduleWithDependentsScope
-import org.elixir_lang.psi.stub.type.call.Stub.isModular
 import org.elixir_lang.reference.Callable.Companion.isBitStreamSegmentOption
 import org.elixir_lang.reference.Callable.Companion.isParameter
 import org.elixir_lang.reference.Callable.Companion.isParameterWithDefault
 import org.elixir_lang.reference.Callable.Companion.isVariable
 import org.elixir_lang.reference.Callable.Companion.variableUseScope
 import org.elixir_lang.reference.ModuleAttribute.Companion.isNonReferencing
-import org.elixir_lang.structure_view.element.Delegation
+import org.elixir_lang.semantic.branching.Cond
+import org.elixir_lang.semantic.semantic
 import org.jetbrains.annotations.Contract
-import java.util.*
 
 fun PsiElement.selfAndFollowingSiblingsSearchScope(): LocalSearchScope {
     val selfAndFollowingSiblingList = ArrayList<PsiElement>()
@@ -60,11 +57,11 @@ object UseScopeImpl {
     @Contract(pure = true)
     @JvmStatic
     fun get(atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>): SearchScope =
-            if (isNonReferencing(atUnqualifiedNoParenthesesCall.atIdentifier)) {
-                atUnqualifiedNoParenthesesCall.moduleWithDependentsScope()
-            } else {
-                atUnqualifiedNoParenthesesCall.selfAndFollowingSiblingsSearchScope()
-            }
+        if (isNonReferencing(atUnqualifiedNoParenthesesCall.atIdentifier)) {
+            atUnqualifiedNoParenthesesCall.moduleWithDependentsScope()
+        } else {
+            atUnqualifiedNoParenthesesCall.selfAndFollowingSiblingsSearchScope()
+        }
 
     /**
      * Returns the scope in which references to this element are searched.
@@ -85,28 +82,28 @@ object UseScopeImpl {
 
             while (true) {
                 if (ancestor is Call) {
-                    val ancestorCall = ancestor
+                    when (val ancestorSemantic = ancestor.semantic) {
+                        is org.elixir_lang.semantic.call.definition.clause.Call -> {
+                            val macroDefinitionClause = ancestor.macroDefinitionClauseForArgument()
 
-                    if (CallDefinitionClause.`is`(ancestorCall)) {
-                        val macroDefinitionClause = ancestorCall.macroDefinitionClauseForArgument()
+                            if (macroDefinitionClause != null) {
+                                ancestor = macroDefinitionClause
+                            }
 
-                        if (macroDefinitionClause != null) {
-                            ancestor = macroDefinitionClause
+                            break
                         }
-
-                        break
-                    } else if (Delegation.`is`(ancestorCall)) {
-                        break
-                    } else if (ancestorCall.hasDoBlockOrKeyword()) {
-                        break
+                        is org.elixir_lang.semantic.call.definition.Delegation -> break
+                        else -> if (ancestor.hasDoBlockOrKeyword()) {
+                            break
+                        }
                     }
                 } else if (ancestor is ElixirStabOperation) {
                     break
                 } else if (ancestor is PsiFile) {
                     Logger.error(
-                            UnqualifiedNoArgumentsCall::class.java,
-                            "Use scope for parameter not found before reaching file scope",
-                            unqualifiedNoArgumentsCall
+                        UnqualifiedNoArgumentsCall::class.java,
+                        "Use scope for parameter not found before reaching file scope",
+                        unqualifiedNoArgumentsCall
                     )
                     break
                 }
@@ -129,21 +126,30 @@ object UseScopeImpl {
     fun selector(element: PsiElement): UseScopeSelector {
         var useScopeSelector = UseScopeSelector.PARENT
 
-        if (element is AtUnqualifiedNoParenthesesCall<*>) {
-            /* Module Attribute declarations */
-            useScopeSelector = UseScopeSelector.SELF_AND_FOLLOWING_SIBLINGS
-        } else if (element is ElixirAnonymousFunction) {
-            useScopeSelector = UseScopeSelector.SELF
-        } else if (element is Call) {
-            if (element.isCalling(KERNEL, CASE) ||
-                    element.isCalling(KERNEL, COND) ||
-                    element.isCalling(KERNEL, IF) ||
-                    element.isCalling(KERNEL, RECEIVE) ||
-                    element.isCalling(KERNEL, UNLESS) ||
-                    element.isCalling(KERNEL, VAR_BANG)) {
+        when (element) {
+            is AtUnqualifiedNoParenthesesCall<*> -> {
+                /* Module Attribute declarations */
                 useScopeSelector = UseScopeSelector.SELF_AND_FOLLOWING_SIBLINGS
-            } else if (CallDefinitionClause.`is`(element) || isModular(element) || hasDoBlockOrKeyword(element)) {
+            }
+            is ElixirAnonymousFunction -> {
                 useScopeSelector = UseScopeSelector.SELF
+            }
+            is Call -> {
+                when (element.semantic) {
+                    is org.elixir_lang.semantic.branching.conditional.Case,
+                    is Cond,
+                    is org.elixir_lang.semantic.branching.conditional.If,
+                    is org.elixir_lang.semantic.branching.Receive,
+                    is org.elixir_lang.semantic.branching.conditional.Unless,
+                    is org.elixir_lang.semantic.variable.Bang ->
+                        useScopeSelector = UseScopeSelector.SELF_AND_FOLLOWING_SIBLINGS
+                    is org.elixir_lang.semantic.call.definition.clause.Call,
+                    is org.elixir_lang.semantic.Modular ->
+                        useScopeSelector = UseScopeSelector.SELF
+                    else -> if (hasDoBlockOrKeyword(element)) {
+                        useScopeSelector = UseScopeSelector.SELF
+                    }
+                }
             }
         }
 

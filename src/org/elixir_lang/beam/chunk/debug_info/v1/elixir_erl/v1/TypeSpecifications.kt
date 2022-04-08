@@ -2,9 +2,12 @@ package org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1
 
 import com.ericsson.otp.erlang.OtpErlangList
 import com.ericsson.otp.erlang.OtpErlangObject
+import org.elixir_lang.NameArity
 import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.type_specifications.*
 
-class TypeSpecifications(private val typeSpecificationList: List<TypeSpecification>) {
+class TypeSpecifications(list: OtpErlangList) {
+    private val typeSpecificationList: List<TypeSpecification> = list.mapNotNull { TypeSpecification.from(this, it) }
+
     val callbacks: Callbacks by lazy {
         typeSpecificationList
                 .mapNotNull { it as? Callback }
@@ -26,7 +29,6 @@ class TypeSpecifications(private val typeSpecificationList: List<TypeSpecificati
     val types: Types by lazy {
         typeSpecificationList
                 .mapNotNull { it as? Type }
-                .filter { isExported(it.name, it.arity) }
                 .let { Types(it) }
     }
 
@@ -40,18 +42,15 @@ class TypeSpecifications(private val typeSpecificationList: List<TypeSpecificati
     fun indexOf(typeSpecification: TypeSpecification): Int = typeSpecificationList.indexOf(typeSpecification)
     fun size() = typeSpecificationList.size
 
-    fun isExported(name: String, arity: Int): Boolean =
-        typeSpecificationList.any { it is ExportType && it.name == name && it.arity == arity }
+    fun isExported(nameArity: NameArity): Boolean =
+        typeSpecificationList.any { it is ExportType && it.nameArity == nameArity }
 
     companion object {
         fun from(term: OtpErlangObject?): TypeSpecifications? =
-            if (term is OtpErlangList) {
-                from(term)
-            } else {
-                null
-            }
-
-        private fun from(list: OtpErlangList): TypeSpecifications =
-            TypeSpecifications(list.mapNotNull { TypeSpecification.from(it) })
+                if (term is OtpErlangList) {
+                    TypeSpecifications(term)
+                } else {
+                    null
+                }
     }
 }

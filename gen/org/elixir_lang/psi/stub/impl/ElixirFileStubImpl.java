@@ -16,7 +16,7 @@ public class ElixirFileStubImpl extends PsiFileStubImpl<ElixirFile> implements E
     @NotNull
     @Override
     public CanonicallyNamed[] modulars() {
-        return getChildrenByType(ModuleStubElementTypes.MODULE, new ArrayFactory<CanonicallyNamed>() {
+        return getChildrenByType(ModuleStubElementTypes.MODULE_DEFINITION, new ArrayFactory<CanonicallyNamed>() {
             @NotNull
             @Override
             public CanonicallyNamed[] create(int count) {

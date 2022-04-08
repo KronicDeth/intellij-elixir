@@ -3,18 +3,21 @@ package org.elixir_lang.mix
 import com.intellij.openapi.application.runReadAction
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
-import com.intellij.psi.ResolveState
 import org.elixir_lang.NameArity
 import org.elixir_lang.package_manager.DepGatherer
-import org.elixir_lang.psi.*
-import org.elixir_lang.psi.CallDefinitionClause.isFunction
-import org.elixir_lang.psi.CallDefinitionClause.isPublicFunction
-import org.elixir_lang.psi.CallDefinitionClause.nameArityInterval
+import org.elixir_lang.psi.AccumulatorContinue
+import org.elixir_lang.psi.ElixirFile
+import org.elixir_lang.psi.ElixirList
+import org.elixir_lang.psi.QuotableKeywordList
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.call.foldChildrenWhile
 import org.elixir_lang.psi.impl.call.macroChildCalls
 import org.elixir_lang.psi.impl.keywordValue
 import org.elixir_lang.psi.impl.stripAccessExpression
+import org.elixir_lang.semantic.Module
+import org.elixir_lang.semantic.call.definition.Clause
+import org.elixir_lang.semantic.call.definition.clause.Time
+import org.elixir_lang.semantic.semantic
 
 class DepGatherer : DepGatherer() {
     override fun visitFile(file: PsiFile) {
@@ -26,15 +29,15 @@ class DepGatherer : DepGatherer() {
     }
 
     override fun visitElement(element: PsiElement) {
-        if (element is Call && Module.`is`(element)) {
-            val childCalls = element.macroChildCalls()
+        element.semantic?.let { it as? Module }?.let { module ->
+            val childCalls = module.psiElement.let { it as Call }.macroChildCalls()
 
             childCalls
-                    .foldDepsDefinersWhile(listOf<Dep>()) { depsDefiner, acc ->
-                        AccumulatorContinue(acc + depsDefiner.deps(), true)
-                    }
-                    .accumulator
-                    .let { depSet.addAll(it) }
+                .foldDepsDefinersWhile(listOf<Dep>()) { depsDefiner, acc ->
+                    AccumulatorContinue(acc + depsDefiner.deps(), true)
+                }
+                .accumulator
+                .let { depSet.addAll(it) }
         }
     }
 }
@@ -51,8 +54,8 @@ private fun Call.lastList(): ElixirList? =
     }.accumulator
 
 private fun <R> Array<Call>.foldDepsDefinersWhile(
-        initial: R,
-        operation: (Call, acc: R) -> AccumulatorContinue<R>
+    initial: R,
+    operation: (Call, acc: R) -> AccumulatorContinue<R>
 ): AccumulatorContinue<R> {
     var final = AccumulatorContinue(initial, true)
 
@@ -88,53 +91,39 @@ private fun Array<Call>.depsNameArity(): NameArity? {
 }
 
 private fun isDefining(call: Call, nameArity: NameArity): Boolean =
-        if (isFunction(call)) {
-            nameArityInterval(call, ResolveState.initial())?.let { definedNameArityInterval ->
-                if (definedNameArityInterval.name == nameArity.name &&
-                        definedNameArityInterval.arityInterval.contains(nameArity.arity)) {
-                    true
-                } else {
-                    null
-                }
-            }
-        } else {
-            null
+    call.semantic?.let { it as? Clause }?.definition?.let { definition ->
+        definition.time == Time.RUN && definition.nameArityInterval?.let { nameArityInterval ->
+            nameArityInterval.name == nameArity.name && nameArityInterval.arityInterval.contains(nameArity.arity)
         } ?: false
+    } ?: false
+
 
 private fun isDefiningProject(call: Call): Boolean =
-        if (isPublicFunction(call)) {
-            nameArityInterval(call, ResolveState.initial())?.let { nameArityRange ->
-                if (nameArityRange.name == "project" && nameArityRange.arityInterval.contains(0)) {
-                    true
-                } else {
-                    null
-                }
-            }
-        } else {
-            null
-        } ?: false
+    call.semantic?.let { it as? Clause }?.definition?.nameArityInterval?.let { nameArityInterval ->
+        nameArityInterval.name == "project" && nameArityInterval.arityInterval.contains(0)
+    } ?: false
 
 private fun Call.lastKeywordList(): QuotableKeywordList? =
-        foldChildrenWhile(null as QuotableKeywordList?) { projectChild, acc ->
-                    if (projectChild is ElixirList) {
-                        val lastKeywordList = projectChild.children.last { it is QuotableKeywordList } as QuotableKeywordList?
-                        AccumulatorContinue(lastKeywordList, true)
-                    } else {
-                        AccumulatorContinue(acc, true)
-                    }
-                }
-                .accumulator
+    foldChildrenWhile(null as QuotableKeywordList?) { projectChild, acc ->
+        if (projectChild is ElixirList) {
+            val lastKeywordList = projectChild.children.last { it is QuotableKeywordList } as QuotableKeywordList?
+            AccumulatorContinue(lastKeywordList, true)
+        } else {
+            AccumulatorContinue(acc, true)
+        }
+    }
+        .accumulator
 
 private fun QuotableKeywordList.depsNameArity(): NameArity? =
-        keywordValue("deps")
-                ?.let { it as? Call }
-                ?.let { depsCall ->
-                    depsCall
-                            .functionName()
-                            ?.let { name ->
-                                NameArity(name, depsCall.resolvedFinalArity())
-                            }
+    keywordValue("deps")
+        ?.let { it as? Call }
+        ?.let { depsCall ->
+            depsCall
+                .functionName()
+                ?.let { name ->
+                    NameArity(name, depsCall.resolvedFinalArity())
                 }
+        }
 
 private fun ElixirList.deps(): List<Dep> =
     children.map { it.stripAccessExpression() }.asSequence().flatMap { Deps.from(it) }.toList()

@@ -4,27 +4,31 @@ import com.intellij.navigation.ChooseByNameContributor
 import com.intellij.navigation.NavigationItem
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
-import com.intellij.psi.ResolveState
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.stubs.StubIndexKey
 import com.intellij.util.ArrayUtil
-import org.elixir_lang.Visibility
 import org.elixir_lang.errorreport.Logger
-import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
-import org.elixir_lang.psi.Implementation.forNameCollection
 import org.elixir_lang.psi.NamedElement
-import org.elixir_lang.psi.call.Call
+import org.elixir_lang.semantic.Semantic
+import org.elixir_lang.semantic.call.definition.Clause
+import org.elixir_lang.semantic.call.definition.clause.Time
+import org.elixir_lang.semantic.call.definition.clause.Visibility
+import org.elixir_lang.semantic.semantic
 import org.elixir_lang.structure_view.element.*
+import org.elixir_lang.structure_view.element.call.Definition
+import org.elixir_lang.structure_view.element.call.definition.delegation.Head
 import org.elixir_lang.structure_view.element.modular.Implementation
 import org.elixir_lang.structure_view.element.modular.Module
 import org.elixir_lang.structure_view.element.modular.Protocol
+import org.elixir_lang.structure_view.element.type.definition.source.Callback
 import java.util.*
 
 /**
  * @see [org.intellij.erlang.go.ErlangSymbolContributor](https://github.com/ignatov/intellij-erlang/blob/2f59e59a31ecbb2fbdf9b7a3547fb4f206b0807e/src/org/intellij/erlang/go/ErlangSymbolContributor.java)
  */
-open class ChooseByNameContributor(private val stubIndexKey: StubIndexKey<String, NamedElement>) : ChooseByNameContributor {
+open class ChooseByNameContributor(private val stubIndexKey: StubIndexKey<String, NamedElement>) :
+    ChooseByNameContributor {
     private fun globalSearchScope(project: Project, includeNonProjectItems: Boolean): GlobalSearchScope =
         if (includeNonProjectItems) {
             GlobalSearchScope.allScope(project)
@@ -46,28 +50,29 @@ open class ChooseByNameContributor(private val stubIndexKey: StubIndexKey<String
      * library classes) should be included in the returned array.
      * @return the array of navigation items.
      */
-    override fun getItemsByName(name: String,
-                                pattern: String,
-                                project: Project,
-                                includeNonProjectItems: Boolean): Array<NavigationItem> {
+    override fun getItemsByName(
+        name: String,
+        pattern: String,
+        project: Project,
+        includeNonProjectItems: Boolean
+    ): Array<NavigationItem> {
         val scope = globalSearchScope(project, includeNonProjectItems)
 
         val result = StubIndex.getElements(stubIndexKey, name, project, scope, NamedElement::class.java)
         val items = SourcePreferredItems()
-        val enclosingModularByCall = EnclosingModularByCall()
-        val callDefinitionByTuple = HashMap<CallDefinition.Tuple, CallDefinition>()
+        val enclosingModularByMaybeEnclosed = EnclosingModularByMaybeEnclosed()
+        val callDefinitionByTuple = HashMap<Definition.Tuple, Definition>()
 
         for (element in result) {
-            // Use navigation element so that source element is used for compiled elements
-            val sourceElement = element.navigationElement
+            val semantic = element.semantic
 
-            if (sourceElement is Call) {
+            if (semantic != null) {
                 getItemsByNameFromCall(
-                        name,
-                        items,
-                        enclosingModularByCall,
-                        callDefinitionByTuple,
-                        sourceElement
+                    name,
+                    items,
+                    enclosingModularByMaybeEnclosed,
+                    callDefinitionByTuple,
+                    semantic
                 )
             }
         }
@@ -75,160 +80,172 @@ open class ChooseByNameContributor(private val stubIndexKey: StubIndexKey<String
         return items.toTypedArray()
     }
 
-    private fun getItemsByNameFromCall(name: String,
-                                       items: SourcePreferredItems,
-                                       enclosingModularByCall: EnclosingModularByCall,
-                                       callDefinitionByTuple: MutableMap<CallDefinition.Tuple, CallDefinition>,
-                                       call: Call) {
-        when {
-            org.elixir_lang.psi.CallDefinitionClause.`is`(call) -> getItemsFromCallDefinitionClause(items, enclosingModularByCall, callDefinitionByTuple, call)
-            CallDefinitionSpecification.`is`(call) -> getItemsFromCallDefinitionSpecification(items, enclosingModularByCall, call)
-            Callback.`is`(call) -> getItemsFromCallback(items, enclosingModularByCall, call)
-            org.elixir_lang.psi.Implementation.`is`(call) -> getItemsFromImplementation(name, items, enclosingModularByCall, call)
-            org.elixir_lang.psi. Module.`is`(call) -> getItemsFromModule(items, enclosingModularByCall, call)
-            org.elixir_lang.psi.Protocol.`is`(call) -> getItemsFromProtocol(items, enclosingModularByCall, call)
-            // MUST be after modular definition one-liners don't count as call definition heads
-            CallDefinitionHead.`is`(call) -> getItemsFromCallDefinitionHead(items, enclosingModularByCall, callDefinitionByTuple, call)
+    private fun getItemsByNameFromCall(
+        name: String,
+        items: SourcePreferredItems,
+        enclosingModularByMaybeEnclosed: EnclosingModularByMaybeEnclosed,
+        callDefinitionByTuple: MutableMap<Definition.Tuple, Definition>,
+        semantic: Semantic
+    ) {
+        when (semantic) {
+            is Clause ->
+                getItemsFromCallDefinitionClause(
+                    items,
+                    enclosingModularByMaybeEnclosed,
+                    callDefinitionByTuple,
+                    semantic
+                )
+            is org.elixir_lang.semantic.type.definition.source.Specification ->
+                getItemsFromCallDefinitionSpecification(items, enclosingModularByMaybeEnclosed, semantic)
+            is org.elixir_lang.semantic.type.definition.source.Callback ->
+                getItemsFromCallback(items, enclosingModularByMaybeEnclosed, semantic)
+            is org.elixir_lang.semantic.Implementation ->
+                getItemsFromImplementation(name, items, enclosingModularByMaybeEnclosed, semantic)
+            is org.elixir_lang.semantic.Module ->
+                getItemsFromModule(items, enclosingModularByMaybeEnclosed, semantic)
+            is org.elixir_lang.semantic.Protocol ->
+                getItemsFromProtocol(items, enclosingModularByMaybeEnclosed, semantic)
+            is org.elixir_lang.semantic.call.definition.delegation.Head ->
+                getItemsFromDelegationHead(items, enclosingModularByMaybeEnclosed, callDefinitionByTuple, semantic)
         }
     }
 
-    private fun getItemsFromCallback(items: SourcePreferredItems,
-                                     enclosingModularByCall: EnclosingModularByCall,
-                                     call: Call) {
-        enclosingModularByCall.putNew(call)?.let { Callback(it, call) }?.run {
-            items.add(this)
-        } ?:
-        error("Cannot find enclosing Modular for Callback", call)
+    private fun getItemsFromCallback(
+        items: SourcePreferredItems,
+        enclosingModularByMaybeEnclosed: EnclosingModularByMaybeEnclosed,
+        callback: org.elixir_lang.semantic.type.definition.source.Callback
+    ) {
+        enclosingModularByMaybeEnclosed.putNew(callback)
+            ?.let { Callback(it, callback) }
+            ?.run {
+                items.add(this)
+            }
+            ?: error("Cannot find enclosing Modular for Callback", callback.psiElement)
     }
 
     private fun getItemsFromCallDefinitionClause(
-            items: SourcePreferredItems,
-            enclosingModularByCall: EnclosingModularByCall,
-            callDefinitionByTuple: MutableMap<CallDefinition.Tuple, CallDefinition>,
-            call: Call
+        items: SourcePreferredItems,
+        enclosingModularByMaybeEnclosed: EnclosingModularByMaybeEnclosed,
+        callDefinitionByTuple: MutableMap<Definition.Tuple, Definition>,
+        clause: Clause
     ) {
-        org.elixir_lang.psi.CallDefinitionClause.nameArityInterval(call, ResolveState.initial())?.let { (name, arityInterval) ->
-            val time = CallDefinitionClause.time(call)
-            val modular = enclosingModularByCall.putNew(call)
+        val definition = clause.definition
+
+        definition.nameArityInterval?.let { (name, arityInterval) ->
+            val time = definition.time
+            val modular = enclosingModularByMaybeEnclosed.putNew(clause)
 
             if (modular == null) {
+                val psiElement = clause.psiElement
                 // don't throw an error if really EEX, but has wrong extension
-                if (!call.text.contains("<%=")) {
-                    error("Cannot find enclosing Modular", call)
+                if (!psiElement.text.contains("<%=")) {
+                    error("Cannot find enclosing Modular", psiElement)
                 }
             } else {
                 for (arity in arityInterval.closed()) {
-                    val tuple = CallDefinition.Tuple(modular, time, name, arity)
-                    callDefinitionByTuple.computeIfAbsent(tuple) { (modular, time, name, arity) ->
-                        CallDefinition(modular, time, name, arity)
-                    }.clause(call).run {
-                        items.add(this)
-                    }
+                    val tuple = Definition.Tuple(modular, time, name, arity)
+                    callDefinitionByTuple
+                        .computeIfAbsent(tuple) { (modular, _, _, _) ->
+                            Definition(modular, definition)
+                        }
+                        .clause(clause)
+                        .run {
+                            items.add(this)
+                        }
                 }
             }
         }
     }
 
-    private fun getItemsFromCallDefinitionHead(
-            items: SourcePreferredItems,
-            enclosingModularByCall: EnclosingModularByCall,
-            callDefinitionByTuple: MutableMap<CallDefinition.Tuple, CallDefinition>,
-            call: Call
+    private fun getItemsFromDelegationHead(
+        items: SourcePreferredItems,
+        enclosingModularByMaybeEnclosed: EnclosingModularByMaybeEnclosed,
+        callDefinitionByTuple: MutableMap<Definition.Tuple, Definition>,
+        head: org.elixir_lang.semantic.call.definition.delegation.Head
     ) {
-        val delegationCall = CallDefinitionHead.enclosingDelegationCall(call)
+        val delegation = head.delegation
+        val modular = enclosingModularByMaybeEnclosed.putNew(delegation)
 
-        if (delegationCall != null) {
-            val modular = enclosingModularByCall.putNew(delegationCall)
+        if (modular != null) {
+            val nameArityInterval = head.nameArityInterval
 
-            if (modular != null) {
-                val callDefinitionName = call.functionName()
+            if (nameArityInterval != null) {
+                val name = nameArityInterval.name
+                val arityInterval = nameArityInterval.arityInterval
 
-                if (callDefinitionName != null) {
-                    val callDefinitionArity = call.resolvedFinalArity()
+                val tuple = Definition.Tuple(
+                    modular,
+                    // Delegation can't delegate macros
+                    Time.RUN,
+                    name,
+                    arityInterval.minimum
+                )
+                var callDefinition: Definition? = callDefinitionByTuple[tuple]
 
-                    val tuple = CallDefinition.Tuple(
-                            modular,
-                            // Delegation can't delegate macros
-                            Timed.Time.RUN,
-                            callDefinitionName,
-                            callDefinitionArity
-                    )
-                    var callDefinition: CallDefinition? = callDefinitionByTuple[tuple]
-
-                    if (callDefinition == null) {
-                        callDefinition = CallDefinition(tuple.modular, tuple.time, tuple.name, tuple.arity)
-                        items.add(callDefinition)
-                        callDefinitionByTuple[tuple] = callDefinition
-                    }
-
-                    // Delegation is always public as import should be used for private
-                    val visibility = Visibility.PUBLIC
-
-
-                    val callDefinitionHead = CallDefinitionHead(callDefinition, visibility, call)
-                    items.add(callDefinitionHead)
-                } else {
-                    error("Call for CallDefinitionHead does not have function name", call)
+                if (callDefinition == null) {
+                    callDefinition = Definition(tuple.modular, delegation)
+                    items.add(callDefinition)
+                    callDefinitionByTuple[tuple] = callDefinition
                 }
+
+                // Delegation is always public as import should be used for private
+                val visibility = Visibility.PUBLIC
+
+                val callDefinitionHead = Head(callDefinition, head)
+                items.add(callDefinitionHead)
             } else {
-                error("Cannot find enclosing Modular for Delegation call", delegationCall)
+                error("Delegation head does not have name or arity interval", head.psiElement)
             }
         } else {
-            error("Cannot find enclosing delegation call for CallDefinitionHead", call)
+            error("Cannot find enclosing Modular for Delegation", delegation.psiElement)
         }
     }
 
-    private fun getItemsFromCallDefinitionSpecification(items: SourcePreferredItems,
-                                                        enclosingModularByCall: EnclosingModularByCall,
-                                                        call: Call) {
-        enclosingModularByCall.putNew(call)?.let { modular ->
-            CallDefinitionSpecification(
-                    modular,
-                    call as AtUnqualifiedNoParenthesesCall<*>,
-                    false,
-                    Timed.Time.RUN
+    private fun getItemsFromCallDefinitionSpecification(
+        items: SourcePreferredItems,
+        enclosingModularByMaybeEnclosed: EnclosingModularByMaybeEnclosed,
+        specification: org.elixir_lang.semantic.type.definition.source.Specification
+    ) {
+        enclosingModularByMaybeEnclosed.putNew(specification)?.let { modular ->
+            org.elixir_lang.structure_view.element.type.definition.source.Specification(
+                modular,
+                specification,
+                false,
+                Time.RUN
             ).run {
                 items.add(this)
             }
-        } ?:
-        error("Cannot find enclosing Modular for CallDefinitionSpecification", call)
+        } ?: error("Cannot find enclosing Modular for CallDefinitionSpecification", specification.psiElement)
     }
 
-    private fun getItemsFromImplementation(name: String,
-                                           items: SourcePreferredItems,
-                                           enclosingModularByCall: EnclosingModularByCall,
-                                           call: Call) {
-        val modular = enclosingModularByCall.putNew(call)
+    private fun getItemsFromImplementation(
+        name: String,
+        items: SourcePreferredItems,
+        enclosingModularByMaybeEnclosed: EnclosingModularByMaybeEnclosed,
+        implementation: org.elixir_lang.semantic.Implementation
+    ) {
+        val modular = enclosingModularByMaybeEnclosed.putNew(implementation)
 
-        val forNameCollection = forNameCollection(modular, call)
-
-        if (forNameCollection != null) {
-            for (forName in forNameCollection) {
-                val forNameOverriddenImplementation = Implementation(modular, call, forName)
-                val implementationName = forNameOverriddenImplementation.name
-
-                if (implementationName != null && implementationName.contains(name)) {
-                    items.add(forNameOverriddenImplementation)
-                }
-            }
-        } else {
-            val implementation = Implementation(modular, call)
-            items.add(implementation)
-        }
+        val implementation = Implementation(modular, implementation)
+        items.add(implementation)
     }
 
-    private fun getItemsFromModule(items: SourcePreferredItems,
-                                   enclosingModularByCall: EnclosingModularByCall,
-                                   call: Call) {
-        enclosingModularByCall.putNew(call).let { Module(it, call) }.run {
+    private fun getItemsFromModule(
+        items: SourcePreferredItems,
+        enclosingModularByMaybeEnclosed: EnclosingModularByMaybeEnclosed,
+        module: org.elixir_lang.semantic.Module
+    ) {
+        enclosingModularByMaybeEnclosed.putNew(module).let { Module(it, module) }.run {
             items.add(this)
         }
     }
 
-    private fun getItemsFromProtocol(items: SourcePreferredItems,
-                                     enclosingModularByCall: EnclosingModularByCall,
-                                     call: Call) {
-        enclosingModularByCall.putNew(call).let { Protocol(it, call) }.run {
+    private fun getItemsFromProtocol(
+        items: SourcePreferredItems,
+        enclosingModularByMaybeEnclosed: EnclosingModularByMaybeEnclosed,
+        protocol: org.elixir_lang.semantic.Protocol
+    ) {
+        enclosingModularByMaybeEnclosed.putNew(protocol).let { Protocol(it, protocol) }.run {
             items.add(this)
         }
     }
@@ -247,10 +264,10 @@ open class ChooseByNameContributor(private val stubIndexKey: StubIndexKey<String
     }
 
     private fun error(userMessage: String, element: PsiElement) =
-            Logger.error(this.javaClass, userMessage, element)
+        Logger.error(this.javaClass, userMessage, element)
 }
 
-private fun CallDefinition.also(block: (CallDefinition) -> Unit): CallDefinition {
+private fun Definition.also(block: (Definition) -> Unit): Definition {
     block(this)
     return this
 }

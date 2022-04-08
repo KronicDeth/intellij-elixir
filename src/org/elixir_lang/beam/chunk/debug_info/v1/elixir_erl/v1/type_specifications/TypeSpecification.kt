@@ -4,12 +4,14 @@ import com.ericsson.otp.erlang.*
 import org.elixir_lang.Macro
 import org.elixir_lang.Macro.expr
 import org.elixir_lang.Macro.variable
+import org.elixir_lang.NameArity
 import org.elixir_lang.beam.chunk.debug_info.logger
 import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.TypeSpecifications
 import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.type_specifications.TypeSpecification.Companion.defaultQuoted
 import org.elixir_lang.beam.term.inspect
 import org.elixir_lang.otpErlangList
 import org.elixir_lang.otpErlangTuple
+import org.elixir_lang.semantic.type.Visibility
 
 const val TYPE = "type"
 
@@ -25,9 +27,9 @@ sealed class TypeSpecification {
 
         fun defaultQuoted(): OtpErlangObject = expr("term")
 
-        fun from(term: OtpErlangObject): TypeSpecification? =
+        fun from(typeSpecifications: TypeSpecifications, term: OtpErlangObject): TypeSpecification? =
                 if (term is OtpErlangTuple && term.arity() == 4 && term.elementAt(0).let { it as? OtpErlangAtom }?.atomValue() == FORM_TYPE) {
-                    fromAttribute(term.elementAt(2), term.elementAt(3))
+                    fromAttribute(typeSpecifications, term.elementAt(2), term.elementAt(3))
                 } else {
                     logger.error("""
                     TypeSpecification does not match `{:$FORM_TYPE, _, _, _}`
@@ -798,11 +800,12 @@ sealed class TypeSpecification {
                 }
 
         private fun fromAttribute(
+                typeSpecifications: TypeSpecifications,
                 attributeType: OtpErlangObject,
                 attributeValue: OtpErlangObject
         ): TypeSpecification? =
                 if (attributeType is OtpErlangAtom) {
-                    fromAttribute(attributeType.atomValue(), attributeValue)
+                    fromAttribute(typeSpecifications, attributeType.atomValue(), attributeValue)
                 } else {
                     logger.error("""
                     Specification attribute type is not an atom.
@@ -816,16 +819,17 @@ sealed class TypeSpecification {
                 }
 
         private fun fromAttribute(
+                typeSpecifications: TypeSpecifications,
                 attributeType: String,
                 attributeValue: OtpErlangObject
         ): TypeSpecification? =
                 when (attributeType) {
                     "callback" -> Callback.from(attributeValue)
                     "export_type" -> ExportType.from(attributeValue)
-                    "opaque" -> Opaque.from(attributeValue)
+                    "opaque" -> Opaque.from(typeSpecifications, attributeValue)
                     "optional_callbacks" -> OptionalCallback.from(attributeValue)
                     "spec" -> Specification.from(attributeValue)
-                    "type" -> Type.from(attributeValue)
+                    "type" -> Type.from(typeSpecifications, attributeValue)
                     else -> {
                         logger.error("Don't know how to convert attribute type $attributeType to TypeSpecification")
 
@@ -1091,7 +1095,7 @@ data class Callback(val function: String, val arity: Long, val body: OtpErlangOb
     }
 }
 
-data class ExportType(val name: String, val arity: Int) : TypeSpecification() {
+data class ExportType(val nameArity: NameArity) : TypeSpecification() {
     companion object {
         fun from(attributeValue: OtpErlangObject): ExportType? {
             val exportType = if (attributeValue is OtpErlangList && attributeValue.arity() == 1) {
@@ -1099,7 +1103,7 @@ data class ExportType(val name: String, val arity: Int) : TypeSpecification() {
                     val (key, value) = prop
 
                     if (key is OtpErlangAtom && value is OtpErlangLong) {
-                        ExportType(key.atomValue(), value.intValue())
+                        ExportType(NameArity(key.atomValue(), value.intValue()))
                     } else {
                         null
                     }
@@ -1126,14 +1130,16 @@ data class ExportType(val name: String, val arity: Int) : TypeSpecification() {
 }
 
 object Typic {
-    fun <T> from(attributeValue: OtpErlangObject, constructor: (name: String, inputs: OtpErlangList, output: OtpErlangObject) -> T): T? {
+    fun <T> from(typeSpecifications: TypeSpecifications,
+                 attributeValue: OtpErlangObject,
+                 constructor: (typeSpecifications: TypeSpecifications, name: String, inputs: OtpErlangList, output: OtpErlangObject) -> T): T? {
         val type = if (attributeValue is OtpErlangTuple && attributeValue.arity() == 3) {
             val name = attributeValue.elementAt(0).let { it as? OtpErlangAtom }?.atomValue()
             val output = attributeValue.elementAt(1)
             val inputs = attributeValue.elementAt(2).let { it as? OtpErlangList }
 
             if (name != null && inputs != null) {
-                constructor(name, inputs, output)
+                constructor(typeSpecifications, name, inputs, output)
             } else {
                 null
             }
@@ -1191,7 +1197,9 @@ data class Opaque(val name: String, val inputs: OtpErlangList, val output: OtpEr
     }
 
     companion object {
-        fun from(attributeValue: OtpErlangObject): Opaque? = Typic.from(attributeValue, ::Opaque)
+        fun from(typeSpecifications: TypeSpecifications, attributeValue: OtpErlangObject): Opaque? = Typic.from(typeSpecifications, attributeValue) { _, name, inputs, output ->
+            Opaque(name, inputs, output)
+        }
     }
 }
 
@@ -1447,21 +1455,30 @@ data class Specification(
     }
 }
 
-data class Type(val name: String, val inputs: OtpErlangList, val output: OtpErlangObject) : TypeSpecification() {
-    val arity = inputs.arity()
-
-    fun toString(typeSpecifications: TypeSpecifications): String {
-        val moduleAttributeName = if (typeSpecifications.isExported(name, arity)) {
-            "type"
+data class Type(val typeSpecifications: TypeSpecifications, private val name: String, val inputs: OtpErlangList, val output: OtpErlangObject) : TypeSpecification() {
+    val visibility: Visibility by lazy {
+        if (typeSpecifications.isExported(nameArity)) {
+            Visibility.PUBLIC
         } else {
-            "typep"
+            Visibility.PRIVATE
+        }
+    }
+    val nameArity: NameArity by lazy {
+        NameArity(name, inputs.arity())
+    }
+
+    override fun toString(): String {
+        val moduleAttributeName = when (visibility) {
+            Visibility.PUBLIC -> "type"
+            Visibility.OPAQUE -> "opaque"
+            Visibility.PRIVATE -> "typep"
         }
 
         return Typic.toQuoted(moduleAttributeName, name, inputs, output).let { Macro.toString(it) }
     }
 
     companion object {
-        fun from(attributeValue: OtpErlangObject): Type? = Typic.from(attributeValue, ::Type)
+        fun from(typeSpecifications: TypeSpecifications, attributeValue: OtpErlangObject): Type? = Typic.from(typeSpecifications, attributeValue, ::Type)
     }
 }
 

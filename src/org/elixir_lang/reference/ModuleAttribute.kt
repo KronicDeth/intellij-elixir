@@ -8,12 +8,16 @@ import com.intellij.psi.PsiPolyVariantReferenceBase
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.impl.source.resolve.ResolveCache
 import org.apache.commons.lang.NotImplementedException
-import org.elixir_lang.psi.*
+import org.elixir_lang.psi.AtOperation
+import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
+import org.elixir_lang.psi.ElementFactory
+import org.elixir_lang.psi.ElixirAtIdentifier
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil
 import org.elixir_lang.psi.impl.ancestorSequence
 import org.elixir_lang.psi.impl.prevSiblingSequence
 import org.elixir_lang.reference.resolver.ModuleAttribute
+import org.elixir_lang.semantic.semantic
 
 class ModuleAttribute(psiElement: PsiElement) : PsiPolyVariantReferenceBase<PsiElement>(psiElement) {
     /**
@@ -28,24 +32,25 @@ class ModuleAttribute(psiElement: PsiElement) : PsiPolyVariantReferenceBase<PsiE
     override fun getVariants(): Array<Any> = getVariantsUpFromElement(myElement).toTypedArray()
 
     override fun handleElementRename(newModuleAttributeName: String): PsiElement =
-            when (myElement) {
-                is AtOperation -> {
-                    val moduleAttributeUsage = ElementFactory.createModuleAttributeUsage(
-                            myElement.getProject(),
-                            newModuleAttributeName
-                    )
-                    myElement.replace(moduleAttributeUsage)
-                }
-                is ElixirAtIdentifier -> {
-                    // do nothing; handled by setName on ElixirAtUnqualifiedNoParenthesesCall
-                    myElement
-                }
-                else -> throw NotImplementedException(
-                        "Renaming module attribute reference on " + myElement.javaClass.canonicalName +
-                                " PsiElements is not implemented yet.  Please open an issue " +
-                                "(https://github.com/KronicDeth/intellij-elixir/issues/new) with the class name and the " +
-                                "sample text:\n" + myElement.text)
+        when (myElement) {
+            is AtOperation -> {
+                val moduleAttributeUsage = ElementFactory.createModuleAttributeUsage(
+                    myElement.getProject(),
+                    newModuleAttributeName
+                )
+                myElement.replace(moduleAttributeUsage)
             }
+            is ElixirAtIdentifier -> {
+                // do nothing; handled by setName on ElixirAtUnqualifiedNoParenthesesCall
+                myElement
+            }
+            else -> throw NotImplementedException(
+                "Renaming module attribute reference on " + myElement.javaClass.canonicalName +
+                        " PsiElements is not implemented yet.  Please open an issue " +
+                        "(https://github.com/KronicDeth/intellij-elixir/issues/new) with the class name and the " +
+                        "sample text:\n" + myElement.text
+            )
+        }
 
     /**
      * Returns the results of resolving the reference.
@@ -56,14 +61,14 @@ class ModuleAttribute(psiElement: PsiElement) : PsiPolyVariantReferenceBase<PsiE
      * @return the array of results for resolving the reference.
      */
     override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> =
-            ResolveCache
-                    .getInstance(this.myElement.project)
-                    .resolveWithCaching(
-                            this,
-                            ModuleAttribute,
-                            false,
-                            incompleteCode
-                    )
+        ResolveCache
+            .getInstance(this.myElement.project)
+            .resolveWithCaching(
+                this,
+                ModuleAttribute,
+                false,
+                incompleteCode
+            )
 
     override fun calculateDefaultRangeInElement(): TextRange {
         val elementTextRange = element.textRange
@@ -74,50 +79,51 @@ class ModuleAttribute(psiElement: PsiElement) : PsiPolyVariantReferenceBase<PsiE
                 val atIdentifierTextRange = myElement.atIdentifier.textRange
 
                 TextRange.create(
-                        atIdentifierTextRange.startOffset - startOffset,
-                        atIdentifierTextRange.endOffset - startOffset
+                    atIdentifierTextRange.startOffset - startOffset,
+                    atIdentifierTextRange.endOffset - startOffset
                 )
             }
             else -> TextRange.create(
-                    startOffset - startOffset,
-                    elementTextRange.endOffset - startOffset
+                startOffset - startOffset,
+                elementTextRange.endOffset - startOffset
             )
         }
     }
 
     private fun getVariantsSibling(lastSibling: PsiElement): List<LookupElement> =
-            lastSibling
-                    .prevSiblingSequence()
-                    .mapNotNull {
-                        when (it) {
-                            is AtUnqualifiedNoParenthesesCall<*> -> {
+        lastSibling
+            .prevSiblingSequence()
+            .mapNotNull { prevSibling ->
+                when (prevSibling) {
+                    is AtUnqualifiedNoParenthesesCall<*> -> {
+                        LookupElementBuilder.createWithSmartPointer(
+                            ElixirPsiImplUtil.moduleAttributeName(prevSibling),
+                            prevSibling
+                        )
+                    }
+                    is Call -> {
+                        prevSibling
+                            .semantic
+                            ?.let { it as? org.elixir_lang.semantic.implementation.Call }
+                            ?.let { implementation ->
+                                val element = implementation.protocolNameElement ?: prevSibling
+
                                 LookupElementBuilder.createWithSmartPointer(
-                                        ElixirPsiImplUtil.moduleAttributeName(it),
-                                        it
+                                    "@protocol",
+                                    element
                                 )
                             }
-                            is Call -> {
-                                if (Implementation.`is`(it)) {
-                                    val element = Implementation.protocolNameElement(it) ?: it
-
-                                    LookupElementBuilder.createWithSmartPointer(
-                                            "@protocol",
-                                            element
-                                    )
-                                } else {
-                                    null
-                                }
-                            }
-                            else -> null
-                        }
                     }
-                    .toList()
+                    else -> null
+                }
+            }
+            .toList()
 
     private fun getVariantsUpFromElement(element: PsiElement): List<LookupElement> =
-            element
-                    .ancestorSequence()
-                    .flatMap { getVariantsSibling(it).asSequence() }
-                    .toList()
+        element
+            .ancestorSequence()
+            .flatMap { getVariantsSibling(it).asSequence() }
+            .toList()
 
     companion object {
         private const val BEHAVIOUR_NAME = "behaviour"
@@ -126,16 +132,16 @@ class ModuleAttribute(psiElement: PsiElement) : PsiPolyVariantReferenceBase<PsiE
         private const val SPECIFICATION_NAME = "spec"
         private val TYPE_NAME_SET = setOf("opaque", "type", "typep")
         private val NON_REFERENCING_NAME_SET =
-                mutableSetOf<String>().apply {
-                    add(BEHAVIOUR_NAME)
-                    addAll(CALLBACK_NAME_SET)
-                    addAll(DOCUMENTATION_NAME_SET)
-                    add(SPECIFICATION_NAME)
-                    addAll(TYPE_NAME_SET)
-                }.toSet()
+            mutableSetOf<String>().apply {
+                add(BEHAVIOUR_NAME)
+                addAll(CALLBACK_NAME_SET)
+                addAll(DOCUMENTATION_NAME_SET)
+                add(SPECIFICATION_NAME)
+                addAll(TYPE_NAME_SET)
+            }.toSet()
 
         fun isTypeSpecName(name: String): Boolean =
-                isCallbackName(name) || isSpecificationName(name) ||  isTypeName(name)
+            isCallbackName(name) || isSpecificationName(name) || isTypeName(name)
 
         /**
          * Whether the module attribute is used to declare function or macro callbacks for behaviours
@@ -160,7 +166,7 @@ class ModuleAttribute(psiElement: PsiElement) : PsiPolyVariantReferenceBase<PsiE
          * library control instead of constant definition; otherwise, `false`.
          */
         fun isNonReferencing(moduleAttribute: AtOperation): Boolean =
-                moduleAttribute.text.substring(1).let { name -> isNonReferencingName(name) }
+            moduleAttribute.text.substring(1).let { name -> isNonReferencingName(name) }
 
         /**
          * All the predefined module attributes that aren't used to define constants, but for defining behaviors, callback,

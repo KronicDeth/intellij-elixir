@@ -17,4 +17,5 @@ class ModularName : StringStubIndexExtension<NamedElement>() {
 
 // 1 - Remove non-canonical names from being index
 // 2 - `implementedProtocolName` added to `Deserialized`
-private const val VERSION = 2
+// 3 - `ModuleDefinitonStub`, `CallDefinitionStub` and `TypeDefinitonStub` simplified
+private const val VERSION = 3

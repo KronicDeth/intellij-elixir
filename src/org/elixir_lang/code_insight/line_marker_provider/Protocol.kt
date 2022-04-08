@@ -14,11 +14,11 @@ import com.intellij.openapi.util.NotNullLazyValue
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.*
 import org.elixir_lang.Icons
-import org.elixir_lang.psi.CallDefinitionClause
-import org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall
-import org.elixir_lang.psi.Protocol
-import org.elixir_lang.psi.call.Call
-import org.elixir_lang.psi.impl.call.macroChildCallList
+import org.elixir_lang.psi.ElixirAccessExpression
+import org.elixir_lang.semantic.call.definition.Clause
+import org.elixir_lang.semantic.Protocol
+import org.elixir_lang.semantic.call.Definition
+import org.elixir_lang.semantic.semantic
 import java.awt.event.MouseEvent
 import java.util.*
 import javax.swing.Icon
@@ -26,63 +26,50 @@ import javax.swing.Icon
 class Protocol : LineMarkerProvider {
     override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<*>? =
             when (element) {
-                is Call -> getLineMarkerInfo(element)
-                else -> null
-            }
-
-    private fun getLineMarkerInfo(call: Call): LineMarkerInfo<*>? =
-            if (Protocol.`is`(call)) {
-                val targets: NotNullLazyValue<Collection<PsiElement>> = NotNullLazyValue.createValue {
-                    val implementations = mutableListOf<PsiElement>()
-
-                    Protocol.processImplementations(call) { implementation ->
-                        implementations.add(implementation)
-                    }
-
-                    implementations
-                }
-
-                ImplsGutterIconBuilder()
-                        .setTargets(targets)
-                        .createLineMarkerInfo(call)
-            } else if (CallDefinitionClause.`is`(call)) {
-                enclosingModularMacroCall(call)?.let { modularCall ->
-                    CallDefinitionClause.nameArityInterval(call, ResolveState.initial())?.let { protocolNameArityInterval ->
-                        if (Protocol.`is`(modularCall)) {
+                is ElixirAccessExpression -> null
+                else -> element.semantic?.let { semantic ->
+                    when (semantic) {
+                        is Protocol -> {
                             val targets: NotNullLazyValue<Collection<PsiElement>> = NotNullLazyValue.createValue {
-                                val implementations = mutableListOf<PsiElement>()
-
-                                Protocol.processImplementations(modularCall) { defimpl ->
-                                    for (defimplChild in (defimpl as Call).macroChildCallList()) {
-                                        if (CallDefinitionClause.`is`(defimplChild)) {
-                                            CallDefinitionClause.nameArityInterval(defimplChild, ResolveState.initial())?.let { implNameArityInterval ->
-                                                if (implNameArityInterval.name == protocolNameArityInterval.name &&
-                                                        implNameArityInterval.arityInterval.overlaps(protocolNameArityInterval.arityInterval)) {
-                                                    implementations.add(defimplChild)
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    true
-                                }
-
-                                implementations
+                                semantic.implementations.map(org.elixir_lang.semantic.Implementation::psiElement)
                             }
-
 
                             ImplsGutterIconBuilder()
                                     .setTargets(targets)
-                                    .createLineMarkerInfo(call)
-                        } else {
-                            null
+                                    .createLineMarkerInfo(element)
                         }
+                        is Clause -> {
+                            semantic.nameArityInterval?.let { protocolNameArityInterval ->
+                                val protocolName = protocolNameArityInterval.name
+                                val protocolArityInterval = protocolNameArityInterval.arityInterval
+
+                                semantic
+                                        .definition
+                                        .enclosingModular.let { it as? Protocol }?.let { protocol ->
+                                            val targets: NotNullLazyValue<Collection<PsiElement>> = NotNullLazyValue.createValue {
+                                                protocol
+                                                        .implementations
+                                                        .flatMap(org.elixir_lang.semantic.Implementation::exportedCallDefinitions).filter { implementationCallDefinitionClause ->
+                                                            implementationCallDefinitionClause.nameArityInterval?.let { implementationNameArityInterval ->
+                                                                implementationNameArityInterval.name == protocolName && implementationNameArityInterval.arityInterval.overlaps(protocolArityInterval)
+                                                            } == true
+                                                        }
+                                                        .flatMap(Definition::clauses)
+                                                        .map(Clause::psiElement)
+                                            }
+
+                                            ImplsGutterIconBuilder()
+                                                    .setTargets(targets)
+                                                    .createLineMarkerInfo(element)
+                                        }
+                            }
+                        }
+                        else -> null
                     }
                 }
-            } else {
-                null
             }
-    private class ImplsGutterIconBuilder() :
+
+    private class ImplsGutterIconBuilder :
             NavigationGutterIconBuilder<PsiElement>(
                     Icons.Protocol.GoToImplementations,
                     DEFAULT_PSI_CONVERTOR,

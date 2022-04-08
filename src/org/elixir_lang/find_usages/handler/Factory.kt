@@ -10,7 +10,7 @@ class Factory : com.intellij.find.findUsages.FindUsagesHandlerFactory() {
             when (element) {
                 is org.elixir_lang.psi.AtOperation -> AtNonNumericOperation(element)
                 is org.elixir_lang.psi.call.Call -> Call(element)
-                is org.elixir_lang.beam.psi.impl.ModuleImpl<*> -> ModuleImpl(element)
+                is org.elixir_lang.beam.psi.impl.ModuleDefinitionImpl -> ModuleImpl(element)
                 is org.elixir_lang.psi.QualifiableAlias -> QualifiableAlias(element)
                 else -> throw IllegalArgumentException("Cannot create FindUsageHandler for ${element.javaClass.canonicalName}")
             }

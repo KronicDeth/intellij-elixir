@@ -13,6 +13,8 @@ import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.impl.stripAccessExpressions
 import org.elixir_lang.psi.operation.Match
+import org.elixir_lang.semantic.call.definition.Clause
+import org.elixir_lang.semantic.semantic
 import java.nio.file.Paths
 
 /**
@@ -118,7 +120,7 @@ data class Dep(val application: String, val path: String, val type: Type = Type.
                 }
 
         private fun putPathFromResolved(dep: Dep, resolved: Call): Dep =
-                if (CallDefinitionClause.`is`(resolved)) {
+                if (resolved.semantic is Clause) {
                     dep
                 } else {
                     putPathFromVariable(dep, resolved)

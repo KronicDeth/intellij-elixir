@@ -1,7 +1,7 @@
 package org.elixir_lang.reference.callable
 
-import org.elixir_lang.psi.CallDefinitionClause.`is`
-import org.elixir_lang.psi.CallDefinitionClause.nameArityInterval
+import org.elixir_lang.semantic.call.definition.Clause.`is`
+import org.elixir_lang.semantic.call.definition.Clause.nameArityInterval
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiPolyVariantReference
 import org.elixir_lang.NameArityInterval

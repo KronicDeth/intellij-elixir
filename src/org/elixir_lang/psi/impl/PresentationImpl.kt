@@ -1,11 +1,11 @@
 package org.elixir_lang.psi.impl
 
 import com.intellij.navigation.ItemPresentation
-import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiFile
 import com.intellij.usageView.UsageViewUtil
+import org.elixir_lang.Presentable
 import org.elixir_lang.annotator.Parameter
 import org.elixir_lang.beam.psi.BeamFileImpl
 import org.elixir_lang.navigation.item_presentation.KeywordKey
@@ -18,34 +18,15 @@ import org.elixir_lang.psi.call.name.Function
 import org.elixir_lang.psi.call.name.Function.ALIAS
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.outerMostQualifiableAlias
-import org.elixir_lang.structure_view.element.CallDefinition
-import org.elixir_lang.structure_view.element.CallDefinitionClause
+import org.elixir_lang.semantic.semantic
 import java.io.File
 import javax.swing.Icon
 
 object PresentationImpl {
     @JvmStatic
     fun getPresentation(call: Call): ItemPresentation =
-            when {
-                org.elixir_lang.psi.CallDefinitionClause.`is`(call) -> {
-                    val callDefinitionClause = CallDefinitionClause.fromCall(call)
-
-                    if (callDefinitionClause == null) {
-                        val callDefinition = CallDefinition.fromCall(call)
-
-                        if (callDefinition != null) {
-                            CallDefinitionClause(callDefinition, call).presentation
-                        } else {
-                            getDefaultPresentation(call)
-                        }
-                    } else {
-                        callDefinitionClause.presentation
-                    }
-                }
-                org.elixir_lang.psi.Module.`is`(call) -> {
-                    val modular = CallDefinitionClause.enclosingModular(call)
-                    org.elixir_lang.structure_view.element.modular.Module(modular, call).presentation
-                }
+        call.semantic?.let { it as? Presentable }?.presentation
+            ?: when {
                 call.isCalling(KERNEL, Function.__MODULE__, 0) -> {
                     if (call.parent?.parent?.let { it as? Call }?.isCalling(KERNEL, ALIAS) == true) {
                         AliasPresentation(call)
@@ -61,10 +42,11 @@ object PresentationImpl {
         val parameterizedParameter = Parameter(identifier).let { Parameter.putParameterized(it) }
 
         return if ((parameterizedParameter.type == Parameter.Type.FUNCTION_NAME ||
-                        parameterizedParameter.type == Parameter.Type.MACRO_NAME) &&
-                parameterizedParameter.parameterized != null) {
+                    parameterizedParameter.type == Parameter.Type.MACRO_NAME) &&
+            parameterizedParameter.parameterized != null
+        ) {
             (parameterizedParameter.parameterized as? Call)?.let {
-                CallDefinitionClause.fromCall(it)?.presentation
+                TODO()
             }
         } else {
             null
@@ -77,8 +59,8 @@ object PresentationImpl {
     @JvmStatic
     fun getPresentation(qualifiableAlias: QualifiableAlias): ItemPresentation =
         qualifiableAlias
-                .outerMostQualifiableAlias()
-                .let { org.elixir_lang.psi.impl.qualifiable_alias.ItemPresentation(it) }
+            .outerMostQualifiableAlias()
+            .let { org.elixir_lang.psi.impl.qualifiable_alias.ItemPresentation(it) }
 
     private fun getDefaultPresentation(call: Call): ItemPresentation {
         val text = UsageViewUtil.createNodeText(call)

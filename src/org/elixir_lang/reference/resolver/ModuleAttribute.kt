@@ -6,8 +6,10 @@ import com.intellij.psi.impl.source.resolve.ResolveCache
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.util.ThreeState
+import org.elixir_lang.beam.psi.CallDefinition
 import org.elixir_lang.beam.psi.impl.CallDefinitionStubImpl
-import org.elixir_lang.beam.psi.impl.ModuleImpl
+import org.elixir_lang.beam.psi.impl.ModuleDefinitionImpl
+import org.elixir_lang.beam.psi.stubs.CallDefinitionStub
 import org.elixir_lang.psi.ElixirAtom
 import org.elixir_lang.psi.NamedElement
 import org.elixir_lang.psi.scope.ResolveResultOrderedSet
@@ -17,7 +19,6 @@ import org.elixir_lang.psi.scope.module_attribute.implemetation.Protocol
 import org.elixir_lang.psi.stub.index.ModularName
 import org.elixir_lang.psi.stub.index.QuoteModuleAttributeName
 import org.elixir_lang.reference.ModuleAttribute
-import org.elixir_lang.sdk.elixir.Type.Companion.mostSpecificSdk
 
 object ModuleAttribute : ResolveCache.PolyVariantResolver<ModuleAttribute> {
     override fun resolve(moduleAttribute: ModuleAttribute, incompleteCode: Boolean): Array<ResolveResult> {
@@ -117,14 +118,18 @@ object ModuleAttribute : ResolveCache.PolyVariantResolver<ModuleAttribute> {
             StubIndex
                     .getInstance()
                     .processElements(ModularName.KEY, ":elixir_module", project, scope, NamedElement::class.java) { namedElement ->
-                        if (namedElement is ModuleImpl<*>) {
+                        if (namedElement is ModuleDefinitionImpl) {
                             namedElement
                                     .stub
-                                    ?.childrenStubs
-                                    ?.filterIsInstance<CallDefinitionStubImpl<*>>()
-                                    ?.filter { it.name == "build" && it.callDefinitionClauseHeadArity() == 3 }
-                                    ?.forEach { callDefinitionStubImpl ->
-                                        val navigationElement = callDefinitionStubImpl.psi.navigationElement
+                                    .childrenStubs
+                                    .filterIsInstance<CallDefinitionStub<CallDefinition>>()
+                                    .filter { callDefinitionStub ->
+                                        val nameArity = callDefinitionStub.nameArity
+
+                                        nameArity.name == "build" && nameArity.arity == 3
+                                    }
+                                    .forEach { callDefinitionStub ->
+                                        val navigationElement = callDefinitionStub.psi.navigationElement
                                         val text = navigationElement.text
 
                                         matchedModuleAttributes.forEach { matchedModuleAttribute ->

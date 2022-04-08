@@ -28,8 +28,10 @@ public class Function {
     public static final String IF = "if";
     public static final String IMPORT = "import";
     public static final String MATCH_QUESTION_MARK = "match?";
+    public static final String PUT_ATTRIBUTE = "put_attribute";
     public static final String QUOTE = Quote.FUNCTION;
     public static final String RECEIVE = "receive";
+    public static final String REGISTER_ATTRIBUTE = "register_attribute";
     public static final String REQUIRE = "require";
     public static final String TRY = "try";
     public static final String UNLESS = "unless";

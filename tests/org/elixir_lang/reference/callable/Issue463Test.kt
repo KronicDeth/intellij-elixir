@@ -1,6 +1,6 @@
 package org.elixir_lang.reference.callable
 
-import org.elixir_lang.psi.CallDefinitionClause.`is`
+import org.elixir_lang.semantic.call.definition.Clause.`is`
 import com.intellij.psi.PsiPolyVariantReference
 import org.elixir_lang.PlatformTestCase
 import org.elixir_lang.psi.call.Call

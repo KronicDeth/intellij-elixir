@@ -3,12 +3,11 @@ package org.elixir_lang.psi
 import com.intellij.psi.ResolveState
 import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase
 import org.elixir_lang.NameArityInterval
-import org.elixir_lang.NameArityRange
 import org.elixir_lang.psi.call.Call
 
 import java.util.ArrayList
 
-import org.elixir_lang.psi.CallDefinitionClause.nameArityInterval
+import org.elixir_lang.semantic.call.definition.Clause.nameArityInterval
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.enclosingMacroCall
 

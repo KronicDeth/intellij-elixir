@@ -7,13 +7,14 @@ import com.ericsson.otp.erlang.OtpErlangTuple
 import com.intellij.openapi.diagnostic.Logger
 import org.elixir_lang.beam.term.inspect
 import org.elixir_lang.beam.term.unsignedIntToInt
+import org.elixir_lang.psi.ArityInterval
 
 typealias Name = String
 typealias Arity = Int
 
 fun Long.toArity(): Arity = toInt()
 
-data class NameArity(val name: Name, val arity: Arity) {
+data class NameArity(val name: Name, val arity: Arity): Comparable<NameArity> {
     companion object {
         private val logger = Logger.getInstance(NameArity::class.java)
 
@@ -94,4 +95,11 @@ data class NameArity(val name: Name, val arity: Arity) {
                     }
                 }
     }
+
+    override fun toString(): String = "$name/$arity"
+
+    override fun compareTo(other: NameArity): Int =
+        compareValuesBy(this, other, NameArity::name, NameArity::arity)
+
+    fun toNameArityInterval(): NameArityInterval = NameArityInterval(name, ArityInterval(arity, arity))
 }

@@ -5,6 +5,7 @@ import com.intellij.codeInsight.lookup.LookupElementPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase;
 import org.elixir_lang.psi.call.Call;
+import org.elixir_lang.semantic.call.definition.Clause;
 import org.jetbrains.annotations.NotNull;
 
 public class CallDefinitionClauseTest extends LightPlatformCodeInsightFixtureTestCase {
@@ -68,7 +69,7 @@ public class CallDefinitionClauseTest extends LightPlatformCodeInsightFixtureTes
 
         Call maybeDefCall = (Call) maybeDefElement;
 
-        assertTrue(org.elixir_lang.psi.CallDefinitionClause.is(maybeDefCall));
+        assertTrue(Clause.is(maybeDefCall));
 
         return org.elixir_lang.code_insight.lookup.element.CallDefinitionClause.createWithSmartPointer(
                 name,

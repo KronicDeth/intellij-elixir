@@ -2,8 +2,8 @@ package org.elixir_lang.name_arity;
 
 import com.intellij.ui.RowIcon;
 import org.elixir_lang.Icons;
-import org.elixir_lang.Visibility;
-import org.elixir_lang.structure_view.element.Timed;
+import org.elixir_lang.semantic.call.definition.clause.Time;
+import org.elixir_lang.semantic.call.definition.clause.Visibility;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,7 +14,7 @@ public class PresentationData {
     public static Icon icon(final boolean callback,
                             final boolean overridable,
                             final boolean override,
-                            @NotNull final Timed.Time time,
+                            @NotNull final Time time,
                             @Nullable final Visibility visibility) {
         int layers = 3;
 
@@ -55,18 +55,5 @@ public class PresentationData {
         }
 
         return rowIcon;
-    }
-
-    @NotNull
-    public static String presentableText(@NotNull String name, @Nullable Integer arity) {
-        StringBuilder presentableTextBuilder = new StringBuilder(name).append('/');
-
-        if (arity != null) {
-            presentableTextBuilder.append(arity);
-        } else {
-            presentableTextBuilder.append('?');
-        }
-
-        return presentableTextBuilder.toString();
     }
 }

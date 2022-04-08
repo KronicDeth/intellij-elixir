@@ -30,9 +30,9 @@ public interface ElixirUnmatchedQualifiedNoParenthesesCall extends ElixirUnmatch
   @NotNull
   ElixirUnmatchedExpression getUnmatchedExpression();
 
-  @Nullable String canonicalName();
+  @Nullable String getCanonicalName();
 
-  @NotNull Set<String> canonicalNameSet();
+  @NotNull Set<String> getCanonicalNameSet();
 
   @Nullable String functionName();
 

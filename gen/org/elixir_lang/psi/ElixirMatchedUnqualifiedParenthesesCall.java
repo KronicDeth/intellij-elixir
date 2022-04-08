@@ -21,9 +21,9 @@ public interface ElixirMatchedUnqualifiedParenthesesCall extends ElixirMatchedEx
   @NotNull
   ElixirMatchedParenthesesArguments getMatchedParenthesesArguments();
 
-  @Nullable String canonicalName();
+  @Nullable String getCanonicalName();
 
-  @NotNull Set<String> canonicalNameSet();
+  @NotNull Set<String> getCanonicalNameSet();
 
   @Nullable String functionName();
 

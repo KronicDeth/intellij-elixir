@@ -24,7 +24,7 @@ import org.elixir_lang.beam.term.inspect
 import org.elixir_lang.psi.call.name.Function
 import org.elixir_lang.psi.call.name.Function.*
 import org.elixir_lang.psi.call.name.Module
-import org.elixir_lang.reference.resolver.Type.BUILTIN_ARITY_BY_NAME
+import org.elixir_lang.semantic.type.definition.Builtin
 import java.util.*
 
 class Decompiler : BinaryFileDecompiler {
@@ -100,29 +100,27 @@ class Decompiler : BinaryFileDecompiler {
                         .append("  # Built-in types (not actually declared in :erlang)\n")
                         .append('\n')
 
-                for (name in BUILTIN_ARITY_BY_NAME.keys.sorted()) {
-                    for (arity in BUILTIN_ARITY_BY_NAME[name]!!.sorted()) {
-                        decompiled.append("  @type ").append(name).append('(')
+                for ((name, arity) in Builtin.SORTED_NAME_ARITIES) {
+                    decompiled.append("  @type ").append(name).append('(')
 
-                        if ((name == "maybe_improper_list" ||
-                                        name == "nonempty_improper_list" ||
-                                        name == "nonempty_maybe_improper_list")
-                                && arity == 2) {
-                            decompiled.append("element :: term(), tail :: term()")
-                        } else if (name == "non_empty_list" && arity == 1) {
-                            decompiled.append("element :: term()")
-                        } else {
-                            for (i in 1..arity) {
-                                if (i > 1) {
-                                    decompiled.append(", ")
-                                }
-
-                                decompiled.append("type").append(i)
+                    if ((name == "maybe_improper_list" ||
+                                    name == "nonempty_improper_list" ||
+                                    name == "nonempty_maybe_improper_list")
+                            && arity == 2) {
+                        decompiled.append("element :: term(), tail :: term()")
+                    } else if (name == "non_empty_list" && arity == 1) {
+                        decompiled.append("element :: term()")
+                    } else {
+                        for (i in 1..arity) {
+                            if (i > 1) {
+                                decompiled.append(", ")
                             }
-                        }
 
-                        decompiled.append(") :: ...\n")
+                            decompiled.append("type").append(i)
+                        }
                     }
+
+                    decompiled.append(") :: ...\n")
                 }
             }
 

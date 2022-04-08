@@ -22,9 +22,9 @@ public interface ElixirUnmatchedUnqualifiedNoArgumentsCall extends ElixirUnmatch
   @NotNull
   ElixirIdentifier getIdentifier();
 
-  @Nullable String canonicalName();
+  @Nullable String getCanonicalName();
 
-  @NotNull Set<String> canonicalNameSet();
+  @NotNull Set<String> getCanonicalNameSet();
 
   @Nullable String functionName();
 

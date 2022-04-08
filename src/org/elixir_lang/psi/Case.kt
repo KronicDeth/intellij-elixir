@@ -8,6 +8,7 @@ import org.elixir_lang.psi.call.name.Function.QUOTE
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.childExpressions
 import org.elixir_lang.psi.scope.WhileIn.whileIn
+import org.elixir_lang.semantic.Quote
 
 object Case {
     fun `is`(call: Call) = call.isCallingMacro(KERNEL, CASE, 2)
@@ -43,7 +44,7 @@ object Case {
         return if (resolveModuleName != null && functionName != null) {
             when {
                 resolveModuleName == KERNEL && functionName == QUOTE -> {
-                    QuoteMacro.treeWalkUp(lastChildCall, state, keepProcessing)
+                    Quote.treeWalkUp(lastChildCall, state, keepProcessing)
                 }
                 else -> true
             }

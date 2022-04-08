@@ -1,7 +1,7 @@
 package org.elixir_lang.beam.chunk
 
 import gnu.trove.THashSet
-import org.elixir_lang.Visibility
+import org.elixir_lang.semantic.call.definition.clause.Visibility
 import org.elixir_lang.beam.Beam
 import org.elixir_lang.beam.chunk.Chunk.Companion.unsignedInt
 import org.elixir_lang.beam.chunk.call_definitions.CallDefinition.Companion.from

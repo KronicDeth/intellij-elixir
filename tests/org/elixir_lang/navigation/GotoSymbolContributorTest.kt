@@ -2,15 +2,15 @@ package org.elixir_lang.navigation
 
 import com.intellij.navigation.ChooseByNameRegistry
 import org.elixir_lang.PlatformTestCase
-import org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall
+import org.elixir_lang.semantic.call.definition.Clause.enclosingModularMacroCall
 import org.elixir_lang.psi.call.Call
-import org.elixir_lang.structure_view.element.CallDefinitionClause
+import org.elixir_lang.structure_view.element.call.definition.Clause
 
 class GotoSymbolContributorTest : PlatformTestCase() {
     private fun gotoSymbolContributor(): GotoSymbolContributor {
         val symbolModelContributors = ChooseByNameRegistry
-                .getInstance()
-                .symbolModelContributors
+            .getInstance()
+            .symbolModelContributors
 
         var gotoSymbolContributor: GotoSymbolContributor? = null
 
@@ -37,16 +37,16 @@ class GotoSymbolContributorTest : PlatformTestCase() {
         myFixture.configureByFile("issue_472.ex")
         val gotoSymbolContributor = gotoSymbolContributor()
         val itemsByName = gotoSymbolContributor.getItemsByName(
-                "decode_auth_type",
-                "decode_a",
-                myFixture.project,
-                false
+            "decode_auth_type",
+            "decode_a",
+            myFixture.project,
+            false
         )
 
         assertEquals(1, itemsByName.size)
 
-        assertInstanceOf(itemsByName[0], CallDefinitionClause::class.java)
-        val callDefinitionClause = itemsByName[0] as CallDefinitionClause
+        assertInstanceOf(itemsByName[0], Clause::class.java)
+        val callDefinitionClause = itemsByName[0] as Clause
         assertEquals("decode_auth_type", callDefinitionClause.name)
     }
 
@@ -59,7 +59,7 @@ class GotoSymbolContributorTest : PlatformTestCase() {
         val enclosingModularMacroCall = enclosingModularMacroCall(call)
         assertNotNull(enclosingModularMacroCall)
 
-        val modular = CallDefinitionClause.enclosingModular(call)
+        val modular = Clause.enclosingModular(call)
         assertNotNull(modular)
     }
 
@@ -72,7 +72,7 @@ class GotoSymbolContributorTest : PlatformTestCase() {
         val enclosingModularMacroCall = enclosingModularMacroCall(call)
         assertNotNull(enclosingModularMacroCall)
 
-        val modular = CallDefinitionClause.enclosingModular(call)
+        val modular = Clause.enclosingModular(call)
         assertNotNull(modular)
     }
 
@@ -85,7 +85,7 @@ class GotoSymbolContributorTest : PlatformTestCase() {
         val enclosingModularMacroCall = enclosingModularMacroCall(call)
         assertNotNull(enclosingModularMacroCall)
 
-        val modular = CallDefinitionClause.enclosingModular(call)
+        val modular = Clause.enclosingModular(call)
         assertNotNull(modular)
     }
 
@@ -98,7 +98,7 @@ class GotoSymbolContributorTest : PlatformTestCase() {
         val enclosingModularMacroCall = enclosingModularMacroCall(call)
         assertNotNull(enclosingModularMacroCall)
 
-        val modular = CallDefinitionClause.enclosingModular(call)
+        val modular = Clause.enclosingModular(call)
         assertNotNull(modular)
     }
 }

@@ -3,51 +3,32 @@ package org.elixir_lang.beam.psi.impl
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
-import com.intellij.psi.ResolveState
 import com.intellij.psi.StubBasedPsiElement
 import com.intellij.psi.impl.source.tree.TreeElement
 import com.intellij.psi.stubs.IStubElementType
 import com.intellij.util.IncorrectOperationException
+import org.elixir_lang.NameArity
+import org.elixir_lang.semantic.call.definition.clause.Visibility
 import org.elixir_lang.beam.psi.CallDefinition
 import org.elixir_lang.beam.psi.stubs.CallDefinitionStub
-import org.jetbrains.annotations.Contract
+import org.elixir_lang.semantic.call.definition.clause.Time
 import org.jetbrains.annotations.NonNls
 
 class CallDefinitionImpl<T : CallDefinitionStub<*>>(private val stub: T) : ModuleElementImpl(), CallDefinition, StubBasedPsiElement<T> {
     override fun getProject(): Project = parent.project
-
-    /**
-     * Returns the array of children for the PSI element.
-     * Important: In some implementations children are only composite elements, i.e. not a leaf elements
-     *
-     * @return the array of child elements.
-     */
+    override fun getParent(): PsiElement = stub.parentStub.psi
     override fun getChildren(): Array<PsiElement> = emptyArray()
 
-    /**
-     * Returns the parent of the PSI element.
-     *
-     * @return the parent of the element, or null if the element has no parent.
-     */
-    override fun getParent(): PsiElement = stub.parentStub.psi
-
     override fun getElementType(): IStubElementType<*, *> = stub.stubType
-
     override fun getStub(): T = stub
 
     override fun appendMirrorText(buffer: StringBuilder, indentLevel: Int) {}
-
     override fun setMirror(element: TreeElement) = setMirrorCheckingType(element, null)
 
-    /**
-     * @return `null` if it does not have a canonical name OR if it has more than one canonical name
-     */
-    override fun canonicalName(): String? = null
-
-    /**
-     * @return empty set if no canonical names
-     */
-    override fun canonicalNameSet(): Set<String> = emptySet()
+    override val visibility: Visibility = stub.visibility
+    override val time: Time = stub.time
+    override fun getName(): String = nameArity.name
+    override val nameArity: NameArity = stub.nameArity
 
     override fun getNameIdentifier(): PsiElement = this
 
@@ -65,20 +46,4 @@ class CallDefinitionImpl<T : CallDefinitionStub<*>>(private val stub: T) : Modul
     override fun getNavigationElement(): PsiElement = mirror
 
     override fun getNode(): ASTNode? = null
-
-    /**
-     * @return `true`
-     */
-    @Contract(pure = true)
-    override fun isExported(): Boolean = stub.isExported
-
-    /**
-     * The arity of the function or macro that was exported into the compiled .beam file
-     */
-    override fun exportedArity(state: ResolveState): Int = stub.callDefinitionClauseHeadArity()
-
-    /**
-     * The name that was exported into the compiled .beam file
-     */
-    override fun exportedName(): String = stub.name
 }

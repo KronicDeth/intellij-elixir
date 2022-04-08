@@ -8,7 +8,6 @@ import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.Module.concat
 import org.elixir_lang.Module.split
 import org.elixir_lang.psi.NamedElement
-import org.elixir_lang.psi.call.Named
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.stripAccessExpression
@@ -21,21 +20,60 @@ import org.elixir_lang.psi.scope.maxScope
 import org.elixir_lang.psi.stub.index.ModularName
 import org.elixir_lang.psi.visitedElementSet
 import org.elixir_lang.reference.module.UnaliasedName
+import org.elixir_lang.semantic.Alias
+import org.elixir_lang.semantic.Modular
 import java.util.*
 
 class MultiResolve internal constructor(private val name: String, private val incompleteCode: Boolean) : Module() {
+    val namePrefix by lazy {
+        split(name)[0]
+    }
+
+    override fun execute(alias: Alias, state: ResolveState): Boolean {
+        val aliasName = alias.name
+        val aliasedNameState = state.putVisitedElement(alias.psiElement)
+
+        val (modulars, validResult) = if (aliasName == name) {
+            Pair(alias.modulars.asSequence(), true)
+        } else if (aliasName == namePrefix) {
+            val modulars =
+                alias
+                    .modulars.asSequence()
+                    .flatMap { modular ->
+                        modular.nested.asSequence()
+                    }
+                    .filter { it.canonicalName == name }
+
+            Pair(modulars, true)
+        } else if(aliasName.startsWith(name)) {
+            Pair(alias.modulars.asSequence(), false)
+        } else {
+            Pair(emptySequence(), false)
+        }
+
+        modulars.forEach { modular ->
+            addModular(modular, validResult, aliasedNameState)
+        }
+
+        return resolveResultOrderedSet.keepProcessing(incompleteCode)
+    }
+
+    private fun addModular(modular: Modular, validResult: Boolean, state: ResolveState) {
+        resolveResultOrderedSet.add(modular.psiElement, modular.canonicalName!!, validResult, state.visitedElementSet())
+    }
+
     /**
      * Decides whether `match` matches the criteria being searched for.  All other [.execute] methods
      * eventually end here.
      *
      * @return `true` to keep processing; `false` to stop processing.
      */
-    override fun executeOnAliasedName(match: PsiNamedElement,
+    override fun executeOnAliasedName(match: PsiElement,
                                       aliasedName: String,
                                       state: ResolveState): Boolean =
         executeOnAliasedName(match, aliasedName, name, state)
 
-    private fun executeOnAliasedName(match: PsiNamedElement, aliasedName: String, targetName: String, state: ResolveState): Boolean {
+    private fun executeOnAliasedName(match: PsiElement, aliasedName: String, targetName: String, state: ResolveState): Boolean {
         val aliasedNameState = state.putVisitedElement(match)
 
         if (aliasedName == targetName) {
@@ -78,14 +116,13 @@ class MultiResolve internal constructor(private val name: String, private val in
             if (aliasedName == firstNamePart) {
                 addUnaliasedNamedElementsToResolveResultList(match, namePartList, aliasedNameState.visitedElementSet())
             } else if (aliasedName.startsWith(name)) {
-                resolveResultOrderedSet.add(match, "alias ${match.text}", false, state.visitedElementSet())
-            }
+                resolveResultOrderedSet.add(match, "alias ${match.text}", false, state.visitedElementSet()) }
         }
 
         return resolveResultOrderedSet.keepProcessing(incompleteCode)
     }
 
-    override fun executeOnModularName(modular: Named, modularName: String, state: ResolveState): Boolean {
+    override fun executeOnModularName(modular: PsiElement, modularName: String, state: ResolveState): Boolean {
         if (modularName.startsWith(name)) {
             val validResult = modularName == name
             resolveResultOrderedSet.add(modular, modularName, validResult, state.visitedElementSet())
@@ -98,7 +135,7 @@ class MultiResolve internal constructor(private val name: String, private val in
 
     private val resolveResultOrderedSet = ResolveResultOrderedSet()
 
-    private fun addUnaliasedNamedElementsToResolveResultList(match: PsiNamedElement,
+    private fun addUnaliasedNamedElementsToResolveResultList(match: PsiElement,
                                                              namePartList: List<String>,
                                                              visitedElementSet: Set<PsiElement>) {
         val unaliasedName = unaliasedName(match, namePartList)
@@ -144,7 +181,7 @@ class MultiResolve internal constructor(private val name: String, private val in
             return multiResolve.resolveResults()
         }
 
-        private fun unaliasedName(match: PsiNamedElement, namePartList: List<String>): String {
+        private fun unaliasedName(match: PsiElement, namePartList: List<String>): String {
             val matchUnaliasedName = UnaliasedName.unaliasedName(match)
 
             val unaliasedNamePartList = ArrayList<String>(namePartList.size)

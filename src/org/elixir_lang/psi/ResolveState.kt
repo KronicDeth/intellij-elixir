@@ -6,6 +6,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import com.intellij.psi.util.isAncestor
 import org.elixir_lang.psi.call.Call
+import org.elixir_lang.semantic.Unquote
 
 private val VISITED_ELEMENT_SET = Key<Set<PsiElement>>("VISITED_ELEMENTS")
 
@@ -25,7 +26,7 @@ fun ResolveState.putInitialVisitedElement(visitedElement: PsiElement): ResolveSt
 
 
 fun ResolveState.putVisitedElements(other: ResolveState): ResolveState =
-        putVisitedElements(other.visitedElementSet())
+    putVisitedElements(other.visitedElementSet())
 
 fun ResolveState.putVisitedElements(visitedElements: Iterable<PsiElement>): ResolveState =
     visitedElements.fold(this) { acc, visitedElement ->
@@ -36,7 +37,8 @@ fun ResolveState.putVisitedElement(visitedElement: PsiElement): ResolveState {
     val visitedElementSet = this.get(VISITED_ELEMENT_SET) ?: emptySet()
 
     if (this.get(VISITED_ELEMENT_SET) == null) {
-       Logger.getInstance(ResolveState::class.java).error("VISITED_ELEMENT_SET is null.  putInitialVisitedElement was not called")
+        Logger.getInstance(ResolveState::class.java)
+            .error("VISITED_ELEMENT_SET is null.  putInitialVisitedElement was not called")
     }
 
     return this.put(VISITED_ELEMENT_SET, visitedElementSet + setOf(visitedElement))
@@ -46,10 +48,10 @@ private val ANCESTOR_UNQUOTE = Key<Call>("ANCESTOR_UNQUOTE")
 
 fun ResolveState.putAncestorUnquote(descendent: PsiElement): ResolveState =
     Unquote.ancestorUnquote(descendent)
-            ?.let { put(ANCESTOR_UNQUOTE, it) }
-            ?: this
+        ?.let { put(ANCESTOR_UNQUOTE, it) }
+        ?: this
 
 fun ResolveState.containsAncestorUnquote(ancestor: PsiElement): Boolean =
-        get(ANCESTOR_UNQUOTE)
-                ?.let { ancestor.isAncestor(it) }
-                ?: false
+    get(ANCESTOR_UNQUOTE)
+        ?.let { ancestor.isAncestor(it) }
+        ?: false

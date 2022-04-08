@@ -1,15 +1,11 @@
 package org.elixir_lang.psi.impl
 
 import com.intellij.psi.PsiElement
-import org.elixir_lang.module.PutAttribute
-import org.elixir_lang.module.RegisterAttribute
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.operation.Operation
-import org.elixir_lang.structure_view.element.CallDefinitionSpecification
-import org.elixir_lang.structure_view.element.Callback
-import org.elixir_lang.structure_view.element.Delegation
-import org.elixir_lang.structure_view.element.Type
-import org.elixir_lang.structure_view.element.modular.Module
+import org.elixir_lang.semantic.semantic
+import org.elixir_lang.semantic.type.definition.source.Callback
+import org.elixir_lang.semantic.type.definition.source.Specification
 
 object PsiNameIdentifierOwnerImpl {
     @JvmStatic
@@ -38,42 +34,38 @@ object PsiNameIdentifierOwnerImpl {
 
     @JvmStatic
     fun getNameIdentifier(keywordKey: ElixirKeywordKey): PsiElement? =
-            if (keywordKey.line != null) {
-                null
-            } else {
-                keywordKey
-            }
+        if (keywordKey.line != null) {
+            null
+        } else {
+            keywordKey
+        }
 
     @JvmStatic
     fun getNameIdentifier(variable: ElixirVariable): PsiElement = variable
 
     @JvmStatic
     fun getNameIdentifier(named: org.elixir_lang.psi.call.Named): PsiElement? =
-            when {
-                /* can't be a {@code public static PsiElement getNameIdentifier(@NotNull Operation operation)} because
-                   it leads to "reference to getNameIdentifier is ambiguous" */
-                named is Operation -> {
+        when (val semantic = named.semantic) {
+            is org.elixir_lang.semantic.call.definition.clause.Call -> semantic.nameIdentifier
+            is Specification -> semantic.nameIdentifier
+            is Callback -> semantic.nameIdentifier
+            is org.elixir_lang.semantic.call.definition.Delegation -> semantic.nameIdentifier
+            is org.elixir_lang.semantic.module.Call -> semantic.nameIdentifier
+            is org.elixir_lang.semantic.protocol.Call -> semantic.nameIdentifier
+            is org.elixir_lang.semantic.type.definition.Source -> semantic.nameIdentifier
+            /* have to set to null so that {@code else} clause doesn't return the {@code defimpl} element as the
+               name identifier */
+            is org.elixir_lang.semantic.implementation.Call -> null
+            is org.elixir_lang.semantic.module_attribute.definition.Literal -> semantic.nameIdentifier
+            is org.elixir_lang.semantic.module_attribute.definition.Dynamic -> semantic.nameIdentifier
+            else -> when (named) {
+                is Operation -> {
                     val operation = named as Operation
                     operation.operator()
                 }
-                CallDefinitionClause.`is`(named) -> CallDefinitionClause.nameIdentifier(named)
-                CallDefinitionSpecification.`is`(named) -> CallDefinitionSpecification.nameIdentifier(named)
-                Callback.`is`(named) -> Callback.nameIdentifier(named)
-                Delegation.`is`(named) -> Delegation.nameIdentifier(named)
-                /* have to set to null so that {@code else} clause doesn't return the {@code defimpl} element as the
-                   name identifier */
-                Implementation.`is`(named) -> null
-                org.elixir_lang.psi.Module.`is`(named) -> Module.nameIdentifier(named)
-                Protocol.`is`(named) -> Module.nameIdentifier(named)
-                Type.`is`(named) -> Type.nameIdentifier(named)
-
-                // module attributes
-                RegisterAttribute.`is`(named) -> RegisterAttribute.nameIdentifier(named)
-                PutAttribute.`is`(named) -> PutAttribute.nameIdentifier(named)
-                named is AtUnqualifiedNoParenthesesCall<*> ->  named.atIdentifier
-
                 else -> named.functionNameElement()
             }
+        }
 
     /**
      *

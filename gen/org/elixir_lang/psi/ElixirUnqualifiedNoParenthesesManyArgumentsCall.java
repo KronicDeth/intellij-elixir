@@ -36,9 +36,9 @@ public interface ElixirUnqualifiedNoParenthesesManyArgumentsCall extends PsiElem
   @Nullable
   ElixirNoParenthesesStrict getNoParenthesesStrict();
 
-  @Nullable String canonicalName();
+  @Nullable String getCanonicalName();
 
-  @NotNull Set<String> canonicalNameSet();
+  @NotNull Set<String> getCanonicalNameSet();
 
   @Nullable String functionName();
 

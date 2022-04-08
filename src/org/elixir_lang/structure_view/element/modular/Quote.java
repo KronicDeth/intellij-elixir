@@ -1,7 +1,7 @@
 package org.elixir_lang.structure_view.element.modular;
 
 import com.intellij.navigation.ItemPresentation;
-import org.elixir_lang.structure_view.element.CallDefinitionClause;
+import org.elixir_lang.structure_view.element.call.definition.Clause;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -9,13 +9,13 @@ import org.jetbrains.annotations.NotNull;
  */
 public class Quote implements Modular {
     @NotNull
-    public final CallDefinitionClause callDefinitionClause;
+    public final Clause callDefinitionClause;
 
     /*
      * Constructors
      */
 
-    public Quote(@NotNull CallDefinitionClause callDefinitionClause) {
+    public Quote(@NotNull Clause callDefinitionClause) {
         this.callDefinitionClause = callDefinitionClause;
     }
 

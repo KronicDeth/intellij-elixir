@@ -7,69 +7,90 @@ import com.intellij.psi.impl.source.resolve.ResolveCache
 import org.elixir_lang.Arity
 import org.elixir_lang.Name
 import org.elixir_lang.NameArityInterval
-import org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall
 import org.elixir_lang.psi.For
 import org.elixir_lang.psi.call.Call
-import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.call.macroChildCalls
-import org.elixir_lang.structure_view.element.CallDefinitionHead
-import org.elixir_lang.structure_view.element.CallDefinitionSpecification.Companion.typeNameArity
-import org.elixir_lang.structure_view.element.Delegation
+import org.elixir_lang.semantic.call.definition.Clause
+import org.elixir_lang.semantic.call.definition.Delegation
+import org.elixir_lang.semantic.semantic
 
 object CallDefinitionClause : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.CallDefinitionClause> {
-    override fun resolve(callDefinitionClause: org.elixir_lang.reference.CallDefinitionClause,
-                         incompleteCode: Boolean): Array<ResolveResult> =
-            enclosingModularMacroCall(callDefinitionClause.moduleAttribute)?.macroChildCalls()?.let { siblings ->
-                if (siblings.isNotEmpty()) {
-                    val nameArity = typeNameArity(callDefinitionClause.element)
-                    val name = nameArity.name
-                    val arity = nameArity.arity
+    override fun resolve(
+        callDefinitionClause: org.elixir_lang.reference.CallDefinitionClause,
+        incompleteCode: Boolean
+    ): Array<ResolveResult> =
+        callDefinitionClause.specification.let { specification ->
+            specification
+                .enclosingModular
+                .psiElement.let { it as? Call }
+                ?.macroChildCalls()?.let { siblings ->
+                    if (siblings.isNotEmpty()) {
+                        val nameArity = specification.nameArity
+                        val name = nameArity.name
+                        val arity = nameArity.arity
 
-                    siblings
+                        siblings
                             .flatMap { call -> callToResolveResults(call, name, arity) }
                             .toTypedArray()
-                } else {
-                    null
+                    } else {
+                        null
+                    }
                 }
-            } ?: emptyArray()
+                ?: emptyArray()
+        }
 
     private fun callToResolveResults(call: Call, name: Name, arity: Arity): List<ResolveResult> =
-            when {
-                org.elixir_lang.psi.CallDefinitionClause.`is`(call) -> {
-                    org.elixir_lang.psi.CallDefinitionClause.nameArityInterval(call, ResolveState.initial())
-                            ?.let { nameArityInterval -> nameArityIntervalToResolveResult(call, name, arity, nameArityInterval) }
-                            ?.let { listOf(it) }
-                            .orEmpty()
-                }
-                Delegation.`is`(call) -> {
-                    call
-                            .finalArguments()
-                            ?.takeIf { it.size == 2 }
-                            ?.let { CallDefinitionHead.nameArityInterval(it[0], ResolveState.initial()) }
-                            ?.let { nameArityRange -> nameArityIntervalToResolveResult(call, name, arity, nameArityRange) }
-                            ?.let { listOf(it) }
-                            .orEmpty()
-                }
-                For.`is`(call) -> {
-                    val resolveResultList = mutableListOf<ResolveResult>()
+        when (val semantic = call.semantic) {
+            is Clause -> {
+                semantic
+                    .nameArityInterval
+                    ?.let { nameArityInterval ->
+                        nameArityIntervalToResolveResult(
+                            call,
+                            name,
+                            arity,
+                            nameArityInterval
+                        )
+                    }
+                    ?.let { listOf(it) }
+                    .orEmpty()
+            }
+            is Delegation -> {
+                semantic
+                    .nameArityInterval
+                    ?.let { nameArityInterval ->
+                        nameArityIntervalToResolveResult(
+                            call,
+                            name,
+                            arity,
+                            nameArityInterval
+                        )
+                    }
+                    ?.let(::listOf)
+                    .orEmpty()
+            }
+            is org.elixir_lang.semantic.chain.For -> {
+                val resolveResultList = mutableListOf<ResolveResult>()
 
-                    For.treeWalkDown(call, ResolveState.initial()) { child, _ ->
-                        if (child is Call) {
-                            resolveResultList.addAll(callToResolveResults(child, name, arity))
-                        }
-
-                        true
+                For.treeWalkDown(call, ResolveState.initial()) { child, _ ->
+                    if (child is Call) {
+                        resolveResultList.addAll(callToResolveResults(child, name, arity))
                     }
 
-                    resolveResultList
+                    true
                 }
-                else -> emptyList()
-            }
 
-    private fun nameArityIntervalToResolveResult(call: Call,
-                                                 name: Name,
-                                                 arity: Arity,
-                                                 nameArityInterval: NameArityInterval): PsiElementResolveResult? {
+                resolveResultList
+            }
+            else -> emptyList()
+        }
+
+    private fun nameArityIntervalToResolveResult(
+        call: Call,
+        name: Name,
+        arity: Arity,
+        nameArityInterval: NameArityInterval
+    ): PsiElementResolveResult? {
         val definerName = nameArityInterval.name
 
         return if (definerName.startsWith(name)) {

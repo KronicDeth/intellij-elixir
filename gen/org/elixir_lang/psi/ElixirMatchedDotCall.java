@@ -24,9 +24,9 @@ public interface ElixirMatchedDotCall extends ElixirMatchedExpression, DotCall<M
   @NotNull
   List<ElixirParenthesesArguments> getParenthesesArgumentsList();
 
-  @Nullable String canonicalName();
+  @Nullable String getCanonicalName();
 
-  @NotNull Set<String> canonicalNameSet();
+  @NotNull Set<String> getCanonicalNameSet();
 
   @Nullable String functionName();
 

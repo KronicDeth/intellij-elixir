@@ -24,9 +24,9 @@ public interface ElixirMatchedQualifiedNoArgumentsCall extends ElixirMatchedExpr
   @NotNull
   ElixirRelativeIdentifier getRelativeIdentifier();
 
-  @Nullable String canonicalName();
+  @Nullable String getCanonicalName();
 
-  @NotNull Set<String> canonicalNameSet();
+  @NotNull Set<String> getCanonicalNameSet();
 
   @Nullable String functionName();
 

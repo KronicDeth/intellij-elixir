@@ -9,6 +9,7 @@ public class Module {
      *
      */
 
+    public static final String EEX = "EEx";
     public static final String KERNEL = "Kernel";
     public static final String KERNEL_SPECIAL_FORMS = KERNEL + ".SpecialForms";
     public static final String MODULE = "Module";
@@ -24,7 +25,7 @@ public class Module {
      * {@code "Elixir.Kernel"}.
      *
      * @return {@code "Elixir.#{moduleName}" if {@code moduleName} does not start with {@code "Elixir"}; otherwise,
-     *   {@code moduleName}.
+     * {@code moduleName}.
      */
     @NotNull
     public static String prependElixirPrefix(@NotNull String moduleName) {

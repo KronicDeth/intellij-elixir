@@ -63,13 +63,13 @@ public class ElixirUnmatchedQualifiedNoArgumentsCallImpl extends NamedStubbedPsi
   }
 
   @Override
-  public @Nullable String canonicalName() {
-    return ElixirPsiImplUtil.canonicalName(this);
+  public @Nullable String getCanonicalName() {
+    return ElixirPsiImplUtil.getCanonicalName(this);
   }
 
   @Override
-  public @NotNull Set<String> canonicalNameSet() {
-    return ElixirPsiImplUtil.canonicalNameSet(this);
+  public @NotNull Set<String> getCanonicalNameSet() {
+    return ElixirPsiImplUtil.getCanonicalNameSet(this);
   }
 
   @Override
