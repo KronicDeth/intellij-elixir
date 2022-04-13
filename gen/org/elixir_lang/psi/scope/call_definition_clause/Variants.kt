@@ -7,6 +7,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.annotator.Parameter
+import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
@@ -32,6 +33,16 @@ class Variants : CallDefinitionClause() {
      * @return `true` to keep searching up tree; `false` to stop searching.
      */
     override fun executeOnCallDefinitionClause(element: Call, state: ResolveState): Boolean {
+        val entranceCallDefinitionClause = state.get(ENTRANCE_CALL_DEFINITION_CLAUSE)
+
+        if ((entranceCallDefinitionClause == null || !element.isEquivalentTo(entranceCallDefinitionClause)) && element is Named) {
+            addCallDefinitionClauseToLookupElementByPsiElement(element)
+        }
+
+        return true
+    }
+
+    override fun execute(element: CallDefinitionImpl<*>, state: ResolveState): Boolean {
         val entranceCallDefinitionClause = state.get(ENTRANCE_CALL_DEFINITION_CLAUSE)
 
         if ((entranceCallDefinitionClause == null || !element.isEquivalentTo(entranceCallDefinitionClause)) && element is Named) {
