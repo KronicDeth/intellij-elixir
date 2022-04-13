@@ -79,7 +79,10 @@ class ModuleImpl<T : StubElement<*>?>(private val stub: T) : ModuleElementImpl()
     }
 
     fun callDefinitions(): Array<CallDefinitionImpl<*>> =
-        getStub()!!.getChildrenByType(ModuleStubElementTypes.CALL_DEFINITION, emptyArray())
+        stub!!.getChildrenByType(ModuleStubElementTypes.CALL_DEFINITION, emptyArray())
+
+    fun typeDefinitions(): Array<TypeDefinitionImpl<*>> =
+        stub!!.getChildrenByType(ModuleStubElementTypes.TYPE_DEFINITION, emptyArray())
 
     /**
      * @return `null` if it does not have a canonical name OR if it has more than one canonical name

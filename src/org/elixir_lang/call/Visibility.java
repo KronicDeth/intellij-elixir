@@ -1,4 +1,4 @@
-package org.elixir_lang;
+package org.elixir_lang.call;
 
 public enum Visibility {
     PUBLIC,

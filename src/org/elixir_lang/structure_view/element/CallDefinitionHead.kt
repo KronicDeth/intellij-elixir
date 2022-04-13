@@ -6,7 +6,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiErrorElement
 import com.intellij.psi.ResolveState
 import org.elixir_lang.NameArityInterval
-import org.elixir_lang.Visibility
+import org.elixir_lang.call.Visibility
 import org.elixir_lang.navigation.item_presentation.NameArity
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
@@ -15,7 +15,7 @@ import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.operation.Normalized.operatorIndex
 
 class CallDefinitionHead(val callDefinition: CallDefinition, private val visibility: Visibility, call: Call) :
-        Element<Call>(call), Presentable, Visible {
+    Element<Call>(call), Presentable, Visible {
     /**
      * Heads have no children since they have no body.
      *
@@ -29,11 +29,11 @@ class CallDefinitionHead(val callDefinition: CallDefinition, private val visibil
      * @return the element presentation.
      */
     override fun getPresentation(): ItemPresentation =
-            org.elixir_lang.navigation.item_presentation.CallDefinitionHead(
-                    callDefinition.presentation as NameArity,
-                    visibility,
-                    navigationItem
-            )
+        org.elixir_lang.navigation.item_presentation.CallDefinitionHead(
+            callDefinition.presentation as NameArity,
+            visibility,
+            navigationItem
+        )
 
     /**
      * The visibility of the element.
@@ -44,17 +44,17 @@ class CallDefinitionHead(val callDefinition: CallDefinition, private val visibil
 
     companion object {
         private fun argumentEnclosingDelegationCall(arguments: PsiElement): Call? =
-                if (arguments is ElixirNoParenthesesOneArgument) {
-                    (arguments.getParent() as? Call)?.let { argumentsParent ->
-                        if (Delegation.`is`(argumentsParent)) {
-                            argumentsParent
-                        } else {
-                            null
-                        }
+            if (arguments is ElixirNoParenthesesOneArgument) {
+                (arguments.getParent() as? Call)?.let { argumentsParent ->
+                    if (Delegation.`is`(argumentsParent)) {
+                        argumentsParent
+                    } else {
+                        null
                     }
-                } else {
-                    null
                 }
+            } else {
+                null
+            }
 
         fun enclosingDelegationCall(call: Call): Call? {
             // reverse of {@link org.elixir_lang.structure_view.element.Delegation.filterCallDefinitionHeadCallList()}
@@ -78,17 +78,17 @@ class CallDefinitionHead(val callDefinition: CallDefinition, private val visibil
         fun `is`(call: Call): Boolean = call is UnqualifiedParenthesesCall<*>
 
         fun nameIdentifier(head: PsiElement): PsiElement? =
-                if (head is ElixirMatchedAtOperation) {
-                    head.operator()
-                } else {
-                    val stripped = strip(head)
+            if (head is ElixirMatchedAtOperation) {
+                head.operator()
+            } else {
+                val stripped = strip(head)
 
-                    if (stripped is Call) {
-                        stripped.functionNameElement()
-                    } else {
-                        stripped
-                    }
+                if (stripped is Call) {
+                    stripped.functionNameElement()
+                } else {
+                    stripped
                 }
+            }
 
         fun nameArityInterval(head: PsiElement, state: ResolveState): NameArityInterval? =
             if (head is ElixirMatchedAtOperation) {
@@ -118,7 +118,7 @@ class CallDefinitionHead(val callDefinition: CallDefinition, private val visibil
          * @return `name(arg, ...)`
          */
         fun strip(head: PsiElement): PsiElement =
-                stripAllOuterParentheses(head).let { stripGuard(it) }.let { stripAllOuterParentheses(it) }
+            stripAllOuterParentheses(head).let { stripGuard(it) }.let { stripAllOuterParentheses(it) }
 
         /**
          * The head without the guard clause

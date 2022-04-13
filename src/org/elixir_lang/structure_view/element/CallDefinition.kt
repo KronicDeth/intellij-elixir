@@ -6,7 +6,7 @@ import com.intellij.navigation.ItemPresentation
 import com.intellij.navigation.NavigationItem
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
-import org.elixir_lang.Visibility
+import org.elixir_lang.call.Visibility
 import org.elixir_lang.navigation.item_presentation.NameArity
 import org.elixir_lang.navigation.item_presentation.Parent
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
@@ -19,12 +19,13 @@ import java.util.*
  * @param modular The scoping module or quote
  */
 class CallDefinition(val modular: Modular, private val time: Timed.Time, private val name: String, val arity: Int) :
-        StructureViewTreeElement, Timed, Visible, NavigationItem {
+    StructureViewTreeElement, Timed, Visible, NavigationItem {
     /**
      * * `true` to mark as overridable by another function of the same name and arity;
      * * `false` to make as non-overridable.
      */
     var isOverridable: Boolean = false
+
     /**
      * @param override `true` to mark as an override of another function; `false` to mark as an independent
      * function
@@ -49,7 +50,8 @@ class CallDefinition(val modular: Modular, private val time: Timed.Time, private
      * @param clause the new clause for the macro
      */
     fun clause(clause: Call): CallDefinitionClause {
-        val nameArityInterval = org.elixir_lang.psi.CallDefinitionClause.nameArityInterval(clause, ResolveState.initial())!!
+        val nameArityInterval =
+            org.elixir_lang.psi.CallDefinitionClause.nameArityInterval(clause, ResolveState.initial())!!
 
         assert(nameArityInterval.name == name)
         assert(arity in nameArityInterval.arityInterval)
@@ -102,18 +104,18 @@ class CallDefinition(val modular: Modular, private val time: Timed.Time, private
      * @return the element presentation.
      */
     override fun getPresentation(): ItemPresentation =
-            (modular.presentation as? Parent)?.locatedPresentableText.let { location ->
-                NameArity(
-                        location,
-                        false,
-                        time,
-                        visibility(),
-                        isOverridable,
-                        override,
-                        name,
-                        arity
-                )
-            }
+        (modular.presentation as? Parent)?.locatedPresentableText.let { location ->
+            NameArity(
+                location,
+                false,
+                time,
+                visibility(),
+                isOverridable,
+                override,
+                name,
+                arity
+            )
+        }
 
     /**
      * Unlike a clause, a head is just the name and arguments, without the outer macro calls.  Heads occur in
@@ -139,7 +141,7 @@ class CallDefinition(val modular: Modular, private val time: Timed.Time, private
      * @return `null` if no clauses match or if more than one clause match
      */
     fun matchingClause(arguments: Array<PsiElement>): CallDefinitionClause? =
-            matchingClauseList(arguments)?.singleOrNull()
+        matchingClauseList(arguments)?.singleOrNull()
 
     fun name(): String = name
 
@@ -167,17 +169,17 @@ class CallDefinition(val modular: Modular, private val time: Timed.Time, private
      */
     fun specification(moduleAttributeDefinition: AtUnqualifiedNoParenthesesCall<*>) {
         val nameArity = CallDefinitionSpecification.moduleAttributeNameArity(
-                moduleAttributeDefinition
+            moduleAttributeDefinition
         )!!
 
         assert(nameArity.name == name)
         assert(nameArity.arity == arity)
 
         val callDefinitionSpecification = CallDefinitionSpecification(
-                modular,
-                moduleAttributeDefinition,
-                false,
-                Timed.Time.RUN
+            modular,
+            moduleAttributeDefinition,
+            false,
+            Timed.Time.RUN
         )
         childList.add(callDefinitionSpecification)
         specificationList.add(callDefinitionSpecification)
@@ -233,18 +235,18 @@ class CallDefinition(val modular: Modular, private val time: Timed.Time, private
          * @param call a def(macro)?p? call
          */
         fun fromCall(call: Call): CallDefinition? =
-                CallDefinitionClause.enclosingModular(call)?.let { modular ->
-                    org.elixir_lang.psi.CallDefinitionClause.nameArityInterval(call, ResolveState.initial())
-                            ?.let { nameArityInterval ->
-                                val name = nameArityInterval.name
-                                /* arity is assumed to be max arity in the range because that's how {@code h} and
-                                   ExDoc treat functions with defaults. */
-                                val arity = nameArityInterval.arityInterval.closed().last
-                                val time = CallDefinitionClause.time(call)
+            CallDefinitionClause.enclosingModular(call)?.let { modular ->
+                org.elixir_lang.psi.CallDefinitionClause.nameArityInterval(call, ResolveState.initial())
+                    ?.let { nameArityInterval ->
+                        val name = nameArityInterval.name
+                        /* arity is assumed to be max arity in the range because that's how {@code h} and
+                           ExDoc treat functions with defaults. */
+                        val arity = nameArityInterval.arityInterval.closed().last
+                        val time = CallDefinitionClause.time(call)
 
-                                CallDefinition(modular, time, name, arity)
-                            }
-                }
+                        CallDefinition(modular, time, name, arity)
+                    }
+            }
     }
 
 }

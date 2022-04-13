@@ -33,10 +33,10 @@ object Icons {
 
         @JvmStatic
         fun from(time: Timed.Time): Icon =
-                when (time) {
-                    Timed.Time.COMPILE -> COMPILE
-                    Timed.Time.RUN -> RUN
-                }
+            when (time) {
+                Timed.Time.COMPILE -> COMPILE
+                Timed.Time.RUN -> RUN
+            }
     }
 
     object Visibility {
@@ -47,13 +47,13 @@ object Icons {
         val PUBLIC = PlatformIcons.PUBLIC_ICON
 
         @JvmStatic
-        fun from(visibility: org.elixir_lang.Visibility?): Icon {
+        fun from(visibility: org.elixir_lang.call.Visibility?): Icon {
             var icon: Icon? = null
 
             if (visibility != null) {
                 when (visibility) {
-                    org.elixir_lang.Visibility.PRIVATE -> icon = PRIVATE
-                    org.elixir_lang.Visibility.PUBLIC -> icon = PUBLIC
+                    org.elixir_lang.call.Visibility.PRIVATE -> icon = PRIVATE
+                    org.elixir_lang.call.Visibility.PUBLIC -> icon = PUBLIC
                 }
 
                 assert(icon != null)
@@ -78,7 +78,8 @@ object Icons {
     val DESCRIBE = AllIcons.Nodes.TestGroup
 
     @JvmField
-    val DELEGATION: Icon = RowIconFactory.create(AllIcons.RunConfigurations.TestState.Run, PlatformIcons.PACKAGE_LOCAL_ICON)
+    val DELEGATION: Icon =
+        RowIconFactory.create(AllIcons.RunConfigurations.TestState.Run, PlatformIcons.PACKAGE_LOCAL_ICON)
 
     @JvmField
     val EXCEPTION = PlatformIcons.EXCEPTION_CLASS_ICON
@@ -104,12 +105,13 @@ object Icons {
 
     object Protocol {
         val Structure = IconLoader.getIcon("/icons/protocol.svg")
-        val GoToImplementations: Icon =AllIcons.Gutter.ImplementedMethod
+        val GoToImplementations: Icon = AllIcons.Gutter.ImplementedMethod
     }
 
     object Implementation {
         @JvmField
         val Structure: Icon = AllIcons.Nodes.Interface
+
         @JvmField
         val GoToProtocols: Icon = IconLoader.getIcon("/icons/go_to_protocols.svg")
     }

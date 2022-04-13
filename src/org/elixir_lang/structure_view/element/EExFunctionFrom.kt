@@ -4,7 +4,7 @@ import com.intellij.ide.structureView.StructureViewTreeElement
 import com.intellij.ide.util.treeView.smartTree.TreeElement
 import com.intellij.navigation.ItemPresentation
 import com.intellij.navigation.NavigationItem
-import org.elixir_lang.Visibility
+import org.elixir_lang.call.Visibility
 import org.elixir_lang.navigation.item_presentation.NameArity
 import org.elixir_lang.navigation.item_presentation.Parent
 import org.elixir_lang.psi.ElixirAtom
@@ -36,21 +36,22 @@ class EExFunctionFrom(val modular: Modular, val call: Call) : StructureViewTreeE
         val location = parent.locatedPresentableText
 
         return NameArity(
-                location,
-                false,
-                Timed.Time.RUN,
-                visibility(),
-                false,
-                false,
-                declaredName,
-                arity
+            location,
+            false,
+            Timed.Time.RUN,
+            visibility(),
+            false,
+            false,
+            declaredName,
+            arity
         )
     }
 
     override fun getChildren(): Array<TreeElement> = arrayOf(EExFunctionFromHead(this))
 
     private val declaredName: String by lazy {
-        call.finalArguments()?.get(1)?.stripAccessExpression()?.let { it as? ElixirAtom }?.node?.lastChildNode?.text ?: "unknown_name"
+        call.finalArguments()?.get(1)?.stripAccessExpression()?.let { it as? ElixirAtom }?.node?.lastChildNode?.text
+            ?: "unknown_name"
     }
 
     private val arity: Int by lazy {
@@ -70,19 +71,20 @@ class EExFunctionFrom(val modular: Modular, val call: Call) : StructureViewTreeE
     }
 
     override fun visibility(): Visibility? =
-            call.finalArguments()?.get(0)?.stripAccessExpression()?.let { it as? ElixirAtom }?.node?.lastChildNode?.text?.let { macro ->
-                when (macro) {
-                    DEF -> Visibility.PUBLIC
-                    DEFP -> Visibility.PRIVATE
-                    else -> null
-                }
+        call.finalArguments()?.get(0)?.stripAccessExpression()
+            ?.let { it as? ElixirAtom }?.node?.lastChildNode?.text?.let { macro ->
+            when (macro) {
+                DEF -> Visibility.PUBLIC
+                DEFP -> Visibility.PRIVATE
+                else -> null
             }
+        }
 
 
     companion object {
         fun fromCall(call: Call): EExFunctionFrom? =
-                enclosingModular(call)?.let { modular ->
-                    EExFunctionFrom(modular, call)
-                }
+            enclosingModular(call)?.let { modular ->
+                EExFunctionFrom(modular, call)
+            }
     }
 }

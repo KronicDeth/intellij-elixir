@@ -4,7 +4,7 @@ import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.ui.RowIcon;
 import org.elixir_lang.Icons;
-import org.elixir_lang.Visibility;
+import org.elixir_lang.call.Visibility;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,9 +28,8 @@ public class CallDefinitionHead implements ItemPresentation {
      */
 
     /**
-     *
      * @param callDefinition the parent {@link NameArity} of which {@code call} is a head
-     * @param psiElement a call definition head
+     * @param psiElement     a call definition head
      */
     public CallDefinitionHead(@NotNull NameArity callDefinition,
                               @NotNull Visibility visibility,

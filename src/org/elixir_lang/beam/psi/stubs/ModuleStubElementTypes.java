@@ -1,17 +1,13 @@
 package org.elixir_lang.beam.psi.stubs;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.stubs.IndexSink;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
 import com.intellij.psi.stubs.StubOutputStream;
-import org.elixir_lang.beam.psi.CallDefinition;
-import org.elixir_lang.beam.psi.CallDefinitionElement;
-import org.elixir_lang.beam.psi.Module;
-import org.elixir_lang.beam.psi.ModuleElement;
-import org.elixir_lang.beam.psi.impl.CallDefinitionImpl;
-import org.elixir_lang.beam.psi.impl.CallDefinitionStubImpl;
-import org.elixir_lang.beam.psi.impl.ModuleImpl;
-import org.elixir_lang.beam.psi.impl.ModuleStubImpl;
+import org.apache.commons.lang.NotImplementedException;
+import org.elixir_lang.beam.psi.*;
+import org.elixir_lang.beam.psi.impl.*;
 import org.elixir_lang.psi.stub.call.Deserialized;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,9 +15,74 @@ import java.io.IOException;
 
 import static org.elixir_lang.psi.stub.call.Deserialized.readGuarded;
 import static org.elixir_lang.psi.stub.call.Deserialized.writeGuarded;
+import static org.elixir_lang.psi.stub.type.Named.indexStubbic;
 
 // See com.intellij.psi.impl.java.stubs.JavaStubElementTypes
 public interface ModuleStubElementTypes {
+    /**
+     * See {@link com.intellij.psi.impl.java.stubs.JavaStubElementTypes#CLASS}
+     */
+    ModuleElementType<ModuleStub<?>, org.elixir_lang.beam.psi.Module> MODULE = new ModuleElementType<ModuleStub<?>, org.elixir_lang.beam.psi.Module>("Module") {
+        @NotNull
+        @Override
+        public ASTNode createCompositeNode() {
+            return new ModuleElement(this);
+        }
+
+        @Override
+        public org.elixir_lang.beam.psi.Module createPsi(@NotNull ModuleStub stub) {
+            return new ModuleImpl<>(stub);
+        }
+
+        @Override
+        public void serialize(@NotNull ModuleStub<?> stub, @NotNull StubOutputStream stubOutputStream) throws IOException {
+            Deserialized.serialize(stubOutputStream, stub);
+        }
+
+        @NotNull
+        @Override
+        public ModuleStub<?> deserialize(@NotNull StubInputStream stubInputStream,
+                                         @NotNull StubElement parentStub) throws IOException {
+            Deserialized deserialized = Deserialized.deserialize(stubInputStream);
+
+            return new ModuleStubImpl(parentStub, deserialized);
+        }
+
+        @Override
+        public void indexStub(@NotNull ModuleStub<?> stub, @NotNull IndexSink sink) {
+            indexStubbic(stub, sink);
+        }
+    };
+
+    ModuleElementType<TypeDefinitionStub<?>, TypeDefinition> TYPE_DEFINITION = new ModuleElementType<TypeDefinitionStub<?>, TypeDefinition>("TypeDefinition") {
+        @NotNull
+        @Override
+        public ASTNode createCompositeNode() {
+            return new TypeDefinitionElement(this);
+        }
+
+        @Override
+        public TypeDefinition createPsi(@NotNull TypeDefinitionStub<?> stub) {
+            return new TypeDefinitionImpl<>(stub);
+        }
+
+        @NotNull
+        @Override
+        public TypeDefinitionStub<?> deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
+            return new TypeDefinitionStubImpl((ModuleStubImpl<ModuleImpl<?>>) parentStub);
+        }
+
+        @Override
+        public void serialize(@NotNull TypeDefinitionStub<?> stub, @NotNull StubOutputStream stubOutputStream) throws IOException {
+            throw new NotImplementedException();
+        }
+
+        @Override
+        public void indexStub(@NotNull TypeDefinitionStub<?> stub, @NotNull IndexSink sink) {
+            throw new NotImplementedException();
+        }
+    };
+
     ModuleElementType<CallDefinitionStub<?>, CallDefinition> CALL_DEFINITION = new ModuleElementType<CallDefinitionStub<?>, CallDefinition>("CallDefinition") {
         @NotNull
         @Override
@@ -51,36 +112,17 @@ public interface ModuleStubElementTypes {
         @Override
         public void serialize(@NotNull CallDefinitionStub stub,
                               @NotNull StubOutputStream stubOutputStream) throws IOException {
-            super.serialize(stub, stubOutputStream);
+            Deserialized.serialize(stubOutputStream, stub);
             writeGuarded(
                     stubOutputStream,
                     guardedStubOutputStream -> guardedStubOutputStream.writeVarInt(stub.callDefinitionClauseHeadArity())
             );
         }
-    };
-
-    /**
-     * See {@link com.intellij.psi.impl.java.stubs.JavaStubElementTypes#CLASS}
-     */
-    ModuleElementType<ModuleStub<?>, Module> MODULE = new ModuleElementType<ModuleStub<?>, Module>("Module") {
-        @NotNull
-        @Override
-        public ASTNode createCompositeNode() {
-            return new ModuleElement(this);
-        }
 
         @Override
-        public Module createPsi(@NotNull ModuleStub stub) {
-            return new ModuleImpl<>(stub);
-        }
-
-        @NotNull
-        @Override
-        public ModuleStub<?> deserialize(@NotNull StubInputStream stubInputStream,
-                                         @NotNull StubElement parentStub) throws IOException {
-            Deserialized deserialized = Deserialized.deserialize(stubInputStream);
-
-            return new ModuleStubImpl(parentStub, deserialized);
+        public void indexStub(@NotNull CallDefinitionStub<?> stub, @NotNull IndexSink sink) {
+            indexStubbic(stub, sink);
         }
     };
+
 }

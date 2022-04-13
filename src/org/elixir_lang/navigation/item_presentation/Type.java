@@ -4,7 +4,7 @@ import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.ui.RowIcon;
 import org.elixir_lang.Icons;
-import org.elixir_lang.Visibility;
+import org.elixir_lang.call.Visibility;
 import org.elixir_lang.psi.ElixirMatchedWhenOperation;
 import org.elixir_lang.psi.call.Call;
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +29,8 @@ public class Type implements ItemPresentation {
      * Static Methods
      */
 
-    @Nullable static PsiElement head(@NotNull Call type) {
+    @Nullable
+    static PsiElement head(@NotNull Call type) {
         PsiElement head = null;
 
         if (type instanceof org.elixir_lang.psi.operation.Type) {
@@ -89,9 +90,9 @@ public class Type implements ItemPresentation {
     @Override
     public Icon getIcon(boolean unused) {
         Icon[] icons = new Icon[]{
-            Icons.Time.COMPILE,
-            Icons.Visibility.from(visibility),
-            Icons.TYPE
+                Icons.Time.COMPILE,
+                Icons.Visibility.from(visibility),
+                Icons.TYPE
         };
 
         RowIcon rowIcon = new RowIcon(icons.length);

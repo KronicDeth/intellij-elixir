@@ -42,6 +42,7 @@ abstract class Type : PsiScopeProcessor {
                 is ElixirNoParenthesesOneArgument, is ElixirAccessExpression -> executeOnChildren(element, state)
                 is ElixirAtom, is ElixirFile, is ElixirList, is ElixirParentheticalStab, is ElixirTuple,
                 is WholeNumber -> false
+                is ModuleImpl<*> -> execute(element, state)
                 else -> {
                     error("Don't know how process element as type", element)
 
@@ -83,6 +84,16 @@ abstract class Type : PsiScopeProcessor {
                     true
                 }
             }
+
+    private fun execute(moduleImpl: ModuleImpl<*>, state: ResolveState): Boolean =
+            if (moduleImpl.isAncestor(state.get(ENTRANCE), false)) {
+                whileIn(moduleImpl.typeDefinitions()) {
+                    execute(it, state)
+                }
+            } else {
+                true
+            }
+
 
     private fun execute(atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>, state: ResolveState): Boolean {
         val identifierName = atUnqualifiedNoParenthesesCall.atIdentifier.identifierName()
