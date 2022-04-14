@@ -5,10 +5,11 @@ import com.intellij.psi.stubs.IndexSink;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
 import com.intellij.psi.stubs.StubOutputStream;
-import org.apache.commons.lang.NotImplementedException;
 import org.elixir_lang.beam.psi.*;
 import org.elixir_lang.beam.psi.impl.*;
 import org.elixir_lang.psi.stub.call.Deserialized;
+import org.elixir_lang.psi.stub.index.AllName;
+import org.elixir_lang.type.Visibility;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -32,6 +33,11 @@ public interface ModuleStubElementTypes {
         @Override
         public org.elixir_lang.beam.psi.Module createPsi(@NotNull ModuleStub stub) {
             return new ModuleImpl<>(stub);
+        }
+
+        @Override
+        public ModuleStub<?> createStub(@NotNull org.elixir_lang.beam.psi.Module psi, StubElement<?> parentStub) {
+            return super.createStub(psi, parentStub);
         }
 
         @Override
@@ -66,20 +72,31 @@ public interface ModuleStubElementTypes {
             return new TypeDefinitionImpl<>(stub);
         }
 
+        @Override
+        public TypeDefinitionStub<?> createStub(@NotNull TypeDefinition psi, StubElement<?> parentStub) {
+            return super.createStub(psi, parentStub);
+        }
+
         @NotNull
         @Override
         public TypeDefinitionStub<?> deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
-            return new TypeDefinitionStubImpl((ModuleStubImpl<ModuleImpl<?>>) parentStub);
+            Visibility visibility = Visibility.valueOf(dataStream.readNameString());
+            String name = dataStream.readNameString();
+            int arity = dataStream.readVarInt();
+
+            return new TypeDefinitionStubImpl((ModuleStubImpl<ModuleImpl<?>>) parentStub, visibility, name, arity);
         }
 
         @Override
         public void serialize(@NotNull TypeDefinitionStub<?> stub, @NotNull StubOutputStream stubOutputStream) throws IOException {
-            throw new NotImplementedException();
+            stubOutputStream.writeName(stub.getVisibility().toString());
+            stubOutputStream.writeName(stub.getName());
+            stubOutputStream.writeVarInt(stub.getArity());
         }
 
         @Override
         public void indexStub(@NotNull TypeDefinitionStub<?> stub, @NotNull IndexSink sink) {
-            throw new NotImplementedException();
+            sink.occurrence(AllName.KEY, stub.getName());
         }
     };
 

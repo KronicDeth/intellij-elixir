@@ -12,6 +12,7 @@ import org.elixir_lang.NameArityInterval
 import org.elixir_lang.beam.psi.CallDefinition
 import org.elixir_lang.beam.psi.stubs.CallDefinitionStub
 import org.elixir_lang.psi.ArityInterval
+import org.elixir_lang.psi.Definition
 import org.elixir_lang.structure_view.element.Timed
 import org.jetbrains.annotations.Contract
 import org.jetbrains.annotations.NonNls
@@ -86,8 +87,12 @@ class CallDefinitionImpl<T : CallDefinitionStub<*>>(private val stub: T) : Modul
      */
     override fun exportedName(): String = stub.name
 
-    override val time: Timed.Time
-        get() = TODO("Not yet implemented")
+    override val time: Timed.Time by lazy {
+        when (stub.definition) {
+            Definition.PUBLIC_MACRO, Definition.PRIVATE_MACRO -> Timed.Time.COMPILE
+            else -> Timed.Time.RUN
+        }
+    }
     override val nameArityInterval: NameArityInterval by lazy {
         val arity = stub.callDefinitionClauseHeadArity()
 

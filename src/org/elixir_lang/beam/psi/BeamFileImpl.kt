@@ -2,49 +2,53 @@ package org.elixir_lang.beam.psi
 
 import com.ericsson.otp.erlang.OtpErlangDecodeException
 import com.intellij.lang.FileASTNode
-import org.elixir_lang.beam.Beam.Companion.from
-import com.intellij.psi.impl.source.PsiFileWithStubSupport
-import com.intellij.util.IncorrectOperationException
-import com.intellij.psi.search.PsiElementProcessor
 import com.intellij.openapi.application.ApplicationManager
-import org.elixir_lang.psi.stub.impl.ElixirFileStubImpl
-import com.intellij.psi.scope.ElementClassHint
-import com.intellij.psi.impl.source.resolve.FileContextUtil
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileTypes.FileType
-import org.elixir_lang.ElixirLanguage
-import com.intellij.psi.impl.source.SourceTreeToPsiMap
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.*
-import java.lang.Runnable
 import com.intellij.psi.impl.source.PsiFileImpl
+import com.intellij.psi.impl.source.PsiFileWithStubSupport
+import com.intellij.psi.impl.source.SourceTreeToPsiMap
+import com.intellij.psi.impl.source.resolve.FileContextUtil
 import com.intellij.psi.impl.source.tree.TreeElement
+import com.intellij.psi.scope.ElementClassHint
 import com.intellij.psi.scope.PsiScopeProcessor
+import com.intellij.psi.search.PsiElementProcessor
 import com.intellij.psi.stubs.*
 import com.intellij.reference.SoftReference
 import com.intellij.util.ArrayUtil
-import org.elixir_lang.psi.ElixirFile
+import com.intellij.util.IncorrectOperationException
+import org.elixir_lang.ElixirLanguage
 import org.elixir_lang.beam.Beam
+import org.elixir_lang.beam.Beam.Companion.from
 import org.elixir_lang.beam.Decompiler
 import org.elixir_lang.beam.MacroNameArity
-import java.io.IOException
-import org.elixir_lang.beam.psi.stubs.ModuleStub
 import org.elixir_lang.beam.chunk.Atoms
 import org.elixir_lang.beam.chunk.CallDefinitions
+import org.elixir_lang.beam.chunk.debug_info.TypeDefinitions
 import org.elixir_lang.beam.psi.impl.*
 import org.elixir_lang.beam.psi.stubs.CallDefinitionStub
+import org.elixir_lang.beam.psi.stubs.ModuleStub
+import org.elixir_lang.beam.psi.stubs.TypeDefinitionStub
+import org.elixir_lang.beam.type.VisibilityNameArity
+import org.elixir_lang.psi.ElixirFile
+import org.elixir_lang.psi.stub.impl.ElixirFileStubImpl
+import org.elixir_lang.type.Visibility
 import org.jetbrains.annotations.NonNls
-import java.lang.StringBuilder
+import java.io.IOException
 import java.util.*
-import java.util.function.Consumer
 
 // See com.intellij.psi.impl.compiled.ClsFileImpl
-class BeamFileImpl private constructor(private val fileViewProvider: FileViewProvider, private val isForDecompiling: Boolean) : ModuleElementImpl(), PsiCompiledFile, PsiFileWithStubSupport {
+class BeamFileImpl private constructor(
+    private val fileViewProvider: FileViewProvider,
+    private val isForDecompiling: Boolean
+) : ModuleElementImpl(), PsiCompiledFile, PsiFileWithStubSupport {
     /**
      * NOTE: you absolutely MUST NOT hold PsiLock under the mirror lock
      */
@@ -120,8 +124,8 @@ class BeamFileImpl private constructor(private val fileViewProvider: FileViewPro
         } else {
             // build newStub out of lock to avoid deadlock
             val indexStubTree = StubTreeLoader
-                    .getInstance()
-                    .readOrBuild(project, virtualFile, this) as StubTree?
+                .getInstance()
+                .readOrBuild(project, virtualFile, this) as StubTree?
 
             val newStubTree = if (indexStubTree == null) {
                 if (LOGGER.isDebugEnabled) {
@@ -137,13 +141,13 @@ class BeamFileImpl private constructor(private val fileViewProvider: FileViewPro
                 // recheck with lock held, in case another thread built and set while we were building
                 val synchronizedStubTree = SoftReference.dereference(stub)
 
-                if (synchronizedStubTree != null ) {
+                if (synchronizedStubTree != null) {
                     synchronizedStubTree
                 } else {
                     newStubTree
-                            .root
-                            .let { it as PsiFileStubImpl<PsiFile> }
-                            .setPsi(this)
+                        .root
+                        .let { it as PsiFileStubImpl<PsiFile> }
+                        .setPsi(this)
 
                     stub = SoftReference(newStubTree)
 
@@ -273,10 +277,12 @@ class BeamFileImpl private constructor(private val fileViewProvider: FileViewPro
      * to be processed again)
      * @param place      the original element from which the tree up walk was initiated.   @return true if the declaration processing should continue or false if it should be stopped.
      */
-    override fun processDeclarations(processor: PsiScopeProcessor,
-                                     state: ResolveState,
-                                     lastParent: PsiElement?,
-                                     place: PsiElement): Boolean {
+    override fun processDeclarations(
+        processor: PsiScopeProcessor,
+        state: ResolveState,
+        lastParent: PsiElement?,
+        place: PsiElement
+    ): Boolean {
         processor.handleEvent(PsiScopeProcessor.Event.SET_DECLARATION_HOLDER, this)
         val classHint = processor.getHint(ElementClassHint.KEY)
         return if (classHint == null || classHint.shouldProcess(ElementClassHint.DeclarationKind.CLASS)) {
@@ -379,11 +385,11 @@ class BeamFileImpl private constructor(private val fileViewProvider: FileViewPro
                     val mirrorText = document!!.immutableCharSequence
                     val factory = PsiFileFactory.getInstance(manager.project)
                     val mirror = factory.createFileFromText(
-                            fileName,
-                            ElixirLanguage,
-                            mirrorText,
-                            false,
-                            false
+                        fileName,
+                        ElixirLanguage,
+                        mirrorText,
+                        false,
+                        false
                     )
                     mirrorTreeElement = SourceTreeToPsiMap.psiToTreeNotNull(mirror)
                     try {
@@ -420,7 +426,7 @@ class BeamFileImpl private constructor(private val fileViewProvider: FileViewPro
 
         @JvmStatic
         fun buildFileStub(bytes: ByteArray?, path: String): Stub? =
-                safeFrom(bytes, path)?.let { buildModuleStub(it) }?.parentStub
+            safeFrom(bytes, path)?.let { buildModuleStub(it) }?.parentStub
 
         private fun safeFrom(bytes: ByteArray?, path: String): Beam? = try {
             from(bytes!!, path)
@@ -433,19 +439,42 @@ class BeamFileImpl private constructor(private val fileViewProvider: FileViewPro
         }
 
         private fun buildModuleStub(beam: Beam): ModuleStub<*>? = beam
-                .atoms()
-                ?.let { atoms ->
-                    atoms
-                            .moduleName()
-                            ?.let { moduleName ->
-                                val name = Decompiler.defmoduleArgument(moduleName)
-                                val parentStub = ElixirFileStubImpl()
-                                val moduleStub: ModuleStub<*> = ModuleStubImpl<ModuleImpl<*>>(parentStub, name)
-                                buildCallDefinitions(moduleStub, beam, atoms)
+            .atoms()
+            ?.let { atoms ->
+                atoms
+                    .moduleName()
+                    ?.let { moduleName ->
+                        val name = Decompiler.defmoduleArgument(moduleName)
+                        val parentStub = ElixirFileStubImpl()
+                        val moduleStub: ModuleStub<*> = ModuleStubImpl<ModuleImpl<*>>(parentStub, name)
+                        buildTypeDefinitions(moduleStub, beam, atoms)
+                        buildCallDefinitions(moduleStub, beam, atoms)
 
-                                moduleStub
-                            }
+                        moduleStub
+                    }
+            }
+
+        private fun buildTypeDefinitions(parentStub: ModuleStub<*>, beam: Beam, atoms: Atoms) {
+            TypeDefinitions.visibilityNameAritySortedSetByVisibility(beam, atoms)
+                .forEach { (_, visibilityNameAritySortedSet) ->
+                    visibilityNameAritySortedSet.forEach { visibilityNameArity ->
+                        buildTypeDefinition(parentStub, visibilityNameArity)
+                    }
                 }
+        }
+
+        private fun buildTypeDefinition(parentStub: ModuleStub<*>, visibilityNameArity: VisibilityNameArity):
+                TypeDefinitionStub<*> =
+            buildTypeDefinition(
+                parentStub,
+                visibilityNameArity.visibility,
+                visibilityNameArity.name,
+                visibilityNameArity.arity
+            )
+
+        private fun buildTypeDefinition(parentStub: ModuleStub<*>, visibility: Visibility, name: String, arity: Int):
+                TypeDefinitionStub<*> =
+            TypeDefinitionStubImpl<TypeDefinitionImpl<*>>(parentStub, visibility, name, arity)
 
         private fun buildCallDefinitions(parentStub: ModuleStub<*>, beam: Beam, atoms: Atoms) {
             CallDefinitions.macroNameAritySortedSetByMacro(beam, atoms).forEach { (_, macroNameAritySortedSet) ->
@@ -455,14 +484,18 @@ class BeamFileImpl private constructor(private val fileViewProvider: FileViewPro
             }
         }
 
-        private fun buildCallDefinition(parentStub: ModuleStub<*>,
-                                        macroNameArity: MacroNameArity): CallDefinitionStub<*> =
-                buildCallDefinition(parentStub, macroNameArity.macro, macroNameArity.name, macroNameArity.arity)
+        private fun buildCallDefinition(
+            parentStub: ModuleStub<*>,
+            macroNameArity: MacroNameArity
+        ): CallDefinitionStub<*> =
+            buildCallDefinition(parentStub, macroNameArity.macro, macroNameArity.name, macroNameArity.arity)
 
-        private fun buildCallDefinition(parentStub: ModuleStub<*>,
-                                        macro: String,
-                                        name: String,
-                                        arity: Int): CallDefinitionStub<*> =
-                CallDefinitionStubImpl<CallDefinitionImpl<*>>(parentStub, macro, name, arity)
+        private fun buildCallDefinition(
+            parentStub: ModuleStub<*>,
+            macro: String,
+            name: String,
+            arity: Int
+        ): CallDefinitionStub<*> =
+            CallDefinitionStubImpl<CallDefinitionImpl<*>>(parentStub, macro, name, arity)
     }
 }
