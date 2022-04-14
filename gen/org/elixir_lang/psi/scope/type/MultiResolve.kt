@@ -4,6 +4,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.ResolveState
 import com.intellij.psi.util.PsiTreeUtil
+import org.elixir_lang.beam.psi.impl.ModuleImpl
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
@@ -161,7 +162,11 @@ private constructor(private val name: String,
             val maxScope = entrance.containingFile
             val entranceResolveState = resolveState.put(ElixirPsiImplUtil.ENTRANCE, entrance).putInitialVisitedElement(entrance)
 
-            PsiTreeUtil.treeWalkUp(multiResolve, entrance, maxScope, entranceResolveState)
+            if (entrance is ModuleImpl<*>) {
+                multiResolve.execute(entrance, entranceResolveState)
+            } else {
+                PsiTreeUtil.treeWalkUp(multiResolve, entrance, maxScope, entranceResolveState)
+            }
 
             return multiResolve.resolveResults()
         }
