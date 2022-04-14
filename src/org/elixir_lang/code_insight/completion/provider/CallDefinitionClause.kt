@@ -46,9 +46,13 @@ class CallDefinitionClause : CompletionProvider<CompletionParameters>() {
             }
     }
 
-    private fun callDefinitionClauseLookupElements(moduleImpl: ModuleImpl<*>): Iterable<LookupElement> {
-        TODO()
-    }
+    private fun callDefinitionClauseLookupElements(moduleImpl: ModuleImpl<*>): Iterable<LookupElement> =
+        moduleImpl.callDefinitions().map { callDefinition ->
+            org.elixir_lang.code_insight.lookup.element.CallDefinitionClause.createWithSmartPointer(
+                callDefinition.exportedName(),
+                callDefinition
+            )
+        }
 
     private fun maybeModularName(parameters: CompletionParameters): PsiElement? =
         parameters.originalPosition?.let { originalPosition ->
