@@ -9,9 +9,9 @@ import com.intellij.psi.StubBasedPsiElement
 import com.intellij.psi.impl.source.SourceTreeToPsiMap
 import com.intellij.psi.impl.source.tree.TreeElement
 import com.intellij.psi.stubs.IStubElementType
-import com.intellij.psi.stubs.StubElement
 import com.intellij.util.IncorrectOperationException
 import org.elixir_lang.beam.psi.Module
+import org.elixir_lang.beam.psi.stubs.ModuleStub
 import org.elixir_lang.beam.psi.stubs.ModuleStubElementTypes
 import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.Modular.callDefinitionClauseCallWhile
@@ -22,14 +22,16 @@ import org.jetbrains.annotations.Contract
 import org.jetbrains.annotations.NonNls
 
 // See com.intellij.psi.impl.compiled.ClsClassImpl
-class ModuleImpl<T : StubElement<*>?>(private val stub: T) : ModuleElementImpl(), Module, StubBasedPsiElement<T> {
+class ModuleImpl<T : ModuleStub<*>?>(private val stub: T) : ModuleElementImpl(), Module, StubBasedPsiElement<T> {
+    override fun getName(): String = stub!!.name
+
     /**
      * Returns the array of children for the PSI element.
      * Important: In some implementations children are only composite elements, i.e. not a leaf elements
      *
      * @return the array of child elements.
      */
-    override fun getChildren(): Array<PsiElement> = emptyArray()
+    override fun getChildren(): Array<PsiElement> = stub!!.childrenStubs.map { it.psi }.toTypedArray()
 
     /**
      * Returns the parent of the PSI element.

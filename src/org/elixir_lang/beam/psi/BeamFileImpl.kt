@@ -447,15 +447,15 @@ class BeamFileImpl private constructor(
                         val name = Decompiler.defmoduleArgument(moduleName)
                         val parentStub = ElixirFileStubImpl()
                         val moduleStub: ModuleStub<*> = ModuleStubImpl<ModuleImpl<*>>(parentStub, name)
-                        buildTypeDefinitions(moduleStub, beam, atoms)
                         buildCallDefinitions(moduleStub, beam, atoms)
+                        buildTypeDefinitions(moduleStub, beam, atoms)
 
                         moduleStub
                     }
             }
 
         private fun buildTypeDefinitions(parentStub: ModuleStub<*>, beam: Beam, atoms: Atoms) {
-            TypeDefinitions.visibilityNameAritySortedSetByVisibility(beam, atoms)
+            TypeDefinitions.visibilityNameAritySortedSetByVisibility(parentStub, beam, atoms)
                 .forEach { (_, visibilityNameAritySortedSet) ->
                     visibilityNameAritySortedSet.forEach { visibilityNameArity ->
                         buildTypeDefinition(parentStub, visibilityNameArity)

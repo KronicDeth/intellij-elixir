@@ -7,10 +7,9 @@ import com.intellij.psi.StubBasedPsiElement
 import com.intellij.psi.impl.source.tree.TreeElement
 import com.intellij.psi.stubs.IStubElementType
 import com.intellij.util.IncorrectOperationException
-import org.elixir_lang.NameArityInterval
+import org.elixir_lang.Arity
 import org.elixir_lang.beam.psi.TypeDefinition
 import org.elixir_lang.beam.psi.stubs.TypeDefinitionStub
-import org.elixir_lang.structure_view.element.Timed
 import org.elixir_lang.type.Visibility
 import org.jetbrains.annotations.NonNls
 
@@ -69,9 +68,10 @@ class TypeDefinitionImpl<T : TypeDefinitionStub<*>>(private val stub: T) : Modul
     override fun getNode(): ASTNode? = null
 
     override val visibility: Visibility
-        get() = TODO("Not yet implemented")
-    override val time: Timed.Time
-        get() = TODO("Not yet implemented")
-    override val nameArityInterval: NameArityInterval
-        get() = TODO("Not yet implemented")
+        get() = stub.visibility
+
+    override fun getName(): String = stub.name
+
+    override val arity: Arity
+        get() = stub.arity
 }

@@ -2,13 +2,15 @@ package org.elixir_lang.beam.chunk.debug_info
 
 import org.elixir_lang.beam.Beam
 import org.elixir_lang.beam.chunk.Atoms
+import org.elixir_lang.beam.psi.stubs.ModuleStub
 import org.elixir_lang.beam.type.VisibilityNameArity
+import org.elixir_lang.psi.Protocol
 import org.elixir_lang.reference.resolver.Type
 import org.elixir_lang.type.Visibility
 import java.util.*
 
 object TypeDefinitions {
-    fun visibilityNameAritySortedSetByVisibility(beam: Beam, atoms: Atoms): Map<Visibility,
+    fun visibilityNameAritySortedSetByVisibility(parentStub: ModuleStub<*>, beam: Beam, atoms: Atoms): Map<Visibility,
             SortedSet<VisibilityNameArity>> =
         if (atoms.moduleName() == "erlang") {
             val sortedSet = TreeSet<VisibilityNameArity>()
@@ -20,6 +22,8 @@ object TypeDefinitions {
             }
 
             mapOf(Visibility.PUBLIC to sortedSet)
+        } else if (Protocol.`is`(parentStub)) {
+            emptyMap()
         } else {
             emptyMap()
         }

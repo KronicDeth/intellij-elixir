@@ -6,7 +6,10 @@ import com.intellij.psi.ResolveState
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.util.Processor
+import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
 import org.elixir_lang.beam.psi.impl.ModuleImpl
+import org.elixir_lang.beam.psi.stubs.ModuleStub
+import org.elixir_lang.beam.psi.stubs.ModuleStubElementTypes
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function
 import org.elixir_lang.psi.stub.index.ImplementedProtocolName
@@ -20,6 +23,13 @@ object Protocol {
         moduleImpl.callDefinitions().any { callDefinitionImpl ->
             callDefinitionImpl.name == "__protocol__" && callDefinitionImpl.exportedArity(ResolveState.initial()) == 1
         }
+
+    fun `is`(moduleStub: ModuleStub<*>): Boolean =
+        moduleStub
+            .getChildrenByType(ModuleStubElementTypes.CALL_DEFINITION, emptyArray<CallDefinitionImpl<*>>())
+            .any { callDefinition ->
+                callDefinition.name == "__protocol__" && callDefinition.exportedArity(ResolveState.initial()) == 1
+            }
 
     fun processImplementations(defprotocol: Call, consumer: Processor<in PsiElement>) {
         processImplementations(defprotocol.project, Module.name(defprotocol), consumer)
