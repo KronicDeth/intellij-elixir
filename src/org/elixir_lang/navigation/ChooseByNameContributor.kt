@@ -9,6 +9,8 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.stubs.StubIndexKey
 import com.intellij.util.ArrayUtil
+import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
+import org.elixir_lang.beam.psi.impl.ModuleImpl
 import org.elixir_lang.call.Visibility
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
@@ -61,17 +63,18 @@ open class ChooseByNameContributor(private val stubIndexKey: StubIndexKey<String
         val callDefinitionByTuple = HashMap<CallDefinition.Tuple, CallDefinition>()
 
         for (element in result) {
-            // Use navigation element so that source element is used for compiled elements
-            val sourceElement = element.navigationElement
-
-            if (sourceElement is Call) {
-                getItemsByNameFromCall(
-                    name,
-                    items,
-                    enclosingModularByCall,
-                    callDefinitionByTuple,
-                    sourceElement
-                )
+            when (element) {
+                is Call ->
+                    getItemsByNameFromCall(
+                        name,
+                        items,
+                        enclosingModularByCall,
+                        callDefinitionByTuple,
+                        element
+                    )
+                is ModuleImpl<*> -> items.add(element)
+                is CallDefinitionImpl<*> -> items.add(element)
+                else -> TODO()
             }
         }
 

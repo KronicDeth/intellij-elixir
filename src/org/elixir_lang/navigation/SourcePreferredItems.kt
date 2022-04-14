@@ -5,6 +5,8 @@ import com.intellij.navigation.NavigationItem
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementResolveResult
 import org.elixir_lang.beam.psi.BeamFileImpl
+import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
+import org.elixir_lang.beam.psi.impl.ModuleImpl
 import org.elixir_lang.structure_view.element.*
 import org.elixir_lang.structure_view.element.modular.Modular
 import org.elixir_lang.structure_view.element.modular.Module
@@ -16,7 +18,7 @@ fun PsiElement.isDecompiled(): Boolean = containingFile.originalFile is BeamFile
 /**
  * Navigation items for [GotoSymbolContributor.getItemsByName] that will only return Source version if both Source and Decompiled version are added.
  */
-class SourcePreferredItems  {
+class SourcePreferredItems {
     fun add(callback: Callback) {
         // currently we don't decompile callbacks, so no need to check
         callbackList.add(callback)
@@ -24,8 +26,10 @@ class SourcePreferredItems  {
 
     fun add(callDefinition: CallDefinition) {
         val modularName = callDefinition.modularName()
-        val callDefinitionByArityByName = callDefinitionListByArityByNameByModularName.computeIfAbsent(modularName) { mutableMapOf() }
-        val callDefinitionListByArity = callDefinitionByArityByName.computeIfAbsent(callDefinition.name()) { mutableMapOf() }
+        val callDefinitionByArityByName =
+            callDefinitionListByArityByNameByModularName.computeIfAbsent(modularName) { mutableMapOf() }
+        val callDefinitionListByArity =
+            callDefinitionByArityByName.computeIfAbsent(callDefinition.name()) { mutableMapOf() }
 
         callDefinitionListByArity.compute(callDefinition.arity) { _, currentCallDefinitionList ->
             if (currentCallDefinitionList != null) {
@@ -36,7 +40,7 @@ class SourcePreferredItems  {
                         currentCallDefinitionList
                     } else {
                         // prefer source over all decompiled
-                       mutableListOf(callDefinition)
+                        mutableListOf(callDefinition)
                     }
                 } else {
                     if (callDefinition.isDecompiled()) {
@@ -57,8 +61,10 @@ class SourcePreferredItems  {
     fun add(callDefinitionHead: CallDefinitionHead) {
         val callDefinition = callDefinitionHead.callDefinition
         val modularName = callDefinition.modularName()
-        val callDefinitionHeadListByArityByName = callDefinitionHeadListByArityByNameByModularName.computeIfAbsent(modularName) { mutableMapOf() }
-        val callDefinitionHeadListByArity = callDefinitionHeadListByArityByName.computeIfAbsent(callDefinition.name()) { mutableMapOf() }
+        val callDefinitionHeadListByArityByName =
+            callDefinitionHeadListByArityByNameByModularName.computeIfAbsent(modularName) { mutableMapOf() }
+        val callDefinitionHeadListByArity =
+            callDefinitionHeadListByArityByName.computeIfAbsent(callDefinition.name()) { mutableMapOf() }
 
         callDefinitionHeadListByArity.compute(callDefinition.arity) { _, currentCallDefinitionHeadList ->
             if (currentCallDefinitionHeadList != null) {
@@ -90,8 +96,10 @@ class SourcePreferredItems  {
     fun add(callDefinitionClause: CallDefinitionClause) {
         val callDefinition = callDefinitionClause.callDefinition
         val modularName = callDefinition.modularName()
-        val callDefinitionClauseListByArityByName = callDefinitionClauseListByArityByNameByModularName.computeIfAbsent(modularName) { mutableMapOf() }
-        val callDefinitionClauseListByArity = callDefinitionClauseListByArityByName.computeIfAbsent(callDefinition.name()) { mutableMapOf() }
+        val callDefinitionClauseListByArityByName =
+            callDefinitionClauseListByArityByNameByModularName.computeIfAbsent(modularName) { mutableMapOf() }
+        val callDefinitionClauseListByArity =
+            callDefinitionClauseListByArityByName.computeIfAbsent(callDefinition.name()) { mutableMapOf() }
 
         callDefinitionClauseListByArity.compute(callDefinition.arity) { _, currentCallDefinitionClauseList ->
             if (currentCallDefinitionClauseList != null) {
@@ -155,29 +163,65 @@ class SourcePreferredItems  {
 
     fun toTypedArray(): Array<NavigationItem> {
         val navigationItemList =
-                modularListByName.values.flatten() as List<NavigationItem> +
-                        callDefinitionClauseListByArityByNameByModularName.values.flatMap { it.values.flatMap { it.values.flatten() } } +
-                        callDefinitionListByArityByNameByModularName.values.flatMap { it.values.flatMap { it.values.flatten() } } +
-                        callDefinitionSpecificationList +
-                        callDefinitionHeadListByArityByNameByModularName.values.flatMap { it.values.flatMap { it.values.flatten() } } +
-                        callbackList
+            modularListByName.values.flatten() as List<NavigationItem> +
+                    moduleImplListByName.values.flatten() +
+                    callDefinitionClauseListByArityByNameByModularName.values.flatMap { it.values.flatMap { it.values.flatten() } } +
+                    callDefinitionListByArityByNameByModularName.values.flatMap { it.values.flatMap { it.values.flatten() } } +
+                    callDefinitionImplListByArityByNameByModularName.values.flatMap {
+                        it.values.flatMap { it.values.flatten() }
+                    } +
+                    callDefinitionSpecificationList +
+                    callDefinitionHeadListByArityByNameByModularName.values.flatMap { it.values.flatMap { it.values.flatten() } } +
+                    callbackList
 
         return navigationItemList
-                .distinctBy { navigationItem ->
-                    navigationItem
-                            .let { it as? StructureViewTreeElement }
-                            ?.value
-                            ?: navigationItem
-                }
-                .toTypedArray()
+            .distinctBy { navigationItem ->
+                navigationItem
+                    .let { it as? StructureViewTreeElement }
+                    ?.value
+                    ?: navigationItem
+            }
+            .toTypedArray()
     }
 
-    private val callDefinitionListByArityByNameByModularName = mutableMapOf<ModularName, MutableMap<Name, MutableMap<Arity, MutableList<CallDefinition>>>>()
-    private val callDefinitionClauseListByArityByNameByModularName = mutableMapOf<ModularName, MutableMap<Name, MutableMap<Arity, MutableList<CallDefinitionClause>>>>()
-    private val callDefinitionHeadListByArityByNameByModularName = mutableMapOf<ModularName, MutableMap<Name, MutableMap<Arity, MutableList<CallDefinitionHead>>>>()
+    fun add(element: ModuleImpl<*>) {
+        moduleImplListByName.compute(element.name) { _, currentModuleImplList ->
+            if (currentModuleImplList != null) {
+                currentModuleImplList.add(element)
+
+                currentModuleImplList
+            } else {
+                mutableListOf(element)
+            }
+        }
+    }
+
+    fun add(element: CallDefinitionImpl<*>) {
+        val modularName = element.parent.name
+        val callDefinitionImplListByArityByName =
+            callDefinitionImplListByArityByNameByModularName.computeIfAbsent(modularName) { mutableMapOf() }
+        val nameArityInterval = element.nameArityInterval
+        val callDefinitionImplListByArity =
+            callDefinitionImplListByArityByName.computeIfAbsent(nameArityInterval.name) { mutableMapOf() }
+
+        for (arity in nameArityInterval.arityInterval.closed()) {
+            val callDefinitionImplList = callDefinitionImplListByArity.computeIfAbsent(arity) { mutableListOf() }
+            callDefinitionImplList.add(element)
+        }
+    }
+
+    private val callDefinitionListByArityByNameByModularName =
+        mutableMapOf<ModularName, MutableMap<Name, MutableMap<Arity, MutableList<CallDefinition>>>>()
+    private val callDefinitionClauseListByArityByNameByModularName =
+        mutableMapOf<ModularName, MutableMap<Name, MutableMap<Arity, MutableList<CallDefinitionClause>>>>()
+    private val callDefinitionHeadListByArityByNameByModularName =
+        mutableMapOf<ModularName, MutableMap<Name, MutableMap<Arity, MutableList<CallDefinitionHead>>>>()
     private val callDefinitionSpecificationList = mutableListOf<CallDefinitionSpecification>()
+    private val callDefinitionImplListByArityByNameByModularName =
+        mutableMapOf<ModularName, MutableMap<Name, MutableMap<Arity, MutableList<CallDefinitionImpl<*>>>>>()
     private val callbackList = mutableListOf<Callback>()
     private val modularListByName = mutableMapOf<Name, MutableList<Modular>>()
+    private val moduleImplListByName = mutableMapOf<Name, MutableList<ModuleImpl<*>>>()
 }
 
 private fun Any.isDecompiled(): Boolean =
@@ -196,11 +240,11 @@ private fun CallDefinitionClause.isDecompiled(): Boolean = callDefinition.isDeco
 private fun CallDefinitionHead.isDecompiled(): Boolean = callDefinition.isDecompiled()
 
 private fun Modular.isDecompiled(): Boolean =
-        when (this) {
-            is Module -> isDecompiled()
-            is Quote -> callDefinitionClause.isDecompiled()
-            else -> false
-        }
+    when (this) {
+        is Module -> isDecompiled()
+        is Quote -> callDefinitionClause.isDecompiled()
+        else -> false
+    }
 
 private fun Module.isDecompiled(): Boolean = (value as PsiElement).containingFile.originalFile is BeamFileImpl
 private fun PsiElementResolveResult.isDecompiled(): Boolean = element.isDecompiled()
@@ -211,9 +255,9 @@ typealias Arity = Int
 
 private fun CallDefinition.modularName() = modularName(modular)
 private fun modularName(presentable: Presentable): String =
-        when (presentable) {
-            is CallDefinitionClause -> presentable.callDefinition.modularName()
-            is Module -> presentable.name
-            is Quote -> "${modularName(presentable.callDefinitionClause)} quote"
-            else -> null
-        } ?: "?"
+    when (presentable) {
+        is CallDefinitionClause -> presentable.callDefinition.modularName()
+        is Module -> presentable.name
+        is Quote -> "${modularName(presentable.callDefinitionClause)} quote"
+        else -> null
+    } ?: "?"
