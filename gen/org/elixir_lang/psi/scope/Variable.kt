@@ -96,7 +96,8 @@ abstract class Variable : PsiScopeProcessor {
                                     element is QualifiableAlias ||
                                     element is QualifiedBracketOperation ||
                                     element is UnqualifiedBracketOperation ||
-                                    element is WholeNumber || element.node.elementType == GeneratedParserUtilBase.DUMMY_BLOCK)) {
+                                    element is WholeNumber ||
+                                element.node?.elementType == GeneratedParserUtilBase.DUMMY_BLOCK)) {
                         Logger.error(Callable::class.java, "Don't know how to resolve variable in match", element)
                     }
 
