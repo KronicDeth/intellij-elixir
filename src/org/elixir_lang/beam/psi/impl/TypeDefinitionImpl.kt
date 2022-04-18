@@ -3,21 +3,17 @@ package org.elixir_lang.beam.psi.impl
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
-import com.intellij.psi.ResolveState
 import com.intellij.psi.StubBasedPsiElement
 import com.intellij.psi.impl.source.tree.TreeElement
 import com.intellij.psi.stubs.IStubElementType
 import com.intellij.util.IncorrectOperationException
-import org.elixir_lang.NameArityInterval
-import org.elixir_lang.beam.psi.CallDefinition
-import org.elixir_lang.beam.psi.stubs.CallDefinitionStub
-import org.elixir_lang.psi.ArityInterval
-import org.elixir_lang.psi.Definition
-import org.elixir_lang.structure_view.element.Timed
-import org.jetbrains.annotations.Contract
+import org.elixir_lang.Arity
+import org.elixir_lang.beam.psi.TypeDefinition
+import org.elixir_lang.beam.psi.stubs.TypeDefinitionStub
+import org.elixir_lang.type.Visibility
 import org.jetbrains.annotations.NonNls
 
-class CallDefinitionImpl<T : CallDefinitionStub<*>>(private val stub: T) : ModuleElementImpl(), CallDefinition,
+class TypeDefinitionImpl<T : TypeDefinitionStub<*>>(private val stub: T) : ModuleElementImpl(), TypeDefinition,
                                                                            StubBasedPsiElement<T> {
     override fun getProject(): Project = parent.project
 
@@ -71,31 +67,11 @@ class CallDefinitionImpl<T : CallDefinitionStub<*>>(private val stub: T) : Modul
 
     override fun getNode(): ASTNode? = null
 
-    /**
-     * @return `true`
-     */
-    @Contract(pure = true)
-    override fun isExported(): Boolean = stub.isExported
+    override val visibility: Visibility
+        get() = stub.visibility
 
-    /**
-     * The arity of the function or macro that was exported into the compiled .beam file
-     */
-    override fun exportedArity(state: ResolveState): Int = stub.callDefinitionClauseHeadArity()
+    override fun getName(): String = stub.name
 
-    /**
-     * The name that was exported into the compiled .beam file
-     */
-    override fun exportedName(): String = stub.name
-
-    override val time: Timed.Time by lazy {
-        when (stub.definition) {
-            Definition.PUBLIC_MACRO, Definition.PRIVATE_MACRO -> Timed.Time.COMPILE
-            else -> Timed.Time.RUN
-        }
-    }
-    override val nameArityInterval: NameArityInterval by lazy {
-        val arity = stub.callDefinitionClauseHeadArity()
-
-        NameArityInterval(stub.name, ArityInterval(arity, arity))
-    }
+    override val arity: Arity
+        get() = stub.arity
 }

@@ -8,6 +8,7 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.util.isAncestor
 import org.elixir_lang.beam.psi.impl.ModuleImpl
+import org.elixir_lang.beam.psi.impl.TypeDefinitionImpl
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.Module
@@ -42,6 +43,8 @@ abstract class Type : PsiScopeProcessor {
                 is ElixirNoParenthesesOneArgument, is ElixirAccessExpression -> executeOnChildren(element, state)
                 is ElixirAtom, is ElixirFile, is ElixirList, is ElixirParentheticalStab, is ElixirTuple,
                 is WholeNumber -> false
+                is ModuleImpl<*> -> execute(element, state)
+                is TypeDefinitionImpl<*> -> execute(element, state)
                 else -> {
                     error("Don't know how process element as type", element)
 
@@ -84,6 +87,17 @@ abstract class Type : PsiScopeProcessor {
                 }
             }
 
+    private fun execute(moduleImpl: ModuleImpl<*>, state: ResolveState): Boolean =
+            if (moduleImpl.isAncestor(state.get(ENTRANCE), false)) {
+                whileIn(moduleImpl.typeDefinitions()) {
+                    execute(it, state)
+                }
+            } else {
+                true
+            }
+
+    protected abstract fun execute(typeDefinitionImpl: TypeDefinitionImpl<*>, state: ResolveState): Boolean
+
     private fun execute(atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>, state: ResolveState): Boolean {
         val identifierName = atUnqualifiedNoParenthesesCall.atIdentifier.identifierName()
 
@@ -112,9 +126,11 @@ abstract class Type : PsiScopeProcessor {
             StubIndex.getInstance().processElements(ModularName.KEY, name, project, GlobalSearchScope.allScope(project), NamedElement::class.java) { modular ->
                 // use `ModuleImpl` to only use decompiled
                 if (modular is ModuleImpl<*>) {
-                    val decompiled = modular.navigationElement
                     // reset the resolve state as only `defmodule` that is an ancestor of entrance will be walked
-                    execute(decompiled, ResolveState.initial().put(ENTRANCE, decompiled).putInitialVisitedElement(decompiled))
+                    execute(
+                        modular,
+                        ResolveState.initial().put(ENTRANCE, modular).putInitialVisitedElement(modular)
+                    )
                 } else {
                     true
                 }
@@ -154,12 +170,12 @@ abstract class Type : PsiScopeProcessor {
                 if (expression.isCalling("Protocol", "__protocol__", 2)) {
                     expression.reference?.let { it as PsiPolyVariantReference }?.multiResolve(false)?.let { resolveResults ->
                         whileIn(resolveResults) { resolveResult ->
-                            resolveResult.element?.let { it as? Call }?.let { __protocol__ ->
+                            resolveResult.element?.let { __protocol__ ->
                                 Using.treeWalkUp(
-                                        __protocol__,
-                                        useCall = null,
-                                        resolveState = state,
-                                        keepProcessing = ::executeOn__protocol__DefinitionExpression
+                                    __protocol__,
+                                    use = null,
+                                    resolveState = state,
+                                    keepProcessing = ::executeOn__protocol__DefinitionExpression
                                 )
                             } ?: true
                         }

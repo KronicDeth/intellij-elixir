@@ -112,7 +112,7 @@ class Variants(private val entrance: PsiElement) : Module() {
         private fun relativeLookupElements(qualifier: QualifiableAlias): Collection<LookupElement> =
                 qualifier
                         .maybeModularNameToModulars(qualifier.containingFile, useCall = null, incompleteCode = false)
-                        .takeIf(Set<Call>::isNotEmpty)
+                        .takeIf(Set<PsiElement>::isNotEmpty)
                         ?.let { modularsRelativeLookupElements(qualifier.project, it) }
                         ?:
                         // The qualifier is an Alias to namespace that is shared, but never declared in an explicit modular
@@ -121,7 +121,7 @@ class Variants(private val entrance: PsiElement) : Module() {
         /**
          * Any modules under `modulars` with each `modular` stripped off the final names for the respective nested one
          */
-        private fun modularsRelativeLookupElements(project: Project, modulars: Set<Call>): Collection<LookupElement> =
+        private fun modularsRelativeLookupElements(project: Project, modulars: Set<PsiElement>): Collection<LookupElement> =
                 modulars
                         .asSequence()
                         .filterIsInstance<CanonicallyNamed>()

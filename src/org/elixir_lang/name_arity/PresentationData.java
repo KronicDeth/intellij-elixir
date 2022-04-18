@@ -2,7 +2,7 @@ package org.elixir_lang.name_arity;
 
 import com.intellij.ui.RowIcon;
 import org.elixir_lang.Icons;
-import org.elixir_lang.Visibility;
+import org.elixir_lang.call.Visibility;
 import org.elixir_lang.structure_view.element.Timed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

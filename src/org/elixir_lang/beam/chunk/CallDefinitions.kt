@@ -1,7 +1,7 @@
 package org.elixir_lang.beam.chunk
 
 import gnu.trove.THashSet
-import org.elixir_lang.Visibility
+import org.elixir_lang.call.Visibility
 import org.elixir_lang.beam.Beam
 import org.elixir_lang.beam.chunk.Chunk.Companion.unsignedInt
 import org.elixir_lang.beam.chunk.call_definitions.CallDefinition.Companion.from
@@ -40,7 +40,8 @@ class CallDefinitions(private val typeID: TypeID, var callDefinitionCollection: 
     fun size(): Int = callDefinitionCollection.size
 
     companion object {
-        private val VISIBILITY_BY_TYPE_ID: Map<TypeID, Visibility> = mapOf(TypeID.EXPT to Visibility.PUBLIC, TypeID.LOCT to Visibility.PRIVATE)
+        private val VISIBILITY_BY_TYPE_ID: Map<TypeID, Visibility> =
+            mapOf(TypeID.EXPT to Visibility.PUBLIC, TypeID.LOCT to Visibility.PRIVATE)
 
         fun from(chunk: Chunk, typeID: TypeID, atoms: Atoms?): CallDefinitions? =
             if (chunk.typeID == typeID.toString() && chunk.data.size >= 4) {

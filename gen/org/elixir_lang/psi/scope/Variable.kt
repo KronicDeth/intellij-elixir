@@ -68,6 +68,8 @@ abstract class Variable : PsiScopeProcessor {
                 is QualifiedMultipleAliases -> execute(element, state)
                 // stop at file.  No reason to look in directories
                 is PsiFile -> false
+                // compiled elements don't have variables
+                is PsiCompiledElement -> false
                 /* KeywordLists happen in map, struct and {@code do: <body>} matches, while KeywordKey happens only in
                    bindQuoted */
                 is QuotableKeywordList -> execute(element, state)
@@ -96,7 +98,8 @@ abstract class Variable : PsiScopeProcessor {
                                     element is QualifiableAlias ||
                                     element is QualifiedBracketOperation ||
                                     element is UnqualifiedBracketOperation ||
-                                    element is WholeNumber || element.node.elementType == GeneratedParserUtilBase.DUMMY_BLOCK)) {
+                                    element is WholeNumber ||
+                                element.node?.elementType == GeneratedParserUtilBase.DUMMY_BLOCK)) {
                         Logger.error(Callable::class.java, "Don't know how to resolve variable in match", element)
                     }
 

@@ -1,5 +1,35 @@
 <html>
 <body>
+<h1>v12.2.1</h1>
+<ul>
+  <li>
+    <p>Bug Fixes</p>
+    <ul dir="auto">
+      <li>
+        <p dir="auto">Don't call <code>.navigationElement</code> to prevent unnecessary decompilation when resolving references or showing completions.</p>
+        <ul dir="auto">
+          <li>Don't call <code>navigationElement</code> in <code>ChooseByNameContributor</code></li>
+          <li>Don't decompile Protocols to get their specific <code>t</code> type</li>
+          <li>Don't call <code>.navigationElement</code> when resolving built-in types in <code>:erlang</code></li>
+          <li>Don't use <code>navigationElement</code> in <code>CallDefinitionClause.implicitImports</code> for <code>Kernel</code> and <code>KernelSpecial.Forms</code>.</li>
+          <li>Don't call <code>.navigationElement</code> in <code>reference.resolver.Module.multiResolveProject</code><br>
+            Prevents decompiling modules when doing completion.</li>
+        </ul>
+        <p dir="auto">Handle <code>PsiCompiledElement</code> in places that previously only handled source and decompiled <code>Call</code>s</p>
+        <ul dir="auto">
+          <li><code>getElementDescription</code> for ModuleImpl</li>
+          <li>Complete call definition under binary modules</li>
+          <li>Don't look for variables in compiled elements</li>
+          <li>Don't assume elements have a non-null node<br>
+            Decompiled elements don't</li>
+          <li>Index <code>TypeDefinition</code>s in .beam files<br>
+            Only supported built-in types faked in <code>:erlang</code> for now</li>
+          <li>Walk <code>ModuleImpl</code> for <code>scope.Type</code></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
 <h1>v12.2.0</h1>
 <ul>
   <li>

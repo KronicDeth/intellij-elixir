@@ -1,14 +1,11 @@
 package org.elixir_lang.psi
 
+import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase
 import org.elixir_lang.NameArityInterval
-import org.elixir_lang.NameArityRange
-import org.elixir_lang.psi.call.Call
-
-import java.util.ArrayList
-
 import org.elixir_lang.psi.CallDefinitionClause.nameArityInterval
+import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.enclosingMacroCall
 
@@ -30,8 +27,9 @@ class ImportTest : LightPlatformCodeInsightFixtureTestCase() {
         val call = maybeCall as Call
         assertTrue(Import.`is`(call))
 
-        val importedCallList = ArrayList<Call>()
-        val resolveState = ResolveState.initial().put(ENTRANCE, call.enclosingMacroCall()).putInitialVisitedElement(call)
+        val importedCallList = ArrayList<PsiElement>()
+        val resolveState =
+            ResolveState.initial().put(ENTRANCE, call.enclosingMacroCall()).putInitialVisitedElement(call)
 
         Import.treeWalkUp(call, resolveState) { call1, _ ->
             importedCallList.add(call1)
@@ -54,8 +52,9 @@ class ImportTest : LightPlatformCodeInsightFixtureTestCase() {
         val call = maybeCall as Call
         assertTrue(Import.`is`(call))
 
-        val importedCallList = ArrayList<Call>()
-        val resolveState = ResolveState.initial().put(ENTRANCE, call.enclosingMacroCall()).putInitialVisitedElement(call)
+        val importedCallList = ArrayList<PsiElement>()
+        val resolveState =
+            ResolveState.initial().put(ENTRANCE, call.enclosingMacroCall()).putInitialVisitedElement(call)
 
         Import.treeWalkUp(call, resolveState) { call1, _ ->
             importedCallList.add(call1)
@@ -65,15 +64,18 @@ class ImportTest : LightPlatformCodeInsightFixtureTestCase() {
         assertEquals(2, importedCallList.size)
 
         val nameArityIntervalList = importedCallList.map { importedCall ->
-            nameArityInterval(importedCall, ResolveState.initial())
+            when (importedCall) {
+                is Call -> nameArityInterval(importedCall, ResolveState.initial())
+                else -> TODO()
+            }
         }
 
         assertContainsElements(
-                listOf(
-                        NameArityInterval("imported", ArityInterval(1, 1)),
-                        NameArityInterval("imported", ArityInterval(0, 0))
-                ),
-                nameArityIntervalList
+            listOf(
+                NameArityInterval("imported", ArityInterval(1, 1)),
+                NameArityInterval("imported", ArityInterval(0, 0))
+            ),
+            nameArityIntervalList
         )
     }
 
@@ -90,11 +92,12 @@ class ImportTest : LightPlatformCodeInsightFixtureTestCase() {
         val call = maybeCall as Call
         assertTrue(Import.`is`(call))
 
-        val importedCallList = ArrayList<Call>()
-        val resolveState = ResolveState.initial().put(ENTRANCE, call.enclosingMacroCall()).putInitialVisitedElement(call)
+        val importedCallList = ArrayList<PsiElement>()
+        val resolveState =
+            ResolveState.initial().put(ENTRANCE, call.enclosingMacroCall()).putInitialVisitedElement(call)
 
-        Import.treeWalkUp(call, resolveState) { call1, _ ->
-            importedCallList.add(call1)
+        Import.treeWalkUp(call, resolveState) { element, _ ->
+            importedCallList.add(element)
             true
         }
 
@@ -103,8 +106,8 @@ class ImportTest : LightPlatformCodeInsightFixtureTestCase() {
         val importedCall = importedCallList[0]
 
         assertEquals(
-                NameArityInterval("imported", ArityInterval(0, 0)),
-                nameArityInterval(importedCall, ResolveState.initial())
+            NameArityInterval("imported", ArityInterval(0, 0)),
+            nameArityInterval(importedCall as Call, ResolveState.initial())
         )
     }
 

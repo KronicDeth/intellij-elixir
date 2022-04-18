@@ -7,6 +7,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.EEx.FUNCTION_FROM_FILE_ARITY_RANGE
 import org.elixir_lang.EEx.FUNCTION_FROM_STRING_ARITY_RANGE
 import org.elixir_lang.NameArityInterval
+import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.CallDefinitionClause.nameArityInterval
 import org.elixir_lang.psi.call.Call
@@ -43,6 +44,9 @@ private constructor(
             nameArityInterval(element, state)
                     ?.let { addIfNameOrArityToResolveResults(element, it, state) }
                     ?: true
+
+    override fun execute(element: CallDefinitionImpl<*>, state: ResolveState): Boolean =
+        addIfNameOrArityToResolveResults(element, element.nameArityInterval, state)
 
     override fun executeOnCallback(element: AtUnqualifiedNoParenthesesCall<*>, state: ResolveState): Boolean =
             Callback.headCall(element)
@@ -158,6 +162,15 @@ private constructor(
         return addIfNameOrArityToResolveResults(call, name, validArity, state)
     }
 
+    private fun addIfNameOrArityToResolveResults(callDefinitionImpl: CallDefinitionImpl<*>,
+                                                 nameArityInterval: NameArityInterval,
+                                                 state: ResolveState): Boolean {
+        val name = nameArityInterval.name
+        val validArity = resolvedPrimaryArity in nameArityInterval.arityInterval
+
+        return addIfNameOrArityToResolveResults(callDefinitionImpl, name, validArity, state)
+    }
+
     private fun addIfNameOrArityToResolveResults(call: Call, name: String, validArity: Boolean, state: ResolveState): Boolean =
             if ((this.name == null && (incompleteCode || validArity)) ||
                     (this.name != null && name.startsWith(this.name))) {
@@ -167,6 +180,19 @@ private constructor(
             } else {
                 true
             }
+
+    private fun addIfNameOrArityToResolveResults(callDefinitionImpl: CallDefinitionImpl<*>,
+                                                 name: String,
+                                                 validArity: Boolean,
+                                                 state: ResolveState) : Boolean =
+        if ((this.name == null && (incompleteCode || validArity)) ||
+            (this.name != null && name.startsWith(this.name))) {
+            val validResult = validArity && name == this.name
+
+            addToResolveResults(callDefinitionImpl, name, validResult, state)
+        } else {
+            true
+        }
 
     override fun keepProcessing(): Boolean = resolveResultOrderedSet.keepProcessing(incompleteCode)
     fun resolveResults(): List<VisitedElementSetResolveResult> = resolveResultOrderedSet.toList()
@@ -183,6 +209,15 @@ private constructor(
 
                 keepProcessing()
             } ?: true
+
+    private fun addToResolveResults(callDefinitionImpl: CallDefinitionImpl<*>,
+                                    name: String,
+                                    validResult: Boolean,
+                                    state: ResolveState): Boolean {
+        resolveResultOrderedSet.add(callDefinitionImpl, name, validResult, state.visitedElementSet())
+
+        return keepProcessing()
+    }
 
     companion object {
         @JvmOverloads

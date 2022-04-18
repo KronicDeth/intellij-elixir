@@ -2,7 +2,7 @@ package org.elixir_lang.structure_view.element;
 
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
-import org.elixir_lang.Visibility;
+import org.elixir_lang.call.Visibility;
 import org.elixir_lang.navigation.item_presentation.Parent;
 import org.elixir_lang.psi.QuotableKeywordPair;
 import org.elixir_lang.structure_view.element.modular.Modular;
@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Much like a {@link CallDefinition}, but
- *
+ * <p>
  * 1) A call reference exists as an element in the PSI.
  * 2) The arity or name may not be fully resolved due to syntactically valid, but semantically invalid code.
  */

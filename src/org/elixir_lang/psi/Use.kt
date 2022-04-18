@@ -21,7 +21,11 @@ object Use {
      * macro called by `useCall` while `keepProcessing` returns `true`.  Stops the first time `keepProcessing`
      * returns `false`.
      */
-    fun treeWalkUp(useCall: Call, resolveState: ResolveState, keepProcessing: (PsiElement, ResolveState) -> Boolean): Boolean {
+    fun treeWalkUp(
+        useCall: Call,
+        resolveState: ResolveState,
+        keepProcessing: (PsiElement, ResolveState) -> Boolean
+    ): Boolean {
         var accumulatedKeepProcessing = true
 
         // don't descend back into `use` when the entrance is the alias to the `use` like `MyAlias` in `use MyAlias`.
@@ -33,10 +37,10 @@ object Use {
                     val childResolveState = useCallResolveState.putVisitedElement(definer)
 
                     accumulatedKeepProcessing = Using.treeWalkUp(
-                            usingCall = definer,
-                            useCall = useCall,
-                            resolveState = childResolveState,
-                            keepProcessing = keepProcessing
+                        using = definer,
+                        use = useCall,
+                        resolveState = childResolveState,
+                        keepProcessing = keepProcessing
                     )
 
                     if (!accumulatedKeepProcessing) {
@@ -73,10 +77,10 @@ object Use {
      * @return `defmodule`, `defimpl`, or `defprotocol` used by `useCall`.  It can be `null` if Alias passed to
      *    `useCall` cannot be resolved.
      */
-    fun modulars(useCall: Call): Set<Call> =
-            useCall
-                    .finalArguments()
-                    ?.firstOrNull()
-                    ?.maybeModularNameToModulars(maxScope = useCall.parent, useCall = useCall, incompleteCode = false)
-                    ?: emptySet()
+    fun modulars(useCall: Call): Set<PsiElement> =
+        useCall
+            .finalArguments()
+            ?.firstOrNull()
+            ?.maybeModularNameToModulars(maxScope = useCall.parent, useCall = useCall, incompleteCode = false)
+            ?: emptySet()
 }

@@ -7,16 +7,18 @@ import com.intellij.psi.ElementDescriptionLocation
 import com.intellij.usageView.UsageViewTypeLocation
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil
 import com.intellij.psi.PsiElement
-import org.elixir_lang.Visibility
+import org.elixir_lang.call.Visibility
 import org.elixir_lang.navigation.item_presentation.Parent
 import org.elixir_lang.psi.ElixirMatchedWhenOperation
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.structure_view.element.modular.Modular
 
-class Type(private val modular: Modular,
-        moduleAttributeDefinition: AtUnqualifiedNoParenthesesCall<*>,
-        private val opaque: Boolean,
-        private val visibility: Visibility) : Element<AtUnqualifiedNoParenthesesCall<*>?>(moduleAttributeDefinition), Visible {
+class Type(
+    private val modular: Modular,
+    moduleAttributeDefinition: AtUnqualifiedNoParenthesesCall<*>,
+    private val opaque: Boolean,
+    private val visibility: Visibility
+) : Element<AtUnqualifiedNoParenthesesCall<*>?>(moduleAttributeDefinition), Visible {
 
     /**
      * No children.
@@ -35,10 +37,10 @@ class Type(private val modular: Modular,
         val location = parentPresentation.locatedPresentableText
 
         return org.elixir_lang.navigation.item_presentation.Type(
-                location,
-                type(navigationItem!!),
-                opaque,
-                visibility
+            location,
+            type(navigationItem!!),
+            opaque,
+            visibility
         )
     }
 
@@ -52,18 +54,19 @@ class Type(private val modular: Modular,
 
     companion object {
         fun elementDescription(call: Call?, location: ElementDescriptionLocation): String? =
-                if (location === UsageViewTypeLocation.INSTANCE) {
-                    "type"
-                } else {
-                    null
-                }
+            if (location === UsageViewTypeLocation.INSTANCE) {
+                "type"
+            } else {
+                null
+            }
 
         fun fromCall(modular: Modular, call: Call): Type =
-                fromAtUnqualifiedNoParenthesesCall(modular, call as AtUnqualifiedNoParenthesesCall<*>)
+            fromAtUnqualifiedNoParenthesesCall(modular, call as AtUnqualifiedNoParenthesesCall<*>)
 
         fun fromAtUnqualifiedNoParenthesesCall(
-                modular: Modular,
-                moduleAttributeDefinition: AtUnqualifiedNoParenthesesCall<*>): Type {
+            modular: Modular,
+            moduleAttributeDefinition: AtUnqualifiedNoParenthesesCall<*>
+        ): Type {
             val moduleAttributeName = ElixirPsiImplUtil.moduleAttributeName(moduleAttributeDefinition)
             val opaque = isOpaque(moduleAttributeName)
             val visibility = visibility(moduleAttributeName)
@@ -81,20 +84,20 @@ class Type(private val modular: Modular,
         private fun isOpaque(moduleAttributeName: String): Boolean = moduleAttributeName == "@opaque"
 
         fun nameIdentifier(atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>): PsiElement? =
-                specification(atUnqualifiedNoParenthesesCall)?.let { specificationType(it) }?.let { typeNameIdentifier(it) }
+            specification(atUnqualifiedNoParenthesesCall)?.let { specificationType(it) }?.let { typeNameIdentifier(it) }
 
         fun nameIdentifier(call: Call): PsiElement? =
-                (call as? AtUnqualifiedNoParenthesesCall<*>)?.let { nameIdentifier(it) }
+            (call as? AtUnqualifiedNoParenthesesCall<*>)?.let { nameIdentifier(it) }
 
         fun specification(atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>): Call? =
-                (atUnqualifiedNoParenthesesCall.noParenthesesOneArgument.arguments().singleOrNull() as? Call)
+            (atUnqualifiedNoParenthesesCall.noParenthesesOneArgument.arguments().singleOrNull() as? Call)
 
         private fun specificationType(specification: Call): Call? =
-                when (specification) {
-                    is org.elixir_lang.psi.operation.Type -> CallDefinitionSpecification.type(specification as org.elixir_lang.psi.operation.Type)
-                    is ElixirMatchedWhenOperation -> CallDefinitionSpecification.type(specification)
-                    else -> null
-                }
+            when (specification) {
+                is org.elixir_lang.psi.operation.Type -> CallDefinitionSpecification.type(specification as org.elixir_lang.psi.operation.Type)
+                is ElixirMatchedWhenOperation -> CallDefinitionSpecification.type(specification)
+                else -> null
+            }
 
         fun type(atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>): Call? =
             atUnqualifiedNoParenthesesCall.noParenthesesOneArgument.arguments().singleOrNull()?.let { it as? Call }

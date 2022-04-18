@@ -3,7 +3,7 @@ package org.elixir_lang.structure_view.element
 import com.intellij.ide.util.treeView.smartTree.TreeElement
 import com.intellij.navigation.ItemPresentation
 import com.intellij.psi.PsiElement
-import org.elixir_lang.Visibility
+import org.elixir_lang.call.Visibility
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.navigation.item_presentation.NameArity
 import org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall
@@ -17,11 +17,8 @@ import org.elixir_lang.psi.CallDefinitionClause.isPrivateMacro
 import org.elixir_lang.psi.CallDefinitionClause.isPublicFunction
 import org.elixir_lang.psi.CallDefinitionClause.isPublicGuard
 import org.elixir_lang.psi.CallDefinitionClause.isPublicMacro
-import org.elixir_lang.psi.For
 import org.elixir_lang.psi.QuoteMacro
 import org.elixir_lang.psi.call.Call
-import org.elixir_lang.psi.call.name.Function.ALIAS
-import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.call.macroChildCalls
 import org.elixir_lang.psi.impl.enclosingMacroCall
 import org.elixir_lang.structure_view.element.modular.*
@@ -35,7 +32,7 @@ import java.util.*
  * @param call           a def(macro)?p? call
  */
 class CallDefinitionClause(val callDefinition: CallDefinition, call: Call) :
-        Element<Call>(call), Presentable, Visible {
+    Element<Call>(call), Presentable, Visible {
     private val visibility: Visibility = visibility(call)
 
     /*
@@ -53,11 +50,11 @@ class CallDefinitionClause(val callDefinition: CallDefinition, call: Call) :
      * @return the element presentation.
      */
     override fun getPresentation(): ItemPresentation =
-            org.elixir_lang.navigation.item_presentation.CallDefinitionHead(
-                    callDefinition.presentation as NameArity,
-                    visibility(),
-                    head(navigationItem)!!
-            )
+        org.elixir_lang.navigation.item_presentation.CallDefinitionHead(
+            callDefinition.presentation as NameArity,
+            visibility(),
+            head(navigationItem)!!
+        )
 
     /**
      * The visibility of the element.
@@ -108,9 +105,9 @@ class CallDefinitionClause(val callDefinition: CallDefinition, call: Call) :
          */
         @Contract(pure = true)
         fun enclosingModular(call: Call): Modular? =
-                enclosingModularMacroCall(call)?.let {
-                    modular(it)
-                }
+            enclosingModularMacroCall(call)?.let {
+                modular(it)
+            }
 
         @Contract(pure = true)
         fun modular(enclosingMacroCall: Call): Modular? {
@@ -137,14 +134,14 @@ class CallDefinitionClause(val callDefinition: CallDefinition, call: Call) :
 
                     if (callDefinitionClause == null) {
                         Logger.error(
-                                CallDefinitionClause::class.java,
-                                "Cannot construct CallDefinitionClause from quote's enclosing macro call",
-                                quoteEnclosingMacroCall
+                            CallDefinitionClause::class.java,
+                            "Cannot construct CallDefinitionClause from quote's enclosing macro call",
+                            quoteEnclosingMacroCall
                         )
                     } else {
                         quote = Quote(
-                                callDefinitionClause,
-                                enclosingMacroCall
+                            callDefinitionClause,
+                            enclosingMacroCall
                         )
                     }
                 } else {
@@ -170,16 +167,16 @@ class CallDefinitionClause(val callDefinition: CallDefinition, call: Call) :
          * @return [Timed.Time.COMPILE] for `defmacrop?`; [Timed.Time.RUN] for `defp?`
          */
         fun time(call: Call): Timed.Time =
-                when {
-                    isFunction(call) -> Timed.Time.RUN
-                    isGuard(call) -> Timed.Time.RUN
-                    isMacro(call) -> Timed.Time.COMPILE
-                    else -> {
-                        Logger.error(logger, "Don't whether call is at runtime or compile-time", call)
+            when {
+                isFunction(call) -> Timed.Time.RUN
+                isGuard(call) -> Timed.Time.RUN
+                isMacro(call) -> Timed.Time.COMPILE
+                else -> {
+                    Logger.error(logger, "Don't whether call is at runtime or compile-time", call)
 
-                        Timed.Time.RUN
-                    }
+                    Timed.Time.RUN
                 }
+            }
 
         /**
          * @param call
@@ -187,15 +184,15 @@ class CallDefinitionClause(val callDefinition: CallDefinition, call: Call) :
          * for `defp` and `defmacrop`; `null` only if `call` is unrecognized
          */
         fun visibility(call: Call): Visibility =
-                if (isPublicFunction(call) || isPublicMacro(call) || isPublicGuard(call)) {
-                    Visibility.PUBLIC
-                } else if (isPrivateFunction(call) || isPrivateMacro(call) || isPrivateGuard(call)) {
-                    Visibility.PRIVATE
-                } else {
-                    Logger.error(logger, "Don't know whether call is public or private", call)
+            if (isPublicFunction(call) || isPublicMacro(call) || isPublicGuard(call)) {
+                Visibility.PUBLIC
+            } else if (isPrivateFunction(call) || isPrivateMacro(call) || isPrivateGuard(call)) {
+                Visibility.PRIVATE
+            } else {
+                Logger.error(logger, "Don't know whether call is public or private", call)
 
-                    Visibility.PUBLIC
-                }
+                Visibility.PUBLIC
+            }
 
         /**
          * Constructs [.callDefinition] from `code`, such as when showing structure in Go To Symbol
@@ -203,9 +200,9 @@ class CallDefinitionClause(val callDefinition: CallDefinition, call: Call) :
          * @param call a def(macro)?p? call
          */
         fun fromCall(call: Call): CallDefinitionClause? =
-                CallDefinition.fromCall(call)?.let {
-                    CallDefinitionClause(it, call)
-                }
+            CallDefinition.fromCall(call)?.let {
+                CallDefinitionClause(it, call)
+            }
 
         private val logger by lazy { com.intellij.openapi.diagnostic.Logger.getInstance(CallDefinitionClause::class.java) }
     }

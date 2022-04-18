@@ -1,7 +1,7 @@
 package org.elixir_lang.navigation.item_presentation;
 
 import com.intellij.navigation.ItemPresentation;
-import org.elixir_lang.Visibility;
+import org.elixir_lang.call.Visibility;
 import org.elixir_lang.name_arity.PresentationData;
 import org.elixir_lang.structure_view.element.Timed;
 import org.jetbrains.annotations.NotNull;
@@ -35,7 +35,6 @@ public class NameArity implements ItemPresentation {
     private final Visibility visibility;
 
     /**
-     *
      * @param location
      * @param time
      * @param visibility {@code null} if clauses are a mix of private and public

@@ -10,19 +10,20 @@ import com.intellij.psi.ResolveResult
 import com.intellij.psi.impl.source.resolve.ResolveCache
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
-import org.elixir_lang.psi.*
+import org.elixir_lang.psi.Alias
+import org.elixir_lang.psi.NamedElement
+import org.elixir_lang.psi.Require
+import org.elixir_lang.psi.Use
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.scope.VisitedElementSetResolveResult
 import org.elixir_lang.psi.scope.module.MultiResolve
 import org.elixir_lang.psi.stub.index.ModularName
-import org.elixir_lang.reference.Resolver
-import org.elixir_lang.structure_view.element.Delegation
 
 
 object Module : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Module> {
     override fun resolve(
-            module: org.elixir_lang.reference.Module,
-            incompleteCode: Boolean
+        module: org.elixir_lang.reference.Module,
+        incompleteCode: Boolean
     ): Array<ResolveResult> {
         val element = module.element
         val name = element.fullyQualifiedName()
@@ -38,47 +39,53 @@ object Module : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Modul
     }
 
     private fun expand(visitedElementSetResolveResultList: List<VisitedElementSetResolveResult>): List<PsiElementResolveResult> =
-            visitedElementSetResolveResultList
-                    .flatMap { visitedElementSetResolveResult ->
-                        val visitedElementSet = visitedElementSetResolveResult.visitedElementSet
-                        val validResult = visitedElementSetResolveResult.isValidResult
+        visitedElementSetResolveResultList
+            .flatMap { visitedElementSetResolveResult ->
+                val visitedElementSet = visitedElementSetResolveResult.visitedElementSet
+                val validResult = visitedElementSetResolveResult.isValidResult
 
-                        val pathResolveResultList =
-                                visitedElementSet
-                                        .filter { visitedElement ->
-                                            visitedElement.let { it as? Call }?.let { visitedCall ->
-                                                Alias.`is`(visitedCall) || Require.`is`(visitedCall) || Use.`is`(visitedCall)
-                                            } ?: false
-                                        }
-                                        .map { PsiElementResolveResult(it, validResult) }
+                val pathResolveResultList =
+                    visitedElementSet
+                        .filter { visitedElement ->
+                            visitedElement.let { it as? Call }?.let { visitedCall ->
+                                Alias.`is`(visitedCall) || Require.`is`(visitedCall) || Use.`is`(visitedCall)
+                            } ?: false
+                        }
+                        .map { PsiElementResolveResult(it, validResult) }
 
-                        val terminalResolveResult = PsiElementResolveResult(
-                                visitedElementSetResolveResult.element,
-                                visitedElementSetResolveResult.isValidResult
-                        )
+                val terminalResolveResult = PsiElementResolveResult(
+                    visitedElementSetResolveResult.element,
+                    visitedElementSetResolveResult.isValidResult
+                )
 
-                        listOf(terminalResolveResult) + pathResolveResultList
-                    }
-                    // deduplicate shared `defdelegate`, `import`, or `use`
-                    .groupBy { it.element }
-                    .map { (_element, resolveResults) -> resolveResults.first() }
+                listOf(terminalResolveResult) + pathResolveResultList
+            }
+            // deduplicate shared `defdelegate`, `import`, or `use`
+            .groupBy { it.element }
+            .map { (_element, resolveResults) -> resolveResults.first() }
 
-    private fun resolvePreferred(element: PsiElement, name: String, incompleteCode: Boolean): List<VisitedElementSetResolveResult> {
+    private fun resolvePreferred(
+        element: PsiElement,
+        name: String,
+        incompleteCode: Boolean
+    ): List<VisitedElementSetResolveResult> {
         val all = resolveAll(element, name, incompleteCode)
 
         return org.elixir_lang.reference.Resolver.preferred(element, incompleteCode, all)
     }
 
     private fun resolveAll(element: PsiElement, name: String, incompleteCode: Boolean) =
-            resolveInScope(element, name, incompleteCode)
-                    .takeIf { set -> set.any(ResolveResult::isValidResult) }
-                    ?: multiResolveProject(element, name)
+        resolveInScope(element, name, incompleteCode)
+            .takeIf { set -> set.any(ResolveResult::isValidResult) }
+            ?: multiResolveProject(element, name)
 
     private fun resolveInScope(element: PsiElement, name: String, incompleteCode: Boolean) =
-       MultiResolve.resolveResults(name, incompleteCode, element)
+        MultiResolve.resolveResults(name, incompleteCode, element)
 
-    private fun multiResolveProject(entrance: PsiElement,
-                                    name: String): List<VisitedElementSetResolveResult> {
+    private fun multiResolveProject(
+        entrance: PsiElement,
+        name: String
+    ): List<VisitedElementSetResolveResult> {
         val resolveResultList = mutableListOf<VisitedElementSetResolveResult>()
         val project = entrance.project
 
@@ -92,15 +99,15 @@ object Module : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Modul
                 val includeTests = entranceVirtualFile?.let { projectFileIndex.isInTestSourceContent(it) } ?: false
                 // DOES NOT include the libraries sources, but...
                 val moduleWithDependenciesAndLibrariesScope =
-                        GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module, includeTests)
+                    GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module, includeTests)
 
                 entranceVirtualFile?.let {
                     // ... we prefer sources compared to decompiled, so use LibraryScope to get the Library source too.
                     val orderEntries = projectFileIndex.getOrderEntriesForFile(entranceVirtualFile)
                     val libraryScope =
-                            LibraryScopeCache
-                                    .getInstance(project)
-                                    .getLibraryScope(orderEntries)
+                        LibraryScopeCache
+                            .getInstance(project)
+                            .getLibraryScope(orderEntries)
 
                     moduleWithDependenciesAndLibrariesScope.uniteWith(libraryScope)
                 } ?: moduleWithDependenciesAndLibrariesScope
@@ -109,12 +116,22 @@ object Module : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Modul
             }
 
             StubIndex
-                    .getInstance()
-                    .processElements(ModularName.KEY, name, project, globalSearchScope, null, NamedElement::class.java) { namedElement ->
-                        /* The namedElement may be a ModuleImpl from a .beam.  Using #getNaviationElement() ensures a source
-                       (either true source or decompiled) is used. */
-                        resolveResultList.add(VisitedElementSetResolveResult(namedElement.navigationElement))
-                    }
+                .getInstance()
+                .processElements(
+                    ModularName.KEY,
+                    name,
+                    project,
+                    globalSearchScope,
+                    null,
+                    NamedElement::class.java
+                ) { namedElement ->
+                    /**
+                     * Don't use `namedElement.navigationElement` as it triggers decompiling of the whole module,
+                     * which will parse the whole Module text, which is overkill to get the module's name that is
+                     * available in the `ModuleImpl` alone.
+                     */
+                    resolveResultList.add(VisitedElementSetResolveResult(namedElement))
+                }
         }
 
         return resolveResultList

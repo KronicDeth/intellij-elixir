@@ -13,6 +13,8 @@ import com.intellij.util.Function
 import org.elixir_lang.Arity
 import org.elixir_lang.Name
 import org.elixir_lang.NameArityInterval
+import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
+import org.elixir_lang.beam.psi.impl.ModuleImpl
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.IMPORT
@@ -37,9 +39,11 @@ object Import {
     fun `is`(call: Call): Boolean = call.isCalling(KERNEL, IMPORT) && call.resolvedFinalArity() in 1..2
 
     @JvmStatic
-    fun treeWalkUp(importCall: Call,
-                   resolveState: ResolveState,
-                   keepProcessing: (Call, ResolveState) -> Boolean): Boolean {
+    fun treeWalkUp(
+        importCall: Call,
+        resolveState: ResolveState,
+        keepProcessing: (PsiElement, ResolveState) -> Boolean
+    ): Boolean {
         var accumulatedKeepProcessing = true
 
         // don't descend back into `import` when the entrance is the alis to the `import` like `MyAlias` in
@@ -54,7 +58,8 @@ object Import {
                 for (modular in modulars) {
                     val childResolveState = importCallResolveState.putVisitedElement(modular)
 
-                    accumulatedKeepProcessing = treeWalkUpImportedModular(modular, filter, childResolveState, keepProcessing)
+                    accumulatedKeepProcessing =
+                        treeWalkUpImportedModular(modular, filter, childResolveState, keepProcessing)
 
                     if (!accumulatedKeepProcessing) {
                         break
@@ -66,32 +71,60 @@ object Import {
         return accumulatedKeepProcessing
     }
 
-    private fun treeWalkUpImportedModular(importedModular: Call,
-                                          filter: (NameArityInterval) -> Boolean,
-                                          resolveState: ResolveState,
-                                          keepProcessing: (Call, ResolveState) -> Boolean): Boolean =
-            importedModular
-                    .stabBodyChildExpressions()
-                    ?.filterIsInstance<Call>()
-                    ?.filter { !resolveState.hasBeenVisited(it) }
-                    ?.map { treeWalkUpImportedModularChildExpression(filter, it, resolveState, keepProcessing) }
-                    ?.takeWhile { it }
-                    ?.lastOrNull()
-                    ?: true
+    private fun treeWalkUpImportedModular(
+        importedModular: PsiElement,
+        filter: (NameArityInterval) -> Boolean,
+        resolveState: ResolveState,
+        keepProcessing: (PsiElement, ResolveState) -> Boolean
+    ): Boolean =
+        when (importedModular) {
+            is Call -> treeWalkUpImportedModular(importedModular, filter, resolveState, keepProcessing)
+            is ModuleImpl<*> -> treeWalkUpImportedModular(importedModular, filter, resolveState, keepProcessing)
+            else -> true
+        }
+
+    private fun treeWalkUpImportedModular(
+        importedModular: Call,
+        filter: (NameArityInterval) -> Boolean,
+        resolveState: ResolveState,
+        keepProcessing: (PsiElement, ResolveState) -> Boolean
+    ): Boolean =
+        importedModular
+            .stabBodyChildExpressions()
+            ?.filterIsInstance<Call>()
+            ?.filter { !resolveState.hasBeenVisited(it) }
+            ?.map { treeWalkUpImportedModularChildExpression(filter, it, resolveState, keepProcessing) }
+            ?.takeWhile { it }
+            ?.lastOrNull()
+            ?: true
+
+    private fun treeWalkUpImportedModular(
+        importedModular: ModuleImpl<*>,
+        filter: (NameArityInterval) -> Boolean,
+        resolveState: ResolveState,
+        keepProcessing: (PsiElement, ResolveState) -> Boolean
+    ): Boolean =
+        importedModular
+            .callDefinitions()
+            .map { treeWalkUpImportedModularChildExpression(filter, it, resolveState, keepProcessing) }
+            .takeWhile { it }
+            .lastOrNull()
+            ?: true
 
     private fun treeWalkUpImportedModularChildExpression(
-            filter: (NameArityInterval) -> Boolean,
-            importedCall: Call,
-            resolveState: ResolveState,
-            keepProcessing: (Call, ResolveState) -> Boolean): Boolean =
+        filter: (NameArityInterval) -> Boolean,
+        importedCall: Call,
+        resolveState: ResolveState,
+        keepProcessing: (Call, ResolveState) -> Boolean
+    ): Boolean =
         when {
             CallDefinitionClause.`is`(importedCall) -> {
                 CallDefinitionClause.nameArityInterval(importedCall, resolveState)?.let { nameArityInterval ->
-                     if (filter(nameArityInterval)) {
-                         keepProcessing(importedCall, resolveState)
-                     } else {
-                         true
-                     }
+                    if (filter(nameArityInterval)) {
+                        keepProcessing(importedCall, resolveState)
+                    } else {
+                        true
+                    }
                 }
             }
             Delegation.`is`(importedCall) -> {
@@ -109,14 +142,31 @@ object Import {
             }
             else -> null
         }
-                ?: true
+            ?: true
+
+    private fun treeWalkUpImportedModularChildExpression(
+        filter: (NameArityInterval) -> Boolean,
+        importedCall: CallDefinitionImpl<*>,
+        resolveState: ResolveState,
+        keepProcessing: (PsiElement, ResolveState) -> Boolean
+    ): Boolean {
+        val nameArityInterval = importedCall.nameArityInterval
+
+
+
+        return if (filter(nameArityInterval)) {
+            keepProcessing(importedCall, resolveState)
+        } else {
+            true
+        }
+    }
 
     fun elementDescription(call: Call, location: ElementDescriptionLocation): String? =
-            when {
-                location === UsageViewTypeLocation.INSTANCE -> "import"
-                location === UsageViewNodeTextLocation.INSTANCE -> call.text
-                else -> null
-            }
+        when {
+            location === UsageViewTypeLocation.INSTANCE -> "import"
+            location === UsageViewNodeTextLocation.INSTANCE -> call.text
+            else -> null
+        }
 
 
     private fun aritiesByNameFromNameByArityKeywordList(list: ElixirList): Map<Name, List<Arity>> {
@@ -141,9 +191,9 @@ object Import {
     }
 
     private fun aritiesByNameFromNameByArityKeywordList(element: PsiElement): Map<String, List<Int>> =
-            (element.stripAccessExpression() as? ElixirList)?.let {
-                aritiesByNameFromNameByArityKeywordList(it)
-            } ?: emptyMap()
+        (element.stripAccessExpression() as? ElixirList)?.let {
+            aritiesByNameFromNameByArityKeywordList(it)
+        } ?: emptyMap()
 
     /**
      * A function that returns `true` for name arity intervals that are imported by `importCall`
@@ -193,18 +243,18 @@ object Import {
     private fun keywordKeyToName(keywordKey: Quotable): String? = (keywordKey.quote() as? OtpErlangAtom)?.atomValue()
 
     private fun keywordValueToArity(keywordValue: Quotable): Int? =
-            (keywordValue.quote() as? OtpErlangLong)?.let { quotedKeywordValue ->
-                try {
-                    quotedKeywordValue.intValue()
-                } catch (e: OtpErlangRangeException) {
-                    Logger.error(
-                            Import::class.java,
-                            "Arity in OtpErlangLong could not be downcast to an int",
-                            keywordValue
-                    )
-                    null
-                }
+        (keywordValue.quote() as? OtpErlangLong)?.let { quotedKeywordValue ->
+            try {
+                quotedKeywordValue.intValue()
+            } catch (e: OtpErlangRangeException) {
+                Logger.error(
+                    Import::class.java,
+                    "Arity in OtpErlangLong could not be downcast to an int",
+                    keywordValue
+                )
+                null
             }
+        }
 
     private fun onlyNameArityIntervalFilter(element: PsiElement): (NameArityInterval) -> Boolean {
         val aritiesByName = aritiesByNameFromNameByArityKeywordList(element)
@@ -222,12 +272,12 @@ object Import {
      * @return `defmodule`, `defimpl`, or `defprotocol` imported by `importCall`.  It can be
      * `null` if Alias passed to `importCall` cannot be resolved.
      */
-    private fun modulars(importCall: Call): Set<Call> =
-            importCall
-                    .finalArguments()
-                    ?.firstOrNull()
-                    ?.maybeModularNameToModulars(maxScope = importCall.parent, useCall = null, incompleteCode = false)
-                    ?: emptySet()
+    private fun modulars(importCall: Call): Set<PsiElement> =
+        importCall
+            .finalArguments()
+            ?.firstOrNull()
+            ?.maybeModularNameToModulars(maxScope = importCall.parent, useCall = null, incompleteCode = false)
+            ?: emptySet()
 
 
 }

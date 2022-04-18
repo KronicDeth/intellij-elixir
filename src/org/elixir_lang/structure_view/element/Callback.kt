@@ -6,7 +6,7 @@ import com.intellij.psi.ElementDescriptionLocation
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import com.intellij.usageView.UsageViewTypeLocation
-import org.elixir_lang.Visibility
+import org.elixir_lang.call.Visibility
 import org.elixir_lang.navigation.item_presentation.NameArity
 import org.elixir_lang.navigation.item_presentation.Parent
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
@@ -19,7 +19,7 @@ import org.elixir_lang.structure_view.element.modular.Modular
 import org.jetbrains.annotations.Contract
 
 class Callback(private val modular: Modular, navigationItem: Call) :
-        Element<AtUnqualifiedNoParenthesesCall<*>>(navigationItem as AtUnqualifiedNoParenthesesCall<*>), Timed {
+    Element<AtUnqualifiedNoParenthesesCall<*>>(navigationItem as AtUnqualifiedNoParenthesesCall<*>), Timed {
     /**
      * A callback's [.getPresentation] is a [NameArity] like a [CallDefinition], so like a call
      * definition, it's children are the specifications and clauses, since the callback has no clauses, the only child
@@ -28,12 +28,14 @@ class Callback(private val modular: Modular, navigationItem: Call) :
      * @return the list of children.
      */
     override fun getChildren(): Array<TreeElement> =
-            arrayOf(CallDefinitionSpecification(
-                    modular,
-                    navigationItem,
-                    true,
-                    time()
-            ))
+        arrayOf(
+            CallDefinitionSpecification(
+                modular,
+                navigationItem,
+                true,
+                time()
+            )
+        )
 
     /**
      * Returns the presentation of the tree element.
@@ -54,14 +56,14 @@ class Callback(private val modular: Modular, navigationItem: Call) :
         }
 
         return NameArity(
-                location,
-                true,
-                time(),
-                Visibility.PUBLIC,
-                false,
-                false,
-                name,
-                arity
+            location,
+            true,
+            time(),
+            Visibility.PUBLIC,
+            false,
+            false,
+            name,
+            arity
         )
     }
 
@@ -72,19 +74,19 @@ class Callback(private val modular: Modular, navigationItem: Call) :
      * [Time.RUN] for run time `def`, `defp`)
      */
     override fun time(): Timed.Time =
-            ElixirPsiImplUtil.moduleAttributeName(navigationItem).let { moduleAttributeName ->
-                when (moduleAttributeName) {
-                    "@callback" -> Timed.Time.RUN
-                    "@macrocallback" -> Timed.Time.COMPILE
-                    else -> TODO("Unknown callback $moduleAttributeName")
-                }
+        ElixirPsiImplUtil.moduleAttributeName(navigationItem).let { moduleAttributeName ->
+            when (moduleAttributeName) {
+                "@callback" -> Timed.Time.RUN
+                "@macrocallback" -> Timed.Time.COMPILE
+                else -> TODO("Unknown callback $moduleAttributeName")
             }
+        }
 
     companion object {
         @JvmStatic
         fun elementDescription(
-                @Suppress("UNUSED_PARAMETER") call: Call,
-                location: ElementDescriptionLocation
+            @Suppress("UNUSED_PARAMETER") call: Call,
+            location: ElementDescriptionLocation
         ): String? =
             if (location === UsageViewTypeLocation.INSTANCE) {
                 "callback"
@@ -94,20 +96,19 @@ class Callback(private val modular: Modular, navigationItem: Call) :
 
         @Contract(pure = true)
         fun headCall(atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>): Call? =
-                atUnqualifiedNoParenthesesCall
-                        .noParenthesesOneArgument
-                        .children
-                        .singleOrNull()
-                        ?.let { specificationHeadCall(it) }
+            atUnqualifiedNoParenthesesCall
+                .noParenthesesOneArgument
+                .children
+                .singleOrNull()
+                ?.let { specificationHeadCall(it) }
 
         @Contract(pure = true)
         fun `is`(call: Call): Boolean =
-                (call as? AtUnqualifiedNoParenthesesCall<*>)?.let {
-                    val moduleAttributeName = ElixirPsiImplUtil.moduleAttributeName(it)
+            (call as? AtUnqualifiedNoParenthesesCall<*>)?.let {
+                val moduleAttributeName = ElixirPsiImplUtil.moduleAttributeName(it)
 
-                    moduleAttributeName == "@callback" || moduleAttributeName == "@macrocallback"
-                } ?:
-                false
+                moduleAttributeName == "@callback" || moduleAttributeName == "@macrocallback"
+            } ?: false
 
         fun fromCall(call: Call): Callback? =
             enclosingModular(call)?.let { modular ->
@@ -116,7 +117,7 @@ class Callback(private val modular: Modular, navigationItem: Call) :
 
         @Contract(pure = true)
         fun nameIdentifier(call: Call): PsiElement? =
-                (call as? AtUnqualifiedNoParenthesesCall<*>)?.let { nameIdentifier(it) }
+            (call as? AtUnqualifiedNoParenthesesCall<*>)?.let { nameIdentifier(it) }
 
         @Contract(pure = true)
         fun nameIdentifier(atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>): PsiElement? =
@@ -130,11 +131,11 @@ class Callback(private val modular: Modular, navigationItem: Call) :
             }
 
         private fun specificationHeadCall(specification: PsiElement): Call? =
-                when (specification) {
-                    is Type -> typeHeadCall(specification)
-                    is ElixirMatchedWhenOperation -> parameterizedTypeHeadCall(specification)
-                    else -> null
-                }
+            when (specification) {
+                is Type -> typeHeadCall(specification)
+                is ElixirMatchedWhenOperation -> parameterizedTypeHeadCall(specification)
+                else -> null
+            }
 
         private fun typeHeadCall(typeOperation: Type): Call? = typeOperation.leftOperand() as? Call
     }
