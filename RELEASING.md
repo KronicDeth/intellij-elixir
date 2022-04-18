@@ -2,7 +2,9 @@
 
 ## Update README
 
-Any changes to the README are delayed until the last PR before release because in the past new users have read the README and assumed that any features in the README MUST exist in the version they can install from the JetBrains repository, so documenting `master` features in the README leads to just more support work.
+Any changes to the README are delayed until the last PR before release because in the past new users have read the
+README and assumed that any features in the README MUST exist in the version they can install from the JetBrains
+repository, so documenting `master` features in the README leads to just more support work.
 
 ## Build Release
 
@@ -12,12 +14,12 @@ Any changes to the README are delayed until the last PR before release because i
 ## Smoke Test Built Release
 
 1. Install the build plugin from disk
-    1. Preferences > Plugins
-    2. Click "Install plugin from disk..."
-    3. Select the `build/distributions/intellij-elixir-VERSION.zip`
-    4. Click Open
-    5. Click Apply
-    6. Click Restart
+  1. Preferences > Plugins
+  2. Click "Install plugin from disk..."
+  3. Select the `build/distributions/intellij-elixir-VERSION.zip`
+  4. Click Open
+  5. Click Apply
+  6. Click Restart
 3. Ensure no errors are raised during re-indexing and reparsing of any previously open files.
 4. Try out new features for this release
 
@@ -36,10 +38,10 @@ To create release notes for the new tag
 3. Click [Tags](https://github.com/KronicDeth/intellij-elixir/tags)
 4. Click "Add release notes" for tag you pushed
 5. Set the "Release title" to `vVERSION`
-6. Add the the release notes
-  1. Thanks for bug reporters for the release (use the Milestone filter to find issues fixed for the release version)
-  2. The changes from the for the release (copy directly from `CHANGELOG.md`)
-  3. README updates (copy directly from `README.md`)
+6. Add the release notes
+1. Thanks for bug reporters for the release (use the Milestone filter to find issues fixed for the release version)
+2. The changes from the for the release (copy directly from `CHANGELOG.md`)
+3. README updates (copy directly from `README.md`)
 7. Attach the `build/distributions/intellij-elixir-VERSION.zip` binary.
 8. Click Publish Release
 
@@ -53,7 +55,8 @@ To create release notes for the new tag
 
 ## Announce on Elixir Forums
 
-1. Open [IntelliJ Elixir - Elixir plugin for JetBrain's IntelliJ Platform](https://elixirforum.com/t/intellij-elixir-elixir-plugin-for-jetbrains-intellij-platform/1697)
+1.
+Open [IntelliJ Elixir - Elixir plugin for JetBrain's IntelliJ Platform](https://elixirforum.com/t/intellij-elixir-elixir-plugin-for-jetbrains-intellij-platform/1697)
 2. Click "+ Reply" at the bottom of the thread
 3. Put version as title of post
    ```
@@ -82,6 +85,7 @@ To create release notes for the new tag
 ## Announce on Twitter
 
 1. Tweet
+
   ```
   IntelliJ Elixir vVERSION
   SUMMARY
@@ -89,6 +93,7 @@ To create release notes for the new tag
   https://github.com/KronicDeth/intellij-elixir/releases/tag/vVERSION
   #myelixirstatus
   ```
+
 2. Pin Tweet
 
 ## Announce on ElixirStatus.com
