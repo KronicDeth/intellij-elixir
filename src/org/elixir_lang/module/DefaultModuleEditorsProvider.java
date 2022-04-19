@@ -18,7 +18,7 @@ public class DefaultModuleEditorsProvider implements ModuleConfigurationEditorPr
 
   @Override
   public ModuleConfigurationEditor[] createEditors(ModuleConfigurationState state) {
-    Module module = state.getRootModel().getModule();
+    Module module = state.getCurrentRootModel().getModule();
     if(ModuleType.get(module) instanceof ElixirModuleType){
       return new ModuleConfigurationEditor[]{
           new ElixirContentEntriesEditor(module.getName(), state),
