@@ -10,8 +10,6 @@ import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.code_style.CodeStyleSettings;
 import org.jetbrains.annotations.NotNull;
 
-import static com.intellij.psi.codeStyle.CodeStyleSettingsCustomizable.SPACES_WITHIN;
-
 public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyle.LanguageCodeStyleSettingsProvider {
     private static final String INDENT_CODE_SAMPLE =
             "defmodule Foo do\n" +
@@ -275,7 +273,8 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
         consumer.renameStandardOption("SPACE_WITHIN_BRACES", "Map (%{}), Struct (%Alias{}), and Tuple ({}) braces");
         consumer.renameStandardOption("SPACE_WITHIN_PARENTHESES", "Parentheses");
 
-        String spacesAroundOperators = CodeStyleSettingsCustomizableOptions.getInstance().SPACES_AROUND_OPERATORS;
+        CodeStyleSettingsCustomizableOptions codeStyleSettingsCustomizableOptions = CodeStyleSettingsCustomizableOptions.getInstance();
+        String spacesAroundOperators = codeStyleSettingsCustomizableOptions.SPACES_AROUND_OPERATORS;
 
         consumer.showCustomOption(
                 CodeStyleSettings.class,
@@ -342,7 +341,7 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
                 CodeStyleSettings.class,
                 "SPACE_WITHIN_BITS",
                 "Bit strings and binaries (<<>>)",
-                SPACES_WITHIN
+                codeStyleSettingsCustomizableOptions.SPACES_WITHIN
         );
     }
 
