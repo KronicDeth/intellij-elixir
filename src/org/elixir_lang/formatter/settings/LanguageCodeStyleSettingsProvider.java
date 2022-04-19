@@ -4,12 +4,12 @@ import com.intellij.application.options.IndentOptionsEditor;
 import com.intellij.application.options.SmartIndentOptionsEditor;
 import com.intellij.lang.Language;
 import com.intellij.psi.codeStyle.CodeStyleSettingsCustomizable;
+import com.intellij.psi.codeStyle.CodeStyleSettingsCustomizableOptions;
 import com.intellij.psi.codeStyle.CommonCodeStyleSettings;
 import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.code_style.CodeStyleSettings;
 import org.jetbrains.annotations.NotNull;
 
-import static com.intellij.psi.codeStyle.CodeStyleSettingsCustomizable.SPACES_AROUND_OPERATORS;
 import static com.intellij.psi.codeStyle.CodeStyleSettingsCustomizable.SPACES_WITHIN;
 
 public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyle.LanguageCodeStyleSettingsProvider {
@@ -275,65 +275,67 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
         consumer.renameStandardOption("SPACE_WITHIN_BRACES", "Map (%{}), Struct (%Alias{}), and Tuple ({}) braces");
         consumer.renameStandardOption("SPACE_WITHIN_PARENTHESES", "Parentheses");
 
+        String spacesAroundOperators = CodeStyleSettingsCustomizableOptions.getInstance().SPACES_AROUND_OPERATORS;
+
         consumer.showCustomOption(
                 CodeStyleSettings.class,
                 "SPACE_AROUND_AND_OPERATORS",
                 "And operators (&&, &&&)",
-                SPACES_AROUND_OPERATORS
+                spacesAroundOperators
         );
         consumer.showCustomOption(
                 CodeStyleSettings.class,
                 "SPACE_AROUND_ARROW_OPERATORS",
                 "Arrow operators (<~, |>, ~>, <<<, <<~, <|>, <~>, >>>, ~>>)",
-                SPACES_AROUND_OPERATORS
+                spacesAroundOperators
         );
         consumer.showCustomOption(
                 CodeStyleSettings.class,
                 "SPACE_AROUND_ASSOCIATION_OPERATOR",
                 "Association operator (=>)",
-                SPACES_AROUND_OPERATORS
+                spacesAroundOperators
         );
         consumer.showCustomOption(
                 CodeStyleSettings.class,
                 "SPACE_AROUND_IN_MATCH_OPERATORS",
                 "In match operators (<-, \\\\)",
-                SPACES_AROUND_OPERATORS
+                spacesAroundOperators
         );
         consumer.showCustomOption(
                 CodeStyleSettings.class,
                 "SPACE_AROUND_OR_OPERATORS",
                 "Or operators (||, |||)",
-                SPACES_AROUND_OPERATORS
+                spacesAroundOperators
         );
         consumer.showCustomOption(
                 CodeStyleSettings.class,
                 "SPACE_AROUND_PIPE_OPERATOR",
                 "Pipe operator (|)",
-                SPACES_AROUND_OPERATORS
+                spacesAroundOperators
         );
         consumer.showCustomOption(
                 CodeStyleSettings.class,
                 "SPACE_AROUND_RANGE_OPERATOR",
                 "Range operator (..)",
-                SPACES_AROUND_OPERATORS
+                spacesAroundOperators
         );
         consumer.showCustomOption(
                 CodeStyleSettings.class,
                 "SPACE_AROUND_THREE_OPERATOR",
                 "Three operator (^^^)",
-                SPACES_AROUND_OPERATORS
+                spacesAroundOperators
         );
         consumer.showCustomOption(
                 CodeStyleSettings.class,
                 "SPACE_AROUND_TWO_OPERATORS",
                 "Two operator (++, --, <>)",
-                SPACES_AROUND_OPERATORS
+                spacesAroundOperators
         );
         consumer.showCustomOption(
                 CodeStyleSettings.class,
                 "SPACE_AROUND_TYPE_OPERATOR",
                 "Type operator (::)",
-                SPACES_AROUND_OPERATORS
+                spacesAroundOperators
         );
 
         consumer.showCustomOption(
