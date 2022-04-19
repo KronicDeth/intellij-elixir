@@ -33,7 +33,12 @@ import java.nio.file.Paths
  * Used in Small IDEs like Rubymine that don't support [OpenProcessor].
  */
 class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator {
-    override fun configureProject(project: Project, baseDir: VirtualFile, moduleRef: Ref<Module>) {
+    override fun configureProject(
+        project: Project,
+        baseDir: VirtualFile,
+        moduleRef: Ref<Module>,
+        isProjectCreatedWithWizard: Boolean
+    ) {
         var foundOtpApps: List<OtpApp> = emptyList()
 
         ProgressManager.getInstance().run(object : Task.Modal(project, "Scanning Mix Projects", true) {
@@ -61,11 +66,12 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
                 addFolders(modifiableRootModel, otpApp.root)
             }
 
-            ProgressManager.getInstance().run(object : Task.Modal(project, "Scanning dependencies for Libraries", true) {
-                override fun run(indicator: ProgressIndicator) {
-                    DepsWatcher(project).syncLibraries(indicator)
-                }
-            })
+            ProgressManager.getInstance()
+                .run(object : Task.Modal(project, "Scanning dependencies for Libraries", true) {
+                    override fun run(indicator: ProgressIndicator) {
+                        DepsWatcher(project).syncLibraries(indicator)
+                    }
+                })
         }
     }
 
@@ -74,7 +80,11 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
             newProject(otpApp)?.let { otpAppProject ->
                 attachToProject(rootProject, Paths.get(otpApp.root.path))
 
-                ProgressManager.getInstance().run(object : Task.Modal(otpAppProject, "Scanning mix.exs to connect libraries for newly attached project for OTP app ${otpApp.name}", true) {
+                ProgressManager.getInstance().run(object : Task.Modal(
+                    otpAppProject,
+                    "Scanning mix.exs to connect libraries for newly attached project for OTP app ${otpApp.name}",
+                    true
+                ) {
                     override fun run(progressIndicator: ProgressIndicator) {
                         for (module in ModuleManager.getInstance(otpAppProject).modules) {
                             if (progressIndicator.isCanceled) {
@@ -123,10 +133,17 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
         fun saveSettings(project: Project) {
             try {
                 val storeUtil = Class.forName("com.intellij.configurationStore.StoreUtil")
-                storeUtil.getDeclaredMethod("saveSettings", ComponentManager::class.java, Boolean::class.javaPrimitiveType).invoke(null, project, true)
+                storeUtil
+                    .getDeclaredMethod("saveSettings", ComponentManager::class.java, Boolean::class.javaPrimitiveType)
+                    .invoke(null, project, true)
             } catch (_: ClassNotFoundException) {
                 val storeUtil = Class.forName("com.intellij.openapi.components.impl.stores.StoreUtil")
-                storeUtil.getDeclaredMethod("save", IComponentStore::class.java, Project::class.java, Boolean::class.javaPrimitiveType).invoke(null, project.stateStore, project, true)
+                storeUtil.getDeclaredMethod(
+                    "save",
+                    IComponentStore::class.java,
+                    Project::class.java,
+                    Boolean::class.javaPrimitiveType
+                ).invoke(null, project.stateStore, project, true)
             }
         }
     }
