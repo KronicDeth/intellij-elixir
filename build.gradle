@@ -54,7 +54,7 @@ allprojects {
                    // needed for documentation rendering
                    "markdown",
                    // always have IdeaVIM installed in sandbox
-                   "IdeaVIM:1.8.1"]
+                   "IdeaVIM:1.10.1"]
         pluginName.set('intellij-elixir')
         version.set(ideaVersion)
         downloadSources.set(Boolean.valueOf(sources))
