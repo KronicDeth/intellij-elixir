@@ -123,23 +123,17 @@ public class ModelBuilder implements FormattingModelBuilder {
         }
     }
 
-    /**
-     * Requests building the formatting model for a section of the file containing
-     * the specified PSI element and its children.
-     *
-     * @param element  the top element for which formatting is requested.
-     * @param settings the code style settings used for formatting.
-     * @return the formatting model for the file.
-     */
-    @NotNull
     @Override
-    public FormattingModel createModel(PsiElement element, CodeStyleSettings settings) {
+    public @NotNull FormattingModel createModel(@NotNull FormattingContext formattingContext) {
+        PsiElement element = formattingContext.getPsiElement();
         PsiFile containingFile = element.getContainingFile();
 
         if (DUMP_FORMATTING_AST) {
             System.out.println("AST tree for " + containingFile.getName() + ":");
             printAST(containingFile.getNode(), 0);
         }
+
+        CodeStyleSettings settings = formattingContext.getCodeStyleSettings();
 
         Block block = new Block(
                 element.getNode(),

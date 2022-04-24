@@ -18,10 +18,10 @@ object Notifier {
 
     private fun mixSettings(module: Module, isEmpty: Boolean) {
         error(
-                module,
-                "Mix settings",
-                "Mix executable path, elixir executable path, or erl executable path is " +
-                        (if (isEmpty) "empty" else "not specified correctly")
+            module,
+            "Mix settings",
+            "Mix executable path, elixir executable path, or erl executable path is " +
+                    (if (isEmpty) "empty" else "not specified correctly")
         )
     }
 
@@ -29,14 +29,16 @@ object Notifier {
         val project = module.project
 
         NotificationGroupManager
-                .getInstance()
-                .getNotificationGroup("Elixir")
-                .createNotification(
-                        title,
-                        "$content<br><a href='configure'>Configure</a></br>",
-                        NotificationType.ERROR,
-                        Listener(project, module)
-                )
-                .notify(project);
+            .getInstance()
+            .getNotificationGroup("Elixir")
+            .createNotification(
+                title,
+                "$content<br><a href='configure'>Configure</a></br>",
+                NotificationType.ERROR
+            )
+            .setListener(
+                Listener(project, module)
+            )
+            .notify(project);
     }
 }

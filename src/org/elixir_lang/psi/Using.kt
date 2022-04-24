@@ -95,7 +95,7 @@ object Using {
                                             modular,
                                             name,
                                             modularResolveState
-                                        ) { callDefinitionClauseCall, _, arityRange, accResolveState ->
+                                        ) { callDefinitionClauseCall, _, _, accResolveState ->
                                             val finalContinue = treeWalkUp(
                                                 callDefinitionClauseCall,
                                                 useCall,

@@ -3,11 +3,10 @@ package org.elixir_lang.reference.module.`as`
 import com.intellij.codeInsight.completion.CompletionType
 import com.intellij.openapi.util.Disposer
 import com.intellij.psi.PsiPolyVariantReference
-import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase
+import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import org.elixir_lang.psi.QualifiedAlias
-import java.lang.Exception
 
-class NestedTest : LightPlatformCodeInsightFixtureTestCase() {
+class NestedTest : BasePlatformTestCase() {
     fun testCompletion() {
         myFixture.configureByFiles("completion.ex", "suffix.ex", "nested.ex")
         myFixture.complete(CompletionType.BASIC, 1)
@@ -20,10 +19,10 @@ class NestedTest : LightPlatformCodeInsightFixtureTestCase() {
     fun testReference() {
         myFixture.configureByFiles("reference.ex", "suffix.ex", "nested.ex")
         val alias = myFixture
-                .file
-                .findElementAt(myFixture.caretOffset)!!
-                .parent
-                .prevSibling
+            .file
+            .findElementAt(myFixture.caretOffset)!!
+            .parent
+            .prevSibling
         assertInstanceOf(alias, QualifiedAlias::class.java)
         val polyVariantReference = alias.reference as PsiPolyVariantReference?
         assertNotNull(polyVariantReference)

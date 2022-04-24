@@ -5,7 +5,6 @@ import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProvider
 import com.intellij.openapi.editor.colors.CodeInsightColors
 import com.intellij.openapi.editor.colors.EditorColorsManager
-import com.intellij.openapi.editor.markup.GutterIconRenderer
 import com.intellij.openapi.editor.markup.SeparatorPlacement
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiPolyVariantReference
@@ -23,46 +22,44 @@ import org.elixir_lang.structure_view.element.CallDefinitionSpecification.Compan
 import org.elixir_lang.structure_view.element.CallDefinitionSpecification.Companion.specificationType
 
 class CallDefinition : LineMarkerProvider {
-   override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<*>? =
-            if (daemonCodeAnalyzerSettings.SHOW_METHOD_SEPARATORS) {
-                when (element) {
-                    is AtUnqualifiedNoParenthesesCall<*> -> getLineMarkerInfo(element)
-                    is Call -> getLineMarkerInfo(element)
-                    else -> null
-                }
-            } else {
-                null
+    override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<*>? =
+        if (daemonCodeAnalyzerSettings.SHOW_METHOD_SEPARATORS) {
+            when (element) {
+                is AtUnqualifiedNoParenthesesCall<*> -> getLineMarkerInfo(element)
+                is Call -> getLineMarkerInfo(element)
+                else -> null
             }
+        } else {
+            null
+        }
 
     private val daemonCodeAnalyzerSettings: DaemonCodeAnalyzerSettings = DaemonCodeAnalyzerSettings.getInstance()
     private val editorColorsManager: EditorColorsManager = EditorColorsManager.getInstance()
 
     private fun callDefinitionSeparator(
-            atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>
+        atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>
     ): LineMarkerInfo<*> {
         val leafPsiElement = atUnqualifiedNoParenthesesCall
-                .atIdentifier
-                .node
-                .findChildByType(ElixirTypes.IDENTIFIER_TOKEN) as LeafPsiElement?
-                ?: error("AtUnqualifiedNoParenthesesCall (" +
+            .atIdentifier
+            .node
+            .findChildByType(ElixirTypes.IDENTIFIER_TOKEN) as LeafPsiElement?
+            ?: error(
+                "AtUnqualifiedNoParenthesesCall (" +
                         atUnqualifiedNoParenthesesCall.text +
-                        ") does not have an Tokenizer token")
+                        ") does not have an Tokenizer token"
+            )
 
         return callDefinitionSeparator(leafPsiElement)
     }
 
     private fun callDefinitionSeparator(psiElement: PsiElement): LineMarkerInfo<*> =
-            LineMarkerInfo(
-                    psiElement,
-                    psiElement.textRange,
-                    null,
-                    null,
-                    null,
-                    GutterIconRenderer.Alignment.RIGHT
-            ).apply {
-                separatorColor = editorColorsManager.globalScheme.getColor(CodeInsightColors.METHOD_SEPARATORS_COLOR)
-                separatorPlacement = SeparatorPlacement.TOP
-            }
+        LineMarkerInfo(
+            psiElement,
+            psiElement.textRange
+        ).apply {
+            separatorColor = editorColorsManager.globalScheme.getColor(CodeInsightColors.METHOD_SEPARATORS_COLOR)
+            separatorPlacement = SeparatorPlacement.TOP
+        }
 
     private fun getLineMarkerInfo(atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>): LineMarkerInfo<*>? {
         var lineMarkerInfo: LineMarkerInfo<*>? = null
@@ -71,32 +68,38 @@ class CallDefinition : LineMarkerProvider {
 
         if (moduleAttributeName == "@doc") {
             val firstInGroup =
-                    atUnqualifiedNoParenthesesCall
-                            .siblingExpression(PREVIOUS_SIBLING)
-                            .let { it as? AtUnqualifiedNoParenthesesCall<*>}
-                            ?.let { previousModuleAttribute ->
-                                val previousModuleAttributeName = moduleAttributeName(previousModuleAttribute)
+                atUnqualifiedNoParenthesesCall
+                    .siblingExpression(PREVIOUS_SIBLING)
+                    .let { it as? AtUnqualifiedNoParenthesesCall<*> }
+                    ?.let { previousModuleAttribute ->
+                        val previousModuleAttributeName = moduleAttributeName(previousModuleAttribute)
 
-                                if (previousModuleAttributeName == "@spec") {
-                                    moduleAttributeNameArity(previousModuleAttribute)?.let { moduleAttributeNameArity ->
-                                        siblingCallDefinitionClause(atUnqualifiedNoParenthesesCall, NEXT_SIBLING)?.let { nextSiblingCallDefinitionClause ->
-                                            nameArityInterval(nextSiblingCallDefinitionClause, ResolveState.initial())?.let { nameArityInterval ->
-                                                val arityInterval = nameArityInterval.arityInterval
+                        if (previousModuleAttributeName == "@spec") {
+                            moduleAttributeNameArity(previousModuleAttribute)?.let { moduleAttributeNameArity ->
+                                siblingCallDefinitionClause(
+                                    atUnqualifiedNoParenthesesCall,
+                                    NEXT_SIBLING
+                                )?.let { nextSiblingCallDefinitionClause ->
+                                    nameArityInterval(
+                                        nextSiblingCallDefinitionClause,
+                                        ResolveState.initial()
+                                    )?.let { nameArityInterval ->
+                                        val arityInterval = nameArityInterval.arityInterval
 
-                                                if (moduleAttributeNameArity.arity in arityInterval) {
-                                                    // the previous spec is part of the group
-                                                    false
-                                                } else {
-                                                    null
-                                                }
-                                            }
+                                        if (moduleAttributeNameArity.arity in arityInterval) {
+                                            // the previous spec is part of the group
+                                            false
+                                        } else {
+                                            null
                                         }
                                     }
-                                } else {
-                                    null
                                 }
                             }
-                            ?: true
+                        } else {
+                            null
+                        }
+                    }
+                    ?: true
 
             if (firstInGroup) {
                 lineMarkerInfo = callDefinitionSeparator(atUnqualifiedNoParenthesesCall)
@@ -149,7 +152,10 @@ class CallDefinition : LineMarkerProvider {
 
                                         if (resolvedList != null && resolvedList.isNotEmpty()) {
                                             firstInGroup = resolvedList.filterIsInstance<Call>().none { resolved ->
-                                                nameArityInterval(resolved, ResolveState.initial())?.let { (_, resolvedArityRange) ->
+                                                nameArityInterval(
+                                                    resolved,
+                                                    ResolveState.initial()
+                                                )?.let { (_, resolvedArityRange) ->
                                                     // the current @spec and the previous @spec apply to the same call definition clause
                                                     moduleAttributeArity in resolvedArityRange && previousModuleAttributeArity in resolvedArityRange
                                                 } ?: false
@@ -238,8 +244,10 @@ class CallDefinition : LineMarkerProvider {
         return lineMarkerInfo
     }
 
-    private fun siblingCallDefinitionClause(element: PsiElement,
-                                            function: Function1<PsiElement, PsiElement>): Call? {
+    private fun siblingCallDefinitionClause(
+        element: PsiElement,
+        function: Function1<PsiElement, PsiElement>
+    ): Call? {
         var expression: PsiElement? = element
         var siblingCallDefinitionClause: Call? = null
 

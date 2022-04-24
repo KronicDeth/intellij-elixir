@@ -73,7 +73,7 @@ public class ElixirPsiImplUtil {
             ElixirTypes.UNARY_OPERATOR
     );
     public static final TokenSet IDENTIFIER_TOKEN_SET = TokenSet.create(ElixirTypes.IDENTIFIER_TOKEN);
-    public static final Function1<? super PsiElement, ? extends PsiElement>  NEXT_SIBLING =
+    public static final Function1<? super PsiElement, ? extends PsiElement> NEXT_SIBLING =
             (Function1<PsiElement, PsiElement>) PsiElement::getNextSibling;
     public static final Function1<? super PsiElement, ? extends PsiElement> PREVIOUS_SIBLING =
             (Function1<PsiElement, PsiElement>) PsiElement::getPrevSibling;
@@ -162,7 +162,7 @@ public class ElixirPsiImplUtil {
 
     @Nullable
     public static String canonicalName(@NotNull StubBased stubBased) {
-       return CanonicallyNamedImpl.INSTANCE.canonicalName(stubBased);
+        return CanonicallyNamedImpl.INSTANCE.canonicalName(stubBased);
     }
 
     @NotNull
@@ -204,7 +204,8 @@ public class ElixirPsiImplUtil {
         return WholeNumberImpl.digitsList(decimalWholeNumber);
     }
 
-    @NotNull static List<Digits> digitsList(@NotNull ElixirHexadecimalWholeNumber hexadecimalWholeNumber) {
+    @NotNull
+    static List<Digits> digitsList(@NotNull ElixirHexadecimalWholeNumber hexadecimalWholeNumber) {
         return WholeNumberImpl.digitsList(hexadecimalWholeNumber);
     }
 
@@ -244,7 +245,7 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     public static boolean isCallingMacro(@NotNull final Call call,
                                          @NotNull final String resolvedModuleName,
-                                         @NotNull final  String functionName,
+                                         @NotNull final String functionName,
                                          final int resolvedFinalArity) {
         return CallImpl.isCallingMacro(call, resolvedModuleName, functionName, resolvedFinalArity);
     }
@@ -661,7 +662,7 @@ public class ElixirPsiImplUtil {
                                               @NotNull ResolveState state,
                                               PsiElement lastParent,
                                               @NotNull PsiElement place) {
-        return ProcessDeclarationsImpl.processDeclarations(type, processor, state, lastParent, place);
+        return ProcessDeclarationsImpl.processDeclarations(type, processor, state);
     }
 
     public static boolean processDeclarations(@NotNull final QualifiedAlias qualifiedAlias,
@@ -914,13 +915,13 @@ public class ElixirPsiImplUtil {
     }
 
     @NotNull
-    @Contract(pure=true)
+    @Contract(pure = true)
     static SearchScope getUseScope(@NotNull AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
         return UseScopeImpl.get(atUnqualifiedNoParenthesesCall);
     }
 
     @NotNull
-    @Contract(pure=true)
+    @Contract(pure = true)
     static SearchScope getUseScope(@NotNull UnqualifiedNoArgumentsCall unqualifiedNoArgumentsCall) {
         return UseScopeImpl.get(unqualifiedNoArgumentsCall);
     }
@@ -1103,7 +1104,7 @@ public class ElixirPsiImplUtil {
 
     @NotNull
     public static OtpErlangObject quote(@NotNull ElixirDecimalFloat decimalFloat) {
-       return QuotableImpl.quote(decimalFloat);
+        return QuotableImpl.quote(decimalFloat);
     }
 
     @Contract(pure = true)
@@ -1252,7 +1253,7 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static OtpErlangObject quote(
             @NotNull
-                    ElixirNoParenthesesManyStrictNoParenthesesExpression noParenthesesManyStrictNoParenthesesExpression
+            ElixirNoParenthesesManyStrictNoParenthesesExpression noParenthesesManyStrictNoParenthesesExpression
     ) {
         return QuotableImpl.quote(noParenthesesManyStrictNoParenthesesExpression);
     }
@@ -1389,7 +1390,7 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static OtpErlangObject quote(
             @NotNull
-                    ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall
+            ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall
     ) {
         return QuotableImpl.quote(unqualifiedNoParenthesesManyArgumentsCall);
     }
@@ -1491,7 +1492,7 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quoteInterpolation(Sigil sigil, ElixirInterpolation interpolation) {
-        return ParentImpl.quoteInterpolation(sigil, interpolation);
+        return ParentImpl.quoteInterpolation(interpolation);
     }
 
     @Contract(pure = true)
@@ -1752,14 +1753,14 @@ public class ElixirPsiImplUtil {
     public static List<Integer> addEscapedTerminator(@NotNull Parent parent,
                                                      @Nullable List<Integer> maybeCodePointList,
                                                      @NotNull ASTNode child) {
-        return ParentImpl.addEscapedTerminator(parent, maybeCodePointList, child);
+        return ParentImpl.addEscapedTerminator(maybeCodePointList, child);
     }
 
     @NotNull
     public static List<Integer> addFragmentCodePoints(@NotNull Parent parent,
                                                       @Nullable List<Integer> codePointList,
                                                       @NotNull ASTNode child) {
-        return ParentImpl.addFragmentCodePoints(parent, codePointList, child);
+        return ParentImpl.addFragmentCodePoints(codePointList, child);
     }
 
     @NotNull

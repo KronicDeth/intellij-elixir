@@ -1,14 +1,13 @@
 package org.elixir_lang.psi.scope.call_definition_clause
 
 import com.intellij.codeInsight.completion.CompletionType
-import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.codeInsight.lookup.LookupElementPresentation
-import junit.framework.TestCase
+import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import org.elixir_lang.psi.call.Call
 
-class VariantsTest : LightPlatformCodeInsightFixtureTestCase() {
+class VariantsTest : BasePlatformTestCase() {
     fun testIssue453() {
         myFixture.configureByFiles("defmodule.ex")
         myFixture.complete(CompletionType.BASIC)
@@ -20,10 +19,10 @@ class VariantsTest : LightPlatformCodeInsightFixtureTestCase() {
     fun testIssue462() {
         myFixture.configureByFiles("self_completion.ex")
         val head = myFixture
-                .file
-                .findElementAt(myFixture.caretOffset - 1)!!
-                .parent
-                .parent
+            .file
+            .findElementAt(myFixture.caretOffset - 1)!!
+            .parent
+            .parent
         assertInstanceOf(head, Call::class.java)
         val reference = head.reference
         assertNotNull("Call definition head does not have a reference", reference)

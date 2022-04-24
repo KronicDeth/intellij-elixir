@@ -15,7 +15,6 @@ import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.openapi.util.ActionCallback
-import com.intellij.openapi.util.Comparing
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.VirtualFile
@@ -33,8 +32,8 @@ import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JPanel
 
-class Editor(private val sdkModel: SdkModel, private val history: History, private var sdk: ProjectJdkImpl):
-        Configurable, Place.Navigator {
+class Editor(private val sdkModel: SdkModel, private val history: History, private var sdk: ProjectJdkImpl) :
+    Configurable, Place.Navigator {
     private val sdkPathEditorByOrderRootType = HashMap<OrderRootType, SdkPathEditor>()
     private val additionalDataConfigurableListBySdkType = HashMap<SdkType, MutableList<AdditionalDataConfigurable>>()
     private val componentByAdditionalDataConfigurable = HashMap<AdditionalDataConfigurable, JComponent?>()
@@ -80,31 +79,83 @@ class Editor(private val sdkModel: SdkModel, private val history: History, priva
         tabbedPane = TabbedPaneWrapper(disposable)
 
         OrderRootType.getAllTypes()
-                .filter { showTabForType(it) }
-                .forEach { orderRootType ->
-                    pathEditor(orderRootType)?.let { pathEditor ->
-                        pathEditor.setAddBaseDir(sdk.homeDirectory)
-                        tabbedPane.addTab(pathEditor.displayName, pathEditor.createComponent())
-                        sdkPathEditorByOrderRootType.put(orderRootType, pathEditor)
-                    }
+            .filter { showTabForType(it) }
+            .forEach { orderRootType ->
+                pathEditor(orderRootType)?.let { pathEditor ->
+                    pathEditor.setAddBaseDir(sdk.homeDirectory)
+                    tabbedPane.addTab(pathEditor.displayName, pathEditor.createComponent())
+                    sdkPathEditorByOrderRootType.put(orderRootType, pathEditor)
                 }
+            }
 
         tabbedPane.addChangeListener { history.pushQueryPlace() }
 
         homeComponent = createHomeComponent()
         homeComponent.textField.isEditable = false
         homeFieldLabel = JLabel(homeFieldLabelValue)
-        mainPanel.add(homeFieldLabel, GridBagConstraints(
-                0, GridBagConstraints.RELATIVE, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, JBUI.insets(2, 10, 2, 2), 0, 0))
-        mainPanel.add(homeComponent, GridBagConstraints(
-                1, GridBagConstraints.RELATIVE, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, JBUI.insets(2, 2, 2, 10), 0, 0))
+        mainPanel.add(
+            homeFieldLabel, GridBagConstraints(
+                0,
+                GridBagConstraints.RELATIVE,
+                1,
+                1,
+                0.0,
+                0.0,
+                GridBagConstraints.WEST,
+                GridBagConstraints.NONE,
+                JBUI.insets(2, 10, 2, 2),
+                0,
+                0
+            )
+        )
+        mainPanel.add(
+            homeComponent, GridBagConstraints(
+                1,
+                GridBagConstraints.RELATIVE,
+                1,
+                1,
+                1.0,
+                0.0,
+                GridBagConstraints.CENTER,
+                GridBagConstraints.HORIZONTAL,
+                JBUI.insets(2, 2, 2, 10),
+                0,
+                0
+            )
+        )
 
         additionalDataPanel = JPanel(BorderLayout())
-        mainPanel.add(additionalDataPanel, GridBagConstraints(
-                0, GridBagConstraints.RELATIVE, 2, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, JBUI.insets(2, 10, 0, 10), 0, 0))
+        mainPanel.add(
+            additionalDataPanel, GridBagConstraints(
+                0,
+                GridBagConstraints.RELATIVE,
+                2,
+                1,
+                1.0,
+                0.0,
+                GridBagConstraints.CENTER,
+                GridBagConstraints.BOTH,
+                JBUI.insets(2, 10, 0, 10),
+                0,
+                0
+            )
+        )
 
-        mainPanel.add(tabbedPane.component, GridBagConstraints(
-                0, GridBagConstraints.RELATIVE, 2, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, JBUI.insetsTop(2), 0, 0))
+        mainPanel.add(
+            tabbedPane.component, GridBagConstraints(
+                0,
+                GridBagConstraints.RELATIVE,
+                2,
+                1,
+                1.0,
+                1.0,
+                GridBagConstraints.CENTER,
+                GridBagConstraints.BOTH,
+                JBUI.insetsTop(2),
+                0,
+                0
+            )
+        )
     }
 
     private fun createHomeComponent(): TextFieldWithBrowseButton = TextFieldWithBrowseButton { doSelectHomePath() }
@@ -112,21 +163,21 @@ class Editor(private val sdkModel: SdkModel, private val history: History, priva
     private fun showTabForType(type: OrderRootType): Boolean = (sdk.sdkType as SdkType).isRootTypeApplicable(type)
 
     override fun isModified(): Boolean =
-            !Comparing.equal(sdk.name, initialName) ||
-                    !Comparing.equal(
-                            FileUtil.toSystemIndependentName(homeValue),
-                            FileUtil.toSystemIndependentName(initialPath!!)
-                    ) ||
-                    sdkPathEditorByOrderRootType.any { entry ->
-                        entry.value.isModified
-                    } ||
-                    additionalDataConfigurable.any { additionalDataConfigurable ->
-                        additionalDataConfigurable.isModified
-                    }
+        !Objects.equals(sdk.name, initialName) ||
+                !Objects.equals(
+                    FileUtil.toSystemIndependentName(homeValue),
+                    FileUtil.toSystemIndependentName(initialPath!!)
+                ) ||
+                sdkPathEditorByOrderRootType.any { entry ->
+                    entry.value.isModified
+                } ||
+                additionalDataConfigurable.any { additionalDataConfigurable ->
+                    additionalDataConfigurable.isModified
+                }
 
     @Throws(ConfigurationException::class)
     override fun apply() {
-        if (!Comparing.equal(initialName, sdk.name) && sdk.name.isEmpty()) {
+        if (!Objects.equals(initialName, sdk.name) && sdk.name.isEmpty()) {
             throw ConfigurationException(ProjectBundle.message("sdk.list.name.required.error"))
         }
 
@@ -164,8 +215,8 @@ class Editor(private val sdkModel: SdkModel, private val history: History, priva
 
     override fun disposeUIResources() {
         additionalDataConfigurableListBySdkType.keys
-                .flatMap { additionalDataConfigurableListBySdkType[it]!! }
-                .forEach(AdditionalDataConfigurable::disposeUIResources)
+            .flatMap { additionalDataConfigurableListBySdkType[it]!! }
+            .forEach(AdditionalDataConfigurable::disposeUIResources)
         additionalDataConfigurableListBySdkType.clear()
         componentByAdditionalDataConfigurable.clear()
 
@@ -178,18 +229,18 @@ class Editor(private val sdkModel: SdkModel, private val history: History, priva
         homeComponent.apply {
             setText(absolutePath)
             textField.foreground =
-                    if (absolutePath != null && !absolutePath.isEmpty()) {
-                        val homeDir = File(absolutePath)
-                        val homeMustBeDirectory = (sdk.sdkType as SdkType).homeChooserDescriptor.isChooseFolders
+                if (absolutePath != null && !absolutePath.isEmpty()) {
+                    val homeDir = File(absolutePath)
+                    val homeMustBeDirectory = (sdk.sdkType as SdkType).homeChooserDescriptor.isChooseFolders
 
-                        if (homeDir.exists() && homeDir.isDirectory == homeMustBeDirectory) {
-                            UIUtil.getFieldForegroundColor()
-                        } else {
-                            PathEditor.INVALID_COLOR
-                        }
-                    } else {
+                    if (homeDir.exists() && homeDir.isDirectory == homeMustBeDirectory) {
                         UIUtil.getFieldForegroundColor()
+                    } else {
+                        PathEditor.INVALID_COLOR
                     }
+                } else {
+                    UIUtil.getFieldForegroundColor()
+                }
         }
     }
 
@@ -218,8 +269,10 @@ class Editor(private val sdkModel: SdkModel, private val history: History, priva
                 _versionString = dummySdk.versionString
 
                 if (_versionString == null) {
-                    Messages.showMessageDialog(ProjectBundle.message("sdk.java.corrupt.error", homePath),
-                            ProjectBundle.message("sdk.java.corrupt.title"), Messages.getErrorIcon())
+                    Messages.showMessageDialog(
+                        ProjectBundle.message("sdk.java.corrupt.error", homePath),
+                        ProjectBundle.message("sdk.java.corrupt.title"), Messages.getErrorIcon()
+                    )
                 }
 
                 val sdkModificator = dummySdk.sdkModificator
@@ -242,7 +295,7 @@ class Editor(private val sdkModel: SdkModel, private val history: History, priva
         val currentName = sdk.name
         val suggestedName = (sdk.sdkType as SdkType).suggestSdkName(currentName, homePath)
 
-        return if (Comparing.equal(currentName, suggestedName)) {
+        return if (Objects.equals(currentName, suggestedName)) {
             currentName
         } else {
             var newSdkName = suggestedName
@@ -319,7 +372,7 @@ class Editor(private val sdkModel: SdkModel, private val history: History, priva
 
         override fun getVersionString(): String? = _versionString ?: sdk.versionString
 
-         // not supported for this editor
+        // not supported for this editor
         override fun setVersionString(versionString: String) = throw UnsupportedOperationException()
 
         override fun getSdkAdditionalData(): SdkAdditionalData? = sdk.sdkAdditionalData
@@ -328,19 +381,19 @@ class Editor(private val sdkModel: SdkModel, private val history: History, priva
         override fun setSdkAdditionalData(data: SdkAdditionalData) = throw UnsupportedOperationException()
 
         override fun getRoots(rootType: OrderRootType): Array<VirtualFile> =
-                sdkPathEditorByOrderRootType[rootType]?.roots ?:
-                        throw IllegalStateException("no editor for root type " + rootType)
+            sdkPathEditorByOrderRootType[rootType]?.roots
+                ?: throw IllegalStateException("no editor for root type " + rootType)
 
         override fun addRoot(root: VirtualFile, rootType: OrderRootType) =
-                sdkPathEditorByOrderRootType[rootType]!!.addPaths(root)
+            sdkPathEditorByOrderRootType[rootType]!!.addPaths(root)
 
         override fun removeRoot(root: VirtualFile, rootType: OrderRootType) =
-                sdkPathEditorByOrderRootType[rootType]!!.removePaths(root)
+            sdkPathEditorByOrderRootType[rootType]!!.removePaths(root)
 
         override fun removeRoots(rootType: OrderRootType) = sdkPathEditorByOrderRootType[rootType]!!.clearList()
 
         override fun removeAllRoots() =
-                sdkPathEditorByOrderRootType.values.forEach { editor -> editor.clearList() }
+            sdkPathEditorByOrderRootType.values.forEach { editor -> editor.clearList() }
 
         override fun commitChanges() {}
 

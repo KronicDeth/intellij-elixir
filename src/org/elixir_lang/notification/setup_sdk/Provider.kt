@@ -25,22 +25,27 @@ import org.elixir_lang.sdk.elixir.Type
 class Provider : EditorNotifications.Provider<EditorNotificationPanel>() {
     override fun getKey(): Key<EditorNotificationPanel> = KEY
 
-    override fun createNotificationPanel(virtualFile: VirtualFile, fileEditor: FileEditor, project: Project): EditorNotificationPanel? =
-            if (virtualFile.fileType is ElixirFileType) {
-                PsiManager
-                        .getInstance(project)
-                        .findFile(virtualFile)
-                        ?.let { psiFile ->
-                            if (psiFile.language === ElixirLanguage &&
-                                    Type.mostSpecificSdk(psiFile) == null) {
-                                createPanel(project, psiFile)
-                            } else {
-                                null
-                            }
-                        }
-            } else {
-                null
-            }
+    override fun createNotificationPanel(
+        virtualFile: VirtualFile,
+        fileEditor: FileEditor,
+        project: Project
+    ): EditorNotificationPanel? =
+        if (virtualFile.fileType is ElixirFileType) {
+            PsiManager
+                .getInstance(project)
+                .findFile(virtualFile)
+                ?.let { psiFile ->
+                    if (psiFile.language === ElixirLanguage &&
+                        Type.mostSpecificSdk(psiFile) == null
+                    ) {
+                        createPanel(project, psiFile)
+                    } else {
+                        null
+                    }
+                }
+        } else {
+            null
+        }
 
     companion object {
         private val KEY = Key.create<EditorNotificationPanel>("Setup Elixir SDK")
@@ -58,12 +63,12 @@ class Provider : EditorNotifications.Provider<EditorNotificationPanel>() {
 
         fun showProjectSettings(project: Project) {
             SdkPopupFactory
-                    .newBuilder()
-                    .withProject(project)
-                    .withSdkType(Type.instance)
-                    .updateProjectSdkFromSelection()
-                    .buildPopup()
-                    .showInFocusCenter()
+                .newBuilder()
+                .withProject(project)
+                .withSdkType(Type.instance)
+                .updateProjectSdkFromSelection()
+                .buildPopup()
+                .showInFocusCenter()
         }
 
         fun showSmallIDEFacetSettings(project: Project) {
@@ -101,6 +106,7 @@ class Provider : EditorNotifications.Provider<EditorNotificationPanel>() {
             val module = ModuleUtilCore.findModuleForPsiElement(psiFile)
 
             return if (module != null) {
+                @Suppress("DEPRECATION")
                 if (module.getOptionValue(Module.ELEMENT_TYPE) == "ELIXIR_MODULE") {
                     createModulePanel(project, module)
                 } else {

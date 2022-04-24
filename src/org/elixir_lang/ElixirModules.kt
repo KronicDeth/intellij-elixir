@@ -6,7 +6,6 @@ import com.intellij.util.io.URLUtil
 import java.io.*
 import java.net.URL
 import java.nio.file.Paths
-import java.util.*
 
 object ElixirModules {
     fun add(parametersList: MutableList<String>, fileList: kotlin.collections.List<File>): MutableList<String> {
@@ -19,15 +18,12 @@ object ElixirModules {
         return parametersList
     }
 
-    fun toRequireList(fileList: kotlin.collections.List<File>): kotlin.collections.List<String> =
-            fileList.flatMap { file ->
-                listOf("-r", file.path)
-            }
-
     @Throws(IOException::class)
-    private fun copy(basePath: String,
-                     relativePathList: kotlin.collections.List<String>,
-                     destinationDirectoryPath: String): kotlin.collections.List<File> {
+    private fun copy(
+        basePath: String,
+        relativePathList: kotlin.collections.List<String>,
+        destinationDirectoryPath: String
+    ): kotlin.collections.List<File> {
         val destinationFileList = ArrayList<File>(relativePathList.size)
 
         for (relativePath in relativePathList) {
@@ -38,14 +34,16 @@ object ElixirModules {
     }
 
     @Throws(IOException::class)
-    private fun copy(basePath: String,
-                     relativePath: String,
-                     destinationDirectoryPath: String): File {
-        val moduleUrl = ResourceUtil.getResource(ElixirModules::class.java, basePath, relativePath)
-                ?: throw IOException(
-                        "Failed to locate Elixir module (under base path `" + basePath + "` on relative path `" +
-                                relativePath + "`"
-                )
+    private fun copy(
+        basePath: String,
+        relativePath: String,
+        destinationDirectoryPath: String
+    ): File {
+        val moduleUrl = ResourceUtil.getResource(ElixirModules::class.java.classLoader, basePath, relativePath)
+            ?: throw IOException(
+                "Failed to locate Elixir module (under base path `" + basePath + "` on relative path `" +
+                        relativePath + "`"
+            )
 
         return copy(moduleUrl, Paths.get(destinationDirectoryPath, basePath, relativePath).toFile())
     }
@@ -56,7 +54,12 @@ object ElixirModules {
 
             destination.parentFile.mkdirs()
 
-            BufferedOutputStream(FileOutputStream(destination)).use { outputStream -> FileUtil.copy(inputStream, outputStream) }
+            BufferedOutputStream(FileOutputStream(destination)).use { outputStream ->
+                FileUtil.copy(
+                    inputStream,
+                    outputStream
+                )
+            }
         }
 
         return destination
@@ -68,5 +71,6 @@ object ElixirModules {
         return copy(basePath, relativePathList, temporaryDirectory.path)
     }
 
-    fun parametersList(fileList: kotlin.collections.List<File>): kotlin.collections.List<String> = add(mutableListOf(), fileList)
+    fun parametersList(fileList: kotlin.collections.List<File>): kotlin.collections.List<String> =
+        add(mutableListOf(), fileList)
 }

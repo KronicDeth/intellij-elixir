@@ -2,14 +2,14 @@ package org.elixir_lang.psi
 
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
-import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase
+import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import org.elixir_lang.NameArityInterval
 import org.elixir_lang.psi.CallDefinitionClause.nameArityInterval
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.enclosingMacroCall
 
-class ImportTest : LightPlatformCodeInsightFixtureTestCase() {
+class ImportTest : BasePlatformTestCase() {
     /*
      * Tests
      */

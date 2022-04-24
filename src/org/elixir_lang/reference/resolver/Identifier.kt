@@ -14,21 +14,20 @@ object Identifier : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.I
         val resolveResultList = mutableListOf<ResolveResult>()
 
         val variableResolveList = org.elixir_lang.psi.scope.variable.MultiResolve.resolveResultList(
-                name,
-                incompleteCode,
-                element
+            name,
+            incompleteCode,
+            element
         )
 
-        if (variableResolveList != null) {
-            resolveResultList.addAll(variableResolveList)
-        }
+        resolveResultList.addAll(variableResolveList)
 
-        val callDefinitionClauseResolveResultList = org.elixir_lang.psi.scope.call_definition_clause.MultiResolve.resolveResults(
+        val callDefinitionClauseResolveResultList =
+            org.elixir_lang.psi.scope.call_definition_clause.MultiResolve.resolveResults(
                 name,
                 0,
                 incompleteCode,
                 element
-        )
+            )
         resolveResultList.addAll(callDefinitionClauseResolveResultList)
 
         return resolveResultList

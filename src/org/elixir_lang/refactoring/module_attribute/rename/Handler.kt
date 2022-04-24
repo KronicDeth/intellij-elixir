@@ -45,9 +45,9 @@ class Handler : RenameHandler {
      * @param dataContext can be null for some but not all of refactoring action handlers
      *                    (it is recommended to pass DataManager.getDataContext() instead of null)
      */
-    override fun invoke(project: Project, editor: Editor?, file: PsiFile?, dataContext: DataContext?) {
+    override fun invoke(project: Project, editor: Editor, file: PsiFile?, dataContext: DataContext?) {
         val elements = reference(editor, file)?.toPsiElementList()?.toTypedArray() ?: emptyArray()
-        val nonNullDataContext = dataContext ?: DataManager.getInstance().dataContext
+        val nonNullDataContext = dataContext ?: DataManager.getInstance().getDataContext(editor.component)
 
         invoke(editor, elements, nonNullDataContext)
     }
@@ -64,14 +64,14 @@ class Handler : RenameHandler {
     override fun invoke(project: Project, elements: Array<out PsiElement>, dataContext: DataContext?) {
         val nonNullDataContext = dataContext ?: DataManager.getInstance().dataContext
 
-        invoke(nonNullDataContext.let(CommonDataKeys.EDITOR::getData), elements, nonNullDataContext)
+        invoke(nonNullDataContext.let(CommonDataKeys.EDITOR::getData)!!, elements, nonNullDataContext)
     }
 
     private fun createRenamer(elementToRename: PsiElement, editor: Editor): VariableInplaceRenamer =
-            Inplace(elementToRename as PsiNamedElement, editor)
+        Inplace(elementToRename as PsiNamedElement, editor)
 
     // See `com.intellij.refactoring.rename.inplace.VariableInplaceRenameHandler.doRename`
-    private fun invoke(editor: Editor?, element: PsiElement, dataContext: DataContext) {
+    private fun invoke(editor: Editor, element: PsiElement, dataContext: DataContext) {
         val renamer = createRenamer(element, editor!!)
         val startedRename = renamer.performInplaceRename()
 
@@ -80,47 +80,47 @@ class Handler : RenameHandler {
         }
     }
 
-    private fun invoke(editor: Editor?, elements: Array<out PsiElement>, dataContext: DataContext) {
+    private fun invoke(editor: Editor, elements: Array<out PsiElement>, dataContext: DataContext) {
         elements.forEach { element ->
             invoke(editor, element, dataContext)
         }
     }
 
     private fun isAvailableOnReference(psiReference: PsiReference) =
-            psiReference
-                    .toPsiElementList()
-                    .any { isAvailableOnResolved(it) }
+        psiReference
+            .toPsiElementList()
+            .any { isAvailableOnResolved(it) }
 
     private fun performDialogRename(element: PsiElement, editor: Editor?, dataContext: DataContext) {
         RenameHandlerRegistry
-                .getInstance()
-                .getRenameHandler(dataContext)!!
-                .invoke(
-                        element.project,
-                        editor,
-                        element.containingFile,
-                        dataContext
-                )
+            .getInstance()
+            .getRenameHandler(dataContext)!!
+            .invoke(
+                element.project,
+                editor,
+                element.containingFile,
+                dataContext
+            )
     }
 
     private fun reference(editor: Editor?, file: PsiFile?): PsiReference? =
-            if (editor != null && file != null) {
-                // matches logic in `UsageTargetProvider`, but with null checks for editor and file
-                val document = editor.document
-                val offset = editor.caretModel.offset
+        if (editor != null && file != null) {
+            // matches logic in `UsageTargetProvider`, but with null checks for editor and file
+            val document = editor.document
+            val offset = editor.caretModel.offset
 
-                val adjustOffset = TargetElementUtil.adjustOffset(file, document, offset)
+            val adjustOffset = TargetElementUtil.adjustOffset(file, document, offset)
 
-                file.findReferenceAt(adjustOffset)?.let { reference ->
-                    if (isAvailableOnReference(reference)) {
-                        reference
-                    } else {
-                        null
-                    }
+            file.findReferenceAt(adjustOffset)?.let { reference ->
+                if (isAvailableOnReference(reference)) {
+                    reference
+                } else {
+                    null
                 }
-            } else {
-                null
             }
+        } else {
+            null
+        }
 
     companion object {
         internal fun isAvailableOnResolved(element: PsiElement): Boolean = element is AtUnqualifiedNoParenthesesCall<*>

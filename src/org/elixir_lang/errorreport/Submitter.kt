@@ -1,9 +1,9 @@
 package org.elixir_lang.errorreport
 
-import com.intellij.diagnostic.AbstractMessage
-import com.intellij.diagnostic.ReportMessages
+import com.intellij.diagnostic.DiagnosticBundle
 import com.intellij.ide.DataManager
-import com.intellij.notification.NotificationListener
+import com.intellij.notification.BrowseNotificationAction
+import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.diagnostic.ErrorReportSubmitter
@@ -34,10 +34,12 @@ class Submitter : ErrorReportSubmitter() {
      * @param consumer        a callback to be called after sending is finished (or failed).
      * @return `true` if reporting was started, `false` if a report can't be sent at the moment.
      */
-    override fun submit(events: Array<IdeaLoggingEvent>,
-                        additionalInfo: String?,
-                        parentComponent: Component,
-                        consumer: Consumer<in SubmittedReportInfo>): Boolean {
+    override fun submit(
+        events: Array<IdeaLoggingEvent>,
+        additionalInfo: String?,
+        parentComponent: Component,
+        consumer: Consumer<in SubmittedReportInfo>
+    ): Boolean {
         val project = project(parentComponent)
         val successCallback = successCallback(project, consumer)
         val errorCallback = errorCallback(project)
@@ -56,27 +58,38 @@ class Submitter : ErrorReportSubmitter() {
         private fun errorCallback(project: Project?): Consumer<Exception> {
             return Consumer { e: Exception ->
                 val message = String.format(
-                        """<html>
+                    """<html>
   There was an error while creating a GitHub issue: %s
   <br>
   Please consider <a href="$ISSUES_URL/new">manually creating an issue</a>
 </html>""",
-                        e.message
+                    e.message
                 )
-                ReportMessages.GROUP.createNotification(
-                        ReportMessages.getErrorReport(),
+                @Suppress("DialogTitleCapitalization")
+                NotificationGroupManager
+                    .getInstance()
+                    .getNotificationGroup("Error Report")
+                    .createNotification(
+                        DiagnosticBundle.message("error.report.title"),
                         message,
-                        NotificationType.ERROR,
-                        NotificationListener.URL_OPENING_LISTENER
-                ).setImportant(false).notify(project)
+                        NotificationType.ERROR
+                    )
+                    .addAction(
+                        BrowseNotificationAction(
+                            "Manually create an issue",
+                            "$ISSUES_URL/new"
+                        )
+                    )
+                    .setImportant(false)
+                    .notify(project)
             }
         }
 
         private fun project(parentComponent: Component): Project? =
             DataManager
-                    .getInstance()
-                    .getDataContext(parentComponent)
-                    .let { dataContext -> CommonDataKeys.PROJECT.getData(dataContext) }
+                .getInstance()
+                .getDataContext(parentComponent)
+                .let { dataContext -> CommonDataKeys.PROJECT.getData(dataContext) }
 
         /**
          * Runs the task in the background if it can.
@@ -94,27 +107,30 @@ class Submitter : ErrorReportSubmitter() {
         }
 
         private fun successCallback(
-                project: Project?,
-                consumer: Consumer<in SubmittedReportInfo>
+            project: Project?,
+            consumer: Consumer<in SubmittedReportInfo>
         ): Consumer<Boolean> {
             return Consumer {
                 val url: String? = null
                 val linkText: String? = null
                 val reportInfo = SubmittedReportInfo(
-                        url,
-                        linkText,
-                        SubmittedReportInfo.SubmissionStatus.NEW_ISSUE
+                    url,
+                    linkText,
+                    SubmittedReportInfo.SubmissionStatus.NEW_ISSUE
                 )
                 consumer.consume(reportInfo)
 
                 // pseudo-named-arguments
-                val notificationListener: NotificationListener? = null
-                ReportMessages.GROUP.createNotification(
-                        ReportMessages.getErrorReport(),
+                NotificationGroupManager
+                    .getInstance()
+                    .getNotificationGroup("Error Report")
+                    .createNotification(
                         "Submitted",
-                        NotificationType.INFORMATION,
-                        notificationListener
-                ).setImportant(false).notify(project)
+                        NotificationType.INFORMATION
+                    )
+                    .setImportant(false)
+                    .notify(project)
+
             }
         }
     }

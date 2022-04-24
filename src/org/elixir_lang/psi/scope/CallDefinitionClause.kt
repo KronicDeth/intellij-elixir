@@ -228,7 +228,7 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
                 ?.filter { org.elixir_lang.psi.CallDefinitionClause.isMacro(it) }
                 ?.let { macroDefinitions ->
                     whileIn(macroDefinitions) { macroDefinition ->
-                        executeOnUnknownMacroDefinition(macroDefinition, macroCall, state)
+                        executeOnUnknownMacroDefinition(macroDefinition, state)
                     }
                 }
                 ?: true
@@ -236,7 +236,7 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
             true
         }
 
-    private fun executeOnUnknownMacroDefinition(macroDefinition: Call, macroCall: Call, state: ResolveState): Boolean =
+    private fun executeOnUnknownMacroDefinition(macroDefinition: Call, state: ResolveState): Boolean =
         org.elixir_lang.psi.CallDefinitionClause.head(macroDefinition)?.let { it as? Call }?.finalArguments()
             ?.lastOrNull()?.let { it as? QuotableKeywordList }?.let { keywords ->
                 keywords.keywordValue("do")?.let { block ->

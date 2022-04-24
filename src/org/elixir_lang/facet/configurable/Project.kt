@@ -30,9 +30,10 @@ class Project(project: Project) : ModuleAwareProjectConfigurable<Configurable>(p
                         addFacet(facetManager, sdk)
 
                         if (sdk != null) {
-                            LibraryTablesRegistrar.getInstance().libraryTable.getLibraryByName(sdk.name)!!.let { library ->
-                                ModuleRootModificationUtil.addDependency(module, library)
-                            }
+                            LibraryTablesRegistrar.getInstance().libraryTable.getLibraryByName(sdk.name)!!
+                                .let { library ->
+                                    ModuleRootModificationUtil.addDependency(module, library)
+                                }
                         }
                     }
                 } else {
@@ -40,9 +41,10 @@ class Project(project: Project) : ModuleAwareProjectConfigurable<Configurable>(p
 
                     ApplicationManager.getApplication().runWriteAction {
                         if (sdk != null) {
-                            LibraryTablesRegistrar.getInstance().libraryTable.getLibraryByName(sdk.name)!!.let { library ->
-                                ModuleRootModificationUtil.addDependency(module, library)
-                            }
+                            LibraryTablesRegistrar.getInstance().libraryTable.getLibraryByName(sdk.name)!!
+                                .let { library ->
+                                    ModuleRootModificationUtil.addDependency(module, library)
+                                }
                         }
                     }
                 }
@@ -58,7 +60,7 @@ class Project(project: Project) : ModuleAwareProjectConfigurable<Configurable>(p
 
             module.apply {
                 if (!isDisposed) {
-                    messageBus.syncPublisher(FacetManager.FACETS_TOPIC).facetConfigurationChanged(facet)
+                    project.messageBus.syncPublisher(FacetManager.FACETS_TOPIC).facetConfigurationChanged(facet)
                 }
             }
         }

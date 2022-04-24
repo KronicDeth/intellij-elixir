@@ -62,7 +62,7 @@ object Module : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Modul
             }
             // deduplicate shared `defdelegate`, `import`, or `use`
             .groupBy { it.element }
-            .map { (_element, resolveResults) -> resolveResults.first() }
+            .map { (_, resolveResults) -> resolveResults.first() }
 
     private fun resolvePreferred(
         element: PsiElement,

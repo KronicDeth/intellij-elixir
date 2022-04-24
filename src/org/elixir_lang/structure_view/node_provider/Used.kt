@@ -7,7 +7,6 @@ import com.intellij.ide.util.treeView.smartTree.ActionPresentation
 import com.intellij.ide.util.treeView.smartTree.ActionPresentationData
 import com.intellij.ide.util.treeView.smartTree.TreeElement
 import com.intellij.openapi.actionSystem.Shortcut
-import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.ResolveState
 import com.intellij.util.IncorrectOperationException
@@ -42,40 +41,42 @@ class Used : FileStructureNodeProvider<TreeElement>, ActionShortcutProvider {
      * @see ActionPresentationData.ActionPresentationData
      */
     override fun getPresentation(): ActionPresentation =
-            ActionPresentationData("Show Used", null, AllIcons.Hierarchy.Supertypes)
+        ActionPresentationData("Show Used", null, AllIcons.Hierarchy.Supertypes)
 
     override fun getShortcut(): Array<Shortcut> = throw IncorrectOperationException("see getActionIdForShortcut()")
 
     override fun provideNodes(node: TreeElement): Collection<TreeElement> =
-            (node as? Module)?.children?.toList()?.let { childCollection ->
-                provideNodesFromChildren(childCollection).let { filterOverridden(it, childCollection) }
-            } ?: emptyList()
+        (node as? Module)?.children?.toList()?.let { childCollection ->
+            provideNodesFromChildren(childCollection).let { filterOverridden(it, childCollection) }
+        } ?: emptyList()
 
     companion object {
         @NonNls
         const val ID = "SHOW_USED"
         private const val USING = "__using__"
 
-        private fun filterOverridden(nodesFromChildren: Collection<TreeElement>,
-                                     children: Collection<TreeElement>): Collection<TreeElement> {
+        private fun filterOverridden(
+            nodesFromChildren: Collection<TreeElement>,
+            children: Collection<TreeElement>
+        ): Collection<TreeElement> {
             val childFunctionByNameArity = functionByNameArity(children)
 
             return nodesFromChildren
-                    .filterIsInstance<CallDefinition>()
-                    // only functions work with `defoverridable`
-                    .filter { it.time() == Timed.Time.RUN }
-                    .filterNot {
-                        val nameArity = NameArity(it.name(), it.arity)
+                .filterIsInstance<CallDefinition>()
+                // only functions work with `defoverridable`
+                .filter { it.time() == Timed.Time.RUN }
+                .filterNot {
+                    val nameArity = NameArity(it.name(), it.arity)
 
-                        childFunctionByNameArity.containsKey(nameArity)
-                    }
+                    childFunctionByNameArity.containsKey(nameArity)
+                }
         }
 
         fun functionByNameArity(children: Collection<TreeElement>): Map<NameArity, CallDefinition> =
-                children
-                        .filterIsInstance<CallDefinition>()
-                        .filter { it.time() == Timed.Time.RUN }
-                        .associateBy { NameArity(it.name(), it.arity) }
+            children
+                .filterIsInstance<CallDefinition>()
+                .filter { it.time() == Timed.Time.RUN }
+                .associateBy { NameArity(it.name(), it.arity) }
 
         private fun provideNodesFromChild(child: TreeElement): Collection<TreeElement> {
             var nodes: MutableCollection<TreeElement>? = null
@@ -110,7 +111,10 @@ class Used : FileStructureNodeProvider<TreeElement>, ActionShortcutProvider {
                                                    dealing with macros, restricted to __using__/1 */
                                                 if (org.elixir_lang.psi.CallDefinitionClause.isMacro(childCall)) {
                                                     val nameArityInterval =
-                                                            org.elixir_lang.psi.CallDefinitionClause.nameArityInterval(childCall, ResolveState.initial())
+                                                        org.elixir_lang.psi.CallDefinitionClause.nameArityInterval(
+                                                            childCall,
+                                                            ResolveState.initial()
+                                                        )
 
                                                     if (nameArityInterval != null) {
                                                         val name = nameArityInterval.name
@@ -118,12 +122,12 @@ class Used : FileStructureNodeProvider<TreeElement>, ActionShortcutProvider {
 
                                                         if (name == USING && arityInterval.contains(1)) {
                                                             addClausesToCallDefinition(
-                                                                    childCall,
-                                                                    name,
-                                                                    arityInterval,
-                                                                    macroByNameArity,
-                                                                    module,
-                                                                    Timed.Time.COMPILE
+                                                                childCall,
+                                                                name,
+                                                                arityInterval,
+                                                                macroByNameArity,
+                                                                module,
+                                                                Timed.Time.COMPILE
                                                             ) { _ -> }
                                                         }
                                                     }
@@ -131,19 +135,10 @@ class Used : FileStructureNodeProvider<TreeElement>, ActionShortcutProvider {
                                             }
 
                                             if (macroByNameArity.size > 0) {
-                                                val usingArguments: Array<PsiElement>
                                                 val macro: CallDefinition?
                                                 var matchingClause: CallDefinitionClause? = null
 
-                                                if (finalArguments.size > 1) {
-                                                    usingArguments = Arrays.copyOfRange(finalArguments, 1, finalArguments.size)
-                                                    val nameArity = NameArity(USING, usingArguments.size)
-                                                    macro = macroByNameArity[nameArity]
-
-                                                    if (macro != null) {
-                                                        matchingClause = macro.matchingClause(usingArguments)
-                                                    }
-                                                } else {
+                                                if (finalArguments.size <= 1) {
                                                     /* `use <ALIAS>` will calls `__using__/1` even though there is
                                                        no additional argument, but it obviously can't select a clause. */
                                                     val nameArity = NameArity(USING, 1)
@@ -162,10 +157,12 @@ class Used : FileStructureNodeProvider<TreeElement>, ActionShortcutProvider {
                                                     val length = callDefinitionClauseChildren.size
 
                                                     if (length > 0) {
-                                                        val lastCallDefinitionClauseChild = callDefinitionClauseChildren[length - 1]
+                                                        val lastCallDefinitionClauseChild =
+                                                            callDefinitionClauseChildren[length - 1]
 
                                                         if (lastCallDefinitionClauseChild is Quote) {
-                                                            val injectedQuote = lastCallDefinitionClauseChild.used(child)
+                                                            val injectedQuote =
+                                                                lastCallDefinitionClauseChild.used(child)
                                                             val injectedQuoteChildren = injectedQuote.children
                                                             nodes = ArrayList(injectedQuoteChildren.size)
 
@@ -201,6 +198,6 @@ class Used : FileStructureNodeProvider<TreeElement>, ActionShortcutProvider {
         }
 
         fun provideNodesFromChildren(children: Collection<TreeElement>): Collection<TreeElement> =
-                children.flatMap { provideNodesFromChild(it) }
+            children.flatMap { provideNodesFromChild(it) }
     }
 }

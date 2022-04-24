@@ -173,47 +173,41 @@ class Variants(private val entrance: PsiElement) : Module() {
          * Any modules nested under `qualifier`
          */
         private fun filteredLookupElements(qualifier: PsiElement): Collection<LookupElement> =
-                qualifier
-                        .reference
-                        ?.let { qualifierReference ->
-                            when (qualifierReference) {
-                                is PsiPolyVariantReference -> {
-                                    val lookupElementByLookupName = LookupElementByLookupName()
+            qualifier
+                .reference
+                ?.let { it as? PsiPolyVariantReference }
+                ?.let { qualifierReference ->
+                    val lookupElementByLookupName = LookupElementByLookupName()
 
-                                    val resolvedElements = qualifierReference
-                                            .multiResolve(false)
-                                            .filter(ResolveResult::isValidResult)
-                                            .mapNotNull(ResolveResult::getElement)
+                    val resolvedElements = qualifierReference
+                        .multiResolve(false)
+                        .filter(ResolveResult::isValidResult)
+                        .mapNotNull(ResolveResult::getElement)
 
-                                    val resolvedModulars = resolvedElements.filterIsInstance<Call>().filter { Stub.isModular(it) }
+                    val resolvedModulars =
+                        resolvedElements.filterIsInstance<Call>().filter { Stub.isModular(it) }
 
-                                    val resolveds = if (resolvedModulars.isNotEmpty()) {
-                                        resolvedModulars
-                                    } else {
-                                        resolvedElements
+                    val resolveds = if (resolvedModulars.isNotEmpty()) {
+                        resolvedModulars
+                    } else {
+                        resolvedElements
 
-                                    }
+                    }
 
-                                    for (resolved in resolveds) {
-                                        putNestedAliased(lookupElementByLookupName, emptyList(), resolved as PsiNamedElement)
-                                    }
+                    for (resolved in resolveds) {
+                        putNestedAliased(
+                            lookupElementByLookupName,
+                            emptyList(),
+                            resolved as PsiNamedElement
+                        )
+                    }
 
-                                    lookupElementByLookupName.lookupElements()
-                                }
-                                else -> {
-                                    val resolved = qualifierReference.resolve()
-                                    TODO()
-                                }
-                            }
-                        }
-                        ?:
-                        // if the qualifier can't be resolved to an `alias` or a modular, then we can't find the nested
-                        // modulars.
-                        emptyList()
-
-        private fun putNested(lookupElementByLookupName: LookupElementByLookupName, project: Project) {
-
-        }
+                    lookupElementByLookupName.lookupElements()
+                }
+                ?:
+                // if the qualifier can't be resolved to an `alias` or a modular, then we can't find the nested
+                // modulars.
+                emptyList()
 
         private fun putNestedAliased(lookupElementByLookupName: LookupElementByLookupName, splitPrefix: List<String>, aliasedElement: PsiNamedElement) {
             UnaliasedName.unaliasedName(aliasedElement)?.let { unaliasedName ->

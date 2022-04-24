@@ -27,7 +27,7 @@ import org.elixir_lang.structure_view.element.structure.Structure
  * [Provider.getType]) together together.
  */
 class ElementDescriptionProvider : com.intellij.psi.ElementDescriptionProvider {
-    override tailrec fun getElementDescription(element: PsiElement, location: ElementDescriptionLocation): String? =
+    override fun getElementDescription(element: PsiElement, location: ElementDescriptionLocation): String? =
         when (element) {
             is AtOperation -> getElementDescription(element, location)
             is Call -> getElementDescription(element, location)
@@ -58,11 +58,8 @@ class ElementDescriptionProvider : com.intellij.psi.ElementDescriptionProvider {
             else -> null
         }
 
-    private fun getElementDescription(identifier: ElixirIdentifier, location: ElementDescriptionLocation): String? {
-        val parameter = Parameter(identifier)
-        val type = Parameter.putParameterized(parameter).type
-
-        return when (type) {
+    private fun getElementDescription(identifier: ElixirIdentifier, location: ElementDescriptionLocation): String? =
+        when (Parameter.putParameterized(Parameter(identifier)).type) {
             Parameter.Type.FUNCTION_NAME -> when (location) {
                 UsageViewShortNameLocation.INSTANCE -> identifier.text
                 UsageViewTypeLocation.INSTANCE -> "function"
@@ -75,15 +72,11 @@ class ElementDescriptionProvider : com.intellij.psi.ElementDescriptionProvider {
             }
             else -> null
         }
-    }
 
     private fun getElementDescription(
         keywordKey: ElixirKeywordKey,
         location: ElementDescriptionLocation
     ): String? {
-        if (location == UsageViewNodeTextLocation.INSTANCE) {
-            "test"
-        }
         var elementDescription: String? = keywordKey
             .parent.let { it as? ElixirKeywordPair }
             ?.parent?.let { it as? ElixirKeywords }
@@ -158,7 +151,7 @@ class ElementDescriptionProvider : com.intellij.psi.ElementDescriptionProvider {
             CallDefinitionClause.`is`(call) -> CallDefinitionClause.elementDescription(call, location)
             CallDefinitionSpecification.`is`(call) -> CallDefinitionSpecification.elementDescription(call, location)
             Callback.`is`(call) -> Callback.elementDescription(call, location)
-            Delegation.`is`(call) -> Delegation.elementDescription(call, location)
+            Delegation.`is`(call) -> Delegation.elementDescription(location)
             Exception.`is`(call) -> org.elixir_lang.structure_view.element.Exception.elementDescription(call, location)
             Implementation.`is`(call) -> Implementation.elementDescription(location)
             Import.`is`(call) -> Import.elementDescription(call, location)
@@ -167,7 +160,7 @@ class ElementDescriptionProvider : com.intellij.psi.ElementDescriptionProvider {
             Protocol.`is`(call) -> Module.elementDescription(call, location)
             QuoteMacro.`is`(call) -> org.elixir_lang.structure_view.element.Quote.elementDescription(call, location)
             Structure.`is`(call) -> Structure.elementDescription(call, location)
-            Type.`is`(call) -> Type.elementDescription(call, location)
+            Type.`is`(call) -> Type.elementDescription(location)
             Use.`is`(call) -> Use.elementDescription(call, location)
             call is AtUnqualifiedNoParenthesesCall<*> -> getElementDescription(call, location)
             Callable.isBitStreamSegmentOption(call) -> Callable.bitStringSegmentOptionElementDescription(call, location)
@@ -229,12 +222,10 @@ class ElementDescriptionProvider : com.intellij.psi.ElementDescriptionProvider {
         }
 
     private tailrec fun isAliasCallAs(element: PsiElement): Boolean =
-        if (element is ElixirAccessExpression || element is QualifiableAlias) {
-            isAliasCallAs(element.parent)
-        } else if (element is QuotableKeywordPair) {
-            isAliasCallAs(element)
-        } else {
-            false
+        when (element) {
+            is ElixirAccessExpression, is QualifiableAlias -> isAliasCallAs(element.parent)
+            is QuotableKeywordPair -> isAliasCallAs(element)
+            else -> false
         }
 
     companion object {

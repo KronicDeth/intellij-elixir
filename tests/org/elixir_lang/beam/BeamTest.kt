@@ -1,8 +1,8 @@
 package org.elixir_lang.beam
 
-import org.elixir_lang.beam.chunk.CallDefinitions.Companion.macroNameAritySortedSetByMacro
+import junit.framework.TestCase.assertEquals
 import org.elixir_lang.beam.Beam.Companion.from
-import junit.framework.Assert.assertEquals
+import org.elixir_lang.beam.chunk.CallDefinitions.Companion.macroNameAritySortedSetByMacro
 import org.elixir_lang.psi.call.name.Function.DEF
 import org.elixir_lang.psi.call.name.Function.DEFP
 import org.junit.After
@@ -15,6 +15,7 @@ import java.io.FileInputStream
 
 class BeamTest {
     private var ebinDirectory: String? = null
+
     @Test
     fun elixirModule() {
         val beam = beam("Elixir.Kernel")
@@ -25,7 +26,8 @@ class BeamTest {
         val callDefinitionCount: Int = beam.callDefinitionsList(atoms).map { it.size() }.sum()
         Assert.assertTrue("There are no callDefinitions", callDefinitionCount > 0)
         val macroNameAritySortedSetByMacro = macroNameAritySortedSetByMacro(beam, atoms)
-        val macroNameArityCount: Int = macroNameAritySortedSetByMacro.map { (_, macroNameAritySortedSet) -> macroNameAritySortedSet.size }.sum()
+        val macroNameArityCount: Int =
+            macroNameAritySortedSetByMacro.map { (_, macroNameAritySortedSet) -> macroNameAritySortedSet.size }.sum()
         assertEquals("There are nameless callDefinitions", callDefinitionCount, macroNameArityCount)
         val nodes = macroNameAritySortedSetByMacro.flatMap { (_, macroNameAritySortedSet) ->
             macroNameAritySortedSet.filter { it.name == "node" }
@@ -45,7 +47,8 @@ class BeamTest {
         val callDefinitionCount: Int = beam.callDefinitionsList(atoms).map { it.size() }.sum()
         Assert.assertTrue("There are no callDefinitions", callDefinitionCount > 0)
         val macroNameAritySortedSetByMacro = macroNameAritySortedSetByMacro(beam, atoms)
-        val macroNameArityCount: Int = macroNameAritySortedSetByMacro.map { (_, macroNameAritySortedSet) -> macroNameAritySortedSet.size }.sum()
+        val macroNameArityCount: Int =
+            macroNameAritySortedSetByMacro.map { (_, macroNameAritySortedSet) -> macroNameAritySortedSet.size }.sum()
         Assert.assertEquals("There are nameless callDefinitions", callDefinitionCount, macroNameArityCount)
 
         val extracts = macroNameAritySortedSetByMacro.flatMap { (_, macroNameAritySortedSet) ->
@@ -65,9 +68,9 @@ class BeamTest {
     private fun beam(baseName: String): Beam? {
         val path = "$ebinDirectory$baseName.beam"
         val dataInputStream = DataInputStream(
-                BufferedInputStream(
-                        FileInputStream(path)
-                )
+            BufferedInputStream(
+                FileInputStream(path)
+            )
         )
         return from(dataInputStream, path)
     }

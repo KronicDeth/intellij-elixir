@@ -33,11 +33,13 @@ object ProcessDeclarationsImpl {
      * `{:ok, value} = func() && value == literal`
      */
     @JvmStatic
-    fun processDeclarations(and: And,
-                            processor: PsiScopeProcessor,
-                            state: ResolveState,
-                            lastParent: PsiElement?,
-                            @Suppress("UNUSED_PARAMETER") place: PsiElement): Boolean {
+    fun processDeclarations(
+        and: And,
+        processor: PsiScopeProcessor,
+        state: ResolveState,
+        lastParent: PsiElement?,
+        @Suppress("UNUSED_PARAMETER") place: PsiElement
+    ): Boolean {
         var keepProcessing = true
 
         if (Normalized.operator(and).text == "&&") {
@@ -53,26 +55,30 @@ object ProcessDeclarationsImpl {
     }
 
     @JvmStatic
-    fun  processDeclarations(atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>,
-                             processor: PsiScopeProcessor,
-                             state: ResolveState,
-                             @Suppress("UNUSED_PARAMETER") lastParent: PsiElement?,
-                             @Suppress("UNUSED_PARAMETER") place: PsiElement): Boolean {
+    fun processDeclarations(
+        atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>,
+        processor: PsiScopeProcessor,
+        state: ResolveState,
+        @Suppress("UNUSED_PARAMETER") lastParent: PsiElement?,
+        @Suppress("UNUSED_PARAMETER") place: PsiElement
+    ): Boolean {
         val identifierName = atUnqualifiedNoParenthesesCall.atIdentifier.identifierName()
 
         return if (ModuleAttribute.isTypeSpecName(identifierName)) {
             processor.execute(atUnqualifiedNoParenthesesCall, state) &&
-            atUnqualifiedNoParenthesesCall.finalArguments()?.singleOrNull()?.let { argument ->
-                processDeclarationInTypeSpecArgument(argument, processor, state)
-            } ?: true
+                    atUnqualifiedNoParenthesesCall.finalArguments()?.singleOrNull()?.let { argument ->
+                        processDeclarationInTypeSpecArgument(argument, processor, state)
+                    } ?: true
         } else {
             processor.execute(atUnqualifiedNoParenthesesCall, state)
         }
     }
 
-    private fun processDeclarationInTypeSpecArgument(argument: PsiElement,
-                                                     processor: PsiScopeProcessor,
-                                                     state: ResolveState): Boolean =
+    private fun processDeclarationInTypeSpecArgument(
+        argument: PsiElement,
+        processor: PsiScopeProcessor,
+        state: ResolveState
+    ): Boolean =
         when (argument) {
             // `Type` are gotten going up, don't need to go down here
             is Type -> true
@@ -80,106 +86,120 @@ object ProcessDeclarationsImpl {
             else -> true
         }
 
-    private fun processDeclarationInTypeSpecArgument(argument: When,
-                                                     processor: PsiScopeProcessor,
-                                                     state: ResolveState): Boolean =
+    private fun processDeclarationInTypeSpecArgument(
+        argument: When,
+        processor: PsiScopeProcessor,
+        state: ResolveState
+    ): Boolean =
         argument.rightOperand()?.stripAccessExpression()?.let {
             processDeclarationInTypeSpecRestrictions(it, processor, state)
         } ?: true
 
-    private fun processDeclarationInTypeSpecRestrictions(restrictions: PsiElement, processor: PsiScopeProcessor, state: ResolveState): Boolean =
-            when (restrictions) {
-                is ElixirList -> restrictions.whileInChildExpressions {
-                    processDeclarationInTypeSpecRestrictions(it, processor, state)
-                }
-                is QuotableKeywordList -> whileIn(restrictions.quotableKeywordPairList()) {
-                    processDeclarationInTypeSpecRestrictions(it, processor, state)
-                }
-                is QuotableKeywordPair -> processor.execute(restrictions.keywordKey, state)
-                is Type -> restrictions.leftOperand()?.let {
-                    processor.execute(it, state)
-                } ?: true
-                // The `when` isn't finished being type, so its argument is the `def` like:
-                // `@spec foo(bar) :: term() when\ndef foo(`
-                is Call -> true
-                else -> {
-                    Logger.error(restrictions::class.java,
-                            "Don't know how find type variable restrictions",
-                            restrictions)
-
-                    true
-                }
+    private fun processDeclarationInTypeSpecRestrictions(
+        restrictions: PsiElement,
+        processor: PsiScopeProcessor,
+        state: ResolveState
+    ): Boolean =
+        when (restrictions) {
+            is ElixirList -> restrictions.whileInChildExpressions {
+                processDeclarationInTypeSpecRestrictions(it, processor, state)
             }
+            is QuotableKeywordList -> whileIn(restrictions.quotableKeywordPairList()) {
+                processDeclarationInTypeSpecRestrictions(it, processor, state)
+            }
+            is QuotableKeywordPair -> processor.execute(restrictions.keywordKey, state)
+            is Type -> restrictions.leftOperand()?.let {
+                processor.execute(it, state)
+            } ?: true
+            // The `when` isn't finished being type, so its argument is the `def` like:
+            // `@spec foo(bar) :: term() when\ndef foo(`
+            is Call -> true
+            else -> {
+                Logger.error(
+                    restrictions::class.java,
+                    "Don't know how find type variable restrictions",
+                    restrictions
+                )
+
+                true
+            }
+        }
 
     /**
      * `def(macro)?p?`, `for`, or `with` can declare variables
      */
     @JvmStatic
-    fun processDeclarations(call: Call,
-                            processor: PsiScopeProcessor,
-                            state: ResolveState,
-                            lastParent: PsiElement?,
-                            place: PsiElement): Boolean =
-            // need to check if call is place because lastParent is set to place at start of treeWalkUp
-            if (!call.isEquivalentTo(lastParent) || call.isEquivalentTo(place)) {
-                when {
-                    call.isCalling(KERNEL, ALIAS) ||
-                    CallDefinitionClause.`is`(call) || // call parameters
-                            Callback.`is`(call) ||
-                            Case.isChild(call, state) ||
-                            Delegation.`is`(call) || // delegation call parameters
-                            Exception.`is`(call) ||
-                            Implementation.`is`(call) ||
-                            Import.`is`(call) ||
-                            Module.`is`(call) ||
-                            Protocol.`is`(call) ||
-                            Use.`is`(call) ||
-                            call.isCalling(KERNEL, DESTRUCTURE) || // left operand
-                            call.isCallingMacro(KERNEL, IF) || // match in condition
-                            call.isCallingMacro(KERNEL, Function.FOR) || // comprehension match variable
-                            call.isCalling(KERNEL, MATCH_QUESTION_MARK) ||
-                            call.isCalling(KERNEL, REQUIRE) ||
-                            call.isCallingMacro(KERNEL, UNLESS) || // match in condition
-                            call.isCallingMacro(KERNEL, "with") || // <- or = variable
-                            QuoteMacro.`is`(call) || // quote :bind_quoted keys for Variable resolver OR call definitions for Callable resolver
-                            org.elixir_lang.psi.mix.Generator.isEmbed(call, state) ||
-                            Assertions.isChild(call, state)
-                    -> processor.execute(call, state)
-                    org.elixir_lang.ecto.Schema.isChild(call, state) -> {
-                        processor.execute(call, state)
-                    }
-                    hasDoBlockOrKeyword(call) ->
-                        // unknown macros that take do blocks often allow variables to be declared in their arguments
-                        processor.execute(call, state)
-                    org.elixir_lang.ecto.Query.isChild(call, state) -> {
-                        processor.execute(call, state)
-                    }
-                    else -> true
+    fun processDeclarations(
+        call: Call,
+        processor: PsiScopeProcessor,
+        state: ResolveState,
+        lastParent: PsiElement?,
+        place: PsiElement
+    ): Boolean =
+        // need to check if call is place because lastParent is set to place at start of treeWalkUp
+        if (!call.isEquivalentTo(lastParent) || call.isEquivalentTo(place)) {
+            when {
+                call.isCalling(KERNEL, ALIAS) ||
+                        CallDefinitionClause.`is`(call) || // call parameters
+                        Callback.`is`(call) ||
+                        Case.isChild(call, state) ||
+                        Delegation.`is`(call) || // delegation call parameters
+                        Exception.`is`(call) ||
+                        Implementation.`is`(call) ||
+                        Import.`is`(call) ||
+                        Module.`is`(call) ||
+                        Protocol.`is`(call) ||
+                        Use.`is`(call) ||
+                        call.isCalling(KERNEL, DESTRUCTURE) || // left operand
+                        call.isCallingMacro(KERNEL, IF) || // match in condition
+                        call.isCallingMacro(KERNEL, Function.FOR) || // comprehension match variable
+                        call.isCalling(KERNEL, MATCH_QUESTION_MARK) ||
+                        call.isCalling(KERNEL, REQUIRE) ||
+                        call.isCallingMacro(KERNEL, UNLESS) || // match in condition
+                        call.isCallingMacro(KERNEL, "with") || // <- or = variable
+                        QuoteMacro.`is`(call) || // quote :bind_quoted keys for Variable resolver OR call definitions for Callable resolver
+                        org.elixir_lang.psi.mix.Generator.isEmbed(call, state) ||
+                        Assertions.isChild(call, state)
+                -> processor.execute(call, state)
+                org.elixir_lang.ecto.Schema.isChild(call, state) -> {
+                    processor.execute(call, state)
                 }
-            } else {
-                true
+                hasDoBlockOrKeyword(call) ->
+                    // unknown macros that take do blocks often allow variables to be declared in their arguments
+                    processor.execute(call, state)
+                org.elixir_lang.ecto.Query.isChild(call, state) -> {
+                    processor.execute(call, state)
+                }
+                else -> true
             }
+        } else {
+            true
+        }
 
     @JvmStatic
-    fun processDeclarations(alias: ElixirAlias,
-                            processor: PsiScopeProcessor,
-                            state: ResolveState,
-                            lastParent: PsiElement,
-                            place: PsiElement): Boolean =
-            processDeclarationsRecursively(
-                    alias,
-                    processor,
-                    state,
-                    lastParent,
-                    place
-            )
+    fun processDeclarations(
+        alias: ElixirAlias,
+        processor: PsiScopeProcessor,
+        state: ResolveState,
+        lastParent: PsiElement,
+        place: PsiElement
+    ): Boolean =
+        processDeclarationsRecursively(
+            alias,
+            processor,
+            state,
+            lastParent,
+            place
+        )
 
     @JvmStatic
-    fun processDeclarations(file: ElixirFile,
-                            processor: PsiScopeProcessor,
-                            state: ResolveState,
-                            lastParent: PsiElement,
-                            place: PsiElement): Boolean {
+    fun processDeclarations(
+        file: ElixirFile,
+        processor: PsiScopeProcessor,
+        state: ResolveState,
+        lastParent: PsiElement,
+        place: PsiElement
+    ): Boolean {
         val keepProcessing = processDeclarationsInPreviousSibling(file, processor, state, lastParent, place)
 
         if (keepProcessing) {
@@ -190,56 +210,66 @@ object ProcessDeclarationsImpl {
     }
 
     @JvmStatic
-    fun processDeclarations(multipleAliases: ElixirMultipleAliases,
-                            processor: PsiScopeProcessor,
-                            state: ResolveState,
-                            lastParent: PsiElement,
-                            entrance: PsiElement): Boolean {
+    fun processDeclarations(
+        multipleAliases: ElixirMultipleAliases,
+        processor: PsiScopeProcessor,
+        state: ResolveState,
+        lastParent: PsiElement,
+        entrance: PsiElement
+    ): Boolean {
         return processDeclarationsRecursively(
-                multipleAliases,
-                processor,
-                state,
-                lastParent,
-                entrance
+            multipleAliases,
+            processor,
+            state,
+            lastParent,
+            entrance
         )
     }
 
     @JvmStatic
-    fun processDeclarations(scope: ElixirEex,
-                            processor: PsiScopeProcessor,
-                            state: ResolveState,
-                            lastParent: PsiElement,
-                            place: PsiElement): Boolean =
-            processDeclarationsInPreviousSibling(scope, processor, state, lastParent, place)
+    fun processDeclarations(
+        scope: ElixirEex,
+        processor: PsiScopeProcessor,
+        state: ResolveState,
+        lastParent: PsiElement,
+        place: PsiElement
+    ): Boolean =
+        processDeclarationsInPreviousSibling(scope, processor, state, lastParent, place)
 
     @JvmStatic
-    fun processDeclarations(scope: ElixirEexTag,
-                            processor: PsiScopeProcessor,
-                            state: ResolveState,
-                            lastParent: PsiElement,
-                            place: PsiElement): Boolean =
+    fun processDeclarations(
+        scope: ElixirEexTag,
+        processor: PsiScopeProcessor,
+        state: ResolveState,
+        lastParent: PsiElement,
+        place: PsiElement
+    ): Boolean =
         if (scope.isEquivalentTo(lastParent.parent)) {
             processDeclarationsInPreviousSibling(scope, processor, state, lastParent, place)
         } else {
             scope
-                    .childExpressions(forward = false)
-                    .let { processDeclarations(it, processor, state, lastParent, place) }
+                .childExpressions(forward = false)
+                .let { processDeclarations(it, processor, state, lastParent, place) }
         }
 
     @JvmStatic
-    fun processDeclarations(scope: ElixirStabBody,
-                            processor: PsiScopeProcessor,
-                            state: ResolveState,
-                            lastParent: PsiElement,
-                            place: PsiElement): Boolean =
-            processDeclarationsInPreviousSibling(scope, processor, state, lastParent, place)
+    fun processDeclarations(
+        scope: ElixirStabBody,
+        processor: PsiScopeProcessor,
+        state: ResolveState,
+        lastParent: PsiElement,
+        place: PsiElement
+    ): Boolean =
+        processDeclarationsInPreviousSibling(scope, processor, state, lastParent, place)
 
     @JvmStatic
-    fun processDeclarations(stabOperation: ElixirStabOperation,
-                            processor: PsiScopeProcessor,
-                            state: ResolveState,
-                            @Suppress("UNUSED_PARAMETER") lastParent: PsiElement,
-                            @Suppress("UNUSED_PARAMETER") place: PsiElement): Boolean {
+    fun processDeclarations(
+        stabOperation: ElixirStabOperation,
+        processor: PsiScopeProcessor,
+        state: ResolveState,
+        @Suppress("UNUSED_PARAMETER") lastParent: PsiElement,
+        @Suppress("UNUSED_PARAMETER") place: PsiElement
+    ): Boolean {
         var keepProcessing = true
         val signature = stabOperation.leftOperand()
 
@@ -253,11 +283,13 @@ object ProcessDeclarationsImpl {
     }
 
     @JvmStatic
-    fun processDeclarations(match: Match,
-                            processor: PsiScopeProcessor,
-                            state: ResolveState,
-                            lastParent: PsiElement,
-                            @Suppress("UNUSED_PARAMETER") place: PsiElement): Boolean {
+    fun processDeclarations(
+        match: Match,
+        processor: PsiScopeProcessor,
+        state: ResolveState,
+        lastParent: PsiElement,
+        @Suppress("UNUSED_PARAMETER") place: PsiElement
+    ): Boolean {
         val rightOperand = match.rightOperand()
         val leftOperand = match.leftOperand()
         var checkRight = false
@@ -303,22 +335,24 @@ object ProcessDeclarationsImpl {
     }
 
     @JvmStatic
-    fun processDeclarations(type: Type,
-                            processor: PsiScopeProcessor,
-                            state: ResolveState,
-                            lastParent: PsiElement,
-                            place: PsiElement): Boolean =
+    fun processDeclarations(
+        type: Type,
+        processor: PsiScopeProcessor,
+        state: ResolveState
+    ): Boolean =
         type
-                .leftOperand()
-                ?.let { processor.execute(it, state) }
-                ?: true
+            .leftOperand()
+            ?.let { processor.execute(it, state) }
+            ?: true
 
     @JvmStatic
-    fun processDeclarations(qualifiedAlias: QualifiedAlias,
-                            processor: PsiScopeProcessor,
-                            state: ResolveState,
-                            @Suppress("UNUSED_PARAMETER") lastParent: PsiElement,
-                            @Suppress("UNUSED_PARAMETER") place: PsiElement): Boolean {
+    fun processDeclarations(
+        qualifiedAlias: QualifiedAlias,
+        processor: PsiScopeProcessor,
+        state: ResolveState,
+        @Suppress("UNUSED_PARAMETER") lastParent: PsiElement,
+        @Suppress("UNUSED_PARAMETER") place: PsiElement
+    ): Boolean {
         return processor.execute(qualifiedAlias, state)
     }
 
@@ -368,46 +402,52 @@ object ProcessDeclarationsImpl {
      *
      * @param scope an [ElixirStabBody] or [ElixirFile] that has a sequence of expressions as children
      */
-    private fun processDeclarationsInPreviousSibling(scope: PsiElement,
-                                                     processor: PsiScopeProcessor,
-                                                     state: ResolveState,
-                                                     lastParent: PsiElement,
-                                                     place: PsiElement): Boolean =
+    private fun processDeclarationsInPreviousSibling(
+        scope: PsiElement,
+        processor: PsiScopeProcessor,
+        state: ResolveState,
+        lastParent: PsiElement,
+        place: PsiElement
+    ): Boolean =
         if (scope.isEquivalentTo(lastParent.parent)) {
             lastParent
-                    .siblingExpressions(forward = false, withSelf = false)
-                    .let { processDeclarations(it, processor, state, lastParent, place) }
+                .siblingExpressions(forward = false, withSelf = false)
+                .let { processDeclarations(it, processor, state, lastParent, place) }
         } else {
             if (lastParent !is ElixirFile) {
                 org.elixir_lang.errorreport.Logger.error(
-                        PsiElement::class.java,
-                        "Scope is not lastParent's parent\nlastParent:\n" + lastParent.text,
-                        scope
+                    PsiElement::class.java,
+                    "Scope is not lastParent's parent\nlastParent:\n" + lastParent.text,
+                    scope
                 )
             }
 
             true
         }
 
-    fun processDeclarations(sequence: Sequence<PsiElement>,
-                                    processor: PsiScopeProcessor,
-                                    state: ResolveState,
-                                    lastParent: PsiElement,
-                                    place: PsiElement): Boolean =
-            sequence
-                    .filter { !createsNewScope(it) }
-                    .map {
-                        it.processDeclarations(processor, state, lastParent, place)
-                    }
-                    .takeWhile { it }
-                    .lastOrNull()
-                    ?: true
+    fun processDeclarations(
+        sequence: Sequence<PsiElement>,
+        processor: PsiScopeProcessor,
+        state: ResolveState,
+        lastParent: PsiElement,
+        place: PsiElement
+    ): Boolean =
+        sequence
+            .filter { !createsNewScope(it) }
+            .map {
+                it.processDeclarations(processor, state, lastParent, place)
+            }
+            .takeWhile { it }
+            .lastOrNull()
+            ?: true
 
-    private fun processDeclarationsRecursively(psiElement: PsiElement,
-                                               processor: PsiScopeProcessor,
-                                               state: ResolveState,
-                                               lastParent: PsiElement,
-                                               place: PsiElement): Boolean {
+    private fun processDeclarationsRecursively(
+        psiElement: PsiElement,
+        processor: PsiScopeProcessor,
+        state: ResolveState,
+        lastParent: PsiElement,
+        place: PsiElement
+    ): Boolean {
         var keepProcessing = processor.execute(psiElement, state)
 
         if (keepProcessing) {
