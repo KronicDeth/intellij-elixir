@@ -46,6 +46,7 @@ import com.intellij.xdebugger.breakpoints.XLineBreakpoint
 import com.intellij.xdebugger.evaluation.EvaluationMode
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator
+import com.intellij.xdebugger.frame.XSuspendContext
 import org.elixir_lang.ElixirFileType
 import org.elixir_lang.beam.chunk.lines.file_names.Index
 import org.elixir_lang.beam.term.inspect
@@ -71,7 +72,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.system.measureNanoTime
 
 class Process(session: XDebugSession, private val executionEnvironment: ExecutionEnvironment) :
-        XDebugProcess(session), Listener {
+    XDebugProcess(session), Listener {
     init {
         session.setPauseActionSupported(false)
     }
@@ -91,15 +92,15 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
     private val debuggedExecutionResult by lazy {
         executionEnvironment.executor.let { executor ->
             debuggableConfiguration
-                    .debuggedConfiguration(debuggedName, cookie)
-                    .getState(executor, executionEnvironment)!!
-                    .execute(executor, executionEnvironment.runner)!!
+                .debuggedConfiguration(debuggedName, cookie)
+                .getState(executor, executionEnvironment)!!
+                .execute(executor, executionEnvironment.runner)!!
         }
     }
 
     private val nodesUUID by lazy { UUID.randomUUID()!! }
     private val cookie by lazy { debuggableConfiguration.cookie ?: nodesUUID.toString() }
-    private val debuggedName by lazy {  debuggableConfiguration.nodeName ?: "debugged$nodesUUID@127.0.0.1" }
+    private val debuggedName by lazy { debuggableConfiguration.nodeName ?: "debugged$nodesUUID@127.0.0.1" }
     private val debuggerName by lazy { "debugger$nodesUUID@127.0.0.1" }
 
     private val node by lazy {
@@ -127,16 +128,16 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
 
                 for (moduleName in moduleNameSet) {
                     moduleName
-                            .let(::elixirModuleNameToErlang)
-                            .let(::OtpErlangAtom)
-                            .run {
-                                afterInitialized { addBreakpoint(breakpoint, sourcePosition, this) }
-                            }
+                        .let(::elixirModuleNameToErlang)
+                        .let(::OtpErlangAtom)
+                        .run {
+                            afterInitialized { addBreakpoint(breakpoint, sourcePosition, this) }
+                        }
                 }
             } else {
                 session.reportMessage(
-                        "Unable to determine module for breakpoint at ${sourcePosition.file} line ${sourcePosition.line}",
-                        MessageType.ERROR
+                    "Unable to determine module for breakpoint at ${sourcePosition.file} line ${sourcePosition.line}",
+                    MessageType.ERROR
                 )
             }
         }
@@ -150,12 +151,19 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
         }
     }
 
-    private fun addBreakpoint(breakpoint: XLineBreakpoint<Properties>, sourcePosition: SourcePosition, module: OtpErlangAtom) {
+    private fun addBreakpoint(
+        breakpoint: XLineBreakpoint<Properties>,
+        sourcePosition: SourcePosition,
+        module: OtpErlangAtom
+    ) {
         try {
             val response = node.setBreakpoint(module, sourcePositionLineToModuleLine(sourcePosition.line))
 
             when (response) {
-                OK -> session.reportMessage("Breakpoint at ${sourcePosition.file}:${sourcePosition.line} set", MessageType.INFO)
+                OK -> session.reportMessage(
+                    "Breakpoint at ${sourcePosition.file}:${sourcePosition.line} set",
+                    MessageType.INFO
+                )
                 is ErrorReason -> session.updateBreakpointPresentation(breakpoint, null, inspect(response.reason))
             }
         } catch (exception: Exception) {
@@ -172,7 +180,8 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
     override fun breakpointIsSet(module: String, file: String, line: Int) {}
 
     override fun breakpointReached(pid: OtpErlangPid, snapshots: List<ProcessSnapshot>) {
-        val processInBreakpoint = ContainerUtil.find(snapshots) { elixirProcessSnapshot -> elixirProcessSnapshot.pid == pid }!!
+        val processInBreakpoint =
+            ContainerUtil.find(snapshots) { elixirProcessSnapshot -> elixirProcessSnapshot.pid == pid }!!
         val breakPosition = SourcePosition.create(processInBreakpoint)
         val breakpoint = getLineBreakpoint(breakPosition)
         val suspendContext = SuspendContext(this, pid, snapshots)
@@ -181,7 +190,7 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
         } else {
             val shouldSuspend = session.breakpointReached(breakpoint, null, suspendContext)
             if (!shouldSuspend) {
-                resume()
+                resume(suspendContext)
             }
         }
     }
@@ -199,40 +208,51 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
 
     override fun failedToDebugRemoteNode(nodeName: String, error: OtpErlangObject) {
         session.reportMessage(
-                "Failed to debug remote node '$nodeName'. Details: ${inspect(error)}",
-                MessageType.ERROR
+            "Failed to debug remote node '$nodeName'. Details: ${inspect(error)}",
+            MessageType.ERROR
         )
     }
 
-    override fun failedToInterpretModules(nodeName: String,
-                                          errorReasonByModule: Map<String, OtpErlangObject>) {
+    override fun failedToInterpretModules(
+        nodeName: String,
+        errorReasonByModule: Map<String, OtpErlangObject>
+    ) {
         val stringBuilder = StringBuilder("Failed to interpret modules on node (")
-                .append(nodeName)
-                .append("):\n\n")
+            .append(nodeName)
+            .append("):\n\n")
 
         for ((key, value) in errorReasonByModule) {
             stringBuilder.append(key).append(": ").append(inspect(value)).append("\n\n")
         }
 
         stringBuilder.append(
-                "Make sure they are compiled with debug_info option, their sources are located in same directory as " + ".beam files, modules are available on the node."
+            "Make sure they are compiled with debug_info option, their sources are located in same directory as " + ".beam files, modules are available on the node."
         )
 
         session.reportMessage(stringBuilder.toString(), MessageType.WARNING)
     }
 
-    override fun failedToSetBreakpoint(module: String,
-                                       file: String,
-                                       line: Int,
-                                       errorMessage: OtpErlangObject) {
+    override fun failedToSetBreakpoint(
+        module: String,
+        file: String,
+        line: Int,
+        errorMessage: OtpErlangObject
+    ) {
         val sourcePosition = SourcePosition.create(file, line)
         val breakpoint = getLineBreakpoint(sourcePosition)
 
         if (breakpoint != null) {
-            session.updateBreakpointPresentation(breakpoint, AllIcons.Debugger.Db_invalid_breakpoint, inspect(errorMessage))
+            session.updateBreakpointPresentation(
+                breakpoint,
+                AllIcons.Debugger.Db_invalid_breakpoint,
+                inspect(errorMessage)
+            )
         }
 
-        session.reportMessage("Failed to set breakpoint. Module: " + module + " Line: " + (line + 1), MessageType.WARNING)
+        session.reportMessage(
+            "Failed to set breakpoint. Module: " + module + " Line: " + (line + 1),
+            MessageType.WARNING
+        )
     }
 
     override fun interpretedModules(interpretedModuleList: List<InterpretedModule>) {
@@ -243,10 +263,12 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
 
     override fun getEditorsProvider(): XDebuggerEditorsProvider {
         return object : XDebuggerEditorsProvider() {
-            override fun createDocument(project: Project,
-                                        text: String,
-                                        sourcePosition: XSourcePosition?,
-                                        mode: EvaluationMode): Document {
+            override fun createDocument(
+                project: Project,
+                text: String,
+                sourcePosition: XSourcePosition?,
+                mode: EvaluationMode
+            ): Document {
                 val file = LightVirtualFile("plain-text-elixir-debugger.txt", text)
 
                 return FileDocumentManager.getInstance().getDocument(file)!!
@@ -259,74 +281,68 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
     }
 
     private fun getLineBreakpoint(sourcePosition: SourcePosition?): XLineBreakpoint<Properties>? =
-            if (sourcePosition != null) sourcePositionToBreakpoint[sourcePosition] else null
+        if (sourcePosition != null) sourcePositionToBreakpoint[sourcePosition] else null
 
     private fun moduleNameSet(breakpointPosition: SourcePosition): Set<String> {
         val virtualFile = breakpointPosition.file
         val project = debuggableConfiguration.getProject()
 
         return PsiManager
-                .getInstance(project)
-                .findFile(virtualFile)
-                ?.let { psiFile ->
-            val element = psiFile.findElementAt(breakpointPosition.sourcePosition.offset)
+            .getInstance(project)
+            .findFile(virtualFile)
+            ?.let { psiFile ->
+                val element = psiFile.findElementAt(breakpointPosition.sourcePosition.offset)
 
-            when (psiFile) {
-                is ElixirFile -> // TODO allow multiple module names for `defimpl`
-                    element?.getModuleName()?.let { setOf(it) } ?: emptySet()
-                is org.elixir_lang.eex.File -> {
-                    val module = ModuleUtilCore.findModuleForPsiElement(psiFile)
-                    val rootDirectory = ensureWorkingDirectory(project, module)
+                when (psiFile) {
+                    is ElixirFile -> // TODO allow multiple module names for `defimpl`
+                        element?.getModuleName()?.let { setOf(it) } ?: emptySet()
+                    is org.elixir_lang.eex.File -> {
+                        val module = ModuleUtilCore.findModuleForPsiElement(psiFile)
+                        val rootDirectory = ensureWorkingDirectory(project, module)
 
-                    val path = virtualFile.path
-                    try {
-                        java.io.File(path).relativeTo(
+                        val path = virtualFile.path
+                        try {
+                            java.io.File(path).relativeTo(
                                 java.io.File(rootDirectory)
-                        )
-                    } catch (illegalArgumentException: IllegalArgumentException) {
-                        null
-                    }?.let { relativeFile ->
-                        val filename = relativeFile.path
+                            )
+                        } catch (illegalArgumentException: IllegalArgumentException) {
+                            null
+                        }?.let { relativeFile ->
+                            val filename = relativeFile.path
 
-                        FileBasedIndex
+                            FileBasedIndex
                                 .getInstance()
                                 .getContainingFiles(
-                                        Index.NAME,
-                                        filename,
-                                        GlobalSearchScope.allScope(project)
+                                    Index.NAME,
+                                    filename,
+                                    GlobalSearchScope.allScope(project)
                                 )
                                 .map { fileNameVirtualFile ->
                                     fileNameVirtualFile.name.removePrefix("Elixir.").removeSuffix(".beam")
                                 }
                                 .toSet()
-                    } ?:
-                    emptySet()
+                        } ?: emptySet()
+                    }
+                    else -> emptySet()
                 }
-                else -> emptySet()
-            }
-        } ?:
-        emptySet()
+            } ?: emptySet()
     }
 
     fun removeBreakpoint(breakpoint: XLineBreakpoint<Properties>) {
-       sourcePosition(breakpoint)?.let { breakpointPosition ->
-           sourcePositionToBreakpoint.remove(breakpointPosition)
+        sourcePosition(breakpoint)?.let { breakpointPosition ->
+            sourcePositionToBreakpoint.remove(breakpointPosition)
 
-           moduleNameSet(breakpointPosition).forEach { moduleName ->
-               moduleName
-                       .let(::elixirModuleNameToErlang)
-                       .let(::OtpErlangAtom)
-                       .let { node.removeBreakpoint(it, breakpointPosition.line) }
-           }
-       }
+            moduleNameSet(breakpointPosition).forEach { moduleName ->
+                moduleName
+                    .let(::elixirModuleNameToErlang)
+                    .let(::OtpErlangAtom)
+                    .let { node.removeBreakpoint(it, breakpointPosition.line) }
+            }
+        }
     }
 
-    override fun resume() {
+    override fun resume(context: XSuspendContext?) {
         node.resume()
-    }
-
-    override fun runToPosition(position: XSourcePosition) {
-        //TODO implement me
     }
 
     private val initialized = AtomicBoolean(false)
@@ -338,8 +354,8 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
 
             val interpretationSeconds = measureNanoTime {
                 node.interpret(
-                        debuggableConfiguration.let { it as Configuration }.sdkPaths(),
-                        debuggableConfiguration.doNotInterpretPatterns()
+                    debuggableConfiguration.let { it as Configuration }.sdkPaths(),
+                    debuggableConfiguration.doNotInterpretPatterns()
                 )
             }.let { TimeUnit.NANOSECONDS.toSeconds(it) }
 
@@ -379,15 +395,15 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
         }
     }
 
-    override fun startStepInto() {
+    override fun startStepInto(context: XSuspendContext?) {
         node.stepInto()
     }
 
-    override fun startStepOut() {
+    override fun startStepOut(context: XSuspendContext?) {
         node.stepOut()
     }
 
-    override fun startStepOver() {
+    override fun startStepOver(context: XSuspendContext?) {
         node.stepOver()
     }
 
@@ -402,15 +418,15 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
     }
 
     fun evaluate(
-            pid: OtpErlangPid,
-            stackPointer: Int,
-            module: OtpErlangAtom,
-            function: String,
-            arity: Int,
-            file: String,
-            line: Int,
-            expression: String,
-            callback: XDebuggerEvaluator.XEvaluationCallback
+        pid: OtpErlangPid,
+        stackPointer: Int,
+        module: OtpErlangAtom,
+        function: String,
+        arity: Int,
+        file: String,
+        line: Int,
+        expression: String,
+        callback: XDebuggerEvaluator.XEvaluationCallback
     ) {
         node.evaluate(pid, stackPointer, module, function, arity, file, line, expression, callback)
     }

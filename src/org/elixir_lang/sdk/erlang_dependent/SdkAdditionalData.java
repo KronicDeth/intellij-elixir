@@ -5,9 +5,9 @@ import com.intellij.openapi.projectRoots.ProjectJdkTable;
 import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.projectRoots.SdkModel;
 import com.intellij.openapi.projectRoots.ValidatableSdkAdditionalData;
-import com.intellij.openapi.util.DefaultJDOMExternalizer;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
+import com.intellij.util.xmlb.XmlSerializer;
 import org.elixir_lang.sdk.elixir.Type;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
@@ -54,12 +54,12 @@ public class SdkAdditionalData implements ValidatableSdkAdditionalData {
     }
 
     public void readExternal(Element element) throws InvalidDataException {
-        DefaultJDOMExternalizer.readExternal(this, element);
+        XmlSerializer.deserializeInto(this, element);
         erlangSdkName = element.getAttributeValue(ERLANG_SDK_NAME);
     }
 
     public void writeExternal(Element element) throws WriteExternalException {
-        DefaultJDOMExternalizer.writeExternal(this, element);
+        XmlSerializer.serializeInto(this, element);
         final Sdk sdk = getErlangSdk();
 
         if (sdk != null) {

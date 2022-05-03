@@ -21,7 +21,6 @@ import org.elixir_lang.psi.operation.Type
 import org.elixir_lang.psi.operation.infix.Normalized
 import org.elixir_lang.reference.ModuleAttribute.Companion.isDocumentationName
 import org.elixir_lang.reference.ModuleAttribute.Companion.isTypeName
-import java.util.*
 
 class Builder : FoldingBuilderEx() {
     /**
@@ -38,209 +37,242 @@ class Builder : FoldingBuilderEx() {
     override fun buildFoldRegions(root: PsiElement, document: Document, quick: Boolean): Array<FoldingDescriptor> {
         val foldingDescriptorList: MutableList<FoldingDescriptor> = ArrayList()
         PsiTreeUtil.processElements(root,
-                object : PsiElementProcessor<PsiElement> {
-                    private val foldingGroupByModuleAttributeName: MutableMap<String, FoldingGroup> = HashMap()
+                                    object : PsiElementProcessor<PsiElement> {
+                                        private val foldingGroupByModuleAttributeName: MutableMap<String, FoldingGroup> =
+                                            HashMap()
 
-                    override fun execute(element: PsiElement): Boolean =
-                            when (element) {
-                                is AtOperation -> {
-                                    execute(element)
-                                }
-                                is AtUnqualifiedNoParenthesesCall<*> -> {
-                                    execute(element)
-                                }
-                                is ElixirDoBlock -> {
-                                    execute(element)
-                                }
-                                is ElixirStabOperation -> {
-                                    execute(element)
-                                }
-                                is Call -> {
-                                    execute(element)
-                                }
-                                else -> {
-                                    true
-                                }
-                            }
+                                        override fun execute(element: PsiElement): Boolean =
+                                            when (element) {
+                                                is AtOperation -> {
+                                                    execute(element)
+                                                }
+                                                is AtUnqualifiedNoParenthesesCall<*> -> {
+                                                    execute(element)
+                                                }
+                                                is ElixirDoBlock -> {
+                                                    execute(element)
+                                                }
+                                                is ElixirStabOperation -> {
+                                                    execute(element)
+                                                }
+                                                is Call -> {
+                                                    execute(element)
+                                                }
+                                                else -> {
+                                                    true
+                                                }
+                                            }
 
-                    /*
-                     * Private Instance Methods
-                     */
+                                        /*
+                                         * Private Instance Methods
+                                         */
 
-                    private fun execute(atNonNumericOperation: AtOperation): Boolean =
-                            if (!quick) {
-                                slowExecute(atNonNumericOperation)
-                            } else {
-                                true
-                            }
+                                        private fun execute(atNonNumericOperation: AtOperation): Boolean =
+                                            if (!quick) {
+                                                slowExecute(atNonNumericOperation)
+                                            } else {
+                                                true
+                                            }
 
-                    private fun execute(atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>): Boolean {
-                        val moduleAttributeName = ElixirPsiImplUtil.moduleAttributeName(atUnqualifiedNoParenthesesCall)
-                        val name = moduleAttributeName.substring(1)
-                        if (isDocumentationName(name)) {
-                            val noParenthesesOneArgument = atUnqualifiedNoParenthesesCall.noParenthesesOneArgument
-                            foldingDescriptorList.add(
-                                    FoldingDescriptor(
-                                            noParenthesesOneArgument.node,
-                                            noParenthesesOneArgument.textRange,
-                                            null,
-                                            "\"...\""
-                                    )
-                            )
-                        } else if (isTypeName(name)) {
-                            atUnqualifiedNoParenthesesCall
-                                    .noParenthesesOneArgument
-                                    .children
-                                    .singleOrNull()
-                                    ?.let { child ->
-                                        if (child is Type) {
-                                            val rightOperand: PsiElement? = Normalized.rightOperand(child)
-                                            if (rightOperand != null) {
+                                        private fun execute(atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>): Boolean {
+                                            val moduleAttributeName =
+                                                ElixirPsiImplUtil.moduleAttributeName(atUnqualifiedNoParenthesesCall)
+                                            val name = moduleAttributeName.substring(1)
+                                            if (isDocumentationName(name)) {
+                                                val noParenthesesOneArgument =
+                                                    atUnqualifiedNoParenthesesCall.noParenthesesOneArgument
                                                 foldingDescriptorList.add(
-                                                        FoldingDescriptor(
-                                                                rightOperand.node,
-                                                                rightOperand.textRange,
-                                                                null,
-                                                                "..."
-                                                        )
+                                                    FoldingDescriptor(
+                                                        noParenthesesOneArgument.node,
+                                                        noParenthesesOneArgument.textRange,
+                                                        null,
+                                                        "\"...\""
+                                                    )
                                                 )
+                                            } else if (isTypeName(name)) {
+                                                atUnqualifiedNoParenthesesCall
+                                                    .noParenthesesOneArgument
+                                                    .children
+                                                    .singleOrNull()
+                                                    ?.let { child ->
+                                                        if (child is Type) {
+                                                            val rightOperand: PsiElement? =
+                                                                Normalized.rightOperand(child)
+                                                            if (rightOperand != null) {
+                                                                foldingDescriptorList.add(
+                                                                    FoldingDescriptor(
+                                                                        rightOperand.node,
+                                                                        rightOperand.textRange,
+                                                                        null,
+                                                                        "..."
+                                                                    )
+                                                                )
+                                                            }
+                                                        }
+                                                    }
+                                            }
+                                            return true
+                                        }
+
+                                        private fun execute(call: Call): Boolean {
+                                            for (resolvedFunctionName in RESOLVED_FUNCTION_NAMES) {
+                                                if (call.isCalling(Module.KERNEL, resolvedFunctionName)) {
+                                                    if (isFirstInGroup(call, Module.KERNEL, resolvedFunctionName)) {
+                                                        call.finalArguments()?.firstOrNull()
+                                                            ?.let { firstFinalArgument ->
+                                                                val last = lastInGroup(
+                                                                    call,
+                                                                    Module.KERNEL,
+                                                                    resolvedFunctionName
+                                                                )
+                                                                val textRange = TextRange(
+                                                                    firstFinalArgument.textOffset,
+                                                                    last.textRange.endOffset
+                                                                )
+                                                                foldingDescriptorList.add(
+                                                                    FoldingDescriptor(
+                                                                        call.parent.node,
+                                                                        textRange,
+                                                                        null,
+                                                                        "..."
+                                                                    )
+                                                                )
+                                                            }
+
+                                                    }
+                                                }
+                                            }
+                                            return true
+                                        }
+
+                                        private fun execute(doBlock: ElixirDoBlock): Boolean {
+                                            foldingDescriptorList.add(FoldingDescriptor(doBlock, doBlock.textRange))
+                                            return true
+                                        }
+
+                                        private fun execute(stabOperation: ElixirStabOperation): Boolean {
+                                            val startOffset = stabOperation.operator().textOffset
+                                            val endOffset = stabOperation.textRange.endOffset
+                                            val textRange = TextRange(startOffset, endOffset)
+                                            foldingDescriptorList.add(FoldingDescriptor(stabOperation, textRange))
+                                            return true
+                                        }
+
+                                        private fun isFirstInGroup(
+                                            call: Call,
+                                            resolvedModuleName: String,
+                                            resolvedFunctionName: String
+                                        ): Boolean {
+                                            val previousSiblingExpression =
+                                                ElixirPsiImplUtil.previousSiblingExpression(call)
+
+                                            return if (previousSiblingExpression is Call) {
+                                                !previousSiblingExpression.isCalling(
+                                                    resolvedModuleName,
+                                                    resolvedFunctionName
+                                                )
+                                            } else {
+                                                true
                                             }
                                         }
-                                    }
-                        }
-                        return true
-                    }
 
-                    private fun execute(call: Call): Boolean {
-                        for (resolvedFunctionName in RESOLVED_FUNCTION_NAMES) {
-                            if (call.isCalling(Module.KERNEL, resolvedFunctionName)) {
-                                if (isFirstInGroup(call, Module.KERNEL, resolvedFunctionName)) {
-                                    call.finalArguments()?.firstOrNull()?.let { firstFinalArgument ->
-                                        val last = lastInGroup(call, Module.KERNEL, resolvedFunctionName)
-                                        val textRange = TextRange(
-                                                firstFinalArgument.textOffset,
-                                                last.textRange.endOffset
-                                        )
-                                        foldingDescriptorList.add(
-                                                FoldingDescriptor(
-                                                        call.parent.node,
-                                                        textRange,
-                                                        null,
-                                                        "..."
-                                                )
-                                        )
-                                    }
-
-                                }
-                            }
-                        }
-                        return true
-                    }
-
-                    private fun execute(doBlock: ElixirDoBlock): Boolean {
-                        foldingDescriptorList.add(FoldingDescriptor(doBlock, doBlock.textRange))
-                        return true
-                    }
-
-                    private fun execute(stabOperation: ElixirStabOperation): Boolean {
-                        val startOffset = stabOperation.operator().textOffset
-                        val endOffset = stabOperation.textRange.endOffset
-                        val textRange = TextRange(startOffset, endOffset)
-                        foldingDescriptorList.add(FoldingDescriptor(stabOperation, textRange))
-                        return true
-                    }
-
-                    private fun isFirstInGroup(call: Call,
-                                               resolvedModuleName: String,
-                                               resolvedFunctionName: String): Boolean {
-                        val previousSiblingExpression = ElixirPsiImplUtil.previousSiblingExpression(call)
-
-                        return if (previousSiblingExpression is Call) {
-                            !previousSiblingExpression.isCalling(resolvedModuleName, resolvedFunctionName)
-                        } else {
-                            true
-                        }
-                    }
-
-                    private fun lastInGroup(first: Call,
+                                        private fun lastInGroup(
+                                            first: Call,
                                             resolvedModuleName: String,
-                                            resolvedFunctionName: String): Call {
-                        var last = first
-                        while (true) {
-                            val nextSibling = last.siblingExpression(ElixirPsiImplUtil.NEXT_SIBLING)
-                            if (nextSibling is Call && nextSibling.isCalling(resolvedModuleName, resolvedFunctionName)) {
-                                last = nextSibling
-                                continue
-                            }
-                            break
-                        }
-                        return last
-                    }
+                                            resolvedFunctionName: String
+                                        ): Call {
+                                            var last = first
+                                            while (true) {
+                                                val nextSibling = last.siblingExpression(ElixirPsiImplUtil.NEXT_SIBLING)
+                                                if (nextSibling is Call && nextSibling.isCalling(
+                                                        resolvedModuleName,
+                                                        resolvedFunctionName
+                                                    )
+                                                ) {
+                                                    last = nextSibling
+                                                    continue
+                                                }
+                                                break
+                                            }
+                                            return last
+                                        }
 
-                    private fun slowExecute(atNonNumericOperation: AtOperation): Boolean =
-                            atNonNumericOperation
-                                    .reference
-                                    ?.let { slowExecute(atNonNumericOperation, it) }
-                                    ?: true
+                                        private fun slowExecute(atNonNumericOperation: AtOperation): Boolean =
+                                            atNonNumericOperation
+                                                .reference
+                                                ?.let { slowExecute(atNonNumericOperation, it) }
+                                                ?: true
 
-                    private fun slowExecute(
-                            atNonNumericOperation: AtOperation,
-                            atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>
-                    ): Boolean = slowExecute(
-                            atNonNumericOperation,
-                            atUnqualifiedNoParenthesesCall,
-                            atUnqualifiedNoParenthesesCall.noParenthesesOneArgument.text
-                    )
-
-                    private fun slowExecute(atNonNumericOperation: AtOperation,
-                                            target: PsiElement): Boolean =
-                            when (target) {
-                                is AtUnqualifiedNoParenthesesCall<*> -> {
-                                    slowExecute(
+                                        private fun slowExecute(
+                                            atNonNumericOperation: AtOperation,
+                                            atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>
+                                        ): Boolean = slowExecute(
                                             atNonNumericOperation,
-                                            target
-                                    )
-                                }
-                                is QualifiableAlias -> {
-                                    slowExecute(
-                                            atNonNumericOperation,
-                                            target
-                                    )
-                                }
-                                else -> {
-                                    true
-                                }
-                            }
+                                            atUnqualifiedNoParenthesesCall,
+                                            atUnqualifiedNoParenthesesCall.noParenthesesOneArgument.text
+                                        )
 
-                    private fun slowExecute(atNonNumericOperation: AtOperation,
-                                            reference: PsiReference): Boolean =
-                            reference
-                                    .resolve()
-                                    ?.let { slowExecute(atNonNumericOperation, it) }
-                                    ?: true
+                                        private fun slowExecute(
+                                            atNonNumericOperation: AtOperation,
+                                            target: PsiElement
+                                        ): Boolean =
+                                            when (target) {
+                                                is AtUnqualifiedNoParenthesesCall<*> -> {
+                                                    slowExecute(
+                                                        atNonNumericOperation,
+                                                        target
+                                                    )
+                                                }
+                                                is QualifiableAlias -> {
+                                                    slowExecute(
+                                                        atNonNumericOperation,
+                                                        target
+                                                    )
+                                                }
+                                                else -> {
+                                                    true
+                                                }
+                                            }
 
-                    private fun slowExecute(atNonNumericOperation: AtOperation,
-                                            qualifiableAlias: QualifiableAlias): Boolean =
-                            slowExecute(atNonNumericOperation, qualifiableAlias, qualifiableAlias.name)
+                                        private fun slowExecute(
+                                            atNonNumericOperation: AtOperation,
+                                            reference: PsiReference
+                                        ): Boolean =
+                                            reference
+                                                .resolve()
+                                                ?.let { slowExecute(atNonNumericOperation, it) }
+                                                ?: true
 
-                    private fun slowExecute(atNonNumericOperation: AtOperation,
+                                        private fun slowExecute(
+                                            atNonNumericOperation: AtOperation,
+                                            qualifiableAlias: QualifiableAlias
+                                        ): Boolean =
+                                            slowExecute(atNonNumericOperation, qualifiableAlias, qualifiableAlias.name)
+
+                                        private fun slowExecute(
+                                            atNonNumericOperation: AtOperation,
                                             element: PsiElement,
-                                            placeHolderText: String?): Boolean {
-                        val moduleAttributeName = atNonNumericOperation.moduleAttributeName()
-                        val foldingGroup = foldingGroupByModuleAttributeName.computeIfAbsent(moduleAttributeName) { debugName: String? -> FoldingGroup.newGroup(debugName) }
-                        foldingDescriptorList.add(
-                                object : FoldingDescriptor(
-                                        atNonNumericOperation.node,
-                                        atNonNumericOperation.textRange,
-                                        foldingGroup, setOf<Any>(element)) {
-                                    override fun getPlaceholderText(): String? {
-                                        return placeHolderText
+                                            placeHolderText: String?
+                                        ): Boolean {
+                                            val moduleAttributeName = atNonNumericOperation.moduleAttributeName()
+                                            val foldingGroup =
+                                                foldingGroupByModuleAttributeName.computeIfAbsent(moduleAttributeName) { debugName: String? ->
+                                                    FoldingGroup.newGroup(debugName)
+                                                }
+                                            foldingDescriptorList.add(
+                                                object : FoldingDescriptor(
+                                                    atNonNumericOperation.node,
+                                                    atNonNumericOperation.textRange,
+                                                    foldingGroup, setOf<Any>(element)
+                                                ) {
+                                                    override fun getPlaceholderText(): String? {
+                                                        return placeHolderText
+                                                    }
+                                                }
+                                            )
+                                            return true
+                                        }
                                     }
-                                }
-                        )
-                        return true
-                    }
-                }
         )
         return foldingDescriptorList.toTypedArray()
     }
@@ -253,17 +285,17 @@ class Builder : FoldingBuilderEx() {
      * @return the placeholder text.
      */
     override fun getPlaceholderText(node: ASTNode): String? =
-            when (node.psi) {
-                is ElixirDoBlock -> {
-                    "do: ..."
-                }
-                is ElixirStabOperation -> {
-                    "-> ..."
-                }
-                else -> {
-                    null
-                }
+        when (node.psi) {
+            is ElixirDoBlock -> {
+                "do: ..."
             }
+            is ElixirStabOperation -> {
+                "-> ..."
+            }
+            else -> {
+                null
+            }
+        }
 
     /**
      * Returns the default collapsed state for the folding region related to the specified node.
@@ -280,8 +312,8 @@ class Builder : FoldingBuilderEx() {
                 RESOLVED_FUNCTION_NAMES.any { resolvedFunctionName ->
                     child.isCalling(Module.KERNEL, resolvedFunctionName) &&
                             ElixirFoldingSettings
-                                    .getInstance()
-                                    .isCollapseElixirModuleDirectiveGroups
+                                .getInstance()
+                                .isCollapseElixirModuleDirectiveGroups
                 }
             }
         }

@@ -1,6 +1,5 @@
 package org.elixir_lang.formatter.settings;
 
-import com.intellij.openapi.options.Configurable;
 import com.intellij.psi.codeStyle.CodeStyleSettings;
 import com.intellij.psi.codeStyle.CustomCodeStyleSettings;
 import org.elixir_lang.ElixirLanguage;
@@ -16,8 +15,8 @@ public class CodeStyleSettingsProvider extends com.intellij.psi.codeStyle.CodeSt
 
     @NotNull
     @Override
-    public Configurable createSettingsPage(CodeStyleSettings settings, CodeStyleSettings originalSettings) {
-        return new CodeStyleConfigurable(settings, originalSettings);
+    public com.intellij.psi.codeStyle.CodeStyleConfigurable createConfigurable(@NotNull CodeStyleSettings settings, @NotNull CodeStyleSettings modelSettings) {
+        return new CodeStyleConfigurable(settings, modelSettings);
     }
 
     /**

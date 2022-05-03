@@ -10,15 +10,11 @@ import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.execution.runners.ProgramRunner
 import com.intellij.execution.ui.ConsoleView
-import com.intellij.notification.Notification
-import com.intellij.notification.NotificationType
-import com.intellij.notification.Notifications
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.projectRoots.Sdk
 import org.elixir_lang.console.ElixirConsoleUtil
-import org.elixir_lang.sdk.elixir.Type.Companion.mostSpecificSdk
-import org.elixir_lang.notification.setup_sdk.Listener
 import org.elixir_lang.notification.setup_sdk.Notifier
+import org.elixir_lang.sdk.elixir.Type.Companion.mostSpecificSdk
 
 fun ensureMostSpecificSdk(module: Module): Sdk = mostSpecificSdk(module) ?: throw MissingSdk(module)
 
@@ -26,7 +22,7 @@ fun ensureMostSpecificSdk(module: Module): Sdk = mostSpecificSdk(module) ?: thro
  * https://github.com/ignatov/intellij-erlang/blob/master/src/org/intellij/erlang/rebar/runner/RebarRunningState.java
  */
 class State(environment: ExecutionEnvironment, private val configuration: Configuration) :
-        CommandLineState(environment) {
+    CommandLineState(environment) {
     @Throws(ExecutionException::class)
     override fun execute(executor: Executor, runner: ProgramRunner<*>): ExecutionResult {
         val consoleBuilder = object : TextConsoleBuilderImpl(configuration.project) {

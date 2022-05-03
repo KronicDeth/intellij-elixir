@@ -343,7 +343,6 @@ class BeamFileImpl private constructor(
      *
      * @return a single-element array containing `this`
      */
-    @Deprecated("Use {@link FileViewProvider#getAllFiles()} instead.")
     override fun getPsiRoots(): Array<PsiFile> = arrayOf(this)
 
     override fun getViewProvider(): FileViewProvider = fileViewProvider

@@ -17,15 +17,12 @@
 package org.elixir_lang.jps.builder;
 
 import com.intellij.execution.CommandLineUtil;
-import com.intellij.ide.IdeBundle;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.UserDataHolder;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.EnvironmentUtil;
-import com.intellij.util.PlatformUtils;
-import com.intellij.util.text.CaseInsensitiveStringHashingStrategy;
 import gnu.trove.THashMap;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -33,7 +30,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * OS-independent way of executing external processes with complex parameters.
@@ -52,7 +52,8 @@ public class GeneralCommandLine implements UserDataHolder {
     private final ParametersList myProgramParams = new ParametersList();
     private Map<Object, Object> myUserData = null;
 
-    public GeneralCommandLine() { }
+    public GeneralCommandLine() {
+    }
 
     @SuppressWarnings("unused")
     public String getExePath() {
@@ -110,8 +111,7 @@ public class GeneralCommandLine implements UserDataHolder {
      */
     @NotNull
     public Map<String, String> getParentEnvironment() {
-        return PlatformUtils.isAppCode() ? System.getenv() // Temporarily fix for OC-8606
-                : EnvironmentUtil.getEnvironmentMap();
+        return EnvironmentUtil.getEnvironmentMap();
     }
 
     public void addParameters(final String... parameters) {
@@ -160,11 +160,9 @@ public class GeneralCommandLine implements UserDataHolder {
         final List<String> commands = new ArrayList<String>();
         if (exeName != null) {
             commands.add(exeName);
-        }
-        else if (myExePath != null) {
+        } else if (myExePath != null) {
             commands.add(myExePath);
-        }
-        else {
+        } else {
             commands.add("<null>");
         }
         commands.addAll(myProgramParams.getList());
@@ -187,16 +185,14 @@ public class GeneralCommandLine implements UserDataHolder {
             }
 
             commands = CommandLineUtil.toCommandLine(myExePath, myProgramParams.getList());
-        }
-        catch (ExecutionException e) {
+        } catch (ExecutionException e) {
             LOG.info(e);
             throw e;
         }
 
         try {
             return startProcess(commands);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             LOG.info(e);
             throw new ProcessNotCreatedException(e.getMessage(), e, this);
         }
@@ -230,13 +226,12 @@ public class GeneralCommandLine implements UserDataHolder {
 
         if (!myEnvParams.isEmpty()) {
             if (SystemInfo.isWindows) {
-                THashMap<String, String> envVars = new THashMap<String, String>(CaseInsensitiveStringHashingStrategy.INSTANCE);
+                Map<String, String> envVars = com.intellij.util.containers.CollectionFactory.createCaseInsensitiveStringMap();
                 envVars.putAll(environment);
                 envVars.putAll(myEnvParams);
                 environment.clear();
                 environment.putAll(envVars);
-            }
-            else {
+            } else {
                 environment.putAll(myEnvParams);
             }
         }
@@ -250,7 +245,7 @@ public class GeneralCommandLine implements UserDataHolder {
     @Override
     public <T> T getUserData(@NotNull final Key<T> key) {
         if (myUserData != null) {
-            @SuppressWarnings({"UnnecessaryLocalVariable", "unchecked"}) final T t = (T)myUserData.get(key);
+            @SuppressWarnings({"UnnecessaryLocalVariable", "unchecked"}) final T t = (T) myUserData.get(key);
             return t;
         }
         return null;

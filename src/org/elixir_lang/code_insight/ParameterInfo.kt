@@ -1,6 +1,5 @@
 package org.elixir_lang.code_insight
 
-import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.lang.parameterInfo.*
 import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.util.PsiTreeUtil
@@ -13,13 +12,11 @@ import org.elixir_lang.structure_view.element.CallDefinitionHead
 import java.util.Collections.singletonList
 
 class ParameterInfo : ParameterInfoHandler<Arguments, Any> {
-    override fun couldShowInLookup(): Boolean = true
-
     override fun findElementForParameterInfo(context: CreateParameterInfoContext): Arguments? =
-            findArguments(context)
+        findArguments(context)
 
     override fun findElementForUpdatingParameterInfo(context: UpdateParameterInfoContext): Arguments? =
-            findArguments(context)
+        findArguments(context)
 
     override fun showParameterInfo(element: Arguments, context: CreateParameterInfoContext) {
         PsiTreeUtil.getParentOfType(element, Call::class.java)?.let { call ->
@@ -53,7 +50,13 @@ class ParameterInfo : ParameterInfoHandler<Arguments, Any> {
     }
 
     override fun updateParameterInfo(parameterOwner: Arguments, context: UpdateParameterInfoContext) {
-        context.setCurrentParameter(ParameterInfoUtils.getCurrentParameterIndex(parameterOwner.node, context.offset, ElixirTypes.COMMA))
+        context.setCurrentParameter(
+            ParameterInfoUtils.getCurrentParameterIndex(
+                parameterOwner.node,
+                context.offset,
+                ElixirTypes.COMMA
+            )
+        )
     }
 
     override fun updateUI(p: Any?, context: ParameterInfoUIContext) {
@@ -105,14 +108,11 @@ class ParameterInfo : ParameterInfoHandler<Arguments, Any> {
                 stringBuilder.append("<no parameters>")
             }
 
-            context.setupUIComponentPresentation(stringBuilder.toString(), start, end, disabled, false, true,
-                    context.defaultParameterColor)
+            context.setupUIComponentPresentation(
+                stringBuilder.toString(), start, end, disabled, false, true,
+                context.defaultParameterColor
+            )
         }
-    }
-
-
-    override fun getParametersForLookup(item: LookupElement?, context: ParameterInfoContext?): Array<Any>? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     private fun findArguments(context: ParameterInfoContext): Arguments? {

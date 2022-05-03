@@ -1,19 +1,18 @@
 package org.elixir_lang.folding;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * @see <a href="https://github.com/JetBrains/intellij-community/blob/22ad327271fbf0953803463ab132ba8253c1b496/python/src/com/jetbrains/python/PythonFoldingSettings.java">com.jetbrains.python.PythonFoldingSettings</a>
  */
 @State(
-  name = "ElixirFoldingSettings",
-  storages = @Storage(value = "editor.codeinsight.xml")
+        name = "ElixirFoldingSettings",
+        storages = @Storage(value = "editor.codeinsight.xml")
 )
 public class ElixirFoldingSettings implements PersistentStateComponent<ElixirFoldingSettings> {
     /*
@@ -30,11 +29,11 @@ public class ElixirFoldingSettings implements PersistentStateComponent<ElixirFol
 
     @NotNull
     public static ElixirFoldingSettings getInstance() {
-        return ServiceManager.getService(ElixirFoldingSettings.class);
+        return ApplicationManager.getApplication().getService(ElixirFoldingSettings.class);
     }
 
     @Override
-    public void loadState(ElixirFoldingSettings state) {
+    public void loadState(@NotNull ElixirFoldingSettings state) {
         XmlSerializerUtil.copyBean(state, this);
     }
 

@@ -1,11 +1,10 @@
 package org.elixir_lang.mix.project
 
+import com.intellij.configurationStore.StoreUtil
 import com.intellij.facet.FacetManager
 import com.intellij.facet.FacetType
 import com.intellij.facet.impl.FacetUtil.addFacet
-import com.intellij.openapi.components.ComponentManager
-import com.intellij.openapi.components.impl.stores.IComponentStore
-import com.intellij.openapi.components.stateStore
+import com.intellij.ide.impl.OpenProjectTask
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.progress.ProgressIndicator
@@ -107,15 +106,24 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
         return if (projectDir.exists()) {
             null
         } else {
-            val projectManager = ProjectManagerEx.getInstanceEx()
+            val path = otpApp.root.path.let { Paths.get(it) }
 
-            projectManager.newProject(otpApp.name, otpApp.root.path, false, false)?.let { project ->
-                runDirectoryProjectConfigurators(Paths.get(otpApp.root.path), project, false)
+            ProjectManagerEx
+                .getInstanceEx()
+                .newProject(
+                    path, OpenProjectTask(
+                        isNewProject = true,
+                        useDefaultProjectAsTemplate = false,
+                        projectName = otpApp.name
+                    )
+                )
+                ?.let { project ->
+                    runDirectoryProjectConfigurators(path, project, false)
 
-                saveSettings(project)
+                    StoreUtil.saveSettings(project, true)
 
-                project
-            }
+                    project
+                }
         }
     }
 
@@ -123,25 +131,6 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
         for (processor in ProjectAttachProcessor.EP_NAME.extensionList) {
             if (processor.attachToProject(project, baseDir, null)) {
                 break
-            }
-        }
-    }
-
-    companion object {
-        fun saveSettings(project: Project) {
-            try {
-                val storeUtil = Class.forName("com.intellij.configurationStore.StoreUtil")
-                storeUtil
-                    .getDeclaredMethod("saveSettings", ComponentManager::class.java, Boolean::class.javaPrimitiveType)
-                    .invoke(null, project, true)
-            } catch (_: ClassNotFoundException) {
-                val storeUtil = Class.forName("com.intellij.openapi.components.impl.stores.StoreUtil")
-                storeUtil.getDeclaredMethod(
-                    "save",
-                    IComponentStore::class.java,
-                    Project::class.java,
-                    Boolean::class.javaPrimitiveType
-                ).invoke(null, project.stateStore, project, true)
             }
         }
     }

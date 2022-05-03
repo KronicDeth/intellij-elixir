@@ -10,15 +10,11 @@ import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.execution.runners.ProgramRunner
 import com.intellij.execution.ui.ConsoleView
-import com.intellij.notification.Notification
-import com.intellij.notification.NotificationType
-import com.intellij.notification.Notifications
 import org.elixir_lang.console.ElixirConsoleUtil
-import org.elixir_lang.notification.setup_sdk.Listener
 import org.elixir_lang.notification.setup_sdk.Notifier
 
 class State(environment: ExecutionEnvironment, private val configuration: Configuration) :
-        CommandLineState(environment) {
+    CommandLineState(environment) {
     @Throws(ExecutionException::class)
     override fun execute(executor: Executor, runner: ProgramRunner<*>): ExecutionResult {
         val consoleBuilder = object : TextConsoleBuilderImpl(configuration.project) {

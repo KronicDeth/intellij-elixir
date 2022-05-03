@@ -35,11 +35,18 @@ class Watcher(private val project: Project) : BulkFileListener {
     private fun contentsChanged(event: VFileContentChangeEvent) {
         if (event.file.name == PackageManager.fileName) {
             ModuleUtil.findModuleForFile(event.file, project)?.let { module ->
-                if (event.file.parent == module.moduleFile?.parent) {
+                val eventFileParent = event.file.parent
+                val shouldSync =
+                    ModuleRootManager
+                        .getInstance(module)
+                        .contentRoots
+                        .any { contentRoot -> contentRoot == eventFileParent }
+
+                if (shouldSync) {
                     ProgressManager.getInstance().run(object : Task.Backgroundable(
-                            project,
-                            "Syncing Libraries for ${module.name} Module",
-                            true
+                        project,
+                        "Syncing Libraries for ${module.name} Module",
+                        true
                     ) {
                         override fun run(indicator: ProgressIndicator) {
                             syncLibraries(module, indicator)
@@ -52,10 +59,10 @@ class Watcher(private val project: Project) : BulkFileListener {
 
     fun syncLibraries(module: Module, progressIndicator: ProgressIndicator) {
         ModuleRootManager
-                .getInstance(module)
-                .contentRoots
-                .let { transitiveResolution(project, PsiManager.getInstance(project), progressIndicator, *it) }
-                .let { deps -> syncLibraries(module, deps, progressIndicator) }
+            .getInstance(module)
+            .contentRoots
+            .let { transitiveResolution(project, PsiManager.getInstance(project), progressIndicator, *it) }
+            .let { deps -> syncLibraries(module, deps, progressIndicator) }
     }
 
     private fun syncLibraries(module: Module, deps: Collection<Dep>, progressIndicator: ProgressIndicator) {
@@ -75,7 +82,8 @@ class Watcher(private val project: Project) : BulkFileListener {
 
                         when (dep.type) {
                             Dep.Type.MODULE -> {
-                                progressIndicator.text2 = "Adding $depName Module as dependency of ${module.name} Module"
+                                progressIndicator.text2 =
+                                    "Adding $depName Module as dependency of ${module.name} Module"
 
                                 val depModule = moduleManager.findModuleByName(depName)
 
@@ -91,7 +99,8 @@ class Watcher(private val project: Project) : BulkFileListener {
                                 }
                             }
                             Dep.Type.LIBRARY -> {
-                                progressIndicator.text2 = "Adding $depName Library as dependency of ${module.name} Module"
+                                progressIndicator.text2 =
+                                    "Adding $depName Library as dependency of ${module.name} Module"
 
                                 val depLibrary = libraryTable.getLibraryByName(depName)
 
@@ -134,19 +143,23 @@ class Watcher(private val project: Project) : BulkFileListener {
     }
 }
 
-private fun Collection<Dep>.externalPaths(project: Project, projectRootManager: ProjectRootManager): Array<VirtualFile> {
+private fun Collection<Dep>.externalPaths(
+    project: Project,
+    projectRootManager: ProjectRootManager
+): Array<VirtualFile> {
     val projectFileIndex = projectRootManager.fileIndex
 
     return this.mapNotNull { it.externalPath(project, projectFileIndex) }.toTypedArray()
 }
 
 private fun Dep.externalPath(project: Project, projectFileIndex: ProjectFileIndex): VirtualFile? =
-        virtualFile(project)?.let { virtualFile ->
-            if (projectFileIndex.getContentRootForFile(virtualFile) == null &&
-                    !projectFileIndex.isInLibrary(virtualFile) &&
-                    !projectFileIndex.isExcluded(virtualFile)) {
-                virtualFile
-            } else {
-                null
-            }
+    virtualFile(project)?.let { virtualFile ->
+        if (projectFileIndex.getContentRootForFile(virtualFile) == null &&
+            !projectFileIndex.isInLibrary(virtualFile) &&
+            !projectFileIndex.isExcluded(virtualFile)
+        ) {
+            virtualFile
+        } else {
+            null
         }
+    }

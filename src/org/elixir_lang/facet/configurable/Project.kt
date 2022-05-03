@@ -5,6 +5,7 @@ import com.intellij.facet.FacetManager
 import com.intellij.facet.FacetType
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.module.Module
+import com.intellij.openapi.module.ModuleType
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.roots.ModuleRootModificationUtil
@@ -12,14 +13,13 @@ import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
 import org.elixir_lang.Facet
 import org.elixir_lang.facet.Configurable
 import org.elixir_lang.facet.Type
+import org.elixir_lang.module.ElixirModuleType
 
 class Project(project: Project) : ModuleAwareProjectConfigurable<Configurable>(project, "Elixir", null) {
-    override fun isSuitableForModule(module: Module): Boolean {
-        @Suppress("DEPRECATION")
-        return !module.getOptionValue(Module.ELEMENT_TYPE).equals("ELIXIR_MODULE")
-    }
+    override fun isSuitableForModule(module: Module): Boolean =
+        !ModuleType.`is`(module, ElixirModuleType.getInstance())
 
-    override fun createModuleConfigurable(module: com.intellij.openapi.module.Module): Configurable {
+    override fun createModuleConfigurable(module: Module): Configurable {
         return object : Configurable(module) {
             override fun applySdk(sdk: Sdk?) {
                 val facetManager = FacetManager.getInstance(module)

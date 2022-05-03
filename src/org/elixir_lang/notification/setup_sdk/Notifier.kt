@@ -36,9 +36,7 @@ object Notifier {
                 "$content<br><a href='configure'>Configure</a></br>",
                 NotificationType.ERROR
             )
-            .setListener(
-                Listener(project, module)
-            )
+            .addAction(Action(project, module))
             .notify(project);
     }
 }

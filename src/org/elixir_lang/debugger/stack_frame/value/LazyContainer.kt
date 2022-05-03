@@ -10,7 +10,8 @@ interface LazyContainer {
 }
 
 fun computeChildren(lazyContainer: LazyContainer, node: XCompositeNode) {
-    val nextNextChildIndexToCompute = Math.min(lazyContainer.nextChildIndexToCompute + XCompositeNode.MAX_CHILDREN_TO_SHOW, lazyContainer.childCount)
+    val nextNextChildIndexToCompute =
+        Math.min(lazyContainer.nextChildIndexToCompute + XCompositeNode.MAX_CHILDREN_TO_SHOW, lazyContainer.childCount)
     val children = XValueChildrenList(nextNextChildIndexToCompute - lazyContainer.nextChildIndexToCompute)
 
     for (i in lazyContainer.nextChildIndexToCompute until nextNextChildIndexToCompute) {
@@ -24,6 +25,8 @@ fun computeChildren(lazyContainer: LazyContainer, node: XCompositeNode) {
     node.addChildren(children, computedAllChildren)
 
     if (!computedAllChildren) {
-        node.tooManyChildren(lazyContainer.childCount - lazyContainer.nextChildIndexToCompute)
+        node.tooManyChildren(lazyContainer.childCount - lazyContainer.nextChildIndexToCompute) {
+            computeChildren(lazyContainer, node)
+        }
     }
 }
