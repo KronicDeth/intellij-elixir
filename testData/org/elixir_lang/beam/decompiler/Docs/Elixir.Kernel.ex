@@ -3972,7 +3972,7 @@ defmodule Kernel do
 
   """
   def node() do
-    :erlang.node()
+    Node.self()
   end
 
   @doc ~S"""
@@ -3984,7 +3984,7 @@ defmodule Kernel do
 
   """
   def node(arg) do
-    node(arg)
+    :erlang.node(arg)
   end
 
   @doc ~S"""
